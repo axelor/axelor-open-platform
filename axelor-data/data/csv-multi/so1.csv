@@ -1,0 +1,3 @@
+firstName,lastName,email,product,quantity,price,tax
+tin,teen,tin.teen@gmail.com,PC1,1,200.12,vat0.4|stx
+tin,teen,tin.teen@gmail.com,PC2,1,250.50,vat0.4|stx

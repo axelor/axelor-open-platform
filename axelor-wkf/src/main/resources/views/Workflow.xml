@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.6.xsd">
+ 
+<!-- SELECTS -->
+    
+    <selection name="node.type.selection">
+		<option value="start">Start</option>
+		<option value="intermediary">Intermediary</option>
+		<option value="stop">Stop</option>
+	</selection>
+    
+    <selection name="end.node.logic.operator.selection">
+		<option value="or">OR</option>
+		<option value="xor">XOR</option>
+	</selection>
+    
+    <selection name="start.node.logic.operator.selection">
+		<option value="and">AND</option>
+		<option value="or">OR</option>
+		<option value="xor">XOR</option>
+	</selection>
+
+<!-- VIEWS -->
+    
+    <grid name="worfklow-grid" title="Workflows" model="com.axelor.wkf.db.Workflow">
+        <field name="name"/>
+        <field name="metaModel"/>
+        <field name="node"/>
+        <field name="maxNodeCounter"/>
+    </grid>
+    
+    <form name="worfklow-form" title="Workflow" cols="4" model="com.axelor.wkf.db.Workflow" onSave="wkf-validate">
+        <field name="name"/>
+        <field name="metaModel"/>
+        <field name="maxNodeCounter"/>
+        <field name="node" form-view="start-node-form"/>
+        <separator colSpan="4"/>
+        <button name="run" title="Run" onClick="save,wkf-method-run" colSpan="2"/>
+        <button name="openInstances" title="Show instances" onClick="save,wkf-method-open-instances" colSpan="2"/>
+    </form>
+    
+    <grid name="node-grid" title="Nodes" model="com.axelor.wkf.db.Node">
+        <field name="name"/>
+    	<field name="workflow"/>
+        <field name="type"/>
+        <field name="action"/>
+    </grid>
+    
+    <form name="node-form" title="Node" cols="4" model="com.axelor.wkf.db.Node"
+    onLoad="node-type-attrs"
+    onNew="node-default-record,node-type-attrs">
+        <field name="name"/>
+    	<field name="workflow"/>
+        <field name="type" onChange="node-type-attrs" required="true"/>
+        <field name="action"/>
+        <group name="startGroup" colSpan="2" cols="2">
+	        <field name="startLogicOperator" />
+	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form"/>
+        </group>
+        <group name="endGroup" colSpan="2" cols="2">
+	        <field name="endLogicOperator" />
+	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form"/>
+        </group>
+    </form>
+    
+    <form name="start-node-form" title="Node" cols="6" model="com.axelor.wkf.db.Node" onNew="node-start-default-record">
+        <field name="name"/>
+    	<field name="workflow"/>
+        <field name="action"/>
+        <field name="type" hidden="true"/>
+        <group name="endGroup" colSpan="6" cols="2">
+	        <field name="endLogicOperator" />
+	        <field name="endTransitions" colSpan="6" grid-view="end-transition-grid" form-view="end-transition-form"/>
+        </group>
+    </form>
+    
+    <grid name="transition-grid" title="Transitions" model="com.axelor.wkf.db.Transition">
+        <field name="sequence"/>
+        <field name="name"/>
+        <field name="startNode"/>
+        <field name="condition"/>
+        <field name="nextNode"/>
+    </grid>
+    
+    <form name="transition-form" title="Transition" cols="4" model="com.axelor.wkf.db.Transition">
+        <field name="sequence"/>
+        <field name="name"/>
+        <field name="startNode" summary-view="node-form" form-view="node-form" edit-window="self"/>
+        <field name="nextNode" summary-view="node-form" form-view="node-form" edit-window="self" domain="self.type != 'start'"/>
+        <field name="condition" colSpan="4"/>
+    </form>
+    
+    <grid name="start-transition-grid" title="Transitions" model="com.axelor.wkf.db.Transition">
+        <field name="sequence"/>
+        <field name="name"/>
+        <field name="startNode"/>
+        <field name="condition"/>
+    </grid>
+    
+    <form name="start-transition-form" title="Transition" cols="6" model="com.axelor.wkf.db.Transition">
+        <field name="sequence"/>
+        <field name="name"/>
+        <field name="startNode" summary-view="node-form" form-view="node-form" edit-window="self"/>
+        <field name="condition" colSpan="6"/>
+    </form>
+    
+    <grid name="end-transition-grid" title="Transitions" model="com.axelor.wkf.db.Transition">
+        <field name="sequence"/>
+        <field name="name"/>
+        <field name="nextNode"/>
+        <field name="condition"/>
+    </grid>
+    
+    <form name="end-transition-form" title="Transition" cols="6" model="com.axelor.wkf.db.Transition">
+        <field name="sequence"/>
+        <field name="name"/>
+        <field name="nextNode" summary-view="node-form" form-view="node-form" edit-window="self" domain="self.type != 'start'"/>
+        <field name="condition" colSpan="6"/>
+    </form>
+    
+<!-- ACTION -->
+
+	<action-validate name="wkf-validate">
+		<error message="Can't save workflow without start node" if="!node"/>
+	</action-validate>
+    
+    <action-record name="node-start-default-record" model="com.axelor.wkf.db.Node">
+    	<field name="type" expr="start"/>
+    	<field name="workflow" expr="eval: _parent"/>
+    </action-record>
+    
+    <action-record name="node-default-record" model="com.axelor.wkf.db.Node">
+    	<field name="workflow" expr="eval: _parent?.startNode?.workflow" if="_parent?.startNode"/>
+    	<field name="workflow" expr="eval: _parent?._parent?.workflow" if="_parent?._parent"/>
+    </action-record>
+    
+    <action-attrs name="node-type-attrs">
+    	<attribute name="hidden" for="startGroup" expr="eval: type == 'start'" />
+    	<attribute name="hidden" for="endGroup" expr="eval: type == 'stop'" />
+    </action-attrs>
+    
+    <action-method name="wkf-method-open-instances">
+    	<call class="com.axelor.wkf.web.WkfController" method="openInstances"/>
+    </action-method>
+    
+    <action-method name="wkf-method-run">
+    	<call class="com.axelor.wkf.web.WkfController" method="run"/>
+    </action-method>
+    
+</object-views>

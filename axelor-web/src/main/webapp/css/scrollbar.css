@@ -1,0 +1,28 @@
+.webkit-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background-color: #fff;
+}
+
+.webkit-scrollbar::-webkit-scrollbar:hover {
+	opacity: 0;
+    background-color: #eee;
+    box-shadow: inset 1px 1px 0 rgba(0,0,0,.1), inset -1px -1px 0 rgba(0,0,0,.07);
+}
+
+.webkit-scrollbar::-webkit-resizer {
+    background-color: #666;
+}
+
+.webkit-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, .2);
+    box-shadow: inset 1px 1px 0 rgba(0,0,0,.1), inset -1px -1px 0 rgba(0,0,0,.07);
+}
+
+.webkit-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #bbb;
+}
+
+.webkit-scrollbar::-webkit-scrollbar-thumb:active {
+    background-color: #888;
+}

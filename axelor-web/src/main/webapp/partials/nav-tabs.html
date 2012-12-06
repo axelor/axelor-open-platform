@@ -1,0 +1,20 @@
+<div class="navigation-tabs">
+  <div class="nav-tabs-wrap">
+	<div class="nav-tabs-scroll-l"><a href="#"><i class="icon-chevron-left"></i></a></div>
+	<div class="nav-tabs-scroll-r"><a href="#"><i class="icon-chevron-right"></i></a></div>
+	<div class="nav-tabs-strip">
+	<ul class="nav nav-tabs nav-tabs-scrollable nav-tabs-closable">
+	 <li ng-repeat="tab in tabs" ng-class="{ active: tab.selected }">
+	   <a href="" ng-click="navClick(tab)">{{tab.title}}</a>
+	   <i class="icon-remove-sign" ng-click="closeTab(tab)"></i>
+	 </li>
+	</ul>
+	</div>
+  </div>
+  <div class="view-content">
+    <div class="view-pane" ng-show="tab.selected" ng-repeat="tab in tabs" ng-controller="ViewCtrl">
+    	<div class="view-container" ng-show="selectedTab.viewType == view.type" ng-repeat="view in tab.views"
+    		ng-include src="'partials/views/'+ view.type +'.html'"></div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,25 @@
+<div class="form-view" ng-controller="FormViewCtrl">
+	<div class="record-toolbar btn-toolbar">
+	  <div class="btn-group">
+	    <button class="btn" ng-click="onNew()" ng-show="hasButton('new')"><i class="icon icon-file"></i> <span x-translate>New</span></button>
+	    <button class="btn" ng-click="onSave()" ng-show="hasButton('save')" ng-disabled="!canSave()"><i class="icon icon-save"></i> <span x-translate>Save</span></button>
+	    <button class="btn" ng-click="onCopy()" ng-show="hasButton('copy')" ng-disabled="!canCopy()"><i class="icon icon-copy"></i> <span x-translate>Copy</span></button>
+	    <button class="btn" ng-click="onCancel()" ng-show="hasButton('cancel')"><i class="icon icon-ban-circle"></i> <span x-translate>Cancel</span></button>
+	  </div>
+	  <div class="btn-group">
+	    <button class="btn" ng-click="onRefresh()" ng-show="hasButton('refresh')"><i class="icon icon-refresh"></i> <span x-translate>Refresh</span></button>
+	    <button class="btn" ng-click="onSearch()" ng-show="hasButton('search')"><i class="icon icon-search"></i> <span x-translate>Search</span></button>
+	  </div>
+	  <div class="btn-group" ng-show="toolbar">
+	  	<button ng-repeat="btn in toolbar" class="btn" ui-tool-button="btn">{{btn.title}}</button>
+	  </div>
+	  <div class="record-pager pull-right">
+	    <span>{{pagerText()}}</span>
+	    <div class="btn-group">
+	      <button class="btn" ng-disabled="!canPrev()" ng-click="onPrev()"><i class="icon-chevron-left"></i></button>
+	      <button class="btn" ng-disabled="!canNext()" ng-click="onNext()"><i class="icon-chevron-right"></i></button>
+	    </div>
+	  </div>
+	</div><!--/.btn-toolbar -->
+	<div ui-view-form x-handler="this"></div>
+</div>

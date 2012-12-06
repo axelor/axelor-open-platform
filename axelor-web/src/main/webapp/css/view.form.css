@@ -1,0 +1,269 @@
+/* FORM VIEW */
+
+.view-container .form-view > div:last-child {
+	position: absolute;
+	top: 48px;
+	bottom: 0; left: 0; right: 0;
+	overflow: auto;
+}
+
+form.dynamic-form {
+	margin: 0;
+}
+
+table.form-layout {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+table.form-layout * {
+	-webkit-box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	    -ms-box-sizing: border-box;
+	        box-sizing: border-box;
+}
+
+table.form-debug,
+table.form-debug td.form-label,
+table.form-debug td.form-item {
+	border: 1px solid #D14;
+}
+
+table.form-layout td.form-label,
+table.form-layout td.form-item {
+	padding: 2px;
+	vertical-align: top;
+}
+
+table.form-layout td.form-label {
+	text-align: right;
+	padding-top: 4px;
+	width: 15%;
+}
+
+table.form-layout td.form-label label.required {
+	font-weight: bold;
+}
+
+table.form-layout td.form-label > label {
+	margin-bottom: 2px;
+}
+
+table.form-layout td.form-item > * {
+	width: 100%;
+	margin: 0;
+	min-width: 100px;
+}
+
+
+table.form-layout td.form-item.v-align-top {
+	vertical-align: top;	
+}
+
+table.form-layout td.form-item input {
+	min-width: 170px;
+	height: 24px;
+}
+
+table.form-layout td.form-item input[type="radio"],
+table.form-layout td.form-item input[type="checkbox"] {
+	width: auto;
+	min-width: inherit;
+	height: inherit;
+	margin-top: -5px;
+}
+
+table.form-layout td.form-item.select-item {
+	white-space: inherit;
+}
+table.form-layout td.form-item .select2-container {
+	display: table;
+}
+table.form-layout td.form-item .select2-container .select2-choice {
+	line-height: 24px;
+}
+table.form-layout td.form-item .select2-container .select2-choice div b {
+	background-position: 0 0;
+}
+table.form-layout td.form-item .select2-dropdown-open .select2-choice div b {
+	background-position: -18px 0;
+}
+table.form-layout td.form-item .select2-container .select2-choice abbr {
+	top: 6px;
+}
+table.form-layout td.form-item .select2-container-multi .select2-choices,
+table.form-layout td.form-item .select2-container-multi .select2-choices .select2-search-field input {
+	height: 20px;
+	min-height: 20px;
+}
+
+table.form-layout td.form-item button {
+	padding: 2px 10px 2px;
+	min-width: 24px;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+table.form-layout td.form-item textarea {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+	resize: vertical;
+}
+
+table.form-layout fieldset {
+	padding: 4px 0;
+}
+
+table.form-layout td.form-item .separator-item > span {
+	font-weight: bold;
+}
+
+table.form-layout td.form-item .input-append input {
+	width: inherit;
+	min-width: 200px;
+	border-radius: 3px;
+}
+
+table.form-layout td.form-item .input-append input:focus {
+	z-index: inherit;
+}
+
+table.form-layout td.form-item .input-append button {
+	padding: 2px 8px;
+}
+
+table.form-layout .tabbable-tabs .nav-tabs {
+	margin-bottom: 0px;
+}
+
+table.form-layout .tabbable-tabs .tab-content {
+	padding: 4px;
+	border: 1px solid #DDD;
+	border-top: 0;
+}
+
+table.form-layout td.form-item .stackbar {
+	position: relative;
+}
+
+table.form-layout td.form-item .slickgrid {
+	position: absolute;
+	left: 0px; right: 0px;
+	top: 26px; bottom: 0px;
+	border-top: none;
+}
+
+table.form-layout td.form-item .slickgrid * {
+	-webkit-box-sizing: content-box;
+	   -moz-box-sizing: content-box;
+	    -ms-box-sizing: content-box;
+	        box-sizing: content-box;
+}
+
+td.form-item > * {
+	position: relative;	
+}
+
+.border-box,
+.bordered-box {
+	-webkit-box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	    -ms-box-sizing: border-box;
+	        box-sizing: border-box;
+}
+
+.bordered,
+.bordered-box {
+	border: 1px solid #DDD;
+	-webkit-border-radius: 4px;
+	   -moz-border-radius: 4px;
+	    -ms-border-radius: 4px;
+	        border-radius: 4px;
+}
+
+.form-item .disabled-overlay {
+	position: absolute;
+	top: 0; left: 0; right: 0; bottom: 0;
+	z-index: 10;
+}
+
+.form-item .form-item-group > .disabled-overlay {
+	top: 12px;
+}
+
+.form-item .form-item-group[x-show-title="false"] > .disabled-overlay {
+	top: 0;
+}
+
+.form-item .form-item-group {
+	padding: 4px;
+	padding-top: 0;
+}
+
+.form-item .form-item-group > legend a {
+	color: #CCC;
+}
+
+.form-item .form-item-group > legend a:hover {
+	 text-decoration: none;
+	 color: inherit;
+}
+
+.form-item .form-item-group > legend i {
+	height: 12px;
+}
+
+.form-item .form-item-group > legend {
+	
+	width: auto;
+	margin: 0;
+	margin-left: 10px;
+	padding: 0 4px;
+		
+	font-size: inherit;
+	font-weight: bold;
+	line-height: 1.4em;
+	
+	border: none;
+}
+
+.form-item .nested-editor > legend > span.legend-toolbar {
+	padding-left: 4px;
+}
+
+.form-item .nested-editor {
+	margin-top: -3px !important;
+}
+
+.form-item .nested-editor.inline-form {
+	position: relative;
+	border: 0;
+	padding-top: 30px;
+}
+
+.form-item .nested-editor.detail-form {
+	border-top: 0;
+	padding-top: 8px; 
+}
+
+.form-item .ng-invalid,
+.form-item .input-append.ng-invalid > input {
+	border-color: #B94A48;
+}
+
+.form-item .ng-invalid:focus,
+.form-item .input-append.ng-invalid > input:focus {
+
+	border-color: #953B39;
+	
+	-webkit-box-shadow: 0 0 6px #D59392;
+	   -moz-box-shadow: 0 0 6px #D59392;
+	        box-shadow: 0 0 6px #D59392;
+}
+
+.form-item form {
+	margin: 0;
+}
+
+.form-item div.code-editor {
+	border: 1px solid #DDD;
+}

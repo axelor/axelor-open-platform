@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://apps.axelor.com/xml/ns/domain-models"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dm="http://apps.axelor.com/xml/ns/domain-models"
+  elementFormDefault="qualified" attributeFormDefault="unqualified"
+  version="2.0">
+
+  <xsd:element name="domain-models">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="module" maxOccurs="1" minOccurs="1">
+          <xsd:annotation>
+            <xsd:documentation>
+              Module settings. This tag will be deprecated once we
+              implement module settings via properties file.
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+            <xsd:attribute name="name" type="xsd:string" use="required" />
+            <xsd:attribute name="package" type="xsd:string" />
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="entity" maxOccurs="unbounded"
+          minOccurs="1" type="dm:Entity">
+          <xsd:annotation>
+            <xsd:documentation>
+              Define an Entity (domain model).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:complexType name="Column" mixed="true">
+    <xsd:annotation>
+      <xsd:documentation>
+        Base abstract type for all field types.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="name" use="required">
+      <xsd:annotation>
+        <xsd:documentation>
+          Name of the field (should start with lower case letter).
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="[a-z][a-zA-Z0-9_]+" />
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="column" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Name of the column in the underlying database table (should be
+          defined when the field name is reserved word in database systems).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="title" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Title text to be used by UI components.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="help" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Help text to be used by UI components.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="required" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          Whether the field is required or allow null value.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="readonly" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          Whether the field should be considered readonly by UI components.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="hidden" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          Whether the field should be hidden in UI components.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="default" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Default value for the field.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="unique" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          Whether the field value should be unique (unique constraint
+          will be created on database table).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="SimpleColumn">
+    <xsd:annotation>
+      <xsd:documentation>Abstract type for simple field types.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="dm:Column">
+        <xsd:attribute name="selection" type="xsd:string" use="optional">
+          <xsd:annotation>
+            <xsd:documentation>
+              List of selection options. "['value', 'Label'], ['valu2', 'Label2']"
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="index" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Whether to create index on database table (optimizes search query).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="RangeColumn">
+    <xsd:complexContent>
+      <xsd:extension base="dm:SimpleColumn">
+        <xsd:attribute name="min" type="xsd:string" />
+        <xsd:attribute name="max" type="xsd:string" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="DateTimeColumn">
+    <xsd:annotation>
+      <xsd:documentation>DateTime Type.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="dm:SimpleColumn">
+        <xsd:attribute name="tz" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Whether to use timezone info.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="RelationalColumn">
+    <xsd:annotation>
+      <xsd:documentation>Relational Type.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="dm:Column">
+        <xsd:attribute name="ref" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              Fully quolified name of the reference entity class.
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:pattern
+                value="(([a-z][a-zA-Z0-9_]+)(\.[a-z][a-zA-Z0-9_]+)*\.)?([A-Z][a-zA-Z0-9_]+)" />
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="mappedBy" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              If this is a bi-directional relationship,
+              indicates the related field in the referenced object.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="orphan" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Whether to allow orphaned records if parent record is deleted.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="orderBy" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              Specify the ordering of the collection value by the given field.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  
+  <xsd:complexType name="OneToOneColumn">
+    <xsd:annotation>
+      <xsd:documentation>OneToOne Type.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent mixed="true">
+      <xsd:restriction base="dm:RelationalColumn">
+        <xsd:attribute name="orderBy" type="xsd:string" use="prohibited"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  
+  <xsd:complexType name="ManyToOneColumn">
+    <xsd:annotation>
+      <xsd:documentation>ManyToOne Type.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent mixed="true">
+    	<xsd:restriction base="dm:RelationalColumn"></xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="OneToManyColumn">
+    <xsd:annotation>
+      <xsd:documentation>OneToMany Type.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:restriction base="dm:RelationalColumn">
+        <xsd:attribute name="unique" type="xsd:boolean" use="prohibited"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+  
+  <xsd:complexType name="ManyToManyColumn">
+    <xsd:annotation>
+      <xsd:documentation>ManyToMany Type.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:restriction base="dm:RelationalColumn">
+        <xsd:attribute name="orphan" type="xsd:boolean" use="prohibited"/>
+        <xsd:attribute name="unique" type="xsd:boolean" use="prohibited"/>
+      </xsd:restriction>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="String">
+    <xsd:annotation>
+      <xsd:documentation>String Type.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="dm:RangeColumn">
+        <xsd:attribute name="multiline" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Whether the string is multiline text (used by UI components).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="large" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Whether the text value is large (CLOB in database).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="namecolumn" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Whether this is a name column (used by UI components to display the record).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="search">
+          <xsd:annotation>
+            <xsd:documentation>
+              Comma seperated list of field names used by autocompletion UI component to search.
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:pattern value="[a-z][a-zA-Z0-9_]+(,[a-z][a-zA-Z0-9_]+)*" />
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="Decimal">
+    <xsd:annotation>
+      <xsd:documentation>Decimal Type.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="dm:RangeColumn">
+        <xsd:attribute name="precision" type="xsd:integer">
+          <xsd:annotation>
+            <xsd:documentation>
+              The precision of the decimal value (total number of digits).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="scale" type="xsd:integer">
+          <xsd:annotation>
+            <xsd:documentation>
+              The scale of the decimal value (total number of digits in decimal part).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="Unique">
+    <xsd:annotation>
+      <xsd:documentation>
+        Declare an unique constraint one speficied column(s).
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="name" type="xsd:string" use="optional">
+      <xsd:annotation>
+        <xsd:documentation>Name of the constraint.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="columns" use="required">
+      <xsd:annotation>
+        <xsd:documentation>
+          List of column names (comma separated).
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="([a-zA-Z][a-zA-Z0-9_]+)(,([a-zA-Z][a-zA-Z0-9_]+))*" />
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="Entity" mixed="true">
+    <xsd:annotation>
+      <xsd:documentation>Entity represent domain model.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:choice minOccurs="0" maxOccurs="unbounded">
+        <xsd:element name="string" type="dm:String">
+          <xsd:annotation>
+            <xsd:documentation>
+              String type field (simple text value).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="boolean" type="dm:SimpleColumn">
+          <xsd:annotation>
+            <xsd:documentation>
+              Boolean type field (yes/no kind of data).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="integer" type="dm:RangeColumn">
+          <xsd:annotation>
+            <xsd:documentation>
+              Integer type field (non-decimal numerical data).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="long" type="dm:RangeColumn">
+          <xsd:annotation>
+            <xsd:documentation>
+              Long type field (non-decimal numerical data, can hold very big value).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="decimal" type="dm:Decimal">
+          <xsd:annotation>
+            <xsd:documentation>
+              Decimal type field (decimal data, can be used for monetary values).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="date" type="dm:DateTimeColumn">
+          <xsd:annotation>
+            <xsd:documentation>
+              Date type field (date value).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="time" type="dm:SimpleColumn">
+          <xsd:annotation>
+            <xsd:documentation>
+              Time type field (time value).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="datetime" type="dm:DateTimeColumn">
+          <xsd:annotation>
+            <xsd:documentation>
+              DateTime type field (datetime field.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="binary" type="dm:Column">
+          <xsd:annotation>
+            <xsd:documentation>
+              Binary type field (binary data, e.g. image, pdf etc).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="one-to-one" type="dm:OneToOneColumn">
+          <xsd:annotation>
+            <xsd:documentation>
+              OneToOne field (single reference value).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="many-to-one" type="dm:ManyToOneColumn">
+          <xsd:annotation>
+            <xsd:documentation>
+              ManyToOne field (single reference value).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="one-to-many" type="dm:OneToManyColumn">
+          <xsd:annotation>
+            <xsd:documentation>
+              OneToMany field (multiple references).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="many-to-many" type="dm:ManyToManyColumn">
+          <xsd:annotation>
+            <xsd:documentation>
+              ManyToMany field (multiple references).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+      </xsd:choice>
+      <xsd:element name="unique-constraint" type="dm:Unique"
+        minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>
+            Define composite uniqe constraint on multiple fields.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+
+    <xsd:attribute use="required" name="name">
+      <xsd:annotation>
+        <xsd:documentation>
+          Name of the Entity (should begin with upper case letter).
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="[A-Z][a-zA-Z0-9_]+" />
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="table">
+      <xsd:annotation>
+        <xsd:documentation>
+          Table name for the entity.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="([a-zA-Z]\w+)(_\w+)*" />
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="sequential" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          Whether the records of this entity should be in
+          unique sequence (else a global sequence will be used).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="lang">
+      <xsd:annotation>
+        <xsd:documentation>
+          Generate code in the given language (default is Java but if
+          there are any function fields then defaults to Groovy).
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="java" />
+          <xsd:enumeration value="groovy" />
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+  </xsd:complexType>
+</xsd:schema>

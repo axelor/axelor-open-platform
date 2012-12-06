@@ -1,0 +1,135 @@
+package com.axelor.meta.db;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.Type;
+import org.joda.time.LocalDate;
+
+import com.axelor.db.JPA;
+import com.axelor.db.Model;
+import com.axelor.db.Query;
+import com.axelor.db.VirtualColumn;
+
+@Entity
+public class Contact extends Model {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+	
+	@ManyToOne
+	private Title title;
+	
+	private String firstName;
+	
+	private String lastName;
+	
+	@VirtualColumn
+	private String fullName;
+	
+	private String email;
+	
+	private BigDecimal credit;
+	
+	@Type(type = "org.joda.time.contrib.hibernate.PersistentLocalDate")
+	private LocalDate birthDate;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "contact", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Address> addresses;
+	
+	@Override
+	public Long getId() {
+		return id;
+	}
+	
+	@Override
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Title getTitle() {
+		return title;
+	}
+	
+	public void setTitle(Title title) {
+		this.title = title;
+	}
+	
+	public String getFirstName() {
+		return firstName;
+	}
+	
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	
+	public String getLastName() {
+		return lastName;
+	}
+	
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	
+	public String getFullName() {
+		fullName = calculateFullName();
+		return fullName;
+	}
+	
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+	
+	protected String calculateFullName() {
+		if (title != null) {
+			return title.getName() + " " + firstName + " " + lastName;
+		}
+		return firstName + " " + lastName;
+	}
+	
+	public String getEmail() {
+		return email;
+	}
+	
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
+	public LocalDate getBirthDate() {
+		return birthDate;
+	}
+	
+	public void setBirthDate(LocalDate birthDate) {
+		this.birthDate = birthDate;
+	}
+	
+	public BigDecimal getCredit() {
+		return credit;
+	}
+	
+	public void setCredit(BigDecimal credit) {
+		this.credit = credit;
+	}
+	
+	public List<Address> getAddresses() {
+		return addresses;
+	}
+	
+	public void setAddresses(List<Address> addresses) {
+		this.addresses = addresses;
+	}
+	
+	public static Query<Contact> all() {
+		return JPA.all(Contact.class);
+	}
+}

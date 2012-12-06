@@ -1,0 +1,100 @@
+- !Country: &IN
+  code: IN
+  name: India
+  
+- !Country: &FR
+  code: FR
+  name: France
+  
+- !Country: &UK
+  code: UK
+  name: United Kingdom
+  
+- !Country: &US
+  code: US
+  name: United States
+  
+- !Country: &DE
+  code: DE
+  name: Germany
+
+- !Group: &family
+  name: family
+  title: Family
+
+- !Group: &friends
+  name: friends
+  title: Friends
+  
+- !Group: &business
+  name: business
+  title: Business
+  
+- !Title: &mr
+  code: mr
+  name: Mr.
+  
+- !Title: &mrs
+  code: mrs
+  name: Mrs.
+  
+- !Title: &miss
+  code: miss
+  name: Miss
+  
+- !Address: &james_addr_home
+  street: 12, some street
+  area: near my home
+  city: Paris
+  zip: 21312312
+  country: *FR
+  
+- !Address: &james_addr_office
+  street: 21, some street
+  area: near my office
+  city: Paris
+  zip: 21312343
+  country: *FR
+
+- !Contact:
+  title:
+    !Title:
+      code: dr
+      name: Dr.
+  firstName: James
+  lastName: Taylor
+  email: jtaylor@gmail.com
+  dateOfBirth: 1977-05-01
+  addresses:
+    - *james_addr_home
+    - *james_addr_office
+  groups:
+    - *family
+  
+- !Contact:
+  title: *mr
+  firstName: John
+  lastName: Smith
+  email: jsmith@gmail.com
+  dateOfBirth: 1979-11-01
+  groups:
+    - *friends
+    - *business
+  addresses:
+    - !Address:
+      street: 11, some street
+      area: near my office
+      city: Madrid
+      zip: 21312343
+      country:
+        !Country:
+          code: ES
+          name: Spain
+- !Contact:
+  title: *mr
+  firstName: Mark
+  lastName: Ram
+  email: ram@markram.com
+  dateOfBirth: 1975-03-23
+  groups:
+    - *business

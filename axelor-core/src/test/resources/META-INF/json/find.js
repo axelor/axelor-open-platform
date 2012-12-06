@@ -1,0 +1,55 @@
+{
+    "operationType":"fetch", 
+    "componentId":"isc_ListGrid_0",
+    "dataSource" : "com_axelor_domain_Contact",
+    "data":{
+    	"_domain": "self.title.code = 'mr'",
+        "operator":"and", 
+        "criteria":[
+            {
+                "fieldName":"code", 
+                "operator":"equals", 
+                "value":"er"
+            }, 
+            {
+                "fieldName":"name", 
+                "operator":"equals", 
+                "value":"er"
+            }, 
+            {
+                "operator":"or", 
+                "criteria":[
+                    {
+                        "fieldName":"name", 
+                        "operator":"equals", 
+                        "value":"we"
+                    }, 
+                    {
+                        "fieldName":"code", 
+                        "operator":"between", 
+                        "start":"er", 
+                        "end":"wer"
+                    }
+                ]
+            },
+            {
+                "operator":"or", 
+                "criteria":[
+                    {
+                        "fieldName":"name", 
+                        "operator":"equals", 
+                        "value":"we"
+                    }, 
+                    {
+                        "fieldName":"lang", 
+                        "operator":"inSet", 
+                        "value": ["en", "hi"]
+                    }
+                ]
+            }
+        ]
+    }, 
+    "startRow":0, 
+    "endRow":75, 
+    "textMatchStyle":"substring"
+}

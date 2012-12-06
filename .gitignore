@@ -1,0 +1,8 @@
+target
+.project
+.classpath
+.settings
+*.sw[nop]
+*~
+.#*
+[#]*#

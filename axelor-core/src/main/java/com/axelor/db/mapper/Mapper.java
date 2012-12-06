@@ -1,0 +1,323 @@
+package com.axelor.db.mapper;
+
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
+import com.axelor.db.Model;
+import com.axelor.db.NameColumn;
+import com.google.common.base.Preconditions;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Maps;
+
+/**
+ * This class can be used to map params to Java bean using reflection. It also
+ * provides convenient methods to get/set values to a bean instance.
+ * 
+ */
+public class Mapper {
+	
+	private static final LoadingCache<Class<?>, Mapper> MAPPER_CACHE = CacheBuilder
+			.newBuilder()
+			.maximumSize(1000)
+			.weakKeys()
+			.build(new CacheLoader<Class<?>, Mapper>() {
+				
+				@Override
+				public Mapper load(Class<?> key) throws Exception {
+					return new Mapper(key);
+				}
+			});
+	
+	private static final Object[] NULL_ARGUMENTS = {};
+
+	private Map<String, Method> getters = new HashMap<String, Method>();
+	private Map<String, Method> setters = new HashMap<String, Method>();
+
+	private Map<String, Class<?>> types = new HashMap<String, Class<?>>();
+	private Map<String, Property> fields = new HashMap<String, Property>();
+
+	private Property nameField;
+	
+	private Class<?> beanClass;
+
+	private Mapper(Class<?> beanClass) {
+		Preconditions.checkNotNull(beanClass);
+		this.beanClass = beanClass;
+		try {
+			BeanInfo info = Introspector.getBeanInfo(beanClass, Object.class);
+			for (PropertyDescriptor descriptor : info.getPropertyDescriptors()) {
+
+				String name = descriptor.getName();
+				Method getter = descriptor.getReadMethod();
+				Method setter = descriptor.getWriteMethod();
+				Class<?> type = descriptor.getPropertyType();
+
+				if (getter != null) {
+					getters.put(name, getter);
+					try {
+						fields.put(name, new Property(
+								beanClass, name, type,
+								getter.getGenericReturnType(),
+								getAnnotations(name, getter)));
+					}catch(Exception e){
+						continue;
+					}
+				}
+				if (setter != null) {
+					setters.put(name, setter);
+				}
+				types.put(name, type);
+			}
+		} catch (IntrospectionException e) {
+		}
+	}
+
+	private Annotation[] getAnnotations(String name, Method getter) {
+		List<Annotation> all = new ArrayList<Annotation>();
+		try {
+			Field field = getField(beanClass, name);
+			all.addAll(Arrays.asList(field.getAnnotations()));
+		} catch (Exception e) {
+		}
+		all.addAll(Arrays.asList(getter.getAnnotations()));
+		return all.toArray(new Annotation[] {});
+	}
+
+	private Field getField(Class<?> klass, String name) {
+		try {
+			return klass.getDeclaredField(name);
+		} catch (NoSuchFieldException e) {
+			return getField(klass.getSuperclass(), name);
+		}
+	}
+
+	/**
+	 * Create a {@link Mapper} for the given Java Bean class by introspecting
+	 * all it's properties.
+	 * <p>
+	 * If the {@link Mapper} class has been previously created for the given
+	 * class, then the {@link Mapper} class is retrieved from the cache.
+	 * 
+	 * @param klassJava
+	 *            bean class
+	 */
+	public static Mapper of(Class<?> klass) {
+		try {
+			return MAPPER_CACHE.get(klass);
+		} catch (ExecutionException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Get all the properties.
+	 * 
+	 * @return an array of {@link Property}
+	 */
+	public Property[] getProperties() {
+		return fields.values().toArray(new Property[] {});
+	}
+
+	/**
+	 * Get the {@link Property} of the given name.
+	 * 
+	 * @param name
+	 *            name of the property
+	 * @return a Property or null if property doesn't exist.
+	 */
+	public Property getProperty(String name) {
+		return fields.get(name);
+	}
+	
+	/**
+	 * Get the property of the name field.
+	 * 
+	 * A name field annotated with {@link NameColumn} or a field with
+	 * name <code>name</code> is considered name field.
+	 * 
+	 * @return a property
+	 */
+	public Property getNameField() {
+		
+		if (this.nameField != null)
+			return nameField;
+
+		Property name = null;
+		for(Property p : fields.values()) {
+			if (p.isNameColumn()) {
+				return this.nameField = p;
+			}
+			if ("name".equals(p.getName())) {
+				name = p;
+			}
+		}
+		
+		if (name != null) {
+			return this.nameField = name;
+		}
+		
+		return null;
+	}
+
+	/**
+	 * Get the bean class this mapper operates on.
+	 * 
+	 * @return the bean class
+	 */
+	public Class<?> getBeanClass() {
+		return beanClass;
+	}
+
+	/**
+	 * Get the getter method of the given property.
+	 * 
+	 * @param name
+	 *            name of the property
+	 * @return getter method or null if property is write-only
+	 */
+	public Method getGetter(String name) {
+		return getters.get(name);
+	}
+
+	/**
+	 * Get the setter method of the given property.
+	 * 
+	 * @param name
+	 *            name of the property
+	 * @return setter method or null if property is read-only
+	 */
+	public Method getSetter(String name) {
+		return setters.get(name);
+	}
+
+	/**
+	 * Get the value of given property from the given bean. It returns
+	 * <code>null</code> if property doesn't exist.
+	 * 
+	 * @param bean
+	 *            the bean
+	 * @param name
+	 *            name of the property
+	 * @return property value
+	 */
+	public Object get(Object bean, String name) {
+
+		Preconditions.checkNotNull(bean);
+		Preconditions.checkNotNull(name);
+
+		Preconditions.checkArgument(beanClass.isInstance(bean));
+		Preconditions.checkArgument(!name.trim().equals(""));
+
+		Method method = getters.get((String) name);
+		try {
+			return method.invoke(bean, NULL_ARGUMENTS);
+		} catch (Exception e) {
+		}
+		return null;
+	}
+
+	/**
+	 * Set the property of the given bean with the provided value.
+	 * 
+	 * @param bean
+	 *            the bean
+	 * @param name
+	 *            name of the property
+	 * @param value
+	 *            value for the property
+	 * @return old value of the property
+	 */
+	public Object set(Object bean, String name, Object value) {
+
+		Preconditions.checkNotNull(bean);
+		Preconditions.checkNotNull(name);
+
+		Preconditions.checkArgument(beanClass.isInstance(bean));
+		Preconditions.checkArgument(!name.trim().equals(""));
+
+		Object oldValue = get(bean, name);
+		Method method = setters.get(name);
+		if (method == null) {
+			throw new IllegalArgumentException("The bean of type: "
+					+ beanClass.getName() + " has no property called: " + name);
+		}
+
+		Class<?> actualType = method.getParameterTypes()[0];
+		Type genericType = method.getGenericParameterTypes()[0];
+		Annotation[] annotations = getAnnotations(name, method);
+		
+		value = Adapter.adapt(value, actualType, genericType, annotations);
+
+		try {
+			method.invoke(bean, new Object[] { value });
+		} catch (Exception e) {
+			throw new IllegalArgumentException(e);
+		}
+		return oldValue;
+	}
+
+	/**
+	 * Create an object of the given class mapping the given value map to it's
+	 * properties.
+	 * 
+	 * @param klass
+	 *            class of the bean
+	 * @param values
+	 *            value map
+	 * @return an instance of the given class
+	 */
+	public static <T> T toBean(Class<T> klass, Map<String, Object> values) {
+		T bean = null;
+		try {
+			bean = klass.newInstance();
+		} catch (Exception ex) {
+			throw new IllegalArgumentException(ex);
+		}
+		if (values == null || values.isEmpty()) {
+			return bean;
+		}
+		Mapper mapper = Mapper.of(klass);
+		for (String name : values.keySet()) {
+			if (mapper.setters.containsKey(name))
+				mapper.set(bean, name, values.get(name));
+		}
+		
+		return bean;
+	}
+	
+	/**
+	 * Create a map from the given bean instance with property names are keys
+	 * and their respective values are map values.
+	 * 
+	 * @param bean
+	 *            a bean instance
+	 * @return a map
+	 */
+	public static Map<String, Object> toMap(Object bean) {
+		if (bean == null) return null;
+		Preconditions.checkArgument(bean instanceof Model);
+		
+		Map<String, Object> map = Maps.newHashMap();
+		Mapper mapper = Mapper.of(bean.getClass());
+		
+		for(Property p : mapper.getProperties()) {
+			map.put(p.getName(), p.get(bean));
+		}
+		
+		return map;
+	}
+}

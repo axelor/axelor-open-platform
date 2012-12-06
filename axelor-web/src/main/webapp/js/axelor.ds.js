@@ -1,0 +1,261 @@
+(function() {
+
+	var ds = angular.module('axelor.ds', ['ngResource']);
+	
+	var forEach = angular.forEach,
+		extend = angular.extend,
+		isArray = angular.isArray;
+
+	ds.factory('RestService', ['$resource', function($resource) {
+
+		// GET 		ws/rest/:model				= fetch list
+		// POST		ws/rest/:model				= save (create/update)
+		// PUT		ws/rest/:model				= create
+		// POST		ws/rest/:model/:id			= update
+		// GET		ws/rest/:model/:id			= read
+		// DELETE	ws/rest/:model/:id			= delete
+		// POST		ws/rest/:model/:id/remove	= delete (with payload)
+		// GET		ws/rest/:model/:id/copy		= get copy
+		// GET		ws/rest/:model/:id/details	= get details
+		// POST		ws/rest/:model/search		= advance search
+		
+		function getResource(model) {
+			
+			return $resource('ws/rest/'+ model +'/:id/:_action', {id: '@id'}, {
+				'query':  	{ method: 'GET'},
+				'search': 	{ method: 'POST', params: {id: 'search'}},
+				'create': 	{ method: 'PUT'},
+				'update': 	{ method: 'POST'},
+				'remove': 	{ method: 'POST', params: {_action: 'remove'}},
+				'copy':    	{ method: 'GET', params: {_action: 'copy'}},
+				'details': 	{ method: 'GET', params: {_action: 'details'}}
+			});
+		}
+		
+		return { get: getResource };
+	}]);
+	
+	ds.factory('MenuService', ['$http', function($http) {
+
+		function get(parent) {
+
+			return $http.get('ws/action/menu', {
+				params : {
+					parent : parent
+				}
+			});
+		}
+
+		function action(name) {
+
+			return $http.post('ws/action/' + name, {
+				model : 'com.axelor.meta.db.MetaMenu',
+				data : {}
+			});
+		}
+
+		return {
+			get: get,
+			action: action
+		};
+	}]);
+
+	ds.factory('ViewService', ['$http', '$q', '$compile', function($http, $q, $compile) {
+
+		var ViewService = function() {
+			
+			this.FIELD_TYPES = {
+				'STRING'		: 'string',
+				'INTEGER'		: 'integer',
+				'DECIMAL'		: 'decimal',
+				'BOOLEAN'		: 'boolean',
+				'DATE'			: 'date',
+				'TIME'			: 'time',
+				'DATETIME'		: 'datetime',
+				'TEXT'			: 'text',
+				'ONE_TO_ONE'	: 'many-to-one',
+				'MANY_TO_ONE'	: 'many-to-one',
+				'ONE_TO_MANY'	: 'one-to-many',
+				'MANY_TO_MANY'	: 'many-to-many',
+				'label'			: 'static', 
+				'notebook'		: 'tabs',
+				'page'			: 'tab',
+				'password'		: 'password',
+				'SuggestBox'	: 'suggest-box',
+				'CodeEditor'	: 'code-editor',
+				'ActionSelector': 'action-selector'
+			};
+		};
+		
+		function titleize(str){
+			if (!str) return;
+		    return str.replace(/_|\.|\s+/g, ' ')
+	    			  .replace(/\s*Id$/, '')
+	    			  .replace(/\s*Ids$/, 's')
+	    			  .replace(/([a-z\d])([A-Z])/g, '$1 $2')
+	    			  .replace(/(?:^|\s)\S/g, function(ch){
+		    	return ch.toUpperCase();
+		    });
+		}
+		
+		ViewService.prototype.accept = function(params) {
+			views = {};
+			forEach(params.views, function(view){
+				var type = view.type || view.viewType;
+				if (params.viewType == null) {
+					params.viewType = type;
+				}
+				views[type] = extend({}, view, {
+					deferred: $q.defer()
+				});
+			});
+			return views;
+		};
+		
+		ViewService.prototype.compile = function(template) {
+			return $compile(template);
+		};
+
+		ViewService.prototype.process = function(meta, view) {
+
+			var fields = {},
+				types = this.FIELD_TYPES; 
+			
+			meta = meta || {};
+			view = view || {};
+			
+			if (isArray(meta.fields)) {
+				forEach(meta.fields, function(field){
+					field.type = types[field.type] || field.type || 'string';
+					field.title = titleize(field.title || field.name);
+					fields[field.name] = field;
+					// if nested field then make it readonly
+					if (field.name.indexOf('.') > -1) {
+						field.readonly = true;
+						field.required = false;
+					}
+				});
+				meta.fields = fields;
+			} else {
+				fields = meta.fields || {};
+			}
+			
+			forEach(view.items, function(item) {
+				forEach(fields[item.name], function(value, key){
+					if (!item.hasOwnProperty(key))
+						item[key] = value;
+				});
+			});
+		};
+		
+		function findFields(view) {
+			var items = [];
+			var fields = view.items || view.pages;
+			
+			if (fields == null)
+				return [];
+			
+			_.each(fields, function(item) {
+				if (item.items || item.pages) {
+					items = items.concat(findFields(item));
+				}
+				else if (item.type === 'field') {
+					items.push(item.name);
+				}
+			});
+			return items;
+		}
+		
+		ViewService.prototype.getMetaDef = function(model, view) {
+			var self = this,
+				deferred = $q.defer();
+
+			var promise = deferred.promise;
+			promise.success = function(fn) {
+				promise.then(function(res){
+					fn(res.fields, res.view);
+				});
+				return promise;
+			};
+			
+			function loadFields(view) {
+
+				$http.get('ws/meta/' + model + '/view_fields', {
+					cache: true,
+					params: {
+						items: findFields(view).join(',')
+					}
+				}).then(function(response) {
+					var res = response.data,
+						fields = res.data,
+						data = { fields: fields };
+
+					self.process(data, view);
+					fields = data.fields;
+
+					deferred.resolve({
+						fields: fields,
+						view: view
+					});
+				});
+
+				return promise;
+			}
+			
+			if (_.isArray(view.items)) {
+				return loadFields(view);
+			};
+
+			$http.get('ws/meta/' + model + '/view', {
+				cache: true,
+				params: {
+					type: view.type,
+					name: view.name
+				}
+			}).then(function(response) {
+				var res = response.data;
+				result = res.data[view.type];
+				loadFields(result);
+			});
+			
+			return promise;
+		};
+
+		ViewService.prototype.defer = function() {
+			return $q.defer();
+		};
+		
+		ViewService.prototype.action = function(action, model, context) {
+			
+			var ctx = _.extend({
+				_model: model,
+			}, context);
+
+			var params = {
+				model: model,
+				action: action,
+				data: {
+					context: ctx
+				}
+			};
+
+			var promise = $http.post('ws/action', params);
+			promise.success = function(fn) {
+				promise.then(function(response){
+					fn(response.data);
+				});
+				return promise;
+			};
+			promise.error = function(fn) {
+				promise.then(null, fn);
+				return promise;
+			};
+			
+			return promise;
+		};
+
+		return new ViewService();
+	}]);
+	
+
+})(this);

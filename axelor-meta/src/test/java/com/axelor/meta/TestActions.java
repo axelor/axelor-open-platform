@@ -1,0 +1,202 @@
+package com.axelor.meta;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import com.axelor.db.JPA;
+import com.axelor.meta.db.Contact;
+import com.axelor.meta.views.Action;
+import com.axelor.meta.views.FormView;
+import com.axelor.meta.views.ObjectViews;
+import com.axelor.rpc.ActionRequest;
+import com.axelor.rpc.ActionResponse;
+import com.google.common.collect.Maps;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+
+public class TestActions extends AbstractTest {
+	
+	private ObjectViews views;
+	
+	@Inject
+	private Injector injector;
+	
+	@Before
+	public void setUp() throws Exception {
+
+		views = this.unmarshal("Contact.xml", ObjectViews.class);
+		assertNotNull(views);
+		assertNotNull(views.getActions());
+		
+		MetaStore.resister(views);
+		
+		if (Contact.all().count() == 0) {
+			JPA.runInTransaction(new Runnable() {
+				
+				@Override
+				public void run() {
+					Contact c = new Contact();
+					c.setFirstName("John");
+					c.setLastName("Smith");
+					c.setEmail("john.smith@gmail.com");
+					JPA.save(c);
+				}
+			});
+		}
+	}
+	
+	private ActionHandler createHandler(String actions, Map<String, Object> context) {
+		
+		ActionRequest request = new ActionRequest();
+		
+		Map<String, Object> data = Maps.newHashMap();
+		request.setData(data);
+		request.setModel("com.axelor.meta.db.Contact");
+		
+		data.put("action", actions);
+		data.put("context", context);
+		
+		return new ActionHandler(request, injector);
+	}
+	
+	@Test
+	public void testRecord() {
+		
+		Action action = MetaStore.getAction("action-contact-defaults");
+		ActionHandler handler = createHandler("action-contact-defaults", null);
+		
+		Object value = action.evaluate(handler);
+		assertTrue(value instanceof Contact);
+		
+		Contact c = (Contact) value;
+
+		assertNotNull(c.getTitle());
+		assertEquals("Mr. John Smith", c.getFullName());
+		
+		System.err.println("XXX: " + c);
+	}
+
+	@Test @SuppressWarnings("all")
+	public void testAttrs() {
+		Action action = MetaStore.getAction("action-contact-attrs");
+		ActionHandler handler = createHandler("action-contact-attrs", null);
+		
+		Object value = action.evaluate(handler);
+		assertTrue(value instanceof Map);
+		
+		Map<String, Object> map = (Map) value;
+		Map<String, Object> attrs = (Map) map.get("lastName");
+		
+		assertTrue(attrs instanceof Map);
+		assertEquals(true, attrs.get("readonly"));
+		assertEquals(true, attrs.get("hidden"));
+		
+		attrs = (Map) map.get("notes");
+		
+		assertTrue(attrs instanceof Map);
+		assertEquals("About Me", attrs.get("title"));
+	}
+
+	@Test
+	public void testValidate() {
+		
+		Action action = MetaStore.getAction("action-contact-validate");
+		Map<String, Object> context = Maps.newHashMap();
+		
+		context.put("id", 1);
+		context.put("firstName", "John");
+		context.put("lastName", "Sm");
+		
+		ActionHandler handler = createHandler("action-contact-validate", context);
+		Object value = action.evaluate(handler);
+		
+		assertNotNull(value);
+	}
+	
+	@Test
+	public void testMethod() {
+		
+		Action action = MetaStore.getAction("action-contact-greetings");
+		Map<String, Object> context = Maps.newHashMap();
+		
+		context.put("id", 1);
+		context.put("firstName", "John");
+		context.put("lastName", "Smith");
+		
+		ActionHandler handler = createHandler("action-contact-greetings", context);
+		Object value = action.evaluate(handler);
+		
+		assertNotNull(value);
+		
+		System.err.println(value);
+		
+	}
+	
+	@Test
+	public void testRpc() {
+		
+		Action action = MetaStore.getAction("action-contact-greetings-rpc");
+		Map<String, Object> context = Maps.newHashMap();
+		
+		context.put("id", 1);
+		context.put("firstName", "John");
+		context.put("lastName", "Smith");
+		context.put("fullName", "John Smith");
+		
+		ActionHandler handler = createHandler("action-contact-greetings-rpc", context);
+		Object value = action.evaluate(handler);
+		
+		assertNotNull(value);
+		assertEquals("Say: John Smith", value);
+		
+		value = handler.evaluate("call: com.axelor.meta.web.Hello:say(fullName)");
+		
+		assertNotNull(value);
+		assertEquals("Say: John Smith", value);
+	}
+	
+	@Test
+	public void testEvents() throws Exception {
+		
+		FormView view = (FormView) MetaStore.getView("contact-form");
+		assertNotNull(view);
+		
+		Map<String, Object> context = Maps.newHashMap();
+		
+		context.put("firstName", "John");
+		context.put("lastName", "Smith");
+		
+		String onLoad = view.getOnLoad();
+		String onSave = view.getOnSave();
+		
+		ActionHandler handler = createHandler(onLoad, context);
+		ActionResponse response = handler.execute();
+		System.err.println(response.getData());
+		
+		handler = createHandler(onSave, context);
+		response = handler.execute();
+		System.err.println(response.getData());
+	}
+	
+ 	@Test
+	public void testView() {
+		
+		Action action = MetaStore.getAction("action-view-contact");
+		Map<String, Object> context = Maps.newHashMap();
+		
+		context.put("id", 1);
+		context.put("firstName", "John");
+		context.put("lastName", "Smith");
+		
+		ActionHandler handler = createHandler("action-view-contact", context);
+		Object value = action.evaluate(handler);
+		
+		assertNotNull(value);
+	}
+}

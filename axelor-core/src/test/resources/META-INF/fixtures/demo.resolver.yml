@@ -1,0 +1,5 @@
+Group: com.axelor.domain.Group
+Title: com.axelor.domain.Title
+Contact: com.axelor.domain.Contact
+Address: com.axelor.domain.Address
+Country: com.axelor.domain.Country

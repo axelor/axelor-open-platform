@@ -1,0 +1,6 @@
+title.code,firstName,lastName,email,phone,dateOfBirth,circle.code,company.code
+mr,Peter,Parker,peter.parker@gmail.com,,1988-11-11,friends,
+mr,John,Smith,jsmith@gmail.com,,1979-11-01,friends,my
+mr,Guillaume,GARRINE,g.garin@axelor.com,,1980-03-31,employee,axelor
+mr,Laith,JUBAIR,l.jubair@axelor.com,,1977-01-31,employee,axelor
+mr,Aryé,HALIOUA,a.halioua@axelor.com,,1976-02-26,employee,axelor

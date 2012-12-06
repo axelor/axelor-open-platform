@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>axelor-module-parent</artifactId>
+    <groupId>com.axelor</groupId>
+    <version>0.0.6-SNAPSHOT</version>
+    <relativePath>../axelor-module-parent/pom.xml</relativePath>
+  </parent>
+
+  <artifactId>axelor-data</artifactId>
+  <name>Axelor :: Data</name>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.opencsv</groupId>
+      <artifactId>opencsv</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.beust</groupId>
+      <artifactId>jcommander</artifactId>
+      <version>1.26</version>
+    </dependency>
+
+	<!-- test dependencies -->
+	<dependency>
+		<groupId>com.axelor</groupId>
+		<artifactId>axelor-contact</artifactId>
+		<version>${project.version}</version>
+		<scope>test</scope>
+	</dependency>
+	<dependency>
+		<groupId>com.axelor</groupId>
+		<artifactId>axelor-sale</artifactId>
+		<version>${project.version}</version>
+		<scope>test</scope>
+	</dependency>
+
+  </dependencies>
+
+</project>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_1.0.xsd">
+    <grid name="user-grid" title="Users">
+        <field name="name"/>
+        <field name="code"/>
+        <field name="group"/>
+    </grid>
+    <form name="user-form" title="User" cols="2" colWidths="50%,50%">
+        <group title="General Info" cols="2">
+            <field name="name"/>
+            <field name="group"/>
+        </group>
+        <group title="Login" cols="2">
+            <field name="code"/>
+            <field name="password" widget="password"/>
+        </group>
+    </form>
+</object-views>

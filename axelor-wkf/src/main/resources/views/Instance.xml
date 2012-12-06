@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.6.xsd">
+	
+    <grid name="instance-grid" title="Instances" model="com.axelor.wkf.db.Instance">
+        <field name="workflow"/>
+        <field name="workflow.metaModel"/>
+        <field name="metaModelId"/>
+        <field name="creationDate"/>
+        <field name="creationUser"/>
+    </grid>
+    
+    <form name="instance-form" title="Instances" cols="4" model="com.axelor.wkf.db.Instance"
+    onLoad="instance-attrs-waitingNodes,instance-attrs-executedNodes" onNew="instance-attrs-waitingNodes,instance-attrs-executedNodes">
+        <field name="workflow"/>
+        <break/>
+        <field name="workflow.metaModel"/>
+        <field name="metaModelId"/>
+        <field name="nodes" colSpan="4" />
+        <field name="waitingNodes" colSpan="4" onChange="instance-attrs-waitingNodes"/>
+        <field name="executedNodes" colSpan="4" onChange="instance-attrs-executedNodes"/>
+        <notebook colSpan="4">
+        	<page title="History" cols="4">
+        		<field name="creationDate" />
+        		<field name="creationUser" />
+        		<field name="histories" colSpan="4" grid-view="instance-history-grid" form-view="instance-history-form"/>
+        	</page>
+        	<page title="Counter" cols="4">
+        		<field name="counters" colSpan="4" grid-view="instance-counter-grid" form-view="instance-counter-form"/>
+        	</page>
+        </notebook>
+    </form>
+    
+    <grid name="instance-history-grid" title="Histories" model="com.axelor.wkf.db.InstanceHistory">
+    	<field name="creationDate" />
+    	<field name="creationUser" />
+    	<field name="transition"/>
+    </grid>
+    
+    <form name="instance-history-form" title="History" cols="4"  model="com.axelor.wkf.db.InstanceHistory">
+    	<field name="creationDate" />
+    	<field name="creationUser" />
+    	<field name="transition" canSelect="false" widget="NestedEditor" summary-view="transition-form" form-view="transition-form" edit-window="self" />
+    </form>
+    
+    <grid name="instance-counter-grid" title="Counters" model="com.axelor.wkf.db.InstanceCounter">
+    	<field name="node" />
+    	<field name="counter" />
+    </grid>
+    
+    <form name="instance-counter-form" title="Counter" cols="4"  model="com.axelor.wkf.db.InstanceCounter">
+    	<field name="node" />
+    	<field name="counter" />
+    </form>
+    
+    <grid name="waiting-node-grid" title="Waiting nodes" model="com.axelor.wkf.db.WaitingNode">
+    	<field name="node" />
+    </grid>
+    
+    <form name="waiting-node-form" title="Waiting node" cols="2" model="com.axelor.wkf.db.WaitingNode">
+    	<field name="node" />
+    	<field name="transitions" colSpan="2" />
+    </form>
+    
+<!-- ACTION -->    
+    
+    <action-attrs name="instance-attrs-waitingNodes">
+    	<attribute name="hidden" for="waitingNodes" expr="eval: !waitingNodes" />
+    </action-attrs>
+    
+    <action-attrs name="instance-attrs-executedNodes">
+    	<attribute name="hidden" for="executedNodes" expr="eval: !executedNodes" />
+    </action-attrs>
+    
+</object-views>
