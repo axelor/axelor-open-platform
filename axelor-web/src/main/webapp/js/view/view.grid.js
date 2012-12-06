@@ -1,0 +1,265 @@
+GridViewCtrl.$inject = ['$scope', '$element'];
+function GridViewCtrl($scope, $element) {
+
+	DSViewCtrl('grid', $scope, $element);
+
+	var ds = $scope._dataSource;
+	var page = {};
+
+	$scope.dataView = new Slick.Data.DataView();
+	$scope.selection = [];
+	
+	ds.on('change', function(e, records, page){
+		$scope.setItems(records, page);
+	});
+	
+	var initialized = false;
+	$scope.onShow = function(viewPromise) {
+		
+		if (!initialized) {
+			
+			viewPromise.then(function(){
+				var view = $scope.schema,
+					sortBy = view.orderBy;
+				
+				if (sortBy) {
+					sortBy = sortBy.split('\\.');
+				}
+
+				$scope.view = view;
+				$scope.filter({
+					_sortBy: sortBy
+				});
+			});
+			
+			initialized = true;
+		}
+	};
+	
+	$scope.setItems = function(items, pageInfo) {
+
+		var dataView = $scope.dataView,
+			selected = _.map($scope.selection, function(index) {
+				return dataView.getItem(index);
+			});
+		
+		//XXX: clear existing items (bug?)
+		if (dataView.getLength()) {
+			dataView.beginUpdate();
+			dataView.setItems([]);
+		    dataView.endUpdate();
+		}
+
+		dataView.beginUpdate();
+	    dataView.setItems(items);
+	    dataView.endUpdate();
+
+	    selected = _.filter(selected, function(record) {
+	    	return dataView.getItemById(record.id);
+	    });
+	    selected = _.map(selected, function(rec) {
+	    	return dataView.getIdxById(rec.id);
+	    });
+	    
+		if (pageInfo) {
+	    	page = pageInfo;
+		}
+
+		if (dataView.adjustSize) {
+			dataView.adjustSize();
+		}
+
+		setTimeout(function(){
+	    	$scope.$broadcast('grid:selection-change', {
+	    		data: dataView,
+	    		selection: selected
+	    	});
+	    });
+	};
+
+	$scope.canEdit = function() {
+		return $scope.canDelete();
+	};
+	
+	$scope.canDelete = function() {
+		return $scope.selection.length > 0;
+	};
+
+	$scope.filter = function(searchFilter) {
+		
+		var filter = {}, sortBy,
+			domain = null,
+			context = null,
+			criteria = {
+				operator: 'and'
+			};
+
+		var fields = _.pluck($scope.fields, 'name');
+		for(var name in searchFilter) {
+			var value = searchFilter[name];
+			if (value !== '') filter[name] = value;
+		}
+		
+		sortBy = filter._sortBy;
+		domain = filter._domain;
+		context = filter._context;
+		
+		delete filter._sortBy;
+		delete filter._domain;
+		delete filter._context;
+
+		criteria.criteria = _.map(filter, function(value, key) {
+
+			var field = $scope.fields[key] || {};
+			var type = field.type || 'string';
+			var operator = 'iContains';
+			
+			//TODO: implement expression parser
+			
+			if (type === 'many-to-one') {
+				if (field.targetName) {
+					key = key + '.' + field.targetName;
+				} else {
+					console.warn("Can't search on field: ", key);
+				}
+			}
+
+			switch(type) {
+				case 'integer':
+				case 'long':
+				case 'decimal':
+					operator = 'iEquals';
+					break;
+			}
+			
+			return {
+				operator: operator,
+				fieldName: key,
+				value: value
+			};
+		});
+		
+		domain = domain || $scope._domain;
+		if (domain && $scope.getContext) {
+			context = _.extend({}, $scope._context, context, $scope.getContext());
+		}
+
+		return ds.search({
+			filter: criteria,
+			fields: fields,
+			sortBy: sortBy,
+			domain: domain,
+			context: context
+		});
+	};
+
+	$scope.pagerText = function() {
+		if (page && page.from !== undefined) {
+			if (page.total == 0) return null;
+			return _t("{0} to {1} of {2}", page.from + 1, page.to, page.total);
+		}
+	};
+	
+	$scope.onNext = function() {
+		var fields = _.pluck($scope.fields, 'name');
+		ds.next(fields);
+	};
+	
+	$scope.onPrev = function() {
+		var fields = _.pluck($scope.fields, 'name');
+		ds.prev(fields);
+	};
+	
+	$scope.onNew = function() {
+		page.index = -1;
+		$scope.switchTo('form', function(viewScope){
+			viewScope.$broadcast("on:new");
+		});
+	};
+	
+	$scope.onEdit = function() {
+		page.index = $scope.selection[0];
+		$scope.switchTo('form');
+	};
+
+	$scope.onDelete = function() {
+		
+		axelor.dialogs.confirm(_t("Do you really want to delete the selected record(s)?"), function(confirmed){
+
+			if (!confirmed)
+				return;
+
+			var selected = _.map($scope.selection, function(index) {
+				return $scope.dataView.getItem(index);
+			});
+
+			ds.removeAll(selected).success(function(records, page){
+				if (records.length == 0 && page.total > 0) {
+					$scope.onRefresh();
+				}
+			});
+		});
+	};
+	
+	$scope.onRefresh = function() {
+		var fields = _.pluck($scope.fields, 'name');
+		ds.search({
+			fields: fields
+		});
+	};
+	
+	$scope.onSort = function(event, args) {
+
+		var sortBy = [],
+			fields = _.pluck($scope.fields, 'name');
+
+		angular.forEach(args.sortCols, function(column){
+			var name = column.sortCol.field;
+			var spec = column.sortAsc ? name : '-' + name;
+			sortBy.push(spec);
+		});
+		
+		ds.search({
+			sortBy: sortBy,
+			fields: fields
+		});
+	};
+	
+	$scope.onSelectionChanged = function(event, args) {
+		$scope.selection = args.rows || [];
+		$scope.$apply();
+	};
+	
+	$scope.onItemClick = function(event, args) {
+		
+	};
+	
+	$scope.onItemDblClick = function(event, args) {
+		$scope.onEdit();
+		$scope.$apply();
+	};
+	
+	var _getContext = $scope.getContext;
+	$scope.getContext = function() {
+
+		// if nested grid then return parent's context
+		if (_getContext) {
+			return _getContext();
+		}
+
+		var dataView = $scope.dataView,
+			selected = _.map($scope.selection, function(index) {
+				return dataView.getItem(index);
+			});
+		return {
+			'_ids': _.pluck(selected, "id")
+		};
+	};
+}
+
+angular.module('axelor.ui').directive('uiViewGrid', function(){
+	return {
+		replace: true,
+		template: '<div ui-slick-grid></div>'
+	};
+});

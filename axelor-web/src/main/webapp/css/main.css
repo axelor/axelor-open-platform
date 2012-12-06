@@ -1,0 +1,334 @@
+html, body {
+	overflow: hidden;
+}
+
+[ng\:cloak], [ng-cloak], .ng-cloak {
+   display: none;
+}
+
+#container {
+	left: 0px; right: 0px; top: 40px; bottom: 0px;
+	min-width:	600px;
+	position:	absolute;
+}
+
+@media (max-width: 979px) {
+#container {
+	top: 50px;
+}
+}
+
+.navbar .navbar-inner .container-fluid {
+	min-width: 940px;
+}
+
+.view-tabs {
+	background-color: white;
+}
+
+.footer {
+	position: absolute;
+	left: 0px; right: 0px; bottom: 0px;
+	padding-top: 4px;
+	background-color: #333;
+	color: white;
+}
+
+.footer p {
+	font-size: smaller;
+	margin-bottom: 4px;
+	text-shadow: 0 1px 1px #111;
+}
+
+.spacer {
+	height: 1em;
+}
+
+/* jQuery UI fixes */
+.ui-state-hover * {
+  color: inherit !important;
+}
+
+.ui-widget {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;;
+	font-size: inherit;
+}
+
+.ui-widget-content {
+	border: 1px solid #E5E5E5;
+}
+
+.ui-dialog,
+.ui-datepicker,
+.ui-menu {
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.ui-dialog {
+	padding: 0;
+}
+
+.ui-dialog-titlebar {
+	border-top: none;
+	border-left: none;
+	border-right: none;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+	background-image: -webkit-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
+	background-image: -ms-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
+	background-image: -o-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
+	background-image: -moz-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f5f5f5', endColorstr='#eeeeee',GradientType=0 );
+	background-image: linear-gradient(top, #F5F5F5 0%,#EEE 100%);
+	background-color: #E5E5E5;
+	border-bottom: 1px solid #E5E5E5;
+}
+
+.ui-dialog .ui-dialog-content {
+	padding: 4px;	
+}
+
+.ui-widget-overlay {
+	background: none;
+	background-color: black;
+}
+
+.ui-dialog .slickgrid {
+	position: absolute;
+	top: 4px; bottom: 0px;
+	left: 4px; right: 4px;
+}
+
+.ui-dialog-buttonpane .btn-group > .btn {
+	margin: inherit;
+}
+
+.ui-dialog-buttonpane .record-pager {
+	margin: .4em;
+}
+
+.ui-dialog-buttonpane .btn-group > .btn:first-child {
+	margin-left: 0;
+}
+
+.ui-dialog-buttonpane .btn-group > .btn:last-child {
+	margin-left: -1px;
+}
+
+.ui-datepicker,
+.ui-datepicker * {
+	line-height: 1.1em;
+}
+
+.ui-datepicker {
+	font-size: .9em;
+}
+
+.ui-autocomplete {
+	max-height: 200px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.no-close .ui-dialog-titlebar-close {
+	display: none;
+}
+/* end jQuery UI fixes */
+
+/* Browser fixes */
+
+/* Remove box-shadow from buttons (dotted outline issue in Firefox) */
+.btn {
+	box-shadow: none !important;
+}
+
+.tooltip {
+	z-index: 2100;
+}
+
+/* end Browser fixes */
+
+.navigation-tabs ul.nav-tabs {
+	margin-bottom: 0px;
+}
+
+.navigation-tabs {
+	position: absolute;
+	top: 8px; left: 4px; right: 4px; bottom: 4px;
+}
+
+.visible-false {
+	visibility: hidden;
+}
+
+.visible-true {
+	visibility: inherit;
+}
+
+.view-content {
+	position: absolute;
+	top: 36px; left: 0px; right: 0px; bottom: 0px;
+}
+
+.view-pane {
+	position: absolute;
+	top: 0px; left: 0px; right: 0px; bottom: 0px;
+	padding: 2px;
+}
+
+.view-pane > .view-container {
+	overflow: auto;
+}
+
+.view-pane > .view-container,
+.view-pane > .view-container > div {
+	position: absolute;
+	top: 0px; left: 0px; right: 0px; bottom: 0px;
+}
+
+.grid-view > .slickgrid {
+	position: absolute !important;
+	top: 46px; left: 0px; right: 0px; bottom: 0px;
+}
+
+.record-toolbar.btn-toolbar {
+	
+	background-image: -webkit-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
+	background-image: -ms-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
+	background-image: -o-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
+	background-image: -moz-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f5f5f5', endColorstr='#eeeeee',GradientType=0 );
+	background-image: linear-gradient(top, #F5F5F5 0%,#EEE 100%);
+	background-color: #E5E5E5;
+	
+	border: 1px solid #E5E5E5;
+	border-left: none;
+	border-right: none;
+	
+	margin: 4px 0;
+	padding: 4px;
+	padding-bottom: 0px;
+}
+
+.record-pager > span {
+	margin-top: 6px;
+	margin-left: 4px;
+	margin-right: 4px;
+}
+
+.record-pager.pull-right > span,
+.record-pager.pull-left > .btn-group {
+	float: left;
+}
+
+.record-pager.pull-left > span {
+	float: right;
+}
+
+.stackbar {
+}
+
+.stackbar .navbar,
+.stackbar .navbar * {
+	color: #333;
+}
+
+.stackbar .navbar .navbar-inner {
+	min-height: 26px;
+	padding-left: 10px;
+	padding-right: 10px;
+	
+	background-image: -webkit-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
+	background-image: -ms-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
+	background-image: -o-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
+	background-image: -moz-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#F5F5F5', endColorstr='#eeeeee',GradientType=0 );
+	background-image: linear-gradient(top, #F5F5F5 0%,#EEE 100%);
+	background-color: #E5E5E5;
+	border: 1px solid #E5E5E5;
+}
+
+.stackbar .navbar .navbar-inner .brand {
+	font-size: small;
+	font-weight: bold;
+	padding: 8px 12px;
+	padding-top: 6px;
+	margin: 0;
+	margin-left: -10px;
+}
+
+.stackbar .navbar .navbar-inner .container-fluid {
+	min-width: 100px;
+	padding: 0;
+}
+
+.stackbar .navbar {
+	margin-bottom: 0px;
+}
+
+.stackbar .navbar,
+.stackbar .navbar .navbar-inner {
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
+	box-shadow: none;
+}
+
+.stackbar .navbar .btn-group {
+	padding: 5px 4px 3px;	
+}
+
+.stackbar .navbar .btn-group a {
+	color: #999;
+	text-decoration: none;
+	cursor: pointer;
+	padding: 6px;
+}
+
+.stackbar .navbar .btn-group a:hover {
+	color: white;
+}
+
+.html-view,
+.iframe-container,
+.iframe-container > iframe {
+	-webkit-box-sizing: border-box;
+   	   -moz-box-sizing: border-box;
+        	box-sizing: border-box;
+}
+
+.html-view > .iframe-container {
+	position: absolute;
+	top: 4px; bottom: 4px; left: 4px; right: 4px;	
+}
+
+.html-view > .iframe-container > iframe {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+
+.search-view {
+
+}
+
+.search-view form {
+	margin: 0 0 8px;
+}
+
+.search-view .search-view-form {
+
+}
+
+.search-view .search-view-toolbar table.form-layout {
+	width: inherit;
+}
+
+.search-view .search-view-grid {
+	position: relative;
+	overflow: hidden;	
+}
+
+.search-view .search-view-grid .slickgrid {
+	position: absolute;
+	top: 0; left: 0; right: 0; bottom: 0;
+}

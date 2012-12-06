@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.6.xsd">
+
+  <menuitem name="menu-admin" title="Administration" priority="-100" groups="admins" icon="img/wrench.png"/>
+  <menuitem name="menu-model" title="Model Management" parent="menu-admin"/>
+  <menuitem name="menu-view-management" title="View Management" parent="menu-admin"/>
+
+  <menuitem name="menu-meta-model" parent="menu-model"
+    title="All Models"
+    action="action-meta-model-views"/>
+
+  <action-view name="action-meta-model-views" title="Models" model="com.axelor.meta.db.MetaModel">
+    <view type="grid" name="meta-model-grid"/>
+    <view type="form" name="meta-model-form"/>
+  </action-view>
+
+  <menuitem name="menu-view-all" parent="menu-view-management"
+    title="All Views"
+    action="action-meta-views"/>
+
+  <action-view name="action-meta-views" title="Views" model="com.axelor.meta.db.MetaView">
+    <view type="grid" name="meta-view-grid"/>
+    <view type="form" name="meta-view-form"/>
+  </action-view>
+
+  <menuitem name="menu-view-menus" parent="menu-view-management"
+    title="All Menus"
+    action="action-meta-menus"/>
+
+  <action-view name="action-meta-menus" title="Menus" model="com.axelor.meta.db.MetaMenu">
+    <view type="grid" name="meta-menu-grid"/>
+    <view type="form" name="meta-menu-form"/>
+  </action-view>
+
+  <menuitem name="menu-view-actions" parent="menu-view-management"
+    title="All Actions"
+    action="action-meta-actions"/>
+
+  <action-view name="action-meta-actions" title="Actions" model="com.axelor.meta.db.MetaAction">
+    <view type="grid" name="meta-action-grid"/>
+    <view type="form" name="meta-action-form"/>
+  </action-view>
+  
+  <menuitem name="menu-view-selects" parent="menu-view-management"
+    title="All Selects" action="action-meta-select"/>
+
+  <action-view name="action-meta-select" title="Selects" model="com.axelor.meta.db.MetaSelect">
+    <view type="grid" name="meta-select-grid"/>
+    <view type="form" name="meta-select-form"/>
+  </action-view>
+  
+  <menuitem name="menu-view-action-menus" parent="menu-view-management"
+    title="Action Menus"
+    action="action-meta-action-menus"/>
+    
+  <action-view name="action-meta-action-menus" title="Action Menus" model="com.axelor.meta.db.MetaActionMenu">
+    <view type="grid" name="meta-action-menu-grid"/>
+    <view type="form" name="meta-action-menu-form"/>
+  </action-view>
+
+</object-views>

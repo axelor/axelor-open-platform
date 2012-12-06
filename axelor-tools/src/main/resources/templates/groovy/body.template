@@ -1,0 +1,70 @@
+${ pojo.documentation }\
+<% pojo.annotations.each { a -> %>
+${a}\
+<% } %>
+class ${pojo.name} extends Model {
+<% pojo.fields.each { p -> %>\
+<% p.annotations.each { a -> %>
+	${a}\
+<% } %>
+	$p.type ${p.name}${p.defaultExpression}
+<% } %>\
+<% pojo.fields.each { p -> %>\
+${p.documentation}
+<% if (! p.code.empty) { %>\
+	$p.type ${p.getter}() {
+		try {
+			$p.name = compute${p.firstUpper(p.name)}()
+		} catch (NullPointerException e){
+			${p.importName('org.slf4j.Logger')} logger = ${p.importName('org.slf4j.LoggerFactory')}.getLogger(getClass())
+			logger.error("NPE in function field: {}", "${p.getter}()")
+		}
+		return $p.name
+	}
+	
+	protected $p.type compute${p.firstUpper(p.name)}() {
+		$p.code
+	}
+<% } else { %>\
+	$p.type ${p.getter}() {
+		$p.getterBody
+	}
+<% } %>\
+
+	void ${p.setter}($p.type $p.name) {
+		$p.setterBody
+	}
+<% } %>\
+
+	$pojo.name persist() {
+		return JPA.persist(this)
+	}
+	
+	$pojo.name merge() {
+		return JPA.merge(this)
+	}
+	
+	$pojo.name save() {
+		return JPA.save(this)
+	}
+	
+	void remove() {
+		JPA.remove(this)
+	}
+	
+	void refresh() {
+		JPA.refresh(this)
+	}
+	
+	void flush() {
+		JPA.flush()
+	}
+	
+	static $pojo.name find(Long id) {
+		return JPA.find(${pojo.name}.class, id)
+	}
+	
+	static Query<$pojo.name> all() {
+		return JPA.all(${pojo.name}.class)
+	}
+}

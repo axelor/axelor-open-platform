@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.6.xsd">
+
+	<menuitem name="menu-wkf" priority="-99" title="Wkf Management"
+		groups="workflow" icon="img/wkf.png" />
+
+	<menuitem name="menu-wkf-workflows" parent="menu-wkf" title="Workflows"
+		action="action-wkf-workflows" />
+
+	<action-view name="action-wkf-workflows" title="Worklows"
+		model="com.axelor.wkf.db.Workflow">
+		<view type="grid" name="worfklow-grid" />
+		<view type="form" name="worfklow-form" />
+	</action-view>
+
+	<menuitem name="menu-wkf-instances" parent="menu-wkf" title="Instances"
+		action="action-wkf-instances" />
+
+	<action-view name="action-wkf-instances" title="Instances"
+		model="com.axelor.wkf.db.Instance">
+		<view type="grid" name="instance-grid" />
+		<view type="form" name="instance-form" />
+	</action-view>
+
+	<menuitem name="menu-wkf-configurations" parent="menu-wkf"
+		title="Configurations" icon="img/wrench.png" />
+
+	<menuitem name="menu-wkf-nodes" parent="menu-wkf-configurations" title="Nodes"
+		action="action-wkf-nodes" />
+
+	<action-view name="action-wkf-nodes" title="Nodes"
+		model="com.axelor.wkf.db.Node">
+		<view type="grid" name="node-grid" />
+		<view type="form" name="node-form" />
+	</action-view>
+
+	<menuitem name="menu-wkf-transitions" parent="menu-wkf-configurations" title="Transitions"
+		action="action-wkf-transitions" />
+
+	<action-view name="action-wkf-transitions" title="Transitions"
+		model="com.axelor.wkf.db.Transition">
+		<view type="grid" name="transition-grid" />
+		<view type="form" name="transition-form" />
+	</action-view>
+
+</object-views>

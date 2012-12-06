@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://apps.axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/domain-models http://apps.axelor.com/xml/ns/domain-models/domain-models_0.6.xsd">
+
+  <module name="workflow" package="com.axelor.wkf.db"/>
+
+  <entity name="Workflow" lang="java">
+    
+    <string name="name" title="Name" required="true"/>
+    <many-to-one name="metaModel" ref="com.axelor.meta.db.MetaModel" title="Model" required="true"/>
+    <many-to-one name="node" ref="Node" title="Node"/>
+    <integer name="maxNodeCounter" title="Max node counter" default="1"/>
+    
+  </entity>
+
+  <entity name="Node" lang="java">
+    
+    <string name="name" title="Name" />
+    <many-to-one name="workflow" ref="Workflow" title="Workflow"/>
+    <string name="type" title="Type" selection="node.type.selection"/>
+    <many-to-one name="action" ref="com.axelor.meta.db.MetaAction" title="Action" />
+    <string name="startLogicOperator" title="Start Logic Operator" selection="start.node.logic.operator.selection" default="or"/>
+    <string name="endLogicOperator" title="End Logic Operator" selection="end.node.logic.operator.selection" default="or" />
+    <one-to-many name="startTransitions" ref="Transition" mappedBy="nextNode" title="Start transitions" readonly="true"/>
+    <one-to-many name="endTransitions" ref="Transition" mappedBy="startNode" title="End transitions" />
+             
+  </entity>
+
+  <entity name="Transition" lang="java">
+    
+    <many-to-one name="startNode" ref="Node" />
+	<many-to-one name="nextNode" ref="Node" title="Next node" required="true"/>
+    <string name="name" title="Name" />
+    <many-to-one name="condition" ref="com.axelor.meta.db.MetaAction" title="Condition" />
+	<integer name="sequence" title="Sequence" />
+             
+  </entity>
+  
+</domain-models>

@@ -1,0 +1,16 @@
+<div id="loginWindow" class="hide" title="Login" style="overflow: hidden;">
+	<div class="modal-body">
+	  <form name="loginForm" class="form-horizontal">
+	  	<label x-translate>User</label>
+	  	<input type="text" name="username" class="input-xlarge">
+	  	<label x-translate>Password</label>
+	  	<input type="password" name="password" class="input-xlarge">
+	  </form>
+	  <div class="alert alert-error hide login-failed">
+        <strong x-translate>Failed!</strong> <i x-translate>Login attempt failed.</i>
+      </div>
+      <div class="alert alert-error hide login-offline">
+      	<strong x-translate>Offline!</strong> <i x-translate>Server is not responding.</i>
+      </div>
+	</div>
+  </div>

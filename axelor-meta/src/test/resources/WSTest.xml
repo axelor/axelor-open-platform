@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.6.xsd">
+
+  <action-ws name="ws.test" service="http://ip.axelor.com:81/SrvWebPortailGRD/SrvImportAffaire.asmx">
+    <action name="WebRegister" template="data/ws-login.tmpl"/>
+  </action-ws>
+
+  <action-ws name="ws.test.1" service="ref:ws.test">
+    <action name="ControleCreeAffaire" template="data/ws-test1.tmpl"/>
+  </action-ws>
+
+  <action-data name="data.test.1" config="data/xml-config.xml">
+    <stream file="ws-test1.xml" provider="ws.test.1" name="titles"/>
+    <!--
+    <stream file="ws-test2.xml" provider="ws.test.2"/>
+    -->
+  </action-data>
+
+</object-views>

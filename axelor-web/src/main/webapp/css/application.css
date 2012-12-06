@@ -1,0 +1,20 @@
+/**
+ * Master CSS file.
+ */
+@import url('../lib/jquery.ui/css/smoothness/jquery-ui.css');
+@import url('../lib/bootstrap/css/bootstrap.css');
+@import url('../lib/bootstrap/css/font-awesome.css');
+@import url('../lib/jquery.timepicker/jquery-ui-timepicker-addon.css');
+
+@import url('../lib/slickgrid/slick.grid.css');
+
+@import url('scrollbar.css');
+@import url('main.css');
+
+@import url('tabs.css');
+@import url('splitter.css');
+@import url('navtree.css');
+@import url('slickgrid.css');
+
+@import url('view.form.css');
+

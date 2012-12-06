@@ -1,0 +1,5 @@
+confirmed,date,firstName,lastName,email,p1,q1,r1,t11,t12,p2,q2,r2,t2
+T,2011-12-11,John,Smith,j.smith@gmail.com,PC1,1,200.12,vat0.4,stx,PC2,4,230.23,vat0.4|stx
+1,2011-12-12,John,Smith,j.smith@gmail.com,PC1,1,200.12,vat0.4,stx,PC2,4,230.23,vat0.6|stx
+F,2011-12-13,John,Smith,j.smith@gmail.com,PC1,10,200.12,vat0.4,stx,PC2,3,230.23,vat0.4|stx
+F,2011-12-14,John,Smith,,L1,5,20.12,vat0.4,stx,L2,3,20.23,vat0.4|vat0.6

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sale-orders xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<sale-order confirmed="T" date="2012-08-11">
+		<some>Thing</some>
+		<customer>
+			<firstName>John</firstName>
+			<lastName>Smith</lastName>
+			<email>john.smith@gmail.com</email>
+		</customer>
+		<items>
+			<item>
+				<product code="PC1" name="Personal Computer" />
+				<price>200.12</price>
+				<quantity>1</quantity>
+				<taxes>
+					<tax code="vat0.4" name="Vat 4%">0.04</tax>
+					<tax code="sal0.12" name="Sale Tax 12%">0.12</tax>
+				</taxes>
+			</item>
+			<item>
+				<product code="LAP" name="Laptop" />
+				<price>250.50</price>
+				<quantity>1</quantity>
+				<taxes>
+					<tax code="vat0.4" name="Vat 4%">0.04</tax>
+				</taxes>
+			</item>
+		</items>
+	</sale-order>
+</sale-orders>

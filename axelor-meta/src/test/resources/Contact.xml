@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_1.0.xsd">
+    <grid name="contact-grid" title="Contacts">
+        <hilite color="#3333FF" background="#CDEB8B" condition="email *= xyz"/>
+        <field name="fullName"/>
+        <field name="email">
+            <hilite color="#FF0000" condition="email $= gmail.com"/>
+        </field>
+        <field name="phone"/>
+        <field name="company"/>
+        <field name="dateOfBirth"/>
+    </grid>
+    <form name="contact-form" title="Contact" cols="2" colWidths="*,200"
+    	onLoad="action-contact-defaults,action-contact-attrs"
+    	onSave="action-contact-validate">
+        <group title="Personal Information" colSpan="1" cols="4">
+            <field name="title"/>
+            <break/>
+            <field name="firstName"/>
+            <field name="lastName" onChange="com.axelor.contact.web.HelloController:guessEmail"/>
+            <field name="email"/>
+            <field name="phone"/>
+            <field name="dateOfBirth"/>
+            <break/>
+            <field name="group" widget="SuggestBox"/>
+            <field name="company" widget="SuggestBox"/>
+        </group>
+        <group title="Actions" colSpan="1" cols="1">
+            <button name="greet" title="Send Greetings..." onClick="com.axelor.contact.web.HelloController:say"/>
+            <button name="showHomePage" title="Home Page..." onClick="com.axelor.contact.web.HelloController:showHomePage"/>
+            <button name="showCompanyList" title="Company List..." help="Demonstrate how to open new view from action." onClick="com.axelor.contact.web.HelloController:showCompanyList"/>
+        </group>
+        <notebook colSpan="1">
+            <page title="Address List" cols="4">
+                <field name="addresses" title="Address List" colSpan="4">
+                    <grid title="Address List">
+                        <field name="street"/>
+                        <field name="area"/>
+                        <field name="city"/>
+                        <field name="zip"/>
+                        <field name="country"/>
+                    </grid>
+                    <form title="Address" cols="4">
+                        <field name="street"/>
+                        <field name="area"/>
+                        <field name="city"/>
+                        <field name="zip"/>
+                        <field name="country"/>
+                        <button name="clickMe" title="Click Me!" onClick="com.axelor.contact.web.HelloController:about"/>
+                    </form>
+                </field>
+            </page>
+            <page title="Notes" cols="1">
+                <field name="notes" title="Notes"/>
+            </page>
+        </notebook>
+    </form>
+    
+    <action-attrs name="action-contact-attrs">
+    	<attribute name="title" for="notes"
+    		expr="eval: String.format('About %s', 'Me')"/>
+    	<attribute name="readonly" for="lastName" expr="eval: 1"/>
+    	<attribute name="hidden" for="lastName" expr="eval: 1"/>
+    	<attribute name="domain" for="title" expr="self.code IN ?1"/>
+    </action-attrs>
+
+    <action-record name="action-contact-defaults"
+    	model="com.axelor.meta.db.Contact">
+    	<field name="title" expr="action:action-default-title"/>
+    	<field name="firstName" expr="John"/>
+    	<field name="lastName" expr="Smith"/>
+    	<field name="email" expr="john.smith@gmail.com"/>
+    	<field name="birthDate" expr="eval: __date__"/>
+    </action-record>
+    
+    <action-record name="action-default-title"
+    	model="com.axelor.meta.db.Title" search="('self.code = ?1', 'MR')">
+    	<field name="code" expr="MR"/>
+    	<field name="name" expr="Mr."/>
+    </action-record>
+    
+    <action-validate name="action-contact-validate">
+    	<error message="Name is too short." if="eval: firstName.length() &lt;= 2"/>
+    	<alert message="Last name is too short. Would you like to continue?"
+    		if="eval: lastName.length() &lt;= 2"/>
+    </action-validate>
+    
+    <action-method name="action-contact-greetings">
+    	<call class="com.axelor.meta.web.Hello" method="say"/>
+    </action-method>
+    
+    <action-method name="action-contact-greetings-rpc">
+      <call class="com.axelor.meta.web.Hello" method="say(fullName)"/>
+    </action-method>
+
+    <action-view name="action-view-contact" model="com.axelor.meta.db.Contact">
+    	<view name="contact-form" type="form"/>
+    	<view name="contact-tree" type="grid" domain="self.group.code = :groupCode" />
+    	<context name="groupCode" expr="falimy"/>
+    </action-view>
+    
+</object-views>
