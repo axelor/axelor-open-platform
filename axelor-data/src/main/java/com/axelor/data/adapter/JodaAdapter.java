@@ -17,10 +17,7 @@ public class JodaAdapter extends Adapter {
 			return value;
 		}
 		
-		String format = this.get("format");
-		if (format == null) {
-			format = DEFAULT_FORMAT;
-		}
+		String format = this.get("format", DEFAULT_FORMAT);
 
 		DateTimeFormatter fmt = DateTimeFormat.forPattern(format);
 		DateTime dt;
@@ -30,7 +27,7 @@ public class JodaAdapter extends Adapter {
 			throw new IllegalArgumentException("Invalid value: " + value, e);
 		}
 		
-		String type = this.get("type");
+		String type = this.get("type", null);
 
 		if ("LocalDate".equals(type)) {
 			return dt.toLocalDate();

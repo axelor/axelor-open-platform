@@ -3,6 +3,10 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://apps.axelor.com/xml/ns/data-import http://apps.axelor.com/xml/ns/data-import/data-import_0.6.xsd">
 
+  <!--
+  These are the default settings.
+  -->
+  
   <adapter name="LocalDate" type="com.axelor.data.adapter.JodaAdapter">
     <option name="type" value="LocalDate"/>
     <option name="format" value="dd/MM/yyyy"/>
