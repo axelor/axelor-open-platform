@@ -143,19 +143,19 @@ public class XMLImporter implements Importer {
 	/**
 	 * Process the data file with the given input binding.
 	 * 
-	 * @param config input binding configuration
+	 * @param input input binding configuration
 	 * @param file data file
 	 * @throws ImportException
 	 */
-	public void process(XMLInput config, File file) throws ImportException {
+	public void process(XMLInput input, File file) throws ImportException {
 		try {
-			this.process(config, new FileReader(file));
+			this.process(input, new FileReader(file));
 		} catch (IOException e) {
 			throw new ImportException(e);
 		}
 	}
 	
-	public void process(XMLInput config, Reader reader) throws ImportException {
+	public void process(XMLInput input, Reader reader) throws ImportException {
 
 		XStream stream = new XStream(new StaxDriver()) {
 
@@ -179,13 +179,12 @@ public class XMLImporter implements Importer {
 			}
 		};
 		
-		XMLBinder binder = new XMLBinder(config, context) {
+		XMLBinder binder = new XMLBinder(input, context) {
 			
 			int count = 0;
 			
 			@Override
 			protected void handle(Object bean, XMLBind binding) {
-				
 				if (bean == null) {
 					return;
 				}
@@ -212,7 +211,15 @@ public class XMLImporter implements Importer {
 				}
 			}
 		};
-		
+
+		// register type adapters
+		for(XMLAdapter adapter : config.getAdapters()) {
+			binder.registerAdapter(adapter);
+		}
+		for(XMLAdapter adapter : input.getAdapters()) {
+			binder.registerAdapter(adapter);
+		}
+
 		stream.setMode(XStream.NO_REFERENCES);
 		stream.registerConverter(new ElementConverter(binder));
 		

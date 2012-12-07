@@ -33,13 +33,19 @@ public abstract class XMLBinder {
 	
 	private Map<String, Object> context;
 	
+	private Map<String, XMLAdapter> adapters = Maps.newHashMap();
+
 	private XPath xpath = XPathFactory.newInstance().newXPath();
 
 	public XMLBinder(XMLInput input, Map<String, Object> context) {
 		this.input = input;
 		this.context = context;
 	}
-
+	
+	public void registerAdapter(XMLAdapter adapter) {
+		adapters.put(adapter.getName(), adapter);
+	}
+	
 	protected abstract void handle(Object bean, XMLBind bind);
 	
 	public void bind(Document element) {
@@ -188,6 +194,8 @@ public abstract class XMLBinder {
 			List<Node> nodes = find(node, bind, ".");
 			Object value = value(nodes, bind);
 			
+			value = this.adapt(bind, value, map);
+
 			if (bind.getNode() == null && bind.getExpression() != null) {
 				value = bind.eval(map);
 			}
@@ -217,6 +225,15 @@ public abstract class XMLBinder {
 			return result.get(0);
 		}
 		return result.size() == 0 ? null : result;
+	}
+	
+	private Object adapt(XMLBind bind, Object value, Map<String, Object> ctx) {
+		String name = bind.getAdapter();
+		if (name == null || !adapters.containsKey(name)) {
+			return value;
+		}
+		XMLAdapter adapter = adapters.get(name);
+		return adapter.adapt(value, ctx);
 	}
 	
 	private List<Node> find(Node node, XMLBind bind, String prefix) {

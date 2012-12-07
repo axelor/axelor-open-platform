@@ -57,6 +57,9 @@ public class XMLBind {
 	@XStreamAsAttribute
 	private String callable;
 	
+	@XStreamAsAttribute
+	private String adapter;
+
 	@XStreamImplicit(itemFieldName = "bind")
 	private List<XMLBind> bindings;
 
@@ -108,6 +111,10 @@ public class XMLBind {
 	
 	public String getCallable() {
 		return callable;
+	}
+	
+	public String getAdapter() {
+		return adapter;
 	}
 	
 	public List<XMLBind> getBindings() {
