@@ -1,5 +1,7 @@
 package com.axelor.data.tests;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -24,6 +26,10 @@ public class Types extends JpaModel {
 	private DateTime dateTimeTz;
 
 	private Boolean active;
+	
+	private Integer number;
+	
+	private BigDecimal price;
 	
 	public LocalDate getDate() {
 		return date;
@@ -65,6 +71,22 @@ public class Types extends JpaModel {
 		this.active = active;
 	}
 	
+	public Integer getNumber() {
+		return number;
+	}
+	
+	public void setNumber(Integer number) {
+		this.number = number;
+	}
+	
+	public BigDecimal getPrice() {
+		return price;
+	}
+	
+	public void setPrice(BigDecimal price) {
+		this.price = price;
+	}
+
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(getClass())
@@ -73,6 +95,8 @@ public class Types extends JpaModel {
 				.add("datetime", dateTime)
 				.add("datetime-tz", dateTimeTz)
 				.add("active", active)
+				.add("number", number)
+				.add("price", price)
 				.toString();
 	}
 }

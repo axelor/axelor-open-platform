@@ -8,14 +8,20 @@
     <datetime>11/12/2013 12:23</datetime>
     <datetime2>11/12/2013 12:23</datetime2>
     <active>1</active>
+    <number>110</number>
+    <price>123,24</price>
   </adapter-test>
   
   <adapter-test>
     <active>0</active>
+    <number>301</number>
+    <price>,242</price>
   </adapter-test>
   
   <adapter-test>
     <active>T</active>
+    <number>-101</number>
+    <price>12.345,000</price>
   </adapter-test>
   
 </adapter-tests>
