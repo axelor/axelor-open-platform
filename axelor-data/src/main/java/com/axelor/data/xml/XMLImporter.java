@@ -22,6 +22,7 @@ import com.axelor.data.ImportException;
 import com.axelor.data.Importer;
 import com.axelor.data.adapter.BooleanAdapter;
 import com.axelor.data.adapter.JodaAdapter;
+import com.axelor.data.adapter.NumberAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.google.common.base.Preconditions;
@@ -63,6 +64,8 @@ public class XMLImporter implements Importer {
 				"type", "DateTime", "format", "dd/MM/yyyy HH:mm"));
 		defaultAdapters.add(new XMLAdapter("Boolean", BooleanAdapter.class,
 				"falsePattern", "(0|f|n|false|no)"));
+		defaultAdapters.add(new XMLAdapter("Number", NumberAdapter.class,
+				"decimalSeparator", ".", "thousandSeparator", ","));
 	}
 
 	public static interface Listener {

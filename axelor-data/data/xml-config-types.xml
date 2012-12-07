@@ -31,6 +31,22 @@
     <option name="falsePattern" value="(0|false|no|f|n)"/>
   </adapter>
   
+  <!-- The default number adapter settings -->
+  <!--
+  <adapter name="Number" type="com.axelor.data.adapter.NumberAdapter">
+    <option name="thousandSeparator" value=","/>
+    <option name="decimalSeparator" value="."/>
+  </adapter>
+  -->
+
+  <!--
+  This is French settings.
+  -->
+  <adapter name="Number" type="com.axelor.data.adapter.NumberAdapter">
+    <option name="thousandSeparator" value="."/>
+    <option name="decimalSeparator" value=","/>
+  </adapter>
+
   <input file="types.xml" root="adapter-tests">
 
     <bind node="adapter-test" type="com.axelor.data.tests.Types">
@@ -39,6 +55,8 @@
       <bind node="datetime" to="dateTime" adapter="LocalDateTime"/>
       <bind node="datetime2" to="dateTimeTz" adapter="DateTime"/>
       <bind node="active" to="active" adapter="Boolean"/>
+      <bind node="number" to="number" adapter="Number"/>
+      <bind node="price" to="price" adapter="Number"/>
     </bind>
 
   </input>
