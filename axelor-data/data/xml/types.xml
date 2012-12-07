@@ -7,6 +7,15 @@
     <time>12:23</time>
     <datetime>11/12/2013 12:23</datetime>
     <datetime2>11/12/2013 12:23</datetime2>
+    <active>1</active>
+  </adapter-test>
+  
+  <adapter-test>
+    <active>0</active>
+  </adapter-test>
+  
+  <adapter-test>
+    <active>T</active>
   </adapter-test>
   
 </adapter-tests>

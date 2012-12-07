@@ -22,6 +22,8 @@ public class Types extends JpaModel {
 	private LocalDateTime dateTime;
 	
 	private DateTime dateTimeTz;
+
+	private Boolean active;
 	
 	public LocalDate getDate() {
 		return date;
@@ -54,7 +56,15 @@ public class Types extends JpaModel {
 	public void setDateTimeTz(DateTime dateTimeTz) {
 		this.dateTimeTz = dateTimeTz;
 	}
-
+	
+	public Boolean getActive() {
+		return active;
+	}
+	
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
+	
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(getClass())
@@ -62,6 +72,7 @@ public class Types extends JpaModel {
 				.add("time", time)
 				.add("datetime", dateTime)
 				.add("datetime-tz", dateTimeTz)
+				.add("active", active)
 				.toString();
 	}
 }
