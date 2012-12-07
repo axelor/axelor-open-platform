@@ -11,11 +11,11 @@ public abstract class Adapter {
 		this.options = options;
 	}
 
-	public String get(String option) {
+	public String get(String option, String defaultValue) {
 		if (options == null) {
-			return null;
+			return defaultValue;
 		}
-		return options.getProperty(option);
+		return options.getProperty(option, defaultValue);
 	}
 
 	public abstract Object adapt(Object value, Map<String, Object> context);

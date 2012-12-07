@@ -15,10 +15,7 @@ public class BooleanAdapter extends Adapter {
 		}
 		
 		if (pattern == null) {
-			String falsePattern = this.get("falsePattern");
-			if (falsePattern == null) {
-				falsePattern = "(0|false|no|f|n)";
-			}
+			String falsePattern = this.get("falsePattern", "(0|false|no|f|n)");
 			pattern = Pattern.compile(falsePattern, Pattern.CASE_INSENSITIVE);
 		}
 
