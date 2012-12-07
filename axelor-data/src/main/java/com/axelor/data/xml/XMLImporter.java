@@ -20,6 +20,8 @@ import org.w3c.dom.Element;
 
 import com.axelor.data.ImportException;
 import com.axelor.data.Importer;
+import com.axelor.data.adapter.BooleanAdapter;
+import com.axelor.data.adapter.JodaAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.google.common.base.Preconditions;
@@ -47,6 +49,21 @@ public class XMLImporter implements Importer {
 	private Map<String, Object> context;
 
 	private List<Listener> listeners = Lists.newArrayList();
+	
+	private static List<XMLAdapter> defaultAdapters = Lists.newArrayList();
+	
+	static {
+		defaultAdapters.add(new XMLAdapter("LocalDate", JodaAdapter.class,
+				"type", "LocalDate", "format", "dd/MM/yyyy"));
+		defaultAdapters.add(new XMLAdapter("LocalTime", JodaAdapter.class,
+				"type", "LocalTime", "format", "HH:mm"));
+		defaultAdapters.add(new XMLAdapter("LocalDateTime", JodaAdapter.class,
+				"type", "LocalDateTime", "format", "dd/MM/yyyy HH:mm"));
+		defaultAdapters.add(new XMLAdapter("DateTime", JodaAdapter.class,
+				"type", "DateTime", "format", "dd/MM/yyyy HH:mm"));
+		defaultAdapters.add(new XMLAdapter("Boolean", BooleanAdapter.class,
+				"falsePattern", "(0|f|n|false|no)"));
+	}
 
 	public static interface Listener {
 		
@@ -213,6 +230,9 @@ public class XMLImporter implements Importer {
 		};
 
 		// register type adapters
+		for(XMLAdapter adapter : defaultAdapters) {
+			binder.registerAdapter(adapter);
+		}
 		for(XMLAdapter adapter : config.getAdapters()) {
 			binder.registerAdapter(adapter);
 		}

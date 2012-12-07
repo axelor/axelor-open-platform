@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.axelor.data.adapter.Adapter;
+import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -38,6 +39,26 @@ public class XMLAdapter {
 	private List<Option> options;
 
 	private Adapter adapter;
+	
+	public XMLAdapter() {
+	}
+	
+	public XMLAdapter(String name, Class<?> type, String... options) {
+		this.name = name;
+		this.klass = type.getName();
+		this.options = Lists.newArrayList();
+		if (options.length % 2 == 0) {
+			for(int i = 0 ; i < options.length ; i += 2) {
+				String key = options[i];
+				String val = options[i+1];
+				Option opt = new Option();
+				
+				opt.name = key;
+				opt.value = val;
+				this.options.add(opt);
+			}
+		}
+	}
 
 	public String getName() {
 		return name;
