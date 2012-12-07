@@ -160,6 +160,7 @@ public class XMLImporter implements Importer {
 	 */
 	public void process(XMLInput input, File file) throws ImportException {
 		try {
+			LOG.info("Importing: {}", file.getName());
 			this.process(input, new FileReader(file));
 		} catch (IOException e) {
 			throw new ImportException(e);

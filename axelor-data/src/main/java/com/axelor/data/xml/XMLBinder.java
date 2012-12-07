@@ -51,11 +51,16 @@ public abstract class XMLBinder {
 	public void bind(Document element) {
 		
 		for(XMLBind binding : input.getBindings()) {
+			LOG.debug("binding: " + binding);
 			List<Node> nodes = this.find(element, binding, "/");
 			for(Node node : nodes) {
+				LOG.trace("element: <{} ...>", node.getNodeName());
 				Map<String, Object> map = this.toMap(node, binding);
 				Object bean = this.bind(binding, binding.getType(), map);
+				if (LOG.isTraceEnabled())
+					LOG.trace("bean created: {}", bean);
 				this.handle(bean, binding);
+				LOG.debug("bean saved: {}", bean);
 			}
 		}
 	}
@@ -69,10 +74,15 @@ public abstract class XMLBinder {
 
 		Object bean = null;
 		Map<String, Object> ctx = toContext(values);
+		
+		LOG.trace("context: " + ctx);
 
 		if (binding.getSearch() != null) {
+			LOG.trace("search: " + binding.getSearch());
 			bean = JPA.all((Class<Model>) type).filter(binding.getSearch()).bind(ctx).fetchOne();
+			LOG.trace("search found: " + bean);
 			if (bean != null && !binding.isUpdate()) {
+				LOG.trace("search no update");
 				return bean;
 			}
 		}
@@ -89,7 +99,11 @@ public abstract class XMLBinder {
 			bean = newInstance(type);
 		}
 
+		LOG.trace("populate: " + type);
+		
 		for (final XMLBind bind : bindings) {
+			
+			LOG.trace("binding: " + bind);
 			
 			final String field = bind.getField();
 			final String name = bind.getAlias() != null ? bind.getAlias() : field;
@@ -105,14 +119,20 @@ public abstract class XMLBinder {
 			}
 			
 			Object value = values.get(name);
-
+			
+			LOG.trace("value: " + value);
+			LOG.trace("condition: " + bind.getCondition());
+			
 			if (!validate(bind, value, ctx)) {
+				LOG.trace("condition failed");
 				continue;
 			}
 
 			// get default value
 			if (bind.getNode() == null && bind.getExpression() != null) {
+				LOG.trace("expression: " + bind.getExpression());
 				value = bind.eval(ctx);
+				LOG.trace("value: " + value);
 			}
 
 			if (value instanceof Model) {
@@ -130,6 +150,7 @@ public abstract class XMLBinder {
 				value = items;
 			}
 
+			LOG.trace("set value: {} = {}", property.getName(), value);
 			isNull = false;
 			property.set(bean, value);
 		}
@@ -253,8 +274,10 @@ public abstract class XMLBinder {
 		}
 
 		try {
+			LOG.trace("xpath: " + path);
 			XPathExpression expression = xpath.compile(path);
 			NodeList items = (NodeList) expression.evaluate(node, XPathConstants.NODESET);
+			LOG.trace("xpath match: " + items.getLength());
 			for (int i = 0; i < items.getLength(); i++) {
 				nodes.add(items.item(i));
 			}
