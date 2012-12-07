@@ -133,8 +133,7 @@ public class XMLImporter implements Importer {
 				try {
 					this.process(input, file);
 				} catch (Exception e) {
-					if (LOG.isErrorEnabled())
-						LOG.error("Error while importing {}.", file, e);
+					LOG.error("Error while importing {}.", file, e);
 				}
 			}
 		}
@@ -215,11 +214,9 @@ public class XMLImporter implements Importer {
 						}
 					}
 				} catch (Exception e) {
-					if (LOG.isErrorEnabled()) {
-						LOG.error("Unable to import object {}.", bean);
-						LOG.error("With binding {}.", binding);
-						LOG.error("With exception:", e);
-					}
+					LOG.error("Unable to import object {}.", bean);
+					LOG.error("With binding {}.", binding);
+					LOG.error("With exception:", e);
 				}
 
 				if (count % 100 == 0) {
