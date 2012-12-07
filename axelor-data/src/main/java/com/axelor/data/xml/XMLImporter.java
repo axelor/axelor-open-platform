@@ -51,22 +51,14 @@ public class XMLImporter implements Importer {
 
 	private List<Listener> listeners = Lists.newArrayList();
 	
-	private static List<XMLAdapter> defaultAdapters = Lists.newArrayList();
-	
-	static {
-		defaultAdapters.add(new XMLAdapter("LocalDate", JodaAdapter.class,
-				"type", "LocalDate", "format", "dd/MM/yyyy"));
-		defaultAdapters.add(new XMLAdapter("LocalTime", JodaAdapter.class,
-				"type", "LocalTime", "format", "HH:mm"));
-		defaultAdapters.add(new XMLAdapter("LocalDateTime", JodaAdapter.class,
-				"type", "LocalDateTime", "format", "dd/MM/yyyy HH:mm"));
-		defaultAdapters.add(new XMLAdapter("DateTime", JodaAdapter.class,
-				"type", "DateTime", "format", "dd/MM/yyyy HH:mm"));
-		defaultAdapters.add(new XMLAdapter("Boolean", BooleanAdapter.class,
-				"falsePattern", "(0|f|n|false|no)"));
-		defaultAdapters.add(new XMLAdapter("Number", NumberAdapter.class,
-				"decimalSeparator", ".", "thousandSeparator", ","));
-	}
+	private static XMLAdapter[] defaultAdapters = {
+		new XMLAdapter("LocalDate", JodaAdapter.class, "type", "LocalDate", "format", "dd/MM/yyyy"),
+		new XMLAdapter("LocalTime", JodaAdapter.class, "type", "LocalTime", "format", "HH:mm"),
+		new XMLAdapter("LocalDateTime", JodaAdapter.class, "type", "LocalDateTime", "format", "dd/MM/yyyy HH:mm"),
+		new XMLAdapter("DateTime", JodaAdapter.class, "type", "DateTime", "format", "dd/MM/yyyy HH:mm"),
+		new XMLAdapter("Boolean", BooleanAdapter.class, "falsePattern", "(0|f|n|false|no)"),
+		new XMLAdapter("Number", NumberAdapter.class, "decimalSeparator", ".", "thousandSeparator", ",")
+	};
 
 	public static interface Listener {
 		
