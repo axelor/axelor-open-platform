@@ -26,6 +26,11 @@
     </annotation>
     <complexType>
       <sequence>
+        <element name="adapter" type="db:Adapter" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Type adapter.</documentation>
+          </annotation>
+        </element>
         <element name="input" type="db:XMLInput" maxOccurs="unbounded">
           <annotation>
             <documentation>Input file binding.</documentation>
@@ -34,6 +39,19 @@
       </sequence>
     </complexType>
   </element>
+  
+  <complexType name="Adapter">
+    <sequence>
+      <element name="option" minOccurs="0" maxOccurs="unbounded">
+        <complexType>
+          <attribute name="name" type="string"/>
+          <attribute name="value" type="string"/>
+        </complexType>
+      </element>
+    </sequence>
+    <attribute name="name" type="string"></attribute>
+    <attribute name="type" type="string"></attribute>
+  </complexType>
 
   <complexType name="Input">
     <annotation>
@@ -181,6 +199,11 @@
     <complexContent>
       <extension base="db:Input">
         <sequence>
+          <element name="adapter" type="db:Adapter" minOccurs="0" maxOccurs="unbounded">
+            <annotation>
+              <documentation>Type adapter.</documentation>
+            </annotation>
+          </element>
           <element name="bind" type="db:XMLBind" maxOccurs="unbounded">
             <annotation>
               <documentation>Binding information.</documentation>
@@ -226,6 +249,13 @@
             <documentation>
               Call a method once the object is populated.
               The object and value map is passed to the method.
+            </documentation>
+          </annotation>
+        </attribute>
+        <attribute name="adapter" type="string">
+          <annotation>
+            <documentation>
+              Type adapter, followed by an optional string argument separated by '|' character.
             </documentation>
           </annotation>
         </attribute>

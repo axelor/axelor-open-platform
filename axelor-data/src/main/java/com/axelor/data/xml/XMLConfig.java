@@ -11,8 +11,18 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 @XStreamAlias("xml-inputs")
 public class XMLConfig {
 
+	@XStreamImplicit(itemFieldName = "adapter")
+	private List<XMLAdapter> adapters = Lists.newArrayList();
+	
 	@XStreamImplicit(itemFieldName = "input")
 	private List<XMLInput> inputs = Lists.newArrayList();
+
+	public List<XMLAdapter> getAdapters() {
+		if (adapters == null) {
+			adapters = Lists.newArrayList();
+		}
+		return adapters;
+	}
 
 	public List<XMLInput> getInputs() {
 		return inputs;

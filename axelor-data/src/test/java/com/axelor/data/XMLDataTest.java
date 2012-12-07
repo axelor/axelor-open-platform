@@ -31,6 +31,12 @@ public class XMLDataTest {
 	}
 
 	@Test
+	public void testTypes() throws IOException {
+		MyLauncher launcher = new MyLauncher();
+		launcher.run("-c", "data/xml-config-types.xml", "-d", "data/xml");
+	}
+	
+	@Test
 	public void testDefault() throws IOException {
 		MyLauncher launcher = new MyLauncher();
 		launcher.run("-c", "data/xml-config.xml", "-d", "data/xml");

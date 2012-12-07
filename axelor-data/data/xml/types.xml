@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<adapter-tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <adapter-test>
+    <date>11/12/2013</date>
+    <time>12:23</time>
+    <datetime>11/12/2013 12:23</datetime>
+    <datetime2>11/12/2013 12:23</datetime2>
+  </adapter-test>
+  
+</adapter-tests>

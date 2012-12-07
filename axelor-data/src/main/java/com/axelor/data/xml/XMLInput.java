@@ -4,8 +4,6 @@ import java.util.List;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -13,9 +11,6 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 @XStreamAlias("input")
 public class XMLInput {
 	
-	@Inject
-	Injector injector;
-
 	@XStreamAlias("file")
 	@XStreamAsAttribute
 	private String fileName;
@@ -23,6 +18,9 @@ public class XMLInput {
 	@XStreamAsAttribute
 	private String root;
 
+	@XStreamImplicit(itemFieldName = "adapter")
+	private List<XMLAdapter> adapters = Lists.newArrayList();
+	
 	@XStreamImplicit(itemFieldName = "bind")
 	private List<XMLBind> bindings = Lists.newArrayList();
 
@@ -36,6 +34,13 @@ public class XMLInput {
 
 	public String getRoot() {
 		return root;
+	}
+	
+	public List<XMLAdapter> getAdapters() {
+		if (adapters == null) {
+			adapters = Lists.newArrayList();
+		}
+		return adapters;
 	}
 	
 	public List<XMLBind> getBindings() {
