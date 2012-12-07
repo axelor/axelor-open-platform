@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
@@ -17,12 +18,16 @@ import com.google.common.base.Objects;
 @Table(name = "DATA_TYPES")
 public class Types extends JpaModel {
 
+	@Type(type = "org.joda.time.contrib.hibernate.PersistentLocalDate")
 	private LocalDate date;
-	
+
+	@Type(type = "org.joda.time.contrib.hibernate.PersistentLocalTimeExact")
 	private LocalTime time;
 	
+	@Type(type = "org.joda.time.contrib.hibernate.PersistentLocalDateTime")
 	private LocalDateTime dateTime;
 	
+	@Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
 	private DateTime dateTimeTz;
 
 	private Boolean active;
