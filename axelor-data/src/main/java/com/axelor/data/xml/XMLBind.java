@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.google.inject.Injector;
@@ -219,13 +217,17 @@ public class XMLBind {
 	@Override
 	public String toString() {
 		
-		ToStringHelper ts = Objects.toStringHelper(this);
-		
-		if (node != null) ts.add("node", node);
-		if (field != null) ts.add("field", field);
-		if (typeName != null) ts.add("type", typeName);
-		if (bindings != null) ts.add("bindings", bindings).toString();
-		
-		return ts.toString();
+		StringBuilder sb = new StringBuilder("<bind");
+
+		if (node != null)
+			sb.append(" node='").append(node).append("'");
+		if (field != null)
+			sb.append(" to=='").append(field).append("'");
+		if (typeName != null)
+			sb.append(" type='").append(typeName).append("'");
+		if (alias != null)
+			sb.append(" alias='").append(alias).append("'");
+
+		return sb.append(" ... >").toString();
 	}
 }
