@@ -236,6 +236,9 @@ public abstract class XMLBinder {
 		List<Object> result = Lists.transform(nodes, new Function<Node, Object>() {
 			@Override
 			public Object apply(@Nullable Node input) {
+				if (bind.getBindings() != null) {
+					return toMap(input, bind);
+				}
 				if (input.getNodeType() == Node.ELEMENT_NODE) {
 					Node child = input.getFirstChild();
 					if (child.getNodeType() == Node.TEXT_NODE) {
