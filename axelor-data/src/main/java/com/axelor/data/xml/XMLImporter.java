@@ -158,7 +158,7 @@ public class XMLImporter implements Importer {
 	 * @param file data file
 	 * @throws ImportException
 	 */
-	public void process(XMLInput input, File file) throws ImportException {
+	private void process(XMLInput input, File file) throws ImportException {
 		try {
 			LOG.info("Importing: {}", file.getName());
 			this.process(input, new FileReader(file));
@@ -167,7 +167,7 @@ public class XMLImporter implements Importer {
 		}
 	}
 	
-	public void process(XMLInput input, Reader reader) throws ImportException {
+	private void process(XMLInput input, Reader reader) throws ImportException {
 
 		XStream stream = new XStream(new StaxDriver()) {
 
