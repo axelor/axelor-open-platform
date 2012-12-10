@@ -157,7 +157,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			$scope.$apply(function(){
 				model.$setViewValue(value);
 				model.$render();
-				if (onChange) {
+				if (onChange && fireOnChange) {
 					onChange._handle();
 				}
 			});
@@ -397,7 +397,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 			if (rec.id <= 0) rec.id = null;
 		});
 		
-		$scope.setValue(records);
+		$scope.setValue(records, true);
 		setTimeout(function(){
 			$scope.$broadcast('grid:changed');
 		});
@@ -432,7 +432,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 			records.push(items[i]);
 		}
 
-		$scope.setValue(records);
+		$scope.setValue(records, true);
 	};
 	
 	$scope.onEdit = function() {

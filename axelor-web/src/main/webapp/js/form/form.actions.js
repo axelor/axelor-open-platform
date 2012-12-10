@@ -377,7 +377,7 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 				action: action
 			});
 			
-			if (element.is('.input-append')) {
+			if (element.is('.input-append') || !(element.is(':input'))) {
 				element.data('$onChange', handler);
 			} else {
 				var input = element.find(':input:first').andSelf().last();
