@@ -4,19 +4,15 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import com.axelor.data.Importer;
-import com.axelor.data.Launcher;
 import com.axelor.data.xml.XMLImporter;
-import com.axelor.db.JpaModule;
 import com.google.inject.AbstractModule;
 
 public class XMLDataTest {
 
-	public static class MyModule extends AbstractModule {
-		
+	static class Module extends MyModule {
+
 		@Override
-		protected void configure() {
-			install(new JpaModule("testUnit", true, true));
+		protected void configureImport() {
 			bind(Importer.class).to(XMLImporter.class);
 		}
 	}
@@ -26,7 +22,7 @@ public class XMLDataTest {
 		@Override
 		protected AbstractModule createModule() {
 			
-			return new MyModule();
+			return new Module();
 		}
 	}
 
