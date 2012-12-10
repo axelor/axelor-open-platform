@@ -26,10 +26,10 @@ public class Response {
 	private int status;
 	
 	@JsonInclude(Include.NON_DEFAULT)
-	private int offset;
+	private int offset = -1;
 	
 	@JsonInclude(Include.NON_DEFAULT)
-	private long total;
+	private long total = -1;
 
 	private Object data;
 	
