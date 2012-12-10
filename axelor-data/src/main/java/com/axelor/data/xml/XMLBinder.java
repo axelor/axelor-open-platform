@@ -128,10 +128,11 @@ public abstract class XMLBinder {
 				continue;
 			}
 
-			// get default value
-			if (bind.getNode() == null && bind.getExpression() != null) {
+			// process eval expression
+			if (bind.getExpression() != null) {
 				LOG.trace("expression: " + bind.getExpression());
-				value = bind.eval(ctx);
+				// default value is already computed so only do eval for node binding
+				value = bind.getNode() == null ? value : bind.eval(ctx);
 				LOG.trace("value: " + value);
 			}
 
@@ -217,13 +218,16 @@ public abstract class XMLBinder {
 			
 			value = this.adapt(bind, value, map);
 
+			if (!validate(bind, value, map)) {
+				continue;
+			}
+			
+			// get default value
 			if (bind.getNode() == null && bind.getExpression() != null) {
 				value = bind.eval(map);
 			}
 
-			if (validate(bind, value, map)) {
-				map.put(name, value);
-			}
+			map.put(name, value);
 		}
 		return map;
 	}
