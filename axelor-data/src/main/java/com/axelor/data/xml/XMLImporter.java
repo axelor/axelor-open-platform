@@ -261,7 +261,9 @@ public class XMLImporter implements Importer {
 	
 	public void runTask(ImportTask task) {
 		try {
-			task.configure();
+			if (task.readers.isEmpty()) {
+				task.configure();
+			}
 			for (XMLInput input : config.getInputs()) {
 				for(Reader reader : task.readers.get(input.getFileName())) {
 					try {
