@@ -428,9 +428,9 @@
 						records.push(record);
 					});
 					
-					page.from = res.offset !== undefined ? res.offset : page.from;
+					page.from = res.offset == undefined ? page.from : res.offset;
 					page.to = page.from + records.length;
-					page.total = res.total || page.total;
+					page.total = res.total == undefined ? page.total : res.total;
 					page.size = records.length;
 					
 					accepted = records;
