@@ -66,20 +66,5 @@
         </address-list>
       </my>
     </contact>
-    <contact location="FR">
-      <title>Mrs.</title>
-      <name type="F">Paul</name>
-      <name type="L">Sébastien</name>
-      <email>p.s@gmail.com</email>
-      <my>
-        <address-list>
-          <address>
-            <line1>Ma maîson</line1>
-            <line2>À l'église</line2>
-            <city>Paris</city>
-          </address>
-        </address-list>
-      </my>
-    </contact>
   </contacts>
 </address-book>
