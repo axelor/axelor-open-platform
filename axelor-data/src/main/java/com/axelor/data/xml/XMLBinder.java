@@ -224,7 +224,7 @@ public abstract class XMLBinder {
 			
 			// get default value
 			if (bind.getNode() == null && bind.getExpression() != null) {
-				value = bind.eval(map);
+				value = bind.eval(toContext(map));
 			}
 
 			map.put(name, value);
