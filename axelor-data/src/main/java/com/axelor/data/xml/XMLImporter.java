@@ -350,12 +350,12 @@ public class XMLImporter implements Importer {
 			int count = 0;
 			
 			@Override
-			protected void handle(Object bean, XMLBind binding) {
+			protected void handle(Object bean, XMLBind binding, Map<String, Object> ctx) {
 				if (bean == null) {
 					return;
 				}
 				try {
-					bean = binding.call(bean, context, injector);
+					bean = binding.call(bean, ctx, injector);
 					if (bean != null) {
 						bean = JPA.manage((Model) bean);
 						count++;

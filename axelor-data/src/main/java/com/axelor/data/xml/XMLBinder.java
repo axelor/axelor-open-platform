@@ -46,7 +46,7 @@ public abstract class XMLBinder {
 		adapters.put(adapter.getName(), adapter);
 	}
 	
-	protected abstract void handle(Object bean, XMLBind bind);
+	protected abstract void handle(Object bean, XMLBind bind, Map<String, Object> context);
 	
 	public void bind(Document element) {
 		
@@ -59,7 +59,7 @@ public abstract class XMLBinder {
 				Object bean = this.bind(binding, binding.getType(), map);
 				if (LOG.isTraceEnabled())
 					LOG.trace("bean created: {}", bean);
-				this.handle(bean, binding);
+				this.handle(bean, binding, toContext(map));
 				LOG.debug("bean saved: {}", bean);
 			}
 		}
