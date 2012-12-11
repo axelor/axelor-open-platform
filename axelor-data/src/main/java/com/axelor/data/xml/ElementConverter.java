@@ -13,6 +13,7 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import com.thoughtworks.xstream.io.naming.NoNameCoder;
 import com.thoughtworks.xstream.io.xml.DomWriter;
 
 public class ElementConverter implements Converter {
@@ -55,7 +56,7 @@ public class ElementConverter implements Converter {
             throw new ConversionException("Cannot instantiate " + Document.class.getName(), e);
         }
         Document document = builder.newDocument();
-        DomWriter writer = new DomWriter(document);
+        DomWriter writer = new DomWriter(document, new NoNameCoder());
         
         copy(reader, writer);
         
