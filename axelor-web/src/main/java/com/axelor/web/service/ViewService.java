@@ -16,6 +16,8 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.service.MetaService;
+import com.axelor.rpc.Request;
+import com.axelor.rpc.Resource;
 import com.axelor.rpc.Response;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
@@ -32,6 +34,18 @@ public class ViewService extends ResourceService {
 
 	@Inject
 	private MetaService service;
+	
+	@RequestScoped
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/meta/models")
+	public static class ModelService {
+		
+		@GET
+		public Response models() {
+			return Resource.models(new Request());
+		}
+	}
 	
 	@GET @SuppressWarnings("all")
 	public Response get() {
