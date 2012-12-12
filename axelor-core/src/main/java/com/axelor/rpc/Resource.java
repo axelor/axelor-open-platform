@@ -2,6 +2,7 @@ package com.axelor.rpc;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,6 @@ import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -86,14 +86,12 @@ public class Resource<T extends Model> {
 
 		Response response = new Response();
 		
-		Collection<?> data = Collections2.transform(JPA.models(),
-				new Function<Class<?>, String>() {
-
-					@Override
-					public String apply(Class<?> input) {
-						return input.getName();
-					}
-				});
+		List<String> data = Lists.newArrayList();
+		for(Class<?> type : JPA.models()) {
+			data.add(type.getName());
+		}
+		
+		Collections.sort(data);
 
 		response.setData(ImmutableList.copyOf(data));
 		response.setStatus(Response.STATUS_SUCCESS);
