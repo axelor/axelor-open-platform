@@ -356,6 +356,10 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 		props = _.isEmpty(props) ? scope.schema : props;
 		if (props == null)
 			return;
+		
+		function isRelational(elem) {
+			return elem.is('.many2one-item,.one2many-item,.many2many-item');
+		}
 
 		action = props.onClick;
 		if (action) {
@@ -371,7 +375,7 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 		
 		action = props.onChange;
 		if (action) {
-			var _scope = element.is('.many2one-item') ? scope.$parent : scope;
+			var _scope = isRelational(element) ? scope.$parent : scope;
 			var handler = new ActionHandler(_scope, ViewService, {
 				element: element,
 				action: action
@@ -385,9 +389,10 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 				input.on('blur', _.bind(handler.onBlur, handler));
 			}
 		}
+
 		action = props.onSelect;
 		if (action) {
-			var _scope = element.is('.many2one-item') ? scope.$parent : scope;
+			var _scope = isRelational(element) ? scope.$parent : scope;
 			var handler = new ActionHandler(_scope, ViewService, {
 				element: element,
 				action: action
