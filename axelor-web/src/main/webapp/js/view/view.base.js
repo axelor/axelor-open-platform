@@ -68,9 +68,43 @@ function ViewCtrl($scope, DataSource, ViewService) {
 		});
 	};
 	
+	if (!params.action) {
+		return;
+	}
+
+	// show single or default record if specified
+	var context = params.context || {};
+	if (context._showSingle || context._showRecord) {
+		var ds = DataSource.create(params.model, params);
+		
+		function doEdit(id) {
+			$scope.switchTo('form', function(scope){
+				scope._viewPromise.then(function(){
+					scope.doRead(id).success(function(record){
+						scope.edit(record);
+					});
+				});
+			});
+		}
+		
+		if (context._showRecord > 0) {
+			return doEdit(context._showRecord);
+		}
+
+		return ds.search({
+			offset: 0,
+			limit: 2,
+			fields: ["id"]
+		}).success(function(records, page){
+			if (page.total === 1 && records.length === 1) {
+				return doEdit(records[0].id);
+			}
+			return $scope.switchTo($scope._viewType || 'grid');
+		});
+	}
+	
 	// switch to the the current viewType
-	if (params.action)
-		$scope.switchTo($scope._viewType || 'grid');
+	$scope.switchTo($scope._viewType || 'grid');
 }
 
 /**
