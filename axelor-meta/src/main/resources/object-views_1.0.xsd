@@ -15,6 +15,7 @@
         <xsd:element name="selection" type="tns:Selection" />
         <xsd:element name="action-menu" type="tns:ActionMenuItem" />
         <xsd:element name="action-validate" type="tns:ActionValidate" />
+        <xsd:element name="action-condition" type="tns:ActionCondition" />
         <xsd:element name="action-record" type="tns:ActionRecord" />
         <xsd:element name="action-attrs" type="tns:ActionAttrs" />
         <xsd:element name="action-method" type="tns:ActionMethod" />
@@ -848,6 +849,50 @@
               <xsd:documentation>XML data import config file.</xsd:documentation>
             </xsd:annotation>
           </xsd:attribute>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="ActionCondition">
+      <xsd:annotation>
+        <xsd:documentation>
+        The action-condition can be used to declare validation conditions.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:complexContent>
+        <xsd:extension base="tns:AbstractAction">
+          <xsd:sequence>
+            <xsd:element name="check" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:documentation>
+                  Define a check condition. The condition expression can be
+                  specified as a string value or required field condition
+                  can be defined with `field` attribute.
+                </xsd:documentation>
+              </xsd:annotation>
+              <xsd:complexType>
+                <xsd:complexContent>
+                  <xsd:extension base="tns:AbstractAct">
+                    <xsd:attribute name="field" type="xsd:string">
+                      <xsd:annotation>
+                        <xsd:documentation>
+                          Check whether the field value exists.
+                          If not the field is marked as required.
+                        </xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="error" type="xsd:string">
+                      <xsd:annotation>
+                        <xsd:documentation>
+                          Specify the error message.
+                        </xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:attribute>
+                  </xsd:extension>
+                </xsd:complexContent>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>

@@ -31,6 +31,7 @@ public class ObjectViews {
 	
 	@XmlElements({
 		@XmlElement(name = "action-validate", type=Action.ActionValidate.class),
+		@XmlElement(name = "action-condition", type=ActionCondition.class),
 		@XmlElement(name = "action-record", type=Action.ActionRecord.class),
 		@XmlElement(name = "action-method", type=Action.ActionMethod.class),
 		@XmlElement(name = "action-attrs", type=Action.ActionAttrs.class),
