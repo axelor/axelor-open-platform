@@ -267,3 +267,7 @@ td.form-item > * {
 .form-item div.code-editor {
 	border: 1px solid #DDD;
 }
+
+.form-item span.error {
+	color: #953B39;
+}

@@ -27,6 +27,56 @@ function updateValues(source, target) {
 	});
 }
 
+function handleError(scope, item, message) {
+	
+	if (item == null) {
+		return;
+	}
+
+	var ctrl = item.data('$ngModelController');
+	if (ctrl == null || ctrl.$doReset) {
+		return;
+	}
+
+	var e = $('<span class="error"></span>').text(message);
+	var p = item.parent('td.form-item');
+
+	if (item.is(':input,.input-append')) {
+		p.append(e);
+	} else {
+		p.prepend(e);
+	}
+
+	var clear = scope.$on('on:edit', function(){
+		ctrl.$doReset();
+	});
+	
+	function cleanUp(items) {
+		var idx = items.indexOf(ctrl.$doReset);
+		if (idx > -1) {
+			items.splice(idx, 1);
+		}
+	}
+	
+	ctrl.$doReset = function(value) {
+		
+		cleanUp(ctrl.$viewChangeListeners);
+		cleanUp(ctrl.$formatters);
+		
+		ctrl.$setValidity('invalid', true);
+		ctrl.$doReset = null;
+		
+		e.remove();
+		clear();
+		
+		return value;
+	};
+	
+	ctrl.$setValidity('invalid', false);
+	ctrl.$viewChangeListeners.push(ctrl.$doReset);
+	ctrl.$formatters.push(ctrl.$doReset);
+}
+
 function ActionHandler($scope, ViewService, options) {
 
 	if (options == null || !options.action)
@@ -199,6 +249,14 @@ ActionHandler.prototype = {
 					});
 				});
 			});
+		}
+		
+		if (!_.isEmpty(data.errors)) {
+			_.each(data.errors, function(v, k){
+				var item = findItems(k).first();
+				handleError(scope, item, v);
+			});
+			return callback(false);
 		}
 		
 		if (data.values) {
