@@ -453,7 +453,7 @@ public abstract class Action {
 		}
 		
 		boolean test(ActionHandler handler) {
-			return test(handler, condition);
+			return test(handler, getCondition());
 		}
 	}
 	

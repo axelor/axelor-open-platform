@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
+import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -117,6 +118,24 @@ public class TestActions extends AbstractTest {
 		Object value = action.evaluate(handler);
 		
 		assertNotNull(value);
+	}
+	
+	@Test
+	@SuppressWarnings("all")
+	public void testCondition() {
+		
+		Action action = MetaStore.getAction("check.dates");
+		Map<String, Object> context = Maps.newHashMap();
+		
+		context.put("orderDate", new LocalDate("2012-12-10"));
+		context.put("createDate", new LocalDate("2012-12-11"));
+		
+		ActionHandler handler = createHandler("check.dates", context);
+		Object value = action.evaluate(handler);
+		
+		assertNotNull(value);
+		assertTrue(value instanceof Map);
+		assertTrue(((Map) value).isEmpty());
 	}
 	
 	@Test

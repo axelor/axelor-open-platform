@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<object-views xmlns="http://apps.axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_1.0.xsd">
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.6.xsd">
     <grid name="contact-grid" title="Contacts">
         <hilite color="#3333FF" background="#CDEB8B" condition="email *= xyz"/>
         <field name="fullName"/>
@@ -93,10 +95,21 @@
       <call class="com.axelor.meta.web.Hello" method="say(fullName)"/>
     </action-method>
 
-    <action-view name="action-view-contact" model="com.axelor.meta.db.Contact">
+    <action-view name="action-view-contact" model="com.axelor.meta.db.Contact" title="Contacts">
     	<view name="contact-form" type="form"/>
-    	<view name="contact-tree" type="grid" domain="self.group.code = :groupCode" />
+    	<view name="contact-tree" type="grid"/>
+        <domain>self.group.code = :groupCode</domain>
     	<context name="groupCode" expr="falimy"/>
     </action-view>
     
+    <action-condition name="check.date.is.required">
+      <check if="state == 'draft'"/>
+    </action-condition>
+
+    <action-condition name="check.dates">
+      <check field="orderDate"/>
+      <check field="createDate"/>
+      <check field="createDate" if="orderDate &lt; createDate" error="Order create date is in future."/>
+    </action-condition>
+
 </object-views>
