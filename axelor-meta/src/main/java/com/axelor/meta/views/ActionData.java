@@ -1,5 +1,6 @@
 package com.axelor.meta.views;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Collection;
@@ -12,6 +13,7 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.data.ImportException;
 import com.axelor.data.xml.XMLImporter;
+import com.axelor.data.xml.XMLImporter.ImportTask;
 import com.axelor.db.Model;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
@@ -38,7 +40,7 @@ public class ActionData extends Action {
 		return streams;
 	}
 
-	private List<Model> doImport(XMLImporter importer, String fileName, Object data) {
+	private List<Model> doImport(XMLImporter importer, final String fileName, Object data) {
 		
 		if (!(data instanceof String)) {
 			log.debug("stream type not supported: " + data.getClass());
@@ -62,13 +64,22 @@ public class ActionData extends Action {
 				records.add(bean);
 			}
 		});
+		
+		importer.runTask(new ImportTask() {
+			
+			@Override
+			protected void configure() throws IOException {
+				input(fileName, reader);
+			}
+			
+			@Override
+			protected boolean handle(ImportException e) {
+				log.error("error:" + e);
+				e.printStackTrace();
+				return true;
+			}
+		});
 
-		try {
-			importer.process(mapping);
-		} catch (ImportException e) {
-			log.error("error:" + e);
-			e.printStackTrace();
-		}
 		log.info("action-data (count): " + records.size());
 		return records;
 	}
