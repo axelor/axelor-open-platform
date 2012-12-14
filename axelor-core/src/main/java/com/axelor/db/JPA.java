@@ -112,6 +112,7 @@ public final class JPA {
 		if (entity != null)
 			checkVersion(entity.getClass(), entity.getId(), entity.getVersion());
 		em().persist(entity);
+		em().flush();
 		return entity;
 	}
 
@@ -124,7 +125,9 @@ public final class JPA {
 		// optimistic concurrency check
 		if (entity != null)
 			checkVersion(entity.getClass(), entity.getId(), entity.getVersion());
-		return em().merge(entity);
+		T result = em().merge(entity);
+		em().flush();
+		return result;
 	}
 
 	/**
