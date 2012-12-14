@@ -119,7 +119,17 @@ public class XMLImporter implements Importer {
 		 * @return return {@code true} to continue else terminate the task
 		 *         immediately.
 		 */
-		protected boolean handle(ImportException exception) {
+		protected boolean handle(ImportException e) {
+			return false;
+		}
+		
+		/**
+		 * Provide io exception handler.
+		 * 
+		 * @return return {@code true} to continue else terminate the task
+		 *         immediately.
+		 */
+		protected boolean handle(IOException e) {
 			return false;
 		}
 
