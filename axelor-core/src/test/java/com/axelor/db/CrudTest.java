@@ -7,10 +7,10 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import com.axelor.BaseTest;
-import com.axelor.domain.Address;
-import com.axelor.domain.Contact;
-import com.axelor.domain.Country;
-import com.axelor.domain.Title;
+import com.axelor.test.db.Address;
+import com.axelor.test.db.Contact;
+import com.axelor.test.db.Country;
+import com.axelor.test.db.Title;
 import com.google.common.collect.Lists;
 
 public class CrudTest  extends BaseTest {

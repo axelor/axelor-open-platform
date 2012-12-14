@@ -57,8 +57,8 @@ import com.google.inject.persist.Transactional;
  * 1. demo.resolver.yml
  * 
  * <pre>
- * Group: com.axelor.domain.Group
- * Person: com.axelor.domain.Person
+ * Group: com.axelor.contact.db.Group
+ * Person: com.axelor.contact.db.Person
  * </pre>
  * 
  * 2. demo.data.yml

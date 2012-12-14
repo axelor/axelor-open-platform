@@ -1,7 +1,7 @@
 {
     "operationType":"fetch",
     "componentId":"isc_ListGrid_0",
-    "dataSource" : "com_axelor_domain_Contact",
+    "dataSource" : "com_axelor_test_db_Contact",
     "data":{
         "firstName": "ma",
         "email": "gmail",
