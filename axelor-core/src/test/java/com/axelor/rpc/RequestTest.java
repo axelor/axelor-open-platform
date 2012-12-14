@@ -10,10 +10,10 @@ import org.junit.Test;
 import com.axelor.BaseTest;
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
-import com.axelor.domain.Address;
-import com.axelor.domain.Contact;
-import com.axelor.domain.Group;
-import com.axelor.domain.Title;
+import com.axelor.test.db.Address;
+import com.axelor.test.db.Contact;
+import com.axelor.test.db.Group;
+import com.axelor.test.db.Title;
 import com.google.inject.persist.Transactional;
 
 public class RequestTest extends BaseTest {

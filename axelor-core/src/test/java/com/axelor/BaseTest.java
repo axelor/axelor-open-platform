@@ -8,9 +8,9 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 
 import com.axelor.db.Fixture;
-import com.axelor.domain.Contact;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.GuiceRunner;
+import com.axelor.test.db.Contact;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(GuiceRunner.class)

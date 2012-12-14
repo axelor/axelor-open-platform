@@ -7,8 +7,8 @@ import com.axelor.BaseTest;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
-import com.axelor.domain.Address;
-import com.axelor.domain.Contact;
+import com.axelor.test.db.Address;
+import com.axelor.test.db.Contact;
 
 public class PropertyTest extends BaseTest {
 

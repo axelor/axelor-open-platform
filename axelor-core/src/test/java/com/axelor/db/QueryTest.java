@@ -11,9 +11,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.axelor.BaseTest;
-import com.axelor.domain.Contact;
-import com.axelor.domain.Group;
-import com.google.common.collect.Maps;
+import com.axelor.db.Query;
+import com.axelor.test.db.Contact;
+import com.axelor.test.db.Group;
 
 public class QueryTest extends BaseTest {
 

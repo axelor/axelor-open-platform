@@ -1,5 +1,5 @@
-Group: com.axelor.domain.Group
-Title: com.axelor.domain.Title
-Contact: com.axelor.domain.Contact
-Address: com.axelor.domain.Address
-Country: com.axelor.domain.Country
+Group: com.axelor.test.db.Group
+Title: com.axelor.test.db.Title
+Contact: com.axelor.test.db.Contact
+Address: com.axelor.test.db.Address
+Country: com.axelor.test.db.Country

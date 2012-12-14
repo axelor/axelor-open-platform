@@ -12,8 +12,8 @@ import org.junit.Test;
 import com.axelor.BaseTest;
 import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
-import com.axelor.domain.Contact;
-import com.axelor.domain.TypeCheck;
+import com.axelor.test.db.Contact;
+import com.axelor.test.db.TypeCheck;
 
 public class MapperTest extends BaseTest {
 
