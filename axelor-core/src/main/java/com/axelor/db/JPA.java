@@ -136,23 +136,15 @@ public final class JPA {
 	 * It uses either {@link #persist(Model)} or {@link #merge(Model)} and calls
 	 * {@link #flush()} the synchronize values with database.
 	 * 
-	 * If the entity is already managed by the entity manager then it only calls
-	 * flush.
-	 * 
 	 * @see #persist(Model)
 	 * @see #merge(Model)
-	 * @see #flush()
 	 * 
 	 */
 	public static <T extends Model> T save(T entity) {
-		if (em().contains(entity)) {
-			em().flush();
-			return entity;
+		if (em().contains(entity) || entity.getId() == null) {
+			return persist(entity);
 		}
-		if (entity.getId() != null) {
-			return merge(entity);
-		}
-		return persist(entity);
+		return merge(entity);
 	}
 
 	/**
