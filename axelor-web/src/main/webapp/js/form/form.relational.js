@@ -803,11 +803,12 @@ var NestedForm = {
 EmbeddedEditorCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewService'];
 function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 	
-	var params = $scope._viewParams;
+	var params = angular.copy($scope._viewParams);
 	
 	params.views = _.compact([params.summaryView]);
 	$scope._viewParams = params;
 
+	ViewCtrl($scope, DataSource, ViewService);
 	FormViewCtrl.call(this, $scope, $element);
 
 	$scope.onShow = function() {
