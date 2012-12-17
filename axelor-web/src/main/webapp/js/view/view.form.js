@@ -426,11 +426,14 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 		
 		scope.setHidden = function(item, hidden) {
 			var flag = _.isUndefined(hidden) || hidden,
-				elem = findItem(item), label;
+				elem = findItem(item), label, parent;
 			if (elem == null)
 				return;
 			label = elem.data('label') || $();
-			return flag ? elem.add(label).parent('td').hide() : elem.add(label).parent('td').show();
+			parent = elem.parent('td');
+			if (parent.size() == 0)
+				parent = elem;
+			return flag ? parent.add(label).hide() : parent.add(label).show();
 		};
 		
 		scope.setRequired = function(item, required) {

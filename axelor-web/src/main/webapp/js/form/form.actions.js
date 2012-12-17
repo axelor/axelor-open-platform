@@ -278,22 +278,23 @@ ActionHandler.prototype = {
 		
 		function findItems(name) {
 			
-			var items;
-
+			var items,
+				containers = formElement.parents('.form-view:first').find('.record-toolbar:first').andSelf();
+			
 			// first search by name
-			items = formElement.find('[name="' + name +'"]');
+			items = containers.find('[name="' + name +'"]');
 			if (items.size())
 				return items;
 
 			// then search by x-path
-			items = formElement.find('[x-path="' + name + '"]');
+			items = containers.find('[x-path="' + name + '"]');
 			if (items.size()) {
 				return items;
 			}
 			
 			// then search with relative path
 			if (scope.formPath) {
-				items = formElement.find('[x-path="' + scope.formPath + '.' + name + '"]');
+				items = containers.find('[x-path="' + scope.formPath + '.' + name + '"]');
 				if (items.size()) {
 					return items;
 				}
