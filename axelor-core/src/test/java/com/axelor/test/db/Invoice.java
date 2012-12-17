@@ -14,7 +14,7 @@ import com.axelor.db.JpaModel;
 import com.axelor.db.Query;
 
 @Entity
-@Table(name = "TEST_MOVE_LINE")
+@Table(name = "TEST_INVOICE")
 public class Invoice extends JpaModel {
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
