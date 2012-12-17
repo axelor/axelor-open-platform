@@ -174,6 +174,6 @@ function DSViewCtrl(type, $scope, $element) {
 	$scope.hasButton = function(name) {
 		if (_(hiddenButtons).has(name))
 			return !hiddenButtons[name];
-		return name !== 'copy';
+		return true;
 	};
 }
