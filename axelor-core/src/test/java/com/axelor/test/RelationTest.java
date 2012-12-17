@@ -16,7 +16,7 @@ import com.google.inject.persist.Transactional;
 
 @RunWith(GuiceRunner.class)
 @GuiceModules({ MyModule.class })
-public class InvoiceTest {
+public class RelationTest {
 
 	@Before
 	@Transactional
@@ -26,9 +26,9 @@ public class InvoiceTest {
 	}
 	
 	@Transactional
-	public void testErrors() {
+	protected void testErrors() {
 		Invoice invoice = Invoice.all().fetchOne();
-		
+
 		Move move = new Move();
 		move.setMoveLines(Lists.<MoveLine>newArrayList());
 		move.setInvoice(invoice);
@@ -38,10 +38,11 @@ public class InvoiceTest {
 		line1.setDebit(BigDecimal.ZERO);
 		line1.setMove(move);
 		line1.setInvoiceReject(invoice);
-
+		
 		move.getMoveLines().add(line1);
 		
 		invoice.setRejectMoveLine(line1);
+		invoice.setMove(move);
 		
 		invoice.save();
 
@@ -53,9 +54,23 @@ public class InvoiceTest {
 
 		move.save();
 	}
+	
+	@Transactional
+	protected void testRelations() {
+		Move move = Move.all().fetchOne();
+		MoveLine line = MoveLine.all().fetchOne();
+		Invoice invoice = Invoice.all().fetchOne();
+		
+		Assert.assertSame(move, line.getMove());
+		Assert.assertSame(move, invoice.getMove());
+		Assert.assertSame(line, invoice.getRejectMoveLine());
+		
+		Assert.assertSame(line, move.getMoveLines().get(0));
+	}
 
 	@Test
 	public void test() {
 		testErrors();
+		testRelations();
 	}
 }
