@@ -39,8 +39,7 @@ public abstract class Action {
 		@XmlElement(name = "field", type = Field.class),
 		@XmlElement(name = "attribute", type = Attr.class),
 		@XmlElement(name = "call", type = Call.class),
-		@XmlElement(name = "view", type = View.class),
-		@XmlElement(name = "context", type = Context.class),
+		@XmlElement(name = "view", type = View.class)
 	})
 	private List<? extends Act> elements;
 	
@@ -302,6 +301,9 @@ public abstract class Action {
 		@XmlElement
 		private String domain;
 		
+		@XmlElement(name = "context")
+		private List<Context> contexts;
+		
 		public String getTitle() {
 			return title;
 		}
@@ -342,16 +344,17 @@ public abstract class Action {
 					
 					views.add(map);
 				}
-				
-				if (elem instanceof Field) {
-					Object value = handler.evaluate(elem.getExpression());
-					if (((Field) elem).getCanCopy() == Boolean.TRUE && value instanceof Model) {
-						value = JPA.copy((Model)value, true);
-					}
-					context.put(elem.getName(), value);
-				}
 			}
 			
+			if (contexts != null) {
+				for(Context ctx : contexts) {
+					Object value = handler.evaluate(ctx.getExpression());
+					if (ctx.getCanCopy() == Boolean.TRUE && value instanceof Model) {
+						value = JPA.copy((Model)value, true);
+					}
+					context.put(ctx.getName(), value);
+				}
+			}
 			String domain = this.getDomain();
 			
 			if (domain != null && domain.contains("$")) {
