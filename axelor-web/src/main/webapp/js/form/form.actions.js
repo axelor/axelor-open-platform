@@ -357,7 +357,11 @@ ActionHandler.prototype = {
 						itemScope.setCollapsed(value);
 					break;
 				case 'title':
-					label.html(value);
+					if (label) {
+						label.html(value);
+					} else if (item.is('label')) {
+						item.html(value);
+					}
 					break;
 				case 'color':
 					//TODO: set color
