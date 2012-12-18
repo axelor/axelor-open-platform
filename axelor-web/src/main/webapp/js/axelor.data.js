@@ -24,6 +24,7 @@
 		
 			this._filter = null;
 			this._sortBy = null;
+			this._lastContext = null;
 
 			this._data = [];
 
@@ -97,6 +98,9 @@
 
 				var limit = options.limit == undefined ? this._page.limit : options.limit;
 				var offset = options.offset == undefined ? this._page.from : options.offset;
+				var domain = options.domain === undefined ? this._domain : options.domain;
+				var context = options.context == undefined ? this._lastContext : options.context;
+
 				if (options.filter) {
 					this._filter = options.filter;
 					offset = 0;
@@ -104,12 +108,17 @@
 				if (options.sortBy) {
 					this._sortBy = options.sortBy;
 				}
+				if (options.context) {
+					this._lastContext = options.context;
+				}
+
+				context = _.extend({}, this._context, context);
 
 				var query = extend({
-					_domain: options.domain === undefined ? this._domain : options.domain,
-					_domainContext: options.context === undefined ? this._context : options.context
+					_domain: domain,
+					_domainContext: context
 				}, this._filter);
-
+				
 				var that = this,
 					page = this._page,
 					records = this._data,
