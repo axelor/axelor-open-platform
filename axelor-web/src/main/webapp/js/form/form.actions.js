@@ -277,10 +277,12 @@ ActionHandler.prototype = {
 		}
 		
 		function findItems(name) {
-			
-			var items,
-				containers = formElement.parents('.form-view:first').find('.record-toolbar:first').andSelf();
-			
+
+			var items;
+			var containers = formElement.parents('.form-view:first')
+										.find('.record-toolbar:first')
+										.add(formElement);
+
 			// first search by name
 			items = containers.find('[name="' + name +'"]');
 			if (items.size())
