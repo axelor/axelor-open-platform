@@ -130,6 +130,21 @@ function GridViewCtrl($scope, $element) {
 				case 'decimal':
 					operator = 'iEquals';
 					break;
+				case 'boolean':
+					operator = 'iEquals';
+					value = !/f|n|false|no|0/.test(value);
+					break;
+				case 'date':
+					operator = 'iEquals';
+					value = moment(value, 'DD/MM/YYYY').format('YYYY-MM-DD'); //TODO: user date format
+					break;
+				case 'time':
+					operator = 'iEquals';
+					break;
+				case 'datetime':
+					operator = 'iEquals';
+					value = moment(value, 'DD/MM/YYYY HH:mm').format(); //TODO: user datetime format
+					break;
 			}
 			
 			return {
