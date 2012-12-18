@@ -19,28 +19,40 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			views[view.viewType] = view;
 		});
 		
+		var formView = null,
+			gridView = null,
+			summaryView = null;
+
+		if (field.summaryView === "" || field.summaryView === "true") {
+			summaryView = views.form;
+		}
+
 		if (field.gridView) {
-			views.grid = {
+			gridView = {
 				type: 'grid',
 				name: field.gridView
 			};
 		}
 		if (field.formView) {
-			views.form = {
+			formView = {
 				type: 'form',
 				name: field.formView
 			};
 		}
-		
+
 		if (field.summaryView === "" || field.summaryView === "true") {
-			params.summaryView = views.form || { type: 'form' };
+			summaryView = views.form || formView || { type: 'form' };
 		} else if (field.summaryView) {
-			params.summaryView = {
+			summaryView = {
 				type: "form",
 				name: field.summaryView
 			};
 		}
-
+		
+		views.form = formView;
+		views.grid = gridView;
+		params.summaryView = summaryView;
+		
 		params.views = _.compact([views.grid, views.form]);
 		$scope._viewParams = params;
 	}
