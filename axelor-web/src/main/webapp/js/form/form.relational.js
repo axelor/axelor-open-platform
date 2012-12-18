@@ -33,7 +33,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		}
 		
 		if (field.summaryView === "" || field.summaryView === "true") {
-			params.summaryView = views.form;
+			params.summaryView = views.form || { type: 'form' };
 		} else if (field.summaryView) {
 			params.summaryView = {
 				type: "form",
