@@ -138,8 +138,11 @@ function SelectorCtrl($scope, $element, DataSource) {
 		var selection = _.map($scope.selection, function(index){
 			return $scope._dataSource.at(index);
 		});
+		
+		if (!_.isEmpty(selection)) {
+			$scope.select(selection);
+		}
 
-		$scope.select(selection);
 		$element.dialog('close');
 	};
 }
