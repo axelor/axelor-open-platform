@@ -19,17 +19,6 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			views[view.viewType] = view;
 		});
 		
-		if (field.summaryView) {
-			if (field.summaryView === "" || field.summaryView === "true")
-				params.summaryView = views.form;
-			else if (field.summaryView) {
-				params.summaryView = {
-					type: "form",
-					name: field.summaryView
-				};
-			}
-		}
-
 		if (field.gridView) {
 			views.grid = {
 				type: 'grid',
@@ -42,6 +31,16 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 				name: field.formView
 			};
 		}
+		
+		if (field.summaryView === "" || field.summaryView === "true") {
+			params.summaryView = views.form;
+		} else if (field.summaryView) {
+			params.summaryView = {
+				type: "form",
+				name: field.summaryView
+			};
+		}
+
 		params.views = _.compact([views.grid, views.form]);
 		$scope._viewParams = params;
 	}
