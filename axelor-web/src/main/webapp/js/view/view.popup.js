@@ -44,6 +44,10 @@ function EditorCtrl($scope, $element, DataSource) {
 		if (!$scope.isValid())
 			return;
 
+		var record = $scope.record,
+			events = $scope._$events,
+			saveAction = events.onSave;
+
 		function close(value) {
 			if (value) {
 				value.$fetched = true;
@@ -53,19 +57,25 @@ function EditorCtrl($scope, $element, DataSource) {
 			$element.dialog('close');
 		};
 		
-		var record = $scope.record;
-		
-		if ($scope.editorCanSave && $scope.isDirty()){
-			if (record.id < 0)
-				record.id = null;
+		function doSave() {
 			ds.save(record).success(function(record, page){
 				setTimeout(function(){
 					close(record);
 				});
 			});
 		}
-		else
+		
+		if ($scope.editorCanSave && $scope.isDirty()) {
+			if (record.id < 0)
+				record.id = null;
+			if (saveAction) {
+				saveAction().then(doSave);
+			} else {
+				doSave();
+			}
+		} else {
 			close(record);
+		}
 	};
 	
 	$scope.onBeforeClose = function(event, ui) {
