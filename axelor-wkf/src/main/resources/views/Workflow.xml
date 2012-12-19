@@ -37,8 +37,11 @@
         <field name="maxNodeCounter"/>
         <field name="node" form-view="start-node-form"/>
         <separator colSpan="4"/>
-        <button name="run" title="Run" onClick="save,wkf-method-run" colSpan="2"/>
-        <button name="openInstances" title="Show instances" onClick="save,wkf-method-open-instances" colSpan="2"/>
+        <group colSpan="4" cols="6">
+	        <button name="run" title="Run" onClick="save,wkf-method-run" colSpan="2"/>
+	        <button name="openInstances" title="Show instances" onClick="save,wkf-method-open-instances" colSpan="2"/>
+	        <button name="showOryx" title="Oryx" onClick="save,wkf-method-show-editor" colSpan="2"/>
+        </group>
     </form>
     
     <grid name="node-grid" title="Nodes" model="com.axelor.wkf.db.Node">
@@ -147,6 +150,10 @@
     
     <action-method name="wkf-method-run">
     	<call class="com.axelor.wkf.web.WkfController" method="run"/>
+    </action-method>
+    
+    <action-method name="wkf-method-show-editor">
+    	<call class="com.axelor.wkf.web.WkfController" method="showEditor"/>
     </action-method>
     
 </object-views>
