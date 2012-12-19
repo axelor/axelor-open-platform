@@ -67,6 +67,7 @@
 			this.FIELD_TYPES = {
 				'STRING'		: 'string',
 				'INTEGER'		: 'integer',
+				'LONG'			: 'integer',
 				'DECIMAL'		: 'decimal',
 				'BOOLEAN'		: 'boolean',
 				'DATE'			: 'date',
