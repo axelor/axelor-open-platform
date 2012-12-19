@@ -38,10 +38,11 @@ public class MetaService {
 	private List<MenuItem> findMenus(Query query) {
 		
 		List<MenuItem> menus = Lists.newArrayList();
-		List<MetaMenu> all = query.getResultList();
+		List<Object[]> all = query.getResultList();
 		
-		for(MetaMenu menu : all) {
+		for(Object[] items : all) {
 
+			MetaMenu menu = (MetaMenu) items[0];
 			MenuItem item = new MenuItem();
 			item.setName(menu.getName());
 			item.setPriority(menu.getPriority());
@@ -71,7 +72,7 @@ public class MetaService {
 			user = User.all().filter("self.code = ?1", subject.getPrincipal()).fetchOne();
 		}
 		
-		String q1 = "SELECT self FROM MetaMenu self LEFT JOIN self.groups g WHERE ";
+		String q1 = "SELECT self, COALESCE(self.priority, 0) AS priority FROM MetaMenu self LEFT JOIN self.groups g WHERE ";
 		String q2 = "self.parent IS NULL";
 		Object p1 = null;
 		Object p2 = null;
@@ -93,7 +94,7 @@ public class MetaService {
 			q1 += " AND self.groups IS EMPTY";
 		}
 		
-		q1 += " ORDER BY self.priority DESC, self.id";
+		q1 += " ORDER BY priority DESC, self.id";
 		
 		Query query = JPA.em().createQuery(q1);
 		if (p1 != null)
