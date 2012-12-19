@@ -24,6 +24,9 @@
 		<view type="form" name="instance-form" />
 	</action-view>
 
+	<menuitem name="menu-wkf-oryx" parent="menu-wkf" title="Oryx"
+		action="wkf-method-show-editor" />
+
 	<menuitem name="menu-wkf-configurations" parent="menu-wkf"
 		title="Configurations" icon="img/wrench.png" />
 
