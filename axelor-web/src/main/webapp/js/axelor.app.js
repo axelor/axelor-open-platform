@@ -325,6 +325,14 @@ function NavCtrl($scope, $rootScope, $location, $routeParams, MenuService) {
 				
 				var view = result.data[0].view;
 				
+				if (view && view.viewType == 'html') {
+					view.views = [{
+						resource: view.resource,
+						title: view.title,
+						type: 'html'
+					}];
+				}
+				
 				tab = view;
 				tab.action = name;
 				$scope.openTab(tab);
