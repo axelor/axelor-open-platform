@@ -191,16 +191,18 @@ public final class JPA {
 		em().clear();
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("all")
 	private static <T extends Model> void checkVersion(T bean, Object version) {
-		if (bean == null || version == null || em().contains(bean)) {
+		if (bean == null || version == null) {
 			return;
 		}
-		Class<T> klass = (Class<T>) bean.getClass();
-		Long id = bean.getId();
-		T entity = JPA.find(klass, id);
+		Class klass = bean.getClass();
+		if (bean instanceof HibernateProxy) {
+			klass = ((HibernateProxy) bean).getHibernateLazyInitializer().getPersistentClass();
+		}
+		Model entity = JPA.find(klass, bean.getId());
 		if (entity == null || !Objects.equal(version, entity.getVersion())) {
-			Exception cause = new StaleObjectStateException(klass.getName(), id);
+			Exception cause = new StaleObjectStateException(klass.getName(), bean.getId());
 			throw new OptimisticLockException(cause);
 		}
 	}
