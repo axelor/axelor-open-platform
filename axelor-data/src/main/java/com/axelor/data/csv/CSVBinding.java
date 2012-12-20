@@ -3,6 +3,7 @@ package com.axelor.data.csv;
 import groovy.lang.Binding;
 import groovy.lang.GroovyCodeSource;
 import groovy.lang.GroovyShell;
+import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 
 import java.security.AccessController;
@@ -113,37 +114,55 @@ public class CSVBinding {
 		return cb;
 	}
 	
-	private Script script;
+	private Script scriptIf;
+	private Script scriptEval;
 
-	private Object _eval(final String expr, Map<String, Object> context) {
-
-		if (script == null) {
-			GroovyCodeSource gcs = AccessController.doPrivileged(new PrivilegedAction<GroovyCodeSource>() {
-	            public GroovyCodeSource run() {
-	                return new GroovyCodeSource(expr, "T" + column, "/groovy/shell");
-	            }
-	        });
-			GroovyShell shell = new GroovyShell();
-			script = shell.parse(gcs);
-		}
+	private Script newScript(final String expr) {
+		GroovyCodeSource gcs = AccessController.doPrivileged(new PrivilegedAction<GroovyCodeSource>() {
+            public GroovyCodeSource run() {
+                return new GroovyCodeSource(expr, "T" + column, "/groovy/shell");
+            }
+        });
+		GroovyShell shell = new GroovyShell();
+		return shell.parse(gcs);
+	}
+	
+	private Object eval(Script script, Map<String, Object> context) {
 		
-		script.setBinding(new Binding(context));
+		script.setBinding(new Binding(context) {
+			
+			@Override
+			public Object getVariable(String name) {
+				try {
+					return super.getVariable(name);
+				} catch (MissingPropertyException e){
+					return null;
+				}
+			}
+		});
+		
 		return script.run();
 	}
 	
 	public Object eval(Map<String, Object> context) {
-		
-		if (Strings.isNullOrEmpty(expression))
+		if (Strings.isNullOrEmpty(expression)) {
 			return context.get(column);
-		
-		return _eval(expression, context);
+		}
+		if (scriptEval == null) {
+			scriptEval = newScript(expression);
+		}
+		return eval(scriptEval, context);
 	}
 	
 	public boolean validate(Map<String, Object> context) {
-		if (Strings.isNullOrEmpty(condition))
+		if (Strings.isNullOrEmpty(condition)) {
 			return true;
+		}
 		String expr = condition + " ? true : false";
-		return (Boolean) _eval(expr, context);
+		if (scriptIf == null) {
+			scriptIf = newScript(expr);
+		}
+		return (Boolean) eval(scriptIf, context);
 	}
 
 	@Override
