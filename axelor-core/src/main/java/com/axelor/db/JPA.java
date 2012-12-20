@@ -109,8 +109,7 @@ public final class JPA {
 	 */
 	public static <T extends Model> T persist(T entity) {
 		// optimistic concurrency check
-		if (entity != null)
-			checkVersion(entity.getClass(), entity.getId(), entity.getVersion());
+		checkVersion(entity, entity.getVersion());
 		em().persist(entity);
 		em().flush();
 		return entity;
@@ -123,8 +122,7 @@ public final class JPA {
 	 */
 	public static <T extends Model> T merge(T entity) {
 		// optimistic concurrency check
-		if (entity != null)
-			checkVersion(entity.getClass(), entity.getId(), entity.getVersion());
+		checkVersion(entity, entity.getVersion());
 		T result = em().merge(entity);
 		em().flush();
 		return result;
@@ -158,7 +156,7 @@ public final class JPA {
 			manager.remove(entity);
 		} else {
 			// optimistic concurrency check
-			checkVersion(entity.getClass(), entity.getId(), entity.getVersion());
+			checkVersion(entity, entity.getVersion());
 			Model attached = manager.find(entity.getClass(), entity.getId());
 			manager.remove(attached);
 		}
@@ -192,11 +190,14 @@ public final class JPA {
 	public static void clear() {
 		em().clear();
 	}
-	
-	private static <T extends Model> void checkVersion(Class<T> klass, Long id, Object version) {
-		if (id == null || version == null) {
+
+	@SuppressWarnings("unchecked")
+	private static <T extends Model> void checkVersion(T bean, Object version) {
+		if (bean == null || version == null || em().contains(bean)) {
 			return;
 		}
+		Class<T> klass = (Class<T>) bean.getClass();
+		Long id = bean.getId();
 		T entity = JPA.find(klass, id);
 		if (entity == null || !Objects.equal(version, entity.getVersion())) {
 			Exception cause = new StaleObjectStateException(klass.getName(), id);
@@ -321,7 +322,7 @@ public final class JPA {
 		}
 		
 		if (beanChanged) {
-			checkVersion(klass, id, beanVersion);
+			checkVersion(bean, beanVersion);
 		}
 		
 		return bean;
