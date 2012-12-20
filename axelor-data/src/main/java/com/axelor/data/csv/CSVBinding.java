@@ -142,8 +142,8 @@ public class CSVBinding {
 	public boolean validate(Map<String, Object> context) {
 		if (Strings.isNullOrEmpty(condition))
 			return true;
-		
-		return (Boolean) _eval(condition, context);
+		String expr = condition + " ? true : false";
+		return (Boolean) _eval(expr, context);
 	}
 
 	@Override
