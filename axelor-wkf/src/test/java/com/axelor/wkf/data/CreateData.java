@@ -18,14 +18,12 @@ public class CreateData {
 		Node node1 = new Node();
 		node1.setName("Node 1");
 		node1.setType("start");
-		node1.setEndLogicOperator("or");
 		node1.setEndTransitions(new ArrayList<Transition>());
 		
 		Node node2 = new Node();
 		node2.setName("Node 2");
 		node2.setType("stop");
-		node2.setStartLogicOperator("and");
-		node2.setEndLogicOperator("or");
+		node2.setLogicOperator("and");
 		node2.setEndTransitions(new ArrayList<Transition>());
 		
 		transition.setStartNode(node1);
