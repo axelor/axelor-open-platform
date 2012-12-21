@@ -84,7 +84,7 @@ function TableLayout(items, attrs, $scope, $compile) {
 		add(el);
 	});
 	
-	var table = $('<table class="form-layout form-debug"></table');
+	var table = $('<table class="form-layout"></table');
 	
 	_.each(layout, function(row){
 		var tr = $('<tr></tr>'),
