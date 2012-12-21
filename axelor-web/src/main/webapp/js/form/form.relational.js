@@ -918,7 +918,20 @@ var NestedEditor = {
 		var configured = false,
 			updateFlag = true;
 		
+		function setValidity(nested, valid) {
+			setTimeout(function(){
+				model.$setValidity('valid', nested.isValid());
+				if (scope.setValidity) {
+					scope.setValidity('valid', nested.isValid());
+				}
+				scope.$apply();
+			});
+		}
+		
 		function configure(nested) {
+			nested.$watch('form.$valid', function(valid){
+				setValidity(nested, valid);
+			});
 			nested.$watch('record', function(rec, old){
 				if (updateFlag && rec != old) {
 					if (_.isEmpty(rec)) {
@@ -931,13 +944,7 @@ var NestedEditor = {
 					}
 				}
 				updateFlag = true;
-				setTimeout(function(){
-					model.$setValidity('valid', nested.isValid());
-					if (scope.setValidity) {
-						scope.setValidity('valid', nested.isValid());
-					}
-					scope.$apply();
-				});
+				setValidity(nested, nested.isValid());
 			}, true);
 		}
 		
