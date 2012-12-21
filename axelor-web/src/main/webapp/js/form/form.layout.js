@@ -48,11 +48,11 @@ function TableLayout(items, attrs, $scope, $compile) {
 	}
 
 	// auto-generate colWidths
-	if (numCols > 3 && !colWidths) {
+	if (numCols > 1 && !colWidths) {
 		var labelCols = Math.floor(numCols / 2),
 			itemCols = Math.ceil(numCols / 2),
-			forLabels = 20 / labelCols,
-			forItems = 80 / itemCols;
+			forLabels = 10 / labelCols,
+			forItems = 90 / itemCols;
 
 		colWidths = [];
 		for(var i = 0 ; i < numCols ; i++) {
