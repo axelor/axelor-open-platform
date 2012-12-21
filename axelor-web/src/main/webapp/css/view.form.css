@@ -271,3 +271,9 @@ td.form-item > * {
 .form-item span.error {
 	color: #953B39;
 }
+
+.form-item .spacer-item {
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	        user-select: none;
+}
