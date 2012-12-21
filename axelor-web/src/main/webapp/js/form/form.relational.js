@@ -286,9 +286,10 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		var path = $element.attr('x-path');
 		var relatives = $element.parents().find('[x-field][x-path^="'+path+'."]').map(
 				function(){
-					return $(this).attr('name').replace(path+'.','');
+					return $(this).attr('x-path').replace(path+'.','');
 				}).get();
 		
+		relatives = _.unique(relatives);
 		if (relatives.length > 0 && value && value.id) {
 			return ds.read(value.id, {
 				fields: relatives
@@ -965,7 +966,7 @@ var NestedEditor = {
 		
 		model.$render = function() {
 			var nested = scope.nested,
-				ds = scope._dataSource,
+				promise = nested._viewPromise,
 				value = model.$viewValue;
 
 			if (nested == null)
@@ -973,7 +974,7 @@ var NestedEditor = {
 			
 			if (!configured) {
 				configured = true;
-				nested._viewPromise.then(function(){
+				promise.then(function(){
 					configure(nested);
 				});
 			}
@@ -981,9 +982,11 @@ var NestedEditor = {
 				return nested.edit(value);
 			}
 			
-			ds.read(value.id).success(function(record){
-				updateFlag = false;
-				nested.edit(record);
+			promise.then(function(){
+				nested.doRead(value.id).success(function(record){
+					updateFlag = false;
+					nested.edit(record);
+				});
 			});
 		};
 	},
