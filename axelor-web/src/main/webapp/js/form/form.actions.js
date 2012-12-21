@@ -183,11 +183,20 @@ ActionHandler.prototype = {
 			if (!scope.isDirty()) {
 				return self._handleActions(actions, context);
 			}
-			var ds = scope._dataSource;
-			promise = ds.save(scope.record);
-			promise = promise.success(function(rec, page) {
+			
+			function doEdit(rec) {
 				scope.editRecord(rec);
 				return self._handleActions(actions, context);
+			}
+
+			var ds = scope._dataSource;
+
+			promise = ds.save(scope.record);
+			promise = promise.success(function(rec, page) {
+				if (scope.doRead) {
+					return scope.doRead(rec.id).success(doEdit);
+				}
+				return ds.read(rec.id).success(doEdit);
 			});
 			this._invalidateContext = true;
 			return promise;
