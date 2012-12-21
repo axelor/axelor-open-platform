@@ -32,7 +32,7 @@ var LabelItem = {
  */
 var SpacerItem = {
 	css: 'spacer-item',
-	template: '<div></div>'
+	template: '<div>&nbsp;</div>'
 };
 
 /**
