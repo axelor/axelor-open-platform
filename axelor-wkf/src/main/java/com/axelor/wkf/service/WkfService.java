@@ -225,7 +225,7 @@ public class WkfService {
 			
 			if (this.isPlayable(node)){
 				
-				nodes.addAll(this.playTransitions(node.getEndTransitions(), node.getEndLogicOperator()));
+				nodes.addAll(this.playTransitions(node.getEndTransitions()));
 				this.counterAdd(this.instance, node);
 				this.addExecutedNodes(node);
 			}
@@ -251,16 +251,13 @@ public class WkfService {
 	 * @return
 	 * 		Set of running nodes.
 	 */
-	private Set<Node> playTransitions(List<Transition> transitions, String endLogicOperator){
+	private Set<Node> playTransitions(List<Transition> transitions){
 		
 		Set<Node> nodes = new HashSet<Node>();
 		
 		for (Transition transition : this.sortTransitions(transitions)){
 			
 			nodes.addAll(this.playTransition(transition));
-			
-			if (endLogicOperator.equals(XOR) && nodes.size() > 0)
-				break;
 			
 		}
 		
@@ -368,7 +365,7 @@ public class WkfService {
 		
 		Node node = transition.getNextNode();
 		
-		if (node.getStartLogicOperator().equals(AND)){
+		if (node.getLogicOperator().equals(AND)){
 			
 			if (!this.waitingNodes.containsKey(node)){
 				
@@ -390,7 +387,7 @@ public class WkfService {
 	 */
 	private void addExecutedNodes(Node node){
 		
-		if (node.getStartLogicOperator().equals(XOR)){
+		if (node.getLogicOperator().equals(XOR)){
 			this.executedNodes.add(node);
 		}
 		
@@ -420,10 +417,10 @@ public class WkfService {
 	 */
 	private boolean isPlayable(Node node){
 		
-		if (node.getStartLogicOperator().equals(XOR) && this.executedNodes.contains(node)){
+		if (node.getLogicOperator().equals(XOR) && this.executedNodes.contains(node)){
 			return false;
 		}
-		else if (node.getStartLogicOperator().equals(AND)){
+		else if (node.getLogicOperator().equals(AND)){
 			
 			if (this.waitingNodes.containsKey(node) && !this.waitingNodes.get(node).containsAll(node.getStartTransitions())){
 				
