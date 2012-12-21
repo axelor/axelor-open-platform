@@ -48,8 +48,8 @@ class WkfController {
 	 */
 	def showEditor(ActionRequest request, ActionResponse response) {
 	   
-		def context = request.context
-		
+		def context = request.context as Workflow
+				
 		if (context?.id){
 			response.view = [title: "Oryx : ${context.name}", resource: "http://188.165.204.152:8080/oryx/editor;bpmn2.0#/model/${context.id}", viewType: "html"]
 		}

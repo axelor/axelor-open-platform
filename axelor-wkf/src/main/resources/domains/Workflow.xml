@@ -11,6 +11,7 @@
     <many-to-one name="metaModel" ref="com.axelor.meta.db.MetaModel" title="Model" required="true"/>
     <many-to-one name="node" ref="Node" title="Node"/>
     <integer name="maxNodeCounter" title="Max node counter" default="1"/>
+    <string name="description" large="true" title="Description" />
     
   </entity>
 
@@ -20,10 +21,10 @@
     <many-to-one name="workflow" ref="Workflow" title="Workflow"/>
     <string name="type" title="Type" selection="node.type.selection"/>
     <many-to-one name="action" ref="com.axelor.meta.db.MetaAction" title="Action" />
-    <string name="startLogicOperator" title="Start Logic Operator" selection="start.node.logic.operator.selection" default="or"/>
-    <string name="endLogicOperator" title="End Logic Operator" selection="end.node.logic.operator.selection" default="or" />
+    <string name="logicOperator" title="Start Logic Operator" selection="node.logic.operator.selection" default="or"/>
     <one-to-many name="startTransitions" ref="Transition" mappedBy="nextNode" title="Start transitions" readonly="true"/>
     <one-to-many name="endTransitions" ref="Transition" mappedBy="startNode" title="End transitions" />
+    <string name="description" large="true" title="Description" />
              
   </entity>
 
@@ -34,6 +35,7 @@
     <string name="name" title="Name" />
     <many-to-one name="condition" ref="com.axelor.meta.db.MetaAction" title="Condition" />
 	<integer name="sequence" title="Sequence" />
+    <string name="description" large="true" title="Description" />
              
   </entity>
   
