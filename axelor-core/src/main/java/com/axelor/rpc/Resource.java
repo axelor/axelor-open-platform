@@ -270,56 +270,33 @@ public class Resource<T extends Model> {
 
 	public Response save(final Request request) {
 
-		final Response response = new Response();
-		final Model[] result = { null };
+		Response response = new Response();
 		
-		try {
-			JPA.runInTransaction(new Runnable() {
-			
-				@Override
-				public void run() {
-					Model bean = JPA.edit(model, request.getData());
-					result[0] = JPA.manage(bean);
-				}
-			});
-			response.setData(ImmutableList.of(result[0]));
-			response.setStatus(Response.STATUS_SUCCESS);
-		} catch (Exception e) {
-			if (LOG.isDebugEnabled())
-				LOG.debug(e.toString(), e);
-			response.setException(e);
-		}
+		Model bean = JPA.edit(model, request.getData());
+		bean = JPA.manage(bean);
+		
+		response.setData(ImmutableList.of(bean));
+		response.setStatus(Response.STATUS_SUCCESS);
+		
 		return response;
 	}
 
 	public Response remove(long id, Request request) {
 		
 		final Response response = new Response();
-		final Model[] result = { null };
-		
 		final Map<String, Object> data = Maps.newHashMap();
 		
 		data.put("id", id);
 		data.put("version", request.getData().get("version"));
 		
-		try {
-			JPA.runInTransaction(new Runnable() {
-				
-				@Override
-				public void run() {
-					Model bean = result[0] = JPA.edit(model, data);
-					if (bean.getId() != null) {
-						JPA.remove(bean);
-					}
-				}
-			});
-			response.setData(ImmutableList.of(_toMap(result[0], true, 0)));
-			response.setStatus(Response.STATUS_SUCCESS);
-		} catch (Exception e) {
-			if (LOG.isDebugEnabled())
-				LOG.debug(e.toString(), e);
-			response.setException(e);
+		Model bean = JPA.edit(model, data);
+		if (bean.getId() != null) {
+			JPA.remove(bean);
 		}
+		
+		response.setData(ImmutableList.of(_toMap(bean, true, 0)));
+		response.setStatus(Response.STATUS_SUCCESS);
+		
 		return response;
 	}
 	
@@ -335,27 +312,17 @@ public class Resource<T extends Model> {
 			return response;
 		}
 
-		try {
-			JPA.runInTransaction(new Runnable() {
-				
-				@Override
-				public void run() {
-					for(Object record : records) {
-						Model bean = JPA.edit(model, (Map) record);
-						if (bean.getId() != null) {
-							JPA.remove(bean);
-							result.add(record);
-						}
-					}
-				}
-			});
-			response.setData(result);
-			response.setStatus(Response.STATUS_SUCCESS);
-		} catch (Exception e) {
-			if (LOG.isDebugEnabled())
-				LOG.debug(e.toString(), e);
-			response.setException(e);
+		for(Object record : records) {
+			Model bean = JPA.edit(model, (Map) record);
+			if (bean.getId() != null) {
+				JPA.remove(bean);
+				result.add(record);
+			}
 		}
+
+		response.setData(result);
+		response.setStatus(Response.STATUS_SUCCESS);
+
 		return response;
 	}
 	
