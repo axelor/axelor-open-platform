@@ -22,7 +22,7 @@ function TableLayout(items, attrs, $scope, $compile) {
 			colspan = +item.attr('x-colspan') || 1,
 			rowspan = +item.attr('x-rowspan') || 1;
 		
-		if (curCol + colspan >= numCols + 1) {
+		if (curCol + colspan + (label ? 1 : 0) >= numCols + 1) {
 			curCol = 0, row = [];
 			layout.push(row);
 		}
@@ -51,8 +51,8 @@ function TableLayout(items, attrs, $scope, $compile) {
 	if (numCols > 3 && !colWidths) {
 		var labelCols = Math.floor(numCols / 2),
 			itemCols = Math.ceil(numCols / 2),
-			forLabels = 30 / labelCols,
-			forItems = 70 / itemCols;
+			forLabels = 20 / labelCols,
+			forItems = 80 / itemCols;
 
 		colWidths = [];
 		for(var i = 0 ; i < numCols ; i++) {
@@ -84,15 +84,8 @@ function TableLayout(items, attrs, $scope, $compile) {
 		add(el);
 	});
 	
-	var table = $('<table class="form-layout"></table');
+	var table = $('<table class="form-layout form-debug"></table');
 	
-	if (_.isArray(colWidths)) {
-		var colGroup = $('<colgroup></colgroup>').appendTo(table);
-		_.each(colWidths, function(cw) {
-			$('<col></col>').css('width', cw).appendTo(colGroup);
-		});
-	}
-
 	_.each(layout, function(row){
 		var tr = $('<tr></tr>'),
 			numCells = 0;
@@ -103,6 +96,9 @@ function TableLayout(items, attrs, $scope, $compile) {
 					.attr('rowspan', cell.rowspan)
 					.append(cell.elem)
 					.appendTo(tr);
+				if (_.isArray(colWidths) && colWidths[i]) {
+					el.width(colWidths[i]);
+				}
 				numCells += cell.colspan || 1;
 		});
 
