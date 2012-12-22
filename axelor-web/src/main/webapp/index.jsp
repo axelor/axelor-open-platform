@@ -44,6 +44,10 @@ if (localeName == null || "".equals(localeName.trim()))
 
   <!-- Le fav and touch icons -->
   <link rel="shortcut icon" href="ico/favicon.ico">
+  
+  <script type="text/javascript">
+	  var __appSettings = <%= settings.toJSON() %>
+  </script>
 </head>
 <body>
 

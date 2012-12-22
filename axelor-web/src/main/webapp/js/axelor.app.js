@@ -103,24 +103,27 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 
 AppCtrl.$inject = ['$scope', '$http', 'authService'];
 function AppCtrl($scope, $http, authService) {
-	
-	$scope.app = {
-		name : 'Axelor Demo',
-		description: 'Showcase'
-	};
-	
+
+	function getAppInfo(settings) {
+		return {
+			name: settings['application.name'],
+			description: settings['application.description'],
+			version: settings['application.version'],
+			mode: settings['application.mode'],
+			user: settings['user.name'],
+			help: settings['help.location']
+		};
+	}
+
 	function appInfo() {
 		$http.get('ws/app/info').then(function(response){
-			var settings = response.data.appSettings;
-			angular.extend($scope.app, {
-				name: settings['application.name'],
-				description: settings['application.description'],
-				version: settings['application.version'],
-				user: settings['user.name'],
-				help: settings['help.location']
-			});
+			var settings = response.data;
+			angular.extend($scope.app, getAppInfo(settings));
 		});
 	}
+
+	// See index.jsp
+	$scope.app = getAppInfo(__appSettings);
 	
 	var loginAttempts = 0;
 	var loginWindow = null;
@@ -256,7 +259,6 @@ function AppCtrl($scope, $http, authService) {
 
 		$scope.routePath = path;
 	});
-	appInfo();
 }
 
 NavCtrl.$inject = ['$scope', '$rootScope', '$location', '$routeParams', 'MenuService'];
