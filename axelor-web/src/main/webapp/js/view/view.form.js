@@ -3,13 +3,13 @@ function FormViewCtrl($scope, $element) {
 
 	DSViewCtrl('form', $scope, $element);
 
-	var ds = $scope._dataSource,
-		original = null;
+	var ds = $scope._dataSource;
 
 	$scope.fields = {};
 	$scope.fields_view = {};
 	
 	$scope.record = {};
+	$scope.$$original = null;
 	
 	$scope._$events = {};
 	
@@ -82,8 +82,8 @@ function FormViewCtrl($scope, $element) {
 	};
 	
 	$scope.editRecord = function(record) {
-		original = record || {};
-		$scope.record = angular.copy(original);
+		$scope.$$original = record || {};
+		$scope.record = angular.copy($scope.$$original);
 		setTimeout(function(){
 			$scope.$apply();
 			$scope.$broadcast("on:edit", $scope.record);
@@ -133,7 +133,7 @@ function FormViewCtrl($scope, $element) {
 	};
 	
 	$scope.isDirty = function() {
-		return !angular.equals($scope.record, original);
+		return !angular.equals($scope.record, $scope.$$original);
 	};
 	
 	$scope.isValid = function() {
