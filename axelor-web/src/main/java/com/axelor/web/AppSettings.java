@@ -81,14 +81,10 @@ public class AppSettings {
 	public String toJSON() {
 		
 		Properties settings = new Properties();
-		Properties context = new Properties();
-		
-		Properties all = new Properties();
 		
 		try {
 			Subject subject = SecurityUtils.getSubject();
 			User user = User.all().filter("self.code = ?1", subject.getPrincipal()).fetchOne();
-			context.put("__user__", user.getCode());
 			settings.put("user.name", user.getName());
 			settings.put("user.login", user.getCode());
 		} catch (Exception e){
@@ -99,14 +95,10 @@ public class AppSettings {
 		// remove server only properties
 		settings.remove("temp.dir");
 		
-		all.put("appSettings", settings);
-		all.put("appContext", context);
-		
 		try {
 			ObjectMapper mapper = new ObjectMapper();
-			return mapper.writeValueAsString(all);
+			return mapper.writeValueAsString(settings);
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		return "{}";
 	}
