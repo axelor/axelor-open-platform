@@ -36,8 +36,13 @@ ui.directive('uiHelpPopover', function() {
 		if (text) {
 			addRow(table, null, '<hr noshade>', 'help-text');
 		}
+		
+		var model = scope._model;
+		if (model === field.target) {
+			model = scope.$parent._model;
+		}
 
-		addRow(table, _t('Object'), scope._model);
+		addRow(table, _t('Object'), model);
 		addRow(table, _t('Field Name'), field.name);
 		addRow(table, _t('Field Type'), field.serverType);
 		
