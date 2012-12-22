@@ -774,7 +774,7 @@ var OneToManyItem = {
 		'<div class="navbar">'+
 			'<div class="navbar-inner">'+
 				'<div class="container-fluid">'+
-					'<span class="brand" href="" ng-bind-html-unsafe="title"></span>'+
+					'<span class="brand" href="" ui-help-popover ng-bind-html-unsafe="title"></span>'+
 					'<div class="btn-group pull-right">'+
 						'<a href="" tabindex="-1" ng-click="onSelect()"><i class="icon-search"></i></a>'+
 						'<a href="" tabindex="-1" ng-click="onNew()"><i class="icon-plus"></i></a>'+

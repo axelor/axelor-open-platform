@@ -277,3 +277,23 @@ td.form-item > * {
 	   -moz-user-select: none;
 	        user-select: none;
 }
+
+table.field-details {
+	width: 100%;
+}
+
+table.field-details th {
+	width: 5%;
+	white-space: nowrap;
+	text-align: right;
+}
+
+table.field-details .help-text hr {
+	margin: 9px 0;
+}
+
+.popover-inner {
+	width: inherit;
+	min-width: 280px;
+	max-width: 360px;
+}
