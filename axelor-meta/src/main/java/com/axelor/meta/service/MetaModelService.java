@@ -29,7 +29,7 @@ import com.axelor.meta.db.MetaModel;
  */
 public class MetaModelService {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(MetaModelService.class);
+	private Logger log = LoggerFactory.getLogger(getClass());
 
 	/**
 	 * Process to create all MetaModel with MetaField.
@@ -38,18 +38,13 @@ public class MetaModelService {
 	 * @see MetaField
 	 */
 	public void process(){
-		
 		for (Class<?> klass : JPA.models()){
-			
 			if (MetaModel.all().filter("fullName = ?1", klass.getName()).count() == 0){
 				this.createEntity(klass).save();
-			}
-			else {
+			} else {
 				this.updateEntity(klass).save();
 			}
-			
 		}
-		
 	}
 	
 	/**
@@ -63,7 +58,7 @@ public class MetaModelService {
 	 */
 	private MetaModel createEntity(Class<?> klass){
 		
-		LOG.debug("Create entities : {}", klass.getName());
+		log.info("Create entities : {}", klass.getName());
 		
 		MetaModel metaModel = new MetaModel();
 		metaModel.setName(klass.getSimpleName());
@@ -90,17 +85,12 @@ public class MetaModelService {
 	 * @see MetaModel
 	 */
 	private MetaModel updateEntity(Class<?> klass){
-		
 		MetaModel metaModel = getMetaModel(klass);
-		
 		for (Field field : klass.getDeclaredFields()){
-			
 			if (MetaField.all().filter("metaModel = ?1 AND name = ?2", metaModel, field.getName()).count() == 0){
 				metaModel.getMetaFields().add(createField(metaModel, field));
 			}
-		
 		}
-		
 		return metaModel;
 	}
 	
@@ -122,7 +112,7 @@ public class MetaModelService {
 		
 		if (!field.isSynthetic()){
 			
-			LOG.debug("Create field : {}", field.getName());
+			log.info("Create field : {}", field.getName());
 			
 			metaField = new MetaField();
 			
@@ -144,27 +134,21 @@ public class MetaModelService {
 			}
 			
 			if (field.isAnnotationPresent(ManyToMany.class)){
-				
 				metaField.setRelationship(ManyToMany.class.getSimpleName());
 				metaField.setTypeName(this.getGenericClassName(field));
 				metaField.setPackageName(this.getGenericPackageName(field));
-				
 			}
 			
 			if (field.isAnnotationPresent(OneToMany.class)){
-				
 				metaField.setRelationship(OneToMany.class.getSimpleName());
 				metaField.setMappedBy(field.getAnnotation(OneToMany.class).mappedBy());
 				metaField.setTypeName(this.getGenericClassName(field));
 				metaField.setPackageName(this.getGenericPackageName(field));
-				
 			}
 			
 			if (field.isAnnotationPresent(OneToOne.class)){
-				
 				metaField.setRelationship(OneToOne.class.getSimpleName());
 				metaField.setMappedBy(field.getAnnotation(OneToOne.class).mappedBy());
-				
 			}
 		}
 		
@@ -189,16 +173,13 @@ public class MetaModelService {
 		MetaField metaField = new MetaField();
 		
 		for (Field field : klass.getDeclaredFields()){
-			
 			metaField = this.createField(metaModel, field);
 			if (metaField != null){
 				modelFields.add(metaField);
 			}
-			
 		}
 		
 		return modelFields;
-		
 	}
 	
 	/**
@@ -239,11 +220,9 @@ public class MetaModelService {
 		String typeName = this.getGenericCanonicalName(field);
 		
 		if (typeName != null){
-			
 			typeName = typeName.replace("class ", "");
 			String[] splitName = typeName.split("\\.");
 			typeName = splitName[splitName.length - 1];
-
 		}
 		
 		return typeName;
@@ -263,11 +242,9 @@ public class MetaModelService {
 		String typeName = this.getGenericCanonicalName(field);
 		
 		if (typeName != null){
-			
 			typeName = typeName.replace("class ", "");
 			String[] splitName = typeName.split("\\.");
 			typeName = typeName.replace("."+splitName[splitName.length - 1], "");
-
 		}
 		
 		return typeName;
@@ -280,9 +257,6 @@ public class MetaModelService {
 	 * @return
 	 */
 	public static MetaModel getMetaModel(Class<?> klass){
-		 
 		return MetaModel.all().filter("self.fullName = ?1", klass.getName()).fetchOne();
-		
 	}
-	
 }

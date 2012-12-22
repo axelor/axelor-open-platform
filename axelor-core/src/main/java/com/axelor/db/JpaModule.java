@@ -4,6 +4,9 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.PersistService;
 import com.google.inject.persist.jpa.JpaPersistModule;
@@ -17,6 +20,8 @@ import com.google.inject.persist.jpa.JpaPersistModule;
  * 
  */
 public class JpaModule extends AbstractModule {
+	
+	private static Logger log = LoggerFactory.getLogger(JpaModule.class);
 
 	private String jpaUnit;
 	private boolean autoscan;
@@ -58,6 +63,7 @@ public class JpaModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
+		log.info("Initialize JPA...");
 		Properties properties = new Properties();
 		properties.put("hibernate.connection.autocommit", "false");
 		if (this.autoscan) {
