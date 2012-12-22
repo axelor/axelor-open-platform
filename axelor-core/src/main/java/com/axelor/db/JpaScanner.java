@@ -2,7 +2,9 @@ package com.axelor.db;
 
 import java.lang.annotation.Annotation;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
@@ -18,6 +20,8 @@ import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 
 /**
@@ -27,17 +31,16 @@ import com.google.common.collect.MapMaker;
  */
 public class JpaScanner extends NativeScanner {
 
-	private static Logger LOG = LoggerFactory.getLogger(JpaScanner.class);
+	private static Logger log = LoggerFactory.getLogger(JpaScanner.class);
 	
-	private static ConcurrentMap<String, Class<?>> CACHE = null;
+	private static ConcurrentMap<String, Class<?>> cache = null;
 	
 	@Override
 	public Set<Class<?>> getClassesInJar(URL jarToScan, Set<Class<? extends Annotation>> annotationsToLookFor) {
-		
 		Set<Class<?>> mine = super.getClassesInJar(jarToScan, annotationsToLookFor);
 		for (Class<?> klass : mine) {
 			if (!Model.class.isAssignableFrom(klass)) {
-				LOG.warn("Not a Model: " + klass.getName());
+				log.warn("Not a Model: " + klass.getName());
 				return mine;
 			}
 		}
@@ -46,28 +49,32 @@ public class JpaScanner extends NativeScanner {
 	
 	public static Set<Class<?>> findModels() {
 		
-		if (CACHE != null) {
-			return new HashSet<Class<?>>(CACHE.values());
+		if (cache != null) {
+			return new HashSet<Class<?>>(cache.values());
 		}
 		
-		CACHE = new MapMaker().makeMap();
-		synchronized (CACHE) {
+		cache = new MapMaker().makeMap();
+		synchronized (cache) {
 			Reflections reflections = new Reflections(
 					new ConfigurationBuilder()
 					.addUrls(ClasspathHelper.forPackage("com.axelor"))
 					.setScanners(new SubTypesScanner()));
+			List<String> names = Lists.newArrayList();
 			for (Class<?> klass : reflections.getSubTypesOf(Model.class)) {
 				if (Model.class.isAssignableFrom(klass) && (
 						klass.isAnnotationPresent(Entity.class) ||
 						klass.isAnnotationPresent(Embeddable.class) ||
 						klass.isAnnotationPresent(MappedSuperclass.class))) {
-					if (CACHE.containsKey(klass.getName()))
+					if (cache.containsKey(klass.getName())) {
 						continue;
-					CACHE.put(klass.getName(), klass);
-					LOG.debug("Found Model: " + klass.getName());
+					}
+					cache.put(klass.getName(), klass);
+					names.add(klass.toString());
 				}
 			}
+			Collections.sort(names);
+			log.info("Model classes found:\n  " + Joiner.on("\n  ").join(names));
 		}
-		return new HashSet<Class<?>>(CACHE.values());
+		return new HashSet<Class<?>>(cache.values());
 	}
 }

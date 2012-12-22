@@ -62,8 +62,15 @@ import com.google.common.io.Resources;
 
 public class MetaLoader {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MetaLoader.class);
+	private static final String LOCAL_SCHEMA = "object-views_1.0.xsd";
+	private static final String REMOTE_SCHEMA = "object-views_0.6.xsd";
+	private static final String REMOTE_SCHEMA_LOCATION = "http://apps.axelor.com/xml/ns/object-views";
 	
+	private Logger log = LoggerFactory.getLogger(getClass());
+	
+	private Marshaller marshaller;
+	private Unmarshaller unmarshaller;
+
 	private static class FileScanner extends ResourcesScanner {
 		
 		private List<File> files = Lists.newArrayList();
@@ -81,10 +88,6 @@ public class MetaLoader {
 		}
 	}
 	
-	private Unmarshaller unmarshaller;
-	
-	private Marshaller marshaller;
-	
 	public MetaLoader() {
 		try {
 			JAXBContext context = JAXBContext.newInstance(ObjectViews.class);
@@ -92,11 +95,10 @@ public class MetaLoader {
 			marshaller = context.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
-					"http://apps.axelor.com/xml/ns/object-views " +
-					"http://apps.axelor.com/xml/ns/object-views/object-views_0.6.xsd");
+					REMOTE_SCHEMA_LOCATION + " " + REMOTE_SCHEMA_LOCATION + "/" + REMOTE_SCHEMA);
 	
 			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-			Schema schema = schemaFactory.newSchema(Resources.getResource("object-views_1.0.xsd"));
+			Schema schema = schemaFactory.newSchema(Resources.getResource(LOCAL_SCHEMA));
 	
 			unmarshaller.setSchema(schema);
 			marshaller.setSchema(schema);
@@ -160,12 +162,16 @@ public class MetaLoader {
 	}
 	
 	private String prepareXML(String xml) {
-		return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-			       "<object-views xmlns=\"http://apps.axelor.com/xml/ns/object-views\"" +
-				   " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
-				   "xsi:schemaLocation=\"http://apps.axelor.com/xml/ns/object-views" +
-				   " http://apps.axelor.com/xml/ns/object-views/object-views_0.6.xsd\">" + xml +
-				   "</object-views>";
+		StringBuilder sb = new StringBuilder("<?xml version='1.0' encoding='UTF-8'?>\n");
+		sb.append("<object-views")
+		  .append(" xmlns='").append(REMOTE_SCHEMA_LOCATION).append("'")
+		  .append(" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'")
+		  .append(" xsi:schemaLocation='").append(REMOTE_SCHEMA_LOCATION).append(" ")
+		  .append(REMOTE_SCHEMA_LOCATION + "/" + REMOTE_SCHEMA).append("'")
+		  .append(">\n")
+		  .append(xml)
+		  .append("\n</object-views>");
+		return sb.toString();
 	}
 
 	public ObjectViews fromXML(String xml) throws JAXBException {
@@ -189,7 +195,7 @@ public class MetaLoader {
 	
 	private void loadView(AbstractView view, String filePath) {
 		
-		LOG.debug("Loading view : {}", view.getName());
+		log.info("Loading view : {}", view.getName());
 		
 		String xml = toXml(view);
 		String type = view.getClass().getSimpleName().replace("View", "").toLowerCase();
@@ -212,7 +218,7 @@ public class MetaLoader {
 	}
 
 	private void loadSelection(Selection selection) {
-		LOG.debug("Loading selection : {}", selection.getName());
+		log.info("Loading selection : {}", selection.getName());
 		for(Selection.Option opt : selection.getOptions()) {
 			MetaSelect select = new MetaSelect();
 			select.setKey(selection.getName());
@@ -224,7 +230,7 @@ public class MetaLoader {
 
 	private void loadAction(Action action) {
 		
-		LOG.debug("Loading action : {}", action.getName());
+		log.info("Loading action : {}", action.getName());
 		
 		String xml = toXml(action);
 		MetaAction entity = new MetaAction();
@@ -234,14 +240,14 @@ public class MetaLoader {
 		entity = entity.save();
 		
 		for (MetaMenu pending : unresolved_actions.get(entity.getName())) {
-			LOG.debug("Resolved menu: {}", pending.getName());
+			log.info("Resolved menu: {}", pending.getName());
 			pending.setAction(entity);
 			pending.save();
 		}
 		unresolved_actions.removeAll(entity.getName());
 		
 		for (MetaActionMenu pending : unresolved_actions2.get(entity.getName())) {
-			LOG.debug("Resolved action menu: {}", pending.getName());
+			log.info("Resolved action menu: {}", pending.getName());
 			pending.setAction(entity);
 			pending.save();
 		}
@@ -258,7 +264,7 @@ public class MetaLoader {
 			return;
 		}
 		
-		LOG.debug("Loading menu : {}", menu.getName());
+		log.info("Loading menu : {}", menu.getName());
 		
 		MetaMenu m = new MetaMenu();
 		m.setName(menu.getName());
@@ -270,7 +276,7 @@ public class MetaLoader {
 		if (!Strings.isNullOrEmpty(menu.getParent())) {
 			MetaMenu p = MetaMenu.all().filter("self.name = ?1", menu.getParent()).fetchOne();
 			if (p == null) {
-				LOG.debug("Unresolved parent : {}", menu.getParent());
+				log.info("Unresolved parent : {}", menu.getParent());
 				unresolved_menus.put(menu.getParent(), m);
 			} else {
 				m.setParent(p);
@@ -280,7 +286,7 @@ public class MetaLoader {
 		if (!Strings.isNullOrEmpty(menu.getAction())) {
 			MetaAction a = MetaAction.all().filter("self.name = ?1", menu.getAction()).fetchOne();
 			if (a == null) {
-				LOG.debug("Unresolved action: {}", menu.getAction());
+				log.info("Unresolved action: {}", menu.getAction());
 				unresolved_actions.put(menu.getAction(), m);
 			} else {
 				m.setAction(a);
@@ -290,7 +296,7 @@ public class MetaLoader {
 		m = m.save();
 		
 		for (MetaMenu pending : unresolved_menus.get(m.getName())) {
-			LOG.debug("Resolved menu : {}", pending.getName());
+			log.info("Resolved menu : {}", pending.getName());
 			pending.setParent(m);
 			pending.save();
 		}
@@ -303,7 +309,7 @@ public class MetaLoader {
 	
 	private void loadMenu2(ActionMenuItem menu) {
 		
-		LOG.debug("Loading action menu : {}", menu.getName());
+		log.info("Loading action menu : {}", menu.getName());
 		
 		MetaActionMenu m = new MetaActionMenu();
 		m.setName(menu.getName());
@@ -313,7 +319,7 @@ public class MetaLoader {
 		if (!Strings.isNullOrEmpty(menu.getParent())) {
 			MetaActionMenu p = MetaActionMenu.all().filter("self.name = ?1", menu.getParent()).fetchOne();
 			if (p == null) {
-				LOG.debug("Unresolved parent : {}", menu.getParent());
+				log.info("Unresolved parent : {}", menu.getParent());
 				unresolved_menus2.put(menu.getParent(), m);
 			} else {
 				m.setParent(p);
@@ -323,7 +329,7 @@ public class MetaLoader {
 		if (!Strings.isNullOrEmpty(menu.getAction())) {
 			MetaAction a = MetaAction.all().filter("self.name = ?1", menu.getAction()).fetchOne();
 			if (a == null) {
-				LOG.debug("Unresolved action: {}", menu.getAction());
+				log.info("Unresolved action: {}", menu.getAction());
 				unresolved_actions2.put(menu.getAction(), m);
 			} else {
 				m.setAction(a);
@@ -333,7 +339,7 @@ public class MetaLoader {
 		m = m.save();
 		
 		for (MetaActionMenu pending : unresolved_menus2.get(m.getName())) {
-			LOG.debug("Resolved action menu : {}", pending.getName());
+			log.info("Resolved action menu : {}", pending.getName());
 			pending.setParent(m);
 			pending.save();
 		}
@@ -350,7 +356,7 @@ public class MetaLoader {
 		for(String name : groups.split(",")) {
 			Group group = Group.all().filter("self.code = ?1", name).fetchOne();
 			if (group == null) {
-				LOG.info("Creating a new user group: {}", name);
+				log.info("Creating a new user group: {}", name);
 				group = new Group();
 				group.setCode(name);
 				group.setName(name);
@@ -480,7 +486,7 @@ public class MetaLoader {
 				} catch (JAXBException e) {
 					Throwable ex = e.getLinkedException();
 					ex = ex == null ? e : ex;
-					LOG.error("Invalid XML input: {}", filePath, ex);
+					log.error("Invalid XML input: {}", filePath, ex);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -502,11 +508,11 @@ public class MetaLoader {
 				if (output != null && output.exists()) {
 					java.io.File out = new java.io.File(output + "/views/" + klass.getSimpleName() + ".xml");
 					try {
-						LOG.debug("Creating default views: {}", out);
+						log.info("Creating default views: {}", out);
 						Files.createParentDirs(out);
 						Files.write(xml, out, Charsets.UTF_8);
 					} catch (IOException e) {
-						LOG.error("Unable to create: {}", out);
+						log.error("Unable to create: {}", out);
 					}
 				}
 			}
@@ -519,24 +525,19 @@ public class MetaLoader {
 	 */
 	public void loadModels() {
 
-		LOG.debug("Load entities...");
-		final MetaModelService metaModelService = new MetaModelService();
+		final MetaModelService service = new MetaModelService();
 		
 		JPA.runInTransaction(new Runnable() {
 
 			@Override
 			public void run() {
+				log.info("Load entities...");
 				try {
-					
-					metaModelService.process();
-					
+					service.process();
 				} catch (Exception e) {
-					
-					e.printStackTrace();
-					
+					log.error("Error loading entities.", e);
 				}
 			}
-			
 		});
 	}
 	

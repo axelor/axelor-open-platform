@@ -15,20 +15,18 @@ public class InitServlet extends HttpServlet {
 	
 	private static final long serialVersionUID = -2493577642638670615L;
 	
-	private final Logger LOG = LoggerFactory.getLogger(InitServlet.class);
+	private static final Logger LOG = LoggerFactory.getLogger(InitServlet.class);
 	
 	@Inject
 	private AppSettings settings;
 
 	@Override
 	public void init() throws ServletException {
-		LOG.debug("Initializing...");
+		LOG.info("Initializing...");
 		try {
-			
 			MetaLoader loader = new MetaLoader();
 			String output = settings.get("temp.dir");
 			loader.load(output);
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

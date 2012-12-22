@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.shiro.guice.web.GuiceShiroFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
@@ -27,10 +29,14 @@ import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
  */
 public class AppServletModule extends JerseyServletModule {
 
-	private String jpaUnit = "persistenceUnit";
-
+	private static final String DEFAULT_PERSISTANCE_UNIT = "persistenceUnit";
+	
+	private Logger log = LoggerFactory.getLogger(getClass());
+	
+	private String jpaUnit;
+	
 	public AppServletModule() {
-		super();
+		this(DEFAULT_PERSISTANCE_UNIT);
 	}
 
 	public AppServletModule(String jpaUnit) {
@@ -42,6 +48,13 @@ public class AppServletModule extends JerseyServletModule {
 		
 		// load application settings
 		bind(AppSettings.class).asEagerSingleton();
+		AppSettings settings = AppSettings.get();
+
+		StringBuilder builder = new StringBuilder("Starting application:");
+		builder.append("\n  ").append("Name: ").append(settings.get("application.name"));
+		builder.append("\n  ").append("Version: ").append(settings.get("application.version"));
+
+		log.info(builder.toString());
 		
 		// initialize JPA
 		install(new JpaModule(jpaUnit, true, false));
@@ -50,8 +63,6 @@ public class AppServletModule extends JerseyServletModule {
 		// install auth module
 		install(new AuthModule(getServletContext()));
 		filter("*").through(GuiceShiroFilter.class);
-		
-		AppSettings settings = AppSettings.get();
 		
 		// no-cache filter
 		if ("dev".equals(settings.get("application.mode", "dev"))) {
