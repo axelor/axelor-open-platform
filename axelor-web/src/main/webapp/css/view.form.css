@@ -194,6 +194,10 @@ td.form-item > * {
 	top: 0;
 }
 
+.ui-state-disabled .ui-state-disabled {
+	opacity: 1;
+}
+
 .form-item .form-item-group {
 	padding: 4px;
 	padding-top: 0;
