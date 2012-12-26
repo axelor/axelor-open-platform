@@ -135,6 +135,8 @@ var Tabs = {
 	}],
 	
 	link: function(scope, elem, attrs) {
+		var props = scope.getViewDef(elem);
+		
 		scope.$tabs = $(elem).bsTabs({
 			closable: false
 		});
@@ -142,6 +144,11 @@ var Tabs = {
 		elem.on('click', '.dropdown-toggle', function(e){
 			$.event.trigger('adjustSize');
 		});
+		
+		// set height (#1011)
+		if (props.height) {
+			elem.children('.tab-content:first').height(props.height);
+		}
 	},
 	
 	template:
