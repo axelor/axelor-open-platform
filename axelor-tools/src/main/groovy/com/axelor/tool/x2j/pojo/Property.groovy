@@ -440,7 +440,7 @@ class Property {
 			.add("mappedBy", mapped)
 		
 		if (orphan != null) {
-			a.add("cascade", ["javax.persistence.CascadeType.PERSIST","javax.persistence.CascadeType.MERGE"], false)
+			a.add("cascade", ["javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"], false)
 		} else {
 			a.add("cascade", "javax.persistence.CascadeType.ALL", false)
 			a.add("orphanRemoval", "true", false)
@@ -454,6 +454,7 @@ class Property {
 			annon("javax.persistence.ManyToMany")
 				.add("fetch", "javax.persistence.FetchType.LAZY", false)
 				.add("mappedBy", mapped)
+				.add("cascade", ["javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"], false)
 	}
 	
 	private Annotation $orderBy() {
