@@ -389,38 +389,43 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 		scope.setReadonly = function(item, readonly) {
 			var flag = _.isUndefined(readonly) || readonly,
 				elem = findItem(item),
-				label, div, tabindex;
-			
+				label, classOp;
+
 			if (elem == null)
 				return;
 
 			label = elem.data('label') || $();
-			tabindex = flag ? elem.attr('tabindex') : elem.data('tabindex');
+			classOp = flag ? 'addClass' : 'removeClass';
 
-			if (flag) {
-				elem.add(label)
-					.addClass('ui-state-disabled')
-					.find(':input, a')
-					.attr('tabindex', -1)
-					.data('tabindex', tabindex);
-			} else {
-				elem.add(label)
-					.removeClass('ui-state-disabled')
-					.find(':input, a')
-					.attr('tabindex', tabindex);
-			}
+			elem.add(label)[classOp]('ui-state-disabled');
 
 			if (elem.is(':input')) {
-				if (elem.data('select2'))
-					elem.select2(flag ? 'disable' : 'enable');
 				return elem.attr('disabled', flag);
 			}
+			
+			if (elem.is('.input-append')){
+				return elem.find(':input').attr('disabled', flag)[classOp]('ui-state-disabled');
+			}
 
-			div = elem.children('.disabled-overlay');
+			elem.find(':input, a').each(function(){
+				var e = $(this);
+				if (e.is('.ui-state-disabled')) {
+					return;
+				}
+				if (e.is('a')) {
+					if (e.attr('tabindex') !== -1) {
+						return e.attr('tabindex', flag ? -2 : null);
+					}
+				}
+				e.attr('disabled', flag);
+			});
+			
+			var div = elem.children('.disabled-overlay');
 			if (div.size() == 0) {
 				div = $('<div class="disabled-overlay"></div>');
 				elem.append(div);
 			}
+			
 			return flag ? div.show() : div.hide();
 		};
 		
