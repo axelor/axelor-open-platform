@@ -28,6 +28,7 @@
     <string name="code" required="true" unique="true" min="2" />
     <string name="name" required="true" unique="true" min="2" />
     <one-to-one name="test1" ref="Title" mappedBy="testG"/>
+    <many-to-many name="contacts" ref="Contact"/>
   </entity>
 
   <entity name="Company">
@@ -52,7 +53,7 @@
     <string name="email" required="true" unique="true" />
     <string name="phone" max="20" />
     <string name="notes" multiline="true" title="About Me" />
-    <many-to-one name="group" ref="Group" />
+    <many-to-many name="groups" ref="Groups" mappedBy="contacts"/>
     <one-to-many name="addresses" ref="Address" mappedBy="contact" orderBy="area" />
   </entity>
 
