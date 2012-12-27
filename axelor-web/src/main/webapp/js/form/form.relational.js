@@ -260,7 +260,8 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		var embedded = $('<div ui-nested-editor></div>')
 			.attr('ng-model', $element.attr('ng-model'))
 			.attr('name', $element.attr('name'))
-			.attr('title', $element.attr('x-title'));
+			.attr('title', $element.attr('x-title'))
+			.attr('x-path', $element.attr('x-path'));
 
 		embedded = ViewService.compile(embedded)($scope);
 		embedded.hide();
@@ -274,37 +275,65 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		return embedded;
 	};
 	
+	var model = $element.attr('ng-model');
+	var nested = undefined;
+
+	$scope.$watch(model + '.id', function(id){
+		
+		if (id == null) {
+			return;
+		}
+		var rec = $scope.$eval(model);
+		if (rec.$fetched || rec.$dirty) {
+			return;
+		}
+		var path = $element.attr('x-path');
+		if (nested === undefined) {
+			nested = $element.parents().find('[x-path^="'+path+'."]').map(function(){
+			    var item = $(this).attr('x-field');
+			    if (!item || item.indexOf('.') == -1)
+			    	return null;
+				return $(this).attr('x-path').replace(path+'.','');
+			}).get();
+			nested = _.compact(_.unique(nested));
+		}
+		if (nested.length === 0) {
+			return;
+		}
+		for(var i = 0 ; i < nested.length ; i++){
+			if ($scope.$eval(nested[i], rec) === undefined) {
+				rec.$fetched = true;
+				return updateNested(rec, nested);
+			}
+		}
+	}, true);
+	
+	function updateNested(value, nested) {
+		return ds.read(value.id, {
+			fields: nested
+		}).success(function(rec){
+			var record = { 'id' : value.id };
+			var parents = _.map(nested, function(name){
+				return name.split('.')[0];
+			});
+			parents = _.unique(parents);
+			record[nameField] = rec[nameField];
+
+			_.each(parents, function(name) {
+				record[name] = rec[name];
+			});
+			record.$fetched = true;
+			_.extend(value, record);
+		});
+	};
+	
 	$scope.select = function(value) {
 		
 		if (_.isArray(value)) {
 			value = _.first(value);
 		}
-		
+
 		var record = value;
-
-		// fetch '.' names
-		var path = $element.attr('x-path');
-		var relatives = $element.parents().find('[x-field][x-path^="'+path+'."]').map(
-				function(){
-					return $(this).attr('x-path').replace(path+'.','');
-				}).get();
-		
-		relatives = _.unique(relatives);
-		if (relatives.length > 0 && value && value.id) {
-			return ds.read(value.id, {
-				fields: relatives
-			}).success(function(rec){
-				var record = { 'id' : value.id };
-				record[nameField] = rec[nameField];
-				_.each(relatives, function(name) {
-					var prefix = name.split('.')[0];
-					record[prefix] = rec[prefix];
-				});
-				$scope.setValue(record, true);
-			});
-		}
-		// end fetch '.' names
-
 		if (value && value.id) {
 			record = { 'id' : value.id };
 			record[nameField] = value[nameField];
