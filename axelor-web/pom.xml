@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.axelor</groupId>
     <artifactId>axelor-web-parent</artifactId>
-    <version>0.0.6-SNAPSHOT</version>
+    <version>0.0.7-SNAPSHOT</version>
     <relativePath>../axelor-web-parent/pom.xml</relativePath>
   </parent>
 
