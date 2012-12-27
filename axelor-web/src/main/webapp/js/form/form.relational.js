@@ -685,9 +685,9 @@ var ManyToOneItem = {
 	'<div class="input-append">'+
 		'<input type="text" autocomplete="off">'+
 		'<button class="btn" type="button" tabindex="-1" ng-click="onSummary()" ng-show="_viewParams.summaryView"><i class="icon-eye-open"></i></button>'+
-		'<button class="btn" type="button" tabindex="-1" ng-click="onEdit()"><i class="icon-pencil"></i></button>'+
-		'<button class="btn" type="button" tabindex="-1" ng-click="onNew()"><i class="icon-plus"></i></button>'+
-		'<button class="btn" type="button" tabindex="-1" ng-click="onSelect()"><i class="icon-search"></i></button>'+
+		'<button class="btn" type="button" tabindex="-1" ng-click="onEdit()" title="{{\'Edit\' | t}}"><i class="icon-pencil"></i></button>'+
+		'<button class="btn" type="button" tabindex="-1" ng-click="onNew()" title="{{\'New\' | t}}"><i class="icon-plus"></i></button>'+
+		'<button class="btn" type="button" tabindex="-1" ng-click="onSelect()" title="{{\'Select\' | t}}"><i class="icon-search"></i></button>'+
    '</div>'
 };
 
@@ -805,10 +805,10 @@ var OneToManyItem = {
 				'<div class="container-fluid">'+
 					'<span class="brand" href="" ui-help-popover ng-bind-html-unsafe="title"></span>'+
 					'<div class="btn-group pull-right">'+
-						'<a href="" tabindex="-1" ng-click="onSelect()"><i class="icon-search"></i></a>'+
-						'<a href="" tabindex="-1" ng-click="onNew()"><i class="icon-plus"></i></a>'+
-						'<a href="" tabindex="-1" ng-click="onEdit()"><i class="icon-pencil"></i></a>'+
-						'<a href="" tabindex="-1" ng-click="onRemove()"><i class="icon-minus"></i></a>'+
+						'<a href="" tabindex="-1" ng-click="onSelect()" title="{{\'Select\' | t}}"><i class="icon-search"></i></a>'+
+						'<a href="" tabindex="-1" ng-click="onNew()" title="{{\'New\' | t}}"><i class="icon-plus"></i></a>'+
+						'<a href="" tabindex="-1" ng-click="onEdit()" title="{{\'Edit\' | t}}"><i class="icon-pencil"></i></a>'+
+						'<a href="" tabindex="-1" ng-click="onRemove()" title="{{\'Remove\' | t}}"><i class="icon-minus"></i></a>'+
 					'</div>'+
 				'</div>'+
 			'</div>'+
@@ -1024,9 +1024,9 @@ var NestedEditor = {
 			'<legend>'+
 				'<span ng-bind-html-unsafe="title"></span> '+
 				'<span class="legend-toolbar">'+
-					'<a href="" tabindex="-1" ng-click="onClear()"><i class="icon-ban-circle"></i></a> '+
-					'<a href="" tabindex="-1" ng-click="onSelect()"><i class="icon-search"></i></a> '+
-					'<a href="" tabindex="-1" ng-click="onClose()"><i class="icon-remove-sign"></i></a>'+
+					'<a href="" tabindex="-1" ng-click="onClear()" title="{{\'Clear\' | t}}"><i class="icon-ban-circle"></i></a> '+
+					'<a href="" tabindex="-1" ng-click="onSelect()" title="{{\'Select\' | t}}"><i class="icon-search"></i></a> '+
+					'<a href="" tabindex="-1" ng-click="onClose()" title="{{\'Close\' | t}}"><i class="icon-remove-sign"></i></a>'+
 				'</span>'+
 			'</legend>'+
 			'<div ui-nested-form></div>'+
