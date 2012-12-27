@@ -284,7 +284,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 			return;
 		}
 		var rec = $scope.$eval(model);
-		if (rec.$fetched || rec.$dirty) {
+		if (rec.$fetched || rec.$dirty || rec.$visited) {
 			return;
 		}
 		var path = $element.attr('x-path');
@@ -302,7 +302,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		}
 		for(var i = 0 ; i < nested.length ; i++){
 			if ($scope.$eval(nested[i], rec) === undefined) {
-				rec.$fetched = true;
+				rec.$visited = true;
 				return updateNested(rec, nested);
 			}
 		}
@@ -322,7 +322,6 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 			_.each(parents, function(name) {
 				record[name] = rec[name];
 			});
-			record.$fetched = true;
 			_.extend(value, record);
 		});
 	};
