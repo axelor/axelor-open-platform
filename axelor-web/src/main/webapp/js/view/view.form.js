@@ -399,6 +399,9 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 
 			elem.add(label)[classOp]('ui-state-disabled');
 
+			if (elem.is('.ui-spinner-input')) {
+				return elem.spinner('option', 'disabled', flag);
+			}
 			if (elem.is(':input')) {
 				return elem.attr('disabled', flag);
 			}
