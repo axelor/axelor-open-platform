@@ -32,8 +32,8 @@ load([
 	'lib/underscore/underscore-min.js',
 	'lib/moment/moment.min.js',
 	
-	'lib/jquery.ui/js/jquery.min.js',
-	'lib/jquery.ui/js/jquery-ui.min.js',
+	'lib/jquery.ui/js/jquery.js',
+	'lib/jquery.ui/js/jquery-ui.js',
 	'lib/jquery.ui/js/jquery.ui.mask.js',
 	'lib/bootstrap/js/bootstrap.js',
 	'lib/jquery.timepicker/jquery-ui-timepicker-addon.js',
