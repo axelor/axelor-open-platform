@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
@@ -18,6 +21,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class CSVBinder {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(CSVBinder.class);
 
 	private Class<?> beanClass;
 
@@ -102,7 +107,9 @@ public class CSVBinder {
 	private Object find(Map<String, Object> params) {
 
 		if (this.query != null) {
+			LOG.trace("search: " + this.query);
 			Object bean = JPA.all((Class<Model>) beanClass).filter(query).bind(params).fetchOne();
+			LOG.trace("search found: " + bean);
 			if (update || bean != null) {
 				return bean;
 			}
@@ -164,8 +171,12 @@ public class CSVBinder {
 
 		if (bean == null)
 			return null;
+		
+		LOG.trace("populate: " + beanClass);
 
 		for (CSVBinding cb : this.bindings) {
+			
+			LOG.trace("binding: " + cb);
 			
 			String field = cb.getField();
 			Property p = mapper.getProperty(field);
@@ -183,7 +194,9 @@ public class CSVBinder {
 			
 			// get default value
 			if (cb.getColumn() == null && cb.getSearch() == null && cb.getExpression() != null) {
+				LOG.trace("expression: " + cb.getExpression());
 				value = cb.eval(values);
+				LOG.trace("value: " + value);
 			}
 			
 			// find m2m references
@@ -203,8 +216,10 @@ public class CSVBinder {
 					p.addAll(bean, (Collection<?>) value);
 				else
 					p.add(bean, value);
-			else
+			else{
 				p.set(bean, value);
+				LOG.trace("set value: {} = {}", p.getName(), value);
+			}
 		}
 
 		return bean;
