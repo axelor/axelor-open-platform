@@ -7,7 +7,7 @@ html, body {
 }
 
 #container {
-	left: 0px; right: 0px; top: 40px; bottom: 0px;
+	left: 0px; right: 0px; top: 42px; bottom: 0px;
 	min-width:	600px;
 	position:	absolute;
 }
@@ -133,6 +133,19 @@ html, body {
 .no-close .ui-dialog-titlebar-close {
 	display: none;
 }
+
+.ui-widget input,
+.ui-widget select,
+.ui-widget textarea,
+.ui-widget button {
+	font-family: inherit;
+	font-size: inherit;
+}
+
+.ui-widget button {
+	font-size: 13px;
+}
+
 /* end jQuery UI fixes */
 
 /* Browser fixes */
@@ -207,7 +220,6 @@ html, body {
 	
 	margin: 4px 0;
 	padding: 4px;
-	padding-bottom: 0px;
 }
 
 .record-pager > span {
@@ -238,21 +250,13 @@ html, body {
 	padding-left: 10px;
 	padding-right: 10px;
 	
-	background-image: -webkit-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
-	background-image: -ms-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
-	background-image: -o-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
-	background-image: -moz-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#F5F5F5', endColorstr='#eeeeee',GradientType=0 );
-	background-image: linear-gradient(top, #F5F5F5 0%,#EEE 100%);
-	background-color: #E5E5E5;
 	border: 1px solid #E5E5E5;
 }
 
 .stackbar .navbar .navbar-inner .brand {
 	font-size: small;
 	font-weight: bold;
-	padding: 8px 12px;
-	padding-top: 6px;
+	padding: 4px 8px;
 	margin: 0;
 	margin-left: -10px;
 }
@@ -273,19 +277,8 @@ html, body {
 	box-shadow: none;
 }
 
-.stackbar .navbar .btn-group {
-	padding: 5px 4px 3px;	
-}
-
-.stackbar .navbar .btn-group a {
-	color: #999;
-	text-decoration: none;
-	cursor: pointer;
-	padding: 6px;
-}
-
-.stackbar .navbar .btn-group a:hover {
-	color: white;
+.stackbar .navbar .nav-pills > li > a {
+	padding: 5px 3px 3px;	
 }
 
 .html-view,

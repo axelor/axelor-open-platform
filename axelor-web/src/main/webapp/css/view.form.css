@@ -296,8 +296,8 @@ table.field-details .help-text hr {
 	margin: 9px 0;
 }
 
-.popover-inner {
-	width: inherit;
+.popover {
+	width: auto;
 	min-width: 280px;
 	max-width: 360px;
 }

@@ -776,12 +776,12 @@ var OneToManyItem = {
 			'<div class="navbar-inner">'+
 				'<div class="container-fluid">'+
 					'<span class="brand" href="" ui-help-popover ng-bind-html-unsafe="title"></span>'+
-					'<div class="btn-group pull-right">'+
-						'<a href="" tabindex="-1" ng-click="onSelect()" title="{{\'Select\' | t}}"><i class="icon-search"></i></a>'+
-						'<a href="" tabindex="-1" ng-click="onNew()" title="{{\'New\' | t}}"><i class="icon-plus"></i></a>'+
-						'<a href="" tabindex="-1" ng-click="onEdit()" title="{{\'Edit\' | t}}"><i class="icon-pencil"></i></a>'+
-						'<a href="" tabindex="-1" ng-click="onRemove()" title="{{\'Remove\' | t}}"><i class="icon-minus"></i></a>'+
-					'</div>'+
+					'<ul class="nav nav-pills pull-right">'+
+						'<li><a href="" tabindex="-1" ng-click="onSelect()" title="{{\'Select\' | t}}"><i class="icon-search"></i></a></li>'+
+						'<li><a href="" tabindex="-1" ng-click="onNew()" title="{{\'New\' | t}}"><i class="icon-plus"></i></a></li>'+
+						'<li><a href="" tabindex="-1" ng-click="onEdit()" title="{{\'Edit\' | t}}"><i class="icon-pencil"></i></a></li>'+
+						'<li><a href="" tabindex="-1" ng-click="onRemove()" title="{{\'Remove\' | t}}"><i class="icon-minus"></i></a></li>'+
+					'</ul>'+
 				'</div>'+
 			'</div>'+
 		'</div>'+
