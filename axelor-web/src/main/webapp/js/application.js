@@ -30,7 +30,7 @@ if (this._t === undefined) {
 load([
 	//-- js-begin
 	'lib/underscore/underscore-min.js',
-	'lib/moment/moment.min.js',
+	'lib/moment/moment.js',
 	
 	'lib/jquery.ui/js/jquery.js',
 	'lib/jquery.ui/js/jquery-ui.js',
