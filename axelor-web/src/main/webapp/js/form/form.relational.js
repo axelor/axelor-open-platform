@@ -931,6 +931,14 @@ var NestedEditor = {
 		}
 		
 		function configure(nested) {
+			
+			//FIX: select on M2O doesn't apply to nested editor
+			scope.$watch(attrs.ngModel + '.id', function(){
+				setTimeout(function(){
+					nested.$apply();
+				});
+			});
+
 			nested.$watch('form.$valid', function(valid){
 				setValidity(nested, valid);
 			});
