@@ -147,10 +147,13 @@ public class CSVImporter implements Importer {
 				try {
 					Map<String, Object> ctx = Maps.newHashMap(context);
 					Object bean = binder.bind(values, ctx);
+					if (LOG.isTraceEnabled())
+						LOG.trace("bean created: {}", bean);
 					bean = csvInput.call(bean, ctx, injector);
 					if (bean != null) {
 						JPA.manage((Model) bean);
 					}
+					LOG.debug("bean saved: {}", bean);
 				} catch (Exception e) {
 					if (LOG.isErrorEnabled()) {
 						LOG.error("Error while importing {}.", input.getName());
