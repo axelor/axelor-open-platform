@@ -282,6 +282,18 @@ td.form-item > * {
 	        user-select: none;
 }
 
+.form-item .ui-spinner {
+	height: 26px;
+	padding-right: 18px;
+}
+
+table.form-layout td.form-item .ui-spinner input {
+	width: 100%;
+	height: 22px;
+	margin: 1px;
+	text-align: right;
+}
+
 table.field-details {
 	width: 100%;
 }
