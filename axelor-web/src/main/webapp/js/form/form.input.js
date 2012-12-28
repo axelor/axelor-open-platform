@@ -225,6 +225,65 @@ if (_t.calendar) {
 	$.timepicker.setDefaults(_t.calendar);
 }
 
+// configure ui.mask
+function createTwoDigitDefinition( maximum ) {
+	return function( value ) {
+		var number = parseInt( value, 10 );
+
+		if ( value === "" || /\D/.test( value ) ) {
+			return;
+		}
+
+		// allow "0" if it is the only character in the value,
+		// otherwise allow anything from 1 to maximum
+		if ( !number && value.length === 2 ) {
+			return;
+		}
+
+		// pad to 2 characters
+		number = ( number < 10 ? "0" : "" ) + number;
+		if ( number <= maximum ) {
+			return number;
+		}
+	};
+}
+
+function yearsDefinition( value ) {
+	var temp;
+
+	// if the value is empty, or contains a non-digit, it is invalid
+	if ( value === "" || /\D/.test( value ) ) {
+		return false;
+	}
+
+	// convert 2 digit years to 4 digits, this allows us to type 80 <right>
+	if ( value.length <= 2 ) {
+		temp = parseInt( value, 10 );
+		// before "32" we assume 2000's otherwise 1900's
+		if ( temp < 10 ) {
+			return "200" + temp;
+		} else if ( temp < 32 ) {
+			return "20" + temp;
+		} else {
+			return "19" + temp;
+		}
+	}
+	if ( value.length === 3 ) {
+		return "0"+value;
+	}
+	if ( value.length === 4 ) {
+		return value;
+	}
+}
+
+$.extend($.ui.mask.prototype.options.definitions, {
+	"MM": createTwoDigitDefinition( 12 ),
+	"DD": createTwoDigitDefinition( 31 ),
+	"YYYY": yearsDefinition,
+	"HH": createTwoDigitDefinition( 23 ),
+	"mm": createTwoDigitDefinition( 59 )
+});
+
 /**
  * The DateTime input widget.
  */
@@ -234,7 +293,7 @@ var DateTimeItem = {
 	require: '?ngModel',
 	
 	format: 'DD/MM/YYYY HH:mm',
-	mask: '39/19/9999 29:69',
+	mask: 'DD/MM/YYYY HH:mm',
 
 	link: function(scope, element, attrs, controller) {
 		
@@ -247,6 +306,7 @@ var DateTimeItem = {
 			showTime: false,
 			showOn: null,
 			onSelect: function(dateText, inst) {
+				input.mask('value', dateText);
 				updateModel();
 				if (!inst.timeDefined)
 					input.datetimepicker('hide');
@@ -304,10 +364,10 @@ var DateTimeItem = {
 			var value = controller.$viewValue;
 			if (value) {
 				value = moment(value).format(self.format);
-				input.val(value);
+				input.mask('value', value);
 				input.datetimepicker('setDate', value);
 			} else {
-				input.val("");
+				input.mask('value', '');
 			}
 		};
 	},
@@ -322,13 +382,13 @@ var DateTimeItem = {
 
 var DateItem = _.extend({}, DateTimeItem, {
 	format: 'DD/MM/YYYY',
-	mask: '39/19/9999',
+	mask: 'DD/MM/YYYY',
 	isDate: true
 });
 
 var TimeItem = {
 	css: 'time-item',
-	mask: '29:69',
+	mask: 'HH:mm',
 	require: '?ngModel',
 	link: function(scope, element, attrs, model) {
 		
@@ -516,11 +576,6 @@ var SelectQueryItem = {
 			'<button class="btn" type="button" tabindex="-1" ng-click="showSelection()"><i class="icon-caret-down"></i></button>'+
 		'</div>'
 };
-
-// define input masks (number rules)
-_.each([0,1,2,3,4,5,6,7,8,9], function(n){
-	$.ui.mask.definitions[""+n] = "[0-" + n + "]";
-});
 
 // register directives
 
