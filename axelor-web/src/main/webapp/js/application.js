@@ -35,7 +35,7 @@ load([
 	'lib/jquery.ui/js/jquery.min.js',
 	'lib/jquery.ui/js/jquery-ui.min.js',
 	'lib/jquery.ui/js/jquery.ui.mask.js',
-	'lib/bootstrap/js/bootstrap.min.js',
+	'lib/bootstrap/js/bootstrap.js',
 	'lib/jquery.timepicker/jquery-ui-timepicker-addon.js',
 
 	'lib/slickgrid/lib/jquery.event.drag-2.0.min.js',

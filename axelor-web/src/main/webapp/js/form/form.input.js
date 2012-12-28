@@ -94,6 +94,7 @@ ui.directive('uiHelpPopover', function() {
 			html: true,
 			delay: { show: 1000, hide: 100 },
 			animate: true,
+			trigger: 'hover',
 			title: function() {
 				return element.text();
 			},
