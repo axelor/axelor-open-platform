@@ -192,25 +192,99 @@ var PhoneItem = {
  */
 var IntegerItem = {
 	css: 'integer-item',
-	template: '<input type="number">'
+	require: '?ngModel',
+	link: function(scope, element, attrs, model) {
+
+		var props = scope.getViewDef(element),
+			scale = props.scale || this.scale,
+			format = "n" + (_.isUndefined(scale) ? 0 : scale);
+		
+		var options = {
+			step: 1,
+			numberFormat: format,
+			change: onChange,
+			spin: onSpin
+		};
+
+		function isValid(text) {
+			return _.isEmpty(text) || /^(-)?\d+(\.\d+)?$/.test(text);
+		}
+		
+		function onChange(event, ui) {
+			var text = this.value,
+				value = element.spinner('value'),
+				valid = isValid(text);
+	
+			model.$setValidity('format', valid);
+			if (!valid) {
+				return;
+			}
+			
+			setTimeout(function(){
+				scope.$apply(function(){
+					model.$setViewValue(value);
+				});
+			});
+		}
+		
+		function onSpin(event, ui) {
+			
+			var text = this.value,
+				value = ui.value,
+				orig = element.spinner('value'),
+				parts, integer, decimal, min, max, dir = 0;
+
+			event.preventDefault();
+			
+			if (!isValid(text)) {
+				return false;
+			}
+
+			if (value < orig)
+				dir = -1;
+			if (value > orig)
+				dir = 1;
+
+			parts = text.split(/\./);
+			integer = +parts[0];
+			decimal = +parts[1];
+			
+			integer += dir;
+			if (parts.length > 1) {
+				value = integer + '.' + decimal;
+			}
+			
+			value = +value;
+			min = options.min;
+			max = options.max;
+
+			if (_.isNumber(min) && value < min)
+				value = min;
+			if (_.isNumber(max) && value > max)
+				value = max;
+
+			element.val(value);
+		}
+
+		if (props.minSize !== undefined)
+			options.min = +props.minSize;
+		if (props.maxSize !== undefined)
+			options.max = +props.maxSize;
+
+		setTimeout(function(){
+			element.spinner(options);
+		});
+	},
+	template: '<input type="text">'
 };
 
 /**
  * The Decimal input widget.
  */
-var DecimalItem = {
+var DecimalItem = _.extend({}, IntegerItem, {
 	css: 'decimal-item',
-	require: '?ngModel',
-	
-	link: function(scope, element, attrs, controller) {
-		controller.$parsers.unshift(function(viewValue) {
-			var isNumber = _.isEmpty(viewValue) || _.isNumber(viewValue) || /^(-)?\d+(\.\d+)?$/.test(viewValue);
-			controller.$setValidity('format', isNumber);
-			return isNumber ? viewValue : undefined;
-		});
-	},
-	template: '<input type="text">'
-};
+	step: 2
+});
 
 /**
  * The Boolean input widget.
