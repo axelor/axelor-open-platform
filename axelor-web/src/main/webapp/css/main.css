@@ -96,8 +96,8 @@ html, body {
 	padding: 1px;
 }
 
-.ui-dialog .ui-icon,
-.ui-dialog .ui-icon.ui-state-hover {
+.ui-dialog .ui-dialog-titlebar-close .ui-icon,
+.ui-dialog .ui-dialog-titlebar-close .ui-icon.ui-state-hover {
 	background: none !important;
 }
 
@@ -192,10 +192,6 @@ html, body {
 .ui-widget textarea,
 .ui-widget button {
 	font-family: inherit;
-	font-size: inherit;
-}
-
-.ui-widget button {
 	font-size: 13px;
 }
 
