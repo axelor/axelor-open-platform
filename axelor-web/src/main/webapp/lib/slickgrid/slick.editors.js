@@ -164,7 +164,7 @@
       $input.datepicker({
         showOn: "button",
         buttonImageOnly: true,
-        buttonImage: "lib/slick.grid/images/calendar.gif",
+        buttonImage: "../images/calendar.gif",
         beforeShow: function () {
           calendarOpen = true
         },
@@ -445,10 +445,10 @@
         scope.cancel();
       } else if (e.which == $.ui.keyCode.TAB && e.shiftKey) {
         e.preventDefault();
-        grid.navigatePrev();
+        args.grid.navigatePrev();
       } else if (e.which == $.ui.keyCode.TAB) {
         e.preventDefault();
-        grid.navigateNext();
+        args.grid.navigateNext();
       }
     };
 
