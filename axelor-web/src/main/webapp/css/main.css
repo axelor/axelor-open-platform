@@ -68,20 +68,73 @@ html, body {
 	padding: 0;
 }
 
-.ui-dialog-titlebar {
+.ui-dialog .ui-dialog-titlebar {
 	border-top: none;
 	border-left: none;
 	border-right: none;
+	border-bottom: 1px solid #EEE;
 	border-bottom-left-radius: 0;
 	border-bottom-right-radius: 0;
-	background-image: -webkit-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
-	background-image: -ms-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
-	background-image: -o-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
-	background-image: -moz-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f5f5f5', endColorstr='#eeeeee',GradientType=0 );
-	background-image: linear-gradient(top, #F5F5F5 0%,#EEE 100%);
-	background-color: #E5E5E5;
-	border-bottom: 1px solid #E5E5E5;
+	background: none;
+	
+	padding: 9px 15px;
+	font-size: 24.5px;
+	line-height: 30px;
+}
+
+.ui-dialog .ui-dialog-title {
+	margin: 0;
+}
+
+.ui-dialog .ui-dialog-titlebar-close.ui-state-hover {
+	background: none;
+	border: 0;
+}
+
+.ui-dialog .ui-dialog-titlebar-close:hover,
+.ui-dialog .ui-dialog-titlebar-close:focus {
+	padding: 1px;
+}
+
+.ui-dialog .ui-icon,
+.ui-dialog .ui-icon.ui-state-hover {
+	background: none !important;
+}
+
+.ui-dialog .ui-dialog-titlebar-close {
+	margin-top: -16px;
+	margin-right: 4px;
+	height: auto;
+	width: auto;
+	opacity: 0.2;
+}
+
+.ui-dialog .ui-dialog-titlebar-close.ui-state-hover {
+	border: 0;
+	background: transparent;
+	font-weight: bold;
+	opacity: 0.4;
+}
+
+.ui-dialog .ui-dialog-titlebar-close span::before {
+	content: "\00D7";
+	display: inline-block;
+}
+
+.ui-dialog .ui-dialog-titlebar-close .ui-icon {
+	text-indent: 0px !important;
+	line-height: 20px;
+	font-size: 20px;
+	height: 20px;
+	width: 12px;
+}
+
+.ui-dialog-buttonpane {
+	background-color: #f5f5f5;
+	border-top: 1px solid #DDD;
+	-webkit-box-shadow: inset 0 1px 0 white;
+       -moz-box-shadow: inset 0 1px 0 #ffffff;
+            box-shadow: inset 0 1px 0 white;
 }
 
 .ui-dialog .ui-dialog-content {
@@ -205,18 +258,12 @@ html, body {
 }
 
 .record-toolbar.btn-toolbar {
-	
-	background-image: -webkit-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
-	background-image: -ms-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
-	background-image: -o-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
-	background-image: -moz-linear-gradient(top, #F5F5F5 0%,#EEE 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f5f5f5', endColorstr='#eeeeee',GradientType=0 );
-	background-image: linear-gradient(top, #F5F5F5 0%,#EEE 100%);
-	background-color: #E5E5E5;
-	
+
 	border: 1px solid #E5E5E5;
 	border-left: none;
 	border-right: none;
+	
+	background-color: #f5f5f5;
 	
 	margin: 4px 0;
 	padding: 4px;
