@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import au.com.bytecode.opencsv.CSVReader;
 
 import com.axelor.data.Importer;
+import com.axelor.data.Listener;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.google.common.base.Preconditions;
@@ -38,6 +39,12 @@ public class CSVImporter implements Importer {
 	private File dataDir;
 	
 	private Injector injector;
+	
+	private List<Listener> listeners = Lists.newArrayList();
+	
+	public void addListener(Listener listener) {
+		this.listeners.add(listener);
+	}
 	
 	@Inject
 	public CSVImporter(Injector injector,
@@ -152,6 +159,9 @@ public class CSVImporter implements Importer {
 					bean = csvInput.call(bean, ctx, injector);
 					if (bean != null) {
 						JPA.manage((Model) bean);
+						for(Listener listener : listeners) {
+							listener.imported((Model) bean);
+						}
 					}
 					LOG.debug("bean saved: {}", bean);
 				} catch (Exception e) {
@@ -177,6 +187,10 @@ public class CSVImporter implements Importer {
 				LOG.error("Error while importing {}.", input.getName());
 				LOG.error("Unable to import data.");
 				LOG.error("With following exception:", e);
+		}
+		
+		for(Listener listener : listeners) {
+			listener.imported(count);
 		}
 		
 		csvReader.close();

@@ -25,6 +25,7 @@ import org.w3c.dom.Element;
 
 import com.axelor.data.ImportException;
 import com.axelor.data.Importer;
+import com.axelor.data.Listener;
 import com.axelor.data.adapter.BooleanAdapter;
 import com.axelor.data.adapter.JodaAdapter;
 import com.axelor.data.adapter.NumberAdapter;
@@ -87,11 +88,6 @@ public class XMLImporter implements Importer {
 		new XMLAdapter("Boolean", BooleanAdapter.class, "falsePattern", "(0|f|n|false|no)"),
 		new XMLAdapter("Number", NumberAdapter.class, "decimalSeparator", ".", "thousandSeparator", ",")
 	};
-
-	public static interface Listener {
-		
-		void imported(Model bean);
-	}
 	
 	/**
 	 * Import task configures input sources and provides error handler.
