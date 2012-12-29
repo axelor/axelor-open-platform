@@ -159,6 +159,12 @@ Grid.prototype.parse = function(view) {
 	this.subscribe(grid.onClick, this.onItemClick);
 	this.subscribe(grid.onDblClick, this.onItemDblClick);
 	
+	this.subscribe(grid.onKeyDown, this.onKeyDown);
+	this.subscribe(grid.onCellChange, this.onCellChange);
+	this.subscribe(grid.onAddNewRow, this.onAddNewRow);
+	this.subscribe(grid.onValidationError, this.onValidationError);
+	this.subscribe(grid.onBeforeEditCell, this.onBeforeEditCell);
+	
 	// register dataView event handlers
 	this.subscribe(dataView.onRowCountChanged, this.onRowCountChanged);
 	this.subscribe(dataView.onRowsChanged, this.onRowsChanged);
@@ -290,8 +296,97 @@ Grid.prototype.setColumnTitle = function(name, title) {
 	this.grid.updateColumnHeader(name, title);
 };
 
-Grid.prototype.onCellChange = function(event, args) {
+Grid.prototype.onBeforeEditCell = function(event, args) {
+	grid.setOptions({'autoEdit': true});
+};
+
+Grid.prototype.onKeyDown = function(e, args) {
+	var grid = this.grid,
+		lock = grid.getEditorLock(),
+		cols = grid.getColumns();
 	
+	if (!lock.isActive()) {
+		return;
+	}
+	
+	if (e.which == 38 || e.which == 40 || e.which == 37 || e.which == 39) {
+		e.stopImmediatePropagation();
+		return false;
+	}
+	
+	function findFirst() {
+		var cell = 0;
+		while (cell < cols.length) {
+			var col = cols[cell] || {};
+			if (col.focusable || col.focusable === undefined) {
+				return cell;
+			}
+			cell += 1;
+		}
+		return cell;
+	}
+	
+	function findLast() {
+		var cell = cols.length - 1;
+		while (cell >= cols.length) {
+			var col = cols[cell] || {};
+			if (col.focusable || col.focusable === undefined) {
+				return cell;
+			}
+			cell -= 1;
+		}
+		return cell;
+	}
+
+	if (e.which == 9 && args.cell == cols.length - 1) {
+		if (e.shiftKey) {
+			return;
+		}
+		
+		grid.setActiveCell(args.row, findFirst());
+		grid.editActiveCell();
+
+		e.stopImmediatePropagation();
+		return false;
+	}
+	
+	if (e.shiftKey && e.which == 9 && args.cell == 0) {
+		
+		grid.setActiveCell(args.row, findLast());
+		grid.editActiveCell();
+
+		e.stopImmediatePropagation();
+		return false;
+	}
+	
+	if (e.which == 13) {
+		if (lock.commitCurrentEdit()) {
+			// save
+		} else {
+			// validate error
+		}
+		grid.setOptions({'autoEdit': false});
+		grid.focus();
+		e.stopImmediatePropagation();
+		return false;
+	}
+	
+	if (e.which == 27) {
+		grid.setOptions({'autoEdit': false});
+		grid.focus();
+	}
+};
+
+Grid.prototype.onCellChange = function(event, args) {
+
+};
+
+Grid.prototype.onAddNewRow = function(event, args) {
+	
+};
+
+Grid.prototype.onValidationError = function(event, args) {
+
 };
 
 Grid.prototype.onSelectionChanged = function(event, args) {
@@ -305,11 +400,19 @@ Grid.prototype.onSort = function(event, args) {
 };
 
 Grid.prototype.onItemClick = function(event, args) {
+	if (this.grid.getEditorLock().isActive()) {
+		event.stopImmediatePropagation();
+		return false;
+	}
 	if (this.handler.onItemClick)
 		this.handler.onItemClick(event, args);
 };
 
 Grid.prototype.onItemDblClick = function(event, args) {
+	if (this.grid.getEditorLock().isActive()) {
+		event.stopImmediatePropagation();
+		return false;
+	}
 	if (this.handler.onItemDblClick)
 		this.handler.onItemDblClick(event, args);
 };
