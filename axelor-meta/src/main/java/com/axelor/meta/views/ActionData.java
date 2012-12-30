@@ -12,8 +12,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.data.ImportException;
+import com.axelor.data.ImportTask;
+import com.axelor.data.Listener;
 import com.axelor.data.xml.XMLImporter;
-import com.axelor.data.xml.XMLImporter.ImportTask;
 import com.axelor.db.Model;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
@@ -55,7 +56,7 @@ public class ActionData extends Action {
 
 		mapping.put(fileName, reader);
 		
-		importer.addListener(new XMLImporter.Listener() {
+		importer.addListener(new Listener() {
 			@Override
 			public void imported(Model bean) {
 				log.info("action-data (record): {}(id={})",
@@ -63,17 +64,23 @@ public class ActionData extends Action {
 						bean.getId());
 				records.add(bean);
 			}
+
+			@Override
+			public void imported(Integer counter) {
+				// TODO Auto-generated method stub
+				
+			}
 		});
 		
 		importer.runTask(new ImportTask() {
 			
 			@Override
-			protected void configure() throws IOException {
+			public void configure() throws IOException {
 				input(fileName, reader);
 			}
 			
 			@Override
-			protected boolean handle(ImportException e) {
+			public boolean handle(ImportException e) {
 				log.error("error:" + e);
 				e.printStackTrace();
 				return true;
