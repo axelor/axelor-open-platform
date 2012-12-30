@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.axelor.data.xml.XMLImporter;
-import com.axelor.data.xml.XMLImporter.ImportTask;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.GuiceRunner;
 import com.google.common.collect.Maps;
@@ -38,13 +37,13 @@ public class XMLImportTest {
 		importer.runTask(new ImportTask(){
 			
 			@Override
-			protected void configure() throws IOException {
+			public void configure() throws IOException {
 				input("contacts.xml", new File("data/xml/contacts.xml"));
 				input("contacts.xml", new File("data/xml/contacts-non-unicode.xml"), Charset.forName("ISO-8859-15"));
 			}
 			
 			@Override
-			protected boolean handle(ImportException exception) {
+			public boolean handle(ImportException exception) {
 				System.err.println("Import error: " + exception);
 				return true;
 			}

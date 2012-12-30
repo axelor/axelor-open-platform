@@ -1,14 +1,10 @@
 package com.axelor.data.xml;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,13 +20,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.axelor.data.ImportException;
+import com.axelor.data.ImportTask;
 import com.axelor.data.Importer;
 import com.axelor.data.Listener;
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.inject.Injector;
@@ -51,12 +47,12 @@ import com.thoughtworks.xstream.mapper.MapperWrapper;
  * 
  * importer.runTask(new ImportTask(){
  * 	
- * 	protected void configure() throws IOException {
+ * 	public void configure() throws IOException {
  * 		input(&quot;contacts.xml&quot;, new File(&quot;data/xml/contacts.xml&quot;));
  * 		input(&quot;contacts.xml&quot;, new File(&quot;data/xml/contacts2.xml&quot;));
  * 	}
  * 
- * 	protected boolean handle(ImportException e) {
+ * 	public boolean handle(ImportException e) {
  * 		System.err.println("Import error: " + e);
  * 		return true;
  * 	}
@@ -77,113 +73,6 @@ public class XMLImporter implements Importer {
 	private Map<String, Object> context;
 
 	private List<Listener> listeners = Lists.newArrayList();
-	
-	/**
-	 * Import task configures input sources and provides error handler.
-	 *
-	 */
-	public static abstract class ImportTask {
-		
-		private Multimap<String, Reader> readers =  ArrayListMultimap.create();
-
-		/**
-		 * Configure the input sources using the various {@code input} methods.
-		 * 
-		 * @throws IOException
-		 * @see {@link #input(String, File)},
-		 *      {@link #input(String, File, Charset)}
-		 *      {@link #input(String, InputStream)},
-		 *      {@link #input(String, InputStream, Charset)},
-		 *      {@link #input(String, Reader)}
-		 */
-		protected abstract void configure() throws IOException;
-		
-		/**
-		 * Provide import error handler.
-		 * 
-		 * @return return {@code true} to continue else terminate the task
-		 *         immediately.
-		 */
-		protected boolean handle(ImportException e) {
-			return false;
-		}
-		
-		/**
-		 * Provide io exception handler.
-		 * 
-		 * @return return {@code true} to continue else terminate the task
-		 *         immediately.
-		 */
-		protected boolean handle(IOException e) {
-			return false;
-		}
-
-		/**
-		 * Provide the input source.
-		 * 
-		 * @param inputName
-		 *            the input name
-		 * @param source
-		 *            the input source
-		 * @throws FileNotFoundException
-		 */
-		protected void input(String inputName, File source) throws FileNotFoundException {
-			input(inputName, source, Charset.defaultCharset());
-		}
-		
-		/**
-		 * Provide the input source.
-		 * 
-		 * @param inputName
-		 *            the input name
-		 * @param source
-		 *            the input source
-		 * @param charset
-		 *            the source encoding
-		 * @throws FileNotFoundException
-		 */
-		protected void input(String inputName, File source, Charset charset) throws FileNotFoundException {
-			input(inputName, new FileInputStream(source), charset);
-		}
-
-		/**
-		 * Provide the input source.
-		 * 
-		 * @param inputName
-		 *            the input name
-		 * @param source
-		 *            the input source
-		 */
-		protected void input(String inputName, InputStream source) {
-			input(inputName, source, Charset.defaultCharset());
-		}
-		
-		/**
-		 * Provide the input source.
-		 * 
-		 * @param inputName
-		 *            the input name
-		 * @param source
-		 *            the input source
-		 * @param charset
-		 *            the source encoding
-		 */
-		protected void input(String inputName, InputStream source, Charset charset) {
-			input(inputName, new InputStreamReader(source, charset));
-		}
-
-		/**
-		 * Provide the input source.
-		 * 
-		 * @param inputName
-		 *            the input name
-		 * @param reader
-		 *            the input source
-		 */
-		protected void input(String inputName, Reader reader) {
-			readers.put(inputName, reader);
-		}
-	}
 
 	@Inject
 	public XMLImporter(Injector injector,

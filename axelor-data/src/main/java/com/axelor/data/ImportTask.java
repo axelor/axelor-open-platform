@@ -1,0 +1,120 @@
+package com.axelor.data;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+
+/**
+ * Import task configures input sources and provides error handler.
+ *
+ */
+public abstract class ImportTask {
+	
+	public Multimap<String, Reader> readers =  ArrayListMultimap.create();
+
+	/**
+	 * Configure the input sources using the various {@code input} methods.
+	 * 
+	 * @throws IOException
+	 * @see {@link #input(String, File)},
+	 *      {@link #input(String, File, Charset)}
+	 *      {@link #input(String, InputStream)},
+	 *      {@link #input(String, InputStream, Charset)},
+	 *      {@link #input(String, Reader)}
+	 */
+	public abstract void configure() throws IOException;
+	
+	/**
+	 * Provide import error handler.
+	 * 
+	 * @return return {@code true} to continue else terminate the task
+	 *         immediately.
+	 */
+	public boolean handle(ImportException e) {
+		return false;
+	}
+	
+	/**
+	 * Provide io exception handler.
+	 * 
+	 * @return return {@code true} to continue else terminate the task
+	 *         immediately.
+	 */
+	public boolean handle(IOException e) {
+		return false;
+	}
+
+	/**
+	 * Provide the input source.
+	 * 
+	 * @param inputName
+	 *            the input name
+	 * @param source
+	 *            the input source
+	 * @throws FileNotFoundException
+	 */
+	public void input(String inputName, File source) throws FileNotFoundException {
+		input(inputName, source, Charset.defaultCharset());
+	}
+	
+	/**
+	 * Provide the input source.
+	 * 
+	 * @param inputName
+	 *            the input name
+	 * @param source
+	 *            the input source
+	 * @param charset
+	 *            the source encoding
+	 * @throws FileNotFoundException
+	 */
+	public void input(String inputName, File source, Charset charset) throws FileNotFoundException {
+		input(inputName, new FileInputStream(source), charset);
+	}
+
+	/**
+	 * Provide the input source.
+	 * 
+	 * @param inputName
+	 *            the input name
+	 * @param source
+	 *            the input source
+	 */
+	public void input(String inputName, InputStream source) {
+		input(inputName, source, Charset.defaultCharset());
+	}
+	
+	/**
+	 * Provide the input source.
+	 * 
+	 * @param inputName
+	 *            the input name
+	 * @param source
+	 *            the input source
+	 * @param charset
+	 *            the source encoding
+	 */
+	public void input(String inputName, InputStream source, Charset charset) {
+		input(inputName, new InputStreamReader(source, charset));
+	}
+
+	/**
+	 * Provide the input source.
+	 * 
+	 * @param inputName
+	 *            the input name
+	 * @param reader
+	 *            the input source
+	 */
+	public void input(String inputName, Reader reader) {
+		readers.put(inputName, reader);
+	}
+}
