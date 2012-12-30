@@ -9,6 +9,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
@@ -33,6 +34,12 @@ public class CSVBinder {
 	private String query;
 
 	private boolean update;
+	
+	private Map<String, DataAdapter> adapters = Maps.newHashMap();
+	
+	public void registerAdapter(DataAdapter adapter) {
+		adapters.put(adapter.getName(), adapter);
+	}
 
 	public CSVBinder(Class<?> beanClass, String[] fields, CSVInput csvInput) {
 		this(beanClass, fields, csvInput.getBindings(), true, csvInput.getSearch(), csvInput.isUpdate());
@@ -186,11 +193,21 @@ public class CSVBinder {
 				continue;
 			}
 			
-			if (p.isPrimary() || p.isVirtual() || !isBound(cb, values) || !cb.validate(values)) {
+			if (p.isPrimary() || p.isVirtual() || !isBound(cb, values)) {
 				continue;
 			}
 			
 			Object value = values.get(cb.getColumn());
+			
+			LOG.trace("value: " + value);
+			LOG.trace("condition: " + cb.getCondition());
+			
+			if (!cb.validate(values)) {
+				LOG.trace("condition failed");
+				continue;
+			}
+			
+			value = this.adapt(cb, value, values);
 			
 			// get default value
 			if (cb.getColumn() == null && cb.getSearch() == null && cb.getExpression() != null) {
@@ -275,5 +292,17 @@ public class CSVBinder {
 			}
 		}
 		return all;
+	}
+	
+	private Object adapt(CSVBinding bind, Object value, Map<String, Object> ctx) {
+		String name = bind.getAdapter();
+		if ("".equals(value)) {
+			value = null;
+		}
+		if (name == null || !adapters.containsKey(name)) {
+			return value;
+		}
+		DataAdapter adapter = adapters.get(name);
+		return adapter.adapt(value, ctx);
 	}
 }

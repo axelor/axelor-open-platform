@@ -3,6 +3,7 @@ package com.axelor.data.xml;
 import java.io.File;
 import java.util.List;
 
+import com.axelor.data.adapter.DataAdapter;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -12,12 +13,12 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 public class XMLConfig {
 
 	@XStreamImplicit(itemFieldName = "adapter")
-	private List<XMLAdapter> adapters = Lists.newArrayList();
+	private List<DataAdapter> adapters = Lists.newArrayList();
 	
 	@XStreamImplicit(itemFieldName = "input")
 	private List<XMLInput> inputs = Lists.newArrayList();
 
-	public List<XMLAdapter> getAdapters() {
+	public List<DataAdapter> getAdapters() {
 		if (adapters == null) {
 			adapters = Lists.newArrayList();
 		}

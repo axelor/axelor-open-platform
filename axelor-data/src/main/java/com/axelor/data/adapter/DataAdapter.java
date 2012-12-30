@@ -1,17 +1,16 @@
-package com.axelor.data.xml;
+package com.axelor.data.adapter;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import com.axelor.data.adapter.Adapter;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 @XStreamAlias("adapter")
-public class XMLAdapter {
+public class DataAdapter {
 	
 	static class Option {
 		
@@ -40,10 +39,10 @@ public class XMLAdapter {
 
 	private Adapter adapter;
 	
-	public XMLAdapter() {
+	public DataAdapter() {
 	}
 	
-	public XMLAdapter(String name, Class<?> type, String... options) {
+	public DataAdapter(String name, Class<?> type, String... options) {
 		this.name = name;
 		this.klass = type.getName();
 		this.options = Lists.newArrayList();
@@ -82,6 +81,7 @@ public class XMLAdapter {
 	}
 
 	public Object adapt(Object value, Map<String, Object> context) {
+		
 		if (adapter == null) {
 			adapter = create();
 			if (options != null) {
@@ -92,6 +92,8 @@ public class XMLAdapter {
 				adapter.setOptions(p);
 			}
 		}
+		
 		return adapter.adapt(value, context);
 	}
+
 }

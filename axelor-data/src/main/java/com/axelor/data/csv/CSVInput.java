@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
+import com.axelor.data.adapter.DataAdapter;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -48,6 +49,9 @@ public class CSVInput {
 
 	@XStreamImplicit(itemFieldName = "bind")
 	private List<CSVBinding> bindings = Lists.newArrayList();
+	
+	@XStreamImplicit(itemFieldName = "adapter")
+	private List<DataAdapter> adapters = Lists.newArrayList();
 
 	public String getFileName() {
 		return fileName;
@@ -90,6 +94,13 @@ public class CSVInput {
 
 	public List<CSVBinding> getBindings() {
 		return bindings;
+	}
+	
+	public List<DataAdapter> getAdapters() {
+		if (adapters == null) {
+			adapters = Lists.newArrayList();
+		}
+		return adapters;
 	}
 	
 	private Object callObject;

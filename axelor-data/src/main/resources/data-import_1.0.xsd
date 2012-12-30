@@ -11,6 +11,11 @@
     </annotation>
     <complexType>
       <sequence>
+        <element name="adapter" type="db:Adapter" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Type adapter.</documentation>
+          </annotation>
+        </element>
         <element name="input" type="db:CSVInput" maxOccurs="unbounded">
           <annotation>
             <documentation>Input file binding.</documentation>
@@ -110,6 +115,11 @@
       <extension base="db:Input">
         <sequence>
           <sequence>
+            <element name="adapter" type="db:Adapter" minOccurs="0" maxOccurs="unbounded">
+              <annotation>
+                <documentation>Type adapter.</documentation>
+              </annotation>
+          	</element>
             <element name="bind" type="db:CSVBind" maxOccurs="unbounded" minOccurs="0">
               <annotation>
                 <documentation>Binding information.</documentation>
@@ -189,6 +199,13 @@
         <attribute name="column" type="string">
           <annotation>
             <documentation>The CSV column name.</documentation>
+          </annotation>
+        </attribute>
+        <attribute name="adapter" type="string">
+          <annotation>
+            <documentation>
+              Type adapter, followed by an optional string argument separated by '|' character.
+            </documentation>
           </annotation>
         </attribute>
       </extension>

@@ -2,6 +2,7 @@ package com.axelor.data.xml;
 
 import java.util.List;
 
+import com.axelor.data.adapter.DataAdapter;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -19,7 +20,7 @@ public class XMLInput {
 	private String root;
 
 	@XStreamImplicit(itemFieldName = "adapter")
-	private List<XMLAdapter> adapters = Lists.newArrayList();
+	private List<DataAdapter> adapters = Lists.newArrayList();
 	
 	@XStreamImplicit(itemFieldName = "bind")
 	private List<XMLBind> bindings = Lists.newArrayList();
@@ -36,7 +37,7 @@ public class XMLInput {
 		return root;
 	}
 	
-	public List<XMLAdapter> getAdapters() {
+	public List<DataAdapter> getAdapters() {
 		if (adapters == null) {
 			adapters = Lists.newArrayList();
 		}

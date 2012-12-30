@@ -23,6 +23,7 @@ import au.com.bytecode.opencsv.CSVReader;
 
 import com.axelor.data.Importer;
 import com.axelor.data.Listener;
+import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.google.common.base.Preconditions;
@@ -34,11 +35,11 @@ public class CSVImporter implements Importer {
 
 	private Logger LOG = LoggerFactory.getLogger(getClass());
 	
-	private File cfgFile;
-	
 	private File dataDir;
 	
 	private Injector injector;
+	
+	private CSVConfig config;
 	
 	private List<Listener> listeners = Lists.newArrayList();
 	
@@ -52,15 +53,18 @@ public class CSVImporter implements Importer {
 			@Named("axelor.data.dir") String dataDir) {
 		
 		File _file = new File(config);
-		File _data = new File(dataDir);
 		
 		Preconditions.checkNotNull(_file);
-		Preconditions.checkNotNull(_data);
 		Preconditions.checkArgument(_file.isFile());
-		Preconditions.checkArgument(_data.isDirectory());
 		
-		this.cfgFile = _file;
-		this.dataDir = _data;
+		if (dataDir != null) {
+			File _data = new File(dataDir);
+			Preconditions.checkNotNull(_data);
+			Preconditions.checkArgument(_data.isDirectory());
+			this.dataDir = _data;
+		}
+		
+		this.config = CSVConfig.parse(_file);
 		this.injector = injector;
 	}
 	
@@ -74,7 +78,6 @@ public class CSVImporter implements Importer {
 	@Override
 	public void run(Map<String, String[]> mappings) throws IOException {
 		
-		CSVConfig config = CSVConfig.parse(this.cfgFile);
 		if (mappings == null) {
 			mappings = new HashMap<String, String[]>();
 		}
@@ -141,6 +144,17 @@ public class CSVImporter implements Importer {
 			
 			Map<String, Object> context = Maps.newHashMap();
 			csvInput.callPrepareContext(context, injector);
+			
+			// register type adapters
+			for(DataAdapter adapter : defaultAdapters) {
+				binder.registerAdapter(adapter);
+			}
+			for(DataAdapter adapter : this.config.getAdapters()) {
+				binder.registerAdapter(adapter);
+			}
+			for(DataAdapter adapter : csvInput.getAdapters()) {
+				binder.registerAdapter(adapter);
+			}
 			
 			while((values = csvReader.readNext()) != null) {
 				
