@@ -566,14 +566,32 @@ var ManyToOneItem = {
 		scope.formPath = scope.formPath ? scope.formPath + "." + field.name : field.name;
 		
 		input.keydown(function(e){
-
-			var KEY = $.ui.keyCode;
-
-			switch(e.keyCode) {
-			case KEY.DELETE:
-			//case KEY.BACKSPACE:
-				scope.select(null);
+			var handled = false;
+			if (e.keyCode == 113) { // F2
+				if (e.shiftKey) {
+					scope.onNew();
+				} else {
+					scope.onEdit();
+				}
+				handled = true;
 			}
+			if (e.keyCode == 114) { // F3
+				scope.onSelect();
+				handled = true;
+			}
+			if (e.keyCode == 46) { // DELETE
+				scope.select(null);
+				handled = true;
+			}
+			if (!handled) {
+				return;
+			}
+			setTimeout(function(){
+				scope.$apply();
+			});
+			e.preventDefault();
+			e.stopPropagation();
+			return false;
 		});
 		
 		model.$render = function() {
