@@ -96,6 +96,18 @@ public class CSVImporter implements Importer {
 						if (!task.handle(e)) {
 							break;
 						}
+					} catch (ClassNotFoundException e) {
+						if (LOG.isErrorEnabled()) {
+							LOG.error("Error while importing {}.", input.getFileName());
+							LOG.error("No such class found {}.", input.getTypeName());
+						}
+						if (!task.handle(e)) {
+							break;
+						}
+					} catch(Exception e){
+						if (!task.handle(new ImportException(e))) {
+							break;
+						}
 					}
 				}
 			}
@@ -127,13 +139,19 @@ public class CSVImporter implements Importer {
 			for(File file : files) {
 				try {
 					this.process(input, file);
-				} catch (ImportException e) {
+				} catch (IOException e) {
 					if (LOG.isErrorEnabled())
 						LOG.error("Error while accessing {}.", file);
 				} catch (ClassNotFoundException e) {
 					if (LOG.isErrorEnabled()) {
 						LOG.error("Error while importing {}.", file);
 						LOG.error("No such class found {}.", input.getTypeName());
+					}
+				} catch (Exception e) {
+					if (LOG.isErrorEnabled()) {
+						LOG.error("Error while importing {}.", file);
+						LOG.error("Unable to import data.");
+						LOG.error("With following exception:", e);
 					}
 				}
 			}
@@ -148,12 +166,8 @@ public class CSVImporter implements Importer {
 		return false;
 	}
 	
-	private void process(CSVInput input, File file) throws ImportException, ClassNotFoundException {
-		try {
-			this.process(input, new FileReader(file));
-		} catch (IOException e) {
-			throw new ImportException(e);
-		}
+	private void process(CSVInput input, File file) throws IOException, ClassNotFoundException {
+		this.process(input, new FileReader(file));
 	}
 	
 	private void process(CSVInput csvInput, Reader reader) throws IOException, ClassNotFoundException {
@@ -239,12 +253,13 @@ public class CSVImporter implements Importer {
 				LOG.error("Error while importing {}.", csvInput.getFileName());
 				LOG.error("Unable to import data.");
 				LOG.error("With following exception:", e);
+		} finally {
+			for(Listener listener : listeners) {
+				listener.imported(count);
+			}
+			csvReader.close();
 		}
 		
-		for(Listener listener : listeners) {
-			listener.imported(count);
-		}
 		
-		csvReader.close();
 	}
 }

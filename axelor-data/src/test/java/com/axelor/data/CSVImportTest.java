@@ -57,13 +57,13 @@ public class CSVImportTest {
 			
 			@Override
 			public boolean handle(ImportException exception) {
-				System.err.println("Import error : " + exception);
+				log.error("Import error : " + exception);
 				return false;
 			}
 			
 			@Override
 			public boolean handle(IOException e) {
-				System.err.println("IOException error : " + e);
+				log.error("IOException error : " + e);
 				return true;
 			}
 			

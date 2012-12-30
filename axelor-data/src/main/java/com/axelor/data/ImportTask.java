@@ -51,6 +51,16 @@ public abstract class ImportTask {
 	public boolean handle(IOException e) {
 		return false;
 	}
+	
+	/**
+	 * Provide class exception handler.
+	 * 
+	 * @return return {@code true} to continue else terminate the task
+	 *         immediately.
+	 */
+	public boolean handle(ClassNotFoundException e) {
+		return false;
+	}
 
 	/**
 	 * Provide the input source.
