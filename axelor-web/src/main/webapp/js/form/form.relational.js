@@ -89,6 +89,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	$scope.showPopupEditor = function(record) {
 		if (editor == null) {
 			editor = ViewService.compile('<div ui-editor-popup></div>')($scope.$new());
+			editor.data('$target', $element);
 		}
 		
 		var popup = editor.data('$scope');
@@ -129,6 +130,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		function doShow() {
 			if (selector == null) {
 				selector = ViewService.compile('<div ui-selector-popup></div>')($scope.$new());
+				selector.data('$target', $element);
 			}
 			var popup = selector.data('$scope');
 			popup.show();

@@ -50,6 +50,12 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 			
 			// focus the previous visible dialog
 			dialog.on('dialogclose', function(e, ui){
+				var target = element.data('$target');
+				if (target) {
+					return setTimeout(function(){
+						target.find(':input:first').focus().select();
+					});
+				}
 				$('body .ui-dialog:visible:last').focus();
 			});
 			
