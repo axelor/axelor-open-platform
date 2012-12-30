@@ -29,4 +29,10 @@ public class CSVDataTest {
 		MyLauncher launcher = new MyLauncher();
 		launcher.run("-c", "data/csv-multi-config.xml", "-d", "data/csv-multi", "-Dsale.order=so1.csv,so2.csv");
 	}
+	
+	@Test
+	public void testData() throws IOException {
+		MyLauncher launcher = new MyLauncher();
+		launcher.run("-c", "data/csv-config-types.xml", "-d", "data/csv");
+	}
 }
