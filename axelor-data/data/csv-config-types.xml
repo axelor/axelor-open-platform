@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<csv-inputs xmlns="http://apps.axelor.com/xml/ns/data-import"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/data-import http://apps.axelor.com/xml/ns/data-import/data-import_0.6.xsd">
+  
+  <!--
+  These are the default settings.
+  -->
+  
+  <adapter name="LocalDate" type="com.axelor.data.adapter.JodaAdapter">
+    <option name="type" value="LocalDate"/>
+    <option name="format" value="dd/MM/yyyy"/>
+  </adapter>
+  
+  <adapter name="LocalTime" type="com.axelor.data.adapter.JodaAdapter">
+    <option name="type" value="LocalTime"/>
+    <option name="format" value="HH:mm"/>
+  </adapter>
+  
+  <adapter name="LocalDateTime" type="com.axelor.data.adapter.JodaAdapter">
+    <option name="type" value="LocalDateTime"/>
+    <option name="format" value="dd/MM/yyyy HH:mm"/>
+  </adapter>
+  
+  <adapter name="DateTime" type="com.axelor.data.adapter.JodaAdapter">
+    <option name="type" value="DateTime"/>
+    <option name="format" value="dd/MM/yyyy HH:mm"/>
+  </adapter>
+  
+  <adapter name="Boolean" type="com.axelor.data.adapter.BooleanAdapter">
+    <option name="falsePattern" value="(0|false|no|f|n)"/>
+  </adapter>
+  
+  <!-- The default number adapter settings -->
+  <!--
+  <adapter name="Number" type="com.axelor.data.adapter.NumberAdapter">
+    <option name="thousandSeparator" value=","/>
+    <option name="decimalSeparator" value="."/>
+  </adapter>
+  -->
+
+  <!--
+  This is French settings.
+  -->
+  <adapter name="Number" type="com.axelor.data.adapter.NumberAdapter">
+    <option name="thousandSeparator" value="."/>
+    <option name="decimalSeparator" value=","/>
+  </adapter>
+
+  <input file="types.csv" type="com.axelor.data.tests.Types">
+      <bind column="date" to="date" adapter="LocalDate"/>
+      <bind column="time" to="time" adapter="LocalTime"/>
+      <bind column="datetime" to="dateTime" adapter="LocalDateTime"/>
+      <bind column="datetime2" to="dateTimeTz" adapter="DateTime"/>
+      <bind column="active" to="active" adapter="Boolean"/>
+      <bind column="number" to="number" adapter="Number"/>
+      <bind column="price" to="price" adapter="Number"/>
+  </input>
+
+</csv-inputs>
