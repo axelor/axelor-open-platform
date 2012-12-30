@@ -2,10 +2,9 @@ package com.axelor.data.csv;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +20,8 @@ import org.slf4j.LoggerFactory;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+import com.axelor.data.ImportException;
+import com.axelor.data.ImportTask;
 import com.axelor.data.Importer;
 import com.axelor.data.Listener;
 import com.axelor.data.adapter.DataAdapter;
@@ -75,6 +76,32 @@ public class CSVImporter implements Importer {
 		return all;
 	}
 	
+	public void runTask(ImportTask task) throws ClassNotFoundException {
+		try {
+			if (task.readers.isEmpty()) {
+				task.configure();
+			}
+			for (CSVInput input : config.getInputs()) {
+				for(Reader reader : task.readers.get(input.getFileName())) {
+					try {
+						this.process(input, reader);
+					} catch (IOException e) {
+						if (LOG.isErrorEnabled()){
+							LOG.error("I/O error while accessing {}.", input.getFileName());
+						}
+						if (!task.handle(e)) {
+							break;
+						}
+					}
+				}
+			}
+		} catch(IOException e) {
+			throw new IllegalArgumentException(e);
+		} finally {
+			task.readers.clear();
+		}
+	}
+	
 	@Override
 	public void run(Map<String, String[]> mappings) throws IOException {
 		
@@ -95,10 +122,10 @@ public class CSVImporter implements Importer {
 			
 			for(File file : files) {
 				try {
-					this.process(file, input);
-				} catch (IOException e) {
+					this.process(input, file);
+				} catch (ImportException e) {
 					if (LOG.isErrorEnabled())
-						LOG.error("I/O error while accessing {}.", file);
+						LOG.error("Error while accessing {}.", file);
 				} catch (ClassNotFoundException e) {
 					if (LOG.isErrorEnabled()) {
 						LOG.error("Error while importing {}.", file);
@@ -117,16 +144,23 @@ public class CSVImporter implements Importer {
 		return false;
 	}
 	
-	private void process(File input, CSVInput csvInput) throws IOException, ClassNotFoundException {
+	private void process(CSVInput input, File file) throws ImportException, ClassNotFoundException {
+		try {
+			this.process(input, new FileReader(file));
+		} catch (IOException e) {
+			throw new ImportException(e);
+		}
+	}
+	
+	private void process(CSVInput csvInput, Reader reader) throws IOException, ClassNotFoundException {
 		
 		String beanName = csvInput.getTypeName();
 		
 		if (LOG.isInfoEnabled()) {
-			LOG.info("Importing {} from {}", beanName, input);
+			LOG.info("Importing {} from {}", beanName, csvInput.getFileName());
 		}
 		
-		InputStream is = new FileInputStream(input);
-		BufferedReader streamReader = new BufferedReader(new InputStreamReader(is));
+		BufferedReader streamReader = new BufferedReader(reader);
 		CSVReader csvReader = new CSVReader(streamReader, csvInput.getSeparator());
 		
 		String[] fields = csvReader.readNext();
@@ -180,7 +214,7 @@ public class CSVImporter implements Importer {
 					LOG.debug("bean saved: {}", bean);
 				} catch (Exception e) {
 					if (LOG.isErrorEnabled()) {
-						LOG.error("Error while importing {}.", input.getName());
+						LOG.error("Error while importing {}.", csvInput.getFileName());
 						LOG.error("Unable to import record: {}", Arrays.asList(values));
 						LOG.error("With following exception:", e);
 					}
@@ -198,7 +232,7 @@ public class CSVImporter implements Importer {
 			if (JPA.em().getTransaction().isActive())
 				JPA.em().getTransaction().rollback();
 			if (LOG.isErrorEnabled())
-				LOG.error("Error while importing {}.", input.getName());
+				LOG.error("Error while importing {}.", csvInput.getFileName());
 				LOG.error("Unable to import data.");
 				LOG.error("With following exception:", e);
 		}
