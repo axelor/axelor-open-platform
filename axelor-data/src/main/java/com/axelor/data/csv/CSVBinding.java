@@ -52,6 +52,9 @@ public class CSVBinding {
 	
 	@XStreamImplicit(itemFieldName = "bind")
 	private List<CSVBinding> bindings;
+	
+	@XStreamAsAttribute
+	private String adapter;
 
 	public String getColumn() {
 		return column;
@@ -83,6 +86,10 @@ public class CSVBinding {
 	
 	public List<CSVBinding> getBindings() {
 		return bindings;
+	}
+	
+	public String getAdapter() {
+		return adapter;
 	}
 	
 	public static CSVBinding getBinding(final String column, final String field, Set<String> cols) {

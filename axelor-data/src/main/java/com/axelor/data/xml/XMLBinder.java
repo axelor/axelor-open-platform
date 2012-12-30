@@ -16,6 +16,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
@@ -33,7 +34,7 @@ public abstract class XMLBinder {
 	
 	private Map<String, Object> context;
 	
-	private Map<String, XMLAdapter> adapters = Maps.newHashMap();
+	private Map<String, DataAdapter> adapters = Maps.newHashMap();
 
 	private XPath xpath = XPathFactory.newInstance().newXPath();
 
@@ -42,7 +43,7 @@ public abstract class XMLBinder {
 		this.context = context;
 	}
 	
-	public void registerAdapter(XMLAdapter adapter) {
+	public void registerAdapter(DataAdapter adapter) {
 		adapters.put(adapter.getName(), adapter);
 	}
 	
@@ -260,7 +261,7 @@ public abstract class XMLBinder {
 		if (name == null || !adapters.containsKey(name)) {
 			return value;
 		}
-		XMLAdapter adapter = adapters.get(name);
+		DataAdapter adapter = adapters.get(name);
 		return adapter.adapt(value, ctx);
 	}
 	
