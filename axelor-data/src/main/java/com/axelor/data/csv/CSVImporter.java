@@ -44,6 +44,8 @@ public class CSVImporter implements Importer {
 	
 	private List<Listener> listeners = Lists.newArrayList();
 	
+	private Map<String, Object> context;
+	
 	public void addListener(Listener listener) {
 		this.listeners.add(listener);
 	}
@@ -78,6 +80,10 @@ public class CSVImporter implements Importer {
 		for (String name : names)
 			all.add(new File(dataDir, name));
 		return all;
+	}
+	
+	public void setContext(Map<String, Object> context) {
+		this.context = context;
 	}
 	
 	public void runTask(ImportTask task) throws ClassNotFoundException {
@@ -194,7 +200,7 @@ public class CSVImporter implements Importer {
 		JPA.em().getTransaction().begin();
 		try {
 			
-			Map<String, Object> context = Maps.newHashMap();
+			Map<String, Object> context = Maps.newHashMap(this.context);
 			csvInput.callPrepareContext(context, injector);
 			
 			// register type adapters
