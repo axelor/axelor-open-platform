@@ -40,8 +40,8 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		element.addClass(this.css).parent().addClass(this.cellCss);
 		element.data('$attrs', attrs); // store the attrs object for event handlers
 
-		if (element.hasClass('input-append')) { // focus the first input field
-			element.on('click', '.btn', function(){
+		if (element.is('.input-append,.picker-input')) { // focus the first input field
+			element.on('click', '.btn, i', function(){
 				element.find('input:first').focus();
 			});
 		}

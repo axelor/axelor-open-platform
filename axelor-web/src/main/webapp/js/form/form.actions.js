@@ -41,7 +41,7 @@ function handleError(scope, item, message) {
 	var e = $('<span class="error"></span>').text(message);
 	var p = item.parent('td.form-item');
 
-	if (item.is(':input,.input-append')) {
+	if (item.is(':input,.input-append,.picker-input')) {
 		p.append(e);
 	} else {
 		p.prepend(e);
@@ -455,7 +455,7 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 				action: action
 			});
 			
-			if (element.is('.input-append') || !(element.is(':input'))) {
+			if (element.is('.input-append,.picker-input') || !(element.is(':input'))) {
 				element.data('$onChange', handler);
 			} else {
 				var input = element.find(':input:first').andSelf().last();

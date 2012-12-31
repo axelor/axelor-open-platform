@@ -406,7 +406,7 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 				return elem.attr('disabled', flag);
 			}
 			
-			if (elem.is('.input-append')){
+			if (elem.is('.input-append,.picker-input')){
 				return elem.find(':input').attr('disabled', flag)[classOp]('ui-state-disabled');
 			}
 
