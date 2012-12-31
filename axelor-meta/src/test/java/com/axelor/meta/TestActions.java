@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
 import java.util.Map;
 
 import org.joda.time.LocalDate;
@@ -80,7 +81,30 @@ public class TestActions extends AbstractTest {
 		assertNotNull(c.getTitle());
 		assertEquals("Mr. John Smith", c.getFullName());
 		
-		System.err.println("XXX: " + c);
+		//System.err.println("XXX: " + c);
+	}
+	
+	@Test
+	public void testMultiRecord() {
+		
+		Action action = MetaStore.getAction("action-contact-defaults-multi");
+		ActionHandler handler = createHandler("action-contact-defaults-multi", null);
+		
+		Object value = action.evaluate(handler);
+		assertTrue(value instanceof Contact);
+		
+		Contact c = (Contact) value;
+
+		assertNotNull(c.getLastName());
+		assertNotNull(c.getFirstName());
+		assertEquals(c.getFirstName(), c.getLastName());
+		assertEquals("Smith", c.getLastName());
+		assertEquals("Mr. Smith Smith", c.getFullName());
+		
+		assertNotNull(c.getEmail());
+		assertNotNull(c.getProEmail());
+		assertEquals(c.getProEmail(), c.getEmail());
+		assertEquals("john.smith@gmail.com", c.getEmail());
 	}
 
 	@Test @SuppressWarnings("all")
@@ -101,7 +125,44 @@ public class TestActions extends AbstractTest {
 		attrs = (Map) map.get("notes");
 		
 		assertTrue(attrs instanceof Map);
+	}
+	
+	@Test @SuppressWarnings("all")
+	public void testAttrsMutli() {
+		Action action = MetaStore.getAction("action-contact-attrs-multi");
+		ActionHandler handler = createHandler("action-contact-attrs-multi", null);
+		
+		Object value = action.evaluate(handler);
+		assertTrue(value instanceof Map);
+		
+		Map<String, Object> map = (Map) value;
+		Map<String, Object> attrs = (Map) map.get("lastName");
+		
+		assertTrue(attrs instanceof Map);
+		assertEquals(true, attrs.get("readonly"));
+		assertEquals(true, attrs.get("hidden"));
+		
+		attrs = (Map) map.get("notes");
+		
+		assertTrue(attrs instanceof Map);
 		assertEquals("About Me", attrs.get("title"));
+		
+		Map<String, Object> attrsPhone = (Map) map.get("phone");
+		Map<String, Object> attrsNotes = (Map) map.get("notes");
+		Map<String, Object> attrsBirth = (Map) map.get("dateOfBirth");
+		
+		assertTrue(attrs instanceof Map);
+		assertEquals(true, attrsPhone.get("hidden"));
+		assertEquals(attrsPhone.get("hidden"), attrsNotes.get("hidden"));
+		assertEquals(attrsBirth.get("hidden"), attrsNotes.get("hidden"));
+		
+		Map<String, Object> attrsFisrtName = (Map) map.get("firstName");
+		Map<String, Object> attrsLastName = (Map) map.get("lastName");
+		
+		assertTrue(attrs instanceof Map);
+		assertEquals(true, attrsFisrtName.get("readonly"));
+		assertEquals(attrsFisrtName.get("readonly"), attrsLastName.get("readonly"));
+		assertEquals(true, attrsLastName.get("hidden"));
 	}
 
 	@Test
@@ -135,10 +196,10 @@ public class TestActions extends AbstractTest {
 		
 		assertNotNull(value);
 		assertTrue(value instanceof Map);
-		assertTrue(((Map) value).isEmpty());
+		assertTrue(!((Map) value).isEmpty());
 	}
 	
-	@Test
+	@Test @SuppressWarnings("all")
 	public void testMethod() {
 		
 		Action action = MetaStore.getAction("action-contact-greetings");
@@ -152,8 +213,7 @@ public class TestActions extends AbstractTest {
 		Object value = action.evaluate(handler);
 		
 		assertNotNull(value);
-		
-		System.err.println(value);
+		assertEquals("Hello World!!!", ((Map)((List<?>)((ActionResponse)value).getData()).get(0)).get("flash") );
 		
 	}
 	
@@ -218,4 +278,5 @@ public class TestActions extends AbstractTest {
 		
 		assertNotNull(value);
 	}
+
 }
