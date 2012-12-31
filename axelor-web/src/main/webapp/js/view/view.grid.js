@@ -38,10 +38,7 @@ function GridViewCtrl($scope, $element) {
 	
 	$scope.setItems = function(items, pageInfo) {
 
-		var dataView = $scope.dataView,
-			selected = _.map($scope.selection, function(index) {
-				return dataView.getItem(index);
-			});
+		var dataView = $scope.dataView;
 		
 		//XXX: clear existing items (bug?)
 		if (dataView.getLength()) {
@@ -54,13 +51,6 @@ function GridViewCtrl($scope, $element) {
 	    dataView.setItems(items);
 	    dataView.endUpdate();
 
-	    selected = _.filter(selected, function(record) {
-	    	return dataView.getItemById(record.id);
-	    });
-	    selected = _.map(selected, function(rec) {
-	    	return dataView.getIdxById(rec.id);
-	    });
-	    
 		if (pageInfo) {
 	    	page = pageInfo;
 		}
@@ -68,13 +58,6 @@ function GridViewCtrl($scope, $element) {
 		if (dataView.adjustSize) {
 			dataView.adjustSize();
 		}
-
-		setTimeout(function(){
-	    	$scope.$broadcast('grid:selection-change', {
-	    		data: dataView,
-	    		selection: selected
-	    	});
-	    });
 	};
 
 	$scope.canEdit = function() {
