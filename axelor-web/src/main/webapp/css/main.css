@@ -64,6 +64,21 @@ html, body {
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
+.ui-menu {
+	border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.ui-menu .ui-menu-item a.ui-state-focus {
+	color: white;
+	text-decoration: none;
+
+	border-color: #0081C2;
+	background-color: #0081C2;
+	background-image: -webkit-linear-gradient(top, #08C, #0077B3);
+	background-image:    -moz-linear-gradient(top, #08C, #0077B3);
+	background-image:         linear-gradient(top, #08C, #0077B3);
+}
+
 .ui-dialog {
 	padding: 0;
 }
