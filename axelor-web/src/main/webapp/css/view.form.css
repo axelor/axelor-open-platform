@@ -164,6 +164,10 @@ table.form-layout td.form-item .input-append button {
 	cursor: pointer;
 }
 
+.picker-input i[class^=icon-caret] {
+	font-size: 12px;
+}
+
 .picker-input i[class^=icon],
 .picker-input i[class^=icon].picker-icon-1 {
 	right: 8px;
@@ -264,17 +268,17 @@ td.form-item > * {
 	padding-top: 0;
 }
 
-.form-item .form-item-group > legend a {
+.form-item .form-item-group > legend i[class^=icon] {
 	color: #CCC;
+	height: 12px;
+	margin-right: 4px;
+	display: inline-block;
+	cursor: pointer;
 }
 
-.form-item .form-item-group > legend a:hover {
+.form-item .form-item-group > legend i[class^=icon]:hover {
 	 text-decoration: none;
 	 color: inherit;
-}
-
-.form-item .form-item-group > legend i {
-	height: 12px;
 }
 
 .form-item .form-item-group > legend {

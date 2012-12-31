@@ -43,9 +43,8 @@ var Group = {
 	template:
 		'<fieldset ng-class="{\'bordered-box\': title}" ng-transclude x-layout-after="&gt; legend:first">'+
 			'<legend ng-show="title">'+
-				'<a href="" ng-show="canCollapse" ng-click="toggle()" tabindex="-1">'+
-					'<i ng-class="{\'icon-plus\': collapsed, \'icon-minus\': !collapsed}"></i>'+
-				'</a> <span ng-bind-html-unsafe="title"></span></legend>'+
+				'<i ng-show="canCollapse" ng-click="toggle()" ng-class="{\'icon-plus\': collapsed, \'icon-minus\': !collapsed}"></i>'+
+				'<span ng-bind-html-unsafe="title"></span></legend>'+
 		'</fieldset>'
 };
 
