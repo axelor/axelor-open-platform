@@ -23,7 +23,7 @@ public class JodaAdapter implements TypeAdapter<Object> {
 			Annotation[] annotations) {
 
 		//TODO: check for annotation to return current date if value is null
-		if (value == null) {
+		if (value == null || (value instanceof String && "".equals(((String) value).trim()))) {
 			return null;
 		}
 		
