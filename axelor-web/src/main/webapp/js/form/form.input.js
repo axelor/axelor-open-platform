@@ -373,7 +373,7 @@ var DateTimeItem = {
 		
 		var self = this;
 		var input = element.children('input:first');
-		var button = element.children('button:first');
+		var button = element.children('i:first');
 		var options = {
 			dateFormat: 'dd/mm/yy',
 			showButtonsPanel: false,
@@ -446,12 +446,10 @@ var DateTimeItem = {
 		};
 	},
 	template:
-		'<div class="input-append">'+
-	    	'<input type="text" autocomplete="off">'+
-	    	'<button class="btn" type="button" tabindex="-1">'+
-	    		'<i class="icon-calendar"></i>'+
-	    	'</button>'+
-	    '</div>'
+	'<span class="picker-input">'+
+	  '<input type="text" autocomplete="off">'+
+	  '<i class="icon-calendar"></i>'+
+	'</span>'
 };
 
 var DateItem = _.extend({}, DateTimeItem, {
@@ -601,10 +599,10 @@ var SelectItem = {
 	},
 	replace: true,
 	template:
-	'<div class="input-append">'+
+	'<span class="picker-input">'+
 		'<input type="text" autocomplete="off">'+
-		'<button class="btn" type="button" tabindex="-1" ng-click="showSelection()"><i class="icon-caret-down"></i></button>'+
-	'</div>'
+		'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
+	'</span>'
 };
 
 var SelectQueryItem = {
@@ -645,10 +643,10 @@ var SelectQueryItem = {
 		},
 		replace: true,
 		template:
-		'<div class="input-append">'+
+		'<span class="picker-input">'+
 			'<input type="text" autocomplete="off">'+
-			'<button class="btn" type="button" tabindex="-1" ng-click="showSelection()"><i class="icon-caret-down"></i></button>'+
-		'</div>'
+			'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
+		'</span>'
 };
 
 // register directives

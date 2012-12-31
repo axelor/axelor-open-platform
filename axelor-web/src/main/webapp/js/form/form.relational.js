@@ -610,11 +610,6 @@ var ManyToOneItem = {
 			});
 		}
 		
-		// fix padding
-		if (scope.summaryView == null) {
-			input.css('padding-right', 84);
-		}
-		
 		scope.setValidity = function(key, value) {
 			model.$setValidity(key, value);
 		};
@@ -672,14 +667,18 @@ var ManyToOneItem = {
 		setTimeout(function(){
 			if (!canSelect) scope.setHidden(element);
 		});
+		
+		if (scope.summaryView) {
+			element.removeClass('picker-icons-3').addClass('picker-icons-4');
+		}
 	},
 	template:
-	'<div class="input-append">'+
+	'<div class="picker-input picker-icons-3">'+
 		'<input type="text" autocomplete="off">'+
-		'<button class="btn" type="button" tabindex="-1" ng-click="onSummary()" ng-show="_viewParams.summaryView"><i class="icon-eye-open"></i></button>'+
-		'<button class="btn" type="button" tabindex="-1" ng-click="onEdit()" title="{{\'Edit\' | t}}"><i class="icon-pencil"></i></button>'+
-		'<button class="btn" type="button" tabindex="-1" ng-click="onNew()" title="{{\'New\' | t}}"><i class="icon-plus"></i></button>'+
-		'<button class="btn" type="button" tabindex="-1" ng-click="onSelect()" title="{{\'Select\' | t}}"><i class="icon-search"></i></button>'+
+		'<i class="icon-eye-open picker-icon-4" 	ng-click="onSummary()" ng-show="_viewParams.summaryView"></i>'+
+		'<i class="icon-pencil picker-icon-3" 		ng-click="onEdit()" title="{{\'Edit\' | t}}"></i>'+
+		'<i class="icon-plus picker-icon-2" 		ng-click="onNew()" title="{{\'New\' | t}}"></i>'+
+		'<i class="icon-search picker-icon-1" 		ng-click="onSelect()" title="{{\'Select\' | t}}"></i>'+
    '</div>'
 };
 
@@ -696,10 +695,10 @@ var SuggestBox = _.extend({}, ManyToOneItem, {
 		};
 	},
 	template:
-	'<div class="input-append">'+
+	'<span class="picker-input">'+
 		'<input type="text" autocomplete="off">'+
-		'<button class="btn" type="button" tabindex="-1" ng-click="showSelection()"><i class="icon-caret-down"></i></button>'+
-   '</div>'
+		'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
+   '</span>'
 });
 
 var OneToManyItem = {
