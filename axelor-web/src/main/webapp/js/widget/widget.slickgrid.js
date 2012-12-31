@@ -151,9 +151,8 @@ var Editor = function(args) {
 	};
 	
 	this.validate = function() {
-		//TODO: validate
 		return {
-			valid: true,
+			valid: !element.hasClass('ng-invalid'),
 			msg: null
         };
 	};
@@ -397,6 +396,9 @@ Grid.prototype.setColumnTitle = function(name, title) {
 };
 
 Grid.prototype.onBeforeEditCell = function(event, args) {
+	if (!args.item) {
+		this.editorScope.editRecord(null);
+	}
 	grid.setOptions({
 		autoEdit: true
 	});
@@ -487,7 +489,8 @@ Grid.prototype.onKeyDown = function(e, args) {
 
 	if (e.which == 13) { // ENTER
 		if (e.ctrlKey) {
-			if (lock.commitCurrentEdit()) {
+
+			if (lock.commitCurrentEdit() && this.editorScope.isValid()) {
 				var scope = this.scope,
 					dataView = scope.dataView,
 					ds = scope.handler._dataSource;
@@ -506,8 +509,7 @@ Grid.prototype.onKeyDown = function(e, args) {
 				}
 				
 				ds.save(rec).success(function(record, page) {
-					//TODO: saved, notify
-					
+					//TODO: notify saved
 					if (rec.id === null) {
 						dataView.deleteItem(0);
 					}
@@ -524,7 +526,7 @@ Grid.prototype.onKeyDown = function(e, args) {
 					});
 				});
 			} else {
-				// TODO: validate errors
+				// TODO: notify errors
 			}
 			grid.setOptions({
 				autoEdit: false
@@ -575,7 +577,7 @@ Grid.prototype.onValidationError = function(event, args) {
 
 };
 
-Grid.prototype.setEditors = function(form) {
+Grid.prototype.setEditors = function(form, formScope) {
 	var grid = this.grid,
 		element = this.element;
 
@@ -587,7 +589,9 @@ Grid.prototype.setEditors = function(form) {
 		editorLock: new Slick.EditorLock()
 	});
 	
-	element.prepend(form);
+	form.prependTo(element).hide();
+	
+	this.editorScope = formScope;
 	this.editable = true;
 };
 
@@ -700,7 +704,7 @@ ui.directive('uiSlickGrid', ['ViewService', function(ViewService) {
 					var child = scope.$new();
 					var form = makeForm(child, scope.handler._model, view.items);
 					form.hide();
-					grid.setEditors(form);
+					grid.setEditors(form, child);
 				}
 			});
 		}
