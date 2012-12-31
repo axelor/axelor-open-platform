@@ -390,6 +390,14 @@ Grid.prototype.setColumnTitle = function(name, title) {
 	this.grid.updateColumnHeader(name, title);
 };
 
+Grid.prototype.isCellEditable = function(cell) {
+	var cols = this.grid.getColumns();
+	if (cell === null)
+		return false;
+	var field = (cols[cell] || {}).descriptor || {};
+	return !field.readonly;
+};
+
 Grid.prototype.onBeforeEditCell = function(event, args) {
 	if (!args.item) {
 		this.editorScope.editRecord(null);
@@ -412,27 +420,20 @@ Grid.prototype.onKeyDown = function(e, args) {
 		e.stopImmediatePropagation();
 		return false;
 	}
-	
-	function isEditable(cell) {
-		if (cell === null)
-			return false;
-		var field = (cols[cell] || {}).descriptor || {};
-		return !field.readonly;
-	}
-	
+
+	var that = this;
+
 	function findNext(row, posX) {
 		var cell = posX + 1;
 		while (cell < cols.length) {
-			var field = cols[cell].descriptor || {};
-			if (!field.readonly) {
+			if (that.isCellEditable(cell)) {
 				return cell;
 			}
 			cell += 1;
 		}
 		cell = 0;
 		while (cell < posX) {
-			var field = cols[cell].descriptor || {};
-			if (!field.readonly) {
+			if (that.isCellEditable(cell)) {
 				return cell;
 			}
 			cell += 1;
@@ -443,16 +444,14 @@ Grid.prototype.onKeyDown = function(e, args) {
 	function findPrev(row, posX) {
 		var cell = posX - 1;
 		while (cell > -1) {
-			var field = cols[cell].descriptor || {};
-			if (!field.readonly) {
+			if (that.isCellEditable(cell)) {
 				return cell;
 			}
 			cell -= 1;
 		}
 		cell = cols.length - 1;
 		while (cell > posX) {
-			var field = cols[cell].descriptor || {};
-			if (!field.readonly) {
+			if (that.isCellEditable(cell)) {
 				return cell;
 			}
 			cell -= 1;
@@ -615,7 +614,15 @@ Grid.prototype.onSort = function(event, args) {
 };
 
 Grid.prototype.onItemClick = function(event, args) {
-	if (this.grid.getEditorLock().isActive()) {
+	var grid = this.grid,
+		lock = grid.getEditorLock();
+
+	if (lock.isActive()) {
+		if (grid.getActiveCell().row === args.row &&
+				this.isCellEditable(args.cell) &&
+				lock.commitCurrentEdit()) {
+			return;
+		}
 		event.stopImmediatePropagation();
 		return false;
 	}
@@ -624,7 +631,15 @@ Grid.prototype.onItemClick = function(event, args) {
 };
 
 Grid.prototype.onItemDblClick = function(event, args) {
-	if (this.grid.getEditorLock().isActive()) {
+	var grid = this.grid,
+		lock = grid.getEditorLock();
+	
+	if (lock.isActive()) {
+		if (grid.getActiveCell().row === args.row &&
+				this.isCellEditable(args.cell) &&
+				lock.commitCurrentEdit()) {
+			return;
+		}
 		event.stopImmediatePropagation();
 		return false;
 	}
