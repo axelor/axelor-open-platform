@@ -140,44 +140,45 @@ public abstract class Action {
 			Mapper mapper = Mapper.of(entityClass);
 			Object target = Mapper.toBean(entityClass, null);
 			
-			for(Act field : getElements()) {
+			for(Act fields : getElements()) {
 				
-				if (!field.test(handler)) {
-					continue;
-				}
-			
-				Property property = mapper.getProperty(field.getName());
-				if (property == null) {
-					log.error("No such field: {}", field.getName());
+				if (!fields.test(handler) || Strings.isNullOrEmpty(fields.getName())) {
 					continue;
 				}
 				
-				String expr = field.getExpression();
-				Object value = expr;
-
-				try {
-					value = handler.evaluate(expr);
-				} catch (Exception e) {
-					log.error("error evaluating expression");
-					log.error("expression: {}", expr, e);
-					continue;
-				}
-				
-				if (((Field) field).getCanCopy() == Boolean.TRUE && value instanceof Model) {
-					value = JPA.copy((Model) value, true);
-				}
-				
-				try {
-					property.set(target, value);
-					if (map != null) {
-						map.put(property.getName(), property.get(target));
+				for(String field : fields.getName().split(",")){
+					Property property = mapper.getProperty(field);
+					if (property == null) {
+						log.error("No such field: {}", field);
+						continue;
 					}
-				} catch (Exception e) {
-					log.error("invalid value for field: {}", property.getName());
-					log.error("value: {}", value);
-					continue;
+					
+					String expr = fields.getExpression();
+					Object value = expr;
+
+					try {
+						value = handler.evaluate(expr);
+					} catch (Exception e) {
+						log.error("error evaluating expression");
+						log.error("expression: {}", expr, e);
+						continue;
+					}
+					
+					if (((Field) fields).getCanCopy() == Boolean.TRUE && value instanceof Model) {
+						value = JPA.copy((Model) value, true);
+					}
+					
+					try {
+						property.set(target, value);
+						if (map != null) {
+							map.put(property.getName(), property.get(target));
+						}
+					} catch (Exception e) {
+						log.error("invalid value for field: {}", property.getName());
+						log.error("value: {}", value);
+						continue;
+					}
 				}
-				
 			}
 			
 			if (search != null) {
@@ -212,21 +213,23 @@ public abstract class Action {
 			
 			Map<String, Object> map = Maps.newHashMap();
 			for(Act attr : getElements()) {
-				if (!attr.test(handler)) continue;
-				Map<String, Object> attrs = (Map) map.get(attr.getField());
-				if (attrs == null) {
-					attrs = Maps.newHashMap();
-					map.put(attr.getField(), attrs);
+				if (!attr.test(handler) || Strings.isNullOrEmpty(attr.getField())) continue;
+				for(String field : attr.getField().split(",")){
+					Map<String, Object> attrs = (Map) map.get(field);
+					if (attrs == null) {
+						attrs = Maps.newHashMap();
+						map.put(field, attrs);
+					}
+					
+					String name = attr.getName();
+					Object value = null;
+					if (name.matches("readonly|required|recommend|hidden|collapse")) {
+						value = attr.test(handler, attr.getExpression());
+					} else {
+						value = handler.evaluate(attr.getExpression());
+					}
+					attrs.put(attr.getName(), value);
 				}
-				
-				String name = attr.getName();
-				Object value = null;
-				if (name.matches("readonly|required|recommend|hidden|collapse")) {
-					value = attr.test(handler, attr.getExpression());
-				} else {
-					value = handler.evaluate(attr.getExpression());
-				}
-				attrs.put(attr.getName(), value);
 			}
 			return map;
 		}
