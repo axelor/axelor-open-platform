@@ -269,14 +269,6 @@ Grid.prototype.parse = function(view) {
 	// register dataView event handlers
 	this.subscribe(dataView.onRowCountChanged, this.onRowCountChanged);
 	this.subscribe(dataView.onRowsChanged, this.onRowsChanged);
-
-	scope.$on('grid:selection-change', function(e, args) {
-		if (dataView === args.data) {
-			grid.setSelectedRows(args.selection || []);
-			if (_.isEmpty(args.selection) && grid.getActiveCell())
-			    grid.setActiveCell(null);
-		}
-	});
 	
 	// delegate some methods to handler scope
 	//TODO: this spoils the handler scope, find some better way
