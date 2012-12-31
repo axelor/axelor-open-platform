@@ -245,7 +245,7 @@ public final class JPA {
 		} catch (NullPointerException e) {
 		}
 		
-		if (id == null) {
+		if (id == null || id <= 0) {
 			try {
 				bean = klass.newInstance();
 			} catch (Exception ex) {
