@@ -690,7 +690,8 @@ ui.directive('uiSlickGrid', ['ViewService', function(ViewService) {
 		},
 		link: function(scope, element, attrs) {
 
-			var grid = null;
+			var grid = null,
+				handler = scope.handler;
 
 			element.addClass('slickgrid').hide();
 			scope.$watch("view", function(view) {
@@ -700,10 +701,9 @@ ui.directive('uiSlickGrid', ['ViewService', function(ViewService) {
 				}
 				
 				grid = new Grid(scope, element, attrs, ViewService);
-				if (view.editable) {
+				if (!handler._readOnly && view.editable) {
 					var child = scope.$new();
-					var form = makeForm(child, scope.handler._model, view.items);
-					form.hide();
+					var form = makeForm(child, handler._model, view.items);
 					grid.setEditors(form, child);
 				}
 			});
