@@ -97,6 +97,7 @@ function EditorCtrl($scope, $element, DataSource) {
 SelectorCtrl.$inject = ['$scope', '$element', 'DataSource'];
 function SelectorCtrl($scope, $element, DataSource) {
 	
+	$scope._readOnly = true;
 	$scope._dataSource = DataSource.create($scope._model, {
 		domain: $scope._domain,
 		context: $scope._context
