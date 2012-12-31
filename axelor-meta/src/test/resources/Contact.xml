@@ -59,10 +59,17 @@
     </form>
     
     <action-attrs name="action-contact-attrs">
-    	<attribute name="title" for="notes"
-    		expr="eval: String.format('About %s', 'Me')"/>
+    	<attribute name="title" for="notes" expr="eval: String.format('About %s', 'Me')"/>
     	<attribute name="readonly" for="lastName" expr="eval: 1"/>
     	<attribute name="hidden" for="lastName" expr="eval: 1"/>
+    	<attribute name="domain" for="title" expr="self.code IN ?1"/>
+    </action-attrs>
+    
+    <action-attrs name="action-contact-attrs-multi">
+    	<attribute name="title" for="notes" expr="eval: String.format('About %s', 'Me')"/>
+    	<attribute name="readonly" for="lastName,firstName" expr="eval: 1"/>
+    	<attribute name="hidden" for="lastName,firstNa" expr="eval: 1"/>
+    	<attribute name="hidden" for="notes,phone,dateOfBirth" expr="true"/>
     	<attribute name="domain" for="title" expr="self.code IN ?1"/>
     </action-attrs>
 
@@ -73,6 +80,13 @@
     	<field name="lastName" expr="Smith"/>
     	<field name="email" expr="john.smith@gmail.com"/>
     	<field name="birthDate" expr="eval: __date__"/>
+    </action-record>
+    
+    <action-record name="action-contact-defaults-multi"
+    	model="com.axelor.meta.db.Contact">
+    	<field name="title" expr="action:action-default-title"/>
+    	<field name="firstName,lastName" expr="Smith"/>
+    	<field name="email,proEmail" expr="john.smith@gmail.com"/>
     </action-record>
     
     <action-record name="action-default-title"

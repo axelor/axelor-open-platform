@@ -39,6 +39,8 @@ public class Contact extends Model {
 	
 	private String email;
 	
+	private String proEmail;
+	
 	private BigDecimal credit;
 	
 	@Type(type = "org.joda.time.contrib.hibernate.PersistentLocalDate")
@@ -103,6 +105,14 @@ public class Contact extends Model {
 	
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	public String getProEmail() {
+		return proEmail;
+	}
+	
+	public void setProEmail(String email) {
+		this.proEmail = email;
 	}
 	
 	public LocalDate getBirthDate() {
