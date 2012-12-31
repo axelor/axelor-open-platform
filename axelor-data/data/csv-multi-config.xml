@@ -12,6 +12,7 @@
       <bind column="firstName" to="firstName"/>
       <bind column="lastName" to="lastName"/>
       <bind column="email" to="email"/>
+      <bind column="CUSTOMER_PHONE" to="phone"/>
     </bind>
 
     <bind to="product" search="self.name = :product">

@@ -3,6 +3,7 @@ package com.axelor.data;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -16,6 +17,7 @@ import com.axelor.db.Model;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.GuiceRunner;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.Injector;
 
 @RunWith(GuiceRunner.class)
@@ -31,6 +33,12 @@ public class CSVImportTest {
 	public void test() throws ClassNotFoundException {
 		final List<Model> records = Lists.newArrayList();
 		CSVImporter importer = new CSVImporter(injector, "data/csv-multi-config.xml");
+		
+		Map<String, Object> context = Maps.newHashMap();
+		
+		context.put("CUSTOMER_PHONE", "+3326253225");
+		
+		importer.setContext(context);
 		
 		importer.addListener(new Listener() {
 			@Override
