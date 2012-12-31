@@ -224,7 +224,10 @@ Grid.prototype.parse = function(view) {
 		selectColumn = new Slick.CheckboxSelectColumn({
 			cssClass: "slick-cell-checkboxsel"
 		});
-		cols.unshift(selectColumn.getColumnDefinition());
+		
+		cols.unshift(_.extend(selectColumn.getColumnDefinition(), {
+			headerCssClass: "slick-cell-checkboxsel"
+		}));
 	}
 
 	var options = {

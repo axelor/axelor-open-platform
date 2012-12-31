@@ -60,9 +60,12 @@
 	border-left: none !important;
 	border-top: none !important;
 	border-bottom: none !important;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
+	background: #f5f5f5;
+	-webkit-box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	     box-sizing: border-box;
 }
+
 .slick-headerrow input {
 	margin: 0;
 	padding: 0;
@@ -99,4 +102,16 @@
 
 .slick-cell .input-append > button {
 	display: none;
+}
+
+.slick-cell-checkboxsel {
+	text-align: center;
+}
+
+.slick-cell-checkboxsel input {
+	width: inherit;
+}
+
+.slick-header-column.slick-cell-checkboxsel {
+	padding-top: 2px;
 }
