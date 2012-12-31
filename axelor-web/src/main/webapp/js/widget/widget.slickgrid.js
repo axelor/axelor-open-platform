@@ -261,9 +261,7 @@ Grid.prototype.parse = function(view) {
 	this.subscribe(grid.onDblClick, this.onItemDblClick);
 	
 	this.subscribe(grid.onKeyDown, this.onKeyDown);
-	this.subscribe(grid.onCellChange, this.onCellChange);
 	this.subscribe(grid.onAddNewRow, this.onAddNewRow);
-	this.subscribe(grid.onValidationError, this.onValidationError);
 	this.subscribe(grid.onBeforeEditCell, this.onBeforeEditCell);
 	
 	// register dataView event handlers
@@ -484,7 +482,7 @@ Grid.prototype.onKeyDown = function(e, args) {
 
 	if (e.which == 13) { // ENTER
 		if (e.ctrlKey) {
-
+			var disableAutoEdit = true;
 			if (lock.commitCurrentEdit() && this.editorScope.isValid()) {
 				var scope = this.scope,
 					dataView = scope.dataView,
@@ -517,16 +515,37 @@ Grid.prototype.onKeyDown = function(e, args) {
 							grid.setOptions({
 								enableAddRow: true
 							});
+							var cell = findNext(args.row + 1, 0);
+							if (cell !== null) {
+								grid.setActiveCell(args.row + 1, cell);
+								grid.editActiveCell();
+							}
 						}
 					});
 				});
 			} else {
 				// TODO: notify errors
+				var formCtrl = this.editorForm.children('form').data('$formController'),
+					error = formCtrl.$error || {};
+				
+				for(var name in error) {
+					var errors = error[name] || [];
+					if (errors.length) {
+						var name = errors[0].$name,
+							cell = grid.getColumnIndex(name);
+						if (cell > -1) {
+							grid.setActiveCell(args.row, cell);
+							grid.editActiveCell();
+							disableAutoEdit = false;
+							break;
+						}
+					}
+				}
 			}
-			grid.setOptions({
-				autoEdit: false
-			});
-			grid.focus();
+			if (disableAutoEdit) {
+				grid.setOptions({ autoEdit: false });
+				grid.focus();
+			}
 		}
 		handled = true;
 	}
@@ -542,10 +561,6 @@ Grid.prototype.onKeyDown = function(e, args) {
 		e.stopImmediatePropagation();
 		return false;
 	}
-};
-
-Grid.prototype.onCellChange = function(event, args) {
-
 };
 
 Grid.prototype.onAddNewRow = function(event, args) {
@@ -568,10 +583,6 @@ Grid.prototype.onAddNewRow = function(event, args) {
 	}
 };
 
-Grid.prototype.onValidationError = function(event, args) {
-
-};
-
 Grid.prototype.setEditors = function(form, formScope) {
 	var grid = this.grid,
 		element = this.element;
@@ -585,7 +596,8 @@ Grid.prototype.setEditors = function(form, formScope) {
 	});
 	
 	form.prependTo(element).hide();
-	
+
+	this.editorForm = form;
 	this.editorScope = formScope;
 	this.editable = true;
 };
@@ -624,8 +636,17 @@ Grid.prototype.onRowCountChanged = function(event, args) {
 };
 
 Grid.prototype.onRowsChanged = function(event, args) {
-	this.grid.invalidateRows(args.rows);
-	this.grid.render();
+	var grid = this.grid,
+		data = this.scope.dataView;
+	
+	if(this.editable && !data.getItemById(0)) {
+		grid.setOptions({
+			enableAddRow: true
+		});
+	}
+	
+	grid.invalidateRows(args.rows);
+	grid.render();
 };
 
 ui.directive('uiSlickEditors', function() {
