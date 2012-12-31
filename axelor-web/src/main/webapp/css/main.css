@@ -335,10 +335,6 @@ html, body {
 	box-shadow: none;
 }
 
-.stackbar .navbar .nav-pills > li > a {
-	padding: 5px 3px 3px;	
-}
-
 .html-view,
 .iframe-container,
 .iframe-container > iframe {

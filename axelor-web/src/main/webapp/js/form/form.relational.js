@@ -675,10 +675,10 @@ var ManyToOneItem = {
 	template:
 	'<div class="picker-input picker-icons-3">'+
 		'<input type="text" autocomplete="off">'+
-		'<i class="icon-eye-open picker-icon-4" 	ng-click="onSummary()" ng-show="_viewParams.summaryView"></i>'+
-		'<i class="icon-pencil picker-icon-3" 		ng-click="onEdit()" title="{{\'Edit\' | t}}"></i>'+
-		'<i class="icon-plus picker-icon-2" 		ng-click="onNew()" title="{{\'New\' | t}}"></i>'+
-		'<i class="icon-search picker-icon-1" 		ng-click="onSelect()" title="{{\'Select\' | t}}"></i>'+
+		'<i class="icon-eye-open picker-icon-4" ng-click="onSummary()" ng-show="_viewParams.summaryView"></i>'+
+		'<i class="icon-pencil picker-icon-3" ng-click="onEdit()" title="{{\'Edit\' | t}}"></i>'+
+		'<i class="icon-plus picker-icon-2" ng-click="onNew()" title="{{\'New\' | t}}"></i>'+
+		'<i class="icon-search picker-icon-1" ng-click="onSelect()" title="{{\'Select\' | t}}"></i>'+
    '</div>'
 };
 
@@ -795,12 +795,12 @@ var OneToManyItem = {
 			'<div class="navbar-inner">'+
 				'<div class="container-fluid">'+
 					'<span class="brand" href="" ui-help-popover ng-bind-html-unsafe="title"></span>'+
-					'<ul class="nav nav-pills pull-right">'+
-						'<li><a href="" tabindex="-1" ng-click="onSelect()" title="{{\'Select\' | t}}"><i class="icon-search"></i></a></li>'+
-						'<li><a href="" tabindex="-1" ng-click="onNew()" title="{{\'New\' | t}}"><i class="icon-plus"></i></a></li>'+
-						'<li><a href="" tabindex="-1" ng-click="onEdit()" title="{{\'Edit\' | t}}"><i class="icon-pencil"></i></a></li>'+
-						'<li><a href="" tabindex="-1" ng-click="onRemove()" title="{{\'Remove\' | t}}"><i class="icon-minus"></i></a></li>'+
-					'</ul>'+
+					'<span class="icons-bar pull-right">'+
+						'<i ng-click="onSelect()" title="{{\'Select\' | t}}" class="icon-search"></i>'+
+						'<i ng-click="onNew()" title="{{\'New\' | t}}" class="icon-plus"></i>'+
+						'<i ng-click="onEdit()" title="{{\'Edit\' | t}}" class="icon-pencil"></i>'+
+						'<i ng-click="onRemove()" title="{{\'Remove\' | t}}" class="icon-minus"></i>'+
+					'</span>'+
 				'</div>'+
 			'</div>'+
 		'</div>'+

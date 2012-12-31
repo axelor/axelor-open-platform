@@ -161,7 +161,6 @@ table.form-layout td.form-item .input-append button {
 .picker-input i[class^=icon] {
 	position: absolute;
 	top: 3px;
-	font-size: 14px;
 	cursor: pointer;
 }
 
@@ -194,6 +193,17 @@ table.form-layout .tabbable-tabs .tab-content {
 
 table.form-layout td.form-item .stackbar {
 	position: relative;
+}
+
+.icons-bar {
+	display: inline-block;
+	padding-top: 4px;
+}
+
+.icons-bar i {
+	margin: 2px;
+	padding: 2px;
+	cursor: pointer;
 }
 
 table.form-layout td.form-item .slickgrid {
