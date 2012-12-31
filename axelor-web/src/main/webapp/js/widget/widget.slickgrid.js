@@ -4,12 +4,14 @@ var ui = angular.module('axelor.ui');
 
 function formatter(row, cell, value, columnDef, dataContext) {
 	
-	if (value === null) {
-		return value;
-	}
-	if (value === undefined || _.isEmpty(value) || /^\s+$/.test(value))
+	if (value === null || value === undefined) {
 		return "";
-	
+	}
+	if (_.isString(value) && value.trim() === "")
+		return "";
+	if (_.isObject(value) && _.isEmpty(value))
+		return "";
+
 	var field = columnDef.descriptor || {};
 	
 	if (_.isArray(field.selection)) {
