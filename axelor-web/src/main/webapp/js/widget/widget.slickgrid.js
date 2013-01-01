@@ -402,9 +402,6 @@ Grid.prototype.onBeforeEditCell = function(event, args) {
 	if (!args.item) {
 		this.editorScope.editRecord(null);
 	}
-	grid.setOptions({
-		autoEdit: true
-	});
 };
 
 Grid.prototype.onKeyDown = function(e, args) {
@@ -483,7 +480,6 @@ Grid.prototype.onKeyDown = function(e, args) {
 
 	if (e.which == 13) { // ENTER
 		if (e.ctrlKey) {
-			var disableAutoEdit = true;
 			if (lock.commitCurrentEdit() && this.editorScope.isValid()) {
 				var scope = this.scope,
 					dataView = scope.dataView,
@@ -539,24 +535,16 @@ Grid.prototype.onKeyDown = function(e, args) {
 						if (cell > -1) {
 							grid.setActiveCell(args.row, cell);
 							grid.editActiveCell();
-							disableAutoEdit = false;
 							break;
 						}
 					}
 				}
-			}
-			if (disableAutoEdit) {
-				grid.setOptions({ autoEdit: false });
-				grid.focus();
 			}
 		}
 		handled = true;
 	}
 	
 	if (e.which == 27) { // ESCAPE
-		grid.setOptions({
-			autoEdit: false
-		});
 		grid.focus();
 	}
 	
@@ -593,7 +581,6 @@ Grid.prototype.setEditors = function(form, formScope) {
 	grid.setOptions({
 		editable: true,
 		asyncEditorLoading: false,
-		autoEdit: false,
 		enableAddRow: true,
 		editorLock: new Slick.EditorLock()
 	});
