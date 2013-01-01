@@ -224,7 +224,11 @@ function GridViewCtrl($scope, $element) {
 	};
 	
 	$scope.onSelectionChanged = function(event, args) {
-		$scope.selection = args.rows || [];
+		var selection = _.filter(args.rows, function(index) {
+			var item = $scope.dataView.getItem(index);
+			return item && item.id !== 0;
+		});
+		$scope.selection = selection;
 		$scope.$apply();
 	};
 	
