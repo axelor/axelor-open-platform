@@ -232,6 +232,7 @@ Grid.prototype.parse = function(view) {
 	}
 
 	var options = {
+		editable: view.editable,
 		editorFactory:  Factory,
 		enableCellNavigation: true,
 		enableColumnReorder: false,
@@ -747,8 +748,12 @@ ui.directive('uiSlickGrid', ['ViewService', function(ViewService) {
 					return;
 				}
 				
+				if (handler._readOnly) {
+					view.editable = false;
+				}
+
 				grid = new Grid(scope, element, attrs, ViewService);
-				if (!handler._readOnly && view.editable) {
+				if (view.editable) {
 					var child = scope.$new();
 					var form = makeForm(child, handler._model, view.items);
 					grid.setEditors(form, child);
