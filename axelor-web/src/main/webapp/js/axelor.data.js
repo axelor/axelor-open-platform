@@ -227,6 +227,55 @@
 
 				return promise;
 			},
+			
+			saveAll: function(items) {
+
+				var that = this,
+					page = this._page,
+					records = this._data,
+					promise = this._request().post({
+						records: items
+					});
+
+				promise.success = function(fn) {
+					return promise.then(function(response){
+						var res = response.data;
+						_.each(res.data || [], function(item){
+							var found = _.find(records, function(rec){
+								if (rec.id === item.id) {
+									angular.copy(item, rec);
+									return true;
+								}
+							});
+							if (!found) {
+								records.push(item);
+								page.total += 1;
+								page.size += 1;
+							}
+						});
+						
+						var i = 0;
+						while(i < records.length) {
+							var rec = records[i];
+							if (rec.id === 0) {
+								records.splice(i, 1);
+								break;
+							}
+							i ++;
+						}
+
+						that.trigger('change', records, page);
+						fn(records, page);
+					});
+					return promise;
+				};
+				promise.error = function(fn) {
+					promise.then(null, fn);
+					return promise;
+				};
+
+				return promise;
+			},
 
 			remove: function(record) {
 				
