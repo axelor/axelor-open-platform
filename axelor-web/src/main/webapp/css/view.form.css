@@ -217,11 +217,17 @@ table.form-layout td.form-item .slickgrid {
 	border-top: none;
 }
 
-table.form-layout td.form-item .slickgrid * {
+table.form-layout td.form-item .slickgrid .slick-cell,
+table.form-layout td.form-item .slickgrid .slick-header-column {
 	-webkit-box-sizing: content-box;
 	   -moz-box-sizing: content-box;
 	    -ms-box-sizing: content-box;
 	        box-sizing: content-box;
+}
+
+table.form-layout td.form-item .slickgrid .slick-cell.editable input,
+table.form-layout td.form-item .slickgrid .slick-cell.editable > [x-field] {
+	height: 23px;
 }
 
 td.form-item > * {
@@ -315,13 +321,14 @@ td.form-item > * {
 }
 
 .form-item .ng-invalid,
-.form-item .input-append.ng-invalid > input {
+.form-item .input-append.ng-invalid > input,
+.form-item .picker-input.ng-invalid > input {
 	border-color: #B94A48;
 }
 
 .form-item .ng-invalid:focus,
-.form-item .input-append.ng-invalid > input:focus {
-
+.form-item .input-append.ng-invalid > input:focus,
+.form-item .picker-input.ng-invalid > input:focus {
 	border-color: #953B39;
 	
 	-webkit-box-shadow: 0 0 6px #D59392;
