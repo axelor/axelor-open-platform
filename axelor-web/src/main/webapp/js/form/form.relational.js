@@ -782,6 +782,23 @@ var OneToManyItem = {
 				});
 			};
 			
+			scope.onGridBeforeSave = function(record) {
+				if (!scope.editorCanSave) {
+					if (record.id === null) { // remove dummy item
+						scope.dataView.deleteItem(0);
+					}
+					scope.select(record);
+					return false;
+				}
+				return true;
+			};
+
+			scope.onGridAfterSave = function(record, args) {
+				if (scope.editorCanSave) {
+					scope.select(record);
+				}
+			};
+			
 			var field = scope.getViewDef(element);
 			if (field.widget === 'MasterDetail') {
 				setTimeout(function(){
@@ -804,7 +821,15 @@ var OneToManyItem = {
 				'</div>'+
 			'</div>'+
 		'</div>'+
-		'<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-no-filter="true" x-on-init="onGridInit"></div>'+
+		'<div ui-view-grid ' +
+			'x-view="schema" '+
+			'x-data-view="dataView" '+
+			'x-handler="this" '+
+			'x-no-filter="true" '+
+			'x-on-init="onGridInit" '+
+			'x-on-before-save="onGridBeforeSave" '+
+			'x-on-after-save="onGridAfterSave" '+
+			'></div>'+
 		'</div>'
 };
 

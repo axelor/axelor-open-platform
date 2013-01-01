@@ -540,9 +540,19 @@ Grid.prototype.saveChanges = function(args) {
 		}
 	}
 
+	var onBeforeSave = this.scope.onBeforeSave(),
+		onAfterSave = this.scope.onAfterSave();
+
+	if (onBeforeSave && onBeforeSave(rec) === false) {
+		return setTimeout(focus);
+	}
+
 	return ds.save(rec).success(function(record, page) {
 		if (rec.id === null) {
 			data.deleteItem(0);
+		}
+		if (onAfterSave) {
+			onAfterSave(record, page);
 		}
 		setTimeout(focus);
 	});
@@ -721,7 +731,9 @@ ui.directive('uiSlickGrid', ['ViewService', function(ViewService) {
 			'handler'	: '=',
 			'selector'	: '@',
 			'noFilter'	: '@',
-			'onInit'	: '&'
+			'onInit'	: '&',
+			'onBeforeSave'	: '&',
+			'onAfterSave'	: '&'
 		},
 		link: function(scope, element, attrs) {
 
