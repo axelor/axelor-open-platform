@@ -788,20 +788,20 @@ var OneToManyItem = {
 				});
 			};
 			
-			scope.onGridBeforeSave = function(record) {
+			scope.onGridBeforeSave = function(records) {
 				if (!scope.editorCanSave) {
-					if (record.id === null) { // remove dummy item
+					if (scope.dataView.getItemById(0)) {
 						scope.dataView.deleteItem(0);
 					}
-					scope.select(record);
+					scope.select(records);
 					return false;
 				}
 				return true;
 			};
 
-			scope.onGridAfterSave = function(record, args) {
+			scope.onGridAfterSave = function(records, args) {
 				if (scope.editorCanSave) {
-					scope.select(record);
+					scope.select(records);
 				}
 			};
 			
