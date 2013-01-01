@@ -389,14 +389,6 @@ Grid.prototype.setColumnTitle = function(name, title) {
 	this.grid.updateColumnHeader(name, title);
 };
 
-Grid.prototype.isCellEditable = function(cell) {
-	var cols = this.grid.getColumns();
-	if (cell === null)
-		return false;
-	var field = (cols[cell] || {}).descriptor || {};
-	return !field.readonly;
-};
-
 Grid.prototype.onBeforeEditCell = function(event, args) {
 	if (!args.item) {
 		this.editorScope.editRecord(null);
@@ -405,9 +397,8 @@ Grid.prototype.onBeforeEditCell = function(event, args) {
 
 Grid.prototype.onKeyDown = function(e, args) {
 	var grid = this.grid,
-		lock = grid.getEditorLock(),
-		cols = grid.getColumns();
-	
+		lock = grid.getEditorLock();
+
 	if (!lock.isActive()) {
 		return;
 	}
@@ -417,44 +408,6 @@ Grid.prototype.onKeyDown = function(e, args) {
 		return false;
 	}
 
-	var that = this;
-
-	function findNext(row, posX) {
-		var cell = posX + 1;
-		while (cell < cols.length) {
-			if (that.isCellEditable(cell)) {
-				return cell;
-			}
-			cell += 1;
-		}
-		cell = 0;
-		while (cell < posX) {
-			if (that.isCellEditable(cell)) {
-				return cell;
-			}
-			cell += 1;
-		}
-		return null;
-	}
-	
-	function findPrev(row, posX) {
-		var cell = posX - 1;
-		while (cell > -1) {
-			if (that.isCellEditable(cell)) {
-				return cell;
-			}
-			cell -= 1;
-		}
-		cell = cols.length - 1;
-		while (cell > posX) {
-			if (that.isCellEditable(cell)) {
-				return cell;
-			}
-			cell -= 1;
-		}
-		return null;
-	}
-	
 	function commit(row, cell) {
 		if (lock.commitCurrentEdit()) {
 			grid.setActiveCell(args.row, cell);
@@ -467,9 +420,9 @@ Grid.prototype.onKeyDown = function(e, args) {
 	if (e.which == 9) {
 		var cell = null;
 		if (e.shiftKey) {
-			cell = findPrev(args.row, args.cell);
+			cell = this.findPrevEditable(args.row, args.cell);
 		} else {
-			cell = findNext(args.row, args.cell);
+			cell = this.findNextEditable(args.row, args.cell);
 		}
 		if (cell !== null) {
 			commit(args.row, cell);
@@ -478,71 +431,12 @@ Grid.prototype.onKeyDown = function(e, args) {
 	}
 
 	if (e.which == 13) { // ENTER
-		if (e.ctrlKey) {
-			if (lock.commitCurrentEdit() && this.editorScope.isValid()) {
-				var scope = this.scope,
-					dataView = scope.dataView,
-					ds = scope.handler._dataSource;
-				
-				var item = dataView.getItem(args.row);
-				var rec = {};
-				
-				for(var key in item) {
-					var val = item[key];
-					if (_.isString(val) && val.trim() === "")
-						val = null;
-					rec[key] = val;
-				}
-				if (rec.id === 0) {
-					rec.id = null;
-				}
-				
-				ds.save(rec).success(function(record, page) {
-					//TODO: notify saved
-					if (rec.id === null) {
-						dataView.deleteItem(0);
-					}
-					setTimeout(function(){
-						
-						grid.setActiveCell(args.row, args.cell);
-						grid.focus();
-						
-						if (rec.id === null) {
-							grid.setOptions({
-								enableAddRow: true
-							});
-							var cell = findNext(args.row + 1, 0);
-							if (cell !== null) {
-								grid.updateRowCount();
-								grid.render();
-								grid.setActiveCell(args.row + 1, cell);
-								grid.editActiveCell();
-							}
-						}
-					});
-				});
-			} else {
-				// TODO: notify errors
-				var formCtrl = this.editorForm.children('form').data('$formController'),
-					error = formCtrl.$error || {};
-				
-				for(var name in error) {
-					var errors = error[name] || [];
-					if (errors.length) {
-						var name = errors[0].$name,
-							cell = grid.getColumnIndex(name);
-						if (cell > -1) {
-							grid.setActiveCell(args.row, cell);
-							grid.editActiveCell();
-							break;
-						}
-					}
-				}
-			}
+		if (e.ctrlKey && !this.saveChanges(args)) {
+			this.focusInvalidCell(args);
 		}
 		handled = true;
 	}
-	
+
 	if (e.which == 27) { // ESCAPE
 		grid.focus();
 	}
@@ -550,6 +444,126 @@ Grid.prototype.onKeyDown = function(e, args) {
 	if (handled) {
 		e.stopImmediatePropagation();
 		return false;
+	}
+};
+
+Grid.prototype.isCellEditable = function(cell) {
+	var cols = this.grid.getColumns();
+	if (cell === null)
+		return false;
+	var field = (cols[cell] || {}).descriptor || {};
+	return !field.readonly;
+};
+
+Grid.prototype.findNextEditable = function(row, posX) {
+	var grid = this.grid,
+		cols = grid.getColumns(),
+		cell = posX + 1;
+	while (cell < cols.length) {
+		if (this.isCellEditable(cell)) {
+			return cell;
+		}
+		cell += 1;
+	}
+	cell = 0;
+	while (cell < posX) {
+		if (this.isCellEditable(cell)) {
+			return cell;
+		}
+		cell += 1;
+	}
+	return null;
+};
+
+Grid.prototype.findPrevEditable = function(row, posX) {
+	var grid = this.grid,
+		cols = grid.getColumns(),
+		cell = posX + 1;
+	while (cell > -1) {
+		if (this.isCellEditable(cell)) {
+			return cell;
+		}
+		cell -= 1;
+	}
+	cell = cols.length - 1;
+	while (cell > posX) {
+		if (this.isCellEditable(cell)) {
+			return cell;
+		}
+		cell -= 1;
+	}
+	return null;
+};
+
+Grid.prototype.saveChanges = function(args) {
+	var grid = this.grid,
+		lock = grid.getEditorLock(),
+		canSave = lock.isActive() && lock.commitCurrentEdit() && this.editorScope.isValid();
+
+	if (!canSave) {
+		return false;
+	}
+
+	var self = this,
+		data = this.scope.dataView,
+		item = data.getItem(args.row);
+
+	var ds = this.handler._dataSource,
+		rec = {};
+
+	for(var key in item) {
+		var val = item[key];
+		if (_.isString(val) && val.trim() === "")
+			val = null;
+		rec[key] = val;
+	}
+	if (rec.id === 0) {
+		rec.id = null;
+	}
+	
+	function focus() {
+		
+		grid.setActiveCell(args.row, args.cell);
+		grid.focus();
+		
+		if (rec.id === null) {
+			grid.setOptions({
+				enableAddRow: true
+			});
+			var nextCell = self.findNextEditable(args.row + 1, 0);
+			if (nextCell !== null) {
+				grid.updateRowCount();
+				grid.render();
+				grid.setActiveCell(args.row + 1, nextCell);
+				grid.editActiveCell();
+			}
+		}
+	}
+
+	return ds.save(rec).success(function(record, page) {
+		if (rec.id === null) {
+			data.deleteItem(0);
+		}
+		setTimeout(focus);
+	});
+};
+
+Grid.prototype.focusInvalidCell = function(args) {
+	var grid = this.grid,
+		formCtrl = this.editorForm.children('form').data('$formController'),
+		error = formCtrl.$error || {};
+	
+	for(var name in error) {
+		var errors = error[name] || [];
+		if (errors.length) {
+			var name = errors[0].$name,
+				cell = grid.getColumnIndex(name);
+			if (cell > -1) {
+				grid.setActiveCell(args.row, cell);
+				grid.editActiveCell();
+				break;
+			}
+		}
 	}
 };
 
