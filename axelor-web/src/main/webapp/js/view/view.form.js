@@ -212,6 +212,8 @@ function FormViewCtrl($scope, $element) {
 		if (record && record.id) {
 			return doEdit(record.id);
 		}
+		$scope.edit(null);
+		$scope.$broadcast("on:new");
 	};
 
 	$scope.onCancel = function() {
