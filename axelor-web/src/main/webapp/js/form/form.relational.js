@@ -756,7 +756,12 @@ var OneToManyItem = {
 				var editable = grid.getOptions().editable;
 				if (editable) {
 					element.addClass('inline-editable');
+					scope.$on('on:new', function(event){
+						grid.getData().deleteItem(0);
+						grid.setOptions({enableAddRow: true});
+					});
 				}
+				
 				if (!scope.summaryView) {
 					return;
 				}
