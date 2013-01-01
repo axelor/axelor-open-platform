@@ -253,9 +253,17 @@ Grid.prototype.parse = function(view) {
 	}
 
 	var onAdjustSize = _.bind(this.adjustSize, this);
-	dataView.adjustSize = onAdjustSize;
+	dataView.$adjustSize = onAdjustSize;
 	element.on('adjustSize', _.throttle(onAdjustSize, 300));
 
+	dataView.$syncSelection = function(old, oldIds) {
+		var selection = dataView.mapIdsToRows(oldIds);
+		grid.setSelectedRows(selection);
+		if (selection.length === 0 && !grid.getEditorLock().isActive()) {
+			grid.setActiveCell(null);
+        }
+	};
+	
 	// register grid event handlers
 	this.subscribe(grid.onSort, this.onSort);
 	this.subscribe(grid.onSelectedRowsChanged, this.onSelectionChanged);
