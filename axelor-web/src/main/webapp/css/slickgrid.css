@@ -101,6 +101,12 @@
 	height: 100%;
 }
 
+.slick-cell.dirty {
+	background-image: url('../img/dirty.gif');
+	background-position: 0 0;
+	background-repeat: no-repeat;
+}
+
 .slick-cell .input-append > button {
 	display: none;
 }

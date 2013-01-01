@@ -290,6 +290,7 @@ Grid.prototype.parse = function(view) {
 	this.subscribe(grid.onDblClick, this.onItemDblClick);
 	
 	this.subscribe(grid.onKeyDown, this.onKeyDown);
+	this.subscribe(grid.onCellChange, this.onCellChange);
 	this.subscribe(grid.onAddNewRow, this.onAddNewRow);
 	this.subscribe(grid.onBeforeEditCell, this.onBeforeEditCell);
 	
@@ -614,6 +615,56 @@ Grid.prototype.saveChanges = function(args) {
 	});
 };
 
+Grid.prototype.isDirty = function(row) {
+	var grid = this.grid;
+	
+	if (row === null || row === undefined) {
+		var n = 0;
+		while (n < grid.getDataLength()) {
+			var item = grid.getDataItem(n);
+			if (item && item.$dirty) {
+				return true;
+			}
+			n ++;
+		}
+	} else {
+		var item = grid.getDataItem(row);
+		if (item && item.$dirty) {
+			return true;
+		}
+	}
+	return false;
+};
+
+Grid.prototype.markDirty = function(row, field) {
+	
+	var grid = this.grid,
+		hash = grid.getCellCssStyles("highlight") || {},
+		items = hash[row] || {};
+	
+	items[field] = "dirty";
+	hash[row] = items;
+
+	grid.setCellCssStyles("highlight", hash);
+	grid.invalidateAllRows();
+	grid.render();
+};
+
+Grid.prototype.clearDirty = function(row) {
+	var grid = this.grid,
+		hash = grid.getCellCssStyles("highlight") || {};
+
+	if (row === null || row === undefined) {
+		hash = {};
+	} else {
+		delete hash[row];
+	}
+	
+	grid.setCellCssStyles("highlight", hash);
+	grid.invalidateAllRows();
+	grid.render();
+};
+
 Grid.prototype.focusInvalidCell = function(args) {
 	var grid = this.grid,
 		formCtrl = this.editorForm.children('form').data('$formController'),
@@ -684,6 +735,14 @@ Grid.prototype.onSelectionChanged = function(event, args) {
 		this.handler.onSelectionChanged(event, args);
 };
 
+Grid.prototype.onCellChange = function(event, args) {
+	var grid = this.grid,
+		cols = grid.getColumns(),
+		name = cols[args.cell].field;
+	
+	this.markDirty(args.row, name);
+};
+
 Grid.prototype.onSort = function(event, args) {
 	if (this.handler.onSort)
 		this.handler.onSort(event, args);
@@ -720,6 +779,9 @@ Grid.prototype.onRowsChanged = function(event, args) {
 		});
 	}
 	
+	if (!this.isDirty()) {
+		this.clearDirty();
+	}
 	grid.invalidateRows(args.rows);
 	grid.render();
 };
