@@ -518,6 +518,8 @@ Grid.prototype.onKeyDown = function(e, args) {
 							});
 							var cell = findNext(args.row + 1, 0);
 							if (cell !== null) {
+								grid.updateRowCount();
+								grid.render();
 								grid.setActiveCell(args.row + 1, cell);
 								grid.editActiveCell();
 							}
