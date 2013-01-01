@@ -420,11 +420,17 @@ Grid.prototype.onKeyDown = function(e, args) {
 	var grid = this.grid,
 		lock = grid.getEditorLock();
 
+	if (e.isDefaultPrevented()){
+		e.stopImmediatePropagation();
+		return false;
+	}
+	
 	if (!lock.isActive()) {
 		return;
 	}
 
-	if (e.which == 38 || e.which == 40 || e.which == 37 || e.which == 39) { // arrow keys
+	// prevent arrow key navigation
+	if (e.which == 38 || e.which == 40 || e.which == 37 || e.which == 39) {
 		e.stopImmediatePropagation();
 		return false;
 	}
@@ -433,12 +439,13 @@ Grid.prototype.onKeyDown = function(e, args) {
 		if (lock.commitCurrentEdit()) {
 			grid.setActiveCell(args.row, cell);
 			grid.editActiveCell();
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	var handled = false;
-	if (e.which == 9) {
+	if (e.which === $.ui.keyCode.TAB) {
 		var cell = null;
 		if (e.shiftKey) {
 			cell = this.findPrevEditable(args.row, args.cell);
@@ -451,14 +458,21 @@ Grid.prototype.onKeyDown = function(e, args) {
 		}
 	}
 
-	if (e.which == 13) { // ENTER
-		if (e.ctrlKey && !this.saveChanges(args)) {
-			this.focusInvalidCell(args);
+	if (e.which === $.ui.keyCode.ENTER) {
+		if (e.ctrlKey) {
+			if (!this.saveChanges(args)) {
+				this.focusInvalidCell(args);
+			}
+		} else {
+			if (!lock.commitCurrentEdit()) {
+				this.focusInvalidCell(args);
+			}
+			grid.focus();
 		}
 		handled = true;
 	}
 
-	if (e.which == 27) { // ESCAPE
+	if (e.which === $.ui.keyCode.ESCAPE) {
 		grid.focus();
 	}
 	
@@ -647,36 +661,18 @@ Grid.prototype.onSort = function(event, args) {
 };
 
 Grid.prototype.onItemClick = function(event, args) {
-	var grid = this.grid,
-		lock = grid.getEditorLock();
-
-	if (lock.isActive()) {
-		if (grid.getActiveCell().row === args.row &&
-				this.isCellEditable(args.cell) &&
-				lock.commitCurrentEdit()) {
-			return;
-		}
-		event.stopImmediatePropagation();
-		return false;
+	if (this.editable) {
+		return;
 	}
 	if (this.handler.onItemClick)
 		this.handler.onItemClick(event, args);
 };
 
 Grid.prototype.onItemDblClick = function(event, args) {
-	var grid = this.grid,
-		lock = grid.getEditorLock();
-	
-	if (lock.isActive()) {
-		if (grid.getActiveCell().row === args.row &&
-				this.isCellEditable(args.cell) &&
-				lock.commitCurrentEdit()) {
-			return;
-		}
-		event.stopImmediatePropagation();
-		return false;
+	if (this.editable) {
+		return;
 	}
-	if (!this.editable && this.handler.onItemDblClick)
+	if (this.handler.onItemDblClick)
 		this.handler.onItemDblClick(event, args);
 };
 
