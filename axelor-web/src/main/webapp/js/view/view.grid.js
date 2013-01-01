@@ -265,6 +265,18 @@ function GridViewCtrl($scope, $element) {
 			'_ids': _.pluck(selected, "id")
 		};
 	};
+	
+	$scope.canEditInline = function() {
+		return _.isFunction(this.dataView.canSave);
+	};
+	
+	$scope.onSave = function() {
+		this.dataView.saveChanges();
+	};
+	
+	$scope.canSave = function() {
+		return this.dataView.canSave && this.dataView.canSave();
+	};
 }
 
 angular.module('axelor.ui').directive('uiViewGrid', function(){

@@ -157,10 +157,17 @@ var Editor = function(args) {
 	
 	this.applyValue = function(item, state) {
 		item[column.field] = state;
+		item.$dirty = true;
 	};
 	
 	this.isValueChanged = function() {
-		return true;
+		var record = scope.record || {},
+			current = args.item || { id: 0 };
+		
+		var v1 = record[column.field],
+			v2 = current[column.field];
+
+		return !angular.equals(v1, v2);
 	};
 	
 	this.validate = function() {
@@ -531,9 +538,19 @@ Grid.prototype.findPrevEditable = function(row, posX) {
 };
 
 Grid.prototype.saveChanges = function(args) {
+	
+	if (args == null) {
+		args = _.extend({ row: 0, cell: 0 }, this.grid.getActiveCell());
+		args.item = this.grid.getDataItem(args.row);
+	}
+
 	var grid = this.grid,
 		lock = grid.getEditorLock(),
-		canSave = lock.isActive() && lock.commitCurrentEdit() && this.editorScope.isValid();
+		canSave = this.editorScope.isValid();
+	
+	if (lock.isActive()) {
+		canSave = canSave && lock.commitCurrentEdit();
+	}
 
 	if (!canSave) {
 		return false;
@@ -544,24 +561,28 @@ Grid.prototype.saveChanges = function(args) {
 		item = data.getItem(args.row);
 
 	var ds = this.handler._dataSource,
-		rec = {};
+		records = [];
 
-	for(var key in item) {
-		var val = item[key];
-		if (_.isString(val) && val.trim() === "")
-			val = null;
-		rec[key] = val;
-	}
-	if (rec.id === 0) {
-		rec.id = null;
-	}
+	records = _.map(data.getItems(), function(rec) {
+		var res = {};
+		for(var key in rec) {
+			var val = rec[key];
+			if (_.isString(val) && val.trim() === "")
+				val = null;
+			res[key] = val;
+		}
+		if (res.id === 0) {
+			res.id = null;
+		}
+		return res;
+	});
 	
 	function focus() {
 		
 		grid.setActiveCell(args.row, args.cell);
 		grid.focus();
 		
-		if (rec.id === null) {
+		if (item.id === 0) {
 			grid.setOptions({
 				enableAddRow: true
 			});
@@ -578,16 +599,16 @@ Grid.prototype.saveChanges = function(args) {
 	var onBeforeSave = this.scope.onBeforeSave(),
 		onAfterSave = this.scope.onAfterSave();
 
-	if (onBeforeSave && onBeforeSave(rec) === false) {
+	if (onBeforeSave && onBeforeSave(records) === false) {
 		return setTimeout(focus);
 	}
 
-	return ds.save(rec).success(function(record, page) {
-		if (rec.id === null) {
+	return ds.saveAll(records).success(function(records, page) {
+		if (data.getItemById(0)) {
 			data.deleteItem(0);
 		}
 		if (onAfterSave) {
-			onAfterSave(record, page);
+			onAfterSave(records, page);
 		}
 		setTimeout(focus);
 	});
@@ -634,6 +655,7 @@ Grid.prototype.onAddNewRow = function(event, args) {
 
 Grid.prototype.setEditors = function(form, formScope) {
 	var grid = this.grid,
+		data = this.scope.dataView,
 		element = this.element;
 
 	grid.setOptions({
@@ -645,6 +667,13 @@ Grid.prototype.setEditors = function(form, formScope) {
 	
 	form.prependTo(element).hide();
 
+	// delegate isDirty to the dataView
+	var that = this;
+	data.canSave = function() {
+		return that.editorScope.isValid() && that.isDirty();
+	};
+	data.saveChanges = _.bind(this.saveChanges, this);
+	
 	this.editorForm = form;
 	this.editorScope = formScope;
 	this.editable = true;
