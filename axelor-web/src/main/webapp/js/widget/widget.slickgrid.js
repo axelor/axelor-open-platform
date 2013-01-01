@@ -113,11 +113,13 @@ var Editor = function(args) {
 				}
 			});
 		}
+		if (args.item && args.item.id > 0)
+			element.hide();
 		this.focus();
 	};
 	
 	this.destroy = function() {
-		element.appendTo(form);
+		element.appendTo(form).show();
 	};
 
 	this.focus = function() {
@@ -129,12 +131,20 @@ var Editor = function(args) {
 	this.loadValue = function(item) {
 		var that = this,
 			record = scope.record || {},
-			current = item || { id: 0 };
+			current = item || { id: 0 },
+			updated = false;
 			
 		if (record.id !== current.id || record.version !== current.version) {
 			scope.editRecord(current);
+		} else {
+			record[column.field] = current[column.field];
+			updated = true;
 		}
 		setTimeout(function(){
+			if (updated) {
+				scope.$apply();
+			}
+			element.show();
 			that.focus();
 		});
 	};
