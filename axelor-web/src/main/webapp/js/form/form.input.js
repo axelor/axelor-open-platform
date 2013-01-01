@@ -407,8 +407,13 @@ var DateTimeItem = {
 			changed = false;
 		});
 		input.on('keydown', function(e){
-			if (e.keyCode == 40) // DOWN
+			if (e.altKey && e.keyCode === $.ui.keyCode.DOWN) {
 				input.datetimepicker('show');
+				e.preventDefault();
+			}
+			if (e.keyCode === $.ui.keyCode.ENTER && $(this).datepicker("widget").is(':visible')) {
+				e.preventDefault();
+			}
 		});
 		button.click(function(e, ui){
 			input.datetimepicker('show');
