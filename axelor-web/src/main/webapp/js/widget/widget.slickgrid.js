@@ -478,7 +478,7 @@ Grid.prototype.findNextEditable = function(row, posX) {
 Grid.prototype.findPrevEditable = function(row, posX) {
 	var grid = this.grid,
 		cols = grid.getColumns(),
-		cell = posX + 1;
+		cell = posX - 1;
 	while (cell > -1) {
 		if (this.isCellEditable(cell)) {
 			return cell;
@@ -530,7 +530,7 @@ Grid.prototype.saveChanges = function(args) {
 			grid.setOptions({
 				enableAddRow: true
 			});
-			var nextCell = self.findNextEditable(args.row + 1, 0);
+			var nextCell = self.findNextEditable(args.row + 1, -1);
 			if (nextCell !== null) {
 				grid.updateRowCount();
 				grid.render();
