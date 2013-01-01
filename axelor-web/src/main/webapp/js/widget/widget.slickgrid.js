@@ -94,7 +94,7 @@ var Editor = function(args) {
 	
 	var element;
 	var column = args.column;
-	var scope, value;
+	var scope;
 
 	var form = $(args.container)
 		.parents('[ui-slick-grid]:first')
@@ -129,8 +129,8 @@ var Editor = function(args) {
 	this.loadValue = function(item) {
 		var record = scope.record || {},
 			current = item || { id: 0 };
-		
-		if (record.id !== current.id) {
+			
+		if (record.id !== current.id || record.version !== current.version) {
 			setTimeout(function(){
 				scope.editRecord(current);
 			});
@@ -148,7 +148,6 @@ var Editor = function(args) {
 	};
 	
 	this.isValueChanged = function() {
-		//TODO: check if value is changed
 		return true;
 	};
 	
