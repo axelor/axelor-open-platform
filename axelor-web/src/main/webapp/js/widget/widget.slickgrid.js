@@ -127,14 +127,16 @@ var Editor = function(args) {
 	};
 
 	this.loadValue = function(item) {
-		var record = scope.record || {},
+		var that = this,
+			record = scope.record || {},
 			current = item || { id: 0 };
 			
 		if (record.id !== current.id || record.version !== current.version) {
-			setTimeout(function(){
-				scope.editRecord(current);
-			});
+			scope.editRecord(current);
 		}
+		setTimeout(function(){
+			that.focus();
+		});
 	};
 	
 	this.serializeValue = function() {
