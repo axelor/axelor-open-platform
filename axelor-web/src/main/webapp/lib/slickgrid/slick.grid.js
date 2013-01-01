@@ -2929,10 +2929,11 @@ if (typeof Slick === "undefined") {
       var stepFn = stepFunctions[dir];
       var pos = stepFn(activeRow, activeCell, activePosX);
       if (pos) {
-        var isAddNewRow = (pos.row == getDataLength());
+        var isAddNewRow = (pos.row == getDataLength()),
+        	editMode = isAddNewRow || (options.autoEdit && (dir === 'prev' || dir === 'next'));
         scrollRowIntoView(pos.row, !isAddNewRow);
         scrollCellIntoView(pos.row, pos.cell);
-        setActiveCellInternal(getCellNode(pos.row, pos.cell), isAddNewRow || options.autoEdit);
+        setActiveCellInternal(getCellNode(pos.row, pos.cell), editMode);
         activePosX = pos.posX;
         return true;
       } else {
