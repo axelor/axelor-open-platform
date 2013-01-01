@@ -199,6 +199,10 @@ table.form-layout td.form-item .stackbar {
 	position: relative;
 }
 
+table.form-layout td.form-item .stackbar.inline-editable {
+	min-height: 200px;
+}
+
 .icons-bar {
 	display: inline-block;
 	padding-top: 4px;

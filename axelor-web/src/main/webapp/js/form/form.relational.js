@@ -753,12 +753,13 @@ var OneToManyItem = {
 			});
 			
 			scope.onGridInit = function(grid) {
-				if (!scope._viewParams.summaryView)
+				var editable = grid.getOptions().editable;
+				if (editable) {
+					element.addClass('inline-editable');
+				}
+				if (!scope.summaryView) {
 					return;
-
-				var el = element.find('.slickgrid:first'),
-					grid = el.data('grid');
-
+				}
 				var col = {
 					id: '_summary',
 					name: '',
