@@ -162,7 +162,7 @@ function GridViewCtrl($scope, $element) {
 	$scope.pagerText = function() {
 		if (page && page.from !== undefined) {
 			if (page.total == 0) return null;
-			return _t("{0} to {1} of {2}", page.from + 1, page.to, page.total);
+			return _t("{0} to {1} of {2}", page.from + 1, page.size, page.total);
 		}
 	};
 	
