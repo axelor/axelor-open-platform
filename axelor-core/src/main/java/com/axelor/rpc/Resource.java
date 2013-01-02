@@ -268,14 +268,26 @@ public class Resource<T extends Model> {
 		return response;
 	}
 
+	@SuppressWarnings("all")
 	public Response save(final Request request) {
 
 		Response response = new Response();
 		
-		Model bean = JPA.edit(model, request.getData());
-		bean = JPA.manage(bean);
+		List<Object> records = request.getRecords();
+		List<Object> data = Lists.newArrayList();
+
+		if (records == null) {
+			records = Lists.newArrayList();
+			records.add(request.getData());
+		}
 		
-		response.setData(ImmutableList.of(bean));
+		for(Object record : records) {
+			Model bean = JPA.edit(model, (Map) record);
+			bean = JPA.manage(bean);
+			data.add(bean);
+		}
+	
+		response.setData(data);
 		response.setStatus(Response.STATUS_SUCCESS);
 		
 		return response;
