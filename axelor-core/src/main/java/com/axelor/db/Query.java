@@ -1,5 +1,6 @@
 package com.axelor.db;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -7,13 +8,12 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
-import com.google.common.base.Function;
+import com.axelor.rpc.Resource;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -420,6 +420,7 @@ public class Query<T extends Model> {
 	public class Selector {
 		
 		private List<String> names = Lists.newArrayList("id", "version");
+		private List<String> collections = Lists.newArrayList();
 		private String query;
 		private Mapper mapper = Mapper.of(beanClass);
 
@@ -429,8 +430,13 @@ public class Query<T extends Model> {
 			selects.add("self.version");
 			for(String name : names) {
 				if (isExists(name)) {
-					selects.add(joinHelper.joinName(name));
-					this.names.add(name);
+					String alias = joinHelper.joinName(name);
+					if (alias != null) {
+						selects.add(alias);
+						this.names.add(name);
+					} else {
+						collections.add(name);
+					}
 				}
 			}
 			StringBuilder sb = new StringBuilder("SELECT")
@@ -474,19 +480,40 @@ public class Query<T extends Model> {
 			}
 			bind(q);
 			
-			List data = q.getResultList();
-			return Lists.transform(data, new Function<List, Map>(){
-				@Override
-				public Map apply(@Nullable List input) {
-					Map<String, Object> map = Maps.newHashMap();
-					for(int i = 0 ; i < names.size() ; i++) {
-						map.put(names.get(i), input.get(i));
-					}
-					return map;
+			List<List> data = q.getResultList();
+			List<Map> result = Lists.newArrayList();
+			
+			for(List item : data) {
+				Map<String, Object> map = Maps.newHashMap();
+				for(int i = 0 ; i < names.size() ; i++) {
+					map.put(names.get(i), item.get(i));
 				}
-			});
+				if (collections.size() > 0) {
+					map.putAll(this.fetchCollections(item.get(0)));
+				}
+				result.add(map);
+			}
+
+			return result;
 		}
-		
+
+		@SuppressWarnings("all")
+		private Map<String, List> fetchCollections(Object id) {
+			Map<String, List> result = Maps.newHashMap();
+			Object self = JPA.em().find(beanClass, id);
+			for(String name : collections) {
+				Collection<Model> items = (Collection<Model>) mapper.get(self, name);
+				if (items != null) {
+					List<Object> all = Lists.newArrayList();
+					for(Model obj : items) {
+						all.add(Resource._toMap(obj, true, 0));
+					}
+					result.put(name, all);
+				}
+			}
+			return result;
+		}
+
 		@Override
 		public String toString() {
 			return query;
@@ -606,6 +633,9 @@ public class Query<T extends Model> {
 				}
 			} else {
 				Property property = mapper.getProperty(name);
+				if (property.isCollection()) {
+					return null;
+				}
 				if (property != null && property.getTarget() != null) {
 					prefix = "_" + name;
 					joins.put("self." + name, prefix);
