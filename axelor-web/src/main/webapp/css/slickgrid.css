@@ -90,6 +90,7 @@
 }
 
 .slick-cell input,
+.slick-cell > .ui-spinner,
 .slick-cell > [x-field] {
 	outline: 0;
 	margin: 0;
