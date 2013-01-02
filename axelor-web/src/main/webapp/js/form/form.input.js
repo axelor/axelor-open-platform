@@ -202,29 +202,17 @@ var IntegerItem = {
 		var options = {
 			step: 1,
 			numberFormat: format,
-			change: onChange,
 			spin: onSpin
 		};
+		
+		model.$parsers.unshift(function(viewValue) {
+            var isNumber = _.isNumber(viewValue) || isValid(viewValue);
+            model.$setValidity('format', isNumber);
+            return isNumber ? viewValue : undefined;
+        });
 
 		function isValid(text) {
 			return _.isEmpty(text) || /^(-)?\d+(\.\d+)?$/.test(text);
-		}
-		
-		function onChange(event, ui) {
-			var text = this.value,
-				value = element.spinner('value'),
-				valid = isValid(text);
-	
-			model.$setValidity('format', valid);
-			if (!valid) {
-				return;
-			}
-			
-			setTimeout(function(){
-				scope.$apply(function(){
-					model.$setViewValue(value);
-				});
-			});
 		}
 		
 		function onSpin(event, ui) {
@@ -264,6 +252,11 @@ var IntegerItem = {
 				value = max;
 
 			element.val(value);
+			setTimeout(function(){
+				scope.$apply(function(){
+					model.$setViewValue(value);
+				});
+			});
 		}
 
 		if (props.minSize !== undefined)
