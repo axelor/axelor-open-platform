@@ -760,7 +760,9 @@ var OneToManyItem = {
 				if (editable) {
 					element.addClass('inline-editable');
 					scope.$on('on:new', function(event){
-						grid.getData().deleteItem(0);
+						if (scope.dataView.getItemById(0)) {
+							scope.dataView.deleteItem(0);
+						}
 						grid.setOptions({enableAddRow: true});
 					});
 				}

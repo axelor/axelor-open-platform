@@ -217,6 +217,11 @@ function FormViewCtrl($scope, $element) {
 	};
 
 	$scope.onCancel = function() {
+		
+		var e = $scope.$broadcast("cancel:grid-edit");
+		if (e.defaultPrevented) {
+			return;
+		}
 		$scope.confirmDirty(function() {
 			$scope.editRecord(null);
 			$scope.switchTo('grid');
