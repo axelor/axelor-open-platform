@@ -103,6 +103,10 @@ var Editor = function(args) {
 	element = form.find('[x-field="'+ column.field +'"]');
 	scope = form.data('$scope');
 	
+	if (!element.parent().is('td.form-item'))
+		element = element.parent();
+	element.data('$parent', element.parent());
+
 	this.init = function() {
 		element.appendTo(args.container);
 		if (element.data('keydown.nav') == null) {
@@ -119,7 +123,9 @@ var Editor = function(args) {
 	};
 	
 	this.destroy = function() {
-		element.appendTo(form).show();
+		element.appendTo(element.data('$parent') || form)
+			   .removeData('$parent')
+			   .show();
 	};
 
 	this.focus = function() {
