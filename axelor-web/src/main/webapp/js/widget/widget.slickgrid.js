@@ -628,6 +628,10 @@ Grid.prototype.saveChanges = function(args) {
 	});
 };
 
+Grid.prototype.canSave = function() {
+	return this.editorScope && this.editorScope.isValid() && this.isDirty();
+};
+
 Grid.prototype.isDirty = function(row) {
 	var grid = this.grid;
 	
@@ -732,10 +736,7 @@ Grid.prototype.setEditors = function(form, formScope) {
 	form.prependTo(element).hide();
 
 	// delegate isDirty to the dataView
-	var that = this;
-	data.canSave = function() {
-		return that.editorScope.isValid() && that.isDirty();
-	};
+	data.canSave = _.bind(this.canSave, this);
 	data.saveChanges = _.bind(this.saveChanges, this);
 	
 	this.editorForm = form;
@@ -757,6 +758,8 @@ Grid.prototype.onCellChange = function(event, args) {
 };
 
 Grid.prototype.onSort = function(event, args) {
+	if (this.canSave())
+		return;
 	if (this.handler.onSort)
 		this.handler.onSort(event, args);
 };
@@ -770,11 +773,11 @@ Grid.prototype.onItemClick = function(event, args) {
 };
 
 Grid.prototype.onItemDblClick = function(event, args) {
-	if (this.editable) {
+	if (this.canSave())
 		return;
-	}
 	if (this.handler.onItemDblClick)
 		this.handler.onItemDblClick(event, args);
+	event.stopImmediatePropagation();
 };
 
 Grid.prototype.onRowCountChanged = function(event, args) {

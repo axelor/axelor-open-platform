@@ -73,7 +73,7 @@ function GridViewCtrl($scope, $element) {
 	};
 	
 	$scope.canDelete = function() {
-		return $scope.selection.length > 0;
+		return !$scope.canSave() && $scope.selection.length > 0;
 	};
 
 	$scope.filter = function(searchFilter) {
