@@ -58,7 +58,7 @@ public class Contact extends JpaModel {
 	@OneToMany(mappedBy = "contact", cascade = CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval = true)
 	private List<Address> addresses;
 
-	@ManyToMany
+	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch=FetchType.LAZY)
 	private List<Group> groups;
 
 	@Widget(title = "Photo", help = "Max size 4MB.")
