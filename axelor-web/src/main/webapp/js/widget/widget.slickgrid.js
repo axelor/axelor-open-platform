@@ -164,6 +164,9 @@ var Editor = function(args) {
 	this.applyValue = function(item, state) {
 		item[column.field] = state;
 		item.$dirty = true;
+		if (item.id === undefined) {
+			args.grid.onCellChange.notify(args.grid.getActiveCell());
+		}
 	};
 	
 	this.isValueChanged = function() {
