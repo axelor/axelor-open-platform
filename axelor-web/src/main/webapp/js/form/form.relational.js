@@ -707,6 +707,7 @@ var OneToManyItem = {
 		showTitle: false,
 		require: '?ngModel',
 		scope: true,
+		collapseIfEmpty: true,
 		controller: OneToManyCtrl,
 		link: function(scope, element, attrs, model) {
 			
@@ -748,10 +749,12 @@ var OneToManyItem = {
 				});
 			};
 			
-			scope.$watch(attrs.ngModel, function(value){
-				element.css('min-height', value && value.length ? 200 : '');
-			});
-			
+			if (this.collapseIfEmpty) {
+				scope.$watch(attrs.ngModel, function(value){
+					element.css('min-height', value && value.length ? 200 : '');
+				});
+			}
+
 			scope.onGridInit = function(grid) {
 				var editable = grid.getOptions().editable;
 				if (editable) {
@@ -841,6 +844,104 @@ var OneToManyItem = {
 
 var ManyToManyItem = _.extend({}, OneToManyItem, {
 	css	: 'many2many-item',
+	controller: ManyToManyCtrl
+});
+
+var OneToManyInline = _.extend({}, OneToManyItem, {
+	css	: 'one2many-inline',
+	requires: '?ngModel',
+	collapseIfEmpty : false,
+	scope: true,
+	link: function(scope, element, attrs, model) {
+		OneToManyItem.link.apply(this, arguments);
+		
+		scope.onSort = function() {
+			
+		};
+		
+		var input = element.children('input');
+		var grid = element.children('[ui-slick-grid]');
+		
+		var wrapper = $('<div class="slick-editor-dropdown"></div>')
+			.css("position", "absolute")
+			.hide();
+
+		var render = model.$render;
+		var canRender = false;
+		model.$render = function() {
+			var value = scope.getValue();
+			if (canRender || !value) {
+				render();
+			}
+		};
+		
+		setTimeout(function(){
+			var container = element.parents('.view-container');
+			grid.height(175).appendTo(wrapper);
+			wrapper.height(175).appendTo(container);
+		});
+		
+		function adjust() {
+			if (!wrapper.is(":visible"))
+				return;
+			wrapper.position({
+				my: "left top",
+				at: "left bottom",
+				of: element,
+				within: "#container"
+			})
+			.zIndex(element.zIndex() + 1)
+			.width(element.width());
+		}
+		
+		element.on("show:slick-editor", function(e){
+			canRender = true;
+			wrapper.show();
+			adjust();
+		});
+
+		element.on("hide:slick-editor", function(e){
+			canRender = false;
+			wrapper.hide();
+		});
+		
+		element.on("adjustSize", _. throttle(adjust, 300));
+		
+		scope.$watch(attrs.ngModel, function(value) {
+			var text = "";
+			if (value && value.length)
+				text = "(" + value.length + ")";
+			input.val(text);
+		});
+		
+		scope.$on("$destroy", function(e){
+			canRender = false;
+			wrapper.remove();
+		});
+	},
+	template:
+	'<span class="picker-input picker-icons-2" style="position: absolute;">'+
+		'<input type="text" readonly>'+
+		'<i class="icon-plus picker-icon-2" ng-click="onNew()" title="{{\'Select\' | t}}"></i>'+
+		'<i class="icon-minus picker-icon-1" ng-click="onRemove()" title="{{\'Select\' | t}}"></i>'+
+		'<div ui-view-grid ' +
+			'x-view="schema" '+
+			'x-data-view="dataView" '+
+			'x-handler="this" '+
+			'x-no-filter="true" '+
+			'x-on-init="onGridInit" '+
+			'x-on-before-save="onGridBeforeSave" '+
+			'x-on-after-save="onGridAfterSave" '+
+			'></div>'+
+	'</span>'
+});
+
+var ManyToManyInline = _.extend({}, OneToManyInline, {
+	css	: 'many2many-inline',
+	link: function(scope, element, attrs, model) {
+		OneToManyInline.link.apply(this, arguments);
+		scope.onNew = scope.onSelect;
+	},
 	controller: ManyToManyCtrl
 });
 
@@ -1071,5 +1172,8 @@ ui.formDirective('uiNestedEditor', NestedEditor);
 ui.formDirective('uiEmbeddedEditor', EmbeddedEditor);
 ui.formDirective('uiNestedForm', NestedForm);
 ui.formDirective('uiSuggestBox', SuggestBox);
+
+ui.formDirective('uiOneToManyInline', OneToManyInline);
+ui.formDirective('uiManyToManyInline', ManyToManyInline);
 
 }).call(this);

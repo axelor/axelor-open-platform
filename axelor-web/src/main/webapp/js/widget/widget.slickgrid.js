@@ -124,8 +124,16 @@ var Editor = function(args) {
 	
 	this.destroy = function() {
 		element.appendTo(element.data('$parent') || form)
-			   .removeData('$parent')
-			   .show();
+			   .removeData('$parent');
+		element.trigger("hide:slick-editor");
+	};
+	
+	this.position = function(pos) {
+		element.trigger("show:slick-editor");
+		setTimeout(function(){
+			element.trigger("show:slick-editor");
+			scope.$apply();
+		});
 	};
 
 	this.focus = function() {
@@ -196,11 +204,7 @@ var Factory = {
 		if (field.readonly) {
 			return null;
 		}
-		//TODO: support for complex widgets
-		if (field.type == 'one-to-many' ||
-				field.type == 'many-to-many' ||
-				field.type == 'text' ||
-				field.type == 'binary') {
+		if (field.type == 'binary') {
 			return null;
 		}
 		if (col.editor) {
@@ -818,12 +822,25 @@ ui.directive('uiSlickEditors', function() {
 
 ui.directive('uiSlickGrid', ['ViewService', function(ViewService) {
 	
-	function makeForm(scope, model, items) {
+	var types = {
+		'one-to-many' : 'one-to-many-inline',
+		'many-to-many' : 'many-to-many-inline'
+	};
 
+	function makeForm(scope, model, items, fields) {
+
+		fields = fields || {};
 		items = _.map(items, function(item) {
-			return _.extend({}, item, { noLabel: true });
+			var field = fields[item.name],
+				type = types[field.type];
+			
+			var params = _.extend({}, item, { noLabel: true });
+			if (type) {
+				params.type = type;
+			}
+			return params;
 		});
-		
+
 		var schema = {
 			cols: items.length,
 			colWidths: '=',
@@ -871,7 +888,7 @@ ui.directive('uiSlickGrid', ['ViewService', function(ViewService) {
 				grid = new Grid(scope, element, attrs, ViewService);
 				if (view.editable) {
 					var child = scope.$new();
-					var form = makeForm(child, handler._model, view.items);
+					var form = makeForm(child, handler._model, view.items, handler.fields);
 					grid.setEditors(form, child);
 				}
 			});
