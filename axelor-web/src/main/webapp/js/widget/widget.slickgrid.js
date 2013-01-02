@@ -220,6 +220,9 @@ var Grid = function(scope, element, attrs) {
 	this.attrs = attrs;
 	this.handler = scope.handler;
 	this.showFilters = !scope.$eval('noFilter');
+	
+	this.$oldValues = null;
+
 	this.grid = this.parse(scope.view);
 };
 
@@ -364,7 +367,35 @@ Grid.prototype.parse = function(view) {
 	if (scope.$parent._viewResolver) {
 		scope.$parent._viewResolver.resolve(view, element);
 	}
+	
+	var that = this;
+	scope.$on("cancel:grid-edit", function(e) {
+		
+		if (that.$oldValues && that.canSave()){
+			
+			dataView.beginUpdate();
+			dataView.setItems(that.$oldValues);
+			dataView.endUpdate();
 
+			that.$oldValues = null;
+			
+			that.clearDirty();
+			
+			grid.invalidateAllRows();
+			grid.render();
+			
+			e.preventDefault();
+		}
+	});
+	
+	scope.$on("on:new", function(e) {
+		that.$oldValues = null;
+	});
+	
+	scope.$on("on:edit", function(e) {
+		that.$oldValues = null;
+	});
+	
 	return grid;
 };
 
@@ -432,6 +463,16 @@ Grid.prototype.setColumnTitle = function(name, title) {
 };
 
 Grid.prototype.onBeforeEditCell = function(event, args) {
+	if (this.$oldValues === null) {
+		this.$oldValues = [];
+		var n = 0;
+		while (n < this.grid.getDataLength()) {
+			var item = this.grid.getDataItem(n++);
+			if (item && item.id) {
+				this.$oldValues.push(_.clone(item));
+			}
+		}
+	}
 	if (!args.item) {
 		this.editorScope.editRecord(null);
 	}
@@ -753,7 +794,7 @@ Grid.prototype.onCellChange = function(event, args) {
 	var grid = this.grid,
 		cols = grid.getColumns(),
 		name = cols[args.cell].field;
-	
+
 	this.markDirty(args.row, name);
 };
 
