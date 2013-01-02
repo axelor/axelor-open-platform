@@ -359,15 +359,24 @@ td.form-item > * {
 }
 
 .form-item .ui-spinner {
-	height: 26px;
-	padding-right: 18px;
+	padding-right: 0;
+	border: 0;
+	overflow: inherit;
+}
+
+.form-item .ui-spinner .ui-spinner-up {
+	margin-top: 1px;
+}
+
+.form-item .ui-spinner .ui-spinner-down {
+	margin-bottom: 1px;
 }
 
 table.form-layout td.form-item .ui-spinner input {
 	width: 100%;
-	height: 22px;
-	margin: 1px;
 	text-align: right;
+	padding-right: 16px;
+	margin: 0;
 }
 
 table.field-details {
