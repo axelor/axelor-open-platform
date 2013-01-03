@@ -58,7 +58,9 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 			action: 'main'
 		})
 		.when('/ds/:resource', {
-			action: 'main.tab'
+			action: 'main.tab',
+			controller: TabCtrl,
+			template: "<span><!-- dummy template --></span>"
 		})
 		.otherwise({
 			redirectTo: '/welcome'
@@ -101,8 +103,8 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 
 })(jQuery);
 
-AppCtrl.$inject = ['$scope', '$http', 'authService'];
-function AppCtrl($scope, $http, authService) {
+AppCtrl.$inject = ['$scope', '$http', '$route', 'authService'];
+function AppCtrl($scope, $http, $route, authService) {
 
 	function getAppInfo(settings) {
 		return {
@@ -259,6 +261,9 @@ function AppCtrl($scope, $http, authService) {
 
 		$scope.routePath = path;
 	});
+	
+	$scope.routePath = ["main"];
+	$route.reload();
 }
 
 NavCtrl.$inject = ['$scope', '$rootScope', '$location', '$routeParams', 'MenuService'];
@@ -384,10 +389,13 @@ function NavCtrl($scope, $rootScope, $location, $routeParams, MenuService) {
 			$.event.trigger('adjustSize');
 		}, 200);
 	});
+}
+
+TabCtrl.$inject = ['$scope', '$rootScope', '$location', '$routeParams'];
+function TabCtrl($scope, $rootScope, $location, $routeParams) {
 	
 	var resource = $routeParams['resource'];
-	
-	if (resource) {
-		$scope.openTabByName(resource);
-	}
+    if (resource) {
+        $scope.openTabByName(resource);
+    }
 }

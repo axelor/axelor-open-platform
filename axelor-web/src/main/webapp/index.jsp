@@ -101,9 +101,7 @@ if (localeName == null || "".equals(localeName.trim()))
 	<div ng-switch-when="about" ng-include src="'partials/about.html'"></div>
 	<div ng-switch-when="welcome" ng-include src="'partials/welcome.html'"></div>
   </section>
-  
-  <div ng-hide="true" ng-view></div>
-  
+
   <!-- JavaScript at the bottom for fast page loading -->
   <script src="js/lib/i18n.js"></script>
   <script src="js/i18n/en.js"></script>
