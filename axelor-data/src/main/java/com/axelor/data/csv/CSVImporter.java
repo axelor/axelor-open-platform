@@ -200,7 +200,11 @@ public class CSVImporter implements Importer {
 		JPA.em().getTransaction().begin();
 		try {
 			
-			Map<String, Object> context = Maps.newHashMap(this.context);
+			Map<String, Object> context = Maps.newHashMap();
+			if (this.context != null) {
+				context.putAll(this.context);
+			}
+			
 			csvInput.callPrepareContext(context, injector);
 			
 			// register type adapters
