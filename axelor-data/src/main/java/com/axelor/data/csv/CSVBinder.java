@@ -141,6 +141,8 @@ public class CSVBinder {
 			for (CSVBinding b : cb.getBindings())
 				if (isBound(b, values))
 					return true;
+		if(cb.getSearch() != null)
+			return true;
 		return cb.getExpression() != null;
 	}
 	
@@ -233,10 +235,10 @@ public class CSVBinder {
 					p.addAll(bean, (Collection<?>) value);
 				else
 					p.add(bean, value);
-			else{
+			else
 				p.set(bean, value);
-				LOG.trace("set value: {} = {}", p.getName(), value);
-			}
+
+			LOG.trace("set value: {} = {}", p.getName(), value);
 		}
 
 		return bean;
