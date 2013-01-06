@@ -46,12 +46,23 @@ function FormViewCtrl($scope, $element) {
 		});
 	}
 	
+	var initialized = false;
 	$scope.onShow = function(viewPromise) {
+		
+		var params = this._viewParams;
 
-		if (this._viewParams.recordId) {
-			return doEdit(this._viewParams.recordId);
+		if (params.recordId) {
+			return doEdit(params.recordId);
 		}
-
+		
+		if (!initialized && params.options.mode === "edit" && params.options.state) {
+			initialized = true;
+			var recordId = +params.options.state;
+			if (recordId > 0) {
+				return doEdit(recordId);
+			}
+		}
+		
 		var page = ds.page(),
 			record = null;
 		
@@ -71,8 +82,35 @@ function FormViewCtrl($scope, $element) {
 		});
 	};
 	
+	$scope.getRouteOptions = function() {
+		var rec = $scope.record,
+			args = [],
+			query = {};
+		
+		if (rec && rec.id > 0) {
+			args.push(rec.id);
+		}
+
+		return {
+			mode: 'edit',
+			args: args,
+			query: query
+		};
+	};
+	
+	$scope.setRouteOptions = function(options) {
+		var record = $scope.record || {},
+			state = +options.state;
+
+		if (record.id == state) {
+			return;
+		}
+		return state ? doEdit(state) : $scope.edit(null);
+	};
+
 	$scope.edit = function(record) {
 		$scope.editRecord(record);
+		$scope.updateRoute();
 		$scope._viewPromise.then(function(){
 			var events = $scope._$events;
 			if (events.onLoad && record) {
@@ -224,7 +262,9 @@ function FormViewCtrl($scope, $element) {
 		}
 		$scope.confirmDirty(function() {
 			$scope.editRecord(null);
-			$scope.switchTo('grid');
+			$scope.switchTo('grid', function(viewScope) {
+				viewScope.updateRoute();
+			});
 		});
 	};
 
