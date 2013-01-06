@@ -13,7 +13,7 @@
 		function DataSource(model, options) {
 			
 			var opts = extend({
-				limit	: 40,
+				limit	: DataSource.DEFAULT_LIMIT,
 				domain	: null,
 				context	: null
 			}, options);
@@ -40,6 +40,8 @@
 			this._listeners = {};
 		};
 		
+		DataSource.DEFAULT_LIMIT = 10;
+
 		DataSource.prototype = {
 
 			constructor: DataSource,
@@ -103,7 +105,7 @@
 
 				if (options.filter) {
 					this._filter = options.filter;
-					offset = 0;
+					offset = options.offset ? offset : 0;
 				}
 				if (options.sortBy) {
 					this._sortBy = options.sortBy;

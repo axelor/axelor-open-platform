@@ -20,15 +20,23 @@ function GridViewCtrl($scope, $element) {
 			
 			viewPromise.then(function(){
 				var view = $scope.schema,
-					sortBy = view.orderBy;
-				
+					params = $scope._viewParams,
+					sortBy = view.orderBy,
+					pageNum = null;
+
 				if (sortBy) {
 					sortBy = sortBy.split('\\.');
+				}
+				if (params.options && params.options.mode === 'list') {
+					pageNum = params.options.state;
 				}
 
 				$scope.view = view;
 				$scope.filter({
-					_sortBy: sortBy
+					_sortBy: sortBy,
+					_pageNum: pageNum
+				}).then(function(){
+					$scope.updateRoute();
 				});
 			});
 			
@@ -36,6 +44,35 @@ function GridViewCtrl($scope, $element) {
 		}
 	};
 	
+	$scope.getRouteOptions = function() {
+		var pos = null,
+			args = [],
+			query = {};
+
+		if (page && page.limit) {
+			pos = (page.from / page.limit) + 1;
+			args.push(pos);
+		}
+		return {
+			mode: 'list',
+			args: args,
+			query: query
+		};
+	};
+	
+	$scope.setRouteOptions = function(options) {
+		var pos = +(options.state),
+			current = (page.from / page.limit) + 1;
+		
+		if (pos === current) {
+			return;
+		}
+		
+		$scope.filter({
+			_pageNum: pos
+		});
+	};
+
 	$scope.setItems = function(items, pageInfo) {
 
 		var dataView = $scope.dataView,
@@ -78,7 +115,7 @@ function GridViewCtrl($scope, $element) {
 
 	$scope.filter = function(searchFilter) {
 		
-		var filter = {}, sortBy,
+		var filter = {}, sortBy, pageNum,
 			domain = null,
 			context = null,
 			criteria = {
@@ -91,10 +128,12 @@ function GridViewCtrl($scope, $element) {
 			if (value !== '') filter[name] = value;
 		}
 		
+		pageNum = +(filter._pageNum || 0);
 		sortBy = filter._sortBy;
 		domain = filter._domain;
 		context = filter._context;
 		
+		delete filter._pageNum;
 		delete filter._sortBy;
 		delete filter._domain;
 		delete filter._context;
@@ -149,31 +188,41 @@ function GridViewCtrl($scope, $element) {
 		if (domain && $scope.getContext) {
 			context = _.extend({}, $scope._context, context, $scope.getContext());
 		}
-
-		return ds.search({
+		
+		var options = {
 			filter: criteria,
 			fields: fields,
 			sortBy: sortBy,
 			domain: domain,
 			context: context
-		});
+		};
+
+		if (pageNum) {
+			options.offset = (pageNum - 1 ) * ds._page.limit;
+		}
+
+		return ds.search(options);
 	};
 
 	$scope.pagerText = function() {
 		if (page && page.from !== undefined) {
 			if (page.total == 0) return null;
-			return _t("{0} to {1} of {2}", page.from + 1, page.size, page.total);
+			return _t("{0} to {1} of {2}", page.from + 1, page.to, page.total);
 		}
 	};
 	
 	$scope.onNext = function() {
 		var fields = _.pluck($scope.fields, 'name');
-		ds.next(fields);
+		ds.next(fields).then(function(){
+			$scope.updateRoute();
+		});
 	};
 	
 	$scope.onPrev = function() {
 		var fields = _.pluck($scope.fields, 'name');
-		ds.prev(fields);
+		ds.prev(fields).then(function(){
+			$scope.updateRoute();
+		});
 	};
 	
 	$scope.onNew = function() {

@@ -47,24 +47,24 @@ function onHttpStop() {
 
 angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 	.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
-		$routeProvider
-		.when('/welcome', {
-			action: 'welcome'
-		})
-		.when('/about', {
-			action: 'about'
-		})
-		.when('/', {
-			action: 'main'
-		})
-		.when('/ds/:resource', {
+		
+		var tabResource = {
 			action: 'main.tab',
 			controller: TabCtrl,
 			template: "<span><!-- dummy template --></span>"
-		})
-		.otherwise({
-			redirectTo: '/welcome'
-		});
+		};
+		
+		$routeProvider
+		
+		.when('/welcome', { action: 'welcome' })
+		.when('/about', { action: 'about' })
+		.when('/', { action: 'main' })
+
+		.when('/ds/:resource', tabResource)
+		.when('/ds/:resource/:mode', tabResource)
+		.when('/ds/:resource/:mode/:state', tabResource)
+
+		.otherwise({ redirectTo: '/' });
 	}])
 	.config(['$httpProvider', function(provider) {
 		provider.responseInterceptors.push('httpIndicator');
@@ -253,8 +253,8 @@ function AppCtrl($scope, $http, $route, authService) {
 	
 	$scope.$on('$routeChangeSuccess', function(event, current, prev) {
 
-		var action = current.$route.action,
-			path = action ? action.split('.') : null;
+		var route = current.$route,
+			path = route && route.action ? route.action.split('.') : null;
 
 		if (path == null)
 			return;
@@ -266,8 +266,8 @@ function AppCtrl($scope, $http, $route, authService) {
 	$route.reload();
 }
 
-NavCtrl.$inject = ['$scope', '$rootScope', '$location', '$routeParams', 'MenuService'];
-function NavCtrl($scope, $rootScope, $location, $routeParams, MenuService) {
+NavCtrl.$inject = ['$scope', '$rootScope', '$location', '$q', 'MenuService'];
+function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 
 	$scope.tabs = [];
 	$scope.selectedTab = null;
@@ -283,78 +283,122 @@ function NavCtrl($scope, $rootScope, $location, $routeParams, MenuService) {
 		$scope.openTab(tab);
 	};
 	
+	$scope.$on("on:update-route", update);
+
+	function update(event) {
+		
+		var tab = $scope.selectedTab,
+			scope = event.targetScope;
+
+		if (!tab || !tab.action || scope !== tab.$viewScope || !scope.getRouteOptions) {
+			return;
+		}
+		if (tab.action.indexOf('$act') > -1) {
+			return;
+		}
+
+		var path = tab.action,
+			opts = scope.getRouteOptions(),
+			mode = opts.mode,
+			args = opts.args;
+
+		path = "/ds/" + path + "/" + mode;
+		args = _.filter(args, function(arg) {
+			return _.isNumber(args) || arg;
+		});
+
+		if (args.length) {
+			path += "/" + args.join("/");
+		}
+
+		if ($location.$$path !== path) {
+			$location.path(path);
+		}
+	}
+
 	function findTab(key) {
 		return _.find($scope.tabs, function(tab){
 			return tab.action == key;
 		});
 	};
 	
-	$scope.openTab = function(tab) {
+	var VIEW_TYPES = {
+		'list' : 'grid',
+		'edit' : 'form'
+	};
 	
-		var tabs = $scope.tabs;
+	$scope.openTab = function(tab, options) {
+	
+		var tabs = $scope.tabs,
+			found = findTab(tab.action);
 
-		_.each(tabs, function(tab){
-			tab.selected = false;
-		});
+		if (options && options.mode) {
+			tab.viewType = VIEW_TYPES[options.mode] || options.mode;
+		}
 		
-		var found = findTab(tab.action);
-		
+		tab.options = options;
+
 		if (!found) {
 			found = tab;
 			tabs.push(tab);
 		}
 		
+		_.each(tabs, function(tab) { tab.selected = false; });
+
 		found.selected = true;
 		$scope.selectedTab = found;
-
-		var resource = found.action;
-		var path = '/ds/' + resource;
 		
-		// don't change location for views opened with button actions
-		if (resource.indexOf('$act') != 0)
-			$location.path(path);
-
+		if (tab.$viewScope) {
+			var view = tab.$viewScope._views[tab.viewType],
+				promise = view ? view.deferred.promise : null;
+			if (promise) {
+				promise.then(function(viewScope) {
+					viewScope.setRouteOptions(options);
+				});
+			}
+		}
+		
 		setTimeout(function(){
 			$.event.trigger('adjust');
 		});
 	};
 	
-	$scope.openTabByName = function(name) {
+	$scope.openTabByName = function(name, options) {
 
 		var tab = findTab(name);
-		if (tab == null) {
-			
-			MenuService.action(name).success(function(result){
-
-				if (!result.data) {
-					return;
-				}
-				
-				var view = result.data[0].view;
-				
-				if (view && view.viewType == 'html') {
-					view.views = [{
-						resource: view.resource,
-						title: view.title,
-						type: 'html'
-					}];
-				}
-				
-				tab = view;
-				tab.action = name;
-				$scope.openTab(tab);
-			});
+		if (tab) {
+			return $scope.openTab(tab, options);
 		}
-		else
-			$scope.openTab(tab);
+
+		MenuService.action(name).success(function(result){
+
+			if (!result.data) {
+				return;
+			}
+
+			var view = result.data[0].view;
+			
+			if (view && view.viewType == 'html') {
+				view.views = [{
+					resource: view.resource,
+					title: view.title,
+					type: 'html'
+				}];
+			}
+
+			tab = view;
+			tab.action = name;
+			
+			$scope.openTab(tab, options);
+		});
 	};
-	
+
 	function closeTab(tab) {
 
 		var tabs = $scope.tabs,
 			index = _.indexOf(tabs, tab);
-		
-		//TODO: garbage collection
+
+		// remove tab
 		tabs.splice(index, 1);
 		
 		if (tab.selected) {
@@ -382,20 +426,30 @@ function NavCtrl($scope, $rootScope, $location, $routeParams, MenuService) {
 		}
 	};
 	
-	$scope.$watch('selectedTab.viewType', function(tab){
-		if (tab == null)
-			return;
-		setTimeout(function(){
-			$.event.trigger('adjustSize');
-		}, 200);
+	$scope.$watch('selectedTab.viewType', function(viewType){
+		if (viewType) {
+			setTimeout(function(){
+				$.event.trigger('adjustSize');
+			});
+		}
 	});
 }
 
-TabCtrl.$inject = ['$scope', '$rootScope', '$location', '$routeParams'];
-function TabCtrl($scope, $rootScope, $location, $routeParams) {
+TabCtrl.$inject = ['$scope', '$location', '$routeParams'];
+function TabCtrl($scope, $location, $routeParams) {
 	
-	var resource = $routeParams['resource'];
-    if (resource) {
-        $scope.openTabByName(resource);
+	var params = _.clone($routeParams),
+		search = _.clone($location.$$search);
+
+	var resource = params.resource,
+		state = params.state,
+		mode = params.mode;
+
+	if (resource) {
+        $scope.openTabByName(resource, {
+        	mode: mode,
+        	state: state,
+        	search: search
+        });
     }
 }

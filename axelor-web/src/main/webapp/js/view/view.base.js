@@ -39,11 +39,22 @@ function ViewCtrl($scope, DataSource, ViewService) {
 		}
 		return ViewService.getMetaDef($scope._model, view);
 	};
+	
+	$scope.updateRoute = function() {
+		this.$emit("on:update-route");
+	};
 
-	$scope.switchTo = function(viewType) {
+	$scope.getRouteOptions = function() {
+		throw "Not Implemented.";
+	};
+	
+	$scope.setRouteOptions = function(options) {
+		throw "Not Implemented.";
+	};
 
-		var view = $scope._views[viewType],
-			callback = arguments.length > 1 ? arguments[1] : null;
+	$scope.switchTo = function(viewType, /* optional */ callback) {
+
+		var view = $scope._views[viewType];
 		if (view == null) {
 			return;
 		}
@@ -57,11 +68,10 @@ function ViewCtrl($scope, DataSource, ViewService) {
 
 			$scope._viewType = viewType;
 			$scope._viewParams.viewType = viewType; //XXX: remove
+			$scope._viewParams.$viewScope = viewScope;
+			
 			viewScope.show();
 			
-			// store viewScope (for NavCtrl usages, dirty check)
-			$scope._viewParams.$viewScope = viewScope;
-
 			if (callback) {
 				callback(viewScope);
 			}
@@ -123,7 +133,7 @@ function DSViewCtrl(type, $scope, $element) {
 	
 	$scope._viewResolver = $scope._defer();
 	$scope._viewPromise = $scope._viewResolver.promise;
-
+	
 	var ds = $scope._dataSource;
 	var view = $scope._views[type] || {};
 	var viewPromise = null;
