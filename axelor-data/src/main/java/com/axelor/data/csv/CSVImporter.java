@@ -50,6 +50,14 @@ public class CSVImporter implements Importer {
 		this.listeners.add(listener);
 	}
 	
+	public void setContext(Map<String, Object> context) {
+		this.context = context;
+	}
+	
+	public CSVImporter(Injector injector, String configFile) {
+		this(injector, configFile, null);
+	}
+	
 	@Inject
 	public CSVImporter(Injector injector,
 			@Named("axelor.data.config") String config,
@@ -71,10 +79,6 @@ public class CSVImporter implements Importer {
 		this.injector = injector;
 	}
 	
-	public CSVImporter(Injector injector, String configFile) {
-		this(injector, configFile, null);
-	}
-	
 	private List<File> getFiles(String... names) {
 		List<File> all = Lists.newArrayList();
 		for (String name : names)
@@ -82,11 +86,11 @@ public class CSVImporter implements Importer {
 		return all;
 	}
 	
-	public void setContext(Map<String, Object> context) {
-		this.context = context;
-	}
-	
-	public void runTask(ImportTask task) throws ClassNotFoundException {
+	/**
+	 * Run the task from the configured readers
+	 * @param task
+	 */
+	public void runTask(ImportTask task) {
 		try {
 			if (task.readers.isEmpty()) {
 				task.configure();
@@ -164,6 +168,11 @@ public class CSVImporter implements Importer {
 		}
 	}
 
+	/**
+	 * Check if the String array is empty.
+	 * @param line
+	 * @return <code>true</code> if line is null or empty, <code>false</code> otherwise
+	 */
 	private boolean isEmpty(String[] line) {
 		if (line == null || line.length == 0)
 			return true;
@@ -172,10 +181,24 @@ public class CSVImporter implements Importer {
 		return false;
 	}
 	
+	/**
+	 * Lauch the import for the input and file.
+	 * @param input
+	 * @param file
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	private void process(CSVInput input, File file) throws IOException, ClassNotFoundException {
 		this.process(input, new FileReader(file));
 	}
 	
+	/**
+	 * Lauch the import for the input and reader.
+	 * @param csvInput
+	 * @param reader
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	private void process(CSVInput csvInput, Reader reader) throws IOException, ClassNotFoundException {
 		
 		String beanName = csvInput.getTypeName();
@@ -201,6 +224,8 @@ public class CSVImporter implements Importer {
 		try {
 			
 			Map<String, Object> context = Maps.newHashMap();
+			
+			//Put global context
 			if (this.context != null) {
 				context.putAll(this.context);
 			}
@@ -218,6 +243,7 @@ public class CSVImporter implements Importer {
 				binder.registerAdapter(adapter);
 			}
 			
+			//Process for each lines
 			while((values = csvReader.readNext()) != null) {
 				
 				if (isEmpty(values))
@@ -228,18 +254,24 @@ public class CSVImporter implements Importer {
 				}
 				
 				try {
+					
 					Map<String, Object> ctx = Maps.newHashMap(context);
 					Object bean = binder.bind(values, ctx);
+					
 					if (LOG.isTraceEnabled())
 						LOG.trace("bean created: {}", bean);
+					
 					bean = csvInput.call(bean, ctx, injector);
+					
 					if (bean != null) {
 						JPA.manage((Model) bean);
 						for(Listener listener : listeners) {
 							listener.imported((Model) bean);
 						}
 					}
+					
 					LOG.debug("bean saved: {}", bean);
+					
 				} catch (Exception e) {
 					if (LOG.isErrorEnabled()) {
 						LOG.error("Error while importing {}.", csvInput.getFileName());
