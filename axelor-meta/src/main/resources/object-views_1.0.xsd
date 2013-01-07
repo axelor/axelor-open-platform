@@ -626,17 +626,12 @@
   <xsd:complexType name="ActField">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractAct">
-        <xsd:attribute name="name" use="required">
+        <xsd:attribute name="name" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>
               Comma seperated list of field names
             </xsd:documentation>
           </xsd:annotation>
-          <xsd:simpleType>
-            <xsd:restriction base="xsd:string">
-              <xsd:pattern value="^[\S+]*$" />
-            </xsd:restriction>
-          </xsd:simpleType>
         </xsd:attribute>
         <xsd:attribute name="expr" type="xsd:string" use="required"/>
         <xsd:attribute name="copy" type="xsd:boolean">
@@ -652,17 +647,12 @@
   <xsd:complexType name="ActAttribute">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractAct">
-        <xsd:attribute name="for"  use="required">
+        <xsd:attribute name="for" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>
               Comma seperated list of field names
             </xsd:documentation>
           </xsd:annotation>
-          <xsd:simpleType>
-            <xsd:restriction base="xsd:string">
-              <xsd:pattern value="^[\S+]*$" />
-            </xsd:restriction>
-          </xsd:simpleType>
         </xsd:attribute>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
         <xsd:attribute name="expr" type="xsd:string" use="required"/>
