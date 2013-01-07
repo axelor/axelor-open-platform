@@ -550,6 +550,17 @@ function ManyToManyCtrl($scope, $element, DataSource, ViewService) {
 	OneToManyCtrl.call(this, $scope, $element, DataSource, ViewService, function(){
 		$scope.editorCanSave = true;
 	});
+	
+	var _setValue = $scope.setValue;
+	$scope.setValue = function(value, trigger) {
+		var compact = _.map(value, function(item) {
+			return {
+				id: item.id,
+				$version: item.version
+			};
+		});
+		_setValue(compact, trigger);
+	};
 }
 
 var ManyToOneItem = {
