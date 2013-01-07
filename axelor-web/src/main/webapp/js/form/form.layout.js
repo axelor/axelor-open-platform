@@ -51,8 +51,8 @@ function TableLayout(items, attrs, $scope, $compile) {
 	if (numCols > 1 && !colWidths) {
 		var labelCols = Math.floor(numCols / 2),
 			itemCols = Math.ceil(numCols / 2),
-			forLabels = Math.min(30, 10 * labelCols) / labelCols,
-			forItems = (100 - forLabels) / itemCols;
+			forLabels = 30 / labelCols,
+			forItems = 70 / itemCols;
 
 		colWidths = [];
 		for(var i = 0 ; i < numCols ; i++) {
