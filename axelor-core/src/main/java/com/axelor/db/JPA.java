@@ -263,6 +263,11 @@ public final class JPA {
 		}
 		visited.add(bean);
 		
+		// don't update reference objects
+		if (id != null && beanVersion == null) {
+			return bean;
+		}
+		
 		for (String name : values.keySet()) {
 
 			Property p = mapper.getProperty(name);
