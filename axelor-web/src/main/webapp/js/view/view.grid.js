@@ -63,14 +63,19 @@ function GridViewCtrl($scope, $element) {
 	
 	$scope._routeSearch = {};
 	$scope.setRouteOptions = function(options) {
-		var pos = +(options.state),
+		var opts = options || {},
+			pos = +(opts.state),
 			current = (page.from / page.limit) + 1;
-		
-		$scope._routeSearch = options.search;
+
+		$scope._routeSearch = opts.search;
 		if (pos === current) {
 			return;
 		}
 		
+		var params = $scope._viewParams;
+		if (params.viewType !== "grid") {
+			return $scope.show();
+		}
 		$scope.filter({
 			_pageNum: pos
 		});

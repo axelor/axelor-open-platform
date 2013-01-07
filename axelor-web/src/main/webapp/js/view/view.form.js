@@ -100,12 +100,18 @@ function FormViewCtrl($scope, $element) {
 	
 	$scope._routeSearch = {};
 	$scope.setRouteOptions = function(options) {
-		var record = $scope.record || {},
-			state = +options.state;
+		var opts = options || {},
+			record = $scope.record || {},
+			state = +opts.state;
 
-		$scope._routeSearch = options.search;
+		$scope._routeSearch = opts.search;
 		if (record.id == state) {
 			return;
+		}
+		
+		var params = $scope._viewParams;
+		if (params.viewType !== "form") {
+			return $scope.show();
 		}
 		return state ? doEdit(state) : $scope.edit(null);
 	};
