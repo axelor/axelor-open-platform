@@ -69,7 +69,7 @@ function GridViewCtrl($scope, $element) {
 
 		$scope._routeSearch = opts.search;
 		if (pos === current) {
-			return;
+			return $scope.updateRoute();
 		}
 		
 		var params = $scope._viewParams;
