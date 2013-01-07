@@ -395,6 +395,11 @@ table.field-details .help-text hr {
 
 .popover {
 	width: auto;
+	z-index: 2100;
+}
+
+.popover-inner {
+	width: inherit;
 	min-width: 280px;
 	max-width: 360px;
 }
