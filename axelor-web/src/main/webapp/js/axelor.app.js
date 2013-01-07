@@ -333,6 +333,8 @@ function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 		var tabs = $scope.tabs,
 			found = findTab(tab.action);
 
+		options = options || tab.options;
+		
 		if (options && options.mode) {
 			tab.viewType = VIEW_TYPES[options.mode] || options.mode;
 		}
@@ -349,7 +351,7 @@ function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 		found.selected = true;
 		$scope.selectedTab = found;
 		
-		if (tab.$viewScope) {
+		if (options && tab.$viewScope) {
 			var view = tab.$viewScope._views[tab.viewType],
 				promise = view ? view.deferred.promise : null;
 			if (promise) {

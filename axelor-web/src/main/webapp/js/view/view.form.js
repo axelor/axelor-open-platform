@@ -55,7 +55,7 @@ function FormViewCtrl($scope, $element) {
 			return doEdit(params.recordId);
 		}
 		
-		if (!initialized && params.options.mode === "edit") {
+		if (!initialized && params.options && params.options.mode === "edit") {
 			initialized = true;
 			$scope._routeSearch = params.options.search;
 			var recordId = +params.options.state;
@@ -106,7 +106,7 @@ function FormViewCtrl($scope, $element) {
 
 		$scope._routeSearch = opts.search;
 		if (record.id == state) {
-			return;
+			return $scope.updateRoute();
 		}
 		
 		var params = $scope._viewParams;
