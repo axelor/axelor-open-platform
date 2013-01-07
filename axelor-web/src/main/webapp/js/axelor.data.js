@@ -40,7 +40,7 @@
 			this._listeners = {};
 		};
 		
-		DataSource.DEFAULT_LIMIT = 10;
+		DataSource.DEFAULT_LIMIT = 40;
 
 		DataSource.prototype = {
 
