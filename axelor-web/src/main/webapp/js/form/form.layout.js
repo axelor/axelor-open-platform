@@ -47,19 +47,6 @@ function TableLayout(items, attrs, $scope, $compile) {
 		curCol += colspan;
 	}
 
-	// auto-generate colWidths
-	if (numCols > 1 && !colWidths) {
-		var labelCols = Math.floor(numCols / 2),
-			itemCols = Math.ceil(numCols / 2),
-			forLabels = 30 / labelCols,
-			forItems = 70 / itemCols;
-
-		colWidths = [];
-		for(var i = 0 ; i < numCols ; i++) {
-			colWidths[i] = (i % 2 == 1 || i >= (labelCols * 2) ? forItems : forLabels) + "%";
-		}
-	}
-
 	if (colWidths && angular.isString(colWidths)) {
 		colWidths = colWidths.trim().split(/\s*,\s*/);
 		for(var i = 0 ; i < colWidths.length; i++) {
@@ -86,9 +73,42 @@ function TableLayout(items, attrs, $scope, $compile) {
 	
 	var table = $('<table class="form-layout"></table');
 	
+	function computeWidths(row) {
+		if (row.length === 1) return null;
+		var widths = [],
+			labelCols = 0,
+			itemCols = 0,
+			emptyCols = 0;
+
+		_.each(row, function(cell) {
+			if (cell.css === 'form-label') {
+				labelCols += (cell.colspan || 1);
+			} else {
+				itemCols += (cell.colspan || 1);
+			}
+		});
+
+		emptyCols = numCols - (labelCols + itemCols);
+		
+		labelCols += (emptyCols / 2);
+		itemCols += (emptyCols / 2) + (emptyCols % 2);
+
+		var labelWidth = labelCols ? Math.min(30, (10 * labelCols)) / labelCols : 0;
+		var itemWidth = (100 - (labelWidth * labelCols)) / itemCols;
+
+		_.each(row, function(cell, i) {
+			var width = ((cell.css === 'form-label' ? labelWidth : itemWidth) * (cell.colspan || 1));
+			widths[i] = width + "%";
+		});
+		
+		return widths;
+	}
+	
 	_.each(layout, function(row){
 		var tr = $('<tr></tr>'),
-			numCells = 0;
+			numCells = 0,
+			widths = colWidths || computeWidths(row);
+
 		_.each(row, function(cell, i) {
 				el = $('<td></td>')
 					.addClass(cell.css)
@@ -96,8 +116,8 @@ function TableLayout(items, attrs, $scope, $compile) {
 					.attr('rowspan', cell.rowspan)
 					.append(cell.elem)
 					.appendTo(tr);
-				if (_.isArray(colWidths) && colWidths[i]) {
-					el.width(colWidths[i]);
+				if (_.isArray(widths) && widths[i]) {
+					el.width(widths[i]);
 				}
 				numCells += cell.colspan || 1;
 		});
