@@ -215,6 +215,7 @@ public abstract class Action {
 			for(Act attr : getElements()) {
 				if (!attr.test(handler) || Strings.isNullOrEmpty(attr.getField())) continue;
 				for(String field : attr.getField().split(",")){
+					if (Strings.isNullOrEmpty(field)) { continue; }
 					Map<String, Object> attrs = (Map) map.get(field);
 					if (attrs == null) {
 						attrs = Maps.newHashMap();
