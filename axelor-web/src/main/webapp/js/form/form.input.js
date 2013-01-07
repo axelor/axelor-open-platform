@@ -467,10 +467,8 @@ var TimeItem = {
 		});
 		
 		element.change(function(e, ui) {
-			setTimeout(function(){
-				scope.$apply(function(){
-					model.$setViewValue(element.val());
-				});
+			scope.$apply(function(){
+				model.$setViewValue(element.val());
 			});
 		});
 	},
