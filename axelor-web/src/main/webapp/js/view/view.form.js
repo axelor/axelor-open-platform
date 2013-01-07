@@ -10,6 +10,7 @@ function FormViewCtrl($scope, $element) {
 	
 	$scope.record = {};
 	$scope.$$original = null;
+	$scope.$$dirty = false;
 	
 	$scope._$events = {};
 	
@@ -129,6 +130,7 @@ function FormViewCtrl($scope, $element) {
 	
 	$scope.editRecord = function(record) {
 		$scope.$$original = record || {};
+		$scope.$$dirty = false;
 		$scope.record = angular.copy($scope.$$original);
 		setTimeout(function(){
 			$scope.$apply();
@@ -177,11 +179,18 @@ function FormViewCtrl($scope, $element) {
 		context._model = ds._model;
 		return context;
 	};
-	
+
 	$scope.isDirty = function() {
-		return !angular.equals($scope.record, $scope.$$original);
+		return $scope.$$dirty;
 	};
-	
+
+	$scope.$watch("record", function(rec, old) {
+		if (rec === old) {
+			return $scope.$$dirty = false;
+		}
+		$scope.$$dirty = !ds.equals($scope.record, $scope.$$original);
+	}, true);
+
 	$scope.isValid = function() {
 		return $scope.form && $scope.form.$valid;
 	};
