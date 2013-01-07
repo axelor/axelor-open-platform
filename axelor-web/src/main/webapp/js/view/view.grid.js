@@ -29,6 +29,7 @@ function GridViewCtrl($scope, $element) {
 				}
 				if (params.options && params.options.mode === 'list') {
 					pageNum = params.options.state;
+					$scope._routeSearch = params.options.search;
 				}
 
 				$scope.view = view;
@@ -60,10 +61,12 @@ function GridViewCtrl($scope, $element) {
 		};
 	};
 	
+	$scope._routeSearch = {};
 	$scope.setRouteOptions = function(options) {
 		var pos = +(options.state),
 			current = (page.from / page.limit) + 1;
 		
+		$scope._routeSearch = options.search;
 		if (pos === current) {
 			return;
 		}
@@ -115,7 +118,7 @@ function GridViewCtrl($scope, $element) {
 
 	$scope.filter = function(searchFilter) {
 		
-		var filter = {}, sortBy, pageNum,
+		var filter =  {}, sortBy, pageNum,
 			domain = null,
 			context = null,
 			criteria = {

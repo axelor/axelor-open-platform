@@ -313,6 +313,7 @@ function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 
 		if ($location.$$path !== path) {
 			$location.path(path);
+			$location.search(opts.query);
 		}
 	}
 

@@ -55,8 +55,9 @@ function FormViewCtrl($scope, $element) {
 			return doEdit(params.recordId);
 		}
 		
-		if (!initialized && params.options.mode === "edit" && params.options.state) {
+		if (!initialized && params.options.mode === "edit") {
 			initialized = true;
+			$scope._routeSearch = params.options.search;
 			var recordId = +params.options.state;
 			if (recordId > 0) {
 				return doEdit(recordId);
@@ -84,8 +85,7 @@ function FormViewCtrl($scope, $element) {
 	
 	$scope.getRouteOptions = function() {
 		var rec = $scope.record,
-			args = [],
-			query = {};
+			args = [];
 		
 		if (rec && rec.id > 0) {
 			args.push(rec.id);
@@ -94,14 +94,16 @@ function FormViewCtrl($scope, $element) {
 		return {
 			mode: 'edit',
 			args: args,
-			query: query
+			query: $scope._routeSearch
 		};
 	};
 	
+	$scope._routeSearch = {};
 	$scope.setRouteOptions = function(options) {
 		var record = $scope.record || {},
 			state = +options.state;
 
+		$scope._routeSearch = options.search;
 		if (record.id == state) {
 			return;
 		}
@@ -153,7 +155,7 @@ function FormViewCtrl($scope, $element) {
 	}
 	
 	$scope.getContext = function() {
-		var context = _.extend({}, $scope.record);
+		var context = _.extend({}, $scope._routeSearch, $scope.record);
 		if ($scope.$parent && $scope.$parent.getContext) {
 			context._parent = $scope.$parent.getContext();
 		}
