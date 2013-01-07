@@ -18,10 +18,19 @@ public class CSVConfig {
 	@XStreamImplicit(itemFieldName = "adapter")
 	private List<DataAdapter> adapters = Lists.newArrayList();
 
+	/**
+	 * Get all {@link #inputs} nodes
+	 * @return List<CSVInput>
+	 */
 	public List<CSVInput> getInputs() {
 		return inputs;
 	}
 	
+	/**
+	 * Get all {@link #adapters} nodes.
+	 * If {@link #adapters} is null, return a new list of {@see DataAdapter}.
+	 * @return
+	 */
 	public List<DataAdapter> getAdapters() {
 		if (adapters == null) {
 			adapters = Lists.newArrayList();
@@ -29,6 +38,11 @@ public class CSVConfig {
 		return adapters;
 	}
 
+	/**
+	 * Parse the <code>input</code> File
+	 * @param input File
+	 * @return
+	 */
 	public static CSVConfig parse(File input) {
 		XStream stream = new XStream();
 		stream.processAnnotations(CSVConfig.class);
