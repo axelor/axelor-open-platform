@@ -963,8 +963,10 @@ var OneToManyInline = _.extend({}, OneToManyItem, {
 	template:
 	'<span class="picker-input picker-icons-2" style="position: absolute;">'+
 		'<input type="text" readonly>'+
-		'<i class="icon-plus picker-icon-2" ng-click="onNew()" title="{{\'Select\' | t}}"></i>'+
-		'<i class="icon-minus picker-icon-1" ng-click="onRemove()" title="{{\'Select\' | t}}"></i>'+
+		'<span class="picker-icons">'+
+			'<i class="icon-plus" ng-click="onNew()" title="{{\'Select\' | t}}"></i>'+
+			'<i class="icon-minus" ng-click="onRemove()" title="{{\'Select\' | t}}"></i>'+
+		'</span>'+
 		'<div ui-view-grid ' +
 			'x-view="schema" '+
 			'x-data-view="dataView" '+
