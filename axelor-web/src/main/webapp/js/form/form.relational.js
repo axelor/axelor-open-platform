@@ -75,6 +75,9 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	};
 	
 	$scope.showNestedEditor = function(record) {
+		if (!record && $scope.isReadonly($element)) {
+			return;
+		}
 		if (!params.summaryView) {
 			return;
 		}
@@ -87,6 +90,9 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	};
 	
 	$scope.showPopupEditor = function(record) {
+		if (!record && $scope.isReadonly($element)) {
+			return;
+		}
 		if (editor == null) {
 			editor = ViewService.compile('<div ui-editor-popup></div>')($scope.$new());
 			editor.data('$target', $element);
@@ -126,7 +132,9 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	};
 	
 	$scope.showSelector = function() {
-		
+		if ($scope.isReadonly($element)) {
+			return;
+		}
 		function doShow() {
 			if (selector == null) {
 				selector = ViewService.compile('<div ui-selector-popup></div>')($scope.$new());
@@ -459,6 +467,9 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	};
 	
 	$scope.onRemove = function() {
+		if ($scope.isReadonly($element)) {
+			return;
+		}
 		axelor.dialogs.confirm(_t("Do you really want to delete the selected record(s)?"), function(confirmed){
 			if (confirmed && $scope.selection && $scope.selection.length)
 				$scope.removeItems($scope.selection);
@@ -777,6 +788,11 @@ var OneToManyItem = {
 						grid.setOptions({enableAddRow: true});
 					});
 				}
+				
+				element.on("on:attrs-change", function(event, data) {
+					if (!editable || !data) return;
+					grid.setOptions({editable: !data.readonly });
+				});
 				
 				if (!scope.summaryView) {
 					return;

@@ -450,6 +450,10 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 			return elem ? $(elem) : null;
 		}
 		
+		scope.isReadonly = function(item) {
+			return $(item).is(":disabled,.ui-state-disabled");
+		};
+
 		scope.setReadonly = function(item, readonly) {
 			var flag = _.isUndefined(readonly) || readonly,
 				elem = findItem(item),
@@ -486,6 +490,10 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 				}
 				e.attr('disabled', flag);
 			});
+			
+			if (elem.is(".one2many-item,.many2many-item")) {
+				return;
+			}
 			
 			var div = elem.children('.disabled-overlay');
 			if (div.size() == 0) {
