@@ -352,12 +352,12 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 				}
 				
 				var widget = this.widget || '',
-					match = widget.match(/(\w+)(?:\[(.*?)\])/),
+					match = widget.match(/([\w_-]+)(?:\[(.*?)\])/),
 					attrs = {}, widgetAttrs = {};
 
 				if (match) {
 					widget = match[1];
-					_.each(match[2].split(/\s*,\s*/), function(part) {
+					_.each(match[2].split(/\s*\|\s*/), function(part) {
 						var parts = part.split(/\s*=\s*/);
 						attrs[parts[0]] = parts[1];
 						widgetAttrs['x-' + parts[0]] = parts[1];
