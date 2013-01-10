@@ -409,6 +409,9 @@ var DateTimeItem = {
 			}
 		});
 		button.click(function(e, ui){
+			if (scope.isReadonly(element)) {
+				return;
+			}
 			input.datetimepicker('show');
 		});
 
