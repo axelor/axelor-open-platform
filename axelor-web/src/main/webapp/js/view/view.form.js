@@ -41,8 +41,11 @@ function FormViewCtrl($scope, $element) {
 		return ds.read(id, params);
 	};
 
-	function doEdit(id) {
+	function doEdit(id, dummy) {
 		return $scope.doRead(id).success(function(record){
+			if (dummy) {
+				record = _.extend(dummy, record);
+			}
 			$scope.edit(record);
 		});
 	}
@@ -226,13 +229,25 @@ function FormViewCtrl($scope, $element) {
 		});
 	};
 	
+	$scope.getDummyValues = function() {
+		if (!$scope.record) return {};
+		var fields = _.keys($scope.fields);
+		var extra = _.chain($scope.fields_view)
+					  .filter(function(f){ return f.widget && !_.contains(fields, f.name); })
+					  .pluck('name')
+					  .compact()
+					  .value();
+		return _.pick($scope.record, extra);
+	};
+
 	$scope.onSave = function() {
 		var events = $scope._$events,
 			saveAction = events.onSave;
 		
 		function doSave() {
+			var dummy = $scope.getDummyValues();
 			ds.save($scope.record).success(function(record, page) {
-				doEdit(record.id);
+				doEdit(record.id, dummy);
 			});
 		}
 		
