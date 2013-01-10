@@ -141,48 +141,41 @@ table.form-layout td.form-item .input-append button {
 	width: 100%;
 }
 
-.picker-input > input,
-.picker-icons-1 > input {
-	padding-right: 24px;
-}
-
-.picker-icons-2 > input {
-	padding-right: 40px;
-}
-
-.picker-icons-3 > input {
-	padding-right: 56px;
-}
-
-.picker-icons-4 > input {
-	padding-right: 72px;
-}
-
-.picker-input > i[class^=icon] {
+.picker-input > .picker-icons {
 	position: absolute;
-	top: 3px;
-	cursor: pointer;
+	display: inline-block;
+	white-space: nowrap;
+
+	right: 3px;
+	height: 100%;
+	padding-top: 3px;
 }
 
-.picker-input > i[class^=icon-caret] {
+.picker-input > .picker-icons > i[class^=icon] {
+	cursor: pointer;
+	margin: 2px;
+	padding: 1px;
+}
+
+.picker-input > .picker-icons > i[class^=icon-caret] {
 	font-size: 12px;
 }
 
-.picker-input > i[class^=icon],
-.picker-input > i[class^=icon].picker-icon-1 {
-	right: 8px;
+.picker-input > input,
+.picker-icons-1 > input {
+	padding-right: 16px;
 }
 
-.picker-input > i[class^=icon].picker-icon-2 {
-	right: 24px;
+.picker-icons-2 > input {
+	padding-right: 32px;
 }
 
-.picker-input > i[class^=icon].picker-icon-3 {
-	right: 40px;
+.picker-icons-3 > input {
+	padding-right: 48px;
 }
 
-.picker-input > i[class^=icon].picker-icon-4 {
-	right: 56px;
+.picker-icons-4 > input {
+	padding-right: 64px;
 }
 
 table.form-layout .tabbable-tabs .nav-tabs {
