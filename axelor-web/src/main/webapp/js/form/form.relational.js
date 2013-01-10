@@ -1052,6 +1052,9 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 	};
 	
 	$scope.onOK = function() {
+		if (!$scope.isValid()) {
+			return;
+		}
 		var record = $scope.record;
 		if (record) record.$fetched = true;
 		$scope.select(record);
