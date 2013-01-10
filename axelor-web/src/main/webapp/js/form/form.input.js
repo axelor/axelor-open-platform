@@ -372,7 +372,7 @@ var DateTimeItem = {
 		
 		var self = this;
 		var input = element.children('input:first');
-		var button = element.children('i:first');
+		var button = element.find('i:first');
 		var options = {
 			dateFormat: 'dd/mm/yy',
 			showButtonsPanel: false,
@@ -455,7 +455,9 @@ var DateTimeItem = {
 	template:
 	'<span class="picker-input">'+
 	  '<input type="text" autocomplete="off">'+
-	  '<i class="icon-calendar"></i>'+
+	  '<span class="picker-icons">'+
+	  	'<i class="icon-calendar"></i>'+
+	  '</span>'+
 	'</span>'
 };
 
@@ -606,7 +608,9 @@ var SelectItem = {
 	template:
 	'<span class="picker-input">'+
 		'<input type="text" autocomplete="off">'+
-		'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
+		'<span class="picker-icons">'+
+			'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
+		'</span>'+
 	'</span>'
 };
 
@@ -650,7 +654,9 @@ var SelectQueryItem = {
 		template:
 		'<span class="picker-input">'+
 			'<input type="text" autocomplete="off">'+
-			'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
+			'<span class="picker-icons">'+
+				'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
+			'</span>'+
 		'</span>'
 };
 

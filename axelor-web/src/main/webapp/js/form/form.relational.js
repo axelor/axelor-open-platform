@@ -693,14 +693,20 @@ var ManyToOneItem = {
 		if (scope.summaryView) {
 			element.removeClass('picker-icons-3').addClass('picker-icons-4');
 		}
+
+		scope.isDisabled = function() {
+			return scope.isReadonly(element);
+		};
 	},
 	template:
 	'<div class="picker-input picker-icons-3">'+
 		'<input type="text" autocomplete="off">'+
-		'<i class="icon-eye-open picker-icon-4" ng-click="onSummary()" ng-show="_viewParams.summaryView"></i>'+
-		'<i class="icon-pencil picker-icon-3" ng-click="onEdit()" title="{{\'Edit\' | t}}"></i>'+
-		'<i class="icon-plus picker-icon-2" ng-click="onNew()" title="{{\'New\' | t}}"></i>'+
-		'<i class="icon-search picker-icon-1" ng-click="onSelect()" title="{{\'Select\' | t}}"></i>'+
+		'<span class="picker-icons">'+
+			'<i class="icon-eye-open" ng-click="onSummary()" ng-show="_viewParams.summaryView"></i>'+
+			'<i class="icon-pencil" ng-click="onEdit()" title="{{\'Edit\' | t}}"></i>'+
+			'<i class="icon-plus" ng-click="onNew()" ng-show="!isDisabled()" title="{{\'New\' | t}}"></i>'+
+			'<i class="icon-search" ng-click="onSelect()" ng-show="!isDisabled()" title="{{\'Select\' | t}}"></i>'+
+		'</span>'+
    '</div>'
 };
 
@@ -719,7 +725,9 @@ var SuggestBox = _.extend({}, ManyToOneItem, {
 	template:
 	'<span class="picker-input">'+
 		'<input type="text" autocomplete="off">'+
-		'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
+		'<span class="picker-icons">'+
+			'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
+		'</span>'+
    '</span>'
 });
 
@@ -837,6 +845,10 @@ var OneToManyItem = {
 				}
 			};
 			
+			scope.isDisabled = function() {
+				return scope.isReadonly(element);
+			};
+			
 			var field = scope.getViewDef(element);
 			if (field.widget === 'MasterDetail') {
 				setTimeout(function(){
@@ -851,10 +863,10 @@ var OneToManyItem = {
 				'<div class="container-fluid">'+
 					'<span class="brand" href="" ui-help-popover ng-bind-html-unsafe="title"></span>'+
 					'<span class="icons-bar pull-right">'+
-						'<i ng-click="onSelect()" title="{{\'Select\' | t}}" class="icon-search"></i>'+
-						'<i ng-click="onNew()" title="{{\'New\' | t}}" class="icon-plus"></i>'+
+						'<i ng-click="onSelect()" ng-show="!isDisabled()" title="{{\'Select\' | t}}" class="icon-search"></i>'+
+						'<i ng-click="onNew()" ng-show="!isDisabled()" title="{{\'New\' | t}}" class="icon-plus"></i>'+
 						'<i ng-click="onEdit()" title="{{\'Edit\' | t}}" class="icon-pencil"></i>'+
-						'<i ng-click="onRemove()" title="{{\'Remove\' | t}}" class="icon-minus"></i>'+
+						'<i ng-click="onRemove()" ng-show="!isDisabled()" title="{{\'Remove\' | t}}" class="icon-minus"></i>'+
 					'</span>'+
 				'</div>'+
 			'</div>'+
