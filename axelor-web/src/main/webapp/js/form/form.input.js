@@ -266,6 +266,12 @@ var IntegerItem = {
 
 		setTimeout(function(){
 			element.spinner(options);
+			if (scope.isReadonly(element)) {
+				element.spinner("disable");
+			}
+			element.on("on:attrs-change", function(event, data) {
+				element.spinner(data.readonly ? "disable" : "enable");
+			});
 		});
 	},
 	template: '<input type="text">'
