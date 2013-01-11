@@ -276,8 +276,10 @@ Grid.prototype.parse = function(view) {
 		showHeaderRow: this.showFilters
 	};
 
+	var grid = new Slick.Grid(element, dataView, cols, options);
+	
 	this.cols = cols;
-	this.grid = grid = new Slick.Grid(element, dataView, cols, options);
+	this.grid = grid;
 	
 	element.show();
 	element.data('grid', grid);
