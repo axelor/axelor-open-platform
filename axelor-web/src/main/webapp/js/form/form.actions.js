@@ -270,6 +270,9 @@ ActionHandler.prototype = {
 		
 		if (data.values) {
 			updateValues(data.values, scope.record, scope);
+			if (scope.onChangeNotify) {
+				scope.onChangeNotify(scope, data.values);
+			}
 			this._invalidateContext = true;
 		}
 		

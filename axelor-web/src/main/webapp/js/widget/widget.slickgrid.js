@@ -775,6 +775,26 @@ Grid.prototype.setEditors = function(form, formScope) {
 	});
 	
 	form.prependTo(element).hide();
+	formScope.onChangeNotify = function(scope, values) {
+		var item, editor, cell = grid.getActiveCell();
+		if (cell == null || formScope !== scope) {
+			return;
+		}
+		item = grid.getDataItem(cell.row);
+		if (item) {
+			editor = grid.getCellEditor();
+			item = _.extend(item, values);
+
+			grid.updateRowCount();
+			grid.render();
+			
+			grid.setActiveCell(cell.row, cell.cell);
+			
+			if (editor) {
+				grid.editActiveCell();
+			}
+		}
+	};
 
 	// delegate isDirty to the dataView
 	data.canSave = _.bind(this.canSave, this);
