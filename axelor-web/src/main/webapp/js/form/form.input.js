@@ -357,6 +357,52 @@ $.extend($.ui.mask.prototype.options.definitions, {
 	"mm": createTwoDigitDefinition( 59 )
 });
 
+// datepicker keyboad navigation hack
+var _doKeyDown = $.datepicker._doKeyDown;
+$.extend($.datepicker, {
+	_doKeyDown: function(event) {
+		var inst = $.datepicker._getInst(event.target),
+			handled = false;
+		inst._keyEvent = true;
+		if ($.datepicker._datepickerShowing) {
+			switch (event.keyCode) {
+			case 36: // home
+				$.datepicker._gotoToday(event.target);
+				handled = true;
+				break;
+			case 37: // left
+				$.datepicker._adjustDate(event.target, -1, "D");
+				handled = true;
+				break;
+			case 38: // up
+				$.datepicker._adjustDate(event.target, -7, "D");
+				handled = true;
+				break;
+			case 39: // right
+				$.datepicker._adjustDate(event.target, +1, "D");
+				handled = true;
+				break;
+			case 40: // down
+				$.datepicker._adjustDate(event.target, +7, "D");
+				handled = true;
+				break;
+			}
+			if (handled) {
+				event.ctrlKey = true;
+			}
+		} else if (event.keyCode === 36 && event.ctrlKey) { // display the date picker on ctrl+home
+			$.datepicker._showDatepicker(this);
+			handled = true;
+		}
+		if (handled) {
+			event.preventDefault();
+			event.stopPropagation();
+		} else {
+			_doKeyDown(event);
+		}
+	}
+});
+
 /**
  * The DateTime input widget.
  */
@@ -401,6 +447,11 @@ var DateTimeItem = {
 			updateModel();
 		});
 		input.on('keydown', function(e){
+
+			if (e.isDefaultPrevented()) {
+				return;
+			}
+
 			if (e.keyCode === $.ui.keyCode.DOWN) {
 				input.datetimepicker('show');
 				e.stopPropagation();
