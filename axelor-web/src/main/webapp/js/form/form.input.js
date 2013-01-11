@@ -369,8 +369,7 @@ var DateTimeItem = {
 	mask: 'DD/MM/YYYY HH:mm',
 
 	link: function(scope, element, attrs, controller) {
-		
-		var self = this;
+
 		var input = element.children('input:first');
 		var button = element.find('i:first');
 		var options = {
@@ -381,8 +380,12 @@ var DateTimeItem = {
 			onSelect: function(dateText, inst) {
 				input.mask('value', dateText);
 				updateModel();
-				if (!inst.timeDefined)
+				if (!inst.timeDefined) {
 					input.datetimepicker('hide');
+					setTimeout(function(){
+						input.focus().select();
+					});
+				}
 			}
 		};
 
@@ -394,24 +397,23 @@ var DateTimeItem = {
 		input.mask({
 			mask: this.mask
 		});
-
-		var changed = false;
 		input.on('change', function(){
-			changed = true;
-		});
-		input.on('blur', function(){
-			if (changed) {
-				updateModel();
-			}
-			changed = false;
+			updateModel();
 		});
 		input.on('keydown', function(e){
-			if (e.altKey && e.keyCode === $.ui.keyCode.DOWN) {
+			if (e.keyCode === $.ui.keyCode.DOWN) {
 				input.datetimepicker('show');
+				e.stopPropagation();
 				e.preventDefault();
+				return false;
 			}
 			if (e.keyCode === $.ui.keyCode.ENTER && $(this).datepicker("widget").is(':visible')) {
+				e.stopPropagation();
 				e.preventDefault();
+				return false;
+			}
+			if (e.keyCode === $.ui.keyCode.ENTER) {
+				updateModel();
 			}
 		});
 		button.click(function(e, ui){
@@ -421,12 +423,13 @@ var DateTimeItem = {
 			input.datetimepicker('show');
 		});
 
+		var that = this;
 		function updateModel() {
 			var value = input.datetimepicker('getDate'),
 				onChange = element.data('$onChange');
 
 			if (angular.isDate(value)) {
-				value = self.isDate ? moment(value).sod().format('YYYY-MM-DD') : moment(value).format();
+				value = that.isDate ? moment(value).sod().format('YYYY-MM-DD') : moment(value).format();
 			}
 			
 			if (controller.$viewValue === value)
@@ -444,7 +447,7 @@ var DateTimeItem = {
 		controller.$render = function () {
 			var value = controller.$viewValue;
 			if (value) {
-				value = moment(value).format(self.format);
+				value = moment(value).format(that.format);
 				input.mask('value', value);
 				input.datetimepicker('setDate', value);
 			} else {
