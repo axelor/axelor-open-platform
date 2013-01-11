@@ -910,12 +910,15 @@ var OneToManyInline = _.extend({}, OneToManyItem, {
 			.css("position", "absolute")
 			.hide();
 
-		var render = model.$render;
-		var canRender = false;
+		var render = model.$render,
+			renderPending = false;
 		model.$render = function() {
 			var value = scope.getValue();
-			if (canRender || !value) {
+			if (wrapper.is(":visible")) {
+				renderPending = false;
 				render();
+			} else {
+				renderPending = true;
 			}
 		};
 		
@@ -939,13 +942,15 @@ var OneToManyInline = _.extend({}, OneToManyItem, {
 		}
 		
 		element.on("show:slick-editor", function(e){
-			canRender = true;
+			if (renderPending) {
+				renderPending = false;
+				render();
+			}
 			wrapper.show();
 			adjust();
 		});
 
 		element.on("hide:slick-editor", function(e){
-			canRender = false;
 			wrapper.hide();
 		});
 		
@@ -959,7 +964,6 @@ var OneToManyInline = _.extend({}, OneToManyItem, {
 		});
 		
 		scope.$on("$destroy", function(e){
-			canRender = false;
 			wrapper.remove();
 		});
 	},
