@@ -395,4 +395,5 @@ table.field-details .help-text hr {
 	width: inherit;
 	min-width: 280px;
 	max-width: 360px;
+	display: table;
 }
