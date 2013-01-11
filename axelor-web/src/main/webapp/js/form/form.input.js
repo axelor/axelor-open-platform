@@ -524,6 +524,9 @@ var SelectItem = {
 		});
 
 		scope.showSelection = function() {
+			if (scope.isReadonly(element)) {
+				return;
+			}
 			input.autocomplete("search" , '');
 		};
 		

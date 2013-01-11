@@ -719,6 +719,9 @@ var SuggestBox = _.extend({}, ManyToOneItem, {
 			minLength: 0
 		});
 		scope.showSelection = function() {
+			if (scope.isReadonly(element)) {
+				return;
+			}
 			input.autocomplete("search" , '');
 		};
 	},
