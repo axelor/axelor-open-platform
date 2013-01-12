@@ -12,7 +12,7 @@ function FormViewCtrl($scope, $element) {
 	$scope.$$original = null;
 	$scope.$$dirty = false;
 	
-	$scope._$events = {};
+	$scope.$events = {};
 	
 	/**
 	 * Get field attributes.
@@ -124,7 +124,7 @@ function FormViewCtrl($scope, $element) {
 		$scope.editRecord(record);
 		$scope.updateRoute();
 		$scope._viewPromise.then(function(){
-			var events = $scope._$events;
+			var events = $scope.$events;
 			if (events.onLoad && record) {
 				setTimeout(events.onLoad);
 			}
@@ -215,7 +215,7 @@ function FormViewCtrl($scope, $element) {
 	
 	$scope.$on("on:new", function(event){
 		$scope._viewPromise.then(function(){
-			var events = $scope._$events;
+			var events = $scope.$events;
 			if (events.onNew) {
 				setTimeout(events.onNew);
 			}
@@ -241,7 +241,7 @@ function FormViewCtrl($scope, $element) {
 	};
 
 	$scope.onSave = function() {
-		var events = $scope._$events,
+		var events = $scope.$events,
 			saveAction = events.onSave;
 		
 		function doSave() {

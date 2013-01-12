@@ -45,7 +45,7 @@ function EditorCtrl($scope, $element, DataSource) {
 			return;
 
 		var record = $scope.record,
-			events = $scope._$events,
+			events = $scope.$events,
 			saveAction = events.onSave;
 
 		function close(value) {

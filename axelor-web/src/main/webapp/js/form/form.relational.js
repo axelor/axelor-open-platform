@@ -146,7 +146,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		
 		var onSelect = $element.data('$onSelect');
 		if (onSelect) {
-			onSelect._handle().then(function(){
+			onSelect.handle().then(function(){
 				doShow();
 			});
 		} else {
@@ -179,7 +179,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 				model.$setViewValue(value);
 				model.$render();
 				if (onChange && fireOnChange) {
-					onChange._handle();
+					onChange.handle();
 				}
 			});
 		});
@@ -663,7 +663,7 @@ var ManyToOneItem = {
 			source: function(request, response) {
 				var onSelect = element.data('$onSelect');
 				if (onSelect && !onSelectFired) {
-					onSelect._handle().then(function(){
+					onSelect.handle().then(function(){
 						search(request, response);
 					});
 					onSelectFired = true;

@@ -491,7 +491,7 @@ var DateTimeItem = {
 			});
 			
 			if (onChange) {
-				onChange._handle();
+				onChange.handle();
 			}
 		}
 
@@ -589,7 +589,7 @@ var SelectItem = {
 			scope.$apply(function(){
 				model.$setViewValue(value);
 				if (onChange) {
-					onChange._handle();
+					onChange.handle();
 				}
 			});
 		}
