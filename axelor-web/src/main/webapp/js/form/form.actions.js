@@ -96,54 +96,74 @@ ActionHandler.prototype = {
 	constructor: ActionHandler,
 	
 	onLoad : function() {
-		return this._handle();
+		return this.handle();
 	},
 	
 	onNew: function() {
-		return this._handle();
+		return this.handle();
 	},
 	
 	onSave: function() {
-		return this._handle();
+		return this.handle();
 	},
 	
 	onSelect: function() {
-		return this._handle();
+		return this.handle();
 	},
 	
 	onClick: function(event) {
 		var self = this;
 		if (this.prompt) {
+			var deferred = this.ws.defer(),
+				promise = deferred.promise;
 			axelor.dialogs.confirm(this.prompt, function(confirmed){
-				if (confirmed)
-					self._handle();
+				if (confirmed) {
+					self.handle().then(deferred.resolve, deferred.reject);
+				} else {
+					deferred.reject();
+				}
 			});
-		} else
-			this._handle();
+			return promise;
+		}
+		return this.handle();
 	},
 
 	onChange: function(event) {
-		var element = $(event.target);
+		var element = $(event.target),
+			deferred = this.ws.defer(),
+			promise = deferred.promise;
+
 		if (element.is('[type="checkbox"],.select-item')) {
 			var self = this;
-			return setTimeout(function(){
-				return self._handle();
+			setTimeout(function(){
+				self.handle().then(deferred.resolve, deferred.reject);
 			});
+			return promise;
 		}
+
+		this._onChangeDeferred = deferred;
 		this._onChangePending = true;
+		
+		return promise;
 	},
 	
 	onBlur: function(event) {
+		var deferred = this._onChangeDeferred || this.ws.defer(),
+			promise = deferred.promise;
 		if (this._onChangePending) {
 			this._onChangePending = false;
-			return this._handle();
+			this._onChangeDeferred = null;
+			this.handle().then(deferred.resolve, deferred.reject);
+		} else {
+			deferred.resolve();
 		}
+		return promise;
 	},
 	
-	_handle: function() {
+	handle: function() {
 		var actions = _.invoke(this.action.split(','), 'trim'),
 			context = this._getContext();
-			
+		
 		return this._handleActions(actions, context).then(function(){
 			//DONE!
 		});
@@ -485,7 +505,7 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 				element: element,
 				action: action
 			});
-			scope._$events.onNew = _.bind(handler.onNew, handler);
+			scope.$events.onNew = _.bind(handler.onNew, handler);
 		}
 		
 		action = props.onLoad;
@@ -494,7 +514,7 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 				element: element,
 				action: action
 			});
-			scope._$events.onLoad = _.bind(handler.onLoad, handler);
+			scope.$events.onLoad = _.bind(handler.onLoad, handler);
 		}
 		
 		action = props.onSave;
@@ -503,7 +523,7 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 				element: element,
 				action: action
 			});
-			scope._$events.onSave = _.bind(handler.onSave, handler);
+			scope.$events.onSave = _.bind(handler.onSave, handler);
 		}
 	};
 }]);
