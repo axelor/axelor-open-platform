@@ -595,24 +595,19 @@ Grid.prototype.findPrevEditable = function(row, posX) {
 };
 
 Grid.prototype.saveChanges = function(args) {
-	
+
+	var grid = this.grid,
+		lock = grid.getEditorLock();
+
+	if ((lock.isActive() && !lock.commitCurrentEdit()) || !this.editorScope.isValid()) {
+		return false;
+	}
+
 	if (args == null) {
 		args = _.extend({ row: 0, cell: 0 }, this.grid.getActiveCell());
 		args.item = this.grid.getDataItem(args.row);
 	}
-
-	var grid = this.grid,
-		lock = grid.getEditorLock(),
-		canSave = this.editorScope.isValid();
 	
-	if (lock.isActive()) {
-		canSave = canSave && lock.commitCurrentEdit();
-	}
-
-	if (!canSave) {
-		return false;
-	}
-
 	var self = this,
 		data = this.scope.dataView,
 		item = data.getItem(args.row);
