@@ -831,6 +831,14 @@ Grid.prototype.onSort = function(event, args) {
 };
 
 Grid.prototype.onItemClick = function(event, args) {
+	if (this.grid.getEditorLock().isActive()) {
+		this.grid.getEditorLock().commitCurrentEdit();
+	}
+	// prevent edit if some action is still in progress
+	if (this.isDirty() && axelor.blockUI()) {
+		event.stopImmediatePropagation();
+		return false;
+	}
 	if (this.editable) {
 		return;
 	}
