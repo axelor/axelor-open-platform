@@ -77,7 +77,7 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 		var blocker = $('<div>').appendTo('body').hide()
 			.css({
 				position: 'absolute',
-				zIndex: 10000000000,
+				zIndex: 100000,
 				width: '100%', height: '100%'
 			});
 
@@ -88,6 +88,9 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 			if (loadingCounter > 0) {
 				blocked = true;
 				doc.on("keydown.blockui mousedown.blockui", function(e) {
+					if ($('#loginWindow').is(':visible')) {
+						return;
+					}
 					e.preventDefault();
 					e.stopPropagation();
 				});
@@ -189,6 +192,7 @@ function AppCtrl($scope, $http, $route, authService) {
 				resizable: false,
 				closeOnEscape: false,
 				dialogClass: 'no-close',
+				zIndex: 100001,
 				buttons: [{
 					text: _t("Login"),
 					click: function(){
