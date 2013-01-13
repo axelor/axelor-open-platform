@@ -785,6 +785,9 @@ Grid.prototype.setEditors = function(form, formScope) {
 		item = grid.getDataItem(cell.row);
 		if (item) {
 			editor = grid.getCellEditor();
+			if (grid.getEditorLock().isActive()) {
+				grid.getEditorLock().commitCurrentEdit();
+			}
 			item = _.extend(item, values);
 
 			grid.updateRowCount();
