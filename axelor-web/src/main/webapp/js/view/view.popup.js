@@ -169,11 +169,10 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 			}
 
 			function autoSize() {
-				var elem = element.find('table:first'),
-					maxWidth = $(document).width() - 8,
+				var maxWidth = $(document).width() - 8,
 					maxHeight = $(document).height() - 8,
-					width = elem.outerWidth(true) + 32,
-					height = elem.outerHeight(true) + 16;
+					width = element[0].scrollWidth + 32,
+					height = element[0].scrollHeight + 16;
 
 				height += element.parent().children('.ui-dialog-titlebar').outerHeight(true);
 				height += element.parent().children('.ui-dialog-buttonpane').outerHeight(true);
