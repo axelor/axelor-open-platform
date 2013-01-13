@@ -71,6 +71,51 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 		provider.defaults.transformRequest.push(onHttpStart);
 	}])
 	.factory('httpIndicator', ['$rootScope', '$q', function($rootScope, $q){
+		
+		var doc = $(document);
+		var body = $('body');
+		var blocker = $('<div>').appendTo('body').hide()
+			.css({
+				position: 'absolute',
+				zIndex: 10000000000,
+				width: '100%', height: '100%'
+			});
+
+		var blocked = false;
+		
+		function block() {
+			if (blocked) return true;
+			if (loadingCounter > 0) {
+				blocked = true;
+				doc.on("keydown.blockui mousedown.blockui", function(e) {
+					e.preventDefault();
+					e.stopPropagation();
+				});
+				body.css("cursor", "wait");
+				blocker.show();
+				unblock();
+			}
+			return blocked;
+		}
+
+		function unblock() {
+			if (loadingCounter > 0) {
+				return _.delay(unblock, 10);
+			}
+			doc.off("keydown.blockui mousedown.blockui");
+			body.css("cursor", "");
+			blocker.hide();
+			blocked = false;
+		}
+
+		axelor.blockUI = function() {
+			return block();
+		};
+
+		axelor.unblockUI = function() {
+			return unblock();
+		};
+
 		return function(promise) {
 			return promise.then(function(response){
 				onHttpStop();

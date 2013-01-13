@@ -164,9 +164,10 @@ ActionHandler.prototype = {
 		var actions = _.invoke(this.action.split(','), 'trim'),
 			context = this._getContext();
 		
-		return this._handleActions(actions, context).then(function(){
-			//DONE!
-		});
+		// block the entire ui (auto unblocks when actions are complete)
+		_.delay(axelor.blockUI, 100);
+
+		return this._handleActions(actions, context);
 	},
 	
 	_getContext: function() {
