@@ -225,6 +225,8 @@ var IntegerItem = {
 		
 		function updateModel(value){
 			
+			var onChange = element.data('$onChange');
+			
 			if(!isValid(value)){
 	            return ;
             }
@@ -255,15 +257,14 @@ var IntegerItem = {
 			
 			}
 			
-			if (model.$viewValue === value)
-				return;
-			
 			element.val(value);
-			setTimeout(function(){
-				scope.$apply(function(){
-					model.$setViewValue(value);
-				});
+			scope.$apply(function(){
+				model.$setViewValue(value);
 			});
+			
+		    if (onChange) {
+				onChange._handle();
+			}
 			
 		}
 		
