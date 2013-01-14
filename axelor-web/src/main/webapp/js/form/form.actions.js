@@ -481,7 +481,7 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 				action: action
 			});
 			
-			if (element.is('.input-append,.picker-input') || !(element.is(':input'))) {
+			if (element.is('.input-append,.picker-input') || !(element.is(':input')) || element.is('.decimal-item')) {
 				element.data('$onChange', handler);
 			} else {
 				var input = element.find(':input:first').andSelf().last();
