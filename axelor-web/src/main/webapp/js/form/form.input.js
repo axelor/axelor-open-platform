@@ -197,7 +197,8 @@ var IntegerItem = {
 
 		var props = scope.getViewDef(element),
 			scale = props.scale || this.scale,
-			format = "n" + (_.isUndefined(scale) ? 0 : scale);
+			format = "n" + (_.isUndefined(scale) ? 0 : scale),
+			self = this;
 		
 		var options = {
 			step: 1,
@@ -210,9 +211,60 @@ var IntegerItem = {
             model.$setValidity('format', isNumber);
             return isNumber ? viewValue : undefined;
         });
+		
+		element.change(function(e, ui) {
+			updateModel(element.val())
+		});
 
 		function isValid(text) {
-			return _.isEmpty(text) || /^(-)?\d+(\.\d+)?$/.test(text);
+
+			if(self.isDecimal) { return  _.isEmpty(text) || /^(-)?\d+(\.\d+)?$/.test(text); }
+			return  _.isEmpty(text) || /^\s*-?[0-9]*\s*$/.test(text);
+			
+		}
+		
+		function updateModel(value){
+			
+			if(!isValid(value)){
+	            return ;
+            }
+
+			//Formatting value of decimal field : Apply scale
+			if(self.isDecimal){
+				
+				parts = value.toString().split(/\./);
+				integer = +parts[0];
+				decimal = +parts[1];
+				decimal_points = scale || 2; //Default scale : 2
+				
+				if(value == 0) {
+					var decimals = "";
+					for(var i=0;i<decimal_points;i++) decimals += "0";
+					value = "0."+decimals;
+				}
+				else{
+					var exponent = Math.pow(10,decimal_points);
+					var num = Math.round((value * exponent)).toString();
+					if(integer == 0){
+						value = "0." + num.slice(-1*decimal_points)
+					}
+					else{
+						value = num.slice(0,-1*decimal_points) + "." + num.slice(-1*decimal_points)
+					}
+				}
+			
+			}
+			
+			if (model.$viewValue === value)
+				return;
+			
+			element.val(value);
+			setTimeout(function(){
+				scope.$apply(function(){
+					model.$setViewValue(value);
+				});
+			});
+			
 		}
 		
 		function onSpin(event, ui) {
@@ -251,12 +303,7 @@ var IntegerItem = {
 			if (_.isNumber(max) && value > max)
 				value = max;
 
-			element.val(value);
-			setTimeout(function(){
-				scope.$apply(function(){
-					model.$setViewValue(value);
-				});
-			});
+			updateModel(value);
 		}
 
 		if (props.minSize !== undefined)
@@ -282,7 +329,8 @@ var IntegerItem = {
  */
 var DecimalItem = _.extend({}, IntegerItem, {
 	css: 'decimal-item',
-	step: 2
+	step: 2,
+	isDecimal: true
 });
 
 /**
