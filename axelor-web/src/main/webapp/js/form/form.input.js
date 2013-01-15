@@ -203,7 +203,10 @@ var IntegerItem = {
 		var options = {
 			step: 1,
 			numberFormat: format,
-			spin: onSpin
+			spin: onSpin,
+			change: function( event, ui ) {
+				updateModel(element.val(),true)
+			}
 		};
 		
 		model.$parsers.unshift(function(viewValue) {
@@ -211,10 +214,6 @@ var IntegerItem = {
             model.$setValidity('format', isNumber);
             return isNumber ? viewValue : undefined;
         });
-		
-		element.change(function(e, ui) {
-			updateModel(element.val())
-		});
 
 		function isValid(text) {
 
@@ -223,7 +222,7 @@ var IntegerItem = {
 			
 		}
 		
-		function updateModel(value){
+		function updateModel(value,handle){
 			
 			var onChange = element.data('$onChange');
 			
@@ -262,8 +261,9 @@ var IntegerItem = {
 				model.$setViewValue(value);
 			});
 			
-		    if (onChange) {
-				onChange._handle();
+			
+		    if (onChange && handle) {
+				onChange.handle();
 			}
 			
 		}
@@ -304,7 +304,7 @@ var IntegerItem = {
 			if (_.isNumber(max) && value > max)
 				value = max;
 
-			updateModel(value);
+			updateModel(value,false);
 		}
 
 		if (props.minSize !== undefined)
