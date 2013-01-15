@@ -61,6 +61,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	
 	$scope.ngModel = null;
 	$scope.editorCanSave = true;
+	$scope.editorCanReload = field.canReload;
 
 	if (initCallback) {
 		initCallback.call(this);
@@ -127,10 +128,25 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		}
 		
 		//TODO: handle other modes
-		
+
+		if ($scope.editorCanReload && record && record.id) {
+			var parent = $scope.$parent;
+			if (parent && parent.canSave()) {
+				return parent.onSave().then(function(){
+					$scope.showPopupEditor(record);
+				});
+			}
+		}
 		return $scope.showPopupEditor(record);
 	};
 	
+	$scope.parentReload = function() {
+		var parent = $scope.$parent;
+		if (parent) {
+			parent.reload();
+		}
+	};
+
 	$scope.showSelector = function() {
 		if ($scope.isReadonly($element)) {
 			return;

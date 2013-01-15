@@ -55,6 +55,9 @@ function EditorCtrl($scope, $element, DataSource) {
 			}
 			canClose = true;
 			$element.dialog('close');
+			if ($scope.editorCanReload) {
+				$scope.parentReload();
+			}
 		};
 		
 		function doSave() {
