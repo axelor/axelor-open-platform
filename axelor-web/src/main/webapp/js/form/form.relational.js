@@ -660,16 +660,30 @@ var ManyToOneItem = {
 			fields = _.chain(fields).compact().unique().value();
 
 			_.each(fields, function(name){
-				if (name !== "id") {
+				if (name !== "id" && request.term) {
 					filter[name] = request.term;
 				}
 			});
+			
+			var domain = scope._domain,
+				context = scope._context;
 
-			ds.search({
+			if (domain && scope.getContext) {
+				context = _.extend({}, context, scope.getContext());
+			}
+
+			var params = {
 				filter: filter,
 				fields: fields,
 				limit: 10
-			}).success(function(records, page){
+			};
+			
+			if (domain) {
+				params.domain = domain;
+				params.context = context;
+			}
+
+			ds.search(params).success(function(records, page){
 				response(records);
 			});
 		}
