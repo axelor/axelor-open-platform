@@ -246,15 +246,15 @@ function FormViewCtrl($scope, $element) {
 		
 		function doSave() {
 			var dummy = $scope.getDummyValues();
-			ds.save($scope.record).success(function(record, page) {
-				doEdit(record.id, dummy);
+			return ds.save($scope.record).success(function(record, page) {
+				return doEdit(record.id, dummy);
 			});
 		}
 		
 		if (saveAction) {
-			saveAction().then(doSave);
-		} else
-			doSave();
+			return saveAction().then(doSave);
+		}
+		return doSave();
 	};
 	
 	$scope.confirmDirty = function(callback) {
