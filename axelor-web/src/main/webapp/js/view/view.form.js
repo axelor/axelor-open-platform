@@ -367,15 +367,29 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 				}
 				
 				var widget = this.widget || '',
-					match = widget.match(/([\w_-]+)(?:\[(.*?)\])/),
+					match = widget.match(/^([\w-]*)\[(.*?)\]$/),
 					attrs = {}, widgetAttrs = {};
-
+				
 				if (match) {
-					widget = match[1];
+					widget = match[1].trim();
 					_.each(match[2].split(/\s*\|\s*/), function(part) {
 						var parts = part.split(/\s*=\s*/);
-						attrs[parts[0]] = parts[1];
-						widgetAttrs['x-' + parts[0]] = parts[1];
+						var attrName = parts[0].trim();
+						var attrValue = parts[1].trim();
+						if (attrValue.match(/^(\d+)$/)) {
+							attrValue = +attrValue;
+						}
+						if (attrValue === "true") {
+							attrValue = true;
+						}
+						if (attrValue === "false") {
+							attrValue = false;
+						}
+						if (attrValue === "null") {
+							attrValue = null;
+						}
+						attrs[attrName] = attrValue;
+						widgetAttrs['x-' + attrName] = attrValue;
 					});
 				}
 			
