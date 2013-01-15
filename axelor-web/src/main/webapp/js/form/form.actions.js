@@ -442,6 +442,12 @@ ActionHandler.prototype = {
 			scope.openTab(tab);
 		}
 		
+		if (data.canClose) {
+			if (scope.onOK) {
+				scope.onOK();
+			}
+		}
+		
 		callback(true);
 	}
 };
