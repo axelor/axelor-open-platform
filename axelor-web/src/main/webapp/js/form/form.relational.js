@@ -270,7 +270,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		var embedded = $('<div ui-nested-editor></div>')
 			.attr('ng-model', $element.attr('ng-model'))
 			.attr('name', $element.attr('name'))
-			.attr('title', $element.attr('x-title'))
+			.attr('x-title', $element.attr('x-title'))
 			.attr('x-path', $element.attr('x-path'));
 
 		embedded = ViewService.compile(embedded)($scope);
@@ -362,7 +362,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	$scope.createNestedEditor = function() {
 
 		embedded = $('<div ui-embedded-editor class="inline-form"></div>');
-		embedded.attr('title', $element.attr('x-title'));
+		embedded.attr('x-title', $element.attr('x-title'));
 		embedded = ViewService.compile(embedded)($scope);
 		embedded.hide();
 		
@@ -383,7 +383,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	
 	$scope.showDetailView = function() {
 		if (detailView == null) {
-			detailView = $('<div ui-embedded-editor class="detail-form"></div>').attr('title', $element.attr('x-title'));
+			detailView = $('<div ui-embedded-editor class="detail-form"></div>').attr('x-title', $element.attr('x-title'));
 			detailView = ViewService.compile(detailView)($scope);
 			detailView.data('$rel', $());
 			detailView.data('$scope').isDetailView = true;
