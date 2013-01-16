@@ -14,6 +14,8 @@ class Entity {
 	String module
 
 	String namespace
+	
+	String baseClass
 
 	boolean sequential
 	
@@ -34,6 +36,7 @@ class Entity {
 		module = node.parent().module.@name
 		sequential = node.@sequential == "true"
 		groovy = node.@lang == "groovy"
+		baseClass = "com.axelor.db.Model"
 		documentation = findDocs(node)
 		
 		if (!name) {
@@ -51,7 +54,6 @@ class Entity {
 		importManager = new ImportManager(namespace, groovy)
 		
 		importType("com.axelor.db.JPA")
-		importType("com.axelor.db.Model")
 		importType("com.axelor.db.Query")
 		
 		properties = []
@@ -66,6 +68,10 @@ class Entity {
 		
 		Property idp = Property.idProperty(this)
 		properties = [idp] + properties
+		
+		if (node.@logUpdates != "false") {
+			baseClass = "com.axelor.auth.db.AuditableModel"
+		}
 	}
 	
 	List<Property> getFields() {
@@ -76,6 +82,10 @@ class Entity {
 		namespace.replace(".", "/") + "/" + name + "." + (groovy ? "groovy" : "java")
 	}
 	
+	String getBaseClass() {
+		return importType(baseClass)
+	}
+
 	String findDocs(parent) {
 		def children = parent.getAt(0).children
 		for (child in children) {
