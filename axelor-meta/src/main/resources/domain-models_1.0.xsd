@@ -492,5 +492,14 @@
         </xsd:restriction>
       </xsd:simpleType>
     </xsd:attribute>
+    <xsd:attribute name="logUpdates" type="xsd:boolean" default="true">
+      <xsd:annotation>
+        <xsd:documentation>
+        Whether to log `creation date, last modified date, user who created the record and
+        user who modified it last` information. The information is stored in these four
+        fields respectively `createdOn, updatedOn, createdBy, and updatedBy`
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 </xsd:schema>
