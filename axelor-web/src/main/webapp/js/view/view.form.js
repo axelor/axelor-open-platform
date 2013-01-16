@@ -106,7 +106,7 @@ function FormViewCtrl($scope, $element) {
 	$scope.setRouteOptions = function(options) {
 		var opts = options || {},
 			record = $scope.record || {},
-			state = +opts.state;
+			state = +opts.state || null;
 
 		$scope._routeSearch = opts.search;
 		if (record.id == state) {
