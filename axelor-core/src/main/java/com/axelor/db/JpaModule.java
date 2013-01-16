@@ -66,6 +66,7 @@ public class JpaModule extends AbstractModule {
 		log.info("Initialize JPA...");
 		Properties properties = new Properties();
 		properties.put("hibernate.connection.autocommit", "false");
+		properties.put("hibernate.ejb.interceptor", "com.axelor.auth.db.AuditInterceptor");
 		if (this.autoscan) {
 			properties.put("hibernate.ejb.resource_scanner", "com.axelor.db.JpaScanner");
 		}
