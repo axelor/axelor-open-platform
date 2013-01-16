@@ -3,9 +3,9 @@
 
   <parent>
     <groupId>com.axelor</groupId>
-    <artifactId>axelor-module-parent</artifactId>
+    <artifactId>axelor-base-parent</artifactId>
     <version>0.0.7-SNAPSHOT</version>
-    <relativePath>../axelor-module-parent/pom.xml</relativePath>
+    <relativePath>../axelor-base-parent/pom.xml</relativePath>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -40,7 +40,23 @@
 
   <!-- module specific build configuration -->
   <build>
-
+    <plugins>
+      <plugin>
+        <groupId>com.axelor</groupId>
+        <artifactId>axelor-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 
 </project>
