@@ -3,93 +3,13 @@
 
   <parent>
     <groupId>com.axelor</groupId>
-    <artifactId>axelor-parent</artifactId>
+    <artifactId>axelor-base-parent</artifactId>
     <version>0.0.7-SNAPSHOT</version>
-    <relativePath>../axelor-parent/pom.xml</relativePath>
+    <relativePath>../axelor-base-parent/pom.xml</relativePath>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>axelor-tools</artifactId>
   <name>Axelor :: Tools</name>
-
-  <dependencies>
-
-    <!-- Axelor Core API -->
-    <dependency>
-      <groupId>com.axelor</groupId>
-      <artifactId>axelor-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <!-- Axelor Test API -->
-    <dependency>
-      <groupId>com.axelor</groupId>
-      <artifactId>axelor-test</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- Groovy -->
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
-    </dependency>
-
-  </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <compilerId>groovy-eclipse-compiler</compilerId>
-          <verbose>false</verbose>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-eclipse-compiler</artifactId>
-            <version>2.7.0-01</version>
-          </dependency>
-          <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-eclipse-batch</artifactId>
-            <version>2.0.0-01</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>add-source</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>src/main/groovy</source>
-              </sources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>add-test-source</id>
-            <phase>generate-test-sources</phase>
-            <goals>
-              <goal>add-test-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>src/test/groovy</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>
