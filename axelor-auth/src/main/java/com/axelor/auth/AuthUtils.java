@@ -1,6 +1,7 @@
 package com.axelor.auth;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.subject.Subject;
 
 import com.axelor.auth.db.User;
@@ -8,7 +9,11 @@ import com.axelor.auth.db.User;
 public class AuthUtils {
 	
 	public static Subject getSubject() {
-		return SecurityUtils.getSubject();
+		try {
+			return SecurityUtils.getSubject();
+		} catch (UnavailableSecurityManagerException e){
+		}
+		return null;
 	}
 
 	public static User getUser() {
