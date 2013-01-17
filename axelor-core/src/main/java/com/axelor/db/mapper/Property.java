@@ -350,7 +350,10 @@ public class Property {
 			else
 				this.add(bean, value);
 		} else {
-			Mapper.of(entity).set(bean, name, setAssociation(value, bean));
+			// ignore readonly fields
+			if (Mapper.of(entity).getSetter(name) != null) {
+				Mapper.of(entity).set(bean, name, setAssociation(value, bean));
+			}
 		}
 
 		return old;
