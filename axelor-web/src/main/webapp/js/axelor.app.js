@@ -151,8 +151,8 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 
 })(jQuery);
 
-AppCtrl.$inject = ['$scope', '$http', '$route', 'authService'];
-function AppCtrl($scope, $http, $route, authService) {
+AppCtrl.$inject = ['$rootScope', '$scope', '$http', '$route', 'authService'];
+function AppCtrl($rootScope, $scope, $http, $route, authService) {
 
 	function getAppInfo(settings) {
 		return {
@@ -173,7 +173,17 @@ function AppCtrl($scope, $http, $route, authService) {
 	}
 
 	// See index.jsp
-	$scope.app = getAppInfo(__appSettings);
+	$rootScope.app = getAppInfo(__appSettings);
+
+	$rootScope.$applyLater = function(callback) {
+		var self = this,
+			ctx = arguments[1];
+		setTimeout(function(){
+			self.$apply(function(){
+				return ctx ? callback.apply(ctx) : callback();
+			});
+		});
+	};
 	
 	var loginAttempts = 0;
 	var loginWindow = null;
