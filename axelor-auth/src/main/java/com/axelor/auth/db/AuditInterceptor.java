@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.Transaction;
 import org.hibernate.type.Type;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 
 import com.axelor.auth.AuthUtils;
@@ -33,7 +34,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 		}
 		for (int i = 0; i < propertyNames.length; i++) {
 			if ("updatedOn".equals(propertyNames[i])) {
-				currentState[i] = new LocalDateTime();
+				currentState[i] = new LocalDateTime(DateTimeZone.UTC);
 			}
 			if ("updatedBy".equals(propertyNames[i])) {
 				currentState[i] = currentUser.get();
@@ -50,7 +51,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 		}
 		for (int i = 0; i < propertyNames.length; i++) {
 			if ("createdOn".equals(propertyNames[i])) {
-				state[i] = new LocalDateTime();
+				state[i] = new LocalDateTime(DateTimeZone.UTC);
 			}
 			if ("createdBy".equals(propertyNames[i])) {
 				state[i] = currentUser.get();
