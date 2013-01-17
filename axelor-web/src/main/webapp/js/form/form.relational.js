@@ -51,7 +51,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		
 		views.form = formView || views.form;
 		views.grid = gridView || views.grid;
-		params.summaryView = summaryView;
+		params.summaryView = angular.copy(summaryView);
 		
 		params.views = _.compact([views.grid, views.form]);
 		$scope._viewParams = params;
