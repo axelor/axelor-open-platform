@@ -579,6 +579,60 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 			}
 		};
 		
+		function getContent() {
+			var info = {};
+				record = scope.record || {};
+			if (record.createdOn) {
+				info.createdOn = moment(record.createdOn).format('DD/MM/YYYY HH:mm');
+				info.createdBy = (scope.record.createdBy || {}).name;
+			}
+			if (record.updatedOn) {
+				info.updatedOn = moment(record.updatedOn).format('DD/MM/YYYY HH:mm');
+				info.updatedBy = (scope.record.updatedBy || {}).name;
+			}
+			var table = $("<table class='field-details'>");
+			var tr;
+			
+			tr = $("<tr></tr>").appendTo(table);
+			$("<th></th>").text(_t("Created On:")).appendTo(tr);
+			$("<td></td>").text(info.createdOn).appendTo(tr);
+			
+			tr = $("<tr></tr>").appendTo(table);
+			$("<th></th>").text(_t("Created By:")).appendTo(tr);
+			$("<td></td>").text(info.createdBy).appendTo(tr);
+			
+			tr = $("<tr></tr>").appendTo(table);
+			$("<th></th>").text(_t("Updated On:")).appendTo(tr);
+			$("<td></td>").text(info.updatedOn).appendTo(tr);
+			
+			tr = $("<tr></tr>").appendTo(table);
+			$("<th></th>").text(_t("Updated By:")).appendTo(tr);
+			$("<td></td>").text(info.updatedBy).appendTo(tr);
+			
+			return table;
+		}
+		
+		var logInfo = null;
+		scope.onShowLog = function(e) {
+			if (logInfo === null) {
+				logInfo = $(e.target).parents("div:first").find("button").popover({
+					title: _t('Update Log'),
+					html: true,
+					content: getContent,
+					placement: "bottom"
+				});
+				logInfo.popover('show');
+			}
+			
+		};
+		
+		scope.$on("$destroy", function() {
+			if (logInfo != null) {
+				logInfo.popover("destroy");
+				logInfo = null;
+			}
+		});
+		
 		scope.$watch('schema', function(schema){
 
 			if (schema == null || loaded)

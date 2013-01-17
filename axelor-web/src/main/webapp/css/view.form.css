@@ -382,6 +382,10 @@ table.field-details th {
 	text-align: right;
 }
 
+table.field-details td {
+	padding-left: 4px;
+}
+
 table.field-details .help-text hr {
 	margin: 9px 0;
 }
