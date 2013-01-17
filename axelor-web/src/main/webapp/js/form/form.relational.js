@@ -814,7 +814,11 @@ var OneToManyItem = {
 			
 			if (this.collapseIfEmpty) {
 				scope.$watch(attrs.ngModel, function(value){
-					element.css('min-height', value && value.length ? 200 : '');
+					var minHeight = _.isEmpty(value) ? '' : 200;
+					element.css('min-height', minHeight);
+					if (minHeight) {
+						$.event.trigger('adjustSize');
+					}
 				});
 			}
 
