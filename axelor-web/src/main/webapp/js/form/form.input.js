@@ -352,13 +352,7 @@ function createTwoDigitDefinition( maximum ) {
 	return function( value ) {
 		var number = parseInt( value, 10 );
 
-		if ( value === "" || /\D/.test( value ) ) {
-			return;
-		}
-
-		// allow "0" if it is the only character in the value,
-		// otherwise allow anything from 1 to maximum
-		if ( !number && value.length === 2 ) {
+		if (value === "" || /\D/.test(value) || _.isNaN(number)) {
 			return;
 		}
 
