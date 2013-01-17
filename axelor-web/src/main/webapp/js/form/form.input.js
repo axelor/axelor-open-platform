@@ -492,8 +492,16 @@ var DateTimeItem = {
 		input.mask({
 			mask: this.mask
 		});
-		input.on('change', function(){
-			updateModel();
+
+		var changed = false;
+		input.on('change', function(e, ui){
+			changed = true;
+		});
+		input.on('blur', function() {
+			if (changed) {
+				changed = false;
+				updateModel();
+			}
 		});
 		input.on('keydown', function(e){
 
@@ -535,7 +543,7 @@ var DateTimeItem = {
 			if (controller.$viewValue === value)
 				return;
 
-			scope.$apply(function(){
+			scope.$applyLater(function(){
 				controller.$setViewValue(value);
 			});
 			
@@ -544,12 +552,11 @@ var DateTimeItem = {
 			}
 		}
 
-		controller.$render = function () {
+		controller.$render = function() {
 			var value = controller.$viewValue;
 			if (value) {
 				value = moment(value).format(that.format);
 				input.mask('value', value);
-				input.datetimepicker('setDate', value);
 			} else {
 				input.mask('value', '');
 			}
