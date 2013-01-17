@@ -60,5 +60,10 @@ _t.put({
 "Warning": "Avertissement",
 "{0} to {1} of {2}": "{0} à {1} sur {2}",
 "{0} of {1}": "{0} sur {1}",
-"Orig. Value": "Valeur orig."
+"Orig. Value": "Valeur orig.",
+"Created On:": "Crée le:",
+"Created By:": "Crée par:",
+"Updated On:": "Mise à jour par:",
+"Updated By:": "Mise à jour le:",
+"Update Log": "Modifications"
 });
