@@ -247,10 +247,14 @@ var IntegerItem = {
 					var exponent = Math.pow(10,decimal_points);
 					var num = Math.round((value * exponent)).toString();
 					if(integer == 0){
-						value = "0." + num.slice(-1*decimal_points)
+						var value = "0.";
+						for(var i=num.length;i<decimal_points;i++) value += "0"; 
+						value += num.slice(-1*decimal_points);
 					}
 					else{
-						value = num.slice(0,-1*decimal_points) + "." + num.slice(-1*decimal_points)
+						var decimals = "";
+						for(var i=num.length;i<decimal_points;i++) decimals += "0";
+						value = num.slice(0,-1*decimal_points) + "." + decimals + num.slice(-1*decimal_points);
 					}
 				}
 			
