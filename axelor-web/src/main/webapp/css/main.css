@@ -145,6 +145,12 @@ html, body {
 	width: 12px;
 }
 
+.ui-dialog .ui-dialog-titlebar-close.ui-state-focus {
+	background: inherit;
+	border: inherit;
+	font-weight: inherit;
+}
+
 .ui-dialog-buttonpane {
 	background-color: #f5f5f5;
 	border-top: 1px solid #DDD;
