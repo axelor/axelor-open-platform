@@ -40,5 +40,6 @@ _t.put({
 "Version:": "Version:",
 "Warning": "Warning",
 "{0} to {1} of {2}": "{0} to {1} of {2}",
-"{0} of {1}": "{0} of {1}"
+"{0} of {1}": "{0} of {1}",
+"Orig. Value": "Orig. Value"
 });
