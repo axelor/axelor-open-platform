@@ -153,8 +153,8 @@ var Tabs = {
 	template:
 		'<div class="tabbable-tabs">' +
 			'<div class="nav-tabs-wrap">' +
-				'<div class="nav-tabs-scroll-l"><a tabindex="-1" href=""><i class="icon-chevron-left"></i></a></div>' +
-				'<div class="nav-tabs-scroll-r"><a tabindex="-1" href=""><i class="icon-chevron-right"></i></a></div>' +
+				'<div class="nav-tabs-scroll-l"><a tabindex="-1" href="#"><i class="icon-chevron-left"></i></a></div>' +
+				'<div class="nav-tabs-scroll-r"><a tabindex="-1" href="#"><i class="icon-chevron-right"></i></a></div>' +
 				'<div class="nav-tabs-strip">' +
 					'<ul class="nav nav-tabs">' +
 						'<li tabindex="-1" ng-repeat="tab in tabs" ng-class="{active:tab.selected}">'+
@@ -164,10 +164,10 @@ var Tabs = {
 				'</div>' +
 				'<div class="nav-tabs-menu">'+
 					'<div class="dropdown pull-right">'+
-						'<a class="dropdown-toggle" data-toggle="dropdown" href=""><i class="caret"></i></a>'+
+						'<a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="caret"></i></a>'+
 							'<ul class="dropdown-menu" role="menu">'+
 							    '<li ng-repeat="tab in tabs">'+
-							    	'<a tabindex="-1" href="" ng-click="select(tab)" ng-bind-html-unsafe="tab.title"></a>'+
+							    	'<a tabindex="-1" href="javascript: void(0)" ng-click="select(tab)" ng-bind-html-unsafe="tab.title"></a>'+
 							    '</li>' +
 							'</ul>' +
 						'</a>'+
