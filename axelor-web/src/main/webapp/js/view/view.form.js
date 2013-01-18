@@ -493,6 +493,10 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 
 			label = elem.data('label') || $();
 			classOp = flag ? 'addClass' : 'removeClass';
+			
+			if (elem.is('.tabbable-tabs')) {
+				elem = elem.children('.tab-content');
+			}
 
 			elem.add(label)[classOp]('ui-state-disabled');
 
@@ -526,29 +530,12 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 			
 			var div = elem.children('.disabled-overlay');
 			if (div.size() == 0) {
-				div = $('<div class="disabled-overlay"></div>').click(function(e){
-					handleNotebookTab(e, elem);
-				});
-				elem.append(div);
+				div = $('<div class="disabled-overlay"></div>').appendTo(elem);
 			}
 			
 			return flag ? div.show() : div.hide();
 		};
-		
-		function handleNotebookTab(e, elem) {
-			var elemOffset = elem.offset();
-			elem.find('.nav.nav-tabs a').each(function(){
-				var tab = $(this),
-					offset = tab.offset(),
-					x = offset.left - elemOffset.left,
-					y = offset.top - elemOffset.top;
-				if (e.offsetX > x && e.offsetX < x + tab.outerWidth() &&
-					e.offsetY > y && e.offsetY < y + tab.outerHeight()) {
-					tab.click();
-				}
-			});
-		}
-		
+
 		scope.setHidden = function(item, hidden) {
 			var flag = _.isUndefined(hidden) || hidden,
 				elem = findItem(item), label, label_parent, parent;

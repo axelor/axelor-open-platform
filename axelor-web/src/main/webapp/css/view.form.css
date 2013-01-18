@@ -183,6 +183,7 @@ table.form-layout .tabbable-tabs .nav-tabs {
 }
 
 table.form-layout .tabbable-tabs .tab-content {
+	position: relative;
 	padding: 4px;
 	border: 1px solid #DDD;
 	border-top: 0;
