@@ -257,6 +257,10 @@ ActionHandler.prototype = {
 			scope = this.scope,
 			formElement = this.element.parents('form:first');
 
+		if (!formElement.get(0)) { // toobar button
+			formElement = this.element.parents('.form-view:first').find('form:first');
+		}
+		
 		if (formElement.length == 0)
 			formElement = this.element;
 
