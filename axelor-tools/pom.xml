@@ -11,5 +11,14 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>axelor-tools</artifactId>
   <name>Axelor :: Tools</name>
+  
+  <dependencies>
+    <dependency>
+      <groupId>com.axelor</groupId>
+      <artifactId>axelor-auth</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
 </project>
