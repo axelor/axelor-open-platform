@@ -215,14 +215,6 @@ table.form-layout td.form-item .slickgrid {
 	border-top: none;
 }
 
-table.form-layout td.form-item .slickgrid .slick-cell,
-table.form-layout td.form-item .slickgrid .slick-header-column {
-	-webkit-box-sizing: content-box;
-	   -moz-box-sizing: content-box;
-	    -ms-box-sizing: content-box;
-	        box-sizing: content-box;
-}
-
 table.form-layout td.form-item .slickgrid .slick-cell.editable input,
 table.form-layout td.form-item .slickgrid .slick-cell.editable > [x-field] {
 	height: 23px;

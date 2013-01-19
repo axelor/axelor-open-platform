@@ -135,11 +135,17 @@ var Editor = function(args) {
 			scope.$apply();
 		});
 	};
-
-	this.focus = function() {
+	
+	function focus() {
+		// Firefox throws exception if element is hidden
+		if (element.is(':hidden')) return;
 		if (element.is(':input'))
 			return element.focus().select();
 		element.find(':input:first').focus().select();
+	}
+
+	this.focus = function() {
+		_.delay(focus);
 	};
 
 	this.loadValue = function(item) {

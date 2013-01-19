@@ -28,6 +28,14 @@
 	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 }
 
+.slickgrid .slick-cell,
+.slickgrid .slick-header-column {
+	-webkit-box-sizing: content-box;
+	   -moz-box-sizing: content-box;
+	    -ms-box-sizing: content-box;
+	        box-sizing: content-box;
+}
+
 .slick-row.odd {
   background: #F9F9F9;
 }
@@ -116,6 +124,13 @@
 
 .slick-cell .input-append > button {
 	display: none;
+}
+
+.slick-cell.editable * {
+	-webkit-box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	    -ms-box-sizing: border-box;
+	        box-sizing: border-box;
 }
 
 .slick-cell-checkboxsel {
