@@ -196,80 +196,56 @@ var IntegerItem = {
 	link: function(scope, element, attrs, model) {
 
 		var props = scope.getViewDef(element),
-			scale = props.scale || this.scale,
-			format = "n" + (_.isUndefined(scale) ? 0 : scale),
-			self = this;
+			scale = props.scale || this.scale;
 		
 		var options = {
 			step: 1,
-			numberFormat: format,
 			spin: onSpin,
 			change: function( event, ui ) {
-				updateModel(element.val(),true)
+				updateModel(element.val(), true);
 			}
 		};
-		
+
 		model.$parsers.unshift(function(viewValue) {
             var isNumber = _.isNumber(viewValue) || isValid(viewValue);
             model.$setValidity('format', isNumber);
             return isNumber ? viewValue : undefined;
         });
+		
+		var isDecimal = this.isDecimal,
+			pattern = isDecimal ? /^(-)?\d+(\.\d+)?$/ : /^\s*-?[0-9]*\s*$/;
 
 		function isValid(text) {
+			return  _.isEmpty(text) || pattern.test(text);
+		}
 
-			if(self.isDecimal) { return  _.isEmpty(text) || /^(-)?\d+(\.\d+)?$/.test(text); }
-			return  _.isEmpty(text) || /^\s*-?[0-9]*\s*$/.test(text);
-			
+		function format(value) {
+			if (isDecimal) {
+				var num = +value;
+				if (num) {
+					return num.toFixed(scale);
+				}
+			}
+			return value;
 		}
 		
-		function updateModel(value,handle){
-			
+		function updateModel(value, handle) {
 			var onChange = element.data('$onChange');
-			
-			if(!isValid(value)){
+
+			if (!isValid(value)) {
 	            return ;
             }
+			
+			value = format(value);
 
-			//Formatting value of decimal field : Apply scale
-			if(self.isDecimal){
-				
-				parts = value.toString().split(/\./);
-				integer = +parts[0];
-				decimal = +parts[1];
-				decimal_points = scale || 2; //Default scale : 2
-				
-				if(value == 0) {
-					var decimals = "";
-					for(var i=0;i<decimal_points;i++) decimals += "0";
-					value = "0."+decimals;
-				}
-				else{
-					var exponent = Math.pow(10,decimal_points);
-					var num = Math.round((value * exponent)).toString();
-					if(integer == 0){
-						var value = "0.";
-						for(var i=num.length;i<decimal_points;i++) value += "0"; 
-						value += num.slice(-1*decimal_points);
-					}
-					else{
-						var decimals = "";
-						for(var i=num.length;i<decimal_points;i++) decimals += "0";
-						value = num.slice(0,-1*decimal_points) + "." + decimals + num.slice(-1*decimal_points);
-					}
-				}
-			
-			}
-			
 			element.val(value);
 			scope.$apply(function(){
 				model.$setViewValue(value);
 			});
 			
-			
 		    if (onChange && handle) {
 				onChange.handle();
 			}
-			
 		}
 		
 		function onSpin(event, ui) {
@@ -292,8 +268,8 @@ var IntegerItem = {
 
 			parts = text.split(/\./);
 			integer = +parts[0];
-			decimal = +parts[1];
-			
+			decimal = parts[1];
+
 			integer += dir;
 			if (parts.length > 1) {
 				value = integer + '.' + decimal;
@@ -308,7 +284,7 @@ var IntegerItem = {
 			if (_.isNumber(max) && value > max)
 				value = max;
 
-			updateModel(value,false);
+			updateModel(value, false);
 		}
 
 		if (props.minSize !== undefined)
@@ -324,6 +300,14 @@ var IntegerItem = {
 			element.on("on:attrs-change", function(event, data) {
 				element.spinner(data.readonly ? "disable" : "enable");
 			});
+			model.$render = function() {
+				var value = model.$viewValue;
+				if (value) {
+					value = format(value);
+				}
+				element.val(value);
+			};
+			model.$render();
 		});
 	},
 	template: '<input type="text">'
