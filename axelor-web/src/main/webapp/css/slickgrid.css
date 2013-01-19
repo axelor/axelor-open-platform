@@ -144,3 +144,15 @@
 .slick-header-column.slick-cell-checkboxsel {
 	padding-top: 2px;
 }
+
+.slick-header-column.integer,
+.slick-header-column.decimal,
+.slick-cell.integer,
+.slick-cell.decimal {
+	text-align: right;
+}
+
+.slick-header-column.boolean,
+.slick-cell.boolean {
+	text-align: center;
+}

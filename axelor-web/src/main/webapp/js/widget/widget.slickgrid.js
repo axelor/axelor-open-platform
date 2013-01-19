@@ -2,43 +2,6 @@
 
 var ui = angular.module('axelor.ui');
 
-function formatter(row, cell, value, columnDef, dataContext) {
-	
-	if (value === null || value === undefined) {
-		return "";
-	}
-	if (_.isString(value) && value.trim() === "")
-		return "";
-	if (_.isObject(value) && _.isEmpty(value))
-		return "";
-
-	var field = columnDef.descriptor || {};
-	
-	if (_.isArray(field.selection)) {
-		var cmp = field.type === "integer" ? function(a, b) { return a == b ; } : _.isEqual;
-		var res = _.find(field.selection, function(item){
-			return cmp(item.value, value);
-		}) || {};
-		return res.title;
-	}
-	
-	switch(field.type) {
-	case 'many-to-one':
-		return value[field.targetName];
-	case 'one-to-many':
-	case 'many-to-many':
-		return '(' + value.length + ')';
-	case 'date':
-		return moment(value, 'YYYY-MM-DD').format('DD/MM/YYYY');
-	case 'datetime':
-		return moment(value, 'YYYY-MM-DD HH:mm').format('DD/MM/YYYY HH:mm');
-	case 'boolean':
-		return value ? '<i class="icon-ok"></i>' : "";
-	}
-
-	return value;
-}
-
 //used to keep track of columns by x-path
 function setDummyCols(element, cols) {
 	var e = $('<div>').appendTo(element).hide();
@@ -217,6 +180,58 @@ var Factory = {
 			return col.editor;
 		}
 		return col.editor = Editor;
+	},
+	
+	getFormatter: function(col) {
+		return _.bind(this.formatter, this);
+	},
+	
+	formatter: function(row, cell, value, columnDef, dataContext) {
+		
+		if (value === null || value === undefined) {
+			return "";
+		}
+		if (_.isString(value) && value.trim() === "")
+			return "";
+		if (_.isObject(value) && _.isEmpty(value))
+			return "";
+
+		var field = columnDef.descriptor || {};
+		
+		if (_.isArray(field.selection)) {
+			var cmp = field.type === "integer" ? function(a, b) { return a == b ; } : _.isEqual;
+			var res = _.find(field.selection, function(item){
+				return cmp(item.value, value);
+			}) || {};
+			return res.title;
+		}
+		
+		switch(field.type) {
+		case 'many-to-one':
+			return value[field.targetName];
+		case 'one-to-many':
+		case 'many-to-many':
+			return '(' + value.length + ')';
+		case 'date':
+			return moment(value, 'YYYY-MM-DD').format('DD/MM/YYYY');
+		case 'datetime':
+			return moment(value, 'YYYY-MM-DD HH:mm').format('DD/MM/YYYY HH:mm');
+		case 'boolean':
+			return value ? '<i class="icon-ok"></i>' : "";
+		case 'decimal':
+			return this.formatDecimal(field, value);
+		}
+
+		return value;
+	},
+	
+	formatDecimal: function(field, value) {
+		var scale = field.scale || 2,
+			num = +(value);
+		if (num) {
+			return num.toFixed(scale);
+		}
+		return value;
 	}
 };
 
@@ -254,8 +269,9 @@ Grid.prototype.parse = function(view) {
 			id: item.name,
 			field: item.name,
 			descriptor: field,
-			formatter: formatter,
 			sortable: true,
+			cssClass: field.type,
+			headerCssClass: field.type,
 			xpath: path
 		};
 	});
@@ -275,6 +291,7 @@ Grid.prototype.parse = function(view) {
 	var options = {
 		editable: view.editable,
 		editorFactory:  Factory,
+		formatterFactory: Factory,
 		enableCellNavigation: true,
 		enableColumnReorder: false,
 		forceFitColumns: false,
