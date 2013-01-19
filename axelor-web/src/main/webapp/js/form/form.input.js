@@ -541,8 +541,10 @@ var DateTimeItem = {
 			if (controller.$viewValue === value)
 				return;
 
-			scope.$applyLater(function(){
-				controller.$setViewValue(value);
+			setTimeout(function(){
+				scope.$apply(function(){
+					controller.$setViewValue(value);
+				});
 			});
 			
 			if (onChange) {
