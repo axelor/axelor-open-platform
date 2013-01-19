@@ -514,6 +514,18 @@ Grid.prototype.onKeyDown = function(e, args) {
 		return false;
 	}
 
+	// firefox fails to trigger onChange
+	if ($.browser.mozilla && (e.which === $.ui.keyCode.TAB || e.which === $.ui.keyCode.ENTER)) {
+		var editor = grid.getCellEditor(),
+			target = $(e.target);
+		if (editor.isValueChanged()) {
+			target.change();
+		}
+		setTimeout(function(){
+			target.blur();
+		});
+	}
+
 	var handled = false;
 	if (e.which === $.ui.keyCode.TAB) {
 		var cell = null;
