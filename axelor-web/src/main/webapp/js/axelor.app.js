@@ -173,18 +173,8 @@ function AppCtrl($rootScope, $scope, $http, $route, authService) {
 	}
 
 	// See index.jsp
-	$rootScope.app = getAppInfo(__appSettings);
+	$scope.app = getAppInfo(__appSettings);
 
-	$rootScope.$applyLater = function(callback) {
-		var self = this,
-			ctx = arguments[1];
-		setTimeout(function(){
-			self.$apply(function(){
-				return ctx ? callback.apply(ctx) : callback();
-			});
-		});
-	};
-	
 	var loginAttempts = 0;
 	var loginWindow = null;
 	var errorWindow = null;
