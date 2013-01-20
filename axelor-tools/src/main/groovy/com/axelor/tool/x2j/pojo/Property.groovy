@@ -163,6 +163,23 @@ class Property {
 		return Utils.stripCode(this.code, "\n\t\t")
 	}
 	
+	String getFormula() {
+		String text = this.code;
+		if (text == null) {
+			return ""
+		}
+		text = text.replaceAll("\"", '''\\\\"''');
+		text = Utils.stripCode(text, "\n\t\t\"")
+		
+		text = "\"(" + text.replaceAll("\n", "\" +\n") + ")\""
+
+		if (text.indexOf('\n') != text.lastIndexOf('\n')) {
+			text = "\n\t\t" + text
+		}
+
+		return text
+	}
+	
 	String getDocumentation() {
 		String text = Utils.stripCode(attrs.get("help"), "\n * ")
 		if (text == "") {
@@ -182,8 +199,16 @@ class Property {
 		type == "many-to-one" || type == "one-to-one"
 	}
 	
+	boolean isCollection() {
+		type == "one-to-many" || type == "many-to-many"
+	}
+
 	boolean isVirtual() {
-		return ! code.empty
+		return code != null && code.trim().length() > 0;
+	}
+	
+	boolean isFormula() {
+		return attrs.formula == 'true' && !isCollection()
 	}
 	
 	static Property idProperty(Entity entity) {
@@ -301,12 +326,19 @@ class Property {
 	}
 
 	private List<Annotation> $virtual() {
-		if (isVirtual())
-			return [
-				annon("com.axelor.db.VirtualColumn", true),
-				annon("javax.persistence.Access").add(
-					entity.importType("javax.persistence.AccessType.PROPERTY"), false)
-			]
+		if (!this.isVirtual()) {
+			return null
+		}
+		def all = [annon("com.axelor.db.VirtualColumn", true)]
+		
+		if (this.isFormula()) {
+			all += [annon(reference ? "org.hibernate.annotations.JoinFormula" : "org.hibernate.annotations.Formula")
+							.add(this.getFormula(), false)]
+		} else {
+			all += [annon("javax.persistence.Access").add(
+						entity.importType("javax.persistence.AccessType.PROPERTY"), false)]
+		}
+		return all
 	}
 
 	private Annotation $nameColumn() {
@@ -360,7 +392,7 @@ class Property {
 	}
 	
 	private Annotation $index() {
-		if (attrs.index == 'false')
+		if (attrs.index == 'false' || this.isFormula())
 			return null
 		if (attrs.index == "true" || name in ['name', 'code'] || attrs.namecolumn == "true") {
 			def index = "${entity.table}_${attrs.column ? attrs.column : this.name}_IDX".toUpperCase()
