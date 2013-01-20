@@ -11,7 +11,7 @@ public class ${pojo.name} extends ${pojo.baseClass} {
 <% } %>\
 <% pojo.fields.each { p -> %>\
 ${p.documentation}
-<% if (! p.code.empty) { %>\
+<% if (p.isVirtual() && !p.isFormula()) { %>\
 	public $p.type ${p.getter}() {
 		try {
 			$p.name = compute${p.firstUpper(p.name)}();
