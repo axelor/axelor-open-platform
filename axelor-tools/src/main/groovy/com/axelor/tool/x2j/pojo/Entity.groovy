@@ -3,6 +3,7 @@ package com.axelor.tool.x2j.pojo
 import groovy.util.slurpersupport.GPathResult;
 import groovy.util.slurpersupport.NodeChild;
 
+import com.axelor.tool.x2j.Utils;
 import com.google.common.base.CaseFormat;
 
 class Entity {
@@ -96,12 +97,10 @@ class Entity {
 	}
 	
 	String getDocumentation() {
-		if (documentation == null || documentation.trim() == "")
-			return "";
-			
-		String text = documentation.trim().replaceAll('    ', '\t')
-		text = text.stripIndent().replaceAll(/\n/, '\n * ')
-		
+		String text = Utils.stripCode(documentation, "\n * ")
+		if (text == "") {
+			return ""
+		}
 		return """
 /**
  * """ + text + """
