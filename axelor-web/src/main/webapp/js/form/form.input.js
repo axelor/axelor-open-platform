@@ -196,7 +196,7 @@ var IntegerItem = {
 	link: function(scope, element, attrs, model) {
 
 		var props = scope.getViewDef(element),
-			scale = props.scale || this.scale;
+			scale = props.scale || 2;
 		
 		var options = {
 			step: 1,
@@ -318,7 +318,6 @@ var IntegerItem = {
  */
 var DecimalItem = _.extend({}, IntegerItem, {
 	css: 'decimal-item',
-	step: 2,
 	isDecimal: true
 });
 
