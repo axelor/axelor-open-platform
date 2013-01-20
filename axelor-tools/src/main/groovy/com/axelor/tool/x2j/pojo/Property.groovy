@@ -1,5 +1,7 @@
 package com.axelor.tool.x2j.pojo
 
+import com.axelor.tool.x2j.Utils;
+
 import groovy.util.slurpersupport.NodeChild
 
 class Property {
@@ -158,22 +160,14 @@ class Property {
 	}
 	
 	String getCode() {
-		if (this.code == null || this.code.trim() == "")
-			return ""
-		
-		String text = code.replaceAll('    ', '\t')
-		text = text.stripIndent().replaceAll(/\n/, '\n\t\t')
-		
-		return text.trim()
+		return Utils.stripCode(this.code, "\n\t\t")
 	}
 	
 	String getDocumentation() {
-		if (attrs.help == null || attrs.help.trim() == "")
-			return "";
-			
-		String text = attrs.help.trim().replaceAll('    ', '\t')
-		text = text.stripIndent().replaceAll(/\n/, '\n * ')
-		
+		String text = Utils.stripCode(attrs.get("help"), "\n * ")
+		if (text == "") {
+			return ""
+		}
 		return """
 \t/**
 \t * """ + text + """
