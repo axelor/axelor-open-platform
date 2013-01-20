@@ -23,18 +23,18 @@
     </dependency>
     
     <!-- Apache Shiro -->
-      <dependency>
-	    <groupId>org.apache.shiro</groupId>
-	    <artifactId>shiro-core</artifactId>
-	  </dependency>
-	  <dependency>
-	    <groupId>org.apache.shiro</groupId>
-	    <artifactId>shiro-web</artifactId>
-	  </dependency>
-	  <dependency>
-	    <groupId>org.apache.shiro</groupId>
-	    <artifactId>shiro-guice</artifactId>
-	  </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-guice</artifactId>
+    </dependency>
 
   </dependencies>
 
@@ -53,8 +53,6 @@
             </goals>
           </execution>
         </executions>
-        <configuration>
-        </configuration>
       </plugin>
     </plugins>
   </build>
