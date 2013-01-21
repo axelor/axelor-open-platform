@@ -231,23 +231,25 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			criteria: [criterion]
 		};
 		
-		var ds = $scope._dataSource;
-		var view = $scope._views ? $scope._views['grid'] || {} : {};
-		var sortBy = view.orderBy;
+		return $scope._viewPromise.then(function(view) {
+
+			var ds = $scope._dataSource;
+			var sortBy = view.orderBy;
+			
+			if (sortBy) {
+				sortBy = sortBy.split("\\.");
+			}
+			
+			return ds.search({
+				filter: filter,
+				fields: fields,
+				sortBy: ds._sortBy || sortBy,
+				limit: -1,
+				domain: null
+			}).success(function(records, page){
+				success(records, page);
+			});
 		
-		if (sortBy) {
-			sortBy = sortBy.split("\\.");
-		}
-		
-		var promise = ds.search({
-			filter: filter,
-			fields: fields,
-			sortBy: ds._sortBy || sortBy,
-			limit: -1,
-			domain: null
-		});
-		promise.success(function(records, page){
-			success(records, page);
 		});
 	};
 	
