@@ -128,6 +128,13 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="formula" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Whether this is a native SQL formula field.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
