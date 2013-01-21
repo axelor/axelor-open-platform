@@ -571,10 +571,26 @@ var TimeItem = {
 		});
 		
 		element.change(function(e, ui) {
+			updateModel();
+		});
+		
+		element.on('keydown', function(e){
+			if (e.isDefaultPrevented()) {
+				return;
+			}
+			if (e.keyCode === $.ui.keyCode.ENTER || e.keyCode === $.ui.keyCode.TAB) {
+				updateModel();
+			}
+		});
+		
+		function updateModel() {
+			var value = element.val();
+			if (model.$viewValue === value)
+				return;
 			scope.$apply(function(){
 				model.$setViewValue(element.val());
 			});
-		});
+		}
 	},
 	template: '<input type="text">'
 };
