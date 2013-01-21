@@ -6,35 +6,6 @@
 		extend = angular.extend,
 		isArray = angular.isArray;
 
-	ds.factory('RestService', ['$resource', function($resource) {
-
-		// GET 		ws/rest/:model				= fetch list
-		// POST		ws/rest/:model				= save (create/update)
-		// PUT		ws/rest/:model				= create
-		// POST		ws/rest/:model/:id			= update
-		// GET		ws/rest/:model/:id			= read
-		// DELETE	ws/rest/:model/:id			= delete
-		// POST		ws/rest/:model/:id/remove	= delete (with payload)
-		// GET		ws/rest/:model/:id/copy		= get copy
-		// GET		ws/rest/:model/:id/details	= get details
-		// POST		ws/rest/:model/search		= advance search
-		
-		function getResource(model) {
-			
-			return $resource('ws/rest/'+ model +'/:id/:_action', {id: '@id'}, {
-				'query':  	{ method: 'GET'},
-				'search': 	{ method: 'POST', params: {id: 'search'}},
-				'create': 	{ method: 'PUT'},
-				'update': 	{ method: 'POST'},
-				'remove': 	{ method: 'POST', params: {_action: 'remove'}},
-				'copy':    	{ method: 'GET', params: {_action: 'copy'}},
-				'details': 	{ method: 'GET', params: {_action: 'details'}}
-			});
-		}
-		
-		return { get: getResource };
-	}]);
-	
 	ds.factory('MenuService', ['$http', function($http) {
 
 		function get(parent) {
