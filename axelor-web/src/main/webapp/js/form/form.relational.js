@@ -722,7 +722,7 @@ var ManyToOneItem = {
 			if (!canSelect) scope.setHidden(element);
 		});
 		
-		if (scope.summaryView) {
+		if ((scope._viewParams || {}).summaryView) {
 			element.removeClass('picker-icons-3').addClass('picker-icons-4');
 		}
 
@@ -841,7 +841,7 @@ var OneToManyItem = {
 					grid.setOptions({editable: !data.readonly });
 				});
 				
-				if (!scope.summaryView) {
+				if (!(scope._viewParams || {}).summaryView) {
 					return;
 				}
 				var col = {
