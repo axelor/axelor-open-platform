@@ -519,7 +519,7 @@ public class Property {
 	 * 
 	 * @return map of property attributes
 	 */
-	public Map<String, ?> toMap() {
+	public Map<String, Object> toMap() {
 
 		Map<String, Object> map = new HashMap<String, Object>();
 
