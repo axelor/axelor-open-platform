@@ -20,7 +20,7 @@
 		function action(name) {
 
 			return $http.post('ws/action/' + name, {
-				model : 'com.axelor.meta.db.MetaMenu',
+				model : 'com.axelor.meta.db.MetaAction',
 				data : {}
 			});
 		}
@@ -31,7 +31,7 @@
 		};
 	}]);
 
-	ds.factory('ViewService', ['$http', '$q', '$compile', function($http, $q, $compile) {
+	ds.factory('ViewService', ['$http', '$q', '$cacheFactory', '$compile', function($http, $q, $cache, $compile) {
 
 		var ViewService = function() {
 			
@@ -138,6 +138,8 @@
 			return items;
 		}
 		
+		var fieldsCache = $cache("viewFields", { capacity: 100 });
+
 		ViewService.prototype.getMetaDef = function(model, view) {
 			var self = this,
 				deferred = $q.defer();
@@ -151,12 +153,24 @@
 			};
 			
 			function loadFields(view) {
+				
+				var fields = findFields(view) || [];
+				var key = model + "|" + fields.join("|");
+				
+				if (!model || !fields || fields.length === 0) {
+					deferred.resolve({view: view});
+					return promise;
+				}
 
-				$http.get('ws/meta/' + model + '/view_fields', {
-					cache: true,
-					params: {
-						items: findFields(view).join(',')
-					}
+				var result = fieldsCache.get(key);
+				if (result) {
+					deferred.resolve(angular.copy(result));
+					return promise;
+				}
+
+				$http.post('ws/meta/view/fields', {
+					model: model,
+					fields: findFields(view)
 				}).then(function(response) {
 					var res = response.data,
 						fields = res.data,
@@ -165,10 +179,13 @@
 					self.process(data, view);
 					fields = data.fields;
 
-					deferred.resolve({
+					var result = {
 						fields: fields,
 						view: view
-					});
+					};
+					
+					fieldsCache.put(key, angular.copy(result));
+					deferred.resolve(result);
 				});
 
 				return promise;
@@ -178,18 +195,20 @@
 				return loadFields(view);
 			};
 
-			$http.get('ws/meta/' + model + '/view', {
+			$http.get('ws/meta/view', {
 				cache: true,
 				params: {
+					model: model,
 					type: view.type,
 					name: view.name
 				}
 			}).then(function(response) {
 				var res = response.data;
-				result = res.data[view.type];
-				loadFields(result);
+				result = res.data;
+				if (_.isArray(result.items)) {
+					loadFields(result);
+				}
 			});
-			
 			return promise;
 		};
 
