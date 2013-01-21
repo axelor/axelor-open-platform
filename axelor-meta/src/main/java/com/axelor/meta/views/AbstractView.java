@@ -15,10 +15,10 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
-@XmlTransient
-@JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "viewType")
+@JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
 @JsonInclude(Include.NON_NULL)
 @JsonSubTypes({
 	@Type(GridView.class),
@@ -83,5 +83,13 @@ public abstract class AbstractView {
 	
 	public void setToolbar(List<Button> toolbar) {
 		this.toolbar = toolbar;
+	}
+	
+	@XmlTransient
+	public String getType() {
+		try {
+			return getClass().getAnnotation(JsonTypeName.class).value();
+		} catch(Exception e){}
+		return "unknown";
 	}
 }
