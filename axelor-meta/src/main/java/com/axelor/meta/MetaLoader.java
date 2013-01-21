@@ -578,7 +578,19 @@ public class MetaLoader {
 		}
 		return result;
 	}
-
+	
+	public AbstractView findView(String model, String name, String type) {
+		if (name != null) {
+			return findView(name);
+		}
+		MetaView view = MetaView.all().filter("self.model = ?1 AND self.type = ?2", model, type).fetchOne();
+		try {
+			return ((ObjectViews) unmarshal(view.getXml())).getViews().get(0);
+		} catch (Exception e) {
+		}
+		return null;
+	}
+	
 	public AbstractView findView(String name) {
 		MetaView view = MetaView.all().filter("self.name = ?1", name).fetchOne();
 		try {
