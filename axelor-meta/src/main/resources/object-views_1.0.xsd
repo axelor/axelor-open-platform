@@ -117,13 +117,20 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="model" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>
-          Name of the model class of this view.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
+  </xsd:complexType>
+  
+  <xsd:complexType name="ObjectView" abstract="true">
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractView">
+        <xsd:attribute name="model" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              Name of the model class of this view.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
   </xsd:complexType>
 
   <xsd:complexType name="AbstractWidget" abstract="true" />
@@ -185,7 +192,7 @@
 
   <xsd:complexType name="GridView">
     <xsd:complexContent>
-      <xsd:extension base="tns:AbstractView">
+      <xsd:extension base="tns:ObjectView">
         <xsd:sequence>
           <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0"/>
           <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" maxOccurs="1" />
@@ -219,7 +226,7 @@
 
   <xsd:complexType name="FormView">
     <xsd:complexContent>
-      <xsd:extension base="tns:AbstractView">
+      <xsd:extension base="tns:ObjectView">
         <xsd:sequence>
           <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0"/>
           <xsd:choice minOccurs="0" maxOccurs="unbounded">
@@ -463,32 +470,17 @@
         <xsd:sequence maxOccurs="unbounded">
           <xsd:element name="portlet" type="tns:Portlet" />
         </xsd:sequence>
+        <xsd:attribute name="cols" type="xsd:integer"/>
       </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-  
-  <xsd:complexType name="AbstractPortlet" abstract="true">
-    <xsd:complexContent>
-      <xsd:restriction base="tns:AbstractContainer">
-        <xsd:attribute name="noLabel" type="xsd:boolean" use="prohibited" />
-        <xsd:attribute name="title" type="xsd:string" use="required"/>
-      </xsd:restriction>
     </xsd:complexContent>
   </xsd:complexType>
   
   <xsd:complexType name="Portlet">
-    <xsd:complexContent>
-      <xsd:extension base="tns:AbstractPortlet">
-        <xsd:all>
-          <xsd:element name="resource" type="xsd:string" />
-          <xsd:element name="domain" type="xsd:string" minOccurs="0"/>
-          <xsd:element name="view-name" type="xsd:string" minOccurs="0"/>
-          <xsd:element name="view-type" type="xsd:string" minOccurs="0"/>
-        </xsd:all>
-      </xsd:extension>
-    </xsd:complexContent>
+    <xsd:attribute name="action" type="xsd:string" use="required"/>
+    <xsd:attribute name="colSpan" type="xsd:integer"/>
+    <xsd:attribute name="rowSpan" type="xsd:integer"/>
   </xsd:complexType>
-  
+
   <xsd:complexType name="Search">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractView">
@@ -783,7 +775,13 @@
           <xsd:element name="context" type="tns:ActContext" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="title" type="xsd:string" use="required"/>
-        <xsd:attribute name="model" type="xsd:string" use="required"/>
+        <xsd:attribute name="model" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            If this is an object view action then provide the fully qualified name of the object model.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
