@@ -938,7 +938,7 @@ ui.directive('uiSlickGrid', ['ViewService', function(ViewService) {
 
 		fields = fields || {};
 		items = _.map(items, function(item) {
-			var field = fields[item.name],
+			var field = fields[item.name] || item,
 				type = types[field.type];
 			
 			var params = _.extend({}, item, { noLabel: true });
