@@ -17,6 +17,7 @@ import com.axelor.meta.GroovyScriptHelper;
 import com.axelor.meta.MetaLoader;
 import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaMenu;
+import com.axelor.meta.views.AbstractView;
 import com.axelor.meta.views.Action;
 import com.axelor.meta.views.ActionMenuItem;
 import com.axelor.meta.views.MenuItem;
@@ -170,6 +171,16 @@ public class MetaService {
 		return response;
 	}
 	
+	public Response findView(String model, String name, String type) {
+		Response response = new Response();
+
+		AbstractView data = loader.findView(model, name, type);
+		response.setData(data);
+		response.setStatus(Response.STATUS_SUCCESS);
+
+		return response;
+	}
+
 	@SuppressWarnings("all")
 	public Response runSearch(Request request) {
 		Response response = new Response();
