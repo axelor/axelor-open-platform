@@ -12,11 +12,22 @@ public class Portlet extends AbstractContainer {
 	@XmlAttribute
 	private String action;
 	
+	@XmlAttribute
+	private Boolean canSearch;
+	
 	public String getAction() {
 		return action;
 	}
 	
 	public void setAction(String action) {
 		this.action = action;
+	}
+	
+	public Boolean getCanSearch() {
+		return canSearch;
+	}
+	
+	public void setCanSearch(Boolean canSearch) {
+		this.canSearch = canSearch;
 	}
 }
