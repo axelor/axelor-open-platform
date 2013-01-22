@@ -16,7 +16,9 @@ angular.module('axelor.ui').directive('uiSplitter', function() {
 					inverse: scope.inverse == 'true',
 					toggleOn: 'click'
 				}).on('splitter:dragstop', function(){
-					$.event.trigger('adjustSize');
+					setTimeout(function(){
+						$.event.trigger('adjustSize');
+					});
 				});
 			});
 		},
