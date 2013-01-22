@@ -16,7 +16,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	if (!$element.is('fieldset')) {
 		
 		_.each(field.views, function(view){
-			views[view.viewType] = view;
+			views[view.type] = view;
 		});
 		
 		var formView = null,
