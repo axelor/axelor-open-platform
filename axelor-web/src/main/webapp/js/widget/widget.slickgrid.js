@@ -304,7 +304,7 @@ Grid.prototype.parse = function(view) {
 		formatterFactory: Factory,
 		enableCellNavigation: true,
 		enableColumnReorder: false,
-		forceFitColumns: false,
+		forceFitColumns: true,
 		multiColumnSort: true,
 		showHeaderRow: this.showFilters
 	};
@@ -322,9 +322,9 @@ Grid.prototype.parse = function(view) {
 		grid.registerPlugin(selectColumn);
 	}
 
-	var onAdjustSize = _.bind(this.adjustSize, this);
-	dataView.$adjustSize = onAdjustSize;
-	element.on('adjustSize', _.throttle(onAdjustSize, 300));
+	var adjustSize = _.bind(this.adjustSize, this);
+	dataView.$adjustSize = adjustSize;
+	element.on('adjustSize', _.debounce(adjustSize, 100));
 
 	dataView.$syncSelection = function(old, oldIds) {
 		var selection = dataView.mapIdsToRows(oldIds);
@@ -439,14 +439,19 @@ Grid.prototype.subscribe = function(event, handler) {
 };
 
 Grid.prototype.adjustSize = function() {
-	var grid = this.grid;
-	if (!grid || !this.element.is(':visible'))
+	if (!this.grid || !this.element.is(':visible')) {
 		return;
-	grid.getViewport().rightPx = 0;
-	grid.resizeCanvas();
-	grid.autosizeColumns();
-	if (!grid.getEditorLock().isActive())
-		grid.invalidate();
+	}
+	var viewPort = this._viewPort;
+	var gridCanvas = this._gridCanvas;
+	if (viewPort === undefined) {
+		viewPort = this._viewPort = this.element.find('.slick-viewport:first');
+		gridCanvas = this._gridCanvas = viewPort.children('.grid-canvas');
+	}
+	if (viewPort && (gridCanvas.width() === viewPort.width())) {
+		return;
+	}
+	this.grid.resizeCanvas();
 };
 
 Grid.prototype.showColumn = function(name, show) {

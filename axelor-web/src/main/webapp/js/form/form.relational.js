@@ -990,7 +990,7 @@ var OneToManyInline = _.extend({}, OneToManyItem, {
 			wrapper.hide();
 		});
 		
-		element.on("adjustSize", _. throttle(adjust, 300));
+		element.on("adjustSize", _.debounce(adjust, 300));
 		
 		scope.$watch(attrs.ngModel, function(value) {
 			var text = "";

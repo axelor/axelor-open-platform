@@ -206,7 +206,7 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 					return;
 				element.closest('.ui-dialog').find('.ui-dialog-title').text(title);
 			});
-			scope.$on('adjust:dialog', _.throttle(autoSize, 300));
+			scope.$on('adjust:dialog', _.debounce(autoSize, 300));
 		},
 		replace: true,
 		template:
