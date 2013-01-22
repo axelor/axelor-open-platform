@@ -971,6 +971,7 @@ ui.directive('uiSlickGrid', ['ViewService', function(ViewService) {
 			'dataView'	: '=',
 			'handler'	: '=',
 			'selector'	: '@',
+			'editable'	: '@',
 			'noFilter'	: '@',
 			'onInit'	: '&',
 			'onBeforeSave'	: '&',
@@ -987,8 +988,7 @@ ui.directive('uiSlickGrid', ['ViewService', function(ViewService) {
 				if (grid || view == null || scope.dataView == null) {
 					return;
 				}
-				
-				if (handler._readOnly) {
+				if (attrs.editable === "false") {
 					view.editable = false;
 				}
 
