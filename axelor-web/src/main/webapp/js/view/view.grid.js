@@ -342,3 +342,34 @@ angular.module('axelor.ui').directive('uiViewGrid', function(){
 		template: '<div ui-slick-grid></div>'
 	};
 });
+
+angular.module('axelor.ui').directive('uiPortletGrid', function(){
+	return {
+		controller: ['$scope', '$element', function($scope, $element) {
+			
+			GridViewCtrl.call(this, $scope, $element);
+			
+			var ds = $scope._dataSource;
+			
+			$scope.onItemDblClick = function(event, args) {
+				var selection = $scope.selection[0];
+				var record = ds.at(selection);
+
+				var tab = angular.copy($scope._viewParams);
+
+				tab.viewType = "form";
+				tab.recordId = record.id;
+				tab.action = $scope._viewAction;
+
+				setTimeout(function(){
+					$scope.openTab(tab);
+					$scope.$apply();
+				});
+			};
+		}],
+		template:
+		'<div ui-view-grid x-view="schema" x-data-view="dataView" x-editable="false" x-no-filter="true" x-handler="this">'+
+			'<div ui-slick-grid></div>'+
+		'</div>'
+	};
+});
