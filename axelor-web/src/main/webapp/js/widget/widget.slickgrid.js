@@ -236,14 +236,18 @@ var Factory = {
 };
 
 var Grid = function(scope, element, attrs) {
+	
+	var noFilter = scope.$eval('noFilter');
+	if (_.isString(noFilter)) {
+		noFilter = noFilter === 'true';
+	}
+	
 	this.scope = scope;
 	this.element = element;
 	this.attrs = attrs;
 	this.handler = scope.handler;
-	this.showFilters = !scope.$eval('noFilter');
-	
+	this.showFilters = !noFilter;
 	this.$oldValues = null;
-
 	this.grid = this.parse(scope.view);
 };
 
