@@ -263,13 +263,23 @@ Grid.prototype.parse = function(view) {
 		field = _.extend({}, item, field);
 		scope.fields_view[item.name] = field;
 		path = path ? path + '.' + item.name : item.name;
-
+		
+		var sortable = true;
+		switch (field.type) {
+		case 'one-to-many':
+		case 'many-to-many':
+			sortable = false;
+			break;
+		default:
+			sortable: true;
+		}
+		
 		return {
 			name: item.title || item.name,
 			id: item.name,
 			field: item.name,
 			descriptor: field,
-			sortable: true,
+			sortable: sortable,
 			cssClass: field.type,
 			headerCssClass: field.type,
 			xpath: path
