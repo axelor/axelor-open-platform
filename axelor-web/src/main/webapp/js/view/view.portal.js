@@ -104,6 +104,8 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 					return;
 				}
 				initialized = true;
+				
+				scope.noFilter = !portlet.canSearch;
 
 				var template = $compile($('<div ui-portlet-' + view.viewType + '></div>'))(scope);
 				element.find('.portlet-content:first').append(template);
