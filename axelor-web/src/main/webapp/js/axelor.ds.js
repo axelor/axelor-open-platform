@@ -207,6 +207,11 @@
 				result = res.data;
 				if (_.isArray(result.items)) {
 					loadFields(result);
+				} else {
+					deferred.resolve({
+						fields: result.items,
+						view: result
+					});
 				}
 			});
 			return promise;

@@ -430,7 +430,7 @@ function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 
 			var view = result.data[0].view;
 			
-			if (view && view.viewType == 'html') {
+			if (view && (view.type || view.viewType) == 'html') {
 				view.views = [{
 					resource: view.resource,
 					title: view.title,

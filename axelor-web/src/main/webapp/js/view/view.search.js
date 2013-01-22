@@ -141,7 +141,7 @@ function SearchFormCtrl($scope, $element, ViewService) {
 		if (schema == null) return;
 		var form = {
 			title: 'Search',
-			viewType: 'form',
+			type: 'form',
 			cols: 1,
 			items: [{
 				type: 'group',
@@ -168,7 +168,7 @@ function SearchGridCtrl($scope, $element, ViewService) {
 		if (schema == null) return;
 		var view = {
 			title: 'Search',
-			viewType: 'grid',
+			type: 'grid',
 			items: [{ name : '_modelTitle', title: 'Object' }].concat(schema.resultFields)
 		};
 		var meta = { fields: schema.resultFields };
@@ -323,7 +323,7 @@ function SearchToolbarCtrl($scope, $element, $http) {
 		$scope.schema = {
 			cols : 7,
 			colWidths : '250px,auto,auto,150px,150px,150px,auto',
-			viewType : 'form',
+			type : 'form',
 			items : [ {
 				name : 'objectSelect',
 				showTitle : false
@@ -516,7 +516,7 @@ function ActionSelectorCtrl($scope, $element, $attrs, $http, MenuService) {
 	$scope.schema = {
 		cols : 4,
 		colWidths : '30%,30%,30%,10%',
-		viewType : 'form',
+		type : 'form',
 		items : [ {
 			name : '$menuRoot',
 			showTitle : false
