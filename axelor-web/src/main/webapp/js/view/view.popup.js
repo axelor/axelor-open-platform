@@ -100,7 +100,6 @@ function EditorCtrl($scope, $element, DataSource) {
 SelectorCtrl.$inject = ['$scope', '$element', 'DataSource'];
 function SelectorCtrl($scope, $element, DataSource) {
 	
-	$scope._readOnly = true;
 	$scope._dataSource = DataSource.create($scope._model, {
 		domain: $scope._domain,
 		context: $scope._context
@@ -271,7 +270,7 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 		replace: true,
 		template:
 		'<div ui-dialog x-on-open="onOpen" x-on-ok="onOK">'+
-		    '<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-selector="true"></div>'+
+		    '<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-editable="false" x-selector="true"></div>'+
 		    '<div class="record-pager pull-left">'+
 			    '<div class="btn-group">'+
 			      '<button class="btn" ng-disabled="!canPrev()" ng-click="onPrev()"><i class="icon-chevron-left"></i></button>'+
