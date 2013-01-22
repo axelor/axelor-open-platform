@@ -45,6 +45,12 @@
   float: left;
 }
 
+.portal-view .portlet-body {
+	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
+	   -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
+}
+
 .portlet-minimized {
 	height: auto !important;
 }
