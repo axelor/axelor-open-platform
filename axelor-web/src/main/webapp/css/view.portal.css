@@ -1,0 +1,64 @@
+.portal-view .portal {
+  padding-top: 2px;
+  overflow: hidden;
+}
+
+.portal-view .portal,
+.portal-view .portlet,
+.portal-view .portlet-header,
+.portal-view .portlet-content {
+	box-sizing: border-box;
+}
+
+.portal-view .portlet {
+	overflow: hidden;
+	position: relative;
+}
+.portal-view .portlet-body,
+.portal-view .portlet-content {
+	position: absolute;
+	top: 2px;
+	bottom: 2px;
+	left: 2px;
+	right: 2px;
+	overflow: hidden;
+}
+
+.portal-view .portlet-content {
+	top: 27px;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.portal-view .portlet-content > div,
+.portal-view .portlet-content > div > .slickgrid {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.portal-view .portlet {
+  padding: 1px;
+  float: left;
+}
+
+.portlet-minimized {
+	height: auto !important;
+}
+
+.portlet-minimized .portlet-content {
+	display: none !important;
+}
+
+.ui-sortable-placeholder {
+	border: 2px dashed #c9c9c9;
+	visibility: visible !important;
+	height: 100px !important;
+}
+
+.ui-sortable-placeholder * {
+	visibility: hidden;
+}
