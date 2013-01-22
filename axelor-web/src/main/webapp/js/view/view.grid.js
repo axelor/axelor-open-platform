@@ -368,7 +368,7 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 			};
 		}],
 		template:
-		'<div ui-view-grid x-view="schema" x-data-view="dataView" x-editable="false" x-no-filter="true" x-handler="this">'+
+		'<div ui-view-grid x-view="schema" x-data-view="dataView" x-editable="false" x-handler="this">'+
 			'<div ui-slick-grid></div>'+
 		'</div>'
 	};
