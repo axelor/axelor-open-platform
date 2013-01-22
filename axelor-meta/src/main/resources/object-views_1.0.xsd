@@ -479,6 +479,13 @@
     <xsd:attribute name="action" type="xsd:string" use="required"/>
     <xsd:attribute name="colSpan" type="xsd:integer"/>
     <xsd:attribute name="rowSpan" type="xsd:integer"/>
+    <xsd:attribute name="canSearch" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+        Whether to enable search header on grid view portlet.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 
   <xsd:complexType name="Search">
