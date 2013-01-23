@@ -31,7 +31,7 @@
 		};
 	}]);
 
-	ds.factory('ViewService', ['$http', '$q', '$cacheFactory', '$compile', function($http, $q, $cache, $compile) {
+	ds.factory('ViewService', ['$http', '$q', '$cacheFactory', '$compile', function($http, $q, $cacheFactory, $compile) {
 
 		var ViewService = function() {
 			
@@ -138,7 +138,7 @@
 			return items;
 		}
 		
-		var fieldsCache = $cache("viewFields", { capacity: 100 });
+		var fieldsCache = $cacheFactory("viewFields", { capacity: 1000 });
 
 		ViewService.prototype.getMetaDef = function(model, view) {
 			var self = this,
@@ -155,7 +155,7 @@
 			function loadFields(view) {
 				
 				var fields = findFields(view) || [];
-				var key = model + "|" + fields.join("|");
+				var key = model + "|" + view.type + "|" + fields.join("|");
 				
 				if (!model || !fields || fields.length === 0) {
 					deferred.resolve({view: view});
