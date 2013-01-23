@@ -523,7 +523,8 @@ Grid.prototype.onBeforeEditCell = function(event, args) {
 };
 
 Grid.prototype.onKeyDown = function(e, args) {
-	var grid = this.grid,
+	var that = this,
+		grid = this.grid,
 		lock = grid.getEditorLock();
 
 	if (e.isDefaultPrevented()){
@@ -531,19 +532,34 @@ Grid.prototype.onKeyDown = function(e, args) {
 		return false;
 	}
 	
-	if (!lock.isActive()) {
-		return;
+	if (!e.isBlocked && (blocked() || !lock.isActive())) {
+		return false;
 	}
-
-	// prevent arrow key navigation
-	if (e.which == 38 || e.which == 40 || e.which == 37 || e.which == 39) {
-		e.stopImmediatePropagation();
+	
+	function blockCallback() {
+		if (e.which === $.ui.keyCode.TAB) {
+			setTimeout(function(){
+				var cell = that.findNextEditable(args.row, args.cell);
+				if (cell) {
+					grid.setActiveCell(cell.row, cell.cell);
+					grid.editActiveCell();
+				}
+			});
+		}
+	}
+	
+	function blocked() {
+		if (that.isDirty() && axelor.blockUI(blockCallback)) {
+			grid.focus();
+			e.stopImmediatePropagation();
+			return true;
+		}
 		return false;
 	}
 
 	function commit(row, cell) {
-		if (lock.commitCurrentEdit()) {
-			grid.setActiveCell(args.row, cell);
+		if (lock.commitCurrentEdit() && !blocked()) {
+			grid.setActiveCell(row, cell);
 			grid.editActiveCell();
 			return true;
 		}
@@ -561,19 +577,18 @@ Grid.prototype.onKeyDown = function(e, args) {
 			target.blur();
 		});
 	}
-
 	var handled = false;
 	if (e.which === $.ui.keyCode.TAB) {
 		var cell = null;
 		if (e.shiftKey) {
 			cell = this.findPrevEditable(args.row, args.cell);
 		} else {
-			cell = this.findNextEditable(args.row, args.cell);
+			cell = this.findNextEditable(args.row, args.cell, true);
 		}
 		if (cell !== null) {
-			commit(args.row, cell);
-			handled = true;
+			commit(cell.row, cell.cell);
 		}
+		handled = true;
 	}
 
 	if (e.which === $.ui.keyCode.ENTER) {
@@ -608,42 +623,58 @@ Grid.prototype.isCellEditable = function(cell) {
 	return !field.readonly;
 };
 
-Grid.prototype.findNextEditable = function(row, posX) {
+Grid.prototype.findNextEditable = function(posY, posX, saveIfLast) {
 	var grid = this.grid,
 		cols = grid.getColumns(),
-		cell = posX + 1;
-	while (cell < cols.length) {
-		if (this.isCellEditable(cell)) {
-			return cell;
+		args = {row: posY, cell: posX + 1};
+	while (args.cell < cols.length) {
+		if (this.isCellEditable(args.cell)) {
+			return args;
 		}
-		cell += 1;
+		args.cell += 1;
 	}
-	cell = 0;
-	while (cell < posX) {
-		if (this.isCellEditable(cell)) {
-			return cell;
+	var editor = this.editorScope;
+	if (!editor.isValid()) {
+		this.focusInvalidCell(args);
+		return null;
+	}
+	console.log('aaaaa', this.isDirty());
+	if (saveIfLast && this.isDirty() && !this.saveChanges(args)) {
+		this.focusInvalidCell(args);
+		return null;
+	}
+	if (grid.getDataItem(args.row)) {
+		args.row += 1;
+	}
+	args.cell = 0;
+	while (args.cell < posX) {
+		if (this.isCellEditable(args.cell)) {
+			return args;
 		}
-		cell += 1;
+		args.cell += 1;
 	}
 	return null;
 };
 
-Grid.prototype.findPrevEditable = function(row, posX) {
+Grid.prototype.findPrevEditable = function(posY, posX) {
 	var grid = this.grid,
 		cols = grid.getColumns(),
-		cell = posX - 1;
-	while (cell > -1) {
-		if (this.isCellEditable(cell)) {
-			return cell;
+		args = {row: posY, cell: posX - 1};
+	while (args.cell > -1) {
+		if (this.isCellEditable(args.cell)) {
+			return args;
 		}
-		cell -= 1;
+		args.cell -= 1;
 	}
-	cell = cols.length - 1;
-	while (cell > posX) {
-		if (this.isCellEditable(cell)) {
-			return cell;
+	if (args.row >= 0) {
+		args.row -= 1;
+	}
+	args.cell = cols.length - 1;
+	while (args.cell > posX) {
+		if (this.isCellEditable(args.cell)) {
+			return args;
 		}
-		cell -= 1;
+		args.cell -= 1;
 	}
 	return null;
 };
@@ -696,7 +727,7 @@ Grid.prototype.saveChanges = function(args) {
 			if (nextCell !== null) {
 				grid.updateRowCount();
 				grid.render();
-				grid.setActiveCell(args.row + 1, nextCell);
+				grid.setActiveCell(nextCell.row, nextCell.cell);
 				grid.editActiveCell();
 			}
 		}
@@ -803,10 +834,6 @@ Grid.prototype.onAddNewRow = function(event, args) {
 		item.id = 0;
 		grid.invalidateRow(dataView.length);
 		dataView.addItem(item);
-	    
-		grid.setOptions({
-			enableAddRow: false
-		});
 	    
 		grid.updateRowCount();
 	    grid.render();
