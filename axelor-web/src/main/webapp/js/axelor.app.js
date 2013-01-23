@@ -83,7 +83,7 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 
 		var blocked = false;
 		
-		function block() {
+		function block(callback) {
 			if (blocked) return true;
 			if (loadingCounter > 0) {
 				blocked = true;
@@ -96,23 +96,26 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 				});
 				body.css("cursor", "wait");
 				blocker.show();
-				unblock();
+				unblock(callback);
 			}
 			return blocked;
 		}
 
-		function unblock() {
+		function unblock(callback) {
 			if (loadingCounter > 0) {
-				return _.delay(unblock, 10);
+				return _.delay(unblock, 10, callback);
 			}
 			doc.off("keydown.blockui mousedown.blockui");
 			body.css("cursor", "");
 			blocker.hide();
+			if (callback) {
+				callback();
+			}
 			blocked = false;
 		}
 
 		axelor.blockUI = function() {
-			return block();
+			return block(arguments[0]);
 		};
 
 		axelor.unblockUI = function() {
