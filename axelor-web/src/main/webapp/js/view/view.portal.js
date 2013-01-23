@@ -113,6 +113,15 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 				scope.show();
 			};
 			
+			scope.onPortletToggle = function(event) {
+				var e = $(event.target);
+				e.toggleClass('icon-chevron-up icon-chevron-down');
+				element.toggleClass('portlet-minimized');
+				if (e.hasClass('icon-chevron-up')) {
+					$.event.trigger('adjustSize');
+				}
+			};
+			
 			var portlet = scope.portlet;
 			var cols = scope.portletCols;
 			var colSpan = portlet.colSpan || 1;
@@ -134,7 +143,8 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 						'<div class="container-fluid">'+
 							'<span class="brand" href="" ng-bind-html-unsafe="title"></span>'+
 							'<span class="icons-bar pull-right">'+
-								'<i ng-click="onRefresh()" title="{{\'Refresh\' | t}}" class="icon icon-refresh"></i>'+
+								'<i ng-click="onRefresh()" title="{{\'Refresh\' | t}}" class="icon-refresh"></i>'+
+								'<i ng-click="onPortletToggle($event)" title="{{\'Toggle\' | t}}" class="icon-chevron-up"></i>'+
 							'</span>'+
 						'</div>'+
 					'</div>'+

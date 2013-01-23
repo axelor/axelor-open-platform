@@ -17,6 +17,7 @@
 .portal-view .portlet {
 	position: relative;
 	float: left;
+	min-height: 32px;
 }
 
 .portal-view .portlet-body,
@@ -54,16 +55,7 @@
 	        box-sizing: border-box;
 }
 
-.portal-view .portlet-minimized {
-	height: auto !important;
-}
-
-.portal-view .portlet-minimized .portlet-content {
-	display: none !important;
-}
-
 .portal-view .ui-sortable-placeholder {
-	height: 75px !important;
 	border: 1px dashed #c9c9c9;
 	visibility: visible !important;
 	
@@ -74,4 +66,12 @@
 
 .portal-view .ui-sortable-placeholder * {
 	visibility: hidden;
+}
+
+.portal-view .portlet-minimized {
+	height: auto !important;
+}
+
+.portal-view .portlet-minimized .portlet-content {
+	display: none !important;
 }
