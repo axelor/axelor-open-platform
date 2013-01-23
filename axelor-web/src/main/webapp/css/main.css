@@ -56,7 +56,7 @@ html, body {
 }
 
 .ui-widget-content {
-	border: 1px solid #E5E5E5;
+	border: 1px solid #d4d4d4;
 }
 
 .ui-dialog,
@@ -277,7 +277,7 @@ html, body {
 
 .record-toolbar.btn-toolbar {
 
-	border: 1px solid #E5E5E5;
+	border: 1px solid #d4d4d4;
 	border-left: none;
 	border-right: none;
 	
@@ -315,8 +315,6 @@ html, body {
 	min-height: 26px;
 	padding-left: 10px;
 	padding-right: 10px;
-	
-	border: 1px solid #E5E5E5;
 }
 
 .stackbar .navbar .navbar-inner .brand {
