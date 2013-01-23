@@ -127,14 +127,14 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 		},
 		replace: true,
 		template:
-		'<div class="portlet ui-widget ui-corner-all">'+
+		'<div class="portlet">'+
 			'<div class="portlet-body stackbar">'+
 				'<div class="portlet-header navbar">'+
 					'<div class="navbar-inner">'+
 						'<div class="container-fluid">'+
 							'<span class="brand" href="" ng-bind-html-unsafe="title"></span>'+
 							'<span class="icons-bar pull-right">'+
-							'<i ng-click="onRefresh()" title="{{\'Refresh\' | t}}" class="icon icon-refresh"></i>'+
+								'<i ng-click="onRefresh()" title="{{\'Refresh\' | t}}" class="icon icon-refresh"></i>'+
 							'</span>'+
 						'</div>'+
 					'</div>'+

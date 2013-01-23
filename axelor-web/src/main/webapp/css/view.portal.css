@@ -1,70 +1,77 @@
-.portal-view .portal {
-  padding-top: 2px;
-  overflow: hidden;
-}
-
 .portal-view .portal,
 .portal-view .portlet,
+.portal-view .portlet-body,
 .portal-view .portlet-header,
-.portal-view .portlet-content {
-	box-sizing: border-box;
+.portal-view .portlet-content,
+.portal-view .ui-sortable-placeholder {
+	overflow: hidden;
+	-webkit-box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	        box-sizing: border-box;
+}
+
+.portal-view .portal {
+	padding-top: 4px;
 }
 
 .portal-view .portlet {
-	overflow: hidden;
 	position: relative;
+	float: left;
 }
+
 .portal-view .portlet-body,
 .portal-view .portlet-content {
 	position: absolute;
-	top: 2px;
-	bottom: 2px;
-	left: 2px;
+}
+
+.portal-view .portlet-body {
+	top: 0px;
 	right: 2px;
-	overflow: hidden;
+	bottom: 4px;
+	left: 2px;
+
+	-webkit-border-radius: 4px;
+	   -moz-border-radius: 4px;
+			border-radius: 4px;
+				
+	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	   -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .portal-view .portlet-content {
 	top: 27px;
-	bottom: 0;
-	left: 0;
-	right: 0;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
 }
 
 .portal-view .portlet-content > div,
 .portal-view .portlet-content > div > .slickgrid {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
+	height: 100%;
+	-webkit-box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	        box-sizing: border-box;
 }
 
-.portal-view .portlet {
-  padding: 1px;
-  float: left;
-}
-
-.portal-view .portlet-body {
-	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
-	   -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
-			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
-}
-
-.portlet-minimized {
+.portal-view .portlet-minimized {
 	height: auto !important;
 }
 
-.portlet-minimized .portlet-content {
+.portal-view .portlet-minimized .portlet-content {
 	display: none !important;
 }
 
-.ui-sortable-placeholder {
-	border: 2px dashed #c9c9c9;
+.portal-view .ui-sortable-placeholder {
+	height: 75px !important;
+	border: 1px dashed #c9c9c9;
 	visibility: visible !important;
-	height: 100px !important;
+	
+	-webkit-border-radius: 4px;
+	   -moz-border-radius: 4px;
+			border-radius: 4px;
 }
 
-.ui-sortable-placeholder * {
+.portal-view .ui-sortable-placeholder * {
 	visibility: hidden;
 }
