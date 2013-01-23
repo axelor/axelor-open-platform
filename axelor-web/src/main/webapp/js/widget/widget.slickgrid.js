@@ -638,7 +638,6 @@ Grid.prototype.findNextEditable = function(posY, posX, saveIfLast) {
 		this.focusInvalidCell(args);
 		return null;
 	}
-	console.log('aaaaa', this.isDirty());
 	if (saveIfLast && this.isDirty() && !this.saveChanges(args)) {
 		this.focusInvalidCell(args);
 		return null;
