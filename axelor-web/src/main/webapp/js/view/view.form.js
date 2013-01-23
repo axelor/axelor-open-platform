@@ -606,7 +606,9 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 					title: _t('Update Log'),
 					html: true,
 					content: getContent,
-					placement: "bottom"
+					placement: "bottom",
+					trigger: "hover",
+					delay: {show: 500, hide: 0}
 				});
 				logInfo.popover('show');
 			}
