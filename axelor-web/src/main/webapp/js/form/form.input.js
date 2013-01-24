@@ -501,7 +501,7 @@ var DateTimeItem = {
 				e.preventDefault();
 				return false;
 			}
-			if (e.keyCode === $.ui.keyCode.ENTER) {
+			if (e.keyCode === $.ui.keyCode.ENTER || e.keyCode === $.ui.keyCode.TAB) {
 				updateModel();
 			}
 		});
@@ -514,20 +514,25 @@ var DateTimeItem = {
 
 		var that = this;
 		function updateModel() {
-			var value = input.datetimepicker('getDate'),
+			var masked = input.mask("value") || '',
+				value = input.datetimepicker('getDate'),
+				oldValue = controller.$viewValue || null,
 				onChange = element.data('$onChange');
+
+			if (_.isEmpty(masked)) {
+				value = null;
+			}
 
 			if (angular.isDate(value)) {
 				value = that.isDate ? moment(value).sod().format('YYYY-MM-DD') : moment(value).format();
 			}
 			
-			if (controller.$viewValue === value)
+			if (angular.equals(value, oldValue))
 				return;
 
+			controller.$setViewValue(value);
 			setTimeout(function(){
-				scope.$apply(function(){
-					controller.$setViewValue(value);
-				});
+				scope.$apply();
 			});
 			
 			if (onChange) {
