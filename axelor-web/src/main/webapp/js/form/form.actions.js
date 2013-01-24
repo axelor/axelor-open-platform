@@ -166,8 +166,9 @@ ActionHandler.prototype = {
 		
 		// block the entire ui (auto unblocks when actions are complete)
 		_.delay(axelor.blockUI, 100);
-
-		return this._handleActions(actions, context);
+		return this._handleActions(actions, context).then(function() {
+			//DONE!
+		});
 	},
 	
 	_getContext: function() {
@@ -212,8 +213,7 @@ ActionHandler.prototype = {
 
 			var ds = scope._dataSource;
 
-			promise = ds.save(scope.record);
-			promise = promise.success(function(rec, page) {
+			ds.save(scope.record).success(function(rec, page) {
 				if (scope.doRead) {
 					return scope.doRead(rec.id).success(doEdit);
 				}
