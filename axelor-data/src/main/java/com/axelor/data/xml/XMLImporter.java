@@ -255,6 +255,14 @@ public class XMLImporter implements Importer {
 					LOG.error("Unable to import object {}.", bean);
 					LOG.error("With binding {}.", binding);
 					LOG.error("With exception:", e);
+					
+					// Recover the transaction
+					if (JPA.em().getTransaction().getRollbackOnly()) {
+						JPA.em().getTransaction().rollback();
+					}
+					if (!JPA.em().getTransaction().isActive()) {
+						JPA.em().getTransaction().begin();
+					}
 				}
 
 				if (count % 20 == 0) {
