@@ -351,21 +351,28 @@ public final class JPA {
 	public static <T extends Model> T manage(T bean) {
 		Set<Model> visited = Sets.newHashSet();
 		try {
-			return persist(_manage(bean, visited));
+			T managed = _manage(bean, visited);
+			if (isUninitialized(managed)) {
+				return managed;
+			}
+			return persist(managed);
 		} finally {
 			visited.clear();
 		}
 	}
+	
+	private static <T extends Model> boolean isUninitialized(T bean) {
+		return bean instanceof HibernateProxy
+				&& ((HibernateProxy) bean).getHibernateLazyInitializer()
+						.isUninitialized();
+	}
 
 	private static <T extends Model> T _manage(T bean, Set<Model> visited) {
-
-		if (visited.contains(bean))
-			return bean;
-		visited.add(bean);
 		
-		if (bean instanceof HibernateProxy
-				&& ((HibernateProxy) bean).getHibernateLazyInitializer().isUninitialized())
+		if (visited.contains(bean) || isUninitialized(bean)) {
 			return bean;
+		}
+		visited.add(bean);
 
 		Mapper mapper = Mapper.of(bean.getClass());
 		for (Property property : mapper.getProperties()) {
