@@ -262,11 +262,12 @@ Grid.prototype.parse = function(view) {
 
 	var cols = _.map(view.items, function(item){
 		var field = handler.fields[item.name],
-			path = handler.formPath;
+			path = handler.formPath, type;
 
 		field = _.extend({}, item, field);
 		scope.fields_view[item.name] = field;
 		path = path ? path + '.' + item.name : item.name;
+		type = field.selection ? 'string' : field.type;
 		
 		var sortable = true;
 		switch (field.type) {
@@ -284,8 +285,8 @@ Grid.prototype.parse = function(view) {
 			field: item.name,
 			descriptor: field,
 			sortable: sortable,
-			cssClass: field.type,
-			headerCssClass: field.type,
+			cssClass: type,
+			headerCssClass: type,
 			xpath: path
 		};
 	});
