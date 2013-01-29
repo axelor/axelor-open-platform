@@ -281,7 +281,7 @@ public class CSVImporter implements Importer {
 					continue;
 				}
 				
-				if (++count % 100 == 0) {
+				if (++count % 20 == 0) {
 					JPA.flush();
 					JPA.em().clear();
 				}
