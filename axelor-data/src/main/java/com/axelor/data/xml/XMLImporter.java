@@ -115,6 +115,10 @@ public class XMLImporter implements Importer {
 		this.listeners.add(listener);
 	}
 
+	public void clearListener() {
+		this.listeners.clear();
+	}
+
 	@Override
 	public void run(Map<String, String[]> mappings) {
 		
@@ -253,10 +257,11 @@ public class XMLImporter implements Importer {
 					LOG.error("With exception:", e);
 				}
 
-				if (count % 100 == 0) {
+				if (count % 20 == 0) {
 					JPA.flush();
 					JPA.em().clear();
 				}
+
 			}
 		};
 
@@ -275,14 +280,23 @@ public class XMLImporter implements Importer {
 		stream.registerConverter(new ElementConverter(binder));
 		
 		JPA.em().getTransaction().begin();
+
 		try {
+
 			stream.fromXML(reader);
-			if (JPA.em().getTransaction().isActive())
+
+			if (JPA.em().getTransaction().isActive()){
 				JPA.em().getTransaction().commit();
+				JPA.em().clear();
+			}
+
+
 		} catch (Exception e) {
+
 			if (JPA.em().getTransaction().isActive())
 				JPA.em().getTransaction().rollback();
 			throw new ImportException(e);
+
 		}
 	}
 }
