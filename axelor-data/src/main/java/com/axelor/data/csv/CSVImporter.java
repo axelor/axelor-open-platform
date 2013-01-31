@@ -50,6 +50,10 @@ public class CSVImporter implements Importer {
 		this.listeners.add(listener);
 	}
 	
+	public void clearListener() {
+		this.listeners.clear();
+	}
+	
 	public void setContext(Map<String, Object> context) {
 		this.context = context;
 	}
@@ -265,6 +269,7 @@ public class CSVImporter implements Importer {
 					
 					if (bean != null) {
 						JPA.manage((Model) bean);
+						count++;
 						for(Listener listener : listeners) {
 							listener.imported((Model) bean);
 						}
@@ -278,28 +283,45 @@ public class CSVImporter implements Importer {
 						LOG.error("Unable to import record: {}", Arrays.asList(values));
 						LOG.error("With following exception:", e);
 					}
-					continue;
+					
+					// Recover the transaction
+					if (JPA.em().getTransaction().getRollbackOnly()) {
+						JPA.em().getTransaction().rollback();
+					}
+					if (!JPA.em().getTransaction().isActive()) {
+						JPA.em().getTransaction().begin();
+					}
+					
 				}
 				
-				if (++count % 20 == 0) {
+				if (count % 20 == 0) {
 					JPA.flush();
 					JPA.em().clear();
 				}
 			}
-			if (JPA.em().getTransaction().isActive())
+			
+			if (JPA.em().getTransaction().isActive()){
 				JPA.em().getTransaction().commit();
+				JPA.em().clear();
+			}
+			
 		} catch (Exception e) {
+			
 			if (JPA.em().getTransaction().isActive())
 				JPA.em().getTransaction().rollback();
+			
 			if (LOG.isErrorEnabled())
 				LOG.error("Error while importing {}.", csvInput.getFileName());
 				LOG.error("Unable to import data.");
 				LOG.error("With following exception:", e);
+				
 		} finally {
+			
 			for(Listener listener : listeners) {
 				listener.imported(count);
 			}
 			csvReader.close();
+			
 		}
 		
 		
