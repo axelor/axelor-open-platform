@@ -12,6 +12,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Formula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +111,7 @@ public class MetaModelService {
 		
 		MetaField metaField = null;
 		
-		if (!field.isSynthetic()){
+		if (!field.isSynthetic() && !field.isAnnotationPresent(Formula.class)){
 			
 			log.info("Create field : {}", field.getName());
 			
