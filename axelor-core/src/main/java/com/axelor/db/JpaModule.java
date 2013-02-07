@@ -26,6 +26,8 @@ public class JpaModule extends AbstractModule {
 	private String jpaUnit;
 	private boolean autoscan;
 	private boolean autostart;
+	
+	private Properties properties;
 
 	/**
 	 * Create new instance of the {@link JpaModule} with the given persistence
@@ -60,16 +62,30 @@ public class JpaModule extends AbstractModule {
 	public JpaModule(String jpaUnit) {
 		this(jpaUnit, true, true);
 	}
+	
+	/**
+	 * Configures the JPA persistence provider with a set of properties.
+	 * 
+	 * @param properties
+	 *            A set of name value pairs that configure a JPA persistence
+	 *            provider as per the specification.
+	 */
+	public JpaModule properties(final Properties properties) {
+		this.properties = properties;
+		return this;
+	}
 
 	@Override
 	protected void configure() {
 		log.info("Initialize JPA...");
 		Properties properties = new Properties();
-		properties.put("hibernate.connection.autocommit", "false");
-		properties.put("hibernate.ejb.interceptor", "com.axelor.auth.db.AuditInterceptor");
+		if (this.properties != null) {
+			properties.putAll(this.properties);
+		}
 		if (this.autoscan) {
 			properties.put("hibernate.ejb.resource_scanner", "com.axelor.db.JpaScanner");
 		}
+		properties.put("hibernate.connection.autocommit", "false");
 		install(new JpaPersistModule(jpaUnit).properties(properties));
 		if (this.autostart) {
 			bind(Initializer.class).asEagerSingleton();
