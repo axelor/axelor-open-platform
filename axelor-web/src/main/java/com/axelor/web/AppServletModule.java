@@ -2,6 +2,7 @@ package com.axelor.web;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.shiro.guice.web.GuiceShiroFilter;
 import org.slf4j.Logger;
@@ -57,7 +58,9 @@ public class AppServletModule extends JerseyServletModule {
 		log.info(builder.toString());
 		
 		// initialize JPA
-		install(new JpaModule(jpaUnit, true, false));
+		Properties properties = new Properties();
+		properties.put("hibernate.ejb.interceptor", "com.axelor.auth.db.AuditInterceptor");
+		install(new JpaModule(jpaUnit, true, false).properties(properties));
 		filter("*").through(PersistFilter.class);
 		
 		// install auth module
