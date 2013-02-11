@@ -22,6 +22,7 @@
         <xsd:element name="action-view" type="tns:ActionView" />
         <xsd:element name="action-data" type="tns:ActionData" />
         <xsd:element name="action-ws" type="tns:ActionWS" />
+        <xsd:element name="action-export" type="tns:ActionExport" />
       </xsd:choice>
     </xsd:complexType>
   </xsd:element>
@@ -873,6 +874,43 @@
               <xsd:documentation>XML data import config file.</xsd:documentation>
             </xsd:annotation>
           </xsd:attribute>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="ActionExport">
+      <xsd:complexContent>
+        <xsd:extension base="tns:AbstractAction">
+            <xsd:sequence>
+              <xsd:element name="export" maxOccurs="unbounded">
+                <xsd:annotation>
+                  <xsd:documentation>
+                  An export task.
+                  </xsd:documentation>
+                </xsd:annotation>
+                <xsd:complexType>
+                  <xsd:attribute name="name" type="xsd:string" use="required">
+                    <xsd:annotation>
+                      <xsd:documentation>Output file name.</xsd:documentation>
+                    </xsd:annotation>
+                  </xsd:attribute>
+                  <xsd:attribute name="template" type="xsd:string" use="required">
+                    <xsd:annotation>
+                      <xsd:documentation>The template to be used to generate output file.</xsd:documentation>
+                    </xsd:annotation>
+                  </xsd:attribute>
+                </xsd:complexType>
+              </xsd:element>
+            </xsd:sequence>
+            <xsd:attribute name="output" type="xsd:string">
+              <xsd:annotation>
+                <xsd:documentation>
+                Override the default output directory.
+                Special keywords ${name}, ${date}, ${datetime} can be
+                used to organize the output directory.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:attribute>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>

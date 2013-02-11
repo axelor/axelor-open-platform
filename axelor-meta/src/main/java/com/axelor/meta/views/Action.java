@@ -19,6 +19,7 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.ActionHandler;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -62,6 +63,11 @@ public abstract class Action {
 	public abstract Object wrap(ActionHandler handler);
 	
 	public abstract Object evaluate(ActionHandler handler);
+	
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(getClass()).add("name", getName()).toString();
+	}
 	
 	@XmlType
 	public static class ActionRecord extends Action {

@@ -13,9 +13,11 @@
 
   <action-data name="data.test.1" config="data/xml-config.xml">
     <stream file="ws-test1.xml" provider="ws.test.1" name="titles"/>
-    <!--
-    <stream file="ws-test2.xml" provider="ws.test.2"/>
-    -->
   </action-data>
+
+  <action-export name="export.sale.order" output="/tmp/x/${name}/">
+    <export name="${name}.xml" template="data/export-sale-order.tmpl"/>
+    <export name="${name}-customer-copy.xml" template="data/export-sale-order.tmpl"/>
+  </action-export>
 
 </object-views>

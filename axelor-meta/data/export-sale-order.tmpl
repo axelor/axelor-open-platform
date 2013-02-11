@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sale-order>
+	<id>${name}</id>
+	<date>${orderDate}</date>
+	<customer>${customer.name}</customer>
+	<% items.each { %>
+	<item>
+		<product>${it.product.name}</product>
+		<price>${it.price}</price>
+		<quantity>${it.quantity}</quantity>
+	</item>
+	<% } %>
+</sale-order>
