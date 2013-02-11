@@ -633,10 +633,10 @@ public class Query<T extends Model> {
 				}
 			} else {
 				Property property = mapper.getProperty(name);
-				if (property.isCollection()) {
-					return null;
-				}
 				if (property != null && property.getTarget() != null) {
+					if (property.isCollection()) {
+						return null;
+					}
 					prefix = "_" + name;
 					joins.put("self." + name, prefix);
 					return prefix;
