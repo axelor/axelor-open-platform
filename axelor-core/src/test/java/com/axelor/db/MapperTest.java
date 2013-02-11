@@ -101,7 +101,7 @@ public class MapperTest extends BaseTest {
 		values.put("intValue", 121);
 		values.put("longValue", 199L);
 		values.put("doubleValue", 23.12);
-		values.put("decimalValue1", "233.232344");
+		values.put("decimalValue1", "123.0123456789123");
 		values.put("dateTime1", "2011-01-11");
 		values.put("localDate1", "1111-11-11");
 		
@@ -125,7 +125,7 @@ public class MapperTest extends BaseTest {
 		Assert.assertTrue(0L == bean.getLongValue2());
 		Assert.assertTrue(0.0 == bean.getDoubleValue2());
 		
-		Assert.assertEquals("233.23", bean.getDecimalValue1().toString());
+		Assert.assertEquals("123.0123456789", bean.getDecimalValue1().toString());
 		Assert.assertTrue(bean.getDateTime1().getYear() == 2011);
 		Assert.assertTrue(bean.getLocalDate1().getYear() == 1111);
 	}

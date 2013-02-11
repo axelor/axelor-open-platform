@@ -3,7 +3,6 @@ package com.axelor.db.mapper.types;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 
 import javax.validation.constraints.Digits;
@@ -29,7 +28,7 @@ public class DecimalAdapter implements TypeAdapter<BigDecimal> {
 		if (value instanceof BigDecimal)
 			return adjust((BigDecimal)value, scale);
 		
-		return adjust(new BigDecimal(value.toString(), MathContext.DECIMAL32), scale);
+		return adjust(new BigDecimal(value.toString()), scale);
 	}
 	
 	private BigDecimal adjust(BigDecimal value, Integer scale) {

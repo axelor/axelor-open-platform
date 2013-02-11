@@ -32,7 +32,7 @@ public class TypeCheck extends JpaModel {
 
 	private double doubleValue2;
 	
-	@Digits(integer = 8, fraction = 2)
+	@Digits(integer = 20, fraction = 10)
 	private BigDecimal decimalValue1;
 	
 	private BigDecimal decimalValue2;
