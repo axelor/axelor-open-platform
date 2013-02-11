@@ -6,12 +6,15 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.joda.time.Period;
 import org.junit.Test;
 
 import com.axelor.meta.views.Action;
 import com.axelor.meta.views.ObjectViews;
 import com.axelor.rpc.ActionRequest;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -41,7 +44,7 @@ public class TestWS extends AbstractTest {
 		List<Action> actions = views.getActions();
 
 		Assert.assertNotNull(actions);
-		Assert.assertEquals(3, actions.size());
+		Assert.assertEquals(4, actions.size());
 		
 		MetaStore.resister(views);
 		
@@ -54,6 +57,30 @@ public class TestWS extends AbstractTest {
 		context.put("dt", dt);
 
 		ActionHandler handler = createHandler("data.test.1", context);
+		action.evaluate(handler);
+	}
+	
+	@Test
+	public void test2() throws Exception {
+		ObjectViews views = this.unmarshal("WSTest.xml", ObjectViews.class);
+
+		MetaStore.resister(views);
+		
+		Action action = MetaStore.getAction("export.sale.order");
+		Map<String, Object> context = Maps.newHashMap();
+		
+		context.put("name", "SO001");
+		context.put("orderDate", new LocalDate());
+		context.put("customer", ImmutableMap.of("name", "John Smith"));
+
+		List<Object> items = Lists.newArrayList();
+		context.put("items", items);
+		
+		items.add(ImmutableMap.of("product", ImmutableMap.of("name", "PC1"), "price", 250, "quantity", 1));
+		items.add(ImmutableMap.of("product", ImmutableMap.of("name", "PC2"), "price", 550, "quantity", 1));
+		items.add(ImmutableMap.of("product", ImmutableMap.of("name", "Laptop"), "price", 690, "quantity", 1));
+
+		ActionHandler handler = createHandler("export.sale.order", context);
 		action.evaluate(handler);
 	}
 }
