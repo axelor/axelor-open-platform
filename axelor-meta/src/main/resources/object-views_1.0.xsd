@@ -20,8 +20,8 @@
         <xsd:element name="action-attrs" type="tns:ActionAttrs" />
         <xsd:element name="action-method" type="tns:ActionMethod" />
         <xsd:element name="action-view" type="tns:ActionView" />
-        <xsd:element name="action-data" type="tns:ActionData" />
         <xsd:element name="action-ws" type="tns:ActionWS" />
+        <xsd:element name="action-import" type="tns:ActionImport" />
         <xsd:element name="action-export" type="tns:ActionExport" />
       </xsd:choice>
     </xsd:complexType>
@@ -834,16 +834,16 @@
       </xsd:complexContent>
     </xsd:complexType>
     
-    <xsd:complexType name="ActionData">
+    <xsd:complexType name="ActionImport">
       <xsd:annotation>
         <xsd:documentation>
-          The action-data can be used to perform data import from xml data stream.
+          The action-import can be used to perform data import from xml data stream.
         </xsd:documentation>
       </xsd:annotation>
       <xsd:complexContent>
         <xsd:extension base="tns:AbstractAction">
           <xsd:sequence>
-            <xsd:element name="stream" maxOccurs="unbounded">
+            <xsd:element name="import" maxOccurs="unbounded">
               <xsd:complexType>
                 <xsd:attribute name="file" type="xsd:string" use="required">
                   <xsd:annotation>
