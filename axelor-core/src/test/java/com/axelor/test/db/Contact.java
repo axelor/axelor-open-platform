@@ -1,6 +1,5 @@
 package com.axelor.test.db;
 
-import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +17,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
+import org.joda.time.LocalDate;
 
 import com.axelor.db.Binary;
 import com.axelor.db.JPA;
@@ -53,7 +53,8 @@ public class Contact extends JpaModel {
 
 	private String lang;
 
-	private Date dateOfBirth;
+	@Type(type = "org.joda.time.contrib.hibernate.PersistentLocalDate")
+	private LocalDate dateOfBirth;
 
 	@OneToMany(mappedBy = "contact", cascade = CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval = true)
 	private List<Address> addresses;
@@ -145,11 +146,11 @@ public class Contact extends JpaModel {
 		this.lang = lang;
 	}
 	
-	public Date getDateOfBirth() {
+	public LocalDate getDateOfBirth() {
 		return dateOfBirth;
 	}
 
-	public void setDateOfBirth(Date dateOfBirth) {
+	public void setDateOfBirth(LocalDate dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 	}
 
