@@ -1,12 +1,20 @@
 package com.axelor.db;
 
 import java.io.InputStream;
+import java.util.Date;
 import java.util.Map;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Construct;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeId;
+import org.yaml.snakeyaml.nodes.Tag;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -157,6 +165,30 @@ public class Fixture {
 		final Map<Node, Object> objects = Maps.newLinkedHashMap();
 		
 		Constructor ctor = new Constructor() {
+			{
+				yamlClassConstructors.put(NodeId.scalar, new TimeStampConstruct());
+			}
+			class TimeStampConstruct extends Constructor.ConstructScalar {
+
+				Construct dateConstructor = yamlConstructors.get(Tag.TIMESTAMP);
+				
+				@Override
+				public Object construct(Node nnode) {
+					if (nnode.getTag().equals(Tag.TIMESTAMP)) {
+						Date date = (Date) dateConstructor.construct(nnode);
+						if (nnode.getType() == LocalDate.class) {
+							return new LocalDate(date, DateTimeZone.UTC);
+						}
+						if (nnode.getType() == LocalDateTime.class) {
+							return new LocalDateTime(date, DateTimeZone.UTC);
+						}
+						return new DateTime(date, DateTimeZone.UTC);
+					} else {
+						return super.construct(nnode);
+					}
+				}
+
+			}
 			
 			@Override
 			protected Object constructObject(Node node) {
