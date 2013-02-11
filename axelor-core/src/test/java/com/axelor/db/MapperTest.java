@@ -1,16 +1,15 @@
 package com.axelor.db;
 
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.axelor.BaseTest;
-import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.TypeCheck;
@@ -59,19 +58,17 @@ public class MapperTest extends BaseTest {
 		Assert.assertNotNull(contact.getId());
 		Assert.assertNotNull(contact.getDateOfBirth());
 		
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(contact.getDateOfBirth());
-		
-		Assert.assertEquals(1975, cal.get(Calendar.YEAR));
-		Assert.assertEquals(2, cal.get(Calendar.MONTH)+1);
-		Assert.assertEquals(27, cal.get(Calendar.DATE));
+		LocalDate date = contact.getDateOfBirth();
+		Assert.assertEquals(1975, date.getYear());
+		Assert.assertEquals(3, date.getMonthOfYear());
+		Assert.assertEquals(23, date.getDayOfMonth());
 		
 		Assert.assertNotNull(contact.getTitle());
 		Assert.assertEquals("Mr.", contact.getTitle().getName());
 		
 		Assert.assertNotNull(contact.getGroups());
 		Assert.assertEquals(1, contact.getGroups().size());
-		Assert.assertEquals("Family", contact.getGroups().get(0).getTitle());
+		Assert.assertEquals("Business", contact.getGroups().get(0).getTitle());
 	}
 	
 	private Map<String, Object> getDemoData() {
