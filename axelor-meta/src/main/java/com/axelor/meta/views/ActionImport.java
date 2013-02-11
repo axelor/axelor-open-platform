@@ -25,20 +25,20 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @XmlType
-public class ActionData extends Action {
+public class ActionImport extends Action {
 
 	@XmlAttribute
 	private String config;
 	
-	@XmlElement(name = "stream")
-	private List<Stream> streams;
+	@XmlElement(name = "import")
+	private List<Import> imports;
 	
 	public String getConfig() {
 		return config;
 	}
 	
-	public List<Stream> getStreams() {
-		return streams;
+	public List<Import> getImports() {
+		return imports;
 	}
 
 	private List<Model> doImport(XMLImporter importer, final String fileName, Object data) {
@@ -48,7 +48,7 @@ public class ActionData extends Action {
 			return null;
 		}
 		
-		log.info("action-data (import): " + fileName);
+		log.info("action-import: " + fileName);
 		
 		final StringReader reader = new StringReader((String) data);
 		final HashMultimap<String, Reader> mapping = HashMultimap.create();
@@ -59,7 +59,7 @@ public class ActionData extends Action {
 		importer.addListener(new Listener() {
 			@Override
 			public void imported(Model bean) {
-				log.info("action-data (record): {}(id={})",
+				log.info("action-import (record): {}(id={})",
 						bean.getClass().getSimpleName(),
 						bean.getId());
 				records.add(bean);
@@ -87,21 +87,21 @@ public class ActionData extends Action {
 			}
 		});
 
-		log.info("action-data (count): " + records.size());
+		log.info("action-import (count): " + records.size());
 		return records;
 	}
 
 	@Override
 	public Object evaluate(ActionHandler handler) {
-		log.info("action-data (config): " + config);
+		log.info("action-import (config): " + config);
 		XMLImporter importer = new XMLImporter(handler.getInjector(), config);
 		Map<String, Object> result = Maps.newHashMap();
 		
 		importer.setContext(handler.getContext());
 
 		int count = 0;
-		for(Stream stream : getStreams()) {
-			log.info("action-data (stream, provider): " + stream.file + ", " + stream.provider);
+		for(Import stream : getImports()) {
+			log.info("action-import (stream, provider): " + stream.file + ", " + stream.provider);
 			Action action = MetaStore.getAction(stream.getProvider());
 			if (action == null) {
 				log.debug("No such action: " + stream.getProvider());
@@ -114,7 +114,7 @@ public class ActionData extends Action {
 			if (data instanceof Collection) {
 				for(Object item : (Collection<?>) data) {
 					if (item instanceof String) {
-						log.info("action-data (xml stream)");
+						log.info("action-import (xml stream)");
 						List<Model> imported = doImport(importer, stream.file, item);
 						if (imported != null) {
 							records.addAll(imported);
@@ -122,7 +122,7 @@ public class ActionData extends Action {
 					}
 				}
 			} else {
-				log.info("action-data (object stream)");
+				log.info("action-import (object stream)");
 				List<Model> imported = doImport(importer, stream.file, data);
 				if (imported != null) {
 					records.addAll(imported);
@@ -131,7 +131,7 @@ public class ActionData extends Action {
 			count += records.size();
 			result.put(stream.name == null ? stream.file : stream.name, records);
 		}
-		log.info("action-data (total): " + count);
+		log.info("action-import (total): " + count);
 		return result;
 	}
 
@@ -147,7 +147,7 @@ public class ActionData extends Action {
 	}
 	
 	@XmlType
-	public static class Stream {
+	public static class Import {
 		
 		@XmlAttribute
 		private String file;

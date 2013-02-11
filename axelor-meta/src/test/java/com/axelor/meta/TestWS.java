@@ -48,7 +48,7 @@ public class TestWS extends AbstractTest {
 		
 		MetaStore.resister(views);
 		
-		Action action = MetaStore.getAction("data.test.1");
+		Action action = MetaStore.getAction("data.import.1");
 		Map<String, Object> context = Maps.newHashMap();
 		
 		DateTime dt = new DateTime();
@@ -56,7 +56,7 @@ public class TestWS extends AbstractTest {
 		
 		context.put("dt", dt);
 
-		ActionHandler handler = createHandler("data.test.1", context);
+		ActionHandler handler = createHandler("data.import.1", context);
 		action.evaluate(handler);
 	}
 	

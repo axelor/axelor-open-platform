@@ -11,9 +11,9 @@
     <action name="ControleCreeAffaire" template="data/ws-test1.tmpl"/>
   </action-ws>
 
-  <action-data name="data.test.1" config="data/xml-config.xml">
-    <stream file="ws-test1.xml" provider="ws.test.1" name="titles"/>
-  </action-data>
+  <action-import name="data.import.1" config="data/xml-config.xml">
+    <import file="ws-test1.xml" provider="ws.test.1" name="titles"/>
+  </action-import>
 
   <action-export name="export.sale.order" output="/tmp/x/${name}/">
     <export name="${name}.xml" template="data/export-sale-order.tmpl"/>
