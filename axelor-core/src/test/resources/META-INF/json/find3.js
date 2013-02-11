@@ -1,7 +1,5 @@
 {
-    "operationType":"fetch",
-    "componentId":"isc_ListGrid_0",
-    "dataSource" : "com_axelor_test_db_Contact",
+    "model" : "com.axelor.test.db.Contact",
     "data":{
         "firstName": "ma",
         "email": "gmail",
@@ -9,10 +7,9 @@
         "_domainContext": {
         	"code": "mr",
         	"firstName": "John"
-        },
-        "__gwt_ObjectId":2291
+        }
     }, 
-    "startRow":0, 
-    "endRow":20, 
+    "limit":0, 
+    "offset":20, 
     "textMatchStyle":"substring"
 }

@@ -1,11 +1,11 @@
 package com.axelor.rpc;
 
-import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,6 +15,9 @@ import com.axelor.test.db.Address;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.Group;
 import com.axelor.test.db.Title;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import com.google.inject.persist.Transactional;
 
 public class ResourceTest extends BaseTest {
 
@@ -28,10 +31,7 @@ public class ResourceTest extends BaseTest {
 		
 		Assert.assertNotNull(res);
 		Assert.assertNotNull(res.getData());
-		Assert.assertTrue(res.getData() instanceof List);
-		
-//		for(Object field : (List<?>) res.getData())
-//			System.err.println(toJson(field));
+		Assert.assertTrue(res.getData() instanceof Map);
 	}
 
 	@Test
@@ -43,12 +43,10 @@ public class ResourceTest extends BaseTest {
 		Assert.assertNotNull(res);
 		Assert.assertNotNull(res.getData());
 		Assert.assertTrue(res.getData() instanceof List);
-		
-//		for(Object field : (List<?>) res.getData())
-//			System.err.println(toJson(field));
 	}
 
 	@Test @SuppressWarnings("all")
+	@Transactional
 	public void testAdd() throws Exception {
 
 		Request req = fromJson("add2.js", Request.class);
@@ -56,15 +54,15 @@ public class ResourceTest extends BaseTest {
 		
 		Assert.assertNotNull(res);
 		Assert.assertNotNull(res.getData());
+		Assert.assertNotNull(res.getItem(0));
+		Assert.assertTrue(res.getItem(0) instanceof Contact);
 
-		Map<String, Object> data = (Map) res.getItem(0);
-		
-		Contact p = Contact.edit(data);
+		Contact p = (Contact) res.getItem(0);
 
 		Assert.assertEquals(Title.class, p.getTitle().getClass());
 		Assert.assertEquals(Address.class, p.getAddresses().get(0).getClass());
 		Assert.assertEquals(Group.class, p.getGroups().get(0).getClass());
-		Assert.assertEquals(Date.class, p.getDateOfBirth().getClass());
+		Assert.assertEquals(LocalDate.class, p.getDateOfBirth().getClass());
 
 		Assert.assertEquals("mr", p.getTitle().getCode());
 		Assert.assertEquals("France", p.getAddresses().get(0).getCountry().getName());
@@ -73,19 +71,31 @@ public class ResourceTest extends BaseTest {
 	}
 	
 	@Test @SuppressWarnings("all")
+	@Transactional
 	public void testUpdate() throws Exception {
 
-		Request req = fromJson("update.js", Request.class);
+		Contact c = Contact.all().fetchOne();
+		Map<String, Object> data = Maps.newHashMap();
+		
+		data.put("id", c.getId());
+		data.put("version", c.getVersion());
+		data.put("firstName", "jack");
+		data.put("lastName", "sparrow");
+
+		String json = toJson(ImmutableMap.of("data", data));
+
+		Request req = fromJson(json, Request.class);
 		Response res = resource.save(req);
 		
 		Assert.assertNotNull(res);
 		Assert.assertNotNull(res.getData());
+		Assert.assertNotNull(res.getItem(0));
+		Assert.assertTrue(res.getItem(0) instanceof Contact);
 
-		Map<String, Object> data = (Map) res.getItem(0);
+		Contact contact = (Contact) res.getItem(0);
 		
-		Assert.assertEquals("Some", data.get("firstName"));
-		Assert.assertEquals("thing", data.get("lastName"));
-		Assert.assertEquals("some@thing.com", data.get("email"));
+		Assert.assertEquals("jack", contact.getFirstName());
+		Assert.assertEquals("sparrow", contact.getLastName());
 	}
 	
 

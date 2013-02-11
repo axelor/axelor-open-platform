@@ -1,9 +1,9 @@
 package com.axelor.rpc;
 
-import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -14,6 +14,8 @@ import com.axelor.test.db.Address;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.Group;
 import com.axelor.test.db.Title;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
 public class RequestTest extends BaseTest {
@@ -100,7 +102,7 @@ public class RequestTest extends BaseTest {
 		Assert.assertEquals(Title.class, p.getTitle().getClass());
 		Assert.assertEquals(Address.class, p.getAddresses().get(0).getClass());
 		Assert.assertEquals(Group.class, p.getGroups().get(0).getClass());
-		Assert.assertEquals(Date.class, p.getDateOfBirth().getClass());
+		Assert.assertEquals(LocalDate.class, p.getDateOfBirth().getClass());
 
 		Assert.assertEquals("mr", p.getTitle().getCode());
 		Assert.assertEquals("France", p.getAddresses().get(0).getCountry().getName());
@@ -111,17 +113,26 @@ public class RequestTest extends BaseTest {
 	}
 	
 	@Test
+	@Transactional
 	public void testUpdate() {
+		
+		Contact c = Contact.all().fetchOne();
+		Map<String, Object> data = Maps.newHashMap();
 
-		Request req = fromJson("update.js", Request.class);
+		data.put("id", c.getId());
+		data.put("version", c.getVersion());
+		data.put("firstName", "Some");
+		data.put("lastName", "thing");
+
+		String json = toJson(ImmutableMap.of("data", data));
+		Request req = fromJson(json, Request.class);
 
 		Assert.assertTrue(req.getData() instanceof Map);
 
-		Map<String, Object> data = req.getData();
+		data = req.getData();
 
 		Assert.assertEquals("Some", data.get("firstName"));
 		Assert.assertEquals("thing", data.get("lastName"));
-		Assert.assertEquals("some@thing.com", data.get("email"));
 
 		Contact o = Contact.edit(data);
 		
