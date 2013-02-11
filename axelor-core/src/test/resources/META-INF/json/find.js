@@ -1,7 +1,6 @@
 {
-    "operationType":"fetch", 
-    "componentId":"isc_ListGrid_0",
-    "dataSource" : "com_axelor_test_db_Contact",
+    "model" : "com.axelor.test.db.Contact",
+    "fields": ["fullName", "email"],
     "data":{
     	"_domain": "self.title.code = 'mr'",
         "operator":"and", 
@@ -49,7 +48,7 @@
             }
         ]
     }, 
-    "startRow":0, 
-    "endRow":75, 
+    "offset":0, 
+    "limit":75, 
     "textMatchStyle":"substring"
 }
