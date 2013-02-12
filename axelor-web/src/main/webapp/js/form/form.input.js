@@ -196,6 +196,7 @@ var IntegerItem = {
 	link: function(scope, element, attrs, model) {
 
 		var props = scope.getViewDef(element),
+			precision = props.precision || 0,
 			scale = props.scale || 2;
 		
 		var options = {
@@ -208,6 +209,12 @@ var IntegerItem = {
 
 		model.$parsers.unshift(function(viewValue) {
             var isNumber = _.isNumber(viewValue) || isValid(viewValue);
+            if (isNumber && _.isString(viewValue)) {
+            	var parts = viewValue.split(/\./),
+            		integer = parts[0],
+            		decimal = parts[1];
+            	isNumber = (integer.length <= precision - scale) && (decimal.length <= scale);
+            }
             model.$setValidity('format', isNumber);
             return isNumber ? viewValue : undefined;
         });
@@ -220,11 +227,16 @@ var IntegerItem = {
 		}
 
 		function format(value) {
-			if (isDecimal) {
-				var num = +value;
-				if (num) {
-					return num.toFixed(scale);
+			if (isDecimal && _.isString(value)) {
+				var parts = value.split(/\./),
+					integer = parts[0],
+					decimal = parts[1];
+				if (decimal.length <= scale) {
+					return integer + '.' + _.string.rpad(decimal, scale, '0');
 				}
+				decimal = (+decimal.slice(0, scale)) + Math.round("." + decimal.slice(scale));
+				decimal = _.string.pad(decimal, scale, '0');
+				return integer + '.' + decimal;
 			}
 			return value;
 		}
@@ -274,8 +286,7 @@ var IntegerItem = {
 			if (parts.length > 1) {
 				value = integer + '.' + decimal;
 			}
-			
-			value = +value;
+
 			min = options.min;
 			max = options.max;
 
