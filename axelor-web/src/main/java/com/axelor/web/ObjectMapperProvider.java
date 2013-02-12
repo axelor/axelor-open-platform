@@ -3,6 +3,7 @@ package com.axelor.web;
 import groovy.lang.GString;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Map;
 
 import javax.ws.rs.Produces;
@@ -83,6 +84,18 @@ public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
 		}
 	}
 	
+	static class DecimalSerializer extends JsonSerializer<BigDecimal> {
+		
+		@Override
+		public void serialize(BigDecimal value, JsonGenerator jgen,
+				SerializerProvider provider) throws IOException,
+				JsonProcessingException {
+			if (value != null) {
+				jgen.writeString(value.toPlainString());
+			}
+		}
+	}
+	
 	public ObjectMapperProvider() {
 		mapper = new ObjectMapper();
 		
@@ -92,6 +105,7 @@ public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
 		SimpleModule module = new SimpleModule("MyModule");
 		module.addSerializer(Model.class, new ModelSerializer());
 		module.addSerializer(GString.class, new GStringSerializer());
+		module.addSerializer(BigDecimal.class, new DecimalSerializer());
 
 		JodaModule jodaModule = new JodaModule();
 		jodaModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer());
