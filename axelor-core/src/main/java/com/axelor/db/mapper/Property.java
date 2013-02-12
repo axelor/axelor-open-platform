@@ -163,8 +163,8 @@ public class Property {
 			}
 			if (annotation instanceof Digits) {
 				Digits d = (Digits) annotation;
-				precision = d.integer();
 				scale = d.fraction();
+				precision = d.integer() + scale;
 			}
 			if (annotation instanceof Min) {
 				Min m = (Min) annotation;
