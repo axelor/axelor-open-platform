@@ -299,9 +299,12 @@ class Property {
 		if (precision == null && scale == null)
 			return null
 
+		precision = precision as Integer
+		scale = scale as Integer
+
 		annon("javax.validation.constraints.Digits", false)
-				.add("integer", precision, false)
-				.add("fraction", scale, false)
+				.add("integer", (precision - scale) as String, false)
+				.add("fraction", scale as String, false)
 	}
 
 	private Annotation $jodatime() {
