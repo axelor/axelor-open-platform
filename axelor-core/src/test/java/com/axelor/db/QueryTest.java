@@ -10,6 +10,9 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.google.common.collect.Maps;
+import com.google.inject.persist.Transactional;
+
 import com.axelor.BaseTest;
 import com.axelor.db.Query;
 import com.axelor.test.db.Contact;
@@ -29,13 +32,13 @@ public class QueryTest extends BaseTest {
 				"self.firstName < ? AND self.lastName LIKE ?", "some", "thing");
 		System.err.println(q);
 	}
-	
+
 	@Test
 	public void testAdaptInt() {
 		Contact.all().filter("self.id = ?", 1).fetchOne();
 		Contact.all().filter("self.id IN (?, ?, ?)", 1, 2, 3).fetch();
 	}
-	
+
 	@Test
 	public void testAutoJoin() {
 		Query<Contact> q = Contact.all().filter(
@@ -45,12 +48,28 @@ public class QueryTest extends BaseTest {
 		System.err.println(q);
 		q.fetch();
 	}
-	
+
+	@Test
+	@Transactional
+	public void testBulkUpdate() {
+		Query<Contact> q = Contact.all().filter("self.title.code = ?1", "mr");
+		for(Contact c : q.fetch()) {
+			Assert.assertNull(c.getLang());
+		}
+		// managed instances are not affected with mass update
+		// so clear the session to avoid unexpected results
+		JPA.clear();
+		q.update("self.lang", "EN");
+		for(Contact c : q.fetch()) {
+			Assert.assertEquals("EN", c.getLang());
+		}
+	}
+
 	@Test
 	public void testJDBC() {
-		
+
 		JPA.jdbcWork(new JPA.JDBCWork() {
-			
+
 			@Override
 			public void execute(Connection connection) throws SQLException {
 				Statement stm = connection.createStatement();

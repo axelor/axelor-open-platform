@@ -257,6 +257,8 @@ public class Query<T extends Model> {
 
 	/**
 	 * Perform mass update on the matched records with the given values.
+	 * To avoid unexpected results, clear the session with {@link JPA.clear}
+	 * before running the update.
 	 * 
 	 * @param values
 	 *            the key value map
@@ -264,11 +266,13 @@ public class Query<T extends Model> {
 	 */
 	@Transactional
 	public int update(Map<String, Object> values) {
-		javax.persistence.Query q = em().createQuery(updateQuery(values));
-		for (String key : values.keySet()) {
-			q.setParameter(key, values.get(key));
+		Map<String, Object> params = Maps.newHashMap();
+		for(String key : values.keySet()) {
+			String name = key.replaceFirst("^self\\.", "");
+			params.put(name, values.get(key));
 		}
-		this.bind(q);
+		javax.persistence.Query q = em().createQuery(updateQuery(params));
+		this.bind(new QueryBinder(q).bind(params, null));
 		return q.executeUpdate();
 	}
 
@@ -284,7 +288,7 @@ public class Query<T extends Model> {
 	@Transactional
 	public int update(String name, Object value) {
 		Map<String, Object> values = Maps.newHashMap();
-		values.put(name, value);
+		values.put(name.replaceFirst("^self\\.", ""), value);
 		return update(values);
 	}
 
@@ -350,25 +354,29 @@ public class Query<T extends Model> {
 	protected String updateQuery(Map<String, Object> values) {
 		StringBuilder sb = new StringBuilder("UPDATE ")
 				.append(beanClass.getSimpleName())
-				.append(" self")
-				.append(joinHelper.toString());
+				.append(" self");
 		List<String> keys = Lists.newArrayList();
 		for (String key : values.keySet()) {
 			keys.add(String.format("self.%s = :%s", key, key));
 		}
 		sb.append(" SET ").append(Joiner.on(", ").join(keys));
-		if (filter != null && filter.trim().length() > 0)
-			sb.append(" WHERE ").append(filter);
+		if (filter != null && filter.trim().length() > 0) {
+			sb.append(" WHERE self.id IN (")
+			  .append(selectQuery().replaceFirst("SELECT self", "SELECT self.id").replaceAll("\\bself", "that"))
+			  .append(")");
+		}
 		return sb.toString();
 	}
-
+	
 	protected String deleteQuery() {
 		StringBuilder sb = new StringBuilder("DELETE FROM ")
 				.append(beanClass.getSimpleName())
-				.append(" self")
-				.append(joinHelper.toString());
-		if (filter != null && filter.trim().length() > 0)
-			sb.append(" WHERE ").append(filter);
+				.append(" self");
+		if (filter != null && filter.trim().length() > 0) {
+			sb.append(" WHERE self.id IN (")
+			  .append(selectQuery().replaceFirst("SELECT self", "SELECT self.id").replaceAll("\\bself", "that"))
+			  .append(")");
+		}
 		return sb.toString();
 	}
 
