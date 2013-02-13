@@ -208,22 +208,27 @@ var IntegerItem = {
 		};
 
 		model.$parsers.unshift(function(viewValue) {
-            var isNumber = _.isNumber(viewValue) || isValid(viewValue);
-            if (isNumber && _.isString(viewValue)) {
-            	var parts = viewValue.split(/\./),
-            		integer = parts[0] || "",
-            		decimal = parts[1] || "";
-            	isNumber = (integer.length <= precision - scale) && (decimal.length <= scale);
-            }
-            model.$setValidity('format', isNumber);
-            return isNumber ? viewValue : undefined;
+            var valid = isValid(viewValue);
+            model.$setValidity('format', valid);
+            return valid ? viewValue : undefined;
         });
 		
 		var isDecimal = this.isDecimal,
 			pattern = isDecimal ? /^(-)?\d+(\.\d+)?$/ : /^\s*-?[0-9]*\s*$/;
 
-		function isValid(text) {
-			return  _.isEmpty(text) || pattern.test(text);
+		function isNumber(value) {
+			return _.isEmpty(value) || _.isNumber(value) || pattern.test(value);
+		}
+
+		function isValid(value) {
+			var valid = isNumber(value);
+            if (valid && _.isString(value)) {
+            	var parts = value.split(/\./),
+            		integer = parts[0] || "",
+            		decimal = parts[1] || "";
+            	valid = (integer.length <= precision - scale) && (decimal.length <= scale);
+            }
+            return valid;
 		}
 
 		function format(value) {
@@ -231,6 +236,8 @@ var IntegerItem = {
 				var parts = value.split(/\./),
 					integer = parts[0] || "",
 					decimal = parts[1] || "";
+
+				integer = "" + (+integer); // remove leading zero if any
 				if (decimal.length <= scale) {
 					return integer + '.' + _.string.rpad(decimal, scale, '0');
 				}
@@ -244,7 +251,7 @@ var IntegerItem = {
 		function updateModel(value, handle) {
 			var onChange = element.data('$onChange');
 
-			if (!isValid(value)) {
+			if (!isNumber(value)) {
 	            return ;
             }
 			
@@ -269,7 +276,7 @@ var IntegerItem = {
 
 			event.preventDefault();
 			
-			if (!isValid(text)) {
+			if (!isNumber(text)) {
 				return false;
 			}
 
