@@ -96,8 +96,8 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 				});
 				body.css("cursor", "wait");
 				blocker.show();
-				unblock(callback);
 			}
+			unblock(callback);
 			return blocked;
 		}
 
