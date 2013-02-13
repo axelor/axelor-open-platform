@@ -121,6 +121,17 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 		axelor.unblockUI = function() {
 			return unblock();
 		};
+		
+		function ajaxStop(callback, context) {
+			if (loadingCounter > 0) {
+				return _.delay(ajaxStop, 10, callback, context);
+			}
+			if (callback) {
+				callback.call(context);
+			}
+		};
+
+		$rootScope.__proto__.ajaxStop = ajaxStop;
 
 		return function(promise) {
 			return promise.then(function(response){
