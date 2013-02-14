@@ -550,6 +550,7 @@
 						records.push(record);
 						page.total += 1;
 						page.size += 1;
+						page.index = page.size - 1;
 					}
 					
 					accepted = record;
