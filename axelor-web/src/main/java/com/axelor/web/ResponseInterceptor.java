@@ -60,6 +60,10 @@ public class ResponseInterceptor implements MethodInterceptor {
 			}
 		}
 		
+		if (response != null) {
+			return response;
+		}
+		
 		log.debug("Transaction begin: {}", invocation.getMethod());
 
 		txn.begin();
