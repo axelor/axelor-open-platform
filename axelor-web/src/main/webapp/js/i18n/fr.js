@@ -63,7 +63,7 @@ _t.put({
 "Orig. Value": "Valeur orig.",
 "Created On:": "Crée le:",
 "Created By:": "Crée par:",
-"Updated On:": "Mise à jour par:",
-"Updated By:": "Mise à jour le:",
+"Updated On:": "Mise à jour le:",
+"Updated By:": "Mise à jour par:",
 "Update Log": "Modifications"
 });
