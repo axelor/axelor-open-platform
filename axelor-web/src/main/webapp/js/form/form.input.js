@@ -196,7 +196,7 @@ var IntegerItem = {
 	link: function(scope, element, attrs, model) {
 
 		var props = scope.getViewDef(element),
-			precision = props.precision || 19,
+			precision = props.precision || 18,
 			scale = props.scale || 2;
 		
 		var options = {
