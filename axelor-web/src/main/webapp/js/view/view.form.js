@@ -620,6 +620,11 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 			
 		};
 		
+		scope.hasAuditLog = function() {
+			var record = scope.record || {};
+			return record.createdOn || record.updatedOn || record.createBy || record.updatedBy;
+		};
+		
 		scope.$on("$destroy", function() {
 			if (logInfo != null) {
 				logInfo.popover("destroy");
