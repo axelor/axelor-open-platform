@@ -321,12 +321,12 @@ function FormViewCtrl($scope, $element) {
 	
 	$scope.canNext = function() {
 		var page = ds.page();
-		return page.index < page.size - 1;
+		return (page.index < page.size - 1) || (page.from + page.index < page.total - 1);
 	};
 	
 	$scope.canPrev = function() {
 		var page = ds.page();
-		return page.index > 0;
+		return page.index > 0 || ds.canPrev();
 	};
 	
 	$scope.onNext = function() {
