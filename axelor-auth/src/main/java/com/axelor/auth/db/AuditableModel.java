@@ -7,7 +7,6 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 
-import org.hibernate.annotations.Type;
 import org.joda.time.LocalDateTime;
 
 import com.axelor.db.Model;
@@ -25,11 +24,9 @@ import com.axelor.db.Widget;
 public abstract class AuditableModel extends Model {
 
 	@Widget(readonly = true)
-	@Type(type = "org.joda.time.contrib.hibernate.PersistentLocalDateTime")
 	private LocalDateTime createdOn;
 
 	@Widget(readonly = true)
-	@Type(type = "org.joda.time.contrib.hibernate.PersistentLocalDateTime")
 	private LocalDateTime updatedOn;
 
 	@Widget(readonly = true)

@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 import org.hibernate.HibernateException;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.usertype.UserType;
 
 import com.axelor.db.Binary;
@@ -46,7 +47,7 @@ public class BinaryType implements UserType {
 	}
 
 	@Override
-	public Object nullSafeGet(ResultSet rs, String[] names, Object owner)
+	public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor session, Object owner)
 			throws HibernateException, SQLException {
 		byte[] data = rs.getBytes(names[0]);
 		Binary value = new Binary();
@@ -56,7 +57,8 @@ public class BinaryType implements UserType {
 	}
 
 	@Override
-	public void nullSafeSet(PreparedStatement st, Object value, int index) throws HibernateException, SQLException {
+	public void nullSafeSet(PreparedStatement st, Object value, int index, SessionImplementor session)
+			throws HibernateException, SQLException {
 		if (value != null) {
 			st.setBytes(index, ((Binary) value).getData());
 		} else {
