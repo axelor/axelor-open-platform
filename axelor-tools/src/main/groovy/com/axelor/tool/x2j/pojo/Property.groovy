@@ -225,7 +225,6 @@ class Property {
 			$required(),
 			$size(),
 			$digits(),
-			$jodatime(),
 			$index(),
 			$column(),
 			$one2one(),
@@ -305,22 +304,6 @@ class Property {
 		annon("javax.validation.constraints.Digits", false)
 				.add("integer", (precision - scale) as String, false)
 				.add("fraction", scale as String, false)
-	}
-
-	private Annotation $jodatime() {
-		switch (type) {
-			case "date":
-				return annon("org.hibernate.annotations.Type")
-				.add("type", "org.joda.time.contrib.hibernate.PersistentLocalDate")
-			case "time":
-				return annon("org.hibernate.annotations.Type")
-				.add("type", "org.joda.time.contrib.hibernate.PersistentLocalTimeExact")
-			case "datetime":
-				def t = attrs['tz'] == 'true' ? 'DateTime' : 'LocalDateTime'
-				return annon("org.hibernate.annotations.Type")
-				.add("type", "org.joda.time.contrib.hibernate.Persistent" + t)
-		}
-		return null
 	}
 
 	private Annotation $required() {
