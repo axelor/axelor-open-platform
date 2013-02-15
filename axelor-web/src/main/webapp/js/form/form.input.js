@@ -243,7 +243,6 @@ var IntegerItem = {
 				    integer = "-" + integer;
 				}
 
-				integer = "" + (+integer); // remove leading zero if any
 				if (decimal.length <= scale) {
 					return integer + '.' + _.string.rpad(decimal, scale, '0');
 				}
