@@ -457,6 +457,7 @@ Grid.prototype.adjustSize = function() {
 		return;
 	}
 	this.grid.resizeCanvas();
+	this.grid.invalidate();
 };
 
 Grid.prototype.showColumn = function(name, show) {
