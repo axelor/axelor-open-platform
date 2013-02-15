@@ -235,7 +235,13 @@ var IntegerItem = {
 			if (isDecimal && _.isString(value)) {
 				var parts = value.split(/\./),
 					integer = parts[0] || "",
-					decimal = parts[1] || "";
+					decimal = parts[1] || "",
+					negative = integer.indexOf("-") === 0;
+
+				integer = "" + (+integer); // remove leading zero if any
+				if (negative && integer.indexOf("-") !== 0) {
+				    integer = "-" + integer;
+				}
 
 				integer = "" + (+integer); // remove leading zero if any
 				if (decimal.length <= scale) {
