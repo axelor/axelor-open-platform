@@ -1,3 +1,0 @@
-<% pojo.imports.each { %>\
-import ${it}
-<% } %>
