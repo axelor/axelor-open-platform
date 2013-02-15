@@ -53,7 +53,6 @@ public class Contact extends JpaModel {
 
 	private String lang;
 
-	@Type(type = "org.joda.time.contrib.hibernate.PersistentLocalDate")
 	private LocalDate dateOfBirth;
 
 	@OneToMany(mappedBy = "contact", cascade = CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval = true)

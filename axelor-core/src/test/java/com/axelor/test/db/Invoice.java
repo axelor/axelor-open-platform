@@ -6,7 +6,6 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Type;
 import org.joda.time.LocalDate;
 
 import com.axelor.db.JPA;
@@ -26,10 +25,8 @@ public class Invoice extends JpaModel {
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private MoveLine rejectMoveLine;
 	
-	@Type(type = "org.joda.time.contrib.hibernate.PersistentLocalDate")
 	private LocalDate date;
 
-	@Type(type = "org.joda.time.contrib.hibernate.PersistentLocalDate")
 	private LocalDate dueDate;
 
 	public Move getMove() {

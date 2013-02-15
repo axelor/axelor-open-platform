@@ -6,7 +6,6 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.Digits;
 
-import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -37,16 +36,12 @@ public class TypeCheck extends JpaModel {
 	
 	private BigDecimal decimalValue2;
 	
-	@Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
 	private DateTime dateTime1;
 	
-	@Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
 	private DateTime dateTime2;
 	
-	@Type(type = "org.joda.time.contrib.hibernate.PersistentLocalDate")
 	private LocalDate localDate1;
 	
-	@Type(type = "org.joda.time.contrib.hibernate.PersistentLocalDate")
 	private LocalDate localDate2;
 	
 	public Boolean getBoolValue() {

@@ -27,6 +27,10 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+    </dependency>
 
     <!-- Joda Time -->
     <dependency>
@@ -34,8 +38,8 @@
       <artifactId>joda-time</artifactId>
     </dependency>
     <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time-hibernate</artifactId>
+      <groupId>org.jadira.usertype</groupId>
+      <artifactId>usertype.core</artifactId>
     </dependency>
 
     <!-- SnakeYAML -->

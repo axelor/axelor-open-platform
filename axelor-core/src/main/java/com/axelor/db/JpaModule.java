@@ -85,7 +85,14 @@ public class JpaModule extends AbstractModule {
 		if (this.autoscan) {
 			properties.put("hibernate.ejb.resource_scanner", "com.axelor.db.JpaScanner");
 		}
+		
 		properties.put("hibernate.connection.autocommit", "false");
+		properties.put("hibernate.id.new_generator_mappings", "true");
+		properties.put("hibernate.ejb.naming_strategy", "org.hibernate.cfg.ImprovedNamingStrategy");
+		properties.put("hibernate.connection.charSet", "UTF-8");
+		properties.put("hibernate.max_fetch_depth", "3");
+		properties.put("jadira.usertype.autoRegisterUserTypes", "true");
+
 		install(new JpaPersistModule(jpaUnit).properties(properties));
 		if (this.autostart) {
 			bind(Initializer.class).asEagerSingleton();

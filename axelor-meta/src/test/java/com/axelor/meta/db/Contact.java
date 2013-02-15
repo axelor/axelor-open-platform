@@ -12,7 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import org.hibernate.annotations.Type;
 import org.joda.time.LocalDate;
 
 import com.axelor.db.JPA;
@@ -43,7 +42,6 @@ public class Contact extends Model {
 	
 	private BigDecimal credit;
 	
-	@Type(type = "org.joda.time.contrib.hibernate.PersistentLocalDate")
 	private LocalDate birthDate;
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "contact", cascade = CascadeType.ALL, orphanRemoval = true)
