@@ -435,7 +435,7 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 					});
 				
 				if (attrs.required)
-					_attrs['x-required'] = true;
+					_attrs['ng-required'] = true;
 				if (attrs.readonly)
 					_attrs['x-readonly'] = true;
 				
