@@ -26,6 +26,11 @@ var Form = {
 			if (name && !elem.attr('ng-model')) {
 				elem.attr('ng-model', 'record.' + name);
 			}
+			if (name && !elem.attr('ng-required')) {
+				// always attache a required validator to make
+				// dynamic `required` attribute change effective
+				elem.attr('ng-required', false);
+			}
 			
 			elem.attr('ui-actions', '');
 		});
