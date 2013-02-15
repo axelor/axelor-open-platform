@@ -46,23 +46,18 @@ class Generator {
 	}
 	
 	@Singleton
-	static class GroovyExpander extends Expander {
+	static class JavaExpander extends Expander {
 		
-		GroovyExpander () {
-			pojoTemplate = template("templates/groovy/pojo.template")
-			headTemplate = template("templates/groovy/head.template")
-			bodyTemplate = template("templates/groovy/body.template")
+		JavaExpander () {
+			pojoTemplate = template("templates/pojo.template")
+			headTemplate = template("templates/head.template")
+			bodyTemplate = template("templates/body.template")
 		}
 	}
 	
 	@Singleton
-	static class JavaExpander extends Expander {
+	static class GroovyExpander extends JavaExpander {
 		
-		JavaExpander () {
-			pojoTemplate = template("templates/java/pojo.template")
-			headTemplate = template("templates/java/head.template")
-			bodyTemplate = template("templates/java/body.template")
-		}
 	}
 	
 	File searchPath
