@@ -115,6 +115,10 @@ class Entity {
 		return importManager.getImports()
 	}
 	
+	List<String> getImportStatements() {
+		return importManager.getImportStatements()
+	}
+	
 	List<Annotation> getAnnotations() {
 		[
 			new Annotation(this, "javax.persistence.Entity", true),
