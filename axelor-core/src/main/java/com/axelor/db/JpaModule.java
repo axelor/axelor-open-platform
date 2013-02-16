@@ -1,6 +1,7 @@
 package com.axelor.db;
 
 import java.util.Properties;
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 
@@ -77,6 +78,18 @@ public class JpaModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
+
+		try {
+			// check for compatible java version to avoid TimeZone issue
+			// with the LocalDate (jadira usertype issue).
+			TimeZone.class.getDeclaredField("defaultZoneTL");
+			throw new RuntimeException("Incompative Java version "
+					+ System.getProperty("java.version")
+					+ " detected, requires 1.6.0_u31 or later.");
+		} catch (SecurityException e) {
+		} catch (NoSuchFieldException e) {
+		}
+
 		log.info("Initialize JPA...");
 		Properties properties = new Properties();
 		if (this.properties != null) {
