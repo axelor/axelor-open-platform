@@ -60,8 +60,42 @@ class ImportManager {
 	}
 	
 	List<String> getImports() {
-		def all = new ArrayList(imports)
-		all.sort()
-		return all
+		return new ArrayList<String>(imports).sort()
+	}
+
+	List<String> getImportStatements() {
+
+		def all = new ArrayList<String>()
+		def groups = imports.groupBy {
+			it.split('\\.')[0]
+		}
+		
+		def coms = groups.remove("com")
+		
+		try {
+			all.addAll(groups.remove("java").sort())
+			all.add(null)
+		} catch (NullPointerException e){}
+		
+		try {
+			all.addAll(groups.remove("javax").sort())
+			all.add(null)
+		} catch (NullPointerException e){}
+		
+		groups.each {
+			all.addAll(it.value.sort())
+			all.add(null)
+		}
+
+		if (coms) {
+			all.addAll(coms.sort())
+			all.add(null)
+		}
+
+		all.pop()
+
+		return all.collect {
+			it == null ? "" : "import " + it + ";"
+		}
 	}
 }
