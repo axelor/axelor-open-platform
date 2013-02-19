@@ -29,7 +29,7 @@ class TemplateHelper {
 	}
 	
 	@CompileStatic
-	static String make(final File template, final Binding binding) {
+	static String make(final String template, final Binding binding) {
 		def engine = new GStringTemplateEngine()
 		def mapping = new Mapping(binding);
 		

@@ -10,6 +10,9 @@ import org.joda.time.LocalDate;
 import org.joda.time.Period;
 import org.junit.Test;
 
+import com.axelor.db.JPA;
+import com.axelor.meta.db.Contact;
+import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.views.Action;
 import com.axelor.meta.views.ObjectViews;
 import com.axelor.rpc.ActionRequest;
@@ -18,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.persist.Transactional;
 
 public class TestWS extends AbstractTest {
 	
@@ -82,5 +86,36 @@ public class TestWS extends AbstractTest {
 
 		ActionHandler handler = createHandler("export.sale.order", context);
 		action.evaluate(handler);
+	}
+	
+	@Transactional
+	public void prepareTest3() {
+		MetaSelect select = new MetaSelect();
+		select.setKey("food.selection");
+		select.setValue("pizza");
+		select.setTitle("Pizza");
+		select.save();
+		
+		Contact c = new Contact();
+		c.setFirstName("John");
+		c.setLastName("Smith");
+		c.setEmail("john.smith@gmail.com");
+		c.setFood("pizza");
+		JPA.save(c);
+	}
+
+	@Test
+	public void test3() throws Exception {
+		prepareTest3();
+		Contact c = Contact.all().fetchOne();
+		Map<String, Object> context = ImmutableMap.<String, Object>of("person", c);
+		
+		ActionHandler actionHandler = createHandler("dummy", context);
+		
+		String text = actionHandler.template("${person.food}");
+		Assert.assertEquals("pizza", text);
+		
+		text = actionHandler.template("${ person.food | text}");
+		Assert.assertEquals("Pizza", text);
 	}
 }
