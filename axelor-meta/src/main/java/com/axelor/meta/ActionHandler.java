@@ -5,7 +5,9 @@ import groovy.lang.GroovyShell;
 import groovy.lang.MissingPropertyException;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -14,9 +16,9 @@ import java.util.regex.Pattern;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
-import org.codehaus.groovy.runtime.InvokerHelper;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.codehaus.groovy.runtime.InvokerHelper;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
@@ -28,17 +30,23 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
+import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.views.Action;
 import com.axelor.meta.views.Action.ActionMethod;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.Response;
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.io.Files;
 import com.google.inject.Injector;
 import com.google.inject.servlet.RequestScoped;
 
@@ -226,9 +234,83 @@ public final class ActionHandler {
 		}
 	}
 	
-	@SuppressWarnings("all")
+	class FormatHelper {
+		
+		public String text(String expr) {
+			return getSelectTitle(entity, expr, binding.getProperty(expr));
+		}
+		
+		public String text(Object bean, String expr) {
+			if (bean == null) {
+				return "";
+			}
+			return getSelectTitle(bean.getClass(), expr, getValue(bean, expr));
+		}
+
+		private String getSelectTitle(Class<?> klass, String expr, Object value) {
+			if (value == null) {
+				return "";
+			}
+			Property property = this.getProperty(klass, expr);
+			if (property == null || property.getSelection() == null) {
+				return value == null ? "" : value.toString();
+			}
+			MetaSelect select = MetaSelect.all()
+					.filter("self.key = ?1 AND self.value = ?2", property.getSelection(), value)
+					.fetchOne();
+			if (select != null) {
+				return select.getTitle();
+			}
+			return value == null ? "" : value.toString();
+		}
+		
+		private Property getProperty(Class<?> beanClass, String name) {
+			Iterator<String> iter = Splitter.on(".").split(name).iterator();
+			Property p = Mapper.of(beanClass).getProperty(iter.next());
+			while(iter.hasNext() && p != null) {
+				p = Mapper.of(p.getTarget()).getProperty(iter.next());
+			}
+			return p;
+		}
+		
+		@SuppressWarnings("all")
+		private Object getValue(Object bean, String expr) {
+			if (bean == null) return null;
+			Iterator<String> iter = Splitter.on(".").split(expr).iterator();
+			Object obj = null;
+			if (bean instanceof Map) {
+				obj = ((Map) bean).get(iter.next());
+			} else {
+				obj = Mapper.of(bean.getClass()).get(bean, iter.next());
+			}
+			if(iter.hasNext() && obj != null) {
+				return getValue(obj, Joiner.on(".").join(iter));
+			}
+			return obj;
+		}
+		
+	}
+
 	public String template(File template) {
-		return TemplateHelper.make(template, binding);
+		String text;
+		try {
+			text = Files.toString(template, Charsets.UTF_8);
+		} catch (IOException e) {
+			throw new IllegalArgumentException(e);
+		}
+		return template(text);
+	}
+	
+	public String template(String text) {
+		if (text == null || "".equals(text.trim())) {
+			return "";
+		}
+		text = text.replaceAll("\\$\\{\\s*(\\w+)\\.(.*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text($1, '$2')}");
+		text = text.replaceAll("\\$\\{\\s*(.*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text('$1')}");
+		text = text.replaceAll("\\$\\{\\s*(.*?)\\s*\\|\\s*e\\s*\\}", "\\${($1) ?: ''}");
+		
+		binding.setProperty("__fmt__", new FormatHelper());
+		return TemplateHelper.make(text, binding);
 	}
 
 	@SuppressWarnings("all")

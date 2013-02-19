@@ -18,6 +18,7 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.VirtualColumn;
+import com.axelor.db.Widget;
 
 @Entity
 public class Contact extends Model {
@@ -39,6 +40,9 @@ public class Contact extends Model {
 	private String email;
 	
 	private String proEmail;
+	
+	@Widget(selection = "food.selection")
+	private String food;
 	
 	private BigDecimal credit;
 	
@@ -111,6 +115,14 @@ public class Contact extends Model {
 	
 	public void setProEmail(String email) {
 		this.proEmail = email;
+	}
+	
+	public String getFood() {
+		return food;
+	}
+	
+	public void setFood(String food) {
+		this.food = food;
 	}
 	
 	public LocalDate getBirthDate() {
