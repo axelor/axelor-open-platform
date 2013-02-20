@@ -107,6 +107,46 @@ class Entity {
  */"""
 	}
 	
+	private List<Property> getHashables() {
+		return properties.findAll { p ->
+			p.hashKey || (p.unique && p.simple && !(p.name =~ /id|version/))
+		}
+	}
+	
+	String getEqualsCode() {
+		importType("com.google.common.base.Objects");
+		def code = getHashables().collect { p -> "if (!Objects.equal(${p.getter}(), other.${p.getter}())) return false;"}
+		code += ""
+		code += code.size() ? "return true;" : "return super.equals(other);"
+		return code.join("\n\t\t")
+	}
+	
+	String getHashCodeCode() {
+		importType("com.google.common.base.Objects");
+		def data = getHashables()collect { "this.${it.getter}()" }.join(", ")
+		if (data.size()) {
+			def hash = name.hashCode()
+			return "return Objects.hashCode(${hash}, ${data});"
+		}
+		return "return super.hashCode();"
+	}
+	
+	String getToStringCode() {
+		importType("com.google.common.base.Objects.ToStringHelper")
+		
+		def code = []
+		
+		code += "ToStringHelper tsh = Objects.toStringHelper(this);\n"
+		code += "tsh.add(\"id\", this.getId());"
+		int count = 0;
+		for(Property p : properties) {
+			if (!p.simple || p.name == "id" || p.name == "version") continue
+			code += "tsh.add(\"${p.name}\", this.${p.getter}());"
+			if (count++ == 10) break;
+		}
+		return code.join("\n\t\t") + "\n\n\t\treturn tsh.toString();"
+	}
+	
 	String importType(String fqn) {
 		return importManager.importType(fqn)
 	}

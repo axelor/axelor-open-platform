@@ -77,6 +77,24 @@ class Property {
 	String getServerType() {
 		return type
 	}
+
+	boolean isSimple() {
+		switch(type) {
+			case "string":
+				if (attrs["large"] == "true" || attrs["multiline"] == "true") return false
+				return true
+			case "integer":
+			case "long":
+			case "boolean":
+			case ["double", "float"]:
+			case "decimal":
+			case "date":
+			case "time":
+			case "datetime":
+				return true
+		}
+		return false
+	}
 	
 	String getValue() {
 		
@@ -205,6 +223,14 @@ class Property {
 	
 	boolean isOrphan() {
 		return attrs["orphan"] == "true"
+	}
+	
+	boolean isUnique() {
+		return attrs["unique"] == "true"
+	}
+	
+	boolean isHashKey() {
+		return attrs["hashKey"] == "true"
 	}
 	
 	String newCollection() {
