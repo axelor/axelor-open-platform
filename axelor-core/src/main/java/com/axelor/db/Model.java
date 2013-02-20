@@ -1,16 +1,8 @@
 package com.axelor.db;
 
-import java.lang.reflect.Field;
-
 import javax.persistence.GeneratedValue;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
-
-import com.axelor.db.mapper.Mapper;
-import com.axelor.db.mapper.Property;
-import com.axelor.db.mapper.PropertyType;
-import com.google.common.base.Objects;
-import com.google.common.base.Objects.ToStringHelper;
 
 /**
  * The base abstract model class to extend all domain objects.
@@ -61,31 +53,5 @@ public abstract class Model {
 	 */
 	public boolean isSelected() {
 		return selected;
-	}
-	
-	@Override
-	public String toString() {
-		Mapper mapper = Mapper.of(this.getClass());
-		ToStringHelper ts = Objects.toStringHelper(this);
-
-		ts.add("id", getId());
-		
-		int count = 0;
-		for(Field f : getClass().getDeclaredFields()) {
-			Property p = mapper.getProperty(f.getName());
-			if (p == null ||
-				p.isPrimary() ||
-				p.isVersion() ||
-				p.isVirtual() ||
-				p.getTarget() != null ||
-				p.getType() == PropertyType.BINARY ||
-				p.getType() == PropertyType.TEXT ||
-				p.get(this) == null)
-				continue;
-			ts.add(p.getName(), p.get(this));
-			if (count++ == 10) break;
-		}
-		
-		return ts.toString();
 	}
 }
