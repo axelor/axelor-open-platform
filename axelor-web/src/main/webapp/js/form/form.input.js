@@ -568,6 +568,7 @@ var DateTimeItem = {
 			if (value) {
 				value = moment(value).format(that.format);
 				input.mask('value', value);
+				input.datetimepicker('setDate', value);
 			} else {
 				input.mask('value', '');
 			}
