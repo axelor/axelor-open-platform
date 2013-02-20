@@ -312,6 +312,13 @@ public final class JPA {
 						}
 					}
 					if (changed) {
+						if (p.isOrphan()) {
+							for(Object item : (Collection) old) {
+								if (!items.contains(item)) {
+									p.setAssociation(item, null);
+								}
+							}
+						}
 						((Collection) old).clear();
 						((Collection) old).addAll(items);
 						beanChanged = true;

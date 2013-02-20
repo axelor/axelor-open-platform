@@ -60,6 +60,8 @@ public class Property {
 	private boolean required;
 
 	private boolean unique;
+	
+	private boolean orphan;
 
 	private Object maxSize;
 
@@ -128,6 +130,7 @@ public class Property {
 				target = (Class<? extends Model>) ((ParameterizedType) genericType)
 						.getActualTypeArguments()[0];
 				mappedBy = ((OneToMany) annotation).mappedBy();
+				orphan = !((OneToMany) annotation).orphanRemoval();
 			}
 
 			if (annotation instanceof ManyToMany) {
@@ -256,6 +259,10 @@ public class Property {
 
 	public boolean isUnique() {
 		return unique;
+	}
+	
+	public boolean isOrphan() {
+		return orphan;
 	}
 
 	public boolean isVirtual() {
@@ -430,7 +437,6 @@ public class Property {
 			return child;
 
 		Preconditions.checkNotNull(child);
-		Preconditions.checkNotNull(bean);
 		
 		Property mapped = Mapper.of(target).getProperty(mappedBy);
 		if (mapped != null && !Objects.equal(mapped.get(child), bean))
