@@ -53,7 +53,7 @@
     <string name="email" required="true" unique="true" />
     <string name="phone" max="20" />
     <string name="notes" multiline="true" title="About Me" />
-    <many-to-many name="groups" ref="Groups" mappedBy="contacts"/>
+    <many-to-many name="groups" ref="Group" mappedBy="contacts"/>
     <one-to-many name="addresses" ref="Address" mappedBy="contact" orderBy="area" />
   </entity>
 

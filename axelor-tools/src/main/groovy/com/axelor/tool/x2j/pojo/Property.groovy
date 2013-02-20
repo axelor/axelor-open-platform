@@ -1,6 +1,7 @@
 package com.axelor.tool.x2j.pojo
 
 import com.axelor.tool.x2j.Utils;
+import com.sun.jersey.core.impl.provider.entity.Inflector;
 
 import groovy.util.slurpersupport.NodeChild
 
@@ -71,6 +72,10 @@ class Property {
 				return entity.importType("java.util.Set<$target>")
 		}
 		throw new IllegalArgumentException("Invalid type: " + type)
+	}
+	
+	String getServerType() {
+		return type
 	}
 	
 	String getValue() {
@@ -153,6 +158,60 @@ class Property {
 	
 	String getSetterBody() {
 		return "this.$name = $name;"
+	}
+	
+	String getLinkCode() {
+		def mapped = attrs["mappedBy"]
+		if (!mapped || type != "one-to-many") {
+			return null
+		}
+		return "item.set" + firstUpper(mapped) + "(this);"
+	}
+	
+	String getDelinkCode() {
+		def mapped = attrs["mappedBy"]
+		def orphan = attrs["orphan"] == "true"
+		if (!orphan || !mapped || type != "one-to-many") {
+			return null
+		}
+		return "item.set" + firstUpper(mapped) + "(null);"
+	}
+	
+	String getDelinkAllCode() {
+		def mapped = attrs["mappedBy"]
+		def orphan = attrs["orphan"] == "true"
+		if (!orphan || !mapped || type != "one-to-many") {
+			return null
+		}
+		return """for(${target} item : ${name}) {
+				item.set${firstUpper(mapped)}(null);
+			}"""
+	}
+	
+	String getSingularName() {
+		return getSingularName(name)
+	}
+	
+	String getSingularName(String name) {
+		def singular = name.replaceFirst(/(.*?)(Set|List)$/, '$1')
+		return Inflector.getInstance().singularize(singular)
+	}
+	
+	String getMappedBy() {
+		return attrs["mappedBy"]
+	}
+	
+	boolean isOrphan() {
+		return attrs["orphan"] == "true"
+	}
+	
+	String newCollection() {
+		if (type == "many-to-many") {
+			importName("java.util.HashSet")
+			return "new HashSet<$target>()"
+		}
+		importName("java.util.ArrayList")
+		return "new ArrayList<$target>()"
 	}
 
 	String firstUpper(String string) {
