@@ -97,6 +97,28 @@ ${p.documentation}
 	}
 <% } %>\
 <% } %>\
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		if (this == obj) return true;
+		if (!(obj instanceof ${pojo.name})) return false;
+		
+		${pojo.name} other = (${pojo.name}) obj;
+		if (this.getId() != null && other.getId() != null) {
+			return Objects.equal(this.getId(), other.getId());
+		}
+		${pojo.equalsCode}
+	}
+	
+	@Override
+	public int hashCode() {
+		${pojo.hashCodeCode}
+	}
+	
+	@Override
+	public String toString() {
+		${pojo.toStringCode}
+	}
 
 	public $pojo.name persist() {
 		return JPA.persist(this);
