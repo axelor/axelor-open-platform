@@ -34,6 +34,68 @@ ${p.documentation}
 	public void ${p.setter}($p.type $p.name) {
 		$p.setterBody
 	}
+
+<% if (p.isCollection()) { %>\
+	/**
+	 * Add the given {@link #${p.target}} item to the {@code ${p.name}}.
+	 *
+<% if (p.serverType == "one-to-many" && p.mappedBy) {%>\
+	 * <p>
+	 * It sets {@code item.${p.mappedBy} = this} to ensure the proper relationship.
+	 * </p>
+<% } %>\
+	 */
+	public void add${p.firstUpper(p.singularName)}($p.target item) {
+		if (${p.name} == null) {
+			${p.name} = ${p.newCollection()};
+		}
+		${p.name}.add(item);
+<% if (p.linkCode) { %>\
+		${p.linkCode}
+<% } %>\
+	}
+
+	/**
+	 * Remove the given {@link #${p.target}} item from the {@code ${p.name}}.
+	 *
+<% if (p.serverType == "one-to-many" && p.orphan) {%>\
+	 * <p>
+	 * It sets {@code item.${p.mappedBy} = null} to break the relationship.
+	 * </p>
+<% } %>\
+	 */	
+	public void remove${p.firstUpper(p.singularName)}($p.target item) {
+		if (${p.name} == null) {
+			return;
+		}
+		${p.name}.remove(item);
+<% if (p.delinkCode) { %>\
+		${p.delinkCode}
+<% } %>\
+	}
+	
+	/**
+	 * Clear the {@code ${p.name}} collection.
+	 *
+	 * <p>
+<% if (p.serverType == "one-to-many" && p.orphan) {%>\
+	 * It sets {@code item.${p.mappedBy} = null} to break the relationship.
+<% } else { %>\
+	 * It calls the {@code this.flush()} method to avoid unexpected errors
+	 * if any of the item in the collection is changed.
+<% } %>\
+	 * </p>
+	 */	
+	public void clear${p.firstUpper(p.name)}() {
+		if (${p.name} != null) {
+<% if (p.delinkAllCode) { %>\
+			${p.delinkAllCode}
+<% } %>\
+			${p.name}.clear();
+			this.flush();
+		}
+	}
+<% } %>\
 <% } %>\
 
 	public $pojo.name persist() {
