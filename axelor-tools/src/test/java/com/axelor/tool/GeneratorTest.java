@@ -20,7 +20,7 @@ public class GeneratorTest {
 	@Test
 	public void test() {
 		Generator gen = new Generator("src/test/resources/domains", "target/src-gen");
-		gen.start();
 		gen.clean();
+		gen.start();
 	}
 }
