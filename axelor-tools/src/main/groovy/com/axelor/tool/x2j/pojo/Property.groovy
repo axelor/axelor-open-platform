@@ -193,8 +193,10 @@ class Property {
 	}
 	
 	String getSingularName(String name) {
-		def singular = name.replaceFirst(/(.*?)(Set|List)$/, '$1')
-		return Inflector.getInstance().singularize(singular)
+		if (name =~ /(Set|List)$/) {
+			return name + "Item"
+		}
+		return Inflector.getInstance().singularize(name)
 	}
 	
 	String getMappedBy() {
