@@ -76,9 +76,6 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	};
 	
 	$scope.showNestedEditor = function(record) {
-		if (!record && $scope.isReadonly($element)) {
-			return;
-		}
 		if (!params.summaryView) {
 			return;
 		}
@@ -88,6 +85,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		if (embedded !== null) {
 			embedded.toggle();
 		}
+		return embedded;
 	};
 	
 	$scope.showPopupEditor = function(record) {
@@ -397,6 +395,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 			embedded.data('$rel').hide();
 			embedded.data('$scope').edit(record);
 		}
+		return embedded;
 	};
 	
 	$scope.showDetailView = function() {
@@ -643,12 +642,24 @@ var ManyToOneItem = {
 			}
 			input.val(value);
 		};
-		
+
+		var embedded = null;
+		var readonly = false;
 		if (field.widget == 'NestedEditor') {
 			setTimeout(function(){
-				scope.showNestedEditor();
+				embedded = scope.showNestedEditor();
+				if (readonly) {
+					scope.setReadonly(embedded, readonly);
+				}
 			});
 		}
+
+		attrs.$observe('readonly', function(value) {
+			readonly = value;
+			if (embedded) {
+				scope.setReadonly(embedded, readonly);
+			}
+		});
 		
 		scope.setValidity = function(key, value) {
 			model.$setValidity(key, value);
