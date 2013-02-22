@@ -426,6 +426,9 @@ function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 		
 		setTimeout(function(){
 			$.event.trigger('adjust');
+			setTimeout(function(){
+				$.event.trigger('adjustSize');
+			});
 		});
 	};
 	
