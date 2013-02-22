@@ -579,7 +579,11 @@ public class Query<T extends Model> {
 			int last = 0;
 			while (matcher.find()) {
 				MatchResult matchResult = matcher.toMatchResult();
-				result += filter.substring(last, matchResult.start()) + joinName(matchResult.group(1));
+				String alias = joinName(matchResult.group(1));
+				if (alias == null) {
+					alias = "self." + matchResult.group(1);
+				}
+				result += filter.substring(last, matchResult.start()) + alias;
 				last = matchResult.end();
 			}
 			if (last < filter.length())
