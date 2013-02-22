@@ -328,7 +328,6 @@ Grid.prototype.parse = function(view) {
 	}
 
 	var adjustSize = _.bind(this.adjustSize, this);
-	dataView.$adjustSize = adjustSize;
 	element.on('adjustSize', _.debounce(adjustSize, 100));
 
 	dataView.$syncSelection = function(old, oldIds) {
@@ -445,15 +444,6 @@ Grid.prototype.subscribe = function(event, handler) {
 
 Grid.prototype.adjustSize = function() {
 	if (!this.grid || !this.element.is(':visible')) {
-		return;
-	}
-	var viewPort = this._viewPort;
-	var gridCanvas = this._gridCanvas;
-	if (viewPort === undefined) {
-		viewPort = this._viewPort = this.element.find('.slick-viewport:first');
-		gridCanvas = this._gridCanvas = viewPort.children('.grid-canvas');
-	}
-	if (viewPort && gridCanvas.height() && (gridCanvas.width() === viewPort.width())) {
 		return;
 	}
 	this.grid.resizeCanvas();

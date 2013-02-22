@@ -107,10 +107,6 @@ function GridViewCtrl($scope, $element) {
 				dataView.$syncSelection(selection, selectionIds);
 			});
 		}
-
-		if (dataView.$adjustSize) {
-			dataView.$adjustSize();
-		}
 	};
 
 	$scope.canEdit = function() {
