@@ -121,7 +121,7 @@ var Tabs = {
 			
 			tab.selected = false;
 			
-			if (selected !== index)
+			if (selected > -1 && selected !== index)
 				return $.event.trigger('adjustSize');
 			
 			for(var i = 0 ; i < tabs.length ; i++) {
