@@ -453,7 +453,7 @@ Grid.prototype.adjustSize = function() {
 		viewPort = this._viewPort = this.element.find('.slick-viewport:first');
 		gridCanvas = this._gridCanvas = viewPort.children('.grid-canvas');
 	}
-	if (viewPort && (gridCanvas.width() === viewPort.width())) {
+	if (viewPort && gridCanvas.height() && (gridCanvas.width() === viewPort.width())) {
 		return;
 	}
 	this.grid.resizeCanvas();

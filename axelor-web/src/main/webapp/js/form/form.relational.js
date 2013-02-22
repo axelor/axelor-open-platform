@@ -819,9 +819,7 @@ var OneToManyItem = {
 					var minHeight = _.isEmpty(value) ? '' : 230;
 					element.css('min-height', minHeight);
 					if (minHeight) {
-						setTimeout(function() {
-							$.event.trigger('adjustSize');
-						});
+						$.event.trigger('adjustSize');
 					}
 				});
 			}
