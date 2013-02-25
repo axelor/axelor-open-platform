@@ -22,6 +22,7 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 			else
 				field.type = 'STRING';
 		});
+		return fields;
 	}
 	
 	$scope.show = function(viewPromise) {
@@ -41,10 +42,64 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 	
 	$scope.initView = function(schema) {
 		
-		fixFields(schema.searchFields);
-		fixFields(schema.resultFields);
+		var params = $scope._viewParams;
 		
+		$scope._searchFields = fixFields(schema.searchFields);
+		$scope._resultFields = fixFields(schema.resultFields);
+
 		$scope._searchView = schema;
+		$scope.updateRoute();
+		
+		if (params.options && params.options.mode == "search") {
+			$scope.setRouteOptions(params.options);
+		}
+	};
+	
+	$scope.getRouteOptions = function() {
+		var args = [],
+			query = $scope._routeSearch;
+
+		return {
+			mode: 'search',
+			args: args,
+			query: query
+		};
+	};
+
+	$scope._routeSearch = null;
+	$scope.setRouteOptions = function(options) {
+		var opts = options || {},
+			fields = $scope._searchFields || [],
+			search = opts.search,
+			record = {};
+
+		if (!search || _.isEmpty(search)) {
+			return;
+		}
+
+		if (angular.equals($scope._routeSearch, search)) {
+			return $scope.updateRoute();
+		}
+		
+		$scope._routeSearch = search;
+		
+		_.each(fields, function(field) {
+			var value = search[field.name];
+			if (value === undefined) {
+				return;
+			}
+			if (field.target) {
+				if (value) {
+					record[field.name] = {id: +value};
+					record[field.name][field.nameField] = value;
+				}
+			} else {
+				record[field.name] = value;
+			}
+		});
+		
+		scopes.form.editRecord(record);
+		$scope.doSearch();
 	};
 	
 	var scopes = {};
