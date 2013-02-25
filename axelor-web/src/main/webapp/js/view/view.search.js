@@ -73,11 +73,7 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 			search = opts.search,
 			record = {};
 
-		if (!search || _.isEmpty(search)) {
-			return;
-		}
-
-		if (angular.equals($scope._routeSearch, search)) {
+		if (!search || _.isEmpty(search) || angular.equals($scope._routeSearch, search)) {
 			return $scope.updateRoute();
 		}
 		
