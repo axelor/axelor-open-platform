@@ -330,6 +330,18 @@ function GridViewCtrl($scope, $element) {
 	$scope.canSave = function() {
 		return this.dataView.canSave && this.dataView.canSave();
 	};
+	
+	$scope.onArchived = function(e) {
+		var button = $(e.currentTarget);
+		setTimeout(function(){
+			var active = button.is('.active');
+			var fields = _.pluck($scope.fields, 'name');
+			ds.search({
+				fields: fields,
+				archived: active
+			});
+		});
+	};
 }
 
 angular.module('axelor.ui').directive('uiViewGrid', function(){
