@@ -22,10 +22,20 @@ public abstract class Model {
 	
 	// Represents the selected state of the record in the UI widgets
 	private transient boolean selected;
+	
+	private Boolean archived;
 
 	public abstract Long getId();
 
 	public abstract void setId(Long id);
+	
+	public Boolean getArchived() {
+		return archived;
+	}
+	
+	public void setArchived(Boolean archived) {
+		this.archived = archived;
+	}
 
 	public Integer getVersion() {
 		return version;
