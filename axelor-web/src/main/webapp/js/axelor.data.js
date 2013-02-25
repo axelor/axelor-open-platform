@@ -25,6 +25,7 @@
 			this._filter = null;
 			this._sortBy = null;
 			this._lastContext = null;
+			this._showArchived = opts.archived;
 
 			this._data = [];
 
@@ -139,6 +140,7 @@
 				var offset = options.offset == undefined ? this._page.from : options.offset;
 				var domain = options.domain === undefined ? this._domain : options.domain;
 				var context = options.context == undefined ? this._lastContext : options.context;
+				var archived = options.archived == undefined ? this._showArchived : options.archived;
 
 				if (options.filter) {
 					this._filter = options.filter;
@@ -150,13 +152,36 @@
 				if (options.context) {
 					this._lastContext = options.context;
 				}
-
+				if (options.archived !== undefined) {
+					this._showArchived = options.archived;
+				}
+				
 				context = _.extend({}, this._context, context);
 
 				var query = extend({
 					_domain: domain,
 					_domainContext: context
 				}, this._filter);
+
+				if (!archived) {
+
+					var criteria = _.clone(query.criteria || []);
+
+					query.criteria = criteria;
+					query.operator = query.operator || 'and';
+					
+					criteria.push({
+						operator: 'or',
+						criteria: [{
+							fieldName: 'archived',
+							operator: 'isNull'
+						}, {
+							fieldName: 'archived',
+							operator: 'iEquals',
+							value: false
+						}]
+					});
+				}
 				
 				var that = this,
 					page = this._page,
