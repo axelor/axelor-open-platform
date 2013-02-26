@@ -25,7 +25,7 @@ function GridViewCtrl($scope, $element) {
 					pageNum = null;
 
 				if (sortBy) {
-					sortBy = sortBy.split('\\.');
+					sortBy = sortBy.split(',');
 				}
 				if (params.options && params.options.mode === 'list') {
 					pageNum = params.options.state;
