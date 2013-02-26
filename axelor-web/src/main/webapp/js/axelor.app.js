@@ -109,7 +109,7 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 			body.css("cursor", "");
 			blocker.hide();
 			if (callback) {
-				callback();
+				callback(blocked);
 			}
 			blocked = false;
 		}
