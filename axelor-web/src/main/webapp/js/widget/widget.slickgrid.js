@@ -528,10 +528,11 @@ Grid.prototype.onKeyDown = function(e, args) {
 		return false;
 	}
 	
-	function blockCallback() {
-		if (e.which === $.ui.keyCode.TAB) {
+	function blockCallback(blocked) {
+		if (blocked && e.which === $.ui.keyCode.TAB) {
 			setTimeout(function(){
-				var cell = that.findNextEditable(args.row, args.cell);
+				var cell = e.shiftKey ? that.findPrevEditable(args.row, args.cell)
+									  : that.findNextEditable(args.row, args.cell);
 				if (cell) {
 					grid.setActiveCell(cell.row, cell.cell);
 					grid.editActiveCell();
@@ -575,10 +576,16 @@ Grid.prototype.onKeyDown = function(e, args) {
 		if (e.shiftKey) {
 			cell = this.findPrevEditable(args.row, args.cell);
 		} else {
-			cell = this.findNextEditable(args.row, args.cell, true);
+			cell = this.findNextEditable(args.row, args.cell);
 		}
 		if (cell !== null) {
-			commit(cell.row, cell.cell);
+			if (cell.row > args.row && this.isDirty()) {
+				if (!this.saveChanges(args)) {
+					this.focusInvalidCell(args);
+				}
+			} else {
+				commit(cell.row, cell.cell);
+			}
 		}
 		handled = true;
 	}
@@ -615,7 +622,7 @@ Grid.prototype.isCellEditable = function(cell) {
 	return !field.readonly;
 };
 
-Grid.prototype.findNextEditable = function(posY, posX, saveIfLast) {
+Grid.prototype.findNextEditable = function(posY, posX) {
 	var grid = this.grid,
 		cols = grid.getColumns(),
 		args = {row: posY, cell: posX + 1};
@@ -624,15 +631,6 @@ Grid.prototype.findNextEditable = function(posY, posX, saveIfLast) {
 			return args;
 		}
 		args.cell += 1;
-	}
-	var editor = this.editorScope;
-	if (!editor.isValid()) {
-		this.focusInvalidCell(args);
-		return null;
-	}
-	if (saveIfLast && this.isDirty() && !this.saveChanges(args)) {
-		this.focusInvalidCell(args);
-		return null;
 	}
 	if (grid.getDataItem(args.row)) {
 		args.row += 1;
