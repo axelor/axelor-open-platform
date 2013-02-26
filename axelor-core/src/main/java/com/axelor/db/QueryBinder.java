@@ -57,6 +57,9 @@ public class QueryBinder {
 	
 	private Object adapt(Object value, Parameter<?> param) {
 		Class<?> type = param.getParameterType();
+		if (type == null) {
+			return value;
+		}
 		value = Adapter.adapt(value, type, type, null);
 		if (value instanceof Model && type.isInstance(value)) {
 			Model bean = (Model) value;
