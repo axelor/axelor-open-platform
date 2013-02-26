@@ -580,7 +580,12 @@ Grid.prototype.onKeyDown = function(e, args) {
 		}
 		if (cell !== null) {
 			if (cell.row > args.row && this.isDirty()) {
-				if (!this.saveChanges(args)) {
+				var saved = this.saveChanges(args, function(){
+					grid.focus();
+					grid.setActiveCell(cell.row, cell.cell);
+					grid.editActiveCell();
+				});
+				if (!saved) {
 					this.focusInvalidCell(args);
 				}
 			} else {
@@ -668,7 +673,7 @@ Grid.prototype.findPrevEditable = function(posY, posX) {
 	return null;
 };
 
-Grid.prototype.saveChanges = function(args) {
+Grid.prototype.saveChanges = function(args, callback) {
 
 	var grid = this.grid,
 		lock = grid.getEditorLock();
@@ -682,10 +687,7 @@ Grid.prototype.saveChanges = function(args) {
 		args.item = this.grid.getDataItem(args.row);
 	}
 	
-	var self = this,
-		data = this.scope.dataView,
-		item = data.getItem(args.row);
-
+	var data = this.scope.dataView;
 	var ds = this.handler._dataSource,
 		records = [];
 
@@ -704,21 +706,10 @@ Grid.prototype.saveChanges = function(args) {
 	});
 	
 	function focus() {
-		
 		grid.setActiveCell(args.row, args.cell);
 		grid.focus();
-		
-		if (item.id === 0) {
-			grid.setOptions({
-				enableAddRow: true
-			});
-			var nextCell = self.findNextEditable(args.row + 1, -1);
-			if (nextCell !== null) {
-				grid.updateRowCount();
-				grid.render();
-				grid.setActiveCell(nextCell.row, nextCell.cell);
-				grid.editActiveCell();
-			}
+		if (callback) {
+			callback();
 		}
 	}
 
@@ -726,7 +717,7 @@ Grid.prototype.saveChanges = function(args) {
 		onAfterSave = this.scope.onAfterSave();
 
 	if (onBeforeSave && onBeforeSave(records) === false) {
-		return setTimeout(focus);
+		return setTimeout(focus, 200);
 	}
 
 	return ds.saveAll(records).success(function(records, page) {
