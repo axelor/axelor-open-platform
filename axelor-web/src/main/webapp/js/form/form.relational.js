@@ -235,7 +235,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			var sortBy = view.orderBy;
 			
 			if (sortBy) {
-				sortBy = sortBy.split("\\.");
+				sortBy = sortBy.split(",");
 			}
 			
 			return ds.search({
