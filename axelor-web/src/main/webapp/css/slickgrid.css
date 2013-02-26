@@ -111,6 +111,12 @@
 	min-width: inherit !important;
 }
 
+.slick-cell input[type=checkbox] {
+	width: auto;
+	height: auto;
+	margin-top: 4px;
+}
+
 .slick-editor-dropdown {
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 	min-width: 250px;
