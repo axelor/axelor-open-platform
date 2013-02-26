@@ -960,10 +960,10 @@ var OneToManyInline = _.extend({}, OneToManyItem, {
 		var render = model.$render,
 			renderPending = false;
 		model.$render = function() {
-			var value = scope.getValue();
 			if (wrapper.is(":visible")) {
 				renderPending = false;
 				render();
+				grid.trigger('adjustSize');
 			} else {
 				renderPending = true;
 			}
