@@ -19,7 +19,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Provider;
-import com.google.inject.persist.Transactional;
 
 /**
  * The {@code Query} class allows filtering and fetching records quickly.
@@ -264,7 +263,6 @@ public class Query<T extends Model> {
 	 *            the key value map
 	 * @return total number of records updated
 	 */
-	@Transactional
 	public int update(Map<String, Object> values) {
 		Map<String, Object> params = Maps.newHashMap();
 		for(String key : values.keySet()) {
@@ -285,7 +283,6 @@ public class Query<T extends Model> {
 	 *            the new value
 	 * @return total number of records updated
 	 */
-	@Transactional
 	public int update(String name, Object value) {
 		Map<String, Object> values = Maps.newHashMap();
 		values.put(name.replaceFirst("^self\\.", ""), value);
@@ -302,7 +299,6 @@ public class Query<T extends Model> {
 	 * @see #remove()
 	 * @return total number of records affected.
 	 */
-	@Transactional
 	public int delete() {
 		javax.persistence.Query q = em().createQuery(deleteQuery());
 		this.bind(q);
@@ -320,7 +316,6 @@ public class Query<T extends Model> {
 	 * @see #delete()
 	 * @return total number of records removed.
 	 */
-	@Transactional
 	public long remove() {
 		long n = this.count();
 		while(this.count() > 0) {

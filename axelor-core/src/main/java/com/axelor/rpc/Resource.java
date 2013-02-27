@@ -21,13 +21,13 @@ import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
-import com.google.common.base.Function;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
+import com.google.inject.persist.Transactional;
 
 /**
  * This class defines CRUD like interface.
@@ -62,23 +62,20 @@ public class Resource<T extends Model> {
 		Response response = new Response();
 		Map<String, Object> meta = Maps.newHashMap();
 
-		try {
-			List<Object> fields = Lists.newArrayList();
-			for (Property p : JPA.fields(model)) {
-				fields.add(p.toMap());
-			}
-
-			meta.put("model", model.getName());
-			//TODO: meta.put("title", "");
-			//TODO: meta.put("description", "");
-			//TODO: meta.put("defaults", null);
-			meta.put("fields", fields);
-			
-			response.setData(meta);
-			response.setStatus(Response.STATUS_SUCCESS);
-		} catch (Exception e) {
-			response.setException(e);
+		List<Object> fields = Lists.newArrayList();
+		for (Property p : JPA.fields(model)) {
+			fields.add(p.toMap());
 		}
+
+		meta.put("model", model.getName());
+		//TODO: meta.put("title", "");
+		//TODO: meta.put("description", "");
+		//TODO: meta.put("defaults", null);
+		meta.put("fields", fields);
+
+		response.setData(meta);
+		response.setStatus(Response.STATUS_SUCCESS);
+
 		return response;
 	}
 
@@ -158,77 +155,53 @@ public class Resource<T extends Model> {
 	}
 
 	public Response search(Request request) {
-		
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("Searching '{}' with {}", model.getCanonicalName(),
-					request.getData());
-		}
+
+		LOG.debug("Searching '{}' with {}", model.getCanonicalName(), request.getData());
 
 		Response response = new Response();
 
-		try {
-			int offset = request.getOffset();
-			int limit = request.getLimit();
-	
-			Criteria criteria = getCriteria(request);
-	
-			Query<?> query = JPA.all(model);
-			if (criteria != null) {
-				query = criteria.createQuery(model);
-			}
-			
-			for(String sortBy : getSortBy(request)) {
-				query = query.order(sortBy);
-			}
-			
-			List<?> data = null;
-			try {
-				if (request.getFields() != null) {
-					Query<?>.Selector selector = query.select(request.getFields().toArray(new String[]{}));
-					if (LOG.isDebugEnabled()) {
-						LOG.debug(selector.toString());
-					}
-					data = selector.fetch(limit, offset);
-				} else {
-					if (LOG.isDebugEnabled()) {
-						LOG.debug(query.toString());
-					}
-					data = query.fetch(limit, offset);
-				}
-			} catch (Exception e) {
-				EntityTransaction txn = JPA.em().getTransaction();
-				if (txn.isActive()) {
-					txn.rollback();
-				}
-				LOG.error("Fetch data without filter, query failed: " + Throwables.getRootCause(e));
-				data = (query = JPA.all(model)).fetch(limit, offset);
-			}
-	
-			data = Lists.transform(data, new Function<Object, Object>() {
-	
-				@Override
-				public Object apply(Object input) {
-					if (input instanceof Map)
-						return input;
-					return toMap(input);
-				}
-			});
-			
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("Records found: {}", data.size());
-			}
-	
-			response.setData(data);
-			
-			response.setOffset(offset);
-			response.setTotal(query.count());
-			
-			response.setStatus(Response.STATUS_SUCCESS);
-		} catch (Exception e) {
-			if (LOG.isDebugEnabled())
-				LOG.debug(e.toString(), e);
-			response.setException(e);
+		int offset = request.getOffset();
+		int limit = request.getLimit();
+
+		Criteria criteria = getCriteria(request);
+
+		Query<?> query = JPA.all(model);
+		if (criteria != null) {
+			query = criteria.createQuery(model);
 		}
+
+		for(String sortBy : getSortBy(request)) {
+			query = query.order(sortBy);
+		}
+
+		List<?> data = null;
+		try {
+			if (request.getFields() != null) {
+				Query<?>.Selector selector = query.select(request.getFields().toArray(new String[]{}));
+				LOG.debug("JPQL: {}", selector);
+				data = selector.fetch(limit, offset);
+			} else {
+				LOG.debug("JPQL: {}", query);
+				data = query.fetch(limit, offset);
+			}
+		} catch (Exception e) {
+			EntityTransaction txn = JPA.em().getTransaction();
+			if (txn.isActive()) {
+				txn.rollback();
+			}
+			LOG.error("Fetch data without filter, query failed: " + Throwables.getRootCause(e));
+			data = (query = JPA.all(model)).fetch(limit, offset);
+		}
+
+		LOG.debug("Records found: {}", data.size());
+
+		response.setData(data);
+
+		response.setOffset(offset);
+		response.setTotal(query.count());
+
+		response.setStatus(Response.STATUS_SUCCESS);
+
 		return response;
 	}
 
@@ -236,39 +209,30 @@ public class Resource<T extends Model> {
 		Response response = new Response();
 		List<Object> data = Lists.newArrayList();
 		
-		try {
-			Model entity = JPA.find(model, id);
-			if (entity != null)
-				data.add(entity);
-			response.setData(data);
-			response.setStatus(Response.STATUS_SUCCESS);
-		} catch (Exception e) {
-			if (LOG.isDebugEnabled())
-				LOG.debug(e.toString(), e);
-			response.setException(e);
-		}
+		Model entity = JPA.find(model, id);
+		if (entity != null)
+			data.add(entity);
+		response.setData(data);
+		response.setStatus(Response.STATUS_SUCCESS);
+
 		return response;
 	}
 	
 	public Response fetch(long id, Request request) {
 		Response response = new Response();
 		List<Object> data = Lists.newArrayList();
-		try {
-			Model entity = JPA.find(model, id);
-			if (entity != null) {
-				data.add(toMap(entity, request.getFields().toArray(new String[]{})));
-			}
-			response.setData(data);
-			response.setStatus(Response.STATUS_SUCCESS);
-		} catch (Exception e) {
-			if (LOG.isDebugEnabled())
-				LOG.debug(e.toString(), e);
-			response.setException(e);
+
+		Model entity = JPA.find(model, id);
+		if (entity != null) {
+			data.add(toMap(entity, request.getFields().toArray(new String[]{})));
 		}
+		response.setData(data);
+		response.setStatus(Response.STATUS_SUCCESS);
+
 		return response;
 	}
 
-	@SuppressWarnings("all")
+	@Transactional
 	public Response save(final Request request) {
 
 		Response response = new Response();
@@ -282,17 +246,19 @@ public class Resource<T extends Model> {
 		}
 		
 		for(Object record : records) {
+			@SuppressWarnings("all")
 			Model bean = JPA.edit(model, (Map) record);
 			bean = JPA.manage(bean);
 			data.add(bean);
 		}
-	
+
 		response.setData(data);
 		response.setStatus(Response.STATUS_SUCCESS);
 		
 		return response;
 	}
 
+	@Transactional
 	public Response remove(long id, Request request) {
 		
 		final Response response = new Response();
@@ -312,7 +278,7 @@ public class Resource<T extends Model> {
 		return response;
 	}
 	
-	@SuppressWarnings("all")
+	@Transactional
 	public Response remove(Request request) {
 		
 		final Response response = new Response();
@@ -325,6 +291,7 @@ public class Resource<T extends Model> {
 		}
 
 		for(Object record : records) {
+			@SuppressWarnings("all")
 			Model bean = JPA.edit(model, (Map) record);
 			if (bean.getId() != null) {
 				JPA.remove(bean);
@@ -342,27 +309,19 @@ public class Resource<T extends Model> {
 		Response response = new Response();
 		Model bean = JPA.find(model, id);
 		
-		try {
-			bean = JPA.copy(bean, true);
-			response.setData(ImmutableList.of(bean));
-			response.setStatus(Response.STATUS_SUCCESS);
-		} catch (Exception e) {
-			if (LOG.isDebugEnabled())
-				LOG.debug(e.toString(), e);
-			response.setException(e);
-		}
+		bean = JPA.copy(bean, true);
+		response.setData(ImmutableList.of(bean));
+		response.setStatus(Response.STATUS_SUCCESS);
+
 		return response;
 	}
 
 	@Inject
-	Injector injector;
+	private Injector injector;
 
-	@SuppressWarnings("all")
 	public ActionResponse action(ActionRequest request) {
 
 		ActionResponse response = new ActionResponse();
-
-		Map<String, Object> data = (Map<String, Object>) request.getData();
 		String[] parts = request.getAction().split("\\:");
 
 		if (parts.length != 2) {
@@ -375,15 +334,15 @@ public class Resource<T extends Model> {
 
 		try {
 			Class<?> klass = Class.forName(controller);
-			Method m = klass.getDeclaredMethod(method, ActionRequest.class,
-					ActionResponse.class);
+			Method m = klass.getDeclaredMethod(method, ActionRequest.class, ActionResponse.class);
 			Object obj = injector.getInstance(klass);
 
+			m.setAccessible(true);
 			m.invoke(obj, new Object[] { request, response });
+
 			response.setStatus(Response.STATUS_SUCCESS);
 		} catch (Exception e) {
-			if (LOG.isDebugEnabled())
-				LOG.debug(e.toString(), e);
+			LOG.debug(e.toString(), e);
 			response.setException(e);
 		}
 		return response;
@@ -404,28 +363,23 @@ public class Resource<T extends Model> {
 		Mapper mapper = Mapper.of(model);
 		Map<String, Object> data = request.getData();
 		
-		try {
-			Property property = mapper.getNameField();
-			if (property != null) {
-				String qs = String.format(
-						"SELECT self.%s FROM %s self WHERE self.id = :id",
-						property.getName(), model.getSimpleName());
+		Property property = mapper.getNameField();
+		if (property != null) {
+			String qs = String.format(
+					"SELECT self.%s FROM %s self WHERE self.id = :id",
+					property.getName(), model.getSimpleName());
 
-				javax.persistence.Query query = JPA.em().createQuery(qs);
-				QueryBinder binder = new QueryBinder(query);
-				query = binder.bind(data, null);
-				
-				Object name = query.getSingleResult();
-				data.put(property.getName(), name);
-			}
-	
-			response.setData(ImmutableList.of(data));
-			response.setStatus(Response.STATUS_SUCCESS);
-		} catch (Exception e) {
-			if (LOG.isDebugEnabled())
-				LOG.debug(e.toString(), e);
-			response.setException(e);
+			javax.persistence.Query query = JPA.em().createQuery(qs);
+			QueryBinder binder = new QueryBinder(query);
+			query = binder.bind(data, null);
+
+			Object name = query.getSingleResult();
+			data.put(property.getName(), name);
 		}
+
+		response.setData(ImmutableList.of(data));
+		response.setStatus(Response.STATUS_SUCCESS);
+
 		return response;
 	}
 
