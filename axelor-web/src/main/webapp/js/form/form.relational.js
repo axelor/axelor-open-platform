@@ -242,6 +242,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 				filter: filter,
 				fields: fields,
 				sortBy: ds._sortBy || sortBy,
+				archived: true,
 				limit: -1,
 				domain: null
 			}).success(function(records, page){
@@ -559,6 +560,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 			filter: filter,
 			fields: fields,
 			sortBy: sortBy,
+			archived: true,
 			limit: -1,
 			domain: null,
 			context: null
@@ -688,6 +690,7 @@ var ManyToOneItem = {
 			var params = {
 				filter: filter,
 				fields: fields,
+				archived: true,
 				limit: 10
 			};
 			
