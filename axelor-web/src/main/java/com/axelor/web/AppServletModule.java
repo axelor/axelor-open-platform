@@ -4,7 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.ws.rs.Path;
+
 import org.apache.shiro.guice.web.GuiceShiroFilter;
+import org.reflections.Reflections;
+import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +80,12 @@ public class AppServletModule extends JerseyServletModule {
 		bindInterceptor(Matchers.any(),
 				Matchers.returns(Matchers.subclassesOf(Response.class)),
 				new ResponseInterceptor());
+		
+		// bind all the web service resources
+		Reflections reflections = new Reflections("com.axelor.web", new TypeAnnotationsScanner());
+		for(Class<?> type : reflections.getTypesAnnotatedWith(Path.class)) {
+			bind(type);
+		}
 		
 		Map<String, String> params = new HashMap<String, String>();
 
