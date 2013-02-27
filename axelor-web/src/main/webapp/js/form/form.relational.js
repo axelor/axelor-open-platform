@@ -246,7 +246,13 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 				limit: -1,
 				domain: null
 			}).success(function(records, page){
-				success(records, page);
+				// only edited records should have version property
+				var items = _.map(records, function(item){
+					item.$version = item.version;
+					delete item.version;
+					return item;
+				});
+				success(items, page);
 			});
 		
 		});
