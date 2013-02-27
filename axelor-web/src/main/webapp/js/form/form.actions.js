@@ -12,11 +12,21 @@ function updateValues(source, target) {
 	if (equals(source, target))
 		return;
 	forEach(source, function(value, key) {
-		if (isArray(value) || isDate(value))
+		if (isDate(value))
 			return target[key] = value;
+		if (isArray(value)) {
+			var dest = target[key] || [];
+			value = _.map(value, function(item){
+				var found = _.find(dest, function(v){
+					return v.id === item.id;
+				});
+				return found ? _.extend({}, found, item) : item;
+			});
+			return target[key] = value;
+		}
 		if (isObject(value)) {
 			var dest = target[key];
-			if (dest) {
+			if (dest && dest.id == value.id) {
 				dest = _.extend({}, dest);
 				updateValues(value, dest);
 				return target[key] = dest;
