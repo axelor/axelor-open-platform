@@ -193,14 +193,14 @@ function FormViewCtrl($scope, $element) {
 	};
 
 	$scope.isDirty = function() {
-		return $scope.$$dirty;
+		return $scope.$$dirty = !ds.equals($scope.record, $scope.$$original);
 	};
 
 	$scope.$watch("record", function(rec, old) {
 		if (rec === old) {
 			return $scope.$$dirty = false;
 		}
-		$scope.$$dirty = !ds.equals($scope.record, $scope.$$original);
+		return $scope.$$dirty = $scope.isDirty();
 	}, true);
 
 	$scope.isValid = function() {
@@ -208,11 +208,11 @@ function FormViewCtrl($scope, $element) {
 	};
 	
 	$scope.canCopy = function() {
-		return $scope.record && !$scope.isDirty() && $scope.record.id;
+		return $scope.record && !$scope.$$dirty && $scope.record.id;
 	};
 	
 	$scope.canSave = function() {
-		return $scope.isDirty() && $scope.isValid();
+		return $scope.$$dirty && $scope.isValid();
 	};
 	
 	$scope.onNew = function() {
