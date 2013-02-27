@@ -210,7 +210,9 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		
 		var records = $.makeArray(value),
 			ids = _.chain(records).filter(function(item){
-				return _.isNumber(item.id) && item.id > 0 && _.isUndefined(item.version);
+				return _.isNumber(item.id) && item.id > 0 &&
+					   _.isUndefined(item.version) &&
+					   _.isUndefined(item.$fetched);
 			}).pluck('id').value();
 		
 		if (ids.length == 0) {
@@ -249,6 +251,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 				// only edited records should have version property
 				var items = _.map(records, function(item){
 					item.$version = item.version;
+					item.$fetched = false;
 					delete item.version;
 					return item;
 				});
