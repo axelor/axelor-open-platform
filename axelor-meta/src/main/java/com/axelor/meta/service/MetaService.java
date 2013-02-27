@@ -161,13 +161,11 @@ public class MetaService {
 	
 	public Response findViews(Class<?> model, Map<String, String> views) {
 		Response response = new Response();
-		try {
-			Map<String, Object> data = loader.findViews(model.getName(), views);
-			response.setData(data);
-			response.setStatus(Response.STATUS_SUCCESS);
-		} catch (Exception e) {
-			response.setException(e);
-		}
+
+		Map<String, Object> data = loader.findViews(model.getName(), views);
+		response.setData(data);
+		response.setStatus(Response.STATUS_SUCCESS);
+
 		return response;
 	}
 	
@@ -185,61 +183,61 @@ public class MetaService {
 	public Response runSearch(Request request) {
 		Response response = new Response();
 		
-		try {
-			Map<String, Object> context = request.getData();
-			String name = (String) context.get("__name");
-			List<String> selected = (List) context.get("__selected");
-			
-			LOG.debug("Search : {}", name);
-			
-			Search search = (Search) loader.findView(name);
-			GroovyScriptHelper helper = search.scriptHandler(context);
-			
-			List<Object> data = Lists.newArrayList();
-			
-			for(Search.SearchSelect select : search.getSelects()) {
-				
-				if (selected != null && !selected.contains(select.getModel())) {
-					continue;
-				}
-			
-				LOG.debug("Model : {}", select.getModel());
-				LOG.debug("Param : {}", context);
-				
-				Query query = select.toQuery(search, helper);
-				List<?> items = Lists.newArrayList();
-				
-				LOG.debug("Query : {}", select.getQueryString());
-				
-				if (query != null) {
-					query.setFirstResult(request.getOffset());
-					query.setMaxResults(search.getLimit());
-					items = query.getResultList();
-				}
-				
-				LOG.debug("Found : {}", items.size());
+		Map<String, Object> context = request.getData();
+		String name = (String) context.get("__name");
+		List<String> selected = (List) context.get("__selected");
 
-				for(Object item : items) {
-					if (item instanceof Map) {
-						((Map) item).put("_model", select.getModel());
-						((Map) item).put("_modelTitle", select.getTitle());
-						((Map) item).put("_form", select.getFormView());
-						((Map) item).put("_grid", select.getGridView());
-					}
-				}
-				
-				data.addAll(items);
+		LOG.debug("Search : {}", name);
+
+		Search search = (Search) loader.findView(name);
+		GroovyScriptHelper helper = search.scriptHandler(context);
+
+		List<Object> data = Lists.newArrayList();
+
+		for(Search.SearchSelect select : search.getSelects()) {
+			
+			if (selected != null && !selected.contains(select.getModel())) {
+				continue;
+			}
+
+			LOG.debug("Model : {}", select.getModel());
+			LOG.debug("Param : {}", context);
+			
+			Query query;
+			try {
+				query = select.toQuery(search, helper);
+			} catch (ClassNotFoundException e) {
+				throw new IllegalArgumentException(e);
+			}
+			List<?> items = Lists.newArrayList();
+			
+			LOG.debug("Query : {}", select.getQueryString());
+			
+			if (query != null) {
+				query.setFirstResult(request.getOffset());
+				query.setMaxResults(search.getLimit());
+				items = query.getResultList();
 			}
 			
-			LOG.debug("Total : {}", data.size());
+			LOG.debug("Found : {}", items.size());
+
+			for(Object item : items) {
+				if (item instanceof Map) {
+					((Map) item).put("_model", select.getModel());
+					((Map) item).put("_modelTitle", select.getTitle());
+					((Map) item).put("_form", select.getFormView());
+					((Map) item).put("_grid", select.getGridView());
+				}
+			}
 			
-			response.setData(data);
-			response.setStatus(Response.STATUS_SUCCESS);
-		} catch (Exception e) {
-			response.setException(e);
-			e.printStackTrace();
+			data.addAll(items);
 		}
 		
+		LOG.debug("Total : {}", data.size());
+
+		response.setData(data);
+		response.setStatus(Response.STATUS_SUCCESS);
+
 		return response;
 	}
 }
