@@ -95,6 +95,7 @@ ${p.documentation}
 			this.flush();
 		}
 	}
+
 <% } %>\
 <% } %>\
 	@Override
