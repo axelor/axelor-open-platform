@@ -20,6 +20,7 @@ function updateValues(source, target) {
 				var found = _.find(dest, function(v){
 					return v.id === item.id;
 				});
+				if (_.has(item, "version") && item.id) item.$fetched = true;
 				return found ? _.extend({}, found, item) : item;
 			});
 			return target[key] = value;
