@@ -108,16 +108,27 @@ class Entity {
 	}
 	
 	private List<Property> getHashables() {
-		return properties.findAll { p ->
+		def all = properties.findAll { p ->
 			p.hashKey || (!p.virtual && p.unique && p.simple && !(p.name =~ /id|version/))
 		}
+		
+		constraints.each {
+			all += it.columns.collect {
+				def n = it
+				properties.find {
+					it.name == n
+				}
+			}.flatten().findAll { it != null }
+		}
+		
+		return all.unique()
 	}
 	
 	String getEqualsCode() {
 		importType("com.google.common.base.Objects");
 		def code = getHashables().collect { p -> "if (!Objects.equal(${p.getter}(), other.${p.getter}())) return false;"}
 		code += ""
-		code += code.size() ? "return true;" : "return super.equals(other);"
+		code += code.size() > 1 ? "return true;" : "return false;"
 		return code.join("\n\t\t")
 	}
 	
