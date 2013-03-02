@@ -61,14 +61,16 @@ public class AppServletModule extends JerseyServletModule {
 
 		log.info(builder.toString());
 		
+		// install the auth module
+		install(new AuthModule(getServletContext()));
+		
 		// initialize JPA
 		Properties properties = new Properties();
 		properties.put("hibernate.ejb.interceptor", "com.axelor.auth.db.AuditInterceptor");
 		install(new JpaModule(jpaUnit, true, false).properties(properties));
+
+		// register filters (order is important)
 		filter("*").through(PersistFilter.class);
-		
-		// install auth module
-		install(new AuthModule(getServletContext()));
 		filter("*").through(GuiceShiroFilter.class);
 		
 		// no-cache filter
