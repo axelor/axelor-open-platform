@@ -1016,7 +1016,7 @@ if (typeof Slick === "undefined") {
         c = columns[i];
         widths.push(c.width);
         total += c.width;
-        if (c.resizable) {
+        if (c.resizable && !c.hasWidth) {
           shrinkLeeway += c.width - Math.max(c.minWidth, absoluteColumnMinWidth);
         }
       }
@@ -1033,6 +1033,7 @@ if (typeof Slick === "undefined") {
           }
           var absMinWidth = Math.max(c.minWidth, absoluteColumnMinWidth);
           var shrinkSize = Math.floor(shrinkProportion * (width - absMinWidth)) || 1;
+          if (c.hasWidth) shrinkSize = 0;
           shrinkSize = Math.min(shrinkSize, width - absMinWidth);
           total -= shrinkSize;
           shrinkLeeway -= shrinkSize;
@@ -1054,6 +1055,7 @@ if (typeof Slick === "undefined") {
             continue;
           }
           var growSize = Math.min(Math.floor(growProportion * c.width) - c.width, (c.maxWidth - c.width) || 1000000) || 1;
+          if (c.hasWidth) growSize = 0;
           total += growSize;
           widths[i] += growSize;
         }
