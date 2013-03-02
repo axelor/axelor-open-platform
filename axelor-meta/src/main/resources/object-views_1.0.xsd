@@ -197,7 +197,7 @@
         <xsd:sequence>
           <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0"/>
           <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" maxOccurs="1" />
-          <xsd:element name="field" type="tns:Field" maxOccurs="unbounded" />
+          <xsd:element name="field" type="tns:GridField" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="editable" type="xsd:boolean" />
         <xsd:attribute name="expandable" type="xsd:boolean" />
@@ -430,6 +430,17 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  
+  <xsd:complexType name="GridField">
+    <xsd:complexContent>
+      <xsd:extension base="tns:Field">
+        <xsd:attribute name="width" type="xsd:integer"/>
+        <xsd:attribute name="canSelect" use="prohibited"/>
+        <xsd:attribute name="edit-window" use="prohibited"/>
+        <xsd:attribute name="summary-view" use="prohibited"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
