@@ -285,6 +285,8 @@ Grid.prototype.parse = function(view) {
 			field: item.name,
 			descriptor: field,
 			sortable: sortable,
+			width: item.width,
+			hasWidth: item.width ? true : false,
 			cssClass: type,
 			headerCssClass: type,
 			xpath: path
