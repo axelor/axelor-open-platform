@@ -25,7 +25,11 @@ public class Criteria {
 	}
 	
 	public <T extends Model> Query<T> createQuery(Class<T> klass) {
-		Query<T> q = filter.build(klass);
+		return createQuery(klass, null);
+	}
+
+	public <T extends Model> Query<T> createQuery(Class<T> klass, Filter and) {
+		Query<T> q = and == null ? filter.build(klass) : Filter.and(filter, and).build(klass);
 		if (domainContext != null) {
 			Class<?> domainClass = klass;
 			if (domainContext.containsKey("_model")) {

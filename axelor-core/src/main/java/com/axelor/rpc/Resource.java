@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.persistence.EntityTransaction;
 
 import org.hibernate.proxy.HibernateProxy;
@@ -15,12 +16,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.db.JPA;
+import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
+import com.axelor.rpc.filter.Filter;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -36,17 +39,20 @@ import com.google.inject.persist.Transactional;
 public class Resource<T extends Model> {
 
 	private Class<T> model;
+	
+	private Provider<JpaSecurity> security;
 
     private Logger LOG = LoggerFactory.getLogger(Resource.class);
     
-	public Resource(Class<T> model) {
+	private Resource(Class<T> model, Provider<JpaSecurity> security) {
 		this.model = model;
+		this.security = security;
 	}
 
 	@Inject
 	@SuppressWarnings("unchecked")
-	public Resource(TypeLiteral<T> typeLiteral) {
-		this((Class<T>) typeLiteral.getRawType());
+	public Resource(TypeLiteral<T> typeLiteral, Provider<JpaSecurity> security) {
+		this((Class<T>) typeLiteral.getRawType(), security);
 	}
 
 	/**
@@ -163,11 +169,16 @@ public class Resource<T extends Model> {
 		int offset = request.getOffset();
 		int limit = request.getLimit();
 
+		security.get().check("canRead", model);
+
 		Criteria criteria = getCriteria(request);
+		Filter filter = security.get().getFilter("canRead", model);
 
 		Query<?> query = JPA.all(model);
 		if (criteria != null) {
-			query = criteria.createQuery(model);
+			query = criteria.createQuery(model, filter);
+		} else if (filter != null) {
+			query = filter.build(model);
 		}
 
 		for(String sortBy : getSortBy(request)) {
@@ -206,6 +217,7 @@ public class Resource<T extends Model> {
 	}
 
 	public Response read(long id) {
+		security.get().check("canRead", model, id);
 		Response response = new Response();
 		List<Object> data = Lists.newArrayList();
 		
@@ -219,6 +231,7 @@ public class Resource<T extends Model> {
 	}
 	
 	public Response fetch(long id, Request request) {
+		security.get().check("canRead", model, id);
 		Response response = new Response();
 		List<Object> data = Lists.newArrayList();
 
@@ -248,6 +261,12 @@ public class Resource<T extends Model> {
 		for(Object record : records) {
 			@SuppressWarnings("all")
 			Model bean = JPA.edit(model, (Map) record);
+			if (bean == null) {
+				security.get().check("canCreate", model);
+			} else {
+				security.get().check("canWrite", bean);
+			}
+
 			bean = JPA.manage(bean);
 			data.add(bean);
 		}
@@ -261,6 +280,7 @@ public class Resource<T extends Model> {
 	@Transactional
 	public Response remove(long id, Request request) {
 		
+		security.get().check("canRemove", model, id);
 		final Response response = new Response();
 		final Map<String, Object> data = Maps.newHashMap();
 		
@@ -306,6 +326,7 @@ public class Resource<T extends Model> {
 	}
 	
 	public Response copy(long id) {
+		security.get().check("canWrite", model, id);
 		Response response = new Response();
 		Model bean = JPA.find(model, id);
 		
