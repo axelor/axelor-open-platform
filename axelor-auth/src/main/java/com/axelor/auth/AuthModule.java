@@ -8,6 +8,7 @@ import org.apache.shiro.guice.ShiroModule;
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.mgt.SecurityManager;
 
+import com.axelor.db.JpaSecurity;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Singleton;
@@ -22,6 +23,10 @@ public class AuthModule extends ShiroWebModule {
 	@Override @SuppressWarnings("unchecked")
 	protected void configureShiroWeb() {
 		
+
+		this.bind(JpaSecurity.class).toProvider(AuthSecurity.class);
+		this.expose(JpaSecurity.class);
+
 		this.bindConstant().annotatedWith(Names.named("shiro.loginUrl")).to("/login.jsp");
 		this.bindRealm().to(AuthRealm.class);
 
@@ -35,6 +40,8 @@ public class AuthModule extends ShiroWebModule {
 		
 		@Override
 		protected void configureShiro() {
+			this.bind(JpaSecurity.class).toProvider(AuthSecurity.class);
+			this.expose(JpaSecurity.class);
 			this.bindRealm().to(AuthRealm.class);
 			this.bind(Initializer.class).asEagerSingleton();
 		}

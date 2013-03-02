@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views
+  http://apps.axelor.com/xml/ns/object-views/object-views_0.8.xsd">
+
+  <grid name="permission-grid" title="Permissions">
+    <field name="name" />
+    <field name="objectName" />
+    <field name="condition" />
+    <field name="canRead" width="75"/>
+    <field name="canWrite"  width="75"/>
+    <field name="canCreate"  width="75"/>
+    <field name="canRemove"  width="75"/>
+  </grid>
+
+  <form title="Permission" name="permission-form" cols="2" colWidths="*,250">
+    <group title="Rules">
+      <field name="name" />
+      <break />
+      <field name="objectName" colSpan="4" />
+      <field name="condition" colSpan="4" />
+      <field name="params" colSpan="4" />
+    </group>
+    <group title="Access" colWidths="*,25,*,25">
+      <field name="canRead" />
+      <field name="canWrite" />
+      <field name="canCreate" />
+      <field name="canRemove" />
+    </group>
+  </form>
+
+</object-views>

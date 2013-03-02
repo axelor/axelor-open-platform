@@ -3,24 +3,32 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.8.xsd">
 
-  <menuitem name="menu-auth" parent="menu-admin" title="User Management"/>
+  <menuitem name="menu-auth" parent="menu-admin" title="User Management" />
 
-	<menuitem name="menu-auth-users" parent="menu-auth"
-		title="Users"
-    action="action-auth-users"/>
+  <menuitem name="menu-auth-users" parent="menu-auth" title="Users"
+    action="action-auth-users" />
 
-	<action-view name="action-auth-users" title="Users" model="com.axelor.auth.db.User">
-		<view type="grid" name="user-grid"/>
-		<view type="form" name="user-form"/>
-	</action-view>
+  <action-view name="action-auth-users" title="Users" model="com.axelor.auth.db.User">
+    <view type="grid" name="user-grid" />
+    <view type="form" name="user-form" />
+  </action-view>
 
-	<menuitem name="menu-auth-groups" parent="menu-auth"
-		title="Groups"
-		action="action-auth-groups"/>
+  <menuitem name="menu-auth-groups" parent="menu-auth" title="Groups"
+    action="action-auth-groups" />
+
+  <action-view name="action-auth-groups" title="Groups"
+    model="com.axelor.auth.db.Group">
+    <view type="grid" name="group-grid" />
+    <view type="form" name="group-form" />
+  </action-view>
   
-  <action-view name="action-auth-groups" title="Groups" model="com.axelor.auth.db.Group">
-		<view type="grid" name="group-grid"/>
-		<view type="form" name="group-form"/>
-	</action-view>
+  <menuitem name="menu-auth-permissions" parent="menu-auth" title="Permissions"
+    action="action-auth-permissions"/>
 
+  <action-view name="action-auth-permissions" title="Permissions"
+    model="com.axelor.auth.db.Permission">
+    <view type="grid" name="permission-grid" />
+    <view type="form" name="permission-form" />
+  </action-view>
+  
 </object-views>

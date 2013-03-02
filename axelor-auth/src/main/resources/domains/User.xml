@@ -9,7 +9,7 @@
     <string name="code" required="true" unique="true" min="2" title="Login"/>
     <string name="name" required="true" unique="true" min="2"/>
     <string name="password" required="true" min="4"/>
-    <many-to-one name="group" ref="Group" column="user_group"/>
+    <many-to-one name="group" ref="Group" column="group_id"/>
   </entity>
   
 </domain-models>
