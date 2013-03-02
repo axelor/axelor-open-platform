@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
-@XmlType(propOrder = { "hilite", "selection", "views" })
+@XmlType
 @JsonTypeName("field")
 public class Field extends SimpleWidget {
 
@@ -39,7 +39,8 @@ public class Field extends SimpleWidget {
 	@XmlAttribute
 	private Boolean readonly;
 	
-	private Hilite hilite;
+	@XmlAttribute
+	private Integer width;
 	
 	@XmlAttribute(name = "min")
 	private String minSize;
@@ -67,6 +68,8 @@ public class Field extends SimpleWidget {
 	
 	@XmlAttribute(name = "summary-view")
 	private String summaryView;
+	
+	private Hilite hilite;
 	
 	@XmlElements({
 		@XmlElement(name = "form", type = FormView.class),
@@ -130,12 +133,12 @@ public class Field extends SimpleWidget {
 		this.readonly = readonly;
 	}
 
-	public Hilite getHilite() {
-		return hilite;
+	public Integer getWidth() {
+		return width;
 	}
-
-	public void setHilite(Hilite hilite) {
-		this.hilite = hilite;
+	
+	public void setWidth(Integer width) {
+		this.width = width;
 	}
 
 	@JsonIgnore
@@ -157,6 +160,14 @@ public class Field extends SimpleWidget {
 	
 	public void setSelection(String selection) {
 		this.selection = selection;
+	}
+	
+	public Hilite getHilite() {
+		return hilite;
+	}
+
+	public void setHilite(Hilite hilite) {
+		this.hilite = hilite;
 	}
 	
 	public List<AbstractView> getViews() {
