@@ -27,7 +27,9 @@ import org.reflections.vfs.Vfs.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
+import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -557,23 +559,16 @@ public class MetaLoader {
 	}
 	
 	public Map<String, Object> findViews(String model, Map<String, String> views) {
-		Map<String, Object> result = Maps.newHashMap();
-		if (views == null || views.isEmpty())
+		final Map<String, Object> result = Maps.newHashMap();
+		if (views == null || views.isEmpty()) {
 			views = ImmutableMap.of("grid", "", "form", "");
-		
+		}
 		for(String type : views.keySet()) {
-			String name = views.get(type);
-			MetaView view;
-			if (Strings.isNullOrEmpty(name)) {
-				view = MetaView.all().filter("self.model = ?1 AND self.type = ?2", model, type).fetchOne();
-			} else {
-				view = MetaView.all().filter("self.name = ?1", name).fetchOne();
-			}
+			final String name = views.get(type);
+			final AbstractView view = findView(model, name, type);
 			try {
-				ObjectViews o = this.unmarshal(view.getXml());
-				result.put(type, o.getViews().get(0));
+				result.put(type, view);
 			} catch (Exception e) {
-				continue;
 			}
 		}
 		return result;
@@ -583,7 +578,14 @@ public class MetaLoader {
 		if (name != null) {
 			return findView(name);
 		}
-		MetaView view = MetaView.all().filter("self.model = ?1 AND self.type = ?2", model, type).fetchOne();
+		MetaView view = null;
+		User user = AuthUtils.getUser();
+		if (user != null && user.getGroup() != null) {
+			view = MetaView.all().filter("self.model = ?1 AND self.type = ?2 AND ?3 MEMBER OF self.groups", model, type, user.getGroup()).fetchOne();
+		}
+		if (view == null) {
+			view = MetaView.all().filter("self.model = ?1 AND self.type = ?2", model, type).fetchOne();
+		}
 		try {
 			return ((ObjectViews) unmarshal(view.getXml())).getViews().get(0);
 		} catch (Exception e) {
