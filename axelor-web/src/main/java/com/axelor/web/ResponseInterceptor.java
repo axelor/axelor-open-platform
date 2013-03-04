@@ -2,6 +2,7 @@ package com.axelor.web;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.shiro.authz.AuthorizationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,13 @@ public class ResponseInterceptor implements MethodInterceptor {
 				JPA.em().getTransaction().rollback();
 			}
 			response = new Response();
-			response.setException(e);
+			if (e instanceof AuthorizationException) {
+				if (!e.toString().contains("not authorized to read")) {
+					response.setException(e);
+				}
+			} else {
+				response.setException(e);
+			}
 			log.error("Error: {}", e, e);
 		} finally {
 			running.remove();
