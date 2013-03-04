@@ -515,5 +515,13 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="hashAll" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+        Whether to use all the simple non-function fields as hash keys.
+        You can still ignore some fields with hashKey="false" attribute.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 </xsd:schema>
