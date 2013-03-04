@@ -22,6 +22,8 @@ class Entity {
 	
 	boolean groovy
 	
+	boolean hashAll
+	
 	String documentation;
 
 	List<Property> properties
@@ -37,6 +39,7 @@ class Entity {
 		module = node.parent().module.@name
 		sequential = node.@sequential == "true"
 		groovy = node.@lang == "groovy"
+		hashAll = node.@hashAll == "true"
 		baseClass = "com.axelor.db.Model"
 		documentation = findDocs(node)
 		
@@ -108,8 +111,14 @@ class Entity {
 	}
 	
 	private List<Property> getHashables() {
+		
+		if (hashAll) {
+			return properties.findAll { p ->
+				p.getAttribute("hashKey") != "false" && !p.virtual && p.simple && !(p.name =~ /id|version/)
+			}
+		}
 		def all = properties.findAll { p ->
-			p.hashKey || (!p.virtual && p.unique && p.simple && !(p.name =~ /id|version/))
+			p.hashKey && !p.virtual && p.simple && !(p.name =~ /id|version/)
 		}
 		
 		constraints.each {
