@@ -62,6 +62,13 @@ public class Resource<T extends Model> {
 	public Class<?> getModel() {
 		return model;
 	}
+	
+	private Long findId(Map<String, Object> values) {
+		try {
+			return Long.parseLong(values.get("id").toString());
+		} catch (Exception e){}
+		return null;
+	}
 
 	public Response fields() {
 		
@@ -169,10 +176,10 @@ public class Resource<T extends Model> {
 		int offset = request.getOffset();
 		int limit = request.getLimit();
 
-		security.get().check("canRead", model);
+		security.get().check(JpaSecurity.CAN_READ, model);
 
 		Criteria criteria = getCriteria(request);
-		Filter filter = security.get().getFilter("canRead", model);
+		Filter filter = security.get().getFilter(JpaSecurity.CAN_READ, model);
 
 		Query<?> query = JPA.all(model);
 		if (criteria != null) {
@@ -217,7 +224,7 @@ public class Resource<T extends Model> {
 	}
 
 	public Response read(long id) {
-		security.get().check("canRead", model, id);
+		security.get().check(JpaSecurity.CAN_READ, model, id);
 		Response response = new Response();
 		List<Object> data = Lists.newArrayList();
 		
@@ -231,7 +238,7 @@ public class Resource<T extends Model> {
 	}
 	
 	public Response fetch(long id, Request request) {
-		security.get().check("canRead", model, id);
+		security.get().check(JpaSecurity.CAN_READ, model, id);
 		Response response = new Response();
 		List<Object> data = Lists.newArrayList();
 
@@ -259,12 +266,20 @@ public class Resource<T extends Model> {
 		}
 		
 		for(Object record : records) {
+			
+			@SuppressWarnings("all")
+			Long id = findId((Map) record);
+			
+			if (id == null || id <= 0L) {
+				security.get().check(JpaSecurity.CAN_CREATE, model);
+			}
+
 			@SuppressWarnings("all")
 			Model bean = JPA.edit(model, (Map) record);
-			if (bean == null) {
-				security.get().check("canCreate", model);
-			} else {
-				security.get().check("canWrite", bean);
+			id = bean.getId();
+
+			if (bean != null && id != null && id > 0L) {
+				security.get().check(JpaSecurity.CAN_WRITE, bean);
 			}
 
 			bean = JPA.manage(bean);
@@ -280,7 +295,7 @@ public class Resource<T extends Model> {
 	@Transactional
 	public Response remove(long id, Request request) {
 		
-		security.get().check("canRemove", model, id);
+		security.get().check(JpaSecurity.CAN_REMOVE, model, id);
 		final Response response = new Response();
 		final Map<String, Object> data = Maps.newHashMap();
 		
@@ -326,7 +341,7 @@ public class Resource<T extends Model> {
 	}
 	
 	public Response copy(long id) {
-		security.get().check("canWrite", model, id);
+		security.get().check(JpaSecurity.CAN_CREATE, model, id);
 		Response response = new Response();
 		Model bean = JPA.find(model, id);
 		
