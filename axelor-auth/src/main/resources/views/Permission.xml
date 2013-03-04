@@ -4,29 +4,41 @@
   xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views
   http://apps.axelor.com/xml/ns/object-views/object-views_0.8.xsd">
 
-  <grid name="permission-grid" title="Permissions">
-    <field name="name" />
-    <field name="objectName" />
-    <field name="condition" />
+  <grid title="Permissions" name="permission-grid">
+    <field name="name"/>
+    <field name="object"/>
     <field name="canRead" width="75"/>
-    <field name="canWrite"  width="75"/>
-    <field name="canCreate"  width="75"/>
-    <field name="canRemove"  width="75"/>
+    <field name="canWrite" width="75"/>
+    <field name="canCreate" width="75"/>
+    <field name="canRemove" width="75"/>
   </grid>
 
-  <form title="Permission" name="permission-form" cols="2" colWidths="*,250">
-    <group title="Rules">
-      <field name="name" />
-      <break />
-      <field name="objectName" colSpan="4" />
-      <field name="condition" colSpan="4" />
-      <field name="params" colSpan="4" />
+  <form title="Permission" name="permission-form" cols="2" colWidths="*,175">
+    <group title="General" cols="2">
+        <field name="name"/>
+        <field name="object"/>
     </group>
     <group title="Access" colWidths="*,25,*,25">
-      <field name="canRead" />
-      <field name="canWrite" />
-      <field name="canCreate" />
-      <field name="canRemove" />
+        <field name="canRead"/>
+        <field name="canWrite"/>
+        <field name="canCreate"/>
+        <field name="canRemove"/>
+    </group>
+    <group title="Read" cols="2" colSpan="2">
+        <field name="readCondition" title="Condition"/>
+        <field name="readParams" title="Params"/>
+    </group>
+    <group title="Write" cols="2" colSpan="2">
+        <field name="writeCondition" title="Condition"/>
+        <field name="writeParams" title="Params"/>
+    </group>
+    <group title="Create" cols="2" colSpan="2">
+        <field name="createCondition" title="Condition"/>
+        <field name="createParams" title="Params"/>
+    </group>
+    <group title="Remove" cols="2" colSpan="2">
+        <field name="removeCondition" title="Condition"/>
+        <field name="removeParams" title="Params"/>
     </group>
   </form>
 

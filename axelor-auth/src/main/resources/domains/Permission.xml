@@ -6,14 +6,20 @@
   <module name="auth" package="com.axelor.auth.db"/>
 
   <entity name="Permission" sequential="true">
-    <string name="name" unique="true" required="true"/>
-    <string name="objectName" required="true" title="Object"/>
-    <string name="condition"/>
-    <string name="params"/>
+    <string name="name" required="true" unique="true"/>
+    <string name="object" required="true"/>
     <boolean name="canRead" title="Read"/>
     <boolean name="canWrite" title="Write"/>
     <boolean name="canCreate" title="Create"/>
     <boolean name="canRemove" title="Remove"/>
+    <string name="readCondition"/>
+    <string name="readParams"/>
+    <string name="writeCondition"/>
+    <string name="writeParams"/>
+    <string name="createCondition"/>
+    <string name="createParams"/>
+    <string name="removeCondition"/>
+    <string name="removeParams"/>
   </entity>
 
 </domain-models>

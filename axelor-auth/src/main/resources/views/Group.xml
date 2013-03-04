@@ -17,7 +17,7 @@
     <field name="permissions" colSpan="2">
       <grid title="Permissions">
         <field name="name" />
-        <field name="objectName" />
+        <field name="object" />
       </grid>
     </field>
   </form>
