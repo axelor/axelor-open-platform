@@ -164,7 +164,7 @@ class Entity {
 			code += "tsh.add(\"${p.name}\", this.${p.getter}());"
 			if (count++ == 10) break;
 		}
-		return code.join("\n\t\t") + "\n\n\t\treturn tsh.toString();"
+		return code.join("\n\t\t") + "\n\n\t\treturn tsh.omitNullValues().toString();"
 	}
 	
 	String importType(String fqn) {
