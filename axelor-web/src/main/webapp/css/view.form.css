@@ -37,8 +37,13 @@ table.form-layout td.form-item {
 
 table.form-layout td.form-label {
 	text-align: right;
-	padding-top: 4px;
+	padding-top: 5px;
 	width: 15%;
+}
+
+table.form-layout td.form-item.boolean-item {
+	padding-top: 5px;
+	vertical-align: inherit;
 }
 
 table.form-layout td.form-label label.required {

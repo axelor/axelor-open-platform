@@ -349,6 +349,7 @@ var DecimalItem = _.extend({}, IntegerItem, {
  */
 var BooleanItem = {
 	css: 'boolean-item',
+	cellCss: 'form-item boolean-item',
 	template: '<input type="checkbox">'
 };
 
