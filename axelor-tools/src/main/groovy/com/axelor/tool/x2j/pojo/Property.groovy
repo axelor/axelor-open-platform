@@ -1,9 +1,9 @@
 package com.axelor.tool.x2j.pojo
 
-import com.axelor.tool.x2j.Utils;
-import com.sun.jersey.core.impl.provider.entity.Inflector;
-
 import groovy.util.slurpersupport.NodeChild
+
+import com.axelor.tool.x2j.Utils
+import com.sun.jersey.core.impl.provider.entity.Inflector
 
 class Property {
 
@@ -228,9 +228,16 @@ class Property {
 	boolean isUnique() {
 		return attrs["unique"] == "true"
 	}
-	
+
 	boolean isHashKey() {
+		if (isUnique() && attrs["hashKey"] != "false") {
+			return true
+		}
 		return attrs["hashKey"] == "true"
+	}
+
+	Object getAttribute(String name) {
+		return attrs[name]
 	}
 	
 	String newCollection() {

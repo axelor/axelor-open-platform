@@ -20,7 +20,7 @@
     @author John Smith <john.smith@gmail.com>
     @since 1.0
     ]]>
-    <string name="code" column="ccc" required="true" unique="true" min="2" help="The unique code."/>
+    <string name="code" column="ccc" required="true" unique="true" min="2" hashKey="false" help="The unique code."/>
     <string name="name" required="true" unique="true" min="2" help="The title name."/>
   </entity>
 
@@ -41,7 +41,7 @@
     <string name="name" required="true" unique="true" min="2" />
   </entity>
 
-  <entity name="Contact" sequential="true" lang="groovy">
+  <entity name="Contact" sequential="true" lang="groovy" hashAll="true">
     <many-to-one name="title" ref="Title" unique="true" />
     <string name="firstName" required="true" />
     <string name="lastName" required="true" />
@@ -51,13 +51,13 @@
       ]]>
     </string>
     <string name="email" required="true" unique="true" />
-    <string name="phone" max="20" />
+    <string name="phone" max="20"  hashKey="false" />
     <string name="notes" multiline="true" title="About Me" />
     <many-to-many name="groups" ref="Group" mappedBy="contacts"/>
     <one-to-many name="addresses" ref="Address" mappedBy="contact" orderBy="area" />
   </entity>
 
-  <entity name="Address">
+  <entity name="Address" hashAll="true">
     <many-to-one name="contact" ref="Contact" required="true" />
     <string name="street" required="true" />
     <string name="area" required="true" />
