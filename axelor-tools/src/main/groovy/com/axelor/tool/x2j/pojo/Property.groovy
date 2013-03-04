@@ -101,12 +101,12 @@ class Property {
 		String value = attrs['default']
 		
 		if (value == null || "" == value.trim()) {
-			if (type == 'boolean')
-				return this.getEmptyValue()
-			return null
+			return this.getEmptyValue()
 		}
 		
 		switch(type) {
+			case "boolean":
+				return value ==~ /(?i)true|t|1|Boolean\\.TRUE/ ? "Boolean.TRUE" : "Boolean.FALSE"
 			case "string":
 				return "\"${value}\""
 			case "long":
@@ -132,21 +132,22 @@ class Property {
 	}
 	
 	String getEmptyValue() {
-		if (type == "boolean")
-			return "Boolean.FALSE"
-		
-		//if (!attrs['required'])
-		//	return null
-		
+
+		if (isNullable()) {
+			return null
+		}
+
 		switch(type) {
+			case "boolean":
+				return "Boolean.FALSE"
 			case "integer":
 				return "0"
 			case "long" :
 				return "0L"
 			case "decimal":
-				return "BigDecimal.ZERO";
+				return "BigDecimal.ZERO"
 		}
-		return null;
+		return null
 	}
 
 	String getGetter() {
@@ -221,6 +222,10 @@ class Property {
 		return attrs["mappedBy"]
 	}
 	
+	boolean isNullable() {
+		return attrs["nullable"] == "true" && attrs["required"] != "true"
+	}
+
 	boolean isOrphan() {
 		return attrs["orphan"] == "true"
 	}
