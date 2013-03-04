@@ -19,11 +19,13 @@ public class QueryBinder {
 	}
 	
 	public javax.persistence.Query bind(Map<String, Object> namedParams, Object[] params) {
+		
+		final Map<String, Object> variables = Maps.newHashMap();
+		
+		variables.put("__date__", new LocalDate());
+		variables.put("__time__", new LocalDateTime());
+		
 		if (namedParams != null) {
-			
-			Map<String, Object> variables = Maps.newHashMap();
-			variables.put("__date__", new LocalDate());
-			variables.put("__time__", new LocalDateTime());
 			
 			variables.putAll(namedParams);
 
@@ -44,11 +46,15 @@ public class QueryBinder {
 		}
 		if (params != null) {
 			for (int i = 0; i < params.length; i++) {
+				Object param = params[i];
+				if (param instanceof String && variables.containsKey(param)) {
+					param = variables.get(param);
+				}
 				try {
-					query.setParameter(i + 1, params[i]);
+					query.setParameter(i + 1, param);
 				} catch (IllegalArgumentException e) {
 					Parameter<?> p = query.getParameter(i + 1);
-					query.setParameter(i + 1, adapt(params[i], p));
+					query.setParameter(i + 1, adapt(param, p));
 				}
 			}
 		}
