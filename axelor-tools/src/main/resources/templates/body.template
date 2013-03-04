@@ -34,8 +34,8 @@ ${p.documentation}
 	public void ${p.setter}($p.type $p.name) {
 		$p.setterBody
 	}
-
 <% if (p.isCollection()) { %>\
+	
 	/**
 	 * Add the given {@link #${p.target}} item to the {@code ${p.name}}.
 	 *
@@ -95,9 +95,9 @@ ${p.documentation}
 			this.flush();
 		}
 	}
-
 <% } %>\
 <% } %>\
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
