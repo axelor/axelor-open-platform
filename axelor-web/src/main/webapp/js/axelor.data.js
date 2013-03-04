@@ -193,7 +193,8 @@
 						fields: options.fields,
 						data: query,
 						limit: limit,
-						offset: offset
+						offset: offset,
+						parent: options.parent
 					};
 				
 				var promise = this._request('search').post(params);
