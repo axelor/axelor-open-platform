@@ -1,4 +1,4 @@
-package com.axelor.wkf.service;
+package com.axelor.wkf.workflow;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -26,10 +28,11 @@ import com.axelor.wkf.db.Transition;
 import com.axelor.wkf.db.WaitingNode;
 import com.axelor.wkf.db.Workflow;
 import com.google.common.base.Preconditions;
+import com.google.inject.persist.Transactional;
 
-public class WkfService {
+public class WorkFlowEngine {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(WkfService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(WorkFlowEngine.class);
 	
 	private final String XOR = "xor";
 	private final String AND = "and";
@@ -43,7 +46,8 @@ public class WkfService {
 	private DateTime dateTime;
 	private User user;
 	
-	public WkfService (){
+	@Inject
+	public WorkFlowEngine (){
 		
 		this.nodeCounters = new HashMap<Node, Integer>();
 		this.executedNodes = new HashSet<Node>();
@@ -60,7 +64,7 @@ public class WkfService {
 	 * 
 	 * 
 	 */
-	private <T extends Model> WkfService init (Workflow wkf, T bean) {
+	private <T extends Model> WorkFlowEngine init (Workflow wkf, T bean) {
 		
 		LOG.debug("INIT Wkf Service :::");
 		
@@ -450,7 +454,8 @@ public class WkfService {
 	 * @return
 	 * 		New instance.
 	 */
-	private Instance createInstance(Workflow wkf, Long id){
+	@Transactional
+	protected Instance createInstance(Workflow wkf, Long id){
 		
 		Instance instance = new Instance();
 		
@@ -470,7 +475,8 @@ public class WkfService {
 		
 	}
 	
-	private Instance updateInstance(Set<Node> nodes){
+	@Transactional
+	protected Instance updateInstance(Set<Node> nodes){
 		
 		this.instance.getNodes().clear();
 		this.instance.getNodes().addAll(nodes);

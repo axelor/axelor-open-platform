@@ -1,0 +1,10 @@
+package com.axelor.wkf.rules;
+ 
+import com.axelor.wkf.db.*;
+
+rule "Test1"
+	when
+		Workflow( maxNodeCounter < 10 ,$maxNodeCounter : maxNodeCounter)
+	then
+		System.out.println("J'ai "+$maxNodeCounter);
+end
