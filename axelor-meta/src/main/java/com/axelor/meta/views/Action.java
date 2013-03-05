@@ -153,6 +153,7 @@ public abstract class Action {
 				}
 				
 				for(String field : fields.getName().split(",")){
+					field = field.trim();
 					Property property = mapper.getProperty(field);
 					if (property == null) {
 						log.error("No such field: {}", field);
@@ -222,6 +223,7 @@ public abstract class Action {
 				if (!attr.test(handler) || Strings.isNullOrEmpty(attr.getField())) continue;
 				for(String field : attr.getField().split(",")){
 					if (Strings.isNullOrEmpty(field)) { continue; }
+					field = field.trim();
 					Map<String, Object> attrs = (Map) map.get(field);
 					if (attrs == null) {
 						attrs = Maps.newHashMap();
@@ -452,7 +454,8 @@ public abstract class Action {
 				return true;
 			if (expression.equals("false"))
 				return false;
-			if (expression != null && !expression.matches("^(eval|select|action):")) {
+			Pattern pattern = Pattern.compile("^(eval|select|action):");
+			if (expression != null && !pattern.matcher(expression).find()) {
 				expression = "eval:" + expression;
 			}
 			Object result = handler.evaluate(expression);
