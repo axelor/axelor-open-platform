@@ -12,4 +12,9 @@ public class Hello {
 	public String say(String what) {
 		return "Say: " + what;
 	}
+	
+	public Boolean returnTrue() {
+		return true;
+	}
+
 }
