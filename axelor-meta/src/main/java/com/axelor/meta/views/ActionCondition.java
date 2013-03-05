@@ -22,9 +22,13 @@ public class ActionCondition extends Action {
 	public Object evaluate(ActionHandler handler) {
 		Map<String, String> errors = Maps.newHashMap();
 		for(Check check : conditions) {
-			if (check.test(handler)) {
-				errors.put(check.getField(), check.getError());
+			for (String field : check.getField().split(",")) {
+				field = field.trim();
+				if (check.test(handler,check.getCondition(field))) {
+					errors.put(field, check.getError());
+				}
 			}
+			
 		}
 		return errors;
 	}
@@ -43,8 +47,7 @@ public class ActionCondition extends Action {
 		@XmlAttribute
 		private String error;
 		
-		@Override
-		public String getCondition() {
+		public String getCondition(String field) {
 			String condition = super.getCondition();
 			if (isEmpty(condition) && !isEmpty(field)) {
 				return field + " == null";
