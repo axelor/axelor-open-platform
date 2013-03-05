@@ -20,6 +20,7 @@ _t.put({
 "Action": "Action",
 "Action Category": "Catégorie",
 "Action Sub-Category": "Sous catégorie",
+"Archived": "Archive",
 "Cancel": "Annuler",
 "Clear": "Effacer",
 "Close": "Fermer",
