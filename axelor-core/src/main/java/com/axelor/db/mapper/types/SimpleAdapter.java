@@ -24,6 +24,13 @@ public class SimpleAdapter implements TypeAdapter<Object> {
 		} catch (Exception e) {
 		}
 
+		if (type == String.class) {
+			if (value == null || value instanceof String) {
+				return value;
+			}
+			return value.toString();
+		}
+
 		if (type == Boolean.TYPE || type == Boolean.class)
 			return Boolean.valueOf(value.toString());
 
