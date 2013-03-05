@@ -3,6 +3,7 @@ _t.put({
 "Action": "Action",
 "Action Category": "Action Category",
 "Action Sub-Category": "Action Sub-Category",
+"Archived": "Archived",
 "Cancel": "Cancel",
 "Clear": "Clear",
 "Close": "Close",
