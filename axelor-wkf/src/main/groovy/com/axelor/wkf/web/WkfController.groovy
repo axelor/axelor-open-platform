@@ -7,12 +7,12 @@ import com.axelor.rpc.ActionResponse
 import com.axelor.wkf.WkfSettings;
 import com.axelor.wkf.db.Instance
 import com.axelor.wkf.db.Workflow
-import com.axelor.wkf.workflow.WorkFlowEngine
+import com.axelor.wkf.workflow.WorkflowService
 
 class WkfController {
 	
 	@Inject
-	WorkFlowEngine workFlowEngine
+	WorkflowService workFlowEngine
 
 	/**
 	 * Open all instances of the wkf.
