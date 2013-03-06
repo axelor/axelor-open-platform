@@ -22,8 +22,8 @@
     <string name="type" title="Type" selection="node.type.selection"/>
     <many-to-one name="action" ref="com.axelor.meta.db.MetaAction" title="Action" />
     <string name="logicOperator" title="Start Logic Operator" selection="node.logic.operator.selection" default="or"/>
-    <one-to-many name="startTransitions" ref="Transition" mappedBy="nextNode" title="Start transitions" readonly="true"/>
-    <one-to-many name="endTransitions" ref="Transition" mappedBy="startNode" title="End transitions" />
+    <one-to-many name="startTransitions" ref="Transition" mappedBy="nextNode" title="Start transitions" readonly="true" orderBy="sequence" />
+    <one-to-many name="endTransitions" ref="Transition" mappedBy="startNode" title="End transitions" orderBy="sequence" />
     <string name="description" large="true" title="Description" />
              
   </entity>

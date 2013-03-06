@@ -3,7 +3,7 @@ package com.axelor.wkf.test;
 import javax.inject.Inject;
 
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -11,33 +11,30 @@ import com.axelor.db.JPA;
 import com.axelor.meta.service.MetaModelService;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.GuiceRunner;
+import com.axelor.wkf.IWorkflow;
 import com.axelor.wkf.WkfTest;
 import com.axelor.wkf.data.CreateData;
 import com.axelor.wkf.db.Workflow;
-import com.axelor.wkf.workflow.WorkFlowEngine;
+import com.axelor.wkf.workflow.WorkflowFactory;
 
 @RunWith(GuiceRunner.class)
 @GuiceModules({ WkfTest.class })
 public class WorkFlowEngineTest {
 	
-	@Inject
-	private WorkFlowEngine workFlowEngine;
+	private static Workflow wkf;
 	
-	private Workflow wkf;
+	@Inject
+	WorkflowFactory<Workflow> workflowFactory;
 
-	@Before
-	public void setUp(){
-		
-		final MetaModelService modelService = new MetaModelService();
+	@BeforeClass
+	public static void setUp(){
 		
 		JPA.runInTransaction(new Runnable() {
-
+						
 			@Override
 			public void run() {
-
-				modelService.process();
+				new MetaModelService().process();
 				wkf = CreateData.createWorkflow();
-				
 			}
 			
 		});
@@ -46,11 +43,15 @@ public class WorkFlowEngineTest {
 	
 	@Test
 	public void run() {
-				
-		workFlowEngine.run(wkf);
+
+		IWorkflow<Workflow> iWorkflow1 = workflowFactory.newEngine();
 		
-		Assert.assertEquals(workFlowEngine.getInstance(wkf, wkf.getId()).getNodes().size(), 1);
-		
+		iWorkflow1.run(wkf);
+		Assert.assertEquals(iWorkflow1.getInstance(wkf, wkf.getId()).getNodes().size(), 1);
+
+		workflowFactory.newEngine();
+		workflowFactory.newEngine();
+		workflowFactory.newEngine();
 	}
 
 }
