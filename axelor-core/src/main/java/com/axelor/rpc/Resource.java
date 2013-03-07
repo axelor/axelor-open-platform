@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.persistence.EntityTransaction;
+import javax.persistence.OptimisticLockException;
 
 import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
@@ -249,6 +250,17 @@ public class Resource<T extends Model> {
 		response.setData(data);
 		response.setStatus(Response.STATUS_SUCCESS);
 
+		return response;
+	}
+	
+	public Response verify(Request request) {
+		Response response = new Response();
+		try {
+			JPA.verify(model, request.getData());
+			response.setStatus(Response.STATUS_SUCCESS);
+		} catch (OptimisticLockException e) {
+			response.setStatus(Response.STATUS_VALIDATION_ERROR);
+		}
 		return response;
 	}
 

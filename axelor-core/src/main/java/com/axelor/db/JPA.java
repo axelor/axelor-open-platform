@@ -206,7 +206,51 @@ public final class JPA {
 			throw new OptimisticLockException(cause);
 		}
 	}
-	
+
+	/**
+	 * Verify the values against the database values to ensure the records
+	 * involved are not modified.
+	 * 
+	 * @throws OptimisticLockException
+	 *             if version mismatch of any a record is deleted
+	 */
+	@SuppressWarnings("all")
+	public static void verify(Class<? extends Model> model, Map<String, Object> values) {
+		if (values == null) {
+			return;
+		}
+		Long id = null;
+		try {
+			id = Long.parseLong(values.get("id").toString());
+		} catch(Exception e){}
+
+		Object version = values.get("version");
+		Mapper mapper = Mapper.of(model);
+
+		if (id != null && version != null) {
+			Model entity = JPA.find(model, id);
+			if (entity == null || !Objects.equal(version, entity.getVersion())) {
+				Exception cause = new StaleObjectStateException(model.getName(), id);
+				throw new OptimisticLockException(cause);
+			}
+		}
+
+		for(String key : values.keySet()) {
+			Object value = values.get(key);
+			if (!(value instanceof Map) || !(value instanceof Collection)) continue;
+			Property property = mapper.getProperty(key);
+			if (property == null || property.getTarget() == null) continue;
+			if (value instanceof Map) {
+				value = Lists.newArrayList(value);
+			}
+			for(Object item : (Collection<?>) value) {
+				if (item instanceof Map) {
+					verify((Class) property.getTarget(), (Map) item);
+				}
+			}
+		}
+	}
+
 	/**
 	 * Edit an instance of the given model class using the given values.
 	 * 
