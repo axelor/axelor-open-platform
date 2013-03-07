@@ -344,6 +344,7 @@ function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 	
 	$scope.navClick = function(tab) {
 		$scope.openTab(tab);
+		$scope.$broadcast("on:nav-click", tab);
 	};
 	
 	$scope.$on("on:update-route", update);

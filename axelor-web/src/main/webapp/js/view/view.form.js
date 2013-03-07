@@ -230,6 +230,34 @@ function FormViewCtrl($scope, $element) {
 			}
 		});
 	});
+	
+	$scope.$on("on:nav-click", function(event, tab) {
+		var record, context, checkVersion;
+		if (event.defaultPrevented || tab.$viewScope !== $scope) {
+			return;
+		}
+		event.preventDefault();
+		context = tab.context || {};
+		record = $scope.record || {};
+		checkVersion = "" + context.__check_version;
+
+		if (!record.id || checkVersion !== "true") {
+			return;
+		}
+		
+		ds.verify(record).success(function(res){
+			if (res.status !== 0) {
+				axelor.dialogs.confirm(
+						_t("The record has been updated or delete by another action.") + "<br>" +
+						_t("Would you like to reload the current record?"),
+				function(confirmed){
+					if (confirmed) {
+						$scope.reload();
+					}
+				});
+			}
+		});
+	});
 
 	$scope.onCopy = function() {
 		var record = $scope.record;
