@@ -121,4 +121,11 @@ public class RestService extends ResourceService {
 		
 		return getResource().getRecordName(request);
 	}
+
+	@POST
+	@Path("verify")
+	public Response verify(Request request) {
+		request.setModel(getModel());
+		return getResource().verify(request);
+	}
 }

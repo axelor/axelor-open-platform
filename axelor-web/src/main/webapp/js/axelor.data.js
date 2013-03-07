@@ -264,6 +264,23 @@
 				};
 				return promise;
 			},
+			
+			verify: function(values) {
+				var promise = this._request("verify").post({
+					data: values
+				});
+				promise.success = function(fn) {
+					promise.then(function(response){
+						fn(response.data);
+					});
+					return promise;
+				};
+				promise.error = function(fn) {
+					promise.then(null, fn);
+					return promise;
+				};
+				return promise;
+			},
 
 			save: function(values) {
 
