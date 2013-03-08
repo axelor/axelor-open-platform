@@ -182,8 +182,39 @@ function DSViewCtrl(type, $scope, $element) {
 	};
 	
 	$scope.hasButton = function(name) {
+		if ((name == "new" || name == "copy") && !this.hasPermission("create")) {
+			return false;
+		}
+		if (name == "save" && !this.hasPermission("write")) {
+			return false;
+		}
+		if (name == "delete" && !this.hasPermission("delete")) {
+			return false;
+		}
 		if (_(hiddenButtons).has(name))
 			return !hiddenButtons[name];
 		return true;
+	};
+	
+	$scope.hasPermission = function(perm) {
+		var view = $scope.schema;
+		if (!view || !view.perms) return true;
+		var perms = view.perms;
+		var permitted = perms[perm];
+		if (!permitted) {
+			return false;
+		}
+		return true;
+	};
+
+	$scope.isPermitted = function(perm, record, callback) {
+		var ds = this._dataSource;
+		ds.isPermitted(perm, record).success(function(res){
+			var errors = res.errors;
+			if (errors) {
+				return axelor.dialogs.error(errors.read);
+			}
+			callback();
+		});
 	};
 }

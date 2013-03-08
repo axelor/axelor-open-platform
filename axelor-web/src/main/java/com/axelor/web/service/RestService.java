@@ -128,4 +128,16 @@ public class RestService extends ResourceService {
 		request.setModel(getModel());
 		return getResource().verify(request);
 	}
+
+	@GET
+	@Path("perms")
+	public Response perms(@QueryParam("action") String action, @QueryParam("id") Long id) {
+		if (action != null && id != null) {
+			return getResource().perms(id, action);
+		}
+		if (id != null) {
+			return getResource().perms(id);
+		}
+		return getResource().perms();
+	}
 }

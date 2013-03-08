@@ -264,6 +264,28 @@
 				};
 				return promise;
 			},
+
+			isPermitted: function(action, values) {
+
+				var data = _.extend({}, {
+					id: values && values.id,
+					action: action
+				});
+				var promise = this._request("perms").get({
+					params: data
+				});
+				promise.success = function(fn) {
+					promise.then(function(response){
+						fn(response.data);
+					});
+					return promise;
+				};
+				promise.error = function(fn) {
+					promise.then(null, fn);
+					return promise;
+				};
+				return promise;
+			},
 			
 			verify: function(values) {
 				var promise = this._request("verify").post({

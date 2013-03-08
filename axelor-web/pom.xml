@@ -16,6 +16,11 @@
 
   <dependencies>
     <!-- module specific dependencies -->
+    <dependency>
+      <groupId>com.axelor</groupId>
+      <artifactId>axelor-auth</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
