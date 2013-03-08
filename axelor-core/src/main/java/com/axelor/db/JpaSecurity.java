@@ -1,5 +1,7 @@
 package com.axelor.db;
 
+import java.util.Set;
+
 import com.axelor.rpc.filter.Filter;
 
 public interface JpaSecurity {
@@ -28,6 +30,12 @@ public interface JpaSecurity {
 	public static final AccessType CAN_REMOVE = AccessType.REMOVE;
 
 	Filter getFilter(AccessType type, Class<? extends Model> model, Object... ids);
+
+	Set<AccessType> perms(Class<? extends Model> model);
+	
+	Set<AccessType> perms(Class<? extends Model> model, Long id);
+
+	Set<AccessType> perms(Model entity);
 
 	void check(AccessType type, Class<? extends Model> model);
 
