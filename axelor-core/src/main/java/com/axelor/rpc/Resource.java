@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -109,7 +110,47 @@ public class Resource<T extends Model> {
 
 		return response;
 	}
-	
+
+	public Response perms() {
+		Set<JpaSecurity.AccessType> perms = security.get().perms(model);
+		Response response = new Response();
+		
+		response.setData(perms);
+		response.setStatus(Response.STATUS_SUCCESS);
+
+		return response;
+	}
+
+	public Response perms(Long id) {
+		Set<JpaSecurity.AccessType> perms = security.get().perms(model, id);
+		Response response = new Response();
+		
+		response.setData(perms);
+		response.setStatus(Response.STATUS_SUCCESS);
+
+		return response;
+	}
+
+	public Response perms(Long id, String perm) {
+		Response response = new Response();
+		
+		JpaSecurity sec = security.get();
+		JpaSecurity.AccessType type = JpaSecurity.CAN_READ;
+		try {
+			type = JpaSecurity.AccessType.valueOf(perm.toUpperCase());
+		} catch (Exception e) {
+		}
+
+		try {
+			sec.check(type, model, id);
+			response.setStatus(Response.STATUS_SUCCESS);
+		} catch (Exception e) {
+			response.addError(perm, e.getMessage());
+			response.setStatus(Response.STATUS_VALIDATION_ERROR);
+		}
+		return response;
+	}
+
 	private List<String> getSortBy(Request request) {
 		
 		List<String> sortBy = Lists.newArrayList();
