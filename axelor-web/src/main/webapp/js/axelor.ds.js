@@ -173,12 +173,16 @@
 					fields: findFields(view)
 				}).then(function(response) {
 					var res = response.data,
-						fields = res.data,
-						data = { fields: fields };
+						data = res.data;
 
+					view.perms = data.perms;
 					self.process(data, view);
-					fields = data.fields;
-
+					
+					if (view.perms && !view.perms.write) {
+						view.editable = false;
+					}
+					
+					var fields = data.fields;
 					var result = {
 						fields: fields,
 						view: view

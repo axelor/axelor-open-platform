@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.TypedQuery;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -14,6 +15,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.Permission;
+import com.axelor.auth.db.User;
+import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaSelect;
@@ -114,12 +119,52 @@ public class ViewService extends AbstractService {
 				if (p.getSelection() != null && !"".equals(p.getSelection().trim())) {
 					map.put("selection", findSelection(p));
 				}
+				if (p.getTarget() != null) {
+					map.put("perms", perms(p.getTarget()));
+				}
 				fields.add(map);
 			}
 		}
-		response.setData(fields);
+		
+		Map<String, Object> data = Maps.newHashMap();
+		data.put("perms", perms(modelClass));
+		data.put("fields", fields);
+
+		response.setData(data);
 		
 		return response;
+	}
+	
+	private Map<String, Object> perms(Class<?> model) {
+		User user = AuthUtils.getUser();
+		if (user == null || user.getGroup() == null) {
+			return null;
+		}
+		
+		TypedQuery<Permission> q = JPA.em().createQuery(
+				"SELECT p FROM User u " +
+				"LEFT JOIN u.group AS g " +
+				"LEFT JOIN g.permissions AS p " +
+				"WHERE u.code = :code AND p.object = :object", Permission.class);
+
+		q.setParameter("code", user.getCode());
+		q.setParameter("object", model.getName());
+		q.setMaxResults(1);
+
+		Permission p;
+		try {
+			p = q.getResultList().get(0);
+		} catch (IndexOutOfBoundsException e){
+			return null;
+		}
+		
+		Map<String, Object> map = Maps.newHashMap();
+		map.put("read", p.getCanRead());
+		map.put("write", p.getCanWrite());
+		map.put("create", p.getCanCreate());
+		map.put("remove", p.getCanRemove());
+
+		return map;
 	}
 	
 	private Property findField(final Mapper mapper, String name) {

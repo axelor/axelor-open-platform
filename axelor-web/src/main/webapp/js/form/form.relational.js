@@ -105,7 +105,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		}
 	};
 	
-	$scope.showEditor = function(record) {
+	function _showEditor(record) {
 		
 		if (field.editWindow === "blank") {
 			var tab = {
@@ -136,6 +136,13 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			}
 		}
 		return $scope.showPopupEditor(record);
+	};
+
+	$scope.showEditor = function(record) {
+		var perm = record ? "read" : "create";
+		$scope.isPermitted(perm, record, function(){
+			_showEditor(record);
+		});
 	};
 	
 	$scope.parentReload = function() {
@@ -279,6 +286,16 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	
 	$scope.onRemove = function() {
 		
+	};
+
+	$scope.hasPermission = function(perm) {
+		if (!field.perms) return true;
+		var perms = field.perms;
+		var permitted = perms[perm];
+		if (!permitted) {
+			return false;
+		}
+		return true;
 	};
 }
 
@@ -757,10 +774,10 @@ var ManyToOneItem = {
 	'<div class="picker-input picker-icons-3">'+
 		'<input type="text" autocomplete="off">'+
 		'<span class="picker-icons">'+
-			'<i class="icon-eye-open" ng-click="onSummary()" ng-show="_viewParams.summaryView"></i>'+
-			'<i class="icon-pencil" ng-click="onEdit()" title="{{\'Edit\' | t}}"></i>'+
-			'<i class="icon-plus" ng-click="onNew()" ng-show="!isDisabled()" title="{{\'New\' | t}}"></i>'+
-			'<i class="icon-search" ng-click="onSelect()" ng-show="!isDisabled()" title="{{\'Select\' | t}}"></i>'+
+			'<i class="icon-eye-open" ng-click="onSummary()" ng-show="hasPermission(\'read\') && _viewParams.summaryView"></i>'+
+			'<i class="icon-pencil" ng-click="onEdit()" ng-show="hasPermission(\'read\')" title="{{\'Edit\' | t}}"></i>'+
+			'<i class="icon-plus" ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}"></i>'+
+			'<i class="icon-search" ng-click="onSelect()" ng-show="hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}"></i>'+
 		'</span>'+
    '</div>'
 };
@@ -925,10 +942,10 @@ var OneToManyItem = {
 				'<div class="container-fluid">'+
 					'<span class="brand" href="" ui-help-popover ng-bind-html-unsafe="title"></span>'+
 					'<span class="icons-bar pull-right">'+
-						'<i ng-click="onSelect()" ng-show="!isDisabled()" title="{{\'Select\' | t}}" class="icon-search"></i>'+
-						'<i ng-click="onNew()" ng-show="!isDisabled()" title="{{\'New\' | t}}" class="icon-plus"></i>'+
-						'<i ng-click="onEdit()" title="{{\'Edit\' | t}}" class="icon-pencil"></i>'+
-						'<i ng-click="onRemove()" ng-show="!isDisabled()" title="{{\'Remove\' | t}}" class="icon-minus"></i>'+
+						'<i ng-click="onSelect()" ng-show="hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}" class="icon-search"></i>'+
+						'<i ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}" class="icon-plus"></i>'+
+						'<i ng-click="onEdit()" ng-show="hasPermission(\'read\')" title="{{\'Edit\' | t}}" class="icon-pencil"></i>'+
+						'<i ng-click="onRemove()" ng-show="hasPermission(\'remove\') && !isDisabled()" title="{{\'Remove\' | t}}" class="icon-minus"></i>'+
 					'</span>'+
 				'</div>'+
 			'</div>'+
@@ -1030,8 +1047,8 @@ var OneToManyInline = _.extend({}, OneToManyItem, {
 	'<span class="picker-input picker-icons-2" style="position: absolute;">'+
 		'<input type="text" readonly>'+
 		'<span class="picker-icons">'+
-			'<i class="icon-plus" ng-click="onNew()" title="{{\'Select\' | t}}"></i>'+
-			'<i class="icon-minus" ng-click="onRemove()" title="{{\'Select\' | t}}"></i>'+
+			'<i class="icon-plus" ng-click="onNew()" ng-show="hasPermission(\'create\')" title="{{\'Select\' | t}}"></i>'+
+			'<i class="icon-minus" ng-click="onRemove()" ng-show="hasPermission(\'remove\')" title="{{\'Select\' | t}}"></i>'+
 		'</span>'+
 		'<div ui-view-grid ' +
 			'x-view="schema" '+
