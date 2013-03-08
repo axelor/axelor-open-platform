@@ -4,14 +4,18 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.persistence.TypedQuery;
 
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthorizedException;
 
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.User;
+import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.rpc.filter.Filter;
@@ -19,6 +23,7 @@ import com.axelor.rpc.filter.JPQLFilter;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 @Singleton
 class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
@@ -128,25 +133,103 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
 		}
 
 		final List<Filter> filters = Lists.newArrayList();
-
-		for(final Permission permission : user.getGroup().getPermissions()) {
-			if (!Objects.equal(model.getName(), permission.getObject())) {
-				continue;
-			}
-			Condition condition = this.getCondition(user, permission, type);
-			if (condition != null) {
-				filters.add(condition.getFilter());
-			}
-		}
-
-		if (filters.isEmpty()) {
+		final Permission permission = getPermission(model, user);
+		
+		if (permission == null) {
 			return null;
 		}
+		
+		Condition condition = this.getCondition(user, permission, type);
+		if (condition == null) {
+			return null;
+		}
+		
+		filters.add(condition.getFilter());
 		
 		if (ids != null && ids.length > 0 && ids[0] != null) {
 			filters.add(0, Filter.in("self.id", Lists.newArrayList(ids)));
 		}
 		return Filter.and(filters);
+	}
+
+	private Permission getPermission(Class<? extends Model> model, User user) {
+		if (model == null || user == null) {
+			return null;
+		}
+		final TypedQuery<Permission> q = JPA.em().createQuery(
+				"SELECT p FROM User u " +
+				"LEFT JOIN u.group AS g " +
+				"LEFT JOIN g.permissions AS p " +
+				"WHERE u.code = :code AND p.object = :object", Permission.class);
+
+		q.setParameter("code", user.getCode());
+		q.setParameter("object", model.getName());
+		q.setMaxResults(1);
+
+		try {
+			return q.getResultList().get(0);
+		} catch (IndexOutOfBoundsException e){
+			return null;
+		}
+	}
+
+	@Override
+	public Set<AccessType> perms(Class<? extends Model> model) {
+		final User user = getUser();
+		if (user == null) {
+			return null;
+		}
+		
+		final Set<AccessType> perms = Sets.newHashSet();
+		final Permission permission = getPermission(model, user);
+		
+		if (permission == null) {
+			return null;
+		}
+		
+		if (hasAccess(permission, CAN_READ)) perms.add(CAN_READ);
+		if (hasAccess(permission, CAN_WRITE)) perms.add(CAN_WRITE);
+		if (hasAccess(permission, CAN_CREATE)) perms.add(CAN_CREATE);
+		if (hasAccess(permission, CAN_REMOVE)) perms.add(CAN_REMOVE);
+
+		return perms;
+	}
+	
+	@Override
+	public Set<AccessType> perms(Class<? extends Model> model, Long id) {
+		final User user = getUser();
+		if (user == null) {
+			return null;
+		}
+
+		final Set<AccessType> perms = Sets.newHashSet();
+		try {
+			check(CAN_READ, model, id);
+			perms.add(CAN_READ);
+		} catch (AuthorizationException e) {
+		}
+		try {
+			check(CAN_WRITE, model, id);
+			perms.add(CAN_WRITE);
+		} catch (AuthorizationException e) {
+		}
+		try {
+			check(CAN_CREATE, model, id);
+			perms.add(CAN_CREATE);
+		} catch (AuthorizationException e) {
+		}
+		try {
+			check(CAN_REMOVE, model, id);
+			perms.add(CAN_REMOVE);
+		} catch (AuthorizationException e) {
+		}
+
+		return perms;
+	}
+
+	@Override
+	public Set<AccessType> perms(Model entity) {
+		return perms(entity.getClass(), entity.getId());
 	}
 
 	@Override
@@ -155,18 +238,13 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
 		if (user == null) {
 			return;
 		}
-
-		boolean checkRestricted = true;
 		
-		for(Permission permission : user.getGroup().getPermissions()) {
-			if (!Objects.equal(model.getName(), permission.getObject())) {
-				continue;
-			}
-			boolean permitted = hasAccess(permission, type);
-			if (!permitted) {
-				throw new UnauthorizedException(type.toString());
-			}
-			checkRestricted = false;
+		final Permission permission = getPermission(model, user);
+		final boolean permitted = permission != null && hasAccess(permission, type);
+		final boolean checkRestricted = permission == null;
+
+		if (permission != null && !permitted) {
+			throw new UnauthorizedException(type.toString());
 		}
 
 		if (checkRestricted && user.getGroup().getRestricted() == Boolean.TRUE) {
@@ -176,19 +254,19 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
 
 	@Override
 	public void check(AccessType type, Class<? extends Model> model, Long id) {
-		User user = getUser();
+		final User user = getUser();
 		if (user == null) {
 			return;
 		}
 
 		check(type, model);
 
-		Filter filter = this.getFilter(type, model, id);
+		final Filter filter = this.getFilter(type, model, id);
 		if (filter == null) {
 			return;
 		}
 
-		Model found = filter.build(model).fetchOne();
+		final Model found = filter.build(model).fetchOne();
 		if (found == null || !Objects.equal(found.getId(), id)) {
 			throw new UnauthorizedException(type.toString());
 		}
@@ -196,7 +274,7 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
 
 	@Override
 	public void check(AccessType type, Model entity) {
-		User user = getUser();
+		final User user = getUser();
 		if (user == null || entity == null) {
 			return;
 		}
