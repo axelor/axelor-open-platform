@@ -11,6 +11,8 @@ import javax.validation.constraints.NotNull;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
+import com.google.common.base.Objects;
+import com.google.common.base.Objects.ToStringHelper;
 
 @Entity
 @Table(name = "CONTACT_COUNTRY")
@@ -57,6 +59,17 @@ public class Country extends Model {
 
 	public void setCode(String code) {
 		this.code = code;
+	}
+	
+	@Override
+	public String toString() {
+		ToStringHelper tsh = Objects.toStringHelper(getClass());
+		
+		tsh.add("id", getId());
+		tsh.add("code", code);
+		tsh.add("name", name);
+		
+		return tsh.omitNullValues().toString();
 	}
 	
 	public static Query<Country> all() {
