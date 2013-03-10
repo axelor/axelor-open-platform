@@ -12,6 +12,7 @@ import com.axelor.test.db.Contact;
 import com.axelor.test.db.Country;
 import com.axelor.test.db.Title;
 import com.google.common.collect.Lists;
+import com.google.inject.persist.Transactional;
 
 public class CrudTest  extends BaseTest {
 
@@ -154,6 +155,25 @@ public class CrudTest  extends BaseTest {
 				JPA.save(contact);
 			}
 		});
+	}
+	
+	@Test
+	@Transactional
+	public void testCopy() {
+		Contact c1 = Contact.all().filter("self.addresses is not empty").fetchOne();
+		
+		Assert.assertNotNull(c1);
+		
+		int numItems = c1.getAddresses().size();
+		
+		Contact c2 = JPA.copy(c1, true);
+		c2 = JPA.save(c2);
+
+		Assert.assertNotNull(c2);
+		Assert.assertFalse(c1.getId() == c2.getId());
+		
+		Assert.assertEquals(numItems, c1.getAddresses().size());
+		Assert.assertEquals(numItems, c2.getAddresses().size());
 	}
 	
 }

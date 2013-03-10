@@ -26,6 +26,8 @@ import com.axelor.db.NameColumn;
 import com.axelor.db.Query;
 import com.axelor.db.VirtualColumn;
 import com.axelor.db.Widget;
+import com.google.common.base.Objects;
+import com.google.common.base.Objects.ToStringHelper;
 
 @Entity
 @Table(name = "CONTACT_CONTACT")
@@ -183,6 +185,17 @@ public class Contact extends JpaModel {
 	
 	public void setNotes(String notes) {
 		this.notes = notes;
+	}
+	
+	@Override
+	public String toString() {
+		ToStringHelper tsh = Objects.toStringHelper(getClass());
+		
+		tsh.add("id", getId());
+		tsh.add("fullName", getFirstName());
+		tsh.add("email", getEmail());
+		
+		return tsh.omitNullValues().toString();
 	}
 	
 	public Contact find(Long id) {

@@ -9,6 +9,8 @@ import javax.validation.constraints.NotNull;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaModel;
 import com.axelor.db.Query;
+import com.google.common.base.Objects;
+import com.google.common.base.Objects.ToStringHelper;
 
 @Entity
 @Table(name = "CONTACT_ADDRESS")
@@ -87,6 +89,21 @@ public class Address extends JpaModel {
 
 	public void setContact(Contact contact) {
 		this.contact = contact;
+	}
+	
+	@Override
+	public String toString() {
+		ToStringHelper tsh = Objects.toStringHelper(getClass());
+		
+		tsh.add("id", getId());
+		tsh.add("contact", contact);
+		tsh.add("street", street);
+		tsh.add("area", area);
+		tsh.add("city", city);
+		tsh.add("zip", zip);
+		tsh.add("country", country);
+		
+		return tsh.omitNullValues().toString();
 	}
 	
 	public static Query<Address> all() {
