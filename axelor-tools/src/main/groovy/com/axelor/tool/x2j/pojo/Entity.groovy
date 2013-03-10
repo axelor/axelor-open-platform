@@ -134,9 +134,11 @@ class Entity {
 	}
 	
 	String getEqualsCode() {
-		importType("com.google.common.base.Objects");
+		def hashables = getHashables()
 		def code = ["if (obj == null) return false;"];
 		
+		importType("com.google.common.base.Objects");
+
 		if (groovy) {
 			code += "if (this.is(obj)) return true;"
 		} else {
@@ -148,9 +150,12 @@ class Entity {
 		code += "if (this.getId() != null && other.getId() != null) {"
 		code += "\treturn Objects.equal(this.getId(), other.getId());"
 		code += "}"
-		code += getHashables().collect { p -> "if (!Objects.equal(${p.getter}(), other.${p.getter}())) return false;"}
+		if (!hashables.empty) {
+			code += ""
+			code += getHashables().collect { p -> "if (!Objects.equal(${p.getter}(), other.${p.getter}())) return false;"}
+		}
 		code += ""
-		code += code.size() > 1 ? "return true;" : "return false;"
+		code += hashables.empty ? "return false;" : "return true;"
 		return code.join("\n\t\t")
 	}
 	
