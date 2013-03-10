@@ -27,7 +27,6 @@ import org.hibernate.proxy.LazyInitializer;
 
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
@@ -521,41 +520,39 @@ public final class JPA {
 		
 		if (bean instanceof HibernateProxy) {
 			LazyInitializer proxy = ((HibernateProxy) bean).getHibernateLazyInitializer();
-			if (proxy.isUninitialized())
+			if (proxy.isUninitialized()) {
 				bean = (T) proxy.getImplementation();
+			}
 			beanClass = proxy.getPersistentClass();
 		}
-		
+
 		String key = beanClass.getName() + "#" + bean.getId();
-		if (visited.contains(key))
+		if (visited.contains(key)) {
 			return null;
+		}
 		visited.add(key);
 		
 		Mapper mapper = Mapper.of(beanClass);
 		final T obj = Mapper.toBean((Class<T>) beanClass, null);
 		
-		for(Property p : mapper.getProperties()) {
+		for(final Property p : mapper.getProperties()) {
 			
-			if (p.isVirtual() || p.isPrimary() || p.isVersion())
+			if (p.isVirtual() || p.isPrimary() || p.isVersion()) {
 				continue;
+			}
 
 			Object value = p.get(bean);
 			
-			if (value instanceof Set) {
+			if (value instanceof List && deep) {
+				List items = Lists.newArrayList();
+				for(Object item : (List) value) {
+					items.add(copy((Model) item, true));
+				}
+				value = items;
+			} else if (value instanceof List) {
+				value = null;
+			} else if (value instanceof Set) {
 				value = new HashSet((Set) value);
-			}
-			
-			else if (value instanceof List) {
-				if (deep) {
-					value = Lists.transform((List<?>) value,
-							new Function<Object, Object>() {
-								@Override
-								public Object apply(Object input) {
-									return copy((Model) input, true);
-								}
-							});
-				} else
-					value = null;
 			}
 
 			if (value instanceof String && p.isUnique()) {
