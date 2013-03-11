@@ -39,6 +39,22 @@ public abstract class GuiceWebTest extends GuiceTest {
 	
 	private Client client;
 	
+	/**
+	 * This method should be called to start the embedded grizzly server. <br>
+	 * <br>
+	 * For example:<br>
+	 * 
+	 * <pre>
+	 * &#064;GuiceModules(MyModule.class)
+	 * public class MyTest extends GuiceWebTest {
+	 * 
+	 * 	&#064;BeforeClass
+	 * 	public static void beforeClass() {
+	 * 		GuiceWebTest.startServer();
+	 * 	}
+	 * }
+	 * </pre>
+	 */
 	public static void startServer() {
 		
 		if (server != null) {
@@ -68,6 +84,22 @@ public abstract class GuiceWebTest extends GuiceTest {
 		}
 	}
 
+	/**
+	 * This method should be called to stop the embedded grizzly server. <br>
+	 * <br>
+	 * For example:<br>
+	 * 
+	 * <pre>
+	 * &#064;GuiceModules(MyModule.class)
+	 * public class MyTest extends GuiceWebTest {
+	 * 
+	 * 	&#064;AfterClass
+	 * 	public static void afterClass() {
+	 * 		GuiceWebTest.stopServer();
+	 * 	}
+	 * }
+	 * </pre>
+	 */
 	public static void stopServer() {
 		try {
 			LOG.info("Stopping grizzly...");
@@ -81,6 +113,10 @@ public abstract class GuiceWebTest extends GuiceTest {
 		}
 	}
 	
+	/**
+	 * Get an instance of {@link Client} created from an injected {@link ClientConfig}.
+	 * 
+	 */
 	public Client getClient() {
 		if (client == null) {
 			if (clientConfig == null) {
@@ -91,6 +127,10 @@ public abstract class GuiceWebTest extends GuiceTest {
 		return client;
 	}
 
+	/**
+	 * Get a {@link WebResource} connected to the embbedded web server at http://localhost:9997/test url.
+	 * 
+	 */
 	public WebResource resource() {
 		return getClient().resource(BASE_URI);
 	}

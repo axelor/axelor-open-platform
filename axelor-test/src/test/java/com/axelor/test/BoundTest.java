@@ -10,6 +10,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.inject.AbstractModule;
@@ -84,8 +85,13 @@ public class BoundTest extends GuiceWebTest {
             return "OK";
         }
     }
+    
+    @BeforeClass
+    public static void beforeClass() {
+    	GuiceWebTest.startServer();
+    }
 
-	@Test
+    @Test
 	public void testBoundPerRequestScope() {
 		WebResource r = resource().path("/bound/perrequest").queryParam("x", "x");
         String s = r.get(String.class);

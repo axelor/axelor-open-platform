@@ -18,18 +18,18 @@ public class ResourceTest extends AbstractTest {
 
 	protected String model = "com.axelor.web.db.Contact";
 
-	protected WebResource.Builder crud(String... params) {
-		return jsonPath("ws/rest/" + model, params);
-	}
-
-	protected WebResource.Builder meta(String... params) {
-		return jsonPath("ws/meta/" + model, params);
+	protected WebResource.Builder crud(String action, String... params) {
+		String path = "ws/rest/" + model;
+		if (action != null) {
+			path = path + "/" + action;
+		}
+		return jsonPath(path, params);
 	}
 
 	@Test
 	public void testFields() {
 
-		Response response = meta().get(Response.class);
+		Response response = jsonPath("ws/meta/fields/" + model).get(Response.class);
 
 		assertNotNull(response);
 		assertNotNull(response.getData());
@@ -45,7 +45,7 @@ public class ResourceTest extends AbstractTest {
 		Request request = new Request();
 		request.setData(ImmutableMap.of("firstName", (Object) "John", "lastName", "Teen"));
 
-		Response response = crud().post(Response.class, request);
+		Response response = crud("search").post(Response.class, request);
 
 		assertNotNull(response);
 		assertNotNull(response.getData());
