@@ -19,7 +19,7 @@ import com.axelor.db.VirtualColumn;
 import com.axelor.db.Widget;
 
 @Entity
-class Contact extends JpaModel {
+public class Contact extends JpaModel {
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private Title title;

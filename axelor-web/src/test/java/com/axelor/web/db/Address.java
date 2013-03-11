@@ -11,7 +11,7 @@ import com.axelor.db.JpaModel;
 import com.axelor.db.Query;
 
 @Entity
-class Address extends JpaModel {
+public class Address extends JpaModel {
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private Contact contact;
