@@ -14,6 +14,7 @@ import com.axelor.meta.db.Title;
 import com.axelor.meta.views.ObjectViews;
 import com.axelor.meta.views.Search;
 import com.google.common.collect.Maps;
+import com.google.inject.persist.Transactional;
 
 public class TestViews extends AbstractTest {
 	
@@ -44,6 +45,7 @@ public class TestViews extends AbstractTest {
 	}
 	
 	@Test
+	@Transactional
 	public void test3() throws Exception {
 		ObjectViews views = this.unmarshal("Search.xml", ObjectViews.class);
 		assertNotNull(views);
