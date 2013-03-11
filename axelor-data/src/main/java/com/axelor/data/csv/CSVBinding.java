@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.groovy.control.CompilerConfiguration;
+
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
@@ -130,7 +132,11 @@ public class CSVBinding {
                 return new GroovyCodeSource(expr, "T" + column, "/groovy/shell");
             }
         });
-		GroovyShell shell = new GroovyShell();
+
+		CompilerConfiguration config = new CompilerConfiguration();
+		config.getOptimizationOptions().put("indy", Boolean.TRUE);
+		
+		GroovyShell shell = new GroovyShell(config);
 		return shell.parse(gcs);
 	}
 	
