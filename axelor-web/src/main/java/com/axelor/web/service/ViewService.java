@@ -137,7 +137,9 @@ public class ViewService extends AbstractService {
 	
 	private Map<String, Object> perms(Class<?> model) {
 		User user = AuthUtils.getUser();
-		if (user == null || user.getGroup() == null) {
+		if (user == null || user.getGroup() == null
+				|| "admin".equals(user.getCode())
+				|| "admins".equals(user.getGroup().getCode())) {
 			return null;
 		}
 		
