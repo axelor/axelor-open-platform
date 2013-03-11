@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -31,6 +32,9 @@ public class GroovyScriptHelper {
 	
 	public GroovyScriptHelper(Map<String, Object> variables) {
 		
+		CompilerConfiguration config = new CompilerConfiguration();
+		config.getOptimizationOptions().put("indy", Boolean.TRUE);
+
 		binding = new Binding(variables) {
 		
 			@Override
@@ -49,7 +53,7 @@ public class GroovyScriptHelper {
 			}
 		};
 		
-		this.shell = new GroovyShell(binding);
+		this.shell = new GroovyShell(binding, config);
 		
 		Subject subject = SecurityUtils.getSubject();
 		if (subject != null) {
