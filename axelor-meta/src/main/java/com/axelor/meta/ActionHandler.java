@@ -18,6 +18,7 @@ import javax.persistence.Query;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -99,10 +100,13 @@ public final class ActionHandler {
 			}
 		};
 		
-		this.shell = new GroovyShell(binding);
+		CompilerConfiguration config = new CompilerConfiguration();
+		config.getOptimizationOptions().put("indy", Boolean.TRUE);
+
+		this.shell = new GroovyShell(binding, config);
 		this.configureObjects();
 	}
-	
+
 	@SuppressWarnings("all")
 	private void configureObjects() {
 		
