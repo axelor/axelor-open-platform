@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,6 +34,7 @@ import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.views.Action;
 import com.axelor.meta.views.Action.ActionMethod;
+import com.axelor.meta.views.ActionGroup;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
@@ -44,7 +44,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -61,6 +60,8 @@ public final class ActionHandler {
 	private ActionRequest request;
 	
 	private Class<?> entity;
+	
+	private Context context;
 	
 	private GroovyShell shell;
 	
@@ -80,8 +81,9 @@ public final class ActionHandler {
 		this.request = request;
 		this.entity = request.getBeanClass();
 		
-		binding = new Binding(context) {
-		
+		this.context = context;
+		this.binding = new Binding(context) {
+
 			@Override
 			public Object getVariable(String name) {
 				try {
@@ -139,7 +141,15 @@ public final class ActionHandler {
 			binding.setProperty("__user__", user);
 		}
 	}
-	
+
+	public Injector getInjector() {
+		return injector;
+	}
+
+	public Context getContext() {
+		return context;
+	}
+
 	/**
 	 * Evaluate the given <code>expression</code>.
 	 * 
@@ -190,15 +200,6 @@ public final class ActionHandler {
 		return expr;
 	}
 	
-	public Injector getInjector() {
-		return injector;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public Map<String, Object> getContext() {
-		return binding.getVariables();
-	}
-
 	public Object call(String className, String method) {
 		ActionResponse response = new ActionResponse();
 		try {
@@ -418,49 +419,27 @@ public final class ActionHandler {
 		return action.evaluate(this);
 	}
 	
-	private Action findAction(String name) {
-		
-		if (name == null || "".equals(name.trim()))
-			return null;
-		
-		name = name.trim();
-		if (name.contains(":")) {
-			String[] parts = name.split("\\:");
-			Action.Call method = new Action.Call();
-			ActionMethod action = new ActionMethod();
-			
-			method.setController(parts[0]);
-			method.setMethod(parts[1]);
-			action.setElements(ImmutableList.of(method));
-
-			return action;
-		}
-
-		return MetaStore.getAction(name);
-	}
-	
-	@SuppressWarnings("all")
 	public ActionResponse execute() {
 		
 		ActionResponse response = new ActionResponse();
-		
-		List<Object> all = Lists.newArrayList();
+
 		String name = request.getAction();
-		
-		Action action = this.findAction(name);
-		if (action == null) {
-			log.error("No such action: {}", name);
-		} else {
-			Object value = action.wrap(this);
-			if (value instanceof ActionResponse)
-				return (ActionResponse) value;
-			if (value != null)
-				all.add(value);
+		if (name == null) {
+			throw new NullPointerException("no action provided");
 		}
 		
-		response.setStatus(ActionResponse.STATUS_SUCCESS);
-		response.setData(all);
+		String[] names = name.split(",");
+		ActionGroup action = new ActionGroup();
+		for(String item : names) {
+			action.addAction(item);
+		}
+
+		Object data = action.wrap(this);
 		
+		response.setData(data);
+		response.setStatus(ActionResponse.STATUS_SUCCESS);
+
 		return response;
 	}
+
 }

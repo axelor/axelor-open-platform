@@ -23,6 +23,7 @@
         <xsd:element name="action-ws" type="tns:ActionWS" />
         <xsd:element name="action-import" type="tns:ActionImport" />
         <xsd:element name="action-export" type="tns:ActionExport" />
+        <xsd:element name="action-group" type="tns:ActionGroup" />
       </xsd:choice>
     </xsd:complexType>
   </xsd:element>
@@ -692,6 +693,14 @@
       <xsd:extension base="tns:ActField"/>
     </xsd:complexContent>
   </xsd:complexType>
+  <xsd:complexType name="ActAction">
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractAct">
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  
   <xsd:complexType name="ActionValidate">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractAction">
@@ -965,6 +974,16 @@
                 </xsd:complexContent>
               </xsd:complexType>
             </xsd:element>
+          </xsd:sequence>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="ActionGroup">
+      <xsd:complexContent>
+        <xsd:extension base="tns:AbstractAction">
+          <xsd:sequence>
+            <xsd:element name="action" type="tns:ActAction" maxOccurs="unbounded"/>
           </xsd:sequence>
         </xsd:extension>
       </xsd:complexContent>
