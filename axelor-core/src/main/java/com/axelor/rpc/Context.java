@@ -36,6 +36,10 @@ import com.google.common.collect.Maps;
  * def so = context.parentContext as SaleOrder
  * </pre>
  * 
+ * The bean instanced returned from the context is a detached object and should
+ * never be used with JPA/Hibernate session. It's only for convenience to get the
+ * context values using the bean methods.
+ * 
  */
 public class Context extends HashMap<String, Object> {
 
@@ -156,5 +160,44 @@ public class Context extends HashMap<String, Object> {
 		if ("parentContext".equals(key))
 			return getParentContext();
 		return super.get(key);
+	}
+	
+	/**
+	 * Update the context with the specified key and value.<br>
+	 * 
+	 * Use this method instead of {@link #put(String, Object)} to propagate the
+	 * value to the underlying context object.
+	 * 
+	 * @param key
+	 *            key with with the context should be updated
+	 * @param value
+	 *            value to be associated to the given key
+	 */
+	public void update(String key, Object  value) {
+		final Map<String, Object> values = Maps.newHashMap();
+		values.put(key, value);
+		this.update(values);
+	}
+
+	/**
+	 * Update the context object with the given values.<br>
+	 * 
+	 * Use this method instead of {@link #putAll(Map)} to propagate the values
+	 * to the underlying context object.
+	 * 
+	 */
+	public void update(Map<String, Object> values) {
+		if (beanInstance == null || values == null || values.isEmpty()) {
+			return;
+		}
+		Mapper mapper = Mapper.of(beanInstance.getClass());
+		for(String key : values.keySet()) {
+			Property property = mapper.getProperty(key);
+			if (property == null) {
+				continue;
+			}
+			property.set(beanInstance, values.get(key));
+		}
+		this.putAll(values);
 	}
 }
