@@ -278,5 +278,35 @@ public class TestActions extends AbstractTest {
 		
 		assertNotNull(value);
 	}
+ 	
+ 	@Test
+ 	public void testGroup() {
+ 		Action action = MetaStore.getAction("action.group.test");
+		Map<String, Object> context = Maps.newHashMap();
+		
+		context.put("id", 1);
+		context.put("firstName", "John");
+		context.put("lastName", "Smith");
+		
+		ActionHandler handler = createHandler(action, context);
+		Object value = action.evaluate(handler);
+		
+		Assert.assertNotNull(value);
+		Assert.assertTrue(value instanceof List);
+		Assert.assertFalse(((List<?>)value).isEmpty());
+		Assert.assertNotNull(((List<?>)value).get(0));
+		Assert.assertFalse(value.toString().contains("pending"));
+		
+		handler.getContext().update("firstName", "J");
+		handler.getContext().update("email", "j.smith@gmail.com");
+		
+		value = action.evaluate(handler);
+		
+		Assert.assertNotNull(value);
+		Assert.assertTrue(value instanceof List);
+		Assert.assertFalse(((List<?>)value).isEmpty());
+		Assert.assertNotNull(((List<?>)value).get(0));
+		Assert.assertTrue(value.toString().contains("pending"));
+ 	}
 
 }

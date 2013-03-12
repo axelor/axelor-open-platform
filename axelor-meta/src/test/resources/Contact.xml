@@ -125,5 +125,12 @@
       <check field="createDate"/>
       <check field="createDate" if="orderDate &lt; createDate" error="Order create date is in future."/>
     </action-condition>
+    
+    <action-group name="action.group.test">
+      <action name="action-contact-attrs"/>
+      <action name="action-contact-validate"/>
+      <action name="action-contact-defaults"/>
+      <action name="action-contact-attrs-multi"/>
+    </action-group>
 
 </object-views>
