@@ -17,7 +17,6 @@ import wslite.soap.SOAPResponse;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.TemplateHelper;
-import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -84,7 +83,7 @@ public class ActionWS extends Action {
 		List<Object> result = Lists.newArrayList();
 		log.info("action-ws (name): " + getName());
 		for(Method m : methods) {
-			log.info("action-ws (method, template): " + m.name + ", " + m.template);
+			log.info("action-ws (method, template): " + m.getName() + ", " + m.template);
 			try {
 				Object res = this.send(url, m, handler);
 				result.add(res);
@@ -100,23 +99,11 @@ public class ActionWS extends Action {
 		return evaluate(handler);
 	}
 	
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(getClass()).add("name", getName()).toString();
-	}
-	
 	@XmlType
-	public static class Method {
-		
-		@XmlAttribute
-		private String name;
+	public static class Method extends Act {
 		
 		@XmlAttribute
 		private String template;
-		
-		public String getName() {
-			return name;
-		}
 		
 		public String getTemplate() {
 			return template;

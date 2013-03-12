@@ -828,16 +828,15 @@
           <xsd:sequence>
             <xsd:element name="action" maxOccurs="unbounded">
               <xsd:complexType>
-                <xsd:attribute name="name" type="xsd:string" use="required">
-                  <xsd:annotation>
-                    <xsd:documentation>The web service action name.</xsd:documentation>
-                  </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="template" type="xsd:string" use="required">
-                  <xsd:annotation>
-                    <xsd:documentation>Template file.</xsd:documentation>
-                  </xsd:annotation>
-                </xsd:attribute>
+                <xsd:complexContent>
+                  <xsd:extension base="tns:ActAction">
+                    <xsd:attribute name="template" type="xsd:string" use="required">
+                      <xsd:annotation>
+                        <xsd:documentation>Template file.</xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:attribute>
+                  </xsd:extension>
+                </xsd:complexContent>
               </xsd:complexType>
             </xsd:element>
           </xsd:sequence>
