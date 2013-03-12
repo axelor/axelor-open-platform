@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.Map;
 
+import junit.framework.Assert;
+
 import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +20,7 @@ import com.axelor.meta.views.FormView;
 import com.axelor.meta.views.ObjectViews;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -53,7 +56,7 @@ public class TestActions extends AbstractTest {
 		}
 	}
 	
-	private ActionHandler createHandler(String actions, Map<String, Object> context) {
+	private ActionHandler createHandler(String action, Map<String, Object> context) {
 		
 		ActionRequest request = new ActionRequest();
 		
@@ -61,17 +64,22 @@ public class TestActions extends AbstractTest {
 		request.setData(data);
 		request.setModel("com.axelor.meta.db.Contact");
 		
-		data.put("action", actions);
+		data.put("action", action);
 		data.put("context", context);
 		
 		return new ActionHandler(request, injector);
+	}
+	
+	private ActionHandler createHandler(Action action, Map<String, Object> context) {
+		Preconditions.checkArgument(action != null, "action is null");
+		return createHandler(action.getName(), context);
 	}
 	
 	@Test
 	public void testRecord() {
 		
 		Action action = MetaStore.getAction("action-contact-defaults");
-		ActionHandler handler = createHandler("action-contact-defaults", null);
+		ActionHandler handler = createHandler(action, null);
 		
 		Object value = action.evaluate(handler);
 		assertTrue(value instanceof Contact);
@@ -88,7 +96,7 @@ public class TestActions extends AbstractTest {
 	public void testMultiRecord() {
 		
 		Action action = MetaStore.getAction("action-contact-defaults-multi");
-		ActionHandler handler = createHandler("action-contact-defaults-multi", null);
+		ActionHandler handler = createHandler(action, null);
 		
 		Object value = action.evaluate(handler);
 		assertTrue(value instanceof Contact);
@@ -107,10 +115,11 @@ public class TestActions extends AbstractTest {
 		assertEquals("john.smith@gmail.com", c.getEmail());
 	}
 
-	@Test @SuppressWarnings("all")
+	@Test
+	@SuppressWarnings("all")
 	public void testAttrs() {
 		Action action = MetaStore.getAction("action-contact-attrs");
-		ActionHandler handler = createHandler("action-contact-attrs", null);
+		ActionHandler handler = createHandler(action, null);
 		
 		Object value = action.evaluate(handler);
 		assertTrue(value instanceof Map);
@@ -127,10 +136,11 @@ public class TestActions extends AbstractTest {
 		assertTrue(attrs instanceof Map);
 	}
 	
-	@Test @SuppressWarnings("all")
+	@Test
+	@SuppressWarnings("all")
 	public void testAttrsMutli() {
 		Action action = MetaStore.getAction("action-contact-attrs-multi");
-		ActionHandler handler = createHandler("action-contact-attrs-multi", null);
+		ActionHandler handler = createHandler(action, null);
 		
 		Object value = action.evaluate(handler);
 		assertTrue(value instanceof Map);
@@ -175,7 +185,7 @@ public class TestActions extends AbstractTest {
 		context.put("firstName", "John");
 		context.put("lastName", "Sm");
 		
-		ActionHandler handler = createHandler("action-contact-validate", context);
+		ActionHandler handler = createHandler(action, context);
 		Object value = action.evaluate(handler);
 		
 		assertNotNull(value);
@@ -191,7 +201,7 @@ public class TestActions extends AbstractTest {
 		context.put("orderDate", new LocalDate("2012-12-10"));
 		context.put("createDate", new LocalDate("2012-12-11"));
 		
-		ActionHandler handler = createHandler("check.dates", context);
+		ActionHandler handler = createHandler(action, context);
 		Object value = action.evaluate(handler);
 		
 		assertNotNull(value);
@@ -199,7 +209,8 @@ public class TestActions extends AbstractTest {
 		assertTrue(!((Map) value).isEmpty());
 	}
 	
-	@Test @SuppressWarnings("all")
+	@Test
+	@SuppressWarnings("all")
 	public void testMethod() {
 		
 		Action action = MetaStore.getAction("action-contact-greetings");
@@ -209,7 +220,7 @@ public class TestActions extends AbstractTest {
 		context.put("firstName", "John");
 		context.put("lastName", "Smith");
 		
-		ActionHandler handler = createHandler("action-contact-greetings", context);
+		ActionHandler handler = createHandler(action, context);
 		Object value = action.evaluate(handler);
 		
 		assertNotNull(value);
@@ -228,7 +239,7 @@ public class TestActions extends AbstractTest {
 		context.put("lastName", "Smith");
 		context.put("fullName", "John Smith");
 		
-		ActionHandler handler = createHandler("action-contact-greetings-rpc", context);
+		ActionHandler handler = createHandler(action, context);
 		Object value = action.evaluate(handler);
 		
 		assertNotNull(value);
@@ -273,7 +284,7 @@ public class TestActions extends AbstractTest {
 		context.put("firstName", "John");
 		context.put("lastName", "Smith");
 		
-		ActionHandler handler = createHandler("action-view-contact", context);
+		ActionHandler handler = createHandler(action, context);
 		Object value = action.evaluate(handler);
 		
 		assertNotNull(value);
