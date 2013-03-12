@@ -170,18 +170,7 @@ ActionHandler.prototype = {
 		}
 		return promise;
 	},
-	
-	handle: function() {
-		var actions = _.invoke(this.action.split(','), 'trim'),
-			context = this._getContext();
-		
-		// block the entire ui (auto unblocks when actions are complete)
-		_.delay(axelor.blockUI, 100);
-		return this._handleActions(actions, context).then(function() {
-			//DONE!
-		});
-	},
-	
+
 	_getContext: function() {
 		var scope = this.scope,
 			context = scope.getContext ? scope.getContext() : scope.record,
@@ -189,15 +178,61 @@ ActionHandler.prototype = {
 			
 		return _.extend({}, viewParams.context, context);
 	},
-	
-	_handleActions: function(actions, context) {
+
+	handle: function() {
+		var action = this.action.trim();
 		
+		// block the entire ui (auto unblocks when actions are complete)
+		_.delay(axelor.blockUI, 100);
+
+		console.log('start: ', action);
+
+		return this._handleAction(action).then(function() {
+			console.log('end');
+		});
+	},
+	
+	_handleSave: function(pending) {
+
 		var self = this,
 			scope = self.scope,
 			deferred = this.ws.defer(),
 			promise = deferred.promise;
 
-		if (!actions || actions.legth === 0 || !actions[0]) {
+		if (!scope.isValid()) {
+			deferred.reject();
+			return promise;
+		}
+		if (!scope.isDirty()) {
+			return self._handleAction(pending);
+		}
+
+		function doEdit(rec) {
+			scope.editRecord(rec);
+			return self._handleAction(pending);
+		}
+
+		var ds = scope._dataSource;
+
+		ds.save(scope.record).success(function(rec, page) {
+			if (scope.doRead) {
+				return scope.doRead(rec.id).success(doEdit);
+			}
+			return ds.read(rec.id).success(doEdit);
+		});
+		this._invalidateContext = true;
+		return promise;
+	},
+
+	_handleAction: function(action) {
+
+		var self = this,
+			scope = this.scope,
+			context = this._getContext(),
+			deferred = this.ws.defer(),
+			promise = deferred.promise;
+
+		if (!action) {
 			setTimeout(function(){
 				scope.$apply(function(){
 					deferred.resolve();
@@ -206,39 +241,15 @@ ActionHandler.prototype = {
 			return promise;
 		}
 
-		var action = actions.shift();
-
 		if (action === 'save') {
-			if (!scope.isValid()) {
-				deferred.reject();
-				return promise;
-			}
-			if (!scope.isDirty()) {
-				return self._handleActions(actions, context);
-			}
-			
-			function doEdit(rec) {
-				scope.editRecord(rec);
-				return self._handleActions(actions, context);
-			}
-
-			var ds = scope._dataSource;
-
-			ds.save(scope.record).success(function(rec, page) {
-				if (scope.doRead) {
-					return scope.doRead(rec.id).success(doEdit);
-				}
-				return ds.read(rec.id).success(doEdit);
-			});
-			this._invalidateContext = true;
-			return promise;
+			return this._handleSave();
 		}
-		
+
 		if (this._invalidateContext) {
 			context = this._getContext();
 			this._invalidateContext = false;
 		}
-		
+
 		promise = this.ws.action(action, scope._model, context);
 		promise = promise.then(function(res){
 			var d = self.ws.defer(),
@@ -250,22 +261,40 @@ ActionHandler.prototype = {
 				}
 			});
 			
-			return p.then(function(res){
-				return self._handleActions(actions, context);
-			});
+			//return p.then(function(res){
+			//	return self._handleAction(action, context);
+			//});
+			return p;
 		});
 		
 		return promise;
 	},
-
+	
 	_handleResponse: function(response, callback) {
+		
+		var self = this,
+			data = response.data || [],
+			result = true;
 
-		if (response.data == null) {
+		for(var i = 0 ; i < data.length && result ; i++) {
+			this._handleSingle(data[i], function(handled, pending){
+				if (handled && pending) {
+					return self._handleAction(pending);
+				}
+				result = handled;
+			});
+		}
+
+		callback(result);
+	},
+
+	_handleSingle: function(data, callback) {
+
+		if (data == null || data.length == 0) {
 			return callback(true);
 		}
 
-		var data = _.first(response.data),
-			scope = this.scope,
+		var scope = this.scope,
 			formElement = this.element.parents('form:first');
 
 		if (!formElement.get(0)) { // toobar button
@@ -290,7 +319,7 @@ ActionHandler.prototype = {
 			return axelor.dialogs.confirm(data.alert, function(confirmed){
 				setTimeout(function(){
 					scope.$apply(function(){
-						callback(confirmed);
+						callback(confirmed, data.pending);
 					});
 				});
 			});
@@ -317,13 +346,17 @@ ActionHandler.prototype = {
 			this._invalidateContext = true;
 			if (promise) {
 				return promise.then(function(){
-					callback(true);
+					callback(true, data.pending);
 				}, function(){
 					callback(false);
 				});
 			}
 		}
 		
+		if (data.save) {
+			return this._handleSave(data.pending);
+		}
+
 		function findItems(name) {
 
 			var items;
