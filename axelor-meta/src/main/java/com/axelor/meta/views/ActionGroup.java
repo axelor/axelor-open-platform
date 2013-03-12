@@ -14,6 +14,7 @@ import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
 import com.axelor.rpc.Response;
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
@@ -39,6 +40,14 @@ public class ActionGroup extends Action {
 		item.setName(name);
 		this.actions.add(item);
 	}
+	
+	private String getPending(Iterator<ActionItem> actions) {
+		List<String> pending = Lists.newArrayList();
+    	while(actions.hasNext()) {
+    		pending.add(actions.next().getName());
+    	}
+    	return Joiner.on(",").join(pending);
+	}
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -57,13 +66,9 @@ public class ActionGroup extends Action {
 			
 			if ("save".equals(name)) {
 				if (act.test(handler)) {
-					log.debug("wait for 'save'...");
-					List<String> pending = Lists.newArrayList();
-	            	while(iter.hasNext()) {
-	            		pending.add(iter.next().getName());
-	            	}
-	            	log.debug("pending actions: {}", pending);
-					result.add(ImmutableMap.of("save", true, "pending", Joiner.on(",").join(pending)));
+					String pending = this.getPending(iter);
+	            	log.debug("wait for 'save', pending actions: {}", pending);
+					result.add(ImmutableMap.of("save", true, "pending", pending));
 				}
 				log.debug("action '{}' doesn't meet the condition: {}", "save", act.getCondition());
 				break;
@@ -104,7 +109,15 @@ public class ActionGroup extends Action {
             		handler.getContext().update((Map) values);
             	}
             }
-            
+
+            // stop for reload
+            if (value instanceof Map && Objects.equal(Boolean.TRUE, ((Map) value).get("reload"))) {
+            	String pending = this.getPending(iter);
+            	log.debug("wait for 'reload', pending actions: {}", pending);
+				((Map<String, Object>) value).put("pending", pending);
+                break;
+            }
+
             if (action instanceof ActionGroup && value instanceof Collection) {
             	result.addAll((Collection<?>) value);
             } else {
@@ -112,13 +125,10 @@ public class ActionGroup extends Action {
             }
 
             if (action instanceof ActionValidate && iter.hasNext()) {
+            	String pending = this.getPending(iter);
             	log.debug("wait for validation: {}, {}", name, value);
-            	List<String> pending = Lists.newArrayList();
-            	while(iter.hasNext()) {
-            		pending.add(iter.next().getName());
-            	}
             	log.debug("pending actions: {}", pending);
-				((Map<String, Object>) value).put("pending", Joiner.on(",").join(pending));
+				((Map<String, Object>) value).put("pending", pending);
                 break;
             }
 		}
