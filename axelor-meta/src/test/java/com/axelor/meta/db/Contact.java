@@ -19,6 +19,8 @@ import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.VirtualColumn;
 import com.axelor.db.Widget;
+import com.google.common.base.Objects;
+import com.google.common.base.Objects.ToStringHelper;
 
 @Entity
 public class Contact extends Model {
@@ -149,6 +151,17 @@ public class Contact extends Model {
 		this.addresses = addresses;
 	}
 	
+	@Override
+	public String toString() {
+		ToStringHelper tsh = Objects.toStringHelper(getClass());
+		
+		tsh.add("fullName", getFullName());
+		tsh.add("email", getEmail());
+		tsh.add("birthDate", getBirthDate());
+		
+		return tsh.toString();
+	}
+
 	public static Query<Contact> all() {
 		return JPA.all(Contact.class);
 	}
