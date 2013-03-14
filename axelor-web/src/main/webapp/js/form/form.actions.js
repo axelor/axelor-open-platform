@@ -185,31 +185,28 @@ ActionHandler.prototype = {
 		// block the entire ui (auto unblocks when actions are complete)
 		_.delay(axelor.blockUI, 100);
 
-		console.log('start: ', action);
-
 		return this._handleAction(action).then(function() {
-			console.log('end');
+			
 		});
 	},
 	
-	_handleSave: function(pending) {
+	_handleSave: function() {
 
-		var self = this,
-			scope = self.scope,
-			deferred = this.ws.defer(),
-			promise = deferred.promise;
+		var scope = this.scope,
+			deferred = this.ws.defer();
 
 		if (!scope.isValid()) {
 			deferred.reject();
-			return promise;
+			return deferred.promise;
 		}
 		if (!scope.isDirty()) {
-			return self._handleAction(pending);
+			deferred.resolve();
+			return deferred.promise;
 		}
 
 		function doEdit(rec) {
 			scope.editRecord(rec);
-			return self._handleAction(pending);
+			deferred.resolve();
 		}
 
 		var ds = scope._dataSource;
@@ -221,7 +218,7 @@ ActionHandler.prototype = {
 			return ds.read(rec.id).success(doEdit);
 		});
 		this._invalidateContext = true;
-		return promise;
+		return deferred.promise;
 	},
 
 	_handleAction: function(action) {
@@ -229,8 +226,7 @@ ActionHandler.prototype = {
 		var self = this,
 			scope = this.scope,
 			context = this._getContext(),
-			deferred = this.ws.defer(),
-			promise = deferred.promise;
+			deferred = this.ws.defer();
 
 		if (!action) {
 			setTimeout(function(){
@@ -238,7 +234,7 @@ ActionHandler.prototype = {
 					deferred.resolve();
 				});
 			});
-			return promise;
+			return deferred.promise;
 		}
 
 		if (action === 'save') {
@@ -250,48 +246,61 @@ ActionHandler.prototype = {
 			this._invalidateContext = false;
 		}
 
-		promise = this.ws.action(action, scope._model, context);
-		promise = promise.then(function(res){
-			var d = self.ws.defer(),
-				p = d.promise;
-
-			self._handleResponse(res.data, function(result){
-				if (result) {
-					d.resolve();
-				}
-			});
+		var promise = this.ws.action(action, scope._model, context).then(function(response){
 			
-			//return p.then(function(res){
-			//	return self._handleAction(action, context);
-			//});
-			return p;
+			var d = self.ws.defer();
+			
+			var resp = response.data,
+				data = resp.data || [],
+				resolved = true;
+
+			for(var i = 0 ; i < data.length && resolved; i++) {
+				var item = data[i];
+				self._handleSingle(item).then(function(result){
+					if (_.isString(result)) {
+						self._handleAction(result).then(function(){
+							d.resolve();
+						});
+					}
+					resolved = result && !_.isString(result);
+				});
+				if (item.pending) {
+					resolved = false;
+				}
+			}
+
+			if (resolved) {
+				d.resolve();
+			}
+
+			return d.promise;
 		});
 		
-		return promise;
-	},
-	
-	_handleResponse: function(response, callback) {
+		promise.then(function(){
+			deferred.resolve();
+		});
 		
-		var self = this,
-			data = response.data || [],
-			result = true;
-
-		for(var i = 0 ; i < data.length && result ; i++) {
-			this._handleSingle(data[i], function(handled, pending){
-				if (handled && pending) {
-					return self._handleAction(pending);
-				}
-				result = handled;
-			});
-		}
-
-		callback(result);
+		return deferred.promise;
 	},
 
-	_handleSingle: function(data, callback) {
+	_handleSingle: function(data) {
+
+		var deferred = this.ws.defer();
+		var resolved_ = deferred.resolve;
+		
+		deferred.resolve = function(handled, pending) {
+			if (!handled) {
+				return resolved_(false);
+			}
+			if (pending) {
+				return resolved_(pending);
+			}
+			resolved_(true);
+		};
 
 		if (data == null || data.length == 0) {
-			return callback(true);
+			deferred.resolve(true);
+			return deferred.promise;
 		}
 
 		var scope = this.scope,
@@ -310,19 +319,21 @@ ActionHandler.prototype = {
 		}
 
 		if (data.error) {
-			return axelor.dialogs.error(data.error, function(){
-				callback(false);
+			axelor.dialogs.error(data.error, function(){
+				deferred.resolve(false);
 			});
+			return deferred.promise;
 		}
 
 		if (data.alert) {
-			return axelor.dialogs.confirm(data.alert, function(confirmed){
+			axelor.dialogs.confirm(data.alert, function(confirmed){
 				setTimeout(function(){
 					scope.$apply(function(){
-						callback(confirmed, data.pending);
+						deferred.resolve(confirmed, data.pending);
 					});
 				});
 			});
+			return deferred.promise;
 		}
 		
 		if (!_.isEmpty(data.errors)) {
@@ -330,7 +341,8 @@ ActionHandler.prototype = {
 				var item = findItems(k).first();
 				handleError(scope, item, v);
 			});
-			return callback(false);
+			deferred.resolve(false);
+			return deferred.promise;
 		}
 		
 		if (data.values) {
@@ -342,19 +354,21 @@ ActionHandler.prototype = {
 		}
 		
 		if (data.reload) {
-			var promise = scope.reload(true);
 			this._invalidateContext = true;
+			var promise = scope.reload(true);
 			if (promise) {
-				return promise.then(function(){
-					callback(true, data.pending);
-				}, function(){
-					callback(false);
+				promise.then(function(){
+					deferred.resolve(true, data.pending);
 				});
 			}
+			return deferred.promise;
 		}
 		
 		if (data.save) {
-			return this._handleSave(data.pending);
+			this._handleSave().then(function(){
+				deferred.resolve(true, data.pending);
+			});
+			return deferred.promise;
 		}
 
 		function findItems(name) {
@@ -495,8 +509,10 @@ ActionHandler.prototype = {
 				scope.onOK();
 			}
 		}
+
+		deferred.resolve(true);
 		
-		callback(true);
+		return deferred.promise;
 	}
 };
 
