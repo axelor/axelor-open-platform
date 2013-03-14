@@ -15,6 +15,7 @@ import com.axelor.meta.MetaStore;
 import com.axelor.rpc.Response;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
@@ -48,6 +49,27 @@ public class ActionGroup extends Action {
     	}
     	return Joiner.on(",").join(pending);
 	}
+	
+	private Action findAction(String name) {
+		
+		if (name == null || "".equals(name.trim()))
+			return null;
+
+		name = name.trim();
+		if (name.contains(":")) {
+			String[] parts = name.split("\\:");
+			Action.Call method = new Action.Call();
+			ActionMethod action = new ActionMethod();
+			
+			method.setController(parts[0]);
+			method.setMethod(parts[1]);
+			action.setElements(ImmutableList.of(method));
+
+			return action;
+		}
+
+		return MetaStore.getAction(name);
+	}
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -75,8 +97,8 @@ public class ActionGroup extends Action {
 			}
 			
 			log.debug("action: {}", name);
-			
-			Action action = MetaStore.getAction(name);
+
+			Action action = this.findAction(name);
 			if (action == null) {
 				log.error("action doesn't exist: {}", name);
                 continue;
@@ -115,14 +137,14 @@ public class ActionGroup extends Action {
             	String pending = this.getPending(iter);
             	log.debug("wait for 'reload', pending actions: {}", pending);
 				((Map<String, Object>) value).put("pending", pending);
-                break;
-            }
-
-            if (action instanceof ActionGroup && value instanceof Collection) {
+				result.add(value);
+            } else if (action instanceof ActionGroup && value instanceof Collection) {
             	result.addAll((Collection<?>) value);
             } else {
             	result.add(value);
             }
+            
+            log.debug("action complete: {}", name);
 
             if (action instanceof ActionValidate && iter.hasNext()) {
             	String pending = this.getPending(iter);
