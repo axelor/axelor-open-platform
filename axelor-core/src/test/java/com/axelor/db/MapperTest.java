@@ -68,7 +68,7 @@ public class MapperTest extends BaseTest {
 		
 		Assert.assertNotNull(contact.getGroups());
 		Assert.assertEquals(1, contact.getGroups().size());
-		Assert.assertEquals("Business", contact.getGroups().get(0).getTitle());
+		Assert.assertEquals("Business", contact.getGroup(0).getTitle());
 	}
 	
 	private Map<String, Object> getDemoData() {

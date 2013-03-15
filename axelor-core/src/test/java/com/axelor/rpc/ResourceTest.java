@@ -61,12 +61,12 @@ public class ResourceTest extends BaseTest {
 
 		Assert.assertEquals(Title.class, p.getTitle().getClass());
 		Assert.assertEquals(Address.class, p.getAddresses().get(0).getClass());
-		Assert.assertEquals(Group.class, p.getGroups().get(0).getClass());
+		Assert.assertEquals(Group.class, p.getGroup(0).getClass());
 		Assert.assertEquals(LocalDate.class, p.getDateOfBirth().getClass());
 
 		Assert.assertEquals("mr", p.getTitle().getCode());
 		Assert.assertEquals("France", p.getAddresses().get(0).getCountry().getName());
-		Assert.assertEquals("family", p.getGroups().get(0).getName());
+		Assert.assertEquals("family", p.getGroup(0).getName());
 		Assert.assertEquals("1977-05-01", p.getDateOfBirth().toString());
 	}
 	
