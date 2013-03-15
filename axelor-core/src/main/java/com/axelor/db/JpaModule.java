@@ -105,6 +105,10 @@ public class JpaModule extends AbstractModule {
 		properties.put("hibernate.connection.charSet", "UTF-8");
 		properties.put("hibernate.max_fetch_depth", "3");
 		properties.put("jadira.usertype.autoRegisterUserTypes", "true");
+		
+		properties.put("hibernate.cache.use_second_level_cache", "true");
+		properties.put("hibernate.cache.use_query_cache", "true");
+		properties.put("hibernate.cache.region.factory_class", "org.hibernate.cache.ehcache.EhCacheRegionFactory");
 
 		install(new JpaPersistModule(jpaUnit).properties(properties));
 		if (this.autostart) {
