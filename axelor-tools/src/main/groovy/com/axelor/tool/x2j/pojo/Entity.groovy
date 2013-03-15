@@ -203,8 +203,8 @@ class Entity {
 	List<Annotation> getAnnotations() {
 		[
 			new Annotation(this, "javax.persistence.Entity", true),
-			$table(),
-			$cachable()
+			$cachable(),
+			$table()
 		]
 		.grep { it != null }.flatten()
 		.grep { Annotation a -> !a.empty }
