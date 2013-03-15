@@ -5,7 +5,7 @@
 
   <module name="meta" package="com.axelor.meta.db" />
   
-  <entity name="MetaView" table="META_VIEW" sequential="true">
+  <entity name="MetaView" table="META_VIEW" sequential="true" cachable="true">
   	<boolean name="active" default="true"/>
   	<string name="name" unique="true" required="true"/>
 	<string name="title" required="true" namecolumn="true"/>
@@ -15,7 +15,7 @@
   	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
   </entity>
   
-  <entity name="MetaMenu" table="META_MENU" sequential="true">
+  <entity name="MetaMenu" table="META_MENU" sequential="true" cachable="true">
   	<integer name="priority"/>
   	<string name="name" unique="true" required="true"/>
   	<string name="title" required="true" namecolumn="true"/>
@@ -25,7 +25,7 @@
   	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
   </entity>
   
-  <entity name="MetaActionMenu" table="META_ACTION_MENU">
+  <entity name="MetaActionMenu" table="META_ACTION_MENU" cachable="true">
   	<string name="name" unique="true" required="true"/>
   	<string name="title" required="true" namecolumn="true"/>
     <string name="category" help="Category name to group action menus."/>
@@ -33,31 +33,27 @@
   	<many-to-one name="action" ref="MetaAction"/>
   </entity>
    
-  <entity name="MetaAction" table="META_ACTION" sequential="true">
+  <entity name="MetaAction" table="META_ACTION" sequential="true" cachable="true">
   	<string name="name" unique="true" required="true"/>
   	<string name="xml" required="true" large="true"/>
   </entity>
   
-  <entity name="MetaSelect" table="META_SELECT">
+  <entity name="MetaSelect" table="META_SELECT" cachable="true">
   	<string name="key" required="true"/>
   	<string name="value" required="true"/>
   	<string name="title" required="true" namecolumn="true"/>
   	<unique-constraint columns="key,value"/>
   </entity>
   
-    <entity name="MetaModel" sequential="true" lang="java">
-    
+  <entity name="MetaModel" sequential="true" lang="java" cachable="true">
     <string name="name" title="Name" required="true"/>
     <string name="packageName" title="Package" required="true"/>
     <string name="tableName" title="Table" />
     <one-to-many name="metaFields" ref="MetaField" mappedBy="metaModel" title="Fields" />
-    
     <string name="fullName" title="Fullname" />
-    
   </entity>
 
-  <entity name="MetaField" sequential="true" lang="java">
-    
+  <entity name="MetaField" sequential="true" lang="java" cachable="true">
     <many-to-one name="metaModel" ref="MetaModel" />
     <string name="name" title="Name" required="true"/>
     <string name="packageName" title="Package" />
@@ -66,7 +62,6 @@
     <string name="relationship" title="Relationship" selection="relationship.field.selection"/>
     <string name="mappedBy" title="Mapped by" />
     <string name="description" title="Description" large="true" />
-     
   </entity>
 
 </domain-models>
