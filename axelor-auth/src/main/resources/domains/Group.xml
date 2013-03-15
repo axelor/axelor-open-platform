@@ -5,7 +5,7 @@
 
   <module name="auth" package="com.axelor.auth.db"/>
 
-  <entity name="Group" sequential="true">
+  <entity name="Group" sequential="true" cachable="true">
   	<string name="code" required="true" unique="true" min="2"/>
   	<string name="name" required="true" unique="true" min="2"/>
     <boolean name="restricted"/>
