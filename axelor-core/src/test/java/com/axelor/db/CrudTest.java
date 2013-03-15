@@ -11,8 +11,10 @@ import com.axelor.BaseTest;
 import com.axelor.test.db.Address;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.Country;
+import com.axelor.test.db.Group;
 import com.axelor.test.db.Title;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.persist.Transactional;
 
 @Transactional
@@ -158,16 +160,40 @@ public class CrudTest  extends BaseTest {
 	@Test
 	public void testCopy() {
 		Contact c1 = Contact.all().filter("self.addresses is not empty").fetchOne();
+		Group g1 = new Group();
+
+		g1.setName("group_x");
+		g1.setTitle("Group X");
 		
+		g1 = JPA.save(g1);
+
 		Assert.assertNotNull(c1);
 		
+		if (c1.getGroups() == null) {
+			c1.setGroups(Sets.<Group>newHashSet());
+		}
+		
+		c1.getGroups().add(g1);
+		c1 = JPA.save(c1);
+
 		int numItems = c1.getAddresses().size();
 		
 		Contact c2 = JPA.copy(c1, true);
 		c2 = JPA.save(c2);
 
+		Assert.assertNotNull(c1.getGroups());
+		Assert.assertNotNull(c2.getGroups());
+		
+		int numGroups = c1.getGroups().size();
+
+		c2.getGroups().clear();
+		c2 = JPA.save(c2);
+
 		Assert.assertNotNull(c2);
 		Assert.assertFalse(c1.getId() == c2.getId());
+
+		Assert.assertEquals(numGroups, c1.getGroups().size());
+		Assert.assertEquals(0, c2.getGroups().size());
 		
 		Assert.assertEquals(numItems, c1.getAddresses().size());
 		Assert.assertEquals(numItems, c2.getAddresses().size());

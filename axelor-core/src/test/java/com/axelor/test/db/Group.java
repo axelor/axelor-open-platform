@@ -11,6 +11,8 @@ import javax.validation.constraints.NotNull;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
+import com.google.common.base.Objects;
+import com.google.common.base.Objects.ToStringHelper;
 
 @Entity
 @Table(name = "CONTACT_GROUP")
@@ -57,6 +59,17 @@ public class Group extends Model {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+	
+	@Override
+	public String toString() {
+		ToStringHelper tsh = Objects.toStringHelper(getClass());
+		
+		tsh.add("id", getId());
+		tsh.add("name", getName());
+		tsh.add("title", getTitle());
+		
+		return tsh.omitNullValues().toString();
 	}
 	
 	public static Query<Group> all() {

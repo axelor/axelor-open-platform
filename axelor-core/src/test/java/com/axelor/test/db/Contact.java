@@ -2,6 +2,7 @@ package com.axelor.test.db;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -28,6 +29,7 @@ import com.axelor.db.VirtualColumn;
 import com.axelor.db.Widget;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
+import com.google.common.collect.Lists;
 
 @Entity
 @Table(name = "CONTACT_CONTACT")
@@ -61,7 +63,7 @@ public class Contact extends JpaModel {
 	private List<Address> addresses;
 
 	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch=FetchType.LAZY)
-	private List<Group> groups;
+	private Set<Group> groups;
 
 	@Widget(title = "Photo", help = "Max size 4MB.")
 	@Lob @Basic(fetch = FetchType.LAZY)
@@ -163,11 +165,16 @@ public class Contact extends JpaModel {
 		this.addresses = addresses;
 	}
 
-	public List<Group> getGroups() {
+	public Group getGroup(int index) {
+		if (groups == null) return null;
+		return Lists.newArrayList(groups).get(index);
+	}
+
+	public Set<Group> getGroups() {
 		return groups;
 	}
 
-	public void setGroups(List<Group> groups) {
+	public void setGroups(Set<Group> groups) {
 		this.groups = groups;
 	}
 	
