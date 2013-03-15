@@ -5,7 +5,7 @@
 
   <module name="contact" package="com.axelor.contact.db" />
 
-  <entity name="Title">
+  <entity name="Title" cachable="true">
     <![CDATA[
     This class represents the name initial like Mr., Mrs. etc.
     
@@ -41,7 +41,7 @@
     <string name="name" required="true" unique="true" min="2" />
   </entity>
 
-  <entity name="Contact" sequential="true" lang="groovy" hashAll="true">
+  <entity name="Contact" sequential="true" lang="groovy" hashAll="true" cachable="false">
     <many-to-one name="title" ref="Title" unique="true" />
     <string name="firstName" required="true" />
     <string name="lastName" required="true" />

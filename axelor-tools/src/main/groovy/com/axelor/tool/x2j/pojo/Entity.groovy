@@ -24,6 +24,8 @@ class Entity {
 	
 	boolean hashAll
 	
+	String cachable
+	
 	String documentation;
 
 	List<Property> properties
@@ -40,6 +42,7 @@ class Entity {
 		sequential = node.@sequential == "true"
 		groovy = node.@lang == "groovy"
 		hashAll = node.@hashAll == "true"
+		cachable = node.@cachable
 		baseClass = "com.axelor.db.Model"
 		documentation = findDocs(node)
 		
@@ -200,8 +203,11 @@ class Entity {
 	List<Annotation> getAnnotations() {
 		[
 			new Annotation(this, "javax.persistence.Entity", true),
-			$table()
+			$table(),
+			$cachable()
 		]
+		.grep { it != null }.flatten()
+		.grep { Annotation a -> !a.empty }
 	}
 	
 	Annotation $table() {
@@ -222,5 +228,15 @@ class Entity {
 			annotation.add("uniqueConstraints", constraints, false)
 		
 		return annotation
+	}
+	
+	Annotation $cachable() {
+		if (cachable == "true") {
+			return new Annotation(this, "javax.persistence.Cacheable", true);
+		}
+		if (cachable == "false") {
+			return new Annotation(this, "javax.persistence.Cacheable", false).add("false", false);
+		}
+		return null
 	}
 }
