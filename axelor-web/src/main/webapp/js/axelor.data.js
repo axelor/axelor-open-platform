@@ -119,7 +119,7 @@
 					if (isScope(obj) || isWindow(obj)) return obj;
 					if (_.isArray(obj)) return _.map(obj, compact).sort();
 					if (_.isDate(obj)) return obj;
-					if (obj.id > 0 && !_.has(obj, "version")) {
+					if (obj.id > 0 && !obj.$dirty && !_.has(obj, "version")) {
 						return obj.id;
 					}
 					var res = {};
