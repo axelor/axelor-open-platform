@@ -66,7 +66,7 @@ public class ActionImport extends Action {
 			}
 
 			@Override
-			public void imported(Integer counter) {
+			public void imported(Integer total, Integer success) {
 				// TODO Auto-generated method stub
 				
 			}
