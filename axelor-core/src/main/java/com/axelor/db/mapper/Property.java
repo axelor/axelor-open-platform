@@ -433,14 +433,25 @@ public class Property {
 	 */
 	public <T, U> U setAssociation(U child, T bean) {
 
-		if (mappedBy == null)
+		if (mappedBy == null || child == null) {
 			return child;
+		}
 
-		Preconditions.checkNotNull(child);
-		
 		Property mapped = Mapper.of(target).getProperty(mappedBy);
-		if (mapped != null && !Objects.equal(mapped.get(child), bean))
+		if (mapped == null) {
+			return child;
+		}
+
+		if (mapped.isCollection()) { // m2m -> m2m
+			// doing `mapped.add(child, bean)` here may add an unmanaged object
+			// to a managed collection.
+			return child;
+		}
+
+		if (!Objects.equal(mapped.get(child), bean)) { // o2m -> m2o
 			mapped.set(child, bean);
+		}
+
 		return child;
 	}
 
