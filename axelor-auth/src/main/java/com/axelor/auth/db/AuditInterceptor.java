@@ -2,6 +2,9 @@ package com.axelor.auth.db;
 
 import java.io.Serializable;
 
+import javax.persistence.FlushModeType;
+import javax.persistence.TypedQuery;
+
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.Transaction;
 import org.hibernate.type.Type;
@@ -9,6 +12,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.db.JPA;
 
 @SuppressWarnings("serial")
 public class AuditInterceptor extends EmptyInterceptor {
@@ -24,7 +28,33 @@ public class AuditInterceptor extends EmptyInterceptor {
 	public void afterTransactionCompletion(Transaction tx) {
 		currentUser.remove();
 	}
+	
+	private User getUser() {
+		User user = currentUser.get();
+		if (user == null || JPA.em().contains(user)) {
+			return user;
+		}
+		
+		TypedQuery<User> q = JPA.em().createQuery(
+				"SELECT self FROM User self WHERE self.code = :code", User.class);
 
+		q.setFlushMode(FlushModeType.COMMIT);
+		q.setParameter("code", user.getCode());
+		
+		user = q.getSingleResult();
+		
+		try {
+			user = q.getSingleResult();
+		} catch (Exception e){
+			return null;
+		}
+		
+		currentUser.remove();
+		currentUser.set(user);
+
+		return user;
+	}
+	
 	@Override
 	public boolean onFlushDirty(Object entity, Serializable id,
 			Object[] currentState, Object[] previousState,
@@ -37,7 +67,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 				currentState[i] = new LocalDateTime(DateTimeZone.UTC);
 			}
 			if ("updatedBy".equals(propertyNames[i])) {
-				currentState[i] = currentUser.get();
+				currentState[i] = this.getUser();
 			}
 		}
 		return true;
@@ -54,7 +84,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 				state[i] = new LocalDateTime(DateTimeZone.UTC);
 			}
 			if ("createdBy".equals(propertyNames[i])) {
-				state[i] = currentUser.get();
+				state[i] = this.getUser();
 			}
 		}
 		return true;
