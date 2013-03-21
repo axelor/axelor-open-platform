@@ -197,10 +197,6 @@ public class TestActions extends AbstractTest {
 		assertNotNull(value);
 		assertTrue(value instanceof Map);
 		assertTrue(!((Map) value).isEmpty());
-		
-		Map<String, String> error = (Map<String, String>) value;
-		
-		assertEquals("Order create date is in future.", error.get("createDate"));
 	}
 	
 	@Test @SuppressWarnings("all")
@@ -281,28 +277,6 @@ public class TestActions extends AbstractTest {
 		Object value = action.evaluate(handler);
 		
 		assertNotNull(value);
-	}
- 	
- 	@Test
-	public void testTest() {
-		
- 		Action actionTest = MetaStore.getAction("test.action");
- 		assertNotNull(actionTest);
- 		
-		Action action = MetaStore.getAction("action-contact-test");
-		Map<String, Object> context = Maps.newHashMap();
-		
-		context.put("id", 1);
-		context.put("firstName", "John");
-		context.put("lastName", "Smith");
-		
-		ActionHandler handler = createHandler("action-contact-test", context);
-		Object value = action.evaluate(handler);
-		Contact c = (Contact) value;
-		
-		assertEquals("john.smith@gmail.com", c.getEmail());
-		assertEquals("john.smith@gmail.fr", c.getProEmail());
-		assertEquals("john.smith", c.getFirstName());
 	}
 
 }

@@ -67,7 +67,7 @@
     
     <action-attrs name="action-contact-attrs-multi">
     	<attribute name="title" for="notes" expr="eval: String.format('About %s', 'Me')"/>
-    	<attribute name="readonly" for="lastName, firstName" expr="eval: 1"/>
+    	<attribute name="readonly" for="lastName,firstName" expr="eval: 1"/>
     	<attribute name="hidden" for="lastName,firstNa" expr="eval: 1"/>
     	<attribute name="hidden" for="notes,phone,dateOfBirth" expr="true"/>
     	<attribute name="domain" for="title" expr="self.code IN ?1"/>
@@ -85,7 +85,7 @@
     <action-record name="action-contact-defaults-multi"
     	model="com.axelor.meta.db.Contact">
     	<field name="title" expr="action:action-default-title"/>
-    	<field name="firstName, lastName" expr="Smith"/>
+    	<field name="firstName,lastName" expr="Smith"/>
     	<field name="email,proEmail" expr="john.smith@gmail.com"/>
     </action-record>
     
@@ -105,10 +105,6 @@
     	<call class="com.axelor.meta.web.Hello" method="say"/>
     </action-method>
     
-    <action-method name="action-contact-returnTrue">
-    	<call class="com.axelor.meta.web.Hello" method="returnTrue()"/>
-    </action-method>
-    
     <action-method name="action-contact-greetings-rpc">
       <call class="com.axelor.meta.web.Hello" method="say(fullName)"/>
     </action-method>
@@ -125,19 +121,9 @@
     </action-condition>
 
     <action-condition name="check.dates">
-      <check field="orderDate,createDate"/>
+      <check field="orderDate"/>
+      <check field="createDate"/>
       <check field="createDate" if="orderDate &lt; createDate" error="Order create date is in future."/>
     </action-condition>
-    
-    <action-record name="action-contact-test"
-    	model="com.axelor.meta.db.Contact">
-    	<field name="email" expr="john.smith@gmail.com"/>
-    	<field name="proEmail" expr="john.smith@gmail.fr" if="action:action-contact-returnTrue"/>
-    	<field name="firstName" expr="john.smith" if="action:test.action"/>
-    </action-record>
-    
-    <action-test name="test.action">
-      <test expression="id == 1" if="lastName == 'Smith'" />
-    </action-test>
 
 </object-views>
