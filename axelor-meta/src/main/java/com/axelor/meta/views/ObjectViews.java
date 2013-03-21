@@ -38,8 +38,7 @@ public class ObjectViews {
 		@XmlElement(name = "action-view", type=Action.ActionView.class),
 		@XmlElement(name = "action-ws", type=ActionWS.class),
 		@XmlElement(name = "action-import", type=ActionImport.class),
-		@XmlElement(name = "action-export", type=ActionExport.class),
-		@XmlElement(name = "action-test", type=ActionTest.class)
+		@XmlElement(name = "action-export", type=ActionExport.class)
 	})
 	private List<Action> actions;
 	

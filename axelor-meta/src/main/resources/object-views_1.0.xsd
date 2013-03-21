@@ -23,7 +23,6 @@
         <xsd:element name="action-ws" type="tns:ActionWS" />
         <xsd:element name="action-import" type="tns:ActionImport" />
         <xsd:element name="action-export" type="tns:ActionExport" />
-        <xsd:element name="action-test" type="tns:ActionTest" />
       </xsd:choice>
     </xsd:complexType>
   </xsd:element>
@@ -962,42 +961,6 @@
                         </xsd:documentation>
                       </xsd:annotation>
                     </xsd:attribute>
-                  </xsd:extension>
-                </xsd:complexContent>
-              </xsd:complexType>
-            </xsd:element>
-          </xsd:sequence>
-        </xsd:extension>
-      </xsd:complexContent>
-    </xsd:complexType>
-    
-    <xsd:complexType name="ActionTest">
-      <xsd:annotation>
-        <xsd:documentation>
-        The action-test can be used to test the context based on some conditions.
-        </xsd:documentation>
-      </xsd:annotation>
-      <xsd:complexContent>
-        <xsd:extension base="tns:AbstractAction">
-          <xsd:sequence>
-            <xsd:element name="test" maxOccurs="unbounded">
-              <xsd:annotation>
-                <xsd:documentation>
-                  Define a test condition. The expression can be
-                  specified as a string value. The rules is the first "if" matched, 
-                  the expr will be evaluate.
-                </xsd:documentation>
-              </xsd:annotation>
-              <xsd:complexType>
-                <xsd:complexContent>
-                  <xsd:extension base="tns:AbstractAct">
-                  	<xsd:attribute name="expression" type="xsd:string">
-                  	  <xsd:annotation>
-                        <xsd:documentation>
-                          Specify the expression
-	                    </xsd:documentation>
-                      </xsd:annotation>
-                  	</xsd:attribute>
                   </xsd:extension>
                 </xsd:complexContent>
               </xsd:complexType>
