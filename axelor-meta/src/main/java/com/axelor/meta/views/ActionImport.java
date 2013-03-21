@@ -71,6 +71,12 @@ public class ActionImport extends Action {
 				
 			}
 
+			@Override
+			public void handle(Model bean, Exception e) {
+				// TODO Auto-generated method stub
+				
+			}
+
 		});
 		
 		importer.runTask(new ImportTask() {
