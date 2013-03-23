@@ -207,22 +207,20 @@ public class CSVImporter implements Importer {
 		
 		String beanName = csvInput.getTypeName();
 		
-		if (LOG.isInfoEnabled()) {
-			LOG.info("Importing {} from {}", beanName, csvInput.getFileName());
-		}
+		LOG.info("Importing {} from {}", beanName, csvInput.getFileName());
 		
 		BufferedReader streamReader = new BufferedReader(reader);
 		CSVReader csvReader = new CSVReader(streamReader, csvInput.getSeparator());
 		
 		String[] fields = csvReader.readNext();
 		Class<?> beanClass = Class.forName(beanName);
-		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Header {}", Arrays.asList(fields));
+
+		LOG.debug("Header {}", Arrays.asList(fields));
 		
 		CSVBinder binder = new CSVBinder(beanClass, fields, csvInput);
 		String[] values = null;
 		int count = 0;
+		int total = 0;
 		
 		JPA.em().getTransaction().begin();
 		try {
@@ -253,17 +251,15 @@ public class CSVImporter implements Importer {
 				if (isEmpty(values))
 					continue;
 				
-				if (LOG.isDebugEnabled()) {
-					LOG.debug("Record {}", Arrays.asList(values));
-				}
-				
+				LOG.trace("Record {}", Arrays.asList(values));
+
+				Object bean = null;
 				try {
 					
 					Map<String, Object> ctx = Maps.newHashMap(context);
-					Object bean = binder.bind(values, ctx);
+					bean = binder.bind(values, ctx);
 					
-					if (LOG.isTraceEnabled())
-						LOG.trace("bean created: {}", bean);
+					LOG.trace("bean created: {}", bean);
 					
 					bean = csvInput.call(bean, ctx, injector);
 					
@@ -275,14 +271,12 @@ public class CSVImporter implements Importer {
 						}
 					}
 					
-					LOG.debug("bean saved: {}", bean);
+					LOG.trace("bean saved: {}", bean);
 					
 				} catch (Exception e) {
-					if (LOG.isErrorEnabled()) {
-						LOG.error("Error while importing {}.", csvInput.getFileName());
-						LOG.error("Unable to import record: {}", Arrays.asList(values));
-						LOG.error("With following exception:", e);
-					}
+					LOG.error("Error while importing {}.", csvInput.getFileName());
+					LOG.error("Unable to import record: {}", Arrays.asList(values));
+					LOG.error("With following exception:", e);
 					
 					// Recover the transaction
 					if (JPA.em().getTransaction().getRollbackOnly()) {
@@ -294,7 +288,7 @@ public class CSVImporter implements Importer {
 					
 				}
 				
-				if (count % 20 == 0) {
+				if (++total % 20 == 0) {
 					JPA.flush();
 					JPA.em().clear();
 				}
@@ -310,15 +304,14 @@ public class CSVImporter implements Importer {
 			if (JPA.em().getTransaction().isActive())
 				JPA.em().getTransaction().rollback();
 			
-			if (LOG.isErrorEnabled())
-				LOG.error("Error while importing {}.", csvInput.getFileName());
-				LOG.error("Unable to import data.");
-				LOG.error("With following exception:", e);
+			LOG.error("Error while importing {}.", csvInput.getFileName());
+			LOG.error("Unable to import data.");
+			LOG.error("With following exception:", e);
 				
 		} finally {
 			
 			for(Listener listener : listeners) {
-				listener.imported(count);
+				listener.imported(total,count);
 			}
 			csvReader.close();
 			

@@ -236,6 +236,7 @@ public class XMLImporter implements Importer {
 		XMLBinder binder = new XMLBinder(input, context) {
 			
 			int count = 0;
+			int total = 0;
 			
 			@Override
 			protected void handle(Object bean, XMLBind binding, Map<String, Object> ctx) {
@@ -265,11 +266,18 @@ public class XMLImporter implements Importer {
 					}
 				}
 
-				if (count % 20 == 0) {
+				if (++total % 20 == 0) {
 					JPA.flush();
 					JPA.em().clear();
 				}
 
+			}
+			
+			@Override
+			protected void finish() {
+				for(Listener listener : listeners) {
+					listener.imported(total,count);
+				}
 			}
 		};
 
