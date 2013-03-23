@@ -50,8 +50,14 @@ public class CSVImportTest {
 			}
 
 			@Override
-			public void imported(Integer counter) {
-				log.info("Record (count): " + counter);
+			public void imported(Integer total, Integer success) {
+				log.info("Record (total): " + total);
+				log.info("Record (success): " + success);
+			}
+
+			@Override
+			public void handle(Model bean, Exception e) {
+				
 			}
 		});
 		

@@ -16,7 +16,15 @@ public interface Listener {
 	
 	/**
 	 * Invoked when file is imported
+	 * @param total
+	 * @param success
+	 */
+	
+	void imported(Integer total, Integer success);
+	
+	/**
+	 * Invoked when bean failed managed
 	 * @param counter
 	 */
-	void imported(Integer counter);
+	void handle(Model bean, Exception e);
 }
