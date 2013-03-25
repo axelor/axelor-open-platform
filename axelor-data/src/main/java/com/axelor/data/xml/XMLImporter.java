@@ -264,6 +264,10 @@ public class XMLImporter implements Importer {
 					if (!JPA.em().getTransaction().isActive()) {
 						JPA.em().getTransaction().begin();
 					}
+					
+					for(Listener listener : listeners) {
+						listener.handle((Model)bean, e);
+					}
 				}
 
 				if (++total % 20 == 0) {
@@ -314,5 +318,6 @@ public class XMLImporter implements Importer {
 			throw new ImportException(e);
 
 		}
+
 	}
 }

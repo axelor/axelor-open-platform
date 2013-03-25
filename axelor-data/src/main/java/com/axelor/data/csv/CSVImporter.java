@@ -286,6 +286,10 @@ public class CSVImporter implements Importer {
 						JPA.em().getTransaction().begin();
 					}
 					
+					for(Listener listener : listeners) {
+						listener.handle((Model)bean, e);
+					}
+					
 				}
 				
 				if (++total % 20 == 0) {
