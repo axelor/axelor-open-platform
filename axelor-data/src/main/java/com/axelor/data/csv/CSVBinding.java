@@ -1,13 +1,10 @@
 package com.axelor.data.csv;
 
 import groovy.lang.Binding;
-import groovy.lang.GroovyCodeSource;
 import groovy.lang.GroovyShell;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -127,17 +124,13 @@ public class CSVBinding {
 	private Script scriptEval;
 
 	private Script newScript(final String expr) {
-		GroovyCodeSource gcs = AccessController.doPrivileged(new PrivilegedAction<GroovyCodeSource>() {
-            public GroovyCodeSource run() {
-                return new GroovyCodeSource(expr, "T" + column, "/groovy/shell");
-            }
-        });
 
 		CompilerConfiguration config = new CompilerConfiguration();
-		config.getOptimizationOptions().put("indy", Boolean.TRUE);
+		config.getOptimizationOptions().put("indy", true);
+		config.getOptimizationOptions().put("int", false);
 		
-		GroovyShell shell = new GroovyShell(config);
-		return shell.parse(gcs);
+		GroovyShell shell = new GroovyShell();
+		return shell.parse(expr);
 	}
 	
 	private Object eval(Script script, Map<String, Object> context) {
@@ -153,7 +146,6 @@ public class CSVBinding {
 				}
 			}
 		});
-		
 		return script.run();
 	}
 	
