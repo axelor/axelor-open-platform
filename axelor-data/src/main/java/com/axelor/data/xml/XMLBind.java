@@ -1,14 +1,11 @@
 package com.axelor.data.xml;
 
 import groovy.lang.Binding;
-import groovy.lang.GroovyCodeSource;
 import groovy.lang.GroovyShell;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -169,17 +166,13 @@ public class XMLBind {
 	private Script scriptEval;
 
 	private Script newScript(final String expr) {
-		GroovyCodeSource gcs = AccessController.doPrivileged(new PrivilegedAction<GroovyCodeSource>() {
-            public GroovyCodeSource run() {
-                return new GroovyCodeSource(expr, "T" + node, "/groovy/shell");
-            }
-        });
-		
-		CompilerConfiguration config = new CompilerConfiguration();
-		config.getOptimizationOptions().put("indy", Boolean.TRUE);
 
-		GroovyShell shell = new GroovyShell(config);
-		return shell.parse(gcs);
+		CompilerConfiguration config = new CompilerConfiguration();
+		config.getOptimizationOptions().put("indy", true);
+		config.getOptimizationOptions().put("int", false);
+
+		GroovyShell shell = new GroovyShell();
+		return shell.parse(expr);
 	}
 	
 	private Object eval(Script script, Map<String, Object> context) {
@@ -195,7 +188,6 @@ public class XMLBind {
 				}
 			}
 		});
-		
 		return script.run();
 	}
 	
