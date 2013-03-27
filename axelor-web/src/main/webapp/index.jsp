@@ -74,6 +74,7 @@ if (localeName == null || "".equals(localeName.trim()))
               </a>
               <ul class="dropdown-menu">
                 <li><a href="#/about"><i>{{app.name}} - v{{app.version}}</i></a></li>
+                <li ng-show="app.sdk"><a href="http://axelor.com/"><i>Axelor Framework - v{{app.sdk}}</i></a></li>
               </ul>
             </li>
             <li class="divider-vertical"></li>
