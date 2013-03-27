@@ -178,7 +178,8 @@ function AppCtrl($rootScope, $scope, $http, $route, authService) {
 			version: settings['application.version'],
 			mode: settings['application.mode'],
 			user: settings['user.name'],
-			help: settings['help.location']
+			help: settings['help.location'],
+			sdk: settings['sdk.version']
 		};
 	}
 
