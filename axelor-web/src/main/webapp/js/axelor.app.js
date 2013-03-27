@@ -131,7 +131,10 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 			}
 		};
 
-		$rootScope.__proto__.ajaxStop = ajaxStop;
+		var proto = Object.getPrototypeOf($rootScope);
+		_.extend(proto, {
+			ajaxStop: ajaxStop
+		});
 
 		return function(promise) {
 			return promise.then(function(response){
