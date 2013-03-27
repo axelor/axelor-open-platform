@@ -350,12 +350,17 @@ public class Property {
 
 		Object old = this.get(bean);
 
+		if (old == value) {
+			return value;
+		}
+
 		if (this.isCollection()) {
 			this.clear(bean);
-			if (value instanceof Collection<?>)
+			if (value instanceof Collection<?>) {
 				this.addAll(bean, (Collection<?>) value);
-			else
+			} else {
 				this.add(bean, value);
+			}
 		} else {
 			// ignore readonly fields
 			if (Mapper.of(entity).getSetter(name) != null) {
