@@ -228,7 +228,7 @@
 		ViewService.prototype.action = function(action, model, context) {
 			
 			var ctx = _.extend({
-				_model: model,
+				_model: model
 			}, context);
 
 			var params = {

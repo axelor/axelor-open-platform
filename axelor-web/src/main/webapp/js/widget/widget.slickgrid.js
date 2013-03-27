@@ -980,7 +980,7 @@ ui.directive('uiSlickGrid', ['ViewService', function(ViewService) {
 			cols: items.length,
 			colWidths: '=',
 			viewType : 'form',
-			items: items,
+			items: items
 		};
 
 		scope._viewParams = {
