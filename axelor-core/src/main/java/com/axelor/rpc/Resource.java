@@ -613,13 +613,17 @@ public class Resource<T extends Model> {
 			
 			PropertyType type = p.getType();
 			
-			if (type == PropertyType.BINARY) {
+			if (type == PropertyType.BINARY && !p.isImage()) {
 				continue;
 			}
 			
 			String name = p.getName();
 			Object value = mapper.get(bean, name);
 			
+			if (p.isImage() && byte[].class.isInstance(value)) {
+				value = new String((byte[]) value);
+			}
+
 			if (value instanceof Model) { // m2o
 				Map<String, Object> _fields = (Map) fields.get(p.getName());
 				if (_fields == null) {
