@@ -440,13 +440,15 @@ class Property {
 		def search = attrs['search']
 		def multiline = attrs['multiline']
 		def selection = attrs['selection']
+		def image = attrs['image']
 		
 		if (selection) {
 			selection = selection.replaceAll("\\],\\s*\\[", '], [')
 		}
 		
-		if (title || help || readonly || hidden || multiline || selection)
+		if (title || help || readonly || hidden || multiline || selection || image)
 			annon("com.axelor.db.Widget")
+				.add("image", image, false)
 				.add("title", title)
 				.add("help", help)
 				.add("readonly", readonly, false)
