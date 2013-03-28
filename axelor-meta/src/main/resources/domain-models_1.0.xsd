@@ -336,6 +336,27 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
+  
+  <xsd:complexType name="Binary">
+    <xsd:annotation>
+      <xsd:documentation>Binary Type.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="dm:Column">
+        <xsd:attribute name="image" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Whether the field is intended to store image data.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="default" use="prohibited"/>
+        <xsd:attribute name="readonly" use="prohibited"/>
+        <xsd:attribute name="unique" use="prohibited"/>
+        <xsd:attribute name="hidden" use="prohibited"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
 
   <xsd:complexType name="Unique">
     <xsd:annotation>
@@ -424,7 +445,7 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:element>
-        <xsd:element name="binary" type="dm:Column">
+        <xsd:element name="binary" type="dm:Binary">
           <xsd:annotation>
             <xsd:documentation>
               Binary type field (binary data, e.g. image, pdf etc).

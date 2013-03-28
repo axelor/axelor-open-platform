@@ -65,7 +65,7 @@ import com.google.common.io.Resources;
 public class MetaLoader {
 
 	private static final String LOCAL_SCHEMA = "object-views_1.0.xsd";
-	private static final String REMOTE_SCHEMA = "object-views_0.8.xsd";
+	private static final String REMOTE_SCHEMA = "object-views_0.9.xsd";
 	private static final String REMOTE_SCHEMA_LOCATION = "http://apps.axelor.com/xml/ns/object-views";
 	
 	private Logger log = LoggerFactory.getLogger(getClass());
