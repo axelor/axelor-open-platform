@@ -45,6 +45,12 @@ public @interface Widget {
 	 * 
 	 */
 	boolean multiline() default false;
+	
+	/**
+	 * Use image widget for this binary field.
+	 * 
+	 */
+	boolean image() default false;
 
 	/**
 	 * List of the columns to be used to search this record.

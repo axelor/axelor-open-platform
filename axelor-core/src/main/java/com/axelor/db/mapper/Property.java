@@ -74,6 +74,8 @@ public class Property {
 	private String title;
 
 	private String help;
+	
+	private boolean image;
 
 	private boolean readonly;
 
@@ -205,8 +207,13 @@ public class Property {
 				nameSearch = w.search();
 				selection = w.selection();
 
-				if (w.multiline() && type == PropertyType.STRING)
+				if (w.multiline() && type == PropertyType.STRING) {
 					type = PropertyType.TEXT;
+				}
+				
+				if (type == PropertyType.BINARY) {
+					image = w.image();
+				}
 			}
 		}
 
@@ -301,6 +308,10 @@ public class Property {
 
 	public String getHelp() {
 		return help;
+	}
+	
+	public boolean isImage() {
+		return image;
 	}
 
 	public boolean isReadonly() {
