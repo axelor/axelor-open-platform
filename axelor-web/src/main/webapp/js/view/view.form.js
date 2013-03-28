@@ -442,6 +442,10 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 					type = 'select';
 				}
 				
+				if (attrs.image ==  true) {
+					type = "image";
+				}
+				
 				attrs.serverType = attrs.type;
 				attrs.type = type;
 				

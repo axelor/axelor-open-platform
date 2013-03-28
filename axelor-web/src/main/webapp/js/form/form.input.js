@@ -802,6 +802,84 @@ var SelectQueryItem = {
 		'</span>'
 };
 
+var ImageItem = {
+	css: 'image-item',
+	cellCss: 'form-item image-item',
+	require: '?ngModel',
+	scope: true,
+	link: function(scope, element, attrs, model) {
+		
+		var input = element.children('input:first');
+		var image = element.children('img:first');
+		var buttons = element.children('.btn-group');
+		
+		input.add(buttons).hide();
+		image.add(buttons).hover(function(){
+			buttons.show();
+		}, function() {
+			buttons.hide();
+		});
+
+		scope.doSelect = function() {
+			input.click();
+		};
+		
+		scope.doSave = function() {
+			var content = image.get(0).src;
+			if (content) {
+				window.open(content);
+			}
+		};
+		
+		var BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
+		scope.doRemove = function() {
+			image.get(0).src = BLANK;
+			image.get(0).src = null;
+			input.val(null);
+			update(null);
+		};
+		
+		input.change(function(e, ui) {
+			var file = input.get(0).files[0];
+			var reader = new FileReader();
+			
+			reader.onload = function(e){
+				var content = e.target.result;
+				image.get(0).src = content;
+				update(content);
+			};
+
+			reader.readAsDataURL(file);
+		});
+		
+		function update(value) {
+			setTimeout(function(){
+				model.$setViewValue(value);
+				scope.$apply();
+			});
+		}
+
+		model.$render = function() {
+			var content = model.$viewValue || null;
+			if (content == null) {
+				image.get(0).src = BLANK;
+			}
+			image.get(0).src = content;
+		};
+	},
+	template:
+	'<div>' +
+		'<input type="file" accept="image/*">' +
+		'<img class="img-polaroid" style="width: 140px; height: 140px;">' +
+		'<div class="btn-group">' +
+			'<button ng-click="doSelect()" class="btn" type="button"><i class="icon-upload-alt"></i></button>' +
+			'<button ng-click="doSave()" class="btn" type="button"><i class="icon-download-alt"></i></button>' +
+			'<button ng-click="doRemove()" class="btn" type="button"><i class="icon-remove"></i></button>' +
+		'</div>' +
+	'</div>'
+};
+
 // register directives
 
 var directives = {
@@ -824,7 +902,8 @@ var directives = {
 	'uiDate'	: DateItem,
 	'uiTime'	: TimeItem,
 	'uiText'	: TextItem,
-	'uiPassword': PasswordItem
+	'uiPassword': PasswordItem,
+	'uiImage'	: ImageItem
 };
 
 for(var name in directives) {
