@@ -296,6 +296,12 @@ td.form-item > * {
 	border: none;
 }
 
+.form-item .image-item > div.btn-group {
+	position: absolute;
+	left: 20px;
+	bottom: 12px;
+}
+
 .form-item .nested-editor > legend > span.legend-toolbar {
 	padding-left: 4px;
 }
