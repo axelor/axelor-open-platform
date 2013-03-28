@@ -17,10 +17,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Type;
 import org.joda.time.LocalDate;
 
-import com.axelor.db.Binary;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaModel;
 import com.axelor.db.NameColumn;
@@ -67,8 +65,7 @@ public class Contact extends JpaModel {
 
 	@Widget(title = "Photo", help = "Max size 4MB.")
 	@Lob @Basic(fetch = FetchType.LAZY)
-	@Type(type="com.axelor.db.types.BinaryType")
-	private Binary image;
+	private byte[] image;
 
 	@Widget(multiline = true)
 	private String notes;
@@ -178,11 +175,11 @@ public class Contact extends JpaModel {
 		this.groups = groups;
 	}
 	
-	public Binary getImage() {
+	public byte[] getImage() {
 		return image;
 	}
 	
-	public void setImage(Binary image) {
+	public void setImage(byte[] image) {
 		this.image = image;
 	}
 	
