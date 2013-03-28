@@ -30,6 +30,10 @@ public class SimpleAdapter implements TypeAdapter<Object> {
 			}
 			return value.toString();
 		}
+		
+		if (type == byte[].class && value instanceof String) {
+			return ((String) value).getBytes();
+		}
 
 		if (type == Boolean.TYPE || type == Boolean.class)
 			return Boolean.valueOf(value.toString());
