@@ -705,6 +705,9 @@ Grid.prototype.saveChanges = function(args, callback) {
 		if (res.id === 0) {
 			res.id = null;
 		}
+		if (res.$dirty && !res.version) {
+			res.version = res.$version;
+		}
 		return res;
 	});
 	
