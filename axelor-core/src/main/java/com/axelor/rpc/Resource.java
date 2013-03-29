@@ -1,6 +1,8 @@
 package com.axelor.rpc;
 
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -622,6 +624,16 @@ public class Resource<T extends Model> {
 			
 			if (p.isImage() && byte[].class.isInstance(value)) {
 				value = new String((byte[]) value);
+			}
+
+			// decimal values should be rounded accordingly otherwise the
+			// json mapper may use wrong scale.
+			if (value instanceof BigDecimal) {
+				BigDecimal decimal = (BigDecimal) value;
+				int scale = p.getScale();
+				if (scale != decimal.scale()) {
+					value = decimal.setScale(scale, RoundingMode.HALF_UP);
+				}
 			}
 
 			if (value instanceof Model) { // m2o
