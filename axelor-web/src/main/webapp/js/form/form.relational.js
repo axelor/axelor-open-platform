@@ -726,6 +726,9 @@ var ManyToOneItem = {
 			}
 
 			ds.search(params).success(function(records, page){
+				if(_.isEmpty(records)){
+		            onSelectFired = false;
+			    }
 				response(records);
 			});
 		}
@@ -741,6 +744,9 @@ var ManyToOneItem = {
 					onSelectFired = true;
 				}
 				else search(request, response);
+			},
+			close: function(event, ui) {
+				onSelectFired = false;
 			},
 			focus: function(event, ui) {
 				return false;
