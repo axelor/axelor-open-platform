@@ -8,7 +8,7 @@
 
 	var ds = angular.module('axelor.ds');
 
-	ds.factory('DataSource', ['$http', '$q', '$exceptionHandler', function($http, $q, $exceptionHandler) {
+	ds.factory('DataSource', ['$rootScope', '$http', '$q', '$exceptionHandler', function($rootScope, $http, $q, $exceptionHandler) {
 
 		function DataSource(model, options) {
 			
@@ -304,13 +304,83 @@
 				return promise;
 			},
 
+			upload: function(values, field, file) {
+				var that = this,
+					page = this._page,
+					deferred = $q.defer(),
+					promise = deferred.promise;
+
+				var xhr = new XMLHttpRequest();
+				var data = new FormData();
+				var progress_cb = angular.noop;
+
+				promise.progress = function(fn) {
+					progress_cb = fn;
+					return promise;
+				};
+				promise.success = function(fn) {
+					return promise.then(function(response) {
+						var res = response,
+							record;
+
+						res.data = response.data[0];
+						record = that._accept(res);
+
+						fn(record, page);
+					});
+				};
+				promise.error = function(fn) {
+					promise.then(null, fn);
+					return promise;
+				};
+				
+				var request = {
+					data: values
+				};
+				
+				data.append("file", file);
+				data.append("field", field);
+				data.append("request", angular.toJson(request));
+
+				xhr.upload.addEventListener("progress", function(e) {
+					var complete = Math.round(e.loaded * 100 / e.total);
+					progress_cb(complete);
+				}, false);
+				
+				xhr.onreadystatechange = function(e) {
+					if (xhr.readyState == 4) {
+						var response = angular.fromJson(xhr.responseText);
+						if (xhr.status == 200) {
+							deferred.resolve(response);
+						} else {
+							deferred.reject(response);
+						}
+						setTimeout(function(){
+							$rootScope.$apply();
+						});
+					}
+				};
+
+				xhr.open("POST", "ws/rest/" + this._model + "/upload", true);
+				xhr.send(data);
+
+				return promise;
+			},
+
 			save: function(values) {
 
 				var that = this,
 					page = this._page,
-					promise = this._request().post({
-						data: values
-					});
+					promise;
+
+				if (values && values.$upload) {
+					var upload = values.$upload;
+					return this.upload(values, upload.field, upload.file);
+				}
+
+				promise = this._request().post({
+					data: values
+				});
 
 				promise.success = function(fn) {
 					return promise.then(function(response){

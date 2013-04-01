@@ -1,5 +1,8 @@
 package com.axelor.web.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,10 +18,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import com.axelor.db.JPA;
+import com.axelor.db.Model;
+import com.axelor.db.mapper.Mapper;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
+import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.servlet.RequestScoped;
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.multipart.FormDataBodyPart;
+import com.sun.jersey.multipart.FormDataParam;
 
 @RequestScoped
 @Consumes(MediaType.APPLICATION_JSON)
@@ -120,6 +130,62 @@ public class RestService extends ResourceService {
 		request.setData(data);
 		
 		return getResource().getRecordName(request);
+	}
+
+	@POST
+	@Path("upload")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public Response upload(
+			@FormDataParam("request") FormDataBodyPart requestText,
+			@FormDataParam("field") String field,
+			@FormDataParam("file") InputStream fileStream,
+			@FormDataParam("file") FormDataContentDisposition fileDetails) throws IOException {
+
+		requestText.setMediaType(MediaType.APPLICATION_JSON_TYPE);
+
+		Request request = requestText.getEntityAs(Request.class);
+		request.setModel(getModel());
+
+		Map<String, Object> values = request.getData();
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		int read = 0;
+		byte[] bytes = new byte[1024];
+
+		while ((read = fileStream.read(bytes)) != -1) {
+			out.write(bytes, 0, read);
+		}
+
+		values.put(field, out.toByteArray());
+
+		return getResource().save(request);
+	}
+	
+	@GET
+	@Path("{id}/{field}/download")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	@SuppressWarnings("all")
+	public javax.ws.rs.core.Response download(
+			@PathParam("id") Long id,
+			@PathParam("field") String field) {
+		
+		Class klass = getResource().getModel();
+		Mapper mapper = Mapper.of(klass);
+		Model bean = JPA.find(klass, id);
+
+		Object data = mapper.get(bean, field);
+		Object name = mapper.getNameField().get(bean);
+
+		String fileName = name == null ? getModel() : name.toString();
+		fileName = fileName.replaceAll("\\s", "") + "_" + id;
+
+		fileName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fileName);
+		
+		if (data == null) {
+			return javax.ws.rs.core.Response.noContent().build();
+		}
+		return javax.ws.rs.core.Response.ok(data).header("Content-Disposition", "attachment; filename=" + fileName).build();
 	}
 
 	@POST
