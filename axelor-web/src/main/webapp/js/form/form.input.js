@@ -880,6 +880,66 @@ var ImageItem = {
 	'</div>'
 };
 
+var FileItem = {
+	css: 'file-item',
+	cellCss: 'form-item file-item',
+	require: '^ngModel',
+	scope: true,
+	link: function(scope, element, attrs, model) {
+		
+		var input = element.children('input:first').hide();
+		var frame = element.children("iframe").hide();
+
+		scope.doSelect = function() {
+			input.click();
+		};
+		
+		scope.doSave = function() {
+			var record = scope.record,
+				model = scope._model,
+				field = element.attr('x-field');
+			var url = "ws/rest/" + model + "/" + record.id + "/" + field + "/download";
+			frame.attr("src", url);
+			setTimeout(function(){
+				frame.attr("src", "");
+			},100);
+		};
+		
+		scope.doRemove = function() {
+			var record = scope.record;
+			input.val(null);
+			model.$setViewValue(null);
+			record.$upload = null;
+		};
+
+		input.change(function(e) {
+			var file = input.get(0).files[0];
+			var record = scope.record;
+			if (file) {
+				record.$upload = {
+					field: element.attr('x-field'),
+					file: file
+				};
+				setTimeout(function(){
+					model.$setViewValue(0); // mark form for save
+					scope.$apply();
+				});
+			}
+		});
+		
+	},
+	template:
+	'<div>' +
+		'<iframe></iframe>' +
+		'<input type="file">' +
+		'<div class="btn-group">' +
+			'<button ng-click="doSelect()" class="btn" type="button"><i class="icon-upload-alt"></i></button>' +
+			'<button ng-click="doSave()" class="btn" type="button"><i class="icon-download-alt"></i></button>' +
+			'<button ng-click="doRemove()" class="btn" type="button"><i class="icon-remove"></i></button>' +
+		'</div>' +
+	'</div>'
+};
+
 // register directives
 
 var directives = {
@@ -903,7 +963,8 @@ var directives = {
 	'uiTime'	: TimeItem,
 	'uiText'	: TextItem,
 	'uiPassword': PasswordItem,
-	'uiImage'	: ImageItem
+	'uiImage'	: ImageItem,
+	'uiBinary'	: FileItem
 };
 
 for(var name in directives) {
