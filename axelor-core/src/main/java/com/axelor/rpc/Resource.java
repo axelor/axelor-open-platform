@@ -631,7 +631,7 @@ public class Resource<T extends Model> {
 			if (value instanceof BigDecimal) {
 				BigDecimal decimal = (BigDecimal) value;
 				int scale = p.getScale();
-				if (scale != decimal.scale()) {
+				if (decimal.scale() == 0 && scale > 0 && scale != decimal.scale()) {
 					value = decimal.setScale(scale, RoundingMode.HALF_UP);
 				}
 			}
