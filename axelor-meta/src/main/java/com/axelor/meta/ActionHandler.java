@@ -249,6 +249,7 @@ public final class ActionHandler {
 			if (bean == null) {
 				return "";
 			}
+			expr = expr.replaceAll("\\?", "");
 			return getSelectTitle(bean.getClass(), expr, getValue(bean, expr));
 		}
 
@@ -310,7 +311,7 @@ public final class ActionHandler {
 		if (text == null || "".equals(text.trim())) {
 			return "";
 		}
-		text = text.replaceAll("\\$\\{\\s*(\\w+)\\.(.*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text($1, '$2')}");
+		text = text.replaceAll("\\$\\{\\s*(\\w+)(\\?)?\\.(.*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text($1, '$3')}");
 		text = text.replaceAll("\\$\\{\\s*(.*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text('$1')}");
 		text = text.replaceAll("\\$\\{\\s*(.*?)\\s*\\|\\s*e\\s*\\}", "\\${($1) ?: ''}");
 		
