@@ -14,12 +14,16 @@
     <field name="name" />
     <field name="code" />
     <field name="restricted"/>
-    <field name="permissions" colSpan="2">
+    <field name="permissions" colSpan="2" onChange="action-validate-group-permissions">
       <grid title="Permissions">
         <field name="name" />
         <field name="object" />
       </grid>
     </field>
   </form>
+  
+  <action-method name="action-validate-group-permissions">
+  	<call class="com.axelor.auth.web.AuthValidator" method="validateGroup"/>
+  </action-method>
 
 </object-views>
