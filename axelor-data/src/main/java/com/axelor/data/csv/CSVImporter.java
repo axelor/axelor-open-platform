@@ -83,6 +83,11 @@ public class CSVImporter implements Importer {
 		this.injector = injector;
 	}
 	
+	public CSVImporter(Injector injector, CSVConfig config){
+		this.config = config;
+		this.injector = injector;
+	}
+	
 	private List<File> getFiles(String... names) {
 		List<File> all = Lists.newArrayList();
 		for (String name : names)

@@ -58,9 +58,17 @@ public class CSVBinding {
 	public String getColumn() {
 		return column;
 	}
+	
+	public void setColumn(String column) {
+		this.column = column;
+	}
 
 	public String getField() {
 		return field;
+	}
+	
+	public void setField(String field) {
+		this.field = field;
 	}
 	
 	public String getType() {
@@ -77,6 +85,10 @@ public class CSVBinding {
 	
 	public String getExpression() {
 		return expression;
+	}
+	
+	public void setExpression(String expression) {
+		this.expression = expression;
 	}
 	
 	public String getCondition() {

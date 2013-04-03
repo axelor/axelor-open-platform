@@ -65,6 +65,10 @@ public class CSVInput {
 		return typeName;
 	}
 	
+	public void setTypeName(String typeName) {
+		this.typeName = typeName;
+	}
+	
 	public char getSeparator() {
 		
 		if (Strings.isNullOrEmpty(separator))
@@ -80,6 +84,10 @@ public class CSVInput {
 		return search;
 	}
 	
+	public void setSearch(String search) {
+		this.search = search;
+	}
+	
 	public boolean isUpdate() {
 		return update;
 	}
@@ -88,12 +96,20 @@ public class CSVInput {
 		return callable;
 	}
 	
+	public void setCallable(String callable) {
+		this.callable = callable;
+	}
+	
 	public String getPrepareContext() {
 		return prepareContext;
 	}
 
 	public List<CSVBinding> getBindings() {
 		return bindings;
+	}
+	
+	public void setBindings(List<CSVBinding> bindings) {
+		this.bindings = bindings;
 	}
 	
 	public List<DataAdapter> getAdapters() {

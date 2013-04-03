@@ -27,6 +27,14 @@ public class CSVConfig {
 	}
 	
 	/**
+	 * Set {@link #inputs} nodes
+	 * @param inputs
+	 */
+	public void setInputs(List<CSVInput> inputs) {
+		this.inputs = inputs;
+	}
+	
+	/**
 	 * Get all {@link #adapters} nodes.
 	 * If {@link #adapters} is null, return a new list of {@see DataAdapter}.
 	 * @return
