@@ -59,5 +59,14 @@
     <view type="grid" name="meta-action-menu-grid"/>
     <view type="form" name="meta-action-menu-form"/>
   </action-view>
+  
+  <menuitem name="menu-view-translations" parent="menu-view-management"
+    title="All Translations"
+    action="action-meta-translations"/>
+    
+  <action-view name="action-meta-translations" title="All Translations" model="com.axelor.meta.db.MetaTranslation">
+    <view type="grid" name="meta-translations-grid"/>
+    <view type="form" name="meta-translations-form"/>
+  </action-view>
 
 </object-views>

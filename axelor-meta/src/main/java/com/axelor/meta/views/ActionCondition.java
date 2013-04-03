@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.db.JPA;
 import com.axelor.meta.ActionHandler;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
@@ -62,11 +63,11 @@ public class ActionCondition extends Action {
 		public String getError() {
 			if (isEmpty(error)) {
 				if (isEmpty(super.getCondition())) {
-					return "Field is required.";
+					return JPA.translate("Field is required.");
 				}
-				return "Invalid field value.";
+				return JPA.translate("Invalid field value.");
 			}
-			return error;
+			return JPA.translate(error);
 		}
 		
 		private boolean isEmpty(String str) {

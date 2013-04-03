@@ -3,6 +3,7 @@ package com.axelor.meta.views;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.db.JPA;
 import com.axelor.meta.db.MetaMenu;
 
 @XmlType
@@ -62,7 +63,7 @@ public class MenuItem {
 	}
 
 	public String getTitle() {
-		return title;
+		return JPA.translate(title);
 	}
 
 	public void setTitle(String title) {

@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.db.JPA;
 import com.axelor.meta.db.MetaSelect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -153,7 +154,7 @@ public class Field extends SimpleWidget {
 		List<MetaSelect> items = MetaSelect.all().filter("self.key = ?", selection).fetch();
 		List<Object> all = Lists.newArrayList();
 		for(MetaSelect ms : items) {
-			all.add(ImmutableMap.of("value", ms.getValue(), "title", ms.getTitle()));
+			all.add(ImmutableMap.of("value", ms.getValue(), "title", JPA.translate(ms.getTitle())));
 		}
 		return all;
 	}
@@ -240,5 +241,10 @@ public class Field extends SimpleWidget {
 	
 	public void setSummaryView(String summaryView) {
 		this.summaryView = summaryView;
+	}
+	
+	protected String getTranslations() {
+		String translation = JPA.translate(super.getName(), super.getTranslationModel(), null);
+		return translation == null ? (super.getDefaultTitle() == null ? null : super.getDefaultTitle()) : translation;
 	}
 }

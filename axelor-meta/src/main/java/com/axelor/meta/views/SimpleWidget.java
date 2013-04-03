@@ -4,6 +4,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.db.JPA;
+
 @XmlType
 @XmlTransient
 public abstract class SimpleWidget extends AbstractWidget {
@@ -35,7 +37,15 @@ public abstract class SimpleWidget extends AbstractWidget {
 	}
 	
 	public String getTitle() {
+		return getTranslations();
+	}
+	
+	public String getDefaultTitle() {
 		return title;
+	}
+	
+	protected String getTranslations() {
+		return JPA.translate(title);
 	}
 
 	public void setTitle(String title) {
@@ -43,7 +53,7 @@ public abstract class SimpleWidget extends AbstractWidget {
 	}
 
 	public String getHelp() {
-		return help;
+		return JPA.translate(help);
 	}
 
 	public void setHelp(String help) {

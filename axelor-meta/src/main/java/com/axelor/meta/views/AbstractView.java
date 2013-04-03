@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.meta.db.MetaView;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -62,6 +63,14 @@ public abstract class AbstractView {
 	}
 	
 	public String getModel() {
+		if(model != null)
+			return model;
+		
+		MetaView view = MetaView.all().filter("self.name = ?1", name).fetchOne();
+		if(view != null && view.getModel() != null){
+			model = view.getModel();
+		}
+		
 		return model;
 	}
 	

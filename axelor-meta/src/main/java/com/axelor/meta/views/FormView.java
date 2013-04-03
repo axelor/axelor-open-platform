@@ -81,6 +81,9 @@ public class FormView extends AbstractView {
 	}
 	
 	public List<AbstractWidget> getItems() {
+		for (AbstractWidget abstractWidget : items) {
+			abstractWidget.setTranslationModel(super.getModel());
+		}
 		return items;
 	}
 	

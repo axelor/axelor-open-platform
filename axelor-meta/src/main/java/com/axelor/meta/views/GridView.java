@@ -51,6 +51,9 @@ public class GridView extends AbstractView {
 	}
 	
 	public List<Field> getItems() {
+		for (Field field : items) {
+			field.setTranslationModel(super.getModel());
+		}
 		return items;
 	}
 	

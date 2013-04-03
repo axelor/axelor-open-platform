@@ -40,7 +40,7 @@
 		<group title="Actions" cols="1">
 		   <button name="validate" title="Validate" onClick="action-view-validate"/>
 		   <button name="restore" title="Restore" onClick="action-meta-todo"/>
-		   <button name="restoreAll" title="Restore All..." onClick="action-meta-restore-all"
+		   <button name="restoreAll" title="Restore All" onClick="action-meta-restore-all"
 		       prompt="All the customizations will be lost. Are you sure?"/>
 		   <button name="preview" title="Preview" onClick="action-meta-todo"/>
 		</group>
@@ -190,5 +190,48 @@
     <action-method name="meta-field-method-open-model">
     	<call class="com.axelor.meta.web.MetaController" method="openModel"/>
     </action-method>
+    
+    <grid title="All Translations" name="meta-translations-grid" model="com.axelor.meta.db.MetaTranslation" editable="true">
+      <field name="key"/>
+      <field name="language"/>
+      <field name="translation"/>
+      <field name="domain"/>
+    </grid>
+    
+    <form title="Translation" name="meta-translations-form" model="com.axelor.meta.db.MetaTranslation" colWidths="*,250">
+      <group noLabel="true" cols="4">
+        <field name="key"/>
+        <field name="language"/>
+        <field name="translation"/>
+        <field name="domain"/>
+      </group>
+      <group title="Actions" cols="2" colSpan="1">
+        <button name="restoreAll" colSpan="2" title="Restore All" prompt="All the customizations will be lost. Are you sure?" onClick="action-meta-restore-translations"/>
+        <button name="export" colSpan="2" title="Export All" onClick="action-meta-export-group"/>
+        <field name="exportPath" title="Export path" hidden="true"/>
+      </group>
+    </form>
+    
+    <action-method name="action-meta-restore-translations">
+    	<call class="com.axelor.meta.web.MetaController" method="restoreTranslations"/>
+    </action-method>
+    
+    <action-group name="action-meta-export-group">
+	    <action if="!exportPath" name="action-meta-show-exportPath"/>
+	    <action if="!exportPath" name="action-meta-check-exportPath"/>
+	    <action if="exportPath" name="action-meta-export-translations"/>
+	</action-group>
+    
+    <action-attrs name="action-meta-show-exportPath">
+    	<attribute name="hidden" for="exportPath" expr="eval: false"/>
+    </action-attrs>
+    
+    <action-condition name="action-meta-check-exportPath">
+    	<check field="exportPath"/>
+    </action-condition>
+    
+    <action-method name="action-meta-export-translations">
+    	<call class="com.axelor.meta.web.MetaController" method="exportTranslations"/>
+    </action-method>   
     
 </object-views>

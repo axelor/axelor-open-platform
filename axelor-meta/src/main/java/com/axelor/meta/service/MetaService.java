@@ -1,7 +1,10 @@
 package com.axelor.meta.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
@@ -13,10 +16,13 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
+import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
 import com.axelor.meta.GroovyScriptHelper;
 import com.axelor.meta.MetaLoader;
 import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaMenu;
+import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.views.AbstractView;
 import com.axelor.meta.views.Action;
 import com.axelor.meta.views.ActionMenuItem;
@@ -24,13 +30,17 @@ import com.axelor.meta.views.MenuItem;
 import com.axelor.meta.views.Search;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 import com.google.inject.Inject;
 
 public class MetaService {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MetaService.class);
+	private String QUOTE = "\"";
+	private String COMMA = ",";
 	
 	@Inject
 	private MetaLoader loader;
@@ -239,5 +249,81 @@ public class MetaService {
 		response.setStatus(Response.STATUS_SUCCESS);
 
 		return response;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void exportTranslations(String path) throws IOException {
+		
+		Query query = JPA.em().createNativeQuery("SELECT distinct language from meta_translation");
+		
+		List<String> languageList = query.getResultList();
+		List<String> header = Lists.newArrayList();
+		String headerLine = createHeader(header);
+		path = path.endsWith("/") ? path : path.concat("/");
+		for (String language : languageList) {
+			File output = new File(path + language + ".csv");
+			String contents = createCSV(language, header, headerLine);
+			Files.createParentDirs(output);
+			Files.write(contents, output, Charsets.UTF_8);
+		}
+
+	}
+	
+	private String createCSV(String language, List<String> header, String headerLine){
+		
+		StringBuilder sb = new StringBuilder(headerLine);
+		
+		List<MetaTranslation> metaList = MetaTranslation.all().filter("self.language = ?1", language).fetch();
+		
+		for (MetaTranslation metaTranslation : metaList) {
+			
+			boolean first = true;
+			Map<String, Object> values = Mapper.toMap(metaTranslation);
+			
+			for (String column : header) {
+				String value = (String) values.get(column);
+				if(!first)
+					sb.append(COMMA);
+				
+				first = false;
+				
+				if(value != null) 
+					sb.append(QUOTE).append(value).append(QUOTE);
+				
+			}
+			
+			sb.append("\n");
+		}
+		
+		sb.replace(sb.length()-1, sb.length(), "");
+		return sb.toString();
+		
+	}
+	
+	private String createHeader(List<String> header){
+		
+		StringBuilder sb = new StringBuilder();
+		
+		//Ignore thoses fields for export
+		Pattern pattern = Pattern.compile("(id|selected|createdOn|createdBy|archived|updatedOn|version|updatedBy|language)", Pattern.CASE_INSENSITIVE);
+		boolean first = true;
+		
+		Mapper mapper = Mapper.of(MetaTranslation.class);
+		for (Property property : mapper.getProperties()) {
+			
+			if(pattern.matcher(property.getName()).matches()){
+				continue;
+			}
+			
+			if(!first)
+				sb.append(COMMA);
+			
+			first = false;
+			sb.append(QUOTE).append(property.getName()).append(QUOTE);
+			header.add(property.getName());
+			
+		}
+
+		return sb.toString();
 	}
 }

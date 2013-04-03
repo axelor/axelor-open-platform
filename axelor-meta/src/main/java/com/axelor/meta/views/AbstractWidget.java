@@ -34,11 +34,21 @@ public abstract class AbstractWidget {
 	@XmlAnyAttribute
 	private Map<QName, String> otherAttributes;
 	
+	private String translationModel;
+	
 	public Map<QName, String> getOtherAttributes() {
 		return otherAttributes;
 	}
 	
 	public void setOtherAttributes(Map<QName, String> otherAttributes) {
 		this.otherAttributes = otherAttributes;
+	}
+
+	public String getTranslationModel() {
+		return translationModel;
+	}
+
+	public void setTranslationModel(String translationModel) {
+		this.translationModel = translationModel;
 	}
 }

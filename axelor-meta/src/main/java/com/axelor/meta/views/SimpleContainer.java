@@ -47,6 +47,9 @@ public abstract class SimpleContainer extends AbstractContainer {
 	}
 	
 	public List<AbstractWidget> getItems() {
+		for (AbstractWidget abstractWidget : items) {
+			abstractWidget.setTranslationModel(super.getTranslationModel());
+		}
 		return items;
 	}
 	

@@ -3,6 +3,7 @@ package com.axelor.meta.views;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.db.JPA;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
@@ -16,7 +17,7 @@ public class Button extends SimpleWidget {
 	private String onClick;
 	
 	public String getPrompt() {
-		return prompt;
+		return JPA.translate(prompt);
 	}
 	
 	public void setPrompt(String prompt) {
