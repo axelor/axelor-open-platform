@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
+import com.axelor.db.Translations;
+import com.axelor.meta.service.MetaTranslations;
 import com.axelor.rpc.Response;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
@@ -51,6 +53,9 @@ public class AppServletModule extends JerseyServletModule {
 	@Override
 	protected void configureServlets() {
 		
+		// bind to provider for translation
+		bind(Translations.class).toProvider(MetaTranslations.class);
+		
 		// load application settings
 		bind(AppSettings.class).asEagerSingleton();
 		AppSettings settings = AppSettings.get();
@@ -70,6 +75,7 @@ public class AppServletModule extends JerseyServletModule {
 		install(new JpaModule(jpaUnit, true, false).properties(properties));
 
 		// register filters (order is important)
+		filter("*").through(TranslationsFilter.class);
 		filter("*").through(PersistFilter.class);
 		filter("*").through(GuiceShiroFilter.class);
 		

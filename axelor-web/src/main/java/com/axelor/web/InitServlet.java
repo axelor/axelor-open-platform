@@ -19,14 +19,16 @@ public class InitServlet extends HttpServlet {
 	
 	@Inject
 	private AppSettings settings;
+	
+	@Inject
+	private MetaLoader metaLoader;
 
 	@Override
 	public void init() throws ServletException {
 		LOG.info("Initializing...");
 		try {
-			MetaLoader loader = new MetaLoader();
 			String output = settings.get("temp.dir");
-			loader.load(output);
+			metaLoader.load(output);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

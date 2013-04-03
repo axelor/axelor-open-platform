@@ -1,6 +1,7 @@
 <%@ page language="java" session="true" %>
 <%@ page import="com.axelor.web.AppSettings" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page import="java.util.Locale "%>
 
 <%
 
@@ -17,10 +18,8 @@ String appTitle =  appName;
 if (appDesc != null)
 	appTitle = appName + " :: " + appDesc;
 
-String appLocale = settings.get("application.locale", null);
-String localeName = request.getParameter("locale");
-if (localeName == null || "".equals(localeName.trim()))
-	localeName = appLocale;
+String localeJS = AppSettings.getLocaleJS(request,getServletContext());
+String appJS = AppSettings.getAppJS(getServletContext());
 
 %>
 <!DOCTYPE html>
@@ -106,16 +105,10 @@ if (localeName == null || "".equals(localeName.trim()))
   <!-- JavaScript at the bottom for fast page loading -->
   <script src="js/lib/i18n.js"></script>
   <script src="js/i18n/en.js"></script>
-  <% if (localeName != null) { %>
-  <script src="js/i18n/<%= localeName %>.js"></script>
+  <% if (localeJS != null) { %>
+  <script src="js/i18n/<%= localeJS %>.js"></script>
   <% } %>
-  <%
-  String appJs = "js/application-all.min.js";
-  if ("dev".equals(settings.get("application.mode", "dev")) || null == getServletContext().getResource("/" + appJs)) {
-	  appJs = "js/application.js";
-  }
-  %>
-  <script src="<%= appJs %>"></script>
+  <script src="<%= appJS %>"></script>
   <!-- trigger adjustSize event on window resize -->  
   <script type="text/javascript">
   	$(function(){
