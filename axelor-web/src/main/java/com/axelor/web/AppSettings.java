@@ -1,10 +1,15 @@
 package com.axelor.web;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Locale;
 import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -16,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class AppSettings {
 
 	private Properties properties;
-
+	private static String DEFAULT_LANGUAGE = "en";
 	private static AppSettings INSTANCE;
 
 	@Inject
@@ -101,5 +106,56 @@ public class AppSettings {
 		} catch (Exception e) {
 		}
 		return "{}";
+	}
+	
+	private static String convertLanguage(Locale locale, boolean minimize){
+		StringBuilder format = new StringBuilder(locale.getLanguage().toLowerCase());
+		if(!minimize && locale.getCountry() != null)
+			format.append("_").append(locale.getCountry().toUpperCase());
+		return format.toString();
+	}
+	
+	public static String getLocaleJS(HttpServletRequest request, ServletContext context){
+		
+		//application.properties
+		String appLocale = AppSettings.get().get("application.locale", null);
+		
+		//Servlet Locale
+		Locale locale = request.getLocale();
+		if(locale == null ){
+			locale = new Locale(appLocale);
+		}
+		
+		String convertLanguage = convertLanguage(locale,false);
+		String minimizeLanguage = convertLanguage(locale,true);
+
+		if(checkResources(context, "/js/i18n/"+convertLanguage +".js")){
+			return convertLanguage;
+		}
+		else if(checkResources(context, "/js/i18n/"+minimizeLanguage +".js")){
+			return minimizeLanguage;
+		}
+		
+		return DEFAULT_LANGUAGE;
+
+	}
+	
+	private static boolean checkResources(ServletContext context, String resourcesPath){
+		try{
+			URL path = context.getResource(resourcesPath);
+			return path == null ? false : true;
+		} catch(MalformedURLException e){
+			return false;
+		}
+	}
+	
+	public static String getAppJS(ServletContext context) {
+		String appJs = "js/application-all.min.js";
+
+		if ("dev".equals(AppSettings.get().get("application.mode", "dev")) || checkResources(context, "/" + appJs) == false) {
+			appJs = "js/application.js";
+		}
+
+		return appJs;
 	}
 }
