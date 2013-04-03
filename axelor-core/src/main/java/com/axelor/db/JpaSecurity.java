@@ -11,11 +11,11 @@ public interface JpaSecurity {
 		READ	("You are not authorized to read this resource."),
 		WRITE	("You are not authorized to update this resource."),
 		CREATE	("You are not authorized to create this resource."),
-		REMOVE	("You are not authrorized to remove this resource.");
+		REMOVE	("You are not authorized to remove this resource.");
 
 		private String message;
 		private AccessType(String message) {
-			this.message = message;
+			this.message = JPA.translate(message);
 		}
 
 		@Override
