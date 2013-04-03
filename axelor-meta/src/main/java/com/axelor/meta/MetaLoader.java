@@ -37,8 +37,10 @@ import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaSelect;
+import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.service.MetaModelService;
+import com.axelor.meta.service.MetaTranslationsService;
 import com.axelor.meta.views.AbstractView;
 import com.axelor.meta.views.AbstractWidget;
 import com.axelor.meta.views.Action;
@@ -61,8 +63,12 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
+import com.google.inject.Inject;
 
 public class MetaLoader {
+	
+	@Inject
+	private MetaTranslationsService metaTranslationsService;
 
 	private static final String LOCAL_SCHEMA = "object-views_1.0.xsd";
 	private static final String REMOTE_SCHEMA = "object-views_0.9.xsd";
@@ -543,8 +549,25 @@ public class MetaLoader {
 		});
 	}
 	
+	/**
+	 * Load all Translations.
+	 * 
+	 */
+	public void loadTranslations() {
+
+		log.info("Load translations...");
+		try {
+			metaTranslationsService.process();
+		} catch (Exception e) {
+			log.error("Error loading translations.", e);
+		}
+	}
+	
 	public void load(String outputPath) {
 		loadModels();
+		if (MetaTranslation.all().count() == 0) {
+			loadTranslations();
+		}
 		if (MetaView.all().count() == 0) {
 			for(File file : findResources()) {
 				loadFile(file);

@@ -116,7 +116,8 @@ public class Search extends AbstractView {
 		}
 
 		public String getTitle() {
-			return title;
+			String translation = JPA.translate(name);
+			return translation == null ? (title == null ? null : title) : translation;
 		}
 
 		public void setTitle(String title) {
@@ -274,7 +275,7 @@ public class Search extends AbstractView {
 			if (title == null && model != null) {
 				title = model.substring(model.lastIndexOf('.')+1);
 			}
-			return title;
+			return JPA.translate(title);
 		}
 		
 		public String getOrderBy() {

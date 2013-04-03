@@ -7,6 +7,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
+import com.axelor.db.JPA;
+
 @XmlType
 public class Selection {
 	
@@ -50,7 +52,7 @@ public class Selection {
 		}
 
 		public String getTitle() {
-			return title;
+			return JPA.translate(title);
 		}
 
 		public void setTitle(String title) {

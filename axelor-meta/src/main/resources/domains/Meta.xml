@@ -63,5 +63,13 @@
     <string name="mappedBy" title="Mapped by" />
     <string name="description" title="Description" large="true" />
   </entity>
+  
+  <entity name="MetaTranslation" table="META_TRANSLATION" cachable="true">
+  	<string name="key" required="true"/>
+  	<string name="language" required="true"/>
+  	<string name="translation"/>
+  	<string name="domain"/>
+  	<unique-constraint columns="key,language,domain"/>
+  </entity>
 
 </domain-models>

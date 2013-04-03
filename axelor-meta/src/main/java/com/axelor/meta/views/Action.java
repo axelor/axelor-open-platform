@@ -317,7 +317,7 @@ public abstract class Action {
 		private List<Context> contexts;
 		
 		public String getTitle() {
-			return title;
+			return JPA.translate(title);
 		}
 		
 		public String getModel() {
@@ -432,7 +432,7 @@ public abstract class Action {
 		}
 		
 		public String getMessage() {
-			return message;
+			return JPA.translate(message);
 		}
 		
 		public void setMessage(String message) {

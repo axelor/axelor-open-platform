@@ -11,12 +11,15 @@ import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaField;
 import com.axelor.meta.db.MetaModel;
+import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
+import com.axelor.meta.service.MetaService;
 import com.axelor.meta.views.AbstractView;
 import com.axelor.meta.views.Action;
 import com.axelor.meta.views.ObjectViews;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -25,6 +28,9 @@ public class MetaController {
 
 	@Inject
 	private MetaLoader loader;
+	
+	@Inject
+	private MetaService service;
 	
 	private ObjectViews validateXML(String xml) {
 		ObjectViews views;
@@ -132,4 +138,47 @@ public class MetaController {
 		response.setView(view);
 		
    }
+	
+	public void restoreTranslations (ActionRequest request, ActionResponse response) {
+		
+		JPA.runInTransaction(new Runnable() {
+			
+			@Override
+			public void run() {
+				JPA.clear();
+				JPA.em().createNativeQuery("DELETE FROM meta_translation").executeUpdate();
+			}
+		});
+		
+		loader.loadTranslations();
+		
+		MetaTranslation view = MetaTranslation.all().fetchOne();
+		response.setValues(view);
+		
+	}
+	
+	public void exportTranslations (ActionRequest request, ActionResponse response) {
+		
+		String exportPath = (String) request.getContext().get("exportPath");
+		Map<String, String> data = Maps.newHashMap();
+		
+		try {
+			
+			if(Strings.isNullOrEmpty(exportPath)){
+				throw new Exception(JPA.translate("Please enter your export path fisrt."));
+			}
+			
+			service.exportTranslations(exportPath);
+			response.setFlash(JPA.translate("Export done."));
+			response.setHidden("exportPath", true);
+			data.put("exportPath", null);
+			response.setValues(data);
+			
+		}
+		catch(Exception e){
+			response.setFlash(e.getLocalizedMessage());
+		}
+		
+		
+	}
 }
