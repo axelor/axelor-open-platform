@@ -3,6 +3,7 @@ package com.axelor.meta;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.lang.MissingPropertyException;
+import groovy.xml.XmlUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -241,6 +242,13 @@ public final class ActionHandler {
 	
 	class FormatHelper {
 		
+		public Object escape(Object value) {
+			if (value == null) {
+				return "";
+			}
+			return XmlUtil.escapeXml(value.toString());
+		}
+		
 		public String text(String expr) {
 			return getSelectTitle(entity, expr, binding.getProperty(expr));
 		}
@@ -315,6 +323,9 @@ public final class ActionHandler {
 		text = text.replaceAll("\\$\\{\\s*(.*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text('$1')}");
 		text = text.replaceAll("\\$\\{\\s*(.*?)\\s*\\|\\s*e\\s*\\}", "\\${($1) ?: ''}");
 		
+		if (text.trim().startsWith("<?xml ")) {
+			text = text.replaceAll("\\$\\{(.*?)\\}", "\\${__fmt__.escape($1)}");
+		}
 		binding.setProperty("__fmt__", new FormatHelper());
 		return TemplateHelper.make(text, binding);
 	}
