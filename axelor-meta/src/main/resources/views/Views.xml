@@ -232,6 +232,20 @@
     
     <action-method name="action-meta-export-translations">
     	<call class="com.axelor.meta.web.MetaController" method="exportTranslations"/>
-    </action-method>   
+	</action-method>
+    
+    <grid title="Files" name="meta-files-grid" model="com.axelor.meta.db.MetaFile">
+      <field name="fileName"/>
+      <field name="size"/>
+      <field name="sizeText" />
+      <field name="mine"/>
+    </grid>
+    
+    <form title="Files" name="meta-files-form" model="com.axelor.meta.db.MetaFile">
+      <field name="content"/>
+  	  <field name="fileName"/>
+  	  <field name="size"/>
+  	  <field name="mine"/>
+    </form>
     
 </object-views>

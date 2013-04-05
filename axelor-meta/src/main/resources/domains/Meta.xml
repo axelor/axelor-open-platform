@@ -71,5 +71,31 @@
   	<string name="domain"/>
   	<unique-constraint columns="key,language,domain"/>
   </entity>
+  
+  <entity name="MetaFile" table="META_FILE">
+  	<binary name="content" title="File"/>
+  	<string name="fileName" required="true" namecolumn="true"/>
+  	<long name="size" title="Size in bytes" readonly="true"/>
+  	<string name="mine" title="File type"/>
+  	<string name="sizeText" title="Size" readonly="true">
+      <![CDATA[
+      	if(size >= 1024)
+      		return (size / 1024) + " Kb";
+      	else if(size > 1048576)
+      		return (size / 1048576) + " MB";
+      	else if(size > 1073741824)
+      		return (size / 1073741824) + " GB";
+      	return size + " Bytes";
+      ]]>
+  	</string>
+  	<unique-constraint columns="fileName"/>
+  </entity>
+  
+  <entity name="MetaAttachment" table="META_ATTACHMENT">
+  	<string name="objectName" required="true"/>
+  	<long name="objectId" required="true"/>
+  	<many-to-one name="metaFile" ref="MetaFile" title="File" required="true" column="meta_file"/>
+  	<unique-constraint columns="objectName,objectId,meta_file"/>
+  </entity>
 
 </domain-models>
