@@ -38,11 +38,18 @@ public class ElementConverter implements Converter {
 	public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
 		
 		if (Document.class.isAssignableFrom(context.getRequiredType())) {
+			String last = null;
 			while(reader.hasMoreChildren()) {
 				reader.moveDown();
 				Document node = (Document) context.convertAnother(reader, Element.class);
+				if (last != null && !last.equals(node.getFirstChild().getNodeName())) {
+					binder.finish();
+					last = node.getFirstChild().getNodeName();
+				}
+				if (last == null) {
+					last = node.getFirstChild().getNodeName();
+				}
 				reader.moveUp();
-				
 				binder.bind(node);
 			}
 			return null;

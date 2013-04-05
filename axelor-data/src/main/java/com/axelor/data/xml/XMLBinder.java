@@ -50,12 +50,17 @@ public abstract class XMLBinder {
 	protected abstract void handle(Object bean, XMLBind bind, Map<String, Object> context);
 	protected abstract void finish();
 	
+	private Class<?> lastClass = null;
+	
 	public void bind(Document element) {
-		
 		for(XMLBind binding : input.getBindings()) {
 			LOG.debug("binding: " + binding);
 			List<Node> nodes = this.find(element, binding, "/");
 			for(Node node : nodes) {
+				if (lastClass != binding.getType()) {
+					lastClass = binding.getType();
+					JPA.flush();
+				}
 				LOG.trace("element: <{} ...>", node.getNodeName());
 				Map<String, Object> map = this.toMap(node, binding);
 				Object bean = this.bind(binding, binding.getType(), map);
@@ -64,7 +69,6 @@ public abstract class XMLBinder {
 				LOG.trace("bean saved: {}", bean);
 			}
 		}
-		this.finish();
 	}
 	
 	@SuppressWarnings("unchecked")
