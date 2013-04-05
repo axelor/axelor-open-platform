@@ -29,6 +29,7 @@ _t.put({
 "Current changes will be lost. Do you really want to proceed?": "Les modifications en cours vont être perdues, voulez vous continuer ?",
 "Delete": "Supprimer",
 "Do you really want to delete the selected record(s)?": "Etes-vous sûr de vouloir désélectionner ce(s) enregistrement(s) ?",
+"Download": "Télécharger",
 "Edit": "Editer",
 "Error": "Erreur",
 "Failed!": "Echec",
@@ -66,5 +67,8 @@ _t.put({
 "Created By:": "Crée par:",
 "Updated On:": "Mise à jour le:",
 "Updated By:": "Mise à jour par:",
-"Update Log": "Modifications"
+"Update Log": "Modifications",
+"Upload": "Ajouter",
+"The record has been updated or delete by another action.": "L'enregistrement a été modifié ou supprimé par une autre action.",
+"Would you like to reload the current record ?": "Voulez-vous actualiser l'enregistrement actuel ?"
 });
