@@ -473,6 +473,79 @@ public class Resource<T extends Model> {
 
 		return response;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public Response getAttachment(long id){
+		Response response = new Response();
+		List<Object> data = Lists.newArrayList();
+		
+		javax.persistence.Query query = JPA.em().createQuery(
+				"SELECT meta FROM MetaFile meta " +
+				"WHERE meta.id IN (SELECT attch.metaFile FROM MetaAttachment attch WHERE attch.objectName = ?1 AND attch.objectId = ?2)");
+		query.setParameter(1, model.getName());
+		query.setParameter(2, id);
+		
+		data = query.getResultList();
+		response.setData(data);
+		response.setStatus(Response.STATUS_SUCCESS);
+		
+		return response;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Transactional
+	public Response addAttachment(long id, Request request) throws ClassNotFoundException{
+		Response response = new Response();
+		Map<String, Object> data = request.getData();
+		Map<String, Object> map = Maps.newHashMap();
+		
+		Class<Model> klassFile = (Class<Model>) Class.forName("com.axelor.meta.db.MetaFile");
+		Model fileBean = (Model) JPA.find(klassFile, Long.valueOf(data.get("id").toString()));
+				
+		map.put("metaFile", fileBean);
+		map.put("objectId", id);
+		map.put("objectName", model.getName());
+		
+		Class<?> klassAtt = Class.forName("com.axelor.meta.db.MetaAttachment");
+		Object attBean = Mapper.toBean(klassAtt, map);
+		JPA.manage( (Model) attBean);
+		
+		response.setData(attBean);
+		response.setStatus(Response.STATUS_SUCCESS);
+		
+		return response;
+	}
+	
+	public Response removeAttachment(final long id) {
+		Response response = new Response();
+		
+		JPA.runInTransaction(new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				//Delete file
+				javax.persistence.Query query = JPA.em().createQuery("SELECT meta FROM MetaFile meta WHERE meta.id = ?1");
+				query.setParameter(1, Long.valueOf(id));
+				Object file = query.getSingleResult();
+				
+				//Delete the attachments
+				javax.persistence.Query queryAtt = JPA.em().createQuery("DELETE FROM MetaAttachment attachment WHERE attachment.metaFile = ?1");
+				queryAtt.setParameter(1, file);
+				queryAtt.executeUpdate();
+				
+				//Delete the file
+				javax.persistence.Query queryFile = JPA.em().createQuery("DELETE FROM MetaFile file WHERE file.id = ?1");
+				queryFile.setParameter(1, id);
+				queryFile.executeUpdate();
+				
+			}
+		});
+
+		response.setStatus(Response.STATUS_SUCCESS);
+
+		return response;
+	}
 
 	/**
 	 * Convert the given model instance to {@link Map}.
