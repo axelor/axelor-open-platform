@@ -102,6 +102,10 @@ public final class JPA {
 	public static <T extends Model> T find(Class<T> klass, Long id) {
 		return em().find(klass, id);
 	}
+	
+	private static boolean isAutoFlushEnabled() {
+		return !Objects.equal("false", em().getEntityManagerFactory().getProperties().get("JPA.auto_flush"));
+	}
 
 	/**
 	 * Make an entity managed and persistent.
@@ -112,7 +116,9 @@ public final class JPA {
 		// optimistic concurrency check
 		checkVersion(entity, entity.getVersion());
 		em().persist(entity);
-		em().flush();
+		if (isAutoFlushEnabled()) {
+			em().flush();
+		}
 		return entity;
 	}
 
@@ -125,7 +131,9 @@ public final class JPA {
 		// optimistic concurrency check
 		checkVersion(entity, entity.getVersion());
 		T result = em().merge(entity);
-		em().flush();
+		if (isAutoFlushEnabled()) {
+			em().flush();
+		}
 		return result;
 	}
 
