@@ -1,13 +1,18 @@
 package com.axelor.db;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Properties;
-import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.PersistService;
 import com.google.inject.persist.jpa.JpaPersistModule;
@@ -75,6 +80,17 @@ public class JpaModule extends AbstractModule {
 		this.properties = properties;
 		return this;
 	}
+	
+	private boolean isCacheEnabled() {
+		try {
+			InputStream res = Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/persistence.xml");
+			String text = CharStreams.toString(new InputStreamReader(res, Charsets.UTF_8));
+			Pattern pat = Pattern.compile("<shared-cache-mode>\\s*(ENABLE_SELECTIVE|ALL)\\s*</shared-cache-mode>");
+			Matcher mat = pat.matcher(text);
+			return mat.find();
+		} catch (Exception e) {}
+		return false;
+	}
 
 	@Override
 	protected void configure() {
@@ -94,10 +110,12 @@ public class JpaModule extends AbstractModule {
 		properties.put("hibernate.max_fetch_depth", "3");
 		properties.put("jadira.usertype.autoRegisterUserTypes", "true");
 		
-		properties.put("hibernate.cache.use_second_level_cache", "true");
-		properties.put("hibernate.cache.use_query_cache", "true");
-		properties.put("hibernate.cache.region.factory_class", "org.hibernate.cache.ehcache.EhCacheRegionFactory");
-
+		if (isCacheEnabled()) {
+			properties.put("hibernate.cache.use_second_level_cache", "true");
+			properties.put("hibernate.cache.use_query_cache", "true");
+			properties.put("hibernate.cache.region.factory_class", "org.hibernate.cache.ehcache.EhCacheRegionFactory");
+		}
+		
 		install(new JpaPersistModule(jpaUnit).properties(properties));
 		if (this.autostart) {
 			bind(Initializer.class).asEagerSingleton();
