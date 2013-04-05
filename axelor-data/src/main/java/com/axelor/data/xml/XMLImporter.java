@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.FlushModeType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,8 +63,10 @@ import com.thoughtworks.xstream.mapper.MapperWrapper;
  */
 public class XMLImporter implements Importer {
 
-	private Logger LOG = LoggerFactory.getLogger(getClass());
+	private static final int DEFAULT_BATCH_SIZE = 20;
 
+	private Logger log = LoggerFactory.getLogger(getClass());
+	
 	private Injector injector;
 	
 	private File dataDir;
@@ -118,6 +121,15 @@ public class XMLImporter implements Importer {
 	public void clearListener() {
 		this.listeners.clear();
 	}
+	
+	private int getBatchSize() {
+		try {
+			Object val = JPA.em().getEntityManagerFactory().getProperties().get("hibernate.jdbc.batch_size");
+			return Integer.parseInt(val.toString());
+		} catch (Exception e) {
+		}
+		return DEFAULT_BATCH_SIZE;
+	}
 
 	@Override
 	public void run(Map<String, String[]> mappings) {
@@ -141,7 +153,7 @@ public class XMLImporter implements Importer {
 				try {
 					this.process(input, file);
 				} catch (Exception e) {
-					LOG.error("Error while importing {}.", file, e);
+					log.error("Error while importing {}.", file, e);
 				}
 			}
 		}
@@ -202,7 +214,7 @@ public class XMLImporter implements Importer {
 	 */
 	private void process(XMLInput input, File file) throws ImportException {
 		try {
-			LOG.info("Importing: {}", file.getName());
+			log.info("Importing: {}", file.getName());
 			this.process(input, new FileReader(file));
 		} catch (IOException e) {
 			throw new ImportException(e);
@@ -211,7 +223,9 @@ public class XMLImporter implements Importer {
 	
 	private void process(XMLInput input, Reader reader) throws ImportException {
 
-		XStream stream = new XStream(new StaxDriver()) {
+		final int batchSize = getBatchSize();
+
+		final XStream stream = new XStream(new StaxDriver()) {
 
 			private String root = null;
 
@@ -233,7 +247,7 @@ public class XMLImporter implements Importer {
 			}
 		};
 		
-		XMLBinder binder = new XMLBinder(input, context) {
+		final XMLBinder binder = new XMLBinder(input, context) {
 			
 			int count = 0;
 			int total = 0;
@@ -253,9 +267,9 @@ public class XMLImporter implements Importer {
 						}
 					}
 				} catch (Exception e) {
-					LOG.error("Unable to import object {}.", bean);
-					LOG.error("With binding {}.", binding);
-					LOG.error("With exception:", e);
+					log.error("Unable to import object {}.", bean);
+					log.error("With binding {}.", binding);
+					log.error("With exception:", e);
 					
 					// Recover the transaction
 					if (JPA.em().getTransaction().getRollbackOnly()) {
@@ -266,21 +280,19 @@ public class XMLImporter implements Importer {
 					}
 					
 					for(Listener listener : listeners) {
-						listener.handle((Model)bean, e);
+						listener.handle((Model) bean, e);
 					}
 				}
-
-				if (++total % 20 == 0) {
+				if (++total % batchSize == 0) {
 					JPA.flush();
-					JPA.em().clear();
+					JPA.clear();
 				}
-
 			}
 			
 			@Override
 			protected void finish() {
 				for(Listener listener : listeners) {
-					listener.imported(total,count);
+					listener.imported(total, count);
 				}
 			}
 		};
@@ -299,25 +311,20 @@ public class XMLImporter implements Importer {
 		stream.setMode(XStream.NO_REFERENCES);
 		stream.registerConverter(new ElementConverter(binder));
 		
+		JPA.em().setFlushMode(FlushModeType.COMMIT);
 		JPA.em().getTransaction().begin();
 
 		try {
-
 			stream.fromXML(reader);
-
+			binder.finish();
 			if (JPA.em().getTransaction().isActive()){
 				JPA.em().getTransaction().commit();
 				JPA.em().clear();
 			}
-
-
 		} catch (Exception e) {
-
 			if (JPA.em().getTransaction().isActive())
 				JPA.em().getTransaction().rollback();
 			throw new ImportException(e);
-
 		}
-
 	}
 }
