@@ -920,6 +920,12 @@ var FileItem = {
 					field: element.attr('x-field'),
 					file: file
 				};
+				//Update file and mine just in case of new record
+				if(!record.id && scope._model == 'com.axelor.meta.db.MetaFile'){
+					record.fileName = file.name;
+					record.mine = file.type;
+				}
+				record.size = file.size;
 				setTimeout(function(){
 					model.$setViewValue(0); // mark form for save
 					scope.$apply();

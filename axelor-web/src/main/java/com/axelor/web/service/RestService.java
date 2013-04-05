@@ -21,6 +21,7 @@ import javax.ws.rs.core.MediaType;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.google.common.base.CaseFormat;
@@ -173,19 +174,40 @@ public class RestService extends ResourceService {
 		Class klass = getResource().getModel();
 		Mapper mapper = Mapper.of(klass);
 		Model bean = JPA.find(klass, id);
-
+		Property prop = mapper.getNameField();
 		Object data = mapper.get(bean, field);
-		Object name = mapper.getNameField().get(bean);
-
-		String fileName = name == null ? getModel() : name.toString();
-		fileName = fileName.replaceAll("\\s", "") + "_" + id;
-
-		fileName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fileName);
+		String name = getModel() + "_" + field;
+		if(prop != null){
+			name = prop.get(bean) != null ? prop.get(bean).toString() : name;
+			if(!prop.getName().equals("fileName")){
+				name = name.replaceAll("\\s", "") + "_" + id;
+				name = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
+			}
+		}
 		
 		if (data == null) {
 			return javax.ws.rs.core.Response.noContent().build();
 		}
-		return javax.ws.rs.core.Response.ok(data).header("Content-Disposition", "attachment; filename=" + fileName).build();
+		return javax.ws.rs.core.Response.ok(data).header("Content-Disposition", "attachment; filename=" + name).build();
+	}
+	
+	@GET
+	@Path("{id}/attachment")
+	public Response attachment(@PathParam("id") long id){
+		return getResource().getAttachment(id);
+	}
+	
+	@GET
+	@Path("{id}/removeAttachment")
+	public Response removeAttachment(@PathParam("id") long id){
+		return getResource().removeAttachment(id);
+	}
+	
+	@POST
+	@Path("{id}/addAttachment")
+	public Response addAttachment(@PathParam("id") long id, Request request) throws ClassNotFoundException{
+		request.setModel(getModel());
+		return getResource().addAttachment(id,request);
 	}
 
 	@POST
