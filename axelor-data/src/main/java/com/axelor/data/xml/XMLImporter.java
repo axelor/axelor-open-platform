@@ -63,8 +63,6 @@ import com.thoughtworks.xstream.mapper.MapperWrapper;
  */
 public class XMLImporter implements Importer {
 
-	private static final int DEFAULT_BATCH_SIZE = 20;
-
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	private Injector injector;

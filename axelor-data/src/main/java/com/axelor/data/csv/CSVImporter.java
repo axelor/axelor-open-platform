@@ -90,6 +90,15 @@ public class CSVImporter implements Importer {
 		return all;
 	}
 	
+	private int getBatchSize() {
+		try {
+			Object val = JPA.em().getEntityManagerFactory().getProperties().get("hibernate.jdbc.batch_size");
+			return Integer.parseInt(val.toString());
+		} catch (Exception e) {
+		}
+		return DEFAULT_BATCH_SIZE;
+	}
+	
 	/**
 	 * Run the task from the configured readers
 	 * @param task
@@ -219,12 +228,14 @@ public class CSVImporter implements Importer {
 		
 		CSVBinder binder = new CSVBinder(beanClass, fields, csvInput);
 		String[] values = null;
+
 		int count = 0;
 		int total = 0;
+		int batchSize = getBatchSize();
 		
 		JPA.em().getTransaction().begin();
 		try {
-			
+
 			Map<String, Object> context = Maps.newHashMap();
 			
 			//Put global context
@@ -248,14 +259,13 @@ public class CSVImporter implements Importer {
 			//Process for each lines
 			while((values = csvReader.readNext()) != null) {
 				
-				if (isEmpty(values))
+				if (isEmpty(values)) {
 					continue;
-				
+				}
 				LOG.trace("Record {}", Arrays.asList(values));
 
 				Object bean = null;
 				try {
-					
 					Map<String, Object> ctx = Maps.newHashMap(context);
 					bean = binder.bind(values, ctx);
 					
@@ -287,14 +297,13 @@ public class CSVImporter implements Importer {
 					}
 					
 					for(Listener listener : listeners) {
-						listener.handle((Model)bean, e);
+						listener.handle((Model) bean, e);
 					}
-					
 				}
-				
-				if (++total % 20 == 0) {
+
+				if (++total % batchSize == 0) {
 					JPA.flush();
-					JPA.em().clear();
+					JPA.clear();
 				}
 			}
 			
@@ -302,25 +311,18 @@ public class CSVImporter implements Importer {
 				JPA.em().getTransaction().commit();
 				JPA.em().clear();
 			}
-			
 		} catch (Exception e) {
-			
-			if (JPA.em().getTransaction().isActive())
+			if (JPA.em().getTransaction().isActive()) {
 				JPA.em().getTransaction().rollback();
-			
+			}
 			LOG.error("Error while importing {}.", csvInput.getFileName());
 			LOG.error("Unable to import data.");
 			LOG.error("With following exception:", e);
-				
 		} finally {
-			
 			for(Listener listener : listeners) {
 				listener.imported(total,count);
 			}
 			csvReader.close();
-			
 		}
-		
-		
 	}
 }

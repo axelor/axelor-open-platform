@@ -13,6 +13,8 @@ import com.google.inject.ImplementedBy;
 @ImplementedBy(CSVImporter.class)
 public interface Importer {
 	
+	static final int DEFAULT_BATCH_SIZE = 20;
+	
 	public static DataAdapter[] defaultAdapters = {
 		new DataAdapter("LocalDate", JodaAdapter.class, "type", "LocalDate", "format", "dd/MM/yyyy"),
 		new DataAdapter("LocalTime", JodaAdapter.class, "type", "LocalTime", "format", "HH:mm"),

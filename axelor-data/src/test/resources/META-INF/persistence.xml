@@ -22,11 +22,12 @@
            value="create-drop" means the same as "create" but also drops tables when Hibernate closes; 
            value="validate" makes no changes to the database -->
       <property name="hibernate.hbm2ddl.auto" value="update" />
-      <property name="hibernate.ejb.naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy" />
-      <property name="hibernate.connection.charSet" value="UTF-8" />
-      <property name="hibernate.max_fetch_depth" value="3" />
-      <property name="hibernate.jdbc.batch_size" value="100"/>
-      <property name="hibernate.id.new_generator_mappings" value="true" />
+      <property name="hibernate.order_inserts" value="true" />
+      <property name="hibernate.order_updates" value="true" />
+      <property name="hibernate.jdbc.batch_size" value="50" />
+      <property name="hibernate.jdbc.fetch_size" value="50" />
+      <property name="hibernate.default_batch_fetch_size" value="50" />
+      <property name="JPA.auto_flush" value="false" />
     </properties>
   </persistence-unit>
 </persistence>
