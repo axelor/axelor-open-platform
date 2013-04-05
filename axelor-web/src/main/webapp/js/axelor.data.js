@@ -694,6 +694,62 @@
 				this.trigger('change', records, page);
 				
 				return accepted;
+			},
+			
+			attachment: function(id) {
+				var promise = this._request('attachment', id).get();
+				promise.success = function(fn){
+					promise.then(function(response){
+						var res = response.data,
+							records = res.data;
+						fn(records);
+					});
+					return promise;
+				};
+				promise.error = function(fn) {
+					promise.then(null, fn);
+					return promise;
+				};
+				return promise;
+			},
+			
+			addAttachment: function(objectId, metaFileId) {
+				var data = _.extend({}, {
+					id: metaFileId
+				});
+				var promise = this._request('addAttachment', objectId).post({
+					data: data
+				});
+				promise.success = function(fn){
+					promise.then(function(response){
+						var res = response.data,
+							records = res.data;
+						fn(records);
+					});
+					return promise;
+				};
+				promise.error = function(fn) {
+					promise.then(null, fn);
+					return promise;
+				};
+				return promise;
+			},
+			
+			removeAttachment: function(id) {
+				var promise = this._request('removeAttachment', id).get();
+				promise.success = function(fn){
+					promise.then(function(response){
+						var res = response.data,
+							records = res.data;
+						fn(records);
+					});
+					return promise;
+				};
+				promise.error = function(fn) {
+					promise.then(null, fn);
+					return promise;
+				};
+				return promise;
 			}
 		};
 		
