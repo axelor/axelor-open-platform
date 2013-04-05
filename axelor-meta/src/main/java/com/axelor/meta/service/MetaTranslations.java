@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import com.axelor.db.Translations;
 import com.axelor.meta.db.MetaTranslation;
+import com.google.common.base.Strings;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
@@ -13,21 +14,21 @@ public class MetaTranslations implements Translations, Provider<Translations> {
 	private static Locale DEFAULT_LANGUAGE = new Locale("en", "US");
 	public static ThreadLocal<Locale> language = new ThreadLocal<Locale>();
 	
-	private Locale getLanguage(){
+	private Locale getLanguage() {
 		return language.get() == null ? DEFAULT_LANGUAGE : language.get();
 	}
 	
-	private String getConvertLanguage(){
+	private String getConvertLanguage() {
 		StringBuilder format = new StringBuilder(getLanguageCode());
 		format.append("_").append(getLanguageCountryCode().toUpperCase());
 		return format.toString();
 	}
 	
-	private String getLanguageCountryCode(){
+	private String getLanguageCountryCode() {
 		return getLanguage().getLanguage().toUpperCase();
 	}
 	
-	private String getLanguageCode(){
+	private String getLanguageCode() {
 		return getLanguage().getLanguage().toLowerCase();
 	}
 
@@ -54,7 +55,7 @@ public class MetaTranslations implements Translations, Provider<Translations> {
 				"AND (self.domain IS NULL OR self.domain = ?4)",
 				key,getConvertLanguage(),getLanguageCode(),domain).order("-language").order("domain").fetchOne();
 		
-		if(translation != null && !"".equals(translation.getTranslation())){
+		if(translation != null && !Strings.isNullOrEmpty(translation.getTranslation())){
 			return translation.getTranslation();
 		}
 		else {
