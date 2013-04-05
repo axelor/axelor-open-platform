@@ -16,12 +16,13 @@ import org.apache.shiro.subject.Subject;
 
 import com.axelor.auth.db.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 
 @Singleton
 public class AppSettings {
 
 	private Properties properties;
-	private static String DEFAULT_LANGUAGE = "en";
+	private static Locale DEFAULT_LOCALE = new Locale("en");
 	private static AppSettings INSTANCE;
 
 	@Inject
@@ -108,13 +109,15 @@ public class AppSettings {
 		return "{}";
 	}
 	
-	private static String convertLanguage(Locale locale, boolean minimize){
-		StringBuilder format = new StringBuilder(locale.getLanguage().toLowerCase());
-		if(!minimize && locale.getCountry() != null)
-			format.append("_").append(locale.getCountry().toUpperCase());
-		return format.toString();
-	}
-	
+	/**
+	 * Return the preferred language.
+	 * Check if the locale JS file exist for the current language.
+	 * By default, return the english file.
+	 * 
+	 * @param request
+	 * @param context
+	 * @return language
+	 */
 	public static String getLocaleJS(HttpServletRequest request, ServletContext context){
 		
 		//application.properties
@@ -122,22 +125,48 @@ public class AppSettings {
 		
 		//Servlet Locale
 		Locale locale = request.getLocale();
-		if(locale == null ){
-			locale = new Locale(appLocale);
+		if(locale == null){
+			appLocale = appLocale.replaceAll("-", "_");
+			if(appLocale.contains("_")) locale = new Locale(appLocale.split("_")[0], appLocale.split("_")[1]);
+			else locale = new Locale(appLocale,"");
 		}
 		
-		String convertLanguage = convertLanguage(locale,false);
-		String minimizeLanguage = convertLanguage(locale,true);
+		String longLanguage = convertLanguage(locale,false);
+		String shortLanguage = convertLanguage(locale,true);
 
-		if(checkResources(context, "/js/i18n/"+convertLanguage +".js")){
-			return convertLanguage;
+		if(checkResources(context, "/js/i18n/"+longLanguage +".js")){
+			return longLanguage;
 		}
-		else if(checkResources(context, "/js/i18n/"+minimizeLanguage +".js")){
-			return minimizeLanguage;
+		else if(checkResources(context, "/js/i18n/"+shortLanguage +".js")){
+			return shortLanguage;
 		}
 		
-		return DEFAULT_LANGUAGE;
+		return DEFAULT_LOCALE.getLanguage();
 
+	}
+	
+	/**
+	 * Return the path of the JS file.
+	 * If dev is specified in application.mode or if the minify JS file doesn't exist then return the unminify js file.
+	 * 
+	 * @param context
+	 * @return path of the JS file
+	 */
+	public static String getAppJS(ServletContext context) {
+		String appJs = "js/application-all.min.js";
+
+		if ("dev".equals(AppSettings.get().get("application.mode", "dev")) || checkResources(context, "/" + appJs) == false) {
+			appJs = "js/application.js";
+		}
+
+		return appJs;
+	}
+	
+	private static String convertLanguage(Locale locale, boolean minimize){
+		StringBuilder format = new StringBuilder(locale.getLanguage().toLowerCase());
+		if(!minimize && !Strings.isNullOrEmpty(locale.getCountry()))
+			format.append("_").append(locale.getCountry().toUpperCase());
+		return format.toString();
 	}
 	
 	private static boolean checkResources(ServletContext context, String resourcesPath){
@@ -147,15 +176,5 @@ public class AppSettings {
 		} catch(MalformedURLException e){
 			return false;
 		}
-	}
-	
-	public static String getAppJS(ServletContext context) {
-		String appJs = "js/application-all.min.js";
-
-		if ("dev".equals(AppSettings.get().get("application.mode", "dev")) || checkResources(context, "/" + appJs) == false) {
-			appJs = "js/application.js";
-		}
-
-		return appJs;
 	}
 }
