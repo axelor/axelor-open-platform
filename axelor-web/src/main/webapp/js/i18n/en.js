@@ -12,6 +12,7 @@ _t.put({
 "Current changes will be lost. Do you really want to proceed?": "Current changes will be lost. Do you really want to proceed?",
 "Delete": "Delete",
 "Do you really want to delete the selected record(s)?": "Do you really want to delete the selected record(s)?",
+"Download": "Download",
 "Edit": "Edit",
 "Error": "Error",
 "Go": "Go",
@@ -47,5 +48,8 @@ _t.put({
 "Created By:": "Created By:",
 "Updated On:": "Updated On:",
 "Updated By:": "Updated By:",
-"Update Log": "Update Log"
+"Update Log": "Update Log",
+"Upload": "Upload",
+"The record has been updated or delete by another action.": "The record has been updated or delete by another action.",
+"Would you like to reload the current record ?": "Would you like to reload the current record ?"
 });
