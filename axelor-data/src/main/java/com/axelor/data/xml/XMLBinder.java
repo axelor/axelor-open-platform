@@ -4,17 +4,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.jxpath.JXPathContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
@@ -35,8 +30,6 @@ public abstract class XMLBinder {
 	private Map<String, Object> context;
 	
 	private Map<String, DataAdapter> adapters = Maps.newHashMap();
-
-	private XPath xpath = XPathFactory.newInstance().newXPath();
 
 	public XMLBinder(XMLInput input, Map<String, Object> context) {
 		this.input = input;
@@ -270,6 +263,7 @@ public abstract class XMLBinder {
 		return adapter.adapt(value, ctx);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private List<Node> find(Node node, XMLBind bind, String prefix) {
 		List<Node> nodes = Lists.newArrayList();
 		String name = bind.getNode();
@@ -288,13 +282,10 @@ public abstract class XMLBinder {
 
 		try {
 			LOG.trace("xpath: " + path);
-			XPathExpression expression = xpath.compile(path);
-			NodeList items = (NodeList) expression.evaluate(node, XPathConstants.NODESET);
-			LOG.trace("xpath match: " + items.getLength());
-			for (int i = 0; i < items.getLength(); i++) {
-				nodes.add(items.item(i));
-			}
-		} catch (XPathExpressionException e) {
+			JXPathContext context = JXPathContext.newContext(node);
+			nodes = context.selectNodes(path);
+			LOG.trace("xpath match: " + nodes.size());
+		} catch (Exception e) {
 			LOG.error("Invalid xpath expression: {}", path);
 		}
 		return nodes;
