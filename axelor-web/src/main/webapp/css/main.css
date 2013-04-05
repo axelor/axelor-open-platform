@@ -175,7 +175,7 @@ html, body {
 }
 
 .ui-dialog-buttonpane .btn-group > .btn {
-	margin: inherit;
+	margin: 0;
 }
 
 .ui-dialog-buttonpane .record-pager {
