@@ -8,6 +8,8 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.db.JPA;
+import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaSelect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -172,6 +174,11 @@ public class Field extends SimpleWidget {
 	}
 	
 	public List<AbstractView> getViews() {
+		if(views != null) {
+			for (AbstractView abstractView : views) {
+				abstractView.setModel(this.getTarget());
+			}
+		}
 		return views;
 	}
 
@@ -245,6 +252,18 @@ public class Field extends SimpleWidget {
 	
 	protected String getTranslations() {
 		String translation = JPA.translate(super.getName(), super.getTranslationModel(), null);
-		return translation == null ? (super.getDefaultTitle() == null ? null : super.getDefaultTitle()) : translation;
+		return JPA.translate(super.getDefaultTitle(), translation);
+	}
+	
+	private String getTarget() {
+		Mapper mapper = null;
+		try {
+			mapper = Mapper.of(Class.forName((super.getTranslationModel())));
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+		Property prop = mapper.getProperty(getName());
+		return prop.getTarget().getName();
 	}
 }
