@@ -80,7 +80,7 @@
   	<string name="sizeText" title="Size" readonly="true">
       <![CDATA[
       	if(size >= 1024)
-      		return (size / 1024) + " Kb";
+      		return (size / 1024) + " KB";
       	else if(size > 1048576)
       		return (size / 1048576) + " MB";
       	else if(size > 1073741824)

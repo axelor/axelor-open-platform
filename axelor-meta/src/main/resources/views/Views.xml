@@ -236,9 +236,8 @@
     
     <grid title="Files" name="meta-files-grid" model="com.axelor.meta.db.MetaFile">
       <field name="fileName"/>
-      <field name="size"/>
-      <field name="sizeText" />
-      <field name="mine"/>
+      <field name="sizeText" width="150"/>
+      <field name="mine" width="250"/>
     </grid>
     
     <form title="Files" name="meta-files-form" model="com.axelor.meta.db.MetaFile">
