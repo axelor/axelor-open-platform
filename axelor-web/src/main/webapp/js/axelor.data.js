@@ -8,7 +8,7 @@
 
 	var ds = angular.module('axelor.ds');
 
-	ds.factory('DataSource', ['$rootScope', '$http', '$q', '$exceptionHandler', function($rootScope, $http, $q, $exceptionHandler) {
+	ds.factory('DataSource', ['$injector', '$rootScope', '$http', '$q', '$exceptionHandler', function($injector, $rootScope, $http, $q, $exceptionHandler) {
 
 		function DataSource(model, options) {
 			
@@ -309,6 +309,9 @@
 					page = this._page,
 					deferred = $q.defer(),
 					promise = deferred.promise;
+				
+				var indicator = $injector.get('httpIndicator');
+				promise = indicator(promise);
 
 				var xhr = new XMLHttpRequest();
 				var data = new FormData();
@@ -319,18 +322,21 @@
 					return promise;
 				};
 				promise.success = function(fn) {
-					return promise.then(function(response) {
-						var res = response,
+					promise.then(function(response) {
+						var res = response.data,
 							record;
 
-						res.data = response.data[0];
+						res.data = res.data[0];
 						record = that._accept(res);
 
 						fn(record, page);
 					});
+					return promise;
 				};
 				promise.error = function(fn) {
-					promise.then(null, fn);
+					promise.then(null, function(response){
+						fn(response.data);
+					});
 					return promise;
 				};
 				
@@ -348,8 +354,17 @@
 				}, false);
 				
 				xhr.onreadystatechange = function(e) {
+					if (xhr.readyState == 1) {
+						_.each($http.defaults.transformRequest, function(tr) {
+							tr(data);
+						});
+					}
 					if (xhr.readyState == 4) {
-						var response = angular.fromJson(xhr.responseText);
+						var data = angular.fromJson(xhr.responseText);
+						var response = {
+							data: data,
+							status: xhr.status
+						};
 						if (xhr.status == 200) {
 							deferred.resolve(response);
 						} else {
