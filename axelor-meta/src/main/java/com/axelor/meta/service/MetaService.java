@@ -16,11 +16,14 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
+import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.GroovyScriptHelper;
 import com.axelor.meta.MetaLoader;
 import com.axelor.meta.db.MetaActionMenu;
+import com.axelor.meta.db.MetaAttachment;
+import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.views.AbstractView;
@@ -33,8 +36,10 @@ import com.axelor.rpc.Response;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
+import com.google.inject.persist.Transactional;
 
 public class MetaService {
 	
@@ -248,6 +253,77 @@ public class MetaService {
 		response.setData(data);
 		response.setStatus(Response.STATUS_SUCCESS);
 
+		return response;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Response getAttachment(long id, String model){
+		Response response = new Response();
+		List<MetaFile> data = Lists.newArrayList();
+		
+		javax.persistence.Query query = JPA.em().createQuery(
+				"SELECT new map(meta.id as id, meta.version as version, meta.sizeText as sizeText, meta.fileName as fileName) FROM MetaFile meta " +
+				"WHERE meta.id IN (SELECT attch.metaFile FROM MetaAttachment attch WHERE attch.objectName = ?1 AND attch.objectId = ?2)");
+		query.setParameter(1, model);
+		query.setParameter(2, id);
+		
+		data = query.getResultList();
+		response.setData(data);
+		response.setStatus(Response.STATUS_SUCCESS);
+		
+		return response;
+	}
+	
+	@Transactional
+	public Response removeAttachment(Request request) {
+		Response response = new Response();
+		List<Object> result = Lists.newArrayList();
+		List<Object> records = request.getRecords();
+		
+		if (records == null || records.isEmpty()) {
+			response.setException(new IllegalArgumentException("No records provides."));
+			return response;
+		}
+		
+		for(Object record : records) {
+			@SuppressWarnings("all")
+			Long fileId = Long.valueOf(((Map) record).get("id").toString());
+			
+			if (fileId != null) {
+				com.axelor.db.Query<MetaAttachment> removedAtt = com.axelor.db.Query.of(MetaAttachment.class);
+				removedAtt.filter("self.metaFile.id = ?1", fileId).delete();
+				
+				com.axelor.db.Query<MetaFile> removedFile = com.axelor.db.Query.of(MetaFile.class);
+				removedFile.filter("self.id = ?", fileId).delete();
+				
+				result.add(record);
+			}
+		}
+
+		response.setData(result);
+		response.setStatus(Response.STATUS_SUCCESS);
+
+		return response;
+	}
+	
+	@Transactional
+	public Response addAttachment(long id, Request request) {
+		Response response = new Response();
+		Map<String, Object> data = request.getData();
+		Map<String, Object> map = Maps.newHashMap();
+		
+		Model fileBean = (Model) JPA.find(MetaFile.class, Long.valueOf(data.get("id").toString()));
+				
+		map.put("metaFile", fileBean);
+		map.put("objectId", id);
+		map.put("objectName", request.getModel());
+		
+		Object attBean = Mapper.toBean(MetaAttachment.class, map);
+		JPA.manage( (Model) attBean);
+		
+		response.setData(attBean);
+		response.setStatus(Response.STATUS_SUCCESS);
+		
 		return response;
 	}
 	
