@@ -51,5 +51,6 @@ _t.put({
 "Update Log": "Update Log",
 "Upload": "Upload",
 "The record has been updated or delete by another action.": "The record has been updated or delete by another action.",
-"Would you like to reload the current record ?": "Would you like to reload the current record ?"
+"Would you like to reload the current record ?": "Would you like to reload the current record ?",
+"You are not allow to upload a file bigger than": "You are not allow to upload a file bigger than"
 });
