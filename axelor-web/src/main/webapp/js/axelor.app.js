@@ -141,7 +141,7 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 				onHttpStop();
 				if (response.data && response.data.status === -1) {
 					$rootScope.$broadcast('event:http-error', response.data);
-					return $q.reject(response.data.message || response.data.string);
+					return $q.reject(response);
 				}
 				return response;
 			}, function(error) {
