@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -22,6 +23,7 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.google.common.base.CaseFormat;
@@ -36,6 +38,9 @@ import com.sun.jersey.multipart.FormDataParam;
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/rest/{model}")
 public class RestService extends ResourceService {
+	
+	@Inject
+	private MetaService service;
 	
 	@GET
 	public Response find(
@@ -194,20 +199,21 @@ public class RestService extends ResourceService {
 	@GET
 	@Path("{id}/attachment")
 	public Response attachment(@PathParam("id") long id){
-		return getResource().getAttachment(id);
+		return service.getAttachment(id, getModel());
 	}
 	
-	@GET
-	@Path("{id}/removeAttachment")
-	public Response removeAttachment(@PathParam("id") long id){
-		return getResource().removeAttachment(id);
+	@POST
+	@Path("removeAttachment")
+	public Response removeAttachment(Request request) {
+		request.setModel(getModel());
+		return service.removeAttachment(request);
 	}
 	
 	@POST
 	@Path("{id}/addAttachment")
-	public Response addAttachment(@PathParam("id") long id, Request request) throws ClassNotFoundException{
+	public Response addAttachment(@PathParam("id") long id, Request request) {
 		request.setModel(getModel());
-		return getResource().addAttachment(id,request);
+		return service.addAttachment(id, request);
 	}
 
 	@POST
