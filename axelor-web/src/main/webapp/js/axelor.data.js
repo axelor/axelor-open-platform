@@ -750,8 +750,15 @@
 				return promise;
 			},
 			
-			removeAttachment: function(id) {
-				var promise = this._request('removeAttachment', id).get();
+			removeAttachment: function(selection) {
+				selection = _.map(selection, function(record){
+					return { "id" : record.id, "version": record.version };
+				});
+				
+				var promise = this._request('removeAttachment').post({
+					records: selection
+				});
+
 				promise.success = function(fn){
 					promise.then(function(response){
 						var res = response.data,

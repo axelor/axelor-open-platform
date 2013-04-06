@@ -166,8 +166,9 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 	var origOnShow = $scope.onShow,
 		origShow = $scope.show,
 		input = $element.children('input:first').hide(),
-		frame = $element.children("iframe").hide();
-	
+		progress = $element.find('.progress').hide();
+		maxUploadSize = $scope.$eval('app.fileMaxSize');
+		
 	function getSelected(){
 		var dataView = $scope.dataView;
 		return selected = _.map($scope.selection, function(index) {
@@ -183,7 +184,7 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 	};
 	
 	$scope.filter = function(searchFilter) {
-		return objectDS.attachment($scope.record.id).success(function(records){
+		return objectDS.attachment($scope.record.id).success(function(records) {
 			if(records) {
 				$scope.setItems(records);
 			}
@@ -195,7 +196,7 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 	};
 
 	$scope.onShow = function(viewPromise) {
-		viewPromise.then(function(){
+		viewPromise.then(function() {
 			$element.dialog('open');
 			initialized = true;
 			origOnShow(viewPromise);
@@ -204,10 +205,6 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 	
 	$scope.onItemClick = function(e, args) {
 		
-	};
-	
-	$scope.onOK = function() {
-		$element.dialog('close');
 	};
 	
 	$scope.canDelete = function() {
@@ -239,25 +236,12 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 				_t("Do you really want to delete the selected record(s)?"),
 		function(confirmed){
 			if (confirmed) {
-				_.each(selected, function(select){
-				    if(select.id){
-    					var newDS = DataSource.create($scope._model);
-    					newDS.removeAttachment(select.id).success(function(records){
-    						$scope.updateItems(select.id, true);
-    					});
-					}
+				var newDS = DataSource.create($scope._model);
+				newDS.removeAttachment(selected).success(function(records){
+					$scope.updateItems(records, true);
 				});
 			}
-			else {
-				$scope.canDownload();
-				$scope.canDelete();
-			}
 		});
-		
-		setTimeout(function(){
-	        $scope.canDownload();
-		    $scope.canDelete();
-	    });
 	};
 	
 	$scope.onDownload = function() {
@@ -269,10 +253,7 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 		}
 
 		var url = "ws/rest/com.axelor.meta.db.MetaFile/" + select.id + "/content/download";
-		frame.attr("src", url);
-		setTimeout(function(){
-			frame.attr("src", "");
-		},100);
+		window.open(url);
 	};
 	
 	$scope.onUpload = function() {
@@ -283,6 +264,11 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 		var file = input.get(0).files[0];
 		
 		if (file) {
+			
+			if(file.size > 1048576 * parseInt(maxUploadSize)) {
+				axelor.dialogs.say(_t("You are not allow to upload a file bigger than") + ' ' + maxUploadSize + 'MB');
+				return ;
+			}
 		    
 		    var record = {
 				fileName: file.name,
@@ -297,45 +283,77 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 			    file: file
 		    };
 			
+		    setTimeout(function() {
+		    	progress.show();
+		    });
+		    
 		    var newDS = DataSource.create($scope._model);
-		    newDS.save(record).success(function(file){
-				if(file.id){
-					objectDS.addAttachment($scope.record.id, file.id).success(function(record){
+		    newDS.save(record).progress(function(fn) {
+		    	if(fn > 95)
+		    	{
+		    		$scope.updateProgress(95);
+		    	}
+		    	else
+		    	{
+		    		$scope.updateProgress(fn);
+		    	}
+		    }).success(function(file) {
+		    	$scope.updateProgress(100);
+		    	if(file && file.id) {
+		    		objectDS.addAttachment($scope.record.id, file.id)
+					.success(function(record) {
+					    progress.hide();
+					    $scope.updateProgress(0);
 						$scope.updateItems(file, false);
+					}).error(function() {
+						progress.hide();
+						$scope.updateProgress(0);
 					});
 				}
+			}).error(function() {
+				progress.hide();
+				$scope.updateProgress(0);
 			});
 		};
 	});
 	
+	$scope.updateProgress = function(value) {
+		progress.children('.bar').css('width',value + '%');
+	    progress.children('.bar').text(value + '%');
+	};
+	
 	$scope.updateItems = function(value, removed) {
-		var target = value,
+		var items = value,
 			records;
 		
 		if (!_.isArray(value)) {
 			items = [value];
 		}
 
-		records = _.map($scope.dataView.getItems(), function(item){
+		records = _.map($scope.dataView.getItems(), function(item) {
 			return _.clone(item);
 		});
+		
+		_.each(items, function(item) {
+			item = _.clone(item);
+			var find = _.find(records, function(rec) {
+				return rec.id && rec.id == item.id;
+			});
+			
 
-		var find = _.find(records, function(rec){
-			return rec.id && rec.id == target;
+			if (find && !removed) {
+				_.extend(find, item);
+			}
+			else if(!removed) {
+				records.push(item);
+			}
+			else {
+				var index = records.indexOf(find);
+				records.splice(index, 1);
+			}
 		});
 		
-		if (find && !removed){
-			_.extend(find, target);
-		}
-		else if(!removed){
-			records.push(target);
-		}
-		else{
-			var index = records.indexOf(find);
-			records.splice(index, 1);
-		}
-		
-		_.each(records, function(rec){
+		_.each(records, function(rec) {
 			if (rec.id <= 0) rec.id = null;
 		});
 		
@@ -514,7 +532,7 @@ angular.module('axelor.ui').directive('uiAttachmentPopup', function(){
 			};
 			
 			scope.$watch('schema.title', function(title){
-				element.closest('.ui-dialog').find('.ui-dialog-title').text('Attachments');
+				element.closest('.ui-dialog').find('.ui-dialog-title').text(title);
 			});
 			
 			setTimeout(function(){
@@ -526,21 +544,21 @@ angular.module('axelor.ui').directive('uiAttachmentPopup', function(){
 		},
 		replace: true,
 		template:
-		'<div ui-dialog x-on-open="onOpen" x-on-ok="onOK">'+
+		'<div ui-dialog x-on-open="onOpen" x-on-ok="false">'+
+			'<input type="file">' +
 			'<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-editable="false" x-selector="true" x-no-filter="true"></div>'+
 		    '<div class="record-pager pull-left">'+
-			    '<div class="btn-group">'+
-			      '<button class="btn" ng-disabled="!canPrev()" ng-click="onPrev()"><i class="icon-chevron-left"></i></button>'+
-			      '<button class="btn" ng-disabled="!canNext()" ng-click="onNext()"><i class="icon-chevron-right"></i></button>'+
-			     '</div>'+
 			     '<div class="btn-group">'+
 			     	'<button class="btn btn-info" ng-disabled="!canUpload()" ng-click="onUpload()"><i class="icon-upload"><span x-translate>Upload</span></i></button>'+
 		     		'<button class="btn btn-success" ng-disabled="!canDownload()" ng-click="onDownload()"><i class="icon-download"><span x-translate>Download</span></i></button>'+
 	     			'<button class="btn btn-danger" ng-disabled="!canDelete()" ng-click="onDelete()"><i class="icon-trash"><span x-translate>Remove</span></i></button>'+
 			    '</div>'+
+			    '<div class="btn-group">'+
+				    '<div class="progress progress-striped active" style="width: 300px; background: gainsboro; margin-top: 5px; margin-bottom: 0px;">'+
+	            		'<div class="bar" style="width: 0%;"></div>'+
+	        		'</div>'+
+        		'</div>'+
 		    '</div>'+
-		    '<iframe></iframe>' +
-			'<input type="file">' +
 		'</div>'
 	};
 });
