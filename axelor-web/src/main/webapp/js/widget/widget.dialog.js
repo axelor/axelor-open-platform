@@ -8,32 +8,38 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 			var onOpen = scope.$eval(attrs.onOpen);
 			var onClose = scope.$eval(attrs.onClose);
 			var onOK = scope.$eval(attrs.onOk);
+			var buttons = [];
+			
+			if(_.isUndefined(onClose) || _.isFunction(onClose)){
+				buttons.push({
+			    	text: _t('Close'),
+			    	'class': 'btn',
+			    	click: function() {
+			    		element.dialog('close');
+			    	}
+			    });
+			}
+			
+			if(_.isEmpty(buttons) || _.isUndefined(onOK) || _.isFunction(onOK)){
+				buttons.push({
+			    	text: _t('OK'),
+			    	'class': 'btn btn-primary',
+			    	click: function() {
+			    		if (onOK) {
+			    			onOK();
+			    		}
+			    		else
+			    			element.dialog('close');
+			    	}
+			    });
+			}
 			
 			var dialog = element.dialog({
 				autoOpen: false,
 				closeOnEscape: true,
 				modal: true,
 				zIndex: 1100,
-				buttons: [
-				    {
-				    	text: _t('Close'),
-				    	'class': 'btn',
-				    	click: function() {
-				    		element.dialog('close');
-				    	}
-				    },
-				    {
-				    	text: _t('OK'),
-				    	'class': 'btn btn-primary',
-				    	click: function() {
-				    		if (onOK) {
-				    			onOK();
-				    		}
-				    		else
-				    			element.dialog('close');
-				    	}
-				    }
-				]
+				buttons: buttons
 			});
 			
 			// maintain overlay opacity
