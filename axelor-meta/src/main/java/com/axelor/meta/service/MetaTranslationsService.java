@@ -30,11 +30,12 @@ public class MetaTranslationsService {
 	
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
-	private final String CSV_INPUT_FILE_NAME =  "[file.name]";
-	private final String CSV_INPUT_TYPE_NAME =  "com.axelor.meta.db.MetaTranslation";
-	private final String LANGUAGE_FIELD =  "language";
-	private final String CURRENT_LANGUAGE =  "current_language";
-	private final String CALLABLE = "com.axelor.meta.ImportTranslations:loadTranslation";
+	private static final String CSV_INPUT_FILE_NAME =  "[file.name]";
+	private static final String CSV_INPUT_TYPE_NAME =  "com.axelor.meta.db.MetaTranslation";
+	private static final String LANGUAGE_FIELD =  "language";
+	private static final String CURRENT_LANGUAGE =  "current_language";
+	private static final String CALLABLE = "com.axelor.meta.ImportTranslations:loadTranslation";
+	private static final String PATH_I18N = "i18n";
 	
 	@Inject
 	Injector injector;
@@ -101,7 +102,7 @@ public class MetaTranslationsService {
 	private List<File> filterFiles(List<File> files, boolean matched){
 		
 		List<File> lists = Lists.newArrayList();
-		Pattern pattern = Pattern.compile("/WEB-INF/classes/translations/");
+		Pattern pattern = Pattern.compile("/WEB-INF/classes/"+PATH_I18N+"/");
 		
 		for (File file : files) {
 			Matcher matcher = pattern.matcher(file.getFullPath());
@@ -133,7 +134,7 @@ public class MetaTranslationsService {
 		
 		@Override
 		public boolean acceptsInput(String file) {
-			return file.startsWith("translations.") && file.endsWith(".csv");
+			return file.startsWith(PATH_I18N+".") && file.endsWith(".csv");
 		}
 		
 		@Override
