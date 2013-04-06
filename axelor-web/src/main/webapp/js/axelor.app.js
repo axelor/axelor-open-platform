@@ -179,7 +179,8 @@ function AppCtrl($rootScope, $scope, $http, $route, authService) {
 			mode: settings['application.mode'],
 			user: settings['user.name'],
 			help: settings['help.location'],
-			sdk: settings['sdk.version']
+			sdk: settings['sdk.version'],
+			fileMaxSize: settings['file.max.size']
 		};
 	}
 
