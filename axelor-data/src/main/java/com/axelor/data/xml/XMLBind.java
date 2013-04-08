@@ -1,17 +1,11 @@
 package com.axelor.data.xml;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-import groovy.lang.MissingPropertyException;
-import groovy.lang.Script;
-
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.groovy.control.CompilerConfiguration;
-
+import com.axelor.data.ScriptHelper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.google.inject.Injector;
@@ -162,43 +156,13 @@ public class XMLBind {
 		return object;
 	}
 
-	private Script scriptIf;
-	private Script scriptEval;
-
-	private Script newScript(final String expr) {
-
-		CompilerConfiguration config = new CompilerConfiguration();
-		config.getOptimizationOptions().put("indy", true);
-		config.getOptimizationOptions().put("int", false);
-
-		GroovyShell shell = new GroovyShell();
-		return shell.parse(expr);
-	}
-	
-	private Object eval(Script script, Map<String, Object> context) {
-		
-		script.setBinding(new Binding(context) {
-			
-			@Override
-			public Object getVariable(String name) {
-				try {
-					return super.getVariable(name);
-				} catch (MissingPropertyException e){
-					return null;
-				}
-			}
-		});
-		return script.run();
-	}
+	private static ScriptHelper helper = new ScriptHelper(100, 10, false);
 	
 	public Object eval(Map<String, Object> context) {
 		if (Strings.isNullOrEmpty(expression)) {
 			return context.get(this.getAliasOrName());
 		}
-		if (scriptEval == null) {
-			scriptEval = newScript(expression);
-		}
-		return eval(scriptEval, context);
+		return helper.eval(expression, context);
 	}
 	
 	public boolean validate(Map<String, Object> context) {
@@ -206,10 +170,7 @@ public class XMLBind {
 			return true;
 		}
 		String expr = condition + " ? true : false";
-		if (scriptIf == null) {
-			scriptIf = newScript(expr);
-		}
-		return (Boolean) eval(scriptIf, context);
+		return (Boolean) helper.eval(expr, context);
 	}
 
 	@Override
