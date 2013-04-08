@@ -1,8 +1,6 @@
 package com.axelor.meta;
 
 import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-import groovy.lang.MissingPropertyException;
 import groovy.xml.XmlUtil;
 
 import java.io.File;
@@ -18,11 +16,6 @@ import javax.persistence.Query;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.codehaus.groovy.control.CompilerConfiguration;
-import org.codehaus.groovy.runtime.InvokerHelper;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,10 +57,10 @@ public final class ActionHandler {
 	
 	private Context context;
 	
-	private GroovyShell shell;
-	
 	private Binding binding;
-	
+
+	private GroovyScriptHelper scriptHelper;
+
 	private Pattern pattern = Pattern.compile("^(select\\[\\]|select|action|call|eval):\\s*(.*)");
 	
 	public ActionHandler(ActionRequest request, Injector injector) {
@@ -83,30 +76,10 @@ public final class ActionHandler {
 		this.entity = request.getBeanClass();
 		
 		this.context = context;
-		this.binding = new Binding(context) {
-
-			@Override
-			public Object getVariable(String name) {
-				try {
-					return super.getVariable(name);
-				} catch (MissingPropertyException e) {
-					if ("__me__".equals(name))
-						return this;
-					if ("__date__".equals(name))
-						return new LocalDate();
-					else if ("__time__".equals(name))
-						return new LocalDateTime();
-					else if ("__datetime__".equals(name))
-						return new DateTime();
-				}
-				return null;
-			}
-		};
 		
-		CompilerConfiguration config = new CompilerConfiguration();
-		config.getOptimizationOptions().put("indy", Boolean.TRUE);
-
-		this.shell = new GroovyShell(binding, config);
+		this.scriptHelper = new GroovyScriptHelper(this.context);
+		this.binding = this.scriptHelper.getBinding();
+		
 		this.configureObjects();
 	}
 
@@ -223,20 +196,16 @@ public final class ActionHandler {
 		Pattern p = Pattern.compile("(\\w+)\\((.*?)\\)");
 		Matcher m = p.matcher(methodCall);
 
-		if (!m.matches()) return null;
-		
+		if (!m.matches()) {
+			return null;
+		}
+
 		try {
 			Class<?> klass = Class.forName(className);
 			Object object = injector.getInstance(klass);
-
-			String method = m.group(1);
-			String params = "[" + m.group(2) + "] as Object[]";
-
-			Object[] arguments = (Object[]) shell.evaluate(params);
-			
-			return InvokerHelper.invokeMethod(object, method, arguments);
+			return scriptHelper.call(object, methodCall);
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new IllegalArgumentException(e);
 		}
 	}
 	
@@ -364,7 +333,7 @@ public final class ActionHandler {
 	public Object search(Class<?> entityClass, String filter, Map params) {
 		filter = makeMethodCall("filter", filter);
 		filter = String.format("%s.all().%s", entityClass.getName(), filter);
-		com.axelor.db.Query q = (com.axelor.db.Query) shell.evaluate(filter);
+		com.axelor.db.Query q = (com.axelor.db.Query) handleGroovy(filter);
 		Map vars = Maps.newHashMap();
 		if (params != null)
 			vars.putAll(params);
@@ -387,16 +356,16 @@ public final class ActionHandler {
 	
 	private Object handleSelectOne(String expression) {
 		expression = makeMethodCall("__me__.selectOne", expression);
-		return shell.evaluate(expression);
+		return handleGroovy(expression);
 	}
 	
 	private Object handleSelectAll(String expression) {
 		expression = makeMethodCall("__me__.selectAll", expression);
-		return shell.evaluate(expression);
+		return handleGroovy(expression);
 	}
 	
 	private Object handleGroovy(String expression) {
-		return shell.evaluate(expression);
+		return scriptHelper.eval(expression);
 	}
 	
 	private Object handleAction(String expression) {

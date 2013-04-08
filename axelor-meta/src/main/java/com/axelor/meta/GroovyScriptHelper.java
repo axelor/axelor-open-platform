@@ -1,7 +1,6 @@
 package com.axelor.meta;
 
 import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
 import groovy.lang.MissingPropertyException;
 
 import java.util.Map;
@@ -17,6 +16,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
 import com.axelor.auth.db.User;
+import com.axelor.data.ScriptHelper;
 import com.google.common.base.Strings;
 
 /**
@@ -26,8 +26,8 @@ import com.google.common.base.Strings;
  */
 public class GroovyScriptHelper {
 
-	private GroovyShell shell;
-	
+	private static ScriptHelper scriptHelper = new ScriptHelper(100, 10, true);
+
 	private Binding binding;
 	
 	public GroovyScriptHelper(Map<String, Object> variables) {
@@ -42,25 +42,25 @@ public class GroovyScriptHelper {
 				try {
 					return super.getVariable(name);
 				} catch (MissingPropertyException e) {
+					if ("__me__".equals(name))
+						return this;
 					if ("__date__".equals(name))
 						return new LocalDate();
-					else if ("__time__".equals(name))
+					if ("__time__".equals(name))
 						return new LocalDateTime();
-					else if ("__datetime__".equals(name))
+					if ("__datetime__".equals(name))
 						return new DateTime();
 				}
 				return null;
 			}
 		};
 		
-		this.shell = new GroovyShell(binding, config);
-		
 		Subject subject = SecurityUtils.getSubject();
 		if (subject != null) {
 			User user = User.all().filter("self.code = ?1", subject.getPrincipal()).fetchOne();
 			binding.setProperty("__user__", user);
 		}
-		
+
 		this.configure(binding);
 	}
 
@@ -112,7 +112,7 @@ public class GroovyScriptHelper {
 		if (Strings.isNullOrEmpty(expression)) {
 			return null;
 		}
-		return shell.evaluate(expression);
+		return scriptHelper.eval(expression, this.binding);
 	}
 	
 	/**
@@ -160,7 +160,7 @@ public class GroovyScriptHelper {
 		
 		String method = m.group(1);
 		String params = "[" + m.group(2) + "] as Object[]";
-		Object[] arguments = (Object[]) shell.evaluate(params);
+		Object[] arguments = (Object[]) scriptHelper.eval(params, this.binding);
 		
 		return call(object, method, arguments);
 	}
