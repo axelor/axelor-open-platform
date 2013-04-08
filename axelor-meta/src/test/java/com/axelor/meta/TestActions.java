@@ -63,8 +63,8 @@ public class TestActions extends AbstractTest {
 		Map<String, Object> data = Maps.newHashMap();
 		request.setData(data);
 		request.setModel("com.axelor.meta.db.Contact");
-		
-		data.put("action", action);
+		request.setAction(action);
+
 		data.put("context", context);
 		
 		return new ActionHandler(request, injector);
