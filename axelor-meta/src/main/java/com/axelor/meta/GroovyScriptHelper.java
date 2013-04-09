@@ -26,7 +26,7 @@ import com.google.common.base.Strings;
  */
 public class GroovyScriptHelper {
 
-	private static ScriptHelper scriptHelper = new ScriptHelper(100, 10, true);
+	private static ScriptHelper scriptHelper = new ScriptHelper(100, 10, false);
 
 	private Binding binding;
 	
