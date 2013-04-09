@@ -69,11 +69,19 @@ var Tabs = {
 			tab.selected = true;
 			selected = _.indexOf(tabs, tab);
 			
+			var select = tabs[selected],
+			    onSelect = null;
+			if(select){
+			    onSelect = select.onSelect;
+			}
 			setTimeout(function() {
 				if ($scope.$tabs) {
 					$scope.$tabs.trigger('adjust');
 				}
 				$.event.trigger('adjustSize');
+				if(onSelect){
+					onSelect.handle();
+				}
 			});
 		};
 		
@@ -185,6 +193,11 @@ var Tab = {
 	require: '^uiTabs',
 	scope: true,
 	link: function(scope, elem, attrs, tabs) {
+		
+		setTimeout(function(){
+			scope.onSelect = elem.data('$onSelect');
+		});
+		
 		tabs.addTab(scope);
 		attrs.$observe('title', function(value){
 			scope.title = value;
@@ -192,7 +205,7 @@ var Tab = {
 	},
 	cellCss: 'form-item v-align-top',
 	transclude: true,
-	template: '<div class="tab-pane" ng-class="{active: selected}" ng-transclude></div>'
+	template: '<div ui-actions class="tab-pane" ng-class="{active: selected}" ng-transclude></div>'
 };
 
 
