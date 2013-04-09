@@ -39,7 +39,13 @@ class Entity {
 		table = node.@table
 		namespace = node.parent().module."@package"
 		module = node.parent().module.@name
+		
 		sequential = node.@sequential == "true"
+		if(node.@sequential == ""
+			&& System.getProperty("generate.unique.id") == "true") {
+			sequential = true
+		}
+		
 		groovy = node.@lang == "groovy"
 		hashAll = node.@hashAll == "true"
 		cachable = node.@cachable
