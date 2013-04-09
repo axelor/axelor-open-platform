@@ -259,6 +259,13 @@
           <xsd:group ref="tns:FormWidgets" />
         </xsd:choice>
         <xsd:attribute name="title" type="xsd:string" use="required"/>
+        <xsd:attribute name="onSelect" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              The actions will be executed after select the page.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:restriction>
     </xsd:complexContent>
   </xsd:complexType>
