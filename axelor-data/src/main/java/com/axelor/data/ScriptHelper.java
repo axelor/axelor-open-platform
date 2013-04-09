@@ -51,7 +51,6 @@ public final class ScriptHelper {
 			.newBuilder()
 			.maximumSize(cacheSize)
 			.expireAfterAccess(expireTime, TimeUnit.MINUTES)
-			.weakKeys()
 			.build(new CacheLoader<String, Script>() {
 
 				@Override
