@@ -77,6 +77,8 @@ public class Property {
 	
 	private boolean image;
 
+	private boolean nullable;
+
 	private boolean readonly;
 
 	private boolean hidden;
@@ -155,6 +157,7 @@ public class Property {
 
 			if (annotation instanceof Column) {
 				unique = ((Column) annotation).unique();
+				nullable = ((Column) annotation).nullable();
 			}
 
 			// Give javax.validators precedence
@@ -207,13 +210,8 @@ public class Property {
 				nameSearch = w.search();
 				selection = w.selection();
 
-				if (w.multiline() && type == PropertyType.STRING) {
+				if (w.multiline() && type == PropertyType.STRING)
 					type = PropertyType.TEXT;
-				}
-				
-				if (type == PropertyType.BINARY) {
-					image = w.image();
-				}
 			}
 		}
 
@@ -309,9 +307,13 @@ public class Property {
 	public String getHelp() {
 		return help;
 	}
-	
+
 	public boolean isImage() {
 		return image;
+	}
+
+	public boolean isNullable() {
+		return nullable;
 	}
 
 	public boolean isReadonly() {

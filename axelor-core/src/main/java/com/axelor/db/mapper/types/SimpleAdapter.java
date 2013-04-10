@@ -6,6 +6,8 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 
+import javax.persistence.Column;
+
 import com.axelor.db.mapper.TypeAdapter;
 
 public class SimpleAdapter implements TypeAdapter<Object> {
@@ -14,8 +16,9 @@ public class SimpleAdapter implements TypeAdapter<Object> {
 	public Object adapt(Object value, Class<?> type, Type genericType,
 			Annotation[] annotations) {
 
-		if (value == null || (value instanceof String && "".equals(((String) value).trim())))
+		if (value == null || (value instanceof String && "".equals(((String) value).trim()))) {
 			return adaptNull(value, type, genericType, annotations);
+		}
 		
 		// try a constructor with exact value type
 		try {
@@ -71,7 +74,7 @@ public class SimpleAdapter implements TypeAdapter<Object> {
 	public Object adaptNull(Object value, Class<?> type, Type genericType,
 			Annotation[] annotations) {
 
-		if (!type.isPrimitive())
+		if (!type.isPrimitive() || isNullable(annotations))
 			return null;
 
 		if (type == boolean.class)
@@ -93,5 +96,19 @@ public class SimpleAdapter implements TypeAdapter<Object> {
 			return ' ';
 
 		return null;
+	}
+	
+	private boolean isNullable(Annotation[] annotations){
+		if(annotations == null || annotations.length == 0){
+			return true;
+		}
+		
+		for (Annotation annotation : annotations) {
+			if(annotation instanceof Column) {
+				return ((Column) annotation).nullable();
+			}
+		}
+		
+		return false;
 	}
 }
