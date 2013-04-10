@@ -210,8 +210,13 @@ public class Property {
 				nameSearch = w.search();
 				selection = w.selection();
 
-				if (w.multiline() && type == PropertyType.STRING)
+				if (w.multiline() && type == PropertyType.STRING) {
 					type = PropertyType.TEXT;
+				}
+				
+				if (type == PropertyType.BINARY) {
+					image = w.image();
+				}
 			}
 		}
 
@@ -307,7 +312,7 @@ public class Property {
 	public String getHelp() {
 		return help;
 	}
-
+	
 	public boolean isImage() {
 		return image;
 	}
@@ -315,7 +320,7 @@ public class Property {
 	public boolean isNullable() {
 		return nullable;
 	}
-
+	
 	public boolean isReadonly() {
 		return readonly;
 	}
