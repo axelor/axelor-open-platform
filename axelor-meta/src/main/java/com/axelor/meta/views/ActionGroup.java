@@ -84,7 +84,7 @@ public class ActionGroup extends Action {
 		
 		while(iter.hasNext()) {
 			Act act = iter.next();
-			String name = act.getName();
+			String name = act.getName().trim();
 			
 			if ("save".equals(name)) {
 				if (act.test(handler)) {
