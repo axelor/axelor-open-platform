@@ -11,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
@@ -58,6 +59,19 @@ public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
 		}
 	}
 	
+	static class DateTimeSerializer extends JsonSerializer<DateTime> {
+		
+		@Override
+		public void serialize(DateTime value, JsonGenerator jgen,
+				SerializerProvider provider) throws IOException,
+				JsonProcessingException {
+			if (value != null) {
+				String text = value.withZone(DateTimeZone.UTC).toString();
+				jgen.writeString(text);
+			}
+		}
+	}
+
 	static class LocalDateTimeSerializer extends JsonSerializer<LocalDateTime> {
 		
 		@Override
@@ -65,7 +79,7 @@ public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
 				SerializerProvider provider) throws IOException,
 				JsonProcessingException {
 			if (value != null) {
-				String text = value.toDateTime(DateTimeZone.UTC).toString();
+				String text = value.toDateTime().withZone(DateTimeZone.UTC).toString();
 				jgen.writeString(text);
 			}
 		}
@@ -108,6 +122,7 @@ public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
 		module.addSerializer(BigDecimal.class, new DecimalSerializer());
 
 		JodaModule jodaModule = new JodaModule();
+		jodaModule.addSerializer(DateTime.class, new DateTimeSerializer());
 		jodaModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer());
 		jodaModule.addSerializer(LocalTime.class, new LocalTimeSerializer());
 
