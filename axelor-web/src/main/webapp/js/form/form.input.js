@@ -499,8 +499,10 @@ var DateTimeItem = {
 		});
 
 		var changed = false;
+		var rendering = false;
+
 		input.on('change', function(e, ui){
-			changed = true;
+			changed = !rendering;
 		});
 		input.on('blur', function() {
 			if (changed) {
@@ -526,7 +528,7 @@ var DateTimeItem = {
 				return false;
 			}
 			if (e.keyCode === $.ui.keyCode.ENTER || e.keyCode === $.ui.keyCode.TAB) {
-				updateModel();
+				if (changed) updateModel();
 			}
 		});
 		button.click(function(e, ui){
@@ -548,7 +550,7 @@ var DateTimeItem = {
 			}
 
 			if (angular.isDate(value)) {
-				value = that.isDate ? moment(value).sod().format('YYYY-MM-DD') : moment(value).format();
+				value = that.isDate ? moment(value).sod().format('YYYY-MM-DD') : value.toISOString();
 			}
 			
 			if (angular.equals(value, oldValue))
@@ -565,13 +567,18 @@ var DateTimeItem = {
 		}
 
 		controller.$render = function() {
-			var value = controller.$viewValue;
-			if (value) {
-				value = moment(value).format(that.format);
-				input.mask('value', value);
-				input.datetimepicker('setDate', value);
-			} else {
-				input.mask('value', '');
+			rendering = true;
+			try {
+				var value = controller.$viewValue;
+				if (value) {
+					value = moment(value).format(that.format);
+					input.mask('value', value);
+					input.datetimepicker('setDate', value);
+				} else {
+					input.mask('value', '');
+				}
+			} finally {
+				rendering = false;
 			}
 		};
 	},
