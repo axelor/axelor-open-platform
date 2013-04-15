@@ -8,7 +8,6 @@ import javax.persistence.TypedQuery;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.Transaction;
 import org.hibernate.type.Type;
-import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 
 import com.axelor.auth.AuthUtils;
@@ -64,7 +63,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 		}
 		for (int i = 0; i < propertyNames.length; i++) {
 			if ("updatedOn".equals(propertyNames[i])) {
-				currentState[i] = new LocalDateTime(DateTimeZone.UTC);
+				currentState[i] = new LocalDateTime();
 			}
 			if ("updatedBy".equals(propertyNames[i])) {
 				currentState[i] = this.getUser();
@@ -81,7 +80,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 		}
 		for (int i = 0; i < propertyNames.length; i++) {
 			if ("createdOn".equals(propertyNames[i])) {
-				state[i] = new LocalDateTime(DateTimeZone.UTC);
+				state[i] = new LocalDateTime();
 			}
 			if ("createdBy".equals(propertyNames[i])) {
 				state[i] = this.getUser();
