@@ -4,7 +4,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
@@ -58,7 +57,7 @@ public class JodaAdapter implements TypeAdapter<Object> {
 		@Override
 		public Object adapt(Object value, Class<?> actualType,
 				Type genericType, Annotation[] annotations) {
-			return new DateTime(value, DateTimeZone.UTC);
+			return new DateTime(value);
 		}
 	}
 
@@ -67,7 +66,7 @@ public class JodaAdapter implements TypeAdapter<Object> {
 		@Override
 		public Object adapt(Object value, Class<?> actualType,
 				Type genericType, Annotation[] annotations) {
-			return new LocalDateTime(value, DateTimeZone.UTC).toLocalDate();
+			return new DateTime(value).toLocalDate();
 		}
 	}
 
@@ -77,11 +76,11 @@ public class JodaAdapter implements TypeAdapter<Object> {
 		public Object adapt(Object value, Class<?> actualType,
 				Type genericType, Annotation[] annotations) {
 			try {
-				return new DateTime(value, DateTimeZone.UTC).toLocalTime();
+				return new DateTime(value).toLocalTime();
 			} catch (IllegalArgumentException e) {
 				DateTime dt = new DateTime();
 				String val = String.format("%d-%d-%dT%s", dt.getYear(), dt.getMonthOfYear(), dt.getDayOfMonth(), value);
-				return new DateTime(val, DateTimeZone.UTC).toLocalTime();
+				return new DateTime(val).toLocalTime();
 			}
 		}
 	}
@@ -91,7 +90,7 @@ public class JodaAdapter implements TypeAdapter<Object> {
 		@Override
 		public Object adapt(Object value, Class<?> actualType,
 				Type genericType, Annotation[] annotations) {
-			return new DateTime(value, DateTimeZone.UTC).toLocalDateTime();
+			return new DateTime(value).toLocalDateTime();
 		}
 	}
 }
