@@ -108,8 +108,10 @@ public class JpaModule extends AbstractModule {
 		properties.put("hibernate.ejb.naming_strategy", "org.hibernate.cfg.ImprovedNamingStrategy");
 		properties.put("hibernate.connection.charSet", "UTF-8");
 		properties.put("hibernate.max_fetch_depth", "3");
+
 		properties.put("jadira.usertype.autoRegisterUserTypes", "true");
-		
+		properties.put("jadira.usertype.databaseZone", "jvm");
+
 		if (isCacheEnabled()) {
 			properties.put("hibernate.cache.use_second_level_cache", "true");
 			properties.put("hibernate.cache.use_query_cache", "true");
