@@ -61,6 +61,8 @@ var Tabs = {
 			selected = 0;
 		
 		$scope.select = function(tab) {
+			
+			var current = selected;
 
 			angular.forEach(tabs, function(tab, i){
 				tab.selected = false;
@@ -69,18 +71,13 @@ var Tabs = {
 			tab.selected = true;
 			selected = _.indexOf(tabs, tab);
 			
-			var select = tabs[selected],
-			    onSelect = null;
-			if(select){
-			    onSelect = select.onSelect;
-			}
 			setTimeout(function() {
 				if ($scope.$tabs) {
 					$scope.$tabs.trigger('adjust');
 				}
 				$.event.trigger('adjustSize');
-				if(onSelect){
-					onSelect.handle();
+				if(current != selected){
+					doSelect();
 				}
 			});
 		};
@@ -98,6 +95,19 @@ var Tabs = {
 			return $element.find('ul.nav-tabs:first > li:nth-child(' + (index+1) + ')');
 		}
 		
+		function doSelect() {
+			var select = tabs[selected],
+			    onSelect = null;
+			
+			if(select){
+			    onSelect = select.onSelect;
+			}
+			
+			if(onSelect){
+				onSelect.handle();
+			}
+		}
+		
 		$scope.showTab = function(index) {
 			
 			if (!inRange(index))
@@ -112,6 +122,10 @@ var Tabs = {
 			
 			$.event.trigger('adjustSize');
 		};
+		
+		$scope.$on('on:edit', function(event){
+			doSelect();
+		});
 		
 		$scope.hideTab = function(index) {
 			
