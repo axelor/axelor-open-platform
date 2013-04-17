@@ -232,7 +232,11 @@ function GridViewCtrl($scope, $element) {
 	$scope.onNew = function() {
 		page.index = -1;
 		$scope.switchTo('form', function(viewScope){
-			viewScope.$broadcast("on:new");
+			$scope.ajaxStop(function(){
+				setTimeout(function(){
+					viewScope.$broadcast('on:new');
+				});
+			});
 		});
 	};
 	

@@ -101,7 +101,11 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		popup.show();
 		popup.edit(record);
 		if (record == null) {
-			popup.$broadcast("on:new");
+			$scope.ajaxStop(function(){
+				setTimeout(function(){
+					popup.$broadcast("on:new");
+				});
+			});
 		}
 	};
 	
