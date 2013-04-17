@@ -76,7 +76,10 @@ load([
 	'js/form/form.layout.js',
 	'js/form/form.container.js',
 	'js/form/form.input.js',
-	'js/form/form.relational.js',
+	'js/form/form.relational.base.js',
+	'js/form/form.relational.single.js',
+	'js/form/form.relational.multiple.js',
+	'js/form/form.relational.nested.js',
 	'js/form/form.code.js',
 	
 	'js/view/view.base.js',
