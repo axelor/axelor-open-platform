@@ -288,9 +288,9 @@ public final class ActionHandler {
 		if (text == null || "".equals(text.trim())) {
 			return "";
 		}
-		text = text.replaceAll("\\$\\{\\s*(\\w+)(\\?)?\\.(.*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text($1, '$3')}");
-		text = text.replaceAll("\\$\\{\\s*(.*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text('$1')}");
-		text = text.replaceAll("\\$\\{\\s*(.*?)\\s*\\|\\s*e\\s*\\}", "\\${($1) ?: ''}");
+		text = text.replaceAll("\\$\\{\\s*(\\w+)(\\?)?\\.([^}]*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text($1, '$3')}");
+		text = text.replaceAll("\\$\\{\\s*([^}]*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text('$1')}");
+		text = text.replaceAll("\\$\\{\\s*([^}]*?)\\s*\\|\\s*e\\s*\\}", "\\${($1) ?: ''}");
 		
 		if (text.trim().startsWith("<?xml ")) {
 			text = text.replaceAll("\\$\\{(.*?)\\}", "\\${__fmt__.escape($1)}");
