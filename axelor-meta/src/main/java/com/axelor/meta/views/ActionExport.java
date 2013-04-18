@@ -14,6 +14,7 @@ import org.joda.time.DateTime;
 import com.axelor.meta.ActionHandler;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 
 @XmlType
@@ -36,6 +37,8 @@ public class ActionExport extends Action {
 	}
 	
 	protected void doExport(String dir, Export export, ActionHandler handler) throws IOException {
+		export.template = handler.evaluate(export.template).toString();
+
 		File template = new File(export.template);
 		if (!template.isFile()) {
 			throw new FileNotFoundException("No such template: " + export.template);
@@ -62,15 +65,22 @@ public class ActionExport extends Action {
 		log.info("action-export: {}", getName());
 
 		String dir = output == null ? DEFAULT_OUTPUT : output;
+
 		dir = dir.replace("${name}", getName())
 				 .replace("${date}", new DateTime().toString("yyyyMMdd"))
 				 .replace("${time}", new DateTime().toString("HHmmss"));
+		dir = handler.evaluate(dir).toString();
 		
 		for(Export export : exports) {
+			if(!export.test(handler)){
+				continue;
+			}
 			try {
 				doExport(dir, export, handler);
+				return ImmutableMap.of("flash", "Export terminé.");
 			} catch (Exception e) {
 				log.error("error while exporting: ", e);
+				return ImmutableMap.of("error", e.getMessage());
 			}
 		}
 		return null;
@@ -81,17 +91,10 @@ public class ActionExport extends Action {
 	}
 
 	@XmlType
-	public static class Export {
-		
-		@XmlAttribute
-		private String name;
+	public static class Export extends Act {
 		
 		@XmlAttribute
 		private String template;
-		
-		public String getName() {
-			return name;
-		}
 		
 		public String getTemplate() {
 			return template;
@@ -100,7 +103,7 @@ public class ActionExport extends Action {
 		@Override
 		public String toString() {
 			return Objects.toStringHelper(getClass())
-					.add("name", name)
+					.add("name", getName())
 					.add("template", template)
 					.toString();
 		}

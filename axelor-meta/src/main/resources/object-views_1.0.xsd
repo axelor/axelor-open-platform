@@ -915,16 +915,20 @@
                   </xsd:documentation>
                 </xsd:annotation>
                 <xsd:complexType>
-                  <xsd:attribute name="name" type="xsd:string" use="required">
-                    <xsd:annotation>
-                      <xsd:documentation>Output file name.</xsd:documentation>
-                    </xsd:annotation>
-                  </xsd:attribute>
-                  <xsd:attribute name="template" type="xsd:string" use="required">
-                    <xsd:annotation>
-                      <xsd:documentation>The template to be used to generate output file.</xsd:documentation>
-                    </xsd:annotation>
-                  </xsd:attribute>
+                 <xsd:complexContent>
+                   <xsd:extension base="tns:AbstractAct">
+                     <xsd:attribute name="name" type="xsd:string" use="required">
+                       <xsd:annotation>
+                         <xsd:documentation>Output file name.</xsd:documentation>
+                       </xsd:annotation>
+                     </xsd:attribute>
+                     <xsd:attribute name="template" type="xsd:string" use="required">
+                       <xsd:annotation>
+                         <xsd:documentation>The template to be used to generate output file.</xsd:documentation>
+                       </xsd:annotation>
+                     </xsd:attribute>
+                    </xsd:extension>
+                  </xsd:complexContent>
                 </xsd:complexType>
               </xsd:element>
             </xsd:sequence>
