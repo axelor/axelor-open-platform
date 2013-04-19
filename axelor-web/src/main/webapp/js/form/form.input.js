@@ -62,6 +62,9 @@ ui.directive('uiHelpPopover', function() {
 		if (value && field.type === 'many-to-one') {
 			value = value.id;
 		}
+		if (value && field.type === "password") {
+			value = _.str.repeat('*', value.length);
+		}
 		if (value && /-many$/.test(field.type)) {
 			var length = value.length;
 			value = _.first(value, 5);
