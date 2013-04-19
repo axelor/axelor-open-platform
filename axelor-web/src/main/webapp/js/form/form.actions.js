@@ -205,7 +205,11 @@ ActionHandler.prototype = {
 		}
 
 		function doEdit(rec) {
+			var params = scope._viewParams || {};
 			scope.editRecord(rec);
+			if (params.$viewScope) {
+				params.$viewScope.updateRoute();
+			}
 			deferred.resolve();
 		}
 
