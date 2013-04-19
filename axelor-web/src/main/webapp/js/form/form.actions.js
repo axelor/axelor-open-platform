@@ -268,7 +268,7 @@ ActionHandler.prototype = {
 					}
 					resolved = result && !_.isString(result);
 				});
-				if (item.pending) {
+				if (item.pending || item.alert || item.error) {
 					resolved = false;
 				}
 			}
