@@ -1,3 +1,9 @@
+(function() {
+
+var ui = angular.module('axelor.ui');
+
+this.FormViewCtrl = FormViewCtrl;
+
 FormViewCtrl.$inject = ['$scope', '$element'];
 function FormViewCtrl($scope, $element) {
 
@@ -95,7 +101,12 @@ function FormViewCtrl($scope, $element) {
 			});
 		});
 	};
-	
+
+	$scope.view_mode = 'view';
+	$scope.setViewMode = function(mode) {
+		$scope.view_mode = mode;
+	};
+
 	$scope.getRouteOptions = function() {
 		var rec = $scope.record,
 			args = [];
@@ -215,9 +226,14 @@ function FormViewCtrl($scope, $element) {
 		return $scope.$$dirty && $scope.isValid();
 	};
 	
+	$scope.canEdit = function() {
+		return $scope.view_mode !== 'edit';
+	};
+	
 	$scope.onNew = function() {
 		$scope.confirmDirty(function(){
 			$scope.edit(null);
+			$scope.setViewMode('edit');
 			$scope.$broadcast("on:new");
 		});
 	};
@@ -258,11 +274,16 @@ function FormViewCtrl($scope, $element) {
 			}
 		});
 	});
+	
+	$scope.onEdit = function() {
+		$scope.setViewMode('edit');
+	};
 
 	$scope.onCopy = function() {
 		var record = $scope.record;
 		ds.copy(record.id).success(function(record){
 			$scope.edit(record);
+			$scope.setViewMode('edit');
 		});
 	};
 	
@@ -329,7 +350,19 @@ function FormViewCtrl($scope, $element) {
 		if (e.defaultPrevented) {
 			return;
 		}
+		
 		$scope.confirmDirty(function() {
+			var record = $scope.record || {};
+			var mode = $scope.view_mode;
+			
+			$scope.setViewMode('view');
+
+			if (record.id && mode == 'edit') {
+				if ($scope.canSave()) {
+					$scope.reload();
+				}
+				return;
+			}
 			$scope.editRecord(null);
 			$scope.switchTo('grid', function(viewScope) {
 				viewScope.updateRoute();
@@ -376,11 +409,11 @@ function FormViewCtrl($scope, $element) {
 			});
 		});
 	};
-}
+};
 
-angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewService){
+ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewService){
 	
-	function parse(scope, schema, fields, types) {
+	function parse(scope, schema, fields) {
 		
 		var path = scope.formPath || "";
 		
@@ -436,16 +469,19 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 					type = widget;
 
 				attrs = angular.extend(attrs, field, this);
-				type = types[widget] || types[attrs.type] || attrs.type || 'string';
+				type = ui.getWidget(widget) || ui.getWidget(attrs.type) || attrs.type || 'string';
 
 				if (_.isArray(attrs.selection)) {
 					type = 'select';
 				}
-				
+
 				if (attrs.image ==  true) {
 					type = "image";
 				}
-				
+				if (type == 'label') { //TODO: allow <static> tag in xml view
+					type = 'static';
+				}
+
 				attrs.serverType = attrs.type;
 				attrs.type = type;
 				
@@ -684,7 +720,7 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 			if (schema == null || loaded)
 				return;
 			
-			var form = parse(scope, schema, scope.fields, ViewService.FIELD_TYPES);
+			var form = parse(scope, schema, scope.fields);
 
 			form = $compile(form)(scope);
 			element.append(form);
@@ -698,3 +734,7 @@ angular.module('axelor.ui').directive('uiViewForm', ['$compile', 'ViewService', 
 		});
 	};
 }]);
+
+}).call(this);
+
+

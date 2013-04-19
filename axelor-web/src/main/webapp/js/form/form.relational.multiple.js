@@ -237,16 +237,20 @@ function ManyToManyCtrl($scope, $element, DataSource, ViewService) {
 	};
 }
 
-var OneToManyItem = {
+ui.formInput('OneToMany', {
+	
 	css: 'one2many-item',
+	
 	transclude: true,
+	
 	showTitle: false,
-	require: '?ngModel',
-	scope: true,
+	
 	collapseIfEmpty: true,
+	
 	controller: OneToManyCtrl,
+	
 	link: function(scope, element, attrs, model) {
-		
+
 		scope.ngModel = model;
 		scope.title = attrs.title;
 		
@@ -305,13 +309,21 @@ var OneToManyItem = {
 					}
 					grid.setOptions({enableAddRow: true});
 				});
+
+				scope.$watch("view_mode", function(mode) {
+					var readonly = scope.isReadonly() || mode !== "edit";
+					grid.setOptions({
+						editable: !readonly
+					});
+				});
+
+				element.on("on:attrs-change", function(event, data) {
+					if (editable && data) {
+						grid.setOptions({editable: !data.readonly });
+					}
+				});
 			}
-			
-			element.on("on:attrs-change", function(event, data) {
-				if (!editable || !data) return;
-				grid.setOptions({editable: !data.readonly });
-			});
-			
+
 			if (!(scope._viewParams || {}).summaryView) {
 				return;
 			}
@@ -366,13 +378,18 @@ var OneToManyItem = {
 			});
 		}
 	},
+	
+	template_editable: null,
+	
+	template_readomly: null,
+	
 	template:
 	'<div class="stackbar">'+
 	'<div class="navbar">'+
 		'<div class="navbar-inner">'+
 			'<div class="container-fluid">'+
 				'<span class="brand" href="" ui-help-popover ng-bind-html-unsafe="title"></span>'+
-				'<span class="icons-bar pull-right">'+
+				'<span class="icons-bar pull-right" ng-show="!isReadonly()">'+
 					'<i ng-click="onSelect()" ng-show="hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}" class="icon-search"></i>'+
 					'<i ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}" class="icon-plus"></i>'+
 					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\')" title="{{\'Edit\' | t}}" class="icon-pencil"></i>'+
@@ -391,21 +408,23 @@ var OneToManyItem = {
 		'x-on-after-save="onGridAfterSave" '+
 		'></div>'+
 	'</div>'
-};
+});
 
-var ManyToManyItem = _.extend({}, OneToManyItem, {
+ui.formInput('ManyToMany', 'OneToMany', {
 	css	: 'many2many-item',
 	controller: ManyToManyCtrl
 });
 
-var OneToManyInline = _.extend({}, OneToManyItem, {
+ui.formInput('OneToManyInline', 'OneToMany', {
+
 	css	: 'one2many-inline',
-	requires: '?ngModel',
+
 	collapseIfEmpty : false,
-	scope: true,
+	
 	link: function(scope, element, attrs, model) {
-		OneToManyItem.link.apply(this, arguments);
 		
+		this._super.apply(this, arguments);
+
 		scope.onSort = function() {
 			
 		};
@@ -474,6 +493,11 @@ var OneToManyInline = _.extend({}, OneToManyItem, {
 			wrapper.remove();
 		});
 	},
+	
+	template_editable: null,
+	
+	template_readomly: null,
+	
 	template:
 	'<span class="picker-input picker-icons-2" style="position: absolute;">'+
 		'<input type="text" readonly>'+
@@ -493,19 +517,16 @@ var OneToManyInline = _.extend({}, OneToManyItem, {
 	'</span>'
 });
 
-var ManyToManyInline = _.extend({}, OneToManyInline, {
+ui.formInput('ManyToManyInline', 'OneToManyInline', {
+	
 	css	: 'many2many-inline',
+	
+	controller: ManyToManyCtrl,
+	
 	link: function(scope, element, attrs, model) {
-		OneToManyInline.link.apply(this, arguments);
+		this._super.apply(this, arguments);
 		scope.onNew = scope.onSelect;
-	},
-	controller: ManyToManyCtrl
+	}
 });
-
-ui.formDirective('uiOneToMany', OneToManyItem);
-ui.formDirective('uiManyToMany', ManyToManyItem);
-
-ui.formDirective('uiOneToManyInline', OneToManyInline);
-ui.formDirective('uiManyToManyInline', ManyToManyInline);
 
 }).call(this);

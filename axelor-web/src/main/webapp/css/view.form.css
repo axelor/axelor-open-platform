@@ -54,12 +54,11 @@ table.form-layout td.form-label > label {
 	margin-bottom: 2px;
 }
 
-table.form-layout td.form-item > * {
+table.form-layout td.form-item > *,
+.form-item-container > * {
 	width: 100%;
-	margin: 0;
-	min-width: 100px;
+	margin: 0 !important;
 }
-
 
 table.form-layout td.form-item.v-align-top {
 	vertical-align: top;	
@@ -296,7 +295,7 @@ td.form-item > * {
 	border: none;
 }
 
-.form-item .image-item > div.btn-group {
+.form-item .image-item div.btn-group {
 	position: absolute;
 	left: 20px;
 	bottom: 12px;
@@ -322,6 +321,8 @@ td.form-item > * {
 }
 
 .form-item .ng-invalid,
+.form-item .form-item-container.ng-invalid > input,
+.form-item .form-item-container.ng-invalid > .ui-spinner input,
 .form-item .input-append.ng-invalid > input,
 .form-item .picker-input.ng-invalid > input {
 	border-color: #B94A48;

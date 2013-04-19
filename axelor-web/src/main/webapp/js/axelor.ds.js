@@ -35,41 +35,8 @@
 
 		var ViewService = function() {
 			
-			this.FIELD_TYPES = {
-				'STRING'		: 'string',
-				'INTEGER'		: 'integer',
-				'LONG'			: 'integer',
-				'DECIMAL'		: 'decimal',
-				'BOOLEAN'		: 'boolean',
-				'DATE'			: 'date',
-				'TIME'			: 'time',
-				'DATETIME'		: 'datetime',
-				'TEXT'			: 'text',
-				'ONE_TO_ONE'	: 'many-to-one',
-				'MANY_TO_ONE'	: 'many-to-one',
-				'ONE_TO_MANY'	: 'one-to-many',
-				'MANY_TO_MANY'	: 'many-to-many',
-				'label'			: 'static', 
-				'notebook'		: 'tabs',
-				'page'			: 'tab',
-				'password'		: 'password',
-				'SuggestBox'	: 'suggest-box',
-				'CodeEditor'	: 'code-editor',
-				'ActionSelector': 'action-selector'
-			};
 		};
-		
-		function titleize(str){
-			if (!str) return;
-		    return str.replace(/_|\.|\s+/g, ' ')
-	    			  .replace(/\s*Id$/, '')
-	    			  .replace(/\s*Ids$/, 's')
-	    			  .replace(/([a-z\d])([A-Z])/g, '$1 $2')
-	    			  .replace(/(?:^|\s)\S/g, function(ch){
-		    	return ch.toUpperCase();
-		    });
-		}
-		
+
 		ViewService.prototype.accept = function(params) {
 			views = {};
 			forEach(params.views, function(view){
@@ -90,16 +57,15 @@
 
 		ViewService.prototype.process = function(meta, view) {
 
-			var fields = {},
-				types = this.FIELD_TYPES; 
+			var fields = {};
 			
 			meta = meta || {};
 			view = view || {};
 			
 			if (isArray(meta.fields)) {
 				forEach(meta.fields, function(field){
-					field.type = types[field.type] || field.type || 'string';
-					field.title = titleize(field.title || field.name);
+					field.type = _.chain(field.type || 'string').underscored().dasherize().value();
+					field.title = _.chain(field.title || field.name).humanize().titleize().value();
 					fields[field.name] = field;
 					// if nested field then make it readonly
 					if (field.name.indexOf('.') > -1) {

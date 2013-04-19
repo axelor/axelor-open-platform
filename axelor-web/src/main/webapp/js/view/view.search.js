@@ -187,6 +187,7 @@ function SearchFormCtrl($scope, $element, ViewService) {
 	
 	FormViewCtrl.call(this, $scope, $element);
 	$scope._register('form', $scope);
+	$scope.setViewMode('edit');
 	
 	$scope.$watch('_searchView', function(schema) {
 		if (schema == null) return;
@@ -273,6 +274,7 @@ function SearchToolbarCtrl($scope, $element, $http) {
 
 	FormViewCtrl.call(this, $scope, $element);
 	$scope._register('toolbar', $scope);
+	$scope.setViewMode('edit');
 	
 	var menus = {};
 	
@@ -332,7 +334,7 @@ function SearchToolbarCtrl($scope, $element, $http) {
 		
 		if (schema == null)
 			return;
-		
+
 		$scope.fields = {
 			'objectSelect' : {
 				type : 'string',
@@ -405,8 +407,6 @@ function SearchToolbarCtrl($scope, $element, $http) {
 				attrs: {
 					'ng-click': 'doAction()'
 				}
-			}, {
-				type : 'spacer'
 			} ]
 		};
 	});
