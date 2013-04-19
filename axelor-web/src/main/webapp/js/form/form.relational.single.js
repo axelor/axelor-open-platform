@@ -93,16 +93,29 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 	};
 }
 
-var ManyToOneItem = {
+ui.formInput('ManyToOne', {
+
 	css	: 'many2one-item',
-	require: '?ngModel',
-	scope: true,
+	
 	controller: ManyToOneCtrl,
-	link: function(scope, element, attrs, model) {
-		
+
+	init: function(scope) {
+
+		var targetName = scope.field && scope.field.targetName;
+
+		scope.format = function(value) {
+			if (value && targetName) {
+				return value[targetName];
+			}
+			return value;
+		};
+	},
+
+	link_editable: function(scope, element, attrs, model) {
+
 		scope.ngModel = model;
 		
-		var field = scope.getViewDef(element),
+		var field = scope.field,
 			input = element.children('input:first'),
 			nameField = field.targetName || field.nameField || 'id';
 		
@@ -136,11 +149,11 @@ var ManyToOneItem = {
 			e.stopPropagation();
 			return false;
 		});
-		
-		model.$render = function() {
-			var value = model.$viewValue;
+
+		scope.$render_editable = function() {
+			var value = scope.getValue();
 			if (value) {
-				value = value[nameField];
+				value = scope.format(value);
 			}
 			input.val(value);
 		};
@@ -250,7 +263,12 @@ var ManyToOneItem = {
 			return scope.isReadonly(element);
 		};
 	},
-	template:
+	
+	link_readonly: function(scope, element, attrs, model) {
+		
+	},
+	
+	template_editable:
 	'<div class="picker-input picker-icons-3">'+
 		'<input type="text" autocomplete="off">'+
 		'<span class="picker-icons">'+
@@ -259,13 +277,16 @@ var ManyToOneItem = {
 			'<i class="icon-plus" ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}"></i>'+
 			'<i class="icon-search" ng-click="onSelect()" ng-show="hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}"></i>'+
 		'</span>'+
-   '</div>'
-};
+   '</div>',
+   
+   template_readonly:
+   '<span>{{text}}</span>'
+});
 
-var SuggestBox = _.extend({}, ManyToOneItem, {
-	_linkOrig : ManyToOneItem.link,
-	link: function(scope, element, attrs, model) {
-		this._linkOrig(scope, element, attrs, model);
+ui.formInput('SuggestBox', 'ManyToOne', {
+
+	link_editable: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
 		var input = element.children(':input:first');
 		input.autocomplete("option" , {
 			minLength: 0
@@ -277,7 +298,7 @@ var SuggestBox = _.extend({}, ManyToOneItem, {
 			input.autocomplete("search" , '');
 		};
 	},
-	template:
+	template_editable:
 	'<span class="picker-input">'+
 		'<input type="text" autocomplete="off">'+
 		'<span class="picker-icons">'+
@@ -285,8 +306,5 @@ var SuggestBox = _.extend({}, ManyToOneItem, {
 		'</span>'+
    '</span>'
 });
-
-ui.formDirective('uiManyToOne', ManyToOneItem);
-ui.formDirective('uiSuggestBox', SuggestBox);
 
 }).call(this);

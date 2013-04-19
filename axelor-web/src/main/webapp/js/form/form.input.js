@@ -112,93 +112,98 @@ ui.directive('uiHelpPopover', function() {
  * The Label widget.
  *
  */
-var LabelItem = {
+ui.formItem('Label', {
+
 	css: 'label-item',
 	cellCss: 'form-label',
+
 	transclude: true,
-	template: '<label ui-help-popover ng-transclude></label>',
-	link: function(scope, element, attrs, controller) {
-			var field = scope.getViewDef(attrs.forWidget);
-			if (field && field.required) {
-				element.addClass('required');
-			}
-	}
-};
+	
+	link: function(scope, element, attrs) {
+		var field = scope.field;
+		if (field && field.required) {
+			element.addClass('required');
+		}
+	},
+
+	template: '<label ui-help-popover ng-transclude></label>'
+});
 
 /**
  * The Spacer widget.
  *
  */
-var SpacerItem = {
+ui.formItem('Spacer', {
 	css: 'spacer-item',
 	template: '<div>&nbsp;</div>'
-};
+});
 
 /**
  * The Separator widget.
  *
  */
-var SeparatorItem = {
+ui.formItem('Separator', {
 	css: 'separator-item',
 	showTitle: false,
 	scope: {
 		title: '@'
 	},
 	template: '<div><span style="padding-left: 4px;">{{title}}</span><hr style="margin: 4px 0;"></div>'
-};
+});
 
 /**
  * The Static Text widget.
  *
  */
-var StaticItem = {
+ui.formItem('Static', {
 	css: 'static-item',
 	transclude: true,
 	template: '<label ng-transclude></label>'
-};
+});
 
 /**
  * The button widget.
  */
-var ButtonItem = {
+ui.formItem('Button', {
 	css: 'button-item',
 	transclude: true,
 	template: '<button class="btn" type="button" ng-transclude></button>'
-};
+});
 
 /**
  * The String widget.
  */
-var StringItem = {
-	css: 'string-item',
-	template: '<input type="text">'
-};
+ui.formInput('String', {
+	css: 'string-item'
+});
 
 /**
  * The Email input widget.
  */
-var EmailItem = {
+ui.formInput('Email', {
 	css: 'email-item',
-	template: '<input type="email">'
-};
+	template_editable: '<input type="email">',
+	template_readonly: '<a target="_blank" href="mailto:{{text}}">{{text}}</a>'
+});
 
 /**
  * The Phone input widget.
  */
-var PhoneItem = {
+ui.formInput('Phone', {
 	css: 'phone-item',
-	template: '<input type="tel">'
-};
+	template_editable: '<input type="tel">'
+});
 
 /**
  * The Integer input widget.
  */
-var IntegerItem = {
-	css: 'integer-item',
-	require: '?ngModel',
-	link: function(scope, element, attrs, model) {
+ui.formInput('Integer', {
 
-		var props = scope.getViewDef(element),
+	css: 'integer-item',
+	
+	link_editable: function(scope, element, attrs, model) {
+
+		var props = scope.field,
 			precision = props.precision || 18,
 			scale = props.scale || 2;
 		
@@ -209,12 +214,6 @@ var IntegerItem = {
 				updateModel(element.val(), true);
 			}
 		};
-
-		model.$parsers.unshift(function(viewValue) {
-            var valid = isValid(viewValue);
-            model.$setValidity('format', valid);
-            return valid ? viewValue : undefined;
-        });
 		
 		var isDecimal = this.isDecimal,
 			pattern = isDecimal ? /^(-)?\d+(\.\d+)?$/ : /^\s*-?[0-9]*\s*$/;
@@ -260,17 +259,18 @@ var IntegerItem = {
 			var onChange = element.data('$onChange');
 
 			if (!isNumber(value)) {
-	            return ;
+				return;
             }
-			
-			value = format(value);
 
-			element.val(value);
-			scope.$apply(function(){
-				model.$setViewValue(value);
-			});
+			value = format(value);
 			
-		    if (onChange && handle) {
+			element.val(value);
+			scope.setValue(value);
+			setTimeout(function(){
+				scope.$apply();
+			});
+
+			if (onChange && handle) {
 				onChange.handle();
 			}
 		}
@@ -312,6 +312,14 @@ var IntegerItem = {
 
 			updateModel(value, false);
 		}
+		
+		scope.validate = function(value) {
+			return isValid(value);
+		};
+
+		scope.format = function(value) {
+			return format(value);
+		};
 
 		if (props.minSize !== undefined)
 			options.min = +props.minSize;
@@ -326,23 +334,24 @@ var IntegerItem = {
 			element.on("on:attrs-change", function(event, data) {
 				element.spinner(data.readonly ? "disable" : "enable");
 			});
+			scope.$elem_editable = element.parent();
 			model.$render = function() {
 				var value = model.$viewValue;
 				if (value) {
 					value = format(value);
 				}
 				element.val(value);
+				scope.initValue(value);
 			};
 			model.$render();
 		});
-	},
-	template: '<input type="text">'
-};
+	}
+});
 
 /**
  * The Decimal input widget.
  */
-var DecimalItem = _.extend({}, IntegerItem, {
+ui.formInput('Decimal', 'Integer', {
 	css: 'decimal-item',
 	isDecimal: true
 });
@@ -350,11 +359,28 @@ var DecimalItem = _.extend({}, IntegerItem, {
 /**
  * The Boolean input widget.
  */
-var BooleanItem = {
+ui.formInput('Boolean', {
+	
 	css: 'boolean-item',
+	
 	cellCss: 'form-item boolean-item',
-	template: '<input type="checkbox">'
-};
+	
+	link_editable: function(scope, element, attrs, model) {
+
+		scope.$render_editable = function() {
+			element[0].checked = scope.parse(model.$viewValue);
+		};
+		
+		element.click(function(){
+			scope.setValue(this.checked);
+			setTimeout(function(){
+				scope.$apply();
+			});
+		});
+	},
+	template_editable: '<input type="checkbox">',
+	template_readonly: '<input type="checkbox" disabled="disabled" ng-checked="text">'
+});
 
 // configure datepicket
 if (_t.calendar) {
@@ -463,16 +489,34 @@ $.extend($.datepicker, {
 /**
  * The DateTime input widget.
  */
-var DateTimeItem = {
+ui.formInput('DateTime', {
 
 	css	: 'datetime-item',
-	require: '?ngModel',
 	
 	format: 'DD/MM/YYYY HH:mm',
 	mask: 'DD/MM/YYYY HH:mm',
 
-	link: function(scope, element, attrs, controller) {
+	init: function(scope) {
 
+		var isDate = this.isDate,
+			format = this.format;
+		
+		scope.parse = function(value) {
+			if (angular.isDate(value)) {
+				isDate ? moment(value).sod().format('YYYY-MM-DD') : value.toISOString();
+			}
+			return value;
+		},
+
+		scope.format = function(value) {
+			if (value) {
+				return moment(value).format(format);
+			}
+			return value;
+		};
+	},
+
+	link_editable: function(scope, element, attrs, model) {
 		var input = element.children('input:first');
 		var button = element.find('i:first');
 		var options = {
@@ -541,40 +585,32 @@ var DateTimeItem = {
 			input.datetimepicker('show');
 		});
 
-		var that = this;
 		function updateModel() {
 			var masked = input.mask("value") || '',
 				value = input.datetimepicker('getDate'),
-				oldValue = controller.$viewValue || null,
-				onChange = element.data('$onChange');
+				oldValue = scope.getValue();
 
 			if (_.isEmpty(masked)) {
 				value = null;
 			}
 
-			if (angular.isDate(value)) {
-				value = that.isDate ? moment(value).sod().format('YYYY-MM-DD') : value.toISOString();
+			value = scope.parse(value);
+			
+			if (angular.equals(value, oldValue)) {
+				return;
 			}
 			
-			if (angular.equals(value, oldValue))
-				return;
-
-			controller.$setViewValue(value);
+			scope.setValue(value, true);
 			setTimeout(function(){
 				scope.$apply();
 			});
-			
-			if (onChange) {
-				onChange.handle();
-			}
 		}
 
-		controller.$render = function() {
+		scope.$render_editable = function() {
 			rendering = true;
 			try {
-				var value = controller.$viewValue;
+				var value = scope.getText();
 				if (value) {
-					value = moment(value).format(that.format);
 					input.mask('value', value);
 					input.datetimepicker('setDate', value);
 				} else {
@@ -585,26 +621,27 @@ var DateTimeItem = {
 			}
 		};
 	},
-	template:
+	template_editable:
 	'<span class="picker-input">'+
 	  '<input type="text" autocomplete="off">'+
 	  '<span class="picker-icons">'+
 	  	'<i class="icon-calendar"></i>'+
 	  '</span>'+
 	'</span>'
-};
+});
 
-var DateItem = _.extend({}, DateTimeItem, {
+ui.formInput('Date', 'DateTime', {
 	format: 'DD/MM/YYYY',
 	mask: 'DD/MM/YYYY',
 	isDate: true
 });
 
-var TimeItem = {
+ui.formInput('Time', 'DateTime', {
+
 	css: 'time-item',
 	mask: 'HH:mm',
-	require: '?ngModel',
-	link: function(scope, element, attrs, model) {
+	
+	link_editable: function(scope, element, attrs, model) {
 		
 		element.mask({
 			mask: this.mask
@@ -632,31 +669,39 @@ var TimeItem = {
 			});
 		}
 	},
-	template: '<input type="text">'
-};
+	template_editable: '<input type="text">'
+});
 
 /**
  * The Text input widget.
  */
-var TextItem = {
+ui.formInput('Text', {
 	css: 'text-item',
-	transclude: true,
-	template: '<textarea rows="8" ng-transclude></textarea>'
-};
+	template_editable: '<textarea rows="8"></textarea>'
+});
 
-var PasswordItem = {
+ui.formInput('Password', {
+	
 	css: 'password-item',
-	template: '<input type="password">'
-};
+	
+	format: function(scope, value, editable) {
+		if (!value || editable) {
+			return value;
+		}
+		return _.str.repeat('*', value.length);
+	},
+	
+	template_editable: '<input type="password">'
+});
 
-var SelectItem = {
+ui.formInput('Select', {
+
 	css: 'select-item',
 	cellCss: 'form-item select-item',
-	require: '?ngModel',
-	scope: true,
-	link: function(scope, element, attrs, model) {
 
-		var props = scope.getViewDef(element),
+	link_editable: function(scope, element, attrs, model) {
+
+		var props = scope.field,
 			multiple = props.multiple,
 			input = element.children('input:first'),
 			selection = [];
@@ -731,8 +776,8 @@ var SelectItem = {
 				return false;
 			}
 		});
-		
-		model.$render = function() {
+
+		scope.$render_editable = function() {
 			var val = model.$modelValue;
 			if (val === null || _.isUndefined(val))
 				return input.val('');
@@ -756,72 +801,73 @@ var SelectItem = {
 			input.autocomplete(value && 'disable' || 'enable');
 		});
 	},
-	replace: true,
-	template:
+	template_editable:
 	'<span class="picker-input">'+
 		'<input type="text" autocomplete="off">'+
 		'<span class="picker-icons">'+
 			'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
 		'</span>'+
 	'</span>'
-};
+});
 
-var SelectQueryItem = {
-		css: 'select-item',
-		cellCss: 'form-item select-item',
-		require: '?ngModel',
-		scope: true,
-		link: function(scope, element, attrs, model) {
-			
-			var query = scope.$eval(attrs.query),
-				input = element.children('input:first');
+ui.formInput('SelectQuery', {
+	
+	css: 'select-item',
+	cellCss: 'form-item select-item',
 
-			scope.showSelection = function() {
-				input.autocomplete("search" , '');
-			};
-			
-			input.keydown(function(e){
-				if (e.keyCode != 9)
-					return false;
+	link_editable: function(scope, element, attrs, model) {
+		
+		var query = scope.$eval(attrs.query),
+			input = element.children('input:first');
+
+		scope.showSelection = function() {
+			input.autocomplete("search" , '');
+		};
+		
+		input.keydown(function(e){
+			if (e.keyCode != 9)
+				return false;
+		});
+		
+		scope.$render_editable = function() {
+			var value = model.$modelValue;
+			input.val(value);
+		};
+
+		setTimeout(function(){
+			input.autocomplete({
+				minLength: 0,
+				source: query,
+				select: function(event, ui) {
+					scope.$apply(function(){
+						model.$setViewValue(ui.item.id);
+					});
+				}
 			});
-			
-			model.$render = function() {
-				var value = model.$modelValue;
-				input.val(value);
-			};
-			
-			setTimeout(function(){
-				input.autocomplete({
-					minLength: 0,
-					source: query,
-					select: function(event, ui) {
-						scope.$apply(function(){
-							model.$setViewValue(ui.item.id);
-						});
-					}
-				});
-			});
-		},
-		replace: true,
-		template:
-		'<span class="picker-input">'+
-			'<input type="text" autocomplete="off">'+
-			'<span class="picker-icons">'+
-				'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
-			'</span>'+
-		'</span>'
-};
+		});
+	},
+	template_editable:
+	'<span class="picker-input">'+
+		'<input type="text" autocomplete="off">'+
+		'<span class="picker-icons">'+
+			'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
+		'</span>'+
+	'</span>'
+});
 
-var ImageItem = {
+ui.formInput('Image', {
+	
 	css: 'image-item',
 	cellCss: 'form-item image-item',
-	require: '?ngModel',
-	scope: true,
-	link: function(scope, element, attrs, model) {
+	
+	BLANK: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+
+	link_editable: function(scope, element, attrs, model) {
 		
 		var input = element.children('input:first');
 		var image = element.children('img:first');
 		var buttons = element.children('.btn-group');
+		var BLANK = this.BLANK;
 		
 		input.add(buttons).hide();
 		image.add(buttons).hover(function(){
@@ -841,8 +887,6 @@ var ImageItem = {
 			}
 		};
 		
-		var BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-
 		scope.doRemove = function() {
 			image.get(0).src = BLANK;
 			image.get(0).src = null;
@@ -870,7 +914,7 @@ var ImageItem = {
 			});
 		}
 
-		model.$render = function() {
+		scope.$render_editable = function() {
 			var content = model.$viewValue || null;
 			if (content == null) {
 				image.get(0).src = BLANK;
@@ -878,7 +922,19 @@ var ImageItem = {
 			image.get(0).src = content;
 		};
 	},
-	template:
+	link_readonly: function(scope, element, attrs, model) {
+
+		var BLANK = this.BLANK;
+
+		scope.$render_readonly = function() {
+			var content = model.$viewValue || null;
+			if (content == null) {
+				element.get(0).src = BLANK;
+			}
+			element.get(0).src = content;
+		};
+	},
+	template_editable:
 	'<div>' +
 		'<input type="file" accept="image/*">' +
 		'<img class="img-polaroid" style="width: 140px; height: 140px;">' +
@@ -887,15 +943,17 @@ var ImageItem = {
 			'<button ng-click="doSave()" class="btn" type="button"><i class="icon-download-alt"></i></button>' +
 			'<button ng-click="doRemove()" class="btn" type="button"><i class="icon-remove"></i></button>' +
 		'</div>' +
-	'</div>'
-};
+	'</div>',
+	
+	template_readonly: '<img class="img-polaroid" style="width: 140px; height: 140px;">'
+});
 
-var FileItem = {
+ui.formInput('Binary', {
+	
 	css: 'file-item',
 	cellCss: 'form-item file-item',
-	require: '^ngModel',
-	scope: true,
-	link: function(scope, element, attrs, model) {
+	
+	link_editable: function(scope, element, attrs, model) {
 		
 		var input = element.children('input:first').hide();
 		var frame = element.children("iframe").hide();
@@ -944,7 +1002,7 @@ var FileItem = {
 		});
 		
 	},
-	template:
+	template_editable:
 	'<div>' +
 		'<iframe></iframe>' +
 		'<input type="file">' +
@@ -954,37 +1012,6 @@ var FileItem = {
 			'<button ng-click="doRemove()" class="btn" type="button"><i class="icon-remove"></i></button>' +
 		'</div>' +
 	'</div>'
-};
-
-// register directives
-
-var directives = {
-	
-	'uiLabel'		: LabelItem,
-	'uiSpacer'		: SpacerItem,
-	'uiSeparator'	: SeparatorItem,
-	'uiStatic'		: StaticItem,
-	'uiButton'		: ButtonItem,
-	'uiSelect'		: SelectItem,
-	'uiSelectQuery'	: SelectQueryItem,
-	
-	'uiString'	: StringItem,
-	'uiEmail'	: EmailItem,
-	'uiPhone'	: PhoneItem,
-	'uiInteger'	: IntegerItem,
-	'uiDecimal'	: DecimalItem,
-	'uiBoolean'	: BooleanItem,
-	'uiDatetime': DateTimeItem,
-	'uiDate'	: DateItem,
-	'uiTime'	: TimeItem,
-	'uiText'	: TextItem,
-	'uiPassword': PasswordItem,
-	'uiImage'	: ImageItem,
-	'uiBinary'	: FileItem
-};
-
-for(var name in directives) {
-	ui.formDirective(name, directives[name]);
-}
+});
 
 })(this);

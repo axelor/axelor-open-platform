@@ -946,6 +946,7 @@ ui.directive('uiSlickEditors', function() {
 		controller: ['$scope', '$element', 'DataSource', 'ViewService', function($scope, $element, DataSource, ViewService) {
 			ViewCtrl($scope, DataSource, ViewService);
 			FormViewCtrl.call(this, $scope, $element);
+			$scope.setViewMode('edit');
 			$scope.onShow = function(viewPromise) {
 				
 			};
@@ -1023,6 +1024,8 @@ ui.directive('uiSlickGrid', ['ViewService', function(ViewService) {
 				if (attrs.editable === "false") {
 					view.editable = false;
 				}
+				scope.selector = attrs.selector;
+				scope.noFilter = attrs.noFilter;
 
 				grid = new Grid(scope, element, attrs, ViewService);
 				if (view.editable) {

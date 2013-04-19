@@ -1,4 +1,7 @@
 (function() {
+	
+// integrate underscore.string with underscore
+_.mixin(_.str.exports());
 
 var util = this.util ? this.util : this.util = {};
 

@@ -194,27 +194,6 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		};
 	};
 	
-	$scope.setValue = function(value, fireOnChange) {
-		var model = $scope.ngModel,
-			onChange = $element.data('$onChange');
-		setTimeout(function(){
-			$scope.$apply(function(){
-				model.$setViewValue(value);
-				model.$render();
-				if (onChange && fireOnChange) {
-					onChange.handle();
-				}
-			});
-		});
-	};
-
-	$scope.getValue = function() {
-		var model = $scope.ngModel;
-		if (model != null)
-			return model.$viewValue;
-		return null;
-	};
-	
 	$scope.fetchData = function(value, success) {
 		
 		var records = $.makeArray(value),

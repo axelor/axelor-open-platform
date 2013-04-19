@@ -2,20 +2,18 @@
 
 var ui = angular.module('axelor.ui');
 
-FormController.$inject = ['$scope', '$element', '$attrs'];
-function FormController(scope, element, attrs) {
-	//TODO: implement form widget controller
-};
-
 /**
  * The Form widget.
  *
  */
-var Form = {
+ui.formWidget('Form', {
 
 	priority: 100,
+	
 	css: "dynamic-form",
-
+	
+	scope: false,
+	
 	compile: function(element, attrs) {
 
 		element.find('[x-field],[data-field]').each(function(){
@@ -39,13 +37,11 @@ var Form = {
 	},
 	
 	link: function(scope, element, attrs, controller) {
+		if (!window.s) window.s = scope;
 		element.on('submit', function(e) {
 			e.preventDefault();
 		});
 	}
-};
-
-// register directives
-ui.formDirective('uiForm', Form);
+});
 
 })(this);

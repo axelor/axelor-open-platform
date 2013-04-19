@@ -2,7 +2,8 @@
 	<div class="record-toolbar btn-toolbar">
 	  <div class="btn-group">
 	    <button class="btn" ng-click="onNew()" ng-show="hasButton('new')"><i class="icon icon-file"></i> <span x-translate>New</span></button>
-	    <button class="btn" ng-click="onSave()" ng-show="hasButton('save')" ng-disabled="!canSave()"><i class="icon icon-save"></i> <span x-translate>Save</span></button>
+	    <button class="btn" ng-click="onEdit()" ng-show="hasButton('edit') && canEdit()"><i class="icon icon-pencil"></i> <span x-translate>Edit</span></button>
+	    <button class="btn" ng-click="onSave()" ng-show="hasButton('save') && !canEdit()" ng-disabled="!canSave()"><i class="icon icon-save"></i> <span x-translate>Save</span></button>
 	    <button class="btn" ng-click="onCopy()" ng-show="hasButton('copy')" ng-disabled="!canCopy()"><i class="icon icon-copy"></i> <span x-translate>Copy</span></button>
 	    <button class="btn" ng-click="onCancel()" ng-show="hasButton('cancel')"><i class="icon icon-ban-circle"></i> <span x-translate>Cancel</span></button>
 	  </div>

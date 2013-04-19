@@ -7,9 +7,10 @@ var ui = angular.module('axelor.ui');
  *
  */
 var Group = {
-
-	scope: true,
 	
+	css: 'form-item-group',
+	cellCss: 'form-item v-align-top',
+		
 	link: function(scope, element, attrs) {
 
 		var props = scope.getViewDef(element);
@@ -37,8 +38,6 @@ var Group = {
 			scope.title = value;
 		});
 	},
-	css: 'form-item-group',
-	cellCss: 'form-item v-align-top',
 	transclude: true,
 	template:
 		'<fieldset ng-class="{\'bordered-box\': title}" ng-transclude x-layout-after="&gt; legend:first">'+
@@ -52,9 +51,11 @@ var Group = {
  * The Tabs widget (notebook).
  */
 var Tabs = {
+	
 	cellCss: 'form-item v-align-top',
-	transclude: true,
-	scope: true,
+	
+	widgets: ['Notebook'],
+
 	controller: ['$scope', '$element', function($scope, $element) {
 		
 		var tabs = $scope.tabs = [],
@@ -171,7 +172,7 @@ var Tabs = {
 			elem.children('.tab-content:first').height(props.height);
 		}
 	},
-	
+	transclude: true,
 	template:
 		'<div class="tabbable-tabs">' +
 			'<div class="nav-tabs-wrap">' +
@@ -204,8 +205,11 @@ var Tabs = {
  * The Tab widget (notebook page).
  */ 
 var Tab = {
+	
 	require: '^uiTabs',
-	scope: true,
+	
+	widgets: ['Page'],
+	
 	link: function(scope, elem, attrs, tabs) {
 		
 		setTimeout(function(){
@@ -224,8 +228,8 @@ var Tab = {
 
 
 // register directives
-ui.formDirective('uiGroup', Group);
-ui.formDirective('uiTabs', Tabs);
-ui.formDirective('uiTab', Tab);
+ui.formItem('uiGroup', Group);
+ui.formItem('uiTabs', Tabs);
+ui.formItem('uiTab', Tab);
 
 })(this);
