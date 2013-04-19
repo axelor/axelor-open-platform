@@ -235,6 +235,7 @@ function GridViewCtrl($scope, $element) {
 			$scope.ajaxStop(function(){
 				setTimeout(function(){
 					viewScope.$broadcast('on:new');
+					viewScope.$apply();
 				});
 			});
 		});

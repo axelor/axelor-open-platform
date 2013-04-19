@@ -104,6 +104,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			$scope.ajaxStop(function(){
 				setTimeout(function(){
 					popup.$broadcast("on:new");
+					popup.$apply();
 				});
 			});
 		}
