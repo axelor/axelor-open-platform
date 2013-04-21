@@ -213,7 +213,7 @@ var Tab = {
 	link: function(scope, elem, attrs, tabs) {
 		
 		setTimeout(function(){
-			scope.onSelect = elem.data('$onSelect');
+			scope.onSelect = scope.$events.onSelect;
 		});
 		
 		tabs.addTab(scope);

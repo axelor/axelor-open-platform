@@ -167,9 +167,9 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			popup.show();
 		}
 		
-		var onSelect = $element.data('$onSelect');
+		var onSelect = scope.$evetns.onSelect;
 		if (onSelect) {
-			onSelect.handle().then(function(){
+			onSelect().then(function(){
 				doShow();
 			});
 		} else {

@@ -144,9 +144,10 @@ function FormViewCtrl($scope, $element) {
 		$scope.editRecord(record);
 		$scope.updateRoute();
 		$scope._viewPromise.then(function(){
-			var events = $scope.$events;
-			if (events.onLoad && record) {
-				setTimeout(events.onLoad);
+			var handler = $scope.$events.onLoad,
+				record = $scope.record;
+			if (handler && record) {
+				setTimeout(handler);
 			}
 		});
 	};
@@ -240,9 +241,10 @@ function FormViewCtrl($scope, $element) {
 	
 	$scope.$on("on:new", function(event){
 		$scope._viewPromise.then(function(){
-			var events = $scope.$events;
-			if (events.onNew) {
-				setTimeout(events.onNew);
+			var handler = $scope.$events.onNew,
+				record = $scope.record;
+			if (handler && record) {
+				setTimeout(handler);
 			}
 		});
 	});
@@ -299,8 +301,8 @@ function FormViewCtrl($scope, $element) {
 	};
 
 	$scope.onSave = function() {
-		var events = $scope.$events,
-			saveAction = events.onSave;
+
+		var saveAction = $scope.$events.onSave;
 		
 		function doSave() {
 			var dummy = $scope.getDummyValues();
@@ -548,100 +550,6 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 	return function(scope, element, attrs) {
 		
 		var loaded = false;
-		
-		function findItem(item) {
-			var elem = item;
-			if (_.isString(item))
-				elem = $('#' + item);
-			return elem ? $(elem) : null;
-		}
-		
-		scope.isReadonly = function(item) {
-			return $(item).is(":disabled,.ui-state-disabled");
-		};
-
-		scope.setReadonly = function(item, readonly) {
-			var flag = _.isUndefined(readonly) || readonly,
-				elem = findItem(item),
-				label, classOp;
-
-			if (elem == null)
-				return;
-
-			label = elem.data('label') || $();
-			classOp = flag ? 'addClass' : 'removeClass';
-			
-			if (elem.is('.tabbable-tabs')) {
-				elem = elem.children('.tab-content');
-			}
-
-			elem.add(label)[classOp]('ui-state-disabled');
-
-			if (elem.is('.ui-spinner-input')) {
-				return elem.spinner('option', 'disabled', flag);
-			}
-			if (elem.is(':input')) {
-				return elem.attr('disabled', flag);
-			}
-			
-			if (elem.is('.input-append,.picker-input')){
-				return elem.find(':input').attr('disabled', flag)[classOp]('ui-state-disabled');
-			}
-
-			elem.find(':input, a').each(function(){
-				var e = $(this);
-				if (e.is('.ui-state-disabled')) {
-					return;
-				}
-				if (e.is('a')) {
-					if (e.attr('tabindex') !== -1) {
-						return e.attr('tabindex', flag ? -2 : null);
-					}
-				}
-				e.attr('disabled', flag);
-			});
-			
-			if (elem.is(".one2many-item,.many2many-item")) {
-				return;
-			}
-			
-			var div = elem.children('.disabled-overlay');
-			if (div.size() == 0) {
-				div = $('<div class="disabled-overlay"></div>').appendTo(elem);
-			}
-			
-			return flag ? div.show() : div.hide();
-		};
-
-		scope.setHidden = function(item, hidden) {
-			var flag = _.isUndefined(hidden) || hidden,
-				elem = findItem(item), label, label_parent, parent;
-			if (elem == null)
-				return;
-			label = elem.data('label') || $();
-			label_parent = label.parent('td');
-			parent = elem.parent('td');
-			if (parent.size() == 0)
-				parent = elem;
-			if (label_parent.size())
-				label = label_parent;
-			return flag ? parent.add(label).hide() : parent.add(label).show();
-		};
-		
-		scope.setRequired = function(item, required) {
-			var flag = _.isUndefined(required) || required,
-				elem = findItem(item), attrs, label;
-			if (elem == null)
-				return;
-			attrs = elem.data('$attrs');
-			label = elem.data('label') || $();
-			if (label) {
-				flag ? label.addClass('required') : label.removeClass('required');
-			}
-			if (attrs) {
-				attrs.$set('required', flag);
-			}
-		};
 		
 		function getContent() {
 			var info = {};

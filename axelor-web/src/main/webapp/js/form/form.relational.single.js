@@ -163,19 +163,13 @@ ui.formInput('ManyToOne', {
 		if (field.widget == 'NestedEditor') {
 			setTimeout(function(){
 				embedded = scope.showNestedEditor();
-				if (readonly) {
-					scope.setReadonly(embedded, readonly);
+				embeddedScope = embedded.data('$scope');
+				if (embeddedScope) {
+					embeddedScope.attr('readonly', readonly);
 				}
 			});
 		}
 
-		attrs.$observe('readonly', function(value) {
-			readonly = value;
-			if (embedded) {
-				scope.setReadonly(embedded, readonly);
-			}
-		});
-		
 		scope.setValidity = function(key, value) {
 			model.$setValidity(key, value);
 		};
@@ -223,9 +217,9 @@ ui.formInput('ManyToOne', {
 		var onSelectFired = false;
 		input.autocomplete({
 			source: function(request, response) {
-				var onSelect = element.data('$onSelect');
+				var onSelect = scope.$evetns.onSelect;
 				if (onSelect && !onSelectFired) {
-					onSelect.handle().then(function(){
+					onSelect().then(function(){
 						search(request, response);
 					});
 					onSelectFired = true;
@@ -252,7 +246,7 @@ ui.formInput('ManyToOne', {
 		
 		var canSelect = _.isUndefined(field.canSelect) ? true : field.canSelect;
 		setTimeout(function(){
-			if (!canSelect) scope.setHidden(element);
+			if (!canSelect) scope.attr('hidden', true);
 		});
 		
 		if ((scope._viewParams || {}).summaryView) {

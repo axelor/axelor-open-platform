@@ -256,7 +256,7 @@ ui.formInput('Integer', {
 		}
 		
 		function updateModel(value, handle) {
-			var onChange = element.data('$onChange');
+			var onChange = scope.$events.onChange;
 
 			if (!isNumber(value)) {
 				return;
@@ -271,7 +271,7 @@ ui.formInput('Integer', {
 			});
 
 			if (onChange && handle) {
-				onChange.handle();
+				setTimeout(onChange);
 			}
 		}
 		
@@ -367,6 +367,8 @@ ui.formInput('Boolean', {
 	
 	link_editable: function(scope, element, attrs, model) {
 
+		var onChange = scope.$events.onChange || angular.noop;
+		
 		scope.$render_editable = function() {
 			element[0].checked = scope.parse(model.$viewValue);
 		};
@@ -375,6 +377,7 @@ ui.formInput('Boolean', {
 			scope.setValue(this.checked);
 			setTimeout(function(){
 				scope.$apply();
+				setTimeout(onChange);
 			});
 		});
 	},
@@ -519,6 +522,8 @@ ui.formInput('DateTime', {
 	link_editable: function(scope, element, attrs, model) {
 		var input = element.children('input:first');
 		var button = element.find('i:first');
+		var onChange = scope.$events.onChange;
+		
 		var options = {
 			dateFormat: 'dd/mm/yy',
 			showButtonsPanel: false,
@@ -527,6 +532,9 @@ ui.formInput('DateTime', {
 			onSelect: function(dateText, inst) {
 				input.mask('value', dateText);
 				updateModel();
+				if (changed && onChange) {
+					setTimeout(onChange);
+				}
 				if (!inst.timeDefined) {
 					input.datetimepicker('hide');
 					setTimeout(function(){
@@ -555,6 +563,9 @@ ui.formInput('DateTime', {
 			if (changed) {
 				changed = false;
 				updateModel();
+				if (scope.$events.onChange) {
+					setTimeout(scope.$events.onChange);
+				}
 			}
 		});
 		input.on('keydown', function(e){
@@ -725,11 +736,11 @@ ui.formInput('Select', {
 		};
 		
 		function updateValue(value) {
-			var onChange = element.data('$onChange');
+			var onChange = scope.$evetns.onChange;
 			scope.$apply(function(){
-				model.$setViewValue(value);
+				this.setValue(value);
 				if (onChange) {
-					onChange.handle();
+					setTimeout(onChange);
 				}
 			});
 		}
