@@ -70,6 +70,6 @@ _t.put({
 "Update Log": "Modifications",
 "Upload": "Ajouter",
 "The record has been updated or delete by another action.": "L'enregistrement a été modifié ou supprimé par une autre action.",
-"Would you like to reload the current record ?": "Voulez-vous actualiser l'enregistrement actuel ?",
+"Would you like to reload the current record?": "Voulez-vous actualiser l'enregistrement actuel ?",
 "You are not allow to upload a file bigger than": "Vous n'êtes pas autoriser à uploader un fichier plus grand que"
 });
