@@ -38,20 +38,25 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		var props = _.pick(field, ['readonly', 'required', 'hidden']);
 		var state = _.clone(props);
 		
+		scope.$events = {};
 		scope.field = field || {};
-
+		
 		scope.attr = function(name) {
 			if (arguments.length > 1) {
 				return state[name] = arguments[1];
 			}
 			return state[name];
 		};
+		
+		function resetState() {
+			state = _.clone(attrs);
+		}
 
 		scope.$on("on:new", function(){
-			state = _.clone(attrs);
+			resetState();
 		});
 		scope.$on("on:edit", function(){
-			state = _.clone(attrs);
+			resetState;
 		});
 
 		scope.isRequired = function() {
@@ -168,13 +173,34 @@ ui.formDirective = function(name, object) {
 				element.append(scope.$elem_readonly);
 				return true;
 			}
-
-			scope.$watch('view_mode', function(mode) {
-				if (mode === 'edit' && showEditable()) {
+			
+			scope.$watch("isReadonly()", function(readonly) {
+				if (readonly && showReadonly()) {
 					return;
 				}
-				return showReadonly();
+				return showEditable();
 			});
+			scope.$watch("isHidden()", function(hidden) {
+				var elem = element,
+					parent = elem.parent('td'),
+					label = elem.data('label') || $(),
+					label_parent = label.parent('td');
+				if (parent.size() == 0)
+					parent = elem;
+				if (label_parent.size())
+					label = label_parent;
+				return hidden ? parent.add(label).hide() : parent.add(label).show();
+			});
+			scope.$watch("isRequired()", function(required) {
+				var elem = element,
+					label = elem.data('label') || $();
+
+				if (label) {
+					required ? label.addClass('required') : label.removeClass('required');
+				}
+				attrs.$set('required', required);
+			});
+			
 		});
 
 		return object;
@@ -207,12 +233,12 @@ var FormInput = {
 		scope.validate = function(value) {
 			return true;
 		};
-
+		
 		scope.setValue = function(value, fireOnChange) {
 
 			var val = this.parse(value);
 			var txt = this.format(value);
-			var onChange = element.data('$onChange');
+			var onChange = this.$events.onChange;
 
 			model.$setViewValue(val);
 			scope.text = txt;
@@ -220,11 +246,9 @@ var FormInput = {
 			setTimeout(function(){
 				model.$render();
 			});
-			
+
 			if (onChange && fireOnChange) {
-				setTimeout(function(){
-					onChange.handle();
-				});
+				setTimeout(onChange);
 			}
 		};
 
@@ -261,10 +285,24 @@ var FormInput = {
 			element.val(value);
 		};
 
-		element.change(function(e){
-			scope.setValue(element.val());
-			scope.$apply();
-		});
+		if (element.is(':input')) {
+			
+			var onChange = scope.$events.onChange || angular.noop,
+				onChangePending = false;
+
+			element.change(function(e){
+				scope.setValue(element.val());
+				scope.$apply();
+				onChangePending = true;
+			});
+			
+			element.blur(function(e){
+				if (onChangePending) {
+					onChangePending = false;
+					setTimeout(onChange);
+				}
+			});
+		}
 		
 		scope.$render_editable();
 	},

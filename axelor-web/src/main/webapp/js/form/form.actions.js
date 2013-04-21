@@ -140,37 +140,16 @@ ActionHandler.prototype = {
 	},
 
 	onChange: function(event) {
-		var element = $(event.target),
-			deferred = this.ws.defer(),
+		var deferred = this.ws.defer(),
 			promise = deferred.promise;
 
-		if (element.is('[type="checkbox"],.select-item')) {
-			var self = this;
-			setTimeout(function(){
-				self.handle().then(deferred.resolve, deferred.reject);
-			});
-			return promise;
-		}
-
-		this._onChangeDeferred = deferred;
-		this._onChangePending = true;
-		
+		var self = this;
+		setTimeout(function(){
+			self.handle().then(deferred.resolve, deferred.reject);
+		});
 		return promise;
 	},
 	
-	onBlur: function(event) {
-		var deferred = this._onChangeDeferred || this.ws.defer(),
-			promise = deferred.promise;
-		if (this._onChangePending) {
-			this._onChangePending = false;
-			this._onChangeDeferred = null;
-			this.handle().then(deferred.resolve, deferred.reject);
-		} else {
-			deferred.resolve();
-		}
-		return promise;
-	},
-
 	_getContext: function() {
 		var scope = this.scope,
 			context = scope.getContext ? scope.getContext() : scope.record,
@@ -443,13 +422,13 @@ ActionHandler.prototype = {
 				
 				switch(attr) {
 				case 'required':
-					scope.setRequired(item, value);
+					itemScope.attr('required', value);
 					break;
 				case 'readonly':
-					scope.setReadonly(item, value);
+					itemScope.attr('readonly', value);
 					break;
 				case 'hidden':
-					scope.setHidden(item, value);
+					itemScope.attr('hidden', value);
 					break;
 				case 'collapse':
 					if (itemScope.setCollapsed)
@@ -473,7 +452,7 @@ ActionHandler.prototype = {
 			
 			item.trigger("on:attrs-change", itemAttrs);
 		}
-
+		
 		forEach(data.attrs, function(itemAttrs, itemName) {
 			var items = findItems(itemName);
 			if (items == null || items.length == 0) {
@@ -520,87 +499,32 @@ ActionHandler.prototype = {
 	}
 };
 
+var EVENTS = ['onClick', 'onChange', 'onSelect', 'onNew', 'onLoad', 'onSave'];
+
 ui.directive('uiActions', ['ViewService', function(ViewService) {
 
 	return function(scope, element, attrs) {
 
-		var props = scope.getViewDef(element),
-			action;
-
-		props = _.isEmpty(props) ? scope.schema : props;
+		var props = _.isEmpty(scope.field) ? scope.schema : scope.field;
 		if (props == null)
 			return;
-		
-		function isRelational(elem) {
-			return elem.is('.many2one-item,.one2many-item,.many2many-item');
-		}
 
-		action = props.onClick;
-		if (action) {
+		_.each(EVENTS, function(name){
+			var action = props[name];
+			if (action == null) {
+				return;
+			}
+			
 			var handler = new ActionHandler(scope, ViewService, {
 				element: element,
 				action: action,
 				canSave: props.canSave,
 				prompt: props.prompt
 			});
-
-			element.on('click', _.bind(handler.onClick, handler));
-		}
-		
-		action = props.onChange;
-		if (action) {
-			var _scope = isRelational(element) ? scope.$parent : scope;
-			var handler = new ActionHandler(_scope, ViewService, {
-				element: element,
-				action: action
-			});
-			
-			if (element.is('.input-append,.picker-input') || !(element.is(':input')) || element.is('.decimal-item')) {
-				element.data('$onChange', handler);
-			} else {
-				var input = element.find(':input:first').andSelf().last();
-				input.on('change', _.bind(handler.onChange, handler));
-				input.on('blur', _.bind(handler.onBlur, handler));
-			}
-		}
-
-		action = props.onSelect;
-		if (action) {
-			var _scope = isRelational(element) ? scope.$parent : scope;
-			var handler = new ActionHandler(_scope, ViewService, {
-				element: element,
-				action: action
-			});
-			element.data('$onSelect', handler);
-		}
-		
-		action = props.onNew;
-		if (action) {
-			var handler = new ActionHandler(scope, ViewService, {
-				element: element,
-				action: action
-			});
-			scope.$events.onNew = _.bind(handler.onNew, handler);
-		}
-		
-		action = props.onLoad;
-		if (action) {
-			var handler = new ActionHandler(scope, ViewService, {
-				element: element,
-				action: action
-			});
-			scope.$events.onLoad = _.bind(handler.onLoad, handler);
-		}
-		
-		action = props.onSave;
-		if (action) {
-			var handler = new ActionHandler(scope, ViewService, {
-				element: element,
-				action: action
-			});
-			scope.$events.onSave = _.bind(handler.onSave, handler);
-		}
+			scope.$events[name] = _.bind(handler[name], handler);
+		});
 	};
+	
 }]);
 
 ui.directive('uiToolButton', ['ViewService', function(ViewService) {
