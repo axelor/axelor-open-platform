@@ -38,6 +38,10 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		var props = _.pick(field, ['readonly', 'required', 'hidden']);
 		var state = _.clone(props);
 		
+		if (attrs.css) {
+			element.addClass(attrs.css);
+		}
+		
 		scope.$events = {};
 		scope.field = field || {};
 		
