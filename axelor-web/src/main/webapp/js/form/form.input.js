@@ -167,6 +167,12 @@ ui.formItem('Static', {
 ui.formItem('Button', {
 	css: 'button-item',
 	transclude: true,
+	link: function(scope, element, attrs, model) {
+
+		element.on("click", function(e) {
+			scope.fireAction("onClick");
+		});
+	},
 	template: '<button class="btn" type="button" ng-transclude></button>'
 });
 
