@@ -694,7 +694,8 @@ ui.formInput('Time', 'DateTime', {
  */
 ui.formInput('Text', {
 	css: 'text-item',
-	template_editable: '<textarea rows="8"></textarea>'
+	template_editable: '<textarea rows="8"></textarea>',
+	template_readonly: '<pre>{{text}}</pre>'
 });
 
 ui.formInput('Password', {
