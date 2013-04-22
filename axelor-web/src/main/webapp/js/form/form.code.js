@@ -2,10 +2,10 @@
 
 var ui = angular.module('axelor.ui');
 
-var CodeEditor = {
+ui.formInput('CodeEditor', {
+
 	css: "code-editor",
-	require: '?ngModel',
-	scope: true,
+
 	link: function(scope, element, attrs, model) {
 		
 		var field = scope.getViewDef(element);
@@ -23,7 +23,8 @@ var CodeEditor = {
 		editor.setTheme('ace/theme/' + props.theme);
 		editor.setFontSize(props.fontSize);
 		editor.setShowPrintMargin(false);
-		editor.setReadOnly(props.readonly);
+		
+		editor.setReadOnly(scope.isReadonly());
 		
 		var loadingText = false;
 		model.$render = function() {
@@ -41,8 +42,10 @@ var CodeEditor = {
 				});
 			});
 		});
-		attrs.$observe('readonly', function(value){
+		scope.$watch('isReadonly()', function(value){
 			editor.setReadOnly(value);
+			editor.renderer.setShowGutter(!value);
+			editor.setHighlightActiveLine(!value);
 		});
 		
 		function resize() {
@@ -62,12 +65,16 @@ var CodeEditor = {
 			resize: resize
 		});
 	},
-	transclude: true,
-	replace: true,
-	template:
-	'<div style="min-height: 280px;" ng-transclude></div>'
-};
 
-ui.formDirective('uiCodeEditor', CodeEditor);
+	replace: true,
+
+	transclude: true,
+	
+	template_editable: null,
+	
+	template_readonly: null,
+	
+	template: '<div style="min-height: 280px;" ng-transclude></div>'
+});
 
 })(this);
