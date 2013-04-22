@@ -78,6 +78,13 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			return this.attr("hidden") || false;
 		};
 
+		scope.fireAction = function(name, success, error) {
+			var handler = this.$events[name];
+			if (handler) {
+				return handler().then(success, error);
+			}
+		};
+
 		if (angular.isFunction(this._link_internal)) {
 			this._link_internal.call(this, scope, element, attrs, controller);
 		}
