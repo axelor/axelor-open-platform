@@ -333,7 +333,7 @@ var FormInput = {
 
 	template_editable: '<input type="text">',
 
-	template_readonly: '<span>{{text}}</span>',
+	template_readonly: '<span class="display-text">{{text}}</span>',
 	
 	template: '<span class="form-item-container"></span>'
 };

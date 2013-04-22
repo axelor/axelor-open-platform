@@ -37,21 +37,24 @@ table.form-layout td.form-item {
 
 table.form-layout td.form-label {
 	text-align: right;
-	padding-top: 5px;
 	width: 15%;
 }
 
 table.form-layout td.form-item.boolean-item {
-	padding-top: 5px;
 	vertical-align: inherit;
+}
+
+table.form-layout td.form-label > label {
+	line-height: 22px;
+	margin-bottom: 0px;
+}
+
+table.form-layout td.form-label > label:after {
+	content: ":";
 }
 
 table.form-layout td.form-label label.required {
 	font-weight: bold;
-}
-
-table.form-layout td.form-label > label {
-	margin-bottom: 2px;
 }
 
 table.form-layout td.form-item > *,
@@ -62,6 +65,12 @@ table.form-layout td.form-item > *,
 
 table.form-layout td.form-item.v-align-top {
 	vertical-align: top;	
+}
+
+table.form-layout td.form-item > .form-item-container,
+table.form-layout td.form-item > .form-item-container > span.display-text {
+	line-height: 22px;
+	display: block;
 }
 
 table.form-layout td.form-item input {
@@ -115,10 +124,6 @@ table.form-layout td.form-item textarea {
 
 table.form-layout fieldset {
 	padding: 4px 0;
-}
-
-table.form-layout td.form-item .separator-item > span {
-	font-weight: bold;
 }
 
 table.form-layout td.form-item .input-append input {
@@ -289,7 +294,6 @@ td.form-item > * {
 	padding: 0 4px;
 		
 	font-size: inherit;
-	font-weight: bold;
 	line-height: 1.4em;
 	
 	border: none;
