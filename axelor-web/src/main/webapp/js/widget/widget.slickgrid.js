@@ -946,7 +946,7 @@ ui.directive('uiSlickEditors', function() {
 		controller: ['$scope', '$element', 'DataSource', 'ViewService', function($scope, $element, DataSource, ViewService) {
 			ViewCtrl($scope, DataSource, ViewService);
 			FormViewCtrl.call(this, $scope, $element);
-			$scope.setViewMode('edit');
+			$scope.setEditable();
 			$scope.onShow = function(viewPromise) {
 				
 			};

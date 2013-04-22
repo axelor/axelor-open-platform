@@ -6,14 +6,14 @@ var ui = angular.module('axelor.ui');
  * The Group widget.
  *
  */
-var Group = {
+ui.formWidget('Group', {
 	
 	css: 'form-item-group',
 	cellCss: 'form-item v-align-top',
 		
 	link: function(scope, element, attrs) {
 
-		var props = scope.getViewDef(element);
+		var props = scope.field;
 
 		scope.canCollapse = props.canCollapse;
 		scope.collapsed = false;
@@ -39,18 +39,21 @@ var Group = {
 		});
 	},
 	transclude: true,
+	transcludeSelect: function(element) {
+		return element;
+	},
 	template:
-		'<fieldset ng-class="{\'bordered-box\': title}" ng-transclude x-layout-after="&gt; legend:first">'+
+		'<fieldset ng-class="{\'bordered-box\': title}" x-layout-after="&gt; legend:first">'+
 			'<legend ng-show="title">'+
 				'<i ng-show="canCollapse" ng-click="toggle()" ng-class="{\'icon-plus\': collapsed, \'icon-minus\': !collapsed}"></i>'+
 				'<span ng-bind-html-unsafe="title"></span></legend>'+
 		'</fieldset>'
-};
+});
 
 /**
  * The Tabs widget (notebook).
  */
-var Tabs = {
+ui.formWidget('Tabs', {
 	
 	cellCss: 'form-item v-align-top',
 	
@@ -173,6 +176,9 @@ var Tabs = {
 		}
 	},
 	transclude: true,
+	transcludeSelect: function(element) {
+		return element.find('.tab-content:first');
+	},
 	template:
 		'<div class="tabbable-tabs">' +
 			'<div class="nav-tabs-wrap">' +
@@ -197,14 +203,14 @@ var Tabs = {
 					'</div>'+
 				'</div>'+
 			'</div>' +
-			'<div class="tab-content" ng-transclude></div>' +
+			'<div class="tab-content"></div>' +
 		'</div>'
-};
+});
 
 /**
  * The Tab widget (notebook page).
  */ 
-var Tab = {
+ui.formWidget('Tab', {
 	
 	require: '^uiTabs',
 	
@@ -223,13 +229,10 @@ var Tab = {
 	},
 	cellCss: 'form-item v-align-top',
 	transclude: true,
-	template: '<div ui-actions class="tab-pane" ng-class="{active: selected}" ng-transclude></div>'
-};
-
-
-// register directives
-ui.formItem('uiGroup', Group);
-ui.formItem('uiTabs', Tabs);
-ui.formItem('uiTab', Tab);
+	transcludeSelect: function(element) {
+		return element;
+	},
+	template: '<div ui-actions class="tab-pane" ng-class="{active: selected}"></div>'
+});
 
 })(this);

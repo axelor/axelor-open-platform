@@ -23,8 +23,8 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		attrs.$set('x-cell-css', this.cellCss);
 	}
 
-	return angular.bind(this, function(scope, element, attrs, controller) {
-
+	function link(scope, element, attrs, controller) {
+		
 		element.addClass(this.css).parent().addClass(this.cellCss);
 		element.data('$attrs', attrs); // store the attrs object for event handlers
 
@@ -34,7 +34,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			});
 		}
 
-		var field = scope.getViewDef ? scope.getViewDef(element) : {};
+		var field = scope.getViewDef ? scope.getViewDef(element) || {}: {};
 		var props = _.pick(field, ['readonly', 'required', 'hidden']);
 		var state = _.clone(props);
 		
@@ -43,20 +43,20 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		
 		scope.attr = function(name) {
 			if (arguments.length > 1) {
-				return state[name] = arguments[1];
+				state[name] = arguments[1];
 			}
 			return state[name];
 		};
 		
 		function resetState() {
-			state = _.clone(attrs);
+			state = _.clone(props);
 		}
 
 		scope.$on("on:new", function(){
 			resetState();
 		});
 		scope.$on("on:edit", function(){
-			resetState;
+			resetState();
 		});
 
 		scope.isRequired = function() {
@@ -64,7 +64,11 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		};
 		
 		scope.isReadonly = function() {
-			if (scope.view_mode !== "edit") {
+			var parent = this.$parent;
+			if (parent && parent.isReadonly && parent.isReadonly()) {
+				return true;
+			}
+			if (!scope.isEditable()) {
 				return true;
 			}
 			return this.attr("readonly") || false;
@@ -77,25 +81,30 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		if (angular.isFunction(this._link_internal)) {
 			this._link_internal.call(this, scope, element, attrs, controller);
 		}
+		if (angular.isFunction(linkerFn) && angular.isFunction(this.transcludeSelect)) {
+			var ref = this.transcludeSelect(element);
+			linkerFn(scope.$new(), function(clone){
+				ref.append(clone);
+			});
+		}
 		if (angular.isFunction(this.init)) {
 			this.init.call(this, scope);
-		}
-		if (angular.isFunction(linkerFn)) {
-			linkerFn.call(this, scope, element, attrs, controller);
 		}
 		if (angular.isFunction(this.link)) {
 			this.link.call(this, scope, element, attrs, controller);
 		}
 
 		this.prepare(scope, element, attrs, controller);
-	});
+	}
+
+	return angular.bind(this, link);
 };
 
 ui.formDirective = function(name, object) {
 
 	if (object.compile === undefined) {
 		object.compile = angular.bind(object, function(element, attrs){
-			return ui.formCompile.call(this, element, attrs);
+			return ui.formCompile.apply(this, arguments);
 		});
 	}
 	
@@ -141,9 +150,9 @@ ui.formDirective = function(name, object) {
 					if (self.link_editable) {
 						self.link_editable.call(self, scope, scope.$elem_editable, attrs, model);
 					}
-					if (object.validate) {
+					if (scope.validate) {
 						model.$parsers.unshift(function(viewValue) {
-							var valid = object.validate(viewValue);
+							var valid = scope.validate(viewValue);
 							model.$setValidity('valid', valid);
 							return valid ? viewValue : undefined;
 						});
@@ -278,6 +287,10 @@ var FormInput = {
 		};
 	},
 
+	link: function(scope, element, attrs, model) {
+
+	},
+	
 	link_editable: function(scope, element, attrs, model) {
 		
 		scope.$render_editable = function() {

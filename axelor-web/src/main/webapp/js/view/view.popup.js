@@ -8,7 +8,7 @@ function EditorCtrl($scope, $element, DataSource) {
 	
 	FormViewCtrl.call(this, $scope, $element);
 	
-	$scope.setViewMode("edit");
+	$scope.setEditable();
 	$scope.onShow = function(viewPromise) {
 		
 		viewPromise.then(function(){

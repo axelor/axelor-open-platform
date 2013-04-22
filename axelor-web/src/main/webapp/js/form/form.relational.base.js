@@ -155,7 +155,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	};
 
 	$scope.showSelector = function() {
-		if ($scope.isReadonly($element)) {
+		if (this.isReadonly()) {
 			return;
 		}
 		function doShow() {
@@ -167,7 +167,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			popup.show();
 		}
 		
-		var onSelect = scope.$evetns.onSelect;
+		var onSelect = this.$events.onSelect;
 		if (onSelect) {
 			onSelect().then(function(){
 				doShow();

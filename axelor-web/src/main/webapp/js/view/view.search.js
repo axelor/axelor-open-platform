@@ -187,7 +187,7 @@ function SearchFormCtrl($scope, $element, ViewService) {
 	
 	FormViewCtrl.call(this, $scope, $element);
 	$scope._register('form', $scope);
-	$scope.setViewMode('edit');
+	$scope.setEditable();
 	
 	$scope.$watch('_searchView', function(schema) {
 		if (schema == null) return;
@@ -274,7 +274,7 @@ function SearchToolbarCtrl($scope, $element, $http) {
 
 	FormViewCtrl.call(this, $scope, $element);
 	$scope._register('toolbar', $scope);
-	$scope.setViewMode('edit');
+	$scope.setEditable();
 	
 	var menus = {};
 	

@@ -111,6 +111,14 @@ ui.formInput('ManyToOne', {
 		};
 	},
 
+	link: function(scope, element, attrs, model) {
+		if (scope.field.widget === 'NestedEditor') {
+			setTimeout(function(){
+				scope.showNestedEditor();
+			});
+		}
+	},
+
 	link_editable: function(scope, element, attrs, model) {
 
 		scope.ngModel = model;
@@ -157,18 +165,6 @@ ui.formInput('ManyToOne', {
 			}
 			input.val(value);
 		};
-
-		var embedded = null;
-		var readonly = false;
-		if (field.widget == 'NestedEditor') {
-			setTimeout(function(){
-				embedded = scope.showNestedEditor();
-				embeddedScope = embedded.data('$scope');
-				if (embeddedScope) {
-					embeddedScope.attr('readonly', readonly);
-				}
-			});
-		}
 
 		scope.setValidity = function(key, value) {
 			model.$setValidity(key, value);
@@ -254,7 +250,7 @@ ui.formInput('ManyToOne', {
 		}
 
 		scope.isDisabled = function() {
-			return scope.isReadonly(element);
+			return this.isReadonly();
 		};
 	},
 	
@@ -286,7 +282,7 @@ ui.formInput('SuggestBox', 'ManyToOne', {
 			minLength: 0
 		});
 		scope.showSelection = function() {
-			if (scope.isReadonly(element)) {
+			if (this.isReadonly()) {
 				return;
 			}
 			input.autocomplete("search" , '');

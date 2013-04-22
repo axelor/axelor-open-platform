@@ -102,11 +102,16 @@ function FormViewCtrl($scope, $element) {
 		});
 	};
 
-	$scope.view_mode = 'view';
-	$scope.setViewMode = function(mode) {
-		$scope.view_mode = mode;
+	var editable = false;
+
+	$scope.isEditable = function() {
+		return editable;
 	};
 
+	$scope.setEditable = function() {
+		editable = arguments.length === 1 ? _.first(arguments) : true;
+	};
+	
 	$scope.getRouteOptions = function() {
 		var rec = $scope.record,
 			args = [];
@@ -228,13 +233,13 @@ function FormViewCtrl($scope, $element) {
 	};
 	
 	$scope.canEdit = function() {
-		return $scope.view_mode !== 'edit';
+		return !$scope.isEditable();
 	};
 	
 	$scope.onNew = function() {
 		$scope.confirmDirty(function(){
 			$scope.edit(null);
-			$scope.setViewMode('edit');
+			$scope.setEditable();
 			$scope.$broadcast("on:new");
 		});
 	};
@@ -278,14 +283,14 @@ function FormViewCtrl($scope, $element) {
 	});
 	
 	$scope.onEdit = function() {
-		$scope.setViewMode('edit');
+		$scope.setEditable();
 	};
 
 	$scope.onCopy = function() {
 		var record = $scope.record;
 		ds.copy(record.id).success(function(record){
 			$scope.edit(record);
-			$scope.setViewMode('edit');
+			$scope.setEditable();
 		});
 	};
 	
@@ -355,11 +360,11 @@ function FormViewCtrl($scope, $element) {
 		
 		$scope.confirmDirty(function() {
 			var record = $scope.record || {};
-			var mode = $scope.view_mode;
+			var editable = $scope.isEditable();
 			
-			$scope.setViewMode('view');
+			$scope.setEditable(false);
 
-			if (record.id && mode == 'edit') {
+			if (record.id && editable) {
 				if ($scope.canSave()) {
 					$scope.reload();
 				}

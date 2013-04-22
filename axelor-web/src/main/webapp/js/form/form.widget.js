@@ -33,11 +33,10 @@ ui.formWidget('Form', {
 			elem.attr('ui-actions', '');
 		});
 		
-		return ui.formCompile.call(this, element, attrs);
+		return ui.formCompile.apply(this, arguments);
 	},
 	
 	link: function(scope, element, attrs, controller) {
-		if (!window.s) window.s = scope;
 		element.on('submit', function(e) {
 			e.preventDefault();
 		});
