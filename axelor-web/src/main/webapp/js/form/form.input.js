@@ -334,7 +334,7 @@ ui.formInput('Integer', {
 
 		setTimeout(function(){
 			element.spinner(options);
-			if (scope.isReadonly(element)) {
+			if (scope.isReadonly()) {
 				element.spinner("disable");
 			}
 			element.on("on:attrs-change", function(event, data) {
@@ -596,7 +596,7 @@ ui.formInput('DateTime', {
 			}
 		});
 		button.click(function(e, ui){
-			if (scope.isReadonly(element)) {
+			if (scope.isReadonly()) {
 				return;
 			}
 			input.datetimepicker('show');
@@ -736,7 +736,7 @@ ui.formInput('Select', {
 		});
 
 		scope.showSelection = function() {
-			if (scope.isReadonly(element)) {
+			if (scope.isReadonly()) {
 				return;
 			}
 			input.autocomplete("search" , '');
