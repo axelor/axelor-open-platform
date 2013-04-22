@@ -207,29 +207,21 @@ ui.formInput('Integer', {
 
 	css: 'integer-item',
 	
-	link_editable: function(scope, element, attrs, model) {
-
+	link: function(scope, element, attrs, model) {
+		
 		var props = scope.field,
 			precision = props.precision || 18,
 			scale = props.scale || 2;
 		
-		var options = {
-			step: 1,
-			spin: onSpin,
-			change: function( event, ui ) {
-				updateModel(element.val(), true);
-			}
-		};
-		
 		var isDecimal = this.isDecimal,
 			pattern = isDecimal ? /^(-)?\d+(\.\d+)?$/ : /^\s*-?[0-9]*\s*$/;
-
-		function isNumber(value) {
+		
+		scope.isNumber = function(value) {
 			return _.isEmpty(value) || _.isNumber(value) || pattern.test(value);
-		}
+		};
 
-		function isValid(value) {
-			var valid = isNumber(value);
+		scope.validate = scope.isValid = function(value) {
+			var valid = scope.isNumber(value);
             if (valid && _.isString(value)) {
             	var parts = value.split(/\./),
             		integer = parts[0] || "",
@@ -237,9 +229,9 @@ ui.formInput('Integer', {
             	valid = (integer.length <= precision - scale) && (decimal.length <= scale);
             }
             return valid;
-		}
+		};
 
-		function format(value) {
+		scope.format = function format(value) {
 			if (isDecimal && _.isString(value)) {
 				var parts = value.split(/\./),
 					integer = parts[0] || "",
@@ -259,16 +251,29 @@ ui.formInput('Integer', {
 				return integer + '.' + decimal;
 			}
 			return value;
-		}
+		};
+	},
+	
+	link_editable: function(scope, element, attrs, model) {
+
+		var props = scope.field;
+		
+		var options = {
+			step: 1,
+			spin: onSpin,
+			change: function( event, ui ) {
+				updateModel(element.val(), true);
+			}
+		};
 		
 		function updateModel(value, handle) {
 			var onChange = scope.$events.onChange;
 
-			if (!isNumber(value)) {
+			if (!scope.isNumber(value)) {
 				return;
             }
 
-			value = format(value);
+			value = scope.format(value);
 			
 			element.val(value);
 			scope.setValue(value);
@@ -290,7 +295,7 @@ ui.formInput('Integer', {
 
 			event.preventDefault();
 			
-			if (!isNumber(text)) {
+			if (!scope.isNumber(text)) {
 				return false;
 			}
 
@@ -319,14 +324,6 @@ ui.formInput('Integer', {
 			updateModel(value, false);
 		}
 		
-		scope.validate = function(value) {
-			return isValid(value);
-		};
-
-		scope.format = function(value) {
-			return format(value);
-		};
-
 		if (props.minSize !== undefined)
 			options.min = +props.minSize;
 		if (props.maxSize !== undefined)
@@ -344,7 +341,7 @@ ui.formInput('Integer', {
 			model.$render = function() {
 				var value = model.$viewValue;
 				if (value) {
-					value = format(value);
+					value = scope.format(value);
 				}
 				element.val(value);
 				scope.initValue(value);
