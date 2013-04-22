@@ -310,17 +310,10 @@ ui.formInput('OneToMany', {
 					grid.setOptions({enableAddRow: true});
 				});
 
-				scope.$watch("view_mode", function(mode) {
-					var readonly = scope.isReadonly() || mode !== "edit";
+				scope.$watch("isReadonly()", function(readonly) {
 					grid.setOptions({
 						editable: !readonly
 					});
-				});
-
-				element.on("on:attrs-change", function(event, data) {
-					if (editable && data) {
-						grid.setOptions({editable: !data.readonly });
-					}
 				});
 			}
 

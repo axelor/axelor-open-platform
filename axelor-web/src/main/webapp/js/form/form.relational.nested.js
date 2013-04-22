@@ -99,7 +99,7 @@ var EmbeddedEditor = {
 	template:
 		'<fieldset class="form-item-group bordered-box">'+
 			'<div ui-view-form x-handler="this"></div>'+
-			'<div class="btn-toolbar pull-right">'+
+			'<div class="btn-toolbar pull-right" ng-show="!isReadonly()">'+
 				'<button type="button" class="btn btn-danger" ng-click="onClose()">Cancel</button> '+
 				'<button type="button" class="btn btn-primary" ng-click="onOK()">OK</button>'+
 			'</div>'+
@@ -121,6 +121,10 @@ function NestedEditorCtrl($scope, $element, DataSource, ViewService) {
 	$scope.nested = null;
 	$scope.registerNested = function(scope) {
 		$scope.nested = scope;
+		
+		$scope.$watch("isReadonly()", function(readonly) {
+			scope.setEditable(!readonly);
+		});
 	};
 }
 
@@ -218,7 +222,7 @@ var NestedEditor = {
 	'<fieldset class="form-item-group bordered-box">'+
 		'<legend>'+
 			'<span ng-bind-html-unsafe="title"></span> '+
-			'<span class="legend-toolbar">'+
+			'<span class="legend-toolbar" ng-show="!isReadonly()">'+
 				'<a href="" tabindex="-1" ng-click="onClear()" title="{{\'Clear\' | t}}"><i class="icon-ban-circle"></i></a> '+
 				'<a href="" tabindex="-1" ng-click="onSelect()" title="{{\'Select\' | t}}"><i class="icon-search"></i></a> '+
 				'<a href="" tabindex="-1" ng-click="onClose()" title="{{\'Close\' | t}}"><i class="icon-remove-sign"></i></a>'+
