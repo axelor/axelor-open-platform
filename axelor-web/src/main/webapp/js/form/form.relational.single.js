@@ -270,7 +270,7 @@ ui.formInput('ManyToOne', {
    '</div>',
    
    template_readonly:
-   '<span>{{text}}</span>'
+   '<a href="" ng-click="onEdit()">{{text}}</a>'
 });
 
 ui.formInput('SuggestBox', 'ManyToOne', {
