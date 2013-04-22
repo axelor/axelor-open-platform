@@ -229,7 +229,8 @@ ActionHandler.prototype = {
 			this._invalidateContext = false;
 		}
 
-		var promise = this.ws.action(action, scope._model, context).then(function(response){
+		var model = context._model || scope._model;
+		var promise = this.ws.action(action, model, context).then(function(response){
 			
 			var d = self.ws.defer();
 			
