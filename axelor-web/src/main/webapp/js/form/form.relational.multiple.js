@@ -127,7 +127,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	};
 	
 	$scope.onRemove = function() {
-		if ($scope.isReadonly($element)) {
+		if (this.isReadonly()) {
 			return;
 		}
 		axelor.dialogs.confirm(_t("Do you really want to delete the selected record(s)?"), function(confirmed){
@@ -361,10 +361,10 @@ ui.formInput('OneToMany', {
 		};
 		
 		scope.isDisabled = function() {
-			return scope.isReadonly(element);
+			return this.isReadonly();
 		};
 		
-		var field = scope.getViewDef(element);
+		var field = scope.field;
 		if (field.widget === 'MasterDetail') {
 			setTimeout(function(){
 				scope.showDetailView();

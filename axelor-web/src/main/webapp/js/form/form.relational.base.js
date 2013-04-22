@@ -91,7 +91,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	};
 	
 	$scope.showPopupEditor = function(record) {
-		if (!record && $scope.isReadonly($element)) {
+		if (!record && this.isReadonly()) {
 			return;
 		}
 		if (editor == null) {
