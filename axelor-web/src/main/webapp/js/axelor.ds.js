@@ -65,7 +65,7 @@
 			if (isArray(meta.fields)) {
 				forEach(meta.fields, function(field){
 					field.type = _.chain(field.type || 'string').underscored().dasherize().value();
-					field.title = _.chain(field.title || field.name).humanize().titleize().value();
+					field.title = _.chain(field.title || _.humanize(field.name)).value();
 					fields[field.name] = field;
 					// if nested field then make it readonly
 					if (field.name.indexOf('.') > -1) {
