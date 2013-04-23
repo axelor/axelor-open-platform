@@ -144,7 +144,9 @@
         <xsd:attribute name="noLabel" type="xsd:boolean" />
         <xsd:attribute name="help" type="xsd:string" />
         <xsd:attribute name="hidden" type="xsd:boolean" />
+        <xsd:attribute name="readonly" type="xsd:boolean" />
         <xsd:attribute name="colSpan" type="xsd:int" />
+        <xsd:attribute name="css" type="xsd:string"/>
         <xsd:anyAttribute />
       </xsd:extension>
     </xsd:complexContent>
@@ -355,7 +357,6 @@
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="widget" type="xsd:string" />
         <xsd:attribute name="selection" type="xsd:string"/>
-        <xsd:attribute name="readonly" type="xsd:boolean" />
         <xsd:attribute name="required" type="xsd:boolean" />
         <xsd:attribute name="canSelect" type="xsd:boolean">
           <xsd:annotation>
