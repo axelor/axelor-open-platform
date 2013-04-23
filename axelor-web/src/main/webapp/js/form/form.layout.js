@@ -61,10 +61,15 @@ function TableLayout(items, attrs, $scope, $compile) {
 		var el = $(this),
 			title = el.attr('x-title'),
 			noTitle = el.attr('x-show-title') == 'false';
+		
+		var labelScope = el.data('$scope');
+		if (labelScope) {
+			labelScope = labelScope.$new();
+		}
 
 		if (numCols > 1 && !noTitle && title) {
 			var label = $('<label ui-label></label>').html(title).attr('x-for-widget', el.attr('id')),
-				labelElem = $compile(label)($scope);
+				labelElem = $compile(label)(labelScope || $scope);
 			el.data('label', labelElem);
 			return add(el, labelElem);
 		}
