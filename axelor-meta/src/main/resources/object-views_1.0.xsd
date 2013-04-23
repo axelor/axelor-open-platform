@@ -243,6 +243,7 @@
         <xsd:attribute name="onLoad" type="xsd:string" />
         <xsd:attribute name="onSave" type="xsd:string" />
         <xsd:attribute name="onNew" type="xsd:string" />
+        <xsd:attribute name="helpLink" type="xsd:string" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
