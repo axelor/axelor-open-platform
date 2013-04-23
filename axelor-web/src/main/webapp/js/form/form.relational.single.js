@@ -213,7 +213,7 @@ ui.formInput('ManyToOne', {
 		var onSelectFired = false;
 		input.autocomplete({
 			source: function(request, response) {
-				var onSelect = scope.$evetns.onSelect;
+				var onSelect = scope.$events.onSelect;
 				if (onSelect && !onSelectFired) {
 					onSelect().then(function(){
 						search(request, response);
