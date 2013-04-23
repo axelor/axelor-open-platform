@@ -32,7 +32,7 @@ function FormViewCtrl($scope, $element) {
 
 		if (_.isObject(field)) {  // assume element
 			name = elem.attr('x-field') || elem.attr('data-field') || elem.attr('name');
-			id = elem.attr('id') || name;
+			id = elem.attr('x-for-widget') || elem.attr('id') || name;
 		}
 		
 		attrs = _.extend({}, $scope.fields[name], $scope.fields_view[id]);

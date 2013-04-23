@@ -406,11 +406,17 @@ table.field-details .help-text hr {
 	display: table;
 }
 
-.subtotal,
-.subtotal-total {
+.subtotal {
 	white-space: nowrap;
-	padding-right: 0px;
 	text-align: right;
+}
+
+.subtotal .form-label {
+	padding-right: 0px !important;
+}
+
+.subtotal .form-item {
+	padding-left: 0px !important;
 }
 
 .subtotal-total {
