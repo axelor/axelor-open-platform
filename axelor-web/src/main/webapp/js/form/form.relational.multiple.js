@@ -370,6 +370,10 @@ ui.formInput('OneToMany', {
 				scope.showDetailView();
 			});
 		}
+
+		attrs.$observe('title', function(title){
+			scope.title = title;
+		});
 	},
 	
 	template_editable: null,

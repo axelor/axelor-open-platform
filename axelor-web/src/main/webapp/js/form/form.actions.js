@@ -403,6 +403,15 @@ ActionHandler.prototype = {
 				return;
 			}
 			
+			//handle o2m/m2m title
+			if(item.is('.one2many-item') || item.is('.many2many-item')){
+				forEach(itemAttrs, function(value, attr){
+					if (attr == 'title') {
+						itemScope.title = value;
+					}
+				});
+			}
+
 			// handle notebook
 			if (item.is('.tab-pane')) {
 				var index = item.parent().children('.tab-pane').index(item);
