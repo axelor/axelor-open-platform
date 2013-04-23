@@ -116,8 +116,8 @@ public class Search extends AbstractView {
 		}
 
 		public String getTitle() {
-			String translation = JPA.translate(name);
-			return translation == null ? (title == null ? null : title) : translation;
+			String translation = JPA.translate(name, null);
+			return JPA.translate(title, translation);
 		}
 
 		public void setTitle(String title) {
