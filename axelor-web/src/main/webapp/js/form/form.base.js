@@ -195,6 +195,7 @@ ui.formDirective = function(name, object) {
 			}
 			
 			scope.$watch("isReadonly()", function(readonly) {
+				element.toggleClass("readonly", readonly);
 				if (readonly && showReadonly()) {
 					return;
 				}

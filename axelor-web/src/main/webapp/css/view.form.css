@@ -47,6 +47,7 @@ table.form-layout td.form-item.boolean-item {
 table.form-layout td.form-label > label {
 	line-height: 22px;
 	margin-bottom: 0px;
+	font-weight: bold;
 }
 
 table.form-layout td.form-label > label:after {
@@ -54,7 +55,13 @@ table.form-layout td.form-label > label:after {
 }
 
 table.form-layout td.form-label label.required {
-	font-weight: bold;
+	color: #B94A48;
+}
+
+table.form-layout td.form-label label.readonly {
+	color: inherit;
+	padding-left: 16px;
+	white-space: nowrap;
 }
 
 table.form-layout td.form-item > *,
@@ -69,8 +76,17 @@ table.form-layout td.form-item.v-align-top {
 
 table.form-layout td.form-item > .form-item-container,
 table.form-layout td.form-item > .form-item-container > span.display-text {
-	line-height: 22px;
+	height: 24px;
 	display: block;
+}
+
+table.form-layout td.form-item > .form-item-container.readonly,
+table.form-layout td.form-item > .form-item-container > span.display-text {
+	line-height: 22px;
+}
+
+table.form-layout td.form-item > .form-item-container > span.display-text {
+	min-width: 100px;
 }
 
 table.form-layout td.form-item input {
