@@ -55,6 +55,7 @@ ui.formInput('CodeEditor', {
 		scope.$on("on:edit", resize);
 		element.on('adjustSize', function(){
 			if (element.is(':visible')) {
+				element.height(props.height);
 				element.width('auto');
 				resize();
 			}
