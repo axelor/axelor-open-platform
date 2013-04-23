@@ -695,7 +695,18 @@ ui.formInput('Time', 'DateTime', {
  */
 ui.formInput('Text', {
 	css: 'text-item',
-	template_editable: '<textarea rows="8"></textarea>',
+	link_editable: function(scope, element, attrs, model) {
+		var field = scope.field,
+			textarea = element.get(0);
+
+		textarea.rows = field.height || 8;
+
+		//Firefox add one more line
+		if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent)){
+			textarea.rows -= 1;
+		}
+    },
+	template_editable: '<textarea></textarea >',
 	template_readonly: '<pre>{{text}}</pre>'
 });
 
