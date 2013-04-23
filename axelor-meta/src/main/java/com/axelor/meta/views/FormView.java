@@ -27,6 +27,9 @@ public class FormView extends AbstractView {
 	
 	@XmlAttribute
 	private String onNew;
+	
+	@XmlAttribute
+	private String helpLink;
 
 	@XmlElements({
 		@XmlElement(name = "group", type = Group.class),
@@ -78,6 +81,14 @@ public class FormView extends AbstractView {
 	
 	public void setOnNew(String onNew) {
 		this.onNew = onNew;
+	}
+	
+	public String getHelpLink() {
+		return helpLink;
+	}
+	
+	public void setHelpLink(String helpLink) {
+		this.helpLink = helpLink;
 	}
 	
 	public List<AbstractWidget> getItems() {
