@@ -40,9 +40,6 @@ public class Field extends SimpleWidget {
 	private Boolean required;
 	
 	@XmlAttribute
-	private Boolean readonly;
-	
-	@XmlAttribute
 	private Integer width;
 	
 	@XmlAttribute(name = "min")
@@ -128,14 +125,6 @@ public class Field extends SimpleWidget {
 		this.required = required;
 	}
 	
-	public Boolean getReadonly() {
-		return readonly;
-	}
-	
-	public void setReadonly(Boolean readonly) {
-		this.readonly = readonly;
-	}
-
 	public Integer getWidth() {
 		return width;
 	}

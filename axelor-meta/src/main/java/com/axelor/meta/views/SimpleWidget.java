@@ -26,7 +26,13 @@ public abstract class SimpleWidget extends AbstractWidget {
 	private Boolean hidden;
 	
 	@XmlAttribute
+	private Boolean readonly;
+	
+	@XmlAttribute
 	private Integer colSpan;
+	
+	@XmlAttribute
+	private String css;
 	
 	public String getName() {
 		return name;
@@ -75,6 +81,14 @@ public abstract class SimpleWidget extends AbstractWidget {
 	public void setHidden(Boolean hidden) {
 		this.hidden = hidden;
 	}
+	
+	public Boolean getReadonly() {
+		return readonly;
+	}
+	
+	public void setReadonly(Boolean readonly) {
+		this.readonly = readonly;
+	}
 
 	public Integer getColSpan() {
 		return colSpan;
@@ -82,5 +96,13 @@ public abstract class SimpleWidget extends AbstractWidget {
 	
 	public void setColSpan(Integer colSpan) {
 		this.colSpan = colSpan;
+	}
+	
+	public String getCss() {
+		return css;
+	}
+	
+	public void setCss(String css) {
+		this.css = css;
 	}
 }
