@@ -315,11 +315,33 @@ var FormInput = {
 			var onChange = scope.$events.onChange || angular.noop,
 				onChangePending = false;
 
-			element.change(function(e){
-				scope.setValue(element.val());
-				scope.$apply();
-				onChangePending = true;
+			function listener() {
+				var value = _.str.trim(element.val()) || null;
+				if (value !== model.$viewValue) {
+					scope.setValue(value);
+					scope.$apply();
+					onChangePending = true;
+				}
+			}
+
+			var timeout = null;
+			
+			element.keydown(function(e) {
+				var key = e.keyCode;
+				
+				// ignore
+			    //    command            modifiers                   arrows
+			    if (key === 91 || (15 < key && key < 19) || (37 <= key && key <= 40)) return;
+			    
+			    if (!timeout) {
+			    	timeout = setTimeout(function(){
+			    		listener();
+			    		timeout = null;
+			    	});
+			    }
 			});
+
+			element.change(listener);
 			
 			element.blur(function(e){
 				if (onChangePending) {
