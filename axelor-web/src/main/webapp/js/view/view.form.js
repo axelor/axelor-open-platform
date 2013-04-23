@@ -620,6 +620,15 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			var record = scope.record || {};
 			return record.createdOn || record.updatedOn || record.createBy || record.updatedBy;
 		};
+
+		scope.hasHelp = function() {
+			var view = scope.schema;
+			return view ? view.helpLink : false;
+		};
+
+		scope.onShowHelp = function() {
+			window.open(scope.schema.helpLink);
+		};
 		
 		scope.$on("$destroy", function() {
 			if (logInfo != null) {
