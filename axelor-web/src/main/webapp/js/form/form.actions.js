@@ -415,6 +415,9 @@ ActionHandler.prototype = {
 						else
 							itemScope.showTab(index);
 					}
+					if (attr == 'title') {
+						itemScope.setTitle(value, index);
+					}
 				});
 				return;
 			}

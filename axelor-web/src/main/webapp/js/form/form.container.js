@@ -157,6 +157,13 @@ ui.formWidget('Tabs', {
 			}
 			selected = -1;
 		};
+		
+		$scope.setTitle = function(value,index){
+			var item = findItem(index),
+				pageScope = item.first().data('$scope');
+
+			pageScope.tab.title = value;
+		};
 	}],
 	
 	link: function(scope, elem, attrs) {
