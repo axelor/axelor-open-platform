@@ -140,6 +140,11 @@
 	        box-sizing: border-box;
 }
 
+.slick-cell.button img {
+	cursor: pointer;
+}
+
+.slick-cell.button,
 .slick-cell-checkboxsel {
 	text-align: center;
 }
