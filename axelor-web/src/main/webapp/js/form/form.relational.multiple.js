@@ -10,6 +10,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	ui.RefFieldCtrl.call(this, $scope, $element, DataSource, ViewService, function(){
 		GridViewCtrl.call(this, $scope, $element);
 		$scope.editorCanSave = false;
+		$scope.selectEnable = false;
 		if (initCallback) {
 			initCallback();
 		}
@@ -161,6 +162,13 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		});
 	};
 	
+	$scope.onItemDblClick = function(event, args) {
+		if($scope.canView()){
+			$scope.onEdit();
+			$scope.$apply();
+		}
+	};
+
 	$scope.filter = function() {
 		
 	};
@@ -223,6 +231,7 @@ function ManyToManyCtrl($scope, $element, DataSource, ViewService) {
 
 	OneToManyCtrl.call(this, $scope, $element, DataSource, ViewService, function(){
 		$scope.editorCanSave = true;
+		$scope.selectEnable = true;
 	});
 	
 	var _setValue = $scope.setValue;
@@ -363,8 +372,24 @@ ui.formInput('OneToMany', {
 		scope.isDisabled = function() {
 			return this.isReadonly();
 		};
-		
+
 		var field = scope.field;
+		scope.canSelect = function() {
+			return _.isUndefined(field.canSelect) ? scope.selectEnable : field.canSelect;
+		};
+
+		scope.canNew = function() {
+			return _.isUndefined(field.canNew) ? true : field.canNew;
+		};
+
+		scope.canView = function() {
+			return _.isUndefined(field.canView) ? true : field.canView;
+		};
+
+		scope.canRemoved = function() {
+			return _.isUndefined(field.canRemoved) ? true : field.canRemoved;
+		};
+
 		if (field.widget === 'MasterDetail') {
 			setTimeout(function(){
 				scope.showDetailView();
@@ -387,10 +412,10 @@ ui.formInput('OneToMany', {
 			'<div class="container-fluid">'+
 				'<span class="brand" href="" ui-help-popover ng-bind-html-unsafe="title"></span>'+
 				'<span class="icons-bar pull-right" ng-show="!isReadonly()">'+
-					'<i ng-click="onSelect()" ng-show="hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}" class="icon-search"></i>'+
-					'<i ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}" class="icon-plus"></i>'+
-					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\')" title="{{\'Edit\' | t}}" class="icon-pencil"></i>'+
-					'<i ng-click="onRemove()" ng-show="hasPermission(\'remove\') && !isDisabled()" title="{{\'Remove\' | t}}" class="icon-minus"></i>'+
+					'<i ng-click="onSelect()" ng-show="hasPermission(\'read\') && !isDisabled() && canSelect()" title="{{\'Select\' | t}}" class="icon-search"></i>'+
+					'<i ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled() && canNew()" title="{{\'New\' | t}}" class="icon-plus"></i>'+
+					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canView()" title="{{\'Edit\' | t}}" class="icon-pencil"></i>'+
+					'<i ng-click="onRemove()" ng-show="hasPermission(\'remove\') && !isDisabled() && canRemoved()" title="{{\'Remove\' | t}}" class="icon-minus"></i>'+
 				'</span>'+
 			'</div>'+
 		'</div>'+
