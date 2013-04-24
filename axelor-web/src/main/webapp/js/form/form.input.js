@@ -755,9 +755,9 @@ ui.formInput('Select', {
 		};
 		
 		function updateValue(value) {
-			var onChange = scope.$evetns.onChange;
+			var onChange = scope.$events.onChange;
 			scope.$apply(function(){
-				this.setValue(value);
+				scope.setValue(value);
 				if (onChange) {
 					setTimeout(onChange);
 				}
