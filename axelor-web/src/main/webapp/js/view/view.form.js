@@ -151,7 +151,7 @@ function FormViewCtrl($scope, $element) {
 		$scope._viewPromise.then(function(){
 			var handler = $scope.$events.onLoad,
 				record = $scope.record;
-			if (handler && record) {
+			if (handler && !_.isEmpty(record)) {
 				setTimeout(handler);
 			}
 		});
