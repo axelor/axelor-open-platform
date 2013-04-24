@@ -22,9 +22,10 @@ public class GridView extends AbstractView {
 	private Hilite hilite;
 
 	@XmlElements({
-		@XmlElement(name="field", type=Field.class)
+		@XmlElement(name="field", type=Field.class),
+		@XmlElement(name="button", type=Button.class)
 	})
-	private List<Field> items;
+	private List<AbstractWidget> items;
 	
 	public Boolean getExpandable() {
 		return expandable;
@@ -50,14 +51,14 @@ public class GridView extends AbstractView {
 		this.hilite = hilite;
 	}
 	
-	public List<Field> getItems() {
-		for (Field field : items) {
+	public List<AbstractWidget> getItems() {
+		for (AbstractWidget field : items) {
 			field.setTranslationModel(super.getModel());
 		}
 		return items;
 	}
 	
-	public void setItems(List<Field> items) {
+	public void setItems(List<AbstractWidget> items) {
 		this.items = items;
 	}
 }

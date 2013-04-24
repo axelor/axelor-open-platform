@@ -201,6 +201,7 @@
           <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0"/>
           <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" maxOccurs="1" />
           <xsd:element name="field" type="tns:GridField" maxOccurs="unbounded" />
+          <xsd:element name="button" type="tns:Button" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="editable" type="xsd:boolean" />
         <xsd:attribute name="expandable" type="xsd:boolean" />
