@@ -428,7 +428,7 @@ public class MetaLoader {
 		gridView.setTitle(title);
 		
 		List<AbstractWidget> formItems = Lists.newArrayList();
-		List<Field> gridItems = Lists.newArrayList();
+		List<AbstractWidget> gridItems = Lists.newArrayList();
 		
 		Mapper mapper = Mapper.of(klass);
 		List<String> fields = Lists.reverse(fieldNames(klass));
