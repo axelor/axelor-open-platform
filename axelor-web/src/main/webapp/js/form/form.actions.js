@@ -529,6 +529,12 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 }]);
 
 ui.directive('uiToolButton', ['ViewService', function(ViewService) {
+	
+	ui.actionHandler = function(scope, element, options) {
+		return new ActionHandler(scope, ViewService, _.extend({}, options, {
+			element: element
+		}));
+	};
 
 	return function(scope, element, attrs) {
 		

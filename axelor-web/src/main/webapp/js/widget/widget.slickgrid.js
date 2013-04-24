@@ -188,6 +188,12 @@ var Factory = {
 	
 	formatter: function(row, cell, value, columnDef, dataContext) {
 		
+		var field = columnDef.descriptor || {};
+
+		if (field.type === "button") {
+			return this.formatButton(field, value);
+		}
+
 		if (value === null || value === undefined) {
 			return "";
 		}
@@ -196,8 +202,6 @@ var Factory = {
 		if (_.isObject(value) && _.isEmpty(value))
 			return "";
 
-		var field = columnDef.descriptor || {};
-		
 		if (_.isArray(field.selection)) {
 			var cmp = field.type === "integer" ? function(a, b) { return a == b ; } : _.isEqual;
 			var res = _.find(field.selection, function(item){
@@ -232,16 +236,24 @@ var Factory = {
 			return num.toFixed(scale);
 		}
 		return value;
+	},
+	
+	formatButton: function(field, value, columnDef) {
+		return '<img class="slick-img-button" src="' + field.image + '">';
 	}
 };
 
-var Grid = function(scope, element, attrs) {
+var Grid = function(scope, element, attrs, ViewService) {
 	
 	var noFilter = scope.$eval('noFilter');
 	if (_.isString(noFilter)) {
 		noFilter = noFilter === 'true';
 	}
-	
+
+	this.compile = function(template) {
+		return ViewService.compile(template)(scope.$new());
+	};
+
 	this.scope = scope;
 	this.element = element;
 	this.attrs = attrs;
@@ -271,6 +283,7 @@ Grid.prototype.parse = function(view) {
 		
 		var sortable = true;
 		switch (field.type) {
+		case 'button':
 		case 'one-to-many':
 		case 'many-to-many':
 			sortable = false;
@@ -278,9 +291,18 @@ Grid.prototype.parse = function(view) {
 		default:
 			sortable: true;
 		}
-		
+
+		if (field.type == "button") {
+			field.image = field.title;
+			field.handler = ui.actionHandler(scope.$new(), element, {
+				action: field.onClick
+			});
+			item.title = " ";
+			item.width = 10;
+		}
+
 		return {
-			name: item.title || item.name,
+			name: item.title || _.chain(item.name).humanize().titleize().value(),
 			id: item.name,
 			field: item.name,
 			descriptor: field,
@@ -450,6 +472,15 @@ Grid.prototype.adjustSize = function() {
 	}
 	this.grid.resizeCanvas();
 	this.grid.invalidate();
+};
+
+Grid.prototype.getColumn = function(indexOrName) {
+	var cols = this.cols;
+	var index = indexOrName;
+	if (_.isString(index)) {
+		index = this.grid.getColumnIndex(index);
+	}
+	return cols[index];
 };
 
 Grid.prototype.showColumn = function(name, show) {
@@ -892,6 +923,28 @@ Grid.prototype.onSort = function(event, args) {
 		this.handler.onSort(event, args);
 };
 
+Grid.prototype.onButtonClick = function(event, args) {
+	var data = this.scope.dataView;
+	var cols = this.getColumn(args.cell);
+	var field = (cols || {}).descriptor || {};
+
+	if (field.handler) {
+		
+		var handlerScope = this.scope.handler;
+		var model = handlerScope._model;
+		var record = data.getItem(args.row) || {};
+		
+		field.handler.scope.record = record;
+		field.handler.scope.getContext = function() {
+			return _.extend({
+				_model: model,
+			}, record);
+		};
+		field.handler.onClick().then(function(res){
+		});
+	}
+};
+
 Grid.prototype.onItemClick = function(event, args) {
 	if (this.grid.getEditorLock().isActive()) {
 		this.grid.getEditorLock().commitCurrentEdit();
@@ -901,6 +954,12 @@ Grid.prototype.onItemClick = function(event, args) {
 		event.stopImmediatePropagation();
 		return false;
 	}
+
+	var source = $(event.srcElement);
+	if (source.is("img.slick-img-button")) {
+		return this.onButtonClick(event, args);
+	}
+	
 	if (this.editable) {
 		return;
 	}
