@@ -368,6 +368,27 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="canNew" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              If this is a relational field, specify whether to allow creating new record(s).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canView" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              If this is a relational field, specify whether to allow view the record(s).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canRemoved" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              If this is a relational field, specify whether to allow removing record(s).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="edit-window">
           <xsd:annotation>
             <xsd:documentation>

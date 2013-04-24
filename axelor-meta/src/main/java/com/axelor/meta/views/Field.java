@@ -28,6 +28,15 @@ public class Field extends SimpleWidget {
 	private Boolean canSelect;
 	
 	@XmlAttribute
+	private Boolean canNew;
+	
+	@XmlAttribute
+	private Boolean canRemoved;
+	
+	@XmlAttribute
+	private Boolean canView;
+	
+	@XmlAttribute
 	private String onChange;
 	
 	@XmlAttribute
@@ -91,6 +100,30 @@ public class Field extends SimpleWidget {
 	
 	public void setCanSelect(Boolean canSelect) {
 		this.canSelect = canSelect;
+	}
+	
+	public Boolean getCanNew() {
+		return canNew;
+	}
+	
+	public void setCanNew(Boolean canNew) {
+		this.canNew = canNew;
+	}
+	
+	public Boolean getCanRemoved() {
+		return canRemoved;
+	}
+	
+	public void setCanRemoved(Boolean canRemoved) {
+		this.canRemoved = canRemoved;
+	}
+	
+	public Boolean getCanView() {
+		return canView;
+	}
+	
+	public void setCanView(Boolean canView) {
+		this.canView = canView;
 	}
 
 	public String getOnChange() {
