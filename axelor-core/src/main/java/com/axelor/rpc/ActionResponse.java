@@ -27,6 +27,10 @@ public class ActionResponse extends Response {
 		_data.put(name, value);
 	}
 	
+	public void setReload(boolean reload) {
+		set("reload", reload);
+	}
+	
 	public void setFlash(String flash) {
 		set("flash", flash);
 	}
