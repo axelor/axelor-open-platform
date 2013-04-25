@@ -77,6 +77,7 @@
   	<string name="fileName" required="true" namecolumn="true"/>
   	<long name="size" title="Size in bytes" readonly="true"/>
   	<string name="mine" title="File type"/>
+  	<string name="description" multiline="true"/>
   	<string name="sizeText" title="Size" readonly="true">
       <![CDATA[
       	if(size >= 1024)
@@ -88,7 +89,6 @@
       	return size + " Bytes";
       ]]>
   	</string>
-  	<unique-constraint columns="fileName"/>
   </entity>
   
   <entity name="MetaAttachment" table="META_ATTACHMENT">

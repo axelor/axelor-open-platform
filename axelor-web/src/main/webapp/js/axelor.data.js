@@ -711,8 +711,14 @@
 				return accepted;
 			},
 			
-			attachment: function(id) {
-				var promise = this._request('attachment', id).get();
+			attachment: function(id, options) {
+				if (options == null)
+					options = {};
+
+				var params = {
+					fields: options.fields
+				};
+				var promise = this._request('attachment', id).post(params);
 				promise.success = function(fn){
 					promise.then(function(response){
 						var res = response.data,

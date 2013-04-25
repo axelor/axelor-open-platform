@@ -185,7 +185,12 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 	};
 	
 	$scope.filter = function(searchFilter) {
-		return objectDS.attachment($scope.record.id).success(function(records) {
+		var fields = _.pluck($scope.fields, 'name');
+			options = {
+				fields: fields
+			};
+
+		return objectDS.attachment($scope.record.id,options).success(function(records) {
 			if(records) {
 				$scope.setItems(records);
 			}
