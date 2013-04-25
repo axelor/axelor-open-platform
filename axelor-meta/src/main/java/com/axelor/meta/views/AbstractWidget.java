@@ -3,6 +3,7 @@ package com.axelor.meta.views;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAnyAttribute;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
@@ -34,6 +35,7 @@ public abstract class AbstractWidget {
 	@XmlAnyAttribute
 	private Map<QName, String> otherAttributes;
 	
+	@XmlTransient
 	private String translationModel;
 	
 	public Map<QName, String> getOtherAttributes() {
