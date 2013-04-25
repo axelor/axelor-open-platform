@@ -730,23 +730,47 @@ ui.formInput('Select', {
 	css: 'select-item',
 	cellCss: 'form-item select-item',
 
-	link_editable: function(scope, element, attrs, model) {
-
+	init: function(scope) {
 		var props = scope.field,
 			multiple = props.multiple,
-			input = element.children('input:first'),
 			selection = [];
 		
 		if (_.isArray(props.selection)) {
 			selection = props.selection;
 		}
 		
-		var data = _.map(selection, function(item){
-			return {
-				key: item.value,
-				value: item.title
-			};
-		});
+		scope.getData = function(){
+			var data = _.map(selection, function(item){
+				return {
+					key: item.value,
+					value: item.title
+				};
+			});
+			return data;
+		};
+
+		scope.format = function(value) {
+			if (value === null || _.isUndefined(value))
+				return '';
+
+			if (props.serverType == "integer") {
+				value = "" + value;
+			}
+			if (!_.isArray(value)) {
+				value = [value];
+			}
+
+			var values = _.filter(scope.getData(), function(item){
+				return value.indexOf(item.key) > -1;
+			});
+			values = _.pluck(values, 'value');
+			return multiple ? values.join(',') : _.first(values);
+		};
+	},
+
+	link_editable: function(scope, element, attrs, model) {
+		var input = element.children('input:first'),
+			data = scope.getData();
 
 		scope.showSelection = function() {
 			if (scope.isReadonly()) {
@@ -765,7 +789,7 @@ ui.formInput('Select', {
 			});
 		}
 		
-		input.keydown(function(e){
+		input.keydown(function(e) {
 
 			var KEY = $.ui.keyCode;
 
@@ -773,7 +797,6 @@ ui.formInput('Select', {
 			case KEY.DELETE:
 			case KEY.BACKSPACE:
 				updateValue('');
-				input.val('');
 			}
 		});
 		
@@ -785,7 +808,7 @@ ui.formInput('Select', {
 			},
 			select: function(event, ui) {
 				var val, terms;
-				if (multiple) {
+				if (this.multiple) {
 					val = model.$modelValue || [];
 					terms = this.value || "";
 
@@ -809,26 +832,10 @@ ui.formInput('Select', {
 		});
 
 		scope.$render_editable = function() {
-			var val = model.$modelValue;
-			if (val === null || _.isUndefined(val))
-				return input.val('');
-
-			if (props.serverType == "integer") {
-				val = "" + val;
-			}
-			if (!_.isArray(val)) {
-				val = [val];
-			}
-			
-			var values = _.filter(data, function(item){
-				return val.indexOf(item.key) > -1;
-			});
-			values = _.pluck(values, 'value');
-			setTimeout(function(){
-				input.val(multiple ? values.join(',') : _.first(values));
-			});
+			input.val(scope.format(model.$modelValue));
 		};
-		attrs.$observe('disabled', function(value){
+
+		attrs.$observe('disabled', function(value) {
 			input.autocomplete(value && 'disable' || 'enable');
 		});
 	},
