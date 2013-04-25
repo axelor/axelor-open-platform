@@ -273,14 +273,14 @@ public class Field extends SimpleWidget {
 	}
 	
 	protected String getTranslations() {
-		String translation = JPA.translate(super.getName(), super.getTranslationModel(), null);
+		String translation = JPA.translate(super.getName(), super.getModel(), null);
 		return JPA.translate(super.getDefaultTitle(), translation);
 	}
 	
 	private String getTarget() {
 		Mapper mapper = null;
 		try {
-			mapper = Mapper.of(Class.forName((super.getTranslationModel())));
+			mapper = Mapper.of(Class.forName((super.getModel())));
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 			return null;

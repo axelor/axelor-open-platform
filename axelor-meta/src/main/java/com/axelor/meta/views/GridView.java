@@ -53,7 +53,7 @@ public class GridView extends AbstractView {
 	
 	public List<AbstractWidget> getItems() {
 		for (AbstractWidget field : items) {
-			field.setTranslationModel(super.getModel());
+			field.setModel(super.getModel());
 		}
 		return items;
 	}

@@ -36,7 +36,7 @@ public abstract class AbstractWidget {
 	private Map<QName, String> otherAttributes;
 	
 	@XmlTransient
-	private String translationModel;
+	private String model;
 	
 	public Map<QName, String> getOtherAttributes() {
 		return otherAttributes;
@@ -46,11 +46,11 @@ public abstract class AbstractWidget {
 		this.otherAttributes = otherAttributes;
 	}
 
-	public String getTranslationModel() {
-		return translationModel;
+	public String getModel() {
+		return model;
 	}
 
-	public void setTranslationModel(String translationModel) {
-		this.translationModel = translationModel;
+	public void setModel(String model) {
+		this.model = model;
 	}
 }
