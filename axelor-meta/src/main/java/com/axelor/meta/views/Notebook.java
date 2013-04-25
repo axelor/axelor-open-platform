@@ -31,7 +31,7 @@ public class Notebook extends AbstractContainer {
 
 	public List<Page> getPages() {
 		for (Page page : pages) {
-			page.setTranslationModel(super.getTranslationModel());
+			page.setModel(super.getModel());
 		}
 		return pages;
 	}
