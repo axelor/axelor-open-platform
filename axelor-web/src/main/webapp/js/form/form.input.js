@@ -696,6 +696,7 @@ ui.formInput('Time', 'DateTime', {
 ui.formInput('Text', {
 	css: 'text-item',
 	link_editable: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
 		var field = scope.field,
 			textarea = element.get(0);
 
