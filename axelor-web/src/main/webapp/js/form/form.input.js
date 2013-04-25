@@ -702,7 +702,7 @@ ui.formInput('Text', {
 		textarea.rows = field.height || 8;
 
 		//Firefox add one more line
-		if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent)){
+		if ($.browser.mozilla){
 			textarea.rows -= 1;
 		}
     },
