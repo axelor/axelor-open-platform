@@ -386,8 +386,8 @@ ui.formInput('OneToMany', {
 			return _.isUndefined(field.canView) ? true : field.canView;
 		};
 
-		scope.canRemoved = function() {
-			return _.isUndefined(field.canRemoved) ? true : field.canRemoved;
+		scope.canRemove = function() {
+			return _.isUndefined(field.canRemove) ? true : field.canRemove;
 		};
 
 		if (field.widget === 'MasterDetail') {
@@ -415,7 +415,7 @@ ui.formInput('OneToMany', {
 					'<i ng-click="onSelect()" ng-show="hasPermission(\'read\') && !isDisabled() && canSelect()" title="{{\'Select\' | t}}" class="icon-search"></i>'+
 					'<i ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled() && canNew()" title="{{\'New\' | t}}" class="icon-plus"></i>'+
 					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canView()" title="{{\'Edit\' | t}}" class="icon-pencil"></i>'+
-					'<i ng-click="onRemove()" ng-show="hasPermission(\'remove\') && !isDisabled() && canRemoved()" title="{{\'Remove\' | t}}" class="icon-minus"></i>'+
+					'<i ng-click="onRemove()" ng-show="hasPermission(\'remove\') && !isDisabled() && canRemove()" title="{{\'Remove\' | t}}" class="icon-minus"></i>'+
 				'</span>'+
 			'</div>'+
 		'</div>'+

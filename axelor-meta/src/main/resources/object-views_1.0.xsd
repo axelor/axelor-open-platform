@@ -382,7 +382,7 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="canRemoved" type="xsd:boolean">
+        <xsd:attribute name="canRemove" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>
               If this is a relational field, specify whether to allow removing record(s).
