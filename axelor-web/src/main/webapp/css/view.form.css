@@ -340,16 +340,18 @@ td.form-item > * {
 	padding-top: 8px; 
 }
 
-.form-item .ng-invalid,
-.form-item .form-item-container.ng-invalid > input,
+.form-item .form-item-container.ng-invalid > textarea,
+.form-item .form-item-container.ng-invalid > .picker-input input,
 .form-item .form-item-container.ng-invalid > .ui-spinner input,
+.form-item .form-item-container.ng-invalid > input,
 .form-item .input-append.ng-invalid > input,
 .form-item .picker-input.ng-invalid > input {
 	border-color: #B94A48;
 }
 
-.form-item .ng-invalid:focus,
+.form-item .form-item-container.ng-invalid:focus,
 .form-item .input-append.ng-invalid > input:focus,
+.form-item .form-item-container.ng-invalid > input:focus,
 .form-item .picker-input.ng-invalid > input:focus {
 	border-color: #953B39;
 	
