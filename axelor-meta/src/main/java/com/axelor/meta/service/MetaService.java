@@ -257,16 +257,26 @@ public class MetaService {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Response getAttachment(long id, String model){
+	public Response getAttachment(long id, String model, Request request){
 		Response response = new Response();
 		List<MetaFile> data = Lists.newArrayList();
-		
+		List<String> fields = request.getFields();
+
+		StringBuilder map = new StringBuilder();
+		map.append("meta.id as id, meta.version as version");
+		for (String fielName : fields) {
+			if(fielName.equals("id") || fielName.equals("version")){
+				continue;
+			}
+			map.append(", meta." + fielName + " as " + fielName);
+		}
+
 		javax.persistence.Query query = JPA.em().createQuery(
-				"SELECT new map(meta.id as id, meta.version as version, meta.sizeText as sizeText, meta.fileName as fileName) FROM MetaFile meta " +
+				"SELECT new map(" + map.toString() + ") FROM MetaFile meta " +
 				"WHERE meta.id IN (SELECT attch.metaFile FROM MetaAttachment attch WHERE attch.objectName = ?1 AND attch.objectId = ?2)");
 		query.setParameter(1, model);
 		query.setParameter(2, id);
-		
+
 		data = query.getResultList();
 		response.setData(data);
 		response.setStatus(Response.STATUS_SUCCESS);

@@ -196,10 +196,10 @@ public class RestService extends ResourceService {
 		return javax.ws.rs.core.Response.ok(data).header("Content-Disposition", "attachment; filename=" + name).build();
 	}
 	
-	@GET
+	@POST
 	@Path("{id}/attachment")
-	public Response attachment(@PathParam("id") long id){
-		return service.getAttachment(id, getModel());
+	public Response attachment(@PathParam("id") long id, Request request){
+		return service.getAttachment(id, getModel(), request);
 	}
 	
 	@POST

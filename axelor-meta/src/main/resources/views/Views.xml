@@ -238,6 +238,8 @@
       <field name="fileName"/>
       <field name="sizeText" width="150"/>
       <field name="mine" width="250"/>
+      <field name="createdBy"/>
+      <field name="createdOn" width="150"/>
     </grid>
     
     <form title="Files" name="meta-files-form" model="com.axelor.meta.db.MetaFile">
@@ -245,6 +247,7 @@
   	  <field name="fileName"/>
   	  <field name="size"/>
   	  <field name="mine"/>
+  	  <field name="description"/>
     </form>
     
 </object-views>
