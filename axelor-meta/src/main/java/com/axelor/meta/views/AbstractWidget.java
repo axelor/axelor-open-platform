@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -36,6 +37,7 @@ public abstract class AbstractWidget {
 	private Map<QName, String> otherAttributes;
 	
 	@XmlTransient
+	@JsonIgnore
 	private String model;
 	
 	public Map<QName, String> getOtherAttributes() {
