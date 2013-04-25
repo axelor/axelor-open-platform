@@ -248,8 +248,8 @@ function FormViewCtrl($scope, $element) {
 		$scope._viewPromise.then(function(){
 			var handler = $scope.$events.onNew,
 				record = $scope.record;
+			$scope.setEditable();
 			if (handler && record) {
-				$scope.setEditable();
 				setTimeout(handler);
 			}
 		});
