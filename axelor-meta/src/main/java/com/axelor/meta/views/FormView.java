@@ -92,8 +92,10 @@ public class FormView extends AbstractView {
 	}
 	
 	public List<AbstractWidget> getItems() {
-		for (AbstractWidget abstractWidget : items) {
-			abstractWidget.setModel(super.getModel());
+		if(items != null) {
+			for (AbstractWidget abstractWidget : items) {
+				abstractWidget.setModel(super.getModel());
+			}
 		}
 		return items;
 	}

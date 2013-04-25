@@ -30,8 +30,10 @@ public class Notebook extends AbstractContainer {
 	}
 
 	public List<Page> getPages() {
-		for (Page page : pages) {
-			page.setModel(super.getModel());
+		if(pages != null) {
+			for (Page page : pages) {
+				page.setModel(super.getModel());
+			}
 		}
 		return pages;
 	}
