@@ -217,9 +217,9 @@ var Factory = {
 		case 'many-to-many':
 			return '(' + value.length + ')';
 		case 'date':
-			return moment(value, 'YYYY-MM-DD').format('DD/MM/YYYY');
+			return moment(value).format('DD/MM/YYYY');
 		case 'datetime':
-			return moment(value, 'YYYY-MM-DD HH:mm').format('DD/MM/YYYY HH:mm');
+			return moment(value).format('DD/MM/YYYY HH:mm');
 		case 'boolean':
 			return value ? '<i class="icon-ok"></i>' : "";
 		case 'decimal':

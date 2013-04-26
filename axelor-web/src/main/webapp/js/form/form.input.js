@@ -505,6 +505,8 @@ ui.formInput('DateTime', {
 	
 	format: 'DD/MM/YYYY HH:mm',
 	mask: 'DD/MM/YYYY HH:mm',
+	
+	widgets: ['Datetime'],
 
 	init: function(scope) {
 
