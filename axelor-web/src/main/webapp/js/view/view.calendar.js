@@ -326,7 +326,8 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 			
 		},
 		replace: true,
-		template: '<div class="webkit-scrollbar">'+
+		template:
+		'<div class="webkit-scrollbar-all">'+
 			'<div class="calendar-main"></div>'+
 			'<div class="calendar-side">'+
 				'<div class="calendar-mini"></div>'+
