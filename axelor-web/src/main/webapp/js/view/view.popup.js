@@ -1,5 +1,5 @@
-EditorCtrl.$inject = ['$scope', '$element', 'DataSource'];
-function EditorCtrl($scope, $element, DataSource) {
+EditorCtrl.$inject = ['$scope', '$element', 'DataSource', '$q'];
+function EditorCtrl($scope, $element, DataSource, $q) {
 	
 	$scope._dataSource = DataSource.create($scope._model, {
 		domain: $scope._domain,
@@ -16,11 +16,22 @@ function EditorCtrl($scope, $element, DataSource) {
 		});
 	};
 	
-	$scope.$popup = $scope;
-
 	var ds = $scope._dataSource;
+	
+	var closeCallback = null;
 	var originalEdit = $scope.edit;
+	var originalShow = $scope.show;
 
+	$scope.show = function(record, callback) {
+		originalShow();
+		if (_.isFunction(record)) {
+			callback = record;
+			record = null;
+		}
+		closeCallback = callback;
+		this.edit(record);
+	};
+	
 	function doEdit(record) {
 		if (record && record.id > 0 && !record.$fetched) {
 			$scope.doRead(record.id).success(function(record){
@@ -59,6 +70,10 @@ function EditorCtrl($scope, $element, DataSource) {
 			if ($scope.editorCanReload) {
 				$scope.parentReload();
 			}
+			if (closeCallback && value) {
+				closeCallback(value);
+			}
+			closeCallback = null;
 		};
 		
 		function doSave() {
@@ -424,7 +439,8 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 					return;
 				element.closest('.ui-dialog').find('.ui-dialog-title').text(title);
 			});
-			scope.$on('adjust:dialog', _.debounce(autoSize, 300));
+
+			scope.adjustSize = _.debounce(autoSize, 300);
 		},
 		replace: true,
 		template:

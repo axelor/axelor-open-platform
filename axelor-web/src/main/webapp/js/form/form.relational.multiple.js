@@ -292,8 +292,8 @@ ui.formInput('OneToMany', {
 							return;
 						}
 						adjusted = true;
-						if (scope.$popup) {
-							scope.$popup.$broadcast('adjust:dialog');
+						if (scope.adjustSize) {
+							scope.adjustSize();
 						}
 					});
 				});
