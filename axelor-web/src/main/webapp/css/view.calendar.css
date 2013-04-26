@@ -1,0 +1,39 @@
+.view-container .calendar-view > div:last-child {
+	position: absolute;
+	top: 48px;
+	bottom: 0; left: 0; right: 0;
+	overflow: auto;
+}
+
+.calendar-main {
+	position: absolute;
+	top: 0; left: 0; bottom: 0;
+	right: 250px;
+}
+
+.calendar-side {
+	position: absolute;
+	top: 0; right: 0; bottom: 0;
+	width: auto;
+	overflow: hidden;
+	padding: 4px;
+	padding-top: 0;
+}
+
+.calendar-side .ui-datepicker {
+	box-shadow: none;
+	border-radius: 0;
+}
+
+.calendar-legend {
+	padding-left: 4px;
+	margin-top: 8px;
+}
+
+.calendar-legend label {
+	line-height: 20px;
+}
+
+.calendar-view .record-pager > span {
+	font-weight: bold;
+}

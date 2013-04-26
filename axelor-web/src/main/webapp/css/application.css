@@ -8,6 +8,9 @@
 
 @import url('../lib/slickgrid/slick.grid.css');
 
+@import url('../lib/fullcalendar/fullcalendar.css');
+@import url('../lib/fullcalendar/fullcalendar.print.css') print;
+
 @import url('scrollbar.css');
 @import url('main.css');
 
@@ -18,3 +21,4 @@
 
 @import url('view.form.css');
 @import url('view.portal.css');
+@import url('view.calendar.css');

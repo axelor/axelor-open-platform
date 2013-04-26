@@ -294,6 +294,11 @@ html, body {
 	font-size: 13px;
 }
 
+.record-pager > button {
+	margin-left: 4px;
+	margin-right: 4px;
+}
+
 .record-pager.pull-right > span,
 .record-pager.pull-left > .btn-group {
 	float: left;
