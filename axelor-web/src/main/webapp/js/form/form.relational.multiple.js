@@ -83,6 +83,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		
 		$scope.setValue(records, true);
 		setTimeout(function(){
+			$scope.$apply();
 			$scope.$broadcast('grid:changed');
 		});
 	};
@@ -117,6 +118,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		}
 
 		$scope.setValue(records, true);
+		$scope.$apply();
 	};
 	
 	$scope.onEdit = function() {
