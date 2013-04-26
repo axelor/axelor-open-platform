@@ -101,7 +101,14 @@
 					items.push(item.name);
 				}
 			});
-			return items;
+			
+			if (view.type === "calendar") {
+				items.push(view.eventStart);
+				items.push(view.eventStop);
+				items.push(view.colorBy);
+			}
+
+			return _.compact(items);
 		}
 		
 		var fieldsCache = $cacheFactory("viewFields", { capacity: 1000 });
