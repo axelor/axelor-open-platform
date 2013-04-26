@@ -37,7 +37,7 @@ function CalendarViewCtrl($scope, $element) {
 
 	function nextColor(n) {
 		if (n === undefined || n < 0 || n > 7) {
-			n = _.randrom(0, 7);
+			n = _.random(0, 7);
 		}
 		var c = tango[n];
 		return {
@@ -100,7 +100,25 @@ function CalendarViewCtrl($scope, $element) {
 		}
 		return nextColor();
 	};
+	
+	$scope.onEventChange = function(event, dayDelta, minuteDelta, allDay) {
+		
+		var view = this.schema;
+		var record = _.clone(event.record);
+		
+		record[view.eventStart] = event.start;
+		record[view.eventStop] = event.end;
 
+		var promise = ds.save(record);
+		
+		promise.success(function(res){
+			
+			event.record.version = res.version;
+		});
+		
+		return promise;
+	};
+	
 	$scope.getRouteOptions = function() {
 		var args = [],
 			query = {};
@@ -129,7 +147,7 @@ function CalendarViewCtrl($scope, $element) {
 	};
 }
 
-angular.module('axelor.ui').directive('uiViewCalendar', function(){
+angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function(ViewService){
 	
 	return {
 		
@@ -148,37 +166,123 @@ angular.module('axelor.ui').directive('uiViewCalendar', function(){
 			});
 			
 			main.fullCalendar({
+				
 				header: false,
+				
+				editable: true,
+				
+				selectable: true,
+				
+				selectHelper: true,
+				
+				select: function(start, end, allDay) {
+					var event = {
+						start: start,
+						end: end,
+						allDay: allDay
+					};
+					setTimeout(function(){
+						scope.$apply(function(){
+							scope.showEditor(event);
+						});
+					});
+					main.fullCalendar('unselect');
+				},
+
+				eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) {
+					scope.onEventChange(event, dayDelta, minuteDelta, allDay).error(function(){
+						revertFunc();
+					});
+				},
+				
+				eventResize: function( event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view ) {
+					scope.onEventChange(event, dayDelta, minuteDelta).error(function(){
+						revertFunc();
+					});
+				},
+				
+				eventClick: function(event, jsEvent, view) {
+					setTimeout(function(){
+						scope.$apply(function(){
+							scope.showEditor(event);
+						});
+					});
+				},
+
 				events: function(start, end, callback) {
 					scope._viewPromise.then(function(){
 						scope.fetchItems(start, end, callback);
 					});
 				},
+				
 				eventDataTransform: function(record) {
-					var view = scope.schema,
-						start = moment(record[view.eventStart] || new Date()),
-						stop = moment(record[view.eventStop] || new Date());
-
-					var color = scope.getColor(record);
-					var diff = moment(stop).diff(start, "minutes");
-
-					var event = {
-						record: record,
-						title: record.name,
-						start: start.toDate(),
-						end: stop.toDate(),
-						allDay: diff <= 0 || diff >= (8 * 60)
-					};
-					
-					event.backgroundColor = color.bg;
-					event.borderColor = color.bc;
-
-					return event;
+					return updateEvent(null, record);
 				},
+				
 				viewDisplay: function(view) {
 					mini.datepicker('setDate', main.fullCalendar('getDate'));
 				}
 			});
+			
+			var editor = null;
+
+			function updateEvent(event, record) {
+				var view = scope.schema,
+					start = moment(record[view.eventStart] || new Date()),
+					stop = moment(record[view.eventStop] || new Date());
+	
+				var diff = moment(stop).diff(start, "minutes");
+				
+				if (event == null || !event.id) {
+					var color = scope.getColor(record);
+					event = {
+						id: record.id,
+						record: record,
+						backgroundColor: color.bg,
+						borderColor: color.bc
+					};
+				} else {
+					_.extend(event.record, record);
+				}
+
+				event.title = record.name;
+				event.start = start.toDate();
+				event.end = stop.toDate();
+				event.allDay = diff <= 0 || diff >= (8 * 60);
+
+				return event;
+			}
+
+			scope.editorCanSave = true;
+			
+			scope.showEditor = function(event) {
+
+				var view = this.schema;
+				var record = _.extend({}, event.record);
+
+				record[view.eventStart] = event.start;
+				record[view.eventStop] = event.end;
+
+				if (editor == null) {
+					editor = ViewService.compile('<div ui-editor-popup></div>')(scope.$new());
+					editor.data('$target', element);
+				}
+
+				var popup = editor.data('$scope');
+				popup.show(record, function(result) {
+					if (!record.id && result && result.id) {
+						main.fullCalendar('renderEvent', updateEvent(null, result));
+					};
+				});
+
+				if (record == null) {
+					popup.$broadcast("on:new");
+				}
+			};
+
+			scope.select = function(record) {
+
+			};
 
 			main.on("adjustSize", _.debounce(function(){
 				if (main.is(':hidden')) {
@@ -227,9 +331,10 @@ angular.module('axelor.ui').directive('uiViewCalendar', function(){
 			'<div class="calendar-side">'+
 				'<div class="calendar-mini"></div>'+
 				'<form class="form calendar-legend">'+
-					'<label class="checkbox" ng-repeat="color in getColors()" style="color: {{color.color.bc}}"><input type="checkbox"> {{color.item.name}}</label>'+
+					'<label class="checkbox" ng-repeat="color in getColors()" style="color: {{color.color.bc}}">'+
+						'<input type="checkbox"> {{color.item.name}}</label>'+
 				'</div>'+
 			'</div>'+
 		'</div>'
 	};
-});
+}]);
