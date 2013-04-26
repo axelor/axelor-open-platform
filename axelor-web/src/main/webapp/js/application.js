@@ -39,7 +39,7 @@ load([
 	'lib/bootstrap/js/bootstrap.js',
 	'lib/jquery.timepicker/jquery-ui-timepicker-addon.js',
 
-	'lib/slickgrid/lib/jquery.event.drag-2.2.js',
+	'lib/slickgrid/lib/jquery.event.drag-2.0.js',
 	'lib/slickgrid/slick.core.js',
 	'lib/slickgrid/slick.grid.js',
 	'lib/slickgrid/slick.dataview.js',
