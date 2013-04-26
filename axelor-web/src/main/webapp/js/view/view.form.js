@@ -353,33 +353,44 @@ function FormViewCtrl($scope, $element) {
 	};
 
 	$scope.onCancel = function() {
-		
 		var e = $scope.$broadcast("cancel:grid-edit");
 		if (e.defaultPrevented) {
 			return;
 		}
-		
-		$scope.confirmDirty(function() {
-			var record = $scope.record || {};
-			var editable = $scope.isEditable();
-			
-			$scope.setEditable(false);
 
-			if (record.id && editable) {
+		var record = $scope.record || {};
+		var editable = $scope.isEditable();
+
+		if (record.id && editable) {
+			$scope.confirmDirty(function() {
+				$scope.setEditable(false);
 				if ($scope.canSave()) {
 					$scope.reload();
 				}
-				return;
-			}
+			});
+			return;
+		}
+
+		switchToGrid();
+	};
+
+	function switchToGrid(){
+		$scope.confirmDirty(function() {
+			$scope.setEditable(false);
 			$scope.editRecord(null);
 			$scope.switchTo('grid', function(viewScope) {
 				viewScope.updateRoute();
 			});
 		});
-	};
+	}
 
 	$scope.onSearch = function() {
-		$scope.onCancel();
+		var e = $scope.$broadcast("cancel:grid-edit");
+		if (e.defaultPrevented) {
+			return;
+		}
+
+		switchToGrid();
 	};
 	
 	$scope.pagerText = function() {
