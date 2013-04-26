@@ -241,13 +241,22 @@ ActionHandler.prototype = {
 			for(var i = 0 ; i < data.length && resolved; i++) {
 				var item = data[i];
 				self._handleSingle(item).then(function(result){
+					resolved = result && !_.isString(result);
 					if (_.isString(result)) {
 						self._handleAction(result).then(function(){
 							d.resolve();
 						});
 					}
-					resolved = result && !_.isString(result);
+					else if(item.alert || item.error) {
+					    if(resolved) {
+					    	d.resolve();
+					    }
+					    else{
+					    	d.reject();
+					    }
+					}
 				});
+				
 				if (item.pending || item.alert || item.error) {
 					resolved = false;
 				}
