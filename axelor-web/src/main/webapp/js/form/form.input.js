@@ -777,6 +777,7 @@ ui.formInput('Select', {
 				return;
 			}
 			input.autocomplete("search" , '');
+			input.focus();
 		};
 		
 		function updateValue(value) {
