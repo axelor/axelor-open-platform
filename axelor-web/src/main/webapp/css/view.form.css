@@ -422,6 +422,7 @@ table.field-details .help-text hr {
 	min-width: 280px;
 	max-width: 360px;
 	display: table;
+	overflow: hidden;
 }
 
 .subtotal {
