@@ -37,3 +37,18 @@
 .calendar-view .record-pager > span {
 	font-weight: bold;
 }
+
+.calendar-view .fc-view-month .calendar-event-day {
+	background-color: transparent !important;
+	border-color: transparent !important;
+}
+
+.calendar-view .fc-view-month .calendar-event-day * {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.calendar-view .fc-agenda .calendar-event-day {
+	color: #fff !important;
+}

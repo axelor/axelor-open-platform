@@ -4,28 +4,34 @@ function CalendarViewCtrl($scope, $element) {
 	DSViewCtrl('calendar', $scope, $element);
 
 	var ds = $scope._dataSource;
-	
-	var colorBy = null;
+
+	var view = {};
 	var colors = {};
 
 	$scope.onShow = function(viewPromise) {
 		
 		viewPromise.then(function(){
-			var view = $scope.schema;
+
+			var schema = $scope.schema;
 			
-			colorBy = view.colorBy;
-			
-			$scope._viewResolver.resolve(view, $element);
+			view = {
+				start: schema.eventStart,
+				stop: schema.eventStop,
+				length: parseInt(schema.eventLength) || 0,
+				color: schema.colorBy,
+				title:schema.items[0].name
+			};
+
+			$scope._viewResolver.resolve(schema, $element);
 			$scope.updateRoute();
 		});
 	};
-	
+
 	$scope.isAgenda = function() {
-		var view = this.schema || {},
-			field = this.fields[view.eventStart] || {};
-		return field.type === "datetime";
+		var field = this.fields[view.start];
+		return field && field.type === "datetime";
 	};
-	
+
 	var tango = new Array(
 		["#fce94f", "#edd400", "#c4a000"],
 		["#fcaf3e", "#f57900", "#ce5c00"],
@@ -48,23 +54,23 @@ function CalendarViewCtrl($scope, $element) {
 	};
 	
 	$scope.fetchItems = function(start, end, callback) {
-		
-		var view = this.schema;
+
 		var fields = _.pluck(this.fields, 'name');
+		var fieldName = view.start;
 
 		var criteria = {
 			operator: "and",
 			criteria: [{
 				operator: "greaterOrEqual",
-				fieldName: view.eventStart,
+				fieldName: fieldName,
 				value: start
 			}, {
 				operator: "lessOrEqual",
-				fieldName: view.eventStart,
+				fieldName: fieldName,
 				value: end
 			}]
 		};
-		
+
 		var opts = {
 			fields: fields,
 			filter: criteria,
@@ -73,18 +79,21 @@ function CalendarViewCtrl($scope, $element) {
 		};
 
 		ds.search(opts).success(function(records) {
-			colors = {};
-			_.each(records, function(record) {
-				var item = record[colorBy];
-				if (!item) return;
-				var key = item.id ? item.id : item;
-				if (!colors[key]) {
-					colors[key] = {
-						item: item,
-						color: nextColor(_.size(colors))
-					};
-				}
-			});
+			var colorBy = view.color;
+			if (colorBy) {
+				colors = {};
+				_.each(records, function(record) {
+					var item = record[colorBy];
+					if (!item) return;
+					var key = item.id ? item.id : item;
+					if (!colors[key]) {
+						colors[key] = {
+							item: item,
+							color: nextColor(_.size(colors))
+						};
+					}
+				});
+			}
 			callback(records);
 		});
 	};
@@ -94,25 +103,51 @@ function CalendarViewCtrl($scope, $element) {
 	};
 	
 	$scope.getColor = function(record) {
-		var item = record[colorBy];
+		var item = record[view.color];
 		if (item && colors[item.id || item]) {
 			return colors[item.id || item].color;
 		}
 		return nextColor();
 	};
 	
+	$scope.getEventInfo = function(record) {
+		var info = {},
+			value;
+
+		value = record[view.start];
+		info.start = value ? moment(value).toDate() : new Date();
+
+		value = record[view.stop];
+		info.end = value ? moment(value).toDate() : moment(info.start).add("hours", view.length || 1).toDate();
+
+		var diff = moment(info.end).diff(info.start, "minutes");
+		var title = this.fields[view.title];
+
+		if (title) {
+			value = record[title.name];
+			if (title.targetName) {
+				value = value[title.targetName];
+			}
+			info.title = value;
+		}
+
+		info.allDay = diff <= 0 || diff >= (8 * 60);
+		info.className = info.allDay ? "calendar-event-allDay" : "calendar-event-day";
+		
+		return info;
+	};
+	
 	$scope.onEventChange = function(event, dayDelta, minuteDelta, allDay) {
 		
-		var view = this.schema;
 		var record = _.clone(event.record);
-		
-		record[view.eventStart] = event.start;
-		record[view.eventStop] = event.end;
+
+		record[view.start] = event.start;
+		record[view.stop] = event.end;
 
 		var promise = ds.save(record);
 		
 		promise.success(function(res){
-			
+			//TODO: update record
 			event.record.version = res.version;
 		});
 		
@@ -120,7 +155,6 @@ function CalendarViewCtrl($scope, $element) {
 	};
 	
 	$scope.removeEvent = function(event, callback) {
-		//XXX: confirm?
 		ds.remove(event.record).success(callback);
 	};
 
@@ -291,12 +325,6 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 			});
 
 			function updateEvent(event, record) {
-				var view = scope.schema,
-					start = moment(record[view.eventStart] || new Date()),
-					stop = moment(record[view.eventStop] || new Date());
-	
-				var diff = moment(stop).diff(start, "minutes");
-				
 				if (event == null || !event.id) {
 					var color = scope.getColor(record);
 					event = {
@@ -309,10 +337,11 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 					_.extend(event.record, record);
 				}
 
-				event.title = record.name;
-				event.start = start.toDate();
-				event.end = stop.toDate();
-				event.allDay = diff <= 0 || diff >= (8 * 60);
+				event = _.extend(event, scope.getEventInfo(record));
+				
+				if (!event.allDay) {
+					event.textColor = event.borderColor;
+				}
 
 				return event;
 			}
