@@ -9,6 +9,7 @@
         <xsd:element name="form" type="tns:FormView" />
         <xsd:element name="grid" type="tns:GridView" />
         <xsd:element name="tree" type="tns:TreeView" />
+        <xsd:element name="calendar" type="tns:CalendarView" />
         <xsd:element name="portal" type="tns:Portal" />
         <xsd:element name="search" type="tns:Search" />
         <xsd:element name="menuitem" type="tns:MenuItem" />
@@ -244,6 +245,71 @@
         <xsd:attribute name="onSave" type="xsd:string" />
         <xsd:attribute name="onNew" type="xsd:string" />
         <xsd:attribute name="helpLink" type="xsd:string" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  
+  <xsd:complexType name="CalendarView">
+    <xsd:complexContent>
+      <xsd:extension base="tns:ObjectView">
+        <xsd:sequence>
+          <xsd:element name="field" maxOccurs="unbounded">
+            <xsd:complexType>
+              <xsd:complexContent>
+                <xsd:extension base="tns:SimpleWidget">
+                  <xsd:attribute name="name" type="xsd:string" use="required" />
+                  <xsd:attribute name="colSpan" use="prohibited"/>
+                  <xsd:attribute name="noLabel" use="prohibited"/>
+                  <xsd:attribute name="hidden" use="prohibited"/>
+                  <xsd:attribute name="readonly" use="prohibited"/>
+                </xsd:extension>
+              </xsd:complexContent>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="eventStart" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+            Name of the field of type date/datetime to be used as event start time.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="eventStop" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            Name of the field of type date/datetme to be used as event stop time.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="eventLength" default="1">
+          <xsd:annotation>
+            <xsd:documentation>
+            If eventStop is not given, the length of an event in hour (default is 1).
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:integer">
+              <xsd:minInclusive value="1"/>
+              <xsd:maxInclusive value="24"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="colorBy" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            Name of the field to be used to colorize the events.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="mode" default="month">
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string" >
+              <xsd:enumeration value="month"/>
+              <xsd:enumeration value="week"/>
+              <xsd:enumeration value="day"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

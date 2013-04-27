@@ -25,7 +25,8 @@ public class ObjectViews {
 		@XmlElement(name = "grid", type = GridView.class),
 		@XmlElement(name = "tree", type = TreeView.class),
 		@XmlElement(name = "portal", type = Portal.class),
-		@XmlElement(name = "search", type = Search.class)
+		@XmlElement(name = "search", type = Search.class),
+		@XmlElement(name = "calendar", type = CalendarView.class)
 	})
 	private List<AbstractView> views;
 	

@@ -9,6 +9,7 @@
 		<option value="tree">Tree</option>
 		<option value="search">Search</option>
 		<option value="portal">Portal</option>
+        <option value="calendar">Calendar</option>
 	</selection>
 
     <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView">
