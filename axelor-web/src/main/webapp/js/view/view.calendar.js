@@ -480,7 +480,10 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 		}
 
 		main.on("adjustSize", _.debounce(adjustSize, 100));
-		setTimeout(adjustSize);
+		setTimeout(function() {
+			scope.onMode(mode);
+			adjustSize();
+		});
 	}
 	
 	return {
