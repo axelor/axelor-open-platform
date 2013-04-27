@@ -132,6 +132,7 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="editable" type="xsd:boolean" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -204,7 +205,6 @@
           <xsd:element name="field" type="tns:GridField" maxOccurs="unbounded" />
           <xsd:element name="button" type="tns:Button" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
-        <xsd:attribute name="editable" type="xsd:boolean" />
         <xsd:attribute name="expandable" type="xsd:boolean" />
         <xsd:attribute name="orderBy" type="xsd:string">
           <xsd:annotation>
