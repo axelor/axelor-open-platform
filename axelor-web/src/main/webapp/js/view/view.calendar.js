@@ -379,16 +379,6 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 
 			};
 
-			main.on("adjustSize", _.debounce(function(){
-				if (main.is(':hidden')) {
-					return;
-				}
-				hideBubble();
-				main.fullCalendar('render');
-				main.fullCalendar('option', 'height', element.height());
-				main.css('right', mini.parent().outerWidth(true));
-			}, 100));
-
 			scope.pagerText = function() {
 				return main.fullCalendar("getView").title;
 			};
@@ -420,6 +410,18 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				main.fullCalendar('today');
 			};
 			
+			function adjustSize() {
+				if (main.is(':hidden')) {
+					return;
+				}
+				hideBubble();
+				main.fullCalendar('render');
+				main.fullCalendar('option', 'height', element.height());
+				main.css('right', mini.parent().outerWidth(true));
+			}
+
+			main.on("adjustSize", _.debounce(adjustSize, 100));
+			setTimeout(adjustSize, 100);
 		},
 		replace: true,
 		template:
