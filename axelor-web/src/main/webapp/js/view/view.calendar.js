@@ -226,10 +226,8 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 					
 					if (selected.length) {
 						filtered = _.filter(all, function(event) {
-							console.log('eeee', event, event.$colorKey);
 							return _.contains(selected, event.$colorKey);
 						});
-						console.log('aaaa', selected, filtered);
 					}
 					
 					main.fullCalendar('addEventSource', filtered);
@@ -335,7 +333,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 					$("<hr>").appendTo(html);
 					
 					if (scope.isEditable()) {
-						$('<a href="javascript: void(0)">Delete</a>')
+						$('<a href="javascript: void(0)"></a>').text(_t("Delete"))
 						.appendTo(html)
 						.click(function(e){
 							hideBubble();
@@ -346,7 +344,9 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 							});
 						});
 					}
-					$('<a class="pull-right" href="javascript: void(0)">Edit event <strong>»</strong></a>')
+					
+					$('<a class="pull-right" href="javascript: void(0)"></a>')
+					.append(_t("Edit event")).append("<strong> »</strong>")
 					.appendTo(html)
 					.click(function(e){
 						hideBubble();
@@ -473,13 +473,13 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				return;
 			}
 			hideBubble();
+			main.css('right', mini.parent().outerWidth(true));
 			main.fullCalendar('render');
 			main.fullCalendar('option', 'height', element.height());
-			main.css('right', mini.parent().outerWidth(true));
 		}
 
 		main.on("adjustSize", _.debounce(adjustSize, 100));
-		setTimeout(adjustSize, 100);
+		setTimeout(adjustSize);
 	}
 	
 	return {
