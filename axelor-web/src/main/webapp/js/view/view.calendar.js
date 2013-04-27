@@ -195,10 +195,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				},
 
 				eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) {
-					if (bubble) {
-						bubble.popover('destroy');
-						bubble = null;
-					}
+					hideBubble();
 					scope.onEventChange(event, dayDelta, minuteDelta, allDay).error(function(){
 						revertFunc();
 					});
@@ -211,7 +208,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				},
 				
 				eventClick: function(event, jsEvent, view) {
-					showBubble(event, jsEvent);
+					showBubble(event, jsEvent.srcElement);
 				},
 
 				events: function(start, end, callback) {
@@ -225,23 +222,24 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				},
 				
 				viewDisplay: function(view) {
-					if (bubble) {
-						bubble.popover('destroy');
-						bubble = null;
-					}
+					hideBubble();
 					mini.datepicker('setDate', main.fullCalendar('getDate'));
 				}
 			});
 			
 			var editor = null;
 			var bubble = null;
-
-			function showBubble(event, jsEvent) {
+			
+			function hideBubble() {
 				if (bubble) {
 					bubble.popover('destroy');
 					bubble = null;
 				}
-				bubble = $(jsEvent.srcElement).popover({
+			}
+
+			function showBubble(event, elem) {
+				hideBubble();
+				bubble = $(elem).popover({
 					html: true,
 					title: "<b>" + event.title + "</b>",
 					placement: "top",
@@ -254,14 +252,13 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 							$("<span> - </span>").appendTo(html);
 							$("<span>").text(moment(event.end).format("LLL")).appendTo(html);
 						}
-						
+
 						$("<hr>").appendTo(html);
 						$('<a href="javascript: void(0)">Delete</a>')
 							.appendTo(html)
 							.click(function(e){
+								hideBubble();
 								scope.$apply(function(){
-									bubble.popover('destroy');
-									bubble = null;
 									scope.removeEvent(event, function(){
 										main.fullCalendar("removeEvents", event.id);
 									});
@@ -270,8 +267,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 						$('<a class="pull-right" href="javascript: void(0)">Edit event <strong>»</strong></a>')
 							.appendTo(html)
 							.click(function(e){
-								bubble.popover('destroy');
-								bubble = null;
+								hideBubble();
 								scope.$apply(function(){
 									scope.showEditor(event);
 								});
@@ -290,7 +286,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 					return;
 				}
 				if (!elem.parents().is(".popover")) {
-					bubble.popover("hide");
+					hideBubble();
 				}
 			});
 
@@ -358,10 +354,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				if (main.is(':hidden')) {
 					return;
 				}
-				if (bubble) {
-					bubble.popover('destroy');
-					bubble = null;
-				}
+				hideBubble();
 				main.fullCalendar('render');
 				main.fullCalendar('option', 'height', element.height());
 				main.css('right', mini.parent().outerWidth(true));
