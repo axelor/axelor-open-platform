@@ -119,6 +119,11 @@ function CalendarViewCtrl($scope, $element) {
 		return promise;
 	};
 	
+	$scope.removeEvent = function(event, callback) {
+		//XXX: confirm?
+		ds.remove(event.record).success(callback);
+	};
+
 	$scope.getRouteOptions = function() {
 		var args = [],
 			query = {};
@@ -190,6 +195,10 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				},
 
 				eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) {
+					if (bubble) {
+						bubble.popover('destroy');
+						bubble = null;
+					}
 					scope.onEventChange(event, dayDelta, minuteDelta, allDay).error(function(){
 						revertFunc();
 					});
@@ -202,11 +211,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				},
 				
 				eventClick: function(event, jsEvent, view) {
-					setTimeout(function(){
-						scope.$apply(function(){
-							scope.showEditor(event);
-						});
-					});
+					showBubble(event, jsEvent);
 				},
 
 				events: function(start, end, callback) {
@@ -220,11 +225,74 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				},
 				
 				viewDisplay: function(view) {
+					if (bubble) {
+						bubble.popover('destroy');
+						bubble = null;
+					}
 					mini.datepicker('setDate', main.fullCalendar('getDate'));
 				}
 			});
 			
 			var editor = null;
+			var bubble = null;
+
+			function showBubble(event, jsEvent) {
+				if (bubble) {
+					bubble.popover('destroy');
+					bubble = null;
+				}
+				bubble = $(jsEvent.srcElement).popover({
+					html: true,
+					title: "<b>" + event.title + "</b>",
+					placement: "top",
+					content: function() {
+						var html = $("<div></div>");
+						
+						$("<span>").text(moment(event.start).format("LLL")).appendTo(html);
+						
+						if (event.end) {
+							$("<span> - </span>").appendTo(html);
+							$("<span>").text(moment(event.end).format("LLL")).appendTo(html);
+						}
+						
+						$("<hr>").appendTo(html);
+						$('<a href="javascript: void(0)">Delete</a>')
+							.appendTo(html)
+							.click(function(e){
+								scope.$apply(function(){
+									bubble.popover('destroy');
+									bubble = null;
+									scope.removeEvent(event, function(){
+										main.fullCalendar("removeEvents", event.id);
+									});
+								});
+							});
+						$('<a class="pull-right" href="javascript: void(0)">Edit event <strong>»</strong></a>')
+							.appendTo(html)
+							.click(function(e){
+								bubble.popover('destroy');
+								bubble = null;
+								scope.$apply(function(){
+									scope.showEditor(event);
+								});
+							});
+
+						return html;
+					}
+				});
+
+				bubble.popover('show');
+			};
+			
+			$("body").on("mousedown", function(e){
+				var elem = $(e.srcElement);
+				if (!bubble || bubble.is(elem) || bubble.has(elem).length) {
+					return;
+				}
+				if (!elem.parents().is(".popover")) {
+					bubble.popover("hide");
+				}
+			});
 
 			function updateEvent(event, record) {
 				var view = scope.schema,
@@ -272,7 +340,9 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				popup.show(record, function(result) {
 					if (!record.id && result && result.id) {
 						main.fullCalendar('renderEvent', updateEvent(null, result));
-					};
+					} else {
+						main.fullCalendar('renderEvent', updateEvent(event, result));
+					}
 				});
 
 				if (record == null) {
@@ -287,6 +357,10 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 			main.on("adjustSize", _.debounce(function(){
 				if (main.is(':hidden')) {
 					return;
+				}
+				if (bubble) {
+					bubble.popover('destroy');
+					bubble = null;
 				}
 				main.fullCalendar('render');
 				main.fullCalendar('option', 'height', element.height());
