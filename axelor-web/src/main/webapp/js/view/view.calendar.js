@@ -92,6 +92,7 @@ function CalendarViewCtrl($scope, $element) {
 							color: nextColor(_.size(colors))
 						};
 					}
+					record.$colorKey = key;
 				});
 			}
 			callback(records);
@@ -195,6 +196,40 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 			var main = element.children('.calendar-main');
 			var mini = element.find('.calendar-mini');
 			var mode = "month";
+			
+			var EventManager = (function() {
+
+				var all = Array();
+				var filtered = Array();
+				
+				return {
+					
+					setEvents : function(events) {
+						all = events;
+					},
+					
+					filter: function() {
+						var selected = element.find('.calendar-legend input:checked').map(function(){
+							var child = $(this).parent().data('$scope');
+							var item = child.color.item;
+							return item.id ? item.id : item;
+						}).toArray();
+
+						main.fullCalendar('removeEventSource', filtered);
+						filtered = all;
+						
+						if (selected.length) {
+							filtered = _.filter(all, function(event) {
+								console.log('eeee', event, event.$colorKey);
+								return _.contains(selected, event.$colorKey);
+							});
+							console.log('aaaa', selected, filtered);
+						}
+						
+						main.fullCalendar('addEventSource', filtered);
+					}
+				};
+			})();
 
 			mini.datepicker({
 				showOtherMonths: true,
@@ -247,10 +282,14 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 
 				events: function(start, end, callback) {
 					scope._viewPromise.then(function(){
-						scope.fetchItems(start, end, callback);
+						scope.fetchItems(start, end, function(records) {
+							callback([]);
+							EventManager.setEvents(records);
+							EventManager.filter();
+						});
 					});
 				},
-				
+
 				eventDataTransform: function(record) {
 					return updateEvent(null, record);
 				},
@@ -378,6 +417,10 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 			scope.select = function(record) {
 
 			};
+			
+			scope.filterEvents = function() {
+				EventManager.filter();
+			};
 
 			scope.pagerText = function() {
 				return main.fullCalendar("getView").title;
@@ -431,7 +474,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				'<div class="calendar-mini"></div>'+
 				'<form class="form calendar-legend">'+
 					'<label class="checkbox" ng-repeat="color in getColors()" style="color: {{color.color.bc}}">'+
-						'<input type="checkbox"> {{color.item.name}}</label>'+
+						'<input type="checkbox" ng-click="filterEvents()"> {{color.item.name}}</label>'+
 				'</div>'+
 			'</div>'+
 		'</div>'
