@@ -105,18 +105,6 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			this.link.call(this, scope, element, attrs, controller);
 		}
 
-		scope.$watch("isHidden()", function(hidden) {
-			var elem = element,
-				parent = elem.parent('td'),
-				label = elem.data('label') || $(),
-				label_parent = label.parent('td');
-			if (parent.size() == 0)
-				parent = elem;
-			if (label_parent.size())
-				label = label_parent;
-			return hidden ? parent.add(label).hide() : parent.add(label).show();
-		});
-
 		this.prepare(scope, element, attrs, controller);
 	}
 
@@ -213,7 +201,17 @@ ui.formDirective = function(name, object) {
 				}
 				return showEditable();
 			});
-
+			scope.$watch("isHidden()", function(hidden) {
+				var elem = element,
+					parent = elem.parent('td'),
+					label = elem.data('label') || $(),
+					label_parent = label.parent('td');
+				if (parent.size() == 0)
+					parent = elem;
+				if (label_parent.size())
+					label = label_parent;
+				return hidden ? parent.add(label).hide() : parent.add(label).show();
+			});
 			scope.$watch("isRequired()", function(required) {
 				var elem = element,
 					label = elem.data('label') || $();
@@ -223,6 +221,7 @@ ui.formDirective = function(name, object) {
 				}
 				attrs.$set('required', required);
 			});
+			
 		});
 
 		return object;
