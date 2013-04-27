@@ -231,6 +231,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 					}
 					
 					main.fullCalendar('addEventSource', filtered);
+					adjustSize();
 				}
 			};
 		})();
