@@ -80,15 +80,20 @@ function CalendarViewCtrl($scope, $element) {
 
 		ds.search(opts).success(function(records) {
 			var colorBy = view.color;
-			if (colorBy) {
+			var colorField = $scope.fields[colorBy];
+			if (colorField) {
 				colors = {};
 				_.each(records, function(record) {
 					var item = record[colorBy];
-					if (!item) return;
+					if (!item) {
+						return;
+					}
 					var key = item.id ? item.id : item;
+					var title = colorField.targetName ? item[colorField.targetName] : item;
 					if (!colors[key]) {
 						colors[key] = {
 							item: item,
+							title: title,
 							color: nextColor(_.size(colors))
 						};
 					}
@@ -474,7 +479,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				'<div class="calendar-mini"></div>'+
 				'<form class="form calendar-legend">'+
 					'<label class="checkbox" ng-repeat="color in getColors()" style="color: {{color.color.bc}}">'+
-						'<input type="checkbox" ng-click="filterEvents()"> {{color.item.name}}</label>'+
+						'<input type="checkbox" ng-click="filterEvents()"> {{color.title}}</label>'+
 				'</div>'+
 			'</div>'+
 		'</div>'
