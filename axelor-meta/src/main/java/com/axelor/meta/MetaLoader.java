@@ -401,7 +401,9 @@ public class MetaLoader {
 	private List<String> fieldNames(Class<?> klass) {
 		List<String> result = new ArrayList<String>();
 		for(java.lang.reflect.Field field : klass.getDeclaredFields()) {
-			result.add(field.getName());
+			if (!field.getName().matches("id|version|selected|created(By|On)|updated(By|On)")) {
+				result.add(field.getName());
+			}
 		}
 		if (klass.getSuperclass() != Object.class) {
 			result.addAll(fieldNames(klass.getSuperclass()));
