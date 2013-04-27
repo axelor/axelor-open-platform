@@ -194,282 +194,299 @@ function CalendarViewCtrl($scope, $element) {
 
 angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function(ViewService){
 	
-	return {
+	function link(scope, element, attrs, controller) {
+
+		var main = element.children('.calendar-main');
+		var mini = element.find('.calendar-mini');
 		
-		link: function(scope, element, attrs, controller) {
-		
-			var main = element.children('.calendar-main');
-			var mini = element.find('.calendar-mini');
-			var mode = "month";
+		var schema = scope.schema;
+		var mode = schema.mode || "month";
+		var editable = schema.editable === undefined ? true : schema.editable;
+
+		var EventManager = (function() {
+
+			var all = Array();
+			var filtered = Array();
 			
-			var EventManager = (function() {
-
-				var all = Array();
-				var filtered = Array();
+			return {
 				
-				return {
-					
-					setEvents : function(events) {
-						all = events;
-					},
-					
-					filter: function() {
-						var selected = element.find('.calendar-legend input:checked').map(function(){
-							var child = $(this).parent().data('$scope');
-							var item = child.color.item;
-							return item.id ? item.id : item;
-						}).toArray();
+				setEvents : function(events) {
+					all = events;
+				},
+				
+				filter: function() {
+					var selected = element.find('.calendar-legend input:checked').map(function(){
+						var child = $(this).parent().data('$scope');
+						var item = child.color.item;
+						return item.id ? item.id : item;
+					}).toArray();
 
-						main.fullCalendar('removeEventSource', filtered);
-						filtered = all;
-						
-						if (selected.length) {
-							filtered = _.filter(all, function(event) {
-								console.log('eeee', event, event.$colorKey);
-								return _.contains(selected, event.$colorKey);
-							});
-							console.log('aaaa', selected, filtered);
-						}
-						
-						main.fullCalendar('addEventSource', filtered);
+					main.fullCalendar('removeEventSource', filtered);
+					filtered = all;
+					
+					if (selected.length) {
+						filtered = _.filter(all, function(event) {
+							console.log('eeee', event, event.$colorKey);
+							return _.contains(selected, event.$colorKey);
+						});
+						console.log('aaaa', selected, filtered);
 					}
-				};
-			})();
-
-			mini.datepicker({
-				showOtherMonths: true,
-				selectOtherMonths: true,
-				onSelect: function(dateStr) {
-					main.fullCalendar('gotoDate', mini.datepicker('getDate'));
+					
+					main.fullCalendar('addEventSource', filtered);
 				}
-			});
+			};
+		})();
+
+		mini.datepicker({
+			showOtherMonths: true,
+			selectOtherMonths: true,
+			onSelect: function(dateStr) {
+				main.fullCalendar('gotoDate', mini.datepicker('getDate'));
+			}
+		});
+		
+		main.fullCalendar({
 			
-			main.fullCalendar({
-				
-				header: false,
-				
-				editable: true,
-				
-				selectable: true,
-				
-				selectHelper: true,
-				
-				select: function(start, end, allDay) {
-					var event = {
-						start: start,
-						end: end,
-						allDay: allDay
-					};
-					setTimeout(function(){
+			header: false,
+			
+			editable: editable,
+			
+			selectable: editable,
+			
+			selectHelper: editable,
+			
+			select: function(start, end, allDay) {
+				var event = {
+					start: start,
+					end: end,
+					allDay: allDay
+				};
+				setTimeout(function(){
+					scope.$apply(function(){
+						scope.showEditor(event);
+					});
+				});
+				main.fullCalendar('unselect');
+			},
+
+			eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) {
+				hideBubble();
+				scope.onEventChange(event, dayDelta, minuteDelta, allDay).error(function(){
+					revertFunc();
+				});
+			},
+			
+			eventResize: function( event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view ) {
+				scope.onEventChange(event, dayDelta, minuteDelta).error(function(){
+					revertFunc();
+				});
+			},
+			
+			eventClick: function(event, jsEvent, view) {
+				showBubble(event, jsEvent.srcElement);
+			},
+
+			events: function(start, end, callback) {
+				scope._viewPromise.then(function(){
+					scope.fetchItems(start, end, function(records) {
+						callback([]);
+						EventManager.setEvents(records);
+						EventManager.filter();
+					});
+				});
+			},
+
+			eventDataTransform: function(record) {
+				return updateEvent(null, record);
+			},
+			
+			viewDisplay: function(view) {
+				hideBubble();
+				mini.datepicker('setDate', main.fullCalendar('getDate'));
+			}
+		});
+		
+		var editor = null;
+		var bubble = null;
+		
+		function hideBubble() {
+			if (bubble) {
+				bubble.popover('destroy');
+				bubble = null;
+			}
+		}
+
+		function showBubble(event, elem) {
+			hideBubble();
+			bubble = $(elem).popover({
+				html: true,
+				title: "<b>" + event.title + "</b>",
+				placement: "top",
+				content: function() {
+					var html = $("<div></div>");
+					
+					$("<span>").text(moment(event.start).format("LLL")).appendTo(html);
+					
+					if (event.end) {
+						$("<span> - </span>").appendTo(html);
+						$("<span>").text(moment(event.end).format("LLL")).appendTo(html);
+					}
+					
+					$("<hr>").appendTo(html);
+					
+					if (scope.isEditable()) {
+						$('<a href="javascript: void(0)">Delete</a>')
+						.appendTo(html)
+						.click(function(e){
+							hideBubble();
+							scope.$apply(function(){
+								scope.removeEvent(event, function(){
+									main.fullCalendar("removeEvents", event.id);
+								});
+							});
+						});
+					}
+					$('<a class="pull-right" href="javascript: void(0)">Edit event <strong>»</strong></a>')
+					.appendTo(html)
+					.click(function(e){
+						hideBubble();
 						scope.$apply(function(){
 							scope.showEditor(event);
 						});
 					});
-					main.fullCalendar('unselect');
-				},
 
-				eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) {
-					hideBubble();
-					scope.onEventChange(event, dayDelta, minuteDelta, allDay).error(function(){
-						revertFunc();
-					});
-				},
-				
-				eventResize: function( event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view ) {
-					scope.onEventChange(event, dayDelta, minuteDelta).error(function(){
-						revertFunc();
-					});
-				},
-				
-				eventClick: function(event, jsEvent, view) {
-					showBubble(event, jsEvent.srcElement);
-				},
-
-				events: function(start, end, callback) {
-					scope._viewPromise.then(function(){
-						scope.fetchItems(start, end, function(records) {
-							callback([]);
-							EventManager.setEvents(records);
-							EventManager.filter();
-						});
-					});
-				},
-
-				eventDataTransform: function(record) {
-					return updateEvent(null, record);
-				},
-				
-				viewDisplay: function(view) {
-					hideBubble();
-					mini.datepicker('setDate', main.fullCalendar('getDate'));
+					return html;
 				}
 			});
-			
-			var editor = null;
-			var bubble = null;
-			
-			function hideBubble() {
-				if (bubble) {
-					bubble.popover('destroy');
-					bubble = null;
-				}
+
+			bubble.popover('show');
+		};
+		
+		$("body").on("mousedown", function(e){
+			var elem = $(e.srcElement);
+			if (!bubble || bubble.is(elem) || bubble.has(elem).length) {
+				return;
+			}
+			if (!elem.parents().is(".popover")) {
+				hideBubble();
+			}
+		});
+
+		function updateEvent(event, record) {
+			if (event == null || !event.id) {
+				var color = scope.getColor(record);
+				event = {
+					id: record.id,
+					record: record,
+					backgroundColor: color.bg,
+					borderColor: color.bc
+				};
+			} else {
+				_.extend(event.record, record);
 			}
 
-			function showBubble(event, elem) {
-				hideBubble();
-				bubble = $(elem).popover({
-					html: true,
-					title: "<b>" + event.title + "</b>",
-					placement: "top",
-					content: function() {
-						var html = $("<div></div>");
-						
-						$("<span>").text(moment(event.start).format("LLL")).appendTo(html);
-						
-						if (event.end) {
-							$("<span> - </span>").appendTo(html);
-							$("<span>").text(moment(event.end).format("LLL")).appendTo(html);
-						}
-
-						$("<hr>").appendTo(html);
-						$('<a href="javascript: void(0)">Delete</a>')
-							.appendTo(html)
-							.click(function(e){
-								hideBubble();
-								scope.$apply(function(){
-									scope.removeEvent(event, function(){
-										main.fullCalendar("removeEvents", event.id);
-									});
-								});
-							});
-						$('<a class="pull-right" href="javascript: void(0)">Edit event <strong>»</strong></a>')
-							.appendTo(html)
-							.click(function(e){
-								hideBubble();
-								scope.$apply(function(){
-									scope.showEditor(event);
-								});
-							});
-
-						return html;
-					}
-				});
-
-				bubble.popover('show');
-			};
+			event = _.extend(event, scope.getEventInfo(record));
 			
-			$("body").on("mousedown", function(e){
-				var elem = $(e.srcElement);
-				if (!bubble || bubble.is(elem) || bubble.has(elem).length) {
-					return;
-				}
-				if (!elem.parents().is(".popover")) {
-					hideBubble();
-				}
-			});
+			if (!event.allDay) {
+				event.textColor = event.borderColor;
+			}
 
-			function updateEvent(event, record) {
-				if (event == null || !event.id) {
-					var color = scope.getColor(record);
-					event = {
-						id: record.id,
-						record: record,
-						backgroundColor: color.bg,
-						borderColor: color.bc
-					};
+			return event;
+		}
+
+		scope.editorCanSave = true;
+		
+		scope.showEditor = function(event) {
+
+			var view = this.schema;
+			var record = _.extend({}, event.record);
+
+			record[view.eventStart] = event.start;
+			record[view.eventStop] = event.end;
+
+			if (editor == null) {
+				editor = ViewService.compile('<div ui-editor-popup></div>')(scope.$new());
+				editor.data('$target', element);
+			}
+
+			var popup = editor.data('$scope');
+			
+			popup.setEditable(scope.isEditable());
+			popup.show(record, function(result) {
+				if (!record.id && result && result.id) {
+					main.fullCalendar('renderEvent', updateEvent(null, result));
 				} else {
-					_.extend(event.record, record);
+					main.fullCalendar('renderEvent', updateEvent(event, result));
 				}
-
-				event = _.extend(event, scope.getEventInfo(record));
-				
-				if (!event.allDay) {
-					event.textColor = event.borderColor;
-				}
-
-				return event;
+			});
+			
+			if (record == null) {
+				popup.$broadcast("on:new");
 			}
+		};
+		
+		scope.isEditable = function() {
+			return editable;
+		};
 
-			scope.editorCanSave = true;
-			
-			scope.showEditor = function(event) {
+		scope.select = function(record) {
 
-				var view = this.schema;
-				var record = _.extend({}, event.record);
+		};
+		
+		scope.filterEvents = function() {
+			EventManager.filter();
+		};
 
-				record[view.eventStart] = event.start;
-				record[view.eventStop] = event.end;
+		scope.pagerText = function() {
+			return main.fullCalendar("getView").title;
+		};
 
-				if (editor == null) {
-					editor = ViewService.compile('<div ui-editor-popup></div>')(scope.$new());
-					editor.data('$target', element);
-				}
+		scope.isMode = function(name) {
+			return mode === name;
+		};
 
-				var popup = editor.data('$scope');
-				popup.show(record, function(result) {
-					if (!record.id && result && result.id) {
-						main.fullCalendar('renderEvent', updateEvent(null, result));
-					} else {
-						main.fullCalendar('renderEvent', updateEvent(event, result));
-					}
-				});
-
-				if (record == null) {
-					popup.$broadcast("on:new");
-				}
-			};
-
-			scope.select = function(record) {
-
-			};
-			
-			scope.filterEvents = function() {
-				EventManager.filter();
-			};
-
-			scope.pagerText = function() {
-				return main.fullCalendar("getView").title;
-			};
-
-			scope.isMode = function(name) {
-				return mode === name;
-			};
-
-			scope.onMode = function(name) {
-				mode = name;
-				if (name === "week") {
-					name = scope.isAgenda() ? "agendaWeek" : "basicWeek";
-				}
-				if (name === "day") {
-					name = scope.isAgenda() ? "agendaDay" : "basicDay";
-				}
-				main.fullCalendar("changeView", name);
-			};
-
-			scope.onNext = function() {
-				main.fullCalendar('next');
-			};
-
-			scope.onPrev = function() {
-				main.fullCalendar('prev');
-			};
-			
-			scope.onToday = function() {
-				main.fullCalendar('today');
-			};
-			
-			function adjustSize() {
-				if (main.is(':hidden')) {
-					return;
-				}
-				hideBubble();
-				main.fullCalendar('render');
-				main.fullCalendar('option', 'height', element.height());
-				main.css('right', mini.parent().outerWidth(true));
+		scope.onMode = function(name) {
+			mode = name;
+			if (name === "week") {
+				name = scope.isAgenda() ? "agendaWeek" : "basicWeek";
 			}
+			if (name === "day") {
+				name = scope.isAgenda() ? "agendaDay" : "basicDay";
+			}
+			main.fullCalendar("changeView", name);
+		};
 
-			main.on("adjustSize", _.debounce(adjustSize, 100));
-			setTimeout(adjustSize, 100);
+		scope.onNext = function() {
+			main.fullCalendar('next');
+		};
+
+		scope.onPrev = function() {
+			main.fullCalendar('prev');
+		};
+		
+		scope.onToday = function() {
+			main.fullCalendar('today');
+		};
+		
+		function adjustSize() {
+			if (main.is(':hidden')) {
+				return;
+			}
+			hideBubble();
+			main.fullCalendar('render');
+			main.fullCalendar('option', 'height', element.height());
+			main.css('right', mini.parent().outerWidth(true));
+		}
+
+		main.on("adjustSize", _.debounce(adjustSize, 100));
+		setTimeout(adjustSize, 100);
+	}
+	
+	return {
+		link: function(scope, element, attrs, controller) {
+			scope._viewPromise.then(function(){
+				link(scope, element, attrs, controller);
+			});
 		},
 		replace: true,
 		template:
