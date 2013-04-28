@@ -133,35 +133,36 @@
 			
 			search: function(options) {
 				
-				if (options == null)
-					options = {};
-
-				var limit = options.limit == undefined ? this._page.limit : options.limit;
-				var offset = options.offset == undefined ? this._page.from : options.offset;
-				var domain = options.domain === undefined ? this._domain : options.domain;
-				var context = options.context == undefined ? this._lastContext : options.context;
-				var archived = options.archived == undefined ? this._showArchived : options.archived;
-
-				if (options.filter) {
-					this._filter = options.filter;
-					offset = options.offset ? offset : 0;
-				}
-				if (options.sortBy) {
-					this._sortBy = options.sortBy;
-				}
-				if (options.context) {
-					this._lastContext = options.context;
-				}
-				if (options.archived !== undefined) {
-					this._showArchived = options.archived;
-				}
+				var opts = _.extend({
+					store: true
+				}, options);
 				
+				var limit = opts.limit == undefined ? this._page.limit : opts.limit;
+				var offset = opts.offset == undefined ? this._page.from : opts.offset;
+				var domain = opts.domain === undefined ? this._domain : opts.domain;
+				var context = opts.context == undefined ? this._lastContext : opts.context;
+				var archived = opts.archived == undefined ? this._showArchived : opts.archived;
+				
+				var filter = opts.filter || this._filter;
+				var sortBy = opts.sortBy || this._sortBy;
+
+				if (opts.store) {
+					this._filter = filter;
+					this._sortBy = sortBy;
+					this._lastContext = context;
+					
+					if (opts.archived !== undefined) {
+						this._showArchived = opts.archived;
+					}
+				}
+
+				offset = opts.offset || 0;
 				context = _.extend({}, this._context, context);
 
 				var query = extend({
 					_domain: domain,
 					_domainContext: context
-				}, this._filter);
+				}, filter);
 
 				if (!archived) {
 
@@ -186,15 +187,14 @@
 				var that = this,
 					page = this._page,
 					records = this._data,
-					sortBy = this._sortBy,
 					params = {
 						textMatchStyle: 'substring',
 						sortBy: sortBy,
-						fields: options.fields,
+						fields: opts.fields,
 						data: query,
 						limit: limit,
 						offset: offset,
-						parent: options.parent
+						parent: opts.parent
 					};
 				
 				var promise = this._request('search').post(params);
@@ -203,8 +203,13 @@
 					var res = response.data;
 					res.offset = offset;
 					res.data = res.data || [];
-					that._accept(res);
-					page.index = -1;
+					if (opts.store) {
+						that._accept(res);
+						page.index = -1;
+					} else {
+						records = res.data || [];
+						page = that._pageInfo(res);
+					}
 				});
 				promise.success = function(fn){
 					promise.then(function(res){
@@ -662,6 +667,18 @@
 				return page.from > 0;
 			},
 			
+			_pageInfo: function(res) {
+				var records = res.data || [];
+				var page = _.extend({}, this._page);
+
+				page.from = res.offset === undefined ? page.from : res.offset;
+				page.to = page.from + records.length;
+				page.total = res.total === undefined ? page.total : res.total;
+				page.size = records.length;
+				
+				return page;
+			},
+			
 			_accept: function(res) {
 				var page = this._page,
 					records = this._data,
@@ -675,10 +692,7 @@
 						records.push(record);
 					});
 					
-					page.from = res.offset == undefined ? page.from : res.offset;
-					page.to = page.from + records.length;
-					page.total = res.total == undefined ? page.total : res.total;
-					page.size = records.length;
+					_.extend(page, this._pageInfo(res));
 					
 					accepted = records;
 
