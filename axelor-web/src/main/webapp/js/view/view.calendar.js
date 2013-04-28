@@ -7,6 +7,8 @@ function CalendarViewCtrl($scope, $element) {
 
 	var view = {};
 	var colors = {};
+	
+	var initialized = false;
 
 	$scope.onShow = function(viewPromise) {
 		
@@ -24,6 +26,12 @@ function CalendarViewCtrl($scope, $element) {
 
 			$scope._viewResolver.resolve(schema, $element);
 			$scope.updateRoute();
+			
+			if (initialized) {
+				$scope.refresh();
+			} else {
+				initialized = true;
+			}
 		});
 	};
 
@@ -70,12 +78,20 @@ function CalendarViewCtrl($scope, $element) {
 				value: end
 			}]
 		};
+		
+		// consider stored filter
+		if (ds._filter) {
+			_.each(ds._filter.criteria, function(criterion) {
+				criteria.criteria.push(criterion);
+			});
+		}
 
 		var opts = {
 			fields: fields,
 			filter: criteria,
 			domain: this._domain,
-			context: this._context
+			context: this._context,
+			store: false
 		};
 
 		ds.search(opts).success(function(records) {
@@ -162,6 +178,14 @@ function CalendarViewCtrl($scope, $element) {
 	
 	$scope.removeEvent = function(event, callback) {
 		ds.remove(event.record).success(callback);
+	};
+	
+	$scope.select = function() {
+		
+	};
+	
+	$scope.refresh = function() {
+		
 	};
 
 	$scope.getRouteOptions = function() {
@@ -430,8 +454,8 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 			return editable;
 		};
 
-		scope.select = function(record) {
-
+		scope.refresh = function(record) {
+			main.fullCalendar("refetchEvents");
 		};
 		
 		scope.filterEvents = function() {
