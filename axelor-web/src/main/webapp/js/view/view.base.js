@@ -72,6 +72,10 @@ function ViewCtrl($scope, DataSource, ViewService) {
 			
 			viewScope.show();
 			
+			if (viewScope.updateRoute) {
+				viewScope.updateRoute();
+			}
+
 			if (callback) {
 				callback(viewScope);
 			}
@@ -218,3 +222,43 @@ function DSViewCtrl(type, $scope, $element) {
 		});
 	};
 }
+
+angular.module('axelor.ui').directive('uiViewSwitcher', function(){
+	return {
+		scope: true,
+		link: function(scope, element, attrs) {
+
+			element.find("button")
+			.click(function(e){
+				var type = $(this).attr("x-view-type");
+				if (type === "form" && scope._dataSource) {
+					var page = scope._dataSource._page;
+					if (page && page.index === -1) {
+						page.index = 0;
+					}
+				}
+				scope.switchTo(type);
+				scope.$apply();
+			})
+			.each(function() {
+				if (scope._views[$(this).attr("x-view-type")] === undefined) {
+					$(this).hide();
+				}
+			});
+			scope.$watch("_viewType", function(type){
+				element.find("button").attr("disabled", false);
+				element.find("button[x-view-type=" + type + "]").attr("disabled", true);
+			});
+		},
+		replace: true,
+		template:
+		'<div class="view-switcher pull-right">'+
+		  	'<div class="btn-group">'+
+		  		'<button class="btn" x-view-type="grid"		><i class="icon-table"		></i></button>'+
+		  		'<button class="btn" x-view-type="calendar"	><i class="icon-calendar"	></i></button>'+
+		  		'<button class="btn" x-view-type="chart"	><i class="icon-bar-chart"	></i></button>'+
+		  		'<button class="btn" x-view-type="form"		><i class="icon-edit"		></i></button>'+
+		    '</div>'+
+		'</div>'
+	};
+});

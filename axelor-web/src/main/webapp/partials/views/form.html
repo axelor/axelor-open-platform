@@ -23,6 +23,7 @@
 	  <div class="btn-group" ng-show="toolbar">
 	  	<button ng-repeat="btn in toolbar" class="btn" ui-tool-button="btn" name="{{btn.name}}">{{btn.title}}</button>
 	  </div>
+	  <div ui-view-switcher class="pull-right"></div>
 	  <div class="record-pager pull-right">
 	    <span>{{pagerText()}}</span>
 	    <div class="btn-group">

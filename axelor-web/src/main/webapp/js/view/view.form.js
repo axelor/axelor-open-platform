@@ -371,18 +371,18 @@ function FormViewCtrl($scope, $element) {
 			return;
 		}
 
-		switchToGrid();
+		$scope.switchTo("grid");
 	};
-
-	function switchToGrid(){
+	
+	var __switchTo = $scope.switchTo;
+	
+	$scope.switchTo = function(type, callback) {
 		$scope.confirmDirty(function() {
 			$scope.setEditable(false);
 			$scope.editRecord(null);
-			$scope.switchTo('grid', function(viewScope) {
-				viewScope.updateRoute();
-			});
+			__switchTo(type, callback);
 		});
-	}
+	};
 
 	$scope.onSearch = function() {
 		var e = $scope.$broadcast("cancel:grid-edit");
@@ -390,7 +390,7 @@ function FormViewCtrl($scope, $element) {
 			return;
 		}
 
-		switchToGrid();
+		$scope.switchTo("grid");
 	};
 	
 	$scope.pagerText = function() {

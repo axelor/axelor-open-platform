@@ -287,6 +287,13 @@ html, body {
 	padding: 4px;
 }
 
+.record-toolbar.btn-toolbar .view-switcher {
+	margin-left: 4px;
+}
+.record-toolbar.btn-toolbar .view-switcher button {
+	padding: 4px 8px;
+}
+
 .record-pager > span {
 	margin-top: 6px;
 	margin-left: 4px;

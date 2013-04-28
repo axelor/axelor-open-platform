@@ -1,10 +1,11 @@
-<div class="calendar-view" ng-controller="CalendarViewCtrl">
+<div class="calendar-view webkit-scrollbar-all" ng-controller="CalendarViewCtrl">
   <div class="record-toolbar btn-toolbar">
 	  <div class="btn-group">
 	    <button class="btn" ng-click="onMode('month')" ng-class="{ active: isMode('month') }"><span x-translate>Month</span></button>
 	    <button class="btn" ng-click="onMode('week')" ng-class="{ active: isMode('week') }"><span x-translate>Week</span></button>
 	    <button class="btn" ng-click="onMode('day')" ng-class="{ active: isMode('day') }"><span x-translate>Day</span></button>
 	  </div>
+	  <div ui-view-switcher class="pull-right"></div>
 	  <div class="record-pager pull-right">
 	    <span ng-bind-html-unsafe="pagerText()"></span>
 	    <button class="btn" ng-click="onToday()"><span x-translate>Today</span></button>
