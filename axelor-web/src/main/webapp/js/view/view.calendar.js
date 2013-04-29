@@ -104,7 +104,7 @@ function CalendarViewCtrl($scope, $element) {
 					if (!item) {
 						return;
 					}
-					var key = "" + (item.id ? item.id : item);
+					var key = $scope.getColorKey(record, item);
 					var title = colorField.targetName ? item[colorField.targetName] : item;
 					if (!colors[key]) {
 						colors[key] = {
@@ -125,11 +125,21 @@ function CalendarViewCtrl($scope, $element) {
 	};
 	
 	$scope.getColor = function(record) {
-		var item = record[view.color];
-		if (item && colors[item.id || item]) {
-			return colors[item.id || item].color;
+		var key = this.getColorKey(record);
+		if (key) {
+			return colors[key].color;
 		}
 		return nextColor(0);
+	};
+	
+	$scope.getColorKey = function(record, key) {
+		if (key) {
+			return "" + (key.id || key);
+		}
+		if (record) {
+			return this.getColorKey(null, record[view.color]);
+		}
+		return null;
 	};
 	
 	$scope.getEventInfo = function(record) {
@@ -246,7 +256,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 					var selected = element.find('.calendar-legend input:checked').map(function(){
 						var child = $(this).parent().data('$scope');
 						var item = child.color.item;
-						return item.id ? item.id : item;
+						return scope.getColorKey(null, item);
 					}).toArray();
 
 					main.fullCalendar('removeEventSource', filtered);
