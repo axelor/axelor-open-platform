@@ -11,10 +11,16 @@ function CalendarViewCtrl($scope, $element) {
 	var initialized = false;
 
 	$scope.onShow = function(viewPromise) {
-		
+
+		if (initialized) {
+			return $scope.refresh();
+		}
+
 		viewPromise.then(function(){
 
 			var schema = $scope.schema;
+
+			initialized = true;
 			
 			view = {
 				start: schema.eventStart,
@@ -26,12 +32,6 @@ function CalendarViewCtrl($scope, $element) {
 
 			$scope._viewResolver.resolve(schema, $element);
 			$scope.updateRoute();
-			
-			if (initialized) {
-				$scope.refresh();
-			} else {
-				initialized = true;
-			}
 		});
 	};
 
@@ -50,8 +50,8 @@ function CalendarViewCtrl($scope, $element) {
 		["#ef2929", "#cc0000", "#a40000"]).reverse();
 
 	function nextColor(n) {
-		if (n === undefined || n < 0 || n > 7) {
-			n = _.random(0, 7);
+		if (n === undefined || n < 0 || n > 6) {
+			n = _.random(0, 6);
 		}
 		var c = tango[n];
 		return {
@@ -99,18 +99,18 @@ function CalendarViewCtrl($scope, $element) {
 			var colorField = $scope.fields[colorBy];
 			if (colorField) {
 				colors = {};
-				_.each(records, function(record) {
+				_.each(records, function(record, i) {
 					var item = record[colorBy];
 					if (!item) {
 						return;
 					}
-					var key = item.id ? item.id : item;
+					var key = "" + (item.id ? item.id : item);
 					var title = colorField.targetName ? item[colorField.targetName] : item;
 					if (!colors[key]) {
 						colors[key] = {
 							item: item,
-							title: title,
-							color: nextColor(_.size(colors))
+							title: title || _t('Unknown'),
+							color: nextColor(i % 7)
 						};
 					}
 					record.$colorKey = key;
@@ -129,7 +129,7 @@ function CalendarViewCtrl($scope, $element) {
 		if (item && colors[item.id || item]) {
 			return colors[item.id || item].color;
 		}
-		return nextColor();
+		return nextColor(0);
 	};
 	
 	$scope.getEventInfo = function(record) {
@@ -201,9 +201,13 @@ function CalendarViewCtrl($scope, $element) {
 	
 	$scope.setRouteOptions = function(options) {
 		var opts = options || {};
-
-		if (opts.state !== "calendar") {
-			$scope.show();
+		
+		if (opts.state === "calendar") {
+			return;
+		}
+		var params = $scope._viewParams;
+		if (params.viewType !== "calendar") {
+			return $scope.show();
 		}
 	};
 
