@@ -717,11 +717,14 @@ ui.formInput('Password', {
 	
 	css: 'password-item',
 	
-	format: function(scope, value, editable) {
-		if (!value || editable) {
-			return value;
-		}
-		return _.str.repeat('*', value.length);
+	init: function(scope) {
+
+		scope.format = function(value) {
+			if (!value || !this.isReadonly()) {
+				return value;
+			}
+			return _.str.repeat('*', value.length);
+		};
 	},
 	
 	template_editable: '<input type="password">'
