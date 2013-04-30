@@ -164,6 +164,7 @@ function FormViewCtrl($scope, $element) {
 		setTimeout(function(){
 			$scope.$apply();
 			$scope.$broadcast("on:edit", $scope.record);
+			$scope.$broadcast("on:record-change", $scope.record);
 		});
 	};
 	
