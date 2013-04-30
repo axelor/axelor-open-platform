@@ -35,6 +35,8 @@
    
   <entity name="MetaAction" table="META_ACTION" sequential="true" cachable="true">
   	<string name="name" unique="true" required="true"/>
+    <string name="type" required="true" />
+    <string name="model" />
   	<string name="xml" required="true" large="true"/>
   </entity>
   

@@ -240,11 +240,20 @@ public class MetaLoader {
 		
 		log.info("Loading action : {}", action.getName());
 		
-		String xml = toXml(action);
-		MetaAction entity = new MetaAction();
-		entity.setName(action.getName());
-		entity.setXml(xml);
+		Class<?> klass = action.getClass();
+		Mapper mapper = Mapper.of(klass);
 		
+		MetaAction entity = new MetaAction();
+
+		entity.setName(action.getName());
+		entity.setXml(toXml(action));
+		
+		String model = (String) mapper.get(action, "model");
+		entity.setModel(model);
+
+		String type = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, klass.getSimpleName());
+		entity.setType(type);
+
 		entity = entity.save();
 		
 		for (MetaMenu pending : unresolved_actions.get(entity.getName())) {

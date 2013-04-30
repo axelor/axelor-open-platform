@@ -1,254 +1,260 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <object-views xmlns="http://apps.axelor.com/xml/ns/object-views"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.8.xsd">
-    
-    <selection name="view.type.selection">
-		<option value="grid">Grid</option>
-		<option value="form">Form</option>
-		<option value="tree">Tree</option>
-		<option value="search">Search</option>
-		<option value="portal">Portal</option>
-        <option value="calendar">Calendar</option>
-	</selection>
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.8.xsd">
 
-    <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView">
-    	<field name="name"/>
-    	<field name="title"/>
-    	<field name="model"/>
-    	<field name="type" selection="view.type.selection"/>
-    </grid>
-    
-    <form title="View" name="meta-view-form" model="com.axelor.meta.db.MetaView" cols="2" colWidths="*,250"
-    	onNew="action-view-form-onload"
-    	onLoad="action-view-form-onload"
-    	onSave="action-view-validate">
-    	<notebook rowSpan="2">
-    		<page title="XML" cols="1">
-    			<field name="xml" noLabel="true" widget="CodeEditor[syntax=xml]"/>
-    		</page>
-    		<page title="Groups" cols="1">
-    			<field name="groups" noLabel="true"/>
-    		</page>
-    	</notebook>
-		<group title="View Details" cols="2">
-	    	<field name="name"/>
-	    	<field name="title"/>
-	    	<field name="type" selection="view.type.selection"/>
-	    	<field name="model"/>
-	    	<field name="active"/>
-		</group>
-		<group title="Actions" cols="1">
-		   <button name="validate" title="Validate" onClick="action-view-validate"/>
-		   <button name="restore" title="Restore" onClick="action-meta-todo"/>
-		   <button name="restoreAll" title="Restore All" onClick="action-meta-restore-all"
-		       prompt="All the customizations will be lost. Are you sure?"/>
-		   <button name="preview" title="Preview" onClick="action-meta-todo"/>
-		</group>
-    </form>
-    
-    <grid title="All Actions" name="meta-action-grid" model="com.axelor.meta.db.MetaAction">
-    	<field name="name"/>
-    </grid>
+  <selection name="view.type.selection">
+    <option value="grid">Grid</option>
+    <option value="form">Form</option>
+    <option value="tree">Tree</option>
+    <option value="search">Search</option>
+    <option value="portal">Portal</option>
+    <option value="calendar">Calendar</option>
+  </selection>
 
-	<form title="Action" name="meta-action-form" model="com.axelor.meta.db.MetaAction"
-		onNew="action-action-form-onload"
-		onLoad="action-action-form-onload"
-		onSave="action-action-validate,com.axelor.meta.web.MetaController:clearCache">
-		<field name="name"/>
-		<break/>
-		<notebook colSpan="4">
-    		<page title="XML" cols="1">
-    			<field name="xml" noLabel="true" widget="CodeEditor[syntax=xml]"/>
-    		</page>
-    	</notebook>
-	</form>
-    
-    <grid title="Menu Items" name="meta-menu-grid" model="com.axelor.meta.db.MetaMenu">
-    	<field name="name"/>
-    	<field name="title"/>
-    	<field name="parent"/>
-    	<field name="action"/>
-    	<field name="priority"/>
-    </grid>
-    
-    <form title="Menu Item" name="meta-menu-form" model="com.axelor.meta.db.MetaMenu">
-    	<field name="name"/>
-    	<field name="parent" domain="self.name != :name"/>
-    	<field name="title"/>
-    	<field name="icon"/>
-    	<field name="action"/>
-    	<field name="priority"/>
-    	<break/>
-    	<notebook colSpan="4">
-    		<page title="Groups" cols="1">
-    			<field name="groups" noLabel="true"/>
-    		</page>
-    	</notebook>
-    </form>
-    
-    <grid title="Action Menus" name="meta-action-menu-grid" model="com.axelor.meta.db.MetaActionMenu">
+  <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView">
+    <field name="name"/>
+    <field name="title"/>
+    <field name="model"/>
+    <field name="type" selection="view.type.selection"/>
+  </grid>
+
+  <form title="View" name="meta-view-form" model="com.axelor.meta.db.MetaView" cols="2" colWidths="*,250"
+    onNew="action-view-form-onload"
+    onLoad="action-view-form-onload"
+    onSave="action-view-validate">
+    <notebook rowSpan="2">
+      <page title="XML" cols="1">
+        <field name="xml" noLabel="true" widget="CodeEditor[syntax=xml]"/>
+      </page>
+      <page title="Groups" cols="1">
+        <field name="groups" noLabel="true"/>
+      </page>
+    </notebook>
+    <group title="View Details" cols="2">
       <field name="name"/>
       <field name="title"/>
-      <field name="parent"/>
-      <field name="category"/>
-      <field name="action"/>
-    </grid>
-    
-    <form title="Action Menu" name="meta-action-menu-form" model="com.axelor.meta.db.MetaActionMenu">
-      <field name="name"/>
-      <field name="title"/>
-      <field name="parent" domain="self.name != :name"/>
-      <field name="category"/>
-      <field name="action"/>
-    </form>
-    
-    <grid title="All Selects" name="meta-select-grid" model="com.axelor.meta.db.MetaSelect">
-      <field name="key"/>
-      <field name="value"/>
-      <field name="title"/>
-    </grid>
-    
-    <form title="Select" name="meta-select-form" model="com.axelor.meta.db.MetaSelect">
-      <field name="key"/>
-      <break/>
-      <field name="value"/>
-      <field name="title"/>
-    </form>
-    
-    <action-attrs name="action-view-form-onload">
-    	<attribute name="readonly" for="name" expr="eval: id != null"/>
-    	<attribute name="readonly" for="title" expr="eval: id != null"/>
-    	<attribute name="readonly" for="type" expr="eval: id != null"/>
-    	<attribute name="readonly" for="model" expr="eval: id != null"/>
-    </action-attrs>
-    
-    <action-attrs name="action-action-form-onload">
-    	<attribute name="readonly" for="name" expr="eval: id != null"/>
-    </action-attrs>
-    
-    <action-method name="action-view-validate">
-    	<call class="com.axelor.meta.web.MetaController" method="validateView"/>
-    </action-method>
-    
-    <action-method name="action-action-validate">
-    	<call class="com.axelor.meta.web.MetaController" method="validateAction"/>
-    </action-method>
-    
-    <action-method name="action-meta-restore-all">
-    	<call class="com.axelor.meta.web.MetaController" method="restoreAll"/>
-    </action-method>
-    
-    <action-validate name="action-meta-todo">
-    	<error message="Not implemented yet!"/>
-    </action-validate>
-    
-    <grid name="meta-model-grid" title="Models" model="com.axelor.meta.db.MetaModel">
-        <field name="packageName"/>
-        <field name="name"/>
-        <field name="tableName"/>
-    </grid>
-    
-    <form name="meta-model-form" title="Model" model="com.axelor.meta.db.MetaModel" cols="2" >
-        <field name="packageName"/>
-        <field name="name"/>
-        <field name="tableName"/>
-        <field name="metaFields" colSpan="2"/>
-    </form>
-    
-    <selection name="relationship.field.selection">
-    	<option value="OneToOne">OneToOne</option>
-    	<option value="ManyToOne">ManyToOne</option>
-    	<option value="OneToMany">OneToMany</option>
-    	<option value="ManyToMany">ManyToMany</option>
-    </selection>
-    
-    <grid name="meta-field-grid" title="Fields" model="com.axelor.meta.db.MetaField">
-        <field name="name"/>
-        <field name="typeName"/>
-        <field name="label"/>
-        <field name="relationship" />
-        <field name="mappedBy" />
-    </grid>
-    
-    <form name="meta-field-form" title="Field" model="com.axelor.meta.db.MetaField" cols="2" onLoad="meta-field-attrs">
-        <field name="name"/>
-        <field name="packageName"/>
-        <field name="typeName"/>
-        <field name="label"/>
-        <field name="relationship" onChange="meta-field-attrs"/>
-        <field name="mappedBy" />
-        <button name="openModel" title="Show Model" colSpan="2" onClick="meta-field-method-open-model"/>
-        <separator title="Description" colSpan="2"/>
-        <field name="description" noLabel="true" colSpan="2"/>
-    </form>
-    
-    <action-attrs name="meta-field-attrs">
-    	<attribute name="hidden" for="mappedBy" expr="eval: !(relationship in ['OneToMany','OneToOne'])" />
-    	<attribute name="hidden" for="openModel" expr="eval: !relationship" />
-    </action-attrs>
-    
-    <action-method name="meta-field-method-open-model">
-    	<call class="com.axelor.meta.web.MetaController" method="openModel"/>
-    </action-method>
-    
-    <grid title="All Translations" name="meta-translations-grid" model="com.axelor.meta.db.MetaTranslation" editable="true">
+      <field name="type" selection="view.type.selection"/>
+      <field name="model"/>
+      <field name="active"/>
+    </group>
+    <group title="Actions" cols="1">
+      <button name="validate" title="Validate" onClick="action-view-validate"/>
+      <button name="restore" title="Restore" onClick="action-meta-todo"/>
+      <button name="restoreAll" title="Restore All" onClick="action-meta-restore-all"
+        prompt="All the customizations will be lost. Are you sure?"/>
+      <button name="preview" title="Preview" onClick="action-meta-todo"/>
+    </group>
+  </form>
+
+  <grid title="All Actions" name="meta-action-grid" model="com.axelor.meta.db.MetaAction">
+    <field name="name" />
+    <field name="type" />
+    <field name="model" />
+  </grid>
+
+  <form title="Action" name="meta-action-form" model="com.axelor.meta.db.MetaAction"
+    onNew="action-action-form-onload"
+    onLoad="action-action-form-onload"
+    onSave="action-action-validate,com.axelor.meta.web.MetaController:clearCache">
+    <field name="name"/>
+    <field name="type"/>
+    <field name="model"/>
+    <break/>
+    <notebook colSpan="4">
+      <page title="XML" cols="1">
+        <field name="xml" noLabel="true" widget="CodeEditor[syntax=xml]"/>
+      </page>
+    </notebook>
+  </form>
+
+  <grid title="Menu Items" name="meta-menu-grid" model="com.axelor.meta.db.MetaMenu">
+    <field name="name"/>
+    <field name="title"/>
+    <field name="parent"/>
+    <field name="action"/>
+    <field name="priority"/>
+  </grid>
+
+  <form title="Menu Item" name="meta-menu-form" model="com.axelor.meta.db.MetaMenu">
+    <field name="name"/>
+    <field name="parent" domain="self.name != :name"/>
+    <field name="title"/>
+    <field name="icon"/>
+    <field name="action"/>
+    <field name="priority"/>
+    <break/>
+    <notebook colSpan="4">
+      <page title="Groups" cols="1">
+        <field name="groups" noLabel="true"/>
+      </page>
+    </notebook>
+  </form>
+
+  <grid title="Action Menus" name="meta-action-menu-grid" model="com.axelor.meta.db.MetaActionMenu">
+    <field name="name"/>
+    <field name="title"/>
+    <field name="parent"/>
+    <field name="category"/>
+    <field name="action"/>
+  </grid>
+
+  <form title="Action Menu" name="meta-action-menu-form" model="com.axelor.meta.db.MetaActionMenu">
+    <field name="name"/>
+    <field name="title"/>
+    <field name="parent" domain="self.name != :name"/>
+    <field name="category"/>
+    <field name="action"/>
+  </form>
+
+  <grid title="All Selects" name="meta-select-grid" model="com.axelor.meta.db.MetaSelect">
+    <field name="key"/>
+    <field name="value"/>
+    <field name="title"/>
+  </grid>
+
+  <form title="Select" name="meta-select-form" model="com.axelor.meta.db.MetaSelect">
+    <field name="key"/>
+    <break/>
+    <field name="value"/>
+    <field name="title"/>
+  </form>
+
+  <action-attrs name="action-view-form-onload">
+    <attribute name="readonly" for="name" expr="eval: id != null"/>
+    <attribute name="readonly" for="title" expr="eval: id != null"/>
+    <attribute name="readonly" for="type" expr="eval: id != null"/>
+    <attribute name="readonly" for="model" expr="eval: id != null"/>
+  </action-attrs>
+
+  <action-attrs name="action-action-form-onload">
+    <attribute name="readonly" for="name" expr="eval: id != null"/>
+    <attribute name="readonly" for="type" expr="eval: id != null"/>
+    <attribute name="readonly" for="model" expr="eval: id != null"/>
+  </action-attrs>
+
+  <action-method name="action-view-validate">
+    <call class="com.axelor.meta.web.MetaController" method="validateView"/>
+  </action-method>
+
+  <action-method name="action-action-validate">
+    <call class="com.axelor.meta.web.MetaController" method="validateAction"/>
+  </action-method>
+
+  <action-method name="action-meta-restore-all">
+    <call class="com.axelor.meta.web.MetaController" method="restoreAll"/>
+  </action-method>
+
+  <action-validate name="action-meta-todo">
+    <error message="Not implemented yet!"/>
+  </action-validate>
+
+  <grid name="meta-model-grid" title="Models" model="com.axelor.meta.db.MetaModel">
+    <field name="packageName"/>
+    <field name="name"/>
+    <field name="tableName"/>
+  </grid>
+
+  <form name="meta-model-form" title="Model" model="com.axelor.meta.db.MetaModel" cols="2" >
+    <field name="packageName"/>
+    <field name="name"/>
+    <field name="tableName"/>
+    <field name="metaFields" colSpan="2"/>
+  </form>
+
+  <selection name="relationship.field.selection">
+    <option value="OneToOne">OneToOne</option>
+    <option value="ManyToOne">ManyToOne</option>
+    <option value="OneToMany">OneToMany</option>
+    <option value="ManyToMany">ManyToMany</option>
+  </selection>
+
+  <grid name="meta-field-grid" title="Fields" model="com.axelor.meta.db.MetaField">
+    <field name="name"/>
+    <field name="typeName"/>
+    <field name="label"/>
+    <field name="relationship" />
+    <field name="mappedBy" />
+  </grid>
+
+  <form name="meta-field-form" title="Field" model="com.axelor.meta.db.MetaField" cols="2" onLoad="meta-field-attrs">
+    <field name="name"/>
+    <field name="packageName"/>
+    <field name="typeName"/>
+    <field name="label"/>
+    <field name="relationship" onChange="meta-field-attrs"/>
+    <field name="mappedBy" />
+    <button name="openModel" title="Show Model" colSpan="2" onClick="meta-field-method-open-model"/>
+    <separator title="Description" colSpan="2"/>
+    <field name="description" noLabel="true" colSpan="2"/>
+  </form>
+
+  <action-attrs name="meta-field-attrs">
+    <attribute name="hidden" for="mappedBy" expr="eval: !(relationship in ['OneToMany','OneToOne'])" />
+    <attribute name="hidden" for="openModel" expr="eval: !relationship" />
+  </action-attrs>
+
+  <action-method name="meta-field-method-open-model">
+    <call class="com.axelor.meta.web.MetaController" method="openModel"/>
+  </action-method>
+
+  <grid title="All Translations" name="meta-translations-grid" model="com.axelor.meta.db.MetaTranslation" editable="true">
+    <field name="key"/>
+    <field name="language"/>
+    <field name="translation"/>
+    <field name="domain"/>
+  </grid>
+
+  <form title="Translation" name="meta-translations-form" model="com.axelor.meta.db.MetaTranslation" colWidths="*,250">
+    <group noLabel="true" cols="4">
       <field name="key"/>
       <field name="language"/>
       <field name="translation"/>
       <field name="domain"/>
-    </grid>
-    
-    <form title="Translation" name="meta-translations-form" model="com.axelor.meta.db.MetaTranslation" colWidths="*,250">
-      <group noLabel="true" cols="4">
-        <field name="key"/>
-        <field name="language"/>
-        <field name="translation"/>
-        <field name="domain"/>
-      </group>
-      <group title="Actions" cols="2" colSpan="1">
-        <button name="restoreAll" colSpan="2" title="Restore All" prompt="All the customizations will be lost. Are you sure?" onClick="action-meta-restore-translations"/>
-        <button name="export" colSpan="2" title="Export All" onClick="action-meta-export-group"/>
-        <field name="exportPath" title="Export path" hidden="true"/>
-      </group>
-    </form>
-    
-    <action-method name="action-meta-restore-translations">
-    	<call class="com.axelor.meta.web.MetaController" method="restoreTranslations"/>
-    </action-method>
-    
-    <action-group name="action-meta-export-group">
-	    <action if="!exportPath" name="action-meta-show-exportPath"/>
-	    <action if="!exportPath" name="action-meta-check-exportPath"/>
-	    <action if="exportPath" name="action-meta-export-translations"/>
-	</action-group>
-    
-    <action-attrs name="action-meta-show-exportPath">
-    	<attribute name="hidden" for="exportPath" expr="eval: false"/>
-    </action-attrs>
-    
-    <action-condition name="action-meta-check-exportPath">
-    	<check field="exportPath"/>
-    </action-condition>
-    
-    <action-method name="action-meta-export-translations">
-    	<call class="com.axelor.meta.web.MetaController" method="exportTranslations"/>
-	</action-method>
-    
-    <grid title="Files" name="meta-files-grid" model="com.axelor.meta.db.MetaFile">
-      <field name="fileName"/>
-      <field name="sizeText" width="150"/>
-      <field name="mine" width="250"/>
-      <field name="createdBy"/>
-      <field name="createdOn" width="150"/>
-    </grid>
-    
-    <form title="Files" name="meta-files-form" model="com.axelor.meta.db.MetaFile">
-      <field name="content"/>
-  	  <field name="fileName"/>
-  	  <field name="size"/>
-  	  <field name="mine"/>
-  	  <field name="description"/>
-    </form>
-    
+    </group>
+    <group title="Actions" cols="2" colSpan="1">
+      <button name="restoreAll" colSpan="2" title="Restore All" prompt="All the customizations will be lost. Are you sure?" onClick="action-meta-restore-translations"/>
+      <button name="export" colSpan="2" title="Export All" onClick="action-meta-export-group"/>
+      <field name="exportPath" title="Export path" hidden="true"/>
+    </group>
+  </form>
+
+  <action-method name="action-meta-restore-translations">
+    <call class="com.axelor.meta.web.MetaController" method="restoreTranslations"/>
+  </action-method>
+
+  <action-group name="action-meta-export-group">
+    <action if="!exportPath" name="action-meta-show-exportPath"/>
+    <action if="!exportPath" name="action-meta-check-exportPath"/>
+    <action if="exportPath" name="action-meta-export-translations"/>
+  </action-group>
+
+  <action-attrs name="action-meta-show-exportPath">
+    <attribute name="hidden" for="exportPath" expr="eval: false"/>
+  </action-attrs>
+
+  <action-condition name="action-meta-check-exportPath">
+    <check field="exportPath"/>
+  </action-condition>
+
+  <action-method name="action-meta-export-translations">
+    <call class="com.axelor.meta.web.MetaController" method="exportTranslations"/>
+  </action-method>
+
+  <grid title="Files" name="meta-files-grid" model="com.axelor.meta.db.MetaFile">
+    <field name="fileName"/>
+    <field name="sizeText" width="150"/>
+    <field name="mine" width="250"/>
+    <field name="createdBy"/>
+    <field name="createdOn" width="150"/>
+  </grid>
+
+  <form title="Files" name="meta-files-form" model="com.axelor.meta.db.MetaFile">
+    <field name="content"/>
+    <field name="fileName"/>
+    <field name="size"/>
+    <field name="mine"/>
+    <field name="description"/>
+  </form>
+
 </object-views>
