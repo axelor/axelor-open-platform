@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.hibernate.proxy.HibernateProxy;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +18,12 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
 import com.axelor.meta.service.MetaModelService;
+import com.axelor.rpc.ActionRequest;
 import com.axelor.wkf.IWorkflow;
+import com.axelor.wkf.action.ActionWorkflow;
 import com.axelor.wkf.db.Instance;
 import com.axelor.wkf.db.InstanceCounter;
 import com.axelor.wkf.db.InstanceHistory;
@@ -27,14 +32,16 @@ import com.axelor.wkf.db.Transition;
 import com.axelor.wkf.db.WaitingNode;
 import com.axelor.wkf.db.Workflow;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
 class WorkflowService<T extends Model> implements IWorkflow<T> {
 	
 	protected static final Logger LOG = LoggerFactory.getLogger(WorkflowService.class);
 	
-	protected static final String XOR = "xor";
-	protected static final String AND = "and";
+	private ActionWorkflow actionWorkflow;
+	
+	protected ActionRequest actionRequest;
 	
 	protected int maxNodeCounter;
 	protected Map<Node, Integer> nodeCounters;
@@ -46,7 +53,7 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 	protected User user;
 	
 	@Inject
-	public WorkflowService (){
+	public WorkflowService ( ActionWorkflow actionWorkflow ){
 		
 		this.nodeCounters = new HashMap<Node, Integer>();
 		this.executedNodes = new HashSet<Node>();
@@ -54,6 +61,30 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 
 		this.dateTime = new DateTime();
 		this.user = AuthUtils.getUser();
+		
+		this.actionWorkflow = actionWorkflow;
+		
+	}
+
+// ACTION REQUEST	
+	
+	/**
+	 * Init the service from one instance.
+	 * 
+	 * 
+	 */
+	protected WorkflowService<T> init (Workflow wkf, ActionRequest actionRequest) {
+		
+		LOG.debug("INIT Wkf engine context ::: {}", actionRequest.getContext());
+		
+		this.actionRequest = actionRequest;
+		this.maxNodeCounter = wkf.getMaxNodeCounter();
+		this.instance = getInstance(wkf, (Long)actionRequest.getContext().get("id"));
+		
+		loadWaitingNodes( instance );
+		loadExecutedNodes( instance );
+		
+		return this;
 		
 	}
 	
@@ -63,15 +94,24 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 	 * 
 	 */
 	protected WorkflowService<T> init (Workflow wkf, T bean) {
+
+		LOG.debug("INIT Wkf engine bean () ::: {}", bean);
+		ActionRequest request = new ActionRequest();
+
+		Map<String, Object> data = Maps.newHashMap();
+		data.put("context", Mapper.toMap( bean ));
 		
-		LOG.debug("INIT Wkf engine :::");
+		request.setData( data );
+		request.setModel( persistentClassName( bean ) );
 		
-		maxNodeCounter = wkf.getMaxNodeCounter();
-		instance = getInstance(wkf, bean.getId());
-		loadWaitingNodes( instance );
-		loadExecutedNodes( instance );
+		return init(wkf, request);
 		
-		return this;
+	}
+	
+	private String persistentClassName( T bean ){
+		
+		if ( bean instanceof HibernateProxy ) { return ((HibernateProxy) bean).getHibernateLazyInitializer().getPersistentClass().getName(); }
+		else { return bean.getClass().getName(); }
 		
 	}
 
@@ -116,9 +156,18 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 	 * @see Model
 	 */
 	@Override
-	public Workflow getWorkflow(Class<? extends Model> klass){
+	public Workflow getWorkflow(Class<?> klass){
 		
-		return Workflow.all().filter("self.metaModel = ?1", MetaModelService.getMetaModel(klass)).fetchOne();
+		List<Workflow> workflows = Workflow.all()
+				.filter("self.metaModel = ?1 AND self.active = true", MetaModelService.getMetaModel(klass))
+				.order("self.sequence")
+				.fetch();
+		
+		for (Workflow workflow : workflows){
+			return workflow;
+		}
+		
+		return null;
 		
 	}
 
@@ -131,9 +180,9 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 	 * 		Target class.
 	 */
 	@Override
-	public void run(Class<T> klass){
+	public void run( Class<T> klass ){
 		
-		Workflow wkf = getWorkflow(klass);
+		Workflow wkf = getWorkflow( klass );
 		
 		if (wkf != null){
 			
@@ -153,7 +202,7 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 	/**
 	 * Run workflow from specific class for one specific record.
 	 * 
-	 * @param klass
+	 * @param bean
 	 * @param id
 	 */
 	@Override
@@ -161,25 +210,44 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 		
 		Workflow wkf = getWorkflow( bean.getClass() );
 		
-		if (wkf != null){ run(wkf, bean); }
-		else {
-			
-			LOG.debug("No workflow for entity ::: {}", bean.getClass());
-			
+		if (wkf != null){ 
+			LOG.debug("Run workflow {}", wkf.getName());
+			run(wkf, bean); 
 		}
+		else { LOG.debug("No workflow for entity ::: {}", bean.getClass()); }
 		
 	}
 	
 	/**
 	 * Run workflow from specific class for one specific wkf and one specific record.
 	 * 
-	 * @param klass
-	 * @param id
+	 * @param wkf
+	 * @param bean
 	 */
 	@Override
 	public void run(Workflow wkf, T bean){
 		
 		updateInstance( init( wkf, bean ).playNodes( instance.getNodes() ) );
+		
+	}
+
+	@Override
+	public void run( ActionRequest actionRequest ) {
+		
+		Workflow wkf = getWorkflow( actionRequest.getBeanClass() );
+		
+		if (wkf != null){ 
+			LOG.debug("Run workflow {}", wkf.getName());
+			run(wkf, actionRequest);
+		}
+		else { LOG.debug("No workflow for entity ::: {}", actionRequest.getBeanClass()); }
+		
+	}
+
+	@Override
+	public void run( Workflow wkf, ActionRequest actionRequest ){
+		
+		updateInstance( init( wkf, actionRequest ).playNodes( instance.getNodes() ) );
 		
 	}
 
@@ -290,10 +358,13 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 		
 		if (transition.getCondition() != null){
 
-			//TODO: Run condition.
+			actionWorkflow.execute( transition.getCondition().getName(), actionRequest);
+			
 			if (true){
 				
-				//TODO: Run action of next node.
+				Node node = transition.getNextNode();
+				
+				if ( node.getAction() != null ){ actionWorkflow.execute( node.getAction().getName(), actionRequest); }
 				addWaitingNodes( transition );
 				nodes.addAll( playNode( transition.getNextNode() ) );
 			}
@@ -304,9 +375,11 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 		}
 		else {
 			
-			//TODO: Run action of next node.
+			Node node = transition.getNextNode();
+			if ( node.getAction() != null ){ actionWorkflow.execute( node.getAction().getName(), actionRequest); }
+			
 			addWaitingNodes( transition );
-			nodes.addAll( playNode( transition.getNextNode() ) );
+			nodes.addAll( playNode( node ) );
 			
 		}
 		

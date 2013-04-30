@@ -25,24 +25,16 @@
         <field name="metaModel"/>
         <field name="node"/>
         <field name="maxNodeCounter"/>
-        <field name="active"/>
     </grid>
     
     <form name="worfklow-form" title="Workflow" cols="4" model="com.axelor.wkf.db.Workflow" onSave="wkf-validate">
         <field name="name"/>
         <field name="metaModel"/>
-    	<field name="sequence" />
-        <field name="active"/>
-        <notebook colSpan="4">
-        	<page title="Configuration">
-		        <field name="maxNodeCounter"/>
-		        <field name="condition" />
-		        <field name="node" form-view="start-node-form" summary-view="start-node-form"/>
-		    </page>
-		    <page title="Description">
-        		<field name="description" colSpan="4" noLabel="true"/>
-		    </page>
-        </notebook> 
+        <field name="maxNodeCounter"/>
+        <field name="node" form-view="start-node-form"/>
+        <separator title="Description" colSpan="4"/>
+        <field name="description" colSpan="4" noLabel="true"/>
+        <separator colSpan="4"/>
         <group colSpan="4" cols="6" colWidths="33,33%*">
 	        <button name="run" title="Run" onClick="save,wkf-method-run" colSpan="2"/>
 	        <button name="openInstances" title="Show instances" onClick="save,wkf-method-open-instances" colSpan="2"/>
@@ -153,7 +145,7 @@
     <action-record name="node-default-record" model="com.axelor.wkf.db.Node">
     	<field name="workflow" expr="eval: _parent?.startNode?.workflow" if="_parent?.startNode"/>
     	<field name="workflow" expr="eval: _parent?._parent?.workflow" if="_parent?._parent"/>
-    	<field name="name" expr="eval: type?.toUpperCase() + ':'"/>
+    	<field name="name" expr="eval: type.toUpperCase() + ':'"/>
     </action-record>
     
     <action-attrs name="node-type-attrs">
