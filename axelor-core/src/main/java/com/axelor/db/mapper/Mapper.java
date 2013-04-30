@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import com.axelor.db.Model;
 import com.axelor.db.NameColumn;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.CacheBuilder;
@@ -309,7 +308,6 @@ public class Mapper {
 	 */
 	public static Map<String, Object> toMap(Object bean) {
 		if (bean == null) return null;
-		Preconditions.checkArgument(bean instanceof Model);
 		
 		Map<String, Object> map = Maps.newHashMap();
 		Mapper mapper = Mapper.of(bean.getClass());
