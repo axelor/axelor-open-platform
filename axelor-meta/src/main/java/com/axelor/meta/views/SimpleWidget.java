@@ -29,6 +29,12 @@ public abstract class SimpleWidget extends AbstractWidget {
 	private Boolean readonly;
 	
 	@XmlAttribute
+	private String hiddenIf;
+	
+	@XmlAttribute
+	private String readonlyIf;
+	
+	@XmlAttribute
 	private Integer colSpan;
 	
 	@XmlAttribute
@@ -88,6 +94,22 @@ public abstract class SimpleWidget extends AbstractWidget {
 	
 	public void setReadonly(Boolean readonly) {
 		this.readonly = readonly;
+	}
+	
+	public String getHiddenIf() {
+		return hiddenIf;
+	}
+	
+	public void setHiddenIf(String hiddenIf) {
+		this.hiddenIf = hiddenIf;
+	}
+	
+	public String getReadonlyIf() {
+		return readonlyIf;
+	}
+	
+	public void setReadonlyIf(String readonlyIf) {
+		this.readonlyIf = readonlyIf;
 	}
 
 	public Integer getColSpan() {
