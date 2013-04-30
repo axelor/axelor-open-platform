@@ -74,7 +74,7 @@ public class SimpleAdapter implements TypeAdapter<Object> {
 	public Object adaptNull(Object value, Class<?> type, Type genericType,
 			Annotation[] annotations) {
 
-		if (!type.isPrimitive() || isNullable(annotations))
+		if (isNullable(type, annotations))
 			return null;
 
 		if (type == boolean.class)
@@ -98,7 +98,10 @@ public class SimpleAdapter implements TypeAdapter<Object> {
 		return null;
 	}
 	
-	private boolean isNullable(Annotation[] annotations){
+	private boolean isNullable(Class<?> type, Annotation[] annotations){
+		if (type.isPrimitive()) {
+			return false;
+		}
 		if(annotations == null || annotations.length == 0){
 			return true;
 		}
