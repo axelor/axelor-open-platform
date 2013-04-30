@@ -217,6 +217,7 @@ function FormViewCtrl($scope, $element) {
 		if (rec === old) {
 			return $scope.$$dirty = false;
 		}
+		$scope.$broadcast("on:record-change", rec);
 		return $scope.$$dirty = $scope.isDirty();
 	}, true);
 

@@ -453,8 +453,7 @@ ActionHandler.prototype = {
 					itemScope.attr('hidden', value);
 					break;
 				case 'collapse':
-					if (itemScope.setCollapsed)
-						itemScope.setCollapsed(value);
+					itemScope.attr('collapse', value);
 					break;
 				case 'title':
 					if (label) {
