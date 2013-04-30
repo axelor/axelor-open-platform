@@ -11,6 +11,19 @@
     <option value="portal">Portal</option>
     <option value="calendar">Calendar</option>
   </selection>
+  
+  <selection name="action.type.selection">
+    <option value="action-attrs">action-attrs</option>
+    <option value="action-view">action-view</option>
+    <option value="action-group">action-group</option>
+    <option value="action-validate">action-validate</option>
+    <option value="action-condition">action-condition</option>
+    <option value="action-record">action-record</option>
+    <option value="action-method">action-method</option>
+    <option value="action-import">action-import</option>
+    <option value="action-export">action-export</option>
+    <option value="action-ws">action-ws</option>
+  </selection>
 
   <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView">
     <field name="name"/>
@@ -49,7 +62,7 @@
 
   <grid title="All Actions" name="meta-action-grid" model="com.axelor.meta.db.MetaAction">
     <field name="name" />
-    <field name="type" />
+    <field name="type" selection="action.type.selection"/>
     <field name="model" />
   </grid>
 
@@ -58,7 +71,7 @@
     onLoad="action-action-form-onload"
     onSave="action-action-validate,com.axelor.meta.web.MetaController:clearCache">
     <field name="name"/>
-    <field name="type"/>
+    <field name="type" selection="action.type.selection"/>
     <field name="model"/>
     <break/>
     <notebook colSpan="4">
