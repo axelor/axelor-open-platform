@@ -15,8 +15,11 @@ ui.formWidget('Group', {
 
 		var props = scope.field;
 
-		scope.canCollapse = props.canCollapse;
 		scope.collapsed = false;
+		
+		scope.canCollapse = function() {
+			return props.canCollapse || props.collapseIf;
+		};
 		
 		scope.setCollapsed = function(collapsed) {
 			scope.collapsed = collapsed;
@@ -28,6 +31,10 @@ ui.formWidget('Group', {
 			scope.collapsed = !scope.collapsed;
 			scope.setCollapsed(scope.collapsed);
 		};
+		
+		scope.$watch("attr('collapse')", function(collapsed) {
+			scope.setCollapsed(collapsed);
+		});
 		
 		// if auto title, then don't show it
 		if (attrs.title === attrs.field) {
@@ -45,7 +52,7 @@ ui.formWidget('Group', {
 	template:
 		'<fieldset ng-class="{\'bordered-box\': title}" x-layout-after="&gt; legend:first">'+
 			'<legend ng-show="title">'+
-				'<i ng-show="canCollapse" ng-click="toggle()" ng-class="{\'icon-plus\': collapsed, \'icon-minus\': !collapsed}"></i>'+
+				'<i ng-show="canCollapse()" ng-click="toggle()" ng-class="{\'icon-plus\': collapsed, \'icon-minus\': !collapsed}"></i>'+
 				'<span ng-bind-html-unsafe="title"></span></legend>'+
 		'</fieldset>'
 });

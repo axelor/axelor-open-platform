@@ -104,7 +104,23 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		if (angular.isFunction(this.link)) {
 			this.link.call(this, scope, element, attrs, controller);
 		}
+		
+		var handleConditional = function(attr, conditional){
+			if (!field[conditional]) return;
+			scope.$moment = moment;						// moment.js helper
+			scope.$number = function(d) {return +d;};	// number helper
+			scope.$on("on:record-change", function(e, rec) {
+				var value = scope.$eval(field[conditional], rec);
+				scope.attr(attr, value);
+			});
+		};
 
+		handleConditional("valid", "validIf");
+		handleConditional("hidden", "hiddenIf");
+		handleConditional("readonly", "readonlyIf");
+		handleConditional("required", "requiredIf");
+		handleConditional("collapse", "collapseIf");
+		
 		scope.$watch("isHidden()", function(hidden, old) {
 			if (hidden === old) return;
 			var elem = element,
@@ -224,6 +240,12 @@ ui.formDirective = function(name, object) {
 				attrs.$set('required', required);
 			});
 			
+			if (scope.field && scope.field.validIf) {
+				scope.$watch("attr('valid')", function(valid) {
+					if (valid === undefined) return;
+					model.$setValidity('invalid', valid);
+				});
+			}
 		});
 
 		return object;
