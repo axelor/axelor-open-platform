@@ -149,6 +149,20 @@
         <xsd:attribute name="readonly" type="xsd:boolean" />
         <xsd:attribute name="colSpan" type="xsd:int" />
         <xsd:attribute name="css" type="xsd:string"/>
+        <xsd:attribute name="hiddenIf" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            A JavaScript boolean expression against the current form values.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="readonlyIf" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            A JavaScript boolean expression against the current form values.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:anyAttribute />
       </xsd:extension>
     </xsd:complexContent>
@@ -318,6 +332,13 @@
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleContainer">
         <xsd:attribute name="canCollapse" type="xsd:boolean" />
+        <xsd:attribute name="collapseIf" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            A JavaScript boolean expression against the current form values.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -426,6 +447,20 @@
         <xsd:attribute name="widget" type="xsd:string" />
         <xsd:attribute name="selection" type="xsd:string"/>
         <xsd:attribute name="required" type="xsd:boolean" />
+        <xsd:attribute name="requiredIf" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            A JavaScript boolean expression against the current form values.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="validIf" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            A JavaScript boolean expression against the current form values.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="canSelect" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>

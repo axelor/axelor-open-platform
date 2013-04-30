@@ -12,11 +12,22 @@ public class Group extends SimpleContainer {
 	@XmlAttribute
 	private Boolean canCollapse;
 	
+	@XmlAttribute
+	private String collapseIf;
+	
 	public Boolean getCanCollapse() {
 		return canCollapse;
 	}
 	
 	public void setCanCollapse(Boolean canCollapse) {
 		this.canCollapse = canCollapse;
+	}
+	
+	public String getCollapseIf() {
+		return collapseIf;
+	}
+	
+	public void setCollapseIf(String collapseIf) {
+		this.collapseIf = collapseIf;
 	}
 }

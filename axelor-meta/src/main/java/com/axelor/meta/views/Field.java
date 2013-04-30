@@ -49,6 +49,12 @@ public class Field extends SimpleWidget {
 	private Boolean required;
 	
 	@XmlAttribute
+	private String requiredIf;
+	
+	@XmlAttribute
+	private String validIf;
+	
+	@XmlAttribute
 	private Integer width;
 	
 	@XmlAttribute(name = "min")
@@ -158,6 +164,22 @@ public class Field extends SimpleWidget {
 		this.required = required;
 	}
 	
+	public String getRequiredIf() {
+		return requiredIf;
+	}
+	
+	public void setRequiredIf(String requiredIf) {
+		this.requiredIf = requiredIf;
+	}
+	
+	public String getValidIf() {
+		return validIf;
+	}
+
+	public void setValidIf(String validIf) {
+		this.validIf = validIf;
+	}
+
 	public Integer getWidth() {
 		return width;
 	}
