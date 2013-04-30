@@ -89,6 +89,10 @@ table.form-layout td.form-item > .form-item-container > span.display-text {
 	min-width: 100px;
 }
 
+table.form-layout td.form-item > .many2one-item.readonly a {
+	color: #0088cc;
+}
+
 table.form-layout td.form-item input {
 	min-width: 170px;
 	height: 24px;
