@@ -42,7 +42,7 @@ class WkfController {
 	   
 		def context = request.context as Workflow
 		
-		workFlowEngine.run(Class.forName(context.metaModel.fullName));
+		workFlowEngine.run( Class.forName(context.metaModel.fullName) );
 		
 	}
 	

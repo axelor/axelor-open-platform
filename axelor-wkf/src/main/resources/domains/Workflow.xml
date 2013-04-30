@@ -12,6 +12,9 @@
     <many-to-one name="node" ref="Node" title="Node"/>
     <integer name="maxNodeCounter" title="Max node counter" default="1"/>
     <string name="description" large="true" title="Description" />
+    <integer name="sequence" />
+    <boolean name="active" default="true"/>
+    <many-to-one name="condition" ref="com.axelor.meta.db.MetaAction" title="Condition" />
     
   </entity>
 

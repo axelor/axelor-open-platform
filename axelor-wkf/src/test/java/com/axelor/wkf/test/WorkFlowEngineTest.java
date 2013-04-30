@@ -1,14 +1,19 @@
 package com.axelor.wkf.test;
 
+import java.util.Map;
+
 import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.axelor.db.JPA;
+import com.axelor.db.mapper.Mapper;
 import com.axelor.meta.service.MetaModelService;
+import com.axelor.rpc.ActionRequest;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.GuiceRunner;
 import com.axelor.wkf.IWorkflow;
@@ -21,13 +26,13 @@ import com.axelor.wkf.workflow.WorkflowFactory;
 @GuiceModules({ WkfTest.class })
 public class WorkFlowEngineTest {
 	
-	private static Workflow wkf;
+	private Workflow wkf;
 	
 	@Inject
 	WorkflowFactory<Workflow> workflowFactory;
 
-	@BeforeClass
-	public static void setUp(){
+	@Before
+	public void setUp() throws JAXBException{
 		
 		JPA.runInTransaction(new Runnable() {
 						
@@ -43,15 +48,18 @@ public class WorkFlowEngineTest {
 	
 	@Test
 	public void run() {
-
-		IWorkflow<Workflow> iWorkflow1 = workflowFactory.newEngine();
 		
-		iWorkflow1.run(wkf);
-		Assert.assertEquals(iWorkflow1.getInstance(wkf, wkf.getId()).getNodes().size(), 1);
+		ActionRequest request = new ActionRequest();
 
-		workflowFactory.newEngine();
-		workflowFactory.newEngine();
-		workflowFactory.newEngine();
+		Map<String, Object> data = Mapper.toMap(wkf);
+		request.setData(data);
+		request.setModel("com.axelor.wkf.db.Workflow");
+		
+		IWorkflow<Workflow> workflow1 = workflowFactory.newEngine();
+		
+		workflow1.run( wkf );
+		Assert.assertEquals( workflow1.getInstance(wkf, wkf.getId() ).getNodes().size(), 1);
+
 	}
 
 }
