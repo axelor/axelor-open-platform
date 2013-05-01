@@ -486,6 +486,8 @@ function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 			if (select) {
 				select.selected = true;
 				$scope.openTab(select);
+			} else {
+				$location.path('/');
 			}
 		}
 	}
