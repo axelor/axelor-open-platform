@@ -57,6 +57,35 @@ ui.formWidget('Group', {
 		'</fieldset>'
 });
 
+ui.formWidget('Portlet', {
+
+	css: 'form-item-portlet',
+	cellCss: 'form-item v-align-top',
+	
+	showTitle: false,
+
+	link: function(scope, element, attrs) {
+		
+		var field = scope.field;
+		
+		scope.canSearch = field.canSearch !== "false";
+		scope.actionName = field.action;
+		
+		element.resizable({
+			handles: 's',
+			resize: _.debounce(function() {
+				$.event.trigger('adjustSize');
+				element.width('auto');
+			}, 100)
+		});
+	},
+	
+	template:
+	'<div>'+
+		'<div ui-view-portlet x-action="{{actionName}}" x-can-search="{{canSearch}}"></div>'+
+	'</div>'
+});
+
 /**
  * The Tabs widget (notebook).
  */
