@@ -32,6 +32,7 @@ public class FormView extends AbstractView {
 	private String helpLink;
 
 	@XmlElements({
+		@XmlElement(name = "portlet", type = Portlet.class),
 		@XmlElement(name = "group", type = Group.class),
         @XmlElement(name = "notebook", type = Notebook.class),
         @XmlElement(name = "field", type = Field.class),
