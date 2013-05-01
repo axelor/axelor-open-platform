@@ -61,7 +61,11 @@ ui.directive('uiViewPortal', function(){
 		transclude: true,
 		template:
 		'<div class="portal" ng-transclude>'+
-			'<div ui-view-portlet x-action="{{portlet.action}}" ng-repeat="portlet in portlets"></div>'+
+			'<div ui-view-portlet ng-repeat="p in portlets" '+
+				'x-action="{{p.action}}" '+
+				'x-can-search="{{p.canSearch}}" '+
+				'x-col-span="{{p.colSpan}}" '+
+				'x-row-span="{{p.rowSpan}}"></div>'+
 		'</div>'
 	};
 });
@@ -83,7 +87,7 @@ function PortletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 			ViewCtrl.call(self, $scope, DataSource, ViewService);
 
 			$scope.title = view.title;
-			$scope.parsePartnet(view);
+			$scope.parsePortlet(view);
 		});
 	};
 }
@@ -91,26 +95,39 @@ function PortletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 ui.directive('uiViewPortlet', ['$compile', function($compile){
 	return {
 		scope: true,
-		require: '^uiViewPortal',
 		controller: PortletCtrl,
-		link: function(scope, element, attrs, portal) {
+		link: function(scope, element, attrs) {
 			setTimeout(function(){
 				scope.initPortlet(attrs.action);
 			});
 			
 			var initialized = false;
-			scope.parsePartnet = function(view) {
+			scope.parsePortlet = function(view) {
 				if (initialized) {
 					return;
 				}
 				initialized = true;
 				
-				scope.noFilter = !portlet.canSearch;
+				scope.noFilter = attrs.canSearch != "true";
 
 				var template = $compile($('<div ui-portlet-' + view.viewType + '></div>'))(scope);
 				element.find('.portlet-content:first').append(template);
 				
 				scope.show();
+				
+				if (scope.portletCols) {
+
+					var cols = scope.portletCols;
+					var colSpan = +attrs.colSpan || 1;
+					var rowSpan = +attrs.rowSpan || 1;
+
+					var width = 100;
+					var height = 250 * rowSpan;
+					
+					width = (width / cols) * colSpan;
+				
+					element.width(width + '%').height(height);
+				}
 			};
 			
 			scope.onPortletToggle = function(event) {
@@ -122,17 +139,13 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 				}
 			};
 			
-			var portlet = scope.portlet;
-			var cols = scope.portletCols;
-			var colSpan = portlet.colSpan || 1;
-			var rowSpan = portlet.rowSpan || 1;
-
-			var width = 100;
-			var height = 250 * rowSpan;
+			scope.doNext = function() {
+				if (this.canNext()) this.onNext();
+			};
 			
-			width = (width / cols) * colSpan;
-			
-			element.width(width + '%').height(height);
+			scope.doPrev = function() {
+				if (this.canPrev()) this.onPrev();
+			};
 		},
 		replace: true,
 		template:
@@ -141,11 +154,23 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 				'<div class="portlet-header navbar">'+
 					'<div class="navbar-inner">'+
 						'<div class="container-fluid">'+
-							'<span class="brand" href="" ng-bind-html-unsafe="title"></span>'+
-							'<span class="icons-bar pull-right">'+
-								'<i ng-click="onRefresh()" title="{{\'Refresh\' | t}}" class="icon-refresh"></i>'+
-								'<i ng-click="onPortletToggle($event)" title="{{\'Toggle\' | t}}" class="icon-chevron-up"></i>'+
-							'</span>'+
+							'<span class="brand" ng-bind-html-unsafe="title"></span>'+
+							'<ul class="nav pull-right">'+
+								'<li class="portlet-pager" ng-show="showPager">'+
+									'<span class="portlet-pager-text">{{pagerText()}}</span>'+
+									'<span class="icons-bar">'+
+										'<i ng-click="doPrev()" ng-class="{disabled: !canPrev()}" class="icon-step-backward"></i>'+
+										'<i ng-click="doNext()" ng-class="{disabled: !canNext()}" class="icon-step-forward"></i>'+
+									'</span>'+
+								'</li>'+
+								'<li class="divider-vertical"></li>'+
+								'<li>'+
+									'<span class="icons-bar">'+
+										'<i title="{{\'Refresh\' | t}}" ng-click="onRefresh()" class="icon-refresh"></i>'+
+										'<i title="{{\'Toggle\' | t}}" ng-click="onPortletToggle($event)" class="icon-chevron-up"></i>'+
+									'</span>'+
+								'</li>'+
+							'</ul>'+
 						'</div>'+
 					'</div>'+
 				'</div>'+
