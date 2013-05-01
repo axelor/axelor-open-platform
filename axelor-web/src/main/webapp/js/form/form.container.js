@@ -70,6 +70,10 @@ ui.formWidget('Portlet', {
 		
 		scope.canSearch = field.canSearch !== "false";
 		scope.actionName = field.action;
+
+		if (field.height) {
+			element.height(field.height);
+		}
 		
 		element.resizable({
 			handles: 's',
