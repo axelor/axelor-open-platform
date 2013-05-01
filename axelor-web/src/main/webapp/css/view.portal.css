@@ -20,6 +20,26 @@
 	min-height: 32px;
 }
 
+.portal-view .portlet-header.navbar .icons-bar {
+	padding-top: 0;
+}
+
+.portal-view .portlet-header.navbar i {
+	padding: 0 2px;
+	margin: 0;
+	padding-top: 4px;
+}
+
+.portal-view .portlet-header.navbar .portlet-pager i.disabled {
+	color: gray;
+	cursor: default;
+}
+
+.portal-view .portlet-header.navbar .divider-vertical {
+	height: 26px;
+	margin: 0 2px;
+}
+
 .portal-view .portlet-body,
 .portal-view .portlet-content {
 	position: absolute;

@@ -364,6 +364,7 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 			
 			var ds = $scope._dataSource;
 			
+			$scope.showPager = true;
 			$scope.onItemDblClick = function(event, args) {
 				var selection = $scope.selection[0];
 				var record = ds.at(selection);
@@ -380,9 +381,10 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 				});
 			};
 		}],
+		replace: true,
 		template:
-		'<div ui-view-grid x-view="schema" x-data-view="dataView" x-editable="false" x-no-filter="{{noFilter}}" x-handler="this">'+
-			'<div ui-slick-grid></div>'+
+		'<div class="portlet-grid webkit-scrollbar-all">'+
+			'<div ui-view-grid x-view="schema" x-data-view="dataView" x-editable="false" x-no-filter="{{noFilter}}" x-handler="this"></div>'+
 		'</div>'
 	};
 });
