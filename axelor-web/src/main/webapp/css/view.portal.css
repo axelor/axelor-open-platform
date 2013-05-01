@@ -10,6 +10,16 @@
 	        box-sizing: border-box;
 }
 
+.form-view .portlet,
+.form-view .portlet-body,
+.form-view .portlet-header,
+.form-view .portlet-content {
+	overflow: hidden;
+	-webkit-box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	        box-sizing: border-box;
+}
+
 .portal-view .portal {
 	padding-top: 4px;
 }
@@ -20,32 +30,32 @@
 	min-height: 32px;
 }
 
-.portal-view .portlet-header.navbar .icons-bar {
+.portlet-header.navbar .icons-bar {
 	padding-top: 0;
 }
 
-.portal-view .portlet-header.navbar i {
+.portlet-header.navbar i {
 	padding: 0 2px;
 	margin: 0;
 	padding-top: 4px;
 }
 
-.portal-view .portlet-header.navbar .portlet-pager i.disabled {
+.portlet-header.navbar .portlet-pager i.disabled {
 	color: gray;
 	cursor: default;
 }
 
-.portal-view .portlet-header.navbar .divider-vertical {
+.portlet-header.navbar .divider-vertical {
 	height: 26px;
 	margin: 0 2px;
 }
 
-.portal-view .portlet-body,
-.portal-view .portlet-content {
-	position: absolute;
+.portlet .portlet-body,
+.portlet .portlet-content {
+	position: absolute !important;
 }
 
-.portal-view .portlet-body {
+.portlet .portlet-body {
 	top: 0px;
 	right: 2px;
 	bottom: 4px;
@@ -60,20 +70,30 @@
 			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.portal-view .portlet-content {
+.portlet .portlet-content {
 	top: 27px;
 	left: 0px;
 	right: 0px;
 	bottom: 0px;
 }
 
-.portal-view .portlet-content > div,
-.portal-view .portlet-content > div > .slickgrid {
+.portlet .portlet-content > div,
+.portlet .portlet-content > div > .slickgrid {
+	top: 0px !important;
 	height: 100%;
 	-webkit-box-sizing: border-box;
 	   -moz-box-sizing: border-box;
 	        box-sizing: border-box;
 }
+
+.portlet.portlet-minimized {
+	height: auto !important;
+}
+
+.portlet.portlet-minimized .portlet-content {
+	display: none !important;
+}
+
 
 .portal-view .ui-sortable-placeholder {
 	border: 1px dashed #c9c9c9;
@@ -86,12 +106,4 @@
 
 .portal-view .ui-sortable-placeholder * {
 	visibility: hidden;
-}
-
-.portal-view .portlet-minimized {
-	height: auto !important;
-}
-
-.portal-view .portlet-minimized .portlet-content {
-	display: none !important;
 }
