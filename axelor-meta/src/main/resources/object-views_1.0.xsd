@@ -173,6 +173,13 @@
       <xsd:extension base="tns:SimpleWidget">
         <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="rowSpan" type="xsd:int" />
+        <xsd:attribute name="height">
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:pattern value="\d+(%|px|pt|em)?"></xsd:pattern>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -367,13 +374,6 @@
         <xsd:sequence maxOccurs="unbounded">
           <xsd:element name="page" type="tns:Page" />
         </xsd:sequence>
-        <xsd:attribute name="height">
-          <xsd:simpleType>
-            <xsd:restriction base="xsd:string">
-              <xsd:pattern value="\d+(%|px|pt|em)?"></xsd:pattern>
-            </xsd:restriction>
-          </xsd:simpleType>
-        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -580,6 +580,7 @@
   
   <xsd:group name="FormWidgets">
     <xsd:choice>
+      <xsd:element name="portlet" type="tns:Portlet" />
       <xsd:element name="group" type="tns:Group" />
       <xsd:element name="notebook" type="tns:Notebook" />
       <xsd:element name="field" type="tns:Field" />
@@ -621,16 +622,18 @@
   </xsd:complexType>
   
   <xsd:complexType name="Portlet">
-    <xsd:attribute name="action" type="xsd:string" use="required"/>
-    <xsd:attribute name="colSpan" type="xsd:integer"/>
-    <xsd:attribute name="rowSpan" type="xsd:integer"/>
-    <xsd:attribute name="canSearch" type="xsd:boolean">
-      <xsd:annotation>
-        <xsd:documentation>
-        Whether to enable search header on grid view portlet.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractContainer">
+        <xsd:attribute name="action" type="xsd:string" use="required"/>
+        <xsd:attribute name="canSearch" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+            Whether to enable search header on grid view portlet.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
   </xsd:complexType>
 
   <xsd:complexType name="Search">
