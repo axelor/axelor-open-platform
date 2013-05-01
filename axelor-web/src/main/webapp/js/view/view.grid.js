@@ -380,6 +380,10 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 					$scope.$apply();
 				});
 			};
+			
+			$scope.onRefresh = function() {
+				$scope.filter([]);
+			};
 		}],
 		replace: true,
 		template:
