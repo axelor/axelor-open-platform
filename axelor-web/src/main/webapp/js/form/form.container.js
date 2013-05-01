@@ -174,8 +174,9 @@ ui.formWidget('Tabs', {
 	}],
 	
 	link: function(scope, elem, attrs) {
-		var props = scope.getViewDef(elem);
 		
+		var props = scope.field;
+
 		scope.$tabs = $(elem).bsTabs({
 			closable: false
 		});
@@ -236,6 +237,8 @@ ui.formWidget('Tab', {
 			scope.onSelect = scope.$events.onSelect;
 		});
 		
+		scope.selected = false;
+
 		tabs.addTab(scope);
 		attrs.$observe('title', function(value){
 			scope.title = value;
