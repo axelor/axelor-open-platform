@@ -65,7 +65,8 @@ ui.directive('uiViewPortal', function(){
 				'x-action="{{p.action}}" '+
 				'x-can-search="{{p.canSearch}}" '+
 				'x-col-span="{{p.colSpan}}" '+
-				'x-row-span="{{p.rowSpan}}"></div>'+
+				'x-row-span="{{p.rowSpan}}" ' +
+				'x-height="{{p.height}}"></div>'+
 		'</div>'
 	};
 });
@@ -122,7 +123,7 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 					var rowSpan = +attrs.rowSpan || 1;
 
 					var width = 100;
-					var height = 250 * rowSpan;
+					var height = (+attrs.height || 250) * rowSpan;
 					
 					width = (width / cols) * colSpan;
 				
