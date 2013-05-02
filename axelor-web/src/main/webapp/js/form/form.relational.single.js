@@ -285,6 +285,7 @@ ui.formInput('SuggestBox', 'ManyToOne', {
 			if (this.isReadonly()) {
 				return;
 			}
+			input.focus();
 			input.autocomplete("search" , '');
 		};
 	},
