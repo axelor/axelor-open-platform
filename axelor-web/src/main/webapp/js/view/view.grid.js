@@ -381,6 +381,13 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 				});
 			};
 			
+			$scope.$on("on:new", function(e) {
+				$scope.filter([]);
+			});
+			$scope.$on("on:edit", function(e) {
+				$scope.filter([]);
+			});
+			
 			$scope.onRefresh = function() {
 				$scope.filter([]);
 			};
