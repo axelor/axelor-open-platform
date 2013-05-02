@@ -147,13 +147,6 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 			scope.doPrev = function() {
 				if (this.canPrev()) this.onPrev();
 			};
-
-			scope.$on("on:new", function() {
-				scope.onRefresh();
-			});
-			scope.$on("on:edit", function() {
-				scope.onRefresh();
-			});
 		},
 		replace: true,
 		template:
