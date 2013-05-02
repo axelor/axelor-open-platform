@@ -360,7 +360,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				title: "<b>" + event.title + "</b>",
 				placement: "top",
 				content: function() {
-					var html = $("<div></div>");
+					var html = $("<div></div>").addClass("calendar-bubble-content");
 					
 					$("<span>").text(moment(event.start).format("LLL")).appendTo(html);
 					

@@ -52,3 +52,11 @@
 .calendar-view .fc-agenda .calendar-event-day {
 	color: #fff !important;
 }
+
+.calendar-bubble-content {
+	overflow: hidden;
+}
+
+.calendar-bubble-content hr {
+	margin: 8px 0;
+}
