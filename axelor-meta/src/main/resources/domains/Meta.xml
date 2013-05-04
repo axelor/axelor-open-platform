@@ -35,7 +35,7 @@
    
   <entity name="MetaAction" table="META_ACTION" sequential="true" cachable="true">
   	<string name="name" unique="true" required="true"/>
-    <string name="type" required="true" />
+    <string name="type" required="true"/>
     <string name="model" />
   	<string name="xml" required="true" large="true"/>
   </entity>
@@ -47,7 +47,7 @@
   	<unique-constraint columns="key,value"/>
   </entity>
   
-  <entity name="MetaModel" sequential="true" lang="java" cachable="true">
+  <entity name="MetaModel" table="META_MODEL" sequential="true" cachable="true">
     <string name="name" title="Name" required="true"/>
     <string name="packageName" title="Package" required="true"/>
     <string name="tableName" title="Table" />
@@ -55,7 +55,7 @@
     <string name="fullName" title="Fullname" />
   </entity>
 
-  <entity name="MetaField" sequential="true" lang="java" cachable="true">
+  <entity name="MetaField" table="META_FIELD" sequential="true" cachable="true">
     <many-to-one name="metaModel" ref="MetaModel" />
     <string name="name" title="Name" required="true"/>
     <string name="packageName" title="Package" />
@@ -98,6 +98,24 @@
   	<long name="objectId" required="true"/>
   	<many-to-one name="metaFile" ref="MetaFile" title="File" required="true" column="meta_file"/>
   	<unique-constraint columns="objectName,objectId,meta_file"/>
+  </entity>
+
+  <entity name="MetaChartSeries" table="META_CHART_SERIES">
+    <string name="key" />
+    <string name="type" />
+    <string name="side" />
+    <string name="expr" />
+  </entity>
+
+  <entity name="MetaChart" table="META_CHART">
+    <string name="name" required="true" unique="true"/>
+    <string name="title" />
+    <boolean name="stacked" />
+    <boolean name="nativeQuery" title="Native"/>
+    <string name="query" max="2048" multiline="true" required="true"/>
+    <string name="categoryKey" required="true" />
+    <string name="categoryType" />
+    <one-to-many name="chartSeries" ref="MetaChartSeries" />
   </entity>
 
 </domain-models>

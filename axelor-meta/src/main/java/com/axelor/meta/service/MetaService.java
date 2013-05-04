@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.persistence.Query;
@@ -23,6 +24,8 @@ import com.axelor.meta.GroovyScriptHelper;
 import com.axelor.meta.MetaLoader;
 import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaAttachment;
+import com.axelor.meta.db.MetaChart;
+import com.axelor.meta.db.MetaChartSeries;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaTranslation;
@@ -411,5 +414,73 @@ public class MetaService {
 		}
 
 		return sb.toString();
+	}
+	
+	private String prepareQuery(String query) {
+		String result = query.replaceAll("\\n", " ").replaceAll("\\s+", " ").trim();
+		Pattern pattern = Pattern.compile("^(SELECT) (.*?) (FROM .*)");
+		Matcher matcher = pattern.matcher(result);
+		
+		if (!matcher.matches()) {
+			return result;
+		}
+		
+		String selection = matcher.group(2);
+		if (selection.startsWith("new ")) {
+			return result;
+		}
+		
+		result = matcher.replaceFirst("$1 new map($2) $3");
+
+		return result;
+	}
+	
+	public Response getChart(String name, Request request) {
+
+		final Response response = new Response();
+		final MetaChart chart = MetaChart.all().filter("self.name = ?", name).fetchOne();
+		
+		if (chart == null || chart.getChartSeries() == null) {
+			return response;
+		}
+
+		if (chart.getNativeQuery() == Boolean.TRUE) {
+			//TODO: handle native query
+			return response;
+		}
+
+		final Map<String, Object> data = Maps.newHashMap();
+
+		data.put("title", chart.getTitle());
+		data.put("stacked", chart.getStacked());
+		
+		data.put("xAxis", chart.getCategoryKey());
+		data.put("xType", chart.getCategoryType());
+
+		final String string = prepareQuery(chart.getQuery());
+		
+		JPA.runInTransaction(new Runnable() {
+
+			@Override
+			public void run() {
+				List<?> records = JPA.em().createQuery(string).getResultList();
+				data.put("data", records);
+			}
+		});
+
+		List<Object> series = Lists.newArrayList();
+		for(MetaChartSeries s : chart.getChartSeries()) {
+			Map<String, Object> map = Maps.newHashMap();
+			map.put("key", s.getKey());
+			map.put("type", s.getType());
+			map.put("expr", s.getExpr());
+			series.add(map);
+		}
+		data.put("series", series);
+
+		response.setData(data);
+		
+		response.setStatus(Response.STATUS_SUCCESS);
+		return response;
 	}
 }
