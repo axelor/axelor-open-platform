@@ -126,7 +126,7 @@ public class MetaController {
 	 * @param request
 	 * @param response
 	 */
-	public void openModel (ActionRequest request, ActionResponse response) {
+	public void openModel(ActionRequest request, ActionResponse response) {
 	   
 		MetaField metaField = request.getContext().asType(MetaField.class);
 		
@@ -136,10 +136,9 @@ public class MetaController {
 		view.put("resource", MetaModel.class.getName());
 		view.put("domain", domain);
 		response.setView(view);
-		
    }
 	
-	public void restoreTranslations (ActionRequest request, ActionResponse response) {
+	public void restoreTranslations(ActionRequest request, ActionResponse response) {
 		
 		JPA.runInTransaction(new Runnable() {
 			
@@ -154,31 +153,24 @@ public class MetaController {
 		
 		MetaTranslation view = MetaTranslation.all().fetchOne();
 		response.setValues(view);
-		
 	}
 	
-	public void exportTranslations (ActionRequest request, ActionResponse response) {
+	public void exportTranslations(ActionRequest request, ActionResponse response) {
 		
 		String exportPath = (String) request.getContext().get("exportPath");
 		Map<String, String> data = Maps.newHashMap();
-		
+
 		try {
-			
 			if(Strings.isNullOrEmpty(exportPath)){
 				throw new Exception(JPA.translate("Please enter your export path fisrt."));
 			}
-			
 			service.exportTranslations(exportPath);
 			response.setFlash(JPA.translate("Export done."));
 			response.setHidden("exportPath", true);
 			data.put("exportPath", null);
 			response.setValues(data);
-			
-		}
-		catch(Exception e){
+		} catch(Exception e){
 			response.setFlash(e.getLocalizedMessage());
 		}
-		
-		
 	}
 }

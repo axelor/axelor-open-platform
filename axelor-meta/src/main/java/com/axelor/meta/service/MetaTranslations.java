@@ -34,34 +34,33 @@ public class MetaTranslations implements Translations, Provider<Translations> {
 
 	@Override
 	public String get(String key) {
-		return get(key,key);
+		return get(key, null, key);
 	}
 
 	@Override
 	public String get(String key, String defaultValue) {
-		return get(key,null,defaultValue);
+		return get(key, null, defaultValue);
 	}
 	
 	@Override
 	public String get(String key, String domain, String defaultValue) {
-		
-		if(key == null){
+
+		if (key == null) {
 			return defaultValue;
 		}
-
-		MetaTranslation translation = MetaTranslation.all().filter(
-				"self.key = ?1 " +
-				"AND (self.language = ?2 OR self.language = ?3) " +
-				"AND (self.domain IS NULL OR self.domain = ?4)",
-				key,getConvertLanguage(),getLanguageCode(),domain).order("-language").order("domain").fetchOne();
 		
-		if(translation != null && !Strings.isNullOrEmpty(translation.getTranslation())){
+		MetaTranslation translation = MetaTranslation
+				.all()
+				.filter("self.key = ?1 "
+						+ "AND (self.language = ?2 OR self.language = ?3) "
+						+ "AND (self.domain IS NULL OR self.domain = ?4)", key,
+						getConvertLanguage(), getLanguageCode(), domain)
+				.order("-language").order("domain").fetchOne();
+
+		if (translation != null && !Strings.isNullOrEmpty(translation.getTranslation())){
 			return translation.getTranslation();
 		}
-		else {
-			return defaultValue;
-		}
-		
+		return defaultValue;
 	}
 
 	@Override
