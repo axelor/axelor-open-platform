@@ -91,6 +91,15 @@ public class Field extends SimpleWidget {
 		@XmlElement(name = "grid", type = GridView.class)
 	})
 	private List<AbstractView> views;
+	
+	@Override
+	public String getTitle() {
+		String title = super.getTitle();
+		if (title == null || "".equals(title.trim())) {
+			return JPA.translate(this.getName(), this.getModel(), null);
+		}
+		return title;
+	}
 
 	public String getWidget() {
 		return widget;
@@ -292,11 +301,6 @@ public class Field extends SimpleWidget {
 	
 	public void setSummaryView(String summaryView) {
 		this.summaryView = summaryView;
-	}
-	
-	protected String getTranslations() {
-		String translation = JPA.translate(super.getName(), super.getModel(), null);
-		return JPA.translate(super.getDefaultTitle(), translation);
 	}
 	
 	private String getTarget() {

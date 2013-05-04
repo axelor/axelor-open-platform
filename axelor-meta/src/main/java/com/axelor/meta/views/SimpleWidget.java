@@ -49,17 +49,12 @@ public abstract class SimpleWidget extends AbstractWidget {
 	}
 	
 	public String getTitle() {
-		return getTranslations();
-	}
-	
-	public String getDefaultTitle() {
-		return title;
-	}
-	
-	protected String getTranslations() {
+		if (title == null || "".equals(title.trim())) {
+			return title;
+		}
 		return JPA.translate(title);
 	}
-
+	
 	public void setTitle(String title) {
 		this.title = title;
 	}
