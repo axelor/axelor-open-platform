@@ -26,6 +26,10 @@ function PortalCtrl($scope, $element) {
 		$scope.updateRoute();
 	};
 	
+	$scope.onShow = function() {
+		
+	};
+
 	$scope.getRouteOptions = function() {
 		return {
 			mode: 'portal',
@@ -74,6 +78,21 @@ ui.directive('uiViewPortal', function(){
 PortletCtrl.$inject = ['$scope', '$element', 'MenuService', 'DataSource', 'ViewService'];
 function PortletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 	
+	var self = this;
+	
+	function init() {
+		
+		ViewCtrl.call(self, $scope, DataSource, ViewService);
+		
+		$scope.show = function() {
+
+		};
+		
+		$scope.onShow = function() {
+			
+		};
+	}
+	
 	$scope.initPortlet = function(action) {
 
 		MenuService.action(action).success(function(result){
@@ -84,8 +103,8 @@ function PortletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 			
 			$scope._viewParams = view;
 			$scope._viewAction = action;
-			
-			ViewCtrl.call(self, $scope, DataSource, ViewService);
+
+			init();
 
 			$scope.title = view.title;
 			$scope.parsePortlet(view);
