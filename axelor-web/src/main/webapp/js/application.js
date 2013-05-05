@@ -48,6 +48,9 @@ load([
 	
 	'lib/fullcalendar/fullcalendar.js',
 	'lib/fullcalendar/gcal.js',
+	
+	'lib/nvd3/lib/d3.v2.js',
+	'lib/nvd3/nv.d3.js',
 
 	'lib/ace/js/ace.js',
 	
@@ -92,6 +95,7 @@ load([
 	'js/view/view.search.js',
 	'js/view/view.portal.js',
 	'js/view/view.popup.js',
+	'js/view/view.chart.js',
 	'js/view/view.calendar.js'
 	//-- js-end
 ]);
