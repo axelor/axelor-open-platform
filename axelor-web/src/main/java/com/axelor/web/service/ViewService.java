@@ -191,4 +191,10 @@ public class ViewService extends AbstractService {
 		}
 		return all;
 	}
+	
+	@GET
+	@Path("chart/{name}")
+	public Response get(@PathParam("name") String name) {
+		return service.getChart(name, new Request());
+	}
 }

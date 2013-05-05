@@ -434,6 +434,10 @@ table.field-details .help-text hr {
 	overflow: hidden;
 }
 
+.ws-nowrap {
+	white-space: nowrap;
+}
+
 .subtotal {
 	white-space: nowrap;
 	text-align: right;

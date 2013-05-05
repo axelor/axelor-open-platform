@@ -71,7 +71,7 @@
 }
 
 .portlet .portlet-content {
-	top: 27px;
+	top: 28px;
 	left: 0px;
 	right: 0px;
 	bottom: 0px;
@@ -79,11 +79,15 @@
 
 .portlet .portlet-content > div,
 .portlet .portlet-content > div > .slickgrid {
-	top: 0px !important;
+	top: -1px !important;
 	height: 100%;
 	-webkit-box-sizing: border-box;
 	   -moz-box-sizing: border-box;
 	        box-sizing: border-box;
+}
+
+.portlet .portlet-content > .nvtooltip {
+	height: auto;
 }
 
 .portlet.portlet-minimized {
@@ -106,4 +110,9 @@
 
 .portal-view .ui-sortable-placeholder * {
 	visibility: hidden;
+}
+
+.portlet-content > .chart-container {
+	border: 1px solid #DDD;
+	border-top: 0;
 }
