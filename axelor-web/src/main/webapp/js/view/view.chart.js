@@ -32,107 +32,104 @@ function ChartCtrl($scope, $element, $http) {
 	};
 };
 
-function barChart(scope, element, data) {
-	
-	var chart = nv.models.multiBarChart()
-		.showControls(false)
-		.reduceXTicks(false)
-		.barColor(d3.scale.category20().range());
-
-	chart.multibar.hideable(true);
-
-	d3.select(element[0])
-	  .datum(data)
-	  .transition().duration(500).call(chart);
-
-	return chart;
+function $eval(scope, expr, locals) {
+	var root = scope.$root || scope;
+	var context = _.extend({
+		"$moment": moment,
+		"$number": function(v) { return +v; }
+	}, locals);
+	return root.$eval(expr, context);
 }
 
-function pieChart(scope, element, data) {
-
-    var chart = nv.models.pieChart()
-    	.showLabels(false)
-    	.x(function(d) { return d.x; })
-        .y(function(d) { return d.y; })
-        .values(function(d) { return d; })
-        .color(d3.scale.category10().range());
-
-	d3.select(element[0])
-    	.datum([data])
-        .transition().duration(1200).call(chart);
-    
-    return chart;
+function $conv(value) {
+	if (!value) return 0;
+	if (_.isNumber(value)) return value;
+	if (/(-)?\d+(\.\d+)?/.test(value)) {
+		return +value;
+	}
+	return value;
 }
 
-
-function makeChart(scope, element, data) {
+function PieChart(scope, element, data) {
 
 	var chart_data = [];
 	
-	function $eval(expr, locals) {
-		var context = _.extend({
-			"$moment": moment
-		}, locals);
-		//TODO: user root scope to prevent access to current scope
-		return scope.$eval(expr, context);
-	}
-	
-	function $conv(value) {
-		if (/\d+(\.\d+)?/.test(value)) {
-			return +value;
-		}
-		return value;
-	}
-
-	function barData(s) {
-		var key = s.key,
-			type = s.type,
-			expr = s.expr;
-
-		_.chain(data.data).groupBy(key).each(function(group, name, i) {
-			var series = {};
-			series.key = name;
-			series.type = type;
-			series.values = [];
-			_.each(group, function(item) {
-				var x = item[data.xAxis] || 0;
-				var y = expr ? $eval(expr, item) : name;
-				series.values.push({
-					x: $conv(x),	
-					y: $conv(y)
-				});
-			});
-			chart_data.push(series);
-		});
-	}
-	
-	function pieData(s) {
-		var key = s.key,
-			expr = s.expr;
-		_.chain(data.data).each(function(item, i) {
+	_.each(data.series, function(series) {
+		var key = series.key,
+			expr = series.expr;
+		
+		_.chain(data.data).each(function(item) {
 			var x = item[data.xAxis];
-			var y = expr ? $eval(expr, item) : item[key];
-			
+			var y = expr ? $eval(scope, expr, item) : item[key];
 			chart_data.push({
 				x: $conv(x),
 				y: $conv(y)
 			});
 		});
-	}
+	});
 
+	var chart = nv.models.pieChart()
+		.showLabels(false)
+		.x(function(d) { return d.x; })
+	    .y(function(d) { return d.y; })
+	    .values(function(d) { return d; })
+	    .color(d3.scale.category10().range());
+	
+	d3.select(element[0])
+		.datum([chart_data])
+	    .transition().duration(1200).call(chart);
+	
+	return chart;
+}
+
+function BarChart(scope, element, data) {
+	
+	var chart_data = [];
+	
+	_.each(data.series, function(series) {
+		var key = series.key,
+			type = series.type,
+			expr = series.expr;
+
+		_.chain(data.data).groupBy(key).each(function(group, name) {
+			var values = _.map(group, function(item) {
+				var x = item[data.xAxis] || 0;
+				var y = expr ? $eval(scope, expr, item) : name;
+				return {
+					x: $conv(x),
+					y: $conv(y)
+				};
+			});
+			chart_data.push({
+				key: name,
+				type: type,
+				values: values
+			});
+		});
+	});
+	
+	var chart = nv.models.multiBarChart()
+		.showControls(false)
+		.reduceXTicks(false)
+		.barColor(d3.scale.category20().range());
+	
+	chart.multibar.hideable(true);
+
+	d3.select(element[0])
+	  .datum(chart_data)
+	  .transition().duration(500).call(chart);
+	
+	return chart;
+}
+
+function Chart(scope, element, data) {
+	
 	var type = null;
 
 	for(var i = 0 ; i < data.series.length ; i++) {
-		var s = data.series[i];
-		
-		type = s.type;
-
-		if (s.type === "pie") {
-			pieData(s);
+		type = data.series[i].type;
+		if (type === "pie") {
 			break;
-		}
-		if (s.type === "bar") {
-			barData(s);
 		}
 	}
 	
@@ -144,8 +141,12 @@ function makeChart(scope, element, data) {
 
 		var chart = null;
 
-		if (type == "pie") chart = pieChart(scope, element, chart_data);
-		if (type == "bar") chart = barChart(scope, element, chart_data, data.xType);
+		if (type === "pie") {
+			chart = PieChart(scope, element, data);
+		}
+		if (type === "bar") {
+			chart = BarChart(scope, element, data);
+		}
 
 		if (chart == null) {
 			return;
@@ -168,8 +169,30 @@ function makeChart(scope, element, data) {
 				.rotateLabels(-45)
 				.tickFormat(tickFormat);
 		}
+		
+		var lastWidth = 0;
+		var lastHeight = 0;
+		
+		function adjust() {
+			
+			if (element.is(":hidden")) {
+				return;
+			}
 
-		element.on('adjustSize', chart.update);
+			var w = element.width(),
+				h = element.height();
+			
+			if (w === lastWidth && h === lastHeight) {
+				return;
+			}
+
+			lastWidth = w;
+			lastHeight = h;
+
+			chart.update();
+		}
+
+		element.on('adjustSize', _.debounce(adjust, 100));
 		setTimeout(chart.update);
 
 		return chart;
@@ -183,7 +206,7 @@ var directiveFn = function(){
 			var elem = element.children('svg');
 			
 			scope.render = function(data) {
-				makeChart(scope, elem, data);
+				Chart(scope, elem, data);
 			};
 		},
 		replace: true,
