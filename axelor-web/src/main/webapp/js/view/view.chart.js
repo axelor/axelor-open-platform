@@ -27,7 +27,14 @@ function ChartCtrl($scope, $element, $http) {
 	var view = $scope.view = views['chart'];
 	
 	function refresh() {
-		return $http.get('ws/meta/chart/' + view.name).then(function(response) {
+		
+		var context = $scope._context || {};
+		if ($scope.getContext) {
+			context = $scope.getContext();
+		}
+		return $http.post('ws/meta/chart/' + view.name, {
+			data: context
+		}).then(function(response) {
 			var res = response.data;
 			$scope.render(res.data);
 		});

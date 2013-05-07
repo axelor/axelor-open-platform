@@ -195,6 +195,26 @@ public class ViewService extends AbstractService {
 	@GET
 	@Path("chart/{name}")
 	public Response get(@PathParam("name") String name) {
-		return service.getChart(name, new Request());
+		final MultivaluedMap<String, String> params = getUriInfo().getQueryParameters(true);
+		final Map<String, Object> context = Maps.newHashMap();
+		final Request request = new Request();
+
+		for(String key : params.keySet()) {
+			List<String> values = params.get(key);
+			if (values.size() == 1) {
+				context.put(key, values.get(0));
+			} else {
+				context.put(key, values);
+			}
+		}
+		request.setData(context);
+
+		return service.getChart(name, request);
+	}
+
+	@POST
+	@Path("chart/{name}")
+	public Response get(@PathParam("name") String name, Request request) {
+		return service.getChart(name, request);
 	}
 }
