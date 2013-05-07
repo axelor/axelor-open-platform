@@ -197,8 +197,6 @@ function AreaChart(scope, element, data) {
 	var chart = nv.models.stackedAreaChart()
 				  .color(d3.scale.category10().range());
 
-	chart.stacked(data.stacked);
-
 	d3.select(element[0])
 	  .datum(chart_data)
 	  .transition().duration(500).call(chart);
