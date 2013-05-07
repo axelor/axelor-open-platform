@@ -10,7 +10,7 @@ nv.tooltip.show = function(pos, content, gravity, dist, parentContainer, classes
 	if (body && !$("body").is(body)) {
 		var diff = $(body).offset();
 		pos[0] += diff.left;
-		pos[1] += diff.top + 12;
+		pos[1] += diff.top;
 		body = $("body")[0];
 	}
 	tooltipShow(pos, content, gravity, dist, body, classes);
@@ -137,9 +137,22 @@ function BarChart(scope, element, data) {
 	var chart_data = PlotData(scope, data, "bar");
 	var chart = nv.models.multiBarChart()
 		.reduceXTicks(false)
-		.barColor(d3.scale.category20().range());
+		.color(d3.scale.category10().range());
 
 	chart.multibar.hideable(true);
+
+	d3.select(element[0])
+	  .datum(chart_data)
+	  .transition().duration(500).call(chart);
+	
+	return chart;
+}
+
+function HBarChart(scope, element, data) {
+	
+	var chart_data = PlotData(scope, data, "hbar");
+	var chart = nv.models.multiBarHorizontalChart()
+		.color(d3.scale.category10().range());
 
 	d3.select(element[0])
 	  .datum(chart_data)
@@ -196,12 +209,17 @@ function Chart(scope, element, data) {
 	nv.addGraph(function generate() {
 
 		var chart = null;
+		
+		element.off('adjustSize').empty();
 
 		if (type === "pie") {
 			chart = PieChart(scope, element, data);
 		}
 		if (type === "bar") {
 			chart = BarChart(scope, element, data);
+		}
+		if (type === "hbar") {
+			chart = HBarChart(scope, element, data);
 		}
 		if (type === "line") {
 			chart = LineChart(scope, element, data);
@@ -266,7 +284,6 @@ var directiveFn = function(){
 		controller: ChartCtrl,
 		link: function(scope, element, attrs) {
 			var elem = element.children('svg');
-			
 			scope.render = function(data) {
 				Chart(scope, elem, data);
 			};
