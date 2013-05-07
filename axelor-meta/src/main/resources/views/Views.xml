@@ -285,7 +285,7 @@
     <field name="nativeQuery" />
     <notebook colSpan="4">
       <page cols="1" title="Query" colWidths="50,*">
-        <field name="query" noLabel="true" widget="CodeEditor[syntax=sql]"/>
+        <field name="query" noLabel="true" widget="CodeEditor[syntax=sql|height=400]"/>
       </page>
       <page title="Series" cols="1">
         <field name="chartSeries">
@@ -308,25 +308,26 @@
   </form>
   
   <selection name="selection.chart.type">
-    <option value="bar">Bar</option>
     <option value="pie">Pie</option>
+    <option value="bar">Bar</option>
+    <option value="hbar">HBar</option>
     <option value="line">Line</option>
     <option value="area">Area</option>
   </selection>
   
   <selection name="selection.chart.side">
     <option value="left">Left</option>
-    <option value="bottom">Bottom</option>
     <option value="right">Right</option>
   </selection>
 
   <selection name="selection.chart.xtype">
     <option value="number">Number</option>
     <option value="decimal">Decimal</option>
+    <option value="date">Date</option>
+    <option value="time">Time</option>
     <option value="month">Month</option>
     <option value="year">Year</option>
-    <option value="date">Date</option>
-    <option value="time">DateTime</option>
+    <option value="">Text</option>
   </selection>
 
 </object-views>
