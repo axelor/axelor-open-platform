@@ -75,7 +75,7 @@ ui.formInput('CodeEditor', {
 	
 	template_readonly: null,
 	
-	template: '<div style="min-height: 280px;" ng-transclude></div>'
+	template: '<div style="min-height: 280px;" class="webkit-scrollbar-all" ng-transclude></div>'
 });
 
 })(this);
