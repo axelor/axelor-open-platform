@@ -4,6 +4,18 @@
 
 nv.dev = false;
 
+var tooltipShow = nv.tooltip.show;
+nv.tooltip.show = function(pos, content, gravity, dist, parentContainer, classes) {
+	var body = parentContainer;
+	if (body && !$("body").is(body)) {
+		var diff = $(body).offset();
+		pos[0] += diff.left;
+		pos[1] += diff.top + 12;
+		body = $("body")[0];
+	}
+	tooltipShow(pos, content, gravity, dist, body, classes);
+};
+
 var ui = angular.module('axelor.ui');
 
 this.ChartCtrl = ChartCtrl;
