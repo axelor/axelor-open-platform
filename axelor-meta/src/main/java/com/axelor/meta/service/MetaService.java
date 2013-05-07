@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.persistence.Query;
@@ -12,12 +11,15 @@ import javax.persistence.TypedQuery;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.GroovyScriptHelper;
@@ -393,7 +395,7 @@ public class MetaService {
 		
 		StringBuilder sb = new StringBuilder();
 		
-		//Ignore thoses fields for export
+		//Ignore these fields for export
 		Pattern pattern = Pattern.compile("(id|selected|createdOn|createdBy|archived|updatedOn|version|updatedBy|language)", Pattern.CASE_INSENSITIVE);
 		boolean first = true;
 		
@@ -416,36 +418,12 @@ public class MetaService {
 		return sb.toString();
 	}
 	
-	private String prepareQuery(String query) {
-		String result = query.replaceAll("\\n", " ").replaceAll("\\s+", " ").trim();
-		Pattern pattern = Pattern.compile("^(SELECT) (.*?) (FROM .*)");
-		Matcher matcher = pattern.matcher(result);
+	public Response getChart(final String name, final Request request) {
 		
-		if (!matcher.matches()) {
-			return result;
-		}
-		
-		String selection = matcher.group(2);
-		if (selection.startsWith("new ")) {
-			return result;
-		}
-		
-		result = matcher.replaceFirst("$1 new map($2) $3");
-
-		return result;
-	}
-	
-	public Response getChart(String name, Request request) {
-
 		final Response response = new Response();
 		final MetaChart chart = MetaChart.all().filter("self.name = ?", name).fetchOne();
 		
 		if (chart == null || chart.getChartSeries() == null) {
-			return response;
-		}
-
-		if (chart.getNativeQuery() == Boolean.TRUE) {
-			//TODO: handle native query
 			return response;
 		}
 
@@ -456,15 +434,37 @@ public class MetaService {
 		
 		data.put("xAxis", chart.getCategoryKey());
 		data.put("xType", chart.getCategoryType());
-
-		final String string = prepareQuery(chart.getQuery());
 		
 		JPA.runInTransaction(new Runnable() {
 
 			@Override
 			public void run() {
-				List<?> records = JPA.em().createQuery(string).getResultList();
-				data.put("data", records);
+				
+				String string = chart.getQuery();
+				Query query = chart.getNativeQuery() == Boolean.TRUE ?
+						JPA.em().createNativeQuery(string) :
+						JPA.em().createQuery(string);
+
+				// return result as list of map
+				((org.hibernate.ejb.QueryImpl<?>) query).getHibernateQuery()
+					.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+
+				Map<String, Object> context = Maps.newHashMap();
+				if (request.getData() != null) {
+					context.putAll(request.getData());
+				}
+				if (AuthUtils.getUser() != null) {
+					context.put("__user__", AuthUtils.getUser());
+					context.put("__userId__", AuthUtils.getUser().getId());
+					context.put("__userCode__", AuthUtils.getSubject());
+				}
+
+				if (request.getData() != null) {
+					QueryBinder binder = new QueryBinder(query);
+					binder.bind(context, null);
+				}
+
+				data.put("data", query.getResultList());
 			}
 		});
 
