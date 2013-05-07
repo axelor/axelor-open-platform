@@ -62,23 +62,61 @@ function $conv(value) {
 	return value;
 }
 
-function PieChart(scope, element, data) {
-
-	var chart_data = [];
-	
+function PlusData(scope, data, type) {
+	var result = [];
 	_.each(data.series, function(series) {
-		var key = series.key,
-			expr = series.expr;
-		
-		_.chain(data.data).each(function(item) {
-			var x = item[data.xAxis];
-			var y = expr ? $eval(scope, expr, item) : item[key];
+		if (series.type !== type) return;
+		var key = series.key;
+		var expr = series.expr;
+		_.chain(data.data).groupBy(data.xAxis).each(function(group, name) {
+			var value = 0;
+			_.each(group, function(item) {
+				value += $conv(expr ? $eval(scope, expr, item) : item[key]);
+			});
+			result.push({x: name, y: value});
+		});
+	});
+	return result;
+}
+
+function PlotData(scope, data, type) {
+	var chart_data = [];
+	var points = _.chain(data.data).pluck(data.xAxis).unique().value();
+	_.each(data.series, function(series) {
+		if (series.type !== type) return;
+		var key = series.key;
+		var expr = series.expr;
+		_.chain(data.data).groupBy(key).each(function(group, name) {
+			var my = [];
+			var values = _.map(group, function(item) {
+				var x = $conv(item[data.xAxis]) || 0;
+				var y = $conv(expr ? $eval(scope, expr, item) : name);
+				my.push(x);
+				return { x: x, y: y };
+			});
+
+			var missing = _.difference(points, my);
+			if (points.length === missing.length) return;
+
+			_.each(missing, function(x) {
+				values.push({ x: x, y: 0 });
+			});
+
+			values = _.sortBy(values, "x");
+
 			chart_data.push({
-				x: $conv(x),
-				y: $conv(y)
+				key: name,
+				type: type,
+				values: values
 			});
 		});
 	});
+	return chart_data;
+}
+
+function PieChart(scope, element, data) {
+
+	var chart_data = PlusData(scope, data, "pie");
 
 	var chart = nv.models.pieChart()
 		.showLabels(false)
@@ -88,44 +126,46 @@ function PieChart(scope, element, data) {
 	    .color(d3.scale.category10().range());
 	
 	d3.select(element[0])
-		.datum([chart_data])
-	    .transition().duration(1200).call(chart);
-	
+	  .datum([chart_data])
+	  .transition().duration(1200).call(chart);
+
 	return chart;
 }
 
 function BarChart(scope, element, data) {
 	
-	var chart_data = [];
-	
-	_.each(data.series, function(series) {
-		var key = series.key,
-			type = series.type,
-			expr = series.expr;
-
-		_.chain(data.data).groupBy(key).each(function(group, name) {
-			var values = _.map(group, function(item) {
-				var x = item[data.xAxis] || 0;
-				var y = expr ? $eval(scope, expr, item) : name;
-				return {
-					x: $conv(x),
-					y: $conv(y)
-				};
-			});
-			chart_data.push({
-				key: name,
-				type: type,
-				values: values
-			});
-		});
-	});
-	
+	var chart_data = PlotData(scope, data, "bar");
 	var chart = nv.models.multiBarChart()
-		.showControls(false)
 		.reduceXTicks(false)
 		.barColor(d3.scale.category20().range());
-	
+
 	chart.multibar.hideable(true);
+
+	d3.select(element[0])
+	  .datum(chart_data)
+	  .transition().duration(500).call(chart);
+	
+	return chart;
+}
+
+function LineChart(scope, element, data) {
+
+	var chart_data = PlotData(scope, data, "line");
+	var chart = nv.models.lineChart()
+		.color(d3.scale.category10().range());
+
+	d3.select(element[0])
+	  .datum(chart_data)
+	  .transition().duration(500).call(chart);
+	
+	return chart;
+}
+
+function AreaChart(scope, element, data) {
+
+	var chart_data = PlotData(scope, data, "area");
+	var chart = nv.models.stackedAreaChart()
+		.color(d3.scale.category10().range());
 
 	d3.select(element[0])
 	  .datum(chart_data)
@@ -144,12 +184,16 @@ function Chart(scope, element, data) {
 			break;
 		}
 	}
+
+	if (type === "pie" && data.series.length > 1) {
+		return;
+	}
 	
 	if (data.series.length > 1) {
 		type = "multi";
 	}
 
-	return nv.addGraph(function() {
+	nv.addGraph(function generate() {
 
 		var chart = null;
 
@@ -158,6 +202,12 @@ function Chart(scope, element, data) {
 		}
 		if (type === "bar") {
 			chart = BarChart(scope, element, data);
+		}
+		if (type === "line") {
+			chart = LineChart(scope, element, data);
+		}
+		if (type === "area") {
+			chart = AreaChart(scope, element, data);
 		}
 
 		if (chart == null) {
