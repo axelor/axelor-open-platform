@@ -62,6 +62,8 @@ function $conv(value) {
 	return value;
 }
 
+var REGISTRY = {};
+
 function PlusData(scope, data, type) {
 	var result = [];
 	_.each(data.series, function(series) {
@@ -114,10 +116,11 @@ function PlotData(scope, data, type) {
 	return chart_data;
 }
 
+REGISTRY["pie"] = PieChart;
 function PieChart(scope, element, data) {
 
 	var chart_data = PlusData(scope, data, "pie");
-
+	
 	var chart = nv.models.pieChart()
 		.showLabels(false)
 		.x(function(d) { return d.x; })
@@ -132,6 +135,7 @@ function PieChart(scope, element, data) {
 	return chart;
 }
 
+REGISTRY["bar"] = BarChart;
 function BarChart(scope, element, data) {
 	
 	var chart_data = PlotData(scope, data, "bar");
@@ -140,6 +144,7 @@ function BarChart(scope, element, data) {
 		.color(d3.scale.category10().range());
 
 	chart.multibar.hideable(true);
+	chart.stacked(data.stacked);
 
 	d3.select(element[0])
 	  .datum(chart_data)
@@ -148,12 +153,15 @@ function BarChart(scope, element, data) {
 	return chart;
 }
 
+REGISTRY["hbar"] = HBarChart;
 function HBarChart(scope, element, data) {
 	
 	var chart_data = PlotData(scope, data, "hbar");
 	var chart = nv.models.multiBarHorizontalChart()
 		.color(d3.scale.category10().range());
 
+	chart.stacked(data.stacked);
+
 	d3.select(element[0])
 	  .datum(chart_data)
 	  .transition().duration(500).call(chart);
@@ -161,6 +169,7 @@ function HBarChart(scope, element, data) {
 	return chart;
 }
 
+REGISTRY["line"] = LineChart;
 function LineChart(scope, element, data) {
 
 	var chart_data = PlotData(scope, data, "line");
@@ -174,16 +183,19 @@ function LineChart(scope, element, data) {
 	return chart;
 }
 
+REGISTRY["area"] = AreaChart;
 function AreaChart(scope, element, data) {
 
 	var chart_data = PlotData(scope, data, "area");
 	var chart = nv.models.stackedAreaChart()
-		.color(d3.scale.category10().range());
+				  .color(d3.scale.category10().range());
+
+	chart.stacked(data.stacked);
 
 	d3.select(element[0])
 	  .datum(chart_data)
 	  .transition().duration(500).call(chart);
-	
+
 	return chart;
 }
 
@@ -206,27 +218,12 @@ function Chart(scope, element, data) {
 		type = "multi";
 	}
 
+	element.off('adjustSize').empty();
+
 	nv.addGraph(function generate() {
-
-		var chart = null;
 		
-		element.off('adjustSize').empty();
-
-		if (type === "pie") {
-			chart = PieChart(scope, element, data);
-		}
-		if (type === "bar") {
-			chart = BarChart(scope, element, data);
-		}
-		if (type === "hbar") {
-			chart = HBarChart(scope, element, data);
-		}
-		if (type === "line") {
-			chart = LineChart(scope, element, data);
-		}
-		if (type === "area") {
-			chart = AreaChart(scope, element, data);
-		}
+		var maker = REGISTRY[type] || REGISTRY["bar"];
+		var chart = maker(scope, element, data);
 
 		if (chart == null) {
 			return;
@@ -273,7 +270,7 @@ function Chart(scope, element, data) {
 		}
 
 		element.on('adjustSize', _.debounce(adjust, 100));
-		setTimeout(chart.update);
+		setTimeout(chart.update, 10);
 
 		return chart;
 	});
