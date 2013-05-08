@@ -40,24 +40,18 @@ function CalendarViewCtrl($scope, $element) {
 		return field && field.type === "datetime";
 	};
 
-	var tango = new Array(
-		["#fce94f", "#edd400", "#c4a000"],
-		["#fcaf3e", "#f57900", "#ce5c00"],
-		["#e9b96e", "#c17d11", "#8f5902"],
-		["#8ae234", "#73d216", "#4e9a06"],
-		["#729fcf", "#3465a4", "#204a87"],
-		["#ad7fa8", "#75507b", "#5c3566"],
-		["#ef2929", "#cc0000", "#a40000"]).reverse();
+	var d3_colors = d3.scale.category10().range().concat(
+				    d3.scale.category20().range());
 
 	function nextColor(n) {
-		if (n === undefined || n < 0 || n > 6) {
-			n = _.random(0, 6);
+		if (n === undefined || n < 0 || n >= d3_colors.length) {
+			n = _.random(0, d3_colors.length);
 		}
-		var c = tango[n];
+		var c = d3.rgb(d3_colors[n]);
 		return {
-			bg: c[0],
-			fg: c[2],
-			bc: c[1]
+			bg: "" + c,
+			fg: "" + c.brighter(1),
+			bc: "" + c.darker(.9)
 		};
 	};
 	
@@ -95,30 +89,40 @@ function CalendarViewCtrl($scope, $element) {
 		};
 
 		ds.search(opts).success(function(records) {
-			var colorBy = view.color;
-			var colorField = $scope.fields[colorBy];
-			if (colorField) {
-				colors = {};
-				_.each(records, function(record, i) {
-					var item = record[colorBy];
-					if (!item) {
-						return;
-					}
-					var key = $scope.getColorKey(record, item);
-					var title = colorField.targetName ? item[colorField.targetName] : item;
-					if (!colors[key]) {
-						colors[key] = {
-							item: item,
-							title: title || _t('Unknown'),
-							color: nextColor(i % 7)
-						};
-					}
-					record.$colorKey = key;
-				});
-			}
+			updateColors(records, true);
 			callback(records);
 		});
 	};
+
+	function updateColors(records, reset) {
+		var colorBy = view.color;
+		var colorField = $scope.fields[colorBy];
+
+		if (!colorField) {
+			return colors;
+		}
+		if (reset) {
+			colors = {};
+		}
+
+		_.each(records, function(record) {
+			var item = record[colorBy];
+			if (!item) {
+				return;
+			}
+			var key = $scope.getColorKey(record, item);
+			var title = colorField.targetName ? item[colorField.targetName] : item;
+			if (!colors[key]) {
+				colors[key] = {
+					item: item,
+					title: title || _t('Unknown'),
+					color: nextColor(_.size(colors))
+				};
+			}
+			record.$colorKey = key;
+		});
+		return colors;
+	}
 	
 	$scope.getColors = function() {
 		return colors;
@@ -126,7 +130,10 @@ function CalendarViewCtrl($scope, $element) {
 	
 	$scope.getColor = function(record) {
 		var key = this.getColorKey(record);
-		if (key) {
+		if (key && !colors[key]) {
+			updateColors([record], false);
+		}
+		if (colors[key]) {
 			return colors[key].color;
 		}
 		return nextColor(0);
