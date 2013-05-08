@@ -52,15 +52,8 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			return state[name];
 		};
 		
-		function resetState() {
-			state = _.clone(props);
-		}
-
-		scope.$on("on:new", function(){
-			resetState();
-		});
 		scope.$on("on:edit", function(){
-			resetState();
+			state = _.clone(props);
 		});
 
 		scope.isRequired = function() {
@@ -107,10 +100,11 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		
 		var handleConditional = function(attr, conditional){
 			if (!field[conditional]) return;
-			scope.$moment = moment;						// moment.js helper
-			scope.$number = function(d) {return +d;};	// number helper
+			var root = scope.$root || scope;
+			root.$moment = function(d) { return moment(d); };	// moment.js helper
+			root.$number = function(d) { return +d; };			// number helper
 			scope.$on("on:record-change", function(e, rec) {
-				var value = scope.$eval(field[conditional], rec);
+				var value = root.$eval(field[conditional], rec);
 				scope.attr(attr, value);
 			});
 		};
