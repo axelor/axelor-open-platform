@@ -9,7 +9,6 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
-import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaSelect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -227,7 +226,7 @@ public class Field extends SimpleWidget {
 	}
 	
 	public List<AbstractView> getViews() {
-		if(views != null) {
+		if(views != null && this.getTarget() != null) {
 			for (AbstractView abstractView : views) {
 				abstractView.setModel(this.getTarget());
 			}
@@ -306,12 +305,13 @@ public class Field extends SimpleWidget {
 	private String getTarget() {
 		Mapper mapper = null;
 		try {
-			mapper = Mapper.of(Class.forName((super.getModel())));
+			mapper = Mapper.of(Class.forName(this.getModel()));
+			return mapper.getProperty(getName()).getTarget().getName();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 			return null;
+		} catch (NullPointerException e) {
 		}
-		Property prop = mapper.getProperty(getName());
-		return prop.getTarget().getName();
+		return null;
 	}
 }
