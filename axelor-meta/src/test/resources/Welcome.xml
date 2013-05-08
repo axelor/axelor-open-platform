@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<object-views xmlns="http://apps.axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_1.0.xsd">
-    <portal title="Welcome!">
-        <portlet title="All Contact">
-            <resource>com.axelor.contact.db.Contact</resource>
-        </portlet>
-        <portlet title="Business Contacts">
-            <resource>com.axelor.contact.db.Contact</resource>
-            <domain>self.group.code = 'business'</domain>
-        </portlet>
-        <portlet title="Sale Orders">
-            <resource>com.axelor.sale.db.Order</resource>
-        </portlet>
-        <portlet title="Axelor!">
-            <resource>http://www.axelor.com/</resource>
-            <view-type>html</view-type>
-        </portlet>
-    </portal>
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.9.xsd">
+  
+  <portal title="Welcome!">
+    <portlet title="All Contact" action="contact.all"/>
+    <portlet title="Business Contacts" action="contacts.business"/>
+    <portlet title="Sale Orders" action="sale.orders"/>
+    <portlet title="Axelor!" action="axelor.web.url"/>
+  </portal>
+
 </object-views>
