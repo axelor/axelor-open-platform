@@ -465,8 +465,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 					main.fullCalendar('renderEvent', updateEvent(event, result));
 				}
 			});
-			
-			if (record == null) {
+			if (record == null || !record.id) {
 				popup.$broadcast("on:new");
 			}
 		};
