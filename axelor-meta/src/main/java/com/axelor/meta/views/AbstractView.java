@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 	@Type(GridView.class),
 	@Type(FormView.class),
 	@Type(TreeView.class),
+	@Type(ChartView.class),
 	@Type(CalendarView.class),
 	@Type(Portal.class),
 	@Type(Search.class)

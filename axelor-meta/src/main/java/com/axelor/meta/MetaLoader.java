@@ -35,6 +35,8 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaActionMenu;
+import com.axelor.meta.db.MetaChart;
+import com.axelor.meta.db.MetaChartSeries;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaTranslation;
@@ -45,6 +47,7 @@ import com.axelor.meta.views.AbstractView;
 import com.axelor.meta.views.AbstractWidget;
 import com.axelor.meta.views.Action;
 import com.axelor.meta.views.ActionMenuItem;
+import com.axelor.meta.views.ChartView;
 import com.axelor.meta.views.Field;
 import com.axelor.meta.views.FormView;
 import com.axelor.meta.views.GridView;
@@ -129,6 +132,26 @@ public class MetaLoader {
 		return scanner.files;
 	}
 	
+	private String stripWhiteSpaces(String text) {
+		String string = text.replaceAll("\\t", "    ");
+		StringBuilder builder = new StringBuilder();
+		int leading = 0;
+		for(String line : string.split("\\n")) {
+			if (line.trim().length() == 0) continue;
+			int n = 0;
+			while(n++ < line.length()) {
+				if (!Character.isWhitespace(line.charAt(n))) break;
+			}
+			if (leading == 0 || n < leading) {
+				leading = n;
+			}
+			if (n >= leading) {
+				builder.append(line.substring(leading)).append("\n");
+			}
+		}
+		return builder.toString();
+	}
+
 	private String strip(String xml) {
 		String[] lines = xml.split("\n");
 		StringBuilder sb = new StringBuilder();
@@ -212,9 +235,16 @@ public class MetaLoader {
 		if (Strings.isNullOrEmpty(model))
 			model = findName(filePath);
 		
-		if (type.matches("portal|search"))
+		if (type.matches("chart|portal|search"))
 			model = null;
 
+		// import charts
+		if (view instanceof ChartView) {
+			loadChart((ChartView) view, xml);
+			return;
+		}
+
+		// import other views
 		MetaView entity = new MetaView();
 		entity.setName(view.getName());
 		entity.setTitle(view.getTitle());
@@ -223,6 +253,37 @@ public class MetaLoader {
 		entity.setXml(xml);
 
 		entity = entity.save();
+	}
+	
+	private void loadChart(ChartView view, String xml) {
+		String name = view.getName();
+		if (MetaChart.all().filter("self.name = ?1", name).count() > 0) {
+			return;
+		}
+
+		MetaChart chart = new MetaChart();
+		
+		chart.setName(view.getName());
+		chart.setTitle(view.getTitle());
+		chart.setStacked(view.getStacked());
+		chart.setNativeQuery(view.getQuery().getNativeQuery());
+		
+		String query = stripWhiteSpaces(view.getQuery().getText());
+		chart.setQuery(query);
+		
+		chart.setCategoryKey(view.getCategoryKey());
+		chart.setCategoryType(view.getCategoryType());
+
+		for(ChartView.ChartSeries series : view.getSeries()) {
+			MetaChartSeries item = new MetaChartSeries();
+			item.setKey(series.getKey());
+			item.setExpr(series.getExpr());
+			item.setType(series.getType());
+			item.setSide(series.getSide());
+			chart.addChartSeries(item);
+		}
+
+		chart.save();
 	}
 
 	private void loadSelection(Selection selection) {
