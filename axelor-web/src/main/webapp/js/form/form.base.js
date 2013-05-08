@@ -286,14 +286,11 @@ var FormInput = {
 			var onChange = this.$events.onChange;
 
 			model.$setViewValue(val);
-			scope.text = txt;
+			this.text = txt;
 
-			setTimeout(function(){
-				model.$render();
-			});
-
+			model.$render();
 			if (onChange && fireOnChange) {
-				setTimeout(onChange);
+				onChange();
 			}
 		};
 
