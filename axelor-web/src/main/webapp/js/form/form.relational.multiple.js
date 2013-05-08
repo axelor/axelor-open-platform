@@ -118,7 +118,9 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		}
 
 		$scope.setValue(records, true);
-		$scope.$apply();
+		setTimeout(function(){
+			$scope.$apply();
+		});
 	};
 	
 	$scope.onEdit = function() {
@@ -302,7 +304,7 @@ ui.formInput('OneToMany', {
 		
 		if (this.collapseIfEmpty) {
 			scope.$watch(attrs.ngModel, function(value){
-				var minHeight = _.isEmpty(value) ? '' : 230;
+				var minHeight = _.isEmpty(value) ? 54 : 250;
 				element.css('min-height', minHeight);
 				if (minHeight) {
 					$.event.trigger('adjustSize');
@@ -405,7 +407,7 @@ ui.formInput('OneToMany', {
 	
 	template_editable: null,
 	
-	template_readomly: null,
+	template_readonly: null,
 	
 	template:
 	'<div class="stackbar">'+
@@ -520,7 +522,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 	
 	template_editable: null,
 	
-	template_readomly: null,
+	template_readonly: null,
 	
 	template:
 	'<span class="picker-input picker-icons-2" style="position: absolute;">'+
