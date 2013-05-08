@@ -71,7 +71,7 @@
 
   <menuitem name="menu-view-charts" parent="menu-view-management"
     title="All Charts"
-    action="meta.chart"/>
+    action="meta.charts"/>
     
   <action-view name="meta.charts" title="All Charts" model="com.axelor.meta.db.MetaChart">
     <view type="grid" name="meta-chart-grid"/>
