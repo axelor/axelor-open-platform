@@ -147,6 +147,10 @@ var Editor = function(args) {
 	};
 	
 	this.isValueChanged = function() {
+		
+		// force change event on spinner widget
+		element.find('.ui-spinner-input').trigger('spinchange');
+
 		var record = scope.record || {},
 			current = args.item || { id: 0 };
 		
