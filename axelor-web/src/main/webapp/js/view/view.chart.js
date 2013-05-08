@@ -26,17 +26,28 @@ function ChartCtrl($scope, $element, $http) {
 	var views = $scope._views;
 	var view = $scope.view = views['chart'];
 	
+	var loading = false;
+
 	function refresh() {
 		
+		if (loading || $element.is(":hidden")) {
+			return;
+		}
+
 		var context = $scope._context || {};
 		if ($scope.getContext) {
 			context = $scope.getContext();
+			if (!context.id) {
+				return;
+			}
 		}
+		loading = true;
 		return $http.post('ws/meta/chart/' + view.name, {
 			data: context
 		}).then(function(response) {
 			var res = response.data;
 			$scope.render(res.data);
+			loading = false;
 		});
 	}
 	
@@ -285,10 +296,28 @@ var directiveFn = function(){
 	return {
 		controller: ChartCtrl,
 		link: function(scope, element, attrs) {
-			var elem = element.children('svg');
+			
+			var elem = element.children('svg'),
+				initialized = false;
+
 			scope.render = function(data) {
+				if (elem.is(":hidden")) {
+					return initialized = false;
+				}
 				Chart(scope, elem, data);
+				return initialized = true;
 			};
+
+			element.on("adjustSize", function(e){
+				if (!initialized) scope.onRefresh();
+			});
+			
+			scope.$on("on:new", function(e) {
+				scope.onRefresh();
+			});
+			scope.$on("on:edit", function(e) {
+				scope.onRefresh();
+			});
 		},
 		replace: true,
 		template:
