@@ -256,6 +256,12 @@ ui.formInput('Integer', {
 			}
 			return value;
 		};
+		
+		scope.parse = function(value) {
+			if (isDecimal) return value;
+			if (value && _.isString(value)) return +value;
+			return value;
+		};
 	},
 	
 	link_editable: function(scope, element, attrs, model) {
@@ -263,12 +269,13 @@ ui.formInput('Integer', {
 		var props = scope.field;
 		
 		var options = {
-			step: 1,
-			spin: onSpin,
-			change: function( event, ui ) {
-				updateModel(element.val(), true);
-			}
+			step: 1
 		};
+
+		element.on("spin", onSpin);
+		element.on("spinchange", function(e) {
+			updateModel(element.val(), true);
+		});
 		
 		function updateModel(value, handle) {
 			var onChange = scope.$events.onChange;
@@ -277,10 +284,12 @@ ui.formInput('Integer', {
 				return;
             }
 
-			value = scope.format(value);
-			
-			element.val(value);
-			scope.setValue(value);
+			var text = scope.format(value);
+			var val = scope.parse(value);
+
+			element.val(text);
+			scope.setValue(val);
+
 			setTimeout(function(){
 				scope.$apply();
 			});
