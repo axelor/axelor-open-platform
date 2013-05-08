@@ -51,7 +51,7 @@ function ChartCtrl($scope, $element, $http) {
 		});
 	}
 	
-	refresh();
+	setTimeout(refresh);
 	
 	$scope.onRefresh = function() {
 		refresh();
