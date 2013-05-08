@@ -531,6 +531,10 @@ public abstract class Action {
 		public String getType() {
 			return type;
 		}
+		
+		public void setType(String type) {
+			this.type = type;
+		}
 	}
 	
 	@XmlType(name = "ActContext")
