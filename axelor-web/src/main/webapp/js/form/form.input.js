@@ -978,17 +978,18 @@ ui.formInput('Image', {
 	link_readonly: function(scope, element, attrs, model) {
 
 		var BLANK = this.BLANK;
-
+		var image = element.children('img:first');
+		
 		scope.$render_readonly = function() {
 			var content = model.$viewValue || null;
 			if (content == null) {
-				element.get(0).src = BLANK;
+				image.get(0).src = BLANK;
 			}
-			element.get(0).src = content;
+			image.get(0).src = content;
 		};
 	},
 	template_editable:
-	'<div>' +
+	'<div style="min-width: 140px;">' +
 		'<input type="file" accept="image/*">' +
 		'<img class="img-polaroid" style="width: 140px; height: 140px;">' +
 		'<div class="btn-group">' +
@@ -998,7 +999,10 @@ ui.formInput('Image', {
 		'</div>' +
 	'</div>',
 	
-	template_readonly: '<img class="img-polaroid" style="width: 140px; height: 140px;">'
+	template_readonly:
+	'<div style="min-width: 140px;">'+
+		'<img class="img-polaroid" style="width: 140px; height: 140px;">'+
+	'</div>'
 });
 
 ui.formInput('Binary', {
