@@ -24,6 +24,7 @@ public class ObjectViews {
 		@XmlElement(name = "form", type = FormView.class),
 		@XmlElement(name = "grid", type = GridView.class),
 		@XmlElement(name = "tree", type = TreeView.class),
+		@XmlElement(name = "chart", type = ChartView.class),
 		@XmlElement(name = "portal", type = Portal.class),
 		@XmlElement(name = "search", type = Search.class),
 		@XmlElement(name = "calendar", type = CalendarView.class)

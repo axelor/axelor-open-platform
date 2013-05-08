@@ -10,6 +10,7 @@
         <xsd:element name="grid" type="tns:GridView" />
         <xsd:element name="tree" type="tns:TreeView" />
         <xsd:element name="calendar" type="tns:CalendarView" />
+        <xsd:element name="chart" type="tns:ChartView" />
         <xsd:element name="portal" type="tns:Portal" />
         <xsd:element name="search" type="tns:Search" />
         <xsd:element name="menuitem" type="tns:MenuItem" />
@@ -631,6 +632,81 @@
             Whether to enable search header on grid view portlet.
             </xsd:documentation>
           </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  
+  <xsd:complexType name="ChartView">
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractView">
+        <xsd:sequence>
+          <xsd:element name="query">
+            <xsd:annotation>
+              <xsd:documentation>
+              Specify the JPQL or SQL query to get the chart data.
+              The select names should be assgined aliases.
+              </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+              <xsd:simpleContent>
+                <xsd:extension base="xsd:string">
+                  <xsd:attribute name="native" type="xsd:boolean">
+                    <xsd:annotation>
+                      <xsd:documentation>
+                      If the query is native SQL select query.
+                      </xsd:documentation>
+                    </xsd:annotation>
+                  </xsd:attribute>
+                </xsd:extension>
+              </xsd:simpleContent>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="series" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>
+              A chart data series. You must provide either `key` or `expr` or both.
+              </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+              <xsd:attribute name="key" type="xsd:string"/>
+              <xsd:attribute name="expr" type="xsd:string"/>
+              <xsd:attribute name="type">
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="pie"/>
+                    <xsd:enumeration value="bar"/>
+                    <xsd:enumeration value="hbar"/>
+                    <xsd:enumeration value="line"/>
+                    <xsd:enumeration value="area"/>
+                    <xsd:enumeration value="scatter"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:attribute>
+              <xsd:attribute name="side">
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="left"/>
+                    <xsd:enumeration value="right"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:attribute>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="stacked" type="xsd:boolean"/>
+        <xsd:attribute name="categoryKey" type="xsd:string" use="required"/>
+        <xsd:attribute name="categoryType">
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:enumeration value="number"/>
+              <xsd:enumeration value="decimal"/>
+              <xsd:enumeration value="date"/>
+              <xsd:enumeration value="time"/>
+              <xsd:enumeration value="month"/>
+              <xsd:enumeration value="year"/>
+            </xsd:restriction>
+          </xsd:simpleType>
         </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
