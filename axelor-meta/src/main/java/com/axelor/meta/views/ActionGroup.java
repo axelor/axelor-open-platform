@@ -51,24 +51,35 @@ public class ActionGroup extends Action {
 	}
 	
 	private Action findAction(String name) {
-		
-		if (name == null || "".equals(name.trim()))
+
+		if (name == null || "".equals(name.trim())) {
 			return null;
+		}
 
-		name = name.trim();
-		if (name.contains(":")) {
+		String actionName = name.trim();
+
+		if (actionName.contains(":")) {
+
+			Action action;
 			String[] parts = name.split("\\:");
-			Action.Call method = new Action.Call();
-			ActionMethod action = new ActionMethod();
-			
-			method.setController(parts[0]);
-			method.setMethod(parts[1]);
-			action.setElements(ImmutableList.of(method));
 
+			if (parts[0].matches("grid|form|tree|portal|calendar|chart")) {
+				Action.View view = new Action.View();
+				view.setType(parts[0]);
+				view.setName(parts[1]);
+				action = new ActionView();
+				action.setElements(ImmutableList.of(view));
+			} else {
+				Action.Call method = new Action.Call();
+				method.setController(parts[0]);
+				method.setMethod(parts[1]);
+				action = new ActionMethod();
+				action.setElements(ImmutableList.of(method));
+			}
 			return action;
 		}
 
-		return MetaStore.getAction(name);
+		return MetaStore.getAction(actionName);
 	}
 
 	@Override
