@@ -930,7 +930,7 @@ ui.formInput('RadioSelect', {
 	template_editable: null,
 	template_readonly: null,
 	template:
-	'<ul>'+
+	'<ul ng-class="{ readonly: isReadonly() }">'+
 		'<li ng-repeat="select in selection">'+
 		'<label>'+
 			'<input type="radio" name="radio_{{$parent.$id}}" value="{{select.value}}"'+
@@ -939,6 +939,38 @@ ui.formInput('RadioSelect', {
 		'</label>'+
 		'</li>'+
 	'</ul>'
+});
+
+ui.formInput('NavSelect', {
+	
+	css: "nav-select",
+	
+	link: function(scope, element, attrs, model) {
+		
+		var field = scope.field,
+			selection = [];
+	
+		if (_.isArray(field.selection)) {
+			selection = field.selection;
+		}
+		scope.selection = selection;
+		
+		scope.onSelect = function(select) {
+			this.setValue(select.value, true);
+		};
+
+	},
+	template_editable: null,
+	template_readonly: null,
+	template:
+	'<div class="nav-select">'+
+	'<ul class="steps">'+
+		'<li ng-repeat="select in selection" ng-class="{ active: getValue() == select.value }">'+
+			'<a href="" ng-click="onSelect(select)">{{select.title}}</a>'+
+		'</li>'+
+		'<li></li>'+
+	'</ul>'+
+	'</div>'
 });
 
 ui.formInput('Image', {

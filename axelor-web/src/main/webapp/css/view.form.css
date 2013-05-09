@@ -430,6 +430,10 @@ table.form-layout td.form-item .ui-spinner input {
 	margin-top: -2px;
 }
 
+.form-item ul.radio-select.readonly > li label {
+	cursor: default;
+}
+
 table.field-details {
 	width: 100%;
 }
@@ -477,4 +481,91 @@ table.field-details .help-text hr {
 	border-top: 1px solid #ccc;
 	font-size: 16px;
 	font-weight: bold;
+}
+
+.nav-select {
+	overflow: hidden;
+}
+
+.nav-select ul {
+	list-style: none;
+	white-space: nowrap;
+	overflow: hidden;
+	display: inline-block;
+	padding-right: 35px;
+}
+
+.nav-select li {
+	float: left;
+	white-space: nowrap;
+}
+
+.nav-select li a {
+	text-decoration: none;
+	padding: 10px 0 10px 55px;
+	background: #f2f2f2;
+	position: relative;
+	display: block;
+	float: left;
+}
+
+.nav-select li a:after,
+.nav-select li a:before {
+	content: " ";
+	display: block;
+	position: absolute;
+	width: 0;
+	height: 0;
+	margin-top: -50px;
+	left: 100%;
+	top: 50%;
+	border-top: 50px solid transparent;
+	border-bottom: 50px solid transparent;
+}
+
+.nav-select li a:after {
+	border-left: 30px solid #f2f2f2;
+	z-index: 2;
+}
+
+.nav-select li a:before {
+	border-left: 30px solid white;
+	margin-left: 2px;
+	z-index: 1;
+}
+
+.nav-select li:first-child a {
+	padding-left: 20px;
+}
+
+.nav-select li:last-child a {
+	background: white !important;
+	color: black;
+	pointer-events: none;
+	cursor: default;
+}
+
+.nav-select li:last-child a:after {
+	border: 0;
+}
+
+.nav-select li a:hover {
+	background: #d4d4d4;
+	transition: background-color 0.3s;
+}
+
+.nav-select li a:hover:after {
+	border-left-color: #d4d4d4 !important;
+	transition: border-left-color 0.3s;
+}
+
+.nav-select li.active a {
+	color: white;
+	background: #0088cc;
+	transition: background-color 0.3s;
+}
+
+.nav-select li.active a:after {
+	border-left-color: #0088cc !important;
+	transition: border-left-color 0.3s;
 }
