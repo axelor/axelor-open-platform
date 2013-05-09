@@ -908,6 +908,39 @@ ui.formInput('SelectQuery', {
 	'</span>'
 });
 
+ui.formInput('RadioSelect', {
+	
+	css: "radio-select",
+	
+	link: function(scope, element, attrs, model) {
+		
+		var field = scope.field,
+			selection = [];
+	
+		if (_.isArray(field.selection)) {
+			selection = field.selection;
+		}
+		scope.selection = selection;
+
+		element.on("change", ":input", function(e) {
+			scope.setValue($(e.target).val(), true);
+			scope.$apply();
+		});
+	},
+	template_editable: null,
+	template_readonly: null,
+	template:
+	'<ul>'+
+		'<li ng-repeat="select in selection">'+
+		'<label>'+
+			'<input type="radio" name="radio_{{$parent.$id}}" value="{{select.value}}"'+
+			' ng-disabled="isReadonly()"'+
+			' ng-checked="getValue() == select.value"> {{select.title}}'+
+		'</label>'+
+		'</li>'+
+	'</ul>'
+});
+
 ui.formInput('Image', {
 	
 	css: 'image-item',
