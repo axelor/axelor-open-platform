@@ -493,10 +493,11 @@ table.field-details .help-text hr {
 	overflow: hidden;
 	display: inline-block;
 	padding-right: 35px;
+	height: 38px;
 }
 
 .nav-select li {
-	float: left;
+	display: inline-block;
 	white-space: nowrap;
 }
 
@@ -521,6 +522,7 @@ table.field-details .help-text hr {
 	top: 50%;
 	border-top: 50px solid transparent;
 	border-bottom: 50px solid transparent;
+	-moz-transform: scale(.9999);
 }
 
 .nav-select li a:after {
