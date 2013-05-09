@@ -98,6 +98,12 @@ table.form-layout td.form-item input {
 	height: 24px;
 }
 
+table.form-layout td.form-item .small-input input,
+table.form-layout td.form-item input.small-input {
+	min-width: 50px;
+	height: 24px;
+}
+
 table.form-layout td.form-item input[type="radio"],
 table.form-layout td.form-item input[type="checkbox"] {
 	width: auto;
