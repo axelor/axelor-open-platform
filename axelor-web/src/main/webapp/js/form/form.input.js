@@ -209,6 +209,18 @@ ui.formInput('String', {
  */
 ui.formInput('Email', {
 	css: 'email-item',
+	
+	init: function(scope, element, attrs, model) {
+
+		scope.validate = function(value) {
+			if(_.isEmpty(value))
+				return true;
+			
+			var reg = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+			return reg.test(value);
+		};
+	},
+	
 	template_editable: '<input type="email">',
 	template_readonly: '<a target="_blank" href="mailto:{{text}}">{{text}}</a>'
 });
