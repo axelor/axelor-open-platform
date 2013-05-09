@@ -65,6 +65,14 @@ ui.directive('uiHelpPopover', function() {
 		if (value && field.type === "password") {
 			value = _.str.repeat('*', value.length);
 		}
+		if (value && field.type === "string") {
+			var length = value.length;
+			value = _.first(value, 50);
+			if (length > 50) {
+				value.push('...');
+			}
+			value = value.join('');
+		}
 		if (value && /-many$/.test(field.type)) {
 			var length = value.length;
 			value = _.first(value, 5);
@@ -97,6 +105,15 @@ ui.directive('uiHelpPopover', function() {
 			html: true,
 			delay: { show: 1000, hide: 100 },
 			animate: true,
+			placement: function() {
+				var coord = $(element.get(0)).offset(),
+					viewport = {height: innerHeight, width: window.innerWidth};
+				if(viewport.height < (coord.top + 100))
+					return 'top';
+				if(coord.left > (viewport.width / 2))
+					return 'left';
+				return 'right';
+			},
 			trigger: 'hover',
 			title: function() {
 				return element.text();

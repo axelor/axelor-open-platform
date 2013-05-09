@@ -455,7 +455,7 @@ table.field-details .help-text hr {
 .popover-inner {
 	width: inherit;
 	min-width: 280px;
-	max-width: 360px;
+	max-width: 500px;
 	display: table;
 	overflow: hidden;
 }
