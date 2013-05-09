@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<object-views xmlns="http://apps.axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.9.xsd">
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.9.xsd">
+    
     <grid name="user-grid" title="Users">
         <field name="name"/>
         <field name="code"/>
         <field name="group"/>
     </grid>
+    
     <form name="user-form" title="User" cols="2" colWidths="50%,50%">
         <group title="General Info" cols="2">
-            <field name="name"/>
+            <field name="name" validIf="name.length &gt;= 2" onChange="action-user-validData"/>
             <field name="group"/>
         </group>
         <group title="Login" cols="2">
-            <field name="code"/>
-            <field name="password" widget="password"/>
+            <field name="code" validIf="code.length &gt;= 2" onChange="action-user-validData"/>
+            <field name="password" widget="password" validIf="password.length &gt;= 4" onChange="action-user-validData"/>
         </group>
     </form>
+    
+    <action-condition name="action-user-validData">
+        <check error="Password length should be greater than 4." field="password" if="password?.length() &lt; 4"/>
+        <check error="Code length should be greater than 2." field="code" if="code?.length() &lt; 2"/>
+        <check error="Name length should be greater than 2." field="name" if="name?.length() &lt; 2"/>
+    </action-condition>
+    
 </object-views>
