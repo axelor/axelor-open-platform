@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<object-views xmlns="http://apps.axelor.com/xml/ns/object-views"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views
-  http://apps.axelor.com/xml/ns/object-views/object-views_0.9.xsd">
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.9.xsd">
 
   <grid name="group-grid" title="Groups">
     <field name="name" />
@@ -11,8 +9,8 @@
   </grid>
 
   <form name="group-form" title="User" cols="2">
-    <field name="name" />
-    <field name="code" />
+    <field name="name" validIf="name.length &gt;= 2" onChange="action-group-validData"/>
+    <field name="code" validIf="code.length &gt;= 2" onChange="action-group-validData"/>
     <field name="restricted"/>
     <field name="permissions" colSpan="2" onChange="action-validate-group-permissions">
       <grid title="Permissions">
@@ -25,5 +23,10 @@
   <action-method name="action-validate-group-permissions">
   	<call class="com.axelor.auth.web.AuthValidator" method="validateGroup"/>
   </action-method>
+  
+  <action-condition name="action-group-validData">
+  	<check error="Code length should be greater than 2." field="code" if="code?.length() &lt; 2"/>
+    <check error="Name length should be greater than 2." field="name" if="name?.length() &lt; 2"/>
+  </action-condition>
 
 </object-views>
