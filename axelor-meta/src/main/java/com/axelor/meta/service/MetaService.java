@@ -434,6 +434,7 @@ public class MetaService {
 		
 		data.put("xAxis", chart.getCategoryKey());
 		data.put("xType", chart.getCategoryType());
+		data.put("xTitle", chart.getCategoryTitle());
 		
 		JPA.runInTransaction(new Runnable() {
 
@@ -441,7 +442,7 @@ public class MetaService {
 			public void run() {
 				
 				String string = chart.getQuery();
-				Query query = chart.getNativeQuery() == Boolean.TRUE ?
+				Query query = "sql".equals(chart.getQueryType()) ?
 						JPA.em().createNativeQuery(string) :
 						JPA.em().createQuery(string);
 
@@ -464,7 +465,7 @@ public class MetaService {
 					binder.bind(context, null);
 				}
 
-				data.put("data", query.getResultList());
+				data.put("dataset", query.getResultList());
 			}
 		});
 
@@ -473,7 +474,9 @@ public class MetaService {
 			Map<String, Object> map = Maps.newHashMap();
 			map.put("key", s.getKey());
 			map.put("type", s.getType());
-			map.put("expr", s.getExpr());
+			map.put("groupBy", s.getGroupBy());
+			map.put("aggregate", s.getAggregate());
+			map.put("title", s.getTitle());
 			series.add(map);
 		}
 		data.put("series", series);

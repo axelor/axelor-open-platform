@@ -16,15 +16,12 @@ public class ChartView extends AbstractView {
 	@XmlAttribute
 	private Boolean stacked;
 
-	@XmlAttribute
-	private String categoryKey;
-	
-	@XmlAttribute
-	private String categoryType;
-	
-	@XmlElement
+	@XmlElement(name = "dataset")
 	private ChartQuery query;
 	
+	@XmlElement
+	private ChartCategory category;
+
 	@XmlElement
 	private List<ChartSeries> series;
 	
@@ -35,15 +32,11 @@ public class ChartView extends AbstractView {
 	public ChartQuery getQuery() {
 		return query;
 	}
-	
-	public String getCategoryKey() {
-		return categoryKey;
+
+	public ChartCategory getCategory() {
+		return category;
 	}
-	
-	public String getCategoryType() {
-		return categoryType;
-	}
-	
+
 	public List<ChartSeries> getSeries() {
 		return series;
 	}
@@ -51,18 +44,44 @@ public class ChartView extends AbstractView {
 	@XmlType
 	public static class ChartQuery {
 		
-		@XmlAttribute(name = "native")
-		private Boolean nativeQuery;
+		@XmlAttribute
+		private String type;
 		
 		@XmlValue
 		private String text;
 		
-		public Boolean getNativeQuery() {
-			return nativeQuery;
+		public String getType() {
+			return type;
 		}
 		
 		public String getText() {
 			return text;
+		}
+	}
+	
+	@XmlType
+	@JsonTypeName("category")
+	public static class ChartCategory {
+		
+		@XmlAttribute
+		private String key;
+		
+		@XmlAttribute
+		private String type;
+		
+		@XmlAttribute
+		private String title;
+		
+		public String getKey() {
+			return key;
+		}
+		
+		public String getType() {
+			return type;
+		}
+		
+		public String getTitle() {
+			return title;
 		}
 	}
 
@@ -74,7 +93,7 @@ public class ChartView extends AbstractView {
 		private String key;
 		
 		@XmlAttribute
-		private String expr;
+		private String groupBy;
 		
 		@XmlAttribute
 		private String type;
@@ -82,36 +101,34 @@ public class ChartView extends AbstractView {
 		@XmlAttribute
 		private String side;
 
+		@XmlAttribute
+		private String title;
+		
+		@XmlAttribute
+		private String aggregate;
+
 		public String getKey() {
 			return key;
 		}
 
-		public void setKey(String key) {
-			this.key = key;
-		}
-
-		public String getExpr() {
-			return expr;
-		}
-
-		public void setExpr(String expr) {
-			this.expr = expr;
+		public String getGroupBy() {
+			return groupBy;
 		}
 
 		public String getType() {
 			return type;
 		}
 
-		public void setType(String type) {
-			this.type = type;
-		}
-
 		public String getSide() {
 			return side;
 		}
-
-		public void setSide(String side) {
-			this.side = side;
+		
+		public String getTitle() {
+			return title;
+		}
+		
+		public String getAggregate() {
+			return aggregate;
 		}
 	}
 }

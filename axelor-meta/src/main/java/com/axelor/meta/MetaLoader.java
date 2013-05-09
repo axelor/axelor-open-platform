@@ -266,20 +266,22 @@ public class MetaLoader {
 		chart.setName(view.getName());
 		chart.setTitle(view.getTitle());
 		chart.setStacked(view.getStacked());
-		chart.setNativeQuery(view.getQuery().getNativeQuery());
 		
 		String query = stripWhiteSpaces(view.getQuery().getText());
 		chart.setQuery(query);
-		
-		chart.setCategoryKey(view.getCategoryKey());
-		chart.setCategoryType(view.getCategoryType());
+		chart.setQueryType(view.getQuery().getType());
+
+		chart.setCategoryKey(view.getCategory().getKey());
+		chart.setCategoryType(view.getCategory().getType());
+		chart.setCategoryTitle(view.getCategory().getTitle());
 
 		for(ChartView.ChartSeries series : view.getSeries()) {
 			MetaChartSeries item = new MetaChartSeries();
 			item.setKey(series.getKey());
-			item.setExpr(series.getExpr());
+			item.setGroupBy(series.getGroupBy());
 			item.setType(series.getType());
 			item.setSide(series.getSide());
+			item.setAggregate(series.getAggregate());
 			chart.addChartSeries(item);
 		}
 
