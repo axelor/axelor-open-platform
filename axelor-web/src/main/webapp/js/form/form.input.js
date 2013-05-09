@@ -226,6 +226,15 @@ ui.formInput('Email', {
 });
 
 /**
+ * The URL input widget.
+ */
+ui.formInput('Url', {
+	css: 'url-item',
+	template_editable: '<input type="url">',
+	template_readonly: '<a target="_blank" href="{{text}}">{{text}}</a>'
+});
+
+/**
  * The Phone input widget.
  */
 ui.formInput('Phone', {
