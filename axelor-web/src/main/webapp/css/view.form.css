@@ -414,6 +414,22 @@ table.form-layout td.form-item .ui-spinner input {
 	margin: 0;
 }
 
+.form-item ul.radio-select {
+	list-style-type: none;
+	overflow: hidden;
+	padding-top: 3px;
+}
+
+.form-item ul.radio-select > li {
+	float: left;
+	margin: 0 4px;
+}
+
+.form-item ul.radio-select > li input[type="radio"],
+.form-item ul.radio-select > li input[type="checkbox"] {
+	margin-top: -2px;
+}
+
 table.field-details {
 	width: 100%;
 }

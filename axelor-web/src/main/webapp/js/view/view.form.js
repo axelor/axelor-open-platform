@@ -492,7 +492,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 				attrs = angular.extend(attrs, field, this);
 				type = ui.getWidget(widget) || ui.getWidget(attrs.type) || attrs.type || 'string';
 
-				if (_.isArray(attrs.selection)) {
+				if (_.isArray(attrs.selection) && !widget) {
 					type = 'select';
 				}
 
