@@ -231,6 +231,7 @@ ui.formInput('ManyToOne', {
 			select: function(event, ui) {
 				scope.select(ui.item);
 				onSelectFired = false;
+				scope.$apply();
 				return false;
 			}
 		}).data("autocomplete")._renderItem = function( ul, item ) {
