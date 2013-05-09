@@ -280,11 +280,13 @@
             <field name="type" selection="selection.chart.type"/>
             <field name="side" selection="selection.chart.side"/>
             <field name="title"/>
+            <field name="aggregate" selection="selection.chart.aggregate"/>
           </grid>
           <form title="Series">
-            <field name="key" />
-            <field name="groupBy"/>
+            <field name="key"/>
             <break/>
+            <field name="groupBy"/>
+            <field name="aggregate" selection="selection.chart.aggregate"/>
             <field name="type" selection="selection.chart.type" />
             <field name="side" selection="selection.chart.side"/>
             <field name="title" colSpan="4"/>
@@ -320,6 +322,16 @@
   <selection name="selection.chart.qtype">
     <option value="jpql">JPQL</option>
     <option value="sql">SQL</option>
+  </selection>
+  
+  <selection name="selection.chart.aggregate">
+    <option value="sum">Sum</option>
+    <option value="count">Count</option>
+    <option value="average">Average</option>
+    <option value="minimum">Minimum</option>
+    <option value="maximum">Maximum</option>
+    <option value="variance">Variance</option>
+    <option value="deviation">Std. Deviation</option>
   </selection>
 
 </object-views>
