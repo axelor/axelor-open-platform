@@ -62,15 +62,6 @@ function ChartCtrl($scope, $element, $http) {
 	};
 };
 
-function $eval(scope, expr, locals) {
-	var root = scope.$root || scope;
-	var context = _.extend({
-		"$moment": moment,
-		"$number": function(v) { return +v; }
-	}, locals);
-	return root.$eval(expr, context);
-}
-
 function $conv(value) {
 	if (!value) return 0;
 	if (_.isNumber(value)) return value;
@@ -87,11 +78,10 @@ function PlusData(scope, data, type) {
 	_.each(data.series, function(series) {
 		if (series.type !== type) return;
 		var key = series.key;
-		var expr = series.expr;
-		_.chain(data.data).groupBy(data.xAxis).each(function(group, name) {
+		_.chain(data.dataset).groupBy(data.xAxis).each(function(group, name) {
 			var value = 0;
 			_.each(group, function(item) {
-				value += $conv(expr ? $eval(scope, expr, item) : item[key]);
+				value += $conv(item[key]);
 			});
 			result.push({x: name, y: value});
 		});
@@ -101,16 +91,16 @@ function PlusData(scope, data, type) {
 
 function PlotData(scope, data, type) {
 	var chart_data = [];
-	var points = _.chain(data.data).pluck(data.xAxis).unique().value();
+	var points = _.chain(data.dataset).pluck(data.xAxis).unique().value();
 	_.each(data.series, function(series) {
 		if (series.type !== type) return;
 		var key = series.key;
-		var expr = series.expr;
-		_.chain(data.data).groupBy(key).each(function(group, name) {
+		var groupBy = series.groupBy || data.xAxis;
+		_.chain(data.dataset).groupBy(groupBy).each(function(group, name) {
 			var my = [];
 			var values = _.map(group, function(item) {
 				var x = $conv(item[data.xAxis]) || 0;
-				var y = $conv(expr ? $eval(scope, expr, item) : name);
+				var y = $conv(item[key] || name);
 				my.push(x);
 				return { x: x, y: y };
 			});
@@ -304,6 +294,7 @@ var directiveFn = function(){
 				if (elem.is(":hidden")) {
 					return initialized = false;
 				}
+				scope.title = data.title;
 				Chart(scope, elem, data);
 				return initialized = true;
 			};
