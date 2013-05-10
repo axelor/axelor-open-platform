@@ -131,7 +131,7 @@ public class MetaController {
 		MetaField metaField = request.getContext().asType(MetaField.class);
 		
 		String domain = String.format("self.packageName = '%s' AND self.name = '%s'", metaField.getPackageName(), metaField.getTypeName());
-		Map<String, String> view = new HashMap<String, String>();
+		Map<String, Object> view = new HashMap<String, Object>();
 		view.put("title", metaField.getTypeName());
 		view.put("resource", MetaModel.class.getName());
 		view.put("domain", domain);
