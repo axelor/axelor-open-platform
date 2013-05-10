@@ -22,6 +22,7 @@ import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaSelect;
+import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Resource;
@@ -184,10 +185,13 @@ public class ViewService extends AbstractService {
 		if (property.getSelection() == null) {
 			return null;
 		}
-		final List<MetaSelect> items = MetaSelect.all().filter("self.key = ?", property.getSelection()).fetch();
 		final List<Object> all = Lists.newArrayList();
-		for(MetaSelect ms : items) {
-			all.add(ImmutableMap.of("value", ms.getValue(), "title", ms.getTitle()));
+		final MetaSelect select = MetaSelect.all().filter("self.name = ?", property.getSelection()).fetchOne();
+		if (select == null || select.getItems() == null) {
+			return all;
+		}
+		for(MetaSelectItem item : select.getItems()) {
+			all.add(ImmutableMap.of("value", item.getValue(), "title", item.getTitle()));
 		}
 		return all;
 	}
