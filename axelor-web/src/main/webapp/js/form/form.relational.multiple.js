@@ -302,13 +302,25 @@ ui.formInput('OneToMany', {
 			});
 		};
 		
+		var adjustSize = (function() {
+			var rowSize = 25,
+				minSize = 54,
+				maxSize = (25 * 10) + 54;
+			var inc = 0;
+			return function(value) {
+				inc = arguments[1] || inc;
+				var count = _.size(value) + inc, height = minSize;
+				if (count > 0) {
+					height = (rowSize * count) + (minSize + rowSize);
+				}
+				element.css('min-height', Math.min(height, maxSize));
+				$.event.trigger('adjustSize');
+			};
+		})();
+		
 		if (this.collapseIfEmpty) {
 			scope.$watch(attrs.ngModel, function(value){
-				var minHeight = _.isEmpty(value) ? 54 : 250;
-				element.css('min-height', minHeight);
-				if (minHeight) {
-					$.event.trigger('adjustSize');
-				}
+				adjustSize(value);
 			});
 		}
 
@@ -328,6 +340,7 @@ ui.formInput('OneToMany', {
 						editable: !readonly
 					});
 				});
+				adjustSize(scope.getValue(), 1);
 			}
 
 			if (!(scope._viewParams || {}).summaryView) {
