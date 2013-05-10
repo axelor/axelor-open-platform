@@ -373,7 +373,13 @@ public abstract class Action {
 				domain = handler.evaluate("eval: \"" + domain + "\"").toString();
 			}
 			
-			result.put("title", getTitle());
+			String title = this.getTitle();
+
+			if (title != null && title.contains("$")) {
+				title = handler.evaluate("eval: \"" + title + "\"").toString();
+			}
+
+			result.put("title", title);
 			result.put("model", getModel());
 			result.put("viewType", viewType);
 			result.put("views", views);
