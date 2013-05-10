@@ -25,7 +25,7 @@ import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
-import com.axelor.meta.db.MetaSelect;
+import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.views.Action;
 import com.axelor.meta.views.Action.ActionMethod;
 import com.axelor.meta.views.ActionGroup;
@@ -238,11 +238,12 @@ public final class ActionHandler {
 			if (property == null || property.getSelection() == null) {
 				return value == null ? "" : value.toString();
 			}
-			MetaSelect select = MetaSelect.all()
-					.filter("self.key = ?1 AND self.value = ?2", property.getSelection(), value)
-					.fetchOne();
-			if (select != null) {
-				return select.getTitle();
+			MetaSelectItem item = MetaSelectItem
+					.all()
+					.filter("self.select.name = ?1 AND self.value = ?2",
+							property.getSelection(), value).fetchOne();
+			if (item != null) {
+				return item.getTitle();
 			}
 			return value == null ? "" : value.toString();
 		}

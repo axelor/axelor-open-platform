@@ -39,6 +39,7 @@ import com.axelor.meta.db.MetaChart;
 import com.axelor.meta.db.MetaChartSeries;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaSelect;
+import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.service.MetaModelService;
@@ -290,13 +291,15 @@ public class MetaLoader {
 
 	private void loadSelection(Selection selection) {
 		log.info("Loading selection : {}", selection.getName());
+		MetaSelect select = new MetaSelect();
+		select.setName(selection.getName());
 		for(Selection.Option opt : selection.getOptions()) {
-			MetaSelect select = new MetaSelect();
-			select.setKey(selection.getName());
-			select.setValue(opt.getValue());
-			select.setTitle(opt.getTitle());
-			select.save();
+			MetaSelectItem item = new MetaSelectItem();
+			item.setValue(opt.getValue());
+			item.setTitle(opt.getTitle());
+			select.addItem(item);
 		}
+		select.save();
 	}
 
 	private void loadAction(Action action) {
