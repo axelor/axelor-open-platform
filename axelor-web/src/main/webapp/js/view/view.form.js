@@ -493,7 +493,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 				type = ui.getWidget(widget) || ui.getWidget(attrs.type) || attrs.type || 'string';
 
 				if (_.isArray(attrs.selection) && !widget) {
-					type = 'select';
+					type = attrs.multiple ? 'multi-select' : 'select';
 				}
 
 				if (attrs.image ==  true) {

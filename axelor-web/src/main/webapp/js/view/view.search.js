@@ -113,7 +113,7 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 		
 		_.extend(params,{
 			__name: view.name,
-			__selected: _.isEmpty(selected) ? null : selected
+			__selected: _.isEmpty(selected) ? null : selected.split(/,\s*/)
 		});
 
 		var promise = $http.post('ws/search', {
@@ -293,9 +293,9 @@ function SearchToolbarCtrl($scope, $element, $http) {
 			var data = res.data.data;
 			data = _.map(data, function(item){
 				return {
-					id: item.name,
+					value: item.name,
 					action: item.action,
-					value: item.title
+					label: item.title
 				};
 			});
 			menus[key] = data;
@@ -326,7 +326,7 @@ function SearchToolbarCtrl($scope, $element, $http) {
 	
 	$scope.getMenuAction = function() {
 		return _.find(menus.menuItem, function(item){
-			return item.id === $scope.record.menuItem;
+			return item.value === $scope.record.menuItem;
 		});
 	};
 
@@ -455,9 +455,9 @@ function ActionSelectorCtrl($scope, $element, $attrs, $http, MenuService) {
 			var data = res.data.data;
 			data = _.map(data, function(item){
 				return {
-					id: item.name,
+					value: item.name,
 					action: item.action,
-					value: item.title
+					label: item.title
 				};
 			});
 			menus[key] = data;
@@ -497,7 +497,7 @@ function ActionSelectorCtrl($scope, $element, $attrs, $http, MenuService) {
 	
 	$scope.getMenuAction = function() {
 		return _.find(menus.$menuItem, function(item){
-			return item.id === $scope.record.$menuItem;
+			return item.value === $scope.record.$menuItem;
 		});
 	};
 	
