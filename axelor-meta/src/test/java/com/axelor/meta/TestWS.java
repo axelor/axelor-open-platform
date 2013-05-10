@@ -3,16 +3,16 @@ package com.axelor.meta;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.Period;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.axelor.db.JPA;
 import com.axelor.meta.db.Contact;
 import com.axelor.meta.db.MetaSelect;
+import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.views.Action;
 import com.axelor.meta.views.ObjectViews;
 import com.axelor.rpc.ActionRequest;
@@ -90,10 +90,14 @@ public class TestWS extends AbstractTest {
 	
 	@Transactional
 	public void prepareTest3() {
-		MetaSelect select = new MetaSelect();
-		select.setKey("food.selection");
-		select.setValue("pizza");
-		select.setTitle("Pizza");
+		final MetaSelect select = new MetaSelect();
+		final MetaSelectItem item = new MetaSelectItem();
+		
+		item.setValue("pizza");
+		item.setTitle("Pizza");
+		select.addItem(item);
+		select.setName("food.selection");
+
 		select.save();
 		
 		Contact c = new Contact();

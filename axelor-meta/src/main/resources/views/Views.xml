@@ -119,16 +119,21 @@
   </form>
 
   <grid title="All Selects" name="meta-select-grid" model="com.axelor.meta.db.MetaSelect">
-    <field name="key"/>
-    <field name="value"/>
-    <field name="title"/>
+    <field name="name"/>
   </grid>
 
-  <form title="Select" name="meta-select-form" model="com.axelor.meta.db.MetaSelect">
-    <field name="key"/>
-    <break/>
-    <field name="value"/>
-    <field name="title"/>
+  <form title="Select" name="meta-select-form" model="com.axelor.meta.db.MetaSelect" cols="2" colWidths="5%,*">
+    <field name="name"/>
+    <field name="items" colSpan="2">
+      <grid title="Select Items" editable="true">
+        <field name="title"/>
+        <field name="value"/>
+      </grid>
+      <form title="Select Item" cols="2">
+        <field name="title"/>
+        <field name="value"/>
+      </form>
+    </field>
   </form>
 
   <action-method name="action-view-validate">

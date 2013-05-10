@@ -41,10 +41,15 @@
   </entity>
   
   <entity name="MetaSelect" table="META_SELECT" cachable="true">
-  	<string name="key" required="true"/>
-  	<string name="value" required="true"/>
-  	<string name="title" required="true" namecolumn="true"/>
-  	<unique-constraint columns="key,value"/>
+    <string name="name" required="true" unique="true"/>
+    <one-to-many name="items" ref="MetaSelectItem" mappedBy="select"/>
+  </entity>
+
+  <entity name="MetaSelectItem" table="META_SELECT_ITEM" cachable="true">
+    <string name="value" required="true"/>
+    <string name="title" required="true" namecolumn="true"/>
+    <many-to-one name="select" ref="MetaSelect" column="select_id" required="true"/>
+    <unique-constraint columns="select_id,value"/>
   </entity>
   
   <entity name="MetaModel" table="META_MODEL" sequential="true" cachable="true">

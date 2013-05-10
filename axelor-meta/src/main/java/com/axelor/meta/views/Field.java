@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.meta.db.MetaSelect;
+import com.axelor.meta.db.MetaSelectItem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -205,10 +206,13 @@ public class Field extends SimpleWidget {
 	public List<Object> getSelectionList() {
 		if (selection == null || "".equals(selection.trim()))
 			return null;
-		List<MetaSelect> items = MetaSelect.all().filter("self.key = ?", selection).fetch();
-		List<Object> all = Lists.newArrayList();
-		for(MetaSelect ms : items) {
-			all.add(ImmutableMap.of("value", ms.getValue(), "title", JPA.translate(ms.getTitle())));
+		final MetaSelect select = MetaSelect.all().filter("self.name = ?", selection).fetchOne();
+		final List<Object> all = Lists.newArrayList();
+		if (select == null || select.getItems() == null) {
+			return all;
+		}
+		for(MetaSelectItem item : select.getItems()) {
+			all.add(ImmutableMap.of("value", item.getValue(), "title", JPA.translate(item.getTitle())));
 		}
 		return all;
 	}
