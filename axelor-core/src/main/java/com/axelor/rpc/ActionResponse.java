@@ -39,12 +39,12 @@ public class ActionResponse extends Response {
 		set("values", context);
 	}
 
-	public void setView(Map<String, String> view) {
+	public void setView(Map<String, Object> view) {
 		set("view", view);
 	}
 	
 	public void setView(String title, String entity, String mode, String criteria) {
-		setView(ImmutableMap.of("title", title, "entity", entity, "view", mode, "criteria", criteria));
+		setView(ImmutableMap.<String,Object>of("title", title, "entity", entity, "view", mode, "criteria", criteria));
 	}
 	
 	public void setAttrs(Map<String, Map<String, Object>> attrs) {
