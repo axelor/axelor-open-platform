@@ -777,121 +777,100 @@ ui.formInput('Password', {
 	template_editable: '<input type="password">'
 });
 
-ui.formInput('Select', {
+ui.formWidget('BaseSelect', {
 
-	css: 'select-item',
-	cellCss: 'form-item select-item',
+	findInput: function(element) {
+		return element.find('input:first');
+	},
 
 	init: function(scope) {
-		var props = scope.field,
-			multiple = props.multiple,
-			selection = [];
 		
-		if (_.isArray(props.selection)) {
-			selection = props.selection;
-		}
-		
-		scope.getData = function(){
-			var data = _.map(selection, function(item){
-				return {
-					key: item.value,
-					value: item.title
-				};
-			});
-			return data;
+		scope.loadSelection = function(request, response) {
+
+		};
+
+		scope.parse = function(value) {
+			return value;
 		};
 
 		scope.format = function(value) {
-			if (value === null || _.isUndefined(value))
-				return '';
-
-			if (props.serverType == "integer") {
-				value = "" + value;
-			}
-			if (!_.isArray(value)) {
-				value = [value];
-			}
-
-			var values = _.filter(scope.getData(), function(item){
-				return value.indexOf(item.key) > -1;
-			});
-			values = _.pluck(values, 'value');
-			return multiple ? values.join(',') : _.first(values);
+			return value;
 		};
 	},
 
-	link_editable: function(scope, element, attrs, model) {
-		var input = element.children('input:first'),
-			data = scope.getData();
+	link_editable: function (scope, element, attrs, model) {
 
-		scope.showSelection = function() {
+		var input = this.findInput(element);
+
+		scope.showSelection = function(e) {
 			if (scope.isReadonly()) {
 				return;
 			}
 			input.autocomplete("search" , '');
 			input.focus();
 		};
-		
-		function updateValue(value) {
-			var onChange = scope.$events.onChange;
-			scope.$apply(function(){
-				scope.setValue(value);
-				if (onChange) {
-					setTimeout(onChange);
-				}
-			});
-		}
-		
-		input.keydown(function(e) {
 
+		scope.handleDelete = function(e) {
+
+		};
+
+		scope.handleSelect = function(e, ui) {
+			
+		};
+		
+		scope.handleClose = function(e, ui) {
+			
+		};
+		
+		scope.handleOpen = function(e, ui) {
+			
+		};
+
+		input.autocomplete({
+			
+			minLength: 0,
+			
+			source: function(request, response) {
+				scope.loadSelection(request, response);
+			},
+
+			focus: function(event, ui) {
+				return false;
+			},
+			
+			select: function(event, ui) {
+				var ret = scope.handleSelect(event, ui);
+				if (ret !== undefined) {
+					return ret;
+				}
+				return false;
+			},
+			
+			open: function(event, ui) {
+				scope.handleOpen(event, ui);
+			},
+			
+			close: function(event, ui) {
+				scope.handleClose(event, ui);
+			}
+		})
+		.focus(function() {
+			element.addClass('focus');
+		})
+		.blur(function() {
+			element.removeClass('focus');
+		})
+		.keydown(function(e) {
 			var KEY = $.ui.keyCode;
 
 			switch(e.keyCode) {
 			case KEY.DELETE:
 			case KEY.BACKSPACE:
-				updateValue('');
+				scope.handleDelete(e);
 			}
-		});
-		
-		input.autocomplete({
-			minLength: 0,
-			source: data,
-			focus: function(event, ui) {
-				return false;
-			},
-			select: function(event, ui) {
-				var val, terms;
-				if (this.multiple) {
-					val = model.$modelValue || [];
-					terms = this.value || "";
-
-					if (!_.isArray(val)) val = val.split(',');
-					if (_.indexOf(val, ui.item.key) > -1)
-						return false;
-
-					val.push(ui.item.key);
-					
-					terms = terms.trim() === "" ? [] : terms.split(/,\s*/);
-					terms.push(ui.item.value);
-					
-					this.value = terms.join(', ');
-					updateValue(val);
-				} else {
-					this.value = ui.item.value;
-					updateValue(ui.item.key);
-				}
-				return false;
-			}
-		});
-
-		scope.$render_editable = function() {
-			input.val(scope.format(model.$modelValue));
-		};
-
-		attrs.$observe('disabled', function(value) {
-			input.autocomplete(value && 'disable' || 'enable');
 		});
 	},
+
 	template_editable:
 	'<span class="picker-input">'+
 		'<input type="text" autocomplete="off">'+
@@ -901,49 +880,252 @@ ui.formInput('Select', {
 	'</span>'
 });
 
-ui.formInput('SelectQuery', {
-	
+ui.formInput('Select', 'BaseSelect', {
+
 	css: 'select-item',
 	cellCss: 'form-item select-item',
 
-	link_editable: function(scope, element, attrs, model) {
+	init: function(scope) {
 		
-		var query = scope.$eval(attrs.query),
-			input = element.children('input:first');
+		this._super(scope);
 
-		scope.showSelection = function() {
-			input.autocomplete("search" , '');
+		var field = scope.field,
+			selection = field.selection || [],
+			selectionMap = {};
+		
+		if (_.isArray(field.selection)) {
+			selection = field.selection;
+		}
+
+		var data = _.map(selection, function(item) {
+			var value = "" + item.value;
+			selectionMap[value] = item.title;
+			return {
+				value: value,
+				label: item.title || value
+			};
+		});
+
+		scope.loadSelection = function(request, response) {
+			var items = _.filter(data, function(item) {
+				var label = item.label || "",
+					term = request.term || "";
+				return label.toLowerCase().indexOf(term.toLowerCase()) > -1;
+			});
+			response(items);
+		};
+
+		scope.parse = function(value) {
+			if (!value || _.isString(value)) return value;
+			return value.value;
+		};
+
+		scope.format = function(value) {
+			if (!value) return value;
+			if (_.isString(value)) {
+				return selectionMap["" + value] || value;
+			}
+			return value.label;
+		};
+	},
+
+	link_editable: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+		
+		var input = this.findInput(element);
+		
+		function update(value) {
+			scope.setValue(value, true);
+			setTimeout(function(){
+				scope.$apply();
+			});
+		}
+
+		scope.handleDelete = function(e) {
+			if (e.keyCode === 46) { // DELETE
+				update('');
+			}
+		};
+
+		scope.handleSelect = function(e, ui) {
+			update(ui.item);
+		};
+
+		scope.$render_editable = function() {
+			input.val(this.getText());
+		};
+	}
+});
+
+ui.formInput('MultiSelect', 'Select', {
+
+	css: 'multi-select-item',
+	cellCss: 'form-item multi-select-item',
+	
+	init: function(scope) {
+		this._super(scope);
+
+		var __parse = scope.parse;
+		var __format = scope.format;
+		
+		scope.parse = function(value) {
+			if (_.isArray(value)) {
+				return value.join(', ');
+			}
+			return __parse(value);
+		};
+
+		scope.format = function(value) {
+			var items = value,
+				values = [];
+			if (!value) {
+				scope.items = [];
+				return value;
+			}
+			if (!_.isArray(items)) items = items.split(/,\s*/);
+			values = _.map(items, function(item) {
+				return {
+					value: item,
+					title: __format(item)
+				};
+			});
+			scope.items = values;
+			return _.pluck(values, 'title').join(', ');
 		};
 		
-		input.keydown(function(e){
-			if (e.keyCode != 9)
-				return false;
+		scope.getItems = function() {
+			return this.items;
+		};
+	},
+
+	link_editable: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+
+		var input = this.findInput(element);
+
+		input.focus(function() {
+			scaleInput();
+		}).blur(function() {
+			scaleInput(50);
+			input.val('');
 		});
+
+		function scaleInput(width) {
+			if (width) {
+				return input.width(width);
+			}
+			var w = element.innerWidth();
+				e = element.find('.tag-item:last'),
+				p = e.position();
+			if (p) {
+				w = w - (p.left + e.outerWidth());
+			}
+			input.width(w - 24);
+		}
+
+		function update(value) {
+			scope.setValue(value, true);
+			setTimeout(function(){
+				scope.$apply();
+			});
+		}
+		
+		scope.removeItem = function(item) {
+			var items = this.getItems(),
+				value = _.isString(item) ? item : item.value;
+
+			items = _.chain(items)
+					 .pluck('value')
+					 .filter(function(v) {
+						 return value !== v;
+					 })
+					 .value();
+
+			update(items);
+		};
+		
+		var __showSelection = scope.showSelection;
+		scope.showSelection = function(e) {
+			if (e && $(e.srcElement).is('li,i')) {
+				return;
+			}
+			return __showSelection(e);
+		};
+
+		scope.handleDelete = function(e) {
+			if (input.val()) {
+				return;
+			}
+			var items = this.getItems();
+			this.removeItem(_.last(items));
+		};
+		
+		scope.handleSelect = function(e, ui) {
+			var items = this.getItems(),
+				values = _.pluck(items, 'value');
+			if (_.indexOf(values, ui.item.value) > -1)
+				return false;
+
+			values.push(ui.item.value);
+			update(values);
+			scaleInput(50);
+		};
+
+		scope.handleOpen = function(e, ui) {
+			input.data('autocomplete')
+				 .menu
+				 .element
+				 .position({
+					 my: "left top",
+					 at: "left bottom",
+					 of: element
+				 })
+				 .width(element.width() - 4);
+		};
 		
 		scope.$render_editable = function() {
-			var value = model.$modelValue;
-			input.val(value);
+			return input.val('');
 		};
-
-		setTimeout(function(){
-			input.autocomplete({
-				minLength: 0,
-				source: query,
-				select: function(event, ui) {
-					scope.$apply(function(){
-						model.$setViewValue(ui.item.id);
-					});
-				}
-			});
-		});
 	},
 	template_editable:
-	'<span class="picker-input">'+
-		'<input type="text" autocomplete="off">'+
-		'<span class="picker-icons">'+
-			'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
-		'</span>'+
-	'</span>'
+	'<div class="tag-select picker-input">'+
+	  '<ul ng-click="showSelection($event)">'+
+		'<li class="tag-item label label-info" ng-repeat="item in items">{{item.title}} <i class="icon-remove icon-small" ng-click="removeItem(item)"></i></li>'+
+		'<li class="tag-selector"><input type="text" autocomplete="off"></li>'+
+	  '</ul>'+
+	  '<span class="picker-icons">'+
+	  	'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
+	  '</span>'+
+	'</div>',
+	template_readonly:
+	'<div class="tag-select">'+
+		'<span class="label label-info" ng-repeat="item in items">{{item.title}}</span>'+
+	'</div>'
+});
+
+ui.formInput('SelectQuery', 'Select', {
+
+	link_editable: function(scope, element, attrs, model) {
+		
+		this._super.apply(this, arguments);
+
+		var current = {};
+		
+		scope.format = function(value) {
+			if (!value) return "";
+			if (_.isString(value)) {
+				return current.label || value;
+			}
+			current = value;
+			return value.label;
+		};
+
+		var query = scope.$eval(attrs.query);
+	
+		scope.loadSelection = function(request, response) {
+			return query(request, response);
+		};
+	}
 });
 
 ui.formInput('RadioSelect', {
