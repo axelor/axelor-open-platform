@@ -61,7 +61,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 			items = [value];
 		}
 
-		records = _.map($scope.dataView.getItems(), function(item){
+		records = _.map($scope.getItems(), function(item){
 			return _.clone(item);
 		});
 
@@ -106,9 +106,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		if (!selection || selection.length == 0)
 			return;
 
-		var dataView = $scope.dataView;
-	
-		var items = dataView.getItems();
+		var items = $scope.getItems();
 		var records = [];
 	
 		for(var i = 0 ; i < items.length ; i++) {
@@ -184,7 +182,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 			return;
 		}
 
-		var records = $scope.dataView.getItems();
+		var records = $scope.getItems();
 		if (records == null || records.length == 0)
 			return;
 

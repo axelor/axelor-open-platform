@@ -81,6 +81,14 @@ function GridViewCtrl($scope, $element) {
 		});
 	};
 
+	$scope.getItem = function(index) {
+		return $scope.dataView.getItem(index);
+	};
+
+	$scope.getItems = function() {
+		return $scope.dataView.getItems();
+	};
+
 	$scope.setItems = function(items, pageInfo) {
 
 		var dataView = $scope.dataView,

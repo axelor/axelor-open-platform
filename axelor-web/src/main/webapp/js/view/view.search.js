@@ -152,7 +152,7 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 	
 		var grid = scopes.grid,
 			index = _.first(grid.selection),
-			record = grid.dataView.getItem(index);
+			record = grid.getItem(index);
 		
 		action = action.action;
 		record = _.extend({
@@ -233,8 +233,8 @@ function SearchGridCtrl($scope, $element, ViewService) {
 	$scope.onEdit = function() {
 
 		var index = _.first(this.selection),
-			records = this.dataView.getItems(),
-			record = this.dataView.getItem(index),
+			records = this.getItems(),
+			record = this.getItem(index),
 			ids, domain, views;
 
 		ids = _.chain(records).filter(function(rec){
