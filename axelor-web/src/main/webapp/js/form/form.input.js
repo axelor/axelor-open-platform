@@ -1157,6 +1157,12 @@ ui.formInput('RadioSelect', {
 			scope.setValue($(e.target).val(), true);
 			scope.$apply();
 		});
+		
+		if (field.direction === "vertical" || field.dir === "vert") {
+			setTimeout(function(){
+				element.addClass("radio-select-vertical");
+			});
+		}
 	},
 	template_editable: null,
 	template_readonly: null,
