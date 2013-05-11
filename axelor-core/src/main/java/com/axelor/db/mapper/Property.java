@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,7 +37,7 @@ import com.axelor.db.VirtualColumn;
 import com.axelor.db.Widget;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class Property {
 
@@ -513,40 +513,30 @@ public class Property {
 
 	private Map<String, Object> update(Map<String, Object> attrs) {
 
-		if (type != PropertyType.MANY_TO_ONE) {
+		if (target == null) {
 			return attrs;
 		}
 		
 		Mapper mapper = Mapper.of(target);
 		Property nameField = mapper.getNameField();
-
-		String name = null;
-		List<String> names = Lists.newArrayList();
+		Property codeField = mapper.getProperty("code");
+		
+		String targetName = null;
+		LinkedHashSet<String> targetSearch = Sets.newLinkedHashSet();
 
 		if (nameField != null) {
-			String[] nameSearch = nameField.getNameSearch();
-			name = nameField.getName();
-			if (nameSearch == null) {
-				if (mapper.getProperty("code") != null)
-					names.add("code");
-				names.add(name);
-			} else {
-				names = Arrays.asList(nameSearch);
+			targetName = nameField.getName();
+			targetSearch.add(targetName);
+			if (nameField.getNameSearch() != null) {
+				targetSearch.addAll(Arrays.asList(nameField.getNameSearch()));
 			}
-		} else {
-			if (mapper.getProperty("name") != null)
-				name = mapper.getProperty("name").getName();
-			if (mapper.getProperty("code") != null) {
-				if (name == null)
-					name = "code";
-				names.add("code");
-			}
-			if (name != null)
-				names.add(name);
+		}
+		if (codeField != null) {
+			targetSearch.add(codeField.getName());
 		}
 
-		attrs.put("targetName", name);
-		attrs.put("targetSearch", names.size() > 0 ? names : null);
+		attrs.put("targetName", targetName);
+		attrs.put("targetSearch", targetSearch.size() > 0 ? targetSearch : null);
 
 		return attrs;
 	}
