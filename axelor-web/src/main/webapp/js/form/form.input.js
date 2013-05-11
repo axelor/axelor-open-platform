@@ -857,16 +857,14 @@ ui.formWidget('BaseSelect', {
 			close: function(event, ui) {
 				scope.handleClose(event, ui);
 			}
-		})
-		.focus(function() {
-			element.addClass('focus');
-		})
-		.blur(function() {
-			element.removeClass('focus');
-		})
-		.keydown(function(e) {
-			var KEY = $.ui.keyCode;
+		});
 
+		input.focus(function() {
+			element.addClass('focus');
+		}).blur(function() {
+			element.removeClass('focus');
+		}).keydown(function(e) {
+			var KEY = $.ui.keyCode;
 			switch(e.keyCode) {
 			case KEY.DELETE:
 			case KEY.BACKSPACE:
@@ -1003,7 +1001,7 @@ ui.formInput('MultiSelect', 'Select', {
 			return a.value === b.value;
 		};
 
-		scope.getItems = function() {
+		scope.getSelection = function() {
 			return this.items;
 		};
 	},
@@ -1041,7 +1039,7 @@ ui.formInput('MultiSelect', 'Select', {
 		}
 		
 		scope.removeItem = function(item) {
-			var items = this.getItems(),
+			var items = this.getSelection(),
 				value = _.isString(item) ? item : item.value;
 
 			items = _.chain(items)
@@ -1066,12 +1064,12 @@ ui.formInput('MultiSelect', 'Select', {
 			if (input.val()) {
 				return;
 			}
-			var items = this.getItems();
+			var items = this.getSelection();
 			this.removeItem(_.last(items));
 		};
 		
 		scope.handleSelect = function(e, ui) {
-			var items = this.getItems(),
+			var items = this.getSelection(),
 				values = _.pluck(items, 'value');
 			var found = _.find(values, function(v){
 				return scope.matchValues(v, ui.item.value);
