@@ -98,25 +98,26 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			this.link.call(this, scope, element, attrs, controller);
 		}
 		
-		var handleConditional = function(attr, conditional){
+		var handleConditional = function(attr, conditional, nagative){
 			if (!field[conditional]) return;
 			var root = scope.$root || scope;
 			root.$moment = function(d) { return moment(d); };	// moment.js helper
 			root.$number = function(d) { return +d; };			// number helper
 			scope.$on("on:record-change", function(e, rec) {
 				var value = root.$eval(field[conditional], rec);
+				if (nagative) { value = !value; };
 				scope.attr(attr, value);
 			});
 		};
 
 		handleConditional("valid", "validIf");
-		handleConditional("hidden", "hiddenIf");
+		handleConditional("hidden", "hideIf");
+		handleConditional("hidden", "showIf", true);
 		handleConditional("readonly", "readonlyIf");
 		handleConditional("required", "requiredIf");
 		handleConditional("collapse", "collapseIf");
 		
-		scope.$watch("isHidden()", function(hidden, old) {
-			if (hidden === old) return;
+		function hideWidget(hidden) {
 			var elem = element,
 				parent = elem.parent('td'),
 				label = elem.data('label') || $(),
@@ -126,6 +127,11 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			if (label_parent.size())
 				label = label_parent;
 			return hidden ? parent.add(label).hide() : parent.add(label).show();
+		}
+
+		scope.$watch("isHidden()", function(hidden, old) {
+			if (hidden === old) return;
+			return hideWidget(hidden);
 		});
 		
 		this.prepare(scope, element, attrs, controller);
