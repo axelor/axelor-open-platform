@@ -283,7 +283,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			filter: filter,
 			fields: fields,
 			archived: true,
-			limit: 10
+			limit: 6
 		};
 
 		if (domain) {
