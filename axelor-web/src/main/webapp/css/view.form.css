@@ -602,6 +602,7 @@ table.field-details .help-text hr {
 	overflow: hidden;
 	margin: 0;
 	margin-right: 16px;
+	padding-bottom: 2px;
 }
 
 .tag-select li {
@@ -609,6 +610,7 @@ table.field-details .help-text hr {
 	display: inline-block;
 	margin: 2px;
 	margin-right: 0;
+	margin-bottom: 0;
 }
 
 .tag-select span.label {
@@ -639,4 +641,9 @@ table.field-details .help-text hr {
 	margin-top: -2px;
 	line-height: 16px;
 	height: auto !important;
+}
+
+.tag-select-action-menu .tag-select-action a {
+	font-style: oblique;
+	padding-left: 12px;
 }

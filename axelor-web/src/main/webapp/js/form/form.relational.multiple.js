@@ -472,13 +472,33 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 		scope.formatItem = function(item) {
 			return item ? item[nameField] : item;
 		};
+
+		scope.getItems = function() {
+			return _.pluck(this.getSelection(), "value");
+		};
 	},
 
 	link_editable: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);
 		
+		var input = this.findInput(element);
+
 		scope.loadSelection = function(request, response) {
-			this.fetchSelection(request, response);
+			this.fetchSelection(request, function(items) {
+				items.push({
+					label: "Search...",
+					click: function() {
+						scope.showSelector();
+					}
+				});
+				items.push({
+					label: "Create...",
+					click: function() {
+						scope.showPopupEditor();
+					}
+				});
+				response(items);
+			});
 		};
 
 		scope.matchValues = function(a, b) {
@@ -487,6 +507,27 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 			if (!b) return false;
 			return a.id === b.id;
 		};
+		
+		var _handleSelect = scope.handleSelect;
+		scope.handleSelect = function(e, ui) {
+			if (ui.item.click) {
+				ui.item.click.call(scope);
+				return setTimeout(function(){
+					scope.$apply();
+				});
+			}
+			return _handleSelect.apply(this, arguments);
+		};
+		
+		var _renderItem = input.data("autocomplete")._renderItem;
+		input.data("autocomplete")._renderItem = function(ul, item) {
+			var el = _renderItem(ul, item);
+			if (item.click) {
+				el.addClass("tag-select-action");
+				ul.addClass("tag-select-action-menu");
+			}
+			return el;
+        };
 	}
 });
 
