@@ -403,7 +403,7 @@
 				});
 
 				promise.success = function(fn) {
-					return promise.then(function(response){
+					promise.then(function(response){
 						var res = response.data,
 							record;
 						
@@ -432,7 +432,7 @@
 					});
 
 				promise.success = function(fn) {
-					return promise.then(function(response){
+					promise.then(function(response){
 						var res = response.data;
 						_.each(res.data || [], function(item){
 							var found = _.find(records, function(rec){
