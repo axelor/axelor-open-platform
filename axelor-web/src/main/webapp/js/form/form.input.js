@@ -1276,7 +1276,7 @@ ui.formInput('Image', {
 	template_editable:
 	'<div style="min-width: 140px;">' +
 		'<input type="file" accept="image/*">' +
-		'<img class="img-polaroid" style="width: 140px; height: 140px;">' +
+		'<img class="img-polaroid" style="width: 140px; height: 140px; display: inline-block;">' +
 		'<div class="btn-group">' +
 			'<button ng-click="doSelect()" class="btn" type="button"><i class="icon-upload-alt"></i></button>' +
 			'<button ng-click="doSave()" class="btn" type="button"><i class="icon-download-alt"></i></button>' +
