@@ -106,6 +106,7 @@ public class MetaController {
 				JPA.em().createNativeQuery("DELETE FROM meta_action_menu").executeUpdate();
 				JPA.em().createNativeQuery("DELETE FROM meta_action").executeUpdate();
 				JPA.em().createNativeQuery("DELETE FROM meta_view").executeUpdate();
+				JPA.em().createNativeQuery("DELETE FROM meta_select_item").executeUpdate();
 				JPA.em().createNativeQuery("DELETE FROM meta_select").executeUpdate();
 			}
 		});
