@@ -450,8 +450,46 @@ ui.formInput('OneToMany', {
 });
 
 ui.formInput('ManyToMany', 'OneToMany', {
+	
 	css	: 'many2many-item',
+	
 	controller: ManyToManyCtrl
+});
+
+ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
+
+	css	: 'many2many-tags',
+
+	showTitle: true,
+	
+	init: function(scope) {
+		this._super(scope);
+
+		var nameField = scope.field.targetName || 'id';
+		
+		scope.parse = function(value) {
+			return value;
+		};
+
+		scope.formatItem = function(item) {
+			return item ? item[nameField] : item;
+		};
+	},
+
+	link_editable: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+		
+		scope.loadSelection = function(request, response) {
+			this.fetchSelection(request, response);
+		};
+
+		scope.matchValues = function(a, b) {
+			if (a === b) return true;
+			if (!a) return false;
+			if (!b) return false;
+			return a.id === b.id;
+		};
+	}
 });
 
 ui.formInput('OneToManyInline', 'OneToMany', {
