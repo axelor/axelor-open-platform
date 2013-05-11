@@ -249,6 +249,51 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		});
 	};
 	
+	$scope.fetchSelection = function(request, response) {
+
+		var nameField = field.targetName || 'id',
+			fields = field.targetSearch || [],
+			filter = {}, ds = this._dataSource;
+
+		fields = ["id", nameField].concat(fields);
+		fields = _.chain(fields).compact().unique().value();
+
+		_.each(fields, function(name){
+			if (name !== "id" && request.term) {
+				filter[name] = request.term;
+			}
+		});
+		
+		var domain = this._domain,
+			context = this._context;
+	
+		if (domain && this.getContext) {
+			context = _.extend({}, context, this.getContext());
+		}
+	
+		var params = {
+			filter: filter,
+			fields: fields,
+			archived: true,
+			limit: 10
+		};
+
+		if (domain) {
+			params.domain = domain;
+			params.context = context;
+		}
+	
+		ds.search(params).success(function(records, page){
+			var items = _.map(records, function(record) {
+				return {
+					label: record[nameField],
+					value: record
+				};
+			});
+			response(items);
+		});
+	};
+
 	$scope.select = function(value) {
 		
 	};
