@@ -63,7 +63,7 @@ function EditorCtrl($scope, $element, DataSource, $q) {
 		function close(value) {
 			if (value) {
 				value.$fetched = true;
-				$scope.select(value);
+				$scope.$parent.select(value);
 			}
 			canClose = true;
 			$element.dialog('close');
@@ -159,7 +159,7 @@ function SelectorCtrl($scope, $element, DataSource) {
 		});
 		
 		if (!_.isEmpty(selection)) {
-			$scope.select(selection);
+			$scope.$parent.select(selection);
 		}
 
 		$element.dialog('close');
