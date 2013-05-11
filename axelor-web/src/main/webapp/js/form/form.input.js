@@ -1101,7 +1101,7 @@ ui.formInput('MultiSelect', 'Select', {
 	template_editable:
 	'<div class="tag-select picker-input">'+
 	  '<ul ng-click="showSelection($event)">'+
-		'<li class="tag-item label label-info" ng-repeat="item in items">{{item.title}} <i class="icon-remove icon-small" ng-click="removeItem(item)"></i></li>'+
+		'<li class="tag-item label label-info" ng-repeat="item in items"><a href="" ng-click="showEditor(item.value)">{{item.title}}</a> <i class="icon-remove icon-small" ng-click="removeItem(item)"></i></li>'+
 		'<li class="tag-selector"><input type="text" autocomplete="off"></li>'+
 	  '</ul>'+
 	  '<span class="picker-icons">'+
@@ -1110,7 +1110,7 @@ ui.formInput('MultiSelect', 'Select', {
 	'</div>',
 	template_readonly:
 	'<div class="tag-select">'+
-		'<span class="label label-info" ng-repeat="item in items">{{item.title}}</span>'+
+		'<span class="label label-info" ng-repeat="item in items"><a ng-click="showEditor(item.value)">{{item.title}}</a></span>'+
 	'</div>'
 });
 

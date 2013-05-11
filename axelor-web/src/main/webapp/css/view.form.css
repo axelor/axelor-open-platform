@@ -629,6 +629,11 @@ table.field-details .help-text hr {
 	cursor: pointer;
 }
 
+.tag-select span.label a,
+.tag-select li.tag-item a {
+	color: white;
+}
+
 .tag-select li.tag-selector input {
 	border: none;
 	border-radius: 0 !important;
