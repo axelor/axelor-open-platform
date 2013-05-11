@@ -584,6 +584,7 @@ table.field-details .help-text hr {
 
 .readonly .tag-select {
 	border: none;
+	box-shadow: none;
 }
 
 .tag-select:focus,
