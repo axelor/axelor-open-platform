@@ -186,8 +186,8 @@
     <field name="typeName"/>
     <field name="label"/>
     <field name="relationship"/>
-    <field name="mappedBy" hiddenIf="relationship != 'OneToMany' || relationship != 'OneToOne'"/>
-    <button name="openModel" title="Show Model" colSpan="2" hiddenIf="!relationship" onClick="meta-field-method-open-model"/>
+    <field name="mappedBy" hideIf="relationship != 'OneToMany' || relationship != 'OneToOne'"/>
+    <button name="openModel" title="Show Model" colSpan="2" hideIf="!relationship" onClick="meta-field-method-open-model"/>
     <separator title="Description" colSpan="2"/>
     <field name="description" noLabel="true" colSpan="2"/>
   </form>

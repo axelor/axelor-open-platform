@@ -164,17 +164,24 @@
         <xsd:attribute name="readonly" type="xsd:boolean" />
         <xsd:attribute name="colSpan" type="xsd:int" />
         <xsd:attribute name="css" type="xsd:string"/>
-        <xsd:attribute name="hiddenIf" type="xsd:string">
+        <xsd:attribute name="showIf" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-            A JavaScript boolean expression against the current form values.
+            Show if the given JavaScript expression is true.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="hideIf" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            Hide if the given JavaScript expression is true.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="readonlyIf" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-            A JavaScript boolean expression against the current form values.
+            Readonly if the given JavaScript expression is true.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>

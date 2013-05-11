@@ -29,7 +29,10 @@ public abstract class SimpleWidget extends AbstractWidget {
 	private Boolean readonly;
 	
 	@XmlAttribute
-	private String hiddenIf;
+	private String showIf;
+	
+	@XmlAttribute
+	private String hideIf;
 	
 	@XmlAttribute
 	private String readonlyIf;
@@ -91,12 +94,20 @@ public abstract class SimpleWidget extends AbstractWidget {
 		this.readonly = readonly;
 	}
 	
-	public String getHiddenIf() {
-		return hiddenIf;
+	public String getShowIf() {
+		return showIf;
 	}
 	
-	public void setHiddenIf(String hiddenIf) {
-		this.hiddenIf = hiddenIf;
+	public void setShowIf(String showIf) {
+		this.showIf = showIf;
+	}
+	
+	public String getHideIf() {
+		return hideIf;
+	}
+	
+	public void setHideIf(String hiddenIf) {
+		this.hideIf = hiddenIf;
 	}
 	
 	public String getReadonlyIf() {
