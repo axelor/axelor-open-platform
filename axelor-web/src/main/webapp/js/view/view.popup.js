@@ -351,7 +351,7 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 			items = [value];
 		}
 
-		records = _.map($scope.dataView.getItems(), function(item) {
+		records = _.map($scope.getItems(), function(item) {
 			return _.clone(item);
 		});
 		
