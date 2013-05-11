@@ -193,7 +193,16 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			_context: $scope._context
 		};
 	};
-	
+
+	var fetchDS = (function() {
+		var ds = $scope._dataSource;
+		var fds = DataSource.create(ds._model, {
+			domain: ds._domain,
+			context: ds._context
+		});
+		return fds;
+	})();
+
 	$scope.fetchData = function(value, success) {
 		
 		var records = $.makeArray(value),
@@ -221,17 +230,16 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		
 		return $scope._viewPromise.then(function(view) {
 
-			var ds = $scope._dataSource;
 			var sortBy = view.orderBy;
 			
 			if (sortBy) {
 				sortBy = sortBy.split(",");
 			}
 			
-			return ds.search({
+			return fetchDS.search({
 				filter: filter,
 				fields: fields,
-				sortBy: ds._sortBy || sortBy,
+				sortBy: fetchDS._sortBy || sortBy,
 				archived: true,
 				limit: -1,
 				domain: null
@@ -253,7 +261,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 
 		var nameField = field.targetName || 'id',
 			fields = field.targetSearch || [],
-			filter = {}, ds = this._dataSource;
+			filter = {};
 
 		fields = ["id", nameField].concat(fields);
 		fields = _.chain(fields).compact().unique().value();
@@ -283,7 +291,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			params.context = context;
 		}
 	
-		ds.search(params).success(function(records, page){
+		fetchDS.search(params).success(function(records, page){
 			var items = _.map(records, function(record) {
 				return {
 					label: record[nameField],
