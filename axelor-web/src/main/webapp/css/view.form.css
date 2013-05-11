@@ -428,6 +428,10 @@ table.form-layout td.form-item .ui-spinner input {
 	margin: 0 4px;
 }
 
+.form-item ul.radio-select-vertical > li {
+	float: none;
+}
+
 .form-item ul.radio-select > li input[type="radio"],
 .form-item ul.radio-select > li input[type="checkbox"] {
 	margin-top: -2px;
