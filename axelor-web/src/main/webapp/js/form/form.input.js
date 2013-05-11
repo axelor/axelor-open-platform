@@ -794,7 +794,11 @@ ui.formWidget('BaseSelect', {
 		};
 
 		scope.format = function(value) {
-			return value;
+			return this.formatItem(value);
+		};
+
+		scope.formatItem = function(item) {
+			return item;
 		};
 	},
 
@@ -919,13 +923,13 @@ ui.formInput('Select', 'BaseSelect', {
 			if (!value || _.isString(value)) return value;
 			return value.value;
 		};
-
-		scope.format = function(value) {
-			if (!value) return value;
-			if (_.isString(value)) {
-				return selectionMap["" + value] || value;
+		
+		scope.formatItem = function(item) {
+			if (!item) return item;
+			if (_.isString(item)) {
+				return selectionMap["" + item] || item;
 			}
-			return value.label;
+			return item.label;
 		};
 	},
 
@@ -966,8 +970,6 @@ ui.formInput('MultiSelect', 'Select', {
 		this._super(scope);
 
 		var __parse = scope.parse;
-		var __format = scope.format;
-		
 		scope.parse = function(value) {
 			if (_.isArray(value)) {
 				return value.join(', ');
@@ -986,13 +988,21 @@ ui.formInput('MultiSelect', 'Select', {
 			values = _.map(items, function(item) {
 				return {
 					value: item,
-					title: __format(item)
+					title: scope.formatItem(item)
 				};
 			});
 			scope.items = values;
 			return _.pluck(values, 'title').join(', ');
 		};
 		
+		scope.matchValues = function(a, b) {
+			if (a === b) return true;
+			if (!a) return false;
+			if (!b) return false;
+			if (_.isString(a)) return a === b;
+			return a.value === b.value;
+		};
+
 		scope.getItems = function() {
 			return this.items;
 		};
@@ -1035,9 +1045,9 @@ ui.formInput('MultiSelect', 'Select', {
 				value = _.isString(item) ? item : item.value;
 
 			items = _.chain(items)
-					 .pluck('value')
-					 .filter(function(v) {
-						 return value !== v;
+				     .pluck('value')
+					 .filter(function(v){
+						 return !scope.matchValues(v, value);
 					 })
 					 .value();
 
@@ -1063,9 +1073,12 @@ ui.formInput('MultiSelect', 'Select', {
 		scope.handleSelect = function(e, ui) {
 			var items = this.getItems(),
 				values = _.pluck(items, 'value');
-			if (_.indexOf(values, ui.item.value) > -1)
+			var found = _.find(values, function(v){
+				return scope.matchValues(v, ui.item.value);
+			});
+			if (found) {
 				return false;
-
+			}
 			values.push(ui.item.value);
 			update(values);
 			scaleInput(50);
