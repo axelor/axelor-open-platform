@@ -308,6 +308,9 @@ public abstract class Action {
 		private String title;
 		
 		@XmlAttribute
+		private String icon;
+		
+		@XmlAttribute
 		private String model;
 		
 		@XmlElement
@@ -320,6 +323,10 @@ public abstract class Action {
 			return JPA.translate(title);
 		}
 		
+		public String getIcon() {
+			return icon;
+		}
+
 		public String getModel() {
 			return model;
 		}
@@ -380,6 +387,7 @@ public abstract class Action {
 			}
 
 			result.put("title", title);
+			result.put("icon", getIcon());
 			result.put("model", getModel());
 			result.put("viewType", viewType);
 			result.put("views", views);

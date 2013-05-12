@@ -621,6 +621,7 @@
           <xsd:group ref="tns:FormWidgets" />
         </xsd:choice>
         <xsd:attribute name="title" type="xsd:string" use="required"/>
+        <xsd:attribute name="icon" type="xsd:string"/>
         <xsd:attribute name="onSelect" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
@@ -680,6 +681,7 @@
       <xsd:restriction base="tns:SimpleWidget">
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="title" type="xsd:string" use="required" />
+        <xsd:attribute name="icon" type="xsd:string" />
         <xsd:attribute name="prompt" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
@@ -1055,6 +1057,7 @@
           <xsd:element name="context" type="tns:ActContext" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="title" type="xsd:string" use="required"/>
+        <xsd:attribute name="icon" type="xsd:string"/>
         <xsd:attribute name="model" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
