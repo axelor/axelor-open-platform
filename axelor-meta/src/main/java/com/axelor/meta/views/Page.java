@@ -10,7 +10,14 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 public class Page extends SimpleContainer {
 	
 	@XmlAttribute
+	private String icon;
+	
+	@XmlAttribute
 	private String onSelect ;
+
+	public String getIcon() {
+		return icon;
+	}
 
 	public String getOnSelect() {
 		return onSelect;

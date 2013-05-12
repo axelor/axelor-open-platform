@@ -11,11 +11,18 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 public class Button extends SimpleWidget {
 
 	@XmlAttribute
+	private String icon;
+	
+	@XmlAttribute
 	private String prompt;
 	
 	@XmlAttribute
 	private String onClick;
 	
+	public String getIcon() {
+		return icon;
+	}
+
 	public String getPrompt() {
 		return JPA.translate(prompt);
 	}
