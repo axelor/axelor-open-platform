@@ -476,6 +476,10 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 		scope.getItems = function() {
 			return _.pluck(this.getSelection(), "value");
 		};
+		
+		scope.handleClick = function(e, item) {
+        	scope.showEditor(item);
+        };
 	},
 
 	link_editable: function(scope, element, attrs, model) {

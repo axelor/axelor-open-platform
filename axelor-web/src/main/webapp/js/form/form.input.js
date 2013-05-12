@@ -1054,7 +1054,7 @@ ui.formInput('MultiSelect', 'Select', {
 		
 		var __showSelection = scope.showSelection;
 		scope.showSelection = function(e) {
-			if (e && $(e.srcElement).is('li,i')) {
+			if (e && $(e.srcElement).is('li,i,span.tag-text')) {
 				return;
 			}
 			return __showSelection(e);
@@ -1101,8 +1101,13 @@ ui.formInput('MultiSelect', 'Select', {
 	template_editable:
 	'<div class="tag-select picker-input">'+
 	  '<ul ng-click="showSelection($event)">'+
-		'<li class="tag-item label label-info" ng-repeat="item in items"><a href="" ng-click="showEditor(item.value)">{{item.title}}</a> <i class="icon-remove icon-small" ng-click="removeItem(item)"></i></li>'+
-		'<li class="tag-selector"><input type="text" autocomplete="off"></li>'+
+		'<li class="tag-item label label-info" ng-repeat="item in items">'+
+			'<span ng-class="{\'tag-link\': handleClick}" class="tag-text" ng-click="handleClick($event, item.value)">{{item.title}}</span> '+
+			'<i class="icon-remove icon-small" ng-click="removeItem(item)"></i>'+
+		'</li>'+
+		'<li class="tag-selector">'+
+			'<input type="text" autocomplete="off">'+
+		'</li>'+
 	  '</ul>'+
 	  '<span class="picker-icons">'+
 	  	'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
@@ -1110,7 +1115,9 @@ ui.formInput('MultiSelect', 'Select', {
 	'</div>',
 	template_readonly:
 	'<div class="tag-select">'+
-		'<span class="label label-info" ng-repeat="item in items"><a ng-click="showEditor(item.value)">{{item.title}}</a></span>'+
+		'<span class="label label-info" ng-repeat="item in items">'+
+			'<span ng-class="{\'tag-link\': handleClick}" class="tag-text" ng-click="handleClick($event, item.value)">{{item.title}}</span>'+
+		'</span>'+
 	'</div>'
 });
 
