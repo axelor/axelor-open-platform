@@ -110,6 +110,13 @@ function PortletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 			$scope.parsePortlet(view);
 		});
 	};
+
+	$scope.$on('on:attrs-change:refresh', function(e) {
+		e.preventDefault();
+		if ($scope.onRefresh) {
+			$scope.onRefresh();
+		}
+	});
 }
 
 ui.directive('uiViewPortlet', ['$compile', function($compile){
