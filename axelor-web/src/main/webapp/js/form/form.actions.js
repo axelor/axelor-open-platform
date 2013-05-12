@@ -468,6 +468,8 @@ ActionHandler.prototype = {
 					if (itemScope.setDomain)
 						itemScope.setDomain(value);
 					break;
+				case 'refresh':
+					itemScope.$broadcast('on:attrs-change:refresh');
 				}
 			});
 		}
