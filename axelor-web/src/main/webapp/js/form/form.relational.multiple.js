@@ -492,19 +492,12 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 
 		function createItem(fields, term, popup) {
 			var ds = scope._dataSource,
-				data = {},
-				missing = false;
+				data = {}, missing = false;
 
 			_.each(fields, function(field) {
-				if (field.name === "name") {
-					return data["name"] = term;
-				}
-				if (field.name === "code") {
-					return data["code"] = term;
-				}
-				if (field.nameColumn) {
-					return data[field.name] = term;
-				}
+				if (field.name === "name") return data["name"] = term;
+				if (field.name === "code") return data["code"] = term;
+				if (field.nameColumn) return data[field.name] = term;
 				if (requiredFields.indexOf(field.name) > -1) {
 					return data[field.name] = term;
 				}
@@ -521,10 +514,7 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 			});
 		}
 		
-		function createAndSelect(term, popup) {
-			setTimeout(function(){
-				input.val("");
-			});
+		function create(term, popup) {
 			if (targetFields) {
 				return createItem(targetFields, term, popup);
 			}
@@ -539,35 +529,25 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 				var term = request.term;
 				if (term) {
 					items.push({
-						label: 'Create "' + term + '" and add...',
-						click: function() {
-							createAndSelect(term);
-						}
+						label : _t('Create "{0}" and add...', term),
+						click : function() { create(term); }
 					});
 					items.push({
-						label: 'Create "' + term + '"...',
-						click: function() {
-							createAndSelect(term, true);
-						}
+						label : _t('Create "{0}"...', term),
+						click : function() { create(term, true); }
 					});
 					items.push({
-						label: "Search...",
-						click: function() {
-							scope.showSelector();
-						}
+						label : _t("Search..."),
+						click : function() { scope.showSelector(); }
 					});
 				} else {
 					items.push({
-						label: "Search...",
-						click: function() {
-							scope.showSelector();
-						}
+						label: _t("Search..."),
+						click: function() { scope.showSelector(); }
 					});
 					items.push({
-						label: "Create...",
-						click: function() {
-							scope.showPopupEditor();
-						}
+						label: _t("Create..."),
+						click: function() { scope.showPopupEditor(); }
 					});
 				}
 				response(items);
@@ -584,6 +564,9 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 		var _handleSelect = scope.handleSelect;
 		scope.handleSelect = function(e, ui) {
 			if (ui.item.click) {
+				setTimeout(function(){
+					input.val("");
+				});
 				ui.item.click.call(scope);
 				return setTimeout(function(){
 					scope.$apply();
