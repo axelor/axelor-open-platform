@@ -190,11 +190,16 @@ ui.formItem('Button', {
 	transclude: true,
 	link: function(scope, element, attrs, model) {
 
+		scope.icon = scope.field && scope.field.icon;
+		
 		element.on("click", function(e) {
 			scope.fireAction("onClick");
 		});
 	},
-	template: '<button class="btn" type="button" ng-transclude></button>'
+	template: '<button class="btn" type="button">'+
+		'<img class="prefix-icon" ng-show="icon" ng-src="{{icon}}">'+
+		'<span ng-transclude></span>'+
+	'</button>'
 });
 
 /**

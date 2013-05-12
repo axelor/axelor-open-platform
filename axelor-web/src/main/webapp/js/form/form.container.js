@@ -235,7 +235,10 @@ ui.formWidget('Tabs', {
 				'<div class="nav-tabs-strip">' +
 					'<ul class="nav nav-tabs">' +
 						'<li tabindex="-1" ng-repeat="tab in tabs" ng-class="{active:tab.selected}">'+
-							'<a tabindex="-1" href="" ng-click="select(tab)" ng-bind-html-unsafe="tab.title"></a>' +
+							'<a tabindex="-1" href="" ng-click="select(tab)">'+
+								'<img class="prefix-icon" ng-show="tab.icon" ng-src="{{tab.icon}}">'+
+								'<span ng-bind-html-unsafe="tab.title"></span>'+
+							'</a>' +
 						'</li>' +
 					'</ul>' +
 				'</div>' +
@@ -271,6 +274,7 @@ ui.formWidget('Tab', {
 		});
 		
 		scope.selected = false;
+		scope.icon = scope.field && scope.field.icon;
 
 		tabs.addTab(scope);
 		attrs.$observe('title', function(value){

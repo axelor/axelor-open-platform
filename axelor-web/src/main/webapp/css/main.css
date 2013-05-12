@@ -405,3 +405,7 @@ html, body {
       -ms-user-select: none;
           user-select: none;
 }
+
+img.prefix-icon {
+	margin-right: 4px;
+}
