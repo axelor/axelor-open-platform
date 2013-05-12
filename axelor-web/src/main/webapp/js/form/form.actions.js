@@ -470,8 +470,6 @@ ActionHandler.prototype = {
 					break;
 				}
 			});
-			
-			item.trigger("on:attrs-change", itemAttrs);
 		}
 		
 		forEach(data.attrs, function(itemAttrs, itemName) {
