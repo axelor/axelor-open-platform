@@ -118,6 +118,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		handleConditional("collapse", "collapseIf");
 		
 		function hideWidget(hidden) {
+			if (hidden === element.is(":hidden")) return;
 			var elem = element,
 				parent = elem.parent('td'),
 				label = elem.data('label') || $(),
@@ -135,6 +136,12 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		});
 		
 		this.prepare(scope, element, attrs, controller);
+		
+		setTimeout(function() {
+			if (scope.isHidden()) {
+				hideWidget(true);
+			}
+		});
 	}
 
 	return angular.bind(this, link);
