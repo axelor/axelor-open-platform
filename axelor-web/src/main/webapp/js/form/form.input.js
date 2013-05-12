@@ -382,12 +382,6 @@ ui.formInput('Integer', {
 
 		setTimeout(function(){
 			element.spinner(options);
-			if (scope.isReadonly()) {
-				element.spinner("disable");
-			}
-			element.on("on:attrs-change", function(event, data) {
-				element.spinner(data.readonly ? "disable" : "enable");
-			});
 			scope.$elem_editable = element.parent();
 			model.$render = function() {
 				var value = model.$viewValue;
