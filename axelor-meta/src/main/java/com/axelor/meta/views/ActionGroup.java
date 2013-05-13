@@ -63,7 +63,7 @@ public class ActionGroup extends Action {
 			Action action;
 			String[] parts = name.split("\\:", 2);
 
-			if (parts[0].matches("grid|form|tree|portal|calendar|chart|html")) {
+			if (parts[0].matches("grid|form|tree|portal|calendar|chart|search|html")) {
 				Action.View view = new Action.View();
 				view.setType(parts[0]);
 				view.setName(parts[1]);
