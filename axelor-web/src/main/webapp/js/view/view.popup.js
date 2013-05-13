@@ -395,11 +395,12 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 			function adjustSize() {
 				element.find(':input:first').focus();
 				$.event.trigger('adjustSize');
-				
-				if (initialized)
+
+				if (initialized === 'editable' ||
+				   (initialized === 'readonly' && scope.isReadonly())) {
 					return;
-				
-				initialized = true;
+				}
+				initialized = scope.isReadonly() ? 'readonly' : 'editable';
 				autoSize();
 			}
 
@@ -426,11 +427,8 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 			}
 
 			scope.onOpen = function(e, ui) {
-				
-				scope._viewPromise.then(function(){
-					setTimeout(function(){
-						adjustSize();
-					});
+				scope._viewPromise.then(function() {
+					setTimeout(adjustSize, 100);
 				});
 			};
 			
