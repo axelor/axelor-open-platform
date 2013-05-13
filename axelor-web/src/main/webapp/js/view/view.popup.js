@@ -1,11 +1,13 @@
-EditorCtrl.$inject = ['$scope', '$element', 'DataSource', '$q'];
-function EditorCtrl($scope, $element, DataSource, $q) {
+EditorCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewService', '$q'];
+function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	
-	$scope._dataSource = DataSource.create($scope._model, {
-		domain: $scope._domain,
-		context: $scope._context
-	});
+	var parent = $scope.$parent;
 	
+	$scope._viewParams = parent._viewParams;
+	$scope.editorCanSave = parent.editorCanSave;
+	$scope.editorCanReload = parent.editorCanReload;
+
+	ViewCtrl.call(this, $scope, DataSource, ViewService);
 	FormViewCtrl.call(this, $scope, $element);
 	
 	$scope.setEditable();
@@ -113,14 +115,15 @@ function EditorCtrl($scope, $element, DataSource, $q) {
 	};
 }
 
-SelectorCtrl.$inject = ['$scope', '$element', 'DataSource'];
-function SelectorCtrl($scope, $element, DataSource) {
+SelectorCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewService'];
+function SelectorCtrl($scope, $element, DataSource, ViewService) {
 	
-	$scope._dataSource = DataSource.create($scope._model, {
-		domain: $scope._domain,
-		context: $scope._context
-	});
+	var parent = $scope.$parent;
 	
+	$scope._viewParams = parent._viewParams;
+	$scope.getDomain = parent.getDomain;
+
+	ViewCtrl.call(this, $scope, DataSource, ViewService);
 	GridViewCtrl.call(this, $scope, $element);
 
 	function doFilter() {
@@ -388,6 +391,7 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 	return {
 		restrict: 'EA',
 		controller: EditorCtrl,
+		scope: {},
 		link: function(scope, element, attrs) {
 			
 			var initialized = false;
@@ -453,6 +457,7 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 	return {
 		restrict: 'EA',
 		controller: SelectorCtrl,
+		scope: {},
 		link: function(scope, element, attrs) {
 			
 			var initialized = false;

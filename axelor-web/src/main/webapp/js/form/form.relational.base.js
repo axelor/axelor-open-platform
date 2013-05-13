@@ -95,7 +95,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			return;
 		}
 		if (editor == null) {
-			editor = ViewService.compile('<div ui-editor-popup></div>')($scope.$new());
+			editor = ViewService.compile('<div ui-editor-popup></div>')($scope);
 			editor.data('$target', $element);
 		}
 		
@@ -160,7 +160,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		}
 		function doShow() {
 			if (selector == null) {
-				selector = ViewService.compile('<div ui-selector-popup></div>')($scope.$new());
+				selector = ViewService.compile('<div ui-selector-popup></div>')($scope);
 				selector.data('$target', $element);
 			}
 			var popup = selector.data('$scope');
