@@ -396,6 +396,18 @@ function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 		'list' : 'grid',
 		'edit' : 'form'
 	};
+
+	function findTabTitle(tab) {
+		var first;
+		if (tab.title) {
+			return tab.title;
+		}
+		first = _.first(tab.views);
+		if (first) {
+			return first.title || first.name;
+		}
+		return tab.name || "Unknown";
+	}
 	
 	$scope.openTab = function(tab, options) {
 		
@@ -409,6 +421,7 @@ function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 		}
 		
 		tab.options = options;
+		tab.title = tab.title || findTabTitle(tab);
 
 		if (!found) {
 			found = tab;
