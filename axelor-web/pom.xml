@@ -46,6 +46,7 @@
               <executable>${basedir}/src/main/webapp/minimize.sh</executable>
               <workingDirectory>${basedir}/src/main/webapp/</workingDirectory>
               <arguments>
+                <argument>-o</argument>
                 <argument>${project.build.directory}/${project.build.finalName}/js/application-all.min.js</argument>
               </arguments>
             </configuration>
