@@ -916,11 +916,6 @@ ui.formInput('Select', 'BaseSelect', {
 			response(items);
 		};
 
-		scope.parse = function(value) {
-			if (!value || _.isString(value)) return value;
-			return value.value;
-		};
-		
 		scope.formatItem = function(item) {
 			if (!item) return item;
 			if (_.isString(item)) {
@@ -949,7 +944,7 @@ ui.formInput('Select', 'BaseSelect', {
 		};
 
 		scope.handleSelect = function(e, ui) {
-			update(ui.item);
+			update(ui.item.value);
 		};
 
 		scope.$render_editable = function() {
