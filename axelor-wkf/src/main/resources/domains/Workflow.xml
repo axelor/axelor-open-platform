@@ -15,6 +15,7 @@
     <integer name="sequence" />
     <boolean name="active" default="true"/>
     <many-to-one name="condition" ref="com.axelor.meta.db.MetaAction" title="Condition" />
+    <string name="bpmn" title="BPMN" large="true" />
     
   </entity>
 

@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import com.axelor.rpc.ActionRequest
 import com.axelor.rpc.ActionResponse
-import com.axelor.wkf.WkfSettings;
+import com.axelor.wkf.WkfSettings
 import com.axelor.wkf.db.Instance
 import com.axelor.wkf.db.Workflow
 import com.axelor.wkf.workflow.WorkflowService
@@ -12,7 +12,7 @@ import com.axelor.wkf.workflow.WorkflowService
 class WkfController {
 	
 	@Inject
-	WorkflowService workFlowEngine
+	WorkflowService workflowService
 
 	/**
 	 * Open all instances of the wkf.
@@ -39,10 +39,18 @@ class WkfController {
 	 * @param response
 	 */
 	def run (ActionRequest request, ActionResponse response) {
-	   
-		def context = request.context as Workflow
 		
-		workFlowEngine.run( Class.forName(context.metaModel.fullName) );
+		updateResponse( workflowService.run( request ), response );
+		
+	}
+	
+	def updateResponse( ActionResponse response, ActionResponse responseToUpdate ){
+		
+		responseToUpdate.data = response.data
+		responseToUpdate.errors = response.errors
+		responseToUpdate.offset = response.offset
+		responseToUpdate.status = response.status
+		responseToUpdate.total = response.total
 		
 	}
 	

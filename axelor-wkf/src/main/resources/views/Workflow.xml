@@ -37,10 +37,11 @@
         	<page title="Configuration">
 		        <field name="maxNodeCounter"/>
 		        <field name="condition" />
-		        <field name="node" form-view="start-node-form" summary-view="start-node-form"/>
+		        <field name="node" form-view="start-node-form" />
 		    </page>
 		    <page title="Description">
         		<field name="description" colSpan="4" noLabel="true"/>
+        		<field name="bpmn" colSpan="4" noLabel="true" widget="CodeEditor[syntax=xml|height=500]"/>
 		    </page>
         </notebook> 
         <group colSpan="4" cols="6" colWidths="33,33%*">
@@ -61,7 +62,7 @@
     onLoad="node-type-attrs"
     onNew="node-default-record,node-type-attrs">
     	<field name="workflow"/>
-        <field name="type" onChange="node-type-attrs" required="true"/>
+        <field name="type" onChange="node-type-attrs,node-record-name" required="true"/>
         <field name="name"/>
         <field name="action" />
         <field name="logicOperator" />
@@ -151,8 +152,13 @@
     </action-record>
     
     <action-record name="node-default-record" model="com.axelor.wkf.db.Node">
+    	<field name="type" expr="intermediary"/>
     	<field name="workflow" expr="eval: _parent?.startNode?.workflow" if="_parent?.startNode"/>
     	<field name="workflow" expr="eval: _parent?._parent?.workflow" if="_parent?._parent"/>
+    	<field name="name" expr="eval: type?.toUpperCase() + ':'"/>
+    </action-record>
+    
+    <action-record name="node-record-name" model="com.axelor.wkf.db.Node">
     	<field name="name" expr="eval: type?.toUpperCase() + ':'"/>
     </action-record>
     
