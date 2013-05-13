@@ -19,11 +19,11 @@ import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
-import com.axelor.db.mapper.Property;
 import com.axelor.meta.service.MetaModelService;
 import com.axelor.rpc.ActionRequest;
+import com.axelor.rpc.ActionResponse;
 import com.axelor.wkf.IWorkflow;
-import com.axelor.wkf.action.ActionWorkflow;
+import com.axelor.wkf.action.Action;
 import com.axelor.wkf.db.Instance;
 import com.axelor.wkf.db.InstanceCounter;
 import com.axelor.wkf.db.InstanceHistory;
@@ -35,13 +35,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
-class WorkflowService<T extends Model> implements IWorkflow<T> {
+public class WorkflowService implements IWorkflow {
 	
 	protected static final Logger LOG = LoggerFactory.getLogger(WorkflowService.class);
 	
-	private ActionWorkflow actionWorkflow;
+	private Action actionWorkflow;
 	
 	protected ActionRequest actionRequest;
+	protected ActionResponse actionResponse;
 	
 	protected int maxNodeCounter;
 	protected Map<Node, Integer> nodeCounters;
@@ -53,7 +54,7 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 	protected User user;
 	
 	@Inject
-	public WorkflowService ( ActionWorkflow actionWorkflow ){
+	public WorkflowService ( Action actionWorkflow ){
 		
 		this.nodeCounters = new HashMap<Node, Integer>();
 		this.executedNodes = new HashSet<Node>();
@@ -73,7 +74,7 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 	 * 
 	 * 
 	 */
-	protected WorkflowService<T> init (Workflow wkf, ActionRequest actionRequest) {
+	protected WorkflowService init (Workflow wkf, ActionRequest actionRequest) {
 		
 		LOG.debug("INIT Wkf engine context ::: {}", actionRequest.getContext());
 		
@@ -93,25 +94,25 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 	 * 
 	 * 
 	 */
-	protected WorkflowService<T> init (Workflow wkf, T bean) {
+	protected WorkflowService init (Workflow wkf, Model model) {
 
-		LOG.debug("INIT Wkf engine bean () ::: {}", bean);
+		LOG.debug("INIT Wkf engine bean () ::: {}", model);
 		ActionRequest request = new ActionRequest();
 
 		Map<String, Object> data = Maps.newHashMap();
-		data.put("context", Mapper.toMap( bean ));
+		data.put("context", Mapper.toMap( model ));
 		
 		request.setData( data );
-		request.setModel( persistentClassName( bean ) );
+		request.setModel( persistentClassName( model ) );
 		
 		return init(wkf, request);
 		
 	}
 	
-	private String persistentClassName( T bean ){
+	private String persistentClassName( Model model ){
 		
-		if ( bean instanceof HibernateProxy ) { return ((HibernateProxy) bean).getHibernateLazyInitializer().getPersistentClass().getName(); }
-		else { return bean.getClass().getName(); }
+		if ( model instanceof HibernateProxy ) { return ((HibernateProxy) model).getHibernateLazyInitializer().getPersistentClass().getName(); }
+		else { return model.getClass().getName(); }
 		
 	}
 
@@ -180,7 +181,7 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 	 * 		Target class.
 	 */
 	@Override
-	public void run( Class<T> klass ){
+	public ActionResponse run( Class<Model> klass ){
 		
 		Workflow wkf = getWorkflow( klass );
 		
@@ -188,7 +189,8 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 			
 			LOG.debug("Run workflow {}", wkf.getName());
 			
-			for (T bean : JPA.all(klass).fetch()) { run( wkf, bean ); }
+			for (Model model : JPA.all(klass).fetch()) { run( wkf, model ); }
+			
 			
 		}
 		else {
@@ -197,6 +199,7 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 			
 		}
 		
+		return this.actionResponse;
 	}
 	
 	/**
@@ -206,15 +209,17 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 	 * @param id
 	 */
 	@Override
-	public void run(T bean) {
+	public ActionResponse run(Model model) {
 		
-		Workflow wkf = getWorkflow( bean.getClass() );
+		Workflow wkf = getWorkflow( model.getClass() );
 		
 		if (wkf != null){ 
 			LOG.debug("Run workflow {}", wkf.getName());
-			run(wkf, bean); 
+			run(wkf, model); 
 		}
-		else { LOG.debug("No workflow for entity ::: {}", bean.getClass()); }
+		else { LOG.debug("No workflow for entity ::: {}", model.getClass()); }
+		
+		return this.actionResponse;
 		
 	}
 	
@@ -225,14 +230,16 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 	 * @param bean
 	 */
 	@Override
-	public void run(Workflow wkf, T bean){
+	public ActionResponse run(Workflow wkf, Model model){
 		
-		updateInstance( init( wkf, bean ).playNodes( instance.getNodes() ) );
+		updateInstance( init( wkf, model ).playNodes( instance.getNodes() ) );
+		
+		return this.actionResponse;
 		
 	}
 
 	@Override
-	public void run( ActionRequest actionRequest ) {
+	public ActionResponse run( ActionRequest actionRequest ) {
 		
 		Workflow wkf = getWorkflow( actionRequest.getBeanClass() );
 		
@@ -242,12 +249,15 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 		}
 		else { LOG.debug("No workflow for entity ::: {}", actionRequest.getBeanClass()); }
 		
+		return this.actionResponse;
+		
 	}
 
 	@Override
-	public void run( Workflow wkf, ActionRequest actionRequest ){
+	public ActionResponse run( Workflow wkf, ActionRequest actionRequest ){
 		
 		updateInstance( init( wkf, actionRequest ).playNodes( instance.getNodes() ) );
+		return this.actionResponse;
 		
 	}
 
@@ -294,7 +304,8 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 		if ( !node.getEndTransitions().isEmpty() ){
 			
 			if ( isPlayable(node) ){
-				
+
+				if ( node.getAction() != null ){ actionResponse = actionWorkflow.execute( node.getAction().getName(), actionRequest ); }
 				nodes.addAll( playTransitions( node.getEndTransitions() ) );
 				counterAdd( instance, node );
 				addExecutedNodes( node );
@@ -302,7 +313,8 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 			
 		}
 		else {
-			
+
+			if ( node.getAction() != null ){ actionResponse = actionWorkflow.execute( node.getAction().getName(), actionRequest ); }
 			nodes.add( node );
 			
 		}
@@ -345,7 +357,6 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 	 * @return
 	 * 		Set of running nodes.
 	 */
-	@SuppressWarnings("unused")
 	protected Set<Node> playTransition(Transition transition) {
 
 		Preconditions.checkArgument( transition.getStartNode().getWorkflow().getMetaModel().equals( transition.getNextNode().getWorkflow().getMetaModel() ) );
@@ -358,13 +369,10 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 		
 		if (transition.getCondition() != null){
 
-			actionWorkflow.execute( transition.getCondition().getName(), actionRequest);
+			actionResponse = actionWorkflow.execute( transition.getCondition().getName(), actionRequest );
 			
-			if (true){
+			if ( actionResponse.getErrors() == null || actionResponse.getErrors().isEmpty() ){
 				
-				Node node = transition.getNextNode();
-				
-				if ( node.getAction() != null ){ actionWorkflow.execute( node.getAction().getName(), actionRequest); }
 				addWaitingNodes( transition );
 				nodes.addAll( playNode( transition.getNextNode() ) );
 			}
@@ -375,11 +383,8 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 		}
 		else {
 			
-			Node node = transition.getNextNode();
-			if ( node.getAction() != null ){ actionWorkflow.execute( node.getAction().getName(), actionRequest); }
-			
 			addWaitingNodes( transition );
-			nodes.addAll( playNode( node ) );
+			nodes.addAll( playNode( transition.getNextNode() ) );
 			
 		}
 		
@@ -443,11 +448,7 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 		
 		if (node.getLogicOperator().equals( AND )){
 			
-			if ( !waitingNodes.containsKey(node) ){
-				
-				waitingNodes.put( node, new HashSet<Transition>() );
-				
-			}
+			if ( !waitingNodes.containsKey(node) ){ waitingNodes.put( node, new HashSet<Transition>() ); }
 
 			waitingNodes.get( node ).add( transition );
 			
@@ -534,14 +535,14 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 		instance.setWorkflow( wkf );
 		instance.setMetaModelId( id );
 		
-		instance.setNodes( new HashSet<Node>() );
-		instance.getNodes().add( wkf.getNode() );
-		
 		instance.setCreationDate( dateTime );
 		instance.setCreationUser( user );
 		
+		instance.setNodes( new HashSet<Node>() );
 		instance.setExecutedNodes( new HashSet<Node>() );
 		instance.setWaitingNodes( new ArrayList<WaitingNode>() );
+
+		instance.addNode( wkf.getNode() );
 		
 		return instance.save();
 		
@@ -550,9 +551,8 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 	@Transactional
 	protected Instance updateInstance(Set<Node> nodes){
 		
-		instance.getNodes().clear();
+		instance.clearNodes();
 		instance.getNodes().addAll( nodes );
-		
 		instance.getExecutedNodes().addAll( executedNodes );
 		
 		return instance.save();
@@ -573,11 +573,8 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 		history.setInstance( instance );
 		history.setCreationDate( dateTime );
 		history.setCreationUser( user );
-		history.setTransition( transition );
-		
-		if (instance.getHistories() == null){ instance.setHistories( new ArrayList<InstanceHistory>() ); }
-		
-		instance.getHistories().add( history );
+		history.setTransition( transition );		
+		instance.addHistory( history );
 		
 	}
 	
@@ -602,12 +599,7 @@ class WorkflowService<T extends Model> implements IWorkflow<T> {
 			counter.setInstance( instance );
 			counter.setNode( node );
 			counter.setCounter( 1 );
-			
-			if ( instance.getCounters() == null ){
-				instance.setCounters( new ArrayList<InstanceCounter>() );
-			}
-			
-			instance.getCounters().add( counter );
+			instance.addCounter( counter );
 			
 		}
 		
