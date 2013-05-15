@@ -143,6 +143,28 @@ function PieChart(scope, element, data) {
 	return chart;
 }
 
+REGISTRY["dbar"] = DBarChart;
+function DBarChart(scope, element, data) {
+	
+	var chart_data = PlusData(scope, data, "bar");
+	chart_data = [{
+		key: data.title,
+		values: chart_data
+	}];
+	
+	var chart = nv.models.discreteBarChart()
+	    .x(function(d) { return d.x; })
+	    .y(function(d) { return d.y; })
+	    .staggerLabels(true)
+	    .showValues(true);
+	
+	d3.select(element[0])
+	  .datum(chart_data)
+	  .transition().duration(500).call(chart);
+	
+	return chart;
+}
+
 REGISTRY["bar"] = BarChart;
 function BarChart(scope, element, data) {
 	
@@ -211,7 +233,8 @@ function Chart(scope, element, data) {
 
 	for(var i = 0 ; i < data.series.length ; i++) {
 		type = data.series[i].type;
-		if (type === "pie") {
+		if (type === "bar" && !data.series[i].groupBy) type = "dbar";
+		if (type === "pie" || type === "dbar") {
 			break;
 		}
 	}
@@ -243,7 +266,8 @@ function Chart(scope, element, data) {
 				return moment([2000, d, 1]).format("YYYY");
 			},
 			"number": d3.format(',f'),
-			"decimal": d3.format(',.1f')
+			"decimal": d3.format(',.1f'),
+			"text": function(d) { return d; }
 		};
 		
 		var tickFormat = tickFormats[data.xType];
