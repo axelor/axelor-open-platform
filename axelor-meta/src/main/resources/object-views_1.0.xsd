@@ -422,6 +422,7 @@
                     <xsd:enumeration value="time"/>
                     <xsd:enumeration value="month"/>
                     <xsd:enumeration value="year"/>
+                    <xsd:enumeration value="text"/>
                   </xsd:restriction>
                 </xsd:simpleType>
               </xsd:attribute>
