@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -544,7 +545,7 @@ public final class JPA {
 		
 		Mapper mapper = Mapper.of(beanClass);
 		final T obj = Mapper.toBean((Class<T>) beanClass, null);
-		
+		final int random = new Random().nextInt();
 		for(final Property p : mapper.getProperties()) {
 			
 			if (p.isVirtual() || p.isPrimary() || p.isVersion()) {
@@ -566,7 +567,7 @@ public final class JPA {
 			}
 
 			if (value instanceof String && p.isUnique()) {
-				value = ((String) value) + " Copy (" + bean.getId() + ")";
+				value = ((String) value) + " Copy (" +  random + ")";
 			}
 
 			p.set(obj, value);
