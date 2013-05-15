@@ -371,7 +371,7 @@ public class WorkflowService implements IWorkflow {
 
 			actionResponse = actionWorkflow.execute( transition.getCondition().getName(), actionRequest );
 			
-			if ( actionResponse.getErrors() == null || actionResponse.getErrors().isEmpty() ){
+			if ( !actionWorkflow.isInError(actionResponse) ){
 				
 				addWaitingNodes( transition );
 				nodes.addAll( playNode( transition.getNextNode() ) );

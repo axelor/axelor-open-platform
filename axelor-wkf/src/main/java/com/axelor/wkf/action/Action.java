@@ -1,5 +1,8 @@
 package com.axelor.wkf.action;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -28,6 +31,16 @@ public class Action {
 		
 		return response;
 		
+	}
+
+	@SuppressWarnings("rawtypes")
+	public boolean isInError(ActionResponse actionResponse){
+		
+		for (Object data : (List) actionResponse.getData()) {
+			if (data instanceof Map && ((Map) data).containsKey("errors")) { return true; }
+		}
+		
+		return false;
 	}
 
 }
