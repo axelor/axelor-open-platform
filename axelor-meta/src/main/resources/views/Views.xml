@@ -321,7 +321,7 @@
     <option value="time">Time</option>
     <option value="month">Month</option>
     <option value="year">Year</option>
-    <option value="">Text</option>
+    <option value="text">Text</option>
   </selection>
   
   <selection name="selection.chart.qtype">
