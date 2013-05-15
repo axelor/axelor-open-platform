@@ -73,8 +73,7 @@ public class WorkFlowEngineTest {
 
 		Action actionWorkflow = new Action();
 
-		ActionResponse value = actionWorkflow.execute("action-alert-test",
-				request);
+		ActionResponse value = actionWorkflow.execute("action-alert-test", request);
 
 		Assert.assertNotNull(value);
 		Assert.assertNotNull(value.getData());
