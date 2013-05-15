@@ -63,13 +63,13 @@ String appJS = AppSettings.getAppJS(getServletContext());
           <% } %>
           <ul class="nav pull-right">
             <li class="divider-vertical"></li>
-            <li><a href="#/"><i class="icon-home"></i> <span x-translate>Home</span></a></li>
+            <li><a href="#/"><img src="img/home-icon.png"> <span x-translate>Home</span></a></li>
             <li class="divider-vertical"></li>
-            <li><a href="{{app.help}}" target="_blank"><i class="icon-info-sign"></i> <span x-translate>Help</span></a></li>
+            <li><a href="{{app.help}}" target="_blank"><img src="img/help-icon.png"> <span x-translate>Help</span></a></li>
             <li class="divider-vertical"></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              	<i class="icon-eye-open"></i> <span x-translate>About</span> <b class="caret"></b>
+              	<img src="img/about-icon.png"> <span x-translate>About</span> <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
                 <li><a href="#/about"><i>{{app.name}} - v{{app.version}}</i></a></li>
@@ -79,7 +79,7 @@ String appJS = AppSettings.getAppJS(getServletContext());
             <li class="divider-vertical"></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              	<i class="icon-user"></i> <span>{{app.user}}</span> <b class="caret"></b>
+              	<img src="img/user-icon.png"> <span>{{app.user}}</span> <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
                 <li><a href="#" x-translate>Profile</a></li>
