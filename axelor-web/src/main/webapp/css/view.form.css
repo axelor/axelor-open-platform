@@ -87,6 +87,9 @@ table.form-layout td.form-item > .form-item-container > span.display-text {
 
 table.form-layout td.form-item > .form-item-container > span.display-text {
 	min-width: 100px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	position: absolute;
 }
 
 table.form-layout td.form-item > .many2one-item.readonly a {
