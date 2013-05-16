@@ -332,6 +332,7 @@ Grid.prototype.parse = function(view) {
 	}
 
 	var options = {
+		rowHeight: 28,
 		editable: view.editable,
 		editorFactory:  Factory,
 		formatterFactory: Factory,

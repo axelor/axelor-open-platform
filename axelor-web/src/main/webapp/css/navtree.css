@@ -16,6 +16,12 @@
 	text-overflow: ellipsis;
 }
 
+.nav-tree li i[class^=icon-] {
+	width: 16px;
+	display: inline-block;
+	text-align: center;
+}
+
 .nav-tree img {
 	width: 16px;
 	height: 16px;

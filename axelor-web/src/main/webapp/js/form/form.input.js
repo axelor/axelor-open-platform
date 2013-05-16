@@ -115,6 +115,7 @@ ui.directive('uiHelpPopover', function() {
 				return 'right';
 			},
 			trigger: 'hover',
+			container: 'body',
 			title: function() {
 				return element.text();
 			},
