@@ -61,7 +61,7 @@ String appJS = AppSettings.getAppJS(getServletContext());
             <img src="<%= appLogo %>">
           </a>
           <% } %>
-          <ul class="nav pull-right">
+          <ul class="nav nav-shortcuts pull-right">
             <li class="divider-vertical"></li>
             <li><a href="#/"><img src="img/home-icon.png"> <span x-translate>Home</span></a></li>
             <li class="divider-vertical"></li>
