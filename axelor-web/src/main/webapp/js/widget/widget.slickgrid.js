@@ -928,6 +928,7 @@ Grid.prototype.onSort = function(event, args) {
 };
 
 Grid.prototype.onButtonClick = function(event, args) {
+	var grid = this.grid;
 	var data = this.scope.dataView;
 	var cols = this.getColumn(args.cell);
 	var field = (cols || {}).descriptor || {};
@@ -945,6 +946,8 @@ Grid.prototype.onButtonClick = function(event, args) {
 			}, record);
 		};
 		field.handler.onClick().then(function(res){
+			grid.invalidateRows([args.row]);
+			grid.render();
 		});
 	}
 };
