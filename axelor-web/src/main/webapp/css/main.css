@@ -26,6 +26,11 @@ html, body {
 	background-color: white;
 }
 
+.header .navbar .nav-shortcuts img {
+	height: 20px !important;
+	margin-top: -2px;
+}
+
 .footer {
 	position: absolute;
 	left: 0px; right: 0px; bottom: 0px;
