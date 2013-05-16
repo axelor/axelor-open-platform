@@ -666,3 +666,12 @@ table.field-details .help-text hr {
 	font-style: oblique;
 	padding-left: 12px;
 }
+
+.multi-object-select {
+	
+}
+
+.multi-object-select fieldset,
+.multi-object-select .v-align-top {
+	padding: 0 !important;
+}

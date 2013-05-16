@@ -7,11 +7,9 @@ ui.ManyToOneCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewService'];
 
 function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 
-	ui.RefFieldCtrl.call(this, $scope, $element, DataSource, ViewService);
+	ui.RefFieldCtrl.apply(this, arguments);
 
-	var ds = $scope._dataSource,
-		field = $scope.getViewDef($element),
-		nameField = field.targetName || field.nameField || 'id';
+	var ds = $scope._dataSource;
 
 	$scope.createNestedEditor = function() {
 		
@@ -39,6 +37,9 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 			value = _.first(value);
 		}
 		
+		var field = $scope.field,
+			nameField = field.targetName || 'id';
+
 		var record = value;
 
 		// fetch '.' names
@@ -101,10 +102,12 @@ ui.formInput('ManyToOne', 'Select', {
 
 	init: function(scope) {
 		this._super(scope);
-		var targetName = scope.field.targetName || "id";
 
 		scope.formatItem = function(item) {
-			return item ? item[targetName] : item;
+			if (item) {
+				return item[(scope.field.targetName || "id")];
+			}
+			return "";
 		};
 	},
 
@@ -192,6 +195,131 @@ ui.formInput('SuggestBox', 'ManyToOne', {
 			'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
 		'</span>'+
    '</span>'
+});
+
+ui.formInput('RefSelect', {
+	
+	showTitle: false,
+	
+	controller: ['$scope', 'ViewService', function($scope, ViewService) {
+
+		$scope.createSelector = function(select, ref, watch) {
+			var value = select.value;
+			var elem = $('<field ui-ref-item ng-show="canShow(\'' + value + '\')"/>')
+				.attr('ng-model', '$_' + ref)
+				.attr('x-target', value)
+				.attr('x-watch', watch)
+				.attr('x-ref', ref);
+
+			return ViewService.compile(elem)($scope);
+		};
+	}],
+	
+	link: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+
+		var watch = scope.getViewDef(scope.field.watch);
+		
+		scope.canShow = function canShow(value) {
+			var v = scope.record[watch.name];
+			return value === v;
+		};
+
+		var elems = _.map(watch.selection, function(s){
+			return scope.createSelector(s, scope.field.name, watch.name);
+		});
+
+		setTimeout(function() {
+			element.append(elems);
+		});
+	},
+
+	template_editable: null,
+	template_readonly: null
+});
+
+ui.formInput('RefItem', 'ManyToOne', {
+
+	showTitle: false,
+
+	link: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+
+		if (scope.field.targetName) {
+			return this._link.apply(this, arguments);
+		}
+
+		var self = this;
+		scope.loadView('grid').success(function(fields, view) {
+			var name = false,
+				search = [];
+
+			_.each(fields, function(f) {
+				if (f.nameColumn) name = f.name;
+				if (f.name === "name") search.push("name");
+				if (f.name === "code") search.push("code");
+			});
+			
+			if (!name && _.contains(search, "name")) {
+				name = "name";
+			}
+
+			_.extend(scope.field, {
+				target: scope._model,
+				targetName: name,
+				targetSearch: search
+			});
+
+			self._link(scope, element, attrs, model);
+		});
+	},
+
+	_link: function(scope, element, attrs, model) {
+		
+		var ref = element.attr('x-ref');
+		var watch = element.attr('x-watch');
+		
+		function doRender() {
+			if (scope.$render_editable) scope.$render_editable();
+			if (scope.$render_readonly) scope.$render_readonly();
+		}
+		
+		function getRef() {
+			return scope.record[ref];
+		}
+		
+		function setRef(value) {
+			return scope.record[ref] = value;
+		}
+		
+		var __setValue = scope.setValue;
+		scope.setValue = function(value) {
+			__setValue.call(scope, value);
+			setRef(value ? value.id : 0);
+		};
+
+		var selected = false;
+		
+		scope.$watch("record." + ref, function(value, old) {
+			setTimeout(function() {
+				var v = scope.getValue();
+				if ((v && v.id === value) || !selected) return;
+				scope.select(value ? {id: value } : null);
+			});
+		});
+		
+		scope.$watch("record." + watch, function(value, old) {
+			selected = value === scope._model;
+			if (value === old) return;
+			setTimeout(function() {
+				scope.setValue(null);
+			});
+		});
+
+		model.$render = function() {
+			if (selected) doRender();
+		};
+	},
 });
 
 }).call(this);

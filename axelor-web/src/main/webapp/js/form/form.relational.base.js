@@ -8,7 +8,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 
 	var field = $scope.getViewDef($element),
 		params = {
-			model: field.target,
+			model: field.target || $element.attr('x-target'),
 			views: field.views || {},
 			domain: field.domain,
 			context: field.context
@@ -259,6 +259,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	
 	$scope.fetchSelection = function(request, response) {
 
+		var field = this.field;
 		var nameField = field.targetName || 'id',
 			fields = field.targetSearch || [],
 			filter = {};
