@@ -222,6 +222,18 @@ html, body {
 	border: none !important;
 }
 
+.ui-datepicker .ui-slider-handle {
+	padding: 0;
+	border: 1px solid #cccccc !important;
+	
+	background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6) !important;
+	background-image:    -moz-linear-gradient(top, #ffffff, #e6e6e6) !important;
+	background-image:     -ms-linear-gradient(top, #ffffff, #e6e6e6) !important;
+	background-image:      -o-linear-gradient(top, #ffffff, #e6e6e6) !important;
+	background-image:         linear-gradient(top, #ffffff, #e6e6e6) !important;
+}
+
+.ui-datepicker .ui-slider-handle.ui-state-hover,
 .ui-datepicker .ui-state-active {
 	color: white !important;
 	border-color: rgba(0,0,0,.1) rgba(0,0,0,.1) rgba(0,0,0,.25) !important;
