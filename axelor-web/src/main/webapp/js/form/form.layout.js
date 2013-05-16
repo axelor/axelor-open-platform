@@ -78,6 +78,10 @@ function TableLayout(items, attrs, $scope, $compile) {
 	
 	var table = $('<table class="form-layout"></table');
 	
+	function isLabel(cell) {
+		return cell.css === "form-label" || (cell.elem && cell.elem.is('label,.spacer-item'));
+	}
+
 	function computeWidths(row) {
 		if (row.length === 1) return null;
 		var widths = [],
@@ -86,7 +90,7 @@ function TableLayout(items, attrs, $scope, $compile) {
 			emptyCols = 0;
 
 		_.each(row, function(cell) {
-			if (cell.css === 'form-label') {
+			if (isLabel(cell)) {
 				labelCols += (cell.colspan || 1);
 			} else {
 				itemCols += (cell.colspan || 1);
@@ -102,7 +106,7 @@ function TableLayout(items, attrs, $scope, $compile) {
 		var itemWidth = (100 - (labelWidth * labelCols)) / itemCols;
 
 		_.each(row, function(cell, i) {
-			var width = ((cell.css === 'form-label' ? labelWidth : itemWidth) * (cell.colspan || 1));
+			var width = ((isLabel(cell) ? labelWidth : itemWidth) * (cell.colspan || 1));
 			widths[i] = width + "%";
 		});
 		
