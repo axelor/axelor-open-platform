@@ -32,6 +32,8 @@ public class AuthModule extends ShiroWebModule {
 
         this.addFilterChain("/public/**", ANON);
         this.addFilterChain("/lib/**", ANON);
+        this.addFilterChain("/img/**", ANON);
+        this.addFilterChain("/css/**", ANON);
 		this.addFilterChain("/logout", LOGOUT);
 		this.addFilterChain("/**", Key.get(AuthFilter.class));
 	}
