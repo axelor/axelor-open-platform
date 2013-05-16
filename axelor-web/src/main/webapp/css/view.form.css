@@ -170,7 +170,6 @@ table.form-layout td.form-item .input-append button {
 }
 
 .picker-input {
-	display: inline-block;
 	box-sizing: border-box;
 }
 
@@ -665,4 +664,18 @@ table.field-details .help-text hr {
 .tag-select-action-menu .tag-select-action a {
 	font-style: oblique;
 	padding-left: 12px;
+}
+
+
+.multi-object-select {
+	
+}
+
+.multi-object-select fieldset,
+.multi-object-select td {
+	padding: 0 !important;
+}
+
+.multi-object-select td.select-item {
+	padding-right: 4px !important;
 }

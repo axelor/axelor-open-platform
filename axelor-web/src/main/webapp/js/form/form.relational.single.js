@@ -216,7 +216,7 @@ ui.formInput('RefSelect', {
 
 		$scope.createElement = function(name, selection, related) {
 
-			var elemGroup = $('<group ui-group ui-table-layout cols="2" x-widths="200,*"></group>');
+			var elemGroup = $('<group ui-group ui-table-layout cols="2" x-widths="150,*"></group>');
 			var elemSelect = $('<input ui-select noLabel="true">')
 				.attr("name", name)
 				.attr("ng-model", "record." + name);
