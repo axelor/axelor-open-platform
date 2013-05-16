@@ -201,8 +201,55 @@ html, body {
 	line-height: 1.1em;
 }
 
-.ui-datepicker {
-	font-size: .9em;
+.ui-datepicker,
+.ui-datepicker table {
+	font-size: 13px;
+}
+
+.ui-datepicker-header {
+	background: none;
+	border: none;
+}
+
+.ui-datepicker .ui-state-default {
+	background: none !important;
+	border: none !important;
+	padding: 4px;
+}
+
+.ui-datepicker .ui-state-hover {
+	background: #eee !important;
+	border: none !important;
+}
+
+.ui-datepicker .ui-state-active {
+	color: white !important;
+	border-color: rgba(0,0,0,.1) rgba(0,0,0,.1) rgba(0,0,0,.25) !important;
+	background-color: #0074CC;
+
+	background-image: -webkit-linear-gradient(top, #08C, #05C) !important;
+	background-image:    -moz-linear-gradient(top, #08C, #05C) !important;
+	background-image:     -ms-linear-gradient(top, #08C, #05C) !important;
+	background-image:      -o-linear-gradient(top, #08C, #05C) !important;
+	background-image:         linear-gradient(top, #08C, #05C) !important;
+}
+
+.ui-datepicker .ui-state-highlight {
+	border: 1px solid #08c !important;
+	padding: 3px;
+}
+
+.ui-datepicker .ui-datepicker-next-hover,
+.ui-datepicker .ui-datepicker-prev-hover {
+	top: 2px;
+}
+
+.ui-datepicker .ui-datepicker-next-hover {
+	right: 2px;
+}
+
+.ui-datepicker .ui-datepicker-prev-hover {
+	left: 2px;
 }
 
 .ui-autocomplete {
