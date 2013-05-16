@@ -199,13 +199,13 @@ ui.formInput('SuggestBox', 'ManyToOne', {
 
 ui.formInput('RefSelect', {
 	
-	showTitle: false,
-	
+	css: 'multi-object-select',
+
 	controller: ['$scope', 'ViewService', function($scope, ViewService) {
 
 		$scope.createSelector = function(select, ref, watch) {
 			var value = select.value;
-			var elem = $('<field ui-ref-item ng-show="canShow(\'' + value + '\')"/>')
+			var elem = $('<input ui-ref-item ng-show="canShow(\'' + value + '\')"/>')
 				.attr('ng-model', '$_' + ref)
 				.attr('x-target', value)
 				.attr('x-watch', watch)
@@ -213,27 +213,46 @@ ui.formInput('RefSelect', {
 
 			return ViewService.compile(elem)($scope);
 		};
+
+		$scope.createElement = function(name, selection, related) {
+
+			var elemGroup = $('<group ui-group ui-table-layout cols="2" x-widths="200,*"></group>');
+			var elemSelect = $('<input ui-select noLabel="true">')
+				.attr("name", name)
+				.attr("ng-model", "record." + name);
+
+			var elemSelects = $('<group ui-group>');
+			var elemItems = _.map(selection, function(s) {
+				return $('<input ui-ref-item ng-show="canShow(\'' + s.value + '\')"/>')
+					.attr('ng-model', 'record.$_' + related)
+					.attr('x-target', s.value)
+					.attr('x-watch', name)
+					.attr('x-ref', related);
+			});
+
+			elemGroup.append(elemSelect).append(elemSelects.append(elemItems));
+
+			return ViewService.compile(elemGroup)($scope);
+		};
 	}],
-	
+
 	link: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);
 
-		var watch = scope.getViewDef(scope.field.watch);
+		var name = scope.field.name,
+			selection = scope.field.selection,
+			related = scope.field.related || scope.field.name + "Id";
 		
-		scope.canShow = function canShow(value) {
-			var v = scope.record[watch.name];
-			return value === v;
+		scope.canShow = function(value) {
+			return value === scope.getValue();
 		};
 
-		var elems = _.map(watch.selection, function(s){
-			return scope.createSelector(s, scope.field.name, watch.name);
-		});
+		var elem = scope.createElement(name, selection, related);
 
 		setTimeout(function() {
-			element.append(elems);
+			element.append(elem);
 		});
 	},
-
 	template_editable: null,
 	template_readonly: null
 });
@@ -311,9 +330,7 @@ ui.formInput('RefItem', 'ManyToOne', {
 		scope.$watch("record." + watch, function(value, old) {
 			selected = value === scope._model;
 			if (value === old) return;
-			setTimeout(function() {
-				scope.setValue(null);
-			});
+			scope.setValue(null);
 		});
 
 		model.$render = function() {
