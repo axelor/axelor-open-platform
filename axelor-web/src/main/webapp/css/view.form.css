@@ -85,11 +85,14 @@ table.form-layout td.form-item > .form-item-container > span.display-text {
 	line-height: 22px;
 }
 
-table.form-layout td.form-item > .form-item-container > span.display-text {
+table.form-layout td.form-item > .form-item-container > input.display-text {
 	min-width: 100px;
 	text-overflow: ellipsis;
 	overflow: hidden;
-	position: absolute;
+	border: none;
+	border-radius: none;
+	box-shadow: none;
+	background: transparent;
 }
 
 table.form-layout td.form-item > .many2one-item.readonly a {
