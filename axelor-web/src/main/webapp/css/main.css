@@ -304,7 +304,7 @@ html, body {
 
 .view-content {
 	position: absolute;
-	top: 36px; left: 0px; right: 0px; bottom: 0px;
+	top: 38px; left: 0px; right: 0px; bottom: 0px;
 }
 
 .view-pane {
@@ -460,4 +460,8 @@ html, body {
 
 img.prefix-icon {
 	margin-right: 4px;
+}
+
+[class^=icon-] {
+	font-size: 14px;
 }

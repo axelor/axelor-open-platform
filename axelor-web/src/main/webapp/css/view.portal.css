@@ -27,17 +27,12 @@
 .portal-view .portlet {
 	position: relative;
 	float: left;
-	min-height: 32px;
-}
-
-.portlet-header.navbar .icons-bar {
-	padding-top: 0;
+	min-height: 34px;
 }
 
 .portlet-header.navbar i {
-	padding: 0 2px;
+	padding: 4px;
 	margin: 0;
-	padding-top: 4px;
 }
 
 .portlet-header.navbar .portlet-pager i.disabled {
@@ -46,8 +41,7 @@
 }
 
 .portlet-header.navbar .divider-vertical {
-	height: 26px;
-	margin: 0 2px;
+	height: 28px;
 }
 
 .portlet .portlet-body,
@@ -71,7 +65,7 @@
 }
 
 .portlet .portlet-content {
-	top: 28px;
+	top: 30px;
 	left: 0px;
 	right: 0px;
 	bottom: 0px;

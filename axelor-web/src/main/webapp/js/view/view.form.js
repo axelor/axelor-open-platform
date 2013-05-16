@@ -612,6 +612,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 					content: getContent,
 					placement: "bottom",
 					trigger: "hover",
+					container: "body",
 					delay: {show: 500, hide: 0}
 				});
 				logInfo.popover('show');

@@ -58,13 +58,13 @@
 }
 
 .slick-headerrow {
-	height: 26px;
+	height: 29px;
 	border-top: none !important;
 	background-image: none !important;
 }
 
 .slick-headerrow-column {
-	height: 24px;
+	height: 29px;
 	border-left: none !important;
 	border-top: none !important;
 	border-bottom: none !important;
@@ -72,6 +72,10 @@
 	-webkit-box-sizing: border-box;
 	   -moz-box-sizing: border-box;
 	     box-sizing: border-box;
+}
+
+.slick-headerrow-columns {
+	height: 27px !important;
 }
 
 .slick-headerrow input {
@@ -91,15 +95,25 @@
 	padding: 0px;
 }
 
+.slick-header-column.ui-state-default {
+	height: inherit;
+	line-height: inherit;
+}
+
+.slick-cell {
+	line-height: 22px;
+}
+
 .slick-cell.editable {
 	background: white;
 	padding: 0;
-	height: 23px !important;
+	height: 26px !important;
 }
 
 .slick-cell input,
-.slick-cell > .ui-spinner,
-.slick-cell > [x-field] {
+.slick-cell .picker-input,
+.slick-cell .ui-spinner,
+.slick-cell [x-field] {
 	outline: 0;
 	margin: 0;
 	padding: 0;
@@ -107,7 +121,7 @@
 	box-sizing: border-box;
 	box-shadow: none;
 	width: 100%;
-	height: 100%;
+	height: 100% !important;
 	min-width: inherit !important;
 	min-height: 23px;
 }

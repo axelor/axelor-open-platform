@@ -43,7 +43,7 @@
 .nav-tabs-strip {
 	position: relative;
 	overflow: hidden;
-	height: 36px;
+	height: 38px;
 }
 
 .nav-tabs-strip .nav-tabs {
@@ -68,8 +68,8 @@
 
 .nav-tabs-closable li > i {
 	position: absolute;
-	top: 0px;
-	right: 3px;
+	top: 4px;
+	right: 6px;
 	color: #ccc;
 	cursor: pointer;
 }

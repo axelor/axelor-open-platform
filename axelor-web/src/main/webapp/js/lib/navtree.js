@@ -142,7 +142,7 @@
 			if (openState && !state.isLoaded) {
 
 				state.isLoading = true;
-				el.find('i').attr('class', 'icon-refresh');
+				el.find('i').attr('class', 'icon-spinner');
 
 				return this.opts.onLazyFetch(record, function success(items) {
 

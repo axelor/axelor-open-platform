@@ -45,7 +45,7 @@ table.form-layout td.form-item.boolean-item {
 }
 
 table.form-layout td.form-label > label {
-	line-height: 22px;
+	line-height: 24px;
 	margin-bottom: 0px;
 	font-weight: bold;
 }
@@ -101,13 +101,13 @@ table.form-layout td.form-item > .many2one-item.readonly a {
 
 table.form-layout td.form-item input {
 	min-width: 170px;
-	height: 24px;
+	height: 26px;
 }
 
 table.form-layout td.form-item .small-input input,
 table.form-layout td.form-item input.small-input {
 	min-width: 50px;
-	height: 24px;
+	height: 26px;
 }
 
 table.form-layout td.form-item input[type="radio"],
@@ -121,30 +121,10 @@ table.form-layout td.form-item input[type="checkbox"] {
 table.form-layout td.form-item.select-item {
 	white-space: inherit;
 }
-table.form-layout td.form-item .select2-container {
-	display: table;
-}
-table.form-layout td.form-item .select2-container .select2-choice {
-	line-height: 24px;
-}
-table.form-layout td.form-item .select2-container .select2-choice div b {
-	background-position: 0 0;
-}
-table.form-layout td.form-item .select2-dropdown-open .select2-choice div b {
-	background-position: -18px 0;
-}
-table.form-layout td.form-item .select2-container .select2-choice abbr {
-	top: 6px;
-}
-table.form-layout td.form-item .select2-container-multi .select2-choices,
-table.form-layout td.form-item .select2-container-multi .select2-choices .select2-search-field input {
-	height: 20px;
-	min-height: 20px;
-}
 
 table.form-layout td.form-item button {
 	padding: 2px 10px 2px;
-	min-width: 24px;
+	min-width: 26px;
 	overflow: hidden;
 	white-space: nowrap;
 }
@@ -193,15 +173,10 @@ table.form-layout td.form-item .input-append button {
 
 .picker-input > .picker-icons > i[class^=icon] {
 	cursor: pointer;
-	margin-top: 2px;
+	margin-top: 4px;
 	margin-right: 2px;
 	padding: 2px;
 	display: inline-block;
-}
-
-.picker-input > .picker-icons > i[class^=icon-caret] {
-	font-size: 14px;
-	margin-top: 1px;
 }
 
 .picker-input > input,
@@ -254,13 +229,8 @@ table.form-layout td.form-item .stackbar.inline-editable {
 table.form-layout td.form-item .slickgrid {
 	position: absolute;
 	left: 0px; right: 0px;
-	top: 26px; bottom: 0px;
+	top: 29px; bottom: 0px;
 	border-top: none;
-}
-
-table.form-layout td.form-item .slickgrid .slick-cell.editable input,
-table.form-layout td.form-item .slickgrid .slick-cell.editable > [x-field] {
-	height: 23px;
 }
 
 td.form-item > * {
@@ -309,7 +279,7 @@ td.form-item > * {
 
 .form-item .form-item-group > legend i[class^=icon] {
 	color: #CCC;
-	height: 12px;
+	height: 10px;
 	margin-right: 4px;
 	display: inline-block;
 	cursor: pointer;
@@ -447,13 +417,17 @@ table.form-layout td.form-item .ui-spinner input {
 }
 
 table.field-details {
-	width: 100%;
+	width: 100px;
 }
 
 table.field-details th {
 	width: 5%;
-	white-space: nowrap;
 	text-align: right;
+}
+
+table.field-details th,
+table.field-details td {
+	white-space: nowrap;
 }
 
 table.field-details .help-text hr {
@@ -461,6 +435,8 @@ table.field-details .help-text hr {
 }
 
 .popover {
+	width: auto;
+	max-width: inherit;
 	z-index: 2100;
 }
 
@@ -633,7 +609,7 @@ table.field-details .help-text hr {
 }
 
 .tag-select li.tag-item i {
-	font-size: 9px;
+	font-size: 12px;
 	height: 12px;
 	cursor: pointer;
 }
