@@ -302,8 +302,8 @@ ui.formInput('OneToMany', {
 		
 		var adjustSize = (function() {
 			var rowSize = 26,
-				minSize = 60,
-				maxSize = (rowSize * 10) + 60;
+				minSize = 56,
+				maxSize = (rowSize * 10) + minSize;
 			var inc = 0;
 			return function(value) {
 				inc = arguments[1] || inc;
