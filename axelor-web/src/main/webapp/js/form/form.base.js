@@ -94,11 +94,12 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		
 		var handleConditional = function(attr, conditional, nagative){
 			if (!field[conditional]) return;
-			var root = scope.$root || scope;
-			root.$moment = function(d) { return moment(d); };	// moment.js helper
-			root.$number = function(d) { return +d; };			// number helper
+			var evalScope = scope.$new(true);
+			evalScope.$moment = function(d) { return moment(d); };			// moment.js helper
+			evalScope.$number = function(d) { return +d; };					// number helper
+			evalScope.$popup = function() { return scope._isPopup; };		// popup detect
 			scope.$on("on:record-change", function(e, rec) {
-				var value = root.$eval(field[conditional], rec);
+				var value = evalScope.$eval(field[conditional], rec);
 				if (nagative) { value = !value; };
 				scope.attr(attr, value);
 			});
