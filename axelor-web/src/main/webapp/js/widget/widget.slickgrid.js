@@ -475,7 +475,7 @@ Grid.prototype.subscribe = function(event, handler) {
 };
 
 Grid.prototype.adjustSize = function() {
-	if (!this.grid || !this.element.is(':visible')) {
+	if (!this.grid || this.element.is(':hidden') || this.grid.getEditorLock().isActive()) {
 		return;
 	}
 	this.grid.resizeCanvas();
@@ -614,24 +614,17 @@ Grid.prototype.onKeyDown = function(e, args) {
 	}
 	var handled = false;
 	if (e.which === $.ui.keyCode.TAB) {
-		var cell = null;
-		if (e.shiftKey) {
-			cell = this.findPrevEditable(args.row, args.cell);
-		} else {
-			cell = this.findNextEditable(args.row, args.cell);
-		}
-		if (cell !== null) {
-			if (cell.row > args.row && this.isDirty()) {
-				var saved = this.saveChanges(args, function(){
-					grid.focus();
-					grid.setActiveCell(cell.row, cell.cell);
-					grid.editActiveCell();
-				});
-				if (!saved) {
-					this.focusInvalidCell(args);
-				}
-			} else {
-				commit(cell.row, cell.cell);
+		var cell = e.shiftKey ? this.findPrevEditable(args.row, args.cell) :
+								this.findNextEditable(args.row, args.cell);
+
+		if (cell && commit(cell.row, cell.cell) && cell.row > args.row && this.isDirty()) {
+			var saved = this.saveChanges(args, function(){
+				grid.focus();
+				grid.setActiveCell(cell.row, cell.cell);
+				grid.editActiveCell();
+			});
+			if (!saved) {
+				this.focusInvalidCell(args);
 			}
 		}
 		handled = true;
