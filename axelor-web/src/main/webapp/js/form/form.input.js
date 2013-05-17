@@ -148,7 +148,7 @@ ui.formItem('Label', {
 		});
 	},
 
-	template: '<label ui-help-popover ng-transclude></label>'
+	template: '<label><span ui-help-popover ng-transclude></span></label>'
 });
 
 /**
