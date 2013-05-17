@@ -504,13 +504,8 @@ public class Resource<T extends Model> {
 		Mapper mapper = Mapper.of(bean.getClass());
 
 		if ((compact && ((Model)bean).getId() != null) || level >= 1) {
-			Property pn = mapper.getProperty("name");
+			Property pn = mapper.getNameField();
 			Property pc = mapper.getProperty("code");
-
-			for (Property p : mapper.getProperties()) {
-				if (p.isNameColumn())
-					pn = p;
-			}
 
 			result.put("id", mapper.get(bean, "id"));
 			result.put("$version", mapper.get(bean, "version"));
@@ -544,9 +539,7 @@ public class Resource<T extends Model> {
 					for(Model input : (Collection<Model>) value) {
 						Map<String, Object> item;
 						if (input.getId() != null) {
-							item = Maps.newHashMap();
-							item.put("id", input.getId());
-							item.put("$version", input.getVersion());
+							item = _toMap(input, true, level+1);
 						} else {
 							item = _toMap(input, false, 0);
 						}
