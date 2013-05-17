@@ -45,7 +45,7 @@ table.form-layout td.form-item.boolean-item {
 }
 
 table.form-layout td.form-label > label {
-	line-height: 24px;
+	margin-top: 2px;
 	margin-bottom: 0px;
 	font-weight: bold;
 }
@@ -74,18 +74,29 @@ table.form-layout td.form-item.v-align-top {
 	vertical-align: top;	
 }
 
-table.form-layout td.form-item > .form-item-container,
-table.form-layout td.form-item > .form-item-container > span.display-text {
+.form-item-container,
+.form-item-container > span.display-text {
 	min-height: 24px;
 	display: block;
 }
 
-table.form-layout td.form-item > .form-item-container.readonly,
-table.form-layout td.form-item > .form-item-container > span.display-text {
+.form-item-container.readonly,
+.form-item-container.readonly > a,
+.form-item-container > span.display-text {
 	line-height: 22px;
 }
 
-table.form-layout td.form-item > .form-item-container > input.display-text {
+.form-item-container.readonly > a,
+.form-item-container.readonly > input,
+.form-item-container.readonly > span.display-text {
+	padding-left: 2px;
+}
+
+.form-item-container.readonly > a {
+	color: #0088cc;
+}
+
+.form-item-container > input.display-text {
 	min-width: 100px;
 	text-overflow: ellipsis;
 	overflow: hidden;
@@ -95,8 +106,8 @@ table.form-layout td.form-item > .form-item-container > input.display-text {
 	background: transparent;
 }
 
-table.form-layout td.form-item > .many2one-item.readonly a {
-	color: #0088cc;
+.form-item-container.many2one-item.readonly {
+	padding-top: 1px;
 }
 
 table.form-layout td.form-item input {
