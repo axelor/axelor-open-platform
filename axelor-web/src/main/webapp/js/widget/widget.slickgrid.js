@@ -972,10 +972,11 @@ Grid.prototype.onItemClick = function(event, args) {
 	}
 	
 	if (this.editable) {
-		return;
+		return this.grid.setActiveCell();
 	}
-	if (this.handler.onItemClick)
+	if (this.handler.onItemClick) {
 		this.handler.onItemClick(event, args);
+	}
 };
 
 Grid.prototype.onItemDblClick = function(event, args) {
