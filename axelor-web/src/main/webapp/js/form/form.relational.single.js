@@ -248,6 +248,11 @@ ui.formInput('RefSelect', {
 		};
 
 		var elem = scope.createElement(name, selection, related);
+		var elemSelect= elem.find('.select-item:first');
+		
+		scope.$watch('isReadonly()', function(readonly) {
+			return readonly ? elemSelect.hide() : elemSelect.show();
+		});
 
 		setTimeout(function() {
 			element.append(elem);
