@@ -207,7 +207,8 @@ ui.formItem('Button', {
  * The String widget.
  */
 ui.formInput('String', {
-	css: 'string-item'
+	css: 'string-item',
+	template_readonly: '<input type="text" tabindex="-1" readonly="readonly" class="display-text" value="{{text}}">'
 });
 
 /**
