@@ -366,6 +366,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				html: true,
 				title: "<b>" + event.title + "</b>",
 				placement: "top",
+				container: 'body',
 				content: function() {
 					var html = $("<div></div>").addClass("calendar-bubble-content");
 					
