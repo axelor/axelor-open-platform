@@ -48,6 +48,11 @@ table.form-layout td.form-label > label {
 	margin-top: 2px;
 	margin-bottom: 0px;
 	font-weight: bold;
+	cursor: inherit;
+}
+
+table.form-layout td.form-label > label > span {
+	cursor: pointer;
 }
 
 table.form-layout td.form-label > label:after {
