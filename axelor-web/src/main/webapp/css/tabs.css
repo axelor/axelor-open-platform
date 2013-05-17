@@ -72,6 +72,12 @@
 	right: 6px;
 	color: #ccc;
 	cursor: pointer;
+	font-size: 11px;
+}
+
+.nav-tabs-closable li.inactive:hover > a {
+	color: #005580;
+	background-color: #eee;
 }
 
 .nav-tabs-closable .active > i,
