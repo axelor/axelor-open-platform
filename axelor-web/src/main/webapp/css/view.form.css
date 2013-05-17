@@ -101,13 +101,13 @@ table.form-layout td.form-item > .many2one-item.readonly a {
 
 table.form-layout td.form-item input {
 	min-width: 170px;
-	height: 26px;
+	height: 24px;
 }
 
 table.form-layout td.form-item .small-input input,
 table.form-layout td.form-item input.small-input {
 	min-width: 50px;
-	height: 26px;
+	height: 24px;
 }
 
 table.form-layout td.form-item input[type="radio"],
@@ -173,27 +173,27 @@ table.form-layout td.form-item .input-append button {
 
 .picker-input > .picker-icons > i[class^=icon] {
 	cursor: pointer;
-	margin-top: 4px;
 	margin-right: 2px;
 	padding: 2px;
 	display: inline-block;
+	line-height: 20px;
 }
 
 .picker-input > input,
 .picker-icons-1 > input {
-	padding-right: 16px;
+	padding-right: 18px;
 }
 
 .picker-icons-2 > input {
-	padding-right: 32px;
+	padding-right: 36px;
 }
 
 .picker-icons-3 > input {
-	padding-right: 48px;
+	padding-right: 54px;
 }
 
 .picker-icons-4 > input {
-	padding-right: 64px;
+	padding-right: 72px;
 }
 
 table.form-layout .tabbable-tabs .nav-tabs {
@@ -229,7 +229,7 @@ table.form-layout td.form-item .stackbar.inline-editable {
 table.form-layout td.form-item .slickgrid {
 	position: absolute;
 	left: 0px; right: 0px;
-	top: 29px; bottom: 0px;
+	top: 26px; bottom: 0px;
 	border-top: none;
 }
 
@@ -609,8 +609,7 @@ table.field-details .help-text hr {
 }
 
 .tag-select li.tag-item i {
-	font-size: 12px;
-	height: 12px;
+	font-size: 10px;
 	cursor: pointer;
 }
 

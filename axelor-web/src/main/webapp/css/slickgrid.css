@@ -48,6 +48,10 @@
 	border-bottom: 1px dotted silver;
 }
 
+.slick-cell {
+	line-height: 20px;
+}
+
 .slick-cell.selected {
   background: #DFE8F6;
 }
@@ -58,13 +62,13 @@
 }
 
 .slick-headerrow {
-	height: 29px;
+	height: 26px;
 	border-top: none !important;
 	background-image: none !important;
 }
 
 .slick-headerrow-column {
-	height: 29px;
+	height: 24px;
 	border-left: none !important;
 	border-top: none !important;
 	border-bottom: none !important;
@@ -72,10 +76,6 @@
 	-webkit-box-sizing: border-box;
 	   -moz-box-sizing: border-box;
 	     box-sizing: border-box;
-}
-
-.slick-headerrow-columns {
-	height: 27px !important;
 }
 
 .slick-headerrow input {
@@ -91,23 +91,19 @@
 	box-shadow: none;
 }
 
-.slick-headerrow-column.ui-state-default {
-	padding: 0px;
-}
-
 .slick-header-column.ui-state-default {
 	height: inherit;
 	line-height: inherit;
 }
 
-.slick-cell {
-	line-height: 22px;
+.slick-headerrow-column.ui-state-default {
+	padding: 0px;
 }
 
 .slick-cell.editable {
 	background: white;
 	padding: 0;
-	height: 26px !important;
+	height: 24px !important;
 }
 
 .slick-cell input,
