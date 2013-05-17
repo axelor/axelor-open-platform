@@ -71,7 +71,10 @@ var Editor = function(args) {
 	element.data('$parent', element.parent());
 
 	this.init = function() {
-		element.appendTo(args.container);
+
+		element.css('display', 'inline-block')
+			   .appendTo(args.container);
+		
 		if (element.data('keydown.nav') == null) {
 			element.data('keydown.nav', true);
 			element.bind("keydown.nav", function (e) {
