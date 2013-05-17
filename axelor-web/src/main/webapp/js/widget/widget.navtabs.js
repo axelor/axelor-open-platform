@@ -16,8 +16,8 @@ angular.module('axelor.ui').directive('navTabs', function() {
 					.css("border-bottom", wrap.find('ul.nav-tabs').css('border-bottom'))
 					.appendTo(elem);
 				
-				logo.height(wrap.height() - 1);
-				wrap.find('ul').height(wrap.height() - 1);
+				logo.height(wrap.height() - 3);
+				wrap.find('ul').height(wrap.height() - 3);
 			});
 		},
 		templateUrl: 'partials/nav-tabs.html'
