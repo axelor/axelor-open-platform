@@ -430,6 +430,9 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 			    });
 			}
 
+			// a flag used by evalScope to detect popup (see form.base.js)
+			scope._isPopup = true;
+
 			scope.onOpen = function(e, ui) {
 				scope._viewPromise.then(function() {
 					setTimeout(adjustSize, 100);
