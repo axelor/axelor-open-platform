@@ -28,12 +28,6 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		element.addClass(this.css).parent().addClass(this.cellCss);
 		element.data('$attrs', attrs); // store the attrs object for event handlers
 
-		if (element.is('.input-append,.picker-input')) { // focus the first input field
-			element.on('click', '.btn, i', function(){
-				element.find('input:first').focus();
-			});
-		}
-
 		var field = scope.getViewDef ? scope.getViewDef(element) || {}: {};
 		var props = _.pick(field, ['readonly', 'required', 'hidden']);
 		var state = _.clone(props);
@@ -202,6 +196,12 @@ ui.formDirective = function(name, object) {
 							var valid = scope.validate(viewValue);
 							model.$setValidity('valid', valid);
 							return valid ? viewValue : undefined;
+						});
+					}
+					// focus the first input field
+					if (scope.$elem_editable.is('.input-append,.picker-input')) {
+						scope.$elem_editable.on('click', '.btn, i', function(){
+							scope.$elem_editable.find('input:first').focus();
 						});
 					}
 				}
