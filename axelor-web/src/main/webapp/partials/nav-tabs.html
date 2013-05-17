@@ -4,11 +4,11 @@
 	<div class="nav-tabs-scroll-r"><a href="#"><i class="icon-chevron-right"></i></a></div>
 	<div class="nav-tabs-strip">
 	<ul class="nav nav-tabs nav-tabs-scrollable nav-tabs-closable">
-	 <li ng-repeat="tab in tabs" ng-class="{ active: tab.selected }">
+	 <li ng-repeat="tab in tabs" ng-class="{ active: tab.selected, inactive: !tab.selected }">
 	   <a href="" ng-click="navClick(tab)">
 	     <img class="prefix-icon" ng-show="tab.icon" ng-src="{{tab.icon}}"><span>{{tab.title}}</span>
 	   </a>
-	   <i class="icon-remove-sign" ng-click="closeTab(tab)"></i>
+	   <i class="icon-remove" ng-click="closeTab(tab)"></i>
 	 </li>
 	</ul>
 	</div>
