@@ -45,7 +45,7 @@ table.form-layout td.form-item.boolean-item {
 }
 
 table.form-layout td.form-label > label {
-	margin-top: 2px;
+	padding-top: 2px;
 	margin-bottom: 0px;
 	font-weight: bold;
 	cursor: inherit;
@@ -85,10 +85,9 @@ table.form-layout td.form-item.v-align-top {
 	display: block;
 }
 
-.form-item-container.readonly,
-.form-item-container.readonly > a,
 .form-item-container > span.display-text {
-	line-height: 22px;
+	padding-top: 2px;
+	padding-bottom: 2px;
 }
 
 .form-item-container.readonly > a,
@@ -98,6 +97,7 @@ table.form-layout td.form-item.v-align-top {
 }
 
 .form-item-container.readonly > a {
+	line-height: 20px;
 	color: #0088cc;
 }
 
@@ -381,6 +381,12 @@ td.form-item > * {
 	color: #953B39;
 }
 
+.form-item .span-item {
+	display: inline-block;
+	padding: 2px;
+	padding-left: 6px;
+}
+
 .form-item .spacer-item {
 	-webkit-user-select: none;
 	   -moz-user-select: none;
@@ -469,22 +475,45 @@ table.field-details .help-text hr {
 }
 
 .subtotal {
+	float: right;
+}
+
+.subtotal,
+.subtotal input {
 	white-space: nowrap;
 	text-align: right;
 }
 
-.subtotal .form-label {
-	padding-right: 0px !important;
+.subtotal label {
+	font-weight: normal !important;	
 }
 
+.subtotal,
+.subtotal * {
+	min-width: auto !important;
+	width: auto !important;
+	white-space: nowrap !important;
+}
+
+.subtotal .form-label,
 .subtotal .form-item {
-	padding-left: 0px !important;
+	padding: 2px 0 !important;
+}
+
+.subtotal .display-text {
+	width: 100% !important;
+	padding-left: 22px !important;
 }
 
 .subtotal-total {
 	border-top: 1px solid #ccc;
-	font-size: 16px;
+	font-size: 18px;
+	padding-top: 6px !important;
+}
+
+.subtotal-total .display-text {
 	font-weight: bold;
+	padding-top: 0 !important;
 }
 
 .nav-select {
