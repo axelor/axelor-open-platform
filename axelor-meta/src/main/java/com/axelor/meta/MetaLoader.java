@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -72,7 +73,7 @@ import com.google.inject.Inject;
 public class MetaLoader {
 	
 	@Inject
-	private MetaTranslationsService metaTranslationsService;
+	private MetaTranslationsService translationsService;
 
 	private static final String LOCAL_SCHEMA = "object-views_1.0.xsd";
 	private static final String REMOTE_SCHEMA = "object-views_0.9.xsd";
@@ -83,23 +84,6 @@ public class MetaLoader {
 	private Marshaller marshaller;
 	private Unmarshaller unmarshaller;
 
-	private static class FileScanner extends ResourcesScanner {
-		
-		private List<File> files = Lists.newArrayList();
-		
-		@Override
-		public boolean acceptsInput(String file) {
-			return file.startsWith("views.") && file.endsWith(".xml");
-		}
-		
-		@Override
-		public void scan(final File file) {
-			files.add(file);
-			String path = file.getRelativePath();
-			getStore().put(path, path);
-		}
-	}
-	
 	public MetaLoader() {
 		try {
 			JAXBContext context = JAXBContext.newInstance(ObjectViews.class);
@@ -117,20 +101,6 @@ public class MetaLoader {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}
-	
-	private List<File> findResources() {
-		
-		FileScanner scanner = new FileScanner();
-		
-		Reflections reflections = new Reflections(
-				new ConfigurationBuilder()
-					.setUrls(ClasspathHelper.forPackage("com.axelor"))
-					.setScanners(scanner)
-				);
-		
-		reflections.getStore().get(FileScanner.class).keySet();
-		return scanner.files;
 	}
 	
 	private String stripWhiteSpaces(String text) {
@@ -245,9 +215,18 @@ public class MetaLoader {
 			return;
 		}
 
-		// import other views
-		MetaView entity = new MetaView();
-		entity.setName(view.getName());
+		String name = view.getName();
+		String name_ = name + "._";
+
+		MetaView entity = MetaView.all().filter("self.name = ?1", name_).fetchOne();
+		if (entity == null) {
+			entity = new MetaView();
+			if (MetaView.all().filter("self.name = ?1", name).count() > 0) {
+				name = name_;
+			}
+			entity.setName(name);
+		}
+		
 		entity.setTitle(view.getTitle());
 		entity.setType(type);
 		entity.setModel(model);
@@ -631,28 +610,86 @@ public class MetaLoader {
 	 * 
 	 */
 	public void loadTranslations() {
-
+		if (translationsService == null || MetaTranslation.all().count() > 0) {
+			return;
+		}
 		log.info("Load translations...");
 		try {
-			metaTranslationsService.process();
+			translationsService.process();
 		} catch (Exception e) {
 			log.error("Error loading translations.", e);
 		}
 	}
 	
-	public void load(String outputPath) {
-		loadModels();
-		if (MetaTranslation.all().count() == 0) {
-			loadTranslations();
+	public void loadViews() throws Exception {
+		
+		if (MetaView.all().count() > 0) {
+			return;
 		}
-		if (MetaView.all().count() == 0) {
-			for(File file : findResources()) {
-				loadFile(file);
+
+		ModuleResolver resolver = new ModuleResolver();
+
+		for(File file : findResources("module", "module.properties")) {
+			Properties cfg = new Properties();
+			cfg.load(file.openInputStream());
+			String[] deps = cfg.getProperty("depends", "").trim().split("\\s+");
+			resolver.add(cfg.getProperty("name"), deps);
+		}
+		
+		List<File> files = findResources("views", ".xml");
+		Set<String> imported = Sets.newHashSet();
+
+		for(String module : resolver.all()) {
+			String pat = String.format("(/WEB-INF/lib/%s)|(%s/WEB-INF/classes/)", module, module);
+			Pattern pattern = Pattern.compile(pat);
+			for(File file : files) {
+				String path = file.getFullPath();
+				if (imported.contains(path)) {
+					continue;
+				}
+				Matcher matcher = pattern.matcher(path);
+				if (matcher.find()) {
+					loadFile(file);
+				}
 			}
 		}
+	}
+
+	public void load(String outputPath) {
+		loadModels();
+		loadTranslations();
+		try {
+			loadViews();
+		} catch (Exception e){}
 		loadDefault(outputPath);
 	}
 	
+	private List<File> findResources(final String prefix, final String suffix) {
+
+		final List<File> files = Lists.newArrayList();
+
+		final ResourcesScanner scanner = new ResourcesScanner() {
+			
+			@Override
+			public boolean acceptsInput(String file) {
+				return file.startsWith(prefix) && file.endsWith(suffix);
+			}
+
+			@Override
+			public void scan(final File file) {
+				files.add(file);
+			}
+		};
+
+		new Reflections(
+				new ConfigurationBuilder()
+					.setUrls(ClasspathHelper.forPackage("com.axelor"))
+					.setScanners(scanner)
+				);
+		
+		return files;
+	}
+
 	private ObjectViews unmarshal(String xml) throws JAXBException {
 		StringReader reader = new StringReader(prepareXML(xml));
 		return (ObjectViews) unmarshaller.unmarshal(reader);
@@ -681,10 +718,14 @@ public class MetaLoader {
 		MetaView view = null;
 		User user = AuthUtils.getUser();
 		if (user != null && user.getGroup() != null) {
-			view = MetaView.all().filter("self.model = ?1 AND self.type = ?2 AND ?3 MEMBER OF self.groups", model, type, user.getGroup()).fetchOne();
+			view = MetaView.all()
+					.filter("self.model = ?1 AND self.type = ?2 AND ?3 MEMBER OF self.groups", model, type, user.getGroup())
+					.order("-name").fetchOne();
 		}
 		if (view == null) {
-			view = MetaView.all().filter("self.model = ?1 AND self.type = ?2", model, type).fetchOne();
+			view = MetaView.all()
+					.filter("self.model = ?1 AND self.type = ?2", model, type)
+					.order("-name").fetchOne();
 		}
 		try {
 			return ((ObjectViews) unmarshal(view.getXml())).getViews().get(0);
@@ -694,7 +735,8 @@ public class MetaLoader {
 	}
 	
 	public AbstractView findView(String name) {
-		MetaView view = MetaView.all().filter("self.name = ?1", name).fetchOne();
+		String name_ = name + "._";
+		MetaView view = MetaView.all().filter("self.name = ?1 OR self.name = ?2", name_, name).order("-name").fetchOne();
 		try {
 			return ((ObjectViews) unmarshal(view.getXml())).getViews().get(0);
 		} catch (Exception e) {
