@@ -1,6 +1,5 @@
 package com.axelor.wkf.test;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -13,9 +12,9 @@ import org.junit.runner.RunWith;
 
 import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.meta.ActionHandler;
 import com.axelor.meta.service.MetaModelService;
 import com.axelor.rpc.ActionRequest;
-import com.axelor.rpc.ActionResponse;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.GuiceRunner;
 import com.axelor.wkf.WkfTest;
@@ -23,6 +22,8 @@ import com.axelor.wkf.action.Action;
 import com.axelor.wkf.data.CreateData;
 import com.axelor.wkf.db.Workflow;
 import com.axelor.wkf.workflow.WorkflowService;
+import com.google.common.collect.Maps;
+import com.google.inject.Injector;
 
 @RunWith(GuiceRunner.class)
 @GuiceModules({ WkfTest.class })
@@ -32,6 +33,23 @@ public class WorkFlowEngineTest {
 
 	@Inject
 	WorkflowService workflowService;
+	
+	@Inject
+	Injector injector;
+	
+	private ActionHandler createHandler(String action, Map<String, Object> context) {
+		
+		ActionRequest request = new ActionRequest();
+		
+		Map<String, Object> data = Maps.newHashMap();
+		request.setData(data);
+		request.setModel("com.axelor.wkf.db.Workflow");
+		request.setAction(action);
+
+		data.put("context", context);
+		
+		return new ActionHandler(request, injector);
+	}
 
 	@BeforeClass
 	public static void setUp() throws JAXBException {
@@ -51,13 +69,11 @@ public class WorkFlowEngineTest {
 	@Test
 	public void run() {
 
-		ActionRequest request = new ActionRequest();
 
-		Map<String, Object> data = Mapper.toMap(wkf);
-		request.setData(data);
-		request.setModel("com.axelor.wkf.db.Workflow");
+		Map<String, Object> context = Mapper.toMap(wkf);
+		ActionHandler actionHandler = createHandler("", context);
 
-		Assert.assertNotNull( workflowService.run(wkf).getData() );
+		Assert.assertNotNull( workflowService.run(wkf.getName(), actionHandler) );
 		Assert.assertEquals( workflowService.getInstance(wkf, wkf.getId()).getNodes().size(), 1 );
 
 	}
@@ -65,20 +81,16 @@ public class WorkFlowEngineTest {
 	@Test
 	public void actionTest() {
 
-		ActionRequest request = new ActionRequest();
-
-		Map<String, Object> data = Mapper.toMap(wkf);
-		request.setData(data);
-		request.setModel("com.axelor.wkf.db.Workflow");
+		Map<String, Object> context = Mapper.toMap(wkf);
+		ActionHandler actionHandler = createHandler("", context);
 
 		Action actionWorkflow = new Action();
 
-		ActionResponse value = actionWorkflow.execute("action-alert-test", request);
+		actionWorkflow.execute("action-alert-test", actionHandler);
+		Map<String, String> value = actionWorkflow.getData();
 
 		Assert.assertNotNull(value);
-		Assert.assertNotNull(value.getData());
-		Assert.assertTrue(value.getData() instanceof List);
-		Assert.assertFalse(((List<?>) value.getData()).isEmpty());
+		Assert.assertFalse(value.isEmpty());
 
 	}
 

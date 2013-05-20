@@ -31,28 +31,6 @@ class WkfController {
 		]
 		
 	}
-
-	/**
-	 * Open all instances of the wkf.
-	 *
-	 * @param request
-	 * @param response
-	 */
-	def run (ActionRequest request, ActionResponse response) {
-		
-		updateResponse( workflowService.run( request ), response );
-		
-	}
-	
-	def updateResponse( ActionResponse response, ActionResponse responseToUpdate ){
-		
-		responseToUpdate.data = response.data
-		responseToUpdate.errors = response.errors
-		responseToUpdate.offset = response.offset
-		responseToUpdate.status = response.status
-		responseToUpdate.total = response.total
-		
-	}
 	
 	/**
 	 * Open ORYX editor

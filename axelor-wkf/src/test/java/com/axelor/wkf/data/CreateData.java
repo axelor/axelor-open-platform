@@ -12,9 +12,13 @@ public class CreateData {
 
 	public static Workflow createWorkflow() {
 		
-		Transition transition = new Transition();
-		transition.setName("Transition");
-		transition.setSequence(0);
+		Transition startTransition = new Transition();
+		startTransition.setName("startTransition");
+		startTransition.setSequence(0);
+		
+		Transition endTransition = new Transition();
+		endTransition.setName("endTransition");
+		endTransition.setSequence(0);
 		
 		MetaAction metaAction = new MetaAction();
 		metaAction.setName("action-alert-test");
@@ -24,18 +28,28 @@ public class CreateData {
 		Node node1 = new Node();
 		node1.setName("Node 1");
 		node1.setType("start");
-		node1.setAction( metaAction );
-		node1.setEndTransitions(new ArrayList<Transition>());
+		node1.setStartTransitions(new ArrayList<Transition>());
+		node1.addEndTransition(startTransition);
 		
 		Node node2 = new Node();
-		node2.setName("Node 2");
-		node2.setType("stop");
-		node2.setLogicOperator("and");
-		node2.setEndTransitions(new ArrayList<Transition>());
+		node2.setName("Node 1");
+		node2.setType("intermediary");
+		node2.setAction( metaAction );
+		node2.addStartTransition(startTransition);
+		node2.addEndTransition(endTransition);
 		
-		transition.setStartNode(node1);
-		transition.setNextNode(node2);
-		node1.getEndTransitions().add(transition);
+		Node node3 = new Node();
+		node3.setName("Node 2");
+		node3.setType("stop");
+		node3.setLogicOperator("and");
+		node3.addStartTransition(endTransition);
+		node3.setEndTransitions(new ArrayList<Transition>());
+		
+		startTransition.setStartNode(node1);
+		startTransition.setNextNode(node2);
+		
+		endTransition.setStartNode(node2);
+		endTransition.setNextNode(node3);
 		
 		Workflow workflow = new Workflow();
 		
@@ -43,9 +57,6 @@ public class CreateData {
 		workflow.setMetaModel( MetaModelService.getMetaModel(Workflow.class) );
 		workflow.setNode(node1);
 		workflow.setMaxNodeCounter(1);
-		
-		node1.setWorkflow(workflow);
-		node2.setWorkflow(workflow);
 		
 		return workflow.save();
 	}

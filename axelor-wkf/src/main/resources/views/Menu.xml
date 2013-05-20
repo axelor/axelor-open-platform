@@ -4,15 +4,15 @@
 	xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.9.xsd">
 
 	<menuitem name="menu-wkf" priority="-99" title="Wkf Management"
-		groups="workflow" icon="img/wkf.png" />
+		groups="admins,workflow" icon="img/wkf.png" />
 
 	<menuitem name="menu-wkf-workflows" parent="menu-wkf" title="Workflows"
 		action="action-wkf-workflows" />
 
 	<action-view name="action-wkf-workflows" title="Worklows"
 		model="com.axelor.wkf.db.Workflow">
-		<view type="grid" name="worfklow-grid" />
-		<view type="form" name="worfklow-form" />
+		<view type="grid" name="workflow-grid" />
+		<view type="form" name="workflow-form" />
 	</action-view>
 
 	<menuitem name="menu-wkf-instances" parent="menu-wkf" title="Instances"
