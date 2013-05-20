@@ -871,6 +871,12 @@ ui.formWidget('BaseSelect', {
 				scope.handleDelete(e);
 			}
 		});
+		
+		input.data('ui-autocomplete')._renderItem = function(ul, item) {
+			return $("<li>")
+				.append( $("<a>").html( item.label ) )
+				.appendTo(ul);
+		};
 	},
 
 	template_editable:
@@ -904,7 +910,7 @@ ui.formInput('Select', 'BaseSelect', {
 			selectionMap[value] = item.title;
 			return {
 				value: value,
-				label: item.title || value
+				label: item.title || "&nbsp;"
 			};
 		});
 
@@ -920,7 +926,7 @@ ui.formInput('Select', 'BaseSelect', {
 		scope.formatItem = function(item) {
 			if (!item) return item;
 			if (_.isString(item)) {
-				return selectionMap["" + item] || item;
+				return selectionMap["" + item] || "";
 			}
 			return item.label;
 		};
