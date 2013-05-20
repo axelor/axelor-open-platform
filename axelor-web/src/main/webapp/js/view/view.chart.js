@@ -37,7 +37,7 @@ function ChartCtrl($scope, $element, $http) {
 		var context = $scope._context || {};
 		if ($scope.getContext) {
 			context = $scope.getContext();
-			if (!context.id) {
+			if ($scope.onSave && !context.id) { // if embedded inside form view
 				return;
 			}
 		}

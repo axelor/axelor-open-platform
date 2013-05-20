@@ -30,6 +30,10 @@ function PortalCtrl($scope, $element) {
 		
 	};
 
+	$scope.getContext = function() {
+		return _.extend({}, $scope._context);
+	};
+
 	$scope.getRouteOptions = function() {
 		return {
 			mode: 'portal',
