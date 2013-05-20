@@ -42,3 +42,4 @@
 "Node","Noeud",
 "Transition","Transition",
 "Can't save workflow without start node","Vous ne pouvez pas sauvegarder le workflow sans noeud de début.",
+"workflow.metaModel","Modèle",
