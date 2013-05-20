@@ -41,7 +41,8 @@ public class ObjectViews {
 		@XmlElement(name = "action-ws", type=ActionWS.class),
 		@XmlElement(name = "action-import", type=ActionImport.class),
 		@XmlElement(name = "action-export", type=ActionExport.class),
-		@XmlElement(name = "action-group", type=ActionGroup.class)
+		@XmlElement(name = "action-group", type=ActionGroup.class),
+		@XmlElement(name = "action-workflow", type=ActionWorkflow.class)
 	})
 	private List<Action> actions;
 	

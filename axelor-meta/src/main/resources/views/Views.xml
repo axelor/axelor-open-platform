@@ -23,6 +23,7 @@
     <option value="action-import">action-import</option>
     <option value="action-export">action-export</option>
     <option value="action-ws">action-ws</option>
+    <option value="action-workflow">action-workflow</option>
   </selection>
 
   <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView">
