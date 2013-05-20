@@ -529,11 +529,11 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 				var term = request.term;
 				if (term) {
 					items.push({
-						label : _t('Create "{0}" and add...', term),
+						label : _t('Create "{0}" and add...', '<b>' + term + '</b>'),
 						click : function() { create(term); }
 					});
 					items.push({
-						label : _t('Create "{0}"...', term),
+						label : _t('Create "{0}"...', '<b>' + term + '</b>'),
 						click : function() { create(term, true); }
 					});
 					items.push({
@@ -575,8 +575,8 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 			return _handleSelect.apply(this, arguments);
 		};
 		
-		var _renderItem = input.data("autocomplete")._renderItem;
-		input.data("autocomplete")._renderItem = function(ul, item) {
+		var _renderItem = input.data("ui-autocomplete")._renderItem;
+		input.data("ui-autocomplete")._renderItem = function(ul, item) {
 			var el = _renderItem(ul, item);
 			if (item.click) {
 				el.addClass("tag-select-action");
