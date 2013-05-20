@@ -91,8 +91,7 @@ ui.directive('uiHelpPopover', function() {
 	}
 
 	return function(scope, element, attrs) {
-		var forWidget = attrs.forWidget || element.parents('[x-field]:first').attr('id');
-		var field = scope.getViewDef(forWidget);
+		var field = scope.field;
 		if (field == null) {
 			return;
 		}
