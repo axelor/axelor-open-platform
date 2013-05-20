@@ -123,6 +123,10 @@ public final class ActionHandler {
 	public Context getContext() {
 		return context;
 	}
+	
+	public ActionRequest getRequest() {
+		return request;
+	}
 
 	/**
 	 * Evaluate the given <code>expression</code>.
