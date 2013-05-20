@@ -7,39 +7,36 @@
 
   <entity name="Workflow" lang="java">
     
-    <string name="name" title="Name" required="true"/>
-    <many-to-one name="metaModel" ref="com.axelor.meta.db.MetaModel" title="Model" required="true"/>
-    <many-to-one name="node" ref="Node" title="Node"/>
-    <integer name="maxNodeCounter" title="Max node counter" default="1"/>
-    <string name="description" large="true" title="Description" />
-    <integer name="sequence" />
-    <boolean name="active" default="true"/>
-    <many-to-one name="condition" ref="com.axelor.meta.db.MetaAction" title="Condition" />
-    <string name="bpmn" title="BPMN" large="true" />
+    <string name="name" required="true" />
+    <many-to-one name="metaModel" ref="com.axelor.meta.db.MetaModel" required="true" />
+    <many-to-one name="node" ref="Node" />
+    <integer name="maxNodeCounter" default="1" />
+    <string name="description" large="true" />
+    <boolean name="active" default="true" />
+    <string name="bpmn" large="true" />
     
   </entity>
 
   <entity name="Node" lang="java">
     
-    <string name="name" title="Name" />
-    <many-to-one name="workflow" ref="Workflow" title="Workflow"/>
-    <string name="type" title="Type" selection="node.type.selection"/>
+    <string name="name" title="Name" required="true" />
+    <string name="type" title="Type" selection="node.type.selection" required="true" />
     <many-to-one name="action" ref="com.axelor.meta.db.MetaAction" title="Action" />
     <string name="logicOperator" title="Start Logic Operator" selection="node.logic.operator.selection" default="or"/>
-    <one-to-many name="startTransitions" ref="Transition" mappedBy="nextNode" title="Start transitions" readonly="true" orderBy="sequence" />
-    <one-to-many name="endTransitions" ref="Transition" mappedBy="startNode" title="End transitions" orderBy="sequence" />
-    <string name="description" large="true" title="Description" />
+    <one-to-many name="startTransitions" ref="Transition" mappedBy="nextNode" readonly="true" orderBy="sequence" />
+    <one-to-many name="endTransitions" ref="Transition" mappedBy="startNode" orderBy="sequence" />
+    <string name="description" large="true" />
              
   </entity>
 
   <entity name="Transition" lang="java">
     
     <many-to-one name="startNode" ref="Node" />
-	<many-to-one name="nextNode" ref="Node" title="Next node" required="true"/>
+	<many-to-one name="nextNode" ref="Node" required="true"/>
     <string name="name" title="Name" />
-    <many-to-one name="condition" ref="com.axelor.meta.db.MetaAction" title="Condition" />
-	<integer name="sequence" title="Sequence" />
-    <string name="description" large="true" title="Description" />
+    <many-to-one name="condition" ref="com.axelor.meta.db.MetaAction" />
+	<integer name="sequence" />
+    <string name="description" large="true" />
              
   </entity>
   
