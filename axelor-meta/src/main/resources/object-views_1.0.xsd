@@ -1252,9 +1252,14 @@
     <xsd:complexType name="ActionWorkflow">
       <xsd:complexContent>
         <xsd:extension base="tns:AbstractAction">
-          <xsd:sequence>
-            <xsd:element name="workflow" type="tns:ActAction" maxOccurs="unbounded"/>
-          </xsd:sequence>
+	        <xsd:attribute name="model" type="xsd:string" use="required">
+	          <xsd:annotation>
+	            <xsd:documentation>
+	              The fully qualified class name of the entity type.
+	              Should be provided when creating default value record.
+	            </xsd:documentation>
+	          </xsd:annotation>
+	        </xsd:attribute>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
