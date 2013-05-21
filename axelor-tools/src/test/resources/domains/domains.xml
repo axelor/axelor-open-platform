@@ -39,6 +39,8 @@
   <entity name="Country">
     <string name="code" required="true" unique="true" min="2" />
     <string name="name" required="true" unique="true" min="2" />
+    <finder-method name="findByName" using="code, name" filter="self.code = :code OR self.name = :name" orderBy="name"/>
+    <finder-method name="findByNameAndCode" using="code, name" all="true"/>
   </entity>
 
   <entity name="Contact" sequential="true" lang="groovy" hashAll="true" cachable="false">

@@ -302,6 +302,10 @@ class Property {
 		type == "one-to-many" || type == "many-to-many"
 	}
 
+	boolean isNameField() {
+		return attrs.namecolumn == "true"
+	}
+
 	boolean isVirtual() {
 		return code != null && code.trim().length() > 0;
 	}
@@ -427,7 +431,7 @@ class Property {
 	}
 
 	private Annotation $nameColumn() {
-		if (attrs.namecolumn == "true")
+		if (isNameField())
 			annon("com.axelor.db.NameColumn", true)
 	}
 	
