@@ -382,6 +382,51 @@
       </xsd:simpleType>
     </xsd:attribute>
   </xsd:complexType>
+  
+  <xsd:complexType name="Finder">
+    <xsd:attribute name="name" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>
+        Name of the finder method. As a convention, always use `findBy` prefix.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="using" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>
+        Provide the list of field names (comma seperated). The given fields must be
+        declared above. The field names will be the method parameters. If the filter
+        is not provided, an ANDed filter on the given fields is generated.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="filter" type="xsd:string" use="optional">
+      <xsd:annotation>
+        <xsd:documentation>
+        Use the given filter. The filter expression should only use the given
+        field names as named parameters.
+        For example:
+
+        `self.name = :name OR self.code = :code OR self.name = :code
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="orderBy" type="xsd:string" use="optional">
+      <xsd:annotation>
+        <xsd:documentation>
+        Return the result with given orderning. For example: orderBy="-name,code"
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="all" type="xsd:boolean" default="false" use="optional">
+      <xsd:annotation>
+        <xsd:documentation>
+        If true, then the finder method returns a Query instance on which you can
+        call any of the fetch method. By default first matched object is returned.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
 
   <xsd:complexType name="Entity" mixed="true">
     <xsd:annotation>
@@ -486,6 +531,13 @@
         <xsd:annotation>
           <xsd:documentation>
             Define composite uniqe constraint on multiple fields.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="finder-method" type="dm:Finder" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>
+          Define a finder method.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
