@@ -43,6 +43,7 @@ _t.put({
 "Login attempt failed.": "La tentative de connexion a échoué.",
 "Navigation": "Menu",
 "New": "Nouveau",
+"No Data Available.": "Aucune donnée disponible.",
 "Search Objects": "Sélectionner objet",
 "OK": "OK",
 "Offline!": "Hors ligne",
