@@ -257,7 +257,8 @@ function Chart(scope, element, data) {
 		if (chart == null) {
 			return;
 		}
-		
+
+		chart.noData(_t('No Data Available.'));
 		var tickFormats = {
 			"month" : function(d) {
 				return moment([2000, d, 1]).format("MMM");

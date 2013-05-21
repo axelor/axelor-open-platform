@@ -25,6 +25,7 @@ _t.put({
 "Login attempt failed.": "Login attempt failed.",
 "Navigation": "Navigation",
 "New": "New",
+"No Data Available.": "No Data Available.",
 "Objects": "Objects",
 "OK": "OK",
 "Password": "Password",
