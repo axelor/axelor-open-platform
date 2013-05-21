@@ -39,9 +39,9 @@ import com.google.inject.Provider;
 
 /**
  * This class provides easy access to {@link EntityManager} and related API. It
- * also provides some convenient methods create {@link Model} instances or
- * creating {@link Query}.
- * 
+ * also provides some convenient methods like create {@link Model} instances or
+ * creating {@link Query}.<br>
+ * <br>
  * This class should be initialized using Guice container as eager singleton
  * during application startup.
  * 
@@ -139,10 +139,10 @@ public final class JPA {
 	}
 
 	/**
-	 * Save the state of the entity.
-	 * 
+	 * Save the state of the entity.<br>
+	 * <br>
 	 * It uses either {@link #persist(Model)} or {@link #merge(Model)} and calls
-	 * {@link #flush()} the synchronize values with database.
+	 * {@link #flush()} to synchronize values with database.
 	 * 
 	 * @see #persist(Model)
 	 * @see #merge(Model)
@@ -262,8 +262,8 @@ public final class JPA {
 	}
 
 	/**
-	 * Edit an instance of the given model class using the given values.
-	 * 
+	 * Edit an instance of the given model class using the given values.<br>
+	 * <br>
 	 * This is a convenient method to reconstruct model object from a key value
 	 * map, for example HTTP params.
 	 * 
@@ -397,8 +397,8 @@ public final class JPA {
 	}
 
 	/**
-	 * A convenient method to persist reconstructed unmanaged objects.
-	 * 
+	 * A convenient method to persist reconstructed unmanaged objects.<br>
+	 * <br>
 	 * This method takes care of relational fields by inspecting the managed
 	 * state of the referenced objects and also sets reverse lookup fields
 	 * annotated with {@link OneToMany#mappedBy()} annotation.
@@ -502,8 +502,8 @@ public final class JPA {
 	}
 
 	/**
-	 * Create a duplicate copy of the given bean instance.
-	 * 
+	 * Create a duplicate copy of the given bean instance.<br>
+	 * <br>
 	 * In case of deep copy, one-to-many records are duplicated. Otherwise,
 	 * one-to-many records will be skipped.
 	 * 
