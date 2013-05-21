@@ -9,10 +9,10 @@ import com.axelor.wkf.db.Workflow;
 public interface IWorkflow {
 
 	static final String XOR = "xor", AND = "and";
-	
-	Instance getInstance (Workflow wkf, long id);
-	Workflow getWorkflow(String name);
 
-	Map<String, String> run(String wkf, ActionHandler actionHandler);
+	Instance getInstance(String klass, long id);
+	Workflow getWorkflow(String klass);
+
+	Map<Object, Object> run(String klass, ActionHandler actionHandler);
 	
 }

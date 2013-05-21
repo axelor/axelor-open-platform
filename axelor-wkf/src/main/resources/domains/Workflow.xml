@@ -11,6 +11,8 @@
     <many-to-one name="metaModel" ref="com.axelor.meta.db.MetaModel" required="true" />
     <many-to-one name="node" ref="Node" />
     <integer name="maxNodeCounter" default="1" />
+    <many-to-one name="condition" ref="com.axelor.meta.db.MetaAction" title="Condition" />
+    <integer name="sequence" />
     <string name="description" large="true" />
     <boolean name="active" default="true" />
     <string name="bpmn" large="true" />
