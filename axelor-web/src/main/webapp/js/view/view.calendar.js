@@ -347,7 +347,9 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 			viewDisplay: function(view) {
 				hideBubble();
 				mini.datepicker('setDate', main.fullCalendar('getDate'));
-			}
+			},
+
+			allDayText: _t('All Day')
 		});
 		
 		var editor = null;
