@@ -125,7 +125,7 @@
 .slick-cell input[type=checkbox] {
 	width: auto;
 	height: auto;
-	margin-top: 4px;
+	margin-top: -1px;
 }
 
 .slick-editor-dropdown {
