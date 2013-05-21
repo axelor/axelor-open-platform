@@ -442,6 +442,7 @@ ui.formInput('Boolean', {
 // configure datepicket
 if (_t.calendar) {
 	$.timepicker.setDefaults(_t.calendar);
+	$.datepicker.setDefaults(_t.calendar);
 }
 
 // configure ui.mask
