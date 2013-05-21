@@ -1,10 +1,10 @@
 package com.axelor.tool.x2j.pojo
 
 import groovy.util.slurpersupport.GPathResult;
-import groovy.util.slurpersupport.NodeChild;
+import groovy.util.slurpersupport.NodeChild
 
-import com.axelor.tool.x2j.Utils;
-import com.google.common.base.CaseFormat;
+import com.axelor.tool.x2j.Utils
+import com.google.common.base.CaseFormat
 
 class Entity {
 
@@ -32,6 +32,10 @@ class Entity {
 	
 	List<Constraint> constraints
 	
+	List<String> finders
+	
+	Map<String, Property> propertyMap
+
 	private ImportManager importManager
 	
 	Entity(NodeChild node) {
@@ -71,16 +75,25 @@ class Entity {
 		
 		properties = []
 		constraints = []
+		finders = []
 		
 		node."*".each {
-			if (it.name() == "unique-constraint")
+			if (it.name() == "unique-constraint") {
 				constraints += new Constraint(this, it)
-			else
+			} else if (it.name() == "finder-method") {
+				finders += new Finder(this, it)
+			} else {
 				properties += new Property(this, it)
+			}
 		}
 		
 		Property idp = Property.idProperty(this)
 		properties = [idp] + properties
+
+		propertyMap = [:]
+		properties.each {
+			propertyMap[it.name] = it
+		}
 		
 		if (node.@logUpdates != "false") {
 			baseClass = "com.axelor.auth.db.AuditableModel"
@@ -117,6 +130,10 @@ class Entity {
 /**
  * """ + text + """
  */"""
+	}
+	
+	Property getField(String name) {
+		return propertyMap[name]
 	}
 	
 	private List<Property> getHashables() {
@@ -214,6 +231,22 @@ class Entity {
 		]
 		.grep { it != null }.flatten()
 		.grep { Annotation a -> !a.empty }
+	}
+	
+	List<Finder> getFinderMethods() {
+		def all = finders.collect()
+		def hasCodeFinder = false
+		def hasNameFinder = false
+		
+		all.each { Finder f ->
+			if (f.name == "findByName") hasNameFinder = true
+			if (f.name == "findByCode") hasCodeFinder = true
+		}
+		
+		if (!hasNameFinder && propertyMap['name']) all.add(0, new Finder(this, "name"));
+		if (!hasCodeFinder && propertyMap['code']) all.add(0, new Finder(this, "code"));
+
+		return all
 	}
 	
 	Annotation $table() {

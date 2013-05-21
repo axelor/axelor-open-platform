@@ -14,4 +14,12 @@ class Utils {
 		text = text.trim().replaceAll("\n", joinWith).trim()
 		return text
 	}
+	
+	public static String firstUpper(String string) {
+		string.substring(0, 1).toUpperCase() + string.substring(1)
+	}
+	
+	public static String firstLower(String string) {
+		string.substring(0, 1).toLowerCase() + string.substring(1)
+	}
 }
