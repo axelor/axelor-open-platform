@@ -958,6 +958,10 @@ Grid.prototype.onItemClick = function(event, args) {
 		event.stopImmediatePropagation();
 		return false;
 	}
+	// checkbox column
+	if (this.scope.selector && args.cell == 0) {
+		return false;
+	}
 
 	var source = $(event.srcElement);
 	if (source.is("img.slick-img-button")) {
