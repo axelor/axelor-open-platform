@@ -396,6 +396,21 @@ public class Query<T extends Model> {
 		this.namedParams.putAll(params);
 		return this;
 	}
+	
+	/**
+	 * Bind the given named parameter of the query with the given value.
+	 * 
+	 * @param name
+	 *            the named parameter to bind
+	 * @param value
+	 *            the parameter value
+	 * 
+	 */
+	public Query<T> bind(String name, Object value) {
+		Map<String, Object> params = Maps.newHashMap();
+		params.put(name, value);
+		return this.bind(params);
+	}
 
 	@Override
 	public String toString() {
