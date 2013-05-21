@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
-import com.axelor.db.Model;
 import com.axelor.meta.ActionHandler;
 import com.axelor.wkf.IWorkflow;
 import com.axelor.wkf.action.Action;
@@ -66,16 +65,17 @@ public class WorkflowService implements IWorkflow {
 	 * 
 	 * 
 	 */
-	protected WorkflowService init (Workflow wkf, ActionHandler actionHandler) {
-
-		Preconditions.checkNotNull(wkf);
+	protected WorkflowService init (String klass, ActionHandler actionHandler) {
 		
 		log.debug("INIT Wkf engine context ::: {}", actionHandler.getContext());
+		log.debug("INIT Wkf engine class ::: {}", klass);
 
-		this.actionHandler = actionHandler;
-		this.maxNodeCounter = wkf.getMaxNodeCounter();
-		this.instance = getInstance(wkf, (Long)actionHandler.getContext().get("id"));
+		Preconditions.checkNotNull(klass);
+		this.instance = getInstance(klass, (Long)actionHandler.getContext().get("id"));
 		
+		Preconditions.checkNotNull(this.instance);
+		this.actionHandler = actionHandler;
+		this.maxNodeCounter = this.instance.getWorkflow().getMaxNodeCounter();
 		loadWaitingNodes( instance );
 		loadExecutedNodes( instance );
 		
@@ -99,39 +99,36 @@ public class WorkflowService implements IWorkflow {
 	 * 		The instance founded.
 	 */
 	@Override
-	public Instance getInstance(Workflow wkf, long id){
+	public Instance getInstance(String klass, long id){
 
-		Instance instance = Instance.all().filter("self.workflow = ?1 AND self.metaModelId = ?2", wkf, id).fetchOne();
+		Instance instance = Instance.all().filter("self.workflow.metaModel.fullName = ?1 AND self.metaModelId = ?2", klass, id).fetchOne();
 		
-		if (instance != null){
-			return instance;
-		}
+		if (instance != null){ return instance; }
 		else {
-			return this.createInstance(wkf, id);
+			Workflow workflow = getWorkflow(klass);
+			return workflow != null ? this.createInstance(workflow, id) : null;
 		}
 		
 	}
-	
-	/**
-	 * Get workflow from class.
-	 * 
-	 * @param klass
-	 * 		Target Class. The class must be extend Model.
-	 * 
-	 * @return
-	 * 		The workflow founded.	
-	 * 
-	 * @see Model
-	 */
+
 	@Override
-	public Workflow getWorkflow(String name){
+	public Workflow getWorkflow(String klass){
 		
 		List<Workflow> workflows = Workflow.all()
-				.filter("self.name = ?1 AND self.active = true", name)
+				.filter("self.metaModel.fullName = ?1 AND self.active = true", klass)
+				.order("self.sequence")
 				.fetch();
 		
-		for (Workflow workflow : workflows){
-			return workflow;
+		for (Workflow workflow : workflows){ 
+			if ( workflow.getCondition() != null ){
+				actionWorkflow.execute(workflow.getCondition(), actionHandler);
+				if ( !actionWorkflow.isInError() ){
+					return workflow;
+				}
+			}
+			else {
+				return workflow;
+			}
 		}
 		
 		return null;
@@ -141,9 +138,9 @@ public class WorkflowService implements IWorkflow {
 // RUN WKF
 
 	@Override
-	public Map<String, String> run( String wkf, ActionHandler handler ){
+	public Map<Object, Object> run( String klass, ActionHandler handler ){
 		
-		updateInstance( init( getWorkflow(wkf), handler ).playNodes( instance.getNodes() ) );
+		updateInstance( init( klass, handler ).playNodes( instance.getNodes() ) );
 		return actionWorkflow.getData();
 		
 	}
@@ -192,7 +189,7 @@ public class WorkflowService implements IWorkflow {
 			
 			if ( isPlayable(node) ){
 
-				if ( node.getAction() != null ){ actionWorkflow.execute( node.getAction().getName(), actionHandler ); }
+				if ( node.getAction() != null ){ actionWorkflow.execute( node.getAction(), actionHandler ); }
 				nodes.addAll( playTransitions( node.getEndTransitions() ) );
 				counterAdd( instance, node );
 				addExecutedNodes( node );
@@ -201,7 +198,7 @@ public class WorkflowService implements IWorkflow {
 		}
 		else {
 
-			if ( node.getAction() != null ){ actionWorkflow.execute( node.getAction().getName(), actionHandler ); }
+			if ( node.getAction() != null ){ actionWorkflow.execute( node.getAction(), actionHandler ); }
 			nodes.add( node );
 			
 		}
@@ -254,7 +251,7 @@ public class WorkflowService implements IWorkflow {
 		
 		if (transition.getCondition() != null){
 
-			actionWorkflow.execute( transition.getCondition().getName(), actionHandler );
+			actionWorkflow.execute( transition.getCondition(), actionHandler );
 			
 			if ( !actionWorkflow.isInError( ) ){
 				

@@ -7,27 +7,40 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.meta.ActionHandler;
+import com.axelor.meta.db.MetaAction;
 import com.google.common.collect.Maps;
 
 public class Action {
 	
 	private Logger log = LoggerFactory.getLogger( getClass() );
 	
-	private Map<String, String> data = Maps.newHashMap();
+	private Map<Object, Object> data = Maps.newHashMap();
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void execute( String action, ActionHandler actionHandler ) {
+	@SuppressWarnings({ "rawtypes" })
+	public void execute( MetaAction action, ActionHandler actionHandler ) {
 
 		log.debug("Execute action : {}", action);
-		actionHandler.getRequest().setAction(action);
+		actionHandler.getRequest().setAction( action.getName() );
 		
-		for ( Object data2 : (List) actionHandler.execute().getData()) {
-			
-			data.putAll( (Map) data2 );
-			
-		}
+		for ( Object data : (List) actionHandler.execute().getData()) { updateData( this.data, data ); }
 
 		log.debug( "Response : {}", data );
+		
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void updateData( Map<Object, Object> data, Object values ){
+		
+		Map data2 = (Map) values;
+		
+		for ( Object key : data2.keySet()) {
+
+			if ( !data.containsKey(key) ) { data.put(key, data2.get(key)); }
+			else {
+				if ( data.get(key) instanceof Map ) { updateData( (Map) data.get(key), data2.get(key) ); }
+				else { data.put(key, data2.get(key)); }
+			}
+		}
 		
 	}
 
@@ -41,7 +54,7 @@ public class Action {
 		return false;
 	}
 	
-	public Map<String, String> getData (){
+	public Map<Object, Object> getData (){
 		return this.data;
 	}
 
