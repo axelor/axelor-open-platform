@@ -14,7 +14,6 @@ import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.service.MetaService;
-import com.axelor.meta.views.AbstractView;
 import com.axelor.meta.views.Action;
 import com.axelor.meta.views.ObjectViews;
 import com.axelor.rpc.ActionRequest;
@@ -73,24 +72,15 @@ public class MetaController {
 	
 	public void validateView(ActionRequest request, ActionResponse response) {
 		MetaView meta = request.getContext().asType(MetaView.class);
-		AbstractView view = loader.findView(meta.getName());
 		Map<String, String> data = Maps.newHashMap();
 		
-		response.setData(ImmutableList.of(data));
-		
-		ObjectViews views;
 		try {
-			views = validateXML(meta.getXml());
+			validateXML(meta.getXml());
 		} catch (Exception e){
 			data.put("error", e.getMessage());
-			return;
 		}
-		
-		AbstractView current = views.getViews().get(0);
-		if (view != null && !view.getName().equals(current.getName())) {
-			data.put("error", "View name can't be changed.");
-			return;
-		}
+
+		response.setData(ImmutableList.of(data));
 	}
 	
 	public void restoreAll(ActionRequest request, ActionResponse response) {

@@ -26,40 +26,33 @@
     <option value="action-workflow">action-workflow</option>
   </selection>
 
-  <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView">
+  <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView" orderBy="priority,name">
     <field name="name"/>
     <field name="title"/>
-    <field name="model"/>
     <field name="type" selection="view.type.selection"/>
+    <field name="model"/>
+    <field name="module"/>
+    <field name="priority" width="75"/>
   </grid>
-
-  <form title="View" name="meta-view-form" model="com.axelor.meta.db.MetaView" cols="2" colWidths="*,250"
-    onSave="action-view-validate">
-    <notebook rowSpan="2">
-      <page title="XML" cols="1">
-        <field name="xml" noLabel="true" widget="CodeEditor[syntax=xml|height=500]"/>
-      </page>
-      <page title="Groups" cols="1">
-        <field name="groups" noLabel="true"/>
-      </page>
-    </notebook>
-    <group cols="2">
-      <field name="active"/>
-      <group title="View Details" cols="2" colSpan="2" readonlyIf="id">
+  
+  <form name="meta-view-form" title="View" model="com.axelor.meta.db.MetaView" cols="2" colWidths="*,250" onSave="action-view-validate">
+    <group title="View Details" cols="4">
         <field name="name"/>
+        <field name="priority"/>
         <field name="title"/>
         <field name="type" selection="view.type.selection"/>
         <field name="model"/>
-      </group>
-      <group title="Actions" cols="1" colSpan="2">
+        <field name="module"/>
+        <field name="groups" widget="TagSelect[create=code,name]"/>
+    </group>
+    <group title="Actions" cols="1">
         <button name="validate" title="Validate" onClick="action-view-validate"/>
         <button name="restore" title="Restore" onClick="action-meta-todo"/>
-        <button name="restoreAll" title="Restore All" onClick="action-meta-restore-all"
-          prompt="All the customizations will be lost. Are you sure?"/>
+        <button name="restoreAll" title="Restore All" prompt="All the customizations will be lost. Are you sure?" onClick="action-meta-restore-all"/>
         <button name="preview" title="Preview" onClick="action-meta-todo"/>
-      </group>
     </group>
-  </form>
+    <field name="xml" noLabel="true" colSpan="2" widget="CodeEditor[syntax=xml|height=500]"/>
+</form>
 
   <grid title="All Actions" name="meta-action-grid" model="com.axelor.meta.db.MetaAction">
     <field name="name" />

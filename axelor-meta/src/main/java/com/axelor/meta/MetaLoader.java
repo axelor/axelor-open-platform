@@ -1,7 +1,6 @@
 package com.axelor.meta;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -187,50 +186,46 @@ public class MetaLoader {
 		return (ObjectViews) unmarshaller.unmarshal(reader);
 	}
 	
-	private String findName(String filePath) {
-		Pattern pattern = Pattern.compile("(.*)\\/views\\/(.*)\\.xml");
-		Matcher matcher = pattern.matcher(filePath);
-		if (matcher.matches())
-			return String.format("com.axelor.%s.db.%s", matcher.group(1), matcher.group(2));
-		return null;
-	}
-	
-	private void loadView(AbstractView view, String filePath) {
+	private void loadView(AbstractView view, String module, String file) {
 		
 		log.info("Loading view : {}", view.getName());
 		
-		String xml = toXml(view);
+		String name = view.getName();
 		String type = view.getClass().getSimpleName().replace("View", "").toLowerCase();
 		String model = view.getModel();
+
+		String xml = toXml(view);
 		
-		if (Strings.isNullOrEmpty(model))
-			model = findName(filePath);
-		
-		if (type.matches("chart|portal|search"))
+		if (type.matches("chart|portal|search")) {
 			model = null;
+		} else if (Strings.isNullOrEmpty(model)) {
+			try {
+				model = Files.getNameWithoutExtension(file);
+				model = JPA.model(model).getName();
+			} catch (Exception e) {
+				throw new IllegalArgumentException("Invalid view: " + name);
+			}
+		}
 
 		// import charts
 		if (view instanceof ChartView) {
 			loadChart((ChartView) view, xml);
 			return;
 		}
-
-		String name = view.getName();
-		String name_ = name + "._";
-
-		MetaView entity = MetaView.all().filter("self.name = ?1", name_).fetchOne();
-		if (entity == null) {
-			entity = new MetaView();
-			if (MetaView.all().filter("self.name = ?1", name).count() > 0) {
-				name = name_;
-			}
-			entity.setName(name);
-		}
 		
+		MetaView entity = new MetaView();
+		entity.setName(name);
 		entity.setTitle(view.getTitle());
 		entity.setType(type);
 		entity.setModel(model);
+		entity.setModule(module);
 		entity.setXml(xml);
+		
+		// if a view with same name exists, set higher priority then that
+		MetaView existing = MetaView.findByName(name);
+		if (existing != null) {
+			entity.setPriority(existing.getPriority() - 1);
+		}
 
 		entity = entity.save();
 	}
@@ -430,13 +425,13 @@ public class MetaLoader {
 		return all;
 	}
 	
-	private void process(InputStream stream, String filePath) throws JAXBException {
+	private void process(File file, String module) throws JAXBException, IOException {
 		
-		ObjectViews views = (ObjectViews) unmarshaller.unmarshal(stream);
+		ObjectViews views = (ObjectViews) unmarshaller.unmarshal(file.openInputStream());
 		
 		if (views.getViews() != null)
 			for(AbstractView view : views.getViews())
-				loadView(view, filePath);
+				loadView(view, module, file.getRelativePath());
 
 		if (views.getActions() != null)
 			for(Action action : views.getActions())
@@ -466,7 +461,7 @@ public class MetaLoader {
 	}
 	
 	@SuppressWarnings("all")
-	private String createDefaultViews(Class<?> klass) {
+	private String createDefaultViews(final Class<?> klass) {
 		
 		final FormView formView = new FormView();
 		final GridView gridView = new GridView();
@@ -514,43 +509,35 @@ public class MetaLoader {
 			
 			@Override
 			public void run() {
-				loadView(formView, null);
-				loadView(gridView, null);
+				
+				String module = null;
+				
+				Pattern pattern = Pattern.compile("(.*?)\\.([^.]+)\\.db\\.(.*)");
+				Matcher matcher = pattern.matcher(klass.getName());
+				if (matcher.matches()) {
+					module = "axelor-" + matcher.group(2);
+				}
+				
+				loadView(formView, module, null);
+				loadView(gridView, module, null);
 			}
 		});
 		
 		return toXml(ImmutableList.of(gridView, formView), false);
 	}
 	
-	private Pattern pattern = Pattern.compile("(\\w+)-(\\w+)");
-	
-	private String findModuleName(File file) {
-		String[] parts = file.getFullPath().split("/");
-		for(int i = parts.length - 1 ; i >= 0 ; i--) {
-			Matcher matcher = pattern.matcher(parts[i]);
-			if (matcher.find())
-				return matcher.group(2);
-		}
-		throw new RuntimeException("Unable to find module name: " + file.getFullPath());
-	}
-	
-	private void loadFile(final File file) {
-		
-		String path = file.getRelativePath();
-		String module = findModuleName(file);
-		
-		final String filePath = module + "/" + path;
+	private void loadFile(final File file, final String module) {
 		
 		JPA.runInTransaction(new Runnable() {
 
 			@Override
 			public void run() {
 				try {
-					process(file.openInputStream(), filePath);
+					process(file, module);
 				} catch (JAXBException e) {
 					Throwable ex = e.getLinkedException();
 					ex = ex == null ? e : ex;
-					log.error("Invalid XML input: {}", filePath, ex);
+					log.error("Invalid XML input: {}", file.getFullPath(), ex);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -649,7 +636,7 @@ public class MetaLoader {
 				}
 				Matcher matcher = pattern.matcher(path);
 				if (matcher.find()) {
-					loadFile(file);
+					loadFile(file, module);
 				}
 			}
 		}
@@ -712,31 +699,14 @@ public class MetaLoader {
 	}
 	
 	public AbstractView findView(String model, String name, String type) {
-		if (name != null) {
-			return findView(name);
-		}
 		MetaView view = null;
 		User user = AuthUtils.getUser();
 		if (user != null && user.getGroup() != null) {
-			view = MetaView.all()
-					.filter("self.model = ?1 AND self.type = ?2 AND ?3 MEMBER OF self.groups", model, type, user.getGroup())
-					.order("-name").fetchOne();
+			view = MetaView.findByGroup(name, type, model, user.getGroup().getId());
 		}
 		if (view == null) {
-			view = MetaView.all()
-					.filter("self.model = ?1 AND self.type = ?2", model, type)
-					.order("-name").fetchOne();
+			view = MetaView.findByType(name, type, model);
 		}
-		try {
-			return ((ObjectViews) unmarshal(view.getXml())).getViews().get(0);
-		} catch (Exception e) {
-		}
-		return null;
-	}
-	
-	public AbstractView findView(String name) {
-		String name_ = name + "._";
-		MetaView view = MetaView.all().filter("self.name = ?1 OR self.name = ?2", name_, name).order("-name").fetchOne();
 		try {
 			return ((ObjectViews) unmarshal(view.getXml())).getViews().get(0);
 		} catch (Exception e) {
