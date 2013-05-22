@@ -105,6 +105,15 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="initParam" type="xsd:boolean">
+    <xsd:annotation>
+      <xsd:documentation>
+        Whether the field should be used as a constructor parameter.&lt;br&gt;&lt;br&gt;
+        If there are some fields with this attribute having `true` value then a constructor
+        is generated using all those fields as constructor parameters.
+      </xsd:documentation>
+    </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 
   <xsd:complexType name="SimpleColumn">
