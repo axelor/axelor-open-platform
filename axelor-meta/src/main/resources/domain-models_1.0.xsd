@@ -391,12 +391,33 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="using" type="xsd:string" use="required">
+    <xsd:attribute name="using" use="required"  type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-        Provide the list of field names (comma seperated). The given fields must be
-        declared above. The field names will be the method parameters. If the filter
-        is not provided, an ANDed filter on the given fields is generated.
+        Provide the method parameters (comma seperated list). A parameter can be
+        a field name defined above or/and a definition in the format `type:name`
+        where `type` can be either of the following type.&lt;br&gt;
+
+        &lt;ul&gt;
+        &lt;li&gt;int, long, double, boolean&lt;/li&gt;
+        &lt;li&gt;Integer, Long, Double, Boolean&lt;/li&gt;
+        &lt;li&gt;String, BigDecimal&lt;/li&gt;
+        &lt;li&gt;LocalDate, LocalTime, LocalDateTime, DateTime&lt;/li&gt;
+        &lt;/ul&gt;
+
+        &lt;br&gt;
+        &lt;br&gt;
+
+        If all the all the parameters are field names and filter is not given then an
+        ANDed filter on the given names is generated.
+
+        &lt;br&gt;
+        &lt;br&gt;
+
+        Some examples:&lt;br&gt;&lt;br&gt;
+        ... using="code, name"&lt;br&gt;
+        ... using="long:customerId,String:email"&lt;br&gt;
+        ... using="long:customerId,String:email,totalAmount"
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -405,9 +426,10 @@
         <xsd:documentation>
         Use the given filter. The filter expression should only use the given
         field names as named parameters.
-        For example:
+        Some examples: &lt;br&gt; &lt;br&gt;
 
-        `self.name = :name OR self.code = :code OR self.name = :code
+        ... using="code, name" filter="self.name = :name OR self.code = :code" &lt;br&gt; &lt;br&gt;
+        ... using="long:id, String:email" filter="self.customer.id = :id OR self.customer.email = :email"
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
