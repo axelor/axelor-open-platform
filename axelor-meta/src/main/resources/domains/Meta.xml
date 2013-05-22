@@ -118,7 +118,7 @@
     <string name="name" required="true" unique="true"/>
     <string name="title" />
     <boolean name="stacked" />
-    <string name="query" max="2048" multiline="true" required="true"/>
+    <string name="query" large="true" multiline="true" required="true"/>
     <string name="queryType"/>
     <string name="categoryKey" required="true" />
     <string name="categoryType" />
