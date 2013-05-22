@@ -479,6 +479,17 @@ public final class JPA {
 			}
 		});
 	}
+	
+	/**
+	 * Return the model class for the given name.
+	 * 
+	 * @param name
+	 *            name of the model
+	 * @return model class
+	 */
+	public static Class<?> model(String name) {
+		return JpaScanner.findModel(name);
+	}
 
 	/**
 	 * Return all the properties of the given model class.

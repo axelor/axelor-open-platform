@@ -35,6 +35,8 @@ public class JpaScanner extends NativeScanner {
 	
 	private static ConcurrentMap<String, Class<?>> cache = null;
 	
+	private static ConcurrentMap<String, String> nameCache = new MapMaker().makeMap();
+
 	@Override
 	public Set<Class<?>> getClassesInJar(URL jarToScan, Set<Class<? extends Annotation>> annotationsToLookFor) {
 		Set<Class<?>> mine = super.getClassesInJar(jarToScan, annotationsToLookFor);
@@ -69,6 +71,7 @@ public class JpaScanner extends NativeScanner {
 						continue;
 					}
 					cache.put(klass.getName(), klass);
+					nameCache.put(klass.getSimpleName(), klass.getName());
 					names.add(klass.toString());
 				}
 			}
@@ -76,5 +79,13 @@ public class JpaScanner extends NativeScanner {
 			log.info("Model classes found:\n  " + Joiner.on("\n  ").join(names));
 		}
 		return new HashSet<Class<?>>(cache.values());
+	}
+	
+	public static Class<?> findModel(String name) {
+		if (cache == null) {
+			findModels();
+		}
+		String className = nameCache.containsKey(name) ? nameCache.get(name) : name;
+		return cache.get(className);
 	}
 }
