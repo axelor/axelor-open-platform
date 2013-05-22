@@ -222,6 +222,10 @@ class Property {
 		return attrs["mappedBy"]
 	}
 	
+	boolean isInitParam() {
+		return attrs["initParam"] == "true"
+	}
+	
 	boolean isNullable() {
 		return attrs["nullable"] == "true" && attrs["required"] != "true"
 	}

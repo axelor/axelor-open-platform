@@ -136,6 +136,28 @@ class Entity {
 		return propertyMap[name]
 	}
 	
+	String getCtorCode() {
+		def lines = []
+		
+		lines += "public ${name}() {"
+		lines += "}\n"
+		
+		def fields = properties.findAll { it.isInitParam() }
+		if (fields.empty) {
+			fields = properties.findAll { it.name =~ /code|name/ }
+		}
+		if (!fields.empty) {
+			def args = fields.collect { Property p -> "$p.type $p.name" }
+			lines += "public ${name}(${args.join(', ')}) {"
+			fields.each { Property p ->
+				lines += "\tthis.${p.name} = ${p.name};"
+			}
+			lines += "}\n"
+		}
+		
+		return "\t" + Utils.stripCode(lines.join("\n"), "\n\t");
+	}
+	
 	private List<Property> getHashables() {
 		
 		if (hashAll) {
