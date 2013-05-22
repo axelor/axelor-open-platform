@@ -209,7 +209,7 @@ public class MetaService {
 
 		LOG.debug("Search : {}", name);
 
-		Search search = (Search) loader.findView(name);
+		Search search = (Search) loader.findView(null, name, "search");
 		GroovyScriptHelper helper = search.scriptHandler(context);
 
 		List<Object> data = Lists.newArrayList();

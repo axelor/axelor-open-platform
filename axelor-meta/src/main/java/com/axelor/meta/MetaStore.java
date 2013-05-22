@@ -36,7 +36,7 @@ public class MetaStore {
 			return (AbstractView) CACHE.get(name);
 		}
 		MetaLoader loader = new MetaLoader();
-		AbstractView view = loader.findView(name);
+		AbstractView view = loader.findView(null, name, null);
 		if (view != null) {
 			register(name, view);
 		}
