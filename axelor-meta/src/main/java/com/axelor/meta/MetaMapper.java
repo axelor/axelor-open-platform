@@ -15,6 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class MetaMapper extends ObjectMapper {
 
+	private static final long serialVersionUID = 1384878592649743711L;
+
 	public MetaMapper() {
 		configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		setSerializationInclusion(Include.NON_NULL);

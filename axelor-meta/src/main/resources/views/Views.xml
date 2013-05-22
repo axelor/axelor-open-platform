@@ -25,6 +25,43 @@
     <option value="action-ws">action-ws</option>
     <option value="action-workflow">action-workflow</option>
   </selection>
+  
+  <grid title="All Modules" name="meta-module-grid" model="com.axelor.meta.db.MetaModule">
+    <field name="name"/>
+    <field name="title"/>
+    <field name="moduleVersion" width="200"/>
+    <field name="installed" width="100"/>
+    <field name="removable" width="100"/>
+  </grid>
+
+  <form name="meta-module-form" title="Module" model="com.axelor.meta.db.MetaModule">
+    <field name="name" />
+    <field name="moduleVersion" />
+    <field name="title" />
+    <field name="installed" />
+    <notebook colSpan="4">
+      <page title="Description" cols="1">
+        <field name="description" widget="Text" />
+      </page>
+      <page title="Dependencies" cols="1">
+        <field name="dependencies">
+          <grid title="Dependencies" editable="true">
+            <field name="name" />
+          </grid>
+          <form title="Dependency">
+            <field name="name" />
+          </form>
+        </field>
+      </page>
+    </notebook>
+    <group colSpan="4" cols="2" colWidths="*,150">
+      <spacer />
+      <group cols="1">
+        <button name="btnInstall" title="Install" showIf="!installed" onClick="com.axelor.meta.web.ModuleController:install(name)"/>
+        <button name="btnUninstall" title="Uninstall" showIf="install &amp;&amp;removable" />
+      </group>
+    </group>
+  </form>
 
   <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView" orderBy="priority,name">
     <field name="name"/>
