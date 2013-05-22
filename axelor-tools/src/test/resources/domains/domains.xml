@@ -45,14 +45,14 @@
 
   <entity name="Contact" sequential="true" lang="groovy" hashAll="true" cachable="false">
     <many-to-one name="title" ref="Title" unique="true" />
-    <string name="firstName" required="true" />
-    <string name="lastName" required="true" />
+    <string name="firstName" required="true" initParam="true"/>
+    <string name="lastName" required="true" initParam="true"/>
     <string name="fullName" namecolumn="true" search="firstName,lastName">
       <![CDATA[
       title ? "$title.name $firstName $lastName" : "$firstName $lastName"
       ]]>
     </string>
-    <string name="email" required="true" unique="true" />
+    <string name="email" required="true" unique="true" initParam="true"/>
     <string name="phone" max="20"  hashKey="false" />
     <string name="notes" multiline="true" title="About Me" />
     <many-to-many name="groups" ref="Group" mappedBy="contacts"/>

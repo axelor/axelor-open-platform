@@ -9,6 +9,9 @@ public class ${pojo.name} extends ${pojo.baseClass} {
 <% } %>
 	private $p.type ${p.name}${p.defaultExpression};
 <% } %>\
+
+${pojo.ctorCode}\
+
 <% pojo.fields.each { p -> %>\
 ${p.documentation}
 <% if (p.isVirtual() && !p.isFormula()) { %>\
