@@ -26,6 +26,29 @@ ui.formInput('CodeEditor', {
 		
 		editor.setReadOnly(scope.isReadonly());
 		
+		editor.commands.addCommands([{
+		    name: "unfind",
+		    bindKey: {
+		        win: "Ctrl-F",
+		        mac: "Command-F"
+		    },
+		    exec: function(editor, line) {
+		        return false;
+		    },
+		    readOnly: true
+		}]);
+		editor.commands.addCommands([{
+		    name: "unreplace",
+		    bindKey: {
+		        win: "Ctrl-R",
+		        mac: "Command-R"
+		    },
+		    exec: function(editor, line) {
+		        return false;
+		    },
+		    readOnly: true
+		}]);
+		
 		var loadingText = false;
 		model.$render = function() {
 			loadingText = true;
