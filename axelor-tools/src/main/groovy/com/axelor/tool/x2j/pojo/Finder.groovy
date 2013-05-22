@@ -20,9 +20,9 @@ class Finder {
 
 	Finder(Entity entity, NodeChild node) {
 		this.entity = entity
-		this.name = node.@name.toString()
+		this.name = node.@name.toString().trim()
 		this.fields = node.@using.toString().trim().split(/\s*,\s*/)
-		this.filter = node.@filter.toString();
+		this.filter = node.@filter.toString().trim();
 		this.orderBy = node.@orderBy.toString().trim().split(/\s*,\s*/)
 
 		this.type = entity.name
@@ -41,6 +41,23 @@ class Finder {
 		this.fields = [field]
 		this.filter = ""
 	}
+	
+	private static final def TYPES = [
+		"int"		: "int",
+		"long"		: "long",
+		"double"	: "double",
+		"boolean"	: "boolean",
+		"Integer"	: "Integer",
+		"Long"		: "Long",
+		"Double"	: "Double",
+		"Boolean"	: "Boolean",
+		"String"	: "String",
+		"LocalDate"		: "org.joda.time.LocalDate",
+		"LocalTime"		: "org.joda.time.LocalTime",
+		"LocalDateTime"	: "org.joda.time.LocalDateTime",
+		"DateTime"		: "org.joda.time.DateTime",
+		"BigDecimal"	: "java.math.BigDecimal"
+	]
 
 	String getCode() {
 		
@@ -49,15 +66,32 @@ class Finder {
 		def args = []
 		
 		for(String field : fields) {
-			def n = Utils.firstLower(field);
-			def p = entity.getField(n);
-			if (!p) return ""
-			args += n
-			query += "self.${n} = :${n}"
-			params += p.type + " " + n
-		}
+			def parts = field.split(/\:/)
+			def n = Utils.firstLower(field)
+			def p
+			def t
+			if (parts.length > 1) {
+				if (filter.empty) return "" // filter must be provided
+				t = parts[0]
+				n = parts[1]
+				if (TYPES[t]) {
+					t = entity.importType(TYPES[t])
+				} else {
+					return ""
+				}
+			} else {
+				p = entity.getField(n)
+				if (!p) return ""
+				t = p.type
+				query += "self.${n} = :${n}"
+			}
+			n = Utils.firstLower(n);
 
-		query = filter.trim().length() == 0 ? query.join(" AND ") : filter
+			args += n
+			params += t + " " + n
+		}
+		
+		query = filter.empty ? query.join(" AND ") : filter
 		params = params.join(", ")
 		
 		def lines = []
