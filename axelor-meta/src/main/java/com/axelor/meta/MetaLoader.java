@@ -38,6 +38,8 @@ import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaChart;
 import com.axelor.meta.db.MetaChartSeries;
 import com.axelor.meta.db.MetaMenu;
+import com.axelor.meta.db.MetaModule;
+import com.axelor.meta.db.MetaModuleDependency;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.db.MetaTranslation;
@@ -102,6 +104,11 @@ public class MetaLoader {
 		}
 	}
 	
+	private ObjectViews unmarshal(String xml) throws JAXBException {
+		StringReader reader = new StringReader(prepareXML(xml));
+		return (ObjectViews) unmarshaller.unmarshal(reader);
+	}
+	
 	private String stripWhiteSpaces(String text) {
 		String string = text.replaceAll("\\t", "    ");
 		StringBuilder builder = new StringBuilder();
@@ -132,10 +139,6 @@ public class MetaLoader {
 
 		Pattern p = Pattern.compile("^(\\t|\\s{4})", Pattern.MULTILINE);
 		return p.matcher(sb).replaceAll("");
-	}
-	
-	private String toXml(Object obj) {
-		return toXml(obj, true);
 	}
 	
 	@SuppressWarnings("all")
@@ -194,7 +197,7 @@ public class MetaLoader {
 		String type = view.getClass().getSimpleName().replace("View", "").toLowerCase();
 		String model = view.getModel();
 
-		String xml = toXml(view);
+		String xml = toXml(view, true);
 		
 		if (type.matches("chart|portal|search")) {
 			model = null;
@@ -286,7 +289,7 @@ public class MetaLoader {
 		MetaAction entity = new MetaAction();
 
 		entity.setName(action.getName());
-		entity.setXml(toXml(action));
+		entity.setXml(toXml(action,  true));
 		
 		String model = (String) mapper.get(action, "model");
 		entity.setModel(model);
@@ -610,25 +613,20 @@ public class MetaLoader {
 	
 	public void loadViews() throws Exception {
 		
-		if (MetaView.all().count() > 0) {
+		if (MetaView.all().count() > 0 || moduleResolver == null) {
 			return;
 		}
 
-		ModuleResolver resolver = new ModuleResolver();
-
-		for(File file : findResources("module", "module.properties")) {
-			Properties cfg = new Properties();
-			cfg.load(file.openInputStream());
-			String[] deps = cfg.getProperty("depends", "").trim().split("\\s+");
-			resolver.add(cfg.getProperty("name"), deps);
-		}
-		
 		List<File> files = findResources("views", ".xml");
 		Set<String> imported = Sets.newHashSet();
 
-		for(String module : resolver.all()) {
+		for(String module : moduleResolver.all()) {
 			String pat = String.format("(/WEB-INF/lib/%s)|(%s/WEB-INF/classes/)", module, module);
 			Pattern pattern = Pattern.compile(pat);
+			MetaModule m = MetaModule.findByName(module);
+			if (m == null || m.getInstalled() == Boolean.FALSE) {
+				continue;
+			}
 			for(File file : files) {
 				String path = file.getFullPath();
 				if (imported.contains(path)) {
@@ -641,14 +639,105 @@ public class MetaLoader {
 			}
 		}
 	}
+	
+	private static ModuleResolver moduleResolver = new ModuleResolver();
+	
+	private void _loadModuleInfo() throws IOException {
+		
+		for(File file : findResources("module", "module.properties")) {
+			
+			Properties cfg = new Properties();
+			cfg.load(file.openInputStream());
+
+			String name = cfg.getProperty("name");
+			String[] deps = cfg.getProperty("depends", "").trim().split("\\s+");
+			
+			moduleResolver.add(name, deps);
+			
+			MetaModule module = MetaModule.findByName(name);
+			if (module == null) {
+				module = new MetaModule();
+				module.setName(name);
+				
+				for(String dep : deps) {
+					module.addDependency(new MetaModuleDependency(dep));
+				}
+			}
+			
+			module.setModuleVersion(cfg.getProperty("version"));
+			module.setTitle(cfg.getProperty("title"));
+			module.setDescription(cfg.getProperty("description"));
+			
+			boolean removable = "true".equals(cfg.getProperty("removable"));
+			module.setRemovable(removable);
+			
+			if (!removable) {
+				module.setInstalled(true);
+			}
+			
+			module = module.save();
+		}
+	}
+	
+	private void loadModuleInfo() throws IOException {
+		JPA.runInTransaction(new Runnable() {
+			@Override
+			public void run() {
+				try {
+				_loadModuleInfo();
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		});
+	}
 
 	public void load(String outputPath) {
+		try {
+			loadModuleInfo();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		loadModels();
 		loadTranslations();
+		
 		try {
 			loadViews();
 		} catch (Exception e){}
+		
 		loadDefault(outputPath);
+	}
+	
+	public void loadModule(MetaModule module) {
+		// load all the resources of the given module if it's installed
+		if (module.getInstalled() == Boolean.FALSE) {
+			return;
+		}
+		
+		// check whether all the dependencies are installed
+		for(String name : moduleResolver.resolve(module.getName())) {
+			if (name.equals(module.getName()) || "axelor-core".equals(name)) {
+				continue;
+			}
+			MetaModule m = MetaModule.findByName(name);
+			if (m == null) {
+				throw new IllegalArgumentException("dependency not found: " + name);
+			}
+			if (m.getInstalled() == Boolean.FALSE) {
+				throw new IllegalArgumentException("dependency not installed: " + name);
+			}
+		}
+
+		String name = module.getName();
+		Pattern pattern = Pattern.compile(String.format("(/WEB-INF/lib/%s)|(%s/WEB-INF/classes/)", name, name));
+
+		for(File file : findResources("views", ".xml")) {
+			Matcher matcher = pattern.matcher(file.getFullPath());
+			if (matcher.find()) {
+				loadFile(file, name);
+			}
+		}
 	}
 	
 	private List<File> findResources(final String prefix, final String suffix) {
@@ -677,11 +766,6 @@ public class MetaLoader {
 		return files;
 	}
 
-	private ObjectViews unmarshal(String xml) throws JAXBException {
-		StringReader reader = new StringReader(prepareXML(xml));
-		return (ObjectViews) unmarshaller.unmarshal(reader);
-	}
-	
 	public Map<String, Object> findViews(String model, Map<String, String> views) {
 		final Map<String, Object> result = Maps.newHashMap();
 		if (views == null || views.isEmpty()) {

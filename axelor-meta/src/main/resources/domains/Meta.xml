@@ -5,6 +5,21 @@
 
   <module name="meta" package="com.axelor.meta.db" />
   
+  <entity name="MetaModule" table="META_MODULE" cachable="true">
+    <string name="name" required="true" unique="true"/>
+    <string name="title" required="true" />
+    <string name="description"/>
+    <string name="moduleVersion" required="true" title="Version"/>
+    <boolean name="removable" />
+    <boolean name="installed" />
+    <one-to-many name="dependencies" ref="MetaModuleDependency" mappedBy="module"/>
+  </entity>
+  
+  <entity name="MetaModuleDependency" table="META_MODULE_DEPENDENCY" cachable="true">
+    <string name="name" required="true"/>
+    <many-to-one name="module" ref="MetaModule" required="true"/>
+  </entity>
+  
   <entity name="MetaView" table="META_VIEW" sequential="true" cachable="true">
   	<string name="name" required="true"/>
 	<string name="title" required="true" namecolumn="true"/>
