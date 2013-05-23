@@ -663,8 +663,12 @@ public final class JPA {
 		return INSTANCE.translations.get().get(key, defaultValue);
 	}
 	
-	public static String translate(String key, String domain, String defaultValue){
-		return INSTANCE.translations.get().get(key, domain, defaultValue);
+	public static String translate(String key, String defaultValue, String domain){
+		return INSTANCE.translations.get().get(key, defaultValue, domain);
+	}
+	
+	public static String translate(String key, String defaultValue, String domain, String type){
+		return INSTANCE.translations.get().get(key, defaultValue, domain, type);
 	}
 	
 }
