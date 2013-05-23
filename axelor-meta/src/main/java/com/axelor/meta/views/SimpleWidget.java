@@ -51,6 +51,10 @@ public abstract class SimpleWidget extends AbstractWidget {
 		this.name = name;
 	}
 	
+	public String getDefaultTitle(){
+		return title;
+	}
+
 	public String getTitle() {
 		if (title == null || "".equals(title.trim())) {
 			return title;
@@ -60,6 +64,10 @@ public abstract class SimpleWidget extends AbstractWidget {
 	
 	public void setTitle(String title) {
 		this.title = title;
+	}
+	
+	public String getDefaultHelp(){
+		return help;
 	}
 
 	public String getHelp() {

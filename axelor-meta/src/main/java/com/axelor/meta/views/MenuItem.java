@@ -62,6 +62,10 @@ public class MenuItem {
 		this.groups = groups;
 	}
 
+	public String getDefaultTitle() {
+		return title;
+	}
+
 	public String getTitle() {
 		return JPA.translate(title);
 	}
