@@ -154,8 +154,15 @@ ActionHandler.prototype = {
 		var scope = this.scope,
 			context = scope.getContext ? scope.getContext() : scope.record,
 			viewParams = scope._viewParams || {};
-			
-		return _.extend({}, viewParams.context, context);
+		
+		context = _.extend({}, viewParams.context, context);
+
+		// include button name as _signal (used by workflow engine)
+		if (this.element.is("button")) {
+			context['_signal'] = this.element.attr('name');
+		}
+
+		return context;
 	},
 
 	handle: function() {
