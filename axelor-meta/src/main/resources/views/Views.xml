@@ -146,18 +146,24 @@
 
   <grid title="All Selects" name="meta-select-grid" model="com.axelor.meta.db.MetaSelect">
     <field name="name"/>
+    <field name="module"/>
+    <field name="priority" width="75"/>
   </grid>
 
-  <form title="Select" name="meta-select-form" model="com.axelor.meta.db.MetaSelect" cols="2" colWidths="5%,*">
-    <field name="name"/>
-    <field name="items" colSpan="2">
+  <form colWidths="5%,*,5%,*" name="meta-select-form" title="Select"
+    model="com.axelor.meta.db.MetaSelect">
+    <field name="name" />
+    <field name="priority" />
+    <field name="module" />
+    <spacer />
+    <field name="items" colSpan="4">
       <grid title="Select Items" editable="true">
-        <field name="title"/>
-        <field name="value"/>
+        <field name="title" />
+        <field name="value" />
       </grid>
-      <form title="Select Item" cols="2">
-        <field name="title"/>
-        <field name="value"/>
+      <form cols="2" title="Select Item">
+        <field name="title" />
+        <field name="value" />
       </form>
     </field>
   </form>
