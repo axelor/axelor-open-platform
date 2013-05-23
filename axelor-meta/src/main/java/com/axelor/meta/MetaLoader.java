@@ -285,7 +285,7 @@ public class MetaLoader {
 		select.save();
 	}
 
-	private void loadAction(Action action) {
+	private void loadAction(Action action, String module) {
 		
 		log.info("Loading action : {}", action.getName());
 		
@@ -299,6 +299,7 @@ public class MetaLoader {
 		
 		String model = (String) mapper.get(action, "model");
 		entity.setModel(model);
+		entity.setModule(module);
 
 		String type = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, klass.getSimpleName());
 		entity.setType(type);
@@ -323,94 +324,96 @@ public class MetaLoader {
 	private Multimap<String, MetaMenu> unresolved_menus = HashMultimap.create();
 	private Multimap<String, MetaMenu> unresolved_actions = HashMultimap.create();
 	
-	private void loadMenu(MenuItem menu) {
+	private void loadMenu(MenuItem menuItem, String module) {
 		
-		if (menu instanceof ActionMenuItem) {
-			loadMenu2((ActionMenuItem) menu);
+		if (menuItem instanceof ActionMenuItem) {
+			loadMenu2((ActionMenuItem) menuItem, module);
 			return;
 		}
 		
-		log.info("Loading menu : {}", menu.getName());
+		log.info("Loading menu : {}", menuItem.getName());
 		
-		MetaMenu m = new MetaMenu();
-		m.setName(menu.getName());
-		m.setPriority(menu.getPriority());
-		m.setTitle(menu.getDefaultTitle());
-		m.setIcon(menu.getIcon());
-		m.setGroups(this.findGroups(menu.getGroups()));
+		MetaMenu menu = new MetaMenu();
+		menu.setName(menuItem.getName());
+		menu.setPriority(menuItem.getPriority());
+		menu.setTitle(menuItem.getDefaultTitle());
+		menu.setIcon(menuItem.getIcon());
+		menu.setModule(module);
+		menu.setGroups(this.findGroups(menuItem.getGroups()));
 		
-		if (!Strings.isNullOrEmpty(menu.getParent())) {
-			MetaMenu p = MetaMenu.all().filter("self.name = ?1", menu.getParent()).fetchOne();
-			if (p == null) {
-				log.info("Unresolved parent : {}", menu.getParent());
-				unresolved_menus.put(menu.getParent(), m);
+		if (!Strings.isNullOrEmpty(menuItem.getParent())) {
+			MetaMenu parent = MetaMenu.findByName(menuItem.getParent());
+			if (parent == null) {
+				log.info("Unresolved parent : {}", menuItem.getParent());
+				unresolved_menus.put(menuItem.getParent(), menu);
 			} else {
-				m.setParent(p);
+				menu.setParent(parent);
 			}
 		}
 		
-		if (!Strings.isNullOrEmpty(menu.getAction())) {
-			MetaAction a = MetaAction.all().filter("self.name = ?1", menu.getAction()).fetchOne();
+		if (!Strings.isNullOrEmpty(menuItem.getAction())) {
+			MetaAction a = MetaAction.findByName(menuItem.getAction());
 			if (a == null) {
-				log.info("Unresolved action: {}", menu.getAction());
-				unresolved_actions.put(menu.getAction(), m);
+				log.info("Unresolved action: {}", menuItem.getAction());
+				unresolved_actions.put(menuItem.getAction(), menu);
 			} else {
-				m.setAction(a);
+				menu.setAction(a);
 			}
 		}
 		
-		m = m.save();
+		menu = menu.save();
 		
-		for (MetaMenu pending : unresolved_menus.get(m.getName())) {
+		for (MetaMenu pending : unresolved_menus.get(menu.getName())) {
 			log.info("Resolved menu : {}", pending.getName());
-			pending.setParent(m);
+			pending.setParent(menu);
 			pending.save();
 		}
 		
-		unresolved_menus.removeAll(m.getName());
+		unresolved_menus.removeAll(menu.getName());
 	}
 	
 	private Multimap<String, MetaActionMenu> unresolved_menus2 = HashMultimap.create();
 	private Multimap<String, MetaActionMenu> unresolved_actions2 = HashMultimap.create();
 	
-	private void loadMenu2(ActionMenuItem menu) {
+	private void loadMenu2(ActionMenuItem menuItem, String module) {
 		
-		log.info("Loading action menu : {}", menu.getName());
+		log.info("Loading action menu : {}", menuItem.getName());
 		
-		MetaActionMenu m = new MetaActionMenu();
-		m.setName(menu.getName());
-		m.setTitle(menu.getDefaultTitle());
-		m.setCategory(menu.getCategory());
+		MetaActionMenu menu = new MetaActionMenu();
+		menu.setName(menuItem.getName());
+		menu.setTitle(menuItem.getDefaultTitle());
+		menu.setModule(module);
+		menu.setCategory(menuItem.getCategory());
 
-		if (!Strings.isNullOrEmpty(menu.getParent())) {
-			MetaActionMenu p = MetaActionMenu.all().filter("self.name = ?1", menu.getParent()).fetchOne();
-			if (p == null) {
-				log.info("Unresolved parent : {}", menu.getParent());
-				unresolved_menus2.put(menu.getParent(), m);
+		if (!Strings.isNullOrEmpty(menuItem.getParent())) {
+			MetaActionMenu parent = MetaActionMenu.findByName(menuItem.getParent());
+			if (parent == null) {
+				log.info("Unresolved parent : {}", menuItem.getParent());
+				unresolved_menus2.put(menuItem.getParent(), menu);
 			} else {
-				m.setParent(p);
+				menu.setParent(parent);
 			}
 		}
 		
-		if (!Strings.isNullOrEmpty(menu.getAction())) {
-			MetaAction a = MetaAction.all().filter("self.name = ?1", menu.getAction()).fetchOne();
-			if (a == null) {
-				log.info("Unresolved action: {}", menu.getAction());
-				unresolved_actions2.put(menu.getAction(), m);
+		if (!Strings.isNullOrEmpty(menuItem.getAction())) {
+			MetaAction action = MetaAction.findByName(menuItem.getAction());
+			if (action == null) {
+				log.info("Unresolved action: {}", menuItem.getAction());
+				unresolved_actions2.put(menuItem.getAction(), menu);
 			} else {
-				m.setAction(a);
+				menu.setAction(action);
 			}
 		}
 		
-		m = m.save();
+		menu = menu.save();
 		
-		for (MetaActionMenu pending : unresolved_menus2.get(m.getName())) {
+		for (MetaActionMenu pending : unresolved_menus2.get(menu.getName())) {
 			log.info("Resolved action menu : {}", pending.getName());
-			pending.setParent(m);
+			pending.setParent(menu);
 			pending.save();
 		}
 		
-		unresolved_menus2.removeAll(m.getName());
+		unresolved_menus2.removeAll(menu.getName());
 	}
 	
 	private Set<Group> findGroups(String groups) {
@@ -444,11 +447,11 @@ public class MetaLoader {
 
 		if (views.getActions() != null)
 			for(Action action : views.getActions())
-				loadAction(action);
+				loadAction(action, module);
 		
 		if (views.getMenuItems() != null)
 			for (MenuItem menu : views.getMenuItems())
-				loadMenu(menu);
+				loadMenu(menu, module);
 		
 		if (views.getSelections() != null)
 			for(Selection selection : views.getSelections())
@@ -802,7 +805,7 @@ public class MetaLoader {
 	}
 	
 	public Action findAction(String name) {
-		MetaAction action = MetaAction.all().filter("self.name = ?1", name).fetchOne();
+		MetaAction action = MetaAction.findByName(name);
 		try {
 			return ((ObjectViews) unmarshal(action.getXml())).getActions().get(0);
 		} catch (Exception e) {

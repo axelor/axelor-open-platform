@@ -90,6 +90,7 @@
     <field name="name" />
     <field name="type" selection="action.type.selection"/>
     <field name="model" />
+    <field name="module"/>
   </grid>
 
   <form title="Action" name="meta-action-form" model="com.axelor.meta.db.MetaAction"
@@ -97,7 +98,7 @@
     <field name="name" readonlyIf="id"/>
     <field name="type" readonlyIf="id" selection="action.type.selection"/>
     <field name="model"/>
-    <break/>
+    <field name="module"/>
     <notebook colSpan="4">
       <page title="XML" cols="1">
         <field name="xml" noLabel="true" widget="CodeEditor[syntax=xml|height=500]"/>
@@ -110,6 +111,7 @@
     <field name="title"/>
     <field name="parent"/>
     <field name="action"/>
+    <field name="module"/>
     <field name="priority"/>
   </grid>
 
@@ -120,6 +122,7 @@
     <field name="icon"/>
     <field name="action"/>
     <field name="priority"/>
+    <field name="module"/>
     <break/>
     <notebook colSpan="4">
       <page title="Groups" cols="1">
@@ -134,6 +137,7 @@
     <field name="parent"/>
     <field name="category"/>
     <field name="action"/>
+    <field name="module"/>
   </grid>
 
   <form title="Action Menu" name="meta-action-menu-form" model="com.axelor.meta.db.MetaActionMenu">
@@ -142,6 +146,7 @@
     <field name="parent" domain="self.name != :name"/>
     <field name="category"/>
     <field name="action"/>
+    <field name="module"/>
   </form>
 
   <grid title="All Selects" name="meta-select-grid" model="com.axelor.meta.db.MetaSelect">
