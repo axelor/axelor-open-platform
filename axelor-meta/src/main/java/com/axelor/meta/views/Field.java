@@ -207,7 +207,7 @@ public class Field extends SimpleWidget {
 	public List<Object> getSelectionList() {
 		if (selection == null || "".equals(selection.trim()))
 			return null;
-		final MetaSelect select = MetaSelect.all().filter("self.name = ?", selection).fetchOne();
+		final MetaSelect select = MetaSelect.findByName(selection);
 		final List<Object> all = Lists.newArrayList();
 		if (select == null || select.getItems() == null) {
 			return all;

@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import com.axelor.meta.MetaLoader;
 import com.axelor.meta.db.MetaModule;
+import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaView;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
@@ -46,6 +47,7 @@ public class ModuleController {
 		module.setInstalled(false);
 		try {
 			MetaView.all().filter("self.module = ?1", name).remove();
+			MetaSelect.all().filter("self.module = ?1", name).remove();
 			module = module.save();
 		} catch (Exception e) {
 			module.refresh();

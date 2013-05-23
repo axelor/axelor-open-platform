@@ -266,15 +266,21 @@ public class MetaLoader {
 		chart.save();
 	}
 
-	private void loadSelection(Selection selection) {
+	private void loadSelection(Selection selection, String module) {
 		log.info("Loading selection : {}", selection.getName());
 		MetaSelect select = new MetaSelect();
 		select.setName(selection.getName());
+		select.setModule(module);
 		for(Selection.Option opt : selection.getOptions()) {
 			MetaSelectItem item = new MetaSelectItem();
 			item.setValue(opt.getValue());
 			item.setTitle(opt.getDefaultTitle());
 			select.addItem(item);
+		}
+		
+		MetaSelect existing = MetaSelect.findByName(select.getName());
+		if (existing != null) {
+			select.setPriority(existing.getPriority() +  1);
 		}
 		select.save();
 	}
@@ -446,7 +452,7 @@ public class MetaLoader {
 		
 		if (views.getSelections() != null)
 			for(Selection selection : views.getSelections())
-				loadSelection(selection);
+				loadSelection(selection, module);
 	}
 	
 	// Fields names are not in ordered but some JVM implementation can.

@@ -63,15 +63,17 @@
   </entity>
   
   <entity name="MetaSelect" table="META_SELECT" cachable="true">
-    <string name="name" required="true" unique="true"/>
+    <string name="name" required="true"/>
+    <integer name="priority" required="true" default="20"/>
+    <string name="module"/>
     <one-to-many name="items" ref="MetaSelectItem" mappedBy="select"/>
+    <finder-method name="findByName" using="name" orderBy="-priority"/>
   </entity>
 
   <entity name="MetaSelectItem" table="META_SELECT_ITEM" cachable="true">
     <string name="value" required="true"/>
     <string name="title" required="true" namecolumn="true"/>
     <many-to-one name="select" ref="MetaSelect" column="select_id" required="true"/>
-    <unique-constraint columns="select_id,value"/>
   </entity>
   
   <entity name="MetaModel" table="META_MODEL" sequential="true" cachable="true">
