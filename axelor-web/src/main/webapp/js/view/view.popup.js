@@ -577,9 +577,9 @@ angular.module('axelor.ui').directive('uiAttachmentPopup', function(){
 			'<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-editable="false" x-selector="true" x-no-filter="true"></div>'+
 		    '<div class="record-pager pull-left">'+
 			     '<div class="btn-group">'+
-			     	'<button class="btn btn-info" ng-disabled="!canUpload()" ng-click="onUpload()"><i class="icon-upload"><span x-translate>Upload</span></i></button>'+
-		     		'<button class="btn btn-success" ng-disabled="!canDownload()" ng-click="onDownload()"><i class="icon-download"><span x-translate>Download</span></i></button>'+
-	     			'<button class="btn btn-danger" ng-disabled="!canDelete()" ng-click="onDelete()"><i class="icon-trash"><span x-translate>Remove</span></i></button>'+
+			     	'<button class="btn btn-info" ng-disabled="!canUpload()" ng-click="onUpload()"><i class="icon icon-upload-alt"/><span x-translate>Upload</span></button>'+
+		     		'<button class="btn btn-success" ng-disabled="!canDownload()" ng-click="onDownload()"><i class="icon icon-download-alt"/><span x-translate>Download</span></button>'+
+	     			'<button class="btn btn-danger" ng-disabled="!canDelete()" ng-click="onDelete()"><i class="icon icon-trash"/><span x-translate>Remove</span></button>'+
 			    '</div>'+
 			    '<div class="btn-group">'+
 				    '<div class="progress progress-striped active" style="width: 300px; background: gainsboro; margin-top: 5px; margin-bottom: 0px;">'+
