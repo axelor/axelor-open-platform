@@ -8,11 +8,11 @@
   <entity name="MetaModule" table="META_MODULE" cachable="true">
     <string name="name" required="true" unique="true"/>
     <string name="title" required="true" />
-    <string name="description"/>
+    <string name="description" large="true"/>
+    <string name="depends" max="512"/>
     <string name="moduleVersion" required="true" title="Version"/>
     <boolean name="removable" />
     <boolean name="installed" />
-    <one-to-many name="dependencies" ref="MetaModuleDependency" mappedBy="module"/>
   </entity>
   
   <entity name="MetaModuleDependency" table="META_MODULE_DEPENDENCY" cachable="true">
@@ -30,11 +30,11 @@
   	<string name="xml" required="true" large="true"/>
   	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
     
-    <finder-method name="findByName" using="name" orderBy="priority"/>
+    <finder-method name="findByName" using="name" orderBy="-priority"/>
     <finder-method name="findByType" using="name,type,model"
-      filter="(self.name = :name) OR (self.model = :model AND self.type = :type)" orderBy="priority"/>
+      filter="(self.name = :name) OR (self.model = :model AND self.type = :type)" orderBy="-priority"/>
     <finder-method name="findByGroup" using="name,type,model,long:groupId"
-      filter="((self.name = :name) OR (self.model = :model AND self.type = :type)) AND self.groups[].id = :groupId" orderBy="priority" />
+      filter="((self.name = :name) OR (self.model = :model AND self.type = :type)) AND self.groups[].id = :groupId" orderBy="-priority" />
   </entity>
   
   <entity name="MetaMenu" table="META_MENU" sequential="true" cachable="true">

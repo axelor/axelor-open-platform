@@ -39,7 +39,6 @@ import com.axelor.meta.db.MetaChart;
 import com.axelor.meta.db.MetaChartSeries;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaModule;
-import com.axelor.meta.db.MetaModuleDependency;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.db.MetaTranslation;
@@ -59,6 +58,7 @@ import com.axelor.meta.views.ObjectViews;
 import com.axelor.meta.views.Selection;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
@@ -227,7 +227,7 @@ public class MetaLoader {
 		// if a view with same name exists, set higher priority then that
 		MetaView existing = MetaView.findByName(name);
 		if (existing != null) {
-			entity.setPriority(existing.getPriority() - 1);
+			entity.setPriority(existing.getPriority() + 1);
 		}
 
 		entity = entity.save();
@@ -621,7 +621,7 @@ public class MetaLoader {
 		Set<String> imported = Sets.newHashSet();
 
 		for(String module : moduleResolver.all()) {
-			String pat = String.format("(/WEB-INF/lib/%s)|(%s/WEB-INF/classes/)", module, module);
+			String pat = String.format("(/WEB-INF/lib/%s-)|(%s/WEB-INF/classes/)", module, module);
 			Pattern pattern = Pattern.compile(pat);
 			MetaModule m = MetaModule.findByName(module);
 			if (m == null || m.getInstalled() == Boolean.FALSE) {
@@ -658,10 +658,7 @@ public class MetaLoader {
 			if (module == null) {
 				module = new MetaModule();
 				module.setName(name);
-				
-				for(String dep : deps) {
-					module.addDependency(new MetaModuleDependency(dep));
-				}
+				module.setDepends(Joiner.on(",").join(deps));
 			}
 			
 			module.setModuleVersion(cfg.getProperty("version"));
