@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <object-views xmlns="http://apps.axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.9.xsd">
+
+	<selection name="auth.user.language.selection">
+		<option value="en">English</option>
+		<option value="fr">French</option>
+	</selection>
     
     <grid name="user-grid" title="Users">
         <field name="name"/>
@@ -12,6 +17,7 @@
         <group title="General Info" cols="2">
             <field name="name" validIf="name.length &gt;= 2" onChange="action-user-validData"/>
             <field name="group"/>
+            <field name="language"/>
         </group>
         <group title="Login" cols="2">
             <field name="code" validIf="code.length &gt;= 2" onChange="action-user-validData"/>
