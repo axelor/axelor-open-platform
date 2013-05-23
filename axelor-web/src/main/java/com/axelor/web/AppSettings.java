@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 
+import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
@@ -119,28 +120,37 @@ public class AppSettings {
 	 * @return language
 	 */
 	public static String getLocaleJS(HttpServletRequest request, ServletContext context){
-		
-		//application.properties
-		String appLocale = AppSettings.get().get("application.locale", null);
-		
-		//Servlet Locale
-		Locale locale = request.getLocale();
-		if(locale == null){
-			appLocale = appLocale.replaceAll("-", "_");
-			if(appLocale.contains("_")) locale = new Locale(appLocale.split("_")[0], appLocale.split("_")[1]);
-			else locale = new Locale(appLocale,"");
+
+		User user = AuthUtils.getUser();
+
+		if(user != null && !Strings.isNullOrEmpty(user.getLanguage())) {
+
+			String longUserLanguage = convertLanguage(toLocale(user.getLanguage()),false);
+			String shortUsertLanguage = convertLanguage(toLocale(user.getLanguage()),true);
+
+			if(checkResources(context, "/js/i18n/"+longUserLanguage +".js")) {
+				return longUserLanguage;
+			}
+			else if(checkResources(context, "/js/i18n/"+shortUsertLanguage +".js")) {
+				return shortUsertLanguage;
+			}
 		}
-		
+
+		Locale locale = request.getLocale();
+		if(locale == null) {
+			locale = toLocale(AppSettings.get().get("application.locale", DEFAULT_LOCALE.getLanguage()));
+		}
+
 		String longLanguage = convertLanguage(locale,false);
 		String shortLanguage = convertLanguage(locale,true);
 
-		if(checkResources(context, "/js/i18n/"+longLanguage +".js")){
+		if(checkResources(context, "/js/i18n/"+longLanguage +".js")) {
 			return longLanguage;
 		}
-		else if(checkResources(context, "/js/i18n/"+shortLanguage +".js")){
+		else if(checkResources(context, "/js/i18n/"+shortLanguage +".js")) {
 			return shortLanguage;
 		}
-		
+
 		return DEFAULT_LOCALE.getLanguage();
 
 	}
@@ -162,14 +172,20 @@ public class AppSettings {
 		return appJs;
 	}
 	
-	private static String convertLanguage(Locale locale, boolean minimize){
+	private static String convertLanguage(Locale locale, boolean minimize) {
 		StringBuilder format = new StringBuilder(locale.getLanguage().toLowerCase());
 		if(!minimize && !Strings.isNullOrEmpty(locale.getCountry()))
 			format.append("_").append(locale.getCountry().toUpperCase());
 		return format.toString();
 	}
 	
-	private static boolean checkResources(ServletContext context, String resourcesPath){
+	private static Locale toLocale(String locale) {
+	    String parts[] = locale.split("_", -1);
+	    if (parts.length == 1) return new Locale(parts[0].toLowerCase());
+	    return new Locale(parts[0].toLowerCase(), parts[1].toUpperCase());
+	}
+	
+	private static boolean checkResources(ServletContext context, String resourcesPath) {
 		try{
 			URL path = context.getResource(resourcesPath);
 			return path == null ? false : true;
