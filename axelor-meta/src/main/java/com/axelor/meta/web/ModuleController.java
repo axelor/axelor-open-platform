@@ -2,58 +2,91 @@ package com.axelor.meta.web;
 
 import javax.inject.Inject;
 
+import com.axelor.db.JPA;
 import com.axelor.meta.MetaLoader;
+import com.axelor.meta.db.MetaAction;
+import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaView;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
-import com.google.inject.persist.Transactional;
+import com.google.common.base.Throwables;
 
 public class ModuleController {
 	
 	@Inject
 	private MetaLoader loader;
 
-	@Transactional
-	public Response install(String name) {
-		ActionResponse response = new ActionResponse();
+	public void doInstall(String name) {
 		MetaModule module = MetaModule.findByName(name);
-		if (module == null) {
-			return response;
+		if (module == null || module.getInstalled() == Boolean.TRUE) {
+			return;
 		}
 		
 		module.setInstalled(true);
 		try {
 			loader.loadModule(module);
-			module = module.save();
+			module.save();
 		} catch (Exception e) {
-			e.printStackTrace();
-			module.refresh();
+			module.setInstalled(false);
+			Throwables.propagate(e);
 		}
+	}
+
+	private void doUninstall(String name) {
+		MetaModule module = MetaModule.findByName(name);
+		if (module == null || module.getInstalled() == Boolean.FALSE) {
+			return;
+		}
+		module.setInstalled(false);
+		try {
+			MetaView.findByModule(name).remove();
+			MetaSelect.findByModule(name).remove();
+			MetaMenu.findByModule(name).remove();
+			MetaAction.findByModule(name).remove();
+			module.save();
+		} catch (Exception e) {
+			module.setInstalled(true);
+			Throwables.propagate(e);
+		}
+	}
+	
+	public Response install(final String name) {
 		
-		response.setReload(true);
+		final ActionResponse response = new ActionResponse();
+		
+		JPA.runInTransaction(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					doInstall(name);
+					response.setReload(true);
+				} catch (Exception e) {
+					response.setException(e);
+				}
+			}
+		});
 		return response;
 	}
 	
-	@Transactional
-	public Response uninstall(String name) {
-		ActionResponse response = new ActionResponse();
-		MetaModule module = MetaModule.findByName(name);
-		if (module == null) {
-			return response;
-		}
+	public Response uninstall(final String name) {
 		
-		module.setInstalled(false);
-		try {
-			MetaView.all().filter("self.module = ?1", name).remove();
-			MetaSelect.all().filter("self.module = ?1", name).remove();
-			module = module.save();
-		} catch (Exception e) {
-			module.refresh();
-		}
-
-		response.setReload(true);
+		final ActionResponse response = new ActionResponse();
+		
+		JPA.runInTransaction(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					doUninstall(name);
+					response.setReload(true);
+				} catch (Exception e) {
+					response.setException(e);
+				}
+			}
+		});
 		return response;
 	}
 }

@@ -15,11 +15,6 @@
     <boolean name="installed" />
   </entity>
   
-  <entity name="MetaModuleDependency" table="META_MODULE_DEPENDENCY" cachable="true">
-    <string name="name" required="true"/>
-    <many-to-one name="module" ref="MetaModule" required="true"/>
-  </entity>
-  
   <entity name="MetaView" table="META_VIEW" sequential="true" cachable="true">
   	<string name="name" required="true"/>
 	<string name="title" required="true" namecolumn="true"/>
@@ -35,6 +30,7 @@
       filter="(self.name = :name) OR (self.model = :model AND self.type = :type)" orderBy="-priority"/>
     <finder-method name="findByGroup" using="name,type,model,long:groupId"
       filter="((self.name = :name) OR (self.model = :model AND self.type = :type)) AND self.groups[].id = :groupId" orderBy="-priority" />
+    <finder-method name="findByModule" using="module" all="true"/>
   </entity>
   
   <entity name="MetaMenu" table="META_MENU" sequential="true" cachable="true">
@@ -42,24 +38,32 @@
   	<string name="name" unique="true" required="true"/>
   	<string name="title" required="true" namecolumn="true"/>
   	<string name="icon"/>
+    <string name="module"/>
   	<many-to-one name="parent" ref="MetaMenu"/>
   	<many-to-one name="action" ref="MetaAction"/>
   	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
+    <finder-method name="findByName" using="name" orderBy="-priority"/>
+    <finder-method name="findByParent" using="Long:id" filter="self.parent.id = :id" all="true"/>
+    <finder-method name="findByModule" using="module" all="true"/>
   </entity>
   
   <entity name="MetaActionMenu" table="META_ACTION_MENU" cachable="true">
   	<string name="name" unique="true" required="true"/>
   	<string name="title" required="true" namecolumn="true"/>
     <string name="category" help="Category name to group action menus."/>
+    <string name="module"/>
   	<many-to-one name="parent" ref="MetaActionMenu"/>
   	<many-to-one name="action" ref="MetaAction"/>
+    <finder-method name="findByModule" using="module" all="true"/>
   </entity>
    
   <entity name="MetaAction" table="META_ACTION" sequential="true" cachable="true">
   	<string name="name" unique="true" required="true"/>
     <string name="type" required="true"/>
     <string name="model" />
+    <string name="module" />
   	<string name="xml" required="true" large="true"/>
+    <finder-method name="findByModule" using="module" all="true"/>
   </entity>
   
   <entity name="MetaSelect" table="META_SELECT" cachable="true">
@@ -68,6 +72,7 @@
     <string name="module"/>
     <one-to-many name="items" ref="MetaSelectItem" mappedBy="select"/>
     <finder-method name="findByName" using="name" orderBy="-priority"/>
+    <finder-method name="findByModule" using="module" all="true"/>
   </entity>
 
   <entity name="MetaSelectItem" table="META_SELECT_ITEM" cachable="true">
