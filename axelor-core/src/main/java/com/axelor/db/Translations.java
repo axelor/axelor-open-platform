@@ -25,7 +25,12 @@ public interface Translations {
 		}
 
 		@Override
-		public String get(String key, String domain, String defaultValue) {
+		public String get(String key, String defaultValue, String domain) {
+			return key;
+		}
+		
+		@Override
+		public String get(String key, String defaultValue, String domain, String type) {
 			return key;
 		}
 	}
@@ -34,5 +39,7 @@ public interface Translations {
 	
 	String get(String key, String defaultValue);
 	
-	String get(String key, String domain, String defaultValue);
+	String get(String key, String defaultValue, String domain);
+	
+	String get(String key, String defaultValue, String domain, String type);
 }
