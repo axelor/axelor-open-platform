@@ -451,7 +451,7 @@ function createTwoDigitDefinition( maximum ) {
 		var number = parseInt( value, 10 );
 
 		if (value === "" || /\D/.test(value) || _.isNaN(number)) {
-			return;
+			return false;
 		}
 
 		// pad to 2 characters
@@ -709,6 +709,18 @@ ui.formInput('Time', 'DateTime', {
 	css: 'time-item',
 	mask: 'HH:mm',
 	
+	init: function(scope) {
+		this._super(scope);
+		
+		scope.parse = function(value) {
+			return value;
+		},
+
+		scope.format = function(value) {
+			return value;
+		};
+	},
+	
 	link_editable: function(scope, element, attrs, model) {
 		
 		element.mask({
@@ -728,14 +740,34 @@ ui.formInput('Time', 'DateTime', {
 			}
 		});
 		
+		scope.validate = function(value) {
+			return !value || /^(\d+:\d+)$/.test(value);
+		};
+		
 		function updateModel() {
-			var value = element.val();
-			if (model.$viewValue === value)
+			var value = element.val() || '',
+				oldValue = scope.getValue();
+
+			value = scope.parse(value);
+			
+			if (angular.equals(value, oldValue)) {
 				return;
-			scope.$apply(function(){
-				model.$setViewValue(element.val());
+			}
+			
+			scope.setValue(value, true);
+			setTimeout(function(){
+				scope.$apply();
 			});
 		}
+		
+		scope.$render_editable = function() {
+			var value = scope.getText();
+			if (value) {
+				element.mask('value', value);
+			} else {
+				element.mask('value', '');
+			}
+		};
 	},
 	template_editable: '<input type="text">'
 });
