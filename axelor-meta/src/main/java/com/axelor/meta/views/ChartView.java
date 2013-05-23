@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
+import com.axelor.db.JPA;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
@@ -79,9 +80,13 @@ public class ChartView extends AbstractView {
 		public String getType() {
 			return type;
 		}
-		
-		public String getTitle() {
+
+		public String getDefaultTitle() {
 			return title;
+		}
+
+		public String getTitle() {
+			return JPA.translate(title);
 		}
 	}
 
@@ -122,9 +127,13 @@ public class ChartView extends AbstractView {
 		public String getSide() {
 			return side;
 		}
-		
-		public String getTitle() {
+
+		public String getDefaultTitle() {
 			return title;
+		}
+
+		public String getTitle() {
+			return JPA.translate(title);
 		}
 		
 		public String getAggregate() {

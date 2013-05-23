@@ -57,6 +57,10 @@ public abstract class AbstractView {
 		this.name = name;
 	}
 	
+	public String getDefaultTitle() {
+		return title;
+	}
+	
 	public String getTitle() {
 		return JPA.translate(title);
 	}
