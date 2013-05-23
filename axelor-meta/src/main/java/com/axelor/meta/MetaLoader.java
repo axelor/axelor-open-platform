@@ -218,7 +218,7 @@ public class MetaLoader {
 		
 		MetaView entity = new MetaView();
 		entity.setName(name);
-		entity.setTitle(view.getTitle());
+		entity.setTitle(view.getDefaultTitle());
 		entity.setType(type);
 		entity.setModel(model);
 		entity.setModule(module);
@@ -242,7 +242,7 @@ public class MetaLoader {
 		MetaChart chart = new MetaChart();
 		
 		chart.setName(view.getName());
-		chart.setTitle(view.getTitle());
+		chart.setTitle(view.getDefaultTitle());
 		chart.setStacked(view.getStacked());
 		
 		String query = stripWhiteSpaces(view.getQuery().getText());
@@ -251,7 +251,7 @@ public class MetaLoader {
 
 		chart.setCategoryKey(view.getCategory().getKey());
 		chart.setCategoryType(view.getCategory().getType());
-		chart.setCategoryTitle(view.getCategory().getTitle());
+		chart.setCategoryTitle(view.getCategory().getDefaultTitle());
 
 		for(ChartView.ChartSeries series : view.getSeries()) {
 			MetaChartSeries item = new MetaChartSeries();
@@ -273,7 +273,7 @@ public class MetaLoader {
 		for(Selection.Option opt : selection.getOptions()) {
 			MetaSelectItem item = new MetaSelectItem();
 			item.setValue(opt.getValue());
-			item.setTitle(opt.getTitle());
+			item.setTitle(opt.getDefaultTitle());
 			select.addItem(item);
 		}
 		select.save();
@@ -329,7 +329,7 @@ public class MetaLoader {
 		MetaMenu m = new MetaMenu();
 		m.setName(menu.getName());
 		m.setPriority(menu.getPriority());
-		m.setTitle(menu.getTitle());
+		m.setTitle(menu.getDefaultTitle());
 		m.setIcon(menu.getIcon());
 		m.setGroups(this.findGroups(menu.getGroups()));
 		
@@ -373,7 +373,7 @@ public class MetaLoader {
 		
 		MetaActionMenu m = new MetaActionMenu();
 		m.setName(menu.getName());
-		m.setTitle(menu.getTitle());
+		m.setTitle(menu.getDefaultTitle());
 		m.setCategory(menu.getCategory());
 
 		if (!Strings.isNullOrEmpty(menu.getParent())) {

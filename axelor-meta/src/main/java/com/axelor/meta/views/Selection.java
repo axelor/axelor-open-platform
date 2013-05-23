@@ -51,6 +51,10 @@ public class Selection {
 			this.value = value;
 		}
 
+		public String getDefaultTitle(){
+			return title;
+		}
+
 		public String getTitle() {
 			return JPA.translate(title);
 		}
