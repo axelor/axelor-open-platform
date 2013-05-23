@@ -94,11 +94,12 @@ public class Field extends SimpleWidget {
 	
 	@Override
 	public String getTitle() {
-		String title = super.getTitle();
-		if (title == null || "".equals(title.trim())) {
-			return JPA.translate(this.getName(), this.getModel(), null);
-		}
-		return title;
+		return JPA.translate(this.getName(), super.getDefaultTitle(), this.getModel(), "title");
+	}
+	
+	@Override
+	public String getHelp() {
+		return JPA.translate(this.getName(), super.getDefaultHelp(), this.getModel(), "help");
 	}
 
 	public String getWidget() {
