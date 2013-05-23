@@ -19,10 +19,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.ResourcesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 import org.reflections.vfs.Vfs.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -549,7 +545,7 @@ public class MetaLoader {
 				} catch (JAXBException e) {
 					Throwable ex = e.getLinkedException();
 					ex = ex == null ? e : ex;
-					log.error("Invalid XML input: {}", file.getFullPath(), ex);
+					log.error("Invalid XML input: {} -> {}", module, file.getRelativePath(), ex);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -626,7 +622,7 @@ public class MetaLoader {
 			return;
 		}
 
-		List<File> files = findResources("views", ".xml");
+		List<File> files = MetaScanner.findAll("views\\.(.*?)\\.xml");
 		Set<String> imported = Sets.newHashSet();
 
 		for(String module : moduleResolver.all()) {
@@ -637,7 +633,7 @@ public class MetaLoader {
 				continue;
 			}
 			for(File file : files) {
-				String path = file.getFullPath();
+				String path = file.toString();
 				if (imported.contains(path)) {
 					continue;
 				}
@@ -653,7 +649,7 @@ public class MetaLoader {
 	
 	private void _loadModuleInfo() throws IOException {
 		
-		for(File file : findResources("module", "module.properties")) {
+		for(File file : MetaScanner.findAll("module\\.properties")) {
 			
 			Properties cfg = new Properties();
 			cfg.load(file.openInputStream());
@@ -736,40 +732,14 @@ public class MetaLoader {
 		}
 
 		String name = module.getName();
-		Pattern pattern = Pattern.compile(String.format("(/WEB-INF/lib/%s)|(%s/WEB-INF/classes/)", name, name));
+		Pattern pattern = Pattern.compile(String.format("(/WEB-INF/lib/%s-)|(%s/WEB-INF/classes/)", name, name));
 
-		for(File file : findResources("views", ".xml")) {
-			Matcher matcher = pattern.matcher(file.getFullPath());
+		for(File file : MetaScanner.findAll("views\\.(.*?)\\.xml")) {
+			Matcher matcher = pattern.matcher(file.toString());
 			if (matcher.find()) {
 				loadFile(file, name);
 			}
 		}
-	}
-	
-	private List<File> findResources(final String prefix, final String suffix) {
-
-		final List<File> files = Lists.newArrayList();
-
-		final ResourcesScanner scanner = new ResourcesScanner() {
-			
-			@Override
-			public boolean acceptsInput(String file) {
-				return file.startsWith(prefix) && file.endsWith(suffix);
-			}
-
-			@Override
-			public void scan(final File file) {
-				files.add(file);
-			}
-		};
-
-		new Reflections(
-				new ConfigurationBuilder()
-					.setUrls(ClasspathHelper.forPackage("com.axelor"))
-					.setScanners(scanner)
-				);
-		
-		return files;
 	}
 
 	public Map<String, Object> findViews(String model, Map<String, String> views) {

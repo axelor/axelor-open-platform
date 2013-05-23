@@ -2,15 +2,13 @@ package com.axelor.meta.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.ResourcesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 import org.reflections.vfs.Vfs.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +19,7 @@ import com.axelor.data.csv.CSVBinding;
 import com.axelor.data.csv.CSVConfig;
 import com.axelor.data.csv.CSVImporter;
 import com.axelor.data.csv.CSVInput;
+import com.axelor.meta.MetaScanner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -35,62 +34,65 @@ public class MetaTranslationsService {
 	private static final String LANGUAGE_FIELD =  "language";
 	private static final String CURRENT_LANGUAGE =  "current_language";
 	private static final String CALLABLE = "com.axelor.meta.ImportTranslations:loadTranslation";
-	private static final String PATH_I18N = "i18n";
 	
 	@Inject
 	Injector injector;
 	
-	public void process(){
-		
+	public void process() {
+
 		CSVConfig config = getCSVConfig();
+
+		List<File> files = MetaScanner.findAll("i18n\\.(.*?)\\.csv");
+
+		//TODO: sort by module resolution order
+
+		Collections.sort(files, new Comparator<File>() {
+			@Override
+			public int compare(File o1, File o2) {
+				String a = o1.toString();
+				String b = o2.toString();
+				if (a.contains("/classes/") && b.contains("/classes/")) return 0;
+				if (a.contains("/classes/")) return 1;
+				if (b.contains("/classes/")) return -1;
+				return 0;
+			}
+		});
 		
-		List<File> allFileList = findResources();
 		
-		for (File file : filterFiles(allFileList,false)) {
+		for(File file : files) {
 			try {
 				process(file, config);
-			}
-			catch(IOException e){
+			} catch (IOException e) {
 				log.error("Unable to import file: {}", file.getName());
 			}
 		}
-		
-		for (File file : filterFiles(allFileList,true)) {
-			try {
-				process(file, config);
-			}
-			catch(IOException e){
-				log.error("Unable to import file: {}", file.getName());
-			}
-		}
-		
 	}
 	
-	private void process(final File file, CSVConfig config) throws IOException{
+	private void process(final File file, CSVConfig config) throws IOException {
 		final InputStream stream = file.openInputStream();
 		CSVImporter importer = new CSVImporter(injector, config);
-		
-		//Get language name from the file name
+
+		// Get language name from the file name
 		String languageName = "";
 		Pattern pattern = Pattern.compile("(\\w+)\\.(.*?)");
 		Matcher matcher = pattern.matcher(file.getName());
-		if(matcher.matches()){
+		if (matcher.matches()) {
 			languageName = matcher.group(1);
 		}
-		
-		//Prepare context
+
+		// Prepare context
 		Map<String, Object> context = Maps.newHashMap();
 		context.put(CURRENT_LANGUAGE, languageName);
 		importer.setContext(context);
-		
-		//Run task
+
+		// Run task
 		importer.runTask(new ImportTask() {
-			
+
 			@Override
 			public void configure() throws IOException {
-				input(CSV_INPUT_FILE_NAME, stream);			
+				input(CSV_INPUT_FILE_NAME, stream);
 			}
-			
+
 			@Override
 			public boolean handle(ImportException e) {
 				log.error("Error with folling exception : {}", e);
@@ -98,53 +100,7 @@ public class MetaTranslationsService {
 			}
 		});
 	}
-	
-	private List<File> filterFiles(List<File> files, boolean matched){
-		
-		List<File> lists = Lists.newArrayList();
-		Pattern pattern = Pattern.compile("/WEB-INF/classes/"+PATH_I18N+"/");
-		
-		for (File file : files) {
-			Matcher matcher = pattern.matcher(file.getFullPath());
-			if(matcher.find() == matched){
-				lists.add(file);
-			}
-		}
-		
-		return lists;
-	}
-	
-	private List<File> findResources() {
-		
-		FileScanner scanner = new FileScanner();
-		
-		Reflections reflections = new Reflections(
-				new ConfigurationBuilder()
-					.setUrls(ClasspathHelper.forPackage("com.axelor"))
-					.setScanners(scanner)
-				);
-		
-		reflections.getStore().get(FileScanner.class).keySet();
-		return scanner.files;
-	}
-	
-	private static class FileScanner extends ResourcesScanner {
-		
-		private List<File> files = Lists.newArrayList();
-		
-		@Override
-		public boolean acceptsInput(String file) {
-			return file.startsWith(PATH_I18N+".") && file.endsWith(".csv");
-		}
-		
-		@Override
-		public void scan(final File file) {
-			files.add(file);
-			String path = file.getRelativePath();
-			getStore().put(path, path);
-		}
-	}
-	
+
 	private CSVConfig getCSVConfig() {
 		
 		CSVConfig csvConfig = new CSVConfig();
