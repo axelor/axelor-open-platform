@@ -53,6 +53,11 @@
     <field name="description" colSpan="4" noLabel="true" />
   </form>
 
+  <selection name="meta.translation.type.selection">
+  	<option value="title">Title</option>
+  	<option value="help">Help</option>
+  </selection>
+
   <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView" orderBy="priority,name">
     <field name="name"/>
     <field name="title"/>
@@ -222,6 +227,7 @@
     <field name="language"/>
     <field name="translation"/>
     <field name="domain"/>
+    <field name="type" selection="meta.translation.type.selection"/>
   </grid>
 
   <form title="Translation" name="meta-translations-form" model="com.axelor.meta.db.MetaTranslation" colWidths="*,250">
@@ -230,6 +236,7 @@
       <field name="language"/>
       <field name="translation"/>
       <field name="domain"/>
+      <field name="type" selection="meta.translation.type.selection"/>
     </group>
     <group title="Actions" cols="2" colSpan="1">
       <button name="restoreAll" colSpan="2" title="Restore All" prompt="All the customizations will be lost. Are you sure?" onClick="action-meta-restore-translations"/>
