@@ -459,7 +459,7 @@ table.field-details .help-text hr {
 .popover {
 	width: auto;
 	max-width: inherit;
-	z-index: 2100;
+	z-index: 2147483647;
 }
 
 .popover-inner {
