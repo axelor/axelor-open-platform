@@ -186,7 +186,7 @@ public class ViewService extends AbstractService {
 			return null;
 		}
 		final List<Object> all = Lists.newArrayList();
-		final MetaSelect select = MetaSelect.all().filter("self.name = ?", property.getSelection()).fetchOne();
+		final MetaSelect select = MetaSelect.findByName(property.getSelection());
 		if (select == null || select.getItems() == null) {
 			return all;
 		}
