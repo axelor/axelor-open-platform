@@ -221,7 +221,7 @@ public class MetaLoader {
 		entity.setXml(xml);
 		
 		// if a view with same name exists, set higher priority then that
-		MetaView existing = MetaView.findByName(name);
+		MetaView existing = model == null ? MetaView.findByName(name) : MetaView.findByName(name, model);
 		if (existing != null) {
 			entity.setPriority(existing.getPriority() + 1);
 		}
@@ -761,12 +761,25 @@ public class MetaLoader {
 	public AbstractView findView(String model, String name, String type) {
 		MetaView view = null;
 		User user = AuthUtils.getUser();
-		if (user != null && user.getGroup() != null) {
-			view = MetaView.findByGroup(name, type, model, user.getGroup().getId());
+		Long group = user != null && user.getGroup() != null ? user.getGroup().getId() : null;
+
+		if (name != null) {
+			view = MetaView.findByName(name, model, group);
+			if (view == null) {
+				view = MetaView.findByName(name, model);
+				if (view == null) {
+					view = MetaView.findByName(name);
+				}
+			}
 		}
+
 		if (view == null) {
-			view = MetaView.findByType(name, type, model);
+			view = MetaView.findByType(type, model, group);
+			if (view == null) {
+				view = MetaView.findByType(type, model);
+			}
 		}
+
 		try {
 			return ((ObjectViews) unmarshal(view.getXml())).getViews().get(0);
 		} catch (Exception e) {
