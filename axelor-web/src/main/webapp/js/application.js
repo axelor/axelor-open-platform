@@ -53,6 +53,7 @@ load([
 	'lib/nvd3/nv.d3.js',
 
 	'lib/ace/js/ace.js',
+	'lib/tinymce/tinymce.min.js',
 	
 	'lib/angular/angular.js',
 	'lib/angular/angular-resource.js',
@@ -87,6 +88,7 @@ load([
 	'js/form/form.relational.multiple.js',
 	'js/form/form.relational.nested.js',
 	'js/form/form.code.js',
+	'js/form/form.tinymce.js',
 	
 	'js/view/view.base.js',
 	'js/view/view.form.js',

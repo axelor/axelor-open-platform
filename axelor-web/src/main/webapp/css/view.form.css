@@ -702,3 +702,11 @@ table.field-details .help-text hr {
 .multi-object-select td.select-item {
 	padding-right: 4px !important;
 }
+
+.form-item-container > .mce-tinymce {
+	box-sizing: content-box !important;
+}
+
+.form-item-container > .html-display-text {
+	padding-top: 4px;	
+}

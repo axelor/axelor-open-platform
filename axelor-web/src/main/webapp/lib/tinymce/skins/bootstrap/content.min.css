@@ -1,0 +1,7 @@
+@import url('../../../bootstrap/css/bootstrap.css');
+
+body.mce-content-body {
+	margin: 8px;
+	font-size: 13px;
+	line-height: 18px;
+}
