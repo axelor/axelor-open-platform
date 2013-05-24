@@ -62,7 +62,8 @@ ui.formInput('Html', {
 						var value = model.$viewValue || "",
 							html = editor.getContent();
 	
-						scope.text = scope.parse(value);
+						scope.text = scope.format(value);
+						
 						if (value === html) {
 							return;
 						}
@@ -81,6 +82,11 @@ ui.formInput('Html', {
 				}, 100);
 			}
 		};
+		
+		function textTemplate(value) {
+			if (!value || value.trim().length === 0) return "";
+			return "<div>" + value + "</div>";
+		}
 		
 		function update(value) {
 			var old = scope.getValue();
@@ -110,8 +116,56 @@ ui.formInput('Html', {
 	template:
 	'<div class="form-item-container">'+
 		'<textarea class="html-edit-text" style="display: none;"></textarea>'+
-		'<div class="html-display-text" ng-bind-html-unsafe="text" style="overflow: auto; height: 400px;"></div>'+
+		'<div class="html-display-text" ui-bind-template x-text="text" x-locals="record" x-live="field.live"></div>'+
 	'</div>'
 });
+
+ui.directive('uiBindTemplate', ['$interpolate', function($interpolate){
+	
+	function expand(scope, template) {
+		if (!template || !template.match(/{{.*?}}/)) {
+			return template;
+		}
+		return $interpolate(template)(scope.locals());
+	}
+	
+	return {
+		terminal: true,
+		scope: {
+			locals: "&",
+			text: "=text",
+			live: "&"
+		},
+		link: function(scope, element, attrs) {
+			
+			var template = null;
+			
+			function update() {
+				var output = expand(scope, template) || "";
+				element.html(output);
+			}
+
+			scope.$watch("text", function(text, old) {
+				
+				if (text === template) {
+					return;
+				}
+				template = text;
+				update();
+			});
+			
+			var live = false;
+			scope.$watch("live()", function(value) {
+				if (live || !value) {
+					return;
+				}
+				live = true;
+				scope.$watch("locals()", function(value) {
+					update();
+				}, true);
+			});
+		}
+	};
+}]);
 
 })(this);
