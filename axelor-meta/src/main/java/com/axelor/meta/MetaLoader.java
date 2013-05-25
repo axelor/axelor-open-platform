@@ -44,7 +44,6 @@ import com.axelor.meta.service.MetaTranslationsService;
 import com.axelor.meta.views.AbstractView;
 import com.axelor.meta.views.AbstractWidget;
 import com.axelor.meta.views.Action;
-import com.axelor.meta.views.ActionMenuItem;
 import com.axelor.meta.views.ChartView;
 import com.axelor.meta.views.Field;
 import com.axelor.meta.views.FormView;
@@ -322,11 +321,6 @@ public class MetaLoader {
 	
 	private void loadMenu(MenuItem menuItem, String module) {
 		
-		if (menuItem instanceof ActionMenuItem) {
-			loadMenu2((ActionMenuItem) menuItem, module);
-			return;
-		}
-		
 		log.info("Loading menu : {}", menuItem.getName());
 		
 		MetaMenu menu = new MetaMenu();
@@ -371,7 +365,7 @@ public class MetaLoader {
 	private Multimap<String, MetaActionMenu> unresolved_menus2 = HashMultimap.create();
 	private Multimap<String, MetaActionMenu> unresolved_actions2 = HashMultimap.create();
 	
-	private void loadMenu2(ActionMenuItem menuItem, String module) {
+	private void loadActionMenu(MenuItem menuItem, String module) {
 		
 		log.info("Loading action menu : {}", menuItem.getName());
 		
@@ -445,9 +439,13 @@ public class MetaLoader {
 			for(Action action : views.getActions())
 				loadAction(action, module);
 		
-		if (views.getMenuItems() != null)
-			for (MenuItem menu : views.getMenuItems())
+		if (views.getMenus() != null)
+			for (MenuItem menu : views.getMenus())
 				loadMenu(menu, module);
+		
+		if (views.getActionMenus() != null)
+			for (MenuItem menu : views.getActionMenus())
+				loadActionMenu(menu, module);
 		
 		if (views.getSelections() != null)
 			for(Selection selection : views.getSelections())

@@ -100,7 +100,7 @@ public class ActionWS extends Action {
 	}
 	
 	@XmlType
-	public static class Method extends Act {
+	public static class Method extends Element {
 		
 		@XmlAttribute
 		private String template;

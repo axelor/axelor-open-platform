@@ -27,8 +27,8 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.views.Action;
-import com.axelor.meta.views.Action.ActionMethod;
 import com.axelor.meta.views.ActionGroup;
+import com.axelor.meta.views.ActionMethod;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
@@ -38,7 +38,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.inject.Injector;
@@ -395,13 +394,13 @@ public final class ActionHandler {
 			return null;
 		}
 		
-		Action action = new ActionMethod();
-		Action.Call call = new Action.Call();
+		ActionMethod action = new ActionMethod();
+		ActionMethod.Call call = new ActionMethod.Call();
 		
 		call.setController(parts[0]);
 		call.setMethod(parts[1]);
-		action.setElements(Lists.newArrayList(call));
-		
+		action.setCall(call);
+
 		return action.evaluate(this);
 	}
 	

@@ -30,6 +30,9 @@ public class MenuItem {
 	@XmlAttribute
 	private String groups;
 	
+	@XmlAttribute
+	private String category;
+
 	public String getName() {
 		return name;
 	}
@@ -60,6 +63,14 @@ public class MenuItem {
 	
 	public void setGroups(String groups) {
 		this.groups = groups;
+	}
+	
+	public String getCategory() {
+		return category;
+	}
+	
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 	public String getDefaultTitle() {

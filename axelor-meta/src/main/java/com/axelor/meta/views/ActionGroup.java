@@ -64,17 +64,17 @@ public class ActionGroup extends Action {
 			String[] parts = name.split("\\:", 2);
 
 			if (parts[0].matches("grid|form|tree|portal|calendar|chart|search|html")) {
-				Action.View view = new Action.View();
+				ActionView.View view = new ActionView.View();
 				view.setType(parts[0]);
 				view.setName(parts[1]);
 				action = new ActionView();
-				action.setElements(ImmutableList.of(view));
+				((ActionView) action).setViews(ImmutableList.of(view));
 			} else {
-				Action.Call method = new Action.Call();
+				ActionMethod.Call method = new ActionMethod.Call();
 				method.setController(parts[0]);
 				method.setMethod(parts[1]);
 				action = new ActionMethod();
-				action.setElements(ImmutableList.of(method));
+				((ActionMethod) action).setCall(method);
 			}
 			return action;
 		}
@@ -94,16 +94,16 @@ public class ActionGroup extends Action {
 		}
 		
 		while(iter.hasNext()) {
-			Act act = iter.next();
-			String name = act.getName().trim();
+			Element element = iter.next();
+			String name = element.getName().trim();
 			
 			if ("save".equals(name)) {
-				if (act.test(handler)) {
+				if (element.test(handler)) {
 					String pending = this.getPending(iter);
 	            	log.debug("wait for 'save', pending actions: {}", pending);
 					result.add(ImmutableMap.of("save", true, "pending", pending));
 				}
-				log.debug("action '{}' doesn't meet the condition: {}", "save", act.getCondition());
+				log.debug("action '{}' doesn't meet the condition: {}", "save", element.getCondition());
 				break;
 			}
 			
@@ -115,8 +115,8 @@ public class ActionGroup extends Action {
                 continue;
 			}
 
-			if (!act.test(handler)) {
-				log.debug("action '{}' doesn't meet the condition: {}", act.getName(), act.getCondition());
+			if (!element.test(handler)) {
+				log.debug("action '{}' doesn't meet the condition: {}", element.getName(), element.getCondition());
 				continue;
 			}
 			
@@ -173,7 +173,7 @@ public class ActionGroup extends Action {
 		return evaluate(handler);
 	}
 
-	public static class ActionItem extends Act {
+	public static class ActionItem extends Element {
 		
 	}
 
