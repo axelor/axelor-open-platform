@@ -15,7 +15,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-@XmlType
+@XmlType(propOrder = {
+	"views",
+	"domain",
+	"contexts",
+	"params"
+})
 public class ActionView extends Action {
 	
 	@XmlType
