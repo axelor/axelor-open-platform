@@ -91,7 +91,7 @@ public class ActionExport extends Action {
 	}
 
 	@XmlType
-	public static class Export extends Act {
+	public static class Export extends Element {
 		
 		@XmlAttribute
 		private String template;

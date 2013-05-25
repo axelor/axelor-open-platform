@@ -33,7 +33,6 @@ import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.views.AbstractView;
 import com.axelor.meta.views.Action;
-import com.axelor.meta.views.ActionMenuItem;
 import com.axelor.meta.views.MenuItem;
 import com.axelor.meta.views.Search;
 import com.axelor.rpc.Request;
@@ -155,7 +154,7 @@ public class MetaService {
 		
 		for(MetaActionMenu menu : all) {
 
-			ActionMenuItem item = new ActionMenuItem();
+			MenuItem item = new MenuItem();
 			item.setName(menu.getName());
 			item.setTitle(menu.getTitle());
 			

@@ -1057,6 +1057,18 @@
             </xsd:annotation>
           </xsd:element>
           <xsd:element name="context" type="tns:ActContext" minOccurs="0" maxOccurs="unbounded"/>
+          <xsd:element name="view-param" minOccurs="0" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>
+              Additional view parameters (anything).
+              The client view implementation utilizes these params.
+              </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+              <xsd:attribute name="name" type="xsd:string"/>
+              <xsd:attribute name="value" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
         </xsd:sequence>
         <xsd:attribute name="title" type="xsd:string" use="required"/>
         <xsd:attribute name="icon" type="xsd:string"/>

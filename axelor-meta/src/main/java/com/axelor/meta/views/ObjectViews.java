@@ -11,11 +11,11 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "object-views")
 public class ObjectViews {
 	
-	@XmlElements({
-		@XmlElement(name = "menuitem", type = MenuItem.class),
-		@XmlElement(name = "action-menu", type = ActionMenuItem.class)
-	})
-	private List<MenuItem> menuItems;
+	@XmlElement(name = "menuitem", type = MenuItem.class)
+	private List<MenuItem> menus;
+	
+	@XmlElement(name = "action-menu", type = MenuItem.class)
+	private List<MenuItem> actionMenus;
 
 	@XmlElement(name = "selection")
 	private List<Selection> selections;
@@ -32,12 +32,12 @@ public class ObjectViews {
 	private List<AbstractView> views;
 	
 	@XmlElements({
-		@XmlElement(name = "action-validate", type=Action.ActionValidate.class),
+		@XmlElement(name = "action-validate", type=ActionValidate.class),
 		@XmlElement(name = "action-condition", type=ActionCondition.class),
-		@XmlElement(name = "action-record", type=Action.ActionRecord.class),
-		@XmlElement(name = "action-method", type=Action.ActionMethod.class),
-		@XmlElement(name = "action-attrs", type=Action.ActionAttrs.class),
-		@XmlElement(name = "action-view", type=Action.ActionView.class),
+		@XmlElement(name = "action-record", type=ActionRecord.class),
+		@XmlElement(name = "action-method", type=ActionMethod.class),
+		@XmlElement(name = "action-attrs", type=ActionAttrs.class),
+		@XmlElement(name = "action-view", type=ActionView.class),
 		@XmlElement(name = "action-ws", type=ActionWS.class),
 		@XmlElement(name = "action-import", type=ActionImport.class),
 		@XmlElement(name = "action-export", type=ActionExport.class),
@@ -46,14 +46,22 @@ public class ObjectViews {
 	})
 	private List<Action> actions;
 	
-	public List<MenuItem> getMenuItems() {
-		return menuItems;
+	public List<MenuItem> getMenus() {
+		return menus;
 	}
 	
-	public void setMenuItems(List<MenuItem> menuItems) {
-		this.menuItems = menuItems;
+	public void setMenus(List<MenuItem> menus) {
+		this.menus = menus;
 	}
 	
+	public List<MenuItem> getActionMenus() {
+		return actionMenus;
+	}
+	
+	public void setActionMenus(List<MenuItem> actionMenus) {
+		this.actionMenus = actionMenus;
+	}
+
 	public List<Selection> getSelections() {
 		return selections;
 	}

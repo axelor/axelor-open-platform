@@ -57,7 +57,7 @@ public class ActionCondition extends Action {
 	}
 
 	@XmlType
-	public static class Check extends Act {
+	public static class Check extends Element {
 		
 		@XmlAttribute
 		private String field;
