@@ -2,9 +2,9 @@ package com.axelor.meta;
 
 import java.util.concurrent.ConcurrentMap;
 
-import com.axelor.meta.views.AbstractView;
-import com.axelor.meta.views.Action;
-import com.axelor.meta.views.ObjectViews;
+import com.axelor.meta.schema.ObjectViews;
+import com.axelor.meta.schema.actions.Action;
+import com.axelor.meta.schema.views.AbstractView;
 import com.google.common.collect.Maps;
 
 public class MetaStore {
