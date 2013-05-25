@@ -11,8 +11,8 @@ import org.junit.Test;
 
 import com.axelor.db.JPA;
 import com.axelor.meta.db.Title;
-import com.axelor.meta.views.ObjectViews;
-import com.axelor.meta.views.Search;
+import com.axelor.meta.schema.ObjectViews;
+import com.axelor.meta.schema.views.Search;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
