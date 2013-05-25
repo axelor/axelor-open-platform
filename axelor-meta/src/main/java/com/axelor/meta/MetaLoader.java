@@ -72,8 +72,7 @@ public class MetaLoader {
 	private MetaTranslationsService translationsService;
 
 	private static final String LOCAL_SCHEMA = "object-views_1.0.xsd";
-	private static final String REMOTE_SCHEMA = "object-views_0.9.xsd";
-	private static final String REMOTE_SCHEMA_LOCATION = "http://apps.axelor.com/xml/ns/object-views";
+	private static final String REMOTE_SCHEMA = "object-views_"+ ObjectViews.VERSION +".xsd";
 	
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
@@ -87,7 +86,7 @@ public class MetaLoader {
 			marshaller = context.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
-					REMOTE_SCHEMA_LOCATION + " " + REMOTE_SCHEMA_LOCATION + "/" + REMOTE_SCHEMA);
+					ObjectViews.NAMESPACE + " " + ObjectViews.NAMESPACE + "/" + REMOTE_SCHEMA);
 	
 			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			Schema schema = schemaFactory.newSchema(Resources.getResource(LOCAL_SCHEMA));
@@ -154,6 +153,7 @@ public class MetaLoader {
 		try {
 			marshaller.marshal(views, writer);
 		} catch (JAXBException e) {
+			e.printStackTrace();
 		}
 		if (strip)
 			return this.strip(writer.toString());
@@ -163,10 +163,10 @@ public class MetaLoader {
 	private String prepareXML(String xml) {
 		StringBuilder sb = new StringBuilder("<?xml version='1.0' encoding='UTF-8'?>\n");
 		sb.append("<object-views")
-		  .append(" xmlns='").append(REMOTE_SCHEMA_LOCATION).append("'")
+		  .append(" xmlns='").append(ObjectViews.NAMESPACE).append("'")
 		  .append(" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'")
-		  .append(" xsi:schemaLocation='").append(REMOTE_SCHEMA_LOCATION).append(" ")
-		  .append(REMOTE_SCHEMA_LOCATION + "/" + REMOTE_SCHEMA).append("'")
+		  .append(" xsi:schemaLocation='").append(ObjectViews.NAMESPACE).append(" ")
+		  .append(ObjectViews.NAMESPACE + "/" + REMOTE_SCHEMA).append("'")
 		  .append(">\n")
 		  .append(xml)
 		  .append("\n</object-views>");

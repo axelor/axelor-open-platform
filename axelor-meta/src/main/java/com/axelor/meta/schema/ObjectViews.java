@@ -36,6 +36,8 @@ public class ObjectViews {
 
 	public static final String NAMESPACE = "http://apps.axelor.com/xml/ns/object-views";
 
+	public static final String VERSION = "0.9";
+
 	@XmlElement(name = "menuitem", type = MenuItem.class)
 	private List<MenuItem> menus;
 	
