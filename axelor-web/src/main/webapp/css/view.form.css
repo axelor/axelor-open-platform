@@ -538,7 +538,7 @@ table.field-details .help-text hr {
 .nav-select li a {
 	text-decoration: none;
 	padding: 10px 0 10px 55px;
-	background: #f2f2f2;
+	background: #e2e2e2;
 	position: relative;
 	display: block;
 	float: left;
@@ -560,7 +560,7 @@ table.field-details .help-text hr {
 }
 
 .nav-select li a:after {
-	border-left: 30px solid #f2f2f2;
+	border-left: 30px solid #e2e2e2;
 	z-index: 2;
 }
 
@@ -586,12 +586,12 @@ table.field-details .help-text hr {
 }
 
 .nav-select li a:hover {
-	background: #d4d4d4;
+	background: #d0d0d0;
 	transition: background-color 0.3s;
 }
 
 .nav-select li a:hover:after {
-	border-left-color: #d4d4d4 !important;
+	border-left-color: #d0d0d0 !important;
 	transition: border-left-color 0.3s;
 }
 
