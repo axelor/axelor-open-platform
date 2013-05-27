@@ -221,6 +221,7 @@ table.form-layout .tabbable-tabs .tab-content {
 	padding: 4px;
 	border: 1px solid #DDD;
 	border-top: 0;
+	background-color: #fff;
 }
 
 table.form-layout td.form-item .stackbar {
