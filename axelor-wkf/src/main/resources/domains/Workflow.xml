@@ -16,6 +16,7 @@
     <string name="description" large="true" />
     <boolean name="active" default="true" />
     <string name="bpmn" large="true" />
+    <string name="ref" />
     
   </entity>
 
@@ -24,10 +25,11 @@
     <string name="name" title="Name" required="true" />
     <string name="type" title="Type" selection="node.type.selection" required="true" />
     <many-to-one name="action" ref="com.axelor.meta.db.MetaAction" title="Action" />
-    <string name="logicOperator" title="Start Logic Operator" selection="node.logic.operator.selection" default="or"/>
+    <string name="logicOperator" title="Start Logic Operator" selection="node.logic.operator.selection" default=""/>
     <one-to-many name="startTransitions" ref="Transition" mappedBy="nextNode" readonly="true" orderBy="sequence" />
     <one-to-many name="endTransitions" ref="Transition" mappedBy="startNode" orderBy="sequence" />
     <string name="description" large="true" />
+    <string name="ref" />
              
   </entity>
 
@@ -39,6 +41,8 @@
     <many-to-one name="condition" ref="com.axelor.meta.db.MetaAction" />
 	<integer name="sequence" />
     <string name="description" large="true" />
+    <string name="signal" />
+    <string name="ref" />
              
   </entity>
   

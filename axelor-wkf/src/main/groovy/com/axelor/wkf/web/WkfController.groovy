@@ -7,12 +7,25 @@ import com.axelor.rpc.ActionResponse
 import com.axelor.wkf.WkfSettings
 import com.axelor.wkf.db.Instance
 import com.axelor.wkf.db.Workflow
+import com.axelor.wkf.workflow.WorkflowImporter;
 import com.axelor.wkf.workflow.WorkflowService
 
 class WkfController {
 	
 	@Inject
 	WorkflowService workflowService
+	
+	@Inject
+	WorkflowImporter workflowImporter
+	
+	def importWorkflow(ActionRequest request, ActionResponse response){
+		
+		def context = request.context as Workflow
+		
+		workflowImporter.run(context.bpmn)
+		response.reload = true
+		
+	}
 
 	/**
 	 * Open all instances of the wkf.

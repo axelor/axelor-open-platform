@@ -13,6 +13,7 @@
 	</selection>
     
     <selection name="node.logic.operator.selection">
+    	<option value=""></option>
 		<option value="and">AND</option>
 		<option value="or">OR</option>
 		<option value="xor">XOR</option>
@@ -46,6 +47,7 @@
         		<field name="description" colSpan="4" noLabel="true" widget="CodeEditor[syntax=text]"/>
 		    </page>
 		    <page title="BPMN">
+		    	<button name="importWorkflow" title="Import" onClick="save,wkf-method-import-workflow"/>
            		<field name="bpmn" colSpan="4" noLabel="true" widget="CodeEditor[syntax=xml]"/>
 		    </page>
         </notebook>
@@ -76,6 +78,7 @@
     <grid name="transition-grid" title="Transitions" model="com.axelor.wkf.db.Transition">
         <field name="sequence"/>
         <field name="name"/>
+        <field name="signal"/>
         <field name="startNode"/>
         <field name="condition"/>
         <field name="nextNode"/>
@@ -86,7 +89,8 @@
         <field name="name"/>
         <field name="startNode" summary-view="node-form" form-view="node-form" edit-window="self"/>
         <field name="nextNode" summary-view="node-form" form-view="node-form" edit-window="self" domain="self.type != 'start'"/>
-        <field name="condition" colSpan="4"/>
+        <field name="signal"/>
+        <field name="condition" />
         <separator title="Description" colSpan="4"/>
   		<field name="description" colSpan="4" noLabel="true" widget="CodeEditor[syntax=text]"/>
     </form>
@@ -102,7 +106,8 @@
         <field name="sequence"/>
         <field name="name"/>
         <field name="startNode" summary-view="node-form" form-view="node-form" edit-window="self"/>
-        <field name="condition" colSpan="6"/>
+        <field name="signal" colSpan="3"/>
+        <field name="condition" colSpan="3"/>
         <separator title="Description" colSpan="6"/>
 		<field name="description" colSpan="6" noLabel="true" widget="CodeEditor[syntax=text]"/>        
     </form>
@@ -118,7 +123,8 @@
         <field name="sequence"/>
         <field name="name"/>
         <field name="nextNode" summary-view="node-form" form-view="node-form" edit-window="self" domain="self.type != 'start'"/>
-        <field name="condition" colSpan="6"/>
+        <field name="signal" colSpan="3"/>
+        <field name="condition" colSpan="3"/>
         <separator title="Description" colSpan="6"/>
 		<field name="description" colSpan="6" noLabel="true" widget="CodeEditor[syntax=text]"/>        
     </form>
@@ -158,6 +164,10 @@
     
     <action-method name="wkf-method-show-editor">
     	<call class="com.axelor.wkf.web.WkfController" method="showEditor"/>
+    </action-method>
+    
+    <action-method name="wkf-method-import-workflow">
+    	<call class="com.axelor.wkf.web.WkfController" method="importWorkflow"/>
     </action-method>
     
 </object-views>
