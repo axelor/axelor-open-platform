@@ -373,7 +373,7 @@ Grid.prototype.parse = function(view) {
 	this.cols = cols;
 	this.grid = grid;
 	
-	element.show().addClass('slickgrid-empty');
+	element.show();
 	element.data('grid', grid);
 	
 	grid.setSelectionModel(new Slick.RowSelectionModel());
@@ -413,7 +413,11 @@ Grid.prototype.parse = function(view) {
 	handler.resetColumns = _.bind(this.resetColumns, this);
 	handler.setColumnTitle = _.bind(this.setColumnTitle, this);
 
-	function setFilters() {
+	function setFilterCols() {
+
+		if (!options.showHeaderRow) {
+			return;
+		}
 
 		var filters = {};
 		var filtersRow = $(grid.getHeaderRow());
@@ -459,23 +463,21 @@ Grid.prototype.parse = function(view) {
 		
 		grid.init();
 		
-		// set filters
-		if (that.showFilters) {
-			setFilters();
-		}
+		setFilterCols();
+		setDummyCols(element, cols);
 		
-		element.removeClass('slickgrid-empty');
-
 		var onInit = scope.onInit();
 		if (_.isFunction(onInit)) {
 			onInit(grid);
 		}
 	};
-
-	setTimeout(function(){
-		setDummyCols(element, cols);
-		element.trigger('adjustSize');
-	});
+	
+	if (element.is(":visible")) {
+		that.__doInit();
+		setTimeout(function(){
+			element.trigger('adjustSize');
+		});
+	}
 
 	if (scope.$parent._viewResolver) {
 		scope.$parent._viewResolver.resolve(view, element);
