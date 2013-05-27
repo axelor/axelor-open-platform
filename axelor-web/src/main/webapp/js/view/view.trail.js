@@ -11,6 +11,14 @@ function FormListCtrl($scope, $element, $compile) {
 
 	$scope._viewParams.$viewScope = $scope;
 	
+	var view = $scope._views['trail'];
+	setTimeout(function(){
+		$scope.$apply(function(){
+			if (view.deferred)
+				view.deferred.resolve($scope);
+		});
+	});
+	
 	var ds = $scope._dataSource;
 	var params = $scope._viewParams.params || {};
 	var sortBy = params['trail-order'] && params['trail-order'].split(/\s*,\s*/);
@@ -33,6 +41,7 @@ function FormListCtrl($scope, $element, $compile) {
 	};
 	
 	$scope.setRouteOptions = function(options) {
+		$scope.updateRoute();
 	};
 	
 	$scope.onNew = function() {
