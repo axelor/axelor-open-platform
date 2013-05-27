@@ -95,14 +95,34 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		var handleConditional = function(attr, conditional, nagative){
 			if (!field[conditional]) return;
 			var evalScope = scope.$new(true);
+			
 			evalScope.$moment = function(d) { return moment(d); };			// moment.js helper
 			evalScope.$number = function(d) { return +d; };					// number helper
 			evalScope.$popup = function() { return scope._isPopup; };		// popup detect
+
+			evalScope.$readonly = _.bind(scope.isReadonly, scope);
+			evalScope.$required = _.bind(scope.isRequired, scope);
+			evalScope.$valid = _.bind(scope.isValid, scope);
+			evalScope.$invalid = function() { return !evalScope.$valid(); };
+			
 			scope.$on("on:record-change", function(e, rec) {
+				handle(rec);
+			});
+
+			scope.$watch("isReadonly()", watcher);
+			scope.$watch("isRequired()", watcher);
+			scope.$watch("isValid()", watcher);
+
+			function watcher(current, old) {
+				if (current === old) return;
+				handle(scope.record);
+			}
+
+			function handle(rec) {
 				var value = evalScope.$eval(field[conditional], rec);
 				if (nagative) { value = !value; };
 				scope.attr(attr, value);
-			});
+			}
 		};
 
 		handleConditional("valid", "validIf");
