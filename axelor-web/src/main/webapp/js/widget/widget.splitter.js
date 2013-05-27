@@ -5,7 +5,8 @@ angular.module('axelor.ui').directive('uiSplitter', function() {
 		scope: {
 			orientation: '@',
 			position: '@',
-			inverse: '@'
+			inverse: '@',
+			toggleOn: '@'
 		},
 		link: function(scope, elem, attrs) {
 			
@@ -14,7 +15,7 @@ angular.module('axelor.ui').directive('uiSplitter', function() {
 					orientation: scope.orientation,
 					position: scope.position,
 					inverse: scope.inverse == 'true',
-					toggleOn: 'click'
+					toggleOn: scope.toggleOn || 'click'
 				}).on('splitter:dragstop', function(){
 					setTimeout(function(){
 						$.event.trigger('adjustSize');
