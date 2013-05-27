@@ -612,6 +612,10 @@ table.field-details .help-text hr {
 	transition: border linear .2s, box-shadow linear .2s;
 }
 
+.tag-select.picker-input {
+	background-color: #fff;
+}
+
 .readonly .tag-select {
 	border: none;
 	box-shadow: none;

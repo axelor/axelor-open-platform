@@ -1,0 +1,20 @@
+.trail-view {
+	
+}
+
+.trail-view .record-toolbar {
+	margin-bottom: 20px;
+}
+
+.trail-form {
+	background-color: #eee;
+	border-radius: 4px;
+	
+	margin-left: 15px;
+	margin-bottom: 4px;
+}
+
+.trail-form.trail-child {
+	background-color: #fff;
+	margin-left: 30px;
+}
