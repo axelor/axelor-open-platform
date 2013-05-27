@@ -1056,16 +1056,27 @@ ui.formInput('MultiSelect', 'Select', {
 		});
 
 		function scaleInput(width) {
+			
+			var elem = element.find('.tag-selector'),
+				pos = elem.position();
+
 			if (width) {
+				input.css('position', '');
+				elem.width('');
 				return input.width(width);
 			}
-			var w = element.innerWidth();
-				e = element.find('.tag-item:last'),
-				p = e.position();
-			if (p) {
-				w = w - (p.left + e.outerWidth());
-			}
-			input.width(w - 24);
+
+			var top = pos.top,
+				left = pos.left,
+				width = element.innerWidth() - left;
+
+			elem.height(input.height() + 2);
+			elem.width(50);
+
+			input.css('position', 'absolute');
+			input.css('top', top + 5);
+			input.css('left', left + 2);
+			input.css('width', width - 24);
 		}
 
 		function update(value) {
