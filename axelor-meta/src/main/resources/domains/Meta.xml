@@ -106,7 +106,7 @@
   <entity name="MetaTranslation" table="META_TRANSLATION" cachable="true">
   	<string name="key" required="true"/>
   	<string name="language" required="true"/>
-  	<string name="translation"/>
+  	<string name="translation" large="true"/>
   	<string name="domain"/>
   	<string name="type" selection="meta.translation.type.selection"/>
   	<unique-constraint columns="key,type,language,domain"/>
