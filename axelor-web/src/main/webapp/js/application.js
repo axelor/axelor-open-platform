@@ -98,7 +98,8 @@ load([
 	'js/view/view.portal.js',
 	'js/view/view.popup.js',
 	'js/view/view.chart.js',
-	'js/view/view.calendar.js'
+	'js/view/view.calendar.js',
+	'js/view/view.trail.js'
 	//-- js-end
 ]);
 
