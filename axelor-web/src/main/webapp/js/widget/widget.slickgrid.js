@@ -200,7 +200,7 @@ var Factory = {
 		if (field.type === "button") {
 			return this.formatButton(field, value);
 		}
-		if (field.widget === "Progress") {
+		if (field.widget === "Progress" || field.widget === "progress") {
 			return this.formatProgress(field, value);
 		}
 
