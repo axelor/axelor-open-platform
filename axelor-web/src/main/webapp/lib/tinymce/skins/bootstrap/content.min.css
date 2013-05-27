@@ -1,7 +1,9 @@
 @import url('../../../bootstrap/css/bootstrap.css');
+@import url('../lightgray/content.min.css');
 
 body.mce-content-body {
-	margin: 8px;
+	margin: 8px !important;
+	padding: 0 !important;
 	font-size: 13px;
 	line-height: 18px;
 }

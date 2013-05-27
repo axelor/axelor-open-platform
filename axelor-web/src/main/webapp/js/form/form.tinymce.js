@@ -20,17 +20,39 @@ ui.formInput('Html', {
 		
 		var selector = "#" + element.attr('id') + ' > textarea';
 		
-		var options = {
-			selector: selector,
+		var liteOptions = {
+			
+			height: 250,
+			
+			menubar: false,
+			
+			statusbar : false,
+			
+			plugins: "hr link image code table textcolor",
+			
+			toolbar: "undo redo |" +
+			        " bold italic underline strikethrough |" +
+					" alignleft aligncenter alignright alignjustify |" +
+					" numlist bullist outdent indent | link image"
+		};
+		
+		var heavyOptions = {
+			
 			height: 350,
-			skin: 'bootstrap',
 			
 			plugins: "hr link image code table textcolor fullscreen",
 		    
 			toolbar: "undo redo | styleselect |" +
 					" bold italic underline strikethrough |" +
 					" alignleft aligncenter alignright alignjustify |" +
-					" numlist bullist outdent indent | link image | fullscreen",
+					" numlist bullist outdent indent | link image | fullscreen"
+		};
+		
+		var options = {
+			
+			selector: selector,
+			
+			skin: 'bootstrap',
 			
 			setup: function(editor) {
 				
@@ -45,9 +67,12 @@ ui.formInput('Html', {
 					
 					var rendered = false;
 					var elemHtml = element.children('div.html-display-text');
+					var elemText = element.children('div.html-edit-text');
 					
 					function showWidget(readonly) {
-						if (readonly === undefined) return;
+						if (readonly === undefined) {
+							return;
+						}
 						if (readonly) {
 							editor.hide();
 							elemHtml.show();
@@ -83,6 +108,8 @@ ui.formInput('Html', {
 			}
 		};
 		
+		options = _.extend(options, scope.field.lite ? liteOptions : heavyOptions);
+
 		function textTemplate(value) {
 			if (!value || value.trim().length === 0) return "";
 			return "<div>" + value + "</div>";
