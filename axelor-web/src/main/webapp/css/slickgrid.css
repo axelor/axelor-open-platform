@@ -61,6 +61,16 @@
   border-style: solid;
 }
 
+.slickgrid-empty .slick-header,
+.slickgrid-empty .slick-headerrow {
+	border-bottom: none !important;
+	background-color: transparent !important;
+}
+
+.slickgrid-empty .slick-headerrow {
+	display: none;
+}
+
 .slick-headerrow {
 	height: 26px;
 	border-top: none !important;
