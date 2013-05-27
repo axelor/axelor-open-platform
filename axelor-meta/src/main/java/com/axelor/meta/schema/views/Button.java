@@ -23,6 +23,10 @@ public class Button extends SimpleWidget {
 		return icon;
 	}
 
+	public String getDefaultPrompt() {
+		return prompt;
+	}
+
 	public String getPrompt() {
 		return JPA.translate(prompt);
 	}
