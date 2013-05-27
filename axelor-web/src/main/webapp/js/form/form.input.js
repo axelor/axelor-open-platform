@@ -957,9 +957,12 @@ ui.formInput('Select', 'BaseSelect', {
 		};
 
 		scope.formatItem = function(item) {
-			if (!item) return item;
-			if (_.isString(item)) {
-				return selectionMap["" + item] || "";
+			var key = _.isNumber(item) ? "" + item : item;
+			if (!key) {
+				return item;
+			}
+			if (_.isString(key)) {
+				return selectionMap[key] || "";
 			}
 			return item.label;
 		};
