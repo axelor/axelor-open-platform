@@ -249,17 +249,29 @@ public class WorkflowService implements IWorkflow {
 		
 		addHistory( instance, transition );
 		
-		if (transition.getCondition() != null){
+		if ( actionHandler.getContext().containsKey("_signal") && 
+				( transition.getSignal() != null && !transition.getSignal().trim().equals("") ) && 
+				actionHandler.getContext().get("_signal").equals(transition.getSignal()) ) {
 
-			actionWorkflow.execute( transition.getCondition(), actionHandler );
-			
-			if ( !actionWorkflow.isInError( ) ){
+			if ( transition.getCondition() != null ){
+
+				actionWorkflow.execute( transition.getCondition(), actionHandler );
+				
+				if ( !actionWorkflow.isInError( ) ){
+					
+					addWaitingNodes( transition );
+					nodes.addAll( playNode( transition.getNextNode() ) );
+				}
+				else {
+					nodes.add( transition.getStartNode() );
+				}
+				
+			}
+			else {
 				
 				addWaitingNodes( transition );
 				nodes.addAll( playNode( transition.getNextNode() ) );
-			}
-			else {
-				nodes.add( transition.getStartNode() );
+				
 			}
 			
 		}
@@ -328,6 +340,8 @@ public class WorkflowService implements IWorkflow {
 		
 		Node node = transition.getNextNode();
 		
+		if ( node.getLogicOperator() == null || node.getLogicOperator().trim().equals("")) { return ; }
+		
 		if (node.getLogicOperator().equals( AND )){
 			
 			if ( !waitingNodes.containsKey(node) ){ waitingNodes.put( node, new HashSet<Transition>() ); }
@@ -345,6 +359,8 @@ public class WorkflowService implements IWorkflow {
 	 * 		Target transition
 	 */
 	protected void addExecutedNodes(Node node){
+
+		if ( node.getLogicOperator() == null || node.getLogicOperator().trim().equals("")) { return ; }
 		
 		if (node.getLogicOperator().equals( XOR )){
 			executedNodes.add( node );
@@ -375,6 +391,8 @@ public class WorkflowService implements IWorkflow {
 	 * 		True if the node is playable else false.
 	 */
 	protected boolean isPlayable( Node node ){
+		
+		if ( node.getLogicOperator() == null || node.getLogicOperator().trim().equals("")) { return true; }
 		
 		if ( node.getLogicOperator().equals( XOR ) && executedNodes.contains( node ) ){
 			return false;

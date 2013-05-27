@@ -63,6 +63,7 @@ public class WorkflowImporter {
 		
 	}
 	
+	@SuppressWarnings("resource")
 	public static String convertStreamToString( InputStream is ) {
 	    Scanner s = new Scanner(is).useDelimiter("\\A");
 	    return s.hasNext() ? s.next() : "";
