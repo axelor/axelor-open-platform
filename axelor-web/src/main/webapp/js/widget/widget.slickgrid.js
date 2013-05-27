@@ -364,7 +364,8 @@ Grid.prototype.parse = function(view) {
 		enableColumnReorder: false,
 		forceFitColumns: true,
 		multiColumnSort: true,
-		showHeaderRow: this.showFilters
+		showHeaderRow: this.showFilters,
+		explicitInitialization: true
 	};
 
 	var grid = new Slick.Grid(element, dataView, cols, options);
@@ -372,7 +373,7 @@ Grid.prototype.parse = function(view) {
 	this.cols = cols;
 	this.grid = grid;
 	
-	element.show();
+	element.show().addClass('slickgrid-empty');
 	element.data('grid', grid);
 	
 	grid.setSelectionModel(new Slick.RowSelectionModel());
@@ -411,9 +412,9 @@ Grid.prototype.parse = function(view) {
 	handler.showColumn = _.bind(this.showColumn, this);
 	handler.resetColumns = _.bind(this.resetColumns, this);
 	handler.setColumnTitle = _.bind(this.setColumnTitle, this);
-	
-	// set filters
-	if (this.showFilters) {
+
+	function setFilters() {
+
 		var filters = {};
 		var filtersRow = $(grid.getHeaderRow());
 		
@@ -446,11 +447,31 @@ Grid.prototype.parse = function(view) {
 		});
 	}
 	
-	var onInit = scope.onInit();
-	if (_.isFunction(onInit)) {
-		onInit(grid);
-	}
+	var that = this;
+	var initialized = false;
 	
+	this.__doInit = function() {
+
+		if (initialized) {
+			return;
+		}
+		initialized = true;
+		
+		grid.init();
+		
+		// set filters
+		if (that.showFilters) {
+			setFilters();
+		}
+		
+		element.removeClass('slickgrid-empty');
+
+		var onInit = scope.onInit();
+		if (_.isFunction(onInit)) {
+			onInit(grid);
+		}
+	};
+
 	setTimeout(function(){
 		setDummyCols(element, cols);
 		element.trigger('adjustSize');
@@ -460,7 +481,6 @@ Grid.prototype.parse = function(view) {
 		scope.$parent._viewResolver.resolve(view, element);
 	}
 	
-	var that = this;
 	scope.$on("cancel:grid-edit", function(e) {
 		
 		if (that.$oldValues && that.canSave()){
@@ -499,6 +519,7 @@ Grid.prototype.adjustSize = function() {
 	if (!this.grid || this.element.is(':hidden') || this.grid.getEditorLock().isActive()) {
 		return;
 	}
+	this.__doInit();
 	this.grid.resizeCanvas();
 	this.grid.invalidate();
 };
