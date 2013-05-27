@@ -139,6 +139,15 @@ function SelectorCtrl($scope, $element, DataSource, ViewService) {
 		}
 	};
 	
+	var _getContext = $scope.getContext;
+	$scope.getContext = function() {
+		// selector popup should return parent's context
+		if ($scope.$parent && $scope.$parent.getContext) {
+			return $scope.$parent.getContext();
+		}
+		return _getContext();
+	};
+	
 	$scope.onItemClick = function(e, args) {
 		setTimeout(function(){
 			$scope.$apply($scope.onOK);
