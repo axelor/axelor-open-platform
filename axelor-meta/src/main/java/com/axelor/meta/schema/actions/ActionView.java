@@ -17,9 +17,9 @@ import com.google.common.collect.Maps;
 
 @XmlType(propOrder = {
 	"views",
+	"params",
 	"domain",
-	"contexts",
-	"params"
+	"contexts"
 })
 public class ActionView extends Action {
 	
@@ -123,22 +123,25 @@ public class ActionView extends Action {
 	public Object evaluate(ActionHandler handler) {
 		Map<String, Object> result = Maps.newHashMap();
 		Map<String, Object> context = Maps.newHashMap();
+		Map<String, Object> viewParams = Maps.newHashMap();
 		List<Object> items = Lists.newArrayList();
 		
 		String viewType = null;
 		
 		for(View elem : views) {
 
-			if (!elem.test(handler))
+			if (!elem.test(handler)) {
 				continue;
+			}
 			
 			Map<String, Object> map = Maps.newHashMap();
 			map.put("name", elem.getName());
 			map.put("type", elem.getType());
 
-			if (viewType == null)
+			if (viewType == null) {
 				viewType = elem.getType();
-			
+			}
+
 			items.add(map);
 		}
 		
@@ -151,14 +154,19 @@ public class ActionView extends Action {
 				context.put(ctx.getName(), value);
 			}
 		}
-		String domain = this.getDomain();
+
+		if (params != null) {
+			for(Param param : params) {
+				viewParams.put(param.name, param.value);
+			}
+		}
 		
+		String domain = this.getDomain();
 		if (domain != null && domain.contains("$")) {
 			domain = handler.evaluate("eval: \"" + domain + "\"").toString();
 		}
 		
 		String title = this.getTitle();
-
 		if (title != null && title.contains("$")) {
 			title = handler.evaluate("eval: \"" + title + "\"").toString();
 		}
@@ -170,7 +178,8 @@ public class ActionView extends Action {
 		result.put("views", items);
 		result.put("domain", domain);
 		result.put("context", context);
-		
+		result.put("params", viewParams);
+
 		return result;
 	}
 	
