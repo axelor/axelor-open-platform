@@ -99,6 +99,8 @@ ui.formInput('ManyToOne', 'Select', {
 	css	: 'many2one-item',
 	
 	controller: ManyToOneCtrl,
+	
+	showSelectionOn: null,
 
 	init: function(scope) {
 		this._super(scope);
@@ -194,6 +196,8 @@ ui.formInput('ManyToOne', 'Select', {
 });
 
 ui.formInput('SuggestBox', 'ManyToOne', {
+
+	showSelectionOn: "click",
 
 	template_editable:
 	'<span class="picker-input">'+
