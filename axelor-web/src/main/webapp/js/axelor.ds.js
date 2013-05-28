@@ -128,7 +128,7 @@
 			function loadFields(view) {
 				
 				var fields = findFields(view) || [];
-				var key = model + "|" + view.type + "|" + fields.join("|");
+				var key = model + "|" + view.type + "|" + view.name + "|" + fields.join("|");
 				
 				if (!model || !fields || fields.length === 0) {
 					deferred.resolve({view: view});
