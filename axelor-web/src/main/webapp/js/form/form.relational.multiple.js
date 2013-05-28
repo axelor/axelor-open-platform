@@ -560,6 +560,20 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 			if (!b) return false;
 			return a.id === b.id;
 		};
+
+		var _setValue = scope.setValue;
+		scope.setValue = function(value, fireOnChange) {
+			var items = _.map(value, function(item) {
+				if (item.version === undefined) {
+					return item;
+				}
+				var ver = item.version;
+				var val = _.omit(item, "version");
+				val.$version = ver;
+				return val;
+			});
+			return _setValue.call(this, items, fireOnChange);
+		};
 		
 		var _handleSelect = scope.handleSelect;
 		scope.handleSelect = function(e, ui) {

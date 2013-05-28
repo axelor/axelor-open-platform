@@ -171,6 +171,13 @@ ui.formInput('ManyToOne', 'Select', {
 			e.stopPropagation();
 			return false;
 		});
+		
+		scope.handleSelect = function(e, ui) {
+			scope.select(ui.item.value);
+			setTimeout(function() {
+				scope.$apply();
+			});
+		};
 	},
 	template_editable:
 	'<div class="picker-input picker-icons-3">'+
