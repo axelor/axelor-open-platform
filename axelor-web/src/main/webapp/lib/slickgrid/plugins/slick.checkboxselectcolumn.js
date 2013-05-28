@@ -16,6 +16,7 @@
       columnId: "_checkbox_selector",
       cssClass: null,
       toolTip: "Select/Deselect All",
+      multiSelect: true,
       width: 30
     };
 
@@ -28,6 +29,7 @@
         .subscribe(_grid.onClick, handleClick)
         .subscribe(_grid.onHeaderClick, handleHeaderClick)
         .subscribe(_grid.onKeyDown, handleKeyDown);
+      _options.multiSelect = grid.getOptions().multiSelect;
     }
 
     function destroy() {
@@ -50,11 +52,13 @@
       }
       _selectedRowsLookup = lookup;
       _grid.render();
-
-      if (selectedRows.length && selectedRows.length == _grid.getDataLength()) {
-        _grid.updateColumnHeader(_options.columnId, "<input type='checkbox' checked='checked'>", _options.toolTip);
-      } else {
-        _grid.updateColumnHeader(_options.columnId, "<input type='checkbox'>", _options.toolTip);
+      
+      if (_options.multiSelect) {
+        if (selectedRows.length && selectedRows.length == _grid.getDataLength()) {
+          _grid.updateColumnHeader(_options.columnId, "<input type='checkbox' checked='checked'>", _options.toolTip);
+        } else {
+          _grid.updateColumnHeader(_options.columnId, "<input type='checkbox'>", _options.toolTip);
+        }
       }
     }
 
@@ -88,13 +92,15 @@
     }
 
     function toggleRowSelection(row) {
+      var selection = [];
       if (_selectedRowsLookup[row]) {
-        _grid.setSelectedRows($.grep(_grid.getSelectedRows(), function (n) {
+        selection = $.grep(_grid.getSelectedRows(), function (n) {
           return n != row
-        }));
+        });
       } else {
-        _grid.setSelectedRows(_grid.getSelectedRows().concat(row));
+        selection = _options.multiSelect ? _grid.getSelectedRows().concat(row) : [row];
       }
+      _grid.setSelectedRows(selection);
     }
 
     function handleHeaderClick(e, args) {
@@ -123,7 +129,7 @@
     function getColumnDefinition() {
       return {
         id: _options.columnId,
-        name: "<input type='checkbox'>",
+        name: _options.multiSelect ? "<input type='checkbox'>" : "<span class='slick-column-name'>&nbsp;</span>",
         toolTip: _options.toolTip,
         field: "sel",
         width: _options.width,

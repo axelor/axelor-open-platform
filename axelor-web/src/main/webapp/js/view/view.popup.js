@@ -469,7 +469,9 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 	return {
 		restrict: 'EA',
 		controller: SelectorCtrl,
-		scope: {},
+		scope: {
+			selectMode: "@"
+		},
 		link: function(scope, element, attrs) {
 			
 			var initialized = false;
@@ -519,7 +521,7 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 		replace: true,
 		template:
 		'<div ui-dialog x-on-open="onOpen" x-on-ok="onOK">'+
-		    '<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-editable="false" x-selector="true"></div>'+
+		    '<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-editable="false" x-selector="{{selectMode}}"></div>'+
 		    '<div class="record-pager pull-left">'+
 			    '<div class="btn-group">'+
 			      '<button class="btn" ng-disabled="!canPrev()" ng-click="onPrev()"><i class="icon-chevron-left"></i></button>'+

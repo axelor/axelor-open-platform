@@ -31,6 +31,8 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		return embedded;
 	};
 	
+	$scope.selectMode = "single";
+	
 	$scope.select = function(value) {
 		
 		if (_.isArray(value)) {

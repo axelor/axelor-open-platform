@@ -347,7 +347,8 @@ Grid.prototype.parse = function(view) {
 	var selectColumn = null;
 	if (scope.selector) {
 		selectColumn = new Slick.CheckboxSelectColumn({
-			cssClass: "slick-cell-checkboxsel"
+			cssClass: "slick-cell-checkboxsel",
+			multiSelect: scope.selector !== "single"
 		});
 		
 		cols.unshift(_.extend(selectColumn.getColumnDefinition(), {
@@ -365,7 +366,8 @@ Grid.prototype.parse = function(view) {
 		forceFitColumns: true,
 		multiColumnSort: true,
 		showHeaderRow: this.showFilters,
-		explicitInitialization: true
+		explicitInitialization: true,
+		multiSelect: scope.selector !== "single"
 	};
 
 	var grid = new Slick.Grid(element, dataView, cols, options);
