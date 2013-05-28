@@ -89,6 +89,7 @@ load([
 	'js/form/form.input.number.js',
 	'js/form/form.input.datetime.js',
 	'js/form/form.input.select.js',
+	'js/form/form.input.progress.js',
 	'js/form/form.input.binary.js',
 
 	'js/form/form.relational.base.js',
