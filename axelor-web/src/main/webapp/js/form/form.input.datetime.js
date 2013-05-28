@@ -1,0 +1,338 @@
+(function(){
+
+var ui = angular.module('axelor.ui');
+
+// configure datepicket
+if (_t.calendar) {
+	$.timepicker.setDefaults(_t.calendar);
+	$.datepicker.setDefaults(_t.calendar);
+}
+
+// configure ui.mask
+function createTwoDigitDefinition( maximum ) {
+	return function( value ) {
+		var number = parseInt( value, 10 );
+
+		if (value === "" || /\D/.test(value) || _.isNaN(number)) {
+			return false;
+		}
+
+		// pad to 2 characters
+		number = ( number < 10 ? "0" : "" ) + number;
+		if ( number <= maximum ) {
+			return number;
+		}
+	};
+}
+
+function yearsDefinition( value ) {
+	var temp;
+
+	// if the value is empty, or contains a non-digit, it is invalid
+	if ( value === "" || /\D/.test( value ) ) {
+		return false;
+	}
+
+	// convert 2 digit years to 4 digits, this allows us to type 80 <right>
+	if ( value.length <= 2 ) {
+		temp = parseInt( value, 10 );
+		// before "32" we assume 2000's otherwise 1900's
+		if ( temp < 10 ) {
+			return "200" + temp;
+		} else if ( temp < 32 ) {
+			return "20" + temp;
+		} else {
+			return "19" + temp;
+		}
+	}
+	if ( value.length === 3 ) {
+		return "0"+value;
+	}
+	if ( value.length === 4 ) {
+		return value;
+	}
+}
+
+$.extend($.ui.mask.prototype.options.definitions, {
+	"MM": createTwoDigitDefinition( 12 ),
+	"DD": createTwoDigitDefinition( 31 ),
+	"YYYY": yearsDefinition,
+	"HH": createTwoDigitDefinition( 23 ),
+	"mm": createTwoDigitDefinition( 59 )
+});
+
+// datepicker keyboad navigation hack
+var _doKeyDown = $.datepicker._doKeyDown;
+$.extend($.datepicker, {
+	_doKeyDown: function(event) {
+		var inst = $.datepicker._getInst(event.target),
+			handled = false;
+		inst._keyEvent = true;
+		if ($.datepicker._datepickerShowing) {
+			switch (event.keyCode) {
+			case 36: // home
+				$.datepicker._gotoToday(event.target);
+				handled = true;
+				break;
+			case 37: // left
+				$.datepicker._adjustDate(event.target, -1, "D");
+				handled = true;
+				break;
+			case 38: // up
+				$.datepicker._adjustDate(event.target, -7, "D");
+				handled = true;
+				break;
+			case 39: // right
+				$.datepicker._adjustDate(event.target, +1, "D");
+				handled = true;
+				break;
+			case 40: // down
+				$.datepicker._adjustDate(event.target, +7, "D");
+				handled = true;
+				break;
+			}
+			if (handled) {
+				event.ctrlKey = true;
+			}
+		} else if (event.keyCode === 36 && event.ctrlKey) { // display the date picker on ctrl+home
+			$.datepicker._showDatepicker(this);
+			handled = true;
+		}
+		if (handled) {
+			event.preventDefault();
+			event.stopPropagation();
+		} else {
+			_doKeyDown(event);
+		}
+	}
+});
+
+/**
+ * The DateTime input widget.
+ */
+ui.formInput('DateTime', {
+
+	css	: 'datetime-item',
+	
+	format: 'DD/MM/YYYY HH:mm',
+	mask: 'DD/MM/YYYY HH:mm',
+	
+	widgets: ['Datetime'],
+
+	init: function(scope) {
+
+		var isDate = this.isDate,
+			format = this.format;
+		
+		scope.parse = function(value) {
+			if (angular.isDate(value)) {
+				return isDate ? moment(value).sod().format('YYYY-MM-DD') : value.toISOString();
+			}
+			return value;
+		},
+
+		scope.format = function(value) {
+			if (value) {
+				return moment(value).format(format);
+			}
+			return value;
+		};
+	},
+
+	link_editable: function(scope, element, attrs, model) {
+		var input = element.children('input:first');
+		var button = element.find('i:first');
+		var onChange = scope.$events.onChange;
+		
+		var options = {
+			dateFormat: 'dd/mm/yy',
+			showButtonsPanel: false,
+			showTime: false,
+			showOn: null,
+			onSelect: function(dateText, inst) {
+				input.mask('value', dateText);
+				updateModel();
+				if (changed && onChange) {
+					setTimeout(onChange);
+				}
+				if (!inst.timeDefined) {
+					input.datetimepicker('hide');
+					setTimeout(function(){
+						input.focus().select();
+					});
+				}
+			}
+		};
+
+		if (this.isDate) {
+			options.showTimepicker = false;
+		}
+
+		input.datetimepicker(options);
+		input.mask({
+			mask: this.mask
+		});
+
+		var changed = false;
+		var rendering = false;
+
+		input.on('change', function(e, ui){
+			changed = !rendering;
+		});
+		input.on('blur', function() {
+			if (changed) {
+				changed = false;
+				updateModel();
+				if (scope.$events.onChange) {
+					setTimeout(scope.$events.onChange);
+				}
+			}
+		});
+		input.on('keydown', function(e){
+
+			if (e.isDefaultPrevented()) {
+				return;
+			}
+
+			if (e.keyCode === $.ui.keyCode.DOWN) {
+				input.datetimepicker('show');
+				e.stopPropagation();
+				e.preventDefault();
+				return false;
+			}
+			if (e.keyCode === $.ui.keyCode.ENTER && $(this).datepicker("widget").is(':visible')) {
+				e.stopPropagation();
+				e.preventDefault();
+				return false;
+			}
+			if (e.keyCode === $.ui.keyCode.ENTER || e.keyCode === $.ui.keyCode.TAB) {
+				if (changed) updateModel();
+			}
+		});
+		button.click(function(e, ui){
+			if (scope.isReadonly()) {
+				return;
+			}
+			input.datetimepicker('show');
+		});
+
+		function updateModel() {
+			var masked = input.mask("value") || '',
+				value = input.datetimepicker('getDate'),
+				oldValue = scope.getValue();
+
+			if (_.isEmpty(masked)) {
+				value = null;
+			}
+
+			value = scope.parse(value);
+			
+			if (angular.equals(value, oldValue)) {
+				return;
+			}
+			
+			scope.setValue(value, true);
+			setTimeout(function(){
+				scope.$apply();
+			});
+		}
+
+		scope.$render_editable = function() {
+			rendering = true;
+			try {
+				var value = scope.getText();
+				if (value) {
+					input.mask('value', value);
+					input.datetimepicker('setDate', value);
+				} else {
+					input.mask('value', '');
+				}
+			} finally {
+				rendering = false;
+			}
+		};
+	},
+	template_editable:
+	'<span class="picker-input">'+
+	  '<input type="text" autocomplete="off">'+
+	  '<span class="picker-icons">'+
+	  	'<i class="icon-calendar"></i>'+
+	  '</span>'+
+	'</span>'
+});
+
+ui.formInput('Date', 'DateTime', {
+	format: 'DD/MM/YYYY',
+	mask: 'DD/MM/YYYY',
+	isDate: true
+});
+
+ui.formInput('Time', 'DateTime', {
+
+	css: 'time-item',
+	mask: 'HH:mm',
+	
+	init: function(scope) {
+		this._super(scope);
+		
+		scope.parse = function(value) {
+			return value;
+		},
+
+		scope.format = function(value) {
+			return value;
+		};
+	},
+	
+	link_editable: function(scope, element, attrs, model) {
+		
+		element.mask({
+			mask: this.mask
+		});
+		
+		element.change(function(e, ui) {
+			updateModel();
+		});
+		
+		element.on('keydown', function(e){
+			if (e.isDefaultPrevented()) {
+				return;
+			}
+			if (e.keyCode === $.ui.keyCode.ENTER || e.keyCode === $.ui.keyCode.TAB) {
+				updateModel();
+			}
+		});
+		
+		scope.validate = function(value) {
+			return !value || /^(\d+:\d+)$/.test(value);
+		};
+		
+		function updateModel() {
+			var value = element.val() || '',
+				oldValue = scope.getValue();
+
+			value = scope.parse(value);
+			
+			if (angular.equals(value, oldValue)) {
+				return;
+			}
+			
+			scope.setValue(value, true);
+			setTimeout(function(){
+				scope.$apply();
+			});
+		}
+		
+		scope.$render_editable = function() {
+			var value = scope.getText();
+			if (value) {
+				element.mask('value', value);
+			} else {
+				element.mask('value', '');
+			}
+		};
+	},
+	template_editable: '<input type="text">'
+});
+
+})(this);
