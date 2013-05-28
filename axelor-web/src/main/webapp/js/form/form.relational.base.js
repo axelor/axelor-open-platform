@@ -160,7 +160,8 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		}
 		function doShow() {
 			if (selector == null) {
-				selector = ViewService.compile('<div ui-selector-popup></div>')($scope);
+				selector = $('<div ui-selector-popup></div>').attr('x-select-mode', $scope.selectMode || "multi");
+				selector = ViewService.compile(selector)($scope);
 				selector.data('$target', $element);
 			}
 			var popup = selector.data('$scope');
