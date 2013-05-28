@@ -3,6 +3,8 @@
 var ui = angular.module('axelor.ui');
 
 ui.formWidget('BaseSelect', {
+	
+	showSelectionOn: "click",
 
 	findInput: function(element) {
 		return element.find('input:first');
@@ -83,9 +85,14 @@ ui.formWidget('BaseSelect', {
 				scope.handleClose(event, ui);
 			}
 		});
+		
+		var showOn = this.showSelectionOn;
 
 		input.focus(function() {
 			element.addClass('focus');
+			if (showOn === "focus") {
+				scope.showSelection();
+			}
 		}).blur(function() {
 			element.removeClass('focus');
 		}).keydown(function(e) {
@@ -94,6 +101,10 @@ ui.formWidget('BaseSelect', {
 			case KEY.DELETE:
 			case KEY.BACKSPACE:
 				scope.handleDelete(e);
+			}
+		}).click(function() {
+			if (showOn === "click") {
+				scope.showSelection();
 			}
 		});
 		
