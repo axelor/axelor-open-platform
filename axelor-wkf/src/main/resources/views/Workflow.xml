@@ -21,6 +21,7 @@
 
 <!-- VIEWS -->
     
+    <!-- WORKFLOW -->
     <grid name="workflow-grid" title="Workflows" model="com.axelor.wkf.db.Workflow">
         <field name="name"/>
         <field name="metaModel"/>
@@ -30,6 +31,10 @@
     </grid>
     
     <form name="workflow-form" title="Workflow" cols="4" model="com.axelor.wkf.db.Workflow" onSave="wkf-validate">
+    	<toolbar>
+	        <button name="openEditor" title="Editor" onClick="save,wkf-method-open-editor"/>
+	        <button name="openInstances" title="Instances" onClick="save,wkf-method-open-instances"/>
+    	</toolbar>
         <field name="name"/>
         <field name="metaModel"/>
 		<field name="maxNodeCounter"/>
@@ -38,10 +43,6 @@
 	    <field name="condition" />
         <field name="active" readonlyIf="archived" />
         <field name="archived" onChange="wkf-record-archived" />
-        <group colSpan="4" cols="4">
-	        <button name="openInstances" title="Show instances" onClick="save,wkf-method-open-instances" colSpan="2"/>
-	        <button name="showOryx" title="Oryx" onClick="save,wkf-method-show-editor" colSpan="2"/>
-        </group>
         <notebook colSpan="6">
 		    <page title="Description">
         		<field name="description" colSpan="4" noLabel="true" widget="CodeEditor[syntax=text]"/>
@@ -50,9 +51,13 @@
 		    	<button name="importWorkflow" title="Import" onClick="save,wkf-method-import-workflow"/>
            		<field name="bpmn" colSpan="4" noLabel="true" widget="CodeEditor[syntax=xml]"/>
 		    </page>
+		    <page title="XML">
+           		<field name="xmlData" colSpan="4" noLabel="true" widget="CodeEditor[syntax=xml]"/>
+		    </page>
         </notebook>
     </form>
     
+    <!-- NODE -->
     <grid name="node-grid" title="Nodes" model="com.axelor.wkf.db.Node">
         <field name="name"/>
         <field name="type"/>
@@ -75,6 +80,7 @@
    		<field name="description" colSpan="4" noLabel="true" widget="CodeEditor[syntax=text]"/>
     </form>
     
+    <!-- TRANSITION -->
     <grid name="transition-grid" title="Transitions" model="com.axelor.wkf.db.Transition">
         <field name="sequence"/>
         <field name="name"/>
@@ -131,15 +137,12 @@
     
 <!-- ACTION -->
 
+	<!-- VALIDATE -->
 	<action-validate name="wkf-validate">
 		<error message="Can't save workflow without start node" if="node?.type != 'start'"/>
 	</action-validate>
-	
-	<action-group name="node-default-record-group">
-		<action name="node-start-default-record" if="_parent?._model == 'com.axelor.wkf.db.Workflow'"/>
-		<action name="node-default-record" if="_parent?._model != 'com.axelor.wkf.db.Workflow'"/>
-	</action-group>
     
+    <!-- RECORD -->
     <action-record name="wkf-record-archived" model="com.axelor.wkf.db.Workflow">
     	<field name="active" expr="eval: !archived"/>
     </action-record>
@@ -158,16 +161,23 @@
     	<field name="name" expr="eval: type?.toUpperCase() + ':'"/>
     </action-record>
     
+    <!-- METHOD -->
     <action-method name="wkf-method-open-instances">
     	<call class="com.axelor.wkf.web.WkfController" method="openInstances"/>
     </action-method>
     
-    <action-method name="wkf-method-show-editor">
-    	<call class="com.axelor.wkf.web.WkfController" method="showEditor"/>
+    <action-method name="wkf-method-open-editor">
+    	<call class="com.axelor.wkf.web.WkfController" method="openEditor"/>
     </action-method>
     
     <action-method name="wkf-method-import-workflow">
     	<call class="com.axelor.wkf.web.WkfController" method="importWorkflow"/>
     </action-method>
+	
+	<!-- GROUP -->
+	<action-group name="node-default-record-group">
+		<action name="node-start-default-record" if="_parent?._model == 'com.axelor.wkf.db.Workflow'"/>
+		<action name="node-default-record" if="_parent?._model != 'com.axelor.wkf.db.Workflow'"/>
+	</action-group>
     
 </object-views>

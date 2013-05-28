@@ -16,6 +16,7 @@
     <string name="description" large="true" />
     <boolean name="active" default="true" />
     <string name="bpmn" large="true" />
+    <string name="xmlData" large="true" />
     <string name="ref" />
     
   </entity>
