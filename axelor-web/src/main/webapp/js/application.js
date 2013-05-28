@@ -82,7 +82,15 @@ load([
 	'js/form/form.widget.js',
 	'js/form/form.layout.js',
 	'js/form/form.container.js',
-	'js/form/form.input.js',
+	
+	'js/form/form.input.static.js',
+	'js/form/form.input.boolean.js',
+	'js/form/form.input.text.js',
+	'js/form/form.input.number.js',
+	'js/form/form.input.datetime.js',
+	'js/form/form.input.select.js',
+	'js/form/form.input.binary.js',
+
 	'js/form/form.relational.base.js',
 	'js/form/form.relational.single.js',
 	'js/form/form.relational.multiple.js',
