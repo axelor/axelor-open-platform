@@ -164,38 +164,4 @@ ui.formInput('Decimal', 'Integer', {
 	isDecimal: true
 });
 
-/**
- * The Progress widget.
- * 
- */
-ui.formInput('Progress', 'Integer', {
-	
-	css: 'progress-item',
-	cellCss: 'form-item progress-item',
-	
-	link_readonly: function(scope, element, attrs, model) {
-		
-		scope.$watch("getValue()", function(value, old) {
-			var width = value || 0;
-			var css = "progress-striped";
-			
-			if (width < 50) {
-				css += " progress-danger active";
-			} else if (width < 100) {
-				css += " progress-warning active";
-			} else {
-				css += " progress-success";
-			}
-			
-			scope.css = css;
-			scope.width = width;
-		});
-	},
-	
-	template_readonly:
-	'<div class="progress {{css}}">'+
-	  '<div class="bar" style="width: {{width}}%;"></div>'+
-	'</div>'
-});
-
 })(this);
