@@ -47,7 +47,7 @@ public class WkfSettings {
 		String value = properties.getProperty(key, defaultValue);
 		if (value == null || "".equals(value.trim()))
 			return defaultValue;
-		return value;
+		return value.trim();
 	}
 	
 	public int getInt(String key, int defaultValue) {

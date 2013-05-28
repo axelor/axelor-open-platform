@@ -61,8 +61,9 @@
     	<bind node="documentation" to="description" />
     </bind>
 
-	<bind node="process" type="com.axelor.wkf.db.Workflow" search="self.name = :name" update="true">
-    	<bind node="@name" to="name"/>
+	<bind node="process" type="com.axelor.wkf.db.Workflow" search="self.name = :name AND self.metaModel.id = :metaModel" update="true">
+		<bind node="@name" alias="name" />
+		<bind node="@model" alias="metaModel" />
     	<bind node="@id" to="ref" />
     	<bind node="@sequence" to="sequence" />
     	<bind node="@condition" to="condition" search="self.id = :condition" />
