@@ -9,10 +9,7 @@ ui.formInput('Html', {
 	init: function(scope) {
 
 		scope.parse = function(value) {
-			if (!value) {
-				return null;
-			}
-			return value.trim() || null;
+			return value;
 		};
 	},
 	
@@ -56,55 +53,43 @@ ui.formInput('Html', {
 			
 			setup: function(editor) {
 				
+				var elemHtml = element.children('div.html-display-text');
+				
+				function showWidget(readonly) {
+					if (readonly) {
+						editor.hide();
+						elemHtml.show();
+					} else {
+						elemHtml.hide();
+						editor.show();
+						render();
+					}
+				}
+
+				function render() {
+					var value = scope.getValue() || "",
+						html = editor.getContent();
+
+					scope.text = scope.format(value);
+					
+					if (value === html) {
+						return;
+					}
+					editor.setContent(value);
+				}
+
+				editor.on('init', function(e) {
+					showWidget(scope.isReadonly());
+					scope.$watch("isReadonly()", showWidget);
+					model.$render = render;
+				});
+
 				editor.on('change', function (e) {
 					if (editor.isDirty()) {
 						editor.save();
 						update(editor.getContent());
 					}
 				});
-
-				setTimeout(function() {
-					
-					var rendered = false;
-					var elemHtml = element.children('div.html-display-text');
-					var elemText = element.children('div.html-edit-text');
-					
-					function showWidget(readonly) {
-						if (readonly === undefined) {
-							return;
-						}
-						if (readonly) {
-							editor.hide();
-							elemHtml.show();
-						} else {
-							elemHtml.hide();
-							editor.show();
-							render();
-						}
-					}
-					
-					function render() {
-						var value = model.$viewValue || "",
-							html = editor.getContent();
-	
-						scope.text = scope.format(value);
-						
-						if (value === html) {
-							return;
-						}
-						editor.setContent(value);
-					}
-
-					scope.$watch("isReadonly()", showWidget);
-					
-					model.$render = function() {
-						if (!rendered) {
-							rendered = true;
-							showWidget(scope.isReadonly());
-						}
-						render();
-					};
-				}, 100);
 			}
 		};
 		
@@ -125,7 +110,9 @@ ui.formInput('Html', {
 
 			scope.setValue(value, true);
 			setTimeout(function() {
-				scope.$apply();
+				 if (!scope.$$phase) {
+					 scope.$apply();
+				 }
 			});
 		}
 		
