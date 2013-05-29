@@ -33,7 +33,7 @@
 "Histories","Historique",
 "Counters","Compteurs",
 "Start","Démarrage",
-"Intermediary","Immédiatement",
+"Intermediary","Intermédiare",
 "Stop","Arrêt",
 "Gateway","Pont",
 "Workflow","Workflow",
@@ -43,3 +43,4 @@
 "Transition","Transition",
 "Can't save workflow without start node","Vous ne pouvez pas sauvegarder le workflow sans noeud de début.",
 "workflow.metaModel","Modèle",
+"Editor","Editeur",
