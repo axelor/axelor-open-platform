@@ -19,6 +19,7 @@ import com.axelor.meta.service.MetaTranslations;
 import com.axelor.rpc.Response;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.persist.PersistFilter;
+import com.google.inject.servlet.ServletModule;
 import com.sun.jersey.api.container.filter.GZIPContentEncodingFilter;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -67,11 +68,18 @@ public class AppServletModule extends JerseyServletModule {
 		properties.put("hibernate.ejb.interceptor", "com.axelor.auth.db.AuditInterceptor");
 		install(new JpaModule(jpaUnit, true, false).properties(properties));
 
-		// register filters (order is important, PersistFilter must be the first filter)
-		filter("*").through(PersistFilter.class);
-		filter("*").through(LocaleFilter.class);
-		filter("*").through(GuiceShiroFilter.class);
-		
+		// trick to ensure PersistFilter is registered before anything else
+		install(new ServletModule() {
+
+			@Override
+			protected void configureServlets() {
+				// order is important, PersistFilter must be the first filter
+				filter("*").through(PersistFilter.class);
+				filter("*").through(LocaleFilter.class);
+				filter("*").through(GuiceShiroFilter.class);
+			}
+		});
+
 		// install the auth module
 		install(new AuthModule(getServletContext()));
 		
