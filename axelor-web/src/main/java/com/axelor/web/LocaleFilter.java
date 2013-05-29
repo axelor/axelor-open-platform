@@ -13,28 +13,25 @@ import com.axelor.meta.service.MetaTranslations;
 import com.google.inject.Singleton;
 
 @Singleton
-public class TranslationsFilter implements Filter {
+public class LocaleFilter implements Filter {
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		
 	}
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
+		
+		MetaTranslations.language.set(request.getLocale());
 		try {
-			MetaTranslations.language.set(request.getLocale());
 			chain.doFilter(request, response);
-		}
-		finally{
+		} finally {
 			MetaTranslations.language.remove();
 		}
 	}
 
 	@Override
 	public void destroy() {
-		
 	}
-
 }
