@@ -52,9 +52,6 @@ public class AppServletModule extends JerseyServletModule {
 	@Override
 	protected void configureServlets() {
 		
-		// bind to provider for translation
-		bind(Translations.class).toProvider(MetaTranslations.class);
-		
 		// load application settings
 		bind(AppSettings.class).asEagerSingleton();
 		AppSettings settings = AppSettings.get();
@@ -65,19 +62,22 @@ public class AppServletModule extends JerseyServletModule {
 
 		log.info(builder.toString());
 		
-		// install the auth module
-		install(new AuthModule(getServletContext()));
-		
 		// initialize JPA
 		Properties properties = new Properties();
 		properties.put("hibernate.ejb.interceptor", "com.axelor.auth.db.AuditInterceptor");
 		install(new JpaModule(jpaUnit, true, false).properties(properties));
 
-		// register filters (order is important)
-		filter("*").through(TranslationsFilter.class);
+		// register filters (order is important, PersistFilter must be the first filter)
 		filter("*").through(PersistFilter.class);
+		filter("*").through(LocaleFilter.class);
 		filter("*").through(GuiceShiroFilter.class);
 		
+		// install the auth module
+		install(new AuthModule(getServletContext()));
+		
+		// bind to translations provider
+		bind(Translations.class).toProvider(MetaTranslations.class);
+
 		// no-cache filter
 		if ("dev".equals(settings.get("application.mode", "dev"))) {
 			filter("*").through(NoCacheFilter.class);
