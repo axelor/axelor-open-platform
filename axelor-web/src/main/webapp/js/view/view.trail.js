@@ -3,15 +3,15 @@
 var ui = angular.module('axelor.ui');
 
 this.FormListCtrl = FormListCtrl;
-this.FormListCtrl.$inject = ["$scope", "$element", "$compile"];
+this.FormListCtrl.$inject = ["$scope", "$element", "$compile", "DataSource", "ViewService"];
 
-function FormListCtrl($scope, $element, $compile) {
-
+function FormListCtrl($scope, $element, $compile, DataSource, ViewService) {
+	
 	DSViewCtrl('form', $scope, $element);
 
 	$scope._viewParams.$viewScope = $scope;
 	
-	var view = $scope._views['trail'];
+	var view = $scope._views['form'];
 	setTimeout(function(){
 		$scope.$apply(function(){
 			if (view.deferred)
@@ -30,7 +30,8 @@ function FormListCtrl($scope, $element, $compile) {
 	$scope.onShow = function(viewPromise) {
 		viewPromise.then(function() {
 			$scope.updateRoute();
-			$scope.onReload();
+			if ($scope.records === undefined)
+				$scope.onReload();
 		});
 	};
 
@@ -66,6 +67,22 @@ function FormListCtrl($scope, $element, $compile) {
 	
 	$scope.show();
 }
+
+ui.directive('uiFormList', function() {
+
+	return {
+		
+		controller: FormListCtrl,
+		
+		link: function(scope, element, attrs) {
+
+		},
+		
+		template: '<div class="trail-list">'+
+			'<div ng-repeat="item in records" ui-trail-form></div>'+
+		'</div>'
+	};
+});
 
 TrailFormCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewService'];
 function TrailFormCtrl($scope, $element, DataSource, ViewService) {
@@ -143,7 +160,7 @@ ui.directive("uiTrailForm", function() {
 			trailWidth(scope, element);
 		},
 		template:
-		'<div ui-view-form x-handler="this"></div>'
+		'<div ui-view-form x-handler="this" class="trail-form"></div>'
 	};
 });
 
@@ -167,7 +184,7 @@ ui.directive("uiTrailEditor", function() {
 			trailWidth(scope, element);
 		},
 		template:
-		'<div ui-trail-form x-handler="this"></div>'
+		'<div ui-trail-form x-handler="this" class="trail-editor"></div>'
 	};
 });
 

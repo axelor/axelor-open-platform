@@ -9,12 +9,20 @@
 .trail-form {
 	background-color: #eee;
 	border-radius: 4px;
-	
-	margin-left: 15px;
+	margin-right: 2px;
+	margin-left: 2px;
 	margin-bottom: 4px;
 }
 
-.trail-form.trail-child {
+.trail-form .trail-form {
 	background-color: #fff;
-	margin-left: 30px;
+}
+
+.trail-form .trail-form .trail-form {
+	margin-left: 2px;
+}
+
+.trail-form .trail-form.trail-editor {
+	padding-top: 4px;
+	background-color: #eee;
 }
