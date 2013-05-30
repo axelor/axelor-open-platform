@@ -16,6 +16,7 @@ ui.formWidget('Form', {
 	
 	compile: function(element, attrs) {
 
+		element.hide();
 		element.find('[x-field],[data-field]').each(function(){
 			
 			var elem = $(this),
@@ -37,8 +38,15 @@ ui.formWidget('Form', {
 	},
 	
 	link: function(scope, element, attrs, controller) {
+		
 		element.on('submit', function(e) {
 			e.preventDefault();
+		});
+
+		scope.$on('on:edit', function(e, rec) {
+			if (rec === scope.record) {
+				element.show();
+			}
 		});
 	}
 });

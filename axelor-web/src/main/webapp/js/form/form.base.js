@@ -46,8 +46,10 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			return state[name];
 		};
 		
-		scope.$on("on:edit", function(){
-			state = _.clone(props);
+		scope.$on("on:edit", function(e, rec){
+			if (_.isEmpty(rec)) {
+				state = _.clone(props);
+			}
 		});
 
 		scope.isRequired = function() {
@@ -135,7 +137,6 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		handleConditional("collapse", "collapseIf");
 		
 		function hideWidget(hidden) {
-			if (hidden === element.is(":hidden")) return;
 			var elem = element,
 				parent = elem.parent('td'),
 				label = elem.data('label') || $(),
