@@ -143,6 +143,7 @@
 				var context = opts.context == undefined ? this._lastContext : opts.context;
 				var archived = opts.archived == undefined ? this._showArchived : opts.archived;
 				
+				var fields = _.isEmpty(opts.fields) ? null : opts.fields;
 				var filter = opts.filter || this._filter;
 				var sortBy = opts.sortBy || this._sortBy;
 
@@ -189,8 +190,8 @@
 					records = this._data,
 					params = {
 						textMatchStyle: 'substring',
+						fields: fields,
 						sortBy: sortBy,
-						fields: opts.fields,
 						data: query,
 						limit: limit,
 						offset: offset,
