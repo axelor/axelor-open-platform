@@ -44,9 +44,12 @@ ui.formWidget('Form', {
 		});
 
 		scope.$on('on:edit', function(e, rec) {
-			if (rec === scope.record) {
-				element.show();
-			}
+			scope.ajaxStop(function() {
+				if (rec === scope.record) {
+					element.show();
+					$.event.trigger('adjustSize');
+				}
+			});
 		});
 	}
 });
