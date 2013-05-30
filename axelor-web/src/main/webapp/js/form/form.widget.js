@@ -43,12 +43,13 @@ ui.formWidget('Form', {
 			e.preventDefault();
 		});
 
-		scope.$on('on:edit', function(e, rec) {
+		scope.$watch('record', function(rec, old) {
+			if (element.is(':visible')) {
+				return;
+			}
 			scope.ajaxStop(function() {
-				if (rec === scope.record) {
-					element.show();
-					$.event.trigger('adjustSize');
-				}
+				element.show();
+				$.event.trigger('adjustSize');
 			});
 		});
 	}
