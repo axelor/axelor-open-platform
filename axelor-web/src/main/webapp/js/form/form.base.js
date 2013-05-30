@@ -106,7 +106,9 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			evalScope.$invalid = function() { return !evalScope.$valid(); };
 			
 			scope.$on("on:record-change", function(e, rec) {
-				handle(rec);
+				if (rec === scope.record) {
+					handle(rec);
+				}
 			});
 
 			scope.$watch("isReadonly()", watcher);
