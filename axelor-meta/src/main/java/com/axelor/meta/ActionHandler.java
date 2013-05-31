@@ -421,6 +421,10 @@ public final class ActionHandler {
 
 		Object data = action.wrap(this);
 		
+		if (data instanceof ActionResponse) {
+			return (ActionResponse) data;
+		}
+		
 		response.setData(data);
 		response.setStatus(ActionResponse.STATUS_SUCCESS);
 
