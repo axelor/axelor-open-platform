@@ -123,7 +123,8 @@ public class ActionGroup extends Action {
 			Object value = action.wrap(handler);
             if (value instanceof Response) {
             	Response res = (Response) value;
-            	if (res.getStatus() != Response.STATUS_SUCCESS) {
+            	// if error or this is the only action then return the response
+            	if (res.getStatus() != Response.STATUS_SUCCESS || actions.size() == 1) {
             		return res;
             	}
             	value = res.getItem(0);
