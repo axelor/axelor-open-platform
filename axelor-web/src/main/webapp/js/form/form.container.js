@@ -128,6 +128,7 @@ ui.formWidget('Tabs', {
 		
 		this.addTab = function(tab) {
 			if (tabs.length === 0) $scope.select(tab);
+			tab.index = tabs.length;
 			tabs.push(tab);
 		};
 		
@@ -154,22 +155,22 @@ ui.formWidget('Tabs', {
 		
 		$scope.showTab = function(index) {
 			
-			if (!inRange(index))
+			if (!inRange(index)) {
 				return;
-			
+			}
+
+			var tab = tabs[index];
 			var item = findItem(index);
-			
+
+			tab.hidden = false;
 			item.show();
-			
-			if (selected == -1 || selected === index)
+
+			if (selected == -1 || selected === index) {
 				return $scope.select(tabs[index]);
-			
+			}
+
 			$.event.trigger('adjustSize');
 		};
-		
-		$scope.$on('on:edit', function(event){
-			doSelect();
-		});
 		
 		$scope.hideTab = function(index) {
 			
@@ -179,21 +180,22 @@ ui.formWidget('Tabs', {
 			var item = findItem(index),
 				tab = tabs[index];
 			
-			if (item.is(':hidden'))
-				return;
-			
+			var wasHidden = item.is(":hidden");
+
 			item.hide();
 			item.removeClass('active');
 			
+			tab.hidden = true;
 			tab.selected = false;
 			
-			if (selected > -1 && selected !== index)
+			if (!wasHidden && selected > -1 && selected !== index)
 				return $.event.trigger('adjustSize');
 			
 			for(var i = 0 ; i < tabs.length ; i++) {
-				item = findItem(i);
-				if (item.is(':visible'))
+				var tab = tabs[i];
+				if (!tab.hidden) {
 					return $scope.select(tabs[i]);
+				}
 			}
 			selected = -1;
 		};
@@ -204,6 +206,10 @@ ui.formWidget('Tabs', {
 
 			pageScope.tab.title = value;
 		};
+		
+		$scope.$on('on:edit', function(event){
+			doSelect();
+		});
 	}],
 	
 	link: function(scope, elem, attrs) {
@@ -277,8 +283,16 @@ ui.formWidget('Tab', {
 		scope.icon = scope.field && scope.field.icon;
 
 		tabs.addTab(scope);
+		
 		attrs.$observe('title', function(value){
 			scope.title = value;
+		});
+		
+		scope.$watch("isHidden()", function(hidden, old) {
+			if (hidden) {
+				return scope.hideTab(scope.index);
+			}
+			return scope.showTab(scope.index);
 		});
 	},
 	cellCss: 'form-item v-align-top',
