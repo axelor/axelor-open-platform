@@ -443,9 +443,11 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 			scope._isPopup = true;
 
 			scope.onOpen = function(e, ui) {
-				scope._viewPromise.then(function() {
-					setTimeout(adjustSize, 100);
-				});
+				setTimeout(function() {
+					scope.ajaxStop(function() {
+						adjustSize();
+					});
+				}, 100);
 			};
 			
 			scope.$watch('schema.title', function(title){
@@ -453,8 +455,6 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 					return;
 				element.closest('.ui-dialog').find('.ui-dialog-title').text(title);
 			});
-
-			scope.adjustSize = _.debounce(autoSize, 300);
 		},
 		replace: true,
 		template:
