@@ -15,6 +15,7 @@ import javax.inject.Provider;
 import javax.persistence.EntityTransaction;
 import javax.persistence.OptimisticLockException;
 
+import org.hibernate.StaleObjectStateException;
 import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +29,12 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.axelor.rpc.filter.Filter;
+import com.google.common.base.Objects;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Longs;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import com.google.inject.persist.Transactional;
@@ -369,27 +372,39 @@ public class Resource<T extends Model> {
 	}
 	
 	@Transactional
+	@SuppressWarnings("all")
 	public Response remove(Request request) {
 		
 		final Response response = new Response();
-		final List<Object> result = Lists.newArrayList();
 		final List<Object> records = request.getRecords();
 
 		if (records == null || records.isEmpty()) {
 			response.setException(new IllegalArgumentException("No records provides."));
 			return response;
 		}
-
+		
+		final List<Model> entities = Lists.newArrayList();
+	
 		for(Object record : records) {
-			@SuppressWarnings("all")
-			Model bean = JPA.edit(model, (Map) record);
-			if (bean.getId() != null) {
-				JPA.remove(bean);
-				result.add(record);
+			Map map = (Map) record;
+			Long id = Longs.tryParse(map.get("id").toString());
+			Object version = map.get("version");
+			Model bean = JPA.find(model, id);
+
+			if (version != null && !Objects.equal(version, bean.getVersion())) {
+				throw new OptimisticLockException(
+						new StaleObjectStateException(model.getName(), id));
+			}
+			entities.add(bean);
+		}
+
+		for(Model entity : entities) {
+			if (JPA.em().contains(entity)) {
+				JPA.remove(entity);
 			}
 		}
 
-		response.setData(result);
+		response.setData(records);
 		response.setStatus(Response.STATUS_SUCCESS);
 
 		return response;

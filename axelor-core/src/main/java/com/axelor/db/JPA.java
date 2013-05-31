@@ -305,8 +305,13 @@ public final class JPA {
 			} catch (Exception ex) {
 				throw new IllegalArgumentException(ex);
 			}
-		} else
+		} else {
 			bean = JPA.em().find(klass, id);
+			if (bean == null) {
+				throw new OptimisticLockException(
+						new StaleObjectStateException(klass.getName(), id));
+			}
+		}
 		
 		// optimistic concurrency check
 		Integer beanVersion = (Integer) values.get("version");
@@ -325,7 +330,7 @@ public final class JPA {
 		for (String name : values.keySet()) {
 
 			Property p = mapper.getProperty(name);
-			if (p == null || p.isVersion() || mapper.getSetter(name) == null)
+			if (p == null || p.isPrimary() || p.isVersion() || mapper.getSetter(name) == null)
 				continue;
 
 			Object value = values.get(name);
