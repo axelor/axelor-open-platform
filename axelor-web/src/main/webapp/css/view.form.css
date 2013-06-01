@@ -713,5 +713,30 @@ table.field-details .help-text hr {
 }
 
 .form-item-container > .html-display-text {
-	padding-top: 4px;	
+	padding-top: 4px;
+}
+
+.button-item.img-button {
+	
+	background: #fff !important;
+	width: auto !important;
+	border: none  !important;
+	
+	padding: 2px !important;
+}
+
+.button-item.img-button:hover img {
+	padding: 1px;
+	
+	-webkit-transform: scale(1.2, 1.2);
+	   -moz-transform: scale(1.2, 1.2);
+	        transform: scale(1.5, 1.5);
+}
+
+.button-item.img-button img {
+	margin: 0;
+}
+
+.button-item.img-button span {
+	display: block;
 }
