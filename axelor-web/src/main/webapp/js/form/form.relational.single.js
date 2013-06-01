@@ -132,7 +132,17 @@ ui.formInput('ManyToOne', 'Select', {
 		scope.formPath = scope.formPath ? scope.formPath + "." + scope.field.name : scope.field.name;
 
 		scope.loadSelection = function(request, response) {
-			this.fetchSelection(request, response);
+			this.fetchSelection(request, function(items) {
+				items.push({
+					label: _t("Search..."),
+					click: function() { scope.showSelector(); }
+				});
+				items.push({
+					label: _t("Create..."),
+					click: function() { scope.showPopupEditor(); }
+				});
+				response(items);
+			});
 		};
 
 		scope.matchValues = function(a, b) {
@@ -177,7 +187,14 @@ ui.formInput('ManyToOne', 'Select', {
 		});
 		
 		scope.handleSelect = function(e, ui) {
-			scope.select(ui.item.value);
+			if (ui.item.click) {
+				setTimeout(function(){
+					input.val("");
+				});
+				ui.item.click.call(scope);
+			} else {
+				scope.select(ui.item.value);
+			}
 			setTimeout(function() {
 				scope.$apply();
 			});
