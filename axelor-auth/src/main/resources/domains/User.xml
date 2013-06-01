@@ -10,7 +10,6 @@
     <string name="name" required="true" unique="true" min="2"/>
     <string name="password" required="true" min="4"/>
     <many-to-one name="group" ref="Group" column="group_id"/>
-    <string name="language" selection="auth.user.language.selection"/>
   </entity>
   
 </domain-models>
