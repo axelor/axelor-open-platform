@@ -31,11 +31,64 @@ html, body {
 	margin-top: -2px;
 }
 
+.navbar-inverse .navbar-inner { 
+	background: #F5F5F5;
+	border-color: #3c3c3d;
+	box-shadow: none;
+	filter: none;
+}
+
+.navbar-inverse .brand {
+	color: black;
+}
+
+.navbar-inverse .brand:hover {
+	color: black;
+}
+
+header .navbar-inverse .nav>li>a {
+	color: #3c3c3d;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+	text-decoration: none;
+}
+
+header .navbar-inverse .nav>li>a:hover {
+	background-color: transparent;
+	color: #53881f;
+	text-decoration: none;
+}
+
+.navbar-inverse .nav li.dropdown.open>.dropdown-toggle,
+.navbar-inverse .nav li.dropdown.active>.dropdown-toggle,
+.navbar-inverse .nav li.dropdown.open.active>.dropdown-toggle {
+	background-color: transparent;
+	color: #53881f;
+}
+
+header .navbar-inverse .divider-vertical {
+	background-color: #269fd8;
+	border-right: 1px solid #3c3c3d;
+}
+
+header .navbar-inverse .nav li.dropdown .dropdown-toggle .caret,
+header .navbar-inverse .nav li.dropdown.open .caret
+	{
+	border-top-color: black;
+	border-bottom-color: black;
+}
+
+.navbar-inverse .nav li.dropdown.open > .dropdown-toggle .caret, 
+.navbar-inverse .nav li.dropdown.active > .dropdown-toggle .caret, 
+.navbar-inverse .nav li.dropdown.open.active > .dropdown-toggle .caret {
+	border-top-color: #53881f;
+	border-bottom-color: #53881f;
+}
+
 .footer {
 	position: absolute;
 	left: 0px; right: 0px; bottom: 0px;
 	padding-top: 4px;
-	background-color: #333;
+	background-color: #3C3C3D;
 	color: white;
 }
 
