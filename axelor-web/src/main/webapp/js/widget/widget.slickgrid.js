@@ -433,6 +433,7 @@ Grid.prototype.parse = function(view) {
 			var input = $('<input type="text">').data("columnId", col.id).appendTo(header);
 			var field = col.descriptor || {};
 			
+			input.attr("placeholder", _t("Search"));
 			if (_.isArray(field.selection)) {
 				makeFilterCombo(input, field.selection, function(filter){
 					_.extend(filters, filter);
