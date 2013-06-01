@@ -180,6 +180,7 @@ function AppCtrl($rootScope, $scope, $http, $route, authService) {
 			mode: settings['application.mode'],
 			user: settings['user.name'],
 			login: settings['user.login'],
+			homeAction: settings['user.action'],
 			help: settings['help.location'],
 			sdk: settings['sdk.version'],
 			fileMaxSize: settings['file.max.size']
@@ -411,6 +412,10 @@ function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 		return tab.name || "Unknown";
 	}
 	
+	$scope.canCloseTab = function(tab) {
+		return tab.closable === undefined ? true : tab.closable;
+	};
+	
 	$scope.openTab = function(tab, options) {
 		
 		var tabs = $scope.tabs,
@@ -480,7 +485,8 @@ function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 
 			tab = view;
 			tab.action = name;
-			
+			tab.closable = options && options.closable;
+
 			$scope.openTab(tab, options);
 		});
 	};
@@ -527,6 +533,19 @@ function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 			});
 		}
 	});
+
+	$scope.$watch('routePath', function(path) {
+		var app = $scope.app || {};
+		if (app.homeAction && _.last(path) === "main") {
+			$scope.openTabByName(app.homeAction, {
+				closable: false
+			});
+		}
+	});
+
+	function ensureHome() {
+		
+	}
 }
 
 TabCtrl.$inject = ['$scope', '$location', '$routeParams'];

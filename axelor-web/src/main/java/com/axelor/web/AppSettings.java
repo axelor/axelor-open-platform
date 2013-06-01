@@ -13,12 +13,10 @@ import javax.persistence.TypedQuery;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
-
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
+import com.axelor.meta.db.MetaUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -94,10 +92,16 @@ public class AppSettings {
 		Properties settings = new Properties();
 		
 		try {
-			Subject subject = SecurityUtils.getSubject();
-			User user = User.all().filter("self.code = ?1", subject.getPrincipal()).fetchOne();
+			User user = AuthUtils.getUser();
+			MetaUser prefs = MetaUser.findByUser(user);
+			
 			settings.put("user.name", user.getName());
 			settings.put("user.login", user.getCode());
+
+			if (prefs != null) {
+				settings.put("user.lang", prefs.getLanguage());
+				settings.put("user.action", prefs.getAction().getName());
+			}
 		} catch (Exception e){
 		}
 		
