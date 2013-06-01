@@ -451,6 +451,8 @@ ui.formInput('NavSelect', {
 		scope.selection = selection;
 		
 		scope.onSelect = function(select) {
+			if(scope.isReadonly())
+				return;
 			this.setValue(select.value, true);
 		};
 
