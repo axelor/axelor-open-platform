@@ -300,7 +300,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 					value: record
 				};
 			});
-			response(items);
+			response(items, page);
 		});
 	};
 
