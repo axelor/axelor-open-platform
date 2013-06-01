@@ -13,6 +13,19 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 	FormViewCtrl($scope, $element);
 	
 	$scope.onClose = function() {
+		$scope.confirmDirty(doClose);
+	};
+	
+	function doClose() {
+		if (!$scope.isDirty()) {
+			var app = $scope.app || {};
+			var rec = $scope.record || {};
+			var act = rec.action;
+	
+			if (app.homeAction !== act.name) {
+				app.homeAction = act.name;
+			}
+		}
 		$location.path('/');
 	};
 

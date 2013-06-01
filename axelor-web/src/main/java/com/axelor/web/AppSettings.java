@@ -14,6 +14,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.meta.db.MetaUser;
@@ -93,10 +94,15 @@ public class AppSettings {
 		
 		try {
 			User user = AuthUtils.getUser();
+			Group group = user.getGroup();
 			MetaUser prefs = MetaUser.findByUser(user);
 			
 			settings.put("user.name", user.getName());
 			settings.put("user.login", user.getCode());
+			
+			if (group != null && group.getHideMenu() == Boolean.TRUE) {
+				settings.put("user.navigator", group.getRestricted() == Boolean.TRUE ? "hidden" : "collapse");
+			}
 
 			if (prefs != null) {
 				settings.put("user.lang", prefs.getLanguage());
