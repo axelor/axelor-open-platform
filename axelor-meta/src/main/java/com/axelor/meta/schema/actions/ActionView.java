@@ -157,7 +157,10 @@ public class ActionView extends Action {
 
 		if (params != null) {
 			for(Param param : params) {
-				viewParams.put(param.name, param.value);
+				Object value = param.value;
+				if ("false".equals(value)) value = false;
+				if ("true".equals(value)) value = true;
+				viewParams.put(param.name, value);
 			}
 		}
 		
