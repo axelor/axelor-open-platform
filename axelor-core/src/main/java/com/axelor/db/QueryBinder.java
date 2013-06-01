@@ -51,6 +51,11 @@ public class QueryBinder {
 					param = variables.get(param);
 				}
 				try {
+					query.getParameter(i + 1);
+				} catch (Exception e) {
+					continue;
+				}
+				try {
 					query.setParameter(i + 1, param);
 				} catch (IllegalArgumentException e) {
 					Parameter<?> p = query.getParameter(i + 1);
