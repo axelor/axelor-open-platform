@@ -97,7 +97,11 @@ function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 
 		if (!found) {
 			found = tab;
-			tabs.push(tab);
+			if (options && options.__tab_prepend) {
+				tabs.unshift(tab);
+			} else {
+				tabs.push(tab);
+			}
 		}
 		
 		_.each(tabs, function(tab) { tab.selected = false; });
@@ -148,7 +152,7 @@ function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 				}];
 			}
 			
-			var closable = options && options.closable;
+			var closable = options && options.__tab_closable;
 			if (closable == undefined && view.params) {
 				closable = view.params.closable;
 			}
@@ -210,7 +214,8 @@ function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 			return;
 		}
 		$scope.openTabByName(app.homeAction, {
-			closable: false
+			__tab_prepend: true,
+			__tab_closable: false
 		});
 	});
 
