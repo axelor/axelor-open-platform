@@ -36,7 +36,7 @@ public class AuthValidator {
 				unique.add(object);
 			}
 			
-			Query query = JPA.em().createNativeQuery("SELECT count(*) from meta_meta_model where CONCAT(package_name, '.', name) = ?1");
+			Query query = JPA.em().createNativeQuery("SELECT count(*) from meta_model where CONCAT(package_name, '.', name) = ?1");
 			query.setParameter(1, object);
 			
 			BigInteger requestResult = (BigInteger) query.getSingleResult();
