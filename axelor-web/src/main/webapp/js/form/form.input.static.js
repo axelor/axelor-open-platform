@@ -65,7 +65,7 @@ ui.directive('uiHelpPopover', function() {
 		if (value && field.type === "password") {
 			value = _.str.repeat('*', value.length);
 		}
-		if (value && field.type === "string") {
+		if (value && /^(string|image|binary)$/.test(field.type)) {
 			var length = value.length;
 			value = _.first(value, 50);
 			if (length > 50) {
