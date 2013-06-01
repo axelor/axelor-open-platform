@@ -8,7 +8,7 @@
 	   <a href="" ng-click="navClick(tab)">
 	     <img class="prefix-icon" ng-show="tab.icon" ng-src="{{tab.icon}}"><span>{{tab.title}}</span>
 	   </a>
-	   <i class="icon-remove" ng-click="closeTab(tab)"></i>
+	   <i ng-show="canCloseTab(tab)" class="icon-remove" ng-click="closeTab(tab)"></i>
 	 </li>
 	</ul>
 	</div>
