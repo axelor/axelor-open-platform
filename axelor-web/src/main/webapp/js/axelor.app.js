@@ -56,6 +56,7 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 		
 		$routeProvider
 		
+		.when('/preferences', { action: 'preferences' })
 		.when('/welcome', { action: 'welcome' })
 		.when('/about', { action: 'about' })
 		.when('/', { action: 'main' })
@@ -178,6 +179,7 @@ function AppCtrl($rootScope, $scope, $http, $route, authService) {
 			version: settings['application.version'],
 			mode: settings['application.mode'],
 			user: settings['user.name'],
+			login: settings['user.login'],
 			help: settings['help.location'],
 			sdk: settings['sdk.version'],
 			fileMaxSize: settings['file.max.size']

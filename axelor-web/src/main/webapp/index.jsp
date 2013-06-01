@@ -18,7 +18,7 @@ String appTitle =  appName;
 if (appDesc != null)
 	appTitle = appName + " :: " + appDesc;
 
-String localeJS = AppSettings.getLocaleJS(request,getServletContext());
+String localeJS = AppSettings.getLocaleJS(request, getServletContext());
 String appJS = AppSettings.getAppJS(getServletContext());
 
 %>
@@ -86,9 +86,9 @@ String appJS = AppSettings.getAppJS(getServletContext());
               	<img src="img/user-icon.png"> <span>{{app.user}}</span> <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
-                <li><a href="#" x-translate>Profile</a></li>
+                <li><a href="#/preferences"><i class="icon-cog"></i> <span x-translate>Preferences</span></a></li>
                 <li class="divider"></li>
-                <li><a href="logout" x-translate>Sign Out</a></li>
+                <li><a href="logout"><i class="icon-off"></i> <span x-translate>Logout</span></a></li>
               </ul>
             </li>
           </ul>
@@ -101,9 +101,10 @@ String appJS = AppSettings.getAppJS(getServletContext());
   <div ng-include src="'partials/error-window.html'"></div>
   
   <section role="main" id="container" ng-switch on="routePath[0]">
-	<div ng-show="routePath[0] == 'main'" ng-include src="'partials/main.html'"></div>
+	<div ng-switch-when="main" ng-include src="'partials/main.html'"></div>
 	<div ng-switch-when="about" ng-include src="'partials/about.html'"></div>
 	<div ng-switch-when="welcome" ng-include src="'partials/welcome.html'"></div>
+	<div ng-switch-when="preferences" ng-include src="'partials/preferences.html'"></div>
   </section>
 
   <!-- JavaScript at the bottom for fast page loading -->

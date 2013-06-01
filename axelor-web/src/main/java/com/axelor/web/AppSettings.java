@@ -8,6 +8,8 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,8 +18,10 @@ import org.apache.shiro.subject.Subject;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.db.JPA;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 @Singleton
 public class AppSettings {
@@ -110,6 +114,28 @@ public class AppSettings {
 		return "{}";
 	}
 	
+	private static String getUserLanguage() {
+
+		final User user = AuthUtils.getUser();
+		final TypedQuery<String> query = JPA.em().createQuery(
+				"SELECT s.language FROM MetaUser s WHERE s.user.code = :code",
+				String.class);
+
+		if (user == null) {
+			return null;
+		}
+
+		query.setMaxResults(1);
+		query.setParameter("code", user.getCode());
+		
+		try {
+			return query.getSingleResult();
+		} catch (NoResultException e) {
+		}
+		
+		return null;
+	}
+	
 	/**
 	 * Return the preferred language.
 	 * Check if the locale JS file exist for the current language.
@@ -121,34 +147,23 @@ public class AppSettings {
 	 */
 	public static String getLocaleJS(HttpServletRequest request, ServletContext context){
 
-		User user = AuthUtils.getUser();
+		Locale locale = null;
+		String language = getUserLanguage();
 
-		if(user != null && !Strings.isNullOrEmpty(user.getLanguage())) {
+		if (!Strings.isNullOrEmpty(language)) {
+			locale = toLocale(language);
+		}
+		if (locale == null) {
+			locale = request.getLocale();
+		}
+		if (locale == null) {
+			locale = toLocale(get().get("application.locale", DEFAULT_LOCALE.getLanguage()));
+		}
 
-			String longUserLanguage = convertLanguage(toLocale(user.getLanguage()),false);
-			String shortUsertLanguage = convertLanguage(toLocale(user.getLanguage()),true);
-
-			if(checkResources(context, "/js/i18n/"+longUserLanguage +".js")) {
-				return longUserLanguage;
+		for(String lang : Lists.newArrayList(toLanguage(locale, false), toLanguage(locale, true))) {
+			if (checkResources(context, "/js/i18n/" + lang + ".js")) {
+				return lang;
 			}
-			else if(checkResources(context, "/js/i18n/"+shortUsertLanguage +".js")) {
-				return shortUsertLanguage;
-			}
-		}
-
-		Locale locale = request.getLocale();
-		if(locale == null) {
-			locale = toLocale(AppSettings.get().get("application.locale", DEFAULT_LOCALE.getLanguage()));
-		}
-
-		String longLanguage = convertLanguage(locale,false);
-		String shortLanguage = convertLanguage(locale,true);
-
-		if(checkResources(context, "/js/i18n/"+longLanguage +".js")) {
-			return longLanguage;
-		}
-		else if(checkResources(context, "/js/i18n/"+shortLanguage +".js")) {
-			return shortLanguage;
 		}
 
 		return DEFAULT_LOCALE.getLanguage();
@@ -172,15 +187,15 @@ public class AppSettings {
 		return appJs;
 	}
 	
-	private static String convertLanguage(Locale locale, boolean minimize) {
+	private static String toLanguage(Locale locale, boolean minimize) {
 		StringBuilder format = new StringBuilder(locale.getLanguage().toLowerCase());
 		if(!minimize && !Strings.isNullOrEmpty(locale.getCountry()))
 			format.append("_").append(locale.getCountry().toUpperCase());
 		return format.toString();
 	}
 	
-	private static Locale toLocale(String locale) {
-	    String parts[] = locale.split("_", -1);
+	private static Locale toLocale(String language) {
+	    String parts[] = language.split("_", -1);
 	    if (parts.length == 1) return new Locale(parts[0].toLowerCase());
 	    return new Locale(parts[0].toLowerCase(), parts[1].toUpperCase());
 	}
