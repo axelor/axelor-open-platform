@@ -237,7 +237,15 @@ function FormViewCtrl($scope, $element) {
 	$scope.canEdit = function() {
 		return !$scope.isEditable();
 	};
-	
+
+	$scope.canCancel = function() {
+		return $scope.$$dirty;
+	};
+
+	$scope.canBack = function() {
+		return !$scope.$$dirty;
+	};
+
 	$scope.onNew = function() {
 		$scope.confirmDirty(function(){
 			$scope.edit(null);
@@ -340,7 +348,19 @@ function FormViewCtrl($scope, $element) {
 			});
 		});
 	};
-	
+
+	$scope.onBack = function() {
+		var record = $scope.record || {};
+		var editable = $scope.isEditable();
+
+		if (record.id && editable) {
+			$scope.setEditable(false);
+			return;
+		}
+
+		$scope.switchTo("grid");
+	};
+
 	$scope.onRefresh = function() {
 		$scope.confirmDirty($scope.reload);
 	};
@@ -366,9 +386,7 @@ function FormViewCtrl($scope, $element) {
 		if (record.id && editable) {
 			$scope.confirmDirty(function() {
 				$scope.setEditable(false);
-				if ($scope.canSave()) {
-					$scope.reload();
-				}
+				$scope.reload();
 			});
 			return;
 		}

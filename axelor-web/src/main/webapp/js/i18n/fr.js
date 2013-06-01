@@ -22,6 +22,7 @@ _t.put({
 "Action Sub-Category": "Sous catégorie",
 "All Day": "Toute la journée",
 "Archived": "Archive",
+"Back": "Retour",
 "Cancel": "Annuler",
 "Clear": "Effacer",
 "Close": "Fermer",

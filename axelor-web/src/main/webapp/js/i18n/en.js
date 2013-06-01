@@ -5,6 +5,7 @@ _t.put({
 "Action Sub-Category": "Action Sub-Category",
 "All Day": "All Day",
 "Archived": "Archived",
+"Back": "Back",
 "Cancel": "Cancel",
 "Clear": "Clear",
 "Close": "Close",
