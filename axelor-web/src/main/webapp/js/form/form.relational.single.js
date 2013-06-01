@@ -132,16 +132,19 @@ ui.formInput('ManyToOne', 'Select', {
 		scope.formPath = scope.formPath ? scope.formPath + "." + scope.field.name : scope.field.name;
 
 		scope.loadSelection = function(request, response) {
-			this.fetchSelection(request, function(items) {
-				items.push({
-					label: _t("Search..."),
-					click: function() { scope.showSelector(); }
-				});
+			this.fetchSelection(request, function(items, page) {
+				if (!page || page.total > items.length) {
+					items.push({
+						label: _t("Search..."),
+						click: function() { scope.showSelector(); }
+					});
+				}
 				items.push({
 					label: _t("Create..."),
 					click: function() { scope.showPopupEditor(); }
 				});
-				response(items);
+				
+				response(items, page);
 			});
 		};
 
