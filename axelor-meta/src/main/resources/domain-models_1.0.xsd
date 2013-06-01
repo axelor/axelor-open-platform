@@ -114,6 +114,13 @@
       </xsd:documentation>
     </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="index" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          Whether to create index on database table (optimizes search query).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 
   <xsd:complexType name="SimpleColumn">
@@ -137,13 +144,6 @@
           <xsd:annotation>
             <xsd:documentation>
               List of selection options. "['value', 'Label'], ['valu2', 'Label2']"
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="index" type="xsd:boolean">
-          <xsd:annotation>
-            <xsd:documentation>
-              Whether to create index on database table (optimizes search query).
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -253,6 +253,7 @@
     </xsd:annotation>
     <xsd:complexContent mixed="true">
     	<xsd:restriction base="dm:RelationalColumn"></xsd:restriction>
+    	
     </xsd:complexContent>
   </xsd:complexType>
 
@@ -263,6 +264,7 @@
     <xsd:complexContent>
       <xsd:restriction base="dm:RelationalColumn">
         <xsd:attribute name="unique" type="xsd:boolean" use="prohibited"/>
+        <xsd:attribute name="index" type="xsd:boolean" use="prohibited"/>
       </xsd:restriction>
     </xsd:complexContent>
   </xsd:complexType>
@@ -275,6 +277,7 @@
       <xsd:restriction base="dm:RelationalColumn">
         <xsd:attribute name="orphan" type="xsd:boolean" use="prohibited"/>
         <xsd:attribute name="unique" type="xsd:boolean" use="prohibited"/>
+        <xsd:attribute name="index" type="xsd:boolean" use="prohibited"/>
       </xsd:restriction>
     </xsd:complexContent>
   </xsd:complexType>
@@ -641,6 +644,17 @@
       <xsd:annotation>
         <xsd:documentation>
         Specifies whether the entity should be cached if caching is enabled.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="indexes" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specifies indexes on multiple columns.
+        Some examples: &lt;br&gt; &lt;br&gt;
+
+        ... indexes="name,code" &lt;br&gt; &lt;br&gt;
+        ... indexes="name,code;name,customer"
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
