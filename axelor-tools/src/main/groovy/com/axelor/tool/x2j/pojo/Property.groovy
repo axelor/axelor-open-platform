@@ -489,7 +489,7 @@ class Property {
 	private Annotation $index() {
 		if (attrs.index == 'false' || this.isFormula())
 			return null
-		if (attrs.index == "true" || name in ['name', 'code'] || attrs.namecolumn == "true") {
+		if (attrs.index == "true" || name in ['name', 'code'] || attrs.namecolumn == "true" || (attrs.get('mappedBy') != null && !(type in ['many-to-many', 'one-to-many']))) {
 			def index = "${entity.table}_${attrs.column ? attrs.column : this.name}_IDX".toUpperCase()
 			return annon("org.hibernate.annotations.Index").add("name", index)
 		}
