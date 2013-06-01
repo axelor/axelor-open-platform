@@ -26,7 +26,9 @@ class Entity {
 	
 	String cachable
 	
-	String documentation;
+	String documentation
+
+	String indexes
 
 	List<Property> properties
 	
@@ -55,6 +57,7 @@ class Entity {
 		cachable = node.@cachable
 		baseClass = "com.axelor.db.Model"
 		documentation = findDocs(node)
+		indexes = node.@indexes
 		
 		if (!name) {
 			throw new IllegalArgumentException("Entity name not given.")
@@ -299,5 +302,60 @@ class Entity {
 			return new Annotation(this, "javax.persistence.Cacheable", false).add("false", false);
 		}
 		return null
+	}
+
+	String getIndexes() {
+		if (!indexes)
+			return ""
+
+		def parts = this.indexes.split(";")
+		if(parts == null || parts.length == 0)
+			return ""
+
+		def indexList = []
+		for (String list : parts) {
+			String index = this.getIndex(list)
+			if(index == null || "".equals(index))
+				continue
+			indexList += index
+		}
+
+		if(indexList == null || indexList.size() == 0)
+			return ""
+
+		return "@org.hibernate.annotations.Table(appliesTo=" +
+			"\"${table.toLowerCase()}\"," +
+			"\n\t indexes = {\n" +
+			indexList.join(",\n") +
+			"\n\t}\n)\n"
+	}
+
+	String getIndex(String list){
+		if(list == null)
+			return null
+
+		def fieldlist = list.split(",")
+		if(fieldlist == null || fieldlist.length == 0)
+			return null
+
+		def column = []
+		def code = "\t\t@Index(name=\""
+		def name = table.toLowerCase()
+
+		fieldlist.each { name += "_" + it.trim() }
+
+		code += name.toUpperCase() + "_IDX\", columnNames={"
+		for(String field : fieldlist) {
+			Property prop = this.getField(field.trim())
+			if(prop == null || prop.getServerType() == "one-to-many" || prop.getServerType() == "many-to-many")
+				return null
+			column += "\""+field.trim()+"\""
+		}
+
+		if(column == null || column.size() == 0)
+			return null
+
+		code += column.join(',') + "})"
+		return code
 	}
 }
