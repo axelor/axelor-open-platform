@@ -100,8 +100,8 @@ public class AppSettings {
 			settings.put("user.name", user.getName());
 			settings.put("user.login", user.getCode());
 			
-			if (group != null && group.getHideMenu() == Boolean.TRUE) {
-				settings.put("user.navigator", group.getRestricted() == Boolean.TRUE ? "hidden" : "collapse");
+			if (group != null && group.getNavigation() != null) {
+				settings.put("user.navigator", group.getNavigation());
 			}
 
 			if (prefs != null) {
