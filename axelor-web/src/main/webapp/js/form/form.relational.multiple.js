@@ -578,16 +578,6 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 			}
 			return _handleSelect.apply(this, arguments);
 		};
-		
-		var _renderItem = input.data("ui-autocomplete")._renderItem;
-		input.data("ui-autocomplete")._renderItem = function(ul, item) {
-			var el = _renderItem(ul, item);
-			if (item.click) {
-				el.addClass("tag-select-action");
-				ul.addClass("tag-select-action-menu");
-			}
-			return el;
-        };
 	}
 });
 

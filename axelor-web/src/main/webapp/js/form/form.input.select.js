@@ -109,9 +109,13 @@ ui.formWidget('BaseSelect', {
 		});
 		
 		input.data('ui-autocomplete')._renderItem = function(ul, item) {
-			return $("<li>")
-				.append( $("<a>").html( item.label ) )
-				.appendTo(ul);
+			var el = $("<li>").append( $("<a>").html( item.label ) )
+							  .appendTo(ul);
+			if (item.click) {
+				el.addClass("tag-select-action");
+				ul.addClass("tag-select-action-menu");
+			}
+			return el;
 		};
 	},
 
