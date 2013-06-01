@@ -6,12 +6,14 @@
     <field name="name" />
     <field name="code" />
     <field name="restricted"/>
+    <field name="hideMenu"/>
   </grid>
 
   <form name="group-form" title="User" cols="2">
     <field name="name" validIf="name.length &gt;= 2" onChange="action-group-validData"/>
     <field name="code" validIf="code.length &gt;= 2" onChange="action-group-validData"/>
     <field name="restricted"/>
+    <field name="hideMenu"/>
     <field name="permissions" colSpan="2" onChange="action-validate-group-permissions">
       <grid title="Permissions">
         <field name="name" />
