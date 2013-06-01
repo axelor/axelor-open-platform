@@ -70,6 +70,7 @@ load([
 	'js/axelor.ds.js',
 	'js/axelor.data.js',
 	'js/axelor.ui.js',
+	'js/axelor.nav.js',
 	'js/axelor.prefs.js',
 
 	'js/widget/widget.navtabs.js',
