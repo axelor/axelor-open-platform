@@ -2,19 +2,25 @@
 <object-views xmlns="http://apps.axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.9.xsd">
 
+  <selection name="select.user.navigation">
+    <option value="visible">Visible</option>
+    <option value="hidden">Hidden</option>
+    <option value="collapse">Collapse</option>
+  </selection>
+
   <grid name="group-grid" title="Groups">
     <field name="name" />
     <field name="code" />
     <field name="restricted"/>
-    <field name="hideMenu"/>
+    <field name="navigation"/>
   </grid>
 
-  <form name="group-form" title="User" cols="2">
+  <form name="group-form" title="User">
     <field name="name" validIf="name.length &gt;= 2" onChange="action-group-validData"/>
     <field name="code" validIf="code.length &gt;= 2" onChange="action-group-validData"/>
+    <field name="navigation"/>
     <field name="restricted"/>
-    <field name="hideMenu"/>
-    <field name="permissions" colSpan="2" onChange="action-validate-group-permissions">
+    <field name="permissions" colSpan="4" onChange="action-validate-group-permissions">
       <grid title="Permissions">
         <field name="name" />
         <field name="object" />
