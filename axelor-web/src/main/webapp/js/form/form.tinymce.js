@@ -29,6 +29,7 @@ ui.formInput('Html', {
 			
 			toolbar: "undo redo |" +
 			        " bold italic underline strikethrough |" +
+			        " forecolor backcolor |" +
 					" alignleft aligncenter alignright alignjustify |" +
 					" numlist bullist outdent indent | link image"
 		};
@@ -41,6 +42,7 @@ ui.formInput('Html', {
 		    
 			toolbar: "undo redo | styleselect |" +
 					" bold italic underline strikethrough |" +
+					" forecolor backcolor |" +
 					" alignleft aligncenter alignright alignjustify |" +
 					" numlist bullist outdent indent | link image | fullscreen"
 		};
