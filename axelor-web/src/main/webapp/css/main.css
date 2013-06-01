@@ -530,3 +530,12 @@ img.prefix-icon {
 [class^=icon-] {
 	font-size: 14px;
 }
+
+.user-preferences-body {
+	width: 400px;
+	margin: auto;
+}
+
+.user-preferences-header {
+	text-align: center;
+}

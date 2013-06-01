@@ -1,0 +1,14 @@
+<div class="user-preferences form-view" ng-controller="UserCtrl">
+	<div class="user-preferences-body">
+		<div class="user-preferences-header">
+			<h2>Preferences</h2>
+			<hr/>
+		</div>
+		<div ui-view-form x-handler="this"></div>
+		<hr/>
+		<div class="user-preferences-footer pull-right">
+			<button class="btn btn-primary" ng-click="onSave()" ng-disabled="!canSave()" x-translate>Save</button>
+			<button class="btn" x-translate ng-click="onClose()">Close</button>
+		</div>
+	</div>
+</div>
