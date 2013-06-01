@@ -21,6 +21,14 @@
       <field name="language" />
       <field name="action" domain="self.type = 'action-view' AND self.model IS NULL" widget="SuggestBox"/>
   </form>
+  
+  <menuitem name="menu-user-preferences" parent="menu-auth" title="Preferences"
+    action="user.preferences" groups="admins"/>
+  
+  <action-view name="user.preferences" title="Preferences" model="com.axelor.meta.db.MetaUser">
+    <view type="grid" name="meta-user-grid" />
+    <view type="form" name="meta-user-form" />
+  </action-view>
 
   <action-view name="user.preferences.my" title="Preferences" model="com.axelor.meta.db.MetaUser">
     <view type="form" name="meta-user-form" />
