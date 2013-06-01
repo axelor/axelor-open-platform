@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://apps.axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/domain-models http://apps.axelor.com/xml/ns/domain-models/domain-models_0.9.xsd">
+
+  <module name="meta" package="com.axelor.meta.db"/>
+
+  <entity name="MetaUser" table="META_USER" sequential="true" cachable="true">
+    <![CDATA[
+    This object store the user preferences.
+    ]]>
+    <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" required="true" unique="true"/>
+    <string name="email" unique="true"/>
+    <string name="language" selection="select.language"/>
+    <many-to-one name="action" ref="com.axelor.meta.db.MetaAction"/>
+    
+    <finder-method name="findByUser" using="user"/>
+    <finder-method name="findByUser" using="String:code" filter="self.user.code = :code" />
+  </entity>
+  
+</domain-models>

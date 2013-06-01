@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.9.xsd">
+
+  <selection name="select.language">
+    <option value="en">English</option>
+    <option value="fr">French</option>
+  </selection>
+
+  <grid name="meta-user-grid" title="Preferences">
+    <field name="user.name" title="User"/>
+    <field name="email" />
+    <field name="language" />
+    <field name="action.name" title="Action"/>
+  </grid>
+
+  <form name="meta-user-form" title="Preferences" cols="2" colWidths="100,*" onNew="com.axelor.meta.web.MetaUserController:load">
+      <field name="user" readonly="true" />
+      <field name="email" widget="Email" />
+      <field name="language" />
+      <field name="action" domain="self.type = 'action-view' AND self.model IS NULL" widget="SuggestBox"/>
+  </form>
+
+  <action-view name="user.preferences.my" title="Preferences" model="com.axelor.meta.db.MetaUser">
+    <view type="form" name="meta-user-form" />
+  </action-view>
+
+</object-views>
