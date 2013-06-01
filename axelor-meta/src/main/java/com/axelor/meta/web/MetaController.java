@@ -12,6 +12,7 @@ import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaField;
 import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.MetaTranslation;
+import com.axelor.meta.db.MetaUser;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
@@ -85,11 +86,22 @@ public class MetaController {
 	
 	public void restoreAll(ActionRequest request, ActionResponse response) {
 		
+		final Map<Long, String> userActions = Maps.newHashMap();
+		
 		JPA.runInTransaction(new Runnable() {
 			
 			@Override
 			public void run() {
+				
+				// backup user actions
+				for(MetaUser user : MetaUser.all().fetch()) {
+					if (user.getAction() != null) {
+						userActions.put(user.getId(), user.getAction().getName());
+					}
+				}
+
 				JPA.clear();
+				JPA.em().createNativeQuery("UPDATE meta_user SET action = NULL").executeUpdate();
 				JPA.em().createNativeQuery("DELETE FROM meta_menu_groups").executeUpdate();
 				JPA.em().createNativeQuery("DELETE FROM meta_view_groups").executeUpdate();
 				JPA.em().createNativeQuery("DELETE FROM meta_menu").executeUpdate();
@@ -103,6 +115,19 @@ public class MetaController {
 		
 		loader.load(null);
 		
+		JPA.runInTransaction(new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				// restore use actions
+				for(Long id : userActions.keySet()) {
+					MetaUser user = MetaUser.find(id);
+					user.setAction(MetaAction.findByName(userActions.get(id)));
+				}
+			}
+		});
+
 		MetaView view = MetaView.all().fetchOne();
 		response.setValues(view);
 	}
