@@ -58,6 +58,7 @@ load([
 	'lib/angular/angular.js',
 	'lib/angular/angular-resource.js',
 	'lib/angular/angular-sanitize.js',
+	'lib/angular/angular-if.js',
 	
 	'js/lib/utils.js',
 	'js/lib/dialogs.js',
