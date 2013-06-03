@@ -81,12 +81,6 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		if (angular.isFunction(this._link_internal)) {
 			this._link_internal.call(this, scope, element, attrs, controller);
 		}
-		if (angular.isFunction(linkerFn) && angular.isFunction(this.transcludeSelect)) {
-			var ref = this.transcludeSelect(element);
-			linkerFn(scope.$new(), function(clone){
-				ref.append(clone);
-			});
-		}
 		if (angular.isFunction(this.init)) {
 			this.init.call(this, scope);
 		}
