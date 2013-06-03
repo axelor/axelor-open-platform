@@ -1,27 +1,27 @@
 <div class="form-view" ng-controller="FormViewCtrl">
 	<div class="record-toolbar btn-toolbar">
 	  <div class="btn-group">
-	    <button class="btn" ng-click="onNew()" ng-show="hasButton('new')"><i class="icon icon-file"></i> <span x-translate>New</span></button>
-	    <button class="btn" ng-click="onEdit()" ng-show="hasButton('edit') && canEdit()"><i class="icon icon-pencil"></i> <span x-translate>Edit</span></button>
-	    <button class="btn" ng-click="onSave()" ng-show="hasButton('save') && !canEdit()" ng-disabled="!canSave()"><i class="icon icon-save"></i> <span x-translate>Save</span></button>
-	    <button class="btn" ng-click="onCopy()" ng-show="hasButton('copy')" ng-disabled="!canCopy()"><i class="icon icon-copy"></i> <span x-translate>Copy</span></button>
-	    <button class="btn" ng-click="onCancel()" ng-show="hasButton('cancel') && canCancel()"><i class="icon icon-ban-circle"></i> <span x-translate>Cancel</span></button>
+	    <button class="btn" ng-click="onNew()" ng-if="hasButton('new')"><i class="icon icon-file"></i> <span x-translate>New</span></button>
+	    <button class="btn" ng-click="onEdit()" ng-if="hasButton('edit') && canEdit()"><i class="icon icon-pencil"></i> <span x-translate>Edit</span></button>
+	    <button class="btn" ng-click="onSave()" ng-if="hasButton('save') && !canEdit()" ng-disabled="!canSave()"><i class="icon icon-save"></i> <span x-translate>Save</span></button>
+	    <button class="btn" ng-click="onCopy()" ng-if="hasButton('copy')" ng-disabled="!canCopy()"><i class="icon icon-copy"></i> <span x-translate>Copy</span></button>
+	    <button class="btn" ng-click="onCancel()" ng-if="hasButton('cancel') && canCancel()"><i class="icon icon-ban-circle"></i> <span x-translate>Cancel</span></button>
 	  </div>
 	  <div class="btn-group">
-		<button class="btn" ng-click="onBack()" ng-show="hasButton('back') && canBack()"><i class="icon icon-reply"></i> <span x-translate>Back</span></button>
-	    <button class="btn" ng-click="onRefresh()" ng-show="hasButton('refresh')"><i class="icon icon-refresh"></i> <span x-translate>Refresh</span></button>
-	    <button class="btn" ng-click="onSearch()" ng-show="hasButton('search')"><i class="icon icon-search"></i> <span x-translate>Search</span></button>
+		<button class="btn" ng-click="onBack()" ng-if="hasButton('back') && canBack()"><i class="icon icon-reply"></i> <span x-translate>Back</span></button>
+	    <button class="btn" ng-click="onRefresh()" ng-if="hasButton('refresh')"><i class="icon icon-refresh"></i> <span x-translate>Refresh</span></button>
+	    <button class="btn" ng-click="onSearch()" ng-if="hasButton('search')"><i class="icon icon-search"></i> <span x-translate>Search</span></button>
 	  </div>
-	  <div class="btn-group" ng-show="hasAuditLog()">
+	  <div class="btn-group" ng-if="hasAuditLog()">
 	  	<button class="btn" ng-click="onShowLog($event)"><i class="icon icon-eye-open"></i></button>
 	  </div>
-	  <div class="btn-group" ng-show="canShowAttachments()">
+	  <div class="btn-group" ng-if="canShowAttachments()">
 	  	<button class="btn" ng-click="onShowAttachments()"><i class="icon icon-pushpin"></i></button>
 	  </div>
-	  <div class="btn-group" ng-show="hasHelp()">
+	  <div class="btn-group" ng-if="hasHelp()">
 		<button class="btn" ng-click="onShowHelp()"><i class="icon icon-info-sign"></i></button>
 	  </div>
-	  <div class="btn-group" ng-show="toolbar">
+	  <div class="btn-group" ng-if="toolbar">
 	  	<button ng-repeat="btn in toolbar" class="btn" ui-tool-button="btn" name="{{btn.name}}">{{btn.title}}</button>
 	  </div>
 	  <div ui-view-switcher class="pull-right"></div>

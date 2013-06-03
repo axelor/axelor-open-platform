@@ -1,17 +1,17 @@
 <div class="grid-view" ng-controller="GridViewCtrl">
   <div class="record-toolbar btn-toolbar">
 	  <div class="btn-group">
-	    <button class="btn" ng-click="onNew()" ng-show="hasButton('new')" ng-disabled="canSave()"><i class="icon icon-file"></i> <span x-translate>New</span></button>
-	    <button class="btn" ng-click="onEdit()" ng-show="hasButton('edit')" ng-disabled="!canEdit()"><i class="icon icon-pencil"></i> <span x-translate>Edit</span></button>
-	    <button class="btn" ng-click="onSave()" ng-show="canEditInline()" ng-disabled="!canSave()"><i class="icon icon-save"></i> <span x-translate>Save</span></button>
-	    <button class="btn" ng-click="onDelete()" ng-show="hasButton('delete')" ng-disabled="!canDelete()"><i class="icon icon-remove"></i> <span x-translate>Delete</span></button>
+	    <button class="btn" ng-click="onNew()" ng-if="hasButton('new')" ng-disabled="canSave()"><i class="icon icon-file"></i> <span x-translate>New</span></button>
+	    <button class="btn" ng-click="onEdit()" ng-if="hasButton('edit')" ng-disabled="!canEdit()"><i class="icon icon-pencil"></i> <span x-translate>Edit</span></button>
+	    <button class="btn" ng-click="onSave()" ng-if="canEditInline()" ng-disabled="!canSave()"><i class="icon icon-save"></i> <span x-translate>Save</span></button>
+	    <button class="btn" ng-click="onDelete()" ng-if="hasButton('delete')" ng-disabled="!canDelete()"><i class="icon icon-remove"></i> <span x-translate>Delete</span></button>
 	  </div>
 	  <div class="btn-group">
-	    <button class="btn" ng-click="onRefresh()" ng-show="hasButton('refresh')"><i class="icon icon-refresh"></i> <span x-translate>Refresh</span></button>
-	    <button class="btn" ng-click="onSearch()" ng-show="hasButton('search')"><i class="icon icon-search"></i> <span x-translate>Search</span></button>
-	    <button class="btn" ng-click="onArchived($event)" ng-show="hasButton('archived')" data-toggle="button"><i class="icon icon-inbox"></i> <span x-translate>Archived</span></button>
+	    <button class="btn" ng-click="onRefresh()" ng-if="hasButton('refresh')"><i class="icon icon-refresh"></i> <span x-translate>Refresh</span></button>
+	    <button class="btn" ng-click="onSearch()" ng-if="hasButton('search')"><i class="icon icon-search"></i> <span x-translate>Search</span></button>
+	    <button class="btn" ng-click="onArchived($event)" ng-if="hasButton('archived')" data-toggle="button"><i class="icon icon-inbox"></i> <span x-translate>Archived</span></button>
 	  </div>
-	  <div class="btn-group" ng-show="toolbar">
+	  <div class="btn-group" ng-if="toolbar">
 	  	<button ng-repeat="btn in toolbar" class="btn" ui-tool-button="btn">{{btn.title}}</button>
 	  </div>
 	  <div ui-view-switcher class="pull-right"></div>
