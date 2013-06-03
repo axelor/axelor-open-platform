@@ -306,7 +306,9 @@ ui.formWidget('Tab', {
 	},
 	cellCss: 'form-item v-align-top',
 	transclude: true,
-	template: '<div ui-actions class="tab-pane" ng-class="{active: selected}" ui-transclude></div>'
+	template: '<div ui-actions class="tab-pane" ng-class="{active: selected}" x-layout-selector="&gt; div:first">'+
+		'<div ui-transclude></div>'+
+	'</div>'
 });
 
 })(this);
