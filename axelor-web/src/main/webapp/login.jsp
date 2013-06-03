@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
 <link href="lib/bootstrap/css/bootstrap.css" rel="stylesheet">
