@@ -151,18 +151,15 @@ public class Mapper {
 	 * @return a property
 	 */
 	public Property getNameField() {
-		if (this.nameField != null) {
+		if (nameField != null) {
 			return nameField;
 		}
 		for(Property property : fields.values()) {
 			if (property.isNameColumn()) {
-				return this.nameField = property;
-			}
-			if ("name".equals(property.getName())) {
-				return this.nameField = property;
+				return nameField = property;
 			}
 		}
-		return null;
+		return nameField = getProperty("name");
 	}
 
 	/**
