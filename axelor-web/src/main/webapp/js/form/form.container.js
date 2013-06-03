@@ -2,6 +2,20 @@
 
 var ui = angular.module('axelor.ui');
 
+// this directive is used as a replacement for ng-transclude directive
+// which fails to keep scope hierarchy (see: https://github.com/angular/angular.js/issues/1809)
+ui.directive('uiTransclude', function() {
+	return {
+		compile: function(tElement, tAttrs, transclude) {
+			return function(scope, element, attrs, ctrl) {
+				transclude(scope.$new(), function(clone) {
+					element.append(clone);
+				});
+			};
+		}
+	};
+});
+
 /**
  * The Group widget.
  *
@@ -51,7 +65,7 @@ ui.formWidget('Group', {
 			'<legend ng-show="title">'+
 				'<i ng-show="canCollapse()" ng-click="toggle()" ng-class="{\'icon-plus\': collapsed, \'icon-minus\': !collapsed}"></i>'+
 				'<span ng-bind-html-unsafe="title"></span></legend>'+
-			'<div ng-transclude></div>'+
+			'<div ui-transclude></div>'+
 		'</fieldset>'
 });
 
@@ -255,7 +269,7 @@ ui.formWidget('Tabs', {
 					'</div>'+
 				'</div>'+
 			'</div>' +
-			'<div class="tab-content" ng-transclude></div>' +
+			'<div class="tab-content" ui-transclude></div>' +
 		'</div>'
 });
 
@@ -292,7 +306,7 @@ ui.formWidget('Tab', {
 	},
 	cellCss: 'form-item v-align-top',
 	transclude: true,
-	template: '<div ui-actions class="tab-pane" ng-class="{active: selected}" ng-transclude></div>'
+	template: '<div ui-actions class="tab-pane" ng-class="{active: selected}" ui-transclude></div>'
 });
 
 })(this);
