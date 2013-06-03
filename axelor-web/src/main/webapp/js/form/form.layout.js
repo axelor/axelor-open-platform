@@ -141,10 +141,8 @@ function TableLayout(items, attrs, $scope, $compile) {
 ui.directive('uiTableLayout', ['$compile', function($compile) {
 
 	return function(scope, element, attrs) {
-		var items = attrs.layoutAfter ?
-		               element.find(attrs.layoutAfter).nextAll() :
-		               element.children();
-		
+		var elem = attrs.layoutSelector ? element.find(attrs.layoutSelector) : element;
+		var items = elem.children();
 
 		var layout = TableLayout(items, attrs, scope, $compile);
 		var brTags = element.children('br:hidden'); // detach all the <br> tags
@@ -153,7 +151,7 @@ ui.directive('uiTableLayout', ['$compile', function($compile) {
 			brTags.remove();
 		});
 
-		element.append(layout);
+		elem.append(layout);
 	};
 
 }]);

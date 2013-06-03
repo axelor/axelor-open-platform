@@ -46,14 +46,12 @@ ui.formWidget('Group', {
 		});
 	},
 	transclude: true,
-	transcludeSelect: function(element) {
-		return element;
-	},
 	template:
-		'<fieldset ng-class="{\'bordered-box\': title}" x-layout-after="&gt; legend:first">'+
+		'<fieldset ng-class="{\'bordered-box\': title}" x-layout-selector="&gt; div:first">'+
 			'<legend ng-show="title">'+
 				'<i ng-show="canCollapse()" ng-click="toggle()" ng-class="{\'icon-plus\': collapsed, \'icon-minus\': !collapsed}"></i>'+
 				'<span ng-bind-html-unsafe="title"></span></legend>'+
+			'<div ng-transclude></div>'+
 		'</fieldset>'
 });
 
@@ -153,7 +151,7 @@ ui.formWidget('Tabs', {
 			}
 		}
 		
-		$scope.showTab = function(index) {
+		this.showTab = function(index) {
 			
 			if (!inRange(index)) {
 				return;
@@ -172,7 +170,7 @@ ui.formWidget('Tabs', {
 			$.event.trigger('adjustSize');
 		};
 		
-		$scope.hideTab = function(index) {
+		this.hideTab = function(index) {
 			
 			if (!inRange(index))
 				return;
@@ -230,9 +228,6 @@ ui.formWidget('Tabs', {
 		}
 	},
 	transclude: true,
-	transcludeSelect: function(element) {
-		return element.find('.tab-content:first');
-	},
 	template:
 		'<div class="tabbable-tabs">' +
 			'<div class="nav-tabs-wrap">' +
@@ -260,7 +255,7 @@ ui.formWidget('Tabs', {
 					'</div>'+
 				'</div>'+
 			'</div>' +
-			'<div class="tab-content"></div>' +
+			'<div class="tab-content" ng-transclude></div>' +
 		'</div>'
 });
 
@@ -290,17 +285,14 @@ ui.formWidget('Tab', {
 		
 		scope.$watch("isHidden()", function(hidden, old) {
 			if (hidden) {
-				return scope.hideTab(scope.index);
+				return tabs.hideTab(scope.index);
 			}
-			return scope.showTab(scope.index);
+			return tabs.showTab(scope.index);
 		});
 	},
 	cellCss: 'form-item v-align-top',
 	transclude: true,
-	transcludeSelect: function(element) {
-		return element;
-	},
-	template: '<div ui-actions class="tab-pane" ng-class="{active: selected}"></div>'
+	template: '<div ui-actions class="tab-pane" ng-class="{active: selected}" ng-transclude></div>'
 });
 
 })(this);
