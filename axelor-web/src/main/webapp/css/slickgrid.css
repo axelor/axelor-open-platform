@@ -88,7 +88,7 @@
 	border-radius: 0;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	box-shadow: none;
+	box-shadow: none !important;
 }
 
 .slick-header-column.ui-state-default {
@@ -120,6 +120,10 @@
 	height: 100% !important;
 	min-width: inherit !important;
 	min-height: 23px;
+}
+
+.slick-cell .picker-input > .picker-icons > i[class^=icon] {
+	padding-top: 2px !important;
 }
 
 .slick-cell input[type=checkbox] {
