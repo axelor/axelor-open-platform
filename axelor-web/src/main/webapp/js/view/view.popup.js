@@ -449,7 +449,9 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 					});
 				}, 100);
 			};
-			
+
+			scope.adjustSize = _.debounce(autoSize, 300);
+
 			scope.$watch('schema.title', function(title){
 				if (title == null)
 					return;
