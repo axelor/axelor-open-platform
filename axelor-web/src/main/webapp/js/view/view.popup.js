@@ -405,7 +405,15 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 			
 			var initialized = false;
 			
-			function adjustSize() {
+			function adjust(how) {
+				setTimeout(function() {
+					scope.ajaxStop(function() {
+						how();
+					});
+				}, 100);
+			}
+			
+			function initSize() {
 				element.find(':input:first').focus();
 				$.event.trigger('adjustSize');
 
@@ -414,7 +422,7 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 					return;
 				}
 				initialized = scope.isReadonly() ? 'readonly' : 'editable';
-				autoSize();
+				adjust(autoSize);
 			}
 
 			function autoSize() {
@@ -443,14 +451,12 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 			scope._isPopup = true;
 
 			scope.onOpen = function(e, ui) {
-				setTimeout(function() {
-					scope.ajaxStop(function() {
-						adjustSize();
-					});
-				}, 100);
+				adjust(initSize);
 			};
 
-			scope.adjustSize = _.debounce(autoSize, 300);
+			scope.adjustSize = function() {
+				adjust(autoSize);
+			};
 
 			scope.$watch('schema.title', function(title){
 				if (title == null)
