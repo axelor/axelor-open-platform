@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -21,6 +22,7 @@ import com.axelor.meta.db.MetaUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 @Singleton
 public class AppSettings {
@@ -90,7 +92,7 @@ public class AppSettings {
 	
 	public String toJSON() {
 		
-		Properties settings = new Properties();
+		Map<String, Object> settings = Maps.newHashMap();
 		
 		try {
 			User user = AuthUtils.getUser();
@@ -100,10 +102,9 @@ public class AppSettings {
 			settings.put("user.name", user.getName());
 			settings.put("user.login", user.getCode());
 			
-			if (group != null && group.getNavigation() != null) {
+			if (group != null) {
 				settings.put("user.navigator", group.getNavigation());
 			}
-
 			if (prefs != null) {
 				settings.put("user.lang", prefs.getLanguage());
 				settings.put("user.action", prefs.getAction().getName());
@@ -111,7 +112,9 @@ public class AppSettings {
 		} catch (Exception e){
 		}
 		
-		settings.putAll(properties);
+		for(Object key : properties.keySet()) {
+			settings.put((String) key, properties.get(key));
+		}
 		
 		// remove server only properties
 		settings.remove("temp.dir");
