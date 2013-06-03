@@ -280,12 +280,21 @@ ui.formInput('OneToMany', {
 			return items;
 		};
 
+		var adjusted = false;
+
 		model.$render = function() {
 			var items = scope.getValue();
 			scope._viewPromise.then(function(){
 				scope.fetchData(items, function(records){
 					records =  ensureIds(records);
 					scope.setItems(records);
+					if (adjusted || !scope.adjustSize) {
+						return;
+					}
+					adjusted = true;
+					setTimeout(function() {
+						scope.adjustSize();
+					});
 				});
 			});
 		};
