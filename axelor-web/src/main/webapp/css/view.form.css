@@ -11,6 +11,10 @@
 	overflow: auto;
 }
 
+.view-container .form-view > div.no-toolbar {
+	top: 0;
+}
+
 form.dynamic-form {
 	margin: 0;
 }

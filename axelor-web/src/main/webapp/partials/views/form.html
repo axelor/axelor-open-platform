@@ -1,5 +1,5 @@
 <div class="form-view" ng-controller="FormViewCtrl">
-	<div class="record-toolbar btn-toolbar">
+	<div class="record-toolbar btn-toolbar" style="display: hidden;" ng-show="canShowToolbar()">
 	  <div class="btn-group">
 	    <button class="btn" ng-click="onNew()" ng-if="hasButton('new')"><i class="icon icon-file"></i> <span x-translate>New</span></button>
 	    <button class="btn" ng-click="onEdit()" ng-if="hasButton('edit') && canEdit()"><i class="icon icon-pencil"></i> <span x-translate>Edit</span></button>
@@ -33,5 +33,5 @@
 	    </div>
 	  </div>
 	</div><!--/.btn-toolbar -->
-	<div ui-view-form x-handler="this"></div>
+	<div ui-view-form x-handler="this" ng-class="{'no-toolbar': !canShowToolbar() }"></div>
 </div>
