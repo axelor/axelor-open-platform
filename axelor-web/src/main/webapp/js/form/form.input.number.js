@@ -3,11 +3,13 @@
 var ui = angular.module('axelor.ui');
 
 /**
- * The Integer input widget.
+ * The Numeric input widget.
  */
-ui.formInput('Integer', {
+ui.formInput('Number', {
 
 	css: 'integer-item',
+	
+	widgets: ['Integer', 'Long', 'Decimal'],
 	
 	link: function(scope, element, attrs, model) {
 		
@@ -154,13 +156,6 @@ ui.formInput('Integer', {
 			model.$render();
 		});
 	}
-});
-
-/**
- * The Decimal input widget.
- */
-ui.formInput('Decimal', 'Integer', {
-	css: 'decimal-item'
 });
 
 })(this);
