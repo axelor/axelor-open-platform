@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.db.JPA;
 import com.axelor.meta.ActionHandler;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Strings;
@@ -51,7 +52,7 @@ public class ActionValidate extends Action {
 		for(Validator validator : validators) {
 			if (validator.test(handler)) {
 				String key = validator.getClass().getSimpleName().toLowerCase();
-				String val = validator.getMessage();
+				String val = JPA.translate(validator.getMessage());
 				
 				if (!Strings.isNullOrEmpty(val))
 					val = handler.evaluate("eval: " + "\"\"\"" + val + "\"\"\"").toString();
