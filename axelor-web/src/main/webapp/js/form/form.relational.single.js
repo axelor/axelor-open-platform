@@ -100,6 +100,8 @@ ui.formInput('ManyToOne', 'Select', {
 
 	css	: 'many2one-item',
 	
+	widgets: ['OneToOne'],
+	
 	controller: ManyToOneCtrl,
 	
 	showSelectionOn: null,
