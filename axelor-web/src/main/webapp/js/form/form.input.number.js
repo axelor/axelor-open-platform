@@ -15,7 +15,7 @@ ui.formInput('Integer', {
 			precision = props.precision || 18,
 			scale = props.scale || 2;
 		
-		var isDecimal = this.isDecimal,
+		var isDecimal = props.serverType === "decimal",
 			pattern = isDecimal ? /^(-)?\d+(\.\d+)?$/ : /^\s*-?[0-9]*\s*$/;
 		
 		scope.isNumber = function(value) {
@@ -160,8 +160,7 @@ ui.formInput('Integer', {
  * The Decimal input widget.
  */
 ui.formInput('Decimal', 'Integer', {
-	css: 'decimal-item',
-	isDecimal: true
+	css: 'decimal-item'
 });
 
 })(this);
