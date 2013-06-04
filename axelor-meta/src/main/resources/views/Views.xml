@@ -54,8 +54,9 @@
   </form>
 
   <selection name="meta.translation.type.selection">
-  	<option value="title">Title</option>
+  	<option value="field">Field</option>
   	<option value="help">Help</option>
+  	<option value="other">Other</option>
   </selection>
 
   <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView" orderBy="priority,name">

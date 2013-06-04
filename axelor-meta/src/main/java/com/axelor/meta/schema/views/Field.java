@@ -94,7 +94,7 @@ public class Field extends SimpleWidget {
 	
 	@Override
 	public String getTitle() {
-		return JPA.translate(this.getName(), super.getDefaultTitle(), this.getModel(), "title");
+		return JPA.translate(this.getName(), super.getDefaultTitle(), this.getModel(), "field");
 	}
 	
 	@Override
