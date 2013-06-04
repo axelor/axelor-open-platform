@@ -221,6 +221,14 @@ function DSViewCtrl(type, $scope, $element) {
 			callback();
 		});
 	};
+	
+	$scope.canShowToolbar = function() {
+		var params = ($scope._viewParams || {}).params;
+		if (params && params['show-toolbar'] === false) {
+			return false;
+		}
+		return true;
+	};
 }
 
 angular.module('axelor.ui').directive('uiViewSwitcher', function(){
