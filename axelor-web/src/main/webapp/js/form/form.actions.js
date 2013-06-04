@@ -491,6 +491,14 @@ ActionHandler.prototype = {
 			});
 		});
 		
+		function openTab(scope, tab) {
+			if (scope.openTab) {
+				scope.openTab(tab);
+			} else if (scope.$parent) {
+				openTab(scope.$parent, tab);
+			}
+		}
+
 		if (data.view) {
 			var tab = data.view;
 			tab.action = _.uniqueId('$act');
@@ -512,7 +520,7 @@ ActionHandler.prototype = {
 				if (!views.grid) tab.views.push({type: 'grid'});
 				if (!views.form) tab.views.push({type: 'form'});
 			}
-			scope.openTab(tab);
+			openTab(scope, tab);
 		}
 		
 		if (data.canClose) {
