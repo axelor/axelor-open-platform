@@ -531,7 +531,7 @@ var EVENTS = ['onClick', 'onChange', 'onSelect', 'onNew', 'onLoad', 'onSave'];
 
 ui.directive('uiActions', ['ViewService', function(ViewService) {
 
-	return function(scope, element, attrs) {
+	function link(scope, element, attrs) {
 
 		var props = _.isEmpty(scope.field) ? scope.schema : scope.field;
 		if (props == null)
@@ -551,8 +551,15 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 			});
 			scope.$events[name] = _.bind(handler[name], handler);
 		});
-	};
+	}
 	
+	return {
+		link: function(scope, element, attrs) {
+			_.delay(function() {
+				link(scope, element, attrs);
+			});
+		}
+	};
 }]);
 
 ui.directive('uiToolButton', ['ViewService', function(ViewService) {
