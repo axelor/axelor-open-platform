@@ -78,12 +78,16 @@
 				fields = meta.fields || {};
 			}
 			
-			forEach(view.items, function(item) {
+			forEach(view.items || view.pages, function(item) {
 				processWidget(item);
 				forEach(fields[item.name], function(value, key){
-					if (!item.hasOwnProperty(key))
+					if (!item.hasOwnProperty(key)) {
 						item[key] = value;
+					}
 				});
+				if (item.items || item.pages) {
+					ViewService.prototype.process(meta, item);
+				}
 			});
 		};
 		
@@ -93,8 +97,9 @@
 				match = widget.match(/^([\w-]*)\[(.*?)\]$/),
 				widgetAttrs = {};
 
-			field.widgetName = widget;
-
+			if (widget) {
+				field.widgetName = widget;
+			}
 			if (!match) {
 				return;
 			}
