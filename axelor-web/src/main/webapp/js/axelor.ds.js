@@ -79,12 +79,46 @@
 			}
 			
 			forEach(view.items, function(item) {
+				processWidget(item);
 				forEach(fields[item.name], function(value, key){
 					if (!item.hasOwnProperty(key))
 						item[key] = value;
 				});
 			});
 		};
+		
+		function processWidget(field) {
+
+			var widget = field.widget || '',
+				match = widget.match(/^([\w-]*)\[(.*?)\]$/),
+				widgetAttrs = {};
+		
+			if (!match) {
+				return;
+			}
+			
+			field.widgetName = match[1].trim();
+			field.widgetAttrs = widgetAttrs;
+			
+			_.each(match[2].split(/\s*\|\s*/), function(part) {
+				var parts = part.split(/\s*=\s*/);
+				var attrName = parts[0].trim();
+				var attrValue = parts[1].trim();
+				if (attrValue.match(/^(\d+)$/)) {
+					attrValue = +attrValue;
+				}
+				if (attrValue === "true") {
+					attrValue = true;
+				}
+				if (attrValue === "false") {
+					attrValue = false;
+				}
+				if (attrValue === "null") {
+					attrValue = null;
+				}
+				widgetAttrs[attrName] = attrValue;
+			});
+		}
 		
 		function findFields(view) {
 			var items = [];

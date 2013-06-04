@@ -475,33 +475,16 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 					delete this.type;
 				}
 				
-				var widget = this.widget || '',
-					match = widget.match(/^([\w-]*)\[(.*?)\]$/),
-					attrs = {}, widgetAttrs = {};
-				
-				if (match) {
-					widget = match[1].trim();
-					_.each(match[2].split(/\s*\|\s*/), function(part) {
-						var parts = part.split(/\s*=\s*/);
-						var attrName = parts[0].trim();
-						var attrValue = parts[1].trim();
-						if (attrValue.match(/^(\d+)$/)) {
-							attrValue = +attrValue;
-						}
-						if (attrValue === "true") {
-							attrValue = true;
-						}
-						if (attrValue === "false") {
-							attrValue = false;
-						}
-						if (attrValue === "null") {
-							attrValue = null;
-						}
-						attrs[attrName] = attrValue;
-						widgetAttrs['x-' + attrName] = attrValue;
-					});
-				}
-			
+				var widget = this.widgetName,
+					widgetAttrs = {},
+					attrs = {};
+
+				_.extend(attrs, this.widgetAttrs);
+
+				_.each(this.widgetAttrs, function(value, key) {
+					widgetAttrs['x-' + key] = value;
+				});
+
 				var item = $('<div></div>').appendTo(parent),
 					field = fields[this.name] || {},
 					widgetId = _.uniqueId('_formWidget'),

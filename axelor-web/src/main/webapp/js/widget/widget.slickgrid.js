@@ -196,12 +196,14 @@ var Factory = {
 	formatter: function(row, cell, value, columnDef, dataContext) {
 		
 		var field = columnDef.descriptor || {};
+		var attrs = _.extend({}, field, field.widgetAttrs);
+		var widget = attrs.widgetName;
 
-		if (field.type === "button") {
-			return this.formatButton(field, value);
+		if (attrs.type === "button") {
+			return this.formatButton(attrs, value);
 		}
-		if (field.widget === "Progress" || field.widget === "progress") {
-			return this.formatProgress(field, value);
+		if (widget === "Progress" || widget === "progress" || widget === "SelectProgress") {
+			return this.formatProgress(attrs, value);
 		}
 
 		if (value === null || value === undefined) {
