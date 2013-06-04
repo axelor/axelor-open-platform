@@ -92,7 +92,9 @@
 			var widget = field.widget || '',
 				match = widget.match(/^([\w-]*)\[(.*?)\]$/),
 				widgetAttrs = {};
-		
+
+			field.widgetName = widget;
+
 			if (!match) {
 				return;
 			}
