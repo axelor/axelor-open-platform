@@ -260,7 +260,7 @@ var Factory = {
 	},
 	
 	formatButton: function(field, value, columnDef) {
-		return '<img class="slick-img-button" src="' + field.image + '">';
+		return '<img class="slick-img-button" src="' + field.icon + '">';
 	}
 };
 
