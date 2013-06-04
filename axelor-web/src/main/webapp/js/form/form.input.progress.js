@@ -2,28 +2,72 @@
 
 var ui = angular.module('axelor.ui');
 
-var ProgressMixin = {
+ui.ProgressMixin = {
 
 	css: 'progress-item',
 	cellCss: 'form-item progress-item',
 	
 	link_readonly: function(scope, element, attrs, model) {
 		
+		var field = scope.field || {},
+			that = this;
+
 		scope.$watch("getValue()", function(value, old) {
-			var width = value || 0;
-			var css = "progress-striped";
-			
-			if (width < 50) {
-				css += " progress-danger active";
-			} else if (width < 100) {
-				css += " progress-warning active";
-			} else {
-				css += " progress-success";
-			}
-			
-			scope.css = css;
-			scope.width = width;
+			var props = that.compute(field, value);
+			scope.css = props.css;
+			scope.width = props.width;
 		});
+	},
+	
+	compute: function(field, value) {
+		
+		var max = +(field.max) || 100,
+			min = +(field.min) || 0;
+
+		colors = [
+			["r", 24],	// 00 - 24 (red)
+			["y", 49],	// 25 - 49 (yellow)
+			["b", 74],  // 50 - 74 (blue)
+			["g", 100]  // 75 - 100 (green)
+		];
+		
+		if (field.colors) {
+			colors = _.chain(field.colors.split(/,/)).invoke('split', /:/).value() || [];
+		}
+
+		colors.reverse();
+		
+		var styles = {
+			"r": "progress-danger",
+			"y": "progress-warning",
+			"b": "",
+			"g": "progress-success"
+		};
+
+		var width = +(value) || 0;
+		var css = "progress-striped";
+
+		width = (width * 100) / (max - min);
+		width = Math.min(Math.round(width), 100);
+
+		var color = "";
+		for(var i = 0 ; i < colors.length; i++) {
+			var c = colors[i][0];
+			var v = +colors[i][1];
+			if (width <= v) {
+				color = styles[c] || "";
+			}
+		}
+		
+		css += " " + color;
+		if (width < 100) {
+			css += " " + "active";
+		}
+		
+		return {
+			css: css,
+			width: width
+		};
 	},
 	
 	template_readonly:
@@ -33,15 +77,15 @@ var ProgressMixin = {
 };
 
 /**
- * The Progress widget with integer input.
+ * The Progress widget with integer/decimal input.
  * 
  */
-ui.formInput('Progress', 'Integer', _.extend({}, ProgressMixin));
+ui.formInput('Progress', 'Integer', _.extend({}, ui.ProgressMixin));
 
 /**
  * The Progress widget with selection input.
  * 
  */
-ui.formInput('SelectProgress', 'Select', _.extend({}, ProgressMixin));
+ui.formInput('SelectProgress', 'Select', _.extend({}, ui.ProgressMixin));
 
 })(this);

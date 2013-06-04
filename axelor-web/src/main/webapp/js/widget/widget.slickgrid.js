@@ -242,20 +242,11 @@ var Factory = {
 	},
 	
 	formatProgress: function(field, value) {
-		var width = value || 0;
-		if (!_.isNumber(width)) {
-			return value;
-		}
-		var css = "progress-striped";
-		if (width < 50) {
-			css += " progress-danger active";
-		} else if (width < 100) {
-			css += " progress-warning active";
-		} else {
-			css += " progress-success";
-		}
-		return '<div class="progress ' + css + '" style="height: 18px; margin: 0; margin-top: 1px;">'+
-		  '<div class="bar" style="width: ' + width +'%;"></div>'+
+		
+		var props = ui.ProgressMixin.compute(field, value);
+		
+		return '<div class="progress ' + props.css + '" style="height: 18px; margin: 0; margin-top: 1px;">'+
+		  '<div class="bar" style="width: ' + props.width +'%;"></div>'+
 		'</div>';
 	},
 	
