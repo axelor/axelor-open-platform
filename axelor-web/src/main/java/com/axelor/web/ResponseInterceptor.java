@@ -1,5 +1,8 @@
 package com.axelor.web;
 
+import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceException;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;
@@ -30,8 +33,14 @@ public class ResponseInterceptor implements MethodInterceptor {
 		try {
 			response = (Response) invocation.proceed();
 		} catch (Exception e) {
-			if (JPA.em().getTransaction().isActive()) {
-				JPA.em().getTransaction().rollback();
+			EntityTransaction txn = JPA.em().getTransaction();
+			if (txn.isActive()) {
+				txn.rollback();
+			} else if (e instanceof PersistenceException) {
+				// recover the transaction
+				try {
+					txn.begin();
+				} catch(Exception ex){}
 			}
 			response = new Response();
 			if (e instanceof AuthorizationException) {
