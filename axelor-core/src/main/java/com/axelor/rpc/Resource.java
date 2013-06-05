@@ -253,6 +253,8 @@ public class Resource<T extends Model> {
 			EntityTransaction txn = JPA.em().getTransaction();
 			if (txn.isActive()) {
 				txn.rollback();
+			} else {
+				Throwables.propagate(e);
 			}
 			LOG.error("Fetch data without filter, query failed: " + Throwables.getRootCause(e));
 			data = (query = JPA.all(model)).fetch(limit, offset);
