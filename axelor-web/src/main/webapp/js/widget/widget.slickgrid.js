@@ -368,7 +368,6 @@ Grid.prototype.parse = function(view) {
 		forceFitColumns: true,
 		multiColumnSort: true,
 		showHeaderRow: this.showFilters,
-		explicitInitialization: true,
 		multiSelect: scope.selector !== "single"
 	};
 
@@ -456,29 +455,15 @@ Grid.prototype.parse = function(view) {
 		});
 	}
 	
-	var that = this;
-	var initialized = false;
+	setFilterCols();
+	setDummyCols(element, cols);
 	
-	this.__doInit = function() {
+	var onInit = scope.onInit();
+	if (_.isFunction(onInit)) {
+		onInit(grid);
+	}
 
-		if (initialized) {
-			return;
-		}
-		initialized = true;
-		
-		grid.init();
-		
-		setFilterCols();
-		setDummyCols(element, cols);
-		
-		var onInit = scope.onInit();
-		if (_.isFunction(onInit)) {
-			onInit(grid);
-		}
-	};
-	
 	if (element.is(":visible")) {
-		that.__doInit();
 		setTimeout(function(){
 			element.trigger('adjustSize');
 		});
@@ -488,6 +473,8 @@ Grid.prototype.parse = function(view) {
 		scope.$parent._viewResolver.resolve(view, element);
 	}
 	
+	var that = this;
+
 	scope.$on("cancel:grid-edit", function(e) {
 		
 		if (that.$oldValues && that.canSave()){
@@ -546,7 +533,6 @@ Grid.prototype.adjustSize = function() {
 	if (!this.grid || this.element.is(':hidden') || this.grid.getEditorLock().isActive()) {
 		return;
 	}
-	this.__doInit();
 	this.grid.resizeCanvas();
 	this.grid.invalidate();
 };
