@@ -14,16 +14,20 @@ ui.formInput('String', {
  * The Email input widget.
  */
 ui.formInput('Email', {
+	
 	css: 'email-item',
 	
-	init: function(scope, element, attrs, model) {
+	pattern: /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
+	
+	link: function(scope, element, attrs, model) {
+
+		var pattern = this.pattern;
 
 		scope.validate = function(value) {
-			if(_.isEmpty(value))
+			if(_.isEmpty(value)) {
 				return true;
-			
-			var reg = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-			return reg.test(value);
+			}
+			return pattern.test(value);
 		};
 	},
 	
