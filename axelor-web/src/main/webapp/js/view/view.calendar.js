@@ -473,7 +473,12 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				}
 			});
 			if (record == null || !record.id) {
-				popup.$broadcast("on:new");
+				popup.ajaxStop(function() {
+					setTimeout(function() {
+						popup.$broadcast("on:new");
+						popup.$apply();
+					});
+				});
 			}
 		};
 		
