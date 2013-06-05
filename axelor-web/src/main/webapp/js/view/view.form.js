@@ -317,20 +317,42 @@ function FormViewCtrl($scope, $element) {
 	};
 
 	$scope.onSave = function() {
-
-		var saveAction = $scope.$events.onSave;
 		
+		var defer = $scope._defer();
+		var event = $scope.$broadcast('on:before-save', $scope.record);
+		var saveAction = $scope.$events.onSave;
+
+		if (event.defaultPrevented) {
+			if (event.error) {
+				axelor.dialogs.error(event.error);
+			}
+			setTimeout(function() {
+				defer.reject(event.error);
+			});
+			return defer.promise;
+		}
+
 		function doSave() {
 			var dummy = $scope.getDummyValues();
-			return ds.save($scope.record).success(function(record, page) {
+			var promise = ds.save($scope.record).success(function(record, page) {
 				return doEdit(record.id, dummy);
 			});
+			
+			promise.success(function(record) {
+				defer.resolve(record);
+			});
+			promise.error(function(error) {
+				defer.reject(error);
+			});
 		}
-		
-		if (saveAction) {
-			return saveAction().then(doSave);
-		}
-		return doSave();
+
+		$scope.ajaxStop(function() {
+			if (saveAction) {
+				return saveAction().then(doSave);
+			}
+			return doSave();
+		});
+		return defer.promise;
 	};
 	
 	$scope.confirmDirty = function(callback) {

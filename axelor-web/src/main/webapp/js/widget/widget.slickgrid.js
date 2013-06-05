@@ -506,6 +506,24 @@ Grid.prototype.parse = function(view) {
 		that.$oldValues = null;
 	});
 	
+	scope.$on("on:before-save", function(e) {
+
+		var lock = grid.getEditorLock();
+		if (lock.isActive()) {
+			lock.commitCurrentEdit();
+		}
+		
+		if (!that.isDirty() || that.saveChanges()) {
+			return;
+		}
+		
+		var args = that.grid.getActiveCell();
+		that.focusInvalidCell(args);
+
+		e.preventDefault();
+		return false;
+	});
+	
 	return grid;
 };
 
