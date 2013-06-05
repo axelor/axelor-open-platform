@@ -343,6 +343,14 @@ var FormInput = {
 				scope.$render_readonly();
 			}
 		};
+
+		// Clear invalid fields (use $setPrestine of angular.js 1.1)
+		scope.$on('on:new', function(e, rec) {
+			if (!model.$valid && model.$viewValue) {
+				model.$viewValue = undefined;
+				model.$render();
+			}
+		});
 	},
 
 	link: function(scope, element, attrs, model) {
