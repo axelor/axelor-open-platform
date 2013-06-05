@@ -406,19 +406,9 @@ function FormViewCtrl($scope, $element) {
 		if (e.defaultPrevented) {
 			return;
 		}
-
-		var record = $scope.record || {};
-		var editable = $scope.isEditable();
-
-		if (record.id && editable) {
-			$scope.confirmDirty(function() {
-				$scope.setEditable(false);
-				$scope.reload();
-			});
-			return;
-		}
-
-		$scope.switchTo("grid");
+		$scope.confirmDirty(function() {
+			$scope.reload();
+		});
 	};
 	
 	var __switchTo = $scope.switchTo;
