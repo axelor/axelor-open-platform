@@ -346,11 +346,16 @@ function FormViewCtrl($scope, $element) {
 			});
 		}
 
-		$scope.ajaxStop(function() {
-			if (saveAction) {
-				return saveAction().then(doSave);
-			}
-			return doSave();
+		$scope.applyLater(function() {
+			$scope.ajaxStop(function() {
+				if (!$scope.canSave()) {
+					return defer.promise;
+				}
+				if (saveAction) {
+					return saveAction().then(doSave);
+				}
+				return doSave();
+			});
 		});
 		return defer.promise;
 	};

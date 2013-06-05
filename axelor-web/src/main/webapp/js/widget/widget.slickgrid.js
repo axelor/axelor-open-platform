@@ -700,8 +700,15 @@ Grid.prototype.onKeyDown = function(e, args) {
 	}
 
 	if (e.which === $.ui.keyCode.ENTER) {
-		if (!this.saveChanges(args)) {
-			this.focusInvalidCell(args);
+		if (e.ctrlKey) {
+			if (!this.saveChanges(args)) {
+				this.focusInvalidCell(args);
+			}
+		} else {
+			if (!lock.commitCurrentEdit()) {
+				this.focusInvalidCell(args);
+			}
+			grid.focus();
 		}
 		grid.focus();
 		handled = true;
