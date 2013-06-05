@@ -124,8 +124,12 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 		};
 		
 		function ajaxStop(callback, context) {
+			var wait = _.last(arguments);
+			if (!wait || !_.isNumber(wait)) {
+				wait = 10;
+			}
 			if (loadingCounter > 0) {
-				return _.delay(ajaxStop, 10, callback, context);
+				return _.delay(ajaxStop, wait, callback, context);
 			}
 			if (callback) {
 				callback.call(context);
