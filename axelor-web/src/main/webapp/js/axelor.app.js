@@ -131,10 +131,29 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 				callback.call(context);
 			}
 		};
+		
+		function applyLater(wait, func) {
+			var that = this,
+				args = _.rest(arguments, _.isFunction(func) ? 2: 1);
+
+			func = func || angular.noop;
+						
+			if (_.isFunction(wait)) {
+				func = wait;
+				wait = 0;
+			}
+
+			return setTimeout(function(){
+		    	return that.$apply(function() {
+		    		return func.apply(null, args);
+		    	});
+		    }, wait);
+		}
 
 		var proto = Object.getPrototypeOf($rootScope);
 		_.extend(proto, {
-			ajaxStop: ajaxStop
+			ajaxStop: ajaxStop,
+			applyLater: applyLater
 		});
 
 		return function(promise) {
