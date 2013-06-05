@@ -7,7 +7,7 @@ var ui = angular.module('axelor.ui');
  */
 ui.formInput('String', {
 	css: 'string-item',
-	template_readonly: '<input type="text" tabindex="-1" readonly="readonly" class="display-text" value="{{text}}">'
+	template_readonly: '<input type="text" ng-show="text" tabindex="-1" readonly="readonly" class="display-text" value="{{text}}">'
 });
 
 /**
@@ -28,7 +28,7 @@ ui.formInput('Email', {
 	},
 	
 	template_editable: '<input type="email">',
-	template_readonly: '<a target="_blank" href="mailto:{{text}}">{{text}}</a>'
+	template_readonly: '<a target="_blank" ng-show="text" href="mailto:{{text}}">{{text}}</a>'
 });
 
 /**
@@ -37,7 +37,7 @@ ui.formInput('Email', {
 ui.formInput('Url', {
 	css: 'url-item',
 	template_editable: '<input type="url">',
-	template_readonly: '<a target="_blank" href="{{text}}">{{text}}</a>'
+	template_readonly: '<a target="_blank" ng-show="text" href="{{text}}">{{text}}</a>'
 });
 
 /**

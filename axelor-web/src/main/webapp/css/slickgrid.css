@@ -115,11 +115,24 @@
 	padding: 0;
 	border-radius: 0;
 	box-sizing: border-box;
-	box-shadow: none;
 	width: 100%;
 	height: 100% !important;
 	min-width: inherit !important;
 	min-height: 23px;
+}
+
+.slick-cell input {
+	padding-left: 2px !important;
+}
+
+.slick-cell textarea {
+	border-radius: 0;
+	margin: 0;
+	outline: 0;
+}
+
+.slick-cell .text-item {
+	height: auto !important;
 }
 
 .slick-cell .picker-input > .picker-icons > i[class^=icon] {

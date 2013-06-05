@@ -216,7 +216,7 @@ ui.formInput('ManyToOne', 'Select', {
 		'</span>'+
 	'</div>',
 	template_readonly:
-	'<a href="" ng-click="onEdit()">{{text}}</a>'
+	'<a href="" ng-show="text" ng-click="onEdit()">{{text}}</a>'
 });
 
 ui.formInput('SuggestBox', 'ManyToOne', {
