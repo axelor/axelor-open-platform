@@ -53,7 +53,7 @@ table.form-layout td.form-item.boolean-item {
 }
 
 table.form-layout td.form-label > label {
-	padding-top: 2px;
+	padding-top: 3px;
 	margin-bottom: 0px;
 	font-weight: bold;
 	cursor: inherit;
@@ -94,8 +94,46 @@ table.form-layout td.form-item.v-align-top {
 }
 
 .form-item-container > span.display-text {
-	padding-top: 2px;
+	padding-top: 4px;
 	padding-bottom: 2px;
+}
+
+.form-item-container input {
+	min-width: 170px;
+	height: 26px;
+	padding: 2px 6px;
+	outline-style: none;
+}
+
+.form-item-container .small-input input,
+.form-item-container input.small-input {
+	min-width: 50px;
+	height: 26px;
+}
+
+.form-item-container input[type="radio"],
+.form-item-container input[type="checkbox"] {
+	width: auto;
+	min-width: inherit;
+	height: inherit;
+	margin-top: 6px !important;
+}
+
+.form-item-container button {
+	padding: 2px 10px 2px;
+	min-width: 26px;
+	height: 26px;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.form-item-container textarea {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+	resize: vertical;
+}
+
+table.form-layout fieldset {
+	padding: 4px 0;
 }
 
 .form-item-container.readonly > a,
@@ -105,7 +143,7 @@ table.form-layout td.form-item.v-align-top {
 }
 
 .form-item-container.readonly > a {
-	line-height: 20px;
+	line-height: 24px;
 	color: #0088cc;
 }
 
@@ -114,69 +152,13 @@ table.form-layout td.form-item.v-align-top {
 	text-overflow: ellipsis;
 	overflow: hidden;
 	border: none;
-	border-radius: none;
+	border-radius: 0;
 	box-shadow: none;
 	background: transparent;
 }
 
 .form-item-container.many2one-item.readonly {
 	padding-top: 1px;
-}
-
-table.form-layout td.form-item input {
-	min-width: 170px;
-	height: 26px;
-	padding: 2px 6px;
-	outline-style: none;
-}
-
-table.form-layout td.form-item .small-input input,
-table.form-layout td.form-item input.small-input {
-	min-width: 50px;
-	height: 26px;
-}
-
-table.form-layout td.form-item input[type="radio"],
-table.form-layout td.form-item input[type="checkbox"] {
-	width: auto;
-	min-width: inherit;
-	height: inherit;
-	margin-top: -5px;
-}
-
-table.form-layout td.form-item.select-item {
-	white-space: inherit;
-}
-
-table.form-layout td.form-item button {
-	padding: 2px 10px 2px;
-	min-width: 26px;
-	height: 26px;
-	overflow: hidden;
-	white-space: nowrap;
-}
-
-table.form-layout td.form-item textarea {
-	font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-	resize: vertical;
-}
-
-table.form-layout fieldset {
-	padding: 4px 0;
-}
-
-table.form-layout td.form-item .input-append input {
-	width: inherit;
-	min-width: 200px;
-	border-radius: 3px;
-}
-
-table.form-layout td.form-item .input-append input:focus {
-	z-index: inherit;
-}
-
-table.form-layout td.form-item .input-append button {
-	padding: 2px 8px;
 }
 
 .picker-input {
@@ -200,7 +182,7 @@ table.form-layout td.form-item .input-append button {
 
 .picker-input > .picker-icons > i[class^=icon] {
 	cursor: pointer;
-	margin-right: 2px;
+	margin-right: 1px;
 	padding: 2px;
 	padding-top: 3px;
 	display: inline-block;
@@ -209,19 +191,19 @@ table.form-layout td.form-item .input-append button {
 
 .picker-input > input,
 .picker-icons-1 > input {
-	padding-right: 18px;
+	padding-right: 18px !important;
 }
 
 .picker-icons-2 > input {
-	padding-right: 36px;
+	padding-right: 36px !important;
 }
 
 .picker-icons-3 > input {
-	padding-right: 54px;
+	padding-right: 54px !important;
 }
 
 .picker-icons-4 > input {
-	padding-right: 72px;
+	padding-right: 72px !important;
 }
 
 table.form-layout .tabbable-tabs .nav-tabs {
