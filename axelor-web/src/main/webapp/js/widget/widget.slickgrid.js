@@ -500,10 +500,12 @@ Grid.prototype.parse = function(view) {
 	
 	scope.$on("on:new", function(e) {
 		that.$oldValues = null;
+		that.clearDirty();
 	});
 	
 	scope.$on("on:edit", function(e) {
 		that.$oldValues = null;
+		that.clearDirty();
 	});
 	
 	scope.$on("on:before-save", function(e) {
@@ -689,16 +691,10 @@ Grid.prototype.onKeyDown = function(e, args) {
 	}
 
 	if (e.which === $.ui.keyCode.ENTER) {
-		if (e.ctrlKey) {
-			if (!this.saveChanges(args)) {
-				this.focusInvalidCell(args);
-			}
-		} else {
-			if (!lock.commitCurrentEdit()) {
-				this.focusInvalidCell(args);
-			}
-			grid.focus();
+		if (!this.saveChanges(args)) {
+			this.focusInvalidCell(args);
 		}
+		grid.focus();
 		handled = true;
 	}
 
