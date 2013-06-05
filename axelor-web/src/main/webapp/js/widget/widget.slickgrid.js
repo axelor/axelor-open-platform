@@ -78,8 +78,17 @@ var Editor = function(args) {
 		if (element.data('keydown.nav') == null) {
 			element.data('keydown.nav', true);
 			element.bind("keydown.nav", function (e) {
-				if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {
+				switch (e.keyCode) {
+				case 37: // LEFT
+				case 39: // RIGHT
 					e.stopImmediatePropagation();
+					break;
+				case 13: // ENTER
+				case 38: // UP
+				case 40: // DOWN
+					if ($(e.srcElement).is('textarea')) {
+						e.stopImmediatePropagation();
+					}
 				}
 			});
 		}
