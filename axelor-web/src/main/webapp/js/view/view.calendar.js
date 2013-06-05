@@ -161,15 +161,19 @@ function CalendarViewCtrl($scope, $element) {
 
 		var diff = moment(info.end).diff(info.start, "minutes");
 		var title = this.fields[view.title];
+		var titleText = _t('Unknown');
 
 		if (title) {
 			value = record[title.name];
 			if (title.targetName) {
 				value = value[title.targetName];
 			}
-			info.title = value;
+			if (value) {
+				titleText = value;
+			}
 		}
-
+		
+		info.title = titleText;
 		info.allDay = diff <= 0 || diff >= (8 * 60);
 		info.className = info.allDay ? "calendar-event-allDay" : "calendar-event-day";
 		
