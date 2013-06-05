@@ -303,7 +303,7 @@ function GridViewCtrl($scope, $element) {
 			return item && item.id !== 0;
 		});
 		$scope.selection = selection;
-		$scope.$apply();
+		$scope.applyLater();
 	};
 	
 	$scope.onItemClick = function(event, args) {
