@@ -31,4 +31,13 @@
     <view type="form" name="permission-form" />
   </action-view>
   
+  <menuitem name="menu-auth-permission-wizards" parent="menu-auth" title="Wizard Permissions"
+    action="action-auth-permission-wizards"/>
+
+  <action-view name="action-auth-permission-wizards" title="Wizard Permissions"
+    model="com.axelor.auth.db.PermissionWizard">
+    <view type="grid" name="permission-wizard-grid" />
+    <view type="form" name="permission-wizard-form" />
+  </action-view>
+  
 </object-views>

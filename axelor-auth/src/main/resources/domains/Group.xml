@@ -10,7 +10,7 @@
   	<string name="name" required="true" unique="true" min="2"/>
     <boolean name="restricted" />
     <string name="navigation" selection="select.user.navigation"/>
-    <many-to-many name="permissions" ref="Permission"/>
+    <many-to-many name="permissions" ref="Permission" />
   </entity>
   
 </domain-models>
