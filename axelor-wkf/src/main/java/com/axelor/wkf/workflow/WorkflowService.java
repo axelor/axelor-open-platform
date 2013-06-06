@@ -223,13 +223,60 @@ public class WorkflowService implements IWorkflow {
 		
 		for ( Transition transition : transitions ){
 			
-			nodes.addAll( playTransition(transition) );
+			if ( transition.getRole() != null ) { nodes.addAll( playTransitionFromRole(transition) ); }
+			else if ( transition.getSignal() != null ) { nodes.addAll( playTransitionFromSignal(transition) ); }
+			else { nodes.addAll( playTransition(transition) ); }
 			
 		}
 		
 		return nodes;
 		
 		
+	}
+	
+	/**
+	 * Play transition.
+	 * 
+	 * @param transition
+	 * 		One transition.
+	 * 
+	 * @return
+	 * 		Set of running nodes.
+	 */
+	protected Set<Node> playTransitionFromRole(Transition transition) {
+		
+		Set<Node> nodes = new HashSet<Node>();
+		
+		if ( transition.getRole().getUsers().contains( user ) ) {
+
+			if ( transition.getSignal() != null ) { nodes.addAll( playTransitionFromSignal(transition) ); }
+			else { nodes.addAll( playTransition(transition) ); }
+			
+		}
+		
+		return nodes;
+	}
+
+	/**
+	 * Play transition.
+	 * 
+	 * @param transition
+	 * 		One transition.
+	 * 
+	 * @return
+	 * 		Set of running nodes.
+	 */
+	protected Set<Node> playTransitionFromSignal(Transition transition) {
+		
+		Set<Node> nodes = new HashSet<Node>();
+		
+		if ( actionHandler.getContext().containsKey("_signal") &&  actionHandler.getContext().get("_signal").equals( transition.getSignal() ) ) {
+			
+			nodes.addAll( playTransition(transition) );
+			
+		}
+
+		return nodes;
 	}
 
 	/**
@@ -247,36 +294,27 @@ public class WorkflowService implements IWorkflow {
 		
 		Set<Node> nodes = new HashSet<Node>();
 		
-		addHistory( instance, transition );
-		
-		if ( actionHandler.getContext().containsKey("_signal") && 
-				( transition.getSignal() != null && !transition.getSignal().trim().equals("") ) && 
-				actionHandler.getContext().get("_signal").equals(transition.getSignal()) ) {
+		if ( transition.getCondition() != null ){
 
-			if ( transition.getCondition() != null ){
+			actionWorkflow.execute( transition.getCondition(), actionHandler );
+			
+			if ( !actionWorkflow.isInError( ) ){
 
-				actionWorkflow.execute( transition.getCondition(), actionHandler );
-				
-				if ( !actionWorkflow.isInError( ) ){
-					
-					addWaitingNodes( transition );
-					nodes.addAll( playNode( transition.getNextNode() ) );
-				}
-				else {
-					nodes.add( transition.getStartNode() );
-				}
+				addHistory( instance, transition );
+				addWaitingNodes( transition );
+				nodes.addAll( playNode( transition.getNextNode() ) );
 				
 			}
 			else {
-				
-				addWaitingNodes( transition );
-				nodes.addAll( playNode( transition.getNextNode() ) );
+
+				nodes.add( transition.getStartNode() );
 				
 			}
 			
 		}
 		else {
-			
+
+			addHistory( instance, transition );
 			addWaitingNodes( transition );
 			nodes.addAll( playNode( transition.getNextNode() ) );
 			
@@ -470,7 +508,6 @@ public class WorkflowService implements IWorkflow {
 		
 		InstanceHistory history = new InstanceHistory();
 		
-		history.setInstance( instance );
 		history.setCreationDate( dateTime );
 		history.setCreationUser( user );
 		history.setTransition( transition );		
@@ -491,12 +528,14 @@ public class WorkflowService implements IWorkflow {
 		InstanceCounter counter = InstanceCounter.all().filter("self.instance = ?1 AND self.node = ?2", instance, node).fetchOne();
 		
 		if (counter != null){
+			
 			counter.setCounter( counter.getCounter() + 1 );
+			
 		}
 		else {
 			
 			counter = new InstanceCounter();
-			counter.setInstance( instance );
+
 			counter.setNode( node );
 			counter.setCounter( 1 );
 			instance.addCounter( counter );

@@ -27,6 +27,15 @@
 	<menuitem name="menu-wkf-configurations" parent="menu-wkf"
 		title="Configurations" icon="img/wrench.png" />
 
+	<menuitem name="menu-wkf-roles" parent="menu-wkf-configurations" title="Roles"
+		action="action-wkf-roles" />
+
+	<action-view name="action-wkf-roles" title="Roles"
+		model="com.axelor.wkf.db.Role">
+		<view type="grid" name="role-grid" />
+		<view type="form" name="role-form" />
+	</action-view>
+
 	<menuitem name="menu-wkf-nodes" parent="menu-wkf-configurations" title="Nodes"
 		action="action-wkf-nodes" />
 
