@@ -84,6 +84,7 @@
     <grid name="transition-grid" title="Transitions" model="com.axelor.wkf.db.Transition">
         <field name="sequence"/>
         <field name="name"/>
+        <field name="role" />
         <field name="signal"/>
         <field name="startNode"/>
         <field name="condition"/>
@@ -95,6 +96,7 @@
         <field name="name"/>
         <field name="startNode" summary-view="node-form" form-view="node-form" edit-window="self"/>
         <field name="nextNode" summary-view="node-form" form-view="node-form" edit-window="self" domain="self.type != 'start'"/>
+        <field name="role" />
         <field name="signal"/>
         <field name="condition" />
         <separator title="Description" colSpan="4"/>
@@ -104,6 +106,8 @@
     <grid name="start-transition-grid" title="Transitions" model="com.axelor.wkf.db.Transition">
         <field name="sequence"/>
         <field name="name"/>
+        <field name="role" />
+        <field name="signal"/>
         <field name="startNode"/>
         <field name="condition"/>
     </grid>
@@ -112,8 +116,9 @@
         <field name="sequence"/>
         <field name="name"/>
         <field name="startNode" summary-view="node-form" form-view="node-form" edit-window="self"/>
-        <field name="signal" colSpan="3"/>
-        <field name="condition" colSpan="3"/>
+        <field name="role" />
+        <field name="signal"/>
+        <field name="condition"/>
         <separator title="Description" colSpan="6"/>
 		<field name="description" colSpan="6" noLabel="true" widget="CodeEditor[syntax=text]"/>        
     </form>
@@ -121,6 +126,8 @@
     <grid name="end-transition-grid" title="Transitions" model="com.axelor.wkf.db.Transition">
         <field name="sequence"/>
         <field name="name"/>
+        <field name="role" />
+        <field name="signal"/>
         <field name="nextNode"/>
         <field name="condition"/>
     </grid>
@@ -129,8 +136,9 @@
         <field name="sequence"/>
         <field name="name"/>
         <field name="nextNode" summary-view="node-form" form-view="node-form" edit-window="self" domain="self.type != 'start'"/>
-        <field name="signal" colSpan="3"/>
-        <field name="condition" colSpan="3"/>
+        <field name="role" />
+        <field name="signal"/>
+        <field name="condition"/>
         <separator title="Description" colSpan="6"/>
 		<field name="description" colSpan="6" noLabel="true" widget="CodeEditor[syntax=text]"/>        
     </form>
