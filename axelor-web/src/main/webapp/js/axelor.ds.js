@@ -177,15 +177,16 @@
 				}
 
 				var result = fieldsCache.get(key);
-				if (result) {
+				if (result && result.fields) {
 					deferred.resolve(angular.copy(result));
 					return promise;
 				}
-
-				$http.post('ws/meta/view/fields', {
-					model: model,
-					fields: findFields(view)
-				}).then(function(response) {
+				if (result && result.then) {
+					result.then(resolver);
+					return promise;
+				}
+				
+				function resolver(response) {
 					var res = response.data,
 						data = res.data;
 
@@ -204,7 +205,17 @@
 					
 					fieldsCache.put(key, angular.copy(result));
 					deferred.resolve(result);
+					
+					return promise;
+				}
+
+				var _promise = $http.post('ws/meta/view/fields', {
+					model: model,
+					fields: findFields(view)
 				});
+				
+				_promise.then(resolver);
+				fieldsCache.put(key, _promise);
 
 				return promise;
 			}
