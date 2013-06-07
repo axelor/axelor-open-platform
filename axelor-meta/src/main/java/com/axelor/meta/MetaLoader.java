@@ -207,7 +207,7 @@ public class MetaLoader {
 
 		// import charts
 		if (view instanceof ChartView) {
-			loadChart((ChartView) view, xml);
+			loadChart((ChartView) view, xml, module);
 			return;
 		}
 		
@@ -228,7 +228,7 @@ public class MetaLoader {
 		entity = entity.save();
 	}
 	
-	private void loadChart(ChartView view, String xml) {
+	private void loadChart(ChartView view, String xml, String module) {
 		String name = view.getName();
 		if (MetaChart.all().filter("self.name = ?1", name).count() > 0) {
 			return;
@@ -237,6 +237,7 @@ public class MetaLoader {
 		MetaChart chart = new MetaChart();
 		
 		chart.setName(view.getName());
+		chart.setModule(module);
 		chart.setTitle(view.getDefaultTitle());
 		chart.setStacked(view.getStacked());
 		

@@ -299,6 +299,7 @@
     <field name="name" />
     <field name="title" />
     <field name="stacked" />
+    <field name="module" />
   </grid>
   
   <form title="Chart" name="meta-chart-form" model="com.axelor.meta.db.MetaChart" cols="6">
@@ -309,6 +310,8 @@
     <field name="categoryKey" />
     <field name="categoryType" selection="selection.chart.xtype"/>
     <field name="categoryTitle"/>
+    
+    <field name="module" />
     <break/>
 
     <notebook colSpan="6">

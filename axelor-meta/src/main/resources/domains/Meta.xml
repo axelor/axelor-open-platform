@@ -149,6 +149,7 @@
 
   <entity name="MetaChart" table="META_CHART">
     <string name="name" required="true" unique="true"/>
+    <string name="module"/>
     <string name="title" />
     <boolean name="stacked" />
     <string name="query" large="true" multiline="true" required="true"/>
@@ -157,6 +158,7 @@
     <string name="categoryType" />
     <string name="categoryTitle" />
     <one-to-many name="chartSeries" ref="MetaChartSeries" />
+	<finder-method name="findByModule" using="module" all="true"/>
   </entity>
 
 </domain-models>
