@@ -186,6 +186,7 @@ function FormViewCtrl($scope, $element) {
 			item = _.extend({}, item, {
 				selected : _.contains(selected, item.id)
 			});
+			if (item.id <= 0) item.id = null;
 			result.push(item);
 		});
 		
