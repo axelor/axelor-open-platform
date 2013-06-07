@@ -106,6 +106,7 @@ ui.formInput('Binary', {
 	
 	link_editable: function(scope, element, attrs, model) {
 		
+		var field = scope.field;
 		var input = element.children('input:first').hide();
 		var frame = element.children("iframe").hide();
 
@@ -115,9 +116,9 @@ ui.formInput('Binary', {
 		
 		scope.doSave = function() {
 			var record = scope.record,
-				model = scope._model,
-				field = element.attr('x-field');
-			var url = "ws/rest/" + model + "/" + record.id + "/" + field + "/download";
+				model = scope._model;
+			
+			var url = "ws/rest/" + model + "/" + record.id + "/" + field.name + "/download";
 			frame.attr("src", url);
 			setTimeout(function(){
 				frame.attr("src", "");
@@ -136,7 +137,7 @@ ui.formInput('Binary', {
 			var record = scope.record;
 			if (file) {
 				record.$upload = {
-					field: element.attr('x-field'),
+					field: field.name,
 					file: file
 				};
 				//Update file and mine just in case of new record
