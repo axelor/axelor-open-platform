@@ -20,7 +20,7 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 		if (!$scope.isDirty()) {
 			var app = $scope.app || {};
 			var rec = $scope.record || {};
-			var act = rec.action;
+			var act = rec.action || {};
 	
 			if (app.homeAction !== act.name) {
 				app.homeAction = act.name;
