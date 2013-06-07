@@ -131,6 +131,42 @@
 				return angular.equals(compact(a), compact(b));
 			},
 			
+			rpc: function(method, options) {
+				
+				var opts = _.extend({
+					
+				}, options);
+
+				var domain = opts.domain === undefined ? this._domain : opts.domain;
+				var context = opts.context === undefined ? this._lastContext : opts.context;
+				var sortBy = opts.sortBy || this._sortBy;
+				
+				var params = {
+					_domain: domain,
+					_domainContext: context
+				};
+				
+				var promise = $http.post('ws/action/' + method, {
+					model : this._model,
+					sortBy: sortBy,
+					data : params
+				});
+				
+				promise.success = function(fn){
+					promise.then(function(response){
+						fn(response.data);
+					});
+					return promise;
+				};
+				
+				promise.error = function(fn){
+					promise.then(null, fn);
+					return promise;
+				};
+				
+				return promise;
+			},
+			
 			search: function(options) {
 				
 				var opts = _.extend({
