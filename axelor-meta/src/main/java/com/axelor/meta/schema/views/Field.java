@@ -14,6 +14,7 @@ import com.axelor.meta.db.MetaSelectItem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
@@ -94,6 +95,9 @@ public class Field extends SimpleWidget {
 	
 	@Override
 	public String getTitle() {
+		if(!Strings.isNullOrEmpty(super.getDefaultTitle())) {
+			return JPA.translate(super.getDefaultTitle(), super.getDefaultTitle(), this.getModel(), "field");
+		}
 		return JPA.translate(this.getName(), super.getDefaultTitle(), this.getModel(), "field");
 	}
 	
