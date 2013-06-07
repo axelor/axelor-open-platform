@@ -162,7 +162,8 @@ var Editor = function(args) {
 		
 		// force change event on spinner widget
 		element.find('.ui-spinner-input').trigger('spinchange');
-
+		element.find('.ui-mask').trigger('blur');
+		
 		var record = scope.record || {},
 			current = args.item || { id: 0 };
 		
