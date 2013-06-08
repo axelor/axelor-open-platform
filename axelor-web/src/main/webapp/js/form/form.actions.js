@@ -304,14 +304,17 @@ ActionHandler.prototype = {
 		}
 
 		var scope = this.scope,
+			formScope = scope,
 			formElement = this.element.parents('form:first');
 
-		if (!formElement.get(0)) { // toobar button
+		if (!formElement.get(0)) { // toolbar button
 			formElement = this.element.parents('.form-view:first').find('form:first');
 		}
 		
-		if (formElement.length == 0)
+		if (formElement.length == 0) {
 			formElement = this.element;
+		}
+		formScope = formElement.data('$scope') || scope;
 
 		if(data.flash) {
 			//TODO: show embedded message instead
@@ -369,6 +372,10 @@ ActionHandler.prototype = {
 				deferred.resolve(true, data.pending);
 			});
 			return deferred.promise;
+		}
+		
+		if (data.signal) {
+			formScope.$broadcast(data.signal, data['signal-data']);
 		}
 
 		function findItems(name) {
