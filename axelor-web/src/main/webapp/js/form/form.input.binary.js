@@ -8,6 +8,13 @@ ui.formInput('Image', {
 	cellCss: 'form-item image-item',
 	
 	BLANK: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+	
+	init: function(scope) {
+		var field = scope.field;
+		
+		scope.width = field.width || 140;
+		scope.height = field.height || 140;
+	},
 
 	link_editable: function(scope, element, attrs, model) {
 		
@@ -83,9 +90,9 @@ ui.formInput('Image', {
 		};
 	},
 	template_editable:
-	'<div style="min-width: 140px;">' +
+	'<div style="min-width: {{width}}px;">' +
 		'<input type="file" accept="image/*">' +
-		'<img class="img-polaroid" style="width: 140px; height: 140px; display: inline-block;">' +
+		'<img class="img-polaroid" style="width: {{width}}px; height: {{height}}px; display: inline-block;">' +
 		'<div class="btn-group">' +
 			'<button ng-click="doSelect()" class="btn" type="button"><i class="icon-upload-alt"></i></button>' +
 			'<button ng-click="doSave()" class="btn" type="button"><i class="icon-download-alt"></i></button>' +
@@ -94,8 +101,8 @@ ui.formInput('Image', {
 	'</div>',
 	
 	template_readonly:
-	'<div style="min-width: 140px;">'+
-		'<img class="img-polaroid" style="width: 140px; height: 140px;">'+
+	'<div style="min-width: {{width}}px;">'+
+		'<img class="img-polaroid" style="width: {{width}}px; height: {{height}}px;">'+
 	'</div>'
 });
 
