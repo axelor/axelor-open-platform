@@ -14,6 +14,12 @@ public class Button extends SimpleWidget {
 	private String icon;
 	
 	@XmlAttribute
+	private String iconHover;
+	
+	@XmlAttribute
+	private String link;
+	
+	@XmlAttribute
 	private String prompt;
 	
 	@XmlAttribute
@@ -21,6 +27,14 @@ public class Button extends SimpleWidget {
 	
 	public String getIcon() {
 		return icon;
+	}
+	
+	public String getIconHover() {
+		return iconHover;
+	}
+	
+	public String getLink() {
+		return link;
 	}
 
 	public String getDefaultPrompt() {
