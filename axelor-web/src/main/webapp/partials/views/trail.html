@@ -11,5 +11,8 @@
 	<div ng-show="canCreate()" class="trail-editor">
 		<div ui-trail-editor class="trail-form"></div>
 	</div>
-	<div ui-trail-form ng-repeat="item in records" class="trail-form" ng-class="{'trail-child': record.parent}"></div>
+	<div ng-repeat="item in records" class="trail-form-container">
+		<div ui-trail-form></div>
+		<div ui-trail-form class="trail-child" ng-repeat="item in item.$children"></div>
+	</div>
 </div>
