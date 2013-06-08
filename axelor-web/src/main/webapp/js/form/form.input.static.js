@@ -189,17 +189,42 @@ ui.formItem('Button', {
 	css: 'button-item',
 	transclude: true,
 	link: function(scope, element, attrs, model) {
-
-		scope.icon = scope.field && scope.field.icon;
+		var field = scope.field || {};
 		
+		var icon = field.icon || "";
+		var iconHover = field.iconHover || "";
+		
+		var isIcon = icon.indexOf('icon-') === 0;
+
+		if (isIcon) {
+			var e = $('<i>').addClass(icon).prependTo(element);
+			if (iconHover) {
+				e.hover(function() {
+					$(this).removeClass(icon).addClass(iconHover);
+				}, function() {
+					$(this).removeClass(iconHover).addClass(icon);
+				});
+			}
+		} else if (icon) {
+			$('<img>').attr('src', icon).prependTo(element);
+		}
+
+		if (!field.title) {
+			element.addClass("icon-only");
+		}
+		
+		if (_.isString(field.link)) {
+			element.removeClass('btn');
+			element.attr("href", field.link);
+		}
+
 		element.on("click", function(e) {
 			scope.fireAction("onClick");
 		});
 	},
-	template: '<button class="btn" type="button">'+
-		'<img class="prefix-icon" ng-show="icon" ng-src="{{icon}}">'+
+	template: '<a href="" class="btn">'+
 		'<span ng-transclude></span>'+
-	'</button>'
+	'</a>'
 });
 
 })(this);
