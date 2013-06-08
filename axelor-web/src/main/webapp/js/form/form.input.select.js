@@ -248,6 +248,16 @@ ui.formInput('MultiSelect', 'Select', {
 		scope.getSelection = function() {
 			return this.items;
 		};
+		
+		var max = +(scope.field.max);
+		scope.limited = function(items) {
+			if (max && items && items.length > max) {
+				scope.more = _t("and {0} more", items.length - max);
+				return _.first(items, max);
+			}
+			scope.more = null;
+			return items;
+		};
 	},
 
 	link_editable: function(scope, element, attrs, model) {
@@ -370,9 +380,10 @@ ui.formInput('MultiSelect', 'Select', {
 	'</div>',
 	template_readonly:
 	'<div class="tag-select">'+
-		'<span class="label label-info" ng-repeat="item in items">'+
+		'<span class="label label-info" ng-repeat="item in limited(items)">'+
 			'<span ng-class="{\'tag-link\': handleClick}" class="tag-text" ng-click="handleClick($event, item.value)">{{item.title}}</span>'+
 		'</span>'+
+		'<span ng-show="more"> {{more}}</span>'+
 	'</div>'
 });
 
