@@ -21,14 +21,16 @@ ui.formWidget('Form', {
 			
 			var elem = $(this),
 				name = elem.attr('x-field') || elem.attr('data-field');
-
-			if (name && !elem.attr('ng-model')) {
-				elem.attr('ng-model', 'record.' + name);
-			}
-			if (name && !elem.attr('ng-required')) {
-				// always attache a required validator to make
-				// dynamic `required` attribute change effective
-				elem.attr('ng-required', false);
+				
+			if (name && elem.attr('ui-button') === undefined) {
+				if (!elem.attr('ng-model')) {
+					elem.attr('ng-model', 'record.' + name);
+				}
+				if (!elem.attr('ng-required')) {
+					// always attache a required validator to make
+					// dynamic `required` attribute change effective
+					elem.attr('ng-required', false);
+				}
 			}
 			
 			elem.attr('ui-actions', '');
