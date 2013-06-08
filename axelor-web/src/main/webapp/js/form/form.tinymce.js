@@ -118,7 +118,7 @@ ui.formInput('Html', {
 			});
 		}
 		
-		setTimeout(function(){
+		scope.ajaxStop(function(){
 			tinymce.init(options);
 		});
 	},
