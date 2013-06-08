@@ -335,4 +335,22 @@ ui.formInput('Time', 'DateTime', {
 	template_editable: '<input type="text">'
 });
 
+ui.formInput('RelativeTime', 'DateTime', {
+	
+	init: function(scope) {
+		this._super(scope);
+		
+		scope.isReadonly = function() {
+			return true;
+		};
+		
+		scope.format = function(value) {
+			if (value) {
+				return moment(value).fromNow();
+			}
+			return "";
+		};
+	}
+});
+
 })(this);

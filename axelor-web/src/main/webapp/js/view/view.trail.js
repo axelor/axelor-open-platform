@@ -11,7 +11,7 @@ function FormListCtrl($scope, $element, $compile, DataSource, ViewService) {
 
 	$scope._viewParams.$viewScope = $scope;
 	
-	var view = $scope._views['form'];
+	var view = $scope._views['trail'];
 	setTimeout(function(){
 		$scope.$apply(function(){
 			if (view.deferred)
@@ -20,12 +20,13 @@ function FormListCtrl($scope, $element, $compile, DataSource, ViewService) {
 	});
 	
 	var ds = $scope._dataSource;
+	var dsChild = DataSource.create(ds._model, {
+		
+	});
+	
 	var params = $scope._viewParams.params || {};
 	var sortBy = params['trail-order'] && params['trail-order'].split(/\s*,\s*/);
-
-	ds.on('change', function(e, records, page){
-		$scope.records = records;
-	});
+	var childField = params['trail-child-field'] || 'children';
 
 	$scope.onShow = function(viewPromise) {
 		viewPromise.then(function() {
@@ -45,8 +46,17 @@ function FormListCtrl($scope, $element, $compile, DataSource, ViewService) {
 		$scope.updateRoute();
 	};
 	
+	$scope.canCreate = function() {
+		return this._canCreate;
+	};
+	
+	$scope.canExpand = function(item) {
+		return !item.$expanded && hasChildren(item);
+	};
+
 	$scope.onNew = function() {
 		this._canCreate = true;
+		$scope.$broadcast("trail:on-new");
 	};
 	
 	$scope.onCancel = function() {
@@ -55,14 +65,71 @@ function FormListCtrl($scope, $element, $compile, DataSource, ViewService) {
 	
 	$scope.onReload = function() {
 		this._canCreate = false;
-		ds.search({
+		return ds.search({
 			sortBy: sortBy
 		}).success(function(records, page) {
+			$scope.records = records;
 		});
 	};
 	
-	$scope.canCreate = function() {
-		return this._canCreate;
+	function hasChildren(item) {
+		return !_.isEmpty(item[childField]);
+	}
+	
+	function findChildren(item) {
+		var items = item[childField];
+		return items;
+	}
+	
+	$scope.onExpand = function(item) {
+		
+		var record = _.isNumber(item) ? _.find($scope.records, function(rec) { return item === rec.id; }) : item;
+		var current = record.$children || [];
+		var children = findChildren(record);
+		
+		var ids = _.pluck(children, 'id');
+		var criterion = {
+			'fieldName': 'id',
+			'operator': 'inSet',
+			'value': ids
+		};
+
+		var filter = {
+			operator: 'and',
+			criteria: [criterion]
+		};
+
+		return dsChild.search({
+			filter: filter,
+			archived: true,
+			limit: -1
+		}).success(function(records, page) {
+			current = current.concat(records);
+			record.$children = current;
+			record.$expanded = true;
+		});
+	};
+
+	$scope.onRecord = function(record) {
+		this._canCreate = false;
+		var found = _.find($scope.records, function(item) {
+			return item.id == record.id;
+		});
+		
+		if (found) {
+			return _.extend(found, record);
+		}
+		
+		if (!record.parent) {
+			return $scope.records.unshift(record);
+		}
+
+		var parent = _.find($scope.records, function(item) {
+			return item.id == record.parent.id;
+		});
+
+		parent.$children = parent.$children || [];
+		parent.$children.push(record);
 	};
 	
 	$scope.show();
@@ -110,7 +177,8 @@ function TrailFormCtrl($scope, $element, DataSource, ViewService) {
 	});
 
 	$scope._viewParams = params;
-
+	$scope._childField = (params.params || {})['trail-child-field'];
+	
 	ViewCtrl.call(this, $scope, DataSource, ViewService);
 	FormViewCtrl.call(this, $scope, $element);
 	
@@ -126,9 +194,12 @@ function TrailFormCtrl($scope, $element, DataSource, ViewService) {
 	};
 	
 	$scope.onShow = function(viewPromise) {
-		
 		viewPromise.then(function() {
-			$scope.edit($scope.$parent.item);
+			var record = $scope.$parent.item;
+			if (record) {
+				record.__expandable = $scope.$parent.canExpand(record);
+			}
+			$scope.edit(record);
 		});
 	};
 	
@@ -139,6 +210,22 @@ function TrailFormCtrl($scope, $element, DataSource, ViewService) {
 		}
 	});
 	
+	$scope.$on("trail:record", function(e, record) {
+		var parent = $scope.$parent || {};
+		if (parent.onRecord) {
+			parent.onRecord(record);
+		}
+	});
+
+	$scope.$on("trail:expand", function(e, id) {
+		var parent = $scope.$parent || {};
+		if (parent.onExpand) {
+			parent.onExpand(id).then(function() {
+				$scope.record.__expandable = false;
+			});
+		}
+	});
+
 	$scope.show();
 }
 
@@ -172,6 +259,10 @@ function TrailEditorCtrl($scope, $element, DataSource, ViewService) {
 		$scope._editForm = params.params['trail-edit-form'];
 	}
 	
+	$scope.$on("trail:on-new", function(e) {
+		$scope.edit(null);
+	});
+	
 	TrailFormCtrl.apply(this, arguments);
 }
 
@@ -184,7 +275,7 @@ ui.directive("uiTrailEditor", function() {
 			trailWidth(scope, element);
 		},
 		template:
-		'<div ui-trail-form x-handler="this" class="trail-editor"></div>'
+		'<div ui-view-form x-handler="this" class="trail-editor"></div>'
 	};
 });
 

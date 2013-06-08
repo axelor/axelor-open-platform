@@ -14,6 +14,11 @@
 	margin-bottom: 4px;
 }
 
+.trail-form.trail-child {
+	margin-right: 8px;
+}
+
+.trail-form.trail-child,
 .trail-form .trail-form {
 	background-color: #fff;
 }
@@ -25,4 +30,23 @@
 .trail-form .trail-form.trail-editor {
 	padding-top: 4px;
 	background-color: #eee;
+}
+
+.trail-form-footer * {
+	min-width: auto !important;
+	width: auto !important;
+}
+
+.trail-form-footer table.form-layout {
+	width: 100% !important;
+}
+
+.trail-form-footer label,
+.trail-form-footer td > * {
+	line-height: 26px;
+}
+.trail-form-footer,
+.trail-form-footer fieldset,
+.trail-form-footer span.display-text {
+	padding: 0 !important;
 }
