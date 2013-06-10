@@ -571,6 +571,7 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 				val.$version = ver;
 				return val;
 			});
+			items = _.isEmpty(items) ? null : items;
 			return _setValue.call(this, items, fireOnChange);
 		};
 		
