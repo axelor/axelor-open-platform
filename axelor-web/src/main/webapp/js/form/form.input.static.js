@@ -219,7 +219,17 @@ ui.formItem('Button', {
 		}
 
 		element.on("click", function(e) {
-			scope.fireAction("onClick");
+			if (!scope.attr('readonly')) {
+				scope.fireAction("onClick");
+			}
+		});
+		
+		scope.$watch('attr("readonly")', function(readonly, old) {
+			if (readonly === old) return;
+			if (readonly) {
+				return element.addClass("disabled");
+			}
+			return element.removeClass("disabled");
 		});
 	},
 	template: '<a href="" class="btn">'+
