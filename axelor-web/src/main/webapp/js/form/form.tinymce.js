@@ -56,7 +56,8 @@ ui.formInput('Html', {
 			setup: function(editor) {
 				
 				var elemHtml = element.children('div.html-display-text');
-				
+				var rendering = false;
+
 				function showWidget(readonly) {
 					if (readonly) {
 						editor.hide();
@@ -77,6 +78,7 @@ ui.formInput('Html', {
 					if (value === html) {
 						return;
 					}
+					rendering = true;
 					editor.setContent(value);
 				}
 
@@ -87,7 +89,9 @@ ui.formInput('Html', {
 				});
 
 				editor.on('change', function (e) {
-					if (editor.isDirty()) {
+					if (rendering) {
+						rendering = false;
+					} else if (editor.isDirty()) {
 						editor.save();
 						update(editor.getContent());
 					}
