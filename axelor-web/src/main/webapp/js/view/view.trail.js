@@ -26,13 +26,22 @@ function FormListCtrl($scope, $element, $compile, DataSource, ViewService) {
 	
 	var params = $scope._viewParams.params || {};
 	var sortBy = params['trail-order'] && params['trail-order'].split(/\s*,\s*/);
-	var childField = params['trail-child-field'] || 'children';
+	
+	var parentField = params['trail-parent-field'] || 'parent';
+	var childrenField = params['trail-children-field'] || 'children';
 
+	var initialized = false;
+	
 	$scope.onShow = function(viewPromise) {
+		if (initialized) {
+			return;
+		}
+		initialized = true;
 		viewPromise.then(function() {
 			$scope.updateRoute();
-			if ($scope.records === undefined)
+			if ($scope.records === undefined) {
 				$scope.onReload();
+			}
 		});
 	};
 
@@ -73,12 +82,19 @@ function FormListCtrl($scope, $element, $compile, DataSource, ViewService) {
 	};
 	
 	function hasChildren(item) {
-		return !_.isEmpty(item[childField]);
+		return !_.isEmpty(findChildren(item));
 	}
 	
+	function hasParent(item) {
+		return !_.isEmpty(findParent(item));
+	}
+
 	function findChildren(item) {
-		var items = item[childField];
-		return items;
+		return item[childrenField];
+	}
+	
+	function findParent(item) {
+		return item[parentField];
 	}
 	
 	$scope.onExpand = function(item) {
@@ -120,12 +136,14 @@ function FormListCtrl($scope, $element, $compile, DataSource, ViewService) {
 			return _.extend(found, record);
 		}
 		
-		if (!record.parent) {
+		if (!hasParent(record)) {
 			return $scope.records.unshift(record);
 		}
 
-		var parent = _.find($scope.records, function(item) {
-			return item.id == record.parent.id;
+		var parent = findParent(record);
+
+		parent = _.find($scope.records, function(item) {
+			return item.id == parent.id;
 		});
 
 		parent.$children = parent.$children || [];
@@ -177,7 +195,6 @@ function TrailFormCtrl($scope, $element, DataSource, ViewService) {
 	});
 
 	$scope._viewParams = params;
-	$scope._childField = (params.params || {})['trail-child-field'];
 	
 	ViewCtrl.call(this, $scope, DataSource, ViewService);
 	FormViewCtrl.call(this, $scope, $element);
@@ -186,7 +203,12 @@ function TrailFormCtrl($scope, $element, DataSource, ViewService) {
 	$scope.setEditable(true);
 	
 	$scope.updateRoute = function(options) {
-		
+	};
+	
+	$scope.getRouteOptions = function() {
+	};
+
+	$scope.setRouteOptions = function(options) {
 	};
 	
 	$scope.confirmDirty = function(fn) {

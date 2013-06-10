@@ -15,7 +15,7 @@
 }
 
 .trail-form.trail-child {
-	margin-right: 8px;
+	margin-left: 12px;
 }
 
 .trail-form.trail-child,
@@ -32,7 +32,7 @@
 	background-color: #eee;
 }
 
-.trail-form-footer * {
+.trail-form-footer td.form-item * {
 	min-width: auto !important;
 	width: auto !important;
 }
