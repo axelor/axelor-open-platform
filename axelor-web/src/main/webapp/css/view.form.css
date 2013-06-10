@@ -102,6 +102,12 @@ table.form-layout td.form-item.v-align-top {
 	min-width: 170px;
 	height: 26px;
 	padding: 2px 6px;
+}
+
+.form-item-container input,
+.form-item-container input:focus,
+.form-item-container textarea,
+.form-item-container textarea:focus {
 	outline-style: none;
 }
 
@@ -284,6 +290,10 @@ td.form-item > * {
 }
 
 .form-item .form-item-group {
+	padding: 0;
+}
+
+.form-item .form-item-group.bordered-box {
 	padding: 4px;
 	padding-top: 0;
 }
