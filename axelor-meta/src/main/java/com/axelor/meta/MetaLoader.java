@@ -235,7 +235,6 @@ public class MetaLoader {
 		}
 
 		MetaChart chart = new MetaChart();
-		
 		chart.setName(view.getName());
 		chart.setModule(module);
 		chart.setTitle(view.getDefaultTitle());
@@ -609,7 +608,7 @@ public class MetaLoader {
 		}
 		log.info("Load translations...");
 		try {
-			translationsService.process();
+			translationsService.process(moduleResolver);
 		} catch (Exception e) {
 			log.error("Error loading translations.", e);
 		}
@@ -701,13 +700,13 @@ public class MetaLoader {
 		}
 		
 		loadModels();
-		loadTranslations();
 		
 		try {
 			loadViews();
 		} catch (Exception e){}
 		
 		loadDefault(outputPath);
+		loadTranslations();
 	}
 	
 	public void loadModule(MetaModule module) {
