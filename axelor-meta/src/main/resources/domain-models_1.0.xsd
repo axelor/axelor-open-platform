@@ -647,7 +647,7 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="indexes" type="xsd:boolean">
+    <xsd:attribute name="indexes">
       <xsd:annotation>
         <xsd:documentation>
         Specifies indexes on multiple columns.
