@@ -1,46 +1,105 @@
-"key","translation","domain"
-"workflow","Workflow",
-"metaModelId","Id modèle",
-"nodes","Noeuds",
-"waitingNodes","Noeuds attente",
-"executedNodes","Noeuds exécutés",
-"creationDate","Date de création",
-"creationUser","Utilisateur",
-"histories","Historique",
-"counters","Compteurs",
-"instance","Instance",
-"transition","Transition",
-"node","Noeud",
-"counter","Compteur",
-"transitions","Transitions",
-"maxNodeCounter","Nombre maximun de noeud",
-"logicOperator","Opérateur logique de démarrage",
-"startTransitions","Transition de démarrage",
-"endTransitions","Transition de fin",
-"startNode","Noeud départ",
-"nextNode","Noeud suivant",
-"condition","Condition",
-"sequence","Séquence",
-"Wkf Management","Gestion des workflows",
-"Workflows","Workflows",
-"Instances","Instances",
-"Oryx","Oryx",
-"Configurations","Configurations",
-"Nodes","Noeuds",
-"Transitions","Transitions",
-"History","Historique",
-"Counter","Compteur",
-"Histories","Historique",
-"Counters","Compteurs",
-"Start","Démarrage",
-"Intermediary","Intermédiare",
-"Stop","Arrêt",
-"Gateway","Pont",
-"Workflow","Workflow",
-"Run","Lancer",
-"Show instances","Voir les instances",
-"Node","Noeud",
-"Transition","Transition",
-"Can't save workflow without start node","Vous ne pouvez pas sauvegarder le workflow sans noeud de début.",
-"workflow.metaModel","Modèle",
-"Editor","Editeur",
+"domain","name","type","title","title_t"
+"menu-wkf","Wkf Management","menu","Wkf Management","Gestion des processus"
+"menu-wkf-configurations","Configurations","menu","Configurations","Configurations"
+"menu-wkf-instances","Instances","menu","Instances","Instances"
+"menu-wkf-nodes","Nodes","menu","Nodes","Nœuds"
+"menu-wkf-roles","Roles","menu","Roles","Les Roles"
+"menu-wkf-transitions","Transitions","menu","Transitions","Transitions"
+"menu-wkf-workflows","Workflows","menu","Workflows","Les Processus"
+"com.axelor.wkf.db.Instance","workflow","field","Workflow","Processus"
+"com.axelor.wkf.db.Instance","metaModelId","field","Model ID","Modèle ID"
+"com.axelor.wkf.db.Instance","nodes","field","Nodes","Les Noeuds"
+"com.axelor.wkf.db.Instance","waitingNodes","field",,"Les Noeuds en attentes"
+"com.axelor.wkf.db.Instance","executedNodes","field","Executed nodes","Les Noeuds exécutés"
+"com.axelor.wkf.db.Instance","creationDate","field","Creation date","Date de création"
+"com.axelor.wkf.db.Instance","creationUser","field","User","Utilisateur"
+"com.axelor.wkf.db.Instance","histories","field","Histories","Historique"
+"com.axelor.wkf.db.Instance","counters","field","Counters","Compteurs"
+"com.axelor.wkf.db.InstanceHistory","instance","field",,"Instance"
+"com.axelor.wkf.db.InstanceHistory","transition","field","Transition","Transition"
+"com.axelor.wkf.db.InstanceHistory","creationDate","field","Création date","Date de création"
+"com.axelor.wkf.db.InstanceHistory","creationUser","field","User","Utilisateur"
+"com.axelor.wkf.db.InstanceCounter","instance","field",,"Instance"
+"com.axelor.wkf.db.InstanceCounter","node","field","Node","Noeud"
+"com.axelor.wkf.db.InstanceCounter","counter","field","Counter","Compteur"
+"com.axelor.wkf.db.WaitingNode","instance","field",,"Instance"
+"com.axelor.wkf.db.WaitingNode","node","field","Node","Noeud"
+"com.axelor.wkf.db.WaitingNode","transitions","field","Transitions","Transitions"
+"com.axelor.wkf.db.Role","name","field",,"Nom"
+"com.axelor.wkf.db.Role","description","field",,"Description"
+"com.axelor.wkf.db.Role","users","field",,"Utilisateur"
+"com.axelor.wkf.db.Workflow","name","field",,"Nom"
+"com.axelor.wkf.db.Workflow","metaModel","field",,"Model"
+"com.axelor.wkf.db.Workflow","node","field",,"Noeud"
+"com.axelor.wkf.db.Workflow","maxNodeCounter","field",,"Nombre de noeuds maximun"
+"com.axelor.wkf.db.Workflow","condition","field","Condition","Condition"
+"com.axelor.wkf.db.Workflow","sequence","field",,"Sequence"
+"com.axelor.wkf.db.Workflow","description","field",,"Description"
+"com.axelor.wkf.db.Workflow","active","field",,"Active ?"
+"com.axelor.wkf.db.Workflow","bpmn","field",,"BPMN"
+"com.axelor.wkf.db.Workflow","xmlData","field",,"Données XML"
+"com.axelor.wkf.db.Workflow","ref","field",,"Ref"
+"com.axelor.wkf.db.Node","name","field","Name","Nom"
+"com.axelor.wkf.db.Node","type","field","Type","Type"
+"com.axelor.wkf.db.Node","action","field","Action","Action"
+"com.axelor.wkf.db.Node","logicOperator","field","Start Logic Operator","Opérateur Logique de Départ"
+"com.axelor.wkf.db.Node","startTransitions","field",,"Transition de départ"
+"com.axelor.wkf.db.Node","endTransitions","field",,"Transition de fin"
+"com.axelor.wkf.db.Node","description","field",,"Description"
+"com.axelor.wkf.db.Node","ref","field",,"Ref"
+"com.axelor.wkf.db.Transition","startNode","field",,"Noeud de départ"
+"com.axelor.wkf.db.Transition","nextNode","field",,"Prochain noeud"
+"com.axelor.wkf.db.Transition","name","field","Name","Nom"
+"com.axelor.wkf.db.Transition","condition","field",,"Condition"
+"com.axelor.wkf.db.Transition","sequence","field",,"Séquence"
+"com.axelor.wkf.db.Transition","description","field",,"Description"
+"com.axelor.wkf.db.Transition","signal","field",,"Signal"
+"com.axelor.wkf.db.Transition","role","field",,"Role"
+"com.axelor.wkf.db.Transition","ref","field",,"Ref"
+"node.logic.operator.selection",,"select",,
+"node.logic.operator.selection","and","select","AND","ET"
+"node.logic.operator.selection","or","select","OR","OU"
+"node.logic.operator.selection","xor","select","XOR","XOR"
+"node.type.selection","start","select","Start","Démarrer"
+"node.type.selection","intermediary","select","Intermediary","Intermédiaire"
+"node.type.selection","stop","select","Stop","Arrêt"
+"node.type.selection","gateway","select","Gateway","Gateway"
+"com.axelor.wkf.db.Transition","end-transition-form","form","Transition","Transition"
+"end-transition-form",,"separator","Description","Description"
+"com.axelor.wkf.db.Transition","end-transition-grid","grid","Transitions","Transitions"
+"com.axelor.wkf.db.InstanceCounter","instance-counter-form","form","Counter","Compteur"
+"com.axelor.wkf.db.InstanceCounter","instance-counter-grid","grid","Counters","Compteurs"
+"com.axelor.wkf.db.Instance","instance-form","form","Instances","Instances"
+"instance-form",,"page","History","Historique"
+"instance-form",,"page","Counter","Compteur"
+"com.axelor.wkf.db.Instance","instance-grid","grid","Instances","Instances"
+"com.axelor.wkf.db.InstanceHistory","instance-history-form","form","History","Historique"
+"com.axelor.wkf.db.InstanceHistory","instance-history-grid","grid","Histories","Historiques"
+"com.axelor.wkf.db.Node","node-form","form","Node","Nœud"
+"node-form",,"separator","Description","Description"
+"com.axelor.wkf.db.Node","node-grid","grid","Nodes","Nœuds"
+"com.axelor.wkf.db.Role","role-form","form","Role","Role"
+"role-form",,"separator","Description","Description"
+"com.axelor.wkf.db.Role","role-grid","grid","Roles","Les Roles"
+"com.axelor.wkf.db.Transition","start-transition-form","form","Transition","Transition"
+"start-transition-form",,"separator","Description","Description"
+"com.axelor.wkf.db.Transition","start-transition-grid","grid","Transitions","Transitions"
+"com.axelor.wkf.db.Transition","transition-form","form","Transition","Transition"
+"transition-form",,"separator","Description","Description"
+"com.axelor.wkf.db.Transition","transition-grid","grid","Transitions","Transitions"
+"com.axelor.wkf.db.WaitingNode","waiting-node-form","form","Waiting node","nœud d'attente"
+"com.axelor.wkf.db.WaitingNode","waiting-node-grid","grid","Waiting nodes","nœuds d'attente"
+"workflow-form","openEditor","button","Editor","Éditeur"
+"workflow-form","openInstances","button","Instances","Instances"
+"com.axelor.wkf.db.Workflow","workflow-form","form","Workflow","Processus"
+"workflow-form",,"page","Description","Description"
+"workflow-form",,"page","BPMN","BPMN"
+"workflow-form","importWorkflow","button","Import","Import"
+"workflow-form",,"page","XML","XML"
+"com.axelor.wkf.db.Workflow","workflow-grid","grid","Workflows","Les Processus"
+"action-wkf-instances","action-wkf-instances","action","Instances","Instances"
+"action-wkf-nodes","action-wkf-nodes","action","Nodes","Nœuds"
+"action-wkf-roles","action-wkf-roles","action","Roles","Les Roles"
+"action-wkf-transitions","action-wkf-transitions","action","Transitions","Transitions"
+"action-wkf-workflows","action-wkf-workflows","action","Worklows","Processus"
+"wkf-validate","wkf-validate","action","Can't save workflow without start node","Impossible de sauvegarder le processus sans le nœud de départ"
