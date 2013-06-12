@@ -103,6 +103,9 @@ public class Field extends SimpleWidget {
 	
 	@Override
 	public String getHelp() {
+		if(!Strings.isNullOrEmpty(super.getDefaultHelp())) {
+			return JPA.translate(super.getDefaultHelp(), super.getDefaultHelp(), this.getModel(), "help");
+		}
 		return JPA.translate(this.getName(), super.getDefaultHelp(), this.getModel(), "help");
 	}
 

@@ -252,8 +252,12 @@
     </group>
     <group title="Actions" cols="2" colSpan="1">
       <button name="restoreAll" colSpan="2" title="Restore All" prompt="All the customizations will be lost. Are you sure?" onClick="action-meta-restore-translations"/>
-      <button name="export" colSpan="2" title="Export All" onClick="action-meta-export-group"/>
-      <field name="exportPath" title="Export path" hidden="true"/>
+      <button name="export" colSpan="2" title="Export All" onClick="action-meta-show-export-group" hideIf="$readonly()"/>
+    </group>
+    <group name="exportGroup" title="Configuration" colSpan="4" hidden="true">
+    	<field name="exportLanguage" title="Export language" selection="select.language"/>
+    	<field name="exportPath" title="Export path"/>
+    	<button name="lauchExport" colSpan="2" title="Export" onClick="action-meta-export-translations" readonlyIf="exportPath &amp;&amp; exportLanguage"/>
     </group>
   </form>
 
@@ -261,19 +265,9 @@
     <call class="com.axelor.meta.web.MetaController" method="restoreTranslations"/>
   </action-method>
 
-  <action-group name="action-meta-export-group">
-    <action if="!exportPath" name="action-meta-show-exportPath"/>
-    <action if="!exportPath" name="action-meta-check-exportPath"/>
-    <action if="exportPath" name="action-meta-export-translations"/>
-  </action-group>
-
-  <action-attrs name="action-meta-show-exportPath">
-    <attribute name="hidden" for="exportPath" expr="eval: false"/>
+  <action-attrs name="action-meta-show-export-group">
+    <attribute name="hidden" for="exportGroup" expr="eval: false"/>
   </action-attrs>
-
-  <action-condition name="action-meta-check-exportPath">
-    <check field="exportPath"/>
-  </action-condition>
 
   <action-method name="action-meta-export-translations">
     <call class="com.axelor.meta.web.MetaController" method="exportTranslations"/>

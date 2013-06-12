@@ -81,6 +81,10 @@ public class ActionView extends Action {
 	
 	@XmlElement(name = "view-param")
 	private List<ActionView.Param> params;
+
+	public String getDefaultTitle() {
+		return title;
+	}
 	
 	public String getTitle() {
 		return JPA.translate(title);

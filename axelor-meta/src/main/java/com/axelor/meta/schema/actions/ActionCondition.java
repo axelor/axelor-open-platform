@@ -20,6 +20,10 @@ public class ActionCondition extends Action {
 	@XmlElement(name = "check")
 	private List<Check> conditions;
 
+	public List<Check> getConditions() {
+		return conditions;
+	}
+
 	@Override
 	public Object evaluate(ActionHandler handler) {
 		Map<String, String> errors = Maps.newHashMap();
@@ -75,6 +79,10 @@ public class ActionCondition extends Action {
 		
 		public String getField() {
 			return field;
+		}
+
+		public String getDefaultError() {
+			return error;
 		}
 		
 		public String getError() {

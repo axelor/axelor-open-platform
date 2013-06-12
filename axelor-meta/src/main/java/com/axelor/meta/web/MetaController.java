@@ -16,6 +16,7 @@ import com.axelor.meta.db.MetaUser;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
+import com.axelor.meta.service.MetaExportTranslation;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
@@ -30,7 +31,7 @@ public class MetaController {
 	private MetaLoader loader;
 	
 	@Inject
-	private MetaService service;
+	private MetaExportTranslation export;
 	
 	private ObjectViews validateXML(String xml) {
 		ObjectViews views;
@@ -174,18 +175,23 @@ public class MetaController {
 	public void exportTranslations(ActionRequest request, ActionResponse response) {
 		
 		String exportPath = (String) request.getContext().get("exportPath");
+		String exportLanguage = (String) request.getContext().get("exportLanguage");
 		Map<String, String> data = Maps.newHashMap();
 
 		try {
-			if(Strings.isNullOrEmpty(exportPath)){
+			if(Strings.isNullOrEmpty(exportLanguage)) {
+				throw new Exception(JPA.translate("Please enter your export language fisrt."));
+			}
+			if(Strings.isNullOrEmpty(exportPath)) {
 				throw new Exception(JPA.translate("Please enter your export path fisrt."));
 			}
-			service.exportTranslations(exportPath);
+			export.exportTranslations(exportPath,exportLanguage);
 			response.setFlash(JPA.translate("Export done."));
-			response.setHidden("exportPath", true);
+			response.setHidden("exportGroup", true);
 			data.put("exportPath", null);
+			data.put("exportLanguage", null);
 			response.setValues(data);
-		} catch(Exception e){
+		} catch(Exception e) {
 			response.setFlash(e.getLocalizedMessage());
 		}
 	}
