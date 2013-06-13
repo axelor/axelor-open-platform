@@ -116,7 +116,7 @@ public class TestWS extends AbstractTest {
 		
 		ActionHandler actionHandler = createHandler("dummy", context);
 		
-		String text = actionHandler.template("${person.food}");
+		String text = actionHandler.template("<%__fmt__.debug('Person food : {}', person.food)%>${person.food}");
 		Assert.assertEquals("pizza", text);
 		
 		text = actionHandler.template("${ person.food | text}");
