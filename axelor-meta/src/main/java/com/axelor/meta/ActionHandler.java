@@ -214,6 +214,8 @@ public final class ActionHandler {
 	
 	class FormatHelper {
 		
+		private final Logger log = LoggerFactory.getLogger(FormatHelper.class);
+
 		public Object escape(Object value) {
 			if (value == null) {
 				return "";
@@ -275,7 +277,23 @@ public final class ActionHandler {
 			}
 			return obj;
 		}
-		
+
+		public void info(String text,  Object... params) {
+			log.info(text, params);
+		}
+
+		public void debug(String text,  Object... params) {
+			log.debug(text, params);
+		}
+
+		public void error(String text,  Object... params) {
+			log.error(text, params);
+		}
+
+		public void trace(String text,  Object... params) {
+			log.trace(text, params);
+		}
+
 	}
 
 	public String template(File template) {
