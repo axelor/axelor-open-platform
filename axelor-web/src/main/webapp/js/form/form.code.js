@@ -2,6 +2,13 @@
 
 var ui = angular.module('axelor.ui');
 
+// configure ace path
+if (!ace.config.get('modePath')) {
+	ace.config.set('modePath', 'lib/ace/js');
+	ace.config.set('themePath', 'lib/ace/js');
+	ace.config.set('workerPath', 'lib/ace/js');
+}
+
 ui.formInput('CodeEditor', {
 
 	css: "code-editor",
