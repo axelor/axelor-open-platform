@@ -123,11 +123,6 @@ public class ActionRecord extends Action {
 			
 			for(String name : recordField.getName().split(",")){
 				name = name.trim();
-				Property property = mapper.getProperty(name);
-				if (property == null) {
-					log.error("No such field: {}", name);
-					continue;
-				}
 				
 				String expr = recordField.getExpression();
 				Object value = expr;
@@ -139,7 +134,13 @@ public class ActionRecord extends Action {
 					log.error("expression: {}", expr, e);
 					continue;
 				}
-				
+
+				Property property = mapper.getProperty(name);
+				if (property == null) { // assume dummy field
+					map.put(name, value);
+					continue;
+				}
+
 				if (((RecordField) recordField).getCanCopy() == Boolean.TRUE && value instanceof Model) {
 					value = JPA.copy((Model) value, true);
 				}
