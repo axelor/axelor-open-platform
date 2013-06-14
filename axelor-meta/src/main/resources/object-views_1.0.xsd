@@ -266,14 +266,6 @@
     </xsd:complexContent>
   </xsd:complexType>
   
-  <xsd:complexType name="TreeView">
-    <xsd:complexContent>
-      <xsd:extension base="tns:GridView">
-        <xsd:attribute name="expandable" use="prohibited"/>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-
   <xsd:complexType name="FormView">
     <xsd:complexContent>
       <xsd:extension base="tns:ObjectView">
@@ -289,6 +281,90 @@
         <xsd:attribute name="onSave" type="xsd:string" />
         <xsd:attribute name="onNew" type="xsd:string" />
         <xsd:attribute name="helpLink" type="xsd:string" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  
+  <xsd:complexType name="TreeView">
+    <xsd:complexContent>
+      <xsd:extension base="tns:SimpleView">
+        <xsd:sequence>
+          <xsd:element name="column" type="tns:SearchField" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>
+                Define a tree column.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="node" maxOccurs="unbounded">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="field" maxOccurs="unbounded">
+                  <xsd:annotation>
+                    <xsd:documentation>
+                      Specify a model field name to read. Can be mapped to a column.
+                    </xsd:documentation>
+                  </xsd:annotation>
+                  <xsd:complexType>
+                    <xsd:attribute name="name" type="xsd:string" use="required">
+                      <xsd:annotation>
+                        <xsd:documentation>
+                        The field name
+                        </xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="as" type="xsd:string">
+                      <xsd:annotation>
+                        <xsd:documentation>
+                        Map the field with a column.
+                        </xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:attribute>
+                  </xsd:complexType>
+                </xsd:element>
+              </xsd:sequence>
+              <xsd:attribute name="model" type="xsd:string" use="required">
+                <xsd:annotation>
+                <xsd:documentation>
+                The model name.
+                </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
+              <xsd:attribute name="parent" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>
+                  The name of the parent field.
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
+              <xsd:attribute name="onClick" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>
+                  An action to execute on click event. The current node record is
+                  passed as context the context handler.
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
+              <xsd:attribute name="draggable" type="xsd:boolean">
+                <xsd:annotation>
+                  <xsd:documentation>
+                  Whether the node can be draggable.
+                  &lt;br&gt;&lt;br&gt;
+                  If draggable and parent field is given then node's parent can be
+                  changed with drag and drop feature.
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="showHeader" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+            Specify whether to show the column header.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
