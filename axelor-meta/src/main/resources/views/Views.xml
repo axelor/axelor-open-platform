@@ -257,7 +257,7 @@
     <group name="exportGroup" title="Configuration" colSpan="4" hidden="true">
     	<field name="exportLanguage" title="Export language" selection="select.language"/>
     	<field name="exportPath" title="Export path"/>
-    	<button name="lauchExport" colSpan="2" title="Export" onClick="action-meta-export-translations" readonlyIf="exportPath &amp;&amp; exportLanguage"/>
+    	<button name="lauchExport" colSpan="2" title="Export" onClick="action-meta-export-translations" readonlyIf="!exportPath &amp;&amp; !exportLanguage"/>
     </group>
   </form>
 
