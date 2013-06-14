@@ -3,9 +3,9 @@
 var ui = angular.module('axelor.ui');
 
 this.TreeViewCtrl = TreeViewCtrl;
-this.TreeViewCtrl.$inject = ['$scope', '$element', 'DataSource'];
+this.TreeViewCtrl.$inject = ['$scope', '$element', 'DataSource', 'ActionService'];
 
-function TreeViewCtrl($scope, $element, DataSource) {
+function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 
 	var view = $scope._views['tree'];
 	var viewPromise = $scope.loadView('tree', view.name);
@@ -19,6 +19,24 @@ function TreeViewCtrl($scope, $element, DataSource) {
 	viewPromise.success(function(fields, schema){
 		$scope.parse(schema);
 	});
+	
+	$scope.show = function() {
+		$scope.updateRoute();
+	};
+
+	$scope.onShow = function(promise) {
+	
+	};
+
+	$scope.getRouteOptions = function() {
+		return {
+			mode: "tree"
+		};
+	};
+	
+	$scope.setRouteOptions = function(options) {
+		$scope.updateRoute();
+	};
 	
 	$scope.parse = function(schema) {
 		
@@ -39,22 +57,37 @@ function TreeViewCtrl($scope, $element, DataSource) {
 		$scope.loaders = loaders;
 	};
 
-	$scope.show = function() {
-		$scope.updateRoute();
-	};
+	$scope.onClick = function(e, options) {
+		
+		var loader = options.loader,
+			record = options.record;
 
-	$scope.onShow = function(promise) {
-	
-	};
+		if (!loader.action) {
+			return;
+		}
 
-	$scope.getRouteOptions = function() {
-		return {
-			mode: "tree"
-		};
-	};
-	
-	$scope.setRouteOptions = function(options) {
-		$scope.updateRoute();
+		if (record.$handler === undefined) {
+			record.$handler = ActionService.handler($scope.$new(), $(e.currentTarget), {
+				action: loader.action
+			});
+		}
+		
+		if (record.$handler) {
+			
+			var model = loader.model;
+			var context = record.$record;
+			
+			record.$handler.scope.record = context;
+			record.$handler.scope.getContext = function() {
+				return _.extend({
+					_model: model,
+				}, context);
+			};
+
+			record.$handler.onClick().then(function(res){
+				console.log('aaaaa', res);
+			});
+		}
 	};
 }
 
@@ -99,6 +132,10 @@ function Loader(scope, node, DataSource) {
 	}
 
 	this.child = null;
+	
+	this.model = node.model;
+
+	this.action = node.onClick;
 
 	this.load = function(parent, fn) {
 
@@ -132,7 +169,7 @@ function Loader(scope, node, DataSource) {
 
 		return _.map(records, function(record) {
 
-			var node = {
+			var item = {
 				'$id': record.id,
 				'$record': record,
 				'$parent': parent && parent.id,
@@ -144,11 +181,21 @@ function Loader(scope, node, DataSource) {
 				}
 			};
 			
+			if (node.onClick) {
+				item.$click = function(e) {
+					scope.onClick(e, {
+						loader: that,
+						record: item,
+						parent: parent
+					});
+				};
+			}
+
 			_.each(fields, function(field) {
-				node[field.as || field.name] = record[field.name]; 
+				item[field.as || field.name] = record[field.name];
 			});
 
-			return node;
+			return item;
 		});
 	};
 }
@@ -234,6 +281,13 @@ ui.directive('uiViewTree', function(){
 				return tr[0];
 			}
 			
+			element.on('click.treeview', 'tr', function(e) {
+				var record = $(e.currentTarget).data('$record');
+				if (record && record.$click) {
+					record.$click(e);
+				}
+			});
+
 			var watcher = scope.$watch('loaders', function(loaders) {
 				
 				if (loaders === undefined) {
