@@ -8,6 +8,9 @@
 
 @import url('../lib/slickgrid/slick.grid.css');
 
+@import url('../lib/jquery.treetable/css/jquery.treetable.css');
+@import url('../lib/jquery.treetable/css/jquery.treetable.theme.default.css');
+
 @import url('../lib/fullcalendar/fullcalendar.css');
 @import url('../lib/fullcalendar/fullcalendar.print.css') print;
 

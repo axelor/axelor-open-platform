@@ -46,6 +46,8 @@ load([
 	'lib/slickgrid/plugins/slick.rowselectionmodel.js',
 	'lib/slickgrid/plugins/slick.checkboxselectcolumn.js',
 	
+	'lib/jquery.treetable/js/jquery.treetable.js',
+	
 	'lib/fullcalendar/fullcalendar.js',
 	'lib/fullcalendar/gcal.js',
 	
@@ -105,6 +107,7 @@ load([
 	'js/view/view.base.js',
 	'js/view/view.form.js',
 	'js/view/view.grid.js',
+	'js/view/view.tree.js',
 	'js/view/view.html.js',
 	'js/view/view.search.js',
 	'js/view/view.portal.js',
