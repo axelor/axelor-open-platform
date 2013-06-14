@@ -542,6 +542,18 @@ ActionHandler.prototype = {
 	}
 };
 
+ui.factory('ActionService', ['ViewService', function(ViewService) {
+	
+	function handler(scope, element, options) {
+		var opts = _.extend({}, options, { element: element });
+		return new ActionHandler(scope, ViewService, opts);
+	}
+	
+	return {
+		handler: handler
+	};
+}]);
+
 var EVENTS = ['onClick', 'onChange', 'onSelect', 'onNew', 'onLoad', 'onSave'];
 
 ui.directive('uiActions', ['ViewService', function(ViewService) {
@@ -579,12 +591,6 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 
 ui.directive('uiToolButton', ['ViewService', function(ViewService) {
 	
-	ui.actionHandler = function(scope, element, options) {
-		return new ActionHandler(scope, ViewService, _.extend({}, options, {
-			element: element
-		}));
-	};
-
 	return {
 		scope: true,
 		link: function(scope, element, attrs) {
