@@ -274,7 +274,7 @@ var Factory = {
 	}
 };
 
-var Grid = function(scope, element, attrs, ViewService) {
+var Grid = function(scope, element, attrs, ViewService, ActionService) {
 	
 	var noFilter = scope.$eval('noFilter');
 	if (_.isString(noFilter)) {
@@ -284,7 +284,11 @@ var Grid = function(scope, element, attrs, ViewService) {
 	this.compile = function(template) {
 		return ViewService.compile(template)(scope.$new());
 	};
-
+	
+	this.newActionHandler = function(scope, element, options) {
+		return ActionService.handler(scope, element, options);
+	};
+	
 	this.scope = scope;
 	this.element = element;
 	this.attrs = attrs;
@@ -296,7 +300,8 @@ var Grid = function(scope, element, attrs, ViewService) {
 
 Grid.prototype.parse = function(view) {
 
-	var scope = this.scope,
+	var that = this,
+		scope = this.scope,
 		handler = scope.handler,
 		dataView = scope.dataView,
 		element = this.element;
@@ -325,7 +330,7 @@ Grid.prototype.parse = function(view) {
 
 		if (field.type == "button") {
 			field.image = field.title;
-			field.handler = ui.actionHandler(scope.$new(), element, {
+			field.handler = that.newActionHandler(scope.$new(), element, {
 				action: field.onClick
 			});
 			item.title = " ";
@@ -1085,7 +1090,7 @@ ui.directive('uiSlickEditors', function() {
 	};
 });
 
-ui.directive('uiSlickGrid', ['ViewService', function(ViewService) {
+ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewService, ActionService) {
 	
 	var types = {
 		'one-to-many' : 'one-to-many-inline',
@@ -1152,7 +1157,7 @@ ui.directive('uiSlickGrid', ['ViewService', function(ViewService) {
 				scope.selector = attrs.selector;
 				scope.noFilter = attrs.noFilter;
 
-				grid = new Grid(scope, element, attrs, ViewService);
+				grid = new Grid(scope, element, attrs, ViewService, ActionService);
 				if (view.editable) {
 					var child = scope.$new();
 					var form = makeForm(child, handler._model, view.items, handler.fields);
