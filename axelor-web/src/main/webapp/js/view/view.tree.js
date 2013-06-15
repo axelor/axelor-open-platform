@@ -45,16 +45,22 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 		});
 
 		var last = null;
+		var draggable = false;
+
 		var loaders = _.map(schema.nodes, function(node) {
 			var loader = new Loader($scope, node, DataSource);
 			if (last) {
 				last.child = loader;
+			}
+			if (loader.draggable) {
+				draggable = true;
 			}
 			return last = loader;
 		});
 
 		$scope.columns = columns;
 		$scope.loaders = loaders;
+		$scope.draggable = draggable;
 	};
 
 	$scope.onClick = function(e, options) {
@@ -85,7 +91,7 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 			};
 
 			record.$handler.onClick().then(function(res){
-				console.log('aaaaa', res);
+
 			});
 		}
 	};
@@ -125,6 +131,7 @@ function Column(scope, col) {
 function Loader(scope, node, DataSource) {
 
 	var ds = DataSource.create(node.model);
+	var names = _.pluck(node.fields, 'name');
 	var domain = null;
 	
 	if (node.parent) {
@@ -136,10 +143,11 @@ function Loader(scope, node, DataSource) {
 	this.model = node.model;
 
 	this.action = node.onClick;
+	
+	this.draggable = node.draggable;
 
-	this.load = function(parent, fn) {
+	this.load = function(parent, callback) {
 
-		var names = _.pluck(node.fields, 'name');
 		var context = {};
 		
 		if (parent) {
@@ -154,14 +162,32 @@ function Loader(scope, node, DataSource) {
 		});
 
 		promise.success(function(records) {
-			fn(accept(records, parent));
+			if (callback) {
+				callback(accept(records, parent));
+			}
 		});
 
 		return promise;
 	};
 
-	var that = this;
+	this.move = function(record, parentId, callback) {
+		
+		var parent = {
+			id: parentId
+		};
 
+		record[node.parent] = parent;
+
+		return ds.save(record).success(function(rec) {
+			record.version = rec.version;
+			if (callback) {
+				callback(rec);
+			}
+		});
+	};
+	
+	var that = this;
+	
 	function accept(records, parent) {
 
 		var fields = node.fields;
@@ -173,11 +199,17 @@ function Loader(scope, node, DataSource) {
 				'$id': record.id,
 				'$record': record,
 				'$parent': parent && parent.id,
+				'$draggable': node.draggable,
 				'$folder': child != null,
 				'$expand': function(fn) {
 					if (child) {
 						return child.load(record, fn);
 					}
+				},
+				'$move': function(fn) {
+					var record = this.$record,
+						parent = this.$parent;
+					return that.move(record, parent, fn);
 				}
 			};
 			
@@ -277,10 +309,62 @@ ui.directive('uiViewTree', function(){
 				_.each(scope.columns, function(col) {
 					$('<td>').html(col.cellText(record)).appendTo(tr);
 				});
+				
+				if (scope.draggable && record.$folder) {
+					makeDroppable(tr);
+				}
 
 				return tr[0];
 			}
 			
+			function onDrop(e, ui) {
+				
+				var row = ui.draggable,
+					record = row.data('$record'),
+					node = element.treetable("node", row.data("id"));
+
+				element.treetable("move", node.id, $(this).data("id"));
+				
+				record.$parent = node.parentId;
+				record.$move(function(result) {
+				
+				});
+			}
+			
+			function makeDroppable(row) {
+				row.droppable({
+					accept: "tr[data-parent]",
+			        hoverClass: "accept",
+			        drop: onDrop,
+			        over: function(e, ui) {
+			        	var row = ui.draggable;
+			        	if(this != row[0] && !$(this).is(".expanded")) {
+			        		element.treetable("expandNode", $(this).data("id"));
+			        	}
+			        }
+				});
+			}
+
+			function makeDraggable(row) {
+
+				var record = row.data('$record');
+				if (!record.$draggable) {
+					return;
+				}
+
+				row.draggable({
+					helper: function() {
+						return $('<span></span>').append(row.children('td:first').clone());
+					},
+					opacity: .75,
+					containment: 'document',
+					refreshPositions: true,
+					revert: "invalid",
+					revertDuration: 300,
+					scroll: true
+				});
+			}
+
 			element.on('dblclick.treeview', 'tbody tr', function(e) {
 				var record = $(e.currentTarget).data('$record');
 				if (record && record.$click) {
@@ -291,6 +375,15 @@ ui.directive('uiViewTree', function(){
 			element.on('mousedown.treeview', 'tbody tr', function(e) {
 				element.find('tr.selected').removeClass('selected');
 				$(this).addClass("selected");
+			});
+			
+			element.on('mouseenter.treeview', 'tr[data-parent]', function(e) {
+				var row = $(this);
+				if (row.data("dndInit")) {
+					return;
+				}
+				row.data("dndInit", true);
+				makeDraggable(row);
 			});
 
 			var watcher = scope.$watch('loaders', function(loaders) {
