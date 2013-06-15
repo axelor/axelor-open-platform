@@ -61,6 +61,8 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 			}
 			return last = loader;
 		});
+		
+		$scope.title = schema.title;
 
 		$scope.columns = columns;
 		$scope.loaders = loaders;
