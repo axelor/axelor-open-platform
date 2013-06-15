@@ -38,6 +38,10 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 		$scope.updateRoute();
 	};
 	
+	$scope.onRefresh = function() {
+		
+	};
+	
 	$scope.parse = function(schema) {
 		
 		var columns = _.map(schema.columns, function(col) {
@@ -320,6 +324,28 @@ ui.directive('uiViewTree', function(){
 				return tr[0];
 			}
 			
+			function clear() {
+				
+				var tree = element.data('treetable');
+				if (tree === undefined) {
+					return;
+				}
+				
+				_.each(tree.roots, function(node) {
+					tree.unloadBranch(node);
+					node.row.remove();
+					delete tree.tree[node.id];
+				});
+				
+				tree.nodes.length = 0;
+				tree.roots.length = 0;
+				
+				var root = _.first(scope.loaders);
+				if (root) {
+					root.load(null, acceptNodes);
+				}
+			}
+			
 			function onDrop(e, ui) {
 				
 				var row = ui.draggable,
@@ -392,6 +418,10 @@ ui.directive('uiViewTree', function(){
 				makeDraggable(row);
 			});
 
+			scope.onRefresh = function() {
+				clear();
+			};
+			
 			var watcher = scope.$watch('loaders', function(loaders) {
 				
 				if (loaders === undefined) {
