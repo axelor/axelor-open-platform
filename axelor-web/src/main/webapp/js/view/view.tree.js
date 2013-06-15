@@ -146,12 +146,13 @@ function Loader(scope, node, DataSource) {
 	
 	this.draggable = node.draggable;
 
-	this.load = function(parent, callback) {
+	this.load = function(item, callback) {
 
-		var context = {};
-		
-		if (parent) {
-			context.parent = parent.id;
+		var context = {},
+			current = item && item.$record;
+
+		if (current) {
+			context.parent = current.id;
 		}
 
 		var promise = ds.search({
@@ -163,18 +164,17 @@ function Loader(scope, node, DataSource) {
 
 		promise.success(function(records) {
 			if (callback) {
-				callback(accept(records, parent));
+				callback(accept(item, records));
 			}
 		});
 
 		return promise;
 	};
 
-	this.move = function(record, parentId, callback) {
-		
-		var parent = {
-			id: parentId
-		};
+	this.move = function(item, callback) {
+
+		var record = item.$record,
+			parent = { id: item.$parent };
 
 		record[node.parent] = parent;
 
@@ -188,40 +188,43 @@ function Loader(scope, node, DataSource) {
 	
 	var that = this;
 	
-	function accept(records, parent) {
+	function accept(current, records) {
 
-		var fields = node.fields;
-		var child = that.child;
+		var fields = node.fields,
+			parent = current && current.$record,
+			child = that.child;
 
 		return _.map(records, function(record) {
 
 			var item = {
 				'$id': record.id,
+				'$model': node.model,
 				'$record': record,
 				'$parent': parent && parent.id,
+				'$parentModel': current && current.$model,
 				'$draggable': node.draggable,
-				'$folder': child != null,
-				'$expand': function(fn) {
-					if (child) {
-						return child.load(record, fn);
-					}
-				},
-				'$move': function(fn) {
-					var record = this.$record,
-						parent = this.$parent;
-					return that.move(record, parent, fn);
+				'$folder': child != null
+			};
+
+			item.$expand = function(callback) {
+				if (child) {
+					return child.load(this, callback);
 				}
 			};
 			
-			if (node.onClick) {
-				item.$click = function(e) {
+			item.$move = function(callback) {
+				return that.move(this, callback);
+			};
+			
+			item.$click = function(e) {
+				if (node.onClick) {
 					scope.onClick(e, {
 						loader: that,
 						record: item,
 						parent: parent
 					});
-				};
-			}
+				}
+			};
 
 			_.each(fields, function(field) {
 				item[field.as || field.name] = record[field.name];
@@ -332,8 +335,11 @@ ui.directive('uiViewTree', function(){
 			}
 			
 			function makeDroppable(row) {
+				
 				row.droppable({
-					accept: "tr[data-parent]",
+					accept: function(draggable) {
+						return row.data('$record').$model === draggable.data('$record').$parentModel;
+					},
 			        hoverClass: "accept",
 			        drop: onDrop,
 			        over: function(e, ui) {
