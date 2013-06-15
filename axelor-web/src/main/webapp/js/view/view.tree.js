@@ -281,11 +281,16 @@ ui.directive('uiViewTree', function(){
 				return tr[0];
 			}
 			
-			element.on('click.treeview', 'tr', function(e) {
+			element.on('dblclick.treeview', 'tbody tr', function(e) {
 				var record = $(e.currentTarget).data('$record');
 				if (record && record.$click) {
 					record.$click(e);
 				}
+			});
+
+			element.on('mousedown.treeview', 'tbody tr', function(e) {
+				element.find('tr.selected').removeClass('selected');
+				$(this).addClass("selected");
 			});
 
 			var watcher = scope.$watch('loaders', function(loaders) {
