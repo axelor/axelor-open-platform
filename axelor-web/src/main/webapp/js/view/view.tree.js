@@ -249,7 +249,9 @@ ui.directive('uiViewTree', function(){
 		
 		link: function(scope, element, attrs) {
 			
-			element.treetable({
+			var table = element.find('.tree-table > table');
+
+			table.treetable({
 				
 				indent: 16,
 				
@@ -272,7 +274,8 @@ ui.directive('uiViewTree', function(){
 					}
 					node._state = "collapsed";
 					
-					element.treetable("collapseNode", row.data("id"));
+					table.treetable("collapseNode", row.data("id"));
+					adjustCols();
 				},
 
 				onNodeExpand: function onNodeExpand() {
@@ -288,7 +291,8 @@ ui.directive('uiViewTree', function(){
 					node._state = "expanded";
 
 					if (node._loaded) {
-						return element.treetable("expandNode", row.data("id"));
+						table.treetable("expandNode", row.data("id"));
+						return adjustCols();
 					}
 
 					node._loading = true;
@@ -298,6 +302,7 @@ ui.directive('uiViewTree', function(){
 							acceptNodes(records, node);
 							node._loading = false;
 							node._loaded = true;
+							adjustCols();
 						});
 					}
 				}
@@ -305,7 +310,7 @@ ui.directive('uiViewTree', function(){
 
 			function acceptNodes(records, after) {
 				var rows = _.map(records, makeRow);
-				element.treetable("loadBranch", after, rows);
+				table.treetable("loadBranch", after, rows);
 			}
 
 			function makeRow(record) {
@@ -330,7 +335,7 @@ ui.directive('uiViewTree', function(){
 			
 			function clear() {
 				
-				var tree = element.data('treetable');
+				var tree = table.data('treetable');
 				if (tree === undefined) {
 					return;
 				}
@@ -354,9 +359,9 @@ ui.directive('uiViewTree', function(){
 				
 				var row = ui.draggable,
 					record = row.data('$record'),
-					node = element.treetable("node", row.data("id"));
+					node = table.treetable("node", row.data("id"));
 
-				element.treetable("move", node.id, $(this).data("id"));
+				table.treetable("move", node.id, $(this).data("id"));
 				
 				record.$parent = node.parentId;
 				record.$move(function(result) {
@@ -368,14 +373,16 @@ ui.directive('uiViewTree', function(){
 				
 				row.droppable({
 					accept: function(draggable) {
-						return row.data('$record').$model === draggable.data('$record').$parentModel;
+						var source = draggable.data('$record'),
+							target = row.data('$record');
+						return source && target && target.$model === source.$parentModel;
 					},
 			        hoverClass: "accept",
 			        drop: onDrop,
 			        over: function(e, ui) {
 			        	var row = ui.draggable;
 			        	if(this != row[0] && !$(this).is(".expanded")) {
-			        		element.treetable("expandNode", $(this).data("id"));
+			        		table.treetable("expandNode", $(this).data("id"));
 			        	}
 			        }
 				});
@@ -401,19 +408,19 @@ ui.directive('uiViewTree', function(){
 				});
 			}
 
-			element.on('dblclick.treeview', 'tbody tr', function(e) {
+			table.on('dblclick.treeview', 'tbody tr', function(e) {
 				var record = $(e.currentTarget).data('$record');
 				if (record && record.$click) {
 					record.$click(e);
 				}
 			});
 
-			element.on('mousedown.treeview', 'tbody tr', function(e) {
-				element.find('tr.selected').removeClass('selected');
+			table.on('mousedown.treeview', 'tbody tr', function(e) {
+				table.find('tr.selected').removeClass('selected');
 				$(this).addClass("selected");
 			});
 			
-			element.on('mouseenter.treeview', 'tr[data-parent]', function(e) {
+			table.on('mouseenter.treeview', 'tr[data-parent]', function(e) {
 				var row = $(this);
 				if (row.data("dndInit")) {
 					return;
@@ -436,20 +443,50 @@ ui.directive('uiViewTree', function(){
 					
 				var root = _.first(loaders);
 				if (root) {
-					root.load(null, acceptNodes);
+					root.load(null, acceptNodes).then(adjustCols);
 				}
 			});
+			
+			element.on('adjustSize', _.debounce(adjustCols, 100));
+			
+			function adjustCols() {
+				
+				if (element.is(':hidden')) {
+					return;
+				}
+				
+				var tds = table.find('tr:first').find('td');
+				var ths = element.find('.tree-header').find('th');
+				var widths = new Array();
+
+				if (tds.length !== ths.length) {
+					return;
+				}
+				
+				tds.each(function() {
+					widths.push($(this).outerWidth());
+				});
+
+				ths.each(function(i) {
+					$(this).width(widths[i] - 12);
+				});
+			}
 		},
 		template:
-		'<table>'+
-			'<thead>'+
-				'<tr>'+
-					'<th ng-repeat="column in columns" ng-class="column.css">{{column.title}}</th>'+
-				'</tr>'+
-			'</thead>'+
-			'<tbody>'+
-			'</tbody>'+
-		'</table>'
+		'<div class="tree-view-container">'+
+			'<table class="tree-header">'+
+				'<thead>'+
+					'<tr>'+
+						'<th ng-repeat="column in columns" ng-class="column.css">{{column.title}}</th>'+
+					'</tr>'+
+				'</thead>'+
+			'</table>'+
+			'<div class="tree-table">'+
+				'<table>'+
+					'<tbody></tbody>'+
+				'</table>'+
+			'</div>'+
+		'</div>'
 	};
 });
 
