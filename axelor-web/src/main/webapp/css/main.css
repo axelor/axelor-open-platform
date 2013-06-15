@@ -351,6 +351,8 @@ html, body {
 	
 	margin: 4px 0;
 	padding: 4px;
+	
+	overflow: hidden;
 }
 
 .record-toolbar.btn-toolbar .view-switcher {
@@ -358,6 +360,14 @@ html, body {
 }
 .record-toolbar.btn-toolbar .view-switcher button {
 	padding: 4px 8px;
+}
+
+.record-toolbar.btn-toolbar .view-title {
+	display: inline-block;
+	font-size: 13px;
+	font-weight: bold;
+	padding-top: 6px;
+	padding-left: 6px;
 }
 
 .record-pager > span {
