@@ -249,6 +249,8 @@ ui.directive('uiViewTree', function(){
 			
 			element.treetable({
 				
+				indent: 16,
+				
 				expandable: true,
 				
 				clickableNodeNames: true,
