@@ -42,6 +42,15 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 		
 	};
 	
+	$scope.sortAs = "";
+	$scope.sortBy = "";
+
+	$scope.onSort = function(column) {
+		$scope.sortAs = $scope.sortAs === "-" ? "" : "-";
+		$scope.sortBy = column.name;
+		$scope.onRefresh();
+	};
+
 	$scope.parse = function(schema) {
 		
 		var columns = _.map(schema.columns, function(col) {
@@ -156,17 +165,31 @@ function Loader(scope, node, DataSource) {
 
 		var context = {},
 			current = item && item.$record;
+		
+		var sortBy = _.find(node.fields, function(field) {
+			return field.as === scope.sortBy;
+		});
 
+		if (sortBy) {
+			sortBy = scope.sortAs + sortBy.name;
+		}
+		
 		if (current) {
 			context.parent = current.id;
 		}
 
-		var promise = ds.search({
+		var opts = {
 			fields: names,
 			domain: domain,
 			context: context,
 			archived: true
-		});
+		};
+
+		if (sortBy) {
+			opts.sortBy = [sortBy];
+		}
+
+		var promise = ds.search(opts);
 
 		promise.success(function(records) {
 			if (callback) {
@@ -477,7 +500,7 @@ ui.directive('uiViewTree', function(){
 			'<table class="tree-header">'+
 				'<thead>'+
 					'<tr>'+
-						'<th ng-repeat="column in columns" ng-class="column.css">{{column.title}}</th>'+
+						'<th ng-repeat="column in columns" ng-class="column.css" ng-click="onSort(column)">{{column.title}}</th>'+
 					'</tr>'+
 				'</thead>'+
 			'</table>'+
