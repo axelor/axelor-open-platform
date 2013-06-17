@@ -484,6 +484,26 @@ ActionHandler.prototype = {
 					break;
 				case 'refresh':
 					itemScope.$broadcast('on:attrs-change:refresh');
+					break;
+
+				case 'value':
+				case 'value:set':
+					if (itemScope.setValue) {
+						itemScope.setValue(value);
+					}
+					break;
+				case 'value:add':
+					if (itemScope.fetchData && itemScope.select) {
+						itemScope.fetchData(value, function(records){
+							itemScope.select(records);
+						});
+					}
+					break;
+				case 'value:del':
+					if (itemScope.removeItems) {
+						itemScope.removeItems(value);
+					}
+					break;
 				}
 			});
 		}

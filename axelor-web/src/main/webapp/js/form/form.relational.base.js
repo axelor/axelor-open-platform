@@ -209,12 +209,19 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	$scope.fetchData = function(value, success) {
 		
 		var records = $.makeArray(value),
-			ids = _.chain(records).filter(function(item){
-				return _.isNumber(item.id) && item.id > 0 &&
-					   _.isUndefined(item.version) &&
-					   _.isUndefined(item.$fetched);
-			}).pluck('id').value();
-		
+			ids = [];
+
+		_.each(records, function(item) {
+			if (_.isNumber(item)) {
+				return ids.push(item);
+			}
+			if (_.isNumber(item.id) && item.id > 0 &&
+				_.isUndefined(item.version) &&
+				_.isUndefined(item.$fetched)) {
+				return ids.push(item.id);
+			}
+		});
+
 		if (ids.length == 0) {
 			return success(value);
 		}
