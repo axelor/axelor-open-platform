@@ -101,24 +101,33 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 			detailView.show();
 	};
 	
-	$scope.removeItems = function(selection) {
+	$scope.removeItems = function(items, fireOnChange) {
+		var all, ids, records;
+		
+		if (_.isEmpty(items)) return;
+		
+		all = _.isArray(items) ? items : [items];
+		
+		ids = _.map(all, function(item) {
+			return _.isNumber(item) ? item : item.id;
+		});
 
-		if (!selection || selection.length == 0)
-			return;
-
-		var items = $scope.getItems();
-		var records = [];
-	
-		for(var i = 0 ; i < items.length ; i++) {
-			if (selection.indexOf(i) > -1)
-				continue;
-			records.push(items[i]);
-		}
-
-		$scope.setValue(records, true);
+		records = _.filter($scope.getItems(), function(item) {
+			return ids.indexOf(item.id) === -1;
+		});
+		
+		$scope.setValue(records, fireOnChange);
 		setTimeout(function(){
 			$scope.$apply();
 		});
+	};
+
+	$scope.removeSelected = function(selection) {
+		if (_.isEmpty(selection)) return;
+		var items = _.map(selection, function(i) {
+			return $scope.getItem(i);
+		});
+		return $scope.removeItems(items, true);
 	};
 	
 	$scope.onEdit = function() {
@@ -135,7 +144,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		}
 		axelor.dialogs.confirm(_t("Do you really want to delete the selected record(s)?"), function(confirmed){
 			if (confirmed && $scope.selection && $scope.selection.length)
-				$scope.removeItems($scope.selection);
+				$scope.removeSelected($scope.selection);
 		});
 	};
 	
