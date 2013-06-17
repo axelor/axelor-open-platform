@@ -352,7 +352,15 @@ ui.directive('uiViewTree', function(){
 				if (scope.draggable && record.$folder) {
 					makeDroppable(tr);
 				}
+				if (record.$draggable) {
+					makeDraggable(tr);
+				}
 
+				var action = record.$draggable ? "dblclick" : "click";
+				tr.on(action, function(e) {
+					record.$click(e);
+				});
+				
 				return tr[0];
 			}
 			
@@ -431,27 +439,11 @@ ui.directive('uiViewTree', function(){
 				});
 			}
 
-			table.on('dblclick.treeview', 'tbody tr', function(e) {
-				var record = $(e.currentTarget).data('$record');
-				if (record && record.$click) {
-					record.$click(e);
-				}
-			});
-
 			table.on('mousedown.treeview', 'tbody tr', function(e) {
 				table.find('tr.selected').removeClass('selected');
 				$(this).addClass("selected");
 			});
 			
-			table.on('mouseenter.treeview', 'tr[data-parent]', function(e) {
-				var row = $(this);
-				if (row.data("dndInit")) {
-					return;
-				}
-				row.data("dndInit", true);
-				makeDraggable(row);
-			});
-
 			scope.onRefresh = function() {
 				clear();
 			};
