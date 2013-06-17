@@ -40,7 +40,7 @@ table.treetable tbody tr.accept {
   color: #fff
 }
 
-.tree-view .tree-header {
+.tree-view-container .tree-header {
 	
 	height: 24px;
 	
@@ -60,13 +60,13 @@ table.treetable tbody tr.accept {
 	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 }
 
-.tree-view .tree-header {
+.tree-view-container .tree-header {
 	width: 100%;
 	white-space: nowrap;
 	border-bottom: 1px solid #d2d2d2;
 }
 
-.tree-view .tree-header th {
+.tree-view-container .tree-header th {
 	display: inline-block;
 	height: 100%;
 	padding: 4px;
@@ -77,12 +77,16 @@ table.treetable tbody tr.accept {
 	text-align: left;
 }
 
-.tree-view .tree-header th:first-of-type {
+.tree-view-container .tree-header th:first-of-type {
 	border-left: none;
 }
 
-.tree-view .tree-table {
+.tree-view-container .tree-table {
 	overflow: auto;
 	position: absolute;
 	top: 27px; left: 0; right: 0; bottom: 0;
+}
+
+.tree-header th {
+	box-sizing: content-box;
 }

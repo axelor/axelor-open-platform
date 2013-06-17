@@ -505,4 +505,17 @@ ui.directive('uiViewTree', function(){
 	};
 });
 
+TreePortletCtrl.$inject = ['$scope', '$element', 'DataSource', 'ActionService'];
+function TreePortletCtrl($scope, $element, DataSource, ActionService) {
+	TreeViewCtrl($scope, $element, DataSource, ActionService);
+}
+
+ui.directive('uiPortletTree', function(){
+
+	return {
+		controller: TreePortletCtrl,
+		template: '<div ui-view-tree></div>'
+	};
+});
+
 }).call(this);
