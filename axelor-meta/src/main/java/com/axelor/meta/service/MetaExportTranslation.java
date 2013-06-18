@@ -66,7 +66,7 @@ import com.google.common.io.Files;
 import com.google.common.io.Resources;
 
 public class MetaExportTranslation {
-	
+
 	private static final String LOCAL_SCHEMA_DOMAIN = "domain-models_1.0.xsd";
 	private static Logger log = LoggerFactory.getLogger(MetaExportTranslation.class);
 	private MetaLoader metaLoader = new MetaLoader();
@@ -79,6 +79,7 @@ public class MetaExportTranslation {
 	private final String portletType = "portlet";
 	private final String selectType = "select";
 	private final String fieldType = "field";
+	private final String viewFieldType = "viewField";
 	private final String helpType = "help";
 	private final String otherType = "other";
 	private final String chartType = "chart";
@@ -90,7 +91,7 @@ public class MetaExportTranslation {
 	private String exportLanguage ;
 	private String exportPath ;
 	private String currentModule ;
-	
+
 	public void exportTranslations(String exportPath, String exportLanguage) {
 
 		exportPath = exportPath.endsWith("/") ? exportPath : exportPath.concat("/");
@@ -120,13 +121,12 @@ public class MetaExportTranslation {
 			this.exportOther();
 		}
 	}
-	
+
 	private void exportOther() {
 		for (MetaTranslation translation : MetaTranslation.all().filter("self.type = ?1 AND self.language = ?2 AND self.domain = ?3",  this.otherType, this.exportLanguage, this.currentModule).order("key").fetch()) {
 			this.appendToFile(translation.getDomain(), translation.getKey(), this.otherType, translation.getKey(), translation.getTranslation());
 		}
 	}
-
 
 	private void exportActions() {
 		for (MetaAction metaAction : MetaAction.findByModule(this.currentModule).order("name").order("type").fetch()) {
@@ -143,7 +143,6 @@ public class MetaExportTranslation {
 			}
 		}
 	}
-
 
 	private void loadAction(Action action) {
 		if(action instanceof ActionView) {
@@ -169,14 +168,12 @@ public class MetaExportTranslation {
 		}
 	}
 
-
 	private void exportMenuActions() {
 		for (MetaActionMenu actionMenu : MetaActionMenu.findByModule(this.currentModule).order("name").fetch()) {
 			String transalation = this.getTranslation(actionMenu.getTitle(), "", null, null);
 			this.appendToFile(actionMenu.getName(), actionMenu.getName(), this.actionMenuType, actionMenu.getTitle(), transalation);
 		}
 	}
-
 
 	private void exportViews() {
 		for (MetaView view : MetaView.findByModule(this.currentModule).order("name").order("type").fetch()) {
@@ -216,7 +213,7 @@ public class MetaExportTranslation {
 			}
 		}
 	}
-	
+
 	private void loadButton(AbstractView abstractView, Button button) {
 		if(!Strings.isNullOrEmpty(button.getDefaultTitle())) {
 			String transalation = this.getTranslation(button.getDefaultTitle(), "", null, null);
@@ -233,7 +230,7 @@ public class MetaExportTranslation {
 			this.appendToFile(abstractView.getName(), button.getName(), this.buttonType, button.getDefaultHelp(), transalation);
 		}
 	}
-	
+
 	private void loadSimpleWidget(AbstractView abstractView, SimpleWidget widget, String type) {
 		
 		if(!Strings.isNullOrEmpty(widget.getDefaultTitle())) {
@@ -247,7 +244,7 @@ public class MetaExportTranslation {
 		}
 		
 	}
-	
+
 	private void loadAbstractView(AbstractView abstractView) {
 		if(abstractView.getToolbar() != null) {
 			for (Button button : abstractView.getToolbar()) {
@@ -284,14 +281,10 @@ public class MetaExportTranslation {
 	}
 
 	private void exportField(AbstractView abstractView, Field field) {
-		if(!Strings.isNullOrEmpty(field.getDefaultTitle())) {
+		if(!Strings.isNullOrEmpty(field.getDefaultTitle()) || !Strings.isNullOrEmpty(field.getDefaultHelp())) {
 			String transalation = this.getTranslation(field.getDefaultTitle(), "", abstractView.getModel(), this.fieldType);
-			this.appendToFile(abstractView.getModel(), field.getDefaultTitle(), this.fieldType, field.getDefaultTitle(), transalation);
-		}
-
-		if(!Strings.isNullOrEmpty(field.getDefaultHelp())) {
-			String transalationHelp = this.getTranslation(field.getName(), "", abstractView.getModel(), this.helpType);
-			this.appendToFile(abstractView.getModel(), field.getName(), this.helpType, field.getDefaultHelp(), transalationHelp);
+			String transalationHelp = this.getTranslation(field.getDefaultHelp(), "", abstractView.getModel(), this.helpType);
+			this.appendToFile(abstractView.getModel(), field.getDefaultTitle(), this.viewFieldType, field.getDefaultTitle(), transalation, field.getDefaultHelp(), transalationHelp);
 		}
 	}
 
@@ -384,12 +377,8 @@ public class MetaExportTranslation {
 		
 		for (Property field : entity.getFields()) {
 			String transalation = this.getTranslation(field.getName(), "", packageName, this.fieldType);
-			this.appendToFile(packageName, field.getName(), this.fieldType, field.getTitle(), transalation);
-			
-			if(!Strings.isNullOrEmpty(field.getHelp())) {
-				String transalationHelp = this.getTranslation(field.getName(), "", packageName, this.helpType);
-				this.appendToFile(packageName, field.getName(), this.helpType, field.getHelp(), transalationHelp);
-			}
+			String transalationHelp = this.getTranslation(field.getName(), "", packageName, this.helpType);
+			this.appendToFile(packageName, field.getName(), this.fieldType, field.getTitle(), transalation, field.getHelp(), transalationHelp);
 		}
 	}
 
@@ -413,7 +402,7 @@ public class MetaExportTranslation {
 		
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
-		List<String> headerList = ImmutableList.of("domain", "name", "type", "title", "title_t");
+		List<String> headerList = ImmutableList.of("domain", "name", "type", "title", "title_t", "help", "help_t");
 		
 		for (String column : headerList) {
 			
@@ -427,7 +416,7 @@ public class MetaExportTranslation {
 
 		return sb.append("\n").toString();
 	}
-	
+
 	private String getTranslation(String key, String defaultValue, String domain, String type) {
 		MetaTranslation translation = null;
 		
@@ -456,7 +445,7 @@ public class MetaExportTranslation {
 		}
 		return defaultValue;
 	}
-	
+
 	private DomainModels unmarshalObject(InputStream openInputStream) {
 		try {
 			JAXBContext context = JAXBContext.newInstance(DomainModels.class);
@@ -472,17 +461,25 @@ public class MetaExportTranslation {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	private void appendToFile(String domain, String name, String type, String title, String titleT) {
+
+	private void appendToFile(String domain, String name, String type, String title, String titleT, String... more) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("\"").append(domain == null ? "" : domain).append("\"").append(",");
 		sb.append("\"").append(name == null ? "" : name).append("\"").append(",");
 		sb.append("\"").append(type == null ? "" : type).append("\"").append(",");
 		sb.append("\"").append(title == null ? "" : title).append("\"").append(",");
-		sb.append("\"").append(titleT == null ? "" : titleT).append("\"").append("\n");
+		sb.append("\"").append(titleT == null ? "" : titleT).append("\"").append(",");
+		if(more == null || more.length != 2){
+			sb.append("\"").append("\"").append(",").append("\"").append("\"");
+		}
+		else {
+			sb.append("\"").append(more[0] == null ? "" : more[0]).append("\"").append(",");
+			sb.append("\"").append(more[1] == null ? "" : more[1]).append("\"");
+		}
+		sb.append("\n");
 		this.appendToFile(sb.toString());
 	}
-	
+
 	private void appendToFile(String content) {
 		if(Strings.isNullOrEmpty(content)) {
 			return;
@@ -500,5 +497,4 @@ public class MetaExportTranslation {
 			log.error("Error while append content to file : {}", ex);
 		}
 	}
-
 }
