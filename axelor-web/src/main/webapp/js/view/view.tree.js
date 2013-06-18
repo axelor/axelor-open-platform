@@ -76,6 +76,11 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 		$scope.columns = columns;
 		$scope.loaders = loaders;
 		$scope.draggable = draggable;
+		
+		var first = _.first(loaders);
+		
+		first.domain = $scope._domain;
+		first.context = $scope._context;
 	};
 
 	$scope.onClick = function(e, options) {
@@ -160,6 +165,23 @@ function Loader(scope, node, DataSource) {
 	this.action = node.onClick;
 	
 	this.draggable = node.draggable;
+	
+	this.getDomain = function(context) {
+		var _domain = domain,
+			_context = context;
+
+		if (_domain && this.domain) {
+			_domain = "(" + this.domain + ") AND (" + domain + ")";
+		}
+		
+		_domain = _domain || this.domain;
+		_context = _.extend({}, this.context, context);
+		
+		return {
+			domain: _domain,
+			context: _context
+		};
+	};
 
 	this.load = function(item, callback) {
 
@@ -177,13 +199,11 @@ function Loader(scope, node, DataSource) {
 		if (current) {
 			context.parent = current.id;
 		}
-
-		var opts = {
+		
+		var opts = _.extend(this.getDomain(context), {
 			fields: names,
-			domain: domain,
-			context: context,
 			archived: true
-		};
+		});
 
 		if (sortBy) {
 			opts.sortBy = [sortBy];
