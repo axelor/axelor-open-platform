@@ -45,14 +45,14 @@
         <field name="archived" onChange="wkf-record-archived" />
         <notebook colSpan="6">
 		    <page title="Description">
-        		<field name="description" colSpan="4" noLabel="true" widget="CodeEditor[syntax=text]"/>
+        		<field name="description" colSpan="4" showTitle="false" widget="CodeEditor[syntax=text]"/>
 		    </page>
 		    <page title="BPMN">
 		    	<button name="importWorkflow" title="Import" onClick="save,wkf-method-import-workflow"/>
-           		<field name="bpmn" colSpan="4" noLabel="true" widget="CodeEditor[syntax=xml]"/>
+           		<field name="bpmn" colSpan="4" showTitle="false" widget="CodeEditor[syntax=xml]"/>
 		    </page>
 		    <page title="XML">
-           		<field name="xmlData" colSpan="4" noLabel="true" widget="CodeEditor[syntax=xml]"/>
+           		<field name="xmlData" colSpan="4" showTitle="false" widget="CodeEditor[syntax=xml]"/>
 		    </page>
         </notebook>
     </form>
@@ -77,7 +77,7 @@
 	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form"/>
         </group>
         <separator title="Description" colSpan="4"/>
-   		<field name="description" colSpan="4" noLabel="true" widget="CodeEditor[syntax=text]"/>
+   		<field name="description" colSpan="4" showTitle="false" widget="CodeEditor[syntax=text]"/>
     </form>
     
     <!-- TRANSITION -->
@@ -100,7 +100,7 @@
         <field name="signal"/>
         <field name="condition" />
         <separator title="Description" colSpan="4"/>
-  		<field name="description" colSpan="4" noLabel="true" widget="CodeEditor[syntax=text]"/>
+  		<field name="description" colSpan="4" showTitle="false" widget="CodeEditor[syntax=text]"/>
     </form>
     
     <grid name="start-transition-grid" title="Transitions" model="com.axelor.wkf.db.Transition">
@@ -120,7 +120,7 @@
         <field name="signal"/>
         <field name="condition"/>
         <separator title="Description" colSpan="6"/>
-		<field name="description" colSpan="6" noLabel="true" widget="CodeEditor[syntax=text]"/>        
+		<field name="description" colSpan="6" showTitle="false" widget="CodeEditor[syntax=text]"/>        
     </form>
     
     <grid name="end-transition-grid" title="Transitions" model="com.axelor.wkf.db.Transition">
@@ -140,7 +140,7 @@
         <field name="signal"/>
         <field name="condition"/>
         <separator title="Description" colSpan="6"/>
-		<field name="description" colSpan="6" noLabel="true" widget="CodeEditor[syntax=text]"/>        
+		<field name="description" colSpan="6" showTitle="false" widget="CodeEditor[syntax=text]"/>        
     </form>
     
 <!-- ACTION -->

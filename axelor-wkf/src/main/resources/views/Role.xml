@@ -11,7 +11,7 @@
         <field name="name" colSpan="2"/>
         <break/>
         <separator title="Description" colSpan="4"/>
-        <field name="description" noLabel="true" colSpan="4"/>
+        <field name="description" showTitle="false" colSpan="4"/>
 		<field name="users" colSpan="4"/>
     </form>
     

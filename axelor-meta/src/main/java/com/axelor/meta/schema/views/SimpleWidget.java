@@ -20,7 +20,7 @@ public abstract class SimpleWidget extends AbstractWidget {
 	private String help;
 	
 	@XmlAttribute
-	private Boolean noLabel;
+	private Boolean showTitle;
 	
 	@XmlAttribute
 	private Boolean hidden;
@@ -78,12 +78,12 @@ public abstract class SimpleWidget extends AbstractWidget {
 		this.help = help;
 	}
 
-	public Boolean getNoLabel() {
-		return noLabel;
+	public Boolean getShowTitle() {
+		return showTitle;
 	}
 	
-	public void setNoLabel(Boolean noLabel) {
-		this.noLabel = noLabel;
+	public void setShowTitle(Boolean showTitle) {
+		this.showTitle = showTitle;
 	}
 	
 	public Boolean getHidden() {

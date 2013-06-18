@@ -502,7 +502,7 @@ public class MetaLoader {
 			
 			if (p.isCollection()) {
 				field.setColSpan(4);
-				field.setNoLabel(true);
+				field.setShowTitle(false);
 			} else
 				gridItems.add(field);
 			formItems.add(field);

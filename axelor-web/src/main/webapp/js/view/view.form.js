@@ -529,10 +529,8 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 				item.attr('id', widgetId);
 				
 				scope.fields_view[widgetId] = attrs;
-				
-				if (!_.isUndefined(attrs.noLabel)){
-					attrs.showTitle = !attrs.noLabel;
-				}
+
+				attrs.showTitle = attrs.showTitle !== false;
 				
 				//TODO: cover all attributes
 				var _attrs = _.extend({}, attrs.attrs, this.attrs, widgetAttrs, {
