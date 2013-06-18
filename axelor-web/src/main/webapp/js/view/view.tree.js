@@ -50,6 +50,8 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 		$scope.sortBy = column.name;
 		$scope.onRefresh();
 	};
+	
+	var first = null;
 
 	$scope.parse = function(schema) {
 		
@@ -77,10 +79,30 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 		$scope.loaders = loaders;
 		$scope.draggable = draggable;
 		
-		var first = _.first(loaders);
+		first = _.first(loaders);
 		
 		first.domain = $scope._domain;
 		first.context = $scope._context;
+	};
+	
+	$scope.onNext = function() {
+		return first && first.onNext();
+	};
+	
+	$scope.onPrev = function() {
+		return first && first.onPrev();
+	};
+	
+	$scope.canNext = function() {
+		return first && first.canNext();
+	};
+	
+	$scope.canPrev = function() {
+		return first && first.canPrev();
+	};
+	
+	$scope.pagerText = function() {
+		return first ? first.pagerText() : "";
 	};
 
 	$scope.onClick = function(e, options) {
@@ -282,6 +304,39 @@ function Loader(scope, node, DataSource) {
 			return item;
 		});
 	};
+
+	var page = {};
+	
+	ds.on('change', function(e, _records, _page) {
+		page = _page;
+	});
+	
+	this.canNext = function() {
+		return ds.canNext();
+	};
+	
+	this.canPrev = function() {
+		return ds.canPrev();
+	};
+	
+	this.onNext = function() {
+		ds.next(names).success(function(records){
+			scope.setRootNodes(accept(null, records));
+		});
+	};
+	
+	this.onPrev = function() {
+		ds.prev(names).success(function(records){
+			scope.setRootNodes(accept(null, records));
+		});
+	};
+	
+	this.pagerText = function() {
+		if (page && page.from !== undefined) {
+			if (page.total == 0) return null;
+			return _t("{0} to {1} of {2}", page.from + 1, page.to, page.total);
+		}
+	};
 }
 
 ui.directive('uiViewTree', function(){
@@ -384,28 +439,6 @@ ui.directive('uiViewTree', function(){
 				return tr[0];
 			}
 			
-			function clear() {
-				
-				var tree = table.data('treetable');
-				if (tree === undefined) {
-					return;
-				}
-				
-				_.each(tree.roots, function(node) {
-					tree.unloadBranch(node);
-					node.row.remove();
-					delete tree.tree[node.id];
-				});
-				
-				tree.nodes.length = 0;
-				tree.roots.length = 0;
-				
-				var root = _.first(scope.loaders);
-				if (root) {
-					root.load(null, acceptNodes);
-				}
-			}
-			
 			function onDrop(e, ui) {
 				
 				var row = ui.draggable,
@@ -458,14 +491,36 @@ ui.directive('uiViewTree', function(){
 					scroll: true
 				});
 			}
-
-			table.on('mousedown.treeview', 'tbody tr', function(e) {
-				table.find('tr.selected').removeClass('selected');
-				$(this).addClass("selected");
-			});
 			
+			function clear() {
+				
+				var tree = table.data('treetable');
+				if (tree === undefined) {
+					return;
+				}
+				
+				_.each(tree.roots, function(node) {
+					tree.unloadBranch(node);
+					node.row.remove();
+					delete tree.tree[node.id];
+				});
+				
+				tree.nodes.length = 0;
+				tree.roots.length = 0;
+			}
+
 			scope.onRefresh = function() {
+				var root = _.first(scope.loaders);
+				if (root) {
+					root.load(null, function(nodes) {
+						scope.setRootNodes(nodes);
+					});
+				}
+			};
+
+			scope.setRootNodes = function(nodes) {
 				clear();
+				acceptNodes(nodes);
 			};
 			
 			var watcher = scope.$watch('loaders', function(loaders) {
@@ -481,8 +536,6 @@ ui.directive('uiViewTree', function(){
 					root.load(null, acceptNodes).then(adjustCols);
 				}
 			});
-			
-			element.on('adjustSize', _.debounce(adjustCols, 100));
 			
 			function adjustCols() {
 				
@@ -506,6 +559,13 @@ ui.directive('uiViewTree', function(){
 					$(this).width(widths[i] - 12);
 				});
 			}
+			
+			table.on('adjustSize', _.debounce(adjustCols, 100));
+
+			table.on('mousedown.treeview', 'tbody tr', function(e) {
+				table.find('tr.selected').removeClass('selected');
+				$(this).addClass("selected");
+			});
 		},
 		template:
 		'<div class="tree-view-container">'+
@@ -527,7 +587,10 @@ ui.directive('uiViewTree', function(){
 
 TreePortletCtrl.$inject = ['$scope', '$element', 'DataSource', 'ActionService'];
 function TreePortletCtrl($scope, $element, DataSource, ActionService) {
+	
 	TreeViewCtrl($scope, $element, DataSource, ActionService);
+	
+	$scope.showPager = true;
 }
 
 ui.directive('uiPortletTree', function(){
