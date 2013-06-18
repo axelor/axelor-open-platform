@@ -159,7 +159,7 @@
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractWidget">
         <xsd:attribute name="title" type="xsd:string" />
-        <xsd:attribute name="noLabel" type="xsd:boolean" />
+        <xsd:attribute name="showTitle" type="xsd:boolean" />
         <xsd:attribute name="help" type="xsd:string" />
         <xsd:attribute name="hidden" type="xsd:boolean" />
         <xsd:attribute name="readonly" type="xsd:boolean" />
@@ -379,7 +379,7 @@
                 <xsd:extension base="tns:SimpleWidget">
                   <xsd:attribute name="name" type="xsd:string" use="required" />
                   <xsd:attribute name="colSpan" use="prohibited"/>
-                  <xsd:attribute name="noLabel" use="prohibited"/>
+                  <xsd:attribute name="showTitle" use="prohibited"/>
                   <xsd:attribute name="hidden" use="prohibited"/>
                   <xsd:attribute name="readonly" use="prohibited"/>
                 </xsd:extension>
@@ -738,7 +738,7 @@
   <xsd:complexType name="Separator">
     <xsd:complexContent>
       <xsd:restriction base="tns:SimpleWidget">
-        <xsd:attribute name="noLabel" use="prohibited"/>
+        <xsd:attribute name="showTitle" use="prohibited"/>
         <xsd:attribute name="hidden" use="prohibited" />
         <xsd:attribute name="help" use="prohibited" />
       </xsd:restriction>
@@ -749,7 +749,7 @@
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleWidget">
         <xsd:attribute name="name" type="xsd:string" />
-        <xsd:attribute name="noLabel" use="prohibited" />
+        <xsd:attribute name="showTitle" use="prohibited" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -776,7 +776,7 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="noLabel" use="prohibited" />
+        <xsd:attribute name="showTitle" use="prohibited" />
         <xsd:attribute name="onClick" type="xsd:string" />
       </xsd:restriction>
     </xsd:complexContent>

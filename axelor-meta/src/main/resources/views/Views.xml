@@ -50,7 +50,7 @@
     </group>
     <spacer />
     <separator title="Details" colSpan="4" />
-    <field name="description" colSpan="4" noLabel="true" />
+    <field name="description" colSpan="4" showTitle="false" />
   </form>
 
   <selection name="meta.translation.type.selection">
@@ -84,7 +84,7 @@
         <button name="restoreAll" title="Restore All" prompt="All the customizations will be lost. Are you sure?" onClick="action-meta-restore-all"/>
         <button name="preview" title="Preview" onClick="action-meta-todo"/>
     </group>
-    <field name="xml" noLabel="true" colSpan="2" widget="CodeEditor[syntax=xml|height=500]"/>
+    <field name="xml" showTitle="false" colSpan="2" widget="CodeEditor[syntax=xml|height=500]"/>
 </form>
 
   <grid title="All Actions" name="meta-action-grid" model="com.axelor.meta.db.MetaAction">
@@ -102,7 +102,7 @@
     <field name="module"/>
     <notebook colSpan="4">
       <page title="XML" cols="1">
-        <field name="xml" noLabel="true" widget="CodeEditor[syntax=xml|height=500]"/>
+        <field name="xml" showTitle="false" widget="CodeEditor[syntax=xml|height=500]"/>
       </page>
     </notebook>
   </form>
@@ -127,7 +127,7 @@
     <break/>
     <notebook colSpan="4">
       <page title="Groups" cols="1">
-        <field name="groups" noLabel="true"/>
+        <field name="groups" showTitle="false"/>
       </page>
     </notebook>
   </form>
@@ -227,7 +227,7 @@
     <field name="mappedBy" hideIf="relationship != 'OneToMany' || relationship != 'OneToOne'"/>
     <button name="openModel" title="Show Model" colSpan="2" hideIf="!relationship" onClick="meta-field-method-open-model"/>
     <separator title="Description" colSpan="2"/>
-    <field name="description" noLabel="true" colSpan="2"/>
+    <field name="description" showTitle="false" colSpan="2"/>
   </form>
 
   <action-method name="meta-field-method-open-model">
@@ -243,7 +243,7 @@
   </grid>
 
   <form title="Translation" name="meta-translations-form" model="com.axelor.meta.db.MetaTranslation" colWidths="*,250">
-    <group noLabel="true" cols="4">
+    <group showTitle="false" cols="4">
       <field name="key"/>
       <field name="language"/>
       <field name="translation"/>
@@ -312,7 +312,7 @@
       <page cols="4" title="Query" colWidths="5%,75,90%,*">
         <field name="queryType" title="Type" css="small-input" selection="selection.chart.qtype"/>
         <spacer colSpan="2"/>
-        <field name="query" colSpan="4" noLabel="true" widget="CodeEditor[syntax=sql|height=400]"/>
+        <field name="query" colSpan="4" showTitle="false" widget="CodeEditor[syntax=sql|height=400]"/>
       </page>
       <page title="Series" cols="1">
         <field name="chartSeries">

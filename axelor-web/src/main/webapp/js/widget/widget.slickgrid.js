@@ -1104,7 +1104,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 			var field = fields[item.name] || item,
 				type = types[field.type];
 			
-			var params = _.extend({}, item, { noLabel: true });
+			var params = _.extend({}, item, { showTitle: false });
 			if (type) {
 				params.type = type;
 			}
