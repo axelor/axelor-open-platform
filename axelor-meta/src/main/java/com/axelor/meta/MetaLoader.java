@@ -785,6 +785,20 @@ public class MetaLoader {
 		return null;
 	}
 	
+	public AbstractView findView(String name, String module) {
+		MetaView view = MetaView.all()
+				.filter("self.name = :name AND self.module = :module")
+				.bind("name", name)
+				.bind("module", module)
+				.order("-priority")
+				.fetchOne();
+		try {
+			return ((ObjectViews) unmarshal(view.getXml())).getViews().get(0);
+		} catch (Exception e) {
+		}
+		return null;
+	}
+	
 	public Action findAction(String name) {
 		MetaAction action = MetaAction.findByName(name);
 		try {

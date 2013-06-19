@@ -85,6 +85,9 @@
 						item[key] = value;
 					}
 				});
+				if (!item.title) {
+					item.title = _.chain(item.title || _.humanize(item.name)).value();
+				}
 				if (item.items || item.pages) {
 					ViewService.prototype.process(meta, item);
 				}
@@ -127,6 +130,20 @@
 			});
 		}
 		
+		function useIncluded(view) {
+			var items = [];
+			_.each(view.items, function(item) {
+				if (item.type === "include") {
+					if (item.view) {
+						items = items.concat(useIncluded(item.view));
+					}
+				} else {
+					items.push(item);
+				}
+			});
+			return items;
+		}
+
 		function findFields(view) {
 			var items = [];
 			var fields = view.items || view.pages;
@@ -134,6 +151,11 @@
 			if (fields == null)
 				return [];
 			
+			if (view.items && !view._included) {
+				view._included = true;
+				fields = view.items = useIncluded(view);
+			}
+
 			_.each(fields, function(item) {
 				if (item.items || item.pages) {
 					items = items.concat(findFields(item));

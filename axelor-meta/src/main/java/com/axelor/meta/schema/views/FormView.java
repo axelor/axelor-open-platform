@@ -32,6 +32,7 @@ public class FormView extends AbstractView {
 	private String helpLink;
 
 	@XmlElements({
+		@XmlElement(name = "include", type = FormInclude.class),
 		@XmlElement(name = "portlet", type = Portlet.class),
 		@XmlElement(name = "group", type = Group.class),
         @XmlElement(name = "notebook", type = Notebook.class),
@@ -96,6 +97,11 @@ public class FormView extends AbstractView {
 		if(items != null) {
 			for (AbstractWidget abstractWidget : items) {
 				abstractWidget.setModel(super.getModel());
+			}
+		}
+		for(AbstractWidget item : items) {
+			if (item instanceof FormInclude) {
+				((FormInclude) item).setOwner(this);
 			}
 		}
 		return items;

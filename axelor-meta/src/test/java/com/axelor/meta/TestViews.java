@@ -7,11 +7,15 @@ import java.util.Map;
 
 import javax.persistence.Query;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.axelor.db.JPA;
 import com.axelor.meta.db.Title;
 import com.axelor.meta.schema.ObjectViews;
+import com.axelor.meta.schema.views.AbstractView;
+import com.axelor.meta.schema.views.FormInclude;
+import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.Search;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
@@ -87,5 +91,32 @@ public class TestViews extends AbstractTest {
 			
 			assertNotNull(q.getResultList());
 		}
+	}
+	
+	@Test
+	public void testInclude() throws Exception {
+		ObjectViews views = this.unmarshal("Include.xml", ObjectViews.class);
+		
+		MetaStore.resister(views);
+
+		assertNotNull(views);
+		assertNotNull(views.getViews());
+		assertEquals(2, views.getViews().size());
+		
+		FormView view = (FormView) views.getViews().get(1);
+		
+		assertNotNull(view.getItems());
+		assertEquals(2, view.getItems().size());
+		
+		FormInclude include = (FormInclude) view.getItems().get(0);
+		
+		AbstractView included = include.getView();
+		
+		assertNotNull(included);
+		Assert.assertTrue(included instanceof FormView);
+		
+		String json = toJson(include);
+		
+		assertNotNull(json);
 	}
 }
