@@ -68,7 +68,8 @@
     <field name="priority" width="75"/>
   </grid>
   
-  <form name="meta-view-form" title="View" model="com.axelor.meta.db.MetaView" cols="2" colWidths="*,250" onSave="action-view-validate">
+  <form name="meta-view-form" title="View" model="com.axelor.meta.db.MetaView" cols="2" colWidths="*,250"
+    onSave="action-view-validate,com.axelor.meta.web.MetaController:clearCache">
     <group title="View Details" cols="4">
         <field name="name"/>
         <field name="priority"/>
