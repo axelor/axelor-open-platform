@@ -370,8 +370,9 @@ html, body {
 	padding-left: 6px;
 }
 
-.record-pager > span {
-	margin-top: 6px;
+.record-pager-text {
+	display: inline-block;
+	margin-top: 4px;
 	margin-left: 4px;
 	margin-right: 4px;
 	font-size: 13px;
@@ -389,6 +390,18 @@ html, body {
 
 .record-pager.pull-left > span {
 	float: right;
+}
+
+.record-pager-change {
+	display: none;
+}
+
+.record-pager-change {
+	margin-right: 4px;
+}
+
+.record-pager-change button {
+	height: auto !important;
 }
 
 .stackbar {

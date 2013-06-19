@@ -185,6 +185,23 @@ function DSViewCtrl(type, $scope, $element) {
 		return ds && ds.canPrev();
 	};
 	
+	$scope.getPageSize = function() {
+		var page = ds && ds._page;
+		if (page) {
+			return page.limit;
+		}
+		return 40;
+	};
+
+	$scope.setPageSize = function(value) {
+		var page = ds && ds._page,
+			limit = Math.max(0, +value) || 40;
+		if (page && page.limit != limit) {
+			page.limit = limit;
+			$scope.onRefresh();
+		}
+	};
+
 	$scope.hasButton = function(name) {
 		if ((name == "new" || name == "copy") && !this.hasPermission("create")) {
 			return false;
@@ -230,6 +247,44 @@ function DSViewCtrl(type, $scope, $element) {
 		return true;
 	};
 }
+
+angular.module('axelor.ui').directive('uiRecordPager', function(){
+
+	return {
+		replace: true,
+		link: function(scope, element, attrs) {
+			
+			var elText = element.find('.record-pager-text').show(),
+				elChanger = element.find('.record-pager-change').hide(),
+				elInput = elChanger.find('input');
+			
+			elText.click(function(e) {
+				elText.add(elChanger).toggle();
+			});
+
+			elChanger.on('click', 'button',  function() {
+				elText.add(elChanger).toggle();
+				if (scope.setPageSize) {
+					scope.setPageSize(elInput.val());
+				}
+			});
+		},
+		template:
+		'<div class="record-pager">'+
+	    '<span>'+
+	    	'<span class="record-pager-text">{{pagerText()}}</span>'+
+			'<span class="input-append record-pager-change">'+
+				'<input type="text" style="width: 30px;" value="{{getPageSize()}}">'+
+				'<button type="button" class="btn add-on"><i class="icon icon-ok"></i></button>'+
+			'</span>'+
+	    '</span>'+
+	    '<div class="btn-group">'+
+	    	'<button class="btn" ng-disabled="!canPrev()" ng-click="onPrev()"><i class="icon-chevron-left"></i></button>'+
+	    	'<button class="btn" ng-disabled="!canNext()" ng-click="onNext()"><i class="icon-chevron-right"></i></button>'+
+	    '</div>'+
+	    '</div>'
+	};
+});
 
 angular.module('axelor.ui').directive('uiViewSwitcher', function(){
 	return {
