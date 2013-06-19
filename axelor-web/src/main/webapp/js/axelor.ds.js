@@ -85,9 +85,6 @@
 						item[key] = value;
 					}
 				});
-				if (!item.title) {
-					item.title = _.chain(item.title || _.humanize(item.name)).value();
-				}
 				if (item.items || item.pages) {
 					ViewService.prototype.process(meta, item);
 				}
