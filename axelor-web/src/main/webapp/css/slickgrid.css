@@ -210,3 +210,34 @@
 	font-size: 11px;
 	font-style:italic
 }
+
+.slick-group-toggle {
+	width: 9px;
+	height: 9px;
+	margin-right: 5px;
+}
+
+.slick-group-toggle.collapsed {
+	background: url(../lib/slickgrid/images/expand.gif) no-repeat center center;
+}
+
+.slick-group-toggle.expanded {
+	background: url(../lib/slickgrid/images/collapse.gif) no-repeat center center;
+}
+
+.slick-group-text,
+.slick-group-count {
+	font-weight: bold;
+}
+
+.slick-group-count {
+	color: green;
+}
+
+.slick-group {
+
+}
+
+.slick-group-totals {
+	font-weight: bold;
+}

@@ -183,6 +183,87 @@ var Editor = function(args) {
 	this.init();
 };
 
+var Formatters = {
+
+	"integer": function(field, value) {
+		return value;
+	},
+
+	"decimal": function(field, value) {
+		var scale = field.scale || 2,
+			num = +(value);
+		if (num) {
+			return num.toFixed(scale);
+		}
+		return value;
+	},
+	
+	"boolean": function(field, value) {
+		return value ? '<i class="icon-ok"></i>' : "";
+	},
+	
+	"date": function(field, value) {
+		return value ? moment(value).format('DD/MM/YYYY') : "";
+	},
+	
+	"time": function(field, value) {
+		return value ? value : "";
+	},
+
+	"datetime": function(field, value) {
+		return value ? moment(value).format('DD/MM/YYYY HH:mm') : "";
+	},
+	
+	"many-to-one": function(field, value) {
+		return value ? value[field.targetName] : "";
+	},
+	
+	"one-to-many": function(field, value) {
+		return value ? '(' + value.length + ')' : "";
+	},
+
+	"many-to-many": function(field, value) {
+		return value ? '(' + value.length + ')' : "";
+	},
+	
+	"button": function(field, value) {
+		return '<img class="slick-img-button" src="' + field.icon + '">';
+	},
+
+	"progress": function(field, value) {
+		var props = ui.ProgressMixin.compute(field, value);
+		return '<div class="progress ' + props.css + '" style="height: 18px; margin: 0; margin-top: 1px;">'+
+		  '<div class="bar" style="width: ' + props.width +'%;"></div>'+
+		'</div>';
+	},
+	
+	"selection": function(field, value) {
+		var cmp = field.type === "integer" ? function(a, b) { return a == b ; } : _.isEqual;
+		var res = _.find(field.selection, function(item){
+			return cmp(item.value, value);
+		}) || {};
+		return res.title;
+	}
+};
+
+function totalsFormatter(totals, columnDef) {
+	
+	var field = columnDef.descriptor;
+	if (field.aggregate == null) {
+		return "";
+	}
+
+	var vals = totals[field.aggregate] || {};
+	var val = vals[field.name];
+
+	var formatter = Formatters[field.type];
+	if (formatter) {
+		return formatter(field, val);
+	}
+	
+	return val;
+}
+
 var Factory = {
 	
 	getEditor : function(col) {
@@ -205,49 +286,30 @@ var Factory = {
 	
 	formatter: function(row, cell, value, columnDef, dataContext) {
 		
-		var field = columnDef.descriptor || {};
-		var attrs = _.extend({}, field, field.widgetAttrs);
-		var widget = attrs.widgetName;
+		var field = columnDef.descriptor || {},
+			attrs = _.extend({}, field, field.widgetAttrs),
+			widget = attrs.widgetName,
+			type = attrs.type;
 
-		if (attrs.type === "button") {
-			return this.formatButton(attrs, value);
-		}
 		if (widget === "Progress" || widget === "progress" || widget === "SelectProgress") {
-			return this.formatProgress(attrs, value);
+			type = "progress";
 		}
-
-		if (value === null || value === undefined) {
-			return "";
-		}
-		if (_.isString(value) && value.trim() === "")
-			return "";
-		if (_.isObject(value) && _.isEmpty(value))
-			return "";
-
 		if (_.isArray(field.selection)) {
-			var cmp = field.type === "integer" ? function(a, b) { return a == b ; } : _.isEqual;
-			var res = _.find(field.selection, function(item){
-				return cmp(item.value, value);
-			}) || {};
-			return res.title;
-		}
-		
-		switch(field.type) {
-		case 'many-to-one':
-			return value[field.targetName];
-		case 'one-to-many':
-		case 'many-to-many':
-			return '(' + value.length + ')';
-		case 'date':
-			return moment(value).format('DD/MM/YYYY');
-		case 'datetime':
-			return moment(value).format('DD/MM/YYYY HH:mm');
-		case 'boolean':
-			return value ? '<i class="icon-ok"></i>' : "";
-		case 'decimal':
-			return this.formatDecimal(field, value);
+			type = "selection";
 		}
 
+		if (type === "button" || type === "progress") {
+			return Formatters[type](field, value);
+		}
+
+		if (_.isEmpty(value)) {
+			return "";
+		}
+
+		var fn = Formatters[type];
+		if (fn) {
+			return fn(field, value);
+		}
 		return value;
 	},
 	
@@ -337,7 +399,7 @@ Grid.prototype.parse = function(view) {
 			item.width = 10;
 		}
 
-		return {
+		var column = {
 			name: item.title || _.chain(item.name).humanize().titleize().value(),
 			id: item.name,
 			field: item.name,
@@ -349,6 +411,12 @@ Grid.prototype.parse = function(view) {
 			headerCssClass: type,
 			xpath: path
 		};
+		
+		if (field.aggregate) {
+			column.groupTotalsFormatter = totalsFormatter;
+		}
+
+		return column;
 	});
 
 	// create checkbox column
@@ -386,6 +454,7 @@ Grid.prototype.parse = function(view) {
 	element.data('grid', grid);
 	
 	grid.setSelectionModel(new Slick.RowSelectionModel());
+	grid.registerPlugin(new Slick.Data.GroupItemMetadataProvider());
 	if (selectColumn) {
 		grid.registerPlugin(selectColumn);
 	}
@@ -467,6 +536,10 @@ Grid.prototype.parse = function(view) {
 	var onInit = scope.onInit();
 	if (_.isFunction(onInit)) {
 		onInit(grid);
+	}
+	
+	if (view.groupBy) {
+		this.groupBy(view.groupBy);
 	}
 
 	if (element.is(":visible")) {
@@ -1039,6 +1112,10 @@ Grid.prototype.onItemClick = function(event, args) {
 };
 
 Grid.prototype.onItemDblClick = function(event, args) {
+	var item = this.grid.getDataItem(args.row) || {};
+	if (item.__group || item.__groupTotals) {
+		return;
+	}
 	if (this.canSave())
 		return;
 	if (this.handler.onItemDblClick)
@@ -1066,6 +1143,62 @@ Grid.prototype.onRowsChanged = function(event, args) {
 	}
 	grid.invalidateRows(args.rows);
 	grid.render();
+};
+
+Grid.prototype.groupBy = function(names) {
+	
+	var data = this.scope.dataView,
+		cols = this.grid.getColumns();
+	
+	var aggregators = _.map(cols, function(col) {
+		var field = col.descriptor;
+		if (field.aggregate === "sum") {
+			return new Slick.Data.Aggregators.Sum(field.name);
+		}
+		if (field.aggregate === "avg") {
+			return new Slick.Data.Aggregators.Avg(field.name);
+		}
+		if (field.aggregate === "min") {
+			return new Slick.Data.Aggregators.Min(field.name);
+		}
+		if (field.aggregate === "max") {
+			return new Slick.Data.Aggregators.Max(field.name);
+		}
+	});
+	
+	aggregators = _.compact(aggregators);
+	
+	var all = names;
+
+	if (_.isString(all)) {
+		all = all.split(/\s*,\s*/);
+	}
+	
+	var grouping = _.map(all, function(name) {
+		
+		var col = this.getColumn(name),
+			field = col.descriptor,
+			formatter = Formatters[field.type];
+		
+		return {
+			getter: function(item) {
+				if (formatter) {
+					return formatter(field, item[name]);
+				}
+				return item[name];
+			},
+			formatter: function(g) {
+				var title = field.title + ": " + g.value;
+				return '<span class="slick-group-text">' + title + '</span>' + ' ' +
+					   '<span class="slick-group-count">' + _t("({0} items)", g.count) + '</span>';
+			},
+			aggregators: aggregators,
+			collapsed: true,
+			aggregateCollapsed: false
+		};
+	}, this);
+	
+	data.setGrouping(grouping);
 };
 
 ui.directive('uiSlickEditors', function() {
