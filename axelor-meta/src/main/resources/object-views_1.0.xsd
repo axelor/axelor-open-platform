@@ -927,6 +927,27 @@
     </xsd:complexContent>
   </xsd:complexType>
   
+  <xsd:complexType name="FormInclude">
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractWidget">
+        <xsd:attribute name="view" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+            Name of an existing view.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="from" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            Name of the module from which the view should be included.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
   <xsd:complexType name="GridField">
     <xsd:complexContent>
       <xsd:extension base="tns:Field">
@@ -950,6 +971,7 @@
   
   <xsd:group name="FormWidgets">
     <xsd:choice>
+      <xsd:element name="include" type="tns:FormInclude"/>
       <xsd:element name="portlet" type="tns:Portlet" />
       <xsd:element name="group" type="tns:Group" />
       <xsd:element name="notebook" type="tns:Notebook" />

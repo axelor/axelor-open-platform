@@ -37,12 +37,30 @@ public class MetaStore {
 		}
 		MetaLoader loader = new MetaLoader();
 		AbstractView view = loader.findView(null, name, null);
+
 		if (view != null) {
 			register(name, view);
 		}
 		return view;
 	}
 	
+	public static AbstractView getView(String name, String module) {
+		if (module == null || "".equals(module.trim())) {
+			return getView(name);
+		}
+		String key = module + ":" + name;
+		if (CACHE.containsKey(key)) {
+			return (AbstractView) CACHE.get(key);
+		}
+		MetaLoader loader = new MetaLoader();
+		AbstractView view = loader.findView(name, module);
+
+		if (view != null) {
+			register(key, view);
+		}
+		return view;
+	}
+
 	public static Action getAction(String name) {
 		if (CACHE.containsKey(name)) {
 			return (Action) CACHE.get(name);
