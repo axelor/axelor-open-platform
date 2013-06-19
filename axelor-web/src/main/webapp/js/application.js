@@ -43,6 +43,7 @@ load([
 	'lib/slickgrid/slick.core.js',
 	'lib/slickgrid/slick.grid.js',
 	'lib/slickgrid/slick.dataview.js',
+	'lib/slickgrid/slick.groupitemmetadataprovider.js',
 	'lib/slickgrid/plugins/slick.rowselectionmodel.js',
 	'lib/slickgrid/plugins/slick.checkboxselectcolumn.js',
 	
