@@ -17,7 +17,6 @@ import com.google.common.collect.Maps;
 @XmlType
 public class ActionValidate extends Action {
 	
-	@XmlType
 	public static class Validator extends Element {
 		
 		@XmlAttribute(name = "message")
@@ -31,11 +30,19 @@ public class ActionValidate extends Action {
 			this.message = message;
 		}
 	}
-	
+
+	@XmlType
+	public static class Error extends Validator {
+	}
+
+	@XmlType
+	public static class Alert extends Validator {
+	}
+
 	@JsonIgnore
 	@XmlElements({
-		@XmlElement(name = "error", type = Validator.class),
-		@XmlElement(name = "alert", type = Validator.class),
+		@XmlElement(name = "error", type = Error.class),
+		@XmlElement(name = "alert", type = Alert.class),
 	})
 	private List<Validator> validators;
 	
