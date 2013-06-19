@@ -19,6 +19,9 @@ public class GridView extends AbstractView {
 	@XmlAttribute
 	private String orderBy;
 	
+	@XmlAttribute
+	private String groupBy;
+	
 	private Hilite hilite;
 
 	@XmlElements({
@@ -41,6 +44,14 @@ public class GridView extends AbstractView {
 	
 	public void setOrderBy(String orderBy) {
 		this.orderBy = orderBy;
+	}
+	
+	public String getGroupBy() {
+		return groupBy;
+	}
+	
+	public void setGroupBy(String groupBy) {
+		this.groupBy = groupBy;
 	}
 	
 	public Hilite getHilite() {

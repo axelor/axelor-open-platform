@@ -73,6 +73,9 @@ public class Field extends SimpleWidget {
 	@XmlAttribute
 	private String selection;
 	
+	@XmlAttribute
+	private String aggregate;
+	
 	@XmlAttribute(name = "edit-window")
 	private String editWindow;
 	
@@ -227,6 +230,14 @@ public class Field extends SimpleWidget {
 	
 	public void setSelection(String selection) {
 		this.selection = selection;
+	}
+	
+	public String getAggregate() {
+		return aggregate;
+	}
+	
+	public void setAggregate(String aggregate) {
+		this.aggregate = aggregate;
 	}
 	
 	public Hilite getHilite() {

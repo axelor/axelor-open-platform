@@ -262,6 +262,13 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="groupBy" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            List of comma separated field names to group the data items.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -924,6 +931,16 @@
     <xsd:complexContent>
       <xsd:extension base="tns:Field">
         <xsd:attribute name="width" type="xsd:integer"/>
+        <xsd:attribute name="aggregate">
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:enumeration value="sum"/>
+              <xsd:enumeration value="avg"/>
+              <xsd:enumeration value="min"/>
+              <xsd:enumeration value="max"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
         <xsd:attribute name="canSelect" use="prohibited"/>
         <xsd:attribute name="edit-window" use="prohibited"/>
         <xsd:attribute name="summary-view" use="prohibited"/>
