@@ -36,6 +36,12 @@
   cursor: pointer;
 }
 
+.slick-header-menusep {
+	height: 1px;
+	background-color: silver;
+	margin: 2px;
+}
+
 .slick-header-menuicon {
   display: inline-block;
   width: 16px;
