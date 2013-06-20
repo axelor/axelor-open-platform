@@ -667,8 +667,9 @@ Grid.prototype.adjustSize = function() {
 };
 
 Grid.prototype.getColumn = function(indexOrName) {
-	var cols = this.cols;
-	var index = indexOrName;
+	var cols = this.grid.getColumns(),
+		index = indexOrName;
+
 	if (_.isString(index)) {
 		index = this.grid.getColumnIndex(index);
 	}
