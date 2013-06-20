@@ -233,6 +233,10 @@
       $activeHeaderColumn = $menuButton.closest(".slick-header-column");
       $activeHeaderColumn
         .addClass("slick-header-column-active");
+      
+      // Stop propagation so that it doesn't register as a header click event.
+      e.preventDefault();
+      e.stopPropagation();
     }
 
 
@@ -255,10 +259,6 @@
             "item": item
           }, e, _self);
       }
-
-      // Stop propagation so that it doesn't register as a header click event.
-      e.preventDefault();
-      e.stopPropagation();
     }
 
     $.extend(this, {
