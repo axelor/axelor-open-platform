@@ -6,7 +6,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -43,16 +42,5 @@ public class AuthFilter extends FormAuthenticationFilter {
 			return false;
 		}
 		return super.onAccessDenied(request, response);
-	}
-	
-	@Override
-	protected boolean onLoginSuccess(AuthenticationToken token,
-			Subject subject, ServletRequest request, ServletResponse response) throws Exception {
-		HttpSession session = ((HttpServletRequest) request).getSession();
-		Object timeout = session.getServletContext().getAttribute("session.timeout");
-		if (timeout instanceof Integer) {
-			session.setMaxInactiveInterval(((Integer) timeout) * 60);
-		}
-		return super.onLoginSuccess(token, subject, request, response);
 	}
 }

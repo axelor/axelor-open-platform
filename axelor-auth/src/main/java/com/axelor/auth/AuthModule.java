@@ -7,11 +7,14 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.guice.ShiroModule;
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.mgt.SessionManager;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 
 import com.axelor.db.JpaSecurity;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Singleton;
+import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.name.Names;
 
 public class AuthModule extends ShiroWebModule {
@@ -19,10 +22,10 @@ public class AuthModule extends ShiroWebModule {
 	public AuthModule(ServletContext servletContext) {
 		super(servletContext);
 	}
-	
-	@Override @SuppressWarnings("unchecked")
+
+	@Override
+	@SuppressWarnings("unchecked")
 	protected void configureShiroWeb() {
-		
 
 		this.bind(JpaSecurity.class).toProvider(AuthSecurity.class);
 		this.expose(JpaSecurity.class);
@@ -30,15 +33,21 @@ public class AuthModule extends ShiroWebModule {
 		this.bindConstant().annotatedWith(Names.named("shiro.loginUrl")).to("/login.jsp");
 		this.bindRealm().to(AuthRealm.class);
 
-        this.addFilterChain("/public/**", ANON);
-        this.addFilterChain("/lib/**", ANON);
-        this.addFilterChain("/img/**", ANON);
-        this.addFilterChain("/ico/**", ANON);
-        this.addFilterChain("/css/**", ANON);
+		this.addFilterChain("/public/**", ANON);
+		this.addFilterChain("/lib/**", ANON);
+		this.addFilterChain("/img/**", ANON);
+		this.addFilterChain("/ico/**", ANON);
+		this.addFilterChain("/css/**", ANON);
 		this.addFilterChain("/logout", LOGOUT);
 		this.addFilterChain("/**", Key.get(AuthFilter.class));
 	}
-	
+
+	@Override
+	protected void bindSessionManager(AnnotatedBindingBuilder<SessionManager> bind) {
+		bind.to(DefaultWebSessionManager.class);
+		bind(DefaultWebSessionManager.class);
+	}
+
 	public static class Simple extends ShiroModule {
 		
 		@Override

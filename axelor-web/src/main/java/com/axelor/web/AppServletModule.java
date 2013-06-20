@@ -18,6 +18,7 @@ import com.axelor.db.Translations;
 import com.axelor.meta.service.MetaTranslations;
 import com.axelor.rpc.Response;
 import com.google.inject.matcher.Matchers;
+import com.google.inject.name.Names;
 import com.google.inject.persist.PersistFilter;
 import com.google.inject.servlet.ServletModule;
 import com.sun.jersey.api.container.filter.GZIPContentEncodingFilter;
@@ -112,8 +113,9 @@ public class AppServletModule extends JerseyServletModule {
 				GZIPContentEncodingFilter.class.getName());
 		params.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
 				GZIPContentEncodingFilter.class.getName());
-		
-		getServletContext().setAttribute("session.timeout", settings.getInt("session.timeout", 30));
+
+		bindConstant().annotatedWith(Names.named("shiro.globalSessionTimeout"))
+				.to(settings.getInt("session.timeout", 30) * 60 * 1000L);
 		
 		serve("_init").with(InitServlet.class);
 		serve("/ws/*").with(GuiceContainer.class, params);
