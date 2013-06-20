@@ -415,6 +415,44 @@ Grid.prototype.parse = function(view) {
 		if (field.aggregate) {
 			column.groupTotalsFormatter = totalsFormatter;
 		}
+		
+		var menus = [{
+			iconImage: "lib/slickgrid/images/sort-asc.gif",
+			title: _t("Sort Ascending"),
+			command: "sort-asc"
+		}, {
+			iconImage: "lib/slickgrid/images/sort-desc.gif",
+			title: _t("Sort Descending"),
+			command: "sort-desc"
+		}, {
+			separator: true
+		}, {
+			title: _t("Group by") + " " + column.name,
+			command: "group-by"
+		}, {
+			title: _t("Ungroup"),
+			command: "ungroup"
+		}, {
+			separator: true
+		}, {
+			title: _t("Hide") + " " + column.name,
+			command: "hide"
+		}];
+		
+		column.header = {
+			menu: {
+				items: menus,
+				position: function($menu, $button) {
+					$menu.css('top', 0)
+						 .css('left', 0);
+					$menu.position({
+						my: 'left top',
+						at: 'left bottom',
+						of: $button
+					});
+				}
+			}
+		};
 
 		return column;
 	});
@@ -458,6 +496,11 @@ Grid.prototype.parse = function(view) {
 	if (selectColumn) {
 		grid.registerPlugin(selectColumn);
 	}
+	
+	var headerMenu = new Slick.Plugins.HeaderMenu({
+		buttonImage: "lib/slickgrid/images/down.gif"
+	});
+	grid.registerPlugin(headerMenu);
 
 	var adjustSize = _.bind(this.adjustSize, this);
 	element.on('adjustSize', _.debounce(adjustSize, 100));
@@ -484,7 +527,11 @@ Grid.prototype.parse = function(view) {
 	// register dataView event handlers
 	this.subscribe(dataView.onRowCountChanged, this.onRowCountChanged);
 	this.subscribe(dataView.onRowsChanged, this.onRowsChanged);
-	
+
+	// register header menu event handlers
+	this.subscribe(headerMenu.onBeforeMenuShow, this.onBeforeMenuShow);
+	this.subscribe(headerMenu.onCommand, this.onMenuCommand);
+
 	// delegate some methods to handler scope
 	//TODO: this spoils the handler scope, find some better way
 	handler.showColumn = _.bind(this.showColumn, this);
@@ -674,6 +721,62 @@ Grid.prototype.resetColumns = function() {
 
 Grid.prototype.setColumnTitle = function(name, title) {
 	this.grid.updateColumnHeader(name, title);
+};
+
+Grid.prototype.onBeforeMenuShow = function(event, args) {
+
+	var menu = args.menu;
+	if (!menu || !menu.items || !this.visibleCols) {
+		return;
+	}
+
+	menu.items = _.filter(menu.items, function(item) {
+		return item.command !== 'show';
+	});
+
+	_.each(this.cols, function(col) {
+		if (_.contains(this.visibleCols, col.id)) return;
+		menu.items.push({
+			title: _t('Show') + ' ' + col.name,
+			command: 'show',
+			field: col.field
+		});
+	}, this);
+};
+
+Grid.prototype.onMenuCommand = function(event, args) {
+	
+	var grid = this.grid;
+
+	if (args.command === 'sort-asc' ||
+		args.command == 'sort-desc') {
+		
+		var opts = {
+			grid: grid,
+			multiColumnSort: true,
+			sortCols: [{
+			    sortCol: args.column,
+			    sortAsc: args.command === 'sort-asc'
+			}]
+		};
+		return grid.onSort.notify(opts, event, grid);
+	}
+	
+	if (args.command === 'group-by') {
+		return this.groupBy(args.column.field);
+	}
+	
+	if (args.command === 'ungroup') {
+		return this.groupBy([]);
+	}
+	
+	if (args.command === 'hide') {
+		return this.showColumn(args.column.field, false);
+	}
+	
+	if (args.command === 'show') {
+		return this.showColumn(args.item.field, true);
+	}
 };
 
 Grid.prototype.onBeforeEditCell = function(event, args) {
