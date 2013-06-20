@@ -499,23 +499,6 @@ Grid.prototype.parse = function(view) {
 
 		var filters = {};
 		var filtersRow = $(grid.getHeaderRow());
-		
-		_.each(cols, function(col){
-			if (!col.xpath) {
-				return;
-			}
-
-			var header = grid.getHeaderRowColumn(col.id);
-			var input = $('<input type="text">').data("columnId", col.id).appendTo(header);
-			var field = col.descriptor || {};
-			
-			input.attr("placeholder", _t("Search"));
-			if (_.isArray(field.selection)) {
-				makeFilterCombo(input, field.selection, function(filter){
-					_.extend(filters, filter);
-				});
-			}
-		});
 
 		filtersRow.on('keyup', ':input', function(event){
 			filters[$(this).data('columnId')] = $(this).val().trim();
@@ -528,6 +511,28 @@ Grid.prototype.parse = function(view) {
 			}
 			return true;
 		});
+
+		function _setInputs(cols) {
+			_.each(cols, function(col){
+				if (!col.xpath) return;
+				var header = grid.getHeaderRowColumn(col.id),
+					input = $('<input type="text">').data("columnId", col.id).appendTo(header),
+					field = col.descriptor || {};
+				if (_.isArray(field.selection)) {
+					makeFilterCombo(input, field.selection, function(filter){
+						_.extend(filters, filter);
+					});
+				}
+			});
+		};
+
+		var _setColumns = grid.setColumns;
+		grid.setColumns = function(columns) {
+			_setColumns.apply(grid, arguments);
+			_setInputs(columns);
+		};
+		
+		_setInputs(cols);
 	}
 	
 	setFilterCols();
@@ -552,8 +557,6 @@ Grid.prototype.parse = function(view) {
 		scope.$parent._viewResolver.resolve(view, element);
 	}
 	
-	var that = this;
-
 	scope.$on("cancel:grid-edit", function(e) {
 		
 		if (that.$oldValues && that.canSave()){
