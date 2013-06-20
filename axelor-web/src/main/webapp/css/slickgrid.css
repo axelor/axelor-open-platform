@@ -22,8 +22,8 @@
 	background-repeat: repeat-x;
 	
 	-webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
-	-moz-box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
-	box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
+	   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
+	        box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
 
 	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 }
@@ -240,4 +240,59 @@
 
 .slick-group-totals {
 	font-weight: bold;
+}
+
+.slick-sort-indicator {
+	margin-right: 18px;
+}
+
+.slick-header-menu {
+	z-index: 20;
+	padding: 0;
+	min-width: 100px;
+
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	background: #fff;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	
+	border-bottom-left-radius: 6px;
+	border-bottom-right-radius: 6px;
+}
+
+.slick-header-menuitem {
+	padding: 2px 4px;
+	padding-right: 20px;
+	border: 1px solid transparent;
+}
+
+.slick-header-menu > div:first-of-type {
+	margin-top: 4px;
+}
+
+.slick-header-menu > div:last-of-type {
+	margin-bottom: 4px;
+}
+
+.slick-header-menuitem:hover {
+	color: #fff;
+	background-color: #0081c2;
+	
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0077b3));
+	background-image: -webkit-linear-gradient(top, #0088cc, #0077b3);
+	background-image:    -moz-linear-gradient(top, #0088cc, #0077b3);
+	background-image:      -o-linear-gradient(top, #0088cc, #0077b3);
+	background-image:         linear-gradient(to bottom, #0088cc, #0077b3);
+	
+	background-repeat: repeat-x;
+}
+
+.slick-header-menusep {
+	margin: 4px 1px;
+	background-color: #e5e5e5;
+	border-bottom: 1px solid #ffffff;
+}
+
+.slick-header-menubutton {
+	width: 16px;
+	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 }
