@@ -112,7 +112,7 @@
             effect[side] = position;
             params['duration'] = this.opts.duration || 200;
             params['step'] = function() {
-                that._adjust(true);
+                that._adjust(false);
             };
             params['complete'] = function() {
                 that._adjust(true);
@@ -162,6 +162,9 @@
                     x = Math.max(0, pos[sideProp]),
                     y = Math.max(dim, x + dim);
 
+                x = Math.round(x);
+                y = Math.round(y);
+                
                 if (y === dim) {
                     el.css(sideProp, 0);
                 }
