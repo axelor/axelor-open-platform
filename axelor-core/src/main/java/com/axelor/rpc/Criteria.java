@@ -13,7 +13,9 @@ import com.axelor.db.mapper.Property;
 import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
 import com.axelor.rpc.filter.Operator;
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 public class Criteria {
 
@@ -83,17 +85,22 @@ public class Criteria {
 	@SuppressWarnings("unchecked")
 	public static Criteria parse(Map<String, Object> rawCriteria, Class<?> beanClass) {
 		Filter search = Criteria.parseCriterion(rawCriteria, beanClass);
-		Filter all = search;
+		List<Filter> all = Lists.newArrayList();
 		
 		String domain = (String) rawCriteria.get("_domain");
 		if (domain != null) {
-			if (Strings.isNullOrEmpty(search.getQuery()))
-				all = new JPQLFilter(domain);
-			else
-				all = Filter.and(new JPQLFilter(domain), search);
+			all.add(new JPQLFilter(domain));
 		}
 		
-		Criteria result = new Criteria(all);
+		if (!Objects.equal(Boolean.TRUE, rawCriteria.get("_archived"))) {
+			all.add(new JPQLFilter("self.archived is null OR self.archived = false"));
+		}
+		
+		if (!Strings.isNullOrEmpty(search.getQuery())) {
+			all.add(search);
+		}
+		
+		Criteria result = new Criteria(Filter.and(all));
 		try {
 			result.domainContext = (Map<String, Object>) rawCriteria.get("_domainContext");
 		} catch(Exception e){
