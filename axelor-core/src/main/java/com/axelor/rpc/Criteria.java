@@ -131,9 +131,9 @@ public class Criteria {
 		Object value = rawCriteria.get("value");
 		
 		if (value instanceof String) {
-			// use the name field of the target object in case of M2O
+			// use the name field of the target object in case of relational field
 			Property property = Mapper.of(beanClass).getProperty(fieldName);
-			if (property != null && property.isReference()) {
+			if (property != null && property.getTarget() != null) {
 				fieldName = fieldName + "." + Mapper.of(property.getTarget()).getNameField().getName();
 			}
 		}
