@@ -6,6 +6,5 @@
         "email": "some@thing.com"
     }, 
     "startRow":0, 
-    "endRow":75, 
-    "textMatchStyle":"substring"
+    "endRow":75
 }
