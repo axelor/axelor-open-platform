@@ -106,7 +106,7 @@ function FormListCtrl($scope, $element, $compile, DataSource, ViewService) {
 		var ids = _.pluck(children, 'id');
 		var criterion = {
 			'fieldName': 'id',
-			'operator': 'inSet',
+			'operator': 'in',
 			'value': ids
 		};
 

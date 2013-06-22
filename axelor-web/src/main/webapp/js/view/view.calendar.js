@@ -63,12 +63,12 @@ function CalendarViewCtrl($scope, $element) {
 		var criteria = {
 			operator: "and",
 			criteria: [{
-				operator: "greaterOrEqual",
 				fieldName: fieldName,
+				operator: ">=",
 				value: start
 			}, {
-				operator: "lessOrEqual",
 				fieldName: fieldName,
+				operator: "<=",
 				value: end
 			}]
 		};

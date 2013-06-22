@@ -228,7 +228,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		
 		var criterion = {
 			'fieldName': 'id',
-			'operator': 'inSet',
+			'operator': 'in',
 			'value': ids
 		};
 
