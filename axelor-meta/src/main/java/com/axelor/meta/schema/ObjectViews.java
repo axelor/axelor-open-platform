@@ -27,6 +27,7 @@ import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.schema.views.Portal;
 import com.axelor.meta.schema.views.Search;
+import com.axelor.meta.schema.views.SearchFilters;
 import com.axelor.meta.schema.views.Selection;
 import com.axelor.meta.schema.views.TreeView;
 
@@ -54,7 +55,8 @@ public class ObjectViews {
 		@XmlElement(name = "chart", type = ChartView.class),
 		@XmlElement(name = "portal", type = Portal.class),
 		@XmlElement(name = "search", type = Search.class),
-		@XmlElement(name = "calendar", type = CalendarView.class)
+		@XmlElement(name = "calendar", type = CalendarView.class),
+		@XmlElement(name = "search-filters", type = SearchFilters.class),
 	})
 	private List<AbstractView> views;
 	

@@ -29,7 +29,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 	@Type(ChartView.class),
 	@Type(CalendarView.class),
 	@Type(Portal.class),
-	@Type(Search.class)
+	@Type(Search.class),
+	@Type(SearchFilters.class)
 })
 public abstract class AbstractView {
 
