@@ -13,6 +13,7 @@
         <xsd:element name="chart" type="tns:ChartView" />
         <xsd:element name="portal" type="tns:Portal" />
         <xsd:element name="search" type="tns:Search" />
+        <xsd:element name="search-filters" type="tns:SearchFilters" />
         <xsd:element name="menuitem" type="tns:MenuItem" />
         <xsd:element name="selection" type="tns:Selection" />
         <xsd:element name="action-menu" type="tns:ActionMenuItem" />
@@ -559,6 +560,69 @@
           </xsd:element>
         </xsd:sequence>
         <xsd:attribute name="stacked" type="xsd:boolean"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  
+  <xsd:complexType name="SearchFilters">
+    <xsd:complexContent>
+      <xsd:extension base="tns:SimpleView">
+        <xsd:sequence>
+          <xsd:element name="filter" type="tns:SearchFilter" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>
+              Define a search filter.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="model" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              The model name.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  
+  <xsd:complexType name="SearchFilter">
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractWidget">
+        <xsd:sequence>
+          <xsd:element name="domain" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>
+              The domain for the filter.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="context" minOccurs="0" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>
+              Define a context item for the domain param.
+              </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+              <xsd:attribute name="name" type="xsd:string" use="required">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    Name of the context variable.
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
+              <xsd:attribute name="value" type="xsd:string" use="required">
+                <xsd:annotation>
+                  <xsd:documentation>
+                  The context value.
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="title" type="xsd:string" use="required"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

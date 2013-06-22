@@ -10,6 +10,7 @@
     <option value="search">Search</option>
     <option value="portal">Portal</option>
     <option value="calendar">Calendar</option>
+    <option value="search-filters">Filters</option>
   </selection>
   
   <selection name="action.type.selection">
