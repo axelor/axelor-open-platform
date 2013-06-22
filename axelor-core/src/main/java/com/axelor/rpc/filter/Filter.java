@@ -36,27 +36,27 @@ public abstract class Filter {
 	}
 
 	public static Filter equals(String fieldName, Object value) {
-		return new SimpleFilter(Operator.EQ, fieldName, value);
+		return new SimpleFilter(Operator.EQUALS, fieldName, value);
 	}
 
 	public static Filter notEquals(String fieldName, Object value) {
-		return new SimpleFilter(Operator.NEQ, fieldName, value);
+		return new SimpleFilter(Operator.NOT_EQUAL, fieldName, value);
 	}
 
 	public static Filter lessThen(String fieldName, Object value) {
-		return new SimpleFilter(Operator.LT, fieldName, value);
+		return new SimpleFilter(Operator.LESS_THAN, fieldName, value);
 	}
 
 	public static Filter greaterThen(String fieldName, Object value) {
-		return new SimpleFilter(Operator.GT, fieldName, value);
+		return new SimpleFilter(Operator.GREATER_THAN, fieldName, value);
 	}
 
 	public static Filter lessOrEqual(String fieldName, Object value) {
-		return new SimpleFilter(Operator.LTE, fieldName, value);
+		return new SimpleFilter(Operator.LESS_OR_EQUAL, fieldName, value);
 	}
 
 	public static Filter greaterOrEqual(String fieldName, Object value) {
-		return new SimpleFilter(Operator.GTE, fieldName, value);
+		return new SimpleFilter(Operator.GREATER_OR_EQUAL, fieldName, value);
 	}
 
 	public static Filter like(String fieldName, Object value) {
@@ -85,7 +85,7 @@ public abstract class Filter {
 	}
 
 	public static Filter notIn(String fieldName, Collection<?> value) {
-		return new RangeFilter(Operator.NO_IN, fieldName, value);
+		return new RangeFilter(Operator.NOT_IN, fieldName, value);
 	}
 
 	public static Filter notIn(String fieldName, Object first, Object second,

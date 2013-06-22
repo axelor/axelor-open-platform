@@ -41,7 +41,7 @@
                     }, 
                     {
                         "fieldName":"lang", 
-                        "operator":"inSet", 
+                        "operator":"in", 
                         "value": ["en", "hi"]
                     }
                 ]
@@ -49,6 +49,5 @@
         ]
     }, 
     "offset":0, 
-    "limit":75, 
-    "textMatchStyle":"substring"
+    "limit":75
 }

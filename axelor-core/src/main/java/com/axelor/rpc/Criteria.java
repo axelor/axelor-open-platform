@@ -12,6 +12,7 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
+import com.axelor.rpc.filter.Operator;
 import com.google.common.base.Strings;
 
 public class Criteria {
@@ -57,15 +58,6 @@ public class Criteria {
 		} catch(IllegalArgumentException e) {
 		}
 		
-		String operator = request.getTextMatchStyle();
-		if (operator == null) {
-			operator = Request.TEXT_MATCH_EXACT;
-		}
-		if (operator.equals(Request.TEXT_MATCH_EXACT))
-			operator = "equals";
-		if (operator.equals(Request.TEXT_MATCH_SUBSTRING))
-			operator = "contains";
-
 		Map<String, Object> raw = new HashMap<String, Object>();
 		List<Map<?, ?>> items = new ArrayList<Map<?, ?>>();
 
@@ -81,7 +73,7 @@ public class Criteria {
 			
 			Map<String, Object> criterion = new HashMap<String, Object>();
 			criterion.put("fieldName", key);
-			criterion.put("operator", operator);
+			criterion.put("operator", "like");
 			criterion.put("value", request.getData().get(key));
 			items.add(criterion);
 		}
@@ -112,19 +104,19 @@ public class Criteria {
 	@SuppressWarnings("unchecked")
 	private static Filter parseCriterion(Map<String, Object> rawCriteria, Class<?> beanClass) {
 
-		OperatorId op = OperatorId.get((String) rawCriteria.get("operator"));
+		Operator operator = Operator.get((String) rawCriteria.get("operator"));
 
-		if (op == OperatorId.AND || op == OperatorId.OR || op == OperatorId.NOT) {
+		if (operator == Operator.AND || operator == Operator.OR || operator == Operator.NOT) {
 			List<Filter> filters = new ArrayList<Filter>();
 			for (Object raw : (List<?>) rawCriteria.get("criteria")) {
 				filters.add(parseCriterion((Map<String, Object>) raw, beanClass));
 			}
 
-			if (op == OperatorId.AND)
+			if (operator == Operator.AND)
 				return Filter.and(filters);
-			if (op == OperatorId.OR)
+			if (operator == Operator.OR)
 				return Filter.or(filters);
-			if (op == OperatorId.NOT)
+			if (operator == Operator.NOT)
 				return Filter.not(filters);
 		}
 
@@ -139,21 +131,18 @@ public class Criteria {
 			}
 		}
 
-		if (op == OperatorId.BETWEEN || op == OperatorId.BETWEEN_INCLUSIVE) {
-			return Filter.between(fieldName, rawCriteria.get("start"),
-					rawCriteria.get("end"));
+		if (operator == Operator.BETWEEN) {
+			return Filter.between(fieldName, rawCriteria.get("value"), rawCriteria.get("value2"));
 		}
 		
 		if (value instanceof String) {
 			value = ((String) value).trim();
 		}
 
-		switch (op) {
+		switch (operator) {
 		case EQUALS:
-		case IEQUALS:
 			return Filter.equals(fieldName, value);
 		case NOT_EQUAL:
-		case INOT_EQUAL:
 			return Filter.notEquals(fieldName, value);
 		case LESS_THAN:
 			return Filter.lessThen(fieldName, value);
@@ -163,33 +152,17 @@ public class Criteria {
 			return Filter.lessOrEqual(fieldName, value);
 		case GREATER_OR_EQUAL:
 			return Filter.greaterOrEqual(fieldName, value);
-		case CONTAINS:
-		case ICONTAINS:
-			value = "%" + value + "%";
-		case STARTS_WITH:
-		case ISTARTS_WITH:
-			value = value + "%";
-		case ENDS_WITH:
-		case IENDS_WITH:
-			value = "%" + value;
+		case LIKE:
 			return Filter.like(fieldName, value);
-		case NOT_CONTAINS:
-		case INOT_CONTAINS:
-			value = "%" + value + "%";
-		case NOT_STARTS_WITH:
-		case INOT_STARTS_WITH:
-			value = value + "%";
-		case NOT_ENDS_WITH:
-		case INOT_ENDS_WITH:
-			value = "%" + value;
+		case NOT_LIKE:
 			return Filter.notLike(fieldName, value);
 		case IS_NULL:
 			return Filter.isNull(fieldName);
 		case NOT_NULL:
 			return Filter.notNull(fieldName);
-		case IN_SET:
+		case IN:
 			return Filter.in(fieldName, (Collection<Object>) value);
-		case NOT_IN_SET:
+		case NOT_IN:
 			return Filter.notIn(fieldName, (Collection<Object>) value);
 		default:
 			return Filter.equals(fieldName, value);

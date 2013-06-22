@@ -7,12 +7,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Request {
 
-	public static final String TEXT_MATCH_EXACT = "exact";
-	public static final String TEXT_MATCH_SUBSTRING = "substring";
-	public static final String TEXT_MATCH_STARTSWITH = "startsWith";
-
-	private String textMatchStyle;
-
 	private int limit;
 
 	private int offset;
@@ -55,14 +49,6 @@ public class Request {
 		} catch (ClassNotFoundException e) {
 		}
 		return null;
-	}
-
-	public String getTextMatchStyle() {
-		return textMatchStyle;
-	}
-
-	public void setTextMatchStyle(String textMatchStyle) {
-		this.textMatchStyle = textMatchStyle;
 	}
 
 	public int getLimit() {

@@ -10,6 +10,5 @@
         }
     }, 
     "limit":0, 
-    "offset":20, 
-    "textMatchStyle":"substring"
+    "offset":20
 }

@@ -1,5 +1,7 @@
 package com.axelor.rpc.filter;
 
+import com.google.common.base.CaseFormat;
+
 public enum Operator {
 
 	AND("AND"),
@@ -8,17 +10,17 @@ public enum Operator {
 
 	NOT("NOT"),
 
-	EQ("="),
+	EQUALS("="),
 
-	NEQ("!="),
+	NOT_EQUAL("!="),
 
-	LT("<"),
+	LESS_THAN("<"),
 
-	GT(">"),
+	GREATER_THAN(">"),
 
-	LTE("<="),
+	LESS_OR_EQUAL("<="),
 
-	GTE(">="),
+	GREATER_OR_EQUAL(">="),
 
 	LIKE("LIKE"),
 
@@ -30,24 +32,28 @@ public enum Operator {
 
 	IN("IN"),
 
-	NO_IN("NOT IN"),
+	NOT_IN("NOT IN"),
 
 	BETWEEN("BETWEEN"),
 
 	NOT_BETWEEN("NOT BETWEEN");
 
 	private String value;
+	
+	private String id;
 
 	private Operator(String value) {
 		this.value = value;
+		this.id = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, this.name());
 	}
 
-	public static Operator of(String value) {
-		for (Operator op : Operator.values()) {
-			if (op.value.equals(value))
-				return op;
+	public static Operator get(String name) {
+		for (Operator operator : Operator.values()) {
+			if (operator.value.equals(name) || operator.id.equals(name)) {
+				return operator;
+			}
 		}
-		throw new IllegalArgumentException("No such operator: " + value);
+		throw new IllegalArgumentException(name);
 	}
 
 	@Override
