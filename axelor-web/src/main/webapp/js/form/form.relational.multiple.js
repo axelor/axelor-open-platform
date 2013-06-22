@@ -206,7 +206,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		var ids = _.pluck(records, 'id');
 		var criterion = {
 			'fieldName': 'id',
-			'operator': 'inSet',
+			'operator': 'in',
 			'value': ids
 		};
 

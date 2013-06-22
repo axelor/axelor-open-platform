@@ -154,7 +154,7 @@ function GridViewCtrl($scope, $element) {
 
 			var field = $scope.fields[key] || {};
 			var type = field.type || 'string';
-			var operator = 'iContains';
+			var operator = 'like';
 			
 			//TODO: implement expression parser
 			
@@ -170,28 +170,28 @@ function GridViewCtrl($scope, $element) {
 				case 'integer':
 				case 'long':
 				case 'decimal':
-					operator = 'iEquals';
+					operator = '=';
 					break;
 				case 'boolean':
-					operator = 'iEquals';
+					operator = '=';
 					value = !/f|n|false|no|0/.test(value);
 					break;
 				case 'date':
-					operator = 'iEquals';
+					operator = '=';
 					value = moment(value, 'DD/MM/YYYY').format('YYYY-MM-DD'); //TODO: user date format
 					break;
 				case 'time':
-					operator = 'iEquals';
+					operator = '=';
 					break;
 				case 'datetime':
-					operator = 'iEquals';
+					operator = '=';
 					value = moment(value, 'DD/MM/YYYY HH:mm').format(); //TODO: user datetime format
 					break;
 			}
 			
 			return {
-				operator: operator,
 				fieldName: key,
+				operator: operator,
 				value: value
 			};
 		});

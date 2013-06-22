@@ -215,7 +215,7 @@
 							operator: 'isNull'
 						}, {
 							fieldName: 'archived',
-							operator: 'iEquals',
+							operator: '=',
 							value: false
 						}]
 					});
@@ -225,7 +225,6 @@
 					page = this._page,
 					records = this._data,
 					params = {
-						textMatchStyle: 'substring',
 						fields: fields,
 						sortBy: sortBy,
 						data: query,
