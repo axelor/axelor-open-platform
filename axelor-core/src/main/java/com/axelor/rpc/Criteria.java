@@ -16,6 +16,7 @@ import com.axelor.rpc.filter.Operator;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class Criteria {
 
@@ -58,6 +59,7 @@ public class Criteria {
 		try {
 			return parse(request.getData(), request.getBeanClass());
 		} catch(IllegalArgumentException e) {
+			System.err.println(e);
 		}
 		
 		Map<String, Object> raw = new HashMap<String, Object>();
@@ -86,12 +88,22 @@ public class Criteria {
 	public static Criteria parse(Map<String, Object> rawCriteria, Class<?> beanClass) {
 		Filter search = Criteria.parseCriterion(rawCriteria, beanClass);
 		List<Filter> all = Lists.newArrayList();
+		Map<String, Object> context = Maps.newHashMap();
 		
+		List<?> domains = (List<?>) rawCriteria.get("_domains");
+		if (domains != null) {
+			all.addAll(parseDomains(domains, context));
+		}
+
 		String domain = (String) rawCriteria.get("_domain");
 		if (domain != null) {
 			all.add(new JPQLFilter(domain));
 		}
-		
+		try {
+			context.putAll((Map<String, ?>) rawCriteria.get("_domainContext"));
+		} catch(Exception e){
+		}
+
 		if (!Objects.equal(Boolean.TRUE, rawCriteria.get("_archived"))) {
 			all.add(new JPQLFilter("self.archived is null OR self.archived = false"));
 		}
@@ -101,11 +113,24 @@ public class Criteria {
 		}
 		
 		Criteria result = new Criteria(Filter.and(all));
-		try {
-			result.domainContext = (Map<String, Object>) rawCriteria.get("_domainContext");
-		} catch(Exception e){
-		}
+		result.domainContext = context;
+
 		return result;
+	}
+
+	@SuppressWarnings("all")
+	private static List<Filter> parseDomains(final List<?> domains, final Map<String, ?> context) {
+		final List<Filter> filters = Lists.newArrayList();
+		for(final Object item : domains) {
+			if (item instanceof Map && ((Map) item).containsKey("domain")) {
+				final Map map = (Map) item;
+				filters.add(new JPQLFilter((String) map.get("domain")));
+				try {
+					context.putAll((Map) map.get("context"));
+				} catch (Exception e){}
+			}
+		}
+		return filters;
 	}
 
 	@SuppressWarnings("unchecked")
