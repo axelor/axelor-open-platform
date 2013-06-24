@@ -302,7 +302,7 @@ var Factory = {
 			return Formatters[type](field, value);
 		}
 
-		if (_.isEmpty(value)) {
+		if (value === null || value === undefined || (_.isObject(value) && _.isEmpty(value))) {
 			return "";
 		}
 
