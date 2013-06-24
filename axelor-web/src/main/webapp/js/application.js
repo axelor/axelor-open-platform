@@ -83,6 +83,7 @@ load([
 	'js/widget/widget.splitter.js',
 	'js/widget/widget.slickgrid.js',
 	'js/widget/widget.dialog.js',
+	'js/widget/widget.search.js',
 
 	'js/form/form.base.js',
 	'js/form/form.actions.js',

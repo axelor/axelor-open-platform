@@ -759,3 +759,62 @@ table.field-details .help-text hr {
 .button-item.icon-only {
 	text-decoration: none;
 }
+
+/* filter menu */
+
+.filter-menu {
+
+	display: none;
+	position: absolute;
+
+	padding: 12px;
+	
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	background: #fff;
+	
+	border-radius: 4px;
+	
+	z-index: 100000;
+}
+
+.filter-menu .filter-list {
+	display: table;
+	width: 100%;
+}
+
+.filter-menu .filter-list > dl {
+	display: table-cell;
+	width: 50%;
+}
+
+.filter-menu .filter-list > dl dd {
+	cursor: pointer;
+}
+
+.filter-menu .filter-list > dl dd:hover {
+	text-decoration: underline;
+}
+
+.filter-menu .filter-list > dl dd.selected::before {
+	content: '\002713';
+	position: absolute;
+	left: 10px;
+}
+
+.filter-menu .filter-form .links {
+	line-height: 20px;
+}
+
+.filter-menu .filter-form .links .divider {
+	color: #ccc;
+	padding: 0 5px;
+}
+
+.filter-menu form {
+	margin-bottom: 8px;
+}
+
+.filter-menu input[type=radio],
+.filter-menu input[type=checkbox] {
+	margin-top: 3px;
+}

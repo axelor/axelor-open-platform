@@ -126,15 +126,24 @@ function GridViewCtrl($scope, $element) {
 	};
 
 	$scope.filter = function(searchFilter) {
-		
-		var filter =  {}, sortBy, pageNum,
-			domain = null,
-			context = null,
-			criteria = {
-				operator: 'and'
-			};
 
 		var fields = _.pluck($scope.fields, 'name');
+		
+		// if criteria is given search using it
+		if (searchFilter.criteria || searchFilter._domains) {
+			return ds.search({
+				filter: searchFilter,
+				fields: fields
+			});
+		}
+
+		var filter =  {}, sortBy, pageNum,
+		domain = null,
+		context = null,
+		criteria = {
+			operator: 'and'
+		};
+
 		for(var name in searchFilter) {
 			var value = searchFilter[name];
 			if (value !== '') filter[name] = value;
@@ -279,7 +288,7 @@ function GridViewCtrl($scope, $element) {
 			fields: fields
 		});
 	};
-	
+
 	$scope.onSort = function(event, args) {
 
 		var sortBy = [],

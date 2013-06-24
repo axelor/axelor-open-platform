@@ -198,29 +198,10 @@
 
 				var query = extend({
 					_domain: domain,
-					_domainContext: context
+					_domainContext: context,
+					_archived: archived
 				}, filter);
 
-				if (!archived) {
-
-					var criteria = _.clone(query.criteria || []);
-
-					query.criteria = criteria;
-					query.operator = query.operator || 'and';
-					
-					criteria.push({
-						operator: 'or',
-						criteria: [{
-							fieldName: 'archived',
-							operator: 'isNull'
-						}, {
-							fieldName: 'archived',
-							operator: '=',
-							value: false
-						}]
-					});
-				}
-				
 				var that = this,
 					page = this._page,
 					records = this._data,
