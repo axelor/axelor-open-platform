@@ -297,6 +297,31 @@
 			
 			return promise;
 		};
+		
+		ViewService.prototype.getFields = function(model) {
+			
+			var that = this,
+				promise = $http.get('ws/meta/fields/' + model, {
+					cache: true
+				});
+			
+			promise.success = function(fn) {
+				promise.then(function(response) {
+					var res = response.data,
+						data = res.data;
+					that.process(data);
+					fn(data.fields);
+				});
+				return promise;
+			};
+			
+			promise.error = function(fn) {
+				promise.then(null, fn);
+				return promise;
+			};
+			
+			return promise;
+		};
 
 		return new ViewService();
 	}]);
