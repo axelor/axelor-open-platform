@@ -333,6 +333,10 @@ public class Resource<T extends Model> {
 			if (id == null || id <= 0L) {
 				security.get().check(JpaSecurity.CAN_CREATE, model);
 			}
+			
+			@SuppressWarnings("all")
+			Map<String, Object> orig = (Map) ((Map) record).get("_original");
+			JPA.verify(model, orig);
 
 			@SuppressWarnings("all")
 			Model bean = JPA.edit(model, (Map) record);
