@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import com.axelor.meta.db.MetaFilter;
 import com.axelor.meta.db.MetaUser;
 import com.axelor.meta.service.MetaUserService;
 import com.axelor.rpc.ActionRequest;
@@ -24,5 +25,28 @@ public class MetaUserController {
 		response.setValues(values);
 		response.setReload(true);
 		response.setStatus(ActionResponse.STATUS_SUCCESS);
+	}
+	
+	public void saveFilter(ActionRequest request, ActionResponse response) {
+		MetaFilter ctx = request.getContext().asType(MetaFilter.class);
+		if (ctx != null) {
+			ctx = service.saveFilter(ctx);
+			response.setData(ctx);
+		}
+	}
+	
+	public void removeFilter(ActionRequest request, ActionResponse response) {
+		MetaFilter ctx = request.getContext().asType(MetaFilter.class);
+		if (ctx != null) {
+			ctx = service.removeFilter(ctx);
+			response.setData(ctx);
+		}
+	}
+
+	public void findFilters(ActionRequest request, ActionResponse response) {
+		MetaFilter ctx = request.getContext().asType(MetaFilter.class);
+		if (ctx != null && ctx.getFilterView() != null) {
+			response.setData(service.getFilters(ctx.getFilterView()));
+		}
 	}
 }
