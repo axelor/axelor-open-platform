@@ -236,9 +236,9 @@ public final class JPA {
 
 		Object version = values.get("version");
 		Mapper mapper = Mapper.of(model);
+		Model entity = JPA.find(model, id);
 
 		if (id != null && version != null) {
-			Model entity = JPA.find(model, id);
 			if (entity == null || !Objects.equal(version, entity.getVersion())) {
 				Exception cause = new StaleObjectStateException(model.getName(), id);
 				throw new OptimisticLockException(cause);
@@ -247,9 +247,23 @@ public final class JPA {
 
 		for(String key : values.keySet()) {
 			Object value = values.get(key);
-			if (!(value instanceof Map) || !(value instanceof Collection)) continue;
 			Property property = mapper.getProperty(key);
 			if (property == null || property.getTarget() == null) continue;
+			if (!(value instanceof Map || value instanceof Collection)) {
+				continue;
+			}
+			if (property.isCollection() && value instanceof Collection) {
+				int size = 0;
+				try {
+					size = ((Collection) property.get(entity)).size();
+				} catch (Exception e) {
+				}
+				if (size > ((Collection) value).size()) {
+					Exception cause = new StaleObjectStateException(model.getName(), id);
+					throw new OptimisticLockException(cause);
+				}
+			}
+			
 			if (value instanceof Map) {
 				value = Lists.newArrayList(value);
 			}
