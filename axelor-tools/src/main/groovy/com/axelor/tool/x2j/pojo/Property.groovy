@@ -549,7 +549,7 @@ class Property {
 			.add("cascade", ["javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"], false)
 	}
 	
-	private Annotation $one2many() {
+	private List<Annotation> $one2many() {
 		
 		if (type != "one-to-many") return null
 		
@@ -566,16 +566,19 @@ class Property {
 			a.add("cascade", "javax.persistence.CascadeType.ALL", false)
 			a.add("orphanRemoval", "true", false)
 		}
-		return a
+		return [a, annon("org.hibernate.annotations.OptimisticLock").add("excluded", "false", false)]
 	}
 	
-	private Annotation $many2many() {
+	private List<Annotation> $many2many() {
 		def mapped = attrs.get('mappedBy')
-		if (type == "many-to-many")
-			annon("javax.persistence.ManyToMany")
+		if (type != "many-to-many") return
+		
+		def a = annon("javax.persistence.ManyToMany")
 				.add("fetch", "javax.persistence.FetchType.LAZY", false)
 				.add("mappedBy", mapped)
 				.add("cascade", ["javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"], false)
+
+		return [a, annon("org.hibernate.annotations.OptimisticLock").add("excluded", "false", false)]
 	}
 	
 	private Annotation $orderBy() {
