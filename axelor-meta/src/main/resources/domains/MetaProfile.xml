@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://apps.axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/domain-models http://apps.axelor.com/xml/ns/domain-models/domain-models_0.9.xsd">
+
+  <module name="meta" package="com.axelor.meta.db"/>
+
+  <entity name="MetaProfile" table="META_PROFILE" sequential="true" >
+    <string name="name" required="true" unique="true"/>
+    <string name="targetPackage" required="true"/>
+    <boolean name="canRead" title="Read"/>
+    <boolean name="canWrite" title="Write"/>
+    <boolean name="canCreate" title="Create"/>
+    <boolean name="canRemove" title="Remove"/>
+    <string name="readCondition"/>
+    <string name="readParams"/>
+    <string name="writeCondition"/>
+    <string name="writeParams"/>
+    <string name="createCondition"/>
+    <string name="createParams"/>
+    <string name="removeCondition"/>
+    <string name="removeParams"/>
+    <many-to-many name="groups" ref="com.axelor.auth.db.Group" />
+    <boolean name="allMenus" />
+    <many-to-many name="metaMenus" ref="com.axelor.meta.db.MetaMenu" />
+  </entity>
+
+</domain-models>
