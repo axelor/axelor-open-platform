@@ -123,7 +123,14 @@ ui.directive('uiFilterInput', function() {
 					model.$setViewValue(value.toISOString());
 				}
 			};
-	
+			
+			model.$formatters.push(function(value) {
+				if (_.isDate(value)) {
+					value = moment(value).format('DD/MM/YYYY');
+				}
+				return value;
+			});
+
 			element.focus(function(e) {
 				var type = scope.filter.type;
 				if (!(type == 'date' || type == 'datetime')) {
@@ -224,6 +231,15 @@ function FilterFormCtrl($scope, $element, ViewService) {
 			}
 			if (filter.operator === '=' && filter.value === false) {
 				filter.operator = 'false';
+			}
+			
+			if (field.type === 'date' || field.type === 'datetime') {
+				if (filter.value) {
+					filter.value = moment(filter.value).toDate();
+				}
+				if (filter.value2) {
+					filter.value2 = moment(filter.value2).toDate();
+				}
 			}
 			
 			$scope.addFilter(filter);
