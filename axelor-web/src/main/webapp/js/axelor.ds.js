@@ -251,8 +251,13 @@
 					name: view.name
 				}
 			}).then(function(response) {
-				var res = response.data;
-				result = res.data;
+				var res = response.data,
+					result = res.data;
+				
+				if (!result) {
+					return deferred.reject('view not found', view);
+				}
+				
 				if (_.isArray(result.items)) {
 					loadFields(result);
 				} else {
