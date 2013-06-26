@@ -774,7 +774,7 @@ table.field-details .help-text hr {
 	
 	border-radius: 4px;
 	
-	z-index: 100000;
+	z-index: 1;
 }
 
 .filter-menu .filter-list {
