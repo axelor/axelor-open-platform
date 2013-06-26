@@ -622,6 +622,13 @@ ui.directive('uiFilterMenu', function() {
 			setTimeout(function() {
 				element.parents('.view-pane').after(menu);
 			});
+			
+			element.on('$destroy', function() {
+				if (menu) {
+					menu.remove();
+					menu = null;
+				}
+			});
 		},
 		replace: true,
 		template:
