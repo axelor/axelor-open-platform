@@ -236,7 +236,7 @@ public final class JPA {
 
 		Object version = values.get("version");
 		Mapper mapper = Mapper.of(model);
-		Model entity = JPA.find(model, id);
+		Model entity = id == null ? null : JPA.find(model, id);
 
 		if (id != null && version != null) {
 			if (entity == null || !Objects.equal(version, entity.getVersion())) {
