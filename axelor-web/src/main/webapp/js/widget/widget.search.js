@@ -426,10 +426,21 @@ ui.directive('uiFilterMenu', function() {
 				handler.onRefresh();
 			};
 			
-			$scope.onSave = function() {
+			$scope.canSaveNew = function() {
+				if ($scope.custName && $scope.custTitle) {
+					return !angular.equals($scope.custName, _.underscored($scope.custTitle));
+				}
+				return false;
+			};
+
+			$scope.onSave = function(saveAs) {
 				
 				var title = _.trim($scope.custTitle),
 					name = $scope.custName || _.underscored(title);
+
+				if (saveAs) {
+					name = _.underscored(title);
+				}
 				
 				var selected = new Array();
 				
@@ -612,6 +623,7 @@ ui.directive('uiFilterMenu', function() {
 						"</label>" +
 					"</div>" +
 					"<button class='btn btn-small' ng-click='onSave()' ng-disabled='!custTitle'>save</button> " +
+					"<button class='btn btn-small' ng-click='onSave(true)' ng-show='canSaveNew()'>save as</button> " +
 					"<button class='btn btn-small' ng-click='onDelete()' ng-show='custName'>delete</button>" +
 				"</div>" +
 			"</div>" +
