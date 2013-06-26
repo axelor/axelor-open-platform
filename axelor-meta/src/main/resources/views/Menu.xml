@@ -87,5 +87,14 @@
     <view type="grid" name="meta-chart-grid"/>
     <view type="form" name="meta-chart-form"/>
   </action-view>
+  
+  <menuitem name="menu-auth-meta-profile" parent="menu-auth" title="Meta Profiles"
+    action="action-auth-meta-profile"/>
+
+  <action-view name="action-auth-meta-profile" title="Meta Profiles"
+    model="com.axelor.meta.db.MetaProfile">
+    <view type="grid" name="user-profile-grid" />
+    <view type="form" name="user-profile-form" />
+  </action-view>
 
 </object-views>
