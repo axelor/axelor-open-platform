@@ -352,7 +352,7 @@ ui.directive('uiFilterMenu', function() {
 					$scope.viewFilters = angular.copy(view.filters);
 				});
 			} else {
-				filterView = (handler._viewParams || {}).action;
+				filterView = 'act:' + (handler._viewParams || {}).action;
 			}
 			
 			if (filterView) {
