@@ -193,6 +193,13 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		
 		return $scope.applyFilter();
 	});
+	
+	$scope.$on('on:before-save', function(e, data) {
+		var criteria = $scope.prepareFilter();
+		if (data) {
+			data.criteria = criteria;
+		}
+	});
 
 	function select(custom) {
 
@@ -234,7 +241,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		$scope.applyFilter();
 	};
 
-	$scope.applyFilter = function() {
+	$scope.prepareFilter = function() {
 		
 		var criteria = {
 			operator: $scope.operator,
@@ -281,6 +288,11 @@ function FilterFormCtrl($scope, $element, ViewService) {
 			criteria.criteria.push(criterion);
 		});
 		
+		return criteria;
+	};
+	
+	$scope.applyFilter = function() {
+		var criteria = $scope.prepareFilter();
 		if ($scope.$parent.onFilter) {
 			$scope.$parent.onFilter(criteria);
 		}
@@ -453,6 +465,9 @@ ui.directive('uiFilterMenu', function() {
 
 			$scope.onSave = function(saveAs) {
 				
+				var data = { criteria: null };
+				$scope.$broadcast('on:before-save', data);
+				
 				var title = _.trim($scope.custTitle),
 					name = $scope.custName || _.underscored(title);
 
@@ -466,7 +481,7 @@ ui.directive('uiFilterMenu', function() {
 					if (item.$selected) selected.push(i);
 				});
 				
-				var custom = current.criteria || {};
+				var custom = data.criteria || {};
 
 				custom = _.extend({
 					operator: custom.operator,
