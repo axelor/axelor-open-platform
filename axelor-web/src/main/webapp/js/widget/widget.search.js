@@ -619,19 +619,22 @@ ui.directive('uiFilterMenu', function() {
 		}],
 		link: function(scope, element, attrs) {
 
-			var menu = element.children('.filter-menu');
+			var menu = element.children('.filter-menu'),
+				toggleButton = null;
 
 			scope.onSearch = function(e) {
 				var hidden = $(e.currentTarget).is('.active');
 				if (hidden) {
-					return menu.hide();
+					return hideMenu();
 				}
+				toggleButton = $(e.currentTarget);
 				menu.show();
 				menu.position({
 					my: "left top",
 					at: "left bottom",
 					of: e.currentTarget
 				});
+				$(document).on('mousedown.search-menu', onMouseDown);
 			};
 
 			// append menu to view page to overlap the view
@@ -639,7 +642,37 @@ ui.directive('uiFilterMenu', function() {
 				element.parents('.view-container').after(menu);
 			});
 			
+			function hideMenu() {
+				$(document).off('mousedown.search-menu', onMouseDown);
+				return menu.hide();
+			}
+			
+			function onMouseDown(e) {
+				if (!menu || menu.is(e.target)) {
+					return;
+				}
+				if ($.contains(element[0], e.target) ||
+				    $.contains(menu[0], e.target)) {
+					return;
+				}
+				if ($(e.target).is('.ui-widget-overlay')) {
+					return;
+				}
+				var popup = $('.ui-datepicker:visible,.ui-dialog:visible')[0];
+				if (popup && (popup === e.target || $.contains(popup, e.target))) {
+					return;
+				}
+				if (menu) {
+					if (toggleButton != null) {
+						toggleButton.removeClass('active');
+						toggleButton = null;
+					}
+			        hideMenu();
+			    }
+			}
+
 			element.on('$destroy', function() {
+				$(document).on('mousedown.search-menu', onMouseDown);
 				if (menu) {
 					menu.remove();
 					menu = null;
