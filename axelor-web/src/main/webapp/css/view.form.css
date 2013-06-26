@@ -779,12 +779,12 @@ table.field-details .help-text hr {
 
 .filter-menu .filter-list {
 	display: table;
-	width: 100%;
 }
 
 .filter-menu .filter-list > dl {
 	display: table-cell;
 	width: 50%;
+	padding-right: 40px;
 }
 
 .filter-menu .filter-list > dl dd {

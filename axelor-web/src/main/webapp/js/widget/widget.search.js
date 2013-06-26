@@ -167,8 +167,8 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	$scope.filters = [{}];
 	$scope.operator = 'or';
 
-	$scope.addFilter = function() {
-		$scope.filters.push({});
+	$scope.addFilter = function(filter) {
+		$scope.filters.push(filter || {});
 	};
 	
 	this.removeFilter = function(filter) {
@@ -180,10 +180,57 @@ function FilterFormCtrl($scope, $element, ViewService) {
 			$scope.addFilter();
 		}
 	};
+	
+	$scope.$on('on:select-custom', function(e, custom) {
+
+		$scope.filters.length = 0;
+		
+		if (custom.$selected) {
+			select(custom);
+		} else {
+			$scope.addFilter();
+		}
+		
+		return $scope.applyFilter();
+	});
+
+	function select(custom) {
+
+		var criteria = custom.criteria;
+		
+		$scope.operator = criteria.operator || 'or';
+
+		_.each(criteria.criteria, function(item) {
+			var filter = {
+				field: item.fieldName,
+				value: item.value,
+				value2: item.value2
+			};
+			
+			var field = $scope.fields[item.fieldName] || {};
+			
+			filter.type = field.type || 'string';
+			filter.operator = item.operator;
+
+			if (item.operator === '=' && filter.value === true) {
+				filter.operator = 'true';
+			}
+			if (filter.operator === '=' && filter.value === false) {
+				filter.operator = 'false';
+			}
+			
+			$scope.addFilter(filter);
+		});
+	}
 
 	$scope.clearFilter = function() {
 		$scope.filters.length = 0;
 		$scope.addFilter();
+		
+		if ($scope.$parent.onClear) {
+			$scope.$parent.onClear();
+		}
+
 		$scope.applyFilter();
 	};
 
@@ -332,6 +379,7 @@ ui.directive('uiFilterMenu', function() {
 				var custom = {
 					title: filter.title,
 					name: filter.name,
+					shared: filter.shared,
 					criteria: angular.fromJson(filter.filterCustom)
 				};
 				custom.selected = filter.filters ? filter.filters.split(/\s*,\s*/) : [];
@@ -359,6 +407,13 @@ ui.directive('uiFilterMenu', function() {
 				} else if (i > -1) {
 					selection.splice(i, 1);
 				}
+				
+				if (isCustom) {
+					$scope.custName = filter.$selected ? filter.name : null;
+					$scope.custTitle = filter.$selected ? filter.title : '';
+					$scope.custShared = filter.$selected ? filter.shared : false;
+					return $scope.$broadcast('on:select-custom', filter, selection);
+				}
 
 				$scope.onFilter();
 			};
@@ -374,7 +429,7 @@ ui.directive('uiFilterMenu', function() {
 			$scope.onSave = function() {
 				
 				var title = _.trim($scope.custTitle),
-					name = _.underscored(title);
+					name = $scope.custName || _.underscored(title);
 				
 				var selected = new Array();
 				
@@ -392,6 +447,7 @@ ui.directive('uiFilterMenu', function() {
 				var value = {
 					name: name,
 					title: title,
+					shared: $scope.custShared,
 					filters: selected.join(', '),
 					filterView: $scope.view.name,
 					filterCustom: angular.toJson(custom)
@@ -403,6 +459,19 @@ ui.directive('uiFilterMenu', function() {
 				}).success(function(res) {
 					acceptCustom(res.data);
 				});
+			};
+			
+			$scope.onClear = function() {
+				
+				_.each(current.domains, function(d) { d.$selected = false; });
+				_.each(current.customs, function(d) { d.$selected = false; });
+				
+				current.domains.length = 0;
+				current.customs.length = 0;
+				
+				$scope.custName = null;
+				$scope.custTitle = null;
+				$scope.custShared = false;
 			};
 
 			$scope.onFilter = function(criteria) {
