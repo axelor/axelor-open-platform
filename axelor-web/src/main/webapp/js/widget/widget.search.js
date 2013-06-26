@@ -620,7 +620,7 @@ ui.directive('uiFilterMenu', function() {
 
 			// append menu to view page to overlap the view
 			setTimeout(function() {
-				element.parents('.view-pane').after(menu);
+				element.parents('.view-container').after(menu);
 			});
 			
 			element.on('$destroy', function() {
