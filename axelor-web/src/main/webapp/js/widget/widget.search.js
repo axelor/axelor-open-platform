@@ -648,27 +648,19 @@ ui.directive('uiFilterMenu', function() {
 			}
 			
 			function onMouseDown(e) {
-				if (!menu || menu.is(e.target)) {
+				var all = $(menu).add(toggleButton);
+				if (all.is(e.target) || all.has(e.target).size() > 0) {
 					return;
 				}
-				if ($.contains(element[0], e.target) ||
-				    $.contains(menu[0], e.target)) {
+				all = $('.ui-widget-overlay,.ui-datepicker:visible,.ui-dialog:visible');
+				if (all.is(e.target) || all.has(e.target).size() > 0) {
 					return;
 				}
-				if ($(e.target).is('.ui-widget-overlay')) {
-					return;
+				if (toggleButton != null) {
+					toggleButton.removeClass('active');
+					toggleButton = null;
 				}
-				var popup = $('.ui-datepicker:visible,.ui-dialog:visible')[0];
-				if (popup && (popup === e.target || $.contains(popup, e.target))) {
-					return;
-				}
-				if (menu) {
-					if (toggleButton != null) {
-						toggleButton.removeClass('active');
-						toggleButton = null;
-					}
-			        hideMenu();
-			    }
+		        hideMenu();
 			}
 
 			element.on('$destroy', function() {
