@@ -172,7 +172,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
 	$scope.fields = {};
 	$scope.filters = [{}];
-	$scope.operator = 'or';
+	$scope.operator = 'and';
 
 	$scope.addFilter = function(filter) {
 		$scope.filters.push(filter || {});
@@ -212,7 +212,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
 		var criteria = custom.criteria;
 		
-		$scope.operator = criteria.operator || 'or';
+		$scope.operator = criteria.operator || 'and';
 
 		_.each(criteria.criteria, function(item) {
 			var filter = {
@@ -335,10 +335,10 @@ ui.directive('uiFilterForm', function() {
 		"<div class='filter-form'>" +
 			"<form class='filter-operator form-inline'>" +
 				"<label class='radio inline'>" +
-					"<input type='radio' name='operator' ng-model='operator' value='or'> or" +
+					"<input type='radio' name='operator' ng-model='operator' value='and'> and" +
 				"</label>" +
 				"<label class='radio inline'>" +
-					"<input type='radio' name='operator' ng-model='operator' value='and'> and" +
+					"<input type='radio' name='operator' ng-model='operator' value='or'> or" +
 				"</label>" +
 			"</form>" +
 			"<div ng-repeat='filter in filters' ui-filter-item x-fields='fields' x-filter='filter'></div>" +
@@ -577,7 +577,7 @@ ui.directive('uiFilterMenu', function() {
 
 				var search = _.extend({}, criteria);
 				if (search.criteria == undefined) {
-					search.operator = "or";
+					search.operator = 'and';
 					search.criteria = [];
 				} else {
 					search.criteria = _.clone(search.criteria);
@@ -593,7 +593,7 @@ ui.directive('uiFilterMenu', function() {
 				_.each(current.customs, function(custom) {
 					if (custom.criteria && custom.criteria.criteria) {
 						customs.push({
-							operator: custom.criteria.operator || 'or',
+							operator: custom.criteria.operator || 'and',
 							criteria: custom.criteria.criteria
 						});
 					}
@@ -609,7 +609,7 @@ ui.directive('uiFilterMenu', function() {
 				
 				if (customs.length > 0) {
 					search.criteria.push({
-						operator: 'or',
+						operator: criteria.operator || 'and',
 						criteria: customs
 					});
 				}
