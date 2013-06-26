@@ -791,16 +791,6 @@ table.field-details .help-text hr {
 	cursor: pointer;
 }
 
-.filter-menu .filter-list > dl dd:hover {
-	text-decoration: underline;
-}
-
-.filter-menu .filter-list > dl dd.selected::before {
-	content: '\002713';
-	margin-left: -14px;
-	padding-right: 3px;
-}
-
 .filter-menu .filter-form .links {
 	line-height: 20px;
 }

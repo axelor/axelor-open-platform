@@ -395,27 +395,34 @@ ui.directive('uiFilterMenu', function() {
 				}
 			}
 
-			$scope.toggleFilter = function(filter, isCustom) {
+			$scope.selectFilter = function(filter, isCustom, live) {
 
-				filter.$selected = !filter.$selected;
-
+				var selected = live ? !filter.$selected : filter.$selected;
 				var selection = isCustom ? current.customs : current.domains;
-				var i = selection.indexOf(filter);
-				
-				if (filter.$selected) {
-					selection.push(filter);
-				} else if (i > -1) {
-					selection.splice(i, 1);
+
+				if (live) {
+					$scope.onClear();
 				}
+
+				filter.$selected = selected;
 				
-				if (isCustom) {
+				var index = selection.indexOf(filter);
+				if (selected) {
+					selection.push(filter);
+				} else if (index > -1) {
+					selection.splice(index, 1);
+				}
+
+				if (isCustom && live) {
 					$scope.custName = filter.$selected ? filter.name : null;
 					$scope.custTitle = filter.$selected ? filter.title : '';
 					$scope.custShared = filter.$selected ? filter.shared : false;
 					return $scope.$broadcast('on:select-custom', filter, selection);
 				}
 
-				$scope.onFilter();
+				if (live) {
+					$scope.onFilter();
+				}
 			};
 
 			$scope.isSelected = function(filter) {
@@ -507,8 +514,8 @@ ui.directive('uiFilterMenu', function() {
 			
 			$scope.onClear = function() {
 				
-				_.each(current.domains, function(d) { d.$selected = false; });
-				_.each(current.customs, function(d) { d.$selected = false; });
+				_.each($scope.viewFilters, function(d) { d.$selected = false; });
+				_.each($scope.custFilters, function(d) { d.$selected = false; });
 				
 				current.domains.length = 0;
 				current.customs.length = 0;
@@ -601,15 +608,21 @@ ui.directive('uiFilterMenu', function() {
 				"<div class='filter-list'>" +
 					"<dl>" +
 						"<dt>Filters</dt>" +
-						"<dd ng-repeat='filter in viewFilters' " +
-							"ng-click='toggleFilter(filter)' " +
-							"ng-class='{selected: isSelected(filter)}'>{{filter.title}}</dd>" +
+						"<dd ng-repeat='filter in viewFilters' class='checkbox'>" +
+							"<input type='checkbox' " +
+								"ng-model='filter.$selected' " +
+								"ng-click='selectFilter(filter, false, false)'> " +
+							"<a href='' ng-click='selectFilter(filter, false, true)'>{{filter.title}}</a>" +
+						"</dd>" +
 					"</dl>" +
 					"<dl>" +
 						"<dt>My Filters</dt>" +
-						"<dd ng-repeat='filter in custFilters' " +
-							"ng-click='toggleFilter(filter, true)' " +
-							"ng-class='{selected: isSelected(filter)}'>{{filter.title}}</dd>" +
+						"<dd ng-repeat='filter in custFilters' class='checkbox'>" +
+							"<input type='checkbox' " +
+								"ng-model='filter.$selected' " +
+								"ng-click='selectFilter(filter, true, false)'> " +
+							"<a href='' ng-click='selectFilter(filter, true, true)'>{{filter.title}}</a>" +
+						"</dd>" +
 					"</dl>" +
 				"</div>" +
 				"<hr>" +
