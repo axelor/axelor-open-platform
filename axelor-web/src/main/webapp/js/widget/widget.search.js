@@ -284,7 +284,7 @@ ui.directive('uiFilterMenu', function() {
 		scope: {
 			handler: '='
 		},
-		controller: ['$scope', 'ViewService', function($scope, ViewService) {
+		controller: ['$scope', 'ViewService', 'DataSource', function($scope, ViewService, DataSource) {
 			
 			var handler = $scope.handler,
 				params = (handler._viewParams || {}).params;
@@ -294,6 +294,8 @@ ui.directive('uiFilterMenu', function() {
 				type: 'search-filters'
 			};
 
+			var filterDS = DataSource.create('com.axelor.meta.db.MetaFilter');
+
 			$scope.model = handler._model;
 			$scope.view = {};
 
@@ -302,26 +304,62 @@ ui.directive('uiFilterMenu', function() {
 			
 			if (filterView) {
 				ViewService.getMetaDef($scope.model, filterView).success(function(fields, view) {
+					
+					filterDS.rpc('com.axelor.meta.web.MetaUserController:findFilters', {
+						model: 'com.axelor.meta.db.MetaFilter',
+						context: {
+							filterView: view.name
+						}
+					}).success(function(res) {
+						_.each(res.data, function(item) {
+							acceptCustom(item);
+						});
+					});
+
 					$scope.view = view;
 					$scope.viewFilters = angular.copy(view.filters);
 				});
 			}
-			
+
 			var current = {
 				criteria: {},
-				domains: []
+				domains: [],
+				customs: []
 			};
 
-			$scope.toggleFilter = function(filter) {
-				var domains = current.domains;
-				var i = domains.indexOf(filter);
+			function acceptCustom(filter) {
+
+				var custom = {
+					title: filter.title,
+					name: filter.name,
+					criteria: angular.fromJson(filter.filterCustom)
+				};
+				custom.selected = filter.filters ? filter.filters.split(/\s*,\s*/) : [];
+				custom.selected = _.map(custom.selected, function(x) {
+					return parseInt(x);
+				});
 				
-				filter.$selected = !filter.$selected;
-				if (filter.$selected) {
-					domains.push(filter);
-				} else if (i > -1) {
-					domains.splice(i, 1);
+				var found = _.findWhere($scope.custFilters, {name: custom.name});
+				if (found) {
+					_.extend(found, custom);
+				} else {
+					$scope.custFilters.push(custom);
 				}
+			}
+
+			$scope.toggleFilter = function(filter, isCustom) {
+
+				filter.$selected = !filter.$selected;
+
+				var selection = isCustom ? current.customs : current.domains;
+				var i = selection.indexOf(filter);
+				
+				if (filter.$selected) {
+					selection.push(filter);
+				} else if (i > -1) {
+					selection.splice(i, 1);
+				}
+
 				$scope.onFilter();
 			};
 
@@ -332,22 +370,86 @@ ui.directive('uiFilterMenu', function() {
 			$scope.onRefresh = function() {
 				handler.onRefresh();
 			};
+			
+			$scope.onSave = function() {
+				
+				var title = _.trim($scope.custTitle),
+					name = _.underscored(title);
+				
+				var selected = new Array();
+				
+				_.each($scope.viewFilters, function(item, i) {
+					if (item.$selected) selected.push(i);
+				});
+				
+				var custom = current.criteria || {};
+
+				custom = _.extend({
+					operator: custom.operator,
+					criteria: custom.criteria
+				});
+
+				var value = {
+					name: name,
+					title: title,
+					filters: selected.join(', '),
+					filterView: $scope.view.name,
+					filterCustom: angular.toJson(custom)
+				};
+				
+				filterDS.rpc('com.axelor.meta.web.MetaUserController:saveFilter', {
+					model: 'com.axelor.meta.db.MetaFilter',
+					context: value
+				}).success(function(res) {
+					acceptCustom(res.data);
+				});
+			};
 
 			$scope.onFilter = function(criteria) {
-				
+
 				if (criteria) {
 					current.criteria = criteria;
 				} else {
 					criteria = current.criteria;
 				}
-				
-				var search = _.extend(criteria, {
-					_domains: current.domains
-				});
-				
+
+				var search = _.extend({}, criteria);
 				if (search.criteria == undefined) {
 					search.operator = "or";
 					search.criteria = [];
+				} else {
+					search.criteria = _.clone(search.criteria);
+				}
+
+				var domains = [],
+					customs = [];
+
+				_.each(current.domains, function(domain) {
+					domains.push(domain);
+				});
+
+				_.each(current.customs, function(custom) {
+					if (custom.criteria && custom.criteria.criteria) {
+						customs.push({
+							operator: custom.criteria.operator || 'or',
+							criteria: custom.criteria.criteria
+						});
+					}
+					_.each(custom.selected, function(i) {
+						var domain = $scope.viewFilters[i];
+						if (domains.indexOf(domain) == -1) {
+							domains.push(domain);
+						}
+					});
+				});
+
+				search._domains = domains;
+				
+				if (customs.length > 0) {
+					search.criteria.push({
+						operator: 'or',
+						criteria: customs
+					});
 				}
 
 				handler.filter(search);
@@ -392,8 +494,9 @@ ui.directive('uiFilterMenu', function() {
 					"</dl>" +
 					"<dl>" +
 						"<dt>My Filters</dt>" +
-						"<dd>filter 1</dd>" +
-						"<dd>filter 2</dd>" +
+						"<dd ng-repeat='filter in custFilters' " +
+							"ng-click='toggleFilter(filter, true)' " +
+							"ng-class='{selected: isSelected(filter)}'>{{filter.title}}</dd>" +
 					"</dl>" +
 				"</div>" +
 				"<hr>" +
@@ -401,12 +504,12 @@ ui.directive('uiFilterMenu', function() {
 				"<hr>" +
 				"<div class='form-inline'>" +
 					"<div class='control-group'>" +
-						"<input type='text' placeholder='save filter as'> " +
+						"<input type='text' placeholder='save filter as' ng-model='custTitle'> " +
 						"<label class='checkbox'>" +
-							"<input type='checkbox'> <span x-translate>Share</span>" +
+							"<input type='checkbox' ng-model='custShared'> <span x-translate>Share</span>" +
 						"</label>" +
 					"</div>" +
-					"<button class='btn btn-small'>save</button>" +
+					"<button class='btn btn-small' ng-click='onSave()' ng-disabled='!custTitle'>save</button>" +
 				"</div>" +
 			"</div>" +
 		"</div>"

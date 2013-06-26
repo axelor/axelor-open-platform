@@ -797,8 +797,8 @@ table.field-details .help-text hr {
 
 .filter-menu .filter-list > dl dd.selected::before {
 	content: '\002713';
-	position: absolute;
-	left: 10px;
+	margin-left: -14px;
+	padding-right: 3px;
 }
 
 .filter-menu .filter-form .links {
