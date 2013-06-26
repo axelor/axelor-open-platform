@@ -336,11 +336,7 @@ ui.directive('uiFilterMenu', function() {
 			var handler = $scope.handler,
 				params = (handler._viewParams || {}).params;
 
-			var filterView = {
-				name: params['search-filters'],
-				type: 'search-filters'
-			};
-
+			var filterView = params['search-filters'];
 			var filterDS = DataSource.create('com.axelor.meta.db.MetaFilter');
 
 			$scope.model = handler._model;
@@ -350,21 +346,25 @@ ui.directive('uiFilterMenu', function() {
 			$scope.custFilters = [];
 			
 			if (filterView) {
-				ViewService.getMetaDef($scope.model, filterView).success(function(fields, view) {
-					
-					filterDS.rpc('com.axelor.meta.web.MetaUserController:findFilters', {
-						model: 'com.axelor.meta.db.MetaFilter',
-						context: {
-							filterView: view.name
-						}
-					}).success(function(res) {
-						_.each(res.data, function(item) {
-							acceptCustom(item);
-						});
-					});
-
+				ViewService.getMetaDef($scope.model, {name: filterView, type: 'search-filters'})
+				.success(function(fields, view) {
 					$scope.view = view;
 					$scope.viewFilters = angular.copy(view.filters);
+				});
+			} else {
+				filterView = (handler._viewParams || {}).action;
+			}
+			
+			if (filterView) {
+				filterDS.rpc('com.axelor.meta.web.MetaUserController:findFilters', {
+					model: 'com.axelor.meta.db.MetaFilter',
+					context: {
+						filterView: filterView
+					}
+				}).success(function(res) {
+					_.each(res.data, function(item) {
+						acceptCustom(item);
+					});
 				});
 			}
 
@@ -467,7 +467,7 @@ ui.directive('uiFilterMenu', function() {
 					title: title,
 					shared: $scope.custShared,
 					filters: selected.join(', '),
-					filterView: $scope.view.name,
+					filterView: filterView,
 					filterCustom: angular.toJson(custom)
 				};
 				
@@ -491,7 +491,7 @@ ui.directive('uiFilterMenu', function() {
 						model: 'com.axelor.meta.db.MetaFilter',
 						context: {
 							name: name,
-							filterView: $scope.view.name
+							filterView: filterView
 						}
 					}).success(function(res) {
 						var found = _.findWhere($scope.custFilters, {name: name});
