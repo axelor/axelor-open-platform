@@ -461,6 +461,39 @@ ui.directive('uiFilterMenu', function() {
 				});
 			};
 			
+			$scope.onDelete = function() {
+				
+				var name = $scope.custName;
+				if (!name) {
+					return;
+				}
+				
+				function doDelete() {
+					filterDS.rpc('com.axelor.meta.web.MetaUserController:removeFilter', {
+						model: 'com.axelor.meta.db.MetaFilter',
+						context: {
+							name: name,
+							filterView: $scope.view.name
+						}
+					}).success(function(res) {
+						var found = _.findWhere($scope.custFilters, {name: name});
+						if (found) {
+							$scope.custFilters.splice($scope.custFilters.indexOf(found), 1);
+							$scope.custName = null;
+							$scope.custTitle = null;
+							$scope.custShared = false;
+						}
+						$scope.onFilter();
+					});
+				}
+				
+				axelor.dialogs.confirm(_t("Would you like to remove the filter?"), function(confirmed){
+					if (confirmed) {
+						doDelete();
+					}
+				});
+			};
+			
 			$scope.onClear = function() {
 				
 				_.each(current.domains, function(d) { d.$selected = false; });
@@ -578,7 +611,8 @@ ui.directive('uiFilterMenu', function() {
 							"<input type='checkbox' ng-model='custShared'> <span x-translate>Share</span>" +
 						"</label>" +
 					"</div>" +
-					"<button class='btn btn-small' ng-click='onSave()' ng-disabled='!custTitle'>save</button>" +
+					"<button class='btn btn-small' ng-click='onSave()' ng-disabled='!custTitle'>save</button> " +
+					"<button class='btn btn-small' ng-click='onDelete()' ng-show='custName'>delete</button>" +
 				"</div>" +
 			"</div>" +
 		"</div>"
