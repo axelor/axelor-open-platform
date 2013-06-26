@@ -433,6 +433,17 @@ ui.directive('uiFilterMenu', function() {
 				handler.onRefresh();
 			};
 			
+			$scope.hasFilters = function(which) {
+				if (which === 1) {
+					return this.viewFilters && this.viewFilters.length;
+				}
+				if (which === 2) {
+					return this.custFilters && this.custFilters.length;
+				}
+				return (this.viewFilters && this.viewFilters.length) ||
+					   (this.custFilters && this.custFilters.length);
+			};
+			
 			$scope.canSaveNew = function() {
 				if ($scope.custName && $scope.custTitle) {
 					return !angular.equals($scope.custName, _.underscored($scope.custTitle));
@@ -606,7 +617,7 @@ ui.directive('uiFilterMenu', function() {
 			"</button>" +
 			"<div class='filter-menu'>"+
 				"<div class='filter-list'>" +
-					"<dl>" +
+					"<dl ng-show='hasFilters(1)'>" +
 						"<dt>Filters</dt>" +
 						"<dd ng-repeat='filter in viewFilters' class='checkbox'>" +
 							"<input type='checkbox' " +
@@ -615,7 +626,7 @@ ui.directive('uiFilterMenu', function() {
 							"<a href='' ng-click='selectFilter(filter, false, true)'>{{filter.title}}</a>" +
 						"</dd>" +
 					"</dl>" +
-					"<dl>" +
+					"<dl ng-show='hasFilters(2)'>" +
 						"<dt>My Filters</dt>" +
 						"<dd ng-repeat='filter in custFilters' class='checkbox'>" +
 							"<input type='checkbox' " +
@@ -625,7 +636,7 @@ ui.directive('uiFilterMenu', function() {
 						"</dd>" +
 					"</dl>" +
 				"</div>" +
-				"<hr>" +
+				"<hr ng-show='hasFilters()'>" +
 				"<div ui-filter-form x-model='model'></div>" +
 				"<hr>" +
 				"<div class='form-inline'>" +
