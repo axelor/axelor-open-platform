@@ -52,9 +52,10 @@ load([
 	
 	'lib/fullcalendar/fullcalendar.js',
 	'lib/fullcalendar/gcal.js',
-	
-	'lib/nvd3/lib/d3.v2.js',
-	'lib/nvd3/nv.d3.js',
+
+	'lib/d3/d3.v3.js',
+	'lib/d3/nv/nv.d3.js',
+	'lib/d3/radar/radar-chart.js',
 
 	'lib/ace/js/ace.js',
 	'lib/tinymce/tinymce.min.js',
