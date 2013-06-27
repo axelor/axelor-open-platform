@@ -26,6 +26,9 @@ public class ChartView extends AbstractView {
 	@XmlElement
 	private List<ChartSeries> series;
 	
+	@XmlElement
+	private List<ChartConfig> config;
+
 	public Boolean getStacked() {
 		return stacked;
 	}
@@ -40,6 +43,10 @@ public class ChartView extends AbstractView {
 
 	public List<ChartSeries> getSeries() {
 		return series;
+	}
+	
+	public List<ChartConfig> getConfig() {
+		return config;
 	}
 	
 	@XmlType
@@ -138,6 +145,32 @@ public class ChartView extends AbstractView {
 		
 		public String getAggregate() {
 			return aggregate;
+		}
+	}
+	
+	@XmlType
+	public static class ChartConfig {
+		
+		@XmlAttribute
+		private String name;
+		
+		@XmlAttribute
+		private String value;
+		
+		public String getName() {
+			return name;
+		}
+		
+		public void setName(String name) {
+			this.name = name;
+		}
+		
+		public void setValue(String value) {
+			this.value = value;
+		}
+		
+		public String getValue() {
+			return value;
 		}
 	}
 }
