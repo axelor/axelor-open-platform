@@ -227,6 +227,41 @@ function AreaChart(scope, element, data) {
 	return chart;
 }
 
+REGISTRY["radar"] = RadarCharter;
+function RadarCharter(scope, element, data) {
+
+	var result = _.map(data.dataset, function(item) {
+		return _.map(data.series, function(s) {
+			var title = s.title || s.key,
+				value = item[s.key];
+			return {
+				axis: title,
+				value: $conv(value) || 0
+			};
+		});
+	});
+
+	var id = _.uniqueId('_radarChart'),
+		parent = element.parent();
+
+	parent.attr('id', id)
+		  .addClass('radar-chart')
+		  .empty();
+
+	var size = Math.min(parent.innerWidth(), parent.innerHeight());
+
+	RadarChart.draw('#'+id, result, {
+		w: size,
+		h: size
+	});
+
+	parent.children('svg')
+		.css('width', 'auto')
+		.css('margin', 'auto')
+		.css('margin-top', 10);
+	
+	return null;
+}
 function Chart(scope, element, data) {
 	
 	var type = null;
@@ -234,7 +269,7 @@ function Chart(scope, element, data) {
 	for(var i = 0 ; i < data.series.length ; i++) {
 		type = data.series[i].type;
 		if (type === "bar" && !data.series[i].groupBy) type = "dbar";
-		if (type === "pie" || type === "dbar") {
+		if (type === "pie" || type === "dbar" || type === "radar" || type === "gauge") {
 			break;
 		}
 	}
@@ -243,7 +278,7 @@ function Chart(scope, element, data) {
 		return;
 	}
 	
-	if (data.series.length > 1) {
+	if (type !== "radar" && data.series.length > 1) {
 		type = "multi";
 	}
 
@@ -312,10 +347,10 @@ var directiveFn = function(){
 		controller: ChartCtrl,
 		link: function(scope, element, attrs) {
 			
-			var elem = element.children('svg'),
-				initialized = false;
+			var initialized = false;
 
 			scope.render = function(data) {
+				var elem = element.children('svg');
 				if (elem.is(":hidden")) {
 					return initialized = false;
 				}
