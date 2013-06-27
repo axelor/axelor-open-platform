@@ -762,6 +762,32 @@ table.field-details .help-text hr {
 
 /* filter menu */
 
+.filter-box {
+	position: relative;
+	display: inline-block;
+	margin: 0 5px;
+	margin-bottom: 0;
+}
+
+.filter-box .search-icons {
+	position: absolute;
+	display: inline-block;
+	top: 0;
+	right: 0;
+	padding-top: 7px;
+	padding-right: 6px;
+}
+
+.filter-box .search-icons i {
+	padding: 3px;
+	cursor: pointer;
+	color: silver;
+}
+
+.filter-box .search-icons i:hover {
+	color: black;
+}
+
 .filter-menu {
 
 	display: none;

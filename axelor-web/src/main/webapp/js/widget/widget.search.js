@@ -159,6 +159,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		return ViewService
 		.getFields(model)
 		.success(function(fields) {
+			var nameField = null;
 			_.each(fields, function(field, name) {
 				if (field.name === 'id' || field.name === 'version' ||
 					field.name === 'archived' || field.name === 'selected') return;
@@ -166,7 +167,12 @@ function FilterFormCtrl($scope, $element, ViewService) {
 				if (field.name === 'createdBy' || field.name === 'updatedBy') return;
 				if (field.type === 'binary' || field.large) return;
 				$scope.fields[name] = field;
+				if (field.nameColumn) {
+					nameField = name;
+				}
 			});
+			$scope.$parent.fields = $scope.fields;
+			$scope.$parent.nameField = nameField || 'name';
 		});
 	};
 
@@ -353,7 +359,7 @@ ui.directive('uiFilterForm', function() {
 	};
 });
 
-ui.directive('uiFilterMenu', function() {
+ui.directive('uiFilterBox', function() {
 
 	return {
 		scope: {
@@ -458,6 +464,9 @@ ui.directive('uiFilterMenu', function() {
 			};
 			
 			$scope.onRefresh = function() {
+				if (this.custTerm) {
+					return this.onFreeSearch();
+				}
 				handler.onRefresh();
 			};
 			
@@ -565,6 +574,7 @@ ui.directive('uiFilterMenu', function() {
 				$scope.custName = null;
 				$scope.custTitle = null;
 				$scope.custShared = false;
+				$scope.custTerm = null;
 			};
 
 			$scope.onFilter = function(criteria) {
@@ -616,6 +626,70 @@ ui.directive('uiFilterMenu', function() {
 
 				handler.filter(search);
 			};
+
+			$scope.onFreeSearch = function() {
+				
+				var filters = Array(),
+					text = this.custTerm,
+					number = +(text);
+
+				if (this.nameField) {
+					filters.push({
+						fieldName: this.nameField,
+						operator: 'like',
+						value: text
+					});
+				}
+				
+				for(var name in this.fields) {
+					
+					if (name === this.nameField) continue;
+					
+					var fieldName = null,
+						operator = "like",
+						value = text;
+					
+					var field = this.fields[name];
+
+					switch (field.type) {
+					case 'integer':
+					case 'decimal':
+						if (_.isNaN(number) || !text || !_.isNumber(number)) continue;
+						fieldName = name;
+						operator = '=';
+						value = number;
+						break;
+					case 'string':
+						fieldName = name;
+						break;
+					case 'many-to-one':
+						fieldName = name + '.' + field.targetName;
+						break;
+					case 'boolean':
+						if (/^(t|f|y|n|true|false|yes|no)$/.test(text)) {
+							fieldName = name;
+							operator = '=';
+							value = /^(t|y|true|yes)$/.test(text);
+						}
+						break;
+					}
+
+					if (!fieldName) continue;
+					
+					filters.push({
+						fieldName: fieldName,
+						operator: operator,
+						value: value
+					});
+				}
+
+				var criteria = {
+					operator: 'or',
+					criteria: filters
+				};
+
+				this.onFilter(criteria);
+			};
 		}],
 		link: function(scope, element, attrs) {
 
@@ -623,8 +697,7 @@ ui.directive('uiFilterMenu', function() {
 				toggleButton = null;
 
 			scope.onSearch = function(e) {
-				var hidden = $(e.currentTarget).is('.active');
-				if (hidden) {
+				if (menu && menu.is(':visible')) {
 					return hideMenu();
 				}
 				toggleButton = $(e.currentTarget);
@@ -632,7 +705,7 @@ ui.directive('uiFilterMenu', function() {
 				menu.position({
 					my: "left top",
 					at: "left bottom",
-					of: e.currentTarget
+					of: element
 				});
 				$(document).on('mousedown.search-menu', onMouseDown);
 			};
@@ -640,6 +713,12 @@ ui.directive('uiFilterMenu', function() {
 			// append menu to view page to overlap the view
 			setTimeout(function() {
 				element.parents('.view-container').after(menu);
+			});
+			
+			element.on('keydown.search-query', '.search-query', function(e) {
+				if (e.keyCode === 13) { // enter
+					scope.onFreeSearch();
+				}
 			});
 			
 			function hideMenu() {
@@ -656,10 +735,6 @@ ui.directive('uiFilterMenu', function() {
 				if (all.is(e.target) || all.has(e.target).size() > 0) {
 					return;
 				}
-				if (toggleButton != null) {
-					toggleButton.removeClass('active');
-					toggleButton = null;
-				}
 		        hideMenu();
 			}
 
@@ -673,11 +748,12 @@ ui.directive('uiFilterMenu', function() {
 		},
 		replace: true,
 		template:
-		"<div class='btn-group'>" +
-			"<button class='btn' ng-click='onRefresh()'><i class='icon icon-refresh'></i> <span x-translate>Refresh</span></button>" +
-			"<button class='btn' ng-click='onSearch($event)' data-toggle='button'>"+
-				"<i class='icon icon-search'></i> <span x-translate>Search</span>" +
-			"</button>" +
+		"<div class='filter-box'>" +
+			"<input type='text' class='search-query' ng-model='custTerm'>" +
+			"<span class='search-icons'>" +
+				"<i ng-click='onSearch($event)' class='icon-caret-down'></i>"+
+				"<i ng-click='onRefresh()' class='icon-search'></i>" +
+			"</span>" +
 			"<div class='filter-menu'>"+
 				"<div class='filter-list'>" +
 					"<dl ng-show='hasFilters(1)'>" +
