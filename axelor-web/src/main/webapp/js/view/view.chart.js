@@ -262,6 +262,45 @@ function RadarCharter(scope, element, data) {
 	
 	return null;
 }
+
+REGISTRY["gauge"] = GaugeCharter;
+function GaugeCharter(scope, element, data) {
+	
+	var config = data.config,
+		min = +(config.min) || 0,
+		max = +(config.max) || 100,
+		value = 0;
+
+	var item = _.first(data.dataset),
+		series = _.first(data.series),
+		key = series.key || data.xAxis;
+
+	if (item) {
+		value = item[key] || value;
+	}
+	
+	var parent = element.parent();
+	parent.empty();
+
+	var chart = GaugeChart(parent[0], {
+		size: 300,
+		clipWidth: 300,
+		clipHeight: 300,
+		ringWidth: 60,
+		minValue: min,
+		maxValue: max,
+		transitionMs: 4000
+	});
+
+	chart.render();
+	chart.update(value);
+
+	parent.children('svg')
+		.css('width', 'auto')
+		.css('margin', 'auto')
+		.css('margin-top', 10);
+}
+
 function Chart(scope, element, data) {
 	
 	var type = null;
