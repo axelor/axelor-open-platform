@@ -15,19 +15,19 @@ import org.slf4j.LoggerFactory;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
 import com.axelor.meta.db.MetaMenu;
-import com.axelor.meta.db.MetaProfile;
+import com.axelor.meta.db.MetaAuthProfile;
 import com.google.common.collect.Lists;
 import com.google.inject.persist.Transactional;
 
-public class MetaProfileService {
+public class MetaAuthProfileService {
 
-	private static Logger log = LoggerFactory.getLogger(MetaProfileService.class);
+	private static Logger log = LoggerFactory.getLogger(MetaAuthProfileService.class);
 
-	public List<Permission> generatePermissions( MetaProfile metaProfile ){
+	public List<Permission> generatePermissions( MetaAuthProfile MetaAuthProfile ){
 
-		log.debug("Generate perms for package : {}", metaProfile.getTargetPackage() );
+		log.debug("Generate perms for package : {}", MetaAuthProfile.getTargetPackage() );
 		
-		Set<URL> urls = ClasspathHelper.forPackage( metaProfile.getTargetPackage() );
+		Set<URL> urls = ClasspathHelper.forPackage( MetaAuthProfile.getTargetPackage() );
 		
 		Reflections reflections = new Reflections( new ConfigurationBuilder().addUrls( urls ) );
 		
@@ -35,7 +35,7 @@ public class MetaProfileService {
 		
 		for (Class<?> klass : reflections.getTypesAnnotatedWith( Table.class )) {
 			
-			permissions.add( generatePermission( klass, metaProfile ) );
+			permissions.add( generatePermission( klass, MetaAuthProfile ) );
 			
 		}
 		
@@ -44,22 +44,22 @@ public class MetaProfileService {
 	}
 	
 	@Transactional
-	protected Permission generatePermission( Class<?> klass, MetaProfile metaProfile ){
+	protected Permission generatePermission( Class<?> klass, MetaAuthProfile MetaAuthProfile ){
 		
 		log.debug("Generate perms for : {}", klass);
 		String object = klass.getName();
 		
-		Permission permission = createPerms(object, metaProfile);
-		groupsAddPermission(permission, metaProfile.getGroups());
-		viewsAddGroups(metaProfile.getMetaMenus(), metaProfile.getGroups());
+		Permission permission = createPerms(object, MetaAuthProfile);
+		groupsAddPermission(permission, MetaAuthProfile.getGroups());
+		viewsAddGroups(MetaAuthProfile.getMetaMenus(), MetaAuthProfile.getGroups());
 		
 		return permission.save();
 	}
 	
-	protected Permission createPerms( String object, MetaProfile metaProfile ){
+	protected Permission createPerms( String object, MetaAuthProfile MetaAuthProfile ){
 
 		String[] objectSplit = object.split("\\.");
-		String name = metaProfile.getName() + objectSplit[ objectSplit.length - 1 ];
+		String name = MetaAuthProfile.getName() + objectSplit[ objectSplit.length - 1 ];
 		
 		Permission permission = Permission.findByName(name);
 		
@@ -70,22 +70,22 @@ public class MetaProfileService {
 			permission.setName( name );
 			permission.setObject( object );
 			
-			permission.setCanRead( metaProfile.getCanRead() );
-			permission.setCanWrite( metaProfile.getCanWrite() );
-			permission.setCanCreate( metaProfile.getCanCreate() );
-			permission.setCanRemove( metaProfile.getCanRemove() );
+			permission.setCanRead( MetaAuthProfile.getCanRead() );
+			permission.setCanWrite( MetaAuthProfile.getCanWrite() );
+			permission.setCanCreate( MetaAuthProfile.getCanCreate() );
+			permission.setCanRemove( MetaAuthProfile.getCanRemove() );
 			
-			permission.setReadCondition( metaProfile.getReadCondition() );
-			permission.setReadParams( metaProfile.getReadParams() );
+			permission.setReadCondition( MetaAuthProfile.getReadCondition() );
+			permission.setReadParams( MetaAuthProfile.getReadParams() );
 			
-			permission.setWriteCondition( metaProfile.getWriteCondition() );
-			permission.setWriteParams( metaProfile.getWriteParams() );
+			permission.setWriteCondition( MetaAuthProfile.getWriteCondition() );
+			permission.setWriteParams( MetaAuthProfile.getWriteParams() );
 			
-			permission.setCreateCondition( metaProfile.getCreateCondition() );
-			permission.setCreateParams( metaProfile.getCreateParams() );
+			permission.setCreateCondition( MetaAuthProfile.getCreateCondition() );
+			permission.setCreateParams( MetaAuthProfile.getCreateParams() );
 			
-			permission.setRemoveCondition( metaProfile.getRemoveCondition() );
-			permission.setRemoveParams( metaProfile.getRemoveParams() );
+			permission.setRemoveCondition( MetaAuthProfile.getRemoveCondition() );
+			permission.setRemoveParams( MetaAuthProfile.getRemoveParams() );
 		
 		}
 		

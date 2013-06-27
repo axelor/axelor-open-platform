@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views
   http://apps.axelor.com/xml/ns/object-views/object-views_0.9.xsd">
 
-	<grid title="Meta Profiles" name="meta-profile-grid">
+	<grid title="Auth Profiles" name="meta-auth-profile-grid">
 		<field name="name" />
 		<field name="targetPackage" />
 		<field name="canRead" />
@@ -14,8 +14,8 @@
 		<field name="groups" />
 	</grid>
 
-	<form cols="4" colWidths="*,175" name="meta-profile-form"
-		title="Meta Profile">
+	<form cols="4" colWidths="*,175" name="meta-auth-profile-form"
+		title="Auth Profile">
 		<toolbar>
 			<button name="generate" title="Generate"
 				onClick="save,action-meta-profile-method-generate" />
@@ -37,7 +37,7 @@
 				<field name="groups" colSpan="2" showTitle="false" />
 			</page>
 			<page title="Menus" cols="4">
-				<field name="allMenus" onChange="action-meta-profile-add-all-menus" />
+				<field name="allMenus" onChange="action-meta-auth-profile-add-all-menus" />
 				<field name="metaMenus" colSpan="4" domain="self.action.model like CONCAT(:targetPackage, '%')" showTitle="false" />
 			</page>
 			<page title="Conditions" cols="2">
@@ -62,7 +62,7 @@
 	</form>
 
 	<action-method name="action-meta-profile-method-generate">
-		<call class="com.axelor.meta.web.MetaProfileController" method="generate" />
+		<call class="com.axelor.meta.web.MetaAuthProfileController" method="generate" />
 	</action-method>
 
 	<action-view name="action-meta-profile-view-permissions"
@@ -74,7 +74,7 @@
 		<context name="targetPackage" expr="eval: targetPackage" />
 	</action-view>
 	
-	<action-record name="action-meta-profile-add-all-menus" model="com.axelor.meta.db.MetaProfile">
+	<action-record name="action-meta-auth-profile-add-all-menus" model="com.axelor.meta.db.MetaAuthProfile">
 		<field name="metaMenus" expr="com.axelor.meta.db.MetaMenu.all().filter(&quot;self.action.model like CONCAT(?1, '%')&quot;,targetPackage).fetch()" if="allMenus"/>
 	</action-record>
 
