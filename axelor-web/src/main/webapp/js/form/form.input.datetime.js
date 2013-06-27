@@ -143,6 +143,8 @@ ui.formInput('DateTime', {
 		var input = element.children('input:first');
 		var button = element.find('i:first');
 		var onChange = scope.$events.onChange;
+		var props = scope.field;
+		var isDate = this.isDate;
 		
 		var options = {
 			dateFormat: 'dd/mm/yy',
@@ -236,6 +238,33 @@ ui.formInput('DateTime', {
 				scope.$apply();
 			});
 		}
+
+		scope.validate = function(value) {
+			var minSize = props.minSize === 'now' ? moment() : props.minSize,
+				maxSize = props.maxSize,
+				input = moment(value),
+				valid = true;
+
+			if(isDate) {
+				if(minSize) minSize = moment(minSize).startOf('day');
+				if(maxSize) maxSize = moment(maxSize).startOf('day');
+			}
+			else {
+				if(minSize) minSize = moment(minSize);
+				if(maxSize) maxSize = moment(maxSize);
+			}
+
+			if(minSize) {
+				if(!input) return false;
+				valid = !input.isBefore(minSize) ;
+			}
+			if(valid && maxSize) {
+				if(!input) return true;
+				valid = !input.isAfter(maxSize) ;
+			}
+
+			return valid;
+		};
 
 		scope.$render_editable = function() {
 			rendering = true;
