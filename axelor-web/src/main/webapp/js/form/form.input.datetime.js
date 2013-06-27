@@ -126,7 +126,7 @@ ui.formInput('DateTime', {
 		
 		scope.parse = function(value) {
 			if (angular.isDate(value)) {
-				return isDate ? moment(value).sod().format('YYYY-MM-DD') : value.toISOString();
+				return isDate ? moment(value).startOf('day').format('YYYY-MM-DD') : value.toISOString();
 			}
 			return value;
 		},
