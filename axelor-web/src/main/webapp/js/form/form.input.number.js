@@ -25,14 +25,25 @@ ui.formInput('Number', {
 		};
 
 		scope.validate = scope.isValid = function(value) {
-			var valid = scope.isNumber(value);
+			var valid = scope.isNumber(value),
+				minSize = +props.minSize,
+				maxSize = +props.maxSize;
             if (valid && _.isString(value)) {
             	var parts = value.split(/\./),
             		integer = parts[0] || "",
             		decimal = parts[1] || "";
             	valid = (integer.length <= precision - scale) && (decimal.length <= scale);
+            	value = +value;
             }
-            return valid;
+
+            if (valid && minSize) {
+				valid = value >= minSize;
+			}
+			if (valid && maxSize) {
+				valid = value <= maxSize;
+			}
+
+        	return valid;
 		};
 
 		scope.format = function format(value) {
