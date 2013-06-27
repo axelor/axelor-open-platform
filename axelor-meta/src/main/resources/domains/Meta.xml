@@ -146,6 +146,11 @@
     <string name="side" />
     <string name="aggregate"/>
   </entity>
+  
+  <entity name="MetaChartConfig" table="META_CHART_CONFIG">
+    <string name="name" required="true"/>
+    <string name="value" required="true"/>
+  </entity>
 
   <entity name="MetaChart" table="META_CHART">
     <string name="name" required="true" unique="true"/>
@@ -158,6 +163,7 @@
     <string name="categoryType" />
     <string name="categoryTitle" />
     <one-to-many name="chartSeries" ref="MetaChartSeries" />
+    <one-to-many name="chartConfig" ref="MetaChartConfig" />
 	<finder-method name="findByModule" using="module" all="true"/>
   </entity>
 

@@ -1,10 +1,7 @@
 package com.axelor.meta.service;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
@@ -21,35 +18,30 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
-import com.axelor.db.mapper.Property;
 import com.axelor.meta.GroovyScriptHelper;
 import com.axelor.meta.MetaLoader;
 import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaChart;
+import com.axelor.meta.db.MetaChartConfig;
 import com.axelor.meta.db.MetaChartSeries;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.MetaMenu;
-import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.schema.views.Search;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
-import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.io.Files;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 
 public class MetaService {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MetaService.class);
-	private String QUOTE = "\"";
-	private String COMMA = ",";
 	
 	@Inject
 	private MetaLoader loader;
@@ -393,6 +385,8 @@ public class MetaService {
 		});
 
 		List<Object> series = Lists.newArrayList();
+		Map<String, Object> config = Maps.newHashMap();
+		
 		for(MetaChartSeries s : chart.getChartSeries()) {
 			Map<String, Object> map = Maps.newHashMap();
 			map.put("key", s.getKey());
@@ -402,11 +396,19 @@ public class MetaService {
 			map.put("title", JPA.translate(s.getTitle()));
 			series.add(map);
 		}
+		
+		if (chart.getChartConfig() != null) {
+			for(MetaChartConfig c : chart.getChartConfig()) {
+				config.put(c.getName(), c.getValue());
+			}
+		}
+
 		data.put("series", series);
+		data.put("config", config);
 
 		response.setData(data);
-		
 		response.setStatus(Response.STATUS_SUCCESS);
+
 		return response;
 	}
 }

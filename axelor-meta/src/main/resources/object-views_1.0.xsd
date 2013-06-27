@@ -531,6 +531,8 @@
                     <xsd:enumeration value="hbar"/>
                     <xsd:enumeration value="line"/>
                     <xsd:enumeration value="area"/>
+                    <xsd:enumeration value="radar"/>
+                    <xsd:enumeration value="gauge"/>
                     <xsd:enumeration value="scatter"/>
                   </xsd:restriction>
                 </xsd:simpleType>
@@ -556,6 +558,12 @@
                   </xsd:restriction>
                 </xsd:simpleType>
               </xsd:attribute>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="config" maxOccurs="unbounded" minOccurs="0">
+            <xsd:complexType>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+              <xsd:attribute name="value" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:sequence>

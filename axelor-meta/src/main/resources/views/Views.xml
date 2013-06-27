@@ -337,6 +337,14 @@
           </form>
         </field>
       </page>
+      <page title="Config" cols="1">
+        <field name="chartConfig">
+          <grid title="Config" editable="true">
+            <field name="name"/>
+            <field name="value"/>
+          </grid>
+        </field>
+      </page>
     </notebook>
   </form>
   
@@ -346,6 +354,9 @@
     <option value="hbar">HBar</option>
     <option value="line">Line</option>
     <option value="area">Area</option>
+    <option value="radar">Radar</option>
+    <option value="gauge">Gauge</option>
+    <option value="scatter">Scatter</option>
   </selection>
   
   <selection name="selection.chart.side">
