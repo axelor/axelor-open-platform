@@ -32,6 +32,7 @@ import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaChart;
+import com.axelor.meta.db.MetaChartConfig;
 import com.axelor.meta.db.MetaChartSeries;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaModule;
@@ -256,6 +257,15 @@ public class MetaLoader {
 			item.setSide(series.getSide());
 			item.setAggregate(series.getAggregate());
 			chart.addChartSeries(item);
+		}
+		
+		if (view.getConfig() != null) {
+			for(ChartView.ChartConfig config : view.getConfig()) {
+				MetaChartConfig item = new MetaChartConfig();
+				item.setName(config.getName());
+				item.setValue(config.getValue());
+				chart.addChartConfig(item);
+			}
 		}
 
 		chart.save();
