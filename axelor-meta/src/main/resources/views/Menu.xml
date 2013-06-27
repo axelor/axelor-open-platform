@@ -88,13 +88,13 @@
     <view type="form" name="meta-chart-form"/>
   </action-view>
   
-  <menuitem name="menu-auth-meta-profile" parent="menu-auth" title="Meta Profiles"
-    action="action-auth-meta-profile"/>
+  <menuitem name="menu-meta-auth-profiles" parent="menu-auth" title="Auth Profiles"
+    action="auth.profiles"/>
 
-  <action-view name="action-auth-meta-profile" title="Meta Profiles"
-    model="com.axelor.meta.db.MetaProfile">
-    <view type="grid" name="user-profile-grid" />
-    <view type="form" name="user-profile-form" />
+  <action-view name="auth.profiles" title="Auth Profiles"
+    model="com.axelor.meta.db.MetaAuthProfile">
+    <view type="grid" name="meta-auth-profile-grid" />
+    <view type="form" name="meta-auth-profile-form" />
   </action-view>
 
 </object-views>
