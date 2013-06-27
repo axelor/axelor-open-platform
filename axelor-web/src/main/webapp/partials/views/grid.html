@@ -6,7 +6,7 @@
       <button class="btn" ng-click="onSave()" ng-if="canEditInline()" ng-disabled="!canSave()"><i class="icon icon-save"></i> <span x-translate>Save</span></button>
       <button class="btn" ng-click="onDelete()" ng-if="hasButton('delete')" ng-disabled="!canDelete()"><i class="icon icon-remove"></i> <span x-translate>Delete</span></button>
     </div>
-    <div ui-filter-menu x-handler="this"></div>
+    <div ui-filter-box x-handler="this"></div>
     <div class="btn-group" ng-if="toolbar">
       <button ng-repeat="btn in toolbar" class="btn" ui-tool-button="btn">{{btn.title}}</button>
     </div>
