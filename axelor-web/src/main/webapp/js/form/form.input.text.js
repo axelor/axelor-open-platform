@@ -7,6 +7,28 @@ var ui = angular.module('axelor.ui');
  */
 ui.formInput('String', {
 	css: 'string-item',
+
+	link: function(scope, element, attrs, model) {
+
+		var props = scope.field;
+
+		scope.validate = function(value) {
+			var length = value ? value.length : 0,
+				minSize = +props.minSize,
+				maxSize = +props.maxSize,
+				valid = true;
+
+			if (minSize) {
+				valid = length >= minSize;
+			}
+			if(valid && maxSize) {
+				valid = length <= maxSize;
+			}
+
+			return valid;
+		};
+	},
+
 	template_readonly: '<input type="text" ng-show="text" tabindex="-1" readonly="readonly" class="display-text" value="{{text}}">'
 });
 
@@ -74,7 +96,7 @@ ui.formInput('Text', {
 	template_readonly: '<pre>{{text}}</pre>'
 });
 
-ui.formInput('Password', {
+ui.formInput('Password', 'String', {
 
 	css: 'password-item',
 
