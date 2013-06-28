@@ -8,11 +8,24 @@ var ui = angular.module('axelor.ui');
 ui.formInput('String', {
 	css: 'string-item',
 
-	link: function(scope, element, attrs, model) {
-
-		var props = scope.field;
+	link_editable: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+		var props = scope.field,
+			regExp = props.pattern ? new RegExp(props.pattern,'i') : null;
 
 		scope.validate = function(value) {
+			return lengthValidation(value) && patternValidation(value);
+		};
+
+		function patternValidation(value) {
+			if(_.isEmpty(value) || !regExp) {
+				return true;
+			}
+
+			return regExp.test(value);
+		};
+
+		function lengthValidation(value) {
 			var length = value ? value.length : 0,
 				minSize = +props.minSize,
 				maxSize = +props.maxSize,
@@ -69,7 +82,7 @@ ui.formInput('Url', {
 /**
  * The Phone input widget.
  */
-ui.formInput('Phone', {
+ui.formInput('Phone', 'String', {
 	css: 'phone-item',
 	template_editable: '<input type="tel">'
 });
