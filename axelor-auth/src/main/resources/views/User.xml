@@ -17,6 +17,11 @@
             <field name="code" validIf="code.length &gt;= 2" onChange="action-user-validData"/>
             <field name="password" widget="password" validIf="password.length &gt;= 4" onChange="action-user-validData"/>
         </group>
+        <group title="Authorization" cols="6" colSpan="2">
+            <field name="blocked"/>
+            <field name="activeFrom" validIf="!activeFrom || (activeFrom &amp;&amp; !activeTo) || (activeFrom &amp;&amp; activeTo &amp;&amp; $moment(activeTo) &gt;= $moment(activeFrom))"/>
+        	<field name="activeTo" validIf="!activeTo || (!activeFrom &amp;&amp; activeTo) || (activeFrom &amp;&amp; activeTo &amp;&amp; $moment(activeTo) &gt;= $moment(activeFrom))"/>
+        </group>
     </form>
     
     <action-condition name="action-user-validData">
