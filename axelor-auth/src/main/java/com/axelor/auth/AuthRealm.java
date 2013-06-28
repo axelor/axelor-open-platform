@@ -9,6 +9,7 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.joda.time.LocalDate;
 
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
@@ -21,7 +22,10 @@ public class AuthRealm extends AuthorizingRealm {
 		String code = ((UsernamePasswordToken) token).getUsername();
 		User user = User.all().filter("self.code = ?1", code).fetchOne();
 
-		if (user == null) {
+		if (user == null || user.getBlocked() == true) {
+			return null;
+		} else if ((user.getActiveFrom() != null && user.getActiveFrom().isAfter(new LocalDate())) || 
+				(user.getActiveTo() != null && user.getActiveTo().isBefore(new LocalDate()))) {
 			return null;
 		}
 
