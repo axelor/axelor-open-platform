@@ -105,5 +105,22 @@ _t.put({
 "Share": "Partager",
 "Save as": "Save as",
 "Delete": "Supprimer",
-"Save filter as": "Sauver filtre comme"
+"Save filter as": "Sauver filtre comme",
+"({0} items)": "({0} éléments)",
+"and {0} more": "et {0} plus",
+"Object": "Objet",
+"Field Name": "Nom du champ",
+"Field Type": "Type de champ",
+"Filter": "Filtre",
+"Reference": "Référence",
+"Create \"{0}\" and add...": "Créer \"{0}\" et ajouter...",
+"Create \"{0}\"...": "Créer \"{0}\"...",
+"Search...": "Rechercher...",
+"Create...": "Créer...",
+"Sort Ascending": "Tri croissant",
+"Sort Descending": "Tri décroissant",
+"Group by": "Grouper par",
+"Ungroup": "Dégrouper",
+"Hide": "Cacher",
+"Show": "Voir"
 });
