@@ -370,7 +370,7 @@ ui.directive('uiFilterBox', function() {
 			var handler = $scope.handler,
 				params = (handler._viewParams || {}).params;
 
-			var filterView = params['search-filters'];
+			var filterView = params ? params['search-filters'] : null;
 			var filterDS = DataSource.create('com.axelor.meta.db.MetaFilter');
 
 			$scope.model = handler._model;
