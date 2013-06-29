@@ -341,10 +341,10 @@ ui.directive('uiFilterForm', function() {
 		"<div class='filter-form'>" +
 			"<form class='filter-operator form-inline'>" +
 				"<label class='radio inline'>" +
-					"<input type='radio' name='operator' ng-model='operator' value='and'> and" +
+					"<input type='radio' name='operator' ng-model='operator' value='and' x-translate><span x-translate>and</span>" +
 				"</label>" +
 				"<label class='radio inline'>" +
-					"<input type='radio' name='operator' ng-model='operator' value='or'> or" +
+					"<input type='radio' name='operator' ng-model='operator' value='or' x-translate><span x-translate>or</span>" +
 				"</label>" +
 			"</form>" +
 			"<div ng-repeat='filter in filters' ui-filter-item x-fields='fields' x-filter='filter'></div>" +
@@ -759,7 +759,7 @@ ui.directive('uiFilterBox', function() {
 			"<div class='filter-menu'>"+
 				"<div class='filter-list'>" +
 					"<dl ng-show='hasFilters(1)'>" +
-						"<dt>Filters</dt>" +
+						"<dt x-translate>Filters</dt>" +
 						"<dd ng-repeat='filter in viewFilters' class='checkbox'>" +
 							"<input type='checkbox' " +
 								"ng-model='filter.$selected' " +
@@ -768,7 +768,7 @@ ui.directive('uiFilterBox', function() {
 						"</dd>" +
 					"</dl>" +
 					"<dl ng-show='hasFilters(2)'>" +
-						"<dt>My Filters</dt>" +
+						"<dt x-translate>My Filters</dt>" +
 						"<dd ng-repeat='filter in custFilters' class='checkbox'>" +
 							"<input type='checkbox' " +
 								"ng-model='filter.$selected' " +
@@ -782,14 +782,14 @@ ui.directive('uiFilterBox', function() {
 				"<hr>" +
 				"<div class='form-inline'>" +
 					"<div class='control-group'>" +
-						"<input type='text' placeholder='save filter as' ng-model='custTitle'> " +
+						"<input type='text' placeholder='Save filter as' ng-model='custTitle'> " +
 						"<label class='checkbox'>" +
-							"<input type='checkbox' ng-model='custShared'> <span x-translate>Share</span>" +
+							"<input type='checkbox' ng-model='custShared'><span x-translate>Share</span>" +
 						"</label>" +
 					"</div>" +
-					"<button class='btn btn-small' ng-click='onSave()' ng-disabled='!custTitle'>save</button> " +
-					"<button class='btn btn-small' ng-click='onSave(true)' ng-show='canSaveNew()'>save as</button> " +
-					"<button class='btn btn-small' ng-click='onDelete()' ng-show='custName'>delete</button>" +
+					"<button class='btn btn-small' ng-click='onSave()' ng-disabled='!custTitle'><span x-translate>Save</span></button> " +
+					"<button class='btn btn-small' ng-click='onSave(true)' ng-show='canSaveNew()'><span x-translate>Save as</span></button> " +
+					"<button class='btn btn-small' ng-click='onDelete()' ng-show='custName'><span x-translate>Delete</span></button>" +
 				"</div>" +
 			"</div>" +
 		"</div>"
