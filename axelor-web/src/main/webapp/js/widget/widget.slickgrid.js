@@ -427,7 +427,7 @@ Grid.prototype.parse = function(view) {
 		}, {
 			separator: true
 		}, {
-			title: _t("Group by") + " " + column.name,
+			title: _t("Group by") + " <i>" + column.name + "</i>",
 			command: "group-by"
 		}, {
 			title: _t("Ungroup"),
@@ -435,7 +435,7 @@ Grid.prototype.parse = function(view) {
 		}, {
 			separator: true
 		}, {
-			title: _t("Hide") + " " + column.name,
+			title: _t("Hide") + " <i>" + column.name + "</i>",
 			command: "hide"
 		}];
 		
@@ -738,7 +738,7 @@ Grid.prototype.onBeforeMenuShow = function(event, args) {
 	_.each(this.cols, function(col) {
 		if (_.contains(this.visibleCols, col.id)) return;
 		menu.items.push({
-			title: _t('Show') + ' ' + col.name,
+			title: _t('Show') + " <i>" + col.name + "</i>",
 			command: 'show',
 			field: col.field
 		});
