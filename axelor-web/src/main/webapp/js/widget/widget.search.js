@@ -759,7 +759,7 @@ ui.directive('uiFilterBox', function() {
 			"<div class='filter-menu'>"+
 				"<div class='filter-list'>" +
 					"<dl ng-show='hasFilters(1)'>" +
-						"<dt x-translate>Filters</dt>" +
+						"<dt><i class='icon-save'></i><span x-translate> Filters</span></dt>" +
 						"<dd ng-repeat='filter in viewFilters' class='checkbox'>" +
 							"<input type='checkbox' " +
 								"ng-model='filter.$selected' " +
@@ -768,7 +768,7 @@ ui.directive('uiFilterBox', function() {
 						"</dd>" +
 					"</dl>" +
 					"<dl ng-show='hasFilters(2)'>" +
-						"<dt x-translate>My Filters</dt>" +
+						"<dt><i class='icon-filter'></i><span x-translate> My Filters</span></dt>" +
 						"<dd ng-repeat='filter in custFilters' class='checkbox'>" +
 							"<input type='checkbox' " +
 								"ng-model='filter.$selected' " +
