@@ -735,7 +735,9 @@ ui.directive('uiFilterBox', function() {
 				if (all.is(e.target) || all.has(e.target).size() > 0) {
 					return;
 				}
-		        hideMenu();
+				if(menu){
+					hideMenu();
+				}
 			}
 
 			element.on('$destroy', function() {
