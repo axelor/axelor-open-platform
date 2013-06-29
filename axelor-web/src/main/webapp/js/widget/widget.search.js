@@ -172,7 +172,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 				}
 			});
 			$scope.$parent.fields = $scope.fields;
-			$scope.$parent.nameField = nameField || 'name';
+			$scope.$parent.nameField = nameField || ($scope.fields['name'] ? 'name' : null);
 		});
 	};
 
