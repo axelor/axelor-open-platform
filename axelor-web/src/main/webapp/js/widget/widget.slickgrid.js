@@ -1296,7 +1296,7 @@ Grid.prototype.groupBy = function(names) {
 				return item[name];
 			},
 			formatter: function(g) {
-				var title = field.title + ": " + g.value;
+				var title = col.name + ": " + g.value;
 				return '<span class="slick-group-text">' + title + '</span>' + ' ' +
 					   '<span class="slick-group-count">' + _t("({0} items)", g.count) + '</span>';
 			},
