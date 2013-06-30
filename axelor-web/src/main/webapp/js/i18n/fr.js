@@ -122,5 +122,8 @@ _t.put({
 "Group by": "Grouper par",
 "Ungroup": "Dégrouper",
 "Hide": "Cacher",
-"Show": "Voir"
+"Show": "Voir",
+"Logout": "Déconnexion",
+"Preferences": "Préférences",
+"Create new": "Créer nouveau"
 });
