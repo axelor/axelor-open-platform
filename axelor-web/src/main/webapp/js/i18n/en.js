@@ -19,6 +19,7 @@ _t.put({
 "Edit": "Edit",
 "Edit event": "Edit event",
 "Error": "Error",
+"Failed!": "Echec",
 "Go": "Go",
 "Help": "Help",
 "Home": "Home",
@@ -33,6 +34,7 @@ _t.put({
 "No Data Available.": "No Data Available.",
 "Objects": "Objects",
 "OK": "OK",
+"Offline!": "Hors ligne",
 "Password": "Password",
 "Profile": "Profile",
 "Question": "Question",
@@ -103,5 +105,8 @@ _t.put({
 "Group by": "Group by",
 "Ungroup": "Ungroup",
 "Hide": "Hide",
-"Show": "Show"
+"Show": "Show",
+"Logout": "Logout",
+"Preferences": "Preferences",
+"Create new": "Create new"
 });
