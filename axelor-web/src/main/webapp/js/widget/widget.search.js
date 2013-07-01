@@ -695,6 +695,8 @@ ui.directive('uiFilterBox', function() {
 
 			var menu = element.children('.filter-menu'),
 				toggleButton = null;
+			
+			scope.custTitleHolder = _t('Save filter as');
 
 			scope.onSearch = function(e) {
 				if (menu && menu.is(':visible')) {
@@ -782,7 +784,7 @@ ui.directive('uiFilterBox', function() {
 				"<hr>" +
 				"<div class='form-inline'>" +
 					"<div class='control-group'>" +
-						"<input type='text' placeholder='Save filter as' ng-model='custTitle'> " +
+						"<input type='text' placeholder={{custTitleHolder}} ng-model='custTitle'> " +
 						"<label class='checkbox'>" +
 							"<input type='checkbox' ng-model='custShared'><span x-translate>Share</span>" +
 						"</label>" +
