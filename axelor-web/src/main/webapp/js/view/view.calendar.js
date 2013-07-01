@@ -353,7 +353,17 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				mini.datepicker('setDate', main.fullCalendar('getDate'));
 			},
 
-			allDayText: _t('All Day')
+			allDayText: _t('All Day'),
+
+			monthNames: (_t.calendar || {}).monthNames,
+
+			monthNamesShort: (_t.calendar || {}).monthNamesShort,
+
+			dayNames: (_t.calendar || {}).dayNames,
+
+			dayNamesShort: (_t.calendar || {}).dayNamesShort,
+
+			firstDay: (_t.calendar || {}).firstDay
 		});
 		
 		var editor = null;
@@ -386,7 +396,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 					$("<hr>").appendTo(html);
 					
 					if (scope.isEditable()) {
-						$('<a href="javascript: void(0)"></a>').text(_t("Delete"))
+						$('<a href="javascript: void(0)" style="margin-right: 5px;"></a>').text(_t("Delete"))
 						.appendTo(html)
 						.click(function(e){
 							hideBubble();
