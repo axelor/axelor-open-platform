@@ -58,6 +58,8 @@
     	<bind node="@targetRef" to="nextNode" search="self.ref = :nextNode" />
     	<bind node="@sequence" to="sequence" />
     	<bind node="@condition" to="condition" search="self.id = :condition" />
+    	<bind node="@signal" to="signal" />
+    	<bind node="@role" to="role" search="self.name = :role" />
     	<bind node="documentation" to="description" />
     </bind>
 

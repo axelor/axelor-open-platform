@@ -13,6 +13,7 @@
 		model="com.axelor.wkf.db.Workflow">
 		<view type="grid" name="workflow-grid" />
 		<view type="form" name="workflow-form" />
+        <context name="__check_version" expr="true"/>
 	</action-view>
 
 	<menuitem name="menu-wkf-instances" parent="menu-wkf" title="Instances"

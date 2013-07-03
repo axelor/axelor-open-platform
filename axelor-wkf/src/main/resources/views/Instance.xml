@@ -5,29 +5,28 @@
 	
     <grid name="instance-grid" title="Instances" model="com.axelor.wkf.db.Instance">
         <field name="workflow"/>
-        <field name="workflow.metaModel"/>
+        <field name="workflow.metaModel.name" title="Meta model"/>
         <field name="metaModelId"/>
         <field name="creationDate"/>
         <field name="creationUser"/>
     </grid>
     
-    <form name="instance-form" title="Instances" cols="4" model="com.axelor.wkf.db.Instance"
-    onLoad="instance-attrs-waitingNodes,instance-attrs-executedNodes" onNew="instance-attrs-waitingNodes,instance-attrs-executedNodes">
+    <form name="instance-form" title="Instances" cols="4" model="com.axelor.wkf.db.Instance">
         <field name="workflow"/>
         <break/>
-        <field name="workflow.metaModel"/>
+        <field name="workflow.metaModel.name" title="Meta model"/>
         <field name="metaModelId"/>
-        <field name="nodes" colSpan="4" />
-        <field name="waitingNodes" colSpan="4" onChange="instance-attrs-waitingNodes"/>
-        <field name="executedNodes" colSpan="4" onChange="instance-attrs-executedNodes"/>
+        <field name="nodes" colSpan="4" showTitle="false" />
+        <field name="waitingNodes" colSpan="4" hideIf="!waitingNodes" showTitle="false"/>
+        <field name="executedNodes" colSpan="4" hideIf="!executedNodes" showTitle="false"/>
         <notebook colSpan="4">
         	<page title="History" cols="4">
         		<field name="creationDate" />
         		<field name="creationUser" />
-        		<field name="histories" colSpan="4" grid-view="instance-history-grid" form-view="instance-history-form"/>
+        		<field name="histories" colSpan="4" grid-view="instance-history-grid" form-view="instance-history-form" showTitle="false"/>
         	</page>
         	<page title="Counter" cols="4">
-        		<field name="counters" colSpan="4" grid-view="instance-counter-grid" form-view="instance-counter-form"/>
+        		<field name="counters" colSpan="4" grid-view="instance-counter-grid" form-view="instance-counter-form" showTitle="false"/>
         	</page>
         </notebook>
     </form>
@@ -60,17 +59,7 @@
     
     <form name="waiting-node-form" title="Waiting node" cols="2" model="com.axelor.wkf.db.WaitingNode">
     	<field name="node" />
-    	<field name="transitions" colSpan="2" />
+    	<field name="transitions" colSpan="2" showTitle="false" />
     </form>
-    
-<!-- ACTION -->    
-    
-    <action-attrs name="instance-attrs-waitingNodes">
-    	<attribute name="hidden" for="waitingNodes" expr="eval: !waitingNodes" />
-    </action-attrs>
-    
-    <action-attrs name="instance-attrs-executedNodes">
-    	<attribute name="hidden" for="executedNodes" expr="eval: !executedNodes" />
-    </action-attrs>
     
 </object-views>
