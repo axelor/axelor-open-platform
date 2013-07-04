@@ -73,6 +73,8 @@ public class WorkflowService implements IWorkflow {
 		Preconditions.checkNotNull(klass);
 		this.instance = getInstance(klass, (Long)actionHandler.getContext().get("id"));
 		
+		log.debug("INIT Wkf instance ::: {}", this.instance);
+		
 		Preconditions.checkNotNull(this.instance);
 		this.actionHandler = actionHandler;
 		this.maxNodeCounter = this.instance.getWorkflow().getMaxNodeCounter();
@@ -159,6 +161,8 @@ public class WorkflowService implements IWorkflow {
 	protected Set<Node> playNodes(Set<Node> nodes){
 		
 		Set<Node> lastNodes = new HashSet<Node>();
+
+		log.debug("Play nodes ::: {}", nodes );
 		
 		for (Node node : nodes){
 			lastNodes.addAll( playNode( node ) );
@@ -179,7 +183,7 @@ public class WorkflowService implements IWorkflow {
 	 */
 	protected Set<Node> playNode(Node node){
 
-		log.debug("Play node {}", node.getName());
+		log.debug("Play node ::: {}", node.getName());
 		
 		testMaxPassedNode(node);
 		
@@ -202,7 +206,7 @@ public class WorkflowService implements IWorkflow {
 			nodes.add( node );
 			
 		}
-			
+		
 		return nodes;
 	}
 	
@@ -221,40 +225,19 @@ public class WorkflowService implements IWorkflow {
 		
 		Set<Node> nodes = new HashSet<Node>();
 		
+		log.debug("Play transitions ::: {}", transitions);	
+		
 		for ( Transition transition : transitions ){
-			
-			if ( transition.getRole() != null ) { nodes.addAll( playTransitionFromRole(transition) ); }
-			else if ( transition.getSignal() != null ) { nodes.addAll( playTransitionFromSignal(transition) ); }
-			else { nodes.addAll( playTransition(transition) ); }
-			
-		}
-		
-		return nodes;
-		
-		
-	}
-	
-	/**
-	 * Play transition.
-	 * 
-	 * @param transition
-	 * 		One transition.
-	 * 
-	 * @return
-	 * 		Set of running nodes.
-	 */
-	protected Set<Node> playTransitionFromRole(Transition transition) {
-		
-		Set<Node> nodes = new HashSet<Node>();
-		
-		if ( transition.getRole().getUsers().contains( user ) ) {
 
 			if ( transition.getSignal() != null ) { nodes.addAll( playTransitionFromSignal(transition) ); }
+			else if ( transition.getRole() != null ) { nodes.addAll( playTransitionFromRole(transition) ); }
 			else { nodes.addAll( playTransition(transition) ); }
 			
 		}
 		
 		return nodes;
+		
+		
 	}
 
 	/**
@@ -269,13 +252,38 @@ public class WorkflowService implements IWorkflow {
 	protected Set<Node> playTransitionFromSignal(Transition transition) {
 		
 		Set<Node> nodes = new HashSet<Node>();
+
+		log.debug( "Play transition for signal ::: {}", transition.getSignal() );
 		
 		if ( actionHandler.getContext().containsKey("_signal") &&  actionHandler.getContext().get("_signal").equals( transition.getSignal() ) ) {
-			
-			nodes.addAll( playTransition(transition) );
+
+			if ( transition.getRole() != null ) { nodes.addAll( playTransitionFromRole(transition) ); }
+			else { nodes.addAll( playTransition(transition) ); }
 			
 		}
+		else { nodes.add( transition.getStartNode() ); }
 
+		return nodes;
+	}
+	
+	/**
+	 * Play transition.
+	 * 
+	 * @param transition
+	 * 		One transition.
+	 * 
+	 * @return
+	 * 		Set of running nodes.
+	 */
+	protected Set<Node> playTransitionFromRole(Transition transition) {
+		
+		Set<Node> nodes = new HashSet<Node>();
+
+		log.debug("Play transition for role ::: {}", transition.getRole().getName());
+		
+		if ( transition.getRole().getUsers().contains( user ) ) { nodes.addAll( playTransition(transition) ); }
+		else { nodes.add( transition.getStartNode() ); }
+		
 		return nodes;
 	}
 
@@ -290,12 +298,13 @@ public class WorkflowService implements IWorkflow {
 	 */
 	protected Set<Node> playTransition(Transition transition) {
 
-		log.debug("Play transition {}", transition.getName());
 		
 		Set<Node> nodes = new HashSet<Node>();
 		
 		if ( transition.getCondition() != null ){
 
+			log.debug("Play transition condition ::: {}", transition.getCondition().getName() );
+			
 			actionWorkflow.execute( transition.getCondition(), actionHandler );
 			
 			if ( !actionWorkflow.isInError( ) ){
@@ -313,12 +322,16 @@ public class WorkflowService implements IWorkflow {
 			
 		}
 		else {
+			
+			log.debug("Play transition without condition");
 
 			addHistory( instance, transition );
 			addWaitingNodes( transition );
 			nodes.addAll( playNode( transition.getNextNode() ) );
 			
 		}
+		
+		log.debug("Nodes returned at the end ::: {}", nodes);
 		
 		return nodes;
 		
@@ -488,6 +501,8 @@ public class WorkflowService implements IWorkflow {
 	
 	@Transactional
 	protected Instance updateInstance(Set<Node> nodes){
+		
+		log.debug( "Final nodes ::: {}", nodes );
 		
 		instance.clearNodes();
 		instance.getNodes().addAll( nodes );

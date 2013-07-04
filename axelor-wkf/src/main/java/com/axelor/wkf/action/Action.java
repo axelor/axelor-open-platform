@@ -31,6 +31,8 @@ public class Action {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void updateData( Map<Object, Object> data, Object values ){
 		
+		log.debug("Update data : {}", values);
+		
 		Map data2 = (Map) values;
 		
 		for ( Object key : data2.keySet()) {
@@ -44,13 +46,14 @@ public class Action {
 		
 	}
 
+	@SuppressWarnings({ "rawtypes" })
 	public boolean isInError( ){
 		
-		if ( data.containsKey("errors") ) {
+		if ( data.containsKey("errors") && data.get("errors") != null && !( (Map) data.get("errors") ).isEmpty() ) {
 			data.remove("errors");
 			return true; 
 		}
-		
+
 		return false;
 	}
 	
