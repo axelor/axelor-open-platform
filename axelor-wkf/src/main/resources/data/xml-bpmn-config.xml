@@ -68,7 +68,7 @@
 		<bind node="@model" alias="metaModel" />
     	<bind node="@id" to="ref" />
     	<bind node="@sequence" to="sequence" />
-    	<bind node="@condition" to="condition" search="self.id = :condition" />
+    	<bind node="@condition" to="condition" search="self.name = :condition" />
     	<bind node="startEvent/@id" to="node" search="self.ref = :node" />
     	<bind node="documentation" to="description" />
     </bind>
