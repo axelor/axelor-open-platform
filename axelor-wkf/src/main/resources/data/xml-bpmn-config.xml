@@ -8,7 +8,7 @@
     <bind node="process/task" type="com.axelor.wkf.db.Node" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
-    	<bind node="@action" to="action" search="self.id = :action" />
+    	<bind node="@action" to="action" search="self.name = :action" />
     	<bind node="documentation" to="description" />
     	<bind eval="'intermediary'" to="type" />
     </bind>
