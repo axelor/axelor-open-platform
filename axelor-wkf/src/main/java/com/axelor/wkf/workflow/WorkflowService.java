@@ -165,49 +165,11 @@ public class WorkflowService implements IWorkflow {
 		log.debug("Play nodes ::: {}", nodes );
 		
 		for (Node node : nodes){
-			lastNodes.addAll( playNode( node ) );
+			lastNodes.addAll( playTransitions( node.getEndTransitions() ) );
 		}
 		
 		return lastNodes;
 		
-	}
-	
-	/**
-	 * Play a node.
-	 * 
-	 * @param node
-	 * 		One node.
-	 * 
-	 * @return
-	 * 		Set of running nodes.
-	 */
-	protected Set<Node> playNode(Node node){
-
-		log.debug("Play node ::: {}", node.getName());
-		
-		testMaxPassedNode(node);
-		
-		Set<Node> nodes = new HashSet<Node>();
-		
-		if ( !node.getEndTransitions().isEmpty() ){
-			
-			if ( isPlayable(node) ){
-
-				if ( node.getAction() != null ){ actionWorkflow.execute( node.getAction(), actionHandler ); }
-				nodes.addAll( playTransitions( node.getEndTransitions() ) );
-				counterAdd( instance, node );
-				addExecutedNodes( node );
-			}
-			
-		}
-		else {
-
-			if ( node.getAction() != null ){ actionWorkflow.execute( node.getAction(), actionHandler ); }
-			nodes.add( node );
-			
-		}
-		
-		return nodes;
 	}
 	
 	/**
@@ -335,6 +297,44 @@ public class WorkflowService implements IWorkflow {
 		
 		return nodes;
 		
+	}
+	
+	/**
+	 * Play a node.
+	 * 
+	 * @param node
+	 * 		One node.
+	 * 
+	 * @return
+	 * 		Set of running nodes.
+	 */
+	protected Set<Node> playNode(Node node){
+
+		log.debug("Play node ::: {}", node.getName());
+		
+		testMaxPassedNode(node);
+		
+		Set<Node> nodes = new HashSet<Node>();
+		
+		if ( !node.getEndTransitions().isEmpty() ){
+			
+			if ( isPlayable(node) ){
+
+				if ( node.getAction() != null ){ actionWorkflow.execute( node.getAction(), actionHandler ); }
+				nodes.addAll( playTransitions( node.getEndTransitions() ) );
+				counterAdd( instance, node );
+				addExecutedNodes( node );
+			}
+			
+		}
+		else {
+
+			if ( node.getAction() != null ){ actionWorkflow.execute( node.getAction(), actionHandler ); }
+			nodes.add( node );
+			
+		}
+		
+		return nodes;
 	}
 	
 // RAISING EXCEPTION
