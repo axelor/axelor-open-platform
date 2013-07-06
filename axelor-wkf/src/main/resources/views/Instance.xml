@@ -17,8 +17,8 @@
         <field name="workflow.metaModel.name" title="Meta model"/>
         <field name="metaModelId"/>
         <field name="nodes" colSpan="4" showTitle="false" />
-        <field name="waitingNodes" colSpan="4" hideIf="!waitingNodes" showTitle="false"/>
-        <field name="executedNodes" colSpan="4" hideIf="!executedNodes" showTitle="false"/>
+        <field name="waitingNodes" colSpan="4" hideIf="!waitingNodes || waitingNodes.length &lt; 1" showTitle="false"/>
+        <field name="executedNodes" colSpan="4" hideIf="!executedNodes || executedNodes.length &lt; 1" showTitle="false"/>
         <notebook colSpan="4">
         	<page title="History" cols="4">
         		<field name="creationDate" />
