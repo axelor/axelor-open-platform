@@ -56,7 +56,7 @@ class WkfController {
 	def openEditor( ActionRequest request, ActionResponse response ) {
 
 		def context = request.context as Workflow
-		def resource = "${WkfSettings.get().get('wkf.editor.url', '')}/p/editor?id=${context.id}&name=${context.name}&model=${context.metaModel.id}&url=${WkfSettings.get().get('application.url', '')}&lang=${WkfSettings.get().get('wkf.editor.lang', '')}&sessionId=${AuthUtils.subject.session.id.toString()}"
+		def resource = "${WkfSettings.get().get('wkf.editor.url', '')}/p/editor?id=${context.id}&name=${context.name}&model=${context.metaModel.fullName}&url=${WkfSettings.get().get('application.url', '')}&lang=${WkfSettings.get().get('wkf.editor.lang', '')}&sessionId=${AuthUtils.subject.session.id.toString()}"
 		
 		log.debug("SIGNAVIO URL : ${resource}")
 		
