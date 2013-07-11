@@ -1,6 +1,5 @@
 package com.axelor.tool.x2j.pojo
 
-import groovy.util.slurpersupport.GPathResult;
 import groovy.util.slurpersupport.NodeChild
 
 import com.axelor.tool.x2j.Utils
@@ -11,54 +10,56 @@ class Entity {
 	String name
 
 	String table
-	
+
 	String module
 
 	String namespace
-	
+
 	String baseClass
 
 	boolean sequential
-	
+
 	boolean groovy
-	
+
+	boolean dynamicUpdate
+
 	boolean hashAll
-	
+
 	String cachable
-	
+
 	String documentation
 
 	String indexes
 
 	List<Property> properties
-	
+
 	List<Constraint> constraints
-	
+
 	List<String> finders
-	
+
 	Map<String, Property> propertyMap
 
 	private ImportManager importManager
-	
+
 	Entity(NodeChild node) {
 		name = node.@name
 		table = node.@table
 		namespace = node.parent().module."@package"
 		module = node.parent().module.@name
-		
+
 		sequential = node.@sequential == "true"
 		if(node.@sequential == ""
 			&& System.getProperty("generate.unique.id") == "true") {
 			sequential = true
 		}
-		
+
 		groovy = node.@lang == "groovy"
 		hashAll = node.@hashAll == "true"
 		cachable = node.@cachable
 		baseClass = "com.axelor.db.Model"
 		documentation = findDocs(node)
 		indexes = node.@indexes
-		
+
 		if (!name) {
 			throw new IllegalArgumentException("Entity name not given.")
 		}
@@ -66,20 +67,20 @@ class Entity {
 		if (!table) {
 			table = module.toUpperCase() + "_" + CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, name)
 		}
-		
+
 		if (!namespace) {
 			namespace = "com.axelor.${module}.db"
 		}
-		
+
 		importManager = new ImportManager(namespace, groovy)
-		
+
 		importType("com.axelor.db.JPA")
 		importType("com.axelor.db.Query")
-		
+
 		properties = []
 		constraints = []
 		finders = []
-		
+
 		node."*".each {
 			if (it.name() == "unique-constraint") {
 				constraints += new Constraint(this, it)
@@ -89,20 +90,23 @@ class Entity {
 				properties += new Property(this, it)
 			}
 		}
-		
+
 		Property idp = Property.idProperty(this)
 		properties = [idp] + properties
 
 		propertyMap = [:]
 		properties.each {
 			propertyMap[it.name] = it
+			if (it.isVirtual() && !it.isTransient()) {
+				dynamicUpdate = true
+			}
 		}
-		
+
 		if (node.@logUpdates != "false") {
 			baseClass = "com.axelor.auth.db.AuditableModel"
 		}
 	}
-	
+
 	List<Property> getFields() {
 		properties
 	}
@@ -110,7 +114,7 @@ class Entity {
 	String getFile() {
 		namespace.replace(".", "/") + "/" + name + "." + (groovy ? "groovy" : "java")
 	}
-	
+
 	String getBaseClass() {
 		return importType(baseClass)
 	}
@@ -123,7 +127,7 @@ class Entity {
 			}
 		}
 	}
-	
+
 	String getDocumentation() {
 		String text = Utils.stripCode(documentation, "\n * ")
 		if (text == "") {
@@ -134,17 +138,17 @@ class Entity {
  * """ + text + """
  */"""
 	}
-	
+
 	Property getField(String name) {
 		return propertyMap[name]
 	}
-	
+
 	String getCtorCode() {
 		def lines = []
-		
+
 		lines += "public ${name}() {"
 		lines += "}\n"
-		
+
 		def fields = properties.findAll { it.isInitParam() }
 		if (fields.empty) {
 			fields = properties.findAll { it.name =~ /code|name/ }
@@ -157,12 +161,12 @@ class Entity {
 			}
 			lines += "}\n"
 		}
-		
+
 		return "\t" + Utils.stripCode(lines.join("\n"), "\n\t");
 	}
-	
+
 	private List<Property> getHashables() {
-		
+
 		if (hashAll) {
 			return properties.findAll { p ->
 				p.getAttribute("hashKey") != "false" && !p.virtual && p.simple && !(p.name =~ /id|version/)
@@ -171,7 +175,7 @@ class Entity {
 		def all = properties.findAll { p ->
 			p.hashKey && !p.virtual && p.simple && !(p.name =~ /id|version/)
 		}
-		
+
 		constraints.each {
 			all += it.columns.collect {
 				def n = it
@@ -180,14 +184,14 @@ class Entity {
 				}
 			}.flatten().findAll { it != null }
 		}
-		
+
 		return all.unique()
 	}
-	
+
 	String getEqualsCode() {
 		def hashables = getHashables()
 		def code = ["if (obj == null) return false;"];
-		
+
 		importType("com.google.common.base.Objects");
 
 		if (groovy) {
@@ -209,7 +213,7 @@ class Entity {
 		code += hashables.empty ? "return false;" : "return true;"
 		return code.join("\n\t\t")
 	}
-	
+
 	String getHashCodeCode() {
 		importType("com.google.common.base.Objects");
 		def data = getHashables()collect { "this.${it.getter}()" }.join(", ")
@@ -219,12 +223,12 @@ class Entity {
 		}
 		return "return super.hashCode();"
 	}
-	
+
 	String getToStringCode() {
 		importType("com.google.common.base.Objects.ToStringHelper")
-		
+
 		def code = []
-		
+
 		code += "ToStringHelper tsh = Objects.toStringHelper(this);\n"
 		code += "tsh.add(\"id\", this.getId());"
 		int count = 0;
@@ -235,52 +239,57 @@ class Entity {
 		}
 		return code.join("\n\t\t") + "\n\n\t\treturn tsh.omitNullValues().toString();"
 	}
-	
+
 	String importType(String fqn) {
 		return importManager.importType(fqn)
 	}
-	
+
 	List<String> getImports() {
 		return importManager.getImports()
 	}
-	
+
 	List<String> getImportStatements() {
 		return importManager.getImportStatements()
 	}
-	
+
 	List<Annotation> getAnnotations() {
-		[
-			new Annotation(this, "javax.persistence.Entity", true),
-			$cachable(),
-			$table()
-		]
-		.grep { it != null }.flatten()
-		.grep { Annotation a -> !a.empty }
+
+		def all = [new Annotation(this, "javax.persistence.Entity", true), $cachable()]
+
+		if (dynamicUpdate) {
+			all += new Annotation(this, "org.hibernate.annotations.DynamicInsert", true)
+			all += new Annotation(this, "org.hibernate.annotations.DynamicUpdate", true)
+		}
+
+		all += $table()
+
+		return all.grep { it != null }.flatten()
+				  .grep { Annotation a -> !a.empty }
 	}
-	
+
 	List<Finder> getFinderMethods() {
 		def all = finders.collect()
 		def hasCodeFinder = false
 		def hasNameFinder = false
-		
+
 		all.each { Finder f ->
 			if (f.name == "findByName") hasNameFinder = true
 			if (f.name == "findByCode") hasCodeFinder = true
 		}
-		
+
 		if (!hasNameFinder && propertyMap['name']) all.add(0, new Finder(this, "name"));
 		if (!hasCodeFinder && propertyMap['code']) all.add(0, new Finder(this, "code"));
 
 		return all
 	}
-	
+
 	Annotation $table() {
 		def annotation = new Annotation(this, "javax.persistence.Table", false).add("name", this.table)
 		if (this.constraints == null || this.constraints.empty)
 			return annotation
-		
+
 		def constraints = []
-		
+
 		this.constraints.each {
 			def unique = new Annotation(this, "javax.persistence.UniqueConstraint", false)
 			if (it.name)
@@ -290,10 +299,10 @@ class Entity {
 
 		if (! constraints.empty)
 			annotation.add("uniqueConstraints", constraints, false)
-		
+
 		return annotation
 	}
-	
+
 	Annotation $cachable() {
 		if (cachable == "true") {
 			return new Annotation(this, "javax.persistence.Cacheable", true);
