@@ -92,6 +92,13 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="transient" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specifies that the field is not persistent (not stored in database).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="default" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>Default value for the field.</xsd:documentation>
