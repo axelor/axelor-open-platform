@@ -47,7 +47,7 @@
     <many-to-one name="title" ref="Title" unique="true" />
     <string name="firstName" required="true" initParam="true"/>
     <string name="lastName" required="true" initParam="true"/>
-    <string name="fullName" namecolumn="true" search="firstName,lastName">
+    <string name="fullName" namecolumn="true" search="firstName,lastName" transient="true">
       <![CDATA[
       title ? "$title.name $firstName $lastName" : "$firstName $lastName"
       ]]>
