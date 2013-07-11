@@ -306,6 +306,10 @@ class Property {
 		type == "one-to-many" || type == "many-to-many"
 	}
 
+	boolean isTransient() {
+		return attrs["transient"] == "true"
+	}
+
 	boolean isNameField() {
 		return attrs.namecolumn == "true"
 	}
@@ -333,6 +337,7 @@ class Property {
 			$size(),
 			$digits(),
 			$index(),
+			$transient(),
 			$column(),
 			$one2one(),
 			$many2one(),
@@ -366,6 +371,12 @@ class Property {
 		annon(reference ? "javax.persistence.JoinColumn" : "javax.persistence.Column")
 				.add("name", column)
 				.add("unique", unique, false)
+	}
+
+	private Annotation $transient() {
+		if (isTransient()) {
+			return annon("javax.persistence.Transient", true)
+		}
 	}
 
 	private List<Annotation> $size() {
@@ -423,6 +434,9 @@ class Property {
 			return null
 		}
 		def all = [annon("com.axelor.db.VirtualColumn", true)]
+		if (this.isTransient()) {
+			return all
+		}
 		
 		if (this.isFormula()) {
 			all += [annon(reference ? "org.hibernate.annotations.JoinFormula" : "org.hibernate.annotations.Formula")
@@ -487,7 +501,7 @@ class Property {
 	}
 	
 	private Annotation $index() {
-		if (attrs.index == 'false' || this.isFormula())
+		if (attrs.index == 'false' || this.isFormula() || this.isTransient())
 			return null
 		if (attrs.index == "true" || name in ['name', 'code'] || attrs.namecolumn == "true" || (attrs.get('mappedBy') != null && !(type in ['many-to-many', 'one-to-many']))) {
 			def index = "${entity.table}_${attrs.column ? attrs.column : this.name}_IDX".toUpperCase()
@@ -549,7 +563,7 @@ class Property {
 			.add("cascade", ["javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"], false)
 	}
 	
-	private List<Annotation> $one2many() {
+	private Annotation $one2many() {
 		
 		if (type != "one-to-many") return null
 		
@@ -566,19 +580,16 @@ class Property {
 			a.add("cascade", "javax.persistence.CascadeType.ALL", false)
 			a.add("orphanRemoval", "true", false)
 		}
-		return [a, annon("org.hibernate.annotations.OptimisticLock").add("excluded", "false", false)]
+		return a
 	}
 	
-	private List<Annotation> $many2many() {
+	private Annotation $many2many() {
 		def mapped = attrs.get('mappedBy')
-		if (type != "many-to-many") return
-		
-		def a = annon("javax.persistence.ManyToMany")
+		if (type == "many-to-many")
+			annon("javax.persistence.ManyToMany")
 				.add("fetch", "javax.persistence.FetchType.LAZY", false)
 				.add("mappedBy", mapped)
 				.add("cascade", ["javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"], false)
-
-		return [a, annon("org.hibernate.annotations.OptimisticLock").add("excluded", "false", false)]
 	}
 	
 	private Annotation $orderBy() {
