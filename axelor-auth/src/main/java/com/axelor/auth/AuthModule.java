@@ -7,14 +7,11 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.guice.ShiroModule;
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.session.mgt.SessionManager;
-import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 
 import com.axelor.db.JpaSecurity;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Singleton;
-import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.name.Names;
 
 public class AuthModule extends ShiroWebModule {
@@ -42,14 +39,8 @@ public class AuthModule extends ShiroWebModule {
 		this.addFilterChain("/**", Key.get(AuthFilter.class));
 	}
 
-	@Override
-	protected void bindSessionManager(AnnotatedBindingBuilder<SessionManager> bind) {
-		bind.to(DefaultWebSessionManager.class);
-		bind(DefaultWebSessionManager.class);
-	}
-
 	public static class Simple extends ShiroModule {
-		
+
 		@Override
 		protected void configureShiro() {
 			this.bind(JpaSecurity.class).toProvider(AuthSecurity.class);
@@ -58,10 +49,10 @@ public class AuthModule extends ShiroWebModule {
 			this.bind(Initializer.class).asEagerSingleton();
 		}
 	}
-	
+
 	@Singleton
 	public static class Initializer {
-		
+
 		@Inject
 		public Initializer(Injector injector) {
 			SecurityManager sm = injector.getInstance(SecurityManager.class);
