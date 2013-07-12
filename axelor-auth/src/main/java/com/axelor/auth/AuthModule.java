@@ -27,7 +27,7 @@ public class AuthModule extends ShiroWebModule {
 		this.bind(JpaSecurity.class).toProvider(AuthSecurity.class);
 		this.expose(JpaSecurity.class);
 
-		this.bindConstant().annotatedWith(Names.named("shiro.loginUrl")).to("/login.jsp");
+		this.bindConstant().annotatedWith(Names.named("app.loginUrl")).to("/login.jsp");
 		this.bindRealm().to(AuthRealm.class);
 
 		this.addFilterChain("/public/**", ANON);
