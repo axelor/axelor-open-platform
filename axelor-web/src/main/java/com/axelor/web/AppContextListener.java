@@ -8,11 +8,10 @@ import com.google.inject.servlet.GuiceServletContextListener;
  * Servlet context listener.
  *
  */
-public class AppContextListener  extends GuiceServletContextListener {
-	
+public class AppContextListener extends GuiceServletContextListener {
+
 	@Override
 	protected final Injector getInjector() {
-		//TODO: auto discover Guice modules within `com.axelor` namespace
 		return Guice.createInjector(new AppServletModule());
 	}
 }
