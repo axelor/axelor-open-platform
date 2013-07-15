@@ -34,6 +34,7 @@
     	<toolbar>
 	        <button name="openEditor" title="Editor" onClick="save,wkf-method-open-editor"/>
 	        <button name="openInstances" title="Instances" onClick="save,wkf-method-open-instances"/>
+            <button name="importWorkflow" title="Import" onClick="save,wkf-method-import-workflow"/>
     	</toolbar>
         <field name="name"/>
         <field name="metaModel"/>
@@ -43,15 +44,14 @@
 	    <field name="condition" />
         <field name="active" readonlyIf="archived" />
         <field name="archived" onChange="wkf-record-archived" />
-        <notebook colSpan="6">
-		    <page title="Description">
-        		<field name="description" colSpan="4" showTitle="false" widget="CodeEditor[syntax=text]"/>
+        <notebook colSpan="4">
+		    <page title="Description" onSelect="wkf-import-hidden">
+        		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
 		    </page>
-		    <page title="BPMN">
-		    	<button name="importWorkflow" title="Import" onClick="save,wkf-method-import-workflow"/>
+		    <page title="BPMN" onSelect="wkf-import-display">
            		<field name="bpmn" colSpan="4" showTitle="false" widget="CodeEditor[syntax=xml]"/>
 		    </page>
-		    <page title="XML">
+		    <page title="XML" onSelect="wkf-import-hidden">
            		<field name="xmlData" colSpan="4" showTitle="false" widget="CodeEditor[syntax=xml]"/>
 		    </page>
         </notebook>
@@ -77,7 +77,7 @@
 	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
         </group>
         <separator title="Description" colSpan="4"/>
-   		<field name="description" colSpan="4" showTitle="false" widget="CodeEditor[syntax=text]"/>
+   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
     </form>
     
     <!-- TRANSITION -->
@@ -100,7 +100,7 @@
         <field name="signal"/>
         <field name="condition" />
         <separator title="Description" colSpan="4"/>
-  		<field name="description" colSpan="4" showTitle="false" widget="CodeEditor[syntax=text]"/>
+  		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
     </form>
     
     <grid name="start-transition-grid" title="Transitions" model="com.axelor.wkf.db.Transition">
@@ -120,7 +120,7 @@
         <field name="signal"/>
         <field name="condition"/>
         <separator title="Description" colSpan="6"/>
-		<field name="description" colSpan="6" showTitle="false" widget="CodeEditor[syntax=text]"/>        
+		<field name="description" colSpan="6" showTitle="false" widget="Html"/>        
     </form>
     
     <grid name="end-transition-grid" title="Transitions" model="com.axelor.wkf.db.Transition">
@@ -140,10 +140,19 @@
         <field name="signal"/>
         <field name="condition"/>
         <separator title="Description" colSpan="6"/>
-		<field name="description" colSpan="6" showTitle="false" widget="CodeEditor[syntax=text]"/>        
+		<field name="description" colSpan="6" showTitle="false" widget="Html"/>        
     </form>
     
 <!-- ACTION -->
+
+    <!-- ATTRS -->
+    <action-attrs name="wkf-import-display">
+        <attribute name="hidden" for="importWorkflow" expr="false"/> 
+    </action-attrs>
+    
+    <action-attrs name="wkf-import-hidden">
+        <attribute name="hidden" for="importWorkflow" expr="true"/> 
+    </action-attrs>
 
 	<!-- VALIDATE -->
 	<action-validate name="wkf-validate">

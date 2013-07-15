@@ -43,7 +43,7 @@
 	<integer name="sequence" />
     <string name="description" large="true" />
     <string name="signal" />
-    <many-to-one name="role" ref="Role" />
+    <many-to-one name="role" ref="com.axelor.auth.db.Role" />
     <string name="ref" />
              
   </entity>
