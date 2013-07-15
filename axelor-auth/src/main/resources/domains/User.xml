@@ -13,6 +13,7 @@
     <date name="activeFrom" title="Active user from" help="Specify whether to allow the user from this specific date."/>
     <date name="activeTo" title="Active user to" help="Specify whether to allow the user until this specific date."/>
     <many-to-one name="group" ref="Group" column="group_id"/>
+    <many-to-many name="roles" ref="com.axelor.auth.db.Role"/>
   </entity>
   
 </domain-models>
