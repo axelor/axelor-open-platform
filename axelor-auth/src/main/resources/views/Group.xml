@@ -25,12 +25,13 @@
 		<field name="code" validIf="code.length &gt;= 2" onChange="action-group-validData" />
 		<field name="navigation" />
 		<field name="restricted" />
-		<field name="permissions" colSpan="4" onChange="action-validate-group-permissions">
+		<field name="permissions" colSpan="2" onChange="action-validate-group-permissions" showTitle="false">
 			<grid title="Permissions">
 				<field name="name" />
 				<field name="object" />
 			</grid>
 		</field>
+        <field name="roles" colSpan="2" grid-view="role-grid" form-view="role-form" showTitle="false" />
 	</form>
 
 	<action-method name="action-validate-group-permissions">

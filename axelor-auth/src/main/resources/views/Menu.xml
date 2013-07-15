@@ -21,6 +21,15 @@
     <view type="grid" name="group-grid" />
     <view type="form" name="group-form" />
   </action-view>
+
+  <menuitem name="menu-auth-roles" parent="menu-auth" title="Roles"
+    action="action-auth-roles" />
+
+  <action-view name="action-auth-roles" title="Roles"
+    model="com.axelor.auth.db.Role">
+    <view type="grid" name="role-grid" />
+    <view type="form" name="role-form" />
+  </action-view>
   
   <menuitem name="menu-auth-permissions" parent="menu-auth" title="Permissions"
     action="action-auth-permissions"/>
