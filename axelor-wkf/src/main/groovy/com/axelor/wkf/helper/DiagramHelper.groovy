@@ -17,11 +17,6 @@ class DiagramHelper {
 	
 	@Inject
 	protected XmlParser xparse
-
-	public String getCenterDiagram (Instance instance){
-
-			return """<div style="width:50%;margin:auto;">${ generateDiagram( instance ) }</div>"""
-	}
 	
 	public String generateDiagram (Instance instance) {
 			

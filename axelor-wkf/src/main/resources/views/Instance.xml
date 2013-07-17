@@ -11,7 +11,7 @@
         <field name="creationUser"/>
     </grid>
     
-    <form name="instance-form" title="Instances" cols="6" model="com.axelor.wkf.db.Instance" onLoad="loadDiagram">
+    <form name="instance-form" title="Instances" cols="6" model="com.axelor.wkf.db.Instance" onLoad="action-instance-load-diagram">
         <field name="workflow"/>
         <field name="workflow.metaModel.name" title="Meta model"/>
         <field name="metaModelId"/>
@@ -69,8 +69,8 @@
     </form>
     
     <!-- ACTION RECORD -->
-    <action-record name="loadDiagram" model="com.axelor.wkf.db.Instance">
-    	<field name="diagram" expr="call: com.axelor.wkf.helper.DiagramHelper:getCenterDiagram(__this__)"/>
+    <action-record name="action-instance-load-diagram" model="com.axelor.wkf.db.Instance">
+    	<field name="diagram" expr="call: com.axelor.wkf.helper.DiagramHelper:generateDiagram(__this__)"/>
     </action-record>
     
     <!-- ACTION VIEW -->
