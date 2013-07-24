@@ -28,7 +28,18 @@
 	<menuitem name="menu-wkf-configurations" parent="menu-wkf"
 		title="Configurations" icon="img/wrench.png" />
 
-	<menuitem name="menu-wkf-nodes" parent="menu-wkf-configurations" title="Nodes"
+	<menuitem name="menu-wkf-transitions" parent="menu-wkf-configurations" title="Transitions"
+		action="action-wkf-transitions" />
+
+	<action-view name="action-wkf-transitions" title="Transitions"
+		model="com.axelor.wkf.db.Transition">
+		<view type="grid" name="transition-grid" />
+		<view type="form" name="transition-form" />
+	</action-view>
+
+	<menuitem name="menu-wkf-nodes-root" parent="menu-wkf-configurations" title="Nodes" />
+
+	<menuitem name="menu-wkf-nodes" parent="menu-wkf-nodes-root" title="All Nodes"
 		action="action-wkf-nodes" />
 
 	<action-view name="action-wkf-nodes" title="Nodes"
@@ -37,13 +48,31 @@
 		<view type="form" name="node-form" />
 	</action-view>
 
-	<menuitem name="menu-wkf-transitions" parent="menu-wkf-configurations" title="Transitions"
-		action="action-wkf-transitions" />
+	<menuitem name="menu-wkf-start-event" parent="menu-wkf-nodes-root" title="Start events"
+		action="action-wkf-start-event" />
 
-	<action-view name="action-wkf-transitions" title="Transitions"
-		model="com.axelor.wkf.db.Transition">
-		<view type="grid" name="transition-grid" />
-		<view type="form" name="transition-form" />
+	<action-view name="action-wkf-start-event" title="Start events"
+		model="com.axelor.wkf.db.node.StartEvent">
+		<view type="grid" name="start-event-grid" />
+		<view type="form" name="start-event-form" />
+	</action-view>
+
+	<menuitem name="menu-wkf-end-event" parent="menu-wkf-nodes-root" title="End events"
+		action="action-wkf-end-event" />
+
+	<action-view name="action-wkf-end-event" title="End events"
+		model="com.axelor.wkf.db.node.EndEvent">
+		<view type="grid" name="end-event-grid" />
+		<view type="form" name="end-event-form" />
+	</action-view>
+
+	<menuitem name="menu-wkf-task" parent="menu-wkf-nodes-root" title="Tasks"
+		action="action-wkf-task" />
+
+	<action-view name="action-wkf-task" title="Tasks"
+		model="com.axelor.wkf.db.node.Task">
+		<view type="grid" name="task-grid" />
+		<view type="form" name="task-form" />
 	</action-view>
 
 </object-views>

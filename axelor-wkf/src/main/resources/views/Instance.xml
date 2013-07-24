@@ -21,12 +21,11 @@
         	</page>
         	<page title="Details" cols="4">
 		        <field name="nodes" colSpan="4" showTitle="false" />
-		        <field name="waitingNodes" colSpan="4" hideIf="!waitingNodes || waitingNodes.length &lt; 1" showTitle="false"/>
-		        <field name="executedNodes" colSpan="4" hideIf="!executedNodes || executedNodes.length &lt; 1" showTitle="false"/>
+		        <field name="executedTransitions" colSpan="4" hideIf="!executedTransitions || executedTransitions.length &lt; 1" showTitle="false"/>
 		        <notebook colSpan="4">
 		        	<page title="History" cols="4">
-		        		<field name="creationDate" />
-		        		<field name="creationUser" />
+		        		<field name="createdOn" />
+		        		<field name="createdBy" />
 		        		<field name="histories" colSpan="4" grid-view="instance-history-grid" form-view="instance-history-form" showTitle="false"/>
 		        	</page>
 		        	<page title="Counter" cols="4">
@@ -38,14 +37,14 @@
     </form>
     
     <grid name="instance-history-grid" title="Histories" model="com.axelor.wkf.db.InstanceHistory">
-    	<field name="creationDate" />
-    	<field name="creationUser" />
+    	<field name="createdOn" />
+    	<field name="createdBy" />
     	<field name="transition"/>
     </grid>
     
     <form name="instance-history-form" title="History" cols="4"  model="com.axelor.wkf.db.InstanceHistory">
-    	<field name="creationDate" />
-    	<field name="creationUser" />
+    	<field name="createdOn" />
+    	<field name="createdBy" />
     	<field name="transition" canSelect="false" widget="NestedEditor" summary-view="transition-form" form-view="transition-form" edit-window="self" />
     </form>
     
@@ -57,15 +56,6 @@
     <form name="instance-counter-form" title="Counter" cols="4"  model="com.axelor.wkf.db.InstanceCounter">
     	<field name="node" />
     	<field name="counter" />
-    </form>
-    
-    <grid name="waiting-node-grid" title="Waiting nodes" model="com.axelor.wkf.db.WaitingNode">
-    	<field name="node" />
-    </grid>
-    
-    <form name="waiting-node-form" title="Waiting node" cols="2" model="com.axelor.wkf.db.WaitingNode">
-    	<field name="node" />
-    	<field name="transitions" colSpan="2" showTitle="false" />
     </form>
     
     <!-- ACTION RECORD -->
