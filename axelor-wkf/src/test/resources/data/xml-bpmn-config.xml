@@ -5,68 +5,70 @@
 
   <input file="[wkf.import]" root="definitions">
     
-    <bind node="process/task" type="com.axelor.wkf.db.Node" search="self.name = :name" update="true">
+    <bind node="process/task" type="com.axelor.wkf.db.node.Task" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
-    	<bind node="@action" to="action" search="self.id = :action" />
+    	<bind node="@action" to="action" search="self.name = :action" />
     	<bind node="documentation" to="description" />
-    	<bind eval="'intermediary'" to="type" />
+    	<bind eval="'task'" to="type" />
     </bind>
     
-    <bind node="process/endEvent" type="com.axelor.wkf.db.Node" search="self.name = :name" update="true">
-    	<bind node="@name" to="name"/>
-    	<bind node="@id" to="ref" />
-    	<bind node="documentation" to="description" />
-    	<bind eval="'stop'" to="type" />
-    </bind>
-    
-    <bind node="process/startEvent" type="com.axelor.wkf.db.Node" search="self.name = :name" update="true">
+    <bind node="process/endEvent" type="com.axelor.wkf.db.node.EndEvent" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="documentation" to="description" />
-    	<bind eval="'start'" to="type" />
+    	<bind eval="'stopEvent'" to="type" />
     </bind>
     
-    <bind node="process/inclusiveGateway" type="com.axelor.wkf.db.Node" search="self.name = :name" update="true">
+    <bind node="process/startEvent" type="com.axelor.wkf.db.node.StartEvent" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="documentation" to="description" />
-    	<bind eval="'gateway'" to="type" />
-    	<bind eval="'or'" to="logicOperator" />
+    	<bind eval="'startEvent'" to="type" />
     </bind>
     
-    <bind node="process/exclusiveGateway" type="com.axelor.wkf.db.Node" search="self.name = :name" update="true">
+    <bind node="process/inclusiveGateway" type="com.axelor.wkf.db.node.InclusiveGateway" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="documentation" to="description" />
     	<bind eval="'gateway'" to="type" />
-    	<bind eval="'xor'" to="logicOperator" />
+    	<bind eval="'inclusive'" to="operator" />
     </bind>
     
-    <bind node="process/parallelGateway" type="com.axelor.wkf.db.Node" search="self.name = :name" update="true">
+    <bind node="process/exclusiveGateway" type="com.axelor.wkf.db.node.ExlusiveGateway" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="documentation" to="description" />
     	<bind eval="'gateway'" to="type" />
-    	<bind eval="'and'" to="logicOperator" />
+    	<bind eval="'exclusive'" to="operator" />
     </bind>
     
-	<bind node="process/sequenceFlow" type="com.axelor.wkf.db.Transition" search="self.name = :name" update="true">
+    <bind node="process/parallelGateway" type="com.axelor.wkf.db.node.ParallelGateway" search="self.name = :name" update="true">
+    	<bind node="@name" to="name"/>
+    	<bind node="@id" to="ref" />
+    	<bind node="documentation" to="description" />
+    	<bind eval="'gateway'" to="type" />
+    	<bind eval="'parallel'" to="operator" />
+    </bind>
+    
+ 	<bind node="process/sequenceFlow" type="com.axelor.wkf.db.Transition" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="@sourceRef" to="startNode" search="self.ref = :startNode" />
     	<bind node="@targetRef" to="nextNode" search="self.ref = :nextNode" />
     	<bind node="@sequence" to="sequence" />
-    	<bind node="@condition" to="condition" search="self.id = :condition" />
+    	<bind node="@condition" to="condition" search="self.name = :condition" />
+    	<bind node="@signal" to="signal" />
+    	<bind node="@role" to="role" search="self.name = :role" />
     	<bind node="documentation" to="description" />
     </bind>
 
-	<bind node="process" type="com.axelor.wkf.db.Workflow" search="self.name = :name AND self.metaModel.id = :metaModel" update="true">
+	<bind node="process" type="com.axelor.wkf.db.Workflow" search="self.name = :name AND self.metaModel.fullName = :metaModel" update="true">
 		<bind node="@name" alias="name" />
 		<bind node="@model" alias="metaModel" />
     	<bind node="@id" to="ref" />
     	<bind node="@sequence" to="sequence" />
-    	<bind node="@condition" to="condition" search="self.id = :condition" />
+    	<bind node="@condition" to="condition" search="self.name = :condition" />
     	<bind node="startEvent/@id" to="node" search="self.ref = :node" />
     	<bind node="documentation" to="description" />
     </bind>
