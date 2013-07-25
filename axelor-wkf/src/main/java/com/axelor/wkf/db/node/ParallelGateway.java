@@ -51,6 +51,7 @@ public class ParallelGateway extends Gateway {
 		
 		Preconditions.checkNotNull(instance); Preconditions.checkNotNull(transition);
 		
+		instance.addExecutedTransition(transition);
 		if ( instance.getExecutedTransitions().containsAll( getStartTransitions() ) ) {
 			instance.removeAllExecutedTransition( getStartTransitions() );
 			return true ;

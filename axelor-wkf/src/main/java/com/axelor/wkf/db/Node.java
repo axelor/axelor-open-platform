@@ -345,6 +345,7 @@ public class Node extends AuditableModel {
 		return JPA.all(Node.class).filter(filter, params);
 	}
 	
-	public Object execute( ActionHandler actionHandler, Object...params ) { return true; };
+	public Node get( ) { return this; };
+	public Object execute( ActionHandler actionHandler, Object...params ) { return this; };
 	
 }

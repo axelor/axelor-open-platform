@@ -9,7 +9,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.db.JPA;
@@ -19,7 +18,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 
 @Entity
-@Table(name = "WORKFLOW_INSTANCE_COUNTER", uniqueConstraints = { @UniqueConstraint(name = "UNIQUE_WORKFLOW_INSTANCE_COUNTER_INSTANCE_NODE", columnNames = { "instance", "node" }) })
+@Table(name = "WORKFLOW_INSTANCE_COUNTER")
 public class InstanceCounter extends AuditableModel {
 
 	@Id

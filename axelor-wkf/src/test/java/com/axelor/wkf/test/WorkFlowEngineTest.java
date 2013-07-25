@@ -84,7 +84,6 @@ public class WorkFlowEngineTest {
 	@Test
 	public void run() {
 
-
 		Map<String, Object> context = Mapper.toMap(wkf);
 		ActionHandler actionHandler = createHandler("", context);
 

@@ -18,8 +18,9 @@ import com.axelor.wkf.db.InstanceHistory;
 import com.axelor.wkf.db.Node;
 import com.axelor.wkf.db.Transition;
 import com.axelor.wkf.db.Workflow;
+import com.axelor.wkf.db.node.EndEvent;
 import com.axelor.wkf.db.node.ExclusiveGateway;
-import com.axelor.wkf.db.node.Gateway;
+import com.axelor.wkf.db.node.ParallelGateway;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -141,7 +142,7 @@ public class WorkflowService implements IWorkflow {
 		log.debug("Play nodes ::: {}", nodes );
 
 		for (Node node : nodes){
-			lastNodes.addAll( playTransitions( node.getEndTransitions() ) );
+			lastNodes.addAll( playTransitions( node.getEndTransitions(), false ) );
 		}
 
 		return lastNodes;
@@ -159,7 +160,7 @@ public class WorkflowService implements IWorkflow {
 	 * @return
 	 * 		Set of running nodes.
 	 */
-	protected Set<Node> playTransitions(List<Transition> transitions){
+	protected Set<Node> playTransitions(List<Transition> transitions, boolean once){
 
 		Set<Node> nodes = new HashSet<Node>();
 
@@ -170,11 +171,11 @@ public class WorkflowService implements IWorkflow {
 			if ( transition.execute( actionHandler ) ) {
 
 				nodes.addAll( playTransition( transition ) );
+				if (once) { break; }
 				
-				if ( transition.getNextNode() instanceof ExclusiveGateway ){
-					break;
-				}
-				
+			}
+			else if ( transition.getNextNode().get() instanceof ParallelGateway ){
+				nodes.add( transition.getStartNode() );
 			}
 
 		}
@@ -194,27 +195,24 @@ public class WorkflowService implements IWorkflow {
 	 */
 	protected Set<Node> playTransition( Transition transition ){
 
-		addHistory( transition );
+		addHistory( transition ); 
+		
 		Node node = transition.getNextNode();
+		Object value = node.execute( actionHandler, this.instance, transition );
+		
 		log.debug( "Play node ::: {}", node.getName() );
-		
-		testMaxPassedNode(node);
-		
-		if ( node.getType().equals("task") ) {
-			updateContext( node.execute( actionHandler ) ); 
+				
+		if ( value instanceof List ) {
+			
+			testMaxPassedNode(node);
+			updateContext( value );
+			
 		}
-		else if ( node.getType().equals("gateway") && ( (Gateway) node ).getOperator().equals("parallel")) {
+		else if ( value instanceof EndEvent ) { return Sets.newHashSet( node ); }
+		else if ( value instanceof ExclusiveGateway ) { return playTransitions( node.getEndTransitions(), true ); }
+		else if ( value instanceof Boolean && !(Boolean) value) { return Sets.newHashSet( ); }
 
-			if ( (Boolean) node.execute( actionHandler, this.instance, transition ) ){ return playTransitions( node.getEndTransitions() ); }
-			return Sets.newHashSet();
-			
-			
-		}
-		else if ( node.getType().equals("endEvent") ){
-			return Sets.newHashSet(node); 
-		}
-		
-		return playTransitions( node.getEndTransitions() );
+		return playTransitions( node.getEndTransitions(), false );
 
 	}
 
