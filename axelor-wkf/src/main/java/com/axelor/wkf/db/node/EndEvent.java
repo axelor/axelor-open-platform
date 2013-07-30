@@ -1,10 +1,15 @@
 package com.axelor.wkf.db.node;
 
+import java.util.Map;
+
 import javax.persistence.Entity;
 
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
+import com.axelor.meta.ActionHandler;
+import com.axelor.wkf.db.Instance;
 import com.axelor.wkf.db.Node;
+import com.axelor.wkf.db.Transition;
 
 @Entity
 public class EndEvent extends Node {
@@ -33,5 +38,13 @@ public class EndEvent extends Node {
 	public static Query<EndEvent> filterEndEvent(String filter, Object... params) {
 		return JPA.all(EndEvent.class).filter(filter, params);
 	}
+	
+	@Override
+	public void execute( ActionHandler actionHandler, Instance instance, Transition transition, Map<Object, Object> context ) { 
+
+		logger.debug("Execute node ::: {}", getName() );
+		historize(instance, transition);
+		
+	};
 	
 }

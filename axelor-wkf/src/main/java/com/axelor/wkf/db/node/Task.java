@@ -4,9 +4,7 @@ import javax.persistence.Entity;
 
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
-import com.axelor.meta.ActionHandler;
 import com.axelor.wkf.db.Node;
-import com.google.common.collect.Lists;
 
 @Entity
 public class Task extends Node {
@@ -34,20 +32,6 @@ public class Task extends Node {
 	 */
 	public static Query<Task> filterTask(String filter, Object... params) {
 		return JPA.all(Task.class).filter(filter, params);
-	}
-	
-	@Override
-	public Object execute( ActionHandler actionHandler, Object...params ) {
-		
-		if ( getAction() != null ) { 
-			
-			actionHandler.getRequest().setAction( getAction().getName() );
-			return actionHandler.execute().getData() ;
-		
-		}
-		
-		return Lists.newArrayList();
-		
 	}
 
 }

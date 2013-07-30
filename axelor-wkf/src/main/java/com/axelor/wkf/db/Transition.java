@@ -14,10 +14,13 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.auth.db.Role;
@@ -33,6 +36,9 @@ import com.google.common.base.Objects.ToStringHelper;
 @Entity
 @Table(name = "WORKFLOW_TRANSITION")
 public class Transition extends AuditableModel {
+	
+	@Transient
+	protected Logger logger = LoggerFactory.getLogger( getClass() );
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -280,22 +286,29 @@ public class Transition extends AuditableModel {
 	@SuppressWarnings("rawtypes")
 	public boolean execute( ActionHandler actionHandler ){ 
 
-		if ( this.signal != null && actionHandler.getContext().containsKey("_signal") &&  !actionHandler.getContext().get("_signal").equals( this.signal ) ) {
+		logger.debug("Execute transition ::: {}", getName() );
+		
+		if ( signal != null && (!actionHandler.getContext().containsKey("_signal") || !actionHandler.getContext().get("_signal").equals( signal )) ) {
+			logger.debug("Signal ::: {}", signal);
 			return false;
 		}
 		
-		if ( this.role != null && actionHandler.getContext().containsKey("__user__") ){
+		if ( role != null ){
+
+			if ( !actionHandler.getContext().containsKey("__user__") ) { return false; }
 			
 			User user = (User) actionHandler.getContext().get("__user__");
-			if ( !this.role.getUsers().contains( user ) || !( user.getGroup() != null && this.role.getGroups().contains( user.getGroup() ) )) {
+			if ( !role.getUsers().contains( user ) && !( user.getGroup() != null && role.getGroups().contains( user.getGroup() ) )) {
+				logger.debug( "Role ::: {}", role.getName() );
 				return false;
 			}
 			
 		}
 
-		if ( this.condition != null ) {
+		if ( condition != null ) {
 
-			actionHandler.getRequest().setAction( this.condition.getName() );
+			logger.debug( "Condition ::: {}", condition.getName() );
+			actionHandler.getRequest().setAction( condition.getName() );
 			for ( Object data : (List) actionHandler.execute().getData()) { 
 				
 				if ( ((Map) data).containsKey("errors") && ((Map) data).get("errors") != null && !( (Map) ((Map) data).get("errors") ).isEmpty() ) { return false; }

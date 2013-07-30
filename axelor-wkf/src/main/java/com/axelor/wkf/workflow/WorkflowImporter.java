@@ -31,9 +31,12 @@ public class WorkflowImporter {
 	public WorkflowImporter ( Injector injector ) throws IOException { 
 		
 		configFile = File.createTempFile("bpmn_config", ".tmp");
-		BufferedWriter writer = new BufferedWriter( new FileWriter( configFile ) );
+		configFile.deleteOnExit();
+		
+		FileWriter fileWriter = new FileWriter( configFile );
+		BufferedWriter writer = new BufferedWriter( fileWriter );
 		writer.write( convertStreamToString( Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG) ));
-		writer.flush(); writer.close();
+		writer.flush(); writer.close(); fileWriter.close();
 		
 		this.xmlImporter = new XMLImporter(injector, configFile.getAbsolutePath());
 		
@@ -58,8 +61,6 @@ public class WorkflowImporter {
             }
 			
 		});
-		
-		configFile.deleteOnExit();
 		
 	}
 	

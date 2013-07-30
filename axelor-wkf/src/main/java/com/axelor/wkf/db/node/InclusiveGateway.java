@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
+import com.axelor.wkf.db.Gateway;
 
 @Entity
 public class InclusiveGateway extends Gateway {

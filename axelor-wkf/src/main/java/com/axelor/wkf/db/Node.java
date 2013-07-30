@@ -2,6 +2,7 @@ package com.axelor.wkf.db;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -18,10 +19,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.db.JPA;
@@ -37,6 +41,9 @@ import com.google.common.base.Objects.ToStringHelper;
 @Inheritance(strategy=InheritanceType.SINGLE_TABLE)
 @Table(name = "WORKFLOW_NODE")
 public class Node extends AuditableModel {
+	
+	@Transient
+	protected Logger logger = LoggerFactory.getLogger( getClass() );
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -345,7 +352,131 @@ public class Node extends AuditableModel {
 		return JPA.all(Node.class).filter(filter, params);
 	}
 	
-	public Node get( ) { return this; };
-	public Object execute( ActionHandler actionHandler, Object...params ) { return this; };
+	public void execute( ActionHandler actionHandler, Instance instance, Map<Object, Object> context ){
+		
+		for ( Transition transition : getEndTransitions() ){
+			
+			if ( transition.execute( actionHandler ) ) {
+
+				transition.getNextNode().execute( actionHandler, instance, transition, context );
+				
+			}
+
+		}
+	}
+	
+	public void execute( ActionHandler actionHandler, Instance instance, Transition transition, Map<Object, Object> context ) { 
+
+		logger.debug("Execute node ::: {}", getName() );
+		
+		testMaxPassedNode( instance );
+		historize( instance, transition );
+		
+		if ( getAction() != null ) { 
+
+			logger.debug( "Action ::: {}", getAction().getName() );
+			actionHandler.getRequest().setAction( getAction().getName() );
+			updateContext( context, actionHandler.execute().getData() );
+			
+		}
+		
+		execute( actionHandler, instance, context );
+		
+	};
+
+	/**
+	 * Add a new history in Instance from a transition.
+	 *
+	 * @param instance
+	 * 		Target instance.
+	 * @param transition
+	 * 		Target transition.
+	 */
+	protected void historize( Instance instance, Transition transition ){
+
+		InstanceHistory history = new InstanceHistory();
+
+		history.setTransition( transition );
+		instance.addHistory( history );
+		
+		instance.addNode( this );
+		instance.removeNode( transition.getStartNode() );
+		
+		logger.debug("Instance state ::: {}", instance.getNodes() );
+
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected void updateContext( Map<Object, Object> context, Object data ){
+		
+		if ( data instanceof List ) {
+			
+			for (Object data2 : (List) data) { updateContext(context, data2); }
+		}
+		else if ( data instanceof Map ) {
+			
+			Map data2 = (Map) data;
+			
+			for ( Object key : data2.keySet()) {
+		
+				if ( !context.containsKey(key) ) { context.put(key, data2.get(key)); }
+				else {
+					if ( context.get(key) instanceof Map ) { updateContext( (Map) context.get(key), data2.get(key) ); }
+					else { context.put(key, data2.get(key)); }
+				}
+			}
+			
+		}
+		
+	}
+
+	// RAISING EXCEPTION
+
+		/**
+		 * Throw error if the counter for this node is greater than max node counter.
+		 */
+		protected void testMaxPassedNode ( Instance instance ) {
+
+			int max = instance.getWorkflow().getMaxNodeCounter();
+			int counter = counterAdd(instance);
+			
+			logger.debug( "compteur {} ::: max {}", counter, max);
+
+			if ( counter > max) {
+				throw new Error( String.format( "We passed by the node %s %d time", getName(), counter ) );
+			}
+
+		}
+
+		/**
+		 * Increment counter of one node for one instance.
+		 *
+		 * @param instance
+		 * 		Target instance.
+		 * @param node
+		 * 		Target node.
+		 */
+		protected int counterAdd( Instance instance ){
+
+			InstanceCounter counter = InstanceCounter.findByInstanceAndNode(instance, this);
+
+			if (counter != null){
+
+				counter.setCounter( counter.getCounter() + 1 );
+
+			}
+			else {
+
+				counter = new InstanceCounter();
+
+				counter.setNode( this );
+				counter.setCounter( 1 );
+				instance.addCounter( counter );
+
+			}
+			
+			return counter.getCounter();
+
+		}
 	
 }

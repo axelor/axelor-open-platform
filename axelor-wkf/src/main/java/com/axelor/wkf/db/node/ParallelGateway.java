@@ -1,10 +1,13 @@
 package com.axelor.wkf.db.node;
 
+import java.util.Map;
+
 import javax.persistence.Entity;
 
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
 import com.axelor.meta.ActionHandler;
+import com.axelor.wkf.db.Gateway;
 import com.axelor.wkf.db.Instance;
 import com.axelor.wkf.db.Transition;
 import com.google.common.base.Preconditions;
@@ -38,26 +41,25 @@ public class ParallelGateway extends Gateway {
 	}
 
 	@Override
-	public Object execute( ActionHandler actionHandler, Object... params ) {
-		
-		Instance instance = null; Transition transition = null;
-		
-		for (Object param : params) {
-			
-			if ( param instanceof Instance ){ instance = (Instance) param; }
-			if ( param instanceof Transition ){ transition = (Transition) param; }
-			
-		}
-		
+	public void execute( ActionHandler actionHandler, Instance instance, Transition transition, Map<Object, Object> context ) {
+
 		Preconditions.checkNotNull(instance); Preconditions.checkNotNull(transition);
+
+		logger.debug("Execute node ::: {}", getName() );
 		
 		instance.addExecutedTransition(transition);
-		if ( instance.getExecutedTransitions().containsAll( getStartTransitions() ) ) {
-			instance.removeAllExecutedTransition( getStartTransitions() );
-			return true ;
-		}
 		
-		return false;
+		if ( instance.getExecutedTransitions().containsAll( getStartTransitions() ) ) {
+			
+			logger.debug("Parallel OK !" );
+			counterAdd(instance);
+			historize(instance, transition);
+			instance.removeAllExecutedTransition( getStartTransitions() );
+			execute(actionHandler, instance, context);
+			
+			
+		}
+		else { instance.removeNode( transition.getStartNode() ); }
 		
 	}
 	
