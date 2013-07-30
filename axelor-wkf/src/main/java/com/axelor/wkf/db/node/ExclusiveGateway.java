@@ -1,9 +1,15 @@
 package com.axelor.wkf.db.node;
 
+import java.util.Map;
+
 import javax.persistence.Entity;
 
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
+import com.axelor.meta.ActionHandler;
+import com.axelor.wkf.db.Gateway;
+import com.axelor.wkf.db.Instance;
+import com.axelor.wkf.db.Transition;
 
 @Entity
 public class ExclusiveGateway extends Gateway {
@@ -31,6 +37,21 @@ public class ExclusiveGateway extends Gateway {
 	 */
 	public static Query<ExclusiveGateway> filterExclusiveGateway(String filter, Object... params) {
 		return JPA.all(ExclusiveGateway.class).filter(filter, params);
+	}
+	
+	@Override
+	public void execute( ActionHandler actionHandler, Instance instance, Map<Object, Object> context ){
+		
+		for ( Transition transition : getEndTransitions() ){
+
+			if ( transition.execute( actionHandler ) ) {
+
+				transition.getNextNode().execute( actionHandler, instance, transition, context );
+				return ;
+				
+			}
+
+		}
 	}
 	
 }

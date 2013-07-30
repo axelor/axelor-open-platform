@@ -39,16 +39,9 @@
 
 	<menuitem name="menu-wkf-nodes-root" parent="menu-wkf-configurations" title="Nodes" />
 
-	<menuitem name="menu-wkf-nodes" parent="menu-wkf-nodes-root" title="All Nodes"
-		action="action-wkf-nodes" />
+	<menuitem name="menu-wkf-nodes-root-event" parent="menu-wkf-nodes-root" title="Events" />
 
-	<action-view name="action-wkf-nodes" title="Nodes"
-		model="com.axelor.wkf.db.Node">
-		<view type="grid" name="node-grid" />
-		<view type="form" name="node-form" />
-	</action-view>
-
-	<menuitem name="menu-wkf-start-event" parent="menu-wkf-nodes-root" title="Start events"
+	<menuitem name="menu-wkf-start-event" parent="menu-wkf-nodes-root-event" title="Start events"
 		action="action-wkf-start-event" />
 
 	<action-view name="action-wkf-start-event" title="Start events"
@@ -57,7 +50,7 @@
 		<view type="form" name="start-event-form" />
 	</action-view>
 
-	<menuitem name="menu-wkf-end-event" parent="menu-wkf-nodes-root" title="End events"
+	<menuitem name="menu-wkf-end-event" parent="menu-wkf-nodes-root-event" title="End events"
 		action="action-wkf-end-event" />
 
 	<action-view name="action-wkf-end-event" title="End events"
@@ -66,13 +59,44 @@
 		<view type="form" name="end-event-form" />
 	</action-view>
 
-	<menuitem name="menu-wkf-task" parent="menu-wkf-nodes-root" title="Tasks"
+	<menuitem name="menu-wkf-nodes-root-activity" parent="menu-wkf-nodes-root" title="Activities" />
+
+	<menuitem name="menu-wkf-task" parent="menu-wkf-nodes-root-activity" title="Tasks"
 		action="action-wkf-task" />
 
 	<action-view name="action-wkf-task" title="Tasks"
 		model="com.axelor.wkf.db.node.Task">
 		<view type="grid" name="task-grid" />
 		<view type="form" name="task-form" />
+	</action-view>
+
+	<menuitem name="menu-wkf-nodes-root-gateway" parent="menu-wkf-nodes-root" title="Gateways" />
+
+	<menuitem name="menu-wkf-inclusive-gateway" parent="menu-wkf-nodes-root-gateway" title="Inclusive gateways"
+		action="action-wkf-inclusive-gateway" />
+
+	<action-view name="action-wkf-inclusive-gateway" title="Inclusive gateways"
+		model="com.axelor.wkf.db.node.InclusiveGateway">
+		<view type="grid" name="inclusive-gateway-grid" />
+		<view type="form" name="inclusive-gateway-form" />
+	</action-view>
+
+	<menuitem name="menu-wkf-parallel-gateway" parent="menu-wkf-nodes-root-gateway" title="Parallel gateways"
+		action="action-wkf-parallel-gateway" />
+
+	<action-view name="action-wkf-parallel-gateway" title="Parallel gateways"
+		model="com.axelor.wkf.db.node.ParallelGateway">
+		<view type="grid" name="parallel-gateway-grid" />
+		<view type="form" name="parallel-gateway-form" />
+	</action-view>
+
+	<menuitem name="menu-wkf-exclusive-gateway" parent="menu-wkf-nodes-root-gateway" title="Exclusive gateways"
+		action="action-wkf-exclusive-gateway" />
+
+	<action-view name="action-wkf-exclusive-gateway" title="Exclusive gateways"
+		model="com.axelor.wkf.db.node.ExclusiveGateway">
+		<view type="grid" name="exclusive-gateway-grid" />
+		<view type="form" name="exclusive-gateway-form" />
 	</action-view>
 
 </object-views>

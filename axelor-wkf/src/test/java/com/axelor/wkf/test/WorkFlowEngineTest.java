@@ -1,6 +1,5 @@
 package com.axelor.wkf.test;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -20,7 +19,6 @@ import com.axelor.test.GuiceModules;
 import com.axelor.test.GuiceRunner;
 import com.axelor.wkf.WkfTest;
 import com.axelor.wkf.data.CreateData;
-import com.axelor.wkf.db.Node;
 import com.axelor.wkf.db.Workflow;
 import com.axelor.wkf.workflow.WorkflowService;
 import com.google.common.collect.Maps;
@@ -68,27 +66,13 @@ public class WorkFlowEngineTest {
 	}
 
 	@Test
-	public void actionTest() {
-
-		Map<String, Object> context = Mapper.toMap(wkf);
-		ActionHandler actionHandler = createHandler("", context);
-		
-		Object value = Node.findByName("Task 1").execute( actionHandler );
-
-		Assert.assertNotNull(value);
-		Assert.assertTrue( value instanceof List );
-		Assert.assertFalse( ( (List<?>) value).isEmpty() );
-
-	}
-
-	@Test
 	public void run() {
 
 		Map<String, Object> context = Mapper.toMap(wkf);
 		ActionHandler actionHandler = createHandler("", context);
 
 		Assert.assertNotNull( workflowService.run(wkf.getClass().getName(), actionHandler) );
-		Assert.assertEquals( workflowService.getInstance(wkf.getMetaModel().getFullName(), wkf.getId()).getNodes().size(), 1 );
+		Assert.assertEquals( 1, workflowService.getInstance(wkf.getMetaModel().getFullName(), wkf.getId()).getNodes().size() );
 
 	}
 
