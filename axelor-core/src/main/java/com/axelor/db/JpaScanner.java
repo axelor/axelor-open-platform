@@ -27,15 +27,17 @@ import com.google.common.collect.MapMaker;
 /**
  * A custom Hibernate scanner that scans all the classpath entries for all the
  * {@link Model} classes annotated with {@link Entity}.
- * 
+ *
  */
 public class JpaScanner extends NativeScanner {
 
 	private static Logger log = LoggerFactory.getLogger(JpaScanner.class);
-	
+
 	private static ConcurrentMap<String, Class<?>> cache = null;
-	
+
 	private static ConcurrentMap<String, String> nameCache = new MapMaker().makeMap();
+
+	public static ClassLoader loader = new JpaClassLoader();
 
 	@Override
 	public Set<Class<?>> getClassesInJar(URL jarToScan, Set<Class<? extends Annotation>> annotationsToLookFor) {
@@ -48,19 +50,22 @@ public class JpaScanner extends NativeScanner {
 		}
 		return findModels();
 	}
-	
+
 	public static Set<Class<?>> findModels() {
-		
+
 		if (cache != null) {
 			return new HashSet<Class<?>>(cache.values());
 		}
-		
+
 		cache = new MapMaker().makeMap();
 		synchronized (cache) {
 			Reflections reflections = new Reflections(
 					new ConfigurationBuilder()
 					.addUrls(ClasspathHelper.forPackage("com.axelor"))
 					.setScanners(new SubTypesScanner()));
+
+			register(Model.class);
+
 			List<String> names = Lists.newArrayList();
 			for (Class<?> klass : reflections.getSubTypesOf(Model.class)) {
 				if (Model.class.isAssignableFrom(klass) && (
@@ -70,8 +75,7 @@ public class JpaScanner extends NativeScanner {
 					if (cache.containsKey(klass.getName())) {
 						continue;
 					}
-					cache.put(klass.getName(), klass);
-					nameCache.put(klass.getSimpleName(), klass.getName());
+					register(klass);
 					names.add(klass.toString());
 				}
 			}
@@ -80,7 +84,16 @@ public class JpaScanner extends NativeScanner {
 		}
 		return new HashSet<Class<?>>(cache.values());
 	}
-	
+
+	private static void register(Class<?> model) {
+		cache.put(model.getName(), model);
+		nameCache.put(model.getSimpleName(), model.getName());
+	}
+
+	public static ClassLoader getClassLoader() {
+		return loader;
+	}
+
 	public static Class<?> findModel(String name) {
 		if (cache == null) {
 			findModels();
