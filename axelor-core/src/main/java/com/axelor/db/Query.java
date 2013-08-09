@@ -22,11 +22,11 @@ import com.google.inject.Provider;
 
 /**
  * The {@code Query} class allows filtering and fetching records quickly.
- * 
+ *
  * <p>
  * It also provides {@link #update(Map)} and {@link #delete()} method to perform
  * mass update and delete operation on matched records.
- * 
+ *
  */
 public class Query<T extends Model> {
 
@@ -39,9 +39,9 @@ public class Query<T extends Model> {
 	private Map<String, Object> namedParams;
 
 	private String orderBy;
-	
+
 	private JoinHelper joinHelper;
-	
+
 	private static final String NAME_PATTERN = "((?:[a-zA-Z_]\\w+)(?:(?:\\[\\])?\\.\\w+)*)";
 
 	private static final Pattern orderPattern = Pattern.compile(
@@ -49,12 +49,12 @@ public class Query<T extends Model> {
 
 	/**
 	 * Create a new instance of {@code Query} with given bean class.
-	 * 
+	 *
 	 * <p>
 	 * Before using the instance, an {@code EntityManager} provider should be
 	 * either injected by the {@code Guice} container or should be provided
 	 * manually using {@link #setEntityManagerProvider(Provider)} method.
-	 * 
+	 *
 	 * @param beanClass
 	 *            model bean class
 	 */
@@ -74,33 +74,33 @@ public class Query<T extends Model> {
 
 	/**
 	 * A convenient method to filter the query using JPQL's <i>where</i> clause.
-	 * 
+	 *
 	 * <p>
 	 * The filter string should refer the field names with {@code self.} prefix
 	 * and values should not be embedded into the filter string but should be
 	 * passed by parameters and {@code ?} placeholder should be used to mark
 	 * parameter substitutions.
-	 * 
+	 *
 	 * Here is an example:
-	 * 
+	 *
 	 * <pre>
 	 * Query&lt;Person&gt; query = Query.of(Person);
 	 * query = query.filter(&quot;self.name = ? AND self.age &gt;= ?&quot;, &quot;some&quot;, 20);
-	 * 
+	 *
 	 * List&lt;Person&gt; matched = query.fetch();
 	 * </pre>
-	 * 
+	 *
 	 * <p>
 	 * This is equivalent to:
-	 * 
+	 *
 	 * <pre>
 	 * SELECT self from Person self WHERE (self.name = ?1) AND (self.age >= ?2)
 	 * </pre>
-	 * 
+	 *
 	 * <p>
 	 * The params passed will be added as positional parameters to the JPA query
 	 * object before performing {@link #fetch()}.
-	 * 
+	 *
 	 * @param filter
 	 *            the filter string
 	 * @param params
@@ -111,7 +111,7 @@ public class Query<T extends Model> {
 		if (this.filter != null) {
 			throw new IllegalStateException("Query is already filtered.");
 		}
-		
+
 		this.filter = joinHelper.parse(filter);
 		this.params = params;
 		return this;
@@ -120,29 +120,29 @@ public class Query<T extends Model> {
 	/**
 	 * Set order by clause for the query. This method can be chained to provide
 	 * multiple fields.
-	 * 
+	 *
 	 * <p>
 	 * The {@code spec} is just a field name for {@code ASC} or should be
 	 * prefixed with {@code -} for {@code DESC} clause.
-	 * 
+	 *
 	 * <p>
 	 * For example:
-	 * 
+	 *
 	 * <pre>
 	 * Query&lt;Person&gt; query = Query.of(Person);
 	 * query = query.filter(&quot;name =&quot;, &quot;some&quot;).filter(&quot;age &gt;=&quot;, 20)
 	 * 		.filter(&quot;lang in&quot;, &quot;en&quot;, &quot;hi&quot;);
-	 * 
+	 *
 	 * query = query.order(&quot;name&quot;).order(&quot;-age&quot;);
 	 * </pre>
-	 * 
+	 *
 	 * <p>
 	 * This is equivalent to:
-	 * 
+	 *
 	 * <pre>
 	 * SELECT p from Person p WHERE (p.name = ?1) AND (p.age >= ?2) AND (lang IN (?3, ?4)) ORDER BY p.name, p.age DESC
 	 * </pre>
-	 * 
+	 *
 	 * @param spec
 	 *            order spec
 	 * @return the same query instance
@@ -165,7 +165,7 @@ public class Query<T extends Model> {
 
 	/**
 	 * Fetch all the matched records.
-	 * 
+	 *
 	 * @return list of all the matched records.
 	 */
 	public List<T> fetch() {
@@ -174,7 +174,7 @@ public class Query<T extends Model> {
 
 	/**
 	 * Fetch the matchied records with the given limit.
-	 * 
+	 *
 	 * @param limit
 	 *            the limit
 	 * @return matched records withing the limit
@@ -185,7 +185,7 @@ public class Query<T extends Model> {
 
 	/**
 	 * Fetch the matched records within the given range.
-	 * 
+	 *
 	 * @param limit
 	 *            the limit
 	 * @param offset
@@ -207,7 +207,7 @@ public class Query<T extends Model> {
 
 	/**
 	 * Fetch the first matched record.
-	 * 
+	 *
 	 * @return the first matched record.
 	 */
 	public T fetchOne() {
@@ -220,7 +220,7 @@ public class Query<T extends Model> {
 
 	/**
 	 * Fetch a matched record at the given offset.
-	 * 
+	 *
 	 * @param offset
 	 *            the offset
 	 * @return the matched record at given offset
@@ -235,7 +235,7 @@ public class Query<T extends Model> {
 
 	/**
 	 * Returns the number of total records matched.
-	 * 
+	 *
 	 * @return total number
 	 */
 	public long count() {
@@ -243,10 +243,10 @@ public class Query<T extends Model> {
 		this.bind(q);
 		return q.getSingleResult();
 	}
-	
+
 	/**
 	 * Return a selector to select records with specific fields only.
-	 * 
+	 *
 	 * @param names field names to select
 	 * @return a new instance of {@link Selector}
 	 */
@@ -258,7 +258,7 @@ public class Query<T extends Model> {
 	 * Perform mass update on the matched records with the given values.
 	 * To avoid unexpected results, clear the session with {@link JPA.clear}
 	 * before running the update.
-	 * 
+	 *
 	 * @param values
 	 *            the key value map
 	 * @return total number of records updated
@@ -276,7 +276,7 @@ public class Query<T extends Model> {
 
 	/**
 	 * This is similar to {@link #update(Map)} but updates only single field.
-	 * 
+	 *
 	 * @param field
 	 *            the field name whose value needs to be changed
 	 * @param value
@@ -292,10 +292,10 @@ public class Query<T extends Model> {
 	/**
 	 * Bulk delete all the matched records. <br>
 	 * <br>
-	 * 
+	 *
 	 * This method uses <code>DELETE</code> query and performs
 	 * {@link javax.persistence.Query#executeUpdate()}.
-	 * 
+	 *
 	 * @see #remove()
 	 * @return total number of records affected.
 	 */
@@ -304,15 +304,15 @@ public class Query<T extends Model> {
 		this.bind(q);
 		return q.executeUpdate();
 	}
-	
+
 	/**
 	 * Remove all the matched records. <br>
 	 * <br>
-	 * 
+	 *
 	 * In contrast to the {@link #delete()} method, it performs
 	 * {@link EntityManager#remove(Object)} operation by fetching objects in
 	 * pages (100 at a time).
-	 * 
+	 *
 	 * @see #delete()
 	 * @return total number of records removed.
 	 */
@@ -362,7 +362,7 @@ public class Query<T extends Model> {
 		}
 		return sb.toString();
 	}
-	
+
 	protected String deleteQuery() {
 		StringBuilder sb = new StringBuilder("DELETE FROM ")
 				.append(beanClass.getSimpleName())
@@ -383,7 +383,7 @@ public class Query<T extends Model> {
 	/**
 	 * Bind the named parameters of the query with the given values. Named
 	 * parameter must me set after query is filtered.
-	 * 
+	 *
 	 * @param params
 	 *            mapping for named params.
 	 */
@@ -391,20 +391,23 @@ public class Query<T extends Model> {
 		if (this.filter == null) {
 			throw new IllegalStateException("Query is not filtered yet.");
 		}
-		if (this.namedParams == null)
+		if (this.namedParams == null) {
 			this.namedParams = Maps.newHashMap();
-		this.namedParams.putAll(params);
+		}
+		if (params != null) {
+			this.namedParams.putAll(params);
+		}
 		return this;
 	}
-	
+
 	/**
 	 * Bind the given named parameter of the query with the given value.
-	 * 
+	 *
 	 * @param name
 	 *            the named parameter to bind
 	 * @param value
 	 *            the parameter value
-	 * 
+	 *
 	 */
 	public Query<T> bind(String name, Object value) {
 		Map<String, Object> params = Maps.newHashMap();
@@ -416,27 +419,27 @@ public class Query<T extends Model> {
 	public String toString() {
 		return selectQuery();
 	}
-	
+
 	/**
 	 * A helper class to select specific field values. The record is returned as
 	 * a Map object with the given names as keys.
-	 * 
+	 *
 	 * <pre>
 	 * List&lt;Map&gt; data = Contact.all().filter(&quot;self.age &gt; ?&quot;, 20)
 	 * 		.select(&quot;title.name&quot;, &quot;fullName&quot;, &quot;age&quot;).fetch(80, 0);
 	 * </pre>
-	 * 
+	 *
 	 * This results in following query:
-	 * 
+	 *
 	 * <pre>
 	 * SELECT _title.name, self.fullName JOIN LEFT self.title AS _title WHERE self.age > ? LIMIT 80
 	 * </pre>
-	 * 
+	 *
 	 * The {@link Selector#fetch(int, int)} method returns a List of Map instead
 	 * of the model object.
 	 */
 	public class Selector {
-		
+
 		private List<String> names = Lists.newArrayList("id", "version");
 		private List<String> collections = Lists.newArrayList();
 		private String query;
@@ -468,7 +471,7 @@ public class Query<T extends Model> {
 			sb.append(orderBy);
 			query = sb.toString();
 		}
-		
+
 		private boolean isExists(String field) {
 			if (field == null || "".equals(field.trim()))
 				return false;
@@ -486,7 +489,7 @@ public class Query<T extends Model> {
 			}
 			return true;
 		}
-		
+
 		@SuppressWarnings("all")
 		public List<Map> fetch(int limit, int offset) {
 			javax.persistence.Query q = em().createQuery(query);
@@ -497,10 +500,10 @@ public class Query<T extends Model> {
 				q.setFirstResult(offset);
 			}
 			bind(q);
-			
+
 			List<List> data = q.getResultList();
 			List<Map> result = Lists.newArrayList();
-			
+
 			for(List item : data) {
 				Map<String, Object> map = Maps.newHashMap();
 				for(int i = 0 ; i < names.size() ; i++) {
@@ -537,52 +540,52 @@ public class Query<T extends Model> {
 			return query;
 		}
 	}
-	
+
 	/**
 	 * JoinHelper class is used to auto generate <code>LEFT JOIN</code> for
 	 * association expressions.
-	 * 
+	 *
 	 * For example:
-	 * 
+	 *
 	 * <pre>
 	 * 	Query<Contact> q = Contact.all().filter("self.title.code = ?1 OR self.age > ?2", "mr", 20);
 	 * </pre>
-	 * 
+	 *
 	 * Results in:
-	 * 
+	 *
 	 * <pre>
 	 * SELECT self FROM Contact self LEFT JOIN self.title _title WHERE _title.code = ?1 OR self.age > ?2
 	 * </pre>
-	 * 
+	 *
 	 * So that all the records are matched even if <code>title</code> field is null.
-	 * 
+	 *
 	 */
 	static class JoinHelper {
-		
+
 		private Class<?> beanClass;
-		
+
 		private Map<String, String> joins = Maps.newLinkedHashMap();
-		
+
 		private static final Pattern pathPattern = Pattern.compile("self\\." + NAME_PATTERN);
-		
+
 		public JoinHelper(Class<?> beanClass) {
 			this.beanClass = beanClass;
 		}
-		
+
 		/**
 		 * Parse the given filter string and return transformed filter
 		 * expression.
-		 * 
+		 *
 		 * Automatically calculate <code>LEFT JOIN</code> for association path
 		 * expressions and the path expressions are replaced with the join
 		 * variables.
-		 * 
+		 *
 		 * @param filter
 		 *            the filter expression
 		 * @return the transformed filter expression
 		 */
 		public String parse(String filter) {
-			
+
 			String result = "";
 			Matcher matcher = pathPattern.matcher(filter);
 
@@ -598,20 +601,20 @@ public class Query<T extends Model> {
 			}
 			if (last < filter.length())
 		        result += filter.substring(last);
-			
+
 			return result;
 		}
-		
+
 		/**
 		 * Automatically generate <code>LEFT JOIN</code> for the given name
 		 * (association path expression) and return the join variable.
-		 * 
+		 *
 		 * @param name
 		 *            the path expression or field name
 		 * @return join variable if join is created else returns name
 		 */
 		public String joinName(String name) {
-			
+
 			Mapper mapper = Mapper.of(beanClass);
 			String[] path = name.split("\\.");
 			String prefix = null;
@@ -627,7 +630,7 @@ public class Query<T extends Model> {
 					if (property == null) {
 						break;
 					}
-					
+
 					if (prefix == null) {
 						joinOn = "self." + item;
 						prefix = "_" + item;
@@ -638,11 +641,11 @@ public class Query<T extends Model> {
 					if (!joins.containsKey(joinOn)) {
 						joins.put(joinOn, prefix);
 					}
-					
+
 					if (property.getTarget() != null) {
 						currentMapper = Mapper.of(property.getTarget());
 					}
-					
+
 					if (i == path.length - 2) {
 						property = currentMapper.getProperty(variable);
 						if (property != null && property.getTarget() != null) {
@@ -664,14 +667,14 @@ public class Query<T extends Model> {
 					return prefix;
 				}
 			}
-			
+
 			if (prefix == null) {
 				prefix = "self";
 			}
-			
+
 			return prefix + "." + variable;
 		}
-		
+
 		@Override
 		public String toString() {
 			if (joins.size() == 0) return "";
