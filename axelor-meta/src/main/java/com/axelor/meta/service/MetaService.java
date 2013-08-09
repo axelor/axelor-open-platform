@@ -18,7 +18,6 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
-import com.axelor.meta.GroovyScriptHelper;
 import com.axelor.meta.MetaLoader;
 import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaAttachment;
@@ -31,6 +30,7 @@ import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.schema.views.Search;
+import com.axelor.meta.script.ScriptHelper;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.google.common.base.Strings;
@@ -40,18 +40,18 @@ import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 
 public class MetaService {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(MetaService.class);
-	
+
 	@Inject
 	private MetaLoader loader;
-	
+
 	@SuppressWarnings("unchecked")
 	private List<MenuItem> findMenus(Query query) {
-		
+
 		List<MenuItem> menus = Lists.newArrayList();
 		List<Object[]> all = query.getResultList();
-		
+
 		for(Object[] items : all) {
 
 			MetaMenu menu = (MetaMenu) items[0];
@@ -60,30 +60,30 @@ public class MetaService {
 			item.setPriority(menu.getPriority());
 			item.setTitle(menu.getTitle());
 			item.setIcon(menu.getIcon());
-			
+
 			if (menu.getParent() != null) {
 				item.setParent(menu.getParent().getName());
 			}
-			
+
 			if (menu.getAction() != null) {
 				item.setAction(menu.getAction().getName());
 			}
-			
+
 			menus.add(item);
 		}
-		
+
 		return menus;
 	}
-	
+
 	public List<MenuItem> getMenus(String parent) {
-		
+
 		Subject subject = SecurityUtils.getSubject();
 		User user = null;
-		
+
 		if (subject != null) {
 			user = User.all().filter("self.code = ?1", subject.getPrincipal()).fetchOne();
 		}
-		
+
 		String q1 = "SELECT self, COALESCE(self.priority, 0) AS priority FROM MetaMenu self LEFT JOIN self.groups g WHERE ";
 		String q2 = "self.parent IS NULL";
 		Object p1 = null;
@@ -92,33 +92,33 @@ public class MetaService {
 		if (user != null && user.getGroup() != null) {
 			p2 = user.getGroup().getCode();
 		}
-		
+
 		if (Strings.isNullOrEmpty(parent) || "null".endsWith(parent)) {
 			q1 += q2;
 		} else {
 			q1 += "self.parent.name = ?1";
 			p1 = parent;
 		}
-		
+
 		if (p2 != null) {
 			q1 += " AND (g.code = ?2 OR self.groups IS EMPTY)";
 		} else {
 			q1 += " AND self.groups IS EMPTY";
 		}
-		
+
 		q1 += " ORDER BY priority DESC, self.id";
-		
+
 		Query query = JPA.em().createQuery(q1);
 		if (p1 != null)
 			query.setParameter(1, p1);
 		if (p2 != null)
 			query.setParameter(2, p2);
-		
+
 		return findMenus(query);
 	}
-	
+
 	public List<MenuItem> getActionMenus(String parent, String category) {
-		
+
 		if ("null".equals(parent))
 			parent = null;
 		if ("null".equals(category))
@@ -143,17 +143,17 @@ public class MetaService {
 
 		List<MenuItem> menus = Lists.newArrayList();
 		List<MetaActionMenu> all = query.getResultList();
-		
+
 		for(MetaActionMenu menu : all) {
 
 			MenuItem item = new MenuItem();
 			item.setName(menu.getName());
 			item.setTitle(menu.getTitle());
-			
+
 			if (menu.getParent() != null) {
 				item.setParent(menu.getParent().getName());
 			}
-			
+
 			if (menu.getAction() != null) {
 				item.setAction(menu.getAction().getName());
 			}
@@ -162,14 +162,14 @@ public class MetaService {
 			}
 			menus.add(item);
 		}
-		
+
 		return menus;
 	}
 
 	public Action getAction(String name) {
 		return loader.findAction(name);
 	}
-	
+
 	public Response findViews(Class<?> model, Map<String, String> views) {
 		Response response = new Response();
 
@@ -179,7 +179,7 @@ public class MetaService {
 
 		return response;
 	}
-	
+
 	public Response findView(String model, String name, String type) {
 		Response response = new Response();
 
@@ -193,7 +193,7 @@ public class MetaService {
 	@SuppressWarnings("all")
 	public Response runSearch(Request request) {
 		Response response = new Response();
-		
+
 		Map<String, Object> context = request.getData();
 		String name = (String) context.get("__name");
 		List<String> selected = (List) context.get("__selected");
@@ -201,19 +201,19 @@ public class MetaService {
 		LOG.debug("Search : {}", name);
 
 		Search search = (Search) loader.findView(null, name, "search");
-		GroovyScriptHelper helper = search.scriptHandler(context);
+		ScriptHelper helper = search.scriptHandler(context);
 
 		List<Object> data = Lists.newArrayList();
 
 		for(Search.SearchSelect select : search.getSelects()) {
-			
+
 			if (selected != null && !selected.contains(select.getModel())) {
 				continue;
 			}
 
 			LOG.debug("Model : {}", select.getModel());
 			LOG.debug("Param : {}", context);
-			
+
 			Query query;
 			try {
 				query = select.toQuery(search, helper);
@@ -221,15 +221,15 @@ public class MetaService {
 				throw new IllegalArgumentException(e);
 			}
 			List<?> items = Lists.newArrayList();
-			
+
 			LOG.debug("Query : {}", select.getQueryString());
-			
+
 			if (query != null) {
 				query.setFirstResult(request.getOffset());
 				query.setMaxResults(search.getLimit());
 				items = query.getResultList();
 			}
-			
+
 			LOG.debug("Found : {}", items.size());
 
 			for(Object item : items) {
@@ -240,10 +240,10 @@ public class MetaService {
 					((Map) item).put("_grid", select.getGridView());
 				}
 			}
-			
+
 			data.addAll(items);
 		}
-		
+
 		LOG.debug("Total : {}", data.size());
 
 		response.setData(data);
@@ -251,7 +251,7 @@ public class MetaService {
 
 		return response;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Response getAttachment(long id, String model, Request request){
 		Response response = new Response();
@@ -276,32 +276,32 @@ public class MetaService {
 		data = query.getResultList();
 		response.setData(data);
 		response.setStatus(Response.STATUS_SUCCESS);
-		
+
 		return response;
 	}
-	
+
 	@Transactional
 	public Response removeAttachment(Request request) {
 		Response response = new Response();
 		List<Object> result = Lists.newArrayList();
 		List<Object> records = request.getRecords();
-		
+
 		if (records == null || records.isEmpty()) {
 			response.setException(new IllegalArgumentException("No records provides."));
 			return response;
 		}
-		
+
 		for(Object record : records) {
 			@SuppressWarnings("all")
 			Long fileId = Long.valueOf(((Map) record).get("id").toString());
-			
+
 			if (fileId != null) {
 				com.axelor.db.Query<MetaAttachment> removedAtt = com.axelor.db.Query.of(MetaAttachment.class);
 				removedAtt.filter("self.metaFile.id = ?1", fileId).delete();
-				
+
 				com.axelor.db.Query<MetaFile> removedFile = com.axelor.db.Query.of(MetaFile.class);
 				removedFile.filter("self.id = ?", fileId).delete();
-				
+
 				result.add(record);
 			}
 		}
@@ -311,33 +311,33 @@ public class MetaService {
 
 		return response;
 	}
-	
+
 	@Transactional
 	public Response addAttachment(long id, Request request) {
 		Response response = new Response();
 		Map<String, Object> data = request.getData();
 		Map<String, Object> map = Maps.newHashMap();
-		
+
 		Model fileBean = (Model) JPA.find(MetaFile.class, Long.valueOf(data.get("id").toString()));
-				
+
 		map.put("metaFile", fileBean);
 		map.put("objectId", id);
 		map.put("objectName", request.getModel());
-		
+
 		Object attBean = Mapper.toBean(MetaAttachment.class, map);
 		JPA.manage( (Model) attBean);
-		
+
 		response.setData(attBean);
 		response.setStatus(Response.STATUS_SUCCESS);
-		
+
 		return response;
 	}
 
 	public Response getChart(final String name, final Request request) {
-		
+
 		final Response response = new Response();
 		final MetaChart chart = MetaChart.all().filter("self.name = ?", name).fetchOne();
-		
+
 		if (chart == null || chart.getChartSeries() == null) {
 			return response;
 		}
@@ -346,16 +346,16 @@ public class MetaService {
 
 		data.put("title", JPA.translate(chart.getTitle()));
 		data.put("stacked", chart.getStacked());
-		
+
 		data.put("xAxis", chart.getCategoryKey());
 		data.put("xType", chart.getCategoryType());
 		data.put("xTitle", JPA.translate(chart.getCategoryTitle()));
-		
+
 		JPA.runInTransaction(new Runnable() {
 
 			@Override
 			public void run() {
-				
+
 				String string = chart.getQuery();
 				Query query = "sql".equals(chart.getQueryType()) ?
 						JPA.em().createNativeQuery(string) :
@@ -386,7 +386,7 @@ public class MetaService {
 
 		List<Object> series = Lists.newArrayList();
 		Map<String, Object> config = Maps.newHashMap();
-		
+
 		for(MetaChartSeries s : chart.getChartSeries()) {
 			Map<String, Object> map = Maps.newHashMap();
 			map.put("key", s.getKey());
@@ -396,7 +396,7 @@ public class MetaService {
 			map.put("title", JPA.translate(s.getTitle()));
 			series.add(map);
 		}
-		
+
 		if (chart.getChartConfig() != null) {
 			for(MetaChartConfig c : chart.getChartConfig()) {
 				config.put(c.getName(), c.getValue());
