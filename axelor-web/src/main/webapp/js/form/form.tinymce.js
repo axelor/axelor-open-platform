@@ -123,7 +123,9 @@ ui.formInput('Html', {
 		}
 		
 		scope.ajaxStop(function(){
-			tinymce.init(options);
+			scope.$evalAsync(function() {
+				tinymce.init(options);
+			});
 		});
 	},
 
