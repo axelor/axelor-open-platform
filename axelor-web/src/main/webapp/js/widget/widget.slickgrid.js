@@ -1115,7 +1115,7 @@ Grid.prototype.setEditors = function(form, formScope) {
 	form.prependTo(element).hide();
 	formScope.onChangeNotify = function(scope, values) {
 		var item, editor, cell = grid.getActiveCell();
-		if (cell == null || formScope !== scope) {
+		if (cell == null || formScope.record !== scope.record) {
 			return;
 		}
 		item = grid.getDataItem(cell.row);
@@ -1127,6 +1127,7 @@ Grid.prototype.setEditors = function(form, formScope) {
 			item = _.extend(item, values);
 
 			grid.updateRowCount();
+			grid.invalidateRow(cell.row);
 			grid.render();
 			
 			grid.setActiveCell(cell.row, cell.cell);
