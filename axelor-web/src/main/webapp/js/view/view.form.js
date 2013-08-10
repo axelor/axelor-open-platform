@@ -573,8 +573,8 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			});
 			return parent;
 		}
-		
-		var elem = $('<form name="form" ui-form ui-table-layout ui-actions></form>');
+
+		var elem = $('<form name="form" ui-form ui-table-layout ui-actions ui-widget-states></form>');
 		elem.attr('x-cols', schema.cols)
 		  	.attr('x-widths', schema.colWidths);
 

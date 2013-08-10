@@ -28,7 +28,9 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		element.addClass(this.css).parent().addClass(this.cellCss);
 		element.data('$attrs', attrs); // store the attrs object for event handlers
 
-		var field = scope.getViewDef ? scope.getViewDef(element) || {}: {};
+		var getViewDef = this.getViewDef || scope.getViewDef || function() {return {}; };
+
+		var field = getViewDef.call(scope, element);
 		var props = _.pick(field, ['readonly', 'required', 'hidden']);
 		var state = _.clone(props);
 		
@@ -87,49 +89,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		if (angular.isFunction(this.link)) {
 			this.link.call(this, scope, element, attrs, controller);
 		}
-		
-		var handleConditional = function(attr, conditional, nagative){
-			if (!field[conditional]) return;
-			var evalScope = scope.$new(true);
-			
-			evalScope.$moment = function(d) { return moment(d); };			// moment.js helper
-			evalScope.$number = function(d) { return +d; };					// number helper
-			evalScope.$popup = function() { return scope._isPopup; };		// popup detect
 
-			evalScope.$readonly = _.bind(scope.isReadonly, scope);
-			evalScope.$required = _.bind(scope.isRequired, scope);
-			evalScope.$valid = _.bind(scope.isValid, scope);
-			evalScope.$invalid = function() { return !evalScope.$valid(); };
-			
-			scope.$on("on:record-change", function(e, rec) {
-				if (rec === scope.record) {
-					handle(rec);
-				}
-			});
-
-			scope.$watch("isReadonly()", watcher);
-			scope.$watch("isRequired()", watcher);
-			scope.$watch("isValid()", watcher);
-
-			function watcher(current, old) {
-				if (current === old) return;
-				handle(scope.record);
-			}
-
-			function handle(rec) {
-				var value = evalScope.$eval(field[conditional], rec);
-				if (nagative) { value = !value; };
-				scope.attr(attr, value);
-			}
-		};
-
-		handleConditional("valid", "validIf");
-		handleConditional("hidden", "hideIf");
-		handleConditional("hidden", "showIf", true);
-		handleConditional("readonly", "readonlyIf");
-		handleConditional("required", "requiredIf");
-		handleConditional("collapse", "collapseIf");
-		
 		function hideWidget(hidden) {
 			var elem = element,
 				parent = elem.parent('td'),

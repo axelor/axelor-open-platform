@@ -21,7 +21,7 @@
 		<button class="btn" ng-click="onShowHelp()"><i class="icon icon-info-sign"></i></button>
 	  </div>
 	  <div class="btn-group" ng-if="toolbar">
-	  	<button ng-repeat="btn in toolbar" class="btn" ui-tool-button="btn" name="{{btn.name}}">{{btn.title}}</button>
+	  	<button ng-repeat="btn in toolbar" ui-tool-button></button>
 	  </div>
 	  <div ui-view-switcher class="pull-right"></div>
 	  <div class="record-pager pull-right">
