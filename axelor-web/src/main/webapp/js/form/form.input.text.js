@@ -14,11 +14,11 @@ ui.formInput('String', {
  * The Email input widget.
  */
 ui.formInput('Email', {
-	
+
 	css: 'email-item',
-	
+
 	pattern: /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
-	
+
 	link: function(scope, element, attrs, model) {
 
 		var pattern = this.pattern;
@@ -30,7 +30,7 @@ ui.formInput('Email', {
 			return pattern.test(value);
 		};
 	},
-	
+
 	template_editable: '<input type="email">',
 	template_readonly: '<a target="_blank" ng-show="text" href="mailto:{{text}}">{{text}}</a>'
 });
@@ -75,19 +75,17 @@ ui.formInput('Text', {
 });
 
 ui.formInput('Password', {
-	
+
 	css: 'password-item',
-	
+
 	init: function(scope) {
 
-		scope.format = function(value) {
-			if (!value || !this.isReadonly()) {
-				return value;
-			}
+		scope.password = function() {
+			var value = this.getValue() || "";
 			return _.str.repeat('*', value.length);
 		};
 	},
-	
+	template_readonly: '<span>{{password()}}</span>',
 	template_editable: '<input type="password">'
 });
 
