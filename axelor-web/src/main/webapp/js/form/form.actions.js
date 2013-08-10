@@ -609,43 +609,4 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 	};
 }]);
 
-ui.directive('uiToolButton', ['ViewService', function(ViewService) {
-	
-	return {
-		scope: true,
-		link: function(scope, element, attrs) {
-			var button = scope.$eval(attrs.uiToolButton);
-			var handler = new ActionHandler(scope, ViewService, {
-				element: element,
-				action: button.onClick,
-				canSave: button.canSave,
-				prompt: button.prompt
-			});
-	
-			element.on('click', _.bind(handler.onClick, handler));
-
-			scope.state = {};
-			
-			scope.$on("on:new", function(){
-				scope.state = {};
-			});
-			scope.$on("on:edit", function(){
-				scope.state = {};
-			});
-
-			scope.attr = function(name, value) {
-				if (arguments.length === 1) {
-					return scope.state[name];
-				}
-				scope.state[name] = value;
-			};
-			
-			scope.$watch('state.hidden', function(hidden, old) {
-				if (hidden === old) return;
-				return hidden ? element.hide() : element.show();
-			});
-		}
-	};
-}]);
-
 }).call(this);

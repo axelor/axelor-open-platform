@@ -34,6 +34,7 @@ ui.formWidget('Form', {
 			}
 			
 			elem.attr('ui-actions', '');
+			elem.attr('ui-widget-states', '');
 		});
 		
 		return ui.formCompile.apply(this, arguments);
@@ -55,6 +56,104 @@ ui.formWidget('Form', {
 			});
 		});
 	}
+});
+
+ui.formWidget('uiToolButton', {
+
+	getViewDef: function(element) {
+		return this.btn;
+	},
+
+	link: function(scope, element, attrs) {
+		var field = scope.field;
+		if (field == null) {
+			return;
+		}
+
+		scope.title = field.title;
+
+		element.on("click", function(e) {
+			if (!scope.attr('readonly')) {
+				scope.fireAction("onClick");
+			}
+		});
+
+		scope.$watch("attr('readonly')", function(readonly, old){
+			if (readonly === old) return;
+			element.toggleClass("disabled", readonly);
+		});
+
+		scope.$watch("isHidden()", function(hidden, old) {
+			setTimeout(function() {
+				element.parent().children().removeClass('btn-fix-left btn-fix-right');
+				element.parent().children(':visible:first').addClass('btn-fix-left');
+				element.parent().children(':visible:last').addClass('btn-fix-right');
+			});
+		});
+	},
+	template_editable: null,
+	template_readonly: null,
+	template: '<button class="btn" ui-actions ui-widget-states>{{title}}</button>'
+});
+
+ui.directive('uiWidgetStates', function() {
+
+	var handleConditional = function(scope, field, attr, conditional, nagative){
+
+		if (!field[conditional]) {
+			return;
+		}
+
+		var evalScope = scope.$new(true);
+
+		evalScope.$moment = function(d) { return moment(d); };			// moment.js helper
+		evalScope.$number = function(d) { return +d; };					// number helper
+		evalScope.$popup = function() { return scope._isPopup; };		// popup detect
+
+		evalScope.$readonly = _.bind(scope.isReadonly, scope);
+		evalScope.$required = _.bind(scope.isRequired, scope);
+		evalScope.$valid = _.bind(scope.isValid, scope);
+		evalScope.$invalid = function() { return !evalScope.$valid(); };
+
+		scope.$on("on:record-change", function(e, rec) {
+			if (rec === scope.record) {
+				handle(rec);
+			}
+		});
+
+		scope.$watch("isReadonly()", watcher);
+		scope.$watch("isRequired()", watcher);
+		scope.$watch("isValid()", watcher);
+
+		function watcher(current, old) {
+			if (current !== old) handle(scope.record);
+		}
+
+		function handle(rec) {
+			var value = evalScope.$eval(field[conditional], rec);
+			if (nagative) { value = !value; };
+			scope.attr(attr, value);
+		}
+	};
+
+	function register(scope) {
+		var field = scope.field;
+		if (field == null) {
+			return;
+		}
+		handleConditional(scope, field, "valid", "validIf");
+		handleConditional(scope, field, "hidden", "hideIf");
+		handleConditional(scope, field, "hidden", "showIf", true);
+		handleConditional(scope, field, "readonly", "readonlyIf");
+		handleConditional(scope, field, "required", "requiredIf");
+		handleConditional(scope, field, "collapse", "collapseIf");
+	};
+
+	return function(scope, element, attrs) {
+		scope.$evalAsync(function() {
+			register(scope);
+		});
+	};
 });
 
 })(this);
