@@ -364,8 +364,7 @@ var FormInput = {
 			element.val(value);
 		};
 
-		if (element.is(':input')) {
-			
+		function bindListeners() {
 			var onChange = scope.$events.onChange || angular.noop,
 				onChangePending = false;
 
@@ -394,7 +393,11 @@ var FormInput = {
 				}
 			});
 		}
-		
+
+		if (element.is(':input')) {
+			setTimeout(bindListeners);
+		}
+
 		scope.$render_editable();
 	},
 
