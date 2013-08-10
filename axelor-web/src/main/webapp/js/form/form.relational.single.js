@@ -120,7 +120,7 @@ ui.formInput('ManyToOne', 'Select', {
 	link: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);
 		var field = scope.field;
-		if (field.widget === 'NestedEditor') {
+		if (_.startsWith(field.widget, 'NestedEditor')) {
 			setTimeout(function(){
 				var canSelect = _.isUndefined(field.canSelect) ? true : field.canSelect;
 		        if (!canSelect) scope.attr('hidden', true);
