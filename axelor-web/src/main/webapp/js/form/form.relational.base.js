@@ -167,6 +167,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 				selector.data('$target', $element);
 			}
 			var popup = selector.data('$scope');
+			popup._domain = $scope._domain; // make sure that popup uses my domain (#1233)
 			popup.show();
 		}
 		
