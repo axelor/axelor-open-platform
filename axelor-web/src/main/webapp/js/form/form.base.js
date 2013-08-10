@@ -149,7 +149,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		
 		this.prepare(scope, element, attrs, controller);
 		
-		setTimeout(function() {
+		scope.$evalAsync(function() {
 			if (scope.isHidden()) {
 				hideWidget(true);
 			}
