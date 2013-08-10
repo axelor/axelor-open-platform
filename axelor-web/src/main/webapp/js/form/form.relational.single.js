@@ -119,8 +119,11 @@ ui.formInput('ManyToOne', 'Select', {
 
 	link: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);
-		if (scope.field.widget === 'NestedEditor') {
+		var field = scope.field;
+		if (field.widget === 'NestedEditor') {
 			setTimeout(function(){
+				var canSelect = _.isUndefined(field.canSelect) ? true : field.canSelect;
+		        if (!canSelect) scope.attr('hidden', true);
 				scope.showNestedEditor();
 			});
 		}
