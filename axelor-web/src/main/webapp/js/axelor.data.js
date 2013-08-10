@@ -24,6 +24,7 @@
 		
 			this._filter = null;
 			this._sortBy = null;
+			this._lastDomain = null;
 			this._lastContext = null;
 			this._showArchived = opts.archived;
 
@@ -167,7 +168,7 @@
 				
 				var limit = opts.limit == undefined ? this._page.limit : opts.limit;
 				var offset = opts.offset == undefined ? this._page.from : opts.offset;
-				var domain = opts.domain === undefined ? this._domain : opts.domain;
+				var domain = opts.domain === undefined ? (this._lastDomain || this._domain) : opts.domain;
 				var context = opts.context == undefined ? this._lastContext : opts.context;
 				var archived = opts.archived == undefined ? this._showArchived : opts.archived;
 				
