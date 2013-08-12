@@ -29,11 +29,11 @@ class Entity {
 
 	String documentation
 
-	String indexes
-
 	List<Property> properties
 
 	List<Constraint> constraints
+
+	List<Index> indexes
 
 	List<String> finders
 
@@ -58,7 +58,6 @@ class Entity {
 		cachable = node.@cachable
 		baseClass = "com.axelor.db.Model"
 		documentation = findDocs(node)
-		indexes = node.@indexes
 
 		if (!name) {
 			throw new IllegalArgumentException("Entity name not given.")
@@ -80,18 +79,19 @@ class Entity {
 		properties = [Property.idProperty(this)]
 		propertyMap = [:]
 		constraints = []
+		indexes = []
 		finders = []
 
 		node."*".each {
-
 			if (it.name() ==  "unique-constraint") {
 				return constraints += new Constraint(this, it)
 			}
-
+			if (it.name() == "index") {
+				return indexes += new Index(this, it)
+			}
 			if (it.name() ==  "finder-method") {
 				return finders += new Finder(this, it)
 			}
-
 			Property field = new Property(this, it)
 			properties += field
 			propertyMap[field.name] = field
@@ -281,24 +281,35 @@ class Entity {
 		return all
 	}
 
-	Annotation $table() {
-		def annotation = new Annotation(this, "javax.persistence.Table", false).add("name", this.table)
-		if (this.constraints == null || this.constraints.empty)
-			return annotation
+	List<Annotation> $table() {
 
-		def constraints = []
-
-		this.constraints.each {
-			def unique = new Annotation(this, "javax.persistence.UniqueConstraint", false)
-			if (it.name)
-				unique.add("name", it.name)
-			constraints += unique.add("columnNames", it.columns, true)
+		def constraints = this.constraints.collect {
+			def idx = new Annotation(this, "javax.persistence.UniqueConstraint", false)
+			if (it.name) {
+				idx.add("name", it.name)
+			}
+			return idx.add("columnNames", it.columns, true)
 		}
 
-		if (! constraints.empty)
-			annotation.add("uniqueConstraints", constraints, false)
+		def indexes = this.indexes.collect {
+			def idx = new Annotation(this, "org.hibernate.annotations.Index", false)
+			if (it.name) {
+				idx.add("name", it.name)
+			}
+			return idx.add("columnNames", it.columns, true)
+		}
 
-		return annotation
+		def a1 = new Annotation(this, "javax.persistence.Table", false).add("name", this.table)
+		if (!constraints.empty)
+			a1.add("uniqueConstraints", constraints, false)
+
+		if (indexes.empty)
+			return [a1]
+
+		def a2 = new Annotation(this, "org.hibernate.annotations.Table", false).add("appliesTo", this.table)
+		a2.add("indexes", indexes, false)
+
+		return [a1, a2]
 	}
 
 	Annotation $cachable() {
@@ -309,60 +320,5 @@ class Entity {
 			return new Annotation(this, "javax.persistence.Cacheable", false).add("false", false)
 		}
 		return null
-	}
-
-	String getIndexes() {
-		if (!indexes)
-			return ""
-
-		def parts = this.indexes.split(";")
-		if(parts == null || parts.length == 0)
-			return ""
-
-		def indexList = []
-		for (String list : parts) {
-			String index = this.getIndex(list)
-			if(index == null || "".equals(index))
-				continue
-			indexList += index
-		}
-
-		if(indexList == null || indexList.size() == 0)
-			return ""
-
-		return "@org.hibernate.annotations.Table(appliesTo=" +
-			"\"${table.toLowerCase()}\"," +
-			"\n\t indexes = {\n" +
-			indexList.join(",\n") +
-			"\n\t}\n)\n"
-	}
-
-	String getIndex(String list){
-		if(list == null)
-			return null
-
-		def fieldlist = list.split(",")
-		if(fieldlist == null || fieldlist.length == 0)
-			return null
-
-		def column = []
-		def code = "\t\t@Index(name=\""
-		def name = table.toLowerCase()
-
-		fieldlist.each { name += "_" + it.trim() }
-
-		code += name.toUpperCase() + "_IDX\", columnNames={"
-		for(String field : fieldlist) {
-			Property prop = this.getField(field.trim())
-			if(prop == null || prop.getServerType() == "one-to-many" || prop.getServerType() == "many-to-many")
-				return null
-			column += "\""+field.trim()+"\""
-		}
-
-		if(column == null || column.size() == 0)
-			return null
-
-		code += column.join(',') + "})"
-		return code
 	}
 }
