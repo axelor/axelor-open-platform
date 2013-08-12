@@ -23,79 +23,82 @@ import com.google.common.collect.Lists;
 public class Field extends SimpleWidget {
 
 	@XmlAttribute
+	private String placeholder;
+
+	@XmlAttribute
 	private String widget;
-	
+
 	@XmlAttribute
 	private Boolean canSelect;
-	
+
 	@XmlAttribute
 	private Boolean canNew;
-	
+
 	@XmlAttribute
 	private Boolean canRemove;
-	
+
 	@XmlAttribute
 	private Boolean canView;
-	
+
 	@XmlAttribute
 	private String onChange;
-	
+
 	@XmlAttribute
 	private String onSelect;
-	
+
 	@XmlAttribute
 	private String domain;
-	
+
 	@XmlAttribute
 	private Boolean required;
-	
+
 	@XmlAttribute
 	private String requiredIf;
-	
+
 	@XmlAttribute
 	private String validIf;
-	
+
 	@XmlAttribute
 	private Integer width;
-	
+
 	@XmlAttribute(name = "min")
 	private String minSize;
-	
+
 	@XmlAttribute(name = "max")
 	private String maxSize;
-	
+
 	@XmlAttribute
 	private String fgColor;
-	
+
 	@XmlAttribute
 	private String bgColor;
-	
+
 	@XmlAttribute
 	private String selection;
-	
+
 	@XmlAttribute
 	private String aggregate;
-	
+
 	@XmlAttribute(name = "edit-window")
 	private String editWindow;
-	
+
 	@XmlAttribute(name = "form-view")
 	private String formView;
-	
+
 	@XmlAttribute(name = "grid-view")
 	private String gridView;
-	
+
 	@XmlAttribute(name = "summary-view")
 	private String summaryView;
-	
+
 	private Hilite hilite;
-	
+
 	@XmlElements({
 		@XmlElement(name = "form", type = FormView.class),
 		@XmlElement(name = "grid", type = GridView.class)
 	})
 	private List<AbstractView> views;
-	
+
 	@Override
 	public String getTitle() {
 		if(!Strings.isNullOrEmpty(super.getDefaultTitle())) {
@@ -103,13 +106,24 @@ public class Field extends SimpleWidget {
 		}
 		return JPA.translate(this.getName(), super.getDefaultTitle(), this.getModel(), "field");
 	}
-	
+
 	@Override
 	public String getHelp() {
 		if(!Strings.isNullOrEmpty(super.getDefaultHelp())) {
 			return JPA.translate(super.getDefaultHelp(), super.getDefaultHelp(), this.getModel(), "help");
 		}
 		return JPA.translate(this.getName(), super.getDefaultHelp(), this.getModel(), "help");
+	}
+
+	public String getPlaceholder() {
+		if (!Strings.isNullOrEmpty(placeholder)) {
+			return JPA.translate(placeholder, placeholder, this.getModel(), "placeholder");
+		}
+		return placeholder;
+	}
+
+	public void setPlaceholder(String placeholder) {
+		this.placeholder = placeholder;
 	}
 
 	public String getWidget() {
@@ -119,35 +133,35 @@ public class Field extends SimpleWidget {
 	public void setWidget(String widget) {
 		this.widget = widget;
 	}
-	
+
 	public Boolean getCanSelect() {
 		return canSelect;
 	}
-	
+
 	public void setCanSelect(Boolean canSelect) {
 		this.canSelect = canSelect;
 	}
-	
+
 	public Boolean getCanNew() {
 		return canNew;
 	}
-	
+
 	public void setCanNew(Boolean canNew) {
 		this.canNew = canNew;
 	}
-	
+
 	public Boolean getCanRemove() {
 		return canRemove;
 	}
-	
+
 	public void setCanRemove(Boolean canRemove) {
 		this.canRemove = canRemove;
 	}
-	
+
 	public Boolean getCanView() {
 		return canView;
 	}
-	
+
 	public void setCanView(Boolean canView) {
 		this.canView = canView;
 	}
@@ -159,11 +173,11 @@ public class Field extends SimpleWidget {
 	public void setOnChange(String onChange) {
 		this.onChange = onChange;
 	}
-	
+
 	public String getOnSelect() {
 		return onSelect;
 	}
-	
+
 	public void setOnSelect(String onSelect) {
 		this.onSelect = onSelect;
 	}
@@ -171,27 +185,27 @@ public class Field extends SimpleWidget {
 	public String getDomain() {
 		return domain;
 	}
-	
+
 	public void setDomain(String domain) {
 		this.domain = domain;
 	}
-	
+
 	public Boolean getRequired() {
 		return required;
 	}
-	
+
 	public void setRequired(Boolean required) {
 		this.required = required;
 	}
-	
+
 	public String getRequiredIf() {
 		return requiredIf;
 	}
-	
+
 	public void setRequiredIf(String requiredIf) {
 		this.requiredIf = requiredIf;
 	}
-	
+
 	public String getValidIf() {
 		return validIf;
 	}
@@ -203,7 +217,7 @@ public class Field extends SimpleWidget {
 	public Integer getWidth() {
 		return width;
 	}
-	
+
 	public void setWidth(Integer width) {
 		this.width = width;
 	}
@@ -227,19 +241,19 @@ public class Field extends SimpleWidget {
 		}
 		return all;
 	}
-	
+
 	public void setSelection(String selection) {
 		this.selection = selection;
 	}
-	
+
 	public String getAggregate() {
 		return aggregate;
 	}
-	
+
 	public void setAggregate(String aggregate) {
 		this.aggregate = aggregate;
 	}
-	
+
 	public Hilite getHilite() {
 		return hilite;
 	}
@@ -247,7 +261,7 @@ public class Field extends SimpleWidget {
 	public void setHilite(Hilite hilite) {
 		this.hilite = hilite;
 	}
-	
+
 	public List<AbstractView> getViews() {
 		if(views != null && this.getTarget() != null) {
 			for (AbstractView abstractView : views) {
@@ -260,7 +274,7 @@ public class Field extends SimpleWidget {
 	public void setViews(List<AbstractView> views) {
 		this.views = views;
 	}
-	
+
 	public String getMinSize() {
 		return minSize;
 	}
@@ -280,51 +294,51 @@ public class Field extends SimpleWidget {
 	public String getFgColor() {
 		return fgColor;
 	}
-	
+
 	public void setFgColor(String fgColor) {
 		this.fgColor = fgColor;
 	}
-	
+
 	public String getBgColor() {
 		return bgColor;
 	}
-	
+
 	public void setBgColor(String bgColor) {
 		this.bgColor = bgColor;
 	}
-	
+
 	public String getEditWindow() {
 		return editWindow;
 	}
-	
+
 	public void setEditWindow(String editWindow) {
 		this.editWindow = editWindow;
 	}
-	
+
 	public String getFormView() {
 		return formView;
 	}
-	
+
 	public void setFormView(String formView) {
 		this.formView = formView;
 	}
-	
+
 	public String getGridView() {
 		return gridView;
 	}
-	
+
 	public void setGridView(String gridView) {
 		this.gridView = gridView;
 	}
-	
+
 	public String getSummaryView() {
 		return summaryView;
 	}
-	
+
 	public void setSummaryView(String summaryView) {
 		this.summaryView = summaryView;
 	}
-	
+
 	private String getTarget() {
 		Mapper mapper = null;
 		try {
