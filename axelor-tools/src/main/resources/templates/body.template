@@ -2,7 +2,6 @@ ${ pojo.documentation }\
 <% pojo.annotations.each { a -> %>
 ${a}\
 <% } %>
-${ pojo.indexes }\
 public class ${pojo.name} extends ${pojo.baseClass} {
 <% pojo.fields.each { p -> %>\
 <% p.annotations.each { a -> %>

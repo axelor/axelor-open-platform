@@ -57,6 +57,8 @@
     <string name="notes" multiline="true" title="About Me" />
     <many-to-many name="groups" ref="Group" mappedBy="contacts"/>
     <one-to-many name="addresses" ref="Address" mappedBy="contact" orderBy="area" />
+    <index name="IDX_NAMES" columns="firstName,lastName,fullName"/>
+    <index columns="id,fullName,email"/>
   </entity>
 
   <entity name="Address" hashAll="true">
