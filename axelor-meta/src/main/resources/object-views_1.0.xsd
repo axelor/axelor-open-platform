@@ -982,6 +982,13 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="pattern" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            Validate against the given pattern.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="fgColor" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
