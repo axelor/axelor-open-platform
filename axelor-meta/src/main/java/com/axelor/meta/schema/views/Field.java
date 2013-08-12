@@ -68,6 +68,9 @@ public class Field extends SimpleWidget {
 	private String maxSize;
 
 	@XmlAttribute
+	private String pattern;
+
+	@XmlAttribute
 	private String fgColor;
 
 	@XmlAttribute
@@ -289,6 +292,14 @@ public class Field extends SimpleWidget {
 
 	public void setMaxSize(String maxSize) {
 		this.maxSize = maxSize;
+	}
+
+	public String getPattern() {
+		return pattern;
+	}
+
+	public void setPattern(String pattern) {
+		this.pattern = pattern;
 	}
 
 	public String getFgColor() {
