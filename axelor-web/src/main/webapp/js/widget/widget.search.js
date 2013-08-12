@@ -20,7 +20,7 @@ var OPERATORS = {
 
 	"isNull"	: _t("is null"),
 	"notNull" 	: _t("is not null"),
-	
+
 	"true"		: _t("is true"),
 	"false" 	: _t("is false")
 };
@@ -40,7 +40,7 @@ _.each(["text", "many-to-one", "one-to-many", "many-to-many"], function(type) {
 });
 
 ui.directive('uiFilterItem', function() {
-	
+
 	return {
 		replace: true,
 		require: '^uiFilterForm',
@@ -49,13 +49,13 @@ ui.directive('uiFilterItem', function() {
 			filter: "="
 		},
 		link: function(scope, element, attrs, form) {
-			
+
 			scope.getOperators = function() {
-				
+
 				if (element.is(':hidden')) {
 					return;
 				}
-				
+
 				var filter = scope.filter || {};
 				if (filter.type === undefined) {
 					return [];
@@ -68,11 +68,11 @@ ui.directive('uiFilterItem', function() {
 					};
 				});
 			};
-			
+
 			scope.remove = function(filter) {
 				form.removeFilter(filter);
 			};
-			
+
 			scope.canShowInput = function() {
 				return scope.filter &&
 					   scope.filter.operator && !(
@@ -80,13 +80,13 @@ ui.directive('uiFilterItem', function() {
 					   scope.filter.operator == 'isNull' ||
 					   scope.filter.operator == 'notNull');
 			};
-			
+
 			scope.canShowRange = function() {
 				return scope.filter && (
 					   scope.filter.operator === 'between' ||
 					   scope.filter.operator === 'notBetween');
 			};
-			
+
 			scope.onFieldChange = function() {
 				var filter = scope.filter,
 					field = scope.fields[filter.field] || {};
@@ -105,14 +105,14 @@ ui.directive('uiFilterItem', function() {
 });
 
 ui.directive('uiFilterInput', function() {
-	
+
 	return {
 		require: '^ngModel',
 
 		link: function(scope, element, attrs, model) {
-		
+
 			var picker = null;
-	
+
 			var options = {
 				dateFormat: 'dd/mm/yy',
 				showButtonsPanel: false,
@@ -123,7 +123,7 @@ ui.directive('uiFilterInput', function() {
 					model.$setViewValue(value.toISOString());
 				}
 			};
-			
+
 			model.$formatters.push(function(value) {
 				if (_.isDate(value)) {
 					value = moment(value).format('DD/MM/YYYY');
@@ -141,7 +141,7 @@ ui.directive('uiFilterInput', function() {
 				}
 				picker.datepicker('show');
 			});
-			
+
 			element.on('$destroy', function() {
 				if (picker) {
 					picker.datepicker('destroy');
@@ -154,7 +154,7 @@ ui.directive('uiFilterInput', function() {
 
 FilterFormCtrl.$inject = ['$scope', '$element', 'ViewService'];
 function FilterFormCtrl($scope, $element, ViewService) {
-	
+
 	this.doInit = function(model) {
 		return ViewService
 		.getFields(model)
@@ -183,7 +183,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	$scope.addFilter = function(filter) {
 		$scope.filters.push(filter || {});
 	};
-	
+
 	this.removeFilter = function(filter) {
 		var index = $scope.filters.indexOf(filter);
 		if (index > -1) {
@@ -193,20 +193,20 @@ function FilterFormCtrl($scope, $element, ViewService) {
 			$scope.addFilter();
 		}
 	};
-	
+
 	$scope.$on('on:select-custom', function(e, custom) {
 
 		$scope.filters.length = 0;
-		
+
 		if (custom.$selected) {
 			select(custom);
 		} else {
 			$scope.addFilter();
 		}
-		
+
 		return $scope.applyFilter();
 	});
-	
+
 	$scope.$on('on:before-save', function(e, data) {
 		var criteria = $scope.prepareFilter();
 		if (data) {
@@ -217,7 +217,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	function select(custom) {
 
 		var criteria = custom.criteria;
-		
+
 		$scope.operator = criteria.operator || 'and';
 
 		_.each(criteria.criteria, function(item) {
@@ -226,9 +226,9 @@ function FilterFormCtrl($scope, $element, ViewService) {
 				value: item.value,
 				value2: item.value2
 			};
-			
+
 			var field = $scope.fields[item.fieldName] || {};
-			
+
 			filter.type = field.type || 'string';
 			filter.operator = item.operator;
 
@@ -238,7 +238,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 			if (filter.operator === '=' && filter.value === false) {
 				filter.operator = 'false';
 			}
-			
+
 			if (field.type === 'date' || field.type === 'datetime') {
 				if (filter.value) {
 					filter.value = moment(filter.value).toDate();
@@ -247,7 +247,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 					filter.value2 = moment(filter.value2).toDate();
 				}
 			}
-			
+
 			$scope.addFilter(filter);
 		});
 	}
@@ -255,7 +255,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	$scope.clearFilter = function() {
 		$scope.filters.length = 0;
 		$scope.addFilter();
-		
+
 		if ($scope.$parent.onClear) {
 			$scope.$parent.onClear();
 		}
@@ -264,24 +264,24 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	};
 
 	$scope.prepareFilter = function() {
-		
+
 		var criteria = {
 			operator: $scope.operator,
 			criteria: []
 		};
 
 		_.each($scope.filters, function(filter) {
-			
+
 			if (!filter.field || !filter.operator) {
 				return;
 			}
-			
+
 			var criterion = {
 				fieldName: filter.field,
 				operator: filter.operator,
 				value: filter.value
 			};
-			
+
 			if (criterion.operator == "true") {
 				criterion.operator = "=";
 				criterion.value = true;
@@ -302,17 +302,17 @@ function FilterFormCtrl($scope, $element, ViewService) {
 					]
 				};
 			}
-			
+
 			if (criterion.operator == "between" || criterion.operator == "notBetween") {
 				criterion.value2 = filter.value2;
 			}
-			
+
 			criteria.criteria.push(criterion);
 		});
-		
+
 		return criteria;
 	};
-	
+
 	$scope.applyFilter = function() {
 		var criteria = $scope.prepareFilter();
 		if ($scope.$parent.onFilter) {
@@ -322,19 +322,19 @@ function FilterFormCtrl($scope, $element, ViewService) {
 }
 
 ui.directive('uiFilterForm', function() {
-	
+
 	return {
 		replace: true,
-		
+
 		scope: {
 			model: '=',
 			onSearch: '&'
 		},
-		
+
 		controller: FilterFormCtrl,
-		
+
 		link: function(scope, element, attrs, ctrl) {
-			
+
 			ctrl.doInit(scope.model);
 		},
 		template:
@@ -366,7 +366,7 @@ ui.directive('uiFilterBox', function() {
 			handler: '='
 		},
 		controller: ['$scope', 'ViewService', 'DataSource', function($scope, ViewService, DataSource) {
-			
+
 			var handler = $scope.handler,
 				params = (handler._viewParams || {}).params;
 
@@ -378,7 +378,7 @@ ui.directive('uiFilterBox', function() {
 
 			$scope.viewFilters = [];
 			$scope.custFilters = [];
-			
+
 			if (filterView) {
 				ViewService.getMetaDef($scope.model, {name: filterView, type: 'search-filters'})
 				.success(function(fields, view) {
@@ -388,7 +388,7 @@ ui.directive('uiFilterBox', function() {
 			} else {
 				filterView = 'act:' + (handler._viewParams || {}).action;
 			}
-			
+
 			if (filterView) {
 				filterDS.rpc('com.axelor.meta.web.MetaUserController:findFilters', {
 					model: 'com.axelor.meta.db.MetaFilter',
@@ -420,7 +420,7 @@ ui.directive('uiFilterBox', function() {
 				custom.selected = _.map(custom.selected, function(x) {
 					return parseInt(x);
 				});
-				
+
 				var found = _.findWhere($scope.custFilters, {name: custom.name});
 				if (found) {
 					_.extend(found, custom);
@@ -439,7 +439,7 @@ ui.directive('uiFilterBox', function() {
 				}
 
 				filter.$selected = selected;
-				
+
 				var index = selection.indexOf(filter);
 				if (selected) {
 					selection.push(filter);
@@ -462,14 +462,14 @@ ui.directive('uiFilterBox', function() {
 			$scope.isSelected = function(filter) {
 				return filter.$selected;
 			};
-			
+
 			$scope.onRefresh = function() {
 				if (this.custTerm) {
 					return this.onFreeSearch();
 				}
 				handler.onRefresh();
 			};
-			
+
 			$scope.hasFilters = function(which) {
 				if (which === 1) {
 					return this.viewFilters && this.viewFilters.length;
@@ -480,7 +480,7 @@ ui.directive('uiFilterBox', function() {
 				return (this.viewFilters && this.viewFilters.length) ||
 					   (this.custFilters && this.custFilters.length);
 			};
-			
+
 			$scope.canSaveNew = function() {
 				if ($scope.custName && $scope.custTitle) {
 					return !angular.equals($scope.custName, _.underscored($scope.custTitle));
@@ -489,23 +489,23 @@ ui.directive('uiFilterBox', function() {
 			};
 
 			$scope.onSave = function(saveAs) {
-				
+
 				var data = { criteria: null };
 				$scope.$broadcast('on:before-save', data);
-				
+
 				var title = _.trim($scope.custTitle),
 					name = $scope.custName || _.underscored(title);
 
 				if (saveAs) {
 					name = _.underscored(title);
 				}
-				
+
 				var selected = new Array();
-				
+
 				_.each($scope.viewFilters, function(item, i) {
 					if (item.$selected) selected.push(i);
 				});
-				
+
 				var custom = data.criteria || {};
 
 				custom = _.extend({
@@ -521,7 +521,7 @@ ui.directive('uiFilterBox', function() {
 					filterView: filterView,
 					filterCustom: angular.toJson(custom)
 				};
-				
+
 				filterDS.rpc('com.axelor.meta.web.MetaUserController:saveFilter', {
 					model: 'com.axelor.meta.db.MetaFilter',
 					context: value
@@ -529,14 +529,14 @@ ui.directive('uiFilterBox', function() {
 					acceptCustom(res.data);
 				});
 			};
-			
+
 			$scope.onDelete = function() {
-				
+
 				var name = $scope.custName;
 				if (!name) {
 					return;
 				}
-				
+
 				function doDelete() {
 					filterDS.rpc('com.axelor.meta.web.MetaUserController:removeFilter', {
 						model: 'com.axelor.meta.db.MetaFilter',
@@ -555,22 +555,22 @@ ui.directive('uiFilterBox', function() {
 						$scope.onFilter();
 					});
 				}
-				
+
 				axelor.dialogs.confirm(_t("Would you like to remove the filter?"), function(confirmed){
 					if (confirmed) {
 						doDelete();
 					}
 				});
 			};
-			
+
 			$scope.onClear = function() {
-				
+
 				_.each($scope.viewFilters, function(d) { d.$selected = false; });
 				_.each($scope.custFilters, function(d) { d.$selected = false; });
-				
+
 				current.domains.length = 0;
 				current.customs.length = 0;
-				
+
 				$scope.custName = null;
 				$scope.custTitle = null;
 				$scope.custShared = false;
@@ -616,7 +616,7 @@ ui.directive('uiFilterBox', function() {
 				});
 
 				search._domains = domains;
-				
+
 				if (customs.length > 0) {
 					search.criteria.push({
 						operator: criteria.operator || 'and',
@@ -628,7 +628,7 @@ ui.directive('uiFilterBox', function() {
 			};
 
 			$scope.onFreeSearch = function() {
-				
+
 				var filters = Array(),
 					text = this.custTerm,
 					number = +(text);
@@ -640,15 +640,15 @@ ui.directive('uiFilterBox', function() {
 						value: text
 					});
 				}
-				
+
 				for(var name in this.fields) {
-					
+
 					if (name === this.nameField) continue;
-					
+
 					var fieldName = null,
 						operator = "like",
 						value = text;
-					
+
 					var field = this.fields[name];
 
 					switch (field.type) {
@@ -675,7 +675,7 @@ ui.directive('uiFilterBox', function() {
 					}
 
 					if (!fieldName) continue;
-					
+
 					filters.push({
 						fieldName: fieldName,
 						operator: operator,
@@ -695,8 +695,6 @@ ui.directive('uiFilterBox', function() {
 
 			var menu = element.children('.filter-menu'),
 				toggleButton = null;
-			
-			scope.custTitleHolder = _t('Save filter as');
 
 			scope.onSearch = function(e) {
 				if (menu && menu.is(':visible')) {
@@ -716,18 +714,18 @@ ui.directive('uiFilterBox', function() {
 			setTimeout(function() {
 				element.parents('.view-container').after(menu);
 			});
-			
+
 			element.on('keydown.search-query', '.search-query', function(e) {
 				if (e.keyCode === 13) { // enter
 					scope.onFreeSearch();
 				}
 			});
-			
+
 			function hideMenu() {
 				$(document).off('mousedown.search-menu', onMouseDown);
 				return menu.hide();
 			}
-			
+
 			function onMouseDown(e) {
 				var all = $(menu).add(toggleButton);
 				if (all.is(e.target) || all.has(e.target).size() > 0) {
@@ -784,7 +782,7 @@ ui.directive('uiFilterBox', function() {
 				"<hr>" +
 				"<div class='form-inline'>" +
 					"<div class='control-group'>" +
-						"<input type='text' placeholder={{custTitleHolder}} ng-model='custTitle'> " +
+						"<input type='text' placeholder='{{\"Save filter as\" | t}}' ng-model='custTitle'> " +
 						"<label class='checkbox'>" +
 							"<input type='checkbox' ng-model='custShared'><span x-translate>Share</span>" +
 						"</label>" +
