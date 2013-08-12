@@ -68,5 +68,12 @@
     <finder-method name="findByContact" using="long:contactId, String:name" filter="self.customer.id = :contactId OR self.customer.fullName = :name" all="true"/>
     <finder-method name="findByContact" using="String:email" filter="self.customer.email = :email" all="true"/>
   </entity>
+  
+  <entity name="ConstraintTester">
+    <string name="someName"/>
+    <string name="anotherName" column="another"/>
+    <many-to-one name="myTitle" ref="Title"/>
+    <unique-constraint columns="someName,anotherName,myTitle"/>
+  </entity>
 
 </domain-models>
