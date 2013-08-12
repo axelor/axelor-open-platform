@@ -10,25 +10,17 @@ ui.formInput('String', {
 
 	link_editable: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);
-		var props = scope.field,
-			regExp = props.pattern ? new RegExp(props.pattern,'i') : null;
+
+		var field = scope.field,
+			regex = field.pattern ? new RegExp(field.pattern, 'i') : null,
+			minSize = +(field.minSize),
+			maxSize = +(field.maxSize);
 
 		scope.validate = function(value) {
-			return lengthValidation(value) && patternValidation(value);
-		};
-
-		function patternValidation(value) {
-			if(_.isEmpty(value) || !regExp) {
+			if (_.isEmpty(value)) {
 				return true;
 			}
-
-			return regExp.test(value);
-		};
-
-		function lengthValidation(value) {
-			var length = value ? value.length : 0,
-				minSize = +props.minSize,
-				maxSize = +props.maxSize,
+			var length = value.length,
 				valid = true;
 
 			if (minSize) {
@@ -36,6 +28,9 @@ ui.formInput('String', {
 			}
 			if(valid && maxSize) {
 				valid = length <= maxSize;
+			}
+			if (valid && regex) {
+				valid = regex.test(value);
 			}
 
 			return valid;
