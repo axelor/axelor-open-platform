@@ -377,17 +377,8 @@
     </xsd:complexContent>
   </xsd:complexType>
 
-  <xsd:complexType name="Unique">
-    <xsd:annotation>
-      <xsd:documentation>
-        Declare an unique constraint one speficied column(s).
-      </xsd:documentation>
-    </xsd:annotation>
-    <xsd:attribute name="name" type="xsd:string" use="optional">
-      <xsd:annotation>
-        <xsd:documentation>Name of the constraint.</xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
+  <xsd:complexType name="Index">
+    <xsd:attribute name="name" type="xsd:string" use="optional"/>
     <xsd:attribute name="columns" use="required">
       <xsd:annotation>
         <xsd:documentation>
@@ -567,11 +558,17 @@
           </xsd:annotation>
         </xsd:element>
       </xsd:choice>
-      <xsd:element name="unique-constraint" type="dm:Unique"
-        minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="unique-constraint" type="dm:Index" minOccurs="0" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation>
-            Define composite uniqe constraint on multiple fields.
+            Define an uniqe constraint on the specified columns(s).
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="index" type="dm:Index" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>
+            Define an index on the specified column(s).
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -651,17 +648,6 @@
       <xsd:annotation>
         <xsd:documentation>
         Specifies whether the entity should be cached if caching is enabled.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="indexes">
-      <xsd:annotation>
-        <xsd:documentation>
-        Specifies indexes on multiple columns.
-        Some examples: &lt;br&gt; &lt;br&gt;
-
-        ... indexes="name,code" &lt;br&gt; &lt;br&gt;
-        ... indexes="name,code;name,customer"
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
