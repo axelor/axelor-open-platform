@@ -876,6 +876,7 @@
           <xsd:element name="form" type="tns:FormView" minOccurs="0" />
         </xsd:all>
         <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="placeholder" type="xsd:string" />
         <xsd:attribute name="widget" type="xsd:string" />
         <xsd:attribute name="selection" type="xsd:string"/>
         <xsd:attribute name="required" type="xsd:boolean" />
