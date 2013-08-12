@@ -157,11 +157,11 @@ ui.formWidget('Tabs', {
 			    onSelect = null;
 			
 			if(select){
-			    onSelect = select.onSelect;
+			    onSelect = select.$events.onSelect;
 			}
 			
 			if(onSelect){
-				onSelect.handle();
+				onSelect();
 			}
 		}
 		
@@ -283,10 +283,6 @@ ui.formWidget('Tab', {
 	widgets: ['Page'],
 	
 	link: function(scope, elem, attrs, tabs) {
-		
-		setTimeout(function(){
-			scope.onSelect = scope.$events.onSelect;
-		});
 		
 		scope.selected = false;
 		scope.icon = scope.field && scope.field.icon;
