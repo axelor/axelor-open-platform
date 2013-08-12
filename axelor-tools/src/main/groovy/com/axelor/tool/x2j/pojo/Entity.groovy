@@ -77,27 +77,25 @@ class Entity {
 		importType("com.axelor.db.JPA")
 		importType("com.axelor.db.Query")
 
-		properties = []
+		properties = [Property.idProperty(this)]
+		propertyMap = [:]
 		constraints = []
 		finders = []
 
 		node."*".each {
-			if (it.name() == "unique-constraint") {
-				constraints += new Constraint(this, it)
-			} else if (it.name() == "finder-method") {
-				finders += new Finder(this, it)
-			} else {
-				properties += new Property(this, it)
+
+			if (it.name() ==  "unique-constraint") {
+				return constraints += new Constraint(this, it)
 			}
-		}
 
-		Property idp = Property.idProperty(this)
-		properties = [idp] + properties
+			if (it.name() ==  "finder-method") {
+				return finders += new Finder(this, it)
+			}
 
-		propertyMap = [:]
-		properties.each {
-			propertyMap[it.name] = it
-			if (it.isVirtual() && !it.isTransient()) {
+			Property field = new Property(this, it)
+			properties += field
+			propertyMap[field.name] = field
+			if (field.isVirtual() && !field.isTransient()) {
 				dynamicUpdate = true
 			}
 		}
@@ -162,7 +160,7 @@ class Entity {
 			lines += "}\n"
 		}
 
-		return "\t" + Utils.stripCode(lines.join("\n"), "\n\t");
+		return "\t" + Utils.stripCode(lines.join("\n"), "\n\t")
 	}
 
 	private List<Property> getHashables() {
@@ -177,7 +175,7 @@ class Entity {
 		}
 
 		constraints.each {
-			all += it.columns.collect {
+			all += it.fields.collect {
 				def n = it
 				properties.find {
 					it.name == n
@@ -190,9 +188,9 @@ class Entity {
 
 	String getEqualsCode() {
 		def hashables = getHashables()
-		def code = ["if (obj == null) return false;"];
+		def code = ["if (obj == null) return false;"]
 
-		importType("com.google.common.base.Objects");
+		importType("com.google.common.base.Objects")
 
 		if (groovy) {
 			code += "if (this.is(obj)) return true;"
@@ -215,7 +213,7 @@ class Entity {
 	}
 
 	String getHashCodeCode() {
-		importType("com.google.common.base.Objects");
+		importType("com.google.common.base.Objects")
 		def data = getHashables()collect { "this.${it.getter}()" }.join(", ")
 		if (data.size()) {
 			def hash = name.hashCode()
@@ -231,11 +229,11 @@ class Entity {
 
 		code += "ToStringHelper tsh = Objects.toStringHelper(this);\n"
 		code += "tsh.add(\"id\", this.getId());"
-		int count = 0;
+		int count = 0
 		for(Property p : properties) {
 			if (p.virtual || !p.simple || p.name == "id" || p.name == "version") continue
 			code += "tsh.add(\"${p.name}\", this.${p.getter}());"
-			if (count++ == 10) break;
+			if (count++ == 10) break
 		}
 		return code.join("\n\t\t") + "\n\n\t\treturn tsh.omitNullValues().toString();"
 	}
@@ -277,8 +275,8 @@ class Entity {
 			if (f.name == "findByCode") hasCodeFinder = true
 		}
 
-		if (!hasNameFinder && propertyMap['name']) all.add(0, new Finder(this, "name"));
-		if (!hasCodeFinder && propertyMap['code']) all.add(0, new Finder(this, "code"));
+		if (!hasNameFinder && propertyMap['name']) all.add(0, new Finder(this, "name"))
+		if (!hasCodeFinder && propertyMap['code']) all.add(0, new Finder(this, "code"))
 
 		return all
 	}
@@ -305,10 +303,10 @@ class Entity {
 
 	Annotation $cachable() {
 		if (cachable == "true") {
-			return new Annotation(this, "javax.persistence.Cacheable", true);
+			return new Annotation(this, "javax.persistence.Cacheable", true)
 		}
 		if (cachable == "false") {
-			return new Annotation(this, "javax.persistence.Cacheable", false).add("false", false);
+			return new Annotation(this, "javax.persistence.Cacheable", false).add("false", false)
 		}
 		return null
 	}
