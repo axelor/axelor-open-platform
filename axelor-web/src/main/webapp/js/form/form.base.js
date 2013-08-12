@@ -182,6 +182,14 @@ ui.formDirective = function(name, object) {
 							scope.$elem_editable.find('input:first').focus();
 						});
 					}
+
+					if (scope.$elem_editable.is(':input')) {
+						scope.$elem_editable.attr('placeholder', scope.field.placeholder);
+					}
+
+					if (scope.$elem_editable.is('.picker-input')) {
+						scope.$elem_editable.find(':input:first').attr('placeholder', scope.field.placeholder);
+					}
 				}
 				if (scope.$elem_readonly) {
 					scope.$elem_readonly.detach();
