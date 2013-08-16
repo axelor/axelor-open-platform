@@ -8,6 +8,16 @@ ui.formInput('ImageLink', {
 
 	BLANK: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
 
+	controller: ['$scope', '$element', '$interpolate', function($scope, $element, $interpolate) {
+
+		$scope.parseText = function(text) {
+			if (!text|| !text.match(/{{.*?}}/)) {
+				return text;
+			}
+			return $interpolate(text)($scope.record);
+		};
+	}],
+
 	init: function(scope) {
 		var field = scope.field;
 
@@ -25,8 +35,13 @@ ui.formInput('ImageLink', {
 			if (content == null) {
 				image.get(0).src = BLANK;
 			}
-			image.get(0).src = content;
+			image.get(0).src = scope.parseText(content);
 		};
+
+		scope.$watch('isReadonly()', function(readonly, old) {
+			if (!readonly || readonly === old) return;
+			scope.$render_readonly();
+		});
 	},
 	template_editable: '<input type="text">',
 	template_readonly:
