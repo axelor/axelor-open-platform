@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.persistence.Entity;
 
+import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
 import com.axelor.meta.ActionHandler;
@@ -40,13 +41,13 @@ public class ExclusiveGateway extends Gateway {
 	}
 	
 	@Override
-	public void execute( ActionHandler actionHandler, Instance instance, Map<Object, Object> context ){
+	public void execute( ActionHandler actionHandler, User user, Instance instance, Map<Object, Object> context ){
 		
 		for ( Transition transition : getEndTransitions() ){
 
-			if ( transition.execute( actionHandler ) ) {
+			if ( transition.execute( actionHandler, user ) ) {
 
-				transition.getNextNode().execute( actionHandler, instance, transition, context );
+				transition.getNextNode().execute( actionHandler, user, instance, transition, context );
 				return ;
 				
 			}

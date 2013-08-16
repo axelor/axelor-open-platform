@@ -284,7 +284,7 @@ public class Transition extends AuditableModel {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public boolean execute( ActionHandler actionHandler ){ 
+	public boolean execute( ActionHandler actionHandler, User user ){ 
 
 		logger.debug("Execute transition ::: {}", getName() );
 		
@@ -295,9 +295,8 @@ public class Transition extends AuditableModel {
 		
 		if ( role != null ){
 
-			if ( !actionHandler.getContext().containsKey("__user__") ) { return false; }
+			if ( user == null ) { return false; }
 			
-			User user = (User) actionHandler.getContext().get("__user__");
 			if ( !role.getUsers().contains( user ) && !( user.getGroup() != null && role.getGroups().contains( user.getGroup() ) )) {
 				logger.debug( "Role ::: {}", role.getName() );
 				return false;
