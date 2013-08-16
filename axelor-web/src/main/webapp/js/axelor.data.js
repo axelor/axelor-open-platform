@@ -802,13 +802,37 @@
 					return promise;
 				};
 				return promise;
+			},
+
+			export_: function(fields) {
+
+				var params = {
+					fields: fields,
+					data: this._filter
+				};
+
+				var promise = this._request('export').post(params);
+
+				promise.success = function(fn){
+					promise.then(function(response){
+						var res = response.data,
+							records = res.data;
+						fn(records);
+					});
+					return promise;
+				};
+				promise.error = function(fn) {
+					promise.then(null, fn);
+					return promise;
+				};
+				return promise;
 			}
 		};
-		
+
 		return {
 			create: create
 		};
-		
+
 		function create(model, options) {
 			return new DataSource(model, options);
 		};
