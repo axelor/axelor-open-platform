@@ -373,6 +373,61 @@ angular.module('axelor.ui').directive('uiViewGrid', function(){
 	};
 });
 
+angular.module('axelor.ui').directive('uiGridExport', function(){
+
+	return {
+		replace: true,
+		scope: {
+		},
+
+		link: function(scope, element, attrs) {
+			var handler = scope.$parent.$eval(attrs.uiGridExport);
+			if (!handler) {
+				return;
+			}
+
+			function action(name) {
+				var res = 'ws/rest/' + handler._model + '/export';
+				return name ? res + '/' + name : res;
+			}
+
+			function fields() {
+				return _.pluck(handler.view.items, 'name');
+			}
+
+			var ds = handler._dataSource;
+
+			scope.onExport = function() {
+				ds.export_(fields()).success(function(res) {
+
+					var filePath = action(res.fileName),
+						fileName = res.fileName;
+
+					var link = document.createElement('a');
+
+					link.onclick = function(e) {
+						document.body.removeChild(e.target);
+					};
+
+					link.href = filePath;
+					link.download = fileName;
+					link.innerHTML = fileName;
+					link.style.display = "none";
+
+					document.body.appendChild(link);
+
+					link.click();
+				});
+			};
+		},
+
+		template:
+			"<button class='btn' ng-click='onExport()'>" +
+				"<span x-translate>Export</span>" +
+			"</button>"
+	};
+});
+
 angular.module('axelor.ui').directive('uiPortletGrid', function(){
 	return {
 		controller: ['$scope', '$element', function($scope, $element) {
