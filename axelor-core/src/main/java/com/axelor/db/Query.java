@@ -491,7 +491,7 @@ public class Query<T extends Model> {
 		}
 
 		@SuppressWarnings("all")
-		public List<Map> fetch(int limit, int offset) {
+		public List<List> values(int limit, int offset) {
 			javax.persistence.Query q = em().createQuery(query);
 			if (limit > 0) {
 				q.setMaxResults(limit);
@@ -501,7 +501,13 @@ public class Query<T extends Model> {
 			}
 			bind(q);
 
-			List<List> data = q.getResultList();
+			return q.getResultList();
+		}
+
+		@SuppressWarnings("all")
+		public List<Map> fetch(int limit, int offset) {
+
+			List<List> data = values(limit, offset);
 			List<Map> result = Lists.newArrayList();
 
 			for(List item : data) {
