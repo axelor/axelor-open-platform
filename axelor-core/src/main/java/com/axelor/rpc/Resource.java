@@ -1,5 +1,7 @@
 package com.axelor.rpc;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -29,6 +31,7 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.axelor.rpc.filter.Filter;
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
@@ -41,16 +44,16 @@ import com.google.inject.persist.Transactional;
 
 /**
  * This class defines CRUD like interface.
- * 
+ *
  */
 public class Resource<T extends Model> {
 
 	private Class<T> model;
-	
+
 	private Provider<JpaSecurity> security;
 
     private Logger LOG = LoggerFactory.getLogger(Resource.class);
-    
+
 	private Resource(Class<T> model, Provider<JpaSecurity> security) {
 		this.model = model;
 		this.security = security;
@@ -64,12 +67,12 @@ public class Resource<T extends Model> {
 
 	/**
 	 * Returns the resource class.
-	 * 
+	 *
 	 */
 	public Class<?> getModel() {
 		return model;
 	}
-	
+
 	private Long findId(Map<String, Object> values) {
 		try {
 			return Long.parseLong(values.get("id").toString());
@@ -78,7 +81,7 @@ public class Resource<T extends Model> {
 	}
 
 	public Response fields() {
-		
+
 		Response response = new Response();
 		Map<String, Object> meta = Maps.newHashMap();
 
@@ -102,12 +105,12 @@ public class Resource<T extends Model> {
 	public static Response models(Request request) {
 
 		Response response = new Response();
-		
+
 		List<String> data = Lists.newArrayList();
 		for(Class<?> type : JPA.models()) {
 			data.add(type.getName());
 		}
-		
+
 		Collections.sort(data);
 
 		response.setData(ImmutableList.copyOf(data));
@@ -119,7 +122,7 @@ public class Resource<T extends Model> {
 	public Response perms() {
 		Set<JpaSecurity.AccessType> perms = security.get().perms(model);
 		Response response = new Response();
-		
+
 		response.setData(perms);
 		response.setStatus(Response.STATUS_SUCCESS);
 
@@ -129,7 +132,7 @@ public class Resource<T extends Model> {
 	public Response perms(Long id) {
 		Set<JpaSecurity.AccessType> perms = security.get().perms(model, id);
 		Response response = new Response();
-		
+
 		response.setData(perms);
 		response.setStatus(Response.STATUS_SUCCESS);
 
@@ -138,7 +141,7 @@ public class Resource<T extends Model> {
 
 	public Response perms(Long id, String perm) {
 		Response response = new Response();
-		
+
 		JpaSecurity sec = security.get();
 		JpaSecurity.AccessType type = JpaSecurity.CAN_READ;
 		try {
@@ -157,10 +160,10 @@ public class Resource<T extends Model> {
 	}
 
 	private List<String> getSortBy(Request request) {
-		
+
 		List<String> sortBy = Lists.newArrayList();
 		Mapper mapper = Mapper.of(model);
-		
+
 		if (request.getSortBy() != null) {
 			for(String spec : request.getSortBy()) {
 				String name = spec;
@@ -179,24 +182,24 @@ public class Resource<T extends Model> {
 				sortBy.add(spec);
 			}
 		}
-		
+
 		if (sortBy.size() > 0) {
 			return sortBy;
 		}
-		
+
 		if (mapper.getNameField() != null) {
 			sortBy.add(mapper.getNameField().getName());
 			return sortBy;
 		}
-		
+
 		if (mapper.getProperty("code") != null) {
 			sortBy.add("code");
 			return sortBy;
 		}
-		
+
 		return sortBy;
 	}
-	
+
 	private Criteria getCriteria(Request request) {
 		if (request.getData() != null) {
 			Object domain = request.getData().get("_domain");
@@ -214,21 +217,11 @@ public class Resource<T extends Model> {
 		return request.getCriteria();
 	}
 
-	public Response search(Request request) {
-
-		LOG.debug("Searching '{}' with {}", model.getCanonicalName(), request.getData());
-
-		Response response = new Response();
-
-		int offset = request.getOffset();
-		int limit = request.getLimit();
-
-		security.get().check(JpaSecurity.CAN_READ, model);
-
+	private Query<?> getQuery(Request request) {
 		Criteria criteria = getCriteria(request);
 		Filter filter = security.get().getFilter(JpaSecurity.CAN_READ, model);
-
 		Query<?> query = JPA.all(model);
+
 		if (criteria != null) {
 			query = criteria.createQuery(model, filter);
 		} else if (filter != null) {
@@ -239,6 +232,21 @@ public class Resource<T extends Model> {
 			query = query.order(sortBy);
 		}
 
+		return query;
+	}
+
+	public Response search(Request request) {
+
+		security.get().check(JpaSecurity.CAN_READ, model);
+
+		LOG.debug("Searching '{}' with {}", model.getCanonicalName(), request.getData());
+
+		Response response = new Response();
+
+		int offset = request.getOffset();
+		int limit = request.getLimit();
+
+		Query<?> query = getQuery(request);
 		List<?> data = null;
 		try {
 			if (request.getFields() != null) {
@@ -272,11 +280,73 @@ public class Resource<T extends Model> {
 		return response;
 	}
 
+	public void export(Request request, Writer writer) throws IOException {
+		security.get().check(JpaSecurity.CAN_READ, model);
+		LOG.debug("Exporting '{}' with {}", model.getName(), request.getData());
+
+		List<String> fields = request.getFields();
+		List<String> header = Lists.newArrayList();
+
+		Mapper mapper = Mapper.of(model);
+
+		for(String field : fields) {
+			Property p = mapper.getProperty(field);
+			if (p == null || p.isCollection()) continue;
+			if (p.isReference()) {
+				Property np = Mapper.of(p.getTarget()).getNameField();
+				if (np == null) continue;
+				header.add(p.getName() + '.' + np.getName());
+			}
+			else {
+				header.add(p.getName());
+			}
+		}
+
+		writer.write(Joiner.on(",").join(header));
+
+		int limit = 100;
+		int offset = 0;
+
+		String[] names = header.toArray(new String[0]);
+
+		Query<?> query = getQuery(request);
+		Query<?>.Selector selector = query.select(names);
+
+		List<?> data = selector.values(limit, offset);
+
+		while(!data.isEmpty()) {
+
+			for(Object item : data) {
+				List<?> row = (List<?>) item;
+				List<String> line = Lists.newArrayList();
+				int index = 0;
+				for(Object value: row) {
+					if (index++ < 2) continue; // ignore first two items (id, version)
+					String strValue = value == null ? "" : escapeCsv(value.toString());
+					line.add(strValue);
+				}
+				writer.write("\n");
+				writer.write(Joiner.on(",").join(line));
+			}
+
+			offset += limit;
+			data = selector.fetch(limit, offset);
+		}
+	}
+
+	private String escapeCsv(String value) {
+		if (value == null) return "";
+		if (value.indexOf('"') > -1) return '"' + value.replaceAll("\"", "\"\"") + '"';
+		if (value.indexOf(',') > -1) return '"' + value + '"';
+		if (value.indexOf('\n') > -1) return '"' + value + '"';
+		return value;
+	}
+
 	public Response read(long id) {
 		security.get().check(JpaSecurity.CAN_READ, model, id);
 		Response response = new Response();
 		List<Object> data = Lists.newArrayList();
-		
+
 		Model entity = JPA.find(model, id);
 		if (entity != null)
 			data.add(entity);
@@ -285,7 +355,7 @@ public class Resource<T extends Model> {
 
 		return response;
 	}
-	
+
 	public Response fetch(long id, Request request) {
 		security.get().check(JpaSecurity.CAN_READ, model, id);
 		Response response = new Response();
@@ -300,7 +370,7 @@ public class Resource<T extends Model> {
 
 		return response;
 	}
-	
+
 	public Response verify(Request request) {
 		Response response = new Response();
 		try {
@@ -316,7 +386,7 @@ public class Resource<T extends Model> {
 	public Response save(final Request request) {
 
 		Response response = new Response();
-		
+
 		List<Object> records = request.getRecords();
 		List<Object> data = Lists.newArrayList();
 
@@ -324,16 +394,16 @@ public class Resource<T extends Model> {
 			records = Lists.newArrayList();
 			records.add(request.getData());
 		}
-		
+
 		for(Object record : records) {
-			
+
 			@SuppressWarnings("all")
 			Long id = findId((Map) record);
-			
+
 			if (id == null || id <= 0L) {
 				security.get().check(JpaSecurity.CAN_CREATE, model);
 			}
-			
+
 			@SuppressWarnings("all")
 			Map<String, Object> orig = (Map) ((Map) record).get("_original");
 			JPA.verify(model, orig);
@@ -352,35 +422,35 @@ public class Resource<T extends Model> {
 
 		response.setData(data);
 		response.setStatus(Response.STATUS_SUCCESS);
-		
+
 		return response;
 	}
 
 	@Transactional
 	public Response remove(long id, Request request) {
-		
+
 		security.get().check(JpaSecurity.CAN_REMOVE, model, id);
 		final Response response = new Response();
 		final Map<String, Object> data = Maps.newHashMap();
-		
+
 		data.put("id", id);
 		data.put("version", request.getData().get("version"));
-		
+
 		Model bean = JPA.edit(model, data);
 		if (bean.getId() != null) {
 			JPA.remove(bean);
 		}
-		
+
 		response.setData(ImmutableList.of(_toMap(bean, true, 0)));
 		response.setStatus(Response.STATUS_SUCCESS);
-		
+
 		return response;
 	}
-	
+
 	@Transactional
 	@SuppressWarnings("all")
 	public Response remove(Request request) {
-		
+
 		final Response response = new Response();
 		final List<Object> records = request.getRecords();
 
@@ -388,9 +458,9 @@ public class Resource<T extends Model> {
 			response.setException(new IllegalArgumentException("No records provides."));
 			return response;
 		}
-		
+
 		final List<Model> entities = Lists.newArrayList();
-	
+
 		for(Object record : records) {
 			Map map = (Map) record;
 			Long id = Longs.tryParse(map.get("id").toString());
@@ -415,12 +485,12 @@ public class Resource<T extends Model> {
 
 		return response;
 	}
-	
+
 	public Response copy(long id) {
 		security.get().check(JpaSecurity.CAN_CREATE, model, id);
 		Response response = new Response();
 		Model bean = JPA.find(model, id);
-		
+
 		bean = JPA.copy(bean, true);
 		response.setData(ImmutableList.of(bean));
 		response.setStatus(Response.STATUS_SUCCESS);
@@ -459,11 +529,11 @@ public class Resource<T extends Model> {
 		}
 		return response;
 	}
-	
+
 	/**
 	 * Get the name of the record. This method should be used to get the value
 	 * of name field if it's a function field.
-	 * 
+	 *
 	 * @param request
 	 *            the request containing the current values of the record
 	 * @return response with the updated values with record name
@@ -471,10 +541,10 @@ public class Resource<T extends Model> {
 	public Response getRecordName(Request request) {
 
 		Response response = new Response();
-		
+
 		Mapper mapper = Mapper.of(model);
 		Map<String, Object> data = request.getData();
-		
+
 		Property property = mapper.getNameField();
 		if (property != null) {
 			String qs = String.format(
@@ -494,13 +564,13 @@ public class Resource<T extends Model> {
 
 		return response;
 	}
-	
+
 	/**
 	 * Convert the given model instance to {@link Map}.
-	 * 
+	 *
 	 * This method converts the given bean to map using {@link Mapper}. The
 	 * multi-value fields will be converted to list of ids.
-	 * 
+	 *
 	 * @param bean
 	 *            JPA managed model instance
 	 * @return a {@link Map} with property names as keys and corresponding
@@ -509,14 +579,14 @@ public class Resource<T extends Model> {
 	public static Map<String, Object> toMap(Object bean) {
 		return _toMap(bean, false, 0);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static Map<String, Object> _toMap(Object bean, boolean compact, int level) {
 
 		if (bean == null) {
 			return null;
 		}
-		
+
 		if (bean instanceof HibernateProxy) {
 			bean = ((HibernateProxy) bean).getHibernateLazyInitializer().getImplementation();
 		}
@@ -538,18 +608,18 @@ public class Resource<T extends Model> {
 
 			return result;
 		}
-		
+
 		for (final Property p : mapper.getProperties()) {
-			
+
 			PropertyType type = p.getType();
-			
+
 			if (type == PropertyType.BINARY) {
 				continue;
 			}
-			
+
 			String name = p.getName();
 			Object value = mapper.get(bean, name);
-			
+
 			if (value != null) {
 
 				if (p.isReference()) {
@@ -572,26 +642,26 @@ public class Resource<T extends Model> {
 			}
 			result.put(name, value);
 		}
-		
+
 		return result;
 	}
 
 	/**
 	 * This method allows to expand given field names with dotted notations.
-	 * 
+	 *
 	 */
 	private static Map<String, Object> toMap(Object bean, String... names) {
 		Map<String, Object> fields = unflatten(null, names);
 		return _toMap(bean, fields);
 	}
-	
+
 	@SuppressWarnings("all")
 	private static Map<String, Object> _toMap(Object bean, Map<String, Object> fields) {
-		
+
 		if (bean == null) {
 			return null;
 		}
-		
+
 		if (bean instanceof HibernateProxy) {
 			bean = ((HibernateProxy) bean).getHibernateLazyInitializer().getImplementation();
 		}
@@ -624,18 +694,18 @@ public class Resource<T extends Model> {
 
 			return result;
 		}
-		
+
 		for (final Property p : mapper.getProperties()) {
-			
+
 			PropertyType type = p.getType();
-			
+
 			if (type == PropertyType.BINARY && !p.isImage()) {
 				continue;
 			}
-			
+
 			String name = p.getName();
 			Object value = mapper.get(bean, name);
-			
+
 			if (p.isImage() && byte[].class.isInstance(value)) {
 				value = new String((byte[]) value);
 			}
@@ -665,10 +735,10 @@ public class Resource<T extends Model> {
 				}
 				value = items;
 			}
-			
+
 			result.put(name, value);
 		}
-		
+
 		return result;
 	}
 
