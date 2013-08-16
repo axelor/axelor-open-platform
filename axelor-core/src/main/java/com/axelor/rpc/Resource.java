@@ -31,6 +31,7 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.axelor.rpc.filter.Filter;
+import com.google.common.base.CaseFormat;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Throwables;
@@ -41,6 +42,7 @@ import com.google.common.primitives.Longs;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import com.google.inject.persist.Transactional;
+import com.sun.jersey.core.impl.provider.entity.Inflector;
 
 /**
  * This class defines CRUD like interface.
@@ -286,31 +288,45 @@ public class Resource<T extends Model> {
 
 		List<String> fields = request.getFields();
 		List<String> header = Lists.newArrayList();
+		List<String> names = Lists.newArrayList();
 
 		Mapper mapper = Mapper.of(model);
 
 		for(String field : fields) {
-			Property p = mapper.getProperty(field);
-			if (p == null || p.isCollection()) continue;
-			if (p.isReference()) {
-				Property np = Mapper.of(p.getTarget()).getNameField();
-				if (np == null) continue;
-				header.add(p.getName() + '.' + np.getName());
+			Property prop = mapper.getProperty(field);
+			if (prop == null || prop.isCollection()) {
+				continue;
 			}
-			else {
-				header.add(p.getName());
+
+			String name = prop.getName();
+			String title = prop.getTitle();
+
+			if (title == null) {
+				title = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, prop.getName());
+				title = Inflector.getInstance().humanize(title);
 			}
+
+			if (prop.isReference()) {
+				prop = Mapper.of(prop.getTarget()).getNameField();
+				if (prop == null) {
+					continue;
+				}
+				name = name + '.' + prop.getName();
+			}
+
+			title = JPA.translate(title, title, prop.getEntity().getName());
+
+			names.add(name);
+			header.add(escapeCsv(title));
 		}
 
-		writer.write(Joiner.on(",").join(header));
+		writer.write(Joiner.on(";").join(header));
 
 		int limit = 100;
 		int offset = 0;
 
-		String[] names = header.toArray(new String[0]);
-
 		Query<?> query = getQuery(request);
-		Query<?>.Selector selector = query.select(names);
+		Query<?>.Selector selector = query.select(names.toArray(new String[0]));
 
 		List<?> data = selector.values(limit, offset);
 
@@ -326,7 +342,7 @@ public class Resource<T extends Model> {
 					line.add(strValue);
 				}
 				writer.write("\n");
-				writer.write(Joiner.on(",").join(line));
+				writer.write(Joiner.on(";").join(line));
 			}
 
 			offset += limit;
@@ -336,10 +352,8 @@ public class Resource<T extends Model> {
 
 	private String escapeCsv(String value) {
 		if (value == null) return "";
-		if (value.indexOf('"') > -1) return '"' + value.replaceAll("\"", "\"\"") + '"';
-		if (value.indexOf(',') > -1) return '"' + value + '"';
-		if (value.indexOf('\n') > -1) return '"' + value + '"';
-		return value;
+		if (value.indexOf('"') > -1) value = value.replaceAll("\"", "\"\"");
+		return '"' + value + '"';
 	}
 
 	public Response read(long id) {
