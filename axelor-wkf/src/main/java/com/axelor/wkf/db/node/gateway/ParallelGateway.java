@@ -1,4 +1,4 @@
-package com.axelor.wkf.db.node;
+package com.axelor.wkf.db.node.gateway;
 
 import java.util.Map;
 
@@ -7,9 +7,9 @@ import javax.persistence.Entity;
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
 import com.axelor.meta.ActionHandler;
-import com.axelor.wkf.db.Gateway;
 import com.axelor.wkf.db.Instance;
 import com.axelor.wkf.db.Transition;
+import com.axelor.wkf.db.node.Gateway;
 import com.google.common.base.Preconditions;
 
 @Entity

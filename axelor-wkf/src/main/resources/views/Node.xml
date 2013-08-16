@@ -10,6 +10,10 @@
 		<option value="task">Task</option>
 		<option value="endEvent">End event</option>
 		<option value="gateway">Gateway</option>
+		<option value="message">Message</option>
+		<option value="timer">Timer</option>
+		<option value="filter">Filter</option>
+		<option value="stopFilter">Stop filter</option>
 	</selection>
     
     <selection name="node.logic.operator.selection">
@@ -17,6 +21,23 @@
 		<option value="parallel">AND</option>
 		<option value="inclusive">OR</option>
 		<option value="exclusive">XOR</option>
+	</selection>
+    
+    <selection name="node.message.type.selection">
+    	<option value=""></option>
+		<option value="email">E-mail</option>
+		<option value="mail">Mail</option>
+		<option value="phoneCall">Phone call</option>
+		<option value="sms">SMS</option>
+		<option value="internetSite">Internet site</option>
+		<option value="socialNetwork">Social network</option>
+	</selection>
+    
+    <selection name="node.social.network.selection">
+    	<option value=""></option>
+		<option value="facebook">Facebook</option>
+		<option value="linkedin">Linkedin</option>
+		<option value="twitter">Twitter</option>
 	</selection>
 
 <!-- VIEWS -->
@@ -32,7 +53,24 @@
         <field name="name"/>
         <field name="action" hideIf="type != 'task'"/>
         <field name="operator" hideIf="type != 'gateway'" />
+        <field name="messageType" hideIf="type != 'message'" />
+        <field name="socialNetwork" hideIf="messageType != 'socialNetwork'" />
+        <field name="filter" hideIf="type != 'filter'" />
         <break/>
+        <group showIf="type == 'timer'" colSpan="4" cols="6">
+        	<field name="timeDate" />
+        	<field name="timeCycle" />
+        	<field name="timeDuration" />
+        </group>
+        <group showIf="type == 'message'" colSpan="4" cols="6">
+        	<field name="account" />
+        	<field name="template" />
+        	<field name="templateModel" />
+        </group>
+        <group showIf="messageType == 'socialNetwork'" colSpan="4" cols="4">
+        	<field name="privateMessage" />
+        	<field name="targetPage" showIf="messageType == 'facebook'"/>
+        </group>
         <group name="startGroup" colSpan="2" cols="2" hideIf="type == 'startEvent'" >
 	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
         </group>
@@ -90,11 +128,11 @@
    		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
     </form>
     
-    <grid name="inclusive-gateway-grid" title="Inclusive gateways" model="com.axelor.wkf.db.node.InclusiveGateway">
+    <grid name="inclusive-gateway-grid" title="Inclusive gateways" model="com.axelor.wkf.db.node.gateway.InclusiveGateway">
         <field name="name"/>
     </grid>
     
-    <form name="inclusive-gateway-form" title="Inclusive gateway" cols="4" model="com.axelor.wkf.db.node.InclusiveGateway" onNew="inclusive-gateway-default-record" >
+    <form name="inclusive-gateway-form" title="Inclusive gateway" cols="4" model="com.axelor.wkf.db.node.gateway.InclusiveGateway" onNew="inclusive-gateway-default-record" >
         <field name="name"/>
         <break/>
         <group name="startGroup" colSpan="2" cols="2" >
@@ -107,11 +145,11 @@
    		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
     </form>
     
-    <grid name="exclusive-gateway-grid" title="Exclusive gateways" model="com.axelor.wkf.db.node.ExclusiveGateway">
+    <grid name="exclusive-gateway-grid" title="Exclusive gateways" model="com.axelor.wkf.db.node.gateway.ExclusiveGateway">
         <field name="name"/>
     </grid>
     
-    <form name="exclusive-gateway-form" title="Exclusive gateway" cols="4" model="com.axelor.wkf.db.node.ExclusiveGateway" onNew="exclusive-gateway-default-record" >
+    <form name="exclusive-gateway-form" title="Exclusive gateway" cols="4" model="com.axelor.wkf.db.node.gateway.ExclusiveGateway" onNew="exclusive-gateway-default-record" >
         <field name="name"/>
         <break/>
         <group name="startGroup" colSpan="2" cols="2" >
@@ -124,13 +162,275 @@
    		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
     </form>
     
-    <grid name="parallel-gateway-grid" title="Parallel gateways" model="com.axelor.wkf.db.node.ParallelGateway">
+    <grid name="parallel-gateway-grid" title="Parallel gateways" model="com.axelor.wkf.db.node.gateway.ParallelGateway">
         <field name="name"/>
     </grid>
     
-    <form name="parallel-gateway-form" title="Parallel gateway" cols="4" model="com.axelor.wkf.db.node.ParallelGateway" onNew="parallel-gateway-default-record" >
+    <form name="parallel-gateway-form" title="Parallel gateway" cols="4" model="com.axelor.wkf.db.node.gateway.ParallelGateway" onNew="parallel-gateway-default-record" >
         <field name="name"/>
         <break/>
+        <group name="startGroup" colSpan="2" cols="2" >
+	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
+        </group>
+        <group name="endGroup" colSpan="2" cols="2" >
+	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
+        </group>
+        <separator title="Description" colSpan="4"/>
+   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
+    </form>
+    
+    <grid name="intermediate-timer-event-grid" title="Timer events" model="com.axelor.wkf.db.node.IntermediateTimerEvent">
+        <field name="name"/>
+       	<field name="timeDate" />
+       	<field name="timeCycle" />
+       	<field name="timeDuration" />
+    </grid>
+    
+    <form name="intermediate-timer-event-form" title="Timer event" cols="4" model="com.axelor.wkf.db.node.IntermediateTimerEvent" onNew="intermediate-timer-event-default-record" >
+        <field name="name"/>
+       	<field name="timeDate" />
+       	<field name="timeCycle" />
+       	<field name="timeDuration" />
+        <group name="startGroup" colSpan="2" cols="2" >
+	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
+        </group>
+        <group name="endGroup" colSpan="2" cols="2" >
+	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
+        </group>
+        <separator title="Description" colSpan="4"/>
+   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
+    </form>
+    
+    <grid name="intermediate-email-event-grid" title="E-mail events" model="com.axelor.wkf.db.node.message.IntermediateEmailEvent" >
+        <field name="name"/>
+       	<field name="account" />
+       	<field name="persist" />
+       	<field name="template" />
+       	<field name="templateModel" />
+    </grid>
+    
+    <form name="intermediate-email-event-form" title="E-mail event" cols="4" model="com.axelor.wkf.db.node.message.IntermediateEmailEvent" onNew="intermediate-email-event-default-record" >
+        <field name="name"/>
+        <break/>
+       	<field name="account" />
+       	<field name="persist" />
+       	<field name="template" />
+       	<field name="templateModel" />
+        <group name="startGroup" colSpan="2" cols="2" >
+	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
+        </group>
+        <group name="endGroup" colSpan="2" cols="2" >
+	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
+        </group>
+        <separator title="Description" colSpan="4"/>
+   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
+    </form>
+    
+    <grid name="intermediate-mail-event-grid" title="Mail events" model="com.axelor.wkf.db.node.message.IntermediateMailEvent" >
+        <field name="name"/>
+       	<field name="account" />
+       	<field name="persist" />
+       	<field name="template" />
+       	<field name="templateModel" />
+    </grid>
+    
+    <form name="intermediate-mail-event-form" title="Mail event" cols="4" model="com.axelor.wkf.db.node.message.IntermediateMailEvent" onNew="intermediate-mail-event-default-record" >
+        <field name="name"/>
+        <break/>
+       	<field name="account" />
+       	<field name="persist" />
+       	<field name="template" />
+       	<field name="templateModel" />
+        <group name="startGroup" colSpan="2" cols="2" >
+	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
+        </group>
+        <group name="endGroup" colSpan="2" cols="2" >
+	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
+        </group>
+        <separator title="Description" colSpan="4"/>
+   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
+    </form>
+    
+    <grid name="intermediate-sms-event-grid" title="Sms events" model="com.axelor.wkf.db.node.message.IntermediateSmsEvent" >
+        <field name="name"/>
+       	<field name="account" />
+       	<field name="persist" />
+       	<field name="template" />
+       	<field name="templateModel" />
+    </grid>
+    
+    <form name="intermediate-sms-event-form" title="Sms event" cols="4" model="com.axelor.wkf.db.node.message.IntermediateSmsEvent" onNew="intermediate-sms-event-default-record" >
+        <field name="name"/>
+        <break/>
+       	<field name="account" />
+       	<field name="persist" />
+       	<field name="template" />
+       	<field name="templateModel" />
+        <group name="startGroup" colSpan="2" cols="2" >
+	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
+        </group>
+        <group name="endGroup" colSpan="2" cols="2" >
+	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
+        </group>
+        <separator title="Description" colSpan="4"/>
+   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
+    </form>
+    
+    <grid name="intermediate-phone-call-event-grid" title="Phone call events" model="com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent" >
+        <field name="name"/>
+       	<field name="account" />
+       	<field name="persist" />
+       	<field name="template" />
+       	<field name="templateModel" />
+    </grid>
+    
+    <form name="intermediate-phone-call-event-form" title="Phone call event" cols="4" model="com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent" onNew="intermediate-phone-call-event-default-record" >
+        <field name="name"/>
+        <break/>
+       	<field name="account" />
+       	<field name="persist" />
+       	<field name="template" />
+       	<field name="templateModel" />
+        <group name="startGroup" colSpan="2" cols="2" >
+	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
+        </group>
+        <group name="endGroup" colSpan="2" cols="2" >
+	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
+        </group>
+        <separator title="Description" colSpan="4"/>
+   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
+    </form>
+    
+    <grid name="intermediate-internet-site-event-grid" title="Internet site events" model="com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent" >
+        <field name="name"/>
+       	<field name="account" />
+       	<field name="persist" />
+       	<field name="template" />
+       	<field name="templateModel" />
+    </grid>
+    
+    <form name="intermediate-internet-site-event-form" title="Internet site event" cols="4" model="com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent" onNew="intermediate-internet-site-event-default-record" >
+        <field name="name"/>
+        <break/>
+       	<field name="account" />
+       	<field name="persist" />
+       	<field name="template" />
+       	<field name="templateModel" />
+        <group name="startGroup" colSpan="2" cols="2" >
+	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
+        </group>
+        <group name="endGroup" colSpan="2" cols="2" >
+	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
+        </group>
+        <separator title="Description" colSpan="4"/>
+   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
+    </form>
+    
+    <grid name="intermediate-facebook-event-grid" title="Facebook events" model="com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent" >
+        <field name="name"/>
+       	<field name="account" />
+       	<field name="persist" />
+       	<field name="template" />
+       	<field name="templateModel" />
+       	<field name="privateMessage" />
+       	<field name="targetPage" />
+    </grid>
+    
+    <form name="facebook-event-form" title="Facebook event" cols="4" model="com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent" onNew="intermediate-facebook-event-default-record" >
+        <field name="name"/>
+       	<field name="account" />
+       	<field name="template" />
+       	<field name="templateModel" />
+       	<field name="privateMessage" />
+       	<field name="persist" />
+       	<field name="targetPage" />
+        <group name="startGroup" colSpan="2" cols="2" >
+	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
+        </group>
+        <group name="endGroup" colSpan="2" cols="2" >
+	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
+        </group>
+        <separator title="Description" colSpan="4"/>
+   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
+    </form>
+    
+    <grid name="intermediate-linkedin-event-grid" title="Linkedin events" model="com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent" >
+        <field name="name"/>
+       	<field name="account" />
+       	<field name="persist" />
+       	<field name="template" />
+       	<field name="templateModel" />
+       	<field name="privateMessage" />
+    </grid>
+    
+    <form name="intermediate-linkedin-event-form" title="Linkedin event" cols="4" model="com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent" onNew="intermediate-linkedin-event-default-record" >
+        <field name="name"/>
+       	<field name="account" />
+       	<field name="template" />
+       	<field name="templateModel" />
+       	<field name="privateMessage" />
+       	<field name="persist" />
+        <group name="startGroup" colSpan="2" cols="2" >
+	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
+        </group>
+        <group name="endGroup" colSpan="2" cols="2" >
+	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
+        </group>
+        <separator title="Description" colSpan="4"/>
+   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
+    </form>
+    
+    <grid name="intermediate-twitter-event-grid" title="Twitter events" model="com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent" >
+        <field name="name"/>
+       	<field name="account" />
+       	<field name="persist" />
+       	<field name="template" />
+       	<field name="templateModel" />
+       	<field name="privateMessage" />
+    </grid>
+    
+    <form name="intermediate-twitter-event-form" title="Twitter event" cols="4" model="com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent" onNew="intermediate-twitter-event-default-record" >
+        <field name="name"/>
+       	<field name="account" />
+       	<field name="template" />
+       	<field name="templateModel" />
+       	<field name="privateMessage" />
+       	<field name="persist" />
+        <group name="startGroup" colSpan="2" cols="2" >
+	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
+        </group>
+        <group name="endGroup" colSpan="2" cols="2" >
+	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
+        </group>
+        <separator title="Description" colSpan="4"/>
+   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
+    </form>
+    
+    <grid name="filter-grid" title="Filters" model="com.axelor.wkf.db.node.Filter" >
+        <field name="name"/>
+       	<field name="filter" />
+    </grid>
+    
+    <form name="filter-form" title="Filter" cols="4" model="com.axelor.wkf.db.node.Filter" onNew="filter-default-record" >
+        <field name="name"/>
+       	<field name="filter" />
+        <group name="startGroup" colSpan="2" cols="2" >
+	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
+        </group>
+        <group name="endGroup" colSpan="2" cols="2" >
+	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
+        </group>
+        <separator title="Description" colSpan="4"/>
+   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
+    </form>
+    
+    <grid name="stop-filter-grid" title="Stop filters" model="com.axelor.wkf.db.node.StopFilter" >
+        <field name="name"/>
+    </grid>
+    
+    <form name="stop-filter-form" title="Stop filter" cols="4" model="com.axelor.wkf.db.node.StopFilter" onNew="stop-filter-default-record" >
+        <field name="name"/>
+       	<field name="filter" />
         <group name="startGroup" colSpan="2" cols="2" >
 	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
         </group>
@@ -160,22 +460,88 @@
     	<field name="name" expr="eval: 'Task:'"/>
     </action-record>
     
-    <action-record name="inclusive-gateway-default-record" model="com.axelor.wkf.db.node.InclusiveGateway">
+    <action-record name="inclusive-gateway-default-record" model="com.axelor.wkf.db.node.gateway.InclusiveGateway">
     	<field name="type" expr="gateway"/>
     	<field name="operator" expr="inclusive"/>
     	<field name="name" expr="eval: 'Inclusive :'"/>
     </action-record>
     
-    <action-record name="exclusive-gateway-default-record" model="com.axelor.wkf.db.node.ExclusiveGateway">
+    <action-record name="exclusive-gateway-default-record" model="com.axelor.wkf.db.node.gateway.ExclusiveGateway">
     	<field name="type" expr="gateway"/>
     	<field name="operator" expr="exclusive"/>
     	<field name="name" expr="eval: 'Exclusive :'"/>
     </action-record>
     
-    <action-record name="parallel-gateway-default-record" model="com.axelor.wkf.db.node.ParallelGateway">
+    <action-record name="parallel-gateway-default-record" model="com.axelor.wkf.db.node.gateway.ParallelGateway">
     	<field name="type" expr="gateway"/>
     	<field name="operator" expr="parallel"/>
     	<field name="name" expr="eval: 'Parallel :'"/>
+    </action-record>
+    
+    <action-record name="intermediate-timer-event-default-record" model="com.axelor.wkf.db.node.IntermediateTimerEvent">
+    	<field name="type" expr="timer"/>
+    	<field name="name" expr="eval: 'Timer event :'"/>
+    </action-record>
+    
+    <action-record name="intermediate-email-event-default-record" model="com.axelor.wkf.db.node.IntermediateEmailEvent">
+    	<field name="type" expr="message"/>
+    	<field name="messageType" expr="email"/>
+    	<field name="name" expr="eval: 'E-mail event :'"/>
+    </action-record>
+    
+    <action-record name="intermediate-mail-event-default-record" model="com.axelor.wkf.db.node.message.IntermediateMailEvent">
+    	<field name="type" expr="message"/>
+    	<field name="messageType" expr="mail"/>
+    	<field name="name" expr="eval: 'Mail event :'"/>
+    </action-record>
+    
+    <action-record name="intermediate-sms-event-default-record" model="com.axelor.wkf.db.node.message.IntermediateSmsEvent">
+    	<field name="type" expr="message"/>
+    	<field name="messageType" expr="sms"/>
+    	<field name="name" expr="eval: 'Sms event :'"/>
+    </action-record>
+    
+    <action-record name="intermediate-phone-call-event-default-record" model="com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent">
+    	<field name="type" expr="message"/>
+    	<field name="messageType" expr="phoneCall"/>
+    	<field name="name" expr="eval: 'Phone call event :'"/>
+    </action-record>
+    
+    <action-record name="intermediate-internet-site-event-default-record" model="com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent">
+    	<field name="type" expr="message"/>
+    	<field name="messageType" expr="internetSite"/>
+    	<field name="name" expr="eval: 'Internet site event :'"/>
+    </action-record>
+    
+    <action-record name="intermediate-facebook-event-default-record" model="com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent">
+    	<field name="type" expr="message"/>
+    	<field name="messageType" expr="socialNetwork"/>
+    	<field name="socialNetwork" expr="facebook"/>
+    	<field name="name" expr="eval: 'Facebook event :'"/>
+    </action-record>
+    
+    <action-record name="intermediate-linkedin-event-default-record" model="com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent">
+    	<field name="type" expr="message"/>
+    	<field name="messageType" expr="socialNetwork"/>
+    	<field name="socialNetwork" expr="linkedin"/>
+    	<field name="name" expr="eval: 'Linkedin event :'"/>
+    </action-record>
+    
+    <action-record name="intermediate-twitter-event-default-record" model="com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent">
+    	<field name="type" expr="message"/>
+    	<field name="messageType" expr="socialNetwork"/>
+    	<field name="socialNetwork" expr="twitter"/>
+    	<field name="name" expr="eval: 'twitter event :'"/>
+    </action-record>
+    
+    <action-record name="filter-default-record" model="com.axelor.wkf.db.node.Filter">
+    	<field name="type" expr="filter"/>
+    	<field name="name" expr="eval: 'Filter :'"/>
+    </action-record>
+    
+    <action-record name="stop-filter-default-record" model="com.axelor.wkf.db.node.StopFilter">
+    	<field name="type" expr="stopFilter"/>
+    	<field name="name" expr="eval: 'Stop filter :'"/>
     </action-record>
     
     <action-record name="node-record-name" model="com.axelor.wkf.db.Node">

@@ -14,7 +14,7 @@
         <field name="active"/>
     </grid>
     
-    <form name="workflow-form" title="Workflow" cols="4" model="com.axelor.wkf.db.Workflow" onSave="wkf-validate">
+    <form name="workflow-form" title="Workflow" cols="4" model="com.axelor.wkf.db.Workflow" >
     	<toolbar>
 	        <button name="openEditor" title="Editor" onClick="save,wkf-method-open-editor"/>
 	        <button name="openInstances" title="Instances" onClick="save,wkf-method-open-instances"/>
@@ -114,11 +114,6 @@
     <action-attrs name="wkf-import-hidden">
         <attribute name="hidden" for="importWorkflow" expr="true"/> 
     </action-attrs>
-
-	<!-- VALIDATE -->
-	<action-validate name="wkf-validate">
-		<error message="Can't save workflow without start node" if="node?.type != 'start'"/>
-	</action-validate>
     
     <!-- RECORD -->
     <action-record name="wkf-record-archived" model="com.axelor.wkf.db.Workflow">

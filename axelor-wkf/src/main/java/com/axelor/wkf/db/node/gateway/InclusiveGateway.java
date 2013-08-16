@@ -1,10 +1,10 @@
-package com.axelor.wkf.db.node;
+package com.axelor.wkf.db.node.gateway;
 
 import javax.persistence.Entity;
 
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
-import com.axelor.wkf.db.Gateway;
+import com.axelor.wkf.db.node.Gateway;
 
 @Entity
 public class InclusiveGateway extends Gateway {

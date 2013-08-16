@@ -372,17 +372,9 @@ public class Node extends AuditableModel {
 		testMaxPassedNode( instance );
 		historize( instance, transition );
 		
-		if ( getAction() != null ) { 
-
-			logger.debug( "Action ::: {}", getAction().getName() );
-			actionHandler.getRequest().setAction( getAction().getName() );
-			updateContext( context, actionHandler.execute().getData() );
-			
-		}
-		
 		execute( actionHandler, instance, context );
 		
-	};
+	}
 
 	/**
 	 * Add a new history in Instance from a transition.
