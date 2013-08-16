@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.persistence.Entity;
 
+import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
 import com.axelor.meta.ActionHandler;
@@ -40,7 +41,7 @@ public class EndEvent extends Node {
 	}
 	
 	@Override
-	public void execute( ActionHandler actionHandler, Instance instance, Transition transition, Map<Object, Object> context ) { 
+	public void execute( ActionHandler actionHandler, User user, Instance instance, Transition transition, Map<Object, Object> context ) { 
 
 		logger.debug("Execute node ::: {}", getName() );
 		historize(instance, transition);

@@ -10,6 +10,8 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.meta.ActionHandler;
 import com.axelor.wkf.IWorkflow;
 import com.axelor.wkf.db.Instance;
@@ -25,6 +27,7 @@ public class WorkflowService implements IWorkflow {
 	protected Logger log = LoggerFactory.getLogger(WorkflowService.class);
 
 	private ActionHandler actionHandler;
+	private User user;
 
 	protected int maxNodeCounter;
 	private Map<Object, Object> context;
@@ -35,6 +38,8 @@ public class WorkflowService implements IWorkflow {
 	public WorkflowService ( ){
 
 		this.context = Maps.newHashMap();
+		this.user = AuthUtils.getUser();
+		
 	}
 
 // ACTION REQUEST
@@ -139,7 +144,7 @@ public class WorkflowService implements IWorkflow {
 		for (Node node : nodes){ 
 			
 			log.debug("Play node ::: {}", node.getName() );
-			node.execute(actionHandler, instance, context);
+			node.execute(actionHandler, user, instance, context);
 			log.debug( "Context ::: {}", context );
 		}
 		

@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.persistence.Entity;
 
+import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
 import com.axelor.meta.ActionHandler;
@@ -41,7 +42,7 @@ public class ParallelGateway extends Gateway {
 	}
 
 	@Override
-	public void execute( ActionHandler actionHandler, Instance instance, Transition transition, Map<Object, Object> context ) {
+	public void execute( ActionHandler actionHandler, User user, Instance instance, Transition transition, Map<Object, Object> context ) {
 
 		Preconditions.checkNotNull(instance); Preconditions.checkNotNull(transition);
 
@@ -55,7 +56,7 @@ public class ParallelGateway extends Gateway {
 			counterAdd(instance);
 			historize(instance, transition);
 			instance.removeAllExecutedTransition( getStartTransitions() );
-			execute(actionHandler, instance, context);
+			execute(actionHandler, user, instance, context);
 			
 			
 		}

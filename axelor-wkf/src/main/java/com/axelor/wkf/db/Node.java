@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.db.AuditableModel;
+import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
@@ -352,27 +353,27 @@ public class Node extends AuditableModel {
 		return JPA.all(Node.class).filter(filter, params);
 	}
 	
-	public void execute( ActionHandler actionHandler, Instance instance, Map<Object, Object> context ){
+	public void execute( ActionHandler actionHandler, User user, Instance instance, Map<Object, Object> context ){
 		
 		for ( Transition transition : getEndTransitions() ){
 			
-			if ( transition.execute( actionHandler ) ) {
+			if ( transition.execute( actionHandler, user ) ) {
 
-				transition.getNextNode().execute( actionHandler, instance, transition, context );
+				transition.getNextNode().execute( actionHandler, user, instance, transition, context );
 				
 			}
 
 		}
 	}
 	
-	public void execute( ActionHandler actionHandler, Instance instance, Transition transition, Map<Object, Object> context ) { 
+	public void execute( ActionHandler actionHandler, User user, Instance instance, Transition transition, Map<Object, Object> context ) { 
 
 		logger.debug("Execute node ::: {}", getName() );
 		
 		testMaxPassedNode( instance );
 		historize( instance, transition );
 		
-		execute( actionHandler, instance, context );
+		execute( actionHandler, user, instance, context );
 		
 	}
 
