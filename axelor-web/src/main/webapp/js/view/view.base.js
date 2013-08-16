@@ -159,7 +159,7 @@ function DSViewCtrl(type, $scope, $element) {
 			viewPromise.success(function(fields, schema){
 				var toolbar = [];
 				_.each(schema.toolbar, function(button){
-					if (/^(new|edit|save|delete|copy|cancel|back|refresh|search)$/.test(button.name))
+					if (/^(new|edit|save|delete|copy|cancel|back|refresh|search|export)$/.test(button.name))
 						return hiddenButtons[button.name] = button.hidden;
 					toolbar.push(button);
 				});
