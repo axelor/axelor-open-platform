@@ -50,6 +50,15 @@
 		<view type="form" name="start-event-form" />
 	</action-view>
 
+	<menuitem name="menu-wkf-intermediate-timer-event" parent="menu-wkf-nodes-root-event" title="Timer events"
+		action="action-wkf-intermediate-timer-event" />
+
+	<action-view name="action-wkf-intermediate-timer-event" title="Timer events"
+		model="com.axelor.wkf.db.node.IntermediateTimerEvent">
+		<view type="grid" name="intermediate-timer-event-grid" />
+		<view type="form" name="intermediate-timer-event-form" />
+	</action-view>
+
 	<menuitem name="menu-wkf-end-event" parent="menu-wkf-nodes-root-event" title="End events"
 		action="action-wkf-end-event" />
 
@@ -59,6 +68,102 @@
 		<view type="form" name="end-event-form" />
 	</action-view>
 
+	<menuitem name="menu-wkf-nodes-root-message" parent="menu-wkf-nodes-root-event" title="Messages" />
+
+	<menuitem name="menu-wkf-intermediate-email-message-event" parent="menu-wkf-nodes-root-message" title="E-mail events"
+		action="action-wkf-intermediate-email-message-event" />
+
+	<action-view name="action-wkf-intermediate-email-message-event" title="E-mail events"
+		model="com.axelor.wkf.db.node.message.IntermediateEmailEvent">
+		<view type="grid" name="intermediate-email-event-grid" />
+		<view type="form" name="intermediate-email-event-form" />
+	</action-view>
+
+	<menuitem name="menu-wkf-intermediate-mail-event" parent="menu-wkf-nodes-root-message" title="Mail events"
+		action="action-wkf-intermediate-mail-event" />
+
+	<action-view name="action-wkf-intermediate-mail-event" title="Mail events"
+		model="com.axelor.wkf.db.node.message.IntermediateMailEvent">
+		<view type="grid" name="intermediate-mail-event-grid" />
+		<view type="form" name="intermediate-mail-event-form" />
+	</action-view>
+
+	<menuitem name="menu-wkf-intermediate-sms-event" parent="menu-wkf-nodes-root-message" title="Sms events"
+		action="action-wkf-intermediate-sms-event" />
+
+	<action-view name="action-wkf-intermediate-sms-event" title="Sms events"
+		model="com.axelor.wkf.db.node.message.IntermediateSmsEvent">
+		<view type="grid" name="intermediate-sms-event-grid" />
+		<view type="form" name="intermediate-sms-event-form" />
+	</action-view>
+
+	<menuitem name="menu-wkf-intermediate-phone-call-event" parent="menu-wkf-nodes-root-message" title="Phone call events"
+		action="action-wkf-intermediate-phone-call-event" />
+
+	<action-view name="action-wkf-intermediate-phone-call-event" title="Phone call events"
+		model="com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent">
+		<view type="grid" name="intermediate-phone-call-event-grid" />
+		<view type="form" name="intermediate-phone-call-event-form" />
+	</action-view>
+
+	<menuitem name="menu-wkf-intermediate-internet-site-event" parent="menu-wkf-nodes-root-message" title="Internet site events"
+		action="action-wkf-intermediate-internet-site-event" />
+
+	<action-view name="action-wkf-intermediate-internet-site-event" title="Internet site events"
+		model="com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent">
+		<view type="grid" name="intermediate-internet-site-event-grid" />
+		<view type="form" name="intermediate-internet-site-event-form" />
+	</action-view>
+	
+	<menuitem name="menu-wkf-nodes-root-social-network" parent="menu-wkf-nodes-root-event" title="Social networks" />
+
+	<menuitem name="menu-wkf-intermediate-facebook-event" parent="menu-wkf-nodes-root-social-network" title="Facebook events"
+		action="action-wkf-intermediate-facebook-event" />
+
+	<action-view name="action-wkf-intermediate-facebook-event" title="Facebook events"
+		model="com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent">
+		<view type="grid" name="intermediate-facebook-event-grid" />
+		<view type="form" name="intermediate-facebook-event-form" />
+	</action-view>
+
+	<menuitem name="menu-wkf-intermediate-linkedin-event" parent="menu-wkf-nodes-root-social-network" title="Linkedin events"
+		action="action-wkf-intermediate-linkedin-event" />
+
+	<action-view name="action-wkf-intermediate-linkedin-event" title="Linkedin events"
+		model="com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent">
+		<view type="grid" name="intermediate-linkedin-event-grid" />
+		<view type="form" name="intermediate-linkedin-event-form" />
+	</action-view>
+
+	<menuitem name="menu-wkf-intermediate-twitter-event" parent="menu-wkf-nodes-root-social-network" title="twitter events"
+		action="action-wkf-intermediate-twitter-event" />
+
+	<action-view name="action-wkf-intermediate-twitter-event" title="twitter events"
+		model="com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent">
+		<view type="grid" name="intermediate-twitter-event-grid" />
+		<view type="form" name="intermediate-twitter-event-form" />
+	</action-view>
+	
+	<menuitem name="menu-wkf-nodes-root-filter" parent="menu-wkf-nodes-root-event" title="Filters" />
+
+	<menuitem name="menu-wkf-filter" parent="menu-wkf-nodes-root-filter" title="Filters"
+		action="action-wkf-filter" />
+
+	<action-view name="action-wkf-filter" title="Filters"
+		model="com.axelor.wkf.db.node.Filter">
+		<view type="grid" name="filter-grid" />
+		<view type="form" name="filter-form" />
+	</action-view>
+
+	<menuitem name="menu-wkf-stop-filter" parent="menu-wkf-nodes-root-filter" title="Stop filters"
+		action="action-wkf-stop-filter" />
+
+	<action-view name="action-wkf-stop-filter" title="Stop filters"
+		model="com.axelor.wkf.db.node.StopFilter">
+		<view type="grid" name="stop-filter-grid" />
+		<view type="form" name="stop-filter-form" />
+	</action-view>
+	
 	<menuitem name="menu-wkf-nodes-root-activity" parent="menu-wkf-nodes-root" title="Activities" />
 
 	<menuitem name="menu-wkf-task" parent="menu-wkf-nodes-root-activity" title="Tasks"
@@ -76,7 +181,7 @@
 		action="action-wkf-inclusive-gateway" />
 
 	<action-view name="action-wkf-inclusive-gateway" title="Inclusive gateways"
-		model="com.axelor.wkf.db.node.InclusiveGateway">
+		model="com.axelor.wkf.db.node.gateway.InclusiveGateway">
 		<view type="grid" name="inclusive-gateway-grid" />
 		<view type="form" name="inclusive-gateway-form" />
 	</action-view>
@@ -85,7 +190,7 @@
 		action="action-wkf-parallel-gateway" />
 
 	<action-view name="action-wkf-parallel-gateway" title="Parallel gateways"
-		model="com.axelor.wkf.db.node.ParallelGateway">
+		model="com.axelor.wkf.db.node.gateway.ParallelGateway">
 		<view type="grid" name="parallel-gateway-grid" />
 		<view type="form" name="parallel-gateway-form" />
 	</action-view>
@@ -94,7 +199,7 @@
 		action="action-wkf-exclusive-gateway" />
 
 	<action-view name="action-wkf-exclusive-gateway" title="Exclusive gateways"
-		model="com.axelor.wkf.db.node.ExclusiveGateway">
+		model="com.axelor.wkf.db.node.gateway.ExclusiveGateway">
 		<view type="grid" name="exclusive-gateway-grid" />
 		<view type="form" name="exclusive-gateway-form" />
 	</action-view>

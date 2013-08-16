@@ -1,10 +1,11 @@
-package com.axelor.wkf.db;
+package com.axelor.wkf.db.node;
 
 import javax.persistence.Entity;
 
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
 import com.axelor.db.Widget;
+import com.axelor.wkf.db.Node;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 
