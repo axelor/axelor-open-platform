@@ -282,6 +282,8 @@ ui.formWidget('Tab', {
 	
 	widgets: ['Page'],
 	
+	handles: ['isHidden'],
+
 	link: function(scope, elem, attrs, tabs) {
 		
 		scope.selected = false;
