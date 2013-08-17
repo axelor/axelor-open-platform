@@ -88,6 +88,11 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 		}
 	});
 	
+	$scope.$parent.$watch('isReadonly()', function(readonly, old) {
+		if (readonly === old) return;
+		$scope.setEditable(!readonly);
+	});
+
 	$scope.show();
 }
 
