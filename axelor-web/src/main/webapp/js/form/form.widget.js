@@ -55,44 +55,6 @@ ui.formWidget('Form', {
 	}
 });
 
-ui.formWidget('uiToolButton', {
-
-	getViewDef: function(element) {
-		return this.btn;
-	},
-
-	link: function(scope, element, attrs) {
-		var field = scope.field;
-		if (field == null) {
-			return;
-		}
-
-		scope.title = field.title;
-
-		element.on("click", function(e) {
-			if (!scope.attr('readonly')) {
-				scope.fireAction("onClick");
-			}
-		});
-
-		scope.$watch("attr('readonly')", function(readonly, old){
-			if (readonly === old) return;
-			element.toggleClass("disabled", readonly);
-		});
-
-		scope.$watch("isHidden()", function(hidden, old) {
-			setTimeout(function() {
-				element.parent().children().removeClass('btn-fix-left btn-fix-right');
-				element.parent().children(':visible:first').addClass('btn-fix-left');
-				element.parent().children(':visible:last').addClass('btn-fix-right');
-			});
-		});
-	},
-	template_editable: null,
-	template_readonly: null,
-	template: '<button class="btn" ui-actions ui-widget-states>{{title}}</button>'
-});
-
 ui.directive('uiWidgetStates', function() {
 
 	var handleConditional = function(scope, field, attr, conditional, nagative){

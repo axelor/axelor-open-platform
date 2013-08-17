@@ -237,4 +237,31 @@ ui.formItem('Button', {
 	'</a>'
 });
 
+ui.formItem('ToolButton', 'Button', {
+
+	getViewDef: function(element) {
+		return this.btn;
+	},
+
+	link: function(scope, element, attrs) {
+		this._super.apply(this, arguments);
+		var field = scope.field;
+		if (field == null) {
+			return;
+		}
+
+		scope.title = field.title;
+
+		scope.$watch("isHidden()", function(hidden, old) {
+			setTimeout(function() {
+				element.parent().children().removeClass('btn-fix-left btn-fix-right');
+				element.parent().children(':visible:first').addClass('btn-fix-left');
+				element.parent().children(':visible:last').addClass('btn-fix-right');
+			});
+		});
+	},
+
+	template: '<button class="btn" ui-actions ui-widget-states>{{title}}</button>'
+});
+
 })(this);
