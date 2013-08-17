@@ -91,11 +91,12 @@ function ViewCtrl($scope, DataSource, ViewService) {
 	if (context._showSingle || context._showRecord) {
 		var ds = DataSource.create(params.model, params);
 		
-		function doEdit(id) {
+		function doEdit(id, readonly) {
 			$scope.switchTo('form', function(scope){
 				scope._viewPromise.then(function(){
 					scope.doRead(id).success(function(record){
 						scope.edit(record);
+						if (readonly) scope.setEditable(false);
 					});
 				});
 			});
@@ -111,7 +112,7 @@ function ViewCtrl($scope, DataSource, ViewService) {
 			fields: ["id"]
 		}).success(function(records, page){
 			if (page.total === 1 && records.length === 1) {
-				return doEdit(records[0].id);
+				return doEdit(records[0].id, true);
 			}
 			return $scope.switchTo($scope._viewType || 'grid');
 		});
