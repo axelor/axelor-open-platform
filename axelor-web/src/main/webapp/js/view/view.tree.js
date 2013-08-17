@@ -158,12 +158,28 @@ function Column(scope, col) {
 	};
 	
 	this.cellText = function(record) {
-		var text = record[this.name];
-		if (text === undefined) {
+		var value = record[this.name];
+		if (value === undefined || value === null) {
 			return '---';
 		}
-		return text;
-	}; 
+		switch(col.type) {
+		case 'datetime':
+			return value ? moment(value).format('DD/MM/YYYY HH:mm') : "";
+		case 'date':
+			return value ? moment(value).format('DD/MM/YYYY') : "";
+		case 'many-to-one':
+			if (value.name) return value.name;
+			if (value.code) return value.name;
+			for(var key in value) {
+				if (key === 'id' ||
+					key === 'version' ||
+					key.indexOf('$') === 0 ||
+					key.indexOf('_') === 0) continue;
+				return value[key] || value.id;
+			}
+		}
+		return value;
+	};
 }
 
 /**
