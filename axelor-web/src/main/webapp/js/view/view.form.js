@@ -555,6 +555,10 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 				
 				update(item, _attrs);
 
+				// enable actions & conditional expressions
+				item.attr('ui-actions', '');
+				item.attr('ui-widget-states', '');
+
 				if (type == 'button' || type == 'static') {
 					item.html(this.title);
 				}

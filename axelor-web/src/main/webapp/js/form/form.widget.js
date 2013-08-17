@@ -32,9 +32,6 @@ ui.formWidget('Form', {
 					elem.attr('ng-required', false);
 				}
 			}
-			
-			elem.attr('ui-actions', '');
-			elem.attr('ui-widget-states', '');
 		});
 		
 		return ui.formCompile.apply(this, arguments);

@@ -102,16 +102,18 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			return hidden ? parent.add(label).hide() : parent.add(label).show();
 		}
 
+		var hideFn = _.contains(this.handles, 'isHidden') ? angular.noop : hideWidget;
+
 		scope.$watch("isHidden()", function(hidden, old) {
 			if (hidden === old) return;
-			return hideWidget(hidden);
+			return hideFn(hidden);
 		});
 		
 		this.prepare(scope, element, attrs, controller);
 		
 		scope.$evalAsync(function() {
 			if (scope.isHidden()) {
-				hideWidget(true);
+				hideFn(true);
 			}
 		});
 	}
