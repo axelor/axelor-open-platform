@@ -220,6 +220,8 @@ function Loader(scope, node, DataSource) {
 		
 		if (current) {
 			context.parent = current.id;
+		} else if (scope.getContext) {
+			context = scope.getContext();
 		}
 		
 		var opts = _.extend(this.getDomain(context), {
@@ -591,6 +593,13 @@ function TreePortletCtrl($scope, $element, DataSource, ActionService) {
 	TreeViewCtrl($scope, $element, DataSource, ActionService);
 	
 	$scope.showPager = true;
+
+	$scope.$on("on:new", function(e) {
+		$scope.onRefresh();
+	});
+	$scope.$on("on:edit", function(e) {
+		$scope.onRefresh();
+	});
 }
 
 ui.directive('uiPortletTree', function(){
