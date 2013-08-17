@@ -30,9 +30,8 @@ ui.formInput('CodeEditor', {
 		editor.setTheme('ace/theme/' + props.theme);
 		editor.setFontSize(props.fontSize);
 		editor.setShowPrintMargin(false);
-		
-		editor.setReadOnly(scope.isReadonly());
-		
+		editor.renderer.setShowGutter(true);
+
 		editor.commands.addCommands([{
 		    name: "unfind",
 		    bindKey: {
@@ -72,10 +71,10 @@ ui.formInput('CodeEditor', {
 				});
 			});
 		});
-		scope.$watch('isReadonly()', function(value){
+		scope.$watch('isReadonly()', function readonly(value){
 			editor.setReadOnly(value);
-			editor.renderer.setShowGutter(!value);
 			editor.setHighlightActiveLine(!value);
+			editor.renderer.setHighlightGutterLine(!value);
 		});
 		
 		function resize() {
