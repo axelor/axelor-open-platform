@@ -42,7 +42,6 @@ import com.google.common.primitives.Longs;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import com.google.inject.persist.Transactional;
-import com.sun.jersey.core.impl.provider.entity.Inflector;
 
 /**
  * This class defines CRUD like interface.
@@ -303,7 +302,7 @@ public class Resource<T extends Model> {
 
 			if (title == null) {
 				title = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, prop.getName());
-				title = Inflector.getInstance().humanize(title);
+				title = humanize(title);
 			}
 
 			if (prop.isReference()) {
@@ -354,6 +353,14 @@ public class Resource<T extends Model> {
 		if (value == null) return "";
 		if (value.indexOf('"') > -1) value = value.replaceAll("\"", "\"\"");
 		return '"' + value + '"';
+	}
+
+	private String humanize(String value) {
+		if (value.endsWith("_id")) value = value.substring(0, value.length() - 3);
+		if (value.endsWith("_set")) value = value.substring(0, value.length() - 5);
+		if (value.endsWith("_list")) value = value.substring(0, value.length() - 6);
+		return value.substring(0, 1).toUpperCase() +
+			   value.substring(1).replaceAll("_+", " ");
 	}
 
 	public Response read(long id) {
