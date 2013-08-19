@@ -805,10 +805,19 @@
 			},
 
 			export_: function(fields) {
+				var domain = this._lastDomain || this._domain;
+				var context = this._lastContext;
+				var filter = this._filter;
+
+				var query = extend({
+					_domain: domain,
+					_domainContext: context
+				}, filter);
 
 				var params = {
 					fields: fields,
-					data: this._filter
+					data: query,
+					sortBy: this._sortBy
 				};
 
 				var promise = this._request('export').post(params);
