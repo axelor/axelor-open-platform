@@ -8,6 +8,7 @@ import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,7 @@ import com.axelor.rpc.filter.Filter;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -294,13 +296,20 @@ public class Resource<T extends Model> {
 		Mapper mapper = Mapper.of(model);
 
 		for(String field : fields) {
-			Property prop = mapper.getProperty(field);
+			Iterator<String> iter = Splitter.on(".").split(field).iterator();
+			Property prop = mapper.getProperty(iter.next());
+			while(iter.hasNext() && prop != null) {
+				prop = Mapper.of(prop.getTarget()).getProperty(iter.next());
+			}
 			if (prop == null || prop.isCollection()) {
 				continue;
 			}
 
 			String name = prop.getName();
 			String title = prop.getTitle();
+			if(iter != null) {
+				name = field;
+			}
 
 			if (title == null) {
 				title = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, prop.getName());
