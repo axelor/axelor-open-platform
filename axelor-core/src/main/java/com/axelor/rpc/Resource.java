@@ -281,6 +281,7 @@ public class Resource<T extends Model> {
 		return response;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void export(Request request, Writer writer) throws IOException {
 		security.get().check(JpaSecurity.CAN_READ, model);
 		LOG.debug("Exporting '{}' with {}", model.getName(), request.getData());
@@ -288,6 +289,7 @@ public class Resource<T extends Model> {
 		List<String> fields = request.getFields();
 		List<String> header = Lists.newArrayList();
 		List<String> names = Lists.newArrayList();
+		Map<Integer, Map<String, String>> selection = Maps.newHashMap();
 
 		Mapper mapper = Mapper.of(model);
 
@@ -311,6 +313,23 @@ public class Resource<T extends Model> {
 					continue;
 				}
 				name = name + '.' + prop.getName();
+			}
+			else if(prop.getSelection() != null && !"".equals(prop.getSelection().trim())) {
+				javax.persistence.Query q = JPA.em().createQuery("SELECT new List(self.value, self.title) FROM MetaSelectItem self "
+						+ "JOIN self.select metaSelect "
+						+ "WHERE metaSelect.name = ?1");
+				q.setParameter(1, prop.getSelection());
+
+				List<List<?>> result = q.getResultList();
+				if (result == null || result.isEmpty()) {
+					continue;
+				}
+
+				Map<String, String> map = Maps.newHashMap();
+				for (List<?> object : result) {
+					map.put(object.get(0).toString(), object.get(1).toString());
+				}
+				selection.put(header.size(), map);
 			}
 
 			title = JPA.translate(title, title, prop.getEntity().getName());
@@ -337,7 +356,11 @@ public class Resource<T extends Model> {
 				int index = 0;
 				for(Object value: row) {
 					if (index++ < 2) continue; // ignore first two items (id, version)
-					String strValue = value == null ? "" : escapeCsv(value.toString());
+					Object objValue = value;
+					if(selection.containsKey(index-3)) {
+						objValue = selection.get(index-3).get(value.toString());
+					}
+					String strValue = objValue == null ? "" : escapeCsv(objValue.toString());
 					line.add(strValue);
 				}
 				writer.write("\n");
