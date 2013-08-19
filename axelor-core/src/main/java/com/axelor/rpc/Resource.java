@@ -345,7 +345,7 @@ public class Resource<T extends Model> {
 			}
 
 			offset += limit;
-			data = selector.fetch(limit, offset);
+			data = selector.values(limit, offset);
 		}
 	}
 
