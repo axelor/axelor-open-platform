@@ -437,18 +437,12 @@ ActionHandler.prototype = {
 
 			// handle notebook
 			if (item.is('.tab-pane')) {
-				var index = item.parent().children('.tab-pane').index(item);
-				itemScope = item.parents('.tabbable-tabs:first').data('$scope');
-				
 				forEach(itemAttrs, function(value, attr){
 					if (attr == 'hidden') {
-						if (value)
-							itemScope.hideTab(index);
-						else
-							itemScope.showTab(index);
+						itemScope.attr('hidden', value);
 					}
 					if (attr == 'title') {
-						itemScope.setTitle(value, index);
+						itemScope.title = value;
 					}
 				});
 				return;
