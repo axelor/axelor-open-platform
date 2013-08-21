@@ -131,7 +131,7 @@ function NavCtrl($scope, $rootScope, $location, $q, MenuService) {
 
 		var tab = findTab(name);
 		if (tab) {
-			return $scope.openTab(tab, options);
+			return $scope.openTab(tab);
 		}
 
 		return MenuService.action(name).success(function(result){

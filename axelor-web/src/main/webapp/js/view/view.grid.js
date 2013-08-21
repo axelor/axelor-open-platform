@@ -76,9 +76,6 @@ function GridViewCtrl($scope, $element) {
 		if (params.viewType !== "grid") {
 			return $scope.show();
 		}
-		$scope.filter({
-			_pageNum: pos
-		});
 	};
 
 	$scope.getItem = function(index) {
