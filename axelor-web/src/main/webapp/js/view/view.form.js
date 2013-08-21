@@ -436,7 +436,7 @@ function FormViewCtrl($scope, $element) {
 			record = $scope.record || {};
 			
 		if (page && page.from !== undefined) {
-			if (page.total == 0 || !record.id) return null;
+			if (page.total == 0 || page.index == -1 || !record.id) return null;
 			return _t("{0} of {1}", (page.from + page.index + 1), page.total);
 		}
 	},

@@ -24,13 +24,7 @@
 	  	<button ng-repeat="btn in toolbar" ui-tool-button></button>
 	  </div>
 	  <div ui-view-switcher class="pull-right"></div>
-	  <div class="record-pager pull-right">
-	    <span>{{pagerText()}}</span>
-	    <div class="btn-group">
-	      <button class="btn" ng-disabled="!canPrev()" ng-click="onPrev()"><i class="icon-chevron-left"></i></button>
-	      <button class="btn" ng-disabled="!canNext()" ng-click="onNext()"><i class="icon-chevron-right"></i></button>
-	    </div>
-	  </div>
+	  <div ui-record-pager class="pull-right"></div>
 	</div><!--/.btn-toolbar -->
 	<div ui-view-form x-handler="this" ng-class="{'no-toolbar': !canShowToolbar() }"></div>
 </div>
