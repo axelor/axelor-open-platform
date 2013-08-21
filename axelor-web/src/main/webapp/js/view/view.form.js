@@ -530,8 +530,6 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 				
 				scope.fields_view[widgetId] = attrs;
 
-				attrs.showTitle = attrs.showTitle !== false;
-				
 				//TODO: cover all attributes
 				var _attrs = _.extend({}, attrs.attrs, this.attrs, widgetAttrs, {
 						'name'			: attrs.name || this.name,
@@ -540,10 +538,14 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 						'x-rowspan'		: this.rowSpan,
 						'x-widths'		: this.colWidths,
 						'x-field'		: this.name,
-						'x-title'		: attrs.title,
-						'x-show-title'	: attrs.showTitle
+						'x-title'		: attrs.title
 					});
-				
+
+				if (attrs.showTitle !== undefined) {
+					attrs.showTitle = attrs.showTitle !== false;
+					_attrs['x-show-title'] = attrs.showTitle;
+				}
+
 				if (attrs.required)
 					_attrs['ng-required'] = true;
 				if (attrs.readonly)
