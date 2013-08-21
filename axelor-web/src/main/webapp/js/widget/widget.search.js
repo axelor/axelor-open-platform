@@ -633,7 +633,9 @@ ui.directive('uiFilterBox', function() {
 					text = this.custTerm,
 					number = +(text);
 
-				if (this.nameField) {
+				text = text ? text.trim() : null;
+
+				if (this.nameField && text) {
 					filters.push({
 						fieldName: this.nameField,
 						operator: 'like',
@@ -643,7 +645,7 @@ ui.directive('uiFilterBox', function() {
 
 				for(var name in this.fields) {
 
-					if (name === this.nameField) continue;
+					if (name === this.nameField || !text) continue;
 
 					var fieldName = null,
 						operator = "like",
