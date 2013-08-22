@@ -510,3 +510,7 @@ img.prefix-icon {
 .user-preferences-header {
 	text-align: center;
 }
+
+ul.nav-menu-bar li.dropdown:hover > ul.dropdown-menu {
+    margin: 0;
+}

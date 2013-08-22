@@ -1,7 +1,7 @@
 (function() {
 
 	var ds = angular.module('axelor.ds', ['ngResource']);
-	
+
 	var forEach = angular.forEach,
 		extend = angular.extend,
 		isArray = angular.isArray;
@@ -17,6 +17,10 @@
 			});
 		}
 
+		function all() {
+			return $http.get('ws/action/menu/all');
+		}
+
 		function action(name) {
 
 			return $http.post('ws/action/' + name, {
@@ -27,6 +31,7 @@
 
 		return {
 			get: get,
+			all: all,
 			action: action
 		};
 	}]);
@@ -34,7 +39,7 @@
 	ds.factory('ViewService', ['$http', '$q', '$cacheFactory', '$compile', function($http, $q, $cacheFactory, $compile) {
 
 		var ViewService = function() {
-			
+
 		};
 
 		ViewService.prototype.accept = function(params) {
@@ -50,7 +55,7 @@
 			});
 			return views;
 		};
-		
+
 		ViewService.prototype.compile = function(template) {
 			return $compile(template);
 		};
@@ -58,10 +63,10 @@
 		ViewService.prototype.process = function(meta, view) {
 
 			var fields = {};
-			
+
 			meta = meta || {};
 			view = view || {};
-			
+
 			if (isArray(meta.fields)) {
 				forEach(meta.fields, function(field){
 					field.type = _.chain(field.type || 'string').underscored().dasherize().value();
@@ -77,7 +82,7 @@
 			} else {
 				fields = meta.fields || {};
 			}
-			
+
 			forEach(view.items || view.pages, function(item) {
 				processWidget(item);
 				forEach(fields[item.name], function(value, key){
@@ -90,7 +95,7 @@
 				}
 			});
 		};
-		
+
 		function processWidget(field) {
 
 			var widget = field.widget || '',
@@ -103,10 +108,10 @@
 			if (!match) {
 				return;
 			}
-			
+
 			field.widgetName = match[1].trim();
 			field.widgetAttrs = widgetAttrs;
-			
+
 			_.each(match[2].split(/\s*\|\s*/), function(part) {
 				var parts = part.split(/\s*=\s*/);
 				var attrName = parts[0].trim();
@@ -126,7 +131,7 @@
 				widgetAttrs[attrName] = attrValue;
 			});
 		}
-		
+
 		function useIncluded(view) {
 			var items = [];
 			_.each(view.items, function(item) {
@@ -144,10 +149,10 @@
 		function findFields(view) {
 			var items = [];
 			var fields = view.items || view.pages;
-			
+
 			if (fields == null)
 				return [];
-			
+
 			if (view.items && !view._included) {
 				view._included = true;
 				fields = view.items = useIncluded(view);
@@ -161,7 +166,7 @@
 					items.push(item.name);
 				}
 			});
-			
+
 			if (view.type === "calendar") {
 				items.push(view.eventStart);
 				items.push(view.eventStop);
@@ -170,7 +175,7 @@
 
 			return _.compact(items);
 		}
-		
+
 		var fieldsCache = $cacheFactory("viewFields", { capacity: 1000 });
 
 		ViewService.prototype.getMetaDef = function(model, view) {
@@ -184,12 +189,12 @@
 				});
 				return promise;
 			};
-			
+
 			function loadFields(view) {
-				
+
 				var fields = findFields(view) || [];
 				var key = model + "|" + view.type + "|" + view.name + "|" + fields.join("|");
-				
+
 				if (!model || !fields || fields.length === 0) {
 					deferred.resolve({view: view});
 					return promise;
@@ -204,27 +209,27 @@
 					result.then(resolver);
 					return promise;
 				}
-				
+
 				function resolver(response) {
 					var res = response.data,
 						data = res.data;
 
 					view.perms = data.perms;
 					self.process(data, view);
-					
+
 					if (view.perms && !view.perms.write) {
 						view.editable = false;
 					}
-					
+
 					var fields = data.fields;
 					var result = {
 						fields: fields,
 						view: view
 					};
-					
+
 					fieldsCache.put(key, angular.copy(result));
 					deferred.resolve(result);
-					
+
 					return promise;
 				}
 
@@ -232,13 +237,13 @@
 					model: model,
 					fields: findFields(view)
 				});
-				
+
 				_promise.then(resolver);
 				fieldsCache.put(key, _promise);
 
 				return promise;
 			}
-			
+
 			if (_.isArray(view.items)) {
 				return loadFields(view);
 			};
@@ -253,11 +258,11 @@
 			}).then(function(response) {
 				var res = response.data,
 					result = res.data;
-				
+
 				if (!result) {
 					return deferred.reject('view not found', view);
 				}
-				
+
 				if (_.isArray(result.items)) {
 					loadFields(result);
 				} else {
@@ -273,9 +278,9 @@
 		ViewService.prototype.defer = function() {
 			return $q.defer();
 		};
-		
+
 		ViewService.prototype.action = function(action, model, context) {
-			
+
 			var ctx = _.extend({
 				_model: model
 			}, context);
@@ -299,17 +304,17 @@
 				promise.then(null, fn);
 				return promise;
 			};
-			
+
 			return promise;
 		};
-		
+
 		ViewService.prototype.getFields = function(model) {
-			
+
 			var that = this,
 				promise = $http.get('ws/meta/fields/' + model, {
 					cache: true
 				});
-			
+
 			promise.success = function(fn) {
 				promise.then(function(response) {
 					var res = response.data,
@@ -319,17 +324,17 @@
 				});
 				return promise;
 			};
-			
+
 			promise.error = function(fn) {
 				promise.then(null, fn);
 				return promise;
 			};
-			
+
 			return promise;
 		};
 
 		return new ViewService();
 	}]);
-	
+
 
 })(this);
