@@ -20,7 +20,7 @@
 		        return h;
 		    })(node);
 	}
-	
+
 // make sure i18n is loaded
 if (this._t === undefined) {
 	this._t = function(key) { return key; };
@@ -32,7 +32,7 @@ load([
 	'lib/underscore/underscore.js',
 	'lib/underscore/underscore.string.js',
 	'lib/moment/moment.js',
-	
+
 	'lib/jquery.ui/js/jquery.js',
 	'lib/jquery.ui/js/jquery-ui.js',
 	'lib/jquery.ui/js/jquery.ui.mask.js',
@@ -47,9 +47,9 @@ load([
 	'lib/slickgrid/plugins/slick.headermenu.js',
 	'lib/slickgrid/plugins/slick.rowselectionmodel.js',
 	'lib/slickgrid/plugins/slick.checkboxselectcolumn.js',
-	
+
 	'lib/jquery.treetable/js/jquery.treetable.js',
-	
+
 	'lib/fullcalendar/fullcalendar.js',
 	'lib/fullcalendar/gcal.js',
 
@@ -60,12 +60,12 @@ load([
 
 	'lib/ace/js/ace.js',
 	'lib/tinymce/tinymce.min.js',
-	
+
 	'lib/angular/angular.js',
 	'lib/angular/angular-resource.js',
 	'lib/angular/angular-sanitize.js',
 	'lib/angular/angular-if.js',
-	
+
 	'js/lib/utils.js',
 	'js/lib/dialogs.js',
 	'js/lib/tabs.js',
@@ -82,6 +82,7 @@ load([
 
 	'js/widget/widget.navtabs.js',
 	'js/widget/widget.navtree.js',
+	'js/widget/widget.navmenu.js',
 	'js/widget/widget.splitter.js',
 	'js/widget/widget.slickgrid.js',
 	'js/widget/widget.dialog.js',
@@ -92,7 +93,7 @@ load([
 	'js/form/form.widget.js',
 	'js/form/form.layout.js',
 	'js/form/form.container.js',
-	
+
 	'js/form/form.input.static.js',
 	'js/form/form.input.boolean.js',
 	'js/form/form.input.text.js',
@@ -108,7 +109,7 @@ load([
 	'js/form/form.relational.nested.js',
 	'js/form/form.code.js',
 	'js/form/form.tinymce.js',
-	
+
 	'js/view/view.base.js',
 	'js/view/view.form.js',
 	'js/view/view.grid.js',

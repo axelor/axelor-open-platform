@@ -25,7 +25,7 @@ public class ActionService extends AbstractService {
 
 	@Inject
 	private MetaService service;
-	
+
 	@GET
 	@Path("menu")
 	public Response menu(@QueryParam("parent") @DefaultValue("") String parent) {
@@ -40,13 +40,28 @@ public class ActionService extends AbstractService {
 		}
 		return response;
 	}
-	
+
+	@GET
+	@Path("menu/all")
+	public Response all() {
+		Response response = new Response();
+		try {
+			response.setData(service.getMenus());
+			response.setStatus(Response.STATUS_SUCCESS);
+		} catch (Exception e) {
+			if (LOG.isErrorEnabled())
+				LOG.error(e.getMessage(), e);
+			response.setException(e);
+		}
+		return response;
+	}
+
 	@POST
 	public Response execute(ActionRequest request) {
 		ActionHandler handler = new ActionHandler(request, getInjector());
 		return handler.execute();
 	}
-	
+
 	@POST
 	@Path("{action}")
 	public Response execute(@PathParam("action") String action, ActionRequest request) {
