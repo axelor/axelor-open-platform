@@ -284,7 +284,7 @@ function FormViewCtrl($scope, $element) {
 			if (res.status !== 0) {
 				axelor.dialogs.confirm(
 						_t("The record has been updated or delete by another action.") + "<br>" +
-						_t("Would you like to reload the current record ?"),
+						_t("Would you like to reload the current record?"),
 				function(confirmed){
 					if (confirmed) {
 						$scope.reload();
