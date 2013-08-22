@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -118,8 +119,10 @@ public class Search extends AbstractView {
 		}
 
 		public String getTitle() {
-			String translation = JPA.translate(name, null);
-			return JPA.translate(title, translation);
+			if(!Strings.isNullOrEmpty(title)) {
+				return JPA.translate(title);
+			}
+			return JPA.translate(name, null);
 		}
 
 		public void setTitle(String title) {
