@@ -46,14 +46,20 @@ function GridViewCtrl($scope, $element) {
 	};
 	
 	$scope.getRouteOptions = function() {
-		var pos = null,
+		var pos = 1,
 			args = [],
-			query = {};
+			query = {},
+			params = $scope._viewParams;
 
 		if (page && page.limit) {
 			pos = (page.from / page.limit) + 1;
-			args.push(pos);
+		} else if (params.options) {
+			pos = +(params.options.state);
 		}
+
+		pos = pos || 1;
+		args = [pos];
+
 		return {
 			mode: 'list',
 			args: args,
@@ -67,6 +73,9 @@ function GridViewCtrl($scope, $element) {
 			pos = +(opts.state),
 			current = (page.from / page.limit) + 1;
 
+		pos = pos || 1;
+		current = current || 1;
+
 		$scope._routeSearch = opts.search;
 		if (pos === current) {
 			return $scope.updateRoute();
@@ -76,6 +85,10 @@ function GridViewCtrl($scope, $element) {
 		if (params.viewType !== "grid") {
 			return $scope.show();
 		}
+
+		$scope.filter({
+			_pageNum: pos
+		});
 	};
 
 	$scope.getItem = function(index) {
