@@ -12,7 +12,7 @@ String appDesc = settings.get("application.description", null);
 String appHome = settings.get("application.home", "");
 String appLogo = settings.get("application.logo", "");
 String appTheme = settings.get("application.theme", null);
-String appMenu = settings.get("application.menu", "left");
+String appMenu = settings.get("application.menu", "both");
 
 String appTitle =  appName;
 
