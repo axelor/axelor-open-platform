@@ -408,7 +408,8 @@ angular.module('axelor.ui').directive('uiGridExport', function(){
 			var ds = handler._dataSource;
 
 			scope.onExport = function() {
-				ds.export_(fields()).success(function(res) {
+
+				return ds.export_(fields()).success(function(res) {
 
 					var filePath = action(res.fileName),
 						fileName = res.fileName;
@@ -432,8 +433,9 @@ angular.module('axelor.ui').directive('uiGridExport', function(){
 		},
 
 		template:
-			"<button class='btn' ng-click='onExport()'>" +
-				"<span x-translate>Export</span>" +
+			"<button class='btn' ng-click='onExport()' title='{{\"Export\" | t}}'>" +
+				"<i class='icon icon-download'></i> " +
+				"<span ng-hide='$parent.tbTitleHide' x-translate>Export</span>" +
 			"</button>"
 	};
 });

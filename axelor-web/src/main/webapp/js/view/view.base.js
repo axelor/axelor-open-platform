@@ -118,6 +118,8 @@ function ViewCtrl($scope, DataSource, ViewService) {
 		});
 	}
 	
+	$scope.tbTitleHide = __appSettings['application.view.toolbar-title'] === 'hide';
+
 	// switch to the the current viewType
 	$scope.switchTo($scope._viewType || 'grid');
 }
