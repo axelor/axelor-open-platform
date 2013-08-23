@@ -108,6 +108,29 @@
     </xsd:sequence>
   </xsd:complexType>
 
+  <xsd:complexType name="Menubar">
+    <xsd:sequence>
+      <xsd:element name="menu" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:choice maxOccurs="unbounded">
+              <xsd:element name="item" maxOccurs="unbounded">
+                <xsd:complexType>
+                  <xsd:attribute name="title" type="xsd:string" use="required"/>
+                  <xsd:attribute name="action" type="xsd:string" use="required"/>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:element name="divider" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:choice>
+          </xsd:sequence>
+          <xsd:attribute name="title" type="xsd:string" use="required"/>
+          <xsd:attribute name="icon" type="xsd:string"/>
+          <xsd:attribute name="showTitle" type="xsd:boolean"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
   <xsd:complexType name="AbstractView" abstract="true">
     <xsd:attribute name="title" type="xsd:string" use="required">
       <xsd:annotation>
@@ -279,6 +302,7 @@
       <xsd:extension base="tns:ObjectView">
         <xsd:sequence>
           <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0"/>
+          <xsd:element name="menubar" type="tns:Menubar" minOccurs="0"/>
           <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:group ref="tns:FormWidgets" />
           </xsd:choice>
