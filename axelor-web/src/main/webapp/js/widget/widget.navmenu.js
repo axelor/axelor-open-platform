@@ -8,6 +8,8 @@ function NavMenuCtrl($scope, $element, MenuService, NavService) {
 	$scope.menus = []; 	// the first four visible menus
 	$scope.more = [];	// rest of the menus
 
+	var hasSideBar = __appSettings['application.menu'] !== 'top';
+
 	MenuService.all().then(function(response) {
 		var res = response.data,
 			data = res.data;
@@ -24,6 +26,11 @@ function NavMenuCtrl($scope, $element, MenuService, NavService) {
 		});
 
 		_.each(data, function(item) {
+
+			if (hasSideBar && item.parent == null && !item.top) {
+				return;
+			}
+
 			if (item.parent == null) {
 				return top.push(item);
 			}
