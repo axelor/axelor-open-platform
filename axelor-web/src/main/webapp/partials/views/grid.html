@@ -1,18 +1,30 @@
 <div class="grid-view" ng-controller="GridViewCtrl">
-  <div class="record-toolbar btn-toolbar">
-    <div class="btn-group">
-      <button class="btn" ng-click="onNew()" ng-if="hasButton('new')" ng-disabled="canSave()"><i class="icon icon-file"></i> <span x-translate>New</span></button>
-      <button class="btn" ng-click="onEdit()" ng-if="hasButton('edit')" ng-disabled="!canEdit()"><i class="icon icon-pencil"></i> <span x-translate>Edit</span></button>
-      <button class="btn" ng-click="onSave()" ng-if="canEditInline()" ng-disabled="!canSave()"><i class="icon icon-save"></i> <span x-translate>Save</span></button>
-      <button class="btn" ng-click="onDelete()" ng-if="hasButton('delete')" ng-disabled="!canDelete()"><i class="icon icon-remove"></i> <span x-translate>Delete</span></button>
-      <button class="btn" ui-grid-export="this" ng-if="hasButton('export')"></button>
+  <div class="navbar record-toolbar">
+    <div class="navbar-inner">
+      <div class="container">
+        <div class="btn-group">
+          <button class="btn" ng-click="onNew()" ng-if="hasButton('new')" ng-disabled="canSave()">
+            <i class="icon icon-file"></i> <span x-translate>New</span>
+          </button>
+          <button class="btn" ng-click="onEdit()" ng-if="hasButton('edit')" ng-disabled="!canEdit()">
+            <i class="icon icon-pencil"></i> <span x-translate>Edit</span>
+          </button>
+          <button class="btn" ng-click="onSave()" ng-if="canEditInline()" ng-disabled="!canSave()">
+            <i class="icon icon-save"></i> <span x-translate>Save</span>
+          </button>
+          <button class="btn" ng-click="onDelete()" ng-if="hasButton('delete')" ng-disabled="!canDelete()">
+            <i class="icon icon-remove"></i> <span x-translate>Delete</span>
+          </button>
+          <button class="btn" ui-grid-export="this" ng-if="hasButton('export')"></button>
+        </div>
+        <div ui-filter-box x-handler="this"></div>
+        <div class="btn-group" ng-if="toolbar">
+          <button ng-repeat="btn in toolbar" class="btn" ui-tool-button="btn">{{btn.title}}</button>
+        </div>
+        <div ui-view-switcher class="pull-right"></div>
+        <div ui-record-pager class="pull-right"></div>
+      </div>
     </div>
-    <div ui-filter-box x-handler="this"></div>
-    <div class="btn-group" ng-if="toolbar">
-      <button ng-repeat="btn in toolbar" class="btn" ui-tool-button="btn">{{btn.title}}</button>
-    </div>
-    <div ui-view-switcher class="pull-right"></div>
-    <div ui-record-pager class="pull-right"></div>
-  </div><!--/.btn-toolbar -->
+  </div>
   <div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this"></div>
 </div>

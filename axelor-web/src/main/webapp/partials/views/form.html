@@ -1,30 +1,35 @@
 <div class="form-view" ng-controller="FormViewCtrl">
-	<div class="record-toolbar btn-toolbar" style="display: hidden;" ng-show="canShowToolbar()">
-	  <div class="btn-group">
-	    <button class="btn" ng-click="onNew()" ng-if="hasButton('new')"><i class="icon icon-file"></i> <span x-translate>New</span></button>
-	    <button class="btn" ng-click="onEdit()" ng-if="hasButton('edit') && canEdit()"><i class="icon icon-pencil"></i> <span x-translate>Edit</span></button>
-	    <button class="btn" ng-click="onSave()" ng-if="hasButton('save') && !canEdit()"><i class="icon icon-save"></i> <span x-translate>Save</span></button>
-	    <button class="btn" ng-click="onCopy()" ng-if="hasButton('copy') && canEdit()" ng-disabled="!canCopy()"><i class="icon icon-copy"></i> <span x-translate>Copy</span></button>
-	    <button class="btn" ng-click="onCancel()" ng-if="hasButton('cancel') && !canEdit()" ng-disabled="!canCancel()"><i class="icon icon-ban-circle"></i> <span x-translate>Cancel</span></button>
-	  </div>
-	  <div class="btn-group">
-		<button class="btn" ng-click="onBack()" ng-if="hasButton('back')" ng-disabled="!canBack()"><i class="icon icon-reply"></i> <span x-translate>Back</span></button>
-	    <button class="btn" ng-click="onRefresh()" ng-if="hasButton('refresh')"><i class="icon icon-refresh"></i> <span x-translate>Refresh</span></button>
-	  </div>
-	  <div class="btn-group" ng-if="hasAuditLog()">
-	  	<button class="btn" ng-click="onShowLog($event)"><i class="icon icon-eye-open"></i></button>
-	  </div>
-	  <div class="btn-group" ng-if="canShowAttachments()">
-	  	<button class="btn" ng-click="onShowAttachments()"><i class="icon icon-pushpin"></i></button>
-	  </div>
-	  <div class="btn-group" ng-if="hasHelp()">
-		<button class="btn" ng-click="onShowHelp()"><i class="icon icon-info-sign"></i></button>
-	  </div>
-	  <div class="btn-group" ng-if="toolbar">
-	  	<button ng-repeat="btn in toolbar" ui-tool-button></button>
-	  </div>
-	  <div ui-view-switcher class="pull-right"></div>
-	  <div ui-record-pager class="pull-right"></div>
-	</div><!--/.btn-toolbar -->
-	<div ui-view-form x-handler="this" ng-class="{'no-toolbar': !canShowToolbar() }"></div>
+  <div class="navbar record-toolbar">
+    <div class="navbar-inner">
+      <div class="container">
+        <div ui-menu-bar menus="menubar" handler="this"></div>
+        <div class="btn-group">
+          <button class="btn" ng-click="onNew()" ng-if="hasButton('new')"><i class="icon icon-file"></i> <span x-translate>New</span></button>
+          <button class="btn" ng-click="onEdit()" ng-if="hasButton('edit') && canEdit()"><i class="icon icon-pencil"></i> <span x-translate>Edit</span></button>
+          <button class="btn" ng-click="onSave()" ng-if="hasButton('save') && !canEdit()"><i class="icon icon-save"></i> <span x-translate>Save</span></button>
+          <button class="btn" ng-click="onCopy()" ng-if="hasButton('copy') && canEdit()" ng-disabled="!canCopy()"><i class="icon icon-copy"></i> <span x-translate>Copy</span></button>
+          <button class="btn" ng-click="onCancel()" ng-if="hasButton('cancel') && !canEdit()" ng-disabled="!canCancel()"><i class="icon icon-ban-circle"></i> <span x-translate>Cancel</span></button>
+        </div>
+        <div class="btn-group">
+          <button class="btn" ng-click="onBack()" ng-if="hasButton('back')" ng-disabled="!canBack()"><i class="icon icon-reply"></i> <span x-translate>Back</span></button>
+          <button class="btn" ng-click="onRefresh()" ng-if="hasButton('refresh')"><i class="icon icon-refresh"></i> <span x-translate>Refresh</span></button>
+        </div>
+        <div class="btn-group" ng-if="hasAuditLog()">
+          <button class="btn" ng-click="onShowLog($event)"><i class="icon icon-eye-open"></i></button>
+        </div>
+        <div class="btn-group" ng-if="canShowAttachments()">
+          <button class="btn" ng-click="onShowAttachments()"><i class="icon icon-pushpin"></i></button>
+        </div>
+        <div class="btn-group" ng-if="hasHelp()">
+        <button class="btn" ng-click="onShowHelp()"><i class="icon icon-info-sign"></i></button>
+        </div>
+        <div class="btn-group" ng-if="toolbar">
+          <button ng-repeat="btn in toolbar" ui-tool-button></button>
+        </div>
+        <div ui-view-switcher class="pull-right"></div>
+        <div ui-record-pager class="pull-right"></div>
+      </div>
+    </div>
+  </div>
+  <div ui-view-form x-handler="this" ng-class="{'no-toolbar': !canShowToolbar() }"></div>
 </div>

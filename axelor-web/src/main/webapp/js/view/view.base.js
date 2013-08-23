@@ -168,6 +168,7 @@ function DSViewCtrl(type, $scope, $element) {
 				$scope.fields = fields;
 				$scope.schema = schema;
 				$scope.toolbar = toolbar;
+				$scope.menubar = schema.menubar;
 			});
 		}
 		

@@ -769,12 +769,16 @@ table.field-details .help-text hr {
 	margin-bottom: 0;
 }
 
+.filter-box > input {
+	margin-top: 4px;
+}
+
 .filter-box .search-icons {
 	position: absolute;
 	display: inline-block;
 	top: 0;
 	right: 0;
-	padding-top: 7px;
+	padding-top: 9px;
 	padding-right: 6px;
 }
 
