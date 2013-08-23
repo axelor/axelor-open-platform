@@ -75,6 +75,37 @@ public class MetaService {
 		return menus;
 	}
 
+	public List<MenuItem> getMenus() {
+
+		Subject subject = SecurityUtils.getSubject();
+		User user = null;
+
+		if (subject != null) {
+			user = User.all().filter("self.code = ?1", subject.getPrincipal()).fetchOne();
+		}
+
+		String q1 = "SELECT self, COALESCE(self.priority, 0) AS priority FROM MetaMenu self LEFT JOIN self.groups g WHERE ";
+		Object p1 = null;
+
+		if (user != null && user.getGroup() != null) {
+			p1 = user.getGroup().getCode();
+		}
+
+		if (p1 != null) {
+			q1 += "(g.code = ?1 OR self.groups IS EMPTY)";
+		} else {
+			q1 += "self.groups IS EMPTY";
+		}
+
+		q1 += " ORDER BY priority DESC, self.id";
+
+		Query query = JPA.em().createQuery(q1);
+		if (p1 != null)
+			query.setParameter(1, p1);
+
+		return findMenus(query);
+	}
+
 	public List<MenuItem> getMenus(String parent) {
 
 		Subject subject = SecurityUtils.getSubject();
