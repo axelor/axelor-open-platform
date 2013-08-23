@@ -1,16 +1,24 @@
 <div class="tree-view" ng-controller="TreeViewCtrl">
-	<div class="record-toolbar btn-toolbar">
-		<span class="view-title">{{title}}</span>
-		<div class="record-pager pull-right">
-			<span>{{pagerText()}}</span>
-			<div class="btn-group">
-				<button class="btn" ng-disabled="!canPrev()" ng-click="onPrev()"><i class="icon-chevron-left"></i></button>
-				<button class="btn" ng-disabled="!canNext()" ng-click="onNext()"><i class="icon-chevron-right"></i></button>
-			</div>
-			<button class="btn" ng-click="onRefresh()">
-				<i class="icon icon-refresh"></i>
-			</button>
-		</div>
-	</div>
-	<div ui-view-tree x-handler="this"></div>
+  <div class="navbar record-toolbar">
+    <div class="navbar-inner">
+      <div class="container">
+        <span class="view-title">{{title}}</span>
+        <div class="record-pager pull-right">
+          <span>{{pagerText()}}</span>
+          <div class="btn-group">
+            <button class="btn" ng-disabled="!canPrev()" ng-click="onPrev()">
+              <i class="icon-chevron-left"></i>
+            </button>
+            <button class="btn" ng-disabled="!canNext()" ng-click="onNext()">
+              <i class="icon-chevron-right"></i>
+            </button>
+          </div>
+          <button class="btn" ng-click="onRefresh()">
+            <i class="icon icon-refresh"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div ui-view-tree x-handler="this"></div>
 </div>
