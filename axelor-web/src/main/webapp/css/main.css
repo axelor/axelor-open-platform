@@ -26,9 +26,65 @@ html, body {
 	background-color: white;
 }
 
-.header .navbar .nav-shortcuts img {
+header .container-fluid {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+header .navbar .nav-shortcuts > li > a {
+	padding: 10px 8px 10px;
+}
+
+header .navbar .nav-shortcuts > .divider-vertical {
+	margin: 0 4px;
+}
+
+header .navbar .nav-shortcuts > li > a > img {
 	height: 20px !important;
-	margin-top: -2px;
+}
+
+header .dropdown > ul.dropdown-menu {
+    margin: 0;
+}
+
+header .dropdown-menu:after,
+header .dropdown-menu:before {
+    border: none;
+    content: none !important;
+}
+
+header .dropdown-menu {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+header .navbar-inverse .dropdown-menu {
+	background-color: #1b1b1b;
+}
+
+header .navbar-inverse .dropdown-menu {
+	border-top: 0;
+}
+
+header .navbar-inverse .dropdown-menu .divider {
+	height: inherit;
+	background-color: inherit;
+	border-top: 1px solid #111;
+	border-bottom: 1px solid #222;
+}
+
+header .navbar-inverse .dropdown-menu > li > a {
+	color: #999999;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+header .navbar-inverse .dropdown-menu > li > a:hover,
+header .navbar-inverse .dropdown-menu > li > a:focus,
+header .navbar-inverse .dropdown-submenu:hover > a,
+header .navbar-inverse .dropdown-submenu:focus > a {
+	background-image: none;
+	background-color: #111;
+	color: #fff;
 }
 
 .footer {
@@ -509,10 +565,6 @@ img.prefix-icon {
 
 .user-preferences-header {
 	text-align: center;
-}
-
-ul.nav-menu-bar li.dropdown:hover > ul.dropdown-menu {
-    margin: 0;
 }
 
 .btn-toolbar .nav {

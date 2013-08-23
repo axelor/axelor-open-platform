@@ -65,18 +65,16 @@ String appJS = AppSettings.getAppJS(getServletContext());
           <ul class="nav nav-shortcuts pull-right">
             <li class="divider-vertical"></li>
             <li>
-            	<a href="#/"><img src="img/home-icon.png"> <span x-translate>Home</span></a>
-            </li>
-            <li class="divider-vertical"></li>
-            <li>
-            	<a href="{{app.help}}" target="_blank"><img src="img/help-icon.png"> <span x-translate>Help</span></a>
+            	<a href="#/"><img src="img/home-icon.png"></a>
             </li>
             <li class="divider-vertical"></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              	<img src="img/about-icon.png"> <span x-translate>About</span> <b class="caret"></b>
+                <img src="img/help-icon.png"> <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
+                <li><a href="{{app.help}}" target="_blank"><span x-translate>Help</span></a></li>
+                <li class="divider"></li>
                 <li><a href="#/about"><i>{{app.name}} - v{{app.version}}</i></a></li>
                 <li ng-show="app.sdk"><a href="http://axelor.com/" target="_blank"><i>Axelor Framework - v{{app.sdk}}</i></a></li>
               </ul>
