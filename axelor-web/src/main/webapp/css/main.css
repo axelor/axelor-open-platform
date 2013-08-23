@@ -403,8 +403,6 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 }
 
 .record-toolbar .navbar-inner {
-	min-height: 38px;
-
 	border: 1px solid #d4d4d4;
 	border-left: none;
 	border-right: none;
@@ -417,11 +415,22 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 	padding: 0;
 }
 
+.record-toolbar button {
+	padding: 4px 12px;
+}
+
+.record-toolbar button i {
+	font-size: 16px;
+	line-height: 20px;
+}
+
+.record-toolbar button span {
+	position: relative;
+	top: -1px;
+}
+
 .record-toolbar .view-switcher {
 	margin-left: 4px;
-}
-.record-toolbar .view-switcher button {
-	padding: 4px 8px;
 }
 
 .record-toolbar .view-title {
