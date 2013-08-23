@@ -34,7 +34,7 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 
 		var tab = findTab(name);
 		if (tab) {
-			return openTab(tab);
+			return openTab(tab, options);
 		}
 
 		return MenuService.action(name).success(function(result){
