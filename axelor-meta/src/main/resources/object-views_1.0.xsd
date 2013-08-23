@@ -82,6 +82,14 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="top" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          If both navigation menus (top and left) are visible then
+          top menubar shows only menus marked with top="true".
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
   
   <xsd:complexType name="ActionMenuItem">

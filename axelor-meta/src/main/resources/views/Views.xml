@@ -126,6 +126,7 @@
     <field name="action"/>
     <field name="priority"/>
     <field name="module"/>
+    <field name="top"/>
     <break/>
     <notebook colSpan="4">
       <page title="Groups" cols="1">

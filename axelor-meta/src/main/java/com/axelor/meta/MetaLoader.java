@@ -68,15 +68,15 @@ import com.google.common.io.Resources;
 import com.google.inject.Inject;
 
 public class MetaLoader {
-	
+
 	@Inject
 	private MetaTranslationsService translationsService;
 
 	private static final String LOCAL_SCHEMA = "object-views_1.0.xsd";
 	private static final String REMOTE_SCHEMA = "object-views_"+ ObjectViews.VERSION +".xsd";
-	
+
 	private Logger log = LoggerFactory.getLogger(getClass());
-	
+
 	private Marshaller marshaller;
 	private Unmarshaller unmarshaller;
 
@@ -88,22 +88,22 @@ public class MetaLoader {
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
 					ObjectViews.NAMESPACE + " " + ObjectViews.NAMESPACE + "/" + REMOTE_SCHEMA);
-	
+
 			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			Schema schema = schemaFactory.newSchema(Resources.getResource(LOCAL_SCHEMA));
-	
+
 			unmarshaller.setSchema(schema);
 			marshaller.setSchema(schema);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	private ObjectViews unmarshal(String xml) throws JAXBException {
 		StringReader reader = new StringReader(prepareXML(xml));
 		return (ObjectViews) unmarshaller.unmarshal(reader);
 	}
-	
+
 	private String stripWhiteSpaces(String text) {
 		String string = text.replaceAll("\\t", "    ");
 		StringBuilder builder = new StringBuilder();
@@ -135,10 +135,10 @@ public class MetaLoader {
 		Pattern p = Pattern.compile("^(\\t|\\s{4})", Pattern.MULTILINE);
 		return p.matcher(sb).replaceAll("");
 	}
-	
+
 	@SuppressWarnings("all")
 	private String toXml(Object obj, boolean strip) {
-		
+
 		ObjectViews views = new ObjectViews();
 		StringWriter writer = new StringWriter();
 
@@ -160,7 +160,7 @@ public class MetaLoader {
 			return this.strip(writer.toString());
 		return writer.toString();
 	}
-	
+
 	private String prepareXML(String xml) {
 		StringBuilder sb = new StringBuilder("<?xml version='1.0' encoding='UTF-8'?>\n");
 		sb.append("<object-views")
@@ -177,24 +177,24 @@ public class MetaLoader {
 	public ObjectViews fromXML(String xml) throws JAXBException {
 		if (Strings.isNullOrEmpty(xml))
 			return null;
-		
+
 		if (!xml.trim().startsWith("<?xml"))
 			xml = prepareXML(xml);
-		
+
 		StringReader reader = new StringReader(xml);
 		return (ObjectViews) unmarshaller.unmarshal(reader);
 	}
-	
+
 	private void loadView(AbstractView view, String module, String file) {
-		
+
 		log.info("Loading view : {}", view.getName());
-		
+
 		String name = view.getName();
 		String type = view.getClass().getSimpleName().replace("View", "").toLowerCase();
 		String model = view.getModel();
 
 		String xml = toXml(view, true);
-		
+
 		if (type.matches("chart|portal|search")) {
 			model = null;
 		} else if (Strings.isNullOrEmpty(model)) {
@@ -211,7 +211,7 @@ public class MetaLoader {
 			loadChart((ChartView) view, xml, module);
 			return;
 		}
-		
+
 		MetaView entity = new MetaView();
 		entity.setName(name);
 		entity.setTitle(view.getDefaultTitle());
@@ -219,7 +219,7 @@ public class MetaLoader {
 		entity.setModel(model);
 		entity.setModule(module);
 		entity.setXml(xml);
-		
+
 		// if a view with same name exists, set higher priority then that
 		MetaView existing = model == null ? MetaView.findByName(name) : MetaView.findByName(name, model);
 		if (existing != null) {
@@ -228,7 +228,7 @@ public class MetaLoader {
 
 		entity = entity.save();
 	}
-	
+
 	private void loadChart(ChartView view, String xml, String module) {
 		String name = view.getName();
 		if (MetaChart.all().filter("self.name = ?1", name).count() > 0) {
@@ -240,7 +240,7 @@ public class MetaLoader {
 		chart.setModule(module);
 		chart.setTitle(view.getDefaultTitle());
 		chart.setStacked(view.getStacked());
-		
+
 		String query = stripWhiteSpaces(view.getQuery().getText());
 		chart.setQuery(query);
 		chart.setQueryType(view.getQuery().getType());
@@ -258,7 +258,7 @@ public class MetaLoader {
 			item.setAggregate(series.getAggregate());
 			chart.addChartSeries(item);
 		}
-		
+
 		if (view.getConfig() != null) {
 			for(ChartView.ChartConfig config : view.getConfig()) {
 				MetaChartConfig item = new MetaChartConfig();
@@ -282,7 +282,7 @@ public class MetaLoader {
 			item.setTitle(opt.getDefaultTitle());
 			select.addItem(item);
 		}
-		
+
 		MetaSelect existing = MetaSelect.findByName(select.getName());
 		if (existing != null) {
 			select.setPriority(existing.getPriority() +  1);
@@ -291,17 +291,17 @@ public class MetaLoader {
 	}
 
 	private void loadAction(Action action, String module) {
-		
+
 		log.info("Loading action : {}", action.getName());
-		
+
 		Class<?> klass = action.getClass();
 		Mapper mapper = Mapper.of(klass);
-		
+
 		MetaAction entity = new MetaAction();
 
 		entity.setName(action.getName());
 		entity.setXml(toXml(action,  true));
-		
+
 		String model = (String) mapper.get(action, "model");
 		entity.setModel(model);
 		entity.setModule(module);
@@ -310,14 +310,14 @@ public class MetaLoader {
 		entity.setType(type);
 
 		entity = entity.save();
-		
+
 		for (MetaMenu pending : unresolved_actions.get(entity.getName())) {
 			log.info("Resolved menu: {}", pending.getName());
 			pending.setAction(entity);
 			pending.save();
 		}
 		unresolved_actions.removeAll(entity.getName());
-		
+
 		for (MetaActionMenu pending : unresolved_actions2.get(entity.getName())) {
 			log.info("Resolved action menu: {}", pending.getName());
 			pending.setAction(entity);
@@ -325,14 +325,14 @@ public class MetaLoader {
 		}
 		unresolved_actions2.removeAll(entity.getName());
 	}
-	
+
 	private Multimap<String, MetaMenu> unresolved_menus = HashMultimap.create();
 	private Multimap<String, MetaMenu> unresolved_actions = HashMultimap.create();
-	
+
 	private void loadMenu(MenuItem menuItem, String module) {
-		
+
 		log.info("Loading menu : {}", menuItem.getName());
-		
+
 		MetaMenu menu = new MetaMenu();
 		menu.setName(menuItem.getName());
 		menu.setPriority(menuItem.getPriority());
@@ -340,7 +340,8 @@ public class MetaLoader {
 		menu.setIcon(menuItem.getIcon());
 		menu.setModule(module);
 		menu.setGroups(this.findGroups(menuItem.getGroups()));
-		
+		menu.setTop(menuItem.getTop());
+
 		if (!Strings.isNullOrEmpty(menuItem.getParent())) {
 			MetaMenu parent = MetaMenu.findByName(menuItem.getParent());
 			if (parent == null) {
@@ -350,7 +351,7 @@ public class MetaLoader {
 				menu.setParent(parent);
 			}
 		}
-		
+
 		if (!Strings.isNullOrEmpty(menuItem.getAction())) {
 			MetaAction a = MetaAction.findByName(menuItem.getAction());
 			if (a == null) {
@@ -360,25 +361,25 @@ public class MetaLoader {
 				menu.setAction(a);
 			}
 		}
-		
+
 		menu = menu.save();
-		
+
 		for (MetaMenu pending : unresolved_menus.get(menu.getName())) {
 			log.info("Resolved menu : {}", pending.getName());
 			pending.setParent(menu);
 			pending.save();
 		}
-		
+
 		unresolved_menus.removeAll(menu.getName());
 	}
-	
+
 	private Multimap<String, MetaActionMenu> unresolved_menus2 = HashMultimap.create();
 	private Multimap<String, MetaActionMenu> unresolved_actions2 = HashMultimap.create();
-	
+
 	private void loadActionMenu(MenuItem menuItem, String module) {
-		
+
 		log.info("Loading action menu : {}", menuItem.getName());
-		
+
 		MetaActionMenu menu = new MetaActionMenu();
 		menu.setName(menuItem.getName());
 		menu.setTitle(menuItem.getDefaultTitle());
@@ -394,7 +395,7 @@ public class MetaLoader {
 				menu.setParent(parent);
 			}
 		}
-		
+
 		if (!Strings.isNullOrEmpty(menuItem.getAction())) {
 			MetaAction action = MetaAction.findByName(menuItem.getAction());
 			if (action == null) {
@@ -404,20 +405,20 @@ public class MetaLoader {
 				menu.setAction(action);
 			}
 		}
-		
+
 		menu = menu.save();
-		
+
 		for (MetaActionMenu pending : unresolved_menus2.get(menu.getName())) {
 			log.info("Resolved action menu : {}", pending.getName());
 			pending.setParent(menu);
 			pending.save();
 		}
-		
+
 		unresolved_menus2.removeAll(menu.getName());
 	}
-	
+
 	private Set<Group> findGroups(String groups) {
-		
+
 		if (Strings.isNullOrEmpty(groups))
 			return null;
 
@@ -433,14 +434,14 @@ public class MetaLoader {
 			}
 			all.add(group);
 		}
-		
+
 		return all;
 	}
-	
+
 	private void process(File file, String module) throws JAXBException, IOException {
-		
+
 		ObjectViews views = (ObjectViews) unmarshaller.unmarshal(file.openInputStream());
-		
+
 		if (views.getViews() != null)
 			for(AbstractView view : views.getViews())
 				loadView(view, module, file.getRelativePath());
@@ -448,20 +449,20 @@ public class MetaLoader {
 		if (views.getActions() != null)
 			for(Action action : views.getActions())
 				loadAction(action, module);
-		
+
 		if (views.getMenus() != null)
 			for (MenuItem menu : views.getMenus())
 				loadMenu(menu, module);
-		
+
 		if (views.getActionMenus() != null)
 			for (MenuItem menu : views.getActionMenus())
 				loadActionMenu(menu, module);
-		
+
 		if (views.getSelections() != null)
 			for(Selection selection : views.getSelections())
 				loadSelection(selection, module);
 	}
-	
+
 	// Fields names are not in ordered but some JVM implementation can.
 	private List<String> fieldNames(Class<?> klass) {
 		List<String> result = new ArrayList<String>();
@@ -475,41 +476,41 @@ public class MetaLoader {
 		}
 		return Lists.reverse(result);
 	}
-	
+
 	@SuppressWarnings("all")
 	private String createDefaultViews(final Class<?> klass) {
-		
+
 		final FormView formView = new FormView();
 		final GridView gridView = new GridView();
-		
+
 		String name = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, klass.getSimpleName());
 		String title = klass.getSimpleName();
-		
+
 		formView.setName(name + "-form");
 		gridView.setName(name + "-grid");
-		
+
 		formView.setModel(klass.getName());
 		gridView.setModel(klass.getName());
-		
+
 		formView.setTitle(title);
 		gridView.setTitle(title);
-		
+
 		List<AbstractWidget> formItems = Lists.newArrayList();
 		List<AbstractWidget> gridItems = Lists.newArrayList();
-		
+
 		Mapper mapper = Mapper.of(klass);
 		List<String> fields = Lists.reverse(fieldNames(klass));
-		
+
 		for(String n : fields) {
-			
+
 			Property p = mapper.getProperty(n);
 
 			if (p == null || p.isPrimary() || p.isVersion())
 				continue;
-			
+
 			Field field = new Field();
 			field.setName(p.getName());
-			
+
 			if (p.isCollection()) {
 				field.setColSpan(4);
 				field.setShowTitle(false);
@@ -517,33 +518,33 @@ public class MetaLoader {
 				gridItems.add(field);
 			formItems.add(field);
 		}
-		
+
 		formView.setItems(formItems);
 		gridView.setItems(gridItems);
-		
+
 		JPA.runInTransaction(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				
+
 				String module = null;
-				
+
 				Pattern pattern = Pattern.compile("(.*?)\\.([^.]+)\\.db\\.(.*)");
 				Matcher matcher = pattern.matcher(klass.getName());
 				if (matcher.matches()) {
 					module = "axelor-" + matcher.group(2);
 				}
-				
+
 				loadView(formView, module, null);
 				loadView(gridView, module, null);
 			}
 		});
-		
+
 		return toXml(ImmutableList.of(gridView, formView), false);
 	}
-	
+
 	private void loadFile(final File file, final String module) {
-		
+
 		JPA.runInTransaction(new Runnable() {
 
 			@Override
@@ -562,11 +563,11 @@ public class MetaLoader {
 	}
 
 	private void loadDefault(String outputPath) {
-		
+
 		java.io.File output = null;
 		if (!Strings.isNullOrEmpty(outputPath))
 			output = new java.io.File(outputPath);
-		
+
 		for(Class<?> klass : JPA.models()) {
 			String model = klass.getName();
 			Long found = MetaView.all().filter("self.model = ?1", model).count();
@@ -585,15 +586,15 @@ public class MetaLoader {
 			}
 		}
 	}
-	
+
 	/**
 	 * Load all JPA models.
-	 * 
+	 *
 	 */
 	public void loadModels() {
 
 		final MetaModelService service = new MetaModelService();
-		
+
 		JPA.runInTransaction(new Runnable() {
 
 			@Override
@@ -607,10 +608,10 @@ public class MetaLoader {
 			}
 		});
 	}
-	
+
 	/**
 	 * Load all Translations.
-	 * 
+	 *
 	 */
 	public void loadTranslations() {
 		if (translationsService == null || MetaTranslation.all().count() > 0) {
@@ -623,9 +624,9 @@ public class MetaLoader {
 			log.error("Error loading translations.", e);
 		}
 	}
-	
+
 	public void loadViews() throws Exception {
-		
+
 		if (MetaView.all().count() > 0 || moduleResolver == null) {
 			return;
 		}
@@ -652,43 +653,43 @@ public class MetaLoader {
 			}
 		}
 	}
-	
+
 	private static ModuleResolver moduleResolver = new ModuleResolver();
-	
+
 	private void _loadModuleInfo() throws IOException {
-		
+
 		for(File file : MetaScanner.findAll("module\\.properties")) {
-			
+
 			Properties cfg = new Properties();
 			cfg.load(file.openInputStream());
 
 			String name = cfg.getProperty("name");
 			String[] deps = cfg.getProperty("depends", "").trim().split("\\s+");
-			
+
 			moduleResolver.add(name, deps);
-			
+
 			MetaModule module = MetaModule.findByName(name);
 			if (module == null) {
 				module = new MetaModule();
 				module.setName(name);
 				module.setDepends(Joiner.on(",").join(deps));
 			}
-			
+
 			module.setModuleVersion(cfg.getProperty("version"));
 			module.setTitle(cfg.getProperty("title"));
 			module.setDescription(cfg.getProperty("description"));
-			
+
 			boolean removable = "true".equals(cfg.getProperty("removable"));
 			module.setRemovable(removable);
-			
+
 			if (!removable) {
 				module.setInstalled(true);
 			}
-			
+
 			module = module.save();
 		}
 	}
-	
+
 	private void loadModuleInfo() throws IOException {
 		JPA.runInTransaction(new Runnable() {
 			@Override
@@ -708,23 +709,23 @@ public class MetaLoader {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		loadModels();
-		
+
 		try {
 			loadViews();
 		} catch (Exception e){}
-		
+
 		loadDefault(outputPath);
 		loadTranslations();
 	}
-	
+
 	public void loadModule(MetaModule module) {
 		// load all the resources of the given module if it's installed
 		if (module.getInstalled() == Boolean.FALSE) {
 			return;
 		}
-		
+
 		// check whether all the dependencies are installed
 		for(String name : moduleResolver.resolve(module.getName())) {
 			if (name.equals(module.getName()) || "axelor-core".equals(name)) {
@@ -765,7 +766,7 @@ public class MetaLoader {
 		}
 		return result;
 	}
-	
+
 	public AbstractView findView(String model, String name, String type) {
 		MetaView view = null;
 		User user = AuthUtils.getUser();
@@ -794,7 +795,7 @@ public class MetaLoader {
 		}
 		return null;
 	}
-	
+
 	public AbstractView findView(String name, String module) {
 		MetaView view = MetaView.all()
 				.filter("self.name = :name AND self.module = :module")
@@ -808,7 +809,7 @@ public class MetaLoader {
 		}
 		return null;
 	}
-	
+
 	public Action findAction(String name) {
 		MetaAction action = MetaAction.findByName(name);
 		try {

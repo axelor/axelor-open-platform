@@ -42,6 +42,7 @@
   	<string name="title" required="true" namecolumn="true"/>
   	<string name="icon"/>
     <string name="module"/>
+    <boolean name="top"/>
   	<many-to-one name="parent" ref="MetaMenu"/>
   	<many-to-one name="action" ref="MetaAction"/>
   	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
