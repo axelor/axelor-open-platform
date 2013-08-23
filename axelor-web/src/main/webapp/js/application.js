@@ -87,6 +87,7 @@ load([
 	'js/widget/widget.slickgrid.js',
 	'js/widget/widget.dialog.js',
 	'js/widget/widget.search.js',
+	'js/widget/widget.menubar.js',
 
 	'js/form/form.base.js',
 	'js/form/form.actions.js',

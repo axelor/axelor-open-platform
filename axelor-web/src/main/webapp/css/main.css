@@ -341,28 +341,28 @@ html, body {
 	top: 46px; left: 0px; right: 0px; bottom: 0px;
 }
 
-.record-toolbar.btn-toolbar {
+.record-toolbar .navbar-inner {
 
 	border: 1px solid #d4d4d4;
 	border-left: none;
 	border-right: none;
 	
 	background-color: #f5f5f5;
+	background-image: none;
+	border-radius: 0;
 	
-	margin: 4px 0;
-	padding: 4px;
-	
-	overflow: hidden;
+	margin: 0;
+	padding: 0;
 }
 
-.record-toolbar.btn-toolbar .view-switcher {
+.record-toolbar .view-switcher {
 	margin-left: 4px;
 }
-.record-toolbar.btn-toolbar .view-switcher button {
+.record-toolbar .view-switcher button {
 	padding: 4px 8px;
 }
 
-.record-toolbar.btn-toolbar .view-title {
+.record-toolbar .view-title {
 	display: inline-block;
 	font-size: 13px;
 	font-weight: bold;
@@ -513,4 +513,9 @@ img.prefix-icon {
 
 ul.nav-menu-bar li.dropdown:hover > ul.dropdown-menu {
     margin: 0;
+}
+
+.btn-toolbar .nav {
+	font-size: 13px !important;
+	margin-bottom: 0;
 }
