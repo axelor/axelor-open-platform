@@ -4,17 +4,17 @@
       <div class="container">
         <div ui-menu-bar menus="menubar" handler="this"></div>
         <div class="btn-group">
-          <button class="btn" ng-click="onNew()" ng-if="hasButton('new')" ng-disabled="canSave()">
-            <i class="icon icon-file"></i> <span x-translate>New</span>
+          <button class="btn" ng-click="onNew()" ng-if="hasButton('new')" ng-disabled="canSave()" title="{{ 'New' | t}}">
+            <i class="icon icon-file"></i> <span ng-hide="tbTitleHide" x-translate>New</span>
           </button>
-          <button class="btn" ng-click="onEdit()" ng-if="hasButton('edit')" ng-disabled="!canEdit()">
-            <i class="icon icon-pencil"></i> <span x-translate>Edit</span>
+          <button class="btn" ng-click="onEdit()" ng-if="hasButton('edit')" ng-disabled="!canEdit()" title="{{ 'Edit' | t}}">
+            <i class="icon icon-pencil"></i> <span ng-hide="tbTitleHide" x-translate>Edit</span>
           </button>
-          <button class="btn" ng-click="onSave()" ng-if="canEditInline()" ng-disabled="!canSave()">
-            <i class="icon icon-save"></i> <span x-translate>Save</span>
+          <button class="btn" ng-click="onSave()" ng-if="canEditInline()" ng-disabled="!canSave()" title="{{ 'Save' | t}}">
+            <i class="icon icon-save"></i> <span ng-hide="tbTitleHide" x-translate>Save</span>
           </button>
-          <button class="btn" ng-click="onDelete()" ng-if="hasButton('delete')" ng-disabled="!canDelete()">
-            <i class="icon icon-remove"></i> <span x-translate>Delete</span>
+          <button class="btn" ng-click="onDelete()" ng-if="hasButton('delete')" ng-disabled="!canDelete()" title="{{ 'Delete' | t}}">
+            <i class="icon icon-remove"></i> <span ng-hide="tbTitleHide" x-translate>Delete</span>
           </button>
           <button class="btn" ui-grid-export="this" ng-if="hasButton('export')"></button>
         </div>
