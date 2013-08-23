@@ -54,9 +54,7 @@ function NavMenuCtrl($scope, $element, MenuService, NavService) {
 		if (this.isSubMenu(item) || item.isFolder) {
 			return;
 		}
-
 		NavService.openTabByName(item.action);
-		$scope.$apply();
 	};
 }
 
