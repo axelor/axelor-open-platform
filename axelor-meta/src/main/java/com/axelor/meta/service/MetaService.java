@@ -60,6 +60,7 @@ public class MetaService {
 			item.setPriority(menu.getPriority());
 			item.setTitle(menu.getTitle());
 			item.setIcon(menu.getIcon());
+			item.setTop(menu.getTop());
 
 			if (menu.getParent() != null) {
 				item.setParent(menu.getParent().getName());
