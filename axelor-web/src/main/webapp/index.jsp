@@ -12,6 +12,7 @@ String appDesc = settings.get("application.description", null);
 String appHome = settings.get("application.home", "");
 String appLogo = settings.get("application.logo", "");
 String appTheme = settings.get("application.theme", null);
+String appMenu = settings.get("application.menu", "left");
 
 String appTitle =  appName;
 
@@ -61,7 +62,9 @@ String appJS = AppSettings.getAppJS(getServletContext());
             <img src="<%= appLogo %>">
           </a>
           <% } %>
+          <% if (!"left".equals(appMenu)) { %>
           <ul class="nav" nav-menu-bar></ul>
+          <% } %>
           <ul class="nav nav-shortcuts pull-right">
             <li class="divider-vertical"></li>
             <li>
@@ -100,7 +103,11 @@ String appJS = AppSettings.getAppJS(getServletContext());
   <div ng-include src="'partials/error-window.html'"></div>
   
   <section role="main" id="container" ng-switch on="routePath[0]">
-	<div ng-switch-when="main" ng-include src="'partials/main.html'"></div>
+    <% if ("top".equals(appMenu)) { %>
+	<div ng-switch-when="main" ng-include src="'partials/main-nomenu.html'"></div>
+    <% } else { %>
+    <div ng-switch-when="main" ng-include src="'partials/main.html'"></div>
+    <% } %>
 	<div ng-switch-when="about" ng-include src="'partials/about.html'"></div>
 	<div ng-switch-when="welcome" ng-include src="'partials/welcome.html'"></div>
 	<div ng-switch-when="preferences" ng-include src="'partials/preferences.html'"></div>
