@@ -53,7 +53,7 @@ function GridViewCtrl($scope, $element) {
 
 		if (page && page.limit) {
 			pos = (page.from / page.limit) + 1;
-		} else if (params.options) {
+		} else if (params.options && params.options.mode === 'list') {
 			pos = +(params.options.state);
 		}
 
