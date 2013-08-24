@@ -171,7 +171,7 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 NavCtrl.$inject = ['$scope', '$rootScope', '$location', 'NavService'];
 function NavCtrl($scope, $rootScope, $location, NavService) {
 
-	$scope.tabs = Object.defineProperty($scope, 'tabs', {
+	$scope.navTabs = Object.defineProperty($scope, 'navTabs', {
 		get: function() {
 			return NavService.getTabs();
 		}
