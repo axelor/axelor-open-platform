@@ -104,9 +104,10 @@ var EmbeddedEditor = {
 	template:
 		'<fieldset class="form-item-group bordered-box">'+
 			'<div ui-view-form x-handler="this"></div>'+
-			'<div class="btn-toolbar pull-right" ng-show="!isReadonly()">'+
-				'<button type="button" class="btn btn-danger" ng-click="onClose()">Cancel</button> '+
-				'<button type="button" class="btn btn-primary" ng-click="onOK()">OK</button>'+
+			'<div class="btn-toolbar pull-right">'+
+				'<button type="button" class="btn btn btn-info" ng-click="onClose()" ng-show="isReadonly()"><span x-translate>Back</span></button> '+
+				'<button type="button" class="btn btn-danger" ng-click="onClose()" ng-show="!isReadonly()"><span x-translate>Cancel</span></button> '+
+				'<button type="button" class="btn btn-primary" ng-click="onOK()" ng-show="!isReadonly()"><span x-translate>OK</span></button>'+
 			'</div>'+
 		'</fieldset>'
 };
