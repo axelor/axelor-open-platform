@@ -7,6 +7,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.db.JPA;
+
 @XmlType
 public class Menu {
 
@@ -22,8 +24,12 @@ public class Menu {
 	@XmlElements({ @XmlElement(name = "item"), @XmlElement(name = "divider") })
 	private List<MenuItem> items;
 
-	public String getTitle() {
+	public String getDefaultTitle() {
 		return title;
+	}
+
+	public String getTitle() {
+		return JPA.translate(title);
 	}
 
 	public void setTitle(String title) {

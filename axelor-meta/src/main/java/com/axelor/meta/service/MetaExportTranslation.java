@@ -52,6 +52,8 @@ import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.Group;
 import com.axelor.meta.schema.views.Label;
+import com.axelor.meta.schema.views.Menu;
+import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.schema.views.Notebook;
 import com.axelor.meta.schema.views.Page;
 import com.axelor.meta.schema.views.Portal;
@@ -91,6 +93,8 @@ public class MetaExportTranslation {
 	private final String actionType = "action";
 	private final String filterType = "filter";
 	private final String placeholderType = "placeholder";
+	private final String menuBarType = "menuBar";
+	private final String menuItemType = "menuItem";
 
 	private File exportFile ;
 	private String exportLanguage ;
@@ -170,23 +174,23 @@ public class MetaExportTranslation {
 	private void loadAction(Action action) {
 		if(action instanceof ActionView) {
 			ActionView actionView = (ActionView) action;
-			String transalation = this.getTranslation(actionView.getDefaultTitle(), "", null, null);
-			this.appendToFile(actionView.getName(), actionView.getName(), this.actionType, actionView.getDefaultTitle(), transalation);
+			String translation = this.getTranslation(actionView.getDefaultTitle(), "", null, null);
+			this.appendToFile(actionView.getName(), actionView.getName(), this.actionType, actionView.getDefaultTitle(), translation);
 			this.exportMetaFilter("act:" + action.getName());
 		}
 		else if(action instanceof ActionValidate) {
 			ActionValidate actionValidate = (ActionValidate) action;
 			for(Validator validator : actionValidate.getValidators()) {
-				String transalation = this.getTranslation(validator.getMessage(), "", null, null);
-				this.appendToFile(actionValidate.getName(), actionValidate.getName(), this.actionType, validator.getMessage(), transalation);
+				String translation = this.getTranslation(validator.getMessage(), "", null, null);
+				this.appendToFile(actionValidate.getName(), actionValidate.getName(), this.actionType, validator.getMessage(), translation);
 			}
 		}
 		else if(action instanceof ActionCondition) {
 			ActionCondition actionCondition = (ActionCondition) action;
 			for(Check check : actionCondition.getConditions()) {
 				if(check.getDefaultError() != null) {
-					String transalation = this.getTranslation(check.getDefaultError(), "", null, null);
-					this.appendToFile(actionCondition.getName(), actionCondition.getName(), this.actionType, check.getDefaultError(), transalation);
+					String translation = this.getTranslation(check.getDefaultError(), "", null, null);
+					this.appendToFile(actionCondition.getName(), actionCondition.getName(), this.actionType, check.getDefaultError(), translation);
 				}
 			}
 		}
@@ -194,8 +198,8 @@ public class MetaExportTranslation {
 
 	private void exportMenuActions() {
 		for (MetaActionMenu actionMenu : MetaActionMenu.findByModule(this.currentModule).order("name").fetch()) {
-			String transalation = this.getTranslation(actionMenu.getTitle(), "", null, null);
-			this.appendToFile(actionMenu.getName(), actionMenu.getName(), this.actionMenuType, actionMenu.getTitle(), transalation);
+			String translation = this.getTranslation(actionMenu.getTitle(), "", null, null);
+			this.appendToFile(actionMenu.getName(), actionMenu.getName(), this.actionMenuType, actionMenu.getTitle(), translation);
 		}
 	}
 
@@ -243,31 +247,31 @@ public class MetaExportTranslation {
 
 	private void loadButton(AbstractView abstractView, Button button) {
 		if(!Strings.isNullOrEmpty(button.getDefaultTitle())) {
-			String transalation = this.getTranslation(button.getDefaultTitle(), "", null, null);
-			this.appendToFile(abstractView.getName(), button.getName(), this.buttonType, button.getDefaultTitle(), transalation);
+			String translation = this.getTranslation(button.getDefaultTitle(), "", null, null);
+			this.appendToFile(abstractView.getName(), button.getName(), this.buttonType, button.getDefaultTitle(), translation);
 		}
 
 		if(!Strings.isNullOrEmpty(button.getDefaultPrompt())) {
-			String transalation = this.getTranslation(button.getDefaultPrompt(), "", null, null);
-			this.appendToFile(abstractView.getName(), button.getName(), this.buttonType, button.getDefaultPrompt(), transalation);
+			String translation = this.getTranslation(button.getDefaultPrompt(), "", null, null);
+			this.appendToFile(abstractView.getName(), button.getName(), this.buttonType, button.getDefaultPrompt(), translation);
 		}
 
 		if(!Strings.isNullOrEmpty(button.getDefaultHelp())) {
-			String transalation = this.getTranslation(button.getDefaultHelp(), "", null, null);
-			this.appendToFile(abstractView.getName(), button.getName(), this.buttonType, button.getDefaultHelp(), transalation);
+			String translation = this.getTranslation(button.getDefaultHelp(), "", null, null);
+			this.appendToFile(abstractView.getName(), button.getName(), this.buttonType, button.getDefaultHelp(), translation);
 		}
 	}
 
 	private void loadSimpleWidget(AbstractView abstractView, SimpleWidget widget, String type) {
 
 		if(!Strings.isNullOrEmpty(widget.getDefaultTitle())) {
-			String transalation = this.getTranslation(widget.getDefaultTitle(), "", null, null);
-			this.appendToFile(abstractView.getName(), widget.getName(), type, widget.getDefaultTitle(), transalation);
+			String translation = this.getTranslation(widget.getDefaultTitle(), "", null, null);
+			this.appendToFile(abstractView.getName(), widget.getName(), type, widget.getDefaultTitle(), translation);
 		}
 
 		if(!Strings.isNullOrEmpty(widget.getDefaultHelp())) {
-			String transalation = this.getTranslation(widget.getDefaultHelp(), "", null, null);
-			this.appendToFile(abstractView.getName(), widget.getName(), type, widget.getDefaultHelp(), transalation);
+			String translation = this.getTranslation(widget.getDefaultHelp(), "", null, null);
+			this.appendToFile(abstractView.getName(), widget.getName(), type, widget.getDefaultHelp(), translation);
 		}
 
 	}
@@ -275,12 +279,34 @@ public class MetaExportTranslation {
 	private void loadAbstractView(AbstractView abstractView) {
 		if(abstractView.getToolbar() != null) {
 			for (Button button : abstractView.getToolbar()) {
-				this.loadButton(abstractView,button);
+				this.loadButton(abstractView, button);
+			}
+		}
+		if(abstractView.getMenubar() != null) {
+			for (Menu menu : abstractView.getMenubar()) {
+				this.loadMenu(abstractView, menu);
 			}
 		}
 
-		String transalation = this.getTranslation(abstractView.getDefaultTitle(), "", null, null);
-		this.appendToFile(abstractView.getModel(), abstractView.getName(), abstractView.getType(), abstractView.getDefaultTitle(), transalation);
+		String translation = this.getTranslation(abstractView.getDefaultTitle(), "", null, null);
+		this.appendToFile(abstractView.getModel(), abstractView.getName(), abstractView.getType(), abstractView.getDefaultTitle(), translation);
+	}
+
+	private void loadMenu(AbstractView abstractView, Menu menu) {
+		if(!Strings.isNullOrEmpty(menu.getTitle())) {
+			String translation = this.getTranslation(menu.getDefaultTitle(), "", null, null);
+			this.appendToFile(abstractView.getName(), menu.getDefaultTitle(), this.menuBarType, menu.getDefaultTitle(), translation);
+		}
+		for (MenuItem menuItem : menu.getItems()) {
+			this.loadMenuItem(menuItem);
+		}
+	}
+
+	private void loadMenuItem(MenuItem menuItem) {
+		if(!Strings.isNullOrEmpty(menuItem.getDefaultTitle())) {
+			String translation = this.getTranslation(menuItem.getDefaultTitle(), "", null, null);
+			this.appendToFile(menuItem.getName(), menuItem.getName(), this.menuItemType, menuItem.getDefaultTitle(), translation);
+		}
 	}
 
 	private void loadWidget(AbstractView abstractView, AbstractWidget widget) {
@@ -309,13 +335,13 @@ public class MetaExportTranslation {
 
 	private void exportField(AbstractView abstractView, Field field) {
 		if(!Strings.isNullOrEmpty(field.getDefaultTitle()) || !Strings.isNullOrEmpty(field.getDefaultHelp())) {
-			String transalation = this.getTranslation(field.getDefaultTitle(), "", abstractView.getModel(), this.fieldType);
-			String transalationHelp = this.getTranslation(field.getDefaultHelp(), "", abstractView.getModel(), this.helpType);
-			this.appendToFile(abstractView.getModel(), field.getDefaultTitle(), this.viewFieldType, field.getDefaultTitle(), transalation, field.getDefaultHelp(), transalationHelp);
+			String translation = this.getTranslation(field.getDefaultTitle(), "", abstractView.getModel(), this.fieldType);
+			String translationHelp = this.getTranslation(field.getDefaultHelp(), "", abstractView.getModel(), this.helpType);
+			this.appendToFile(abstractView.getModel(), field.getDefaultTitle(), this.viewFieldType, field.getDefaultTitle(), translation, field.getDefaultHelp(), translationHelp);
 		}
 		if(!Strings.isNullOrEmpty(field.getDefaultPlaceholder())) {
-			String transalation = this.getTranslation(field.getDefaultPlaceholder(), "", abstractView.getModel(), this.placeholderType);
-			this.appendToFile(abstractView.getModel(), field.getDefaultPlaceholder(), this.placeholderType, field.getDefaultPlaceholder(), transalation);
+			String translation = this.getTranslation(field.getDefaultPlaceholder(), "", abstractView.getModel(), this.placeholderType);
+			this.appendToFile(abstractView.getModel(), field.getDefaultPlaceholder(), this.placeholderType, field.getDefaultPlaceholder(), translation);
 		}
 	}
 
@@ -348,19 +374,19 @@ public class MetaExportTranslation {
 
 	private void exportCharts() {
 		for (MetaChart chart : MetaChart.findByModule(this.currentModule).order("name").fetch()) {
-			String transalation = this.getTranslation(chart.getTitle(), "", null, null);
-			this.appendToFile(chart.getName(), chart.getName(), this.chartType, chart.getTitle(), transalation);
+			String translation = this.getTranslation(chart.getTitle(), "", null, null);
+			this.appendToFile(chart.getName(), chart.getName(), this.chartType, chart.getTitle(), translation);
 
 			if(!Strings.isNullOrEmpty(chart.getCategoryTitle())) {
-				String transalationTitle = this.getTranslation(chart.getCategoryTitle(), "", null, null);
-				this.appendToFile(chart.getName(), chart.getName(), this.chartType, chart.getCategoryTitle(), transalationTitle);
+				String translationTitle = this.getTranslation(chart.getCategoryTitle(), "", null, null);
+				this.appendToFile(chart.getName(), chart.getName(), this.chartType, chart.getCategoryTitle(), translationTitle);
 			}
 
 			if(chart.getChartSeries() != null) {
 				for (MetaChartSeries serie : chart.getChartSeries()) {
 					if(!Strings.isNullOrEmpty(serie.getTitle())) {
-						String transalationSerie = this.getTranslation(serie.getTitle(), "", null, null);
-						this.appendToFile(serie.getTitle(), serie.getTitle(), this.chartType, serie.getTitle(), transalationSerie);
+						String translationSerie = this.getTranslation(serie.getTitle(), "", null, null);
+						this.appendToFile(serie.getTitle(), serie.getTitle(), this.chartType, serie.getTitle(), translationSerie);
 					}
 				}
 			}
@@ -407,24 +433,24 @@ public class MetaExportTranslation {
 		String packageName = module.getPackageName()+"."+entity.getName();
 
 		for (Property field : entity.getFields()) {
-			String transalation = this.getTranslation(field.getName(), "", packageName, this.fieldType);
-			String transalationHelp = this.getTranslation(field.getName(), "", packageName, this.helpType);
-			this.appendToFile(packageName, field.getName(), this.fieldType, field.getTitle(), transalation, field.getHelp(), transalationHelp);
+			String translation = this.getTranslation(field.getName(), "", packageName, this.fieldType);
+			String translationHelp = this.getTranslation(field.getName(), "", packageName, this.helpType);
+			this.appendToFile(packageName, field.getName(), this.fieldType, field.getTitle(), translation, field.getHelp(), translationHelp);
 		}
 	}
 
 	private void exportMenus() {
 		for (MetaMenu menu : MetaMenu.findByModule(this.currentModule).order("name").fetch()) {
-			String transalation = this.getTranslation(menu.getTitle(), "", null, null);
-			this.appendToFile(menu.getName(), menu.getTitle(), this.menuType, menu.getTitle(), transalation);
+			String translation = this.getTranslation(menu.getTitle(), "", null, null);
+			this.appendToFile(menu.getName(), menu.getTitle(), this.menuType, menu.getTitle(), translation);
 		}
 	}
 
 	private void exportSelects() {
 		for (MetaSelect select : MetaSelect.findByModule(this.currentModule).order("name").fetch()) {
 			for (MetaSelectItem item : select.getItems()) {
-				String transalation = this.getTranslation(item.getTitle(), "", null, null);
-				this.appendToFile(select.getName(), item.getValue(), this.selectType, item.getTitle(), transalation);
+				String translation = this.getTranslation(item.getTitle(), "", null, null);
+				this.appendToFile(select.getName(), item.getValue(), this.selectType, item.getTitle(), translation);
 			}
 		}
 	}
