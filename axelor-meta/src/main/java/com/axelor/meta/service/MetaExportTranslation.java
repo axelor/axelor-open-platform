@@ -24,6 +24,7 @@ import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaChart;
 import com.axelor.meta.db.MetaChartSeries;
+import com.axelor.meta.db.MetaFilter;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.MetaSelect;
@@ -55,6 +56,8 @@ import com.axelor.meta.schema.views.Notebook;
 import com.axelor.meta.schema.views.Page;
 import com.axelor.meta.schema.views.Portal;
 import com.axelor.meta.schema.views.Portlet;
+import com.axelor.meta.schema.views.SearchFilters;
+import com.axelor.meta.schema.views.SearchFilters.SearchFilter;
 import com.axelor.meta.schema.views.Separator;
 import com.axelor.meta.schema.views.SimpleContainer;
 import com.axelor.meta.schema.views.SimpleWidget;
@@ -86,6 +89,7 @@ public class MetaExportTranslation {
 	private final String menuType = "menu";
 	private final String actionMenuType = "actionMenu";
 	private final String actionType = "action";
+	private final String filterType = "filter";
 
 	private File exportFile ;
 	private String exportLanguage ;
@@ -96,19 +100,19 @@ public class MetaExportTranslation {
 
 		exportPath = exportPath.endsWith("/") ? exportPath : exportPath.concat("/");
 		this.exportLanguage = exportLanguage;
-		
+
 		List<MetaModule> modules = MetaModule.all().filter("self.installed = true").fetch();
-		
+
 		//axelor-core
 		MetaModule coreModule = new MetaModule();
 		coreModule.setName("axelor-core");
 		modules.add(coreModule);
-		
+
 		for(MetaModule module : modules) {
 			this.exportPath = exportPath + module.getName() + "/";
-			this.exportFile = new File(this.exportPath + this.exportLanguage + ".csv");
+			this.exportFile = new File(Files.simplifyPath(this.exportPath + this.exportLanguage + ".csv"));
 			this.currentModule = module.getName();
-			
+
 			log.info("Export {} module to {}.", module.getName(), this.exportFile.getPath());
 
 			this.exportMenus();
@@ -120,6 +124,24 @@ public class MetaExportTranslation {
 			this.exportActions();
 			this.exportOther();
 		}
+	}
+
+	private void exportSearchFilters(SearchFilters searchFilters) {
+		for (SearchFilter filter : searchFilters.getFilters()) {
+			String translationFilter = this.getTranslation(filter.getDefaultTitle(), "", null, null);
+			this.appendToFile(searchFilters.getModel(), filter.getDefaultTitle(), this.filterType, filter.getDefaultTitle(), translationFilter);
+		}
+		this.exportMetaFilter(searchFilters.getName());
+	}
+
+	private void exportMetaFilter(String filterView) {
+		MetaFilter filter = MetaFilter.all().filter("self.filterView = ?1", filterView).fetchOne();
+		if (filter == null) {
+			return;
+		}
+		String translation = this.getTranslation(filter.getTitle(), "", null,
+				null);
+		this.appendToFile(filterView, filterView, this.filterType, filter.getTitle(), translation);
 	}
 
 	private void exportOther() {
@@ -149,6 +171,7 @@ public class MetaExportTranslation {
 			ActionView actionView = (ActionView) action;
 			String transalation = this.getTranslation(actionView.getDefaultTitle(), "", null, null);
 			this.appendToFile(actionView.getName(), actionView.getName(), this.actionType, actionView.getDefaultTitle(), transalation);
+			this.exportMetaFilter("act:" + action.getName());
 		}
 		else if(action instanceof ActionValidate) {
 			ActionValidate actionValidate = (ActionValidate) action;
@@ -212,6 +235,9 @@ public class MetaExportTranslation {
 				this.loadWidget(abstractView, widget);
 			}
 		}
+		else if (abstractView instanceof SearchFilters) {
+			this.exportSearchFilters((SearchFilters) abstractView);
+		}
 	}
 
 	private void loadButton(AbstractView abstractView, Button button) {
@@ -219,12 +245,12 @@ public class MetaExportTranslation {
 			String transalation = this.getTranslation(button.getDefaultTitle(), "", null, null);
 			this.appendToFile(abstractView.getName(), button.getName(), this.buttonType, button.getDefaultTitle(), transalation);
 		}
-		
+
 		if(!Strings.isNullOrEmpty(button.getDefaultPrompt())) {
 			String transalation = this.getTranslation(button.getDefaultPrompt(), "", null, null);
 			this.appendToFile(abstractView.getName(), button.getName(), this.buttonType, button.getDefaultPrompt(), transalation);
 		}
-		
+
 		if(!Strings.isNullOrEmpty(button.getDefaultHelp())) {
 			String transalation = this.getTranslation(button.getDefaultHelp(), "", null, null);
 			this.appendToFile(abstractView.getName(), button.getName(), this.buttonType, button.getDefaultHelp(), transalation);
@@ -232,17 +258,17 @@ public class MetaExportTranslation {
 	}
 
 	private void loadSimpleWidget(AbstractView abstractView, SimpleWidget widget, String type) {
-		
+
 		if(!Strings.isNullOrEmpty(widget.getDefaultTitle())) {
 			String transalation = this.getTranslation(widget.getDefaultTitle(), "", null, null);
 			this.appendToFile(abstractView.getName(), widget.getName(), type, widget.getDefaultTitle(), transalation);
 		}
-		
+
 		if(!Strings.isNullOrEmpty(widget.getDefaultHelp())) {
 			String transalation = this.getTranslation(widget.getDefaultHelp(), "", null, null);
 			this.appendToFile(abstractView.getName(), widget.getName(), type, widget.getDefaultHelp(), transalation);
 		}
-		
+
 	}
 
 	private void loadAbstractView(AbstractView abstractView) {
@@ -251,7 +277,7 @@ public class MetaExportTranslation {
 				this.loadButton(abstractView,button);
 			}
 		}
-		
+
 		String transalation = this.getTranslation(abstractView.getDefaultTitle(), "", null, null);
 		this.appendToFile(abstractView.getModel(), abstractView.getName(), abstractView.getType(), abstractView.getDefaultTitle(), transalation);
 	}
@@ -301,13 +327,13 @@ public class MetaExportTranslation {
 		}
 		else if(container instanceof SimpleContainer) {
 			SimpleContainer simpleContainer = (SimpleContainer) container;
-			
+
 			if(simpleContainer.getItems() != null) {
 				if(simpleContainer instanceof Group)
 					this.loadSimpleWidget(view, (SimpleWidget) container, this.groupType);
 				else if(simpleContainer instanceof Page)
 					this.loadSimpleWidget(view, (SimpleWidget) container, this.pageType);
-				
+
 				for (AbstractWidget widget : simpleContainer.getItems()) {
 					this.loadWidget(view, widget) ;
 				}
@@ -319,12 +345,12 @@ public class MetaExportTranslation {
 		for (MetaChart chart : MetaChart.findByModule(this.currentModule).order("name").fetch()) {
 			String transalation = this.getTranslation(chart.getTitle(), "", null, null);
 			this.appendToFile(chart.getName(), chart.getName(), this.chartType, chart.getTitle(), transalation);
-			
+
 			if(!Strings.isNullOrEmpty(chart.getCategoryTitle())) {
 				String transalationTitle = this.getTranslation(chart.getCategoryTitle(), "", null, null);
 				this.appendToFile(chart.getName(), chart.getName(), this.chartType, chart.getCategoryTitle(), transalationTitle);
 			}
-			
+
 			if(chart.getChartSeries() != null) {
 				for (MetaChartSeries serie : chart.getChartSeries()) {
 					if(!Strings.isNullOrEmpty(serie.getTitle())) {
@@ -338,7 +364,7 @@ public class MetaExportTranslation {
 
 	private void exportObjects() {
 		List<org.reflections.vfs.Vfs.File> files = MetaScanner.findAll("domains\\.(.*?)\\.xml");
-		
+
 		Collections.sort(files, new Comparator<org.reflections.vfs.Vfs.File>() {
 			@Override
 			public int compare(org.reflections.vfs.Vfs.File o1, org.reflections.vfs.Vfs.File o2) {
@@ -374,7 +400,7 @@ public class MetaExportTranslation {
 
 	private void exportEntity(Entity entity, Module module) throws IOException {
 		String packageName = module.getPackageName()+"."+entity.getName();
-		
+
 		for (Property field : entity.getFields()) {
 			String transalation = this.getTranslation(field.getName(), "", packageName, this.fieldType);
 			String transalationHelp = this.getTranslation(field.getName(), "", packageName, this.helpType);
@@ -399,17 +425,17 @@ public class MetaExportTranslation {
 	}
 
 	private String createHeader() {
-		
+
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		List<String> headerList = ImmutableList.of("domain", "name", "type", "title", "title_t", "help", "help_t");
-		
+
 		for (String column : headerList) {
-			
+
 			if(!first) {
 				sb.append(",");
 			}
-			
+
 			first = false;
 			sb.append("\"").append(column).append("\"");
 		}
@@ -419,17 +445,17 @@ public class MetaExportTranslation {
 
 	private String getTranslation(String key, String defaultValue, String domain, String type) {
 		MetaTranslation translation = null;
-		
+
 		List<Object> params = Lists.newArrayList();
 		String query = "self.key = ?1 AND self.language = ?2";
 		params.add(key);
 		params.add(this.exportLanguage);
-		
+
 		if(domain != null) {
 			query += " AND (self.domain IS NULL OR self.domain = ?3)";
 			params.add(domain);
 		}
-		
+
 		if(type != null) {
 			query += " AND self.type = ?" + (params.size() + 1);
 			params.add(type);
@@ -439,7 +465,7 @@ public class MetaExportTranslation {
 		}
 
 		translation = MetaTranslation.all().filter(query, params.toArray()).order("domain").fetchOne();
-		
+
 		if (translation != null && !Strings.isNullOrEmpty(translation.getTranslation())) {
 			return translation.getTranslation();
 		}
@@ -450,13 +476,13 @@ public class MetaExportTranslation {
 		try {
 			JAXBContext context = JAXBContext.newInstance(DomainModels.class);
 			Unmarshaller unmarshaller = context.createUnmarshaller();
-	
+
 			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			Schema schema = schemaFactory.newSchema(Resources.getResource(LOCAL_SCHEMA_DOMAIN));
-	
+
 			unmarshaller.setSchema(schema);
 			return (DomainModels) unmarshaller.unmarshal(openInputStream);
-		} 
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -484,13 +510,13 @@ public class MetaExportTranslation {
 		if(Strings.isNullOrEmpty(content)) {
 			return;
 		}
-		
+
 		try {
 			if(!this.exportFile.exists()) {
 				Files.createParentDirs(this.exportFile);
 				Files.write(this.createHeader(), this.exportFile, Charsets.UTF_8);
 			}
-			
+
 			Files.append(content, this.exportFile, Charsets.UTF_8);
 		}
 		catch(Exception ex) {

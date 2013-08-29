@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.db.JPA;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -19,7 +20,7 @@ public class SearchFilters extends AbstractView {
 
 	@XmlElement(name = "filter")
 	private List<SearchFilter> filters;
-	
+
 	public List<SearchFilter> getFilters() {
 		return filters;
 	}
@@ -37,11 +38,15 @@ public class SearchFilters extends AbstractView {
 		@JsonIgnore
 		@XmlElement(name = "context")
 		private List<SearchContext> contexts;
-		
-		public String getTitle() {
+
+		public String getDefaultTitle() {
 			return title;
 		}
-		
+
+		public String getTitle() {
+			return JPA.translate(title);
+		}
+
 		public String getDomain() {
 			return domain;
 		}
@@ -60,17 +65,17 @@ public class SearchFilters extends AbstractView {
 
 	@XmlType
 	public static class SearchContext {
-		
+
 		@XmlAttribute
 		private String name;
-		
+
 		@XmlAttribute
 		private String value;
-		
+
 		public String getName() {
 			return name;
 		}
-		
+
 		public String getValue() {
 			return value;
 		}
