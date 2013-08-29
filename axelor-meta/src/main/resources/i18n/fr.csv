@@ -1,259 +1,296 @@
 "domain","name","type","title","title_t","help","help_t"
-"menu-admin","Administration","menu","Administration","Administration","",""
-"menu-meta-model","All Models","menu","All Models","Les objets","",""
-"menu-meta-module","All Modules","menu","All Modules","Les Modules","",""
-"menu-model","Model Management","menu","Model Management","Gestion des objets","",""
-"menu-module-management","Module Management","menu","Module Management","Gestion des modules","",""
-"menu-user-preferences","Preferences","menu","Preferences","Préférences","",""
-"menu-view-action-menus","Action Menus","menu","Action Menus","Les Action Menus","",""
-"menu-view-actions","All Actions","menu","All Actions","Les Actions","",""
-"menu-view-all","All Views","menu","All Views","Les Vues","",""
-"menu-view-charts","All Charts","menu","All Charts","Les Graphiques","",""
-"menu-view-management","View Management","menu","View Management","Gestion des vues","",""
-"menu-view-menus","All Menus","menu","All Menus","Les Menus","",""
-"menu-view-selects","All Selects","menu","All Selects","Les Sélections","",""
-"menu-view-translations","All Translations","menu","All Translations","Les Traductions","",""
-"com.axelor.meta.db.MetaModule","name","field","","Nom","",""
-"com.axelor.meta.db.MetaModule","title","field","","Libellé","",""
-"com.axelor.meta.db.MetaModule","description","field","","Description","",""
-"com.axelor.meta.db.MetaModule","depends","field","","Dépend de","",""
-"com.axelor.meta.db.MetaModule","moduleVersion","field","Version","Version","",""
-"com.axelor.meta.db.MetaModule","removable","field","","Supprimable ?","",""
-"com.axelor.meta.db.MetaModule","installed","field","","Installé ?","",""
-"com.axelor.meta.db.MetaView","name","field","","Nom","",""
-"com.axelor.meta.db.MetaView","title","field","","Libellé","",""
-"com.axelor.meta.db.MetaView","type","field","","Type","",""
-"com.axelor.meta.db.MetaView","priority","field","","Priorité","",""
-"com.axelor.meta.db.MetaView","model","field","","Objet","",""
-"com.axelor.meta.db.MetaView","module","field","","Module","",""
-"com.axelor.meta.db.MetaView","xml","field","","XML","",""
-"com.axelor.meta.db.MetaView","groups","field","","Groupes","",""
-"com.axelor.meta.db.MetaMenu","priority","field","","Priorité","",""
-"com.axelor.meta.db.MetaMenu","name","field","","Nom","",""
-"com.axelor.meta.db.MetaMenu","title","field","","Libellé","",""
-"com.axelor.meta.db.MetaMenu","icon","field","","Icone","",""
-"com.axelor.meta.db.MetaMenu","module","field","","Module","",""
-"com.axelor.meta.db.MetaMenu","parent","field","","Parent","",""
-"com.axelor.meta.db.MetaMenu","action","field","","Action","",""
-"com.axelor.meta.db.MetaMenu","groups","field","","Groupes","",""
-"com.axelor.meta.db.MetaActionMenu","name","field","","Nom","",""
-"com.axelor.meta.db.MetaActionMenu","title","field","","Libellé","",""
-"com.axelor.meta.db.MetaActionMenu","category","field","","Catégorie","Category name to group action menus.","Nom de la catégorie pour grouper les actions menus"
-"com.axelor.meta.db.MetaActionMenu","module","field","","Module","",""
-"com.axelor.meta.db.MetaActionMenu","parent","field","","Parent","",""
-"com.axelor.meta.db.MetaActionMenu","action","field","","Action","",""
-"com.axelor.meta.db.MetaAction","name","field","","Nom","",""
-"com.axelor.meta.db.MetaAction","type","field","","Type","",""
-"com.axelor.meta.db.MetaAction","model","field","","Modèle","",""
-"com.axelor.meta.db.MetaAction","module","field","","Module","",""
-"com.axelor.meta.db.MetaAction","xml","field","","XML","",""
-"com.axelor.meta.db.MetaSelect","name","field","","Nom","",""
-"com.axelor.meta.db.MetaSelect","priority","field","","Priorité","",""
-"com.axelor.meta.db.MetaSelect","module","field","","Module","",""
-"com.axelor.meta.db.MetaSelect","items","field","","Elément","",""
-"com.axelor.meta.db.MetaSelectItem","value","field","","Valeur","",""
-"com.axelor.meta.db.MetaSelectItem","title","field","","Libellé","",""
-"com.axelor.meta.db.MetaSelectItem","select","field","","Sélection","",""
-"com.axelor.meta.db.MetaModel","name","field","Name","Nom","",""
-"com.axelor.meta.db.MetaModel","packageName","field","Package","Package","",""
-"com.axelor.meta.db.MetaModel","tableName","field","Table","Table","",""
-"com.axelor.meta.db.MetaModel","metaFields","field","Fields","Champs","",""
-"com.axelor.meta.db.MetaModel","fullName","field","Fullname","Nom complet","",""
-"com.axelor.meta.db.MetaField","metaModel","field","","Meta Model","",""
-"com.axelor.meta.db.MetaField","name","field","Name","Nom","",""
-"com.axelor.meta.db.MetaField","packageName","field","Package","Nom du package","",""
-"com.axelor.meta.db.MetaField","typeName","field","Type","Type","",""
-"com.axelor.meta.db.MetaField","label","field","Label","Libellé","",""
-"com.axelor.meta.db.MetaField","relationship","field","Relationship","Relation","",""
-"com.axelor.meta.db.MetaField","mappedBy","field","Mapped by","Mappé avec","",""
-"com.axelor.meta.db.MetaField","description","field","Description","Description","",""
-"com.axelor.meta.db.MetaTranslation","key","field","","Clé","",""
-"com.axelor.meta.db.MetaTranslation","language","field","","Langue","",""
-"com.axelor.meta.db.MetaTranslation","translation","field","","Traduction","",""
-"com.axelor.meta.db.MetaTranslation","domain","field","","Domain","",""
-"com.axelor.meta.db.MetaTranslation","type","field","","Type","",""
-"com.axelor.meta.db.MetaFile","content","field","File","Fichier","",""
-"com.axelor.meta.db.MetaFile","fileName","field","","Nom du fichier","",""
-"com.axelor.meta.db.MetaFile","size","field","Size in bytes","Taille en bytes","",""
-"com.axelor.meta.db.MetaFile","mine","field","File type","Type de fichier","",""
-"com.axelor.meta.db.MetaFile","description","field","","Description","",""
-"com.axelor.meta.db.MetaFile","sizeText","field","Size","Taille","",""
-"com.axelor.meta.db.MetaAttachment","objectName","field","","Nom de l'objet","",""
-"com.axelor.meta.db.MetaAttachment","objectId","field","","ID de l'objet","",""
-"com.axelor.meta.db.MetaAttachment","metaFile","field","File","Meta File","",""
-"com.axelor.meta.db.MetaChartSeries","key","field","","Clé","",""
-"com.axelor.meta.db.MetaChartSeries","groupBy","field","","Grouper par","",""
-"com.axelor.meta.db.MetaChartSeries","title","field","","Libellé","",""
-"com.axelor.meta.db.MetaChartSeries","type","field","","Type","",""
-"com.axelor.meta.db.MetaChartSeries","side","field","","Côté","",""
-"com.axelor.meta.db.MetaChartSeries","aggregate","field","","Regrouper par","",""
-"com.axelor.meta.db.MetaChart","name","field","","Nom","",""
-"com.axelor.meta.db.MetaChart","module","field","","Module","",""
-"com.axelor.meta.db.MetaChart","title","field","","Titre","",""
-"com.axelor.meta.db.MetaChart","stacked","field","","Empilement","",""
-"com.axelor.meta.db.MetaChart","query","field","","Requête","",""
-"com.axelor.meta.db.MetaChart","queryType","field","","Type de requete","",""
-"com.axelor.meta.db.MetaChart","categoryKey","field","","Clé de la catégorie","",""
-"com.axelor.meta.db.MetaChart","categoryType","field","","Type de la catégorie","",""
-"com.axelor.meta.db.MetaChart","categoryTitle","field","","Libellé de la catégorie","",""
-"com.axelor.meta.db.MetaChart","chartSeries","field","","Séries de données","",""
-"com.axelor.meta.db.MetaUser","user","field","","Utilisateur","",""
-"com.axelor.meta.db.MetaUser","email","field","","Email","",""
-"com.axelor.meta.db.MetaUser","language","field","","Langue","",""
-"com.axelor.meta.db.MetaUser","action","field","","Action","",""
-"action.type.selection","action-attrs","select","action-attrs","action-attrs","",""
-"action.type.selection","action-view","select","action-view","action-view","",""
-"action.type.selection","action-group","select","action-group","action-group","",""
-"action.type.selection","action-validate","select","action-validate","action-validate","",""
-"action.type.selection","action-condition","select","action-condition","action-condition","",""
-"action.type.selection","action-record","select","action-record","action-record","",""
-"action.type.selection","action-method","select","action-method","action-method","",""
-"action.type.selection","action-import","select","action-import","action-import","",""
-"action.type.selection","action-export","select","action-export","action-export","",""
-"action.type.selection","action-ws","select","action-ws","action-ws","",""
-"action.type.selection","action-workflow","select","action-workflow","action-workflow","",""
-"meta.translation.type.selection","field","select","Field","Champ","",""
-"meta.translation.type.selection","help","select","Help","Aide","",""
-"meta.translation.type.selection","other","select","Other","Autre","",""
-"relationship.field.selection","OneToOne","select","OneToOne","OneToOne","",""
-"relationship.field.selection","ManyToOne","select","ManyToOne","ManyToOne","",""
-"relationship.field.selection","OneToMany","select","OneToMany","OneToMany","",""
-"relationship.field.selection","ManyToMany","select","ManyToMany","ManyToMany","",""
-"selection.chart.aggregate","sum","select","Sum","Somme","",""
-"selection.chart.aggregate","count","select","Count","Compteur","",""
-"selection.chart.aggregate","average","select","Average","Moyenne","",""
-"selection.chart.aggregate","minimum","select","Minimum","Minimum","",""
-"selection.chart.aggregate","maximum","select","Maximum","Maximum","",""
-"selection.chart.aggregate","variance","select","Variance","Variance","",""
-"selection.chart.aggregate","deviation","select","Std. Deviation","Écart type","",""
-"selection.chart.qtype","jpql","select","JPQL","JPQL","",""
-"selection.chart.qtype","sql","select","SQL","SQL","",""
-"selection.chart.side","left","select","Left","Gauche","",""
-"selection.chart.side","right","select","Right","Droite","",""
-"selection.chart.type","pie","select","Pie","Camembert","",""
-"selection.chart.type","bar","select","Bar","Histogramme","",""
-"selection.chart.type","hbar","select","HBar","Histogramme horizontal","",""
-"selection.chart.type","line","select","Line","Ligne","",""
-"selection.chart.type","area","select","Area","Aire","",""
-"selection.chart.xtype","number","select","Number","Nombre","",""
-"selection.chart.xtype","decimal","select","Decimal","Décimal","",""
-"selection.chart.xtype","date","select","Date","Date","",""
-"selection.chart.xtype","time","select","Time","Heure","",""
-"selection.chart.xtype","month","select","Month","Mois","",""
-"selection.chart.xtype","year","select","Year","Année","",""
-"selection.chart.xtype","text","select","Text","Texte","",""
-"select.language","en","select","English","Anglais","",""
-"select.language","fr","select","French","Français","",""
-"view.type.selection","grid","select","Grid","Liste","",""
-"view.type.selection","form","select","Form","Formulaire","",""
-"view.type.selection","tree","select","Tree","Arbre","",""
-"view.type.selection","search","select","Search","Recherche","",""
-"view.type.selection","portal","select","Portal","Portail","",""
-"view.type.selection","calendar","select","Calendar","Calendrier","",""
-"com.axelor.meta.db.MetaAction","meta-action-form","form","Action","Action","",""
-"meta-action-form","","page","XML","XML","",""
-"com.axelor.meta.db.MetaAction","meta-action-grid","grid","All Actions","Les Actions","",""
-"com.axelor.meta.db.MetaActionMenu","meta-action-menu-form","form","Action Menu","Action de menu","",""
-"com.axelor.meta.db.MetaActionMenu","meta-action-menu-grid","grid","Action Menus","Les Action Menus","",""
-"com.axelor.meta.db.MetaAttachment","meta-attachment-form","form","MetaAttachment","Les pièces jointes","",""
-"com.axelor.meta.db.MetaAttachment","meta-attachment-grid","grid","MetaAttachment","Les pièces jointes","",""
-"com.axelor.meta.db.MetaChart","meta-chart-form","form","Chart","Graphique","",""
-"meta-chart-form","","page","Query","Requête","",""
-"com.axelor.meta.db.MetaChart","Type","viewField","Type","Type","",""
-"meta-chart-form","","page","Series","Série","",""
-"com.axelor.meta.db.MetaChartSeries","","grid","Series","Série","",""
-"com.axelor.meta.db.MetaChartSeries","","form","Series","Série","",""
-"com.axelor.meta.db.MetaChart","meta-chart-grid","grid","Charts","Graphiques","",""
-"com.axelor.meta.db.MetaChartSeries","meta-chart-series-form","form","MetaChartSeries","Séries de graphiques","",""
-"com.axelor.meta.db.MetaChartSeries","meta-chart-series-grid","grid","MetaChartSeries","Séries de graphiques","",""
-"com.axelor.meta.db.MetaField","meta-field-form","form","Field","Champ","",""
-"meta-field-form","openModel","button","Show Model","Voir le modèle","",""
-"meta-field-form","","separator","Description","Description","",""
-"com.axelor.meta.db.MetaField","meta-field-grid","grid","Fields","Champs","",""
-"com.axelor.meta.db.MetaFile","meta-files-form","form","Files","Fichiers","",""
-"com.axelor.meta.db.MetaFile","meta-files-grid","grid","Files","Fichiers","",""
-"com.axelor.meta.db.MetaMenu","meta-menu-form","form","Menu Item","Menu Item","",""
-"meta-menu-form","","page","Groups","Groupes","",""
-"com.axelor.meta.db.MetaMenu","meta-menu-grid","grid","Menu Items","Menu Items","",""
-"com.axelor.meta.db.MetaModel","meta-model-form","form","Model","Objet","",""
-"com.axelor.meta.db.MetaModel","meta-model-grid","grid","Models","Objets","",""
-"com.axelor.meta.db.MetaModule","meta-module-form","form","Module","Module","",""
-"meta-module-form","","separator","Module","Module","",""
-"meta-module-form","btnInstall","button","Install","Installer","",""
-"meta-module-form","btnUninstall","button","Uninstall","Désinstaller","",""
-"meta-module-form","","separator","Details","Détails","",""
-"com.axelor.meta.db.MetaModule","meta-module-grid","grid","All Modules","Les Modules","",""
-"com.axelor.meta.db.MetaSelect","meta-select-form","form","Select","Sélection","",""
-"com.axelor.meta.db.MetaSelectItem","","grid","Select Items","Eléments de la selection","",""
-"com.axelor.meta.db.MetaSelectItem","","form","Select Item","Elément de la selection","",""
-"com.axelor.meta.db.MetaSelect","meta-select-grid","grid","All Selects","Les Sélections","",""
-"com.axelor.meta.db.MetaSelectItem","meta-select-item-form","form","MetaSelectItem","MetaSelectItem","",""
-"com.axelor.meta.db.MetaSelectItem","meta-select-item-grid","grid","MetaSelectItem","MetaSelectItem","",""
-"com.axelor.meta.db.MetaTranslation","meta-translations-form","form","Translation","Traduction","",""
-"meta-translations-form","","group","Actions","Actions","",""
-"meta-translations-form","restoreAll","button","Restore All","Tout restaurer","",""
-"meta-translations-form","restoreAll","button","All the customizations will be lost. Are you sure?","Toutes les changements seront perdus. Voulez-vous continuer ?","",""
-"meta-translations-form","export","button","Export All","Tout exporter","",""
-"meta-translations-form","exportGroup","group","Configuration","Configuration","",""
-"com.axelor.meta.db.MetaTranslation","Export language","viewField","Export language","Langue d'export","",""
-"com.axelor.meta.db.MetaTranslation","Export path","viewField","Export path","Chemin d'export","",""
-"meta-translations-form","lauchExport","button","Export","Export","",""
-"com.axelor.meta.db.MetaTranslation","meta-translations-grid","grid","All Translations","Les Traductions","",""
-"com.axelor.meta.db.MetaUser","meta-user-form","form","Preferences","Préférences","",""
-"com.axelor.meta.db.MetaUser","meta-user-grid","grid","Preferences","Préférences","",""
-"com.axelor.meta.db.MetaUser","User","viewField","User","Utilisateur","",""
-"com.axelor.meta.db.MetaUser","Action","viewField","Action","Action","",""
-"com.axelor.meta.db.MetaView","meta-view-form","form","View","Vue","",""
-"meta-view-form","","group","View Details","Détails de la vue","",""
-"meta-view-form","","group","Actions","Actions","",""
-"meta-view-form","validate","button","Validate","Valider","",""
-"meta-view-form","restore","button","Restore","Restaurer","",""
-"meta-view-form","restoreAll","button","Restore All","Tout restaurer","",""
-"meta-view-form","restoreAll","button","All the customizations will be lost. Are you sure?","Toutes les changements seront perdus. Voulez-vous continuer ?","",""
-"meta-view-form","preview","button","Preview","Aperçu","",""
-"com.axelor.meta.db.MetaView","meta-view-grid","grid","All Views","Les Vues","",""
-"action-meta-action-menus","action-meta-action-menus","action","Action Menus","Les Action Menus","",""
-"action-meta-actions","action-meta-actions","action","Actions","Actions","",""
-"action-meta-menus","action-meta-menus","action","Menus","Menus","",""
-"action-meta-model-views","action-meta-model-views","action","Models","Objets","",""
-"action-meta-select","action-meta-select","action","Selects","Les Sélections","",""
-"action-meta-todo","action-meta-todo","action","Not implemented yet!","Pas encore implémenté!","",""
-"action-meta-translations","action-meta-translations","action","All Translations","Les Traductions","",""
-"action-meta-views","action-meta-views","action","Views","Les Vues","",""
-"meta.charts","meta.charts","action","All Charts","Les Graphiques","",""
-"meta.modules","meta.modules","action","Modules","Modules","",""
-"user.preferences","user.preferences","action","Preferences","Préférences","",""
-"user.preferences.my","user.preferences.my","action","Preferences","Préférences","",""
-"axelor-meta","All the customizations will be lost. Are you sure?","other","All the customizations will be lost. Are you sure?","Toutes les changements seront perdus. Voulez-vous continuer ?","",""
-"axelor-meta","Export done.","other","Export done.","Export terminé.","",""
-"axelor-meta","exportPath","other","exportPath","Chemin d'export","",""
-"axelor-meta","Field is required.","other","Field is required.","Champ requis.","",""
-"axelor-meta","Invalid field value.","other","Invalid field value.","Valeur non valide.","",""
-"axelor-meta","Not implemented yet!","other","Not implemented yet!","Pas encore implémenté!","",""
-"axelor-meta","Please enter your export path fisrt.","other","Please enter your export path fisrt.","Merci de renseigner un chemin d'export.","",""
-"menu-meta-auth-profiles","Auth Profiles","menu","Auth Profiles","Assistant règle de droit","",""
-"com.axelor.meta.db.MetaAuthProfile","name","field","","Nom","",""
-"com.axelor.meta.db.MetaAuthProfile","targetPackage","field","","Package cible","",""
-"com.axelor.meta.db.MetaAuthProfile","canRead","field","Read","Lecture","",""
-"com.axelor.meta.db.MetaAuthProfile","canWrite","field","Write","Ecriture","",""
-"com.axelor.meta.db.MetaAuthProfile","canCreate","field","Create","Création","",""
-"com.axelor.meta.db.MetaAuthProfile","canRemove","field","Remove","Suppression","",""
-"com.axelor.meta.db.MetaAuthProfile","readCondition","field","","Condition","",""
-"com.axelor.meta.db.MetaAuthProfile","readParams","field","","Parametres","",""
-"com.axelor.meta.db.MetaAuthProfile","writeCondition","field","","Condition","",""
-"com.axelor.meta.db.MetaAuthProfile","writeParams","field","","Parametres","",""
-"com.axelor.meta.db.MetaAuthProfile","createCondition","field","","Condition","",""
-"com.axelor.meta.db.MetaAuthProfile","createParams","field","","Parametres","",""
-"com.axelor.meta.db.MetaAuthProfile","removeCondition","field","","Condition","",""
-"com.axelor.meta.db.MetaAuthProfile","removeParams","field","","Parametres","",""
-"com.axelor.meta.db.MetaAuthProfile","groups","field","","Groupes","",""
-"com.axelor.meta.db.MetaAuthProfile","allMenus","field","","Tous les menus ?","",""
-"com.axelor.meta.db.MetaAuthProfile","metaMenus","field","","Menus","",""
-"meta-auth-profile-form","","group","General","Général","",""
-"meta-auth-profile-form","","group","Access","Accès","",""
-"meta-auth-profile-form","","group","Read","Lecture","",""
-"meta-auth-profile-form","generate","button","Generate","Générer","",""
-"meta-auth-profile-form","showPermissions","button","Show permissions","Voir les permissions","",""
-"meta-auth-profile-form","","group","Write","Écriture","",""
-"meta-auth-profile-form","","group","Create","Créer","",""
-"meta-auth-profile-form","","group","Remove","Suppression","",""
+"menu-admin","Administration","menu","Administration","Administration",,
+"menu-meta-auth-profiles","Auth Profiles","menu","Auth Profiles","Assistant règle de droit",,
+"menu-meta-model","All Models","menu","All Models","Les objets",,
+"menu-meta-module","All Modules","menu","All Modules","Les Modules",,
+"menu-model","Model Management","menu","Model Management","Gestion des objets",,
+"menu-module-management","Module Management","menu","Module Management","Gestion des modules",,
+"menu-user-preferences","Preferences","menu","Preferences","Préférences",,
+"menu-view-action-menus","Action Menus","menu","Action Menus","Les Action Menus",,
+"menu-view-actions","All Actions","menu","All Actions","Les Actions",,
+"menu-view-all","All Views","menu","All Views","Les Vues",,
+"menu-view-charts","All Charts","menu","All Charts","Les Graphiques",,
+"menu-view-management","View Management","menu","View Management","Gestion des vues",,
+"menu-view-menus","All Menus","menu","All Menus","Les Menus",,
+"menu-view-selects","All Selects","menu","All Selects","Les Sélections",,
+"menu-view-translations","All Translations","menu","All Translations","Les Traductions",,
+"com.axelor.meta.db.MetaModule","name","field",,"Nom",,
+"com.axelor.meta.db.MetaModule","title","field",,"Libellé",,
+"com.axelor.meta.db.MetaModule","description","field",,"Description",,
+"com.axelor.meta.db.MetaModule","depends","field",,"Dépend de",,
+"com.axelor.meta.db.MetaModule","moduleVersion","field","Version","Version",,
+"com.axelor.meta.db.MetaModule","removable","field",,"Supprimable ?",,
+"com.axelor.meta.db.MetaModule","installed","field",,"Installé ?",,
+"com.axelor.meta.db.MetaView","name","field",,"Nom",,
+"com.axelor.meta.db.MetaView","title","field",,"Libellé",,
+"com.axelor.meta.db.MetaView","type","field",,"Type",,
+"com.axelor.meta.db.MetaView","priority","field",,"Priorité",,
+"com.axelor.meta.db.MetaView","model","field",,"Objet",,
+"com.axelor.meta.db.MetaView","module","field",,"Module",,
+"com.axelor.meta.db.MetaView","xml","field",,"XML",,
+"com.axelor.meta.db.MetaView","groups","field",,"Groupes",,
+"com.axelor.meta.db.MetaMenu","priority","field",,"Priorité",,
+"com.axelor.meta.db.MetaMenu","name","field",,"Nom",,
+"com.axelor.meta.db.MetaMenu","title","field",,"Libellé",,
+"com.axelor.meta.db.MetaMenu","icon","field",,"Icone",,
+"com.axelor.meta.db.MetaMenu","module","field",,"Module",,
+"com.axelor.meta.db.MetaMenu","top","field",,"Menu du haut ?",,
+"com.axelor.meta.db.MetaMenu","parent","field",,"Parent",,
+"com.axelor.meta.db.MetaMenu","action","field",,"Action",,
+"com.axelor.meta.db.MetaMenu","groups","field",,"Groupes",,
+"com.axelor.meta.db.MetaActionMenu","name","field",,"Nom",,
+"com.axelor.meta.db.MetaActionMenu","title","field",,"Libellé",,
+"com.axelor.meta.db.MetaActionMenu","category","field",,"Catégorie","Category name to group action menus.","Nom de la catégorie pour grouper les actions menus"
+"com.axelor.meta.db.MetaActionMenu","module","field",,"Module",,
+"com.axelor.meta.db.MetaActionMenu","parent","field",,"Parent",,
+"com.axelor.meta.db.MetaActionMenu","action","field",,"Action",,
+"com.axelor.meta.db.MetaAction","name","field",,"Nom",,
+"com.axelor.meta.db.MetaAction","type","field",,"Type",,
+"com.axelor.meta.db.MetaAction","model","field",,"Modèle",,
+"com.axelor.meta.db.MetaAction","module","field",,"Module",,
+"com.axelor.meta.db.MetaAction","xml","field",,"XML",,
+"com.axelor.meta.db.MetaSelect","name","field",,"Nom",,
+"com.axelor.meta.db.MetaSelect","priority","field",,"Priorité",,
+"com.axelor.meta.db.MetaSelect","module","field",,"Module",,
+"com.axelor.meta.db.MetaSelect","items","field",,"Elément",,
+"com.axelor.meta.db.MetaSelectItem","value","field",,"Valeur",,
+"com.axelor.meta.db.MetaSelectItem","title","field",,"Libellé",,
+"com.axelor.meta.db.MetaSelectItem","select","field",,"Sélection",,
+"com.axelor.meta.db.MetaModel","name","field","Name","Nom",,
+"com.axelor.meta.db.MetaModel","packageName","field","Package","Package",,
+"com.axelor.meta.db.MetaModel","tableName","field","Table","Table",,
+"com.axelor.meta.db.MetaModel","metaFields","field","Fields","Champs",,
+"com.axelor.meta.db.MetaModel","fullName","field","Fullname","Nom complet",,
+"com.axelor.meta.db.MetaField","metaModel","field",,"Meta Model",,
+"com.axelor.meta.db.MetaField","name","field","Name","Nom",,
+"com.axelor.meta.db.MetaField","packageName","field","Package","Nom du package",,
+"com.axelor.meta.db.MetaField","typeName","field","Type","Type",,
+"com.axelor.meta.db.MetaField","label","field","Label","Libellé",,
+"com.axelor.meta.db.MetaField","relationship","field","Relationship","Relation",,
+"com.axelor.meta.db.MetaField","mappedBy","field","Mapped by","Mappé avec",,
+"com.axelor.meta.db.MetaField","description","field","Description","Description",,
+"com.axelor.meta.db.MetaTranslation","key","field",,"Clé",,
+"com.axelor.meta.db.MetaTranslation","language","field",,"Langue",,
+"com.axelor.meta.db.MetaTranslation","translation","field",,"Traduction",,
+"com.axelor.meta.db.MetaTranslation","domain","field",,"Domain",,
+"com.axelor.meta.db.MetaTranslation","type","field",,"Type",,
+"com.axelor.meta.db.MetaFile","content","field","File","Fichier",,
+"com.axelor.meta.db.MetaFile","fileName","field",,"Nom du fichier",,
+"com.axelor.meta.db.MetaFile","size","field","Size in bytes","Taille en bytes",,
+"com.axelor.meta.db.MetaFile","mine","field","File type","Type de fichier",,
+"com.axelor.meta.db.MetaFile","description","field",,"Description",,
+"com.axelor.meta.db.MetaFile","sizeText","field","Size","Taille",,
+"com.axelor.meta.db.MetaAttachment","objectName","field",,"Nom de l'objet",,
+"com.axelor.meta.db.MetaAttachment","objectId","field",,"ID de l'objet",,
+"com.axelor.meta.db.MetaAttachment","metaFile","field","File","Meta File",,
+"com.axelor.meta.db.MetaChartSeries","key","field",,"Clé",,
+"com.axelor.meta.db.MetaChartSeries","groupBy","field",,"Grouper par",,
+"com.axelor.meta.db.MetaChartSeries","title","field",,"Libellé",,
+"com.axelor.meta.db.MetaChartSeries","type","field",,"Type",,
+"com.axelor.meta.db.MetaChartSeries","side","field",,"Côté",,
+"com.axelor.meta.db.MetaChartSeries","aggregate","field",,"Regrouper par",,
+"com.axelor.meta.db.MetaChartConfig","name","field",,"Nom",,
+"com.axelor.meta.db.MetaChartConfig","value","field",,"Valeur",,
+"com.axelor.meta.db.MetaChart","name","field",,"Nom",,
+"com.axelor.meta.db.MetaChart","module","field",,"Module",,
+"com.axelor.meta.db.MetaChart","title","field",,"Titre",,
+"com.axelor.meta.db.MetaChart","stacked","field",,"Empilement",,
+"com.axelor.meta.db.MetaChart","query","field",,"Requête",,
+"com.axelor.meta.db.MetaChart","queryType","field",,"Type de requete",,
+"com.axelor.meta.db.MetaChart","categoryKey","field",,"Clé de la catégorie",,
+"com.axelor.meta.db.MetaChart","categoryType","field",,"Type de la catégorie",,
+"com.axelor.meta.db.MetaChart","categoryTitle","field",,"Libellé de la catégorie",,
+"com.axelor.meta.db.MetaChart","chartSeries","field",,"Séries de données",,
+"com.axelor.meta.db.MetaChart","chartConfig","field",,"Configuration du graphique",,
+"com.axelor.meta.db.MetaAuthProfile","name","field",,"Nom",,
+"com.axelor.meta.db.MetaAuthProfile","targetPackage","field",,"Package cible",,
+"com.axelor.meta.db.MetaAuthProfile","canRead","field","Read","Lecture",,
+"com.axelor.meta.db.MetaAuthProfile","canWrite","field","Write","Ecriture",,
+"com.axelor.meta.db.MetaAuthProfile","canCreate","field","Create","Création",,
+"com.axelor.meta.db.MetaAuthProfile","canRemove","field","Remove","Suppression",,
+"com.axelor.meta.db.MetaAuthProfile","readCondition","field",,"Condition",,
+"com.axelor.meta.db.MetaAuthProfile","readParams","field",,"Parametres",,
+"com.axelor.meta.db.MetaAuthProfile","writeCondition","field",,"Condition",,
+"com.axelor.meta.db.MetaAuthProfile","writeParams","field",,"Parametres",,
+"com.axelor.meta.db.MetaAuthProfile","createCondition","field",,"Condition",,
+"com.axelor.meta.db.MetaAuthProfile","createParams","field",,"Parametres",,
+"com.axelor.meta.db.MetaAuthProfile","removeCondition","field",,"Condition",,
+"com.axelor.meta.db.MetaAuthProfile","removeParams","field",,"Parametres",,
+"com.axelor.meta.db.MetaAuthProfile","groups","field",,"Groupes",,
+"com.axelor.meta.db.MetaAuthProfile","allMenus","field",,"Tous les menus ?",,
+"com.axelor.meta.db.MetaAuthProfile","metaMenus","field",,"Menus",,
+"com.axelor.meta.db.MetaFilter","name","field",,"Nom",,
+"com.axelor.meta.db.MetaFilter","title","field",,"Titre",,
+"com.axelor.meta.db.MetaFilter","filters","field",,"Filtres",,
+"com.axelor.meta.db.MetaFilter","filterCustom","field",,"Filtre personnalisé",,
+"com.axelor.meta.db.MetaFilter","filterView","field",,"Filtre de vue",,
+"com.axelor.meta.db.MetaFilter","shared","field",,"Partagé ?",,
+"com.axelor.meta.db.MetaFilter","user","field",,"Utilisateur",,
+"com.axelor.meta.db.MetaUser","user","field",,"Utilisateur",,
+"com.axelor.meta.db.MetaUser","email","field",,"Email",,
+"com.axelor.meta.db.MetaUser","language","field",,"Langue",,
+"com.axelor.meta.db.MetaUser","action","field",,"Action",,
+"action.type.selection","action-workflow","select","action-workflow","action-workflow",,
+"action.type.selection","action-ws","select","action-ws","action-ws",,
+"action.type.selection","action-export","select","action-export","action-export",,
+"action.type.selection","action-import","select","action-import","action-import",,
+"action.type.selection","action-method","select","action-method","action-method",,
+"action.type.selection","action-record","select","action-record","action-record",,
+"action.type.selection","action-condition","select","action-condition","action-condition",,
+"action.type.selection","action-validate","select","action-validate","action-validate",,
+"action.type.selection","action-group","select","action-group","action-group",,
+"action.type.selection","action-view","select","action-view","action-view",,
+"action.type.selection","action-attrs","select","action-attrs","action-attrs",,
+"meta.translation.type.selection","placeholder","select","PlaceHolder","Texte par défaut",,
+"meta.translation.type.selection","other","select","Other","Autre",,
+"meta.translation.type.selection","help","select","Help","Aide",,
+"meta.translation.type.selection","field","select","Field","Champ",,
+"relationship.field.selection","ManyToMany","select","ManyToMany","ManyToMany",,
+"relationship.field.selection","OneToMany","select","OneToMany","OneToMany",,
+"relationship.field.selection","ManyToOne","select","ManyToOne","ManyToOne",,
+"relationship.field.selection","OneToOne","select","OneToOne","OneToOne",,
+"selection.chart.aggregate","deviation","select","Std. Deviation","Écart type",,
+"selection.chart.aggregate","variance","select","Variance","Variance",,
+"selection.chart.aggregate","maximum","select","Maximum","Maximum",,
+"selection.chart.aggregate","minimum","select","Minimum","Minimum",,
+"selection.chart.aggregate","average","select","Average","Moyenne",,
+"selection.chart.aggregate","count","select","Count","Compteur",,
+"selection.chart.aggregate","sum","select","Sum","Somme",,
+"selection.chart.qtype","sql","select","SQL","SQL",,
+"selection.chart.qtype","jpql","select","JPQL","JPQL",,
+"selection.chart.side","right","select","Right","Droite",,
+"selection.chart.side","left","select","Left","Gauche",,
+"selection.chart.type","scatter","select","Scatter","Dispertion",,
+"selection.chart.type","gauge","select","Gauge","Jauge",,
+"selection.chart.type","radar","select","Radar","Radar",,
+"selection.chart.type","area","select","Area","Aire",,
+"selection.chart.type","line","select","Line","Ligne",,
+"selection.chart.type","hbar","select","HBar","Histogramme horizontal",,
+"selection.chart.type","bar","select","Bar","Histogramme",,
+"selection.chart.type","pie","select","Pie","Camembert",,
+"selection.chart.xtype","text","select","Text","Texte",,
+"selection.chart.xtype","year","select","Year","Année",,
+"selection.chart.xtype","month","select","Month","Mois",,
+"selection.chart.xtype","time","select","Time","Heure",,
+"selection.chart.xtype","date","select","Date","Date",,
+"selection.chart.xtype","decimal","select","Decimal","Décimal",,
+"selection.chart.xtype","number","select","Number","Nombre",,
+"select.language","fr","select","French","Français",,
+"select.language","en","select","English","Anglais",,
+"view.type.selection","searchfilters","select","Filters","Filtres",,
+"view.type.selection","calendar","select","Calendar","Calendrier",,
+"view.type.selection","portal","select","Portal","Portail",,
+"view.type.selection","search","select","Search","Recherche",,
+"view.type.selection","tree","select","Tree","Arbre",,
+"view.type.selection","form","select","Form","Formulaire",,
+"view.type.selection","grid","select","Grid","Liste",,
+"com.axelor.meta.db.MetaAction","meta-action-form","form","Action","Action",,
+"meta-action-form",,"page","XML","XML",,
+"com.axelor.meta.db.MetaAction","meta-action-grid","grid","All Actions","Les Actions",,
+"com.axelor.meta.db.MetaActionMenu","meta-action-menu-form","form","Action Menu","Action de menu",,
+"com.axelor.meta.db.MetaActionMenu","meta-action-menu-grid","grid","Action Menus","Les Action Menus",,
+"com.axelor.meta.db.MetaAttachment","meta-attachment-form","form","MetaAttachment","Les pièces jointes",,
+"com.axelor.meta.db.MetaAttachment","meta-attachment-grid","grid","MetaAttachment","Les pièces jointes",,
+"meta-auth-profile-form","generate","button","Generate","Générer",,
+"meta-auth-profile-form","showPermissions","button","Show permissions","Voir les permissions",,
+"com.axelor.meta.db.MetaAuthProfile","meta-auth-profile-form","form","Auth Profile","Profil permission",,
+"meta-auth-profile-form",,"group","General","Général",,
+"meta-auth-profile-form",,"group","Access","Accès",,
+"meta-auth-profile-form",,"page","Groups","Groupes",,
+"meta-auth-profile-form",,"page","Menus","Menus",,
+"meta-auth-profile-form",,"page","Conditions","Condition",,
+"meta-auth-profile-form",,"group","Read","Lecture",,
+"com.axelor.meta.db.MetaAuthProfile","Condition","viewField","Condition","Condition",,
+"com.axelor.meta.db.MetaAuthProfile","Params","viewField","Params","Parametres",,
+"meta-auth-profile-form",,"group","Write","Écriture",,
+"com.axelor.meta.db.MetaAuthProfile","Condition","viewField","Condition","Condition",,
+"com.axelor.meta.db.MetaAuthProfile","Params","viewField","Params","Parametres",,
+"meta-auth-profile-form",,"group","Create","Créer",,
+"com.axelor.meta.db.MetaAuthProfile","Condition","viewField","Condition","Condition",,
+"com.axelor.meta.db.MetaAuthProfile","Params","viewField","Params","Parametres",,
+"meta-auth-profile-form",,"group","Remove","Suppression",,
+"com.axelor.meta.db.MetaAuthProfile","Condition","viewField","Condition","Condition",,
+"com.axelor.meta.db.MetaAuthProfile","Params","viewField","Params","Parametres",,
+"com.axelor.meta.db.MetaAuthProfile","meta-auth-profile-grid","grid","Auth Profiles","Assistant règle de droit",,
+"com.axelor.meta.db.MetaChartConfig","meta-chart-config-form","form","MetaChartConfig","MetaChartConfig",,
+"com.axelor.meta.db.MetaChartConfig","meta-chart-config-grid","grid","MetaChartConfig","MetaChartConfig",,
+"com.axelor.meta.db.MetaChart","meta-chart-form","form","Chart","Graphique",,
+"meta-chart-form",,"page","Query","Requête",,
+"com.axelor.meta.db.MetaChart","Type","viewField","Type","Type",,
+"meta-chart-form",,"page","Series","Série",,
+"com.axelor.meta.db.MetaChartSeries",,"grid","Series","Série",,
+"com.axelor.meta.db.MetaChartSeries",,"form","Series","Série",,
+"meta-chart-form",,"page","Config","Configuration",,
+"com.axelor.meta.db.MetaChartConfig",,"grid","Config","Configuration des graphiques",,
+"com.axelor.meta.db.MetaChart","meta-chart-grid","grid","Charts","Graphiques",,
+"com.axelor.meta.db.MetaChartSeries","meta-chart-series-form","form","MetaChartSeries","Séries de graphiques",,
+"com.axelor.meta.db.MetaChartSeries","meta-chart-series-grid","grid","MetaChartSeries","Séries de graphiques",,
+"com.axelor.meta.db.MetaField","meta-field-form","form","Field","Champ",,
+"meta-field-form","openModel","button","Show Model","Voir le modèle",,
+"meta-field-form",,"separator","Description","Description",,
+"com.axelor.meta.db.MetaField","meta-field-grid","grid","Fields","Champs",,
+"com.axelor.meta.db.MetaFile","meta-files-form","form","Files","Fichiers",,
+"com.axelor.meta.db.MetaFile","meta-files-grid","grid","Files","Fichiers",,
+"com.axelor.meta.db.MetaFilter","meta-filter-form","form","MetaFilter","Filtre",,
+"com.axelor.meta.db.MetaFilter","meta-filter-grid","grid","MetaFilter","Filtres",,
+"com.axelor.meta.db.MetaMenu","meta-menu-form","form","Menu Item","Menu Item",,
+"meta-menu-form",,"page","Groups","Groupes",,
+"com.axelor.meta.db.MetaMenu","meta-menu-grid","grid","Menu Items","Menu Items",,
+"com.axelor.meta.db.MetaModel","meta-model-form","form","Model","Objet",,
+"com.axelor.meta.db.MetaModel","meta-model-grid","grid","Models","Objets",,
+"com.axelor.meta.db.MetaModule","meta-module-form","form","Module","Module",,
+"meta-module-form",,"separator","Module","Module",,
+"meta-module-form","btnInstall","button","Install","Installer",,
+"meta-module-form","btnUninstall","button","Uninstall","Désinstaller",,
+"meta-module-form",,"separator","Details","Détails",,
+"com.axelor.meta.db.MetaModule","meta-module-grid","grid","All Modules","Les Modules",,
+"com.axelor.meta.db.MetaSelect","meta-select-form","form","Select","Sélection",,
+"com.axelor.meta.db.MetaSelectItem",,"grid","Select Items","Eléments de la selection",,
+"com.axelor.meta.db.MetaSelectItem",,"form","Select Item","Elément de la selection",,
+"com.axelor.meta.db.MetaSelect","meta-select-grid","grid","All Selects","Les Sélections",,
+"com.axelor.meta.db.MetaSelectItem","meta-select-item-form","form","MetaSelectItem","MetaSelectItem",,
+"com.axelor.meta.db.MetaSelectItem","meta-select-item-grid","grid","MetaSelectItem","MetaSelectItem",,
+"com.axelor.meta.db.MetaTranslation","meta-translations-form","form","Translation","Traduction",,
+"meta-translations-form",,"group","Actions","Actions",,
+"meta-translations-form","restoreAll","button","Restore All","Tout restaurer",,
+"meta-translations-form","restoreAll","button","All the customizations will be lost. Are you sure?","Toutes les changements seront perdus. Voulez-vous continuer ?",,
+"meta-translations-form","export","button","Export All","Tout exporter",,
+"meta-translations-form","exportGroup","group","Configuration","Configuration",,
+"com.axelor.meta.db.MetaTranslation","Export language","viewField","Export language","Langue d'export",,
+"com.axelor.meta.db.MetaTranslation","Export path","viewField","Export path","Chemin d'export",,
+"meta-translations-form","lauchExport","button","Export","Export",,
+"com.axelor.meta.db.MetaTranslation","meta-translations-grid","grid","All Translations","Les Traductions",,
+"com.axelor.meta.db.MetaUser","meta-user-form","form","Preferences","Préférences",,
+"com.axelor.meta.db.MetaUser","meta-user-grid","grid","Preferences","Préférences",,
+"com.axelor.meta.db.MetaUser","User","viewField","User","Utilisateur",,
+"com.axelor.meta.db.MetaUser","Action","viewField","Action","Action",,
+"com.axelor.meta.db.MetaView","meta-view-form","form","View","Vue",,
+"meta-view-form",,"group","View Details","Détails de la vue",,
+"meta-view-form",,"group","Actions","Actions",,
+"meta-view-form","validate","button","Validate","Valider",,
+"meta-view-form","restore","button","Restore","Restaurer",,
+"meta-view-form","restoreAll","button","Restore All","Tout restaurer",,
+"meta-view-form","restoreAll","button","All the customizations will be lost. Are you sure?","Toutes les changements seront perdus. Voulez-vous continuer ?",,
+"meta-view-form","preview","button","Preview","Aperçu",,
+"com.axelor.meta.db.MetaView","meta-view-grid","grid","All Views","Les Vues",,
+"action-meta-action-menus","action-meta-action-menus","action","Action Menus","Les Action Menus",,
+"action-meta-actions","action-meta-actions","action","Actions","Actions",,
+"action-meta-menus","action-meta-menus","action","Menus","Menus",,
+"action-meta-model-views","action-meta-model-views","action","Models","Objets",,
+"action-meta-profile-view-permissions","action-meta-profile-view-permissions","action","Permissions","Permissions",,
+"action-meta-select","action-meta-select","action","Selects","Les Sélections",,
+"action-meta-todo","action-meta-todo","action","Not implemented yet!","Pas encore implémenté!",,
+"action-meta-translations","action-meta-translations","action","All Translations","Les Traductions",,
+"action-meta-views","action-meta-views","action","Views","Les Vues",,
+"auth.profiles","auth.profiles","action","Auth Profiles","Assistant règle de droit",,
+"meta.charts","meta.charts","action","All Charts","Les Graphiques",,
+"meta.modules","meta.modules","action","Modules","Modules",,
+"user.preferences","user.preferences","action","Preferences","Préférences",,
+"user.preferences.my","user.preferences.my","action","Preferences","Préférences",,
+"axelor-meta","All the customizations will be lost. Are you sure?","other","All the customizations will be lost. Are you sure?","Toutes les changements seront perdus. Voulez-vous continuer ?",,
+"axelor-meta","Export done.","other","Export done.","Export terminé.",,
+"axelor-meta","exportPath","other","exportPath","Chemin d'export",,
+"axelor-meta","Field is required.","other","Field is required.","Champ requis.",,
+"axelor-meta","Invalid field value.","other","Invalid field value.","Valeur non valide.",,
+"axelor-meta","Not implemented yet!","other","Not implemented yet!","Pas encore implémenté!",,
+"axelor-meta","Please enter your export path fisrt.","other","Please enter your export path fisrt.","Merci de renseigner un chemin d'export.",,
