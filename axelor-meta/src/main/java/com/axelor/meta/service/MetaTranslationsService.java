@@ -27,9 +27,9 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 
 public class MetaTranslationsService {
-	
+
 	private Logger log = LoggerFactory.getLogger(getClass());
-	
+
 	private static final String CSV_INPUT_FILE_NAME =  "[file.name]";
 	private static final String CSV_INPUT_TYPE_NAME =  "com.axelor.meta.db.MetaTranslation";
 	private static final String LANGUAGE_FIELD =  "language";
@@ -41,10 +41,10 @@ public class MetaTranslationsService {
 	private static final String TYPE_COLUMN = "type";
 	private static final String CURRENT_LANGUAGE =  "_currentLanguage";
 	private static final String CALLABLE = "com.axelor.meta.ImportTranslations:loadTranslation";
-	
+
 	@Inject
 	Injector injector;
-	
+
 	public void process(ModuleResolver moduleResolver) {
 
 		CSVConfig config = getCSVConfig();
@@ -62,7 +62,7 @@ public class MetaTranslationsService {
 				return 0;
 			}
 		});
-		
+
 		//Import by module resolver order
 		for(String module : moduleResolver.all()) {
 			String pat = String.format("(/WEB-INF/lib/%s-)|(%s/WEB-INF/classes/)", module, module);
@@ -80,7 +80,7 @@ public class MetaTranslationsService {
 			}
 		}
 	}
-	
+
 	private void process(final File file, CSVConfig config, String module) throws IOException {
 		final InputStream stream = file.openInputStream();
 		CSVImporter importer = new CSVImporter(injector, config);
@@ -116,7 +116,7 @@ public class MetaTranslationsService {
 	}
 
 	private CSVConfig getCSVConfig() {
-		
+
 		CSVConfig csvConfig = new CSVConfig();
 		List<CSVBinding> bindings = Lists.newArrayList();
 
@@ -150,13 +150,13 @@ public class MetaTranslationsService {
 		CSVBinding bindingType = new CSVBinding();
 		bindingType.setField("type");
 		bindingType.setColumn(TYPE_COLUMN);
-		bindingType.setCondition("type in ['field', 'viewField', 'other']");
+		bindingType.setCondition("type in ['field', 'viewField', 'other', 'placeholder']");
 		bindings.add(bindingType);
 
 		CSVBinding bindingDomain = new CSVBinding();
 		bindingDomain.setField("domain");
 		bindingDomain.setColumn(DOMAIN_COLUMN);
-		bindingDomain.setCondition("type in ['field', 'viewField', 'other']");
+		bindingDomain.setCondition("type in ['field', 'viewField', 'other', 'placeholder']");
 		bindings.add(bindingDomain);
 
 		input.setBindings(bindings);
@@ -164,5 +164,5 @@ public class MetaTranslationsService {
 
 		return csvConfig;
 	}
-	
+
 }

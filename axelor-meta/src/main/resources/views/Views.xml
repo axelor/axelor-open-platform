@@ -58,6 +58,7 @@
   	<option value="field">Field</option>
   	<option value="help">Help</option>
   	<option value="other">Other</option>
+    <option value="placeholder">PlaceHolder</option>
   </selection>
 
   <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView" orderBy="priority,name">

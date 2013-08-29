@@ -90,6 +90,7 @@ public class MetaExportTranslation {
 	private final String actionMenuType = "actionMenu";
 	private final String actionType = "action";
 	private final String filterType = "filter";
+	private final String placeholderType = "placeholder";
 
 	private File exportFile ;
 	private String exportLanguage ;
@@ -311,6 +312,10 @@ public class MetaExportTranslation {
 			String transalation = this.getTranslation(field.getDefaultTitle(), "", abstractView.getModel(), this.fieldType);
 			String transalationHelp = this.getTranslation(field.getDefaultHelp(), "", abstractView.getModel(), this.helpType);
 			this.appendToFile(abstractView.getModel(), field.getDefaultTitle(), this.viewFieldType, field.getDefaultTitle(), transalation, field.getDefaultHelp(), transalationHelp);
+		}
+		if(!Strings.isNullOrEmpty(field.getDefaultPlaceholder())) {
+			String transalation = this.getTranslation(field.getDefaultPlaceholder(), "", abstractView.getModel(), this.placeholderType);
+			this.appendToFile(abstractView.getModel(), field.getDefaultPlaceholder(), this.placeholderType, field.getDefaultPlaceholder(), transalation);
 		}
 	}
 
