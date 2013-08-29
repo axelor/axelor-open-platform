@@ -59,10 +59,12 @@ import com.axelor.meta.schema.views.Page;
 import com.axelor.meta.schema.views.Portal;
 import com.axelor.meta.schema.views.Portlet;
 import com.axelor.meta.schema.views.SearchFilters;
+import com.axelor.meta.schema.views.TreeView;
 import com.axelor.meta.schema.views.SearchFilters.SearchFilter;
 import com.axelor.meta.schema.views.Separator;
 import com.axelor.meta.schema.views.SimpleContainer;
 import com.axelor.meta.schema.views.SimpleWidget;
+import com.axelor.meta.schema.views.TreeView.TreeColumn;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -95,6 +97,7 @@ public class MetaExportTranslation {
 	private final String placeholderType = "placeholder";
 	private final String menuBarType = "menuBar";
 	private final String menuItemType = "menuItem";
+	private final String treeColmunType = "treeColmun";
 
 	private File exportFile ;
 	private String exportLanguage ;
@@ -230,6 +233,11 @@ public class MetaExportTranslation {
 				this.loadWidget(abstractView, widget);
 			}
 		}
+		else if(abstractView instanceof TreeView) {
+			for (TreeColumn column : ((TreeView) abstractView).getColumns()) {
+				this.loadTreeColumn(abstractView, column);
+			}
+		}
 		else if(abstractView instanceof Portal) {
 			for (AbstractWidget widget : ((Portal) abstractView).getItems()) {
 				this.loadWidget(abstractView, widget);
@@ -242,6 +250,13 @@ public class MetaExportTranslation {
 		}
 		else if (abstractView instanceof SearchFilters) {
 			this.exportSearchFilters((SearchFilters) abstractView);
+		}
+	}
+
+	private void loadTreeColumn(AbstractView abstractView, TreeColumn column) {
+		if(!Strings.isNullOrEmpty(column.getDefaultTitle())) {
+			String translation = this.getTranslation(column.getDefaultTitle(), "", null, null);
+			this.appendToFile(abstractView.getName(), column.getName(), this.treeColmunType, column.getDefaultTitle(), translation);
 		}
 	}
 
