@@ -118,6 +118,10 @@ public class Field extends SimpleWidget {
 		return JPA.translate(this.getName(), super.getDefaultHelp(), this.getModel(), "help");
 	}
 
+	public String getDefaultPlaceholder() {
+		return placeholder;
+	}
+
 	public String getPlaceholder() {
 		if (!Strings.isNullOrEmpty(placeholder)) {
 			return JPA.translate(placeholder, placeholder, this.getModel(), "placeholder");
