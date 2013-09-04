@@ -82,11 +82,8 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	};
 
 	var canClose = false;
-	
-	$scope.onOK = function() {
-		
-		if (!$scope.isValid())
-			return;
+
+	function onOK() {
 
 		var record = $scope.record,
 			events = $scope.$events,
@@ -129,6 +126,18 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		}
 	};
 	
+	$scope.onOK = function() {
+
+		if (!$scope.isValid())
+			return;
+
+		$scope.ajaxStop(function() {
+			setTimeout(function() {
+				onOK();
+			}, 100);
+		});
+	};
+
 	$scope.onBeforeClose = function(event, ui) {
 
 		if (canClose || !$scope.isDirty()) {
