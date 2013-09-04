@@ -628,3 +628,13 @@ img.prefix-icon {
 	vertical-align: middle;
 	white-space: nowrap;
 }
+
+.record-toolbar .menu-bar a.disabled {
+	color: #ccc;
+}
+
+.record-toolbar .menu-bar a.disabled:hover,
+.record-toolbar .menu-bar a.disabled:focus {
+	background-color: inherit;
+	background-image: inherit;
+}
