@@ -82,6 +82,7 @@
   <entity name="MetaSelectItem" table="META_SELECT_ITEM" cachable="true">
     <string name="value" required="true"/>
     <string name="title" required="true" namecolumn="true"/>
+    <integer name="order" column="order_seq"/>
     <many-to-one name="select" ref="MetaSelect" column="select_id" required="true"/>
   </entity>
   
