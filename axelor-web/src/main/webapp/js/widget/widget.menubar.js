@@ -124,6 +124,35 @@ module.directive('uiMenuItem', ['ActionService', function(ActionService) {
 				});
 			}
 
+			scope.isRequired = function(){};
+			scope.isValid = function(){};
+
+			var attrs = {
+				hidden: false,
+				readonly: false
+			};
+
+			scope.attr = function(name, value) {
+				attrs[name] = value;
+			};
+
+			scope.isReadonly = function(){
+				return attrs.readonly;
+			};
+
+			scope.isHidden = function(){
+				return attrs.hidden;
+			};
+
+			var form = element.parents('.form-view:first');
+			var formScope = form.data('$scope');
+
+			if (formScope) {
+				formScope.$watch('record', function(rec) {
+					scope.record = rec;
+				});
+			}
+
 			scope.onClick = function(e) {
 				$(e.srcElement).parents('.dropdown').dropdown('toggle');
 				if (item.action) {
@@ -138,8 +167,9 @@ module.directive('uiMenuItem', ['ActionService', function(ActionService) {
 			};
 		},
 		template:
-			"<li ng-class='cssClass()'>" +
-				"<a href='' ng-show='!isDivider' ng-click='onClick($event)'>{{item.title}}</a>" +
+			"<li ng-class='cssClass()' ui-widget-states	ng-show='!isHidden()'>" +
+				"<a href='' ng-show='isReadonly()' class='disabled'>{{item.title}}</a>" +
+				"<a href='' ng-show='!isDivider && !isReadonly()' ng-click='onClick($event)'>{{item.title}}</a>" +
 			"</li>"
 	};
 }]);
