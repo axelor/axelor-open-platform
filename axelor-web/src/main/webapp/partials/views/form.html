@@ -2,7 +2,6 @@
   <div class="navbar record-toolbar">
     <div class="navbar-inner">
       <div class="container">
-        <div ui-menu-bar menus="menubar" handler="this"></div>
         <div class="btn-group">
           <button class="btn" ng-click="onNew()" ng-if="hasButton('new')" title="{{ 'New' | t}}">
             <i class="icon icon-file"></i> <span ng-hide="tbTitleHide" x-translate>New</span>
@@ -37,6 +36,7 @@
         <div class="btn-group" ng-if="hasHelp()">
         <button class="btn" ng-click="onShowHelp()"><i class="icon icon-info-sign"></i></button>
         </div>
+        <div ui-menu-bar menus="menubar" handler="this"></div>
         <div class="btn-group" ng-if="toolbar">
           <button ng-repeat="btn in toolbar" ui-tool-button></button>
         </div>

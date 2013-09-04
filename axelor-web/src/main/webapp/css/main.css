@@ -621,3 +621,10 @@ img.prefix-icon {
 	font-size: 13px !important;
 	margin-bottom: 0;
 }
+
+.record-toolbar .menu-bar {
+	display: inline-block;
+	float: inherit;
+	vertical-align: middle;
+	white-space: nowrap;
+}
