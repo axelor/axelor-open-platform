@@ -59,6 +59,7 @@
   	<option value="help">Help</option>
   	<option value="other">Other</option>
     <option value="placeholder">PlaceHolder</option>
+    <option value="documentation">Documentation</option>
   </selection>
 
   <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView" orderBy="priority,name">
@@ -256,14 +257,19 @@
       <field name="domain"/>
       <field name="type" selection="meta.translation.type.selection"/>
     </group>
-    <group title="Actions" cols="2" colSpan="1">
-      <button name="restoreAll" colSpan="2" title="Restore All" prompt="All the customizations will be lost. Are you sure?" onClick="action-meta-restore-translations"/>
-      <button name="export" colSpan="2" title="Export All" onClick="action-meta-show-export-group" hideIf="$readonly()"/>
+    <group title="Actions" cols="2" colSpan="1" hideIf="$readonly()">
+      <button name="restoreAll" colSpan="2" title="Restore All" onClick="action-meta-show-import-group"/>
+      <button name="export" colSpan="2" title="Export All" onClick="action-meta-show-export-group"/>
     </group>
     <group name="exportGroup" title="Configuration" colSpan="4" hidden="true">
     	<field name="exportLanguage" title="Export language" selection="select.language"/>
     	<field name="exportPath" title="Export path"/>
     	<button name="lauchExport" colSpan="2" title="Export" onClick="action-meta-export-translations" readonlyIf="!exportPath &amp;&amp; !exportLanguage"/>
+    </group>
+    <group name="importGroup" title="Configuration" hidden="true" colSpan="4">
+        <field name="importType" title="Import type" selection="selection.translation.import.type" widget="RadioSelect"/>
+        <field name="importPath" title="Import path" showIf="importType == 2"/>
+        <button name="lauchImport" colSpan="2" title="Import" readonlyIf="!importPath &amp;&amp; !importType" prompt="All the customizations will be lost. Are you sure?" onClick="action-meta-restore-translations"/>
     </group>
   </form>
 
@@ -273,6 +279,12 @@
 
   <action-attrs name="action-meta-show-export-group">
     <attribute name="hidden" for="exportGroup" expr="eval: false"/>
+    <attribute name="hidden" for="importGroup" expr="eval: true"/>
+  </action-attrs>
+  
+  <action-attrs name="action-meta-show-import-group">
+    <attribute name="hidden" for="exportGroup" expr="eval: true"/>
+    <attribute name="hidden" for="importGroup" expr="eval: false"/>
   </action-attrs>
 
   <action-method name="action-meta-export-translations">
@@ -391,6 +403,11 @@
     <option value="maximum">Maximum</option>
     <option value="variance">Variance</option>
     <option value="deviation">Std. Deviation</option>
+  </selection>
+  
+  <selection name="selection.translation.import.type">
+    <option value="1">From sources</option>
+    <option value="2">From directory</option>
   </selection>
 
 </object-views>

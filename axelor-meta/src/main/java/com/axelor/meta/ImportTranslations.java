@@ -41,7 +41,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 public class ImportTranslations {
-	
+
 	private final Logger LOG = LoggerFactory.getLogger(ActionHandler.class);
 
 	@SuppressWarnings("rawtypes")
@@ -49,9 +49,12 @@ public class ImportTranslations {
 
 		MetaTranslation meta = (MetaTranslation) bean;
 		MetaTranslation foundedTranslation = null;
+
 		String help = values.get("help").toString();
 		String help_t = values.get("help_t").toString();
-		
+
+		String doc = values.get("doc") != null ? values.get("doc").toString() : null;
+
 		if(!Strings.isNullOrEmpty(help) && !Strings.isNullOrEmpty(help_t) && "viewField".equals(meta.getType())) {
 			MetaTranslation helpT = new MetaTranslation();
 			helpT.setDomain(meta.getDomain());
@@ -70,15 +73,25 @@ public class ImportTranslations {
 			helpT.setType("help");
 			helpT.save();
 		}
-		
+
+		if(!Strings.isNullOrEmpty(doc) && "field".equals(meta.getType())) {
+			MetaTranslation docT = new MetaTranslation();
+			docT.setDomain(meta.getDomain());
+			docT.setKey(meta.getKey());
+			docT.setLanguage(meta.getLanguage());
+			docT.setTranslation(doc);
+			docT.setType("documentation");
+			docT.save();
+		}
+
 		if(meta.getKey() == null) {
 			return null;
 		}
-		
+
 		if("viewField".equals(meta.getType())) {
 			meta.setType("field");
 		}
-		
+
 		foundedTranslation = searchMetaTranslation(meta);
 
 		if(foundedTranslation != null) {
@@ -90,7 +103,7 @@ public class ImportTranslations {
 
 		return meta;
 	}
-	
+
 	private MetaTranslation searchMetaTranslation(MetaTranslation meta) {
 		List<Object> params = Lists.newArrayList();
 		String query = "self.key = ?1 AND self.language = ?2";
@@ -115,5 +128,5 @@ public class ImportTranslations {
 
 		return MetaTranslation.all().filter(query, params.toArray()).fetchOne();
 	}
-	
+
 }
