@@ -167,13 +167,15 @@
     <field name="module" />
     <spacer />
     <field name="items" colSpan="4">
-      <grid title="Select Items" editable="true">
+      <grid title="Select Items" editable="true" orderBy="order">
         <field name="title" />
         <field name="value" />
+        <field name="order" />
       </grid>
       <form cols="2" title="Select Item">
         <field name="title" />
         <field name="value" />
+        <field name="order" help="Sequence order" />
       </form>
     </field>
   </form>

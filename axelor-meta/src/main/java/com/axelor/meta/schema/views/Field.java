@@ -273,7 +273,11 @@ public class Field extends SimpleWidget {
 		if (select == null || select.getItems() == null) {
 			return all;
 		}
-		for(MetaSelectItem item : select.getItems()) {
+		List<MetaSelectItem> items = MetaSelectItem.all().filter("self.select.id = ?", select.getId()).order("order").fetch();
+		if (items == null || items.isEmpty()) {
+			return null;
+		}
+		for(MetaSelectItem item : items) {
 			all.add(ImmutableMap.of("value", item.getValue(), "title", JPA.translate(item.getTitle())));
 		}
 		return all;

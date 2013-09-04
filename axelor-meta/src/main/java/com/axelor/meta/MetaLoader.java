@@ -306,10 +306,12 @@ public class MetaLoader {
 		MetaSelect select = new MetaSelect();
 		select.setName(selection.getName());
 		select.setModule(module);
+		int sequence = 0;
 		for(Selection.Option opt : selection.getOptions()) {
 			MetaSelectItem item = new MetaSelectItem();
 			item.setValue(opt.getValue());
 			item.setTitle(opt.getDefaultTitle());
+			item.setOrder(sequence++);
 			select.addItem(item);
 		}
 
