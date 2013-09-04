@@ -626,7 +626,7 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 	
 	return {
 		link: function(scope, element, attrs) {
-			_.delay(function() {
+			scope.$evalAsync(function() {
 				link(scope, element, attrs);
 			});
 		}

@@ -179,11 +179,13 @@ function FormViewCtrl($scope, $element) {
 		$scope.editRecord(record);
 		$scope.updateRoute();
 		$scope._viewPromise.then(function(){
-			var handler = $scope.$events.onLoad,
-				record = $scope.record;
-			if (handler && !_.isEmpty(record)) {
-				setTimeout(handler);
-			}
+			$scope.ajaxStop(function(){
+				var handler = $scope.$events.onLoad,
+					record = $scope.record;
+				if (handler && !_.isEmpty(record)) {
+					setTimeout(handler);
+				}
+			});
 		});
 	};
 	
