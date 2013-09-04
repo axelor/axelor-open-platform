@@ -128,13 +128,14 @@ public class MetaExportTranslation {
 	private final String menuBarType = "menuBar";
 	private final String menuItemType = "menuItem";
 	private final String treeColmunType = "treeColmun";
+	private final String docType = "documentation";
 
 	private File exportFile ;
 	private String exportLanguage ;
 	private String exportPath ;
 	private String currentModule ;
 
-	public void exportTranslations(String exportPath, String exportLanguage) {
+	public void exportTranslations(String exportPath, String exportLanguage) throws Exception {
 
 		exportPath = exportPath.endsWith("/") ? exportPath : exportPath.concat("/");
 		this.exportLanguage = exportLanguage;
@@ -148,7 +149,11 @@ public class MetaExportTranslation {
 
 		for(MetaModule module : modules) {
 			this.exportPath = exportPath + module.getName() + "/";
-			this.exportFile = new File(Files.simplifyPath(this.exportPath + this.exportLanguage + ".csv"));
+			File file = new File(Files.simplifyPath(this.exportPath + this.exportLanguage + ".csv"));
+			if(file.isFile() && file.exists()) {
+				file.delete();
+			}
+			this.exportFile = file;
 			this.currentModule = module.getName();
 
 			log.info("Export {} module to {}.", module.getName(), this.exportFile.getPath());
@@ -480,7 +485,8 @@ public class MetaExportTranslation {
 		for (Property field : entity.getFields()) {
 			String translation = this.getTranslation(field.getName(), "", packageName, this.fieldType);
 			String translationHelp = this.getTranslation(field.getName(), "", packageName, this.helpType);
-			this.appendToFile(packageName, field.getName(), this.fieldType, field.getTitle(), translation, field.getHelp(), translationHelp);
+			String doc = this.getTranslation(field.getName(), "", packageName, this.docType);
+			this.appendToFile(packageName, field.getName(), this.fieldType, field.getTitle(), translation, field.getHelp(), translationHelp, doc);
 		}
 	}
 
@@ -504,7 +510,7 @@ public class MetaExportTranslation {
 
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
-		List<String> headerList = ImmutableList.of("domain", "name", "type", "title", "title_t", "help", "help_t");
+		List<String> headerList = ImmutableList.of("domain", "name", "type", "title", "title_t", "help", "help_t", "doc");
 
 		for (String column : headerList) {
 
@@ -571,12 +577,13 @@ public class MetaExportTranslation {
 		sb.append("\"").append(type == null ? "" : type).append("\"").append(",");
 		sb.append("\"").append(title == null ? "" : title).append("\"").append(",");
 		sb.append("\"").append(titleT == null ? "" : titleT).append("\"").append(",");
-		if(more == null || more.length != 2){
-			sb.append("\"").append("\"").append(",").append("\"").append("\"");
+		if(more == null || more.length == 0){
+			sb.append("\"").append("\"").append(",").append("\"").append("\"").append(",").append("\"").append("\"");
 		}
 		else {
-			sb.append("\"").append(more[0] == null ? "" : more[0]).append("\"").append(",");
-			sb.append("\"").append(more[1] == null ? "" : more[1]).append("\"");
+			if(more.length >= 1) sb.append("\"").append(more[0] == null ? "" : more[0]).append("\"").append(",");
+			if(more.length >= 2) sb.append("\"").append(more[1] == null ? "" : more[1]).append("\"").append(",");
+			if(more.length >= 3) sb.append("\"").append(more[2] == null ? "" : more[2]).append("\"");
 		}
 		sb.append("\n");
 		this.appendToFile(sb.toString());

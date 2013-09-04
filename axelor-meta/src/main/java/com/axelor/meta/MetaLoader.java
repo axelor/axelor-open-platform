@@ -643,15 +643,17 @@ public class MetaLoader {
 
 	/**
 	 * Load all Translations.
+	 * @param importPath
+	 * @param importType
 	 *
 	 */
-	public void loadTranslations() {
+	public void loadTranslations(String importPath) {
 		if (translationsService == null || MetaTranslation.all().count() > 0) {
 			return;
 		}
 		log.info("Load translations...");
 		try {
-			translationsService.process(moduleResolver);
+			translationsService.process(moduleResolver, importPath);
 		} catch (Exception e) {
 			log.error("Error loading translations.", e);
 		}
@@ -749,7 +751,7 @@ public class MetaLoader {
 		} catch (Exception e){}
 
 		loadDefault(outputPath);
-		loadTranslations();
+		loadTranslations(null);
 	}
 
 	public void loadModule(MetaModule module) {

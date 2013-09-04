@@ -30,6 +30,7 @@
  */
 package com.axelor.meta.service;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -51,6 +52,7 @@ import com.axelor.data.csv.CSVImporter;
 import com.axelor.data.csv.CSVInput;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.ModuleResolver;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -75,10 +77,36 @@ public class MetaTranslationsService {
 	@Inject
 	Injector injector;
 
-	public void process(ModuleResolver moduleResolver) {
+	public void process(ModuleResolver moduleResolver, String importPath) {
+		if(Strings.isNullOrEmpty(importPath)){
+			loadFromSources(moduleResolver);
+		}
+		else {
+			loadFromDir(moduleResolver, importPath);
+		}
+	}
 
-		CSVConfig config = getCSVConfig();
+	private void loadFromDir(ModuleResolver moduleResolver, String importPath) {
+		importPath = importPath.endsWith("/") ? importPath : importPath.concat("/");
 
+		//Import by module resolver order
+		for(String module : moduleResolver.all()) {
+			java.io.File moduleDir = new java.io.File(importPath + module);
+			if(!moduleDir.exists() || !moduleDir.isDirectory() || moduleDir.listFiles() == null) {
+				continue;
+			}
+
+			for(java.io.File file : moduleDir.listFiles()) {
+				try {
+					process(new FileInputStream(file), file.getName(), module);
+				} catch (IOException e) {
+					log.error("Unable to import file: {}", file.getName());
+				}
+			}
+		}
+	}
+
+	private void loadFromSources(ModuleResolver moduleResolver) {
 		List<File> files = MetaScanner.findAll("i18n\\.(.*?)\\.csv");
 
 		Collections.sort(files, new Comparator<File>() {
@@ -102,7 +130,7 @@ public class MetaTranslationsService {
 				Matcher matcher = pattern.matcher(path);
 				if (matcher.find()) {
 					try {
-						process(file, config, module);
+						process(file.openInputStream(), file.getName(), module);
 					} catch (IOException e) {
 						log.error("Unable to import file: {}", file.getName());
 					}
@@ -111,14 +139,16 @@ public class MetaTranslationsService {
 		}
 	}
 
-	private void process(final File file, CSVConfig config, String module) throws IOException {
-		final InputStream stream = file.openInputStream();
+	private void process(final InputStream stream, String fileName, String module) throws IOException {
+		log.debug("Load translation for {} module", module);
+
+		CSVConfig config = getCSVConfig();
 		CSVImporter importer = new CSVImporter(injector, config);
 
 		// Get language name from the file name
 		String languageName = "";
 		Pattern pattern = Pattern.compile("(\\w+)\\.(.*?)");
-		Matcher matcher = pattern.matcher(file.getName());
+		Matcher matcher = pattern.matcher(fileName);
 		if (matcher.matches()) {
 			languageName = matcher.group(1);
 		}

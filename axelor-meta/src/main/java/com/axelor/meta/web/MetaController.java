@@ -58,10 +58,10 @@ public class MetaController {
 
 	@Inject
 	private MetaLoader loader;
-	
+
 	@Inject
 	private MetaExportTranslation export;
-	
+
 	private ObjectViews validateXML(String xml) {
 		ObjectViews views;
 		try {
@@ -76,16 +76,16 @@ public class MetaController {
 		}
 		return views;
 	}
-	
+
 	public void validateAction(ActionRequest request, ActionResponse response) {
-		
+
 		MetaAction meta = request.getContext().asType(MetaAction.class);
-		
+
 		Action action = loader.findAction(meta.getName());
 		Map<String, String> data = Maps.newHashMap();
-		
+
 		response.setData(ImmutableList.of(data));
-		
+
 		ObjectViews views;
 		try {
 			views = validateXML(meta.getXml());
@@ -93,18 +93,18 @@ public class MetaController {
 			data.put("error", e.getMessage());
 			return;
 		}
-		
+
 		Action current = views.getActions().get(0);
 		if (action != null && !action.getName().equals(current.getName())) {
 			data.put("error", "Action name can't be changed.");
 			return;
 		}
 	}
-	
+
 	public void validateView(ActionRequest request, ActionResponse response) {
 		MetaView meta = request.getContext().asType(MetaView.class);
 		Map<String, String> data = Maps.newHashMap();
-		
+
 		try {
 			validateXML(meta.getXml());
 		} catch (Exception e){
@@ -113,16 +113,16 @@ public class MetaController {
 
 		response.setData(ImmutableList.of(data));
 	}
-	
+
 	public void restoreAll(ActionRequest request, ActionResponse response) {
-		
+
 		final Map<Long, String> userActions = Maps.newHashMap();
-		
+
 		JPA.runInTransaction(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				
+
 				// backup user actions
 				for(MetaUser user : MetaUser.all().fetch()) {
 					if (user.getAction() != null) {
@@ -142,14 +142,14 @@ public class MetaController {
 				JPA.em().createNativeQuery("DELETE FROM meta_select").executeUpdate();
 			}
 		});
-		
+
 		loader.load(null);
-		
+
 		JPA.runInTransaction(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				
+
 				// restore use actions
 				for(Long id : userActions.keySet()) {
 					MetaUser user = MetaUser.find(id);
@@ -161,11 +161,11 @@ public class MetaController {
 		MetaView view = MetaView.all().fetchOne();
 		response.setValues(view);
 	}
-	
+
 	public void clearCache(ActionRequest request, ActionResponse response) {
 		MetaStore.clear();
 	}
-	
+
 	/**
 	 * Open ModelEntity of the relationship.
 	 *
@@ -173,9 +173,9 @@ public class MetaController {
 	 * @param response
 	 */
 	public void openModel(ActionRequest request, ActionResponse response) {
-	   
+
 		MetaField metaField = request.getContext().asType(MetaField.class);
-		
+
 		String domain = String.format("self.packageName = '%s' AND self.name = '%s'", metaField.getPackageName(), metaField.getTypeName());
 		Map<String, Object> view = new HashMap<String, Object>();
 		view.put("title", metaField.getTypeName());
@@ -183,26 +183,42 @@ public class MetaController {
 		view.put("domain", domain);
 		response.setView(view);
    }
-	
+
 	public void restoreTranslations(ActionRequest request, ActionResponse response) {
-		
+
+		String importPath = (String) request.getContext().get("importPath");
+		String importType = (String) request.getContext().get("importType");
+
 		JPA.runInTransaction(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				JPA.clear();
 				JPA.em().createNativeQuery("DELETE FROM meta_translation").executeUpdate();
 			}
 		});
-		
-		loader.loadTranslations();
-		
-		MetaTranslation view = MetaTranslation.all().fetchOne();
-		response.setValues(view);
+
+		try {
+			if(Strings.isNullOrEmpty(importType)) {
+				throw new Exception(JPA.translate("Please select an import type first."));
+			}
+			if(importType.equals("2") && Strings.isNullOrEmpty(importPath)) {
+				throw new Exception(JPA.translate("Please enter your import path fisrt."));
+			}
+			loader.loadTranslations(importPath);
+
+			response.setFlash(JPA.translate("Import done."));
+			response.setHidden("exportGroup", true);
+
+			MetaTranslation view = MetaTranslation.all().fetchOne();
+			response.setValues(view);
+		} catch(Exception e) {
+			response.setFlash(e.getLocalizedMessage());
+		}
 	}
-	
+
 	public void exportTranslations(ActionRequest request, ActionResponse response) {
-		
+
 		String exportPath = (String) request.getContext().get("exportPath");
 		String exportLanguage = (String) request.getContext().get("exportLanguage");
 		Map<String, String> data = Maps.newHashMap();
@@ -214,9 +230,11 @@ public class MetaController {
 			if(Strings.isNullOrEmpty(exportPath)) {
 				throw new Exception(JPA.translate("Please enter your export path fisrt."));
 			}
-			export.exportTranslations(exportPath,exportLanguage);
+			export.exportTranslations(exportPath, exportLanguage);
+
 			response.setFlash(JPA.translate("Export done."));
 			response.setHidden("exportGroup", true);
+
 			data.put("exportPath", null);
 			data.put("exportLanguage", null);
 			response.setValues(data);
