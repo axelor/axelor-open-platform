@@ -291,7 +291,7 @@ ui.formItem('ToolButton', 'Button', {
 		});
 	},
 
-	template: '<button class="btn" ui-actions ui-widget-states>{{title}}</button>'
+	template: '<button class="btn" name="{{btn.name}}" ui-actions ui-widget-states>{{title}}</button>'
 });
 
 })(this);
