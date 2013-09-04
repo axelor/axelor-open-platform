@@ -66,6 +66,15 @@ public class MenuItem {
 	@XmlAttribute
 	private String category;
 
+	@XmlAttribute
+	private String showIf;
+
+	@XmlAttribute
+	private String hideIf;
+
+	@XmlAttribute
+	private String readonlyIf;
+
 	public String getName() {
 		return name;
 	}
@@ -144,5 +153,29 @@ public class MenuItem {
 
 	public Boolean getIsFolder() {
 		return MetaMenu.all().filter("self.parent.name = ?1", name).count() > 0;
+	}
+
+	public String getShowIf() {
+		return showIf;
+	}
+
+	public void setShowIf(String showIf) {
+		this.showIf = showIf;
+	}
+
+	public String getHideIf() {
+		return hideIf;
+	}
+
+	public void setHideIf(String hideIf) {
+		this.hideIf = hideIf;
+	}
+
+	public String getReadonlyIf() {
+		return readonlyIf;
+	}
+
+	public void setReadonlyIf(String readonlyIf) {
+		this.readonlyIf = readonlyIf;
 	}
 }
