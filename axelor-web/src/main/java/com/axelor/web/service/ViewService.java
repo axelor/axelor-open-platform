@@ -97,7 +97,14 @@ public class ViewService extends AbstractService {
 		final List<Object> fields = Lists.newArrayList();
 
 		for (Property p : Mapper.of(modelClass).getProperties()) {
-			fields.add(p.toMap());
+			Map<String, Object> map = p.toMap();
+			String title = p.getTitle();
+			if (title == null) {
+				title = p.getName();
+			}
+			title = JPA.translate(title, p.getTitle(), modelClass.getName(), "field");
+			map.put("title", title);
+			fields.add(map);
 		}
 
 		meta.put("model", model);
