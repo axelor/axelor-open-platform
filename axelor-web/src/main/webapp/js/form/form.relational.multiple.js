@@ -563,9 +563,17 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 		}
 
 		scope.loadSelection = function(request, response) {
+
+			var canSelect = field.canSelect !== false;
+			var canCreate = field.canNew !== false;
+
+			if (!canSelect) {
+				return response([]);
+			}
+
 			this.fetchSelection(request, function(items) {
 				var term = request.term;
-				if (term) {
+				if (term && canCreate) {
 					items.push({
 						label : _t('Create "{0}" and add...', '<b>' + term + '</b>'),
 						click : function() { create(term); }
@@ -574,15 +582,20 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 						label : _t('Create "{0}"...', '<b>' + term + '</b>'),
 						click : function() { create(term, true); }
 					});
+				}
+				if (term && canSelect) {
 					items.push({
 						label : _t("Search..."),
 						click : function() { scope.showSelector(); }
 					});
-				} else {
+				}
+				if (!term && canSelect) {
 					items.push({
 						label: _t("Search..."),
 						click: function() { scope.showSelector(); }
 					});
+				}
+				if (!term && canCreate) {
 					items.push({
 						label: _t("Create..."),
 						click: function() { scope.showPopupEditor(); }
@@ -626,6 +639,12 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 				});
 			}
 			return _handleSelect.apply(this, arguments);
+		};
+
+		var _removeItem = scope.removeItem;
+		scope.removeItem = function(e, ui) {
+			if (field.canRemove === false) return;
+			_removeItem.apply(this, arguments);
 		};
 	}
 });
