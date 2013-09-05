@@ -97,7 +97,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			canClose = true;
 			$element.dialog('close');
 			if ($scope.editorCanReload) {
-				$scope.parentReload();
+				$scope.$parent.parentReload();
 			}
 			if (closeCallback && value) {
 				closeCallback(value);
