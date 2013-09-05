@@ -204,7 +204,8 @@ function GridViewCtrl($scope, $element) {
 			var field = $scope.fields[key] || {};
 			var type = field.type || 'string';
 			var operator = 'like';
-			
+			var value2 = undefined;
+
 			//TODO: implement expression parser
 			
 			if (type === 'many-to-one') {
@@ -233,15 +234,18 @@ function GridViewCtrl($scope, $element) {
 					operator = '=';
 					break;
 				case 'datetime':
-					operator = '=';
-					value = moment(value, 'DD/MM/YYYY HH:mm').format(); //TODO: user datetime format
+					operator = 'between';
+					var val = moment(value, 'DD/MM/YYYY');
+					value = val.startOf('day').toDate().toISOString();
+					value2 = val.endOf('day').toDate().toISOString();
 					break;
 			}
 			
 			return {
 				fieldName: key,
 				operator: operator,
-				value: value
+				value: value,
+				value2: value2
 			};
 		});
 		

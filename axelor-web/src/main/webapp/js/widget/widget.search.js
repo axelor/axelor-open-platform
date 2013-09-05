@@ -162,6 +162,11 @@ ui.directive('uiFilterInput', function() {
 				showOn: null,
 				onSelect: function(dateText, inst) {
 					var value = picker.datepicker('getDate');
+					var isValue2 = _.str.endsWith(attrs.ngModel, 'value2');
+
+					value = isValue2 ? moment(value).endOf('day').toDate() :
+						               moment(value).startOf('day').toDate();
+
 					model.$setViewValue(value.toISOString());
 				}
 			};
