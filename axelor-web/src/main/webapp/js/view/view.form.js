@@ -623,8 +623,6 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 	
 	return function(scope, element, attrs) {
 		
-		var loaded = false;
-		
 		function getContent() {
 			var info = {};
 				record = scope.record || {};
@@ -666,13 +664,12 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 					html: true,
 					content: getContent,
 					placement: "bottom",
-					trigger: "hover",
+					trigger: "manual",
 					container: "body",
 					delay: {show: 500, hide: 0}
 				});
-				logInfo.popover('show');
 			}
-			
+			logInfo.popover('show');
 		};
 		
 		scope.canShowAttachments = function() {
@@ -699,19 +696,35 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 		scope.onShowHelp = function() {
 			window.open(scope.schema.helpLink);
 		};
-		
-		scope.$on("$destroy", function() {
+
+		function onMouseDown(e) {
+			if (!logInfo) return;
+			if (logInfo.is(e.target) || logInfo.has(e.target).size() > 0) return;
+			if (logInfo.data('popover').$tip.is(e.target) ||
+			    logInfo.data('popover').$tip.has(e.target).size() > 0) return;
+			closePopover();
+		};
+
+		function closePopover() {
 			if (logInfo != null) {
+				logInfo.popover('hide');
 				logInfo.popover("destroy");
 				logInfo = null;
 			}
-		});
-		
-		scope.$watch('schema', function(schema){
+		}
 
-			if (schema == null || loaded)
-				return;
-			
+		$(document).on('mousedown.loginfo', onMouseDown);
+
+		scope.$on("$destroy", function() {
+			closePopover();
+			$(document).off('mousedown.loginfo', onMouseDown);
+		});
+
+		var unwatch = scope.$watch('schema', function(schema){
+
+			if (!schema) return;
+			unwatch();
+
 			var form = parse(scope, schema, scope.fields);
 
 			form = $compile(form)(scope);
@@ -721,8 +734,6 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 				scope._viewResolver.resolve(schema, element);
 				scope.$broadcast("adjust:dialog");
 			}
-
-			loaded = true;
 		});
 	};
 }]);
