@@ -120,12 +120,24 @@ ui.directive('uiFilterItem', function() {
 			scope.onFieldChange = function() {
 				var filter = scope.filter,
 					field = scope.fields[filter.field] || {};
+
 				filter.type = field.type || 'string';
+
+				if (field.type === 'many-to-one') {
+					filter.targetName = field.targetName;
+				}
 			};
+
+			var unwatch = scope.$watch('fields', function(fields, old) {
+				if (_.isEmpty(fields)) return;
+				unwatch();
+				var options = _.values(fields);
+				scope.options = _.sortBy(options, 'title');
+			}, true);
 		},
 		template:
 		"<div class='form-inline' style='margin-bottom: 5px;'>" +
-			"<select ng-model='filter.field' ng-options='v.name as v.title for (k, v) in fields' ng-change='onFieldChange()' class='input-medium'></select> " +
+			"<select ng-model='filter.field' ng-options='v.name as v.title for v in options' ng-change='onFieldChange()' class='input-medium'></select> " +
 			"<select ng-model='filter.operator' ng-options='o.name as o.title for o in getOperators()' class='input-medium'></select> "+
 			"<input type='text' ui-filter-input ng-model='filter.value' ng-show='canShowInput()' class='input-medium'> " +
 			"<input type='text' ui-filter-input ng-model='filter.value2' ng-show='canShowRange()' class='input-medium'> " +
@@ -311,6 +323,12 @@ function FilterFormCtrl($scope, $element, ViewService) {
 				operator: filter.operator,
 				value: filter.value
 			};
+
+			if (filter.targetName && (
+					filter.operator !== 'isNull' ||
+					filter.operator !== 'notNull')) {
+				criterion.fieldName += '.' + filter.targetName;
+			}
 
 			if (criterion.operator == "true") {
 				criterion.operator = "=";
@@ -659,10 +677,12 @@ ui.directive('uiFilterBox', function() {
 
 			$scope.onFreeSearch = function() {
 
-				var filters = Array(),
+				var filters = new Array(),
+					fields = {},
 					text = this.custTerm,
 					number = +(text);
 
+				fields = _.extend({}, this.$parent.fields, this.fields);
 				text = text ? text.trim() : null;
 
 				if (this.nameField && text) {
@@ -673,7 +693,7 @@ ui.directive('uiFilterBox', function() {
 					});
 				}
 
-				for(var name in this.fields) {
+				for(var name in fields) {
 
 					if (name === this.nameField || !text) continue;
 
@@ -681,7 +701,7 @@ ui.directive('uiFilterBox', function() {
 						operator = "like",
 						value = text;
 
-					var field = this.fields[name];
+					var field = fields[name];
 
 					switch (field.type) {
 					case 'integer':
