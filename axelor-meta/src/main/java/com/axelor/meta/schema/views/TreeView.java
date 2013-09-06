@@ -88,6 +88,9 @@ public class TreeView extends AbstractView {
 		@XmlAttribute
 		private Boolean draggable;
 		
+		@XmlAttribute
+		private String domain;
+
 		@XmlElement(name = "field")
 		private List<NodeField> fields;
 		
@@ -105,6 +108,10 @@ public class TreeView extends AbstractView {
 		
 		public Boolean getDraggable() {
 			return draggable;
+		}
+
+		public String getDomain() {
+			return domain;
 		}
 
 		public List<NodeField> getFields() {
