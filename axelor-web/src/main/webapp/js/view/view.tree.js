@@ -487,8 +487,7 @@ ui.directive('uiViewTree', function(){
 					makeDraggable(tr);
 				}
 
-				var action = record.$draggable ? "dblclick" : "click";
-				tr.on(action, function(e) {
+				tr.on('dblclick', function(e) {
 					record.$click(e);
 				});
 				
