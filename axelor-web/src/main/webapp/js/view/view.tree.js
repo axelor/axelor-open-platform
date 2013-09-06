@@ -226,6 +226,14 @@ function Loader(scope, node, DataSource) {
 		domain = "self." + node.parent + ".id = :parent";
 	}
 
+	if (node.domain) {
+		if (domain) {
+			domain = '(' + domain + ') AND (' + node.domain + ')';
+		} else {
+			domain = node.domain;
+		}
+	}
+
 	this.child = null;
 	
 	this.model = node.model;
