@@ -399,6 +399,13 @@
                   </xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
+              <xsd:attribute name="domain" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>
+                  The domain for the node records.
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
             </xsd:complexType>
           </xsd:element>
         </xsd:sequence>
