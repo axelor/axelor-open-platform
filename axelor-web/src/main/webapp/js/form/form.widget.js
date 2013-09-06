@@ -87,6 +87,17 @@ ui.formWidget('Form', {
 
 ui.directive('uiWidgetStates', function() {
 
+	function isValid(scope, name) {
+		if (!name) return scope.isValid();
+		var ctrl = scope.form;
+		if (ctrl) {
+			ctrl = ctrl[name];
+		}
+		if (ctrl) {
+			return ctrl.$valid;
+		}
+	}
+
 	var handleConditional = function(scope, field, attr, conditional, nagative){
 
 		if (!field[conditional]) {
@@ -101,8 +112,14 @@ ui.directive('uiWidgetStates', function() {
 
 		evalScope.$readonly = _.bind(scope.isReadonly, scope);
 		evalScope.$required = _.bind(scope.isRequired, scope);
-		evalScope.$valid = _.bind(scope.isValid, scope);
-		evalScope.$invalid = function() { return !evalScope.$valid(); };
+
+		evalScope.$valid = function(name) {
+			return isValid(scope, name);
+		};
+
+		evalScope.$invalid = function(name) {
+			return !isValid(scope, name);
+		};
 
 		scope.$on("on:record-change", function(e, rec) {
 			if (rec === scope.record) {
