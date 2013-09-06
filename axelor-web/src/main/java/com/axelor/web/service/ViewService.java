@@ -80,7 +80,7 @@ public class ViewService extends AbstractService {
 		}
 		return null;
 	}
-	
+
 	@GET
 	@Path("models")
 	public Response models() {
@@ -115,7 +115,7 @@ public class ViewService extends AbstractService {
 
 		return response;
 	}
-	
+
 	@GET
 	@Path("views/{model}")
 	public Response views(@PathParam("model") String model) {
@@ -126,7 +126,7 @@ public class ViewService extends AbstractService {
 		}
 		return service.findViews(findClass(model), views);
 	}
-	
+
 	@GET
 	@Path("view")
 	public Response view(
@@ -139,7 +139,7 @@ public class ViewService extends AbstractService {
 	@POST
 	@Path("view/fields")
 	public Response viewFields(Request request) {
-		
+
 		final String model = request.getModel();
 		final List<String> names = request.getFields();
 
@@ -163,16 +163,16 @@ public class ViewService extends AbstractService {
 				fields.add(map);
 			}
 		}
-		
+
 		Map<String, Object> data = Maps.newHashMap();
 		data.put("perms", perms(modelClass));
 		data.put("fields", fields);
 
 		response.setData(data);
-		
+
 		return response;
 	}
-	
+
 	private Map<String, Object> perms(Class<?> model) {
 		User user = AuthUtils.getUser();
 		if (user == null || user.getGroup() == null
@@ -180,7 +180,7 @@ public class ViewService extends AbstractService {
 				|| "admins".equals(user.getGroup().getCode())) {
 			return null;
 		}
-		
+
 		TypedQuery<Permission> q = JPA.em().createQuery(
 				"SELECT p FROM User u " +
 				"LEFT JOIN u.group AS g " +
@@ -197,7 +197,7 @@ public class ViewService extends AbstractService {
 		} catch (IndexOutOfBoundsException e){
 			return null;
 		}
-		
+
 		Map<String, Object> map = Maps.newHashMap();
 		map.put("read", p.getCanRead());
 		map.put("write", p.getCanWrite());
@@ -206,7 +206,7 @@ public class ViewService extends AbstractService {
 
 		return map;
 	}
-	
+
 	private Property findField(final Mapper mapper, String name) {
 		final Iterator<String> iter = Splitter.on(".").split(name).iterator();
 		Mapper current = mapper;
@@ -227,12 +227,16 @@ public class ViewService extends AbstractService {
 		if (select == null || select.getItems() == null) {
 			return all;
 		}
-		for(MetaSelectItem item : select.getItems()) {
+		List<MetaSelectItem> items = MetaSelectItem.all().filter("self.select.id = ?", select.getId()).order("order").fetch();
+		if (items == null || items.isEmpty()) {
+			return null;
+		}
+		for(MetaSelectItem item : items) {
 			all.add(ImmutableMap.of("value", item.getValue(), "title", JPA.translate(item.getTitle())));
 		}
 		return all;
 	}
-	
+
 	@GET
 	@Path("chart/{name}")
 	public Response get(@PathParam("name") String name) {
