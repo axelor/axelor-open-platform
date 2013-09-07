@@ -120,7 +120,7 @@ ui.directive('uiHelpPopover', function() {
 		return table;
 	}
 
-	return function(scope, element, attrs) {
+	function doLink(scope, element, attrs) {
 		var field = scope.field;
 		if (field == null) {
 			return;
@@ -152,6 +152,20 @@ ui.directive('uiHelpPopover', function() {
 				return getHelp(scope, element, field, mode);
 			}
 		});
+	};
+
+	return function(scope, element, attrs) {
+		var field = scope.field;
+		if (!_.isEmpty(field)) {
+			return doLink(scope, element, attrs);
+		}
+		var unwatch = scope.$watch('field', function(field, old) {
+			if (field === old || !field) {
+				return;
+			}
+			unwatch();
+			doLink(scope, element, attrs);
+		}, true);
 	};
 });
 
