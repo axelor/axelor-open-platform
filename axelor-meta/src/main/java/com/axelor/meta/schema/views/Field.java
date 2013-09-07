@@ -266,6 +266,7 @@ public class Field extends SimpleWidget {
 
 	@JsonProperty("selection")
 	public List<Object> getSelectionList() {
+		String selection = getSelection();
 		if (selection == null || "".equals(selection.trim()))
 			return null;
 		final MetaSelect select = MetaSelect.findByName(selection);
