@@ -192,8 +192,14 @@ function DSViewCtrl(type, $scope, $element) {
 			viewPromise.success(function(fields, schema){
 				var toolbar = [];
 				_.each(schema.toolbar, function(button){
-					if (/^(new|edit|save|delete|copy|cancel|back|refresh|search|export)$/.test(button.name))
-						return hiddenButtons[button.name] = button.hidden;
+					button.custom = true;
+					if (/^(new|edit|save|delete|copy|cancel|back|refresh|search|export|log|files)$/.test(button.name)) {
+						hiddenButtons[button.name] = button;
+						button.custom = false;
+					}
+					if (!button.title) {
+						button.title = button.name;
+					}
 					toolbar.push(button);
 				});
 
@@ -246,8 +252,13 @@ function DSViewCtrl(type, $scope, $element) {
 		if (name == "delete" && !this.hasPermission("delete")) {
 			return false;
 		}
-		if (_(hiddenButtons).has(name))
-			return !hiddenButtons[name];
+		if (_(hiddenButtons).has(name)) {
+			var button = hiddenButtons[name];
+			if (button.isHidden) {
+				return !button.isHidden();
+			}
+			return !button.hidden;
+		}
 		return true;
 	};
 	

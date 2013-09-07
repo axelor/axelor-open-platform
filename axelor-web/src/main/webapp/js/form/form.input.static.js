@@ -282,6 +282,10 @@ ui.formItem('ToolButton', 'Button', {
 
 		scope.title = field.title;
 
+		scope.btn.isHidden = function() {
+			return scope.isHidden();
+		};
+
 		scope.$watch("isHidden()", function(hidden, old) {
 			setTimeout(function() {
 				element.parent().children().removeClass('btn-fix-left btn-fix-right');
