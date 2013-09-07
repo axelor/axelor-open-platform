@@ -299,6 +299,17 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	};
 	
 	$scope.fetchSelection = function(request, response) {
+		var fn = fetchSelection.bind(this);
+		var onSelect = this.$events.onSelect;
+		if (onSelect) {
+			return onSelect().then(function() {
+				return fn(request, response);
+			});
+		}
+		return fn(request, response);
+	};
+
+	function fetchSelection(request, response) {
 
 		var field = this.field;
 		var nameField = field.targetName || 'id',
