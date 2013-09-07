@@ -282,6 +282,8 @@ function Loader(scope, node, DataSource) {
 			sortBy = scope.sortAs + sortBy.name;
 		}
 		
+		sortBy = sortBy || node.orderBy;
+
 		if (current) {
 			context.parent = current.id;
 		} else if (scope.getContext) {
