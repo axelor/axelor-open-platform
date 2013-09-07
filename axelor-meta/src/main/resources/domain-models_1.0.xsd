@@ -157,7 +157,7 @@
         <xsd:attribute name="selection" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-              List of selection options. "['value', 'Label'], ['valu2', 'Label2']"
+              Selection key name (defined in views).
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
