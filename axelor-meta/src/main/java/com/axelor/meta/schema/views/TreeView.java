@@ -91,6 +91,9 @@ public class TreeView extends AbstractView {
 		@XmlAttribute
 		private String domain;
 
+		@XmlAttribute
+		private String orderBy;
+
 		@XmlElement(name = "field")
 		private List<NodeField> fields;
 		
@@ -114,7 +117,16 @@ public class TreeView extends AbstractView {
 			return domain;
 		}
 
+		public String getOrderBy() {
+			return orderBy;
+		}
+
 		public List<NodeField> getFields() {
+			if (fields != null) {
+				for(NodeField field : fields) {
+					field.setModel(model);
+				}
+			}
 			return fields;
 		}
 	}

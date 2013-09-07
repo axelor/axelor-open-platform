@@ -364,6 +364,7 @@
                         </xsd:documentation>
                       </xsd:annotation>
                     </xsd:attribute>
+                    <xsd:attribute name="selection" type="xsd:string" />
                   </xsd:complexType>
                 </xsd:element>
               </xsd:sequence>
@@ -403,6 +404,13 @@
                 <xsd:annotation>
                   <xsd:documentation>
                   The domain for the node records.
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
+              <xsd:attribute name="orderBy" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>
+                  Sort the node results by the given field.
                   </xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
