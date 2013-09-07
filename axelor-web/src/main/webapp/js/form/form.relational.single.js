@@ -151,26 +151,31 @@ ui.formInput('ManyToOne', 'Select', {
 		this._super.apply(this, arguments);
 
 		var field = scope.field;
-		var showNestedEditor = scope.showNestedEditor;
-
-		scope.showNestedEditor = function() {
-			if (scope.canToggle() === 'both') {
-				scope.attr('hidden', true);
-			}
-			return showNestedEditor.apply(this, arguments);
-		};
 
 		scope.canToggle = function() {
 			return (field.widgetAttrs || {}).toggle;
 		};
 
-
-
 		if (field.widgetName === 'NestedEditor') {
+
+			var isHidden = scope.isHidden;
+			scope.isHidden = function() {
+				if (!scope.canSelect()) {
+					return true;
+				}
+				if (scope.canToggle() === 'both' && scope.__nestedOpen) {
+					return true;
+				}
+				return isHidden.call(scope);
+			};
+
+			var showNestedEditor = scope.showNestedEditor;
+			scope.showNestedEditor = function() {
+				scope.__nestedOpen = true;
+				return showNestedEditor.call(scope);
+			};
+
 			setTimeout(function(){
-		        if (!scope.canSelect()) {
-		        	scope.attr('hidden', true);
-		        }
 				scope.showNestedEditor();
 			});
 		}

@@ -221,9 +221,7 @@ var NestedEditor = {
 		};
 
 		scope.onClose = function() {
-			if (scope.canToggle() === 'both') {
-				scope.$parent.attr('hidden', false);
-			}
+			scope.$parent.__nestedOpen = false;
 			element.hide();
 		};
 
