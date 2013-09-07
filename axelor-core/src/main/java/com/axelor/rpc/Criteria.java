@@ -85,11 +85,13 @@ public class Criteria {
 	}
 
 	public static Criteria parse(Request request) {
-		
-		try {
-			return parse(request.getData(), request.getBeanClass());
-		} catch(IllegalArgumentException e) {
-			System.err.println(e);
+
+		if (request.getData().get("operator") != null) {
+			try {
+				return parse(request.getData(), request.getBeanClass());
+			} catch(IllegalArgumentException e) {
+				System.err.println(e);
+			}
 		}
 		
 		Map<String, Object> raw = new HashMap<String, Object>();

@@ -83,7 +83,7 @@ public enum Operator {
 				return operator;
 			}
 		}
-		throw new IllegalArgumentException(name);
+		throw new IllegalArgumentException("No such operator: " + name);
 	}
 
 	@Override
