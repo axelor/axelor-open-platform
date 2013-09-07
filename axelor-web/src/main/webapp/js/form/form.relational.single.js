@@ -152,8 +152,7 @@ ui.formInput('ManyToOne', 'Select', {
 		var field = scope.field;
 		if (_.startsWith(field.widget, 'NestedEditor')) {
 			setTimeout(function(){
-				var canSelect = _.isUndefined(field.canSelect) ? true : field.canSelect;
-		        if (!canSelect) scope.attr('hidden', true);
+		        if (!scope.canSelect()) scope.attr('hidden', true);
 				scope.showNestedEditor();
 			});
 		}
@@ -167,18 +166,25 @@ ui.formInput('ManyToOne', 'Select', {
 		scope.formPath = scope.formPath ? scope.formPath + "." + scope.field.name : scope.field.name;
 
 		scope.loadSelection = function(request, response) {
+
+			if (!scope.canSelect()) {
+				return response([]);
+			}
+
 			this.fetchSelection(request, function(items, page) {
-				if (!page || page.total > items.length) {
+				if (scope.canSelect() && (!page || page.total > items.length)) {
 					items.push({
 						label: _t("Search..."),
 						click: function() { scope.showSelector(); }
 					});
 				}
-				items.push({
-					label: _t("Create..."),
-					click: function() { scope.showPopupEditor(); }
-				});
-				
+				if (scope.canNew()) {
+					items.push({
+						label: _t("Create..."),
+						click: function() { scope.showPopupEditor(); }
+					});
+				}
+
 				response(items, page);
 			});
 		};
@@ -244,8 +250,8 @@ ui.formInput('ManyToOne', 'Select', {
 		'<span class="picker-icons">'+
 			'<i class="icon-eye-open" ng-click="onSummary()" ng-show="hasPermission(\'read\') && _viewParams.summaryView"></i>'+
 			'<i class="icon-pencil" ng-click="onEdit()" ng-show="hasPermission(\'read\')" title="{{\'Edit\' | t}}"></i>'+
-			'<i class="icon-plus" ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}"></i>'+
-			'<i class="icon-search" ng-click="onSelect()" ng-show="hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}"></i>'+
+			'<i class="icon-plus" ng-click="onNew()" ng-show="canNew() && hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}"></i>'+
+			'<i class="icon-search" ng-click="onSelect()" ng-show="canSelect() && hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}"></i>'+
 		'</span>'+
 	'</div>',
 	template_readonly:

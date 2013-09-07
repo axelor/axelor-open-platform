@@ -427,22 +427,6 @@ ui.formInput('OneToMany', {
 		};
 
 		var field = scope.field;
-		scope.canSelect = function() {
-			return _.isUndefined(field.canSelect) ? scope.selectEnable : field.canSelect;
-		};
-
-		scope.canNew = function() {
-			return _.isUndefined(field.canNew) ? true : field.canNew;
-		};
-
-		scope.canView = function() {
-			return _.isUndefined(field.canView) ? true : field.canView;
-		};
-
-		scope.canRemove = function() {
-			return _.isUndefined(field.canRemove) ? true : field.canRemove;
-		};
-
 		if (field.widget === 'MasterDetail') {
 			setTimeout(function(){
 				scope.showDetailView();
