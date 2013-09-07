@@ -146,9 +146,9 @@ ui.NestedEditorCtrl = NestedEditorCtrl;
 ui.NestedEditorCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewService'];
 
 function NestedEditorCtrl($scope, $element, DataSource, ViewService) {
-	
-	var params = $scope._viewParams;
-	
+
+	var params = angular.copy($scope._viewParams);
+
 	params.views = _.compact([params.summaryView]);
 	$scope._viewParams = params;
 
