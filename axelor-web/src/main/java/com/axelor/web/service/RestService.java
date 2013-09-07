@@ -64,6 +64,7 @@ import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.google.common.base.CaseFormat;
+import com.google.common.base.Charsets;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
@@ -282,7 +283,7 @@ public class RestService extends ResourceService {
 
 	@GET
 	@Path("export/{name}")
-	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	@Produces("text/csv")
 	public StreamingOutput export(@PathParam("name") final String name) {
 
 		final Request request = EXPORT_REQUESTS.getIfPresent(name);
@@ -294,7 +295,7 @@ public class RestService extends ResourceService {
 
 			@Override
 			public void write(OutputStream output) throws IOException, WebApplicationException {
-				Writer writer = new OutputStreamWriter(output);
+				Writer writer = new OutputStreamWriter(output, Charsets.UTF_8);
 				try {
 					getResource().export(request, writer);
 				} finally {
