@@ -21,7 +21,7 @@
     @since 1.0
     ]]>
     <string name="code" column="ccc" required="true" unique="true" min="2" hashKey="false" help="The unique code."/>
-    <string name="name" required="true" unique="true" min="2" help="The title name."/>
+    <string name="name" required="true" unique="true" min="2" help="The title name." index="idx_my"/>
   </entity>
 
   <entity name="Group">
