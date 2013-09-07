@@ -336,15 +336,19 @@ angular.module('axelor.ui').directive('uiViewSwitcher', function(){
 		scope: true,
 		link: function(scope, element, attrs) {
 
-			element.find("button")
-			.click(function(e){
-				var type = $(this).attr("x-view-type");
-				if (type === "form" && scope._dataSource) {
-					var page = scope._dataSource._page;
-					if (page && page.index === -1) {
-						page.index = 0;
-					}
+			element.find("button").click(function(e){
+				var type = $(this).attr("x-view-type"),
+					ds = scope._dataSource,
+					page = ds && ds._page;
+
+				if (type === "form" && page) {
+					if (page.index === -1) page.index = 0;
 				}
+
+				if (scope.selectedTab.viewType === 'grid' && scope.selection) {
+					page.index = _.first(scope.selection);
+				}
+
 				scope.switchTo(type);
 				scope.$apply();
 			})
