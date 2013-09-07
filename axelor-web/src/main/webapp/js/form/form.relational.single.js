@@ -149,10 +149,28 @@ ui.formInput('ManyToOne', 'Select', {
 
 	link: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);
+
 		var field = scope.field;
-		if (_.startsWith(field.widget, 'NestedEditor')) {
+		var showNestedEditor = scope.showNestedEditor;
+
+		scope.showNestedEditor = function() {
+			if (scope.canToggle() === 'both') {
+				scope.attr('hidden', true);
+			}
+			return showNestedEditor.apply(this, arguments);
+		};
+
+		scope.canToggle = function() {
+			return (field.widgetAttrs || {}).toggle;
+		};
+
+
+
+		if (field.widgetName === 'NestedEditor') {
 			setTimeout(function(){
-		        if (!scope.canSelect()) scope.attr('hidden', true);
+		        if (!scope.canSelect()) {
+		        	scope.attr('hidden', true);
+		        }
 				scope.showNestedEditor();
 			});
 		}
@@ -248,7 +266,7 @@ ui.formInput('ManyToOne', 'Select', {
 	'<div class="picker-input picker-icons-3">'+
 		'<input type="text" autocomplete="off">'+
 		'<span class="picker-icons">'+
-			'<i class="icon-eye-open" ng-click="onSummary()" ng-show="hasPermission(\'read\') && _viewParams.summaryView"></i>'+
+			'<i class="icon-eye-open" ng-click="onSummary()" ng-show="hasPermission(\'read\') && _viewParams.summaryView && canToggle()"></i>'+
 			'<i class="icon-pencil" ng-click="onEdit()" ng-show="hasPermission(\'read\')" title="{{\'Edit\' | t}}"></i>'+
 			'<i class="icon-plus" ng-click="onNew()" ng-show="canNew() && hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}"></i>'+
 			'<i class="icon-search" ng-click="onSelect()" ng-show="canSelect() && hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}"></i>'+

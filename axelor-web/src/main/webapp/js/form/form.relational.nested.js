@@ -221,7 +221,14 @@ var NestedEditor = {
 		};
 
 		scope.onClose = function() {
+			if (scope.canToggle() === 'both') {
+				scope.$parent.attr('hidden', false);
+			}
 			element.hide();
+		};
+
+		scope.canClose = function() {
+			return scope.canToggle() && scope.canSelect();
 		};
 
 		attrs.$observe('title', function(title){
@@ -261,7 +268,7 @@ var NestedEditor = {
 			'<span class="legend-toolbar" ng-show="!isReadonly()">'+
 				'<a href="" tabindex="-1" ng-click="onClear()" title="{{\'Clear\' | t}}"><i class="icon-ban-circle"></i></a> '+
 				'<a href="" tabindex="-1" ng-click="onSelect()" title="{{\'Select\' | t}}"><i class="icon-search"></i></a> '+
-				'<a href="" tabindex="-1" ng-click="onClose()" title="{{\'Close\' | t}}"><i class="icon-remove-sign"></i></a>'+
+				'<a href="" tabindex="-1" ng-click="onClose()" title="{{\'Close\' | t}}" ng-show="canClose()"><i class="icon-remove-sign"></i></a>'+
 			'</span>'+
 		'</legend>'+
 		'<div ui-nested-form></div>'+
