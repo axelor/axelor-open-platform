@@ -370,9 +370,10 @@ class Property {
 	}
 
 	boolean isIndexable() {
-		if (this.isFormula() || this.isTransient())
+		if (this.isFormula() || this.isTransient() || attrs['index'] == 'false')
 			return false
-		return attrs['index'] == 'true' ||
+		String index = attrs['index'] as String
+		return index =~ /true|^idx_/ ||
 			attrs['namecolumn'] == 'true' ||
 			name in ['name', 'code'] ||
 			this.isReference() && !attrs['mappedBy']
@@ -558,7 +559,9 @@ class Property {
 
 	private Annotation $index() {
 		if (!this.isIndexable()) return null
-		def index = "${entity.table}_${columnAuto}_IDX".toUpperCase()
+		String index = attrs['index'] as String
+		if (index && !index.startsWith('idx_'))
+			index = "${entity.table}_${columnAuto}_IDX".toUpperCase()
 			return annon("org.hibernate.annotations.Index").add("name", index)
 	}
 
