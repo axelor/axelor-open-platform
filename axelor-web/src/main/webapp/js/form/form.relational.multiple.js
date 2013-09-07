@@ -427,7 +427,7 @@ ui.formInput('OneToMany', {
 		};
 
 		var field = scope.field;
-		if (field.widget === 'MasterDetail') {
+		if (field.widgetName === 'MasterDetail') {
 			setTimeout(function(){
 				scope.showDetailView();
 			});

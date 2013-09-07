@@ -356,7 +356,9 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	};
 
 	$scope.canSelect = function() {
-		return _.isUndefined(field.canSelect) ? $scope.selectEnable : field.canSelect;
+		if (field.canSelect !== undefined) return field.canSelect;
+		if ($scope.selectEnable !== undefined) return $scope.selectEnable;
+		return true;
 	};
 
 	$scope.canNew = function() {
