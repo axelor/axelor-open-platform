@@ -192,11 +192,21 @@ function Column(scope, col) {
 		if (value === undefined || value === null) {
 			return '---';
 		}
+
+		var selection = (record.$selection || {})[this.name];
+		if (selection) {
+			var cmp = col.type === "integer" ? function(a, b) { return a == b ; } : _.isEqual;
+			var res = _.find(selection, function(item){
+				return cmp(item.value, value);
+			}) || {};
+			return res.title;
+		}
 		switch(col.type) {
 		case 'datetime':
 			return value ? moment(value).format('DD/MM/YYYY HH:mm') : "";
 		case 'date':
 			return value ? moment(value).format('DD/MM/YYYY') : "";
+		case 'reference':
 		case 'many-to-one':
 			if (value.name) return value.name;
 			if (value.code) return value.name;
@@ -327,6 +337,7 @@ function Loader(scope, node, DataSource) {
 				'$id': record.id,
 				'$model': node.model,
 				'$record': record,
+				'$selection': {},
 				'$parent': parent && parent.id,
 				'$parentModel': current && current.$model,
 				'$draggable': node.draggable,
@@ -354,7 +365,9 @@ function Loader(scope, node, DataSource) {
 			};
 
 			_.each(fields, function(field) {
-				item[field.as || field.name] = record[field.name];
+				var name = field.as || field.name;
+				item[name] = record[field.name];
+				item.$selection[name] = field.selection;
 			});
 
 			return item;
