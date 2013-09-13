@@ -90,11 +90,19 @@ function FormViewCtrl($scope, $element) {
 	$scope.onShow = function(viewPromise) {
 		
 		var params = this._viewParams;
+		var context = params.context || {};
+		var recordId = params.recordId || context._showRecord;
 
 		if (params.recordId) {
+			params.recordId = undefined;
+		}
+
+		if (context._showRecord) {
+			context._showRecord = undefined;
+		}
+
+		if (recordId) {
 			return viewPromise.then(function(){
-				var recordId = params.recordId;
-				params.recordId = undefined;
 				doEdit(recordId);
 			});
 		}
