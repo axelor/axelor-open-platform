@@ -94,6 +94,7 @@
           <xsd:enumeration value="top" />
           <xsd:enumeration value="left" />
           <xsd:enumeration value="both" />
+          <xsd:enumeration value="none" />
         </xsd:restriction>
       </xsd:simpleType>
     </xsd:attribute>

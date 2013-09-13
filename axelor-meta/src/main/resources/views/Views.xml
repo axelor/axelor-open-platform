@@ -31,6 +31,7 @@
     <option value="top">Top</option>
     <option value="left">Left</option>
     <option value="both">Both</option>
+    <option value="none">None</option>
   </selection>
 
   <grid title="All Modules" name="meta-module-grid" model="com.axelor.meta.db.MetaModule">
