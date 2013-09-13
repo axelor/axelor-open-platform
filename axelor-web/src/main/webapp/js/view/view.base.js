@@ -197,9 +197,6 @@ function DSViewCtrl(type, $scope, $element) {
 						hiddenButtons[button.name] = button;
 						button.custom = false;
 					}
-					if (!button.title) {
-						button.title = button.name;
-					}
 					toolbar.push(button);
 				});
 

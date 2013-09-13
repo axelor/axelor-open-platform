@@ -254,7 +254,7 @@ ui.formItem('Button', {
 		}
 
 		if (!field.title) {
-			element.addClass("icon-only");
+			element.addClass("button-icon");
 		}
 		
 		if (_.isString(field.link)) {

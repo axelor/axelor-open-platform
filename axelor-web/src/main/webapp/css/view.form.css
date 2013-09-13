@@ -786,8 +786,16 @@ table.field-details .help-text hr {
 	display: block;
 }
 
-.button-item.icon-only {
+.button-item.button-icon {
 	text-decoration: none;
+}
+
+.record-toolbar .button-item {
+	line-height: 20px;
+}
+
+.record-toolbar .button-item.button-icon img {
+	margin-top: -2px;
 }
 
 /* filter menu */
