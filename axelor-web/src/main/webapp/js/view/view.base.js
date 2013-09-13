@@ -133,7 +133,7 @@ function ViewCtrl($scope, DataSource, ViewService) {
 		}
 		
 		if (context._showRecord > 0) {
-			return doEdit(context._showRecord);
+			return $scope.switchTo('form');
 		}
 
 		return ds.search({
