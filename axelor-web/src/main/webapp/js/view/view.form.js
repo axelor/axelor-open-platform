@@ -93,7 +93,9 @@ function FormViewCtrl($scope, $element) {
 
 		if (params.recordId) {
 			return viewPromise.then(function(){
-				doEdit(params.recordId);
+				var recordId = params.recordId;
+				params.recordId = undefined;
+				doEdit(recordId);
 			});
 		}
 		
