@@ -47,6 +47,12 @@ angular.module('axelor.ui').directive('navTree', function() {
 					if (successFn) {
 						return successFn(items);
 					}
+
+					if (name == null) {
+						items = _.filter(items, function(item) {
+							return item.navbar !== 'top';
+						});
+					}
 					$element.navtree('addItems', items);
 				});
 			};
