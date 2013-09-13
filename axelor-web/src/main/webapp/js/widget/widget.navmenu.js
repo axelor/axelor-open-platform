@@ -57,7 +57,7 @@ function NavMenuCtrl($scope, $element, MenuService, NavService) {
 
 		_.each(data, function(item) {
 
-			if (hasSideBar && !item.parent && (!item.navbar || item.navbar == 'left')) {
+			if (hasSideBar && !item.parent && (!item.navbar || item.navbar == 'left' || item.navbar == 'none')) {
 				return;
 			}
 
