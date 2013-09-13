@@ -61,7 +61,7 @@ public class MenuItem {
 	private String groups;
 
 	@XmlAttribute
-	private Boolean top;
+	private String navbar;
 
 	@XmlAttribute
 	private String category;
@@ -107,12 +107,12 @@ public class MenuItem {
 		this.groups = groups;
 	}
 
-	public Boolean getTop() {
-		return top;
+	public String getNavbar() {
+		return navbar;
 	}
 
-	public void setTop(Boolean top) {
-		this.top = top;
+	public void setNavbar(String navbar) {
+		this.navbar = navbar;
 	}
 
 	public String getCategory() {

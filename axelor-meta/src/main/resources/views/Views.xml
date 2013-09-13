@@ -27,6 +27,12 @@
     <option value="action-workflow">action-workflow</option>
   </selection>
   
+  <selection name="menuitem.navbar.selection">
+    <option value="top">Top</option>
+    <option value="left">Left</option>
+    <option value="both">Both</option>
+  </selection>
+
   <grid title="All Modules" name="meta-module-grid" model="com.axelor.meta.db.MetaModule">
     <field name="name"/>
     <field name="title"/>
@@ -117,6 +123,7 @@
     <field name="parent"/>
     <field name="action"/>
     <field name="module"/>
+    <field name="navbar"/>
     <field name="priority"/>
   </grid>
 
@@ -128,7 +135,7 @@
     <field name="action"/>
     <field name="priority"/>
     <field name="module"/>
-    <field name="top"/>
+    <field name="navbar"/>
     <break/>
     <notebook colSpan="4">
       <page title="Groups" cols="1">
