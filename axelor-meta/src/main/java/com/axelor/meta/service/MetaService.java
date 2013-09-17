@@ -90,7 +90,9 @@ public class MetaService {
 			item.setPriority(menu.getPriority());
 			item.setTitle(menu.getTitle());
 			item.setIcon(menu.getIcon());
-			item.setNavbar(menu.getNavbar());
+			item.setTop(menu.getTop());
+			item.setLeft(menu.getLeft());
+			item.setMobile(menu.getMobile());
 
 			if (menu.getParent() != null) {
 				item.setParent(menu.getParent().getName());

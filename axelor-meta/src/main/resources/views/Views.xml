@@ -13,20 +13,6 @@
     <option value="searchfilters">Filters</option>
   </selection>
   
-  <selection name="action.type.selection">
-    <option value="action-attrs">action-attrs</option>
-    <option value="action-view">action-view</option>
-    <option value="action-group">action-group</option>
-    <option value="action-validate">action-validate</option>
-    <option value="action-condition">action-condition</option>
-    <option value="action-record">action-record</option>
-    <option value="action-method">action-method</option>
-    <option value="action-import">action-import</option>
-    <option value="action-export">action-export</option>
-    <option value="action-ws">action-ws</option>
-    <option value="action-workflow">action-workflow</option>
-  </selection>
-  
   <selection name="menuitem.navbar.selection">
     <option value="top">Top</option>
     <option value="left">Left</option>
@@ -124,7 +110,9 @@
     <field name="parent"/>
     <field name="action"/>
     <field name="module"/>
-    <field name="navbar"/>
+    <field name="top"/>
+    <field name="left"/>
+    <field name="mobile"/>
     <field name="priority"/>
   </grid>
 
@@ -134,9 +122,11 @@
     <field name="title"/>
     <field name="icon"/>
     <field name="action"/>
-    <field name="priority"/>
+    <field name="top"/>
     <field name="module"/>
-    <field name="navbar"/>
+    <field name="left"/>
+    <field name="priority"/>
+    <field name="mobile"/>
     <break/>
     <notebook colSpan="4">
       <page title="Groups" cols="1">

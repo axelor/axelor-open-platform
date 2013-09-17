@@ -82,21 +82,26 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="navbar">
+    <xsd:attribute name="top" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>
-        If both navigation menus (top and left) are visible then
-        where to show this menu item (default is left menu).
+        Whether to show the menu item in top navigation menu.
         </xsd:documentation>
       </xsd:annotation>
-      <xsd:simpleType>
-        <xsd:restriction base="xsd:string">
-          <xsd:enumeration value="top" />
-          <xsd:enumeration value="left" />
-          <xsd:enumeration value="both" />
-          <xsd:enumeration value="none" />
-        </xsd:restriction>
-      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="left" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+        Whether to show the menu item in the left navigation menu.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="mobile" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+        Whether to show the menu item in the mobile menu.
+        </xsd:documentation>
+      </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
 
