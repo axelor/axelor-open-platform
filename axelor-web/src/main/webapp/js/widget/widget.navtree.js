@@ -37,7 +37,11 @@ angular.module('axelor.ui').directive('navTree', function() {
 		},
 
 		controller: ['$scope', '$element', 'MenuService', function($scope, $element, MenuService) {
-			
+
+			function canAccept(item) {
+				return item.left || item.left === undefined;
+			}
+
 			$scope.load = function(parent, successFn) {
 
 				var name = parent ? parent.name : null;
@@ -49,9 +53,7 @@ angular.module('axelor.ui').directive('navTree', function() {
 					}
 
 					if (name == null) {
-						items = _.filter(items, function(item) {
-							return item.navbar !== 'top' && item.navbar !== 'none';
-						});
+						items = _.filter(items, canAccept);
 					}
 					$element.navtree('addItems', items);
 				});
