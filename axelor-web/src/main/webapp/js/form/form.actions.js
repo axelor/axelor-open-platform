@@ -41,6 +41,16 @@ var equals = angular.equals,
 function updateValues(source, target) {
 	if (equals(source, target))
 		return;
+
+	function compact(value) {
+		if (!value) return value;
+		if (value.version === undefined) return value;
+		if (!value.id) return value;
+		var res = _.extend(value);
+		res.version = undefined;
+		return res;
+	};
+
 	forEach(source, function(value, key) {
 		if (isDate(value))
 			return target[key] = value;
@@ -56,13 +66,16 @@ function updateValues(source, target) {
 			return target[key] = value;
 		}
 		if (isObject(value)) {
-			var dest = target[key];
-			if (dest && dest.id == value.id) {
-				dest = _.extend({}, dest);
-				updateValues(value, dest);
-				return target[key] = dest;
+			var dest = target[key] || {};
+			if (dest.id == value.id) {
+				if (dest.version) {
+					dest = _.extend({}, dest);
+					updateValues(value, dest);
+				}
+			} else {
+				dest = compact(value);
 			}
-			return target[key] = value;
+			return target[key] = dest;
 		}
 		return target[key] = value;
 	});
