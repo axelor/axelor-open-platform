@@ -61,7 +61,13 @@ public class MenuItem {
 	private String groups;
 
 	@XmlAttribute
-	private String navbar;
+	private Boolean top;
+
+	@XmlAttribute
+	private Boolean left;
+
+	@XmlAttribute
+	private Boolean mobile;
 
 	@XmlAttribute
 	private String category;
@@ -107,12 +113,28 @@ public class MenuItem {
 		this.groups = groups;
 	}
 
-	public String getNavbar() {
-		return navbar;
+	public Boolean getTop() {
+		return top;
 	}
 
-	public void setNavbar(String navbar) {
-		this.navbar = navbar;
+	public void setTop(Boolean top) {
+		this.top = top;
+	}
+
+	public Boolean getLeft() {
+		return left;
+	}
+
+	public void setLeft(Boolean left) {
+		this.left = left;
+	}
+
+	public Boolean getMobile() {
+		return mobile;
+	}
+
+	public void setMobile(Boolean mobile) {
+		this.mobile = mobile;
 	}
 
 	public String getCategory() {

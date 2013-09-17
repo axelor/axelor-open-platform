@@ -372,7 +372,9 @@ public class MetaLoader {
 		menu.setIcon(menuItem.getIcon());
 		menu.setModule(module);
 		menu.setGroups(this.findGroups(menuItem.getGroups()));
-		menu.setNavbar(menuItem.getNavbar());
+		menu.setTop(menuItem.getTop());
+		menu.setLeft(menuItem.getLeft() == null ? true : menuItem.getLeft());
+		menu.setMobile(menuItem.getMobile());
 
 		if (!Strings.isNullOrEmpty(menuItem.getParent())) {
 			MetaMenu parent = MetaMenu.findByName(menuItem.getParent());
