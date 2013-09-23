@@ -12,12 +12,19 @@
     <option value="calendar">Calendar</option>
     <option value="searchfilters">Filters</option>
   </selection>
-  
-  <selection name="menuitem.navbar.selection">
-    <option value="top">Top</option>
-    <option value="left">Left</option>
-    <option value="both">Both</option>
-    <option value="none">None</option>
+
+  <selection name="action.type.selection">
+    <option value="action-attrs">action-attrs</option>
+    <option value="action-view">action-view</option>
+    <option value="action-group">action-group</option>
+    <option value="action-validate">action-validate</option>
+    <option value="action-condition">action-condition</option>
+    <option value="action-record">action-record</option>
+    <option value="action-method">action-method</option>
+    <option value="action-import">action-import</option>
+    <option value="action-export">action-export</option>
+    <option value="action-ws">action-ws</option>
+    <option value="action-workflow">action-workflow</option>
   </selection>
 
   <grid title="All Modules" name="meta-module-grid" model="com.axelor.meta.db.MetaModule">
