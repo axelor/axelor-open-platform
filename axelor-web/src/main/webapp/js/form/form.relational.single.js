@@ -150,6 +150,9 @@ ui.formInput('ManyToOne', 'Select', {
 	link: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);
 
+		scope.ngModel = model;
+		scope.formPath = scope.formPath ? scope.formPath + "." + scope.field.name : scope.field.name;
+
 		var field = scope.field;
 
 		scope.canToggle = function() {
@@ -184,9 +187,6 @@ ui.formInput('ManyToOne', 'Select', {
 	link_editable: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);
 		var input = this.findInput(element);
-		
-		scope.ngModel = model;
-		scope.formPath = scope.formPath ? scope.formPath + "." + scope.field.name : scope.field.name;
 
 		scope.loadSelection = function(request, response) {
 
