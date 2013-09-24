@@ -32,6 +32,7 @@ package com.axelor.meta.script;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
+import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 
 import java.lang.reflect.Method;
@@ -181,7 +182,17 @@ public class GroovyScriptHelper implements ScriptHelper {
 				CACHE.put(key, klass);
 			}
 			Script script = (Script) klass.newInstance();
-			script.setBinding(new Binding(bindings));
+			script.setBinding(new Binding(bindings) {
+
+				@Override
+				public Object getVariable(String name) {
+					try {
+						return super.getVariable(name);
+					} catch (MissingPropertyException e) {
+					}
+					return null;
+				}
+			});
 			return script.run();
 		} catch (Exception e) {
 		}
