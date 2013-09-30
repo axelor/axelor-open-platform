@@ -146,27 +146,27 @@
 	
 	<menuitem name="menu-wkf-nodes-root-filter" parent="menu-wkf-nodes-root-event" title="Filters" />
 
-	<menuitem name="menu-wkf-filter" parent="menu-wkf-nodes-root-filter" title="Filters"
-		action="action-wkf-filter" />
+	<menuitem name="menu-wkf-filter-event" parent="menu-wkf-nodes-root-filter" title="Filters"
+		action="action-wkf-filter-event" />
 
-	<action-view name="action-wkf-filter" title="Filters"
-		model="com.axelor.wkf.db.node.Filter">
-		<view type="grid" name="filter-grid" />
-		<view type="form" name="filter-form" />
+	<action-view name="action-wkf-filter-event" title="Filters"
+		model="com.axelor.wkf.db.node.FilterEvent">
+		<view type="grid" name="filter-event-grid" />
+		<view type="form" name="filter-event-form" />
 	</action-view>
 
-	<menuitem name="menu-wkf-stop-filter" parent="menu-wkf-nodes-root-filter" title="Stop filters"
-		action="action-wkf-stop-filter" />
+	<menuitem name="menu-wkf-stop-filter-event" parent="menu-wkf-nodes-root-filter" title="Stop filters"
+		action="action-wkf-stop-filter-event" />
 
-	<action-view name="action-wkf-stop-filter" title="Stop filters"
-		model="com.axelor.wkf.db.node.StopFilter">
-		<view type="grid" name="stop-filter-grid" />
-		<view type="form" name="stop-filter-form" />
+	<action-view name="action-wkf-stop-filter-event" title="Stop filters"
+		model="com.axelor.wkf.db.node.StopFilterEvent">
+		<view type="grid" name="stop-filter-event-grid" />
+		<view type="form" name="stop-filter-event-form" />
 	</action-view>
 	
 	<menuitem name="menu-wkf-nodes-root-activity" parent="menu-wkf-nodes-root" title="Activities" />
 
-	<menuitem name="menu-wkf-activity" parent="menu-wkf-nodes-root-activity" title="Tasks"
+	<menuitem name="menu-wkf-activity" parent="menu-wkf-nodes-root-activity" title="Activities"
 		action="action-wkf-activity" />
 
 	<action-view name="action-wkf-activity" title="Tasks"

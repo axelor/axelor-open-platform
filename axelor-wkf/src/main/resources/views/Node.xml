@@ -12,8 +12,8 @@
 		<option value="gateway">Gateway</option>
 		<option value="message">Message</option>
 		<option value="timer">Timer</option>
-		<option value="filter">Filter</option>
-		<option value="stopFilter">Stop filter</option>
+		<option value="filterEvent">Filter event</option>
+		<option value="stopFilterEvent">Stop filter event</option>
 	</selection>
     
     <selection name="node.logic.operator.selection">
@@ -55,7 +55,7 @@
         <field name="operator" hideIf="type != 'gateway'" />
         <field name="messageType" hideIf="type != 'message'" />
         <field name="socialNetwork" hideIf="messageType != 'socialNetwork'" />
-        <field name="filter" hideIf="type != 'filter'" />
+        <field name="filter" hideIf="type != 'filterEvent'" />
         <break/>
         <group showIf="type == 'timer'" colSpan="4" cols="6">
         	<field name="timeDate" />
@@ -109,7 +109,7 @@
    		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
     </form>
     
-    <grid name="activity-grid" title="Activitys" model="com.axelor.wkf.db.node.Activity">
+    <grid name="activity-grid" title="Activities" model="com.axelor.wkf.db.node.Activity">
         <field name="name"/>
         <field name="action"/>
     </grid>
@@ -406,12 +406,12 @@
    		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
     </form>
     
-    <grid name="filter-grid" title="Filters" model="com.axelor.wkf.db.node.Filter" >
+    <grid name="filter-event-grid" title="Filters" model="com.axelor.wkf.db.node.FilterEvent" >
         <field name="name"/>
        	<field name="filter" />
     </grid>
     
-    <form name="filter-form" title="Filter" cols="4" model="com.axelor.wkf.db.node.Filter" onNew="filter-default-record" >
+    <form name="filter-event-form" title="Filter" cols="4" model="com.axelor.wkf.db.node.FilterEvent" onNew="filter-event-default-record" >
         <field name="name"/>
        	<field name="filter" />
         <group name="startGroup" colSpan="2" cols="2" >
@@ -424,13 +424,13 @@
    		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
     </form>
     
-    <grid name="stop-filter-grid" title="Stop filters" model="com.axelor.wkf.db.node.StopFilter" >
+    <grid name="stop-filter-event-grid" title="Stop filters" model="com.axelor.wkf.db.node.StopFilterEvent" >
         <field name="name"/>
     </grid>
     
-    <form name="stop-filter-form" title="Stop filter" cols="4" model="com.axelor.wkf.db.node.StopFilter" onNew="stop-filter-default-record" >
+    <form name="stop-filter-event-form" title="Stop filter" cols="4" model="com.axelor.wkf.db.node.StopFilterEvent" onNew="stop-filter-event-default-record" >
         <field name="name"/>
-       	<field name="filter" />
+        <break/>
         <group name="startGroup" colSpan="2" cols="2" >
 	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
         </group>
@@ -534,13 +534,13 @@
     	<field name="name" expr="eval: 'twitter event :'"/>
     </action-record>
     
-    <action-record name="filter-default-record" model="com.axelor.wkf.db.node.Filter">
-    	<field name="type" expr="filter"/>
+    <action-record name="filter-event-default-record" model="com.axelor.wkf.db.node.FilterEvent">
+    	<field name="type" expr="filterEvent"/>
     	<field name="name" expr="eval: 'Filter :'"/>
     </action-record>
     
-    <action-record name="stop-filter-default-record" model="com.axelor.wkf.db.node.StopFilter">
-    	<field name="type" expr="stopFilter"/>
+    <action-record name="stop-filter-event-default-record" model="com.axelor.wkf.db.node.StopFilterEvent">
+    	<field name="type" expr="stopFilterEvent"/>
     	<field name="name" expr="eval: 'Stop filter :'"/>
     </action-record>
     
