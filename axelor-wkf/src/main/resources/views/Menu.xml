@@ -166,13 +166,13 @@
 	
 	<menuitem name="menu-wkf-nodes-root-activity" parent="menu-wkf-nodes-root" title="Activities" />
 
-	<menuitem name="menu-wkf-task" parent="menu-wkf-nodes-root-activity" title="Tasks"
-		action="action-wkf-task" />
+	<menuitem name="menu-wkf-activity" parent="menu-wkf-nodes-root-activity" title="Tasks"
+		action="action-wkf-activity" />
 
-	<action-view name="action-wkf-task" title="Tasks"
-		model="com.axelor.wkf.db.node.Task">
-		<view type="grid" name="task-grid" />
-		<view type="form" name="task-form" />
+	<action-view name="action-wkf-activity" title="Tasks"
+		model="com.axelor.wkf.db.node.Activity">
+		<view type="grid" name="activity-grid" />
+		<view type="form" name="activity-form" />
 	</action-view>
 
 	<menuitem name="menu-wkf-nodes-root-gateway" parent="menu-wkf-nodes-root" title="Gateways" />

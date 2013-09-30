@@ -7,7 +7,7 @@
 
     <selection name="node.type.selection">
 		<option value="startEvent">Start event</option>
-		<option value="task">Task</option>
+		<option value="activity">Activity</option>
 		<option value="endEvent">End event</option>
 		<option value="gateway">Gateway</option>
 		<option value="message">Message</option>
@@ -51,7 +51,7 @@
     <form name="node-form" title="Node" cols="4" model="com.axelor.wkf.db.Node" onNew="node-default-record-group" >
         <field name="type" onChange="node-record-name"/>
         <field name="name"/>
-        <field name="action" hideIf="type != 'task'"/>
+        <field name="action" hideIf="type != 'activity'"/>
         <field name="operator" hideIf="type != 'gateway'" />
         <field name="messageType" hideIf="type != 'message'" />
         <field name="socialNetwork" hideIf="messageType != 'socialNetwork'" />
@@ -109,12 +109,12 @@
    		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
     </form>
     
-    <grid name="task-grid" title="Tasks" model="com.axelor.wkf.db.node.Task">
+    <grid name="activity-grid" title="Activitys" model="com.axelor.wkf.db.node.Activity">
         <field name="name"/>
         <field name="action"/>
     </grid>
     
-    <form name="task-form" title="Task" cols="4" model="com.axelor.wkf.db.node.Task" onNew="task-default-record" >
+    <form name="activity-form" title="Activity" cols="4" model="com.axelor.wkf.db.node.Activity" onNew="activity-default-record" >
         <field name="name"/>
         <field name="action"/>
         <break/>
@@ -455,9 +455,9 @@
     	<field name="name" expr="End event :"/>
     </action-record>
     
-    <action-record name="task-default-record" model="com.axelor.wkf.db.node.Task">
-    	<field name="type" expr="task"/>
-    	<field name="name" expr="eval: 'Task:'"/>
+    <action-record name="activity-default-record" model="com.axelor.wkf.db.node.Activity">
+    	<field name="type" expr="activity"/>
+    	<field name="name" expr="eval: 'Activity:'"/>
     </action-record>
     
     <action-record name="inclusive-gateway-default-record" model="com.axelor.wkf.db.node.gateway.InclusiveGateway">
@@ -551,7 +551,7 @@
 	<!-- GROUP -->
 	<action-group name="node-default-record-group">
 		<action name="start-event-default-record" if="_parent?._model == 'com.axelor.wkf.db.Workflow'"/>
-		<action name="task-default-record" if="_parent?._model != 'com.axelor.wkf.db.Workflow'"/>
+		<action name="activity-default-record" if="_parent?._model != 'com.axelor.wkf.db.Workflow'"/>
 	</action-group>
     
 </object-views>

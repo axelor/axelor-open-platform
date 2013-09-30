@@ -20,7 +20,7 @@
 	
   <input file="[wkf.import]" root="definitions">
     
-    <bind node="process/task" type="com.axelor.wkf.db.node.Task" search="self.name = :name" update="true">
+    <bind node="process/task" type="com.axelor.wkf.db.node.Activity" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="@action" to="action" search="self.name = :action" />

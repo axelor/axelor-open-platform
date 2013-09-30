@@ -43,31 +43,31 @@ import com.axelor.wkf.db.Node;
 import com.axelor.wkf.db.Transition;
 
 @Entity
-public class Task extends Node {
+public class Activity extends Node {
 	
 	/**
-	 * Find a <code>Task</code> by <code>id</code>.
+	 * Find a <code>Activity</code> by <code>id</code>.
 	 *
 	 */
-	public static Task find(Long id) {
-		return JPA.find(Task.class, id);
+	public static Activity find(Long id) {
+		return JPA.find(Activity.class, id);
 	}
 	
 	/**
-	 * Return a {@link Query} instance for <code>Task</code> to filter
+	 * Return a {@link Query} instance for <code>Activity</code> to filter
 	 * on all the records.
 	 *
 	 */
-	public static Query<Task> allTask() {
-		return JPA.all(Task.class);
+	public static Query<Activity> allActivity() {
+		return JPA.all(Activity.class);
 	}
 	
 	/**
-	 * A shortcut method to <code>Task.all().filter(...)</code>
+	 * A shortcut method to <code>Activity.all().filter(...)</code>
 	 *
 	 */
-	public static Query<Task> filterTask(String filter, Object... params) {
-		return JPA.all(Task.class).filter(filter, params);
+	public static Query<Activity> filterActivity(String filter, Object... params) {
+		return JPA.all(Activity.class).filter(filter, params);
 	}
 	
 	@Override
