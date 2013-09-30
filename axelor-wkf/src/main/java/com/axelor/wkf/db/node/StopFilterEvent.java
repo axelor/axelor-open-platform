@@ -37,14 +37,14 @@ import com.axelor.db.Query;
 import com.axelor.wkf.db.Node;
 
 @Entity
-public class StopFilter extends Node {
+public class StopFilterEvent extends Node {
 
 	/**
 	 * Find a <code>StopFilter</code> by <code>id</code>.
 	 *
 	 */
-	public static StopFilter find(Long id) {
-		return JPA.find(StopFilter.class, id);
+	public static StopFilterEvent find(Long id) {
+		return JPA.find(StopFilterEvent.class, id);
 	}
 	
 	/**
@@ -52,16 +52,16 @@ public class StopFilter extends Node {
 	 * on all the records.
 	 *
 	 */
-	public static Query<StopFilter> allStopFilter() {
-		return JPA.all(StopFilter.class);
+	public static Query<StopFilterEvent> allStopFilter() {
+		return JPA.all(StopFilterEvent.class);
 	}
 	
 	/**
 	 * A shortcut method to <code>StopFilter.all().StopFilter(...)</code>
 	 *
 	 */
-	public static Query<StopFilter> StopFilterStopFilter(String StopFilter, Object... params) {
-		return JPA.all(StopFilter.class).filter(StopFilter, params);
+	public static Query<StopFilterEvent> StopFilterStopFilter(String StopFilter, Object... params) {
+		return JPA.all(StopFilterEvent.class).filter(StopFilter, params);
 	}
 
 }

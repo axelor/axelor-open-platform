@@ -37,7 +37,7 @@ import com.axelor.db.Query;
 import com.axelor.wkf.db.Node;
 
 @Entity
-public class Filter extends Node {
+public class FilterEvent extends Node {
 	
 	private String filter;
 	
@@ -53,8 +53,8 @@ public class Filter extends Node {
 	 * Find a <code>Filter</code> by <code>id</code>.
 	 *
 	 */
-	public static Filter find(Long id) {
-		return JPA.find(Filter.class, id);
+	public static FilterEvent find(Long id) {
+		return JPA.find(FilterEvent.class, id);
 	}
 	
 	/**
@@ -62,16 +62,16 @@ public class Filter extends Node {
 	 * on all the records.
 	 *
 	 */
-	public static Query<Filter> allFilter() {
-		return JPA.all(Filter.class);
+	public static Query<FilterEvent> allFilter() {
+		return JPA.all(FilterEvent.class);
 	}
 	
 	/**
 	 * A shortcut method to <code>Filter.all().filter(...)</code>
 	 *
 	 */
-	public static Query<Filter> filterFilter(String filter, Object... params) {
-		return JPA.all(Filter.class).filter(filter, params);
+	public static Query<FilterEvent> filterFilter(String filter, Object... params) {
+		return JPA.all(FilterEvent.class).filter(filter, params);
 	}
 
 }

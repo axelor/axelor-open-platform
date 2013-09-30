@@ -25,7 +25,7 @@
     	<bind node="@id" to="ref" />
     	<bind node="@action" to="action" search="self.name = :action" />
     	<bind node="documentation" to="description" />
-    	<bind eval="'task'" to="type" />
+    	<bind eval="'activity'" to="type" />
     </bind>
     
     <bind node="process/intermediateCatchEvent[timerEventDefinition]" type="com.axelor.wkf.db.node.IntermediateTimerEvent" search="self.name = :name" update="true" >
@@ -177,7 +177,7 @@
     	
     </bind>
     
-    <bind node="process/intermediateCatchEvent[filterEventDefinition]" type="com.axelor.wkf.db.node.Filter" search="self.name = :name" update="true" >
+    <bind node="process/intermediateCatchEvent[filterEventDefinition]" type="com.axelor.wkf.db.node.FilterEvent" search="self.name = :name" update="true" >
         
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
@@ -185,17 +185,17 @@
     	
     	<bind node="filterEventDefinition/filter/@name" to="filter" />
     	
-    	<bind eval="'filter'" to="type" />
+    	<bind eval="'filterEvent'" to="type" />
     	
     </bind>
     
-    <bind node="process/intermediateCatchEvent[stopFilterEventDefinition]" type="com.axelor.wkf.db.node.StopFilter" search="self.name = :name" update="true" >
+    <bind node="process/intermediateCatchEvent[stopFilterEventDefinition]" type="com.axelor.wkf.db.node.StopFilterEvent" search="self.name = :name" update="true" >
         
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="documentation" to="description" />
     	
-    	<bind eval="'stopFilter'" to="type" />
+    	<bind eval="'stopFilterEvent'" to="type" />
     	
     </bind>
     
