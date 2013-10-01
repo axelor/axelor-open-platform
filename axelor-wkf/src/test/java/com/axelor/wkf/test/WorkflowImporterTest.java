@@ -46,8 +46,6 @@ import com.axelor.test.GuiceRunner;
 import com.axelor.wkf.WkfTest;
 import com.axelor.wkf.db.Node;
 import com.axelor.wkf.db.Workflow;
-import com.axelor.wkf.db.node.IntermediateMessageEvent;
-import com.axelor.wkf.db.node.StartEvent;
 import com.axelor.wkf.workflow.WorkflowImporter;
 
 @RunWith(GuiceRunner.class)
