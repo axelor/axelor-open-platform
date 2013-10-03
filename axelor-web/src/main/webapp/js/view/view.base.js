@@ -246,7 +246,7 @@ function DSViewCtrl(type, $scope, $element) {
 		if (name == "save" && !this.hasPermission("write")) {
 			return false;
 		}
-		if (name == "delete" && !this.hasPermission("delete")) {
+		if (name == "delete" && !this.hasPermission("remove")) {
 			return false;
 		}
 		if (_(hiddenButtons).has(name)) {

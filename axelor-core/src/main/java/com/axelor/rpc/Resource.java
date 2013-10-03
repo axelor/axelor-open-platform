@@ -548,6 +548,8 @@ public class Resource<T extends Model> {
 			Map map = (Map) record;
 			Long id = Longs.tryParse(map.get("id").toString());
 			Object version = map.get("version");
+
+			security.get().check(JpaSecurity.CAN_REMOVE, model, id);
 			Model bean = JPA.find(model, id);
 
 			if (version != null && !Objects.equal(version, bean.getVersion())) {
