@@ -273,6 +273,10 @@ var Formatters = {
 			return cmp(item.value, value);
 		}) || {};
 		return res.title;
+	},
+
+	"url": function(field, value) {
+		return '<a target="_blank" ng-show="text" href="' + value + '">' + value + '</a>';
 	}
 };
 
@@ -330,6 +334,10 @@ var Factory = {
 
 		if (type === "button" || type === "progress") {
 			return Formatters[type](field, value);
+		}
+
+		if(widget === "Url") {
+			type = "url";
 		}
 
 		if (value === null || value === undefined || (_.isObject(value) && _.isEmpty(value))) {
