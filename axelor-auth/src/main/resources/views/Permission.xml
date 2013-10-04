@@ -24,19 +24,19 @@
         <field name="canCreate"/>
         <field name="canRemove"/>
     </group>
-    <group title="Read" cols="2" colSpan="2">
+    <group title="Read" cols="2" colSpan="2" showIf="canRead">
         <field name="readCondition" title="Condition"/>
         <field name="readParams" title="Params"/>
     </group>
-    <group title="Write" cols="2" colSpan="2">
+    <group title="Write" cols="2" colSpan="2" showIf="canWrite">
         <field name="writeCondition" title="Condition"/>
         <field name="writeParams" title="Params"/>
     </group>
-    <group title="Create" cols="2" colSpan="2">
+    <group title="Create" cols="2" colSpan="2" showIf="canCreate">
         <field name="createCondition" title="Condition"/>
         <field name="createParams" title="Params"/>
     </group>
-    <group title="Remove" cols="2" colSpan="2">
+    <group title="Remove" cols="2" colSpan="2" showIf="canRemove">
         <field name="removeCondition" title="Condition"/>
         <field name="removeParams" title="Params"/>
     </group>
