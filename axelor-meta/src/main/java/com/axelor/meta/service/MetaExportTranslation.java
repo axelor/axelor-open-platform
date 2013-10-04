@@ -135,6 +135,8 @@ public class MetaExportTranslation {
 	private String exportPath ;
 	private String currentModule ;
 
+	private List<String> internalFields = Lists.newArrayList("createdOn", "updatedOn", "createdBy", "updatedBy", "id", "version", "archived");
+
 	public void exportTranslations(String exportPath, String exportLanguage) throws Exception {
 
 		exportPath = exportPath.endsWith("/") ? exportPath : exportPath.concat("/");
@@ -392,6 +394,10 @@ public class MetaExportTranslation {
 		if(!Strings.isNullOrEmpty(field.getDefaultPlaceholder())) {
 			String translation = this.getTranslation(field.getDefaultPlaceholder(), "", abstractView.getModel(), this.placeholderType);
 			this.appendToFile(abstractView.getModel(), field.getDefaultPlaceholder(), this.placeholderType, field.getDefaultPlaceholder(), translation);
+		}
+		if(internalFields.contains(field.getName()) && Strings.isNullOrEmpty(field.getDefaultTitle())) {
+			String translation = this.getTranslation(field.getName(), "", abstractView.getModel(), this.fieldType);
+			this.appendToFile(abstractView.getModel(), field.getName(), this.fieldType, field.getDefaultTitle(), translation);
 		}
 	}
 
