@@ -16,7 +16,7 @@
 		<field name="navigation" />
 	</grid>
 
-	<form name="group-form" title="User">
+	<form name="group-form" title="Group">
 		<toolbar>
 			<button name="showPermissions" title="Show permissions"
 				onClick="action-group-view-permissions" readonlyIf="!permissions" />
