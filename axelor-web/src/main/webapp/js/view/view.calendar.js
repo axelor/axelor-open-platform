@@ -281,39 +281,66 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 		var schema = scope.schema;
 		var mode = schema.mode || "month";
 		var editable = schema.editable === undefined ? true : schema.editable;
+		
+		var RecordManager = (function () {
 
-		var EventManager = (function() {
+			var records = [],
+				current = [];
 
-			var all = Array();
-			var filtered = Array();
-			
-			return {
-				
-				setEvents : function(events) {
-					all = events;
-				},
-				
-				filter: function() {
-					var selected = element.find('.calendar-legend input:checked').map(function(){
-						var child = $(this).parent().data('$scope');
-						var item = child.color.item;
-						return scope.getColorKey(null, item);
-					}).toArray();
-
-					main.fullCalendar('removeEventSource', filtered);
-					filtered = all;
-					
-					if (selected.length) {
-						filtered = _.filter(all, function(event) {
-							return _.contains(selected, event.$colorKey);
-						});
-					}
-					
-					main.fullCalendar('addEventSource', filtered);
-					adjustSize();
+			function add(record) {
+				if (!record || _.isArray(record)) {
+					records = record || [];
+					return filter();
 				}
+				var found = _.findWhere(records, {
+					id: record.id
+				});
+				if (!found) {
+					found = record;
+					records.push(record);
+				}
+				if (found !== record) {
+					_.extend(found, record);
+				}
+				return filter();
+			}
+
+			function remove(record) {
+				records = _.filter(records, function (item) {
+					return record.id !== item.id;
+				});
+				return filter();
+			}
+
+			function filter() {
+
+				var selected = [];
+				
+				_.each(scope.getColors(), function (color) {
+					if (color.checked) {
+						selected.push(scope.getColorKey(null, color.item));
+					}
+				});
+				
+				main.fullCalendar('removeEventSource', current);
+				current = records;
+
+				if (selected.length) {
+					current = _.filter(records, function(record) {
+						return _.contains(selected, record.$colorKey);
+					});
+				}
+
+				main.fullCalendar('addEventSource', current);
+				adjustSize();
+			}
+
+			return {
+				add: add,
+				remove: remove,
+				filter: filter
 			};
-		})();
+		}());
 
 		mini.datepicker({
 			showOtherMonths: true,
@@ -368,8 +395,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				scope._viewPromise.then(function(){
 					scope.fetchItems(start, end, function(records) {
 						callback([]);
-						EventManager.setEvents(records);
-						EventManager.filter();
+						RecordManager.add(records);
 					});
 				});
 			},
@@ -431,8 +457,8 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 						.click(function(e){
 							hideBubble();
 							scope.$apply(function(){
-								scope.removeEvent(event, function(){
-									main.fullCalendar("removeEvents", event.id);
+								scope.removeEvent(event, function() {
+									RecordManager.remove(event.record);
 								});
 							});
 						});
@@ -506,11 +532,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 			
 			popup.setEditable(scope.isEditable());
 			popup.show(record, function(result) {
-				if (!record.id && result && result.id) {
-					main.fullCalendar('renderEvent', updateEvent(null, result));
-				} else {
-					main.fullCalendar('renderEvent', updateEvent(event, result));
-				}
+				RecordManager.add(result);
 			});
 			if (record == null || !record.id) {
 				popup.ajaxStop(function() {
@@ -531,7 +553,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 		};
 		
 		scope.filterEvents = function() {
-			EventManager.filter();
+			RecordManager.filter();
 		};
 
 		scope.pagerText = function() {
@@ -596,7 +618,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				'<div class="calendar-mini"></div>'+
 				'<form class="form calendar-legend">'+
 					'<label class="checkbox" ng-repeat="color in getColors()" style="color: {{color.color.bc}}">'+
-						'<input type="checkbox" ng-click="filterEvents()"> {{color.title}}</label>'+
+						'<input type="checkbox" ng-click="filterEvents()" ng-model="color.checked"> {{color.title}}</label>'+
 				'</div>'+
 			'</div>'+
 		'</div>'
