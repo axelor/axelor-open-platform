@@ -185,10 +185,6 @@ ui.formItem('Label', {
 		if (field && field.required) {
 			element.addClass('required');
 		}
-		
-		scope.$watch("isReadonly()", function(readonly){
-			element.toggleClass("readonly", readonly);
-		});
 	},
 
 	template: '<label><span ui-help-popover ng-transclude></span></label>'

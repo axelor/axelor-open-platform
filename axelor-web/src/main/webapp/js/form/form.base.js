@@ -139,6 +139,10 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			return hideFn(hidden);
 		});
 		
+		scope.$watch("isReadonly()", function(readonly, old) {
+			return element.toggleClass("readonly", readonly);
+		});
+
 		this.prepare(scope, element, attrs, controller);
 		
 		scope.$evalAsync(function() {
@@ -249,7 +253,6 @@ ui.formDirective = function(name, object) {
 			}
 			
 			scope.$watch("isReadonly()", function(readonly) {
-				element.toggleClass("readonly", readonly);
 				if (readonly && showReadonly()) {
 					return;
 				}
