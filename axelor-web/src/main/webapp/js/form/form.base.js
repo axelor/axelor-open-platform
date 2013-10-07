@@ -134,12 +134,17 @@ ui.formCompile = function(element, attrs, linkerFn) {
 
 		var hideFn = _.contains(this.handles, 'isHidden') ? angular.noop : hideWidget;
 
+		var hiddenSet = false;
 		scope.$watch("isHidden()", function(hidden, old) {
-			if (hidden === old) return;
+			if (hiddenSet && hidden === old) return;
+			hiddenSet = true;
 			return hideFn(hidden);
 		});
 		
+		var readonlySet = false;
 		scope.$watch("isReadonly()", function(readonly, old) {
+			if (readonlySet && readonly === old) return;
+			readonlySet = true;
 			return element.toggleClass("readonly", readonly);
 		});
 
