@@ -93,7 +93,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			if (parent && parent.isReadonly && parent.isReadonly()) {
 				return true;
 			}
-			if (!scope.isEditable()) {
+			if (scope.isEditable && !scope.isEditable()) {
 				return true;
 			}
 			return this.attr("readonly") || false;
