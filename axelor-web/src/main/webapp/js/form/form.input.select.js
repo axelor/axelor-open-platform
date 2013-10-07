@@ -425,6 +425,13 @@ ui.formInput('SelectQuery', 'Select', {
 
 		var current = {};
 		
+		function update(value) {
+			scope.setValue(value);
+			setTimeout(function(){
+				scope.$apply();
+			});
+		}
+
 		scope.format = function(value) {
 			if (!value) return "";
 			if (_.isString(value)) {
@@ -432,6 +439,15 @@ ui.formInput('SelectQuery', 'Select', {
 			}
 			current = value;
 			return value.label;
+		};
+		
+		scope.parse = function(value) {
+			if (!value || _.isString(value)) return value;
+			return value.value;
+		};
+		
+		scope.handleSelect = function(e, ui) {
+			update(ui.item);
 		};
 
 		var query = scope.$eval(attrs.query);
