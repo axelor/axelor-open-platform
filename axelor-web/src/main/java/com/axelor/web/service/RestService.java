@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,6 +64,7 @@ import com.axelor.db.mapper.Property;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
+import com.axelor.web.AppSettings;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Charsets;
 import com.google.common.cache.Cache;
@@ -281,6 +283,15 @@ public class RestService extends ResourceService {
 			.expireAfterAccess(1, TimeUnit.MINUTES)
 			.build();
 
+	private static Charset csvCharset = Charsets.UTF_8;
+	static {
+		try {
+			csvCharset = Charset.forName(
+					AppSettings.get().get("data.export.encoding"));
+		} catch (Exception e) {
+		}
+	}
+
 	@GET
 	@Path("export/{name}")
 	@Produces("text/csv")
@@ -295,7 +306,7 @@ public class RestService extends ResourceService {
 
 			@Override
 			public void write(OutputStream output) throws IOException, WebApplicationException {
-				Writer writer = new OutputStreamWriter(output, Charsets.UTF_8);
+				Writer writer = new OutputStreamWriter(output, csvCharset);
 				try {
 					getResource().export(request, writer);
 				} finally {
