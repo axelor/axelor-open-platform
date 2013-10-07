@@ -136,9 +136,9 @@ String appJS = AppSettings.getAppJS(getServletContext());
   
   <section role="main" id="container" ng-switch on="routePath[0]">
     <% if ("top".equals(appMenu)) { %>
-	<div ng-switch-when="main" ng-include src="'partials/main-nomenu.html'"></div>
+	<div ng-show="routePath[0] == 'main'" ng-include src="'partials/main-nomenu.html'"></div>
     <% } else { %>
-    <div ng-switch-when="main" ng-include src="'partials/main.html'"></div>
+    <div ng-show="routePath[0] == 'main'" ng-include src="'partials/main.html'"></div>
     <% } %>
 	<div ng-switch-when="about" ng-include src="'partials/about.html'"></div>
 	<div ng-switch-when="welcome" ng-include src="'partials/welcome.html'"></div>
