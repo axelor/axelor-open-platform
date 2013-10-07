@@ -535,15 +535,31 @@ Grid.prototype.parse = function(view) {
 	element.data('grid', grid);
 	
 	grid.setSelectionModel(new Slick.RowSelectionModel());
-	grid.registerPlugin(new Slick.Data.GroupItemMetadataProvider());
-	if (selectColumn) {
-		grid.registerPlugin(selectColumn);
-	}
-	
+
 	var headerMenu = new Slick.Plugins.HeaderMenu({
 		buttonImage: "lib/slickgrid/images/down.gif"
 	});
-	grid.registerPlugin(headerMenu);
+
+	// performance tweaks
+	var _resizeCanvas = grid.resizeCanvas;
+	grid.resizeCanvas = _.debounce(function() {
+		if (element.is(':hidden')) return;
+		_resizeCanvas.call(grid);
+	}, 100);
+
+	var initialized = false;
+	this.doInit = function() {
+		if (initialized) {
+			return;
+		}
+		initialized = true;
+		grid.registerPlugin(new Slick.Data.GroupItemMetadataProvider());
+		grid.registerPlugin(headerMenu);
+		if (selectColumn) {
+			grid.registerPlugin(selectColumn);
+		}
+	};
+	// end performance tweaks
 
 	var adjustSize = _.bind(this.adjustSize, this);
 	element.on('adjustSize', _.debounce(adjustSize, 100));
@@ -714,6 +730,7 @@ Grid.prototype.adjustSize = function() {
 	if (!this.grid || this.element.is(':hidden') || this.grid.getEditorLock().isActive()) {
 		return;
 	}
+	this.doInit();
 	this.grid.resizeCanvas();
 	this.grid.invalidate();
 };
