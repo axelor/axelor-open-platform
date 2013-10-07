@@ -67,7 +67,7 @@ function updateValues(source, target) {
 		}
 		if (isObject(value)) {
 			var dest = target[key] || {};
-			if (dest.id == value.id) {
+			if (dest.id === value.id) {
 				if (dest.version) {
 					dest = _.extend({}, dest);
 					updateValues(value, dest);
