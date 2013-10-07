@@ -52,7 +52,7 @@ function TableLayout(items, attrs, $scope, $compile) {
 			colspan = +item.attr('x-colspan') || 1,
 			rowspan = +item.attr('x-rowspan') || 1;
 		
-		if (curCol + colspan + (label ? 1 : 0) >= numCols + 1) {
+		if (curCol + colspan >= numCols + 1) {
 			curCol = 0, row = [];
 			layout.push(row);
 		}
