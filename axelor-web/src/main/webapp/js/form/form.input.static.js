@@ -206,10 +206,7 @@ ui.formItem('Spacer', {
 ui.formItem('Separator', {
 	css: 'separator-item',
 	showTitle: false,
-	scope: {
-		title: '@'
-	},
-	template: '<div><span style="padding-left: 4px;">{{title}}</span><hr style="margin: 4px 0;"></div>'
+	template: '<div><span style="padding-left: 4px;">{{field.title}}</span><hr style="margin: 4px 0;"></div>'
 });
 
 /**
