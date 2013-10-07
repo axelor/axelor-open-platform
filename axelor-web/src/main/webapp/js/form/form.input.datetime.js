@@ -209,7 +209,7 @@ ui.formInput('DateTime', {
 		var rendering = false;
 
 		input.on('change', function(e, ui){
-			changed = !rendering;
+			changed = !rendering && (model.$viewValue !== model.$modelValue);
 		});
 		input.on('blur', function() {
 			if (changed) {
