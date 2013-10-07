@@ -191,7 +191,7 @@ var Editor = function(args) {
 	this.isValueChanged = function() {
 		
 		// force change event on spinner widget
-		element.find('.ui-spinner-input').trigger('spinchange');
+		element.find('.ui-spinner-input').trigger('spinchange', args.item);
 		element.find('.ui-mask').trigger('blur');
 		
 		var record = scope.record || {},
