@@ -386,6 +386,7 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 
 .navigation-tabs ul.nav-tabs {
 	margin-bottom: 0px;
+	height: 35px;
 }
 
 .navigation-tabs {
