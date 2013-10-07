@@ -637,6 +637,15 @@ Grid.prototype.parse = function(view) {
 		this.groupBy(view.groupBy);
 	}
 
+	setTimeout(function () {
+		// hide columns
+		_.each(cols, function (col) {
+			if (col.descriptor.hidden) {
+				that.showColumn(col.field, false);
+			}
+		});
+	});
+
 	if (element.is(":visible")) {
 		setTimeout(function(){
 			element.trigger('adjustSize');
