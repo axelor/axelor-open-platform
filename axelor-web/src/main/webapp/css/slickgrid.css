@@ -151,6 +151,10 @@
 	min-height: 23px;
 }
 
+.slick-cell .ui-spinner {
+	border: none;
+}
+
 .slick-cell input {
 	padding-left: 2px !important;
 }
@@ -169,10 +173,11 @@
 	padding-top: 2px !important;
 }
 
-.slick-cell input[type=checkbox] {
+.slick-cell input[type=checkbox],
+.slick-cell .form-item-container input[type=checkbox] {
 	width: auto;
 	height: auto;
-	margin-top: -1px;
+	margin-top: 0 !important;
 }
 
 .slick-editor-dropdown {
