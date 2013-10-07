@@ -384,7 +384,7 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 
 /* end Browser fixes */
 
-.navigation-tabs ul.nav-tabs {
+.navigation-tabs ul.nav-tabs-main {
 	margin-bottom: 0px;
 	height: 35px;
 }
