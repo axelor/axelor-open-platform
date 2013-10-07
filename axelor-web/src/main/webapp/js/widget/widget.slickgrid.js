@@ -257,7 +257,12 @@ var Formatters = {
 	},
 	
 	"button": function(field, value) {
-		return '<img class="slick-img-button" src="' + field.icon + '">';
+		var elem = '<img class="slick-img-button" src="' + field.icon + '"';
+		if (field.help) {
+			elem += ' title="' + field.help + '"';
+		}
+		elem += '>';
+		return elem;
 	},
 
 	"progress": function(field, value) {

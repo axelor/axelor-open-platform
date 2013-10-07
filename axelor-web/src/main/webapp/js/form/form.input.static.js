@@ -261,6 +261,15 @@ ui.formItem('Button', {
 			element.removeClass('btn');
 			element.attr("href", field.link);
 		}
+		
+		if (field.help) {
+			element.tooltip({
+				html: true,
+				title: field.help,
+				delay: { show: 500, hide: 100 },
+				container: 'body'
+			});
+		}
 
 		element.on("click", function(e) {
 			if (!scope.attr('readonly')) {
