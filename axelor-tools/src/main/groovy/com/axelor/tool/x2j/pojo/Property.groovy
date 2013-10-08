@@ -562,7 +562,8 @@ class Property {
 		String index = attrs['index'] as String
 		if (index && !index.startsWith('idx_'))
 			index = "${entity.table}_${columnAuto}_IDX".toUpperCase()
-			return annon("org.hibernate.annotations.Index").add("name", index)
+		if (!index) return null
+		return annon("org.hibernate.annotations.Index").add("name", index)
 	}
 
 	private List<Annotation> $id() {
