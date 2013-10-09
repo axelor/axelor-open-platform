@@ -364,6 +364,10 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	$scope.canNew = function() {
 		return _.isUndefined(field.canNew) ? true : field.canNew;
 	};
+	
+	$scope.canEdit = function() {
+		return !$scope.isReadonly();
+	};
 
 	$scope.canView = function() {
 		return _.isUndefined(field.canView) ? true : field.canView;
