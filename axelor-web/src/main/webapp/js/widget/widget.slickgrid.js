@@ -559,11 +559,18 @@ Grid.prototype.parse = function(view) {
 			grid.registerPlugin(selectColumn);
 		}
 	};
-	// end performance tweaks
 
-	var adjustSize = _.bind(this.adjustSize, this);
+	function adjustSize() {
+		scope.ajaxStop(function () {
+			scope.$evalAsync(function () {
+				that.adjustSize();
+			});
+		});
+	}
+	
 	element.on('adjustSize', _.debounce(adjustSize, 100));
-
+	// end performance tweaks
+	
 	dataView.$syncSelection = function(old, oldIds) {
 		var selection = dataView.mapIdsToRows(oldIds);
 		grid.setSelectedRows(selection);
