@@ -111,7 +111,7 @@
     <attribute name="if-empty" type="boolean">
       <annotation>
         <documentation>
-          Onl update the value if target field is empty (or null).
+          Only update the value if target field is empty (or null).
         </documentation>
       </annotation>
     </attribute>
