@@ -466,7 +466,7 @@ function inherit(array) {
 
 ui.formWidget = function(name, object) {
 	var obj = inherit(arguments);
-	var widget = _.str.titleize(name.replace(/^ui/, ''));
+	var widget = _.str.capitalize(name.replace(/^ui/, ''));
 	var directive = "ui" + widget;
 
 	registry[directive] = directive;
@@ -491,7 +491,7 @@ ui.formInput = function(name, object) {
 };
 
 ui.getWidget = function(type) {
-	var name = _.chain(type).camelize().capitalize().value();
+	var name = _.str.classify(type);
 	var widget = registry["ui" + name] || registry[name];
 	if (widget) {
 		widget = widget.replace(/^ui/, '');
