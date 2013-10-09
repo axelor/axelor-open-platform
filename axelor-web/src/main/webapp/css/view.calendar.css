@@ -66,6 +66,7 @@
 
 .calendar-view .record-pager > span {
 	font-weight: bold;
+	padding: 10px 4px 0;
 }
 
 .calendar-view .fc-view-month .calendar-event-day {

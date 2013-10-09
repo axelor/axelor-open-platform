@@ -281,6 +281,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 		var schema = scope.schema;
 		var mode = schema.mode || "month";
 		var editable = schema.editable === undefined ? true : schema.editable;
+		var calRange = {};
 		
 		var RecordManager = (function () {
 
@@ -392,6 +393,8 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 			},
 
 			events: function(start, end, callback) {
+				calRange.start = start;
+				calRange.end = end;
 				scope._viewPromise.then(function(){
 					scope.fetchItems(start, end, function(records) {
 						callback([]);
@@ -573,6 +576,13 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 				name = scope.isAgenda() ? "agendaDay" : "basicDay";
 			}
 			main.fullCalendar("changeView", name);
+		};
+		
+		scope.onRefresh = function () {
+			if (!calRange.start) return;
+			scope.fetchItems(calRange.start, calRange.end, function (records) {
+				RecordManager.add(records);
+			});
 		};
 
 		scope.onNext = function() {
