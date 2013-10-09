@@ -272,7 +272,7 @@ ui.formInput('ManyToOne', 'Select', {
 		'<input type="text" autocomplete="off">'+
 		'<span class="picker-icons">'+
 			'<i class="icon-eye-open" ng-click="onSummary()" ng-show="hasPermission(\'read\') && _viewParams.summaryView && canToggle()"></i>'+
-			'<i class="icon-pencil" ng-click="onEdit()" ng-show="hasPermission(\'read\')" title="{{\'Edit\' | t}}"></i>'+
+			'<i class="icon-pencil" ng-click="onEdit()" ng-show="canView() && hasPermission(\'read\')" title="{{\'Edit\' | t}}"></i>'+
 			'<i class="icon-plus" ng-click="onNew()" ng-show="canNew() && hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}"></i>'+
 			'<i class="icon-search" ng-click="onSelect()" ng-show="canSelect() && hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}"></i>'+
 		'</span>'+
