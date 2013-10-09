@@ -720,7 +720,9 @@ ui.directive('uiFilterBox', function() {
 						fieldName = name;
 						break;
 					case 'many-to-one':
-						fieldName = name + '.' + field.targetName;
+						if (field.targetName) {
+							fieldName = name + '.' + field.targetName;
+						}
 						break;
 					case 'boolean':
 						if (/^(t|f|y|n|true|false|yes|no)$/.test(text)) {
