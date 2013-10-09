@@ -42,7 +42,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 	var ds = $scope._dataSource;
 
 	$scope.createNestedEditor = function() {
-		
+
 		var embedded = $('<div ui-nested-editor></div>')
 			.attr('ng-model', $element.attr('ng-model'))
 			.attr('name', $element.attr('name'))
@@ -51,24 +51,24 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 
 		embedded = ViewService.compile(embedded)($scope);
 		embedded.hide();
-		
+
 		var colspan = $element.parents("form.dynamic-form:first").attr('x-cols') || 4,
 			cell = $('<td class="form-item"></td>').attr('colspan', colspan).append(embedded),
 			row = $('<tr></tr>').append(cell);
-		
+
 		row.insertAfter($element.parents("tr:first"));
-		
+
 		return embedded;
 	};
-	
+
 	$scope.selectMode = "single";
-	
+
 	$scope.select = function(value) {
-		
+
 		if (_.isArray(value)) {
 			value = _.first(value);
 		}
-		
+
 		var field = $scope.field,
 			nameField = field.targetName || 'id';
 
@@ -80,7 +80,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 				function(){
 					return $(this).attr('x-path').replace(path+'.','');
 				}).get();
-		
+
 		relatives = _.unique(relatives);
 		if (relatives.length > 0 && value && value.id) {
 			return ds.read(value.id, {
@@ -106,15 +106,19 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 				});
 			}
 		}
-		
+
 		$scope.setValue(record, true);
 	};
-	
+
+	$scope.canEdit = function () {
+		return $scope.canView() && $scope.getValue();
+	};
+
 	$scope.onEdit = function() {
 		var record = $scope.getValue();
 		$scope.showEditor(record);
 	};
-	
+
 	$scope.onSummary = function() {
 		var record = $scope.getValue();
 		if (record && record.id) {
@@ -129,11 +133,11 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 ui.formInput('ManyToOne', 'Select', {
 
 	css	: 'many2one-item',
-	
+
 	widgets: ['OneToOne'],
-	
+
 	controller: ManyToOneCtrl,
-	
+
 	showSelectionOn: null,
 
 	init: function(scope) {
@@ -218,11 +222,11 @@ ui.formInput('ManyToOne', 'Select', {
 			if (!b) return false;
 			return a.id === b.id;
 		};
-		
+
 		scope.setValidity = function(key, value) {
 			model.$setValidity(key, value);
 		};
-		
+
 		if ((scope._viewParams || {}).summaryView) {
 			element.removeClass('picker-icons-3').addClass('picker-icons-4');
 		}
@@ -252,7 +256,7 @@ ui.formInput('ManyToOne', 'Select', {
 			e.stopPropagation();
 			return false;
 		});
-		
+
 		scope.handleSelect = function(e, ui) {
 			if (ui.item.click) {
 				setTimeout(function(){
@@ -272,7 +276,7 @@ ui.formInput('ManyToOne', 'Select', {
 		'<input type="text" autocomplete="off">'+
 		'<span class="picker-icons">'+
 			'<i class="icon-eye-open" ng-click="onSummary()" ng-show="hasPermission(\'read\') && _viewParams.summaryView && canToggle()"></i>'+
-			'<i class="icon-pencil" ng-click="onEdit()" ng-show="canView() && hasPermission(\'read\')" title="{{\'Edit\' | t}}"></i>'+
+			'<i class="icon-pencil" ng-click="onEdit()" ng-show="hasPermission(\'read\') && canView() && canEdit()" title="{{\'Edit\' | t}}"></i>'+
 			'<i class="icon-plus" ng-click="onNew()" ng-show="canNew() && hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}"></i>'+
 			'<i class="icon-search" ng-click="onSelect()" ng-show="canSelect() && hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}"></i>'+
 		'</span>'+
@@ -295,7 +299,7 @@ ui.formInput('SuggestBox', 'ManyToOne', {
 });
 
 ui.formInput('RefSelect', {
-	
+
 	css: 'multi-object-select',
 
 	controller: ['$scope', 'ViewService', function($scope, ViewService) {
@@ -339,14 +343,14 @@ ui.formInput('RefSelect', {
 		var name = scope.field.name,
 			selection = scope.field.selection,
 			related = scope.field.related || scope.field.name + "Id";
-		
+
 		scope.canShow = function(value) {
 			return value === scope.getValue();
 		};
 
 		var elem = scope.createElement(name, selection, related);
 		var elemSelect= elem.find('.select-item:first');
-		
+
 		scope.$watch('isReadonly()', function(readonly) {
 			return readonly ? elemSelect.hide() : elemSelect.show();
 		});
@@ -380,7 +384,7 @@ ui.formInput('RefItem', 'ManyToOne', {
 				if (f.name === "name") search.push("name");
 				if (f.name === "code") search.push("code");
 			});
-			
+
 			if (!name && _.contains(search, "name")) {
 				name = "name";
 			}
@@ -396,23 +400,23 @@ ui.formInput('RefItem', 'ManyToOne', {
 	},
 
 	_link: function(scope, element, attrs, model) {
-		
+
 		var ref = element.attr('x-ref');
 		var watch = element.attr('x-watch');
-		
+
 		function doRender() {
 			if (scope.$render_editable) scope.$render_editable();
 			if (scope.$render_readonly) scope.$render_readonly();
 		}
-		
+
 		function getRef() {
 			return scope.record[ref];
 		}
-		
+
 		function setRef(value) {
 			return scope.record[ref] = value;
 		}
-		
+
 		var __setValue = scope.setValue;
 		scope.setValue = function(value) {
 			__setValue.call(scope, value);
@@ -420,7 +424,7 @@ ui.formInput('RefItem', 'ManyToOne', {
 		};
 
 		var selected = false;
-		
+
 		scope.$watch("record." + ref, function(value, old) {
 			setTimeout(function() {
 				var v = scope.getValue();
@@ -428,7 +432,7 @@ ui.formInput('RefItem', 'ManyToOne', {
 				scope.select(value ? {id: value } : null);
 			});
 		});
-		
+
 		scope.$watch("record." + watch, function(value, old) {
 			selected = value === scope._model;
 			if (value === old) return;
