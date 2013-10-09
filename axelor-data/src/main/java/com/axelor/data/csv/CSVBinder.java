@@ -234,6 +234,11 @@ public class CSVBinder {
 			LOG.trace("value: " + value);
 			LOG.trace("condition: " + cb.getCondition());
 			
+			if (cb.getConditionEmpty() == Boolean.TRUE && p.get(bean) != null) {
+				LOG.trace("field is not empty");
+				continue;
+			}
+
 			if (!cb.validate(values)) {
 				LOG.trace("condition failed");
 				continue;
