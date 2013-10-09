@@ -26,12 +26,12 @@
   	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
     
     <finder-method name="findByName" using="name"                     orderBy="-priority" />
-    <finder-method name="findByName" using="name,long:groupId"        orderBy="-priority" filter="self.name = :name AND self.groups[].id = :groupId"/>
+    <finder-method name="findByName" using="name,Long:groupId"        orderBy="-priority" filter="self.name = :name AND self.groups[].id = :groupId"/>
     <finder-method name="findByName" using="name,model"               orderBy="-priority"/>
-    <finder-method name="findByName" using="name,model,long:groupId"  orderBy="-priority" filter="self.name = :name AND self.model = :model AND self.groups[].id = :groupId"/>
+    <finder-method name="findByName" using="name,model,Long:groupId"  orderBy="-priority" filter="self.name = :name AND self.model = :model AND self.groups[].id = :groupId"/>
     
     <finder-method name="findByType" using="type,model"               orderBy="-priority" filter="self.model = :model AND self.type = :type"/>
-    <finder-method name="findByType" using="type,model,long:groupId"  orderBy="-priority" filter="self.model = :model AND self.type = :type AND self.groups[].id = :groupId"/>
+    <finder-method name="findByType" using="type,model,Long:groupId"  orderBy="-priority" filter="self.model = :model AND self.type = :type AND self.groups[].id = :groupId"/>
     
     <finder-method name="findByModule" using="module" all="true"/>
   </entity>
