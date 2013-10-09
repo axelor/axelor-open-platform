@@ -627,7 +627,7 @@ Grid.prototype.parse = function(view) {
 
 		function _setInputs(cols) {
 			_.each(cols, function(col){
-				if (!col.xpath) return;
+				if (!col.xpath || col.descriptor.type === 'button') return;
 				var header = grid.getHeaderRowColumn(col.id),
 					input = $('<input type="text">').data("columnId", col.id).appendTo(header),
 					field = col.descriptor || {};
