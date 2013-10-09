@@ -73,6 +73,10 @@ public class CSVBinding {
 	@XStreamAsAttribute
 	private String condition;
 	
+	@XStreamAlias("if-empty")
+	@XStreamAsAttribute
+	private Boolean conditionEmpty;
+
 	@XStreamImplicit(itemFieldName = "bind")
 	private List<CSVBinding> bindings;
 	
@@ -121,6 +125,14 @@ public class CSVBinding {
 
 	public void setCondition(String condition) {
 		this.condition = condition;
+	}
+
+	public Boolean getConditionEmpty() {
+		return conditionEmpty;
+	}
+	
+	public void setConditionEmpty(Boolean conditionEmpty) {
+		this.conditionEmpty = conditionEmpty;
 	}
 	
 	public List<CSVBinding> getBindings() {

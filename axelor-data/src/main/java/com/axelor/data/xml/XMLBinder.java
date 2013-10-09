@@ -152,6 +152,11 @@ public abstract class XMLBinder {
 			LOG.trace("value: " + value);
 			LOG.trace("condition: " + bind.getCondition());
 			
+			if (bind.getConditionEmpty() == Boolean.TRUE && property.get(bean) != null) {
+				LOG.trace("field is not empty");
+				continue;
+			}
+
 			if (!validate(bind, value, ctx)) {
 				LOG.trace("condition failed");
 				continue;

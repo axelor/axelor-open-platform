@@ -74,6 +74,10 @@ public class XMLBind {
 	@XStreamAsAttribute
 	private String condition;
 	
+	@XStreamAlias("if-empty")
+	@XStreamAsAttribute
+	private Boolean conditionEmpty;
+	
 	@XStreamAlias("call")
 	@XStreamAsAttribute
 	private String callable;
@@ -128,6 +132,10 @@ public class XMLBind {
 	
 	public String getCondition() {
 		return condition;
+	}
+	
+	public Boolean getConditionEmpty() {
+		return conditionEmpty;
 	}
 	
 	public String getCallable() {
