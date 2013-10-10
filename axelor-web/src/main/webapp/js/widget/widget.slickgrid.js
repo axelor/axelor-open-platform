@@ -562,7 +562,7 @@ Grid.prototype.parse = function(view) {
 
 	function adjustSize() {
 		scope.ajaxStop(function () {
-			scope.$evalAsync(function () {
+			setTimeout(function () {
 				that.adjustSize();
 			});
 		});
