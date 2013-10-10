@@ -663,7 +663,7 @@ Grid.prototype.parse = function(view) {
 	setTimeout(function () {
 		// hide columns
 		_.each(cols, function (col) {
-			if (col.descriptor.hidden) {
+			if (col.descriptor && col.descriptor.hidden) {
 				that.showColumn(col.field, false);
 			}
 		});
