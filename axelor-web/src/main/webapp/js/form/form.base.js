@@ -491,8 +491,12 @@ ui.formInput = function(name, object) {
 };
 
 ui.getWidget = function(type) {
-	var name = _.str.classify(type);
-	var widget = registry["ui" + name] || registry[name];
+	var name = type,
+		widget = registry["ui" + name] || registry[name];
+	if (!widget) {
+		name = _.str.classify(name);
+		widget = registry["ui" + name] || registry[name];
+	}
 	if (widget) {
 		widget = widget.replace(/^ui/, '');
 		return _.chain(widget).underscored().dasherize().value();
