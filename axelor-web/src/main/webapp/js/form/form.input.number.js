@@ -115,6 +115,9 @@ ui.formInput('Number', {
 
 		element.on("spin", onSpin);
 		element.on("spinchange", function(e, row) {
+			updateModel(element.val(), true);
+		});
+		element.on("spinchange:ensure", function(e, row) {
 			var val = row[props.name],
 				handle = val !== undefined && val !== scope.getValue();
 			updateModel(element.val(), handle);
