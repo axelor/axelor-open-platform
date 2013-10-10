@@ -52,29 +52,31 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
 public abstract class XMLBinder {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(XMLBinder.class);
 
 	private XMLInput input;
-	
+
 	private Map<String, Object> context;
-	
+
+	private boolean newBean;
+
 	private Map<String, DataAdapter> adapters = Maps.newHashMap();
 
 	public XMLBinder(XMLInput input, Map<String, Object> context) {
 		this.input = input;
 		this.context = context;
 	}
-	
+
 	public void registerAdapter(DataAdapter adapter) {
 		adapters.put(adapter.getName(), adapter);
 	}
-	
+
 	protected abstract void handle(Object bean, XMLBind bind, Map<String, Object> context);
 	protected abstract void finish();
-	
+
 	private Class<?> lastClass = null;
-	
+
 	public void bind(Document element) {
 		for(XMLBind binding : input.getBindings()) {
 			LOG.debug("binding: " + binding);
@@ -93,7 +95,7 @@ public abstract class XMLBinder {
 			}
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private Object bind(XMLBind binding, Class<?> type, Map<String, Object> values) {
 
@@ -103,7 +105,7 @@ public abstract class XMLBinder {
 
 		Object bean = null;
 		Map<String, Object> ctx = toContext(values);
-		
+
 		LOG.trace("context: " + ctx);
 
 		if (binding.getSearch() != null) {
@@ -115,29 +117,30 @@ public abstract class XMLBinder {
 				return bean;
 			}
 		}
-		
+
 		Mapper mapper = Mapper.of(type);
 		List<XMLBind> bindings = binding.getBindings();
 		boolean isNull = bean == null;
-		
+
 		if (bindings == null) {
 			return bean;
 		}
 
 		if (isNull) {
+			newBean = true;
 			bean = newInstance(type);
 		}
 
 		LOG.trace("populate: " + type);
-		
+
 		for (final XMLBind bind : bindings) {
-			
+
 			LOG.trace("binding: " + bind);
-			
+
 			final String field = bind.getField();
 			final String name = bind.getAlias() != null ? bind.getAlias() : field;
 			final Property property = mapper.getProperty(field);
-			
+
 			if (property == null) { // handle dummy binding
 				//TODO: this.handleDummyBind(bind, values);
 				continue;
@@ -146,13 +149,13 @@ public abstract class XMLBinder {
 			if (property.isPrimary() || property.isVirtual()) {
 				continue;
 			}
-			
+
 			Object value = values.get(name);
-			
+
 			LOG.trace("value: " + value);
 			LOG.trace("condition: " + bind.getCondition());
-			
-			if (bind.getConditionEmpty() == Boolean.TRUE && property.get(bean) != null) {
+
+			if (newBean == false && bind.getConditionEmpty() == Boolean.TRUE && property.get(bean) != null) {
 				LOG.trace("field is not empty");
 				continue;
 			}
@@ -189,10 +192,10 @@ public abstract class XMLBinder {
 			isNull = false;
 			property.set(bean, value);
 		}
-		
+
 		return isNull ? null : bean;
 	}
-	
+
 	@SuppressWarnings("all")
 	private Object relational(Property property, XMLBind bind, Object value, Map<String, Object> ctx) {
 
@@ -223,7 +226,7 @@ public abstract class XMLBinder {
 		}
 		return ctx;
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private boolean validate(XMLBind binding, Object value, Map<String, Object> values) {
 		Map<String, Object> ctx = toContext(value instanceof Map ? ((Map) value) : values);
@@ -232,7 +235,7 @@ public abstract class XMLBinder {
 
 	@SuppressWarnings("all")
 	private Map<String, Object> toMap(Node node, XMLBind binding) {
-		
+
 		Map<String, Object> map = Maps.newHashMap();
 
 		// first prepare complete map
@@ -242,20 +245,20 @@ public abstract class XMLBinder {
 			if (name == null) {
 				name = bind.getField();
 			}
-			
+
 			if (name == null) {
 				continue;
 			}
-			
+
 			List<Node> nodes = find(node, bind, ".");
 			Object value = value(nodes, bind);
-			
+
 			value = this.adapt(bind, value, map);
 
 			if (!validate(bind, value, map)) {
 				continue;
 			}
-			
+
 			// get default value
 			if (bind.getNode() == null && bind.getExpression() != null) {
 				value = bind.eval(toContext(map));
@@ -265,7 +268,7 @@ public abstract class XMLBinder {
 		}
 		return map;
 	}
-	
+
 	private Object value(List<Node> nodes, final XMLBind bind) {
 		List<Object> result = Lists.transform(nodes, new Function<Node, Object>() {
 			@Override
@@ -288,7 +291,7 @@ public abstract class XMLBinder {
 		}
 		return result.size() == 0 ? null : result;
 	}
-	
+
 	private Object adapt(XMLBind bind, Object value, Map<String, Object> ctx) {
 		String name = bind.getAdapter();
 		if (name == null || !adapters.containsKey(name)) {
@@ -297,17 +300,17 @@ public abstract class XMLBinder {
 		DataAdapter adapter = adapters.get(name);
 		return adapter.adapt(value, ctx);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private List<Node> find(Node node, XMLBind bind, String prefix) {
 		List<Node> nodes = Lists.newArrayList();
 		String name = bind.getNode();
 		String path = name;
-		
+
 		if (name == null) {
 			return nodes;
 		}
-		
+
 		if (!path.startsWith("/")) {
 			path = "/" + path;
 		}

@@ -52,7 +52,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class CSVBinder {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(CSVBinder.class);
 
 	private Class<?> beanClass;
@@ -64,9 +64,11 @@ public class CSVBinder {
 	private String query;
 
 	private boolean update;
-	
+
+	private boolean newBean;
+
 	private Map<String, DataAdapter> adapters = Maps.newHashMap();
-	
+
 	public void registerAdapter(DataAdapter adapter) {
 		adapters.put(adapter.getName(), adapter);
 	}
@@ -153,12 +155,13 @@ public class CSVBinder {
 		}
 
 		try {
+			newBean = true;
 			return beanClass.newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private Object findAll(Class<?> beanClass, String query, Map<String, Object> params) {
 		return JPA.all((Class<Model>) beanClass).filter(query).bind(params).fetch();
@@ -175,19 +178,19 @@ public class CSVBinder {
 			return true;
 		return cb.getExpression() != null;
 	}
-	
+
 	private void handleDummyBind(CSVBinding cb, Map<String, Object> values) {
-		
+
 		Class<?> type = null;
 		try {
 			type = Class.forName(cb.getType());
 		} catch (ClassNotFoundException e) {
 		} catch (Exception e) {
 		}
-		
+
 		String field = cb.getField();
 		Object value = null;
-		
+
 		if (type == null) {
 			value = values.get(cb.getColumn());
 			if (cb.getColumn() == null &&
@@ -201,7 +204,7 @@ public class CSVBinder {
 		}
 		values.put(field, value);
 	}
-	
+
 	@SuppressWarnings("all")
 	private Object bind(Map<String, Object> values) {
 
@@ -210,31 +213,31 @@ public class CSVBinder {
 
 		if (bean == null)
 			return null;
-		
+
 		LOG.trace("populate: " + beanClass);
 
 		for (CSVBinding cb : this.bindings) {
-			
+
 			LOG.trace("binding: " + cb);
-			
+
 			String field = cb.getField();
 			Property p = mapper.getProperty(field);
-			
+
 			if (p == null) { // handle dummy binding
 				this.handleDummyBind(cb, values);
 				continue;
 			}
-			
+
 			if (p.isPrimary() || p.isVirtual() || !isBound(cb, values)) {
 				continue;
 			}
-			
+
 			Object value = values.get(cb.getColumn());
-			
+
 			LOG.trace("value: " + value);
 			LOG.trace("condition: " + cb.getCondition());
-			
-			if (cb.getConditionEmpty() == Boolean.TRUE && p.get(bean) != null) {
+
+			if (newBean == false && cb.getConditionEmpty() == Boolean.TRUE && p.get(bean) != null) {
 				LOG.trace("field is not empty");
 				continue;
 			}
@@ -243,28 +246,28 @@ public class CSVBinder {
 				LOG.trace("condition failed");
 				continue;
 			}
-			
+
 			value = this.adapt(cb, value, values);
-			
+
 			// get default value
 			if (cb.getColumn() == null && cb.getSearch() == null && cb.getExpression() != null) {
 				LOG.trace("expression: " + cb.getExpression());
 				value = cb.eval(values);
 				LOG.trace("value: " + value);
 			}
-			
+
 			// find m2m references
 			else if (p.getType() == PropertyType.MANY_TO_MANY
 					&& cb.getColumn() != null && cb.getSearch() != null) {
 				value = findAll(p.getTarget(), cb.getSearch(), values);
 			}
-			
+
 			// handle relational fields (including other case of m2m)
 			else if (p.getTarget() != null) {
 				CSVBinder b = new CSVBinder(p.getTarget(), fields, cb);
 				value = b.bind(values);
 			}
-			
+
 			if (p.isCollection())
 				if (value instanceof Collection<?>)
 					p.addAll(bean, (Collection<?>) value);
@@ -278,17 +281,17 @@ public class CSVBinder {
 
 		return bean;
 	}
-	
+
 	/**
 	 * Get a bean instance with the given set of <code>values</code> binding to
 	 * the instance according to the binding rules.<br>
-	 * 
+	 *
 	 * <p>
 	 * The <code>localContext</code> is a copy of the global context created
 	 * with <code>prepare-context</code> method. The <code>localContext</code>
 	 * is updated with the current binding values and is available to the
 	 * <code>call</code> method as context.
-	 * 
+	 *
 	 * @param values
 	 *            values from csv row
 	 * @param localContext
@@ -297,7 +300,7 @@ public class CSVBinder {
 	 * @return a bean instance of the class on which binding is performed
 	 */
 	public Object bind(String[] values, Map<String, Object> localContext) {
-		
+
 		Preconditions.checkNotNull(values);
 		Preconditions.checkNotNull(localContext);
 		Preconditions.checkArgument(values.length == fields.length);
@@ -306,7 +309,7 @@ public class CSVBinder {
 		for (int i = 0; i < fields.length; i++) {
 			map.put(fields[i], values[i]);
 		}
-		
+
 		localContext.putAll(map);
 		for (CSVBinding cb : flatten(this.bindings)) {
 			String field = cb.getColumn();
@@ -316,10 +319,10 @@ public class CSVBinder {
 			if (field.contains("."))
 				localContext.put(field.replace(".", "_") + "_", localContext.get(field));
 		}
-		
+
 		return bind(localContext);
 	}
-	
+
 	private List<CSVBinding> flatten(List<CSVBinding> bindings) {
 		List<CSVBinding> all = Lists.newArrayList();
 		for (CSVBinding cb : bindings) {
@@ -330,7 +333,7 @@ public class CSVBinder {
 		}
 		return all;
 	}
-	
+
 	private Object adapt(CSVBinding bind, Object value, Map<String, Object> ctx) {
 		String name = bind.getAdapter();
 		if ("".equals(value)) {
