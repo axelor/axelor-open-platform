@@ -132,6 +132,11 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 	text-align: center;
 }
 
+.loading-counter {
+	padding: 4px 8px 6px 8px;
+	border-radius: 0px 0px 4px 4px;
+}
+
 .spacer {
 	height: 1em;
 }

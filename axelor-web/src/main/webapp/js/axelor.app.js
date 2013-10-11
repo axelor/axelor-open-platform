@@ -40,8 +40,6 @@ var loadingElem = null,
 
 function updateLoadingCounter(val) {
 	loadingCounter += val;
-	if (loadingElem)
-		loadingElem.children('span').text(_t('Loading') + ' (' + loadingCounter + ')...');
 }
 
 function onHttpStart(data, headersGetter) {
@@ -54,7 +52,7 @@ function onHttpStart(data, headersGetter) {
 	}
 	
 	if (loadingElem == null) {
-		loadingElem = $('<div><span class="label label-important" style="padding: 8px 8px 4px 8px;">' + _t('Loading') + '...</span></div>')
+		loadingElem = $('<div><span class="label label-important loading-counter">' + _t('Loading') + '...</span></div>')
 			.css({
 				position: 'fixed',
 				top: 0,
