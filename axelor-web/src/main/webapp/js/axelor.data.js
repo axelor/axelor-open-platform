@@ -161,6 +161,34 @@
 				}
 				return angular.equals(compact(a), compact(b));
 			},
+
+			/**
+			 * Return the difference between two records.
+			 * 
+			 * The relational fields are compared by it's id if version
+			 * property is missing (assuming, the are not modified).
+			 * 
+			 * @param {Object} a - source record
+			 * @param {Object} b - original record
+			 * 
+			 * @returns {Object}
+			 */
+			diff: function(a, b) {
+				if (a === b) return a;
+				if (a === null || b === null) return a;
+				if (!a && !b) return a;
+				if (!a.id || a.id < 1) return a;
+				var result = _.pick(a, 'id', 'version'),
+					that = this;
+
+				_.each(a, function (value, key) {
+					if (!that.equals(value, b[key])) {
+						result[key] = value;
+					}
+				});
+
+				return result;
+			},
 			
 			rpc: function(method, options) {
 				

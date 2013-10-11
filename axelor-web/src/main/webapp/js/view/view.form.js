@@ -377,10 +377,12 @@ function FormViewCtrl($scope, $element) {
 
 		function doSave() {
 			var dummy = $scope.getDummyValues();
-			var promise = ds.save($scope.record).success(function(record, page) {
+
+			var values = ds.diff($scope.record, $scope.$$original);
+			var promise = ds.save(values).success(function(record, page) {
 				return doEdit(record.id, dummy);
 			});
-			
+
 			promise.success(function(record) {
 				defer.resolve(record);
 			});

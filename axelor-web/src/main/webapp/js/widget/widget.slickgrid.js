@@ -867,6 +867,9 @@ Grid.prototype.onBeforeEditCell = function(event, args) {
 			}
 		}
 	}
+	if (args.item && args.item._original === undefined) {
+		args.item._original = _.clone(args.item);
+	}
 	if (!args.item) {
 		this.editorScope.editRecord(null);
 	}
