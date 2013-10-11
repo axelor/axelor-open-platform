@@ -32,6 +32,7 @@ package com.axelor.db;
 
 import java.util.Map;
 
+import javax.persistence.FlushModeType;
 import javax.persistence.Parameter;
 
 import org.joda.time.LocalDate;
@@ -40,23 +41,92 @@ import org.joda.time.LocalDateTime;
 import com.axelor.db.mapper.Adapter;
 import com.google.common.collect.Maps;
 
+/**
+ * The query binder class provides the helper methods to bind query parameters
+ * and mark the query cacheable.
+ *
+ */
 public class QueryBinder {
-	
-	private javax.persistence.Query query;
-	
-	public QueryBinder(javax.persistence.Query query) {
+
+	private final javax.persistence.Query query;
+
+	/**
+	 * Create a new query binder for the given query instance.
+	 *
+	 * @param query
+	 *            the query instance
+	 */
+	private QueryBinder(javax.persistence.Query query) {
 		this.query = query;
 	}
-	
-	public javax.persistence.Query bind(Map<String, Object> namedParams, Object[] params) {
-		
+
+	/**
+	 * Create a new query binder for the given query instance.
+	 *
+	 * @param query
+	 *            the query instance
+	 *
+	 * @return a new query binder instance
+	 */
+	public static QueryBinder of(javax.persistence.Query query) {
+		return new QueryBinder(query);
+	}
+
+	/**
+	 * Set the query cacheable.
+	 *
+	 * @return the same query binder instance
+	 */
+	public QueryBinder setCacheable() {
+		return this.setCacheable(true);
+	}
+
+	/**
+	 * Set whether to set the query cacheable or not.
+	 *
+	 * @param cacheable
+	 *            whether to set cacheable or not
+	 * @return the same query binder instance
+	 */
+	public QueryBinder setCacheable(boolean cacheable) {
+		query.unwrap(org.hibernate.Query.class).setCacheable(cacheable);
+		return this;
+	}
+
+	/**
+	 * Set query flush mode.
+	 *
+	 * @param mode
+	 *            flush mode
+	 * @return the same query binder instance
+	 */
+	public QueryBinder setFlushMode(FlushModeType mode) {
+		query.setFlushMode(mode);
+		return this;
+	}
+
+	/**
+	 * Bind the query with the given named and/or positional parameters.
+	 *
+	 * The parameter values will be automatically adapted to correct data type
+	 * of the query parameter.
+	 *
+	 * @param namedParams
+	 *            the named parameters
+	 * @param params
+	 *            the positional parameters
+	 *
+	 * @return the same query binder instance
+	 */
+	public QueryBinder bind(Map<String, Object> namedParams, Object... params) {
+
 		final Map<String, Object> variables = Maps.newHashMap();
-		
+
 		variables.put("__date__", new LocalDate());
 		variables.put("__time__", new LocalDateTime());
-		
+
 		if (namedParams != null) {
-			
+
 			variables.putAll(namedParams);
 
 			for (Parameter<?> p : query.getParameters()) {
@@ -93,11 +163,35 @@ public class QueryBinder {
 				}
 			}
 		}
+		return this;
+	}
+
+	/**
+	 * Bind the given named parameter with the given value.
+	 *
+	 * @param name
+	 *            the named parameter
+	 * @param value
+	 *            the parameter value
+	 * @return the same query binder instance
+	 */
+	public QueryBinder bind(String name, Object value) {
+		final Map<String, Object> params = Maps.newHashMap();
+		params.put(name, value);
+		return this.bind(params);
+	}
+
+	/**
+	 * Get the underlying query instance.
+	 *
+	 * @return the query instance
+	 */
+	public javax.persistence.Query getQuery() {
 		return query;
 	}
-	
+
 	private Object adapt(Object value, Parameter<?> param) {
-		Class<?> type = param.getParameterType();
+		final Class<?> type = param.getParameterType();
 		if (type == null) {
 			return value;
 		}

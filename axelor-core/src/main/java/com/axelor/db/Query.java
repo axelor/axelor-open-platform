@@ -300,7 +300,8 @@ public class Query<T extends Model> {
 			params.put(name, values.get(key));
 		}
 		javax.persistence.Query q = em().createQuery(updateQuery(params));
-		this.bind(new QueryBinder(q).bind(params, null));
+		this.bind(q).bind(params);
+
 		return q.executeUpdate();
 	}
 
@@ -405,9 +406,8 @@ public class Query<T extends Model> {
 		return sb.toString();
 	}
 
-	protected void bind(javax.persistence.Query query) {
-		QueryBinder binder = new QueryBinder(query);
-		binder.bind(namedParams, params);
+	protected QueryBinder bind(javax.persistence.Query query) {
+		return QueryBinder.of(query).bind(namedParams, params);
 	}
 
 	/**
