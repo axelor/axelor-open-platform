@@ -358,7 +358,12 @@ ui.formInput('OneToMany', {
 			});
 		};
 
-		model.$render = _.debounce(doRender, 100);
+		model.$render = _.debounce(function () {
+			setTimeout(function () {
+				doRender();
+				scope.$apply();
+			});
+		}, 100);
 		
 		var adjustSize = (function() {
 			var rowSize = 26,
