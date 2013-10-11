@@ -1460,26 +1460,42 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 		link: function(scope, element, attrs) {
 
 			var grid = null,
-				handler = scope.handler;
+				schema = null,
+				handler = scope.handler,
+				initialized = false;
 
-			element.addClass('slickgrid').hide();
-			scope.$watch("view", function(view) {
-				
-				if (grid || view == null || scope.dataView == null) {
-					return;
-				}
+			function doInit() {
+				if (initialized || !schema || !scope.dataView) return;
+				initialized = true;
+
 				if (attrs.editable === "false") {
-					view.editable = false;
+					schema.editable = false;
 				}
 				scope.selector = attrs.selector;
 				scope.noFilter = attrs.noFilter;
 
 				grid = new Grid(scope, element, attrs, ViewService, ActionService);
-				if (view.editable) {
+				if (schema.editable) {
 					var child = scope.$new();
-					var form = makeForm(child, handler._model, view.items, handler.fields);
+					var form = makeForm(child, handler._model, schema.items, handler.fields);
 					grid.setEditors(form, child);
 				}
+			};
+
+			var unwatch = scope.$watch(function () {
+				if (element.is(':hidden')) return;
+				if (initialized) return unwatch();
+				doInit();
+			});
+
+			element.addClass('slickgrid').hide();
+			var unwatch2 = scope.$watch("view", function(view) {
+				if (!view || !scope.dataView) {
+					return;
+				}
+				element.show();
+				unwatch2();
+				schema = view;
 			});
 		}
 	};
