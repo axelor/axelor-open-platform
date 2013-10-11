@@ -383,7 +383,9 @@ public class Search extends AbstractView {
 			queryString = builder.toString();
 
 			Query query = JPA.em().createQuery(queryString);
-			return new QueryBinder(query).bind(binding, null);
+			QueryBinder.of(query).bind(binding);
+
+			return query;
 		}
 	}
 

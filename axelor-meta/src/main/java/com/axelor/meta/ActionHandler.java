@@ -323,8 +323,7 @@ public final class ActionHandler {
 			query = "SELECT " + query;
 
 		Query q = JPA.em().createQuery(query);
-		QueryBinder binder = new QueryBinder(q);
-		binder.bind(bindings, params);
+		QueryBinder.of(q).bind(bindings, params);
 
 		return q;
 	}

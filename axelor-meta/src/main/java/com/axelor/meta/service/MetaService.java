@@ -440,8 +440,7 @@ public class MetaService {
 				}
 
 				if (request.getData() != null) {
-					QueryBinder binder = new QueryBinder(query);
-					binder.bind(context, null);
+					QueryBinder.of(query).bind(context);
 				}
 
 				data.put("dataset", query.getResultList());
