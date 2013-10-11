@@ -50,6 +50,6 @@ public class AuthUtils {
 		Subject subject = getSubject();
 		if (subject == null || subject.getPrincipal() == null)
 			return null;
-		return User.all().filter("self.code = ?", subject.getPrincipal()).fetchOne();
+		return User.all().filter("self.code = ?", subject.getPrincipal()).cacheable().fetchOne();
 	}
 }
