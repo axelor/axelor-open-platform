@@ -165,6 +165,12 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		return $scope.canView() && selected !== null;
 	};
 	
+	var _canRemove = $scope.canRemove;
+	$scope.canRemove = function () {
+		var selected = $scope.selection.length ? $scope.selection[0] : null;
+		return _canRemove() && selected !== null;
+	};
+	
 	$scope.onEdit = function() {
 		var selected = $scope.selection.length ? $scope.selection[0] : null;
 		if (selected !== null) {
