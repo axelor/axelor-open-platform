@@ -631,8 +631,7 @@ public class Resource<T extends Model> {
 					property.getName(), model.getSimpleName());
 
 			javax.persistence.Query query = JPA.em().createQuery(qs);
-			QueryBinder binder = new QueryBinder(query);
-			query = binder.bind(data, null);
+			QueryBinder.of(query).bind(data);
 
 			Object name = query.getSingleResult();
 			data.put(property.getName(), name);
