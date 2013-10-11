@@ -303,7 +303,14 @@ function FormViewCtrl($scope, $element) {
 				record = $scope.record;
 			$scope.setEditable();
 			if (handler && record) {
-				setTimeout(handler);
+				setTimeout(function () {
+					var promise = handler();
+					if (promise && promise.then) {
+						promise.then(function () {
+							if ($scope.isDirty()) $scope.editRecord(record);
+						});
+					}
+				});
 			}
 		});
 	});
