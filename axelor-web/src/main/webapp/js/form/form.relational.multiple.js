@@ -312,7 +312,8 @@ ui.formInput('OneToMany', {
 		scope.formPath = scope.formPath ? scope.formPath + "." + attrs.name : attrs.name;
 		
 		var dummyId = 0;
-		
+		var adjusted = false;
+
 		function ensureIds(records) {
 			var items = [];
 			angular.forEach(records, function(record){
@@ -323,25 +324,35 @@ ui.formInput('OneToMany', {
 			});
 			return items;
 		};
-
-		var adjusted = false;
-
-		model.$render = function() {
+		
+		function fetchData() {
 			var items = scope.getValue();
-			scope._viewPromise.then(function(){
-				scope.fetchData(items, function(records){
-					records =  ensureIds(records);
-					scope.setItems(records);
-					if (adjusted || !scope.adjustSize) {
-						return;
-					}
-					adjusted = true;
-					setTimeout(function() {
-						scope.adjustSize();
-					});
+			scope.fetchData(items, function(records){
+				records =  ensureIds(records);
+				scope.setItems(records);
+				if (adjusted || !scope.adjustSize) {
+					return;
+				}
+				adjusted = true;
+				setTimeout(function() {
+					scope.adjustSize();
+				});
+			});
+		}
+
+		function doRender() {
+			var unwatch = null;
+			return scope._viewPromise.then(function () {
+				if (unwatch) return;
+				unwatch = scope.$watch(function () {
+					if (element.is(':hidden')) return;
+					unwatch();
+					fetchData();
 				});
 			});
 		};
+
+		model.$render = _.debounce(doRender, 100);
 		
 		var adjustSize = (function() {
 			var rowSize = 26,
