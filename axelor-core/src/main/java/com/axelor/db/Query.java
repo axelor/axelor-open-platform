@@ -72,6 +72,8 @@ public class Query<T extends Model> {
 
 	private JoinHelper joinHelper;
 
+	private boolean cacheable;
+
 	private static final String NAME_PATTERN = "((?:[a-zA-Z_]\\w+)(?:(?:\\[\\])?\\.\\w+)*)";
 
 	private static final Pattern orderPattern = Pattern.compile(
@@ -194,6 +196,16 @@ public class Query<T extends Model> {
 	}
 
 	/**
+	 * Set the query result cacheable.
+	 *
+	 * @return the same query instance
+	 */
+	public Query<T> cacheable() {
+		this.cacheable = true;
+		return this;
+	}
+
+	/**
 	 * Fetch all the matched records.
 	 *
 	 * @return list of all the matched records.
@@ -223,16 +235,16 @@ public class Query<T extends Model> {
 	 * @return list of matched records within the range
 	 */
 	public List<T> fetch(int limit, int offset) {
-		TypedQuery<T> q = em().createQuery(selectQuery(), beanClass);
+		final TypedQuery<T> query = em().createQuery(selectQuery(), beanClass);
 		if (limit > 0) {
-			q.setMaxResults(limit);
+			query.setMaxResults(limit);
 		}
 		if (offset > 0) {
-			q.setFirstResult(offset);
+			query.setFirstResult(offset);
 		}
 
-		this.bind(q);
-		return q.getResultList();
+		this.bind(query).setCacheable(cacheable);
+		return query.getResultList();
 	}
 
 	/**
@@ -269,9 +281,9 @@ public class Query<T extends Model> {
 	 * @return total number
 	 */
 	public long count() {
-		TypedQuery<Long> q = em().createQuery(countQuery(), Long.class);
-		this.bind(q);
-		return q.getSingleResult();
+		final TypedQuery<Long> query = em().createQuery(countQuery(), Long.class);
+		this.bind(query).setCacheable(cacheable);
+		return query.getSingleResult();
 	}
 
 	/**
@@ -529,7 +541,8 @@ public class Query<T extends Model> {
 			if (offset > 0) {
 				q.setFirstResult(offset);
 			}
-			bind(q);
+
+			bind(q).setCacheable(cacheable);
 
 			return q.getResultList();
 		}
