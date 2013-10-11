@@ -32,9 +32,6 @@ package com.axelor.auth.db;
 
 import java.io.Serializable;
 
-import javax.persistence.FlushModeType;
-import javax.persistence.TypedQuery;
-
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.Transaction;
 import org.hibernate.type.Type;
@@ -63,21 +60,14 @@ public class AuditInterceptor extends EmptyInterceptor {
 		if (user == null || JPA.em().contains(user)) {
 			return user;
 		}
-		
-		TypedQuery<User> q = JPA.em().createQuery(
-				"SELECT self FROM User self WHERE self.code = :code", User.class);
 
-		q.setFlushMode(FlushModeType.COMMIT);
-		q.setParameter("code", user.getCode());
-		
-		user = q.getSingleResult();
-		
-		try {
-			user = q.getSingleResult();
-		} catch (Exception e){
+		user = User.all().filter("self.code = ?", user.getCode())
+				.cacheable().fetchOne();
+
+		if (user == null) {
 			return null;
 		}
-		
+
 		currentUser.remove();
 		currentUser.set(user);
 
