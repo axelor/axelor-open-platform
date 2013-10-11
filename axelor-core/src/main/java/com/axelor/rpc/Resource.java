@@ -241,9 +241,8 @@ public class Resource<T extends Model> {
 					JPA.em().createQuery(
 							"SELECT self FROM " + model.getSimpleName() +
 							" self WHERE " + domain);
-				} catch (Exception e){
-					LOG.error("Invalid domain: {}", domain);
-					request.getData().remove("_domain");
+				} catch (Exception e) {
+					throw new IllegalArgumentException("Invalid domain: " + domain);
 				}
 			}
 		}
@@ -297,8 +296,7 @@ public class Resource<T extends Model> {
 			} else {
 				Throwables.propagate(e);
 			}
-			LOG.error("Fetch data without filter, query failed: " + Throwables.getRootCause(e));
-			data = (query = JPA.all(model)).fetch(limit, offset);
+			Throwables.propagate(e);
 		}
 
 		LOG.debug("Records found: {}", data.size());
