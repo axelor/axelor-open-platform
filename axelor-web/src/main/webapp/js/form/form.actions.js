@@ -242,9 +242,12 @@ ActionHandler.prototype = {
 			deferred.resolve();
 		}
 
-		var ds = scope._dataSource;
-
-		ds.save(scope.record).success(function(rec, page) {
+		var ds = scope._dataSource,
+			values = _.extend({
+				_original: scope.$$original
+			}, scope.record);
+ 
+		ds.save(values).success(function(rec, page) {
 			if (scope.doRead) {
 				return scope.doRead(rec.id).success(doEdit);
 			}

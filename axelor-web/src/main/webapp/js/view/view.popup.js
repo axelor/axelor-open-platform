@@ -106,7 +106,9 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		};
 		
 		function doSave() {
-			ds.save(record).success(function(record, page){
+			var values = ds.diff(record, $scope.$$original);
+			values._original = $scope.$$original;
+			ds.save(values).success(function(record, page){
 				setTimeout(function(){
 					close(record);
 				});
