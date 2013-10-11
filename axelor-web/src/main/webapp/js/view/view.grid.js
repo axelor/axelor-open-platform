@@ -216,11 +216,19 @@ function GridViewCtrl($scope, $element) {
 				}
 			}
 
+			function stripOperator(val) {
+				if (val.indexOf('>') === 0) operator = '>';
+				if (val.indexOf('<') === 0) operator = '<';
+				return val.replace(/<|>\s*/g, '');
+			}
+
 			switch(type) {
 				case 'integer':
 				case 'long':
 				case 'decimal':
 					operator = '=';
+					value = stripOperator(value);
+					value = +(value) || 0;
 					break;
 				case 'boolean':
 					operator = '=';
@@ -228,6 +236,7 @@ function GridViewCtrl($scope, $element) {
 					break;
 				case 'date':
 					operator = '=';
+					value = stripOperator(value);
 					value = moment(value, 'DD/MM/YYYY').format('YYYY-MM-DD'); //TODO: user date format
 					break;
 				case 'time':
@@ -235,12 +244,13 @@ function GridViewCtrl($scope, $element) {
 					break;
 				case 'datetime':
 					operator = 'between';
+					value = stripOperator(value);
 					var val = moment(value, 'DD/MM/YYYY');
 					value = val.startOf('day').toDate().toISOString();
 					value2 = val.endOf('day').toDate().toISOString();
 					break;
 			}
-			
+
 			return {
 				fieldName: key,
 				operator: operator,
