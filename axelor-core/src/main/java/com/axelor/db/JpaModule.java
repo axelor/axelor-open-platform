@@ -30,6 +30,7 @@
  */
 package com.axelor.db;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
@@ -49,32 +50,32 @@ import com.google.inject.persist.jpa.JpaPersistModule;
 
 /**
  * A Guice module to configure JPA.
- * 
+ *
  * This module takes care of initialising JPA and registers an Hibernate custom
  * scanner that automatically scans all the classpath entries for Entity
  * classes.
- * 
+ *
  */
 public class JpaModule extends AbstractModule {
-	
+
 	private static Logger log = LoggerFactory.getLogger(JpaModule.class);
 
 	private String jpaUnit;
 	private boolean autoscan;
 	private boolean autostart;
-	
+
 	private Properties properties;
 
 	/**
 	 * Create new instance of the {@link JpaModule} with the given persistence
 	 * unit name.
-	 * 
+	 *
 	 * If <i>autoscan</i> is true then a custom Hibernate scanner will be used to scan
 	 * all the classpath entries for Entity classes.
-	 * 
+	 *
 	 * If <i>autostart</i> is true then the {@link PersistService} will be started
 	 * automatically.
-	 * 
+	 *
 	 * @param jpaUnit
 	 *            the persistence unit name
 	 * @param autoscan
@@ -91,17 +92,17 @@ public class JpaModule extends AbstractModule {
 	/**
 	 * Create a new instance of the {@link JpaModule} with the given persistence
 	 * unit name with <i>autoscan</i> and <i>autostart</i> enabled.
-	 * 
+	 *
 	 * @param jpaUnit
 	 *            the persistence unit name
 	 */
 	public JpaModule(String jpaUnit) {
 		this(jpaUnit, true, true);
 	}
-	
+
 	/**
 	 * Configures the JPA persistence provider with a set of properties.
-	 * 
+	 *
 	 * @param properties
 	 *            A set of name value pairs that configure a JPA persistence
 	 *            provider as per the specification.
@@ -110,7 +111,7 @@ public class JpaModule extends AbstractModule {
 		this.properties = properties;
 		return this;
 	}
-	
+
 	private boolean isCacheEnabled() {
 		try {
 			InputStream res = Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/persistence.xml");
@@ -132,7 +133,7 @@ public class JpaModule extends AbstractModule {
 		if (this.autoscan) {
 			properties.put("hibernate.ejb.resource_scanner", "com.axelor.db.JpaScanner");
 		}
-		
+
 		properties.put("hibernate.connection.autocommit", "false");
 		properties.put("hibernate.id.new_generator_mappings", "true");
 		properties.put("hibernate.ejb.naming_strategy", "org.hibernate.cfg.ImprovedNamingStrategy");
@@ -146,13 +147,34 @@ public class JpaModule extends AbstractModule {
 			properties.put("hibernate.cache.use_second_level_cache", "true");
 			properties.put("hibernate.cache.use_query_cache", "true");
 			properties.put("hibernate.cache.region.factory_class", "org.hibernate.cache.ehcache.EhCacheRegionFactory");
+			try {
+				updateCacheProperties(properties);
+			} catch (Exception e) {
+			}
 		}
-		
+
 		install(new JpaPersistModule(jpaUnit).properties(properties));
 		if (this.autostart) {
 			bind(Initializer.class).asEagerSingleton();
 		}
 		bind(JPA.class).asEagerSingleton();
+	}
+
+	private Properties updateCacheProperties(Properties properties) throws IOException {
+		final Properties config = new Properties();
+		config.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("ehcache-objects.properties"));
+
+		for (Object key : config.keySet()) {
+			String name = (String) key;
+			String value = config.getProperty((String) name).trim();
+			String prefix = "hibernate.ejb.classcache";
+			if (!Character.isUpperCase(name.charAt(name.lastIndexOf(".") + 1))) {
+				prefix = "hibernate.ejb.collectioncache";
+			}
+			properties.put(prefix + "." + name, value);
+		}
+
+		return properties;
 	}
 
 	public static class Initializer {
