@@ -281,12 +281,12 @@ public class Resource<T extends Model> {
 		List<?> data = null;
 		try {
 			if (request.getFields() != null) {
-				Query<?>.Selector selector = query.select(request.getFields().toArray(new String[]{}));
+				Query<?>.Selector selector = query.cacheable().select(request.getFields().toArray(new String[]{}));
 				LOG.debug("JPQL: {}", selector);
 				data = selector.fetch(limit, offset);
 			} else {
 				LOG.debug("JPQL: {}", query);
-				data = query.fetch(limit, offset);
+				data = query.cacheable().fetch(limit, offset);
 			}
 			response.setTotal(query.count());
 		} catch (Exception e) {
