@@ -1386,6 +1386,20 @@
               </xsd:documentation>
             </xsd:annotation>
           </xsd:attribute>
+          <xsd:attribute name="connect-timeout" type="xsd:int" default="30">
+            <xsd:annotation>
+              <xsd:documentation>
+              Connection timeout in seconds (default 60 seconds).
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="read-timeout" type="xsd:int" default="120">
+            <xsd:annotation>
+              <xsd:documentation>
+              Read timeout in seconds (default 300 seconds).
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>

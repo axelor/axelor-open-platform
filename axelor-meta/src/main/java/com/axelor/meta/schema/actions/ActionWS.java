@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -49,24 +50,48 @@ import com.axelor.meta.MetaStore;
 import com.axelor.meta.TemplateHelper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 @XmlType
 public class ActionWS extends Action {
 
+	private static final int DEFAULT_READ_TIMEOUT = 300;
+	private static final int DEFAULT_CONNECT_TIMEOUT = 60;
+
 	@XmlAttribute
 	private String service;
-	
+
+	@XmlAttribute(name = "connect-timeout")
+	private Integer connectTimeout;
+
+	@XmlAttribute(name = "read-timeout")
+	private Integer readTimeout;
+
 	@XmlElement(name = "action")
 	private List<Method> methods;
-	
+
 	public String getService() {
 		return service;
 	}
-	
+
+	public Integer getConnectTimeout() {
+		if (connectTimeout == null) {
+			return DEFAULT_CONNECT_TIMEOUT;
+		}
+		return connectTimeout;
+	}
+
+	public Integer getReadTimeout() {
+		if (readTimeout == null) {
+			return DEFAULT_READ_TIMEOUT;
+		}
+		return readTimeout;
+	}
+
 	public List<Method> getMethods() {
 		return methods;
 	}
-	
+
 	private ActionWS getRef() {
 		if (service == null || !service.startsWith("ref:"))
 			return null;
@@ -78,19 +103,24 @@ public class ActionWS extends Action {
 			throw new IllegalArgumentException("Invalid web service: " + refName);
 		return (ActionWS) ref;
 	}
-	
+
 	private Object send(String location, Method method, ActionHandler handler)
 			throws IOException, FileNotFoundException, ClassNotFoundException {
-		
+
 		File template = new File(method.template);
 		if (!template.isFile()) {
 			throw new IllegalArgumentException("No such template: " + method.template);
 		}
-		
+
 		String payload = handler.template(template);
+		Map<String, Object> params = Maps.newHashMap();
+
+		params.put("connectTimeout", getConnectTimeout() * 1000);
+		params.put("readTimeout", getReadTimeout() * 1000);
+
 		SOAPClient client = new SOAPClient(location);
-		SOAPResponse response = client.send(payload);
-		
+		SOAPResponse response = client.send(params, payload);
+
 		GPathResult gpath = (GPathResult) response.getBody();
 		gpath = gpath.children();
 
@@ -102,14 +132,14 @@ public class ActionWS extends Action {
 
 		ActionWS ref = getRef();
 		String url = ref == null ? service : ref.getService();
-		
+
 		if (Strings.isNullOrEmpty(url))
 			return null;
-		
+
 		if (ref != null) {
 			ref.evaluate(handler);
 		}
-		
+
 		List<Object> result = Lists.newArrayList();
 		log.info("action-ws (name): " + getName());
 		for(Method m : methods) {
@@ -123,18 +153,18 @@ public class ActionWS extends Action {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Object wrap(ActionHandler handler) {
 		return evaluate(handler);
 	}
-	
+
 	@XmlType
 	public static class Method extends Element {
-		
+
 		@XmlAttribute
 		private String template;
-		
+
 		public String getTemplate() {
 			return template;
 		}
