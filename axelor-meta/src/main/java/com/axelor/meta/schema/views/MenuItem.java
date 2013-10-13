@@ -174,7 +174,7 @@ public class MenuItem {
 	}
 
 	public Boolean getIsFolder() {
-		return MetaMenu.all().filter("self.parent.name = ?1", name).count() > 0;
+		return MetaMenu.all().filter("self.parent.name = ?1", name).cacheable().count() > 0;
 	}
 
 	public String getShowIf() {

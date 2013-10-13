@@ -79,6 +79,8 @@ public class MetaService {
 	@SuppressWarnings("unchecked")
 	private List<MenuItem> findMenus(Query query) {
 
+		QueryBinder.of(query).setCacheable();
+
 		List<MenuItem> menus = Lists.newArrayList();
 		List<Object[]> all = query.getResultList();
 
@@ -204,6 +206,8 @@ public class MetaService {
 		if (!Strings.isNullOrEmpty(category)) {
 			query.setParameter(2, category);
 		}
+
+		QueryBinder.of(query).setCacheable();
 
 		List<MenuItem> menus = Lists.newArrayList();
 		List<MetaActionMenu> all = query.getResultList();

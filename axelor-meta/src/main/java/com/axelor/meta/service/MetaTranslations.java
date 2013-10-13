@@ -120,7 +120,7 @@ public class MetaTranslations implements Translations, Provider<Translations> {
 			metaQuery.order("-domain");
 		}
 
-		MetaTranslation translation = metaQuery.fetchOne();
+		MetaTranslation translation = metaQuery.cacheable().fetchOne();
 
 		if (translation != null && !Strings.isNullOrEmpty(translation.getTranslation())) {
 			return translation.getTranslation();
