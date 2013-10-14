@@ -46,16 +46,16 @@ import com.google.common.collect.Maps;
 
 @XmlType
 public class ActionValidate extends Action {
-	
+
 	public static class Validator extends Element {
-		
+
 		@XmlAttribute(name = "message")
 		private String message;
-		
+
 		public String getMessage() {
 			return message;
 		}
-		
+
 		public void setMessage(String message) {
 			this.message = message;
 		}
@@ -75,11 +75,11 @@ public class ActionValidate extends Action {
 		@XmlElement(name = "alert", type = Alert.class),
 	})
 	private List<Validator> validators;
-	
+
 	public List<Validator> getValidators() {
 		return validators;
 	}
-	
+
 	public void setValidators(List<Validator> validators) {
 		this.validators = validators;
 	}
@@ -89,11 +89,11 @@ public class ActionValidate extends Action {
 		for(Validator validator : validators) {
 			if (validator.test(handler)) {
 				String key = validator.getClass().getSimpleName().toLowerCase();
-				String val = JPA.translate(validator.getMessage());
-				
+				String val = JPA.translate(validator.getMessage(), validator.getMessage(), null, "action");
+
 				if (!Strings.isNullOrEmpty(val))
 					val = handler.evaluate("eval: " + "\"\"\"" + val + "\"\"\"").toString();
-				
+
 				Map<String, Object> result = Maps.newHashMap();
 				result.put(key, val);
 				return result;
@@ -101,7 +101,7 @@ public class ActionValidate extends Action {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public Object wrap(ActionHandler handler) {
 		return evaluate(handler);

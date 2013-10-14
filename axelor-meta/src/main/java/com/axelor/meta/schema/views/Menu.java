@@ -38,9 +38,31 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.db.JPA;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @XmlType
 public class Menu {
+
+	@XmlType
+	public static class Item extends MenuItem {
+
+		@JsonIgnore
+		private String model;
+
+		public String getModel() {
+			return model;
+		}
+
+		public void setModel(String model) {
+			this.model = model;
+		}
+
+		@Override
+		public String getTitle() {
+			return JPA.translate(super.getDefaultTitle(), super.getDefaultTitle(), model, "button");
+		}
+
+	}
 
 	@XmlAttribute
 	private String title;
@@ -52,14 +74,18 @@ public class Menu {
 	private Boolean showTitle;
 
 	@XmlElements({ @XmlElement(name = "item"), @XmlElement(name = "divider") })
-	private List<MenuItem> items;
+	private List<Item> items;
 
+	@JsonIgnore
+	private String model;
+
+	@JsonIgnore
 	public String getDefaultTitle() {
 		return title;
 	}
 
 	public String getTitle() {
-		return JPA.translate(title);
+		return JPA.translate(title, title, getModel(), "button");
 	}
 
 	public void setTitle(String title) {
@@ -82,11 +108,25 @@ public class Menu {
 		this.showTitle = showTitle;
 	}
 
-	public List<MenuItem> getItems() {
+	public List<Item> getItems() {
+		if(items != null) {
+			for (Item item : items) {
+				item.setModel(getModel());
+			}
+		}
 		return items;
 	}
 
-	public void setItems(List<MenuItem> items) {
+	public void setItems(List<Item> items) {
 		this.items = items;
 	}
+
+	public void setModel(String model) {
+		this.model = model;
+	}
+
+	public String getModel() {
+		return model;
+	}
+
 }

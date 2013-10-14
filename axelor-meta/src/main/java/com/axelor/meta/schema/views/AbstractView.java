@@ -40,6 +40,7 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.db.JPA;
 import com.axelor.meta.db.MetaView;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -92,12 +93,13 @@ public abstract class AbstractView {
 		this.name = name;
 	}
 
+	@JsonIgnore
 	public String getDefaultTitle() {
 		return title;
 	}
 
 	public String getTitle() {
-		return JPA.translate(title);
+		return JPA.translate(title, title, this.getModel(), "view");
 	}
 
 	public void setTitle(String title) {
@@ -129,6 +131,11 @@ public abstract class AbstractView {
 	}
 
 	public List<Button> getToolbar() {
+		if(toolbar != null) {
+			for (Button button : toolbar) {
+				button.setModel(this.getModel());
+			}
+		}
 		return toolbar;
 	}
 
@@ -137,6 +144,11 @@ public abstract class AbstractView {
 	}
 
 	public List<Menu> getMenubar() {
+		if(menubar != null) {
+			for (Menu menu : menubar) {
+				menu.setModel(this.getModel());
+			}
+		}
 		return menubar;
 	}
 

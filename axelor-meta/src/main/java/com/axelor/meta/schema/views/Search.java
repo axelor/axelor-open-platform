@@ -148,15 +148,16 @@ public class Search extends AbstractView {
 			this.name = name;
 		}
 
+		@JsonIgnore
 		public String getDefaultTitle() {
 			return title;
 		}
 
 		public String getTitle() {
 			if(!Strings.isNullOrEmpty(title)) {
-				return JPA.translate(title);
+				return JPA.translate(title, title, null, "search");
 			}
-			return JPA.translate(name, null);
+			return JPA.translate(name, null, null, "search");
 		}
 
 		public void setTitle(String title) {
@@ -310,11 +311,19 @@ public class Search extends AbstractView {
 			return model;
 		}
 
+		@JsonIgnore
+		public String getDefaultTitle() {
+			if (title == null && model != null) {
+				return model.substring(model.lastIndexOf('.')+1);
+			}
+			return title;
+		}
+
 		public String getTitle() {
 			if (title == null && model != null) {
-				title = model.substring(model.lastIndexOf('.')+1);
+				title = this.getDefaultTitle();
 			}
-			return JPA.translate(title);
+			return JPA.translate(title, title, null, "search");
 		}
 
 		public String getOrderBy() {

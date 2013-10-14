@@ -52,6 +52,11 @@ public class SearchFilters extends AbstractView {
 	private List<SearchFilter> filters;
 
 	public List<SearchFilter> getFilters() {
+		if(filters != null) {
+			for (SearchFilter searchFilter : filters) {
+				searchFilter.setModel(super.getModel());
+			}
+		}
 		return filters;
 	}
 
@@ -66,19 +71,27 @@ public class SearchFilters extends AbstractView {
 		private String domain;
 
 		@JsonIgnore
+		private String model;
+
+		@JsonIgnore
 		@XmlElement(name = "context")
 		private List<SearchContext> contexts;
 
+		@JsonIgnore
 		public String getDefaultTitle() {
 			return title;
 		}
 
 		public String getTitle() {
-			return JPA.translate(title);
+			return JPA.translate(title, title, model, "filter");
 		}
 
 		public String getDomain() {
 			return domain;
+		}
+
+		public void setModel(String model) {
+			this.model = model;
 		}
 
 		public Map<String, Object> getContext() {

@@ -193,13 +193,13 @@ public class MetaTranslationsService {
 		CSVBinding bindingName = new CSVBinding();
 		bindingName.setField("key");
 		bindingName.setColumn(NAME_COLUMN);
-		bindingName.setCondition("type in ['field', 'viewField']");
+		bindingName.setCondition("type in ['field']");
 		bindings.add(bindingName);
 
 		CSVBinding bindingTitle = new CSVBinding();
 		bindingTitle.setField("key");
 		bindingTitle.setColumn(TITLE_COLUMN);
-		bindingTitle.setCondition("!(type in ['field', 'viewField'])");
+		bindingTitle.setCondition("!(type in ['field'])");
 		bindings.add(bindingTitle);
 
 		CSVBinding bindingTranslation = new CSVBinding();
@@ -210,13 +210,12 @@ public class MetaTranslationsService {
 		CSVBinding bindingType = new CSVBinding();
 		bindingType.setField("type");
 		bindingType.setColumn(TYPE_COLUMN);
-		bindingType.setCondition("type in ['field', 'viewField', 'other', 'placeholder']");
 		bindings.add(bindingType);
 
 		CSVBinding bindingDomain = new CSVBinding();
 		bindingDomain.setField("domain");
 		bindingDomain.setColumn(DOMAIN_COLUMN);
-		bindingDomain.setCondition("type in ['field', 'viewField', 'other', 'placeholder']");
+		bindingDomain.setCondition("!(type in ['menu', 'actionMenu', 'tree', 'chart', 'search', 'action', 'select'])");
 		bindings.add(bindingDomain);
 
 		input.setBindings(bindings);

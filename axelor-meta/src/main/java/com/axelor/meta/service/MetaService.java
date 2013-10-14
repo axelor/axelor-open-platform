@@ -412,12 +412,12 @@ public class MetaService {
 
 		final Map<String, Object> data = Maps.newHashMap();
 
-		data.put("title", JPA.translate(chart.getTitle()));
+		data.put("title", JPA.translate(chart.getTitle(), chart.getTitle(), null, "chart"));
 		data.put("stacked", chart.getStacked());
 
 		data.put("xAxis", chart.getCategoryKey());
 		data.put("xType", chart.getCategoryType());
-		data.put("xTitle", JPA.translate(chart.getCategoryTitle()));
+		data.put("xTitle", JPA.translate(chart.getCategoryTitle(), chart.getCategoryTitle(), null, "chart"));
 
 		JPA.runInTransaction(new Runnable() {
 
@@ -460,7 +460,7 @@ public class MetaService {
 			map.put("type", s.getType());
 			map.put("groupBy", s.getGroupBy());
 			map.put("aggregate", s.getAggregate());
-			map.put("title", JPA.translate(s.getTitle()));
+			map.put("title", JPA.translate(s.getTitle(), s.getTitle(), null, "chart"));
 			series.add(map);
 		}
 

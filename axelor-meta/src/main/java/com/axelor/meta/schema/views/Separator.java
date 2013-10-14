@@ -32,10 +32,15 @@ package com.axelor.meta.schema.views;
 
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.db.JPA;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("separator")
 public class Separator extends SimpleWidget {
 
+	@Override
+	public String getTitle() {
+		return JPA.translate(getDefaultTitle(), getDefaultTitle(), getModel(), "separator");
+	}
 }

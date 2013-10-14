@@ -33,15 +33,16 @@ package com.axelor.meta.schema.views;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.db.JPA;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("page")
 public class Page extends SimpleContainer {
-	
+
 	@XmlAttribute
 	private String icon;
-	
+
 	@XmlAttribute
 	private String onSelect ;
 
@@ -55,6 +56,11 @@ public class Page extends SimpleContainer {
 
 	public void setOnSelect(String onSelect) {
 		this.onSelect = onSelect;
+	}
+
+	@Override
+	public String getTitle() {
+		return JPA.translate(getDefaultTitle(), getDefaultTitle(), getModel(), "page");
 	}
 
 }
