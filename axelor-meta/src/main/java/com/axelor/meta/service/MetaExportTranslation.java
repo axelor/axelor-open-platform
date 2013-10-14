@@ -83,17 +83,21 @@ import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.Group;
 import com.axelor.meta.schema.views.Label;
 import com.axelor.meta.schema.views.Menu;
+import com.axelor.meta.schema.views.Menu.Item;
 import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.schema.views.Notebook;
 import com.axelor.meta.schema.views.Page;
 import com.axelor.meta.schema.views.Portal;
 import com.axelor.meta.schema.views.Portlet;
+import com.axelor.meta.schema.views.Search;
+import com.axelor.meta.schema.views.Search.SearchField;
+import com.axelor.meta.schema.views.Search.SearchSelect;
 import com.axelor.meta.schema.views.SearchFilters;
-import com.axelor.meta.schema.views.TreeView;
 import com.axelor.meta.schema.views.SearchFilters.SearchFilter;
 import com.axelor.meta.schema.views.Separator;
 import com.axelor.meta.schema.views.SimpleContainer;
 import com.axelor.meta.schema.views.SimpleWidget;
+import com.axelor.meta.schema.views.TreeView;
 import com.axelor.meta.schema.views.TreeView.TreeColumn;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
@@ -108,27 +112,27 @@ public class MetaExportTranslation {
 	private static Logger log = LoggerFactory.getLogger(MetaExportTranslation.class);
 	private MetaLoader metaLoader = new MetaLoader();
 
-	private final String groupType = "group";
-	private final String labelType = "label";
-	private final String separatorType = "separator";
-	private final String pageType = "page";
-	private final String buttonType = "button";
-	private final String portletType = "portlet";
-	private final String selectType = "select";
 	private final String fieldType = "field";
-	private final String viewFieldType = "viewField";
 	private final String helpType = "help";
-	private final String otherType = "other";
-	private final String chartType = "chart";
+	private final String placeholderType = "placeholder";
+	private final String docType = "documentation";
+	private final String groupType = "group";
+	private final String pageType = "page";
+	private final String separatorType = "separator";
+	private final String labelType = "label";
+	private final String buttonType = "button";
 	private final String menuType = "menu";
 	private final String actionMenuType = "actionMenu";
-	private final String actionType = "action";
+	private final String viewType = "view";
+	private final String treeType = "tree";
+	private final String chartType = "chart";
+	private final String portletType = "portlet";
 	private final String filterType = "filter";
-	private final String placeholderType = "placeholder";
-	private final String menuBarType = "menuBar";
-	private final String menuItemType = "menuItem";
-	private final String treeColmunType = "treeColmun";
-	private final String docType = "documentation";
+	private final String searchType = "search";
+	private final String actionType = "action";
+	private final String selectType = "select";
+	private final String otherType = "other";
+	private final String viewFieldType = "viewField";
 
 	private File exportFile ;
 	private String exportLanguage ;
@@ -173,25 +177,26 @@ public class MetaExportTranslation {
 
 	private void exportSearchFilters(SearchFilters searchFilters) {
 		for (SearchFilter filter : searchFilters.getFilters()) {
-			String translationFilter = this.getTranslation(filter.getDefaultTitle(), "", null, null);
-			this.appendToFile(searchFilters.getModel(), filter.getDefaultTitle(), this.filterType, filter.getDefaultTitle(), translationFilter);
+			//String translation = this.getTranslation(filter.getDefaultTitle(), "", searchFilters.getModel(), this.filterType);
+			String translation = this.getTranslation(filter.getDefaultTitle(), "", null, this.filterType);
+			this.appendToFile(searchFilters.getModel(), "", this.filterType, filter.getDefaultTitle(), translation);
 		}
-		this.exportMetaFilter(searchFilters.getName());
+		this.exportMetaFilter(searchFilters.getName(), searchFilters.getModel());
 	}
 
-	private void exportMetaFilter(String filterView) {
+	private void exportMetaFilter(String filterView, String model) {
 		MetaFilter filter = MetaFilter.all().filter("self.filterView = ?1", filterView).fetchOne();
 		if (filter == null) {
 			return;
 		}
-		String translation = this.getTranslation(filter.getTitle(), "", null,
-				null);
-		this.appendToFile(filterView, filterView, this.filterType, filter.getTitle(), translation);
+		//String translation = this.getTranslation(filter.getTitle(), "", model, this.filterType);
+		String translation = this.getTranslation(filter.getTitle(), "", null, null);
+		this.appendToFile(model, "", this.filterType, filter.getTitle(), translation);
 	}
 
 	private void exportOther() {
 		for (MetaTranslation translation : MetaTranslation.all().filter("self.type = ?1 AND self.language = ?2 AND self.domain = ?3",  this.otherType, this.exportLanguage, this.currentModule).order("key").fetch()) {
-			this.appendToFile(translation.getDomain(), translation.getKey(), this.otherType, translation.getKey(), translation.getTranslation());
+			this.appendToFile(translation.getDomain(), "", this.otherType, translation.getKey(), translation.getTranslation());
 		}
 	}
 
@@ -214,23 +219,26 @@ public class MetaExportTranslation {
 	private void loadAction(Action action) {
 		if(action instanceof ActionView) {
 			ActionView actionView = (ActionView) action;
+			//String translation = this.getTranslation(actionView.getDefaultTitle(), "", null, this.actionType);
 			String translation = this.getTranslation(actionView.getDefaultTitle(), "", null, null);
-			this.appendToFile(actionView.getName(), actionView.getName(), this.actionType, actionView.getDefaultTitle(), translation);
-			this.exportMetaFilter("act:" + action.getName());
+			this.appendToFile("", "", this.actionType, actionView.getDefaultTitle(), translation);
+			this.exportMetaFilter("act:" + action.getName(), actionView.getModel());
 		}
 		else if(action instanceof ActionValidate) {
 			ActionValidate actionValidate = (ActionValidate) action;
 			for(Validator validator : actionValidate.getValidators()) {
+				//String translation = this.getTranslation(validator.getMessage(), "", null, this.actionType);
 				String translation = this.getTranslation(validator.getMessage(), "", null, null);
-				this.appendToFile(actionValidate.getName(), actionValidate.getName(), this.actionType, validator.getMessage(), translation);
+				this.appendToFile("", "", this.actionType, validator.getMessage(), translation);
 			}
 		}
 		else if(action instanceof ActionCondition) {
 			ActionCondition actionCondition = (ActionCondition) action;
 			for(Check check : actionCondition.getConditions()) {
 				if(check.getDefaultError() != null) {
+					//String translation = this.getTranslation(check.getDefaultError(), "", null, this.actionType);
 					String translation = this.getTranslation(check.getDefaultError(), "", null, null);
-					this.appendToFile(actionCondition.getName(), actionCondition.getName(), this.actionType, check.getDefaultError(), translation);
+					this.appendToFile("", "", this.actionType, check.getDefaultError(), translation);
 				}
 			}
 		}
@@ -238,8 +246,9 @@ public class MetaExportTranslation {
 
 	private void exportMenuActions() {
 		for (MetaActionMenu actionMenu : MetaActionMenu.findByModule(this.currentModule).order("name").fetch()) {
+			//String translation = this.getTranslation(actionMenu.getTitle(), "", null, this.actionMenuType);
 			String translation = this.getTranslation(actionMenu.getTitle(), "", null, null);
-			this.appendToFile(actionMenu.getName(), actionMenu.getName(), this.actionMenuType, actionMenu.getTitle(), translation);
+			this.appendToFile("", "", this.actionMenuType, actionMenu.getTitle(), translation);
 		}
 	}
 
@@ -288,42 +297,75 @@ public class MetaExportTranslation {
 		else if (abstractView instanceof SearchFilters) {
 			this.exportSearchFilters((SearchFilters) abstractView);
 		}
+		else if (abstractView instanceof Search) {
+			this.exportSearch((Search) abstractView);
+		}
+	}
+
+	private void exportSearch(Search abstractView) {
+		for (SearchSelect searchSelect : abstractView.getSelects()) {
+			if(!Strings.isNullOrEmpty(searchSelect.getDefaultTitle())) {
+				//String translation = this.getTranslation(searchSelect.getDefaultTitle(), "", null, this.searchType);
+				String translation = this.getTranslation(searchSelect.getDefaultTitle(), "", null, null);
+				this.appendToFile("", "", this.searchType, searchSelect.getDefaultTitle(), translation);
+			}
+		}
+		for (SearchField searchField : abstractView.getSearchFields()) {
+			if(!Strings.isNullOrEmpty(searchField.getDefaultTitle())) {
+				//String translation = this.getTranslation(searchField.getDefaultTitle(), "", null, this.searchType);
+				String translation = this.getTranslation(searchField.getDefaultTitle(), "", null, null);
+				this.appendToFile("", "", this.searchType, searchField.getDefaultTitle(), translation);
+			}
+		}
+		for (SearchField searchField : abstractView.getResultFields()) {
+			if(!Strings.isNullOrEmpty(searchField.getDefaultTitle())) {
+				//String translation = this.getTranslation(searchField.getDefaultTitle(), "", null, this.searchType);
+				String translation = this.getTranslation(searchField.getDefaultTitle(), "", null, null);
+				this.appendToFile("", "", this.searchType, searchField.getDefaultTitle(), translation);
+			}
+		}
 	}
 
 	private void loadTreeColumn(AbstractView abstractView, TreeColumn column) {
 		if(!Strings.isNullOrEmpty(column.getDefaultTitle())) {
+			//String translation = this.getTranslation(column.getDefaultTitle(), "", null, this.treeType);
 			String translation = this.getTranslation(column.getDefaultTitle(), "", null, null);
-			this.appendToFile(abstractView.getName(), column.getName(), this.treeColmunType, column.getDefaultTitle(), translation);
+			this.appendToFile("", "", this.treeType, column.getDefaultTitle(), translation);
 		}
 	}
 
 	private void loadButton(AbstractView abstractView, Button button) {
 		if(!Strings.isNullOrEmpty(button.getDefaultTitle())) {
+			//String translation = this.getTranslation(button.getDefaultTitle(), "", abstractView.getModel(), this.buttonType);
 			String translation = this.getTranslation(button.getDefaultTitle(), "", null, null);
-			this.appendToFile(abstractView.getName(), button.getName(), this.buttonType, button.getDefaultTitle(), translation);
+			this.appendToFile(abstractView.getModel(), "", this.buttonType, button.getDefaultTitle(), translation);
 		}
 
 		if(!Strings.isNullOrEmpty(button.getDefaultPrompt())) {
+			//String translation = this.getTranslation(button.getDefaultPrompt(), "", abstractView.getModel(), this.buttonType);
 			String translation = this.getTranslation(button.getDefaultPrompt(), "", null, null);
-			this.appendToFile(abstractView.getName(), button.getName(), this.buttonType, button.getDefaultPrompt(), translation);
+			this.appendToFile(abstractView.getModel(), "", this.buttonType, button.getDefaultPrompt(), translation);
 		}
 
 		if(!Strings.isNullOrEmpty(button.getDefaultHelp())) {
+			//String translation = this.getTranslation(button.getDefaultHelp(), "", abstractView.getModel(), this.buttonType);
 			String translation = this.getTranslation(button.getDefaultHelp(), "", null, null);
-			this.appendToFile(abstractView.getName(), button.getName(), this.buttonType, button.getDefaultHelp(), translation);
+			this.appendToFile(abstractView.getModel(), "", this.buttonType, button.getDefaultHelp(), translation);
 		}
 	}
 
-	private void loadSimpleWidget(AbstractView abstractView, SimpleWidget widget, String type) {
+	private void loadSimpleWidget(SimpleWidget widget, String model, String type) {
 
 		if(!Strings.isNullOrEmpty(widget.getDefaultTitle())) {
+			//String translation = this.getTranslation(widget.getDefaultTitle(), "", model, type);
 			String translation = this.getTranslation(widget.getDefaultTitle(), "", null, null);
-			this.appendToFile(abstractView.getName(), widget.getName(), type, widget.getDefaultTitle(), translation);
+			this.appendToFile(model, "", type, widget.getDefaultTitle(), translation);
 		}
 
 		if(!Strings.isNullOrEmpty(widget.getDefaultHelp())) {
+			//String translation = this.getTranslation(widget.getDefaultHelp(), "", model, type);
 			String translation = this.getTranslation(widget.getDefaultHelp(), "", null, null);
-			this.appendToFile(abstractView.getName(), widget.getName(), type, widget.getDefaultHelp(), translation);
+			this.appendToFile(model, "", type, widget.getDefaultHelp(), translation);
 		}
 
 	}
@@ -340,24 +382,27 @@ public class MetaExportTranslation {
 			}
 		}
 
+		//String translation = this.getTranslation(abstractView.getDefaultTitle(), "", abstractView.getModel(), this.viewType);
 		String translation = this.getTranslation(abstractView.getDefaultTitle(), "", null, null);
-		this.appendToFile(abstractView.getModel(), abstractView.getName(), abstractView.getType(), abstractView.getDefaultTitle(), translation);
+		this.appendToFile(abstractView.getModel(), "", this.viewType, abstractView.getDefaultTitle(), translation);
 	}
 
 	private void loadMenu(AbstractView abstractView, Menu menu) {
 		if(!Strings.isNullOrEmpty(menu.getTitle())) {
+			//String translation = this.getTranslation(menu.getDefaultTitle(), "", abstractView.getModel(), this.buttonType);
 			String translation = this.getTranslation(menu.getDefaultTitle(), "", null, null);
-			this.appendToFile(abstractView.getName(), menu.getDefaultTitle(), this.menuBarType, menu.getDefaultTitle(), translation);
+			this.appendToFile(abstractView.getModel(), "", this.buttonType, menu.getDefaultTitle(), translation);
 		}
-		for (MenuItem menuItem : menu.getItems()) {
-			this.loadMenuItem(menuItem);
+		for (Item item : menu.getItems()) {
+			this.loadMenuItem(abstractView, item);
 		}
 	}
 
-	private void loadMenuItem(MenuItem menuItem) {
+	private void loadMenuItem(AbstractView abstractView, MenuItem menuItem) {
 		if(!Strings.isNullOrEmpty(menuItem.getDefaultTitle())) {
+			//String translation = this.getTranslation(menuItem.getDefaultTitle(), "", abstractView.getModel(), this.buttonType);
 			String translation = this.getTranslation(menuItem.getDefaultTitle(), "", null, null);
-			this.appendToFile(menuItem.getName(), menuItem.getName(), this.menuItemType, menuItem.getDefaultTitle(), translation);
+			this.appendToFile(abstractView.getModel(), "", this.buttonType, menuItem.getDefaultTitle(), translation);
 		}
 	}
 
@@ -369,14 +414,14 @@ public class MetaExportTranslation {
 			this.loadButton(abstractView, (Button) widget);
 		}
 		else if(widget instanceof Separator) {
-			this.loadSimpleWidget(abstractView, (SimpleWidget) widget, this.separatorType);
+			this.loadSimpleWidget((SimpleWidget) widget, abstractView.getModel(), this.separatorType);
 		}
 		else if(widget instanceof Label) {
-			this.loadSimpleWidget(abstractView, (SimpleWidget) widget, this.labelType);
+			this.loadSimpleWidget((SimpleWidget) widget, abstractView.getModel(), this.labelType);
 		}
 		else if(widget instanceof Field) {
 			Field field = (Field) widget;
-			this.exportField(abstractView,field);
+			this.exportField(abstractView, field);
 			if(field.getViews() != null) {
 				for (AbstractView subAbstractView : field.getViews()) {
 					this.loadView(subAbstractView);
@@ -389,11 +434,11 @@ public class MetaExportTranslation {
 		if(!Strings.isNullOrEmpty(field.getDefaultTitle()) || !Strings.isNullOrEmpty(field.getDefaultHelp())) {
 			String translation = this.getTranslation(field.getDefaultTitle(), "", abstractView.getModel(), this.fieldType);
 			String translationHelp = this.getTranslation(field.getDefaultHelp(), "", abstractView.getModel(), this.helpType);
-			this.appendToFile(abstractView.getModel(), field.getDefaultTitle(), this.viewFieldType, field.getDefaultTitle(), translation, field.getDefaultHelp(), translationHelp);
+			this.appendToFile(abstractView.getModel(), "", this.viewFieldType, field.getDefaultTitle(), translation, field.getDefaultHelp(), translationHelp);
 		}
 		if(!Strings.isNullOrEmpty(field.getDefaultPlaceholder())) {
 			String translation = this.getTranslation(field.getDefaultPlaceholder(), "", abstractView.getModel(), this.placeholderType);
-			this.appendToFile(abstractView.getModel(), field.getDefaultPlaceholder(), this.placeholderType, field.getDefaultPlaceholder(), translation);
+			this.appendToFile(abstractView.getModel(), "", this.placeholderType, field.getDefaultPlaceholder(), translation);
 		}
 		if(internalFields.contains(field.getName()) && Strings.isNullOrEmpty(field.getDefaultTitle())) {
 			String translation = this.getTranslation(field.getName(), "", abstractView.getModel(), this.fieldType);
@@ -410,16 +455,16 @@ public class MetaExportTranslation {
 			}
 		}
 		else if(container instanceof Portlet) {
-			this.loadSimpleWidget(view, (Portlet) container, this.portletType);
+			this.loadSimpleWidget((Portlet) container, "", this.portletType);
 		}
 		else if(container instanceof SimpleContainer) {
 			SimpleContainer simpleContainer = (SimpleContainer) container;
 
 			if(simpleContainer.getItems() != null) {
 				if(simpleContainer instanceof Group)
-					this.loadSimpleWidget(view, (SimpleWidget) container, this.groupType);
+					this.loadSimpleWidget((SimpleWidget) container, view.getModel(), this.groupType);
 				else if(simpleContainer instanceof Page)
-					this.loadSimpleWidget(view, (SimpleWidget) container, this.pageType);
+					this.loadSimpleWidget((SimpleWidget) container, view.getModel(), this.pageType);
 
 				for (AbstractWidget widget : simpleContainer.getItems()) {
 					this.loadWidget(view, widget) ;
@@ -430,19 +475,22 @@ public class MetaExportTranslation {
 
 	private void exportCharts() {
 		for (MetaChart chart : MetaChart.findByModule(this.currentModule).order("name").fetch()) {
+			//String translation = this.getTranslation(chart.getTitle(), "", null, this.chartType);
 			String translation = this.getTranslation(chart.getTitle(), "", null, null);
-			this.appendToFile(chart.getName(), chart.getName(), this.chartType, chart.getTitle(), translation);
+			this.appendToFile("", "", this.chartType, chart.getTitle(), translation);
 
 			if(!Strings.isNullOrEmpty(chart.getCategoryTitle())) {
+				//String translationTitle = this.getTranslation(chart.getCategoryTitle(), "", null, this.chartType);
 				String translationTitle = this.getTranslation(chart.getCategoryTitle(), "", null, null);
-				this.appendToFile(chart.getName(), chart.getName(), this.chartType, chart.getCategoryTitle(), translationTitle);
+				this.appendToFile("", "", this.chartType, chart.getCategoryTitle(), translationTitle);
 			}
 
 			if(chart.getChartSeries() != null) {
 				for (MetaChartSeries serie : chart.getChartSeries()) {
 					if(!Strings.isNullOrEmpty(serie.getTitle())) {
+						//String translationSerie = this.getTranslation(serie.getTitle(), "", null, this.chartType);
 						String translationSerie = this.getTranslation(serie.getTitle(), "", null, null);
-						this.appendToFile(serie.getTitle(), serie.getTitle(), this.chartType, serie.getTitle(), translationSerie);
+						this.appendToFile("", "", this.chartType, serie.getTitle(), translationSerie);
 					}
 				}
 			}
@@ -491,23 +539,24 @@ public class MetaExportTranslation {
 		for (Property field : entity.getFields()) {
 			String translation = this.getTranslation(field.getName(), "", packageName, this.fieldType);
 			String translationHelp = this.getTranslation(field.getName(), "", packageName, this.helpType);
-			String doc = this.getTranslation(field.getName(), "", packageName, this.docType);
-			this.appendToFile(packageName, field.getName(), this.fieldType, field.getTitle(), translation, field.getHelp(), translationHelp, doc);
+			this.appendToFile(packageName, field.getName(), this.fieldType, field.getTitle(), translation, field.getHelp(), translationHelp);
 		}
 	}
 
 	private void exportMenus() {
 		for (MetaMenu menu : MetaMenu.findByModule(this.currentModule).order("name").fetch()) {
+			//String translation = this.getTranslation(menu.getTitle(), "", null, this.menuType);
 			String translation = this.getTranslation(menu.getTitle(), "", null, null);
-			this.appendToFile(menu.getName(), menu.getTitle(), this.menuType, menu.getTitle(), translation);
+			this.appendToFile("", "", this.menuType, menu.getTitle(), translation);
 		}
 	}
 
 	private void exportSelects() {
 		for (MetaSelect select : MetaSelect.findByModule(this.currentModule).order("name").fetch()) {
 			for (MetaSelectItem item : select.getItems()) {
+				//String translation = this.getTranslation(item.getTitle(), "", null, this.selectType);
 				String translation = this.getTranslation(item.getTitle(), "", null, null);
-				this.appendToFile(select.getName(), item.getValue(), this.selectType, item.getTitle(), translation);
+				this.appendToFile("", "", this.selectType, item.getTitle(), translation);
 			}
 		}
 	}
@@ -539,7 +588,7 @@ public class MetaExportTranslation {
 		params.add(key);
 		params.add(this.exportLanguage);
 
-		if(domain != null) {
+		if(!Strings.isNullOrEmpty(domain)) {
 			query += " AND (self.domain IS NULL OR self.domain = ?3)";
 			params.add(domain);
 		}

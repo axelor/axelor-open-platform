@@ -34,7 +34,7 @@
     <field name="installed" width="100"/>
     <field name="removable" width="100"/>
   </grid>
-
+  
   <form name="meta-module-form" title="Module" cols="4" colWidths="100,10,200,*"
     model="com.axelor.meta.db.MetaModule">
     <separator title="Module" colSpan="4" />
@@ -57,9 +57,24 @@
   <selection name="meta.translation.type.selection">
   	<option value="field">Field</option>
   	<option value="help">Help</option>
-  	<option value="other">Other</option>
     <option value="placeholder">PlaceHolder</option>
     <option value="documentation">Documentation</option>
+    <option value="group">Group</option>
+    <option value="page">Page</option>
+    <option value="separator">Separator</option>
+    <option value="label">Label</option>
+    <option value="button">Button</option>
+    <option value="menu">Menu</option>
+    <option value="actionMenu">Action Menu</option>
+    <option value="view">Vue</option>
+    <option value="tree">Tree</option>
+    <option value="chart">Chart</option>
+    <option value="portlet">Portlet</option>
+    <option value="search">Search</option>
+    <option value="filter">Filter</option>
+    <option value="action">Action</option>
+    <option value="select">Select</option>
+    <option value="other">Other</option>
   </selection>
 
   <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView" orderBy="priority,name">

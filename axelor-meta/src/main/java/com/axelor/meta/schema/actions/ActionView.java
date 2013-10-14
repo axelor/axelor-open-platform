@@ -41,6 +41,7 @@ import javax.xml.bind.annotation.XmlType;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.meta.ActionHandler;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -52,74 +53,75 @@ import com.google.common.collect.Maps;
 	"contexts"
 })
 public class ActionView extends Action {
-	
+
 	@XmlType
 	public static class View extends Element {
-		
+
 		@XmlAttribute
 		private String type;
-		
+
 		public String getType() {
 			return type;
 		}
-		
+
 		public void setType(String type) {
 			this.type = type;
 		}
 	}
-	
+
 	@XmlType
 	public static class Context extends ActionRecord.RecordField {
-		
+
 	}
-	
+
 	@XmlType
 	public static class Param {
-		
+
 		@XmlAttribute
 		private String name;
-		
+
 		@XmlAttribute
 		private String value;
-		
+
 		public String getName() {
 			return name;
 		}
-		
+
 		public String getValue() {
 			return value;
 		}
 	}
-	
+
 	@XmlAttribute
 	private String title;
-	
+
 	@XmlAttribute
 	private String icon;
-	
+
 	@XmlAttribute
 	private String model;
-	
+
 	@XmlElement
 	private String domain;
-	
+
 	@XmlElement(name = "view")
 	private List<View> views;
-	
+
 	@XmlElement(name = "context")
 	private List<Context> contexts;
-	
+
 	@XmlElement(name = "view-param")
 	private List<ActionView.Param> params;
 
+	@JsonIgnore
 	public String getDefaultTitle() {
 		return title;
 	}
-	
+
 	public String getTitle() {
-		return JPA.translate(title);
+		return JPA.translate(title, title, null, "view");
 	}
-	
+
 	public String getIcon() {
 		return icon;
 	}
@@ -127,15 +129,15 @@ public class ActionView extends Action {
 	public String getModel() {
 		return model;
 	}
-	
+
 	public String getDomain() {
 		return domain;
 	}
-	
+
 	public List<View> getViews() {
 		return views;
 	}
-	
+
 	public void setViews(List<View> views) {
 		this.views = views;
 	}
@@ -144,11 +146,11 @@ public class ActionView extends Action {
 	public Object getContext() {
 		return null;
 	}
-	
+
 	public List<Param> getParams() {
 		return params;
 	}
-	
+
 	public void setParams(List<ActionView.Param> params) {
 		this.params = params;
 	}
@@ -159,15 +161,15 @@ public class ActionView extends Action {
 		Map<String, Object> context = Maps.newHashMap();
 		Map<String, Object> viewParams = Maps.newHashMap();
 		List<Object> items = Lists.newArrayList();
-		
+
 		String viewType = null;
-		
+
 		for(View elem : views) {
 
 			if (!elem.test(handler)) {
 				continue;
 			}
-			
+
 			Map<String, Object> map = Maps.newHashMap();
 			map.put("name", elem.getName());
 			map.put("type", elem.getType());
@@ -178,7 +180,7 @@ public class ActionView extends Action {
 
 			items.add(map);
 		}
-		
+
 		if (contexts != null) {
 			for(Context ctx : contexts) {
 				Object value = handler.evaluate(ctx.getExpression());
@@ -197,12 +199,12 @@ public class ActionView extends Action {
 				viewParams.put(param.name, value);
 			}
 		}
-		
+
 		String domain = this.getDomain();
 		if (domain != null && domain.contains("$")) {
 			domain = handler.evaluate("eval: \"" + domain + "\"").toString();
 		}
-		
+
 		String title = this.getTitle();
 		if (title != null && title.contains("$")) {
 			title = handler.evaluate("eval: \"" + title + "\"").toString();
@@ -219,7 +221,7 @@ public class ActionView extends Action {
 
 		return result;
 	}
-	
+
 	@Override
 	public Object wrap(ActionHandler handler) {
 		return ImmutableMap.of("view", evaluate(handler));

@@ -35,6 +35,7 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.db.JPA;
 import com.axelor.meta.db.MetaMenu;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @XmlType
 public class MenuItem {
@@ -145,12 +146,13 @@ public class MenuItem {
 		this.category = category;
 	}
 
+	@JsonIgnore
 	public String getDefaultTitle() {
 		return title;
 	}
 
 	public String getTitle() {
-		return JPA.translate(title);
+		return JPA.translate(title, title, null, "menu");
 	}
 
 	public void setTitle(String title) {

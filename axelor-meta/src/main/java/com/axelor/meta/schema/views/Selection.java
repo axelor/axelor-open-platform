@@ -38,32 +38,33 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
 import com.axelor.db.JPA;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @XmlType
 public class Selection {
-	
+
 	@XmlAttribute
 	private String name;
-	
+
 	@XmlElement(name = "option", required = true)
 	private List<Selection.Option> options;
 
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public List<Selection.Option> getOptions() {
 		return options;
 	}
-	
+
 	public void setOptions(List<Selection.Option> options) {
 		this.options = options;
 	}
-	
+
 	@XmlType
 	public static class Option {
 
@@ -81,18 +82,19 @@ public class Selection {
 			this.value = value;
 		}
 
+		@JsonIgnore
 		public String getDefaultTitle(){
 			return title;
 		}
 
 		public String getTitle() {
-			return JPA.translate(title);
+			return JPA.translate(title, title, null, "select");
 		}
 
 		public void setTitle(String title) {
 			this.title = title;
 		}
-	
+
 	}
 
 }

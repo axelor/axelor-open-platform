@@ -42,27 +42,27 @@ public class Button extends SimpleWidget {
 
 	@XmlAttribute
 	private String icon;
-	
+
 	@XmlAttribute
 	private String iconHover;
-	
+
 	@XmlAttribute
 	private String link;
-	
+
 	@XmlAttribute
 	private String prompt;
-	
+
 	@XmlAttribute
 	private String onClick;
-	
+
 	public String getIcon() {
 		return icon;
 	}
-	
+
 	public String getIconHover() {
 		return iconHover;
 	}
-	
+
 	public String getLink() {
 		return link;
 	}
@@ -72,9 +72,9 @@ public class Button extends SimpleWidget {
 	}
 
 	public String getPrompt() {
-		return JPA.translate(prompt);
+		return JPA.translate(prompt, prompt, super.getModel(), "button");
 	}
-	
+
 	public void setPrompt(String prompt) {
 		this.prompt = prompt;
 	}
@@ -85,5 +85,15 @@ public class Button extends SimpleWidget {
 
 	public void setOnClick(String onClick) {
 		this.onClick = onClick;
+	}
+
+	@Override
+	public String getHelp() {
+		return JPA.translate(super.getDefaultHelp(), super.getDefaultHelp(), super.getModel(), "button");
+	}
+
+	@Override
+	public String getTitle() {
+		return JPA.translate(super.getDefaultTitle(), super.getDefaultTitle(), super.getModel(), "button");
 	}
 }

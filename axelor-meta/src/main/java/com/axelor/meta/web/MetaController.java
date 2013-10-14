@@ -67,7 +67,7 @@ public class MetaController {
 		try {
 			views = loader.fromXML(xml);
 		} catch (JAXBException e){
-			String message = "Invalid XML.";
+			String message = JPA.translate("Invalid XML.");
 			Throwable ex = e.getLinkedException();
 			if (ex != null) {
 				message = ex.getMessage().replaceFirst("[^:]+\\:(.*)", "$1");
@@ -96,7 +96,7 @@ public class MetaController {
 
 		Action current = views.getActions().get(0);
 		if (action != null && !action.getName().equals(current.getName())) {
-			data.put("error", "Action name can't be changed.");
+			data.put("error", JPA.translate("Action name can't be changed."));
 			return;
 		}
 	}

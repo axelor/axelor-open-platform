@@ -32,10 +32,16 @@ package com.axelor.meta.schema.views;
 
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.db.JPA;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("label")
 public class Label extends SimpleWidget {
+
+	@Override
+	public String getTitle() {
+		return JPA.translate(getDefaultTitle(), getDefaultTitle(), getModel(), "label");
+	}
 
 }

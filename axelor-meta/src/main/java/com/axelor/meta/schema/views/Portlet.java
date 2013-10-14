@@ -33,6 +33,7 @@ package com.axelor.meta.schema.views;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.db.JPA;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
@@ -41,23 +42,28 @@ public class Portlet extends AbstractContainer {
 
 	@XmlAttribute
 	private String action;
-	
+
 	@XmlAttribute
 	private Boolean canSearch;
-	
+
 	public String getAction() {
 		return action;
 	}
-	
+
 	public void setAction(String action) {
 		this.action = action;
 	}
-	
+
 	public Boolean getCanSearch() {
 		return canSearch;
 	}
-	
+
 	public void setCanSearch(Boolean canSearch) {
 		this.canSearch = canSearch;
+	}
+
+	@Override
+	public String getTitle() {
+		return JPA.translate(getDefaultTitle(), getDefaultTitle(), null, "portlet");
 	}
 }

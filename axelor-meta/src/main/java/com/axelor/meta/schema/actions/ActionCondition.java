@@ -76,7 +76,7 @@ public class ActionCondition extends Action {
 					errors.put(field, error);
 				}
 			}
-			
+
 		}
 		return allCheck ? true : errors;
 	}
@@ -92,13 +92,13 @@ public class ActionCondition extends Action {
 
 	@XmlType
 	public static class Check extends Element {
-		
+
 		@XmlAttribute
 		private String field;
-		
+
 		@XmlAttribute
 		private String error;
-		
+
 		public String getCondition(String field) {
 			String condition = this.getCondition();
 			if (isEmpty(condition) && !isEmpty(field)) {
@@ -106,7 +106,7 @@ public class ActionCondition extends Action {
 			}
 			return condition != null ? condition.trim() : condition;
 		}
-		
+
 		public String getField() {
 			return field;
 		}
@@ -114,21 +114,21 @@ public class ActionCondition extends Action {
 		public String getDefaultError() {
 			return error;
 		}
-		
+
 		public String getError() {
 			if (isEmpty(error)) {
 				if (isEmpty(this.getCondition())) {
-					return JPA.translate("Field is required.");
+					return JPA.translate("Field is required.", "Field is required.", null, "action");
 				}
-				return JPA.translate("Invalid field value.");
+				return JPA.translate("Invalid field value.", "Invalid field value.", null, "action");
 			}
-			return JPA.translate(error);
+			return JPA.translate(error, error, null, "action");
 		}
-		
+
 		private boolean isEmpty(String str) {
 			return str == null || "".equals(str.trim());
 		}
-		
+
 		@Override
 		public String toString() {
 			return Objects.toStringHelper(getClass())

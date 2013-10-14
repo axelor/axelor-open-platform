@@ -232,7 +232,7 @@ public class ViewService extends AbstractService {
 			return null;
 		}
 		for(MetaSelectItem item : items) {
-			all.add(ImmutableMap.of("value", item.getValue(), "title", JPA.translate(item.getTitle())));
+			all.add(ImmutableMap.of("value", item.getValue(), "title", JPA.translate(item.getTitle(), item.getTitle(), null, "select")));
 		}
 		return all;
 	}
