@@ -51,12 +51,12 @@ public class AuthValidator {
 		if (group.getPermissions() == null) {
 			return;
 		}
-		
+
 		Set<Permission> all = Sets.newHashSet();
 		Set<String> unique = Sets.newHashSet();
 		Set<String> duplicates = Sets.newHashSet();
 		Set<String> notValid = Sets.newHashSet();
-		
+
 		for(Permission permission : group.getPermissions()) {
 			String object = permission.getObject();
 			if (unique.contains(object)) {
@@ -65,22 +65,22 @@ public class AuthValidator {
 			} else {
 				unique.add(object);
 			}
-			
+
 			Query query = JPA.em().createNativeQuery("SELECT count(*) from meta_model where CONCAT(package_name, '.', name) = ?1");
 			query.setParameter(1, object);
-			
+
 			BigInteger requestResult = (BigInteger) query.getSingleResult();
 			if(requestResult.equals(BigInteger.ZERO)){
 				notValid.add(object);
 				continue;
 			}
-			
+
 			all.add(permission);
 		}
-		
+
 		if (duplicates.size() > 0) {
 			response.setFlash(JPA.translate("Only one permission per object is required.")+"<br><br>"+
-					JPA.translate("Duplicates found:<br>") + Joiner.on("<br>").join(duplicates));
+					JPA.translate("Duplicates found:")+"<br>" + Joiner.on("<br>").join(duplicates));
 			response.setValues(ImmutableMap.of("permissions", all));
 		}
 		else if(notValid.size() >0){
