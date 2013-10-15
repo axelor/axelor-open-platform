@@ -113,14 +113,17 @@ ui.formInput('Number', {
 			step: 1
 		};
 
+		var ensured = false;
+		
 		element.on("spin", onSpin);
 		element.on("spinchange", function(e, row) {
-			updateModel(element.val(), true);
+			updateModel(element.val(), !ensured);
+			ensured = false;
 		});
 		element.on("spinchange:ensure", function(e, row) {
-			var val = row[props.name],
-				handle = val !== undefined && val !== scope.getValue();
-			updateModel(element.val(), handle);
+			var val = row[props.name];
+			ensured = val !== undefined && val !== scope.getValue();
+			updateModel(element.val(), ensured);
 		});
 		
 		function updateModel(value, handle) {
