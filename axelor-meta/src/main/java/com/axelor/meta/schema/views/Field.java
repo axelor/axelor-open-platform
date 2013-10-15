@@ -39,6 +39,7 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.PropertyType;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -131,6 +132,14 @@ public class Field extends SimpleWidget {
 		@XmlElement(name = "grid", type = GridView.class)
 	})
 	private List<AbstractView> views;
+
+	@XmlAttribute
+	@JsonIgnore
+	private Boolean export;
+
+	@XmlAttribute
+	@JsonIgnore
+	private Boolean documentation;
 
 	@Override
 	public String getTitle() {
@@ -389,7 +398,39 @@ public class Field extends SimpleWidget {
 		this.summaryView = summaryView;
 	}
 
-	private String getTarget() {
+	public Boolean getExport() {
+		return export == null ? true : export;
+	}
+
+	public void setExport(Boolean export) {
+		this.export = export;
+	}
+
+	public Boolean getDocumentation() {
+		if(documentation != null) {
+			return documentation;
+		}
+
+		Mapper mapper = null;
+		try {
+			mapper = Mapper.of(Class.forName(this.getModel()));
+			PropertyType type = mapper.getProperty(getName()).getType();
+			if(type == PropertyType.ONE_TO_ONE || type == PropertyType.MANY_TO_ONE || type == PropertyType.MANY_TO_MANY) {
+				return documentation == null ? false : documentation;
+			}
+			else if(type == PropertyType.ONE_TO_MANY) {
+				return documentation == null ? true : documentation;
+			}
+		} catch (Exception e) {
+		}
+		return false;
+	}
+
+	public void setDocumentation(Boolean documentation) {
+		this.documentation = documentation;
+	}
+
+	public String getTarget() {
 		Mapper mapper = null;
 		try {
 			mapper = Mapper.of(Class.forName(this.getModel()));

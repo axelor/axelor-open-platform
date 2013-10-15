@@ -53,8 +53,6 @@ public class ImportTranslations {
 		String help = values.get("help").toString();
 		String help_t = values.get("help_t").toString();
 
-		String doc = values.get("doc") != null ? values.get("doc").toString() : null;
-
 		if(!Strings.isNullOrEmpty(help) && !Strings.isNullOrEmpty(help_t) && "viewField".equals(meta.getType())) {
 			MetaTranslation helpT = new MetaTranslation();
 			helpT.setDomain(meta.getDomain());
@@ -74,17 +72,7 @@ public class ImportTranslations {
 			helpT.save();
 		}
 
-		if(!Strings.isNullOrEmpty(doc) && "field".equals(meta.getType())) {
-			MetaTranslation docT = new MetaTranslation();
-			docT.setDomain(meta.getDomain());
-			docT.setKey(meta.getKey());
-			docT.setLanguage(meta.getLanguage());
-			docT.setTranslation(doc);
-			docT.setType("documentation");
-			docT.save();
-		}
-
-		if(meta.getKey() == null) {
+		if(meta.getKey() == null || ("documentation".equals(meta.getType()) && Strings.isNullOrEmpty(meta.getTranslation()))) {
 			return null;
 		}
 
