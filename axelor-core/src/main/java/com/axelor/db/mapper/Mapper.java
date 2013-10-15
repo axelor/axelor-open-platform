@@ -38,8 +38,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,30 +45,32 @@ import java.util.concurrent.ExecutionException;
 
 import com.axelor.db.NameColumn;
 import com.google.common.base.Preconditions;
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
  * This class can be used to map params to Java bean using reflection. It also
  * provides convenient methods to get/set values to a bean instance.
- * 
+ *
  */
 public class Mapper {
-	
+
 	private static final LoadingCache<Class<?>, Mapper> MAPPER_CACHE = CacheBuilder
 			.newBuilder()
 			.maximumSize(1000)
 			.weakKeys()
 			.build(new CacheLoader<Class<?>, Mapper>() {
-				
+
 				@Override
 				public Mapper load(Class<?> key) throws Exception {
 					return new Mapper(key);
 				}
 			});
-	
+
 	private static final Object[] NULL_ARGUMENTS = {};
 
 	private Map<String, Method> getters = new HashMap<String, Method>();
@@ -80,7 +80,7 @@ public class Mapper {
 	private Map<String, Property> fields = new HashMap<String, Property>();
 
 	private Property nameField;
-	
+
 	private Class<?> beanClass;
 
 	private Mapper(Class<?> beanClass) {
@@ -115,15 +115,35 @@ public class Mapper {
 		}
 	}
 
-	private Annotation[] getAnnotations(String name, Method getter) {
-		List<Annotation> all = new ArrayList<Annotation>();
+	private static final Cache<Method, Annotation[]> ANNOTATION_CACHE = CacheBuilder
+			.newBuilder()
+			.maximumSize(1000)
+			.weakKeys()
+			.build();
+
+	private Annotation[] getAnnotations(String name, Method method) {
+		Annotation[] found = ANNOTATION_CACHE.getIfPresent(method);
+		if (found != null) {
+			return found;
+		}
+
+		final List<Annotation> all = Lists.newArrayList();
 		try {
-			Field field = getField(beanClass, name);
-			all.addAll(Arrays.asList(field.getAnnotations()));
+			final Field field = getField(beanClass, name);
+			for (Annotation a : field.getAnnotations()) {
+				all.add(a);
+			}
 		} catch (Exception e) {
 		}
-		all.addAll(Arrays.asList(getter.getAnnotations()));
-		return all.toArray(new Annotation[] {});
+
+		for (Annotation a : method.getAnnotations()) {
+			all.add(a);
+		}
+
+		found = all.toArray(new Annotation[] {});
+		ANNOTATION_CACHE.put(method, found);
+
+		return found;
 	}
 
 	private Field getField(Class<?> klass, String name) {
@@ -140,7 +160,7 @@ public class Mapper {
 	 * <p>
 	 * If the {@link Mapper} class has been previously created for the given
 	 * class, then the {@link Mapper} class is retrieved from the cache.
-	 * 
+	 *
 	 * @param klassJava
 	 *            bean class
 	 */
@@ -154,7 +174,7 @@ public class Mapper {
 
 	/**
 	 * Get all the properties.
-	 * 
+	 *
 	 * @return an array of {@link Property}
 	 */
 	public Property[] getProperties() {
@@ -163,7 +183,7 @@ public class Mapper {
 
 	/**
 	 * Get the {@link Property} of the given name.
-	 * 
+	 *
 	 * @param name
 	 *            name of the property
 	 * @return a Property or null if property doesn't exist.
@@ -171,13 +191,13 @@ public class Mapper {
 	public Property getProperty(String name) {
 		return fields.get(name);
 	}
-	
+
 	/**
 	 * Get the property of the name field.
-	 * 
+	 *
 	 * A name field annotated with {@link NameColumn} or a field with
 	 * name <code>name</code> is considered name field.
-	 * 
+	 *
 	 * @return a property
 	 */
 	public Property getNameField() {
@@ -194,7 +214,7 @@ public class Mapper {
 
 	/**
 	 * Get the bean class this mapper operates on.
-	 * 
+	 *
 	 * @return the bean class
 	 */
 	public Class<?> getBeanClass() {
@@ -203,7 +223,7 @@ public class Mapper {
 
 	/**
 	 * Get the getter method of the given property.
-	 * 
+	 *
 	 * @param name
 	 *            name of the property
 	 * @return getter method or null if property is write-only
@@ -214,7 +234,7 @@ public class Mapper {
 
 	/**
 	 * Get the setter method of the given property.
-	 * 
+	 *
 	 * @param name
 	 *            name of the property
 	 * @return setter method or null if property is read-only
@@ -226,7 +246,7 @@ public class Mapper {
 	/**
 	 * Get the value of given property from the given bean. It returns
 	 * <code>null</code> if property doesn't exist.
-	 * 
+	 *
 	 * @param bean
 	 *            the bean
 	 * @param name
@@ -251,7 +271,7 @@ public class Mapper {
 
 	/**
 	 * Set the property of the given bean with the provided value.
-	 * 
+	 *
 	 * @param bean
 	 *            the bean
 	 * @param name
@@ -278,7 +298,7 @@ public class Mapper {
 		Class<?> actualType = method.getParameterTypes()[0];
 		Type genericType = method.getGenericParameterTypes()[0];
 		Annotation[] annotations = getAnnotations(name, method);
-		
+
 		value = Adapter.adapt(value, actualType, genericType, annotations);
 
 		try {
@@ -292,7 +312,7 @@ public class Mapper {
 	/**
 	 * Create an object of the given class mapping the given value map to it's
 	 * properties.
-	 * 
+	 *
 	 * @param klass
 	 *            class of the bean
 	 * @param values
@@ -314,28 +334,28 @@ public class Mapper {
 			if (mapper.setters.containsKey(name))
 				mapper.set(bean, name, values.get(name));
 		}
-		
+
 		return bean;
 	}
-	
+
 	/**
 	 * Create a map from the given bean instance with property names are keys
 	 * and their respective values are map values.
-	 * 
+	 *
 	 * @param bean
 	 *            a bean instance
 	 * @return a map
 	 */
 	public static Map<String, Object> toMap(Object bean) {
 		if (bean == null) return null;
-		
+
 		Map<String, Object> map = Maps.newHashMap();
 		Mapper mapper = Mapper.of(bean.getClass());
-		
+
 		for(Property p : mapper.getProperties()) {
 			map.put(p.getName(), p.get(bean));
 		}
-		
+
 		return map;
 	}
 }
