@@ -125,6 +125,13 @@ ui.formCompile = function(element, attrs, linkerFn) {
 				parent = elem.parent('td'),
 				label = elem.data('label') || $(),
 				label_parent = label.parent('td');
+
+			// label scope should use same isHidden method (#1514)
+			var lScope = label.data('$scope');
+			if (lScope && lScope.isHidden !== scope.isHidden) {
+				lScope.isHidden = scope.isHidden;
+			}
+
 			if (parent.size() == 0)
 				parent = elem;
 			if (label_parent.size())
