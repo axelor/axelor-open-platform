@@ -193,13 +193,13 @@ public class MetaTranslationsService {
 		CSVBinding bindingName = new CSVBinding();
 		bindingName.setField("key");
 		bindingName.setColumn(NAME_COLUMN);
-		bindingName.setCondition("type in ['field']");
+		bindingName.setCondition("type in ['field', 'documentation']");
 		bindings.add(bindingName);
 
 		CSVBinding bindingTitle = new CSVBinding();
 		bindingTitle.setField("key");
 		bindingTitle.setColumn(TITLE_COLUMN);
-		bindingTitle.setCondition("!(type in ['field'])");
+		bindingTitle.setCondition("!(type in ['field', 'documentation'])");
 		bindings.add(bindingTitle);
 
 		CSVBinding bindingTranslation = new CSVBinding();
