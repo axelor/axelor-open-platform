@@ -442,7 +442,7 @@ td.form-item > * {
 	margin-bottom: 1px;
 }
 
-table.form-layout td.form-item .ui-spinner input {
+.form-item-container .ui-spinner input {
 	width: 100%;
 	text-align: right;
 	padding-right: 16px;
