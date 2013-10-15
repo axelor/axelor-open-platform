@@ -119,7 +119,7 @@ public class ActionView extends Action {
 	}
 
 	public String getTitle() {
-		return JPA.translate(title, title, null, "view");
+		return JPA.translate(title, title, null, "action");
 	}
 
 	public String getIcon() {
