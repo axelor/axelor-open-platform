@@ -39,6 +39,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.persistence.EntityManager;
+import javax.persistence.FlushModeType;
 import javax.persistence.TypedQuery;
 
 import com.axelor.db.mapper.Mapper;
@@ -73,6 +74,8 @@ public class Query<T extends Model> {
 	private JoinHelper joinHelper;
 
 	private boolean cacheable;
+
+	private FlushModeType flushMode = FlushModeType.AUTO;
 
 	private static final String NAME_PATTERN = "((?:[a-zA-Z_]\\w+)(?:(?:\\[\\])?\\.\\w+)*)";
 
@@ -205,6 +208,11 @@ public class Query<T extends Model> {
 		return this;
 	}
 
+	public Query<T> autoFlush(boolean auto) {
+		this.flushMode = auto ? FlushModeType.AUTO : FlushModeType.COMMIT;
+		return this;
+	}
+
 	/**
 	 * Fetch all the matched records.
 	 *
@@ -243,7 +251,7 @@ public class Query<T extends Model> {
 			query.setFirstResult(offset);
 		}
 
-		this.bind(query).setCacheable(cacheable);
+		this.bind(query).opts(cacheable, flushMode);
 		return query.getResultList();
 	}
 
@@ -282,7 +290,7 @@ public class Query<T extends Model> {
 	 */
 	public long count() {
 		final TypedQuery<Long> query = em().createQuery(countQuery(), Long.class);
-		this.bind(query).setCacheable(cacheable);
+		this.bind(query).opts(cacheable, flushMode);
 		return query.getSingleResult();
 	}
 
@@ -542,7 +550,7 @@ public class Query<T extends Model> {
 				q.setFirstResult(offset);
 			}
 
-			bind(q).setCacheable(cacheable);
+			bind(q).opts(cacheable, flushMode);
 
 			return q.getResultList();
 		}
