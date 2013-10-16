@@ -62,7 +62,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 		}
 
 		user = User.all().filter("self.code = ?", user.getCode())
-				.cacheable().fetchOne();
+				.cacheable().autoFlush(false).fetchOne();
 
 		if (user == null) {
 			return null;
