@@ -130,6 +130,16 @@ class Entity {
 		}
 	}
 
+	boolean addField(Property field) {
+		for (Property current : properties) {
+			if (current.name == field.name) {
+				return false
+			}
+		}
+		field.entity = this
+		properties.add(field);
+	}
+
 	List<Property> getFields() {
 		properties
 	}
@@ -345,5 +355,11 @@ class Entity {
 			return new Annotation(this, "javax.persistence.Cacheable", false).add("false", false)
 		}
 		return null
+	}
+
+	@Override
+	String toString() {
+		def names = fields.collect { it.name }
+		return "Entity(name: $name, fields: $names)"
 	}
 }

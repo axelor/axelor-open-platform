@@ -30,6 +30,8 @@
  */
 package com.axelor.tool;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Test;
@@ -37,6 +39,7 @@ import org.junit.runner.RunWith;
 
 import com.axelor.test.GuiceModules;
 import com.axelor.test.GuiceRunner;
+import com.axelor.tool.x2j.Extender;
 import com.axelor.tool.x2j.Generator;
 
 @RunWith(GuiceRunner.class)
@@ -46,10 +49,23 @@ public class GeneratorTest {
 	InputStream read(String resource) {
 		return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
 	}
-	
+
 	@Test
-	public void test() {
-		Generator gen = new Generator("src/test/resources/domains", "target/src-gen");
+	public void test() throws IOException {
+		Generator gen = new Generator(
+				"src/test/resources/axelor-app/axelor-contact",
+				"src/test/resources/axelor-app/axelor-contact/target");
+		gen.clean();
+		gen.start();
+	}
+
+	@Test
+	public void test2() throws IOException {
+
+		String base = "src/test/resources/axelor-app";
+		File basePath = new File(base);
+
+		Extender gen = new Extender(basePath);
 		gen.clean();
 		gen.start();
 	}

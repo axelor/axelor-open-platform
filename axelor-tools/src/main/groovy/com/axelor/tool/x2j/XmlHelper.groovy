@@ -30,26 +30,38 @@
  */
 package com.axelor.tool.x2j
 
-class Utils {
+import com.axelor.tool.x2j.pojo.Entity
+
+class XmlHelper {
 
 	/**
-	 * Strip the extra leading white space from the code string.
-	 * 
+	 * Read return the list of modules from the given pom.xml
+	 *
+	 * @param input the input file
+	 * @return list of all the modules found in the xml
 	 */
-	public static String stripCode(String code, String joinWith) {
-		if (code == null || code.trim().length() == 0) {
-			return ""
+	public static List<String> modules(File input) {
+		return new XmlSlurper().parse(input).'**'.findAll { it.name() == "module" }.collect { it.text() }
+	}
+
+	/**
+	 * Parse the given input xml and return {@link Entity} mapping
+	 * to each entity elements.
+	 *
+	 * @param input the input file
+	 * @return list of entity mapping
+	 */
+	public static  List<Entity> entities(File input) {
+		return new XmlSlurper().parse(input).'entity'.collect {
+			return new Entity(it)
 		}
-		String text = code.stripIndent().replaceAll("    ", "\t")
-		text = text.trim().replaceAll("\n", joinWith).trim()
-		return text
 	}
-	
-	public static String firstUpper(String string) {
-		string.substring(0, 1).toUpperCase() + string.substring(1)
-	}
-	
-	public static String firstLower(String string) {
-		string.substring(0, 1).toLowerCase() + string.substring(1)
+
+	public static String version(File input) {
+		def version = new XmlSlurper().parse(input).'**'.find { it.name() == 'version' }
+		if (version) {
+			return version.text()
+		}
+		return "1.0.0-SNAPSHOT"
 	}
 }
