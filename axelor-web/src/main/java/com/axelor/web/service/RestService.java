@@ -283,7 +283,7 @@ public class RestService extends ResourceService {
 			.expireAfterAccess(1, TimeUnit.MINUTES)
 			.build();
 
-	private static Charset csvCharset = Charsets.UTF_8;
+	private static Charset csvCharset = Charsets.ISO_8859_1;
 	static {
 		try {
 			csvCharset = Charset.forName(
