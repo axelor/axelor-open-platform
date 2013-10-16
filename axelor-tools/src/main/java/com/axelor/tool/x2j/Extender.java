@@ -119,6 +119,7 @@ public class Extender extends Generator {
 
 		for (String module : modules()) {
 			File path = this.file(base, module, OBJECT_PATH);
+			if (!path.exists()) continue;
 			for (File input : path.listFiles()) {
 				List<File> set = all.get(input.getName());
 				if (set == null) {
