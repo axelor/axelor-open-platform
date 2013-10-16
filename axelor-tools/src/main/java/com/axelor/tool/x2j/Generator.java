@@ -3,7 +3,6 @@ package com.axelor.tool.x2j;
 import java.io.File;
 import java.io.IOException;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.tool.x2j.pojo.Entity;
@@ -17,7 +16,7 @@ public class Generator {
 
 	static final String OUTPUT_PATH = "src-gen";
 
-	static final Logger LOG = LoggerFactory.getLogger(Generator.class);
+	protected Log log = new Log(LoggerFactory.getLogger(getClass()));
 
 	protected File domainPath;
 
@@ -34,6 +33,10 @@ public class Generator {
 
 	public Generator(String base, String target) {
 		this(new File(base), new File(target));
+	}
+	
+	public Log getLog() {
+		return log;
 	}
 
 	protected File file(File base, String... parts) {
@@ -64,7 +67,7 @@ public class Generator {
 			}
 		}
 
-		LOG.info("Generating: " + fileName);
+		log.info("Generating: " + fileName);
 
 		String code = Expander.expand(entity);
 
@@ -73,7 +76,7 @@ public class Generator {
 
 	protected void process(File input, File outputPath) throws IOException {
 
-		LOG.info("Processing: " + input);
+		log.info("Processing: " + input);
 
 		for (Entity it : XmlHelper.entities(input)) {
 			expand(input, outputPath, it);
@@ -91,8 +94,8 @@ public class Generator {
 
 	public void clean() {
 
-		LOG.info("Cleaning generated sources.");
-		LOG.info("Output path: " + outputPath);
+		log.info("Cleaning generated sources.");
+		log.info("Output path: " + outputPath);
 
 		if (!this.outputPath.exists()) return;
 
@@ -103,9 +106,9 @@ public class Generator {
 
 	public void start() throws IOException {
 
-		LOG.info("Generating JPA classes.");
-		LOG.info("Domain path: " + domainPath);
-		LOG.info("Output path: " + outputPath);
+		log.info("Generating JPA classes.");
+		log.info("Domain path: " + domainPath);
+		log.info("Output path: " + outputPath);
 
 		outputPath.mkdirs();
 
