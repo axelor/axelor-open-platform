@@ -318,7 +318,6 @@ ui.formInput('OneToMany', {
 		scope.formPath = scope.formPath ? scope.formPath + "." + attrs.name : attrs.name;
 		
 		var dummyId = 0;
-		var adjusted = false;
 
 		function ensureIds(records) {
 			var items = [];
@@ -336,13 +335,6 @@ ui.formInput('OneToMany', {
 			scope.fetchData(items, function(records){
 				records =  ensureIds(records);
 				scope.setItems(records);
-				if (adjusted || !scope.adjustSize) {
-					return;
-				}
-				adjusted = true;
-				setTimeout(function() {
-					scope.adjustSize();
-				});
 			});
 		}
 

@@ -745,7 +745,6 @@ Grid.prototype.adjustSize = function() {
 	}
 	this.doInit();
 	this.grid.resizeCanvas();
-	this.grid.invalidate();
 };
 
 Grid.prototype.getColumn = function(indexOrName) {
@@ -1491,20 +1490,15 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 				}
 			};
 
-			var unwatch = scope.$watch(function () {
-				if (element.is(':hidden')) return;
-				if (initialized) return unwatch();
-				doInit();
-			});
-
 			element.addClass('slickgrid').hide();
-			var unwatch2 = scope.$watch("view", function(view) {
+			var unwatch = scope.$watch("view", function(view) {
 				if (!view || !scope.dataView) {
 					return;
 				}
-				element.show();
-				unwatch2();
+				unwatch();
 				schema = view;
+				element.show();
+				doInit();
 			});
 		}
 	};
