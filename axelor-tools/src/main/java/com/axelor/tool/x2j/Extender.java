@@ -22,9 +22,9 @@ public class Extender extends Generator {
 
 	private  File projectPath;
 
-	public Extender(File base) {
-		super(base, base);
-		this.target = this.file(base, PROJECT_PATH, "target");
+	public Extender(File base, File target) {
+		super(base, target);
+		this.target = this.file(base, PROJECT_PATH, target.getName());
 		this.outputPath = this.file(this.target, OUTPUT_PATH);
 		this.projectPath = this.file(base, PROJECT_PATH);
 	}

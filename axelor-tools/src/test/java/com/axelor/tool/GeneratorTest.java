@@ -63,9 +63,12 @@ public class GeneratorTest {
 	public void test2() throws IOException {
 
 		String base = "src/test/resources/axelor-app";
-		File basePath = new File(base);
+		String target = "src/test/resources/axelor-app/axelor-objects/target";
 
-		Extender gen = new Extender(basePath);
+		File basePath = new File(base);
+		File targetPath = new File(target);
+
+		Extender gen = new Extender(basePath, targetPath);
 		gen.clean();
 		gen.start();
 	}
