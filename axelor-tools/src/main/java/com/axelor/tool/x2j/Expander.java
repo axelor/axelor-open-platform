@@ -25,15 +25,12 @@ final class Expander {
 
 	private Template headTemplate;
 
-	private Template pomTemplate;
-
 	private static Expander instance;
 
 	private Expander() {
 		pojoTemplate = template("templates/pojo.template");
 		headTemplate = template("templates/head.template");
 		bodyTemplate = template("templates/body.template");
-		pomTemplate = template("templates/pom.template");
 	}
 
 	public static Expander getInstance() {
@@ -45,12 +42,6 @@ final class Expander {
 
 	public static String expand(Entity entity) {
 		return Expander.getInstance().doExpand(entity);
-	}
-
-	public static String expandPom(String version) {
-		final Map<String, Object> binding = Maps.newHashMap();
-		binding.put("version", version);
-		return getInstance().pomTemplate.make(binding).toString();
 	}
 
 	private Reader read(String resource) {

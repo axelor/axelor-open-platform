@@ -34,7 +34,7 @@ public class Generator {
 	public Generator(String base, String target) {
 		this(new File(base), new File(target));
 	}
-	
+
 	public Log getLog() {
 		return log;
 	}
@@ -94,10 +94,10 @@ public class Generator {
 
 	public void clean() {
 
+		if (!this.outputPath.exists()) return;
+
 		log.info("Cleaning generated sources.");
 		log.info("Output path: " + outputPath);
-
-		if (!this.outputPath.exists()) return;
 
 		for (File file : outputPath.listFiles()) {
 			delete(file);

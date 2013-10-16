@@ -52,29 +52,10 @@ public class Extender extends Generator {
 		return all;
 	}
 
-	private boolean prepare() {
+	private boolean hasAggregator() {
 		final File basePom = this.file(base, "pom.xml");
 		final File thisPom = this.file(projectPath, "pom.xml");
-
-		if (!basePom.exists()) {
-			return false;
-		}
-		if (thisPom.exists()) {
-			return true;
-		}
-
-		String version = XmlHelper.version(basePom);
-		String code = Expander.expandPom(version);
-
-		try {
-			Files.createParentDirs(thisPom);
-			thisPom.createNewFile();
-			Files.write(code, thisPom, Charsets.UTF_8);
-		} catch (IOException e) {
-			return false;
-		}
-
-		return true;
+		return basePom.exists() && thisPom.exists();
 	}
 
 	private Entity merge(Entity target, Entity source) {
@@ -111,7 +92,7 @@ public class Extender extends Generator {
 	@Override
 	public void start() throws IOException {
 
-		if (!prepare()) {
+		if (!hasAggregator()) {
 			return;
 		}
 
