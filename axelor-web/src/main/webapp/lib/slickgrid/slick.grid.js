@@ -1403,11 +1403,6 @@ if (typeof Slick === "undefined") {
 
         // Do not render cells outside of the viewport.
         if (columnPosRight[Math.min(ii - 1, i + colspan - 1)] > range.leftPx) {
-          if (columnPosLeft[i] > range.rightPx) {
-            // All columns to the right are outside the range.
-            break;
-          }
-
           appendCellHtml(stringArray, row, i, colspan);
         }
 
