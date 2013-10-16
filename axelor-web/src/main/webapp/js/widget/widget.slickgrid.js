@@ -558,6 +558,12 @@ Grid.prototype.parse = function(view) {
 		if (selectColumn) {
 			grid.registerPlugin(selectColumn);
 		}
+
+		//XXX: ui-dialog issue (filter row)
+		var zIndex = element.parents('.ui-dialog:first').zIndex();
+		if (zIndex) {
+			element.find('.slick-headerrow-column').zIndex(zIndex);
+		}
 	};
 
 	function adjustSize() {
