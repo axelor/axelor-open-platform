@@ -46,7 +46,7 @@ public class Extender extends Generator {
 		final List<String> all = XmlHelper.modules(basePom);
 		try {
 			Files.write(Joiner.on("\n").join(all), props, Charsets.UTF_8);
-		} catch (Exception e){
+		} catch (Exception e) {
 		}
 
 		return all;
@@ -86,7 +86,7 @@ public class Extender extends Generator {
 
 	private List<Entity> accept(List<Entity> target, File input) {
 
-		LOG.info("Processing: " + input);
+		log.info("Processing: " + input);
 
 		List<Entity> source = XmlHelper.entities(input);
 		List<Entity> all = Lists.newArrayList();
