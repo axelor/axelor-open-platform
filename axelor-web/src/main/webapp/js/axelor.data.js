@@ -237,6 +237,7 @@
 				if (opts.store) {
 					this._filter = filter;
 					this._sortBy = sortBy;
+					this._lastDomain = domain;
 					this._lastContext = context;
 					
 					if (opts.archived !== undefined) {
