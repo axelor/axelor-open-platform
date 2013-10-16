@@ -106,6 +106,24 @@ public class QueryBinder {
 	}
 
 	/**
+	 * Shortcut to the {@link #setCacheable()} and
+	 * {@link #setFlushMode(FlushModeType)} methods.
+	 *
+	 * @param cacheable
+	 *            whether to mark the query cacheable
+	 * @param type
+	 *            the {@link FlushModeType}, only set if type is not null
+	 * @return the same query binder instance
+	 */
+	public QueryBinder opts(boolean cacheable, FlushModeType type) {
+		this.setCacheable(cacheable);
+		if (type != null) {
+			this.setFlushMode(type);
+		}
+		return this;
+	}
+
+	/**
 	 * Bind the query with the given named and/or positional parameters.
 	 *
 	 * The parameter values will be automatically adapted to correct data type
