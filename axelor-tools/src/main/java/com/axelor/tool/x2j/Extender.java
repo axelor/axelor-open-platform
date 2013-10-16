@@ -30,7 +30,7 @@ public class Extender extends Generator {
 	}
 
 	private List<String> modules() {
-		final File props = this.file(projectPath, "modules.txt");
+		final File props = this.file(outputPath, "modules.txt");
 		final File basePom = this.file(base, "pom.xml");
 		try {
 			if (props.lastModified() > basePom.lastModified()) {
@@ -56,7 +56,7 @@ public class Extender extends Generator {
 		final File basePom = this.file(base, "pom.xml");
 		final File thisPom = this.file(projectPath, "pom.xml");
 
-		if (!base.exists()) {
+		if (!basePom.exists()) {
 			return false;
 		}
 		if (thisPom.exists()) {
