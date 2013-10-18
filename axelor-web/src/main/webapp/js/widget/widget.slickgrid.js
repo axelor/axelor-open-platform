@@ -732,6 +732,13 @@ Grid.prototype.parse = function(view) {
 		return false;
 	});
 	
+	element.on('blur', '.slick-cell.editable :input', function (e) {
+		var lock = grid.getEditorLock();
+		if (lock && lock.isActive()) {
+			lock.commitCurrentEdit();
+		}
+	});
+	
 	return grid;
 };
 
