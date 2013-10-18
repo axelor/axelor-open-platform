@@ -73,6 +73,10 @@ public class CSVBinder {
 		adapters.put(adapter.getName(), adapter);
 	}
 
+	public String[] getFields() {
+		return fields;
+	}
+
 	public CSVBinder(Class<?> beanClass, String[] fields, CSVInput csvInput) {
 		this(beanClass, fields, csvInput.getBindings(), true, csvInput.getSearch(), csvInput.isUpdate());
 	}

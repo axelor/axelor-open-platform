@@ -40,11 +40,16 @@ import com.axelor.data.adapter.NumberAdapter;
 import com.axelor.data.csv.CSVImporter;
 import com.google.inject.ImplementedBy;
 
+/**
+ * The {@link Importer} interface to run import.
+ * @author axelor
+ *
+ */
 @ImplementedBy(CSVImporter.class)
 public interface Importer {
-	
+
 	static final int DEFAULT_BATCH_SIZE = 20;
-	
+
 	public static DataAdapter[] defaultAdapters = {
 		new DataAdapter("LocalDate", JodaAdapter.class, "type", "LocalDate", "format", "dd/MM/yyyy"),
 		new DataAdapter("LocalTime", JodaAdapter.class, "type", "LocalTime", "format", "HH:mm"),
@@ -53,13 +58,13 @@ public interface Importer {
 		new DataAdapter("Boolean", BooleanAdapter.class, "falsePattern", "(0|f|n|false|no)"),
 		new DataAdapter("Number", NumberAdapter.class, "decimalSeparator", ".", "thousandSeparator", ",")
 	};
-	
+
 	/**
 	 * Run the data import task.
-	 * 
+	 *
 	 * The file name mappings should be passed to process data from multiple
 	 * files. For example:
-	 * 
+	 *
 	 * <pre>
 	 * 	Map<String, String[]) mappings = new HashMap<String, String[])();
 	 * 	String[] files = {
@@ -68,15 +73,15 @@ public interface Importer {
 	 *  };
 	 * 	mappings.put("sale.order", files);
 	 * 	importer.run(mappings);
-	 * 
+	 *
 	 * </pre>
-	 * 
+	 *
 	 * If mappings is empty or null then multifile import configuration is
 	 * ignored.
-	 * 
+	 *
 	 * @param mappings
 	 *            file name mappings for multifile data import
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	void run(Map<String, String[]> mappings) throws IOException;

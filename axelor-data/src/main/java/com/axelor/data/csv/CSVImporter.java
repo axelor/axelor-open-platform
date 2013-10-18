@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -54,6 +55,7 @@ import com.axelor.data.ImportException;
 import com.axelor.data.ImportTask;
 import com.axelor.data.Importer;
 import com.axelor.data.Listener;
+import com.axelor.data.LoggerManager;
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
@@ -65,66 +67,72 @@ import com.google.inject.Injector;
 public class CSVImporter implements Importer {
 
 	private Logger LOG = LoggerFactory.getLogger(getClass());
-	
+
 	private File dataDir;
-	
+
 	private Injector injector;
-	
+
 	private CSVConfig config;
-	
+
 	private List<Listener> listeners = Lists.newArrayList();
-	
+
+	private List<String[]> valuesStack = Lists.newArrayList();
+
 	private Map<String, Object> context;
-	
+
+	private LoggerManager loggerManager;
+
 	public void addListener(Listener listener) {
 		this.listeners.add(listener);
 	}
-	
+
 	public void clearListener() {
 		this.listeners.clear();
 	}
-	
+
 	public void setContext(Map<String, Object> context) {
 		this.context = context;
 	}
-	
+
 	public CSVImporter(Injector injector, String configFile) {
-		this(injector, configFile, null);
+		this(injector, configFile, null, null);
 	}
-	
+
 	@Inject
 	public CSVImporter(Injector injector,
 			@Named("axelor.data.config") String config,
-			@Named("axelor.data.dir") String dataDir) {
-		
+			@Named("axelor.data.dir") String dataDir,
+			@Nullable @Named("axelor.error.dir") String errorDir) {
+
 		File _file = new File(config);
-		
+
 		Preconditions.checkNotNull(_file);
 		Preconditions.checkArgument(_file.isFile());
-		
+
 		if (dataDir != null) {
 			File _data = new File(dataDir);
 			Preconditions.checkNotNull(_data);
 			Preconditions.checkArgument(_data.isDirectory());
 			this.dataDir = _data;
 		}
-		
+
 		this.config = CSVConfig.parse(_file);
 		this.injector = injector;
+		this.loggerManager = new LoggerManager(errorDir);
 	}
-	
+
 	public CSVImporter(Injector injector, CSVConfig config){
 		this.config = config;
 		this.injector = injector;
 	}
-	
+
 	private List<File> getFiles(String... names) {
 		List<File> all = Lists.newArrayList();
 		for (String name : names)
 			all.add(new File(dataDir, name));
 		return all;
 	}
-	
+
 	private int getBatchSize() {
 		try {
 			Object val = JPA.em().getEntityManagerFactory().getProperties().get("hibernate.jdbc.batch_size");
@@ -133,7 +141,7 @@ public class CSVImporter implements Importer {
 		}
 		return DEFAULT_BATCH_SIZE;
 	}
-	
+
 	/**
 	 * Run the task from the configured readers
 	 * @param task
@@ -175,25 +183,25 @@ public class CSVImporter implements Importer {
 			task.readers.clear();
 		}
 	}
-	
+
 	@Override
 	public void run(Map<String, String[]> mappings) throws IOException {
-		
+
 		if (mappings == null) {
 			mappings = new HashMap<String, String[]>();
 		}
-		
+
 		for (CSVInput input : config.getInputs()) {
-			
+
 			String fileName = input.getFileName();
-			
+
 			Pattern pattern = Pattern.compile("\\[([\\w.]+)\\]");
 			Matcher matcher = pattern.matcher(fileName);
-			
+
 			List<File> files = matcher.matches() ?
 					this.getFiles(mappings.get(matcher.group(1))) :
 					this.getFiles(fileName);
-			
+
 			for(File file : files) {
 				try {
 					this.process(input, file);
@@ -228,7 +236,7 @@ public class CSVImporter implements Importer {
 			return true;
 		return false;
 	}
-	
+
 	/**
 	 * Lauch the import for the input and file.
 	 * @param input
@@ -239,7 +247,7 @@ public class CSVImporter implements Importer {
 	private void process(CSVInput input, File file) throws IOException, ClassNotFoundException {
 		this.process(input, new FileReader(file));
 	}
-	
+
 	/**
 	 * Lauch the import for the input and reader.
 	 * @param csvInput
@@ -248,38 +256,41 @@ public class CSVImporter implements Importer {
 	 * @throws ClassNotFoundException
 	 */
 	private void process(CSVInput csvInput, Reader reader) throws IOException, ClassNotFoundException {
-		
+
 		String beanName = csvInput.getTypeName();
-		
+
 		LOG.info("Importing {} from {}", beanName, csvInput.getFileName());
-		
+
 		BufferedReader streamReader = new BufferedReader(reader);
 		CSVReader csvReader = new CSVReader(streamReader, csvInput.getSeparator());
-		
+
 		String[] fields = csvReader.readNext();
 		Class<?> beanClass = Class.forName(beanName);
+		if(loggerManager != null) {
+			loggerManager.prepareInput(csvInput, fields);
+		}
 
 		LOG.debug("Header {}", Arrays.asList(fields));
-		
+
 		CSVBinder binder = new CSVBinder(beanClass, fields, csvInput);
 		String[] values = null;
 
 		int count = 0;
 		int total = 0;
 		int batchSize = getBatchSize();
-		
+
 		JPA.em().getTransaction().begin();
 		try {
 
 			Map<String, Object> context = Maps.newHashMap();
-			
+
 			//Put global context
 			if (this.context != null) {
 				context.putAll(this.context);
 			}
-			
+
 			csvInput.callPrepareContext(context, injector);
-			
+
 			// register type adapters
 			for(DataAdapter adapter : defaultAdapters) {
 				binder.registerAdapter(adapter);
@@ -290,10 +301,10 @@ public class CSVImporter implements Importer {
 			for(DataAdapter adapter : csvInput.getAdapters()) {
 				binder.registerAdapter(adapter);
 			}
-			
+
 			//Process for each lines
 			while((values = csvReader.readNext()) != null) {
-				
+
 				if (isEmpty(values)) {
 					continue;
 				}
@@ -301,28 +312,13 @@ public class CSVImporter implements Importer {
 
 				Object bean = null;
 				try {
-					Map<String, Object> ctx = Maps.newHashMap(context);
-					bean = binder.bind(values, ctx);
-					
-					LOG.trace("bean created: {}", bean);
-					
-					bean = csvInput.call(bean, ctx, injector);
-					
-					if (bean != null) {
-						JPA.manage((Model) bean);
-						count++;
-						for(Listener listener : listeners) {
-							listener.imported((Model) bean);
-						}
-					}
-					
-					LOG.trace("bean saved: {}", bean);
-					
+					bean = this.importRow(values, binder, csvInput, context, false);
+					count++;
 				} catch (Exception e) {
 					LOG.error("Error while importing {}.", csvInput.getFileName());
 					LOG.error("Unable to import record: {}", Arrays.asList(values));
 					LOG.error("With following exception:", e);
-					
+
 					// Recover the transaction
 					if (JPA.em().getTransaction().getRollbackOnly()) {
 						JPA.em().getTransaction().rollback();
@@ -330,19 +326,33 @@ public class CSVImporter implements Importer {
 					if (!JPA.em().getTransaction().isActive()) {
 						JPA.em().getTransaction().begin();
 					}
-					
+
 					for(Listener listener : listeners) {
 						listener.handle((Model) bean, e);
 					}
+
+					//Re-parse previous records
+					this.onRollback(values, binder, csvInput, context);
 				}
 
-				if (++total % batchSize == 0) {
-					JPA.flush();
-					JPA.clear();
+				++total;
+				if (valuesStack.size() % batchSize == 0) {
+					LOG.trace("Commit {} records", valuesStack.size());
+
+					if (JPA.em().getTransaction().isActive()) {
+						JPA.em().getTransaction().commit();
+						JPA.em().clear();
+						valuesStack.clear();
+					}
+					if (!JPA.em().getTransaction().isActive()) {
+						JPA.em().getTransaction().begin();
+					}
 				}
 			}
-			
-			if (JPA.em().getTransaction().isActive()){
+
+			if (JPA.em().getTransaction().isActive()) {
+				LOG.trace("Commit {} records", valuesStack.size());
+
 				JPA.em().getTransaction().commit();
 				JPA.em().clear();
 			}
@@ -350,14 +360,82 @@ public class CSVImporter implements Importer {
 			if (JPA.em().getTransaction().isActive()) {
 				JPA.em().getTransaction().rollback();
 			}
+
 			LOG.error("Error while importing {}.", csvInput.getFileName());
 			LOG.error("Unable to import data.");
 			LOG.error("With following exception:", e);
 		} finally {
 			for(Listener listener : listeners) {
-				listener.imported(total,count);
+				listener.imported(total, count);
 			}
+
+			valuesStack.clear();
 			csvReader.close();
+		}
+	}
+
+	/**
+	 * Import the specific row.
+	 * @param values
+	 * @param binder
+	 * @param csvInput
+	 * @param context
+	 * @param onRollback
+	 * @return the imported object
+	 * @throws Exception
+	 */
+	private Object importRow(String[] values, CSVBinder binder, CSVInput csvInput, Map<String, Object> context, Boolean onRollback) throws Exception {
+		Object bean = null;
+		Map<String, Object> ctx = Maps.newHashMap(context);
+
+		bean = binder.bind(values, ctx);
+		LOG.trace("bean created: {}", bean);
+
+		bean = csvInput.call(bean, ctx, injector);
+
+		if (bean != null) {
+			JPA.manage((Model) bean);
+			if(!onRollback) {
+				valuesStack.add(values);
+			}
+
+			for(Listener listener : listeners) {
+				listener.imported((Model) bean);
+			}
+			LOG.trace("bean saved: {}", bean);
+		}
+
+		return bean;
+	}
+
+	/**
+	 * Rollback previous rows stored in valuesStack.
+	 * @param values
+	 * @param binder
+	 * @param csvInput
+	 * @param context
+	 */
+	private void onRollback(String[] values, CSVBinder binder, CSVInput csvInput, Map<String, Object> context) {
+		if(loggerManager != null) {
+			loggerManager.log(values);
+		}
+
+		for (String[] row : valuesStack) {
+			LOG.debug("Recover record {}", Arrays.asList(row));
+
+			try {
+				this.importRow(row, binder, csvInput, context, true);
+			} catch (Exception e) {
+			}
+		}
+
+		if (JPA.em().getTransaction().isActive()) {
+			JPA.em().getTransaction().commit();
+			JPA.em().clear();
+			valuesStack.clear();
+		}
+		if (!JPA.em().getTransaction().isActive()) {
+			JPA.em().getTransaction().begin();
 		}
 	}
 }
