@@ -42,9 +42,9 @@ import com.axelor.db.JPA;
 
 @SuppressWarnings("serial")
 public class AuditInterceptor extends EmptyInterceptor {
-	
+
 	private ThreadLocal<User> currentUser = new ThreadLocal<User>();
-	
+
 	@Override
 	public void afterTransactionBegin(Transaction tx) {
 		currentUser.set(AuthUtils.getUser());
@@ -54,16 +54,14 @@ public class AuditInterceptor extends EmptyInterceptor {
 	public void afterTransactionCompletion(Transaction tx) {
 		currentUser.remove();
 	}
-	
+
 	private User getUser() {
 		User user = currentUser.get();
 		if (user == null || JPA.em().contains(user)) {
 			return user;
 		}
 
-		user = User.all().filter("self.code = ?", user.getCode())
-				.cacheable().autoFlush(false).fetchOne();
-
+		user = AuthUtils.getUser(user.getCode());
 		if (user == null) {
 			return null;
 		}
@@ -73,7 +71,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 
 		return user;
 	}
-	
+
 	@Override
 	public boolean onFlushDirty(Object entity, Serializable id,
 			Object[] currentState, Object[] previousState,
@@ -91,7 +89,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public boolean onSave(Object entity, Serializable id, Object[] state,
 			String[] propertyNames, Type[] types) {
