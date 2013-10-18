@@ -37,7 +37,7 @@ import org.apache.shiro.subject.Subject;
 import com.axelor.auth.db.User;
 
 public class AuthUtils {
-	
+
 	public static Subject getSubject() {
 		try {
 			return SecurityUtils.getSubject();
@@ -50,6 +50,14 @@ public class AuthUtils {
 		Subject subject = getSubject();
 		if (subject == null || subject.getPrincipal() == null)
 			return null;
-		return User.all().filter("self.code = ?", subject.getPrincipal()).cacheable().fetchOne();
+		return getUser(subject.getPrincipal().toString());
+	}
+
+	public static User getUser(String code) {
+		if (code == null) {
+			return null;
+		}
+		return User.all().filter("self.code = ?", code)
+				.cacheable().autoFlush(false).fetchOne();
 	}
 }

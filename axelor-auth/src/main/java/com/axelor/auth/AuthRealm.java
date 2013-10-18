@@ -49,12 +49,12 @@ public class AuthRealm extends AuthorizingRealm {
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 
-		String code = ((UsernamePasswordToken) token).getUsername();
-		User user = User.all().filter("self.code = ?1", code).fetchOne();
+		final String code = ((UsernamePasswordToken) token).getUsername();
+		final User user = AuthUtils.getUser(code);
 
 		if (user == null || user.getBlocked() == true) {
 			return null;
-		} else if ((user.getActiveFrom() != null && user.getActiveFrom().isAfter(new LocalDate())) || 
+		} else if ((user.getActiveFrom() != null && user.getActiveFrom().isAfter(new LocalDate())) ||
 				(user.getActiveTo() != null && user.getActiveTo().isBefore(new LocalDate()))) {
 			return null;
 		}
@@ -65,17 +65,19 @@ public class AuthRealm extends AuthorizingRealm {
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 
-		String code = (String) principals.fromRealm(getName()).iterator().next();
-		User user = User.all().filter("self.code = ?1", code).fetchOne();
+		final String code = (String) principals.fromRealm(getName()).iterator().next();
+		final User user = AuthUtils.getUser(code);
 
 		if (user == null) {
 			return null;
 		}
 
-		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-		Group group = user.getGroup();
-		if (group != null)
+		final SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+		final Group group = user.getGroup();
+		if (group != null) {
 			info.addRole(group.getCode());
+		}
+
 		return info;
 	}
 }
