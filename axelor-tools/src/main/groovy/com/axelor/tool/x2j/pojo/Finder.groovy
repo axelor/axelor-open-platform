@@ -30,20 +30,24 @@
  */
 package com.axelor.tool.x2j.pojo
 
-import groovy.util.slurpersupport.NodeChild;
+import groovy.util.slurpersupport.NodeChild
 
-import com.axelor.tool.x2j.Utils;
+import com.axelor.tool.x2j.Utils
 
 class Finder {
 
 	Entity entity
-	
+
 	String name
 
 	String type
-	
+
 	String filter
-	
+
+	Boolean cacheable
+
+	Boolean flush
+
 	List<String> orderBy
 
 	List<String> fields
@@ -59,11 +63,14 @@ class Finder {
 		if (node.@all == "true") {
 			type = "Query<" + type + ">"
 		}
-		
+
 		fields = fields.findAll { s -> !s.empty }
 		orderBy = orderBy.findAll { s -> !s.empty }
+
+		if (node.@cacheable == "true") cacheable = true
+		if (node.@flush == "false") flush = false
 	}
-	
+
 	Finder(Entity entity, String field) {
 		this.entity = entity
 		this.name = "findBy" + Utils.firstUpper(field)
@@ -71,7 +78,7 @@ class Finder {
 		this.fields = [field]
 		this.filter = ""
 	}
-	
+
 	private static final def TYPES = [
 		"int"		: "int",
 		"long"		: "long",
@@ -90,11 +97,11 @@ class Finder {
 	]
 
 	String getCode() {
-		
+
 		def query = []
 		def params = []
 		def args = []
-		
+
 		for(String field : fields) {
 			def parts = field.split(/\:/)
 			def n = Utils.firstLower(field)
@@ -120,22 +127,29 @@ class Finder {
 			args += n
 			params += t + " " + n
 		}
-		
+
 		query = filter.empty ? query.join(" AND ") : filter
 		params = params.join(", ")
-		
+
 		def lines = []
-		
+
 		lines += "public static ${type} ${name}(${params}) {"
 		lines += "\treturn ${entity.name}.all()"
 		lines += "\t\t\t.filter(\"${query}\")"
-		
+
 		args.each { n ->
 			lines += "\t\t\t.bind(\"${n}\", ${n})"
 		}
-		
+
 		orderBy.each { n ->
 			lines += "\t\t\t.order(\"${n}\")"
+		}
+
+		if (cacheable == Boolean.TRUE) {
+			lines += "\t\t\t.cacheable()"
+		}
+		if (flush == Boolean.FALSE) {
+			lines += "\t\t\t.autoFlush(false)"
 		}
 		if (type == entity.name) {
 			lines += "\t\t\t.fetchOne();"
