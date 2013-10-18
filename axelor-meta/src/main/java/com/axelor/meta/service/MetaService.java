@@ -36,8 +36,6 @@ import java.util.Map;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,12 +110,7 @@ public class MetaService {
 
 	public List<MenuItem> getMenus() {
 
-		Subject subject = SecurityUtils.getSubject();
-		User user = null;
-
-		if (subject != null) {
-			user = User.all().filter("self.code = ?1", subject.getPrincipal()).fetchOne();
-		}
+		User user = AuthUtils.getUser();
 
 		String q1 = "SELECT self, COALESCE(self.priority, 0) AS priority FROM MetaMenu self LEFT JOIN self.groups g WHERE ";
 		Object p1 = null;
@@ -143,12 +136,7 @@ public class MetaService {
 
 	public List<MenuItem> getMenus(String parent) {
 
-		Subject subject = SecurityUtils.getSubject();
-		User user = null;
-
-		if (subject != null) {
-			user = User.all().filter("self.code = ?1", subject.getPrincipal()).fetchOne();
-		}
+		User user = AuthUtils.getUser();
 
 		String q1 = "SELECT self, COALESCE(self.priority, 0) AS priority FROM MetaMenu self LEFT JOIN self.groups g WHERE ";
 		String q2 = "self.parent IS NULL";
