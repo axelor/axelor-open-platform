@@ -40,6 +40,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Singleton;
+
 import org.reflections.vfs.Vfs.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +60,7 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 
+@Singleton
 public class MetaTranslationsService {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
