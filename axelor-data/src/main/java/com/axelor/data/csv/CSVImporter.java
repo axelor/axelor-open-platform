@@ -98,6 +98,10 @@ public class CSVImporter implements Importer {
 		this(injector, configFile, null, null);
 	}
 
+	public CSVImporter(Injector injector, String config, String dataDir){
+		this(injector, config, dataDir, null);
+	}
+
 	@Inject
 	public CSVImporter(Injector injector,
 			@Named("axelor.data.config") String config,
