@@ -41,6 +41,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Singleton;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -52,6 +53,7 @@ import javax.xml.validation.SchemaFactory;
 import org.reflections.vfs.Vfs.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
@@ -86,6 +88,7 @@ import com.google.common.base.CaseFormat;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -97,6 +100,7 @@ import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.google.inject.Inject;
 
+@Singleton
 public class MetaLoader {
 
 	@Inject
@@ -107,26 +111,32 @@ public class MetaLoader {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 
-	private Marshaller marshaller;
-	private Unmarshaller unmarshaller;
+	private static Marshaller marshaller;
+	private static Unmarshaller unmarshaller;
 
 	public MetaLoader() {
 		try {
-			JAXBContext context = JAXBContext.newInstance(ObjectViews.class);
-			unmarshaller = context.createUnmarshaller();
-			marshaller = context.createMarshaller();
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
-					ObjectViews.NAMESPACE + " " + ObjectViews.NAMESPACE + "/" + REMOTE_SCHEMA);
-
-			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-			Schema schema = schemaFactory.newSchema(Resources.getResource(LOCAL_SCHEMA));
-
-			unmarshaller.setSchema(schema);
-			marshaller.setSchema(schema);
+			this.init();
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			Throwables.propagate(e);
 		}
+	}
+
+	private void init() throws JAXBException, SAXException {
+		if (unmarshaller != null) return;
+
+		JAXBContext context = JAXBContext.newInstance(ObjectViews.class);
+		unmarshaller = context.createUnmarshaller();
+		marshaller = context.createMarshaller();
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
+				ObjectViews.NAMESPACE + " " + ObjectViews.NAMESPACE + "/" + REMOTE_SCHEMA);
+
+		SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		Schema schema = schemaFactory.newSchema(Resources.getResource(LOCAL_SCHEMA));
+
+		unmarshaller.setSchema(schema);
+		marshaller.setSchema(schema);
 	}
 
 	private ObjectViews unmarshal(String xml) throws JAXBException {
