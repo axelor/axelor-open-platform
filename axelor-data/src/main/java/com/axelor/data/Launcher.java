@@ -42,20 +42,21 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.name.Names;
+import com.google.inject.util.Providers;
 
 public abstract class Launcher {
-	
+
 	protected final Logger LOG = LoggerFactory.getLogger(getClass());
-	
+
 	/**
 	 * Create additional guice module that configures other stuffs like
 	 * persistence etc.
-	 * 
+	 *
 	 */
 	protected abstract AbstractModule createModule();
-	
+
 	public void run(String... args) throws IOException {
-		
+
 		Commander cmd = new Commander();
 		try {
 			if (args == null || args.length == 0)
@@ -72,28 +73,30 @@ public abstract class Launcher {
 			Commander.usage();
 			return;
 		}
-		
+
 		if (cmd.getShowHelp() == Boolean.TRUE) {
 			Commander.usage();
 			return;
 		}
-		
+
 		final String config = cmd.getConfig().getPath();
 		final String dataDir = cmd.getDataDir().getPath();
-		
+		final String errorDir = cmd.getErrorDir() == null ? null : cmd.getErrorDir().getPath();
+
 		Injector injector = Guice.createInjector(new AbstractModule() {
-			
+
 			@Override
 			protected void configure() {
 				install(createModule());
 				bindConstant().annotatedWith(Names.named("axelor.data.config")).to(config);
 				bindConstant().annotatedWith(Names.named("axelor.data.dir")).to(dataDir);
+				bind(String.class).annotatedWith(Names.named("axelor.error.dir")).toProvider(Providers.<String>of(errorDir));
 			}
 		});
 
 		if (LOG.isInfoEnabled())
 			LOG.info("Importing data. Please wait...");
-		
+
 		Importer importer = injector.getInstance(Importer.class);
 		Map<String, String[]> mappings = new HashMap<String, String[]>();
 
@@ -102,9 +105,9 @@ public abstract class Launcher {
 			String[] files = ((String) entry.getValue()).split(",");
 			mappings.put(name, files);
 		}
-		
+
 		importer.run(mappings);
-		
+
 		if (LOG.isInfoEnabled())
 			LOG.info("Import done!");
 	}
