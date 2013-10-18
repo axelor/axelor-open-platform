@@ -848,6 +848,7 @@ public class MetaLoader {
 				.bind("name", name)
 				.bind("module", module)
 				.order("-priority")
+				.cacheable().autoFlush(false)
 				.fetchOne();
 		try {
 			return ((ObjectViews) unmarshal(view.getXml())).getViews().get(0);
