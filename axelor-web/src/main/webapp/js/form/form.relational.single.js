@@ -270,6 +270,10 @@ ui.formInput('ManyToOne', 'Select', {
 				scope.$apply();
 			});
 		};
+		
+		scope.$render_editable = function() {
+			input.val(scope.getText());
+		};
 	},
 	template_editable:
 	'<div class="picker-input picker-icons-3">'+
