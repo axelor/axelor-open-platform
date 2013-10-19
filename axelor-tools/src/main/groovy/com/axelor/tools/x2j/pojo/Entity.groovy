@@ -47,6 +47,8 @@ class Entity {
 
 	String baseClass
 
+	String strategy
+
 	boolean sequential
 
 	boolean groovy
@@ -54,6 +56,8 @@ class Entity {
 	boolean dynamicUpdate
 
 	boolean hashAll
+
+	boolean hasExtends
 
 	String cachable
 
@@ -75,13 +79,14 @@ class Entity {
 		name = node.@name
 		table = node.@table
 		namespace = node.parent().module."@package"
-		module = node.parent().module.@name
+		module = node.parent().module.'@name'
 
-		sequential = !(node.@sequential == "false")
-		groovy = node.@lang == "groovy"
-		hashAll = node.@hashAll == "true"
-		cachable = node.@cachable
-		baseClass = "com.axelor.db.Model"
+		sequential = !(node.'@sequential' == "false")
+		groovy = node.'@lang' == "groovy"
+		hashAll = node.'@hashAll' == "true"
+		cachable = node.'@cachable'
+		baseClass = node.'@extends'
+		strategy = node.'@strategy'
 		documentation = findDocs(node)
 
 		if (!name) {
@@ -101,11 +106,26 @@ class Entity {
 		importType("com.axelor.db.JPA")
 		importType("com.axelor.db.Query")
 
-		properties = [Property.idProperty(this)]
+		properties = []
 		propertyMap = [:]
 		constraints = []
 		indexes = []
 		finders = []
+
+		if (!baseClass) {
+			if (node.@logUpdates != "false") {
+				baseClass = "com.axelor.auth.db.AuditableModel"
+			} else {
+				baseClass = "com.axelor.db.Model"
+			}
+			properties.add(Property.idProperty(this));
+		} else {
+			if (!strategy || strategy == 'SINGLE') {
+				table = null
+			}
+			hasExtends = true
+			importType("com.axelor.db.internal.EntityHelper")
+		}
 
 		node."*".each {
 			if (it.name() ==  "unique-constraint") {
@@ -125,9 +145,6 @@ class Entity {
 			}
 		}
 
-		if (node.@logUpdates != "false") {
-			baseClass = "com.axelor.auth.db.AuditableModel"
-		}
 	}
 
 	boolean addField(Property field) {
@@ -182,17 +199,19 @@ class Entity {
 		lines += "public ${name}() {"
 		lines += "}\n"
 
-		def fields = properties.findAll { it.isInitParam() }
-		if (fields.empty) {
-			fields = properties.findAll { it.name =~ /code|name/ }
-		}
-		if (!fields.empty) {
-			def args = fields.collect { Property p -> "$p.type $p.name" }
-			lines += "public ${name}(${args.join(', ')}) {"
-			fields.each { Property p ->
-				lines += "\tthis.${p.name} = ${p.name};"
+		if (!hasExtends) {
+			def fields = properties.findAll { it.isInitParam() }
+			if (fields.empty) {
+				fields = properties.findAll { it.name =~ /code|name/ }
 			}
-			lines += "}\n"
+			if (!fields.empty) {
+				def args = fields.collect { Property p -> "$p.type $p.name" }
+				lines += "public ${name}(${args.join(', ')}) {"
+				fields.each { Property p ->
+					lines += "\tthis.${p.name} = ${p.name};"
+				}
+				lines += "}\n"
+			}
 		}
 
 		return "\t" + Utils.stripCode(lines.join("\n"), "\n\t")
@@ -222,6 +241,11 @@ class Entity {
 	}
 
 	String getEqualsCode() {
+
+		if (hasExtends) {
+			return "return EntityHelper.equals(this, obj, $hashAll);"
+		}
+
 		def hashables = getHashables()
 		def code = ["if (obj == null) return false;"]
 
@@ -248,6 +272,9 @@ class Entity {
 	}
 
 	String getHashCodeCode() {
+		if (hasExtends) {
+			return "return EntityHelper.hashCode(this, $hashAll);"
+		}
 		importType("com.google.common.base.Objects")
 		def data = getHashables()collect { "this.${it.getter}()" }.join(", ")
 		if (data.size()) {
@@ -258,6 +285,9 @@ class Entity {
 	}
 
 	String getToStringCode() {
+		if (hasExtends) {
+			return "return EntityHelper.toString(this);"
+		}
 		importType("com.google.common.base.Objects.ToStringHelper")
 
 		def code = []
@@ -295,6 +325,7 @@ class Entity {
 		}
 
 		all += $table()
+		all += $strategy()
 
 		return all.grep { it != null }.flatten()
 				  .grep { Annotation a -> !a.empty }
@@ -317,6 +348,8 @@ class Entity {
 	}
 
 	List<Annotation> $table() {
+
+		if (!table) return []
 
 		def constraints = this.constraints.collect {
 			def idx = new Annotation(this, "javax.persistence.UniqueConstraint", false)
@@ -355,6 +388,16 @@ class Entity {
 			return new Annotation(this, "javax.persistence.Cacheable", false).add("false", false)
 		}
 		return null
+	}
+
+	Annotation $strategy() {
+		if (!strategy) return null
+		String type = "SINGLE_TABLE"
+		if (strategy == "JOINED") type = "JOINED"
+		if (strategy == "CLASS") type = "TABLE_PER_CLASS"
+
+		return new Annotation(this, "javax.persistence.Inheritance")
+				.add("strategy", "javax.persistence.InheritanceType.${type}", false)
 	}
 
 	@Override
