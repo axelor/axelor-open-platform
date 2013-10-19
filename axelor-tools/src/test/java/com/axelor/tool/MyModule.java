@@ -30,46 +30,12 @@
  */
 package com.axelor.tool;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import com.google.inject.AbstractModule;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+public class MyModule extends AbstractModule {
 
-import com.axelor.test.GuiceModules;
-import com.axelor.test.GuiceRunner;
-import com.axelor.tool.x2j.Extender;
-import com.axelor.tool.x2j.Generator;
+	@Override
+	protected void configure() {
 
-@RunWith(GuiceRunner.class)
-@GuiceModules({ TestModule.class })
-public class GeneratorTest {
-
-	InputStream read(String resource) {
-		return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
-	}
-
-	@Test
-	public void test() throws IOException {
-		Generator gen = new Generator(
-				"src/test/resources/axelor-app/axelor-contact",
-				"src/test/resources/axelor-app/axelor-contact/target");
-		gen.clean();
-		gen.start();
-	}
-
-	@Test
-	public void test2() throws IOException {
-
-		String base = "src/test/resources/axelor-app";
-		String target = "src/test/resources/axelor-app/axelor-objects/target";
-
-		File basePath = new File(base);
-		File targetPath = new File(target);
-
-		Extender gen = new Extender(basePath, targetPath);
-		gen.clean();
-		gen.start();
 	}
 }
