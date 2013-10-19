@@ -286,10 +286,10 @@ class Property {
 	}
 
 	boolean isHashKey() {
-		if (isUnique() && attrs["hashKey"] != "false") {
-			return true
-		}
-		return attrs["hashKey"] == "true"
+		if (name == "id" || name == "version") return false
+		if (attrs["hashKey"] == "false") return false
+		if (attrs["hashKey"] == "true" || isUnique()) return true
+		return entity.hashAll && isSimple() && !isVirtual()
 	}
 
 	Object getAttribute(String name) {
@@ -386,6 +386,7 @@ class Property {
 	List<Annotation> getAnnotations() {
 		[
 			$id(),
+			$hashKey(),
 			$widget(),
 			$binary(),
 			$nameColumn(),
@@ -658,5 +659,10 @@ class Property {
 		}.join(", ")
 
 		return annon("javax.persistence.OrderBy").add(orderBy)
+	}
+
+	private Annotation $hashKey() {
+		if (!hashKey) return null
+		return annon("com.axelor.db.HashKey", true)
 	}
 }
