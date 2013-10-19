@@ -183,15 +183,9 @@ ui.formWidget('Tabs', {
 		}
 		
 		function doSelect() {
-			var select = tabs[selected],
-			    onSelect = null;
-			
-			if(select){
-			    onSelect = select.$events.onSelect;
-			}
-			
-			if(onSelect){
-				onSelect();
+			var select = tabs[selected];
+			if (select) {
+				select.handleSelect();
 			}
 		}
 		
@@ -331,6 +325,13 @@ ui.formWidget('Tab', {
 			}
 			return tabs.showTab(scope.index);
 		});
+		
+		scope.handleSelect = function () {
+			var onSelect = scope.$events.onSelect;
+			if (onSelect && !elem.is(":hidden")) {
+				onSelect();
+			}
+		};
 	},
 	cellCss: 'form-item v-align-top',
 	transclude: true,
