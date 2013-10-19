@@ -28,7 +28,7 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2013 Axelor. All Rights Reserved.
  */
-package com.axelor.db;
+package com.axelor.db.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -38,9 +38,9 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation should be used to mark computed fields.
- * 
+ *
  * For example:
- * 
+ *
  * <pre>
  * &#064;Entity
  * public class Contact extends Model {
@@ -56,7 +56,7 @@ import java.lang.annotation.Target;
  * 	...
  * }
  * </pre>
- * 
+ *
  */
 @Documented
 @Target({ ElementType.FIELD, ElementType.METHOD })

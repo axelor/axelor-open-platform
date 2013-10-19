@@ -40,13 +40,11 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.google.common.collect.Maps;
-import com.google.inject.persist.Transactional;
-
 import com.axelor.BaseTest;
-import com.axelor.db.Query;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.Group;
+import com.google.common.collect.Maps;
+import com.google.inject.persist.Transactional;
 
 public class QueryTest extends BaseTest {
 
