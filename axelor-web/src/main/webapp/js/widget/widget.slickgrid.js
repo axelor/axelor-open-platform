@@ -191,8 +191,8 @@ var Editor = function(args) {
 	this.isValueChanged = function() {
 		
 		// force change event on spinner widget
-		element.find('.ui-spinner-input').trigger('spinchange:ensure', args.item);
-		element.find('.ui-mask').trigger('blur');
+		element.find('.ui-spinner-input').trigger('grid:check', args.item);
+		element.find('.ui-mask').trigger('grid:check');
 		
 		var record = scope.record || {},
 			current = args.item || { id: 0 };
@@ -730,13 +730,6 @@ Grid.prototype.parse = function(view) {
 
 		e.preventDefault();
 		return false;
-	});
-	
-	element.on('blur', '.slick-cell.editable :input', function (e) {
-		var lock = grid.getEditorLock();
-		if (lock && lock.isActive()) {
-			lock.commitCurrentEdit();
-		}
 	});
 	
 	return grid;

@@ -113,28 +113,36 @@ ui.formInput('Number', {
 			step: 1
 		};
 
-		var ensured = false;
-		
 		element.on("spin", onSpin);
 		element.on("spinchange", function(e, row) {
-			updateModel(element.val(), !ensured);
-			ensured = false;
+			updateModel(element.val());
 		});
-		element.on("spinchange:ensure", function(e, row) {
-			var val = row[props.name];
-			ensured = val !== undefined && val !== scope.getValue();
-			updateModel(element.val(), ensured);
+		element.on("grid:check", function(e, row) {
+			updateModel(element.val());
 		});
 		
-		function updateModel(value, handle) {
+		var pendingChange = false;
+		
+		function handleChange(changed) {
 			var onChange = scope.$events.onChange;
+			if (onChange && (changed || pendingChange)) {
+				pendingChange = false;
+				setTimeout(onChange);
+			}
+		}
 
+		function updateModel(value, handle) {
 			if (!scope.isNumber(value)) {
 				return;
             }
-
-			var text = scope.format(value);
 			var val = scope.parse(value);
+			var old = scope.getValue();
+			
+			if (angular.equals(val, old)) {
+				return handleChange();
+			};
+			
+			var text = scope.format(value);
 
 			element.val(text);
 			scope.setValue(val);
@@ -142,10 +150,12 @@ ui.formInput('Number', {
 			setTimeout(function(){
 				scope.$apply();
 			});
-
-			if (onChange && handle) {
-				setTimeout(onChange);
+			
+			if (handle === false) {
+				return pendingChange = true;
 			}
+			
+			handleChange();
 		}
 		
 		function onSpin(event, ui) {

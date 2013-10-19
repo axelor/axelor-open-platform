@@ -209,16 +209,16 @@ ui.formInput('DateTime', {
 		var rendering = false;
 
 		input.on('change', function(e, ui){
-			changed = !rendering && (model.$viewValue !== model.$modelValue);
+			changed = !rendering;
 		});
 		input.on('blur', function() {
 			if (changed) {
 				changed = false;
 				updateModel();
-				if (scope.$events.onChange) {
-					setTimeout(scope.$events.onChange);
-				}
 			}
+		});
+		input.on('grid:check', function () {
+			updateModel();
 		});
 		input.on('keydown', function(e){
 
