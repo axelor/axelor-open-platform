@@ -104,7 +104,6 @@ table.form-layout td.form-label label.required {
 table.form-layout td.form-label label.readonly {
 	color: inherit;
 	padding-left: 16px;
-	white-space: nowrap;
 }
 
 table.form-layout td.form-item > *,
