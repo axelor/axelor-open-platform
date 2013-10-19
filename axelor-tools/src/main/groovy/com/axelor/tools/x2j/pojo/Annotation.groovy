@@ -41,7 +41,7 @@ class Annotation {
 	Entity entity
 
 	Annotation(Entity entity, String name) {
-		this(name, false)
+		this(entity, name, false)
 	}
 
 	Annotation(Entity entity, String name, boolean empty) {
