@@ -54,15 +54,15 @@ public class ActionGroup extends Action {
 
 	@XmlElement(name = "action")
 	private List<ActionItem> actions;
-	
+
 	public List<ActionItem> getActions() {
 		return actions;
 	}
-	
+
 	public void setActions(List<ActionItem> actions) {
 		this.actions = actions;
 	}
-	
+
 	public void addAction(String name) {
 		if (this.actions == null) {
 			this.actions = Lists.newArrayList();
@@ -71,7 +71,7 @@ public class ActionGroup extends Action {
 		item.setName(name);
 		this.actions.add(item);
 	}
-	
+
 	private String getPending(Iterator<ActionItem> actions) {
 		List<String> pending = Lists.newArrayList();
     	while(actions.hasNext()) {
@@ -79,7 +79,7 @@ public class ActionGroup extends Action {
     	}
     	return Joiner.on(",").join(pending);
 	}
-	
+
 	private Action findAction(String name) {
 
 		if (name == null || "".equals(name.trim())) {
@@ -118,15 +118,15 @@ public class ActionGroup extends Action {
 
 		List<Object> result = Lists.newArrayList();
 		Iterator<ActionItem> iter = actions.iterator();
-		
+
 		if (getName() != null) {
 			log.debug("action-group: {}", getName());
 		}
-		
+
 		while(iter.hasNext()) {
 			Element element = iter.next();
 			String name = element.getName().trim();
-			
+
 			if ("save".equals(name)) {
 				if (element.test(handler)) {
 					String pending = this.getPending(iter);
@@ -136,7 +136,7 @@ public class ActionGroup extends Action {
 				log.debug("action '{}' doesn't meet the condition: {}", "save", element.getCondition());
 				break;
 			}
-			
+
 			log.debug("action: {}", name);
 
 			Action action = this.findAction(name);
@@ -149,7 +149,7 @@ public class ActionGroup extends Action {
 				log.debug("action '{}' doesn't meet the condition: {}", element.getName(), element.getCondition());
 				continue;
 			}
-			
+
 			Object value = action.wrap(handler);
             if (value instanceof Response) {
             	Response res = (Response) value;
@@ -162,7 +162,7 @@ public class ActionGroup extends Action {
             if (value == null) {
             	continue;
             }
-            
+
             // update the context if required
             if (value instanceof Map && ((Map) value).get("values") != null) {
             	Object values = ((Map) value).get("values");
@@ -185,7 +185,7 @@ public class ActionGroup extends Action {
             } else {
             	result.add(value);
             }
-            
+
             log.debug("action complete: {}", name);
 
             if (action instanceof ActionValidate && iter.hasNext()) {
@@ -194,6 +194,12 @@ public class ActionGroup extends Action {
             	log.debug("pending actions: {}", pending);
 				((Map<String, Object>) value).put("pending", pending);
                 break;
+            }
+
+            if (action instanceof ActionCondition) {
+            	if (value instanceof Map || Objects.equal(value, Boolean.FALSE)) {
+                	break;
+            	}
             }
 		}
 		return result;
@@ -205,7 +211,7 @@ public class ActionGroup extends Action {
 	}
 
 	public static class ActionItem extends Element {
-		
+
 	}
 
 }
