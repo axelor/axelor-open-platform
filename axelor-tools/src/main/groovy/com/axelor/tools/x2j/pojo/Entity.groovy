@@ -28,11 +28,11 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2013 Axelor. All Rights Reserved.
  */
-package com.axelor.tool.x2j.pojo
+package com.axelor.tools.x2j.pojo
 
 import groovy.util.slurpersupport.NodeChild
 
-import com.axelor.tool.x2j.Utils
+import com.axelor.tools.x2j.Utils
 import com.google.common.base.CaseFormat
 
 class Entity {

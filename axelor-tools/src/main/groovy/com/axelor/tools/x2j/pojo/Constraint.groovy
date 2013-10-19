@@ -28,48 +28,15 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2013 Axelor. All Rights Reserved.
  */
-package com.axelor.tool;
+package com.axelor.tools.x2j.pojo
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import groovy.transform.CompileStatic
+import groovy.util.slurpersupport.NodeChild
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+@CompileStatic
+class Constraint extends Index {
 
-import com.axelor.test.GuiceModules;
-import com.axelor.test.GuiceRunner;
-import com.axelor.tool.x2j.Extender;
-import com.axelor.tool.x2j.Generator;
-
-@RunWith(GuiceRunner.class)
-@GuiceModules({ MyModule.class })
-public class X2JTest {
-
-	InputStream read(String resource) {
-		return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
-	}
-
-	@Test
-	public void testDomains() throws IOException {
-		Generator gen = new Generator(
-				"src/test/resources/axelor-app/axelor-contact",
-				"src/test/resources/axelor-app/axelor-contact/target");
-		gen.clean();
-		gen.start();
-	}
-
-	@Test
-	public void testObjects() throws IOException {
-
-		String base = "src/test/resources/axelor-app";
-		String target = "src/test/resources/axelor-app/axelor-objects/target";
-
-		File basePath = new File(base);
-		File targetPath = new File(target);
-
-		Extender gen = new Extender(basePath, targetPath);
-		gen.clean();
-		gen.start();
+	Constraint(Entity entity, NodeChild node) {
+		super(entity, node)
 	}
 }

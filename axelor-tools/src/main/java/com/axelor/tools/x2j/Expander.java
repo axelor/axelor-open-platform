@@ -28,7 +28,7 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2013 Axelor. All Rights Reserved.
  */
-package com.axelor.tool.x2j;
+package com.axelor.tools.x2j;
 
 import groovy.text.GStringTemplateEngine;
 import groovy.text.Template;
@@ -42,7 +42,7 @@ import java.util.Map;
 
 import org.codehaus.groovy.control.CompilationFailedException;
 
-import com.axelor.tool.x2j.pojo.Entity;
+import com.axelor.tools.x2j.pojo.Entity;
 import com.google.common.collect.Maps;
 
 final class Expander {

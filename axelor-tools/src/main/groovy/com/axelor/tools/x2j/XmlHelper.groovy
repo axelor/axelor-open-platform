@@ -28,54 +28,40 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2013 Axelor. All Rights Reserved.
  */
-package com.axelor.tool.x2j.pojo
+package com.axelor.tools.x2j
 
-import groovy.transform.CompileStatic
-import groovy.transform.TypeChecked
-import groovy.util.slurpersupport.NodeChild
+import com.axelor.tools.x2j.pojo.Entity
 
-@CompileStatic
-class Index {
+class XmlHelper {
 
-	String name
+	/**
+	 * Read return the list of modules from the given pom.xml
+	 *
+	 * @param input the input file
+	 * @return list of all the modules found in the xml
+	 */
+	public static List<String> modules(File input) {
+		return new XmlSlurper().parse(input).'**'.findAll { it.name() == "module" }.collect { it.text() }
+	}
 
-	List<String> columns
-
-	List<String> fields
-
-	Entity entity
-
-	Index(Entity entity, NodeChild node) {
-		this.entity = entity
-		this.name = node.getProperty("@name")
-		this.columns = []
-		this.fields = []
-
-		((node.getProperty("@columns") as String).trim().split(/\,/) as List).each { String column ->
-			def field = column
-			if (field.empty) {
-				return
-			}
-			Property property = entity.getField(field)
-
-			fields += field
-			columns += Index.getColumn(property, column)
+	/**
+	 * Parse the given input xml and return {@link Entity} mapping
+	 * to each entity elements.
+	 *
+	 * @param input the input file
+	 * @return list of entity mapping
+	 */
+	public static  List<Entity> entities(File input) {
+		return new XmlSlurper().parse(input).'entity'.collect {
+			return new Entity(it)
 		}
 	}
 
-	private static String getColumn(Property property, String column) {
-		if (property == null) return column
-		def col = property.getColumn()
-		if (col) return property.getColumn()
-		if (property.isReference()) return property.getColumnAuto()
-		return column
-	}
-
-	List<String> getColumns() {
-		return this.columns
-	}
-
-	List<String> getFields() {
-		return this.fields
+	public static String version(File input) {
+		def version = new XmlSlurper().parse(input).'**'.find { it.name() == 'version' }
+		if (version) {
+			return version.text()
+		}
+		return "1.0.0-SNAPSHOT"
 	}
 }

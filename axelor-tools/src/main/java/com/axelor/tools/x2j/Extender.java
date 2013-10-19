@@ -28,15 +28,15 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2013 Axelor. All Rights Reserved.
  */
-package com.axelor.tool.x2j;
+package com.axelor.tools.x2j;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import com.axelor.tool.x2j.pojo.Entity;
-import com.axelor.tool.x2j.pojo.Property;
+import com.axelor.tools.x2j.pojo.Entity;
+import com.axelor.tools.x2j.pojo.Property;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;

@@ -28,7 +28,7 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2013 Axelor. All Rights Reserved.
  */
-package com.axelor.tool.x2j.pojo
+package com.axelor.tools.x2j.pojo
 
 class Annotation {
 
@@ -37,7 +37,7 @@ class Annotation {
 	List<String> args = []
 
 	boolean empty
-	
+
 	Entity entity
 
 	Annotation(Entity entity, String name) {
@@ -59,16 +59,16 @@ class Annotation {
 			return '"' + s + '"'
 		return s
 	}
-	
+
 	String wrap(List<String> names) {
 		def value = names.join(", ")
 		entity.groovy ? "[ $value ]" : "{ $value }"
 	}
-	
+
 	Annotation add(String value) {
 		this.add(value, true)
 	}
-	
+
 	Annotation add(String value, boolean quote) {
 		if (value != null)
 			args.add(quote ? this.quote(value) : value)
@@ -84,7 +84,7 @@ class Annotation {
 			return this
 		this.add(param, [ value ], quote, true)
 	}
-	
+
 	Annotation add(String param, String value, boolean quote, boolean array) {
 		if (value == null)
 			return this
@@ -95,7 +95,7 @@ class Annotation {
 	Annotation add(String param, List<?> values, boolean quote) {
 		this.add(param, values, quote, false)
 	}
-	
+
 	Annotation add(String param, List<?> values, boolean quote, boolean unwrapSingle) {
 		if (values == null)
 			return this;
@@ -105,9 +105,9 @@ class Annotation {
 				return it
 			quote ? this.quote(it) : entity.importType(it)
 		}
-		
+
 		def value = unwrapSingle && values.size() == 1 ? values[0] : wrap(values)
-		
+
 		args.add("$param = $value")
 		return this
 	}

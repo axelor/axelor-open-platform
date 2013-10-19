@@ -28,40 +28,48 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2013 Axelor. All Rights Reserved.
  */
-package com.axelor.tool.x2j
+package com.axelor.tools;
 
-import com.axelor.tool.x2j.pojo.Entity
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
-class XmlHelper {
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-	/**
-	 * Read return the list of modules from the given pom.xml
-	 *
-	 * @param input the input file
-	 * @return list of all the modules found in the xml
-	 */
-	public static List<String> modules(File input) {
-		return new XmlSlurper().parse(input).'**'.findAll { it.name() == "module" }.collect { it.text() }
+import com.axelor.test.GuiceModules;
+import com.axelor.test.GuiceRunner;
+import com.axelor.tools.x2j.Extender;
+import com.axelor.tools.x2j.Generator;
+
+@RunWith(GuiceRunner.class)
+@GuiceModules({ MyModule.class })
+public class X2JTest {
+
+	InputStream read(String resource) {
+		return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
 	}
 
-	/**
-	 * Parse the given input xml and return {@link Entity} mapping
-	 * to each entity elements.
-	 *
-	 * @param input the input file
-	 * @return list of entity mapping
-	 */
-	public static  List<Entity> entities(File input) {
-		return new XmlSlurper().parse(input).'entity'.collect {
-			return new Entity(it)
-		}
+	@Test
+	public void testDomains() throws IOException {
+		Generator gen = new Generator(
+				"src/test/resources/axelor-app/axelor-contact",
+				"src/test/resources/axelor-app/axelor-contact/target");
+		gen.clean();
+		gen.start();
 	}
 
-	public static String version(File input) {
-		def version = new XmlSlurper().parse(input).'**'.find { it.name() == 'version' }
-		if (version) {
-			return version.text()
-		}
-		return "1.0.0-SNAPSHOT"
+	@Test
+	public void testObjects() throws IOException {
+
+		String base = "src/test/resources/axelor-app";
+		String target = "src/test/resources/axelor-app/axelor-objects/target";
+
+		File basePath = new File(base);
+		File targetPath = new File(target);
+
+		Extender gen = new Extender(basePath, targetPath);
+		gen.clean();
+		gen.start();
 	}
 }

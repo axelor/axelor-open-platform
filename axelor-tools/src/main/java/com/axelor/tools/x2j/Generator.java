@@ -28,14 +28,14 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2013 Axelor. All Rights Reserved.
  */
-package com.axelor.tool.x2j;
+package com.axelor.tools.x2j;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.slf4j.LoggerFactory;
 
-import com.axelor.tool.x2j.pojo.Entity;
+import com.axelor.tools.x2j.pojo.Entity;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
