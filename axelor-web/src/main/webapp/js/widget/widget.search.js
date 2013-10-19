@@ -366,10 +366,13 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		return criteria;
 	};
 
-	$scope.applyFilter = function() {
+	$scope.applyFilter = function(hide) {
 		var criteria = $scope.prepareFilter();
 		if ($scope.$parent.onFilter) {
 			$scope.$parent.onFilter(criteria);
+		}
+		if ($scope.$parent && hide) {
+			$scope.$parent.$broadcast('on:hide-menu');
 		}
 	};
 }
@@ -406,7 +409,7 @@ ui.directive('uiFilterForm', function() {
 				"<span class='divider'>|</span>"+
 				"<a href='' ng-click='clearFilter()' x-translate>Clear</a></li>"+
 				"<span class='divider'>|</span>"+
-				"<a href='' ng-click='applyFilter()' x-translate>Apply</a></li>"+
+				"<a href='' ng-click='applyFilter(true)' x-translate>Apply</a></li>"+
 			"<div>"+
 		"</div>"
 	};
@@ -778,6 +781,10 @@ ui.directive('uiFilterBox', function() {
 				if (e.keyCode === 13) { // enter
 					scope.onFreeSearch();
 				}
+			});
+			
+			scope.$on('on:hide-menu', function () {
+				hideMenu();
 			});
 
 			function hideMenu() {
