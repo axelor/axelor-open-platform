@@ -62,9 +62,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.axelor.db.Model;
-import com.axelor.db.NameColumn;
-import com.axelor.db.VirtualColumn;
-import com.axelor.db.Widget;
+import com.axelor.db.annotations.NameColumn;
+import com.axelor.db.annotations.VirtualColumn;
+import com.axelor.db.annotations.Widget;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;

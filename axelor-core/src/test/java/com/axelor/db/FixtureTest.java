@@ -32,16 +32,15 @@ package com.axelor.db;
 
 import javax.inject.Inject;
 
-import com.axelor.MyModule;
-import com.axelor.db.Fixture;
-import com.axelor.test.GuiceModules;
-import com.axelor.test.GuiceRunner;
-import com.axelor.test.db.Contact;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import com.axelor.MyModule;
+import com.axelor.test.GuiceModules;
+import com.axelor.test.GuiceRunner;
+import com.axelor.test.db.Contact;
 
 @RunWith(GuiceRunner.class)
 @GuiceModules(MyModule.class)

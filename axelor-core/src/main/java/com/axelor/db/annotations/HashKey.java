@@ -28,7 +28,7 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2013 Axelor. All Rights Reserved.
  */
-package com.axelor.db;
+package com.axelor.db.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -37,15 +37,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation can be used to declare a column as name column that can be
- * used to give name to the record.
- * 
- * This column can be used by UI to display the record with text value of this
- * column.
- * 
+ * Mark the field as hash code candidate.
+ *
  */
 @Documented
-@Target({ ElementType.FIELD, ElementType.METHOD })
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface NameColumn {
+public @interface HashKey {
+
 }

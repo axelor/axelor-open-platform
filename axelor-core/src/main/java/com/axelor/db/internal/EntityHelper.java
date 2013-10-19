@@ -33,8 +33,8 @@ package com.axelor.db.internal;
 import java.util.Arrays;
 import java.util.List;
 
-import com.axelor.db.HashKey;
 import com.axelor.db.Model;
+import com.axelor.db.annotations.HashKey;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
