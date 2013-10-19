@@ -90,8 +90,10 @@ public class Property {
 	private boolean required;
 
 	private boolean unique;
-	
+
 	private boolean orphan;
+
+	private transient boolean hashKey;
 
 	private Object maxSize;
 
@@ -104,7 +106,7 @@ public class Property {
 	private String title;
 
 	private String help;
-	
+
 	private boolean image;
 
 	private boolean nullable;
@@ -118,9 +120,9 @@ public class Property {
 	private boolean nameColumn;
 
 	private String[] nameSearch;
-	
+
 	private String selection;
-	
+
 	@SuppressWarnings("unchecked")
 	Property(Class<?> entity, String name, Class<?> javaType, Type genericType,
 			Annotation[] annotations) {
@@ -153,7 +155,7 @@ public class Property {
 				target = (Class<? extends Model>) javaType;
 				mappedBy = ((OneToOne) annotation).mappedBy();
 			}
-			
+
 			if (annotation instanceof ManyToOne) {
 				type = PropertyType.MANY_TO_ONE;
 				target = (Class<? extends Model>) javaType;
@@ -243,7 +245,7 @@ public class Property {
 				if (w.multiline() && type == PropertyType.STRING) {
 					type = PropertyType.TEXT;
 				}
-				
+
 				if (type == PropertyType.BINARY) {
 					image = w.image();
 				}
@@ -300,9 +302,13 @@ public class Property {
 	public boolean isUnique() {
 		return unique;
 	}
-	
+
 	public boolean isOrphan() {
 		return orphan;
+	}
+
+	public boolean isHashKey() {
+		return hashKey;
 	}
 
 	public boolean isVirtual() {
@@ -318,7 +324,7 @@ public class Property {
 		return type == PropertyType.ONE_TO_MANY
 				|| type == PropertyType.MANY_TO_MANY;
 	}
-	
+
 	public Object getMaxSize() {
 		return maxSize;
 	}
@@ -342,7 +348,7 @@ public class Property {
 	public String getHelp() {
 		return help;
 	}
-	
+
 	public boolean isImage() {
 		return image;
 	}
@@ -350,7 +356,7 @@ public class Property {
 	public boolean isNullable() {
 		return nullable;
 	}
-	
+
 	public boolean isReadonly() {
 		return readonly;
 	}
@@ -366,14 +372,14 @@ public class Property {
 	public String[] getNameSearch() {
 		return nameSearch;
 	}
-	
+
 	public String getSelection() {
 		return selection;
 	}
-	
+
 	/**
 	 * Get the value of this property from the given bean instance.
-	 * 
+	 *
 	 * @param bean
 	 *            the instance
 	 * @return value of the current property
@@ -384,10 +390,10 @@ public class Property {
 
 	/**
 	 * Set the value for this property to the given bean instance.
-	 * 
+	 *
 	 * If the property is a collection, ensure the proper parent-child
 	 * relationship marked with <i>mappedBy</i> attribute.
-	 * 
+	 *
 	 * @param bean
 	 *            the bean instance
 	 * @param value
@@ -422,7 +428,7 @@ public class Property {
 	/**
 	 * If this is a multi-valued field (one-to-many, many-to-many), add the
 	 * specified item to the collection.
-	 * 
+	 *
 	 * @param bean
 	 *            the bean instance
 	 * @param item
@@ -440,9 +446,9 @@ public class Property {
 		if (item == null) {
 			return this.clear(bean);
 		}
-		
+
 		Preconditions.checkArgument(target.isInstance(item));
-		
+
 		Collection items = (Collection) get(bean);
 
 		if (items == null) {
@@ -451,7 +457,7 @@ public class Property {
 			// The type adapter creates new instance of collection so grab the new reference
 			items = (Collection) get(bean);
 		}
-		
+
 		items.add(setAssociation(item, bean));
 		return bean;
 	}
@@ -459,7 +465,7 @@ public class Property {
 	/**
 	 * If this is a multi-valued field (one-to-many, many-to-many), add all the
 	 * specified items to the collection.
-	 * 
+	 *
 	 * @param bean
 	 *            the bean instance
 	 * @param items
@@ -510,7 +516,7 @@ public class Property {
 
 	/**
 	 * If this is a multi-valued field, clear the collection values.
-	 * 
+	 *
 	 * @param bean
 	 *            the bean instance
 	 * @return the same bean instance
@@ -528,10 +534,10 @@ public class Property {
 		}
 		return bean;
 	}
-	
+
 	/**
 	 * Check whether the property value in the given bean is changed.
-	 * 
+	 *
 	 */
 	public boolean valueChanged(Object bean, Object oldValue) {
 		Object current = get(bean);
@@ -546,11 +552,11 @@ public class Property {
 		if (target == null) {
 			return attrs;
 		}
-		
+
 		Mapper mapper = Mapper.of(target);
 		Property nameField = mapper.getNameField();
 		Property codeField = mapper.getProperty("code");
-		
+
 		String targetName = null;
 		LinkedHashSet<String> targetSearch = Sets.newLinkedHashSet();
 
@@ -574,9 +580,9 @@ public class Property {
 	/**
 	 * Create a {@link Map} of property attributes. Transient and null valued
 	 * attributes with be omitted.
-	 * 
+	 *
 	 * This method should be used to convert property to JSON format.
-	 * 
+	 *
 	 * @return map of property attributes
 	 */
 	public Map<String, Object> toMap() {
