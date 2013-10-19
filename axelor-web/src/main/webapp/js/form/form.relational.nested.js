@@ -216,8 +216,8 @@ var NestedEditor = {
 		scope.ngModel = model;
 		
 		scope.onClear = function() {
-			model.$setViewValue(null);
-			model.$render();
+			scope.$parent.setValue(null, true);
+			scope.$parent.$broadcast('on:new');
 		};
 
 		scope.onClose = function() {
