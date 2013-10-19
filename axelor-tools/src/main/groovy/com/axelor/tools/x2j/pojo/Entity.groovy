@@ -218,32 +218,13 @@ class Entity {
 	}
 
 	private List<Property> getHashables() {
-
-		if (hashAll) {
-			return properties.findAll { p ->
-				p.getAttribute("hashKey") != "false" && !p.virtual && p.simple && !(p.name =~ /id|version/)
-			}
-		}
-		def all = properties.findAll { p ->
-			p.hashKey && !p.virtual && p.simple && !(p.name =~ /id|version/)
-		}
-
-		constraints.each {
-			all += it.fields.collect {
-				def n = it
-				properties.find {
-					it.name == n
-				}
-			}.flatten().findAll { it != null }
-		}
-
-		return all.unique()
+		return properties.findAll { p -> p.hashKey }
 	}
 
 	String getEqualsCode() {
 
 		if (hasExtends) {
-			return "return EntityHelper.equals(this, obj, $hashAll);"
+			return "return EntityHelper.equals(this, obj);"
 		}
 
 		def hashables = getHashables()
@@ -273,7 +254,7 @@ class Entity {
 
 	String getHashCodeCode() {
 		if (hasExtends) {
-			return "return EntityHelper.hashCode(this, $hashAll);"
+			return "return EntityHelper.hashCode(this);"
 		}
 		importType("com.google.common.base.Objects")
 		def data = getHashables()collect { "this.${it.getter}()" }.join(", ")
