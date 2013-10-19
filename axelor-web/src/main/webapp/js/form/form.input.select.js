@@ -516,6 +516,10 @@ ui.formInput('NavSelect', {
 				return;
 			}
 			this.setValue(select.value, true);
+			
+			// if selection change is used to show/hide some elements
+			// the layout should be adjustted
+			$.event.trigger('adjustSize');
 		};
 
 	},
