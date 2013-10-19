@@ -28,7 +28,7 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2013 Axelor. All Rights Reserved.
  */
-package com.axelor.tool.x2j;
+package com.axelor.tools.x2j;
 
 import org.codehaus.groovy.runtime.StringGroovyMethods;
 

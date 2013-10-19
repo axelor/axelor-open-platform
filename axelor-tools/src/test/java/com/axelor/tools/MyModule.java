@@ -28,15 +28,14 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2013 Axelor. All Rights Reserved.
  */
-package com.axelor.tool.x2j.pojo
+package com.axelor.tools;
 
-import groovy.transform.CompileStatic
-import groovy.util.slurpersupport.NodeChild
+import com.google.inject.AbstractModule;
 
-@CompileStatic
-class Constraint extends Index {
+public class MyModule extends AbstractModule {
 
-	Constraint(Entity entity, NodeChild node) {
-		super(entity, node)
+	@Override
+	protected void configure() {
+
 	}
 }
