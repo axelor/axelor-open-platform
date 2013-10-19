@@ -171,7 +171,7 @@ public class ActionView extends Action {
 			}
 
 			Map<String, Object> map = Maps.newHashMap();
-			map.put("name", elem.getName());
+			map.put("name", handler.evaluate(elem.getName()));
 			map.put("type", elem.getType());
 
 			if (viewType == null) {
