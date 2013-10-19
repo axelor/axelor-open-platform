@@ -672,5 +672,38 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="extends"  type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify the base entity class.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="strategy">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify the inheritance strategy (default is SINGLE).
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="SINGLE">
+            <xsd:annotation>
+              <xsd:documentation>Single table inheritance strategy</xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+          <xsd:enumeration value="JOINED">
+            <xsd:annotation>
+              <xsd:documentation>Joined table inheritance strategy</xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+          <xsd:enumeration value="CLASS">
+            <xsd:annotation>
+              <xsd:documentation>Table per class inheritance strategy</xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
   </xsd:complexType>
 </xsd:schema>
