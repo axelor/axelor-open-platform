@@ -77,5 +77,15 @@
     <many-to-one name="myTitle" ref="Title"/>
     <unique-constraint columns="someName,anotherName,myTitle"/>
   </entity>
+  
+  <!-- inheritance -->
+  <entity name="Hello" strategy="SINGLE">
+    <string name="title" required="true"/>
+    <string name="message" required="true"/>
+  </entity>
+  
+  <entity name="HelloWorld" extends="Hello" strategy="CLASS" hashAll="true">
+    <string name="tags"/>
+  </entity>
 
 </domain-models>
