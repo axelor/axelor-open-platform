@@ -491,7 +491,7 @@ class Property {
 		if (!this.isVirtual()) {
 			return null
 		}
-		def all = [annon("com.axelor.db.VirtualColumn", true)]
+		def all = [annon("com.axelor.db.annotations.VirtualColumn", true)]
 		if (this.isTransient()) {
 			return all
 		}
@@ -508,7 +508,7 @@ class Property {
 
 	private Annotation $nameColumn() {
 		if (isNameField())
-			annon("com.axelor.db.NameColumn", true)
+			annon("com.axelor.db.annotations.NameColumn", true)
 	}
 
 	private Annotation $widget() {
@@ -527,7 +527,7 @@ class Property {
 		}
 
 		if (title || help || readonly || hidden || multiline || selection || image)
-			annon("com.axelor.db.Widget")
+			annon("com.axelor.db.annotations.Widget")
 				.add("image", image, false)
 				.add("title", title)
 				.add("help", help)
@@ -663,6 +663,6 @@ class Property {
 
 	private Annotation $hashKey() {
 		if (!hashKey) return null
-		return annon("com.axelor.db.HashKey", true)
+		return annon("com.axelor.db.annotations.HashKey", true)
 	}
 }

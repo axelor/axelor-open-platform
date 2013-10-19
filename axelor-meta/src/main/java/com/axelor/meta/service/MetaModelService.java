@@ -47,7 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.db.JPA;
-import com.axelor.db.Widget;
+import com.axelor.db.annotations.Widget;
 import com.axelor.meta.db.MetaField;
 import com.axelor.meta.db.MetaModel;
 

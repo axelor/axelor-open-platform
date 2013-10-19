@@ -47,8 +47,8 @@ import org.joda.time.LocalDate;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
-import com.axelor.db.VirtualColumn;
-import com.axelor.db.Widget;
+import com.axelor.db.annotations.VirtualColumn;
+import com.axelor.db.annotations.Widget;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 

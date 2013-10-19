@@ -43,10 +43,10 @@ import javax.validation.constraints.NotNull;
 
 import com.axelor.db.JPA;
 import com.axelor.db.JpaModel;
-import com.axelor.db.NameColumn;
 import com.axelor.db.Query;
-import com.axelor.db.VirtualColumn;
-import com.axelor.db.Widget;
+import com.axelor.db.annotations.NameColumn;
+import com.axelor.db.annotations.VirtualColumn;
+import com.axelor.db.annotations.Widget;
 
 @Entity
 public class Contact extends JpaModel {
