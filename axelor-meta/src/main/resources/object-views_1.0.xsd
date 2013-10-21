@@ -274,7 +274,6 @@
       <xsd:enumeration value="warning"></xsd:enumeration>
       <xsd:enumeration value="success"></xsd:enumeration>
       <xsd:enumeration value="danger"></xsd:enumeration>
-      <xsd:enumeration value="error"></xsd:enumeration>
       <xsd:enumeration value="info"></xsd:enumeration>
     </xsd:restriction>
   </xsd:simpleType>
