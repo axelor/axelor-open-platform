@@ -40,15 +40,15 @@ import javax.persistence.MappedSuperclass;
 import org.joda.time.LocalDateTime;
 
 import com.axelor.db.Model;
-import com.axelor.db.Widget;
+import com.axelor.db.annotations.Widget;
 
 /**
  * The base abstract class with update logging feature.
- * 
+ *
  * The model instance logs the creation date, last modified date,
  * the authorized user who created the record and the user who
  * updated the record last time.
- * 
+ *
  */
 @MappedSuperclass
 public abstract class AuditableModel extends Model {
@@ -66,7 +66,7 @@ public abstract class AuditableModel extends Model {
 	@Widget(readonly = true)
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private User updatedBy;
-	
+
 	public LocalDateTime getCreatedOn() {
 		return createdOn;
 	}
