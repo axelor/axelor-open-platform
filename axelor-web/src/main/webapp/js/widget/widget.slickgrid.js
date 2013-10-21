@@ -610,6 +610,20 @@ Grid.prototype.parse = function(view) {
 	handler.resetColumns = _.bind(this.resetColumns, this);
 	handler.setColumnTitle = _.bind(this.setColumnTitle, this);
 
+	// hilite support
+	dataView.getItemMetadata = function (row) {
+		var item = grid.getDataItem(row);
+		if (item && item.$style === undefined) {
+			that.hilite(row);
+		}
+		return that.getItemMetadata(row);
+	};
+	this.subscribe(grid.onCellChange, function (e, args) {
+		that.hilite(args.row);
+		grid.invalidateRow(args.row);
+		grid.render();
+	});
+
 	function setFilterCols() {
 
 		if (!options.showHeaderRow) {
@@ -803,6 +817,62 @@ Grid.prototype.resetColumns = function() {
 
 Grid.prototype.setColumnTitle = function(name, title) {
 	this.grid.updateColumnHeader(name, title);
+};
+
+Grid.prototype.getItemMetadata = function(row) {
+	var item = this.grid.getDataItem(row);
+	if (item && item.$style) {
+		return {
+			cssClasses: item.$style
+		};
+	}
+	return null;
+};
+
+Grid.prototype.hilite = function (row, field) {
+	var view = this.scope.view,
+		record = this.grid.getDataItem(row),
+		params = null;
+
+	if (!view || !record) {
+		return null;
+	}
+
+	if (!field) {
+		_.each(this.scope.fields_view, function (item) {
+			if (item.hilite) this.hilite(row, item);
+		}, this);
+	}
+	
+	record.$style = null;
+
+	params = field ? field.hilite : view.hilite;
+	if (!params) {
+		return null;
+	}
+
+	var condition = params.condition,
+		style = [],
+		pass = false;
+
+	try {
+		pass = axelor.$eval(this.scope, condition, record);
+	} catch (e) {
+	}
+	if (!pass) {
+		return null;
+	}
+
+	if (params.strong) style.push("strong");
+	if (params.color) style.push("hilite-" + params.color + "-text");
+	if (params.background) style.push("hilite-" + params.color);
+
+	if (field) {
+		var styles = record.$styles || (record.$styles = {});
+		styles[field.name] = style.join(' ');
+	} else {
+		record.$style = style.join(' ');
+	}
 };
 
 Grid.prototype.onBeforeMenuShow = function(event, args) {
