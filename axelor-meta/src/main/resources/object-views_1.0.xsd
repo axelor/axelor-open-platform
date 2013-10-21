@@ -266,11 +266,40 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
+  
+  <xsd:simpleType name="HiliteStyle">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="default"></xsd:enumeration>
+      <xsd:enumeration value="primary"></xsd:enumeration>
+      <xsd:enumeration value="warning"></xsd:enumeration>
+      <xsd:enumeration value="success"></xsd:enumeration>
+      <xsd:enumeration value="danger"></xsd:enumeration>
+      <xsd:enumeration value="error"></xsd:enumeration>
+      <xsd:enumeration value="info"></xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
 
   <xsd:complexType name="Hilite">
-    <xsd:attribute name="color" type="xsd:string" />
-    <xsd:attribute name="background" type="xsd:string" />
-    <xsd:attribute name="condition" type="xsd:string" use="required" />
+    <xsd:attribute name="color" type="tns:HiliteStyle">
+      <xsd:annotation>
+        <xsd:documentation>Highlight text color style</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="background" type="tns:HiliteStyle">
+      <xsd:annotation>
+        <xsd:documentation>Highlight background color style</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="strong" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Highlight text with strong font style</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="if" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>Highlight condition</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
   
   <xsd:complexType name="Selection">
