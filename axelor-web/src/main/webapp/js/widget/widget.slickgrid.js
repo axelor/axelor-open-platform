@@ -852,7 +852,7 @@ Grid.prototype.hilite = function (row, field) {
 	}
 
 	var condition = params.condition,
-		style = [],
+		styles = null,
 		pass = false;
 
 	try {
@@ -863,15 +863,11 @@ Grid.prototype.hilite = function (row, field) {
 		return null;
 	}
 
-	if (params.strong) style.push("strong");
-	if (params.color) style.push("hilite-" + params.color + "-text");
-	if (params.background) style.push("hilite-" + params.color);
-
 	if (field) {
-		var styles = record.$styles || (record.$styles = {});
-		styles[field.name] = style.join(' ');
+		styles = record.$styles || (record.$styles = {});
+		styles[field.name] = params.css;
 	} else {
-		record.$style = style.join(' ');
+		record.$style = params.css;
 	}
 };
 
