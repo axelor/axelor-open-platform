@@ -74,6 +74,9 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		scope.attr = function(name) {
 			if (arguments.length > 1) {
 				state[name] = arguments[1];
+				if (name === "highlight") {
+					setHighlight(state.highlight);
+				}
 			}
 			return state[name];
 		};
@@ -154,6 +157,16 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			readonlySet = true;
 			return element.toggleClass("readonly", readonly);
 		});
+		
+		function setHighlight(highlight) {
+			var params = field.hilite,
+				label = null;
+			if (params && params.css) {
+				label = element.data('label') || $();
+				element.toggleClass(params.css, highlight);
+				label.toggleClass(params.css.replace(/(hilite-[^-]+\b(?!-))/g, ''), highlight);
+			}
+		}
 
 		this.prepare(scope, element, attrs, controller);
 		

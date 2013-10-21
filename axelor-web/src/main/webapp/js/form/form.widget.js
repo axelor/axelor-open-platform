@@ -97,10 +97,10 @@ ui.directive('uiWidgetStates', function() {
 			return ctrl.$valid;
 		}
 	}
+	
+	function handleCondition(scope, field, attr, condition, negative) {
 
-	var handleConditional = function(scope, field, attr, conditional, nagative){
-
-		if (!field[conditional]) {
+		if (!condition) {
 			return;
 		}
 
@@ -119,23 +119,33 @@ ui.directive('uiWidgetStates', function() {
 		}
 
 		function handle(rec) {
-			var value = axelor.$eval(scope, field[conditional], rec);
-			if (nagative) { value = !value; };
+			var value = axelor.$eval(scope, condition, rec);
+			if (negative) { value = !value; };
 			scope.attr(attr, value);
 		}
-	};
-
+	}
+	
 	function register(scope) {
 		var field = scope.field;
 		if (field == null) {
 			return;
 		}
-		handleConditional(scope, field, "valid", "validIf");
-		handleConditional(scope, field, "hidden", "hideIf");
-		handleConditional(scope, field, "hidden", "showIf", true);
-		handleConditional(scope, field, "readonly", "readonlyIf");
-		handleConditional(scope, field, "required", "requiredIf");
-		handleConditional(scope, field, "collapse", "collapseIf");
+		
+		function handleFor(attr, conditional, negative) {
+			if (!field[conditional]) return;
+			handleCondition(scope, field, attr, field[conditional], negative);
+		}
+		
+		handleFor("valid", "validIf");
+		handleFor("hidden", "hideIf");
+		handleFor("hidden", "showIf", true);
+		handleFor("readonly", "readonlyIf");
+		handleFor("required", "requiredIf");
+		handleFor("collapse", "collapseIf");
+
+		if (field.hilite) {
+			handleCondition(scope, field, "highlight", field.hilite.condition);
+		}
 	};
 
 	return function(scope, element, attrs) {
