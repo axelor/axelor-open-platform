@@ -104,23 +104,6 @@ ui.directive('uiWidgetStates', function() {
 			return;
 		}
 
-		var evalScope = scope.$new(true);
-
-		evalScope.$moment = function(d) { return moment(d); };			// moment.js helper
-		evalScope.$number = function(d) { return +d; };					// number helper
-		evalScope.$popup = function() { return scope._isPopup; };		// popup detect
-
-		evalScope.$readonly = _.bind(scope.isReadonly, scope);
-		evalScope.$required = _.bind(scope.isRequired, scope);
-
-		evalScope.$valid = function(name) {
-			return isValid(scope, name);
-		};
-
-		evalScope.$invalid = function(name) {
-			return !isValid(scope, name);
-		};
-
 		scope.$on("on:record-change", function(e, rec) {
 			if (rec === scope.record) {
 				handle(rec);
@@ -136,7 +119,7 @@ ui.directive('uiWidgetStates', function() {
 		}
 
 		function handle(rec) {
-			var value = evalScope.$eval(field[conditional], rec);
+			var value = axelor.$eval(scope, field[conditional], rec);
 			if (nagative) { value = !value; };
 			scope.attr(attr, value);
 		}
