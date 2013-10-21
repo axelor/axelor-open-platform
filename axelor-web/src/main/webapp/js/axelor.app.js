@@ -218,6 +218,62 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 		};
 	});
 
+	// some helpers
+	
+	axelor.$eval = function (scope, expr, context) {
+		if (!scope || !expr) {
+			return null;
+		}
+
+		var evalScope = scope.$new(true);
+		
+		function isValid(name) {
+			if (!name) {
+				if (_.isFunction(scope.isValid)) {
+					return scope.isValid();
+				}
+				return scope.isValid === undefined || scope.isValid;
+			}
+		
+			var ctrl = scope.form;
+			if (ctrl) {
+				ctrl = ctrl[name];
+			}
+			if (ctrl) {
+				return ctrl.$valid;
+			}
+			return true;
+		}
+
+		evalScope.$moment = function(d) { return moment(d); };		// moment.js helper
+		evalScope.$number = function(d) { return +d; };				// number helper
+		evalScope.$popup = function() { return scope._isPopup; };		// popup detect
+
+		evalScope.$contains = function(iter, item) {
+			if (iter && iter.indexOf)
+				return iter.indexOf(item) > -1;
+			return false;
+		};
+		
+		evalScope.$readonly = scope.isReadonly ? _.bind(scope.isReadonly, scope) : angular.noop;
+		evalScope.$required = scope.isRequired ? _.bind(scope.isRequired, scope) : angular.noop;
+
+		evalScope.$valid = function(name) {
+			return isValid(scope, name);
+		};
+
+		evalScope.$invalid = function(name) {
+			return !isValid(scope, name);
+		};
+		
+		try {
+			return evalScope.$eval(expr, context);
+		} finally {
+			evalScope.$destroy();
+			evalScope = null;
+		}
+	};
+
 })(jQuery);
 
 AppCtrl.$inject = ['$rootScope', '$scope', '$http', '$route', 'authService'];
