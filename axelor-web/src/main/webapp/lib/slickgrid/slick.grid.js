@@ -1422,6 +1422,11 @@ if (typeof Slick === "undefined") {
       if (row === activeRow && cell === activeCell) {
         cellCss += (" active");
       }
+      
+      // css from record meta data
+      if (d && d.$styles && d.$styles[m.field]) {
+    	  cellCss += (" " + d.$styles[m.field]);
+      }
 
       // TODO:  merge them together in the setter
       for (var key in cellCssClasses) {
