@@ -336,3 +336,8 @@
 	line-height: 24px;
 	color: #0088cc;
 }
+
+.slick-cell.edit-icon i {
+	padding: 6px;
+	cursor: pointer;
+}

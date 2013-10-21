@@ -306,8 +306,8 @@ function totalsFormatter(totals, columnDef) {
 var Factory = {
 	
 	getEditor : function(col) {
-		var field = col.descriptor || {};
-		if (field.readonly) {
+		var field = col.descriptor;
+		if (!field || field.readonly) {
 			return null;
 		}
 		if (field.type == 'binary') {
@@ -499,6 +499,21 @@ Grid.prototype.parse = function(view) {
 
 		return column;
 	});
+	
+	// create edit column
+	var editColumn = null;
+	if (!scope.selector && view.editIcon && (!handler.hasPermission || handler.hasPermission('write'))) {
+		editColumn = new EditIconColumn({
+			onClick: function (e, args) {
+				if (handler && handler.onEdit) {
+					setTimeout(function () {
+						handler.onEdit(true);
+					});
+				}
+			}
+		});
+		cols.unshift(editColumn.getColumnDefinition());
+	}
 
 	// create checkbox column
 	var selectColumn = null;
@@ -557,6 +572,9 @@ Grid.prototype.parse = function(view) {
 		grid.registerPlugin(headerMenu);
 		if (selectColumn) {
 			grid.registerPlugin(selectColumn);
+		}
+		if (editColumn) {
+			grid.registerPlugin(editColumn);
 		}
 
 		//XXX: ui-dialog issue (filter row)
@@ -1370,6 +1388,8 @@ Grid.prototype.onItemClick = function(event, args) {
 };
 
 Grid.prototype.onItemDblClick = function(event, args) {
+	var col = this.grid.getColumns()[args.cell];
+	if (col.id === '_edit_column') return;
 	var item = this.grid.getDataItem(args.row) || {};
 	if (item.__group || item.__groupTotals) {
 		return;
@@ -1410,6 +1430,7 @@ Grid.prototype.groupBy = function(names) {
 	
 	var aggregators = _.map(cols, function(col) {
 		var field = col.descriptor;
+		if (!field) return null;
 		if (field.aggregate === "sum") {
 			return new Slick.Data.Aggregators.Sum(field.name);
 		}
@@ -1458,6 +1479,58 @@ Grid.prototype.groupBy = function(names) {
 	
 	data.setGrouping(grouping);
 };
+
+function EditIconColumn(options) {
+
+	var _grid;
+    var _self = this;
+    var _handler = new Slick.EventHandler();
+    
+    var _opts = _.extend({
+    	onClick: angular.noop
+    }, options);
+
+    function init(grid) {
+    	_grid = grid;
+    	_handler.subscribe(grid.onClick, handleClick);
+    };
+    
+    function handleClick(e, args) {
+    	if (_grid.getColumns()[args.cell].id !==  '_edit_column' || !$(e.target).is("i")) {
+    		return;
+    	}
+    	return _opts.onClick(e, args);
+    }
+    
+    function destroy() {
+    	_handler.unsubscribeAll();
+    }
+    	
+    function editFormatter(row, cell, value, columnDef, dataContext) {
+    	if (!dataContext || !dataContext.id) return "";
+    	return '<i class="icon-pencil"></i>';
+    }
+
+    function getColumnDefinition() {
+		return {
+			id : '_edit_column',
+			name : "<span class='slick-column-name'>&nbsp;</span>",
+			field : "edit",
+			width : 24,
+			resizable : false,
+			sortable : false,
+			cssClass: 'edit-icon',
+			formatter : editFormatter
+		};
+	}
+    
+    $.extend(this, {
+		"init": init,
+		"destroy": destroy,
+		
+		"getColumnDefinition": getColumnDefinition
+	});
+}
 
 ui.directive('uiSlickEditors', function() {
 	
