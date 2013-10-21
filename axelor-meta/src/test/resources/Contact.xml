@@ -3,10 +3,10 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_0.9.xsd">
     <grid name="contact-grid" title="Contacts">
-        <hilite color="#3333FF" background="#CDEB8B" condition="email *= xyz"/>
+        <hilite background="warning" if="$contains(email, 'gmeil.com')"/>
         <field name="fullName"/>
         <field name="email">
-            <hilite color="#FF0000" condition="email $= gmail.com"/>
+            <hilite strong="true" if="$contains(email, 'gmeil.com')"/>
         </field>
         <field name="phone"/>
         <field name="company"/>
