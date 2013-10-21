@@ -312,9 +312,13 @@ function GridViewCtrl($scope, $element) {
 		});
 	};
 	
-	$scope.onEdit = function() {
+	$scope.onEdit = function(force) {
 		page.index = $scope.selection[0];
-		$scope.switchTo('form');
+		$scope.switchTo('form', function (formScope) {
+			if (force) {
+				formScope.onEdit();
+			}
+		});
 	};
 
 	$scope.onDelete = function() {
