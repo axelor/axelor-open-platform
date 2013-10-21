@@ -48,10 +48,13 @@ public class GridView extends AbstractView {
 
 	@XmlAttribute
 	private String orderBy;
-	
+
 	@XmlAttribute
 	private String groupBy;
-	
+
+	@XmlAttribute(name = "edit-icon")
+	private Boolean editIcon = Boolean.TRUE;
+
 	private Hilite hilite;
 
 	@XmlElements({
@@ -59,39 +62,47 @@ public class GridView extends AbstractView {
 		@XmlElement(name="button", type=Button.class)
 	})
 	private List<AbstractWidget> items;
-	
+
 	public Boolean getExpandable() {
 		return expandable;
 	}
-	
+
 	public void setExpandable(Boolean expandable) {
 		this.expandable = expandable;
 	}
-	
+
 	public String getOrderBy() {
 		return orderBy;
 	}
-	
+
 	public void setOrderBy(String orderBy) {
 		this.orderBy = orderBy;
 	}
-	
+
 	public String getGroupBy() {
 		return groupBy;
 	}
-	
+
 	public void setGroupBy(String groupBy) {
 		this.groupBy = groupBy;
 	}
-	
+
+	public Boolean getEditIcon() {
+		return editIcon;
+	}
+
+	public void setEditIcon(Boolean editIcon) {
+		this.editIcon = editIcon;
+	}
+
 	public Hilite getHilite() {
 		return hilite;
 	}
-	
+
 	public void setHilite(Hilite hilite) {
 		this.hilite = hilite;
 	}
-	
+
 	public List<AbstractWidget> getItems() {
 		if(items != null) {
 			for (AbstractWidget field : items) {
@@ -100,7 +111,7 @@ public class GridView extends AbstractView {
 		}
 		return items;
 	}
-	
+
 	public void setItems(List<AbstractWidget> items) {
 		this.items = items;
 	}
