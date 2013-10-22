@@ -36,7 +36,48 @@ angular.module('axelor.ui').directive('navTabs', function() {
 			scope.$watch('tabs.length', function(value, oldValue){
 				if (value != oldValue) $.event.trigger('adjust');
 			});
-			$(elem).bsTabs();
+			elem.bsTabs();
+			elem.on('contextmenu', '.nav-tabs-main > li > a', showMenu);
+
+			var menu = elem.find('#nav-tabs-menu');
+			
+			menu.css({
+				position: 'absolute',
+				zIndex: 1000
+			}).hide();
+			
+			function showMenu(e) {
+				var tabElem = $(e.target).parents('li:first');
+				var tabScope = tabElem.data('$scope');
+				if (!tabScope || !tabScope.tab) {
+					return;
+				}
+
+				e.preventDefault();
+				e.stopPropagation();
+				
+				menu.show().position({
+					my: "left top",
+					at: "left+" + e.offsetX + " top+" + e.offsetY,
+					of: tabElem
+				});
+
+				scope.current = tabScope.tab;
+				$(document).on('mousedown.nav-tabs-menu', hideMenu);
+			}
+			
+			function hideMenu(e) {
+				if (menu.is(e.target) || menu.has(e.target).size() > 0) {
+					scope.$evalAsync(function () {
+						scope.current = null;
+						menu.hide();
+					});
+				} else {
+					scope.current = null;
+					menu.hide();
+				}
+				$(document).off('mousedown.nav-tabs-menu');
+			}
 		},
 		templateUrl: 'partials/nav-tabs.html'
 	};

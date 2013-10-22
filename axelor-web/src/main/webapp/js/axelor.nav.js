@@ -179,6 +179,41 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 			__closeTab(tab);
 		}
 	}
+	
+	function closeTabOthers(current) {
+		var i, tab, viewScope;
+		
+		function select(tab) {
+			if (!tab.selected) {
+				tab.selected = true;
+				openTab(tab);
+			}
+		}
+		
+		for (i = 0; i < tabs.length; i++) {
+			tab = tabs[i];
+			if (tab === current) {
+				select(tab);
+				continue;
+			}
+			viewScope = tab.$viewScope;
+			if (viewScope && viewScope.confirmDirty) {
+				viewScope.confirmDirty(function(){
+					tabs.splice(i, 1);
+					closeTabOthers(current);
+				});
+				select(tab);
+			} else {
+				tabs.splice(i, 1);
+				closeTabOthers(current);
+			}
+			break;
+		}
+	}
+	
+	function closeTabAll() {
+		closeTabOthers();
+	}
 
 	function getTabs() {
 		return tabs;
@@ -193,6 +228,8 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		openTab: openTab,
 		canCloseTab: canCloseTab,
 		closeTab: closeTab,
+		closeTabOthers: closeTabOthers,
+		closeTabAll: closeTabAll,
 		getTabs: getTabs,
 		getSelected: getSelected
 	};
@@ -273,6 +310,14 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 
 	$scope.closeTab = function(tab) {
 		return NavService.closeTab(tab);
+	};
+	
+	$scope.closeTabOthers = function(tab) {
+		return NavService.closeTabOthers(tab);
+	};
+	
+	$scope.closeTabAll = function() {
+		return NavService.closeTabAll();
 	};
 
 	$scope.$watch('selectedTab.viewType', function(viewType){
