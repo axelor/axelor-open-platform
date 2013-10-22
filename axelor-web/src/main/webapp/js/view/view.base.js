@@ -240,13 +240,13 @@ function DSViewCtrl(type, $scope, $element) {
 	};
 
 	$scope.hasButton = function(name) {
-		if ((name == "new" || name == "copy") && !this.hasPermission("create")) {
+		if ((name === "new" || name === "copy") && !this.hasPermission("create")) {
 			return false;
 		}
-		if (name == "save" && !this.hasPermission("write")) {
+		if ((name === "edit" || name === "save") && !this.hasPermission("write")) {
 			return false;
 		}
-		if (name == "delete" && !this.hasPermission("remove")) {
+		if (name === "delete" && !this.hasPermission("remove")) {
 			return false;
 		}
 		if (_(hiddenButtons).has(name)) {
