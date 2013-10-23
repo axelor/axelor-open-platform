@@ -56,6 +56,8 @@ _t.put({
 "Cancel": "Annuler",
 "Clear": "Effacer",
 "Close": "Fermer",
+"Close Others": "Fermer les autres",
+"Close All" : "Fermer tout",
 "Concurrent updates error.": "Erreur : Modification concurrente détectée.",
 "Copy": "Copier",
 "Current changes will be lost. Do you really want to proceed?": "Les modifications en cours vont être perdues, voulez vous continuer ?",
