@@ -151,11 +151,11 @@ ui.formInput('Number', {
 				scope.$apply();
 			});
 			
-			if (handle === false) {
-				return pendingChange = true;
-			}
+			pendingChange = true;
 			
-			handleChange();
+			if (handle !== false) {
+				handleChange();
+			}
 		}
 		
 		function onSpin(event, ui) {
