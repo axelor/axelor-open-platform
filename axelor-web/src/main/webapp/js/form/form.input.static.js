@@ -160,7 +160,7 @@ ui.directive('uiHelpPopover', function() {
 			return doLink(scope, element, attrs);
 		}
 		var unwatch = scope.$watch('field', function(field, old) {
-			if (field === old || !field) {
+			if (!field) {
 				return;
 			}
 			unwatch();
