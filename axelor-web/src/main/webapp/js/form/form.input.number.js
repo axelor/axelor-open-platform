@@ -130,6 +130,12 @@ ui.formInput('Number', {
 				setTimeout(onChange);
 			}
 		}
+		
+		function equals(a, b) {
+			if (a === b) return true;
+			if (angular.equals(a, b)) return true;
+			return (+a) === (+b);
+		}
 
 		function updateModel(value, handle) {
 			if (!scope.isNumber(value)) {
@@ -137,8 +143,8 @@ ui.formInput('Number', {
             }
 			var val = scope.parse(value);
 			var old = scope.getValue();
-			
-			if (angular.equals(val, old)) {
+
+			if (equals(val, old)) {
 				return handleChange();
 			};
 			
