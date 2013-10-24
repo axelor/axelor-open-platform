@@ -190,6 +190,11 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 			}
 		}
 		
+		function close(index) {
+			tabs.splice(index, 1);
+			closeTabOthers(current);
+		}
+		
 		for (i = 0; i < tabs.length; i++) {
 			tab = tabs[i];
 			if (tab === current) {
@@ -197,17 +202,12 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 				continue;
 			}
 			viewScope = tab.$viewScope;
-			if (viewScope && viewScope.confirmDirty) {
-				viewScope.confirmDirty(function(){
-					tabs.splice(i, 1);
-					closeTabOthers(current);
+			if (viewScope && viewScope.confirmDirty && viewScope.isDirty()) {
+				return viewScope.confirmDirty(function(){
+					return close(i);
 				});
-				select(tab);
-			} else {
-				tabs.splice(i, 1);
-				closeTabOthers(current);
 			}
-			break;
+			return close(i);
 		}
 	}
 	
