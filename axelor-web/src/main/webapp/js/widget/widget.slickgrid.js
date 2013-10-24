@@ -642,12 +642,17 @@ Grid.prototype.parse = function(view) {
 	handler.setColumnTitle = _.bind(this.setColumnTitle, this);
 
 	// hilite support
+	var getItemMetadata = dataView.getItemMetadata;
 	dataView.getItemMetadata = function (row) {
 		var item = grid.getDataItem(row);
 		if (item && item.$style === undefined) {
 			that.hilite(row);
 		}
-		return that.getItemMetadata(row);
+		var meta = that.getItemMetadata(row);
+		if (meta) {
+			return meta;
+		}
+		return getItemMetadata.apply(dataView, arguments);
 	};
 	this.subscribe(grid.onCellChange, function (e, args) {
 		that.hilite(args.row);
