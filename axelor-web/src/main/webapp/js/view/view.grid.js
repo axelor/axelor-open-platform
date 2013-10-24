@@ -496,9 +496,8 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 			
 			var ds = $scope._dataSource;
 			var counter = 0;
-
-			$scope.showPager = true;
-			$scope.onItemDblClick = function(event, args) {
+			
+			function doEdit(force) {
 				var selection = $scope.selection[0];
 				var record = ds.at(selection);
 
@@ -520,11 +519,20 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 							scope.confirmDirty(function() {
 								scope.doRead(record.id).success(function(record){
 									scope.edit(record);
+									if (force) {
+										scope.onEdit();
+									}
 								});
 							});
 						}
 					});
 				});
+			}
+
+			$scope.showPager = true;
+			$scope.onEdit = doEdit;
+			$scope.onItemDblClick = function(event, args) {
+				doEdit(false);
 			};
 			
 			$scope.$on("on:new", function(e) {
