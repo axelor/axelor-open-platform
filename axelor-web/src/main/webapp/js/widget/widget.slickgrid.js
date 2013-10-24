@@ -438,7 +438,7 @@ Grid.prototype.parse = function(view) {
 			field.handler = that.newActionHandler(scope.$new(), element, {
 				action: field.onClick
 			});
-			item.title = " ";
+			item.title = "&nbsp;";
 			item.width = 10;
 		}
 
@@ -459,6 +459,10 @@ Grid.prototype.parse = function(view) {
 			column.groupTotalsFormatter = totalsFormatter;
 		}
 		
+		if (field.type === "button") {
+			return column;
+		}
+
 		var menus = [{
 			iconImage: "lib/slickgrid/images/sort-asc.gif",
 			title: _t("Sort Ascending"),
