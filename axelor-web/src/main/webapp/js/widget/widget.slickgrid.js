@@ -412,8 +412,10 @@ Grid.prototype.parse = function(view) {
 		element = this.element;
 
 	scope.fields_view = {};
-
-	var cols = _.map(view.items, function(item){
+	
+	var cols = [];
+	
+	_.each(view.items, function(item) {
 		var field = handler.fields[item.name],
 			path = handler.formPath, type;
 
@@ -434,6 +436,7 @@ Grid.prototype.parse = function(view) {
 		}
 
 		if (field.type == "button") {
+			if (scope.selector) return;
 			field.image = field.title;
 			field.handler = that.newActionHandler(scope.$new(), element, {
 				action: field.onClick
@@ -455,12 +458,14 @@ Grid.prototype.parse = function(view) {
 			xpath: path
 		};
 		
+		cols.push(column);
+		
 		if (field.aggregate) {
 			column.groupTotalsFormatter = totalsFormatter;
 		}
 		
 		if (field.type === "button") {
-			return column;
+			return ;
 		}
 
 		var menus = [{
@@ -500,8 +505,6 @@ Grid.prototype.parse = function(view) {
 				}
 			}
 		};
-
-		return column;
 	});
 	
 	// create edit column
