@@ -30,6 +30,7 @@
  */
 package com.axelor.db;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import javax.persistence.FlushModeType;
@@ -47,6 +48,18 @@ import com.google.common.collect.Maps;
  *
  */
 public class QueryBinder {
+
+	//TODO: ScriptBinding
+	private static final String[] SPECIAL_NAMES = {
+		"__this__",
+		"__self__",
+		"__user__",
+		"__ref__",
+		"__parent__",
+		"__date__",
+		"__time__",
+		"__datetime__"
+	};
 
 	private final javax.persistence.Query query;
 
@@ -152,6 +165,9 @@ public class QueryBinder {
 					continue;
 				if (variables.containsKey(p.getName())) {
 					Object value = variables.get(p.getName());
+					if (value instanceof String && "".equals(((String) value).trim())) {
+						value = adapt(value, p);
+					}
 					try {
 						query.setParameter(p.getName(), value);
 					} catch (IllegalArgumentException e) {
@@ -165,7 +181,9 @@ public class QueryBinder {
 		if (params != null) {
 			for (int i = 0; i < params.length; i++) {
 				Object param = params[i];
-				if (param instanceof String && variables.containsKey(param)) {
+				if (param instanceof String
+						&& Arrays.binarySearch(SPECIAL_NAMES, param) > -1
+						&& variables.containsKey(param)) {
 					param = variables.get(param);
 				}
 				try {
