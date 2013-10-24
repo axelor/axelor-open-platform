@@ -134,7 +134,9 @@ ui.formInput('Number', {
 		function equals(a, b) {
 			if (a === b) return true;
 			if (angular.equals(a, b)) return true;
-			return (+a) === (+b);
+			a = (+a) || 0;
+			b = (+b) || 0;
+			return a === b;
 		}
 
 		function updateModel(value, handle) {
