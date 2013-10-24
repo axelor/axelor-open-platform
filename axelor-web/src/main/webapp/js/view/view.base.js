@@ -115,6 +115,9 @@ function ViewCtrl($scope, DataSource, ViewService) {
 	if (!params.action) {
 		return;
 	}
+	
+	// hide toolbar button titles
+	$scope.tbTitleHide = __appSettings['application.view.toolbar-title'] === 'hide';
 
 	// show single or default record if specified
 	var context = params.context || {};
@@ -148,8 +151,6 @@ function ViewCtrl($scope, DataSource, ViewService) {
 		});
 	}
 	
-	$scope.tbTitleHide = __appSettings['application.view.toolbar-title'] === 'hide';
-
 	// switch to the the current viewType
 	$scope.switchTo($scope._viewType || 'grid');
 }
