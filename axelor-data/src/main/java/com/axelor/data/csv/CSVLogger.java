@@ -33,12 +33,19 @@ package com.axelor.data.csv;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axelor.data.adapter.DataAdapter;
 import com.google.common.base.Charsets;
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.thoughtworks.xstream.XStream;
@@ -52,7 +59,10 @@ import com.thoughtworks.xstream.XStream;
 public class CSVLogger {
 
 	private static final String REMOTE_SCHEMA = "data-import_"+ CSVConfig.VERSION +".xsd";
+
 	private static final String DEFAULT_CONFIG_NAME = "csv-config.xml";
+
+	private Logger LOG = LoggerFactory.getLogger(getClass());
 
 	private File errorDir;
 
@@ -82,7 +92,7 @@ public class CSVLogger {
 	}
 
 	/**
-	 * Delete all file of the directory
+	 * Delete all files and directories of the directory
 	 * @param file
 	 */
 	private void cleanDir(File file) {
@@ -103,6 +113,9 @@ public class CSVLogger {
 				}
 			}
 		}
+		else {
+    		file.delete();
+    	}
 	}
 
 	/**
@@ -129,13 +142,28 @@ public class CSVLogger {
 		try {
 			if(!this.currentFile.exists()) {
 				Files.createParentDirs(this.currentFile);
-				Files.append(Joiner.on(this.csvInput.getSeparator()).join(this.header), this.currentFile, Charsets.UTF_8);
+				Files.append(Joiner.on(this.csvInput.getSeparator()).join(this.transformLine(this.header)), this.currentFile, Charsets.UTF_8);
 				this.filesName.add(this.currentFile.getName());
 			}
 
-			Files.append("\n" + Joiner.on(this.csvInput.getSeparator()).join(values), this.currentFile, Charsets.UTF_8);
+			Files.append("\n" + Joiner.on(this.csvInput.getSeparator()).join(this.transformLine(values)), this.currentFile, Charsets.UTF_8);
 		} catch (IOException e) {
 		}
+	}
+
+	/**
+	 * Quote all text in tab
+	 * @param line
+	 * @return
+	 */
+	private Collection<String> transformLine(String[] values) {
+		return Collections2.transform(Arrays.asList(values), new Function<String, String>(){
+
+			@Override
+			public String apply(String value) {
+				return "\"" + value + "\"";
+			}
+		});
 	}
 
 	/**
@@ -180,14 +208,24 @@ public class CSVLogger {
 	 */
 	private void exportInput() {
 		if(this.inputExported == false) {
-			this.computeBindings();
+			try {
+				this.computeBindings();
+			}
+			catch(IOException ex) {
+				LOG.error("Error while accessing file {}", this.configFile.getName());
+			}
+			finally {
+				this.inputExported = true;
+			}
+
 		}
 	}
 
 	/**
 	 * Append the current binding to the config file.
+	 * @throws IOException
 	 */
-	private void computeBindings() {
+	private void computeBindings() throws IOException {
 		List<String> lines = Lists.newArrayList();
 		StringBuilder sb = new StringBuilder();
 		XStream xStream = new XStream();
@@ -195,25 +233,15 @@ public class CSVLogger {
 		String originalFileName = this.csvInput.getFileName();
 
 		if(configFile == null) {
-			try {
-				this.createConfigFile();
-			}
-			catch(IOException ex) {
-				ex.printStackTrace();
-				return;
-			}
+			this.createConfigFile();
+			LOG.error("Error while creating file {}", this.configFile.getName());
 
 			for (DataAdapter adapter : this.csvConfig.getAdapters()) {
 				sb.append(xStream.toXML(adapter));
 			}
 		}
 		else {
-			try {
-				lines = Files.readLines(this.configFile, Charsets.UTF_8);
-			} catch (IOException ex) {
-				ex.printStackTrace();
-				return ;
-			}
+			lines = Files.readLines(this.configFile, Charsets.UTF_8);
 
 			for(int i = 0; i < lines.size() - 1; i++) {
 				if(i == 0 || i==1 || i == (lines.size()-1)) {
@@ -230,16 +258,9 @@ public class CSVLogger {
 
 		this.csvInput.setFileName(this.currentFile.getName());
 		sb.append(xStream.toXML(this.csvInput));
+		this.csvInput.setFileName(originalFileName);
 
-		try {
-			Files.write(this.prepareXML(sb.toString()), this.configFile, Charset.defaultCharset());
-		}
-		catch(IOException ex) {
-			ex.printStackTrace();
-		}
-		finally {
-			this.csvInput.setFileName(originalFileName);
-		}
+		Files.write(this.prepareXML(sb.toString()), this.configFile, Charset.defaultCharset());
 	}
 
 	/**
