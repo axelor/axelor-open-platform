@@ -55,11 +55,11 @@ import com.axelor.data.ImportException;
 import com.axelor.data.ImportTask;
 import com.axelor.data.Importer;
 import com.axelor.data.Listener;
-import com.axelor.data.LoggerManager;
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Injector;
@@ -80,7 +80,7 @@ public class CSVImporter implements Importer {
 
 	private Map<String, Object> context;
 
-	private LoggerManager loggerManager;
+	private CSVLogger loggerManager;
 
 	public void addListener(Listener listener) {
 		this.listeners.add(listener);
@@ -122,7 +122,9 @@ public class CSVImporter implements Importer {
 
 		this.config = CSVConfig.parse(_file);
 		this.injector = injector;
-		this.loggerManager = new LoggerManager(errorDir);
+		if(!Strings.isNullOrEmpty(errorDir)) {
+			this.loggerManager = new CSVLogger(this.config, errorDir);
+		}
 	}
 
 	public CSVImporter(Injector injector, CSVConfig config){
