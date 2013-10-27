@@ -45,12 +45,12 @@
 	top: 0;
 }
 
-.view-container .form-view div[ui-view-form].has-width {
+.view-container .form-view > div[ui-view-form].has-width {
 	padding: 8px 16px;
 	background-color: #f7f7f9;
 }
 
-.view-container .form-view div[ui-view-form].has-width form:first-of-type {
+.view-container .form-view > div[ui-view-form].has-width > form:first-of-type {
 	padding: 12px;
 	margin: auto;
 	
