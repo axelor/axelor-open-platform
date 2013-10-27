@@ -291,6 +291,48 @@ function DSViewCtrl(type, $scope, $element) {
 	};
 }
 
+angular.module('axelor.ui').directive('uiViewPane', function() {
+
+	return {
+		replace: true,
+		controller: ['$scope', '$attrs', 'DataSource', 'ViewService', function ($scope, $attrs, DataSource, ViewService) {
+			
+			var params = $scope.$eval($attrs.uiViewPane);
+			
+			$scope._viewParams = params;
+			ViewCtrl.call(this, $scope, DataSource, ViewService);
+			
+			$scope.viewList = [];
+			$scope.viewType = null;
+			$scope.viewType = null;
+
+			var switchTo = $scope.switchTo;
+			$scope.switchTo = function (type, callback) {
+				var view = $scope._views[type];
+				if (view && $scope.viewList.indexOf(type) === -1) {
+					$scope.viewList.push(type);
+				}
+				$scope.viewType = type;
+				$scope.viewTitle = view.title || params.title || $scope.viewTitle;
+				return switchTo(type, callback);
+			};
+
+			$scope.viewTemplate = function (type) {
+				return 'partials/views/' + type + '.html';
+			};
+
+			$scope.switchTo((params.viewType || params.type));
+		}],
+		link: function(scope, element, attrs) {
+		
+		},
+		template:
+			"<div class='view-pane'>" +
+				"<div class='view-container' ng-repeat='type in viewList' ng-show='type == viewType' ng-include='viewTemplate(type)'></div>" +
+			"</div>"
+	};
+});
+
 angular.module('axelor.ui').directive('uiRecordPager', function(){
 
 	return {

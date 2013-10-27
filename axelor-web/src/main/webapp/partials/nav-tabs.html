@@ -14,10 +14,7 @@
 	</div>
   </div>
   <div class="view-content">
-    <div class="view-pane" ng-show="tab.selected" ng-repeat="tab in navTabs" ng-controller="ViewCtrl">
-    	<div class="view-container" ng-show="selectedTab.viewType == view.type" ng-repeat="view in tab.views"
-    		ng-include src="'partials/views/'+ view.type +'.html'"></div>
-    </div>
+    <div ng-show="tab.selected" ng-repeat="tab in navTabs" ui-view-pane="tab"></div>
   </div>
   <a href="http://axelor.com" tabindex="-1" target="_blank" style="position: absolute; position: absolute; right: 0px; top: 0px;">
     <img src="img/axelor.png" width="100" height="32">
