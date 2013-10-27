@@ -141,13 +141,16 @@ table.form-layout td.form-item.v-align-top {
 	display: block;
 }
 
+.form-item-container {
+	min-width: 26px;
+}
+
 .form-item-container > span.display-text {
 	padding-top: 4px;
 	padding-bottom: 2px;
 }
 
 .form-item-container input {
-	min-width: 170px;
 	height: 26px;
 	padding: 2px 6px;
 }

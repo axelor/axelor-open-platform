@@ -67,6 +67,9 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		if (field.css) {
 			element.addClass(field.css);
 		}
+		if (field.width && field.width !== '*') {
+			element.width(field.width);
+		}
 		
 		scope.$events = {};
 		scope.field = field || {};
