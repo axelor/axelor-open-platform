@@ -49,6 +49,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.google.common.base.Strings;
 
 @XmlType
 @JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
@@ -76,6 +77,10 @@ public abstract class AbstractView {
 
 	@XmlAttribute
 	private Boolean editable;
+
+	@JsonIgnore
+	@XmlAttribute( name = "width")
+	private String widthSpec;
 
 	@XmlElementWrapper
 	@XmlElement(name = "button")
@@ -128,6 +133,33 @@ public abstract class AbstractView {
 
 	public void setEditable(Boolean editable) {
 		this.editable = editable;
+	}
+
+	private String widthPart(int which) {
+		if (Strings.isNullOrEmpty(widthSpec)) {
+			return null;
+		}
+		String[] parts = widthSpec.split(":");
+		if (which >= parts.length) {
+			return null;
+		}
+		String part = parts[which];
+		if (part.matches("\\d+")) {
+			part += "px";
+		}
+		return part;
+	}
+
+	public String getWidth() {
+		return widthPart(0);
+	}
+
+	public String getMinWidth() {
+		return widthPart(1);
+	}
+
+	public String getMaxWidth() {
+		return widthPart(2);
 	}
 
 	public List<Button> getToolbar() {
