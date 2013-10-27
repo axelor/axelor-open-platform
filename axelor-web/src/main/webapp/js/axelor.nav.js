@@ -35,6 +35,7 @@ var app = angular.module("axelor.app");
 app.factory('NavService', ['$location', 'MenuService', function($location, MenuService) {
 
 	var tabs = [];
+	var popups = [];
 	var selected = null;
 
 	var VIEW_TYPES = {
@@ -97,9 +98,17 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 			openTab(tab, options);
 		});
 	}
+	
+	function openTabAsPopup(tab, options) {
+		popups.push(tab);
+	}
 
 	function openTab(tab, options) {
 
+		if (tab && tab.$popupParent) {
+			return openTabAsPopup(tab, options);
+		}
+		
 		var found = findTab(tab.action);
 
 		options = options || tab.options;
@@ -144,18 +153,24 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 	}
 
 	function __closeTab(tab) {
-		var index = _.indexOf(tabs, tab);
+		
+		var all = tab.$popupParent ? popups : tabs;
+		var index = _.indexOf(all, tab);
 
 		// remove tab
-		tabs.splice(index, 1);
+		all.splice(index, 1);
+		
+		if (tab.$popupParent) {
+			return;
+		}
 
 		if (tab.selected) {
 			if (index == tabs.length)
 				index -= 1;
-			_.each(tabs, function(tab){
+			_.each(all, function(tab){
 				tab.selected = false;
 			});
-			var select = tabs[index];
+			var select = all[index];
 			if (select) {
 				select.selected = true;
 				openTab(select);
@@ -218,6 +233,10 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 	function getTabs() {
 		return tabs;
 	}
+	
+	function getPopups() {
+		return popups;
+	}
 
 	function getSelected() {
 		return selected;
@@ -231,6 +250,7 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		closeTabOthers: closeTabOthers,
 		closeTabAll: closeTabAll,
 		getTabs: getTabs,
+		getPopups: getPopups,
 		getSelected: getSelected
 	};
 }]);
@@ -243,12 +263,22 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 			return NavService.getTabs();
 		}
 	});
+	
+	$scope.navPopups = Object.defineProperty($scope, 'navPopups', {
+		get: function() {
+			return NavService.getPopups();
+		}
+	});
 
 	$scope.selectedTab = Object.defineProperty($scope, 'selectedTab', {
 		get: function() {
 			return NavService.getSelected();
 		}
 	});
+	
+	$scope.hasNabPopups = function () {
+		return $scope.navPopups && $scope.navPopups.length > 0;
+	};
 
 	$scope.menuClick = function(event, record) {
 		if (record.isFolder)
