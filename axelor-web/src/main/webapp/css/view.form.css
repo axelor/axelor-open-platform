@@ -261,6 +261,10 @@ table.form-layout td.form-item .stackbar.inline-editable {
 	min-height: 200px;
 }
 
+table.form-layout td.form-item .stackbar.readonly .edit-icon i:before {
+	content: "\f044";
+}
+	
 .icons-bar {
 	display: inline-block;
 	padding-top: 4px;
