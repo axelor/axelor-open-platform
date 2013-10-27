@@ -711,6 +711,11 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			var view = scope.schema;
 			return view ? view.helpLink : false;
 		};
+		
+		scope.hasWidth = function() {
+			var view = scope.schema;
+			return view && view.width;
+		};
 
 		scope.onShowHelp = function() {
 			window.open(scope.schema.helpLink);
@@ -748,6 +753,15 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 
 			form = $compile(form)(scope);
 			element.append(form);
+			
+			if (schema.width) {
+				element.addClass('has-width');
+				form.css({
+					width: schema.width,
+					minWidth: schema.minWidth,
+					maxWidth: schema.maxWidth
+				});
+			}
 			
 			if (scope._viewResolver) {
 				scope._viewResolver.resolve(schema, element);

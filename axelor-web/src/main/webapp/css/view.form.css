@@ -36,13 +36,32 @@
 
 .view-container .form-view > div:last-child {
 	position: absolute;
-	top: 48px;
+	top: 46px;
 	bottom: 0; left: 0; right: 0;
 	overflow: auto;
 }
 
 .view-container .form-view > div.no-toolbar {
 	top: 0;
+}
+
+.view-container .form-view div[ui-view-form].has-width {
+	padding: 8px 16px;
+	background-color: #f7f7f9;
+}
+
+.view-container .form-view div[ui-view-form].has-width form:first-of-type {
+	padding: 12px;
+	margin: auto;
+	
+	background-color: #fff;
+	
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: 4px;
+	box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+	
+	width: 900px;
+	overflow: auto;
 }
 
 form.dynamic-form {
