@@ -522,28 +522,31 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 			selectMode: "@"
 		},
 		link: function(scope, element, attrs) {
-			
+
 			var initialized = false;
+			var width = $(window).width();
+			var height = $(window).height();
+			
+			width = (60 * width / 100);
+			height = (70 * height / 100);
+
 			scope.onOpen = function(e, ui) {
 
 				setTimeout(function(){
 					
 					element.find('input[type=text]:first').focus();
 					$.event.trigger('adjustSize');
-					
+
 					//XXX: ui-dialog issue
-					var zIndex = element.zIndex();
-					element.find('.slick-headerrow-column').zIndex(zIndex);
+					element.find('.slick-headerrow-column').zIndex(element.zIndex());
 
-					if (initialized)
+					if (initialized) {
 						return;
+					}
 
-					var width = $(window).width();
-					var height = $(window).height();
-					
-					element.dialog('option', 'width', (70 * width / 100));
-					element.dialog('option', 'height', (70 * height / 100));
-					
+					element.dialog('option', 'width', width);
+					element.dialog('option', 'height', height);
+
 					element.closest('.ui-dialog').position({
 				      my: "center",
 				      at: "center",
