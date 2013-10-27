@@ -520,12 +520,6 @@ Grid.prototype.parse = function(view) {
 			}
 		});
 		cols.unshift(editColumn.getColumnDefinition());
-		
-		if (handler.isReadonly) {
-			handler.$watch('isReadonly()', function (readonly) {
-				that.showColumn('_edit_column', !readonly);
-			});
-		}
 	}
 
 	// create checkbox column
