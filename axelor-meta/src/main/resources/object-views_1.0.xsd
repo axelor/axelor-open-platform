@@ -163,8 +163,30 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="width">
+      <xsd:annotation>
+        <xsd:documentation>
+        The preferred width of the view.&lt;br&gt;&lt;br&gt;
+      
+        The width can be specified as percentage or fixed value followed by
+        optional min/max widths separated by ':' character.&lt;br&gt;&lt;br&gt;
+        
+        For example: &lt;br&gt;&lt;pre&gt;
+          width="720"
+          width="80%"
+          width="80%:600:700"&lt;/pre&gt;
+          
+        The fix width can be either in 'px' or 'em', 'px' is assumed if not specified.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="((\*)|(\d+)(%|px|em)?)((:(\d+)(px|em)?){1,2})?"></xsd:pattern>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
   </xsd:complexType>
-  
+
   <xsd:complexType name="ObjectView" abstract="true">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractView">
@@ -213,6 +235,13 @@
         <xsd:attribute name="readonly" type="xsd:boolean" />
         <xsd:attribute name="colSpan" type="xsd:int" />
         <xsd:attribute name="css" type="xsd:string"/>
+        <xsd:attribute name="width">
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:pattern value="(\*)|(\d+(%|px|em)?)"></xsd:pattern>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
         <xsd:attribute name="showIf" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
@@ -1142,7 +1171,6 @@
   <xsd:complexType name="GridField">
     <xsd:complexContent>
       <xsd:extension base="tns:Field">
-        <xsd:attribute name="width" type="xsd:integer"/>
         <xsd:attribute name="aggregate">
           <xsd:simpleType>
             <xsd:restriction base="xsd:string">

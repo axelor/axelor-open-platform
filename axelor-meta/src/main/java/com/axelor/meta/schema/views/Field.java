@@ -89,9 +89,6 @@ public class Field extends SimpleWidget {
 	@XmlAttribute
 	private String validIf;
 
-	@XmlAttribute
-	private Integer width;
-
 	@XmlAttribute(name = "min")
 	private String minSize;
 
@@ -258,14 +255,6 @@ public class Field extends SimpleWidget {
 
 	public void setValidIf(String validIf) {
 		this.validIf = validIf;
-	}
-
-	public Integer getWidth() {
-		return width;
-	}
-
-	public void setWidth(Integer width) {
-		this.width = width;
 	}
 
 	@JsonIgnore

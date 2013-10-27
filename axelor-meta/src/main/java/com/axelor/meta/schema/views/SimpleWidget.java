@@ -74,6 +74,9 @@ public abstract class SimpleWidget extends AbstractWidget {
 	@XmlAttribute
 	private String css;
 
+	@XmlAttribute
+	private String width;
+
 	public String getName() {
 		return name;
 	}
@@ -172,5 +175,13 @@ public abstract class SimpleWidget extends AbstractWidget {
 
 	public void setCss(String css) {
 		this.css = css;
+	}
+
+	public String getWidth() {
+		return width;
+	}
+
+	public void setWidth(String width) {
+		this.width = width;
 	}
 }
