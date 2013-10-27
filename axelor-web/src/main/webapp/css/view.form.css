@@ -50,10 +50,8 @@
 	background-color: #f7f7f9;
 }
 
-.view-container .form-view > div[ui-view-form].has-width > form:first-of-type {
-	padding: 12px;
-	margin: auto;
-	
+.view-container .form-view > div[ui-view-form].has-width > form {
+	padding: 8px;
 	background-color: #fff;
 	
 	border: 1px solid rgba(0, 0, 0, 0.2);
@@ -64,8 +62,12 @@
 	overflow: auto;
 }
 
+.ui-dialog-content > div[ui-view-form] {
+	min-width: 400px;
+}
+
 form.dynamic-form {
-	margin: 0;
+	margin: 4px auto;
 }
 
 table.form-layout {
