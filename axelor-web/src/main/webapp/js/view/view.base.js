@@ -333,6 +333,93 @@ angular.module('axelor.ui').directive('uiViewPane', function() {
 	};
 });
 
+angular.module('axelor.ui').directive('uiViewPopup', function() {
+	
+	return {
+		controller: ['$scope', '$attrs', function ($scope, $attrs) {
+			var params = $scope.$eval($attrs.uiViewPopup);
+
+			$scope.tab = params;
+			$scope._isPopup = true;
+		}],
+		link: function (scope, element, attrs) {
+
+			var initialized = false,
+				width = $(window).width(),
+				height = $(window).height();
+
+			width = (60 * width / 100);
+			height = (70 * height / 100);
+
+			function adjust(how) {
+				element.find('input[type=text]:first').focus();
+				$.event.trigger('adjustSize');
+
+				//XXX: ui-dialog issue
+				element.find('.slick-headerrow-column').zIndex(element.zIndex());
+
+				if (initialized) {
+					return;
+				}
+
+				element.dialog('option', 'width', width);
+				element.dialog('option', 'height', height);
+				
+				element.closest('.ui-dialog').position({
+			      my: "center",
+			      at: "center",
+			      of: window
+			    });
+				
+				initialized = true;
+			}
+			
+			// a flag used by evalScope to detect popup (see form.base.js)
+			scope._isPopup = true;
+			
+			scope.onPopupOpen = function () {
+				adjust();
+			};
+
+			scope.onPopupClose = function () {
+				try {
+					return scope.closeTab(scope.tab);
+				} finally {
+					setTimeout(function () {
+						scope.$apply();
+					});
+				}
+			};
+			
+			scope.$watch('viewTitle', function (title) {
+				if (title) {
+					element.closest('.ui-dialog').find('.ui-dialog-title').text(title);
+				}
+			});
+			
+			var unwatch = scope.$watch("_viewParams.$viewScope.schema", function(schema) {
+				if (initialized || !schema) {
+					return;
+				}
+				unwatch();
+				if (schema.width) {
+					width = schema.maxWidth || schema.width;
+				}
+				setTimeout(function () {
+					scope.ajaxStop(function () {
+						element.dialog('open');
+					});
+				});
+			});
+		},
+		replace: true,
+		template:
+			'<div ui-dialog x-on-open="onPopupOpen" x-on-close="onPopupClose" x-on-ok="false" x-on-before-close="onBeforeClose">' +
+				'<div ui-view-pane="tab"></div>' +
+			'</div>'
+	};
+});
+
 angular.module('axelor.ui').directive('uiRecordPager', function(){
 
 	return {

@@ -588,6 +588,10 @@ ActionHandler.prototype = {
 				if (!views.grid) tab.views.push({type: 'grid'});
 				if (!views.form) tab.views.push({type: 'form'});
 			}
+			
+			if (tab.params && tab.params.popup) {
+				tab.$popupParent = formScope;
+			}
 			openTab(scope, tab);
 		}
 		

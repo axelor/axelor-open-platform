@@ -755,7 +755,9 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			element.append(form);
 			
 			if (schema.width) {
-				element.addClass('has-width');
+				if (!scope._isPopup) {
+					element.addClass('has-width');
+				}
 				form.css({
 					width: schema.width,
 					minWidth: schema.minWidth,
