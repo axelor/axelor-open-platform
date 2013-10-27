@@ -105,7 +105,9 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 
 			scope.$on('$destroy', function(){
 				if (dialog) {
-					dialog.dialog('destroy');
+					if (dialog.data('dialog')) {
+						dialog.dialog('destroy');
+					}
 					dialog.remove();
 					dialog = null;
 				}
