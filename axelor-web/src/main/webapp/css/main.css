@@ -391,12 +391,21 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 
 .navigation-tabs ul.nav-tabs-main {
 	margin-bottom: 0px;
+	padding: 0 8px;
 	height: 35px;
 }
 
 .navigation-tabs {
 	position: absolute;
-	top: 8px; left: 4px; right: 4px; bottom: 4px;
+	top: 8px; left: 0; right: 0; bottom: 0;
+}
+
+.navigation-tabs > .nav-tabs-wrap {
+	margin-right: 100px;
+}
+
+.navigation-tabs > .axelor-logo {
+	border-bottom: 1px solid #ddd;
 }
 
 .visible-false {
@@ -430,7 +439,8 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 
 .grid-view > .slickgrid {
 	position: absolute !important;
-	top: 46px; left: 0px; right: 0px; bottom: 0px;
+	top: 43px; left: 0px; right: 0px; bottom: 0px;
+	border: none;
 }
 
 .record-toolbar {
@@ -448,7 +458,7 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 	border-radius: 0;
 	
 	margin: 0;
-	padding: 0;
+	padding: 0 4px;
 }
 
 .record-toolbar button {
