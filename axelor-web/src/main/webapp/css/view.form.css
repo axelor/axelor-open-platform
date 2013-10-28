@@ -100,6 +100,7 @@ table.form-layout td.form-label {
 	padding-left: 8px;
 	padding-right: 4px;
 	width: 15%;
+	min-width: 100px;
 }
 
 table.form-layout td.form-item.boolean-item {
@@ -593,6 +594,7 @@ table.field-details .help-text hr {
 	display: inline-block;
 	padding-right: 35px;
 	height: 38px;
+	margin: 0;
 }
 
 .nav-select li {
