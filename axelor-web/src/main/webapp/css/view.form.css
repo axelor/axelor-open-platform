@@ -58,7 +58,8 @@
 	border-radius: 4px;
 	box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
 	
-	width: 900px;
+	width: 90%;
+	min-width: 600px;
 	overflow: auto;
 }
 
