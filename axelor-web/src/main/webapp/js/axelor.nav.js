@@ -152,7 +152,7 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		});
 	}
 
-	function __closeTab(tab) {
+	function __closeTab(tab, callback) {
 		
 		var all = tab.$popupParent ? popups : tabs;
 		var index = _.indexOf(all, tab);
@@ -160,6 +160,9 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		// remove tab
 		all.splice(index, 1);
 		
+		if (_.isFunction(callback)) {
+			callback();
+		}
 		if (tab.$popupParent) {
 			return;
 		}
@@ -184,14 +187,14 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		return tab.closable === undefined ? true : tab.closable;
 	}
 
-	function closeTab(tab) {
+	function closeTab(tab, callback) {
 		var viewScope = tab.$viewScope;
 		if (viewScope && viewScope.confirmDirty) {
 			viewScope.confirmDirty(function(){
-				__closeTab(tab);
+				__closeTab(tab, callback);
 			});
 		} else {
-			__closeTab(tab);
+			__closeTab(tab, callback);
 		}
 	}
 	
@@ -338,8 +341,8 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 		return NavService.openTabByName(name, options);
 	};
 
-	$scope.closeTab = function(tab) {
-		return NavService.closeTab(tab);
+	$scope.closeTab = function(tab, callback) {
+		return NavService.closeTab(tab, callback);
 	};
 	
 	$scope.closeTabOthers = function(tab) {

@@ -373,24 +373,35 @@ angular.module('axelor.ui').directive('uiViewPopup', function() {
 				
 				initialized = true;
 			}
-			
-			// a flag used by evalScope to detect popup (see form.base.js)
-			scope._isPopup = true;
-			
+
 			scope.onPopupOpen = function () {
 				adjust();
 			};
+			
+			var canClose = false;
+			scope.onBeforeClose = function(e) {
+				if (canClose) {
+					return;
+				}
+				e.preventDefault();
+				e.stopPropagation();
+
+				scope.closeTab(scope.tab, function() {
+					canClose = true;
+					element.dialog('close');
+				});
+			};
 
 			scope.onPopupClose = function () {
-				try {
-					return scope.closeTab(scope.tab);
-				} finally {
-					setTimeout(function () {
-						scope.$apply();
-					});
+				var tab = scope.tab,
+					params = tab.params || {},
+					parent = tab.$popupParent;
+				if (parent && parent.reload && params.popup === "reload") {
+					parent.reload();
 				}
+				scope.applyLater();
 			};
-			
+
 			scope.$watch('viewTitle', function (title) {
 				if (title) {
 					element.closest('.ui-dialog').find('.ui-dialog-title').text(title);
