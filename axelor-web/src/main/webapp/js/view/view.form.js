@@ -763,6 +763,11 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 				element.addClass('has-width');
 			}
 			
+			var first = _.first(schema.items) || {};
+			if (!schema.width && !schema.colWidths && schema.cols < 4 && !first.items) {
+				schema.width = 600;
+			}
+			
 			if (schema.width) {
 				if (schema.width === '100%' || schema.width === '*') {
 					element.removeClass('has-width');
