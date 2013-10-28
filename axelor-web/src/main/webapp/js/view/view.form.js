@@ -413,13 +413,14 @@ function FormViewCtrl($scope, $element) {
 	};
 	
 	$scope.confirmDirty = function(callback) {
-
-		if (!$scope.isDirty())
+		var params = $scope._viewParams || {};
+		if (!$scope.isDirty() || (params.params && params.params['no-confirm'])) {
 			return callback();
-
+		}
 		axelor.dialogs.confirm(_t("Current changes will be lost. Do you really want to proceed?"), function(confirmed){
-			if (!confirmed)
+			if (!confirmed) {
 				return;
+			}
 			setTimeout(function(){
 				$scope.$apply(function(){
 					callback();
