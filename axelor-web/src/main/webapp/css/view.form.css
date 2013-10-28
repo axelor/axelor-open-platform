@@ -97,7 +97,8 @@ table.form-layout td.form-item {
 
 table.form-layout td.form-label {
 	text-align: left;
-	padding: 0px 4px 0px 16px;
+	padding-left: 8px;
+	padding-right: 4px;
 	width: 15%;
 }
 
