@@ -414,7 +414,7 @@ function FormViewCtrl($scope, $element) {
 	
 	$scope.confirmDirty = function(callback) {
 		var params = $scope._viewParams || {};
-		if (!$scope.isDirty() || (params.params && params.params['no-confirm'])) {
+		if (!$scope.isDirty() || (params.params && params.params['show-confirm'] === false)) {
 			return callback();
 		}
 		axelor.dialogs.confirm(_t("Current changes will be lost. Do you really want to proceed?"), function(confirmed){
