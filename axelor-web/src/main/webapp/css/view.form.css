@@ -91,7 +91,7 @@ table.form-debug td.form-item {
 
 table.form-layout td.form-label,
 table.form-layout td.form-item {
-	padding: 2px 0;
+	padding: 2px;
 	vertical-align: top;
 }
 
