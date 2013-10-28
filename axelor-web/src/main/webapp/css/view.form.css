@@ -91,12 +91,13 @@ table.form-debug td.form-item {
 
 table.form-layout td.form-label,
 table.form-layout td.form-item {
-	padding: 2px;
+	padding: 2px 0;
 	vertical-align: top;
 }
 
 table.form-layout td.form-label {
-	text-align: right;
+	text-align: left;
+	padding: 0px 4px 0px 16px;
 	width: 15%;
 }
 
@@ -115,17 +116,12 @@ table.form-layout td.form-label > label > span {
 	cursor: pointer;
 }
 
-table.form-layout td.form-label > label:after {
-	content: ":";
-}
-
 table.form-layout td.form-label label.required {
 	color: #B94A48;
 }
 
 table.form-layout td.form-label label.readonly {
 	color: inherit;
-	padding-left: 16px;
 }
 
 table.form-layout td.form-item > *,
@@ -548,6 +544,7 @@ table.field-details .help-text hr {
 }
 
 .subtotal label {
+	text-align: right;
 	font-weight: normal !important;	
 }
 

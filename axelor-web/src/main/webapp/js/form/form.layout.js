@@ -132,7 +132,7 @@ function TableLayout(items, attrs, $scope, $compile) {
 		labelCols += (emptyCols / 2);
 		itemCols += (emptyCols / 2) + (emptyCols % 2);
 
-		var labelWidth = labelCols ? Math.min(30, (10 * labelCols)) / labelCols : 0;
+		var labelWidth = labelCols ? Math.min(50, (12 * labelCols)) / labelCols : 0;
 		var itemWidth = (100 - (labelWidth * labelCols)) / itemCols;
 
 		_.each(row, function(cell, i) {
