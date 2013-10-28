@@ -591,8 +591,9 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 	margin: 0 0 8px;
 }
 
-.search-view .search-view-form {
-
+.search-view .search-view-form,
+.search-view .search-view-toolbar {
+	margin: 4px;
 }
 
 .search-view .search-view-toolbar table.form-layout {
@@ -607,6 +608,7 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 .search-view .search-view-grid .slickgrid {
 	position: absolute;
 	top: 0; left: 0; right: 0; bottom: 0;
+	border: none;
 }
 
 .unselectable-text {
