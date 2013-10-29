@@ -151,7 +151,7 @@ public class CSVBinder {
 
 		if (this.query != null) {
 			LOG.trace("search: " + this.query);
-			Object bean = JPA.all((Class<Model>) beanClass).filter(query).bind(params).fetchOne();
+			Object bean = JPA.all((Class<Model>) beanClass).filter(query).bind(params).cacheable().autoFlush(false).fetchOne();
 			LOG.trace("search found: " + bean);
 			if (update || bean != null) {
 				return bean;
@@ -168,7 +168,7 @@ public class CSVBinder {
 
 	@SuppressWarnings("unchecked")
 	private Object findAll(Class<?> beanClass, String query, Map<String, Object> params) {
-		return JPA.all((Class<Model>) beanClass).filter(query).bind(params).fetch();
+		return JPA.all((Class<Model>) beanClass).filter(query).bind(params).cacheable().autoFlush(false).fetch();
 	}
 
 	private boolean isBound(CSVBinding cb, Map<String, Object> values) {
