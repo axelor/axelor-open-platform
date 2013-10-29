@@ -351,7 +351,7 @@
         <xsd:sequence>
           <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0"/>
           <xsd:element name="menubar" type="tns:Menubar" minOccurs="0"/>
-          <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" maxOccurs="1" />
+          <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" maxOccurs="unbounded" />
           <xsd:element name="field" type="tns:GridField" maxOccurs="unbounded" />
           <xsd:element name="button" type="tns:Button" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
@@ -991,8 +991,8 @@
   <xsd:complexType name="Field">
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleWidget">
-        <xsd:all>
-          <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" >
+        <xsd:sequence>
+          <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" maxOccurs="unbounded">
             <xsd:annotation>
               <xsd:documentation>
                 Hilite the field with given color/background-color combination.
@@ -1001,7 +1001,7 @@
           </xsd:element>
           <xsd:element name="grid" type="tns:GridView" minOccurs="0" />
           <xsd:element name="form" type="tns:FormView" minOccurs="0" />
-        </xsd:all>
+        </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="placeholder" type="xsd:string" />
         <xsd:attribute name="widget" type="xsd:string" />
