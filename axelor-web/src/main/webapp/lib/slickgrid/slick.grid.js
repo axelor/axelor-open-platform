@@ -922,6 +922,13 @@ if (typeof Slick === "undefined") {
         $style[0].appendChild(document.createTextNode(rules.join(" ")));
       }
     }
+    
+    function __updateCanvasWidth() {
+      if (this.count > 1) return;
+      this.count = this.count || 0;
+      this.count = this.count + 1;
+      updateCanvasWidth(true);
+    }
 
     function getColumnCssRules(idx) {
       if (!stylesheet) {
@@ -934,7 +941,8 @@ if (typeof Slick === "undefined") {
         }
 
         if (!stylesheet) {
-          throw new Error("Cannot find stylesheet.");
+          setTimeout(__updateCanvasWidth, 100);
+          return;
         }
 
         // find and cache column CSS rules
@@ -1106,9 +1114,10 @@ if (typeof Slick === "undefined") {
         w = columns[i].width;
 
         rule = getColumnCssRules(i);
-        rule.left.style.left = x + "px";
-        rule.right.style.right = (canvasWidth - x - w) + "px";
-
+        if (rule) {
+          rule.left.style.left = x + "px";
+          rule.right.style.right = (canvasWidth - x - w) + "px";
+        }
         x += columns[i].width;
       }
     }
