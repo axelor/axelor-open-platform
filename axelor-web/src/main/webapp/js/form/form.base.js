@@ -161,13 +161,20 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			return element.toggleClass("readonly", readonly);
 		});
 		
-		function setHighlight(highlight) {
-			var params = field.hilite,
-				label = null;
-			if (params && params.css) {
-				label = element.data('label') || $();
-				element.toggleClass(params.css, highlight);
-				label.toggleClass(params.css.replace(/(hilite-[^-]+\b(?!-))/g, ''), highlight);
+		function setHighlight(args) {
+
+			function doHilite(params, passed) {
+				var label = element.data('label') || $();
+				element.toggleClass(params.css, passed);
+				label.toggleClass(params.css.replace(/(hilite-[^-]+\b(?!-))/g, ''), passed);
+			}
+			
+			_.each(field.hilites, function(p) {
+				if (p.css) doHilite(p, false);
+			});
+			
+			if (args && args.hilite && args.hilite.css) {
+				doHilite(args.hilite, args.passed);
 			}
 		}
 
