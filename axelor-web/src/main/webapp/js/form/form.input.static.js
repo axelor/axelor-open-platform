@@ -301,17 +301,23 @@ ui.formItem('ToolButton', 'Button', {
 		scope.btn.isHidden = function() {
 			return scope.isHidden();
 		};
-
-		scope.$watch("isHidden()", function(hidden, old) {
-			setTimeout(function() {
-				element.parent().children().removeClass('btn-fix-left btn-fix-right');
-				element.parent().children(':visible:first').addClass('btn-fix-left');
-				element.parent().children(':visible:last').addClass('btn-fix-right');
-			});
-		});
 	},
 
 	template: '<button class="btn" name="{{btn.name}}" ui-actions ui-widget-states>{{title}}</button>'
+});
+
+ui.directive('uiBtnGroupHelper', function () {
+	
+	return function (scope, element, attrs) {
+		if (!element.is('.btn-group')) {
+			return;
+		}
+		scope.$watch(function() {
+			element.children().removeClass('btn-fix-left btn-fix-right');
+			element.children(':visible:first').addClass('btn-fix-left');
+			element.children(':visible:last').addClass('btn-fix-right');
+		});
+	};
 });
 
 })(this);

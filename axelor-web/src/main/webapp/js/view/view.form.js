@@ -683,7 +683,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 		var logInfo = null;
 		scope.onShowLog = function(e) {
 			if (logInfo === null) {
-				logInfo = $(e.target).parents("div:first").find("button").popover({
+				logInfo = $(e.delegateTarget).popover({
 					title: _t('Update Log'),
 					html: true,
 					content: getContent,
