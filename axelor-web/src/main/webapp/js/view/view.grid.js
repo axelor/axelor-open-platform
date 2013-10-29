@@ -315,7 +315,7 @@ function GridViewCtrl($scope, $element) {
 	$scope.onEdit = function(force) {
 		page.index = $scope.selection[0];
 		$scope.switchTo('form', function (formScope) {
-			if (force) {
+			if (force && formScope.canEdit()) {
 				formScope.onEdit();
 			}
 		});
