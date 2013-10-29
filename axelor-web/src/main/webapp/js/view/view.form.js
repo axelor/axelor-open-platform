@@ -416,13 +416,16 @@ function FormViewCtrl($scope, $element) {
 		return defer.promise;
 	};
 	
-	$scope.confirmDirty = function(callback) {
+	$scope.confirmDirty = function(callback, cancelCallback) {
 		var params = $scope._viewParams || {};
 		if (!$scope.isDirty() || (params.params && params.params['show-confirm'] === false)) {
 			return callback();
 		}
 		axelor.dialogs.confirm(_t("Current changes will be lost. Do you really want to proceed?"), function(confirmed){
 			if (!confirmed) {
+				if (cancelCallback) {
+					cancelCallback();
+				}
 				return;
 			}
 			setTimeout(function(){

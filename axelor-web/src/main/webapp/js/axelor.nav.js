@@ -198,9 +198,10 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		}
 	}
 	
-	function closeTabOthers(current) {
+	function closeTabs(selected) {
+		var all = _.flatten([selected], true);
 		var i, tab, viewScope;
-		
+
 		function select(tab) {
 			if (!tab.selected) {
 				tab.selected = true;
@@ -208,25 +209,46 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 			}
 		}
 		
-		function close(index) {
-			tabs.splice(index, 1);
-			closeTabOthers(current);
+		function close(tab, ignore) {
+			var at = tabs.indexOf(tab);
+			if (at > -1) {
+				tabs.splice(at, 1);
+			}
+			if (selected === tab) {
+				selected = null;
+			}
+			var rest = _.difference(selected, [ignore, tab]);
+			closeTabs(rest);
 		}
 		
-		for (i = 0; i < tabs.length; i++) {
-			tab = tabs[i];
-			if (tab === current) {
-				select(tab);
-				continue;
-			}
+		for (i = 0; i < all.length; i++) {
+			tab = all[i];
 			viewScope = tab.$viewScope;
-			if (viewScope && viewScope.confirmDirty && viewScope.isDirty()) {
+			if (viewScope && viewScope.confirmDirty) {
+				select(tab);
 				return viewScope.confirmDirty(function(){
-					return close(i);
+					return close(tab);
+				}, function() {
+					close(null, tab);
+					viewScope.applyLater();
 				});
 			}
-			return close(i);
+			return close(tab);
 		}
+		
+		var first = _.first(tabs);
+		if (first && !first.selected && !selected) {
+			openTab(first);
+		}
+	}
+	
+	function closeTabOthers(current) {
+		var rest = _.difference(tabs, [current]);
+		if (current && !current.selected) {
+			current.selected = true;
+			openTab(current);
+		}
+		return closeTabs(rest);
 	}
 	
 	function closeTabAll() {
