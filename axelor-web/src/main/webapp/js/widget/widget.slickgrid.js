@@ -870,34 +870,37 @@ Grid.prototype.hilite = function (row, field) {
 
 	if (!field) {
 		_.each(this.scope.fields_view, function (item) {
-			if (item.hilite) this.hilite(row, item);
+			if (item.hilites) this.hilite(row, item);
 		}, this);
 	}
 	
+	var hilites = field ? field.hilites : view.hilites;
+	if (!hilites || hilites.length === 0) {
+		return null;
+	}
+	
 	record.$style = null;
-
-	params = field ? field.hilite : view.hilite;
-	if (!params) {
-		return null;
-	}
-
-	var condition = params.condition,
-		styles = null,
-		pass = false;
-
-	try {
-		pass = axelor.$eval(this.scope, condition, record);
-	} catch (e) {
-	}
-	if (!pass) {
-		return null;
-	}
-
-	if (field) {
-		styles = record.$styles || (record.$styles = {});
-		styles[field.name] = params.css;
-	} else {
-		record.$style = params.css;
+	
+	for (var i = 0; i < hilites.length; i++) {
+		var params = hilites[i],
+			condition = params.condition,
+			styles = null,
+			pass = false;
+		
+		try {
+			pass = axelor.$eval(this.scope, condition, record);
+		} catch (e) {
+		}
+		if (!pass) {
+			continue;
+		}
+		if (field) {
+			styles = record.$styles || (record.$styles = {});
+			styles[field.name] = params.css;
+		} else {
+			record.$style = params.css;
+		}
+		break;
 	}
 };
 

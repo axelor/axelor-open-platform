@@ -125,6 +125,34 @@ ui.directive('uiWidgetStates', function() {
 		}
 	}
 	
+	function handleHilites(scope, field) {
+		if (!field || _.isEmpty(field.hilites)) {
+			return;
+		}
+		
+		var hilites = field.hilites || [];
+		
+		function handle(rec) {
+			for (var i = 0; i < hilites.length; i++) {
+				var hilite = hilites[i];
+				var value = axelor.$eval(scope, hilite.condition, rec);
+				if (value) {
+					return scope.attr('highlight', {
+						hilite: hilite,
+						passed: value
+					});
+				}
+			}
+			return scope.attr('highlight', {});
+		}
+		
+		scope.$on("on:record-change", function(e, rec) {
+			if (rec === scope.record) {
+				handle(rec);
+			}
+		});
+	}
+	
 	function register(scope) {
 		var field = scope.field;
 		if (field == null) {
@@ -143,9 +171,7 @@ ui.directive('uiWidgetStates', function() {
 		handleFor("required", "requiredIf");
 		handleFor("collapse", "collapseIf");
 
-		if (field.hilite) {
-			handleCondition(scope, field, "highlight", field.hilite.condition);
-		}
+		handleHilites(scope, field);
 	};
 
 	return function(scope, element, attrs) {
