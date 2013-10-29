@@ -33,6 +33,7 @@ package com.axelor.meta;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -140,8 +141,15 @@ public class MetaLoader {
 	}
 
 	private ObjectViews unmarshal(String xml) throws JAXBException {
-		StringReader reader = new StringReader(prepareXML(xml));
-		return (ObjectViews) unmarshaller.unmarshal(reader);
+		synchronized (unmarshaller) {
+			return (ObjectViews) unmarshaller.unmarshal(new StringReader(prepareXML(xml)));
+		}
+	}
+
+	private void marshal(ObjectViews views, Writer writer) throws JAXBException {
+		synchronized (marshaller) {
+			marshaller.marshal(views, writer);
+		}
 	}
 
 	private String stripWhiteSpaces(String text) {
@@ -192,7 +200,7 @@ public class MetaLoader {
 			views.setViews((List)obj);
 		}
 		try {
-			marshaller.marshal(views, writer);
+			marshal(views, writer);
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
