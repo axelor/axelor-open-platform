@@ -234,7 +234,6 @@ public class CSVLogger {
 
 		if(configFile == null) {
 			this.createConfigFile();
-			LOG.error("Error while creating file {}", this.configFile.getName());
 
 			for (DataAdapter adapter : this.csvConfig.getAdapters()) {
 				sb.append(xStream.toXML(adapter));
