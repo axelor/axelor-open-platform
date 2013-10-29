@@ -55,7 +55,8 @@ public class GridView extends AbstractView {
 	@XmlAttribute(name = "edit-icon")
 	private Boolean editIcon = Boolean.TRUE;
 
-	private Hilite hilite;
+	@XmlElement(name = "hilite")
+	private List<Hilite> hilites;
 
 	@XmlElements({
 		@XmlElement(name="field", type=Field.class),
@@ -95,12 +96,12 @@ public class GridView extends AbstractView {
 		this.editIcon = editIcon;
 	}
 
-	public Hilite getHilite() {
-		return hilite;
+	public List<Hilite> getHilites() {
+		return hilites;
 	}
 
-	public void setHilite(Hilite hilite) {
-		this.hilite = hilite;
+	public void setHilites(List<Hilite> hilites) {
+		this.hilites = hilites;
 	}
 
 	public List<AbstractWidget> getItems() {
