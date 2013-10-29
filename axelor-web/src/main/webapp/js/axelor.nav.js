@@ -198,9 +198,8 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		}
 	}
 	
-	function closeTabs(selected) {
-		var all = _.flatten([selected], true);
-		var i, tab, viewScope;
+	function closeTabs(selection) {
+		var all = _.flatten([selection], true);
 
 		function select(tab) {
 			if (!tab.selected) {
@@ -214,16 +213,12 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 			if (at > -1) {
 				tabs.splice(at, 1);
 			}
-			if (selected === tab) {
-				selected = null;
-			}
-			var rest = _.difference(selected, [ignore, tab]);
-			closeTabs(rest);
+			closeTabs(_.difference(selection, [ignore, tab]));
 		}
-		
-		for (i = 0; i < all.length; i++) {
-			tab = all[i];
-			viewScope = tab.$viewScope;
+
+		for (var i = 0; i < all.length; i++) {
+			var tab = all[i];
+			var viewScope = tab.$viewScope;
 			if (viewScope && viewScope.confirmDirty) {
 				select(tab);
 				return viewScope.confirmDirty(function(){
@@ -235,10 +230,18 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 			}
 			return close(tab);
 		}
+
+		if (tabs.indexOf(selected) == -1) {
+			selected = null;
+		}
+		
+		if (selected) {
+			return openTab(selected);
+		}
 		
 		var first = _.first(tabs);
-		if (first && !first.selected && !selected) {
-			openTab(first);
+		if (first && !first.selected) {
+			return openTab(first);
 		}
 	}
 	
