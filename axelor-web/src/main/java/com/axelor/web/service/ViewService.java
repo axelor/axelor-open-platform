@@ -30,6 +30,7 @@
  */
 package com.axelor.web.service;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -84,17 +85,65 @@ public class ViewService extends AbstractService {
 	@GET
 	@Path("models")
 	public Response models() {
-		return Resource.models(new Request());
+
+		final List<Permission> permissions = this.getPermissions(null);
+		final Response response = new Response();
+		if (permissions == null) {
+			return Resource.models(new Request());
+		}
+
+		final List<String> all = Lists.newArrayList();
+		final User user = AuthUtils.getUser();
+		if (user.getGroup().getRestricted() == Boolean.TRUE) {
+			for (Permission p : permissions) {
+				if (p.getObject() == null || (p.getCanRead() != Boolean.TRUE && p.getReadCondition() == null)) {
+					continue;
+				}
+				all.add(p.getObject());
+			}
+		} else {
+			final List<String> exclude = Lists.newArrayList();
+			for (Permission p : permissions) {
+				if (p.getObject() == null || (p.getCanRead() != Boolean.TRUE && p.getReadCondition() == null)) {
+					exclude.add(p.getObject());
+				}
+			}
+			for (Class<?> cls : JPA.models()) {
+				if (exclude.indexOf(cls.getName()) == -1) {
+					all.add(cls.getName());
+				}
+			}
+		}
+
+		Collections.sort(all);
+
+		response.setData(all);
+		response.setTotal(all.size());
+		response.setStatus(Response.STATUS_SUCCESS);
+		return response;
 	}
 
 	@GET
 	@Path("fields/{model}")
 	public Response fields(@PathParam("model") String model) {
-
 		final Response response = new Response();
 		final Map<String, Object> meta = Maps.newHashMap();
 		final Class<?> modelClass = findClass(model);
 		final List<Object> fields = Lists.newArrayList();
+		final List<Permission> permissions = this.getPermissions(model);
+
+		if (permissions != null) {
+			final User user = AuthUtils.getUser();
+			final Permission perm = permissions.isEmpty() ? null : permissions.get(0);
+			if (perm == null && user.getGroup().getRestricted() == Boolean.TRUE) {
+				response.setStatus(Response.STATUS_FAILURE);
+				return response;
+			}
+			if (perm != null && perm.getCanRead() != Boolean.TRUE && perm.getReadCondition() == null) {
+				response.setStatus(Response.STATUS_FAILURE);
+				return response;
+			}
+		}
 
 		for (Property p : Mapper.of(modelClass).getProperties()) {
 			Map<String, Object> map = p.toMap();
@@ -205,6 +254,35 @@ public class ViewService extends AbstractService {
 		map.put("remove", p.getCanRemove());
 
 		return map;
+	}
+
+	private List<Permission> getPermissions(String model) {
+		final User user = AuthUtils.getUser();
+		if (user == null || user.getGroup() == null
+				|| "admin".equals(user.getCode())
+				|| "admins".equals(user.getGroup().getCode())) {
+			return null;
+		}
+
+		String s = "SELECT p FROM User u " +
+				"LEFT JOIN u.group AS g " +
+				"LEFT JOIN g.permissions AS p " +
+				"WHERE u.code = :code";
+
+		if (model == null) {
+			s += " AND p.object IS NOT NULL";
+		} else {
+			s += " AND p.object = :obj";
+		}
+
+		TypedQuery<Permission> q = JPA.em().createQuery(s, Permission.class);
+
+		q.setParameter("code", user.getCode());
+		if (model != null) {
+			q.setParameter("obj", model);
+		}
+
+		return q.getResultList();
 	}
 
 	private Property findField(final Mapper mapper, String name) {
