@@ -375,6 +375,14 @@ function FilterFormCtrl($scope, $element, ViewService) {
 			$scope.$parent.$broadcast('on:hide-menu');
 		}
 	};
+	
+	$scope.canExport = function() {
+		var handler = $scope.$parent.handler;
+		if (handler && handler.hasPermission) {
+			return handler.hasPermission('export');
+		}
+		return true;
+	};
 }
 
 ui.directive('uiFilterForm', function() {
@@ -408,6 +416,8 @@ ui.directive('uiFilterForm', function() {
 				"<a href='' ng-click='addFilter()' x-translate>Add filter</a>"+
 				"<span class='divider'>|</span>"+
 				"<a href='' ng-click='clearFilter()' x-translate>Clear</a></li>"+
+				"<span class='divider' ng-if='canExport()'>|</span>"+
+				"<a href='' ng-if='canExport()' ui-grid-export x-translate>Export</a></li>"+
 				"<span class='divider'>|</span>"+
 				"<a href='' ng-click='applyFilter(true)' x-translate>Apply</a></li>"+
 			"<div>"+
@@ -429,6 +439,7 @@ ui.directive('uiFilterBox', function() {
 			var filterView = params ? params['search-filters'] : null;
 			var filterDS = DataSource.create('com.axelor.meta.db.MetaFilter');
 
+			this.$scope = $scope;
 			$scope.model = handler._model;
 			$scope.view = {};
 
