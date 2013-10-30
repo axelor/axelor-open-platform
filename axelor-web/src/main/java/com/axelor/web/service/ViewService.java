@@ -252,6 +252,7 @@ public class ViewService extends AbstractService {
 		map.put("write", p.getCanWrite());
 		map.put("create", p.getCanCreate());
 		map.put("remove", p.getCanRemove());
+		map.put("export", p.getCanExport());
 
 		return map;
 	}
