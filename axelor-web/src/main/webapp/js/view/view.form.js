@@ -643,6 +643,10 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 		elem.attr('x-cols', schema.cols)
 		  	.attr('x-widths', schema.colWidths);
 
+		if (schema.css) {
+			elem.addClass(schema.css);
+		}
+		
 		process(schema.items, elem);
 		
 		return elem;
