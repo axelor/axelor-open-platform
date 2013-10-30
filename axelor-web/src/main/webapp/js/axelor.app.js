@@ -168,18 +168,18 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 			var that = this,
 				args = _.rest(arguments, _.isFunction(func) ? 2: 1);
 
-			func = func || angular.noop;
-						
 			if (_.isFunction(wait)) {
 				func = wait;
 				wait = 0;
 			}
-
+			
+			func = func || angular.noop;
+			
 			return setTimeout(function(){
 		    	return that.$apply(function() {
 		    		return func.apply(null, args);
 		    	});
-		    }, wait);
+		    }, wait || 0);
 		}
 
 		var proto = Object.getPrototypeOf($rootScope);
