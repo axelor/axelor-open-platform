@@ -394,6 +394,7 @@
             <xsd:group ref="tns:FormWidgets" />
           </xsd:choice>
         </xsd:sequence>
+        <xsd:attribute name="css" type="xsd:string"/>
         <xsd:attribute name="cols" type="xsd:int" />
         <xsd:attribute name="colWidths" type="xsd:string" />
         <xsd:attribute name="onLoad" type="xsd:string" />
