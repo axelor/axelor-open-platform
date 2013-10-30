@@ -326,9 +326,10 @@ public class CSVImporter implements Importer {
 					LOG.error("With following exception:", e);
 
 					// Recover the transaction
-					if (JPA.em().getTransaction().getRollbackOnly()) {
+					if (JPA.em().getTransaction().isActive()) {
 						JPA.em().getTransaction().rollback();
 					}
+
 					if (!JPA.em().getTransaction().isActive()) {
 						JPA.em().getTransaction().begin();
 					}
@@ -395,9 +396,9 @@ public class CSVImporter implements Importer {
 		Map<String, Object> ctx = Maps.newHashMap(context);
 
 		bean = binder.bind(values, ctx);
-		LOG.trace("bean created: {}", bean);
 
 		bean = csvInput.call(bean, ctx, injector);
+		LOG.trace("bean created: {}", bean);
 
 		if (bean != null) {
 			JPA.manage((Model) bean);
@@ -431,17 +432,21 @@ public class CSVImporter implements Importer {
 
 			try {
 				this.importRow(row, binder, csvInput, context, true);
+
+				if (JPA.em().getTransaction().isActive()) {
+					JPA.em().getTransaction().commit();
+				}
 			} catch (Exception e) {
+				if (JPA.em().getTransaction().isActive()) {
+					JPA.em().getTransaction().rollback();
+				}
+			} finally {
+				if (!JPA.em().getTransaction().isActive()) {
+					JPA.em().getTransaction().begin();
+				}
 			}
 		}
 
-		if (JPA.em().getTransaction().isActive()) {
-			JPA.em().getTransaction().commit();
-			JPA.em().clear();
-			valuesStack.clear();
-		}
-		if (!JPA.em().getTransaction().isActive()) {
-			JPA.em().getTransaction().begin();
-		}
+		valuesStack.clear();
 	}
 }
