@@ -44,6 +44,9 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 public class FormView extends AbstractView {
 
 	@XmlAttribute
+	private String css;
+
+	@XmlAttribute
 	private Integer cols;
 
 	@XmlAttribute
@@ -77,6 +80,14 @@ public class FormView extends AbstractView {
         @XmlElement(name = "button", type = Button.class)
 	})
 	private List<AbstractWidget> items;
+
+	public String getCss() {
+		return css;
+	}
+
+	public void setCss(String css) {
+		this.css = css;
+	}
 
 	public Integer getCols() {
 		return cols;
