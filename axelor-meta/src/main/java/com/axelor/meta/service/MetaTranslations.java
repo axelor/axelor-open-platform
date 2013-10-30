@@ -45,25 +45,25 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class MetaTranslations implements Translations, Provider<Translations> {
-	
-	private static Locale DEFAULT_LANGUAGE = new Locale("en", "US");
+
+	private static Locale DEFAULT_LANGUAGE = new Locale("en");
 	public static ThreadLocal<Locale> language = new ThreadLocal<Locale>();
-	
-	private Locale getLanguage() {
+
+	public static Locale getLanguage() {
 		MetaUser preferences = MetaUser.findByUser(AuthUtils.getUser());
 		if (preferences != null && !Strings.isNullOrEmpty(preferences.getLanguage())) {
 			return toLocale(preferences.getLanguage());
 		}
 		return language.get() == null ? DEFAULT_LANGUAGE : language.get();
 	}
-	
-	private Locale toLocale(String locale) {
+
+	private static Locale toLocale(String locale) {
 	    String parts[] = locale.split("_", -1);
 	    if (parts.length == 1) return new Locale(parts[0].toLowerCase());
 	    return new Locale(parts[0].toLowerCase(), parts[1].toUpperCase());
 	}
-	
-	private String convertLanguage(Locale locale, boolean minimize) {
+
+	public static String convertLanguage(Locale locale, boolean minimize) {
 		StringBuilder format = new StringBuilder(locale.getLanguage().toLowerCase());
 		if(!minimize && !Strings.isNullOrEmpty(locale.getCountry()))
 			format.append("_").append(locale.getCountry().toUpperCase());
@@ -79,12 +79,12 @@ public class MetaTranslations implements Translations, Provider<Translations> {
 	public String get(String key, String defaultValue) {
 		return get(key, defaultValue, null);
 	}
-	
+
 	@Override
 	public String get(String key, String defaultValue, String domain) {
 		return get(key, defaultValue, domain, null);
 	}
-	
+
 	@Override
 	public String get(String key, String defaultValue, String domain, String type) {
 
@@ -97,7 +97,7 @@ public class MetaTranslations implements Translations, Provider<Translations> {
 		params.add(key);
 		params.add(convertLanguage(getLanguage(),false));
 		params.add(convertLanguage(getLanguage(),true));
-		
+
 		if(domain != null) {
 			query += " AND (self.domain IS NULL OR self.domain = ?4)";
 			params.add(domain);
