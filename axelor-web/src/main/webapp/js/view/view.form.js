@@ -525,6 +525,38 @@ function FormViewCtrl($scope, $element) {
 			});
 		});
 	};
+	
+	$scope.onHotKey = function (e, action) {
+		if (action === "save" && $scope.canSave()) {
+			$scope.onSave();
+		}
+		if (action === "refresh") {
+			$scope.onRefresh();
+		}
+		if (action === "new") {
+			$scope.onNew();
+		}
+		if (action === "edit" && $scope.canEdit()) {
+			$scope.onEdit();
+		}
+		if (action === "delete" && $scope.canCopy()) {
+			$scope.onCopy();
+		}
+		if (action === "select") {
+			$element.find('form :input:visible:first').focus().select();
+		}
+		if (action === "prev" && $scope.canPrev()) {
+			$scope.onPrev();
+		}
+		if (action === "next" && $scope.canNext()) {
+			$scope.onNext();
+		}
+		if (action === "back") {
+			$scope.onBack();
+		}
+		$scope.applyLater();
+		return false;
+	};
 };
 
 ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewService){
@@ -795,5 +827,3 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 }]);
 
 }).call(this);
-
-

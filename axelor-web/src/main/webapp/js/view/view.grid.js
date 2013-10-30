@@ -422,6 +422,39 @@ function GridViewCtrl($scope, $element) {
 			});
 		});
 	};
+	
+	$scope.onHotKey = function (e, action) {
+		if (action === "save" && $scope.canSave()) {
+			$scope.onSave();
+		}
+		if (action === "refresh") {
+			$scope.onRefresh();
+		}
+		if (action === "new") {
+			$scope.onNew();
+		}
+		if (action === "edit" && $scope.canEdit()) {
+			$scope.onEdit(true);
+		}
+		if (action === "delete" && $scope.canDelete()) {
+			$scope.onDelete();
+		}
+		if (action === "select") {
+			var first = $scope.dataView.getItem(0);
+			if (first) {
+				$scope.dataView.$syncSelection([], [first.id]);
+			}
+		}
+		if (action === "prev" && $scope.canPrev()) {
+			$scope.onPrev();
+		}
+		if (action === "next" && $scope.canNext()) {
+			$scope.onNext();
+		}
+
+		$scope.applyLater();
+		return false;
+	};
 }
 
 angular.module('axelor.ui').directive('uiViewGrid', function(){
