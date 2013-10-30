@@ -200,7 +200,9 @@ function DSViewCtrl(type, $scope, $element) {
 					}
 					toolbar.push(button);
 				});
-
+				if (schema.title) {
+					$scope.viewTitle = schema.title;
+				}
 				$scope.fields = fields;
 				$scope.schema = schema;
 				$scope.toolbar = toolbar;
@@ -304,7 +306,6 @@ angular.module('axelor.ui').directive('uiViewPane', function() {
 			
 			$scope.viewList = [];
 			$scope.viewType = null;
-			$scope.viewType = null;
 
 			var switchTo = $scope.switchTo;
 			$scope.switchTo = function (type, callback) {
@@ -313,7 +314,6 @@ angular.module('axelor.ui').directive('uiViewPane', function() {
 					$scope.viewList.push(type);
 				}
 				$scope.viewType = type;
-				$scope.viewTitle = view.title || params.title || $scope.viewTitle;
 				return switchTo(type, callback);
 			};
 
