@@ -525,8 +525,17 @@ function FormViewCtrl($scope, $element) {
 			});
 		});
 	};
-	
+
+	function focusFirst() {
+		$scope._viewPromise.then(function() {
+			setTimeout(function() {
+				$element.find('form :input:visible').not('[readonly],[type=checkbox]').first().focus().select();
+			});
+		});
+	}
+
 	$scope.onHotKey = function (e, action) {
+		
 		if (action === "save" && $scope.canSave()) {
 			$scope.onSave();
 		}
@@ -536,14 +545,17 @@ function FormViewCtrl($scope, $element) {
 		if (action === "new") {
 			$scope.onNew();
 		}
-		if (action === "edit" && $scope.canEdit()) {
-			$scope.onEdit();
+		if (action === "edit") {
+			if ($scope.canEdit()) {
+				$scope.onEdit();
+			}
+			focusFirst();
 		}
 		if (action === "delete" && $scope.canCopy()) {
 			$scope.onCopy();
 		}
 		if (action === "select") {
-			$element.find('form :input:visible:first').focus().select();
+			focusFirst();
 		}
 		if (action === "prev" && $scope.canPrev()) {
 			$scope.onPrev();
@@ -554,7 +566,9 @@ function FormViewCtrl($scope, $element) {
 		if (action === "back") {
 			$scope.onBack();
 		}
+		
 		$scope.applyLater();
+		
 		return false;
 	};
 };
