@@ -50,6 +50,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.inject.Injector;
 
 public class CSVBinder {
 
@@ -69,6 +70,8 @@ public class CSVBinder {
 
 	private Map<String, DataAdapter> adapters = Maps.newHashMap();
 
+	private Injector injector;
+
 	public void registerAdapter(DataAdapter adapter) {
 		adapters.put(adapter.getName(), adapter);
 	}
@@ -77,20 +80,21 @@ public class CSVBinder {
 		return fields;
 	}
 
-	public CSVBinder(Class<?> beanClass, String[] fields, CSVInput csvInput) {
-		this(beanClass, fields, csvInput.getBindings(), true, csvInput.getSearch(), csvInput.isUpdate());
+	public CSVBinder(Class<?> beanClass, String[] fields, CSVInput csvInput, Injector injector) {
+		this(beanClass, fields, csvInput.getBindings(), true, csvInput.getSearch(), csvInput.isUpdate(), injector);
 	}
 
-	public CSVBinder(Class<?> beanClass, String[] fields, CSVBinding csvBind) {
-		this(beanClass, fields, csvBind.getBindings(), false, csvBind.getSearch(), csvBind.isUpdate());
+	public CSVBinder(Class<?> beanClass, String[] fields, CSVBinding csvBind, Injector injector) {
+		this(beanClass, fields, csvBind.getBindings(), false, csvBind.getSearch(), csvBind.isUpdate(), injector);
 	}
 
-	private CSVBinder(Class<?> beanClass, String[] fields, List<CSVBinding> csvBinds, boolean autoBind, String query, boolean update) {
+	private CSVBinder(Class<?> beanClass, String[] fields, List<CSVBinding> csvBinds, boolean autoBind, String query, boolean update, Injector injector) {
 		this.beanClass = beanClass;
 		this.fields = fields;
 		this.bindings = Lists.newArrayList();
 		this.query = query;
 		this.update = update;
+		this.injector = injector;
 
 		if (csvBinds != null)
 			this.bindings.addAll(csvBinds);
@@ -200,10 +204,10 @@ public class CSVBinder {
 			if (cb.getColumn() == null &&
 				cb.getSearch() == null &&
 				cb.getExpression() != null) {
-				value = cb.eval(values);
+				value = cb.evaluate(values, injector);
 			}
 		} else {
-			CSVBinder binder = new CSVBinder(type, fields, cb);
+			CSVBinder binder = new CSVBinder(type, fields, cb, injector);
 			value = binder.bind(values);
 		}
 		values.put(field, value);
@@ -256,7 +260,7 @@ public class CSVBinder {
 			// get default value
 			if (cb.getColumn() == null && cb.getSearch() == null && cb.getExpression() != null) {
 				LOG.trace("expression: " + cb.getExpression());
-				value = cb.eval(values);
+				value = cb.evaluate(values, injector);
 				LOG.trace("value: " + value);
 			}
 
@@ -268,7 +272,7 @@ public class CSVBinder {
 
 			// handle relational fields (including other case of m2m)
 			else if (p.getTarget() != null) {
-				CSVBinder b = new CSVBinder(p.getTarget(), fields, cb);
+				CSVBinder b = new CSVBinder(p.getTarget(), fields, cb, injector);
 				value = b.bind(values);
 			}
 
@@ -319,7 +323,7 @@ public class CSVBinder {
 			String field = cb.getColumn();
 			if (Strings.isNullOrEmpty(field) || !map.containsKey(field))
 				continue;
-			localContext.put(field, cb.eval(map));
+			localContext.put(field, cb.evaluate(map, injector));
 			if (field.contains("."))
 				localContext.put(field.replace(".", "_") + "_", localContext.get(field));
 		}
