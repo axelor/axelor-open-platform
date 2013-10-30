@@ -12,6 +12,7 @@
     <boolean name="canWrite" title="Write"/>
     <boolean name="canCreate" title="Create"/>
     <boolean name="canRemove" title="Remove"/>
+    <boolean name="canExport" title="Export"/>
     <string name="readCondition"/>
     <string name="readParams"/>
     <string name="writeCondition"/>
@@ -20,6 +21,8 @@
     <string name="createParams"/>
     <string name="removeCondition"/>
     <string name="removeParams"/>
+    <string name="exportCondition"/>
+    <string name="exportParams"/>
   </entity>
 
 </domain-models>

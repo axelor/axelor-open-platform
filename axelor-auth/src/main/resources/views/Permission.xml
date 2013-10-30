@@ -11,6 +11,7 @@
     <field name="canWrite" width="75"/>
     <field name="canCreate" width="75"/>
     <field name="canRemove" width="75"/>
+    <field name="canExport" width="75"/>
   </grid>
 
   <form title="Permission" name="permission-form" cols="2" colWidths="*,175">
@@ -23,6 +24,7 @@
         <field name="canWrite"/>
         <field name="canCreate"/>
         <field name="canRemove"/>
+        <field name="canExport"/>
     </group>
     <group title="Read" cols="2" colSpan="2" showIf="canRead">
         <field name="readCondition" title="Condition"/>
@@ -36,9 +38,9 @@
         <field name="createCondition" title="Condition"/>
         <field name="createParams" title="Params"/>
     </group>
-    <group title="Remove" cols="2" colSpan="2" showIf="canRemove">
-        <field name="removeCondition" title="Condition"/>
-        <field name="removeParams" title="Params"/>
+    <group title="Export" cols="2" colSpan="2" showIf="canExport">
+        <field name="exportCondition" title="Condition"/>
+        <field name="exportParams" title="Params"/>
     </group>
   </form>
 
