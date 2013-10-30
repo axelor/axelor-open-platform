@@ -1559,6 +1559,16 @@ ui.directive('uiSlickEditors', function() {
 			$scope.onShow = function(viewPromise) {
 				
 			};
+
+			var _getContext = $scope.getContext;
+			$scope.getContext = function() {
+				var context = _getContext();
+				var handler = $scope.handler || {};
+				if (context && handler.field && handler.field.target) {
+					context._parent = handler.getContext();
+				}
+				return context;
+			};
 			
 			$scope.show();
 		}],
