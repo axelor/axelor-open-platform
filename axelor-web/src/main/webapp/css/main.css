@@ -656,3 +656,13 @@ img.prefix-icon {
 	background-color: inherit;
 	background-image: inherit;
 }
+
+.nvtooltip {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;;
+	font-size: inherit;
+}
+
+.nvtooltip h3 {
+	font-size: 13px;
+	font-weight: bold;
+}

@@ -46,6 +46,12 @@ nv.tooltip.show = function(pos, content, gravity, dist, parentContainer, classes
 	tooltipShow(pos, content, gravity, dist, body, classes);
 };
 
+// i18n
+_.extend(nv.messages, {
+	'Grouped': _t('Grouped'),
+	'Stacked': _t('Stacked')
+});
+
 var ui = angular.module('axelor.ui');
 
 this.ChartCtrl = ChartCtrl;
@@ -167,7 +173,7 @@ function PieChart(scope, element, data) {
 	    .color(d3.scale.category10().range());
 	
 	d3.select(element[0])
-	  .datum([chart_data])
+	  .datum(chart_data)
 	  .transition().duration(1200).call(chart);
 
 	return chart;
