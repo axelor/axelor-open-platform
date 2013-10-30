@@ -91,6 +91,8 @@ ui.formWidget('BaseSelect', {
 			
 			minLength: 0,
 			
+			position: {  collision: "flip"  },
+			
 			source: function(request, response) {
 				scope.loadSelection(request, response);
 			},
