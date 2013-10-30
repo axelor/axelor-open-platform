@@ -151,7 +151,7 @@ public class ViewService extends AbstractService {
 			if (title == null) {
 				title = p.getName();
 			}
-			title = JPA.translate(title, p.getTitle(), modelClass.getName(), "field");
+			title = JPA.translate(p.getName(), p.getTitle(), modelClass.getName(), "field");
 			map.put("title", title);
 			fields.add(map);
 		}
