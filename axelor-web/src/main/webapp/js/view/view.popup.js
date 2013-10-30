@@ -213,6 +213,7 @@ function SelectorCtrl($scope, $element, DataSource, ViewService) {
 		
 		if (!_.isEmpty(selection)) {
 			$scope.$parent.select(selection);
+			$scope.selection = [];
 		}
 
 		$element.dialog('close');
