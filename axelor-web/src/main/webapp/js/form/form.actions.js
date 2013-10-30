@@ -516,6 +516,7 @@ ActionHandler.prototype = {
 					} else if (item.is('label')) {
 						item.html(value);
 					}
+					itemScope.attr('title', value);
 					break;
 				case 'color':
 					//TODO: set color
