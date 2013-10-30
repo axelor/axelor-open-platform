@@ -84,10 +84,12 @@ ui.formWidget('Group', {
 		if (attrs.title === attrs.field) {
 			attrs.$set('title', '');
 		}
-		
-		attrs.$observe('title', function(value){
-			scope.title = value;
-		});
+
+		if (props.showTitle !== false) {
+			attrs.$observe('title', function(value){
+				scope.title = value;
+			});
+		}
 	},
 	transclude: true,
 	template:
