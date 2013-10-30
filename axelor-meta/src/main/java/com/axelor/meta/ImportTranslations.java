@@ -37,6 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.meta.db.MetaTranslation;
+import com.axelor.meta.db.MetaView;
+import com.axelor.meta.service.MetaTranslations;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -70,6 +72,37 @@ public class ImportTranslations {
 			helpT.setTranslation(help_t);
 			helpT.setType("help");
 			helpT.save();
+		}
+		else if("documentation".equals(meta.getType())) {
+			if(!Strings.isNullOrEmpty(help_t)) {
+				String module = values.get("_currentModule").toString();
+				MetaView view = MetaView.all().filter("self.name = ?1 AND self.module = ?2", meta.getDomain(), module).fetchOne();
+				if(view != null && view.getModel() != null) {
+					MetaTranslation searchHelp = MetaTranslation.all().filter("self.key = ?1 AND self.domain = ?2 AND self.type = ?3", meta.getKey(), view.getModel(), "help").fetchOne();
+
+					if(searchHelp == null) {
+						MetaTranslation helpT = new MetaTranslation();
+						helpT.setDomain(view.getModel());
+						helpT.setKey(meta.getKey());
+						helpT.setLanguage(meta.getLanguage());
+						helpT.setTranslation(help_t);
+						helpT.setType("help");
+						helpT.save();
+					}
+				}
+			}
+			if(!Strings.isNullOrEmpty(values.get("title").toString())) {
+				MetaTranslation searchDoc = MetaTranslation.all().filter("self.key = ?1 AND self.domain = ?2 AND self.type = ?3", meta.getKey(), meta.getDomain(), "documentation").fetchOne();
+				if(searchDoc == null) {
+					MetaTranslation doc = new MetaTranslation();
+					doc.setDomain(meta.getDomain());
+					doc.setKey(meta.getKey());
+					doc.setLanguage(MetaTranslations.convertLanguage(MetaTranslations.getLanguage(), false));
+					doc.setTranslation(values.get("title").toString());
+					doc.setType("documentation");
+					doc.save();
+				}
+			}
 		}
 
 		if(meta.getKey() == null || ("documentation".equals(meta.getType()) && Strings.isNullOrEmpty(meta.getTranslation()))) {
