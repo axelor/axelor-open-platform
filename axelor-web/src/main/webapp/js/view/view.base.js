@@ -512,3 +512,63 @@ angular.module('axelor.ui').directive('uiViewSwitcher', function(){
 		'</div>'
 	};
 });
+
+angular.module('axelor.ui').directive('uiHotKeys', function() {
+
+	var keys = {
+		//78: 'new',	// n
+		79: 'new',		// o
+		69: 'edit',		// e
+		83: 'save',		// s
+		68: 'delete',	// d
+		82: 'refresh',	// r
+		70: 'search',	// f
+		71: 'select',	// g
+		74: 'prev',		// j
+		75:	'next',		// n
+		 8: 'back',		// backspace
+		81: 'close'		// q
+	};
+
+	return function(scope, element, attrs) {
+		
+		$(document).on('keydown.axelor-keys', function (e) {
+			
+			if (e.shiftKey || !e.ctrlKey || !scope.selectedTab) {
+				return;
+			}
+			
+			var tab = scope.selectedTab,
+				vs = tab.$viewScope;
+			
+			if (!vs || !keys.hasOwnProperty(e.which)) {
+				return;
+			}
+
+			var action = keys[e.which];
+			
+			if (action === "close") {
+				scope.closeTab(tab, function() {
+					scope.applyLater();
+				});
+				return false;
+			}
+			
+			if (action === "search") {
+				var filterBox = $('.filter-box .search-query:visible');
+				if (filterBox.size()) {
+					filterBox.focus();
+					return false;
+				}
+			}
+			
+			if (_.isFunction(vs.onHotKey)) {
+				return vs.onHotKey(e, action);
+			}
+		});
+		
+		scope.$on('$destroy', function() {
+			$(document).off('keydown.axelor-keys');
+		});
+	};
+});
