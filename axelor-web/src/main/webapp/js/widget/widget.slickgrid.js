@@ -602,11 +602,14 @@ Grid.prototype.parse = function(view) {
 	element.on('adjustSize', _.debounce(adjustSize, 100));
 	// end performance tweaks
 	
-	dataView.$syncSelection = function(old, oldIds) {
+	dataView.$syncSelection = function(old, oldIds, focus) {
 		var selection = dataView.mapIdsToRows(oldIds);
 		grid.setSelectedRows(selection);
 		if (selection.length === 0 && !grid.getEditorLock().isActive()) {
 			grid.setActiveCell(null);
+        } else if (focus) {
+        	grid.setActiveCell(_.first(selection), 1);
+        	grid.focus();
         }
 	};
 	
