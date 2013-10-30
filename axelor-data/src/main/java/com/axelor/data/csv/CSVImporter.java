@@ -278,7 +278,7 @@ public class CSVImporter implements Importer {
 
 		LOG.debug("Header {}", Arrays.asList(fields));
 
-		CSVBinder binder = new CSVBinder(beanClass, fields, csvInput);
+		CSVBinder binder = new CSVBinder(beanClass, fields, csvInput, injector);
 		String[] values = null;
 
 		int count = 0;
