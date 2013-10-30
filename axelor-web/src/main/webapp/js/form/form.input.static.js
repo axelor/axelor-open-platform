@@ -277,9 +277,14 @@ ui.formItem('Button', {
 			}
 			return element.removeClass("disabled");
 		});
+		
+		scope.$watch('attr("title")', function(title, old) {
+			if (!title || title === old) return;
+			element.children('.btn-text').html(title);
+		});
 	},
 	template: '<a href="" class="btn">'+
-		'<span ng-transclude></span>'+
+		'<span class="btn-text" ng-transclude></span>'+
 	'</a>'
 });
 

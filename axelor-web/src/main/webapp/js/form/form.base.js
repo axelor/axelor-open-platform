@@ -61,7 +61,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		var getViewDef = this.getViewDef || scope.getViewDef || function() {return {}; };
 
 		var field = getViewDef.call(scope, element);
-		var props = _.pick(field, ['readonly', 'required', 'hidden']);
+		var props = _.pick(field, ['readonly', 'required', 'hidden', 'title']);
 		var state = _.clone(props);
 		
 		if (field.css) {
