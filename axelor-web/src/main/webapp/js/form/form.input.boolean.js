@@ -61,4 +61,20 @@ ui.formInput('Boolean', {
 	template_readonly: '<input type="checkbox" disabled="disabled" ng-checked="text">'
 });
 
+/**
+ * The Boolean widget with label on right.
+ */
+ui.formInput('InlineCheckbox', 'Boolean', {
+	css: 'checkbox-inline',
+	showTitle: false,
+	link: function (scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+		scope.$watch('attr("title")', function(title) {
+			scope.label = title;
+		});
+	},
+	template_editable: '<label class="checkbox"><input type="checkbox" ng-model="record[field.name]"> {{label}}</label>',
+	template_readonly: '<label class="checkbox"><input type="checkbox" disabled="disabled" ng-checked="text"> {{label}}</label>'
+});
+
 })(this);
