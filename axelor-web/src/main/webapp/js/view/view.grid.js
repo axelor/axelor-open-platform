@@ -423,6 +423,13 @@ function GridViewCtrl($scope, $element) {
 		});
 	};
 	
+	function focusFirst() {
+		var first = $scope.dataView.getItem(0);
+		if (first) {
+			$scope.dataView.$syncSelection([], [first.id], true);
+		}
+	}
+	
 	$scope.onHotKey = function (e, action) {
 		if (action === "save" && $scope.canSave()) {
 			$scope.onSave();
@@ -433,17 +440,18 @@ function GridViewCtrl($scope, $element) {
 		if (action === "new") {
 			$scope.onNew();
 		}
-		if (action === "edit" && $scope.canEdit()) {
-			$scope.onEdit(true);
+		if (action === "edit") {
+			if ($scope.canEdit()) {
+				$scope.onEdit(true);
+			} else {
+				focusFirst();
+			}
 		}
 		if (action === "delete" && $scope.canDelete()) {
 			$scope.onDelete();
 		}
 		if (action === "select") {
-			var first = $scope.dataView.getItem(0);
-			if (first) {
-				$scope.dataView.$syncSelection([], [first.id]);
-			}
+			focusFirst();
 		}
 		if (action === "prev" && $scope.canPrev()) {
 			$scope.onPrev();
