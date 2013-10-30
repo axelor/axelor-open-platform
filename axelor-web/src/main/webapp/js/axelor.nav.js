@@ -377,6 +377,18 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 	$scope.closeTabAll = function() {
 		return NavService.closeTabAll();
 	};
+	
+	$scope.tabTitle = function(tab) {
+		return tab.title;
+	};
+
+	$scope.tabDirty = function(tab) {
+		var viewScope = tab.$viewScope;
+		if (viewScope && viewScope.isDirty) {
+			return viewScope.isDirty();
+		}
+		return false;
+	};
 
 	$scope.$watch('selectedTab.viewType', function(viewType){
 		if (viewType) {
