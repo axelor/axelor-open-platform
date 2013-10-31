@@ -116,6 +116,7 @@ ui.formInput('CodeEditor', {
 			if (element.is(':visible')) {
 				element.height(props.height);
 				element.width('auto');
+				editor.renderer.updateFull();
 				resize();
 			}
 		});
