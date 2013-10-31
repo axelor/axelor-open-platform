@@ -111,6 +111,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			ds.save(values).success(function(record, page){
 				setTimeout(function(){
 					close(record);
+					$scope.applyLater();
 				});
 			});
 		}
