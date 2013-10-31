@@ -88,6 +88,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			if (_.isEmpty(rec)) {
 				state = _.clone(props);
 			}
+			state["force-edit"] = false;
 		});
 
 		scope.isRequired = function() {
@@ -95,6 +96,9 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		};
 		
 		scope.isReadonly = function() {
+			if (this.attr("force-edit")) {
+				return false;
+			}
 			var parent = this.$parent;
 			if (parent && parent.isReadonly && parent.isReadonly()) {
 				return true;

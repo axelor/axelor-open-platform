@@ -567,8 +567,46 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 			}
 		});
 		
+		$(document).on("dblclick.hot-edit", ".form-item-container.readonly", function (e) {
+			var fs = $(e.target).data('$scope');
+			var field = fs ? fs.field : null;
+			if (!field || field.readonly) {
+				return;
+			}
+			if (fs.canEdit() && fs.isReadonly()) {
+				var parent = $(e.target).parent();
+				fs.attr("force-edit", true);
+				fs.applyLater(function () {
+					setTimeout(function() {
+						parent.find(':input:first').focus().select();
+					});
+				});
+			}
+		});
+		
+		$(document).on("keydown.hot-edit", ".form-item-container.editable", function (e) {
+			if (!(e.which === 13 || e.which === 27) || e.ctrlKey || e.shiftKey) {
+				return;
+			}
+			var elem = $(e.target);
+			if (!elem.is('.form-item-container')) {
+				elem = elem.parents('.form-item-container:first');
+			}
+
+			var fs = elem.data('$scope');
+			var field = fs ? fs.field : null;
+			if (!field || field.readonly || !fs.attr('force-edit')) {
+				return;
+			}
+			
+			fs.attr("force-edit", false);
+			fs.applyLater();
+		});
+		
 		scope.$on('$destroy', function() {
 			$(document).off('keydown.axelor-keys');
+			$(document).off('dblclick:hot-edit');
+			$(document).off('keydown:hot-edit');
 		});
 	};
 });
