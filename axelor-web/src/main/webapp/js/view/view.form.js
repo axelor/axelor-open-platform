@@ -563,7 +563,7 @@ function FormViewCtrl($scope, $element) {
 		if (action === "next" && $scope.canNext()) {
 			$scope.onNext();
 		}
-		if (action === "back") {
+		if (action === "search") {
 			$scope.onBack();
 		}
 		
