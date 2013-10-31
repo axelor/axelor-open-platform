@@ -526,13 +526,22 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 		71: 'select',	// g
 		74: 'prev',		// j
 		75:	'next',		// n
-		 8: 'back',		// backspace
+
+		77: 'focus-menu',		// m
+	   120: 'toggle-menu',		// F9
+		
+		8: 'back',		// backspace
 		81: 'close'		// q
 	};
-
+	
 	return function(scope, element, attrs) {
 		
 		$(document).on('keydown.axelor-keys', function (e) {
+			
+			if (e.which === 120) {
+				$('[nav-menu-toggle]').splitter('toggle');
+				return false;
+			}
 			
 			if (e.shiftKey || !e.ctrlKey || !scope.selectedTab) {
 				return;
@@ -559,6 +568,18 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 				if (filterBox.size()) {
 					filterBox.focus();
 					return false;
+				}
+			}
+			
+			if (action === "focus-menu") {
+				var activeMenu = $('.sidebar .nav-tree li.active');
+				if (activeMenu.size() === 0) {
+					activeMenu = $('.sidebar .nav-tree li:first');
+				}
+				
+				var navTree = activeMenu.parents('[nav-tree]:first');
+				if (navTree.size()) {
+					navTree.navtree('selectItem', activeMenu);
 				}
 			}
 			

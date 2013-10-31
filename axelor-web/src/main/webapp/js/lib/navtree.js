@@ -149,9 +149,10 @@
 		
 		selectItem: function(item) {
 			var el = $(item);
-			if (this.selectedItem)
+			if (this.selectedItem) {
 				this.selectedItem.removeClass('active');
-				this.selectedItem = el.addClass('active');
+			}
+			this.selectedItem = el.addClass('active');
 			el.find('a').focus();
 			el.trigger('navtree:select', el.data('record'));
 		},
@@ -210,8 +211,6 @@
 	  var $this = $(this)
 	    , data = $this.data('nav-tree');
 	  if (!data) $this.data('nav-tree', (data = new NavTree(this, options)));
-	  
-	  
 	  if (typeof options == 'string') data[options].apply(data, params);
 	});
   };
