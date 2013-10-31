@@ -320,7 +320,8 @@ public class Query<T extends Model> {
 			params.put(name, values.get(key));
 		}
 		javax.persistence.Query q = em().createQuery(updateQuery(params));
-		this.bind(q).bind(params);
+		QueryBinder.of(q).bind(params);
+		this.bind(q);
 
 		return q.executeUpdate();
 	}
