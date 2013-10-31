@@ -538,11 +538,26 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 		
 		$(document).on('keydown.axelor-keys', function (e) {
 			
-			if (e.which === 120) {
+			var action = keys[e.which];
+			
+			if (action === "toggle-menu") {
 				$('[nav-menu-toggle]').splitter('toggle');
 				return false;
 			}
-			
+
+			if (action === "focus-menu") {
+				var activeMenu = $('.sidebar .nav-tree li.active');
+				if (activeMenu.size() === 0) {
+					activeMenu = $('.sidebar .nav-tree li:first');
+				}
+				
+				var navTree = activeMenu.parents('[nav-tree]:first');
+				if (navTree.size()) {
+					navTree.navtree('selectItem', activeMenu);
+				}
+				return false;
+			}
+
 			if (e.shiftKey || !e.ctrlKey || !scope.selectedTab) {
 				return;
 			}
@@ -554,8 +569,6 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 				return;
 			}
 
-			var action = keys[e.which];
-			
 			if (action === "close") {
 				scope.closeTab(tab, function() {
 					scope.applyLater();
@@ -568,18 +581,6 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 				if (filterBox.size()) {
 					filterBox.focus();
 					return false;
-				}
-			}
-			
-			if (action === "focus-menu") {
-				var activeMenu = $('.sidebar .nav-tree li.active');
-				if (activeMenu.size() === 0) {
-					activeMenu = $('.sidebar .nav-tree li:first');
-				}
-				
-				var navTree = activeMenu.parents('[nav-tree]:first');
-				if (navTree.size()) {
-					navTree.navtree('selectItem', activeMenu);
 				}
 			}
 			
