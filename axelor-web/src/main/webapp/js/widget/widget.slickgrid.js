@@ -1083,11 +1083,13 @@ Grid.prototype.onKeyDown = function(e, args) {
 };
 
 Grid.prototype.isCellEditable = function(cell) {
-	var cols = this.grid.getColumns();
-	if (cell === null)
+	var cols = this.grid.getColumns(),
+		col = cols[cell];
+	if (!col || col.id === "_edit_column") {
 		return false;
-	var field = (cols[cell] || {}).descriptor || {};
-	return !field.readonly;
+	}
+	var field = col.descriptor || {};
+	return !field.readonly && field.type !== 'button';
 };
 
 Grid.prototype.findNextEditable = function(posY, posX) {
