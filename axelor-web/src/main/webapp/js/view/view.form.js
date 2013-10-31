@@ -536,6 +536,10 @@ function FormViewCtrl($scope, $element) {
 
 	$scope.onHotKey = function (e, action) {
 		
+		if (action === "delete") {
+			return;
+		}
+
 		if (action === "save" && $scope.canSave()) {
 			$scope.onSave();
 		}

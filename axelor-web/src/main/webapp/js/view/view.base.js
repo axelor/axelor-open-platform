@@ -534,13 +534,23 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 	
 	return function(scope, element, attrs) {
 		
+		var loginWindow = $("#loginWindow");
+		
 		$(document).on('keydown.axelor-keys', function (e) {
+			
+			if (loginWindow.is(":visible")) {
+				return;
+			}
 			
 			var action = keys[e.which];
 			
 			if (action === "toggle-menu") {
 				$('[nav-menu-toggle]').splitter('toggle');
 				return false;
+			}
+			
+			if (e.shiftKey || !e.ctrlKey || !scope.selectedTab) {
+				return;
 			}
 
 			if (action === "focus-menu") {
@@ -554,10 +564,6 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 					navTree.navtree('selectItem', activeMenu);
 				}
 				return false;
-			}
-
-			if (e.shiftKey || !e.ctrlKey || !scope.selectedTab) {
-				return;
 			}
 			
 			var tab = scope.selectedTab,
