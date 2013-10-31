@@ -1401,6 +1401,18 @@ Grid.prototype.onItemClick = function(event, args) {
 		return false;
 	}
 
+	//XXX: hack to show popup grid (selector and editable in conflict?)
+	if (this.scope.selector && this.editable) {
+		var col = this.grid.getColumns()[args.cell];
+		if (col && col.forEdit !== false) {
+			this.grid.setActiveCell(args.row, args.cell);
+			this.grid.editActiveCell();
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			return false;
+		}
+	}
+
 	var source = $(event.srcElement);
 	if (source.is("img.slick-img-button")) {
 		return this.onButtonClick(event, args);
