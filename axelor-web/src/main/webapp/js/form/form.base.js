@@ -158,7 +158,8 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		scope.$watch("isReadonly()", function(readonly, old) {
 			if (readonlySet && readonly === old) return;
 			readonlySet = true;
-			return element.toggleClass("readonly", readonly);
+			element.toggleClass("readonly", readonly);
+			element.toggleClass("editable", !readonly);
 		});
 		
 		function setHighlight(args) {
