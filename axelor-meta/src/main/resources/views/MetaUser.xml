@@ -19,7 +19,7 @@
       <field name="user" readonly="true" />
       <field name="email" widget="Email" />
       <field name="language" />
-      <field name="action" domain="self.type = 'action-view' AND self.model IS NULL" widget="SuggestBox"/>
+      <field name="action" domain="self.type = 'action-view'" widget="SuggestBox"/>
   </form>
   
   <menuitem name="menu-user-preferences" parent="menu-auth" title="Preferences"
