@@ -160,6 +160,9 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		// remove tab
 		all.splice(index, 1);
 		
+		if (tabs.length === 0) {
+			selected = null;
+		}
 		if (_.isFunction(callback)) {
 			callback();
 		}
@@ -214,6 +217,9 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 				tabs.splice(at, 1);
 			}
 			closeTabs(_.difference(selection, [ignore, tab]));
+			if (tabs.length === 0) {
+				selected = null;
+			}
 		}
 
 		for (var i = 0; i < all.length; i++) {
