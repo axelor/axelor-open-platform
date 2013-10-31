@@ -307,7 +307,7 @@ var Factory = {
 	
 	getEditor : function(col) {
 		var field = col.descriptor;
-		if (!field || field.readonly) {
+		if (!field || field.readonly || col.forEdit === false) {
 			return null;
 		}
 		if (field.type == 'binary') {
@@ -449,6 +449,7 @@ Grid.prototype.parse = function(view) {
 			name: item.title || _.chain(item.name).humanize().titleize().value(),
 			id: item.name,
 			field: item.name,
+			forEdit: item.forEdit,
 			descriptor: field,
 			sortable: sortable,
 			width: item.width,
@@ -1288,15 +1289,17 @@ Grid.prototype.onAddNewRow = function(event, args) {
 	}
 };
 
-Grid.prototype.setEditors = function(form, formScope) {
+Grid.prototype.setEditors = function(form, formScope, forEdit) {
 	var grid = this.grid,
 		data = this.scope.dataView,
 		element = this.element;
+	
+	forEdit = forEdit === undefined ? true : forEdit;
 
 	grid.setOptions({
 		editable: true,
 		asyncEditorLoading: false,
-		enableAddRow: true,
+		enableAddRow: forEdit,
 		editorLock: new Slick.EditorLock()
 	});
 	
@@ -1329,6 +1332,10 @@ Grid.prototype.setEditors = function(form, formScope) {
 	// delegate isDirty to the dataView
 	data.canSave = _.bind(this.canSave, this);
 	data.saveChanges = _.bind(this.saveChanges, this);
+	
+	if (!forEdit) {
+		formScope.setEditable(false);
+	}
 	
 	this.editorForm = form;
 	this.editorScope = formScope;
@@ -1591,25 +1598,33 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 		'many-to-many' : 'many-to-many-inline'
 	};
 
-	function makeForm(scope, model, items, fields) {
+	function makeForm(scope, model, items, fields, forEdit) {
 
-		fields = fields || {};
-		items = _.map(items, function(item) {
-			var field = fields[item.name] || item,
+		var _fields = fields || {},
+			_items = [];
+		
+		_.each(items, function(item) {
+			var field = _fields[item.name] || item,
 				type = types[field.type];
+
+			if (!type && !forEdit) {
+				return item.forEdit = false;
+			}
 			
 			var params = _.extend({}, item, { showTitle: false });
 			if (type) {
-				params.type = type;
+				params.widget = type;
+				params.canEdit = forEdit;
 			}
-			return params;
+
+			_items.push(params);
 		});
 
 		var schema = {
-			cols: items.length,
+			cols: _items.length,
 			colWidths: '=',
 			viewType : 'form',
-			items: items
+			items: _items
 		};
 
 		scope._viewParams = {
@@ -1651,11 +1666,30 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 				scope.selector = attrs.selector;
 				scope.noFilter = attrs.noFilter;
 
+				var forEdit = schema.editable,
+					canEdit = schema.editable,
+					hasMulti = false;
+
+				hasMulti = _.find(schema.items, function(item) {
+					var field = handler.fields[item.name] || {};
+					return _.str.endsWith(field.type, '-many');
+				});
+
+				if (hasMulti) {
+					canEdit = true;
+				}
+
+				var form = null,
+					formScope = null;
+				
+				if (canEdit) {
+					formScope = scope.$new();
+					form = makeForm(formScope, handler._model, schema.items, handler.fields, forEdit);
+				}
+								
 				grid = new Grid(scope, element, attrs, ViewService, ActionService);
-				if (schema.editable) {
-					var child = scope.$new();
-					var form = makeForm(child, handler._model, schema.items, handler.fields);
-					grid.setEditors(form, child);
+				if (form) {
+					grid.setEditors(form, formScope, forEdit);
 				}
 			};
 

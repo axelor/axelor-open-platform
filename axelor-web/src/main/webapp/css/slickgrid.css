@@ -185,6 +185,11 @@
 	min-width: 250px;
 }
 
+.ui-dialog .slick-editor-dropdown .slickgrid {
+	position: relative;
+	top: 0; right: 0; border: 0; left: 0;
+}
+
 .slick-cell.dirty {
 	background-image: url('../img/dirty.gif');
 	background-position: 0 0;
