@@ -666,9 +666,11 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 			
 		};
 		
+		var field = scope.field;
 		var input = element.children('input');
 		var grid = element.children('[ui-slick-grid]');
 		
+		var container = null;
 		var wrapper = $('<div class="slick-editor-dropdown"></div>')
 			.css("position", "absolute")
 			.hide();
@@ -686,7 +688,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 		};
 		
 		setTimeout(function(){
-			var container = element.parents('.view-container');
+			container = element.parents('.ui-dialog-content,.view-container').first();
 			grid.height(175).appendTo(wrapper);
 			wrapper.height(175).appendTo(container);
 		});
@@ -698,7 +700,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 				my: "left top",
 				at: "left bottom",
 				of: element,
-				within: "#container"
+				within: container
 			})
 			.zIndex(element.zIndex() + 1)
 			.width(element.width());
@@ -726,9 +728,23 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 			input.val(text);
 		});
 		
+		scope.$watch('schema', function(schema, old) {
+			if (schema && field.canEdit === false) {
+				schema.editIcon = false;
+			}
+		});
+		
 		scope.$on("$destroy", function(e){
 			wrapper.remove();
 		});
+
+		scope.canEdit = function () {
+			return scope.hasPermission('create') && !scope.isReadonly() && field.canEdit !== false;
+		};
+		
+		scope.canRemove = function() {
+			return scope.hasPermission('create') && !scope.isReadonly() && field.canEdit !== false;
+		};
 	},
 	
 	template_editable: null,
@@ -739,8 +755,8 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 	'<span class="picker-input picker-icons-2" style="position: absolute;">'+
 		'<input type="text" readonly>'+
 		'<span class="picker-icons">'+
-			'<i class="icon-plus" ng-click="onNew()" ng-show="hasPermission(\'create\')" title="{{\'Select\' | t}}"></i>'+
-			'<i class="icon-minus" ng-click="onRemove()" ng-show="hasPermission(\'remove\')" title="{{\'Select\' | t}}"></i>'+
+			'<i class="icon-plus" ng-click="onNew()" ng-show="canEdit()" title="{{\'Select\' | t}}"></i>'+
+			'<i class="icon-minus" ng-click="onRemove()" ng-show="canRemove()" title="{{\'Select\' | t}}"></i>'+
 		'</span>'+
 		'<div ui-view-grid ' +
 			'x-view="schema" '+
