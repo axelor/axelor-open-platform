@@ -424,7 +424,8 @@ function GridViewCtrl($scope, $element) {
 	};
 	
 	function focusFirst() {
-		var first = $scope.dataView.getItem(0);
+		var index = _.first($scope.selection) || 0;
+		var first = $scope.dataView.getItem(index);
 		if (first) {
 			$scope.dataView.$syncSelection([], [first.id], true);
 		}
