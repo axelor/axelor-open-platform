@@ -483,7 +483,7 @@ angular.module('axelor.ui').directive('uiViewSwitcher', function(){
 					if (page.index === -1) page.index = 0;
 				}
 
-				if (scope.selectedTab.viewType === 'grid' && scope.selection) {
+				if (scope.selectedTab.viewType === 'grid' && !_.isEmpty(scope.selection)) {
 					page.index = _.first(scope.selection);
 				}
 
