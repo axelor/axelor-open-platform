@@ -536,10 +536,6 @@ function FormViewCtrl($scope, $element) {
 
 	$scope.onHotKey = function (e, action) {
 		
-		if (action === "delete") {
-			return;
-		}
-
 		if (action === "save" && $scope.canSave()) {
 			$scope.onSave();
 		}
@@ -554,9 +550,6 @@ function FormViewCtrl($scope, $element) {
 				$scope.onEdit();
 			}
 			focusFirst();
-		}
-		if (action === "delete" && $scope.canCopy()) {
-			$scope.onCopy();
 		}
 		if (action === "select") {
 			focusFirst();

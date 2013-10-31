@@ -519,6 +519,7 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 		45: 'new',		// insert
 		69: 'edit',		// e
 		83: 'save',		// s
+		68: 'delete',	// d
 		82: 'refresh',	// r
 		70: 'search',	// f
 		71: 'select',	// g
@@ -528,7 +529,6 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 		77: 'focus-menu',		// m
 	   120: 'toggle-menu',		// F9
 
-	   	 8: 'delete',	// backspace
 		81: 'close'		// q
 	};
 	
