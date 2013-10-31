@@ -549,7 +549,7 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 				return false;
 			}
 			
-			if (e.shiftKey || !e.ctrlKey || !scope.selectedTab) {
+			if (e.shiftKey || !e.ctrlKey) {
 				return;
 			}
 
@@ -567,7 +567,7 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 			}
 			
 			var tab = scope.selectedTab,
-				vs = tab.$viewScope;
+				vs = tab ? tab.$viewScope : null;
 			
 			if (!vs || !keys.hasOwnProperty(e.which)) {
 				return;
