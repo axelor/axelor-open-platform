@@ -600,11 +600,23 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 				return;
 			}
 			if (fs.hasPermission("write") && fs.isReadonly()) {
-				var parent = $(e.target).parent();
-				fs.attr("force-edit", true);
+				var elem = $(e.target),
+					parent = $(e.target).parent();
+				$.event.trigger('cancel:hot-edit');
 				fs.applyLater(function () {
+					fs.attr("force-edit", true);
 					setTimeout(function() {
 						parent.find(':input:first').focus().select();
+					});
+					elem.on('cancel:hot-edit', function() {
+						fs.attr("force-edit", false);
+						fs.applyLater();
+					});
+					var unwatch = fs.$watch("attr('force-edit')", function(edit) {
+						if (!edit) {
+							elem.off('cancel:hot-edit');
+							unwatch();
+						}
 					});
 				});
 			}

@@ -95,15 +95,23 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			return this.attr("required") || false;
 		};
 		
-		scope.isReadonly = function() {
-			if (this.attr("force-edit")) {
-				return false;
-			}
-			var parent = this.$parent;
-			if (parent && parent.isReadonly && parent.isReadonly()) {
+		scope.isReadonlyExclusive = function() {
+			var parent = this.$parent || {};
+			if (parent.isReadonlyExclusive && parent.isReadonlyExclusive()) {
 				return true;
 			}
-			if (scope.isEditable && !scope.isEditable()) {
+			return this.attr("readonly") || false;
+		};
+		
+		scope.isReadonly = function() {
+			var parent = this.$parent || {};
+			if ((this.hasPermission && !this.hasPermission('write')) || this.isReadonlyExclusive()) {
+				return true;
+			}
+			if (!this.attr("readonly") && this.attr("force-edit")) {
+				return false;
+			}
+			if ((parent.isReadonly && parent.isReadonly()) || (scope.isEditable && !scope.isEditable())) {
 				return true;
 			}
 			return this.attr("readonly") || false;
