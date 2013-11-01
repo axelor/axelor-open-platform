@@ -52,13 +52,13 @@
 			});
 		},
 
-		confirm: function(str, callback) {
+		confirm: function(str, callback, title) {
 			var element = null,
 				cb = callback || $.noop,
 				doCall = true;
 	
 			return element = this.box(str, {
-				title: _t('Question'),
+				title: title || _t('Question'),
 				onClose: function() {
 					if (doCall) cb(false);
 				},
