@@ -52,12 +52,23 @@ public class ActionValidate extends Action {
 		@XmlAttribute(name = "message")
 		private String message;
 
+		@XmlAttribute(name = "action")
+		private String action;
+
 		public String getMessage() {
 			return message;
 		}
 
 		public void setMessage(String message) {
 			this.message = message;
+		}
+
+		public String getAction() {
+			return action;
+		}
+
+		public void setAction(String action) {
+			this.action = action;
 		}
 	}
 
@@ -96,6 +107,9 @@ public class ActionValidate extends Action {
 
 				Map<String, Object> result = Maps.newHashMap();
 				result.put(key, val);
+				if (!Strings.isNullOrEmpty(validator.getAction())) {
+					result.put("action", validator.getAction());
+				}
 				return result;
 			}
 		}

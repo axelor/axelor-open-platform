@@ -1232,7 +1232,16 @@
   <xsd:complexType name="ActMessage">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractAct">
-        <xsd:attribute name="message" type="xsd:string" use="required"/>
+        <xsd:attribute name="message" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>The message to show.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="action" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>An action-record to be executed on confimation.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

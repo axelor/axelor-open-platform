@@ -188,8 +188,12 @@ public class ActionGroup extends Action {
 
             log.debug("action complete: {}", name);
 
-            if (action instanceof ActionValidate && iter.hasNext()) {
-            	String pending = this.getPending(iter);
+            if (action instanceof ActionValidate && value instanceof Map) {
+            	String pending = iter.hasNext() ? this.getPending(iter) : null;
+            	String onConfirm = (String) ((Map<String, Object>) value).get("action");
+            	if (onConfirm != null) {
+            		pending = Joiner.on(",").skipNulls().join(onConfirm, action.getName(), pending);
+            	}
             	log.debug("wait for validation: {}, {}", name, value);
             	log.debug("pending actions: {}", pending);
 				((Map<String, Object>) value).put("pending", pending);
