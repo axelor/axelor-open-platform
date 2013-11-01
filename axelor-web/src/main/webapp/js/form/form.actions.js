@@ -264,13 +264,30 @@ ActionHandler.prototype = {
 			context = this._getContext(),
 			deferred = this.ws.defer();
 
-		if (!action) {
+		function resolveLater() {
 			setTimeout(function(){
 				scope.$apply(function(){
-					deferred.resolve();
+					return deferred.resolve();
 				});
 			});
 			return deferred.promise;
+		}
+		
+		function chain(items) {
+			var first = _.first(items);
+			if (first === undefined) {
+				return resolveLater();
+			}
+			return self._handleSingle(first).then(function(pending) {
+				if (_.isString(pending)) {
+					return self._handleAction(pending);
+				}
+				return chain(_.rest(items));
+			});
+		}
+
+		if (!action) {
+			return resolveLater();
 		}
 
 		if (action === 'save') {
@@ -284,44 +301,11 @@ ActionHandler.prototype = {
 
 		var model = context._model || scope._model;
 		var promise = this.ws.action(action, model, context).then(function(response){
-			
-			var d = self.ws.defer();
-			
 			var resp = response.data,
-				data = resp.data || [],
-				resolved = true;
-
-			for(var i = 0 ; i < data.length && resolved; i++) {
-				var item = data[i];
-				self._handleSingle(item).then(function(result){
-					resolved = result && !_.isString(result);
-					if (_.isString(result)) {
-						self._handleAction(result).then(function(){
-							d.resolve();
-						});
-					}
-					else if(item.alert || item.error) {
-					    if(resolved) {
-					    	d.resolve();
-					    }
-					    else{
-					    	d.reject();
-					    }
-					}
-				});
-				
-				if (item.pending || item.alert || item.error) {
-					resolved = false;
-				}
-			}
-
-			if (resolved) {
-				d.resolve();
-			}
-
-			return d.promise;
+				data = resp.data || [];
+			return chain(data);
 		});
-		
+
 		promise.then(function(){
 			deferred.resolve();
 		});
@@ -332,20 +316,9 @@ ActionHandler.prototype = {
 	_handleSingle: function(data) {
 
 		var deferred = this.ws.defer();
-		var resolved_ = deferred.resolve;
-		
-		deferred.resolve = function(handled, pending) {
-			if (!handled) {
-				return resolved_(false);
-			}
-			if (pending) {
-				return resolved_(pending);
-			}
-			resolved_(true);
-		};
 
 		if (data == null || data.length == 0) {
-			deferred.resolve(true);
+			deferred.resolve();
 			return deferred.promise;
 		}
 
@@ -367,21 +340,18 @@ ActionHandler.prototype = {
 			axelor.dialogs.say(data.flash);
 		}
 
-		if (data.error) {
-			axelor.dialogs.error(data.error, function(){
-				deferred.resolve(false);
-			});
-			return deferred.promise;
-		}
-
-		if (data.alert) {
-			axelor.dialogs.confirm(data.alert, function(confirmed){
+		if (data.error || data.alert) {
+			axelor.dialogs.confirm(data.error || data.alert, function(confirmed){
 				setTimeout(function(){
 					scope.$apply(function(){
-						deferred.resolve(confirmed, data.pending);
+						if (confirmed) {
+							return deferred.resolve(data.pending);
+						}
+						deferred.reject();
 					});
 				});
-			});
+			}, data.error ? _t('Error') : _t('Warning'));
+			scope.applyLater();
 			return deferred.promise;
 		}
 		
@@ -390,7 +360,7 @@ ActionHandler.prototype = {
 				var item = findItems(k).first();
 				handleError(scope, item, v);
 			});
-			deferred.resolve(false);
+			deferred.reject();
 			return deferred.promise;
 		}
 		
@@ -408,7 +378,7 @@ ActionHandler.prototype = {
 			var promise = scope.reload(true);
 			if (promise) {
 				promise.then(function(){
-					deferred.resolve(true, data.pending);
+					deferred.resolve(data.pending);
 				});
 			}
 			return deferred.promise;
@@ -416,7 +386,7 @@ ActionHandler.prototype = {
 		
 		if (data.save) {
 			this._handleSave().then(function(){
-				deferred.resolve(true, data.pending);
+				deferred.resolve(data.pending);
 			});
 			return deferred.promise;
 		}
@@ -602,7 +572,7 @@ ActionHandler.prototype = {
 			}
 		}
 
-		deferred.resolve(true);
+		deferred.resolve();
 		
 		return deferred.promise;
 	}
