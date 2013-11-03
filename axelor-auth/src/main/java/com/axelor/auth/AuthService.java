@@ -19,6 +19,16 @@ import com.axelor.rpc.Context;
 import com.google.common.base.Objects;
 import com.google.inject.persist.Transactional;
 
+/**
+ * The {@link AuthService} class provides various utility services including
+ * password encryption, password match and saving user password in encrypted
+ * form.
+ * <p>
+ * The {@link AuthService} should not be manually instantiated but either
+ * injected or user {@link #getInstance()} method to get the instace of the
+ * service.
+ *
+ */
 @Singleton
 public class AuthService {
 
@@ -49,6 +59,13 @@ public class AuthService {
 		instance = this;
 	}
 
+	/**
+	 * Get the instance of the {@link AuthService}.
+	 *
+	 * @throws IllegalStateException
+	 *             if AuthService is not initialized
+	 * @return the {@link AuthService} instance
+	 */
 	public static AuthService getInstance() {
 		if (instance == null) {
 			throw new IllegalStateException("AuthService is not initialized, did you forget to bind the AuthService?");
@@ -56,6 +73,17 @@ public class AuthService {
 		return instance;
 	}
 
+	/**
+	 * Encrypt the given password text if it's not encrypted yet.
+	 * <p>
+	 * The method tests the password for a special format to check if it is
+	 * already encrypted, and In that case the password is returned as it is to
+	 * avoid multiple encryption.
+	 *
+	 * @param password
+	 *            the password to encrypt
+	 * @return encrypted password
+	 */
 	public String encrypt(String password) {
 		try {
 			hashFormat.parse(password);
@@ -65,11 +93,31 @@ public class AuthService {
 		return passwordService.encryptPassword(password);
 	}
 
+	/**
+	 * Encrypt the password of the given user.
+	 *
+	 * @param user
+	 *            the user whose password needs to be encrypted
+	 * @return the same user instance
+	 */
 	public User encrypt(User user) {
 		user.setPassword(encrypt(user.getPassword()));
 		return user;
 	}
 
+	/**
+	 * This is an adapter method to be used with data import.
+	 * <p>
+	 * This method can be used as
+	 * <code>call="com.axelor.auth.AuthService:encrypt"</code> while importing
+	 * user data to ensure user passwords are encrypted.
+	 *
+	 * @param user
+	 *            the object instance passed by data import engine
+	 * @param context
+	 *            the data import context
+	 * @return the same instance passed
+	 */
 	public Object encrypt(Object user, @SuppressWarnings("rawtypes") Map context) {
 		if (user instanceof User) {
 			return encrypt((User) user);
@@ -77,14 +125,32 @@ public class AuthService {
 		return user;
 	}
 
+	/**
+	 * Match the given plain and saved passwords.
+	 *
+	 * @param plain
+	 *            the plain password text
+	 * @param saved
+	 *            the saved password text (hashed)
+	 * @return true if they match
+	 */
 	public boolean match(String plain, String saved) {
-		//TODO: remove plain text match in final version
+		// TODO: remove plain text match in final version
 		if (Objects.equal(plain, saved)) { // plain text match
 			return true;
 		}
 		return passwordService.passwordsMatch(plain, saved);
 	}
 
+	/**
+	 * A helper method used to encrypt user password when the user record is
+	 * saved with user interface.
+	 *
+	 * @param request
+	 *            the request with user object as context
+	 * @param response
+	 *            the response, which is updated according to the validation
+	 */
 	@Transactional
 	public void validate(ActionRequest request, ActionResponse response) {
 		Context context = request.getContext();
