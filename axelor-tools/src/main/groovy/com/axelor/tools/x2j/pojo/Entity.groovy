@@ -277,7 +277,7 @@ class Entity {
 		code += "tsh.add(\"id\", this.getId());"
 		int count = 0
 		for(Property p : properties) {
-			if (p.virtual || !p.simple || p.name == "id" || p.name == "version") continue
+			if (p.virtual || p.password || !p.simple || p.name == "id" || p.name == "version") continue
 			code += "tsh.add(\"${p.name}\", this.${p.getter}());"
 			if (count++ == 10) break
 		}
