@@ -1,5 +1,7 @@
 package com.axelor.auth;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -65,6 +67,13 @@ public class AuthService {
 
 	public User encrypt(User user) {
 		user.setPassword(encrypt(user.getPassword()));
+		return user;
+	}
+
+	public Object encrypt(Object user, @SuppressWarnings("rawtypes") Map context) {
+		if (user instanceof User) {
+			return encrypt((User) user);
+		}
 		return user;
 	}
 
