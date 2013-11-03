@@ -583,7 +583,7 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 			if (action === "search") {
 				var filterBox = $('.filter-box .search-query:visible');
 				if (filterBox.size()) {
-					filterBox.focus();
+					filterBox.focus().select();
 					return false;
 				}
 			}

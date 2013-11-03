@@ -514,7 +514,7 @@ Grid.prototype.parse = function(view) {
 		editColumn = new EditIconColumn({
 			onClick: function (e, args) {
 				if (handler && handler.onEdit) {
-					setTimeout(function () {
+					handler.applyLater(function () {
 						handler.onEdit(true);
 					});
 				}

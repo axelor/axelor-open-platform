@@ -403,12 +403,12 @@ ui.formInput('OneToMany', {
 			}
 			var col = {
 				id: '_summary',
-				name: '',
+				name: '<span>&nbsp;</span>',
 				sortable: false,
 				resizable: false,
 				width: 16,
 				formatter: function(row, cell, value, columnDef, dataContext) {
-					return '<i class="icon-caret-right" style="display: inline-block; cursor: pointer; padding: 1px 4px;"></i>';
+					return '<i class="icon-caret-right" style="display: inline-block; cursor: pointer; padding: 2px 8px; font-size: 15.5px;"></i>';
 				}
 			};
 			
