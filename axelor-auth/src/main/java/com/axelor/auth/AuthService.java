@@ -154,7 +154,6 @@ public class AuthService {
 	@Transactional
 	public void validate(ActionRequest request, ActionResponse response) {
 		Context context = request.getContext();
-		User user = context.asType(User.class);
 		if (context.get("confirm") == null) {
 			return;
 		}
@@ -163,11 +162,10 @@ public class AuthService {
 		String confirm = (String) context.get("confirm");
 
 		if (Objects.equal(password, confirm)) {
-			password = encrypt(password);
-			user.setPassword(password);
-			user.save();
-			response.setValue("id", user.getId());
-			response.setReload(true);
+			response.setValue("password", encrypt(password));
+			response.setValue("newPassword", null);
+			response.setValue("confirm", null);
+			response.setValue("change", false);
 		} else {
 			response.addError("confirm", JPA.translate("Password doesn't match"));
 		}
