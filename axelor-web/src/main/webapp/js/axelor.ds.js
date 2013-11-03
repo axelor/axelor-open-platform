@@ -123,6 +123,10 @@
 				if (item.items || item.pages) {
 					ViewService.prototype.process(meta, item);
 				}
+				if (item.password) {
+					item.widget = "password";
+					item.widgetName = "password";
+				}
 			});
 		};
 
