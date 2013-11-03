@@ -83,6 +83,12 @@ public @interface Widget {
 	boolean image() default false;
 
 	/**
+	 * Use password widget for this string field.
+	 *
+	 */
+	boolean password() default false;
+
+	/**
 	 * List of the columns to be used to search this record.
 	 *
 	 * Used by auto-complete widget. By default the same column will be
