@@ -117,6 +117,8 @@ public class Property {
 
 	private boolean virtual;
 
+	private boolean password;
+
 	private boolean nameColumn;
 
 	private String[] nameSearch;
@@ -241,6 +243,7 @@ public class Property {
 				hidden = w.hidden();
 				nameSearch = w.search();
 				selection = w.selection();
+				password = w.password();
 
 				if (w.multiline() && type == PropertyType.STRING) {
 					type = PropertyType.TEXT;
@@ -313,6 +316,10 @@ public class Property {
 
 	public boolean isVirtual() {
 		return virtual;
+	}
+
+	public boolean isPassword() {
+		return password;
 	}
 
 	public boolean isReference() {
