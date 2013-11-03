@@ -145,7 +145,7 @@ ui.formInput('Password', 'String', {
 			return _.str.repeat('*', value.length);
 		};
 	},
-	template_readonly: '<span>{{password()}}</span>',
+	template_readonly: '<input type="password" ng-show="text" tabindex="-1" readonly="readonly" class="display-text" value="{{password()}}"></input>',
 	template_editable: '<input type="password">'
 });
 
