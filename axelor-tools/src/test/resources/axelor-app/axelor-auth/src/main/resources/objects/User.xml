@@ -6,8 +6,9 @@
   <module name="auth" package="com.axelor.auth.db" />
 
   <entity name="User">
-    <string name="code" />
+    <string name="code" title="Login"/>
     <string name="name" />
+    <string name="password" password="true"/>
   </entity>
 
 </domain-models>
