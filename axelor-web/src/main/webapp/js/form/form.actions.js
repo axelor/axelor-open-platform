@@ -357,7 +357,7 @@ ActionHandler.prototype = {
 		
 		if (!_.isEmpty(data.errors)) {
 			_.each(data.errors, function(v, k){
-				var item = findItems(k).first();
+				var item = (findItems(k) || $()).first();
 				handleError(scope, item, v);
 			});
 			deferred.reject();
