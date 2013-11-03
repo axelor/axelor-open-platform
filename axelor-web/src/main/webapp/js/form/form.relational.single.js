@@ -238,7 +238,7 @@ ui.formInput('ManyToOne', 'Select', {
 		input.keydown(function(e){
 			var handled = false;
 			if (e.keyCode == 113) { // F2
-				if (e.shiftKey) {
+				if (e.shiftKey || !scope.getValue()) {
 					scope.onNew();
 				} else {
 					scope.onEdit();
