@@ -30,19 +30,24 @@
  */
 package com.axelor.auth;
 
+import java.io.IOException;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
+import org.apache.shiro.web.util.WebUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -58,6 +63,15 @@ public class AuthFilter extends FormAuthenticationFilter {
 			return loginUrl;
 		}
 		return super.getLoginUrl();
+	}
+
+	@Override
+	public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws ServletException, IOException {
+		if (isLoginRequest(request, response) && SecurityUtils.getSubject().isAuthenticated()) {
+			WebUtils.issueRedirect(request, response, "/");
+		}
+		super.doFilterInternal(request, response, chain);
 	}
 
 	@Override
