@@ -335,6 +335,13 @@
             </xsd:restriction>
           </xsd:simpleType>
         </xsd:attribute>
+        <xsd:attribute name="password" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+            Whether the field is storing password text.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
