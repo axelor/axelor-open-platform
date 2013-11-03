@@ -84,6 +84,7 @@ public class AuthModule extends ShiroWebModule {
 			this.bindConstant().annotatedWith(Names.named("auth.hash.algorithm")).to("SHA-512");
 			this.bindConstant().annotatedWith(Names.named("auth.hash.iterations")).to(500000);
 			this.bind(AuthService.class).asEagerSingleton();
+			this.expose(AuthService.class);
 
 			this.bindRealm().to(AuthRealm.class);
 			this.bind(Initializer.class).asEagerSingleton();
