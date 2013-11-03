@@ -325,6 +325,7 @@ function AppCtrl($rootScope, $scope, $http, $route, authService) {
 				zIndex: 100001,
 				buttons: [{
 					text: _t("Login"),
+					'class': 'btn btn-primary',
 					click: function(){
 						$scope.doLogin();
 					}
@@ -354,12 +355,14 @@ function AppCtrl($rootScope, $scope, $http, $route, authService) {
 				},
 				buttons: [{
 					text: _t("Show Details"),
+					'class': 'btn',
 					click: function(){
 						$scope.onErrorWindowShow('stacktrace');
 						$scope.$apply();
 					}
 				}, {
 					text: _t("Close"),
+					'class': 'btn btn-primary',
 					click: function() {
 						errorWindow.dialog('close');
 					}
