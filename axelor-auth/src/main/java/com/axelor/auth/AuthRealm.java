@@ -35,6 +35,8 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.authc.credential.PasswordMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -45,6 +47,33 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 
 public class AuthRealm extends AuthorizingRealm {
+
+	public static class AuthMatcher extends PasswordMatcher {
+
+		@Override
+		public boolean doCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) {
+
+			//TODO: remove plain text match in final version
+			Object plain = getSubmittedPassword(token);
+			Object saved = getStoredPassword(info);
+			AuthService service = AuthService.getInstance();
+			if (plain instanceof char[]) {
+				plain = new String((char[]) plain);
+			}
+			if (service.match((String) plain, (String) saved)) {
+				return true;
+			}
+
+			return super.doCredentialsMatch(token, info);
+		}
+	}
+
+	private CredentialsMatcher credentialsMatcher = new AuthMatcher();
+
+	@Override
+	public CredentialsMatcher getCredentialsMatcher() {
+		return credentialsMatcher;
+	}
 
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
