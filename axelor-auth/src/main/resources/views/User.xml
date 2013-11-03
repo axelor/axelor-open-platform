@@ -13,7 +13,7 @@
             <field name="name" placeholder="user name" validIf="name.length &gt;= 2" onChange="action-user-validData"/>
             <field name="group" placeholder="user group"/>
             <field name="code" placeholder="login name" validIf="code.length &gt;= 2" onChange="action-user-validData"/>
-            <field name="change" widget="inline-checkbox" title="Change password?" showIf="id"/>
+            <field name="change" widget="inline-checkbox" title="Change password?" showIf="id &amp;&amp; !$readonly()"/>
             <break/>
             <field name="newPassword" title="Password" placeholder="new password" widget="password" showIf="change || !id"
               requiredIf="!id" validIf="(!change &amp;&amp; id) || (newPassword.length &gt;= 4 &amp;&amp; confirm == newPassword)"/>
