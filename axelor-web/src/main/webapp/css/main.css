@@ -387,6 +387,11 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 	z-index: 2100;
 }
 
+input[disabled], select[disabled], textarea[disabled],
+input[readonly], select[readonly], textarea[readonly] {
+	cursor: default;
+}
+
 /* end Browser fixes */
 
 .navigation-tabs ul.nav-tabs-main {
