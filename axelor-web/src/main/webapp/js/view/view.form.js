@@ -125,7 +125,8 @@ function FormViewCtrl($scope, $element) {
 			record = ds.at(page.index);
 		}
 		viewPromise.then(function(){
-			setTimeout(function(){
+			$scope.ajaxStop(function(){
+				record = ($scope.record || {}).id ? $scope.record : record;
 				if (record === undefined) {
 					$scope.edit(null);
 					$scope.ajaxStop(function(){
