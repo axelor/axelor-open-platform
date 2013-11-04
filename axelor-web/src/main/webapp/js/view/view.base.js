@@ -136,6 +136,7 @@ function ViewCtrl($scope, DataSource, ViewService) {
 		}
 		
 		if (context._showRecord > 0) {
+			params.viewType = "form";
 			return $scope.switchTo('form');
 		}
 
