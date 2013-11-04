@@ -341,16 +341,28 @@ ActionHandler.prototype = {
 		}
 
 		if (data.error || data.alert) {
-			axelor.dialogs.confirm(data.error || data.alert, function(confirmed){
-				setTimeout(function(){
-					scope.$apply(function(){
-						if (confirmed) {
-							return deferred.resolve(data.pending);
-						}
-						deferred.reject();
+			//TODO : #1090
+			if(data.error) {
+				axelor.dialogs.error(data.error, function(){
+					setTimeout(function(){
+						scope.$apply(function(){
+							deferred.reject();
+						});
 					});
 				});
-			}, data.error ? _t('Error') : _t('Warning'));
+			}
+			else {
+				axelor.dialogs.confirm(data.alert, function(confirmed){
+					setTimeout(function(){
+						scope.$apply(function(){
+							if (confirmed) {
+								return deferred.resolve(data.pending);
+							}
+							deferred.reject();
+						});
+					});
+				}, _t('Warning'));
+			}
 			scope.applyLater();
 			return deferred.promise;
 		}
