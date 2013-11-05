@@ -10,9 +10,9 @@
     
     <form name="user-form" title="User" cols="1" onSave="com.axelor.auth.AuthService:validate">
         <group title="General Info">
-            <field name="name" placeholder="user name" validIf="name.length &gt;= 2" onChange="action-user-validData"/>
+            <field name="name" placeholder="user name" validIf="name.length &gt;= 2" onChange="action-condition-user-validName"/>
             <field name="group" placeholder="user group"/>
-            <field name="code" placeholder="login name" validIf="code.length &gt;= 2" onChange="action-user-validData"/>
+            <field name="code" placeholder="login name" validIf="code.length &gt;= 2" onChange="action-condition-user-validCode"/>
             <field name="change" widget="inline-checkbox" title="Change password?" showIf="id &amp;&amp; !$readonly()"/>
             <break/>
             <field name="newPassword" title="Password" placeholder="new password" widget="password" showIf="change || !id"
@@ -25,11 +25,14 @@
             <field name="activeFrom" validIf="!activeFrom || (activeFrom &amp;&amp; !activeTo) || (activeFrom &amp;&amp; activeTo &amp;&amp; $moment(activeTo) &gt;= $moment(activeFrom))"/>
         	<field name="activeTo" validIf="!activeTo || (!activeFrom &amp;&amp; activeTo) || (activeFrom &amp;&amp; activeTo &amp;&amp; $moment(activeTo) &gt;= $moment(activeFrom))"/>
         </group>
-        <field name="roles" grid-view="role-grid" form-view="role-form" showTitle="false" />
+        <field name="roles" grid-view="role-grid" form-view="role-form" />
     </form>
     
-    <action-condition name="action-user-validData">
+    <action-condition name="action-condition-user-validCode">
         <check error="Code length should be greater than 2." field="code" if="code?.length() &lt; 2"/>
+    </action-condition>
+    
+    <action-condition name="action-condition-user-validName">
         <check error="Name length should be greater than 2." field="name" if="name?.length() &lt; 2"/>
     </action-condition>
     
