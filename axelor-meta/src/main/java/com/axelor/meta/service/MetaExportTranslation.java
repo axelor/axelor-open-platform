@@ -259,21 +259,23 @@ public class MetaExportTranslation {
 
 	private void exportViews() {
 		for (MetaView view : MetaView.findByModule(this.currentModule).order("name").order("type").fetch()) {
-			AbstractView abstractView = this.fromXML(view.getXml());
+			AbstractView abstractView = this.fromXML(view);
 			if(abstractView != null) {
 				this.loadView(abstractView);
 			}
 		}
 	}
 
-	private AbstractView fromXML(String xml) {
+	private AbstractView fromXML(MetaView view) {
 		try {
-			ObjectViews views = (ObjectViews) metaLoader.fromXML(xml);
+			ObjectViews views = (ObjectViews) metaLoader.fromXML(view.getXml());
 			if (views != null && views.getViews() != null)
 					return views.getViews().get(0);
 		}
 		catch(Exception ex) {
-			log.error("Exception : {}", ex);
+			log.error("Error while exporting {}.", view.getName());
+			log.error("Unable to export data.");
+			log.error("With following exception:", ex);
 		}
 		return null;
 	}
@@ -535,8 +537,9 @@ public class MetaExportTranslation {
 			}
 		}
 		catch(Exception ex) {
-			log.error("Error while exporting file : {}", file.getName());
-			log.error("With following exception : {}", ex);
+			log.error("Error while exporting {}.", file.getName());
+			log.error("Unable to export data.");
+			log.error("With following exception:", ex);
 		}
 	}
 
@@ -579,7 +582,7 @@ public class MetaExportTranslation {
 			try {
 				MetaView view = MetaView.all().filter("self.name = ?1 AND self.module = ?2", name, currentModule).fetchOne();
 				if(view != null) {
-					AbstractView abstractView = this.fromXML(view.getXml());
+					AbstractView abstractView = this.fromXML(view);
 					if(abstractView != null) {
 						this.viewToDoc(abstractView, abstractView.getName(), 1);
 					}
@@ -666,7 +669,7 @@ public class MetaExportTranslation {
 				else if(field.getFormView() != null) {
 					MetaView view = MetaView.all().filter("self.name = ?1 AND self.module = ?2", field.getFormView(), currentModule).fetchOne();
 					if(view != null) {
-						AbstractView subAbstractView = this.fromXML(view.getXml());
+						AbstractView subAbstractView = this.fromXML(view);
 						if(subAbstractView != null) {
 							this.viewToDoc(subAbstractView, subAbstractView.getName(), level+1);
 						}
@@ -676,7 +679,7 @@ public class MetaExportTranslation {
 					String name = this.findView(field.getTarget(), "form");
 					MetaView view = MetaView.all().filter("self.name = ?1 AND self.module = ?2", name, currentModule).fetchOne();
 					if(view != null) {
-						AbstractView subAbstractView = this.fromXML(view.getXml());
+						AbstractView subAbstractView = this.fromXML(view);
 						if(subAbstractView != null) {
 							this.viewToDoc(subAbstractView, subAbstractView.getName(), level+1);
 						}
