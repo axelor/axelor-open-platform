@@ -7,11 +7,11 @@
   <grid title="Permissions" name="permission-grid">
     <field name="name"/>
     <field name="object"/>
-    <field name="canRead" width="75"/>
-    <field name="canWrite" width="75"/>
-    <field name="canCreate" width="75"/>
-    <field name="canRemove" width="75"/>
-    <field name="canExport" width="75"/>
+    <field name="canRead" width="100"/>
+    <field name="canWrite" width="100"/>
+    <field name="canCreate" width="100"/>
+    <field name="canRemove" width="100"/>
+    <field name="canExport" width="100"/>
   </grid>
 
   <form title="Permission" name="permission-form" cols="2" colWidths="*,175">
