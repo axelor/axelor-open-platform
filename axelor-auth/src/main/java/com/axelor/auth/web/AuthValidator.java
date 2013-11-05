@@ -66,11 +66,7 @@ public class AuthValidator {
 				unique.add(object);
 			}
 
-			Query query = JPA.em().createNativeQuery("SELECT count(*) from meta_model where CONCAT(package_name, '.', name) = ?1");
-			query.setParameter(1, object);
-
-			BigInteger requestResult = (BigInteger) query.getSingleResult();
-			if(requestResult.equals(BigInteger.ZERO)){
+			if(isNotValidObject(object)){
 				notValid.add(object);
 				continue;
 			}
@@ -88,5 +84,16 @@ public class AuthValidator {
 					JPA.translate("Object found:")+"<br>" + Joiner.on("<br>").join(notValid));
 			response.setValues(ImmutableMap.of("permissions", all));
 		}
+	}
+
+	public boolean isNotValidObject(String name) {
+		Query query = JPA.em().createNativeQuery("SELECT count(*) from meta_model where CONCAT(package_name, '.', name) = ?1");
+		query.setParameter(1, name);
+
+		BigInteger requestResult = (BigInteger) query.getSingleResult();
+		if(requestResult.equals(BigInteger.ZERO)){
+			return true;
+		}
+		return false;
 	}
 }

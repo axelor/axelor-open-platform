@@ -14,7 +14,7 @@
     <field name="canExport" width="100"/>
   </grid>
 
-  <form title="Permission" name="permission-form" cols="2" colWidths="*,175">
+  <form title="Permission" name="permission-form" cols="2" colWidths="*,175" onSave="action-validate-permission-object">
     <group title="General" cols="2" colWidths="100,*">
         <field name="name"/>
         <field name="object"/>
@@ -47,5 +47,13 @@
         <field name="expoParams" title="Params"/>
     </group>
   </form>
+  
+  <action-validate name="action-validate-permission-object">
+    <error message="Not a valid object name." if="action:action-method-permission-object"/>
+  </action-validate>
+  
+  <action-method name="action-method-permission-object">
+    <call class="com.axelor.auth.web.AuthValidator" method="isNotValidObject(object)"/>
+  </action-method>
 
 </object-views>
