@@ -868,7 +868,7 @@ Grid.prototype.hilite = function (row, field) {
 		record = this.grid.getDataItem(row),
 		params = null;
 
-	if (!view || !record || record.__group) {
+	if (!view || !record || record.__group || record.__groupTotals) {
 		return null;
 	}
 
