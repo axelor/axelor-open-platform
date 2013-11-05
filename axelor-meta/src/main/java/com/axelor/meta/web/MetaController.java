@@ -116,6 +116,7 @@ public class MetaController {
 
 	public void restoreAll(ActionRequest request, ActionResponse response) {
 
+		MetaStore.clear();
 		final Map<Long, String> userActions = Maps.newHashMap();
 
 		JPA.runInTransaction(new Runnable() {
