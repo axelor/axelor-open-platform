@@ -5,7 +5,11 @@
 
   <module name="auth" package="com.axelor.auth.db"/>
 
-  <entity name="Permission" sequential="true" cachable="true">
+  <entity name="Permission" cachable="true">
+    <![CDATA[
+    This object store the permissions.
+    ]]>
+    
     <string name="name" required="true" unique="true" />
     <string name="object" required="true"/>
     <boolean name="canRead" title="Read"/>

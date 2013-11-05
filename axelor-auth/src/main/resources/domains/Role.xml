@@ -5,7 +5,10 @@
 
   <module name="auth" package="com.axelor.auth.db"/>
 
-  <entity name="Role" lang="java">
+  <entity name="Role">
+    <![CDATA[
+    This object store the roles.
+    ]]>
     
     <string name="name" required="true" />
     <string name="description" large="true" />
