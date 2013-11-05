@@ -81,6 +81,7 @@
 "axelor-auth",,"other","Duplicates found:","Doublons trouvés:",,
 "axelor-auth",,"other","Not a valid object.","Objet non valide.",,
 "axelor-auth",,"other","Object found:","Objet trouvés:",,
+"axelor-auth",,"other","Password doesn't match","Le mot de passe ne correspond pas",,
 "axelor-auth",,"other","Only one permission per object is required.","Une seule permission par objet est requise.",,
 "role-form","name","documentation",,,,
 "role-form","groups","documentation",,,,
