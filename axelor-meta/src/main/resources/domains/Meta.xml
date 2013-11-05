@@ -6,6 +6,10 @@
   <module name="meta" package="com.axelor.meta.db" />
   
   <entity name="MetaModule" table="META_MODULE" cachable="true">
+    <![CDATA[
+    This object store the modules.
+    ]]>
+    
     <string name="name" required="true" unique="true"/>
     <string name="title" required="true" />
     <string name="description" large="true"/>
@@ -15,7 +19,11 @@
     <boolean name="installed" />
   </entity>
   
-  <entity name="MetaView" table="META_VIEW" sequential="true" cachable="true">
+  <entity name="MetaView" table="META_VIEW" cachable="true">
+    <![CDATA[
+    This object store the xml views.
+    ]]>
+    
   	<string name="name" required="true"/>
 	<string name="title" required="true" namecolumn="true"/>
   	<string name="type" required="true"/>
@@ -25,18 +33,22 @@
   	<string name="xml" required="true" large="true"/>
   	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
     
-    <finder-method name="findByName" using="name"                     orderBy="-priority" />
-    <finder-method name="findByName" using="name,Long:groupId"        orderBy="-priority" filter="self.name = :name AND self.groups[].id = :groupId"/>
-    <finder-method name="findByName" using="name,model"               orderBy="-priority"/>
-    <finder-method name="findByName" using="name,model,Long:groupId"  orderBy="-priority" filter="self.name = :name AND self.model = :model AND self.groups[].id = :groupId"/>
+    <finder-method name="findByName" using="name"                     orderBy="-priority" cacheable="true"/>
+    <finder-method name="findByName" using="name,Long:groupId"        orderBy="-priority" filter="self.name = :name AND self.groups[].id = :groupId" cacheable="true"/>
+    <finder-method name="findByName" using="name,model"               orderBy="-priority" cacheable="true"/>
+    <finder-method name="findByName" using="name,model,Long:groupId"  orderBy="-priority" filter="self.name = :name AND self.model = :model AND self.groups[].id = :groupId" cacheable="true"/>
     
-    <finder-method name="findByType" using="type,model"               orderBy="-priority" filter="self.model = :model AND self.type = :type"/>
-    <finder-method name="findByType" using="type,model,Long:groupId"  orderBy="-priority" filter="self.model = :model AND self.type = :type AND self.groups[].id = :groupId"/>
+    <finder-method name="findByType" using="type,model"               orderBy="-priority" filter="self.model = :model AND self.type = :type" cacheable="true"/>
+    <finder-method name="findByType" using="type,model,Long:groupId"  orderBy="-priority" filter="self.model = :model AND self.type = :type AND self.groups[].id = :groupId" cacheable="true"/>
     
-    <finder-method name="findByModule" using="module" all="true"/>
+    <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
   
-  <entity name="MetaMenu" table="META_MENU" sequential="true" cachable="true">
+  <entity name="MetaMenu" table="META_MENU" cachable="true">
+    <![CDATA[
+    This object store the menus.
+    ]]>
+    
   	<integer name="priority"/>
   	<string name="name" unique="true" required="true"/>
   	<string name="title" required="true" namecolumn="true"/>
@@ -48,47 +60,71 @@
   	<many-to-one name="parent" ref="MetaMenu"/>
   	<many-to-one name="action" ref="MetaAction"/>
   	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
-    <finder-method name="findByName" using="name" orderBy="-priority"/>
-    <finder-method name="findByParent" using="Long:id" filter="self.parent.id = :id" all="true"/>
-    <finder-method name="findByModule" using="module" all="true"/>
+    
+    <finder-method name="findByName" using="name" orderBy="-priority" cacheable="true"/>
+    <finder-method name="findByParent" using="Long:id" filter="self.parent.id = :id" all="true" cacheable="true"/>
+    <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
   
   <entity name="MetaActionMenu" table="META_ACTION_MENU" cachable="true">
+    <![CDATA[
+    This object store the actions menu.
+    ]]>
+    
   	<string name="name" unique="true" required="true"/>
   	<string name="title" required="true" namecolumn="true"/>
     <string name="category" help="Category name to group action menus."/>
     <string name="module"/>
   	<many-to-one name="parent" ref="MetaActionMenu"/>
   	<many-to-one name="action" ref="MetaAction"/>
-    <finder-method name="findByModule" using="module" all="true"/>
+    
+    <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
    
-  <entity name="MetaAction" table="META_ACTION" sequential="true" cachable="true">
+  <entity name="MetaAction" table="META_ACTION" cachable="true">
+    <![CDATA[
+    This object store the xml actions.
+    ]]>
+    
   	<string name="name" unique="true" required="true"/>
     <string name="type" required="true"/>
     <string name="model" />
     <string name="module" />
   	<string name="xml" required="true" large="true"/>
-    <finder-method name="findByModule" using="module" all="true"/>
+    
+    <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
   
   <entity name="MetaSelect" table="META_SELECT" cachable="true">
+    <![CDATA[
+    This object store the selects.
+    ]]>
+    
     <string name="name" required="true"/>
     <integer name="priority" required="true" default="20"/>
     <string name="module"/>
     <one-to-many name="items" ref="MetaSelectItem" mappedBy="select"/>
-    <finder-method name="findByName" using="name" orderBy="-priority"/>
-    <finder-method name="findByModule" using="module" all="true"/>
+    
+    <finder-method name="findByName" using="name" orderBy="-priority" cacheable="true"/>
+    <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
 
   <entity name="MetaSelectItem" table="META_SELECT_ITEM" cachable="true">
+    <![CDATA[
+    This object store the select items.
+    ]]>
+    
     <string name="value" required="true"/>
     <string name="title" required="true" namecolumn="true"/>
     <integer name="order" column="order_seq"/>
     <many-to-one name="select" ref="MetaSelect" column="select_id" required="true"/>
   </entity>
   
-  <entity name="MetaModel" table="META_MODEL" sequential="true" cachable="true">
+  <entity name="MetaModel" table="META_MODEL" cachable="true">
+    <![CDATA[
+    This object store the models.
+    ]]>
+    
     <string name="name" title="Name" required="true"/>
     <string name="packageName" title="Package" required="true"/>
     <string name="tableName" title="Table" />
@@ -96,7 +132,11 @@
     <string name="fullName" title="Fullname" />
   </entity>
 
-  <entity name="MetaField" table="META_FIELD" sequential="true" cachable="true">
+  <entity name="MetaField" table="META_FIELD" cachable="true">
+    <![CDATA[
+    This object store the fields.
+    ]]>
+    
     <many-to-one name="metaModel" ref="MetaModel" />
     <string name="name" title="Name" required="true"/>
     <string name="packageName" title="Package" />
@@ -108,6 +148,10 @@
   </entity>
   
   <entity name="MetaTranslation" table="META_TRANSLATION" cachable="true">
+    <![CDATA[
+    This object store the translation.
+    ]]>
+    
   	<string name="key" required="true"/>
   	<string name="language" required="true"/>
   	<string name="translation" large="true"/>
@@ -117,6 +161,10 @@
   </entity>
   
   <entity name="MetaFile" table="META_FILE">
+    <![CDATA[
+    This object store the files.
+    ]]>
+    
   	<binary name="content" title="File"/>
   	<string name="fileName" required="true" namecolumn="true"/>
   	<long name="size" title="Size in bytes" readonly="true"/>
@@ -157,6 +205,10 @@
   </entity>
 
   <entity name="MetaChart" table="META_CHART">
+    <![CDATA[
+    This object store the charts definition.
+    ]]>
+    
     <string name="name" required="true" unique="true"/>
     <string name="module"/>
     <string name="title" />
@@ -168,7 +220,8 @@
     <string name="categoryTitle" />
     <one-to-many name="chartSeries" ref="MetaChartSeries" />
     <one-to-many name="chartConfig" ref="MetaChartConfig" />
-	<finder-method name="findByModule" using="module" all="true"/>
+    
+	<finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
 
 </domain-models>

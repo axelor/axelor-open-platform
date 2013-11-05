@@ -5,7 +5,7 @@
 
   <module name="meta" package="com.axelor.meta.db"/>
 
-  <entity name="MetaUser" table="META_USER" sequential="true" cachable="true">
+  <entity name="MetaUser" table="META_USER" cachable="true">
     <![CDATA[
     This object store the user preferences.
     ]]>
