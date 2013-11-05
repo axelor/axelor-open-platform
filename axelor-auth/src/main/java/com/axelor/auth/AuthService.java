@@ -47,6 +47,8 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.persist.Transactional;
 
 /**
@@ -197,7 +199,7 @@ public class AuthService {
 			response.setValue("confirm", null);
 			response.setValue("change", false);
 		} else {
-			response.addError("confirm", JPA.translate("Password doesn't match"));
+			response.setData(ImmutableList.of(ImmutableMap.of("error", JPA.translate("Password doesn't match"))));
 		}
 	}
 }
