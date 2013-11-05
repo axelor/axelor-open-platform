@@ -52,6 +52,10 @@ html, body {
 	min-width: 940px;
 }
 
+.navbar .brand-logo {
+	float: left;
+}
+
 .view-tabs {
 	background-color: white;
 }
