@@ -5,7 +5,11 @@
 
   <module name="meta" package="com.axelor.meta.db"/>
 
-  <entity name="MetaAuthProfile" table="META_AUTH_PROFILE" sequential="true" >
+  <entity name="MetaAuthProfile" table="META_AUTH_PROFILE" >
+    <![CDATA[
+    This object store the auth profiles.
+    ]]>
+    
     <string name="name" required="true" unique="true"/>
     <string name="targetPackage" required="true"/>
     <boolean name="canRead" title="Read"/>
