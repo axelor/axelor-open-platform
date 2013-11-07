@@ -286,6 +286,16 @@ function GridViewCtrl($scope, $element) {
 		}
 	};
 	
+	$scope.pagerIndex = function(fromSelection) {
+		var index = page.index,
+			record = null;
+		if (fromSelection) {
+			record = $scope.dataView.getItem(_.first($scope.selection));
+			index = ds._data.indexOf(record);
+		}
+		return index;
+	};
+
 	$scope.onNext = function() {
 		var fields = _.pluck($scope.fields, 'name');
 		ds.next(fields).then(function(){
@@ -313,7 +323,7 @@ function GridViewCtrl($scope, $element) {
 	};
 	
 	$scope.onEdit = function(force) {
-		page.index = $scope.selection[0];
+		page.index = $scope.pagerIndex(true);
 		$scope.switchTo('form', function (formScope) {
 			if (force && formScope.canEdit()) {
 				formScope.onEdit();
@@ -532,8 +542,8 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 			var counter = 0;
 			
 			function doEdit(force) {
-				var selection = $scope.selection[0];
-				var record = ds.at(selection);
+				var index = $scope.pagerIndex(true);
+				var record = ds.at(index);
 
 				var tab = angular.copy($scope._viewParams);
 
