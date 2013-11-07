@@ -261,7 +261,11 @@ function FormViewCtrl($scope, $element) {
 	$scope.$watch("record", function(rec, old) {
 		var view = $scope.schema;
 		if (view && view.readonlyIf) {
-			editable = !axelor.$eval($scope, view.readonlyIf, rec);
+			var readonly = axelor.$eval($scope, view.readonlyIf, rec);
+			if (_.isFunction($scope.attr)) {
+				$scope.attr('readonly', readonly);
+			}
+			editable = !readonly;
 		}
 		if (rec === old) {
 			return $scope.$$dirty = false;
