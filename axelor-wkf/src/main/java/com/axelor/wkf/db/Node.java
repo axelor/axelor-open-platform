@@ -387,7 +387,7 @@ public class Node extends AuditableModel {
 		
 		for ( Transition transition : getEndTransitions() ){
 			
-			if ( transition.execute( actionHandler, user ) ) {
+			if ( transition.execute( actionHandler, context, user ) ) {
 
 				transition.getNextNode().execute( actionHandler, user, instance, transition, context );
 				

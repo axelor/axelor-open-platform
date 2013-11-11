@@ -75,7 +75,7 @@ public class ExclusiveGateway extends Gateway {
 		
 		for ( Transition transition : getEndTransitions() ){
 
-			if ( transition.execute( actionHandler, user ) ) {
+			if ( transition.execute( actionHandler, context, user ) ) {
 
 				transition.getNextNode().execute( actionHandler, user, instance, transition, context );
 				return ;

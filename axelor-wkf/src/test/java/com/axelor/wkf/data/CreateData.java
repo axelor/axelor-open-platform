@@ -91,6 +91,12 @@ public class CreateData {
 		metaAction6.setXml("<action-group name=\"action-test-6\" ><action name=\"action-test-3\"/><action name=\"action-test-4\"/><action name=\"save\"/></action-group>");
 		metaAction6.setType("action-group");
 		
+		MetaAction metaCondition = new MetaAction();
+		metaCondition.setName("action-condition");
+		metaCondition.setXml("<action-condition name=\"action-condition\" ><check field=\"archived\" if=\"archived\" error=\"This is an error !\"/></action-condition>");
+		metaCondition.setType("action-condition");
+		metaCondition.save();
+		
 		Node start = new StartEvent();
 		start.setName("Start");
 		start.setType("startEvent");
@@ -121,6 +127,7 @@ public class CreateData {
 		startTransition.setNextNode(task1);
 		
 		intermediaryTransition.setStartNode(task1);
+		intermediaryTransition.setCondition(metaCondition);
 		intermediaryTransition.setNextNode(task2);
 		
 		endTransition.setStartNode(task2);

@@ -169,7 +169,7 @@
 	<menuitem name="menu-wkf-activity" parent="menu-wkf-nodes-root-activity" title="Activities"
 		action="action-wkf-activity" />
 
-	<action-view name="action-wkf-activity" title="Tasks"
+	<action-view name="action-wkf-activity" title="Activities"
 		model="com.axelor.wkf.db.node.Activity">
 		<view type="grid" name="activity-grid" />
 		<view type="form" name="activity-form" />
