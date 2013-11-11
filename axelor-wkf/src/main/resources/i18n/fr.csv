@@ -404,3 +404,5 @@
 "action-wkf-transitions","action-wkf-transitions","action","Transitions","Transitions","",""
 "action-wkf-workflows","action-wkf-workflows","action","Worklows","Processus","",""
 "wkf-validate","wkf-validate","action","Can't save workflow without start node","Impossible de sauvegarder le processus sans le nœud de départ","",""
+
+"axelor-wkf","You have no sufficient rights.","other","You have no sufficient rights.","Vous n'avez pas les droits suffisants.","","",""

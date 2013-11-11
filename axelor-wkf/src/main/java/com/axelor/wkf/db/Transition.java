@@ -313,8 +313,8 @@ public class Transition extends AuditableModel {
 		return JPA.all(Transition.class).filter(filter, params);
 	}
 
-	@SuppressWarnings("rawtypes")
-	public boolean execute( ActionHandler actionHandler, User user ){ 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public boolean execute( ActionHandler actionHandler, Map<Object, Object> context, User user ){ 
 
 		logger.debug("Execute transition ::: {}", getName() );
 		
@@ -329,6 +329,7 @@ public class Transition extends AuditableModel {
 			
 			if ( !role.getUsers().contains( user ) && !( user.getGroup() != null && role.getGroups().contains( user.getGroup() ) )) {
 				logger.debug( "Role ::: {}", role.getName() );
+				context.put("flash", JPA.translate("You have no sufficient rights."));
 				return false;
 			}
 			
@@ -338,12 +339,18 @@ public class Transition extends AuditableModel {
 
 			logger.debug( "Condition ::: {}", condition.getName() );
 			actionHandler.getRequest().setAction( condition.getName() );
-			for ( Object data : (List) actionHandler.execute().getData()) { 
-				
-				if ( ((Map) data).containsKey("errors") && ((Map) data).get("errors") != null && !( (Map) ((Map) data).get("errors") ).isEmpty() ) { return false; }
-				
-			}	
-		}		
+			for ( Object data : (List) actionHandler.execute().getData()) {
+				if ( data instanceof Boolean ) { return (Boolean) data; }
+				if ( data instanceof Map && ((Map) data).containsKey("errors") && ((Map) data).get("errors") != null && !( (Map) ((Map) data).get("errors") ).isEmpty() ) {
+
+					logger.debug( "Context with Errors ::: {}", data );
+					context.putAll( (Map) data );
+					return false;
+					
+				}
+
+			}
+		}
 
 		return true;
 	}
