@@ -34,7 +34,7 @@ import javax.persistence.Entity;
 
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
-import com.axelor.db.Widget;
+import com.axelor.db.annotations.Widget;
 import com.axelor.wkf.db.node.IntermediateMessageEvent;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
