@@ -64,7 +64,7 @@ public class ImportTranslations {
 			helpT.setType("help");
 			helpT.save();
 		}
-		else if(!Strings.isNullOrEmpty(help) && !Strings.isNullOrEmpty(help_t) && "field".equals(meta.getType()) && meta.getKey() != null) {
+		else if(!Strings.isNullOrEmpty(help_t) && "field".equals(meta.getType()) && meta.getKey() != null) {
 			MetaTranslation helpT = new MetaTranslation();
 			helpT.setDomain(meta.getDomain());
 			helpT.setKey(meta.getKey());
