@@ -164,15 +164,15 @@
 		<view type="form" name="stop-filter-event-form" />
 	</action-view>
 	
-	<menuitem name="menu-wkf-nodes-root-activity" parent="menu-wkf-nodes-root" title="Activities" />
+	<menuitem name="menu-wkf-nodes-root-NodeTask" parent="menu-wkf-nodes-root" title="Activities" />
 
-	<menuitem name="menu-wkf-activity" parent="menu-wkf-nodes-root-activity" title="Activities"
-		action="action-wkf-activity" />
+	<menuitem name="menu-wkf-NodeTask" parent="menu-wkf-nodes-root-NodeTask" title="Activities"
+		action="action-wkf-NodeTask" />
 
-	<action-view name="action-wkf-activity" title="Activities"
-		model="com.axelor.wkf.db.node.Activity">
-		<view type="grid" name="activity-grid" />
-		<view type="form" name="activity-form" />
+	<action-view name="action-wkf-NodeTask" title="Activities"
+		model="com.axelor.wkf.db.node.NodeTask">
+		<view type="grid" name="NodeTask-grid" />
+		<view type="form" name="NodeTask-form" />
 	</action-view>
 
 	<menuitem name="menu-wkf-nodes-root-gateway" parent="menu-wkf-nodes-root" title="Gateways" />
