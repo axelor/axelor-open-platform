@@ -554,7 +554,7 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 				return false;
 			}
 			
-			if (e.shiftKey || !e.ctrlKey) {
+			if (e.altKey || e.shiftKey || !e.ctrlKey) {
 				return;
 			}
 
