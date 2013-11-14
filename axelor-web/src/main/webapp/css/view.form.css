@@ -922,6 +922,10 @@ table.field-details .help-text hr {
 	margin-top: 3px;
 }
 
+.filter-menu .show-archived {
+	margin-left: 26px;
+}
+
 .btn-group > .btn-fix-left {
 	border-top-left-radius: 4px;
 	border-bottom-left-radius: 4px;
