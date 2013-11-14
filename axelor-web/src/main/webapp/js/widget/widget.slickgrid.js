@@ -1339,6 +1339,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 	
 	this.editorForm = form;
 	this.editorScope = formScope;
+	this.editorForEdit = forEdit;
 	this.editable = true;
 };
 
@@ -1447,11 +1448,12 @@ Grid.prototype.onRowCountChanged = function(event, args) {
 
 Grid.prototype.onRowsChanged = function(event, args) {
 	var grid = this.grid,
-		data = this.scope.dataView;
+		data = this.scope.dataView,
+		forEdit = this.editorForEdit;
 	
 	if(this.editable && !data.getItemById(0)) {
 		grid.setOptions({
-			enableAddRow: true
+			enableAddRow: forEdit === undefined ? true : forEdit
 		});
 	}
 	
@@ -1678,8 +1680,8 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 				scope.selector = attrs.selector;
 				scope.noFilter = attrs.noFilter;
 
-				var forEdit = schema.editable,
-					canEdit = schema.editable,
+				var forEdit = schema.editable || false,
+					canEdit = schema.editable || false,
 					hasMulti = false;
 
 				hasMulti = _.find(schema.items, function(item) {
