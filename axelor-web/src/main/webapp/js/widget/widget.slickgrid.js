@@ -121,7 +121,16 @@ var Editor = function(args) {
 					}
 				}
 			});
+			
+			element.bind('close:slick-editor', function(e) {
+				var grid = args.grid;
+				var lock = grid.getEditorLock();
+				if (lock.isActive()) {
+					lock.commitCurrentEdit();
+				}
+			});
 		}
+		
 		if (args.item && args.item.id > 0)
 			element.hide();
 		this.focus();
