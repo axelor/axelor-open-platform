@@ -201,6 +201,15 @@ var NestedEditor = {
 					nested.$apply();
 				});
 			});
+			
+			//FIX: accept values updated with actions
+			scope.$watch(attrs.ngModel + '.$updatedValues', function(value) {
+				if (!nested || !value) return;
+				var record = nested.record || {};
+				if (record.id === value.id) {
+					_.extend(record, value);
+				}
+			});
 
 			nested.$watch('form.$valid', function(valid){
 				setValidity(nested, valid);

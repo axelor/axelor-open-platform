@@ -71,6 +71,8 @@ function updateValues(source, target) {
 				if (dest.version) {
 					dest = _.extend({}, dest);
 					updateValues(value, dest);
+				} else {
+					dest.$updatedValues = value;
 				}
 			} else {
 				dest = compact(value);
