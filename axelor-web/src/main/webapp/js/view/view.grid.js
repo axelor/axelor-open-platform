@@ -167,22 +167,28 @@ function GridViewCtrl($scope, $element) {
 
 	$scope.filter = function(searchFilter) {
 
-		var fields = _.pluck($scope.fields, 'name');
-		
+		var fields = _.pluck($scope.fields, 'name'),
+			options = {};
+
 		// if criteria is given search using it
 		if (searchFilter.criteria || searchFilter._domains) {
-			return ds.search({
+			options = {
 				filter: searchFilter,
 				fields: fields
-			});
+			};
+			if (searchFilter.archived !== undefined) {
+				options.archived = searchFilter.archived;
+			}
+			return ds.search(options);
 		}
 
-		var filter =  {}, sortBy, pageNum,
-		domain = null,
-		context = null,
-		criteria = {
-			operator: 'and'
-		};
+		var filter =  {},
+			sortBy, pageNum,
+			domain = null,
+			context = null,
+			criteria = {
+				operator: 'and'
+			};
 
 		for(var name in searchFilter) {
 			var value = searchFilter[name];
@@ -264,7 +270,7 @@ function GridViewCtrl($scope, $element) {
 			context = _.extend({}, $scope._context, context, $scope.getContext());
 		}
 		
-		var options = {
+		options = {
 			filter: criteria,
 			fields: fields,
 			sortBy: sortBy,

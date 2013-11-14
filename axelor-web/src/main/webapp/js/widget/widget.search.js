@@ -226,6 +226,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	$scope.fields = {};
 	$scope.filters = [{}];
 	$scope.operator = 'and';
+	$scope.showArchived = false;
 
 	$scope.addFilter = function(filter) {
 		$scope.filters.push(filter || {});
@@ -313,6 +314,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	$scope.prepareFilter = function() {
 
 		var criteria = {
+			archived: $scope.showArchived,
 			operator: $scope.operator,
 			criteria: []
 		};
@@ -409,6 +411,9 @@ ui.directive('uiFilterForm', function() {
 				"</label>" +
 				"<label class='radio inline'>" +
 					"<input type='radio' name='operator' ng-model='operator' value='or' x-translate><span x-translate>or</span>" +
+				"</label>" +
+				"<label class='checkbox inline show-archived'>" +
+					"<input type='checkbox' ng-model='showArchived'><span x-translate>show archived</span>" +
 				"</label>" +
 			"</form>" +
 			"<div ng-repeat='filter in filters' ui-filter-item x-fields='fields' x-filter='filter'></div>" +
