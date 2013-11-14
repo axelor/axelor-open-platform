@@ -161,6 +161,14 @@ function NestedEditorCtrl($scope, $element, DataSource, ViewService) {
 		$scope.$watch("isReadonly()", function(readonly) {
 			scope.setEditable(!readonly);
 		});
+		
+		$scope.ajaxStop(function() {
+			$scope.applyLater(function() {
+				if (_.isEmpty(scope.record)) {
+					scope.$broadcast('on:new');
+				}
+			});
+		});
 	};
 }
 
@@ -236,7 +244,7 @@ var NestedEditor = {
 		model.$render = function() {
 			var nested = scope.nested,
 				promise = nested._viewPromise,
-				value = model.$viewValue;
+				oldValue = model.$viewValue;
 
 			if (nested == null)
 				return;
@@ -247,14 +255,18 @@ var NestedEditor = {
 					configure(nested);
 				});
 			}
-			if (value == null || !value.id || value.$dirty) {
-				return nested.edit(value);
-			}
 			
-			promise.then(function(){
-				nested.doRead(value.id).success(function(record){
+			promise.then(function() {
+				var value = model.$viewValue;
+				if (oldValue !== value) { // prevent unnecessary onLoad
+					return;
+				}
+				if (!value || !value.id || value.$dirty) {
+					return nested.edit(value);
+				}
+				return nested.doRead(value.id).success(function(record){
 					updateFlag = false;
-					nested.edit(record);
+					return nested.edit(record);
 				});
 			});
 		};

@@ -129,7 +129,7 @@ function FormViewCtrl($scope, $element) {
 				record = ($scope.record || {}).id ? $scope.record : record;
 				if (record === undefined) {
 					$scope.edit(null);
-					$scope.ajaxStop(function(){
+					return $scope.ajaxStop(function(){
 						setTimeout(function(){
 							$scope.$broadcast("on:new");
 							$scope.$apply();

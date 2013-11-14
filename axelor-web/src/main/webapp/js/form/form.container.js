@@ -146,7 +146,14 @@ ui.formWidget('Tabs', {
 	controller: ['$scope', '$element', function($scope, $element) {
 		
 		var tabs = $scope.tabs = [],
-			selected = 0;
+			selected = -1;
+		
+		var doSelect = _.debounce(function doSelect() {
+			var select = tabs[selected];
+			if (select) {
+				select.handleSelect();
+			}
+		}, 100);
 		
 		$scope.select = function(tab) {
 			
@@ -158,6 +165,10 @@ ui.formWidget('Tabs', {
 			
 			tab.selected = true;
 			selected = _.indexOf(tabs, tab);
+			
+			if (current === selected) {
+				return;
+			}
 			
 			setTimeout(function() {
 				if ($scope.$tabs) {
@@ -182,13 +193,6 @@ ui.formWidget('Tabs', {
 		
 		function findItem(index) {
 			return $element.find('ul.nav-tabs:first > li:nth-child(' + (index+1) + ')');
-		}
-		
-		function doSelect() {
-			var select = tabs[selected];
-			if (select) {
-				select.handleSelect();
-			}
 		}
 		
 		this.showTab = function(index) {
@@ -245,9 +249,7 @@ ui.formWidget('Tabs', {
 			pageScope.tab.title = value;
 		};
 		
-		$scope.$on('on:edit', function(event){
-			doSelect();
-		});
+		$scope.$on('on:edit', doSelect);
 	}],
 	
 	link: function(scope, elem, attrs) {

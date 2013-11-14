@@ -81,6 +81,8 @@ function ViewCtrl($scope, DataSource, ViewService) {
 	$scope.setRouteOptions = function(options) {
 		throw "Not Implemented.";
 	};
+	
+	var switchedTo = null;
 
 	$scope.switchTo = function(viewType, /* optional */ callback) {
 
@@ -92,9 +94,11 @@ function ViewCtrl($scope, DataSource, ViewService) {
 		var promise = view.deferred.promise;
 		promise.then(function(viewScope){
 
-			if (viewScope == null) {
+			if (viewScope == null || switchedTo === viewType) {
 				return;
 			}
+			
+			switchedTo = viewType;
 
 			$scope._viewType = viewType;
 			$scope._viewParams.viewType = viewType; //XXX: remove
