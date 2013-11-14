@@ -721,6 +721,20 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 		
 		element.on("adjustSize", _.debounce(adjust, 300));
 		
+		function hidePopup(e) {
+			if (element.is(':hidden')) {
+				return;
+			}
+			var all = element.add(wrapper);
+			var elem = $(e.target);
+			if (all.is(elem) || all.has(elem).size() > 0) return;
+			if (elem.zIndex() > wrapper.zIndex()) return;
+			
+			element.trigger('close:slick-editor');
+		}
+		
+		$(document).on('mousedown.mini-grid', hidePopup);
+		
 		scope.$watch(attrs.ngModel, function(value) {
 			var text = "";
 			if (value && value.length)
@@ -736,6 +750,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 		
 		scope.$on("$destroy", function(e){
 			wrapper.remove();
+			$(document).off('mousedown.mini-grid', hidePopup);
 		});
 
 		scope.canEdit = function () {
