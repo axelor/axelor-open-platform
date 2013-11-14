@@ -414,19 +414,20 @@ ActionHandler.prototype = {
 										.find('.record-toolbar:first')
 										.add(formElement);
 
-			// first search by x-path
+			// first search by nested x-path
 			if (scope.formPath) {
 				items = containers.find('[x-path="' + scope.formPath + '.' + name + '"]');
 				if (items.size()) {
 					return items;
 				}
-			} else {
-				items = containers.find('[x-path="' + name + '"]');
-				if (items.size()) {
-					return items;
-				}
 			}
-
+			
+			// then search by x-path
+			items = containers.find('[x-path="' + name + '"]');
+			if (items.size()) {
+				return items;
+			}
+		
 			// else search by name
 			items = containers.find('[name="' + name +'"]');
 			if (items.size()) {
