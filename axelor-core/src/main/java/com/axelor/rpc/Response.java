@@ -103,6 +103,7 @@ public class Response {
 
 	public void setErrors(Map<String, String> errors) {
 		this.errors = errors;
+		this.setStatus(STATUS_VALIDATION_ERROR);
 	}
 
 	public void addError(String fieldName, String errorMessage) {
@@ -110,6 +111,7 @@ public class Response {
 			this.errors = new HashMap<String, String>();
 		}
 		this.errors.put(fieldName, errorMessage);
+		this.setStatus(STATUS_VALIDATION_ERROR);
 	}
 	
 	public void setException(Throwable throwable) {
