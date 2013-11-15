@@ -158,6 +158,7 @@ public class CSVBinder {
 			Object bean = JPA.all((Class<Model>) beanClass).filter(query).bind(params).cacheable().autoFlush(false).fetchOne();
 			LOG.trace("search found: " + bean);
 			if (update || bean != null) {
+				newBean = false;
 				return bean;
 			}
 		}

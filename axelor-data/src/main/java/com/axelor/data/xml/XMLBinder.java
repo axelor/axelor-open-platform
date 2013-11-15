@@ -121,13 +121,13 @@ public abstract class XMLBinder {
 		Mapper mapper = Mapper.of(type);
 		List<XMLBind> bindings = binding.getBindings();
 		boolean isNull = bean == null;
+		newBean = isNull;
 
 		if (bindings == null) {
 			return bean;
 		}
 
 		if (isNull) {
-			newBean = true;
 			bean = newInstance(type);
 		}
 
