@@ -228,6 +228,11 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	$scope.operator = 'and';
 	$scope.showArchived = false;
 
+	var handler = $scope.$parent.handler;
+	if (handler && handler._dataSource) {
+		$scope.showArchived = handler._dataSource._showArchived;
+	}
+
 	$scope.addFilter = function(filter) {
 		$scope.filters.push(filter || {});
 	};
