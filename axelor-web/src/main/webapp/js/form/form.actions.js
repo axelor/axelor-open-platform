@@ -305,6 +305,11 @@ ActionHandler.prototype = {
 		var promise = this.ws.action(action, model, context).then(function(response){
 			var resp = response.data,
 				data = resp.data || [];
+			if (resp.errors) {
+				data.splice(0, 0, {
+					errors: resp.errors
+				});
+			}
 			return chain(data);
 		});
 
