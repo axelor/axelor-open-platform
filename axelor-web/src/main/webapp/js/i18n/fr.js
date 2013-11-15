@@ -94,6 +94,7 @@ _t.put({
 "Search": "Rechercher",
 "Select": "Selectionner",
 "Server is not responding.": "Le serveur ne répond pas",
+"Show archived": "Afficher Archives",
 "Show Details": "Afficher les détails",
 "Sign Out": "Se déconnecter",
 "Stacked": "Empilé",

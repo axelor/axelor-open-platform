@@ -418,7 +418,7 @@ ui.directive('uiFilterForm', function() {
 					"<input type='radio' name='operator' ng-model='operator' value='or' x-translate><span x-translate>or</span>" +
 				"</label>" +
 				"<label class='checkbox inline show-archived'>" +
-					"<input type='checkbox' ng-model='showArchived'><span x-translate>show archived</span>" +
+					"<input type='checkbox' ng-model='showArchived'><span x-translate>Show archived</span>" +
 				"</label>" +
 			"</form>" +
 			"<div ng-repeat='filter in filters' ui-filter-item x-fields='fields' x-filter='filter'></div>" +

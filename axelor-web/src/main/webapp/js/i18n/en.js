@@ -75,6 +75,7 @@ _t.put({
 "Search": "Search",
 "Select": "Select",
 "Server is not responding.": "Server is not responding.",
+"Show archived": "Show Archived",
 "Show Details": "Show Details",
 "Sign Out": "Sign Out",
 "Stacked": "Stacked",
