@@ -655,11 +655,12 @@ Grid.prototype.parse = function(view) {
 		if (item && item.$style === undefined) {
 			that.hilite(row);
 		}
-		var meta = that.getItemMetadata(row);
-		if (meta) {
-			return meta;
+		var meta = getItemMetadata.apply(dataView, arguments);
+		var my = that.getItemMetadata(row);
+		if (my && meta && meta.cssClasses) {
+			my.cssClasses += " " + meta.cssClasses;
 		}
-		return getItemMetadata.apply(dataView, arguments);
+		return meta || my;
 	};
 	this.subscribe(grid.onCellChange, function (e, args) {
 		that.hilite(args.row);
