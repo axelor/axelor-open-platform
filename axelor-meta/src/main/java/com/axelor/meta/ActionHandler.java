@@ -61,7 +61,6 @@ import com.axelor.meta.script.ScriptHelper;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
-import com.axelor.rpc.Response;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -179,7 +178,6 @@ public final class ActionHandler {
 					ActionResponse.class);
 			Object obj = injector.getInstance(klass);
 			m.invoke(obj, new Object[] { request, response });
-			response.setStatus(Response.STATUS_SUCCESS);
 		} catch (Exception e) {
 			e.printStackTrace();
 			response.setException(e);
