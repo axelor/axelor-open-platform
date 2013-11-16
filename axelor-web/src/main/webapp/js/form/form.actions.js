@@ -329,7 +329,8 @@ ActionHandler.prototype = {
 			return deferred.promise;
 		}
 
-		var scope = this.scope,
+		var self = this,
+			scope = this.scope,
 			formScope = scope,
 			formElement = this.element.parents('form:first');
 
@@ -347,30 +348,30 @@ ActionHandler.prototype = {
 			axelor.dialogs.say(data.flash);
 		}
 
-		if (data.error || data.alert) {
-			//TODO : #1090
-			if(data.error) {
-				axelor.dialogs.error(data.error, function(){
-					setTimeout(function(){
-						scope.$apply(function(){
-							deferred.reject();
-						});
-					});
+		if(data.error) {
+			axelor.dialogs.error(data.error, function(){
+				scope.applyLater(function(){
+					if (data.action) {
+						self._handleAction(data.action);
+					}
+					deferred.reject();
 				});
-			}
-			else {
-				axelor.dialogs.confirm(data.alert, function(confirmed){
-					setTimeout(function(){
-						scope.$apply(function(){
-							if (confirmed) {
-								return deferred.resolve(data.pending);
-							}
-							deferred.reject();
-						});
-					});
-				}, _t('Warning'));
-			}
-			scope.applyLater();
+			});
+			return deferred.promise;
+		}
+		
+		if (data.alert) {
+			axelor.dialogs.confirm(data.alert, function(confirmed){
+				scope.applyLater(function(){
+					if (confirmed) {
+						return deferred.resolve(data.pending);
+					}
+					if (data.action) {
+						self._handleAction(data.action);
+					}
+					deferred.reject();
+				});
+			}, _t('Warning'));
 			return deferred.promise;
 		}
 		
