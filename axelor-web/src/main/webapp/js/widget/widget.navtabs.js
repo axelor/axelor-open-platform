@@ -56,6 +56,10 @@ angular.module('axelor.ui').directive('navTabs', function() {
 				e.preventDefault();
 				e.stopPropagation();
 				
+				if (!tabScope.canCloseTab(tabScope.tab)) {
+					return;
+				}
+				
 				menu.show().position({
 					my: "left top",
 					at: "left+" + e.offsetX + " top+" + e.offsetY,

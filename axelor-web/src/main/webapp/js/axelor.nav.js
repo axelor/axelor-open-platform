@@ -252,7 +252,9 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 	}
 	
 	function closeTabOthers(current) {
-		var rest = _.difference(tabs, [current]);
+		var rest = _.filter(tabs, function(tab) {
+			return canCloseTab(tab) && tab !== current;
+		});
 		if (current && !current.selected) {
 			current.selected = true;
 			openTab(current);
@@ -373,7 +375,9 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 	};
 
 	$scope.closeTab = function(tab, callback) {
-		return NavService.closeTab(tab, callback);
+		if (NavService.canCloseTab(tab)) {
+			return NavService.closeTab(tab, callback);
+		}
 	};
 	
 	$scope.closeTabOthers = function(tab) {
@@ -395,7 +399,7 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 		}
 		return false;
 	};
-
+	
 	$scope.$watch('selectedTab.viewType', function(viewType){
 		if (viewType) {
 			setTimeout(function(){
@@ -419,19 +423,23 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 TabCtrl.$inject = ['$scope', '$location', '$routeParams'];
 function TabCtrl($scope, $location, $routeParams) {
 
-	var params = _.clone($routeParams),
+	var app = $scope.app || {},
+		params = _.clone($routeParams),
 		search = _.clone($location.$$search);
 
-	var resource = params.resource,
-		state = params.state,
-		mode = params.mode;
+	if (app.homeAction) {
+		$scope.openTabByName(app.homeAction, {
+			__tab_prepend: true,
+			__tab_closable: false
+		});
+	}
 
-	if (resource) {
-        $scope.openTabByName(resource, {
-        	mode: mode,
-        	state: state,
+	if (params.resource) {
+        $scope.openTabByName(params.resource, {
+    		mode: params.mode,
+        	state: params.state,
         	search: search
-        });
+    	});
     }
 }
 
