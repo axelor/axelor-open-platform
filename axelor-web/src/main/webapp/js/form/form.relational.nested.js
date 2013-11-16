@@ -163,7 +163,7 @@ function NestedEditorCtrl($scope, $element, DataSource, ViewService) {
 		});
 		
 		$scope.ajaxStop(function() {
-			$scope.applyLater(function() {
+			scope._viewPromise.then(function() {
 				if (_.isEmpty(scope.record)) {
 					scope.$broadcast('on:new');
 				}
