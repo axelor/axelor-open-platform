@@ -154,7 +154,13 @@ ui.formCompile = function(element, attrs, linkerFn) {
 				parent = elem;
 			if (label_parent.size())
 				label = label_parent;
-			return hidden ? parent.add(label).hide() : parent.add(label).show();
+			
+			if (hidden) {
+				parent.add(label).hide();
+			} else {
+				parent.add(label).show();
+			}
+			return $.event.trigger('adjustSize');
 		}
 
 		var hideFn = _.contains(this.handles, 'isHidden') ? angular.noop : hideWidget;
