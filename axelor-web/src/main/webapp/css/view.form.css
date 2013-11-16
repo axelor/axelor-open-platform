@@ -621,6 +621,7 @@ table.field-details .help-text hr {
 	position: relative;
 	display: block;
 	float: left;
+	outline: none;
 }
 
 .nav-select li a:after,

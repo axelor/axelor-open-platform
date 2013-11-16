@@ -531,7 +531,7 @@ ui.formInput('NavSelect', {
 	'<div class="nav-select">'+
 	'<ul class="steps">'+
 		'<li ng-repeat="select in selection" ng-class="{ active: getValue() == select.value }">'+
-			'<a href="" ng-click="onSelect(select)">{{select.title}}</a>'+
+			'<a href="" tabindex="-1" ng-click="onSelect(select)">{{select.title}}</a>'+
 		'</li>'+
 		'<li></li>'+
 	'</ul>'+
