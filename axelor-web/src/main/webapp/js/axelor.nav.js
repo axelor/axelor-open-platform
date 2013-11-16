@@ -381,7 +381,10 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 	};
 	
 	$scope.closeTabOthers = function(tab) {
-		return NavService.closeTabOthers(tab);
+		NavService.closeTabOthers(tab);
+		if ($scope.selectedTab === tab) {
+			$scope.$broadcast("on:nav-click", tab);
+		}
 	};
 	
 	$scope.closeTabAll = function() {
