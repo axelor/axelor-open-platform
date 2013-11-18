@@ -41,15 +41,8 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	FormViewCtrl.call(this, $scope, $element);
 	
 	$scope.setEditable();
-	$scope.onShow = function(viewPromise) {
-		
-		viewPromise.then(function(){
-			$element.dialog('open');
-		});
-	};
 	
 	var ds = $scope._dataSource;
-	
 	var closeCallback = null;
 	var originalEdit = $scope.edit;
 	var originalShow = $scope.show;
@@ -449,11 +442,9 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 			var initialized = false;
 			
 			function adjust(how) {
-				setTimeout(function() {
-					scope.ajaxStop(function() {
-						how();
-					});
-				}, 100);
+				scope.ajaxStop(function() {
+					how();
+				});
 			}
 			
 			function initSize() {
@@ -466,6 +457,10 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 				}
 				initialized = scope.isReadonly() ? 'readonly' : 'editable';
 				adjust(autoSize);
+
+				return scope.ajaxStop(function() {
+					element.closest('.ui-dialog').css('visibility', '');
+				}, 100);
 			}
 
 			function autoSize() {
@@ -492,9 +487,15 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 
 			// a flag used by evalScope to detect popup (see form.base.js)
 			scope._isPopup = true;
-
-			scope.onOpen = function(e, ui) {
-				adjust(initSize);
+			
+			scope.onShow = function(viewPromise) {
+				viewPromise.then(function(s) {
+					if (!initialized) {
+						element.closest('.ui-dialog').css('visibility', 'hidden');
+					}
+					element.dialog('open');
+					adjust(initSize);
+				});
 			};
 
 			scope.adjustSize = function() {
@@ -509,7 +510,7 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 		},
 		replace: true,
 		template:
-		'<div ui-dialog x-on-open="onOpen" x-on-ok="onOK" x-on-before-close="onBeforeClose">'+
+		'<div ui-dialog x-on-ok="onOK" x-on-before-close="onBeforeClose">'+
 		    '<div ui-view-form x-handler="this"></div>'+
 		'</div>'
 	};
