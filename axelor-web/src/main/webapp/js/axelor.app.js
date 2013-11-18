@@ -245,9 +245,16 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 			return true;
 		}
 
+		evalScope.$get = function(n) {
+			var context = this.$context || {};
+			if (context.hasOwnProperty(n)) {
+				return context[n];
+			}
+			return evalScope.$eval(n, context);
+		};
 		evalScope.$moment = function(d) { return moment(d); };		// moment.js helper
 		evalScope.$number = function(d) { return +d; };				// number helper
-		evalScope.$popup = function() { return scope._isPopup; };		// popup detect
+		evalScope.$popup = function() { return scope._isPopup; };	// popup detect
 
 		evalScope.$contains = function(iter, item) {
 			if (iter && iter.indexOf)
@@ -267,6 +274,7 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 		};
 		
 		try {
+			evalScope.$context = context;
 			return evalScope.$eval(expr, context);
 		} finally {
 			evalScope.$destroy();
