@@ -536,16 +536,25 @@ table.field-details .help-text hr {
 
 .popover {
 	width: auto;
-	max-width: inherit;
+	max-width: 480px;
 	z-index: 2147483647;
 }
 
 .popover-inner {
 	width: inherit;
 	min-width: 280px;
-	max-width: 500px;
+	max-width: 480px;
 	display: table;
 	overflow: hidden;
+}
+
+.popover .field-details th {
+	vertical-align: top;
+}
+
+.popover .field-details code {
+	display: block;
+	white-space: pre-wrap;
 }
 
 .ws-nowrap {
