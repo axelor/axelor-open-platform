@@ -64,7 +64,7 @@
 }
 
 .ui-dialog-content > div[ui-view-form] {
-	min-width: 400px;
+	min-width: 320px;
 }
 
 form.dynamic-form {
