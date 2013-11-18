@@ -573,9 +573,17 @@ Grid.prototype.parse = function(view) {
 	});
 
 	// performance tweaks
+	var _containerH = 0;
+	var _containerW = 0;
 	var _resizeCanvas = grid.resizeCanvas;
 	grid.resizeCanvas = _.debounce(function() {
-		if (element.is(':hidden')) return;
+		var w = element.width(),
+			h = element.height();
+		if (element.is(':hidden') || (w === _containerW && h === _containerH)) {
+			return;
+		}
+		_containerW = w;
+		_containerH = h;
 		_resizeCanvas.call(grid);
 	}, 100);
 
