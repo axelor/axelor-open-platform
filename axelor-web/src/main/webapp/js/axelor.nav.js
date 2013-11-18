@@ -375,14 +375,19 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 	};
 
 	$scope.closeTab = function(tab, callback) {
+		var wasSelected = tab.selected;
 		if (NavService.canCloseTab(tab)) {
-			return NavService.closeTab(tab, callback);
+			NavService.closeTab(tab, callback);
+			if ($scope.selectedTab && wasSelected) {
+				$scope.$broadcast("on:nav-click", $scope.selectedTab);
+			}
 		}
 	};
 	
 	$scope.closeTabOthers = function(tab) {
+		var wasSelected = tab.selected;
 		NavService.closeTabOthers(tab);
-		if ($scope.selectedTab === tab) {
+		if ($scope.selectedTab === tab && !wasSelected) {
 			$scope.$broadcast("on:nav-click", tab);
 		}
 	};
