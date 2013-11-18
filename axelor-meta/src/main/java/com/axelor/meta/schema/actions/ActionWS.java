@@ -104,15 +104,15 @@ public class ActionWS extends Action {
 		return (ActionWS) ref;
 	}
 
-	private Object send(String location, Method method, ActionHandler handler)
+	private Object send(String location, String template, ActionHandler handler)
 			throws IOException, FileNotFoundException, ClassNotFoundException {
 
-		File template = new File(method.template);
-		if (!template.isFile()) {
-			throw new IllegalArgumentException("No such template: " + method.template);
+		File templateFile = new File(template);
+		if (!templateFile.isFile()) {
+			throw new IllegalArgumentException("No such template: " + template);
 		}
 
-		String payload = handler.template(template);
+		String payload = handler.template(templateFile);
 		Map<String, Object> params = Maps.newHashMap();
 
 		params.put("connectTimeout", getConnectTimeout() * 1000);
@@ -131,7 +131,19 @@ public class ActionWS extends Action {
 	public Object evaluate(ActionHandler handler) {
 
 		ActionWS ref = getRef();
-		String url = ref == null ? service : ref.getService();
+		String url = null;
+
+		if(ref == null) {
+			url = service;
+		}
+		else {
+			Object service = handler.evaluate(ref.getService());
+			if(service == null) {
+				log.error("No such service: " + ref.getService());
+				return null;
+			}
+			url = service.toString();
+		}
 
 		if (Strings.isNullOrEmpty(url))
 			return null;
@@ -143,9 +155,14 @@ public class ActionWS extends Action {
 		List<Object> result = Lists.newArrayList();
 		log.info("action-ws (name): " + getName());
 		for(Method m : methods) {
-			log.info("action-ws (method, template): " + m.getName() + ", " + m.template);
+			Object template = handler.evaluate(m.template);
+			if(template == null) {
+				log.error("No such template: " + m.template);
+				continue;
+			}
+			log.info("action-ws (method, template): " + m.getName() + ", " + template.toString());
 			try {
-				Object res = this.send(url, m, handler);
+				Object res = this.send(url, template.toString(), handler);
 				result.add(res);
 			} catch (Exception e) {
 				log.error("error: " + e);
