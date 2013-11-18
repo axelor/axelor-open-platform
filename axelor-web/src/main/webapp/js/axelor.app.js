@@ -160,7 +160,7 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 				return _.delay(ajaxStop, wait, callback, context);
 			}
 			if (callback) {
-				callback.call(context);
+				_.delay(callback, wait, context);
 			}
 		};
 		
