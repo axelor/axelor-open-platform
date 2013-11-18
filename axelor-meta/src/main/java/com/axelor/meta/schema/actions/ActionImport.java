@@ -137,7 +137,13 @@ public class ActionImport extends Action {
 
 		int count = 0;
 		for(Import stream : getImports()) {
-			log.info("action-import (stream, provider): " + stream.file + ", " + stream.provider);
+			Object fileName = handler.evaluate(stream.getFile());
+			if(fileName == null) {
+				log.debug("No such config file: " + stream.getFile());
+				continue;
+			}
+
+			log.info("action-import (stream, provider): " + fileName.toString() + ", " + stream.getProvider());
 			Action action = MetaStore.getAction(stream.getProvider());
 			if (action == null) {
 				log.debug("No such action: " + stream.getProvider());
@@ -151,7 +157,7 @@ public class ActionImport extends Action {
 				for(Object item : (Collection<?>) data) {
 					if (item instanceof String) {
 						log.info("action-import (xml stream)");
-						List<Model> imported = doImport(importer, stream.file, item);
+						List<Model> imported = doImport(importer, fileName.toString(), item);
 						if (imported != null) {
 							records.addAll(imported);
 						}
@@ -159,13 +165,13 @@ public class ActionImport extends Action {
 				}
 			} else {
 				log.info("action-import (object stream)");
-				List<Model> imported = doImport(importer, stream.file, data);
+				List<Model> imported = doImport(importer, fileName.toString(), data);
 				if (imported != null) {
 					records.addAll(imported);
 				}
 			}
 			count += records.size();
-			result.put(stream.name == null ? stream.file : stream.name, records);
+			result.put(stream.name == null ? fileName.toString() : stream.name, records);
 		}
 		log.info("action-import (total): " + count);
 		return result;
