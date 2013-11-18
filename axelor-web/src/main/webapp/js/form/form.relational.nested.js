@@ -161,14 +161,6 @@ function NestedEditorCtrl($scope, $element, DataSource, ViewService) {
 		$scope.$watch("isReadonly()", function(readonly) {
 			scope.setEditable(!readonly);
 		});
-		
-		$scope.ajaxStop(function() {
-			scope._viewPromise.then(function() {
-				if (_.isEmpty(scope.record)) {
-					scope.$broadcast('on:new');
-				}
-			});
-		});
 	};
 }
 
