@@ -127,23 +127,23 @@ public class ActionWS extends Action {
 		return TemplateHelper.serialize(gpath);
 	}
 
+	private String getService(ActionWS ref, ActionHandler handler) {
+		String url = ref == null ? service : ref.getService();
+		Object service = handler.evaluate(url);
+
+		if(service == null) {
+			log.error("No such service: " + url);
+			return null;
+		}
+
+		return service.toString();
+	}
+
 	@Override
 	public Object evaluate(ActionHandler handler) {
 
 		ActionWS ref = getRef();
-		String url = null;
-
-		if(ref == null) {
-			url = service;
-		}
-		else {
-			Object service = handler.evaluate(ref.getService());
-			if(service == null) {
-				log.error("No such service: " + ref.getService());
-				return null;
-			}
-			url = service.toString();
-		}
+		String url = getService(ref, handler);
 
 		if (Strings.isNullOrEmpty(url))
 			return null;
