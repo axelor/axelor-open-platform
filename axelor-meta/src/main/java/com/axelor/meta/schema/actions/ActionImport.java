@@ -129,21 +129,21 @@ public class ActionImport extends Action {
 
 	@Override
 	public Object evaluate(ActionHandler handler) {
-		log.info("action-import (config): " + config);
-		XMLImporter importer = new XMLImporter(handler.getInjector(), config);
 		Map<String, Object> result = Maps.newHashMap();
 
+		Object configName = handler.evaluate(config);
+		if(configName == null) {
+			log.debug("No such config file: " + config);
+			return result;
+		}
+
+		log.info("action-import (config): " + configName.toString());
+		XMLImporter importer = new XMLImporter(handler.getInjector(), configName.toString());
 		importer.setContext(handler.getContext());
 
 		int count = 0;
 		for(Import stream : getImports()) {
-			Object fileName = handler.evaluate(stream.getFile());
-			if(fileName == null) {
-				log.debug("No such config file: " + stream.getFile());
-				continue;
-			}
-
-			log.info("action-import (stream, provider): " + fileName.toString() + ", " + stream.getProvider());
+			log.info("action-import (stream, provider): " + stream.getFile() + ", " + stream.getProvider());
 			Action action = MetaStore.getAction(stream.getProvider());
 			if (action == null) {
 				log.debug("No such action: " + stream.getProvider());
@@ -157,7 +157,7 @@ public class ActionImport extends Action {
 				for(Object item : (Collection<?>) data) {
 					if (item instanceof String) {
 						log.info("action-import (xml stream)");
-						List<Model> imported = doImport(importer, fileName.toString(), item);
+						List<Model> imported = doImport(importer, stream.getFile(), item);
 						if (imported != null) {
 							records.addAll(imported);
 						}
@@ -165,13 +165,13 @@ public class ActionImport extends Action {
 				}
 			} else {
 				log.info("action-import (object stream)");
-				List<Model> imported = doImport(importer, fileName.toString(), data);
+				List<Model> imported = doImport(importer, stream.getFile(), data);
 				if (imported != null) {
 					records.addAll(imported);
 				}
 			}
 			count += records.size();
-			result.put(stream.name == null ? fileName.toString() : stream.name, records);
+			result.put(stream.name == null ? stream.getFile() : stream.name, records);
 		}
 		log.info("action-import (total): " + count);
 		return result;
