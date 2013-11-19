@@ -89,7 +89,7 @@ ui.directive('uiHelpPopover', function() {
 		}
 
 		var value = scope.$eval('$$original.' + field.name);
-		if (value && field.type === 'many-to-one') {
+		if (value && field.serverType === 'many-to-one') {
 			value = value.id;
 		}
 		if (value && field.type === "password") {
@@ -103,7 +103,7 @@ ui.directive('uiHelpPopover', function() {
 			}
 			value = value.join('');
 		}
-		if (value && /-many$/.test(field.type)) {
+		if (value && /-many$/.test(field.serverType)) {
 			var length = value.length;
 			value = _.first(value, 5);
 			value = _.map(value, function(v){
