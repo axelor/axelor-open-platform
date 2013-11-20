@@ -50,7 +50,7 @@
       <view type="grid" name="permission-grid" />
       <view type="form" name="permission-form" />
       <domain>self.id IN (:permissions)</domain>
-      <context name="permissions" expr="eval: permissions.collect{it.id}?.join(',')" />
+      <context name="permissions" expr="eval: permissions.collect { it.id }" />
     </action-view>
 
 </object-views>
