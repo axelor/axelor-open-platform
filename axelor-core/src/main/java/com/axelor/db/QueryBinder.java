@@ -161,20 +161,8 @@ public class QueryBinder {
 			variables.putAll(namedParams);
 
 			for (Parameter<?> p : query.getParameters()) {
-				if (p.getName() == null)
-					continue;
-				if (variables.containsKey(p.getName())) {
-					Object value = variables.get(p.getName());
-					if (value instanceof String && "".equals(((String) value).trim())) {
-						value = adapt(value, p);
-					}
-					try {
-						query.setParameter(p.getName(), value);
-					} catch (IllegalArgumentException e) {
-						query.setParameter(p.getName(), adapt(value, p));
-					}
-				} else {
-					query.setParameter(p.getName(), adapt(null, p));
+				if (p.getName() != null) {
+					this.bind(p.getName(), variables.get(p.getName()));
 				}
 			}
 		}
@@ -212,9 +200,26 @@ public class QueryBinder {
 	 * @return the same query binder instance
 	 */
 	public QueryBinder bind(String name, Object value) {
-		final Map<String, Object> params = Maps.newHashMap();
-		params.put(name, value);
-		return this.bind(params);
+		Parameter<?> parameter = null;
+		try {
+			parameter = query.getParameter(name);
+		} catch (Exception e) {}
+
+		if (parameter == null) {
+			return this;
+		}
+
+		if (value == null || value instanceof String && "".equals(((String) value).trim())) {
+			value = adapt(value, parameter);
+		}
+
+		try {
+			query.setParameter(name, value);
+		} catch (IllegalArgumentException e) {
+			query.setParameter(name, adapt(value, parameter));
+		}
+
+		return this;
 	}
 
 	/**
