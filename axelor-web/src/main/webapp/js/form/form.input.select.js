@@ -235,6 +235,63 @@ ui.formInput('Select', 'BaseSelect', {
 	}
 });
 
+ui.formInput('ImageSelect', 'Select', {
+	
+	BLANK: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+	
+	link: function(scope, element, attrs) {
+		this._super(scope, element, attrs);
+		
+		var field = scope.field;
+		var formatItem = scope.formatItem;
+
+		scope.canShowText = function () {
+			return field.labels === undefined || field.labels;
+		};
+
+		scope.formatItem = function (item) {
+			if (scope.canShowText()) {
+				return formatItem(item);
+			}
+			return "";
+		};
+		
+		scope.$watch('getValue()', function (value, old) {
+			scope.image = value || this.BLANK;
+			element.toggleClass('empty', !value);
+		}.bind(this));
+	},
+	
+	link_editable: function(scope, element, attrs) {
+		this._super(scope, element, attrs);
+		var input = this.findInput(element);
+		
+		input.data('ui-autocomplete')._renderItem = function(ul, item) {
+			var a = $("<a>").append($("<img>").attr("src", item.value));
+			var el = $("<li>").addClass("image-select-item").append(a).appendTo(ul);
+			
+			if (scope.canShowText()) {
+				a.append($("<span></span>").html(item.label));
+			}
+			
+			return el;
+		};
+	},
+	template_readonly:
+		'<span class="image-select readonly">'+
+			'<img ng-src="{{image}}"></img> <span ng-show="canShowText()">{{text}}</span>' +
+		'</span>',
+
+	template_editable:
+		'<span class="picker-input image-select">'+
+			'<img ng-src="{{image}}"></img>' +
+			'<input type="text" autocomplete="off">'+
+			'<span class="picker-icons">'+
+				'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
+			'</span>'+
+		'</span>'
+});
+
 ui.formInput('MultiSelect', 'Select', {
 
 	css: 'multi-select-item',
