@@ -427,8 +427,10 @@ function AppCtrl($rootScope, $scope, $http, $route, authService) {
 
 			stacktrace = report.stacktrace;
 			cause = report.cause;
-		} else {
+		} else if (_.isString(report)) {
 			stacktrace = report.replace(/.*<body>|<\/body>.*/g, '');
+		} else {
+			return; // no error report, so ignore
 		}
 		_.extend($scope.httpError, {
 			message: message,
