@@ -794,6 +794,27 @@ table.field-details .help-text hr {
 	padding-left: 12px;
 }
 
+.image-select > img {
+	position: absolute;
+	top: 5px;
+	left: 8px;
+}
+
+.image-select.readonly > img {
+	position: initial;
+}
+
+.image-select input {
+	padding-left: 28px;
+}
+
+.empty > .image-select input {
+	padding-left: 8px;
+}
+
+.image-select-item img {
+	margin-right: 8px;
+}
 
 .multi-object-select {
 	
