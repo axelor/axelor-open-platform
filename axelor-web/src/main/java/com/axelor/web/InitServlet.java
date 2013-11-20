@@ -38,24 +38,40 @@ import javax.servlet.http.HttpServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.auth.AuthService;
+import com.axelor.auth.db.Group;
+import com.axelor.auth.db.User;
+import com.axelor.db.JPA;
 import com.axelor.meta.MetaLoader;
 
 @Singleton
 public class InitServlet extends HttpServlet {
-	
+
 	private static final long serialVersionUID = -2493577642638670615L;
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(InitServlet.class);
-	
+
 	@Inject
 	private AppSettings settings;
-	
+
 	@Inject
 	private MetaLoader metaLoader;
+
+	@Inject
+	private AuthService authService;
 
 	@Override
 	public void init() throws ServletException {
 		LOG.info("Initializing...");
+
+		JPA.runInTransaction(new Runnable() {
+
+			@Override
+			public void run() {
+				createInitialUsers();
+			}
+		});
+
 		try {
 			String output = settings.get("temp.dir");
 			metaLoader.load(output);
@@ -63,5 +79,40 @@ public class InitServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		super.init();
+	}
+
+	private void createInitialUsers() {
+
+		if (User.all().count() > 0) {
+			return;
+		}
+
+		Group g1 = Group.findByCode("admins");
+		Group g2 = Group.findByCode("users");
+
+		if (g1 == null) {
+			g1 = new Group("admins", "Administrators");
+			g1.save();
+		}
+
+		if (g2 == null) {
+			g2 = new Group("users", "Users");
+			g2.save();
+		}
+
+		User u1 = new User("admin", "Administrator");
+		User u2 = new User("demo", "Demo User");
+
+		u1.setGroup(g1);
+		u2.setGroup(g2);
+
+		u1.setPassword("admin");
+		u2.setPassword("demo");
+
+		authService.encrypt(u1);
+		authService.encrypt(u2);
+
+		u1.save();
+		u2.save();
 	}
 }
