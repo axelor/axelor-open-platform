@@ -193,6 +193,9 @@ function SelectorCtrl($scope, $element, DataSource, ViewService) {
 	$scope.onShow = function(viewPromise) {
 		
 		viewPromise.then(function(){
+			if (!initialized) {
+				$element.closest('.ui-dialog').css('visibility', 'hidden');
+			}
 			$element.dialog('open');
 			initialized = true;
 			origOnShow(viewPromise);
@@ -532,31 +535,41 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 			
 			width = (60 * width / 100);
 			height = (70 * height / 100);
+			
+			function adjustSize() {
 
-			scope.onOpen = function(e, ui) {
+				element.find('input[type=text]:first').focus();
+				$.event.trigger('adjustSize');
 
-				setTimeout(function(){
-					
-					element.find('input[type=text]:first').focus();
-					$.event.trigger('adjustSize');
+				//XXX: ui-dialog issue
+				element.find('.slick-headerrow-column').zIndex(element.zIndex());
 
-					//XXX: ui-dialog issue
-					element.find('.slick-headerrow-column').zIndex(element.zIndex());
+				if (initialized) {
+					return;
+				}
 
-					if (initialized) {
-						return;
+				element.dialog('option', 'width', width);
+				element.dialog('option', 'height', height);
+
+				element.closest('.ui-dialog').position({
+			      my: "center",
+			      at: "center",
+			      of: window
+			    });
+				
+				initialized = true;
+				element.closest('.ui-dialog').css('visibility', '');
+			};
+			
+			var onShow = scope.onShow;
+			scope.onShow = function (viewPromise) {
+				onShow(viewPromise);
+				viewPromise.then(function (result) {
+					var view = result.view || {};
+					if (view.width !== undefined) {
+						width = view.width || width;
 					}
-
-					element.dialog('option', 'width', width);
-					element.dialog('option', 'height', height);
-
-					element.closest('.ui-dialog').position({
-				      my: "center",
-				      at: "center",
-				      of: window
-				    });
-					
-					initialized = true;
+					setTimeout(adjustSize);
 				});
 			};
 			
@@ -575,7 +588,7 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 		},
 		replace: true,
 		template:
-		'<div ui-dialog x-on-open="onOpen" x-on-ok="onOK">'+
+		'<div ui-dialog x-on-ok="onOK">'+
 		    '<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-editable="false" x-selector="{{selectMode}}"></div>'+
 		    '<div class="record-pager pull-left">'+
 			    '<div class="btn-group">'+
