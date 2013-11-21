@@ -412,4 +412,48 @@ ui.formInput('RelativeTime', 'DateTime', {
 	}
 });
 
+ui.formInput('Duration', 'Time', {
+	
+	mask: '99:mm',
+	
+	init: function(scope) {
+		this._super(scope);
+		var pattern = /^\d+:\d+$/;
+		
+		scope.format = function(value) {
+			if (!value || !_.isNumber(value)) {
+				return value;
+			}
+			
+			var h = Math.floor(value / 3600);
+			var m = Math.floor((value % 3600) / 60);
+
+			return h + ':' + m;
+		};
+		
+		scope.parse = function(value) {
+			if (!value || !_.isString(value)) {
+				return value;
+			}
+			if (!pattern.test(value)) {
+				return null;
+			}
+			
+			var parts = value.split(':'),
+				first = +(parts[0]),
+				last = +(parts[1]);
+			
+			return (first * 60 * 60) + (last * 60);
+		};
+	},
+	
+	link_editable: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+		
+		scope.validate = function(value) {
+			return !value || _.isNumber(value);
+		};
+	}
+});
+
 })(this);
