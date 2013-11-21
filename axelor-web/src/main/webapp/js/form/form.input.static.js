@@ -265,12 +265,12 @@ ui.formItem('Button', {
 		}
 
 		element.on("click", function(e) {
-			if (!scope.attr('readonly')) {
+			if (!scope.isReadonlyExclusive()) {
 				scope.fireAction("onClick");
 			}
 		});
 		
-		scope.$watch('attr("readonly")', function(readonly, old) {
+		scope.$watch('isReadonlyExclusive()', function(readonly, old) {
 			if (readonly === old) return;
 			if (readonly) {
 				return element.addClass("disabled");
