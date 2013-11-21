@@ -1516,7 +1516,7 @@ Grid.prototype.groupBy = function(names) {
 		
 		var col = this.getColumn(name),
 			field = col.descriptor,
-			formatter = Formatters[field.type];
+			formatter = Formatters[field.selection ? 'selection' : field.type];
 		
 		return {
 			getter: function(item) {
