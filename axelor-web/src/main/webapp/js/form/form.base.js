@@ -105,13 +105,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		
 		scope.isReadonly = function() {
 			var parent = this.$parent || {};
-			if (this.isReadonlyExclusive()) {
-				return;
-			}
-			if (this.hasPermission && !this.hasPermission('read')) {
-				return true;
-			}
-			if (parent.hasPermission && !parent.hasPermission('write')) {
+			if ((this.hasPermission && !this.hasPermission('read')) || this.isReadonlyExclusive()) {
 				return true;
 			}
 			if (!this.attr("readonly") && this.attr("force-edit")) {
