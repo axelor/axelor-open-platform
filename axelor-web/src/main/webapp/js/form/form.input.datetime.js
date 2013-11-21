@@ -418,8 +418,10 @@ ui.formInput('Duration', 'Time', {
 	
 	init: function(scope) {
 		this._super(scope);
-		var pattern = /^\d+:\d+$/;
 		
+		var field = scope.field;
+		var pattern = /^\d+:\d+(:\d+)?$/;
+
 		scope.format = function(value) {
 			if (!value || !_.isNumber(value)) {
 				return value;
@@ -427,8 +429,15 @@ ui.formInput('Duration', 'Time', {
 			
 			var h = Math.floor(value / 3600);
 			var m = Math.floor((value % 3600) / 60);
-
-			return h + ':' + m;
+			var s = Math.floor((value % 3600) % 60);
+			
+			var text = h + ':' + m;
+			
+			if (field.seconds) {
+				text = text + ':' + s;
+			}
+			
+			return text;
 		};
 		
 		scope.parse = function(value) {
@@ -441,13 +450,25 @@ ui.formInput('Duration', 'Time', {
 			
 			var parts = value.split(':'),
 				first = +(parts[0]),
-				last = +(parts[1]);
+				next = +(parts[1]),
+				last = +(parts[2] || 0);
 			
-			return (first * 60 * 60) + (last * 60);
+			return (first * 60 * 60) + (next * 60) + last;
 		};
 	},
 	
 	link_editable: function(scope, element, attrs, model) {
+		var field = scope.field || {},
+			mask = this.mask;
+		
+		if (field.big) {
+			mask = "999:mm";
+		}
+		if (field.seconds) {
+			mask = mask + ":mm";
+		}
+		
+		this.mask = mask;
 		this._super.apply(this, arguments);
 		
 		scope.validate = function(value) {
