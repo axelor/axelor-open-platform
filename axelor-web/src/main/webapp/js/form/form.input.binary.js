@@ -51,8 +51,15 @@ ui.formInput('ImageLink', {
 	init: function(scope) {
 		var field = scope.field;
 
-		scope.width = field.width || 140;
-		scope.height = field.height || 140;
+		var width = field.width || 140;
+		var height = field.height || 140;
+		
+		scope.styles = [{
+			'min-width' : width
+		}, {
+			'width': width,
+			'height': height
+		}];
 	},
 
 	link_readonly: function(scope, element, attrs, model) {
@@ -62,10 +69,10 @@ ui.formInput('ImageLink', {
 
 		scope.$render_readonly = function() {
 			var content = model.$viewValue || null;
-			if (content == null) {
+			if (!content) {
 				image.get(0).src = BLANK;
 			}
-			image.get(0).src = scope.parseText(content);
+			image.get(0).src = scope.parseText(content) || BLANK;
 		};
 
 		scope.$watch('isReadonly()', function(readonly, old) {
@@ -75,8 +82,8 @@ ui.formInput('ImageLink', {
 	},
 	template_editable: '<input type="text">',
 	template_readonly:
-		'<div style="min-width: {{width}}px;">'+
-			'<img class="img-polaroid" style="width: {{width}}px; height: {{height}}px;">'+
+		'<div ng-style="styles[0]">'+
+			'<img class="img-polaroid" ng-style="styles[1]">'+
 		'</div>'
 });
 
@@ -108,8 +115,8 @@ ui.formInput('Image', 'ImageLink', {
 		};
 
 		scope.doRemove = function() {
-			image.get(0).src = BLANK;
 			image.get(0).src = null;
+			image.get(0).src = BLANK;
 			input.val(null);
 			update(null);
 		};
@@ -136,16 +143,16 @@ ui.formInput('Image', 'ImageLink', {
 
 		scope.$render_editable = function() {
 			var content = model.$viewValue || null;
-			if (content == null) {
+			if (!content) {
 				image.get(0).src = BLANK;
 			}
-			image.get(0).src = content;
+			image.get(0).src = content || BLANK;
 		};
 	},
 	template_editable:
-	'<div style="min-width: {{width}}px;">' +
+	'<div ng-style="styles[0]">' +
 		'<input type="file" accept="image/*">' +
-		'<img class="img-polaroid" style="width: {{width}}px; height: {{height}}px; display: inline-block;">' +
+		'<img class="img-polaroid" ng-style="styles[1]" style="display: inline-block;">' +
 		'<div class="btn-group">' +
 			'<button ng-click="doSelect()" class="btn" type="button"><i class="icon-upload-alt"></i></button>' +
 			'<button ng-click="doSave()" class="btn" type="button"><i class="icon-download-alt"></i></button>' +
