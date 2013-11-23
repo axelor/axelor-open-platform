@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -49,6 +50,7 @@ public class LdapTest extends AbstractLdapTestUnit {
 
 			properties.put(AuthLdap.LDAP_GROUP_BASE, "ou=groups,dc=test,dc=com");
 			properties.put(AuthLdap.LDAP_USER_BASE, "ou=users,dc=test,dc=com");
+			properties.put(AuthLdap.LDAP_GROUP_OBJECT_CLASS, "groupOfUniqueNames");
 
 			properties.put(AuthLdap.LDAP_GROUP_FILTER, "(uniqueMember=uid={0})");
 			properties.put(AuthLdap.LDAP_USER_FILTER, "(uid={0})");
@@ -64,6 +66,10 @@ public class LdapTest extends AbstractLdapTestUnit {
 		private AuthLdap authLdap;
 
 		public void test() {
+
+			new Group("test", "Test").save();
+			new Group("my", "My").save();
+
 			ensureUsers(0);
 			loginFailed();
 			ensureUsers(0);
@@ -71,6 +77,10 @@ public class LdapTest extends AbstractLdapTestUnit {
 			ensureUsers(1);
 			loginSuccess();
 			ensureUsers(1);
+
+			// make sure groups are create on ldap server
+			Assert.assertTrue(authLdap.ldapGroupExists("(cn={0})", "test"));
+			Assert.assertTrue(authLdap.ldapGroupExists("(cn={0})", "my"));
 		}
 
 		void ensureUsers(int count) {
