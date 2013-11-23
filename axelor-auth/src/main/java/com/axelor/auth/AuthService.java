@@ -36,6 +36,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.credential.DefaultPasswordService;
 import org.apache.shiro.crypto.hash.DefaultHashService;
 import org.apache.shiro.crypto.hash.format.ParsableHashFormat;
@@ -57,7 +58,7 @@ import com.google.inject.persist.Transactional;
  * form.
  * <p>
  * The {@link AuthService} should not be manually instantiated but either
- * injected or user {@link #getInstance()} method to get the instace of the
+ * injected or user {@link #getInstance()} method to get the instance of the
  * service.
  *
  */
@@ -103,6 +104,36 @@ public class AuthService {
 			throw new IllegalStateException("AuthService is not initialized, did you forget to bind the AuthService?");
 		}
 		return instance;
+	}
+
+	@Inject
+	private AuthLdap authLdap;
+
+	/**
+	 * Perform LDAP authentication.
+	 * <p>
+	 * The user/group objects are created in the database when user logins first
+	 * time via ldap server. The user object created has a random password
+	 * generated so the user can not logged in against the local database object
+	 * as password is unknown.
+	 *
+	 * @param subject
+	 *            the user login name
+	 * @param password
+	 *            the user submitted password
+	 * @throws IllegalStateException
+	 *             if ldap is not enabled
+	 * @throws AuthenticationException
+	 *             if ldap authentication failed
+	 *
+	 * @return true if login success else false
+	 */
+	boolean ldapLogin(String subject, String password) throws AuthenticationException {
+		return authLdap.login(subject, password);
+	}
+
+	boolean ldapEnabled() {
+		return authLdap.isEnabled();
 	}
 
 	/**

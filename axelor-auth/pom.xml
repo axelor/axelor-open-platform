@@ -12,6 +12,10 @@
   
   <artifactId>axelor-auth</artifactId>
   <name>Axelor :: Auth</name>
+  
+  <properties>
+    <apache.ds.version>2.0.0-M15</apache.ds.version>
+  </properties>
 
   <!-- module specific dependencies -->
   <dependencies>
@@ -34,6 +38,26 @@
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-guice</artifactId>
+    </dependency>
+
+    <!-- ApacheDS -->
+    <dependency>
+      <groupId>org.apache.directory.server</groupId>
+      <artifactId>apacheds-test-framework</artifactId>
+      <version>${apache.ds.version}</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>apacheds-jdbm1</artifactId>
+          <groupId>org.apache.directory.jdbm</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.directory.jdbm</groupId>
+      <artifactId>apacheds-jdbm1</artifactId>
+      <version>2.0.0-M3-SNAPSHOT</version>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>
