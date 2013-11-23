@@ -273,9 +273,9 @@ ui.formItem('Button', {
 		scope.$watch('isReadonlyExclusive()', function(readonly, old) {
 			if (readonly === old) return;
 			if (readonly) {
-				return element.addClass("disabled");
+				return element.addClass("disabled").attr('tabindex', -1);
 			}
-			return element.removeClass("disabled");
+			return element.removeClass("disabled").removeAttr('tabindex');
 		});
 		
 		scope.$watch('attr("title")', function(title, old) {

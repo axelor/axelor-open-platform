@@ -866,6 +866,11 @@ table.field-details .help-text hr {
 	text-decoration: none;
 }
 
+.button-item.disabled {
+	outline: none;
+	opacity: 0.55;
+}
+
 .record-toolbar .button-item {
 	line-height: 20px;
 }
