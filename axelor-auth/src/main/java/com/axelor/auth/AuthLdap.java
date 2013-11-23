@@ -82,12 +82,24 @@ public class AuthLdap {
 		this.authService = authService;
 	}
 
-	public User findOrCreateUser(String subject) {
-		return null;
-	}
-
 	public boolean isEnabled() {
 		return ldapServerUrl != null && !"".equals(ldapServerUrl.trim());
+	}
+
+	public boolean ldapUserExists(String filter, String code) {
+		try {
+			return search(ldapUsersDn, filter, code).hasMore();
+		} catch (NamingException e) {
+		}
+		return false;
+	}
+
+	public boolean ldapGroupExists(String filter, String code) {
+		try {
+			return search(ldapGroupsDn, filter, code).hasMore();
+		} catch (NamingException e) {
+		}
+		return false;
 	}
 
 	@Transactional
@@ -110,7 +122,12 @@ public class AuthLdap {
 		while (all.hasMore()) {
 			final SearchResult result = (SearchResult) all.next();
 			final String dn = result.getNameInNamespace();
-			factory.getLdapContext((Object) dn, password);
+			LdapContext context = null;
+			try {
+				context = factory.getLdapContext((Object) dn, password);
+			} finally {
+				LdapUtils.closeContext(context);
+			}
 			findOrCreateUser(user, result);
 			return true;
 		}
@@ -129,9 +146,7 @@ public class AuthLdap {
 		try {
 			return context.search(where, filterString, controls);
 		} finally {
-			if (context != null) {
-				context.close();
-			}
+			LdapUtils.closeContext(context);
 		}
 	}
 
