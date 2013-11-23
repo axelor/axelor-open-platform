@@ -1,6 +1,8 @@
 package com.axelor.auth;
 
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -10,18 +12,22 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.realm.ldap.JndiLdapContextFactory;
+import org.apache.shiro.realm.ldap.LdapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.google.common.base.Objects;
+import com.google.common.collect.Sets;
 import com.google.inject.persist.Transactional;
 
 @Singleton
@@ -36,6 +42,7 @@ public class AuthLdap {
 	public static final String LDAP_SYSTEM_PASSWORD = "ldap.system.password";
 
 	public static final String LDAP_GROUP_BASE = "ldap.group.base";
+	public static final String LDAP_GROUP_OBJECT_CLASS = "ldap.group.object.class";
 	public static final String LDAP_GROUP_FILTER = "ldap.group.filter";
 
 	public static final String LDAP_USER_BASE = "ldap.user.base";
@@ -59,6 +66,8 @@ public class AuthLdap {
 
 	private String ldapUserFilter;
 
+	private String ldapGroupObjectClass;
+
 	private JndiLdapContextFactory factory = new JndiLdapContextFactory();
 
 	private AuthService authService;
@@ -73,6 +82,7 @@ public class AuthLdap {
 		ldapUsersDn = properties.getProperty(LDAP_USER_BASE);
 		ldapGroupFilter = properties.getProperty(LDAP_GROUP_FILTER);
 		ldapUserFilter = properties.getProperty(LDAP_USER_FILTER);
+		ldapGroupObjectClass = properties.getProperty(LDAP_GROUP_OBJECT_CLASS);
 
 		factory.setUrl(ldapServerUrl);
 		factory.setSystemUsername(ldapSysUser);
@@ -176,6 +186,12 @@ public class AuthLdap {
 		} catch (Exception e) {
 		}
 
+		try {
+			createLdapGroups();
+		} catch (Exception e) {
+			log.warn("unable to create ldap groups", e);
+		}
+
 		return user.save();
 	}
 
@@ -202,6 +218,54 @@ public class AuthLdap {
 		}
 
 		return group;
+	}
+
+	private void uploadGroup(Group group) throws NamingException {
+
+		Attributes attrs = new BasicAttributes();
+
+		Attribute objClass = new BasicAttribute("objectClass");
+		objClass.add("top");
+		objClass.add(ldapGroupObjectClass);
+
+		Attribute cn = new BasicAttribute("cn");
+		cn.add(group.getCode());
+
+		Attribute uniqueMember = new BasicAttribute("uniqueMember");
+		uniqueMember.add("uid=admin");
+
+		attrs.put(objClass);
+		attrs.put(cn);
+		attrs.put(uniqueMember);
+
+		LdapContext context =  factory.getSystemLdapContext();
+		try {
+			context.createSubcontext("cn=" + group.getCode() + "," + ldapGroupsDn, attrs);
+		} finally {
+			LdapUtils.closeContext(context);
+		}
+	}
+
+	private void createLdapGroups() throws NamingException {
+
+		if (ldapGroupObjectClass == null || "".equals(ldapGroupObjectClass.trim())) {
+			return;
+		}
+
+		final Set<String> found = Sets.newHashSet();
+		final NamingEnumeration<?> all = search(ldapGroupsDn, ldapGroupFilter, "*");
+
+		while (all.hasMore()) {
+			SearchResult result = (SearchResult) all.next();
+			Attributes attributes = result.getAttributes();
+			String name = (String) attributes.get("cn").get();
+			found.add(name);
+		}
+
+		final List<Group> groups = Group.all().filter("self.code not in (:names)").bind("names", found).fetch();
+		for (Group group : groups) {
+			uploadGroup(group);
+		}
 	}
 
 	@Override
