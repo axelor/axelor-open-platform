@@ -404,11 +404,12 @@ public class CSVImporter implements Importer {
 			JPA.manage((Model) bean);
 			if(!onRollback) {
 				valuesStack.add(values);
+
+				for(Listener listener : listeners) {
+					listener.imported((Model) bean);
+				}
 			}
 
-			for(Listener listener : listeners) {
-				listener.imported((Model) bean);
-			}
 			LOG.trace("bean saved: {}", bean);
 		}
 
