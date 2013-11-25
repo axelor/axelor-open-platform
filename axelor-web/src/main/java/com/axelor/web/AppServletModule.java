@@ -48,7 +48,6 @@ import com.axelor.db.Translations;
 import com.axelor.meta.service.MetaTranslations;
 import com.axelor.rpc.Response;
 import com.google.inject.matcher.Matchers;
-import com.google.inject.name.Names;
 import com.google.inject.persist.PersistFilter;
 import com.google.inject.servlet.ServletModule;
 import com.sun.jersey.api.container.filter.GZIPContentEncodingFilter;
@@ -111,12 +110,8 @@ public class AppServletModule extends JerseyServletModule {
 			}
 		});
 
-		// bind LDAP configuration
-		bind(Properties.class).annotatedWith(Names.named("auth.ldap.config"))
-				.toInstance(settings.getProperties());
-
 		// install the auth module
-		install(new AuthModule(getServletContext()));
+		install(new AuthModule(getServletContext()).properties(settings.getProperties()));
 
 		// bind to translations provider
 		bind(Translations.class).toProvider(MetaTranslations.class);
