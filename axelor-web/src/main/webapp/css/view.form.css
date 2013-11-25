@@ -152,7 +152,6 @@ table.form-layout td.form-item.v-align-top {
 }
 
 .form-item-container input {
-	min-width: 170px;
 	height: 26px;
 	padding: 2px 6px;
 }
@@ -220,6 +219,14 @@ table.form-layout fieldset {
 .form-item-container.readonly > a {
 	line-height: 24px;
 	color: #0088cc;
+}
+
+.form-item-container.datetime input {
+	min-width: 100px;
+}
+
+.form-item-container.datetime-item input {
+	min-width: 134px;
 }
 
 .form-item-container > input.display-text {
