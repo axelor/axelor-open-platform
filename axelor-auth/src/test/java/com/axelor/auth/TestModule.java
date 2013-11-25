@@ -37,13 +37,14 @@ import com.google.inject.AbstractModule;
 
 public class TestModule extends AbstractModule {
 
+	protected Properties properties = new Properties();
+
 	@Override
 	protected void configure() {
 
-		Properties properties = new Properties();
 		properties.put("hibernate.ejb.interceptor", "com.axelor.auth.db.AuditInterceptor");
-		
-		install(new AuthModule.Simple());
+
+		install(new AuthModule.Simple().properties(properties));
 		install(new JpaModule("testUnit").properties(properties));
 	}
 }

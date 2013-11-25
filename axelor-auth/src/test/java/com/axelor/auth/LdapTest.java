@@ -1,7 +1,5 @@
 package com.axelor.auth;
 
-import java.util.Properties;
-
 import javax.inject.Inject;
 
 import org.apache.directory.server.annotations.CreateLdapServer;
@@ -22,7 +20,6 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.name.Names;
 import com.google.inject.persist.Transactional;
 
 @RunWith(FrameworkRunner.class)
@@ -40,9 +37,6 @@ public class LdapTest extends AbstractLdapTestUnit {
 
 		@Override
 		protected void configure() {
-			super.configure();
-
-			Properties properties = new Properties();
 
 			properties.put(AuthLdap.LDAP_SERVER_URL, "ldap://localhost:" + ldapServer.getPort());
 			properties.put(AuthLdap.LDAP_SYSTEM_USER, "uid=admin,ou=system");
@@ -55,7 +49,7 @@ public class LdapTest extends AbstractLdapTestUnit {
 			properties.put(AuthLdap.LDAP_GROUP_FILTER, "(uniqueMember=uid={0})");
 			properties.put(AuthLdap.LDAP_USER_FILTER, "(uid={0})");
 
-			bind(Properties.class).annotatedWith(Names.named("auth.ldap.config")).toInstance(properties);
+			super.configure();
 		}
 	}
 
