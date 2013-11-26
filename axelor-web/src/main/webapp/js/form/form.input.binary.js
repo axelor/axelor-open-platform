@@ -202,10 +202,10 @@ ui.formInput('Binary', {
 					field: field.name,
 					file: file
 				};
-				//Update file and mine just in case of new record
+				//Update file and mime just in case of new record
 				if(!record.id && scope._model == 'com.axelor.meta.db.MetaFile'){
 					record.fileName = file.name;
-					record.mine = file.type;
+					record.mime = file.type;
 				}
 				record.size = file.size;
 				setTimeout(function(){

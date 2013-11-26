@@ -63,7 +63,7 @@ public class AppSettings {
 
 	@Inject
 	private AppSettings() {
-			
+
 		InputStream is = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("application.properties");
 
@@ -73,7 +73,7 @@ public class AppSettings {
 		}
 
 		properties = new Properties();
-		
+
 		try {
 			properties.load(is);
 		} catch (Exception e) {
@@ -97,41 +97,51 @@ public class AppSettings {
 			return defaultValue;
 		return value;
 	}
-	
+
 	public int getInt(String key, int defaultValue) {
 		try {
 			return Integer.parseInt(get(key).toString());
 		} catch (Exception e){}
 		return defaultValue;
 	}
-	
+
 	public boolean getBoolean(String key, boolean defaultValue) {
 		try {
 			return Boolean.parseBoolean(get(key).toString());
 		} catch (Exception e){}
 		return defaultValue;
 	}
-	
+
+	public String getPath(String key, String defaultValue) {
+		String path = get(key);
+		if (path == null || "".equals(path.trim())) {
+			return defaultValue;
+		}
+		return path.replace("{java.io.tmpdir}",
+				System.getProperty("java.io.tmpdir")).replace("{user.home}",
+				System.getProperty("user.home"));
+	}
+
 	public void putAll(Properties properties) {
 		this.properties.putAll(properties);
 	}
-	
+
 	public Properties getProperties() {
 		return properties;
 	}
-	
+
 	public String toJSON() {
-		
+
 		Map<String, Object> settings = Maps.newHashMap();
-		
+
 		try {
 			User user = AuthUtils.getUser();
 			Group group = user.getGroup();
 			MetaUser prefs = MetaUser.findByUser(user);
-			
+
 			settings.put("user.name", user.getName());
 			settings.put("user.login", user.getCode());
-			
+
 			if (group != null) {
 				settings.put("user.navigator", group.getNavigation());
 			}
@@ -141,14 +151,14 @@ public class AppSettings {
 			}
 		} catch (Exception e){
 		}
-		
+
 		for(Object key : properties.keySet()) {
 			settings.put((String) key, properties.get(key));
 		}
-		
+
 		// remove server only properties
 		settings.remove("temp.dir");
-		
+
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			return mapper.writeValueAsString(settings);
@@ -156,7 +166,7 @@ public class AppSettings {
 		}
 		return "{}";
 	}
-	
+
 	private static String getUserLanguage() {
 
 		final User user = AuthUtils.getUser();
@@ -170,20 +180,20 @@ public class AppSettings {
 
 		query.setMaxResults(1);
 		query.setParameter("code", user.getCode());
-		
+
 		try {
 			return query.getSingleResult();
 		} catch (NoResultException e) {
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
 	 * Return the preferred language.
 	 * Check if the locale JS file exist for the current language.
 	 * By default, return the english file.
-	 * 
+	 *
 	 * @param request
 	 * @param context
 	 * @return language
@@ -212,11 +222,11 @@ public class AppSettings {
 		return DEFAULT_LOCALE.getLanguage();
 
 	}
-	
+
 	/**
 	 * Return the path of the JS file.
 	 * If dev is specified in application.mode or if the minify JS file doesn't exist then return the unminify js file.
-	 * 
+	 *
 	 * @param context
 	 * @return path of the JS file
 	 */
@@ -229,20 +239,20 @@ public class AppSettings {
 
 		return appJs;
 	}
-	
+
 	private static String toLanguage(Locale locale, boolean minimize) {
 		StringBuilder format = new StringBuilder(locale.getLanguage().toLowerCase());
 		if(!minimize && !Strings.isNullOrEmpty(locale.getCountry()))
 			format.append("_").append(locale.getCountry().toUpperCase());
 		return format.toString();
 	}
-	
+
 	private static Locale toLocale(String language) {
 	    String parts[] = language.split("_", -1);
 	    if (parts.length == 1) return new Locale(parts[0].toLowerCase());
 	    return new Locale(parts[0].toLowerCase(), parts[1].toUpperCase());
 	}
-	
+
 	private static boolean checkResources(ServletContext context, String resourcesPath) {
 		try{
 			URL path = context.getResource(resourcesPath);

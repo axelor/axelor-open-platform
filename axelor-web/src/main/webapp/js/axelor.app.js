@@ -299,7 +299,7 @@ function AppCtrl($rootScope, $scope, $http, $route, authService) {
 			navigator: settings['user.navigator'],
 			help: settings['help.location'],
 			sdk: settings['sdk.version'],
-			fileMaxSize: settings['file.max.size']
+			fileUploadSize: settings['file.upload.size']
 		};
 	}
 
