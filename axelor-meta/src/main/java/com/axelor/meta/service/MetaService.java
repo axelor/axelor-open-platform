@@ -30,6 +30,7 @@
  */
 package com.axelor.meta.service;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -337,7 +338,7 @@ public class MetaService {
 	}
 
 	@Transactional
-	public Response removeAttachment(Request request) {
+	public Response removeAttachment(Request request, String uploadPath) {
 		Response response = new Response();
 		List<Object> result = Lists.newArrayList();
 		List<Object> records = request.getRecords();
@@ -352,11 +353,16 @@ public class MetaService {
 			Long fileId = Long.valueOf(((Map) record).get("id").toString());
 
 			if (fileId != null) {
-				com.axelor.db.Query<MetaAttachment> removedAtt = com.axelor.db.Query.of(MetaAttachment.class);
-				removedAtt.filter("self.metaFile.id = ?1", fileId).delete();
+				MetaFile obj = MetaFile.find(fileId);
+				if (uploadPath != null) {
+					File file = new File(uploadPath + "/" + obj.getFilePath());
+					if (file.exists() && !file.delete()) {
+						continue;
+					}
+				}
 
-				com.axelor.db.Query<MetaFile> removedFile = com.axelor.db.Query.of(MetaFile.class);
-				removedFile.filter("self.id = ?", fileId).delete();
+				MetaAttachment.all().filter("self.metaFile.id = ?1", fileId).delete();
+				obj.remove();
 
 				result.add(record);
 			}
