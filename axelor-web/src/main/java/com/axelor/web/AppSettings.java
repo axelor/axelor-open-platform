@@ -113,9 +113,9 @@ public class AppSettings {
 	}
 
 	public String getPath(String key, String defaultValue) {
-		String path = get(key);
-		if (path == null || "".equals(path.trim())) {
-			return defaultValue;
+		String path = get(key, defaultValue);
+		if (path == null) {
+			return null;
 		}
 		return path.replace("{java.io.tmpdir}",
 				System.getProperty("java.io.tmpdir")).replace("{user.home}",
