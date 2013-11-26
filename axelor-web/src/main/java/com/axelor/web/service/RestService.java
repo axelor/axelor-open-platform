@@ -31,6 +31,9 @@
 package com.axelor.web.service;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -60,7 +63,7 @@ import javax.ws.rs.core.StreamingOutput;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
-import com.axelor.db.mapper.Property;
+import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
@@ -71,6 +74,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.io.Files;
 import com.google.inject.servlet.RequestScoped;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataBodyPart;
@@ -181,6 +185,17 @@ public class RestService extends ResourceService {
 		return getResource().getRecordName(request);
 	}
 
+	private static String uploadPath = AppSettings.get().getPath("file.upload.dir", null);
+
+	private void uploadSave(InputStream in, OutputStream out) throws IOException {
+		int read = 0;
+		byte[] bytes = new byte[1024];
+		while ((read = in.read(bytes)) != -1) {
+			out.write(bytes, 0, read);
+		}
+		out.close();
+	}
+
 	@POST
 	@Path("upload")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -193,22 +208,46 @@ public class RestService extends ResourceService {
 
 		requestText.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 
+
+		boolean isAttachment = MetaFile.class.getName().equals(getModel());
+
 		Request request = requestText.getEntityAs(Request.class);
 		request.setModel(getModel());
 
-		Map<String, Object> values = request.getData();
+		Map<String, Object> data = request.getData();
 
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		int read = 0;
-		byte[] bytes = new byte[1024];
-
-		while ((read = fileStream.read(bytes)) != -1) {
-			out.write(bytes, 0, read);
+		if (!isAttachment) {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			uploadSave(fileStream, out);
+			data.put(field, out.toByteArray());
 		}
 
-		values.put(field, out.toByteArray());
+		String filePath = fileDetails.getFileName();
+		if (isAttachment) {
+			int maxCounter = 1000;
+			long counter = 0;
+			while (new File(uploadPath + "/" + filePath).exists()) {
+				if (counter++ > maxCounter) {
+					counter = System.currentTimeMillis();
+				}
+				filePath = fileDetails.getFileName();
+				filePath = Files.getNameWithoutExtension(filePath) + " (" + counter + ")." + Files.getFileExtension(filePath);
+				if (counter > maxCounter) {
+					break;
+				}
+			}
+			data.put("filePath", filePath);
+		}
 
-		return getResource().save(request);
+		Response response = getResource().save(request);
+		if (isAttachment && response.getStatus() == Response.STATUS_SUCCESS) {
+			File file = new File(uploadPath + "/" + filePath);
+			Files.createParentDirs(file);
+			FileOutputStream out = new FileOutputStream(file);
+			uploadSave(fileStream, out);
+		}
+
+		return response;
 	}
 
 	@GET
@@ -217,26 +256,42 @@ public class RestService extends ResourceService {
 	@SuppressWarnings("all")
 	public javax.ws.rs.core.Response download(
 			@PathParam("id") Long id,
-			@PathParam("field") String field) {
+			@PathParam("field") String field) throws IOException {
+
+		boolean isAttachment = MetaFile.class.getName().equals(getModel());
 
 		Class klass = getResource().getModel();
 		Mapper mapper = Mapper.of(klass);
 		Model bean = JPA.find(klass, id);
-		Property prop = mapper.getNameField();
-		Object data = mapper.get(bean, field);
-		String name = getModel() + "_" + field;
-		if(prop != null){
-			name = prop.get(bean) != null ? prop.get(bean).toString() : name;
-			if(!prop.getName().equals("fileName")){
-				name = name.replaceAll("\\s", "") + "_" + id;
-				name = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
-			}
+
+		if (isAttachment) {
+			final String fileName = (String) mapper.get(bean, "fileName");
+			final String filePath = (String) mapper.get(bean, "filePath");
+			final File inputFile = new File(uploadPath + "/" + filePath);
+			return javax.ws.rs.core.Response.ok(new StreamingOutput() {
+
+				@Override
+				public void write(OutputStream output) throws IOException, WebApplicationException {
+					uploadSave(new FileInputStream(inputFile), output);
+				}
+			})
+			.header("Content-Disposition", "attachment; filename=" + fileName)
+			.build();
 		}
+
+		String fileName = getModel() + "_" + field;
+		Object data = mapper.get(bean, field);
+
+		fileName = fileName.replaceAll("\\s", "") + "_" + id;
+		fileName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fileName);
 
 		if (data == null) {
 			return javax.ws.rs.core.Response.noContent().build();
 		}
-		return javax.ws.rs.core.Response.ok(data).header("Content-Disposition", "attachment; filename=" + name).build();
+		return javax.ws.rs.core.Response
+				.ok(data)
+				.header("Content-Disposition", "attachment; filename=" + fileName)
+				.build();
 	}
 
 	@POST
@@ -249,7 +304,7 @@ public class RestService extends ResourceService {
 	@Path("removeAttachment")
 	public Response removeAttachment(Request request) {
 		request.setModel(getModel());
-		return service.removeAttachment(request);
+		return service.removeAttachment(request, uploadPath);
 	}
 
 	@POST

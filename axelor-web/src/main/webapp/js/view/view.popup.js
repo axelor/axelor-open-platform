@@ -233,8 +233,8 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 	var origOnShow = $scope.onShow,
 		origShow = $scope.show,
 		input = $element.children('input:first').hide(),
-		progress = $element.find('.progress').hide();
-		maxUploadSize = $scope.$eval('app.fileMaxSize');
+		progress = $element.find('.progress').hide(),
+		uploadSize = $scope.$eval('app.fileUploadSize');
 		
 	function getSelected(){
 		var dataView = $scope.dataView;
@@ -256,7 +256,7 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 				fields: fields
 			};
 
-		return objectDS.attachment($scope.record.id,options).success(function(records) {
+		return objectDS.attachment($scope.record.id, options).success(function(records) {
 			if(records) {
 				$scope.setItems(records);
 			}
@@ -334,59 +334,50 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 	
 	input.change(function(e) {
 		var file = input.get(0).files[0];
-		
-		if (file) {
-			
-			if(file.size > 1048576 * parseInt(maxUploadSize)) {
-				axelor.dialogs.say(_t("You are not allow to upload a file bigger than") + ' ' + maxUploadSize + 'MB');
-				return ;
+		if (!file) {
+			return;
+		}
+
+		if(file.size > 1048576 * parseInt(uploadSize)) {
+			return axelor.dialogs.say(_t("You are not allow to upload a file bigger than") + ' ' + uploadSize + 'MB');
+		}
+	    
+	    var record = {
+			fileName: file.name,
+			mime: file.type,
+			size: file.size,
+			id: null,
+			version: null
+	    };
+
+	    record.$upload = {
+		    file: file
+	    };
+
+	    setTimeout(function() {
+	    	progress.show();
+	    });
+	    
+	    var newDS = DataSource.create($scope._model);
+	    newDS.save(record).progress(function(fn) {
+	    	$scope.updateProgress(fn > 95 ? 95 : fn);
+	    }).success(function(file) {
+	    	$scope.updateProgress(100);
+	    	if(file && file.id) {
+	    		objectDS.addAttachment($scope.record.id, file.id)
+				.success(function(record) {
+				    progress.hide();
+				    $scope.updateProgress(0);
+					$scope.updateItems(file, false);
+				}).error(function() {
+					progress.hide();
+					$scope.updateProgress(0);
+				});
 			}
-		    
-		    var record = {
-				fileName: file.name,
-				mine: file.type,
-				size: file.size,
-				id: null,
-				version: null
-		    };
-		    
-		    record.$upload = {
-			    field: 'content',
-			    file: file
-		    };
-			
-		    setTimeout(function() {
-		    	progress.show();
-		    });
-		    
-		    var newDS = DataSource.create($scope._model);
-		    newDS.save(record).progress(function(fn) {
-		    	if(fn > 95)
-		    	{
-		    		$scope.updateProgress(95);
-		    	}
-		    	else
-		    	{
-		    		$scope.updateProgress(fn);
-		    	}
-		    }).success(function(file) {
-		    	$scope.updateProgress(100);
-		    	if(file && file.id) {
-		    		objectDS.addAttachment($scope.record.id, file.id)
-					.success(function(record) {
-					    progress.hide();
-					    $scope.updateProgress(0);
-						$scope.updateItems(file, false);
-					}).error(function() {
-						progress.hide();
-						$scope.updateProgress(0);
-					});
-				}
-			}).error(function() {
-				progress.hide();
-				$scope.updateProgress(0);
-			});
-		};
+		}).error(function() {
+			progress.hide();
+			$scope.updateProgress(0);
+		});
 	});
 	
 	$scope.updateProgress = function(value) {
@@ -412,14 +403,11 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 				return rec.id && rec.id == item.id;
 			});
 			
-
 			if (find && !removed) {
 				_.extend(find, item);
-			}
-			else if(!removed) {
+			} else if(!removed) {
 				records.push(item);
-			}
-			else {
+			} else {
 				var index = records.indexOf(find);
 				records.splice(index, 1);
 			}
@@ -430,7 +418,6 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 		});
 		
 		$scope.setItems(records);
-		
 	};
 }
 
