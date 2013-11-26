@@ -416,6 +416,9 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 		_.each(records, function(rec) {
 			if (rec.id <= 0) rec.id = null;
 		});
+
+		// update attachment counter
+		($scope.$parent.record || {}).$attachments = _.size(records);
 		
 		$scope.setItems(records);
 	};
