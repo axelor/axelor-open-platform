@@ -164,11 +164,10 @@
     <![CDATA[
     This object store the files.
     ]]>
-    
-  	<binary name="content" title="File"/>
   	<string name="fileName" required="true" namecolumn="true"/>
+    <string name="filePath" required="true"/>
   	<long name="size" title="Size in bytes" readonly="true"/>
-  	<string name="mine" title="File type"/>
+  	<string name="mime" title="File type"/>
   	<string name="description" multiline="true"/>
   	<string name="sizeText" title="Size" readonly="true">
       <![CDATA[
