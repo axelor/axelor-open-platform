@@ -63,6 +63,7 @@ import javax.ws.rs.core.StreamingOutput;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.Request;
@@ -133,7 +134,17 @@ public class RestService extends ResourceService {
 	@Path("{id}/fetch")
 	public Response fetch(
 			@PathParam("id") long id, Request request) {
-		return getResource().fetch(id, request);
+
+		Response response = getResource().fetch(id, request);
+		long attachments = MetaAttachment
+				.all().filter("self.objectId = ?1 AND self.objectName = ?2", id, getModel())
+				.cacheable().count();
+
+		@SuppressWarnings("all")
+		Map<String, Object> item = (Map) response.getItem(0);
+		item.put("$attachments", attachments);
+
+		return response;
 	}
 
 	@POST
