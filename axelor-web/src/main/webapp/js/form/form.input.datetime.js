@@ -431,6 +431,10 @@ ui.formInput('Duration', 'Time', {
 			var m = Math.floor((value % 3600) / 60);
 			var s = Math.floor((value % 3600) % 60);
 			
+			h = _.str.pad(h, field.big ? 3 : 2, '0');
+			m = _.str.pad(m, 2, '0');
+			s = _.str.pad(s, 2, '0');
+
 			var text = h + ':' + m;
 			
 			if (field.seconds) {
