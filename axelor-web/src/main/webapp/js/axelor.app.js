@@ -34,48 +34,110 @@
  */
 (function($, undefined){
 	
-var loadingElem = null,
-	loadingTimer = null,
-	loadingCounter = 0;
-
-function updateLoadingCounter(val) {
-	loadingCounter += val;
-}
-
-function onHttpStart(data, headersGetter) {
-
-	updateLoadingCounter(1);
+	var loadingElem = null,
+		loadingTimer = null,
+		loadingCounter = 0;
 	
-	if (loadingTimer) clearTimeout(loadingTimer);
-	if (loadingCounter > 1) {
+	function updateLoadingCounter(val) {
+		loadingCounter += val;
+	}
+	
+	function onHttpStart(data, headersGetter) {
+	
+		updateLoadingCounter(1);
+		
+		if (loadingTimer) clearTimeout(loadingTimer);
+		if (loadingCounter > 1) {
+			return data;
+		}
+		
+		if (loadingElem == null) {
+			loadingElem = $('<div><span class="label label-important loading-counter">' + _t('Loading') + '...</span></div>')
+				.css({
+					position: 'fixed',
+					top: 0,
+					width: '100%',
+					'text-align': 'center',
+					'z-index': 2000
+				}).appendTo('body');
+		}
+		loadingElem.show();
 		return data;
 	}
 	
-	if (loadingElem == null) {
-		loadingElem = $('<div><span class="label label-important loading-counter">' + _t('Loading') + '...</span></div>')
-			.css({
-				position: 'fixed',
-				top: 0,
-				width: '100%',
-				'text-align': 'center',
-				'z-index': 2000
-			}).appendTo('body');
+	function onHttpStop() {
+		updateLoadingCounter(-1);
+		loadingTimer = setTimeout(function(){
+			if (loadingElem && loadingCounter === 0)
+				loadingElem.fadeOut();
+		}, 100);
 	}
-	loadingElem.show();
-	return data;
-}
+	
+	axelor.$eval = function (scope, expr, context) {
+		if (!scope || !expr) {
+			return null;
+		}
 
-function onHttpStop() {
-	updateLoadingCounter(-1);
-	loadingTimer = setTimeout(function(){
-		if (loadingElem && loadingCounter === 0)
-			loadingElem.fadeOut();
-	}, 100);
-}
-
-angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
-	.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+		var evalScope = scope.$new(true);
 		
+		function isValid(name) {
+			if (!name) {
+				if (_.isFunction(scope.isValid)) {
+					return scope.isValid();
+				}
+				return scope.isValid === undefined || scope.isValid;
+			}
+		
+			var ctrl = scope.form;
+			if (ctrl) {
+				ctrl = ctrl[name];
+			}
+			if (ctrl) {
+				return ctrl.$valid;
+			}
+			return true;
+		}
+
+		evalScope.$get = function(n) {
+			var context = this.$context || {};
+			if (context.hasOwnProperty(n)) {
+				return context[n];
+			}
+			return evalScope.$eval(n, context);
+		};
+		evalScope.$moment = function(d) { return moment(d); };		// moment.js helper
+		evalScope.$number = function(d) { return +d; };				// number helper
+		evalScope.$popup = function() { return scope._isPopup; };	// popup detect
+
+		evalScope.$contains = function(iter, item) {
+			if (iter && iter.indexOf)
+				return iter.indexOf(item) > -1;
+			return false;
+		};
+		
+		evalScope.$readonly = scope.isReadonly ? _.bind(scope.isReadonly, scope) : angular.noop;
+		evalScope.$required = scope.isRequired ? _.bind(scope.isRequired, scope) : angular.noop;
+
+		evalScope.$valid = function(name) {
+			return isValid(scope, name);
+		};
+
+		evalScope.$invalid = function(name) {
+			return !isValid(scope, name);
+		};
+		
+		try {
+			evalScope.$context = context;
+			return evalScope.$eval(expr, context);
+		} finally {
+			evalScope.$destroy();
+			evalScope = null;
+		}
+	};
+
+	var module = angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth']);
+	
+	module.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
 		var tabResource = {
 			action: 'main.tab',
 			controller: 'TabCtrl',
@@ -94,12 +156,14 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 		.when('/ds/:resource/:mode/:state', tabResource)
 
 		.otherwise({ redirectTo: '/' });
-	}])
-	.config(['$httpProvider', function(provider) {
+	}]);
+	
+	module.config(['$httpProvider', function(provider) {
 		provider.responseInterceptors.push('httpIndicator');
 		provider.defaults.transformRequest.push(onHttpStart);
-	}])
-	.factory('httpIndicator', ['$rootScope', '$q', function($rootScope, $q){
+	}]);
+	
+	module.factory('httpIndicator', ['$rootScope', '$q', function($rootScope, $q){
 		
 		var doc = $(document);
 		var body = $('body');
@@ -202,14 +266,16 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 				return $q.reject(error);
 			});
 		};
-	}])
-	.filter('t', function(){
+	}]);
+	
+	module.filter('t', function(){
 		return function(input) {
 			var t = _t || angular.nop;
 			return t(input);
 		};
-	})
-	.directive('translate', function(){
+	});
+	
+	module.directive('translate', function(){
 		return function(scope, element, attrs) {
 			var t = _t || angular.nop;
 			setTimeout(function(){
@@ -218,242 +284,180 @@ angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth'])
 		};
 	});
 
-	// some helpers
+	module.controller('AppCtrl', AppCtrl);
 	
-	axelor.$eval = function (scope, expr, context) {
-		if (!scope || !expr) {
-			return null;
+	AppCtrl.$inject = ['$rootScope', '$scope', '$http', '$route', 'authService'];
+	function AppCtrl($rootScope, $scope, $http, $route, authService) {
+	
+		function getAppInfo(settings) {
+			return {
+				name: settings['application.name'],
+				description: settings['application.description'],
+				version: settings['application.version'],
+				mode: settings['application.mode'],
+				user: settings['user.name'],
+				login: settings['user.login'],
+				homeAction: settings['user.action'],
+				navigator: settings['user.navigator'],
+				help: settings['help.location'],
+				sdk: settings['sdk.version'],
+				fileUploadSize: settings['file.upload.size']
+			};
 		}
-
-		var evalScope = scope.$new(true);
+	
+		function appInfo() {
+			$http.get('ws/app/info').then(function(response){
+				var settings = response.data;
+				angular.extend($scope.app, getAppInfo(settings));
+			});
+		}
+	
+		// See index.jsp
+		$scope.app = getAppInfo(__appSettings);
+	
+		var loginAttempts = 0;
+		var loginWindow = null;
+		var errorWindow = null;
 		
-		function isValid(name) {
-			if (!name) {
-				if (_.isFunction(scope.isValid)) {
-					return scope.isValid();
+		function showLogin(hide) {
+			
+			if (loginWindow == null) {
+				loginWindow = $('#loginWindow')
+				.attr('title', _t('Login'))
+				.dialog({
+					autoOpen: false,
+					modal: true,
+					position: "center",
+					width: "auto",
+					resizable: false,
+					closeOnEscape: false,
+					dialogClass: 'no-close',
+					zIndex: 100001,
+					buttons: [{
+						text: _t("Login"),
+						'class': 'btn btn-primary',
+						click: function(){
+							$scope.doLogin();
+						}
+					}]
+				});
+		
+				$('#loginWindow input').keypress(function(event){
+					if (event.keyCode === 13)
+						$scope.doLogin();
+				});
+			}
+			return loginWindow.dialog(hide ? 'close' : 'open').height('auto');
+		}
+	
+		function showError(hide) {
+			if (errorWindow == null) {
+				errorWindow = $('#errorWindow')
+				.attr('title', _t('Error'))
+				.dialog({
+					modal: true,
+					position: "center",
+					width: 480,
+					resizable: false,
+					close: function() {
+						$scope.httpError = {};
+						$scope.$apply();
+					},
+					buttons: [{
+						text: _t("Show Details"),
+						'class': 'btn',
+						click: function(){
+							$scope.onErrorWindowShow('stacktrace');
+							$scope.$apply();
+						}
+					}, {
+						text: _t("Close"),
+						'class': 'btn btn-primary',
+						click: function() {
+							errorWindow.dialog('close');
+						}
+					}]
+				});
+			}
+			
+			return errorWindow.dialog(hide ? 'close' : 'open').height('auto');
+		}
+	
+		$scope.doLogin = function() {
+			
+			var data = {
+				username: $('#loginWindow form input:first').val(),
+				password: $('#loginWindow form input:last').val()
+			};
+			
+			$http.post('login.jsp', data).then(function(response){
+				authService.loginConfirmed();
+				$('#loginWindow form input').val('');
+				$('#loginWindow .alert').hide();
+			});
+		};
+		
+		$scope.$on('event:auth-loginRequired', function(event, status) {
+			$('#loginWindow .alert').hide();
+			showLogin();
+			if (loginAttempts++ > 0)
+				$('#loginWindow .alert.login-failed').show();
+			if (status === 0 || status === 502)
+		       $('#loginWindow .alert.login-offline').show();
+			setTimeout(function(){
+				$('#loginWindow input:first').focus();
+			}, 300);
+		});
+		$scope.$on('event:auth-loginConfirmed', function() {
+			showLogin(true);
+			loginAttempts = 0;
+			appInfo();
+		});
+		
+		$scope.httpError = {};
+		$scope.$on('event:http-error', function(event, data) {
+			var message = _t("Internal Server Error"),
+				report = data.data || data, stacktrace = null, cause = null, exception;
+			
+			if (report.stacktrace) {
+				message = report.message || report.string;
+				exception = report['class'] || '';
+				
+				if (exception.match(/(OptimisticLockException|StaleObjectStateException)/)) {
+					message = "<b>" + _t('Concurrent updates error.') + '</b><br>' + message;
 				}
-				return scope.isValid === undefined || scope.isValid;
+	
+				stacktrace = report.stacktrace;
+				cause = report.cause;
+			} else if (_.isString(report)) {
+				stacktrace = report.replace(/.*<body>|<\/body>.*/g, '');
+			} else {
+				return; // no error report, so ignore
 			}
-		
-			var ctrl = scope.form;
-			if (ctrl) {
-				ctrl = ctrl[name];
-			}
-			if (ctrl) {
-				return ctrl.$valid;
-			}
-			return true;
-		}
-
-		evalScope.$get = function(n) {
-			var context = this.$context || {};
-			if (context.hasOwnProperty(n)) {
-				return context[n];
-			}
-			return evalScope.$eval(n, context);
-		};
-		evalScope.$moment = function(d) { return moment(d); };		// moment.js helper
-		evalScope.$number = function(d) { return +d; };				// number helper
-		evalScope.$popup = function() { return scope._isPopup; };	// popup detect
-
-		evalScope.$contains = function(iter, item) {
-			if (iter && iter.indexOf)
-				return iter.indexOf(item) > -1;
-			return false;
+			_.extend($scope.httpError, {
+				message: message,
+				stacktrace: stacktrace,
+				cause: cause
+			});
+			showError();
+		});
+		$scope.onErrorWindowShow = function(what) {
+			$scope.httpError.show = what;
 		};
 		
-		evalScope.$readonly = scope.isReadonly ? _.bind(scope.isReadonly, scope) : angular.noop;
-		evalScope.$required = scope.isRequired ? _.bind(scope.isRequired, scope) : angular.noop;
-
-		evalScope.$valid = function(name) {
-			return isValid(scope, name);
-		};
-
-		evalScope.$invalid = function(name) {
-			return !isValid(scope, name);
-		};
+		$scope.$on('$routeChangeSuccess', function(event, current, prev) {
+	
+			var route = current.$route,
+				path = route && route.action ? route.action.split('.') : null;
+	
+			if (path == null)
+				return;
+	
+			$scope.routePath = path;
+		});
 		
-		try {
-			evalScope.$context = context;
-			return evalScope.$eval(expr, context);
-		} finally {
-			evalScope.$destroy();
-			evalScope = null;
-		}
-	};
+		$scope.routePath = ["main"];
+		$route.reload();
+	}
 
 })(jQuery);
-
-AppCtrl.$inject = ['$rootScope', '$scope', '$http', '$route', 'authService'];
-function AppCtrl($rootScope, $scope, $http, $route, authService) {
-
-	function getAppInfo(settings) {
-		return {
-			name: settings['application.name'],
-			description: settings['application.description'],
-			version: settings['application.version'],
-			mode: settings['application.mode'],
-			user: settings['user.name'],
-			login: settings['user.login'],
-			homeAction: settings['user.action'],
-			navigator: settings['user.navigator'],
-			help: settings['help.location'],
-			sdk: settings['sdk.version'],
-			fileUploadSize: settings['file.upload.size']
-		};
-	}
-
-	function appInfo() {
-		$http.get('ws/app/info').then(function(response){
-			var settings = response.data;
-			angular.extend($scope.app, getAppInfo(settings));
-		});
-	}
-
-	// See index.jsp
-	$scope.app = getAppInfo(__appSettings);
-
-	var loginAttempts = 0;
-	var loginWindow = null;
-	var errorWindow = null;
-	
-	function showLogin(hide) {
-		
-		if (loginWindow == null) {
-			loginWindow = $('#loginWindow')
-			.attr('title', _t('Login'))
-			.dialog({
-				autoOpen: false,
-				modal: true,
-				position: "center",
-				width: "auto",
-				resizable: false,
-				closeOnEscape: false,
-				dialogClass: 'no-close',
-				zIndex: 100001,
-				buttons: [{
-					text: _t("Login"),
-					'class': 'btn btn-primary',
-					click: function(){
-						$scope.doLogin();
-					}
-				}]
-			});
-	
-			$('#loginWindow input').keypress(function(event){
-				if (event.keyCode === 13)
-					$scope.doLogin();
-			});
-		}
-		return loginWindow.dialog(hide ? 'close' : 'open').height('auto');
-	}
-
-	function showError(hide) {
-		if (errorWindow == null) {
-			errorWindow = $('#errorWindow')
-			.attr('title', _t('Error'))
-			.dialog({
-				modal: true,
-				position: "center",
-				width: 480,
-				resizable: false,
-				close: function() {
-					$scope.httpError = {};
-					$scope.$apply();
-				},
-				buttons: [{
-					text: _t("Show Details"),
-					'class': 'btn',
-					click: function(){
-						$scope.onErrorWindowShow('stacktrace');
-						$scope.$apply();
-					}
-				}, {
-					text: _t("Close"),
-					'class': 'btn btn-primary',
-					click: function() {
-						errorWindow.dialog('close');
-					}
-				}]
-			});
-		}
-		
-		return errorWindow.dialog(hide ? 'close' : 'open').height('auto');
-	}
-
-	$scope.doLogin = function() {
-		
-		var data = {
-			username: $('#loginWindow form input:first').val(),
-			password: $('#loginWindow form input:last').val()
-		};
-		
-		$http.post('login.jsp', data).then(function(response){
-			authService.loginConfirmed();
-			$('#loginWindow form input').val('');
-			$('#loginWindow .alert').hide();
-		});
-	};
-	
-	$scope.$on('event:auth-loginRequired', function(event, status) {
-		$('#loginWindow .alert').hide();
-		showLogin();
-		if (loginAttempts++ > 0)
-			$('#loginWindow .alert.login-failed').show();
-		if (status === 0 || status === 502)
-	       $('#loginWindow .alert.login-offline').show();
-		setTimeout(function(){
-			$('#loginWindow input:first').focus();
-		}, 300);
-	});
-	$scope.$on('event:auth-loginConfirmed', function() {
-		showLogin(true);
-		loginAttempts = 0;
-		appInfo();
-	});
-	
-	$scope.httpError = {};
-	$scope.$on('event:http-error', function(event, data) {
-		var message = _t("Internal Server Error"),
-			report = data.data || data, stacktrace = null, cause = null, exception;
-		
-		if (report.stacktrace) {
-			message = report.message || report.string;
-			exception = report['class'] || '';
-			
-			if (exception.match(/(OptimisticLockException|StaleObjectStateException)/)) {
-				message = "<b>" + _t('Concurrent updates error.') + '</b><br>' + message;
-			}
-
-			stacktrace = report.stacktrace;
-			cause = report.cause;
-		} else if (_.isString(report)) {
-			stacktrace = report.replace(/.*<body>|<\/body>.*/g, '');
-		} else {
-			return; // no error report, so ignore
-		}
-		_.extend($scope.httpError, {
-			message: message,
-			stacktrace: stacktrace,
-			cause: cause
-		});
-		showError();
-	});
-	$scope.onErrorWindowShow = function(what) {
-		$scope.httpError.show = what;
-	};
-	
-	$scope.$on('$routeChangeSuccess', function(event, current, prev) {
-
-		var route = current.$route,
-			path = route && route.action ? route.action.split('.') : null;
-
-		if (path == null)
-			return;
-
-		$scope.routePath = path;
-	});
-	
-	$scope.routePath = ["main"];
-	$route.reload();
-}
