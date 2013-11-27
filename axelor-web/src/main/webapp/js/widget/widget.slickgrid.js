@@ -525,7 +525,7 @@ Grid.prototype.parse = function(view) {
 				if (handler && handler.onEdit) {
 					handler.applyLater(function () {
 						handler.onEdit(true);
-					});
+					}, 10);
 				}
 			}
 		});
@@ -555,7 +555,8 @@ Grid.prototype.parse = function(view) {
 		forceFitColumns: true,
 		multiColumnSort: true,
 		showHeaderRow: this.showFilters,
-		multiSelect: scope.selector !== "single"
+		multiSelect: scope.selector !== "single",
+		explicitInitialization: true
 	};
 
 	var grid = new Slick.Grid(element, dataView, cols, options);
@@ -593,6 +594,7 @@ Grid.prototype.parse = function(view) {
 			return;
 		}
 		initialized = true;
+		grid.init();
 		grid.registerPlugin(new Slick.Data.GroupItemMetadataProvider());
 		grid.registerPlugin(headerMenu);
 		if (selectColumn) {

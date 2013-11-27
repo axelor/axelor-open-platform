@@ -1570,7 +1570,7 @@ if (typeof Slick === "undefined") {
     }
 
     function resizeCanvas() {
-      if (!initialized) { return; }
+      if (!initialized || $viewport.is(':hidden')) { return; }
       if (options.autoHeight) {
         viewportH = options.rowHeight * (getDataLength() + (options.enableAddRow ? 1 : 0));
       } else {
