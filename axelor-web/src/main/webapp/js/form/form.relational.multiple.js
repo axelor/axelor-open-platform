@@ -338,24 +338,33 @@ ui.formInput('OneToMany', {
 			});
 		}
 
+		var doRenderUnwatch = null;
+		var doViewPromised = false;
+
 		function doRender() {
-			var unwatch = null;
-			return scope._viewPromise.then(function () {
-				if (unwatch) return;
-				unwatch = scope.$watch(function () {
-					if (element.is(':hidden')) return;
-					unwatch();
+			if (doRenderUnwatch) {
+				return;
+			}
+			doRenderUnwatch = scope.$watch(function () {
+				if (element.is(':hidden') || !doViewPromised) {
+					return;
+				}
+				doRenderUnwatch();
+				doRenderUnwatch = null;
 					fetchData();
 				});
-			});
 		};
 
-		model.$render = _.debounce(function () {
-			setTimeout(function () {
+		scope._viewPromise.then(function () {
+			doViewPromised = true;
+			if (doRenderUnwatch) {
+				doRenderUnwatch();
+				doRenderUnwatch = null;
 				doRender();
-				scope.$apply();
+			}
 			});
-		}, 100);
+
+		model.$render = doRender;
 		
 		var adjustSize = (function() {
 			var rowSize = 26,
