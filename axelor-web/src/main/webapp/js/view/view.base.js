@@ -212,6 +212,9 @@ function DSViewCtrl(type, $scope, $element) {
 				$scope.schema = schema;
 				$scope.toolbar = toolbar;
 				$scope.menubar = schema.menubar;
+
+				// watch on view.loaded to improve performance
+				schema.loaded = true;
 			});
 		}
 		

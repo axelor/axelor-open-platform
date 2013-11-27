@@ -1726,12 +1726,12 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 			};
 
 			element.addClass('slickgrid').hide();
-			var unwatch = scope.$watch("view", function(view) {
-				if (!view || !scope.dataView) {
+			var unwatch = scope.$watch("view.loaded", function(viewLoaded) {
+				if (!viewLoaded || !scope.dataView) {
 					return;
 				}
 				unwatch();
-				schema = view;
+				schema = scope.view;
 				element.show();
 				doInit();
 			});
