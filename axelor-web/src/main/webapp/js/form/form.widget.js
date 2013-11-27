@@ -79,7 +79,7 @@ ui.formWidget('Form', {
 			}
 			scope.ajaxStop(function() {
 				element.show();
-				$.event.trigger('adjustSize');
+				axelor.$adjustSize();
 			});
 		});
 	}

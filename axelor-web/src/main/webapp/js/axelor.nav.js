@@ -146,9 +146,7 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 
 		setTimeout(function(){
 			$.event.trigger('adjust');
-			setTimeout(function(){
-				$.event.trigger('adjustSize');
-			});
+			axelor.$adjustSize();
 		});
 	}
 
@@ -410,9 +408,7 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 	
 	$scope.$watch('selectedTab.viewType', function(viewType){
 		if (viewType) {
-			setTimeout(function(){
-				$.event.trigger('adjustSize');
-			});
+			axelor.$adjustSize();
 		}
 	});
 

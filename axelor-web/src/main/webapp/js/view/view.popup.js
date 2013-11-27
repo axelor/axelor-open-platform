@@ -442,7 +442,7 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 			
 			function initSize() {
 				element.find(':input:first').focus();
-				$.event.trigger('adjustSize');
+				axelor.$adjustSize();
 
 				if (initialized === 'editable' ||
 				   (initialized === 'readonly' && scope.isReadonly())) {
@@ -529,7 +529,7 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 			function adjustSize() {
 
 				element.find('input[type=text]:first').focus();
-				$.event.trigger('adjustSize');
+				axelor.$adjustSize();
 
 				//XXX: ui-dialog issue
 				element.find('.slick-headerrow-column').zIndex(element.zIndex());
@@ -603,7 +603,7 @@ angular.module('axelor.ui').directive('uiAttachmentPopup', function(){
 				setTimeout(function(){
 					
 					element.find('input[type=text]:first').focus();
-					$.event.trigger('adjustSize');
+					axelor.$adjustSize();
 					
 					//XXX: ui-dialog issue
 					var zIndex = element.zIndex();

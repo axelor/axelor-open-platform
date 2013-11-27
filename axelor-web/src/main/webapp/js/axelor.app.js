@@ -135,6 +135,10 @@
 		}
 	};
 
+	axelor.$adjustSize = _.debounce(function () {
+		$.event.trigger('adjustSize');
+	}, 100);
+
 	var module = angular.module('axelor.app', ['axelor.ds', 'axelor.ui', 'axelor.auth']);
 	
 	module.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {

@@ -390,7 +390,7 @@ ActionHandler.prototype = {
 				scope.onChangeNotify(scope, data.values);
 			}
 			this._invalidateContext = true;
-			$.event.trigger('adjustSize');
+			axelor.$adjustSize();
 		}
 		
 		if (data.reload) {

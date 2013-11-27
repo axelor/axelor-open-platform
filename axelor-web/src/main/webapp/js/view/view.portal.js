@@ -196,7 +196,7 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 				e.toggleClass('icon-chevron-up icon-chevron-down');
 				element.toggleClass('portlet-minimized');
 				if (e.hasClass('icon-chevron-up')) {
-					$.event.trigger('adjustSize');
+					axelor.$adjustSize();
 				}
 			};
 			

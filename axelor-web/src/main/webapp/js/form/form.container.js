@@ -68,7 +68,7 @@ ui.formWidget('Group', {
 		scope.setCollapsed = function(collapsed) {
 			scope.collapsed = collapsed;
 			element.children('legend').nextAll(':not(br)')[collapsed ? 'hide' : 'show']();
-			$.event.trigger('adjustSize');
+			axelor.$adjustSize();
 		};
 
 		scope.toggle = function() {
@@ -122,7 +122,7 @@ ui.formWidget('Portlet', {
 		element.resizable({
 			handles: 's',
 			resize: _.debounce(function() {
-				$.event.trigger('adjustSize');
+				axelor.$adjustSize();
 				element.width('auto');
 			}, 100)
 		});
@@ -174,7 +174,7 @@ ui.formWidget('Tabs', {
 				if ($scope.$tabs) {
 					$scope.$tabs.trigger('adjust');
 				}
-				$.event.trigger('adjustSize');
+				axelor.$adjustSize();
 				if(current != selected){
 					doSelect();
 				}
@@ -211,7 +211,7 @@ ui.formWidget('Tabs', {
 				return $scope.select(tabs[index]);
 			}
 
-			$.event.trigger('adjustSize');
+			axelor.$adjustSize();
 		};
 		
 		this.hideTab = function(index) {
@@ -231,7 +231,7 @@ ui.formWidget('Tabs', {
 			tab.selected = false;
 			
 			if (!wasHidden && selected > -1 && selected !== index)
-				return $.event.trigger('adjustSize');
+				return axelor.$adjustSize();
 			
 			for(var i = 0 ; i < tabs.length ; i++) {
 				var tab = tabs[i];
@@ -261,7 +261,7 @@ ui.formWidget('Tabs', {
 		});
 		
 		elem.on('click', '.dropdown-toggle', function(e){
-			$.event.trigger('adjustSize');
+			axelor.$adjustSize();
 		});
 		
 		// set height (#1011)
