@@ -361,7 +361,7 @@ angular.module('axelor.ui').directive('uiViewPopup', function() {
 
 			function adjust(how) {
 				element.find('input[type=text]:first').focus();
-				$.event.trigger('adjustSize');
+				axelor.$adjustSize();
 
 				//XXX: ui-dialog issue
 				element.find('.slick-headerrow-column').zIndex(element.zIndex());

@@ -160,7 +160,8 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			} else {
 				parent.add(label).show();
 			}
-			return $.event.trigger('adjustSize');
+
+			return axelor.$adjustSize();
 		}
 
 		var hideFn = _.contains(this.handles, 'isHidden') ? angular.noop : hideWidget;

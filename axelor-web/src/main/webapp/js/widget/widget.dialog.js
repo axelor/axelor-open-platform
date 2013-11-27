@@ -96,7 +96,7 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 			});
 			
 			dialog.on('dialogresizestop', function(){
-				$.event.trigger('adjustSize');
+				axelor.$adjustSize();
 			});
 
 			dialog.on('dialogopen', onOpen)

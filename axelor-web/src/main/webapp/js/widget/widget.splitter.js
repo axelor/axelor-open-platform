@@ -51,9 +51,7 @@ ui.directive('uiSplitter', function() {
 					inverse: scope.inverse == 'true',
 					toggleOn: scope.toggleOn || 'click'
 				}).on('splitter:dragstop', function(){
-					setTimeout(function(){
-						$.event.trigger('adjustSize');
-					});
+					axelor.$adjustSize();
 				});
 			});
 		},
