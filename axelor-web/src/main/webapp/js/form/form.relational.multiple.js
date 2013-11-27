@@ -742,7 +742,8 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 			input.val(text);
 		});
 		
-		scope.$watch('schema', function(schema, old) {
+		scope.$watch('schema.loaded', function(viewLoaded) {
+			var schema = scope.schema;
 			if (schema && field.canEdit === false) {
 				schema.editIcon = false;
 			}

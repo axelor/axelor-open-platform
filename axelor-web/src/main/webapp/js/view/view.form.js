@@ -804,11 +804,13 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			$(document).off('mousedown.loginfo', onMouseDown);
 		});
 
-		var unwatch = scope.$watch('schema', function(schema){
+		var unwatch = scope.$watch('schema.loaded', function(viewLoaded){
 
-			if (!schema) return;
+			if (!viewLoaded) return;
+			
 			unwatch();
 
+			var schema = scope.schema;
 			var form = parse(scope, schema, scope.fields);
 
 			form = $compile(form)(scope);
