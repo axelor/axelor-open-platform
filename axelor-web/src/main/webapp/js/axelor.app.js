@@ -214,43 +214,6 @@
 		axelor.unblockUI = function() {
 			return unblock();
 		};
-		
-		function ajaxStop(callback, context) {
-			var wait = _.last(arguments);
-			if (!wait || !_.isNumber(wait)) {
-				wait = 10;
-			}
-			if (loadingCounter > 0) {
-				return _.delay(ajaxStop, wait, callback, context);
-			}
-			if (callback) {
-				_.delay(callback, wait, context);
-			}
-		};
-		
-		function applyLater(wait, func) {
-			var that = this,
-				args = _.rest(arguments, _.isFunction(func) ? 2: 1);
-
-			if (_.isFunction(wait)) {
-				func = wait;
-				wait = 0;
-			}
-			
-			func = func || angular.noop;
-			
-			return setTimeout(function(){
-		    	return that.$apply(function() {
-		    		return func.apply(null, args);
-		    	});
-		    }, wait || 0);
-		}
-
-		var proto = Object.getPrototypeOf($rootScope);
-		_.extend(proto, {
-			ajaxStop: ajaxStop,
-			applyLater: applyLater
-		});
 
 		return function(promise) {
 			return promise.then(function(response){
@@ -283,11 +246,42 @@
 			});
 		};
 	});
-
+	
+	function applyScopeMixin($rootScope, $exceptionHandler) {
+		
+		var scopeMixin = {
+			
+			ajaxStop: function ajaxStop(callback, context) {
+				var wait = _.last(arguments);
+				if (!wait || !_.isNumber(wait)) {
+					wait = 10;
+				}
+				if (loadingCounter > 0) {
+					return _.delay(ajaxStop, wait, callback, context);
+				}
+				if (callback) {
+					_.delay(callback, wait, context);
+				}
+			},
+	
+			applyLater: function applyLater(func, wait) {
+				var that = this;
+				return setTimeout(function(){
+			    	return that.$apply(func ||angular.noop);
+			    }, wait);
+			}
+		};
+		
+		return _.extend(Object.getPrototypeOf($rootScope), scopeMixin);
+	};
+	
 	module.controller('AppCtrl', AppCtrl);
 	
-	AppCtrl.$inject = ['$rootScope', '$scope', '$http', '$route', 'authService'];
-	function AppCtrl($rootScope, $scope, $http, $route, authService) {
+	AppCtrl.$inject = ['$rootScope', '$exceptionHandler', '$scope', '$http', '$route', 'authService'];
+	function AppCtrl($rootScope, $exceptionHandler, $scope, $http, $route, authService) {
+		
+		// apply additional helper methods to scope
+		applyScopeMixin($rootScope, $exceptionHandler);
 	
 		function getAppInfo(settings) {
 			return {
