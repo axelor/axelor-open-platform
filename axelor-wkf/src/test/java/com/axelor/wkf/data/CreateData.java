@@ -39,7 +39,7 @@ import com.axelor.wkf.db.Transition;
 import com.axelor.wkf.db.Workflow;
 import com.axelor.wkf.db.node.EndEvent;
 import com.axelor.wkf.db.node.StartEvent;
-import com.axelor.wkf.db.node.Activity;
+import com.axelor.wkf.db.node.NodeTask;
 
 public class CreateData {
 
@@ -103,14 +103,14 @@ public class CreateData {
 		start.setStartTransitions(new ArrayList<Transition>());
 		start.addEndTransition(startTransition);
 		
-		Node task1 = new Activity();
+		Node task1 = new NodeTask();
 		task1.setName("Task 1");
 		task1.setType("task");
 		task1.setAction( metaAction5 );
 		task1.addStartTransition(startTransition);
 		task1.addEndTransition(intermediaryTransition);
 		
-		Node task2 = new Activity();
+		Node task2 = new NodeTask();
 		task2.setName("Task 2");
 		task2.setType("task");
 		task2.setAction( metaAction6 );
