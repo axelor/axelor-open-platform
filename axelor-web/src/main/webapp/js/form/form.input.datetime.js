@@ -32,7 +32,7 @@
 
 var ui = angular.module('axelor.ui');
 
-// configure datepicket
+// configure datepicker
 if (_t.calendar) {
 	$.timepicker.setDefaults(_t.calendar);
 	$.datepicker.setDefaults(_t.calendar);
@@ -136,6 +136,13 @@ $.extend($.datepicker, {
 		}
 	}
 });
+
+var _updateDatepicker = $.datepicker._updateDatepicker;
+$.datepicker._updateDatepicker = function(inst) {
+	if (!$.datepicker._noUpdate) {
+		return _updateDatepicker(inst);
+	}
+};
 
 /**
  * The DateTime input widget.
@@ -302,7 +309,12 @@ ui.formInput('DateTime', {
 				var value = scope.getText();
 				if (value) {
 					input.mask('value', value);
-					input.datetimepicker('setDate', value);
+					try {
+						$.datepicker._noUpdate = true;
+						$.datepicker._base_setDateDatepicker(input[0], value);
+					} finally {
+						$.datepicker._noUpdate = false;
+					}
 				} else {
 					input.mask('value', '');
 				}
