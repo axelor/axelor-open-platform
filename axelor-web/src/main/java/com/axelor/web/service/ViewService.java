@@ -54,6 +54,14 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
+import com.axelor.meta.schema.views.AbstractView;
+import com.axelor.meta.schema.views.AbstractWidget;
+import com.axelor.meta.schema.views.Field;
+import com.axelor.meta.schema.views.FormInclude;
+import com.axelor.meta.schema.views.FormView;
+import com.axelor.meta.schema.views.GridView;
+import com.axelor.meta.schema.views.Notebook;
+import com.axelor.meta.schema.views.SimpleContainer;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Resource;
@@ -176,27 +184,12 @@ public class ViewService extends AbstractService {
 		return service.findViews(findClass(model), views);
 	}
 
-	@GET
-	@Path("view")
-	public Response view(
-			@QueryParam("model") String model,
-			@QueryParam("name") String name,
-			@QueryParam("type") String type) {
-		return service.findView(model, name, type);
-	}
-
-	@POST
-	@Path("view/fields")
-	public Response viewFields(Request request) {
-
-		final String model = request.getModel();
-		final List<String> names = request.getFields();
+	private Map<String, Object> findFields(final String model, final List<String> names) {
 
 		final Class<?> modelClass = findClass(model);
 		final Mapper mapper = Mapper.of(modelClass);
-
-		final Response response = new Response();
 		final List<Object> fields = Lists.newArrayList();
+		final Map<String, Object> data = Maps.newHashMap();
 
 		for(String name : names) {
 			Property p = findField(mapper, name);
@@ -213,12 +206,78 @@ public class ViewService extends AbstractService {
 			}
 		}
 
-		Map<String, Object> data = Maps.newHashMap();
 		data.put("perms", perms(modelClass));
 		data.put("fields", fields);
 
-		response.setData(data);
+		return data;
+	}
 
+	private List<String> findNames(final List<String> names, final AbstractWidget widget) {
+		List<? extends AbstractWidget> all = null;
+		if (widget instanceof Notebook) {
+			all = ((Notebook) widget).getPages();
+		} else if (widget instanceof SimpleContainer) {
+			all = ((SimpleContainer) widget).getItems();
+		} else if (widget instanceof FormInclude) {
+			names.addAll(findNames(((FormInclude) widget).getView()));
+		} else if (widget instanceof Field) {
+			names.add(((Field) widget).getName());
+		}
+		if (all == null) {
+			return names;
+		}
+		for (AbstractWidget item : all) {
+			findNames(names, item);
+		}
+		return names;
+	}
+
+	public List<String> findNames(final AbstractView view) {
+		List<String> names = Lists.newArrayList();
+		List<AbstractWidget> items = null;
+		if (view instanceof FormView) {
+			items = ((FormView) view).getItems();
+		}
+		if (view instanceof GridView) {
+			items = ((GridView) view).getItems();
+		}
+		if (items == null || items.isEmpty()) {
+			return names;
+		}
+		for (AbstractWidget widget : items) {
+			findNames(names, widget);
+		}
+		return names;
+	}
+
+	@GET
+	@Path("view")
+	public Response view(
+			@QueryParam("model") String model,
+			@QueryParam("name") String name,
+			@QueryParam("type") String type) {
+
+		final Response response = service.findView(model, name, type);
+		final AbstractView view = (AbstractView) response.getData();
+
+		final Map<String, Object> data = Maps.newHashMap();
+		data.put("view", view);
+
+		if (view instanceof AbstractView) {
+			data.putAll(findFields(model, findNames((AbstractView) view)));
+		}
+
+		response.setData(data);
+		response.setStatus(Response.STATUS_SUCCESS);
+
+		return response;
+	}
+
+	@POST
+	@Path("view/fields")
+	public Response viewFields(Request request) {
+		final Response response = new Response();
+		response.setData(findFields(request.getModel(), request.getFields()));
 		return response;
 	}
 
