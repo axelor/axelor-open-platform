@@ -176,22 +176,20 @@ var NestedEditor = {
 			updateFlag = true;
 		
 		function setValidity(nested, valid) {
-			setTimeout(function(){
-				model.$setValidity('valid', nested.isValid());
-				if (scope.setValidity) {
-					scope.setValidity('valid', nested.isValid());
-				}
-				scope.$apply();
-			});
+			model.$setValidity('valid', nested.isValid());
+			if (scope.setValidity) {
+				scope.setValidity('valid', nested.isValid());
+			}
 		}
 		
 		function configure(nested) {
 			
 			//FIX: select on M2O doesn't apply to nested editor
-			scope.$watch(attrs.ngModel + '.id', function(){
-				setTimeout(function(){
-					nested.$apply();
-				});
+			var valueSet = false;
+			scope.$watch(attrs.ngModel + '.id', function(id, old){
+				if (id === old && valueSet) return;
+				valueSet = true;
+				scope.applyLater();
 			});
 			
 			//FIX: accept values updated with actions
@@ -203,7 +201,12 @@ var NestedEditor = {
 				}
 			});
 
-			nested.$watch('form.$valid', function(valid){
+			var validitySet = false;
+			nested.$watch('form.$valid', function(valid, old){
+				if (valid === old && validitySet) {
+					return;
+				}
+				validitySet = true;
 				setValidity(nested, valid);
 			});
 			nested.$watch('record', function(rec, old){
