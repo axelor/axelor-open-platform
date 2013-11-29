@@ -567,11 +567,19 @@ Grid.prototype.parse = function(view) {
 	element.show();
 	element.data('grid', grid);
 	
-	grid.setSelectionModel(new Slick.RowSelectionModel());
-
 	var headerMenu = new Slick.Plugins.HeaderMenu({
 		buttonImage: "lib/slickgrid/images/down.gif"
 	});
+
+	grid.setSelectionModel(new Slick.RowSelectionModel());
+	grid.registerPlugin(new Slick.Data.GroupItemMetadataProvider());
+	grid.registerPlugin(headerMenu);
+	if (selectColumn) {
+		grid.registerPlugin(selectColumn);
+	}
+	if (editColumn) {
+		grid.registerPlugin(editColumn);
+	}
 
 	// performance tweaks
 	var _containerH = 0;
@@ -595,14 +603,6 @@ Grid.prototype.parse = function(view) {
 		}
 		initialized = true;
 		grid.init();
-		grid.registerPlugin(new Slick.Data.GroupItemMetadataProvider());
-		grid.registerPlugin(headerMenu);
-		if (selectColumn) {
-			grid.registerPlugin(selectColumn);
-		}
-		if (editColumn) {
-			grid.registerPlugin(editColumn);
-		}
 
 		//XXX: ui-dialog issue (filter row)
 		var zIndex = element.parents('.ui-dialog:first').zIndex();
