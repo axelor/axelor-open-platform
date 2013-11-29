@@ -130,10 +130,7 @@ function FormViewCtrl($scope, $element) {
 				if (record === undefined) {
 					$scope.edit(null);
 					return $scope.ajaxStop(function(){
-						setTimeout(function(){
-							$scope.$broadcast("on:new");
-							$scope.$apply();
-						});
+						$scope.$broadcast("on:new");
 					});
 				}
 				if (record && record.id)
@@ -204,8 +201,7 @@ function FormViewCtrl($scope, $element) {
 		$scope.$$original = record || {};
 		$scope.$$dirty = false;
 		$scope.record = angular.copy($scope.$$original);
-		setTimeout(function(){
-			$scope.$apply();
+		$scope.ajaxStop(function(){
 			$scope.$broadcast("on:edit", $scope.record);
 			$scope.$broadcast("on:record-change", $scope.record);
 		});
@@ -433,11 +429,7 @@ function FormViewCtrl($scope, $element) {
 				}
 				return;
 			}
-			setTimeout(function(){
-				$scope.$apply(function(){
-					callback();
-				});
-			});
+			$scope.applyLater(callback);
 		});
 	};
 
