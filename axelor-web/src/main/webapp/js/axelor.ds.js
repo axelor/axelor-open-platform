@@ -209,6 +209,54 @@
 
 			return _.compact(items);
 		}
+		
+		ViewService.prototype.getMetaDef2 = function (model, view) {
+			var that = this,
+				deferred = $q.defer();
+
+			var promise = deferred.promise;
+			promise.success = function(fn) {
+				promise.then(function(res){
+					fn(res.fields, res.view);
+				});
+				return promise;
+			};
+			promise.error = function(fn) {
+				promise.then(null, fn);
+				return promise;
+			};
+			
+			function getFieldDef(view) {
+				
+			}
+			
+			if (_.isArray(view.items)) {
+				return loadFields(view);
+			};
+
+			$http.get('ws/meta/view', {
+				cache: true,
+				params: {
+					model: model,
+					type: view.type,
+					name: view.name
+				}
+			}).then(function(response) {
+				var res = response.data,
+					result = res.data;
+
+				if (!result || !result.view) {
+					return deferred.reject('view not found', view);
+				}
+				
+				deferred.resolve({
+					fields: result.items,
+					view: result
+				});
+			});
+
+			return promise;
+		};
 
 		var fieldsCache = $cacheFactory("viewFields", { capacity: 1000 });
 
@@ -223,14 +271,31 @@
 				});
 				return promise;
 			};
+			
+			function process(data) {
+				data.view.perms = data.view.perms || data.perms;
+				self.process(data, data.view);
+				
+				if (data.perms && !data.perms.write) {
+					data.view.editable = false;
+				}
 
-			function loadFields(view) {
+				return data;
+			}
 
-				var fields = findFields(view) || [];
-				var key = model + "|" + view.type + "|" + view.name + "|" + fields.join("|");
+			function loadFields(data) {
+
+				var fields = (findFields(data.view) || []).sort();
+				var key = model + "|" + data.view.type + "|" + data.view.name + "|" + fields.join("|");
+
+				if (!_.isEmpty(data.fields)) {
+					fieldsCache.put(key, angular.copy(data));
+					deferred.resolve(process(data));
+					return promise;
+				}
 
 				if (!model || !fields || fields.length === 0) {
-					deferred.resolve({view: view});
+					deferred.resolve(data);
 					return promise;
 				}
 
@@ -246,22 +311,12 @@
 
 				function resolver(response) {
 					var res = response.data,
-						data = res.data;
+						result = res.data;
 
-					view.perms = data.perms;
-					self.process(data, view);
-
-					if (view.perms && !view.perms.write) {
-						view.editable = false;
-					}
-
-					var fields = data.fields;
-					var result = {
-						fields: fields,
-						view: view
-					};
-
+					result.view = view;
+					result = process(result);
 					fieldsCache.put(key, angular.copy(result));
+					
 					deferred.resolve(result);
 
 					return promise;
@@ -279,7 +334,7 @@
 			}
 
 			if (_.isArray(view.items)) {
-				return loadFields(view);
+				return loadFields({view: view});
 			};
 
 			$http.get('ws/meta/view', {
@@ -293,18 +348,18 @@
 				var res = response.data,
 					result = res.data;
 
-				if (!result) {
+				if (!result || !result.view) {
 					return deferred.reject('view not found', view);
 				}
 
-				if (_.isArray(result.items)) {
-					loadFields(result);
-				} else {
-					deferred.resolve({
-						fields: result.items,
-						view: result
-					});
+				if (_.isArray(result.view.items)) {
+					return loadFields(result);
 				}
+
+				deferred.resolve({
+					fields: result.view.items,
+					view: result.view
+				});
 			});
 			return promise;
 		};
