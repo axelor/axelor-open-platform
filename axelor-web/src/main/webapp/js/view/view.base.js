@@ -185,13 +185,6 @@ function DSViewCtrl(type, $scope, $element) {
 	$scope.fields = {};
 	$scope.schema = null;
 	
-	setTimeout(function(){
-		$scope.$apply(function(){
-			if (view.deferred)
-				view.deferred.resolve($scope);
-		});
-	});
-
 	$scope.show = function() {
 		if (viewPromise == null) {
 			viewPromise = $scope.loadView(type, view.name);
@@ -299,6 +292,10 @@ function DSViewCtrl(type, $scope, $element) {
 		}
 		return true;
 	};
+	
+	if (view.deferred) {
+		view.deferred.resolve($scope);
+	}
 }
 
 angular.module('axelor.ui').directive('uiViewPane', function() {
