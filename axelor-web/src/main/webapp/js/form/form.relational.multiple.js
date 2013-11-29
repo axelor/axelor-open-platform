@@ -346,7 +346,7 @@ ui.formInput('OneToMany', {
 				return;
 			}
 			doRenderUnwatch = scope.$watch(function () {
-				if (element.is(':hidden') || !doViewPromised) {
+				if (!isVisible() || !doViewPromised) {
 					return;
 				}
 				doRenderUnwatch();
@@ -354,6 +354,10 @@ ui.formInput('OneToMany', {
 					fetchData();
 				});
 		};
+		
+		function isVisible() {
+			return element.parents('.tab-content.form-item').filter(':hidden').size() === 0;
+		}
 
 		scope._viewPromise.then(function () {
 			doViewPromised = true;
