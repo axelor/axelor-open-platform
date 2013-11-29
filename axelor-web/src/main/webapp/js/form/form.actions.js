@@ -267,11 +267,7 @@ ActionHandler.prototype = {
 			deferred = this.ws.defer();
 
 		function resolveLater() {
-			setTimeout(function(){
-				scope.$apply(function(){
-					return deferred.resolve();
-				});
-			});
+			deferred.resolve();
 			return deferred.promise;
 		}
 		
