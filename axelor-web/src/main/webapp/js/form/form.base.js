@@ -97,21 +97,20 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		
 		scope.isReadonlyExclusive = function() {
 			var parent = this.$parent || {};
-			if (parent.isReadonlyExclusive && parent.isReadonlyExclusive()) {
+			if (parent.isReadonly && parent.isReadonly()) {
 				return true;
 			}
 			return this.attr("readonly") || false;
 		};
 		
 		scope.isReadonly = function() {
-			var parent = this.$parent || {};
 			if ((this.hasPermission && !this.hasPermission('read')) || this.isReadonlyExclusive()) {
 				return true;
 			}
 			if (!this.attr("readonly") && this.attr("force-edit")) {
 				return false;
 			}
-			if ((parent.isReadonly && parent.isReadonly()) || (scope.isEditable && !scope.isEditable())) {
+			if (scope.isEditable && !scope.isEditable()) {
 				return true;
 			}
 			return this.attr("readonly") || false;
