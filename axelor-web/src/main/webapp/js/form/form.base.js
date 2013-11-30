@@ -74,21 +74,42 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		scope.$events = {};
 		scope.field = field || {};
 		
+		scope.$$readonly = undefined;
+		
 		scope.attr = function(name) {
 			if (arguments.length > 1) {
+				var old = state[name];
 				state[name] = arguments[1];
 				if (name === "highlight") {
 					setHighlight(state.highlight);
+				}
+				if (old !== state[name]) {
+					scope.$broadcast("on:attrs-changed", {
+						name: name,
+						value: state[name]
+					});
 				}
 			}
 			return state[name];
 		};
 		
-		scope.$on("on:edit", function(e, rec){
+		scope.$on("on:edit", function(e, rec) {
 			if (_.isEmpty(rec)) {
 				state = _.clone(props);
 			}
 			state["force-edit"] = false;
+		});
+		
+		scope.$on("on:attrs-changed", function(event, attr) {
+			if (attr.name === "readonly") {
+				scope.$$readonly = scope.$$isReadonly();
+			}
+		});
+		
+		scope.$watch("isEditable()", function(editable, old) {
+			if (editable === undefined) return;
+			if (editable === old) return;
+			scope.$$readonly = scope.$$isReadonly();
 		});
 
 		scope.isRequired = function() {
@@ -97,13 +118,20 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		
 		scope.isReadonlyExclusive = function() {
 			var parent = this.$parent || {};
-			if (parent.isReadonly && parent.isReadonly()) {
+			if (parent.isReadonlyExclusive && parent.isReadonlyExclusive()) {
 				return true;
 			}
 			return this.attr("readonly") || false;
 		};
 		
 		scope.isReadonly = function() {
+			if (scope.$$readonly === undefined) {
+				scope.$$readonly = scope.$$isReadonly();
+			}
+			return scope.$$readonly;
+		};
+		
+		scope.$$isReadonly = function() {
 			if ((this.hasPermission && !this.hasPermission('read')) || this.isReadonlyExclusive()) {
 				return true;
 			}
