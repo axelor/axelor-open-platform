@@ -167,6 +167,47 @@
 		provider.defaults.transformRequest.push(onHttpStart);
 	}]);
 	
+	module.config(['$provide', function($provide) {
+		
+		$provide.decorator('$rootScope', ['$delegate', '$exceptionHandler', function ($rootScope, $exceptionHandler) {
+			
+			var __proto__ = Object.getPrototypeOf($rootScope),
+				__super__ = {},
+				__custom__ = {};
+
+			for (var name in __proto__) {
+				if (angular.isFunction(__proto__[name])) {
+					__super__[name] = __proto__[name];
+				}
+			}
+
+			__custom__.ajaxStop = function ajaxStop(callback, context) {
+				var wait = _.last(arguments);
+				if (!wait || !_.isNumber(wait)) {
+					wait = 10;
+				}
+				if (loadingCounter > 0) {
+					return _.delay(ajaxStop, wait, callback, context);
+				}
+				if (callback) {
+					_.delay(callback, wait, context);
+				}
+			};
+		
+			__custom__.applyLater = function applyLater(func, wait) {
+				var that = this;
+				return setTimeout(function(){
+			    	return that.$apply(func ||angular.noop);
+			    }, wait);
+			};
+			
+			angular.extend(__proto__, __custom__);
+			angular.extend($rootScope, __custom__);
+
+			return $rootScope;
+		}]);
+	}]);
+	
 	module.factory('httpIndicator', ['$rootScope', '$q', function($rootScope, $q){
 		
 		var doc = $(document);
@@ -251,42 +292,11 @@
 		};
 	});
 	
-	function applyScopeMixin($rootScope, $exceptionHandler) {
-		
-		var scopeMixin = {
-			
-			ajaxStop: function ajaxStop(callback, context) {
-				var wait = _.last(arguments);
-				if (!wait || !_.isNumber(wait)) {
-					wait = 10;
-				}
-				if (loadingCounter > 0) {
-					return _.delay(ajaxStop, wait, callback, context);
-				}
-				if (callback) {
-					_.delay(callback, wait, context);
-				}
-			},
-	
-			applyLater: function applyLater(func, wait) {
-				var that = this;
-				return setTimeout(function(){
-			    	return that.$apply(func ||angular.noop);
-			    }, wait);
-			}
-		};
-		
-		return _.extend(Object.getPrototypeOf($rootScope), scopeMixin);
-	};
-	
 	module.controller('AppCtrl', AppCtrl);
 	
 	AppCtrl.$inject = ['$rootScope', '$exceptionHandler', '$scope', '$http', '$route', 'authService'];
 	function AppCtrl($rootScope, $exceptionHandler, $scope, $http, $route, authService) {
 		
-		// apply additional helper methods to scope
-		applyScopeMixin($rootScope, $exceptionHandler);
-	
 		function getAppInfo(settings) {
 			return {
 				name: settings['application.name'],
