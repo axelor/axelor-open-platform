@@ -160,10 +160,10 @@ ui.formWidget('Tabs', {
 			var current = selected;
 
 			angular.forEach(tabs, function(tab, i){
-				tab.selected = false;
+				tab.tabSelected = false;
 			});
 			
-			tab.selected = true;
+			tab.tabSelected = true;
 			selected = _.indexOf(tabs, tab);
 			
 			if (current === selected) {
@@ -228,7 +228,7 @@ ui.formWidget('Tabs', {
 			item.removeClass('active');
 			
 			tab.hidden = true;
-			tab.selected = false;
+			tab.tabSelected = false;
 			
 			if (!wasHidden && selected > -1 && selected !== index)
 				return axelor.$adjustSize();
@@ -277,7 +277,7 @@ ui.formWidget('Tabs', {
 				'<div class="nav-tabs-scroll-r"><a tabindex="-1" href="#"><i class="icon-chevron-right"></i></a></div>' +
 				'<div class="nav-tabs-strip">' +
 					'<ul class="nav nav-tabs">' +
-						'<li tabindex="-1" ng-repeat="tab in tabs" ng-class="{active:tab.selected}">'+
+						'<li tabindex="-1" ng-repeat="tab in tabs" ng-class="{active:tab.tabSelected}">'+
 							'<a tabindex="-1" href="" ng-click="select(tab)">'+
 								'<img class="prefix-icon" ng-show="tab.icon" ng-src="{{tab.icon}}">'+
 								'<span ng-bind-html-unsafe="tab.title"></span>'+
@@ -314,7 +314,7 @@ ui.formWidget('Tab', {
 
 	link: function(scope, elem, attrs, tabs) {
 		
-		scope.selected = false;
+		scope.tabSelected = false;
 		scope.icon = scope.field && scope.field.icon;
 
 		tabs.addTab(scope);
@@ -339,7 +339,7 @@ ui.formWidget('Tab', {
 	},
 	cellCss: 'form-item v-align-top',
 	transclude: true,
-	template: '<div ui-actions class="tab-pane" ng-class="{active: selected}" x-layout-selector="&gt; div:first">'+
+	template: '<div ui-actions class="tab-pane" ng-class="{active: tabSelected}" x-layout-selector="&gt; div:first">'+
 		'<div ui-transclude></div>'+
 	'</div>'
 });

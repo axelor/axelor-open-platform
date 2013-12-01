@@ -234,6 +234,7 @@ var NestedEditor = {
 
 		scope.onClose = function() {
 			scope.$parent.__nestedOpen = false;
+			scope.visible = false;
 			element.hide();
 		};
 
@@ -276,7 +277,7 @@ var NestedEditor = {
 		};
 	},
 	template:
-	'<fieldset class="form-item-group bordered-box">'+
+	'<fieldset class="form-item-group bordered-box" ui-show="visible">'+
 		'<legend>'+
 			'<span ng-bind-html-unsafe="title"></span> '+
 			'<span class="legend-toolbar" ng-show="!isReadonly()">'+

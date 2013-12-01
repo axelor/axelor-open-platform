@@ -333,7 +333,7 @@ angular.module('axelor.ui').directive('uiViewPane', function() {
 		},
 		template:
 			"<div class='view-pane'>" +
-				"<div class='view-container' ng-repeat='type in viewList' ng-show='type == viewType' ng-include='viewTemplate(type)'></div>" +
+				"<div class='view-container' ng-repeat='type in viewList' ui-show='type == viewType' ng-include='viewTemplate(type)'></div>" +
 			"</div>"
 	};
 });

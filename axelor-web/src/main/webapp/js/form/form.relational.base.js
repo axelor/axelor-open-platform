@@ -114,8 +114,9 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		if (embedded === null) {
 			embedded = $scope.createNestedEditor();
 		}
-		if (embedded !== null) {
-			embedded.toggle();
+		var es = embedded.data('$scope');
+		if (es !== null) {
+			embedded.toggle(es.visible = !es.visible);
 		}
 		return embedded;
 	};
