@@ -69,10 +69,50 @@
 			    	return that.$apply(func ||angular.noop);
 			    }, wait);
 			};
+			
+			__custom__.$new = function $new() {
+				var inst = __super__.$new.apply(this, arguments);
+				inst.$$watchChecker = this.$$watchChecker;
+				inst.$$watchInitialized = false;
+				inst.$$childCanWatch = true;
+				return inst;
+			};
+			
+			// make sure to patch $rootScope.$digest with
+			// if ((!current.$$canWatch || current.$$canWatch(current)) && (watchers = current.$$watchers)) {
+			//   ...
+			// }
+
+			__custom__.$$canWatch = function () {
+				if (!this.$$watchInitialized || !this.$$watchChecker) {
+					return this.$$watchInitialized = true;
+				}
+				var parent = this.$parent || {};
+				if (parent.$$childCanWatch !== undefined && !parent.$$childCanWatch) {
+					return false;
+				}
+				return this.$$childCanWatch = this.$$watchChecker(this);
+			};
+
+			__custom__.$watchChecker = function (checker) {
+
+				var self = this,
+					previous = this.$$watchChecker;
+
+				if (this.$$watchChecker === null) {
+					this.$$watchChecker = checker;
+				} else {
+					this.$$watchChecker = function() {
+						return previous(self) && checker(self);
+					};
+				}
+			};
 
 			angular.extend(__proto__, __custom__);
 			angular.extend($rootScope, __custom__);
 
+			$rootScope.$$watchChecker = null;
+			
 			return $rootScope;
 		}]);
 	}]);
