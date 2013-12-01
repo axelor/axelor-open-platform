@@ -85,6 +85,51 @@ ui.formWidget('Form', {
 	}
 });
 
+/**
+ * This directive is used filter $watch on scopes of inactive tabs.
+ *
+ */
+ui.directive('uiTabGate', function() {
+
+	return {
+		
+		compile: function compile(tElement, tAttrs) {
+			
+			return {
+				pre: function preLink(scope, element, attrs) {
+					scope.$watchChecker(function(current) {
+						return !scope.tab || scope.tab.selected;
+					});
+				}
+			};
+		}
+	};
+});
+
+/**
+ * This directive is used to filter $watch on scopes of hidden forms.
+ *
+ */
+ui.directive('uiFormGate', function() {
+
+	return {
+		compile: function compile(tElement, tAttrs) {
+
+			return {
+				pre: function preLink(scope, element, attrs) {
+					var parents = null;
+					scope.$watchChecker(function(current) {
+						if (parents === null) {
+							parents = element.parents('[ui-view-form]:first,.view-container:first');
+						}
+						return parents.filter(':hidden').size() === 0;
+					});
+				}
+			};
+		}
+	};
+});
+
 ui.directive('uiWidgetStates', function() {
 
 	function isValid(scope, name) {
