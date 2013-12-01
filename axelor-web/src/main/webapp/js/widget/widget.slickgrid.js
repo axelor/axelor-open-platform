@@ -1621,7 +1621,7 @@ ui.directive('uiSlickEditors', function() {
 		link: function(scope, element, attrs) {
 			
 		},
-		template: '<div ui-view-form x-handler="true"></div>'
+		template: '<div ui-view-form x-handler="true" ui-show="false"></div>'
 	};
 });
 

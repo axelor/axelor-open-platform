@@ -98,7 +98,10 @@ ui.directive('uiTabGate', function() {
 			return {
 				pre: function preLink(scope, element, attrs) {
 					scope.$watchChecker(function(current) {
-						return !scope.tab || scope.tab.selected;
+						if (current.tabSelected === undefined) {
+							return !scope.tab || scope.tab.selected;
+						}
+						return current.tabSelected;
 					});
 				}
 			};
@@ -117,16 +120,37 @@ ui.directive('uiFormGate', function() {
 
 			return {
 				pre: function preLink(scope, element, attrs) {
-					var parents = null;
+					var parent = null;
 					scope.$watchChecker(function(current) {
-						if (parents === null) {
-							parents = element.parents('[ui-view-form]:first,.view-container:first');
+						if (scope.tabSelected === false) {
+							return false;
 						}
-						return parents.filter(':hidden').size() === 0;
+						if (parent === null) {
+							parent = element.parents('[ui-show]:first');
+						}
+						return !(parent.hasClass('ui-hide') || parent.hasClass('ui-hide'));
 					});
 				}
 			};
 		}
+	};
+});
+
+function toBoolean(value) {
+	if (value && value.length !== 0) {
+		var v = angular.lowercase("" + value);
+		value = !(v == 'f' || v == '0' || v == 'false' || v == 'no' || v == 'n' || v == '[]');
+	} else {
+		value = false;
+	}
+	return value;
+}
+
+ui.directive('uiShow', function() {
+	return function (scope, element, attrs) {
+		scope.$watch(attrs.uiShow, function ngShowWatchAction(value){
+			element.css('display', toBoolean(value) ? '' : 'none').toggleClass('ui-hide', !toBoolean(value));
+		});
 	};
 });
 
