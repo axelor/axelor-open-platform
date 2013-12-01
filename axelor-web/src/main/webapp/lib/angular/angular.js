@@ -7710,7 +7710,7 @@ function $RootScopeProvider(){
                 $exceptionHandler(e);
               }
             }
-            if ((watchers = current.$$watchers)) {
+            if ((!current.$$canWatch || current.$$canWatch()) && (watchers = current.$$watchers)) {
               // process our watches
               length = watchers.length;
               while (length--) {
