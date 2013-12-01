@@ -46,10 +46,16 @@
 				}
 			}
 
+			var $http = null,
+				$timeout = null;
+			
 			__custom__.ajaxStop = function ajaxStop(callback, context) {
 
-				var $http = $injector.get('$http'),
-					count = _.size($http.pendingRequests || []),
+				if ($http === null) {
+					$http = $injector.get('$http');
+				}
+
+				var count = _.size($http.pendingRequests || []),
 					wait = _.last(arguments);
 
 				if (!wait || !_.isNumber(wait)) {
@@ -64,10 +70,14 @@
 			};
 
 			__custom__.applyLater = function applyLater(func, wait) {
-				var that = this;
-				return setTimeout(function(){
-			    	return that.$apply(func ||angular.noop);
-			    }, wait);
+				return this.$timeout(func ||angular.noop, wait);
+			};
+
+			__custom__.$timeout = function(func, wait, invokeApply) {
+				if ($timeout === null) {
+					$timeout = $injector.get('$timeout');
+				}
+				return $timeout.apply(null, arguments);
 			};
 			
 			__custom__.$new = function $new() {
