@@ -96,6 +96,8 @@ load([
 	'lib/angular/angular-sanitize.js',
 	'lib/angular/angular-if.js',
 
+	'js/axelor.ng.js',
+	
 	'js/lib/utils.js',
 	'js/lib/dialogs.js',
 	'js/lib/tabs.js',
