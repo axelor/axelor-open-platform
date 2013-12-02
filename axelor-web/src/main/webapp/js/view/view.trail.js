@@ -42,7 +42,7 @@ function FormListCtrl($scope, $element, $compile, DataSource, ViewService) {
 	$scope._viewParams.$viewScope = $scope;
 	
 	var view = $scope._views['trail'];
-	scope.applyLater(function(){
+	$scope.applyLater(function(){
 		if (view.deferred)
 			view.deferred.resolve($scope);
 	}, 0);

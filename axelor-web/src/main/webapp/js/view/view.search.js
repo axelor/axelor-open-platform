@@ -35,7 +35,7 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 	
 	$scope._dataSource = DataSource.create('multi-search');
 	
-	scope.applyLater(function(){
+	$scope.applyLater(function(){
 		if (view.deferred)
 			view.deferred.resolve($scope);
 	}, 0);

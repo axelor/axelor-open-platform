@@ -313,7 +313,7 @@
 					var res = response.data,
 						result = res.data;
 
-					result.view = view;
+					result.view = data.view || view;
 					result = process(result);
 					fieldsCache.put(key, angular.copy(result));
 					
