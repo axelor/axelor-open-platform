@@ -145,11 +145,7 @@ ui.formInput('Html', {
 			}
 
 			scope.setValue(value, true);
-			setTimeout(function() {
-				 if (!scope.$$phase) {
-					 scope.$apply();
-				 }
-			});
+			scope.applyLater();
 		}
 		
 		scope.ajaxStop(function(){

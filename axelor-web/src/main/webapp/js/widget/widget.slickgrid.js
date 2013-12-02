@@ -144,9 +144,8 @@ var Editor = function(args) {
 	
 	this.position = function(pos) {
 		element.trigger("show:slick-editor");
-		setTimeout(function(){
+		scope.applyLater(function(){
 			element.trigger("show:slick-editor");
-			scope.$apply();
 		});
 	};
 	

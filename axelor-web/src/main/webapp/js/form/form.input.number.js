@@ -154,10 +154,7 @@ ui.formInput('Number', {
 
 			element.val(text);
 			scope.setValue(val);
-
-			setTimeout(function(){
-				scope.$apply();
-			});
+			scope.applyLater();
 			
 			pendingChange = true;
 			

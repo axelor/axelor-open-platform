@@ -214,9 +214,7 @@ ui.formInput('Select', 'BaseSelect', {
 		
 		function update(value) {
 			scope.setValue(value, true);
-			setTimeout(function(){
-				scope.$apply();
-			});
+			scope.applyLater();
 		}
 
 		scope.handleDelete = function(e) {
@@ -387,9 +385,7 @@ ui.formInput('MultiSelect', 'Select', {
 
 		function update(value) {
 			scope.setValue(value, true);
-			setTimeout(function(){
-				scope.$apply();
-			});
+			scope.applyLater();
 		}
 		
 		scope.removeItem = function(item) {
@@ -486,9 +482,7 @@ ui.formInput('SelectQuery', 'Select', {
 		
 		function update(value) {
 			scope.setValue(value);
-			setTimeout(function(){
-				scope.$apply();
-			});
+			scope.applyLater();
 		}
 
 		scope.format = function(value) {

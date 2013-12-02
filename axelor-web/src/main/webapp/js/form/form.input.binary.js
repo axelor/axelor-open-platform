@@ -135,9 +135,8 @@ ui.formInput('Image', 'ImageLink', {
 		});
 
 		function update(value) {
-			setTimeout(function(){
+			scope.applyLater(function(){
 				model.$setViewValue(value);
-				scope.$apply();
 			});
 		}
 
@@ -208,9 +207,8 @@ ui.formInput('Binary', {
 					record.mime = file.type;
 				}
 				record.size = file.size;
-				setTimeout(function(){
+				scope.applyLater(function(){
 					model.$setViewValue(0); // mark form for save
-					scope.$apply();
 				});
 			}
 		});

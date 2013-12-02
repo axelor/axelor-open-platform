@@ -266,9 +266,7 @@ ui.formInput('ManyToOne', 'Select', {
 			} else {
 				scope.select(ui.item.value);
 			}
-			setTimeout(function() {
-				scope.$apply();
-			});
+			scope.applyLater();
 		};
 		
 		scope.$render_editable = function() {

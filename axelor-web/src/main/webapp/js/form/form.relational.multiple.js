@@ -112,8 +112,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		});
 		
 		$scope.setValue(records, true);
-		setTimeout(function(){
-			$scope.$apply();
+		$scope.applyLater(function(){
 			$scope.$broadcast('grid:changed');
 		});
 	};
@@ -147,9 +146,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		});
 		
 		$scope.setValue(records, fireOnChange);
-		setTimeout(function(){
-			$scope.$apply();
-		});
+		$scope.applyLater();
 	};
 
 	$scope.removeSelected = function(selection) {
@@ -650,9 +647,7 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 					input.val("");
 				});
 				ui.item.click.call(scope);
-				return setTimeout(function(){
-					scope.$apply();
-				});
+				return scope.applyLater();
 			}
 			return _handleSelect.apply(this, arguments);
 		};

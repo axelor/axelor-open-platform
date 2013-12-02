@@ -95,10 +95,8 @@ ui.formInput('CodeEditor', {
 		editor.on('change', function(e){
 			if (loadingText)
 				return;
-			setTimeout(function(){
-				scope.$apply(function(){
-					model.$setViewValue(session.getValue());
-				});
+			scope.applyLater(function(){
+				model.$setViewValue(session.getValue());
 			});
 		});
 		scope.$watch('isReadonly()', function readonly(value){

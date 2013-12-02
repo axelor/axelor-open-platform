@@ -35,12 +35,10 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 	
 	$scope._dataSource = DataSource.create('multi-search');
 	
-	setTimeout(function(){
-		$scope.$apply(function(){
-			if (view.deferred)
-				view.deferred.resolve($scope);
-		});
-	});
+	scope.applyLater(function(){
+		if (view.deferred)
+			view.deferred.resolve($scope);
+	}, 0);
 	
 	function fixFields(fields) {
 		_.each(fields, function(field){

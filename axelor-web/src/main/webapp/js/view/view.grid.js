@@ -320,9 +320,8 @@ function GridViewCtrl($scope, $element) {
 		page.index = -1;
 		$scope.switchTo('form', function(viewScope){
 			$scope.ajaxStop(function(){
-				setTimeout(function(){
+				scope.applyLater(function(){
 					viewScope.$broadcast('on:new');
-					viewScope.$apply();
 				});
 			});
 		});
