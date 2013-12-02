@@ -77,6 +77,9 @@
 				if ($timeout === null) {
 					$timeout = $injector.get('$timeout');
 				}
+				if (arguments.length === 0) {
+					return $timeout;
+				}
 				return $timeout.apply(null, arguments);
 			};
 			
