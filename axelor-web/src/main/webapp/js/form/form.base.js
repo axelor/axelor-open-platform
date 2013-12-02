@@ -356,6 +356,17 @@ ui.formDirective = function(name, object) {
 					model.$setValidity('invalid', valid);
 				});
 			}
+			
+			scope.$on('$destroy', function() {
+				if (scope.$elem_editable) {
+					scope.$elem_editable.remove();
+					scope.$elem_editable = null;
+				}
+				if (scope.$elem_readonly) {
+					scope.$elem_readonly.remove();
+					scope.$elem_readonly = null;
+				}
+			});
 		});
 
 		return object;
