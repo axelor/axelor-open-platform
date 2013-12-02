@@ -38,7 +38,7 @@ function PortalCtrl($scope, $element) {
 	var view = $scope._views['portal'];
 	var viewPromise = $scope.loadView('portal', view.name);
 
-	scope.applyLater(function(){
+	$scope.applyLater(function(){
 		if (view.deferred)
 			view.deferred.resolve($scope);
 	}, 0);
