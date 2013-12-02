@@ -791,10 +791,14 @@ ui.directive('uiFilterBox', function() {
 					of: element
 				});
 				$(document).on('mousedown.search-menu', onMouseDown);
+				
+				scope.applyLater(function () {
+					scope.visible = true;
+				});
 			};
-
+			
 			// append menu to view page to overlap the view
-			setTimeout(function() {
+			scope.$timeout(function() {
 				element.parents('.view-container').after(menu);
 			});
 
@@ -810,6 +814,9 @@ ui.directive('uiFilterBox', function() {
 
 			function hideMenu() {
 				$(document).off('mousedown.search-menu', onMouseDown);
+				scope.applyLater(function () {
+					scope.visible = false;
+				});
 				return menu.hide();
 			}
 
@@ -843,7 +850,7 @@ ui.directive('uiFilterBox', function() {
 				"<i ng-click='onSearch($event)' class='icon-caret-down'></i>"+
 				"<i ng-click='onRefresh()' class='icon-search'></i>" +
 			"</span>" +
-			"<div class='filter-menu'>"+
+			"<div class='filter-menu' ui-watch-if='visible'>"+
 				"<div class='filter-list'>" +
 					"<dl ng-show='hasFilters(1)'>" +
 						"<dt><i class='icon-save'></i><span x-translate> Filters</span></dt>" +
