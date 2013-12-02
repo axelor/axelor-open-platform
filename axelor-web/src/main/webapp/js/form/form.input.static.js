@@ -308,7 +308,7 @@ ui.formItem('ToolButton', 'Button', {
 		};
 	},
 
-	template: '<button class="btn" name="{{btn.name}}" ui-actions ui-widget-states>{{title}}</button>'
+	template: '<button class="btn" ui-show="!isHidden()" name="{{btn.name}}" ui-actions ui-widget-states>{{title}}</button>'
 });
 
 ui.directive('uiBtnGroupHelper', function () {
@@ -319,8 +319,8 @@ ui.directive('uiBtnGroupHelper', function () {
 		}
 		scope.$watch(function() {
 			element.children().removeClass('btn-fix-left btn-fix-right');
-			element.children(':visible:first').addClass('btn-fix-left');
-			element.children(':visible:last').addClass('btn-fix-right');
+			element.children(':not(.ui-hide):first').addClass('btn-fix-left');
+			element.children(':not(.ui-hide):last').addClass('btn-fix-right');
 		});
 	};
 });
