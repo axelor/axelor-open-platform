@@ -136,6 +136,33 @@ ui.directive('uiFormGate', function() {
 	};
 });
 
+/**
+ * This directive is used to filter $watch on scopes based on some condition.
+ *
+ */
+ui.directive('uiWatchIf', ['$parse', function($parse) {
+	
+	return {
+		compile: function compile(tElement, tAttrs) {
+			
+			return {
+				scope: true,
+				pre: function preLink(scope, element, attrs) {
+					var value = false,
+						expression = $parse(attrs.uiWatchIf);
+					
+					scope.$watchChecker(function (current) {
+						if (current === scope) {
+							return value = expression(scope);
+						}
+						return value;
+					});
+				}
+			};
+		}
+	};
+}]);
+
 function toBoolean(value) {
 	if (value && value.length !== 0) {
 		var v = angular.lowercase("" + value);
