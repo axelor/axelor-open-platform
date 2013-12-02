@@ -448,9 +448,7 @@
 						} else {
 							deferred.reject(response);
 						}
-						setTimeout(function(){
-							$rootScope.$apply();
-						});
+						$rootScope.applyLater();
 					}
 				};
 

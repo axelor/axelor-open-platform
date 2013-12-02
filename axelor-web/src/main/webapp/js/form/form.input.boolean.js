@@ -51,8 +51,7 @@ ui.formInput('Boolean', {
 		
 		element.click(function(){
 			scope.setValue(this.checked);
-			setTimeout(function(){
-				scope.$apply();
+			scope.applyLater(function(){
 				setTimeout(onChange);
 			});
 		});

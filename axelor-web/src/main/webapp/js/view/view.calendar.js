@@ -367,10 +367,8 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 					end: end,
 					allDay: allDay
 				};
-				setTimeout(function(){
-					scope.$apply(function(){
-						scope.showEditor(event);
-					});
+				scope.applyLater(function(){
+					scope.showEditor(event);
 				});
 				main.fullCalendar('unselect');
 			},
@@ -539,9 +537,8 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 			});
 			if (record == null || !record.id) {
 				popup.ajaxStop(function() {
-					setTimeout(function() {
+					scope.applyLater(function() {
 						popup.$broadcast("on:new");
-						popup.$apply();
 					});
 				});
 			}

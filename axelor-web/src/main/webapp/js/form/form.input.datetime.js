@@ -271,9 +271,7 @@ ui.formInput('DateTime', {
 			}
 			
 			scope.setValue(value, true);
-			setTimeout(function(){
-				scope.$apply();
-			});
+			scope.applyLater();
 		}
 
 		scope.validate = function(value) {
@@ -389,9 +387,7 @@ ui.formInput('Time', 'DateTime', {
 			}
 			
 			scope.setValue(value, true);
-			setTimeout(function(){
-				scope.$apply();
-			});
+			scope.applyLater();
 		}
 		
 		scope.$render_editable = function() {
