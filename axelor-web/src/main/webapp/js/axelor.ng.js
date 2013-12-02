@@ -120,6 +120,30 @@
 					};
 				}
 			};
+			
+			function debouncedApply(wait) {
+				return _.debounce(__super__.$apply, wait);
+			}
+
+			var $apply1 = _.debounce(__super__.$apply);
+			var $apply2 = _.debounce(__super__.$apply, 100);
+
+			var $debouncedApply = _.debounce(function $debouncedApply() {
+				if ($http === null) {
+					$http = $injector.get('$http');
+				}
+				if ($http.pendingRequests.length) {
+					return $apply2.call(this);
+				}
+				return $apply1.call(this);
+			});
+
+			__custom__.$apply = function $apply() {
+				if (arguments.length === 0) {
+					return $debouncedApply.call(this);
+				}
+				return __super__.$apply.apply(this, arguments);
+			};
 
 			angular.extend(__proto__, __custom__);
 			angular.extend($rootScope, __custom__);
