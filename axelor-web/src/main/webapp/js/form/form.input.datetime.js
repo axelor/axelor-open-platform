@@ -140,7 +140,7 @@ $.extend($.datepicker, {
 var _updateDatepicker = $.datepicker._updateDatepicker;
 $.datepicker._updateDatepicker = function(inst) {
 	if (!$.datepicker._noUpdate) {
-		return _updateDatepicker(inst);
+		return _updateDatepicker.call($.datepicker, inst);
 	}
 };
 
