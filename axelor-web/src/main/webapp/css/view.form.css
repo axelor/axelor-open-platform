@@ -154,6 +154,7 @@ table.form-layout td.form-item.v-align-top {
 .form-item-container input {
 	height: 26px;
 	padding: 2px 6px;
+	min-width: 170px;
 }
 
 .form-item-container[style *= width] input {
