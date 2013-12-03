@@ -813,6 +813,7 @@ Grid.prototype._doInit = function(view) {
 		element.find('.slick-headerrow-column').zIndex(zIndex);
 	}
 	
+	scope.$timeout(grid.invalidate);
 	scope.applyLater();
 };
 
