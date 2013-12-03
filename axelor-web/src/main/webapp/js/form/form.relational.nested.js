@@ -227,6 +227,7 @@ var NestedEditor = {
 		}
 		
 		scope.ngModel = model;
+		scope.visible = false;
 		
 		scope.onClear = function() {
 			scope.$parent.setValue(null, true);
