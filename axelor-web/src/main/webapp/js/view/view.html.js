@@ -47,7 +47,7 @@ var directiveFn = function(){
 		replace: true,
 		template:
 		'<div class="iframe-container">'+
-			'<iframe src="{{view.name || view.resource}}" frameborder="0" scrolling="auto"></iframe>'+
+			'<iframe ng-src="{{view.name || view.resource}}" frameborder="0" scrolling="auto"></iframe>'+
 		'</div>'
 	};
 };
