@@ -320,7 +320,7 @@ function GridViewCtrl($scope, $element) {
 		page.index = -1;
 		$scope.switchTo('form', function(viewScope){
 			$scope.ajaxStop(function(){
-				scope.applyLater(function(){
+				$scope.applyLater(function(){
 					viewScope.$broadcast('on:new');
 				});
 			});

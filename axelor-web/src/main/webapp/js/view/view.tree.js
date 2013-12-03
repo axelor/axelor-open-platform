@@ -44,7 +44,7 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 		if (view.deferred) {
 			view.deferred.resolve($scope);
 		}
-	});
+	}, 0);
 	
 	viewPromise.success(function(fields, schema){
 		$scope.parse(schema);

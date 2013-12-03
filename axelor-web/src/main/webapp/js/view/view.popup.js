@@ -102,7 +102,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			var values = ds.diff(record, $scope.$$original);
 			values._original = $scope.$$original;
 			ds.save(values).success(function(record, page){
-				scope.applyLater(function(){
+				$scope.applyLater(function(){
 					close(record);
 				});
 			});
@@ -183,7 +183,7 @@ function SelectorCtrl($scope, $element, DataSource, ViewService) {
 	};
 	
 	$scope.onItemClick = function(e, args) {
-		scope.applyLater($scope.onOK);
+		$scope.applyLater($scope.onOK);
 	};
 	
 	var origOnShow = $scope.onShow;
