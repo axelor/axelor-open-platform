@@ -265,11 +265,26 @@ var Formatters = {
 	},
 	
 	"button": function(field, value) {
-		var elem = '<img class="slick-img-button" src="' + field.icon + '"';
-		if (field.help) {
-			elem += ' title="' + field.help + '"';
+		var elem;
+		var isIcon = field.icon.indexOf('icon-') === 0;
+
+		if(isIcon) {
+			elem = '<a href="#"';
+			if (field.help) {
+				elem += ' title="' + field.help + '"';
+			}
+
+			elem += '><i class="slick-icon-button ' + field.icon + '"></i></a>';
 		}
-		elem += '>';
+		else {
+			elem = '<img class="slick-img-button" src="' + field.icon + '"';
+			if (field.help) {
+				elem += ' title="' + field.help + '"';
+			}
+
+			elem += '>';
+		}
+
 		return elem;
 	},
 
@@ -1451,7 +1466,7 @@ Grid.prototype.onItemClick = function(event, args) {
 	}
 
 	var source = $(event.srcElement);
-	if (source.is("img.slick-img-button")) {
+	if (source.is("img.slick-img-button") || source.is("i.slick-icon-button")) {
 		return this.onButtonClick(event, args);
 	}
 	
