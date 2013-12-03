@@ -98,10 +98,11 @@ ui.formCompile = function(element, attrs, linkerFn) {
 				state = _.clone(props);
 			}
 			state["force-edit"] = false;
+			scope.$$readonly = scope.$$isReadonly();
 		});
 		
 		scope.$on("on:attrs-changed", function(event, attr) {
-			if (attr.name === "readonly") {
+			if (attr.name === "readonly" || attr.name === "force-edit") {
 				scope.$$readonly = scope.$$isReadonly();
 			}
 		});

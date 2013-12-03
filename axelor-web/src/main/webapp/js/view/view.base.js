@@ -612,7 +612,7 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 					fs.attr("force-edit", true);
 					setTimeout(function() {
 						parent.find(':input:first').focus().select();
-					});
+					}, 100);
 					elem.on('cancel:hot-edit', function() {
 						fs.attr("force-edit", false);
 						fs.applyLater();
