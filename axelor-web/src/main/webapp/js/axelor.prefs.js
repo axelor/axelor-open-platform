@@ -61,6 +61,10 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 
 	$scope.setEditable();
 	$scope.show();
+	
+	$scope.ajaxStop(function () {
+		$scope.applyLater();
+	});
 }
 
 app.controller("UserCtrl", ['$scope', '$element', '$location', 'DataSource', 'ViewService', UserCtrl]);
