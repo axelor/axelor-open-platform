@@ -434,7 +434,7 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 			function adjust(how) {
 				scope.ajaxStop(function() {
 					how();
-				});
+				}, 100);
 			}
 			
 			function initSize() {
