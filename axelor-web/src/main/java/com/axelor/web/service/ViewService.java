@@ -67,6 +67,7 @@ import com.axelor.rpc.Request;
 import com.axelor.rpc.Resource;
 import com.axelor.rpc.Response;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -185,11 +186,16 @@ public class ViewService extends AbstractService {
 	}
 
 	private Map<String, Object> findFields(final String model, final List<String> names) {
+		final Map<String, Object> data = Maps.newHashMap();
+
+		if (Strings.isNullOrEmpty(model)) {
+			return data;
+		}
 
 		final Class<?> modelClass = findClass(model);
 		final Mapper mapper = Mapper.of(modelClass);
 		final List<Object> fields = Lists.newArrayList();
-		final Map<String, Object> data = Maps.newHashMap();
+
 
 		for(String name : names) {
 			Property p = findField(mapper, name);
