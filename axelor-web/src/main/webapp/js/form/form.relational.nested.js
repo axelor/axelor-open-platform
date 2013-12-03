@@ -85,6 +85,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 			$scope.edit($scope.getSelectedRecord());
 			return;
 		}
+		$scope.visible = false;
 		$element.hide();
 		$element.data('$rel').show();
 	};
@@ -132,7 +133,7 @@ var EmbeddedEditor = {
 	scope: true,
 	controller: EmbeddedEditorCtrl,
 	template:
-		'<fieldset class="form-item-group bordered-box">'+
+		'<fieldset class="form-item-group bordered-box" ui-show="visible">'+
 			'<div ui-view-form x-handler="this"></div>'+
 			'<div class="btn-toolbar pull-right">'+
 				'<button type="button" class="btn btn btn-info" ng-click="onClose()" ng-show="isReadonly()"><span x-translate>Back</span></button> '+
