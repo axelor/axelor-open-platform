@@ -173,11 +173,19 @@ function toBoolean(value) {
 	return value;
 }
 
+/**
+ * This directive is used to speedup uiFormGate.
+ */
 ui.directive('uiShow', function() {
-	return function (scope, element, attrs) {
-		scope.$watch(attrs.uiShow, function ngShowWatchAction(value){
-			element.css('display', toBoolean(value) ? '' : 'none').toggleClass('ui-hide', !toBoolean(value));
-		});
+
+	return {
+		scope: true, // create new scope to always watch the expression
+		link: function link(scope, element, attrs) {
+			scope.$$shouldWatch = true;
+			scope.$watch(attrs.uiShow, function uiShowWatchAction(value){
+				element.css('display', toBoolean(value) ? '' : 'none').toggleClass('ui-hide', !toBoolean(value));
+			});
+		}
 	};
 });
 
