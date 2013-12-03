@@ -89,7 +89,7 @@ ui.directive('uiHelpPopover', function() {
 		}
 
 		var value = scope.$eval('$$original.' + field.name);
-		if (value && field.serverType === 'many-to-one') {
+		if (value && /-one$/.test(field.serverType)) {
 			value = value.id;
 		}
 		if (value && field.type === "password") {
