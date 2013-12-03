@@ -235,6 +235,7 @@ function SearchFormCtrl($scope, $element, ViewService) {
 		
 		$scope.fields = meta.fields;
 		$scope.schema = form;
+		$scope.schema.loaded = true;
 	});
 }
 
@@ -256,6 +257,7 @@ function SearchGridCtrl($scope, $element, ViewService) {
 		
 		$scope.fields = meta.fields;
 		$scope.schema = view;
+		$scope.schema.loaded = true;
 	});
 	
 	$scope.onEdit = function() {
@@ -437,6 +439,8 @@ function SearchToolbarCtrl($scope, $element, $http) {
 				}
 			} ]
 		};
+		
+		$scope.schema.loaded = true;
 	});
 }
 
