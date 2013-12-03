@@ -563,9 +563,44 @@ Grid.prototype.parse = function(view) {
 	this.cols = cols;
 	this.grid = grid;
 	
+	this._selectColumn = selectColumn;
+	this._editColumn = editColumn;
+	
 	element.show();
 	element.data('grid', grid);
 	
+	function adjustSize() {
+		scope.ajaxStop(function () {
+			setTimeout(function () {
+				that.adjustSize();
+			});
+		});
+	}
+
+	element.on('adjustSize', _.debounce(adjustSize, 100));
+	
+	if (element.is(':visible')) {
+		setTimeout(function () {
+			element.trigger('adjustSize');
+		});
+	}
+	
+	this.doInit = _.once(function doInit() {
+		this._doInit(view);
+	}.bind(this));
+
+	return grid;
+};
+
+Grid.prototype._doInit = function(view) {
+
+	var that = this,
+		grid = this.grid,
+		scope = this.scope,
+		handler = this.scope.handler,
+		dataView = this.scope.dataView,
+		element = this.element;
+
 	var headerMenu = new Slick.Plugins.HeaderMenu({
 		buttonImage: "lib/slickgrid/images/down.gif"
 	});
@@ -573,11 +608,11 @@ Grid.prototype.parse = function(view) {
 	grid.setSelectionModel(new Slick.RowSelectionModel());
 	grid.registerPlugin(new Slick.Data.GroupItemMetadataProvider());
 	grid.registerPlugin(headerMenu);
-	if (selectColumn) {
-		grid.registerPlugin(selectColumn);
+	if (this._selectColumn) {
+		grid.registerPlugin(this._selectColumn);
 	}
-	if (editColumn) {
-		grid.registerPlugin(editColumn);
+	if (this._editColumn) {
+		grid.registerPlugin(this._editColumn);
 	}
 
 	// performance tweaks
@@ -595,30 +630,8 @@ Grid.prototype.parse = function(view) {
 		_resizeCanvas.call(grid);
 	}, 100);
 
-	var initialized = false;
-	this.doInit = function() {
-		if (initialized) {
-			return;
-		}
-		initialized = true;
-		grid.init();
+	grid.init();
 
-		//XXX: ui-dialog issue (filter row)
-		var zIndex = element.parents('.ui-dialog:first').zIndex();
-		if (zIndex) {
-			element.find('.slick-headerrow-column').zIndex(zIndex);
-		}
-	};
-
-	function adjustSize() {
-		scope.ajaxStop(function () {
-			setTimeout(function () {
-				that.adjustSize();
-			});
-		});
-	}
-	
-	element.on('adjustSize', _.debounce(adjustSize, 100));
 	// end performance tweaks
 	
 	dataView.$syncSelection = function(old, oldIds, focus) {
@@ -679,7 +692,7 @@ Grid.prototype.parse = function(view) {
 
 	function setFilterCols() {
 
-		if (!options.showHeaderRow) {
+		if (!that.showFilters) {
 			return;
 		}
 
@@ -718,11 +731,11 @@ Grid.prototype.parse = function(view) {
 			_setInputs(columns);
 		};
 		
-		_setInputs(cols);
+		_setInputs(that.cols);
 	}
 	
 	setFilterCols();
-	setDummyCols(element, cols);
+	setDummyCols(element, this.cols);
 	
 	var onInit = scope.onInit();
 	if (_.isFunction(onInit)) {
@@ -735,18 +748,12 @@ Grid.prototype.parse = function(view) {
 
 	setTimeout(function () {
 		// hide columns
-		_.each(cols, function (col) {
+		_.each(that.cols, function (col) {
 			if (col.descriptor && col.descriptor.hidden) {
 				that.showColumn(col.field, false);
 			}
 		});
 	});
-
-	if (element.is(":visible")) {
-		setTimeout(function(){
-			element.trigger('adjustSize');
-		});
-	}
 
 	if (scope.$parent._viewResolver) {
 		scope.$parent._viewResolver.resolve(view, element);
@@ -799,7 +806,13 @@ Grid.prototype.parse = function(view) {
 		return false;
 	});
 	
-	return grid;
+	//XXX: ui-dialog issue (filter row)
+	var zIndex = element.parents('.ui-dialog:first').zIndex();
+	if (zIndex) {
+		element.find('.slick-headerrow-column').zIndex(zIndex);
+	}
+	
+	scope.applyLater();
 };
 
 Grid.prototype.subscribe = function(event, handler) {
