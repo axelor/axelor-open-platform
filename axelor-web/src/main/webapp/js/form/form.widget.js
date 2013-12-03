@@ -144,9 +144,7 @@ ui.directive('uiWatchIf', ['$parse', function($parse) {
 	
 	return {
 		compile: function compile(tElement, tAttrs) {
-			
 			return {
-				scope: true,
 				pre: function preLink(scope, element, attrs) {
 					var value = false,
 						expression = $parse(attrs.uiWatchIf);
