@@ -210,54 +210,6 @@
 			return _.compact(items);
 		}
 		
-		ViewService.prototype.getMetaDef2 = function (model, view) {
-			var that = this,
-				deferred = $q.defer();
-
-			var promise = deferred.promise;
-			promise.success = function(fn) {
-				promise.then(function(res){
-					fn(res.fields, res.view);
-				});
-				return promise;
-			};
-			promise.error = function(fn) {
-				promise.then(null, fn);
-				return promise;
-			};
-			
-			function getFieldDef(view) {
-				
-			}
-			
-			if (_.isArray(view.items)) {
-				return loadFields(view);
-			};
-
-			$http.get('ws/meta/view', {
-				cache: true,
-				params: {
-					model: model,
-					type: view.type,
-					name: view.name
-				}
-			}).then(function(response) {
-				var res = response.data,
-					result = res.data;
-
-				if (!result || !result.view) {
-					return deferred.reject('view not found', view);
-				}
-				
-				deferred.resolve({
-					fields: result.items,
-					view: result
-				});
-			});
-
-			return promise;
-		};
-
 		var fieldsCache = $cacheFactory("viewFields", { capacity: 1000 });
 
 		ViewService.prototype.getMetaDef = function(model, view) {
