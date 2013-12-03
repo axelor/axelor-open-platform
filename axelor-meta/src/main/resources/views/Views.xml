@@ -320,7 +320,7 @@
   </grid>
 
   <form title="Files" name="meta-files-form" model="com.axelor.meta.db.MetaFile">
-    <field name="content" type="binary"/>
+    <field name="content" widget="binary"/>
     <field name="fileName"/>
     <field name="size"/>
     <field name="mime"/>
