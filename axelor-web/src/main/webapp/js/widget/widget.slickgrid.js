@@ -1438,8 +1438,10 @@ Grid.prototype.onItemClick = function(event, args) {
 
 	//XXX: hack to show popup grid (selector and editable in conflict?)
 	if (this.scope.selector && this.editable) {
-		var col = this.grid.getColumns()[args.cell];
-		if (col && col.forEdit !== false) {
+		var col = this.grid.getColumns()[args.cell] || {},
+			field = col.descriptor || {};
+		if (col.forEdit !== false &&
+				(field.type === 'one-to-many' || field.type === 'many-to-many')) {
 			this.grid.setActiveCell(args.row, args.cell);
 			this.grid.editActiveCell();
 			event.preventDefault();
@@ -1453,7 +1455,7 @@ Grid.prototype.onItemClick = function(event, args) {
 		return this.onButtonClick(event, args);
 	}
 	
-	if (this.editable) {
+	if (!this.scope.selector && this.editable) {
 		return this.grid.setActiveCell();
 	}
 	if (this.handler.onItemClick) {
