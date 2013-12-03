@@ -88,6 +88,7 @@
 				inst.$$watchChecker = this.$$watchChecker;
 				inst.$$watchInitialized = false;
 				inst.$$childCanWatch = true;
+				inst.$$shouldWatch = false;
 				return inst;
 			};
 			
@@ -99,6 +100,9 @@
 			__custom__.$$canWatch = function () {
 				if (!this.$$watchInitialized || !this.$$watchChecker) {
 					return this.$$watchInitialized = true;
+				}
+				if (this.$$shouldWatch === true) {
+					return true;
 				}
 				var parent = this.$parent || {};
 				if (parent.$$childCanWatch !== undefined && !parent.$$childCanWatch) {
