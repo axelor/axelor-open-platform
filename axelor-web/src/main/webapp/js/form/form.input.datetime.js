@@ -309,7 +309,7 @@ ui.formInput('DateTime', {
 					input.mask('value', value);
 					try {
 						$.datepicker._noUpdate = true;
-						$.datepicker._base_setDateDatepicker(input[0], value);
+						$.datepicker._setDateDatepicker(input[0], value);
 					} finally {
 						$.datepicker._noUpdate = false;
 					}
