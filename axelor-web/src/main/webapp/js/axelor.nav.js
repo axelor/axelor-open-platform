@@ -247,6 +247,8 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		if (first && !first.selected) {
 			return openTab(first);
 		}
+		
+		axelor.$adjustSize();
 	}
 	
 	function closeTabOthers(current) {
