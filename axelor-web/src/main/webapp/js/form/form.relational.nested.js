@@ -64,6 +64,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 	ViewCtrl($scope, DataSource, ViewService);
 	FormViewCtrl.call(this, $scope, $element);
 
+	$scope.visible = false;
 	$scope.onShow = function() {
 		
 	};
