@@ -80,7 +80,8 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 			detailView.data('$scope').isDetailView = true;
 			$element.after(detailView);
 		}
-		detailView.show();
+		var es = detailView.data('$scope');
+		detailView.toggle(es.visible = !es.visible);
 	};
 	
 	$scope.select = function(value) {
