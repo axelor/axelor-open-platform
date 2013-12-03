@@ -631,6 +631,7 @@ Grid.prototype._doInit = function(view) {
 	}, 100);
 
 	grid.init();
+	this.$$initialized = true;
 
 	// end performance tweaks
 	
@@ -1631,9 +1632,20 @@ ui.directive('uiSlickEditors', function() {
 			$scope.show();
 		}],
 		link: function(scope, element, attrs) {
-			
+
+			var grid = null;
+			scope.canWatch = function () {
+				if (!scope.grid || !scope.grid.$$initialized) {
+					return false;
+				}
+				if (grid === null) {
+					grid = scope.grid.grid;
+					return true;
+				}
+				return grid.getEditorLock().isActive();
+			};
 		},
-		template: '<div ui-view-form x-handler="true" ui-show="false"></div>'
+		template: '<div ui-view-form x-handler="true" ui-watch-if="canWatch()"></div>'
 	};
 });
 
@@ -1735,6 +1747,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 								
 				grid = new Grid(scope, element, attrs, ViewService, ActionService);
 				if (form) {
+					formScope.grid = grid;
 					grid.setEditors(form, formScope, forEdit);
 				}
 			};
