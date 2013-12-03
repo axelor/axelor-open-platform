@@ -542,6 +542,10 @@ table.field-details td {
 	white-space: nowrap;
 }
 
+table.field-details .help-text {
+	white-space: normal;
+}
+
 table.field-details .help-text hr {
 	margin: 9px 0;
 }
