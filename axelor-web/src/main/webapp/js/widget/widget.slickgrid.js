@@ -1425,6 +1425,9 @@ Grid.prototype.onButtonClick = function(event, args) {
 		var record = data.getItem(args.row) || {};
 		
 		field.handler.scope.record = record;
+		if(field.prompt) {
+			field.handler.prompt = field.prompt;
+		}
 		field.handler.scope.getContext = function() {
 			return _.extend({
 				_model: model,
