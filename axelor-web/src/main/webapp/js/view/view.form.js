@@ -302,21 +302,44 @@ function FormViewCtrl($scope, $element) {
 		});
 	};
 	
-	$scope.$on("on:new", function(event){
-		$scope._viewPromise.then(function(){
-			var handler = $scope.$events.onNew,
-				record = $scope.record;
-			$scope.setEditable();
-			if (handler && record) {
-				setTimeout(function () {
-					var promise = handler();
-					if (promise && promise.then) {
-						promise.then(function () {
-							if ($scope.isDirty()) $scope.editRecord(record);
-						});
-					}
-				});
+	$scope.onNewPromise = null;
+	
+	$scope.$on("on:new", function onNewHandler(event) {
+		
+		function afterVewLoaded() {
+			
+			var handler = $scope.$events.onNew;
+			var last = $scope.$parent.onNewPromise || $scope.onNewPromise;
+			
+			function reset() {
+				$scope.onNewPromise = null;
 			}
+			
+			function handle() {
+				var promise = handler();
+				if (promise && promise.then) {
+					promise.then(reset, reset);
+					promise = promise.then(function () {
+						if ($scope.isDirty()) {
+							return $scope.editRecord($scope.record);
+						}
+					});
+				}
+				return promise;
+			}
+
+			$scope.setEditable();
+
+			if (handler && $scope.record) {
+				if (last) {
+					return $scope.onNewPromise = last.then(handle);
+				}
+				$scope.onNewPromise = handle();
+			}
+		}
+		
+		$scope._viewPromise.then(function() {
+			$scope.$timeout(afterVewLoaded);
 		});
 	});
 	
