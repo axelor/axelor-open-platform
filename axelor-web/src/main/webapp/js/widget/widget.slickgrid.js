@@ -116,7 +116,7 @@ var Editor = function(args) {
 				case 13: // ENTER
 				case 38: // UP
 				case 40: // DOWN
-					if ($(e.srcElement).is('textarea')) {
+					if ($(e.target).is('textarea')) {
 						e.stopImmediatePropagation();
 					}
 				}
@@ -1465,8 +1465,8 @@ Grid.prototype.onItemClick = function(event, args) {
 		}
 	}
 
-	var source = $(event.srcElement);
-	if (source.is("img.slick-img-button") || source.is("i.slick-icon-button")) {
+	var source = $(event.target);
+	if (source.is('img.slick-img-button,i.slick-icon-button')) {
 		return this.onButtonClick(event, args);
 	}
 	
