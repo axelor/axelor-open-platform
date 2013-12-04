@@ -230,12 +230,22 @@ public class MetaController {
    }
 
 	public void restoreTranslations(ActionRequest request, ActionResponse response) {
-
+		Map<String, String> data = Maps.newHashMap();
 		String importPath = (String) request.getContext().get("importPath");
 		String importType = (String) request.getContext().get("importType");
 
-		JPA.runInTransaction(new Runnable() {
+		if(Strings.isNullOrEmpty(importType)) {
+			data.put("error", JPA.translate("Please select an import type first."));
+			response.setData(ImmutableList.of(data));
+			return;
+		}
+		if(importType.equals("2") && Strings.isNullOrEmpty(importPath)) {
+			data.put("error", JPA.translate("Please enter your import path fisrt."));
+			response.setData(ImmutableList.of(data));
+			return;
+		}
 
+		JPA.runInTransaction(new Runnable() {
 			@Override
 			public void run() {
 				JPA.clear();
@@ -243,23 +253,15 @@ public class MetaController {
 			}
 		});
 
-		try {
-			if(Strings.isNullOrEmpty(importType)) {
-				throw new Exception(JPA.translate("Please select an import type first."));
-			}
-			if(importType.equals("2") && Strings.isNullOrEmpty(importPath)) {
-				throw new Exception(JPA.translate("Please enter your import path fisrt."));
-			}
-			loader.loadTranslations(importPath);
 
-			response.setFlash(JPA.translate("Import done."));
-			response.setHidden("exportGroup", true);
+		loader.loadTranslations(importPath);
 
-			MetaTranslation view = MetaTranslation.all().fetchOne();
-			response.setValues(view);
-		} catch(Exception e) {
-			response.setFlash(e.getLocalizedMessage());
-		}
+		response.setFlash(JPA.translate("Import done."));
+		response.setHidden("exportGroup", true);
+
+		MetaTranslation view = MetaTranslation.all().fetchOne();
+		response.setValues(view);
+		response.setReload(true);
 	}
 
 	public void exportTranslations(ActionRequest request, ActionResponse response) {
@@ -268,13 +270,19 @@ public class MetaController {
 		String exportLanguage = (String) request.getContext().get("exportLanguage");
 		Map<String, String> data = Maps.newHashMap();
 
+		if(Strings.isNullOrEmpty(exportLanguage)) {
+			data.put("error", JPA.translate("Please enter your export language fisrt."));
+			response.setData(ImmutableList.of(data));
+			return;
+		}
+		if(Strings.isNullOrEmpty(exportPath)) {
+			data.put("error", JPA.translate("Please enter your export path fisrt."));
+			response.setData(ImmutableList.of(data));
+			return;
+		}
+
 		try {
-			if(Strings.isNullOrEmpty(exportLanguage)) {
-				throw new Exception(JPA.translate("Please enter your export language fisrt."));
-			}
-			if(Strings.isNullOrEmpty(exportPath)) {
-				throw new Exception(JPA.translate("Please enter your export path fisrt."));
-			}
+
 			export.exportTranslations(exportPath, exportLanguage);
 
 			response.setFlash(JPA.translate("Export done."));
@@ -283,8 +291,11 @@ public class MetaController {
 			data.put("exportPath", null);
 			data.put("exportLanguage", null);
 			response.setValues(data);
-		} catch(Exception e) {
-			response.setFlash(e.getLocalizedMessage());
+
+		}
+		catch(Exception e) {
+			data.put("error", e.getMessage());
+			response.setData(ImmutableList.of(data));
 		}
 	}
 }
