@@ -39,6 +39,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 
 	ui.RefFieldCtrl.apply(this, arguments);
 
+	$scope.selectEnable = true;
 	var ds = $scope._dataSource;
 
 	$scope.createNestedEditor = function() {
