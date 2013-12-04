@@ -140,9 +140,12 @@ public class RestService extends ResourceService {
 				.all().filter("self.objectId = ?1 AND self.objectName = ?2", id, getModel())
 				.cacheable().count();
 
-		@SuppressWarnings("all")
-		Map<String, Object> item = (Map) response.getItem(0);
-		item.put("$attachments", attachments);
+		if(response.getItem(0) != null) {
+			@SuppressWarnings("all")
+			Map<String, Object> item = (Map) response.getItem(0);
+			item.put("$attachments", attachments);
+		}
+
 
 		return response;
 	}
