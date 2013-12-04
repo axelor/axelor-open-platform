@@ -161,6 +161,50 @@ public class MetaController {
 
 		MetaView view = MetaView.all().fetchOne();
 		response.setValues(view);
+		response.setReload(true);
+	}
+
+	public void restoreSingle(ActionRequest request, ActionResponse response) {
+		final MetaView meta = request.getContext().asType(MetaView.class);
+		Map<String, String> data = Maps.newHashMap();
+
+		if(Strings.isNullOrEmpty(meta.getName())) {
+			data.put("error", JPA.translate("Please specified the view name"));
+			response.setData(ImmutableList.of(data));
+			return;
+		}
+		else if(Strings.isNullOrEmpty(meta.getModule())) {
+			data.put("error", JPA.translate("Please specified the view module"));
+			response.setData(ImmutableList.of(data));
+			return;
+		}
+
+		MetaStore.clear();
+		JPA.runInTransaction(new Runnable() {
+
+			@Override
+			public void run() {
+				JPA.clear();
+				JPA.em().createNativeQuery("DELETE FROM meta_view where id = ?1").setParameter(1, meta.getId()).executeUpdate();
+			}
+		});
+
+		Boolean imported = loader.loadSingleViews(meta.getName(), meta.getModule());
+		if(!imported) {
+			JPA.runInTransaction(new Runnable() {
+
+				@Override
+				public void run() {
+					meta.setId(null);
+					meta.setVersion(null);
+					meta.save();
+				}
+			});
+		}
+
+		MetaView view = MetaView.all().filter("self.name = ?1 AND self.module = ?2", meta.getName(), meta.getModule()).fetchOne();
+		response.setValues(view);
+		response.setReload(true);
 	}
 
 	public void clearCache(ActionRequest request, ActionResponse response) {

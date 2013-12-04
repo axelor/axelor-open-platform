@@ -708,6 +708,58 @@ public class MetaLoader {
 		}
 	}
 
+	public Boolean loadSingleViews(String name, String module) {
+		Boolean found = null;
+		List<File> files = MetaScanner.findAll("views\\.(.*?)\\.xml");
+
+		for(File file : files) {
+			String pat = String.format("(/WEB-INF/lib/%s-)|(%s/WEB-INF/classes/)", module, module);
+			Pattern pattern = Pattern.compile(pat);
+			String path = file.toString();
+			Matcher matcher = pattern.matcher(path);
+			if (matcher.find()) {
+				found = loadSingleFile(file, module, name);
+				if(found) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private Boolean loadSingleFile(final File file, final String module, String name) {
+		try {
+			ObjectViews views = (ObjectViews) unmarshaller.unmarshal(file.openInputStream());
+
+			if (views.getViews() != null) {
+				for(final AbstractView view : views.getViews()) {
+					if(view.getName() != null && view.getName().equals(name)) {
+						JPA.runInTransaction(new Runnable() {
+
+							@Override
+							public void run() {
+								loadView(view, module, file.getRelativePath());
+							}
+						});
+						return true;
+					}
+				}
+			}
+
+		}
+		catch (JAXBException e) {
+			Throwable ex = e.getLinkedException();
+			ex = ex == null ? e : ex;
+			log.error("Invalid XML input: {} -> {}", module, file.getRelativePath(), ex);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
 	private static ModuleResolver moduleResolver = new ModuleResolver();
 
 	private void _loadModuleInfo() throws IOException {
