@@ -334,6 +334,8 @@
 "axelor-meta",,"other","Not implemented yet!","Pas encore implémenté!",,
 "axelor-meta",,"other","Please enter your export path fisrt.","Merci de renseigner un chemin d'export.",,
 "axelor-meta",,"other","Please enter your import path fisrt.","Merci de renseigner un chemin d'import.",,
+"axelor-meta",,"other","Please specify the module name.","Merci de renseigner le nom du module concerné.",,
+"axelor-meta",,"other","Please specify the view name.","Merci de renseigner le nom de la vue concerné.",,
 "axelor-meta",,"other","Please select an import type first.","Merci de renseigner un type d'import.",,
 "auth.profiles","auth.profiles","documentation",,,,
 "user.preferences","user.preferences","documentation",,,,

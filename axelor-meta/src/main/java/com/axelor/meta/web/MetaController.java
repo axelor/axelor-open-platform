@@ -169,12 +169,12 @@ public class MetaController {
 		Map<String, String> data = Maps.newHashMap();
 
 		if(Strings.isNullOrEmpty(meta.getName())) {
-			data.put("error", JPA.translate("Please specified the view name"));
+			data.put("error", JPA.translate("Please specify the view name."));
 			response.setData(ImmutableList.of(data));
 			return;
 		}
 		else if(Strings.isNullOrEmpty(meta.getModule())) {
-			data.put("error", JPA.translate("Please specified the view module"));
+			data.put("error", JPA.translate("Please specify the module name."));
 			response.setData(ImmutableList.of(data));
 			return;
 		}
