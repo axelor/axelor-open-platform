@@ -276,7 +276,7 @@
 
 				var _promise = $http.post('ws/meta/view/fields', {
 					model: model,
-					fields: findFields(view)
+					fields: fields
 				});
 
 				_promise.then(resolver);
