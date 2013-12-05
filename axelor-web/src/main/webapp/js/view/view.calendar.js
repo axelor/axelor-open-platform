@@ -57,7 +57,7 @@ function CalendarViewCtrl($scope, $element) {
 				stop: schema.eventStop,
 				length: parseInt(schema.eventLength) || 0,
 				color: schema.colorBy,
-				title:schema.items[0].name
+				title: schema.items[0].name,
 			};
 
 			$scope._viewResolver.resolve(schema, $element);
@@ -216,15 +216,42 @@ function CalendarViewCtrl($scope, $element) {
 
 		record[view.start] = event.start;
 		record[view.stop] = event.end;
+		
+		$scope.record = record;
+		
+		function reset() {
+			$scope.record = null;
+		}
 
-		var promise = ds.save(record);
+		function doSave() {
+			return ds.save(record).success(function(res){
+				var info = $scope.getEventInfo(record);
+				event.record = _.extend(event.record, info.record);
+				event.start = info.start;
+				event.end = info.end;
+				event.allDay = info.allDay;
+				event.record.version = res.version;
+				return $scope.refresh();
+			});
+		}
 		
-		promise.success(function(res){
-			//TODO: update record
-			event.record.version = res.version;
-		});
-		
-		return promise;
+		var handler = $scope.onChangeHandler;
+		if (handler) {
+			var promise = handler.onChange().then(function () {
+				return doSave();
+			});
+			promise.success = function(fn) {
+				promise.then(fn);
+				return promise;
+			};
+			promise.error = function (fn) {
+				promise.then(null, fn);
+				return promise;
+			};
+			return promise;
+		}
+
+		return doSave();
 	};
 	
 	$scope.removeEvent = function(event, callback) {
@@ -271,7 +298,7 @@ function CalendarViewCtrl($scope, $element) {
 	};
 }
 
-angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function(ViewService){
+angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionService', function(ViewService, ActionService) {
 	
 	function link(scope, element, attrs, controller) {
 
@@ -593,6 +620,13 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', function
 		scope.onToday = function() {
 			main.fullCalendar('today');
 		};
+		
+		scope.onChangeHandler = null;
+		if (schema.onChange) {
+			scope.onChangeHandler = ActionService.handler(scope, element, {
+				action: schema.onChange
+			});
+		}
 		
 		function adjustSize() {
 			if (main.is(':hidden')) {
