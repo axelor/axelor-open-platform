@@ -49,6 +49,9 @@ public class CalendarView extends AbstractView {
 	private String colorBy;
 	
 	@XmlAttribute
+	private String onChange;
+
+	@XmlAttribute
 	private String eventStart;
 	
 	@XmlAttribute
@@ -78,6 +81,14 @@ public class CalendarView extends AbstractView {
 
 	public void setColorBy(String colorBy) {
 		this.colorBy = colorBy;
+	}
+
+	public String getOnChange() {
+		return onChange;
+	}
+
+	public void setOnChange(String onChange) {
+		this.onChange = onChange;
 	}
 
 	public String getEventStart() {

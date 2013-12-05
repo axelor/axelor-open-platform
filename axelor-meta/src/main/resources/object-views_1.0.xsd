@@ -550,6 +550,13 @@
             </xsd:restriction>
           </xsd:simpleType>
         </xsd:attribute>
+        <xsd:attribute name="onChange" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            The onchange action is called when event is moved or resized in the calendar view.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="colorBy" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
