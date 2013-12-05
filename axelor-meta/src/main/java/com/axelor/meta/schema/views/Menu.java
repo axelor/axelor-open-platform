@@ -61,6 +61,10 @@ public class Menu {
 		public String getTitle() {
 			return JPA.translate(super.getDefaultTitle(), super.getDefaultTitle(), model, "button");
 		}
+	}
+
+	@XmlType
+	public static class Devider extends MenuItem {
 
 	}
 
@@ -73,7 +77,9 @@ public class Menu {
 	@XmlAttribute
 	private Boolean showTitle;
 
-	@XmlElements({ @XmlElement(name = "item"), @XmlElement(name = "divider") })
+	@XmlElements({
+		@XmlElement(name = "item", type = Item.class),
+		@XmlElement(name = "divider", type = Devider.class) })
 	private List<Item> items;
 
 	@JsonIgnore

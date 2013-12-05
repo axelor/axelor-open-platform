@@ -135,7 +135,7 @@
         <xsd:complexType>
           <xsd:sequence>
             <xsd:choice maxOccurs="unbounded">
-              <xsd:element name="item" maxOccurs="unbounded">
+              <xsd:element name="item">
                 <xsd:complexType>
                   <xsd:attribute name="title" type="xsd:string" use="required"/>
                   <xsd:attribute name="action" type="xsd:string" use="required"/>
@@ -144,7 +144,12 @@
                   <xsd:attribute name="readonlyIf" type="xsd:string"/>
                 </xsd:complexType>
               </xsd:element>
-              <xsd:element name="divider" minOccurs="0" maxOccurs="unbounded"/>
+              <xsd:element name="divider">
+                <xsd:complexType>
+                  <xsd:attribute name="showIf" type="xsd:string"/>
+                  <xsd:attribute name="hideIf" type="xsd:string"/>
+                </xsd:complexType>
+              </xsd:element>
             </xsd:choice>
           </xsd:sequence>
           <xsd:attribute name="title" type="xsd:string" use="required"/>
