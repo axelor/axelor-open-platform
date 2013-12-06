@@ -64,8 +64,12 @@ public class Menu {
 	}
 
 	@XmlType
-	public static class Devider extends MenuItem {
+	public static class Devider extends Item {
 
+		@Override
+		public String getTitle() {
+			return null;
+		}
 	}
 
 	@XmlAttribute
