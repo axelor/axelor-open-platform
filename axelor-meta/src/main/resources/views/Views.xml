@@ -316,9 +316,9 @@
 
   <grid title="Files" name="meta-files-grid" model="com.axelor.meta.db.MetaFile">
     <field name="fileName"/>
-    <field name="sizeText" width="150"/>
-    <field name="mime" width="250"/>
-    <field name="createdBy"/>
+    <field name="sizeText" width="100"/>
+    <field name="mime" width="175"/>
+    <field name="createdBy" width="175"/>
     <field name="createdOn" width="150"/>
   </grid>
 
