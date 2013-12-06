@@ -52,17 +52,9 @@ module.directive('uiMenuBar', function() {
 		link: function(scope, element, attrs, ctrl) {
 
 			ctrl.handler = scope.handler;
-
-			var unwatch = scope.$watch('menus', function(menus, old) {
-				if (!menus || menus.length == 0 || menus === old) {
-					return;
-				}
-
-				unwatch();
-
-				setTimeout(function() {
-					element.find('.dropdown-toggle').dropdown();
-				}, 100);
+			
+			scope.onMenuClick = _.once(function onMenuClick() {
+				element.find('.dropdown-toggle').dropdown('toggle');
 			});
 
 			scope.canShowTitle = function(menu) {
@@ -73,7 +65,7 @@ module.directive('uiMenuBar', function() {
 		template:
 			"<ul class='nav menu-bar'>" +
 				"<li class='menu dropdown' ng-repeat='menu in menus'>" +
-					"<a href='' class='dropdown-toggle' data-toggle='dropdown' ng-click='noop()'>" +
+					"<a href='' class='dropdown-toggle' data-toggle='dropdown' ng-click='onMenuClick()'>" +
 						"<img ng-show='menu.icon != null' ng-src='{{menu.icon}}'> " +
 						"<span ng-show='canShowTitle(menu)'>{{menu.title}}</span> " +
 						"<b class='caret'></b>" +
