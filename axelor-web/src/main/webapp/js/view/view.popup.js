@@ -594,35 +594,26 @@ angular.module('axelor.ui').directive('uiAttachmentPopup', function(){
 		controller: AttachmentCtrl,
 		link: function(scope, element, attrs) {
 			
-			var initialized = false;
+			var doResize = _.once(function doResize() {
+				
+				var width = $(window).width();
+				var height = $(window).height();
+
+				width = Math.min(1000, (70 * width / 100));
+				height = Math.min(600, (70 * height / 100));
+				
+				element.dialog('option', 'width', width);
+				element.dialog('option', 'height', height);
+				
+				element.closest('.ui-dialog').position({
+			      my: "center",
+			      at: "center",
+			      of: window
+			    });
+			});
+
 			scope.onOpen = function(e, ui) {
-
-				setTimeout(function(){
-					
-					element.find('input[type=text]:first').focus();
-					axelor.$adjustSize();
-					
-					//XXX: ui-dialog issue
-					var zIndex = element.zIndex();
-					element.find('.slick-headerrow-column').zIndex(zIndex);
-
-					if (initialized)
-						return;
-
-					var width = $(window).width();
-					var height = $(window).height();
-					
-					element.dialog('option', 'width', (70 * width / 100));
-					element.dialog('option', 'height', (70 * height / 100));
-					
-					element.closest('.ui-dialog').position({
-				      my: "center",
-				      at: "center",
-				      of: window
-				    });
-					
-					initialized = true;
-				});
+				setTimeout(doResize);
 			};
 			
 			scope.$watch('schema.title', function(title){
@@ -631,8 +622,7 @@ angular.module('axelor.ui').directive('uiAttachmentPopup', function(){
 			
 			setTimeout(function(){
 				var footer = element.closest('.ui-dialog').find('.ui-dialog-buttonpane'),
-				pager = element.find('.record-pager');
-
+					pager = element.find('.record-pager');
 				footer.prepend(pager);
 			});
 		},
@@ -643,9 +633,9 @@ angular.module('axelor.ui').directive('uiAttachmentPopup', function(){
 			'<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-editable="false" x-selector="true" x-no-filter="true"></div>'+
 		    '<div class="record-pager pull-left">'+
 			     '<div class="btn-group">'+
-			     	'<button class="btn btn-info" ng-disabled="!canUpload()" ng-click="onUpload()"><i class="icon icon-upload-alt"/><span x-translate>Upload</span></button>'+
-		     		'<button class="btn btn-success" ng-disabled="!canDownload()" ng-click="onDownload()"><i class="icon icon-download-alt"/><span x-translate>Download</span></button>'+
-	     			'<button class="btn btn-danger" ng-disabled="!canDelete()" ng-click="onDelete()"><i class="icon icon-trash"/><span x-translate>Remove</span></button>'+
+			     	'<button class="btn btn-primary" ng-disabled="!canUpload()" ng-click="onUpload()"><i class="icon icon-upload-alt"/> <span x-translate>Upload</span></button>'+
+		     		'<button class="btn btn-success" ng-disabled="!canDownload()" ng-click="onDownload()"><i class="icon icon-download-alt"/> <span x-translate>Download</span></button>'+
+	     			'<button class="btn btn-danger" ng-disabled="!canDelete()" ng-click="onDelete()"><i class="icon icon-trash"/> <span x-translate>Remove</span></button>'+
 			    '</div>'+
 			    '<div class="btn-group">'+
 				    '<div class="progress progress-striped active" style="width: 300px; background: gainsboro; margin-top: 5px; margin-bottom: 0px;">'+
