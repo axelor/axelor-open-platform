@@ -717,16 +717,16 @@ Grid.prototype._doInit = function(view) {
 		var filters = {};
 		var filtersRow = $(grid.getHeaderRow());
 
-		filtersRow.on('keyup', ':input', function(event){
+		function updateFilters(event) {
 			filters[$(this).data('columnId')] = $(this).val().trim();
-			return true;
-		});
+		}
+		
+		filtersRow.on('keyup', ':input', updateFilters);
 		filtersRow.on('keypress', ':input', function(event){
 			if (event.keyCode === 13) {
+				updateFilters.call(this, event);
 				scope.handler.filter(filters);
-				return false;
 			}
-			return true;
 		});
 
 		function _setInputs(cols) {
