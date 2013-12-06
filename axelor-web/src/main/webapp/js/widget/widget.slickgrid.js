@@ -600,8 +600,10 @@ Grid.prototype.parse = function(view) {
 		});
 	}
 	
+	element.addClass('slickgrid-empty');
 	this.doInit = _.once(function doInit() {
 		this._doInit(view);
+		element.removeClass('slickgrid-empty');
 	}.bind(this));
 
 	return grid;

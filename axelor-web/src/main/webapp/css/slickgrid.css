@@ -58,6 +58,12 @@
 	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 }
 
+.slickgrid-empty .slick-header,
+.slickgrid-empty .slick-headerrow {
+	height: 0;
+	border-bottom: none;
+}
+
 .slickgrid .slick-cell,
 .slickgrid .slick-header-column {
 	-webkit-box-sizing: content-box;
