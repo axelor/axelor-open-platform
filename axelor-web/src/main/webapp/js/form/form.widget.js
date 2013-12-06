@@ -187,7 +187,7 @@ ui.directive('uiShow', function() {
 	};
 });
 
-ui.directive('uiWidgetStates', function() {
+ui.directive('uiWidgetStates', ['$parse', function($parse) {
 
 	function isValid(scope, name) {
 		if (!name) return scope.isValid();
@@ -215,15 +215,19 @@ ui.directive('uiWidgetStates', function() {
 		scope.$watch("isReadonly()", watcher);
 		scope.$watch("isRequired()", watcher);
 		scope.$watch("isValid()", watcher);
+		
+		var expr = $parse(condition);
 
 		function watcher(current, old) {
 			if (current !== old) handle(scope.record);
 		}
 
 		function handle(rec) {
-			var value = axelor.$eval(scope, condition, rec);
-			if (negative) { value = !value; };
-			scope.attr(attr, value);
+			var value = undefined;
+			try {
+				value = axelor.$eval(scope, expr, rec);
+			} catch (e) {}
+			scope.attr(attr, negative ? !value : value);
 		}
 	}
 	
@@ -233,11 +237,16 @@ ui.directive('uiWidgetStates', function() {
 		}
 		
 		var hilites = field.hilites || [];
-		
+		var exprs = _.map(_.pluck(hilites, 'condition'), $parse);
+
 		function handle(rec) {
 			for (var i = 0; i < hilites.length; i++) {
 				var hilite = hilites[i];
-				var value = axelor.$eval(scope, hilite.condition, rec);
+				var expr = exprs[i];
+				var value = false;
+				try {
+					value = axelor.$eval(scope, expr, rec);
+				} catch (e) {}
 				if (value) {
 					return scope.attr('highlight', {
 						hilite: hilite,
@@ -281,6 +290,6 @@ ui.directive('uiWidgetStates', function() {
 			register(scope);
 		});
 	};
-});
+}]);
 
 })(this);
