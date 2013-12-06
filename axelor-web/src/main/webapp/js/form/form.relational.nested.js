@@ -93,6 +93,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 	
 	$scope.edit = function(record) {
 		doEdit(record);
+		$scope.setEditable(!$scope.$parent.$$readonly);
 	};
 
 	$scope.onClose = function() {
