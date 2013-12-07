@@ -237,7 +237,7 @@ var NestedEditor = {
 		};
 
 		scope.onClose = function() {
-			scope.$parent.__nestedOpen = false;
+			scope.$parent._isNestedOpen = false;
 			scope.visible = false;
 			element.hide();
 		};

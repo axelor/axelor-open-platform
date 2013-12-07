@@ -63,8 +63,8 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	};
 	
 	var _showNestedEditor = $scope.showNestedEditor;
-	$scope.showNestedEditor = function(record) {
-		_showNestedEditor(record);
+	$scope.showNestedEditor = function(show, record) {
+		_showNestedEditor(show, record);
 		if (embedded) {
 			embedded.data('$rel').hide();
 			embedded.data('$scope').edit(record);
@@ -190,7 +190,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	$scope.onSummary = function() {
 		var selected = $scope.getSelectedRecord();
 		if (selected) {
-			$scope.showNestedEditor(selected);
+			$scope.showNestedEditor(true, selected);
 		}
 	};
 	

@@ -106,8 +106,13 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	$scope.createNestedEditor = function() {
 		return null;
 	};
-	
-	$scope.showNestedEditor = function(record) {
+
+	/**
+	 * Show/Hide the nested editor according to the show parameter, if
+	 * undefined then toggle.
+	 *
+	 */
+	$scope.showNestedEditor = function showNestedEditor(show) {
 		if (!params.summaryView) {
 			return;
 		}
@@ -116,7 +121,8 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		}
 		var es = embedded.data('$scope');
 		if (es !== null) {
-			embedded.toggle(es.visible = !es.visible);
+			es.visible = (show === undefined ? !es.visible : show);
+			embedded.toggle(es.visible);
 		}
 		return embedded;
 	};

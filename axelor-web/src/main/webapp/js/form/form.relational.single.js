@@ -120,14 +120,16 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		$scope.showEditor(record);
 	};
 
+	$scope._isNestedOpen = false;
 	$scope.onSummary = function() {
+		$scope._isNestedOpen = !$scope._isNestedOpen;
 		var record = $scope.getValue();
 		if (record && record.id) {
 			return ds.read(record.id).success(function(record){
-				$scope.showNestedEditor(record);
+				$scope.showNestedEditor($scope._isNestedOpen);
 			});
 		}
-		$scope.showNestedEditor(record);
+		$scope.showNestedEditor($scope._isNestedOpen);
 	};
 }
 
@@ -171,20 +173,25 @@ ui.formInput('ManyToOne', 'Select', {
 				if (!scope.canSelect()) {
 					return true;
 				}
-				if (scope.canToggle() === 'both' && scope.__nestedOpen) {
+				if (scope.canToggle() === 'both' && scope._isNestedOpen) {
 					return true;
 				}
 				return isHidden.call(scope);
 			};
 
-			var showNestedEditor = scope.showNestedEditor;
-			scope.showNestedEditor = function() {
-				scope.__nestedOpen = true;
-				return showNestedEditor.call(scope);
-			};
+			var hiddenSet = false;
+			scope.$watch('attr("hidden")', function (hidden, old) {
+				if (hiddenSet && hidden === old) return;
+				hiddenSet = true;
+				if (scope._isNestedOpen) {
+					scope.showNestedEditor(!hidden);
+				}
+			});
 
-			setTimeout(function(){
-				scope.showNestedEditor();
+			scope.$timeout(function() {
+				if (!scope.attr("hidden")) {
+					scope.onSummary();
+				}
 			});
 		}
 	},
