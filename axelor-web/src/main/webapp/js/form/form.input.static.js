@@ -270,8 +270,10 @@ ui.formItem('Button', {
 			}
 		});
 		
+		var readonlySet = false;
 		scope.$watch('isReadonlyExclusive()', function(readonly, old) {
-			if (readonly === old) return;
+			if (readonly === old && readonlySet) return;
+			readonlySet = true;
 			if (readonly) {
 				return element.addClass("disabled").attr('tabindex', -1);
 			}
