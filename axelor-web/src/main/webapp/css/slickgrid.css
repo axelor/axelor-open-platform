@@ -217,6 +217,12 @@
 	cursor: pointer;
 }
 
+.slick-cell.button .disabled {
+	outline: none;
+	opacity: 0.45;
+	cursor: inherit;
+}
+
 .slick-cell.button,
 .slick-cell-checkboxsel {
 	text-align: center;

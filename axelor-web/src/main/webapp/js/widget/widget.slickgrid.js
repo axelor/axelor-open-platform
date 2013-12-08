@@ -264,27 +264,29 @@ var Formatters = {
 		return value ? '(' + value.length + ')' : "";
 	},
 	
-	"button": function(field, value) {
+	"button": function(field, value, context, grid) {
 		var elem;
 		var isIcon = field.icon.indexOf('icon-') === 0;
-
+		var css = isIcon ? "slick-icon-button " + field.icon : "slick-img-button";
+		
+		if (field.readonlyIf && axelor.$eval(grid.scope, field.readonlyIf, context)) {
+			css += " readonly disabled";
+		};
+		
 		if(isIcon) {
-			elem = '<a href="#"';
+			elem = '<a href="#" tabindex="-1"';
 			if (field.help) {
 				elem += ' title="' + field.help + '"';
 			}
-
-			elem += '><i class="slick-icon-button ' + field.icon + '"></i></a>';
-		}
-		else {
-			elem = '<img class="slick-img-button" src="' + field.icon + '"';
+			elem += '><i class="' + css + '"></i></a>';
+		} else {
+			elem = '<img class="' + css + '" src="' + field.icon + '"';
 			if (field.help) {
 				elem += ' title="' + field.help + '"';
 			}
-
 			elem += '>';
 		}
-
+		
 		return elem;
 	},
 
@@ -326,8 +328,12 @@ function totalsFormatter(totals, columnDef) {
 	return val;
 }
 
-var Factory = {
-	
+function Factory(grid) {
+	this.grid = grid;
+}
+
+_.extend(Factory.prototype, {
+
 	getEditor : function(col) {
 		var field = col.descriptor;
 		if (!field || field.readonly || col.forEdit === false) {
@@ -361,7 +367,7 @@ var Factory = {
 		}
 
 		if (type === "button" || type === "progress") {
-			return Formatters[type](field, value);
+			return Formatters[type](field, value, dataContext, this.grid);
 		}
 
 		if(widget === "Url") {
@@ -374,7 +380,7 @@ var Factory = {
 
 		var fn = Formatters[type];
 		if (fn) {
-			return fn(field, value);
+			return fn(field, value, dataContext, this.grid);
 		}
 		return value;
 	},
@@ -400,7 +406,7 @@ var Factory = {
 	formatButton: function(field, value, columnDef) {
 		return '<img class="slick-img-button" src="' + field.icon + '">';
 	}
-};
+});
 
 var Grid = function(scope, element, attrs, ViewService, ActionService) {
 	
@@ -558,12 +564,14 @@ Grid.prototype.parse = function(view) {
 			headerCssClass: "slick-cell-checkboxsel"
 		}));
 	}
+	
+	var factory = new Factory(this);
 
 	var options = {
 		rowHeight: 26,
 		editable: view.editable,
-		editorFactory:  Factory,
-		formatterFactory: Factory,
+		editorFactory:  factory,
+		formatterFactory: factory,
 		enableCellNavigation: true,
 		enableColumnReorder: false,
 		forceFitColumns: true,
@@ -1415,11 +1423,17 @@ Grid.prototype.onSort = function(event, args) {
 };
 
 Grid.prototype.onButtonClick = function(event, args) {
+	
+	if ($(event.srcElement).is('.readonly')) {
+		event.stopImmediatePropagation();
+		return false;
+	}
+	
 	var grid = this.grid;
 	var data = this.scope.dataView;
 	var cols = this.getColumn(args.cell);
 	var field = (cols || {}).descriptor || {};
-
+	
 	if (field.handler) {
 		
 		var handlerScope = this.scope.handler;
@@ -1484,6 +1498,11 @@ Grid.prototype.onItemClick = function(event, args) {
 };
 
 Grid.prototype.onItemDblClick = function(event, args) {
+	
+	if ($(event.srcElement).is('img.slick-img-button,i.slick-icon-button')) {
+		return this.onButtonClick(event, args);
+	}
+	
 	var col = this.grid.getColumns()[args.cell];
 	if (col.id === '_edit_column') return;
 	var item = this.grid.getDataItem(args.row) || {};
