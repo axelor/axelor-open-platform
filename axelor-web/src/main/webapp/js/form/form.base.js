@@ -119,6 +119,9 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		
 		scope.isReadonlyExclusive = function() {
 			var parent = this.$parent || {};
+			if (scope._isPopup && !parent._isPopup) {
+				return this.attr("readonly") || false;
+			}
 			if (parent.isReadonlyExclusive && parent.isReadonlyExclusive()) {
 				return true;
 			}
