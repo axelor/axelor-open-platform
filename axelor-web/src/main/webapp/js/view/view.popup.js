@@ -40,8 +40,6 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	ViewCtrl.call(this, $scope, DataSource, ViewService);
 	FormViewCtrl.call(this, $scope, $element);
 	
-	$scope.setEditable();
-	
 	var ds = $scope._dataSource;
 	var closeCallback = null;
 	var originalEdit = $scope.edit;
@@ -71,6 +69,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	$scope.edit = function(record) {
 		$scope._viewPromise.then(function(){
 			doEdit(record);
+			$scope.setEditable(!$scope.$parent.$$readonly);
 		});
 	};
 
