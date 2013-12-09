@@ -137,11 +137,11 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		}
 		
 		var popup = editor.data('$scope');
-		popup.show();
-		popup.edit(record);
+		popup.show(record);
 		if (record == null) {
 			popup.ajaxStop(function() {
 				popup.$broadcast("on:new");
+				popup.applyLater();
 			});
 		}
 	};
