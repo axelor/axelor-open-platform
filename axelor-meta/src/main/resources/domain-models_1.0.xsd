@@ -131,7 +131,7 @@
       </xsd:annotation>
       <xsd:simpleType>
         <xsd:restriction base="xsd:string">
-          <xsd:pattern value="(true|false|idx_[\w]+)"></xsd:pattern>
+          <xsd:pattern value="(true|false|idx_[\w|_]+)"></xsd:pattern>
         </xsd:restriction>
       </xsd:simpleType>
     </xsd:attribute>
