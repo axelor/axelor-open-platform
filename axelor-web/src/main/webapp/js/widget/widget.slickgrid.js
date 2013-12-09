@@ -726,6 +726,10 @@ Grid.prototype._doInit = function(view) {
 		var filtersRow = $(grid.getHeaderRow());
 
 		function updateFilters(event) {
+			var elem = $(this);
+			if (elem.is('.ui-autocomplete-input')) {
+				return;
+			}
 			filters[$(this).data('columnId')] = $(this).val().trim();
 		}
 		
