@@ -41,8 +41,10 @@ import com.axelor.rpc.Context;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestScripts extends BaseTest {
 
+	private int counter = 0;
+
     @Test
-    public void test02_casts() {
+    public void test01_casts() {
 
     	GroovyScriptHelper helper = new GroovyScriptHelper(context());
 
@@ -60,5 +62,14 @@ public class TestScripts extends BaseTest {
     	actual = helper.eval("(__ref__ as Contact).fullName");
     	Assert.assertTrue(actual instanceof String);
     	Assert.assertEquals("John Smith", actual);
+
+    	actual = helper.eval("(__ref__ as Contact).fullName + ' (" + counter + ")'");
+    }
+
+    //@Test
+    public void test02_permgen() {
+    	while (counter++ < 5000) {
+    		test01_casts();
+    	}
     }
 }
