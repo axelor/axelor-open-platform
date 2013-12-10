@@ -69,20 +69,43 @@ public class GroovyScriptHelper implements ScriptHelper {
 	private static final CompilerConfiguration config = new CompilerConfiguration();
 	private static final GroovyShell SHELL;
 
+	private static final int DEFAULT_CACHE_SIZE = 500;
+	private static final int DEFAULT_CACHE_EXPIRE_TIME = 10;
+
+	private static int cacheSize;
+	private static int cacheExpireTime;
+
+	private static final Cache<String, Object> CACHE;
+
 	static {
 		config.getOptimizationOptions().put("indy", true);
 		config.getOptimizationOptions().put("int", false);
 
+		try {
+			cacheSize = Integer.parseInt(System.getProperty("axelor.ScriptCacheSize"));
+		} catch (Exception e) {
+		}
+		try {
+			cacheExpireTime = Integer.parseInt(System.getProperty("axelor.ScriptCacheExpireTime"));
+		} catch (Exception e) {
+		}
+
+		if (cacheSize <= 0) {
+			cacheSize = DEFAULT_CACHE_SIZE;
+		}
+		if (cacheExpireTime <= 0) {
+			cacheExpireTime = DEFAULT_CACHE_EXPIRE_TIME;
+		}
+
+		CACHE = CacheBuilder.newBuilder()
+				.maximumSize(cacheSize)
+				.expireAfterAccess(cacheExpireTime, TimeUnit.MINUTES)
+				.build();
+
 		SHELL = new GroovyShell(JpaScanner.getClassLoader(), new Binding(), config);
 	}
 
-
 	private static final Delegator DELEGATOR = new Delegator();
-
-	private static final Cache<String, Object> CACHE = CacheBuilder.newBuilder()
-			.maximumSize(10000)
-			.expireAfterAccess(30, TimeUnit.MINUTES)
-			.build();
 
 	private static int scriptCounter = 0;
 
@@ -121,6 +144,10 @@ public class GroovyScriptHelper implements ScriptHelper {
 		final String code = generate(forClass, expr, name);
 
 		final Class<?> script = SHELL.getClassLoader().parseClass(code, name + ".groovy");
+
+		// Ask shell class loader to clear internal cache to ensure GC
+		// can claim them. Fixes PermGen error.
+		SHELL.getClassLoader().clearCache();
 
 		enhancer.setSuperclass(script);
 
