@@ -43,6 +43,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.codehaus.groovy.control.CompilerConfiguration;
+import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -80,6 +81,18 @@ public class GroovyScriptHelper implements ScriptHelper {
 	static {
 		config.getOptimizationOptions().put("indy", true);
 		config.getOptimizationOptions().put("int", false);
+
+		final ImportCustomizer importCustomizer = new ImportCustomizer();
+
+		importCustomizer.addStarImports("java.math");
+		importCustomizer.addStarImports("java.util");
+		importCustomizer.addStarImports("org.joda.time");
+		importCustomizer.addStarImports("com.google.common.base");
+		importCustomizer.addStarImports("com.google.common.collect");
+		importCustomizer.addStarImports("com.google.common.math");
+		importCustomizer.addStarImports("com.google.common.primitives");
+
+		config.addCompilationCustomizers(importCustomizer);
 
 		try {
 			cacheSize = Integer.parseInt(System.getProperty("axelor.ScriptCacheSize"));
