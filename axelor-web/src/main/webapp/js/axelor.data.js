@@ -231,7 +231,7 @@
 				var limit = opts.limit == undefined ? this._page.limit : opts.limit;
 				var offset = opts.offset == undefined ? this._page.from : opts.offset;
 				var domain = opts.domain === undefined ? (this._lastDomain || this._domain) : opts.domain;
-				var context = opts.context == undefined ? this._lastContext : opts.context;
+				var context = opts.context == undefined ? (this._lastContext || this._context) : opts.context;
 				var archived = opts.archived == undefined ? this._showArchived : opts.archived;
 				
 				var fields = _.isEmpty(opts.fields) ? null : opts.fields;
