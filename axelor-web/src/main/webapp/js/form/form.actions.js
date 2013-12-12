@@ -581,6 +581,7 @@ ActionHandler.prototype = {
 				tab.$popupParent = formScope;
 			}
 			openTab(scope, tab);
+			scope.applyLater();
 		}
 		
 		if (data.canClose) {
