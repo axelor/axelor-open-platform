@@ -43,7 +43,6 @@ import com.axelor.db.mapper.PropertyType;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -258,12 +257,10 @@ public class Field extends SimpleWidget {
 		this.validIf = validIf;
 	}
 
-	@JsonIgnore
 	public String getSelection() {
 		return selection;
 	}
 
-	@JsonProperty("selection")
 	public List<Object> getSelectionList() {
 		String selection = getSelection();
 		if (selection == null || "".equals(selection.trim()))
