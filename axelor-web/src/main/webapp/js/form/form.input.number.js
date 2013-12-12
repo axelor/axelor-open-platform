@@ -47,7 +47,7 @@ ui.formInput('Number', {
 			precision = props.precision || 18,
 			scale = props.scale || 2;
 		
-		var isDecimal = props.serverType === "decimal",
+		var isDecimal = props.serverType === "decimal" || props.widgetName === "decimal",
 			pattern = isDecimal ? /^(-)?\d+(\.\d+)?$/ : /^\s*-?[0-9]*\s*$/;
 		
 		scope.isNumber = function(value) {
@@ -134,8 +134,11 @@ ui.formInput('Number', {
 		function equals(a, b) {
 			if (a === b) return true;
 			if (angular.equals(a, b)) return true;
-			a = (+a) || 0;
-			b = (+b) || 0;
+			if (a === undefined || b === undefined) return false;
+			a = a === "" ? a : ((+a) || 0);
+			b = b === "" ? b : ((+b) || 0);
+
+			console.log('fff 2', a, b);
 			return a === b;
 		}
 
