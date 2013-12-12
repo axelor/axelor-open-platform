@@ -170,14 +170,10 @@ ui.formInput('Select', 'BaseSelect', {
 		this._super(scope);
 
 		var field = scope.field,
-			selection = field.selection || [],
+			selectionList = field.selectionList || [],
 			selectionMap = {};
 		
-		if (_.isArray(field.selection)) {
-			selection = field.selection;
-		}
-
-		var data = _.map(selection, function(item) {
+		var data = _.map(selectionList, function(item) {
 			var value = "" + item.value;
 			selectionMap[value] = item.title;
 			return {
@@ -185,14 +181,45 @@ ui.formInput('Select', 'BaseSelect', {
 				label: item.title || "&nbsp;"
 			};
 		});
-
-		scope.loadSelection = function(request, response) {
-			var items = _.filter(data, function(item) {
-				var label = item.label || "",
-					term = request.term || "";
-				return label.toLowerCase().indexOf(term.toLowerCase()) > -1;
+	
+		var dataSource = null;
+		function getDataSource() {
+			if (dataSource || !field.selection || !field.domain) {
+				return dataSource;
+			}
+			return dataSource = scope._dataSource._new('com.axelor.meta.db.MetaSelectItem', {
+				domain: "(self.select.name = :_select) AND (" + field.domain + ")",
+				context: {
+					_select: field.selection
+				}
 			});
-			response(items);
+		}
+		
+		scope.loadSelection = function(request, response) {
+			
+			var  ds = getDataSource();
+			
+			function select(records) {
+				var items = _.filter(records, function(item) {
+					var label = item.label || "",
+						term = request.term || "";
+					return label.toLowerCase().indexOf(term.toLowerCase()) > -1;
+				});
+				return response(items);
+			}
+			
+			if (ds) {
+				return ds.search({
+					fields: ['value', 'title'],
+					context: scope.getContext ? scope.getContext() : undefined
+				}).success(function (records) {
+					_.each(records, function (item) {
+						item.label = item.title;
+					});
+					return select(records);
+				});
+			}
+			return select(data);
 		};
 
 		scope.formatItem = function(item) {
@@ -517,13 +544,9 @@ ui.formInput('RadioSelect', {
 	
 	link: function(scope, element, attrs, model) {
 		
-		var field = scope.field,
-			selection = [];
-	
-		if (_.isArray(field.selection)) {
-			selection = field.selection;
-		}
-		scope.selection = selection;
+		var field = scope.field;
+
+		scope.selection = field.selectionList || [];
 
 		element.on("change", ":input", function(e) {
 			scope.setValue($(e.target).val(), true);
@@ -556,13 +579,9 @@ ui.formInput('NavSelect', {
 	
 	link: function(scope, element, attrs, model) {
 		
-		var field = scope.field,
-			selection = [];
+		var field = scope.field;
 	
-		if (_.isArray(field.selection)) {
-			selection = field.selection;
-		}
-		scope.selection = selection;
+		scope.selection = field.selectionList || [];
 		
 		scope.onSelect = function(select) {
 			if (scope.attr('readonly')) {

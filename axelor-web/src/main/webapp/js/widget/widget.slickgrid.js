@@ -299,7 +299,7 @@ var Formatters = {
 	
 	"selection": function(field, value) {
 		var cmp = field.type === "integer" ? function(a, b) { return a == b ; } : _.isEqual;
-		var res = _.find(field.selection, function(item){
+		var res = _.find(field.selectionList, function(item){
 			return cmp(item.value, value);
 		}) || {};
 		return res.title;
@@ -362,7 +362,7 @@ _.extend(Factory.prototype, {
 		if (widget === "Progress" || widget === "progress" || widget === "SelectProgress") {
 			type = "progress";
 		}
-		if (_.isArray(field.selection)) {
+		if (_.isArray(field.selectionList)) {
 			type = "selection";
 		}
 
@@ -747,8 +747,8 @@ Grid.prototype._doInit = function(view) {
 				var header = grid.getHeaderRowColumn(col.id),
 					input = $('<input type="text">').data("columnId", col.id).appendTo(header),
 					field = col.descriptor || {};
-				if (_.isArray(field.selection)) {
-					makeFilterCombo(input, field.selection, function(filter){
+				if (_.isArray(field.selectionList)) {
+					makeFilterCombo(input, field.selectionList, function(filter){
 						_.extend(filters, filter);
 					});
 				}
