@@ -266,7 +266,7 @@ var Formatters = {
 	
 	"button": function(field, value, context, grid) {
 		var elem;
-		var isIcon = field.icon.indexOf('icon-') === 0;
+		var isIcon = field.icon && field.icon.indexOf('icon-') === 0;
 		var css = isIcon ? "slick-icon-button " + field.icon : "slick-img-button";
 		
 		if (field.readonlyIf && axelor.$eval(grid.scope, field.readonlyIf, context)) {
