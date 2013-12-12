@@ -97,6 +97,10 @@
 				};
 			},
 			
+			_new: function(model, options) {
+				return new DataSource(model, options);
+			},
+			
 			on: function(name, listener) {
 				var listeners = this._listeners[name];
 				if(!listeners){
