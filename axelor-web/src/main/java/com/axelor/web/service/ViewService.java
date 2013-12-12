@@ -203,7 +203,8 @@ public class ViewService extends AbstractService {
 				Map<String, Object> map = p.toMap();
 				map.put("name", name);
 				if (p.getSelection() != null && !"".equals(p.getSelection().trim())) {
-					map.put("selection", findSelection(p));
+					map.put("selection", p.getSelection());
+					map.put("selectionList", findSelection(p));
 				}
 				if (p.getTarget() != null) {
 					map.put("perms", perms(p.getTarget()));
