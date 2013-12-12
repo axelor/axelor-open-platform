@@ -414,7 +414,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 			},
 			
 			eventClick: function(event, jsEvent, view) {
-				showBubble(event, jsEvent.srcElement);
+				showBubble(event, jsEvent.target);
 			},
 
 			events: function(start, end, callback) {
