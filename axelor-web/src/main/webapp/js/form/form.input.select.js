@@ -214,7 +214,7 @@ ui.formInput('Select', 'BaseSelect', {
 					context: scope.getContext ? scope.getContext() : undefined
 				}).success(function (records) {
 					_.each(records, function (item) {
-						item.label = item.title;
+						item.label = selectionMap[item.value] || item.title;
 					});
 					return select(records);
 				});
