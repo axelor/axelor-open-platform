@@ -325,7 +325,7 @@ ui.formInput('RefSelect', {
 			return ViewService.compile(elem)($scope);
 		};
 
-		$scope.createElement = function(name, selection, related) {
+		$scope.createElement = function(name, selectionList, related) {
 
 			var elemGroup = $('<group ui-group ui-table-layout cols="2" x-widths="150,*"></group>');
 			var elemSelect = $('<input ui-select showTitle="false">')
@@ -333,7 +333,7 @@ ui.formInput('RefSelect', {
 				.attr("ng-model", "record." + name);
 
 			var elemSelects = $('<group ui-group>');
-			var elemItems = _.map(selection, function(s) {
+			var elemItems = _.map(selectionList, function(s) {
 				return $('<input ui-ref-item ng-show="canShow(\'' + s.value + '\')"/>')
 					.attr('ng-model', 'record.$_' + related)
 					.attr('x-target', s.value)
@@ -351,14 +351,14 @@ ui.formInput('RefSelect', {
 		this._super.apply(this, arguments);
 
 		var name = scope.field.name,
-			selection = scope.field.selection,
+			selectionList = scope.field.selectionList,
 			related = scope.field.related || scope.field.name + "Id";
 
 		scope.canShow = function(value) {
 			return value === scope.getValue();
 		};
 
-		var elem = scope.createElement(name, selection, related);
+		var elem = scope.createElement(name, selectionList, related);
 		var elemSelect= elem.find('.select-item:first');
 
 		scope.$watch('isReadonly()', function(readonly) {
