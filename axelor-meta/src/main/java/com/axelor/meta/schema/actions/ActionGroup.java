@@ -45,6 +45,7 @@ import com.axelor.meta.MetaStore;
 import com.axelor.rpc.Response;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -199,6 +200,25 @@ public class ActionGroup extends Action {
             if (action instanceof ActionCondition) {
             	if (value instanceof Map || Objects.equal(value, Boolean.FALSE)) {
                 	break;
+            	}
+            }
+
+            if (action instanceof ActionGroup && !result.isEmpty() && iter.hasNext()) {
+            	Map<String, Object> last = null;
+            	try {
+            		last = (Map) result.get(result.size() - 1);
+            	} catch (ClassCastException e) {
+            	}
+            	if (last != null && (last.containsKey("alert") || last.containsKey("error"))) {
+            		String previous = (String) last.get("pending");
+            		String pending = this.getPending(iter);
+            		if (!Strings.isNullOrEmpty(previous)) {
+            			pending = previous + "," + pending;
+            		}
+            		last.put("pending", pending);
+            		log.debug("wait for group validation: {}", action.getName());
+            		log.debug("pending actions: {}", pending);
+            		break;
             	}
             }
 		}
