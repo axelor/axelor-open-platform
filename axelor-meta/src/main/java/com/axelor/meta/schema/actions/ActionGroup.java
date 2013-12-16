@@ -113,6 +113,8 @@ public class ActionGroup extends Action {
 				String idx = actionName.substring(actionName.lastIndexOf('[') + 1, actionName.lastIndexOf(']'));
 				actionName = actionName.substring(0, actionName.lastIndexOf('['));
 				int index = Integer.parseInt(idx);
+				log.debug("continue action-validate: {}", actionName);
+				log.debug("continue at: {}", index);
 				Action action = MetaStore.getAction(actionName);
 				if (action instanceof ActionValidate) {
 					((ActionValidate) action).setIndex(index);
