@@ -1,0 +1,131 @@
+/**
+ * Copyright (c) 2012-2013 Axelor. All Rights Reserved.
+ *
+ * The contents of this file are subject to the Common Public
+ * Attribution License Version 1.0 (the “License”); you may not use
+ * this file except in compliance with the License. You may obtain a
+ * copy of the License at:
+ *
+ * http://license.axelor.com/.
+ *
+ * The License is based on the Mozilla Public License Version 1.1 but
+ * Sections 14 and 15 have been added to cover use of software over a
+ * computer network and provide for limited attribution for the
+ * Original Developer. In addition, Exhibit A has been modified to be
+ * consistent with Exhibit B.
+ *
+ * Software distributed under the License is distributed on an “AS IS”
+ * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See
+ * the License for the specific language governing rights and limitations
+ * under the License.
+ *
+ * The Original Code is part of "Axelor Business Suite", developed by
+ * Axelor exclusively.
+ *
+ * The Original Developer is the Initial Developer. The Initial Developer of
+ * the Original Code is Axelor.
+ *
+ * All portions of the code written by Axelor are
+ * Copyright (c) 2012-2013 Axelor. All Rights Reserved.
+ */
+html, body {
+	height: 100%;
+}
+
+abbr[title]:after,
+a[href]:after, .ir a:after,
+a[href^="javascript:"]:after,
+a[href^="#"]:after {
+	content: "";
+}
+
+#container {
+	top: 16px;
+}
+
+.view-content,
+.view-container .form-view > div:last-child {
+	top: 16px !important;
+}
+
+.grid-view > .slickgrid {
+	top: 16px !important;	
+}
+
+.splitter-container .sidebar.splitter-panel,
+.splitter-container .splitter-vertical {
+	display: none;
+}
+
+.splitter-container .splitter-panel {
+	width: 0;
+}
+
+.splitter-container .splitter-panel.view-tabs {
+	width: 100% !important;
+	left: 0 !important;
+}
+
+.nav.nav-shortcuts {
+	display: none;
+}
+
+.navigation-tabs .axelor-logo {
+	top: -16px !important;
+	border: none;
+}
+
+.navigation-tabs > .nav-tabs-wrap,
+.navigation-tabs .record-toolbar {
+	display: none;	
+}
+
+.nav-tabs > li {
+	border: none;
+	display: none !important;
+}
+
+.nav-tabs > li.active {
+	display: list-item !important;
+}
+
+.form-item .tabbable-tab,
+.form-item .tab-content {
+	border: none !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.form-item .nav-tabs-wrap {
+	display: none;
+}
+
+.form-item-group > legend > i,
+.form-item-group > legend > i:before {
+	display: none !important;
+}
+
+.form-item-group > legend > span {
+	background: initial !important;
+	background-color: white !important;
+}
+
+.btn {
+	border: 1px solid gray !important;
+}
+
+.picker-input > .picker-icons {
+	display: none !important;
+}
+
+input {
+	border: none !important;
+}
+
+.stackbar > .navbar .icons-bar {
+	display: none !important;
+}
+
+.slick-row .slick-cell.edit-icon i {
+	display: none;
+}
