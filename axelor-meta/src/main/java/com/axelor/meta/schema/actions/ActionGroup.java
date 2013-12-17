@@ -45,7 +45,6 @@ import com.axelor.meta.MetaStore;
 import com.axelor.rpc.Response;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -78,8 +77,7 @@ public class ActionGroup extends Action {
 		while(actions.hasNext()) {
     		pending.add(actions.next().getName());
     	}
-    	final String result = Joiner.on(",").skipNulls().join(pending);
-    	return Strings.isNullOrEmpty(result) ? null : result;
+    	return Joiner.on(",").skipNulls().join(pending);
 	}
 
 	private Action findAction(String name) {
