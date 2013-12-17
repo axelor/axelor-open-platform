@@ -365,13 +365,26 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 	$scope.canCloseTab = function(tab) {
 		return NavService.canCloseTab(tab);
 	};
+	
+	function ensureScopeApply(func) {
+		var args = _.rest(arguments);
+		var promise = func.apply(NavService, args);
+		if (promise && promise.then) {
+			promise.then(function () {
+				$scope.applyLater();
+			});
+		} else {
+			$scope.applyLater();
+		}
+		return promise;
+	}
 
 	$scope.openTab = function(tab, options) {
-		return NavService.openTab(tab, options);
+		return ensureScopeApply(NavService.openTab, tab, options);
 	};
 
 	$scope.openTabByName = function(name, options) {
-		return NavService.openTabByName(name, options);
+		return ensureScopeApply(NavService.openTabByName, name, options);
 	};
 
 	$scope.closeTab = function(tab, callback) {
