@@ -99,7 +99,7 @@ ui.directive('uiTabGate', function() {
 				pre: function preLink(scope, element, attrs) {
 					scope.$watchChecker(function(current) {
 						if (current.tabSelected === undefined) {
-							return !scope.tab || scope.tab.selected;
+							return !scope.tab || scope.tab.selected === undefined || scope.tab.selected;
 						}
 						return current.tabSelected;
 					});
