@@ -420,7 +420,107 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 	};
 }
 
-angular.module('axelor.ui').directive('uiEditorPopup', function(){
+angular.module('axelor.ui').directive('uiDialogSize', function() {
+
+	return function (scope, element, attrs) {
+		
+		// use only with ui-dialog directive
+		if (attrs.uiDialog === undefined) {
+			return;
+		}
+		
+		var initialized = false;
+		
+		function isReadonly() {
+			return scope.isReadonly && scope.isReadonly();
+		}
+		
+		function adjust(how) {
+			scope.ajaxStop(how, 100);
+		}
+		
+		function initSize() {
+
+			// focus first element
+			element.find(':input:first').focus();
+			
+			//XXX: ui-dialog issue
+			element.find('.slick-headerrow-column').zIndex(element.zIndex());
+			
+			axelor.$adjustSize();
+
+			if (initialized === 'editable' ||
+			   (initialized === 'readonly' && isReadonly())) {
+				return;
+			}
+			initialized = isReadonly() ? 'readonly' : 'editable';
+			adjust(autoSize);
+
+			return scope.ajaxStop(function() {
+				element.closest('.ui-dialog').css('visibility', '');
+			}, 100);
+		}
+		
+		function autoSize() {
+			var maxWidth = $(document).width() - 8,
+				maxHeight = $(document).height() - 8,
+				width = element[0].scrollWidth + 32,
+				height = element[0].scrollHeight + 16;
+
+			var elem = element.find('.view-pane [ui-view-form]:first').first();
+			if (elem.size()) {
+				height = elem[0].scrollHeight + 16;
+			}
+			
+			height += element.parent().children('.ui-dialog-titlebar').outerHeight(true);
+			height += element.parent().children('.ui-dialog-buttonpane').outerHeight(true);
+			
+			width = Math.min(maxWidth, width) || 'auto';
+			height = Math.min(maxHeight, height) || 'auto';
+
+			if (scope._calcWidth) {
+				width = scope._calcWidth(width) || width;
+			}
+			if (scope._calcHeight) {
+				height = scope._calcHeight(height) || height;
+			}
+
+			element.dialog('option', 'width', width);
+			element.dialog('option', 'height', height);
+			
+			element.closest('.ui-dialog').position({
+		      my: "center",
+		      at: "center",
+		      of: window
+		    });
+		}
+		
+		// a flag used by evalScope to detect popup (see form.base.js)
+		scope._isPopup = true;
+		scope._doShow = function(viewPromise) {
+			
+			viewPromise.then(function(s) {
+				if (!initialized) {
+					element.closest('.ui-dialog').css('visibility', 'hidden');
+				}
+				element.dialog('open');
+				adjust(initSize);
+			});
+		};
+		
+		scope._setTitle = function (title) {
+			if (title) {
+				element.closest('.ui-dialog').find('.ui-dialog-title').text(title);
+			}
+		};
+
+		scope.adjustSize = function() {
+			adjust(autoSize);
+		};
+	};
+});
+
+angular.module('axelor.ui').directive('uiEditorPopup', function() {
 	
 	return {
 		restrict: 'EA',
@@ -428,78 +528,17 @@ angular.module('axelor.ui').directive('uiEditorPopup', function(){
 		scope: {},
 		link: function(scope, element, attrs) {
 			
-			var initialized = false;
-			
-			function adjust(how) {
-				scope.ajaxStop(function() {
-					how();
-				}, 100);
-			}
-			
-			function initSize() {
-				element.find(':input:first').focus();
-				axelor.$adjustSize();
-
-				if (initialized === 'editable' ||
-				   (initialized === 'readonly' && scope.isReadonly())) {
-					return;
-				}
-				initialized = scope.isReadonly() ? 'readonly' : 'editable';
-				adjust(autoSize);
-
-				return scope.ajaxStop(function() {
-					element.closest('.ui-dialog').css('visibility', '');
-				}, 100);
-			}
-
-			function autoSize() {
-				var maxWidth = $(document).width() - 8,
-					maxHeight = $(document).height() - 8,
-					width = element[0].scrollWidth + 32,
-					height = element[0].scrollHeight + 16;
-
-				height += element.parent().children('.ui-dialog-titlebar').outerHeight(true);
-				height += element.parent().children('.ui-dialog-buttonpane').outerHeight(true);
-				
-				width = Math.min(maxWidth, width) || 'auto';
-				height = Math.min(maxHeight, height) || 'auto';
-				
-				element.dialog('option', 'width', width);
-				element.dialog('option', 'height', height);
-				
-				element.closest('.ui-dialog').position({
-			      my: "center",
-			      at: "center",
-			      of: window
-			    });
-			}
-
-			// a flag used by evalScope to detect popup (see form.base.js)
-			scope._isPopup = true;
-			
 			scope.onShow = function(viewPromise) {
-				viewPromise.then(function(s) {
-					if (!initialized) {
-						element.closest('.ui-dialog').css('visibility', 'hidden');
-					}
-					element.dialog('open');
-					adjust(initSize);
-				});
+				scope._doShow(viewPromise);
 			};
-
-			scope.adjustSize = function() {
-				adjust(autoSize);
-			};
-
-			scope.$watch('schema.title', function(title){
-				if (title == null)
-					return;
-				element.closest('.ui-dialog').find('.ui-dialog-title').text(title);
+			
+			scope.$watch('schema.title', function (title) {
+				scope._setTitle(title);
 			});
 		},
 		replace: true,
 		template:
-		'<div ui-dialog x-on-ok="onOK" x-on-before-close="onBeforeClose">'+
+		'<div ui-dialog ui-dialog-size x-on-ok="onOK" x-on-before-close="onBeforeClose">'+
 		    '<div ui-view-form x-handler="this"></div>'+
 		'</div>'
 	};
@@ -515,66 +554,39 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 		},
 		link: function(scope, element, attrs) {
 
-			var initialized = false;
 			var width = $(window).width();
 			var height = $(window).height();
-			
+						
 			width = (60 * width / 100);
 			height = (70 * height / 100);
 			
-			function adjustSize() {
-
-				element.find('input[type=text]:first').focus();
-				axelor.$adjustSize();
-
-				//XXX: ui-dialog issue
-				element.find('.slick-headerrow-column').zIndex(element.zIndex());
-
-				if (initialized) {
-					return;
-				}
-
-				element.dialog('option', 'width', width);
-				element.dialog('option', 'height', height);
-
-				element.closest('.ui-dialog').position({
-			      my: "center",
-			      at: "center",
-			      of: window
-			    });
-				
-				initialized = true;
-				element.closest('.ui-dialog').css('visibility', '');
+			scope._calcWidth = function (w) {
+				return width;
 			};
 			
+			scope._calcHeight = function (h) {
+				return height;
+			};
+
 			var onShow = scope.onShow;
 			scope.onShow = function (viewPromise) {
 				onShow(viewPromise);
-				viewPromise.then(function (result) {
-					var view = result.view || {};
-					if (view.width !== undefined) {
-						width = view.width || width;
-					}
-					setTimeout(adjustSize);
-				});
+				scope._doShow(viewPromise);
 			};
 			
 			scope.$watch('schema.title', function(title){
-				if (title == null)
-					return;
-				element.closest('.ui-dialog').find('.ui-dialog-title').text(title);
+				scope._setTitle(title);
 			});
-			
+
 			setTimeout(function(){
 				var footer = element.closest('.ui-dialog').find('.ui-dialog-buttonpane'),
-				pager = element.find('.record-pager');
-
+					pager = element.find('.record-pager');
 				footer.prepend(pager);
 			});
 		},
 		replace: true,
 		template:
-		'<div ui-dialog x-on-ok="onOK">'+
+		'<div ui-dialog ui-dialog-size x-on-ok="onOK">'+
 		    '<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-editable="false" x-selector="{{selectMode}}"></div>'+
 		    '<div class="record-pager pull-left">'+
 			    '<div class="btn-group">'+

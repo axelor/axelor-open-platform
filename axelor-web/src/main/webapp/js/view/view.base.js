@@ -348,40 +348,6 @@ angular.module('axelor.ui').directive('uiViewPopup', function() {
 			$scope._isPopup = true;
 		}],
 		link: function (scope, element, attrs) {
-
-			var initialized = false,
-				width = $(window).width(),
-				height = $(window).height();
-
-			width = (60 * width / 100);
-			height = (70 * height / 100);
-
-			function adjust(how) {
-				element.find('input[type=text]:first').focus();
-				axelor.$adjustSize();
-
-				//XXX: ui-dialog issue
-				element.find('.slick-headerrow-column').zIndex(element.zIndex());
-
-				if (initialized) {
-					return;
-				}
-
-				element.dialog('option', 'width', width);
-				element.dialog('option', 'height', height);
-				
-				element.closest('.ui-dialog').position({
-			      my: "center",
-			      at: "center",
-			      of: window
-			    });
-				
-				initialized = true;
-			}
-
-			scope.onPopupOpen = function () {
-				adjust();
-			};
 			
 			var canClose = false;
 			scope.onBeforeClose = function(e) {
@@ -406,31 +372,24 @@ angular.module('axelor.ui').directive('uiViewPopup', function() {
 				}
 				scope.applyLater();
 			};
-
+			
 			scope.$watch('viewTitle', function (title) {
-				if (title) {
-					element.closest('.ui-dialog').find('.ui-dialog-title').text(title);
-				}
+				scope._setTitle(title);
 			});
 			
-			var unwatch = scope.$watch("_viewParams.$viewScope.schema", function(schema) {
-				if (initialized || !schema) {
+			var unwatch = scope.$watch("_viewParams.$viewScope.schema.loaded", function(loaded) {
+				if (!loaded) {
 					return;
 				}
 				unwatch();
-				if (schema.width) {
-					width = schema.maxWidth || schema.width;
-				}
-				setTimeout(function () {
-					scope.ajaxStop(function () {
-						element.dialog('open');
-					});
-				});
+				var viewScope = scope._viewParams.$viewScope;
+				var viewPromise = viewScope._viewPromise;
+				scope._doShow(viewPromise);
 			});
 		},
 		replace: true,
 		template:
-			'<div ui-dialog x-on-open="onPopupOpen" x-on-close="onPopupClose" x-on-ok="false" x-on-before-close="onBeforeClose">' +
+			'<div ui-dialog ui-dialog-size x-on-close="onPopupClose" x-on-ok="false" x-on-before-close="onBeforeClose">' +
 				'<div ui-view-pane="tab"></div>' +
 			'</div>'
 	};
