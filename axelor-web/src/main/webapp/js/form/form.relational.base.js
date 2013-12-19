@@ -235,13 +235,16 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		};
 	};
 
-	var fetchDS = (function() {
-		var ds = $scope._dataSource;
-		var fds = DataSource.create(ds._model, {
-			domain: ds._domain,
-			context: ds._context
-		});
-		return fds;
+	var fetchDS = (function () {
+		var fds = null;
+		return function () {
+			if (fds) return fds;
+			var ds = $scope._dataSource;
+			return fds = DataSource.create(ds._model, {
+				domain: ds._domain,
+				context: ds._context
+			});
+		};
 	})();
 
 	$scope.fetchData = function(value, success) {
@@ -284,10 +287,10 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 				sortBy = sortBy.split(",");
 			}
 			
-			return fetchDS.search({
+			return fetchDS().search({
 				filter: filter,
 				fields: fields,
-				sortBy: fetchDS._sortBy || sortBy,
+				sortBy: fetchDS()._sortBy || sortBy,
 				archived: true,
 				limit: -1,
 				domain: null
@@ -351,7 +354,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			params.context = context;
 		}
 	
-		fetchDS.search(params).success(function(records, page){
+		fetchDS().search(params).success(function(records, page){
 			var items = _.map(records, function(record) {
 				return {
 					label: record[nameField],
