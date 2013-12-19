@@ -91,6 +91,10 @@ public class CSVLogger {
 		this.cleanDir(this.errorDir);
 	}
 
+	public File getCurrentFile() {
+		return currentFile;
+	}
+
 	/**
 	 * Delete all files and directories of the directory
 	 * @param file
