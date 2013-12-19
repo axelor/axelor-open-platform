@@ -128,8 +128,27 @@ public class CSVImporter implements Importer {
 	}
 
 	public CSVImporter(Injector injector, CSVConfig config){
+		this(injector, config, null);
+	}
+
+	public CSVImporter(Injector injector, CSVConfig config, String dataDir){
+		this(injector, config, dataDir, null);
+	}
+
+	public CSVImporter(Injector injector, CSVConfig config, String dataDir, String errorDir){
+
+		if (dataDir != null) {
+			File _data = new File(dataDir);
+			Preconditions.checkNotNull(_data);
+			Preconditions.checkArgument(_data.isDirectory());
+			this.dataDir = _data;
+		}
+
 		this.config = config;
 		this.injector = injector;
+		if(!Strings.isNullOrEmpty(errorDir)) {
+			this.loggerManager = new CSVLogger(this.config, errorDir);
+		}
 	}
 
 	private List<File> getFiles(String... names) {
@@ -146,6 +165,10 @@ public class CSVImporter implements Importer {
 		} catch (Exception e) {
 		}
 		return DEFAULT_BATCH_SIZE;
+	}
+
+	public CSVLogger getLoggerManager() {
+		return loggerManager;
 	}
 
 	/**
