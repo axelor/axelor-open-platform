@@ -314,14 +314,17 @@ public class Query<T extends Model> {
 	 * @return total number of records updated
 	 */
 	public int update(Map<String, Object> values) {
-		Map<String, Object> params = Maps.newHashMap();
+		final Map<String, Object> params = Maps.newHashMap();
+		final Map<String, Object> namedParams = Maps.newHashMap(this.namedParams);
+
 		for(String key : values.keySet()) {
 			String name = key.replaceFirst("^self\\.", "");
 			params.put(name, values.get(key));
+			namedParams.put(name, values.get(key));
 		}
+
 		javax.persistence.Query q = em().createQuery(updateQuery(params));
-		QueryBinder.of(q).bind(params);
-		this.bind(q);
+		QueryBinder.of(q).bind(namedParams, this.params);
 
 		return q.executeUpdate();
 	}
