@@ -161,6 +161,11 @@ function GridViewCtrl($scope, $element) {
 		return $scope.canDelete();
 	};
 	
+	$scope.canBulkUpdate = function () {
+		// this permission is actually calculated from fields marked for bulk update
+		return $scope.hasPermission('bulkUpdate', false);
+	};
+
 	$scope.canDelete = function() {
 		return !$scope.canSave() && $scope.selection.length > 0;
 	};

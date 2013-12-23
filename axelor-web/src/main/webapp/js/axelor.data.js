@@ -545,6 +545,54 @@
 
 				return promise;
 			},
+			
+			updateBulk: function (values, ids) {
+				
+				var domain = this._lastDomain;
+				var context = this._lastContext;
+				var filter = this._filter;
+
+				var items = _.compact(ids);
+				if (items.length > 0) {
+					if (domain) {
+						domain = domain + " AND self.id IN (:__ids__)";
+					} else {
+						domain = "self.id IN (:__ids__)";
+					}
+					context = _.extend({
+						__ids__: items
+					}, context);
+				}
+				
+				var query = extend({
+					_domain: domain,
+					_domainContext: context,
+					_archived: this._showArchived
+				}, filter);
+				
+				
+				
+				var promise = this._request('updateBulk').post({
+					records: [values],
+					sortBy: this._sortBy,
+					data: query
+				});
+
+				promise.success = function(fn) {
+					promise.then(function(response){
+						var res = response.data;
+						fn(res);
+					});
+					return promise;
+				};
+
+				promise.error = function(fn) {
+					promise.then(null, fn);
+					return promise;
+				};
+				
+				return promise;
+			},
 
 			remove: function(record) {
 				

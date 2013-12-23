@@ -927,6 +927,7 @@ table.field-details .help-text hr {
 	color: black;
 }
 
+.update-menu,
 .filter-menu {
 
 	display: none;
@@ -983,37 +984,57 @@ table.field-details .help-text hr {
 	margin-bottom: 8px;
 }
 
-.filter-menu input {
-	height: inherit;
-}
-
 .filter-menu input[type=radio],
 .filter-menu input[type=checkbox] {
 	margin-top: 3px;
+	min-width: initial;
 }
 
 .filter-menu .show-archived {
 	margin-left: 26px;
 }
 
-.filter-form .form-layout .form-item input {
+.filter-form .form-layout .form-item > input,
+.filter-form .form-layout .form-item > .form-item-container {
 	width: auto;
 	min-width: inherit;
 	max-width: 170px;
 }
+
+.filter-form .form-layout .form-item > input {
+	height: 26px;
+}
+
 .filter-form .form-layout .form-item.filter-select {
 	width: 170px;
 	min-width: 170px;
+}
+
+.filter-form .form-layout .form-item select {
+	height: 26px;
+	line-height: 26px;
+	
+	padding: inherit;
 }
 
 .filter-form .form-layout .filter-remove {
 	width: 16px;
 	min-width: 16px;
 	max-width: 16px;
+	padding-top: 5px;
+	vertical-align: top;
+}
+
+.record-toolbar button.update-menu-button {
+	padding: 4px;
 }
 
 .filter-form.update-form .form-item {
 	min-width: 170px;
+}
+
+.filter-menu.update-menu .checkbox.update-all {
+	margin-left: 8px;
 }
 
 .filter-form .links {

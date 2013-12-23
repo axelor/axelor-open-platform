@@ -157,6 +157,13 @@ public class RestService extends ResourceService {
 		return getResource().save(request);
 	}
 
+	@POST
+	@Path("updateBulk")
+	public Response updateBulk(Request request) {
+		request.setModel(getModel());
+		return getResource().updateBulk(request);
+	}
+
 	@DELETE
 	@Path("{id}")
 	public Response delete(@PathParam("id") long id, @QueryParam("version") int version) {
