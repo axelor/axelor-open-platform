@@ -504,6 +504,31 @@ public class Resource<T extends Model> {
 	}
 
 	@Transactional
+	public Response updateBulk(Request request) {
+
+		security.get().check(JpaSecurity.CAN_WRITE, model);
+
+		LOG.debug("Bulk update '{}' with {}", model.getCanonicalName(), request.getData());
+
+		Response response = new Response();
+
+		Query<?> query = getQuery(request);
+		List<?> data = request.getRecords();
+
+		LOG.debug("JPQL: {}", query);
+
+		@SuppressWarnings("all")
+		Map<String, Object> values = (Map) data.get(0);
+		response.setTotal(query.update(values));
+
+		LOG.debug("Records updated: {}", response.getTotal());
+
+		response.setStatus(Response.STATUS_SUCCESS);
+
+		return response;
+	}
+
+	@Transactional
 	public Response remove(long id, Request request) {
 
 		security.get().check(JpaSecurity.CAN_REMOVE, model, id);
