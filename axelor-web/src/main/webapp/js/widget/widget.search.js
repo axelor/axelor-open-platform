@@ -136,12 +136,26 @@ ui.directive('uiFilterItem', function() {
 			}, true);
 		},
 		template:
-		"<div class='form-inline' style='margin-bottom: 5px;'>" +
-			"<select ng-model='filter.field' ng-options='v.name as v.title for v in options' ng-change='onFieldChange()' class='input-medium'></select> " +
-			"<select ng-model='filter.operator' ng-options='o.name as o.title for o in getOperators()' class='input-medium'></select> "+
-			"<input type='text' ui-filter-input ng-model='filter.value' ng-show='canShowInput()' class='input-medium'> " +
-			"<input type='text' ui-filter-input ng-model='filter.value2' ng-show='canShowRange()' class='input-medium'> " +
-			"<a href='' ng-click='remove(filter)'><i class='icon icon-remove'></i></a>" +
+		"<div class='form-inline'>" +
+			"<table class='form-layout'>" +
+				"<tr>" +
+					"<td class='filter-remove'>" +
+						"<a href='' ng-click='remove(filter)'><i class='icon icon-remove'></i></a>" +
+					"</td>" +
+					"<td class='form-item filter-select'>" +
+						"<select ng-model='filter.field' ng-options='v.name as v.title for v in options' ng-change='onFieldChange()' class='input-medium'></select> " +
+					"</td>" +
+					"<td class='form-item filter-select'>" +
+						"<select ng-model='filter.operator' ng-options='o.name as o.title for o in getOperators()' class='input-medium'></select> "+
+					"</td>" +
+					"<td class='form-item'>" +
+						"<input type='text' ui-filter-input ng-model='filter.value' ng-show='canShowInput()' class='input-medium'> " +
+					"</td>" +
+					"<td class='form-item'>" +
+						"<input type='text' ui-filter-input ng-model='filter.value2' ng-show='canShowRange()' class='input-medium'> " +
+					"</td>" +
+				"</tr>" +
+			"</table>" +
 		"</div>"
 	};
 });
@@ -850,7 +864,9 @@ ui.directive('uiFilterBox', function() {
 				"<i ng-click='onSearch($event)' class='icon-caret-down'></i>"+
 				"<i ng-click='onRefresh()' class='icon-search'></i>" +
 			"</span>" +
-			"<div class='filter-menu' ui-watch-if='visible'>"+
+			"<div class='filter-menu' ui-watch-if='visible'>" +
+				"<strong x-translate>Advanced Search</strong>" +
+				"<hr>"+
 				"<div class='filter-list'>" +
 					"<dl ng-show='hasFilters(1)'>" +
 						"<dt><i class='icon-save'></i><span x-translate> Filters</span></dt>" +
