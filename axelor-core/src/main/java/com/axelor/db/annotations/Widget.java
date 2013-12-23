@@ -89,6 +89,12 @@ public @interface Widget {
 	boolean password() default false;
 
 	/**
+	 * Whether to allow bulk update on this field.
+	 *
+	 */
+	boolean bulkUpdate() default false;
+
+	/**
 	 * List of the columns to be used to search this record.
 	 *
 	 * Used by auto-complete widget. By default the same column will be
