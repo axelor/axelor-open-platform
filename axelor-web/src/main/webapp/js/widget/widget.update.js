@@ -87,7 +87,7 @@ ui.directive('uiUpdateButton', ['$compile', function ($compile) {
 				if (all.is(e.target) || all.has(e.target).size() > 0) {
 					return;
 				}
-				all = $('.ui-widget-overlay,.ui-datepicker:visible,.ui-dialog:visible');
+				all = $('.ui-widget-overlay,.ui-datepicker:visible,.ui-dialog:visible,.ui-menu:visible');
 				if (all.is(e.target) || all.has(e.target).size() > 0) {
 					return;
 				}
