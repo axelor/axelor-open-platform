@@ -265,13 +265,14 @@ function DSViewCtrl(type, $scope, $element) {
 	
 	$scope.hasPermission = function(perm) {
 		var view = $scope.schema;
-		if (!view || !view.perms) return true;
+		var defaultValue = arguments.length === 2 ? arguments[1] : true;
+		if (!view || !view.perms) return defaultValue;
 		var perms = view.perms;
 		var permitted = perms[perm];
-		if (!permitted) {
-			return false;
+		if (permitted === undefined) {
+			return defaultValue;
 		}
-		return true;
+		return _.toBoolean(permitted);
 	};
 
 	$scope.isPermitted = function(perm, record, callback) {
