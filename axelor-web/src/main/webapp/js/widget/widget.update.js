@@ -430,7 +430,6 @@ ui.directive('uiUpdateMenu', function () {
 			"<div class='update-menu filter-menu' ui-watch-if='$parent.visible'>" +
 				"<div ui-update-form></div>" +
 				"<hr>" +
-				"<span>Visible: {{visible}}</span>" +
 				"<div class='form-inline'>" +
 					"<button class='btn btn-small' ng-disabled='!canUpdate()' ng-click='applyUpdate()'><span x-translate>Update</span></button> " +
 					"<button class='btn btn-small' ng-click='onCancel()'><span x-translate>Cancel</span></button> " +
