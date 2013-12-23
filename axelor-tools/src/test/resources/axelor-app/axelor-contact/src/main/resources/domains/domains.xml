@@ -22,8 +22,6 @@
     ]]>
     <string name="code" column="ccc" required="true" unique="true" min="2" hashKey="false" help="The unique code."/>
     <string name="name" required="true" unique="true" min="2" help="The title name." index="idx_my"/>
-    <string name="test" bulkUpdate="true"/>
-    <string name="testMe" bulkUpdate="true" unique="true"/>
   </entity>
 
   <entity name="Group">
@@ -54,8 +52,8 @@
       title ? "$title.name $firstName $lastName" : "$firstName $lastName"
       ]]>
     </string>
-    <string name="email" required="true" unique="true" initParam="true"/>
-    <string name="phone" max="20"  hashKey="false" />
+    <string name="email" required="true" unique="true" initParam="true" massUpdate="true"/>
+    <string name="phone" max="20"  hashKey="false" massUpdate="true"/>
     <string name="notes" multiline="true" title="About Me" />
     <many-to-many name="groups" ref="Group" mappedBy="contacts"/>
     <one-to-many name="addresses" ref="Address" mappedBy="contact" orderBy="area" />

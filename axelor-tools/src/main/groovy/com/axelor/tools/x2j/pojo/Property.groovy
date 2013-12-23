@@ -526,17 +526,17 @@ class Property {
 		def selection = attrs['selection']
 		def image = attrs['image']
 		def password = attrs['password']
-		def bulkUpdate = attrs['bulkUpdate']
+		def massUpdate = attrs['massUpdate']
 
-		if (bulkUpdate && (isUnique() || isCollection() || attrs['large'])) {
-			bulkUpdate = false;
+		if (massUpdate && (isUnique() || isCollection() || attrs['large'])) {
+			massUpdate = false;
 		}
 
 		if (selection) {
 			selection = selection.replaceAll("\\],\\s*\\[", '], [')
 		}
 
-		if (title || help || readonly || hidden || multiline || selection || image || isPassword() || bulkUpdate)
+		if (title || help || readonly || hidden || multiline || selection || image || isPassword() || massUpdate)
 			annon("com.axelor.db.annotations.Widget")
 				.add("image", image, false)
 				.add("title", title)
@@ -547,7 +547,7 @@ class Property {
 				.add("search", search, true, true)
 				.add("selection", selection)
 				.add("password", password, false)
-				.add("bulkUpdate", bulkUpdate, false)
+				.add("massUpdate", massUpdate, false)
 	}
 
 	private List<Annotation> $binary() {

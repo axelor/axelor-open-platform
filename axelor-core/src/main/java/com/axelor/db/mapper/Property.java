@@ -119,7 +119,7 @@ public class Property {
 
 	private boolean password;
 
-	private boolean bulkUpdate;
+	private boolean massUpdate;
 
 	private boolean nameColumn;
 
@@ -246,7 +246,7 @@ public class Property {
 				nameSearch = w.search();
 				selection = w.selection();
 				password = w.password();
-				bulkUpdate = w.bulkUpdate();
+				massUpdate = w.massUpdate();
 
 				if (w.multiline() && type == PropertyType.STRING) {
 					type = PropertyType.TEXT;
@@ -325,11 +325,11 @@ public class Property {
 		return password;
 	}
 
-	public boolean isBulkUpdate() {
+	public boolean isMassUpdate() {
 		if (isCollection() || isUnique()) {
 			return false;
 		}
-		return bulkUpdate;
+		return massUpdate;
 	}
 
 	public boolean isReference() {
