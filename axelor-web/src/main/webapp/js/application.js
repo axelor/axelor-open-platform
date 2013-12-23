@@ -118,6 +118,7 @@ load([
 	'js/widget/widget.splitter.js',
 	'js/widget/widget.slickgrid.js',
 	'js/widget/widget.dialog.js',
+	'js/widget/widget.update.js',
 	'js/widget/widget.search.js',
 	'js/widget/widget.menubar.js',
 

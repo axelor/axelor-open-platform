@@ -196,6 +196,7 @@ public class ViewService extends AbstractService {
 		final Mapper mapper = Mapper.of(modelClass);
 		final List<Object> fields = Lists.newArrayList();
 
+		boolean canBulkUpdate = false;
 
 		for(String name : names) {
 			Property p = findField(mapper, name);
@@ -209,11 +210,23 @@ public class ViewService extends AbstractService {
 				if (p.getTarget() != null) {
 					map.put("perms", perms(p.getTarget()));
 				}
+				if (p.isBulkUpdate()) {
+					canBulkUpdate = true;
+				}
 				fields.add(map);
 			}
 		}
 
-		data.put("perms", perms(modelClass));
+		Map<String, Object> perms = this.perms(modelClass);
+
+		if (canBulkUpdate) {
+			if (perms == null) {
+				perms = Maps.newHashMap();
+			}
+			perms.put("bulkUpdate", canBulkUpdate);
+		}
+
+		data.put("perms", perms);
 		data.put("fields", fields);
 
 		return data;

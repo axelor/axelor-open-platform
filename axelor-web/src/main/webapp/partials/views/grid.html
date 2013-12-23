@@ -9,6 +9,7 @@
           <button class="btn" ng-click="onEdit()" ng-if="hasButton('edit')" ng-disabled="!canEdit()" title="{{ 'Edit' | t}}">
             <i class="icon icon-pencil"></i> <span ng-hide="tbTitleHide" x-translate>Edit</span>
           </button>
+          <button ui-update-button x-handler="this" ng-if="hasButton('edit') && canBulkUpdate()" title="{{ 'Bulk Update' | t}}"></button>
           <button class="btn" ng-click="onSave()" ng-if="canEditInline()" ng-disabled="!canSave()" title="{{ 'Save' | t}}">
             <i class="icon icon-save"></i> <span ng-hide="tbTitleHide" x-translate>Save</span>
           </button>
