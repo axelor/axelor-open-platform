@@ -47,7 +47,7 @@ ui.directive('uiUpdateButton', ['$compile', function ($compile) {
 			
 			scope.visible = false;
 			
-			scope.onBulkUpdate = function (e) {
+			scope.onMassUpdate = function (e) {
 				if (menu && menu.is(':visible')) {
 					return hideMenu();
 				}
@@ -67,7 +67,7 @@ ui.directive('uiUpdateButton', ['$compile', function ($compile) {
 				hideMenu();
 			};
 			
-			scope.canBulkUpdate = function () {
+			scope.canMassUpdate = function () {
 				return scope.handler && scope.handler.canEdit();
 			};
 			
@@ -111,7 +111,7 @@ ui.directive('uiUpdateButton', ['$compile', function ($compile) {
 		},
 		replace: true,
 		template: 
-			"<button class='btn update-menu-button' ng-click='onBulkUpdate($event)' ng-disabled='!canBulkUpdate()' >" +
+			"<button class='btn update-menu-button' ng-click='onMassUpdate($event)' ng-disabled='!canMassUpdate()' >" +
 				"<i class='icon-caret-down'></i>" +
 				"<div ui-update-menu x-handler='handler' x-visible='visible'></div>" +
 			"</button>"
@@ -181,7 +181,7 @@ ui.directive('uiUpdateForm',  function () {
 		var all = {};
 		
 		_.each(fields, function (field, name) {
-			if (!field.bulkUpdate) return;
+			if (!field.massUpdate) return;
 			if (/id|version|selected|archived|((updated|created)(On|By))/.test(name)) return;
 			if (field.large || field.unique) return;
 			switch (field.type) {
@@ -303,7 +303,7 @@ ui.directive('uiUpdateForm',  function () {
 						items = _.pluck(items, "id");
 					}
 					
-					promise = ds.updateBulk(values, items);
+					promise = ds.updateMass(values, items);
 					promise.success(function () {
 						handler.onRefresh();
 						$scope.onCancel();
@@ -374,7 +374,7 @@ ui.directive('uiUpdateForm',  function () {
 		},
 		template:
 			"<form class='form-inline update-form filter-form'>" +
-				"<strong x-translate>Bulk Update</strong> " +
+				"<strong x-translate>Mass Update</strong> " +
 				"<hr>" +
 				"<table class='form-layout'>" +
 					"<tr ng-repeat='filter in filters' class='form-inline'>" +

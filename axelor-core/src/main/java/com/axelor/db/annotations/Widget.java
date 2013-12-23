@@ -89,10 +89,10 @@ public @interface Widget {
 	boolean password() default false;
 
 	/**
-	 * Whether to allow bulk update on this field.
+	 * Whether to allow mass update on this field.
 	 *
 	 */
-	boolean bulkUpdate() default false;
+	boolean massUpdate() default false;
 
 	/**
 	 * List of the columns to be used to search this record.

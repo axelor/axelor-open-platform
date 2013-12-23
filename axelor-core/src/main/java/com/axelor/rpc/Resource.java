@@ -504,11 +504,11 @@ public class Resource<T extends Model> {
 	}
 
 	@Transactional
-	public Response updateBulk(Request request) {
+	public Response updateMass(Request request) {
 
 		security.get().check(JpaSecurity.CAN_WRITE, model);
 
-		LOG.debug("Bulk update '{}' with {}", model.getCanonicalName(), request.getData());
+		LOG.debug("Mass update '{}' with {}", model.getCanonicalName(), request.getData());
 
 		Response response = new Response();
 

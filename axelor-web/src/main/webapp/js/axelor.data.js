@@ -546,7 +546,7 @@
 				return promise;
 			},
 			
-			updateBulk: function (values, ids) {
+			updateMass: function (values, ids) {
 				
 				var domain = this._lastDomain;
 				var context = this._lastContext;
@@ -572,7 +572,7 @@
 				
 				
 				
-				var promise = this._request('updateBulk').post({
+				var promise = this._request('updateMass').post({
 					records: [values],
 					sortBy: this._sortBy,
 					data: query

@@ -158,10 +158,10 @@ public class RestService extends ResourceService {
 	}
 
 	@POST
-	@Path("updateBulk")
-	public Response updateBulk(Request request) {
+	@Path("updateMass")
+	public Response updateMass(Request request) {
 		request.setModel(getModel());
-		return getResource().updateBulk(request);
+		return getResource().updateMass(request);
 	}
 
 	@DELETE

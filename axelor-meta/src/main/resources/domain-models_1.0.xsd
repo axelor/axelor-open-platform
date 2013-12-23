@@ -135,10 +135,10 @@
         </xsd:restriction>
       </xsd:simpleType>
     </xsd:attribute>
-    <xsd:attribute name="bulkUpdate" type="xsd:boolean" default="false">
+    <xsd:attribute name="massUpdate" type="xsd:boolean" default="false">
       <xsd:annotation>
         <xsd:documentation>
-        Whether to allow bulk update on this field (default false).
+        Whether to allow mass update on this field (default false).
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -285,7 +285,7 @@
       <xsd:restriction base="dm:RelationalColumn">
         <xsd:attribute name="unique" type="xsd:boolean" use="prohibited"/>
         <xsd:attribute name="index" type="xsd:boolean" use="prohibited"/>
-        <xsd:attribute name="bulkUpdate" type="xsd:boolean" use="prohibited"/>
+        <xsd:attribute name="massUpdate" type="xsd:boolean" use="prohibited"/>
       </xsd:restriction>
     </xsd:complexContent>
   </xsd:complexType>
@@ -299,7 +299,7 @@
         <xsd:attribute name="orphan" type="xsd:boolean" use="prohibited"/>
         <xsd:attribute name="unique" type="xsd:boolean" use="prohibited"/>
         <xsd:attribute name="index" type="xsd:boolean" use="prohibited"/>
-        <xsd:attribute name="bulkUpdate" type="xsd:boolean" use="prohibited"/>
+        <xsd:attribute name="massUpdate" type="xsd:boolean" use="prohibited"/>
       </xsd:restriction>
     </xsd:complexContent>
   </xsd:complexType>
@@ -395,7 +395,7 @@
         <xsd:attribute name="readonly" use="prohibited"/>
         <xsd:attribute name="unique" use="prohibited"/>
         <xsd:attribute name="hidden" use="prohibited"/>
-        <xsd:attribute name="bulkUpdate" use="prohibited"/>
+        <xsd:attribute name="massUpdate" use="prohibited"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
