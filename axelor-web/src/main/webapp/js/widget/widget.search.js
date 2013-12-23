@@ -248,6 +248,8 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	}
 
 	$scope.addFilter = function(filter) {
+		var last = _.last($scope.filters);
+		if (last && !(last.field && last.operator)) return;
 		$scope.filters.push(filter || {});
 	};
 
