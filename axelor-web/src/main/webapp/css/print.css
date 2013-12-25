@@ -39,17 +39,37 @@ a[href^="#"]:after {
 	content: "";
 }
 
+.popover, .dropdown-menu,
+.ui-menu, .filter-menu {
+	display: none !important;
+}
+
+.ui-dialog {
+	position: relative !important;
+	top: 48px !important;
+	left: inherit !important;
+	margin: auto !important;
+	background-color: white !important;
+}
+
+header .navbar-inner {
+	border-color: #d4d4d4 !important;
+}
+
 #container {
 	top: 16px;
 }
 
 .view-content,
+.view-container .portal-view,
 .view-container .form-view > div:last-child {
 	top: 16px !important;
 }
 
-.grid-view > .slickgrid {
-	top: 16px !important;	
+.view-print-header,
+.view-print-header h3 {
+	text-align: center;
+	font-size: 17px !important;
 }
 
 .splitter-container .sidebar.splitter-panel,
@@ -64,6 +84,10 @@ a[href^="#"]:after {
 .splitter-container .splitter-panel.view-tabs {
 	width: 100% !important;
 	left: 0 !important;
+}
+
+.nav-menu-bar {
+	display: none !important;
 }
 
 .nav.nav-shortcuts {
@@ -122,10 +146,23 @@ input {
 	border: none !important;
 }
 
+.slick-row, .slick-cell {
+	border-bottom-style: none !important;
+}
+
+.slick-headerrow {
+	display: none !important;
+}
+
 .stackbar > .navbar .icons-bar {
 	display: none !important;
 }
 
 .slick-row .slick-cell.edit-icon i {
 	display: none;
+}
+
+.portlet .divider-vertical {
+	width: 0 !important;
+	border: none !important;
 }

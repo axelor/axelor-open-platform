@@ -602,7 +602,7 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 		}],
 		replace: true,
 		template:
-		'<div class="portlet-grid webkit-scrollbar-all">'+
+		'<div class="portlet-grid">'+
 			'<div ui-view-grid x-view="schema" x-data-view="dataView" x-editable="false" x-no-filter="{{noFilter}}" x-handler="this"></div>'+
 		'</div>'
 	};
