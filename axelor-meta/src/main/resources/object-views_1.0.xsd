@@ -1019,6 +1019,13 @@
         <xsd:attribute name="placeholder" type="xsd:string" />
         <xsd:attribute name="widget" type="xsd:string" />
         <xsd:attribute name="selection" type="xsd:string"/>
+        <xsd:attribute name="selection-in" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            The filter on the selection, for example: selection-in="[preferredColor, 'red', 'blue']"
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="required" type="xsd:boolean" />
         <xsd:attribute name="requiredIf" type="xsd:string">
           <xsd:annotation>
