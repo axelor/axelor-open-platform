@@ -160,6 +160,26 @@ ui.formWidget('BaseSelect', {
 	'</span>'
 });
 
+function filterSelection(scope, field, selection, current) {
+	if (_.isEmpty(selection)) return selection;
+	if (_.isEmpty(field.selectionIn)) return selection;
+	
+	var context = (scope.getContext || angular.noop)() || {};
+	var expr = field.selectionIn.trim();
+	if (expr.indexOf('[') !== 0) {
+		expr = '[' + expr + ']';
+	}
+	
+	var list = axelor.$eval(scope, expr, context);
+	if (_.isEmpty(list)) {
+		return selection;
+	}
+	
+	return _.filter(selection, function (item) {
+		return item.value === current || list.indexOf(item.value) > -1;
+	});
+}
+
 ui.formInput('Select', 'BaseSelect', {
 
 	css: 'select-item',
@@ -205,6 +225,7 @@ ui.formInput('Select', 'BaseSelect', {
 						term = request.term || "";
 					return label.toLowerCase().indexOf(term.toLowerCase()) > -1;
 				});
+				items = filterSelection(scope, field, items);
 				return response(items);
 			}
 			
@@ -545,8 +566,11 @@ ui.formInput('RadioSelect', {
 	link: function(scope, element, attrs, model) {
 		
 		var field = scope.field;
-
-		scope.selection = field.selectionList || [];
+		var selection = field.selectionList || [];
+		
+		scope.getSelection = function () {
+			return filterSelection(scope, field, selection, scope.getValue());
+		};
 
 		element.on("change", ":input", function(e) {
 			scope.setValue($(e.target).val(), true);
@@ -563,7 +587,7 @@ ui.formInput('RadioSelect', {
 	template_readonly: null,
 	template:
 	'<ul ng-class="{ readonly: isReadonly() }">'+
-		'<li ng-repeat="select in selection">'+
+		'<li ng-repeat="select in getSelection()">'+
 		'<label>'+
 			'<input type="radio" name="radio_{{$parent.$id}}" value="{{select.value}}"'+
 			' ng-disabled="isReadonly()"'+
@@ -580,8 +604,11 @@ ui.formInput('NavSelect', {
 	link: function(scope, element, attrs, model) {
 		
 		var field = scope.field;
-	
-		scope.selection = field.selectionList || [];
+		var selection = field.selectionList || [];
+
+		scope.getSelection = function () {
+			return filterSelection(scope, field, selection, scope.getValue());
+		};
 		
 		scope.onSelect = function(select) {
 			if (scope.attr('readonly')) {
@@ -600,7 +627,7 @@ ui.formInput('NavSelect', {
 	template:
 	'<div class="nav-select">'+
 	'<ul class="steps">'+
-		'<li ng-repeat="select in selection" ng-class="{ active: getValue() == select.value }">'+
+		'<li ng-repeat="select in getSelection()" ng-class="{ active: getValue() == select.value }">'+
 			'<a href="" tabindex="-1" ng-click="onSelect(select)">{{select.title}}</a>'+
 		'</li>'+
 		'<li></li>'+
