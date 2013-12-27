@@ -64,7 +64,7 @@
 				}
 				
 				if (count > 0) {
-					return _.delay(ajaxStop, wait, callback, context);
+					return _.delay(ajaxStop.bind(this), wait, callback, context);
 				}
 				if (_.isFunction(callback)) {
 					return this.$timeout(callback.bind(context), wait);
