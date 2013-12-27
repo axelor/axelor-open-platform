@@ -475,7 +475,12 @@ function FormViewCtrl($scope, $element) {
 	$scope.reload = function() {
 		var record = $scope.record;
 		if (record && record.id) {
-			return doEdit(record.id);
+			return doEdit(record.id).success(function (rec) {
+				var shared = ds.get(record.id);
+				if (shared) {
+					shared = _.extend(shared, rec);
+				}
+			});
 		}
 		$scope.edit(null);
 		$scope.$broadcast("on:new");
