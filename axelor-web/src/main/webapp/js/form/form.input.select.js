@@ -169,14 +169,24 @@ function filterSelection(scope, field, selection, current) {
 	if (expr.indexOf('[') !== 0) {
 		expr = '[' + expr + ']';
 	}
+
+	function conv(v) {
+		if (v === null || v === undefined) return v;
+		return '' + v;
+	}
 	
 	var list = axelor.$eval(scope, expr, context);
+	var value = conv(current);
+	
 	if (_.isEmpty(list)) {
 		return selection;
 	}
 	
+	list = _.map(list, conv);
+	
 	return _.filter(selection, function (item) {
-		return item.value === current || list.indexOf(item.value) > -1;
+		var val = conv(item.value);
+		return val === value || list.indexOf(val) > -1;
 	});
 }
 
