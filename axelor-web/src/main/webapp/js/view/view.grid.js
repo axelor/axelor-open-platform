@@ -72,6 +72,11 @@ function GridViewCtrl($scope, $element) {
 			});
 			
 			initialized = true;
+		} else {
+			var current = $scope.dataView.getItem(_.first($scope.selection));
+			if (current && current.id) {
+				$scope.dataView.updateItem(current.id, current);
+			}
 		}
 	};
 	
