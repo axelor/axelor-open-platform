@@ -106,6 +106,9 @@ public class Field extends SimpleWidget {
 	@XmlAttribute
 	private String selection;
 
+	@XmlAttribute(name = "selection-in")
+	private String selectionIn;
+
 	@XmlAttribute
 	private String aggregate;
 
@@ -259,6 +262,14 @@ public class Field extends SimpleWidget {
 
 	public String getSelection() {
 		return selection;
+	}
+
+	public String getSelectionIn() {
+		return selectionIn;
+	}
+
+	public void setSelectionIn(String selectionIn) {
+		this.selectionIn = selectionIn;
 	}
 
 	public List<Object> getSelectionList() {
