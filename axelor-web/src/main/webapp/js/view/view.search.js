@@ -76,11 +76,14 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 		$scope._resultFields = fixFields(schema.resultFields);
 
 		$scope._searchView = schema;
+		$scope._showSingle = params.params && params.params._showSingle;
+		
 		$scope.updateRoute();
 		
 		if (params.options && params.options.mode == "search") {
 			$scope.setRouteOptions(params.options);
 		}
+		
 	};
 	
 	$scope.getRouteOptions = function() {
@@ -129,7 +132,17 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 		}
 		
 		scopes.form.editRecord(record);
-		$scope.doSearch();
+		
+		var promise = $scope.doSearch();
+		if (promise && promise.then && $scope._showSingle) {
+			promise.then(function () {
+				var items = scopes.grid.getItems();
+				if (items && items.length === 1) {
+					scopes.grid.selection = [0];
+					scopes.grid.onEdit();
+				}
+			});
+		}
 	};
 	
 	var scopes = {};
@@ -155,7 +168,7 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 			data: params
 		});
 		
-		promise.then(function(response){
+		return promise.then(function(response){
 			var res = response.data,
 				records = res.data || [];
 			
