@@ -122,6 +122,12 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 			}
 		});
 		
+		if (search.objects) {
+			scopes.toolbar.editRecord({
+				objectSelect: search.objects
+			});
+		}
+		
 		scopes.form.editRecord(record);
 		$scope.doSearch();
 	};
