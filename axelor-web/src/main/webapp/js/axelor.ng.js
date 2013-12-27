@@ -50,22 +50,24 @@
 				$timeout = null;
 			
 			__custom__.ajaxStop = function ajaxStop(callback, context) {
+				var count, wait;
 
 				if ($http === null) {
 					$http = $injector.get('$http');
 				}
+				
+				count = _.size($http.pendingRequests || []);
+				wait = _.last(arguments) || 10;
 
-				var count = _.size($http.pendingRequests || []),
-					wait = _.last(arguments);
-
-				if (!wait || !_.isNumber(wait)) {
-					wait = 10;
+				if (_.isNumber(context)) {
+					context = undefined;
 				}
+				
 				if (count > 0) {
 					return _.delay(ajaxStop, wait, callback, context);
 				}
-				if (callback) {
-					_.delay(callback, wait, context);
+				if (_.isFunction(callback)) {
+					return this.$timeout(callback.bind(context), wait);
 				}
 			};
 
@@ -78,7 +80,7 @@
 					$timeout = $injector.get('$timeout');
 				}
 				if (arguments.length === 0) {
-					return $timeout;
+					return $timeout();
 				}
 				return $timeout.apply(null, arguments);
 			};
