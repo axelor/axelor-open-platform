@@ -84,13 +84,10 @@ public class GroovyScriptHelper implements ScriptHelper {
 
 		final ImportCustomizer importCustomizer = new ImportCustomizer();
 
-		importCustomizer.addStarImports("java.math");
-		importCustomizer.addStarImports("java.util");
-		importCustomizer.addStarImports("org.joda.time");
-		importCustomizer.addStarImports("com.google.common.base");
-		importCustomizer.addStarImports("com.google.common.collect");
-		importCustomizer.addStarImports("com.google.common.math");
-		importCustomizer.addStarImports("com.google.common.primitives");
+		importCustomizer.addImports("org.joda.time.DateTime");
+		importCustomizer.addImports("org.joda.time.LocalDateTime");
+		importCustomizer.addImports("org.joda.time.LocalDate");
+		importCustomizer.addImports("org.joda.time.LocalTime");
 
 		config.addCompilationCustomizers(importCustomizer);
 
