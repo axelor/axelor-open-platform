@@ -322,6 +322,12 @@ angular.module('axelor.ui').directive('uiViewPane', function() {
 				$scope.viewType = type;
 				return switchTo(type, callback);
 			};
+			
+			$scope.$watch('selectedTab.viewType', function (type) {
+				if ($scope.viewType !== type && type) {
+					$scope.switchTo(type);
+				}
+			});
 
 			$scope.viewTemplate = function (type) {
 				return 'partials/views/' + type + '.html';
