@@ -370,7 +370,7 @@ function SearchToolbarCtrl($scope, $element, $http) {
 				type : 'string',
 				placeholder: _t('Search Objects'),
 				multiple : true,
-				selection : _.map(schema.selects, function(x) {
+				selectionList : _.map(schema.selects, function(x) {
 					return {
 						value : x.model,
 						title : x.title

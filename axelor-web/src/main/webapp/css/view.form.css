@@ -198,6 +198,7 @@ table.form-layout td.form-item.v-align-top {
 	margin-top: 4px !important;
 }
 
+.form-item > a.btn,
 .form-item-container button {
 	padding: 2px 10px 2px;
 	min-width: 26px;
