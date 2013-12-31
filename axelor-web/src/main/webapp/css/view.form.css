@@ -859,8 +859,8 @@ table.field-details .help-text hr {
 	background: #fff !important;
 	width: auto !important;
 	border: none  !important;
-	
 	padding: 2px !important;
+	height: inherit !important;
 }
 
 .button-item.img-button:hover img {
