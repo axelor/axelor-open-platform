@@ -97,6 +97,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 	};
 
 	$scope.onClose = function() {
+		$scope.onClear();
 		doClose();
 	};
 	
@@ -110,8 +111,43 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 		setTimeout(doClose);
 	};
 	
+	$scope.onAdd = function() {
+		if (!$scope.isValid() || !$scope.record) {
+			return;
+		}
+		
+		var record = $scope.record;
+		record.id = null;
+		record.version = null;
+		record.$version = null;
+		
+		$scope.onClear();
+		
+		function doSelect(rec) {
+			if (rec) {
+				$scope.select(rec);
+			}
+			return doEdit(rec);
+		}
+		
+		if (!$scope.editorCanSave) {
+			return doSelect(record);
+		}
+		
+		$scope.onSave().then(function (rec) {
+			doSelect(rec);
+		});
+	};
+	
 	$scope.onClear = function() {
-		$scope.record = {};
+		if ($scope.$parent.selection) {
+			$scope.$parent.selection.length = 0;
+		}
+		doEdit(null);
+	};
+	
+	$scope.canUpdate = function () {
+		return $scope.record && $scope.record.id;
 	};
 	
 	$scope.$on('grid:changed', function(event) {
@@ -139,8 +175,9 @@ var EmbeddedEditor = {
 			'<div ui-view-form x-handler="this"></div>'+
 			'<div class="btn-toolbar pull-right">'+
 				'<button type="button" class="btn btn btn-info" ng-click="onClose()" ng-show="isReadonly()"><span x-translate>Back</span></button> '+
+				'<button type="button" class="btn btn-primary" ng-click="onOK()" ng-show="!isReadonly() && canUpdate()"><span x-translate>OK</span></button>'+
+				'<button type="button" class="btn btn-primary" ng-click="onAdd()" ng-show="!isReadonly()"><span x-translate>Add</span></button> '+
 				'<button type="button" class="btn btn-danger" ng-click="onClose()" ng-show="!isReadonly()"><span x-translate>Cancel</span></button> '+
-				'<button type="button" class="btn btn-primary" ng-click="onOK()" ng-show="!isReadonly()"><span x-translate>OK</span></button>'+
 			'</div>'+
 		'</fieldset>'
 };
