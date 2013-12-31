@@ -209,6 +209,17 @@ ActionHandler.prototype = {
 
 		return context;
 	},
+	
+	_getFormElement: function () {
+		var formElement = this.element.parents('form:first');
+		if (!formElement.get(0)) { // toolbar button
+			formElement = this.element.parents('.form-view:first').find('form:first');
+		}
+		if (formElement.length == 0) {
+			formElement = this.element;
+		}
+		return formElement;
+	},
 
 	handle: function() {
 		var action = this.action.trim();
@@ -287,6 +298,24 @@ ActionHandler.prototype = {
 		if (!action) {
 			return resolveLater();
 		}
+		
+		var pattern = /(^sync\s*,\s*)|(^sync$)/;
+		if (pattern.test(action)) {
+			action = action.replace(pattern, '');
+			var formElement = this._getFormElement();
+			var formScope = formElement.scope();
+			var event = formScope.$broadcast('on:before-save');
+			if (event.defaultPrevented) {
+				if (event.error) {
+					axelor.dialogs.error(event.error);
+				}
+				setTimeout(function() {
+					deferred.reject(event.error);
+				});
+				return deferred.promise;
+			}
+			return self._handleAction(action);
+		}
 
 		if (action === 'save') {
 			return this._handleSave();
@@ -327,17 +356,8 @@ ActionHandler.prototype = {
 
 		var self = this,
 			scope = this.scope,
-			formScope = scope,
-			formElement = this.element.parents('form:first');
-
-		if (!formElement.get(0)) { // toolbar button
-			formElement = this.element.parents('.form-view:first').find('form:first');
-		}
-		
-		if (formElement.length == 0) {
-			formElement = this.element;
-		}
-		formScope = formElement.data('$scope') || scope;
+			formElement = this._getFormElement(),
+			formScope = formElement.data('$scope') || scope;
 
 		if(data.flash) {
 			//TODO: show embedded message instead
