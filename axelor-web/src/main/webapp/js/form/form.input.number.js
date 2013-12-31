@@ -137,8 +137,6 @@ ui.formInput('Number', {
 			if (a === undefined || b === undefined) return false;
 			a = a === "" ? a : ((+a) || 0);
 			b = b === "" ? b : ((+b) || 0);
-
-			console.log('fff 2', a, b);
 			return a === b;
 		}
 
