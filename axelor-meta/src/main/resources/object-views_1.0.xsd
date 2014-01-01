@@ -385,6 +385,10 @@
             <xsd:documentation>Whether to show edit icon.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="canNew" type="xsd:boolean"/>
+        <xsd:attribute name="canEdit" type="xsd:boolean"/>
+        <xsd:attribute name="canSave" type="xsd:boolean"/>
+        <xsd:attribute name="canDelete" type="xsd:boolean"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -407,6 +411,12 @@
         <xsd:attribute name="onNew" type="xsd:string" />
         <xsd:attribute name="helpLink" type="xsd:string" />
         <xsd:attribute name="readonlyIf" type="xsd:string" />
+		<xsd:attribute name="canNew" type="xsd:string"/>
+        <xsd:attribute name="canEdit" type="xsd:string"/>
+        <xsd:attribute name="canSave" type="xsd:string"/>
+        <xsd:attribute name="canDelete" type="xsd:string"/>
+        <xsd:attribute name="canCopy" type="xsd:string"/>
+        <xsd:attribute name="canAttach" type="xsd:string"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

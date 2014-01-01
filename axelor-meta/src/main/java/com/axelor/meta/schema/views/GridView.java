@@ -51,7 +51,19 @@ public class GridView extends AbstractView {
 
 	@XmlAttribute
 	private String groupBy;
-
+	
+	@XmlAttribute
+	private Boolean canNew;
+	
+	@XmlAttribute
+	private Boolean canEdit;
+	
+	@XmlAttribute
+	private Boolean canSave;
+	
+	@XmlAttribute
+	private Boolean canDelete;
+	
 	@XmlAttribute(name = "edit-icon")
 	private Boolean editIcon = Boolean.TRUE;
 
@@ -86,6 +98,38 @@ public class GridView extends AbstractView {
 
 	public void setGroupBy(String groupBy) {
 		this.groupBy = groupBy;
+	}
+
+	public Boolean getCanNew() {
+		return canNew;
+	}
+
+	public void setCanNew(Boolean canNew) {
+		this.canNew = canNew;
+	}
+
+	public Boolean getCanEdit() {
+		return canEdit;
+	}
+
+	public void setCanEdit(Boolean canEdit) {
+		this.canEdit = canEdit;
+	}
+
+	public Boolean getCanSave() {
+		return canSave;
+	}
+
+	public void setCanSave(Boolean canSave) {
+		this.canSave = canSave;
+	}
+
+	public Boolean getCanDelete() {
+		return canDelete;
+	}
+
+	public void setCanDelete(Boolean canDelete) {
+		this.canDelete = canDelete;
 	}
 
 	public Boolean getEditIcon() {
