@@ -66,6 +66,24 @@ public class FormView extends AbstractView {
 
 	@XmlAttribute
 	private String readonlyIf;
+	
+	@XmlAttribute
+	private String canNew;
+	
+	@XmlAttribute
+	private String canEdit;
+	
+	@XmlAttribute
+	private String canSave;
+	
+	@XmlAttribute
+	private String canDelete;
+	
+	@XmlAttribute
+	private String canCopy;
+	
+	@XmlAttribute
+	private String canAttach;
 
 	@XmlElements({
 		@XmlElement(name = "include", type = FormInclude.class),
@@ -143,6 +161,54 @@ public class FormView extends AbstractView {
 
 	public void setReadonlyIf(String readonlyIf) {
 		this.readonlyIf = readonlyIf;
+	}
+	
+	public String getCanNew() {
+		return canNew;
+	}
+
+	public void setCanNew(String canNew) {
+		this.canNew = canNew;
+	}
+
+	public String getCanEdit() {
+		return canEdit;
+	}
+
+	public void setCanEdit(String canEdit) {
+		this.canEdit = canEdit;
+	}
+
+	public String getCanSave() {
+		return canSave;
+	}
+
+	public void setCanSave(String canSave) {
+		this.canSave = canSave;
+	}
+
+	public String getCanDelete() {
+		return canDelete;
+	}
+
+	public void setCanDelete(String canDelete) {
+		this.canDelete = canDelete;
+	}
+
+	public String getCanCopy() {
+		return canCopy;
+	}
+
+	public void setCanCopy(String canCopy) {
+		this.canCopy = canCopy;
+	}
+
+	public String getCanAttach() {
+		return canAttach;
+	}
+
+	public void setCanAttach(String canAttach) {
+		this.canAttach = canAttach;
 	}
 
 	public List<AbstractWidget> getItems() {
