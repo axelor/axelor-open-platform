@@ -242,15 +242,44 @@ function DSViewCtrl(type, $scope, $element) {
 			$scope.onRefresh();
 		}
 	};
+	
+	var can = (function (scope) {
+		var fn = null;
+		var perms = {
+			'new': 'create',
+			'copy': 'create',
+			'edit': 'write',
+			'save': 'write',
+			'delete': 'remove',
+			'export': 'export'
+		};
+		var actions = {
+			'new': 'canNew',
+			'edit': 'canEdit',
+			'save': 'canSave',
+			'copy': 'canCopy',
+			'delete': 'canDelete',
+			'attach': 'canAttach'
+		};
 
+		function attr(which) {
+			if (fn === null && _.isFunction(scope.attr)) {
+				fn = scope.attr;
+			}
+			return !fn || fn(which) !== false;
+		}
+		
+		function perm(which) {
+			return which === undefined || scope.hasPermission(which);
+		}
+		
+		return function can(what) {
+			return attr(actions[what]) && perm(perms[what]);
+		};
+	})($scope);
+	
 	$scope.hasButton = function(name) {
-		if ((name === "new" || name === "copy") && !this.hasPermission("create")) {
-			return false;
-		}
-		if ((name === "edit" || name === "save") && !this.hasPermission("write")) {
-			return false;
-		}
-		if (name === "delete" && !this.hasPermission("remove")) {
+		if (!can(name)) {
 			return false;
 		}
 		if (_(hiddenButtons).has(name)) {
@@ -570,7 +599,7 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 			if (!field || field.readonly) {
 				return;
 			}
-			if (fs.hasPermission("write") && fs.isReadonly()) {
+			if (fs.hasPermission("write") && fs.isReadonly() && fs.hasButton('edit')) {
 				var elem = $(e.target),
 					parent = $(e.target).parent();
 				$.event.trigger('cancel:hot-edit');

@@ -162,17 +162,36 @@ function GridViewCtrl($scope, $element) {
 		}
 	};
 
+	$scope.attr = function (name) {
+		if (!$scope.schema || $scope.schema[name] === undefined) {
+			return true;
+		}
+		return $scope.schema[name];
+	};
+	
+	$scope.canNew = function() {
+		return $scope.hasButton('new');
+	};
+
 	$scope.canEdit = function() {
-		return $scope.canDelete();
+		return $scope.hasButton('edit');
+	};
+	
+	$scope.canSave = function() {
+		return $scope.hasButton('save') && this.dataView.canSave && this.dataView.canSave();
+	};
+	
+	$scope.canDelete = function() {
+		return $scope.hasButton('delete') && !$scope.canSave() && $scope.selection.length > 0;
+	};
+	
+	$scope.canEditInline = function() {
+		return _.isFunction(this.dataView.canSave);
 	};
 	
 	$scope.canMassUpdate = function () {
 		// this permission is actually calculated from fields marked for mass update
 		return $scope.hasPermission('massUpdate', false);
-	};
-
-	$scope.canDelete = function() {
-		return !$scope.canSave() && $scope.selection.length > 0;
 	};
 
 	$scope.filter = function(searchFilter) {
@@ -424,16 +443,8 @@ function GridViewCtrl($scope, $element) {
 		};
 	};
 	
-	$scope.canEditInline = function() {
-		return _.isFunction(this.dataView.canSave);
-	};
-	
 	$scope.onSave = function() {
 		this.dataView.saveChanges();
-	};
-	
-	$scope.canSave = function() {
-		return this.dataView.canSave && this.dataView.canSave();
 	};
 	
 	$scope.onArchived = function(e) {
@@ -494,7 +505,7 @@ function GridViewCtrl($scope, $element) {
 angular.module('axelor.ui').directive('uiViewGrid', function(){
 	return {
 		replace: true,
-		template: '<div ui-slick-grid></div>'
+		template: '<div ui-slick-grid ui-widget-states></div>'
 	};
 });
 

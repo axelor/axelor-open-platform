@@ -273,17 +273,29 @@ function FormViewCtrl($scope, $element) {
 	$scope.isValid = function() {
 		return $scope.form && $scope.form.$valid;
 	};
-	
-	$scope.canCopy = function() {
-		return $scope.record && !$scope.$$dirty && $scope.record.id;
+
+	$scope.canNew = function() {
+		return $scope.hasButton('new');
+	};
+
+	$scope.canEdit = function() {
+		return $scope.hasButton('edit');
 	};
 	
 	$scope.canSave = function() {
-		return $scope.$$dirty && $scope.isValid();
+		return $scope.hasButton('save') && $scope.$$dirty && $scope.isValid();
+	};
+
+	$scope.canDelete = function() {
+		return $scope.hasButton('delete');
 	};
 	
-	$scope.canEdit = function() {
-		return !$scope.isEditable();
+	$scope.canCopy = function() {
+		return !$scope.isEditable() && $scope.hasButton('copy') && !$scope.$$dirty && ($scope.record || {}).id;
+	};
+	
+	$scope.canAttach = function() {
+		return $scope.hasButton('attach');
 	};
 
 	$scope.canCancel = function() {
@@ -772,8 +784,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 		};
 		
 		scope.canShowAttachments = function() {
-			var record = scope.record || {};
-			return record.id ;
+			return scope.canAttach() && (scope.record || {}).id;
 		};
 		
 		scope.onShowAttachments = function(){
