@@ -307,6 +307,10 @@
 				if (_.isArray(result.view.items)) {
 					return loadFields(result);
 				}
+				
+				if (result.searchForm) {
+					result.view.searchForm = result.searchForm;
+				}
 
 				deferred.resolve({
 					fields: result.view.items,

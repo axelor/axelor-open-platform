@@ -42,8 +42,10 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 	
 	function fixFields(fields) {
 		_.each(fields, function(field){
-			if (field.type == 'reference')
+			if (field.type == 'reference') {
 				field.type = 'MANY_TO_ONE';
+				field.canNew = false;
+			}
 			
 			if (field.type)
 				field.type = field.type.toUpperCase();
@@ -253,7 +255,7 @@ function SearchFormCtrl($scope, $element, ViewService) {
 		ViewService.process(meta);
 		
 		$scope.fields = meta.fields;
-		$scope.schema = form;
+		$scope.schema = schema.searchForm || form;
 		$scope.schema.loaded = true;
 	});
 }
