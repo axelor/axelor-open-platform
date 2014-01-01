@@ -264,30 +264,41 @@ ui.directive('uiWidgetStates', ['$parse', function($parse) {
 		});
 	}
 	
-	function register(scope) {
-		var field = scope.field;
-		if (field == null) {
-			return;
-		}
-		
-		function handleFor(attr, conditional, negative) {
-			if (!field[conditional]) return;
+	function handleFor(scope, field, attr, conditional, negative) {
+		if (field[conditional]) {
 			handleCondition(scope, field, attr, field[conditional], negative);
 		}
-		
-		handleFor("valid", "validIf");
-		handleFor("hidden", "hideIf");
-		handleFor("hidden", "showIf", true);
-		handleFor("readonly", "readonlyIf");
-		handleFor("required", "requiredIf");
-		handleFor("collapse", "collapseIf");
-
-		handleHilites(scope, field);
-	};
-
+	}
+	
+	function handleForField(scope) {
+		var field = scope.field;
+		if (!field) return;
+		handleFor(scope, field, "valid", "validIf");
+		handleFor(scope, field, "hidden", "hideIf");
+		handleFor(scope, field, "hidden", "showIf", true);
+		handleFor(scope, field, "readonly", "readonlyIf");
+		handleFor(scope, field, "required", "requiredIf");
+		handleFor(scope, field, "collapse", "collapseIf");
+		handleHilites(scope, scope.field);
+	}
+	
+	function handleForView(scope) {
+		var field = scope.schema;
+		if (!field) return;
+		handleFor(scope, field, "canNew", "canNew");
+		handleFor(scope, field, "canEdit", "canEdit");
+		handleFor(scope, field, "canSave", "canSave");
+		handleFor(scope, field, "canCopy", "canCopy");
+		handleFor(scope, field, "canDelete", "canDelete");
+		handleFor(scope, field, "canAttach", "canAttach");
+	}
+	
 	return function(scope, element, attrs) {
 		scope.$evalAsync(function() {
-			register(scope);
+			if (element.is('[ui-form]')) {
+				return handleForView(scope);
+			}
+			handleForField(scope);
 		});
 	};
 }]);

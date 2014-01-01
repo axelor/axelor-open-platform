@@ -3,16 +3,16 @@
     <div class="navbar-inner">
       <div class="container">
         <div class="btn-group">
-          <button class="btn" ng-click="onNew()" ng-if="hasButton('new')" title="{{ 'New' | t}}">
+          <button class="btn" ng-click="onNew()" ng-if="canNew()" title="{{ 'New' | t}}">
             <i class="icon icon-file"></i> <span ng-hide="tbTitleHide" x-translate>New</span>
           </button>
-          <button class="btn" ng-click="onEdit()" ng-if="hasButton('edit') && canEdit()" title="{{ 'Edit' | t}}">
+          <button class="btn" ng-click="onEdit()" ng-if="!isEditable() && canEdit()" title="{{ 'Edit' | t}}">
             <i class="icon icon-pencil"></i> <span ng-hide="tbTitleHide" x-translate>Edit</span>
           </button>
-          <button class="btn" ng-click="onSave()" ng-if="hasButton('save') && (!canEdit() || canSave())"  title="{{ 'Save' | t}}">
+          <button class="btn" ng-click="onSave()" ng-if="isEditable() && (canEdit() || canSave())"  title="{{ 'Save' | t}}">
             <i class="icon icon-save"></i> <span ng-hide="tbTitleHide" x-translate>Save</span>
           </button>
-          <button class="btn" ng-click="onCopy()" ng-if="hasButton('copy') && canEdit()" ng-disabled="!canCopy()" title="{{ 'Copy' | t}}">
+          <button class="btn" ng-click="onCopy()" ng-if="canCopy()" ng-disabled="!canCopy()" title="{{ 'Copy' | t}}">
             <i class="icon icon-copy"></i> <span ng-hide="tbTitleHide" x-translate>Copy</span>
           </button>
           <button class="btn" ng-click="onCancel()" ng-if="hasButton('cancel') && !canEdit()" ng-disabled="!canCancel()" title="{{ 'Cancel' | t}}">
