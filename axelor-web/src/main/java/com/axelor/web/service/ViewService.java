@@ -61,6 +61,7 @@ import com.axelor.meta.schema.views.FormInclude;
 import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.Notebook;
+import com.axelor.meta.schema.views.Search;
 import com.axelor.meta.schema.views.SimpleContainer;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.Request;
@@ -282,6 +283,12 @@ public class ViewService extends AbstractService {
 
 		final Map<String, Object> data = Maps.newHashMap();
 		data.put("view", view);
+
+		if (view instanceof Search && ((Search) view).getSearchForm() != null) {
+			String searchForm = ((Search) view).getSearchForm();
+			Response searchResponse = service.findView(null, searchForm, "form");
+			data.put("searchForm", searchResponse.getData());
+		}
 
 		if (view instanceof AbstractView) {
 			data.putAll(findFields(model, findNames((AbstractView) view)));
