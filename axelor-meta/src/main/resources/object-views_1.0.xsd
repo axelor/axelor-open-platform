@@ -806,6 +806,13 @@
           <xsd:element name="select" type="tns:SearchSelect" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="limit" type="xsd:int" use="required" />
+        <xsd:attribute name="search-form" type="xsd:string">
+        	<xsd:annotation>
+        		<xsd:documentation>
+        		The form view to be used as search form using the given search fields.
+        		</xsd:documentation>
+        	</xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -827,6 +834,8 @@
       </xsd:simpleType>
     </xsd:attribute>
     <xsd:attribute name="target" type="xsd:string" />
+    <xsd:attribute name="domain" type="xsd:string" />
+    <xsd:attribute name="selection" type="xsd:string" />
     <xsd:attribute name="widget" type="xsd:string" />
   </xsd:complexType>
   

@@ -71,6 +71,9 @@ public class Search extends AbstractView {
 	@XmlAttribute
 	private Integer limit;
 
+	@XmlAttribute(name = "search-form")
+	private String searchForm;
+
 	@XmlElement(name = "field", type = SearchField.class)
 	@XmlElementWrapper(name = "search-fields")
 	private List<SearchField> searchFields;
@@ -88,6 +91,14 @@ public class Search extends AbstractView {
 
 	public void setLimit(Integer limit) {
 		this.limit = limit;
+	}
+	
+	public String getSearchForm() {
+		return searchForm;
+	}
+	
+	public void setSearchForm(String searchForm) {
+		this.searchForm = searchForm;
 	}
 
 	public List<SearchField> getSearchFields() {
@@ -136,7 +147,13 @@ public class Search extends AbstractView {
 
 		@XmlAttribute
 		private String target;
-
+		
+		@XmlAttribute
+		private String domain;
+		
+		@XmlAttribute
+		private String selection;
+		
 		@XmlAttribute
 		private String widget;
 
@@ -179,12 +196,36 @@ public class Search extends AbstractView {
 		public void setTarget(String target) {
 			this.target = target;
 		}
+		
+		public String getDomain() {
+			return domain;
+		}
+
+		public void setDomain(String domain) {
+			this.domain = domain;
+		}
+
+		public String getSelection() {
+			return selection;
+		}
+
+		public void setSelection(String selection) {
+			this.selection = selection;
+		}
+
+		public static Map<String, ?> getTypes() {
+			return TYPES;
+		}
+
+		public void setWidget(String widget) {
+			this.widget = widget;
+		}
 
 		public String getWidget() {
 			return widget;
 		}
 
-		public String getNameField() {
+		public String getTargetName() {
 			try {
 				return Mapper.of(Class.forName(target)).getNameField().getName();
 			} catch (Exception e){}
