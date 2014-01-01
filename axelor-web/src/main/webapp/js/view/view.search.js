@@ -106,6 +106,9 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 			search = opts.search,
 			record = {};
 
+		if (!search || _.isEmpty(search)) {
+			scopes.form.$broadcast('on:new');
+		}
 		if (!search || _.isEmpty(search) || angular.equals($scope._routeSearch, search)) {
 			return $scope.updateRoute();
 		}
@@ -258,6 +261,20 @@ function SearchFormCtrl($scope, $element, ViewService) {
 		$scope.schema = schema.searchForm || form;
 		$scope.schema.loaded = true;
 	});
+	
+	var model = null;
+	var getContext = $scope.getContext;
+	
+	$scope.getContext = function() {
+		var view = $scope._searchView || {};
+		if (model === null && view.selects) {
+			model = (_.first(view.selects) || {}).model;
+		}
+		
+		var ctx = getContext.apply(this, arguments) || {};
+		ctx._model = model;
+		return ctx;
+	};
 }
 
 SearchGridCtrl.$inject = ['$scope', '$element', 'ViewService'];
