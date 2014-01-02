@@ -423,6 +423,8 @@ function SearchToolbarCtrl($scope, $element, $http) {
 		
 		if (schema == null)
 			return;
+		
+		var selected = [];
 
 		$scope.fields = {
 			'objectSelect' : {
@@ -430,6 +432,9 @@ function SearchToolbarCtrl($scope, $element, $http) {
 				placeholder: _t('Search Objects'),
 				multiple : true,
 				selectionList : _.map(schema.selects, function(x) {
+					if (x.selected) {
+						selected.push(x.model);
+					}
 					return {
 						value : x.model,
 						title : x.title
@@ -500,6 +505,14 @@ function SearchToolbarCtrl($scope, $element, $http) {
 		};
 		
 		$scope.schema.loaded = true;
+		
+		$scope.$timeout(function () {
+			var record = $scope.record || {};
+			if (selected.length > 0 && _.isEmpty(record.objectSelect)) {
+				record.objectSelect = selected.join(', ');
+				$scope.edit(record);
+			}
+		});
 	});
 }
 
