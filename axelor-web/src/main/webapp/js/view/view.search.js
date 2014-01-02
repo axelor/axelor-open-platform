@@ -255,7 +255,28 @@ function SearchFormCtrl($scope, $element, ViewService) {
 		};
 
 		var meta = { fields: schema.searchFields };
-		ViewService.process(meta);
+		ViewService.process(meta, schema.searchForm);
+		
+		function process(item) {
+			if (item.items || item.pages) {
+				return _.each(item.items || item.pages, process);
+			}
+			switch (item.widgetName) {
+			case 'ManyToOne':
+			case 'OneToOne':
+				item.canNew = false;
+				item.canEdit = false;
+				break;
+			case 'OneToMany':
+			case 'ManyToMany':
+			case 'MasterDetail':
+				item.hidden = true;
+			}
+		}
+		
+		if (schema.searchForm && schema.searchForm.items) {
+			_.each(schema.searchForm.items, process);
+		}
 		
 		$scope.fields = meta.fields;
 		$scope.schema = schema.searchForm || form;
