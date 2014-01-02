@@ -319,6 +319,9 @@ public class Search extends AbstractView {
 
 		@XmlAttribute
 		private String title;
+		
+		@XmlAttribute
+		private Boolean selected;
 
 		@JsonIgnore
 		@XmlAttribute
@@ -365,6 +368,10 @@ public class Search extends AbstractView {
 				title = this.getDefaultTitle();
 			}
 			return JPA.translate(title, title, null, "search");
+		}
+		
+		public Boolean getSelected() {
+			return selected;
 		}
 
 		public String getOrderBy() {
