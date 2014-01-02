@@ -886,6 +886,7 @@
     </xsd:sequence>
     <xsd:attribute name="model" type="xsd:string" use="required"/>
     <xsd:attribute name="title" type="xsd:string"/>
+    <xsd:attribute name="selected" type="xsd:boolean"/>
     <xsd:attribute name="orderBy" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
