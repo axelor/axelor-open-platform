@@ -50,6 +50,7 @@ _t.put({
 "Action": "Action",
 "Action Category": "Catégorie",
 "Action Sub-Category": "Sous catégorie",
+"Add": "Ajouter",
 "Advanced Search": "Recherche avancée",
 "All Day": "Toute la journée",
 "Archived": "Archive",
