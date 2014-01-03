@@ -66,6 +66,14 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		canClose = false;
 	};
 
+	var isEditable = $scope.isEditable;
+	$scope.isEditable = function () {
+		if (($scope.$parent.canEditTarget || angular.noop)() === false) {
+			return false;
+		}
+		return isEditable.apply($scope, arguments);
+	};
+
 	$scope.edit = function(record) {
 		$scope._viewPromise.then(function(){
 			doEdit(record);
