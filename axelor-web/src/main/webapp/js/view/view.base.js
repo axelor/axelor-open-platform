@@ -599,7 +599,7 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 			if (!field || field.readonly) {
 				return;
 			}
-			if (fs.hasPermission("write") && fs.isReadonly() && fs.hasButton('edit')) {
+			if (fs.hasPermission("write") && fs.isReadonly() && fs.canEdit()) {
 				var elem = $(e.target),
 					parent = $(e.target).parent();
 				$.event.trigger('cancel:hot-edit');

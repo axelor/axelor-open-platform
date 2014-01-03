@@ -66,12 +66,18 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		canClose = false;
 	};
 
+	function isEditableTarget() {
+		return ($scope.$parent.canEditTarget || angular.noop)() !== false;
+	}
+
 	var isEditable = $scope.isEditable;
 	$scope.isEditable = function () {
-		if (($scope.$parent.canEditTarget || angular.noop)() === false) {
-			return false;
-		}
-		return isEditable.apply($scope, arguments);
+		return isEditableTarget() && isEditable.call($scope);
+	};
+	
+	var canEdit = $scope.canEdit;
+	$scope.canEdit = function() {
+		return isEditableTarget() && canEdit.call($scope);
 	};
 
 	$scope.edit = function(record) {
