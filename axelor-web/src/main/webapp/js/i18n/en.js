@@ -33,6 +33,7 @@ _t.put({
 "Action": "Action",
 "Action Category": "Action Category",
 "Action Sub-Category": "Action Sub-Category",
+"Add": "Add",
 "Advanced Search": "Advanced Search",
 "All Day": "All Day",
 "Archived": "Archived",
