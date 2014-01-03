@@ -110,7 +110,11 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 
 		$scope.setValue(record, true);
 	};
-
+	
+	$scope.canEditTarget = function () {
+		return $scope.canEdit() && $scope.field.canEdit !== false;
+	};
+	
 	$scope.canEdit = function () {
 		return $scope.canView() && $scope.getValue();
 	};

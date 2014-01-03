@@ -45,6 +45,7 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 			if (field.type == 'reference') {
 				field.type = 'MANY_TO_ONE';
 				field.canNew = false;
+				field.canEdit = false;
 			}
 			
 			if (field.type)
@@ -264,6 +265,7 @@ function SearchFormCtrl($scope, $element, ViewService) {
 			switch (item.widgetName) {
 			case 'ManyToOne':
 			case 'OneToOne':
+			case 'SuggestBox':
 				item.canNew = false;
 				item.canEdit = false;
 				break;
