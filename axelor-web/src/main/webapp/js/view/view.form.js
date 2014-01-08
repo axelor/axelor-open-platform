@@ -246,6 +246,15 @@ function FormViewCtrl($scope, $element) {
 				}
 			}
 		});
+
+		var dummy = $scope.getDummyValues();
+		_.each(dummy, function (value, name) {
+			if (value && value.$updatedValues) {
+				dummy[name] = value.$updatedValues;
+			}
+		});
+		
+		context = _.extend(context, dummy);
 		context._model = ds._model;
 		return context;
 	};
