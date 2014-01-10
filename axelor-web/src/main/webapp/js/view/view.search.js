@@ -311,6 +311,7 @@ function SearchGridCtrl($scope, $element, ViewService) {
 		var view = {
 			title: 'Search',
 			type: 'grid',
+			editIcon: true,
 			items: [{ name : '_modelTitle', title: 'Object' }].concat(schema.resultFields)
 		};
 		var meta = { fields: schema.resultFields };
@@ -321,7 +322,7 @@ function SearchGridCtrl($scope, $element, ViewService) {
 		$scope.schema.loaded = true;
 	});
 	
-	$scope.onEdit = function() {
+	$scope.onEdit = function(force) {
 
 		var index = _.first(this.selection),
 			records = this.getItems(),
@@ -347,6 +348,7 @@ function SearchGridCtrl($scope, $element, ViewService) {
 			title: record._modelTitle,
 			domain: domain,
 			recordId: record._id,
+			forceEdit: force,
 			viewType: 'form',
 			views: views
 		};
