@@ -353,6 +353,10 @@ angular.module('axelor.ui').directive('uiViewPane', function() {
 			};
 			
 			$scope.$watch('selectedTab.viewType', function (type) {
+				var params = $scope._viewParams;
+				if (params && params.$viewScope !== $scope.selectedTab.$viewScope) {
+					return;
+				}
 				if ($scope.viewType !== type && type) {
 					$scope.switchTo(type);
 				}
