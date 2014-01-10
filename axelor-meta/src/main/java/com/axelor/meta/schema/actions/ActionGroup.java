@@ -50,7 +50,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 @XmlType
-public class ActionGroup extends Action {
+public class ActionGroup extends ActionIndex {
 
 	@XmlElement(name = "action")
 	private List<ActionItem> actions;
@@ -72,10 +72,10 @@ public class ActionGroup extends Action {
 		this.actions.add(item);
 	}
 
-	private String getPending(Iterator<ActionItem> actions, String... prepend) {
+	private String getPending(int index, String... prepend) {
 		final List<String> pending = Lists.newArrayList(prepend);
-		while(actions.hasNext()) {
-    		pending.add(actions.next().getName());
+		if ((index + 1) < actions.size()) {
+    		pending.add(getName() + "[" + (index + 1) + "]");
     	}
     	return Joiner.on(",").skipNulls().join(pending);
 	}
@@ -114,8 +114,8 @@ public class ActionGroup extends Action {
 				log.debug("continue action-validate: {}", actionName);
 				log.debug("continue at: {}", index);
 				Action action = MetaStore.getAction(actionName);
-				if (action instanceof ActionValidate) {
-					((ActionValidate) action).setIndex(index);
+				if (action instanceof ActionIndex) {
+					((ActionIndex) action).setIndex(index);
 				}
 				return action;
 		}
@@ -133,14 +133,15 @@ public class ActionGroup extends Action {
 		if (getName() != null) {
 			log.debug("action-group: {}", getName());
 		}
+		
+		for (int i = getIndex(); i < actions.size(); i++) {
 
-		while(iter.hasNext()) {
-			Element element = iter.next();
+			Element element = actions.get(i);
 			String name = element.getName().trim();
 
 			if ("save".equals(name)) {
 				if (element.test(handler)) {
-					String pending = this.getPending(iter);
+					String pending = this.getPending(i);
 	            	log.debug("wait for 'save', pending actions: {}", pending);
 					result.add(ImmutableMap.of("save", true, "pending", pending));
 				}
@@ -187,7 +188,7 @@ public class ActionGroup extends Action {
 
             // stop for reload
             if (value instanceof Map && Objects.equal(Boolean.TRUE, ((Map) value).get("reload"))) {
-            	String pending = this.getPending(iter);
+            	String pending = this.getPending(i);
             	log.debug("wait for 'reload', pending actions: {}", pending);
 				((Map<String, Object>) value).put("pending", pending);
 				result.add(value);
@@ -201,7 +202,7 @@ public class ActionGroup extends Action {
 
             if (action instanceof ActionValidate && value instanceof Map) {
             	String validate = (String) ((Map) value).get("pending");
-            	String pending = this.getPending(iter, validate);
+            	String pending = this.getPending(i, validate);
             	log.debug("wait for validation: {}, {}", name, value);
             	log.debug("pending actions: {}", pending);
             	((Map<String, Object>) value).put("pending", pending);
@@ -222,7 +223,7 @@ public class ActionGroup extends Action {
             	}
             	if (last != null && (last.containsKey("alert") || last.containsKey("error"))) {
             		String previous = (String) last.get("pending");
-            		String pending = this.getPending(iter, previous);
+            		String pending = this.getPending(i, previous);
             		last.put("pending", pending);
             		log.debug("wait for group validation: {}", action.getName());
             		log.debug("pending actions: {}", pending);
