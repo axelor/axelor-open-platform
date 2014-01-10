@@ -45,7 +45,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 @XmlType
-public class ActionValidate extends Action {
+public class ActionValidate extends ActionIndex {
 
 	public static class Validator extends Element {
 
@@ -80,27 +80,12 @@ public class ActionValidate extends Action {
 	public static class Alert extends Validator {
 	}
 
-	private static final ThreadLocal<Integer> INDEX = new ThreadLocal<Integer>();
-
 	@JsonIgnore
 	@XmlElements({
 		@XmlElement(name = "error", type = Error.class),
 		@XmlElement(name = "alert", type = Alert.class),
 	})
 	private List<Validator> validators;
-
-	public void setIndex(int index) {
-		INDEX.set(index);
-	}
-
-	public int getIndex() {
-		final Integer n = INDEX.get();
-		if (n == null) {
-			return 0;
-		}
-		INDEX.remove();
-		return n;
-	}
 
 	public List<Validator> getValidators() {
 		return validators;
