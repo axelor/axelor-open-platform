@@ -592,6 +592,15 @@ Grid.prototype.parse = function(view) {
 	element.show();
 	element.data('grid', grid);
 	
+	// delegate some methods to handler scope
+	//TODO: this spoils the handler scope, find some better way
+	handler.showColumn = _.bind(this.showColumn, this);
+	handler.resetColumns = _.bind(this.resetColumns, this);
+	handler.setColumnTitle = _.bind(this.setColumnTitle, this);
+
+	// set dummy columns to apply attrs if grid is not initialized yet
+	setDummyCols(element, this.cols);
+	
 	function adjustSize() {
 		scope.ajaxStop(function () {
 			setTimeout(function () {
@@ -690,12 +699,6 @@ Grid.prototype._doInit = function(view) {
 	this.subscribe(headerMenu.onBeforeMenuShow, this.onBeforeMenuShow);
 	this.subscribe(headerMenu.onCommand, this.onMenuCommand);
 
-	// delegate some methods to handler scope
-	//TODO: this spoils the handler scope, find some better way
-	handler.showColumn = _.bind(this.showColumn, this);
-	handler.resetColumns = _.bind(this.resetColumns, this);
-	handler.setColumnTitle = _.bind(this.setColumnTitle, this);
-
 	// hilite support
 	var getItemMetadata = dataView.getItemMetadata;
 	dataView.getItemMetadata = function (row) {
@@ -765,7 +768,6 @@ Grid.prototype._doInit = function(view) {
 	}
 	
 	setFilterCols();
-	setDummyCols(element, this.cols);
 	
 	var onInit = scope.onInit();
 	if (_.isFunction(onInit)) {
