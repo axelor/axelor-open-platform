@@ -769,6 +769,11 @@ Grid.prototype._doInit = function(view) {
 	
 	setFilterCols();
 	
+	// make sure to hide columns
+	if (this.visibleCols && this.visibleCols.length < this.cols.length) {
+		grid.setColumns(this.getVisibleColumns());
+	}
+
 	var onInit = scope.onInit();
 	if (_.isFunction(onInit)) {
 		onInit(grid);
@@ -882,8 +887,8 @@ Grid.prototype.showColumn = function(name, show) {
 	
 	show = _.isUndefined(show) ? true : show;
 	
-	var visible = new Array(),
-		current = new Array();
+	var visible = [],
+		current = [];
 	
 	_.each(cols, function(col){
 		if (col.id != name && _.contains(that.visibleCols, col.id))
@@ -893,13 +898,26 @@ Grid.prototype.showColumn = function(name, show) {
 	});
 	
 	this.visibleCols = visible;
+	
+	if (!this.$$initialized) {
+		return;
+	}
+	
 	current = _.filter(cols, function(col) {
 		return _.contains(visible, col.id);
 	});
+	
 	grid.setColumns(current);
 	grid.getViewport().rightPx = 0;
 	grid.resizeCanvas();
 	grid.autosizeColumns();
+};
+
+Grid.prototype.getVisibleColumns = function() {
+	var visible = this.visibleCols || [];
+	return _.filter(this.cols, function(col) {
+		return _.contains(visible, col.id);
+	});
 };
 
 Grid.prototype.resetColumns = function() {
