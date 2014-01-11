@@ -75,7 +75,14 @@ public class ActionGroup extends ActionIndex {
 	private String getPending(int index, String... prepend) {
 		final List<String> pending = Lists.newArrayList(prepend);
 		if ((index + 1) < actions.size()) {
-    		pending.add(getName() + "[" + (index + 1) + "]");
+			String name = getName();
+			if (name == null) { // dummy group
+				for (int i = index + 1; i < actions.size(); i++) {
+					pending.add(actions.get(i).getName());
+				}
+			} else {
+				pending.add(name + "[" + (index + 1) + "]");
+			}
     	}
     	return Joiner.on(",").skipNulls().join(pending);
 	}
