@@ -116,6 +116,10 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 	};
 	
 	$scope.canEdit = function () {
+		var parent = $scope.$parent;
+		if (parent.canEditTarget && !parent.canEditTarget()) {
+			return false;
+		}
 		return $scope.canView() && $scope.getValue();
 	};
 
