@@ -915,7 +915,13 @@ Grid.prototype.resetColumns = function() {
 };
 
 Grid.prototype.setColumnTitle = function(name, title) {
-	this.grid.updateColumnHeader(name, title);
+	if (this.$$initialized) {
+		return this.grid.updateColumnHeader(name, title);
+	}
+	var col = this.getColumn(name);
+	if (col && title) {
+		col.name = title;
+	}
 };
 
 Grid.prototype.getItemMetadata = function(row) {
