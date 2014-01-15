@@ -494,8 +494,8 @@ Grid.prototype.parse = function(view) {
 			column.groupTotalsFormatter = totalsFormatter;
 		}
 		
-		if (field.type === "button") {
-			return ;
+		if (field.type === "button" || field.type === "boolean") {
+			return;
 		}
 
 		var menus = [{
