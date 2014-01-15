@@ -128,7 +128,9 @@ function handleError(scope, item, message) {
 		return value;
 	};
 	
-	ctrl.$setValidity('invalid', false);
+	if (!item.hasClass('readonly')) {
+		ctrl.$setValidity('invalid', false);
+	}
 	ctrl.$viewChangeListeners.push(ctrl.$doReset);
 	ctrl.$formatters.push(ctrl.$doReset);
 }
