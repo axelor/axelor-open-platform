@@ -152,7 +152,7 @@ public class Resource<T extends Model> {
 	}
 
 	public Response perms() {
-		Set<JpaSecurity.AccessType> perms = security.get().perms(model);
+		Set<JpaSecurity.AccessType> perms = security.get().getAccessTypes(model, null);
 		Response response = new Response();
 
 		response.setData(perms);
@@ -162,7 +162,7 @@ public class Resource<T extends Model> {
 	}
 
 	public Response perms(Long id) {
-		Set<JpaSecurity.AccessType> perms = security.get().perms(model, id);
+		Set<JpaSecurity.AccessType> perms = security.get().getAccessTypes(model, id);
 		Response response = new Response();
 
 		response.setData(perms);
@@ -490,7 +490,7 @@ public class Resource<T extends Model> {
 			id = bean.getId();
 
 			if (bean != null && id != null && id > 0L) {
-				security.get().check(JpaSecurity.CAN_WRITE, bean);
+				security.get().check(JpaSecurity.CAN_WRITE, model, id);
 			}
 
 			bean = JPA.manage(bean);

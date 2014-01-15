@@ -52,6 +52,7 @@ import org.hibernate.annotations.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
@@ -327,7 +328,7 @@ public class Transition extends AuditableModel {
 
 			if ( user == null ) { return false; }
 			
-			if ( !role.getUsers().contains( user ) && !( user.getGroup() != null && role.getGroups().contains( user.getGroup() ) )) {
+			if ( !AuthUtils.hasRole(user, role.getName()) ) {
 				logger.debug( "Role ::: {}", role.getName() );
 				context.put("flash", JPA.translate("You have no sufficient rights."));
 				return false;

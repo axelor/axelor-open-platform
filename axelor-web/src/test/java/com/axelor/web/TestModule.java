@@ -43,39 +43,28 @@ public class TestModule extends AbstractModule {
 	public static class MySecurity implements JpaSecurity {
 
 		@Override
-		public Filter getFilter(AccessType type, Class<? extends Model> model,
-				Object... ids) {
+		public Set<AccessType> getAccessTypes(Class<? extends Model> model, Long id) {
 			return null;
 		}
 
 		@Override
-		public Set<AccessType> perms(Class<? extends Model> model) {
+		public boolean hasRole(String name) {
+			return false;
+		}
+
+		@Override
+		public Filter getFilter(AccessType type, Class<? extends Model> model, Long... ids) {
 			return null;
 		}
 
 		@Override
-		public Set<AccessType> perms(Class<? extends Model> model, Long id) {
-			return null;
+		public boolean isPermitted(AccessType type, Class<? extends Model> model, Long... ids) {
+			return true;
 		}
 
 		@Override
-		public Set<AccessType> perms(Model entity) {
-			return null;
-		}
-
-		@Override
-		public void check(AccessType type, Class<? extends Model> model) {
-			
-		}
-
-		@Override
-		public void check(AccessType type, Class<? extends Model> model, Long id) {
-			
-		}
-
-		@Override
-		public void check(AccessType type, Model entity) {
-			
+		public void check(AccessType type, Class<? extends Model> model, Long... ids) {
+		
 		}
 	}
 
