@@ -279,7 +279,27 @@ var NestedEditor = {
 			scope.visible = false;
 			element.hide();
 		};
-
+		
+		var icons = null;
+		scope.canShowIcon = function (which) {
+			var names;
+			if (icons === null) {
+				icons = {};
+				names = scope.field.icons || scope.$parent.field.icons;
+				if (names === false) {
+					icons[which] = false;
+				} else if (names === true) {
+					icons[which] = true;
+				} else if (names) {
+					names = names.split(',');
+					names.forEach(function (name) {
+						icons[name.trim()] = true;
+					});
+				}
+			}
+			return icons[which];
+		};
+		
 		scope.canClose = function() {
 			return scope.canToggle() && scope.canSelect();
 		};
@@ -323,8 +343,8 @@ var NestedEditor = {
 		'<legend>'+
 			'<span ng-bind-html-unsafe="title"></span> '+
 			'<span class="legend-toolbar" ng-show="!isReadonly()">'+
-				'<a href="" tabindex="-1" ng-click="onClear()" title="{{\'Clear\' | t}}"><i class="icon-ban-circle"></i></a> '+
-				'<a href="" tabindex="-1" ng-click="onSelect()" title="{{\'Select\' | t}}"><i class="icon-search"></i></a> '+
+				'<a href="" tabindex="-1" ng-click="onClear()" title="{{\'Clear\' | t}}" ng-show="canShowIcon(\'clear\')"><i class="icon-ban-circle"></i></a> '+
+				'<a href="" tabindex="-1" ng-click="onSelect()" title="{{\'Select\' | t}}" ng-show="canShowIcon(\'select\')"><i class="icon-search"></i></a> '+
 				'<a href="" tabindex="-1" ng-click="onClose()" title="{{\'Close\' | t}}" ng-show="canClose()"><i class="icon-remove-sign"></i></a>'+
 			'</span>'+
 		'</legend>'+

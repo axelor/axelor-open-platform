@@ -421,7 +421,10 @@ td.form-item > * {
 	bottom: 12px;
 }
 
-.form-item .nested-editor > legend > span.legend-toolbar {
+.form-item .nested-editor > legend > .legend-toolbar a:hover {
+	text-decoration: none;
+}
+.form-item .nested-editor > legend > .legend-toolbar a:first-of-type {
 	padding-left: 4px;
 }
 
