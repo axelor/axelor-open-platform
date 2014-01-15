@@ -44,7 +44,7 @@ public class CSVConfig {
 
 	public static final String NAMESPACE = "http://apps.axelor.com/xml/ns/data-import";
 
-	public static final String VERSION = "0.9";
+	public static final String VERSION = "2.0";
 
 	@XStreamImplicit(itemFieldName = "input")
 	private List<CSVInput> inputs = Lists.newArrayList();

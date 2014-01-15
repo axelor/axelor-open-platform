@@ -42,7 +42,7 @@ public class DomainModels {
 	
 	public static final String NAMESPACE = "http://apps.axelor.com/xml/ns/domain-models";
 
-	public static final String VERSION = "0.9";
+	public static final String VERSION = "2.0";
 	
 	@XmlElement(name = "module")
 	private Module module;
