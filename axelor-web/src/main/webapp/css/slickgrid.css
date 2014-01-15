@@ -295,7 +295,12 @@
 }
 
 .slick-sort-indicator {
-	margin-right: 18px;
+	display: none;
+}
+
+.slick-sort-indicator-asc,
+.slick-sort-indicator-desc {
+	display: inline-block;
 }
 
 .slick-header-menu {
