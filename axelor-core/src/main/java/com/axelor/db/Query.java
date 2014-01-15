@@ -315,7 +315,11 @@ public class Query<T extends Model> {
 	 */
 	public int update(Map<String, Object> values) {
 		final Map<String, Object> params = Maps.newHashMap();
-		final Map<String, Object> namedParams = Maps.newHashMap(this.namedParams);
+		final Map<String, Object> namedParams = Maps.newHashMap();
+		
+		if (this.namedParams != null) {
+			namedParams.putAll(this.namedParams);
+		}
 
 		for(String key : values.keySet()) {
 			String name = key.replaceFirst("^self\\.", "");
