@@ -195,9 +195,11 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 	
 	$scope.doClear = function(all) {
 		scopes.form.edit(null);
+		scopes.form.$broadcast('on:new');
 		scopes.grid.setItems([]);
 		if (all) {
 			scopes.toolbar.edit(null);
+			scopes.toolbar.doReset();
 		}
 	};
 	
@@ -514,13 +516,15 @@ function SearchToolbarCtrl($scope, $element, $http) {
 		
 		$scope.schema.loaded = true;
 		
-		$scope.$timeout(function () {
+		$scope.doReset = function () {
 			var record = $scope.record || {};
 			if (selected.length > 0 && _.isEmpty(record.objectSelect)) {
 				record.objectSelect = selected.join(', ');
 				$scope.edit(record);
 			}
-		});
+		};
+		
+		$scope.$timeout($scope.doReset);
 	});
 }
 
