@@ -13,7 +13,6 @@
       <field name="name" />
       <field name="code" />
       <field name="navigation" />
-      <field name="restricted" width="100"/>
     </grid>
 
 	<form name="group-form" title="Group">
@@ -23,19 +22,15 @@
 		<field name="name" validIf="name.length &gt;= 2" onChange="action-condition-group-validName" />
 		<field name="code" validIf="code.length &gt;= 2" onChange="action-condition-group-validCode" />
 		<field name="navigation" />
-		<field name="restricted" />
-		<field name="permissions" colSpan="2" onChange="action-validate-group-permissions" >
+		<break/>
+		<field name="roles" colSpan="2" grid-view="role-grid" form-view="role-form" />
+		<field name="permissions" colSpan="2">
 			<grid title="Permissions">
 				<field name="name" />
 				<field name="object" />
 			</grid>
 		</field>
-        <field name="roles" colSpan="2" grid-view="role-grid" form-view="role-form" />
 	</form>
-
-	<action-method name="action-validate-group-permissions">
-      <call class="com.axelor.auth.web.AuthValidator" method="validateGroup" />
-    </action-method>
 
     <action-condition name="action-condition-group-validName">
       <check error="Name length should be greater than 2." field="name" if="name?.length() &lt; 2" />
@@ -45,8 +40,7 @@
       <check error="Code length should be greater than 2." field="code" if="code?.length() &lt; 2" />
     </action-condition>
 
-    <action-view name="action-group-view-permissions" title="Permissions"
-      model="com.axelor.auth.db.Permission">
+    <action-view name="action-group-view-permissions" title="Permissions" model="com.axelor.auth.db.Permission">
       <view type="grid" name="permission-grid" />
       <view type="form" name="permission-form" />
       <domain>self.id IN (:permissions)</domain>

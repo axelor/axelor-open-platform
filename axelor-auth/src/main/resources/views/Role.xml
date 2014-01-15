@@ -7,18 +7,10 @@
         <field name="name"/>
     </grid>
     
-    <form name="role-form" title="Role" cols="4" model="com.axelor.auth.db.Role">
-        <field name="name" colSpan="2"/>
-        <break/>
-		<field name="groups" colSpan="2">
-          <grid title="Groups">
-            <field name="name"/>
-            <field name="code"/>
-          </grid>
-        </field>
-        <field name="users" colSpan="2"/>
-        <separator title="Description" colSpan="4"/>
-        <field name="description" colSpan="4" widget="Html[lite=true]" showTitle="false"/>
+    <form name="role-form" title="Role" cols="2" colWidths="150,*" model="com.axelor.auth.db.Role">
+        <field name="name" />
+        <field name="description" />
+		<field name="permissions" colSpan="2" />
     </form>
-    
+
 </object-views>

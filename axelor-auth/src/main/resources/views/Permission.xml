@@ -14,46 +14,22 @@
     <field name="canExport" width="100"/>
   </grid>
 
-  <form title="Permission" name="permission-form" cols="2" colWidths="*,175" onSave="action-validate-permission-object">
+  <form title="Permission" name="permission-form" cols="2" colWidths="*,175">
     <group title="General" cols="2" colWidths="100,*">
         <field name="name"/>
         <field name="object"/>
     </group>
-    <group title="Access" cols="3">
+    <group title="Allow" cols="3">
         <field name="canRead" widget="inline-checkbox"/>
         <field name="canWrite" widget="inline-checkbox"/>
         <field name="canCreate" widget="inline-checkbox"/>
         <field name="canRemove" widget="inline-checkbox"/>
         <field name="canExport" widget="inline-checkbox"/>
     </group>
-    <group title="Read" colSpan="2" cols="2" colWidths="100,*" showIf="canRead">
-        <field name="readCondition" title="Condition"/>
-        <field name="readParams" title="Params"/>
-    </group>
-    <group title="Write" colSpan="2" cols="2" colWidths="100,*" showIf="canWrite">
-        <field name="writeCondition" title="Condition"/>
-        <field name="writeParams" title="Params"/>
-    </group>
-    <group title="Create" colSpan="2" cols="2" colWidths="100,*" showIf="canCreate">
-        <field name="createCondition" title="Condition"/>
-        <field name="createParams" title="Params"/>
-    </group>
-    <group title="Remove" colSpan="2" cols="2" colWidths="100,*" showIf="canRemove">
-        <field name="removeCondition" title="Condition"/>
-        <field name="removeParams" title="Params"/>
-    </group>
-    <group title="Export" colSpan="2" cols="2" colWidths="100,*" showIf="canExport">
-        <field name="exportCondition" title="Condition"/>
-        <field name="expoParams" title="Params"/>
+    <group title="Condition" colSpan="2" cols="2" colWidths="100,*">
+        <field name="condition" title="Condition"/>
+        <field name="conditionParams" title="Params"/>
     </group>
   </form>
-  
-  <action-validate name="action-validate-permission-object">
-    <error message="Not a valid object name." if="action:action-method-permission-object"/>
-  </action-validate>
-  
-  <action-method name="action-method-permission-object">
-    <call class="com.axelor.auth.web.AuthValidator" method="isNotValidObject(object)"/>
-  </action-method>
 
 </object-views>
