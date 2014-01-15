@@ -38,21 +38,15 @@ import java.util.Set;
 
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.persistence.FlushModeType;
-import javax.persistence.TypedQuery;
 
-import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthorizedException;
 
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.User;
-import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
-import com.axelor.db.QueryBinder;
 import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
-import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -60,7 +54,7 @@ import com.google.common.collect.Sets;
 @Singleton
 class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
 
-	private static class Condition {
+	private static final class Condition {
 
 		private Filter filter;
 
@@ -99,6 +93,8 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
 			return filter.getQuery();
 		}
 	}
+	
+	private AuthResolver authResolver = new AuthResolver();
 
 	private User getUser() {
 		User user = AuthUtils.getUser();
@@ -112,209 +108,101 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
 	}
 
 	private Condition getCondition(User user, Permission permission, AccessType accessType) {
-		final String condition;
-		final String params;
-		switch (accessType) {
-		case READ:
-			condition = permission.getReadCondition();
-			params = permission.getReadParams();
-			break;
-		case WRITE:
-			condition = permission.getWriteCondition();
-			params = permission.getWriteParams();
-			break;
-		case CREATE:
-			condition = permission.getCreateCondition();
-			params = permission.getCreateParams();
-			break;
-		case REMOVE:
-			condition = permission.getRemoveCondition();
-			params = permission.getRemoveParams();
-			break;
-		default:
-			return null;
-		}
-
+		final String condition = permission.getCondition();
+		final String params = permission.getConditionParams();
 		if (condition == null || "".equals(condition.trim())) {
 			return null;
 		}
 		return new Condition(user, condition, params);
 	}
-
-	private boolean hasAccess(Permission permission, AccessType accessType) {
-		switch(accessType) {
-		case READ:
-			return permission.getCanRead() == Boolean.TRUE;
-		case WRITE:
-			return permission.getCanWrite() == Boolean.TRUE;
-		case CREATE:
-			return permission.getCanCreate() == Boolean.TRUE;
-		case REMOVE:
-			return permission.getCanRemove() == Boolean.TRUE;
-		default:
-			return false;
+	
+	@Override
+	public boolean hasRole(String name) {
+		final User user = getUser();
+		if (user == null) {
+			return true;
 		}
+		return AuthUtils.hasRole(user, name);
+	}
+	
+	@Override
+	public Set<AccessType> getAccessTypes(Class<? extends Model> model, Long id) {
+		final Set<AccessType> types = Sets.newHashSet();
+		for (AccessType type : AccessType.values()) {
+			if (isPermitted(type, model, id)) {
+				types.add(type);
+			}
+		}
+		return types;
 	}
 
 	@Override
-	public Filter getFilter(AccessType type, Class<? extends Model> model, Object... ids) {
-
+	public Filter getFilter(AccessType type, Class<? extends Model> model, Long... ids) {
 		final User user = getUser();
 		if (user == null) {
 			return null;
 		}
 
 		final List<Filter> filters = Lists.newArrayList();
-		final Permission permission = getPermission(model, user);
-
-		if (permission == null) {
+		final Set<Permission> permissions = authResolver.resolve(user, model.getName(), type);
+		if (permissions.isEmpty()) {
 			return null;
 		}
-
-		Condition condition = this.getCondition(user, permission, type);
-		if (condition == null) {
-			return null;
+		
+		for (Permission permission : permissions) {
+			Condition condition = this.getCondition(user, permission, type);
+			if (condition != null) {
+				filters.add(condition.getFilter());
+			}
 		}
 
-		filters.add(condition.getFilter());
+		if (filters.isEmpty() && ids.length == 0) {
+			return null;
+		}
+		
+		Filter left = filters.isEmpty() ? null : Filter.or(filters);
+		Filter right = null;
 
 		if (ids != null && ids.length > 0 && ids[0] != null) {
-			filters.add(0, Filter.in("self.id", Lists.newArrayList(ids)));
+			right = Filter.in("id", Lists.newArrayList(ids));
 		}
-		return Filter.and(filters);
-	}
-
-	private Permission getPermission(Class<? extends Model> model, User user) {
-		if (model == null || user == null) {
-			return null;
-		}
-		final TypedQuery<Permission> q = JPA.em().createQuery(
-				"SELECT p FROM User u " +
-				"LEFT JOIN u.group AS g " +
-				"LEFT JOIN g.permissions AS p " +
-				"WHERE u.code = :code AND p.object = :object", Permission.class);
-
-		q.setMaxResults(1);
-		q.setFlushMode(FlushModeType.COMMIT);
-
-		QueryBinder.of(q)
-			.bind("code", user.getCode())
-			.bind("object", model.getName())
-			.setCacheable();
-
-		try {
-			return q.getResultList().get(0);
-		} catch (IndexOutOfBoundsException e){
-			return null;
-		}
+		
+		if (right == null) return left;
+		if (left == null) return right;
+		
+		return Filter.and(left, right);
 	}
 
 	@Override
-	public Set<AccessType> perms(Class<? extends Model> model) {
+	public boolean isPermitted(AccessType type, Class<? extends Model> model, Long... ids) {
 		final User user = getUser();
 		if (user == null) {
-			return null;
+			return true;
 		}
-
-		final Set<AccessType> perms = Sets.newHashSet();
-		final Permission permission = getPermission(model, user);
-
-		if (permission == null) {
-			return null;
+		
+		final Set<Permission> permissions = authResolver.resolve(user, model.getName(), type);
+		if (permissions.isEmpty()) {
+			return false;
 		}
-
-		if (hasAccess(permission, CAN_READ)) perms.add(CAN_READ);
-		if (hasAccess(permission, CAN_WRITE)) perms.add(CAN_WRITE);
-		if (hasAccess(permission, CAN_CREATE)) perms.add(CAN_CREATE);
-		if (hasAccess(permission, CAN_REMOVE)) perms.add(CAN_REMOVE);
-
-		return perms;
-	}
-
-	@Override
-	public Set<AccessType> perms(Class<? extends Model> model, Long id) {
-		final User user = getUser();
-		if (user == null) {
-			return null;
+		
+		if (ids == null || ids.length == 0) {
+			return true;
 		}
-
-		final Set<AccessType> perms = Sets.newHashSet();
-		try {
-			check(CAN_READ, model, id);
-			perms.add(CAN_READ);
-		} catch (AuthorizationException e) {
-		}
-		try {
-			check(CAN_WRITE, model, id);
-			perms.add(CAN_WRITE);
-		} catch (AuthorizationException e) {
-		}
-		try {
-			check(CAN_CREATE, model, id);
-			perms.add(CAN_CREATE);
-		} catch (AuthorizationException e) {
-		}
-		try {
-			check(CAN_REMOVE, model, id);
-			perms.add(CAN_REMOVE);
-		} catch (AuthorizationException e) {
-		}
-
-		return perms;
-	}
-
-	@Override
-	public Set<AccessType> perms(Model entity) {
-		return perms(entity.getClass(), entity.getId());
-	}
-
-	@Override
-	public void check(AccessType type, Class<? extends Model> model) {
-		final User user = getUser();
-		if (user == null) {
-			return;
-		}
-
-		final Permission permission = getPermission(model, user);
-		final boolean permitted = permission != null && hasAccess(permission, type);
-		final boolean checkRestricted = permission == null;
-
-		if (permission != null && !permitted) {
-			throw new UnauthorizedException(type.toString());
-		}
-
-		if (checkRestricted && user.getGroup().getRestricted() == Boolean.TRUE) {
-			throw new UnauthorizedException(type.toString());
-		}
-	}
-
-	@Override
-	public void check(AccessType type, Class<? extends Model> model, Long id) {
-		final User user = getUser();
-		if (user == null) {
-			return;
-		}
-
-		check(type, model);
-
-		final Filter filter = this.getFilter(type, model, id);
+		
+		final Filter filter = this.getFilter(type, model, ids);
 		if (filter == null) {
-			return;
+			return true;
 		}
-
-		final Model found = filter.build(model).fetchOne();
-		if (found == null || !Objects.equal(found.getId(), id)) {
-			throw new UnauthorizedException(type.toString());
-		}
+		
+		return filter.build(model).count() == ids.length;
 	}
-
+	
 	@Override
-	public void check(AccessType type, Model entity) {
-		final User user = getUser();
-		if (user == null || entity == null) {
+	public void check(AccessType type, Class<? extends Model> model, Long... ids) {
+		if (isPermitted(type, model, ids)) {
 			return;
 		}
-		check(type, entity.getClass(), entity.getId());
+		throw new UnauthorizedException(type.getMessage());
 	}
 
 	@Override

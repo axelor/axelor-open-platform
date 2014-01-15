@@ -30,11 +30,19 @@
  */
 package com.axelor.auth;
 
+import java.util.List;
+
+import javax.persistence.FlushModeType;
+import javax.persistence.TypedQuery;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.subject.Subject;
+import org.joda.time.LocalDate;
 
 import com.axelor.auth.db.User;
+import com.axelor.db.JPA;
+import com.axelor.db.QueryBinder;
 
 public class AuthUtils {
 
@@ -59,5 +67,42 @@ public class AuthUtils {
 		}
 		return User.all().filter("self.code = ?", code)
 				.cacheable().autoFlush(false).fetchOne();
+	}
+	
+	public static boolean isActive(final User user) {
+		if (user.getArchived() == Boolean.TRUE ||
+			user.getBlocked() == Boolean.TRUE) {
+			return false;
+		}
+		
+		final LocalDate from = user.getActivateOn();
+		final LocalDate till = user.getExpiresOn();
+		final LocalDate now = LocalDate.now();
+		
+		if ((from != null && from.isAfter(now)) ||
+			(till != null && till.isBefore(now))) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private static final String QS_HAS_ROLE = "SELECT self.id FROM Role self WHERE "
+			+ "(self.name = :name) AND "
+			+ "("
+			+ "  (self.id IN (SELECT r.id FROM User u LEFT JOIN u.roles AS r WHERE u.code = :user)) OR "
+			+ "  (self.id IN (SELECT r.id FROM User u LEFT JOIN u.group AS g LEFT JOIN g.roles AS r WHERE u.code = :user))"
+			+ ")";
+	
+	public static boolean hasRole(final User user, final String role) {
+		final TypedQuery<Long> query = JPA.em().createQuery(QS_HAS_ROLE, Long.class);
+		query.setParameter("name", role);
+		query.setParameter("user", user.getCode());
+		query.setMaxResults(1);
+		
+		QueryBinder.of(query).opts(true, FlushModeType.COMMIT);
+		
+		final List<Long> ids = query.getResultList();
+		return ids != null && ids.size() == 1;
 	}
 }

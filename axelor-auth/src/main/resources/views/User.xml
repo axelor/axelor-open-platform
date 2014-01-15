@@ -22,10 +22,11 @@
         <group title="Authorization">
             <field name="blocked"/>
             <break/>
-            <field name="activeFrom" validIf="!activeFrom || (activeFrom &amp;&amp; !activeTo) || (activeFrom &amp;&amp; activeTo &amp;&amp; $moment(activeTo) &gt;= $moment(activeFrom))"/>
-        	<field name="activeTo" validIf="!activeTo || (!activeFrom &amp;&amp; activeTo) || (activeFrom &amp;&amp; activeTo &amp;&amp; $moment(activeTo) &gt;= $moment(activeFrom))"/>
+            <field name="activateOn" validIf="!activateOn || (activateOn &amp;&amp; !expiresOn) || (activateOn &amp;&amp; expiresOn &amp;&amp; $moment(expiresOn) &gt;= $moment(activateOn))"/>
+        	<field name="expiresOn" validIf="!expiresOn || (!activateOn &amp;&amp; expiresOn) || (activateOn &amp;&amp; expiresOn &amp;&amp; $moment(expiresOn) &gt;= $moment(activateOn))"/>
         </group>
         <field name="roles" grid-view="role-grid" form-view="role-form" />
+        <field name="permissions"/>
     </form>
     
     <action-condition name="action-condition-user-validCode">

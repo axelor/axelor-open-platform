@@ -10,11 +10,9 @@
     This object store the roles.
     ]]>
     
-    <string name="name" required="true" />
-    <string name="description" large="true" />
-    <many-to-many name="users" ref="com.axelor.auth.db.User" mappedBy="roles" />
-    <many-to-many name="groups" ref="com.axelor.auth.db.Group" mappedBy="roles" />
-    
+    <string name="name" required="true" unique="true" />
+    <string name="description" />
+    <many-to-many name="permissions" ref="Permission" />
   </entity>
-  
+
 </domain-models>
