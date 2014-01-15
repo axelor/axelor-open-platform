@@ -237,6 +237,7 @@ var NestedEditor = {
 				if (!nested || !value) return;
 				var record = nested.record || {};
 				if (record.id === value.id) {
+					updateFlag = true;
 					_.extend(record, value);
 				}
 			});
