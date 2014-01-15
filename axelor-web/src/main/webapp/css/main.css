@@ -460,6 +460,7 @@ input[readonly], select[readonly], textarea[readonly] {
 .record-toolbar {
 	margin-top: 2px;
 	margin-bottom: 4px;
+	min-width: 480px;
 }
 
 .record-toolbar .navbar-inner {

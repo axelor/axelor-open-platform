@@ -495,6 +495,12 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			var elem = element.find('.view-pane [ui-view-form]:first').first();
 			if (elem.size()) {
 				height = elem[0].scrollHeight + 16;
+				width = Math.max(width, elem[0].scrollWidth + 32);
+			}
+			elem = element.find('.record-toolbar:first').first();
+			if (elem.size()) {
+				height += elem[0].scrollHeight + 16;
+				width = Math.max(width, elem[0].scrollWidth + 32);
 			}
 			
 			height += element.parent().children('.ui-dialog-titlebar').outerHeight(true);
