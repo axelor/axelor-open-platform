@@ -101,20 +101,24 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 	};
 
 	$scope._routeSearch = null;
+	var onNewCalled = false;
 	$scope.setRouteOptions = function(options) {
 		var opts = options || {},
 			fields = $scope._searchFields || [],
 			search = opts.search,
 			record = {};
-
-		if (!search || _.isEmpty(search)) {
-			scopes.form.$broadcast('on:new');
-		}
-		if (!search || _.isEmpty(search) || angular.equals($scope._routeSearch, search)) {
-			return $scope.updateRoute();
-		}
+		
+		var changed = angular.equals($scope._routeSearch, search);
 		
 		$scope._routeSearch = search;
+		
+		if (!onNewCalled && _.isEmpty(search)) {
+			onNewCalled = true;
+			scopes.form.$broadcast('on:new');
+		}
+		if (!search || _.isEmpty(search) || !changed) {
+			return $scope.updateRoute();
+		}
 		
 		_.each(fields, function(field) {
 			var value = search[field.name];
