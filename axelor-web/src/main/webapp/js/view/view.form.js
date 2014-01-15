@@ -255,6 +255,9 @@ function FormViewCtrl($scope, $element) {
 			if (value && value.$updatedValues) {
 				dummy[name] = value.$updatedValues;
 			}
+			if (name.indexOf('$') === 0) {
+				dummy[name.substring(1)] = dummy[name];
+			}
 		});
 		
 		context = _.extend(context, dummy);
@@ -411,7 +414,7 @@ function FormViewCtrl($scope, $element) {
 		if (!$scope.record) return {};
 		var fields = _.keys($scope.fields);
 		var extra = _.chain($scope.fields_view)
-					  .filter(function(f){ return f.widget && !_.contains(fields, f.name); })
+					  .filter(function(f){ return f.name && !_.contains(fields, f.name); })
 					  .pluck('name')
 					  .compact()
 					  .value();
