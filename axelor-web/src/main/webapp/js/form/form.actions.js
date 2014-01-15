@@ -423,8 +423,10 @@ ActionHandler.prototype = {
 		}
 		
 		if (data.save) {
-			this._handleSave().then(function(){
-				deferred.resolve(data.pending);
+			scope.$timeout(function () {
+				self._handleSave().then(function(){
+					deferred.resolve(data.pending);
+				});
 			});
 			return deferred.promise;
 		}
