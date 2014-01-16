@@ -103,8 +103,9 @@ function FormViewCtrl($scope, $element) {
 
 		if (recordId) {
 			return viewPromise.then(function(){
+				var forceEdit = params.forceEdit || (params.params && params.params.forceEdit);
 				doEdit(recordId);
-				if (params.forceEdit) {
+				if (forceEdit) {
 					$scope.setEditable();
 				}
 			});
