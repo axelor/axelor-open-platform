@@ -856,24 +856,26 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			
 			unwatch();
 
+			var params = (scope._viewParams || {}).params || {};
 			var schema = scope.schema;
 			var form = parse(scope, schema, scope.fields);
 
 			form = $compile(form)(scope);
 			element.append(form);
-			
+
 			if (!scope._isPopup) {
 				element.addClass('has-width');
 			}
-			
-			if (schema.width) {
-				if (schema.width === '100%' || schema.width === '*') {
+
+			var width = schema.width || params.width;
+			if (width) {
+				if (width === '100%' || width === '*') {
 					element.removeClass('has-width');
 				}
 				form.css({
-					width: schema.width,
-					minWidth: schema.minWidth,
-					maxWidth: schema.maxWidth
+					width: width,
+					minWidth: schema.minWidth || params.minWidth,
+					maxWidth: schema.maxWidth || params.maxWidth
 				});
 			}
 			
