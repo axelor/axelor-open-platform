@@ -5,7 +5,7 @@
     <groupId>com.axelor</groupId>
     <artifactId>axelor-parent</artifactId>
     <version>0.9.0-SNAPSHOT</version>
-    <relativePath>../axelor-parent/pom.xml</relativePath>
+    <relativePath>../../axelor-maven/axelor-parent/pom.xml</relativePath>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -49,7 +49,7 @@
       <artifactId>validation-api</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <!-- Unified EL -->
     <dependency>
       <groupId>javax.el</groupId>
