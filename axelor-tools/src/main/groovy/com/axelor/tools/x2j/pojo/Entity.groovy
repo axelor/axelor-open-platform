@@ -103,6 +103,8 @@ class Entity {
 
 		importManager = new ImportManager(namespace, groovy)
 
+		importType("javax.persistence.EntityManager")
+		importType("com.axelor.db.Model")
 		importType("com.axelor.db.JPA")
 		importType("com.axelor.db.Query")
 
