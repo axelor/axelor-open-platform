@@ -45,6 +45,8 @@ class Property {
 	String code
 
 	String target
+	
+	String targetFqn
 
 	Entity entity
 
@@ -63,7 +65,8 @@ class Property {
 		name = node.@name
 		type = node.name()
 		code = node.text()
-		target = entity.importType(node.@ref.toString())
+		targetFqn = node.@ref.toString()
+		target = entity.importType(targetFqn)
 		attrs = node.attributes()
 
 		if (!name) {
@@ -96,7 +99,7 @@ class Property {
 				return "byte[]"
 			case "one-to-one":
 			case "many-to-one":
-				return entity.importType(target)
+				return entity.importType(targetFqn)
 			case "one-to-many":
 				return entity.importType("java.util.List<$target>")
 			case "many-to-many":
