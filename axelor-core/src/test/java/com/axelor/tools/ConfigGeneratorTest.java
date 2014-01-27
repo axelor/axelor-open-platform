@@ -28,15 +28,36 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.tools.cmd;
+package com.axelor.tools;
 
-import io.airlift.command.Command;
+import java.io.IOException;
+import java.io.StringWriter;
 
-@Command(name = "generate", description = "Generate code")
-public class GenerateCommand extends AxelorCommand {
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-	@Override
-	public void run() {
+import com.axelor.MyModule;
+import com.axelor.test.GuiceModules;
+import com.axelor.test.GuiceRunner;
 
+@RunWith(GuiceRunner.class)
+@GuiceModules({ MyModule.class })
+public class ConfigGeneratorTest {
+
+	@Test
+	public void test1() throws IOException {
+		ConfigGenerator gen = new ConfigGenerator();
+
+		StringWriter writer = new StringWriter();
+		gen.generate(writer);
+	}
+
+	@Test
+	public void test2() throws IOException {
+		ConfigGenerator gen = new ConfigGenerator();
+		gen.setBigName("big");
+
+		StringWriter writer = new StringWriter();
+		gen.ehcache(writer);
 	}
 }

@@ -13,17 +13,31 @@
   <name>Axelor :: Tools</name>
 
   <dependencies>
+  
+    <!-- Google Guava -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+    </dependency>
+  
     <!-- Use Inflector from Jersey -->
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-server</artifactId>
     </dependency>
-    <!-- command line parser -->
+  
+    <!-- Axelor Test API -->
     <dependency>
-      <groupId>io.airlift</groupId>
-      <artifactId>airline</artifactId>
-      <version>0.6</version>
+      <groupId>com.axelor</groupId>
+      <artifactId>axelor-test</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
+
   </dependencies>
 
 </project>

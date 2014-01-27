@@ -28,7 +28,7 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.tools.cfg;
+package com.axelor.tools;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -49,7 +49,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 
-public final class Generator {
+public final class ConfigGenerator {
 
 	private static final String[] CORE = {
 		"auth",
@@ -65,7 +65,7 @@ public final class Generator {
 
 	private String bigName;
 
-	public Generator() {
+	public ConfigGenerator() {
 
 	}
 

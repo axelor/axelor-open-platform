@@ -101,6 +101,13 @@
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
     </dependency>
+    
+    <!-- command line parser -->
+    <dependency>
+      <groupId>io.airlift</groupId>
+      <artifactId>airline</artifactId>
+      <version>0.6</version>
+    </dependency>
 
     <!-- Logging -->
     <dependency>
