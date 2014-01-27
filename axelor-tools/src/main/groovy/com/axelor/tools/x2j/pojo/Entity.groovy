@@ -192,9 +192,8 @@ class Entity {
 	}
 	
 	String getImplementStmt() {
-		if (interfaces) {
-			return " implements " + interfaces
-		}
+		if (!interfaces || interfaces.trim() == "") return ""
+		return " implements " + interfaces
 	}
 
 	String findDocs(parent) {
