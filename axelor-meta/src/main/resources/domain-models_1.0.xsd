@@ -616,6 +616,22 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
+      <xsd:element name="extra-imports" minOccurs="0" type="xsd:string">
+      	<xsd:annotation>
+      		<xsd:documentation>
+      		Provide extra import statements.
+      		</xsd:documentation>
+      	</xsd:annotation>
+      </xsd:element>
+      <xsd:element name="extra-code" minOccurs="0" type="xsd:string">
+      	<xsd:annotation>
+      		<xsd:documentation>
+      		Put extra code to the end of the class body (generally interface implementation).
+      		Be careful of this feature else you may have unexpected results. Only provide methods
+      		and try to avoid storing states to any variables except fields defined above.
+      		</xsd:documentation>
+      	</xsd:annotation>
+      </xsd:element>
     </xsd:sequence>
 
     <xsd:attribute use="required" name="name">
@@ -687,6 +703,13 @@
         Specifies whether the entity should be cached if caching is enabled.
         </xsd:documentation>
       </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="implements" type="xsd:string">
+    	<xsd:annotation>
+    		<xsd:documentation>
+    		Specify the list of interfaces to implement.
+    		</xsd:documentation>
+    	</xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="extends"  type="xsd:string">
       <xsd:annotation>

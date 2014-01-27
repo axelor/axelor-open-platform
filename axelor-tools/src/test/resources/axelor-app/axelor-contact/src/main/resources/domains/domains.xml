@@ -4,8 +4,8 @@
   xsi:schemaLocation="http://apps.axelor.com/xml/ns/domain-models http://apps.axelor.com/xml/ns/domain-models/domain-models_2.0.xsd">
 
   <module name="contact" package="com.axelor.contact.db" />
-
-  <entity name="Title" cachable="true">
+  
+  <entity name="Title" cachable="true" implements="java.io.Serializable">
     <![CDATA[
     This class represents the name initial like Mr., Mrs. etc.
     
@@ -22,6 +22,36 @@
     ]]>
     <string name="code" column="ccc" required="true" unique="true" min="2" hashKey="false" help="The unique code."/>
     <string name="name" required="true" unique="true" min="2" help="The title name." index="idx_my"/>
+    
+    <extra-imports>
+    import org.slf4j.*;
+    import java.util.List;
+    import static com.google.common.collect.Lists.newArrayList;
+    </extra-imports>
+    
+    <extra-code>
+    <![CDATA[
+    private static final Logger log = LoggerFactory.getLogger(Title.class);
+    
+	public static List<String> getFooNames() {
+    	final List<String> names = newArrayList();
+    	names.add("foo");
+    	names.add("bar");
+    	return names;
+	}
+
+	public Title saveAndLog() {
+    	Title title = null;
+		log.info("saving Title instance: " + this.getCode());
+    	try {
+    		title = this.save();
+    	} catch (Exception e) {
+    		log.error("error saving Title");
+    	}
+    	return title;
+    }
+    ]]>
+    </extra-code>
   </entity>
 
   <entity name="Group">
