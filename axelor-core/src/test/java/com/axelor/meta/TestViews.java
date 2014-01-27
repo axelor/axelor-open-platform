@@ -55,7 +55,7 @@ public class TestViews extends AbstractTest {
 
 	@Test
 	public void test1() throws Exception {
-		ObjectViews views = this.unmarshal("Contact.xml", ObjectViews.class);
+		ObjectViews views = this.unmarshal("com/axelor/meta/Contact.xml", ObjectViews.class);
 
 		assertNotNull(views);
 		assertNotNull(views.getViews());
@@ -68,7 +68,7 @@ public class TestViews extends AbstractTest {
 
 	@Test
 	public void test2() throws Exception {
-		ObjectViews views = this.unmarshal("Welcome.xml", ObjectViews.class);
+		ObjectViews views = this.unmarshal("com/axelor/meta/Welcome.xml", ObjectViews.class);
 
 		assertNotNull(views);
 		assertNotNull(views.getViews());
@@ -82,7 +82,7 @@ public class TestViews extends AbstractTest {
 	@Test
 	@Transactional
 	public void test3() throws Exception {
-		ObjectViews views = this.unmarshal("Search.xml", ObjectViews.class);
+		ObjectViews views = this.unmarshal("com/axelor/meta/Search.xml", ObjectViews.class);
 		assertNotNull(views);
 		assertNotNull(views.getViews());
 		assertEquals(1, views.getViews().size());
@@ -126,7 +126,7 @@ public class TestViews extends AbstractTest {
 
 	@Test
 	public void testInclude() throws Exception {
-		ObjectViews views = this.unmarshal("Include.xml", ObjectViews.class);
+		ObjectViews views = this.unmarshal("com/axelor/meta/Include.xml", ObjectViews.class);
 
 		MetaStore.resister(views);
 

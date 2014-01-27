@@ -15,11 +15,7 @@
   <name>Axelor :: Wkf</name>
 
   <dependencies>
-    <dependency>
-      <groupId>com.axelor</groupId>
-      <artifactId>axelor-meta</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+
   </dependencies>
 
 </project>
