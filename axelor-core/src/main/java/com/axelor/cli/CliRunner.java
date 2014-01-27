@@ -28,36 +28,24 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.tools;
+package com.axelor.cli;
 
-import java.io.IOException;
-import java.io.StringWriter;
+import io.airlift.command.Cli;
+import io.airlift.command.Cli.CliBuilder;
+import io.airlift.command.Help;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+public final class CliRunner {
 
-import com.axelor.test.GuiceModules;
-import com.axelor.test.GuiceRunner;
-import com.axelor.tools.cfg.Generator;
+	public static void main(String[] args) {
 
-@RunWith(GuiceRunner.class)
-@GuiceModules({ MyModule.class })
-public class CfgTest {
+		//TODO: scan for all commands
+		
+		CliBuilder<Runnable> builder = Cli.<Runnable>builder("axelor")
+				.withDescription("axelor commands")
+				.withDefaultCommand(Help.class)
+				.withCommand(Help.class);
 
-	@Test
-	public void test1() throws IOException {
-		Generator gen = new Generator();
-
-		StringWriter writer = new StringWriter();
-		gen.generate(writer);
-	}
-
-	@Test
-	public void test2() throws IOException {
-		Generator gen = new Generator();
-		gen.setBigName("big");
-
-		StringWriter writer = new StringWriter();
-		gen.ehcache(writer);
+		Cli<Runnable> runner = builder.build();
+		runner.parse(args).run();
 	}
 }

@@ -31,5 +31,5 @@
 #
 
 args=`echo "$@"`
-exec mvn -q exec:java -Dexec.mainClass="com.axelor.tools.Runner" -Dexec.args="$args"
+exec mvn -q exec:java -Dexec.mainClass="com.axelor.cli.CliRunner" -Dexec.args="$args"
 
