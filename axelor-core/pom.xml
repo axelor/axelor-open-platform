@@ -25,18 +25,6 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>com.axelor</groupId>
-      <artifactId>axelor-contact</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.axelor</groupId>
-      <artifactId>axelor-sale</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
 
     <!-- Joda Time -->
     <dependency>
