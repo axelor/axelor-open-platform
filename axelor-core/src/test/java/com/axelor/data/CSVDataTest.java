@@ -30,41 +30,39 @@
  */
 package com.axelor.data;
 
+
 import java.io.IOException;
 
 import org.junit.Test;
 
-import com.axelor.data.xml.XMLImporter;
 import com.google.inject.AbstractModule;
 
-public class XMLDataTest {
-
-	static class Module extends MyModule {
-
-		@Override
-		protected void configureImport() {
-			bind(Importer.class).to(XMLImporter.class);
-		}
-	}
-
+public class CSVDataTest {
+	
 	static class MyLauncher extends Launcher {
 		
 		@Override
 		protected AbstractModule createModule() {
 			
-			return new Module();
+			return new MyModule();
 		}
 	}
 
 	@Test
-	public void testTypes() throws IOException {
+	public void testDefault() throws IOException {
 		MyLauncher launcher = new MyLauncher();
-		launcher.run("-c", "data/xml-config-types.xml", "-d", "data/xml");
+		launcher.run("-c", "data/data-test/csv-config.xml", "-d", "data/csv");
 	}
 	
 	@Test
-	public void testDefault() throws IOException {
+	public void testMulti() throws IOException {
 		MyLauncher launcher = new MyLauncher();
-		launcher.run("-c", "data/xml-config.xml", "-d", "data/xml");
+		launcher.run("-c", "data/data-test/csv-multi-config.xml", "-d", "data/data-test/csv-multi", "-Dsale.order=so1.csv,so2.csv");
+	}
+	
+	@Test
+	public void testData() throws IOException {
+		MyLauncher launcher = new MyLauncher();
+		launcher.run("-c", "data/data-test/csv-config-types.xml", "-d", "data/data-test/csv");
 	}
 }

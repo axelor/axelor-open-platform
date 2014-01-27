@@ -26,8 +26,6 @@
     <module>axelor-test</module>
     <module>axelor-core</module>
     <module>axelor-tools</module>
-    <module>axelor-meta</module>
-    <module>axelor-data</module>
     <module>axelor-web</module>
     <module>axelor-wkf</module>
   </modules>

@@ -74,7 +74,7 @@ public class TestWS extends AbstractTest {
 	
 	@Test
 	public void test1() throws Exception {
-		ObjectViews views = this.unmarshal("WSTest.xml", ObjectViews.class);
+		ObjectViews views = this.unmarshal("com/axelor/meta/WSTest.xml", ObjectViews.class);
 		List<Action> actions = views.getActions();
 
 		Assert.assertNotNull(actions);
@@ -96,7 +96,7 @@ public class TestWS extends AbstractTest {
 	
 	@Test
 	public void test2() throws Exception {
-		ObjectViews views = this.unmarshal("WSTest.xml", ObjectViews.class);
+		ObjectViews views = this.unmarshal("com/axelor/meta/WSTest.xml", ObjectViews.class);
 
 		MetaStore.resister(views);
 		
