@@ -44,6 +44,8 @@ class Entity {
 	String module
 
 	String namespace
+	
+	private String interfaces
 
 	String baseClass
 
@@ -74,6 +76,10 @@ class Entity {
 	Map<String, Property> propertyMap
 
 	private ImportManager importManager
+	
+	private String extraImports;
+	
+	private String extraCode
 
 	Entity(NodeChild node) {
 		name = node.@name
@@ -85,6 +91,7 @@ class Entity {
 		groovy = node.'@lang' == "groovy"
 		hashAll = node.'@hashAll' == "true"
 		cachable = node.'@cachable'
+		interfaces = node.'@implements'
 		baseClass = node.'@extends'
 		strategy = node.'@strategy'
 		documentation = findDocs(node)
@@ -100,9 +107,9 @@ class Entity {
 		if (!namespace) {
 			namespace = "com.axelor.${module}.db"
 		}
-
+		
 		importManager = new ImportManager(namespace, groovy)
-
+		
 		importType("javax.persistence.EntityManager")
 		importType("com.axelor.db.Model")
 		importType("com.axelor.db.JPA")
@@ -113,7 +120,12 @@ class Entity {
 		constraints = []
 		indexes = []
 		finders = []
+		extraCode = null
 
+		if (interfaces) {
+			interfaces = interfaces.split(",").collect { importType(it.trim()) }.join(", ")
+		}
+		
 		if (!baseClass) {
 			if (node.@logUpdates != "false") {
 				baseClass = "com.axelor.auth.db.AuditableModel"
@@ -130,23 +142,31 @@ class Entity {
 		}
 
 		node."*".each {
-			if (it.name() ==  "unique-constraint") {
-				return constraints += new Constraint(this, it)
-			}
-			if (it.name() == "index") {
-				return indexes += new Index(this, it)
-			}
-			if (it.name() ==  "finder-method") {
-				return finders += new Finder(this, it)
-			}
-			Property field = new Property(this, it)
-			properties += field
-			propertyMap[field.name] = field
-			if (field.isVirtual() && !field.isTransient()) {
-				dynamicUpdate = true
+			switch (it.name()) {
+			case "index":
+				indexes += new Index(this, it)
+				break
+			case "unique-constraint":
+				constraints += new Constraint(this, it)
+				break
+			case "finder-method":
+				finders += new Finder(this, it)
+				break
+			case "extra-imports":
+				extraImports = it.text()
+				break
+			case "extra-code":
+				extraCode = it.text()
+				break
+			default:
+				Property field = new Property(this, it)
+				properties += field
+				propertyMap[field.name] = field
+				if (field.isVirtual() && !field.isTransient()) {
+					dynamicUpdate = true
+				}
 			}
 		}
-
 	}
 
 	boolean addField(Property field) {
@@ -169,6 +189,12 @@ class Entity {
 
 	String getBaseClass() {
 		return importType(baseClass)
+	}
+	
+	String getImplementStmt() {
+		if (interfaces) {
+			return " implements " + interfaces
+		}
 	}
 
 	String findDocs(parent) {
@@ -217,6 +243,16 @@ class Entity {
 		}
 
 		return "\t" + Utils.stripCode(lines.join("\n"), "\n\t")
+	}
+	
+	String getExtraCode() {
+		if (!extraCode || extraCode.trim().isEmpty()) return "";
+		return "\n\t" + Utils.stripCode(extraCode, "\n\t")
+	}
+	
+	String getExtraImports() {
+		if (!extraImports || extraImports.trim().isEmpty()) return "";
+		return "\n" + Utils.stripCode(extraImports, "\n") + "\n"
 	}
 
 	private List<Property> getHashables() {

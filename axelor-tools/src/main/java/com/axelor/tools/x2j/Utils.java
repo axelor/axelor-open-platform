@@ -42,7 +42,7 @@ public class Utils {
 		if (code == null || code.trim().length() == 0) {
 			return "";
 		}
-		String text = StringGroovyMethods.stripIndent(code).replaceAll("    ", "\t");
+		String text = StringGroovyMethods.stripIndent(code.replaceAll("    ", "\t"));
 		text = text.trim().replaceAll("\n", joinWith).trim();
 		return text;
 	}
