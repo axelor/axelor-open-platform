@@ -17,11 +17,6 @@
   <dependencies>
     <dependency>
       <groupId>com.axelor</groupId>
-      <artifactId>axelor-auth</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.axelor</groupId>
       <artifactId>axelor-data</artifactId>
       <version>${project.version}</version>
     </dependency>
