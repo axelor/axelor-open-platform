@@ -483,7 +483,7 @@ ui.directive('uiFilterBox', function() {
 			}
 
 			if (filterView) {
-				filterDS.rpc('com.axelor.meta.web.MetaUserController:findFilters', {
+				filterDS.rpc('com.axelor.meta.web.MetaFilterController:findFilters', {
 					model: 'com.axelor.meta.db.MetaFilter',
 					context: {
 						filterView: filterView
@@ -615,7 +615,7 @@ ui.directive('uiFilterBox', function() {
 					filterCustom: angular.toJson(custom)
 				};
 
-				filterDS.rpc('com.axelor.meta.web.MetaUserController:saveFilter', {
+				filterDS.rpc('com.axelor.meta.web.MetaFilterController:saveFilter', {
 					model: 'com.axelor.meta.db.MetaFilter',
 					context: value
 				}).success(function(res) {
@@ -631,7 +631,7 @@ ui.directive('uiFilterBox', function() {
 				}
 
 				function doDelete() {
-					filterDS.rpc('com.axelor.meta.web.MetaUserController:removeFilter', {
+					filterDS.rpc('com.axelor.meta.web.MetaFilterController:removeFilter', {
 						model: 'com.axelor.meta.db.MetaFilter',
 						context: {
 							name: name,

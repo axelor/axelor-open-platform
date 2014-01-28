@@ -30,32 +30,17 @@
  */
 package com.axelor.meta.web;
 
-import java.util.Map;
-
 import javax.inject.Inject;
 
 import com.axelor.meta.db.MetaFilter;
-import com.axelor.meta.db.MetaUser;
-import com.axelor.meta.service.MetaUserService;
+import com.axelor.meta.service.MetaFilterService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
-import com.google.common.collect.Maps;
 
-public class MetaUserController {
+public class MetaFilterController {
 
 	@Inject
-	private MetaUserService service;
-	
-	public void load(ActionRequest request, ActionResponse response) {
-		MetaUser prefs = service.getPreferences();
-		Map<String, Object> values = Maps.newHashMap();
-		
-		values.put("id", prefs.getId());
-		
-		response.setValues(values);
-		response.setReload(true);
-		response.setStatus(ActionResponse.STATUS_SUCCESS);
-	}
+	private MetaFilterService service;
 	
 	public void saveFilter(ActionRequest request, ActionResponse response) {
 		MetaFilter ctx = request.getContext().asType(MetaFilter.class);

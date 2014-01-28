@@ -35,6 +35,7 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
+import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.meta.MetaLoader;
 import com.axelor.meta.MetaStore;
@@ -42,7 +43,6 @@ import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaField;
 import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.MetaTranslation;
-import com.axelor.meta.db.MetaUser;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
@@ -125,7 +125,7 @@ public class MetaController {
 			public void run() {
 
 				// backup user actions
-				for(MetaUser user : MetaUser.all().fetch()) {
+				for(User user : User.all().fetch()) {
 					if (user.getAction() != null) {
 						userActions.put(user.getId(), user.getAction().getName());
 					}
@@ -153,7 +153,7 @@ public class MetaController {
 
 				// restore use actions
 				for(Long id : userActions.keySet()) {
-					MetaUser user = MetaUser.find(id);
+					User user = User.find(id);
 					user.setAction(MetaAction.findByName(userActions.get(id)));
 				}
 			}
