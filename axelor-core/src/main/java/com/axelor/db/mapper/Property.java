@@ -454,8 +454,12 @@ public class Property {
 	 *            additional items
 	 * @return the same bean instance
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Object add(Object bean, Object item) {
+		return add(bean, item, true);
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private Object add(Object bean, Object item, boolean associate) {
 		Preconditions.checkNotNull(bean);
 		Preconditions.checkArgument(entity.isInstance(bean));
 		Preconditions.checkState(isCollection());
@@ -474,8 +478,12 @@ public class Property {
 			// The type adapter creates new instance of collection so grab the new reference
 			items = (Collection) get(bean);
 		}
-
-		items.add(setAssociation(item, bean));
+		
+		if (associate) {
+			items.add(setAssociation(item, bean));
+		} else {
+			items.add(item);
+		}
 		return bean;
 	}
 
@@ -490,8 +498,10 @@ public class Property {
 	 * @return the same bean instance
 	 */
 	public Object addAll(Object bean, Collection<?> items) {
-		for (Object item : items) {
-			add(bean, item);
+		if (items != null) {
+			for (Object item : items) {
+				add(bean, item);
+			}
 		}
 		return bean;
 	}
@@ -518,9 +528,11 @@ public class Property {
 			return child;
 		}
 
+		// handle bidirectional m2m
 		if (mapped.isCollection()) { // m2m -> m2m
-			// doing `mapped.add(child, bean)` here may add an unmanaged object
+			//XXX: `mapped.add(child, bean)` here may add an unmanaged object
 			// to a managed collection.
+			mapped.add(child, bean, false);
 			return child;
 		}
 
@@ -542,6 +554,22 @@ public class Property {
 		Preconditions.checkNotNull(bean);
 		Preconditions.checkArgument(entity.isInstance(bean));
 		Preconditions.checkState(this.isCollection());
+		
+		Collection<?> items = (Collection<?>) get(bean);
+		if (items == null || items.isEmpty()) {
+			return bean;
+		}
+
+		// handle bidirectional m2m
+		Property mapped = Mapper.of(target).getProperty(mappedBy);
+		if (mapped != null && mapped.isCollection()) { // m2m -> m2m
+			for (Object item : items) {
+				Collection<?> inverse = (Collection<?>) mapped.get(item);
+				if (inverse != null) {
+					inverse.remove(bean);
+				}
+			}
+		}
 
 		try {
 			((Collection<?>) get(bean)).clear();

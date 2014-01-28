@@ -58,6 +58,7 @@ import org.hibernate.proxy.LazyInitializer;
 
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.db.mapper.PropertyType;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
@@ -422,11 +423,15 @@ public final class JPA {
 								}
 							}
 						}
+						p.clear(bean);
 						((Collection) old).clear();
 						((Collection) old).addAll(items);
 						beanChanged = true;
 					}
 					continue;
+				}
+				if (p.getType() == PropertyType.MANY_TO_MANY && p.getMappedBy() != null) {
+					p.addAll(bean, items);
 				}
 				value = items;
 			} else if (value instanceof Map) {
