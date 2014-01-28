@@ -30,6 +30,20 @@
 				<field name="object" />
 			</grid>
 		</field>
+		<field name="menus" colSpan="2">
+			<grid title="Menus">
+				<field name="name"/>
+				<field name="title"/>
+			</grid>
+		</field>
+		<field name="views" colSpan="2">
+			<grid title="View">
+				<field name="name"/>
+				<field name="title"/>
+				<field name="type" selection="view.type.selection"/>
+				<field name="priority" width="75"/>
+			</grid>
+		</field>
 	</form>
 
     <action-condition name="action-condition-group-validName">
