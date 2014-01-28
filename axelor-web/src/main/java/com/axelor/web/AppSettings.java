@@ -39,16 +39,12 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.persistence.NoResultException;
-import javax.persistence.TypedQuery;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
-import com.axelor.db.JPA;
-import com.axelor.meta.db.MetaUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -137,7 +133,6 @@ public class AppSettings {
 		try {
 			User user = AuthUtils.getUser();
 			Group group = user.getGroup();
-			MetaUser prefs = MetaUser.findByUser(user);
 
 			settings.put("user.name", user.getName());
 			settings.put("user.login", user.getCode());
@@ -145,10 +140,8 @@ public class AppSettings {
 			if (group != null) {
 				settings.put("user.navigator", group.getNavigation());
 			}
-			if (prefs != null) {
-				settings.put("user.lang", prefs.getLanguage());
-				settings.put("user.action", prefs.getAction().getName());
-			}
+			settings.put("user.lang", user.getLanguage());
+			settings.put("user.action", user.getAction().getName());
 		} catch (Exception e){
 		}
 
@@ -168,25 +161,11 @@ public class AppSettings {
 	}
 
 	private static String getUserLanguage() {
-
 		final User user = AuthUtils.getUser();
-		final TypedQuery<String> query = JPA.em().createQuery(
-				"SELECT s.language FROM MetaUser s WHERE s.user.code = :code",
-				String.class);
-
 		if (user == null) {
 			return null;
 		}
-
-		query.setMaxResults(1);
-		query.setParameter("code", user.getCode());
-
-		try {
-			return query.getSingleResult();
-		} catch (NoResultException e) {
-		}
-
-		return null;
+		return user.getLanguage();
 	}
 
 	/**

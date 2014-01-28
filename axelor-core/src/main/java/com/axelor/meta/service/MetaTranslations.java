@@ -34,10 +34,10 @@ import java.util.List;
 import java.util.Locale;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.db.Query;
 import com.axelor.db.Translations;
 import com.axelor.meta.db.MetaTranslation;
-import com.axelor.meta.db.MetaUser;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.inject.Provider;
@@ -50,7 +50,7 @@ public class MetaTranslations implements Translations, Provider<Translations> {
 	public static ThreadLocal<Locale> language = new ThreadLocal<Locale>();
 
 	public static Locale getLanguage() {
-		MetaUser preferences = MetaUser.findByUser(AuthUtils.getUser());
+		User preferences = AuthUtils.getUser();
 		if (preferences != null && !Strings.isNullOrEmpty(preferences.getLanguage())) {
 			return toLocale(preferences.getLanguage());
 		}

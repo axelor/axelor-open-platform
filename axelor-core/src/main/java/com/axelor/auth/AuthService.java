@@ -50,6 +50,7 @@ import com.axelor.rpc.Context;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
 /**
@@ -232,5 +233,28 @@ public class AuthService {
 		} else {
 			response.setData(ImmutableList.of(ImmutableMap.of("error", JPA.translate("Password doesn't match"))));
 		}
+	}
+	
+	/**
+	 * Load the user preferences.
+	 * 
+	 * @param request
+	 *            the request with user object as context
+	 * @param response
+	 *            the response, which is updated according to the validation
+	 */
+	@Transactional
+	public void preferences(ActionRequest request, ActionResponse response) {
+		final User user = AuthUtils.getUser();
+		if (user == null) {
+			response.setStatus(ActionResponse.STATUS_FAILURE);
+			return;
+		}
+		
+		final Map<String, Object> values = Maps.newHashMap();
+		values.put("id", user.getId());
+		response.setValues(values);
+		response.setReload(true);
+		response.setStatus(ActionResponse.STATUS_SUCCESS);
 	}
 }

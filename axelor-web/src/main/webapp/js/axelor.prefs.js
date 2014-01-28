@@ -35,8 +35,8 @@ var app = angular.module("axelor.app");
 function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 	
 	$scope._viewParams = {
-		model: 'com.axelor.meta.db.MetaUser',
-		viewType: 'form'
+		model: 'com.axelor.auth.db.User',
+		views: [{name: 'user-preferences-form', type: 'form'}]
 	};
 	
 	ViewCtrl($scope, DataSource, ViewService);
