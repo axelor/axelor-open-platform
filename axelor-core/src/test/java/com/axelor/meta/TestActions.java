@@ -43,12 +43,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.axelor.db.JPA;
-import com.axelor.meta.db.Contact;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.FormView;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
+import com.axelor.test.db.Contact;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;

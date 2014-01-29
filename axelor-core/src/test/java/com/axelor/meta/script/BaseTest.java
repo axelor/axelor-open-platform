@@ -38,8 +38,8 @@ import org.junit.runners.MethodSorters;
 
 import com.axelor.db.JPA;
 import com.axelor.meta.AbstractTest;
-import com.axelor.meta.db.Contact;
 import com.axelor.rpc.Context;
+import com.axelor.test.db.Contact;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
