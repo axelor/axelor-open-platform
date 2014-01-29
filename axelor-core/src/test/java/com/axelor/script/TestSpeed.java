@@ -28,13 +28,14 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.meta.script;
+package com.axelor.script;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import com.axelor.rpc.Context;
+import com.axelor.script.GroovyScriptHelper;
 import com.axelor.test.db.Contact;
 
 @SuppressWarnings("all")

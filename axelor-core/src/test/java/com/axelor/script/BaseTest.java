@@ -28,24 +28,29 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.meta.script;
+package com.axelor.script;
 
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.FixMethodOrder;
+import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
+import com.axelor.MyModule;
 import com.axelor.db.JPA;
-import com.axelor.meta.AbstractTest;
 import com.axelor.rpc.Context;
+import com.axelor.test.GuiceModules;
+import com.axelor.test.GuiceRunner;
 import com.axelor.test.db.Contact;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
+@RunWith(GuiceRunner.class)
+@GuiceModules(MyModule.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class BaseTest extends AbstractTest {
+abstract class BaseTest {
 
 	@Before
     @Transactional

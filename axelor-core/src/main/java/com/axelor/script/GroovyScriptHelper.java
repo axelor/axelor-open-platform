@@ -28,7 +28,7 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.meta.script;
+package com.axelor.script;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
@@ -290,7 +290,7 @@ public class GroovyScriptHelper implements ScriptHelper {
 			+ "package %s;\n"
 			+ "\n"
 			+ "@groovy.transform.CompileStatic\n"
-			+ "public class %s extends %s implements com.axelor.meta.script.Scriptable<%s> {\n"
+			+ "public class %s extends %s implements com.axelor.script.Scriptable<%s> {\n"
 			+ "\n"
 			+ "\tpublic final Object __eval("
 			+ "%s __this__, "
