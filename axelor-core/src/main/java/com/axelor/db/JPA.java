@@ -424,8 +424,7 @@ public final class JPA {
 							}
 						}
 						p.clear(bean);
-						((Collection) old).clear();
-						((Collection) old).addAll(items);
+						p.addAll(bean, items);
 						beanChanged = true;
 					}
 					continue;
