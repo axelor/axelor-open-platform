@@ -46,7 +46,7 @@ import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.FormInclude;
 import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.Search;
-import com.axelor.meta.script.ScriptHelper;
+import com.axelor.script.ScriptHelper;
 import com.axelor.test.db.Title;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;

@@ -28,7 +28,7 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.meta.script;
+package com.axelor.script;
 
 import java.util.Map;
 import java.util.Set;

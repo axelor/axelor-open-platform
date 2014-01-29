@@ -28,17 +28,49 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.meta.script;
+package com.axelor.script;
 
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
+import org.junit.Assert;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
-import com.axelor.auth.db.User;
-import com.axelor.db.Model;
 import com.axelor.rpc.Context;
+import com.axelor.script.GroovyScriptHelper;
+import com.axelor.test.db.Contact;
 
-public interface Scriptable<T extends Model> {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class TestScripts extends BaseTest {
 
-	Object __eval(T __self__, T __this__,  User __user__, Context __parent__, Model __ref__, LocalDate __date__, LocalDateTime __time__, DateTime __datetime__);
+	private int counter = 0;
+
+    @Test
+    public void test01_casts() {
+
+    	GroovyScriptHelper helper = new GroovyScriptHelper(context());
+
+    	Object actual;
+
+    	actual = helper.eval("__parent__");
+    	Assert.assertTrue(actual instanceof Context);
+
+    	actual = helper.eval("__ref__");
+    	Assert.assertTrue(actual instanceof Contact);
+
+    	actual = helper.eval("__parent__ as Contact");
+    	Assert.assertTrue(actual instanceof Contact);
+
+    	actual = helper.eval("(__ref__ as Contact).fullName");
+    	Assert.assertTrue(actual instanceof String);
+    	Assert.assertEquals("John Smith", actual);
+
+    	actual = helper.eval("(__ref__ as Contact).fullName + ' (" + counter + ")'");
+    }
+
+    //@Test
+    public void test02_permgen() {
+    	while (counter++ < 5000) {
+    		test01_casts();
+    	}
+    }
 }
