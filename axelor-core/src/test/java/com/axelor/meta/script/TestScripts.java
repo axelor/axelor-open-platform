@@ -35,8 +35,8 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import com.axelor.meta.db.Contact;
 import com.axelor.rpc.Context;
+import com.axelor.test.db.Contact;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestScripts extends BaseTest {

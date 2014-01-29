@@ -32,6 +32,7 @@ package com.axelor.test.db;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -39,8 +40,7 @@ import javax.validation.constraints.NotNull;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaModel;
 import com.axelor.db.Query;
-import com.google.common.base.Objects;
-import com.google.common.base.Objects.ToStringHelper;
+import com.axelor.db.internal.EntityHelper;
 
 @Entity
 @Table(name = "CONTACT_ADDRESS")
@@ -57,11 +57,11 @@ public class Address extends JpaModel {
 	@NotNull
 	private String zip;
 
-	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private Country country;
 
 	@NotNull
-	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private Contact contact;
 
 	public Address() {
@@ -123,17 +123,7 @@ public class Address extends JpaModel {
 	
 	@Override
 	public String toString() {
-		ToStringHelper tsh = Objects.toStringHelper(getClass());
-		
-		tsh.add("id", getId());
-		tsh.add("contact", contact);
-		tsh.add("street", street);
-		tsh.add("area", area);
-		tsh.add("city", city);
-		tsh.add("zip", zip);
-		tsh.add("country", country);
-		
-		return tsh.omitNullValues().toString();
+		return EntityHelper.toString(this);
 	}
 	
 	public static Query<Address> all() {

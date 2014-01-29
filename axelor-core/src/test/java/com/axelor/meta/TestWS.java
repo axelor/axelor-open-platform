@@ -40,12 +40,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.axelor.db.JPA;
-import com.axelor.meta.db.Contact;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.rpc.ActionRequest;
+import com.axelor.test.db.Contact;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

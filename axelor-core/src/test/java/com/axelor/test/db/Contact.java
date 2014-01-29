@@ -30,6 +30,7 @@
  */
 package com.axelor.test.db;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,8 +56,7 @@ import com.axelor.db.Query;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.VirtualColumn;
 import com.axelor.db.annotations.Widget;
-import com.google.common.base.Objects;
-import com.google.common.base.Objects.ToStringHelper;
+import com.axelor.db.internal.EntityHelper;
 import com.google.common.collect.Lists;
 
 @Entity
@@ -78,12 +78,18 @@ public class Contact extends JpaModel {
 	@Access(AccessType.PROPERTY)
 	private String fullName;
 
-	@NotNull
 	private String email;
+	
+	private String proEmail;
 
 	private String phone;
 
 	private String lang;
+	
+	@Widget(selection = "food.selection")
+	private String food;
+	
+	private BigDecimal credit;
 
 	private LocalDate dateOfBirth;
 
@@ -159,6 +165,14 @@ public class Contact extends JpaModel {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	
+	public String getProEmail() {
+		return proEmail;
+	}
+	
+	public void setProEmail(String proEmail) {
+		this.proEmail = proEmail;
+	}
 
 	public String getPhone() {
 		return phone;
@@ -174,6 +188,22 @@ public class Contact extends JpaModel {
 
 	public void setLang(String lang) {
 		this.lang = lang;
+	}
+	
+	public String getFood() {
+		return food;
+	}
+	
+	public void setFood(String food) {
+		this.food = food;
+	}
+	
+	public BigDecimal getCredit() {
+		return credit;
+	}
+	
+	public void setCredit(BigDecimal credit) {
+		this.credit = credit;
 	}
 	
 	public LocalDate getDateOfBirth() {
@@ -223,15 +253,9 @@ public class Contact extends JpaModel {
 	
 	@Override
 	public String toString() {
-		ToStringHelper tsh = Objects.toStringHelper(getClass());
-		
-		tsh.add("id", getId());
-		tsh.add("fullName", getFirstName());
-		tsh.add("email", getEmail());
-		
-		return tsh.omitNullValues().toString();
+		return EntityHelper.toString(this);
 	}
-	
+
 	public Contact find(Long id) {
 		return JPA.find(Contact.class, id);
 	}
@@ -243,5 +267,4 @@ public class Contact extends JpaModel {
 	public static Query<Contact> all() {
 		return JPA.all(Contact.class);
 	}
-
 }
