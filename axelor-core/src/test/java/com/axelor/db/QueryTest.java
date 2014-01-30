@@ -42,7 +42,7 @@ import org.junit.Test;
 
 import com.axelor.BaseTest;
 import com.axelor.test.db.Contact;
-import com.axelor.test.db.Group;
+import com.axelor.test.db.Circle;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
@@ -50,7 +50,7 @@ public class QueryTest extends BaseTest {
 
 	@Test
 	public void testCount() {
-		Assert.assertTrue(Group.all().count() > 0);
+		Assert.assertTrue(Circle.all().count() > 0);
 		Assert.assertTrue(Contact.all().count() > 0);
 	}
 
