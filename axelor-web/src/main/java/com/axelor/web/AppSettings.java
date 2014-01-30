@@ -204,19 +204,36 @@ public class AppSettings {
 
 	/**
 	 * Return the path of the JS file.
-	 * If dev is specified in application.mode or if the minify JS file doesn't exist then return the unminify js file.
+	 * If dev is specified in application.mode or if the minified JS file doesn't exist then return the plain js file.
 	 *
 	 * @param context
 	 * @return path of the JS file
 	 */
 	public static String getAppJS(ServletContext context) {
-		String appJs = "js/application-all.min.js";
+		String appJs = "js/application.min.js";
 
 		if ("dev".equals(AppSettings.get().get("application.mode", "dev")) || checkResources(context, "/" + appJs) == false) {
 			appJs = "js/application.js";
 		}
 
 		return appJs;
+	}
+	
+	/**
+	 * Return the path of the CSS file.
+	 * If dev is specified in application.mode or if the minified CSS file doesn't exist then return the plain css file.
+	 *
+	 * @param context
+	 * @return path of the CSS file
+	 */
+	public static String getAppCSS(ServletContext context) {
+		String appCss = "css/application.min.css";
+
+		if ("dev".equals(AppSettings.get().get("application.mode", "dev")) || checkResources(context, "/" + appCss) == false) {
+			appCss = "css/application.css";
+		}
+
+		return appCss;
 	}
 
 	private static String toLanguage(Locale locale, boolean minimize) {

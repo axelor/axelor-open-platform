@@ -18,37 +18,59 @@
     <!-- module specific dependencies -->
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-war-plugin</artifactId>
-        <configuration>
-          <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.2.1</version>
-        <executions>
-          <execution>
-            <id>Minimize JavaScript</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
+  <profiles>
+    <!-- profile to conditionally run grunt tasks -->
+    <profile>
+      <id>minimize</id>
+      <activation>
+        <property>
+          <name>npm.path</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-war-plugin</artifactId>
             <configuration>
-              <executable>${basedir}/src/main/webapp/minimize.sh</executable>
-              <workingDirectory>${basedir}/src/main/webapp/</workingDirectory>
-              <arguments>
-                <argument>-o</argument>
-                <argument>${project.build.directory}/${project.build.finalName}/js/application-all.min.js</argument>
-              </arguments>
+              <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
             </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.2.1</version>
+            <configuration>
+              <workingDirectory>${basedir}/src/main/webapp/</workingDirectory>
+            </configuration>
+            <executions>
+              <execution>
+                <id>npm install</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>${npm.path}</executable>
+                  <arguments>
+                  	<argument>install</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>grunt</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>node_modules/.bin/grunt</executable>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

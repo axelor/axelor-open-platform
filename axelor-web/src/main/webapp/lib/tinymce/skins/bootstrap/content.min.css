@@ -1,4 +1,4 @@
-@import url('../../../bootstrap/css/bootstrap.css');
+@import url('../../../../bootstrap/css/bootstrap.css');
 @import url('../lightgray/content.min.css');
 
 body.mce-content-body {
