@@ -41,25 +41,24 @@ import javax.validation.constraints.NotNull;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
-import com.google.common.base.Objects;
-import com.google.common.base.Objects.ToStringHelper;
+import com.axelor.db.internal.EntityHelper;
 
 @Entity
-@Table(name = "CONTACT_GROUP")
-public class Group extends Model {
+@Table(name = "CONTACT_CIRCLE")
+public class Circle extends Model {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CONTACT_GROUP_SEQ")
-	@SequenceGenerator(name = "CONTACT_GROUP_SEQ", sequenceName = "CONTACT_GROUP_SEQ", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CONTACT_CIRCLE_SEQ")
+	@SequenceGenerator(name = "CONTACT_CIRCLE_SEQ", sequenceName = "CONTACT_CIRCLE_SEQ", allocationSize = 1)
 	private Long id;
 	
 	@NotNull
-	private String name;
+	private String code;
 
 	@NotNull
-	private String title;
+	private String name;
 
-	public Group() {
+	public Circle() {
 	}
 	
 	public Long getId() {
@@ -70,40 +69,34 @@ public class Group extends Model {
 		this.id = id;
 	}
 
-	public Group(String name, String title) {
-		this.name = name;
-		this.title = title;
+	public Circle(String name, String title) {
+		this.code = name;
+		this.name = title;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String name) {
+		this.code = name;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
+	public void setName(String title) {
+		this.name = title;
 	}
 	
 	@Override
 	public String toString() {
-		ToStringHelper tsh = Objects.toStringHelper(getClass());
-		
-		tsh.add("id", getId());
-		tsh.add("name", getName());
-		tsh.add("title", getTitle());
-		
-		return tsh.omitNullValues().toString();
+		return EntityHelper.toString(this);
 	}
 	
-	public static Query<Group> all() {
-		return JPA.all(Group.class);
+	public static Query<Circle> all() {
+		return JPA.all(Circle.class);
 	}
 
 }
