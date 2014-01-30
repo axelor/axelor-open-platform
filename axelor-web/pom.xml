@@ -27,6 +27,9 @@
           <name>npm.path</name>
         </property>
       </activation>
+	  <properties>
+		<grunt>grunt</grunt>
+	  </properties>
       <build>
         <plugins>
           <plugin>
@@ -63,7 +66,7 @@
                   <goal>exec</goal>
                 </goals>
                 <configuration>
-                  <executable>node_modules/.bin/grunt</executable>
+                  <executable>${basedir}/src/main/webapp/node_modules/.bin/${grunt}</executable>
                 </configuration>
               </execution>
             </executions>
