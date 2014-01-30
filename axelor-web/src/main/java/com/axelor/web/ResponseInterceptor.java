@@ -55,8 +55,8 @@ public class ResponseInterceptor implements MethodInterceptor {
 			return invocation.proceed();
 		}
 
-		log.debug("Web Service: {}", invocation.getMethod());
-		
+		log.trace("Web Service: {}", invocation.getMethod());
+
 		Response response = null;
 		
 		running.set(true);
