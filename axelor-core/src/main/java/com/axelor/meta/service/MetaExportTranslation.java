@@ -50,6 +50,7 @@ import javax.xml.validation.SchemaFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.common.FileUtils;
 import com.axelor.db.JPA;
 import com.axelor.meta.MetaLoader;
 import com.axelor.meta.MetaScanner;
@@ -68,6 +69,7 @@ import com.axelor.meta.domains.DomainModels;
 import com.axelor.meta.domains.Entity;
 import com.axelor.meta.domains.Module;
 import com.axelor.meta.domains.Property;
+import com.axelor.meta.internal.MetaUtils;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.actions.ActionCondition;
@@ -140,17 +142,15 @@ public class MetaExportTranslation {
 	private final String otherType = "other";
 	private final String viewFieldType = "viewField";
 
-	private File exportFile ;
-	private String exportLanguage ;
-	private String exportPath ;
-	private String currentModule ;
+	private File exportFile;
+	private String exportLanguage;
+	private String currentModule;
 
 	private List<String> internalFields = Lists.newArrayList("createdOn", "updatedOn", "createdBy", "updatedBy", "id", "version", "archived");
 	Map<String, Map<String, String>> doc = Maps.newLinkedHashMap();
 
 	public void exportTranslations(String exportPath, String exportLanguage) throws Exception {
 
-		exportPath = exportPath.endsWith("/") ? exportPath : exportPath.concat("/");
 		this.exportLanguage = exportLanguage;
 
 		List<MetaModule> modules = MetaModule.all().filter("self.installed = true").fetch();
@@ -164,15 +164,14 @@ public class MetaExportTranslation {
 		modules.add(coreModule);
 
 		for(MetaModule module : modules) {
-			this.exportPath = exportPath + module.getName() + "/";
-			File file = new File(Files.simplifyPath(this.exportPath + this.exportLanguage + ".csv"));
+			File file = FileUtils.getFile(exportPath, this.exportLanguage + ".csv");
 			if(file.isFile() && file.exists()) {
 				file.delete();
 			}
 			this.exportFile = file;
 			this.currentModule = module.getName();
 
-			log.info("Export {} module to {}.", module.getName(), this.exportFile.getPath());
+			log.info("Export {} module to {}.", module.getName(), file.getPath());
 
 			this.exportMenus();
 			this.exportMenuActions();
@@ -518,8 +517,7 @@ public class MetaExportTranslation {
 			}
 		});
 
-		String pat = String.format("(/WEB-INF/lib/%s-)|(%s/WEB-INF/classes/)", this.currentModule, this.currentModule);
-		Pattern pattern = Pattern.compile(pat);
+		Pattern pattern = MetaUtils.getModuleNamePattern(this.currentModule);
 		for(org.reflections.vfs.Vfs.File file : files) {
 			String path = file.toString();
 			Matcher matcher = pattern.matcher(path);

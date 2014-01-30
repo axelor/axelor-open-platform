@@ -57,7 +57,6 @@ public class MetaScanner extends ResourcesScanner {
 	
 	@Override
 	public boolean acceptResult(String fqn) {
-		System.err.println("FFFF: " + fqn);
 		return pattern.matcher(fqn).matches();
 	}
 
