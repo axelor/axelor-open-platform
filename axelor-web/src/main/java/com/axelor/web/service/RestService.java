@@ -60,6 +60,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
+import com.axelor.common.FileUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
@@ -247,7 +248,7 @@ public class RestService extends ResourceService {
 		if (isAttachment) {
 			int maxCounter = 1000;
 			long counter = 0;
-			while (new File(uploadPath + "/" + filePath).exists()) {
+			while (FileUtils.getFile(uploadPath, filePath).exists()) {
 				if (counter++ > maxCounter) {
 					counter = System.currentTimeMillis();
 				}
@@ -262,7 +263,7 @@ public class RestService extends ResourceService {
 
 		Response response = getResource().save(request);
 		if (isAttachment && response.getStatus() == Response.STATUS_SUCCESS) {
-			File file = new File(uploadPath + "/" + filePath);
+			File file = FileUtils.getFile(uploadPath, filePath);
 			Files.createParentDirs(file);
 			FileOutputStream out = new FileOutputStream(file);
 			uploadSave(fileStream, out);
@@ -288,7 +289,7 @@ public class RestService extends ResourceService {
 		if (isAttachment) {
 			final String fileName = (String) mapper.get(bean, "fileName");
 			final String filePath = (String) mapper.get(bean, "filePath");
-			final File inputFile = new File(uploadPath + "/" + filePath);
+			final File inputFile = FileUtils.getFile(uploadPath, filePath);
 			return javax.ws.rs.core.Response.ok(new StreamingOutput() {
 
 				@Override

@@ -59,6 +59,7 @@ import org.xml.sax.SAXException;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
+import com.axelor.common.FileUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -73,6 +74,7 @@ import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
+import com.axelor.meta.internal.MetaUtils;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
@@ -626,7 +628,7 @@ public class MetaLoader {
 			if (found == 0) {
 				String xml = createDefaultViews(klass);
 				if (output != null && output.exists()) {
-					java.io.File out = new java.io.File(output + "/views/" + klass.getSimpleName() + ".xml");
+					java.io.File out = FileUtils.getFile(output, "views", klass.getSimpleName() + ".xml");
 					try {
 						log.info("Creating default views: {}", out);
 						Files.createParentDirs(out);
@@ -689,8 +691,7 @@ public class MetaLoader {
 		Set<String> imported = Sets.newHashSet();
 
 		for(String module : moduleResolver.all()) {
-			String pat = String.format("(/WEB-INF/lib/%s-)|(%s/WEB-INF/classes/)", module, module);
-			Pattern pattern = Pattern.compile(pat);
+			Pattern pattern = MetaUtils.getModuleNamePattern(module);
 			MetaModule m = MetaModule.findByName(module);
 			if (m == null || m.getInstalled() == Boolean.FALSE) {
 				continue;
@@ -713,8 +714,7 @@ public class MetaLoader {
 		List<File> files = MetaScanner.findAll("views\\.(.*?)\\.xml");
 
 		for(File file : files) {
-			String pat = String.format("(/WEB-INF/lib/%s-)|(%s/WEB-INF/classes/)", module, module);
-			Pattern pattern = Pattern.compile(pat);
+			Pattern pattern = MetaUtils.getModuleNamePattern(module);
 			String path = file.toString();
 			Matcher matcher = pattern.matcher(path);
 			if (matcher.find()) {
@@ -820,7 +820,8 @@ public class MetaLoader {
 
 		try {
 			loadViews();
-		} catch (Exception e){}
+		} catch (Exception e) {
+		}
 
 		loadDefault(outputPath);
 		loadTranslations(null);

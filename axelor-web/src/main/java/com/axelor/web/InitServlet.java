@@ -73,7 +73,7 @@ public class InitServlet extends HttpServlet {
 		});
 
 		try {
-			String output = settings.get("temp.dir");
+			String output = settings.getPath("temp.dir", "{java.io.tmpdir}");
 			metaLoader.load(output);
 		} catch (Exception e) {
 			e.printStackTrace();

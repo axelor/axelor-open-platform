@@ -46,6 +46,7 @@ import org.reflections.vfs.Vfs.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.common.FileUtils;
 import com.axelor.data.ImportException;
 import com.axelor.data.ImportTask;
 import com.axelor.data.csv.CSVBinding;
@@ -54,6 +55,8 @@ import com.axelor.data.csv.CSVImporter;
 import com.axelor.data.csv.CSVInput;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.ModuleResolver;
+import com.axelor.meta.internal.MetaUtils;
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -90,11 +93,10 @@ public class MetaTranslationsService {
 	}
 
 	private void loadFromDir(ModuleResolver moduleResolver, String importPath) {
-		importPath = importPath.endsWith("/") ? importPath : importPath.concat("/");
-
+		
 		//Import by module resolver order
 		for(String module : moduleResolver.all()) {
-			java.io.File moduleDir = new java.io.File(importPath + module);
+			java.io.File moduleDir = FileUtils.getFile(importPath, module);
 			if(!moduleDir.exists() || !moduleDir.isDirectory() || moduleDir.listFiles() == null) {
 				continue;
 			}
@@ -126,8 +128,7 @@ public class MetaTranslationsService {
 
 		//Import by module resolver order
 		for(String module : moduleResolver.all()) {
-			String pat = String.format("(/WEB-INF/lib/%s-)|(%s/WEB-INF/classes/)", module, module);
-			Pattern pattern = Pattern.compile(pat);
+			Pattern pattern = MetaUtils.getModuleNamePattern(module);
 			for(org.reflections.vfs.Vfs.File file : files) {
 				String path = file.toString();
 				Matcher matcher = pattern.matcher(path);
@@ -167,7 +168,7 @@ public class MetaTranslationsService {
 
 			@Override
 			public void configure() throws IOException {
-				input(CSV_INPUT_FILE_NAME, stream);
+				input(CSV_INPUT_FILE_NAME, stream, Charsets.UTF_8);
 			}
 
 			@Override

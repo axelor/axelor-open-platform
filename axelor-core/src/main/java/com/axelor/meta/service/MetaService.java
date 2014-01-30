@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.common.FileUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
@@ -355,7 +356,7 @@ public class MetaService {
 			if (fileId != null) {
 				MetaFile obj = MetaFile.find(fileId);
 				if (uploadPath != null) {
-					File file = new File(uploadPath + "/" + obj.getFilePath());
+					File file = FileUtils.getFile(uploadPath, obj.getFilePath());
 					if (file.exists() && !file.delete()) {
 						continue;
 					}

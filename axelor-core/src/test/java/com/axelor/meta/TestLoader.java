@@ -46,7 +46,7 @@ public class TestLoader extends AbstractTest {
 	
 	@Test
 	public void testLoad() {
-		loader.load("/tmp");
+		loader.load("{java.io.tmp}");
 	}
 	
 	@Test
