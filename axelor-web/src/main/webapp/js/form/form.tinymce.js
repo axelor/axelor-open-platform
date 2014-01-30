@@ -32,6 +32,9 @@
 
 var ui = angular.module('axelor.ui');
 
+tinyMCE.baseURL = "lib/tinymce/";
+tinyMCE.suffix = ".min";
+
 ui.formInput('Html', {
 
 	css: "html-item",

@@ -2,6 +2,8 @@ target
 .project
 .classpath
 .settings
+node_modules
+application.min.*
 *.sw[nop]
 *~
 .#*

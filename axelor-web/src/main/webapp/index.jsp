@@ -53,6 +53,7 @@ if (appDesc != null)
 
 String localeJS = AppSettings.getLocaleJS(request, getServletContext());
 String appJS = AppSettings.getAppJS(getServletContext());
+String appCss = AppSettings.getAppCSS(getServletContext());
 
 %>
 <!DOCTYPE html>
@@ -65,7 +66,7 @@ String appJS = AppSettings.getAppJS(getServletContext());
   <meta name="author" content="{{app.author}}">
 
   <!-- Le styles -->
-  <link href="css/application.css" rel="stylesheet">
+  <link href="<%= appCss %>" rel="stylesheet">
   <% if (appTheme != null) { %>
   <link href="css/<%= appTheme %>/theme.css" rel="stylesheet">
   <% } %>
