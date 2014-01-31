@@ -239,11 +239,11 @@ ActionHandler.prototype = {
 		var scope = this.scope,
 			deferred = this.ws.defer();
 
-		if (!scope.isValid()) {
+		if (scope.isValid && !scope.isValid()) {
 			deferred.reject();
 			return deferred.promise;
 		}
-		if (!scope.isDirty()) {
+		if (scope.isDirty && !scope.isDirty()) {
 			deferred.resolve();
 			return deferred.promise;
 		}

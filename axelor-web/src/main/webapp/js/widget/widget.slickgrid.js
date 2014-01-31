@@ -432,6 +432,19 @@ var Grid = function(scope, element, attrs, ViewService, ActionService) {
 	this.grid = this.parse(scope.view);
 };
 
+function buttonScope(scope) {
+	var btnScope = scope.$new();
+	var handler = scope.handler;
+	
+	btnScope._dataSource = handler._dataSource;
+	btnScope.editRecord = function (record) {};
+	btnScope.reload = function () {
+		return handler.onRefresh();
+	};
+	
+	return btnScope;
+}
+
 Grid.prototype.parse = function(view) {
 
 	var that = this,
@@ -472,7 +485,7 @@ Grid.prototype.parse = function(view) {
 		if (field.type == "button") {
 			if (scope.selector) return;
 			field.image = field.title;
-			field.handler = that.newActionHandler(scope.$new(), element, {
+			field.handler = that.newActionHandler(buttonScope(scope), element, {
 				action: field.onClick
 			});
 			item.title = "&nbsp;";
