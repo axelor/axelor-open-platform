@@ -135,6 +135,7 @@ ui.formInput('Number', {
 			if (a === b) return true;
 			if (angular.equals(a, b)) return true;
 			if (a === undefined || b === undefined) return false;
+			if (a === null || b === null) return false;
 			a = a === "" ? a : ((+a) || 0);
 			b = b === "" ? b : ((+b) || 0);
 			return a === b;
