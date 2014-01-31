@@ -443,6 +443,7 @@ Grid.prototype.parse = function(view) {
 	scope.fields_view = {};
 	
 	var cols = [];
+	var allColsHasWidth = true;
 	
 	_.each(view.items, function(item) {
 		var field = handler.fields[item.name],
@@ -452,6 +453,10 @@ Grid.prototype.parse = function(view) {
 		scope.fields_view[item.name] = field;
 		path = path ? path + '.' + item.name : item.name;
 		type = field.selection ? 'string' : field.type;
+		
+		if (!item.width) {
+			allColsHasWidth = false;
+		}
 		
 		var sortable = true;
 		switch (field.type) {
@@ -537,6 +542,13 @@ Grid.prototype.parse = function(view) {
 		};
 	});
 	
+	// if all columns are fixed width, add a dummy column
+	if (allColsHasWidth) {
+		cols.push({
+			name: "&nbsp;"
+		});
+	}
+
 	// create edit column
 	var editColumn = null;
 	if (!scope.selector && view.editIcon && (!handler.hasPermission || handler.hasPermission('write'))) {
