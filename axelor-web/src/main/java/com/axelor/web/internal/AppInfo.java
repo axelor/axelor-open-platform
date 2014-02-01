@@ -48,8 +48,8 @@ public final class AppInfo {
 		} catch (Exception e){
 		}
 
-		map.put("app.toolbar.title", settings.get("application.view.toolbar-title"));
-		map.put("app.menubar.location", settings.get("application.menu"));
+		map.put("app.toolbar.titles", settings.getBoolean("application.toolbar.titles", false));
+		map.put("app.menubar.location", settings.get("application.menubar.location"));
 
 		try {
 			ObjectMapper mapper = new ObjectMapper();
