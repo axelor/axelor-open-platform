@@ -44,11 +44,11 @@ function NavMenuCtrl($scope, $element, MenuService, NavService) {
 		var res = response.data,
 			data = res.data;
 
-		var all = {};
-		var top = [];
+		var items = {};
+		var all = [];
 
 		_.each(data, function(item) {
-			all[item.name] = item;
+			items[item.name] = item;
 			if (item.children === undefined) {
 				item.children = [];
 			}
@@ -62,26 +62,22 @@ function NavMenuCtrl($scope, $element, MenuService, NavService) {
 			}
 
 			if (item.parent == null) {
-				return top.push(item);
+				return all.push(item);
 			}
-			var parent = all[item.parent];
+			var parent = items[item.parent];
 			if (parent) {
 				parent.children.push(item);
 			}
 		});
 
-		$scope.menus = _.first(top, 5);
-		$scope.more = _.rest(top, 5);
+		$scope.menus = all;
+		$scope.more = all;
 
 		$scope.extra = {
 			title: 'More',
 			children: $scope.more
 		};
 	});
-
-	$scope.hasMore = function() {
-		return $scope.more && $scope.more.length > 0;
-	};
 
 	this.isSubMenu = function(item) {
 		return item && item.children && item.children.length > 0;
@@ -107,21 +103,89 @@ module.directive('navMenuBar', function() {
 
 		link: function(scope, element, attrs, ctrl) {
 
+			var elemTop,
+				elemSub,
+				elemMore;
+
+			var siblingsWidth = 0;
+			var adjusting = false;
+			
+			function adjust() {
+				
+				if (adjusting) {
+					return;
+				}
+				
+				adjusting = true;
+
+				var count = 0;
+				var parentWidth = element.parent().width() - 32;
+
+				elemMore.hide();
+				elemTop.hide();
+				elemSub.hide();
+				
+				while (count < elemTop.size()) {
+					var elem = $(elemTop[count]).show();
+					var width = siblingsWidth + element.width();
+					if (width > parentWidth) {
+						elem.hide();
+						
+						// show more...
+						elemMore.show();
+						width = siblingsWidth + element.width();
+						if (width > parentWidth) {
+							count--;
+							$(elemTop[count]).hide();
+						}
+						
+						break;
+					}
+					count++;
+				}
+				
+				if (count === elemTop.size()) {
+					elemMore.hide();
+				}
+				while(count < elemTop.size()) {
+					$(elemSub[count++]).show();
+				}
+				
+				adjusting = false;
+			}
+			
+			function setup() {
+				element.find('.dropdown-toggle').dropdown();
+				element.find('.dropdown.nav-menu').hover(function() {
+					$(this).addClass('open');
+				}, function() {
+					$(this).removeClass('open');
+				});
+				element.siblings().each(function () {
+					siblingsWidth += $(this).width();
+				});
+
+				elemTop = element.find('.nav-menu.dropdown:not(.nav-menu-more)');
+				elemMore = element.find('.nav-menu.dropdown.nav-menu-more');
+				elemSub = elemMore.find('.dropdown-menu:first > .dropdown-submenu');
+				adjust();
+			}
+			
+			$(window).on("resize.menubar", adjust);
+
+			element.on('$destroy', function () {
+				if (element) {
+					window.off("resize.menubar");
+					element = null;
+				}
+			});
+			
 			var unwatch = scope.$watch('menus', function(menus, old) {
 				if (!menus || menus.length == 0  || menus === old) {
 					return;
 				}
-
 				unwatch();
-
-				setTimeout(function() {
-					element.find('.dropdown-toggle').dropdown();
-					element.find('.dropdown.nav-menu').hover(function() {
-						$(this).addClass('open');
-					}, function() {
-						$(this).removeClass('open');
-					});
-				}, 100);
+				setTimeout(setup, 100);
 			});
 		},
 
@@ -135,7 +199,7 @@ module.directive('navMenuBar', function() {
 					"</a>" +
 					"<ul nav-menu='menu'></ul>" +
 				"</li>" +
-				"<li ng-if='hasMore()' class='nav-menu dropdown'>" +
+				"<li class='nav-menu nav-menu-more dropdown'>" +
 					"<a href='' class='dropdown-toggle' data-toggle='dropdown'>" +
 						"<span x-translate>More</span>" +
 						"<b class='caret'></b>" +
