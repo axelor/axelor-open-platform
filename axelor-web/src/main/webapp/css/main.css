@@ -43,8 +43,13 @@ html, body {
 }
 
 @media (max-width: 979px) {
-#container {
-	top: 50px;
+header > .navbar-fixed-top {
+	position: fixed;
+	margin-bottom: 0;
+}
+
+header > .navbar-fixed-top .navbar-inner {
+	padding: 0;
 }
 }
 
