@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
@@ -50,9 +51,6 @@ public class InitServlet extends HttpServlet {
 	private static final long serialVersionUID = -2493577642638670615L;
 
 	private static final Logger LOG = LoggerFactory.getLogger(InitServlet.class);
-
-	@Inject
-	private AppSettings settings;
 
 	@Inject
 	private MetaLoader metaLoader;
@@ -73,7 +71,7 @@ public class InitServlet extends HttpServlet {
 		});
 
 		try {
-			String output = settings.getPath("temp.dir", "{java.io.tmpdir}");
+			String output = AppSettings.get().getPath("temp.dir", "{java.io.tmpdir}");
 			metaLoader.load(output);
 		} catch (Exception e) {
 			e.printStackTrace();

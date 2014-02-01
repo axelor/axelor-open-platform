@@ -42,6 +42,7 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
 import com.axelor.db.Translations;
@@ -84,7 +85,6 @@ public class AppServletModule extends JerseyServletModule {
 	protected void configureServlets() {
 
 		// load application settings
-		bind(AppSettings.class).asEagerSingleton();
 		AppSettings settings = AppSettings.get();
 
 		StringBuilder builder = new StringBuilder("Starting application:");
