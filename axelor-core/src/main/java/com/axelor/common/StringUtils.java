@@ -15,7 +15,7 @@ public final class StringUtils {
 	 * @return true if empty false otherwise
 	 */
 	public static boolean isEmpty(String value) {
-		return value == null || "".equals(value);
+		return value == null || value.length() == 0;
 	}
 
 	/**
@@ -27,6 +27,14 @@ public final class StringUtils {
 	 * @return true if empty false otherwise
 	 */
 	public static boolean isBlank(String value) {
-		return value == null || "".equals(value.trim());
+		if (isEmpty(value)) {
+			return true;
+		}
+		for (int i = 0; i < value.length(); i++) {
+			if (!Character.isWhitespace(value.charAt(i))) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

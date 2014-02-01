@@ -1,6 +1,8 @@
 package com.axelor.common;
 
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.net.URL;
 import java.util.Set;
 
 import org.reflections.Reflections;
@@ -130,5 +132,29 @@ public final class ClassUtils {
 		} catch (ClassNotFoundException e) {
 			throw new IllegalArgumentException(name, e);
 		}
+	}
+
+	/**
+	 * Finds the resource with the given name.
+	 * 
+	 * @param name
+	 *            The resource name
+	 * @return resource an {@link URL} for reading the resource or null
+	 * @see ClassLoader#getResource(String)
+	 */
+	public static URL getResource(String name) {
+		return Thread.currentThread().getContextClassLoader().getResource(name);
+	}
+
+	/**
+	 * Returns an input stream for reading the specified resource.
+	 * 
+	 * @param name
+	 *            The resource name
+	 * @return An input stream for reading the resource or null
+	 * @see ClassLoader#getResourceAsStream(String)
+	 */
+	public static InputStream getResourceStream(String name) {
+		return Thread.currentThread().getContextClassLoader().getResourceAsStream(name);
 	}
 }
