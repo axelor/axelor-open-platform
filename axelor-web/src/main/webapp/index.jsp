@@ -31,13 +31,13 @@
 
 --%>
 <%@ page language="java" session="true" %>
-<%@ page import="com.axelor.web.AppSettings" %>
+<%@ page import="com.axelor.app.AppSettings" %>
+<%@ page import="com.axelor.web.internal.AppInfo" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page import="java.util.Locale "%>
+<%@ page import="java.util.Locale"%>
 
 <%
-
-AppSettings settings = AppSettings.get();
+	AppSettings settings = AppSettings.get();
 
 String appName = settings.get("application.name", "My App");
 String appDesc = settings.get("application.description", null);
@@ -51,10 +51,9 @@ String appTitle =  appName;
 if (appDesc != null)
 	appTitle = appName + " :: " + appDesc;
 
-String localeJS = AppSettings.getLocaleJS(request, getServletContext());
-String appJS = AppSettings.getAppJS(getServletContext());
-String appCss = AppSettings.getAppCSS(getServletContext());
-
+String appJS = AppInfo.getAppJS(getServletContext());
+String appCss = AppInfo.getAppCSS(getServletContext());
+String langJS = AppInfo.getLangJS(request, getServletContext());
 %>
 <!DOCTYPE html>
 <html lang="en" ng-app="axelor.app" ng-controller="AppCtrl" ng-cloak>
@@ -67,9 +66,13 @@ String appCss = AppSettings.getAppCSS(getServletContext());
 
   <!-- Le styles -->
   <link href="<%= appCss %>" rel="stylesheet">
-  <% if (appTheme != null) { %>
+  <%
+  	if (appTheme != null) {
+  %>
   <link href="css/<%= appTheme %>/theme.css" rel="stylesheet">
-  <% } %>
+  <%
+  	}
+  %>
   <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -79,7 +82,7 @@ String appCss = AppSettings.getAppCSS(getServletContext());
   <link rel="shortcut icon" href="ico/favicon.ico">
   
   <script type="text/javascript">
-	  var __appSettings = <%= settings.toJSON() %>
+	  var __appSettings = <%= AppInfo.asJson() %>
   </script>
 </head>
 <body>
@@ -149,8 +152,8 @@ String appCss = AppSettings.getAppCSS(getServletContext());
   <!-- JavaScript at the bottom for fast page loading -->
   <script src="js/lib/i18n.js"></script>
   <script src="js/i18n/en.js"></script>
-  <% if (localeJS != null) { %>
-  <script src="js/i18n/<%= localeJS %>.js"></script>
+  <% if ( langJS != null) { %>
+  <script src="<%= langJS %>"></script>
   <% } %>
   <script src="<%= appJS %>"></script>
   <!-- trigger adjustSize event on window resize -->  

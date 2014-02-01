@@ -35,6 +35,8 @@ import javax.inject.Singleton;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
+import com.axelor.app.AppSettings;
+
 /**
  * The {@link AppSessionListener} configures the session timeout.
  *

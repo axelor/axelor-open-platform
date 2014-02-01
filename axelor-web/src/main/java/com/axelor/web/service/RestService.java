@@ -60,6 +60,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
+import com.axelor.app.AppSettings;
 import com.axelor.common.FileUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
@@ -69,7 +70,6 @@ import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
-import com.axelor.web.AppSettings;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Charsets;
 import com.google.common.cache.Cache;
