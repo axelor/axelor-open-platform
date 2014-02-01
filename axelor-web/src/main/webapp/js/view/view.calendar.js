@@ -382,6 +382,11 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 			
 			header: false,
 			
+			timeFormat: {
+				agenda: 'h(:mm)t{ - h(:mm)t}',
+				'': 'h(:mm)t'
+			},
+			
 			editable: editable,
 			
 			selectable: editable,
