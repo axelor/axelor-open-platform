@@ -130,6 +130,8 @@ ui.directive('uiHelpPopover', function() {
 			return;
 		}
 
+		var content = null;
+
 		element.popover({
 			html: true,
 			delay: { show: 1000, hide: 100 },
@@ -149,9 +151,25 @@ ui.directive('uiHelpPopover', function() {
 				return element.text();
 			},
 			content: function() {
-				return getHelp(scope, element, field, mode);
+				if (content) {
+					content.remove();
+				}
+				return content = getHelp(scope, element, field, mode);
 			}
 		});
+
+		function destroy() {
+			if (element) {
+				element.popover('destroy');
+				element = null;
+			}
+			if (content) {
+				content.remove();
+				content = null;
+			}
+		}
+		
+		element.on('$destroy', destroy);
 	};
 
 	return function(scope, element, attrs) {
