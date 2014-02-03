@@ -397,6 +397,10 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 	};
 	
 	$scope.tabTitle = function(tab) {
+		var vs = tab.$viewScope || {};
+		if (vs.viewType === "form") {
+			return vs.viewTitle || tab.title;
+		}
 		return tab.title;
 	};
 
