@@ -110,6 +110,8 @@ module.directive('navMenuBar', function() {
 			var siblingsWidth = 0;
 			var adjusting = false;
 			
+			element.hide();
+			
 			function adjust() {
 				
 				if (adjusting) {
@@ -155,6 +157,7 @@ module.directive('navMenuBar', function() {
 			}
 			
 			function setup() {
+				
 				element.find('.dropdown-toggle').dropdown();
 				element.find('.dropdown.nav-menu').hover(function() {
 					$(this).addClass('open');
@@ -168,10 +171,12 @@ module.directive('navMenuBar', function() {
 				elemTop = element.find('.nav-menu.dropdown:not(.nav-menu-more)');
 				elemMore = element.find('.nav-menu.dropdown.nav-menu-more');
 				elemSub = elemMore.find('.dropdown-menu:first > .dropdown-submenu');
+
+				element.show();
 				adjust();
+				
+				$(window).on("resize.menubar", adjust);
 			}
-			
-			$(window).on("resize.menubar", adjust);
 
 			element.on('$destroy', function () {
 				if (element) {
