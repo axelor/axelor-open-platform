@@ -101,7 +101,7 @@ function ChartCtrl($scope, $element, $http) {
 function $conv(value) {
 	if (!value) return 0;
 	if (_.isNumber(value)) return value;
-	if (/(-)?\d+(\.\d+)?/.test(value)) {
+	if (/^(-)?\d+(\.\d+)?$/.test(value)) {
 		return +value;
 	}
 	return value;
