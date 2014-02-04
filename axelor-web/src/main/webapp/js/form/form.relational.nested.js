@@ -57,8 +57,8 @@ ui.EmbeddedEditorCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewServic
 function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 	
 	var params = angular.copy($scope._viewParams);
-	
-	params.views = _.compact([params.summaryView]);
+
+	params.views = _.compact([params.summaryView || params.summaryViewDefault]);
 	$scope._viewParams = params;
 
 	ViewCtrl($scope, DataSource, ViewService);
@@ -189,7 +189,7 @@ function NestedEditorCtrl($scope, $element, DataSource, ViewService) {
 
 	var params = angular.copy($scope._viewParams);
 
-	params.views = _.compact([params.summaryView]);
+	params.views = _.compact([params.summaryView || params.summaryViewDefault]);
 	$scope._viewParams = params;
 
 	ui.ManyToOneCtrl.call(this, $scope, $element, DataSource, ViewService);
