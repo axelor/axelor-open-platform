@@ -168,18 +168,28 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		}
 		
 		//TODO: handle other modes
-
-		var canSaveParent = field.canSaveParent || field.canSaveParent === undefined;
-		var parent = $scope.$parent;
 		
-		if (canSaveParent && $scope.editorCanReload && record && record.id) {
-			if (parent && parent.canSave()) {
-				return parent.onSave().then(function(){
-					$scope.showPopupEditor(record);
-				});
+		var callOnSave = field.callOnSave !== false;
+		
+		function showPopup() {
+			return $scope.showPopupEditor(record);
+		}
+		
+		if ($scope.editorCanReload && record && record.id) {
+			var parent = $scope.$parent;
+			if (parent) {
+				if (!parent.canSave()) {
+					return;
+				}
+				if (!callOnSave && parent.onSaveEx) {
+					return parent.onSaveEx({
+						callOnSave: false
+					}).then(showPopup);
+				}
+				return parent.onSave().then(showPopup);
 			}
 		}
-		return $scope.showPopupEditor(record);
+		return showPopup();
 	};
 
 	$scope.showEditor = function(record) {
