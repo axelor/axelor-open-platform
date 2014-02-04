@@ -206,9 +206,13 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		_onSelectionChanged(e, args);
 		if (detailView === null)
 			return;
-		setTimeout(function(){
+		$scope.$timeout(function(){
+			var dvs = detailView.scope();
+			var rec = $scope.getSelectedRecord() || {};
 			detailView.show();
-			detailView.data('$scope').edit($scope.getSelectedRecord());
+			if (!dvs.record || (dvs.record.id !== rec.id)) {
+				dvs.edit(rec);
+			}
 		});
 	};
 	
