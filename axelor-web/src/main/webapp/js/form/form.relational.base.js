@@ -55,7 +55,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			gridView = null,
 			summaryView = null;
 		
-		if (!field.summaryView || field.summaryView === "true") {
+		if (field.summaryView === "" || field.summaryView === "true") {
 			summaryView = views.form;
 		}
 
@@ -72,7 +72,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			};
 		}
 
-		if (!field.summaryView || field.summaryView === "true") {
+		if (field.summaryView === "" || field.summaryView === "true") {
 			summaryView = views.form || formView || { type: 'form' };
 		} else if (field.summaryView) {
 			summaryView = {
@@ -84,6 +84,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		views.form = formView || views.form;
 		views.grid = gridView || views.grid;
 		params.summaryView = angular.copy(summaryView);
+		params.summaryViewDefault = params.summaryView || views.form;
 		
 		params.views = _.compact([views.grid, views.form]);
 		$scope._viewParams = params;
