@@ -54,8 +54,8 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		var formView = null,
 			gridView = null,
 			summaryView = null;
-
-		if (field.summaryView === "" || field.summaryView === "true") {
+		
+		if (!field.summaryView || field.summaryView === "true") {
 			summaryView = views.form;
 		}
 
@@ -72,7 +72,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			};
 		}
 
-		if (field.summaryView === "" || field.summaryView === "true") {
+		if (!field.summaryView || field.summaryView === "true") {
 			summaryView = views.form || formView || { type: 'form' };
 		} else if (field.summaryView) {
 			summaryView = {
