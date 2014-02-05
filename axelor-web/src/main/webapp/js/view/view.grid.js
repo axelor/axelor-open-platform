@@ -385,8 +385,12 @@ function GridViewCtrl($scope, $element) {
 	};
 	
 	$scope.onRefresh = function() {
+		return $scope.reload();
+	};
+	
+	$scope.reload = function() {
 		var fields = _.pluck($scope.fields, 'name');
-		ds.search({
+		return ds.search({
 			fields: fields
 		});
 	};
