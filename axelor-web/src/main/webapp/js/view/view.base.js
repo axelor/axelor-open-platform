@@ -124,7 +124,7 @@ function ViewCtrl($scope, DataSource, ViewService) {
 	}
 	
 	// hide toolbar button titles
-	$scope.tbTitleHide = !__appSettings['app.toolbar.titles'];
+	$scope.tbTitleHide = !__appSettings['view.toolbar.titles'];
 
 	// show single or default record if specified
 	var context = params.context || {};
