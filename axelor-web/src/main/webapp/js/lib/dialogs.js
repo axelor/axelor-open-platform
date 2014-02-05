@@ -155,10 +155,92 @@
 			return dialog;
 		}
 	};
+
+	var elemNotifyStack = null;
+	var elemNotifyText = '<div class="alert alert-block fade in">'+
+						 '  <button type="button" class="close" data-dismiss="alert">×</button>'+
+						 '  <h4 class="alert-heading">#title#</h4>'+
+						 '  <p>#message#</p>'+
+						 '</div>';
+	var elemNotifyText2 = '<div class="alert alert-block fade in">'+
+						 '  <button type="button" class="close" data-dismiss="alert">×</button>'+
+						 '  <strong>#title#</strong> #message#'+
+						 '</div>';
+
+	function doNotify(message, options) {
+		if (elemNotifyStack === null) {
+			elemNotifyStack = $('<div class="notify-stack"></div>')
+				.css('position', 'fixed')
+				.css('bottom', 0)
+				.css('right', 10)
+				.appendTo("body");
+		}
+		
+		var opts = _.extend({
+			timeout: 5000
+		}, options);
+		var tmpl, elem;
+		
+		tmpl = opts.alt ? elemNotifyText2 : elemNotifyText;
+		tmpl = tmpl.replace("#title#", opts.title || '').replace("#message#", message);
+
+		elem = $(tmpl)
+			.css('margin-bottom', 7)
+			.appendTo(elemNotifyStack);
+		
+		if (opts.css) {
+			elem.addClass(opts.css);
+		}
+		
+		_.delay(function () {
+			if (elem) {
+				elem.alert("close");
+				elem = null;
+			}
+		}, opts.timeout);
+
+		elem.alert();
+	}
 	
-	if (this.axelor == null)
+	var notify = {
+		
+		info: function(message, options) {
+			var opts = _.extend({
+				title: _t('Information'),
+				css: 'alert-info'
+			}, options);
+			return doNotify(message, opts);
+		},
+
+		alert: function(message, options) {
+			var opts = _.extend({
+				title: _t('Alert')
+			}, options);
+			return doNotify(message, options);
+		},
+		
+		success: function(message, options) {
+			var opts = _.extend({
+				title: _t('Success'),
+				css: 'alert-success'
+			}, options);
+			return doNotify(message, opts);
+		},
+
+		error: function(message, options) {
+			var opts = _.extend({
+				title: _t('Error'),
+				css: 'alert-error'
+			}, options);
+			return doNotify(message, opts);
+		}
+	};
+	
+	if (this.axelor == null) {
 		this.axelor = {};
-	
+	}
+
 	this.axelor.dialogs = dialogs;
-	
+	this.axelor.notify = notify;
+
 })(window.jQuery);
