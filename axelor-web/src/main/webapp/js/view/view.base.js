@@ -600,8 +600,6 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 			}
 		});
 		
-		
-		
 		function hotEdit(elem) {
 			var fs = elem.data('$scope');
 			var field = fs ? fs.field : null;
@@ -624,9 +622,11 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 					unwatch = null;
 				}
 				fs.attr("force-edit", false);
-				elem.off('cancel:hot-edit');
-				elem.off('$destroy:hot-edit');
-				elem = null;
+				if (elem) {
+					elem.off('cancel:hot-edit');
+					elem.off('$destroy:hot-edit');
+					elem = null;
+				}
 			}
 
 			$.event.trigger('cancel:hot-edit');
@@ -655,8 +655,6 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 
 		scope.$on('$destroy', function() {
 			$(document).off('keydown.axelor-keys');
-			$(document).off('dblclick.hot-edit');
-			$(document).off('keydown.hot-edit');
 		});
 	};
 });
