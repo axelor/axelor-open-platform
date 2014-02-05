@@ -56,6 +56,9 @@ public class CSVInput {
 	@XStreamAlias("file")
 	@XStreamAsAttribute
 	private String fileName;
+	
+	@XStreamAsAttribute
+	private String header;
 
 	@XStreamAlias("type")
 	@XStreamAsAttribute
@@ -90,6 +93,14 @@ public class CSVInput {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+	
+	public String getHeader() {
+		return header;
+	}
+	
+	public void setHeader(String header) {
+		this.header = header;
 	}
 
 	public String getTypeName() {

@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+import com.axelor.common.StringUtils;
 import com.axelor.data.ImportException;
 import com.axelor.data.ImportTask;
 import com.axelor.data.Importer;
@@ -292,8 +293,14 @@ public class CSVImporter implements Importer {
 
 		BufferedReader streamReader = new BufferedReader(reader);
 		CSVReader csvReader = new CSVReader(streamReader, csvInput.getSeparator());
+		String[] fields;
+		
+		if (StringUtils.isBlank(csvInput.getHeader())) {
+			fields = csvReader.readNext();
+		} else {
+			fields = csvInput.getHeader().trim().split("\\s*,\\s*");
+		}
 
-		String[] fields = csvReader.readNext();
 		Class<?> beanClass = Class.forName(beanName);
 		if(loggerManager != null) {
 			loggerManager.prepareInput(csvInput, fields);

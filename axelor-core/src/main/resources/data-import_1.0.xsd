@@ -122,6 +122,11 @@
       <extension base="db:Input">
         <sequence>
           <sequence>
+          	<element name="header" type="string" minOccurs="0">
+          	  <annotation>
+          	    <documentation>The header of the input csv if first line of input is not header.</documentation>
+          	  </annotation>
+          	</element>
             <element name="adapter" type="db:Adapter" minOccurs="0" maxOccurs="unbounded">
               <annotation>
                 <documentation>Type adapter.</documentation>
