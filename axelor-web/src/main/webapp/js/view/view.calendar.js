@@ -58,6 +58,7 @@ function CalendarViewCtrl($scope, $element) {
 				length: parseInt(schema.eventLength) || 0,
 				color: schema.colorBy,
 				title: schema.items[0].name,
+				dayLength: schema.dayLength || 8
 			};
 
 			$scope._viewResolver.resolve(schema, $element);
@@ -204,7 +205,7 @@ function CalendarViewCtrl($scope, $element) {
 		}
 		
 		info.title = titleText;
-		info.allDay = diff <= 0 || diff >= (8 * 60);
+		info.allDay = diff <= 0 || diff >= (view.dayLength * 60);
 		info.className = info.allDay ? "calendar-event-allDay" : "calendar-event-day";
 		
 		return info;

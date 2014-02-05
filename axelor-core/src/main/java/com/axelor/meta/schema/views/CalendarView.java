@@ -59,6 +59,9 @@ public class CalendarView extends AbstractView {
 	
 	@XmlAttribute
 	private Integer eventLength;
+	
+	@XmlAttribute
+	private Integer dayLength;
 
 	@XmlElement(name="field", type=Field.class)
 	private List<AbstractWidget> items;
@@ -113,6 +116,14 @@ public class CalendarView extends AbstractView {
 
 	public void setEventLength(Integer eventLength) {
 		this.eventLength = eventLength;
+	}
+	
+	public Integer getDayLength() {
+		return dayLength;
+	}
+	
+	public void setDayLength(Integer dayLength) {
+		this.dayLength = dayLength;
 	}
 
 	public void setItems(List<AbstractWidget> items) {
