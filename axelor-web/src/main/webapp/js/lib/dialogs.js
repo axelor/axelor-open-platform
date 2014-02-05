@@ -32,6 +32,10 @@
 	
 	var dialogs = {
 
+		config: {
+			yesNo: false
+		},
+		
 		say: function(str) {
 			return this.box(str, {
 				title: _t('Information')
@@ -52,19 +56,33 @@
 			});
 		},
 
-		confirm: function(str, callback, title) {
+		confirm: function(str, callback, options) {
 			var element = null,
-				cb = callback || $.noop,
+				opts = null,
+				cb = angular.noop,
 				doCall = true;
-	
+
+			for (var i = 1; i < 3; i++) {
+				var arg = arguments[i];
+				if (_.isFunction(arg)) cb = arg;
+				if (_.isObject(arg)) opts = arg;
+			}
+
+			opts = _.extend({
+				title: _t('Question')
+			}, this.config, opts);
+
+			var titleOK = opts.yesNo ? _t('Yes') : _t('OK');
+			var titleCancel = opts.yesNo ? _t('No') : _t('Cancel');
+
 			return element = this.box(str, {
-				title: title || _t('Question'),
+				title: opts.title,
 				onClose: function() {
 					if (doCall) cb(false);
 				},
 				buttons: [
 					{
-						text: _t('Cancel'),
+						text: titleCancel,
 						'class': 'btn',
 						click: function() {
 							cb(false);
@@ -73,7 +91,7 @@
 						}
 					},
 					{
-						text: _t('OK'),
+						text: titleOK,
 						'class': 'btn btn-primary',
 						click: function() {
 							cb(true);
