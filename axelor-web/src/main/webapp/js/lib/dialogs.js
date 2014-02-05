@@ -173,6 +173,7 @@
 				.css('position', 'fixed')
 				.css('bottom', 0)
 				.css('right', 10)
+				.zIndex(9999999)
 				.appendTo("body");
 		}
 		
