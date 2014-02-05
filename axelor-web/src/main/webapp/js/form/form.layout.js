@@ -158,6 +158,9 @@ function TableLayout(items, attrs, $scope, $compile) {
 				if (_.isArray(widths) && widths[i]) {
 					el.width(widths[i]);
 				}
+				if ($(cell.elem).is('.form-item-container')) {
+					$(cell.elem).prepend($('<span class="icon icon-pencil hot-edit-icon"></span>'));
+				}
 				numCells += cell.colspan || 1;
 		});
 
