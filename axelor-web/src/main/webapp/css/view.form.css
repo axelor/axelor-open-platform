@@ -532,6 +532,19 @@ td.form-item > * {
 	cursor: default;
 }
 
+.form-item-container .hot-edit-icon {
+	width: 18px;
+	position: absolute;
+	left: -16px;
+	top: 7px;
+	cursor: pointer;
+	display: none;
+}
+
+form.readonly .form-item-container:hover .hot-edit-icon {
+	display: inline;
+}
+
 table.field-details {
 	width: 100px;
 }

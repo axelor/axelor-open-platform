@@ -91,6 +91,9 @@ function ViewCtrl($scope, DataSource, ViewService) {
 			return;
 		}
 		
+		// cancel hot edit
+		$.event.trigger('cancel:hot-edit');
+		
 		var promise = view.deferred.promise;
 		promise.then(function(viewScope){
 
@@ -597,58 +600,63 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 			}
 		});
 		
-		$(document).on("dblclick.hot-edit", ".form-item-container.readonly", function (e) {
-			var fs = $(e.target).data('$scope');
+		
+		
+		function hotEdit(elem) {
+			var fs = elem.data('$scope');
 			var field = fs ? fs.field : null;
 			if (!field || field.readonly) {
 				return;
 			}
-			if (fs.hasPermission("write") && fs.isReadonly() && fs.canEdit()) {
-				var elem = $(e.target),
-					parent = $(e.target).parent();
-				$.event.trigger('cancel:hot-edit');
-				fs.applyLater(function () {
-					fs.attr("force-edit", true);
-					setTimeout(function() {
-						parent.find(':input:first').focus().select();
-					}, 100);
-					elem.on('cancel:hot-edit', function() {
-						fs.attr("force-edit", false);
-						fs.applyLater();
-					});
-					var unwatch = fs.$watch("attr('force-edit')", function(edit) {
-						if (!edit) {
-							elem.off('cancel:hot-edit');
-							unwatch();
-						}
-					});
-				});
-			}
-		});
-		
-		$(document).on("keydown.hot-edit", ".form-item-container.editable", function (e) {
-			if (!(e.which === 13 || e.which === 27) || e.ctrlKey || e.shiftKey) {
+			
+			var isHotEdit = fs.attr("force-edit");
+			var unwatch = null;
+
+			$.event.trigger('cancel:hot-edit');
+			
+			if (isHotEdit || !fs.hasPermission("write") || !fs.isReadonly()) {
 				return;
-			}
-			var elem = $(e.target);
-			if (!elem.is('.form-item-container')) {
-				elem = elem.parents('.form-item-container:first');
 			}
 
-			var fs = elem.data('$scope');
-			var field = fs ? fs.field : null;
-			if (!field || field.readonly || !fs.attr('force-edit')) {
-				return;
+			function cleanup() {
+				if (unwatch) {
+					unwatch();
+					unwatch = null;
+				}
+				fs.attr("force-edit", false);
+				elem.off('cancel:hot-edit');
+				elem.off('$destroy:hot-edit');
+				elem = null;
 			}
-			
-			fs.attr("force-edit", false);
-			fs.applyLater();
-		});
+
+			$.event.trigger('cancel:hot-edit');
+				
+			fs.applyLater(function () {
+				fs.attr("force-edit", true);
+				fs.$timeout(function() {
+					elem.find(':input:first').focus();
+				}, 100);
+				elem.on('cancel:hot-edit', function () {
+					cleanup();
+					fs.applyLater();
+				});
+				elem.on('$destroy.hot-edit', cleanup);
+				unwatch = fs.$watch("attr('force-edit')", function(edit) {
+					if (!edit) {
+						cleanup();
+					}
+				});
+			});
+		}
 		
+		$(document).on("click.hot-edit", ".hot-edit-icon", function (e) {
+			hotEdit($(e.target).parent());
+		});
+
 		scope.$on('$destroy', function() {
 			$(document).off('keydown.axelor-keys');
-			$(document).off('dblclick:hot-edit');
-			$(document).off('keydown:hot-edit');
+			$(document).off('dblclick.hot-edit');
+			$(document).off('keydown.hot-edit');
 		});
 	};
 });

@@ -400,6 +400,7 @@ function FormViewCtrl($scope, $element) {
 	});
 	
 	$scope.onEdit = function() {
+		$.event.trigger('cancel:hot-edit');
 		$scope.setEditable();
 	};
 
