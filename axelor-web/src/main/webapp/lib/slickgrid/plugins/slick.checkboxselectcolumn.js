@@ -142,9 +142,10 @@
 
     function checkboxSelectionFormatter(row, cell, value, columnDef, dataContext) {
       if (dataContext) {
+    	var type = _options.multiSelect ? "checkbox" : "radio";
         return _selectedRowsLookup[row]
-            ? "<input type='checkbox' checked='checked'>"
-            : "<input type='checkbox'>";
+            ? "<input type='" + type + "' checked='checked'>"
+            : "<input type='" + type + "'>";
       }
       return null;
     }
