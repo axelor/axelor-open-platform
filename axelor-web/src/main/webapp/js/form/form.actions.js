@@ -242,6 +242,9 @@ ActionHandler.prototype = {
 			deferred = this.ws.defer();
 
 		if (scope.isValid && !scope.isValid()) {
+			axelor.notify.error(_t('Please correct the invalid form values.'), {
+				title: _t('Validation error')
+			});
 			deferred.reject();
 			return deferred.promise;
 		}
