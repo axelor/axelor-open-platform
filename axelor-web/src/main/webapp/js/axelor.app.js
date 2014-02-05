@@ -257,7 +257,8 @@
 	function AppCtrl($rootScope, $exceptionHandler, $scope, $http, $route, authService) {
 		
 		function getAppInfo(settings) {
-			return {
+			
+			var info = {
 				name: settings['application.name'],
 				description: settings['application.description'],
 				version: settings['application.version'],
@@ -270,6 +271,14 @@
 				sdk: settings['sdk.version'],
 				fileUploadSize: settings['file.upload.size']
 			};
+
+			if (settings['view.confirm.yes-no'] === true) {
+				_.extend(axelor.dialogs.config, {
+					yesNo: true
+				});
+			}
+			
+			return info;
 		}
 	
 		function appInfo() {

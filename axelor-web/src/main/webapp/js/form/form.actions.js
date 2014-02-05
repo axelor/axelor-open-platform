@@ -180,6 +180,8 @@ ActionHandler.prototype = {
 				} else {
 					deferred.reject();
 				}
+			}, {
+				yesNo: false
 			});
 			return promise;
 		}
@@ -389,7 +391,11 @@ ActionHandler.prototype = {
 					}
 					deferred.reject();
 				});
-			}, _t('Warning'));
+			}, {
+				title: _t('Warning'),
+				yesNo: false
+			});
+			
 			return deferred.promise;
 		}
 		

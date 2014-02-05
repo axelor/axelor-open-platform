@@ -266,6 +266,10 @@ header .navbar-inverse .dropdown-submenu:focus > a {
             box-shadow: inset 0 1px 0 white;
 }
 
+.ui-dialog-buttonpane .btn {
+	padding: 16px auto;
+}
+
 .ui-dialog .ui-dialog-content {
 	padding: 4px;	
 }
