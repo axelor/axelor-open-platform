@@ -78,9 +78,6 @@ public final class AppInfo {
 		} catch (Exception e){
 		}
 
-		map.put("app.toolbar.titles", settings.getBoolean("application.toolbar.titles", false));
-		map.put("app.menubar.location", settings.get("application.menubar.location"));
-		
 		map.put("application.name", settings.get("application.name"));
 		map.put("application.description", settings.get("application.description"));
 		map.put("application.version", settings.get("application.version"));
@@ -89,6 +86,16 @@ public final class AppInfo {
 		map.put("help.location", settings.get("help.location"));
 		map.put("sdk.version", settings.get("sdk.version"));
 		map.put("file.upload.size", settings.get("file.upload.size"));
+
+		for (String key : settings.getProperties().stringPropertyNames()) {
+			if (key.startsWith("view.")) {
+				Object value = settings.get(key);
+				if ("true".equals(value) || "false".equals(value)) {
+					value = Boolean.parseBoolean(value.toString());
+				}
+				map.put(key, value);
+			}
+		}
 
 		try {
 			ObjectMapper mapper = new ObjectMapper();
