@@ -108,16 +108,18 @@ public final class ClassUtils {
 		}
 		
 		private boolean hasAnnotation(Class<?> cls) {
+			boolean matched = false;
 			for (Class<? extends Annotation> annotation : annotations) {
 				if (cls.isAnnotationPresent(annotation)) {
 					if (!matchAll) {
 						return true;
 					}
+					matched = true;
 				} else if (matchAll) {
 					return false;
 				}
 			}
-			return annotations.size() == 0;
+			return annotations.size() == 0 || matched;
 		}
 
 		/**
