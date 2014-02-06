@@ -18,17 +18,17 @@
   code: DE
   name: Germany
 
-- !Group: &family
-  name: family
-  title: Family
+- !Circle: &family
+  code: family
+  name: Family
 
-- !Group: &friends
-  name: friends
-  title: Friends
+- !Circle: &friends
+  code: friends
+  name: Friends
   
-- !Group: &business
-  name: business
-  title: Business
+- !Circle: &business
+  code: business
+  name: Business
   
 - !Title: &mr
   code: mr
@@ -68,7 +68,7 @@
   addresses:
     - *james_addr_home
     - *james_addr_office
-  groups:
+  circles:
     - *family
   
 - !Contact:
@@ -77,7 +77,7 @@
   lastName: Smith
   email: jsmith@gmail.com
   dateOfBirth: 1979-11-01
-  groups:
+  circles:
     - *friends
     - *business
   addresses:
@@ -96,5 +96,5 @@
   lastName: Ram
   email: ram@markram.com
   dateOfBirth: 1975-03-23
-  groups:
+  circles:
     - *business

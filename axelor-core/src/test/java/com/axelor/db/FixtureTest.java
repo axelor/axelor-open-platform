@@ -47,12 +47,12 @@ import com.axelor.test.db.Contact;
 public class FixtureTest {
 
 	@Inject
-	Fixture fixture;
+	private JpaFixture fixture;
 
 	@Before
 	public void setUp() {
 		if (Contact.all().count() == 0) {
-			fixture.load("demo");
+			fixture.load("demo-data.yml");
 		}
 	}
 
