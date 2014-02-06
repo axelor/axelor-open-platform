@@ -32,7 +32,6 @@ package com.axelor.web;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.ws.rs.Path;
 
@@ -94,9 +93,7 @@ public class AppServletModule extends JerseyServletModule {
 		log.info(builder.toString());
 
 		// initialize JPA
-		Properties properties = new Properties();
-		properties.put("hibernate.ejb.interceptor", "com.axelor.auth.db.AuditInterceptor");
-		install(new JpaModule(jpaUnit, true, false).properties(properties));
+		install(new JpaModule(jpaUnit, true, false));
 
 		// trick to ensure PersistFilter is registered before anything else
 		install(new ServletModule() {
