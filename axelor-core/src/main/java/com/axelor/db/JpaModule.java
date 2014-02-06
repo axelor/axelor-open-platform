@@ -133,6 +133,8 @@ public class JpaModule extends AbstractModule {
 		if (this.autoscan) {
 			properties.put("hibernate.ejb.resource_scanner", "com.axelor.db.JpaScanner");
 		}
+		
+		properties.put("hibernate.ejb.interceptor", "com.axelor.auth.db.AuditInterceptor");
 
 		properties.put("hibernate.connection.autocommit", "false");
 		properties.put("hibernate.id.new_generator_mappings", "true");
