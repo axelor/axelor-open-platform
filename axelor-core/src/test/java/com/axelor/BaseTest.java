@@ -37,7 +37,7 @@ import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 
-import com.axelor.db.Fixture;
+import com.axelor.db.JpaFixture;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.GuiceRunner;
 import com.axelor.test.db.Contact;
@@ -51,7 +51,7 @@ public abstract class BaseTest {
 	protected ObjectMapper objectMapper = new ObjectMapper();
 
 	@Inject
-	private Fixture fixture;
+	private JpaFixture fixture;
 
 	@Before
 	public void setUp() {

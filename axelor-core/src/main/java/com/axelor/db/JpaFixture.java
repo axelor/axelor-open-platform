@@ -46,22 +46,16 @@ import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.Tag;
 
+import com.axelor.common.ClassUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.inject.Injector;
 import com.google.inject.persist.Transactional;
 
 /**
  * This class can be used to load test data for JPA entities.
  * 
  * <p>
- * It processes YAML files located in {@code META-INF/fixtures}. A fixture
- * consists of two files with {@code .resolver.yml} and {@code .data.yml}
- * suffixes.
- * 
- * <p>
- * The resolver file defiles short names for fully qualified entity name to use
- * in the data file.
+ * It processes YAML files located in {@code /fixtures}.
  * 
  * <p>
  * For example, the following schema:
@@ -69,22 +63,23 @@ import com.google.inject.persist.Transactional;
  * <pre>
  * 
  * &#64;Entity
- * &#64;Table(name = "PERSON_GROUP")
- * public class Group extends Model {
+ * &#64;Table(name = "CONTACT_CIRCLE")
+ * public class Circle extends Model {
+ *     private String code;
  *     private String name;
- *     private String title;
  *     ...
  *     ...
  * }
  * 
  * &#64;Entity
- * public class Person extends Model {
- *     private String name;
- *     private String age;
- *     private String lang;
+ * &#64;Table(name = "CONTACT_CONTACT")
+ * public class Contact extends Model {
+ *     private String firstName;
+ *     private String lastName;
+ *     private String email;
  *     
  *     &#64;ManyToMany
- *     private List<Group> groups;
+ *     private Set<Circle> circles;
  *     ...
  *     ...
  *     ...
@@ -92,54 +87,37 @@ import com.google.inject.persist.Transactional;
  * 
  * The fixtures should be defined like this:
  * 
- * 1. demo.resolver.yml
- * 
  * <pre>
- * Group: com.axelor.contact.db.Group
- * Person: com.axelor.contact.db.Person
- * </pre>
+ *  - !Circle: &family
+ *   code: family
+ *   name: Family
  * 
- * 2. demo.data.yml
- * 
- * <pre>
- *  - !Group: &family
- *   name: family
- *   title: Family
- * 
- * - !Group: &friends
- *   name: friends
- *   title: Friends
+ * - !Circle: &friends
+ *   code: friends
+ *   name: Friends
  *   
- * - !Group: &business
- *   name: business
- *   title: Business
+ * - !Circle: &business
+ *   code: business
+ *   name: Business
  * 
- * - !Person:
- *   name: Some
- *   age: 27
- *   lang: en
- *   groups:
- *     - *family
- *   
- * - !Person:
- *   name: One
- *   age: 23
- *   lang: fr
- *   groups:
+ * - !Contact:
+ *   firstName: John
+ *   lastName: Smith
+ *   email: j.smith@gmail.com
+ *   circles:
  *     - *friends
  *     - *business
- * 
- * - !Person:
- *   name: Else
- *   age: 31
- *   lang: hi
- *   groups:
+ *   
+ * - !Contact:
+ *   firstName: Tin
+ *   lastName: Tin
+ *   email: tin.tin@gmail.com
+ *   circles:
  *     - *business
  * </pre>
  * 
  * <p>
- * In order to use the fixture data, you should inject Guice {@link Injector}
- * object before using the {@link Fixture} instance.
+ * In order to use the fixture data, the {@link JpaFixture} must be injected.
  * 
  * <pre>
  * &#64;RunWith(GuiceRunner.class)
@@ -147,57 +125,44 @@ import com.google.inject.persist.Transactional;
  * class FixtureTest {
  * 
  *     &#64;Inject
- *     Fixture fixture;
- *     
- *     &#64;Inject
- *     Manager&lt;Person&gt; mp;
- *     
- *     &#64;Inject
- *     Manager&lt;Group&gt; mg;
+ *     private JpaFixture fixture;
  *     
  *     &#64;Before
  *     public void setUp() {
- *         fixture.load("data");
- *         fixture.load("some_other_fixture");
+ *         fixture.load("demo-data.yml");
+ *         fixture.load("demo-data-extra.yml");
  *     }
  *     
  *     &#64;Test
  *     public void testCount() {
- *         Assert.assertEqual(3, mg.all().count());
+ *         Assert.assertEqual(2, Contact.all().count());
  *         ...
  *     }
  *     ...
  * }
  * </pre>
  */
-public class Fixture {
-	
+public class JpaFixture {
+
 	private InputStream read(String resource) {
-		return Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream(("META-INF/fixtures/" + resource));
+		return ClassUtils.getResourceStream("fixtures/" + resource);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Transactional
 	public void load(String fixture) {
 
-		Yaml yaml = new Yaml();
-
-		InputStream is = read(fixture + ".resolver.yml");
-		InputStream ds = read(fixture + ".data.yml");
-
-		if (is == null || ds == null) {
-			throw new IllegalArgumentException("No such fixture: " + fixture
-					+ ".yml");
-		}
-
-		final Map<String, String> classes = (Map<String, String>) yaml.load(is);
+		final InputStream stream = read(fixture);
 		final Map<Node, Object> objects = Maps.newLinkedHashMap();
+
+		if (stream == null) {
+			throw new IllegalArgumentException("No such fixture found: " + fixture);
+		}
 		
-		Constructor ctor = new Constructor() {
+		final Constructor ctor = new Constructor() {
 			{
 				yamlClassConstructors.put(NodeId.scalar, new TimeStampConstruct());
 			}
+			
 			class TimeStampConstruct extends Constructor.ConstructScalar {
 
 				Construct dateConstructor = yamlConstructors.get(Tag.TIMESTAMP);
@@ -237,20 +202,12 @@ public class Fixture {
 			}
 		};
 		
-		for (String key : classes.keySet()) {
-			try {
-				Class<?> klass = Class.forName(classes.get(key));
-				ctor.addTypeDescription(new TypeDescription(klass, "!" + key
-						+ ":"));
-			} catch (ClassNotFoundException e) {
-				throw new RuntimeException(String.format(
-						"Invalid fixture resolver '%s': %s: %s", fixture, key,
-						classes.get(key)));
-			}
+		for(Class<?> klass : JPA.models()) {
+			ctor.addTypeDescription(new TypeDescription(klass, "!" + klass.getSimpleName() + ":"));
 		}
 
 		Yaml data = new Yaml(ctor);
-		data.load(ds);
+		data.load(stream);
 		
 		for(Object item : Lists.reverse(Lists.newArrayList(objects.values()))) {
 			try {
