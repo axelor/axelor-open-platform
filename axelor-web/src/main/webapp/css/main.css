@@ -548,6 +548,12 @@ input[readonly], select[readonly], textarea[readonly] {
 
 .record-pager-change button {
 	height: auto !important;
+	margin-top: 5px !important;
+}
+
+.record-pager-change input {
+	margin-top: 5px;
+	height: 20px;
 }
 
 .stackbar {
