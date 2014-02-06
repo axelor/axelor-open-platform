@@ -295,7 +295,7 @@
 }
 
 .slick-sort-indicator {
-	display: none;
+	margin-left: 7px;
 }
 
 .slick-sort-indicator-asc,
