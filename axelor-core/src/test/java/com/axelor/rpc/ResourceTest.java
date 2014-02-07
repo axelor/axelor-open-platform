@@ -39,17 +39,16 @@ import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.axelor.BaseTest;
 import com.axelor.db.JPA;
 import com.axelor.test.db.Address;
-import com.axelor.test.db.Contact;
 import com.axelor.test.db.Circle;
+import com.axelor.test.db.Contact;
 import com.axelor.test.db.Title;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
-public class ResourceTest extends BaseTest {
+public class ResourceTest extends RpcTest {
 
 	@Inject
 	Resource<Contact> resource;
@@ -91,12 +90,12 @@ public class ResourceTest extends BaseTest {
 
 		Assert.assertEquals(Title.class, p.getTitle().getClass());
 		Assert.assertEquals(Address.class, p.getAddresses().get(0).getClass());
-		Assert.assertEquals(Circle.class, p.getGroup(0).getClass());
+		Assert.assertEquals(Circle.class, p.getCircle(0).getClass());
 		Assert.assertEquals(LocalDate.class, p.getDateOfBirth().getClass());
 
 		Assert.assertEquals("mr", p.getTitle().getCode());
 		Assert.assertEquals("France", p.getAddresses().get(0).getCountry().getName());
-		Assert.assertEquals("family", p.getGroup(0).getCode());
+		Assert.assertEquals("family", p.getCircle(0).getCode());
 		Assert.assertEquals("1977-05-01", p.getDateOfBirth().toString());
 	}
 	

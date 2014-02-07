@@ -53,7 +53,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.persist.Transactional;
 
-public class TestWS extends AbstractTest {
+public class TestWS extends MetaTest {
 	
 	@Inject
 	private Injector injector;

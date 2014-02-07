@@ -28,42 +28,46 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.db;
+package com.axelor.meta;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import javax.inject.Inject;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import com.axelor.MyTest;
+import com.axelor.common.ClassUtils;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.axelor.MyModule;
-import com.axelor.test.GuiceModules;
-import com.axelor.test.GuiceRunner;
-import com.axelor.test.db.Contact;
-
-@RunWith(GuiceRunner.class)
-@GuiceModules(MyModule.class)
-public class FixtureTest {
+public abstract class MetaTest extends MyTest {
 
 	@Inject
-	private JpaFixture fixture;
+	private ObjectMapper mapper;
 
-	@Before
-	public void setUp() {
-		if (Contact.all().count() == 0) {
-			fixture.load("demo-data.yml");
-		}
+	protected InputStream read(String resource) {
+		return ClassUtils.getResourceStream(resource);
 	}
 
-	@Test
-	public void testInjected() {
-		Assert.assertNotNull(fixture);
+	protected ObjectMapper getObjectMapper() {
+		return mapper;
 	}
 
-	@Test
-	public void testCount() {
-		Assert.assertTrue(Contact.all().count() > 0);
+	@SuppressWarnings("unchecked")
+	protected <T> T unmarshal(String resource, Class<T> type) throws JAXBException {
+		JAXBContext context = JAXBContext.newInstance(type);
+		Unmarshaller unmarshaller = context.createUnmarshaller();
+		return (T) unmarshaller.unmarshal(read(resource));
 	}
 
+	protected String toJson(Object object) throws JsonGenerationException,
+			JsonMappingException, IOException {
+		return getObjectMapper()
+				.writerWithDefaultPrettyPrinter()
+				.writeValueAsString(object);
+	}
 }

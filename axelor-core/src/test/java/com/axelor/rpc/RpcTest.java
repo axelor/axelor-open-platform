@@ -28,51 +28,48 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.meta;
+package com.axelor.rpc;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import javax.inject.Inject;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
-import org.junit.runner.RunWith;
-
-import com.axelor.test.GuiceModules;
-import com.axelor.test.GuiceRunner;
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.axelor.MyTest;
+import com.axelor.common.ClassUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@RunWith(GuiceRunner.class)
-@GuiceModules(TestModule.class)
-public abstract class AbstractTest {
+abstract class RpcTest extends MyTest {
 
 	@Inject
-	private ObjectMapper mapper;
+	protected ObjectMapper mapper;
 
-	protected InputStream read(String resource) {
-		return Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream(resource);
+	protected InputStreamReader read(String json) {
+		return new InputStreamReader(ClassUtils.getResourceStream("json/" + json));
 	}
 
-	protected ObjectMapper getObjectMapper() {
-		return mapper;
+	protected String toJson(Object value) {
+		try {
+			return mapper.writeValueAsString(value);
+		} catch (Exception e){
+			throw new IllegalArgumentException(e);
+		}
 	}
-
-	@SuppressWarnings("unchecked")
-	protected <T> T unmarshal(String resource, Class<T> type) throws JAXBException {
-		JAXBContext context = JAXBContext.newInstance(type);
-		Unmarshaller unmarshaller = context.createUnmarshaller();
-		return (T) unmarshaller.unmarshal(read(resource));
+	
+	protected <T> T fromJson(InputStreamReader reader, Class<T> klass) {
+		try {
+			return mapper.readValue(reader, klass);
+		} catch (Exception e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
-
-	protected String toJson(Object object) throws JsonGenerationException,
-			JsonMappingException, IOException {
-		return getObjectMapper()
-				.writerWithDefaultPrettyPrinter()
-				.writeValueAsString(object);
+	
+	protected <T> T fromJson(String json, Class<T> klass) {
+		if (json.endsWith(".js"))
+			return fromJson(read(json), klass);
+		try {
+			return mapper.readValue(json, klass);
+		} catch (Exception e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 }

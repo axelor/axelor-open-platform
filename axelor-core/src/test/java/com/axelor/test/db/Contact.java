@@ -46,6 +46,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.joda.time.LocalDate;
@@ -103,6 +104,7 @@ public class Contact extends JpaModel {
 	@Lob @Basic(fetch = FetchType.LAZY)
 	private byte[] image;
 
+	@Transient
 	@Widget(multiline = true)
 	private String notes;
 
@@ -222,7 +224,7 @@ public class Contact extends JpaModel {
 		this.addresses = addresses;
 	}
 
-	public Circle getGroup(int index) {
+	public Circle getCircle(int index) {
 		if (circles == null) return null;
 		return Lists.newArrayList(circles).get(index);
 	}

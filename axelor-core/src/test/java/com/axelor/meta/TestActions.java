@@ -50,11 +50,12 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.test.db.Contact;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 
-public class TestActions extends AbstractTest {
+public class TestActions extends MetaTest {
 	
 	private ObjectViews views;
 	
@@ -62,9 +63,13 @@ public class TestActions extends AbstractTest {
 	private Injector injector;
 	
 	@Before
-	public void setUp() throws Exception {
-
-		views = this.unmarshal("Contact.xml", ObjectViews.class);
+	public void setUp() {
+		try {
+			views = this.unmarshal("com/axelor/meta/Contact.xml", ObjectViews.class);
+		} catch (Exception e) {
+			throw Throwables.propagate(e);
+		}
+		
 		assertNotNull(views);
 		assertNotNull(views.getActions());
 		
@@ -91,7 +96,7 @@ public class TestActions extends AbstractTest {
 		
 		Map<String, Object> data = Maps.newHashMap();
 		request.setData(data);
-		request.setModel("com.axelor.meta.db.Contact");
+		request.setModel("com.axelor.test.db.Contact");
 		request.setAction(action);
 
 		data.put("context", context);

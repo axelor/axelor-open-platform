@@ -35,7 +35,7 @@ import javax.xml.bind.JAXBException;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestLoader extends AbstractTest {
+public class TestLoader extends MetaTest {
 	
 	private MetaLoader loader;
 

@@ -34,15 +34,10 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import com.axelor.MyModule;
-import com.axelor.test.GuiceModules;
-import com.axelor.test.GuiceRunner;
+import com.axelor.MyTest;
 
-@RunWith(GuiceRunner.class)
-@GuiceModules({ MyModule.class })
-public class ConfigGeneratorTest {
+public class ConfigGeneratorTest extends MyTest {
 
 	@Test
 	public void test1() throws IOException {

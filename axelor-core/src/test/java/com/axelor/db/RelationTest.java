@@ -28,7 +28,7 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.test;
+package com.axelor.db;
 
 import java.math.BigDecimal;
 
@@ -37,18 +37,15 @@ import javax.persistence.PersistenceException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import com.axelor.MyModule;
+import com.axelor.MyTest;
 import com.axelor.test.db.Invoice;
 import com.axelor.test.db.Move;
 import com.axelor.test.db.MoveLine;
 import com.google.common.collect.Lists;
 import com.google.inject.persist.Transactional;
 
-@RunWith(GuiceRunner.class)
-@GuiceModules({ MyModule.class })
-public class RelationTest {
+public class RelationTest extends MyTest {
 
 	@Before
 	@Transactional

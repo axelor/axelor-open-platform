@@ -40,7 +40,6 @@ import javax.persistence.Query;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.axelor.db.JPA;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.FormInclude;
@@ -51,7 +50,7 @@ import com.axelor.test.db.Title;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
-public class TestViews extends AbstractTest {
+public class TestViews extends MetaTest {
 
 	@Test
 	public void test1() throws Exception {
@@ -93,10 +92,8 @@ public class TestViews extends AbstractTest {
 
 		Search search = (Search) views.getViews().get(0);
 
-		Title title = new Title();
-		title.setCode("mr");
-		title.setName("Mr.");
-		title = JPA.save(title);
+		Title title = Title.all().filter("self.code = ?", "mr").fetchOne();
+		Assert.assertNotNull(title);
 
 		Map<String, Object> binding = Maps.newHashMap();
 		binding.put("customer", "Some");

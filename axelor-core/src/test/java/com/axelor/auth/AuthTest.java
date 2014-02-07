@@ -37,21 +37,17 @@ import org.apache.shiro.subject.Subject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
+import com.axelor.MyTest;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity.AccessType;
-import com.axelor.test.GuiceModules;
-import com.axelor.test.GuiceRunner;
 import com.google.inject.persist.Transactional;
 
-@RunWith(GuiceRunner.class)
-@GuiceModules({ TestModule.class })
-public class AuthTest {
+public class AuthTest extends MyTest {
 	
 	@Inject
 	private AuthService authService;

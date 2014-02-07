@@ -36,7 +36,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.axelor.BaseTest;
+import com.axelor.MyTest;
 import com.axelor.test.db.Address;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.Country;
@@ -47,7 +47,7 @@ import com.google.common.collect.Sets;
 import com.google.inject.persist.Transactional;
 
 @Transactional
-public class CrudTest  extends BaseTest {
+public class CrudTest  extends MyTest {
 	
 	@Before
 	public void setUp() {
