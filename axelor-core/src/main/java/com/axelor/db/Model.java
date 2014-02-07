@@ -32,6 +32,7 @@ package com.axelor.db;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 import javax.persistence.Version;
 
 /**
@@ -51,8 +52,9 @@ public abstract class Model {
 	private Integer version;
 	
 	// Represents the selected state of the record in the UI widgets
+	@Transient
 	private transient boolean selected;
-	
+
 	private Boolean archived;
 
 	public abstract Long getId();

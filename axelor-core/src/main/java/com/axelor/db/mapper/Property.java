@@ -52,6 +52,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 import javax.persistence.Version;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
@@ -116,6 +117,8 @@ public class Property {
 	private boolean hidden;
 
 	private boolean virtual;
+	
+	private boolean transient_;
 
 	private boolean password;
 
@@ -235,6 +238,10 @@ public class Property {
 			if (annotation instanceof NameColumn) {
 				nameColumn = true;
 			}
+			
+			if (annotation instanceof Transient) {
+				transient_ = true;
+			}
 
 			// Widget attributes
 			if (annotation instanceof Widget) {
@@ -319,6 +326,10 @@ public class Property {
 
 	public boolean isVirtual() {
 		return virtual;
+	}
+	
+	public boolean isTransient() {
+		return transient_;
 	}
 
 	public boolean isPassword() {
@@ -652,7 +663,7 @@ public class Property {
 					|| (value instanceof Object[] && ((Object[]) value).length == 0)) {
 				continue;
 			}
-			map.put(field.getName(), value);
+			map.put(field.getName().replaceAll("_+$", ""), value);
 		}
 
 		return update(map);

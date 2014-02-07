@@ -49,8 +49,9 @@ import com.google.common.collect.Lists;
 public final class EntityHelper {
 
 	private static boolean isSimple(Property field) {
-		if (field.isPrimary() || field.isVersion() || field.isCollection()
-				|| field.isReference() || field.isVirtual() || field.isImage()
+		if (field.isTransient() || field.isPrimary() || field.isVersion()
+				|| field.isCollection() || field.isReference()
+				|| field.isVirtual() || field.isImage()
 				|| field.getType() == PropertyType.TEXT
 				|| field.getType() == PropertyType.BINARY) {
 			return false;
