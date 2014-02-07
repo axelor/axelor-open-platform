@@ -46,7 +46,9 @@ import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
 import com.axelor.db.Translations;
 import com.axelor.meta.service.MetaTranslations;
+import com.axelor.rpc.ObjectMapperProvider;
 import com.axelor.rpc.Response;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.persist.PersistFilter;
 import com.google.inject.servlet.ServletModule;
@@ -91,6 +93,9 @@ public class AppServletModule extends JerseyServletModule {
 		builder.append("\n  ").append("Version: ").append(settings.get("application.version"));
 
 		log.info(builder.toString());
+		
+		// some common bindings
+		bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
 
 		// initialize JPA
 		install(new JpaModule(jpaUnit, true, false));
