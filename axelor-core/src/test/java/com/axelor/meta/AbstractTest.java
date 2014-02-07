@@ -33,7 +33,10 @@ package com.axelor.meta;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.inject.Inject;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 import org.junit.runner.RunWith;
 
@@ -47,7 +50,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @GuiceModules(TestModule.class)
 public abstract class AbstractTest {
 
-	private ObjectMapper objectMapper = new MetaMapper();
+	@Inject
+	private ObjectMapper mapper;
 
 	protected InputStream read(String resource) {
 		return Thread.currentThread().getContextClassLoader()
@@ -55,11 +59,14 @@ public abstract class AbstractTest {
 	}
 
 	protected ObjectMapper getObjectMapper() {
-		return objectMapper;
+		return mapper;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected <T> T unmarshal(String resource, Class<T> type) throws JAXBException {
-		return MetaMapper.unmarshal(read(resource), type);
+		JAXBContext context = JAXBContext.newInstance(type);
+		Unmarshaller unmarshaller = context.createUnmarshaller();
+		return (T) unmarshaller.unmarshal(read(resource));
 	}
 
 	protected String toJson(Object object) throws JsonGenerationException,

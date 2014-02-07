@@ -28,7 +28,7 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.web;
+package com.axelor.rpc;
 
 import groovy.lang.GString;
 
@@ -36,10 +36,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Map;
 
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Provider;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -47,7 +45,6 @@ import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
 
 import com.axelor.db.Model;
-import com.axelor.rpc.Resource;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -59,9 +56,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 
-@Provider
-@Produces(MediaType.APPLICATION_JSON)
-public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
+@Singleton
+public class ObjectMapperProvider implements Provider<ObjectMapper> {
 
 	private ObjectMapper mapper;
 
@@ -160,9 +156,9 @@ public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
 		mapper.registerModule(jodaModule);
 		mapper.registerModule(new GuavaModule());
 	}
-	
+
 	@Override
-	public ObjectMapper getContext(Class<?> objectType) {
+	public ObjectMapper get() {
 		return mapper;
 	}
 }
