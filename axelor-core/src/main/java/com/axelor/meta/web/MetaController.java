@@ -132,7 +132,7 @@ public class MetaController {
 				}
 
 				JPA.clear();
-				JPA.em().createNativeQuery("UPDATE meta_user SET action = NULL").executeUpdate();
+				JPA.em().createNativeQuery("UPDATE auth_user SET action = NULL").executeUpdate();
 				JPA.em().createNativeQuery("DELETE FROM meta_menu_groups").executeUpdate();
 				JPA.em().createNativeQuery("DELETE FROM meta_view_groups").executeUpdate();
 				JPA.em().createNativeQuery("DELETE FROM meta_menu").executeUpdate();
