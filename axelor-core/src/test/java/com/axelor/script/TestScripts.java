@@ -40,7 +40,7 @@ import com.axelor.script.GroovyScriptHelper;
 import com.axelor.test.db.Contact;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestScripts extends BaseTest {
+public class TestScripts extends ScriptTest {
 
 	private int counter = 0;
 

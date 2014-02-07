@@ -33,24 +33,16 @@ package com.axelor.script;
 import java.util.Map;
 
 import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 
-import com.axelor.MyModule;
+import com.axelor.MyTest;
 import com.axelor.db.JPA;
 import com.axelor.rpc.Context;
-import com.axelor.test.GuiceModules;
-import com.axelor.test.GuiceRunner;
 import com.axelor.test.db.Contact;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
-@RunWith(GuiceRunner.class)
-@GuiceModules(MyModule.class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-abstract class BaseTest {
+public abstract class ScriptTest extends MyTest {
 
 	@Before
     @Transactional

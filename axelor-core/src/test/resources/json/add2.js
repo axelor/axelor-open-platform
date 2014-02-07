@@ -37,9 +37,9 @@
 			"zip" : "234656",
 			"person" : null
 		} ],
-		"groups" : [ {
-			"name" : "family",
-			"title" : "Family",
+		"circles" : [ {
+			"code" : "family",
+			"name" : "Family",
 			"id" : 1,
 			"version" : 0
 		} ],

@@ -39,8 +39,7 @@ import com.axelor.script.GroovyScriptHelper;
 import com.axelor.test.db.Contact;
 
 @SuppressWarnings("all")
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestSpeed extends BaseTest {
+public class TestSpeed extends ScriptTest {
 
     private static final int COUNT = 1000;
 

@@ -39,14 +39,14 @@ import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.axelor.BaseTest;
+import com.axelor.MyTest;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.TypeCheck;
 
-public class MapperTest extends BaseTest {
+public class MapperTest extends MyTest {
 
-	Mapper mapper = Mapper.of(Contact.class);
+	private Mapper mapper = Mapper.of(Contact.class);
 
 	@Test
 	public void testGet() {
@@ -98,7 +98,7 @@ public class MapperTest extends BaseTest {
 		
 		Assert.assertNotNull(contact.getCircles());
 		Assert.assertEquals(1, contact.getCircles().size());
-		Assert.assertEquals("Business", contact.getGroup(0).getName());
+		Assert.assertEquals("Business", contact.getCircle(0).getName());
 	}
 	
 	private Map<String, Object> getDemoData() {

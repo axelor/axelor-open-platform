@@ -74,7 +74,7 @@
     </action-attrs>
 
     <action-record name="action-contact-defaults"
-    	model="com.axelor.meta.db.Contact">
+    	model="com.axelor.test.db.Contact">
     	<field name="title" expr="action:action-default-title"/>
     	<field name="firstName" expr="John"/>
     	<field name="lastName" expr="Smith"/>
@@ -83,14 +83,14 @@
     </action-record>
     
     <action-record name="action-contact-defaults-multi"
-    	model="com.axelor.meta.db.Contact">
+    	model="com.axelor.test.db.Contact">
     	<field name="title" expr="action:action-default-title"/>
     	<field name="firstName,lastName" expr="Smith"/>
     	<field name="email,proEmail" expr="john.smith@gmail.com"/>
     </action-record>
     
     <action-record name="action-default-title"
-    	model="com.axelor.meta.db.Title" search="('self.code = ?1', 'MR')">
+    	model="com.axelor.test.db.Title" search="('self.code = ?1', 'MR')">
     	<field name="code" expr="MR"/>
     	<field name="name" expr="Mr."/>
     </action-record>
@@ -109,7 +109,7 @@
       <call class="com.axelor.meta.web.Hello" method="say(fullName)"/>
     </action-method>
 
-    <action-view name="action-view-contact" model="com.axelor.meta.db.Contact" title="Contacts">
+    <action-view name="action-view-contact" model="com.axelor.test.db.Contact" title="Contacts">
     	<view name="contact-form" type="form"/>
     	<view name="contact-tree" type="grid"/>
         <domain>self.group.code = :groupCode</domain>

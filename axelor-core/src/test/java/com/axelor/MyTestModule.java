@@ -28,23 +28,26 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.auth;
+package com.axelor;
 
 import java.util.Properties;
 
+import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
+import com.axelor.rpc.ObjectMapperProvider;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 
-public class TestModule extends AbstractModule {
-
+public class MyTestModule extends AbstractModule {
+	
 	protected Properties properties = new Properties();
-
+	
 	@Override
 	protected void configure() {
+		
+		bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
 
-		properties.put("hibernate.ejb.interceptor", "com.axelor.auth.db.AuditInterceptor");
-
-		install(new AuthModule.Simple().properties(properties));
 		install(new JpaModule("testUnit").properties(properties));
+		install(new AuthModule.Simple().properties(properties));
 	}
 }

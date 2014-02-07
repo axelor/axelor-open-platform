@@ -5,7 +5,7 @@
   
   	<search-fields>
    		<field name="customer" type="string" />
-   		<field name="partner" type="reference" target="com.axelor.meta.db.Contact"/>
+   		<field name="partner" type="reference" target="com.axelor.test.db.Contact"/>
    		<field name="country" type="string" />
    		<field name="date" type="date" />
    		<field name="value" type="decimal" />
@@ -18,12 +18,12 @@
    		<field name="value" type="decimal" />
    	</result-fields>
    	
-   	<select model="com.axelor.meta.db.Contact" orderBy="customer,-date">
+   	<select model="com.axelor.test.db.Contact" orderBy="customer,-date">
    		<field name="fullName" as="customer"/>
-   		<field name="birthDate" as="date"/>
+   		<field name="dateOfBirth" as="date"/>
    		<where match="all">
    			<input name="customer" field="fullName" matchStyle="contains"/>
-   			<input name="date" field="birthDate"/>
+   			<input name="date" field="dateOfBirth"/>
    			<input name="value" field="credit"/>
    			<input name="title" field="title"/>
    			<input name="customer" field="title.name"/>
@@ -32,20 +32,20 @@
    		</where>
    	</select>
    	
-   	<select model="com.axelor.meta.db.Contact" if="value &lt; 100.0">
+   	<select model="com.axelor.test.db.Contact" if="value &lt; 100.0">
    		<field name="fullName" as="customer"/>
    		<where match="all">
    			<input name="customer" field="fullName" matchStyle="contains"/>
-   			<input name="date" field="birthDate"/>
+   			<input name="date" field="dateOfBirth"/>
    			<input name="value" field="credit"/>
    		</where>
    	</select>
    	
-   	<select model="com.axelor.meta.db.Contact" >
+   	<select model="com.axelor.test.db.Contact" >
    		<field name="fullName" as="customer"/>
    		<where match="all">
    			<input name="customer" field="fullName" matchStyle="contains"/>
-   			<input name="date" field="birthDate"/>
+   			<input name="date" field="dateOfBirth"/>
    			<input name="value" field="credit" if="value &lt; 100.0"/>
    		</where>
    	</select>
