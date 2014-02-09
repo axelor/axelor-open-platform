@@ -30,51 +30,24 @@
  */
 package com.axelor.web;
 
-import java.util.Set;
+import java.util.Properties;
 
+import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
-import com.axelor.db.JpaSecurity;
-import com.axelor.db.Model;
-import com.axelor.rpc.filter.Filter;
+import com.axelor.rpc.ObjectMapperProvider;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 
 public class TestModule extends AbstractModule {
 
-	public static class MySecurity implements JpaSecurity {
-
-		@Override
-		public Set<AccessType> getAccessTypes(Class<? extends Model> model, Long id) {
-			return null;
-		}
-
-		@Override
-		public boolean hasRole(String name) {
-			return false;
-		}
-
-		@Override
-		public Filter getFilter(AccessType type, Class<? extends Model> model, Long... ids) {
-			return null;
-		}
-
-		@Override
-		public boolean isPermitted(AccessType type, Class<? extends Model> model, Long... ids) {
-			return true;
-		}
-
-		@Override
-		public void check(AccessType type, Class<? extends Model> model, Long... ids) {
-		
-		}
-	}
-
+protected Properties properties = new Properties();
+	
 	@Override
 	protected void configure() {
 		
-		// bind fake security implementation
-		bind(JpaSecurity.class).to(MySecurity.class);
-		
-		// initialize JPA
-		install(new JpaModule("testUnit", true, false));
+		bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
+
+		install(new JpaModule("testUnit").properties(properties));
+		install(new AuthModule.Simple().properties(properties));
 	}
 }
