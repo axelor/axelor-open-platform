@@ -28,7 +28,7 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.meta;
+package com.axelor.meta.loader;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Strings;
+import com.axelor.common.StringUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -45,50 +45,9 @@ import com.google.common.collect.Sets;
  * Module dependency resolver.
  * 
  */
-public final class ModuleResolver {
+final class Resolver {
 
 	private HashMap<String, Module> modules = Maps.newHashMap();
-
-	private class Module {
-
-		private String name;
-		
-		private List<Module> depends = Lists.newArrayList();
-
-		public Module(String name) {
-			this.name = name;
-		}
-
-		public void dependsOn(Module module) {
-			if (!depends.contains(module)) {
-				depends.add(module);
-			}
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (obj == this) return true;
-			if (obj == null) return false;
-			if (!(obj instanceof Module)) return false;
-			return name.equals(((Module) obj).name);
-		}
-		
-		@Override
-		public String toString() {
-			 return pprint(1);
-		}
-
-		private String pprint(int depth) {
-			StringBuilder builder = new StringBuilder();
-			builder.append(name).append("\n");
-			for(Module dep : depends) {
-				builder.append(Strings.repeat("    ", depth))
-					   .append("-> ")
-					   .append(dep.pprint(depth+1));
-			}
-			return builder.toString();
-		}
-	}
 
 	private Module module(String name) {
 		Module module = modules.get(name);
@@ -105,12 +64,12 @@ public final class ModuleResolver {
 		if (module == null) {
 			return;
 		}
-		for(Module dep : module.depends) {
-			if (!resolved.contains(dep.name)) {
-				if (unresolved.contains(dep.name)) {
-					throw new IllegalArgumentException("Circular dependency detected: " + name + " -> " + dep.name);
+		for(Module dep : module.getDepends()) {
+			if (!resolved.contains(dep.getName())) {
+				if (unresolved.contains(dep.getName())) {
+					throw new IllegalArgumentException("Circular dependency detected: " + name + " -> " + dep.getName());
 				}
-				resolve(dep.name, resolved, unresolved);
+				resolve(dep.getName(), resolved, unresolved);
 			}
 		}
 		resolved.add(name);
@@ -118,25 +77,20 @@ public final class ModuleResolver {
 	}
 
 	/**
-	 * Add a module name to resolve.
-	 * 
-	 * @param name a module name
-	 */
-	public void add(String name) {
-		module(name);
-	}
-
-	/**
 	 * Add a module with dependency information.
 	 * 
 	 * @param name a module name
 	 * @param depends name of modules it depends on
+	 * @return a {@link Module} instance
 	 */
-	public void add(String name, String... depends) {
+	public Module add(String name, String... depends) {
 		Module module = module(name);
 		for(String dep : depends) {
-			module.dependsOn(module(dep));
+			if (!StringUtils.isBlank(dep)) {
+				module.dependsOn(module(dep));
+			}
 		}
+		return module;
 	}
 
 	/**
@@ -145,7 +99,8 @@ public final class ModuleResolver {
 	 * @param name a module name
 	 * @return list of the resolved dependencies.
 	 */
-	public List<String> resolve(String name) {
+	public List<Module> resolve(String name) {
+		
 		List<String> resolved = Lists.newArrayList();
 		Set<String> unresolved = Sets.newHashSet();
 
@@ -155,17 +110,23 @@ public final class ModuleResolver {
 			throw new IllegalArgumentException("Unresolved dependencies: " + unresolved);
 		}
 		
-		return resolved;
+		List<Module> all = Lists.newArrayList();
+		for (String n : resolved) {
+			all.add(module(n));
+		}
+		
+		return all;
 	}
 
 	/**
 	 * Returns all the resolved modules.
 	 * 
+	 * @return list of module in dependency order.
 	 */
-	public List<String> all() {
+	public List<Module> all() {
 		
-		List<String> resolved = Lists.newArrayList();
-		List<List<String>> resolutions = Lists.newArrayList();
+		List<Module> resolved = Lists.newArrayList();
+		List<List<Module>> resolutions = Lists.newArrayList();
 
 		for(String key : modules.keySet()) {
 			resolutions.add(resolve(key));
@@ -178,21 +139,35 @@ public final class ModuleResolver {
 			}
 		});
 
-		for(List<String> resolution : resolutions) {
-			for(String name : resolution) {
-				if (resolved.contains(name)) continue;
-				resolved.add(name);
+		for(List<Module> resolution : resolutions) {
+			for(Module module : resolution) {
+				if (resolved.contains(module)) continue;
+				resolved.add(module);
 			}
 		}
 		
 		return resolved;
 	}
 	
+	/**
+	 * Return resolved module names.
+	 * 
+	 * @return list of module names in dependency order.
+	 */
+	public List<String> names() {
+		List<Module> all = this.all();
+		List<String> names = Lists.newArrayList();
+		for (Module module : all) {
+			names.add(module.getName());
+		}
+		return names;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		for(Module m : modules.values()) {
-			builder.append(m).append("\n\n");
+			builder.append(m.pprint(1)).append("\n\n");
 		}
 		return builder.toString();
 	}

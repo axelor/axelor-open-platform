@@ -32,6 +32,7 @@ package com.axelor.meta;
 
 import java.util.concurrent.ConcurrentMap;
 
+import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
@@ -65,8 +66,7 @@ public class MetaStore {
 		if (CACHE.containsKey(name)) {
 			return (AbstractView) CACHE.get(name);
 		}
-		MetaLoader loader = new MetaLoader();
-		AbstractView view = loader.findView(null, name, null);
+		AbstractView view = XMLViews.findView(null, name, null);
 
 		if (view != null) {
 			register(name, view);
@@ -82,8 +82,7 @@ public class MetaStore {
 		if (CACHE.containsKey(key)) {
 			return (AbstractView) CACHE.get(key);
 		}
-		MetaLoader loader = new MetaLoader();
-		AbstractView view = loader.findView(name, module);
+		AbstractView view = XMLViews.findView(name, module);
 
 		if (view != null) {
 			register(key, view);
@@ -95,8 +94,7 @@ public class MetaStore {
 		if (CACHE.containsKey(name)) {
 			return (Action) CACHE.get(name);
 		}
-		MetaLoader loader = new MetaLoader();
-		Action action = loader.findAction(name);
+		Action action = XMLViews.findAction(name);
 		if (action != null) {
 			register(name, action);
 		}

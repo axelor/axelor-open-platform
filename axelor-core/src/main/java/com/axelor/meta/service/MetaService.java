@@ -48,7 +48,6 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
-import com.axelor.meta.MetaLoader;
 import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaChart;
@@ -56,6 +55,7 @@ import com.axelor.meta.db.MetaChartConfig;
 import com.axelor.meta.db.MetaChartSeries;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.MetaMenu;
+import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.MenuItem;
@@ -66,15 +66,11 @@ import com.axelor.script.ScriptHelper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 
 public class MetaService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MetaService.class);
-
-	@Inject
-	private MetaLoader loader;
 
 	@SuppressWarnings("unchecked")
 	private List<MenuItem> findMenus(Query query) {
@@ -225,13 +221,13 @@ public class MetaService {
 	}
 
 	public Action getAction(String name) {
-		return loader.findAction(name);
+		return XMLViews.findAction(name);
 	}
 
 	public Response findViews(Class<?> model, Map<String, String> views) {
 		Response response = new Response();
 
-		Map<String, Object> data = loader.findViews(model.getName(), views);
+		Map<String, Object> data = XMLViews.findViews(model.getName(), views);
 		response.setData(data);
 		response.setStatus(Response.STATUS_SUCCESS);
 
@@ -241,7 +237,7 @@ public class MetaService {
 	public Response findView(String model, String name, String type) {
 		Response response = new Response();
 
-		AbstractView data = loader.findView(model, name, type);
+		AbstractView data = XMLViews.findView(model, name, type);
 		response.setData(data);
 		response.setStatus(Response.STATUS_SUCCESS);
 
@@ -258,7 +254,7 @@ public class MetaService {
 
 		LOG.debug("Search : {}", name);
 
-		Search search = (Search) loader.findView(null, name, "search");
+		Search search = (Search) XMLViews.findView(null, name, "search");
 		ScriptHelper helper = search.scriptHandler(context);
 
 		List<Object> data = Lists.newArrayList();

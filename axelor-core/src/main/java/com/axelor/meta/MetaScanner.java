@@ -30,6 +30,8 @@
  */
 package com.axelor.meta;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -45,6 +47,8 @@ public class MetaScanner extends ResourcesScanner {
 	private List<Vfs.File> files = Lists.newArrayList();
 
 	private Pattern pattern;
+	
+	private String module;
 	
 	public MetaScanner(String regex) {
 		this.pattern = Pattern.compile(regex);
@@ -62,13 +66,32 @@ public class MetaScanner extends ResourcesScanner {
 
 	@Override
 	public Object scan(File file, Object classObject) {
-		this.files.add(file);
+		if (module == null || file.toString().contains(module)) {
+			this.files.add(file);
+		}
 		return super.scan(file, classObject);
 	}
 	
 	public static List<Vfs.File> findAll(String regex) {
 		MetaScanner scanner = new MetaScanner(regex);
 		new Reflections(scanner);
+		return scanner.files;
+	}
+	
+	public static List<Vfs.File> findAll(String module, String directory, String pattern) {
+		String regex = directory + "\\." + pattern;
+		MetaScanner scanner = new MetaScanner(regex);
+		scanner.module = module;
+		
+		new Reflections(scanner);
+		
+		Collections.sort(scanner.files, new Comparator<Vfs.File>() {
+			@Override
+			public int compare(File o1, File o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+
 		return scanner.files;
 	}
 }

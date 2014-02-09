@@ -35,15 +35,15 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
-import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
-import com.axelor.meta.MetaLoader;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaField;
 import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
+import com.axelor.meta.loader.I18nLoader;
+import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.service.MetaExportTranslation;
@@ -57,7 +57,7 @@ import com.google.inject.Inject;
 public class MetaController {
 
 	@Inject
-	private MetaLoader loader;
+	private I18nLoader i18nLoader;
 
 	@Inject
 	private MetaExportTranslation export;
@@ -65,7 +65,7 @@ public class MetaController {
 	private ObjectViews validateXML(String xml) {
 		ObjectViews views;
 		try {
-			views = loader.fromXML(xml);
+			views = XMLViews.fromXML(xml);
 		} catch (JAXBException e){
 			String message = JPA.translate("Invalid XML.");
 			Throwable ex = e.getLinkedException();
@@ -81,7 +81,7 @@ public class MetaController {
 
 		MetaAction meta = request.getContext().asType(MetaAction.class);
 
-		Action action = loader.findAction(meta.getName());
+		Action action = XMLViews.findAction(meta.getName());
 		Map<String, String> data = Maps.newHashMap();
 
 		response.setData(ImmutableList.of(data));
@@ -112,99 +112,6 @@ public class MetaController {
 		}
 
 		response.setData(ImmutableList.of(data));
-	}
-
-	public void restoreAll(ActionRequest request, ActionResponse response) {
-
-		MetaStore.clear();
-		final Map<Long, String> userActions = Maps.newHashMap();
-
-		JPA.runInTransaction(new Runnable() {
-
-			@Override
-			public void run() {
-
-				// backup user actions
-				for(User user : User.all().fetch()) {
-					if (user.getAction() != null) {
-						userActions.put(user.getId(), user.getAction().getName());
-					}
-				}
-
-				JPA.clear();
-				JPA.em().createNativeQuery("UPDATE auth_user SET action = NULL").executeUpdate();
-				JPA.em().createNativeQuery("DELETE FROM meta_menu_groups").executeUpdate();
-				JPA.em().createNativeQuery("DELETE FROM meta_view_groups").executeUpdate();
-				JPA.em().createNativeQuery("DELETE FROM meta_menu").executeUpdate();
-				JPA.em().createNativeQuery("DELETE FROM meta_action_menu").executeUpdate();
-				JPA.em().createNativeQuery("DELETE FROM meta_action").executeUpdate();
-				JPA.em().createNativeQuery("DELETE FROM meta_view").executeUpdate();
-				JPA.em().createNativeQuery("DELETE FROM meta_select_item").executeUpdate();
-				JPA.em().createNativeQuery("DELETE FROM meta_select").executeUpdate();
-			}
-		});
-
-		loader.load(null);
-
-		JPA.runInTransaction(new Runnable() {
-
-			@Override
-			public void run() {
-
-				// restore use actions
-				for(Long id : userActions.keySet()) {
-					User user = User.find(id);
-					user.setAction(MetaAction.findByName(userActions.get(id)));
-				}
-			}
-		});
-
-		MetaView view = MetaView.all().fetchOne();
-		response.setValues(view);
-		response.setReload(true);
-	}
-
-	public void restoreSingle(ActionRequest request, ActionResponse response) {
-		final MetaView meta = request.getContext().asType(MetaView.class);
-		Map<String, String> data = Maps.newHashMap();
-
-		if(Strings.isNullOrEmpty(meta.getName())) {
-			data.put("error", JPA.translate("Please specify the view name."));
-			response.setData(ImmutableList.of(data));
-			return;
-		}
-		else if(Strings.isNullOrEmpty(meta.getModule())) {
-			data.put("error", JPA.translate("Please specify the module name."));
-			response.setData(ImmutableList.of(data));
-			return;
-		}
-
-		MetaStore.clear();
-		JPA.runInTransaction(new Runnable() {
-
-			@Override
-			public void run() {
-				JPA.clear();
-				JPA.em().createNativeQuery("DELETE FROM meta_view where id = ?1").setParameter(1, meta.getId()).executeUpdate();
-			}
-		});
-
-		Boolean imported = loader.loadSingleViews(meta.getName(), meta.getModule());
-		if(!imported) {
-			JPA.runInTransaction(new Runnable() {
-
-				@Override
-				public void run() {
-					meta.setId(null);
-					meta.setVersion(null);
-					meta.save();
-				}
-			});
-		}
-
-		MetaView view = MetaView.all().filter("self.name = ?1 AND self.module = ?2", meta.getName(), meta.getModule()).fetchOne();
-		response.setValues(view);
-		response.setReload(true);
 	}
 
 	public void clearCache(ActionRequest request, ActionResponse response) {
@@ -254,7 +161,7 @@ public class MetaController {
 		});
 
 
-		loader.loadTranslations(importPath);
+		i18nLoader.load(importPath);
 
 		response.setFlash(JPA.translate("Import done."));
 		response.setHidden("exportGroup", true);

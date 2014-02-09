@@ -33,12 +33,12 @@ package com.axelor.meta.web;
 import javax.inject.Inject;
 
 import com.axelor.db.JPA;
-import com.axelor.meta.MetaLoader;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaView;
+import com.axelor.meta.loader.ModuleManager;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
 import com.google.common.base.Throwables;
@@ -46,7 +46,7 @@ import com.google.common.base.Throwables;
 public class ModuleController {
 	
 	@Inject
-	private MetaLoader loader;
+	private ModuleManager loader;
 
 	public void doInstall(String name) {
 		MetaModule module = MetaModule.findByName(name);
@@ -56,7 +56,7 @@ public class ModuleController {
 		
 		module.setInstalled(true);
 		try {
-			loader.loadModule(module);
+			loader.install(module.getName(), true);
 			module.save();
 		} catch (Exception e) {
 			module.setInstalled(false);

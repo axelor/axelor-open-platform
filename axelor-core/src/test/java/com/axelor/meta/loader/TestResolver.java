@@ -28,7 +28,7 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.meta;
+package com.axelor.meta.loader;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ import com.google.common.collect.Lists;
 
 public class TestResolver {
 
-	private ModuleResolver resolver = new ModuleResolver();
+	private Resolver resolver = new Resolver();
 
 	@Test
 	public void test() {
@@ -65,7 +65,7 @@ public class TestResolver {
 
 		Assert.assertEquals(expected, resolver.resolve("axelor-sale"));
 
-		List<String> all = resolver.all();
+		List<String> all = resolver.names();
 		
 		Assert.assertEquals("axelor-core", all.get(0));
 		Assert.assertEquals("axelor-project", all.get(all.size() - 1));
