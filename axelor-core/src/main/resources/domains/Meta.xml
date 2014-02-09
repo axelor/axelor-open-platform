@@ -157,6 +157,7 @@
   	<string name="translation" large="true"/>
   	<string name="domain"/>
   	<string name="type" selection="meta.translation.type.selection"/>
+    <string name="module"/>
   	<unique-constraint columns="key,type,language,domain"/>
   </entity>
   

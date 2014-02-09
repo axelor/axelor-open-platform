@@ -69,15 +69,6 @@ public class ModuleManager {
 		}
 	}
 
-	/**
-	 * Update installed modules.<br>
-	 * <br>
-	 * If module names are not given then it updates all the installed modules.
-	 * 
-	 * @param modules
-	 *            name of modules to update
-	 */
-	@Transactional
 	public void update(String... modules) {
 
 		this.createUsers();

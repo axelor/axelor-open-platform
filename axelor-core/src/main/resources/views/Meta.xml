@@ -270,6 +270,7 @@
     <field name="translation"/>
     <field name="domain"/>
     <field name="type" selection="meta.translation.type.selection"/>
+    <field name="module"/>
   </grid>
 
   <form title="Translation" name="meta-translations-form" model="com.axelor.meta.db.MetaTranslation" colWidths="*,250">
@@ -279,6 +280,7 @@
       <field name="translation"/>
       <field name="domain"/>
       <field name="type" selection="meta.translation.type.selection"/>
+      <field name="module"/>
     </group>
     <group title="Actions" cols="2" colSpan="1" hideIf="$readonly()">
       <button name="restoreAll" colSpan="2" title="Restore All" onClick="action-meta-show-import-group"/>
