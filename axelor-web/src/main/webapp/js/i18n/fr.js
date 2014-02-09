@@ -168,5 +168,7 @@ _t.put({
 "Show": "Voir",
 "Logout": "Déconnexion",
 "Preferences": "Préférences",
-"Create new": "Créer nouveau"
+"Create new": "Créer nouveau",
+"Validation error": "Erreur de validation",
+"Please correct the invalid form values.": "Merci de corriger les champs du formulaire non valides."
 });
