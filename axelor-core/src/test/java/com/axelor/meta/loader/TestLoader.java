@@ -28,26 +28,16 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.meta;
+package com.axelor.meta.loader;
 
 import javax.xml.bind.JAXBException;
 
-import org.junit.Before;
 import org.junit.Test;
 
-public class TestLoader extends MetaTest {
-	
-	private MetaLoader loader;
+import com.axelor.meta.MetaTest;
+import com.axelor.meta.loader.XMLViews;
 
-	@Before
-	public void setUp() {
-		loader = new MetaLoader();
-	}
-	
-	@Test
-	public void testLoad() {
-		loader.load("{java.io.tmp}");
-	}
+public class TestLoader extends MetaTest {
 	
 	@Test
 	public void testValidate() {
@@ -61,7 +51,7 @@ public class TestLoader extends MetaTest {
 				"</form>";
 		
 		try {
-			loader.fromXML(xml);
+			XMLViews.fromXML(xml);
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}

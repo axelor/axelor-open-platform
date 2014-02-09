@@ -50,6 +50,7 @@ import com.axelor.db.JPA;
 import com.axelor.db.annotations.Widget;
 import com.axelor.meta.db.MetaField;
 import com.axelor.meta.db.MetaModel;
+import com.google.inject.persist.Transactional;
 
 /**
  * API for MetaModel and MetaField entity.
@@ -60,7 +61,7 @@ import com.axelor.meta.db.MetaModel;
  */
 public class MetaModelService {
 	
-	private Logger log = LoggerFactory.getLogger(getClass());
+	private static Logger log = LoggerFactory.getLogger(MetaModelService.class);
 
 	/**
 	 * Process to create all MetaModel with MetaField.
@@ -68,13 +69,19 @@ public class MetaModelService {
 	 * @see MetaModel
 	 * @see MetaField
 	 */
+	@Transactional
 	public void process(){
 		for (Class<?> klass : JPA.models()){
-			if (MetaModel.all().filter("fullName = ?1", klass.getName()).count() == 0){
-				this.createEntity(klass).save();
-			} else {
-				this.updateEntity(klass).save();
-			}
+			process(klass);
+		}
+	}
+	
+	@Transactional
+	public void process(Class<?> klass){
+		if (MetaModel.all().filter("fullName = ?1", klass.getName()).count() == 0){
+			this.createEntity(klass).save();
+		} else {
+			this.updateEntity(klass).save();
 		}
 	}
 	

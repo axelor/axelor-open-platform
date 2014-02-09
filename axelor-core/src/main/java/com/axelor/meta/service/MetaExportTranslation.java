@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.common.FileUtils;
 import com.axelor.db.JPA;
-import com.axelor.meta.MetaLoader;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaActionMenu;
@@ -70,6 +69,7 @@ import com.axelor.meta.domains.Entity;
 import com.axelor.meta.domains.Module;
 import com.axelor.meta.domains.Property;
 import com.axelor.meta.internal.MetaUtils;
+import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.actions.ActionCondition;
@@ -118,7 +118,6 @@ public class MetaExportTranslation {
 
 	private static final String LOCAL_SCHEMA_DOMAIN = "domain-models_1.0.xsd";
 	private static Logger log = LoggerFactory.getLogger(MetaExportTranslation.class);
-	private MetaLoader metaLoader = new MetaLoader();
 
 	private final String fieldType = "field";
 	private final String helpType = "help";
@@ -211,7 +210,7 @@ public class MetaExportTranslation {
 	private void exportActions() {
 		for (MetaAction metaAction : MetaAction.findByModule(this.currentModule).order("name").order("type").fetch()) {
 			try {
-				ObjectViews views = (ObjectViews) metaLoader.fromXML(metaAction.getXml());
+				ObjectViews views = (ObjectViews) XMLViews.fromXML(metaAction.getXml());
 				if(views.getActions() != null) {
 					Action action = (Action) views.getActions().get(0);
 					this.loadAction(action);
@@ -267,7 +266,7 @@ public class MetaExportTranslation {
 
 	private AbstractView fromXML(MetaView view) {
 		try {
-			ObjectViews views = (ObjectViews) metaLoader.fromXML(view.getXml());
+			ObjectViews views = (ObjectViews) XMLViews.fromXML(view.getXml());
 			if (views != null && views.getViews() != null)
 					return views.getViews().get(0);
 		}
@@ -842,7 +841,7 @@ public class MetaExportTranslation {
 		ObjectViews views;
 
 		try {
-			views = (ObjectViews) metaLoader.fromXML(metaAction.getXml());
+			views = (ObjectViews) XMLViews.fromXML(metaAction.getXml());
 		} catch (JAXBException e) {
 			return ;
 		}

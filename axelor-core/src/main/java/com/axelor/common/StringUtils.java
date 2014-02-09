@@ -67,4 +67,31 @@ public final class StringUtils {
 		}
 		return true;
 	}
+
+	/**
+	 * Strip the leading indentation from the given text.
+	 * 
+	 * @param text
+	 *            the text to strip
+	 * @return stripped text
+	 */
+	public static String stripIndent(String text) {
+		String string = text.replaceAll("\\t", "    ");
+		StringBuilder builder = new StringBuilder();
+		int leading = 0;
+		for(String line : string.split("\\n")) {
+			if (line.trim().length() == 0) continue;
+			int n = 0;
+			while(n++ < line.length()) {
+				if (!Character.isWhitespace(line.charAt(n))) break;
+			}
+			if (leading == 0 || n < leading) {
+				leading = n;
+			}
+			if (n >= leading) {
+				builder.append(line.substring(leading)).append("\n");
+			}
+		}
+		return builder.toString();
+	}
 }
