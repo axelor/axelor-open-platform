@@ -99,15 +99,17 @@ class Entity {
 		if (!name) {
 			throw new IllegalArgumentException("Entity name not given.")
 		}
-
-		if (!table) {
-			table = module.toUpperCase() + "_" + CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, name)
-		}
-
+		
 		if (!namespace) {
 			namespace = "com.axelor.${module}.db"
 		}
-		
+
+		if (!table) {
+			table = namespace.replaceAll(/\.db$/, "")
+			table = table.substring(table.lastIndexOf('.') + 1)
+			table = table.toUpperCase() + "_" + CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, name)
+		}
+
 		importManager = new ImportManager(namespace, groovy)
 		
 		importType("javax.persistence.EntityManager")
