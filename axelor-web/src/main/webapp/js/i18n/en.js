@@ -149,5 +149,7 @@ _t.put({
 "Show": "Show",
 "Logout": "Logout",
 "Preferences": "Preferences",
-"Create new": "Create new"
+"Create new": "Create new",
+"Validation error": "Validation error",
+"Please correct the invalid form values.": "Please correct the invalid form values."
 });
