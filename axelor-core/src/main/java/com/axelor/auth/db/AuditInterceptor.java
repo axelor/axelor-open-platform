@@ -79,12 +79,13 @@ public class AuditInterceptor extends EmptyInterceptor {
 		if (!(entity instanceof AuditableModel)) {
 			return false;
 		}
+		User user = this.getUser();
 		for (int i = 0; i < propertyNames.length; i++) {
 			if ("updatedOn".equals(propertyNames[i])) {
 				currentState[i] = new LocalDateTime();
 			}
-			if ("updatedBy".equals(propertyNames[i])) {
-				currentState[i] = this.getUser();
+			if ("updatedBy".equals(propertyNames[i]) && user != null) {
+				currentState[i] = user;
 			}
 		}
 		return true;
@@ -96,12 +97,13 @@ public class AuditInterceptor extends EmptyInterceptor {
 		if (!(entity instanceof AuditableModel)) {
 			return false;
 		}
+		User user = this.getUser();
 		for (int i = 0; i < propertyNames.length; i++) {
 			if ("createdOn".equals(propertyNames[i])) {
 				state[i] = new LocalDateTime();
 			}
-			if ("createdBy".equals(propertyNames[i])) {
-				state[i] = this.getUser();
+			if ("createdBy".equals(propertyNames[i]) && user != null) {
+				state[i] = user;
 			}
 		}
 		return true;
