@@ -62,6 +62,7 @@ public class ImportTranslations {
 			helpT.setLanguage(meta.getLanguage());
 			helpT.setTranslation(help_t);
 			helpT.setType("help");
+			helpT.setModule(meta.getModule());
 			helpT.save();
 		}
 		else if(!Strings.isNullOrEmpty(help_t) && "field".equals(meta.getType()) && meta.getKey() != null) {
@@ -71,6 +72,7 @@ public class ImportTranslations {
 			helpT.setLanguage(meta.getLanguage());
 			helpT.setTranslation(help_t);
 			helpT.setType("help");
+			helpT.setModule(meta.getModule());
 			helpT.save();
 		}
 		else if("documentation".equals(meta.getType())) {
@@ -87,6 +89,7 @@ public class ImportTranslations {
 						helpT.setLanguage(meta.getLanguage());
 						helpT.setTranslation(help_t);
 						helpT.setType("help");
+						helpT.setModule(meta.getModule());
 						helpT.save();
 					}
 				}
@@ -100,6 +103,7 @@ public class ImportTranslations {
 					doc.setLanguage(MetaTranslations.convertLanguage(MetaTranslations.getLanguage(), false));
 					doc.setTranslation(values.get("title").toString());
 					doc.setType("documentation");
+					doc.setModule(meta.getModule());
 					doc.save();
 				}
 			}
@@ -127,7 +131,8 @@ public class ImportTranslations {
 
 	private MetaTranslation searchMetaTranslation(MetaTranslation meta) {
 		List<Object> params = Lists.newArrayList();
-		String query = "self.key = ?1 AND self.language = ?2";
+		String query = "self.module = ?1 AND self.key = ?2 AND self.language = ?3";
+		params.add(meta.getModule());
 		params.add(meta.getKey());
 		params.add(meta.getLanguage());
 

@@ -95,6 +95,7 @@ public class I18nLoader implements Loader {
 
 		for(Vfs.File file : files) {
 			try {
+				MetaTranslation.all().filter("self.module = ?", module.getName()).remove();
 				log.debug("Load translation: {}", file);
 				process(file.openInputStream(), file.getName(), module.getName());
 			} catch (IOException e) {
@@ -157,6 +158,8 @@ public class I18nLoader implements Loader {
 				String type = map.get(TYPE_COLUMN);
 				
 				MetaTranslation entity = new MetaTranslation();
+
+				entity.setModule(moduleName);
 				entity.setLanguage(languageName);
 				entity.setTranslation(map.get(TRANSLATION_COLUMN));
 				entity.setType(type);
