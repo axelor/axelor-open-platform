@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views
   http://apps.axelor.com/xml/ns/object-views/object-views_2.0.xsd">
 
-  <grid title="Permissions" name="permission-grid" model="Permission">
+  <grid title="Permissions" name="permission-grid" model="com.axelor.auth.db.Permission">
     <field name="name"/>
     <field name="object"/>
     <field name="canRead" width="100"/>
@@ -14,7 +14,7 @@
     <field name="canExport" width="100"/>
   </grid>
 
-  <form title="Permission" name="permission-form" model="Permission" cols="2" colWidths="*,175">
+  <form title="Permission" name="permission-form" model="com.axelor.auth.db.Permission" cols="2" colWidths="*,175">
     <group title="General" cols="2" colWidths="100,*">
         <field name="name"/>
         <field name="object"/>

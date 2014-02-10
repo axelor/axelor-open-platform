@@ -7,7 +7,7 @@
     	<option value="fr">French</option>
   	</selection>
   
-    <grid name="user-grid" title="Users" model="User">
+    <grid name="user-grid" title="Users" model="com.axelor.auth.db.User">
         <field name="name"/>
         <field name="code"/>
         <field name="email"/>
@@ -15,7 +15,7 @@
 		<field name="group"/>
     </grid>
     
-    <form name="user-form" title="User" model="User" cols="1" onSave="com.axelor.auth.AuthService:validate">
+    <form name="user-form" title="User" model="com.axelor.auth.db.User" cols="1" onSave="com.axelor.auth.AuthService:validate">
         <group title="General Info">
             <field name="name" placeholder="user name" validIf="name.length &gt;= 2" onChange="action-condition-user-validName"/>
             <field name="group" placeholder="user group"/>
@@ -41,7 +41,7 @@
         <field name="permissions"/>
     </form>
     
-	<form name="user-preferences-form" title="Preferences" model="User" cols="2" colWidths="100,*"
+	<form name="user-preferences-form" title="Preferences" model="com.axelor.auth.db.User" cols="2" colWidths="100,*"
 		onNew="com.axelor.auth.AuthService:preferences">
 		<field name="email" widget="Email" />
 		<field name="language" />

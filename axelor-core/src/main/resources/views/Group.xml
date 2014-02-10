@@ -9,13 +9,13 @@
       <option value="collapse">Collapse</option>
     </selection>
 
- 	<grid name="group-grid" title="Groups" model="Group">
+ 	<grid name="group-grid" title="Groups" model="com.axelor.auth.db.Group">
       <field name="name" />
       <field name="code" />
       <field name="navigation" />
     </grid>
 
-	<form name="group-form" title="Group" model="Group">
+	<form name="group-form" title="Group" model="com.axelor.auth.db.Group">
 		<toolbar>
 			<button name="showPermissions" title="Show permissions" onClick="action-group-view-permissions" hideIf="permissions == null || permissions.length == 0" />
 		</toolbar>
