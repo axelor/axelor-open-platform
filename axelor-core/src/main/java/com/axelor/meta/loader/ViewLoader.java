@@ -158,8 +158,10 @@ public class ViewLoader implements Loader {
 		}
 		
 		if (modelName != null) {
-			Class<?> model = JPA.model(modelName);
-			if (model == null) {
+			Class<?> model;
+			try {
+				model = Class.forName(modelName);
+			} catch (ClassNotFoundException e) {
 				throw new IllegalArgumentException("Invalid view, model not found: " + modelName);
 			}
 			modelName = model.getName();
