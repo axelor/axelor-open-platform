@@ -56,7 +56,7 @@ public class ModuleController {
 		
 		module.setInstalled(true);
 		try {
-			loader.install(module.getName(), true);
+			loader.install(module.getName(), true, false);
 			module.save();
 		} catch (Exception e) {
 			module.setInstalled(false);

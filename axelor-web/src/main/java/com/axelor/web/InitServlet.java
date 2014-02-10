@@ -55,7 +55,7 @@ public class InitServlet extends HttpServlet {
 		LOG.info("Initializing...");
 
 		try {
-			moduleManager.initialize(false);
+			moduleManager.initialize(false, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
