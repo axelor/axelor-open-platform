@@ -119,7 +119,7 @@ public class ModuleManager {
 		
 		for (Module module : resolver.all()) {
 			if (names.contains(module.getName())) {
-				install(module, withDemo);
+				install(module, true, withDemo);
 			}
 		}
 	}
@@ -152,12 +152,12 @@ public class ModuleManager {
 			if (module.isInstalled() && !(update || module.isUpgradable())) {
 				continue;
 			}
-
-			install(module, withDemo);
 		}
+
+		install(module, update, withDemo);
 	}
 	
-	private void install(Module module, boolean withDemo) {
+	private void install(Module module, boolean update, boolean withDemo) {
 		
 		if (SKIP.contains(module.getName())) {
 			return;
@@ -171,12 +171,12 @@ public class ModuleManager {
 		log.info(message, module);
 
 		// load meta
-		installMeta(module);
+		installMeta(module, update);
 
 		// load data (runs in it's own transaction)
-		dataLoader.load(module);
+		dataLoader.load(module, update);
 		if (withDemo) {
-			demoLoader.load(module);
+			demoLoader.load(module, update);
 		}
 
 		// finally update install state
@@ -184,15 +184,15 @@ public class ModuleManager {
 	}
 
 	@Transactional
-	void installMeta(Module module) {
+	void installMeta(Module module, boolean update) {
 		// load model info
-		modelLoader.load(module);
+		modelLoader.load(module, update);
 
 		// load views
-		viewLoader.load(module);
+		viewLoader.load(module, update);
 		
 		// load i18n
-		i18nLoader.load(module);
+		i18nLoader.load(module, update);
 	}
 	
 	@Transactional

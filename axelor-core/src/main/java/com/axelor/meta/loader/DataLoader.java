@@ -56,7 +56,7 @@ import com.google.common.io.LineReader;
 import com.google.inject.Injector;
 
 @Singleton
-class DataLoader implements Loader {
+class DataLoader extends AbstractLoader {
 
 	private static final String DATA_DIR_NAME = "data-init";
 
@@ -70,7 +70,7 @@ class DataLoader implements Loader {
 	private Injector injector;
 	
 	@Override
-	public void load(Module module) {
+	public void load(Module module, boolean update) {
 
 		File tmp = extract(module);
 		if (tmp == null) {

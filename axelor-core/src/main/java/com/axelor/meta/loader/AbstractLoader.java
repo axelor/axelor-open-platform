@@ -30,7 +30,14 @@
  */
 package com.axelor.meta.loader;
 
-interface Loader {
 	
-	void load(Module module);
+	/**
+	 * Implement this method the load the data.
+	 * 
+	 * @param module
+	 *            the module for which to load the data
+	 * @param update
+	 *            whether to force update while loading
+	 */
+	protected abstract void load(Module module, boolean update);
 }
