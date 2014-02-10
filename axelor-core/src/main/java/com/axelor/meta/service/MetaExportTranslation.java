@@ -33,12 +33,8 @@ package com.axelor.meta.service;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -68,7 +64,6 @@ import com.axelor.meta.domains.DomainModels;
 import com.axelor.meta.domains.Entity;
 import com.axelor.meta.domains.Module;
 import com.axelor.meta.domains.Property;
-import com.axelor.meta.internal.MetaUtils;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
@@ -157,13 +152,8 @@ public class MetaExportTranslation {
 		List<String> menuList = Lists.newArrayList();
 		this.loadViewFromEntry(viewList, menuList, "");
 
-		//axelor-core
-		MetaModule coreModule = new MetaModule();
-		coreModule.setName("axelor-core");
-		modules.add(coreModule);
-
 		for(MetaModule module : modules) {
-			File file = FileUtils.getFile(exportPath, this.exportLanguage + ".csv");
+			File file = FileUtils.getFile(exportPath, module.getName(), this.exportLanguage + ".csv");
 			if(file.isFile() && file.exists()) {
 				file.delete();
 			}
@@ -202,7 +192,7 @@ public class MetaExportTranslation {
 	}
 
 	private void exportOther() {
-		for (MetaTranslation translation : MetaTranslation.all().filter("self.type = ?1 AND self.language = ?2 AND self.domain = ?3",  this.otherType, this.exportLanguage, this.currentModule).order("key").fetch()) {
+		for (MetaTranslation translation : MetaTranslation.all().filter("self.type = ?1 AND self.language = ?2 AND self.module = ?3",  this.otherType, this.exportLanguage, this.currentModule).order("key").fetch()) {
 			this.appendToFile(translation.getDomain(), "", this.otherType, translation.getKey(), translation.getTranslation());
 		}
 	}
@@ -505,24 +495,10 @@ public class MetaExportTranslation {
 	}
 
 	private void exportObjects() {
-		List<org.reflections.vfs.Vfs.File> files = MetaScanner.findAll("domains\\.(.*?)\\.xml");
+		List<org.reflections.vfs.Vfs.File> files = MetaScanner.findAll(this.currentModule, "domains", "(.*?)\\.xml");
 
-		Collections.sort(files, new Comparator<org.reflections.vfs.Vfs.File>() {
-			@Override
-			public int compare(org.reflections.vfs.Vfs.File o1, org.reflections.vfs.Vfs.File o2) {
-				String a = o1.getName();
-				String b = o2.getName();
-				return a.compareTo(b);
-			}
-		});
-
-		Pattern pattern = MetaUtils.getModuleNamePattern(this.currentModule);
 		for(org.reflections.vfs.Vfs.File file : files) {
-			String path = file.toString();
-			Matcher matcher = pattern.matcher(path);
-			if (matcher.find()) {
-				this.exportFile(file);
-			}
+			this.exportFile(file);
 		}
 	}
 
