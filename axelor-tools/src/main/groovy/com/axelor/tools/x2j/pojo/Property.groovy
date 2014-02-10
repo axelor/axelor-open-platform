@@ -291,6 +291,10 @@ class Property {
 	boolean isUnique() {
 		return attrs["unique"] == "true"
 	}
+	
+	boolean isSequence() {
+		return attrs["sequence"]
+	}
 
 	boolean isHashKey() {
 		if (name == "id" || name == "version") return false
@@ -408,7 +412,8 @@ class Property {
 			$many2one(),
 			$one2many(),
 			$many2many(),
-			$orderBy()
+			$orderBy(),
+			$sequence()
 		]
 		.grep { it != null }
 		.flatten()
@@ -673,6 +678,12 @@ class Property {
 		}.join(", ")
 
 		return annon("javax.persistence.OrderBy").add(orderBy)
+	}
+	
+	private Annotation $sequence() {
+		def sequence = attrs.get('sequence')?.trim()
+		if (!sequence) return null
+		return annon("com.axelor.db.annotations.Sequence").add(sequence);
 	}
 
 	private Annotation $hashKey() {

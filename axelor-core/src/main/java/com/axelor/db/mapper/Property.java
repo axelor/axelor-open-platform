@@ -64,6 +64,7 @@ import javax.validation.constraints.Size;
 
 import com.axelor.db.Model;
 import com.axelor.db.annotations.NameColumn;
+import com.axelor.db.annotations.Sequence;
 import com.axelor.db.annotations.VirtualColumn;
 import com.axelor.db.annotations.Widget;
 import com.google.common.base.Objects;
@@ -125,6 +126,10 @@ public class Property {
 	private boolean massUpdate;
 
 	private boolean nameColumn;
+
+	private boolean sequence;
+
+	private transient String sequenceName;
 
 	private String[] nameSearch;
 
@@ -241,6 +246,11 @@ public class Property {
 			
 			if (annotation instanceof Transient) {
 				transient_ = true;
+			}
+			
+			if (annotation instanceof Sequence) {
+				sequence = true;
+				sequenceName = ((Sequence) annotation).value();
 			}
 
 			// Widget attributes
@@ -391,6 +401,14 @@ public class Property {
 
 	public boolean isHidden() {
 		return hidden;
+	}
+	
+	public boolean isSequence() {
+		return sequence;
+	}
+	
+	public String getSequenceName() {
+		return sequenceName;
 	}
 
 	public boolean isNameColumn() {

@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://apps.axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/domain-models http://apps.axelor.com/xml/ns/domain-models/domain-models_2.0.xsd">
+
+  <module name="axelor-core" package="com.axelor.meta.db"/>
+
+  <entity name="MetaSequence" table="META_SEQUENCE" sequential="false">
+    <![CDATA[
+    This object store custom sequences.
+    ]]>
+    <string name="name" required="true" unique="true" min="2" />
+    <string name="prefix" />
+    <string name="suffix" />
+    <integer name="padding" required="true" default="0" />
+    <integer name="increment" column="increment_by" required="true" default="1"/>
+    <long name="initial" column="initial_value" required="true" default="0"/>
+    <long name="next" column="next_value" required="true" default="1"/>
+  </entity>
+
+</domain-models>
