@@ -11,6 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>axelor-core</artifactId>
   <name>Axelor :: Core</name>
+  <description>The core platform module.</description>
 
   <properties>
     <apache.ds.version>2.0.0-M15</apache.ds.version>
@@ -96,13 +97,6 @@
       <artifactId>reflections</artifactId>
     </dependency>
     
-    <!-- Command line parser -->
-    <dependency>
-      <groupId>io.airlift</groupId>
-      <artifactId>airline</artifactId>
-      <version>0.6</version>
-    </dependency>
-
     <!-- Servlet API -->
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -193,7 +187,7 @@
     <dependency>
       <groupId>com.beust</groupId>
       <artifactId>jcommander</artifactId>
-      <version>1.26</version>
+      <version>1.32</version>
     </dependency>
     
   </dependencies>
