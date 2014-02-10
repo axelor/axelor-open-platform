@@ -130,7 +130,9 @@ public class ModuleManager {
 	
 	@Transactional
 	public void install(String moduleName, boolean update, boolean withDemo) {
-		install(moduleName, update, withDemo, true);
+		for (Module module: resolver.resolve(moduleName)) {
+			install(module.getName(), update, withDemo, true);
+		}
 	}
 
 	@Transactional
@@ -139,19 +141,18 @@ public class ModuleManager {
 	}
 
 	private void install(String moduleName, boolean update, boolean withDemo, boolean force) {
-
-		for (Module module : resolver.resolve(moduleName)) {
-			
-			final MetaModule metaModule = MetaModule.findByName(moduleName);
-			if (metaModule == null) {
-				continue;
-			}
-			if (!module.isInstalled() && module.isRemovable() && !force) {
-				continue;
-			}
-			if (module.isInstalled() && !(update || module.isUpgradable())) {
-				continue;
-			}
+		
+		final Module module = resolver.get(moduleName);
+		final MetaModule metaModule = MetaModule.findByName(moduleName);
+		
+		if (metaModule == null) {
+			return;
+		}
+		if (!module.isInstalled() && module.isRemovable() && !force) {
+			return;
+		}
+		if (module.isInstalled() && !(update || module.isUpgradable())) {
+			return;
 		}
 
 		install(module, update, withDemo);
