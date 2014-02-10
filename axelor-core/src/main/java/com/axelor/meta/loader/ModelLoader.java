@@ -57,7 +57,7 @@ import com.google.common.base.Throwables;
 import com.google.common.io.Resources;
 
 @Singleton
-public class ModelLoader implements Loader {
+public class ModelLoader extends AbstractLoader {
 
 	private static Logger log = LoggerFactory.getLogger(ModelLoader.class);
 
@@ -68,25 +68,27 @@ public class ModelLoader implements Loader {
 	private MetaModelService service;
 
 	@Override
-	public void load(Module module) {
-		
+	public void load(Module module, boolean update) {
+
 		for (Class<?> klass : JPA.models()) {
 			if (module.hasEntity(klass)) {
 				service.process(klass);
 			}
 		}
-		
-		loadSequences(module);
+		try {
+			loadSequences(module, update);
+		} finally {
+			this.clear();
+		}
 	}
-
-	private void loadSequences(Module module) {
-
+	
+	private void loadSequences(Module module, boolean update) {
 		for (Vfs.File file : MetaScanner.findAll(module.getName(), "domains", "(.*?)\\.xml")) {
 			try {
 				DomainModels models = unmarshal(file.openInputStream());
 				if (models.getSequences() != null) {
 					log.info("importing sequence data: {}", file.getName());
-					importSequences(models.getSequences());
+					importSequences(models.getSequences(), update);
 				}
 			} catch (IOException | JAXBException e) {
 				throw Throwables.propagate(e);
@@ -94,7 +96,7 @@ public class ModelLoader implements Loader {
 		}
 	}
 	
-	private void importSequences(List<Sequence>  sequences) {
+	private void importSequences(List<Sequence> sequences, boolean update) {
 		for (Sequence sequence : sequences) {
 			log.info("importing sequence: {}", sequence.getName());
 			MetaSequence entity = MetaSequence.findByName(sequence.getName());

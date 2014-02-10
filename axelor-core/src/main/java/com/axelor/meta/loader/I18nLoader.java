@@ -61,7 +61,7 @@ import com.google.common.collect.Sets;
 import com.google.inject.persist.Transactional;
 
 @Singleton
-public class I18nLoader implements Loader {
+public class I18nLoader extends AbstractLoader {
 
 	private Logger log = LoggerFactory.getLogger(I18nLoader.class);
 
@@ -77,7 +77,7 @@ public class I18nLoader implements Loader {
 	private ImportTranslations importTranslations;
 	
 	@Override
-	public void load(Module module) {
+	public void load(Module module, boolean update) {
 		
 		List<Vfs.File> files = MetaScanner.findAll(module.getName(), "i18n", "(.*?)\\.csv");
 		
