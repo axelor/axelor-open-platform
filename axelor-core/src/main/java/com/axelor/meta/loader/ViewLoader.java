@@ -38,11 +38,10 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Singleton;
+import javax.persistence.PersistenceException;
 import javax.xml.bind.JAXBException;
 
 import org.reflections.vfs.Vfs;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.db.Group;
 import com.axelor.common.FileUtils;
@@ -72,75 +71,86 @@ import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.schema.views.Selection;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Charsets;
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.inject.persist.Transactional;
 
 @Singleton
-public class ViewLoader implements Loader {
+public class ViewLoader extends AbstractLoader {
 
-	protected Logger log = LoggerFactory.getLogger(ViewLoader.class);
-	
 	@Override
 	@Transactional
-	public void load(Module module) {
-		for (Vfs.File file : MetaScanner.findAll(module.getName(), "views", "(.*?)\\.xml")) {
-			log.info("importing: {}", file.getName());
-			try {
-				process(file.openInputStream(), module);
-			} catch (IOException | JAXBException e) {
-				throw Throwables.propagate(e);
+	public void load(Module module, boolean update) {
+		try {
+			for (Vfs.File file : MetaScanner.findAll(module.getName(), "views", "(.*?)\\.xml")) {
+				log.info("importing: {}", file.getName());
+				try {
+					process(file.openInputStream(), module, update);
+				} catch (IOException | JAXBException e) {
+					throw Throwables.propagate(e);
+				}
 			}
-		}
 
-		// generate default views
-		importDefault(module);
+			Set<?> unresolved = this.unresolvedKeys();
+			if (unresolved.size() > 0) {
+				log.error("unresolved items: {}", unresolved);
+				throw new PersistenceException("There are some unresolve items, check the log.");
+			}
+			
+			// generate default views
+			importDefault(module);
+		
+		} finally {
+			this.clear();
+		}
 	}
-	
+
 	private static <T> List<T> getList(List<T> list) {
 		if (list == null) {
 			return Lists.newArrayList();
 		}
 		return list;
 	}
-	
-	//TODO: change the view overriding with same name
-	//TODO: make name unique and add `overrides="original"` attribute
-	private void process(InputStream stream, Module module) throws JAXBException {
+
+	private void process(InputStream stream, Module module, boolean update) throws JAXBException {
 		final ObjectViews all = XMLViews.unmarshal(stream);
 		
 		for (AbstractView view : getList(all.getViews())) {
-			importView(view, module);
+			importView(view, module, update);
 		}
 		
 		for (Selection selection : getList(all.getSelections())) {
-			importSelection(selection, module);
+			importSelection(selection, module, update);
 		}
 		
 		for (Action action : getList(all.getActions())) {
-			importAction(action, module);
+			importAction(action, module, update);
 		}
 		
 		for (MenuItem item : getList(all.getMenus())) {
-			importMenu(item, module);
+			importMenu(item, module, update);
 		}
 		
 		for (MenuItem item: getList(all.getActionMenus())) {
-			importActionMenu(item, module);
+			importActionMenu(item, module, update);
 		}
 	}
 	
-	private void importView(AbstractView view, Module module) {
+	private void importView(AbstractView view, Module module, boolean update) {
 
+		String xmlId = view.getId();
 		String name = view.getName();
 		String type = view.getType();
 		String modelName = view.getModel();
+
+		if (xmlId != null && isVisited("view", xmlId)) {
+			return;
+		}
 		
 		log.info("Loading view: {}", name);
 
@@ -153,7 +163,7 @@ public class ViewLoader implements Loader {
 		}
 		
 		if (view instanceof ChartView) {
-			importChart((ChartView) view, module);
+			importChart((ChartView) view, module, update);
 			return;
 		}
 		
@@ -166,12 +176,34 @@ public class ViewLoader implements Loader {
 			}
 			modelName = model.getName();
 		}
-		
-		MetaView entity = MetaView.findByName(name);
-		if (entity == null) {
-			entity = new MetaView(name);
+
+		MetaView entity = new MetaView(name);
+		MetaView existing = xmlId == null ?
+				MetaView.findByModule(name, module.getName()) :
+				MetaView.findByID(xmlId);
+
+		if (existing != null) {
+			
+			if (xmlId == null) {
+				if (!update) {
+					log.warn("duplicate view without 'id': {}", name);
+				}
+				return;
+			}
+			
+			// set priority higher to existing view
+			if (!Objects.equal(xmlId, existing.getXmlId())) {
+				entity.setPriority(existing.getPriority() + 1);
+			} else if (update) {
+				entity = existing;
+			}
 		}
 		
+		if (isUpdated(entity)) {
+			return;
+		}
+
+		entity.setXmlId(xmlId);
 		entity.setTitle(view.getDefaultTitle());
 		entity.setType(type);
 		entity.setModel(modelName);
@@ -181,15 +213,23 @@ public class ViewLoader implements Loader {
 		entity = entity.save();
 	}
 	
-	private void importChart(ChartView view, Module module) {
-		
+	private void importChart(ChartView view, Module module, boolean update) {
+
+		if (isVisited("chart", view.getName())) {
+			return;
+		}
+
 		MetaChart entity = MetaChart.findByName(view.getName());
 		if (entity == null) {
 			entity = new MetaChart(view.getName());
-		} else {
-			entity.clearChartSeries();
-			entity.clearChartConfig();
 		}
+		
+		if (isUpdated(entity)) {
+			return;
+		}
+		
+		entity.clearChartSeries();
+		entity.clearChartConfig();
 		
 		entity.setModule(module.getName());
 		entity.setTitle(view.getDefaultTitle());
@@ -225,15 +265,24 @@ public class ViewLoader implements Loader {
 		entity.save();
 	}
 	
-	private void importSelection(Selection selection, Module module) {
+	private void importSelection(Selection selection, Module module, boolean update) {
+		
+		if (isVisited("select", selection.getName())) {
+			return;
+		}
+		
 		log.info("Loading selection : {}", selection.getName());
+		
 		MetaSelect select = MetaSelect.findByName(selection.getName());
 		if (select == null) {
 			select = new MetaSelect(selection.getName());
-		} else {
-			select.clearItems();
+		}
+
+		if (isUpdated(select)) {
+			return;
 		}
 		
+		select.clearItems();
 		select.setModule(module.getName());
 		
 		int sequence = 0;
@@ -268,11 +317,13 @@ public class ViewLoader implements Loader {
 
 		return all;
 	}
-	
-	private Multimap<String, MetaMenu> unresolved_menus = HashMultimap.create();
-	private Multimap<String, MetaMenu> unresolved_actions = HashMultimap.create();
-	
-	private void importAction(Action action, Module module) {
+
+	private void importAction(Action action, Module module, boolean update) {
+		
+		if (isVisited("action", action.getName())) {
+			return;
+		}
+		
 		log.info("Loading action : {}", action.getName());
 		
 		Class<?> klass = action.getClass();
@@ -281,6 +332,10 @@ public class ViewLoader implements Loader {
 		MetaAction entity = MetaAction.findByName(action.getName());
 		if (entity == null) {
 			entity = new MetaAction(action.getName());
+		}
+
+		if (isUpdated(entity)) {
+			return;
 		}
 		
 		entity.setXml(XMLViews.toXml(action,  true));
@@ -293,24 +348,31 @@ public class ViewLoader implements Loader {
 		entity.setType(type);
 
 		entity = entity.save();
-		
-		for (MetaMenu pending : unresolved_actions.get(entity.getName())) {
+
+		for (MetaMenu pending : this.resolve(MetaMenu.class, entity.getName())) {
 			log.info("Resolved menu: {}", pending.getName());
 			pending.setAction(entity);
 			pending.save();
 		}
-		unresolved_actions.removeAll(entity.getName());
 	}
 	
-	private void importMenu(MenuItem menuItem, Module module) {
-		
+	private void importMenu(MenuItem menuItem, Module module, boolean update) {
+
+		if (isVisited("menu", menuItem.getName())) {
+			return;
+		}
+
 		log.info("Loading menu : {}", menuItem.getName());
 
 		MetaMenu menu = MetaMenu.findByName(menuItem.getName());
 		if (menu == null) {
 			menu = new MetaMenu(menuItem.getName());
 		}
-		
+
+		if (isUpdated(menu)) {
+			return;
+		}
+
 		menu.setPriority(menuItem.getPriority());
 		menu.setTitle(menuItem.getDefaultTitle());
 		menu.setIcon(menuItem.getIcon());
@@ -319,15 +381,14 @@ public class ViewLoader implements Loader {
 		menu.setLeft(menuItem.getLeft() == null ? true : menuItem.getLeft());
 		menu.setMobile(menuItem.getMobile());
 		
-		if (menu.getId() == null) {
-			menu.setGroups(this.findGroups(menuItem.getGroups()));
-		}
-		
+		menu.clearGroups();
+		menu.setGroups(this.findGroups(menuItem.getGroups()));
+
 		if (!Strings.isNullOrEmpty(menuItem.getParent())) {
 			MetaMenu parent = MetaMenu.findByName(menuItem.getParent());
 			if (parent == null) {
 				log.info("Unresolved parent : {}", menuItem.getParent());
-				unresolved_menus.put(menuItem.getParent(), menu);
+				this.setUnresolved(MetaMenu.class, menuItem.getParent(), menu);
 			} else {
 				menu.setParent(parent);
 			}
@@ -337,32 +398,36 @@ public class ViewLoader implements Loader {
 			MetaAction action = MetaAction.findByName(menuItem.getAction());
 			if (action == null) {
 				log.info("Unresolved action: {}", menuItem.getAction());
-				unresolved_actions.put(menuItem.getAction(), menu);
+				setUnresolved(MetaMenu.class, menuItem.getAction(), menu);
 			} else {
 				menu.setAction(action);
 			}
 		}
 		
 		menu = menu.save();
-
-		for (MetaMenu pending : unresolved_menus.get(menu.getName())) {
+		
+		for (MetaMenu pending : this.resolve(MetaMenu.class, menu.getName())) {
 			log.info("Resolved menu : {}", pending.getName());
 			pending.setParent(menu);
 			pending.save();
 		}
-
-		unresolved_menus.removeAll(menu.getName());
 	}
 	
-	private Multimap<String, MetaActionMenu> unresolved_action_menus = HashMultimap.create();
-	private Multimap<String, MetaActionMenu> unresolved_action_actions = HashMultimap.create();
+	private void importActionMenu(MenuItem menuItem, Module module, boolean update) {
 
-	private void importActionMenu(MenuItem menuItem, Module module) {
+		if (isVisited("menu", menuItem.getName())) {
+			return;
+		}
+		
 		log.info("Loading action menu : {}", menuItem.getName());
 
 		MetaActionMenu menu = MetaActionMenu.findByName(menuItem.getName());
 		if (menu == null) {
 			menu = new MetaActionMenu(menuItem.getName());
+		}
+		
+		if (isUpdated(menu)) {
+			return;
 		}
 
 		menu.setTitle(menuItem.getDefaultTitle());
@@ -373,7 +438,7 @@ public class ViewLoader implements Loader {
 			MetaActionMenu parent = MetaActionMenu.findByName(menuItem.getParent());
 			if (parent == null) {
 				log.info("Unresolved parent : {}", menuItem.getParent());
-				unresolved_action_menus.put(menuItem.getParent(), menu);
+				this.setUnresolved(MetaActionMenu.class, menuItem.getParent(), menu);
 			} else {
 				menu.setParent(parent);
 			}
@@ -383,7 +448,7 @@ public class ViewLoader implements Loader {
 			MetaAction action = MetaAction.findByName(menuItem.getAction());
 			if (action == null) {
 				log.info("Unresolved action: {}", menuItem.getAction());
-				unresolved_action_actions.put(menuItem.getAction(), menu);
+				this.setUnresolved(MetaActionMenu.class, menuItem.getAction(), menu);
 			} else {
 				menu.setAction(action);
 			}
@@ -391,13 +456,11 @@ public class ViewLoader implements Loader {
 
 		menu = menu.save();
 
-		for (MetaActionMenu pending : unresolved_action_menus.get(menu.getName())) {
+		for (MetaActionMenu pending : this.resolve(MetaActionMenu.class, menu.getName())) {
 			log.info("Resolved action menu : {}", pending.getName());
 			pending.setParent(menu);
 			pending.save();
 		}
-
-		unresolved_action_actions.removeAll(menu.getName());
 	}
 
 	private static final File outputDir = FileUtils.getFile(System.getProperty("java.io.tmpdir"), "axelor", "generated");
@@ -465,8 +528,8 @@ public class ViewLoader implements Loader {
 		gridView.setItems(gridItems);
 
 
-		importView(formView, module);
-		importView(gridView, module);
+		importView(formView, module, false);
+		importView(gridView, module, false);
 
 		return XMLViews.toXml(ImmutableList.of(gridView, formView), false);
 	}
