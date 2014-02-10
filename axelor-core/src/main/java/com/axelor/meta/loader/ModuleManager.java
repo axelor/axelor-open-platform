@@ -42,6 +42,12 @@ public class ModuleManager {
 	@Inject
 	private I18nLoader i18nLoader;
 	
+	@Inject
+	private DataLoader dataLoader;
+	
+	@Inject
+	private DemoLoader demoLoader;
+
 	private static final Set<String> SKIP = Sets.newHashSet(
 			"axelor-cglib",
 			"axelor-test",
@@ -51,8 +57,7 @@ public class ModuleManager {
 
 	}
 
-	@Transactional
-	public void initialize(boolean update) {
+	public void initialize(boolean update, boolean withDemo) {
 
 		this.createUsers();
 		this.resolve(true);
@@ -64,12 +69,12 @@ public class ModuleManager {
 
 		for (Module module : resolver.all()) {
 			if (!module.isRemovable()) {
-				install(module.getName(), update, false);
+				install(module.getName(), update, withDemo, false);
 			}
 		}
 	}
 
-	public void update(String... modules) {
+	public void update(boolean withDemo, String... modules) {
 
 		this.createUsers();
 		this.resolve(true);
@@ -84,7 +89,7 @@ public class ModuleManager {
 		
 		for (Module module : resolver.all()) {
 			if (names.contains(module.getName())) {
-				install(module);
+				install(module, withDemo);
 			}
 		}
 	}
@@ -94,8 +99,8 @@ public class ModuleManager {
 	}
 	
 	@Transactional
-	public void install(String moduleName, boolean update) {
-		install(moduleName, update, true);
+	public void install(String moduleName, boolean update, boolean withDemo) {
+		install(moduleName, update, withDemo, true);
 	}
 
 	@Transactional
@@ -103,7 +108,7 @@ public class ModuleManager {
 		log.info("TODO: uninstall module: {}", module);
 	}
 
-	private void install(String moduleName, boolean update, boolean force) {
+	private void install(String moduleName, boolean update, boolean withDemo, boolean force) {
 
 		for (Module module : resolver.resolve(moduleName)) {
 			
@@ -118,11 +123,11 @@ public class ModuleManager {
 				continue;
 			}
 
-			install(module);
+			install(module, withDemo);
 		}
 	}
 	
-	private void install(Module module) {
+	private void install(Module module, boolean withDemo) {
 		
 		if (SKIP.contains(module.getName())) {
 			return;
@@ -135,6 +140,21 @@ public class ModuleManager {
 		
 		log.info(message, module);
 
+		// load meta
+		installMeta(module);
+
+		// load data (runs in it's own transaction)
+		dataLoader.load(module);
+		if (withDemo) {
+			demoLoader.load(module);
+		}
+
+		// finally update install state
+		updateState(module);
+	}
+
+	@Transactional
+	void installMeta(Module module) {
 		// load model info
 		modelLoader.load(module);
 
@@ -143,16 +163,18 @@ public class ModuleManager {
 		
 		// load i18n
 		i18nLoader.load(module);
-
+	}
+	
+	@Transactional
+	void updateState(Module module) {
 		MetaModule metaModule = MetaModule.findByName(module.getName());
-		
 		module.setInstalled(true);
 		metaModule.setInstalled(true);
 		module.setInstalledVersion(module.getVersion());
 	}
 
 	@Transactional
-	private void resolve(boolean update) {
+	void resolve(boolean update) {
 		for (File file : MetaScanner.findAll("module\\.properties")) {
 			Properties properties = new Properties();
 			try {
@@ -197,7 +219,7 @@ public class ModuleManager {
 	}
 	
 	@Transactional
-	private void createUsers() {
+	void createUsers() {
 		
 		User admin = User.findByCode("admin");
 		if (admin != null) {
