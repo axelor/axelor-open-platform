@@ -345,6 +345,14 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="id" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+        If this view is overriding some existing view with same name,
+        provide an unique view id to identify this view.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="editable" type="xsd:boolean" />
   </xsd:attributeGroup>
 

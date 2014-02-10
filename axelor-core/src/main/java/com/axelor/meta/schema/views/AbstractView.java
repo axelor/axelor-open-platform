@@ -78,6 +78,9 @@ public abstract class AbstractView {
 	@XmlAttribute
 	private Boolean editable;
 
+	@XmlAttribute(name = "id")
+	private String id;
+
 	@JsonIgnore
 	@XmlAttribute( name = "width")
 	private String widthSpec;
@@ -133,6 +136,14 @@ public abstract class AbstractView {
 
 	public void setEditable(Boolean editable) {
 		this.editable = editable;
+	}
+
+	public String getId() {
+		return id;
+	}
+	
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	private String widthPart(int which) {
