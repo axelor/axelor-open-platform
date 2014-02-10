@@ -76,12 +76,14 @@ public class Main {
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			cmd.usage();
+			System.exit(-1);
 			return;
 		}
 
 		if ((opts.showHelp == Boolean.TRUE)
 				|| (opts.init == Boolean.FALSE && opts.update == Boolean.FALSE)) {
 			cmd.usage();
+			System.exit(0);
 			return;
 		}
 		
@@ -90,6 +92,7 @@ public class Main {
 		
 		if (opts.init == Boolean.TRUE) {
 			manager.initialize(opts.update == Boolean.TRUE, opts.importDemo == Boolean.TRUE);
+			System.exit(0);
 			return;
 		}
 
@@ -98,5 +101,6 @@ public class Main {
 			names = opts.modules.toArray(new String[] {});
 		}
 		manager.update(opts.importDemo == Boolean.TRUE, names);
+		System.exit(0);
 	}
 }
