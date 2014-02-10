@@ -163,6 +163,17 @@ final class Resolver {
 		return names;
 	}
 	
+	/**
+	 * Get the instance of the module by given name.
+	 * 
+	 * @param name
+	 *            the module name.
+	 * @return the {@link Module} instance or null if no module by that name
+	 */
+	public Module get(String name) {
+		return modules.get(name);
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
