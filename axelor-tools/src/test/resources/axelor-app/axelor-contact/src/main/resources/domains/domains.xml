@@ -74,6 +74,7 @@
   </entity>
 
   <entity name="Contact" sequential="true" lang="groovy" hashAll="true" cachable="false">
+    <string name="empId" sequence="emp.seq"/>
     <many-to-one name="title" ref="Title" unique="true" />
     <string name="firstName" required="true" initParam="true"/>
     <string name="lastName" required="true" initParam="true"/>

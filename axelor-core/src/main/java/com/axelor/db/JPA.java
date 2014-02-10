@@ -381,6 +381,11 @@ public final class JPA {
 			Object value = values.get(name);
 			Class<Model> target = (Class<Model>) p.getTarget();
 
+			// set sequence value
+			if (p.isSequence() && bean.getId() == null && value == null) {
+				value = JpaSequence.nextValue(p.getSequenceName());
+			}
+
 			if (p.isCollection()) {
 
 				Collection items = new ArrayList();
@@ -612,7 +617,7 @@ public final class JPA {
 		final int random = new Random().nextInt();
 		for(final Property p : mapper.getProperties()) {
 			
-			if (p.isVirtual() || p.isPrimary() || p.isVersion()) {
+			if (p.isVirtual() || p.isPrimary() || p.isVersion() || p.isSequence()) {
 				continue;
 			}
 

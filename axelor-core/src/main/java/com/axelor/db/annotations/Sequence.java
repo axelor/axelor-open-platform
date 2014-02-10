@@ -28,52 +28,25 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.meta.domains;
+package com.axelor.db.annotations;
 
-import java.util.List;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+/**
+ * Mark the field to use a specified custom sequence.
+ * 
+ */
+@Documented
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Sequence {
 
-@XmlType
-@XmlRootElement(name = "domain-models")
-public class DomainModels {
-	
-	public static final String NAMESPACE = "http://apps.axelor.com/xml/ns/domain-models";
-
-	public static final String VERSION = "2.0";
-	
-	@XmlElement(name = "module")
-	private Module module;
-
-	@XmlElement(name = "sequence")
-	private List<Sequence> sequences;
-	
-	@XmlElement(name = "entity")
-	private List<Entity> entities;
-
-	public Module getModule() {
-		return module;
-	}
-
-	public void setModule(Module module) {
-		this.module = module;
-	}
-	
-	public List<Sequence> getSequences() {
-		return sequences;
-	}
-	
-	public void setSequences(List<Sequence> sequences) {
-		this.sequences = sequences;
-	}
-
-	public List<Entity> getEntities() {
-		return entities;
-	}
-
-	public void setEntities(List<Entity> entities) {
-		this.entities = entities;
-	}
+	/**
+	 * The custom sequence name.
+	 */
+	String value();
 }

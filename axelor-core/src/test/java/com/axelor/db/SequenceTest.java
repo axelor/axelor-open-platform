@@ -28,52 +28,34 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.meta.domains;
+package com.axelor.db;
 
-import java.util.List;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import com.axelor.MyTest;
+import com.axelor.meta.db.MetaSequence;
+import com.google.inject.persist.Transactional;
 
-@XmlType
-@XmlRootElement(name = "domain-models")
-public class DomainModels {
+public class SequenceTest extends MyTest {
 	
-	public static final String NAMESPACE = "http://apps.axelor.com/xml/ns/domain-models";
-
-	public static final String VERSION = "2.0";
-	
-	@XmlElement(name = "module")
-	private Module module;
-
-	@XmlElement(name = "sequence")
-	private List<Sequence> sequences;
-	
-	@XmlElement(name = "entity")
-	private List<Entity> entities;
-
-	public Module getModule() {
-		return module;
+	@Before
+	public void setUp() {
+		if (MetaSequence.all().count() == 0) {
+			fixture("sequence-data.yml");
+		}
 	}
 
-	public void setModule(Module module) {
-		this.module = module;
-	}
-	
-	public List<Sequence> getSequences() {
-		return sequences;
-	}
-	
-	public void setSequences(List<Sequence> sequences) {
-		this.sequences = sequences;
-	}
+	@Test
+	@Transactional
+	public void test() {
+		Assert.assertEquals("EMP_00001_ID", JpaSequence.nextValue("seq.emp.id"));
+		Assert.assertEquals("EMP_00002_ID", JpaSequence.nextValue("seq.emp.id"));
+		Assert.assertEquals("EMP_00003_ID", JpaSequence.nextValue("seq.emp.id"));
+		
+		JpaSequence.nextValue("seq.emp.id", 100);
 
-	public List<Entity> getEntities() {
-		return entities;
-	}
-
-	public void setEntities(List<Entity> entities) {
-		this.entities = entities;
+		Assert.assertEquals("EMP_00100_ID", JpaSequence.nextValue("seq.emp.id"));
 	}
 }

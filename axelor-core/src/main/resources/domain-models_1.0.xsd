@@ -19,6 +19,13 @@
             <xsd:attribute name="package" type="xsd:string" />
           </xsd:complexType>
         </xsd:element>
+        <xsd:element name="sequence" minOccurs="0" maxOccurs="unbounded" type="dm:Sequence">
+          <xsd:annotation>
+            <xsd:documentation>
+              Define a custom sequence.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
         <xsd:element name="entity" maxOccurs="unbounded"
           minOccurs="1" type="dm:Entity">
           <xsd:annotation>
@@ -30,6 +37,39 @@
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
+
+  <xsd:complexType name="Sequence">
+    <xsd:attribute name="name" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>The name of the sequence.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="prefix" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>The sequence prefix.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="suffix" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>The sequence suffix.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="padding" type="xsd:integer">
+      <xsd:annotation>
+        <xsd:documentation>The padding width of the numeric part of the sequence.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="initial" type="xsd:long">
+      <xsd:annotation>
+        <xsd:documentation>The initial value of the sequence number.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="increment" type="xsd:integer">
+      <xsd:annotation>
+        <xsd:documentation>Increment the sequence number by given value.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
 
   <xsd:complexType name="Column" mixed="true">
     <xsd:annotation>
@@ -347,6 +387,13 @@
           <xsd:annotation>
             <xsd:documentation>
             Whether the field is storing password text.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="sequence" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            User the specified custom sequence generator.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
