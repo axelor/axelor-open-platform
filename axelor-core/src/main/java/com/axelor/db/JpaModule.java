@@ -125,7 +125,7 @@ public class JpaModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		log.info("Initialize JPA...");
+		log.info("Configuring JPA...");
 		Properties properties = new Properties();
 		if (this.properties != null) {
 			properties.putAll(this.properties);
@@ -183,6 +183,7 @@ public class JpaModule extends AbstractModule {
 
 		@Inject
 		Initializer(PersistService service) {
+			log.info("Initialize JPA...");
 			service.start();
 		}
 	}

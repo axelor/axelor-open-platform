@@ -203,6 +203,40 @@ public class ModuleManager {
 		metaModule.setInstalled(true);
 		module.setInstalledVersion(module.getVersion());
 	}
+	
+	public static List<String> findInClassPath(boolean includeRemovables) {
+		final Resolver resolver = new Resolver();
+		final List<String> found = Lists.newArrayList();
+
+		for (File file : MetaScanner.findAll("module\\.properties")) {
+			Properties properties = new Properties();
+			try {
+				properties.load(file.openInputStream());
+			} catch (IOException e) {
+				throw Throwables.propagate(e);
+			}
+			
+			String name = properties.getProperty("name");
+			
+			if (SKIP.contains(name)) {
+				continue;
+			}
+			
+			String[] deps = properties.getProperty("depends", "").trim().split("\\s+");
+			boolean removable = "true".equals(properties.getProperty("removable"));
+
+			Module module = resolver.add(name, deps);
+			module.setRemovable(removable);
+		}
+		
+		for (Module module : resolver.all()) {
+			if (!includeRemovables && module.isRemovable()) {
+				continue;
+			}
+			found.add(module.getName());
+		}
+		return found;
+	}
 
 	@Transactional
 	void resolve(boolean update) {

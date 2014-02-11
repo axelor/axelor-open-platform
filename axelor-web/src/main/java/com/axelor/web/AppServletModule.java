@@ -41,6 +41,7 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.app.AppModule;
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
@@ -117,6 +118,9 @@ public class AppServletModule extends JerseyServletModule {
 
 		// bind to translations provider
 		bind(Translations.class).toProvider(MetaTranslations.class);
+
+		// install the app modules
+		install(new AppModule());
 
 		// no-cache filter
 		if ("dev".equals(settings.get("application.mode", "dev"))) {
