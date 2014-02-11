@@ -70,7 +70,7 @@ class DataLoader extends AbstractLoader {
 	private Injector injector;
 	
 	@Override
-	public void load(Module module, boolean update) {
+	protected void doLoad(Module module, boolean update) {
 
 		File tmp = extract(module);
 		if (tmp == null) {

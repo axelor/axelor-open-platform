@@ -63,12 +63,12 @@ abstract class AbstractLoader {
 	 *            the key name
 	 * @return true if the name is already visited false otherwise
 	 */
-	protected boolean isVisited(String type, String name) {
+	protected boolean isVisited(Class<?> type, String name) {
 		if (visited.get() == null) {
 			visited.set(Sets.<String>newHashSet());
 		}
 		if (visited.get().contains(type + name)) {
-			log.error("duplicated {} found: {}", type, name);
+			log.error("duplicate found: {}", name);
 			return true;
 		}
 		visited.get().add(type + name);
@@ -97,8 +97,6 @@ abstract class AbstractLoader {
 	 * key.<br>
 	 * <br>
 	 * The value is put inside a {@link Multimap} with unresolvedKey as the key.
-	 * The internal map keeping the given values should be cleared using
-	 * {@link #clear()} method when task is complete.
 	 * 
 	 * @param type
 	 * @param unresolvedKey
@@ -173,5 +171,13 @@ abstract class AbstractLoader {
 	 * @param update
 	 *            whether to force update while loading
 	 */
-	protected abstract void load(Module module, boolean update);
+	protected abstract void doLoad(Module module, boolean update);
+
+	public final void load(Module module, boolean update) {
+		try {
+			doLoad(module, update);
+		} finally {
+			clear();
+		}
+	}
 }

@@ -68,18 +68,15 @@ public class ModelLoader extends AbstractLoader {
 	private MetaModelService service;
 
 	@Override
-	public void load(Module module, boolean update) {
+	protected void doLoad(Module module, boolean update) {
 
 		for (Class<?> klass : JPA.models()) {
 			if (module.hasEntity(klass)) {
 				service.process(klass);
 			}
 		}
-		try {
-			loadSequences(module, update);
-		} finally {
-			this.clear();
-		}
+		
+		loadSequences(module, update);
 	}
 	
 	private void loadSequences(Module module, boolean update) {
@@ -99,7 +96,7 @@ public class ModelLoader extends AbstractLoader {
 	private void importSequences(List<Sequence> sequences, boolean update) {
 		
 		for (Sequence sequence : sequences) {
-			if (isVisited("sequence", sequence.getName())) {
+			if (isVisited(Sequence.class, sequence.getName())) {
 				continue;
 			}
 			log.info("importing sequence: {}", sequence.getName());
