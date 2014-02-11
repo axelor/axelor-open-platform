@@ -31,125 +31,14 @@
 package com.axelor.common;
 
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
 import java.net.URL;
-import java.util.Set;
-
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-
-import com.google.common.collect.Sets;
 
 /**
- * The class provides some static helper methods to deal with classes.
+ * The class provides static helper methods to deal with classes & resource.
  * 
  */
 public final class ClassUtils {
-	
-	/**
-	 * The helper class to find subtypes of a given super class.
-	 * 
-	 */
-	public static class ClassFinder<T> {
 
-		private Class<T> type;
-		
-		private ConfigurationBuilder builder = new ConfigurationBuilder();
-		private Set<Class<? extends Annotation>> annotations = Sets.newLinkedHashSet();
-		
-		private boolean matchAll = true;
-		private boolean hasUrls = false;
-		
-		private ClassFinder(Class<T> type) {
-			this.type = type;
-			this.builder.addUrls(ClasspathHelper.forClassLoader());
-			this.builder.addScanners(new SubTypesScanner());	
-		}
-		
-		/**
-		 * Only search within the given package name.
-		 * 
-		 * @param packageName
-		 *            the package name
-		 * @return same class finder instance
-		 */
-		public ClassFinder<T> within(String packageName) {
-			if (!hasUrls) {
-				hasUrls = true;
-				builder.getUrls().clear();
-			}
-			builder.addUrls(ClasspathHelper.forPackage(packageName));
-			return this;
-		}
-		
-		/**
-		 * Only search classes with the given annotation.
-		 * 
-		 * @param annotation
-		 *            the annotation to check
-		 * @return same class finder instance
-		 */
-		public ClassFinder<T> having(final Class<? extends Annotation> annotation) {
-			this.annotations.add(annotation);
-			return this;
-		}
-		
-		/**
-		 * In case of multiple {@link #having(Class)} calls, whether to check
-		 * any one annotation (by default all annotations are checked).
-		 * 
-		 * @return same class finder instance
-		 */
-		public ClassFinder<T> any() {
-			this.matchAll = false;
-			return this;
-		}
-		
-		private boolean hasAnnotation(Class<?> cls) {
-			boolean matched = false;
-			for (Class<? extends Annotation> annotation : annotations) {
-				if (cls.isAnnotationPresent(annotation)) {
-					if (!matchAll) {
-						return true;
-					}
-					matched = true;
-				} else if (matchAll) {
-					return false;
-				}
-			}
-			return annotations.size() == 0 || matched;
-		}
-
-		/**
-		 * Find the classes.
-		 * 
-		 * @return set of matched classes
-		 */
-		public Set<Class<? extends T>> find() {
-			final Reflections reflections = new Reflections(builder);
-			final Set<Class<? extends T>> all = Sets.newLinkedHashSet();
-			for (Class<? extends T> cls : reflections.getSubTypesOf(type)) {
-				if (hasAnnotation(cls)) {
-					all.add(cls);
-				}
-			}
-			return all;
-		}
-	}
-	
-	/**
-	 * Return a class finder to find all the subtypes of the given type.
-	 * 
-	 * @param type
-	 *            the super type
-	 * @return class finder
-	 */
-	public static <T> ClassFinder<T> finderOf(Class<T> type) {
-		return new ClassFinder<T>(type);
-	}
-	
 	/**
 	 * This is same as {@link Class#forName(String)} but throws
 	 * {@link IllegalArgumentException} if class is not found.
