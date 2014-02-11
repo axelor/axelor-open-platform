@@ -77,7 +77,7 @@ public class I18nLoader extends AbstractLoader {
 	private ImportTranslations importTranslations;
 	
 	@Override
-	public void load(Module module, boolean update) {
+	protected void doLoad(Module module, boolean update) {
 		
 		List<Vfs.File> files = MetaScanner.findAll(module.getName(), "i18n", "(.*?)\\.csv");
 		

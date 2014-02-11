@@ -85,29 +85,24 @@ public class ViewLoader extends AbstractLoader {
 
 	@Override
 	@Transactional
-	public void load(Module module, boolean update) {
-		try {
-			for (Vfs.File file : MetaScanner.findAll(module.getName(), "views", "(.*?)\\.xml")) {
-				log.info("importing: {}", file.getName());
-				try {
-					process(file.openInputStream(), module, update);
-				} catch (IOException | JAXBException e) {
-					throw Throwables.propagate(e);
-				}
+	protected void doLoad(Module module, boolean update) {
+		for (Vfs.File file : MetaScanner.findAll(module.getName(), "views", "(.*?)\\.xml")) {
+			log.info("importing: {}", file.getName());
+			try {
+				process(file.openInputStream(), module, update);
+			} catch (IOException | JAXBException e) {
+				throw Throwables.propagate(e);
 			}
-
-			Set<?> unresolved = this.unresolvedKeys();
-			if (unresolved.size() > 0) {
-				log.error("unresolved items: {}", unresolved);
-				throw new PersistenceException("There are some unresolve items, check the log.");
-			}
-			
-			// generate default views
-			importDefault(module);
-		
-		} finally {
-			this.clear();
 		}
+
+		Set<?> unresolved = this.unresolvedKeys();
+		if (unresolved.size() > 0) {
+			log.error("unresolved items: {}", unresolved);
+			throw new PersistenceException("There are some unresolve items, check the log.");
+		}
+		
+		// generate default views
+		importDefault(module);
 	}
 
 	private static <T> List<T> getList(List<T> list) {
@@ -148,7 +143,7 @@ public class ViewLoader extends AbstractLoader {
 		String type = view.getType();
 		String modelName = view.getModel();
 
-		if (xmlId != null && isVisited("view", xmlId)) {
+		if (xmlId != null && isVisited(view.getClass(), xmlId)) {
 			return;
 		}
 		
@@ -215,7 +210,7 @@ public class ViewLoader extends AbstractLoader {
 	
 	private void importChart(ChartView view, Module module, boolean update) {
 
-		if (isVisited("chart", view.getName())) {
+		if (isVisited(view.getClass(), view.getName())) {
 			return;
 		}
 
@@ -267,7 +262,7 @@ public class ViewLoader extends AbstractLoader {
 	
 	private void importSelection(Selection selection, Module module, boolean update) {
 		
-		if (isVisited("select", selection.getName())) {
+		if (isVisited(Selection.class, selection.getName())) {
 			return;
 		}
 		
@@ -320,7 +315,7 @@ public class ViewLoader extends AbstractLoader {
 
 	private void importAction(Action action, Module module, boolean update) {
 		
-		if (isVisited("action", action.getName())) {
+		if (isVisited(Action.class, action.getName())) {
 			return;
 		}
 		
@@ -358,7 +353,7 @@ public class ViewLoader extends AbstractLoader {
 	
 	private void importMenu(MenuItem menuItem, Module module, boolean update) {
 
-		if (isVisited("menu", menuItem.getName())) {
+		if (isVisited(MenuItem.class, menuItem.getName())) {
 			return;
 		}
 
@@ -415,7 +410,7 @@ public class ViewLoader extends AbstractLoader {
 	
 	private void importActionMenu(MenuItem menuItem, Module module, boolean update) {
 
-		if (isVisited("menu", menuItem.getName())) {
+		if (isVisited(MenuItem.class, menuItem.getName())) {
 			return;
 		}
 		
