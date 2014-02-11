@@ -52,9 +52,9 @@ public final class ClassUtils {
 	 * The helper class to find subtypes of a given super class.
 	 * 
 	 */
-	public static class ClassFinder {
+	public static class ClassFinder<T> {
 
-		private Class<?> type;
+		private Class<T> type;
 		
 		private ConfigurationBuilder builder = new ConfigurationBuilder();
 		private Set<Class<? extends Annotation>> annotations = Sets.newLinkedHashSet();
@@ -62,7 +62,7 @@ public final class ClassUtils {
 		private boolean matchAll = true;
 		private boolean hasUrls = false;
 		
-		private ClassFinder(Class<?> type) {
+		private ClassFinder(Class<T> type) {
 			this.type = type;
 			this.builder.addUrls(ClasspathHelper.forClassLoader());
 			this.builder.addScanners(new SubTypesScanner());	
@@ -75,7 +75,7 @@ public final class ClassUtils {
 		 *            the package name
 		 * @return same class finder instance
 		 */
-		public ClassFinder within(String packageName) {
+		public ClassFinder<T> within(String packageName) {
 			if (!hasUrls) {
 				hasUrls = true;
 				builder.getUrls().clear();
@@ -91,7 +91,7 @@ public final class ClassUtils {
 		 *            the annotation to check
 		 * @return same class finder instance
 		 */
-		public ClassFinder having(final Class<? extends Annotation> annotation) {
+		public ClassFinder<T> having(final Class<? extends Annotation> annotation) {
 			this.annotations.add(annotation);
 			return this;
 		}
@@ -102,7 +102,7 @@ public final class ClassUtils {
 		 * 
 		 * @return same class finder instance
 		 */
-		public ClassFinder any() {
+		public ClassFinder<T> any() {
 			this.matchAll = false;
 			return this;
 		}
@@ -127,10 +127,10 @@ public final class ClassUtils {
 		 * 
 		 * @return set of matched classes
 		 */
-		public Set<Class<?>> find() {
+		public Set<Class<? extends T>> find() {
 			final Reflections reflections = new Reflections(builder);
-			final Set<Class<?>> all = Sets.newLinkedHashSet();
-			for (Class<?> cls : reflections.getSubTypesOf(type)) {
+			final Set<Class<? extends T>> all = Sets.newLinkedHashSet();
+			for (Class<? extends T> cls : reflections.getSubTypesOf(type)) {
 				if (hasAnnotation(cls)) {
 					all.add(cls);
 				}
@@ -146,8 +146,8 @@ public final class ClassUtils {
 	 *            the super type
 	 * @return class finder
 	 */
-	public static ClassFinder finderOf(Class<?> type) {
-		return new ClassFinder(type);
+	public static <T> ClassFinder<T> finderOf(Class<T> type) {
+		return new ClassFinder<T>(type);
 	}
 	
 	/**
