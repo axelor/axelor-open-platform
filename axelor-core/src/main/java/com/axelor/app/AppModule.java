@@ -27,7 +27,7 @@ public class AppModule extends AbstractModule {
 		final List<String> mods = ModuleManager.findInClassPath(false);
 		final List<Class<? extends AxelorModule>> all = Lists.newArrayList();
 		
-		for (Class<? extends AxelorModule> module : ClassUtils.finderOf(
+		for (Class<? extends AxelorModule> module : ClassUtils.findSubTypesOf(
 				AxelorModule.class).having(AxelorModuleInfo.class).find()) {
 			String name = module.getAnnotation(AxelorModuleInfo.class).name();
 			if (mods.contains(name)) {

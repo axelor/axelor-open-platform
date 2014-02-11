@@ -30,19 +30,32 @@
  */
 package com.axelor.common;
 
+import java.util.Map;
+
+import javax.persistence.Entity;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestClassUtils {
+import com.axelor.common.reflections.Reflections;
+
+public class TestReflections {
 
 	@Test
-	public void testFindClass() {
-		Class<?> cls = ClassUtils.findClass("com.axelor.common.StringUtils");
-		Assert.assertEquals(cls, StringUtils.class);
+	public void testClassFinder() {
+		Assert.assertNotNull(Reflections.findSubTypesOf(Map.class).within("com.google").find());
+		Assert.assertNotNull(Reflections
+				.findTypes()
+				.within("com.axelor")
+				.having(Entity.class)
+				.find());
 	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testFindClassFail() {
-		ClassUtils.findClass("com.axelor.common.StringUtil");
+	
+	@Test
+	public void testResourceFinder() {
+		Assert.assertNotNull(Reflections
+				.findResources()
+				.byName("views/(.*)\\.xml")
+				.find());
 	}
 }
