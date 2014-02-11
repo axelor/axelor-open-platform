@@ -32,6 +32,7 @@ package com.axelor.cli;
 
 import java.util.Properties;
 
+import com.axelor.app.AppModule;
 import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
 import com.axelor.meta.loader.ModuleManager;
@@ -63,6 +64,7 @@ public class Main {
 
 			install(new JpaModule(jpaUnit).properties(properties));
 			install(new AuthModule.Simple().properties(properties));
+			install(new AppModule());
 		}
 	}
 
