@@ -174,7 +174,7 @@ function GridViewCtrl($scope, $element) {
 	};
 
 	$scope.canEdit = function() {
-		return $scope.hasButton('edit');
+		return $scope.hasButton('edit') && $scope.selection.length > 0;
 	};
 	
 	$scope.canSave = function() {
