@@ -37,8 +37,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,6 +51,7 @@ import org.slf4j.LoggerFactory;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+import com.axelor.common.FileUtils;
 import com.axelor.meta.ImportTranslations;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaTranslation;
@@ -70,30 +69,17 @@ public class I18nLoader extends AbstractLoader {
 	private static final String DOMAIN_COLUMN =  "domain";
 	private static final String TITLE_COLUMN =  "title";
 	private static final String TRANSLATION_COLUMN =  "title_t";
-	private static final String CURRENT_MODULE =  "_currentModule";
 	private static final String TYPE_COLUMN = "type";
 	private static final String CURRENT_LANGUAGE =  "_currentLanguage";
-	
+
 	@Inject
 	private ImportTranslations importTranslations;
-	
+
 	@Override
 	protected void doLoad(Module module, boolean update) {
-		
+
 		List<URL> files = MetaScanner.findAll(module.getName(), "i18n", "(.*?)\\.csv");
 		List<URL> sorted = Lists.newArrayList(files);
-		
-		Collections.sort(sorted, new Comparator<URL>() {
-			@Override
-			public int compare(URL o1, URL o2) {
-				String a = o1.toString();
-				String b = o2.toString();
-				if (a.contains("/classes/") && b.contains("/classes/")) return 0;
-				if (a.contains("/classes/")) return 1;
-				if (b.contains("/classes/")) return -1;
-				return 0;
-			}
-		});
 
 		for(URL resource : sorted) {
 			try {
@@ -109,11 +95,9 @@ public class I18nLoader extends AbstractLoader {
 	@Transactional
 	public void load(String importPath) {
 
-		importPath = importPath.endsWith("/") ? importPath : importPath.concat("/");
-
 		//Import by module resolver order
 		for(String module : ModuleManager.getResolution()) {
-			File moduleDir = new File(importPath + module);
+			File moduleDir = FileUtils.getFile(importPath, module, null);
 			if(!moduleDir.exists() || !moduleDir.isDirectory() || moduleDir.listFiles() == null) {
 				continue;
 			}
@@ -127,45 +111,44 @@ public class I18nLoader extends AbstractLoader {
 			}
 		}
 	}
-	
+
 	private static Set<String> typeSet = Sets.newHashSet("field", "documentation");
 	private static Set<String> domainSet = Sets.newHashSet("menu", "actionMenu", "tree", "chart", "search", "action", "select");
-	
+
 	private void process(final InputStream stream, String fileName, String moduleName) throws IOException {
 
 		// Get language name from the file name
 		String languageName = "";
-		Pattern pattern = Pattern.compile("(\\w+)\\.(.*?)");
+		Pattern pattern = Pattern.compile(".*(?:/|\\\\)(.+)\\.(\\w+)$");
 		Matcher matcher = pattern.matcher(fileName);
 		if (matcher.matches()) {
 			languageName = matcher.group(1);
 		}
-		
+
 		Reader reader = new InputStreamReader(stream);
 		CSVReader csvReader = new CSVReader(reader);
 
 		try {
 			String[] fields = csvReader.readNext();
 			String[] values = null;
-					
+
 			while((values = csvReader.readNext()) != null) {
 				if (isEmpty(values)) {
 					continue;
 				}
 				Map<String, String> map = toMap(fields, values);
-				
+
 				map.put(CURRENT_LANGUAGE, languageName);
-				map.put(CURRENT_MODULE, moduleName);
-				
+
 				String type = map.get(TYPE_COLUMN);
-				
+
 				MetaTranslation entity = new MetaTranslation();
 
 				entity.setModule(moduleName);
 				entity.setLanguage(languageName);
 				entity.setTranslation(map.get(TRANSLATION_COLUMN));
 				entity.setType(type);
-				
+
 				if (typeSet.contains(type)) {
 					entity.setKey(map.get(NAME_COLUMN));
 				} else {
@@ -174,14 +157,14 @@ public class I18nLoader extends AbstractLoader {
 				if (!domainSet.contains(type)) {
 					entity.setDomain(map.get(DOMAIN_COLUMN));
 				}
-	
-				entity = (MetaTranslation) importTranslations.loadTranslation(entity, map);
+
+				importTranslations.loadTranslation(entity, map);
 			}
 		} finally {
 			csvReader.close();
 		}
 	}
-	
+
 	private Map<String, String> toMap(String[] fields, String[] values) {
 		Map<String, String> map = Maps.newHashMap();
 		for (int i = 0; i < fields.length; i++) {
@@ -189,7 +172,7 @@ public class I18nLoader extends AbstractLoader {
 		}
 		return map;
 	}
-	
+
 	private boolean isEmpty(String[] line) {
 		if (line == null || line.length == 0)
 			return true;
