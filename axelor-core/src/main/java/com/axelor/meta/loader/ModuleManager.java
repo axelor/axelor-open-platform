@@ -31,6 +31,7 @@
 package com.axelor.meta.loader;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -38,7 +39,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.reflections.vfs.Vfs.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -208,10 +208,10 @@ public class ModuleManager {
 		final Resolver resolver = new Resolver();
 		final List<String> found = Lists.newArrayList();
 
-		for (File file : MetaScanner.findAll("module\\.properties")) {
+		for (URL file : MetaScanner.findAll("module\\.properties")) {
 			Properties properties = new Properties();
 			try {
-				properties.load(file.openInputStream());
+				properties.load(file.openStream());
 			} catch (IOException e) {
 				throw Throwables.propagate(e);
 			}
@@ -240,10 +240,10 @@ public class ModuleManager {
 
 	@Transactional
 	void resolve(boolean update) {
-		for (File file : MetaScanner.findAll("module\\.properties")) {
+		for (URL file : MetaScanner.findAll("module\\.properties")) {
 			Properties properties = new Properties();
 			try {
-				properties.load(file.openInputStream());
+				properties.load(file.openStream());
 			} catch (IOException e) {
 				throw Throwables.propagate(e);
 			}

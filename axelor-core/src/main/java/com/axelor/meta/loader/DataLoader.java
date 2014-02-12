@@ -37,13 +37,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.net.URL;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import org.reflections.vfs.Vfs;
 
 import com.axelor.common.FileUtils;
 import com.axelor.data.csv.CSVImporter;
@@ -128,7 +127,7 @@ class DataLoader extends AbstractLoader {
 	private File extract(Module module) {
 
 		final String dirName = this.getDirName();
-		final List<Vfs.File> files = MetaScanner.findAll(module.getName(), dirName, "(.*?)\\.(xml|csv)");
+		final List<URL> files = MetaScanner.findAll(module.getName(), dirName, "(.*?)\\.(xml|csv)");
 
 		if (files.isEmpty()) {
 			return null;
@@ -136,11 +135,11 @@ class DataLoader extends AbstractLoader {
 
 		final File tmp = Files.createTempDir();
 
-		for (Vfs.File file : files) {
+		for (URL file : files) {
 			String name = file.toString();
 			name = name.substring(name.lastIndexOf(dirName));
 			try {
-				copy(file.openInputStream(), tmp, name);
+				copy(file.openStream(), tmp, name);
 			} catch (IOException e) {
 				throw Throwables.propagate(e);
 			}

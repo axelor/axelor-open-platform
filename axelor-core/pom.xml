@@ -91,12 +91,6 @@
       <artifactId>hibernate-c3p0</artifactId>
     </dependency>
 
-    <!-- Refleactions -->
-    <dependency>
-      <groupId>org.reflections</groupId>
-      <artifactId>reflections</artifactId>
-    </dependency>
-    
     <!-- Servlet API -->
     <dependency>
       <groupId>javax.servlet</groupId>

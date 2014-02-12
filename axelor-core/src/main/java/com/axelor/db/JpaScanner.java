@@ -43,13 +43,10 @@ import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 
 import org.hibernate.ejb.packaging.NativeScanner;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.common.reflections.Reflections;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
@@ -89,15 +86,11 @@ public class JpaScanner extends NativeScanner {
 
 		cache = new MapMaker().makeMap();
 		synchronized (cache) {
-			Reflections reflections = new Reflections(
-					new ConfigurationBuilder()
-					.addUrls(ClasspathHelper.forPackage("com.axelor"))
-					.setScanners(new SubTypesScanner()));
-
+			
 			register(Model.class);
 
 			List<String> names = Lists.newArrayList();
-			for (Class<?> klass : reflections.getSubTypesOf(Model.class)) {
+			for (Class<?> klass : Reflections.findSubTypesOf(Model.class).within("com.axelor").find()) {
 				if (Model.class.isAssignableFrom(klass) && (
 						klass.isAnnotationPresent(Entity.class) ||
 						klass.isAnnotationPresent(Embeddable.class) ||

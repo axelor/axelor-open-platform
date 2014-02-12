@@ -30,11 +30,13 @@
  */
 package com.axelor.meta.loader;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -46,8 +48,6 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.reflections.vfs.Vfs;
-import org.reflections.vfs.Vfs.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +56,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import com.axelor.meta.ImportTranslations;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaTranslation;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.persist.Transactional;
@@ -79,11 +80,12 @@ public class I18nLoader extends AbstractLoader {
 	@Override
 	protected void doLoad(Module module, boolean update) {
 		
-		List<Vfs.File> files = MetaScanner.findAll(module.getName(), "i18n", "(.*?)\\.csv");
+		List<URL> files = MetaScanner.findAll(module.getName(), "i18n", "(.*?)\\.csv");
+		List<URL> sorted = Lists.newArrayList(files);
 		
-		Collections.sort(files, new Comparator<File>() {
+		Collections.sort(sorted, new Comparator<URL>() {
 			@Override
-			public int compare(File o1, File o2) {
+			public int compare(URL o1, URL o2) {
 				String a = o1.toString();
 				String b = o2.toString();
 				if (a.contains("/classes/") && b.contains("/classes/")) return 0;
@@ -93,13 +95,13 @@ public class I18nLoader extends AbstractLoader {
 			}
 		});
 
-		for(Vfs.File file : files) {
+		for(URL resource : sorted) {
 			try {
 				MetaTranslation.all().filter("self.module = ?", module.getName()).remove();
-				log.debug("Load translation: {}", file);
-				process(file.openInputStream(), file.getName(), module.getName());
+				log.debug("Load translation: {}", resource);
+				process(resource.openStream(), resource.getFile(), module.getName());
 			} catch (IOException e) {
-				log.error("Unable to import file: {}", file.getName());
+				log.error("Unable to import file: {}", resource.getFile());
 			}
 		}
 	}
@@ -111,12 +113,12 @@ public class I18nLoader extends AbstractLoader {
 
 		//Import by module resolver order
 		for(String module : ModuleManager.getResolution()) {
-			java.io.File moduleDir = new java.io.File(importPath + module);
+			File moduleDir = new File(importPath + module);
 			if(!moduleDir.exists() || !moduleDir.isDirectory() || moduleDir.listFiles() == null) {
 				continue;
 			}
 
-			for(java.io.File file : moduleDir.listFiles()) {
+			for(File file : moduleDir.listFiles()) {
 				try {
 					process(new FileInputStream(file), file.getName(), module);
 				} catch (IOException e) {

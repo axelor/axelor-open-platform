@@ -32,6 +32,7 @@ package com.axelor.meta.loader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -43,7 +44,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.reflections.vfs.Vfs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,11 +80,11 @@ public class ModelLoader extends AbstractLoader {
 	}
 	
 	private void loadSequences(Module module, boolean update) {
-		for (Vfs.File file : MetaScanner.findAll(module.getName(), "domains", "(.*?)\\.xml")) {
+		for (URL file : MetaScanner.findAll(module.getName(), "domains", "(.*?)\\.xml")) {
 			try {
-				DomainModels models = unmarshal(file.openInputStream());
+				DomainModels models = unmarshal(file.openStream());
 				if (models.getSequences() != null) {
-					log.info("importing sequence data: {}", file.getName());
+					log.info("importing sequence data: {}", file.getFile());
 					importSequences(models.getSequences(), update);
 				}
 			} catch (IOException | JAXBException e) {
