@@ -155,13 +155,14 @@
     This object store the translation.
     ]]>
     
-  	<string name="key" required="true"/>
-  	<string name="language" required="true"/>
-  	<string name="translation" large="true"/>
-  	<string name="domain"/>
-  	<string name="type" selection="meta.translation.type.selection"/>
-    <string name="module"/>
+  	<string name="key" required="true" initParam="true"/>
+  	<string name="language" required="true" initParam="true"/>
+  	<string name="translation" large="true" initParam="true"/>
+  	<string name="domain" initParam="true"/>
+  	<string name="type" selection="meta.translation.type.selection" initParam="true"/>
+    <string name="module" initParam="true"/>
   	<unique-constraint columns="key,type,language,domain"/>
+    <finder-method name="findByAll" using="key,language,domain,type,module" cacheable="true"/>
   </entity>
   
   <entity name="MetaFile" table="META_FILE">

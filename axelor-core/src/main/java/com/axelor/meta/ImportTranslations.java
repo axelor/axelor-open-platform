@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
-import com.axelor.meta.service.MetaTranslations;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -47,86 +46,41 @@ public class ImportTranslations {
 	private final Logger LOG = LoggerFactory.getLogger(ActionHandler.class);
 
 	@SuppressWarnings("rawtypes")
-	public Object loadTranslation(Object bean, Map values) {
+	public void loadTranslation(Object bean, Map values) {
 
 		MetaTranslation meta = (MetaTranslation) bean;
-		MetaTranslation foundedTranslation = null;
 
 		String help = values.get("help").toString();
 		String help_t = values.get("help_t").toString();
 
 		if(!Strings.isNullOrEmpty(help) && !Strings.isNullOrEmpty(help_t) && "viewField".equals(meta.getType())) {
-			MetaTranslation helpT = new MetaTranslation();
-			helpT.setDomain(meta.getDomain());
-			helpT.setKey(help);
-			helpT.setLanguage(meta.getLanguage());
-			helpT.setTranslation(help_t);
-			helpT.setType("help");
-			helpT.setModule(meta.getModule());
-			helpT.save();
+			this.createOrUpdateTranslation(help, "help", meta.getModule(), meta.getDomain(), help_t, meta.getLanguage());
 		}
 		else if(!Strings.isNullOrEmpty(help_t) && "field".equals(meta.getType()) && meta.getKey() != null) {
-			MetaTranslation helpT = new MetaTranslation();
-			helpT.setDomain(meta.getDomain());
-			helpT.setKey(meta.getKey());
-			helpT.setLanguage(meta.getLanguage());
-			helpT.setTranslation(help_t);
-			helpT.setType("help");
-			helpT.setModule(meta.getModule());
-			helpT.save();
+			this.createOrUpdateTranslation(meta.getKey(), "help", meta.getModule(), meta.getDomain(), help_t, meta.getLanguage());
 		}
 		else if("documentation".equals(meta.getType())) {
 			if(!Strings.isNullOrEmpty(help_t)) {
-				String module = values.get("_currentModule").toString();
-				MetaView view = MetaView.all().filter("self.name = ?1 AND self.module = ?2", meta.getDomain(), module).fetchOne();
+				MetaView view = MetaView.all().filter("self.name = ?1 AND self.module = ?2", meta.getDomain(), meta.getModule()).fetchOne();
 				if(view != null && view.getModel() != null) {
-					MetaTranslation searchHelp = MetaTranslation.all().filter("self.key = ?1 AND self.domain = ?2 AND self.type = ?3", meta.getKey(), view.getModel(), "help").fetchOne();
-
-					if(searchHelp == null) {
-						MetaTranslation helpT = new MetaTranslation();
-						helpT.setDomain(view.getModel());
-						helpT.setKey(meta.getKey());
-						helpT.setLanguage(meta.getLanguage());
-						helpT.setTranslation(help_t);
-						helpT.setType("help");
-						helpT.setModule(meta.getModule());
-						helpT.save();
-					}
+					this.createOrUpdateTranslation(meta.getKey(), "help", meta.getModule(), view.getModel(), help_t, meta.getLanguage());
 				}
 			}
 			if(!Strings.isNullOrEmpty(values.get("title").toString())) {
-				MetaTranslation searchDoc = MetaTranslation.all().filter("self.key = ?1 AND self.domain = ?2 AND self.type = ?3", meta.getKey(), meta.getDomain(), "documentation").fetchOne();
-				if(searchDoc == null) {
-					MetaTranslation doc = new MetaTranslation();
-					doc.setDomain(meta.getDomain());
-					doc.setKey(meta.getKey());
-					doc.setLanguage(MetaTranslations.convertLanguage(MetaTranslations.getLanguage(), false));
-					doc.setTranslation(values.get("title").toString());
-					doc.setType("documentation");
-					doc.setModule(meta.getModule());
-					doc.save();
-				}
+				this.createOrUpdateTranslation(meta.getKey(), "documentation", meta.getModule(), meta.getDomain(), values.get("title").toString(), meta.getLanguage());
 			}
 		}
 
 		if(meta.getKey() == null || ("documentation".equals(meta.getType()) && Strings.isNullOrEmpty(meta.getTranslation()))) {
-			return null;
+			return ;
 		}
 
+		//`viewFiled` type are considered as `field` type
 		if("viewField".equals(meta.getType())) {
 			meta.setType("field");
 		}
 
-		foundedTranslation = searchMetaTranslation(meta);
-
-		if(foundedTranslation != null) {
-			LOG.trace("Found translation : " + foundedTranslation);
-			foundedTranslation.setTranslation(meta.getTranslation());
-			foundedTranslation.save();
-			return null;
-		}
-
-		return meta;
+		this.createOrUpdateTranslation(meta);
 	}
 
 	private MetaTranslation searchMetaTranslation(MetaTranslation meta) {
@@ -153,6 +107,34 @@ public class ImportTranslations {
 		}
 
 		return MetaTranslation.all().filter(query, params.toArray()).fetchOne();
+	}
+
+	private void createOrUpdateTranslation(MetaTranslation meta) {
+
+		MetaTranslation foundedTranslation = searchMetaTranslation(meta);
+
+		if(foundedTranslation != null) {
+			LOG.trace("Found translation : " + foundedTranslation);
+			foundedTranslation.setTranslation(meta.getTranslation());
+			foundedTranslation.save();
+			return ;
+		}
+
+		meta.save();
+	}
+
+	private void createOrUpdateTranslation(String key, String type, String module, String domain, String translation, String language) {
+
+		MetaTranslation founded = MetaTranslation.findByAll(key, language, domain, type, module);
+
+		if(founded == null) {
+			founded = new MetaTranslation(key, language, translation, domain, type, module);
+		}
+		else {
+			founded.setTranslation(translation);
+		}
+
+		founded.save();
 	}
 
 }
