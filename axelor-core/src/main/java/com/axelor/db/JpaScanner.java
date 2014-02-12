@@ -32,9 +32,7 @@ package com.axelor.db;
 
 import java.lang.annotation.Annotation;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
@@ -47,8 +45,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.common.reflections.Reflections;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 
 /**
@@ -59,7 +55,7 @@ import com.google.common.collect.MapMaker;
 public class JpaScanner extends NativeScanner {
 
 	private static Logger log = LoggerFactory.getLogger(JpaScanner.class);
-
+	
 	private static ConcurrentMap<String, Class<?>> cache = null;
 
 	private static ConcurrentMap<String, String> nameCache = new MapMaker().makeMap();
@@ -87,23 +83,23 @@ public class JpaScanner extends NativeScanner {
 		cache = new MapMaker().makeMap();
 		synchronized (cache) {
 			
+			log.info("Searching for model classes...");
+			
 			register(Model.class);
-
-			List<String> names = Lists.newArrayList();
-			for (Class<?> klass : Reflections.findSubTypesOf(Model.class).within("com.axelor").find()) {
-				if (Model.class.isAssignableFrom(klass) && (
-						klass.isAnnotationPresent(Entity.class) ||
-						klass.isAnnotationPresent(Embeddable.class) ||
-						klass.isAnnotationPresent(MappedSuperclass.class))) {
-					if (cache.containsKey(klass.getName())) {
-						continue;
-					}
-					register(klass);
-					names.add(klass.toString());
+			
+			final Set<Class<? extends Model>> models = Reflections.findSubTypesOf(Model.class)
+					.within("com.axelor")
+					.having(Entity.class)
+					.having(Embeddable.class)
+					.having(MappedSuperclass.class)
+					.any().find();
+			for (Class<?> klass : models) {
+				if (cache.containsKey(klass.getName())) {
+					continue;
 				}
+				register(klass);
 			}
-			Collections.sort(names);
-			log.info("Model classes found:\n  " + Joiner.on("\n  ").join(names));
+			log.info("Total found: {}", cache.size());
 		}
 		return new HashSet<Class<?>>(cache.values());
 	}
