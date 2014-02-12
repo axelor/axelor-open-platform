@@ -36,14 +36,13 @@ import java.util.Map;
 import javax.ws.rs.Path;
 
 import org.apache.shiro.guice.web.GuiceShiroFilter;
-import org.reflections.Reflections;
-import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppModule;
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthModule;
+import com.axelor.common.reflections.Reflections;
 import com.axelor.db.JpaModule;
 import com.axelor.db.Translations;
 import com.axelor.meta.service.MetaTranslations;
@@ -133,8 +132,11 @@ public class AppServletModule extends JerseyServletModule {
 				new ResponseInterceptor());
 
 		// bind all the web service resources
-		Reflections reflections = new Reflections("com.axelor.web", new TypeAnnotationsScanner());
-		for(Class<?> type : reflections.getTypesAnnotatedWith(Path.class)) {
+		for (Class<?> type : Reflections
+				.findTypes()
+				.within("com.axelor.web")
+				.having(Path.class)
+				.find()) {
 			bind(type);
 		}
 

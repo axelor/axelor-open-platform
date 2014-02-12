@@ -7,7 +7,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axelor.common.ClassUtils;
+import com.axelor.common.reflections.Reflections;
 import com.axelor.meta.loader.ModuleManager;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -27,8 +27,10 @@ public class AppModule extends AbstractModule {
 		final List<String> mods = ModuleManager.findInClassPath(false);
 		final List<Class<? extends AxelorModule>> all = Lists.newArrayList();
 		
-		for (Class<? extends AxelorModule> module : ClassUtils.findSubTypesOf(
-				AxelorModule.class).having(AxelorModuleInfo.class).find()) {
+		for (Class<? extends AxelorModule> module : Reflections
+				.findSubTypesOf(AxelorModule.class)
+				.having(AxelorModuleInfo.class)
+				.find()) {
 			String name = module.getAnnotation(AxelorModuleInfo.class).name();
 			if (mods.contains(name)) {
 				all.add(module);

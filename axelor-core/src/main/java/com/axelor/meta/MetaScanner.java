@@ -30,68 +30,23 @@
  */
 package com.axelor.meta;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.regex.Pattern;
+import java.net.URL;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.ResourcesScanner;
-import org.reflections.vfs.Vfs;
-import org.reflections.vfs.Vfs.File;
+import com.axelor.common.reflections.Reflections;
+import com.google.common.collect.ImmutableList;
 
-import com.google.common.collect.Lists;
-
-public class MetaScanner extends ResourcesScanner {
-
-	private List<Vfs.File> files = Lists.newArrayList();
-
-	private Pattern pattern;
+public class MetaScanner {
 	
-	private String module;
-	
-	public MetaScanner(String regex) {
-		this.pattern = Pattern.compile(regex);
-	}
-
-	@Override
-	public boolean acceptsInput(String file) {
-		return pattern.matcher(file).matches();
-	}
-	
-	@Override
-	public boolean acceptResult(String fqn) {
-		return pattern.matcher(fqn).matches();
-	}
-
-	@Override
-	public Object scan(File file, Object classObject) {
-		if (module == null || file.toString().contains(module)) {
-			this.files.add(file);
-		}
-		return super.scan(file, classObject);
-	}
-	
-	public static List<Vfs.File> findAll(String regex) {
-		MetaScanner scanner = new MetaScanner(regex);
-		new Reflections(scanner);
-		return scanner.files;
-	}
-	
-	public static List<Vfs.File> findAll(String module, String directory, String pattern) {
-		String regex = directory + "\\." + pattern;
-		MetaScanner scanner = new MetaScanner(regex);
-		scanner.module = module;
+	private MetaScanner() {
 		
-		new Reflections(scanner);
-		
-		Collections.sort(scanner.files, new Comparator<Vfs.File>() {
-			@Override
-			public int compare(File o1, File o2) {
-				return o1.getName().compareTo(o2.getName());
-			}
-		});
+	}
 
-		return scanner.files;
+	public static ImmutableList<URL> findAll(String regex) {
+		return Reflections.findResources().byName(regex).find();
+	}
+	
+	public static ImmutableList<URL> findAll(String module, String directory, String pattern) {
+		String regex = directory + "(/|\\\\)" + pattern;
+		return Reflections.findResources().byName(regex).byURL(module).find();
 	}
 }

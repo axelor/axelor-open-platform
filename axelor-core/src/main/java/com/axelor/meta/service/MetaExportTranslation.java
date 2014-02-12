@@ -33,6 +33,7 @@ package com.axelor.meta.service;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -495,22 +496,22 @@ public class MetaExportTranslation {
 	}
 
 	private void exportObjects() {
-		List<org.reflections.vfs.Vfs.File> files = MetaScanner.findAll(this.currentModule, "domains", "(.*?)\\.xml");
+		List<URL> files = MetaScanner.findAll(this.currentModule, "domains", "(.*?)\\.xml");
 
-		for(org.reflections.vfs.Vfs.File file : files) {
+		for(URL file : files) {
 			this.exportFile(file);
 		}
 	}
 
-	private void exportFile(org.reflections.vfs.Vfs.File file) {
+	private void exportFile(URL file) {
 		try {
-			DomainModels object = this.unmarshalObject(file.openInputStream());
+			DomainModels object = this.unmarshalObject(file.openStream());
 			for (Entity entity : object.getEntities()) {
 				this.exportEntity(entity, object.getModule());
 			}
 		}
 		catch(Exception ex) {
-			log.error("Error while exporting {}.", file.getName());
+			log.error("Error while exporting {}.", file.getFile());
 			log.error("Unable to export data.");
 			log.error("With following exception:", ex);
 		}

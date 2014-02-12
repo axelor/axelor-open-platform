@@ -33,6 +33,7 @@ package com.axelor.meta.loader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -40,8 +41,6 @@ import java.util.Set;
 import javax.inject.Singleton;
 import javax.persistence.PersistenceException;
 import javax.xml.bind.JAXBException;
-
-import org.reflections.vfs.Vfs;
 
 import com.axelor.auth.db.Group;
 import com.axelor.common.FileUtils;
@@ -86,10 +85,10 @@ public class ViewLoader extends AbstractLoader {
 	@Override
 	@Transactional
 	protected void doLoad(Module module, boolean update) {
-		for (Vfs.File file : MetaScanner.findAll(module.getName(), "views", "(.*?)\\.xml")) {
-			log.info("importing: {}", file.getName());
+		for (URL file : MetaScanner.findAll(module.getName(), "views", "(.*?)\\.xml")) {
+			log.info("importing: {}", file.getFile());
 			try {
-				process(file.openInputStream(), module, update);
+				process(file.openStream(), module, update);
 			} catch (IOException | JAXBException e) {
 				throw Throwables.propagate(e);
 			}
