@@ -46,6 +46,7 @@ import com.axelor.common.reflections.Reflections;
 import com.axelor.db.JpaModule;
 import com.axelor.db.Translations;
 import com.axelor.meta.service.MetaTranslations;
+import com.axelor.quartz.SchedulerModule;
 import com.axelor.rpc.ObjectMapperProvider;
 import com.axelor.rpc.Response;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -120,6 +121,9 @@ public class AppServletModule extends JerseyServletModule {
 
 		// install the app modules
 		install(new AppModule());
+		
+		// install the scheduler module
+		install(new SchedulerModule());
 
 		// no-cache filter
 		if ("dev".equals(settings.get("application.mode", "dev"))) {

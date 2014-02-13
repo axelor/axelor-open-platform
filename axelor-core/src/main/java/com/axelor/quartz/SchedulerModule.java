@@ -28,61 +28,23 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.web;
+package com.axelor.quartz;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerFactory;
+import org.quartz.impl.StdSchedulerFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.inject.AbstractModule;
 
-import com.axelor.app.AppSettings;
-import com.axelor.meta.loader.ModuleManager;
-import com.axelor.quartz.JobRunner;
+/**
+ * The default guice module for quartz scheduler.
+ * 
+ */
+public class SchedulerModule extends AbstractModule {
 
-@Singleton
-public class InitServlet extends HttpServlet {
-
-	private static final long serialVersionUID = -2493577642638670615L;
-
-	private static final Logger LOG = LoggerFactory.getLogger(InitServlet.class);
-
-	@Inject
-	private ModuleManager moduleManager;
-	
-	@Inject
-	private JobRunner jobRunner;
-	
 	@Override
-	public void init() throws ServletException {
-		LOG.info("Initializing...");
-
-		try {
-			moduleManager.initialize(false, false);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		try {
-			if (AppSettings.get().getBoolean("quartz.init", false)) {
-				jobRunner.start();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		super.init();
-	}
-	
-	@Override
-	public void destroy() {
-		try {
-			jobRunner.stop();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		super.destroy();
+	protected void configure() {
+		bind(SchedulerFactory.class).to(StdSchedulerFactory.class);
+		bind(Scheduler.class).toProvider(SchedulerProvider.class);
 	}
 }

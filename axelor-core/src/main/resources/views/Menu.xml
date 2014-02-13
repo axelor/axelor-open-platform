@@ -8,6 +8,7 @@
   <menuitem name="menu-model" title="Model Management" parent="menu-admin"/>
   <menuitem name="menu-view-management" title="View Management" parent="menu-admin"/>
   <menuitem name="menu-module-management" title="Module Management" parent="menu-admin" />
+  <menuitem name="menu-job-management" title="Job Management" parent="menu-admin" />
 
   <menuitem name="menu-auth-users" parent="menu-auth" title="Users"
     action="action-auth-users" />
@@ -122,6 +123,15 @@
   <action-view name="meta.charts" title="All Charts" model="com.axelor.meta.db.MetaChart">
     <view type="grid" name="meta-chart-grid"/>
     <view type="form" name="meta-chart-form"/>
+  </action-view>
+  
+  <menuitem name="menu-job-all" parent="menu-job-management"
+    title="All Schedules"
+    action="meta.jobs" />
+  
+  <action-view name="meta.jobs" title="All Schedules" model="com.axelor.meta.db.MetaSchedule">
+    <view type="grid" name="meta-schedule-grid"/>
+    <view type="form" name="meta-schedule-form"/>
   </action-view>
   
 </object-views>

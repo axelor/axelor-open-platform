@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://apps.axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/domain-models
+  http://apps.axelor.com/xml/ns/domain-models/domain-models_2.0.xsd">
+
+  <module name="meta" package="com.axelor.meta.db" />
+
+  <entity name="MetaScheduleParam" table="META_SCHEDULE_PARAM">
+    <string name="name" />
+    <string name="value" />
+    <many-to-one name="schedule" ref="MetaSchedule" required="true"/>
+  </entity>
+
+  <entity name="MetaSchedule" table="META_SCHEDULE">
+    <![CDATA[
+    This object stores the scheduler configuration.
+    ]]>
+    <boolean name="active"/>
+    <string name="name" required="true" unique="true" />
+    <string name="description" />
+    <string name="job" required="true" />
+    <string name="cron" required="true" />
+    <one-to-many name="params" ref="MetaScheduleParam" mappedBy="schedule" />
+  </entity>
+
+</domain-models>

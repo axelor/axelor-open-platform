@@ -28,61 +28,36 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.web;
+package com.axelor.quartz;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.quartz.Job;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.spi.JobFactory;
+import org.quartz.spi.TriggerFiredBundle;
 
-import com.axelor.app.AppSettings;
-import com.axelor.meta.loader.ModuleManager;
-import com.axelor.quartz.JobRunner;
+import com.google.inject.Injector;
 
+/**
+ * The custom {@link JobFactory} to create job instance using guice injector.
+ * 
+ */
 @Singleton
-public class InitServlet extends HttpServlet {
+class GuiceJobFactory implements JobFactory {
 
-	private static final long serialVersionUID = -2493577642638670615L;
-
-	private static final Logger LOG = LoggerFactory.getLogger(InitServlet.class);
+	private Injector injector;
 
 	@Inject
-	private ModuleManager moduleManager;
-	
-	@Inject
-	private JobRunner jobRunner;
-	
-	@Override
-	public void init() throws ServletException {
-		LOG.info("Initializing...");
-
-		try {
-			moduleManager.initialize(false, false);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		try {
-			if (AppSettings.get().getBoolean("quartz.init", false)) {
-				jobRunner.start();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		super.init();
+	public GuiceJobFactory(Injector injector) {
+		this.injector = injector;
 	}
-	
+
 	@Override
-	public void destroy() {
-		try {
-			jobRunner.stop();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		super.destroy();
+	public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException {
+		Class<? extends Job> jobClass = bundle.getJobDetail().getJobClass();
+		return this.injector.getInstance(jobClass);
 	}
 }

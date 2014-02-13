@@ -110,6 +110,12 @@
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-guice</artifactId>
     </dependency>
+    
+    <!-- Quartz Scheduler -->
+    <dependency>
+      <groupId>org.quartz-scheduler</groupId>
+      <artifactId>quartz</artifactId>
+    </dependency>
 
     <!-- CGLIB -->
     <dependency>
