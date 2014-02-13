@@ -39,7 +39,7 @@ import com.axelor.rpc.ObjectMapperProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 
-public class MyTestModule extends AbstractModule {
+public class JpaTestModule extends AbstractModule {
 	
 	protected Properties properties = new Properties();
 	

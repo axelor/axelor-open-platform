@@ -41,13 +41,13 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.axelor.MyTest;
+import com.axelor.JpaTest;
 import com.axelor.test.db.Circle;
 import com.axelor.test.db.Contact;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
-public class QueryTest extends MyTest {
+public class QueryTest extends JpaTest {
 
 	@Test
 	public void testCount() {

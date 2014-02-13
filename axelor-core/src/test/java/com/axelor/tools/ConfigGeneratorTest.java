@@ -35,9 +35,9 @@ import java.io.StringWriter;
 
 import org.junit.Test;
 
-import com.axelor.MyTest;
+import com.axelor.AbstractTest;
 
-public class ConfigGeneratorTest extends MyTest {
+public class ConfigGeneratorTest extends AbstractTest {
 
 	@Test
 	public void test1() throws IOException {

@@ -38,7 +38,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.axelor.MyTest;
+import com.axelor.JpaTest;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.Role;
@@ -47,7 +47,7 @@ import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.google.inject.persist.Transactional;
 
-public class AuthTest extends MyTest {
+public class AuthTest extends JpaTest {
 	
 	@Inject
 	private AuthService authService;

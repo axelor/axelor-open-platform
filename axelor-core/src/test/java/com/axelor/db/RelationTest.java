@@ -38,14 +38,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.axelor.MyTest;
+import com.axelor.JpaTest;
 import com.axelor.test.db.Invoice;
 import com.axelor.test.db.Move;
 import com.axelor.test.db.MoveLine;
 import com.google.common.collect.Lists;
 import com.google.inject.persist.Transactional;
 
-public class RelationTest extends MyTest {
+public class RelationTest extends JpaTest {
 
 	@Before
 	@Transactional

@@ -33,14 +33,14 @@ package com.axelor.db;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.axelor.MyTest;
+import com.axelor.AbstractTest;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.axelor.test.db.Address;
 import com.axelor.test.db.Contact;
 
-public class PropertyTest extends MyTest {
+public class PropertyTest extends AbstractTest {
 
 	private Mapper mapper = Mapper.of(Contact.class);
 	

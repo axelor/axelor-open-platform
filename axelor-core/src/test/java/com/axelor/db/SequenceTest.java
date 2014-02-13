@@ -34,11 +34,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.axelor.MyTest;
+import com.axelor.JpaTest;
 import com.axelor.meta.db.MetaSequence;
 import com.google.inject.persist.Transactional;
 
-public class SequenceTest extends MyTest {
+public class SequenceTest extends JpaTest {
 	
 	@Before
 	public void setUp() {
