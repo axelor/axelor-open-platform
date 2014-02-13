@@ -194,7 +194,7 @@ public class MetaExportTranslation {
 
 	private void exportOther() {
 		for (MetaTranslation translation : MetaTranslation.all().filter("self.type = ?1 AND self.language = ?2 AND self.module = ?3",  this.otherType, this.exportLanguage, this.currentModule).order("key").fetch()) {
-			this.appendToFile(translation.getDomain(), "", this.otherType, translation.getKey(), translation.getTranslation());
+			this.appendToFile("", "", this.otherType, translation.getKey(), translation.getTranslation());
 		}
 	}
 
