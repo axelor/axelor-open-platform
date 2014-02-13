@@ -152,15 +152,6 @@ public class MetaController {
 			return;
 		}
 
-		JPA.runInTransaction(new Runnable() {
-			@Override
-			public void run() {
-				JPA.clear();
-				JPA.em().createNativeQuery("DELETE FROM meta_translation").executeUpdate();
-			}
-		});
-
-
 		i18nLoader.load(importPath);
 
 		response.setFlash(JPA.translate("Import done."));

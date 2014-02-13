@@ -55,6 +55,7 @@ import com.axelor.common.FileUtils;
 import com.axelor.meta.ImportTranslations;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaTranslation;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -81,9 +82,9 @@ public class I18nLoader extends AbstractLoader {
 		List<URL> files = MetaScanner.findAll(module.getName(), "i18n", "(.*?)\\.csv");
 		List<URL> sorted = Lists.newArrayList(files);
 
+		MetaTranslation.all().filter("self.module = ?", module.getName()).remove();
 		for(URL resource : sorted) {
 			try {
-				MetaTranslation.all().filter("self.module = ?", module.getName()).remove();
 				log.debug("Load translation: {}", resource);
 				process(resource.openStream(), resource.getFile(), module.getName());
 			} catch (IOException e) {
@@ -96,18 +97,32 @@ public class I18nLoader extends AbstractLoader {
 	public void load(String importPath) {
 
 		//Import by module resolver order
-		for(String module : ModuleManager.getResolution()) {
-			File moduleDir = FileUtils.getFile(importPath, module, null);
-			if(!moduleDir.exists() || !moduleDir.isDirectory() || moduleDir.listFiles() == null) {
-				continue;
-			}
+		for(Module module : ModuleManager.getAll()) {
 
-			for(File file : moduleDir.listFiles()) {
-				try {
-					process(new FileInputStream(file), file.getName(), module);
-				} catch (IOException e) {
-					log.error("Unable to import file: {}", file.getName());
-				}
+			if(Strings.isNullOrEmpty(importPath)) {
+				this.doLoad(module, false);
+			}
+			else {
+				this.loadModule(module, importPath);
+			}
+		}
+	}
+
+	private void loadModule(Module module, String importPath) {
+
+		File moduleDir = FileUtils.getFile(importPath, module.getName());
+		if(!moduleDir.exists() || !moduleDir.isDirectory() || moduleDir.listFiles() == null) {
+			return;
+		}
+
+		log.debug("Load {} translations", module.getName());
+		MetaTranslation.all().filter("self.module = ?", module.getName()).remove();
+		for(File file : moduleDir.listFiles()) {
+			try {
+				log.debug("Load {} translations", file.getPath());
+				process(new FileInputStream(file), file.getPath(), module.getName());
+			} catch (IOException e) {
+				log.error("Unable to import file: {}", file.getName());
 			}
 		}
 	}
