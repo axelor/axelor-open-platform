@@ -28,61 +28,54 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.web;
+package com.axelor.quartz;
+
+import java.util.Properties;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SchedulerFactory;
+import org.quartz.impl.StdSchedulerFactory;
 
 import com.axelor.app.AppSettings;
-import com.axelor.meta.loader.ModuleManager;
-import com.axelor.quartz.JobRunner;
+import com.google.common.base.Throwables;
 
+/**
+ * The {@link Provider} for {@link Scheduler} that uses {@link GuiceJobFactory}
+ * so that services can be injected to the job instances.
+ * 
+ */
 @Singleton
-public class InitServlet extends HttpServlet {
+class SchedulerProvider implements Provider<Scheduler> {
 
-	private static final long serialVersionUID = -2493577642638670615L;
-
-	private static final Logger LOG = LoggerFactory.getLogger(InitServlet.class);
-
-	@Inject
-	private ModuleManager moduleManager;
+	private static final String DEFAULT_THREAD_COUNT = "3";
 	
+	private static final String THREAD_COUNT_GET = "quartz.threadCount";
+	private static final String THREAD_COUNT_SET = "org.quartz.threadPool.threadCount";
+
 	@Inject
-	private JobRunner jobRunner;
+	private GuiceJobFactory jobFactory;
 	
 	@Override
-	public void init() throws ServletException {
-		LOG.info("Initializing...");
+	public Scheduler get() {
 
-		try {
-			moduleManager.initialize(false, false);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		try {
-			if (AppSettings.get().getBoolean("quartz.init", false)) {
-				jobRunner.start();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		Properties cfg = new Properties();
+		cfg.put(THREAD_COUNT_SET, AppSettings.get().get(THREAD_COUNT_GET, DEFAULT_THREAD_COUNT));
 		
-		super.init();
-	}
-	
-	@Override
-	public void destroy() {
+		Scheduler scheduler;
+		SchedulerFactory schedulerFactory;
 		try {
-			jobRunner.stop();
-		} catch (Exception e) {
-			e.printStackTrace();
+			schedulerFactory = new StdSchedulerFactory(cfg);
+			scheduler = schedulerFactory.getScheduler();
+			scheduler.setJobFactory(jobFactory);
+		} catch (SchedulerException e) {
+			throw Throwables.propagate(e);
 		}
-		super.destroy();
+
+		return scheduler;
 	}
 }

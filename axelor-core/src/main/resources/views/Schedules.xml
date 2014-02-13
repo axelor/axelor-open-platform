@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_2.0.xsd">
+
+  <grid name="meta-schedule-grid" title="Schedules" model="com.axelor.meta.db.MetaSchedule" editable="true">
+    <field name="name" />
+    <field name="job" />
+    <field name="cron" />
+    <field name="active" />
+  </grid>
+
+  <form name="meta-schedule-form" title="Schedule" model="com.axelor.meta.db.MetaSchedule" cols="2" colWidths="*,200">
+    <group title="Job Details" cols="4">
+      <field name="name"/>
+      <field name="active"/>
+      <field name="description" colSpan="4"/>
+      <field name="job" colSpan="4"/>
+      <field name="cron" colSpan="4"/>
+    </group>
+    <group title="Actions" cols="1">
+      <button name="btnValidate" title="Validate" onClick="com.axelor.quartz.JobRunner:validate(cron)"/>
+      <button name="btnRestart" title="Restart jobs..." prompt="This may terminate any running jobs. Are sure to continue?" onClick="com.axelor.quartz.JobRunner:restart()"/>
+    </group>
+    <field name="params">
+      <grid edit-icon="true" title="Params" editable="true">
+        <field name="name"/>
+        <field name="value"/>
+      </grid>
+      <form title="Param">
+        <field name="name"/>
+        <field name="value"/>
+      </form>
+    </field>
+  </form>
+
+</object-views>
