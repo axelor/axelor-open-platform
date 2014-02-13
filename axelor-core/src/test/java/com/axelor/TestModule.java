@@ -28,46 +28,16 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.meta;
+package com.axelor;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.inject.Inject;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-import com.axelor.JpaTest;
-import com.axelor.common.ClassUtils;
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.axelor.rpc.ObjectMapperProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.AbstractModule;
 
-public abstract class MetaTest extends JpaTest {
+public class TestModule extends AbstractModule {
 
-	@Inject
-	private ObjectMapper mapper;
-
-	protected InputStream read(String resource) {
-		return ClassUtils.getResourceStream(resource);
-	}
-
-	protected ObjectMapper getObjectMapper() {
-		return mapper;
-	}
-
-	@SuppressWarnings("unchecked")
-	protected <T> T unmarshal(String resource, Class<T> type) throws JAXBException {
-		JAXBContext context = JAXBContext.newInstance(type);
-		Unmarshaller unmarshaller = context.createUnmarshaller();
-		return (T) unmarshaller.unmarshal(read(resource));
-	}
-
-	protected String toJson(Object object) throws JsonGenerationException,
-			JsonMappingException, IOException {
-		return getObjectMapper()
-				.writerWithDefaultPrettyPrinter()
-				.writeValueAsString(object);
+	@Override
+	protected void configure() {
+		bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
 	}
 }

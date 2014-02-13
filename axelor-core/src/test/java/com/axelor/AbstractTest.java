@@ -28,48 +28,18 @@
  * All portions of the code written by Axelor are
  * Copyright (c) 2012-2014 Axelor. All Rights Reserved.
  */
-package com.axelor.rpc;
+package com.axelor;
 
-import java.io.InputStreamReader;
+import org.junit.FixMethodOrder;
+import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 
-import javax.inject.Inject;
+import com.axelor.test.GuiceModules;
+import com.axelor.test.GuiceRunner;
 
-import com.axelor.JpaTest;
-import com.axelor.common.ClassUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
+@RunWith(GuiceRunner.class)
+@GuiceModules({ TestModule.class })
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public abstract class AbstractTest {
 
-abstract class RpcTest extends JpaTest {
-
-	@Inject
-	protected ObjectMapper mapper;
-
-	protected InputStreamReader read(String json) {
-		return new InputStreamReader(ClassUtils.getResourceStream("json/" + json));
-	}
-
-	protected String toJson(Object value) {
-		try {
-			return mapper.writeValueAsString(value);
-		} catch (Exception e){
-			throw new IllegalArgumentException(e);
-		}
-	}
-	
-	protected <T> T fromJson(InputStreamReader reader, Class<T> klass) {
-		try {
-			return mapper.readValue(reader, klass);
-		} catch (Exception e) {
-			throw new IllegalArgumentException(e);
-		}
-	}
-	
-	protected <T> T fromJson(String json, Class<T> klass) {
-		if (json.endsWith(".js"))
-			return fromJson(read(json), klass);
-		try {
-			return mapper.readValue(json, klass);
-		} catch (Exception e) {
-			throw new IllegalArgumentException(e);
-		}
-	}
 }

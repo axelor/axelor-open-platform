@@ -44,9 +44,9 @@ import com.axelor.test.db.Contact;
 import com.google.inject.persist.Transactional;
 
 @RunWith(GuiceRunner.class)
-@GuiceModules({ MyTestModule.class })
+@GuiceModules({ JpaTestModule.class })
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public abstract class MyTest {
+public abstract class JpaTest {
 
 	@Inject
 	private JpaFixture fixture;

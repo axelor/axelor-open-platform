@@ -46,7 +46,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.axelor.MyTestModule;
+import com.axelor.JpaTestModule;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.google.inject.Guice;
@@ -64,7 +64,7 @@ public class LdapTest extends AbstractLdapTestUnit {
 
 	private static LdapServer ldapServer = getLdapServer();
 
-	public static class LdapTestModule extends MyTestModule {
+	public static class LdapTestModule extends JpaTestModule {
 
 		@Override
 		protected void configure() {

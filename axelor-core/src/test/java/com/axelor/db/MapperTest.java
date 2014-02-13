@@ -39,12 +39,12 @@ import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.axelor.MyTest;
+import com.axelor.AbstractTest;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.TypeCheck;
 
-public class MapperTest extends MyTest {
+public class MapperTest extends AbstractTest {
 
 	private Mapper mapper = Mapper.of(Contact.class);
 
