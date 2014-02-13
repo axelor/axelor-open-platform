@@ -57,24 +57,24 @@ import com.google.inject.persist.Transactional;
 public class ModuleManager {
 
 	private static final Logger log = LoggerFactory.getLogger(ModuleManager.class);
-	
+
 	private static final Resolver resolver = new Resolver();
-	
+
 	@Inject
 	private AuthService authService;
-	
+
 	@Inject
 	private ViewLoader viewLoader;
-	
+
 	@Inject
 	private ModelLoader modelLoader;
-	
+
 	@Inject
 	private I18nLoader i18nLoader;
-	
+
 	@Inject
 	private DataLoader dataLoader;
-	
+
 	@Inject
 	private DemoLoader demoLoader;
 
@@ -108,7 +108,7 @@ public class ModuleManager {
 
 		this.createUsers();
 		this.resolve(true);
-		
+
 		List<String> names = Lists.newArrayList();
 		if (modules != null) {
 			names = Lists.newArrayList(modules);
@@ -116,7 +116,7 @@ public class ModuleManager {
 		if (names.isEmpty()) {
 			names = resolver.names();
 		}
-		
+
 		for (Module module : resolver.all()) {
 			if (names.contains(module.getName())) {
 				install(module, true, withDemo);
@@ -127,7 +127,11 @@ public class ModuleManager {
 	public static List<String> getResolution() {
 		return resolver.names();
 	}
-	
+
+	public static List<Module> getAll() {
+		return resolver.all();
+	}
+
 	@Transactional
 	public void install(String moduleName, boolean update, boolean withDemo) {
 		for (Module module: resolver.resolve(moduleName)) {
@@ -141,10 +145,10 @@ public class ModuleManager {
 	}
 
 	private void install(String moduleName, boolean update, boolean withDemo, boolean force) {
-		
+
 		final Module module = resolver.get(moduleName);
 		final MetaModule metaModule = MetaModule.findByName(moduleName);
-		
+
 		if (metaModule == null) {
 			return;
 		}
@@ -157,18 +161,18 @@ public class ModuleManager {
 
 		install(module, update, withDemo);
 	}
-	
+
 	private void install(Module module, boolean update, boolean withDemo) {
-		
+
 		if (SKIP.contains(module.getName())) {
 			return;
 		}
-		
+
 		String message = "installing: {}";
 		if (module.isInstalled()) {
 			message = "updating: {}";
 		}
-		
+
 		log.info(message, module);
 
 		// load meta
@@ -191,11 +195,11 @@ public class ModuleManager {
 
 		// load views
 		viewLoader.load(module, update);
-		
+
 		// load i18n
 		i18nLoader.load(module, update);
 	}
-	
+
 	@Transactional
 	void updateState(Module module) {
 		MetaModule metaModule = MetaModule.findByName(module.getName());
@@ -203,7 +207,7 @@ public class ModuleManager {
 		metaModule.setInstalled(true);
 		module.setInstalledVersion(module.getVersion());
 	}
-	
+
 	public static List<String> findInClassPath(boolean includeRemovables) {
 		final Resolver resolver = new Resolver();
 		final List<String> found = Lists.newArrayList();
@@ -215,20 +219,20 @@ public class ModuleManager {
 			} catch (IOException e) {
 				throw Throwables.propagate(e);
 			}
-			
+
 			String name = properties.getProperty("name");
-			
+
 			if (SKIP.contains(name)) {
 				continue;
 			}
-			
+
 			String[] deps = properties.getProperty("depends", "").trim().split("\\s+");
 			boolean removable = "true".equals(properties.getProperty("removable"));
 
 			Module module = resolver.add(name, deps);
 			module.setRemovable(removable);
 		}
-		
+
 		for (Module module : resolver.all()) {
 			if (!includeRemovables && module.isRemovable()) {
 				continue;
@@ -247,13 +251,13 @@ public class ModuleManager {
 			} catch (IOException e) {
 				throw Throwables.propagate(e);
 			}
-			
+
 			String name = properties.getProperty("name");
-			
+
 			if (SKIP.contains(name)) {
 				continue;
 			}
-			
+
 			String[] deps = properties.getProperty("depends", "").trim().split("\\s+");
 			String title = properties.getProperty("title");
 			String description = properties.getProperty("description");
@@ -267,7 +271,7 @@ public class ModuleManager {
 				stored.setName(name);
 				stored.setDepends(Joiner.on(",").join(deps));
 			}
-			
+
 			if (stored.getId() == null || update) {
 				stored.setTitle(title);
 				stored.setDescription(description);
@@ -282,10 +286,10 @@ public class ModuleManager {
 			module.setInstalledVersion(stored.getModuleVersion());
 		}
 	}
-	
+
 	@Transactional
 	void createUsers() {
-		
+
 		User admin = User.findByCode("admin");
 		if (admin != null) {
 			return;
@@ -293,17 +297,17 @@ public class ModuleManager {
 
 		Group admins = Group.findByCode("admins");
 		Group users = Group.findByCode("users");
-		
+
 		if (admins == null) {
 			admins = new Group("admins", "Administrators");
 			admins = admins.save();
 		}
-		
+
 		if (users == null) {
 			users = new Group("users", "Users");
 			users = users.save();
 		}
-		
+
 		admin = new User("admin", "Administrator");
 		admin.setPassword(authService.encrypt("admin"));
 		admin.setGroup(admins);
