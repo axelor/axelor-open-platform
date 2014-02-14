@@ -74,6 +74,19 @@ public class ActionResponse extends Response {
 	}
 
 	/**
+	 * Set the <i>canClose</i> flag.
+	 * <p>
+	 * The client uses the <i>canClose</i> flag to decide whether the view can
+	 * be closed.
+	 * 
+	 * @param canClose
+	 *            whether the view can be closed.
+	 */
+	public void setCanClose(boolean canClose) {
+		set("canClose", canClose);
+	}
+
+	/**
 	 * Set a flash message.
 	 * <p>
 	 * This message will be shown on the client screen.
