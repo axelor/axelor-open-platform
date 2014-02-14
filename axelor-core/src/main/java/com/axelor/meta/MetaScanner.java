@@ -46,7 +46,8 @@ public class MetaScanner {
 	}
 	
 	public static ImmutableList<URL> findAll(String module, String directory, String pattern) {
-		String regex = directory + "(/|\\\\)" + pattern;
-		return Reflections.findResources().byName(regex).byURL(module).find();
+		String namePattern = directory + "(/|\\\\)" + pattern;
+		String pathPattern = "(lib(/|\\\\)" + module + ")|(" + module + ".*(/|\\\\).*classes)";
+		return Reflections.findResources().byName(namePattern).byURL(pathPattern).find();
 	}
 }
