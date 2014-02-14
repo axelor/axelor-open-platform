@@ -327,7 +327,7 @@ ui.formInput('RefSelect', {
 			var elem = $('<input ui-ref-item ng-show="canShow(\'' + value + '\')"/>')
 				.attr('ng-model', '$_' + ref)
 				.attr('x-target', value)
-				.attr('x-watch', watch)
+				.attr('x-watch-name', watch)
 				.attr('x-ref', ref);
 
 			return ViewService.compile(elem)($scope);
@@ -335,17 +335,17 @@ ui.formInput('RefSelect', {
 
 		$scope.createElement = function(name, selectionList, related) {
 
-			var elemGroup = $('<group ui-group ui-table-layout cols="2" x-widths="150,*"></group>');
+			var elemGroup = $('<div ui-group ui-table-layout cols="2" x-widths="150,*"></div>');
 			var elemSelect = $('<input ui-select showTitle="false">')
 				.attr("name", name)
 				.attr("ng-model", "record." + name);
 
-			var elemSelects = $('<group ui-group>');
+			var elemSelects = $('<div ui-group></div>');
 			var elemItems = _.map(selectionList, function(s) {
-				return $('<input ui-ref-item ng-show="canShow(\'' + s.value + '\')"/>')
+				return $('<input ui-ref-item ng-show="canShow(this)" style="display: none;"/>')
 					.attr('ng-model', 'record.$_' + related)
 					.attr('x-target', s.value)
-					.attr('x-watch', name)
+					.attr('x-watch-name', name)
 					.attr('x-ref', related);
 			});
 
@@ -362,17 +362,15 @@ ui.formInput('RefSelect', {
 			selectionList = scope.field.selectionList,
 			related = scope.field.related || scope.field.name + "Id";
 
-		scope.canShow = function(value) {
-			return value === scope.getValue();
+		scope.canShow = function(itemScope) {
+			return itemScope.targetValue === scope.getValue();
+		};
+
+		scope.isReadonly = function() {
+			return false;
 		};
 
 		var elem = scope.createElement(name, selectionList, related);
-		var elemSelect= elem.find('.select-item:first');
-
-		scope.$watch('isReadonly()', function(readonly) {
-			return readonly ? elemSelect.hide() : elemSelect.show();
-		});
-
 		setTimeout(function() {
 			element.append(elem);
 		});
@@ -420,8 +418,9 @@ ui.formInput('RefItem', 'ManyToOne', {
 	_link: function(scope, element, attrs, model) {
 
 		var ref = element.attr('x-ref');
-		var watch = element.attr('x-watch');
-
+		var watch = element.attr('x-watch-name');
+		var target = element.attr('x-target');
+		
 		function doRender() {
 			if (scope.$render_editable) scope.$render_editable();
 			if (scope.$render_readonly) scope.$render_readonly();
@@ -434,6 +433,8 @@ ui.formInput('RefItem', 'ManyToOne', {
 		function setRef(value) {
 			return scope.record[ref] = value;
 		}
+		
+		scope.targetValue = target;
 
 		var __setValue = scope.setValue;
 		scope.setValue = function(value) {
@@ -460,7 +461,7 @@ ui.formInput('RefItem', 'ManyToOne', {
 		model.$render = function() {
 			if (selected) doRender();
 		};
-	},
+	}
 });
 
 }).call(this);
