@@ -427,21 +427,13 @@ function FormViewCtrl($scope, $element) {
 		return _.pick($scope.record, extra);
 	};
 
-	$scope.onSave = function() {
-		return $scope.onSaveEx();
-	};
-	
-	$scope.onSaveEx = function (options) {
+	$scope.onSave = function(options) {
 		
 		var defer = $scope._defer();
 		var event = $scope.$broadcast('on:before-save', $scope.record);
 		var saveAction = $scope.$events.onSave;
-
-		var opts = _.extend({
-			callOnSave: true
-		}, options);
 		
-		if (!opts.callOnSave) {
+		if (options && options.callOnSave === false) {
 			saveAction = null;
 		}
 
