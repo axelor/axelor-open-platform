@@ -349,7 +349,11 @@ function FormViewCtrl($scope, $element) {
 					promise.then(reset, reset);
 					promise = promise.then(function () {
 						if ($scope.isDirty()) {
-							return $scope.editRecord($scope.record);
+							var res = $scope.editRecord($scope.record);
+							if ($scope.record && !$scope.record.id) {
+								$scope.record._dirty = true;
+							}
+							return res;
 						}
 					});
 				}
