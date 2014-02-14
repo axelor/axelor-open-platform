@@ -240,6 +240,10 @@ var Formatters = {
 		return value ? '<i class="icon-ok"></i>' : "";
 	},
 	
+	"duration": function(field, value) {
+		return ui.formatDuration(field, value);
+	},
+	
 	"date": function(field, value) {
 		return value ? moment(value).format('DD/MM/YYYY') : "";
 	},
@@ -370,8 +374,8 @@ _.extend(Factory.prototype, {
 			return Formatters[type](field, value, dataContext, this.grid);
 		}
 
-		if(widget === "Url") {
-			type = "url";
+		if(["Url", "url", "duration"].indexOf(widget) > 0) {
+			type = widget.toLowerCase();
 		}
 
 		if (value === null || value === undefined || (_.isObject(value) && _.isEmpty(value))) {

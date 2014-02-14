@@ -420,6 +420,30 @@ ui.formInput('RelativeTime', 'DateTime', {
 	}
 });
 
+function formatDuration(field, value) {
+	if (!value || !_.isNumber(value)) {
+		return value;
+	}
+	
+	var h = Math.floor(value / 3600);
+	var m = Math.floor((value % 3600) / 60);
+	var s = Math.floor((value % 3600) % 60);
+	
+	h = _.str.pad(h, field.big ? 3 : 2, '0');
+	m = _.str.pad(m, 2, '0');
+	s = _.str.pad(s, 2, '0');
+
+	var text = h + ':' + m;
+	
+	if (field.seconds) {
+		text = text + ':' + s;
+	}
+	
+	return text;
+}
+
+ui.formatDuration = formatDuration;
+	
 ui.formInput('Duration', 'Time', {
 	
 	mask: '99:mm',
@@ -431,25 +455,7 @@ ui.formInput('Duration', 'Time', {
 		var pattern = /^\d+:\d+(:\d+)?$/;
 
 		scope.format = function(value) {
-			if (!value || !_.isNumber(value)) {
-				return value;
-			}
-			
-			var h = Math.floor(value / 3600);
-			var m = Math.floor((value % 3600) / 60);
-			var s = Math.floor((value % 3600) % 60);
-			
-			h = _.str.pad(h, field.big ? 3 : 2, '0');
-			m = _.str.pad(m, 2, '0');
-			s = _.str.pad(s, 2, '0');
-
-			var text = h + ':' + m;
-			
-			if (field.seconds) {
-				text = text + ':' + s;
-			}
-			
-			return text;
+			return formatDuration(field, value);
 		};
 		
 		scope.parse = function(value) {
