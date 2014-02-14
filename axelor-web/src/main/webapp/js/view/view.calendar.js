@@ -281,8 +281,8 @@ function CalendarViewCtrl($scope, $element) {
 	$scope.setRouteOptions = function(options) {
 		var opts = options || {};
 		
-		if (opts.state === "calendar") {
-			return;
+		if (opts.mode === "calendar") {
+			return $scope.updateRoute();
 		}
 		var params = $scope._viewParams;
 		if (params.viewType !== "calendar") {
