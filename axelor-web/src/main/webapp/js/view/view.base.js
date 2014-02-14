@@ -427,6 +427,7 @@ angular.module('axelor.ui').directive('uiViewPopup', function() {
 				unwatch();
 				var viewScope = scope._viewParams.$viewScope;
 				var viewPromise = viewScope._viewPromise;
+				scope.viewTitle = viewScope.schema.title;
 				scope._doShow(viewPromise);
 			});
 		},
