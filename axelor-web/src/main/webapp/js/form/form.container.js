@@ -114,6 +114,10 @@ ui.formWidget('Portlet', {
 		
 		scope.canSearch = field.canSearch !== "false";
 		scope.actionName = field.action;
+		
+		if (field.name) {
+			scope.formPath = field.name;
+		}
 
 		if (field.height) {
 			element.height(field.height);
