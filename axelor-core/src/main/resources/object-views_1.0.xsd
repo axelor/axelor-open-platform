@@ -1413,6 +1413,7 @@
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="error" type="tns:ActMessage" />
           <xsd:element name="alert" type="tns:ActMessage" />
+          <xsd:element name="info" type="tns:ActMessage" />
         </xsd:choice>
       </xsd:extension>
     </xsd:complexContent>

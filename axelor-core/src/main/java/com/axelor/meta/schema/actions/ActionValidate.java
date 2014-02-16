@@ -38,10 +38,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.meta.ActionHandler;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @XmlType
@@ -80,10 +81,15 @@ public class ActionValidate extends ActionIndex {
 	public static class Alert extends Validator {
 	}
 
+	@XmlType
+	public static class Info extends Validator {
+	}
+
 	@JsonIgnore
 	@XmlElements({
 		@XmlElement(name = "error", type = Error.class),
 		@XmlElement(name = "alert", type = Alert.class),
+		@XmlElement(name = "info", type = Info.class),
 	})
 	private List<Validator> validators;
 
@@ -98,6 +104,9 @@ public class ActionValidate extends ActionIndex {
 	@Override
 	public Object evaluate(ActionHandler handler) {
 
+		final List<String> info = Lists.newArrayList();
+		final Map<String, Object> result = Maps.newHashMap();
+
 		for (int i = getIndex(); i < validators.size(); i++) {
 
 			final Validator validator = validators.get(i);
@@ -106,25 +115,40 @@ public class ActionValidate extends ActionIndex {
 			}
 
 			String key = validator.getClass().getSimpleName().toLowerCase();
-			String val = JPA.translate(validator.getMessage(), validator.getMessage(), null, "action");
+			String value = JPA.translate(validator.getMessage(), validator.getMessage(), null, "action");
 
-			if (!Strings.isNullOrEmpty(val)) {
-				val = handler.evaluate("eval: " + "\"\"\"" + val + "\"\"\"").toString();
+			if (!StringUtils.isBlank(value)) {
+				value = handler.evaluate("eval: " + "\"\"\"" + value + "\"\"\"").toString();
 			}
 
-			Map<String, Object> result = Maps.newHashMap();
-			result.put(key, val);
-			if (!Strings.isNullOrEmpty(validator.getAction())) {
+			if (validator instanceof Info) {
+				info.add(value);
+				continue;
+			}
+
+			result.put(key, value);
+
+			if (!StringUtils.isBlank(validator.getAction())) {
 				result.put("action", validator.getAction());
 			}
-
+			
 			if (i + 1 < validators.size() && validator instanceof Alert) {
 				result.put("pending", String.format("%s[%d]", getName(), i + 1));
 			}
 
+			if (!info.isEmpty()) {
+				result.put("info", info);
+			}
+
 			return result;
 		}
-		return null;
+		
+		if (info.isEmpty()) {
+			return null;
+		}
+
+		result.put("info", info);
+		return result;
 	}
 
 	@Override
