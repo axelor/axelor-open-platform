@@ -331,10 +331,11 @@ function FormViewCtrl($scope, $element) {
 	};
 	
 	$scope.onNewPromise = null;
+	$scope.defaultValues = null;
 	
 	$scope.$on("on:new", function onNewHandler(event) {
-		
-		function afterVewLoaded() {
+	
+		function handleOnNew() {
 			
 			var handler = $scope.$events.onNew;
 			var last = $scope.$parent.onNewPromise || $scope.onNewPromise;
@@ -343,15 +344,16 @@ function FormViewCtrl($scope, $element) {
 				$scope.onNewPromise = null;
 			}
 			
-			function handle() {
+			function handle(defaults) {
 				var promise = handler();
 				if (promise && promise.then) {
 					promise.then(reset, reset);
 					promise = promise.then(function () {
 						if ($scope.isDirty()) {
-							var res = $scope.editRecord($scope.record);
-							if ($scope.record && !$scope.record.id) {
-								$scope.record._dirty = true;
+							var rec = _.extend({}, defaults, $scope.record);
+							var res = $scope.editRecord(rec);
+							if (rec && !rec.id) {
+								rec._dirty = true;
 							}
 							return res;
 						}
@@ -366,8 +368,20 @@ function FormViewCtrl($scope, $element) {
 				if (last) {
 					return $scope.onNewPromise = last.then(handle);
 				}
-				$scope.onNewPromise = handle();
+				$scope.onNewPromise = handle($scope.defaultValues);
+			} else if ($scope.defaultValues) {
+				$scope.editRecord($scope.defaultValues);
 			}
+		}
+		
+		function afterVewLoaded() {
+			if ($scope.defaultValues === null) {
+				return ds.defaults().success(function (defaults) {
+					$scope.defaultValues = defaults;
+					return handleOnNew();
+				});
+			}
+			return handleOnNew();
 		}
 		
 		$scope._viewPromise.then(function() {
