@@ -836,12 +836,16 @@ public class Resource<T extends Model> {
 		for (final Property p : mapper.getProperties()) {
 
 			PropertyType type = p.getType();
-
+			String name = p.getName();
+			
 			if (type == PropertyType.BINARY && !p.isImage()) {
 				continue;
 			}
 
-			String name = p.getName();
+			if (p.isCollection() && !fields.containsKey(name)) {
+				continue;
+			}
+
 			Object value = mapper.get(bean, name);
 
 			if (p.isImage() && byte[].class.isInstance(value)) {
