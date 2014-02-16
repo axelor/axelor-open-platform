@@ -30,16 +30,13 @@
  */
 package com.axelor.db;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import javax.persistence.FlushModeType;
 import javax.persistence.Parameter;
 
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-
 import com.axelor.db.mapper.Adapter;
+import com.axelor.script.ScriptBindings;
 import com.google.common.collect.Maps;
 
 /**
@@ -49,20 +46,8 @@ import com.google.common.collect.Maps;
  */
 public class QueryBinder {
 
-	//TODO: ScriptBinding
-	private static final String[] SPECIAL_NAMES = {
-		"__this__",
-		"__self__",
-		"__user__",
-		"__ref__",
-		"__parent__",
-		"__date__",
-		"__time__",
-		"__datetime__"
-	};
-
 	private final javax.persistence.Query query;
-
+	
 	/**
 	 * Create a new query binder for the given query instance.
 	 *
@@ -151,28 +136,35 @@ public class QueryBinder {
 	 */
 	public QueryBinder bind(Map<String, Object> namedParams, Object... params) {
 
-		final Map<String, Object> variables = Maps.newHashMap();
+		ScriptBindings bindings = null;
 
-		variables.put("__date__", new LocalDate());
-		variables.put("__time__", new LocalDateTime());
+		if (namedParams instanceof ScriptBindings) {
+			bindings = (ScriptBindings) namedParams;
+		} else {
+			Map<String, Object> variables = Maps.newHashMap();
+			if (namedParams != null) {
+				variables.putAll(namedParams);
+			}
+			bindings = new ScriptBindings(variables);
+		}
 
 		if (namedParams != null) {
-
-			variables.putAll(namedParams);
-
 			for (Parameter<?> p : query.getParameters()) {
 				if (p.getName() != null) {
-					this.bind(p.getName(), variables.get(p.getName()));
+					this.bind(p.getName(), bindings.get(p.getName()));
 				}
 			}
 		}
+
 		if (params != null) {
 			for (int i = 0; i < params.length; i++) {
 				Object param = params[i];
 				if (param instanceof String
-						&& Arrays.binarySearch(SPECIAL_NAMES, param) > -1
-						&& variables.containsKey(param)) {
-					param = variables.get(param);
+						&& ((String) param).startsWith("__")
+						&& ((String) param).endsWith("__")
+						&& bindings.containsKey(param)) {
+					// special variable
+					param = bindings.get(param);
 				}
 				try {
 					query.getParameter(i + 1);
