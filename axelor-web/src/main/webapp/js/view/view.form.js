@@ -480,6 +480,7 @@ function FormViewCtrl($scope, $element) {
 		$scope.applyLater(function() {
 			$scope.ajaxStop(function() {
 				if (!$scope.canSave()) {
+					$scope.showErrorNotice();
 					return defer.promise;
 				}
 				if (saveAction) {
@@ -849,6 +850,48 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 
 		scope.onShowHelp = function() {
 			window.open(scope.schema.helpLink);
+		};
+		
+		var translatted = null;
+		
+		scope.showErrorNotice = function () {
+			var form = scope.form || $(element).data('$formController'),
+				names;
+
+			if (!form || form.$valid) {
+				return;
+			}
+
+			names = _.pluck(form.$error.required, '$name');
+			names = _.compact(names);
+			
+			if (names.length === 0) {
+				return;
+			}
+			
+			if (translatted == null) {
+				translatted = {};
+				_.each(scope.fields_view, function (v, k) {
+					if (v.name) {
+						translatted[v.name] = v.title;
+					}
+				});
+			}
+
+			names = _.map(names, function(name) {
+				var field = scope.fields[name];
+				var value = name;
+				if (field && field.title) {
+					value = translatted[name] || field.title;
+				}
+				return '<li>' + value + '</li>';
+			});
+
+			names = '<ul>' + names.join('') + '</ul>';
+			
+			axelor.notify.error(names, {
+				title: _t("The following fields are invalid:")
+			});
 		};
 
 		function onMouseDown(e) {
