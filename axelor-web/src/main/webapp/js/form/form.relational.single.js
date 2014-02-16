@@ -316,6 +316,46 @@ ui.formInput('SuggestBox', 'ManyToOne', {
    '</span>'
 });
 
+ui.formInput('BinaryImage', 'ManyToOne', {
+	
+	BLANK: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+	
+	link_readonly: function(scope, element, attrs, model) {
+
+		var image = element.children('img:first');
+		var field = scope.field;
+		var width = field.width || 140;
+		var height = field.height || 140;
+		
+		var BLANK = this.BLANK;
+		
+		scope.styles = [{
+			'min-width' : width
+		}, {
+			'width': width,
+			'height': height
+		}];
+
+		scope.$render_readonly = function() {
+			var content = model.$viewValue || null;
+			if (!content || !content.id || !content.fileName) {
+				return image.get(0).src = BLANK;
+			}
+			image.get(0).src = "ws/rest/com.axelor.meta.db.MetaFile/" + content.id + "/" + content.fileName + "/download";
+		};
+
+		scope.$watch('isReadonly()', function(readonly, old) {
+			if (!readonly || readonly === old) return;
+			scope.$render_readonly();
+		});
+	},
+	
+	template_readonly:
+		'<div ng-style="styles[0]">'+
+			'<img class="img-polaroid" ng-style="styles[1]">'+
+		'</div>'
+});
+
 ui.formInput('RefSelect', {
 
 	css: 'multi-object-select',
