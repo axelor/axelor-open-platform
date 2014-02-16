@@ -46,7 +46,12 @@ import com.axelor.auth.AuthService;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.meta.MetaScanner;
+import com.axelor.meta.db.MetaAction;
+import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaModule;
+import com.axelor.meta.db.MetaSelect;
+import com.axelor.meta.db.MetaTranslation;
+import com.axelor.meta.db.MetaView;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -141,7 +146,26 @@ public class ModuleManager {
 
 	@Transactional
 	public void uninstall(String module) {
-		log.info("TODO: uninstall module: {}", module);
+
+		log.info("Uninstall module: {}", module);
+
+		MetaModule entity = MetaModule.findByName(module);
+		if (entity == null || entity.getInstalled() != Boolean.TRUE) {
+			log.error("Module not installed: {}", module);
+		}
+
+		MetaView.findByModule(module).remove();
+		MetaSelect.findByModule(module).remove();
+		MetaMenu.findByModule(module).remove();
+		MetaAction.findByModule(module).remove();
+		MetaTranslation.findByModule(module).remove();
+		
+		entity.setInstalled(false);
+		entity.save();
+		
+		resolver.get(module).setInstalled(false);
+
+		log.info("Module uninstalled: {}", module);
 	}
 
 	private void install(String moduleName, boolean update, boolean withDemo, boolean force) {

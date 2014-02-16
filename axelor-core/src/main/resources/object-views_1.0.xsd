@@ -328,6 +328,13 @@
       </xsd:element>
     </xsd:sequence>
     <xsd:attribute name="name" type="xsd:string" use="required" />
+    <xsd:attribute name="id" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+        If overriding some existing one, provide an unique id to identify this one.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 
   <xsd:attributeGroup name="ObjectViewAttributes">
@@ -348,8 +355,7 @@
     <xsd:attribute name="id" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-        If this view is overriding some existing view with same name,
-        provide an unique view id to identify this view.
+        If overriding some existing one, provide an unique id to identify this one.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>

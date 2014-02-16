@@ -102,12 +102,13 @@
     <![CDATA[
     This object store the selects.
     ]]>
-    
+    <string name="xmlId" unique="true" />
     <string name="name" required="true"/>
     <integer name="priority" required="true" default="20"/>
     <string name="module"/>
     <one-to-many name="items" ref="MetaSelectItem" mappedBy="select"/>
     
+    <finder-method name="findByID" using="xmlId" cacheable="true" />
     <finder-method name="findByName" using="name" orderBy="-priority" cacheable="true"/>
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
@@ -163,6 +164,7 @@
     <string name="module" initParam="true"/>
   	<unique-constraint columns="key,type,language,domain"/>
     <finder-method name="findByAll" using="key,language,domain,type,module" cacheable="true"/>
+    <finder-method name="findByModule" using="module" all="true"/>
   </entity>
   
   <entity name="MetaFile" table="META_FILE">
