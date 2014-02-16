@@ -63,6 +63,7 @@ import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.axelor.rpc.filter.Filter;
 import com.google.common.base.CaseFormat;
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
@@ -299,6 +300,16 @@ public class Resource<T extends Model> {
 		}
 
 		LOG.debug("Records found: {}", data.size());
+		
+		data = Lists.transform(data, new Function<Object, Object>() {
+			@Override
+			public Object apply(Object input) {
+				if (input instanceof Model) {
+					return _toMap((Model) input, true, 1);
+				}
+				return input;
+			};
+		});
 
 		response.setData(data);
 		response.setOffset(offset);
@@ -715,7 +726,7 @@ public class Resource<T extends Model> {
 	 *         property values as values.
 	 */
 	public static Map<String, Object> toMap(Object bean) {
-		return _toMap(bean, false, 0);
+		return _toMap(bean, false, 1);
 	}
 
 	@SuppressWarnings("unchecked")
