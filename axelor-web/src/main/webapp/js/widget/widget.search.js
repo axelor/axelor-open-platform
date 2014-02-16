@@ -668,6 +668,10 @@ ui.directive('uiFilterBox', function() {
 				$scope.custTitle = null;
 				$scope.custShared = false;
 				$scope.custTerm = null;
+				
+				if ($scope.handler && $scope.handler.clearFilters) {
+					$scope.handler.clearFilters();
+				}
 			};
 
 			$scope.onFilter = function(criteria) {
