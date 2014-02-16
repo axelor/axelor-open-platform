@@ -49,6 +49,8 @@ import com.google.common.collect.Maps;
 
 public class ScriptBindings extends SimpleBindings {
 
+	private static final String MODEL_KEY = "_model";
+
 	private static final Set<String> META_VARS = ImmutableSet.of(
 			"__this__",
 			"__self__",
@@ -62,22 +64,30 @@ public class ScriptBindings extends SimpleBindings {
 
 	private Map<String, Object> variables;
 
-	public ScriptBindings(Context context) {
-		this.variables = context;
-	}
-
 	public ScriptBindings(Map<String, Object> variables) {
-		this.variables = variables;
+		this.variables = this.tryContext(variables);
+	}
+	
+	private Map<String, Object> tryContext(Map<String, Object> variables) {
+		if (variables instanceof Context) {
+			return variables;
+		}
+		Class<?> klass = null;
+		try {
+			klass = Class.forName((String) variables.get(MODEL_KEY));
+		} catch (NullPointerException | ClassNotFoundException e) {
+			return variables;
+		}
+		return Context.create(variables, klass);
 	}
 
 	@SuppressWarnings("all")
 	private Object getSpecial(String name) throws Exception {
-		Context context = (Context) variables;
 		switch (name) {
 		case "__this__":
-			return context.asType(Model.class);
+			return ((Context) variables).asType(Model.class);
 		case "__parent__":
-			return context.getParentContext();
+			return ((Context) variables).getParentContext();
 		case "__date__":
 			return new LocalDate();
 		case "__time__":
@@ -87,11 +97,11 @@ public class ScriptBindings extends SimpleBindings {
 		case "__user__":
 			return AuthUtils.getUser();
 		case "__self__":
-			Model bean = context.asType(Model.class);
+			Model bean = ((Context) variables).asType(Model.class);
 			if (bean == null || bean.getId() == null) return null;
 			return JPA.find(bean.getClass(), bean.getId());
 		case "__ref__":
-			Map values = (Map) context.get("_ref");
+			Map values = (Map) variables.get("_ref");
 			Class<?> klass = Class.forName((String) values.get("_model"));
 			return JPA.em().find(klass, Long.parseLong(values.get("id").toString()));
 		}
