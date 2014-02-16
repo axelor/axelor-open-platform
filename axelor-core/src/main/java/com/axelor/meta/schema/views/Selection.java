@@ -45,6 +45,9 @@ public class Selection {
 
 	@XmlAttribute
 	private String name;
+	
+	@XmlAttribute(name = "id")
+	private String xmlId;
 
 	@XmlElement(name = "option", required = true)
 	private List<Selection.Option> options;
@@ -55,6 +58,14 @@ public class Selection {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public String getXmlId() {
+		return xmlId;
+	}
+	
+	public void setXmlId(String xmlId) {
+		this.xmlId = xmlId;
 	}
 
 	public List<Selection.Option> getOptions() {

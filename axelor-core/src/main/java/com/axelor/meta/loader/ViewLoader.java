@@ -172,24 +172,23 @@ public class ViewLoader extends AbstractLoader {
 		}
 
 		MetaView entity = new MetaView(name);
-		MetaView existing = xmlId == null ?
-				MetaView.findByModule(name, module.getName()) :
-				MetaView.findByID(xmlId);
+		MetaView extending = MetaView.findByName(name);
 
-		if (existing != null) {
+		if (extending != null) {
 			
 			if (xmlId == null) {
-				if (!update) {
-					log.warn("duplicate view without 'id': {}", name);
-				}
+				log.error("duplicate view without 'id': {}", name);
 				return;
 			}
 			
-			// set priority higher to existing view
-			if (!Objects.equal(xmlId, existing.getXmlId())) {
-				entity.setPriority(existing.getPriority() + 1);
-			} else if (update) {
+			MetaView existing = MetaView.findByID(xmlId);
+			if (update && existing != null && Objects.equal(xmlId, existing.getXmlId())) {
 				entity = existing;
+			}
+			
+			// set priority higher to existing view
+			if (!Objects.equal(xmlId, extending.getXmlId())) {
+				entity.setPriority(extending.getPriority() + 1);
 			}
 		}
 		
@@ -264,20 +263,39 @@ public class ViewLoader extends AbstractLoader {
 		if (isVisited(Selection.class, selection.getName())) {
 			return;
 		}
+
+		String name = selection.getName();
+		String xmlId = selection.getXmlId();
+
+		log.info("Loading selection : {}", name);
 		
-		log.info("Loading selection : {}", selection.getName());
+		MetaSelect entity = new MetaSelect(selection.getName());
+		MetaSelect extending = MetaSelect.findByName(selection.getName());
 		
-		MetaSelect select = MetaSelect.findByName(selection.getName());
-		if (select == null) {
-			select = new MetaSelect(selection.getName());
+		if (extending != null) {
+			
+			if (StringUtils.isBlank(xmlId)) {
+				log.error("duplicate selection without 'id': {}", name);
+				return;
+			}
+
+			MetaSelect existing = MetaSelect.findByID(xmlId);
+			if (update && existing != null && Objects.equal(xmlId, existing.getXmlId())) {
+				entity = existing;
+			}
+
+			// set priority higher to existing view
+			if (!Objects.equal(xmlId, extending.getXmlId())) {
+				entity.setPriority(extending.getPriority() + 1);
+			}
 		}
 
-		if (isUpdated(select)) {
+		if (isUpdated(entity)) {
 			return;
 		}
 		
-		select.clearItems();
-		select.setModule(module.getName());
+		entity.clearItems();
+		entity.setModule(module.getName());
 		
 		int sequence = 0;
 		for(Selection.Option opt : selection.getOptions()) {
@@ -285,10 +303,10 @@ public class ViewLoader extends AbstractLoader {
 			item.setValue(opt.getValue());
 			item.setTitle(opt.getDefaultTitle());
 			item.setOrder(sequence++);
-			select.addItem(item);
+			entity.addItem(item);
 		}
 		
-		select.save();
+		entity.save();
 	}
 	
 	private Set<Group> findGroups(String groups) {
