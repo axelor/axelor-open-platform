@@ -184,6 +184,14 @@ function DSViewCtrl(type, $scope, $element) {
 	var view = $scope._views[type] || {};
 	var viewPromise = null;
 	var hiddenButtons = {};
+	
+	var params = $scope._viewParams;
+	
+	if (params.params && params.params.limit) {
+		if (ds && ds._page) {
+			ds._page.limit = +(params.params.limit) || ds._page.limit;
+		}
+	}
 
 	$scope.fields = {};
 	$scope.schema = null;
