@@ -366,9 +366,12 @@ ActionHandler.prototype = {
 			formElement = this._getFormElement(),
 			formScope = formElement.data('$scope') || scope;
 
-		if(data.flash) {
-			//TODO: show embedded message instead
-			axelor.dialogs.say(data.flash);
+		if(data.flash || data.info) {
+			_.each(_.flatten([data.flash, data.info]), function (message) {
+				if (message) {
+					axelor.notify.info(message);
+				}
+			});
 		}
 
 		if(data.error) {
