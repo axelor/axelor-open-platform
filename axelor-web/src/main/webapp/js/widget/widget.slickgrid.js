@@ -765,6 +765,13 @@ Grid.prototype._doInit = function(view) {
 			filters[$(this).data('columnId')] = $(this).val().trim();
 		}
 		
+		function clearFilters() {
+			filters = {};
+			filtersRow.find(":input").val("");
+		}
+
+		handler.clearFilters = clearFilters;
+		
 		filtersRow.on('keyup', ':input', updateFilters);
 		filtersRow.on('keypress', ':input', function(event){
 			if (event.keyCode === 13) {
