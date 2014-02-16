@@ -667,6 +667,41 @@ public class Resource<T extends Model> {
 
 		return response;
 	}
+	
+	/**
+	 * Return the default values for the model.
+	 * 
+	 * @param request
+	 *            the request object
+	 * @return response with the default values
+	 */
+	public Response getDefaults(Request request) {
+		Response response = new Response();
+		Mapper mapper = Mapper.of(model);
+		Map<String, Object> data = Maps.newHashMap();
+		Model bean = null;
+		
+		try {
+			bean = model.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+		}
+
+		if (bean == null) {
+			return response;
+		}
+		
+		for (Property property : mapper.getProperties()) {
+			if (property.isTransient()) continue;
+			Object value = property.get(bean);
+			if (value != null) {
+				data.put(property.getName(), value);
+			}
+		}
+		response.setData(ImmutableList.of(data));
+		response.setStatus(Response.STATUS_SUCCESS);
+		
+		return response;
+	}
 
 	/**
 	 * Convert the given model instance to {@link Map}.
