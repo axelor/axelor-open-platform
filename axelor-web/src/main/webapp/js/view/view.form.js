@@ -402,8 +402,21 @@ function FormViewCtrl($scope, $element) {
 		if (!record.id || checkVersion !== "true") {
 			return;
 		}
-		
-		ds.verify(record).success(function(res){
+
+		function compact(rec) {
+			var res = {
+				id: rec.id,
+				version: rec.version || rec.$version
+			};
+			_.each(rec, function(v, k) {
+				if (!v) return;
+				if (v.id) res[k] = compact(v);
+				if (_.isArray(v)) res[k] = _.map(v, compact);
+			});
+			return res;
+		}
+
+		ds.verify(compact(record)).success(function(res){
 			if (res.status !== 0) {
 				axelor.dialogs.confirm(
 						_t("The record has been updated or delete by another action.") + "<br>" +
