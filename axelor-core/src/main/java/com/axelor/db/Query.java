@@ -572,7 +572,11 @@ public class Query<T extends Model> {
 			for(List item : data) {
 				Map<String, Object> map = Maps.newHashMap();
 				for(int i = 0 ; i < names.size() ; i++) {
-					map.put(names.get(i), item.get(i));
+					Object value = item.get(i);
+					if (value instanceof Model) {
+						value = Resource.toMapCompact(value);
+					}
+					map.put(names.get(i), value);
 				}
 				if (collections.size() > 0) {
 					map.putAll(this.fetchCollections(item.get(0)));

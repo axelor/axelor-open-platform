@@ -715,7 +715,7 @@ public class Resource<T extends Model> {
 	}
 
 	public static Map<String, Object> toMap(Object bean, String... names) {
-		return _toMap(bean, unflatten(null, names), false, 1);
+		return _toMap(bean, unflatten(null, names), false, 0);
 	}
 
 	public static Map<String, Object> toMapCompact(Object bean) {
@@ -739,11 +739,12 @@ public class Resource<T extends Model> {
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		Mapper mapper = Mapper.of(bean.getClass());
-
+		
 		boolean isSaved = ((Model)bean).getId() != null;
 		boolean isCompact = compact || fields.containsKey("$version");
-		
-		if ((isCompact && isSaved) || (isSaved && level >= 1 ) || (level > 1)) {
+
+		if ((isCompact && isSaved) || (level >= 1 )) {
+			
 			Property pn = mapper.getNameField();
 			Property pc = mapper.getProperty("code");
 
@@ -758,13 +759,12 @@ public class Resource<T extends Model> {
 			for(String name: fields.keySet()) {
 				Object child = mapper.get(bean, name);
 				if (child instanceof Model) {
-					child = _toMap(child, (Map) fields.get(name), true, 1);
+					child = _toMap(child, (Map) fields.get(name), true, level + 1);
 				}
 				if (child != null) {
 					result.put(name, child);
 				}
 			}
-			
 			return result;
 		}
 
@@ -796,15 +796,13 @@ public class Resource<T extends Model> {
 					value = decimal.setScale(scale, RoundingMode.HALF_UP);
 				}
 			}
-
-			//if (value instanceof Model) { // m2o
-			if (value != null && prop.isReference()) {
+			
+			if (value instanceof Model) { // m2o
 				Map<String, Object> _fields = (Map) fields.get(prop.getName());
 				value = _toMap(value, _fields, true, level + 1);
 			}
 
-			//if (value instanceof Collection) { // o2m | m2m
-			if (value != null && prop.isCollection()) {
+			if (value instanceof Collection) { // o2m | m2m
 				List<Object> items = Lists.newArrayList();
 				for(Model input : (Collection<Model>) value) {
 					Map<String, Object> item;
@@ -813,12 +811,12 @@ public class Resource<T extends Model> {
 					} else {
 						item = _toMap(input, null, false, 1);
 					}
-					if (item != null)
+					if (item != null) {
 						items.add(item);
+					}
 				}
 				value = items;
 			}
-			
 			result.put(name, value);
 		}
 
