@@ -432,7 +432,14 @@ public class MetaService {
 			QueryBinder.of(query).bind(context);
 		}
 
+		response.setData(data);
+		response.setStatus(Response.STATUS_SUCCESS);
+
 		data.put("dataset", query.getResultList());
+
+		if (request.getFields() != null && request.getFields().contains("dataset")) {
+			return response;
+		}
 
 		data.put("title", chart.getTitle());
 		data.put("stacked", chart.getStacked());
@@ -462,9 +469,8 @@ public class MetaService {
 
 		data.put("series", series);
 		data.put("config", config);
-
-		response.setData(data);
-		response.setStatus(Response.STATUS_SUCCESS);
+		data.put("search", chart.getSearchFields());
+		data.put("onInit", chart.getOnInit());
 
 		return response;
 	}

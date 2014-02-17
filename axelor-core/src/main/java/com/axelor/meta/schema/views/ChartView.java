@@ -34,10 +34,12 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
 import com.axelor.db.JPA;
+import com.axelor.meta.schema.views.Search.SearchField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
@@ -47,6 +49,13 @@ public class ChartView extends AbstractView {
 
 	@XmlAttribute
 	private Boolean stacked;
+	
+	@XmlAttribute
+	private String onInit;
+
+	@XmlElement(name = "field", type = SearchField.class)
+	@XmlElementWrapper(name = "search-fields")
+	private List<SearchField> searchFields;
 
 	@XmlElement(name = "dataset")
 	private ChartQuery query;
@@ -62,6 +71,14 @@ public class ChartView extends AbstractView {
 
 	public Boolean getStacked() {
 		return stacked;
+	}
+	
+	public String getOnInit() {
+		return onInit;
+	}
+
+	public List<SearchField> getSearchFields() {
+		return searchFields;
 	}
 
 	public ChartQuery getQuery() {

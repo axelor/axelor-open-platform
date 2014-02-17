@@ -62,11 +62,19 @@ function ChartCtrl($scope, $element, $http) {
 	var views = $scope._views;
 	var view = $scope.view = views['chart'];
 	
+	var viewChart = null;
+	var viewValues = null;
+
 	var loading = false;
 
 	function refresh() {
 		
 		if (loading || $element.is(":hidden")) {
+			return;
+		}
+
+		// in case of onInit
+		if ($scope.searchInit && !viewValues) {
 			return;
 		}
 
@@ -77,26 +85,124 @@ function ChartCtrl($scope, $element, $http) {
 				return;
 			}
 		}
+
+		context = _.extend({}, context, viewValues);
 		loading = true;
-		return $http.post('ws/meta/chart/' + view.name, {
+		
+		var params = {
 			data: context
-		}).then(function(response) {
+		};
+
+		if (viewChart) {
+			params.fields = ['dataset'];
+		}
+
+		return $http.post('ws/meta/chart/' + view.name, params).then(function(response) {
 			var res = response.data;
-			$scope.render(res.data);
+			var data = res.data;
+
+			if (viewChart === null) {
+				viewChart = data;
+			} else {
+				data = _.extend({}, viewChart, data);
+			}
+
+			if ($scope.searchFields === undefined) {
+				$scope.searchFields = data.search;
+				$scope.searchInit = data.onInit;
+			} else {
+				$scope.render(data);
+			}
 			loading = false;
 		});
 	}
-	
+
 	setTimeout(refresh);
-	
+
 	$scope.onRefresh = function() {
 		refresh();
+	};
+
+	$scope.setViewValues = function (values) {
+		viewValues = values;
 	};
 
 	$scope.render = function(data) {
 		
 	};
 };
+
+ChartFormCtrl.$inject = ['$scope', '$element', 'ViewService', 'DataSource'];
+function ChartFormCtrl($scope, $element, ViewService, DataSource) {
+
+	$scope._dataSource = DataSource.create('com.axelor.meta.db.MetaView');
+	
+	FormViewCtrl.call(this, $scope, $element);
+	$scope.setEditable();
+	
+	function fixFields(fields) {
+		_.each(fields, function(field){
+			if (field.type == 'reference') {
+				field.type = 'MANY_TO_ONE';
+				field.canNew = false;
+				field.canEdit = false;
+			}
+			
+			if (field.type)
+				field.type = field.type.toUpperCase();
+			else
+				field.type = 'STRING';
+		});
+		return fields;
+	}
+	
+	var unwatch = $scope.$watch('searchFields', function (fields) {
+		if (!fields) {
+			return;
+		}
+		unwatch();
+
+		var meta = { fields: fixFields(fields) };
+		var view = {
+			type: 'form',
+			cols: 4,
+			items: meta.fields
+		};
+
+		ViewService.process(meta, view);
+
+		view.onLoad = $scope.searchInit;
+		
+		$scope.fields = meta.fields;
+		$scope.schema = view;
+		$scope.schema.loaded = true;
+
+		var interval = undefined;
+
+		function reload() {
+			$scope.$parent.setViewValues($scope.record);
+			$scope.$parent.onRefresh();
+		}
+		
+		function delayedReload() {
+			clearTimeout(interval);
+			interval = setTimeout(reload, 500);
+		}
+
+		$scope.$watch('record', function (record) {
+			if (interval === undefined) {
+				return interval = null;
+			}
+			delayedReload();
+		}, true);
+		
+		$scope.$watch('$events.onLoad', function (handler) {
+			if (handler) {
+				handler().then(delayedReload);
+			}
+		});
+	});
+}
 
 function $conv(value) {
 	if (!value) return 0;
@@ -448,10 +554,28 @@ var directiveFn = function(){
 		replace: true,
 		template:
 		'<div class="chart-container" style="background-color: white; ">'+
+			'<div ui-chart-form></div>'+
 			'<svg></svg>'+
 		'</div>'
 	};
 };
+
+ui.directive('uiChartForm', function () {
+	
+	return {
+		scope: true,
+		controller: ChartFormCtrl,
+		link: function (scope, element, attrs, ctrls) {
+
+		},
+		replace: true,
+		template:
+			"<div class='chart-controls'>" +
+				"<div ui-view-form x-handler='this'></div>" +
+			"</div>"
+	};
+});
+
 
 ui.directive('uiViewChart', directiveFn);
 ui.directive('uiPortletChart', directiveFn);
