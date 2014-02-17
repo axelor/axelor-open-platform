@@ -119,10 +119,11 @@
   <menuitem name="menu-view-charts" parent="menu-view-management"
     title="All Charts"
     action="meta.charts"/>
-    
-  <action-view name="meta.charts" title="All Charts" model="com.axelor.meta.db.MetaChart">
-    <view type="grid" name="meta-chart-grid"/>
-    <view type="form" name="meta-chart-form"/>
+
+  <action-view name="meta.charts" title="All Charts" model="com.axelor.meta.db.MetaView">
+    <view type="grid" name="meta-view-grid"/>
+    <view type="form" name="meta-view-form"/>
+    <domain>self.type = 'chart'</domain>
   </action-view>
   
   <menuitem name="menu-job-all" parent="menu-job-management"

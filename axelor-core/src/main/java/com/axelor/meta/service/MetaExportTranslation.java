@@ -52,8 +52,6 @@ import com.axelor.db.JPA;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaActionMenu;
-import com.axelor.meta.db.MetaChart;
-import com.axelor.meta.db.MetaChartSeries;
 import com.axelor.meta.db.MetaFilter;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaModule;
@@ -128,7 +126,6 @@ public class MetaExportTranslation {
 	private final String actionMenuType = "actionMenu";
 	private final String viewType = "view";
 	private final String treeType = "tree";
-	private final String chartType = "chart";
 	private final String portletType = "portlet";
 	private final String filterType = "filter";
 	private final String searchType = "search";
@@ -167,7 +164,6 @@ public class MetaExportTranslation {
 			this.exportMenuActions();
 			this.exportObjects();
 			this.exportSelects();
-			this.exportCharts();
 			this.exportViews();
 			this.exportActions();
 			this.exportOther();
@@ -469,27 +465,6 @@ public class MetaExportTranslation {
 
 				for (AbstractWidget widget : simpleContainer.getItems()) {
 					this.loadWidget(view, widget) ;
-				}
-			}
-		}
-	}
-
-	private void exportCharts() {
-		for (MetaChart chart : MetaChart.findByModule(this.currentModule).order("name").fetch()) {
-			String translation = this.getTranslation(chart.getTitle(), "", null, this.chartType);
-			this.appendToFile("", "", this.chartType, chart.getTitle(), translation);
-
-			if(!Strings.isNullOrEmpty(chart.getCategoryTitle())) {
-				String translationTitle = this.getTranslation(chart.getCategoryTitle(), "", null, this.chartType);
-				this.appendToFile("", "", this.chartType, chart.getCategoryTitle(), translationTitle);
-			}
-
-			if(chart.getChartSeries() != null) {
-				for (MetaChartSeries serie : chart.getChartSeries()) {
-					if(!Strings.isNullOrEmpty(serie.getTitle())) {
-						String translationSerie = this.getTranslation(serie.getTitle(), "", null, this.chartType);
-						this.appendToFile("", "", this.chartType, serie.getTitle(), translationSerie);
-					}
 				}
 			}
 		}

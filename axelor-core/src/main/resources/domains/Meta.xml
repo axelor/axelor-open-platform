@@ -196,38 +196,4 @@
   	<unique-constraint columns="objectName,objectId,meta_file"/>
   </entity>
 
-  <entity name="MetaChartSeries" table="META_CHART_SERIES">
-    <string name="key" required="true"/>
-    <string name="groupBy" />
-    <string name="title" />
-    <string name="type" />
-    <string name="side" />
-    <string name="aggregate"/>
-  </entity>
-  
-  <entity name="MetaChartConfig" table="META_CHART_CONFIG">
-    <string name="name" required="true"/>
-    <string name="value" required="true"/>
-  </entity>
-
-  <entity name="MetaChart" table="META_CHART">
-    <![CDATA[
-    This object store the charts definition.
-    ]]>
-    
-    <string name="name" required="true" unique="true"/>
-    <string name="module"/>
-    <string name="title" />
-    <boolean name="stacked" />
-    <string name="query" large="true" multiline="true" required="true"/>
-    <string name="queryType"/>
-    <string name="categoryKey" required="true" />
-    <string name="categoryType" />
-    <string name="categoryTitle" />
-    <one-to-many name="chartSeries" ref="MetaChartSeries" />
-    <one-to-many name="chartConfig" ref="MetaChartConfig" />
-    
-	<finder-method name="findByModule" using="module" all="true" cacheable="true"/>
-  </entity>
-
 </domain-models>

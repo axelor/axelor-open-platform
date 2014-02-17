@@ -7,6 +7,7 @@
     <option value="grid">Grid</option>
     <option value="form">Form</option>
     <option value="tree">Tree</option>
+    <option value="chart">Chart</option>
     <option value="search">Search</option>
     <option value="portal">Portal</option>
     <option value="calendar">Calendar</option>
@@ -332,104 +333,6 @@
     <field name="description"/>
   </form>
 
-  <grid title="Charts" name="meta-chart-grid" model="com.axelor.meta.db.MetaChart">
-    <field name="name" />
-    <field name="title" />
-    <field name="stacked" />
-    <field name="module" />
-  </grid>
-  
-  <form title="Chart" name="meta-chart-form" model="com.axelor.meta.db.MetaChart" cols="6">
-    <field name="name" />
-    <field name="title" />
-    <field name="stacked" />
-
-    <field name="categoryKey" />
-    <field name="categoryType" selection="selection.chart.xtype"/>
-    <field name="categoryTitle"/>
-    
-    <field name="module" />
-    <break/>
-
-    <notebook colSpan="6">
-      <page cols="4" title="Query" colWidths="5%,75,90%,*">
-        <field name="queryType" title="Type" css="small-input" selection="selection.chart.qtype"/>
-        <spacer colSpan="2"/>
-        <field name="query" colSpan="4" showTitle="false" widget="CodeEditor[syntax=sql|height=400]"/>
-      </page>
-      <page title="Series" cols="1">
-        <field name="chartSeries">
-          <grid title="Series" editable="true">
-            <field name="key" />
-            <field name="groupBy"/>
-            <field name="type" selection="selection.chart.type"/>
-            <field name="side" selection="selection.chart.side"/>
-            <field name="title"/>
-            <field name="aggregate" selection="selection.chart.aggregate"/>
-          </grid>
-          <form title="Series">
-            <field name="key"/>
-            <break/>
-            <field name="groupBy"/>
-            <field name="aggregate" selection="selection.chart.aggregate"/>
-            <field name="type" selection="selection.chart.type" />
-            <field name="side" selection="selection.chart.side"/>
-            <field name="title" colSpan="4"/>
-          </form>
-        </field>
-      </page>
-      <page title="Config" cols="1">
-        <field name="chartConfig">
-          <grid title="Config" editable="true">
-            <field name="name"/>
-            <field name="value"/>
-          </grid>
-        </field>
-      </page>
-    </notebook>
-  </form>
-  
-  <selection name="selection.chart.type">
-    <option value="pie">Pie</option>
-    <option value="bar">Bar</option>
-    <option value="hbar">HBar</option>
-    <option value="line">Line</option>
-    <option value="area">Area</option>
-    <option value="radar">Radar</option>
-    <option value="gauge">Gauge</option>
-    <option value="scatter">Scatter</option>
-  </selection>
-  
-  <selection name="selection.chart.side">
-    <option value="left">Left</option>
-    <option value="right">Right</option>
-  </selection>
-
-  <selection name="selection.chart.xtype">
-    <option value="number">Number</option>
-    <option value="decimal">Decimal</option>
-    <option value="date">Date</option>
-    <option value="time">Time</option>
-    <option value="month">Month</option>
-    <option value="year">Year</option>
-    <option value="text">Text</option>
-  </selection>
-  
-  <selection name="selection.chart.qtype">
-    <option value="jpql">JPQL</option>
-    <option value="sql">SQL</option>
-  </selection>
-  
-  <selection name="selection.chart.aggregate">
-    <option value="sum">Sum</option>
-    <option value="count">Count</option>
-    <option value="average">Average</option>
-    <option value="minimum">Minimum</option>
-    <option value="maximum">Maximum</option>
-    <option value="variance">Variance</option>
-    <option value="deviation">Std. Deviation</option>
-  </selection>
-  
   <selection name="selection.translation.import.type">
     <option value="1">From sources</option>
     <option value="2">From directory</option>

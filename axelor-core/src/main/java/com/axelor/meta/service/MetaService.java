@@ -50,14 +50,15 @@ import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaAttachment;
-import com.axelor.meta.db.MetaChart;
-import com.axelor.meta.db.MetaChartConfig;
-import com.axelor.meta.db.MetaChartSeries;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.MetaMenu;
+import com.axelor.meta.db.MetaView;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
+import com.axelor.meta.schema.views.ChartView;
+import com.axelor.meta.schema.views.ChartView.ChartConfig;
+import com.axelor.meta.schema.views.ChartView.ChartSeries;
 import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.schema.views.Search;
 import com.axelor.rpc.Request;
@@ -395,68 +396,66 @@ public class MetaService {
 	public Response getChart(final String name, final Request request) {
 
 		final Response response = new Response();
-		final MetaChart chart = MetaChart.all().filter("self.name = ?", name).fetchOne();
+		final MetaView view = MetaView.findByName(name);
+		
+		if (view == null) {
+			return response;
+		}
 
-		if (chart == null || chart.getChartSeries() == null) {
+		ChartView chart = (ChartView) XMLViews.findView(null, name, "chart");
+		if (chart == null) {
 			return response;
 		}
 
 		final Map<String, Object> data = Maps.newHashMap();
 
-		data.put("title", JPA.translate(chart.getTitle(), chart.getTitle(), null, "chart"));
+		String string = chart.getQuery().getText();
+		Query query = "sql".equals(chart.getQuery().getType()) ?
+				JPA.em().createNativeQuery(string) :
+				JPA.em().createQuery(string);
+
+		// return result as list of map
+		((org.hibernate.ejb.QueryImpl<?>) query).getHibernateQuery()
+			.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+
+		Map<String, Object> context = Maps.newHashMap();
+		if (request.getData() != null) {
+			context.putAll(request.getData());
+		}
+		if (AuthUtils.getUser() != null) {
+			context.put("__user__", AuthUtils.getUser());
+			context.put("__userId__", AuthUtils.getUser().getId());
+			context.put("__userCode__", AuthUtils.getSubject());
+		}
+
+		if (request.getData() != null) {
+			QueryBinder.of(query).bind(context);
+		}
+
+		data.put("dataset", query.getResultList());
+
+		data.put("title", chart.getTitle());
 		data.put("stacked", chart.getStacked());
 
-		data.put("xAxis", chart.getCategoryKey());
-		data.put("xType", chart.getCategoryType());
-		data.put("xTitle", JPA.translate(chart.getCategoryTitle(), chart.getCategoryTitle(), null, "chart"));
-
-		JPA.runInTransaction(new Runnable() {
-
-			@Override
-			public void run() {
-
-				String string = chart.getQuery();
-				Query query = "sql".equals(chart.getQueryType()) ?
-						JPA.em().createNativeQuery(string) :
-						JPA.em().createQuery(string);
-
-				// return result as list of map
-				((org.hibernate.ejb.QueryImpl<?>) query).getHibernateQuery()
-					.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-
-				Map<String, Object> context = Maps.newHashMap();
-				if (request.getData() != null) {
-					context.putAll(request.getData());
-				}
-				if (AuthUtils.getUser() != null) {
-					context.put("__user__", AuthUtils.getUser());
-					context.put("__userId__", AuthUtils.getUser().getId());
-					context.put("__userCode__", AuthUtils.getSubject());
-				}
-
-				if (request.getData() != null) {
-					QueryBinder.of(query).bind(context);
-				}
-
-				data.put("dataset", query.getResultList());
-			}
-		});
+		data.put("xAxis", chart.getCategory().getKey());
+		data.put("xType", chart.getCategory().getType());
+		data.put("xTitle", chart.getCategory().getType());
 
 		List<Object> series = Lists.newArrayList();
 		Map<String, Object> config = Maps.newHashMap();
 
-		for(MetaChartSeries s : chart.getChartSeries()) {
+		for(ChartSeries cs : chart.getSeries()) {
 			Map<String, Object> map = Maps.newHashMap();
-			map.put("key", s.getKey());
-			map.put("type", s.getType());
-			map.put("groupBy", s.getGroupBy());
-			map.put("aggregate", s.getAggregate());
-			map.put("title", JPA.translate(s.getTitle(), s.getTitle(), null, "chart"));
+			map.put("key", cs.getKey());
+			map.put("type", cs.getType());
+			map.put("groupBy", cs.getGroupBy());
+			map.put("aggregate", cs.getAggregate());
+			map.put("title", JPA.translate(cs.getTitle(), cs.getTitle(), null, "chart"));
 			series.add(map);
 		}
 
-		if (chart.getChartConfig() != null) {
-			for(MetaChartConfig c : chart.getChartConfig()) {
+		if (chart.getConfig() != null) {
+			for(ChartConfig c : chart.getConfig()) {
 				config.put(c.getName(), c.getValue());
 			}
 		}
