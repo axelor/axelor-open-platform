@@ -682,6 +682,13 @@
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleView">
         <xsd:sequence>
+          <xsd:element name="search-fields" minOccurs="0">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="field" type="tns:SearchField" maxOccurs="2"/>
+              </xsd:sequence>
+            </xsd:complexType>
+          </xsd:element>
           <xsd:element name="dataset">
             <xsd:annotation>
               <xsd:documentation>
@@ -778,6 +785,13 @@
           </xsd:element>
         </xsd:sequence>
         <xsd:attribute name="stacked" type="xsd:boolean" />
+        <xsd:attribute name="onInit" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            Call an action when chart is initialized.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
