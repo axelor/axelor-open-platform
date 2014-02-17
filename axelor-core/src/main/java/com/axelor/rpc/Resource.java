@@ -742,8 +742,10 @@ public class Resource<T extends Model> {
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		Mapper mapper = Mapper.of(bean.getClass());
-
-		if ((compact && ((Model)bean).getId() != null) || level >= 1) {
+		
+		boolean isSaved = ((Model)bean).getId() != null;
+		
+		if ((compact && isSaved) || (isSaved && level >= 1 ) || (level > 1)) {
 			Property pn = mapper.getNameField();
 			Property pc = mapper.getProperty("code");
 
@@ -781,7 +783,7 @@ public class Resource<T extends Model> {
 						if (input.getId() != null) {
 							item = _toMap(input, true, level+1);
 						} else {
-							item = _toMap(input, false, 0);
+							item = _toMap(input, false, 1);
 						}
 						if (item != null)
 							items.add(item);
