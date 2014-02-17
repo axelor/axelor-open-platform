@@ -61,6 +61,10 @@ ui.formInput('CodeEditor', {
 		editor.setFontSize(props.fontSize);
 		editor.setShowPrintMargin(false);
 		editor.renderer.setShowGutter(true);
+		
+		if (props.syntax === "xml") {
+			session.setTabSize(2);
+		}
 
 		editor.commands.addCommands([{
 		    name: "unfind",
