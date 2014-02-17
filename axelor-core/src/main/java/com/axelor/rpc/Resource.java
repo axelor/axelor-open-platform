@@ -305,7 +305,7 @@ public class Resource<T extends Model> {
 			@Override
 			public Object apply(Object input) {
 				if (input instanceof Model) {
-					return _toMap((Model) input, true, 1);
+					return toMapCompact((Model) input);
 				}
 				return input;
 			};
@@ -554,7 +554,7 @@ public class Resource<T extends Model> {
 			JPA.remove(bean);
 		}
 
-		response.setData(ImmutableList.of(_toMap(bean, true, 0)));
+		response.setData(ImmutableList.of(toMapCompact(bean)));
 		response.setStatus(Response.STATUS_SUCCESS);
 
 		return response;
@@ -714,23 +714,16 @@ public class Resource<T extends Model> {
 		return response;
 	}
 
-	/**
-	 * Convert the given model instance to {@link Map}.
-	 *
-	 * This method converts the given bean to map using {@link Mapper}. The
-	 * multi-value fields will be converted to list of ids.
-	 *
-	 * @param bean
-	 *            JPA managed model instance
-	 * @return a {@link Map} with property names as keys and corresponding
-	 *         property values as values.
-	 */
-	public static Map<String, Object> toMap(Object bean) {
-		return _toMap(bean, false, 1);
+	public static Map<String, Object> toMap(Object bean, String... names) {
+		return _toMap(bean, unflatten(null, names), false, 1);
 	}
 
-	@SuppressWarnings("unchecked")
-	public static Map<String, Object> _toMap(Object bean, boolean compact, int level) {
+	public static Map<String, Object> toMapCompact(Object bean) {
+		return _toMap(bean, null, true, 1);
+	}
+	
+	@SuppressWarnings("all")
+	private static Map<String, Object> _toMap(Object bean, Map<String, Object> fields, boolean compact, int level) {
 
 		if (bean == null) {
 			return null;
@@ -739,13 +732,18 @@ public class Resource<T extends Model> {
 		if (bean instanceof HibernateProxy) {
 			bean = ((HibernateProxy) bean).getHibernateLazyInitializer().getImplementation();
 		}
+		
+		if (fields == null) {
+			fields = Maps.newHashMap();
+		}
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		Mapper mapper = Mapper.of(bean.getClass());
-		
+
 		boolean isSaved = ((Model)bean).getId() != null;
+		boolean isCompact = compact || fields.containsKey("$version");
 		
-		if ((compact && isSaved) || (isSaved && level >= 1 ) || (level > 1)) {
+		if ((isCompact && isSaved) || (isSaved && level >= 1 ) || (level > 1)) {
 			Property pn = mapper.getNameField();
 			Property pc = mapper.getProperty("code");
 
@@ -757,111 +755,35 @@ public class Resource<T extends Model> {
 			if (pc != null)
 				result.put(pc.getName(), mapper.get(bean, pc.getName()));
 
-			return result;
-		}
-
-		for (final Property p : mapper.getProperties()) {
-
-			PropertyType type = p.getType();
-
-			if (type == PropertyType.BINARY) {
-				continue;
-			}
-
-			String name = p.getName();
-			Object value = mapper.get(bean, name);
-
-			if (value != null) {
-
-				if (p.isReference()) {
-					value = _toMap(value, true, level+1);
-				}
-				else if (p.isCollection()) {
-					List<Object> items = Lists.newArrayList();
-					for(Model input : (Collection<Model>) value) {
-						Map<String, Object> item;
-						if (input.getId() != null) {
-							item = _toMap(input, true, level+1);
-						} else {
-							item = _toMap(input, false, 1);
-						}
-						if (item != null)
-							items.add(item);
-					}
-					value = items;
-				}
-			}
-			result.put(name, value);
-		}
-
-		return result;
-	}
-
-	/**
-	 * This method allows to expand given field names with dotted notations.
-	 *
-	 */
-	private static Map<String, Object> toMap(Object bean, String... names) {
-		Map<String, Object> fields = unflatten(null, names);
-		return _toMap(bean, fields);
-	}
-
-	@SuppressWarnings("all")
-	private static Map<String, Object> _toMap(Object bean, Map<String, Object> fields) {
-
-		if (bean == null) {
-			return null;
-		}
-
-		if (bean instanceof HibernateProxy) {
-			bean = ((HibernateProxy) bean).getHibernateLazyInitializer().getImplementation();
-		}
-
-		Map<String, Object> result = new HashMap<String, Object>();
-		Mapper mapper = Mapper.of(bean.getClass());
-		boolean compact = fields.containsKey("$version");
-
-		if ((compact && ((Model)bean).getId() != null)) {
-			Property pn = mapper.getNameField();
-			Property pc = mapper.getProperty("code");
-
-			result.put("id", mapper.get(bean, "id"));
-			result.put("$version", mapper.get(bean, "version"));
-
-			if (pn != null)
-				result.put(pn.getName(), pn.get(bean));
-			if (pc != null)
-				result.put(pc.getName(), pc.get(bean));
-
 			for(String name: fields.keySet()) {
 				Object child = mapper.get(bean, name);
 				if (child instanceof Model) {
-					child = _toMap(child, (Map) fields.get(name));
+					child = _toMap(child, (Map) fields.get(name), true, 1);
 				}
 				if (child != null) {
 					result.put(name, child);
 				}
 			}
-
+			
 			return result;
 		}
 
-		for (final Property p : mapper.getProperties()) {
+		for (final Property prop : mapper.getProperties()) {
 
-			PropertyType type = p.getType();
-			String name = p.getName();
+			String name = prop.getName();
+			PropertyType type = prop.getType();
+
+			if (type == PropertyType.BINARY) {
+				continue;
+			}
+
+			if (isSaved && prop.isCollection() && !fields.isEmpty() && !fields.containsKey(name)) {
+				continue;
+			}
 			
-			if (type == PropertyType.BINARY && !p.isImage()) {
-				continue;
-			}
-
-			if (p.isCollection() && !fields.containsKey(name)) {
-				continue;
-			}
-
 			Object value = mapper.get(bean, name);
-
-			if (p.isImage() && byte[].class.isInstance(value)) {
+			
+			if (prop.isImage() && byte[].class.isInstance(value)) {
 				value = new String((byte[]) value);
 			}
 
@@ -869,28 +791,34 @@ public class Resource<T extends Model> {
 			// json mapper may use wrong scale.
 			if (value instanceof BigDecimal) {
 				BigDecimal decimal = (BigDecimal) value;
-				int scale = p.getScale();
+				int scale = prop.getScale();
 				if (decimal.scale() == 0 && scale > 0 && scale != decimal.scale()) {
 					value = decimal.setScale(scale, RoundingMode.HALF_UP);
 				}
 			}
 
-			if (value instanceof Model) { // m2o
-				Map<String, Object> _fields = (Map) fields.get(p.getName());
-				if (_fields == null) {
-					_fields = Maps.newHashMap();
-				}
-				_fields.put("$version", null);
-				value = _toMap(value, _fields);
+			//if (value instanceof Model) { // m2o
+			if (value != null && prop.isReference()) {
+				Map<String, Object> _fields = (Map) fields.get(prop.getName());
+				value = _toMap(value, _fields, true, level + 1);
 			}
-			if (value instanceof Collection<?>) { // m2m | o2m
+
+			//if (value instanceof Collection) { // o2m | m2m
+			if (value != null && prop.isCollection()) {
 				List<Object> items = Lists.newArrayList();
-				for(Object item : (Collection) value) {
-					items.add(toMap(item, "$version"));
+				for(Model input : (Collection<Model>) value) {
+					Map<String, Object> item;
+					if (input.getId() != null) {
+						item = _toMap(input, null, true, level+1);
+					} else {
+						item = _toMap(input, null, false, 1);
+					}
+					if (item != null)
+						items.add(item);
 				}
 				value = items;
 			}
-
+			
 			result.put(name, value);
 		}
 
@@ -908,7 +836,6 @@ public class Resource<T extends Model> {
 				Map<String, Object> child = (Map) map.get(parts[0]);
 				if (child == null) {
 					child = Maps.newHashMap();
-					child.put("$version", null);
 				}
 				map.put(parts[0], unflatten(child, parts[1]));
 			} else {

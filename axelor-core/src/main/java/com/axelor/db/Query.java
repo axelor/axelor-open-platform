@@ -592,7 +592,7 @@ public class Query<T extends Model> {
 				if (items != null) {
 					List<Object> all = Lists.newArrayList();
 					for(Model obj : items) {
-						all.add(Resource._toMap(obj, true, 0));
+						all.add(Resource.toMapCompact(obj));
 					}
 					result.put(name, all);
 				}
