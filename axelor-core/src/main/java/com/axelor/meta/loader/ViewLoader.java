@@ -51,9 +51,6 @@ import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaActionMenu;
-import com.axelor.meta.db.MetaChart;
-import com.axelor.meta.db.MetaChartConfig;
-import com.axelor.meta.db.MetaChartSeries;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
@@ -62,7 +59,6 @@ import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.AbstractWidget;
-import com.axelor.meta.schema.views.ChartView;
 import com.axelor.meta.schema.views.Field;
 import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.GridView;
@@ -156,11 +152,6 @@ public class ViewLoader extends AbstractLoader {
 			throw new IllegalArgumentException("Invalid view, model name missing.");
 		}
 		
-		if (view instanceof ChartView) {
-			importChart((ChartView) view, module, update);
-			return;
-		}
-		
 		if (modelName != null) {
 			Class<?> model;
 			try {
@@ -204,58 +195,6 @@ public class ViewLoader extends AbstractLoader {
 		entity.setXml(xml);
 		
 		entity = entity.save();
-	}
-	
-	private void importChart(ChartView view, Module module, boolean update) {
-
-		if (isVisited(view.getClass(), view.getName())) {
-			return;
-		}
-
-		MetaChart entity = MetaChart.findByName(view.getName());
-		if (entity == null) {
-			entity = new MetaChart(view.getName());
-		}
-		
-		if (isUpdated(entity)) {
-			return;
-		}
-		
-		entity.clearChartSeries();
-		entity.clearChartConfig();
-		
-		entity.setModule(module.getName());
-		entity.setTitle(view.getDefaultTitle());
-		entity.setStacked(view.getStacked());
-		
-		String query = StringUtils.stripIndent(view.getQuery().getText());
-		entity.setQuery(query);
-		entity.setQueryType(view.getQuery().getType());
-
-		entity.setCategoryKey(view.getCategory().getKey());
-		entity.setCategoryType(view.getCategory().getType());
-		entity.setCategoryTitle(view.getCategory().getDefaultTitle());
-		
-		for(ChartView.ChartSeries series : view.getSeries()) {
-			MetaChartSeries item = new MetaChartSeries();
-			item.setKey(series.getKey());
-			item.setGroupBy(series.getGroupBy());
-			item.setType(series.getType());
-			item.setSide(series.getSide());
-			item.setAggregate(series.getAggregate());
-			entity.addChartSeries(item);
-		}
-
-		if (view.getConfig() != null) {
-			for(ChartView.ChartConfig config : view.getConfig()) {
-				MetaChartConfig item = new MetaChartConfig();
-				item.setName(config.getName());
-				item.setValue(config.getValue());
-				entity.addChartConfig(item);
-			}
-		}
-		
-		entity.save();
 	}
 	
 	private void importSelection(Selection selection, Module module, boolean update) {
