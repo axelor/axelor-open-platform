@@ -107,7 +107,7 @@ function ChartCtrl($scope, $element, $http) {
 				data = _.extend({}, viewChart, data);
 			}
 
-			if ($scope.searchFields === undefined) {
+			if ($scope.searchFields === undefined && data.search) {
 				$scope.searchFields = data.search;
 				$scope.searchInit = data.onInit;
 			} else {
