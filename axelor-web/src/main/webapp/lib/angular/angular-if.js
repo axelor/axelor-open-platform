@@ -41,7 +41,7 @@ var ngIfDirective = function() {
             childScope = $scope.$new();
             transclude(childScope, function (clone) {
               childElement = clone;
-              element.after(clone);
+              $element.after(clone);
             });
           }
         });
