@@ -89,7 +89,21 @@ ui.directive('uiViewPortal', function(){
 			setTimeout(function(){
 				element.sortable({
 					handle: ".portlet-header",
-					items: "> .portlet"
+					items: "> .portlet",
+					scroll: true,
+					forceHelperSize: true,
+					activate: function( event, ui ) {
+						var width = ui.placeholder.width();
+						ui.placeholder.width(width - 3);
+						ui.placeholder.css({
+							'left': '2px',
+							'top': '2px',
+							'margin-right': '4px'
+						});
+					},
+					deactivate: function( event, ui ) {
+						axelor.$adjustSize();
+					}
 				});
 			});
 		},
