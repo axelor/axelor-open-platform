@@ -47,9 +47,10 @@ public class Portal extends AbstractView {
 	private Integer cols;
 
 	@XmlElements({
-		@XmlElement(name = "portlet", type = Portlet.class)
+		@XmlElement(name = "portlet", type = Portlet.class),
+		@XmlElement(name = "tabs", type = PortalTabs.class)
 	})
-	private List<Portlet> items;
+	private List<AbstractContainer> items;
 
 	public Integer getCols() {
 		return cols;
@@ -58,12 +59,24 @@ public class Portal extends AbstractView {
 	public void setCols(Integer cols) {
 		this.cols = cols;
 	}
-	
-	public List<Portlet> getItems() {
+
+	public List<AbstractContainer> getItems() {
 		return items;
 	}
-	
-	public void setItems(List<Portlet> items) {
-		this.items = items;
+
+	@XmlType
+	@JsonTypeName("tabs")
+	public static class PortalTabs extends AbstractContainer {
+
+		@XmlElement(name = "tab")
+		private List<Portal> tabs;
+		
+		public List<Portal> getTabs() {
+			return tabs;
+		}
+
+		public void setTabs(List<Portal> tabs) {
+			this.tabs = tabs;
+		}
 	}
 }

@@ -32,8 +32,7 @@
 .portal-view .portlet,
 .portal-view .portlet-body,
 .portal-view .portlet-header,
-.portal-view .portlet-content,
-.portal-view .ui-sortable-placeholder {
+.portal-view .portlet-content {
 	overflow: hidden;
 	-webkit-box-sizing: border-box;
 	   -moz-box-sizing: border-box;
@@ -54,10 +53,10 @@
 	padding: 4px;
 }
 
-.portal-view .portlet {
+.portal > .portal-tabs,
+.portal > .portlet {
 	position: relative;
 	float: left;
-	min-height: 34px;
 }
 
 .portlet-header.navbar i {
@@ -117,6 +116,21 @@
 	border: none;
 }
 
+.portal-tabs {
+	margin-bottom: 4px;
+}
+
+.portal-tabs > .nav-tabs {
+	margin-bottom: 0;
+}
+
+.portal-tabs > .tab-content {
+	position: relative;
+	border: 1px solid #DDD;
+	border-top: 0;
+	background-color: #fff;
+}
+
 .portlet .portlet-content > .nvtooltip {
 	height: auto;
 }
@@ -129,9 +143,8 @@
 	display: none !important;
 }
 
-
 .portal-view .ui-sortable-placeholder {
-	border: 1px dashed #c9c9c9;
+	border: 2px dashed #c9c9c9;
 	visibility: visible !important;
 	
 	margin-bottom: 4px;
@@ -139,8 +152,4 @@
 	-webkit-border-radius: 4px;
 	   -moz-border-radius: 4px;
 			border-radius: 4px;
-}
-
-.portal-view .ui-sortable-placeholder * {
-	visibility: hidden;
 }
