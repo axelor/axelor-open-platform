@@ -36,17 +36,21 @@ PortalCtrl.$inject = ['$scope', '$element'];
 function PortalCtrl($scope, $element) {
 
 	var view = $scope._views['portal'];
-	var viewPromise = $scope.loadView('portal', view.name);
+	if (view.items) {
+		$scope.$timeout(function () {
+			$scope.parse(view);
+		});
+	} else {
+		$scope.loadView('portal', view.name).success(function(fields, schema){
+			$scope.parse(schema);
+		});
+	}
 
 	$scope.applyLater(function(){
 		if (view.deferred)
 			view.deferred.resolve($scope);
 	}, 0);
 
-	viewPromise.success(function(fields, schema){
-		$scope.parse(schema);
-	});
-	
 	$scope.parse = function(schema) {
 	};
 	
@@ -70,56 +74,77 @@ function PortalCtrl($scope, $element) {
 	};
 	
 	$scope.setRouteOptions = function(options) {
-		$scope.updateRoute();
+		if (!$scope.isNested) {
+			$scope.updateRoute();
+		}
 	};
-	
 }
 
-ui.directive('uiViewPortal', function(){
+var tmplPortlet =
+	'<div ui-view-portlet '+
+		'x-action="{{p.action}}" '+
+		'x-can-search="{{p.canSearch}}" '+
+		'x-col-span="{{p.colSpan}}" '+
+		'x-row-span="{{p.rowSpan}}" ' +
+		'x-height="{{p.height}}"></div>';
+
+var tmplTabs =
+	"<div ui-portal-tabs x-schema='p'></div>";
+
+ui.directive('uiViewPortal', ['$compile', function($compile) {
+	
 	return {
 		scope: true,
 		controller: PortalCtrl,
 		link: function(scope, element, attrs) {
 			
-			scope.parse = function(schema) {
-				scope.portletCols = schema.cols || 2;
-				scope.portlets = schema.items;
-			};
-			
-			setTimeout(function(){
+			function init() {
 				element.sortable({
 					handle: ".portlet-header",
-					items: "> .portlet",
-					scroll: true,
+					items: "> .portlet, > .portal-tabs",
 					forceHelperSize: true,
-					activate: function( event, ui ) {
+					forcePlaceholderSizeType: true,
+					activate2: function(event, ui) {
 						var width = ui.placeholder.width();
-						ui.placeholder.width(width - 3);
+						var height = ui.placeholder.height();
+						
+						ui.placeholder.width(width - 4);
+						ui.placeholder.height(height - 4);
+						
 						ui.placeholder.css({
 							'left': '2px',
 							'top': '2px',
 							'margin-right': '4px'
 						});
 					},
-					deactivate: function( event, ui ) {
+					deactivate: function(event, ui) {
 						axelor.$adjustSize();
 					}
 				});
-			});
+			}
+
+			scope.parse = function(schema) {
+				scope.portletCols = schema.cols || 2;
+				scope.portlets = schema.items;
+
+				_.each(scope.portlets, function (item) {
+					var tmpl = item.type === 'tabs' ? tmplTabs : tmplPortlet;
+					var child = scope.$new();
+					child.p = item;
+					
+					var elem = $compile(tmpl)(child);
+					
+					element.append(elem);
+				});
+
+				setTimeout(init);
+			};
 		},
 		replace: true,
 		transclude: true,
-		template:
-		'<div class="portal" ng-transclude>'+
-			'<div ui-view-portlet ng-repeat="p in portlets" '+
-				'x-action="{{p.action}}" '+
-				'x-can-search="{{p.canSearch}}" '+
-				'x-col-span="{{p.colSpan}}" '+
-				'x-row-span="{{p.rowSpan}}" ' +
-				'x-height="{{p.height}}"></div>'+
-		'</div>'
+		template: '<div class="portal" ng-transclude></div>'
 	};
-});
+}]);
 
 PortletCtrl.$inject = ['$scope', '$element', 'MenuService', 'DataSource', 'ViewService'];
 function PortletCtrl($scope, $element, MenuService, DataSource, ViewService) {
@@ -165,17 +190,34 @@ function PortletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 	});
 }
 
+function setPortletSize(scope, element, attrs) {
+	var cols = scope.portletCols;
+	var colSpan = +attrs.colSpan || 1;
+	var rowSpan = +attrs.rowSpan || 1;
+
+	var width = 100;
+	var height = (+attrs.height || 250) * rowSpan;
+	
+	width = (width / cols) * colSpan;
+
+	element.width(width + '%').height(height);
+}
+
 ui.directive('uiViewPortlet', ['$compile', function($compile){
 	return {
 		scope: true,
 		controller: PortletCtrl,
 		link: function(scope, element, attrs) {
-			setTimeout(function(){
-				scope.initPortlet(attrs.action);
+			
+			attrs.$observe('action', function (action) {
+				if (action) {
+					scope.initPortlet(action)
+				}
 			});
 			
 			var initialized = false;
 			scope.parsePortlet = function(view) {
+				
 				if (initialized) {
 					return;
 				}
@@ -189,17 +231,7 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 				scope.show();
 				
 				if (scope.portletCols) {
-
-					var cols = scope.portletCols;
-					var colSpan = +attrs.colSpan || 1;
-					var rowSpan = +attrs.rowSpan || 1;
-
-					var width = 100;
-					var height = (+attrs.height || 250) * rowSpan;
-					
-					width = (width / cols) * colSpan;
-				
-					element.width(width + '%').height(height);
+					setPortletSize(scope, element, attrs);
 				}
 			};
 			
@@ -252,5 +284,82 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 		'</div>'
 	};
 }]);
+
+ui.directive('uiPortalTabs',  function() {
+	return {
+		scope: {
+			schema: '='
+		},
+		replace: true,
+		link: function(scope, element, attrs) {
+			
+			var schema = scope.schema;
+			
+			var first = _.first(schema.tabs);
+			if (first) {
+				first.active = true;
+			}
+
+			scope.tabClick = function (tab) {
+				_.each(schema.tabs, function (item) {
+					item.active = false;
+				});
+				tab.active = true;
+				axelor.$adjustSize();
+			};
+			
+			scope.tabs = schema.tabs;
+			scope.portletCols = scope.$parent.portletCols;
+
+			setPortletSize(scope, element, {
+				colSpan: schema.colSpan,
+				rowSpan: schema.rowSpan,
+				height: schema.height
+			});
+			
+			element.height('auto');
+		},
+		template:
+			"<div class='tabbable-tabs portal-tabs'>" +
+				"<ul class='nav nav-tabs nav-tabs-scrollable'>" +
+					"<li ng-repeat='tab in tabs' ng-class='{active: tab.active}'>" +
+						"<a href='' ng-click='tabClick(tab)' >{{tab.title}}</a>" +
+					"</li>" +
+				"</ul>" +
+				"<div class='tab-content portal-tab-content'>" +
+					"<div ng-repeat='tab in tabs' ng-class='{active: tab.active}' class='tab-pane'>" +
+						"<div ui-portal-tab x-schema='tab'></div>" +
+					"</div>" +
+				"</div>" +
+			"</div>"
+	};
+	
+});
+
+ui.directive('uiPortalTab', function() {
+
+	return {
+		scope: {
+			schema: '='
+		},
+		controller: ['$scope', 'DataSource', 'ViewService', function ($scope, DataSource, ViewService) {
+			
+			var view = $scope.schema;
+			var params = {
+				viewType: 'portal',
+				views: [ view ]
+			};
+			
+			view.type = 'portal';
+			
+			$scope._viewParams = params;
+			$scope.isNested = true;
+			$scope._model = null;
+
+			ViewCtrl.apply(this, arguments);
+		}],
+		template: "<div ui-view-portal></div>"
+	};
+});
 
 })();
