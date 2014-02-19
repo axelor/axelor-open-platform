@@ -206,6 +206,10 @@ table.form-layout td.form-item.v-align-top {
 .form-item-container[style *= width] input {
 	min-width: inherit;
 }
+
+.slick-cell .form-item-container {
+	width: 100%;
+}
 /* end widget width */
 
 .form-item-container input,
