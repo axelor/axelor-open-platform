@@ -248,6 +248,9 @@ function SearchFormCtrl($scope, $element, ViewService) {
 	$scope._register('form', $scope);
 	$scope.setEditable();
 	
+	// prevent requesting defaults
+	$scope.defaultValues = {};
+	
 	$scope.$watch('_searchView', function(schema) {
 		if (schema == null) return;
 		var form = {
