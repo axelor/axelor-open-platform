@@ -822,6 +822,21 @@ table.field-details .help-text hr {
 	height: auto !important;
 }
 
+.tag-select .tag-editor {
+	position: absolute !important;
+	padding: 1px 4px !important;
+	padding-right: 4px !important;
+	box-shadow: none !important;
+	min-width: 10px !important;
+	height: auto !important;
+	border: 0 !important;
+
+	color: white;
+	background-color: #3a87ad;
+	font-weight: bold;
+	font-size: 11px;
+}
+
 .tag-select-action-menu .tag-select-action a {
 	font-style: oblique;
 	padding-left: 12px;
