@@ -652,7 +652,7 @@ img.prefix-icon {
 	margin-right: 4px;
 }
 
-[class^=icon-] {
+.icon, [class^=icon-] {
 	font-size: 14px;
 }
 

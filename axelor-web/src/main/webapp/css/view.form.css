@@ -249,8 +249,11 @@ table.form-layout fieldset {
 	padding-top: 1px;
 }
 
-.picker-input {
+.picker-input,
+.form-item .ui-spinner {
 	box-sizing: border-box;
+	position: relative;
+	display: inline-block;
 }
 
 .picker-input > input {
