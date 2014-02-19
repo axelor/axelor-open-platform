@@ -366,6 +366,44 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			response(items, page);
 		});
 	};
+	
+	$scope.createOnTheFly = function (term, popup, onSaveCallback) {
+
+		var field = $scope.field;
+		var targetFields = null;
+		var requiredFields = (field.create||"").split(/,\s*/);
+	
+		function createItem(fields, term, popup) {
+			var ds = $scope._dataSource,
+				data = {}, missing = false;
+	
+			_.each(fields, function(field) {
+				if (field.name === "name") return data["name"] = term;
+				if (field.name === "code") return data["code"] = term;
+				if (field.nameColumn) return data[field.name] = term;
+				if (requiredFields.indexOf(field.name) > -1) {
+					return data[field.name] = term;
+				}
+				if (field.required) {
+					missing = true;
+				}
+			});
+			if (popup || missing || _.isEmpty(data)) {
+				return $scope.showPopupEditor(data);
+			}
+			return ds.save(data).success(onSaveCallback);
+		}
+		
+
+		if (targetFields) {
+			return createItem(targetFields, term, popup);
+		}
+		
+		return $scope.loadView("form").success(function(fields, view){
+			targetFields = fields;
+			return createItem(fields, term, popup);
+		});
+	};
 
 	$scope.canSelect = function() {
 		if (field.canSelect !== undefined) return field.canSelect;
