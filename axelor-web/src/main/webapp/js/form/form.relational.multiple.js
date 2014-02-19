@@ -543,40 +543,11 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 		
 		var input = this.findInput(element);
 		var field = scope.field;
-		var targetFields = null;
-		var requiredFields = (field.create||"").split(/,\s*/);
 
-		function createItem(fields, term, popup) {
-			var ds = scope._dataSource,
-				data = {}, missing = false;
-
-			_.each(fields, function(field) {
-				if (field.name === "name") return data["name"] = term;
-				if (field.name === "code") return data["code"] = term;
-				if (field.nameColumn) return data[field.name] = term;
-				if (requiredFields.indexOf(field.name) > -1) {
-					return data[field.name] = term;
-				}
-				if (field.required) {
-					missing = true;
-				}
-			});
-			if (popup || missing || _.isEmpty(data)) {
-				return scope.showPopupEditor(data);
-			}
-			ds.save(data).success(function(record){
+		function create(term, popup) {
+			scope.createOnTheFly(term, popup, function (record) {
 				scope.select(record);
 				input.width(50);
-			});
-		}
-		
-		function create(term, popup) {
-			if (targetFields) {
-				return createItem(targetFields, term, popup);
-			}
-			scope.loadView("form").success(function(fields, view){
-				targetFields = fields;
-				return createItem(fields, term, popup);
 			});
 		}
 

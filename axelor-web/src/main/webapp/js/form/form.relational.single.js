@@ -208,6 +208,12 @@ ui.formInput('ManyToOne', 'Select', {
 		this._super.apply(this, arguments);
 		var input = this.findInput(element);
 
+		function create(term, popup) {
+			scope.createOnTheFly(term, popup, function (record) {
+				scope.select(record);
+			});
+		}
+
 		scope.loadSelection = function(request, response) {
 
 			if (!scope.canSelect()) {
@@ -215,13 +221,27 @@ ui.formInput('ManyToOne', 'Select', {
 			}
 
 			this.fetchSelection(request, function(items, page) {
+				var term = request.term;
+				
 				if (scope.canSelect() && (!page || page.total > items.length)) {
 					items.push({
 						label: _t("Search..."),
 						click: function() { scope.showSelector(); }
 					});
 				}
-				if (scope.canNew()) {
+				
+				if (term && scope.canNew()) {
+					items.push({
+						label : _t('Create "{0}" and select...', '<b>' + term + '</b>'),
+						click : function() { create(term); }
+					});
+					items.push({
+						label : _t('Create "{0}"...', '<b>' + term + '</b>'),
+						click : function() { create(term, true); }
+					});
+				}
+				
+				if (!term && scope.canNew()) {
 					items.push({
 						label: _t("Create..."),
 						click: function() { scope.showPopupEditor(); }
