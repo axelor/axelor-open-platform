@@ -132,8 +132,11 @@ table.form-layout td.form-label label.readonly {
 
 table.form-layout td.form-item > *,
 .form-item-container > * {
-	width: 100%;
 	margin: 0 !important;
+}
+
+.form-item-container > * {
+	width: 100%;
 }
 
 table.form-layout td.form-item.v-align-top {
@@ -158,12 +161,52 @@ table.form-layout td.form-item.v-align-top {
 .form-item-container input {
 	height: 26px;
 	padding: 2px 6px;
-	min-width: 170px;
+}
+
+/* start widget width */
+.form-item .button-item {
+	width: auto;
+}
+
+.form-item .button-group .button-item {
+	width: 100%;
+}
+
+.form-item-container.email-item,
+.form-item-container.string-item,
+.form-item-container.select-item,
+.form-item-container.multi-select-item,
+.form-item-container.many2one-item,
+.form-item-container.many2many-tags {
+	width: 250px;
+}
+
+.form-item-container.integer-item,
+.form-item-container.datetime-item {
+	min-width: 120px;
+	width: 140px;
+}
+
+.form-item-container.time-item {
+	width: 60px;
+	min-width: 40px;
+}
+
+.form-item-container.text-item,
+.form-item-container.text-item textarea {
+	width: 100%;
+}
+
+.form-item-container.readonly,
+.form-item-container.editable input {
+	min-width: inherit;
+	width: 100%;
 }
 
 .form-item-container[style *= width] input {
 	min-width: inherit;
 }
+/* end widget width */
 
 .form-item-container input,
 .form-item-container input:focus,

@@ -768,6 +768,9 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 						item.attr('ui-table-layout', '');
 					}
 				}
+				if (type === 'group' && _.all(items, function (x){ return x.type === 'button'; })) {
+					item.addClass('button-group');
+				}
 			});
 			return parent;
 		}
