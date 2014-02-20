@@ -175,6 +175,10 @@ public class ViewService extends AbstractService {
 		final List<Object> fields = Lists.newArrayList();
 
 		boolean massUpdate = false;
+		Object bean = null;
+		try {
+			bean = modelClass.newInstance();
+		} catch (Exception e) {}
 
 		for(String name : names) {
 			Property p = findField(mapper, name);
@@ -190,6 +194,12 @@ public class ViewService extends AbstractService {
 				}
 				if (p.isMassUpdate()) {
 					massUpdate = true;
+				}
+				if (bean != null && !p.isTransient() && !p.isVirtual()) {
+					Object defaultValue = p.get(bean);
+					if (defaultValue != null) {
+						map.put("defaultValue", defaultValue);
+					}
 				}
 				fields.add(map);
 			}
