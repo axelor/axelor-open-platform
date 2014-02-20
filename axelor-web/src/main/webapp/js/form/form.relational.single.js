@@ -307,11 +307,16 @@ ui.formInput('ManyToOne', 'Select', {
 			} else {
 				scope.select(ui.item.value);
 			}
+			setTimeout(adjustPadding, 100);
 			scope.applyLater();
 		};
 		
 		scope.$render_editable = function() {
-			input.val(scope.getText());
+			if (!scope.canShowTag) {
+				input.val(scope.getText());
+			} else {
+				setTimeout(adjustPadding, 100);
+			}
 		};
 		
 		if (scope.field && scope.field['tag-edit']) {
@@ -328,6 +333,22 @@ ui.formInput('ManyToOne', 'Select', {
 		scope.onTagRemove = function (e) {
 			scope.setValue(null);
 		};
+
+		function adjustPadding() {
+			var tag = element.find('span.tag-link');
+			if (tag.size() && tag.is(':visible')) {
+				input.css('padding-left', tag.width() + 24);
+			} else {
+				input.css('padding-left', '');
+			}
+			if (scope.canShowTag) {
+				input.val('');
+			}
+		}
+		
+		if (scope.canShowTag) {
+			input.focus(adjustPadding);
+		}
 	},
 	template_editable:
 	'<div class="picker-input picker-icons-3 tag-select-single">'+
