@@ -207,14 +207,6 @@ public class RestService extends ResourceService {
 		return getResource().getRecordName(request);
 	}
 	
-	@GET
-	@Path("defaults")
-	public Response defaults() {
-		Request request = new Request();
-		request.setModel(getModel());
-		return getResource().getDefaults(request);
-	}
-
 	private static String uploadPath = AppSettings.get().getPath("file.upload.dir", "{java.io.tmpdir}/attachments");
 
 	private void uploadSave(InputStream in, OutputStream out) throws IOException {

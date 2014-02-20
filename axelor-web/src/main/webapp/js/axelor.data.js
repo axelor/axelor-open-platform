@@ -728,25 +728,6 @@
 				return promise;
 			},
 			
-			defaults: function() {
-				var promise = this._request('defaults').get();
-				promise.success = function(fn){
-					promise.then(function(response){
-						var res = response.data,
-							record = res.data;
-						if (isArray(record))
-							record = record[0];
-						fn(record);
-					});
-					return promise;
-				};
-				promise.error = function(fn) {
-					promise.then(null, fn);
-					return promise;
-				};
-				return promise;
-			},
-			
 			/**
 			 * Get current page info.
 			 * 

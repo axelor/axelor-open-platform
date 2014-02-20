@@ -376,9 +376,11 @@ function FormViewCtrl($scope, $element) {
 		
 		function afterVewLoaded() {
 			if ($scope.defaultValues === null) {
-				return ds.defaults().success(function (defaults) {
-					$scope.defaultValues = defaults;
-					return handleOnNew();
+				$scope.defaultValues = {};
+				_.each($scope.fields, function (field, name) {
+					if (field.defaultValue !== undefined) {
+						$scope.defaultValues[name] = field.defaultValue;
+					}
 				});
 			}
 			return handleOnNew();
