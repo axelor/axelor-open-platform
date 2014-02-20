@@ -99,7 +99,10 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		// end fetch '.' names
 
 		if (value && value.id) {
-			record = { 'id' : value.id };
+			record = {
+				id: value.id,
+				$version: value.version || value.$version
+			};
 			record[nameField] = value[nameField];
 			if (nameField && _.isUndefined(value[nameField])) {
 				return ds.details(value.id).success(function(rec){
@@ -154,6 +157,8 @@ ui.formInput('ManyToOne', 'Select', {
 	init: function(scope) {
 		this._super(scope);
 
+		scope.canShowTag = scope.field['tag-edit'];
+		
 		scope.formatItem = function(item) {
 			if (item) {
 				return item[(scope.field.targetName || "id")];
@@ -308,10 +313,29 @@ ui.formInput('ManyToOne', 'Select', {
 		scope.$render_editable = function() {
 			input.val(scope.getText());
 		};
+		
+		if (scope.field && scope.field['tag-edit']) {
+			scope.attachTagEditor(scope, element, attrs);
+		}
+		
+		scope.onTagSelect = function (e) {
+			if (scope.canEdit()) {
+				return scope.onTagEdit(e, scope.getValue());
+			}
+			scope.onEdit();
+		};
+
+		scope.onTagRemove = function (e) {
+			scope.setValue(null);
+		};
 	},
 	template_editable:
-	'<div class="picker-input picker-icons-3">'+
+	'<div class="picker-input picker-icons-3 tag-select-single">'+
 		'<input type="text" autocomplete="off">'+
+		'<span class="tag-item label label-info" ng-if="canShowTag" ng-show="text">'+
+			'<span class="tag-link tag-text" ng-click="onTagSelect($event)">{{text}}</span> '+
+			'<i class="icon-remove icon-small" ng-click="onTagRemove($event)"></i>'+
+		'</span>'+
 		'<span class="picker-icons">'+
 			'<i class="icon-eye-open" ng-click="onSummary()" ng-show="hasPermission(\'read\') && _viewParams.summaryView && canToggle()"></i>'+
 			'<i class="icon-pencil" ng-click="onEdit()" ng-show="hasPermission(\'read\') && canView() && canEdit()" title="{{\'Edit\' | t}}"></i>'+

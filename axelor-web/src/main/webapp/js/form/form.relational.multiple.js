@@ -534,8 +534,8 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 		};
 		
 		scope.handleClick = function(e, item) {
-			if (scope.field.inline && scope.editInline && !scope.isReadonly()) {
-				return scope.editInline(e, item);
+			if (scope.field['tag-edit'] && scope.onTagEdit && !scope.isReadonly()) {
+				return scope.onTagEdit(e, item);
 			}
         	scope.showEditor(item);
         };
@@ -546,63 +546,6 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 		
 		var input = this.findInput(element);
 		var field = scope.field;
-		var inline = null;
-
-		scope.editInline = function editInline(e, item) {
-			
-			var elem = $(e.target);
-			var value = item[field.targetName];
-
-			function onKeyDown(e) {
-
-				// enter key
-				if (e.keyCode === 13) {
-					item[field.targetName] = $(e.target).val();
-					saveAndSelect(item);
-					hideEditor();
-				}
-
-				// escape
-				if (e.keyCode === 27) {
-					hideEditor();
-				}
-			}
-
-			function hideEditor() {
-				$(document).off('mousedown.tag-editor');
-				$(inline).off('keydown.tag-editor').hide();
-			}
-
-			if (inline === null) {
-				inline = $('<input class="tag-editor" type="text">').appendTo(element);
-			}
-
-			inline.val(value)
-				.width(elem.parent().outerWidth() + 2)
-				.show().focus()
-				.position({
-					my: 'left top',
-					at: 'left-5 top-2',
-					of: elem
-				});
-
-			$(inline).on('keydown.tag-editor', onKeyDown);
-			$(document).on('mousedown.tag-editor', function (e) {
-				if (!inline.is(e.target)) {
-					hideEditor();
-				}
-			});
-		};
-
-		function saveAndSelect(record) {
-        	var ds = scope._dataSource;
-        	var data = _.extend({}, record, {
-        		version: record.version || record.$version
-        	});
-        	ds.save(data).success(function (rec) {
-        		scope.select(rec);
-        	});
-        }
 
         function create(term, popup) {
 			scope.createOnTheFly(term, popup, function (record) {
@@ -693,6 +636,10 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 			if (field.canRemove === false) return;
 			_removeItem.apply(this, arguments);
 		};
+
+		if (scope.field && scope.field['tag-edit']) {
+			scope.attachTagEditor(scope, element, attrs);
+		}
 	}
 });
 
