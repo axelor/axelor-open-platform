@@ -424,7 +424,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 
 				// enter key
 				if (e.keyCode === 13) {
-					item[field.targetName] = $(e.target).val();
+					item[field.targetName] = input.val();
 					saveAndSelect(item);
 					hideEditor();
 				}
@@ -435,9 +435,15 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 				}
 			}
 
-			function hideEditor() {
+			function hideEditor(forceSave) {
+				
 				$(document).off('mousedown.tag-editor');
 				$(input).off('keydown.tag-editor').hide();
+				
+				if (forceSave && value !== input.val()) {
+					item[field.targetName] = input.val();
+					saveAndSelect(item);
+				}
 			}
 
 			if (input === null) {
@@ -445,18 +451,18 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			}
 
 			input.val(value)
-				.width(elem.parent().outerWidth() + 2)
+				.width(element.width() - 6)
 				.show().focus()
 				.position({
 					my: 'left top',
-					at: 'left-5 top-2',
-					of: elem
+					at: 'left+3 top+3',
+					of: element
 				});
 
 			$(input).on('keydown.tag-editor', onKeyDown);
 			$(document).on('mousedown.tag-editor', function (e) {
 				if (!input.is(e.target)) {
-					hideEditor();
+					hideEditor(true);
 				}
 			});
 		}
