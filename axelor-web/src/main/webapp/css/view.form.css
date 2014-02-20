@@ -854,6 +854,11 @@ table.field-details .help-text hr {
 .tag-select .tag-link,
 .tag-select-single .tag-link {
 	cursor: pointer;
+	display: inline-block;
+	max-width: 140px;
+	height: 11px;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .tag-select .tag-link:hover,
