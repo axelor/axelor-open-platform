@@ -841,7 +841,8 @@ table.field-details .help-text hr {
 	
 }
 
-.tag-select li.tag-item i {
+.tag-select li.tag-item i,
+.tag-select-single .tag-item i {
 	font-size: 10px;
 	cursor: pointer;
 }
@@ -850,11 +851,13 @@ table.field-details .help-text hr {
 
 }
 
-.tag-select .tag-link {
+.tag-select .tag-link,
+.tag-select-single .tag-link {
 	cursor: pointer;
 }
 
-.tag-select .tag-link:hover {
+.tag-select .tag-link:hover,
+.tag-select-single .tag-link:hover {
 	text-decoration: underline;
 }
 
@@ -872,7 +875,14 @@ table.field-details .help-text hr {
 	height: auto !important;
 }
 
-.tag-select .tag-editor {
+.tag-select-single .tag-item {
+	position: absolute;
+	left: 4px;
+	top: 4px;
+}
+
+.tag-select .tag-editor,
+.tag-select-single .tag-editor {
 	position: absolute !important;
 	padding: 1px 4px !important;
 	padding-right: 4px !important;

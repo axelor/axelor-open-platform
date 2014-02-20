@@ -404,6 +404,75 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			return createItem(fields, term, popup);
 		});
 	};
+	
+	$scope.attachTagEditor = function attachTagEditor(scope, element, attrs) {
+
+		var field = scope.field;
+		var input = null;
+		
+		if (!field.target) {
+			return;
+		}
+
+		function onTagEdit(e, item) {
+
+			var elem = $(e.target);
+			var field = scope.field;
+			var value = item[field.targetName];
+			
+			function onKeyDown(e) {
+
+				// enter key
+				if (e.keyCode === 13) {
+					item[field.targetName] = $(e.target).val();
+					saveAndSelect(item);
+					hideEditor();
+				}
+
+				// escape
+				if (e.keyCode === 27) {
+					hideEditor();
+				}
+			}
+
+			function hideEditor() {
+				$(document).off('mousedown.tag-editor');
+				$(input).off('keydown.tag-editor').hide();
+			}
+
+			if (input === null) {
+				input = $('<input class="tag-editor" type="text">').appendTo(element);
+			}
+
+			input.val(value)
+				.width(elem.parent().outerWidth() + 2)
+				.show().focus()
+				.position({
+					my: 'left top',
+					at: 'left-5 top-2',
+					of: elem
+				});
+
+			$(input).on('keydown.tag-editor', onKeyDown);
+			$(document).on('mousedown.tag-editor', function (e) {
+				if (!input.is(e.target)) {
+					hideEditor();
+				}
+			});
+		}
+		
+		function saveAndSelect(record) {
+        	var ds = scope._dataSource;
+        	var data = _.extend({}, record, {
+        		version: record.version || record.$version
+        	});
+        	ds.save(data).success(function (rec) {
+        		scope.select(rec);
+        	});
+        }
+
+		scope.onTagEdit = onTagEdit;
+	};
 
 	$scope.canSelect = function() {
 		if (field.canSelect !== undefined) return field.canSelect;
