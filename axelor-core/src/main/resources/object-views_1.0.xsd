@@ -208,7 +208,15 @@
     </xsd:complexContent>
   </xsd:complexType>
 
-  <xsd:complexType name="AbstractWidget" abstract="true" />
+  <xsd:complexType name="AbstractWidget" abstract="true">
+    <xsd:attribute name="if-module" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Only use the widget if the given module is installed.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
 
   <xsd:complexType name="SimpleWidget" abstract="true">
     <xsd:complexContent>

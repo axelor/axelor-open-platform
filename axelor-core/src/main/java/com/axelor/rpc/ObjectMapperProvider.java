@@ -34,6 +34,7 @@ import groovy.lang.GString;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Provider;
@@ -44,15 +45,22 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
+import com.axelor.meta.loader.ModuleManager;
+import com.axelor.meta.schema.views.AbstractWidget;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 
@@ -135,6 +143,47 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 			}
 		}
 	}
+
+	static class WidgetListSerializer extends JsonSerializer<List<AbstractWidget>> {
+
+		@Override
+		public void serialize(List<AbstractWidget> value, JsonGenerator jgen,
+				SerializerProvider provider) throws IOException,
+				JsonProcessingException {
+			
+			if (value == null) {
+				return;
+			}
+
+			jgen.writeStartArray();
+			
+			for (AbstractWidget widget : value) {
+				String module = widget.getModuleToCheck();
+				if (StringUtils.isBlank(module) || ModuleManager.isInstalled(module)) {
+					jgen.writeObject(widget);
+				}
+			}
+			
+			jgen.writeEndArray();
+		}
+	}
+
+	static class ListSerializerModifier extends BeanSerializerModifier {
+
+		private WidgetListSerializer listSerializer = new WidgetListSerializer();
+		
+		@Override
+		public JsonSerializer<?> modifyCollectionSerializer(
+				SerializationConfig config, CollectionType valueType,
+				BeanDescription beanDesc, JsonSerializer<?> serializer) {
+
+			if (AbstractWidget.class.isAssignableFrom(valueType.getContentType().getRawClass())) {
+				return listSerializer;
+			}
+
+			return serializer;
+		}
+	}
 	
 	public ObjectMapperProvider() {
 		mapper = new ObjectMapper();
@@ -146,6 +195,8 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 		module.addSerializer(Model.class, new ModelSerializer());
 		module.addSerializer(GString.class, new GStringSerializer());
 		module.addSerializer(BigDecimal.class, new DecimalSerializer());
+
+		module.setSerializerModifier(new ListSerializerModifier());
 
 		JodaModule jodaModule = new JodaModule();
 		jodaModule.addSerializer(DateTime.class, new DateTimeSerializer());

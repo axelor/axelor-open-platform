@@ -33,6 +33,7 @@ package com.axelor.meta.schema.views;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAnyAttribute;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
@@ -62,13 +63,24 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 	@Type(Portlet.class)
 })
 public abstract class AbstractWidget {
-
+	
+	@XmlAttribute(name = "if-module")
+	private String moduleToCheck;
+	
 	@XmlAnyAttribute
 	private Map<QName, String> otherAttributes;
 	
 	@XmlTransient
 	@JsonIgnore
 	private String model;
+	
+	public String getModuleToCheck() {
+		return moduleToCheck;
+	}
+
+	public void setModuleToCheck(String moduleToCheck) {
+		this.moduleToCheck = moduleToCheck;
+	}
 	
 	public Map<QName, String> getOtherAttributes() {
 		return otherAttributes;
