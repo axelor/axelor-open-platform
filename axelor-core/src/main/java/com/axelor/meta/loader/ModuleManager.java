@@ -232,6 +232,11 @@ public class ModuleManager {
 		module.setInstalledVersion(module.getVersion());
 	}
 
+	public static boolean isInstalled(String module) {
+		final Module mod = resolver.get(module);
+		return mod != null && mod.isInstalled();
+	}
+
 	public static List<String> findInClassPath(boolean includeRemovables) {
 		final Resolver resolver = new Resolver();
 		final List<String> found = Lists.newArrayList();
