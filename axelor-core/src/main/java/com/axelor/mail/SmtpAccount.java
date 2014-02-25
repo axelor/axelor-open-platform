@@ -15,8 +15,12 @@ import com.google.common.base.Preconditions;
  */
 public class SmtpAccount implements MailAccount {
 
-	private static final String DEFAULT_PORT = "25";
+	public static final String ENCRYPTION_TLS = "tls";
 
+	public static final String ENCRYPTION_SSL = "ssl";
+	
+	private static final String DEFAULT_PORT = "25";
+	
 	private String host;
 	private String port;
 	private String user;
@@ -74,10 +78,10 @@ public class SmtpAccount implements MailAccount {
 			return Session.getInstance(props);
 		}
 		
-		if ("tls".equals(encryption)) {
+		if (ENCRYPTION_TLS.equals(encryption)) {
 			props.setProperty("mail.smtp.starttls.enable", "true");
 		}
-		if ("ssl".equals(encryption)) {
+		if (ENCRYPTION_SSL.equals(encryption)) {
 			props.setProperty("mail.smtp.socketFactory.port", port);
 			props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 		}
