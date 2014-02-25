@@ -13,8 +13,6 @@ public class MailSenderTest extends AbstractTest {
 	private static final String SMTP_USER = "my.name@gmail.com";
 	private static final String SMTP_PASS = "secret";
 
-	private static final String SMPT_ENCRYPTION = "tls";
-	
 	private static final String SEND_TO = "my.name@gmail.com";
 
 	@Test
@@ -24,7 +22,7 @@ public class MailSenderTest extends AbstractTest {
 			return;
 		}
 
-		MailAccount account = new SmtpAccount(SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMPT_ENCRYPTION);
+		MailAccount account = new SmtpAccount(SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SmtpAccount.ENCRYPTION_SSL);
 		MailSender sender = new MailSender(account);
 
 		String file = ClassUtils.getResource("log4j.properties").getFile();
