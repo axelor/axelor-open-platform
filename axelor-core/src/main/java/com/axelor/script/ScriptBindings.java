@@ -46,6 +46,7 @@ import com.axelor.rpc.Context;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class ScriptBindings extends SimpleBindings {
 
@@ -99,11 +100,11 @@ public class ScriptBindings extends SimpleBindings {
 		case "__self__":
 			Model bean = ((Context) variables).asType(Model.class);
 			if (bean == null || bean.getId() == null) return null;
-			return JPA.find(bean.getClass(), bean.getId());
+			return JPA.em().getReference(bean.getClass(), bean.getId());
 		case "__ref__":
 			Map values = (Map) variables.get("_ref");
 			Class<?> klass = Class.forName((String) values.get("_model"));
-			return JPA.em().find(klass, Long.parseLong(values.get("id").toString()));
+			return JPA.em().getReference(klass, Long.parseLong(values.get("id").toString()));
 		}
 		return null;
 	}
@@ -120,6 +121,14 @@ public class ScriptBindings extends SimpleBindings {
 			return true;
 		}
 		return variables.containsKey(key);
+	}
+
+	@Override
+	public Set<String> keySet() {
+		Set<String> keys = Sets.newHashSet(super.keySet());
+		keys.addAll(META_VARS);
+		keys.addAll(variables.keySet());
+		return keys;
 	}
 
 	@Override
