@@ -184,6 +184,12 @@
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
     </dependency>
+    
+    <!-- StringTemplate -->
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>ST4</artifactId>
+    </dependency>
 
     <!-- OpenCSV -->
     <dependency>
