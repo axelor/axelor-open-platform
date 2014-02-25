@@ -64,7 +64,7 @@ public class TestWS extends MetaTest {
 		
 		Map<String, Object> data = Maps.newHashMap();
 		request.setData(data);
-		request.setModel("com.axelor.meta.db.Contact");
+		request.setModel("com.axelor.test.db.Contact");
 		
 		data.put("action", actions);
 		data.put("context", context);
@@ -141,7 +141,7 @@ public class TestWS extends MetaTest {
 	@Test
 	public void test3() throws Exception {
 		prepareTest3();
-		Contact c = Contact.all().fetchOne();
+		Contact c = Contact.all().filter("self.email = ?", "john.smith@gmail.com").fetchOne();
 		Map<String, Object> context = ImmutableMap.<String, Object>of("person", c);
 		
 		ActionHandler actionHandler = createHandler("dummy", context);
