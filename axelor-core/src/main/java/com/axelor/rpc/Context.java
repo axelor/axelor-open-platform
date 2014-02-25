@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.axelor.db.JPA;
+import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.google.common.base.Preconditions;
@@ -74,12 +75,27 @@ import com.google.common.collect.Maps;
 public class Context extends HashMap<String, Object> {
 
 	private static final long serialVersionUID = -5405070533303843069L;
+	
+	private static final String FIELD_ID = "id";
+	private static final String FIELD_VERSION = "version";
+	private static final String FIELD_SELECTED = "selected";
+
+	private static final String KEY_MODEL = "_model";
+	private static final String KEY_PARENT = "_parent";
+	private static final String KEY_PARENT_CONTEXT = "parentContext";
 
 	private Object beanInstance;
 
 	private Context(Map<String, Object> data, Object bean) {
 		super(data);
 		this.beanInstance = bean;
+	}
+	
+	public static <T extends Model> Context create(T bean) {
+		Preconditions.checkNotNull(bean, "Context object can't be null");
+		Map<String, Object> vars = Mapper.toMap(bean);
+		vars.put(KEY_MODEL, bean.getClass());
+		return new Context(vars, bean);
 	}
 
 	@SuppressWarnings("all")
@@ -89,16 +105,16 @@ public class Context extends HashMap<String, Object> {
 
 		if (value instanceof Map) {
 			Map map = (Map) value;
-			Object id = map.get("id");
+			Object id = map.get(FIELD_ID);
 			// if new/updated then create map
-			if (map.containsKey("version") || id == null) {
+			if (map.containsKey(FIELD_VERSION) || id == null) {
 				Context ctx =  create(map, p.getTarget());
 				bean = ctx.beanInstance;
 			} else {
 				bean = JPA.find((Class) p.getTarget(), Long.parseLong(id.toString()));
 			}
-			if (bean != null && map.containsKey("selected"))
-				Mapper.of(p.getTarget()).set(bean, "selected", map.get("selected"));
+			if (bean != null && map.containsKey(FIELD_SELECTED))
+				Mapper.of(p.getTarget()).set(bean, FIELD_SELECTED, map.get(FIELD_SELECTED));
 		}
 
 		return bean;
@@ -124,9 +140,9 @@ public class Context extends HashMap<String, Object> {
 			Property p = mapper.getProperty(name);
 
 			if (p == null) {
-				if ("_parent".equals(name)) {
+				if (KEY_PARENT.equals(name)) {
 					try {
-						Class<?> parentClass = Class.forName((String) ((Map) value).get("_model"));
+						Class<?> parentClass = Class.forName((String) ((Map) value).get(KEY_MODEL));
 						value = create((Map) value, parentClass);
 					} catch (Exception e) {
 					}
@@ -186,12 +202,12 @@ public class Context extends HashMap<String, Object> {
 	}
 
 	public Context getParentContext() {
-		return (Context) this.get("_parent");
+		return (Context) this.get(KEY_PARENT);
 	}
 
 	@Override
 	public boolean containsKey(Object key) {
-		if ("parentContext".equals(key)) {
+		if (KEY_PARENT_CONTEXT.equals(key)) {
 			return true;
 		}
 		return super.containsKey(key);
@@ -199,7 +215,7 @@ public class Context extends HashMap<String, Object> {
 
 	@Override
 	public Object get(Object key) {
-		if ("parentContext".equals(key)) {
+		if (KEY_PARENT_CONTEXT.equals(key)) {
 			return getParentContext();
 		}
 		return super.get(key);
