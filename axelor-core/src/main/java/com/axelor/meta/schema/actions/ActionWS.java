@@ -31,6 +31,7 @@
 package com.axelor.meta.schema.actions;
 
 import groovy.util.slurpersupport.GPathResult;
+import groovy.xml.XmlUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -47,8 +48,8 @@ import wslite.soap.SOAPResponse;
 
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
-import com.axelor.meta.TemplateHelper;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -121,10 +122,13 @@ public class ActionWS extends Action {
 		SOAPClient client = new SOAPClient(location);
 		SOAPResponse response = client.send(params, payload);
 
-		GPathResult gpath = (GPathResult) response.getBody();
-		gpath = gpath.children();
+		GPathResult gpath = ((GPathResult) response.getBody()).children();
+		String ns = gpath.lookupNamespace("");
+		if (ns != null) {
+			gpath.declareNamespace(ImmutableMap.of(":", ns));
+		}
 
-		return TemplateHelper.serialize(gpath);
+		return XmlUtil.serialize(gpath);
 	}
 
 	private String getService(ActionWS ref, ActionHandler handler) {

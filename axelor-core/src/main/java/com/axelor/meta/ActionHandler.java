@@ -30,7 +30,6 @@
  */
 package com.axelor.meta;
 
-import groovy.lang.Binding;
 import groovy.xml.XmlUtil;
 
 import java.io.File;
@@ -61,6 +60,8 @@ import com.axelor.rpc.Context;
 import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
+import com.axelor.text.GroovyTemplates;
+import com.axelor.text.Templates;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -86,6 +87,8 @@ public final class ActionHandler {
 	private ScriptBindings bindings;
 
 	private ScriptHelper scriptHelper;
+	
+	private Templates templates;
 
 	private Pattern pattern = Pattern.compile("^(select\\[\\]|select|action|call|eval):\\s*(.*)");
 
@@ -103,6 +106,7 @@ public final class ActionHandler {
 
 		this.context = context;
 
+		this.templates = new GroovyTemplates();
 		this.scriptHelper = new GroovyScriptHelper(this.context);
 		this.bindings = this.scriptHelper.getBindings();
 	}
@@ -311,7 +315,7 @@ public final class ActionHandler {
 
 		bindings.put("__fmt__", new FormatHelper());
 
-		return TemplateHelper.make(text, new Binding(bindings));
+		return templates.fromText(text).make(bindings).render();
 	}
 
 	@SuppressWarnings("all")
