@@ -29,7 +29,7 @@
         </div>
         <div class="btn-group" ui-btn-group-helper>
           <button class="btn" ui-show="hasAuditLog()" ng-click="onShowLog($event)"><i class="icon icon-eye-open"></i></button>
-          <button class="btn" ui-show="canShowAttachments()" ng-click="onShowAttachments()"><i class="icon icon-pushpin"></i><sub ng-if="record.$attachments"> {{record.$attachments}}</sub></button>
+          <button class="btn" ui-show="canShowAttachments()" ng-click="onShowAttachments()" ng-class="{'has-attachments': record.$attachments}"><i class="icon icon-pushpin"></i><sub ng-if="record.$attachments"> {{record.$attachments}}</sub></button>
           <button class="btn" ui-show="hasHelp()" ng-click="onShowHelp()"><i class="icon icon-info-sign"></i></button>
         </div>
         <div class="btn-group" ng-if="toolbar" ui-btn-group-helper>
