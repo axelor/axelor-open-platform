@@ -880,10 +880,17 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 				return;
 			}
 
-			names = _.pluck(form.$error.required, '$name');
-			names = _.compact(names);
-			
-			if (names.length === 0) {
+			var elems = element.find('[x-field].ng-invalid:not(fieldset)');
+			var items = elems.map(function () {
+				return {
+					name: $(this).attr('x-field'),
+					title: $(this).attr('x-title'),
+				};
+			});
+
+			items = _.compact(items);
+
+			if (items.length === 0) {
 				return;
 			}
 			
@@ -896,18 +903,17 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 				});
 			}
 
-			names = _.map(names, function(name) {
-				var field = scope.fields[name];
-				var value = name;
-				if (field && field.title) {
-					value = translatted[name] || field.title;
+			items = _.map(items, function(item) {
+				var value = item.title;
+				if (item.name) {
+					value = translatted[item.name] || value;
 				}
 				return '<li>' + value + '</li>';
 			});
 
-			names = '<ul>' + names.join('') + '</ul>';
+			items = '<ul>' + items.join('') + '</ul>';
 			
-			axelor.notify.error(names, {
+			axelor.notify.error(items, {
 				title: _t("The following fields are invalid:")
 			});
 		};
