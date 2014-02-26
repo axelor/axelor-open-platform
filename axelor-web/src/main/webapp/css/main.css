@@ -507,8 +507,8 @@ input[readonly], select[readonly], textarea[readonly] {
 	display: inline-block;
 	font-size: 13px;
 	font-weight: bold;
-	padding-top: 6px;
-	padding-left: 6px;
+	padding-top: 10px;
+	padding-left: 8px;
 }
 
 .record-toolbar .dropdown a.dropdown-toggle {
