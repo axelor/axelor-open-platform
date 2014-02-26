@@ -80,6 +80,7 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 
 		$scope._searchView = schema;
 		$scope._showSingle = params.params && params.params._showSingle;
+		$scope._forceEdit = params.params && params.params.forceEdit;
 		
 		$scope.updateRoute();
 		
@@ -350,6 +351,10 @@ function SearchGridCtrl($scope, $element, ViewService) {
 			if (name) view.name = name;
 			return view;
 		});
+		
+		if (force === undefined) {
+			force = $scope._forceEdit;
+		}
 
 		var tab = {
 			action: _.uniqueId('$act'),
