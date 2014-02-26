@@ -89,7 +89,7 @@ public class ActionResponse extends Response {
 	/**
 	 * Set a flash message.
 	 * <p>
-	 * This message will be shown on the client screen.
+	 * This message will be shown on the client screen as a dialog.
 	 * </p>
 	 * 
 	 * @param flash
@@ -97,6 +97,19 @@ public class ActionResponse extends Response {
 	 */
 	public void setFlash(String flash) {
 		set("flash", flash);
+	}
+
+	/**
+	 * Set a notification message.
+	 * <p>
+	 * The message will be show on the client screen as a notification.
+	 * </p>
+	 * 
+	 * @param message
+	 *            the message to show on client
+	 */
+	public void setNotify(String message) {
+		set("notify", message);
 	}
 
 	/**

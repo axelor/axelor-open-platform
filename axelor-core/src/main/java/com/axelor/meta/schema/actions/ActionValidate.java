@@ -84,12 +84,17 @@ public class ActionValidate extends ActionIndex {
 	@XmlType
 	public static class Info extends Validator {
 	}
+	
+	@XmlType
+	public static class Notify extends Validator {
+	}
 
 	@JsonIgnore
 	@XmlElements({
 		@XmlElement(name = "error", type = Error.class),
 		@XmlElement(name = "alert", type = Alert.class),
 		@XmlElement(name = "info", type = Info.class),
+		@XmlElement(name = "notify", type = Notify.class)
 	})
 	private List<Validator> validators;
 
@@ -105,6 +110,7 @@ public class ActionValidate extends ActionIndex {
 	public Object evaluate(ActionHandler handler) {
 
 		final List<String> info = Lists.newArrayList();
+		final List<String> notify = Lists.newArrayList();
 		final Map<String, Object> result = Maps.newHashMap();
 
 		for (int i = getIndex(); i < validators.size(); i++) {
@@ -125,6 +131,10 @@ public class ActionValidate extends ActionIndex {
 				info.add(value);
 				continue;
 			}
+			if (validator instanceof Notify) {
+				notify.add(value);
+				continue;
+			}
 
 			result.put(key, value);
 
@@ -139,16 +149,21 @@ public class ActionValidate extends ActionIndex {
 			if (!info.isEmpty()) {
 				result.put("info", info);
 			}
+			if (!notify.isEmpty()) {
+				result.put("notify", notify);
+			}
 
 			return result;
 		}
-		
-		if (info.isEmpty()) {
-			return null;
+
+		if (!info.isEmpty()) {
+			result.put("info", info);
+		}
+		if (!notify.isEmpty()) {
+			result.put("notify", notify);
 		}
 
-		result.put("info", info);
-		return result;
+		return result.isEmpty() ? null : result;
 	}
 
 	@Override

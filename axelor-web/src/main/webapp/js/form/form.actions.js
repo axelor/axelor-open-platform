@@ -367,11 +367,11 @@ ActionHandler.prototype = {
 			formScope = formElement.data('$scope') || scope;
 
 		if(data.flash || data.info) {
-			_.each(_.flatten([data.flash, data.info]), function (message) {
-				if (message) {
-					axelor.notify.info(message);
-				}
-			});
+			axelor.dialogs.say(data.flash || data.info);
+		}
+
+		if(data.notify) {
+			axelor.notify.info(data.notify);
 		}
 
 		if(data.error) {
