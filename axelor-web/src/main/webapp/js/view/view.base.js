@@ -209,7 +209,7 @@ function DSViewCtrl(type, $scope, $element) {
 					}
 					toolbar.push(button);
 				});
-				if (schema.title) {
+				if (!params.forceTitle && schema.title) {
 					$scope.viewTitle = schema.title;
 				}
 				$scope.fields = fields;
