@@ -156,6 +156,9 @@ public class Search extends AbstractView {
 		
 		@XmlAttribute
 		private String widget;
+		
+		@XmlAttribute
+		private String width;
 
 		public String getName() {
 			return name;
@@ -223,6 +226,14 @@ public class Search extends AbstractView {
 
 		public String getWidget() {
 			return widget;
+		}
+		
+		public String getWidth() {
+			return width;
+		}
+		
+		public void setWidth(String width) {
+			this.width = width;
 		}
 
 		public String getTargetName() {

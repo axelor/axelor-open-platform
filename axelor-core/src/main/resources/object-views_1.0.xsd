@@ -946,6 +946,7 @@
     <xsd:attribute name="domain" type="xsd:string" />
     <xsd:attribute name="selection" type="xsd:string" />
     <xsd:attribute name="widget" type="xsd:string" />
+    <xsd:attribute name="width" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="SearchSelect">
