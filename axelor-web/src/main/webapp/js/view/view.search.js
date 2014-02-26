@@ -373,10 +373,44 @@ function SearchGridCtrl($scope, $element, ViewService) {
 		
 		this.openTab(tab);
 	};
-	
-	// disable sorting
-	$scope.onSort = function() {
+
+	$scope.onSort = function(event, args) {
+		var grid = args.grid;
+		var data = grid.getData();
+		var sortCols = args.sortCols;
 		
+		var types = {};
+		
+		_.each($scope.fields, function (field) {
+			types[field.name] = field.type;
+		});
+
+		data.sort(function(dataRow1, dataRow2) {
+			for (var i = 0, l = sortCols.length; i < l; i++) {
+				var name = sortCols[i].sortCol.field;
+				var sign = sortCols[i].sortAsc ? 1 : -1;
+				var value1 = dataRow1[name], value2 = dataRow2[name];
+		
+				switch (types[name]) {
+				case "integer":
+				case "long":
+					value1 = value1 || 0;
+					value2 = value2 || 0;
+				default:
+					value1 = value1 || "";
+					value2 = value2 || "";
+				}
+
+				var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
+				if (result != 0) {
+					return result;
+				}
+			}
+			return 0;
+		});
+		
+		grid.invalidate();
+		grid.render();
 	};
 }
 
