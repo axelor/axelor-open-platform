@@ -151,5 +151,6 @@ _t.put({
 "Preferences": "Preferences",
 "Create new": "Create new",
 "Validation error": "Validation error",
-"Please correct the invalid form values.": "Please correct the invalid form values."
+"Please correct the invalid form values.": "Please correct the invalid form values.",
+"The following fields are invalid:": "The following fields are invalid:"
 });
