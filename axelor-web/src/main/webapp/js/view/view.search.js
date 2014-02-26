@@ -81,6 +81,7 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 		$scope._searchView = schema;
 		$scope._showSingle = params.params && params.params._showSingle;
 		$scope._forceEdit = params.params && params.params.forceEdit;
+		$scope._hideActions = params.params && params.params.hideActions;
 		
 		$scope.updateRoute();
 		
@@ -523,45 +524,51 @@ function SearchToolbarCtrl($scope, $element, $http) {
 			}
 		};
 
-		$scope.schema = {
+		var items1 = [{
+			name : 'objectSelect',
+			showTitle : false
+		}, {
+			type : 'button',
+			title : _t('Search'),
+			attrs: {
+				'ng-click': 'doSearch()'
+			}
+		}, {
+			type : 'button',
+			title : _t('Clear'),
+			attrs: {
+				'ng-click': 'doClear(true)'
+			}
+		}];
+		
+		var items2 = [{
+			name : 'menuRoot',
+			showTitle : false
+		}, {
+			name : 'menuSub',
+			showTitle : false
+		}, {
+			name : 'menuItem',
+			showTitle : false
+		}, {
+			type : 'button',
+			title : _t('Go'),
+			attrs: {
+				'ng-click': 'doAction()'
+			}
+		}];
+
+		var schema = {
 			cols : 7,
 			colWidths : '250px,auto,auto,150px,150px,150px,auto',
-			type : 'form',
-			items : [ {
-				name : 'objectSelect',
-				showTitle : false
-			}, {
-				type : 'button',
-				title : _t('Search'),
-				attrs: {
-					'ng-click': 'doSearch()'
-				}
-			}, {
-				type : 'button',
-				title : _t('Clear'),
-				attrs: {
-					'ng-click': 'doClear(true)'
-				}
-			}, {
-				name : 'menuRoot',
-				showTitle : false
-			}, {
-				name : 'menuSub',
-				showTitle : false
-			}, {
-				name : 'menuItem',
-				showTitle : false
-			}, {
-				type : 'button',
-				title : _t('Go'),
-				attrs: {
-					'ng-click': 'doAction()'
-				}
-			} ]
+			type : 'form'
 		};
 		
-		$scope.schema.loaded = true;
+		schema.items = $scope._hideActions ? items1 : _.union(items1, items2);
 		
+		$scope.schema = schema;
+		$scope.schema.loaded = true;
+
 		$scope.doReset = function () {
 			var record = $scope.record || {};
 			if (selected.length > 0 && _.isEmpty(record.objectSelect)) {
