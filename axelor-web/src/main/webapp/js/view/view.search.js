@@ -315,12 +315,14 @@ function SearchFormCtrl($scope, $element, ViewService) {
 	};
 }
 
-SearchGridCtrl.$inject = ['$scope', '$element', 'ViewService'];
-function SearchGridCtrl($scope, $element, ViewService) {
+SearchGridCtrl.$inject = ['$scope', '$element', 'ViewService', '$interpolate'];
+function SearchGridCtrl($scope, $element, ViewService, $interpolate) {
 	
 	GridViewCtrl.call(this, $scope, $element);
 	$scope._register('grid', $scope);
 	
+	var viewTitles = {};
+
 	$scope.$watch('_searchView', function(schema) {
 		if (schema == null) return;
 		var view = {
@@ -331,7 +333,11 @@ function SearchGridCtrl($scope, $element, ViewService) {
 		};
 		var meta = { fields: schema.resultFields };
 		ViewService.process(meta);
-		
+
+		_.each(schema.selects, function (select) {
+			viewTitles[select.model] = select.viewTitle;
+		});
+
 		$scope.fields = meta.fields;
 		$scope.schema = view;
 		$scope.schema.loaded = true;
@@ -360,11 +366,17 @@ function SearchGridCtrl($scope, $element, ViewService) {
 		if (force === undefined) {
 			force = $scope._forceEdit;
 		}
-
+		
+		var title = viewTitles[record._model];
+		if (title) {
+			title = $interpolate(title)(record);
+		}
+		
 		var tab = {
 			action: _.uniqueId('$act'),
 			model: record._model,
-			title: record._modelTitle,
+			title: title || record._modelTitle,
+			forceTitle: true,
 			domain: domain,
 			recordId: record._id,
 			forceEdit: force,

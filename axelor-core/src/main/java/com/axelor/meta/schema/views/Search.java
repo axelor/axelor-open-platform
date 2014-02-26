@@ -331,6 +331,9 @@ public class Search extends AbstractView {
 		@XmlAttribute
 		private String title;
 		
+		@XmlAttribute(name = "view-title")
+		private String viewTitle;
+
 		@XmlAttribute
 		private Boolean selected;
 
@@ -379,6 +382,10 @@ public class Search extends AbstractView {
 				title = this.getDefaultTitle();
 			}
 			return JPA.translate(title, title, null, "search");
+		}
+		
+		public String getViewTitle() {
+			return viewTitle;
 		}
 		
 		public Boolean getSelected() {
