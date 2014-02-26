@@ -313,7 +313,7 @@ function Loader(scope, node, DataSource) {
 	this.move = function(item, callback) {
 
 		var record = item.$record,
-			parent = { id: item.$parent };
+			parent = { id: item.$parentId };
 
 		record[node.parent] = parent;
 
@@ -334,13 +334,17 @@ function Loader(scope, node, DataSource) {
 			child = that.child;
 
 		return _.map(records, function(record) {
+			
+			var $id = _.uniqueId('row');
+			var $parent = current ? current.$id : null;
 
 			var item = {
-				'$id': record.id,
+				'$id': $id,
 				'$model': node.model,
 				'$record': record,
 				'$selection': {},
-				'$parent': parent && parent.id,
+				'$parent': $parent,
+				'$parentId': parent && parent.id,
 				'$parentModel': current && current.$model,
 				'$draggable': node.draggable,
 				'$folder': child != null
@@ -513,11 +517,12 @@ ui.directive('uiViewTree', function(){
 				
 				var row = ui.draggable,
 					record = row.data('$record'),
+					current = $(this).data('$record'),
 					node = table.treetable("node", row.data("id"));
 
 				table.treetable("move", node.id, $(this).data("id"));
 				
-				record.$parent = node.parentId;
+				record.$parentId = current.$record.id;
 				record.$move(function(result) {
 				
 				});
