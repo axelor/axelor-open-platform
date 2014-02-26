@@ -170,5 +170,6 @@ _t.put({
 "Preferences": "Préférences",
 "Create new": "Créer nouveau",
 "Validation error": "Erreur de validation",
-"Please correct the invalid form values.": "Merci de corriger les champs du formulaire non valides."
+"Please correct the invalid form values.": "Merci de corriger les champs du formulaire non valides.",
+"The following fields are invalid:": "Les champs suivants sont invalides:"
 });
