@@ -190,6 +190,10 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 			});
 			
 			scopes.grid.setItems(records);
+			
+			if (_.isEmpty(records)) {
+				axelor.notify.info(_t("No records found."));
+			}
 		});
 		
 	};
