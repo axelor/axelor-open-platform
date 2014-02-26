@@ -550,7 +550,12 @@ ActionHandler.prototype = {
 				case 'refresh':
 					itemScope.$broadcast('on:attrs-change:refresh');
 					break;
-
+				case 'url':
+				case 'url:set':
+					if (item.is('[ui-portlet]')) {
+						item.find('iframe:first').attr('src', value);
+					}
+					break;
 				case 'value':
 				case 'value:set':
 					if (itemScope.setValue) {
