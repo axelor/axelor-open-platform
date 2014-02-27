@@ -613,6 +613,9 @@ table.field-details .help-text hr {
 .popover .field-details code {
 	display: block;
 	white-space: pre-wrap;
+	max-width: 300px;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .ws-nowrap {
