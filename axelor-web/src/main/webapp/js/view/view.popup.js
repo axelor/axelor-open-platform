@@ -346,7 +346,12 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 		}
 
 		var url = "ws/rest/com.axelor.meta.db.MetaFile/" + select.id + "/content/download";
-		window.open(url);
+		
+		if ($scope.doDownload) {
+			$scope.doDownload(url);
+		} else {
+			window.open(url);
+		}
 	};
 	
 	$scope.onUpload = function() {
@@ -658,6 +663,14 @@ angular.module('axelor.ui').directive('uiAttachmentPopup', function(){
 				setTimeout(doResize);
 			};
 			
+			scope.doDownload = function (url) {
+				var frame = element.find('iframe:first');
+				frame.attr("src", url);
+				setTimeout(function(){
+					frame.attr("src", "");
+				}, 100);
+			};
+			
 			scope.$watch('schema.title', function(title){
 				element.closest('.ui-dialog').find('.ui-dialog-title').text(title);
 			});
@@ -671,6 +684,7 @@ angular.module('axelor.ui').directive('uiAttachmentPopup', function(){
 		replace: true,
 		template:
 		'<div ui-dialog x-on-open="onOpen" x-on-ok="false">'+
+			'<iframe style="display: hidden;"></iframe>'+
 			'<input type="file">' +
 			'<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-editable="false" x-selector="true" x-no-filter="true"></div>'+
 		    '<div class="record-pager pull-left">'+

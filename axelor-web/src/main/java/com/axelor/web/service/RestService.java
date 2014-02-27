@@ -58,6 +58,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
 import com.axelor.app.AppSettings;
@@ -290,6 +291,9 @@ public class RestService extends ResourceService {
 			final String fileName = (String) mapper.get(bean, "fileName");
 			final String filePath = (String) mapper.get(bean, "filePath");
 			final File inputFile = FileUtils.getFile(uploadPath, filePath);
+			if (!inputFile.exists()) {
+				return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+			}
 			return javax.ws.rs.core.Response.ok(new StreamingOutput() {
 
 				@Override
