@@ -332,6 +332,43 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		$scope.applyFilter();
 	};
 
+	function trySelection(criterion) {
+		var name = criterion.fieldName;
+		var field = handler.fields[name] || {};
+		var items = field.selectionList;
+
+		if (!items) {
+			field = _.findWhere((handler.view||{}).items, {name: name}) || {};
+			items = field.selectionList;
+		}
+		if (!items || items.length === 0) {
+			return criterion;
+		}
+
+		var value = criterion.value;
+		var filter = {
+			operator: "or",
+			criteria: [criterion]
+		};
+
+		for(var i = 0; i < items.length; i++) {
+			var item = items[i];
+			if (criterion.operator == "like" ||
+				criterion.operator == "notLike") {
+				if (item.title.toLowerCase().indexOf(value) > -1) {
+					var nested = _.extend({}, criterion);
+					nested.value = item.value;
+					filter.criteria.push(nested);
+				}
+			} else if (item.title === value) {
+				criterion.value = item.value;
+				return criterion;
+			}
+		}
+
+		return filter;
+	}
+
 	$scope.prepareFilter = function() {
 
 		var criteria = {
@@ -382,6 +419,8 @@ function FilterFormCtrl($scope, $element, ViewService) {
 			if (criterion.operator == "between" || criterion.operator == "notBetween") {
 				criterion.value2 = filter.value2;
 			}
+			
+			criterion = trySelection(criterion);
 
 			criteria.criteria.push(criterion);
 		});
