@@ -31,9 +31,8 @@
 package com.axelor.text;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
-
-import org.apache.commons.io.output.StringBuilderWriter;
 
 /**
  * The {@link Template} renderer provides ways to render an encapsulated
@@ -48,7 +47,7 @@ public abstract class Renderer {
 	 * @return the template output
 	 */
 	public String render() {
-		StringBuilderWriter out = new StringBuilderWriter();
+		StringWriter out = new StringWriter();
 		try {
 			render(out);
 		} catch (IOException e) {
