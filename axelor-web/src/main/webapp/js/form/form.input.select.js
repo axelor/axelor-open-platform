@@ -277,7 +277,13 @@ ui.formInput('Select', 'BaseSelect', {
 
 		scope.handleDelete = function(e) {
 			if (e.keyCode === 46) { // DELETE
-				update('');
+				update(null);
+			}
+			if (e.keyCode === 8) { // BACKSPACE
+				var value = scope.getValue();
+				if (value || (e.target.value||'').length < 2) {
+					update(null);
+				}
 			}
 		};
 
