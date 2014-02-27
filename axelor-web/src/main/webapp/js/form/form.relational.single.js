@@ -540,11 +540,13 @@ ui.formInput('RefItem', 'ManyToOne', {
 		}
 
 		function getRef() {
-			return scope.record[ref];
+			return (scope.record||{})[ref];
 		}
 
 		function setRef(value) {
-			return scope.record[ref] = value;
+			if (scope.record) {
+				return scope.record[ref] = value;
+			}
 		}
 		
 		scope.targetValue = target;
