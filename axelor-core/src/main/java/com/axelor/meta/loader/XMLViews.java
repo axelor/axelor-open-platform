@@ -130,7 +130,9 @@ public class XMLViews {
 		return sb.toString();
 	}
 
-	private static final Pattern INDENT_PATTERN = Pattern.compile("^(    |\t)", Pattern.MULTILINE);
+	private static final String INDENT_STRING = "  ";
+	private static final Pattern INDENT_PATTERN = Pattern.compile("(    |\t)", Pattern.MULTILINE);
+	private static final Pattern STRIP_INDENT_PATTERN = Pattern.compile("^(    |\t)", Pattern.MULTILINE);
 
 	private static String strip(String xml) {
 		String[] lines = xml.split("\n");
@@ -139,8 +141,8 @@ public class XMLViews {
 			sb.append(lines[i] + "\n");
 		}
 		sb.deleteCharAt(sb.length()-1);
-
-		return INDENT_PATTERN.matcher(sb).replaceAll("");
+		
+		return STRIP_INDENT_PATTERN.matcher(sb).replaceAll("");
 	}
 	
 	@SuppressWarnings("all")
@@ -163,10 +165,11 @@ public class XMLViews {
 		} catch (JAXBException e) {
 			log.error(e.getMessage(), e);
 		}
+		String text = writer.toString();
 		if (strip) {
-			return strip(writer.toString());
+			text = strip(text);
 		}
-		return writer.toString();
+		return INDENT_PATTERN.matcher(text).replaceAll(INDENT_STRING);
 	}
 	
 	public static ObjectViews fromXML(String xml) throws JAXBException {
