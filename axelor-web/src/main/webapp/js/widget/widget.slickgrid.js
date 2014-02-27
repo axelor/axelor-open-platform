@@ -278,7 +278,7 @@ var Formatters = {
 		};
 		
 		if(isIcon) {
-			elem = '<a href="#" tabindex="-1"';
+			elem = '<a href="javascript: void(0)" tabindex="-1"';
 			if (field.help) {
 				elem += ' title="' + field.help + '"';
 			}
