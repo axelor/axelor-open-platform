@@ -195,10 +195,21 @@ public class ViewService extends AbstractService {
 				if (p.isMassUpdate()) {
 					massUpdate = true;
 				}
-				if (bean != null && !p.isTransient() && !p.isVirtual()) {
-					Object defaultValue = p.get(bean);
-					if (defaultValue != null) {
-						map.put("defaultValue", defaultValue);
+				// find the default value
+				if (!p.isTransient() && !p.isVirtual()) {
+					Object obj = null;
+					if (name.contains(".")) {
+						try {
+							obj = p.getEntity().newInstance();
+						} catch (Exception e) {}
+					} else {
+						obj = bean;
+					}
+					if (obj != null) {
+						Object defaultValue = p.get(obj);
+						if (defaultValue != null) {
+							map.put("defaultValue", defaultValue);
+						}
 					}
 				}
 				fields.add(map);
