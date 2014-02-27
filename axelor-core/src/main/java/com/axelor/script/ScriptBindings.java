@@ -47,12 +47,15 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Longs;
 
 public class ScriptBindings extends SimpleBindings {
 
 	private static final String MODEL_KEY = "_model";
 
 	private static final Set<String> META_VARS = ImmutableSet.of(
+			"__id__",
+			"__ids__",
 			"__this__",
 			"__self__",
 			"__user__",
@@ -85,6 +88,12 @@ public class ScriptBindings extends SimpleBindings {
 	@SuppressWarnings("all")
 	private Object getSpecial(String name) throws Exception {
 		switch (name) {
+		case "__id__":
+			if (variables.containsKey("id")) return Longs.tryParse(variables.get("id").toString());
+			if (variables.containsKey("_id")) return Longs.tryParse(variables.get("_id").toString());
+			return ((Context) variables).asType(Model.class).getId();
+		case "__ids__":
+			return variables.get("_ids");
 		case "__this__":
 			return ((Context) variables).asType(Model.class);
 		case "__parent__":
