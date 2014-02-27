@@ -595,6 +595,10 @@ form.readonly .form-item-container:hover .hot-edit-icon {
 	display: inline;
 }
 
+[x-readonly="true"] .hot-edit-icon {
+	display: none !important;
+}
+
 table.field-details {
 	width: 100px;
 }
