@@ -163,6 +163,11 @@ function TableLayout(items, attrs, $scope, $compile) {
 				}
 				numCells += cell.colspan || 1;
 		});
+		
+		// append remaining cells
+		for (var i = 0 ; i < numCols - numCells ; i++) {
+			$('<td></td>').width(widths[i]).appendTo(tr);
+		}
 
 		tr.appendTo(table);
 	});
