@@ -193,6 +193,10 @@ public class ActionView extends Action {
 			}
 		}
 
+		if (!context.containsKey("_id") && handler.getContext().containsKey("id")) {
+			context.put("_id", handler.evaluate("eval: id"));
+		}
+
 		if (params != null) {
 			for(Param param : params) {
 				Object value = param.value;
