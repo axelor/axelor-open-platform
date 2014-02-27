@@ -534,9 +534,10 @@ ui.directive('uiFilterBox', function() {
 				filter.$selected = selected;
 
 				var index = selection.indexOf(filter);
-				if (selected) {
+				if (selected && !live) {
 					selection.push(filter);
-				} else if (index > -1) {
+				}
+				if (!selected && index > -1) {
 					selection.splice(index, 1);
 				}
 
