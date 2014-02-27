@@ -70,8 +70,6 @@ public class XMLViews {
 
 	private static final String LOCAL_SCHEMA = "object-views_1.0.xsd";
 	private static final String REMOTE_SCHEMA = "object-views_" + ObjectViews.VERSION + ".xsd";
-	private static final String JAXB_INDENT_KEY = "com.sun.xml.internal.bind.indentString";
-	private static final String JAXB_INDENT_STRING = "  ";
 	
 	private static Marshaller marshaller;
 	private static Unmarshaller unmarshaller;
@@ -93,7 +91,6 @@ public class XMLViews {
 		marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, ObjectViews.NAMESPACE + " " + ObjectViews.NAMESPACE + "/" + REMOTE_SCHEMA);
-		marshaller.setProperty(JAXB_INDENT_KEY, JAXB_INDENT_STRING);
 
 		SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		Schema schema = schemaFactory.newSchema(Resources.getResource(LOCAL_SCHEMA));
@@ -133,6 +130,8 @@ public class XMLViews {
 		return sb.toString();
 	}
 
+	private static final Pattern INDENT_PATTERN = Pattern.compile("^(    |\t)", Pattern.MULTILINE);
+
 	private static String strip(String xml) {
 		String[] lines = xml.split("\n");
 		StringBuilder sb = new StringBuilder();
@@ -141,8 +140,7 @@ public class XMLViews {
 		}
 		sb.deleteCharAt(sb.length()-1);
 
-		Pattern p = Pattern.compile("^" + JAXB_INDENT_STRING, Pattern.MULTILINE);
-		return p.matcher(sb).replaceAll("");
+		return INDENT_PATTERN.matcher(sb).replaceAll("");
 	}
 	
 	@SuppressWarnings("all")
