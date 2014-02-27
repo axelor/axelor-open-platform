@@ -105,6 +105,9 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			if (attr.name === "readonly" || attr.name === "force-edit") {
 				scope.$$readonly = scope.$$isReadonly();
 			}
+			if (attr.name === "readonly") {
+				element.attr("x-readonly", scope.$$readonly);
+			}
 		});
 		
 		scope.$watch("isEditable()", function(editable, old) {
