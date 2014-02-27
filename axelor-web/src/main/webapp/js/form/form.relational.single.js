@@ -200,6 +200,14 @@ ui.formInput('ManyToOne', 'Select', {
 					scope.showNestedEditor(!hidden);
 				}
 			});
+			scope.$on("on:check-nested-values", function (e, value) {
+				if (scope.isHidden() && value) {
+					var val = scope.getValue() || {};
+					if (val.$updatedValues === value && val.id === value.id) {
+						_.extend(val, value);
+					}
+				}
+			});
 
 			scope.$timeout(function() {
 				if (!scope.attr("hidden")) {

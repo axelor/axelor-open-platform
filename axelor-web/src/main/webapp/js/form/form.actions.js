@@ -38,7 +38,7 @@ var equals = angular.equals,
 	isObject = angular.isObject,
 	isDate = angular.isDate;
 
-function updateValues(source, target) {
+function updateValues(source, target, itemScope, formScope) {
 	if (equals(source, target))
 		return;
 
@@ -70,9 +70,12 @@ function updateValues(source, target) {
 			if (dest.id === value.id) {
 				if (dest.version) {
 					dest = _.extend({}, dest);
-					updateValues(value, dest);
+					updateValues(value, dest, itemScope. formScope);
 				} else {
 					dest.$updatedValues = value;
+					if (formScope) {
+						formScope.$broadcast('on:check-nested-values', value);
+					}
 				}
 			} else {
 				dest = compact(value);
@@ -415,7 +418,7 @@ ActionHandler.prototype = {
 		}
 		
 		if (data.values) {
-			updateValues(data.values, scope.record, scope);
+			updateValues(data.values, scope.record, scope, formScope);
 			if (scope.onChangeNotify) {
 				scope.onChangeNotify(scope, data.values);
 			}
