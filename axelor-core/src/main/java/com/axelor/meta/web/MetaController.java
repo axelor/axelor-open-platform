@@ -43,6 +43,7 @@ import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.loader.I18nLoader;
+import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
@@ -61,6 +62,9 @@ public class MetaController {
 
 	@Inject
 	private MetaExportTranslation export;
+
+	@Inject
+	private ModuleManager moduleManager;
 
 	private ObjectViews validateXML(String xml) {
 		ObjectViews views;
@@ -195,5 +199,21 @@ public class MetaController {
 			data.put("error", e.getMessage());
 			response.setData(ImmutableList.of(data));
 		}
+	}
+
+	public void restoreAll(ActionRequest request, ActionResponse response) {
+		Map<String, String> data = Maps.newHashMap();
+
+		try {
+			moduleManager.update(false);
+		} catch (Exception e){
+			data.put("error", e.getMessage());
+		}
+
+		response.setData(ImmutableList.of(data));
+	}
+
+	public void restoreSingle(ActionRequest request, ActionResponse response) {
+		//TODO
 	}
 }
