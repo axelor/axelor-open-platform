@@ -708,7 +708,7 @@ public class Resource<T extends Model> {
 		boolean isSaved = ((Model)bean).getId() != null;
 		boolean isCompact = compact || fields.containsKey("$version");
 
-		if ((isCompact && isSaved) || (level >= 1 )) {
+		if ((isCompact && isSaved) || (isSaved && level >= 1 ) || (level > 1)) {
 			
 			Property pn = mapper.getNameField();
 			Property pc = mapper.getProperty("code");
