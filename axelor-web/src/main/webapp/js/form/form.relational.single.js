@@ -483,6 +483,13 @@ ui.formInput('RefSelect', {
 			return false;
 		};
 
+		scope.refFireEvent = function (name) {
+			var handler = scope.$events[name];
+			if (handler) {
+				return handler();
+			}
+		};
+		
 		var elem = scope.createElement(name, selectionList, related);
 		setTimeout(function() {
 			element.append(elem);
@@ -548,8 +555,15 @@ ui.formInput('RefItem', 'ManyToOne', {
 		}
 
 		function setRef(value) {
-			if (scope.record) {
-				return scope.record[ref] = value;
+			if (!scope.record) {
+				return;
+			}
+			
+			var old = scope.record[ref];
+			scope.record[ref] = value;
+			
+			if (old != value) {
+				scope.refFireEvent('onChange');
 			}
 		}
 		
