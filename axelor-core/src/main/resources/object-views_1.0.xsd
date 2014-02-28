@@ -136,24 +136,64 @@
             <xsd:choice maxOccurs="unbounded">
               <xsd:element name="item">
                 <xsd:complexType>
-                  <xsd:attribute name="title" type="xsd:string" use="required" />
-                  <xsd:attribute name="action" type="xsd:string" use="required" />
-                  <xsd:attribute name="showIf" type="xsd:string" />
-                  <xsd:attribute name="hideIf" type="xsd:string" />
-                  <xsd:attribute name="readonlyIf" type="xsd:string" />
+                  <xsd:attribute name="title" type="xsd:string" use="required">
+                    <xsd:annotation>
+                      <xsd:documentation>The display text</xsd:documentation>
+                    </xsd:annotation>
+                  </xsd:attribute>
+                  <xsd:attribute name="action" type="xsd:string" use="required">
+                    <xsd:annotation>
+                      <xsd:documentation>Comma separate list of actions to execute on click event.</xsd:documentation>
+                    </xsd:annotation>
+                  </xsd:attribute>
+                  <xsd:attribute name="showIf" type="xsd:string">
+                    <xsd:annotation>
+                      <xsd:documentation>Show if the given JavaScript expression is true.</xsd:documentation>
+                    </xsd:annotation>
+                  </xsd:attribute>
+                  <xsd:attribute name="hideIf" type="xsd:string">
+                    <xsd:annotation>
+                      <xsd:documentation>Hide if the given JavaScript expression is true.</xsd:documentation>
+                    </xsd:annotation>
+                  </xsd:attribute>
+                  <xsd:attribute name="readonlyIf" type="xsd:string">
+                    <xsd:annotation>
+                      <xsd:documentation>Readonly if the given JavaScript expression is true.</xsd:documentation>
+                    </xsd:annotation>
+                  </xsd:attribute>
                 </xsd:complexType>
               </xsd:element>
               <xsd:element name="divider">
                 <xsd:complexType>
-                  <xsd:attribute name="showIf" type="xsd:string" />
-                  <xsd:attribute name="hideIf" type="xsd:string" />
+                  <xsd:attribute name="showIf" type="xsd:string">
+                    <xsd:annotation>
+                      <xsd:documentation>Show if the given JavaScript expression is true.</xsd:documentation>
+                    </xsd:annotation>
+                  </xsd:attribute>
+                  <xsd:attribute name="hideIf" type="xsd:string">
+                    <xsd:annotation>
+                      <xsd:documentation>Hide if the given JavaScript expression is true.</xsd:documentation>
+                    </xsd:annotation>
+                  </xsd:attribute>
                 </xsd:complexType>
               </xsd:element>
             </xsd:choice>
           </xsd:sequence>
-          <xsd:attribute name="title" type="xsd:string" use="required" />
-          <xsd:attribute name="icon" type="xsd:string" />
-          <xsd:attribute name="showTitle" type="xsd:boolean" />
+          <xsd:attribute name="title" type="xsd:string" use="required">
+            <xsd:annotation>
+              <xsd:documentation>The display text</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="icon" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Path of the image.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="showTitle" type="xsd:boolean">
+            <xsd:annotation>
+              <xsd:documentation>Specify whether to show the title.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
         </xsd:complexType>
       </xsd:element>
     </xsd:sequence>
@@ -221,13 +261,41 @@
   <xsd:complexType name="SimpleWidget" abstract="true">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractWidget">
-        <xsd:attribute name="title" type="xsd:string" />
-        <xsd:attribute name="showTitle" type="xsd:boolean" />
-        <xsd:attribute name="help" type="xsd:string" />
-        <xsd:attribute name="hidden" type="xsd:boolean" />
-        <xsd:attribute name="readonly" type="xsd:boolean" />
-        <xsd:attribute name="colSpan" type="xsd:int" />
-        <xsd:attribute name="css" type="xsd:string" />
+        <xsd:attribute name="title" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>The display text</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="showTitle" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the title.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="help" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>The help text</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="hidden" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to hide the widget.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="readonly" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether the widget should be considered readonly.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="colSpan" type="xsd:int">
+          <xsd:annotation>
+            <xsd:documentation>Specify the number of columns taken by the widget.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="css" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Custom css class to apply.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="width">
           <xsd:simpleType>
             <xsd:restriction base="xsd:string">
@@ -264,9 +332,24 @@
   <xsd:complexType name="AbstractContainer" abstract="true">
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleWidget">
-        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="name" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Container name.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="rowSpan" type="xsd:int" />
         <xsd:attribute name="height">
+          <xsd:annotation>
+            <xsd:documentation>
+              Container height.&lt;br&gt;&lt;br&gt;
+              
+              The width can be specified as percentage 
+              or fixed value.&lt;br&gt;&lt;br&gt;
+    
+              The fix width can be either in 'px'
+              or 'em', 'px' is assumed if not specified.
+            </xsd:documentation>
+          </xsd:annotation>
           <xsd:simpleType>
             <xsd:restriction base="xsd:string">
               <xsd:pattern value="\d+(%|px|pt|em)?"></xsd:pattern>
@@ -283,7 +366,11 @@
         <xsd:choice maxOccurs="unbounded" minOccurs="0">
           <xsd:group ref="tns:FormWidgets" />
         </xsd:choice>
-        <xsd:attribute name="cols" type="xsd:int" />
+        <xsd:attribute name="cols" type="xsd:int">
+          <xsd:annotation>
+            <xsd:documentation>Number of columns inside the container.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="colWidths" type="xsd:string" />
       </xsd:extension>
     </xsd:complexContent>
@@ -291,12 +378,12 @@
 
   <xsd:simpleType name="HiliteStyle">
     <xsd:restriction base="xsd:string">
-      <xsd:enumeration value="default"></xsd:enumeration>
-      <xsd:enumeration value="primary"></xsd:enumeration>
-      <xsd:enumeration value="warning"></xsd:enumeration>
-      <xsd:enumeration value="success"></xsd:enumeration>
-      <xsd:enumeration value="danger"></xsd:enumeration>
-      <xsd:enumeration value="info"></xsd:enumeration>
+      <xsd:enumeration value="default"/>
+      <xsd:enumeration value="primary"/>
+      <xsd:enumeration value="warning"/>
+      <xsd:enumeration value="success"/>
+      <xsd:enumeration value="danger"/>
+      <xsd:enumeration value="info"/>
     </xsd:restriction>
   </xsd:simpleType>
 
@@ -329,18 +416,26 @@
         <xsd:complexType>
           <xsd:simpleContent>
             <xsd:extension base="xsd:string">
-              <xsd:attribute name="value" type="xsd:string" use="required" />
+              <xsd:attribute name="value" type="xsd:string" use="required">
+                <xsd:annotation>
+                  <xsd:documentation>Value stored in database.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
               <xsd:anyAttribute processContents="lax" />
             </xsd:extension>
           </xsd:simpleContent>
         </xsd:complexType>
       </xsd:element>
     </xsd:sequence>
-    <xsd:attribute name="name" type="xsd:string" use="required" />
+    <xsd:attribute name="name" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>Selection name.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="id" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-        If overriding some existing one, provide an unique id to identify this one.
+          If overriding some existing one, provide an unique id to identify this one.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -368,7 +463,11 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="editable" type="xsd:boolean" />
+    <xsd:attribute name="editable" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether the grid is editable.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:complexType name="AbstractGridView" abstract="true">
@@ -406,10 +505,26 @@
             <xsd:documentation>Whether to show edit icon.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="canNew" type="xsd:boolean" />
-        <xsd:attribute name="canEdit" type="xsd:boolean" />
-        <xsd:attribute name="canSave" type="xsd:boolean" />
-        <xsd:attribute name="canDelete" type="xsd:boolean" />
+        <xsd:attribute name="canNew" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the 'New' button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canEdit" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the 'Edit' button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canSave" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the 'Save' button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canDelete" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the 'Remove' button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -425,7 +540,11 @@
   <xsd:complexType name="NestedGridView">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractGridView">
-        <xsd:attribute name="editable" type="xsd:boolean" />
+        <xsd:attribute name="editable" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether the grid is editable.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -440,20 +559,68 @@
             <xsd:group ref="tns:FormWidgets" />
           </xsd:choice>
         </xsd:sequence>
-        <xsd:attribute name="css" type="xsd:string" />
-        <xsd:attribute name="cols" type="xsd:int" />
+        <xsd:attribute name="css" type="xsd:string"/>
+        <xsd:attribute name="cols" type="xsd:int">
+          <xsd:annotation>
+            <xsd:documentation>Number of initial column for the form.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="colWidths" type="xsd:string" />
-        <xsd:attribute name="onLoad" type="xsd:string" />
-        <xsd:attribute name="onSave" type="xsd:string" />
-        <xsd:attribute name="onNew" type="xsd:string" />
-        <xsd:attribute name="helpLink" type="xsd:string" />
-        <xsd:attribute name="readonlyIf" type="xsd:string" />
-        <xsd:attribute name="canNew" type="xsd:string" />
-        <xsd:attribute name="canEdit" type="xsd:string" />
-        <xsd:attribute name="canSave" type="xsd:string" />
-        <xsd:attribute name="canDelete" type="xsd:string" />
-        <xsd:attribute name="canCopy" type="xsd:string" />
-        <xsd:attribute name="canAttach" type="xsd:string" />
+        <xsd:attribute name="onLoad" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Comma separate list of actions to execute on load event.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="onSave" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Comma separate list of actions to execute on save event.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="onNew" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Comma separate list of actions to execute on new event.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="helpLink" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Link to a web page.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="readonlyIf" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Readonly if the given JavaScript expression is true.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canNew" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Show the 'New' button if the given JavaScript expression is true.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canEdit" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Show the 'Edit' button if the given JavaScript expression is true.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canSave" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Show the 'Save' button if the given JavaScript expression is true.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canDelete" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Show the 'Remove' button if the given JavaScript expression is true.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canCopy" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Show the 'Copy' button if the given JavaScript expression is true.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canAttach" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Show the 'Attachment' button if the given JavaScript expression is true.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -862,7 +1029,7 @@
           <xsd:element name="domain" type="xsd:string">
             <xsd:annotation>
               <xsd:documentation>
-                The domain for the filter.
+                Domain for the filter.
               </xsd:documentation>
             </xsd:annotation>
           </xsd:element>
@@ -890,7 +1057,13 @@
             </xsd:complexType>
           </xsd:element>
         </xsd:sequence>
-        <xsd:attribute name="title" type="xsd:string" use="required" />
+        <xsd:attribute name="title" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              The display text of the filter.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -915,7 +1088,13 @@
           </xsd:element>
           <xsd:element name="select" type="tns:SearchSelect" maxOccurs="unbounded" />
         </xsd:sequence>
-        <xsd:attribute name="limit" type="xsd:int" use="required" />
+        <xsd:attribute name="limit" type="xsd:int" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              Number of record to fetch.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="search-form" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
@@ -1031,7 +1210,13 @@
   <xsd:complexType name="Group">
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleContainer">
-        <xsd:attribute name="canCollapse" type="xsd:boolean" />
+        <xsd:attribute name="canCollapse" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Whether to collapse the group.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="collapseIf" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
@@ -1049,8 +1234,20 @@
         <xsd:choice maxOccurs="unbounded" minOccurs="0">
           <xsd:group ref="tns:FormWidgets" />
         </xsd:choice>
-        <xsd:attribute name="title" type="xsd:string" use="required" />
-        <xsd:attribute name="icon" type="xsd:string" />
+        <xsd:attribute name="title" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              The display text.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="icon" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              Path of the image.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="onSelect" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
@@ -1108,8 +1305,20 @@
   <xsd:complexType name="Button">
     <xsd:complexContent>
       <xsd:restriction base="tns:SimpleWidget">
-        <xsd:attribute name="name" type="xsd:string" use="required" />
-        <xsd:attribute name="icon" type="xsd:string" />
+        <xsd:attribute name="name" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              Button name.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="icon" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              Path of the image.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="iconHover" type="xsd:string" />
         <xsd:attribute name="link" type="xsd:string">
           <xsd:annotation>
@@ -1129,7 +1338,14 @@
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="showTitle" use="prohibited" />
-        <xsd:attribute name="onClick" type="xsd:string" />
+        <xsd:attribute name="onClick" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              An action to execute on click event. The current node record is
+              passed as context the context handler.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:restriction>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1148,10 +1364,28 @@
           <xsd:element name="grid" type="tns:NestedGridView" minOccurs="0" />
           <xsd:element name="form" type="tns:NestedFormView" minOccurs="0" />
         </xsd:sequence>
-        <xsd:attribute name="name" type="xsd:string" use="required" />
-        <xsd:attribute name="placeholder" type="xsd:string" />
+        <xsd:attribute name="name" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              Field name.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="placeholder" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              Text display inside the input.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="widget" type="xsd:string" />
-        <xsd:attribute name="selection" type="xsd:string" />
+        <xsd:attribute name="selection" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              If this is a selection field, specify the target selection name.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="selection-in" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
@@ -1159,7 +1393,13 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="required" type="xsd:boolean" />
+        <xsd:attribute name="required" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Whether the field should be considered readonly.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="requiredIf" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
@@ -1239,7 +1479,14 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="onChange" type="xsd:string" />
+        <xsd:attribute name="onChange" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              An action to execute on change event. The current node record is
+              passed as context the context handler.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="onSelect" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
@@ -1249,7 +1496,18 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="domain" type="xsd:string" />
+        <xsd:attribute name="domain" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              Specify the default domain.&lt;br&gt;&lt;br&gt;
+              
+              For example:
+              &lt;br&gt;&lt;pre&gt;
+              self.isActive = true
+              self.partner = :partner&lt;/pre&gt;
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="min" type="xsd:decimal">
           <xsd:annotation>
             <xsd:documentation>
@@ -1378,10 +1636,18 @@
   </xsd:group>
 
   <xsd:complexType name="AbstractAction" abstract="true">
-    <xsd:attribute name="name" type="xsd:string" use="required" />
+    <xsd:attribute name="name" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>Action name.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
   <xsd:complexType name="AbstractAct" abstract="true">
-    <xsd:attribute name="if" type="xsd:string" />
+    <xsd:attribute name="if" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>A Groovy boolean expression against the current form values.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
   <xsd:complexType name="ActMessage">
     <xsd:complexContent>
@@ -1416,7 +1682,13 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="expr" type="xsd:string" use="required" />
+        <xsd:attribute name="expr" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              A Groovy boolean expression against the current form values.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="copy" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>
@@ -1433,20 +1705,46 @@
         <xsd:attribute name="for" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>
-              Comma seperated list of field names
+              Comma seperated list of field names.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="name" type="xsd:string" use="required" />
-        <xsd:attribute name="expr" type="xsd:string" use="required" />
+        <xsd:attribute name="name" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              Name of the attribute.&lt;br&gt;&lt;br&gt;
+              
+              Exemple : hidden, readonly, ...
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="expr" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              A Groovy boolean expression against the current form values.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
   <xsd:complexType name="ActCall">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractAct">
-        <xsd:attribute name="class" type="xsd:string" use="required" />
-        <xsd:attribute name="method" type="xsd:string" use="required" />
+        <xsd:attribute name="class" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              Target class name.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="method" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              Method name.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="if" use="prohibited" />
       </xsd:extension>
     </xsd:complexContent>
@@ -1454,8 +1752,16 @@
   <xsd:complexType name="ActView">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractAct">
-        <xsd:attribute name="type" type="xsd:string" use="required" />
-        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="type" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>View type. For exemple: form, grid, calendar, ...</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="name" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>View name.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1577,8 +1883,16 @@
               </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
-              <xsd:attribute name="value" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required">
+                <xsd:annotation>
+                  <xsd:documentation>Param name.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
+              <xsd:attribute name="value" type="xsd:string" use="required">
+                <xsd:annotation>
+                  <xsd:documentation>Param value.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="domain" type="xsd:string" minOccurs="0">
@@ -1591,7 +1905,11 @@
           <xsd:element name="context" type="tns:ActContext" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="title" type="xsd:string" use="required" />
-        <xsd:attribute name="icon" type="xsd:string" />
+        <xsd:attribute name="icon" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Path of the image.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="model" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
@@ -1711,9 +2029,7 @@
         <xsd:sequence>
           <xsd:element name="export" maxOccurs="unbounded">
             <xsd:annotation>
-              <xsd:documentation>
-                An export task.
-              </xsd:documentation>
+              <xsd:documentation>An export task.</xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
               <xsd:complexContent>
@@ -1738,8 +2054,7 @@
             <xsd:documentation>
               Override the default output directory.
               Special keywords ${name}, ${date}, ${datetime} can
-              be
-              used to organize the output directory.
+              be used to organize the output directory.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>

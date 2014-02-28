@@ -10,13 +10,24 @@
         <xsd:element name="module" maxOccurs="1" minOccurs="1">
           <xsd:annotation>
             <xsd:documentation>
-              Module settings. This tag will be deprecated once we
-              implement module settings via properties file.
+              Module settings.
             </xsd:documentation>
           </xsd:annotation>
           <xsd:complexType>
-            <xsd:attribute name="name" type="xsd:string" use="required" />
-            <xsd:attribute name="package" type="xsd:string" />
+            <xsd:attribute name="name" type="xsd:string" use="required">
+              <xsd:annotation>
+                <xsd:documentation>
+                  Provide name for the package. Package will be "com.axelor.${name}.db".
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="package" type="xsd:string">
+              <xsd:annotation>
+                <xsd:documentation>
+                  Define a custom package name for the entity.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:attribute>
           </xsd:complexType>
         </xsd:element>
         <xsd:element name="sequence" minOccurs="0" maxOccurs="unbounded" type="dm:Sequence">
