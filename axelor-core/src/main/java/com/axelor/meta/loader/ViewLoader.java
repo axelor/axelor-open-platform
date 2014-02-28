@@ -82,7 +82,7 @@ public class ViewLoader extends AbstractLoader {
 	@Transactional
 	protected void doLoad(Module module, boolean update) {
 		for (URL file : MetaScanner.findAll(module.getName(), "views", "(.*?)\\.xml")) {
-			log.info("importing: {}", file.getFile());
+			log.debug("importing: {}", file.getFile());
 			try {
 				process(file.openStream(), module, update);
 			} catch (IOException | JAXBException e) {
@@ -95,7 +95,7 @@ public class ViewLoader extends AbstractLoader {
 			log.error("unresolved items: {}", unresolved);
 			throw new PersistenceException("There are some unresolve items, check the log.");
 		}
-		
+
 		// generate default views
 		importDefault(module);
 	}
@@ -109,28 +109,28 @@ public class ViewLoader extends AbstractLoader {
 
 	private void process(InputStream stream, Module module, boolean update) throws JAXBException {
 		final ObjectViews all = XMLViews.unmarshal(stream);
-		
+
 		for (AbstractView view : getList(all.getViews())) {
 			importView(view, module, update);
 		}
-		
+
 		for (Selection selection : getList(all.getSelections())) {
 			importSelection(selection, module, update);
 		}
-		
+
 		for (Action action : getList(all.getActions())) {
 			importAction(action, module, update);
 		}
-		
+
 		for (MenuItem item : getList(all.getMenus())) {
 			importMenu(item, module, update);
 		}
-		
+
 		for (MenuItem item: getList(all.getActionMenus())) {
 			importActionMenu(item, module, update);
 		}
 	}
-	
+
 	private void importView(AbstractView view, Module module, boolean update) {
 
 		String xmlId = view.getId();
@@ -141,8 +141,8 @@ public class ViewLoader extends AbstractLoader {
 		if (xmlId != null && isVisited(view.getClass(), xmlId)) {
 			return;
 		}
-		
-		log.info("Loading view: {}", name);
+
+		log.debug("Loading view: {}", name);
 
 		String xml = XMLViews.toXml(view, true);
 
@@ -151,7 +151,7 @@ public class ViewLoader extends AbstractLoader {
 		} else if (StringUtils.isBlank(modelName)) {
 			throw new IllegalArgumentException("Invalid view, model name missing.");
 		}
-		
+
 		if (modelName != null) {
 			Class<?> model;
 			try {
@@ -166,23 +166,23 @@ public class ViewLoader extends AbstractLoader {
 		MetaView extending = MetaView.findByName(name);
 
 		if (extending != null) {
-			
+
 			if (xmlId == null) {
 				log.error("duplicate view without 'id': {}", name);
 				return;
 			}
-			
+
 			MetaView existing = MetaView.findByID(xmlId);
 			if (update && existing != null && Objects.equal(xmlId, existing.getXmlId())) {
 				entity = existing;
 			}
-			
+
 			// set priority higher to existing view
 			if (!Objects.equal(xmlId, extending.getXmlId())) {
 				entity.setPriority(extending.getPriority() + 1);
 			}
 		}
-		
+
 		if (isUpdated(entity)) {
 			return;
 		}
@@ -193,12 +193,12 @@ public class ViewLoader extends AbstractLoader {
 		entity.setModel(modelName);
 		entity.setModule(module.getName());
 		entity.setXml(xml);
-		
+
 		entity = entity.save();
 	}
-	
+
 	private void importSelection(Selection selection, Module module, boolean update) {
-		
+
 		if (isVisited(Selection.class, selection.getName())) {
 			return;
 		}
@@ -206,13 +206,13 @@ public class ViewLoader extends AbstractLoader {
 		String name = selection.getName();
 		String xmlId = selection.getXmlId();
 
-		log.info("Loading selection : {}", name);
-		
+		log.debug("Loading selection : {}", name);
+
 		MetaSelect entity = new MetaSelect(selection.getName());
 		MetaSelect extending = MetaSelect.findByName(selection.getName());
-		
+
 		if (extending != null) {
-			
+
 			if (StringUtils.isBlank(xmlId)) {
 				log.error("duplicate selection without 'id': {}", name);
 				return;
@@ -232,10 +232,10 @@ public class ViewLoader extends AbstractLoader {
 		if (isUpdated(entity)) {
 			return;
 		}
-		
+
 		entity.clearItems();
 		entity.setModule(module.getName());
-		
+
 		int sequence = 0;
 		for(Selection.Option opt : selection.getOptions()) {
 			MetaSelectItem item = new MetaSelectItem();
@@ -244,15 +244,15 @@ public class ViewLoader extends AbstractLoader {
 			item.setOrder(sequence++);
 			entity.addItem(item);
 		}
-		
+
 		entity.save();
 	}
-	
+
 	private Set<Group> findGroups(String groups) {
 		if (StringUtils.isBlank(groups)) {
 			return null;
 		}
-		
+
 		Set<Group> all = Sets.newHashSet();
 		for(String name : groups.split(",")) {
 			Group group = Group.all().filter("self.code = ?1", name).fetchOne();
@@ -270,16 +270,16 @@ public class ViewLoader extends AbstractLoader {
 	}
 
 	private void importAction(Action action, Module module, boolean update) {
-		
+
 		if (isVisited(Action.class, action.getName())) {
 			return;
 		}
-		
-		log.info("Loading action : {}", action.getName());
-		
+
+		log.debug("Loading action : {}", action.getName());
+
 		Class<?> klass = action.getClass();
 		Mapper mapper = Mapper.of(klass);
-	
+
 		MetaAction entity = MetaAction.findByName(action.getName());
 		if (entity == null) {
 			entity = new MetaAction(action.getName());
@@ -288,9 +288,9 @@ public class ViewLoader extends AbstractLoader {
 		if (isUpdated(entity)) {
 			return;
 		}
-		
+
 		entity.setXml(XMLViews.toXml(action,  true));
-		
+
 		String model = (String) mapper.get(action, "model");
 		entity.setModel(model);
 		entity.setModule(module.getName());
@@ -301,19 +301,19 @@ public class ViewLoader extends AbstractLoader {
 		entity = entity.save();
 
 		for (MetaMenu pending : this.resolve(MetaMenu.class, entity.getName())) {
-			log.info("Resolved menu: {}", pending.getName());
+			log.debug("Resolved menu: {}", pending.getName());
 			pending.setAction(entity);
 			pending.save();
 		}
 	}
-	
+
 	private void importMenu(MenuItem menuItem, Module module, boolean update) {
 
 		if (isVisited(MenuItem.class, menuItem.getName())) {
 			return;
 		}
 
-		log.info("Loading menu : {}", menuItem.getName());
+		log.debug("Loading menu : {}", menuItem.getName());
 
 		MetaMenu menu = MetaMenu.findByName(menuItem.getName());
 		if (menu == null) {
@@ -331,52 +331,52 @@ public class ViewLoader extends AbstractLoader {
 		menu.setTop(menuItem.getTop());
 		menu.setLeft(menuItem.getLeft() == null ? true : menuItem.getLeft());
 		menu.setMobile(menuItem.getMobile());
-		
+
 		menu.clearGroups();
 		menu.setGroups(this.findGroups(menuItem.getGroups()));
 
 		if (!Strings.isNullOrEmpty(menuItem.getParent())) {
 			MetaMenu parent = MetaMenu.findByName(menuItem.getParent());
 			if (parent == null) {
-				log.info("Unresolved parent : {}", menuItem.getParent());
+				log.debug("Unresolved parent : {}", menuItem.getParent());
 				this.setUnresolved(MetaMenu.class, menuItem.getParent(), menu);
 			} else {
 				menu.setParent(parent);
 			}
 		}
-		
+
 		if (!StringUtils.isBlank(menuItem.getAction())) {
 			MetaAction action = MetaAction.findByName(menuItem.getAction());
 			if (action == null) {
-				log.info("Unresolved action: {}", menuItem.getAction());
+				log.debug("Unresolved action: {}", menuItem.getAction());
 				setUnresolved(MetaMenu.class, menuItem.getAction(), menu);
 			} else {
 				menu.setAction(action);
 			}
 		}
-		
+
 		menu = menu.save();
-		
+
 		for (MetaMenu pending : this.resolve(MetaMenu.class, menu.getName())) {
-			log.info("Resolved menu : {}", pending.getName());
+			log.debug("Resolved menu : {}", pending.getName());
 			pending.setParent(menu);
 			pending.save();
 		}
 	}
-	
+
 	private void importActionMenu(MenuItem menuItem, Module module, boolean update) {
 
 		if (isVisited(MenuItem.class, menuItem.getName())) {
 			return;
 		}
-		
-		log.info("Loading action menu : {}", menuItem.getName());
+
+		log.debug("Loading action menu : {}", menuItem.getName());
 
 		MetaActionMenu menu = MetaActionMenu.findByName(menuItem.getName());
 		if (menu == null) {
 			menu = new MetaActionMenu(menuItem.getName());
 		}
-		
+
 		if (isUpdated(menu)) {
 			return;
 		}
@@ -384,11 +384,11 @@ public class ViewLoader extends AbstractLoader {
 		menu.setTitle(menuItem.getDefaultTitle());
 		menu.setModule(module.getName());
 		menu.setCategory(menuItem.getCategory());
-		
+
 		if (!StringUtils.isBlank(menuItem.getParent())) {
 			MetaActionMenu parent = MetaActionMenu.findByName(menuItem.getParent());
 			if (parent == null) {
-				log.info("Unresolved parent : {}", menuItem.getParent());
+				log.debug("Unresolved parent : {}", menuItem.getParent());
 				this.setUnresolved(MetaActionMenu.class, menuItem.getParent(), menu);
 			} else {
 				menu.setParent(parent);
@@ -398,7 +398,7 @@ public class ViewLoader extends AbstractLoader {
 		if (!Strings.isNullOrEmpty(menuItem.getAction())) {
 			MetaAction action = MetaAction.findByName(menuItem.getAction());
 			if (action == null) {
-				log.info("Unresolved action: {}", menuItem.getAction());
+				log.debug("Unresolved action: {}", menuItem.getAction());
 				this.setUnresolved(MetaActionMenu.class, menuItem.getAction(), menu);
 			} else {
 				menu.setAction(action);
@@ -408,7 +408,7 @@ public class ViewLoader extends AbstractLoader {
 		menu = menu.save();
 
 		for (MetaActionMenu pending : this.resolve(MetaActionMenu.class, menu.getName())) {
-			log.info("Resolved action menu : {}", pending.getName());
+			log.debug("Resolved action menu : {}", pending.getName());
 			pending.setParent(menu);
 			pending.save();
 		}
@@ -422,7 +422,7 @@ public class ViewLoader extends AbstractLoader {
 				File out = FileUtils.getFile(outputDir, "views", klass.getSimpleName() + ".xml");
 				String xml = createDefaultViews(module, klass);
 				try {
-					log.info("Creating default views: {}", out);
+					log.debug("Creating default views: {}", out);
 					Files.createParentDirs(out);
 					Files.write(xml, out, Charsets.UTF_8);
 				} catch (IOException e) {
@@ -431,7 +431,7 @@ public class ViewLoader extends AbstractLoader {
 			}
 		}
 	}
-	
+
 	@SuppressWarnings("all")
 	private String createDefaultViews(Module module, final Class<?> klass) {
 
@@ -484,7 +484,7 @@ public class ViewLoader extends AbstractLoader {
 
 		return XMLViews.toXml(ImmutableList.of(gridView, formView), false);
 	}
-	
+
 	// Fields names are not in ordered but some JVM implementation can.
 	private List<String> fieldNames(Class<?> klass) {
 		List<String> result = new ArrayList<String>();
