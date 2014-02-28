@@ -440,7 +440,9 @@ ActionHandler.prototype = {
 		if (data.save) {
 			scope.$timeout(function () {
 				self._handleSave().then(function(){
-					deferred.resolve(data.pending);
+					scope.ajaxStop(function () {
+						deferred.resolve(data.pending);
+					}, 100);
 				});
 			});
 			return deferred.promise;
