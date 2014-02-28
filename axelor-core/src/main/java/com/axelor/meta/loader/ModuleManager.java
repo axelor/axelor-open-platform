@@ -109,6 +109,16 @@ public class ModuleManager {
 		}
 	}
 
+	public void updateAll(boolean withDemo) {
+
+		this.createUsers();
+		this.resolve(true);
+
+		for (Module module : resolver.all()) {
+			install(module.getName(), true, withDemo, false);
+		}
+	}
+
 	public void update(boolean withDemo, String... modules) {
 
 		this.createUsers();
@@ -159,10 +169,10 @@ public class ModuleManager {
 		MetaMenu.findByModule(module).remove();
 		MetaAction.findByModule(module).remove();
 		MetaTranslation.findByModule(module).remove();
-		
+
 		entity.setInstalled(false);
 		entity.save();
-		
+
 		resolver.get(module).setInstalled(false);
 
 		log.info("Module uninstalled: {}", module);
