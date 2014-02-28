@@ -41,6 +41,7 @@ import javax.xml.bind.annotation.XmlType;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.meta.ActionHandler;
+import com.axelor.rpc.ActionResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -231,5 +232,143 @@ public class ActionView extends Action {
 	@Override
 	public Object wrap(ActionHandler handler) {
 		return ImmutableMap.of("view", evaluate(handler));
+	}
+
+	/**
+	 * Return an instance of {@link ActionViewBuilder} that can be used to
+	 * quickly define {@link ActionView}.
+	 * 
+	 * @param title
+	 *            the view title
+	 * @return an instance of {@link ActionViewBuilder}
+	 */
+	public static ActionViewBuilder define(String title) {
+		return new ActionViewBuilder(title);
+	}
+
+	/**
+	 * The {@link ActionViewBuilder} can be used to quickly define
+	 * {@link ActionView} manually, especially when setting view to
+	 * {@link ActionResponse}.
+	 * 
+	 */
+	public static final class ActionViewBuilder {
+
+		private ActionView view = new ActionView();
+
+		private ActionViewBuilder(String title) {
+			view.title = title;
+			view.views = Lists.newArrayList();
+			view.contexts = Lists.newArrayList();
+			view.params = Lists.newArrayList();
+		}
+		
+		public ActionViewBuilder name(String name) {
+			view.setName(name);
+			return this;
+		}
+
+		public ActionViewBuilder model(String model) {
+			view.model = model;
+			return this;
+		}
+		
+		public ActionViewBuilder icon(String icon) {
+			view.icon = icon;
+			return this;
+		}
+
+		public ActionViewBuilder add(String type) {
+			return add(type, null);
+		}
+
+		public ActionViewBuilder add(String type, String name) {
+			View item = new View();
+			item.setType(type);
+			item.setName(name);
+			view.views.add(item);
+			return this;
+		}
+		
+		public ActionViewBuilder domain(String domain) {
+			view.domain = domain;
+			return this;
+		}
+		
+		public ActionViewBuilder context(String key, String value) {
+			Context item = new Context();
+			item.setName(key);
+			item.setExpression(value);
+			view.contexts.add(item);
+			return this;
+		}
+		
+		public ActionViewBuilder param(String key, String value) {
+			Param item = new Param();
+			item.name = key;
+			item.value = value;
+			view.params.add(item);
+			return this;
+		}
+
+		/**
+		 * Get the prepared {@link ActionView}.
+		 * 
+		 * @return an instance of {@link ActionView}
+		 */
+		public ActionView get() {
+			return view;
+		}
+
+		/**
+		 * Return a {@link Map} that represents the action view.
+		 * 
+		 * @return a {@link Map}
+		 */
+		public Map<String, Object> map() {
+			Map<String, Object> result = Maps.newHashMap();
+			Map<String, Object> context = Maps.newHashMap();
+			Map<String, Object> params = Maps.newHashMap();
+			List<Object> items = Lists.newArrayList();
+			String type = null;
+
+			for (View v : view.views) {
+				if (type == null) {
+					type = v.type;
+				}
+				Map<String, Object> item = Maps.newHashMap();
+				item.put("type", v.getType());
+				item.put("name", v.getName());
+				items.add(item);
+			}
+
+			if (type == null) {
+				type = "grid";
+				items.add(ImmutableMap.of("type", "grid"));
+				items.add(ImmutableMap.of("type", "form"));
+			}
+
+			for(Context ctx : view.contexts) {
+				context.put(ctx.getName(), ctx.getExpression());
+			}
+
+			for(Param param : view.params) {
+				Object value = param.value;
+				if ("false".equals(value)) value = false;
+				if ("true".equals(value)) value = true;
+				params.put(param.name, value);
+			}
+
+			result.put("title", view.title);
+			result.put("icon", view.icon);
+			result.put("model", view.model);
+			result.put("viewType", type);
+			result.put("views", items);
+			result.put("domain", view.domain);
+			result.put("context", context);
+			result.put("params", params);
+			
+			return result;
+		}
 	}
 }
