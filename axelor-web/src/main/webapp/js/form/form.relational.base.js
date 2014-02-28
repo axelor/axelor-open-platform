@@ -221,8 +221,8 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	};
 	
 	$scope.$on("on:edit", function(record){
-		$scope._domain = field.domain;
-		$scope._context = field.context;
+		$scope._domain = ($scope.field||field).domain;
+		$scope._context = ($scope.field||field).context;
 	});
 	
 	$scope.setDomain = function(domain, context) {

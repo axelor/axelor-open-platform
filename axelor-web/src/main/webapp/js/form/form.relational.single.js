@@ -504,7 +504,10 @@ ui.formInput('RefItem', 'ManyToOne', {
 		}
 
 		var self = this;
-		scope.loadView('grid').success(function(fields, view) {
+		var target = element.attr('x-target');
+		var data = (_.findWhere(scope.$parent.field.selectionList, {value: target})||{}).data || {};
+
+		scope.loadView('grid', data.grid).success(function(fields, view) {
 			var name = false,
 				search = [];
 
@@ -521,7 +524,8 @@ ui.formInput('RefItem', 'ManyToOne', {
 			_.extend(scope.field, {
 				target: scope._model,
 				targetName: name,
-				targetSearch: search
+				targetSearch: search,
+				domain: data.domain
 			});
 
 			self._link(scope, element, attrs, model);
