@@ -319,6 +319,10 @@ public class ModuleManager {
 	@Transactional
 	void createUsers() {
 
+		if(User.all().count() != 0) {
+			return;
+		}
+
 		User admin = User.findByCode("admin");
 		if (admin != null) {
 			return;
