@@ -31,11 +31,14 @@
 package com.axelor.meta.schema.views;
 
 import java.util.List;
+import java.util.Map;
 
+import javax.xml.bind.annotation.XmlAnyAttribute;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
+import javax.xml.namespace.QName;
 
 import com.axelor.db.JPA;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -85,6 +88,9 @@ public class Selection {
 		@XmlValue
 		private String title;
 
+		@XmlAnyAttribute
+		private Map<QName, String> data;
+
 		public String getValue() {
 			return value;
 		}
@@ -106,6 +112,13 @@ public class Selection {
 			this.title = title;
 		}
 
+		public Map<QName, String> getData() {
+			return data;
+		}
+		
+		public void setData(Map<QName, String> data) {
+			this.data = data;
+		}
 	}
 
 }

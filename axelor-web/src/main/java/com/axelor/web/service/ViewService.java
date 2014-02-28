@@ -70,7 +70,6 @@ import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -366,7 +365,14 @@ public class ViewService extends AbstractService {
 			return null;
 		}
 		for(MetaSelectItem item : items) {
-			all.add(ImmutableMap.of("value", item.getValue(), "title", JPA.translate(item.getTitle(), item.getTitle(), null, "select")));
+			Map<String, Object> current = Maps.newHashMap();
+			String data = item.getData();
+			current.put("value", item.getValue());
+			current.put("title", JPA.translate(item.getTitle(), item.getTitle(), null, "select"));
+			if (data != null) {
+				current.put("data", data);
+			}
+			all.add(current);
 		}
 		return all;
 	}

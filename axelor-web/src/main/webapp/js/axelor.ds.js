@@ -107,6 +107,7 @@
 						field.readonly = true;
 						field.required = false;
 					}
+					processSelection(field);
 				});
 				meta.fields = fields;
 			} else {
@@ -115,6 +116,7 @@
 
 			forEach(view.items || view.pages, function(item) {
 				processWidget(item);
+				processSelection(item);
 				forEach(fields[item.name], function(value, key){
 					if (!item.hasOwnProperty(key)) {
 						item[key] = value;
@@ -129,6 +131,14 @@
 				}
 			});
 		};
+		
+		function processSelection(field) {
+			_.each(field.selectionList, function (item) {
+				if (_.isString(item.data)) {
+					item.data = angular.fromJson(item.data);
+				}
+			});
+		}
 
 		function processWidget(field) {
 

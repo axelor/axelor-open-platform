@@ -191,12 +191,14 @@
       <grid title="Select Items" editable="true" orderBy="order">
         <field name="title" />
         <field name="value" />
-        <field name="order" />
+        <field name="data" />
+        <field name="order" width="100" />
       </grid>
       <form cols="2" title="Select Item">
         <field name="title" />
         <field name="value" />
-        <field name="order" help="Sequence order" />
+        <field name="data" />
+        <field name="order" help="Sequence order" width="100" />
       </form>
     </field>
   </form>

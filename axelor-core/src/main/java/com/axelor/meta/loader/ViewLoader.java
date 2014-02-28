@@ -36,11 +36,13 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Singleton;
 import javax.persistence.PersistenceException;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 
 import com.axelor.auth.db.Group;
 import com.axelor.common.FileUtils;
@@ -64,6 +66,8 @@ import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.schema.views.Selection;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
@@ -71,12 +75,17 @@ import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
+import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 
 @Singleton
 public class ViewLoader extends AbstractLoader {
+	
+	@Inject
+	private ObjectMapper objectMapper;
 
 	@Override
 	@Transactional
@@ -243,6 +252,21 @@ public class ViewLoader extends AbstractLoader {
 			item.setTitle(opt.getDefaultTitle());
 			item.setOrder(sequence++);
 			entity.addItem(item);
+			if (opt.getData() == null) {
+				continue;
+			}
+
+			Map<String, Object> data = Maps.newHashMap();
+			for (QName param : opt.getData().keySet()) {
+				String paramName = param.getLocalPart();
+				if (paramName.startsWith("data-")) {
+					data.put(paramName.substring(5), opt.getData().get(param));
+				}
+			}
+			try {
+				item.setData(objectMapper.writeValueAsString(data));
+			} catch (JsonProcessingException e) {
+			}
 		}
 
 		entity.save();
