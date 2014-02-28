@@ -330,6 +330,7 @@
           <xsd:simpleContent>
             <xsd:extension base="xsd:string">
               <xsd:attribute name="value" type="xsd:string" use="required" />
+              <xsd:anyAttribute processContents="lax" />
             </xsd:extension>
           </xsd:simpleContent>
         </xsd:complexType>
