@@ -140,6 +140,7 @@
 			});
 		}
 
+		//TODO: remove the widget[attr=value] support
 		function processWidget(field) {
 
 			var widget = field.widget || '',
@@ -149,6 +150,18 @@
 			if (widget) {
 				field.widgetName = widget;
 			}
+
+			if (field.widgetAttrs) {
+				_.each(field.widgetAttrs, function (value, name) {
+					if (value === "true") value = true;
+					if (value === "false") value = false;
+					if (value === "null") value = null;
+					if (/(-)?\d+/.test(value)) value = +(value);
+					field.widgetAttrs[name] = value;
+				});
+				return;
+			}
+
 			if (!match) {
 				return;
 			}
