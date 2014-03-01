@@ -46,6 +46,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.google.common.collect.Maps;
 
 @XmlType
 @JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type", defaultImpl = Field.class)
@@ -67,6 +68,7 @@ public abstract class AbstractWidget {
 	@XmlAttribute(name = "if-module")
 	private String moduleToCheck;
 	
+	@JsonIgnore
 	@XmlAnyAttribute
 	private Map<QName, String> otherAttributes;
 	
@@ -90,6 +92,23 @@ public abstract class AbstractWidget {
 		this.otherAttributes = otherAttributes;
 	}
 
+	@XmlTransient
+	public Map<String, Object> getWidgetAttrs() {
+		if (otherAttributes == null || otherAttributes.isEmpty()) {
+			return null;
+		}
+		final Map<String, Object> attrs = Maps.newHashMap();
+		for (QName qn : otherAttributes.keySet()) {
+			String name = qn.getLocalPart();
+			String value = otherAttributes.get(qn);
+			if (name.startsWith("x-") || name.startsWith("data-")) {
+				name = name.replaceFirst("^(x|data)-", "");
+				attrs.put(name, value);
+			}
+		}
+		return attrs;
+	}
+	
 	public String getModel() {
 		return model;
 	}
