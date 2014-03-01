@@ -22,6 +22,7 @@
 		<field name="name" validIf="name.length &gt;= 2" onChange="action-condition-group-validName" />
 		<field name="code" validIf="code.length &gt;= 2" onChange="action-condition-group-validCode" />
 		<field name="navigation" />
+        <field name="technicalStaff"/>
 		<break/>
 		<field name="roles" colSpan="2" grid-view="role-grid" form-view="role-form" />
 		<field name="permissions" colSpan="2">
