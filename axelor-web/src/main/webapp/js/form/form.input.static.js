@@ -32,9 +32,19 @@
 
 var ui = angular.module('axelor.ui');
 
-ui.directive('uiHelpPopover', function() {
-	
-	function addRow(table, label, text, klass) {
+function makePopover(scope, element, callback, placement) {
+
+	if (!scope.app || scope.app.mode !== 'dev') {
+		return;
+	}
+
+	var table = null;
+
+	function addRow(label, text, klass) {
+		if (table === null) {
+			table = $('<table class="field-details"></table>');
+		}
+		
 		var tr = $('<tr></tr>').appendTo(table);
 		if (label) {
 			$('<th></th>').text(label + ':').appendTo(tr);
@@ -48,23 +58,95 @@ ui.directive('uiHelpPopover', function() {
 		}
 		return table;
 	}
-	
-	function getHelp(scope, element, field, mode) {
-		
-		var text = field.help;
-		var table = $('<table class="field-details"></table>');
 
+	element.popover({
+		html: true,
+		delay: { show: 1000, hide: 100 },
+		animate: true,
+		placement: function() {
+			if (placement) return placement;
+			var coord = $(element.get(0)).offset(),
+				viewport = {height: innerHeight, width: window.innerWidth};
+			if(viewport.height < (coord.top + 100))
+				return 'top';
+			if(coord.left > (viewport.width / 2))
+				return 'left';
+			return 'right';
+		},
+		trigger: 'hover',
+		container: 'body',
+		title: function() {
+			return element.text();
+		},
+		content: function() {
+			if (table) {
+				table.remove();
+				table = null;
+			}
+			callback(scope, addRow);
+			if (table) return table;
+			return "";
+		}
+	});
+
+	function destroy() {
+		if (element) {
+			element.popover('destroy');
+			element = null;
+		}
+		if (table) {
+			table.remove();
+			table = null;
+		}
+	}
+	
+	element.on('$destroy', destroy);
+}
+
+ui.directive('uiTabPopover', function() {
+	
+	function getHelp(scope, addRow) {
+		var tab = scope.tab || {};
+		var type = tab.viewType;
+		var view = _.findWhere(tab.views, {type: type});
+		
+		var viewScope = tab.$viewScope;
+		if (viewScope && viewScope.schema) {
+			view = viewScope.schema;
+		}
+		
+		if (tab.action) {
+			addRow(_t('Action'), tab.action);
+		}
+		if (tab.model) {
+			addRow(_t('Object'), tab.model);
+		}
+		if (tab.domain) {
+			addRow(_t('Domain'), tab.domain);
+		}
+		if (view && view.name) {
+			addRow(_t('View'), view.name);
+		}
+	}
+
+	return function (scope, element, attrs) {
+		return makePopover(scope, element, getHelp, 'bottom');
+	};
+});
+
+ui.directive('uiHelpPopover', function() {
+
+	function getHelp(scope, addRow) {
+
+		var field = scope.field;
+		var text = field.help;
 		if (text) {
 			text = text.replace(/\\n/g, '<br>');
-			addRow(table, null, text, 'help-text');
-		}
-		
-		if (mode != 'dev') {
-			return table;
+			addRow(null, text, 'help-text');
 		}
 
 		if (text) {
-			addRow(table, null, '<hr noshade>', 'help-text');
+			addRow(null, '<hr noshade>', 'help-text');
 		}
 		
 		var model = scope._model;
@@ -72,20 +154,20 @@ ui.directive('uiHelpPopover', function() {
 			model = scope.$parent._model;
 		}
 
-		addRow(table, _t('Object'), model);
-		addRow(table, _t('Field Name'), field.name);
-		addRow(table, _t('Field Type'), field.serverType);
-		
-		if (field.type == 'text') {
-			return table;
+		addRow(_t('Object'), model);
+		addRow(_t('Field Name'), field.name);
+		addRow(_t('Field Type'), field.serverType);
+
+		if (field.type === 'text') {
+			return;
 		}
-		
+
 		if (field.domain) {
-			addRow(table, _t('Filter'), field.domain);
+			addRow(_t('Filter'), field.domain);
 		}
-		
+
 		if (field.target) {
-			addRow(table, _t('Reference'), field.target);
+			addRow(_t('Reference'), field.target);
 		}
 
 		var value = scope.$eval('$$original.' + field.name);
@@ -115,9 +197,7 @@ ui.directive('uiHelpPopover', function() {
 			value = value.join(', ');
 		}
 
-		addRow(table, _t('Orig. Value'), value);
-
-		return table;
+		addRow(_t('Orig. Value'), value);
 	}
 
 	function doLink(scope, element, attrs) {
@@ -125,51 +205,7 @@ ui.directive('uiHelpPopover', function() {
 		if (field == null) {
 			return;
 		}
-		var mode = scope.$eval('app.mode') || 'dev';
-		if (!field.help && mode != 'dev') {
-			return;
-		}
-
-		var content = null;
-
-		element.popover({
-			html: true,
-			delay: { show: 1000, hide: 100 },
-			animate: true,
-			placement: function() {
-				var coord = $(element.get(0)).offset(),
-					viewport = {height: innerHeight, width: window.innerWidth};
-				if(viewport.height < (coord.top + 100))
-					return 'top';
-				if(coord.left > (viewport.width / 2))
-					return 'left';
-				return 'right';
-			},
-			trigger: 'hover',
-			container: 'body',
-			title: function() {
-				return element.text();
-			},
-			content: function() {
-				if (content) {
-					content.remove();
-				}
-				return content = getHelp(scope, element, field, mode);
-			}
-		});
-
-		function destroy() {
-			if (element) {
-				element.popover('destroy');
-				element = null;
-			}
-			if (content) {
-				content.remove();
-				content = null;
-			}
-		}
-		
-		element.on('$destroy', destroy);
+		makePopover(scope, element, getHelp);
 	};
 
 	return function(scope, element, attrs) {
