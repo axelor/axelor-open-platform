@@ -33,8 +33,11 @@
 var ui = angular.module('axelor.ui');
 
 function makePopover(scope, element, callback, placement) {
+	
+	var mode = __appSettings['application.mode'];
+	var tech = __appSettings['user.technical'];
 
-	if (!scope.app || scope.app.mode !== 'dev') {
+	if (mode != 'dev' && !tech) {
 		return;
 	}
 
