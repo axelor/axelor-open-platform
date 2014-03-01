@@ -503,7 +503,7 @@ Grid.prototype.parse = function(view) {
 			forEdit: item.forEdit,
 			descriptor: field,
 			sortable: sortable,
-			width: item.width,
+			width: +(item.width) || null,
 			hasWidth: item.width ? true : false,
 			cssClass: type,
 			headerCssClass: type,
