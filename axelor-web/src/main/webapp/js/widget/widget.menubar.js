@@ -38,6 +38,18 @@ function MenuBarCtrl($scope, $element) {
 	this.isDivider = function(item) {
 		return !item.title && !item.icon;
 	};
+	
+	$scope.isImage = function (menu) {
+		return menu.icon && menu.icon.indexOf('icon-') !== 0;
+	};
+	
+	$scope.isIcon = function (menu) {
+		return menu.icon && menu.icon.indexOf('icon-') === 0;
+	};
+	
+	$scope.canShowTitle = function(menu) {
+		return menu.showTitle === null || menu.showTitle === undefined || menu.showTitle;
+	};
 }
 
 module.directive('uiMenuBar', function() {
@@ -56,17 +68,14 @@ module.directive('uiMenuBar', function() {
 			scope.onMenuClick = _.once(function onMenuClick() {
 				element.find('.dropdown-toggle').dropdown('toggle');
 			});
-
-			scope.canShowTitle = function(menu) {
-				return menu.showTitle === null || menu.showTitle === undefined || menu.showTitle;
-			};
 		},
 
 		template:
 			"<ul class='nav menu-bar'>" +
-				"<li class='menu dropdown' ng-repeat='menu in menus'>" +
-					"<a href='' class='dropdown-toggle' data-toggle='dropdown' ng-click='onMenuClick()'>" +
-						"<img ng-show='menu.icon != null' ng-src='{{menu.icon}}'> " +
+				"<li class='menu dropdown' ng-class='{\"button-menu\": menu.isButton}' ng-repeat='menu in menus'>" +
+					"<a href='' class='dropdown-toggle' ng-class='{\"btn\": menu.isButton}' data-toggle='dropdown' ng-click='onMenuClick()'>" +
+						"<img ng-if='isImage(menu)' ng-src='{{menu.icon}}'> " +
+						"<i class='{{menu.icon}}' ng-if='isIcon(menu)'></i> " +
 						"<span ng-show='canShowTitle(menu)'>{{menu.title}}</span> " +
 						"<b class='caret'></b>" +
 					"</a>" +
@@ -129,7 +138,11 @@ module.directive('uiMenuItem', ['ActionService', function(ActionService) {
 			};
 
 			scope.isReadonly = function(){
-				return attrs.readonly;
+				if (attrs.readonly) return true;
+				if (_.isFunction(item.active)) {
+					return !item.active();
+				}
+				return false;
 			};
 
 			scope.isHidden = function(){
@@ -149,6 +162,9 @@ module.directive('uiMenuItem', ['ActionService', function(ActionService) {
 				$(e.srcElement).parents('.dropdown').dropdown('toggle');
 				if (item.action) {
 					return handler.onClick();
+				}
+				if (_.isFunction(item.click)) {
+					return item.click(e);
 				}
 			};
 
