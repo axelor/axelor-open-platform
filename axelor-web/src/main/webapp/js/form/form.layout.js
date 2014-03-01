@@ -166,9 +166,7 @@ function TableLayout(items, attrs, $scope, $compile) {
 		
 		// append remaining cells
 		for (var i = numCells ; i < numCols ; i++) {
-			if (widths && widths.length > i) {
-				$('<td></td>').width(widths[i]).appendTo(tr);
-			}
+			$('<td></td>').appendTo(tr).width((widths||[])[i]);
 		}
 
 		tr.appendTo(table);
