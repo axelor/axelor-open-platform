@@ -677,8 +677,20 @@ img.prefix-icon {
 	white-space: nowrap;
 }
 
+.record-toolbar .button-menu a.btn {
+	padding: 5px 8px 5px;
+	margin-top: 4px;
+	color: #333;
+}
+
+.record-toolbar .button-menu a.btn:hover,
+.record-toolbar .button-menu a.btn:focus {
+	background: #eeeeee;
+}
+
 .record-toolbar .menu-bar a.disabled {
 	color: #ccc;
+	cursor: default;
 }
 
 .record-toolbar .menu-bar a.disabled:hover,

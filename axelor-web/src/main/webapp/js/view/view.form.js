@@ -625,6 +625,68 @@ function FormViewCtrl($scope, $element) {
 			});
 		});
 	}
+	
+	function showLog() {
+		
+		var info = {};
+			record = $scope.record || {};
+		if (record.createdOn) {
+			info.createdOn = moment(record.createdOn).format('DD/MM/YYYY HH:mm');
+			info.createdBy = (record.createdBy || {}).name;
+		}
+		if (record.updatedOn) {
+			info.updatedOn = moment(record.updatedOn).format('DD/MM/YYYY HH:mm');
+			info.updatedBy = (record.updatedBy || {}).name;
+		}
+		var table = $("<table class='field-details'>");
+		var tr;
+		
+		tr = $("<tr></tr>").appendTo(table);
+		$("<th></th>").text(_t("Created On:")).appendTo(tr);
+		$("<td></td>").text(info.createdOn).appendTo(tr);
+		
+		tr = $("<tr></tr>").appendTo(table);
+		$("<th></th>").text(_t("Created By:")).appendTo(tr);
+		$("<td></td>").text(info.createdBy).appendTo(tr);
+		
+		tr = $("<tr></tr>").appendTo(table);
+		$("<th></th>").text(_t("Updated On:")).appendTo(tr);
+		$("<td></td>").text(info.updatedOn).appendTo(tr);
+		
+		tr = $("<tr></tr>").appendTo(table);
+		$("<th></th>").text(_t("Updated By:")).appendTo(tr);
+		$("<td></td>").text(info.updatedBy).appendTo(tr);
+
+		var text = $('<div>').append(table).html();
+
+		axelor.dialogs.say(text);
+	}
+	
+	$scope.toolmenu = [{
+		icon: 'icon-cog',
+		isButton: true,
+		items: [{
+			title: _t('Refresh'),
+			click: function(e) {
+				$scope.onRefresh();
+			}
+		}, {
+			title: _t('Duplicate'),
+			active: function () {
+				return $scope.canCopy();
+			},
+			click: function(e) {
+				$scope.onCopy();
+			}
+		}, {
+		}, {
+			title: _t('Log...'),
+			active: function () {
+				return $scope.hasAuditLog();
+			},
+			click: showLog
+		}]
+	}];
 
 	$scope.onHotKey = function (e, action) {
 		
@@ -792,55 +854,6 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 	
 	return function(scope, element, attrs) {
 		
-		function getContent() {
-			var info = {};
-				record = scope.record || {};
-			if (record.createdOn) {
-				info.createdOn = moment(record.createdOn).format('DD/MM/YYYY HH:mm');
-				info.createdBy = (scope.record.createdBy || {}).name;
-			}
-			if (record.updatedOn) {
-				info.updatedOn = moment(record.updatedOn).format('DD/MM/YYYY HH:mm');
-				info.updatedBy = (scope.record.updatedBy || {}).name;
-			}
-			var table = $("<table class='field-details'>");
-			var tr;
-			
-			tr = $("<tr></tr>").appendTo(table);
-			$("<th></th>").text(_t("Created On:")).appendTo(tr);
-			$("<td></td>").text(info.createdOn).appendTo(tr);
-			
-			tr = $("<tr></tr>").appendTo(table);
-			$("<th></th>").text(_t("Created By:")).appendTo(tr);
-			$("<td></td>").text(info.createdBy).appendTo(tr);
-			
-			tr = $("<tr></tr>").appendTo(table);
-			$("<th></th>").text(_t("Updated On:")).appendTo(tr);
-			$("<td></td>").text(info.updatedOn).appendTo(tr);
-			
-			tr = $("<tr></tr>").appendTo(table);
-			$("<th></th>").text(_t("Updated By:")).appendTo(tr);
-			$("<td></td>").text(info.updatedBy).appendTo(tr);
-			
-			return table;
-		}
-		
-		var logInfo = null;
-		scope.onShowLog = function(e) {
-			if (logInfo === null) {
-				logInfo = $(e.delegateTarget).popover({
-					title: _t('Update Log'),
-					html: true,
-					content: getContent,
-					placement: "bottom",
-					trigger: "manual",
-					container: "body",
-					delay: {show: 500, hide: 0}
-				});
-			}
-			logInfo.popover('show');
-		};
-		
 		scope.canShowAttachments = function() {
 			return scope.canAttach() && (scope.record || {}).id;
 		};
@@ -919,29 +932,6 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 				title: _t("The following fields are invalid:")
 			});
 		};
-
-		function onMouseDown(e) {
-			if (!logInfo) return;
-			if (logInfo.is(e.target) || logInfo.has(e.target).size() > 0) return;
-			if (logInfo.data('popover').$tip.is(e.target) ||
-			    logInfo.data('popover').$tip.has(e.target).size() > 0) return;
-			closePopover();
-		};
-
-		function closePopover() {
-			if (logInfo != null) {
-				logInfo.popover('hide');
-				logInfo.popover("destroy");
-				logInfo = null;
-			}
-		}
-
-		$(document).on('mousedown.loginfo', onMouseDown);
-
-		scope.$on("$destroy", function() {
-			closePopover();
-			$(document).off('mousedown.loginfo', onMouseDown);
-		});
 
 		var unwatch = scope.$watch('schema.loaded', function(viewLoaded){
 
