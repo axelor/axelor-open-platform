@@ -338,6 +338,12 @@ function SearchGridCtrl($scope, $element, ViewService, $interpolate) {
 			viewTitles[select.model] = select.viewTitle;
 		});
 
+		_.each(view.items, function (item) {
+			if (item.width) {
+				view.items[0].width = 220;
+			}
+		});
+
 		$scope.fields = meta.fields;
 		$scope.schema = view;
 		$scope.schema.loaded = true;
