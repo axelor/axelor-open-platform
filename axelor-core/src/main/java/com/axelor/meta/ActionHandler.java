@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
@@ -72,7 +73,7 @@ import com.google.inject.Injector;
 import com.google.inject.servlet.RequestScoped;
 
 @RequestScoped
-public final class ActionHandler {
+public class ActionHandler {
 
 	private final Logger log = LoggerFactory.getLogger(ActionHandler.class);
 
@@ -91,8 +92,8 @@ public final class ActionHandler {
 	private Templates templates;
 
 	private Pattern pattern = Pattern.compile("^(select\\[\\]|select|action|call|eval):\\s*(.*)");
-
-	public ActionHandler(ActionRequest request, Injector injector) {
+	
+	private ActionHandler(Injector injector, ActionRequest request) {
 
 		Context context = request.getContext();
 		if (context == null) {
@@ -111,6 +112,15 @@ public final class ActionHandler {
 		this.bindings = this.scriptHelper.getBindings();
 	}
 
+	@Inject
+	ActionHandler(Injector injector) {
+		this.injector = injector;
+	}
+	
+	public ActionHandler forRequest(ActionRequest request) {
+		return new ActionHandler(injector, request);
+	}
+	
 	public Injector getInjector() {
 		return injector;
 	}

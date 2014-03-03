@@ -52,7 +52,6 @@ import com.axelor.wkf.data.CreateData;
 import com.axelor.wkf.db.Workflow;
 import com.axelor.wkf.workflow.WorkflowService;
 import com.google.common.collect.Maps;
-import com.google.inject.Injector;
 
 @RunWith(GuiceRunner.class)
 @GuiceModules({ WkfTest.class })
@@ -61,10 +60,10 @@ public class WorkFlowEngineTest {
 	private static Workflow wkf;
 
 	@Inject
-	WorkflowService workflowService;
+	private WorkflowService workflowService;
 	
 	@Inject
-	Injector injector;
+	private ActionHandler handler;
 	
 	private ActionHandler createHandler(String action, Map<String, Object> context) {
 		
@@ -77,7 +76,7 @@ public class WorkFlowEngineTest {
 
 		data.put("context", context);
 		
-		return new ActionHandler(request, injector);
+		return handler.forRequest(request);
 	}
 
 	@BeforeClass
