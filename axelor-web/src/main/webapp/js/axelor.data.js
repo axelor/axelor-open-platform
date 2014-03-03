@@ -259,6 +259,7 @@
 				var query = extend({
 					_domain: domain,
 					_domainContext: context,
+					_domainAction: opts.action,
 					_archived: archived
 				}, filter);
 
