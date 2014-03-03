@@ -33,6 +33,7 @@ package com.axelor.rpc;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.Maps;
 
 public class ActionRequest extends Request {
 
@@ -51,10 +52,23 @@ public class ActionRequest extends Request {
 	@JsonIgnore
 	@SuppressWarnings("all")
 	public Context getContext() {
-		if (context != null)
+		if (context != null) {
 			return context;
-		if (getData() == null)
+		}
+		if (getData() == null) {
 			return null;
-		return context = Context.create((Map) getData().get("context"), getBeanClass());
+		}
+		
+		Map<String, Object> data = getData();
+		Map<String, Object> ctx = Maps.newHashMap();
+
+		if (data.get("context") != null) {
+			ctx.putAll((Map) data.get("context"));
+		}
+		if (data.get("_domainContext") != null) {
+			ctx.putAll((Map) data.get("_domainContext"));
+		}
+
+		return context = Context.create(ctx, getBeanClass());
 	}
 }
