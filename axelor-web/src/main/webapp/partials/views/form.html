@@ -12,10 +12,10 @@
           <button class="btn" ng-click="onSave()" ng-if="isEditable() && (canEdit() || canSave())"  title="{{ 'Save' | t}}">
             <i class="icon icon-save"></i> <span ng-hide="tbTitleHide" x-translate>Save</span>
           </button>
-          <button class="btn" ng-click="onCancel()" ng-if="hasButton('cancel') && !canEdit()" ng-disabled="!canCancel()" title="{{ 'Cancel' | t}}">
+          <button class="btn" ng-click="onCancel()" ng-if="hasButton('cancel') && canCancel()" title="{{ 'Cancel' | t}}">
             <i class="icon icon-ban-circle"></i> <span ng-hide="tbTitleHide" x-translate>Cancel</span>
           </button>
-          <button class="btn" ng-click="onBack()" ng-if="hasButton('back')" ng-disabled="!canBack()" title="{{ 'Back' | t}}">
+          <button class="btn" ng-click="onBack()" ng-if="hasButton('back') && !canCancel()" ng-disabled="!canBack()" title="{{ 'Back' | t}}">
             <i class="icon icon-reply"></i> <span ng-hide="tbTitleHide" x-translate>Back</span>
           </button>
           <button class="btn" ng-disabled="!canShowAttachments()" ng-click="onShowAttachments()" ng-class="{'has-attachments': record.$attachments}">
