@@ -38,6 +38,7 @@ import javax.persistence.Parameter;
 import com.axelor.db.mapper.Adapter;
 import com.axelor.script.ScriptBindings;
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Ints;
 
 /**
  * The query binder class provides the helper methods to bind query parameters
@@ -150,7 +151,7 @@ public class QueryBinder {
 
 		if (namedParams != null) {
 			for (Parameter<?> p : query.getParameters()) {
-				if (p.getName() != null) {
+				if (p.getName() != null && Ints.tryParse(p.getName()) == null) {
 					this.bind(p.getName(), bindings.get(p.getName()));
 				}
 			}
