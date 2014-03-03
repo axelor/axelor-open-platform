@@ -237,7 +237,7 @@ var Formatters = {
 	},
 	
 	"boolean": function(field, value) {
-		return value ? '<i class="icon-ok"></i>' : "";
+		return value ? '<i class="fa fa-check"></i>' : "";
 	},
 	
 	"duration": function(field, value) {
@@ -270,8 +270,8 @@ var Formatters = {
 	
 	"button": function(field, value, context, grid) {
 		var elem;
-		var isIcon = field.icon && field.icon.indexOf('icon-') === 0;
-		var css = isIcon ? "slick-icon-button " + field.icon : "slick-img-button";
+		var isIcon = field.icon && field.icon.indexOf('fa-') === 0;
+		var css = isIcon ? "slick-icon-button fa " + field.icon : "slick-img-button";
 		
 		if (field.readonlyIf && axelor.$eval(grid.scope, field.readonlyIf, context)) {
 			css += " readonly disabled";
@@ -1690,7 +1690,7 @@ function EditIconColumn(options) {
     	
     function editFormatter(row, cell, value, columnDef, dataContext) {
     	if (!dataContext || !dataContext.id) return "";
-    	return '<i class="icon-pencil"></i>';
+    	return '<i class="fa fa-pencil"></i>';
     }
 
     function getColumnDefinition() {

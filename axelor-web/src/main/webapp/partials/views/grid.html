@@ -4,17 +4,17 @@
       <div class="container">
         <div class="btn-group">
           <button class="btn" ng-click="onNew()" ng-if="hasButton('new')" ng-disabled="canSave()" title="{{ 'New' | t}}">
-            <i class="icon icon-file"></i> <span ng-hide="tbTitleHide" x-translate>New</span>
+            <i class="fa fa-file"></i> <span ng-hide="tbTitleHide" x-translate>New</span>
           </button>
           <button class="btn" ng-click="onEdit()" ng-if="hasButton('edit')" ng-disabled="!canEdit()" title="{{ 'Edit' | t}}">
-            <i class="icon icon-pencil"></i> <span ng-hide="tbTitleHide" x-translate>Edit</span>
+            <i class="fa fa-pencil"></i> <span ng-hide="tbTitleHide" x-translate>Edit</span>
           </button>
           <button ui-update-button x-handler="this" ng-if="hasButton('edit') && canMassUpdate()" title="{{ 'Mass Update' | t}}"></button>
           <button class="btn" ng-click="onSave()" ng-if="canEditInline()" ng-disabled="!canSave()" title="{{ 'Save' | t}}">
-            <i class="icon icon-save"></i> <span ng-hide="tbTitleHide" x-translate>Save</span>
+            <i class="fa fa-floppy-o"></i> <span ng-hide="tbTitleHide" x-translate>Save</span>
           </button>
           <button class="btn" ng-click="onDelete()" ng-if="hasButton('delete')" ng-disabled="!canDelete()" title="{{ 'Delete' | t}}">
-            <i class="icon icon-remove"></i> <span ng-hide="tbTitleHide" x-translate>Delete</span>
+            <i class="fa fa-times"></i> <span ng-hide="tbTitleHide" x-translate>Delete</span>
           </button>
         </div>
         <div ui-filter-box x-handler="this"></div>

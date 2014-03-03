@@ -626,8 +626,8 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 		    '<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-editable="false" x-selector="{{selectMode}}"></div>'+
 		    '<div class="record-pager pull-left">'+
 			    '<div class="btn-group">'+
-			      '<button class="btn" ng-disabled="!canPrev()" ng-click="onPrev()"><i class="icon-chevron-left"></i></button>'+
-			      '<button class="btn" ng-disabled="!canNext()" ng-click="onNext()"><i class="icon-chevron-right"></i></button>'+
+			      '<button class="btn" ng-disabled="!canPrev()" ng-click="onPrev()"><i class="fa fa-chevron-left"></i></button>'+
+			      '<button class="btn" ng-disabled="!canNext()" ng-click="onNext()"><i class="fa fa-chevron-right"></i></button>'+
 			    '</div>'+
 			    '<span>{{pagerText()}}</span>'+
 		    '</div>'+
@@ -689,9 +689,9 @@ angular.module('axelor.ui').directive('uiAttachmentPopup', function(){
 			'<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-editable="false" x-selector="true" x-no-filter="true"></div>'+
 		    '<div class="record-pager pull-left">'+
 			     '<div class="btn-group">'+
-			     	'<button class="btn btn-primary" ng-disabled="!canUpload()" ng-click="onUpload()"><i class="icon icon-upload-alt"/> <span x-translate>Upload</span></button>'+
-		     		'<button class="btn btn-success" ng-disabled="!canDownload()" ng-click="onDownload()"><i class="icon icon-download-alt"/> <span x-translate>Download</span></button>'+
-	     			'<button class="btn btn-danger" ng-disabled="!canDelete()" ng-click="onDelete()"><i class="icon icon-trash"/> <span x-translate>Remove</span></button>'+
+			     	'<button class="btn btn-primary" ng-disabled="!canUpload()" ng-click="onUpload()"><i class="fa fa-arrow-circle-up"/> <span x-translate>Upload</span></button>'+
+		     		'<button class="btn btn-success" ng-disabled="!canDownload()" ng-click="onDownload()"><i class="fa fa-arrow-circle-down"/> <span x-translate>Download</span></button>'+
+	     			'<button class="btn btn-danger" ng-disabled="!canDelete()" ng-click="onDelete()"><i class="fa fa-trash-o"/> <span x-translate>Remove</span></button>'+
 			    '</div>'+
 			    '<div class="btn-group">'+
 				    '<div class="progress progress-striped active" style="width: 300px; background: gainsboro; margin-top: 5px; margin-bottom: 0px;">'+

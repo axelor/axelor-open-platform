@@ -289,7 +289,7 @@ table.form-layout fieldset {
 	height: 100%;
 }
 
-.picker-input > .picker-icons > i[class^=icon] {
+.picker-input > .picker-icons > i.fa {
 	cursor: pointer;
 	margin-right: 1px;
 	padding: 2px;
@@ -405,15 +405,16 @@ td.form-item > * {
 	padding-top: 0;
 }
 
-.form-item .form-item-group > legend i[class^=icon] {
+.form-item .form-item-group > legend i.fa {
 	color: #CCC;
-	height: 10px;
+	height: 15px;
 	margin-right: 4px;
+	vertical-align: middle;
 	display: inline-block;
 	cursor: pointer;
 }
 
-.form-item .form-item-group > legend i[class^=icon]:hover {
+.form-item .form-item-group > legend i.fa:hover {
 	 text-decoration: none;
 	 color: inherit;
 }

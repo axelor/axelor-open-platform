@@ -489,11 +489,6 @@ input[readonly], select[readonly], textarea[readonly] {
 	padding: 4px 12px;
 }
 
-.record-toolbar button i {
-	font-size: 16px;
-	line-height: 20px;
-}
-
 .record-toolbar button span {
 	position: relative;
 	top: -1px;
@@ -652,7 +647,7 @@ img.prefix-icon {
 	margin-right: 4px;
 }
 
-.icon, [class^=icon-] {
+.fa, [class^=fa-] {
 	font-size: 14px;
 }
 
@@ -678,7 +673,7 @@ img.prefix-icon {
 }
 
 .record-toolbar .button-menu a.btn {
-	padding: 5px 8px 5px;
+	padding: 4px 8px 4px;
 	margin-top: 4px;
 	color: #333;
 }

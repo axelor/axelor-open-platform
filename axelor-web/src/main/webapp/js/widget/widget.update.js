@@ -112,7 +112,7 @@ ui.directive('uiUpdateButton', ['$compile', function ($compile) {
 		replace: true,
 		template: 
 			"<button class='btn update-menu-button' ng-click='onMassUpdate($event)' ng-disabled='!canMassUpdate()' >" +
-				"<i class='icon-caret-down'></i>" +
+				"<i class='fa fa-caret-down'></i>" +
 				"<div ui-update-menu x-handler='handler' x-visible='visible'></div>" +
 			"</button>"
 	};
@@ -379,7 +379,7 @@ ui.directive('uiUpdateForm',  function () {
 				"<table class='form-layout'>" +
 					"<tr ng-repeat='filter in filters' class='form-inline'>" +
 						"<td class='filter-remove'>" +
-							"<a href='' ng-click='remove(filter)'><i class='icon icon-remove'></i></a>" +
+							"<a href='' ng-click='remove(filter)'><i class='fa fa-times'></i></a>" +
 						"</td>" +
 						"<td class='form-item'>" +
 							"<span class='form-item-container'>" +

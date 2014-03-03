@@ -155,7 +155,7 @@ ui.formWidget('BaseSelect', {
 	'<span class="picker-input">'+
 		'<input type="text" autocomplete="off">'+
 		'<span class="picker-icons">'+
-			'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
+			'<i class="fa fa-caret-down" ng-click="showSelection()"></i>'+
 		'</span>'+
 	'</span>'
 });
@@ -349,7 +349,7 @@ ui.formInput('ImageSelect', 'Select', {
 			'<img ng-src="{{image}}"></img>' +
 			'<input type="text" autocomplete="off">'+
 			'<span class="picker-icons">'+
-				'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
+				'<i class="fa fa-caret-down" ng-click="showSelection()"></i>'+
 			'</span>'+
 		'</span>'
 });
@@ -517,14 +517,14 @@ ui.formInput('MultiSelect', 'Select', {
 	  '<ul ng-click="showSelection($event)">'+
 		'<li class="tag-item label label-info" ng-repeat="item in items">'+
 			'<span ng-class="{\'tag-link\': handleClick}" class="tag-text" ng-click="handleClick($event, item.value)">{{item.title}}</span> '+
-			'<i class="icon-remove icon-small" ng-click="removeItem(item)"></i>'+
+			'<i class="fa fa-times fa-small" ng-click="removeItem(item)"></i>'+
 		'</li>'+
 		'<li class="tag-selector">'+
 			'<input type="text" autocomplete="off">'+
 		'</li>'+
 	  '</ul>'+
 	  '<span class="picker-icons">'+
-	  	'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
+	  	'<i class="fa fa-caret-down" ng-click="showSelection()"></i>'+
 	  '</span>'+
 	'</div>',
 	template_readonly:

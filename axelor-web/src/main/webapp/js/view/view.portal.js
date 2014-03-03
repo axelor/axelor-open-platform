@@ -237,9 +237,9 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 			
 			scope.onPortletToggle = function(event) {
 				var e = $(event.target);
-				e.toggleClass('icon-chevron-up icon-chevron-down');
+				e.toggleClass('fa-chevron-up fa-chevron-down');
 				element.toggleClass('portlet-minimized');
-				if (e.hasClass('icon-chevron-up')) {
+				if (e.hasClass('fa-chevron-up')) {
 					axelor.$adjustSize();
 				}
 			};
@@ -264,15 +264,15 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 								'<li class="portlet-pager" ng-show="showPager">'+
 									'<span class="portlet-pager-text">{{pagerText()}}</span>'+
 									'<span class="icons-bar">'+
-										'<i ng-click="doPrev()" ng-class="{disabled: !canPrev()}" class="icon-step-backward"></i>'+
-										'<i ng-click="doNext()" ng-class="{disabled: !canNext()}" class="icon-step-forward"></i>'+
+										'<i ng-click="doPrev()" ng-class="{disabled: !canPrev()}" class="fa fa-step-backward"></i>'+
+										'<i ng-click="doNext()" ng-class="{disabled: !canNext()}" class="fa fa-step-forward"></i>'+
 									'</span>'+
 								'</li>'+
 								'<li class="divider-vertical"></li>'+
 								'<li>'+
 									'<span class="icons-bar">'+
-										'<i title="{{\'Refresh\' | t}}" ng-click="onRefresh()" class="icon-refresh"></i>'+
-										'<i title="{{\'Toggle\' | t}}" ng-click="onPortletToggle($event)" class="icon-chevron-up"></i>'+
+										'<i title="{{\'Refresh\' | t}}" ng-click="onRefresh()" class="fa fa-refresh"></i>'+
+										'<i title="{{\'Toggle\' | t}}" ng-click="onPortletToggle($event)" class="fa fa-chevron-up"></i>'+
 									'</span>'+
 								'</li>'+
 							'</ul>'+

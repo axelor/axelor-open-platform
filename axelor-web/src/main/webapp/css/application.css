@@ -32,9 +32,10 @@
  * Master CSS file.
  */
 @import url('../lib/jquery.ui/css/smoothness/jquery-ui.css');
-@import url('../lib/bootstrap/css/bootstrap.css');
-@import url('../lib/bootstrap/css/font-awesome.css');
 @import url('../lib/jquery.timepicker/jquery-ui-timepicker-addon.css');
+
+@import url('../lib/bootstrap/css/bootstrap.css');
+@import url('../lib/font-awesome/css/font-awesome.css');
 
 @import url('../lib/slickgrid/slick.grid.css');
 @import url('../lib/slickgrid/plugins/slick.headermenu.css');

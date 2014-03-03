@@ -474,12 +474,12 @@ angular.module('axelor.ui').directive('uiRecordPager', function(){
 	    	'<span class="record-pager-text">{{pagerText()}}</span>'+
 			'<span class="input-append record-pager-change">'+
 				'<input type="text" style="width: 30px;" value="{{getPageSize()}}">'+
-				'<button type="button" class="btn add-on"><i class="icon icon-ok"></i></button>'+
+				'<button type="button" class="btn add-on"><i class="fa fa-check"></i></button>'+
 			'</span>'+
 	    '</span>'+
 	    '<div class="btn-group">'+
-	    	'<button class="btn" ng-disabled="!canPrev()" ng-click="onPrev()"><i class="icon-chevron-left"></i></button>'+
-	    	'<button class="btn" ng-disabled="!canNext()" ng-click="onNext()"><i class="icon-chevron-right"></i></button>'+
+	    	'<button class="btn" ng-disabled="!canPrev()" ng-click="onPrev()"><i class="fa fa-chevron-left"></i></button>'+
+	    	'<button class="btn" ng-disabled="!canNext()" ng-click="onNext()"><i class="fa fa-chevron-right"></i></button>'+
 	    '</div>'+
 	    '</div>'
 	};
@@ -520,10 +520,10 @@ angular.module('axelor.ui').directive('uiViewSwitcher', function(){
 		template:
 		'<div class="view-switcher pull-right">'+
 		  	'<div class="btn-group">'+
-		  		'<button class="btn" x-view-type="grid"		><i class="icon-table"		></i></button>'+
-		  		'<button class="btn" x-view-type="calendar"	><i class="icon-calendar"	></i></button>'+
-		  		'<button class="btn" x-view-type="chart"	><i class="icon-bar-chart"	></i></button>'+
-		  		'<button class="btn" x-view-type="form"		><i class="icon-edit"		></i></button>'+
+		  		'<button class="btn" x-view-type="grid"		><i class="fa fa-table"		></i></button>'+
+		  		'<button class="btn" x-view-type="calendar"	><i class="fa fa-calendar"	></i></button>'+
+		  		'<button class="btn" x-view-type="chart"	><i class="fa fa-bar-chart-o"	></i></button>'+
+		  		'<button class="btn" x-view-type="form"		><i class="fa fa-pencil-square-o"		></i></button>'+
 		    '</div>'+
 		'</div>'
 	};

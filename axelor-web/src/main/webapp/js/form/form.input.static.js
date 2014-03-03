@@ -288,10 +288,10 @@ ui.formItem('Button', {
 		var icon = field.icon || "";
 		var iconHover = field.iconHover || "";
 		
-		var isIcon = icon.indexOf('icon-') === 0;
+		var isIcon = icon.indexOf('fa-') === 0;
 
 		if (isIcon) {
-			var e = $('<i>').addClass(icon).prependTo(element);
+			var e = $('<i>').addClass('fa').addClass(icon).prependTo(element);
 			if (iconHover) {
 				e.hover(function() {
 					$(this).removeClass(icon).addClass(iconHover);

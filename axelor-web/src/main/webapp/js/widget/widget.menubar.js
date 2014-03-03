@@ -40,11 +40,11 @@ function MenuBarCtrl($scope, $element) {
 	};
 	
 	$scope.isImage = function (menu) {
-		return menu.icon && menu.icon.indexOf('icon-') !== 0;
+		return menu.icon && menu.icon.indexOf('fa-') !== 0;
 	};
 	
 	$scope.isIcon = function (menu) {
-		return menu.icon && menu.icon.indexOf('icon-') === 0;
+		return menu.icon && menu.icon.indexOf('fa-') === 0;
 	};
 	
 	$scope.canShowTitle = function(menu) {
@@ -75,7 +75,7 @@ module.directive('uiMenuBar', function() {
 				"<li class='menu dropdown' ng-class='{\"button-menu\": menu.isButton}' ng-repeat='menu in menus'>" +
 					"<a href='' class='dropdown-toggle' ng-class='{\"btn\": menu.isButton}' data-toggle='dropdown' ng-click='onMenuClick()'>" +
 						"<img ng-if='isImage(menu)' ng-src='{{menu.icon}}'> " +
-						"<i class='{{menu.icon}}' ng-if='isIcon(menu)'></i> " +
+						"<i class='fa {{menu.icon}}' ng-if='isIcon(menu)'></i> " +
 						"<span ng-show='canShowTitle(menu)'>{{menu.title}}</span> " +
 						"<b class='caret'></b>" +
 					"</a>" +

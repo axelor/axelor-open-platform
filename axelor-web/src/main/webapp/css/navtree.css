@@ -46,7 +46,7 @@
 	text-overflow: ellipsis;
 }
 
-.nav-tree li i[class^=icon-] {
+.nav-tree li i.fa {
 	width: 16px;
 	display: inline-block;
 	text-align: center;

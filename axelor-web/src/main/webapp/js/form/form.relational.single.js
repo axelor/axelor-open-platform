@@ -363,13 +363,13 @@ ui.formInput('ManyToOne', 'Select', {
 		'<input type="text" autocomplete="off">'+
 		'<span class="tag-item label label-info" ng-if="canShowTag" ng-show="text">'+
 			'<span class="tag-link tag-text" ng-click="onTagSelect($event)">{{text}}</span> '+
-			'<i class="icon-remove icon-small" ng-click="onTagRemove($event)"></i>'+
+			'<i class="fa fa-times fa-small" ng-click="onTagRemove($event)"></i>'+
 		'</span>'+
 		'<span class="picker-icons">'+
-			'<i class="icon-eye-open" ng-click="onSummary()" ng-show="hasPermission(\'read\') && _viewParams.summaryView && canToggle()"></i>'+
-			'<i class="icon-pencil" ng-click="onEdit()" ng-show="hasPermission(\'read\') && canView() && canEdit()" title="{{\'Edit\' | t}}"></i>'+
-			'<i class="icon-plus" ng-click="onNew()" ng-show="canNew() && hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}"></i>'+
-			'<i class="icon-search" ng-click="onSelect()" ng-show="canSelect() && hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}"></i>'+
+			'<i class="fa fa-eye" ng-click="onSummary()" ng-show="hasPermission(\'read\') && _viewParams.summaryView && canToggle()"></i>'+
+			'<i class="fa fa-pencil" ng-click="onEdit()" ng-show="hasPermission(\'read\') && canView() && canEdit()" title="{{\'Edit\' | t}}"></i>'+
+			'<i class="fa fa-plus" ng-click="onNew()" ng-show="canNew() && hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}"></i>'+
+			'<i class="fa fa-search" ng-click="onSelect()" ng-show="canSelect() && hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}"></i>'+
 		'</span>'+
 	'</div>',
 	template_readonly:
@@ -384,7 +384,7 @@ ui.formInput('SuggestBox', 'ManyToOne', {
 	'<span class="picker-input">'+
 		'<input type="text" autocomplete="off">'+
 		'<span class="picker-icons">'+
-			'<i class="icon-caret-down" ng-click="showSelection()"></i>'+
+			'<i class="fa fa-caret-down" ng-click="showSelection()"></i>'+
 		'</span>'+
    '</span>'
 });
