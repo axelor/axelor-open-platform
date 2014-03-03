@@ -53,14 +53,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 
 public class TestActions extends MetaTest {
 	
 	private ObjectViews views;
 	
 	@Inject
-	private Injector injector;
+	private ActionHandler handler;
 	
 	@Before
 	public void setUp() {
@@ -101,7 +100,7 @@ public class TestActions extends MetaTest {
 
 		data.put("context", context);
 		
-		return new ActionHandler(request, injector);
+		return handler.forRequest(request);
 	}
 	
 	private ActionHandler createHandler(Action action, Map<String, Object> context) {

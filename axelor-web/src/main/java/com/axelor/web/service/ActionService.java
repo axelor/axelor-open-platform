@@ -55,6 +55,9 @@ public class ActionService extends AbstractService {
 
 	@Inject
 	private MetaService service;
+	
+	@Inject
+	private ActionHandler handler;
 
 	@GET
 	@Path("menu")
@@ -88,15 +91,13 @@ public class ActionService extends AbstractService {
 
 	@POST
 	public Response execute(ActionRequest request) {
-		ActionHandler handler = new ActionHandler(request, getInjector());
-		return handler.execute();
+		return handler.forRequest(request).execute();
 	}
 
 	@POST
 	@Path("{action}")
 	public Response execute(@PathParam("action") String action, ActionRequest request) {
 		request.setAction(action);
-		ActionHandler handler = new ActionHandler(request, getInjector());
-		return handler.execute();
+		return handler.forRequest(request).execute();
 	}
 }
