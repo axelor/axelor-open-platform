@@ -215,6 +215,7 @@ function GridViewCtrl($scope, $element) {
 			sortBy, pageNum,
 			domain = null,
 			context = null,
+			action = undefined,
 			criteria = {
 				operator: 'and'
 			};
@@ -228,11 +229,13 @@ function GridViewCtrl($scope, $element) {
 		sortBy = filter._sortBy;
 		domain = filter._domain;
 		context = filter._context;
+		action = filter._action;
 		
 		delete filter._pageNum;
 		delete filter._sortBy;
 		delete filter._domain;
 		delete filter._context;
+		delete filter._action;
 
 		criteria.criteria = _.map(filter, function(value, key) {
 
@@ -304,7 +307,8 @@ function GridViewCtrl($scope, $element) {
 			fields: fields,
 			sortBy: sortBy,
 			domain: domain,
-			context: context
+			context: context,
+			action: action
 		};
 
 		if (pageNum) {
@@ -564,7 +568,7 @@ angular.module('axelor.ui').directive('uiGridExport', function(){
 
 angular.module('axelor.ui').directive('uiPortletGrid', function(){
 	return {
-		controller: ['$scope', '$element', function($scope, $element) {
+		controller: ['$scope', '$element', 'ViewService', function($scope, $element, ViewService) {
 			
 			GridViewCtrl.call(this, $scope, $element);
 			
@@ -610,14 +614,27 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 			};
 			
 			$scope.$on("on:new", function(e) {
-				$scope.filter([]);
+				$scope.filter({});
 			});
 			$scope.$on("on:edit", function(e) {
-				$scope.filter([]);
+				$scope.filter({});
 			});
 			
 			$scope.onRefresh = function() {
-				$scope.filter([]);
+				$scope.filter({});
+			};
+			
+			var _filter = $scope.filter;
+			var _action = $scope._viewAction;
+
+			$scope.filter = function (searchFilter) {
+				var opts = searchFilter;
+				if ($scope.$parent._model) {
+					opts = _.extend({}, opts, {
+						_action: _action
+					});
+				}
+				return _filter.call($scope, opts);
 			};
 		}],
 		replace: true,
