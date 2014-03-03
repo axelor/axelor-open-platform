@@ -442,6 +442,7 @@ function FormViewCtrl($scope, $element) {
 		ds.copy(record.id).success(function(record){
 			$scope.edit(record);
 			$scope.setEditable();
+			record._dirty = true;
 		});
 	};
 	
