@@ -95,7 +95,7 @@ ui.formWidget('Group', {
 	template:
 		'<fieldset ng-class="{\'bordered-box\': title}" x-layout-selector="&gt; div:first">'+
 			'<legend ng-show="title">'+
-				'<i ng-show="canCollapse()" ng-click="toggle()" ng-class="{\'icon-plus\': collapsed, \'icon-minus\': !collapsed}"></i>'+
+				'<i ng-show="canCollapse()" ng-click="toggle()" ng-class="{\'fa fa-plus\': collapsed, \'fa fa-minus\': !collapsed}"></i>'+
 				'<span ng-bind-html-unsafe="title"></span></legend>'+
 			'<div ui-transclude></div>'+
 		'</fieldset>'
@@ -277,8 +277,8 @@ ui.formWidget('Tabs', {
 	template:
 		'<div class="tabbable-tabs">' +
 			'<div class="nav-tabs-wrap">' +
-				'<div class="nav-tabs-scroll-l"><a tabindex="-1" href="#"><i class="icon-chevron-left"></i></a></div>' +
-				'<div class="nav-tabs-scroll-r"><a tabindex="-1" href="#"><i class="icon-chevron-right"></i></a></div>' +
+				'<div class="nav-tabs-scroll-l"><a tabindex="-1" href="#"><i class="fa fa-chevron-left"></i></a></div>' +
+				'<div class="nav-tabs-scroll-r"><a tabindex="-1" href="#"><i class="fa fa-chevron-right"></i></a></div>' +
 				'<div class="nav-tabs-strip">' +
 					'<ul class="nav nav-tabs">' +
 						'<li tabindex="-1" ng-repeat="tab in tabs" ng-class="{active:tab.tabSelected}">'+

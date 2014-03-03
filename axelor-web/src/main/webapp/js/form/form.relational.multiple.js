@@ -423,7 +423,7 @@ ui.formInput('OneToMany', {
 				resizable: false,
 				width: 16,
 				formatter: function(row, cell, value, columnDef, dataContext) {
-					return '<i class="icon-caret-right" style="display: inline-block; cursor: pointer; padding: 2px 8px; font-size: 15.5px;"></i>';
+					return '<i class="fa fa-caret-right" style="display: inline-block; cursor: pointer; padding: 2px 8px; font-size: 15.5px;"></i>';
 				}
 			};
 			
@@ -432,7 +432,7 @@ ui.formInput('OneToMany', {
 			
 			grid.setColumns(cols);
 			grid.onClick.subscribe(function(e, args) {
-				if ($(e.target).is('.icon-caret-right'))
+				if ($(e.target).is('.fa-caret-right'))
 					setTimeout(function(){
 						scope.onSummary();
 					});
@@ -483,10 +483,10 @@ ui.formInput('OneToMany', {
 			'<div class="container-fluid">'+
 				'<span class="brand" href="" ui-help-popover ng-bind-html-unsafe="title"></span>'+
 				'<span class="icons-bar pull-right" ng-show="!isReadonly()">'+
-					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canEdit()" title="{{\'Edit\' | t}}" class="icon-pencil"></i>'+
-					'<i ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled() && canNew()" title="{{\'New\' | t}}" class="icon-plus"></i>'+
-					'<i ng-click="onRemove()" ng-show="hasPermission(\'remove\') && !isDisabled() && canRemove()" title="{{\'Remove\' | t}}" class="icon-minus"></i>'+
-					'<i ng-click="onSelect()" ng-show="hasPermission(\'read\') && !isDisabled() && canSelect()" title="{{\'Select\' | t}}" class="icon-search"></i>'+
+					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canEdit()" title="{{\'Edit\' | t}}" class="fa fa-pencil"></i>'+
+					'<i ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled() && canNew()" title="{{\'New\' | t}}" class="fa fa-plus"></i>'+
+					'<i ng-click="onRemove()" ng-show="hasPermission(\'remove\') && !isDisabled() && canRemove()" title="{{\'Remove\' | t}}" class="fa fa-minus"></i>'+
+					'<i ng-click="onSelect()" ng-show="hasPermission(\'read\') && !isDisabled() && canSelect()" title="{{\'Select\' | t}}" class="fa fa-search"></i>'+
 				'</span>'+
 			'</div>'+
 		'</div>'+
@@ -762,8 +762,8 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 	'<span class="picker-input picker-icons-2" style="position: absolute;">'+
 		'<input type="text" readonly>'+
 		'<span class="picker-icons">'+
-			'<i class="icon-plus" ng-click="onNew()" ng-show="canEdit()" title="{{\'Select\' | t}}"></i>'+
-			'<i class="icon-minus" ng-click="onRemove()" ng-show="canRemove()" title="{{\'Select\' | t}}"></i>'+
+			'<i class="fa fa-plus" ng-click="onNew()" ng-show="canEdit()" title="{{\'Select\' | t}}"></i>'+
+			'<i class="fa fa-minus" ng-click="onRemove()" ng-show="canRemove()" title="{{\'Select\' | t}}"></i>'+
 		'</span>'+
 		'<div ui-view-grid ' +
 			'x-view="schema" '+

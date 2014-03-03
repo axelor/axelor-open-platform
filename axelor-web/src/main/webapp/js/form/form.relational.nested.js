@@ -343,9 +343,9 @@ var NestedEditor = {
 		'<legend>'+
 			'<span ng-bind-html-unsafe="title"></span> '+
 			'<span class="legend-toolbar" ng-show="!isReadonly()">'+
-				'<a href="" tabindex="-1" ng-click="onClear()" title="{{\'Clear\' | t}}" ng-show="canShowIcon(\'clear\')"><i class="icon-ban-circle"></i></a> '+
-				'<a href="" tabindex="-1" ng-click="onSelect()" title="{{\'Select\' | t}}" ng-show="canShowIcon(\'select\')"><i class="icon-search"></i></a> '+
-				'<a href="" tabindex="-1" ng-click="onClose()" title="{{\'Close\' | t}}" ng-show="canClose()"><i class="icon-remove-sign"></i></a>'+
+				'<a href="" tabindex="-1" ng-click="onClear()" title="{{\'Clear\' | t}}" ng-show="canShowIcon(\'clear\')"><i class="fa fa-ban"></i></a> '+
+				'<a href="" tabindex="-1" ng-click="onSelect()" title="{{\'Select\' | t}}" ng-show="canShowIcon(\'select\')"><i class="fa fa-search"></i></a> '+
+				'<a href="" tabindex="-1" ng-click="onClose()" title="{{\'Close\' | t}}" ng-show="canClose()"><i class="fa fa-times-circle"></i></a>'+
 			'</span>'+
 		'</legend>'+
 		'<div ui-nested-form></div>'+

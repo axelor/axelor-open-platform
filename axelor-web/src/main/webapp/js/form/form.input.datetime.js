@@ -325,7 +325,7 @@ ui.formInput('DateTime', {
 	'<span class="picker-input">'+
 	  '<input type="text" autocomplete="off">'+
 	  '<span class="picker-icons">'+
-	  	'<i class="icon-calendar"></i>'+
+	  	'<i class="fa fa-calendar"></i>'+
 	  '</span>'+
 	'</span>'
 });

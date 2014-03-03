@@ -140,7 +140,7 @@ ui.directive('uiFilterItem', function() {
 			"<table class='form-layout'>" +
 				"<tr>" +
 					"<td class='filter-remove'>" +
-						"<a href='' ng-click='remove(filter)'><i class='icon icon-remove'></i></a>" +
+						"<a href='' ng-click='remove(filter)'><i class='fa fa-times'></i></a>" +
 					"</td>" +
 					"<td class='form-item filter-select'>" +
 						"<select ng-model='filter.field' ng-options='v.name as v.title for v in options' ng-change='onFieldChange()' class='input-medium'></select> " +
@@ -907,15 +907,15 @@ ui.directive('uiFilterBox', function() {
 		"<div class='filter-box'>" +
 			"<input type='text' class='search-query' ng-model='custTerm'>" +
 			"<span class='search-icons'>" +
-				"<i ng-click='onSearch($event)' class='icon-caret-down'></i>"+
-				"<i ng-click='onRefresh()' class='icon-search'></i>" +
+				"<i ng-click='onSearch($event)' class='fa fa-caret-down'></i>"+
+				"<i ng-click='onRefresh()' class='fa fa-search'></i>" +
 			"</span>" +
 			"<div class='filter-menu' ui-watch-if='visible'>" +
 				"<strong x-translate>Advanced Search</strong>" +
 				"<hr>"+
 				"<div class='filter-list'>" +
 					"<dl ng-show='hasFilters(1)'>" +
-						"<dt><i class='icon-save'></i><span x-translate> Filters</span></dt>" +
+						"<dt><i class='fa fa-floppy-o'></i><span x-translate> Filters</span></dt>" +
 						"<dd ng-repeat='filter in viewFilters' class='checkbox'>" +
 							"<input type='checkbox' " +
 								"ng-model='filter.$selected' " +
@@ -924,7 +924,7 @@ ui.directive('uiFilterBox', function() {
 						"</dd>" +
 					"</dl>" +
 					"<dl ng-show='hasFilters(2)'>" +
-						"<dt><i class='icon-filter'></i><span x-translate> My Filters</span></dt>" +
+						"<dt><i class='fa fa-filter'></i><span x-translate> My Filters</span></dt>" +
 						"<dd ng-repeat='filter in custFilters' class='checkbox'>" +
 							"<input type='checkbox' " +
 								"ng-model='filter.$selected' " +

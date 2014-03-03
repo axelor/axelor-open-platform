@@ -175,7 +175,7 @@
 	height: auto !important;
 }
 
-.slick-cell .picker-input > .picker-icons > i[class^=icon] {
+.slick-cell .picker-input > .picker-icons > i.fa {
 	padding-top: 2px !important;
 }
 
@@ -360,6 +360,6 @@
 }
 
 .slick-cell.edit-icon i {
-	padding: 6px;
+	padding-left: 6px;
 	cursor: pointer;
 }

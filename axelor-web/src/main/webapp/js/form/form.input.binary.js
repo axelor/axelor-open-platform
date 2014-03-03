@@ -153,9 +153,9 @@ ui.formInput('Image', 'ImageLink', {
 		'<input type="file" accept="image/*">' +
 		'<img class="img-polaroid" ng-style="styles[1]" style="display: inline-block;">' +
 		'<div class="btn-group">' +
-			'<button ng-click="doSelect()" class="btn" type="button"><i class="icon-upload-alt"></i></button>' +
-			'<button ng-click="doSave()" class="btn" type="button"><i class="icon-download-alt"></i></button>' +
-			'<button ng-click="doRemove()" class="btn" type="button"><i class="icon-remove"></i></button>' +
+			'<button ng-click="doSelect()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
+			'<button ng-click="doSave()" class="btn" type="button"><i class="fa fa-arrow-circle-down"></i></button>' +
+			'<button ng-click="doRemove()" class="btn" type="button"><i class="fa fa-times"></i></button>' +
 		'</div>' +
 	'</div>'
 });
@@ -219,9 +219,9 @@ ui.formInput('Binary', {
 		'<iframe></iframe>' +
 		'<input type="file">' +
 		'<div class="btn-group">' +
-			'<button ng-click="doSelect()" class="btn" type="button"><i class="icon-upload-alt"></i></button>' +
-			'<button ng-click="doSave()" class="btn" type="button"><i class="icon-download-alt"></i></button>' +
-			'<button ng-click="doRemove()" class="btn" type="button"><i class="icon-remove"></i></button>' +
+			'<button ng-click="doSelect()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
+			'<button ng-click="doSave()" class="btn" type="button"><i class="fa fa-arrow-circle-down"></i></button>' +
+			'<button ng-click="doRemove()" class="btn" type="button"><i class="fa fa-times"></i></button>' +
 		'</div>' +
 	'</div>'
 });
