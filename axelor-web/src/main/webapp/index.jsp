@@ -126,7 +126,7 @@ String langJS = AppInfo.getLangJS(request, getServletContext());
               <ul class="dropdown-menu">
                 <li><a href="#/preferences"><i class="icon-cog"></i> <span x-translate>Preferences</span></a></li>
                 <li class="divider"></li>
-                <li><a href="logout"><i class="fa-power-off"></i> <span x-translate>Logout</span></a></li>
+                <li><a href="logout"><i class="fa fa-power-off"></i> <span x-translate>Logout</span></a></li>
               </ul>
             </li>
           </ul>
