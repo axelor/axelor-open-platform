@@ -32,12 +32,25 @@
 
 var ui = angular.module('axelor.ui');
 
-// configure ace path
-if (!ace.config.get('modePath')) {
-	ace.config.set('modePath', 'lib/ace/js');
-	ace.config.set('themePath', 'lib/ace/js');
-	ace.config.set('workerPath', 'lib/ace/js');
-}
+var SpaceIndentKeys = {
+	Tab: function (cm) {
+		var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
+		cm.replaceSelection(spaces, "end", "+input");
+	},
+	Backspace: function (cm) {
+		var cur = cm.getCursor(),
+			num = cm.getOption("indentUnit"),
+			line = cm.getLine(cur.line),
+			space = line.substring(cur.ch - num, cur.ch);
+		
+		if (space.length > 0 && space.trim() === "") {
+			cm.setSelection({line: cur.line, ch: cur.ch - num}, cur);
+			cm.replaceSelection("");
+			return true;
+		}
+		return CodeMirror.Pass;
+	}
+};
 
 ui.formInput('CodeEditor', {
 
@@ -45,84 +58,85 @@ ui.formInput('CodeEditor', {
 
 	link: function(scope, element, attrs, model) {
 		
-		var field = scope.getViewDef(element);
-		var editor = ace.edit(element.get(0));
-		var session = editor.getSession();
-		var props = _.extend({
-			syntax: 'text',
-			theme : "textmate",
-			fontSize: '14px',
-			readonly: false,
-			height: 280
-		}, field);
+		var editor = null;
+		var loading = false;
 
-		session.setMode("ace/mode/" + props.syntax);
-		editor.setTheme('ace/theme/' + props.theme);
-		editor.setFontSize(props.fontSize);
-		editor.setShowPrintMargin(false);
-		editor.renderer.setShowGutter(true);
-		
-		if (props.syntax === "xml") {
-			session.setTabSize(2);
-		}
-
-		editor.commands.addCommands([{
-		    name: "unfind",
-		    bindKey: {
-		        win: "Ctrl-F",
-		        mac: "Command-F"
-		    },
-		    exec: function(editor, line) {
-		        return false;
-		    },
-		    readOnly: true
-		}]);
-		editor.commands.addCommands([{
-		    name: "unreplace",
-		    bindKey: {
-		        win: "Ctrl-R",
-		        mac: "Command-R"
-		    },
-		    exec: function(editor, line) {
-		        return false;
-		    },
-		    readOnly: true
-		}]);
-		
-		var loadingText = false;
-		model.$render = function() {
-			loadingText = true;
-			session.setValue(model.$viewValue || "");
-			loadingText = false;
+		var field = scope.field;
+		var props = {
+			autofocus: true,
+			lineNumbers: true
 		};
+
+		if (field.mode || field.syntax) {
+			props.mode = field.mode || field.syntax;
+		}
 		
-		editor.on('change', function(e){
-			if (loadingText)
-				return;
-			scope.applyLater(function(){
-				model.$setViewValue(session.getValue());
+		if (field.theme) {
+			props.theme = field.theme || "default";
+		}
+		
+		if (props.mode === "xml") {
+			props = _.extend(props, {
+				foldGutter : true,
+				gutters : ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+				autoCloseBrackets : true,
+				autoCloseTags : true,
+				tabSize : 2,
+				indentUnit : 2,
+				extraKeys : SpaceIndentKeys
 			});
-		});
-		scope.$watch('isReadonly()', function readonly(value){
-			editor.setReadOnly(value);
-			editor.setHighlightActiveLine(!value);
-			editor.renderer.setHighlightGutterLine(!value);
-		});
-		
-		function resize() {
-			editor.resize();
 		}
 
-		scope.$on("on:edit", resize);
-		element.on('adjustSize', function(){
-			if (element.is(':visible')) {
-				element.height(props.height);
-				element.width('auto');
-				editor.renderer.updateFull();
-				resize();
+		if (field.height) {
+			element.height(field.height);
+		}
+
+		setTimeout(function () {
+			props.readOnly = scope.$$readonly;
+			editor = CodeMirror(element.get(0), props);
+			readonlySet(props.readOnly);
+			editor.setSize('100%', '100%');
+			editor.on("change", changed);
+		});
+		
+		scope.$watch('$$readonly', readonlySet);
+
+		model.$render = function() {
+			loading = true;
+			var val = model.$modelValue;
+			if (editor) {
+				editor.setValue(val || "");
+				editor.clearHistory();
 			}
+			loading = false;
+		};
+
+		model.$formatters.push(function (value) {
+			return value || '';
 		});
 
+		function readonlySet(readonly) {
+			if (editor) {
+				editor.setOption('readOnly', readonly ? "nocursor" : false);
+			}
+		}
+
+		function changed(instance, changedObj) {
+			if (loading || !editor) return;
+			var value = editor.getValue();
+			if (value !== model.$viewValue) {
+				model.$setViewValue(value);
+			}
+			scope.applyLater();
+		}
+
+		function resize() {
+			if (editor) {
+				editor.refresh();
+			}
+			element.width('');
+		}
+		
 		element.resizable({
 			handles: 's',
 			resize: resize
@@ -137,7 +151,7 @@ ui.formInput('CodeEditor', {
 	
 	template_readonly: null,
 	
-	template: '<div style="min-height: 280px;" class="webkit-scrollbar-all" ng-transclude></div>'
+	template: '<div ng-transclude></div>'
 });
 
 })(this);

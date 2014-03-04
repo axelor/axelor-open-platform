@@ -88,7 +88,7 @@ load([
 	'lib/d3/radar/radar-chart.js',
 	'lib/d3/gauge/gauge-chart.js',
 
-	'lib/ace/js/ace.js',
+	'lib/codemirror/codemirror.min.js',
 	'lib/tinymce/tinymce.min.js',
 
 	'lib/angular/angular.js',
