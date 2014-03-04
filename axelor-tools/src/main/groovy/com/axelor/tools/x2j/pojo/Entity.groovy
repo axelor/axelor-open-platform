@@ -394,7 +394,7 @@ class Entity {
 		if (indexes.empty)
 			return [a1]
 
-		def a2 = new Annotation(this, "org.hibernate.annotations.Table", false).add("appliesTo", this.table)
+		def a2 = new Annotation(this, "org.hibernate.annotations.Table", false).add("appliesTo", this.table.toLowerCase())
 		a2.add("indexes", indexes, false)
 
 		return [a1, a2]
