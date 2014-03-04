@@ -520,7 +520,7 @@ angular.module('axelor.ui').directive('uiViewSwitcher', function(){
 		template:
 		'<div class="view-switcher pull-right">'+
 		  	'<div class="btn-group">'+
-		  		'<button class="btn" x-view-type="grid"		><i class="fa fa-table"		></i></button>'+
+		  		'<button class="btn" x-view-type="grid"		><i class="fa fa-list"		></i></button>'+
 		  		'<button class="btn" x-view-type="calendar"	><i class="fa fa-calendar"	></i></button>'+
 		  		'<button class="btn" x-view-type="chart"	><i class="fa fa-bar-chart-o"	></i></button>'+
 		  		'<button class="btn" x-view-type="form"		><i class="fa fa-pencil-square-o"		></i></button>'+
