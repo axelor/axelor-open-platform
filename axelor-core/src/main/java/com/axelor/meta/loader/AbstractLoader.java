@@ -36,7 +36,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axelor.db.Model;
+import com.axelor.auth.db.AuditableModel;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -85,11 +85,11 @@ abstract class AbstractLoader {
 	 *            the entity instance
 	 * @return true if updated false otherwise
 	 */
-	protected boolean isUpdated(Model entity) {
+	protected boolean isUpdated(AuditableModel entity) {
 		if (entity == null || entity.getVersion() == null) {
 			return false;
 		}
-		return entity.getVersion() > 0;
+		return entity.getUpdatedBy() != null;
 	}
 
 	/**

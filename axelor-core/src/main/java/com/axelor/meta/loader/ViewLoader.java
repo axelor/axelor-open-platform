@@ -176,7 +176,7 @@ public class ViewLoader extends AbstractLoader {
 
 		if (extending != null) {
 
-			if (xmlId == null) {
+			if (xmlId == null && isVisited(view.getClass(), name)) {
 				log.error("duplicate view without 'id': {}", name);
 				return;
 			}
@@ -185,7 +185,10 @@ public class ViewLoader extends AbstractLoader {
 			if (update && existing != null && Objects.equal(xmlId, existing.getXmlId())) {
 				entity = existing;
 			}
-
+			if (update && existing == null) {
+				entity = extending;
+			}
+			
 			// set priority higher to existing view
 			if (!Objects.equal(xmlId, extending.getXmlId())) {
 				entity.setPriority(extending.getPriority() + 1);
@@ -193,6 +196,7 @@ public class ViewLoader extends AbstractLoader {
 		}
 
 		if (isUpdated(entity)) {
+			log.debug("view is modified, can't update: {}", name);
 			return;
 		}
 
@@ -208,12 +212,12 @@ public class ViewLoader extends AbstractLoader {
 
 	private void importSelection(Selection selection, Module module, boolean update) {
 
-		if (isVisited(Selection.class, selection.getName())) {
-			return;
-		}
-
 		String name = selection.getName();
 		String xmlId = selection.getXmlId();
+		
+		if (xmlId != null && isVisited(Selection.class, xmlId)) {
+			return;
+		}
 
 		log.debug("Loading selection : {}", name);
 
@@ -222,7 +226,7 @@ public class ViewLoader extends AbstractLoader {
 
 		if (extending != null) {
 
-			if (StringUtils.isBlank(xmlId)) {
+			if (StringUtils.isBlank(xmlId) && isVisited(Selection.class, name)) {
 				log.error("duplicate selection without 'id': {}", name);
 				return;
 			}
@@ -230,6 +234,9 @@ public class ViewLoader extends AbstractLoader {
 			MetaSelect existing = MetaSelect.findByID(xmlId);
 			if (update && existing != null && Objects.equal(xmlId, existing.getXmlId())) {
 				entity = existing;
+			}
+			if (update && existing == null) {
+				entity = extending;
 			}
 
 			// set priority higher to existing view
@@ -239,6 +246,7 @@ public class ViewLoader extends AbstractLoader {
 		}
 
 		if (isUpdated(entity)) {
+			log.debug("selection is modified, can't update: {}", name);
 			return;
 		}
 
