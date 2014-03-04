@@ -4,7 +4,7 @@
       <div class="container">
         <div class="btn-group">
           <button class="btn" ng-click="onNew()" ng-if="canNew()" title="{{ 'New' | t}}">
-            <i class="fa fa-file"></i> <span ng-hide="tbTitleHide" x-translate>New</span>
+            <i class="fa fa-plus"></i> <span ng-hide="tbTitleHide" x-translate>New</span>
           </button>
           <button class="btn" ng-click="onEdit()" ng-if="!isEditable() && canEdit()" title="{{ 'Edit' | t}}">
             <i class="fa fa-pencil"></i> <span ng-hide="tbTitleHide" x-translate>Edit</span>
@@ -13,7 +13,7 @@
             <i class="fa fa-floppy-o"></i> <span ng-hide="tbTitleHide" x-translate>Save</span>
           </button>
           <button class="btn" ng-click="onCancel()" ng-if="hasButton('cancel') && canCancel()" title="{{ 'Cancel' | t}}">
-            <i class="fa fa-ban"></i> <span ng-hide="tbTitleHide" x-translate>Cancel</span>
+            <i class="fa fa-refresh"></i> <span ng-hide="tbTitleHide" x-translate>Cancel</span>
           </button>
           <button class="btn" ng-click="onBack()" ng-if="hasButton('back') && !canCancel()" ng-disabled="!canBack()" title="{{ 'Back' | t}}">
             <i class="fa fa-reply"></i> <span ng-hide="tbTitleHide" x-translate>Back</span>
