@@ -69,10 +69,16 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		System.exit(process(args));
+		int status = 0;
+		try {
+			status = process(args);
+		} catch (Exception e) {
+			status = -1;
+		}
+		System.exit(status);
 	}
 
-	public static Integer process(String[] args) {
+	public static int process(String[] args) {
 
 		Options opts = new Options();
 		JCommander cmd = new JCommander(opts);
