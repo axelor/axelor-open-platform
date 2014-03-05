@@ -34,6 +34,10 @@ var ui = angular.module('axelor.ui');
 
 var SpaceIndentKeys = {
 	Tab: function (cm) {
+		var sel = cm.doc.sel;
+		if (sel.from.line !== sel.to.line) {
+			return CodeMirror.Pass;
+		}
 		var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
 		cm.replaceSelection(spaces, "end", "+input");
 	},
@@ -83,6 +87,7 @@ ui.formInput('CodeEditor', {
 				autoCloseTags : true,
 				tabSize : 2,
 				indentUnit : 2,
+				indentWithTabs: false,
 				extraKeys : SpaceIndentKeys
 			});
 		}
