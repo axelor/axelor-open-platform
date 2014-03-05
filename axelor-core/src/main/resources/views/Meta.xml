@@ -96,14 +96,14 @@
         <field name="type" selection="view.type.selection"/>
         <field name="model"/>
         <field name="module"/>
-        <field name="groups" widget="TagSelect[create=code,name]"/>
+        <field name="groups" widget="TagSelect" x-create="code,name"/>
     </group>
     <group title="Actions" cols="1">
         <button name="validate" title="Validate" onClick="action-view-validate"/>
         <button name="restore" title="Restore" prompt="All the customizations made for this view will be lost. Are you sure ?" onClick="save,action-meta-restore-single"/>
         <button name="restoreAll" title="Restore All" prompt="All the customizations will be lost. Are you sure ?" onClick="action-meta-restore-all"/>
     </group>
-    <field name="xml" showTitle="false" colSpan="2" widget="CodeEditor[syntax=xml|height=500]"/>
+    <field name="xml" showTitle="false" colSpan="2" widget="CodeEditor" x-syntax="xml" x-height="500"/>
 </form>
 
   <grid title="All Actions" name="meta-action-grid" model="com.axelor.meta.db.MetaAction">
@@ -121,7 +121,7 @@
     <field name="module"/>
     <notebook colSpan="4">
       <page title="XML" cols="1">
-        <field name="xml" showTitle="false" widget="CodeEditor[syntax=xml|height=500]"/>
+        <field name="xml" showTitle="false" widget="CodeEditor" x-syntax="xml" x-height="500"/>
       </page>
     </notebook>
   </form>
