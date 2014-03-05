@@ -68,7 +68,7 @@ public class XMLViews {
 	
 	private static final Logger log = LoggerFactory.getLogger(XMLViews.class);
 
-	private static final String LOCAL_SCHEMA = "object-views_1.0.xsd";
+	private static final String LOCAL_SCHEMA = "object-views.xsd";
 	private static final String REMOTE_SCHEMA = "object-views_" + ObjectViews.VERSION + ".xsd";
 	
 	private static Marshaller marshaller;
