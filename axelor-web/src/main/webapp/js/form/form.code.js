@@ -100,7 +100,6 @@ ui.formInput('CodeEditor', {
 			props.readOnly = scope.$$readonly;
 			editor = CodeMirror(element.get(0), props);
 			readonlySet(props.readOnly);
-			editor.setSize('100%', '100%');
 			editor.on("change", changed);
 		});
 		
@@ -146,6 +145,8 @@ ui.formInput('CodeEditor', {
 			handles: 's',
 			resize: resize
 		});
+		
+		element.on('adjustSize', _.debounce(resize));
 	},
 
 	replace: true,

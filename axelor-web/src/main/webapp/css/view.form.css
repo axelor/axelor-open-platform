@@ -496,9 +496,16 @@ td.form-item > * {
 
 .form-item div.code-editor .CodeMirror {
 	border: 1px solid #DDD;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	height: inherit;
 }
 .form-item div.code-editor .CodeMirror-scroll {
 	height: calc(100% + 30px);
+	width: 100%;
 }
 
 .form-item span.error {
