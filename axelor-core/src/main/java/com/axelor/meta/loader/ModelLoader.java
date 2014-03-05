@@ -61,7 +61,7 @@ public class ModelLoader extends AbstractLoader {
 
 	private static Logger log = LoggerFactory.getLogger(ModelLoader.class);
 
-	private static final String LOCAL_SCHEMA_DOMAIN = "domain-models_1.0.xsd";
+	private static final String LOCAL_SCHEMA_DOMAIN = "domain-models.xsd";
 	private static Unmarshaller unmarshaller;
 	
 	@Inject

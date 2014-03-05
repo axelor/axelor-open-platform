@@ -110,7 +110,7 @@ import com.google.common.io.Resources;
 
 public class MetaExportTranslation {
 
-	private static final String LOCAL_SCHEMA_DOMAIN = "domain-models_1.0.xsd";
+	private static final String LOCAL_SCHEMA_DOMAIN = "domain-models.xsd";
 	private static Logger log = LoggerFactory.getLogger(MetaExportTranslation.class);
 
 	private final String fieldType = "field";
