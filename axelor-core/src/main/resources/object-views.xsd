@@ -324,7 +324,7 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:anyAttribute processContents="lax" />
+        <xsd:anyAttribute processContents="skip" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -421,7 +421,7 @@
                   <xsd:documentation>Value stored in database.</xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
-              <xsd:anyAttribute processContents="lax" />
+              <xsd:anyAttribute processContents="skip" />
             </xsd:extension>
           </xsd:simpleContent>
         </xsd:complexType>
