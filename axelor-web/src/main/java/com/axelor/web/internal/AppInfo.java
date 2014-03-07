@@ -84,8 +84,8 @@ public final class AppInfo {
 		map.put("application.version", settings.get("application.version"));
 		map.put("application.mode", settings.get("application.mode"));
 		
-		map.put("help.location", settings.get("help.location"));
-		map.put("sdk.version", settings.get("sdk.version"));
+		map.put("help.location", settings.get("application.help.location"));
+		map.put("sdk.version", settings.get("application.sdk.version"));
 		map.put("file.upload.size", settings.get("file.upload.size"));
 
 		for (String key : settings.getProperties().stringPropertyNames()) {
