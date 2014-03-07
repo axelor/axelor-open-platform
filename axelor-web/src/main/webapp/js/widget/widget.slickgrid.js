@@ -360,7 +360,7 @@ _.extend(Factory.prototype, {
 		
 		var field = columnDef.descriptor || {},
 			attrs = _.extend({}, field, field.widgetAttrs),
-			widget = attrs.widgetName,
+			widget = attrs.widget,
 			type = attrs.type;
 
 		if (widget === "Progress" || widget === "progress" || widget === "SelectProgress") {

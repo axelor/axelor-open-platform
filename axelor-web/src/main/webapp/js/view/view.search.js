@@ -277,7 +277,7 @@ function SearchFormCtrl($scope, $element, ViewService) {
 			if (item.items || item.pages) {
 				return _.each(item.items || item.pages, process);
 			}
-			switch (item.widgetName) {
+			switch (item.widget) {
 			case 'ManyToOne':
 			case 'OneToOne':
 			case 'SuggestBox':

@@ -750,7 +750,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 					delete this.type;
 				}
 				
-				var widget = this.widgetName,
+				var widget = this.widget,
 					widgetAttrs = {},
 					attrs = {};
 

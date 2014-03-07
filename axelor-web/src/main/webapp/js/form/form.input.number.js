@@ -47,7 +47,7 @@ ui.formInput('Number', {
 			precision = props.precision || 18,
 			scale = props.scale || 2;
 		
-		var isDecimal = props.serverType === "decimal" || props.widgetName === "decimal",
+		var isDecimal = props.serverType === "decimal" || props.widget === "decimal",
 			pattern = isDecimal ? /^(-)?\d+(\.\d+)?$/ : /^\s*-?[0-9]*\s*$/;
 		
 		scope.isNumber = function(value) {
