@@ -33,6 +33,7 @@ package com.axelor.db;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,7 +43,11 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.app.AppSettings;
+import com.axelor.common.ClassUtils;
+import com.axelor.common.StringUtils;
 import com.google.common.base.Charsets;
+import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.PersistService;
@@ -113,8 +118,7 @@ public class JpaModule extends AbstractModule {
 	}
 
 	private boolean isCacheEnabled() {
-		try {
-			InputStream res = Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/persistence.xml");
+		try (InputStream res = ClassUtils.getResourceStream("META-INF/persistence.xml")) {
 			String text = CharStreams.toString(new InputStreamReader(res, Charsets.UTF_8));
 			Pattern pat = Pattern.compile("<shared-cache-mode>\\s*(ENABLE_SELECTIVE|ALL)\\s*</shared-cache-mode>");
 			Matcher mat = pat.matcher(text);
@@ -154,6 +158,8 @@ public class JpaModule extends AbstractModule {
 			} catch (Exception e) {
 			}
 		}
+		
+		updatePersistenceProperties(properties);
 
 		install(new JpaPersistModule(jpaUnit).properties(properties));
 		if (this.autostart) {
@@ -162,9 +168,32 @@ public class JpaModule extends AbstractModule {
 		bind(JPA.class).asEagerSingleton();
 	}
 
+	private Properties updatePersistenceProperties(Properties properties) {
+		final AppSettings settings = AppSettings.get();
+		final Map<String, String> keys = Maps.newLinkedHashMap();
+		final String unit = jpaUnit.replaceAll("(PU|Unit)$", "").replaceAll("^persistence$", "default");
+
+		keys.put("db.%s.dialect", "hibernate.dialect");
+		keys.put("db.%s.driver", "javax.persistence.jdbc.driver");
+		keys.put("db.%s.ddl", "hibernate.hbm2ddl.auto");
+		keys.put("db.%s.url", "javax.persistence.jdbc.url");
+		keys.put("db.%s.user", "javax.persistence.jdbc.user");
+		keys.put("db.%s.password", "javax.persistence.jdbc.password");
+
+		for (String key : keys.keySet()) {
+			String name = keys.get(key);
+			String value = settings.get(String.format(key, unit));
+			if (!StringUtils.isBlank(value)) {
+				properties.put(name, value.trim());
+			}
+		}
+		
+		return properties;
+	}
+	
 	private Properties updateCacheProperties(Properties properties) throws IOException {
 		final Properties config = new Properties();
-		config.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("ehcache-objects.properties"));
+		config.load(ClassUtils.getResourceStream("ehcache-objects.properties"));
 
 		for (Object key : config.keySet()) {
 			String name = (String) key;
