@@ -38,7 +38,6 @@ import javax.servlet.http.HttpServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axelor.app.AppSettings;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.quartz.JobRunner;
 
@@ -62,15 +61,15 @@ public class InitServlet extends HttpServlet {
 		try {
 			moduleManager.initialize(false, false);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error(e.getMessage(), e);
 		}
 
 		try {
-			if (AppSettings.get().getBoolean("quartz.init", false)) {
+			if (jobRunner.isEnabled()) {
 				jobRunner.start();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error(e.getMessage(), e);
 		}
 		
 		super.init();
