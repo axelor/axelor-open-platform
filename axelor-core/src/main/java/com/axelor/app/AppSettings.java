@@ -30,29 +30,39 @@
  */
 package com.axelor.app;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
 import com.axelor.common.ClassUtils;
+import com.axelor.common.StringUtils;
 
 public final class AppSettings {
+
+	private static final String DEFAULT_CONFIG_LOCATION = "application.properties";
+	private static final String CUSTOM_CONFIG_LOCATION = "app.config";
 
 	private Properties properties;
 
 	private static AppSettings instance;
 
 	private AppSettings() {
-
-		final InputStream stream = ClassUtils.getResourceStream("application.properties");
-		if (stream == null) {
-			throw new RuntimeException("Unable to locate application configuration file.");
-		}
-		
-		properties = new Properties();
+		String config = System.getProperty(CUSTOM_CONFIG_LOCATION);
+		InputStream stream = null;
 		try {
-			properties.load(stream);
+			if (StringUtils.isBlank(config)) {
+				stream = ClassUtils.getResourceStream(config = DEFAULT_CONFIG_LOCATION);
+			} else {
+				stream = new FileInputStream(config);
+			}
+			try {
+				properties = new Properties();
+				properties.load(stream);
+			} finally {
+				stream.close();
+			}
 		} catch (Exception e) {
-			throw new RuntimeException("Error reading application configuration.");
+			throw new RuntimeException("Unable to load application settings: " + config);
 		}
 	}
 
