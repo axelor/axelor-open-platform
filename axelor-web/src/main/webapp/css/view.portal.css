@@ -136,7 +136,7 @@
 }
 
 .portlet.portlet-minimized {
-	height: auto !important;
+	height: 34px !important;
 }
 
 .portlet.portlet-minimized .portlet-content {
