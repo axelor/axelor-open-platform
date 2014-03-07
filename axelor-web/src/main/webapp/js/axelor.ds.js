@@ -127,7 +127,6 @@
 				}
 				if (item.password) {
 					item.widget = "password";
-					item.widgetName = "password";
 				}
 			});
 		};
@@ -140,52 +139,13 @@
 			});
 		}
 
-		//TODO: remove the widget[attr=value] support
 		function processWidget(field) {
-
-			var widget = field.widget || '',
-				match = widget.match(/^([\w-]*)\[(.*?)\]$/),
-				widgetAttrs = {};
-
-			if (widget) {
-				field.widgetName = widget;
-			}
-
-			if (field.widgetAttrs) {
-				_.each(field.widgetAttrs, function (value, name) {
-					if (value === "true") value = true;
-					if (value === "false") value = false;
-					if (value === "null") value = null;
-					if (/(-)?\d+/.test(value)) value = +(value);
-					field.widgetAttrs[name] = value;
-				});
-				return;
-			}
-
-			if (!match) {
-				return;
-			}
-
-			field.widgetName = match[1].trim();
-			field.widgetAttrs = widgetAttrs;
-
-			_.each(match[2].split(/\s*\|\s*/), function(part) {
-				var parts = part.split(/\s*=\s*/);
-				var attrName = parts[0].trim();
-				var attrValue = parts[1].trim();
-				if (attrValue.match(/^(\d+)$/)) {
-					attrValue = +attrValue;
-				}
-				if (attrValue === "true") {
-					attrValue = true;
-				}
-				if (attrValue === "false") {
-					attrValue = false;
-				}
-				if (attrValue === "null") {
-					attrValue = null;
-				}
-				widgetAttrs[attrName] = attrValue;
+			_.each(field.widgetAttrs || {}, function (value, name) {
+				if (value === "true") value = true;
+				if (value === "false") value = false;
+				if (value === "null") value = null;
+				if (/(-)?\d+/.test(value)) value = +(value);
+				field.widgetAttrs[name] = value;
 			});
 		}
 

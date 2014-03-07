@@ -179,7 +179,7 @@ ui.formInput('ManyToOne', 'Select', {
 			return (field.widgetAttrs || {}).toggle;
 		};
 
-		if (field.widgetName === 'NestedEditor') {
+		if (field.widget === 'NestedEditor') {
 
 			var isHidden = scope.isHidden;
 			scope.isHidden = function() {
