@@ -446,7 +446,7 @@ public class MetaService {
 
 		data.put("xAxis", chart.getCategory().getKey());
 		data.put("xType", chart.getCategory().getType());
-		data.put("xTitle", chart.getCategory().getType());
+		data.put("xTitle", chart.getCategory().getTitle());
 
 		List<Object> series = Lists.newArrayList();
 		Map<String, Object> config = Maps.newHashMap();
@@ -457,7 +457,7 @@ public class MetaService {
 			map.put("type", cs.getType());
 			map.put("groupBy", cs.getGroupBy());
 			map.put("aggregate", cs.getAggregate());
-			map.put("title", JPA.translate(cs.getTitle(), cs.getTitle(), null, "chart"));
+			map.put("title", cs.getTitle());
 			series.add(map);
 		}
 
