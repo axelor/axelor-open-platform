@@ -262,7 +262,16 @@ function PlotData(scope, data, type) {
 				values: values
 			});
 		});
+		
+		if (series.title) {
+			if (series.side === "right") {
+				data.y2Title = series.title;
+			} else {
+				data.yTitle = series.title;
+			}
+		}
 	});
+
 	return chart_data;
 }
 
@@ -494,6 +503,12 @@ function Chart(scope, element, data) {
 				.tickFormat(tickFormat);
 		}
 		
+		if (chart.yAxis && data.yTitle) {
+			chart.yAxis.axisLabel(data.yTitle);
+		}
+		
+		chart.margin({ left: 90, top: 25 });
+
 		var lastWidth = 0;
 		var lastHeight = 0;
 		
