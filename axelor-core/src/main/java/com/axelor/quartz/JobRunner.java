@@ -45,6 +45,7 @@ import org.quartz.TriggerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.app.AppSettings;
 import com.axelor.common.ClassUtils;
 import com.axelor.meta.db.MetaSchedule;
 import com.axelor.meta.db.MetaScheduleParam;
@@ -62,6 +63,7 @@ import com.google.common.base.Throwables;
 public class JobRunner {
 
 	private static Logger log = LoggerFactory.getLogger(JobRunner.class);
+	private static final String CONFIG_QUARTZ_ENABLE = "quartz.enable";
 
 	private Scheduler scheduler;
 	
@@ -70,6 +72,10 @@ public class JobRunner {
 	@Inject
 	public JobRunner(Scheduler scheduler) {
 		this.scheduler = scheduler;
+	}
+	
+	public boolean isEnabled() {
+		return AppSettings.get().getBoolean(CONFIG_QUARTZ_ENABLE, false);
 	}
 
 	private void configure() {
@@ -158,6 +164,9 @@ public class JobRunner {
 	 * 
 	 */
 	public void start() {
+		if (!isEnabled()) {
+			throw new IllegalStateException("The scheduler service is disabled.");
+		}
 		this.configure();
 		log.info("Starting scheduler...");
 		try {
