@@ -38,6 +38,7 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.meta.ActionHandler;
@@ -146,17 +147,16 @@ public class ActionGroup extends ActionIndex {
 			Element element = actions.get(i);
 			String name = element.getName().trim();
 
+			log.debug("action: {}", name);
+
 			if ("save".equals(name)) {
-				if (element.test(handler)) {
-					String pending = this.getPending(i);
+				String pending = this.getPending(i);
+	            result.add(ImmutableMap.of("save", true, "pending", pending));
+	            if (!StringUtils.isBlank(pending)) {
 	            	log.debug("wait for 'save', pending actions: {}", pending);
-					result.add(ImmutableMap.of("save", true, "pending", pending));
-				}
-				log.debug("action '{}' doesn't meet the condition: {}", "save", element.getCondition());
+	            }
 				break;
 			}
-
-			log.debug("action: {}", name);
 
 			Action action = this.findAction(name);
 			if (action == null) {
@@ -192,20 +192,20 @@ public class ActionGroup extends ActionIndex {
             		handler.getContext().update((Map) values);
             	}
             }
+            
+            if (action instanceof ActionGroup && value instanceof Collection) {
+            	result.addAll((Collection<?>) value);
+            } else {
+            	result.add(value);
+            }
 
             // stop for reload
             if (value instanceof Map && Objects.equal(Boolean.TRUE, ((Map) value).get("reload"))) {
             	String pending = this.getPending(i);
             	log.debug("wait for 'reload', pending actions: {}", pending);
 				((Map<String, Object>) value).put("pending", pending);
-				result.add(value);
-            } else if (action instanceof ActionGroup && value instanceof Collection) {
-            	result.addAll((Collection<?>) value);
-            } else {
-            	result.add(value);
+				break;
             }
-
-            log.debug("action complete: {}", name);
 
             if (action instanceof ActionValidate && value instanceof Map) {
             	String validate = (String) ((Map) value).get("pending");
