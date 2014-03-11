@@ -163,7 +163,7 @@
   	<string name="domain" initParam="true"/>
   	<string name="type" selection="meta.translation.type.selection" initParam="true"/>
     <string name="module" initParam="true"/>
-  	<unique-constraint columns="key,type,language,domain"/>
+  	<unique-constraint columns="key,type,language,domain,module"/>
     <finder-method name="findByAll" using="key,language,domain,type,module" cacheable="true"/>
     <finder-method name="findByModule" using="module" all="true"/>
   </entity>
