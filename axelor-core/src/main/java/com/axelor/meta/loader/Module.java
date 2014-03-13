@@ -38,6 +38,8 @@ final class Module {
 	
 	private boolean removable = false;
 
+	private transient String path = null;
+
 	public Module(String name) {
 		this.name = name;
 	}
@@ -86,6 +88,14 @@ final class Module {
 		return installed && !Objects.equal(version, installedVersion);
 	}
 	
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
 	public void dependsOn(Module module) {
 		if (!depends.contains(module)) {
 			depends.add(module);
