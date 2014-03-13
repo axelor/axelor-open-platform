@@ -20,6 +20,7 @@ package com.axelor.meta;
 import java.net.URL;
 
 import com.axelor.common.reflections.Reflections;
+import com.axelor.meta.loader.ModuleManager;
 import com.google.common.collect.ImmutableList;
 
 public class MetaScanner {
@@ -33,8 +34,12 @@ public class MetaScanner {
 	}
 	
 	public static ImmutableList<URL> findAll(String module, String directory, String pattern) {
-		String namePattern = directory + "(/|\\\\)" + pattern;
-		String pathPattern = "(/|\\\\)(" + module + "(.*)\\.jar)|(" + module + ".*(/|\\\\).*classes)";
+		final String path = ModuleManager.getModulePath(module);
+		if (path == null) {
+			return ImmutableList.of();
+		}
+		final String namePattern = directory + "(/|\\\\)" + pattern;
+		final String pathPattern = String.format("^(%s)", path.replaceFirst("module\\.properties$", ""));
 		return Reflections.findResources().byName(namePattern).byURL(pathPattern).find();
 	}
 }

@@ -134,6 +134,14 @@ public class ModuleManager {
 		return resolver.all();
 	}
 
+	public static String getModulePath(String module) {
+		try {
+			return resolver.get(module).getPath();
+		} catch (NullPointerException e) {
+			return null;
+		}
+	}
+
 	@Transactional
 	public void install(String moduleName, boolean update, boolean withDemo) {
 		for (Module module: resolver.resolve(moduleName)) {
@@ -257,6 +265,7 @@ public class ModuleManager {
 
 			Module module = resolver.add(name, deps);
 			module.setRemovable(removable);
+			module.setPath(file.getPath());
 		}
 
 		for (Module module : resolver.all()) {
@@ -306,6 +315,7 @@ public class ModuleManager {
 				stored = stored.save();
 			}
 
+			module.setPath(file.getPath());
 			module.setVersion(version);
 			module.setRemovable(removable);
 			module.setInstalled(stored.getInstalled() == Boolean.TRUE);
