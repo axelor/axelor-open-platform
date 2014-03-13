@@ -12,7 +12,6 @@
     
     <string name="name" required="true" unique="true" help="An unique permission name."/>
     <string name="object" required="true" help="Fully qualified object name or wild card package name." />
-    <boolean name="deny" />
     <boolean name="canRead" title="Read" help="Whether to grant read access." />
     <boolean name="canWrite" title="Write" help="Whether to grant write access." />
     <boolean name="canCreate" title="Create" help="Whether to grant create access." />
