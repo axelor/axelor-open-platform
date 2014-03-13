@@ -30,6 +30,7 @@
  */
 package com.axelor.data.csv;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -286,15 +287,22 @@ public class CSVBinder {
 				value = b.bind(values);
 			}
 
-			if (p.isCollection())
+			if (p.isCollection()) {
 				if (value instanceof Collection<?>)
 					p.addAll(bean, (Collection<?>) value);
 				else
 					p.add(bean, value);
-			else
+			}
+			else {
 				p.set(bean, value);
+			}
 
-			LOG.trace("set value: {} = {}", p.getName(), value);
+			if(value == null && (p.isReference() || p.isCollection())) {
+				LOG.info("[Warning] Bind null value to {} with context: {}", p.getName(), Arrays.asList(values));
+			}
+			else {
+				LOG.trace("set value: {} = {}", p.getName(), value);
+			}
 		}
 
 		return bean;
