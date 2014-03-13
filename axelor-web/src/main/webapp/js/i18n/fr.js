@@ -59,6 +59,7 @@ _t.put({
 "Edit": "Editer",
 "Edit event": "Editer évènement",
 "Error": "Erreur",
+"Export in progress ...": "Export en cours ...",
 "Failed!": "Echec",
 "Go": "Lancer",
 "Grouped": "Groupé",

@@ -39,6 +39,7 @@ _t.put({
 "Duplicate": "Duplicate",
 "Edit": "Edit",
 "Edit event": "Edit event",
+"Export in progress ...": "Export in progress ...",
 "Error": "Error",
 "Failed!": "Echec",
 "Go": "Go",

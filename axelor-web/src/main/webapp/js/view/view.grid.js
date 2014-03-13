@@ -545,6 +545,8 @@ angular.module('axelor.ui').directive('uiGridExport', function(){
 					document.body.appendChild(link);
 	
 					link.click();
+					
+					axelor.notify.info(_t("Export in progress ..."));
 				});
 			};
 			
