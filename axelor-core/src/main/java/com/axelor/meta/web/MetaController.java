@@ -192,6 +192,7 @@ public class MetaController {
 		Map<String, String> data = Maps.newHashMap();
 
 		try {
+			MetaStore.clear();
 			moduleManager.update(false);
 		} catch (Exception e){
 			data.put("error", e.getMessage());
