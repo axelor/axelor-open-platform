@@ -410,8 +410,6 @@ ui.directive('uiUpdateMenu', function () {
 					});
 				});
 			};
-			
-			window.s = scope;
 		},
 		template:
 			"<div class='update-menu filter-menu' ui-watch-if='$parent.visible'>" +
