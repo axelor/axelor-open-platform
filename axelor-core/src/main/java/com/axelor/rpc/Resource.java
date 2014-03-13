@@ -287,7 +287,7 @@ public class Resource<T extends Model> {
 		}
 
 		LOG.debug("Records found: {}", data.size());
-		
+
 		data = Lists.transform(data, new Function<Object, Object>() {
 			@Override
 			public Object apply(Object input) {
@@ -387,9 +387,9 @@ public class Resource<T extends Model> {
 				int index = 0;
 				for(Object value: row) {
 					if (index++ < 2) continue; // ignore first two items (id, version)
-					Object objValue = value;
+					Object objValue = value == null ? "" : value;
 					if(selection.containsKey(index-3)) {
-						objValue = selection.get(index-3).get(value.toString());
+						objValue = selection.get(index-3).get(objValue.toString());
 					}
 					String strValue = objValue == null ? "" : escapeCsv(objValue.toString());
 					line.add(strValue);
@@ -665,7 +665,7 @@ public class Resource<T extends Model> {
 
 		return response;
 	}
-	
+
 	public static Map<String, Object> toMap(Object bean, String... names) {
 		return _toMap(bean, unflatten(null, names), false, 0);
 	}
@@ -673,7 +673,7 @@ public class Resource<T extends Model> {
 	public static Map<String, Object> toMapCompact(Object bean) {
 		return _toMap(bean, null, true, 1);
 	}
-	
+
 	@SuppressWarnings("all")
 	private static Map<String, Object> _toMap(Object bean, Map<String, Object> fields, boolean compact, int level) {
 
@@ -684,19 +684,19 @@ public class Resource<T extends Model> {
 		if (bean instanceof HibernateProxy) {
 			bean = ((HibernateProxy) bean).getHibernateLazyInitializer().getImplementation();
 		}
-		
+
 		if (fields == null) {
 			fields = Maps.newHashMap();
 		}
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		Mapper mapper = Mapper.of(bean.getClass());
-		
+
 		boolean isSaved = ((Model)bean).getId() != null;
 		boolean isCompact = compact || fields.containsKey("$version");
 
 		if ((isCompact && isSaved) || (isSaved && level >= 1 ) || (level > 1)) {
-			
+
 			Property pn = mapper.getNameField();
 			Property pc = mapper.getProperty("code");
 
@@ -732,9 +732,9 @@ public class Resource<T extends Model> {
 			if (isSaved && prop.isCollection() && !fields.isEmpty() && !fields.containsKey(name)) {
 				continue;
 			}
-			
+
 			Object value = mapper.get(bean, name);
-			
+
 			if (prop.isImage() && byte[].class.isInstance(value)) {
 				value = new String((byte[]) value);
 			}
@@ -748,7 +748,7 @@ public class Resource<T extends Model> {
 					value = decimal.setScale(scale, RoundingMode.HALF_UP);
 				}
 			}
-			
+
 			if (value instanceof Model) { // m2o
 				Map<String, Object> _fields = (Map) fields.get(prop.getName());
 				value = _toMap(value, _fields, true, level + 1);
