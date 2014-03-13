@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.axelor.data.ImportException;
 import com.axelor.data.ScriptHelper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -48,40 +49,40 @@ public class XMLBind {
 
 	@XStreamAsAttribute
 	private String node;
-	
+
 	@XStreamAlias("to")
 	@XStreamAsAttribute
 	private String field;
-	
+
 	@XStreamAsAttribute
 	private String alias;
-	
+
 	@XStreamAlias("type")
 	@XStreamAsAttribute
 	private String typeName;
 
 	@XStreamAsAttribute
 	private String search;
-	
+
 	@XStreamAsAttribute
 	private boolean update;
-	
+
 	@XStreamAlias("eval")
 	@XStreamAsAttribute
 	private String expression;
-	
+
 	@XStreamAlias("if")
 	@XStreamAsAttribute
 	private String condition;
-	
+
 	@XStreamAlias("if-empty")
 	@XStreamAsAttribute
 	private Boolean conditionEmpty;
-	
+
 	@XStreamAlias("call")
 	@XStreamAsAttribute
 	private String callable;
-	
+
 	@XStreamAsAttribute
 	private String adapter;
 
@@ -91,25 +92,25 @@ public class XMLBind {
 	public String getNode() {
 		return node;
 	}
-	
+
 	public String getField() {
 		return field;
 	}
-	
+
 	public String getAlias() {
 		return alias;
 	}
-	
+
 	public String getAliasOrName() {
 		if (alias == null || "".equals(alias.trim()))
 			return node;
 		return alias;
 	}
-	
+
 	public String getTypeName() {
 		return typeName;
 	}
-	
+
 	public Class<?> getType() {
 		try {
 			return Class.forName(typeName);
@@ -121,37 +122,37 @@ public class XMLBind {
 	public String getSearch() {
 		return search;
 	}
-	
+
 	public boolean isUpdate() {
 		return update;
 	}
-	
+
 	public String getExpression() {
 		return expression;
 	}
-	
+
 	public String getCondition() {
 		return condition;
 	}
-	
+
 	public Boolean getConditionEmpty() {
 		return conditionEmpty;
 	}
-	
+
 	public String getCallable() {
 		return callable;
 	}
-	
+
 	public String getAdapter() {
 		return adapter;
 	}
-	
+
 	public List<XMLBind> getBindings() {
 		return bindings;
 	}
-	
+
 	private Set<String> multiples;
-	
+
 	public boolean isMultiple(XMLBind bind) {
 		if (multiples == null) {
 			multiples = Sets.newHashSet();
@@ -165,44 +166,44 @@ public class XMLBind {
 		}
 		return multiples.contains(bind.getNode());
 	}
-	
+
 	private Object callObject;
 	private Method callMethod;
-	
+
 	@SuppressWarnings("unchecked")
 	public <T> T call(T object, Map<String, Object> context, Injector injector) throws Exception {
-		
+
 		if (Strings.isNullOrEmpty(callable))
 			return object;
-		
+
 		if (callObject == null) {
-			
+
 			String className = callable.split("\\:")[0];
 			String method = callable.split("\\:")[1];
-			
+
 			Class<?> klass = Class.forName(className);
-			
+
 			callMethod = klass.getMethod(method, Object.class, Map.class);
 			callObject = injector.getInstance(klass);
 		}
-		
+
 		try {
 			return (T) callMethod.invoke(callObject, new Object[]{ object, context });
 		} catch (Exception e) {
 			System.err.println("EEE: " + e);
+			throw new ImportException(e);
 		}
-		return object;
 	}
 
 	private static ScriptHelper helper = new ScriptHelper(100, 10, false);
-	
+
 	public Object eval(Map<String, Object> context) {
 		if (Strings.isNullOrEmpty(expression)) {
 			return context.get(this.getAliasOrName());
 		}
 		return helper.eval(expression, context);
 	}
-	
+
 	public boolean validate(Map<String, Object> context) {
 		if (Strings.isNullOrEmpty(condition)) {
 			return true;
@@ -213,7 +214,7 @@ public class XMLBind {
 
 	@Override
 	public String toString() {
-		
+
 		StringBuilder sb = new StringBuilder("<bind");
 
 		if (node != null)
