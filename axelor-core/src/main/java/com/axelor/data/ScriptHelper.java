@@ -54,7 +54,7 @@ import com.google.common.cache.LoadingCache;
  * The {@link ScriptHelper} maintains an internal LRU cache to reuse the parsed
  * script. If the specified expiry time is elapsed without any access to the
  * cached script, the cache is evited to regain the memory.
- * 
+ *
  */
 public final class ScriptHelper {
 
@@ -63,18 +63,18 @@ public final class ScriptHelper {
 	private static final int DEFAULT_EXPIRE_TIME = 10;
 
 	private static final Logger log = LoggerFactory.getLogger(ScriptHelper.class);
-	
+
 	final static CompilerConfiguration config = new CompilerConfiguration();
 
 	static {
 		config.getOptimizationOptions().put("indy", true);
 		config.getOptimizationOptions().put("int", false);
 	}
-	
+
 	private boolean indy = true;
-	
+
 	private int cacheSize = DEFAULT_CACHE_SIZE;
-	
+
 	private int expireTime = DEFAULT_EXPIRE_TIME;
 
 	private LoadingCache<String, Script> cache = CacheBuilder
@@ -95,7 +95,7 @@ public final class ScriptHelper {
 	/**
 	 * Create a new {@link ScriptHelper} with the given {@link #cacheSize} and
 	 * {@link #expireTime} in minutes.
-	 * 
+	 *
 	 * @param cacheSize
 	 *            Size of the cache.
 	 * @param expireTime
@@ -116,17 +116,17 @@ public final class ScriptHelper {
 	 * An instance of {@link Binding} is created to deal with missing variables.
 	 * In that case, <code>null</code> is returned and avoids
 	 * {@link MissingPropertyException}.
-	 * 
+	 *
 	 * @param expression
 	 *            the groovy expression to evaluate
 	 * @param variables
 	 *            the binding variables
 	 * @return the result of the expression
 	 */
-	public Object eval(String expression, Map<String, Object> variables) {
-		
+	public synchronized Object eval(String expression, Map<String, Object> variables) {
+
 		return eval(expression, new Binding(variables) {
-			
+
 			@Override
 			public Object getVariable(String name) {
 				try {
@@ -140,7 +140,7 @@ public final class ScriptHelper {
 
 	/**
 	 * Evaluate the given expression.
-	 * 
+	 *
 	 * @param expression
 	 *            the groovy expression to evaluate
 	 * @param binding
