@@ -920,7 +920,8 @@
 
 				var query = extend({
 					_domain: domain,
-					_domainContext: context
+					_domainContext: context,
+					_archived: this._showArchived
 				}, filter);
 
 				var params = {
