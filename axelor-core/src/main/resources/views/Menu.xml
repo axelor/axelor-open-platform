@@ -121,7 +121,7 @@
     action="meta.charts"/>
 
   <action-view name="meta.charts" title="All Charts" model="com.axelor.meta.db.MetaView">
-    <view type="grid" name="meta-view-grid"/>
+    <view type="grid" name="meta-view-chart-grid"/>
     <view type="form" name="meta-view-form"/>
     <domain>self.type = 'chart'</domain>
   </action-view>
