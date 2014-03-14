@@ -66,7 +66,7 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 		$scope._resultFields = fixFields(schema.resultFields);
 
 		$scope._searchView = schema;
-		$scope._showSingle = params.params && params.params._showSingle;
+		$scope._showSingle = params.params && params.params.showSingle;
 		$scope._forceEdit = params.params && params.params.forceEdit;
 		$scope._hideActions = params.params && params.params.hideActions;
 		
