@@ -390,6 +390,14 @@ angular.module('axelor.ui').directive('uiViewPopup', function() {
 		link: function (scope, element, attrs) {
 			
 			var canClose = false;
+
+			scope.onOK = function () {
+				scope.closeTab(scope.tab, function() {
+					canClose = true;
+					element.dialog('close');
+				});
+			};
+			
 			scope.onBeforeClose = function(e) {
 				if (canClose) {
 					return;
@@ -397,10 +405,7 @@ angular.module('axelor.ui').directive('uiViewPopup', function() {
 				e.preventDefault();
 				e.stopPropagation();
 
-				scope.closeTab(scope.tab, function() {
-					canClose = true;
-					element.dialog('close');
-				});
+				scope.onOK();
 			};
 
 			scope.onPopupClose = function () {
