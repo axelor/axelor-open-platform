@@ -114,10 +114,10 @@ function ViewCtrl($scope, DataSource, ViewService) {
 	$scope.tbTitleHide = !__appSettings['view.toolbar.titles'];
 
 	// show single or default record if specified
-	var actionParams = params.params || {};
-	if (actionParams.showSingle || actionParams.showRecord) {
+	var context = params.context || {};
+	if (context._showSingle || context._showRecord) {
 		var ds = $scope._dataSource;
-		var forceEdit = actionParams.forceEdit === undefined || actionParams.forceEdit;
+		var forceEdit = (params.params||{}).forceEdit === true;
 
 		function doEdit(id, readonly) {
 			$scope.switchTo('form', function(scope){
@@ -130,8 +130,7 @@ function ViewCtrl($scope, DataSource, ViewService) {
 			});
 		}
 
-		if (actionParams.showRecord > 0) {
-			params.context = _.extend(params.context || {}, {_showRecord: actionParams.showRecord});
+		if (context._showRecord > 0) {
 			params.viewType = "form";
 			return $scope.switchTo('form');
 		}
