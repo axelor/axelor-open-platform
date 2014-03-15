@@ -220,7 +220,7 @@ function Loader(scope, node, DataSource) {
 	var domain = null;
 	
 	if (node.parent) {
-		domain = "self." + node.parent + ".id = :parent";
+		domain = "self." + node.parent + ".id = :parentId";
 	}
 
 	if (node.domain) {
@@ -272,7 +272,7 @@ function Loader(scope, node, DataSource) {
 		sortBy = sortBy || node.orderBy;
 
 		if (current) {
-			context.parent = current.id;
+			context.parentId = current.id;
 		} else if (scope.getContext) {
 			context = scope.getContext();
 		}
