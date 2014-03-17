@@ -317,6 +317,10 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		}
 
 		$scope.applyFilter();
+		
+		if ($scope.$parent) {
+			$scope.$parent.$broadcast('on:hide-menu');
+		}
 	};
 
 	function trySelection(criterion) {
