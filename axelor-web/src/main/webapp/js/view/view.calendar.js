@@ -131,9 +131,12 @@ function CalendarViewCtrl($scope, $element) {
 			var key = $scope.getColorKey(record, item);
 			var title = colorField.targetName ? item[colorField.targetName] : item;
 			if (colorField.selectionList) {
-				title = _.find(colorField.selectionList, function(s) {
-					return s.value == value;
+				var select = _.find(colorField.selectionList, function (select) {
+					return ("" + select.value) === ("" + title);
 				});
+				if (select) {
+					title = select.title;
+				}
 			}
 			if (!colors[key]) {
 				colors[key] = {
