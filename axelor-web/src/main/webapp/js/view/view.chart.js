@@ -417,8 +417,10 @@ function GaugeCharter(scope, element, data) {
 		value = item[key] || value;
 	}
 	
-	var parent = element.parent();
-	parent.empty();
+	var parent = element.hide().parent();
+	
+	parent.children('svg').remove();
+	parent.append(element);
 
 	var chart = GaugeChart(parent[0], {
 		size: 300,
@@ -433,7 +435,7 @@ function GaugeCharter(scope, element, data) {
 	chart.render();
 	chart.update(value);
 
-	parent.children('svg')
+	parent.children('svg:last')
 		.css('width', 'auto')
 		.css('margin', 'auto')
 		.css('margin-top', 10);
