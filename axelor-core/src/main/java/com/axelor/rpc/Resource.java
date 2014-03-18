@@ -292,7 +292,7 @@ public class Resource<T extends Model> {
 			@Override
 			public Object apply(Object input) {
 				if (input instanceof Model) {
-					return toMapCompact((Model) input);
+					return toMap((Model) input);
 				}
 				return input;
 			};
