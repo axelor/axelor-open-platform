@@ -109,13 +109,18 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		
 		scope.isReadonlyExclusive = function() {
 			var parent = this.$parent || {};
+			var readonly = this.attr("readonly");
+
 			if (scope._isPopup && !parent._isPopup) {
-				return this.attr("readonly") || false;
+				return readonly || false;
+			}
+			if (readonly !== undefined) {
+				return readonly || false;
 			}
 			if (parent.isReadonlyExclusive && parent.isReadonlyExclusive()) {
 				return true;
 			}
-			return this.attr("readonly") || false;
+			return readonly || false;
 		};
 		
 		scope.isReadonly = function() {
