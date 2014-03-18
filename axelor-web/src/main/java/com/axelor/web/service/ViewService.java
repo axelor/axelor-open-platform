@@ -111,7 +111,7 @@ public class ViewService extends AbstractService {
 		final Response response = new Response();
 		final Map<String, Object> meta = Maps.newHashMap();
 		final Class<?> modelClass = findClass(model);
-		final List<Object> fields = Lists.newArrayList();
+		final List<String> names = Lists.newArrayList();
 		
 		if (!security.isPermitted(AccessType.READ, (Class) modelClass)) {
 			response.setStatus(Response.STATUS_FAILURE);
@@ -119,18 +119,13 @@ public class ViewService extends AbstractService {
 		}
 		
 		for (Property p : Mapper.of(modelClass).getProperties()) {
-			Map<String, Object> map = p.toMap();
-			String title = p.getTitle();
-			if (title == null) {
-				title = p.getName();
+			if (!p.isTransient()) {
+				names.add(p.getName());
 			}
-			title = JPA.translate(p.getName(), p.getTitle(), modelClass.getName(), "field");
-			map.put("title", title);
-			fields.add(map);
 		}
 
 		meta.put("model", model);
-		meta.put("fields", fields);
+		meta.putAll(findFields(model, names));
 
 		response.setData(meta);
 		response.setStatus(Response.STATUS_SUCCESS);
