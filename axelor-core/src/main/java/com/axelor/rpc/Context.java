@@ -88,7 +88,7 @@ public class Context extends HashMap<String, Object> {
 	@SuppressWarnings("all")
 	public static Object createOrFind(Property p, Object value) {
 
-		Object bean = null;
+		Object bean = value;
 
 		if (value instanceof Map) {
 			Map map = (Map) value;
@@ -103,8 +103,10 @@ public class Context extends HashMap<String, Object> {
 			if (bean != null && map.containsKey(FIELD_SELECTED))
 				Mapper.of(p.getTarget()).set(bean, FIELD_SELECTED, map.get(FIELD_SELECTED));
 		}
-
-		return bean;
+		if (bean instanceof Model) {
+			return bean;
+		}
+		return null;
 	}
 
 	@SuppressWarnings("all")
