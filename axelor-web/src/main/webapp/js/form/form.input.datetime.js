@@ -244,8 +244,8 @@ ui.formInput('DateTime', {
 
 		function updateModel() {
 			var masked = input.mask("value") || '',
-				value = input.datetimepicker('getDate'),
-				oldValue = scope.getValue();
+				value = input.datetimepicker('getDate') || null,
+				oldValue = scope.getValue() || null;
 
 			if (_.isEmpty(masked)) {
 				value = null;
@@ -365,7 +365,7 @@ ui.formInput('Time', 'DateTime', {
 		
 		function updateModel() {
 			var value = element.val() || '',
-				oldValue = scope.getValue();
+				oldValue = scope.getValue() || '';
 
 			value = scope.parse(value);
 			
