@@ -45,7 +45,8 @@ var OPERATORS = {
 var OPERATORS_BY_TYPE = {
 	"string"	: ["=", "!=", "like", "notLike", "isNull", "notNull"],
 	"integer"	: ["=", "!=", ">=", "<=", ">", "<", "between", "notBetween", "isNull", "notNull"],
-	"boolean"	: ["true", "false"]
+	"boolean"	: ["true", "false"],
+	"selection"	: ["=", "!=", "isNull", "notNull"]
 };
 
 _.each(["long", "decimal", "date", "time", "datetime"], function(type) {
@@ -89,9 +90,16 @@ ui.directive('uiFilterItem', function() {
 			scope.remove = function(filter) {
 				form.removeFilter(filter);
 			};
+			
+			scope.canShowSelect = function () {
+				return scope.filter && scope.filter.type === 'selection' &&
+					   scope.filter.operator && !(
+					   scope.filter.operator == 'isNull' ||
+					   scope.filter.operator == 'notNull');
+			};
 
 			scope.canShowInput = function() {
-				return scope.filter &&
+				return scope.filter && !scope.canShowSelect() &&
 					   scope.filter.operator && !(
 					   scope.filter.type == 'boolean' ||
 					   scope.filter.operator == 'isNull' ||
@@ -103,12 +111,21 @@ ui.directive('uiFilterItem', function() {
 					   scope.filter.operator === 'between' ||
 					   scope.filter.operator === 'notBetween');
 			};
+			
+			scope.getSelection = function () {
+				if (!scope.canShowSelect()) return [];
+				var field = (scope.fields||{})[scope.filter.field] || {};
+				return field.selectionList || [];
+			};
 
 			scope.onFieldChange = function() {
 				var filter = scope.filter,
 					field = scope.fields[filter.field] || {};
 
 				filter.type = field.type || 'string';
+				if (field.selection) {
+					filter.type = 'selection';
+				}
 
 				if (field.type === 'many-to-one') {
 					filter.targetName = field.targetName;
@@ -135,11 +152,14 @@ ui.directive('uiFilterItem', function() {
 					"<td class='form-item filter-select'>" +
 						"<select ng-model='filter.operator' ng-options='o.name as o.title for o in getOperators()' class='input-medium'></select> "+
 					"</td>" +
-					"<td class='form-item'>" +
-						"<input type='text' ui-filter-input ng-model='filter.value' ng-show='canShowInput()' class='input-medium'> " +
+					"<td class='form-item filter-select' ng-show='canShowSelect()'>" +
+						"<select ng-model='filter.value' class='input=medium' ng-options='o.value as o.title for o in getSelection()'></select>" +
 					"</td>" +
-					"<td class='form-item'>" +
-						"<input type='text' ui-filter-input ng-model='filter.value2' ng-show='canShowRange()' class='input-medium'> " +
+					"<td class='form-item' ng-show='canShowInput()'>" +
+						"<input type='text' ui-filter-input ng-model='filter.value' class='input-medium'> " +
+					"</td>" +
+					"<td class='form-item' ng-show='canShowRange()'>" +
+						"<input type='text' ui-filter-input ng-model='filter.value2' class='input-medium'> " +
 					"</td>" +
 				"</tr>" +
 			"</table>" +
@@ -323,43 +343,6 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		}
 	};
 
-	function trySelection(criterion) {
-		var name = criterion.fieldName;
-		var field = handler.fields[name] || {};
-		var items = field.selectionList;
-
-		if (!items) {
-			field = _.findWhere((handler.view||{}).items, {name: name}) || {};
-			items = field.selectionList;
-		}
-		if (!items || items.length === 0) {
-			return criterion;
-		}
-
-		var value = criterion.value;
-		var filter = {
-			operator: "or",
-			criteria: [criterion]
-		};
-
-		for(var i = 0; i < items.length; i++) {
-			var item = items[i];
-			if (criterion.operator == "like" ||
-				criterion.operator == "notLike") {
-				if (item.title.toLowerCase().indexOf(value) > -1) {
-					var nested = _.extend({}, criterion);
-					nested.value = item.value;
-					filter.criteria.push(nested);
-				}
-			} else if (item.title === value) {
-				criterion.value = item.value;
-				return criterion;
-			}
-		}
-
-		return filter;
-	}
-
 	$scope.prepareFilter = function() {
 
 		var criteria = {
@@ -410,8 +393,6 @@ function FilterFormCtrl($scope, $element, ViewService) {
 			if (criterion.operator == "between" || criterion.operator == "notBetween") {
 				criterion.value2 = filter.value2;
 			}
-			
-			criterion = trySelection(criterion);
 
 			criteria.criteria.push(criterion);
 		});
