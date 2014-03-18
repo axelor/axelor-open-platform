@@ -142,7 +142,6 @@ public class ModuleManager {
 		}
 	}
 
-	@Transactional
 	public void install(String moduleName, boolean update, boolean withDemo) {
 		for (Module module: resolver.resolve(moduleName)) {
 			install(module.getName(), update, withDemo, true);
