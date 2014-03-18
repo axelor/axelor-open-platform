@@ -29,7 +29,6 @@ public class ModuleController {
 	@Inject
 	private ModuleManager loader;
 
-	@Transactional
 	public Response install(final String name) {
 		final ActionResponse response = new ActionResponse();
 		try {
