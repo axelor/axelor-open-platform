@@ -108,7 +108,7 @@ ui.formInput('CodeEditor', {
 
 		function readonlySet(readonly) {
 			if (editor) {
-				editor.setOption('readOnly', readonly ? "nocursor" : false);
+				editor.setOption('readOnly', _.toBoolean(readonly));
 			}
 		}
 
