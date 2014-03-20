@@ -90,7 +90,7 @@ public class ModuleManager {
 		}
 
 		for (Module module : resolver.all()) {
-			if (!module.isRemovable()) {
+			if (!module.isRemovable() || module.isInstalled()) {
 				install(module.getName(), update, withDemo, false);
 			}
 		}
@@ -115,8 +115,13 @@ public class ModuleManager {
 		if (modules != null) {
 			names = Lists.newArrayList(modules);
 		}
+
 		if (names.isEmpty()) {
-			names = resolver.names();
+			for (Module module : resolver.all()) {
+				if (module.isInstalled()) {
+					names.add(module.getName());
+				}
+			}
 		}
 
 		for (Module module : resolver.all()) {

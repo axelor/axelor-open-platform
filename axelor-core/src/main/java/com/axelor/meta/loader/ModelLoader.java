@@ -87,14 +87,11 @@ public class ModelLoader extends AbstractLoader {
 				continue;
 			}
 			log.info("importing sequence: {}", sequence.getName());
-			MetaSequence entity = MetaSequence.findByName(sequence.getName());
-			if (entity == null) {
-				entity = new MetaSequence(sequence.getName());
-			}
-			
-			if (isUpdated(entity)) {
+			if (MetaSequence.findByName(sequence.getName()) != null) {
 				continue;
 			}
+			
+			MetaSequence entity = new MetaSequence(sequence.getName());
 			
 			entity.setPrefix(sequence.getPrefix());
 			entity.setSuffix(entity.getSuffix());

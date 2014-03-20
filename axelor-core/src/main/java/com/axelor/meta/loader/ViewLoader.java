@@ -126,7 +126,7 @@ public class ViewLoader extends AbstractLoader {
 			importActionMenu(item, module, update);
 		}
 	}
-
+	
 	private void importView(AbstractView view, Module module, boolean update) {
 
 		String xmlId = view.getId();
@@ -157,33 +157,39 @@ public class ViewLoader extends AbstractLoader {
 			}
 			modelName = model.getName();
 		}
-
+		
 		MetaView entity = new MetaView(name);
-		MetaView extending = MetaView.findByName(name);
+		MetaView other = MetaView.findByName(name);
+		MetaView found = MetaView.findByID(xmlId);
+		if (found == null) {
+			found = MetaView.findByModule(name, module.getName());
+		}
 
-		if (extending != null) {
+		if (other == found) {
+			other = null;
+		}
 
+		if (other != null) {
+			
 			if (xmlId == null && isVisited(view.getClass(), name)) {
 				log.error("duplicate view without 'id': {}", name);
 				return;
 			}
-
-			MetaView existing = MetaView.findByID(xmlId);
-			if (update && existing != null && Objects.equal(xmlId, existing.getXmlId())) {
-				entity = existing;
+			
+			if (update && found != null && Objects.equal(xmlId, found.getXmlId())) {
+				entity = found;
 			}
-			if (update && existing == null) {
-				entity = extending;
+			if (update && found == null) {
+				entity = other;
 			}
 			
 			// set priority higher to existing view
-			if (!Objects.equal(xmlId, extending.getXmlId())) {
-				entity.setPriority(extending.getPriority() + 1);
+			if (!Objects.equal(xmlId, other.getXmlId())) {
+				entity.setPriority(other.getPriority() + 1);
 			}
 		}
 
-		if (isUpdated(entity)) {
-			log.debug("view is modified, can't update: {}", name);
+		if (entity.getId() != null && !update) {
 			return;
 		}
 
@@ -209,31 +215,33 @@ public class ViewLoader extends AbstractLoader {
 		log.debug("Loading selection : {}", name);
 
 		MetaSelect entity = new MetaSelect(selection.getName());
-		MetaSelect extending = MetaSelect.findByName(selection.getName());
+		MetaSelect other = MetaSelect.findByName(selection.getName());
+		MetaSelect found = MetaSelect.findByID(xmlId);
+		if (found == null) {
+			found = MetaSelect.filter("self.name = ? AND self.module = ?", name, module.getName()).fetchOne();
+		}
 
-		if (extending != null) {
+		if (other != null) {
 
 			if (StringUtils.isBlank(xmlId) && isVisited(Selection.class, name)) {
 				log.error("duplicate selection without 'id': {}", name);
 				return;
 			}
 
-			MetaSelect existing = MetaSelect.findByID(xmlId);
-			if (update && existing != null && Objects.equal(xmlId, existing.getXmlId())) {
-				entity = existing;
+			if (update && found != null && Objects.equal(xmlId, found.getXmlId())) {
+				entity = found;
 			}
-			if (update && existing == null) {
-				entity = extending;
+			if (update && found == null) {
+				entity = other;
 			}
 
 			// set priority higher to existing view
-			if (!Objects.equal(xmlId, extending.getXmlId())) {
-				entity.setPriority(extending.getPriority() + 1);
+			if (!Objects.equal(xmlId, other.getXmlId())) {
+				entity.setPriority(other.getPriority() + 1);
 			}
 		}
-
-		if (isUpdated(entity)) {
-			log.debug("selection is modified, can't update: {}", name);
+		
+		if (entity.getId() != null && !update) {
 			return;
 		}
 
@@ -304,7 +312,7 @@ public class ViewLoader extends AbstractLoader {
 			entity = new MetaAction(action.getName());
 		}
 
-		if (isUpdated(entity)) {
+		if (entity.getId() != null && !update) {
 			return;
 		}
 
@@ -338,8 +346,8 @@ public class ViewLoader extends AbstractLoader {
 		if (menu == null) {
 			menu = new MetaMenu(menuItem.getName());
 		}
-
-		if (isUpdated(menu)) {
+		
+		if (menu.getId() != null && !update) {
 			return;
 		}
 
@@ -396,7 +404,7 @@ public class ViewLoader extends AbstractLoader {
 			menu = new MetaActionMenu(menuItem.getName());
 		}
 
-		if (isUpdated(menu)) {
+		if (menu.getId() != null && !update) {
 			return;
 		}
 
