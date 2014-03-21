@@ -90,6 +90,10 @@
 	background-image: none !important;
 }
 
+.slick-headerrow-columns .slick-headerrow-column {
+	background-color: white;
+}
+
 .slick-headerrow-column {
 	height: 24px;
 	border-left: none !important;

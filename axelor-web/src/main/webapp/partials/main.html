@@ -1,11 +1,7 @@
  <div ng-controller="NavCtrl">
   <div ui-splitter nav-menu-toggle x-orientation="vertical" x-position="250">
     <div class="sidebar">
-       <div class="splitter-header">
-         <div class="splitter-title" x-translate>Navigation</div>
-       </div>
        <div nav-tree x-item-click="menuClick" class="splitter-center webkit-scrollbar"></div>
-       <div class="splitter-footer"></div>
     </div> <!--/.sidebar-->
     <div class="view-tabs">
       <div nav-tabs ng-model="tabs"></div>

@@ -67,6 +67,7 @@
             var dragger = this.element.find('> .' + css);
             if (dragger.size() === 0) {
                 dragger = $('<div></div>').addClass(css).appendTo(this.element);
+                $('<span class="splitter-handle"></span>').appendTo(dragger);
             }
 
             var pos = +opts.position,

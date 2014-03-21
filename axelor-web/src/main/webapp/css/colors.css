@@ -1,0 +1,149 @@
+header .navbar-inverse .navbar-inner {
+	background-color: #535353;
+	background-image: linear-gradient(#5B5B5B, #424242);
+	border-color: #333;
+	border-bottom-color: #2C3440;
+	color: #fff;
+}
+
+header .navbar-inverse .nav li.dropdown.open > .dropdown-toggle,
+header .navbar-inverse .nav li.dropdown.active > .dropdown-toggle,
+header .navbar-inverse .nav li.dropdown.open.active > .dropdown-toggle {
+	background-color: #3f3f3f;
+	color: #fff;
+}
+
+header .navbar-inverse .dropdown-menu {
+	background-color: #535353;
+}
+
+header .navbar-inverse .divider-vertical {
+	border-left-color: #2d2d2d;
+	border-right-color: #5d5d5d;	
+}
+
+header .navbar-inverse .dropdown-menu .divider {
+	border-top-color: #3d3d3d;
+	border-bottom-color: #5d5d5d;
+}
+
+header .navbar-inverse .brand,
+header .navbar-inverse .nav > li > a,
+header .navbar-inverse .dropdown-menu > li > a {
+	color: #fff;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 1);
+}
+
+header .navbar-inverse .dropdown-menu > li > a:hover,
+header .navbar-inverse .dropdown-menu > li > a:focus,
+header .navbar-inverse .dropdown-submenu:hover > a,
+header .navbar-inverse .dropdown-submenu:focus > a {
+	background-image: none;
+	background-color: #3f3f3f;
+	color: #fff;
+}
+
+header {
+	font-weight: bold;
+}
+
+.sidebar {
+	background-color: #f5f5f5;
+}
+
+.sidebar .nav-tree li.active a {
+	background-color: #5377b1;
+	background-image: linear-gradient(to bottom, #5d83c3, #456697);
+}
+
+.sidebar .splitter-header {
+	background-color: #efefef;
+	background-image: linear-gradient(to bottom, #f6f6f6, #e5e5e5);
+	border-bottom: 1px solid #c1c1c1;
+	height: 26px;
+}
+
+.sidebar .splitter-header .splitter-title {	
+	color: #2f5e92;
+	line-height: 26px;
+	padding: 0 10px;
+	text-shadow: 0 1px 1px #FFF;
+}
+
+.nav-tabs > li {
+	margin-right: -1px;
+	margin-bottom: -1px;
+}
+
+.nav-tabs > li > a {
+	color: #555;
+	background-color: #f1f1f1;
+}
+
+.nav-tabs > li > a,
+.nav-tabs > li.active > a {
+	margin: 0;
+	border-radius: 0;
+	border: 1px solid #c1c1c1;
+}
+
+.nav-tabs > li > a:hover,
+.nav-tabs > li > a:focus {
+	color: #000;
+	border: 1px solid #c1c1c1;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+	border: 1px solid #c1c1c1;
+	border-bottom: 1px solid transparent;
+}
+
+.nav-tabs > li > a {
+	padding-top: 6px;
+	padding-bottom: 6px;
+}
+
+.nav-tabs > li.active > a {}
+
+.nav-tabs-strip {
+	height: 32px;
+}
+
+.nav-tabs-strip .nav-tabs {
+	padding: 0 8px;
+	border-bottom-color: #c1c1c1;
+}
+
+.navigation-tabs ul.nav-tabs-main {
+	height: 31px;
+}
+
+.view-tabs,
+.navigation-tabs > .nav-tabs-wrap {
+	background-color: #e3e3e3;
+}
+
+.navigation-tabs {
+	background-color: #fff;
+}
+
+table.form-layout .tabbable-tabs .tab-content {
+	border-color: #c1c1c1;
+}
+
+.navigation-tabs > .axelor-logo {
+	border-bottom-color: #c1c1c1;
+	background-color: #e3e3e3;
+}
+
+.bordered,
+.bordered-box {
+	border-color: #c1c1c1;
+}
+
+.view-container .form-view > div[ui-view-form].has-width {
+	background-color: #f7f7f9;
+	background: url(../img/texture.png) repeat left top;
+}

@@ -48,6 +48,11 @@ header > .navbar-fixed-top .navbar-inner {
 	float: left;
 }
 
+.navbar .brand-logo img {
+	height: 32px;
+	margin-top: 4px;
+}
+
 .view-tabs {
 	background-color: white;
 }
@@ -65,8 +70,12 @@ header .navbar .nav-shortcuts > .divider-vertical {
 	margin: 0 4px;
 }
 
-header .navbar .nav-shortcuts > li > a > img {
-	height: 20px !important;
+header .navbar .nav-shortcuts > li > a > i {
+	font-size: 20px;
+}
+
+header .navbar .nav-shortcuts > li > a > span {
+	vertical-align: top;
 }
 
 header .dropdown > ul.dropdown-menu {
@@ -396,7 +405,6 @@ input[readonly], select[readonly], textarea[readonly] {
 
 .navigation-tabs ul.nav-tabs-main {
 	margin-bottom: 0px;
-	padding: 0 6px;
 	height: 35px;
 }
 
