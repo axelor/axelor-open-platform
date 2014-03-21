@@ -134,12 +134,12 @@ public class ViewLoader extends AbstractLoader {
 		String type = view.getType();
 		String modelName = view.getModel();
 
-		if (xmlId != null && isVisited(view.getClass(), xmlId)) {
+		if (!StringUtils.isBlank(xmlId) && isVisited(view.getClass(), xmlId)) {
 			return;
 		}
 
 		log.debug("Loading view: {}", name);
-
+		
 		String xml = XMLViews.toXml(view, true);
 
 		if (type.matches("tree|chart|portal|search")) {
@@ -168,17 +168,18 @@ public class ViewLoader extends AbstractLoader {
 		if (other == found) {
 			other = null;
 		}
+		
+		if (StringUtils.isBlank(xmlId) && isVisited(view.getClass(), name)) {
+			log.error("duplicate view without 'id': {}", name);
+			return;
+		}
+
+		if (found != null && Objects.equal(xmlId, found.getXmlId())) {
+			entity = found;
+		}
 
 		if (other != null) {
 			
-			if (xmlId == null && isVisited(view.getClass(), name)) {
-				log.error("duplicate view without 'id': {}", name);
-				return;
-			}
-			
-			if (update && found != null && Objects.equal(xmlId, found.getXmlId())) {
-				entity = found;
-			}
 			if (update && found == null) {
 				entity = other;
 			}
@@ -208,7 +209,7 @@ public class ViewLoader extends AbstractLoader {
 		String name = selection.getName();
 		String xmlId = selection.getXmlId();
 		
-		if (xmlId != null && isVisited(Selection.class, xmlId)) {
+		if (!StringUtils.isBlank(xmlId) && isVisited(Selection.class, xmlId)) {
 			return;
 		}
 
@@ -221,16 +222,17 @@ public class ViewLoader extends AbstractLoader {
 			found = MetaSelect.filter("self.name = ? AND self.module = ?", name, module.getName()).fetchOne();
 		}
 
+		if (StringUtils.isBlank(xmlId) && isVisited(Selection.class, name)) {
+			log.error("duplicate selection without 'id': {}", name);
+			return;
+		}
+
+		if (found != null && Objects.equal(xmlId, found.getXmlId())) {
+			entity = found;
+		}
+
 		if (other != null) {
-
-			if (StringUtils.isBlank(xmlId) && isVisited(Selection.class, name)) {
-				log.error("duplicate selection without 'id': {}", name);
-				return;
-			}
-
-			if (update && found != null && Objects.equal(xmlId, found.getXmlId())) {
-				entity = found;
-			}
+			
 			if (update && found == null) {
 				entity = other;
 			}
