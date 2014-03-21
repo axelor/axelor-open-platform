@@ -24,12 +24,12 @@
 <%@ page import="java.util.Locale"%>
 
 <%
-	AppSettings settings = AppSettings.get();
+AppSettings settings = AppSettings.get();
 
 String appName = settings.get("application.name", "My App");
 String appDesc = settings.get("application.description", null);
 String appHome = settings.get("application.home", "");
-String appLogo = settings.get("application.logo", "");
+String appLogo = settings.get("application.logo", "img/axelor-logo.png");
 String appTheme = settings.get("application.theme", null);
 String appMenu = settings.get("application.menu", "both");
 
@@ -91,12 +91,12 @@ String langJS = AppInfo.getLangJS(request, getServletContext());
           <ul class="nav nav-shortcuts pull-right">
             <li class="divider-vertical"></li>
             <li>
-            	<a href="#/"><img src="img/home-icon.png"></a>
+            	<a href="#/"><i class="fa fa-home"></i></a>
             </li>
             <li class="divider-vertical"></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <img src="img/help-icon.png"> <b class="caret"></b>
+                <i class="fa fa-info-circle"></i> <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
                 <li><a href="{{app.help}}" target="_blank"><span x-translate>Help</span></a></li>
@@ -108,7 +108,7 @@ String langJS = AppInfo.getLangJS(request, getServletContext());
             <li class="divider-vertical"></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              	<img src="img/user-icon.png"> <span>{{app.user}}</span> <b class="caret"></b>
+              	<i class="fa fa-user"></i> <span>{{app.user}}</span> <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
                 <li><a href="#/preferences"><i class="icon-cog"></i> <span x-translate>Preferences</span></a></li>

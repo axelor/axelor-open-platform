@@ -52,6 +52,39 @@
 	background-image: url("../img/splitter-h.png");
 }
 
+.splitter-handle {
+	font-family: "FontAwesome";
+	font-size: 14px;
+	color: #c1c1c1;
+}
+
+.splitter-vertical .splitter-handle {
+	width: 100%;
+	height: 14px;
+	position: absolute;
+	top: calc(50% - 7px);
+	cursor: pointer;
+}
+
+.splitter-vertical .splitter-handle:before {
+	content: "\f142";
+	margin-left: 3px;
+}
+
+.splitter-horizontal .splitter-handle {
+	width: 14px;
+	height: 100%;
+	position: absolute;
+	left: calc(50% - 7px);
+	cursor: pointer; 
+}
+
+.splitter-horizontal .splitter-handle:before {
+	content: "\f141";
+	position: absolute;
+	top: -3px;
+}
+
 .splitter-header {
 	height: 23px;
 	background-image: url("../img/splitter-header.png");
