@@ -134,7 +134,12 @@ public class ViewLoader extends AbstractLoader {
 		String type = view.getType();
 		String modelName = view.getModel();
 
-		if (!StringUtils.isBlank(xmlId) && isVisited(view.getClass(), xmlId)) {
+		if (StringUtils.isBlank(xmlId)) {
+			if (isVisited(view.getClass(), name)) {
+				log.error("duplicate view without 'id': {}", name);
+				return;
+			}
+		} else if (isVisited(view.getClass(), xmlId)) {
 			return;
 		}
 
@@ -158,36 +163,23 @@ public class ViewLoader extends AbstractLoader {
 			modelName = model.getName();
 		}
 		
-		MetaView entity = new MetaView(name);
+		MetaView entity = MetaView.findByID(xmlId);
 		MetaView other = MetaView.findByName(name);
-		MetaView found = MetaView.findByID(xmlId);
-		if (found == null) {
-			found = MetaView.findByModule(name, module.getName());
-		}
-
-		if (other == found) {
-			other = null;
+		if (entity == null) {
+			entity = MetaView.findByModule(name, module.getName());
 		}
 		
-		if (StringUtils.isBlank(xmlId) && isVisited(view.getClass(), name)) {
-			log.error("duplicate view without 'id': {}", name);
-			return;
+		if (entity == null) {
+			entity = new MetaView(name);
+		}
+		
+		if (other == entity) {
+			other = null;
 		}
 
-		if (found != null && Objects.equal(xmlId, found.getXmlId())) {
-			entity = found;
-		}
-
-		if (other != null) {
-			
-			if (update && found == null) {
-				entity = other;
-			}
-			
-			// set priority higher to existing view
-			if (!Objects.equal(xmlId, other.getXmlId())) {
-				entity.setPriority(other.getPriority() + 1);
-			}
+		// set priority higher to existing view
+		if (other != null && !Objects.equal(xmlId, other.getXmlId())) {
+			entity.setPriority(other.getPriority() + 1);
 		}
 
 		if (entity.getId() != null && !update) {
@@ -208,39 +200,35 @@ public class ViewLoader extends AbstractLoader {
 
 		String name = selection.getName();
 		String xmlId = selection.getXmlId();
-		
-		if (!StringUtils.isBlank(xmlId) && isVisited(Selection.class, xmlId)) {
+
+		if (StringUtils.isBlank(xmlId)) {
+			if (isVisited(Selection.class, name)) {
+				log.error("duplicate selection without 'id': {}", name);
+				return;
+			}
+		} else if (isVisited(Selection.class, xmlId)) {
 			return;
 		}
 
 		log.debug("Loading selection : {}", name);
 
-		MetaSelect entity = new MetaSelect(selection.getName());
+		MetaSelect entity = MetaSelect.findByID(xmlId);
 		MetaSelect other = MetaSelect.findByName(selection.getName());
-		MetaSelect found = MetaSelect.findByID(xmlId);
-		if (found == null) {
-			found = MetaSelect.filter("self.name = ? AND self.module = ?", name, module.getName()).fetchOne();
+		if (entity == null) {
+			entity = MetaSelect.filter("self.name = ? AND self.module = ?", name, module.getName()).fetchOne();
 		}
 
-		if (StringUtils.isBlank(xmlId) && isVisited(Selection.class, name)) {
-			log.error("duplicate selection without 'id': {}", name);
-			return;
+		if (entity == null) {
+			entity = new MetaSelect(selection.getName());
+		}
+		
+		if (other == entity) {
+			other = null;
 		}
 
-		if (found != null && Objects.equal(xmlId, found.getXmlId())) {
-			entity = found;
-		}
-
-		if (other != null) {
-			
-			if (update && found == null) {
-				entity = other;
-			}
-
-			// set priority higher to existing view
-			if (!Objects.equal(xmlId, other.getXmlId())) {
-				entity.setPriority(other.getPriority() + 1);
-			}
+		// set priority higher to existing view
+		if (other != null && !Objects.equal(xmlId, other.getXmlId())) {
+			entity.setPriority(other.getPriority() + 1);
 		}
 		
 		if (entity.getId() != null && !update) {
