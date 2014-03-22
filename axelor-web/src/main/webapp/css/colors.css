@@ -97,6 +97,10 @@ header {
 	background-color: #f1f1f1;
 }
 
+.nav-tabs > li.active > a {
+	color: #555;
+}
+
 .nav-tabs > li > a,
 .nav-tabs > li.active > a {
 	margin: 0;
@@ -105,9 +109,11 @@ header {
 }
 
 .nav-tabs > li > a:hover,
-.nav-tabs > li > a:focus {
+.nav-tabs > li > a:focus,
+.nav-tabs > li:hover > a {
 	color: #000;
 	border: 1px solid #c1c1c1;
+	background-color: #f8f8f8;
 }
 
 .nav-tabs > li.active > a,
@@ -115,14 +121,13 @@ header {
 .nav-tabs > li.active > a:focus {
 	border: 1px solid #c1c1c1;
 	border-bottom: 1px solid transparent;
+	background-color: #fff;
 }
 
 .nav-tabs > li > a {
 	padding-top: 6px;
 	padding-bottom: 6px;
 }
-
-.nav-tabs > li.active > a {}
 
 .nav-tabs-strip {
 	height: 32px;
@@ -162,5 +167,4 @@ table.form-layout .tabbable-tabs .tab-content {
 
 .view-container .form-view > div[ui-view-form].has-width {
 	background-color: #f7f7f9;
-	background: url(../img/texture.png) repeat left top;
 }

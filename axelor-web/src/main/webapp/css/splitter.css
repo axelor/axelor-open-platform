@@ -40,14 +40,14 @@
 
 .splitter-vertical {
 	top: 0;	bottom: 0;
-	width: 10px;
+	width: 11px;
 	cursor: ew-resize;
 	background-image: url("../img/splitter-v.png");
 }
 
 .splitter-horizontal {
 	left: 0; right: 0;
-	height: 10px;
+	height: 11px;
 	cursor: ns-resize;
 	background-image: url("../img/splitter-h.png");
 }
@@ -68,7 +68,7 @@
 
 .splitter-vertical .splitter-handle:before {
 	content: "\f142";
-	margin-left: 3px;
+	margin-left: 4px;
 }
 
 .splitter-horizontal .splitter-handle {
