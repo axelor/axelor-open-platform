@@ -78,3 +78,7 @@
 .calendar-bubble-content hr {
 	margin: 8px 0;
 }
+
+.calendar-view .fc-widget-header {
+	background-color: #f5f5f5;
+}

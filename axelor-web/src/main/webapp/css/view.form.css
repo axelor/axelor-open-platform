@@ -323,7 +323,7 @@ table.form-layout td.form-item .stackbar.inline-editable {
 }
 
 table.form-layout td.form-item .stackbar.readonly .edit-icon i:before {
-	content: "\f044";
+	content: "\f0f6";
 }
 	
 .icons-bar {
@@ -389,6 +389,9 @@ td.form-item > * {
 
 .form-item .form-item-group.bordered-box {
 	padding: 4px;
+}
+
+.form-item .form-item-group.bordered-box.has-title {
 	padding-top: 0;
 }
 
@@ -1136,6 +1139,10 @@ table.field-details .help-text hr {
 .filter-form .links {
 	margin: 4px;
 	padding-left: 14px;
+}
+
+.filter-menu .btn-small {
+	font-size: 12px;
 }
 
 /* end filter/update menu */
