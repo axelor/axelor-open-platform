@@ -423,8 +423,8 @@ function TabCtrl($scope, $location, $routeParams) {
 	var app = $scope.app || {},
 		params = _.clone($routeParams),
 		search = _.clone($location.$$search);
-
-	if (app.homeAction) {
+	
+	if (app.homeAction && app.homeAction !== params.resource) {
 		$scope.openTabByName(app.homeAction, {
 			__tab_prepend: true,
 			__tab_closable: false
