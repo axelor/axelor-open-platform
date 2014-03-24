@@ -37,7 +37,7 @@ function makePopover(scope, element, callback, placement) {
 		
 		var tr = $('<tr></tr>').appendTo(table);
 		if (label) {
-			$('<th></th>').text(label + ':').appendTo(tr);
+			$('<th></th>').text(label).appendTo(tr);
 		}
 		if (klass == null) {
 			text = '<code>' + text + '</code>';
