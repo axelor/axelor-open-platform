@@ -422,6 +422,10 @@ input[readonly], select[readonly], textarea[readonly] {
 	margin-right: 2px;
 }
 
+.navigation-tabs > .nav-tabs-wrap li.notclosable a {
+	padding-right: 12px;	
+}
+
 .navigation-tabs > .axelor-logo {
 	border-bottom: 1px solid #ddd;
 }
