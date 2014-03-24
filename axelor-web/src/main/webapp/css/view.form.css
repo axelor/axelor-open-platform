@@ -615,6 +615,7 @@ table.field-details .help-text hr {
 
 .popover .field-details th {
 	vertical-align: top;
+	padding-right: 10px;
 }
 
 .popover .field-details code {
@@ -623,6 +624,19 @@ table.field-details .help-text hr {
 	max-width: 300px;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	font-size: 12px;
+}
+
+.popover.bottom {
+	background-color: #f7f7f7;
+}
+
+.popover.bottom .arrow:after {
+	border-bottom-color: #f7f7f7;
+}
+
+.popover.bottom .popover-content {
+	background-color: white;	
 }
 
 .ws-nowrap {
