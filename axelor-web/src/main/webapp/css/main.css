@@ -514,6 +514,10 @@ input[readonly], select[readonly], textarea[readonly] {
 	font-size: 13px;
 }
 
+.ui-dialog-buttonpane .record-pager-text {
+	margin-top: 5px;
+}
+
 .record-pager > button {
 	margin-left: 4px;
 	margin-right: 4px;

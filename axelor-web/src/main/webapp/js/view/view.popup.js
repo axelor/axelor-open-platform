@@ -616,7 +616,7 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 			      '<button class="btn" ng-disabled="!canPrev()" ng-click="onPrev()"><i class="fa fa-chevron-left"></i></button>'+
 			      '<button class="btn" ng-disabled="!canNext()" ng-click="onNext()"><i class="fa fa-chevron-right"></i></button>'+
 			    '</div>'+
-			    '<span>{{pagerText()}}</span>'+
+			    '<span class="record-pager-text">{{pagerText()}}</span>'+
 		    '</div>'+
 		'</div>'
 	};

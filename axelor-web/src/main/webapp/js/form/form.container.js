@@ -80,7 +80,7 @@ ui.formWidget('Group', {
 	},
 	transclude: true,
 	template:
-		'<fieldset ng-class="{\'bordered-box\': title}" x-layout-selector="&gt; div:first">'+
+		'<fieldset ng-class="{\'bordered-box\': title, \'has-title\': title}" x-layout-selector="&gt; div:first">'+
 			'<legend ng-show="title">'+
 				'<i ng-show="canCollapse()" ng-click="toggle()" ng-class="{\'fa fa-plus\': collapsed, \'fa fa-minus\': !collapsed}"></i>'+
 				'<span ng-bind-html-unsafe="title"></span></legend>'+

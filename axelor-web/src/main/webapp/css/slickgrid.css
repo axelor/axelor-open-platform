@@ -91,7 +91,7 @@
 }
 
 .slick-headerrow-columns .slick-headerrow-column {
-	background-color: white;
+	background: #F9F9F9;
 }
 
 .slick-headerrow-column {
@@ -283,6 +283,11 @@
 
 .slick-group-totals {
 	font-weight: bold;
+}
+
+.slick-group-totals,
+.slick-group-totals .slick-cell {
+	background-color: #e9e9e9;
 }
 
 .slick-sort-indicator {
