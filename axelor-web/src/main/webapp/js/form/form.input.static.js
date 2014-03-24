@@ -18,12 +18,15 @@
 (function(){
 
 var ui = angular.module('axelor.ui');
+var popoverElem = null;
+var popoverTimer = null;
 
 function makePopover(scope, element, callback, placement) {
 	
 	var mode = __appSettings['application.mode'];
 	var tech = __appSettings['user.technical'];
-
+	var doc = $(document);
+	
 	if (mode != 'dev' && !tech) {
 		return;
 	}
@@ -63,7 +66,7 @@ function makePopover(scope, element, callback, placement) {
 				return 'left';
 			return 'right';
 		},
-		trigger: 'hover',
+		trigger: 'manual',
 		container: 'body',
 		title: function() {
 			return element.text();
@@ -78,9 +81,45 @@ function makePopover(scope, element, callback, placement) {
 			return "";
 		}
 	});
+	
+	element.on('mouseenter.popover', enter);
+	element.on('mouseleave.popover', leave);
+
+	function enter(e) {
+		if (popoverTimer) {
+			clearTimeout(popoverTimer);
+		}
+		popoverTimer = setTimeout(function () {
+			if (popoverElem === null) {
+				popoverElem = element;
+				popoverElem.popover('show');
+			}
+		}, 1000);
+	}
+	
+	function leave(e) {
+		
+		if (e.ctrlKey) {
+			doc.off('mousemove.popover');
+			doc.on('mousemove.popover', leave);
+			return;
+		}
+		
+		if (popoverTimer) {
+			clearTimeout(popoverTimer);
+			popoverTimer = null;
+		}
+		if (popoverElem) {
+			popoverElem.popover('hide');
+			popoverElem = null;
+			doc.off('mousemove.popover');
+		}
+	}
 
 	function destroy() {
 		if (element) {
+			element.off('mouseenter.popover');
+			element.off('mouseleave.popover');
 			element.popover('destroy');
 			element = null;
 		}
@@ -88,6 +127,7 @@ function makePopover(scope, element, callback, placement) {
 			table.remove();
 			table = null;
 		}
+		doc.off('mousemove.popover');
 	}
 	
 	element.on('$destroy', destroy);
