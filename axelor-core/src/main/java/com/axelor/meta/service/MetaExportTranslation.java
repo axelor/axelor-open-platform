@@ -70,7 +70,6 @@ import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.Group;
 import com.axelor.meta.schema.views.Label;
 import com.axelor.meta.schema.views.Menu;
-import com.axelor.meta.schema.views.Menu.Item;
 import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.schema.views.Notebook;
 import com.axelor.meta.schema.views.Page;
@@ -377,16 +376,20 @@ public class MetaExportTranslation {
 			this.appendToFile(abstractView.getModel(), "", this.buttonType, menu.getDefaultTitle(), translation);
 		}
 		if(menu.getItems() != null) {
-			for (Item item : menu.getItems()) {
-				this.loadMenuItem(abstractView, item);
+			for (Object item : menu.getItems()) {
+				if (item instanceof MenuItem) {
+					this.loadMenuItem(abstractView, ((MenuItem) item).getDefaultTitle());
+				} else if (item instanceof Menu) {
+					this.loadMenuItem(abstractView, ((Menu) item).getDefaultTitle());
+				}
 			}
 		}
 	}
 
-	private void loadMenuItem(AbstractView abstractView, MenuItem menuItem) {
-		if(!Strings.isNullOrEmpty(menuItem.getDefaultTitle())) {
-			String translation = this.getTranslation(menuItem.getDefaultTitle(), "", abstractView.getModel(), this.buttonType);
-			this.appendToFile(abstractView.getModel(), "", this.buttonType, menuItem.getDefaultTitle(), translation);
+	private void loadMenuItem(AbstractView abstractView, String title) {
+		if(!Strings.isNullOrEmpty(title)) {
+			String translation = this.getTranslation(title, "", abstractView.getModel(), this.buttonType);
+			this.appendToFile(abstractView.getModel(), "", this.buttonType, title, translation);
 		}
 	}
 
@@ -541,8 +544,10 @@ public class MetaExportTranslation {
 		if(abstractView.getMenubar() != null) {
 			for (Menu menu : abstractView.getMenubar()) {
 				if(menu.getItems() != null) {
-					for (Item item : menu.getItems()) {
-						this.sendToDoc(abstractView.getName(), item.getName(), "");
+					for (Object item : menu.getItems()) {
+						if (item instanceof MenuItem) {
+							this.sendToDoc(abstractView.getName(), ((MenuItem)item).getName(), "");
+						}
 					}
 				}
 			}

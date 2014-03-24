@@ -130,73 +130,82 @@
 
   <xsd:complexType name="Menubar">
     <xsd:sequence>
-      <xsd:element name="menu" maxOccurs="unbounded">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:choice maxOccurs="unbounded">
-              <xsd:element name="item">
-                <xsd:complexType>
-                  <xsd:attribute name="title" type="xsd:string" use="required">
-                    <xsd:annotation>
-                      <xsd:documentation>The display text</xsd:documentation>
-                    </xsd:annotation>
-                  </xsd:attribute>
-                  <xsd:attribute name="action" type="xsd:string" use="required">
-                    <xsd:annotation>
-                      <xsd:documentation>Comma separate list of actions to execute on click event.</xsd:documentation>
-                    </xsd:annotation>
-                  </xsd:attribute>
-                  <xsd:attribute name="showIf" type="xsd:string">
-                    <xsd:annotation>
-                      <xsd:documentation>Show if the given JavaScript expression is true.</xsd:documentation>
-                    </xsd:annotation>
-                  </xsd:attribute>
-                  <xsd:attribute name="hideIf" type="xsd:string">
-                    <xsd:annotation>
-                      <xsd:documentation>Hide if the given JavaScript expression is true.</xsd:documentation>
-                    </xsd:annotation>
-                  </xsd:attribute>
-                  <xsd:attribute name="readonlyIf" type="xsd:string">
-                    <xsd:annotation>
-                      <xsd:documentation>Readonly if the given JavaScript expression is true.</xsd:documentation>
-                    </xsd:annotation>
-                  </xsd:attribute>
-                </xsd:complexType>
-              </xsd:element>
-              <xsd:element name="divider">
-                <xsd:complexType>
-                  <xsd:attribute name="showIf" type="xsd:string">
-                    <xsd:annotation>
-                      <xsd:documentation>Show if the given JavaScript expression is true.</xsd:documentation>
-                    </xsd:annotation>
-                  </xsd:attribute>
-                  <xsd:attribute name="hideIf" type="xsd:string">
-                    <xsd:annotation>
-                      <xsd:documentation>Hide if the given JavaScript expression is true.</xsd:documentation>
-                    </xsd:annotation>
-                  </xsd:attribute>
-                </xsd:complexType>
-              </xsd:element>
-            </xsd:choice>
-          </xsd:sequence>
-          <xsd:attribute name="title" type="xsd:string" use="required">
-            <xsd:annotation>
-              <xsd:documentation>The display text</xsd:documentation>
-            </xsd:annotation>
-          </xsd:attribute>
-          <xsd:attribute name="icon" type="xsd:string">
-            <xsd:annotation>
-              <xsd:documentation>Path of the image.</xsd:documentation>
-            </xsd:annotation>
-          </xsd:attribute>
-          <xsd:attribute name="showTitle" type="xsd:boolean">
-            <xsd:annotation>
-              <xsd:documentation>Specify whether to show the title.</xsd:documentation>
-            </xsd:annotation>
-          </xsd:attribute>
-        </xsd:complexType>
+      <xsd:element name="menu" type="tns:MenubarItem" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>Define a menu.</xsd:documentation>
+        </xsd:annotation>
       </xsd:element>
     </xsd:sequence>
+  </xsd:complexType>
+  
+  <xsd:complexType name="MenubarItem">
+    <xsd:sequence>
+      <xsd:choice maxOccurs="unbounded">
+        <xsd:element name="item">
+          <xsd:complexType>
+            <xsd:attribute name="title" type="xsd:string" use="required">
+              <xsd:annotation>
+                <xsd:documentation>The display text</xsd:documentation>
+              </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="action" type="xsd:string" use="required">
+              <xsd:annotation>
+                <xsd:documentation>Comma separate list of actions to execute on click event.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="showIf" type="xsd:string">
+              <xsd:annotation>
+                <xsd:documentation>Show if the given JavaScript expression is true.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="hideIf" type="xsd:string">
+              <xsd:annotation>
+                <xsd:documentation>Hide if the given JavaScript expression is true.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="readonlyIf" type="xsd:string">
+              <xsd:annotation>
+                <xsd:documentation>Readonly if the given JavaScript expression is true.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:attribute>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="divider">
+          <xsd:complexType>
+            <xsd:attribute name="showIf" type="xsd:string">
+              <xsd:annotation>
+                <xsd:documentation>Show if the given JavaScript expression is true.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="hideIf" type="xsd:string">
+              <xsd:annotation>
+                <xsd:documentation>Hide if the given JavaScript expression is true.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:attribute>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="menu" type="tns:MenubarItem">
+          <xsd:annotation>
+            <xsd:documentation>Define a submenu.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+      </xsd:choice>
+    </xsd:sequence>
+    <xsd:attribute name="title" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>The display text</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="icon" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Path of the image.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="showTitle" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether to show the title.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 
   <xsd:complexType name="AbstractView" abstract="true">

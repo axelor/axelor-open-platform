@@ -70,8 +70,9 @@ public class Menu {
 
 	@XmlElements({
 		@XmlElement(name = "item", type = Item.class),
+		@XmlElement(name = "menu", type = Menu.class),
 		@XmlElement(name = "divider", type = Devider.class) })
-	private List<Item> items;
+	private List<Object> items;
 
 	@JsonIgnore
 	private String model;
@@ -105,16 +106,21 @@ public class Menu {
 		this.showTitle = showTitle;
 	}
 
-	public List<Item> getItems() {
+	public List<Object> getItems() {
 		if(items != null) {
-			for (Item item : items) {
-				item.setModel(getModel());
+			for (Object item : items) {
+				if (item instanceof Item) {
+					((Item) item).setModel(getModel());
+				}
+				if (item instanceof Menu) {
+					((Menu) item).setModel(getModel());
+				}
 			}
 		}
 		return items;
 	}
 
-	public void setItems(List<Item> items) {
+	public void setItems(List<Object> items) {
 		this.items = items;
 	}
 
