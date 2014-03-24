@@ -56,15 +56,16 @@ module.directive('uiMenuBar', function() {
 
 			ctrl.handler = scope.handler;
 			
-			scope.onMenuClick = _.once(function onMenuClick() {
-				element.find('.dropdown-toggle').dropdown('toggle');
+			scope.onMenuClick = _.once(function onMenuClick(e) {
+				element.find('.dropdown-toggle').dropdown();
+				$(e.srcElement).dropdown('toggle');
 			});
 		},
 
 		template:
 			"<ul class='nav menu-bar'>" +
 				"<li class='menu dropdown' ng-class='{\"button-menu\": menu.isButton}' ng-repeat='menu in menus'>" +
-					"<a href='' class='dropdown-toggle' ng-class='{\"btn\": menu.isButton}' data-toggle='dropdown' ng-click='onMenuClick()'>" +
+					"<a href='' class='dropdown-toggle' ng-class='{\"btn\": menu.isButton}' data-toggle='dropdown' ng-click='onMenuClick($event)'>" +
 						"<img ng-if='isImage(menu)' ng-src='{{menu.icon}}'> " +
 						"<i class='fa {{menu.icon}}' ng-if='isIcon(menu)'></i> " +
 						"<span ng-show='canShowTitle(menu)'>{{menu.title}}</span> " +
@@ -169,6 +170,7 @@ module.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, 
 					return 'dropdown-submenu';
 				}
 			};
+			
 			
 			if (scope.isSubMenu) {
 				$compile('<ul ui-menu="item"></ul>')(scope, function(cloned, scope) {
