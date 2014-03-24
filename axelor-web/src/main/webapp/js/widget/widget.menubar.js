@@ -26,6 +26,10 @@ function MenuBarCtrl($scope, $element) {
 		return !item.title && !item.icon;
 	};
 	
+	this.isSubMenu = function(item) {
+		return item && item.items && item.items.length > 0;
+	};
+	
 	$scope.isImage = function (menu) {
 		return menu.icon && menu.icon.indexOf('fa-') !== 0;
 	};
@@ -90,7 +94,7 @@ module.directive('uiMenu', function() {
 	};
 });
 
-module.directive('uiMenuItem', ['ActionService', function(ActionService) {
+module.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, ActionService) {
 
 	return {
 		replace: true,
@@ -105,6 +109,7 @@ module.directive('uiMenuItem', ['ActionService', function(ActionService) {
 
 			scope.field  = item;
 			scope.isDivider = ctrl.isDivider(item);
+			scope.isSubMenu = ctrl.isSubMenu(item);
 
 			if (item.action) {
 				handler = ActionService.handler(ctrl.handler, element, {
@@ -147,6 +152,7 @@ module.directive('uiMenuItem', ['ActionService', function(ActionService) {
 
 			scope.onClick = function(e) {
 				$(e.srcElement).parents('.dropdown').dropdown('toggle');
+				if (scope.isSubMenu) return;
 				if (item.action) {
 					return handler.onClick();
 				}
@@ -159,7 +165,16 @@ module.directive('uiMenuItem', ['ActionService', function(ActionService) {
 				if (scope.isDivider) {
 					return 'divider';
 				}
+				if (scope.isSubMenu) {
+					return 'dropdown-submenu';
+				}
 			};
+			
+			if (scope.isSubMenu) {
+				$compile('<ul ui-menu="item"></ul>')(scope, function(cloned, scope) {
+					element.append(cloned);
+				});
+			}
 		},
 		template:
 			"<li ng-class='cssClass()' ui-widget-states	ng-show='!isHidden()'>" +
