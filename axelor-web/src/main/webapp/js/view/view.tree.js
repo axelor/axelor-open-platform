@@ -100,6 +100,12 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 		
 		first.domain = $scope._domain;
 		first.context = $scope._context;
+
+		// recursive tree (parent -> child on same object)
+		if (loaders.length === 2 && first.model === last.model) {
+			last.child = last;
+			$scope._countOn = _.last(schema.nodes).parent;
+		}
 	};
 	
 	$scope.onNext = function() {
@@ -274,9 +280,13 @@ function Loader(scope, node, DataSource) {
 		if (current) {
 			context.parentId = current.id;
 		} else if (scope.getContext) {
-			context = scope.getContext();
+			context = scope.getContext() || {};
 		}
-		
+
+		if (scope._countOn) {
+			context._countOn = scope._countOn;
+		}
+
 		var opts = _.extend(this.getDomain(context), {
 			fields: names,
 			archived: true
@@ -302,7 +312,7 @@ function Loader(scope, node, DataSource) {
 		var record = item.$record,
 			parent = { id: item.$parentId };
 
-		record[node.parent] = parent;
+		record[node.parent || scope._countOn] = parent;
 
 		return ds.save(record).success(function(rec) {
 			record.version = rec.version;
@@ -334,7 +344,7 @@ function Loader(scope, node, DataSource) {
 				'$parentId': parent && parent.id,
 				'$parentModel': current && current.$model,
 				'$draggable': node.draggable,
-				'$folder': child != null
+				'$folder': child != null && (record._children === undefined || record._children > 0)
 			};
 
 			item.$expand = function(callback) {
@@ -486,10 +496,10 @@ ui.directive('uiViewTree', function(){
 					$('<td>').html(col.cellText(record)).appendTo(tr);
 				});
 				
-				if (scope.draggable && record.$folder) {
+				if (scope.draggable && (record.$folder || scope._countOn)) {
 					makeDroppable(tr);
 				}
-				if (record.$draggable) {
+				if (record.$draggable || (scope.draggable && scope._countOn)) {
 					makeDraggable(tr);
 				}
 
@@ -515,12 +525,29 @@ ui.directive('uiViewTree', function(){
 				});
 			}
 			
+			function isParent(source, target) {
+				var parent = target.parent().find('[data-id=' + target.data('parent') + ']');
+				if (parent.data('id') === source.data('id')) {
+					return true;
+				}
+				if (parent.size()) {
+					return isParent(source, parent);
+				}
+				return false;
+			}
+			
 			function makeDroppable(row) {
 				
 				row.droppable({
-					accept: function(draggable) {
+					accept: function(draggable, x) {
 						var source = draggable.data('$record'),
 							target = row.data('$record');
+						
+						// don't allow moving parent to child
+						if (scope._countOn) {
+							return !isParent(draggable, $(this));
+						}
+						
 						return source && target && target.$model === source.$parentModel;
 					},
 			        hoverClass: "accept",
@@ -537,7 +564,7 @@ ui.directive('uiViewTree', function(){
 			function makeDraggable(row) {
 
 				var record = row.data('$record');
-				if (!record.$draggable) {
+				if (!record.$draggable && !scope._countOn) {
 					return;
 				}
 
@@ -550,6 +577,7 @@ ui.directive('uiViewTree', function(){
 					refreshPositions: true,
 					revert: "invalid",
 					revertDuration: 300,
+					delay: 300,
 					scroll: true
 				});
 			}

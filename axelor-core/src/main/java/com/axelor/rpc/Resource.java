@@ -40,6 +40,7 @@ import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
@@ -298,11 +299,49 @@ public class Resource<T extends Model> {
 			};
 		});
 
+		try {
+			// check for children (used by tree view)
+			doChildCount(request, data);
+		} catch (NullPointerException | ClassCastException e) {};
+
 		response.setData(data);
 		response.setOffset(offset);
 		response.setStatus(Response.STATUS_SUCCESS);
 
 		return response;
+	}
+
+	@SuppressWarnings("all")
+	private void doChildCount(Request request, List<?> result) throws NullPointerException, ClassCastException {
+
+		final Map context = (Map) request.getData().get("_domainContext");
+		final String parent = (String) context.get("_countOn");
+		if (StringUtils.isBlank(parent) || result == null || result.isEmpty()) {
+			return;
+		}
+
+		final StringBuilder builder = new StringBuilder();
+		builder.append("SELECT new map(_parent.id as id, count(self.id) as count) FROM ")
+			   .append(model.getName()).append(" self ")
+			   .append("LEFT JOIN self.").append(parent).append(" AS _parent ")
+			   .append("WHERE _parent.id IN (:ids) GROUP BY _parent");
+
+		final List ids = Lists.newArrayList();
+		for (Object item : result) {
+			ids.add(((Map) item).get("id"));
+		}
+
+		javax.persistence.Query q = JPA.em().createQuery(builder.toString());
+		q.setParameter("ids", ids);
+
+		Map counts = Maps.newHashMap();
+		for (Object item : q.getResultList()) {
+			counts.put(((Map)item).get("id"), ((Map)item).get("count"));
+		}
+		
+		for (Object item : result) {
+			((Map) item).put("_children", counts.get(((Map) item).get("id")));
+		}
 	}
 
 	@SuppressWarnings("unchecked")
