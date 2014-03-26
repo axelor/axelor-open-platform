@@ -316,6 +316,10 @@ ui.formItem('Button', {
 		var iconHover = field.iconHover || "";
 		
 		var isIcon = icon.indexOf('fa-') === 0;
+		
+		if (isIcon || icon) {
+			element.prepend(' ');
+		}
 
 		if (isIcon) {
 			var e = $('<i>').addClass('fa').addClass(icon).prependTo(element);
