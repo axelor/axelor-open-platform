@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.FileUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
@@ -395,36 +396,42 @@ public class MetaService {
 		}
 
 		final Map<String, Object> data = Maps.newHashMap();
-
-		String string = chart.getQuery().getText();
-		Query query = "sql".equals(chart.getQuery().getType()) ?
-				JPA.em().createNativeQuery(string) :
-				JPA.em().createQuery(string);
-
-		// return result as list of map
-		((org.hibernate.ejb.QueryImpl<?>) query).getHibernateQuery()
-			.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-
-		Map<String, Object> context = Maps.newHashMap();
-		if (request.getData() != null) {
-			context.putAll(request.getData());
-		}
-		if (AuthUtils.getUser() != null) {
-			context.put("__user__", AuthUtils.getUser());
-			context.put("__userId__", AuthUtils.getUser().getId());
-			context.put("__userCode__", AuthUtils.getSubject());
-		}
-
-		if (request.getData() != null) {
-			QueryBinder.of(query).bind(context);
-		}
-
+		
 		response.setData(data);
 		response.setStatus(Response.STATUS_SUCCESS);
+		
+		boolean hasOnInit = !StringUtils.isBlank(chart.getOnInit());
+		boolean hasDataSet = request.getFields() != null && request.getFields().contains("dataset");
+		
+		if (hasDataSet || !hasOnInit) {
+			
+			final String string = chart.getQuery().getText();
+			final Query query = "sql".equals(chart.getQuery().getType()) ?
+					JPA.em().createNativeQuery(string) :
+					JPA.em().createQuery(string);
+	
+			// return result as list of map
+			((org.hibernate.ejb.QueryImpl<?>) query).getHibernateQuery()
+				.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+	
+			final Map<String, Object> context = Maps.newHashMap();
+			if (request.getData() != null) {
+				context.putAll(request.getData());
+			}
+			if (AuthUtils.getUser() != null) {
+				context.put("__user__", AuthUtils.getUser());
+				context.put("__userId__", AuthUtils.getUser().getId());
+				context.put("__userCode__", AuthUtils.getSubject());
+			}
+	
+			if (request.getData() != null) {
+				QueryBinder.of(query).bind(context);
+			}
 
-		data.put("dataset", query.getResultList());
+			data.put("dataset", query.getResultList());
+		}
 
-		if (request.getFields() != null && request.getFields().contains("dataset")) {
+		if (hasDataSet) {
 			return response;
 		}
 
