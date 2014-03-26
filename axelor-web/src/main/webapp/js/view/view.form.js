@@ -207,22 +207,13 @@ function FormViewCtrl($scope, $element) {
 		if (records == null || childScope == null)
 			return records;
 		
-		var selected = childScope.selection || [],
-			result = [];
+		var selected = childScope.selection || [];
 		
-		selected = _.map(selected, function(i){
-			return childScope.dataView.getItem(i).id;
-		});
-		
-		_.each(records, function(item){
-			item = _.extend({}, item, {
-				selected : _.contains(selected, item.id)
+		return _.map(records, function(item, i) {
+			return _.extend({}, item, {
+				selected: _.contains(selected, i)
 			});
-			if (item.id <= 0) item.id = null;
-			result.push(item);
 		});
-		
-		return result;
 	}
 	
 	$scope.getContext = function() {
