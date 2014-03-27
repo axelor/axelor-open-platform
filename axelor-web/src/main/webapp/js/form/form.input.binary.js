@@ -76,18 +76,54 @@ ui.formInput('ImageLink', {
 
 ui.formInput('Image', 'ImageLink', {
 
+	init: function(scope) {
+		this._super.apply(this, arguments);
+
+		var field = scope.field;
+		var isBinary = field.serverType === 'binary';
+		var BLANK = this.BLANK;
+		var META_FILE = "com.axelor.meta.db.MetaFile";
+		
+		if (!isBinary && field.target !== META_FILE) {
+			throw new Error("Invalid field type for Image widget.");
+		}
+
+		scope.parseText = function (value) {
+			return scope.getLink(value);
+		};
+
+		scope.getLink = function (value) {
+			if (!value || isBinary) {
+				return value || BLANK;
+			}
+			return "ws/rest/" + META_FILE + "/" + (value.id || value) + "/content/download";
+		};
+	},
+
 	link_editable: function(scope, element, attrs, model) {
 
+		var field = scope.field;
 		var input = element.children('input:first');
 		var image = element.children('img:first');
 		var buttons = element.children('.btn-group');
-		var BLANK = this.BLANK;
+		var META_FILE = "com.axelor.meta.db.MetaFile";
+		
+		var isBinary = field.serverType === 'binary';
+		var timer = null;
 
 		input.add(buttons).hide();
-		image.add(buttons).hover(function(){
-			buttons.show();
-		}, function() {
-			buttons.hide();
+		element.on('mouseenter', function (e) {
+			if (timer) clearTimeout(timer);
+			timer = setTimeout(function () {
+				buttons.slideDown();
+			}, 500);
+		});
+		element.on('mouseleave', function (e) {
+			if (timer) {
+				clearTimeout(timer);
+				timer = null;
+			}
+			buttons.slideUp();
 		});
 
 		scope.doSelect = function() {
@@ -102,37 +138,85 @@ ui.formInput('Image', 'ImageLink', {
 		};
 
 		scope.doRemove = function() {
-			image.get(0).src = null;
-			image.get(0).src = BLANK;
+			image.get(0).src = "";
 			input.val(null);
 			update(null);
 		};
 
 		input.change(function(e, ui) {
 			var file = input.get(0).files[0];
-			var reader = new FileReader();
+			var uploadSize = scope.$eval('app.fileUploadSize');
+			
+			if (!file) {
+				return;
+			}
 
-			reader.onload = function(e){
-				var content = e.target.result;
-				image.get(0).src = content;
-				update(content);
+			if(file.size > 1048576 * parseInt(uploadSize)) {
+				return axelor.dialogs.say(_t("You are not allow to upload a file bigger than") + ' ' + uploadSize + 'MB');
+			}
+			
+			if (!isBinary) {
+				return doUpload(file);
+			}
+
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				doUpdate(file.name, e.target.result);
 			};
 
 			reader.readAsDataURL(file);
 		});
+		
+		function doProgress(n) {
 
-		function update(value) {
-			scope.applyLater(function(){
-				model.$setViewValue(value);
+		}
+		
+		function doUpload(file) {
+
+			if (!scope.record || !scope.record.id) {
+				return;
+			}
+
+			var ds = scope._dataSource._new(META_FILE);
+			var record = {
+				fileName: file.name,
+				mime: file.type,
+				size: file.size,
+				id: null,
+				version: null
+		    };
+
+			record.$upload = {
+			    file: file
+		    };
+
+			ds.save(record).progress(doProgress).success(function (saved) {
+				update(saved);
 			});
 		}
 
-		scope.$render_editable = function() {
-			var content = model.$viewValue || null;
-			if (!content) {
-				image.get(0).src = BLANK;
+		function doUpdate(value) {
+			image.get(0).src = scope.getLink(value);
+			model.$setViewValue(getData(value));			
+		}
+
+		function update(value) {
+			scope.applyLater(function() {
+				doUpdate(value);
+			});
+		}
+		
+		function getData(value) {
+			if (!value || isBinary) {
+				return value;
 			}
-			image.get(0).src = content || BLANK;
+			return {
+				id: value.id
+			};
+		}
+
+		scope.$render_editable = function() {
+			image.get(0).src = scope.getLink(model.$viewValue);
 		};
 	},
 	template_editable:
