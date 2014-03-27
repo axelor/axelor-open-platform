@@ -34,8 +34,8 @@ import com.axelor.rpc.Response;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 @XmlType
 public class ActionGroup extends ActionIndex {
@@ -137,11 +137,18 @@ public class ActionGroup extends ActionIndex {
 			log.debug("action: {}", name);
 
 			if ("save".equals(name)) {
+				if (!element.test(handler)) {
+					log.debug("action '{}' doesn't meet the condition: {}", "save", element.getCondition());
+					continue;
+				}
 				String pending = this.getPending(i);
-	            result.add(ImmutableMap.of("save", true, "pending", pending));
-	            if (!StringUtils.isBlank(pending)) {
-	            	log.debug("wait for 'save', pending actions: {}", pending);
-	            }
+				Map<String, Object> res = Maps.newHashMap();
+				res.put("save", true);
+				res.put("pending", pending);
+				result.add(res);
+				if (!StringUtils.isBlank(pending)) {
+					log.debug("wait for 'save', pending actions: {}", pending);
+				}
 				break;
 			}
 
@@ -215,11 +222,11 @@ public class ActionGroup extends ActionIndex {
             		last = (Map) result.get(result.size() - 1);
             	} catch (ClassCastException e) {
             	}
-            	if (last != null && (last.containsKey("alert") || last.containsKey("error"))) {
+                if (last != null && (last.containsKey("alert") || last.containsKey("error") || last.containsKey("save"))) {
             		String previous = (String) last.get("pending");
             		String pending = this.getPending(i, previous);
             		last.put("pending", pending);
-            		log.debug("wait for group validation: {}", action.getName());
+            		log.debug("wait for group: {}", action.getName());
             		log.debug("pending actions: {}", pending);
             		break;
             	}
