@@ -97,7 +97,7 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 			search = opts.search,
 			record = {};
 		
-		var changed = angular.equals($scope._routeSearch, search);
+		var changed = !angular.equals($scope._routeSearch, search);
 		
 		$scope._routeSearch = search;
 		
