@@ -15,7 +15,7 @@
     <import file="ws-test1.xml" provider="ws.test.1" name="titles"/>
   </action-import>
 
-  <action-export name="export.sale.order" output="/tmp/x/${name}/">
+  <action-export name="export.sale.order" output="${name}/${date}${time}">
     <export name="${name}.xml" template="data/ws-test/export-sale-order.tmpl"/>
     <export name="${name}-customer-copy.xml" template="data/ws-test/export-sale-order.tmpl"/>
   </action-export>

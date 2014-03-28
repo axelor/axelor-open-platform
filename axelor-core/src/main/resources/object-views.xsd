@@ -2061,7 +2061,7 @@
         <xsd:attribute name="output" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-              Override the default output directory.
+              Override the default output directory structure.
               Special keywords ${name}, ${date}, ${datetime} can
               be used to organize the output directory.
             </xsd:documentation>
