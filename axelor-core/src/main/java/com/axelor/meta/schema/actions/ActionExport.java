@@ -28,6 +28,8 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.joda.time.DateTime;
 
+import com.axelor.app.AppSettings;
+import com.axelor.common.FileUtils;
 import com.axelor.meta.ActionHandler;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
@@ -36,8 +38,9 @@ import com.google.common.io.Files;
 
 @XmlType
 public class ActionExport extends Action {
-	
-	private static final String DEFAULT_OUTPUT = "/tmp/data-export/${date}/${name}";
+
+	private static final String EXPORT_PATH = AppSettings.get().getPath("data.export.dir", "{java.io.tmpdir}/axelor/data-export");
+	private static final String DEFAULT_DIR = "${date}/${name}";
 
 	@XmlAttribute(name = "output")
 	private String output;
@@ -67,8 +70,8 @@ public class ActionExport extends Action {
 		}
 
 		log.info("export {} as {}", export.getTemplate(), name);
-		
-		File output = new File(Files.simplifyPath(dir + "/" + name));
+
+		File output = FileUtils.getFile(EXPORT_PATH, dir, name);
 		String contents = handler.template(template);
 		
 		Files.createParentDirs(output);
@@ -81,7 +84,7 @@ public class ActionExport extends Action {
 	public Object evaluate(ActionHandler handler) {
 		log.info("action-export: {}", getName());
 
-		String dir = output == null ? DEFAULT_OUTPUT : output;
+		String dir = output == null ? DEFAULT_DIR : output;
 
 		dir = dir.replace("${name}", getName())
 				 .replace("${date}", new DateTime().toString("yyyyMMdd"))
