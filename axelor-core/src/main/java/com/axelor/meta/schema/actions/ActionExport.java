@@ -35,6 +35,7 @@ import org.joda.time.DateTime;
 import com.axelor.app.AppSettings;
 import com.axelor.common.ClassUtils;
 import com.axelor.common.FileUtils;
+import com.axelor.db.JPA;
 import com.axelor.meta.ActionHandler;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
@@ -50,6 +51,9 @@ public class ActionExport extends Action {
 	@XmlAttribute(name = "output")
 	private String output;
 	
+	@XmlAttribute(name = "download")
+	private Boolean download;
+	
 	@XmlElement(name = "export")
 	private List<Export> exports;
 
@@ -57,6 +61,10 @@ public class ActionExport extends Action {
 		return output;
 	}
 	
+	public Boolean getDownload() {
+		return download;
+	}
+
 	public List<Export> getExports() {
 		return exports;
 	}
@@ -118,7 +126,10 @@ public class ActionExport extends Action {
 			}
 			try {
 				String file = doExport(dir, export, handler);
-				return ImmutableMap.of("exportFile", file);
+				if (getDownload() == Boolean.TRUE) {
+					return ImmutableMap.of("exportFile", file, "notify", JPA.translate("Export complete."));
+				}
+				return ImmutableMap.of("notify", JPA.translate("Export complete."));
 			} catch (Exception e) {
 				log.error("error while exporting: ", e);
 				return ImmutableMap.of("error", e.getMessage());
