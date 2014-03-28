@@ -24,7 +24,7 @@ html, body {
 }
 
 #container {
-	left: 0px; right: 0px; top: 42px; bottom: 0px;
+	left: 0px; right: 0px; top: 41px; bottom: 0px;
 	min-width:	600px;
 	position:	absolute;
 }
@@ -63,7 +63,7 @@ header .container-fluid {
 }
 
 header .navbar .nav-shortcuts > li > a {
-	padding: 10px 8px 10px;
+	padding: 10px 8px 9px;
 }
 
 header .navbar .nav-shortcuts > .divider-vertical {
@@ -80,6 +80,10 @@ header .navbar .nav-shortcuts > li > a > span {
 
 header .dropdown > ul.dropdown-menu {
     margin: 0;
+}
+
+header .dropdown ul.dropdown-menu {
+    border-top: 1px solid transparent;
 }
 
 header .dropdown-menu:after,
