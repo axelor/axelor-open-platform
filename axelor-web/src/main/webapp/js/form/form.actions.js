@@ -452,7 +452,7 @@ ActionHandler.prototype = {
 					frame.attr("src", "");
 					frame.remove();
 					frame = null;
-				},100);
+				}, 5000);
 			})();
 		}
 
