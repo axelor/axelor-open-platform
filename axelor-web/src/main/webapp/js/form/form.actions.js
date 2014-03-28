@@ -444,12 +444,16 @@ ActionHandler.prototype = {
 		}
 		
 		if (data.exportFile) {
-			var filePath = data.exportFile;
-			var fileName = _.last(filePath.split('/'));
-			var link = "<a href='ws/files/data-export/" + filePath +"' download='"+ fileName +"'>" + fileName +"</a>";
-			axelor.dialogs.box(_t("Exported file: {0}", link), {
-				title: _t("Download")
-			});
+			(function () {
+				var link = "ws/files/data-export/" + data.exportFile;
+				var frame = $('<iframe>').appendTo('body').hide();
+				frame.attr("src", link);
+				setTimeout(function(){
+					frame.attr("src", "");
+					frame.remove();
+					frame = null;
+				},100);
+			})();
 		}
 
 		function findItems(name) {
