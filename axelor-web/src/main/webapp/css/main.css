@@ -383,6 +383,11 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 	font-size: 13px;
 }
 
+.ui-dialog .message-box a {
+	color: #0088cc;
+	outline: none;
+}
+
 /* end jQuery UI fixes */
 
 /* Browser fixes */

@@ -442,6 +442,15 @@ ActionHandler.prototype = {
 		if (data.signal) {
 			formScope.$broadcast(data.signal, data['signal-data']);
 		}
+		
+		if (data.exportFile) {
+			var filePath = data.exportFile;
+			var fileName = _.last(filePath.split('/'));
+			var link = "<a href='ws/files/data-export/" + filePath +"' download='"+ fileName +"'>" + fileName +"</a>";
+			axelor.dialogs.box(_t("Exported file: {0}", link), {
+				title: _t("Download")
+			});
+		}
 
 		function findItems(name) {
 

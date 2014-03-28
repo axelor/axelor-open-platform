@@ -19,8 +19,10 @@ package com.axelor.meta;
 
 import groovy.xml.XmlUtil;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Map;
@@ -296,6 +298,16 @@ public class ActionHandler {
 			throw new IllegalArgumentException(e);
 		}
 		return template(text);
+	}
+
+	public String template(Reader template) throws IOException {
+		StringBuilder text = new StringBuilder();
+		BufferedReader reader = new BufferedReader(template);
+		String line = null;
+		while((line = reader.readLine()) != null) {
+			text.append(line).append("\n");
+		}
+		return template(text.toString());
 	}
 
 	public String template(String text) {
