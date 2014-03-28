@@ -85,6 +85,10 @@
 	top: -3px;
 }
 
+.splitter-handle:hover {
+	color: #333333;
+}
+
 .splitter-header {
 	height: 23px;
 	background-image: url("../img/splitter-header.png");

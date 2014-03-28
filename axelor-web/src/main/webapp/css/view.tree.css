@@ -19,7 +19,7 @@
 	position: absolute;
 	top: 43px;
 	bottom: 0; left: 0; right: 0;
-	border: 1px solid #DDD;
+	border-top: 1px solid #DDD;
 }
 
 table.treetable {
