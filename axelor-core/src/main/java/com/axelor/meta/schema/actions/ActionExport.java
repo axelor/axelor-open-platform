@@ -19,7 +19,11 @@ package com.axelor.meta.schema.actions;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -29,6 +33,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.joda.time.DateTime;
 
 import com.axelor.app.AppSettings;
+import com.axelor.common.ClassUtils;
 import com.axelor.common.FileUtils;
 import com.axelor.meta.ActionHandler;
 import com.google.common.base.Charsets;
@@ -39,7 +44,7 @@ import com.google.common.io.Files;
 @XmlType
 public class ActionExport extends Action {
 
-	private static final String EXPORT_PATH = AppSettings.get().getPath("data.export.dir", "{java.io.tmpdir}/axelor/data-export");
+	public static final String EXPORT_PATH = AppSettings.get().getPath("data.export.dir", "{java.io.tmpdir}/axelor/data-export");
 	private static final String DEFAULT_DIR = "${date}/${name}";
 
 	@XmlAttribute(name = "output")
@@ -56,12 +61,21 @@ public class ActionExport extends Action {
 		return exports;
 	}
 	
-	protected void doExport(String dir, Export export, ActionHandler handler) throws IOException {
+	protected String doExport(String dir, Export export, ActionHandler handler) throws IOException {
 		export.template = handler.evaluate(export.template).toString();
 
+		Reader reader = null;
 		File template = new File(export.template);
-		if (!template.isFile()) {
-			throw new FileNotFoundException("No such template: " + export.template);
+		if (template.isFile()) {
+			reader = new FileReader(template);
+		}
+		
+		if (reader == null) {
+			InputStream is = ClassUtils.getResourceStream(export.template);
+			if (is == null) {
+				throw new FileNotFoundException("No such template: " + export.template);
+			}
+			reader = new InputStreamReader(is);
 		}
 
 		String name = export.getName();
@@ -72,12 +86,19 @@ public class ActionExport extends Action {
 		log.info("export {} as {}", export.getTemplate(), name);
 
 		File output = FileUtils.getFile(EXPORT_PATH, dir, name);
-		String contents = handler.template(template);
+		String contents = null;
+		try {
+			contents = handler.template(reader);
+		} finally {
+			reader.close();
+		}
 		
 		Files.createParentDirs(output);
 		Files.write(contents, output, Charsets.UTF_8);
 		
 		log.info("file saved: {}", output);
+		
+		return FileUtils.getFile(dir, name).toString();
 	}
 
 	@Override
@@ -96,8 +117,8 @@ public class ActionExport extends Action {
 				continue;
 			}
 			try {
-				doExport(dir, export, handler);
-				return ImmutableMap.of("flash", "Export terminé.");
+				String file = doExport(dir, export, handler);
+				return ImmutableMap.of("exportFile", file);
 			} catch (Exception e) {
 				log.error("error while exporting: ", e);
 				return ImmutableMap.of("error", e.getMessage());
