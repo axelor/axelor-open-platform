@@ -127,13 +127,15 @@
 		}
 
 		function processWidget(field) {
+			var attrs = {};
 			_.each(field.widgetAttrs || {}, function (value, name) {
 				if (value === "true") value = true;
 				if (value === "false") value = false;
 				if (value === "null") value = null;
 				if (/(-)?\d+/.test(value)) value = +(value);
-				field.widgetAttrs[name] = value;
+				attrs[_.str.camelize(name)] = value;
 			});
+			field.widgetAttrs = attrs;
 		}
 
 		function useIncluded(view) {
