@@ -174,7 +174,7 @@ ui.directive('uiShow', function() {
 	};
 });
 
-ui.directive('uiWidgetStates', ['$parse', function($parse) {
+ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $interpolate) {
 
 	function isValid(scope, name) {
 		if (!name) return scope.isValid();
@@ -251,6 +251,32 @@ ui.directive('uiWidgetStates', ['$parse', function($parse) {
 		});
 	}
 	
+	function handleBind(scope, field) {
+		
+		if (!field.bind || !field.name) {
+			return;
+		}
+		
+		var expr = $interpolate(field.bind);
+
+		function handle(rec) {
+			var value = undefined;
+			try {
+				value = expr(rec).trim();
+			} catch (e) {}
+			
+			if (scope.setValue) {
+				scope.setValue(value);
+			}
+		}
+		
+		scope.$on("on:record-change", function(e, rec) {
+			if (rec === scope.record) {
+				handle(rec);
+			}
+		});
+	}
+	
 	function handleFor(scope, field, attr, conditional, negative) {
 		if (field[conditional]) {
 			handleCondition(scope, field, attr, field[conditional], negative);
@@ -266,7 +292,8 @@ ui.directive('uiWidgetStates', ['$parse', function($parse) {
 		handleFor(scope, field, "readonly", "readonlyIf");
 		handleFor(scope, field, "required", "requiredIf");
 		handleFor(scope, field, "collapse", "collapseIf");
-		handleHilites(scope, scope.field);
+		handleHilites(scope, field);
+		handleBind(scope, field);
 	}
 	
 	function handleForView(scope) {
