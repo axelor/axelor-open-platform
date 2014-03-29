@@ -449,7 +449,7 @@ input[readonly], select[readonly], textarea[readonly] {
 
 .view-content {
 	position: absolute;
-	top: 38px; left: 0px; right: 0px; bottom: 0px;
+	top: 36px; left: 0px; right: 0px; bottom: 0px;
 }
 
 .view-pane {
@@ -470,13 +470,12 @@ input[readonly], select[readonly], textarea[readonly] {
 
 .grid-view > .slickgrid {
 	position: absolute !important;
-	top: 43px; left: 0px; right: 0px; bottom: 0px;
+	top: 41px; left: 0px; right: 0px; bottom: 0px;
 	border: none;
 }
 
 .record-toolbar {
-	margin-top: 2px;
-	margin-bottom: 4px;
+	margin: 0;
 	min-width: 480px;
 }
 
