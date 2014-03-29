@@ -54,6 +54,27 @@ public abstract class Action {
 		return Objects.toStringHelper(getClass()).add("name", getName()).toString();
 	}
 	
+	static boolean test(ActionHandler handler, String expression) {
+		if (Strings.isNullOrEmpty(expression)) // if expression is not given always return true
+			return true;
+		if (expression.matches("true"))
+			return true;
+		if (expression.equals("false"))
+			return false;
+		Pattern pattern = Pattern.compile("^(eval|select|action):");
+		if (expression != null && !pattern.matcher(expression).find()) {
+			expression = "eval:" + expression;
+		}
+		Object result = handler.evaluate(expression);
+		if (result == null)
+			return false;
+		if (result instanceof Number && result.equals(0))
+			return false;
+		if (result instanceof Boolean)
+			return (Boolean) result;
+		return true;
+	}
+	
 	@XmlType
 	public static abstract class Element {
 		
@@ -89,30 +110,9 @@ public abstract class Action {
 		public void setExpression(String expression) {
 			this.expression = expression;
 		}
-		
-		boolean test(ActionHandler handler, String expression) {
-			if (Strings.isNullOrEmpty(expression)) // if expression is not given always return true
-				return true;
-			if (expression.matches("true"))
-				return true;
-			if (expression.equals("false"))
-				return false;
-			Pattern pattern = Pattern.compile("^(eval|select|action):");
-			if (expression != null && !pattern.matcher(expression).find()) {
-				expression = "eval:" + expression;
-			}
-			Object result = handler.evaluate(expression);
-			if (result == null)
-				return false;
-			if (result instanceof Number && result.equals(0))
-				return false;
-			if (result instanceof Boolean)
-				return (Boolean) result;
-			return true;
-		}
-		
+
 		boolean test(ActionHandler handler) {
-			return test(handler, getCondition());
+			return Action.test(handler, getCondition());
 		}
 	}
 }

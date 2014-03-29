@@ -1840,6 +1840,14 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="saveIf" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            Save the record if the given boolean expression is true
+            and  "id" is null or "version" field is provided.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

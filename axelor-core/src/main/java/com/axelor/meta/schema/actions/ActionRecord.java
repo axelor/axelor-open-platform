@@ -24,11 +24,13 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.ActionHandler;
+import com.axelor.rpc.Resource;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -58,6 +60,9 @@ public class ActionRecord extends Action {
 	
 	@XmlAttribute(name = "copy")
 	private Boolean canCopy;
+	
+	@XmlAttribute(name = "saveIf")
+	private String saveIf;
 	
 	@XmlElement(name = "field")
 	private List<RecordField> fields;
@@ -94,6 +99,14 @@ public class ActionRecord extends Action {
 		this.canCopy = canCopy;
 	}
 	
+	public String getSaveIf() {
+		return saveIf;
+	}
+	
+	public void setSaveIf(String saveIf) {
+		this.saveIf = saveIf;
+	}
+	
 	public List<RecordField> getFields() {
 		return fields;
 	}
@@ -116,9 +129,9 @@ public class ActionRecord extends Action {
 		return _evaluate(handler, map);
 	}
 	
-	private Object _evaluate(ActionHandler handler, Map<String, Object> map) {
+	private Object _evaluate(final ActionHandler handler, final Map<String, Object> map) {
 		
-		Class<?> entityClass = findClass(model);
+		final Class<?> entityClass = findClass(model);
 		if (ref != null) {
 			Object result = handler.evaluate(ref);
 			if (result != null) {
@@ -129,8 +142,8 @@ public class ActionRecord extends Action {
 			}
 		}
 		
-		Mapper mapper = Mapper.of(entityClass);
-		Object target = Mapper.toBean(entityClass, null);
+		final Mapper mapper = Mapper.of(entityClass);
+		final Object target = Mapper.toBean(entityClass, null);
 		
 		for(RecordField recordField : fields) {
 			
@@ -185,7 +198,26 @@ public class ActionRecord extends Action {
 			}
 		}
 		
-		return target;
+		final Object[] result = { target };
+
+		if (canSave(handler, (Model) target)) {
+			JPA.runInTransaction(new Runnable() {
+				@Override
+				public void run() {
+					Model bean = JPA.save(((Model) result[0]));
+					map.putAll(Resource.toMapCompact(bean));
+					result[0] = bean;
+				}
+			});
+		}
+
+		return result[0];
+	}
+	
+	private boolean canSave(ActionHandler handler, Model bean) {
+		if (bean == null || StringUtils.isBlank(saveIf)) return false;
+		if (bean.getId() != null && bean.getVersion() == null) return false;
+		return Action.test(handler, saveIf);
 	}
 	
 	@Override
