@@ -45,7 +45,8 @@
 		onNew="com.axelor.auth.AuthService:preferences">
 		<field name="email" widget="Email" />
 		<field name="language" />
-		<field name="action" domain="self.type = 'action-view'" widget="SuggestBox" canNew="false"/>
+        <field name="homeAction" x-bind="{{actionSelect.name}}" hidden="true"/>
+		<field name="actionSelect" title="Action" x-target="com.axelor.meta.db.MetaAction" x-target-name="name" x-domain="self.type = 'action-view'" widget="SuggestBox" canNew="false"/>
 	</form>
 	
     <action-condition name="action-condition-user-validCode">

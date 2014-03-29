@@ -62,7 +62,7 @@ public final class AppInfo {
 				map.put("user.technical", group.getTechnicalStaff());
 			}
 			map.put("user.lang", user.getLanguage());
-			map.put("user.action", user.getAction().getName());
+			map.put("user.action", user.getHomeAction());
 		} catch (Exception e){
 		}
 
