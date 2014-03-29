@@ -31,9 +31,11 @@ import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 
 import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
+import com.axelor.meta.db.MetaAction;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
+import com.axelor.rpc.Resource;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -239,9 +241,19 @@ public class AuthService {
 		}
 		
 		final Map<String, Object> values = Maps.newHashMap();
+		final MetaAction action = MetaAction.findByName(user.getHomeAction());
+		
 		values.put("id", user.getId());
+		values.put("version", user.getVersion());
+		values.put("email", user.getEmail());
+		values.put("language", user.getLanguage());
+		values.put("homeAction", user.getHomeAction());
+		
+		if (action != null) {
+			values.put("actionSelect", Resource.toMapCompact(action));
+		}
+		
 		response.setValues(values);
-		response.setReload(true);
 		response.setStatus(ActionResponse.STATUS_SUCCESS);
 	}
 }
