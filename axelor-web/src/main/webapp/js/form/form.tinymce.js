@@ -54,6 +54,10 @@ ui.formInput('Html', {
 					" numlist bullist outdent indent | link image"
 		};
 		
+		var language = __appSettings['user.lang'] || '';
+		if (language === 'fr') language = 'fr_FR';
+		if (language === 'en') language = null;
+		
 		var heavyOptions = {
 			
 			height: 350,
@@ -72,6 +76,8 @@ ui.formInput('Html', {
 			selector: selector,
 			
 			skin: 'bootstrap',
+			
+			language: language,
 			
 			setup: function(editor) {
 				
