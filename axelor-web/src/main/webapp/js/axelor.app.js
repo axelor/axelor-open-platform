@@ -29,13 +29,29 @@
 		loadingCounter += val;
 	}
 	
+	function hideLoading() {
+		if (loadingTimer) {
+			clearTimeout(loadingTimer);
+			loadingTimer = null;
+		}
+		if (loadingCounter > 0) {
+			return loadingTimer = _.delay(hideLoading, 300);
+		}
+		loadingTimer = _.delay(function () {
+			loadingTimer = null;
+			if (loadingElem) {
+				loadingElem.fadeOut(100);
+			}
+		}, 100);
+	}
+
 	function onHttpStart(data, headersGetter) {
 	
 		updateLoadingCounter(1);
 		
-		if (loadingTimer) clearTimeout(loadingTimer);
-		if (loadingCounter > 1) {
-			return data;
+		if (loadingTimer) {
+			clearTimeout(loadingTimer);
+			loadingTimer = null;
 		}
 		
 		if (loadingElem == null) {
@@ -54,10 +70,7 @@
 	
 	function onHttpStop() {
 		updateLoadingCounter(-1);
-		loadingTimer = setTimeout(function(){
-			if (loadingElem && loadingCounter === 0)
-				loadingElem.fadeOut();
-		}, 100);
+		hideLoading();
 	}
 	
 	axelor.$eval = function (scope, expr, context) {
@@ -166,9 +179,11 @@
 			});
 
 		var blocked = false;
-		
+		var blockedTimer = null;
+
 		function block(callback) {
 			if (blocked) return true;
+			if (blockedTimer) { clearTimeout(blockedTimer); blockedTimer = null; };
 			if (loadingCounter > 0) {
 				blocked = true;
 				doc.on("keydown.blockui mousedown.blockui", function(e) {
@@ -186,8 +201,9 @@
 		}
 
 		function unblock(callback) {
-			if (loadingCounter > 0) {
-				return _.delay(unblock, 10, callback);
+			if (blockedTimer) { clearTimeout(blockedTimer); blockedTimer = null; };
+			if (loadingCounter > 0 || loadingTimer) {
+				return blockedTimer = _.delay(unblock, 10, callback);
 			}
 			doc.off("keydown.blockui mousedown.blockui");
 			body.css("cursor", "");
