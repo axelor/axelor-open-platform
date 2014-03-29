@@ -283,9 +283,9 @@ public class CSVBinder {
 			else {
 				p.set(bean, value);
 			}
-
-			if(value == null && (p.isReference() || p.isCollection())) {
-				LOG.info("[Warning] Bind null value to {} with context: {}", p.getName(), Arrays.asList(values));
+			
+			if(value == null && (p.isReference() || p.isCollection()) && isValueGiven(cb, values)) {
+				LOG.warn("Bind null value to {} with context: {}", p.getName(), Arrays.asList(values));
 			}
 			else {
 				LOG.trace("set value: {} = {}", p.getName(), value);
@@ -293,6 +293,20 @@ public class CSVBinder {
 		}
 
 		return bean;
+	}
+	
+	private boolean isValueGiven(CSVBinding bind, Map<String, Object> values) {
+		if (bind.getColumn() != null) return false;
+		if (bind.getBindings() == null) return true;
+		boolean given = false;
+		for (CSVBinding binding : bind.getBindings()) {
+			Object raw = values.get(binding.getColumn());
+			if (raw != null && !"".equals(raw)) {
+				given = true;
+				break;
+			}
+		}
+		return given;
 	}
 
 	/**
