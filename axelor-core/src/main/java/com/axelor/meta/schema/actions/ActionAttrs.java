@@ -76,7 +76,7 @@ public class ActionAttrs extends Action {
 				String name = attribute.getName();
 				Object value = null;
 				if (name.matches("readonly|required|recommend|hidden|collapse")) {
-					value = attribute.test(handler, attribute.getExpression());
+					value = Action.test(handler, attribute.getExpression());
 				} else {
 					value = handler.evaluate(attribute.getExpression());
 				}

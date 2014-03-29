@@ -58,7 +58,7 @@ public class ActionCondition extends Action {
 			}
 			for (String field : names.split(",")) {
 				field = field.trim();
-				if (check.test(handler, check.getCondition(field))) {
+				if (Action.test(handler, check.getCondition(field))) {
 					errors.put(field, error);
 					allCheck = false;
 				}
