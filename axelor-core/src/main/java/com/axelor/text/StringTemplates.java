@@ -19,21 +19,68 @@ package com.axelor.text;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Locale;
 import java.util.Map;
 
-import org.stringtemplate.v4.NoIndentWriter;
+import org.stringtemplate.v4.AttributeRenderer;
+import org.stringtemplate.v4.AutoIndentWriter;
+import org.stringtemplate.v4.Interpreter;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.misc.ObjectModelAdaptor;
+import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
+import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
+import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.rpc.Context;
 import com.axelor.script.ScriptBindings;
+import com.google.common.xml.XmlEscapers;
 
 /**
  * The implementation of {@link Templates} for the StringTemplate (ST4) support.
  * 
  */
 public class StringTemplates implements Templates {
+	
+	class StringRenderer implements AttributeRenderer {
+		
+		@Override
+		public String toString(Object o, String formatString, Locale locale) {
+			if (o == null) return "";
+			if (formatString == null) return o.toString();
+			if (formatString.equals("escape")) return XmlEscapers.xmlAttributeEscaper().escape(o.toString());
+			if (formatString.startsWith("selection:")) return getSelectionTitle(formatString.substring(10).trim(), o.toString());
+			return o.toString();
+		}
+	}
+	
+	class DataAdapter extends ObjectModelAdaptor {
+		
+		@Override
+		public Object getProperty(Interpreter interp, ST self, Object o,
+				Object property, String propertyName)
+				throws STNoSuchPropertyException {
+
+			if (!(o instanceof Model)) {
+				return super.getProperty(interp, self, o, property, propertyName);
+			}
+			
+			final Mapper mapper = Mapper.of(o.getClass());
+			final Property field = mapper.getProperty(propertyName);
+
+			if (field == null) {
+				return null;
+			}
+			
+			if (StringUtils.isBlank(field.getSelection())) {
+				return field.get(o);
+			}
+			return getSelectionTitle(field.getSelection(), field.get(o));
+		}
+	}
 
 	class StringTemplate implements Template {
 
@@ -58,7 +105,7 @@ public class StringTemplates implements Templates {
 				@Override
 				public void render(Writer out) throws IOException {
 					try {
-						template.write(new NoIndentWriter(out));
+						template.write(new AutoIndentWriter(out));
 					} catch (IOException e) {
 					}
 				}
@@ -82,11 +129,24 @@ public class StringTemplates implements Templates {
 
 	public StringTemplates(char delimiterStartChar, char delimiterStopChar) {
 		this.group = new STGroup(delimiterStartChar, delimiterStopChar);
+		this.group.registerRenderer(String.class, new StringRenderer());
+		this.group.registerModelAdaptor(Object.class, new DataAdapter());
 	}
 
 	@Override
 	public Template fromText(String text) {
 		ST template = new ST(group, text);
 		return new StringTemplate(template);
+	}
+	
+	private String valueOf(Object value) {
+		if (value == null) return "";
+		return String.valueOf(value);
+	}
+
+	private String getSelectionTitle(String name, Object value) {
+		if (StringUtils.isBlank(name)) return valueOf(value);
+		final MetaSelectItem item = MetaSelectItem.filter("self.select.name = ? and self.value = ?", name, value).fetchOne();
+		return item == null ? valueOf(value) : item.getTitle();
 	}
 }
