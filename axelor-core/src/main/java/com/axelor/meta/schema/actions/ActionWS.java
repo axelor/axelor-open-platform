@@ -22,7 +22,9 @@ import groovy.xml.XmlUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +37,9 @@ import wslite.soap.SOAPResponse;
 
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
+import com.axelor.text.GroovyTemplates;
+import com.axelor.text.StringTemplates;
+import com.axelor.text.Templates;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -56,7 +61,7 @@ public class ActionWS extends Action {
 	private Integer readTimeout;
 
 	@XmlElement(name = "action")
-	private List<Method> methods;
+	private List<WSAction> methods;
 
 	public String getService() {
 		return service;
@@ -76,7 +81,7 @@ public class ActionWS extends Action {
 		return readTimeout;
 	}
 
-	public List<Method> getMethods() {
+	public List<WSAction> getMethods() {
 		return methods;
 	}
 
@@ -92,15 +97,26 @@ public class ActionWS extends Action {
 		return (ActionWS) ref;
 	}
 
-	private Object send(String location, String template, ActionHandler handler)
+	private Object send(String location, WSAction act, ActionHandler handler)
 			throws IOException, FileNotFoundException, ClassNotFoundException {
 
-		File templateFile = new File(template);
+		File templateFile = new File(act.template);
 		if (!templateFile.isFile()) {
-			throw new IllegalArgumentException("No such template: " + template);
+			throw new IllegalArgumentException("No such template: " + act.template);
+		}
+		
+		Templates engine = new StringTemplates('$', '$');
+		if ("groovy".equals(act.engine)) {
+			engine = new GroovyTemplates();
 		}
 
-		String payload = handler.template(templateFile);
+		String payload = null;
+		Reader reader = new FileReader(templateFile);
+		try {
+			payload = handler.template(engine, reader);
+		} finally {
+			reader.close();
+		}
 		Map<String, Object> params = Maps.newHashMap();
 
 		params.put("connectTimeout", getConnectTimeout() * 1000);
@@ -145,15 +161,15 @@ public class ActionWS extends Action {
 
 		List<Object> result = Lists.newArrayList();
 		log.info("action-ws (name): " + getName());
-		for(Method m : methods) {
-			Object template = handler.evaluate(m.template);
+		for(WSAction act : methods) {
+			Object template = handler.evaluate(act.template);
 			if(template == null) {
-				log.error("No such template: " + m.template);
+				log.error("No such template: " + act.template);
 				continue;
 			}
-			log.info("action-ws (method, template): " + m.getName() + ", " + template.toString());
+			log.info("action-ws (method, template): " + act.getName() + ", " + template.toString());
 			try {
-				Object res = this.send(url, template.toString(), handler);
+				Object res = this.send(url, act, handler);
 				result.add(res);
 			} catch (Exception e) {
 				log.error("error: " + e);
@@ -168,13 +184,20 @@ public class ActionWS extends Action {
 	}
 
 	@XmlType
-	public static class Method extends Element {
+	public static class WSAction extends Element {
 
 		@XmlAttribute
 		private String template;
+		
+		@XmlAttribute
+		private String engine;
 
 		public String getTemplate() {
 			return template;
+		}
+		
+		public String getEngine() {
+			return engine;
 		}
 	}
 }

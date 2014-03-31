@@ -37,6 +37,9 @@ import com.axelor.common.ClassUtils;
 import com.axelor.common.FileUtils;
 import com.axelor.db.JPA;
 import com.axelor.meta.ActionHandler;
+import com.axelor.text.GroovyTemplates;
+import com.axelor.text.StringTemplates;
+import com.axelor.text.Templates;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
@@ -46,6 +49,7 @@ import com.google.common.io.Files;
 public class ActionExport extends Action {
 
 	public static final String EXPORT_PATH = AppSettings.get().getPath("data.export.dir", "{java.io.tmpdir}/axelor/data-export");
+	
 	private static final String DEFAULT_DIR = "${date}/${name}";
 
 	@XmlAttribute(name = "output")
@@ -92,11 +96,16 @@ public class ActionExport extends Action {
 		}
 
 		log.info("export {} as {}", export.getTemplate(), name);
+		
+		Templates engine = new StringTemplates('$', '$');
+		if ("groovy".equals(export.engine)) {
+			engine = new GroovyTemplates();
+		}
 
 		File output = FileUtils.getFile(EXPORT_PATH, dir, name);
 		String contents = null;
 		try {
-			contents = handler.template(reader);
+			contents = handler.template(engine, reader);
 		} finally {
 			reader.close();
 		}
@@ -148,10 +157,24 @@ public class ActionExport extends Action {
 		@XmlAttribute
 		private String template;
 		
+		@XmlAttribute
+		private String engine;
+
+		@XmlAttribute(name = "processor")
+		private String processor;
+
 		public String getTemplate() {
 			return template;
 		}
 		
+		public String getEngine() {
+			return engine;
+		}
+
+		public String getProcessor() {
+			return processor;
+		}
+
 		@Override
 		public String toString() {
 			return Objects.toStringHelper(getClass())

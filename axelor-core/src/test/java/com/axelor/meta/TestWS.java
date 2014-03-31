@@ -17,6 +17,8 @@
  */
 package com.axelor.meta;
 
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +35,8 @@ import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.test.db.Contact;
+import com.axelor.text.GroovyTemplates;
+import com.axelor.text.Templates;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -132,11 +136,14 @@ public class TestWS extends MetaTest {
 		Map<String, Object> context = ImmutableMap.<String, Object>of("person", c);
 		
 		ActionHandler actionHandler = createHandler("dummy", context);
+		Templates engine = new GroovyTemplates();
+		Reader template = new StringReader("<%__fmt__.debug('Person food : {}', person.food)%>${person.food}");
 		
-		String text = actionHandler.template("<%__fmt__.debug('Person food : {}', person.food)%>${person.food}");
+		String text = actionHandler.template(engine, template);
 		Assert.assertEquals("pizza", text);
 		
-		text = actionHandler.template("${ person.food | text}");
+		template = new StringReader("${ person.food | text}");
+		text = actionHandler.template(engine, template);
 		Assert.assertEquals("Pizza", text);
 	}
 }
