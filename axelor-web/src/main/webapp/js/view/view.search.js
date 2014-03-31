@@ -132,16 +132,28 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 		
 		scopes.form.editRecord(record);
 		
-		var promise = $scope.doSearch();
-		if (promise && promise.then && $scope._showSingle) {
-			promise.then(function () {
-				var items = scopes.grid.getItems();
-				if (items && items.length === 1) {
-					scopes.grid.selection = [0];
-					scopes.grid.onEdit();
-				}
-			});
+		function _doSearch() {
+			var promise = $scope.doSearch();
+			if (promise && promise.then && $scope._showSingle) {
+				promise.then(function () {
+					var items = scopes.grid.getItems();
+					if (items && items.length === 1) {
+						scopes.grid.selection = [0];
+						scopes.grid.onEdit();
+					}
+				});
+			}
 		}
+		
+		var promise = scopes.toolbar._viewPromise;
+		if (promise && promise.then) {
+			promise.then(function() {
+				$scope.$timeout(_doSearch);
+			});
+		} else {
+			_doSearch();
+		}
+		
 	};
 	
 	var scopes = {};
