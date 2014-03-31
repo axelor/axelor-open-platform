@@ -20,7 +20,6 @@ package com.axelor.meta;
 import groovy.xml.XmlUtil;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Method;
@@ -36,6 +35,7 @@ import javax.persistence.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
@@ -52,12 +52,10 @@ import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.axelor.text.GroovyTemplates;
 import com.axelor.text.Templates;
-import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.io.Files;
 import com.google.inject.Injector;
 import com.google.inject.servlet.RequestScoped;
 
@@ -78,8 +76,6 @@ public class ActionHandler {
 
 	private ScriptHelper scriptHelper;
 	
-	private Templates templates;
-
 	private Pattern pattern = Pattern.compile("^(select\\[\\]|select|action|call|eval):\\s*(.*)");
 	
 	private ActionHandler(Injector injector, ActionRequest request) {
@@ -96,7 +92,6 @@ public class ActionHandler {
 
 		this.context = context;
 
-		this.templates = new GroovyTemplates();
 		this.scriptHelper = new GroovyScriptHelper(this.context);
 		this.bindings = this.scriptHelper.getBindings();
 	}
@@ -290,28 +285,8 @@ public class ActionHandler {
 
 	}
 
-	public String template(File template) {
-		String text;
-		try {
-			text = Files.toString(template, Charsets.UTF_8);
-		} catch (IOException e) {
-			throw new IllegalArgumentException(e);
-		}
-		return template(text);
-	}
-
-	public String template(Reader template) throws IOException {
-		StringBuilder text = new StringBuilder();
-		BufferedReader reader = new BufferedReader(template);
-		String line = null;
-		while((line = reader.readLine()) != null) {
-			text.append(line).append("\n");
-		}
-		return template(text.toString());
-	}
-
-	public String template(String text) {
-		if (text == null || "".equals(text.trim())) {
+	private String groovyTemplate(String text) {
+		if (StringUtils.isBlank(text)) {
 			return "";
 		}
 		text = text.replaceAll("\\$\\{\\s*(\\w+)(\\?)?\\.([^}]*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text($1, '$3')}");
@@ -324,7 +299,23 @@ public class ActionHandler {
 
 		bindings.put("__fmt__", new FormatHelper());
 
-		return templates.fromText(text).make(bindings).render();
+		return text;
+	}
+	
+	public String template(Templates engine, Reader template) throws IOException {
+		StringBuilder builder = new StringBuilder();
+		BufferedReader reader = new BufferedReader(template);
+		String line = null;
+		while((line = reader.readLine()) != null) {
+			builder.append(line).append("\n");
+		}
+		String text = builder.toString();
+		
+		if (engine instanceof GroovyTemplates) {
+			text = groovyTemplate(text);
+		}
+		
+		return engine.fromText(text).make(bindings).render();
 	}
 
 	@SuppressWarnings("all")

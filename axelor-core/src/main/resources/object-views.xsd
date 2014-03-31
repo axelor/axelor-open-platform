@@ -1961,6 +1961,14 @@
                       <xsd:documentation>Template file.</xsd:documentation>
                     </xsd:annotation>
                   </xsd:attribute>
+                  <xsd:attribute name="engine">
+                    <xsd:simpleType>
+                      <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="ST"/>
+                        <xsd:enumeration value="groovy"/>
+                      </xsd:restriction>
+                    </xsd:simpleType>
+                  </xsd:attribute>
                 </xsd:extension>
               </xsd:complexContent>
             </xsd:complexType>
@@ -2060,6 +2068,14 @@
                     <xsd:annotation>
                       <xsd:documentation>The template to be used to generate output file.</xsd:documentation>
                     </xsd:annotation>
+                  </xsd:attribute>
+                  <xsd:attribute name="engine">
+                    <xsd:simpleType>
+                      <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="ST"/>
+                        <xsd:enumeration value="groovy"/>
+                      </xsd:restriction>
+                    </xsd:simpleType>
                   </xsd:attribute>
                 </xsd:extension>
               </xsd:complexContent>
