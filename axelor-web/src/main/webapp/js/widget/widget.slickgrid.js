@@ -997,6 +997,11 @@ Grid.prototype.hilite = function (row, field) {
 	
 	record.$style = null;
 	
+	var ctx = record || {};
+	if (this.handler._context) {
+		ctx = _.extend({}, this.handler._context, ctx);
+	}
+	
 	for (var i = 0; i < hilites.length; i++) {
 		var params = hilites[i],
 			condition = params.condition,
@@ -1004,7 +1009,7 @@ Grid.prototype.hilite = function (row, field) {
 			pass = false;
 		
 		try {
-			pass = axelor.$eval(this.scope, condition, record);
+			pass = axelor.$eval(this.scope, condition, ctx);
 		} catch (e) {
 		}
 		if (!pass) {
