@@ -78,13 +78,6 @@ public class Context extends HashMap<String, Object> {
 		this.beanInstance = bean;
 	}
 	
-	public static <T extends Model> Context create(T bean) {
-		Preconditions.checkNotNull(bean, "Context object can't be null");
-		Map<String, Object> vars = Mapper.toMap(bean);
-		vars.put(KEY_MODEL, bean.getClass());
-		return new Context(vars, bean);
-	}
-
 	@SuppressWarnings("all")
 	public static Object createOrFind(Property p, Object value) {
 
