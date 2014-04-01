@@ -21,12 +21,14 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.stringtemplate.v4.AttributeRenderer;
 import org.stringtemplate.v4.AutoIndentWriter;
 import org.stringtemplate.v4.Interpreter;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.compiler.Bytecode;
 import org.stringtemplate.v4.misc.ObjectModelAdaptor;
 import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
@@ -35,8 +37,8 @@ import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaSelectItem;
-import com.axelor.rpc.Context;
-import com.axelor.script.ScriptBindings;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.xml.XmlEscapers;
 
 /**
@@ -85,22 +87,41 @@ public class StringTemplates implements Templates {
 	class StringTemplate implements Template {
 
 		private ST template;
+		private Set<String> names;
 
 		private StringTemplate(ST template) {
 			this.template = template;
+			this.names = findAttributes();
+		}
+		
+		private Set<String> findAttributes() {
+			Set<String> names = Sets.newHashSet();
+			int ip = 0;
+			while (ip < template.impl.codeSize) {
+				int opcode = template.impl.instrs[ip];
+				Bytecode.Instruction I = Bytecode.instructions[opcode];
+				ip++;
+				for (int opnd = 0; opnd < I.nopnds; opnd++) {
+					if (opcode == Bytecode.INSTR_LOAD_ATTR) {
+						int nameIndex = Interpreter.getShort(template.impl.instrs, ip);
+						if (nameIndex < template.impl.strings.length) {
+							names.add(template.impl.strings[nameIndex]);
+						}
+					}
+					ip += Bytecode.OPND_SIZE_IN_BYTES;
+				}
+			}
+			return names;
 		}
 
 		@Override
 		public Renderer make(Map<String, Object> context) {
-			Map<String, Object> vars = new ScriptBindings(context);
-
-			for (String key : vars.keySet()) {
+			for (String name : names) {
 				try {
-					template.add(key, vars.get(key));
+					template.add(name, context.get(name));
 				} catch (Exception e) {
 				}
 			}
-
 			return new Renderer() {
 				@Override
 				public void render(Writer out) throws IOException {
@@ -114,7 +135,17 @@ public class StringTemplates implements Templates {
 
 		@Override
 		public <T extends Model> Renderer make(T context) {
-			return make(Context.create(context));
+			final Map<String, Object> ctx = Maps.newHashMap();
+			if (context != null) {
+				Mapper mapper = Mapper.of(context.getClass());
+				for (String name : names) {
+					Property property = mapper.getProperty(name);
+					if (property != null) {
+						ctx.put(name, property.get(context));
+					}
+				}
+			}
+			return make(ctx);
 		}
 	}
 
