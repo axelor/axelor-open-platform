@@ -50,6 +50,19 @@
 	overflow: auto;
 }
 
+@media (max-width: 979px) {
+	.view-container .form-view > div[ui-view-form].has-width {
+		padding: 4px;
+		background-color: #fff !important;
+	}
+	.view-container .form-view > div[ui-view-form].has-width > form {
+		border: none;
+		border-radius: 0;
+		box-shadow: none;
+		width: auto;
+	}
+}
+
 .view-container .form-view .nested-editor form {
 	width: inherit !important;
 }
