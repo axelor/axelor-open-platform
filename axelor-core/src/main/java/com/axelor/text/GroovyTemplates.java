@@ -22,12 +22,13 @@ import groovy.text.TemplateEngine;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import com.axelor.db.Model;
-import com.axelor.rpc.Context;
+import com.axelor.db.mapper.Mapper;
 import com.axelor.script.ScriptBindings;
 import com.google.common.base.Throwables;
 
@@ -59,8 +60,22 @@ public class GroovyTemplates implements Templates {
 		}
 
 		@Override
-		public <T extends Model> Renderer make(T context) {
-			return make(Context.create(context));
+		@SuppressWarnings("serial")
+		public <T extends Model> Renderer make(final T context) {
+			final Mapper mapper = context == null ? null : Mapper.of(context.getClass());
+			final Map<String, Object> ctx = new HashMap<String, Object>() {
+				
+				@Override
+				public boolean containsKey(Object key) {
+					return mapper != null && mapper.getProperty((String) key) != null;
+				}
+				
+				@Override
+				public Object get(Object key) {
+					return mapper == null ? null : mapper.get(context, (String) key);
+				}
+			};
+			return make(ctx);
 		}
 	}
 
