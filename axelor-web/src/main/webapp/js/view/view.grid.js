@@ -603,16 +603,21 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 			};
 			
 			$scope.$on("on:new", function(e) {
-				$scope.filter({});
+				$scope.ajaxStop(function () {
+					$scope.filter({});
+				});
 			});
 			$scope.$on("on:edit", function(e) {
-				$scope.filter({});
+				$scope.ajaxStop(function () {
+					$scope.filter({});
+				});
 			});
 			
 			$scope.onRefresh = function() {
 				$scope.filter({});
 			};
 			
+			var _onShow = $scope.onShow;
 			var _filter = $scope.filter;
 			var _action = $scope._viewAction;
 
@@ -624,6 +629,14 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 					});
 				}
 				return _filter.call($scope, opts);
+			};
+			
+			$scope.onShow = function () {
+				var scope = ($scope.selectedTab || {}).$viewScope;
+				if (scope && scope.editRecord) {
+					return;
+				}
+				return _onShow.apply($scope, arguments);
 			};
 		}],
 		replace: true,
