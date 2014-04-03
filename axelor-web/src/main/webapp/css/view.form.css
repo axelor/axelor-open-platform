@@ -851,7 +851,7 @@ table.field-details .help-text hr {
 .tag-select li {
 	float: left;
 	display: inline-block;
-	margin: 3px;
+	margin: 2px;
 	margin-right: 0;
 	margin-bottom: 0;
 }
@@ -881,9 +881,10 @@ table.field-details .help-text hr {
 	cursor: pointer;
 	display: inline-block;
 	max-width: 140px;
-	height: 11px;
+	height: 15px;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	vertical-align: middle;
 }
 
 .tag-select .tag-link:hover,
