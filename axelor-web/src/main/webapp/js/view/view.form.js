@@ -458,10 +458,12 @@ function FormViewCtrl($scope, $element) {
 		}
 
 		function doSave() {
-			var dummy = $scope.getDummyValues();
-
-			var values = ds.diff($scope.record, $scope.$$original);
-			var promise = ds.save(values).success(function(record, page) {
+			var dummy = $scope.getDummyValues(),
+				values = _.extend({}, $scope.record, (options||{}).values),
+				promise;
+			
+			values = ds.diff(values, $scope.$$original);
+			promise = ds.save(values).success(function(record, page) {
 				return doEdit(record.id, dummy);
 			});
 
