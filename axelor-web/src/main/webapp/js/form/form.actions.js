@@ -255,18 +255,28 @@ ActionHandler.prototype = {
 			}
 			deferred.resolve();
 		}
+		
+		function doSave(values) {
+			var ds = scope._dataSource;
+			ds.save(values).success(function(rec, page) {
+				if (scope.doRead) {
+					return scope.doRead(rec.id).success(doEdit);
+				}
+				return ds.read(rec.id).success(doEdit);
+			});
+		}
+		
+		var values = _.extend({ _original: scope.$$original }, scope.record);
+		if (scope.onSave) {
+			scope.onSave({
+				values: values
+			}).then(function () {
+				deferred.resolve();
+			});
+		} else {
+			doSave(values);
+		}
 
-		var ds = scope._dataSource,
-			values = _.extend({
-				_original: scope.$$original
-			}, scope.record);
- 
-		ds.save(values).success(function(rec, page) {
-			if (scope.doRead) {
-				return scope.doRead(rec.id).success(doEdit);
-			}
-			return ds.read(rec.id).success(doEdit);
-		});
 		this._invalidateContext = true;
 		return deferred.promise;
 	},

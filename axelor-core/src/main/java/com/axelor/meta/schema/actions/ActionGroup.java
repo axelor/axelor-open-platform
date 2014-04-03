@@ -177,14 +177,8 @@ public class ActionGroup extends ActionIndex {
             }
 
             // update the context if required
-            if (value instanceof Map && ((Map) value).get("values") != null) {
-            	Object values = ((Map) value).get("values");
-            	if (values instanceof Model) {
-            		values = Mapper.toMap(values);
-            	}
-            	if (values instanceof Map) {
-            		handler.getContext().update((Map) values);
-            	}
+            if (value instanceof Map) {
+            	updateContext(handler, (Map) value);
             }
             
             if (action instanceof ActionGroup && value instanceof Collection) {
@@ -233,6 +227,39 @@ public class ActionGroup extends ActionIndex {
             }
 		}
 		return result;
+	}
+	
+	@SuppressWarnings("all")
+	private void updateContext(ActionHandler handler, Map<String, Object> value) {
+		if (value == null) return;
+		
+		Object values = value.get("values");
+		Map<String, Object> map = Maps.newHashMap();
+		
+    	if (values instanceof Model) {
+    		map = Mapper.toMap(value);
+    	}
+    	if (values instanceof Map) {
+    		map = (Map) values;
+    	}
+    	
+    	values = value.get("attrs");
+    	
+    	if (values instanceof Map) {
+    		for (Object key : ((Map) values).keySet()) {
+    			String name = (String) key;
+    			Map attrs = (Map) ((Map) values).get(key);
+    			if (name.indexOf('$') == 0) name = name.substring(1);
+    			if (attrs.containsKey("value")) {
+    				map.put(name, attrs.get("value"));
+    			}
+    			if (attrs.containsKey("value:set")) {
+    				map.put(name, attrs.get("value:set"));
+    			}
+    		}
+    	}
+    	
+    	handler.getContext().update(map);
 	}
 
 	@Override
