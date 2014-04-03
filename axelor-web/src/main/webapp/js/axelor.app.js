@@ -171,15 +171,24 @@
 		
 		var doc = $(document);
 		var body = $('body');
-		var blocker = $('<div>').appendTo('body').hide()
+		var blocker = $('<div class="blocker-overlay"></div>')
+			.appendTo('body')
+			.hide()
 			.css({
 				position: 'absolute',
 				zIndex: 100000,
 				width: '100%', height: '100%'
 			});
+		
+		var spinner = $('<span class="blocker-spinner"></span>')
+			.append($('<i class="fa fa-spinner fa-spin">'))
+			.append(' ')
+			.append(_t('Please wait...'))
+			.appendTo(blocker);
 
 		var blocked = false;
 		var blockedTimer = null;
+		var spinnerTimer = 0;
 
 		function block(callback) {
 			if (blocked) return true;
@@ -203,11 +212,17 @@
 		function unblock(callback) {
 			if (blockedTimer) { clearTimeout(blockedTimer); blockedTimer = null; };
 			if (loadingCounter > 0 || loadingTimer) {
+				spinnerTimer += 1;
+				if (spinnerTimer > 200) {
+					spinner.addClass('visible');
+				}
 				return blockedTimer = _.delay(unblock, 10, callback);
 			}
 			doc.off("keydown.blockui mousedown.blockui");
 			body.css("cursor", "");
 			blocker.hide();
+			spinner.removeClass('visible');
+			spinnerTimer = 0;
 			if (callback) {
 				callback(blocked);
 			}
