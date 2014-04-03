@@ -17,13 +17,10 @@
  */
 package com.axelor.meta;
 
-import groovy.xml.XmlUtil;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Method;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,12 +32,8 @@ import javax.persistence.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.QueryBinder;
-import com.axelor.db.mapper.Mapper;
-import com.axelor.db.mapper.Property;
-import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.actions.ActionGroup;
 import com.axelor.meta.schema.actions.ActionMethod;
@@ -50,11 +43,8 @@ import com.axelor.rpc.Context;
 import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
-import com.axelor.text.GroovyTemplates;
 import com.axelor.text.Templates;
-import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.inject.Injector;
 import com.google.inject.servlet.RequestScoped;
@@ -67,8 +57,6 @@ public class ActionHandler {
 	private Injector injector;
 
 	private ActionRequest request;
-
-	private Class<?> entity;
 
 	private Context context;
 
@@ -88,7 +76,6 @@ public class ActionHandler {
 
 		this.injector = injector;
 		this.request = request;
-		this.entity = request.getBeanClass();
 
 		this.context = context;
 
@@ -201,107 +188,6 @@ public class ActionHandler {
 		}
 	}
 
-	class FormatHelper {
-
-		private final Logger log = LoggerFactory.getLogger(FormatHelper.class);
-
-		public Object escape(Object value) {
-			if (value == null) {
-				return "";
-			}
-			return XmlUtil.escapeXml(value.toString());
-		}
-
-		public String text(String expr) {
-			return getSelectTitle(entity, expr, bindings.get(expr));
-		}
-
-		public String text(Object bean, String expr) {
-			if (bean == null) {
-				return "";
-			}
-			expr = expr.replaceAll("\\?", "");
-			return getSelectTitle(bean.getClass(), expr, getValue(bean, expr));
-		}
-
-		private String getSelectTitle(Class<?> klass, String expr, Object value) {
-			if (value == null) {
-				return "";
-			}
-			Property property = this.getProperty(klass, expr);
-			if (property == null || property.getSelection() == null) {
-				return value == null ? "" : value.toString();
-			}
-			MetaSelectItem item = MetaSelectItem
-					.all()
-					.filter("self.select.name = ?1 AND self.value = ?2",
-							property.getSelection(), value).fetchOne();
-			if (item != null) {
-				return item.getTitle();
-			}
-			return value == null ? "" : value.toString();
-		}
-
-		private Property getProperty(Class<?> beanClass, String name) {
-			Iterator<String> iter = Splitter.on(".").split(name).iterator();
-			Property p = Mapper.of(beanClass).getProperty(iter.next());
-			while(iter.hasNext() && p != null) {
-				p = Mapper.of(p.getTarget()).getProperty(iter.next());
-			}
-			return p;
-		}
-
-		@SuppressWarnings("all")
-		private Object getValue(Object bean, String expr) {
-			if (bean == null) return null;
-			Iterator<String> iter = Splitter.on(".").split(expr).iterator();
-			Object obj = null;
-			if (bean instanceof Map) {
-				obj = ((Map) bean).get(iter.next());
-			} else {
-				obj = Mapper.of(bean.getClass()).get(bean, iter.next());
-			}
-			if(iter.hasNext() && obj != null) {
-				return getValue(obj, Joiner.on(".").join(iter));
-			}
-			return obj;
-		}
-
-		public void info(String text,  Object... params) {
-			log.info(text, params);
-		}
-
-		public void debug(String text,  Object... params) {
-			log.debug(text, params);
-		}
-
-		public void error(String text,  Object... params) {
-			log.error(text, params);
-		}
-
-		public void trace(String text,  Object... params) {
-			log.trace(text, params);
-		}
-
-	}
-
-	private String groovyTemplate(String text) {
-		if (StringUtils.isBlank(text)) {
-			return "";
-		}
-		text = text.replaceAll("\\$\\{\\s*(\\w+)(\\?)?\\.([^}]*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text($1, '$3')}");
-		text = text.replaceAll("\\$\\{\\s*([^}]*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text('$1')}");
-		text = text.replaceAll("\\$\\{\\s*([^}]*?)\\s*\\|\\s*e\\s*\\}", "\\${($1) ?: ''}");
-
-		if (text.trim().startsWith("<?xml ")) {
-			text = text.replaceAll("\\$\\{(.*?)\\}", "\\${__fmt__.escape($1)}");
-		}
-
-		bindings.put("__fmt__", new FormatHelper());
-
-		return text;
-	}
-	
 	public String template(Templates engine, Reader template) throws IOException {
 		StringBuilder builder = new StringBuilder();
 		BufferedReader reader = new BufferedReader(template);
@@ -309,13 +195,7 @@ public class ActionHandler {
 		while((line = reader.readLine()) != null) {
 			builder.append(line).append("\n");
 		}
-		String text = builder.toString();
-		
-		if (engine instanceof GroovyTemplates) {
-			text = groovyTemplate(text);
-		}
-		
-		return engine.fromText(text).make(bindings).render();
+		return engine.fromText(builder.toString()).make(bindings).render();
 	}
 
 	@SuppressWarnings("all")
