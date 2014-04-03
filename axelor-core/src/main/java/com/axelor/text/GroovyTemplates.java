@@ -33,7 +33,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axelor.common.ClassUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
@@ -43,7 +42,7 @@ import com.axelor.script.ScriptBindings;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
-import com.google.common.io.LineReader;
+import com.google.common.io.CharStreams;
 
 /**
  * The implementation of {@link Templates} for groovy string template support.
@@ -66,7 +65,7 @@ public class GroovyTemplates implements Templates {
 				return "";
 			}
 			text = text.replaceAll("\\$\\{\\s*(\\w+)(\\?)?\\.([^}]*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text($1, '$3')}");
-			text = text.replaceAll("\\$\\{\\s*([^}]*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text('$1')}");
+			text = text.replaceAll("\\$\\{\\s*([^}]*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text(it, '$1')}");
 			text = text.replaceAll("\\$\\{\\s*([^}]*?)\\s*\\|\\s*e\\s*\\}", "\\${($1) ?: ''}");
 			if (text.trim().startsWith("<?xml ")) {
 				text = text.replaceAll("\\$\\{(.*?)\\}", "\\${__fmt__.escape($1)}");
@@ -77,14 +76,9 @@ public class GroovyTemplates implements Templates {
 		@Override
 		public Renderer make(final Map<String, Object> context) {
 			final ScriptBindings bindings = new ScriptBindings(context);
-			String text = this.text;
-			try {
-				Class<?> klass = ClassUtils.findClass((String) bindings.get("_model"));
-				bindings.put("__fmt__", new FormatHelper(klass, bindings));
-				text = process(text);
-			} catch (Exception e) {
-			}
-
+			final String text = process(this.text);
+			
+			bindings.put("__fmt__", new FormatHelper());
 			
 			try {
 				final groovy.text.Template template = engine.createTemplate(text);
@@ -123,14 +117,6 @@ public class GroovyTemplates implements Templates {
 	class FormatHelper {
 
 		private final Logger log = LoggerFactory.getLogger(FormatHelper.class);
-		
-		private Class<?> contextClass;
-		private Map<String, Object> context;
-
-		public FormatHelper(Class<?> entityClass, Map<String, Object> bindings) {
-			this.contextClass = entityClass;
-			this.context = bindings;
-		}
 
 		public Object escape(Object value) {
 			if (value == null) {
@@ -138,20 +124,16 @@ public class GroovyTemplates implements Templates {
 			}
 			return XmlUtil.escapeXml(value.toString());
 		}
-
-		public String text(String expr) {
-			return getSelectTitle(contextClass, expr, context.get(expr));
-		}
-
+		
 		public String text(Object bean, String expr) {
 			if (bean == null) {
 				return "";
 			}
 			expr = expr.replaceAll("\\?", "");
-			return getSelectTitle(bean.getClass(), expr, getValue(bean, expr));
+			return getTitle(bean.getClass(), expr, getValue(bean, expr));
 		}
 
-		private String getSelectTitle(Class<?> klass, String expr, Object value) {
+		private String getTitle(Class<?> klass, String expr, Object value) {
 			if (value == null) {
 				return "";
 			}
@@ -223,12 +205,6 @@ public class GroovyTemplates implements Templates {
 	
 	@Override
 	public Template from(Reader reader) throws IOException {
-		LineReader lines = new LineReader(reader);
-		StringBuilder builder = new StringBuilder();
-		String line = null;
-		while ((line = lines.readLine()) != null) {
-			builder.append(line).append("\n");
-		}
-		return fromText(builder.toString());
+		return fromText(CharStreams.toString(reader));
 	}
 }

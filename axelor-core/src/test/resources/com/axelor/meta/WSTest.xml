@@ -4,11 +4,11 @@
   xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_2.0.xsd">
 
   <action-ws name="ws.test" service="http://ip.axelor.com:81/SrvWebPortailGRD/SrvImportAffaire.asmx">
-    <action name="WebRegister" template="data/ws-test/ws-login.tmpl"/>
+    <action name="WebRegister" template="data/ws-test/ws-login.tmpl" engine="groovy"/>
   </action-ws>
 
   <action-ws name="ws.test.1" service="ref:ws.test">
-    <action name="ControleCreeAffaire" template="data/ws-test/ws-test1.tmpl"/>
+    <action name="ControleCreeAffaire" template="data/ws-test/ws-test1.tmpl" engine="groovy"/>
   </action-ws>
 
   <action-import name="data.import.1" config="data/ws-test/xml-config.xml">
@@ -16,8 +16,8 @@
   </action-import>
 
   <action-export name="export.sale.order" output="${name}/${date}${time}">
-    <export name="${name}.xml" template="data/ws-test/export-sale-order.tmpl"/>
-    <export name="${name}-customer-copy.xml" template="data/ws-test/export-sale-order.tmpl"/>
+    <export name="${name}.xml" template="data/ws-test/export-sale-order.tmpl" engine="groovy"/>
+    <export name="${name}-customer-copy.xml" template="data/ws-test/export-sale-order.tmpl" engine="groovy"/>
   </action-export>
 
 </object-views>
