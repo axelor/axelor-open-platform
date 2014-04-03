@@ -58,7 +58,7 @@ module.directive('uiMenuBar', function() {
 			
 			scope.onMenuClick = _.once(function onMenuClick(e) {
 				element.find('.dropdown-toggle').dropdown();
-				$(e.srcElement).dropdown('toggle');
+				$(e.currentTarget).dropdown('toggle');
 			});
 		},
 
