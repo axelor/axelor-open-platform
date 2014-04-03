@@ -875,7 +875,8 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			}
 
 			var elems = element.find('[x-field].ng-invalid:not(fieldset)').filter(function() {
-				return !$(this).parents('.ui-slick-grid') || $(this).is(':visible');
+				var isInline = $(this).parents('.slickgrid').size() > 0;
+				return !isInline || (isInline && $(this).is(':visible'));
 			});
 			var items = elems.map(function () {
 				return {
