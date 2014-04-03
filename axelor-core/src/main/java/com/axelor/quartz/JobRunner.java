@@ -79,7 +79,7 @@ public class JobRunner {
 	
 	private void configure(MetaSchedule meta) {
 
-		if (meta == null || meta.getActive() == Boolean.FALSE) {
+		if (meta == null || meta.getActive() != Boolean.TRUE) {
 			return;
 		}
 		
