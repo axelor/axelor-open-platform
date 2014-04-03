@@ -42,7 +42,7 @@ import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaSelectItem;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.io.LineReader;
+import com.google.common.io.CharStreams;
 import com.google.common.xml.XmlEscapers;
 
 /**
@@ -181,13 +181,7 @@ public class StringTemplates implements Templates {
 	
 	@Override
 	public Template from(Reader reader) throws IOException {
-		LineReader lines = new LineReader(reader);
-		StringBuilder builder = new StringBuilder();
-		String line = null;
-		while ((line = lines.readLine()) != null) {
-			builder.append(line).append("\n");
-		}
-		return fromText(builder.toString());
+		return fromText(CharStreams.toString(reader));
 	}
 	
 	private String valueOf(Object value) {

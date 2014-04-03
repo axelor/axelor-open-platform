@@ -17,7 +17,6 @@
  */
 package com.axelor.meta;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Method;
@@ -46,6 +45,7 @@ import com.axelor.script.ScriptHelper;
 import com.axelor.text.Templates;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.io.CharStreams;
 import com.google.inject.Injector;
 import com.google.inject.servlet.RequestScoped;
 
@@ -189,13 +189,7 @@ public class ActionHandler {
 	}
 
 	public String template(Templates engine, Reader template) throws IOException {
-		StringBuilder builder = new StringBuilder();
-		BufferedReader reader = new BufferedReader(template);
-		String line = null;
-		while((line = reader.readLine()) != null) {
-			builder.append(line).append("\n");
-		}
-		return engine.fromText(builder.toString()).make(bindings).render();
+		return engine.fromText(CharStreams.toString(template)).make(bindings).render();
 	}
 
 	@SuppressWarnings("all")
