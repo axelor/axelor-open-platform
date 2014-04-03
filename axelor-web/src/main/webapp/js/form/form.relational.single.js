@@ -534,7 +534,7 @@ ui.formInput('RefItem', 'ManyToOne', {
 
 		scope.$watch("record." + watch, function(value, old) {
 			selected = value === scope._model;
-			if (value === old) return;
+			if (value === old || old === undefined) return;
 			scope.setValue(null);
 		});
 
