@@ -193,6 +193,13 @@ function CalendarViewCtrl($scope, $element) {
 			value = record[title.name];
 			if (title.targetName) {
 				value = value[title.targetName];
+			} else if (title.selectionList && value) {
+				var select = _.find(title.selectionList, function (select) {
+					return ("" + select.value) === ("" + value);
+				});
+				if (select) {
+					titleText = select.title;
+				}
 			}
 			if (value) {
 				titleText = value;
