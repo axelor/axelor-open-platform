@@ -187,6 +187,14 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		}
 	}
 	
+	function withContext(scope, record) {
+		var values = record;
+		if (scope._context) {
+			values = _.extend({}, scope._context, values);
+		}
+		return values;
+	}
+	
 	function handleCondition(scope, field, attr, condition, negative) {
 
 		if (!condition) {
@@ -212,7 +220,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		function handle(rec) {
 			var value = undefined;
 			try {
-				value = axelor.$eval(scope, expr, rec);
+				value = axelor.$eval(scope, expr, withContext(scope, rec));
 			} catch (e) {}
 			scope.attr(attr, negative ? !value : value);
 		}
@@ -232,7 +240,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 				var expr = exprs[i];
 				var value = false;
 				try {
-					value = axelor.$eval(scope, expr, rec);
+					value = axelor.$eval(scope, expr, withContext(scope, rec));
 				} catch (e) {}
 				if (value) {
 					return scope.attr('highlight', {
@@ -262,7 +270,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		function handle(rec) {
 			var value = undefined;
 			try {
-				value = expr(rec).trim();
+				value = expr(withContext(scope, rec)).trim();
 			} catch (e) {}
 			
 			if (scope.setValue) {
