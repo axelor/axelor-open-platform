@@ -17,7 +17,10 @@
  */
 package com.axelor.text;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.Locale;
 import java.util.Map;
@@ -39,6 +42,7 @@ import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaSelectItem;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.io.LineReader;
 import com.google.common.xml.XmlEscapers;
 
 /**
@@ -168,6 +172,22 @@ public class StringTemplates implements Templates {
 	public Template fromText(String text) {
 		ST template = new ST(group, text);
 		return new StringTemplate(template);
+	}
+	
+	@Override
+	public Template from(File file) throws IOException {
+		return from(new FileReader(file));
+	}
+	
+	@Override
+	public Template from(Reader reader) throws IOException {
+		LineReader lines = new LineReader(reader);
+		StringBuilder builder = new StringBuilder();
+		String line = null;
+		while ((line = lines.readLine()) != null) {
+			builder.append(line).append("\n");
+		}
+		return fromText(builder.toString());
 	}
 	
 	private String valueOf(Object value) {

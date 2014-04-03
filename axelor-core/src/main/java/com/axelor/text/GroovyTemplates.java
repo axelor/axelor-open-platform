@@ -21,7 +21,10 @@ import groovy.text.GStringTemplateEngine;
 import groovy.text.TemplateEngine;
 import groovy.xml.XmlUtil;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,6 +43,7 @@ import com.axelor.script.ScriptBindings;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
+import com.google.common.io.LineReader;
 
 /**
  * The implementation of {@link Templates} for groovy string template support.
@@ -210,5 +214,21 @@ public class GroovyTemplates implements Templates {
 	@Override
 	public Template fromText(String text) {
 		return new GroovyTemplate(text);
+	}
+	
+	@Override
+	public Template from(File file) throws IOException {
+		return from(new FileReader(file));
+	}
+	
+	@Override
+	public Template from(Reader reader) throws IOException {
+		LineReader lines = new LineReader(reader);
+		StringBuilder builder = new StringBuilder();
+		String line = null;
+		while ((line = lines.readLine()) != null) {
+			builder.append(line).append("\n");
+		}
+		return fromText(builder.toString());
 	}
 }
