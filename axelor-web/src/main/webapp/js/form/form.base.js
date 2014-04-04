@@ -205,6 +205,9 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			readonlySet = true;
 			element.toggleClass("readonly", readonly);
 			element.toggleClass("editable", !readonly);
+			if (scope.canEdit) {
+				element.toggleClass("no-edit", !scope.canEdit());
+			}
 		});
 		
 		function setHighlight(args) {

@@ -799,7 +799,7 @@ Grid.prototype._doInit = function(view) {
 
 	var onInit = scope.onInit();
 	if (_.isFunction(onInit)) {
-		onInit(grid);
+		onInit(grid, this);
 	}
 	
 	if (view.groupBy) {

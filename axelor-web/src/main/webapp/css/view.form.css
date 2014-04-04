@@ -599,6 +599,7 @@ form.readonly .form-item-container:hover .hot-edit-icon {
 	display: inline;
 }
 
+.no-edit .hot-edit-icon,
 [x-readonly="true"] .hot-edit-icon {
 	display: none !important;
 }

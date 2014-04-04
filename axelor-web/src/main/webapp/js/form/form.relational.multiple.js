@@ -381,7 +381,7 @@ ui.formInput('OneToMany', {
 			});
 		}
 
-		scope.onGridInit = function(grid) {
+		scope.onGridInit = function(grid, inst) {
 			var editable = grid.getOptions().editable;
 			if (editable) {
 				element.addClass('inline-editable');
@@ -394,9 +394,12 @@ ui.formInput('OneToMany', {
 
 				scope.$watch("isReadonly()", function(readonly) {
 					grid.setOptions({
-						editable: !readonly
+						editable: !readonly && scope.canEdit()
 					});
+					
+					inst.showColumn('_edit_column', scope.canView() || (!readonly && scope.canEdit()));
 				});
+				
 				adjustSize(scope.getValue(), 1);
 			}
 
