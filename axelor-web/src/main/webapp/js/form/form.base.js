@@ -206,7 +206,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			element.toggleClass("readonly", readonly);
 			element.toggleClass("editable", !readonly);
 			if (scope.canEdit) {
-				element.toggleClass("no-edit", !scope.canEdit());
+				element.toggleClass("no-edit", scope.canEdit() === false);
 			}
 		});
 		
