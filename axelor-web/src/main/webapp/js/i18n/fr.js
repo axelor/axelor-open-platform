@@ -80,6 +80,7 @@ _t.put({
 "OK": "OK",
 "Offline!": "Hors ligne",
 "Password": "Mot de passe",
+"Please wait...": "Merci de patienter...",
 "Profile": "Profil",
 "Question": "Question",
 "Refresh": "Actualiser",
