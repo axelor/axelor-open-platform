@@ -193,7 +193,7 @@ function CalendarViewCtrl($scope, $element) {
 			value = record[title.name];
 			if (title.targetName) {
 				value = value[title.targetName];
-			} else if (title.selectionList && value) {
+			} else if (title.selectionList) {
 				var select = _.find(title.selectionList, function (select) {
 					return ("" + select.value) === ("" + value);
 				});
@@ -201,12 +201,10 @@ function CalendarViewCtrl($scope, $element) {
 					titleText = select.title;
 				}
 			}
-			if (value) {
-				titleText = value;
-			}
+			titleText = titleText || value;
 		}
 		
-		info.title = titleText;
+		info.title = ("" + titleText);
 		info.allDay = diff <= 0 || diff >= (view.dayLength * 60);
 		info.className = info.allDay ? "calendar-event-allDay" : "calendar-event-day";
 		
