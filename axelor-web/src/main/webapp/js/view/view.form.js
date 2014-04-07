@@ -53,7 +53,10 @@ function FormViewCtrl($scope, $element) {
 		}
 		
 		attrs = _.extend({}, $scope.fields[name], $scope.fields_view[id]);
-
+		if ($scope.fields_view[id]) {
+			$scope.fields_view[id].widgetId = attrs.widgetId = id;
+		}
+		
 		return attrs;
 	};
 
@@ -200,12 +203,20 @@ function FormViewCtrl($scope, $element) {
 		});
 	};
 	
-	function updateSelected(name, records) {
-		var path = $scope.formPath ? $scope.formPath + '.' + name : name,
-			child = $element.find('[x-path="' + path + '"]:first'),
-			childScope = child.data('$scope');
-		if (records == null || childScope == null)
+	function updateSelected(field, records) {
+		if (!records) return;
+		
+		var child = $element.find('#' + field.widgetId);
+		if (child.size() === 0) {
+			var path = $scope.formPath ? $scope.formPath + '.' + field.name : field.name;
+			child = $element.find('[x-path="' + path + '"]:first');
+		}
+		
+		childScope = child.data('$scope');
+		
+		if (childScope == null || child.is(':hidden')) {
 			return records;
+		}
 		
 		var selected = childScope.selection || [];
 		
@@ -224,7 +235,7 @@ function FormViewCtrl($scope, $element) {
 		
 		_.each($scope.fields, function(field, name) {
 			if (/-many$/.test(field.type)) {
-				var items = updateSelected(field.name, context[name]);
+				var items = updateSelected(field, context[name]);
 				if (items) {
 					context[name] = items;
 				}
@@ -233,7 +244,7 @@ function FormViewCtrl($scope, $element) {
 
 		var dummyFields = $scope.getDummyFields();
 		var dummyValues = $scope.getDummyValues();
-		
+
 		_.each(dummyValues, function (value, name) {
 			if (value && value.$updatedValues) {
 				dummyValues[name] = value.$updatedValues;
@@ -245,7 +256,7 @@ function FormViewCtrl($scope, $element) {
 		
 		_.each(dummyFields, function (field) {
 			if (/-many$/.test(field.type)) {
-				var items = updateSelected(field.name, dummyValues[field.name]);
+				var items = updateSelected(field, dummyValues[field.name]);
 				if (items) {
 					dummyValues[field.name] = items;
 				}
@@ -436,13 +447,12 @@ function FormViewCtrl($scope, $element) {
 			record._dirty = true;
 		});
 	};
-	
+
 	$scope.getDummyFields = function() {
 		var fields = _.keys($scope.fields);
-		var extra = _.chain($scope.fields_view)
-					  .filter(function(f){ return f.name && !_.contains(fields, f.name); })
-					  .value();
-		return extra;
+		return _.filter($scope.fields_view, function(f){
+			return f.name && !_.contains(fields, f.name);
+		});
 	};
 	
 	$scope.getDummyValues = function() {
