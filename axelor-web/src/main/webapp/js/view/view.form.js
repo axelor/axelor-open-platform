@@ -231,17 +231,30 @@ function FormViewCtrl($scope, $element) {
 			}
 		});
 
-		var dummy = $scope.getDummyValues();
-		_.each(dummy, function (value, name) {
+		var dummyFields = $scope.getDummyFields();
+		var dummyValues = $scope.getDummyValues();
+		
+		_.each(dummyValues, function (value, name) {
 			if (value && value.$updatedValues) {
-				dummy[name] = value.$updatedValues;
+				dummyValues[name] = value.$updatedValues;
 			}
 			if (name.indexOf('$') === 0) {
-				dummy[name.substring(1)] = dummy[name];
+				dummyValues[name.substring(1)] = dummyValues[name];
 			}
 		});
 		
-		context = _.extend(context, dummy);
+		_.each(dummyFields, function (field) {
+			if (/-many$/.test(field.type)) {
+				var items = updateSelected(field.name, dummyValues[field.name]);
+				if (items) {
+					dummyValues[field.name] = items;
+				}
+			}
+		});
+		
+		console.log('aaaa', dummyValues);
+		
+		context = _.extend(context, dummyValues);
 		context._model = ds._model;
 		return context;
 	};
@@ -426,15 +439,18 @@ function FormViewCtrl($scope, $element) {
 		});
 	};
 	
-	$scope.getDummyValues = function() {
-		if (!$scope.record) return {};
+	$scope.getDummyFields = function() {
 		var fields = _.keys($scope.fields);
 		var extra = _.chain($scope.fields_view)
 					  .filter(function(f){ return f.name && !_.contains(fields, f.name); })
-					  .pluck('name')
-					  .compact()
 					  .value();
-		return _.pick($scope.record, extra);
+		return extra;
+	};
+	
+	$scope.getDummyValues = function() {
+		if (!$scope.record) return {};
+		var names = _.pluck($scope.getDummyFields(), 'name');
+		return _.pick($scope.record, names);
 	};
 
 	$scope.onSave = function(options) {
