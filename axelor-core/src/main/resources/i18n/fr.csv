@@ -285,7 +285,7 @@
 "com.axelor.meta.db.MetaView",,"button","Validate","Valider",,
 "com.axelor.meta.db.MetaView",,"button","Restore","Restaurer",,
 "com.axelor.meta.db.MetaView",,"button","All the customizations made for this view will be lost. Are you sure ?","Tous les changements de cette vue seront perdus. Voulez-vous continuer ?",,
-"com.axelor.meta.db.MetaView",,"button","Restore All","Tout restaurer",,
+"com.axelor.meta.db.MetaView",,"button","Restore all","Tout restaurer",,
 "com.axelor.meta.db.MetaView",,"button","All the customizations will be lost. Are you sure ?","Tous les changements seront perdus. Voulez-vous continuer ?",,
 "com.axelor.meta.db.MetaView",,"view","All Views","Les Vues",,
 "com.axelor.auth.db.Permission",,"view","Permission","Permission",,
