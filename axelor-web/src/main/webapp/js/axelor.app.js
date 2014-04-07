@@ -180,10 +180,9 @@
 				width: '100%', height: '100%'
 			});
 		
-		var spinner = $('<span class="blocker-spinner"></span>')
-			.append($('<i class="fa fa-spinner fa-spin">'))
-			.append(' ')
-			.append(_t('Please wait...'))
+		var spinner = $('<div class="blocker-wait"></div>')
+			.append('<div class="blocker-spinner"><i class="fa fa-spinner fa-spin"></div>')
+			.append('<div class="blocker-message">' + _t('Please wait...') + '</div>')
 			.appendTo(blocker);
 
 		var blocked = false;
@@ -214,14 +213,13 @@
 			if (loadingCounter > 0 || loadingTimer) {
 				spinnerTimer += 1;
 				if (spinnerTimer > 200) {
-					spinner.addClass('visible');
+					blocker.addClass('wait');
 				}
 				return blockedTimer = _.delay(unblock, 10, callback);
 			}
 			doc.off("keydown.blockui mousedown.blockui");
 			body.css("cursor", "");
-			blocker.hide();
-			spinner.removeClass('visible');
+			blocker.removeClass('wait').hide();
 			spinnerTimer = 0;
 			if (callback) {
 				callback(blocked);
