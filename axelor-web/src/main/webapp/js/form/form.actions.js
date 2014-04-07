@@ -539,7 +539,7 @@ ActionHandler.prototype = {
 
 			forEach(itemAttrs, function(value, attr){
 				
-				if (itemIndex > 0 && attrs && (attr === "value" || attr.indexOf("value:") === 0)) {
+				if (itemIndex > 0 && attr && (attr === "value" || attr.indexOf("value:") === 0)) {
 					return;
 				}
 				
