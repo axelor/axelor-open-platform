@@ -74,40 +74,53 @@ ui.formWidget('BaseSelect', {
 			
 		};
 
-		input.autocomplete({
-			
-			minLength: 0,
-			
-			position: {  collision: "flip"  },
-			
-			source: function(request, response) {
-				scope.loadSelection(request, response);
-			},
-
-			focus: function(event, ui) {
-				return false;
-			},
-			
-			select: function(event, ui) {
-				var ret = scope.handleSelect(event, ui);
-				if (ret !== undefined) {
-					return ret;
+		var showOn = this.showSelectionOn;
+		var doSetup = _.once(function (input) {
+		
+			input.autocomplete({
+				
+				minLength: 0,
+				
+				position: {  collision: "flip"  },
+				
+				source: function(request, response) {
+					scope.loadSelection(request, response);
+				},
+	
+				focus: function(event, ui) {
+					return false;
+				},
+				
+				select: function(event, ui) {
+					var ret = scope.handleSelect(event, ui);
+					if (ret !== undefined) {
+						return ret;
+					}
+					return false;
+				},
+				
+				open: function(event, ui) {
+					scope.handleOpen(event, ui);
+				},
+				
+				close: function(event, ui) {
+					scope.handleClose(event, ui);
 				}
-				return false;
-			},
-			
-			open: function(event, ui) {
-				scope.handleOpen(event, ui);
-			},
-			
-			close: function(event, ui) {
-				scope.handleClose(event, ui);
-			}
+			});
+	
+			input.data('ui-autocomplete')._renderItem = function(ul, item) {
+				var el = $("<li>").append( $("<a>").html( item.label ) )
+								  .appendTo(ul);
+				if (item.click) {
+					el.addClass("tag-select-action");
+					ul.addClass("tag-select-action-menu");
+				}
+				return el;
+			};
 		});
 		
-		var showOn = this.showSelectionOn;
-
 		input.focus(function() {
+			doSetup(input);
 			element.addClass('focus');
 			if (showOn === "focus") {
 				scope.showSelection();
@@ -122,20 +135,11 @@ ui.formWidget('BaseSelect', {
 				scope.handleDelete(e);
 			}
 		}).click(function() {
+			doSetup(input);
 			if (showOn === "click") {
 				scope.showSelection();
 			}
 		});
-		
-		input.data('ui-autocomplete')._renderItem = function(ul, item) {
-			var el = $("<li>").append( $("<a>").html( item.label ) )
-							  .appendTo(ul);
-			if (item.click) {
-				el.addClass("tag-select-action");
-				ul.addClass("tag-select-action-menu");
-			}
-			return el;
-		};
 	},
 
 	template_editable:
