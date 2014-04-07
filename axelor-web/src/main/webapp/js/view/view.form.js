@@ -252,8 +252,6 @@ function FormViewCtrl($scope, $element) {
 			}
 		});
 		
-		console.log('aaaa', dummyValues);
-		
 		context = _.extend(context, dummyValues);
 		context._model = ds._model;
 		return context;
