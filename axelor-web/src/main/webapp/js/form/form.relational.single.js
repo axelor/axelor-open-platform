@@ -118,7 +118,6 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		$scope.showEditor(record);
 	};
 
-	$scope._isNestedOpen = false;
 	$scope.onSummary = function() {
 		$scope._isNestedOpen = !$scope._isNestedOpen;
 		var record = $scope.getValue();
@@ -178,12 +177,12 @@ ui.formInput('ManyToOne', 'Select', {
 				}
 				return isHidden.call(scope);
 			};
-
+			
 			var hiddenSet = false;
 			scope.$watch('attr("hidden")', function (hidden, old) {
 				if (hiddenSet && hidden === old) return;
 				hiddenSet = true;
-				if (scope._isNestedOpen) {
+				if (scope._isNestedOpen || scope._isNestedOpen === undefined) {
 					scope.showNestedEditor(!hidden);
 				}
 			});
