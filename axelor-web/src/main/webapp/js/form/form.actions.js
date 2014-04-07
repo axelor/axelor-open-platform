@@ -494,7 +494,7 @@ ActionHandler.prototype = {
 			}
 		}
 		
-		function setAttrs(item, itemAttrs) {
+		function setAttrs(item, itemAttrs, itemIndex) {
 			
 			var label = item.data('label'),
 				itemScope = item.data('$scope'),
@@ -538,6 +538,10 @@ ActionHandler.prototype = {
 			}
 
 			forEach(itemAttrs, function(value, attr){
+				
+				if (itemIndex > 0 && attrs && (attr === "value" || attr.indexOf("value:") === 0)) {
+					return;
+				}
 				
 				switch(attr) {
 				case 'required':
@@ -602,8 +606,8 @@ ActionHandler.prototype = {
 			if (items == null || items.length == 0) {
 				return;
 			}
-			items.each(function() {
-				setAttrs($(this), itemAttrs);
+			items.each(function(i) {
+				setAttrs($(this), itemAttrs, i);
 			});
 		});
 		
