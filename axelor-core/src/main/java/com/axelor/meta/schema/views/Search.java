@@ -41,10 +41,11 @@ import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -121,55 +122,11 @@ public class Search extends AbstractView {
 	}
 
 	@XmlType
-	public static class SearchField {
-
-		@XmlAttribute
-		private String name;
-
-		@XmlAttribute
-		private String title;
+	@JsonInclude(Include.NON_NULL)
+	public static class SearchField extends Field {
 
 		@XmlAttribute
 		private String type;
-
-		@XmlAttribute
-		private String target;
-		
-		@XmlAttribute
-		private String domain;
-		
-		@XmlAttribute
-		private String selection;
-		
-		@XmlAttribute
-		private String widget;
-		
-		@XmlAttribute
-		private String width;
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		@JsonIgnore
-		public String getDefaultTitle() {
-			return title;
-		}
-
-		public String getTitle() {
-			if(!Strings.isNullOrEmpty(title)) {
-				return JPA.translate(title, title, null, "search");
-			}
-			return JPA.translate(name, null, null, "search");
-		}
-
-		public void setTitle(String title) {
-			this.title = title;
-		}
 
 		public String getType() {
 			return type;
@@ -178,54 +135,14 @@ public class Search extends AbstractView {
 		public void setType(String type) {
 			this.type = type;
 		}
-
-		public String getTarget() {
-			return target;
-		}
-
-		public void setTarget(String target) {
-			this.target = target;
-		}
 		
-		public String getDomain() {
-			return domain;
-		}
-
-		public void setDomain(String domain) {
-			this.domain = domain;
-		}
-
-		public String getSelection() {
-			return selection;
-		}
-
-		public void setSelection(String selection) {
-			this.selection = selection;
-		}
-
 		public static Map<String, ?> getTypes() {
 			return TYPES;
 		}
 
-		public void setWidget(String widget) {
-			this.widget = widget;
-		}
-
-		public String getWidget() {
-			return widget;
-		}
-		
-		public String getWidth() {
-			return width;
-		}
-		
-		public void setWidth(String width) {
-			this.width = width;
-		}
-
 		public String getTargetName() {
 			try {
-				return Mapper.of(Class.forName(target)).getNameField().getName();
+				return Mapper.of(Class.forName(getTarget())).getNameField().getName();
 			} catch (Exception e){}
 			return null;
 		}
@@ -243,7 +160,7 @@ public class Search extends AbstractView {
 			try {
 				Class<?> klass = (Class<?>) TYPES.get(type);
 				if ("reference".equals(type)) {
-					klass = Class.forName(target);
+					klass = Class.forName(getTarget());
 					return JPA.em().find(klass, ((Map)input).get("id"));
 				}
 				return Adapter.adapt(input, klass, klass, null);
@@ -256,7 +173,7 @@ public class Search extends AbstractView {
 	public ScriptHelper scriptHandler(Map<String, Object> variables) {
 		Map<String, Object> map = Maps.newHashMap(variables);
 		for(SearchField field : searchFields) {
-			map.put(field.name, field.validate(variables.get(field.name)));
+			map.put(field.getName(), field.validate(variables.get(field.getName())));
 		}
 		return new GroovyScriptHelper(new ScriptBindings(map));
 	}
