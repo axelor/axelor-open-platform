@@ -475,10 +475,10 @@ function Chart(scope, element, data) {
 		chart.noData(_t('No Data Available.'));
 		var tickFormats = {
 			"month" : function(d) {
-				return moment([2000, d, 1]).format("MMM");
+				return moment([2000, d - 1, 1]).format("MMM");
 			},
 			"year" : function(d) {
-				return moment([2000, d, 1]).format("YYYY");
+				return moment([2000, d - 1, 1]).format("YYYY");
 			},
 			"number": d3.format(',f'),
 			"decimal": d3.format(',.1f'),
