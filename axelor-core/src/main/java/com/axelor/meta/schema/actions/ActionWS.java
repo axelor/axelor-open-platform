@@ -97,14 +97,14 @@ public class ActionWS extends Action {
 		return (ActionWS) ref;
 	}
 
-	private Object send(String location, WSAction act, ActionHandler handler)
+	private Object send(String location, WSAction act, String template, ActionHandler handler)
 			throws IOException, FileNotFoundException, ClassNotFoundException {
 
-		File templateFile = new File(act.template);
+		File templateFile = new File(template);
 		if (!templateFile.isFile()) {
-			throw new IllegalArgumentException("No such template: " + act.template);
+			throw new IllegalArgumentException("No such template: " + template);
 		}
-		
+
 		Templates engine = new StringTemplates('$', '$');
 		if ("groovy".equals(act.engine)) {
 			engine = new GroovyTemplates();
@@ -164,12 +164,12 @@ public class ActionWS extends Action {
 		for(WSAction act : methods) {
 			Object template = handler.evaluate(act.template);
 			if(template == null) {
-				log.error("No such template: " + act.template);
+				log.error("No such template: " + template);
 				continue;
 			}
 			log.info("action-ws (method, template): " + act.getName() + ", " + template.toString());
 			try {
-				Object res = this.send(url, act, handler);
+				Object res = this.send(url, act, template.toString(), handler);
 				result.add(res);
 			} catch (Exception e) {
 				log.error("error: " + e);
@@ -188,14 +188,14 @@ public class ActionWS extends Action {
 
 		@XmlAttribute
 		private String template;
-		
+
 		@XmlAttribute
 		private String engine;
 
 		public String getTemplate() {
 			return template;
 		}
-		
+
 		public String getEngine() {
 			return engine;
 		}
