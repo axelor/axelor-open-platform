@@ -524,17 +524,22 @@ ui.formInput('RefItem', 'ManyToOne', {
 		var selected = false;
 
 		scope.$watch("record." + ref, function(value, old) {
-			setTimeout(function() {
+			scope.$timeout(function() {
 				var v = scope.getValue();
 				if ((v && v.id === value) || !selected) return;
 				scope.select(value ? {id: value } : null);
 			});
 		});
+		
+		var lastId = null;
 
 		scope.$watch("record." + watch, function(value, old) {
 			selected = value === scope._model;
 			if (value === old || old === undefined) return;
-			scope.setValue(null);
+			if (lastId == scope.record.id) {
+				scope.setValue(null);
+			}
+			lastId = scope.record.id;
 		});
 
 		model.$render = function() {
