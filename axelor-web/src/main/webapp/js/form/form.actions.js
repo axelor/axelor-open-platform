@@ -270,7 +270,8 @@ ActionHandler.prototype = {
 		var values = _.extend({ _original: scope.$$original }, scope.record);
 		if (scope.onSave) {
 			scope.onSave({
-				values: values
+				values: values,
+				callOnSave: false
 			}).then(function () {
 				deferred.resolve();
 			});
