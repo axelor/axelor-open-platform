@@ -403,6 +403,8 @@ ui.formInput('OneToMany', {
 				adjustSize(scope.getValue(), 1);
 			}
 
+			inst.showColumn('_edit_column', scope.canView() || (!scope.isReadonly() && scope.canEdit()));
+
 			if (!(scope._viewParams || {}).summaryView) {
 				return;
 			}
