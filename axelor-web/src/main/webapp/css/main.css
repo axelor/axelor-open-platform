@@ -152,7 +152,7 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 
 .blocker-overlay.wait {
 	opacity: 1;
-	background: rgba(0, 0, 0, 0.8);
+	background: rgba(0, 0, 0, 0.5);
 	transition: opacity ease 0.4s;
 }
 
@@ -164,7 +164,7 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 	width: 100%;
 	
 	text-align: center;
-	font-size: 22px;
+	font-size: 18px;
 	color: white;
 }
 
