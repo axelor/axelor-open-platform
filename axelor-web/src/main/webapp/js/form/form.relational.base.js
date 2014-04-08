@@ -208,13 +208,15 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	};
 	
 	$scope.$on("on:edit", function(record){
-		$scope._domain = ($scope.field||field).domain;
-		$scope._context = ($scope.field||field).context;
+		var domain = ($scope.field||field).domain;
+		var context = ($scope.field||field).context;
+		if (domain !== undefined) $scope._domain = domain;
+		if (context !== undefined) $scope._context = context;
 	});
 	
 	$scope.setDomain = function(domain, context) {
-		$scope._domain = domain;
-		$scope._context = context;
+		if (domain !== undefined) $scope._domain = domain;
+		if (context !== undefined) $scope._context = context;
 	};
 	
 	$scope.getDomain = function() {
