@@ -42,29 +42,30 @@ import com.axelor.text.StringTemplates;
 import com.axelor.text.Templates;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 
 @XmlType
 public class ActionExport extends Action {
 
-	public static final String EXPORT_PATH = AppSettings.get().getPath("data.export.dir", "{java.io.tmpdir}/axelor/data-export");
-	
+	public static final String EXPORT_PATH = AppSettings.get().getPath("data.export.dir", "");
+
 	private static final String DEFAULT_DIR = "${date}/${name}";
 
 	@XmlAttribute(name = "output")
 	private String output;
-	
+
 	@XmlAttribute(name = "download")
 	private Boolean download;
-	
+
 	@XmlElement(name = "export")
 	private List<Export> exports;
 
 	public String getOutput() {
 		return output;
 	}
-	
+
 	public Boolean getDownload() {
 		return download;
 	}
@@ -72,7 +73,7 @@ public class ActionExport extends Action {
 	public List<Export> getExports() {
 		return exports;
 	}
-	
+
 	protected String doExport(String dir, Export export, ActionHandler handler) throws IOException {
 		export.template = handler.evaluate(export.template).toString();
 
@@ -81,7 +82,7 @@ public class ActionExport extends Action {
 		if (template.isFile()) {
 			reader = new FileReader(template);
 		}
-		
+
 		if (reader == null) {
 			InputStream is = ClassUtils.getResourceStream(export.template);
 			if (is == null) {
@@ -96,25 +97,31 @@ public class ActionExport extends Action {
 		}
 
 		log.info("export {} as {}", export.getTemplate(), name);
-		
+
 		Templates engine = new StringTemplates('$', '$');
 		if ("groovy".equals(export.engine)) {
 			engine = new GroovyTemplates();
 		}
 
-		File output = FileUtils.getFile(EXPORT_PATH, dir, name);
+		File output = null;
+		if(Strings.isNullOrEmpty(EXPORT_PATH)) {
+			output = FileUtils.getFile(dir, name);
+		}
+		else {
+			output = FileUtils.getFile(EXPORT_PATH, dir, name);
+		}
 		String contents = null;
 		try {
 			contents = handler.template(engine, reader);
 		} finally {
 			reader.close();
 		}
-		
+
 		Files.createParentDirs(output);
 		Files.write(contents, output, Charsets.UTF_8);
-		
+
 		log.info("file saved: {}", output);
-		
+
 		return FileUtils.getFile(dir, name).toString();
 	}
 
@@ -128,7 +135,7 @@ public class ActionExport extends Action {
 				 .replace("${date}", new DateTime().toString("yyyyMMdd"))
 				 .replace("${time}", new DateTime().toString("HHmmss"));
 		dir = handler.evaluate(dir).toString();
-		
+
 		for(Export export : exports) {
 			if(!export.test(handler)){
 				continue;
@@ -147,16 +154,17 @@ public class ActionExport extends Action {
 		return null;
 	}
 
+	@Override
 	public Object wrap(ActionHandler handler) {
 		return evaluate(handler);
 	}
 
 	@XmlType
 	public static class Export extends Element {
-		
+
 		@XmlAttribute
 		private String template;
-		
+
 		@XmlAttribute
 		private String engine;
 
@@ -166,7 +174,7 @@ public class ActionExport extends Action {
 		public String getTemplate() {
 			return template;
 		}
-		
+
 		public String getEngine() {
 			return engine;
 		}
