@@ -217,16 +217,17 @@ ActionHandler.prototype = {
 
 	handle: function() {
 		var action = this.action.trim();
-		
+		return this._handleAction(action);
+	},
+	
+	_blockUI: function() {
 		// block the entire ui (auto unblocks when actions are complete)
 		_.delay(axelor.blockUI, 100);
-
-		return this._handleAction(action).then(function() {
-			
-		});
 	},
 	
 	_handleSave: function() {
+
+		this._blockUI();
 
 		var scope = this.scope,
 			deferred = this.ws.defer();
@@ -283,6 +284,8 @@ ActionHandler.prototype = {
 
 	_handleAction: function(action) {
 
+		this._blockUI();
+		
 		var self = this,
 			scope = this.scope,
 			context = this._getContext(),
