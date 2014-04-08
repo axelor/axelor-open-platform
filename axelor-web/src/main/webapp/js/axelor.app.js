@@ -212,7 +212,7 @@
 			if (blockedTimer) { clearTimeout(blockedTimer); blockedTimer = null; };
 			if (loadingCounter > 0 || loadingTimer) {
 				spinnerTimer += 1;
-				if (spinnerTimer > 200) {
+				if (spinnerTimer > 300) {
 					blocker.addClass('wait');
 				}
 				return blockedTimer = _.delay(unblock, 10, callback);
