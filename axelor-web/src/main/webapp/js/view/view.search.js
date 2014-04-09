@@ -339,7 +339,7 @@ function SearchGridCtrl($scope, $element, ViewService, $interpolate) {
 		objItem = _.extend(objItem, { name : '_modelTitle', title: _t('Object') });
 		view.items = view.items.concat(schema.resultFields);
 
-		if (+(objItem.width || 0) === 0) {
+		if (+(objItem.width) === 0) {
 			objItem.hidden = true;
 		}
 
