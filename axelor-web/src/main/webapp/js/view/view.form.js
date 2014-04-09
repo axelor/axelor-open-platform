@@ -217,11 +217,26 @@ function FormViewCtrl($scope, $element) {
 		if (childScope == null || child.is(':hidden')) {
 			return records;
 		}
-		
+
 		var selected = childScope.selection || [];
+		var items = records;
 		
-		return _.map(records, function(item, i) {
-			return _.extend({}, item, {
+		if (childScope.getItems) {
+			items = childScope.getItems() || items;
+		}
+
+		function compact(item) {
+			if (item.id > 0 && item.version === undefined) {
+				return {
+					id: item.id,
+					$version: item.$version
+				};
+			}
+			return item;
+		}
+
+		return _.map(items, function(item, i) {
+			return _.extend({}, compact(item), {
 				selected: _.contains(selected, i)
 			});
 		});
