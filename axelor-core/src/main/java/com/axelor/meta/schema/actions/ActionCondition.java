@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.meta.ActionHandler;
 import com.google.common.base.Objects;
@@ -56,6 +57,11 @@ public class ActionCondition extends Action {
 			if (names == null) {
 				continue;
 			}
+
+			if (!StringUtils.isBlank(error)) {
+				error = handler.evaluate("eval: " + "\"\"\"" + error + "\"\"\"").toString();
+			}
+
 			for (String field : names.split(",")) {
 				field = field.trim();
 				if (Action.test(handler, check.getCondition(field))) {
