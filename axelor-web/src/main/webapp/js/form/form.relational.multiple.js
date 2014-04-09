@@ -225,6 +225,13 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		if (records == null || records.length == 0)
 			return;
 
+		for (var i = 0; i < records.length; i++) {
+			var item = records[i];
+			if (!item.id || item.id <= 0) {
+				return;
+			}
+		}
+
 		var sortBy = [];
 		
 		angular.forEach(args.sortCols, function(column){
