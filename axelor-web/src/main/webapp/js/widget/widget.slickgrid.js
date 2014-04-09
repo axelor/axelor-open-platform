@@ -450,14 +450,19 @@ Grid.prototype.parse = function(view) {
 	var allColsHasWidth = true;
 	
 	_.each(view.items, function(item) {
-		var field = handler.fields[item.name],
+		var field = handler.fields[item.name] || {},
 			path = handler.formPath, type;
 
-		field = _.extend({}, field, item, {type: field.type});
+		type = field.type || item.type || 'string';
+
+		field = _.extend({}, field, item, {type: type});
 		scope.fields_view[item.name] = field;
 		path = path ? path + '.' + item.name : item.name;
-		type = field.selection ? 'string' : field.type;
 		
+		if (type === 'field' || field.selection) {
+			type = 'string';
+		}
+
 		if (!item.width) {
 			allColsHasWidth = false;
 		}
