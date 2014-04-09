@@ -534,7 +534,7 @@ function FormViewCtrl($scope, $element) {
 		var record = $scope.record || {};
 		var editable = $scope.isEditable();
 
-		if (record.id && editable) {
+		if (record.id && editable && $scope.canEdit()) {
 			$scope.setEditable(false);
 			return;
 		}
