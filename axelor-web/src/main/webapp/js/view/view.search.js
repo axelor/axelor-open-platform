@@ -328,8 +328,21 @@ function SearchGridCtrl($scope, $element, ViewService, $interpolate) {
 			title: 'Search',
 			type: 'grid',
 			editIcon: true,
-			items: [{ name : '_modelTitle', title: 'Object' }].concat(schema.resultFields)
+			items: []
 		};
+		
+		var objItem = _.findWhere(schema.resultFields, {name: 'object'});
+		if (!objItem) {
+			view.items.push(objItem = {});
+		}
+		
+		objItem = _.extend(objItem, { name : '_modelTitle', title: _t('Object') });
+		view.items = view.items.concat(schema.resultFields);
+
+		if (+(objItem.width || 0) === 0) {
+			objItem.hidden = true;
+		}
+
 		var meta = { fields: schema.resultFields };
 		ViewService.process(meta);
 
@@ -339,7 +352,7 @@ function SearchGridCtrl($scope, $element, ViewService, $interpolate) {
 
 		_.each(view.items, function (item) {
 			if (item.width) {
-				view.items[0].width = 220;
+				objItem.width = objItem.width || 220;
 			}
 		});
 
