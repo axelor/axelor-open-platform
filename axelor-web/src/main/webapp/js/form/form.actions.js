@@ -306,7 +306,16 @@ ActionHandler.prototype = {
 				if (_.isString(pending)) {
 					return self._handleAction(pending);
 				}
-				return chain(_.rest(items));
+
+				scope.$timeout(function () {
+					scope.ajaxStop(function() {
+						deferred.resolve();
+					});
+				});
+
+				return deferred.promise.then(function () {
+					return chain(_.rest(items));
+				});
 			});
 		}
 
