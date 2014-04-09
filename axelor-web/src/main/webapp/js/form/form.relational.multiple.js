@@ -382,6 +382,7 @@ ui.formInput('OneToMany', {
 		}
 
 		scope.onGridInit = function(grid, inst) {
+			var editIcon = scope.canView() || (!readonly && scope.canEdit());
 			var editable = grid.getOptions().editable;
 			if (editable) {
 				element.addClass('inline-editable');
@@ -391,19 +392,21 @@ ui.formInput('OneToMany', {
 					}
 					grid.setOptions({enableAddRow: true});
 				});
-
 				scope.$watch("isReadonly()", function(readonly) {
 					grid.setOptions({
 						editable: !readonly && scope.canEdit()
 					});
 					
-					inst.showColumn('_edit_column', scope.canView() || (!readonly && scope.canEdit()));
+					var _editIcon = scope.canView() || (!readonly && scope.canEdit());
+					if (_editIcon != editIcon) {
+						inst.showColumn('_edit_column', editIcon = _editIcon);
+					}
 				});
 				
 				adjustSize(scope.getValue(), 1);
 			}
 
-			inst.showColumn('_edit_column', scope.canView() || (!scope.isReadonly() && scope.canEdit()));
+			inst.showColumn('_edit_column', editIcon);
 
 			if (!(scope._viewParams || {}).summaryView) {
 				return;
