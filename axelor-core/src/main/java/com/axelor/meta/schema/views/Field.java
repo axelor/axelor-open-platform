@@ -421,7 +421,6 @@ public class Field extends SimpleWidget {
 			mapper = Mapper.of(Class.forName(this.getModel()));
 			return mapper.getProperty(getName()).getTarget().getName();
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
 			return null;
 		} catch (NullPointerException e) {
 		}
