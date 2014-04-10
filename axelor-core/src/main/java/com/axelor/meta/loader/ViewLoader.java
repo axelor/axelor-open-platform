@@ -312,7 +312,7 @@ public class ViewLoader extends AbstractLoader {
 		entity.setModel(model);
 		entity.setModule(module.getName());
 
-		String type = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, klass.getSimpleName());
+		String type = klass.getSimpleName().replaceAll("([a-z\\d])([A-Z]+)", "$1-$2").toLowerCase();
 		entity.setType(type);
 
 		entity = entity.save();
