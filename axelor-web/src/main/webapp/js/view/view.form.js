@@ -316,7 +316,7 @@ function FormViewCtrl($scope, $element) {
 	};
 	
 	$scope.canSave = function() {
-		return $scope.hasButton('save') && $scope.$$dirty && $scope.isValid();
+		return $scope.hasPermission('write') && $scope.$$dirty && $scope.isValid();
 	};
 
 	$scope.canDelete = function() {
