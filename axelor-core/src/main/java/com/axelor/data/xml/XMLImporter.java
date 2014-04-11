@@ -30,6 +30,8 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
 
 import org.slf4j.Logger;
@@ -92,6 +94,8 @@ public class XMLImporter implements Importer {
 
 	private List<Listener> listeners = Lists.newArrayList();
 
+	private boolean canClear = true;
+
 	@Inject
 	public XMLImporter(Injector injector,
 			@Named("axelor.data.config") String configFile,
@@ -135,6 +139,10 @@ public class XMLImporter implements Importer {
 
 	public void clearListener() {
 		this.listeners.clear();
+	}
+
+	public void setCanClear(boolean canClear) {
+		this.canClear = canClear;
 	}
 	
 	private int getBatchSize() {
@@ -326,19 +334,30 @@ public class XMLImporter implements Importer {
 		stream.setMode(XStream.NO_REFERENCES);
 		stream.registerConverter(new ElementConverter(binder));
 		
-		JPA.em().setFlushMode(FlushModeType.COMMIT);
-		JPA.em().getTransaction().begin();
+		final EntityManager em = JPA.em();
+		final EntityTransaction txn = em.getTransaction();
+		final boolean started = !txn.isActive();
+
+		if (canClear) {
+			em.setFlushMode(FlushModeType.COMMIT);
+		}
+		if (started) {
+			txn.begin();
+		}
 
 		try {
 			stream.fromXML(reader);
 			binder.finish();
-			if (JPA.em().getTransaction().isActive()){
-				JPA.em().getTransaction().commit();
-				JPA.em().clear();
+			if (txn.isActive() && !txn.getRollbackOnly() && started) {
+				txn.commit();
+				if (canClear) {
+					em.clear();
+				}
 			}
 		} catch (Exception e) {
-			if (JPA.em().getTransaction().isActive())
-				JPA.em().getTransaction().rollback();
+			if (txn.isActive() && started) {
+				txn.rollback();
+			}
 			throw new ImportException(e);
 		}
 	}

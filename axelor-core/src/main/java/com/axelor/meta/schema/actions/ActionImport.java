@@ -95,6 +95,7 @@ public class ActionImport extends Action {
 			}
 		});
 
+		importer.setCanClear(false);
 		importer.runTask(new ImportTask() {
 
 			@Override
