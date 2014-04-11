@@ -54,8 +54,8 @@ ui.formWidget('BaseSelect', {
 			if (scope.isReadonly()) {
 				return;
 			}
-			input.autocomplete("search" , '');
 			input.focus();
+			input.autocomplete("search" , '');
 		};
 
 		scope.handleDelete = function(e) {
