@@ -9,7 +9,7 @@
           <button class="btn" ng-click="onEdit()" ng-if="!isEditable() && canEdit()" title="{{ 'Edit' | t}}">
             <i class="fa fa-pencil"></i> <span ng-hide="tbTitleHide" x-translate>Edit</span>
           </button>
-          <button class="btn" ng-click="onSave()" ng-if="isEditable() && (canEdit() || canSave())"  title="{{ 'Save' | t}}">
+          <button class="btn" ng-click="onSave()" ng-if="isEditable() && hasButton('save') && (canEdit() || canSave())"  title="{{ 'Save' | t}}">
             <i class="fa fa-floppy-o"></i> <span ng-hide="tbTitleHide" x-translate>Save</span>
           </button>
           <button class="btn" ng-click="onCancel()" ng-if="hasButton('cancel') && canCancel()" title="{{ 'Cancel' | t}}">
