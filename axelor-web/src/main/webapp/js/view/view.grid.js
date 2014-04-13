@@ -557,7 +557,7 @@ angular.module('axelor.ui').directive('uiGridExport', function(){
 
 angular.module('axelor.ui').directive('uiPortletGrid', function(){
 	return {
-		controller: ['$scope', '$element', 'ViewService', function($scope, $element, ViewService) {
+		controller: ['$scope', '$element', 'ViewService', 'NavService', function($scope, $element, ViewService, NavService) {
 			
 			GridViewCtrl.call(this, $scope, $element);
 			
@@ -573,9 +573,17 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 				tab.viewType = "form";
 				tab.recordId = record.id;
 				tab.action = $scope._viewAction;
+				
+				if ($scope._isPopup) {
+					tab.$popupParent = $scope;
+					tab.params = tab.params || {};
+					_.defaults(tab.params, {
+						'show-toolbar': false
+					});
+				}
 
 				setTimeout(function(){
-					$scope.openTab(tab);
+					NavService.openTab(tab);
 					$scope.$apply();
 					if (counter++ === 0) {
 						return;
