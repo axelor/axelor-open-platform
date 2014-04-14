@@ -294,6 +294,38 @@ function DonutChart(scope, element, data) {
 	return PieChart(scope, element, data, "donut");
 }
 
+REGISTRY["text"] = TextChart;
+function TextChart(scope, element, data) {	
+	
+	var config = _.extend({
+		strong: true,
+		shadow: false,
+		fontSize: 22
+	}, data.config);
+	
+	var values = _.first(data.dataset) || {};
+	var series = _.first(data.series) || {};
+	
+	var value = values[series.key];
+	
+	if (config.format) {
+		value = _t(config.format, value);
+	}
+	
+	var svg = d3.select(element.empty()[0]);
+	var text = svg.append("svg:text")
+		.attr("x", "50%")
+		.attr("y", "50%")
+		.attr("dy", ".3em")
+	    .attr("text-anchor", "middle")
+		.text(value);
+
+	if (config.color) text.attr("fill", config.color);
+	if (config.fontSize) text.style("font-size", config.fontSize);
+	if (_.toBoolean(config.strong)) text.style("font-weight", "bold");
+	if (_.toBoolean(config.shadow)) text.style("text-shadow", "0 1px 2px rgba(0, 0, 0, .5)");
+}
+
 REGISTRY["dbar"] = DBarChart;
 function DBarChart(scope, element, data) {
 	
