@@ -413,6 +413,16 @@ ui.formInput('MultiSelect', 'Select', {
 			scaleInput(50);
 			input.val('');
 		});
+		
+		var placeholder = null;
+		if (scope.field.placeholder) {
+			placeholder = $('<span class="tag-select-placeholder hidden"></span>')
+				.text(scope.field.placeholder)
+				.appendTo(element)
+				.click(function (e) {
+					scope.showSelection();
+				});
+		}
 
 		function scaleInput(width) {
 			
@@ -500,6 +510,9 @@ ui.formInput('MultiSelect', 'Select', {
 		};
 		
 		scope.$render_editable = function() {
+			if (placeholder) {
+				placeholder.toggleClass('hidden', !!scope.getValue());
+			}
 			return input.val('');
 		};
 	},
