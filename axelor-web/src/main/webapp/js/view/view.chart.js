@@ -267,6 +267,7 @@ function PieChart(scope, element, data, type) {
 
 	var chart_data = PlusData(scope, data, type || "pie");
 	
+	var config = data.config || {};
 	var chart = nv.models.pieChart()
 		.showLabels(false)
 		.x(function(d) { return d.x; })
@@ -275,13 +276,17 @@ function PieChart(scope, element, data, type) {
 	    .color(d3.scale.category10().range());
 
 	if (type === "donut") {
-		chart.showLabels(true)
-			 .labelType("percent")
-			 .labelThreshold(.05)
-			 .donut(true)
+		config.percent = true;
+		chart.donut(true)
 			 .donutRatio(0.40);
 	}
-
+	
+	if (_.toBoolean(config.percent)) {
+		chart.showLabels(true)
+			.labelType("percent")
+			.labelThreshold(.05);
+	}
+	
 	d3.select(element[0])
 	  .datum(chart_data)
 	  .transition().duration(1200).call(chart);
