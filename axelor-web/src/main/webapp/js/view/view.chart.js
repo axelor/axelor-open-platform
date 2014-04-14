@@ -263,9 +263,9 @@ function PlotData(scope, data, type) {
 }
 
 REGISTRY["pie"] = PieChart;
-function PieChart(scope, element, data) {
+function PieChart(scope, element, data, type) {
 
-	var chart_data = PlusData(scope, data, "pie");
+	var chart_data = PlusData(scope, data, type || "pie");
 	
 	var chart = nv.models.pieChart()
 		.showLabels(false)
@@ -273,12 +273,25 @@ function PieChart(scope, element, data) {
 	    .y(function(d) { return d.y; })
 	    .values(function(d) { return d; })
 	    .color(d3.scale.category10().range());
-	
+
+	if (type === "donut") {
+		chart.showLabels(true)
+			 .labelType("percent")
+			 .labelThreshold(.05)
+			 .donut(true)
+			 .donutRatio(0.40);
+	}
+
 	d3.select(element[0])
 	  .datum(chart_data)
 	  .transition().duration(1200).call(chart);
 
 	return chart;
+}
+
+REGISTRY["donut"] = DonutChart;
+function DonutChart(scope, element, data) {
+	return PieChart(scope, element, data, "donut");
 }
 
 REGISTRY["dbar"] = DBarChart;
