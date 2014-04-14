@@ -139,11 +139,12 @@ public class ScriptBindings extends SimpleBindings {
 		}
 
 		if (META_VARS.contains(key)) {
+			String name = key.toString();
 			Object value = null;
 			try {
-				value = getSpecial((String) key);
+				value = getSpecial(name);
 			} catch (Exception e){}
-			super.put((String) key, value);
+			super.put(name, value);
 			return value;
 		}
 
