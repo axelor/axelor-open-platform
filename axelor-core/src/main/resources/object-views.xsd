@@ -960,6 +960,7 @@
                     <xsd:enumeration value="hbar" />
                     <xsd:enumeration value="line" />
                     <xsd:enumeration value="area" />
+                    <xsd:enumeration value="donut" />
                     <xsd:enumeration value="radar" />
                     <xsd:enumeration value="gauge" />
                     <xsd:enumeration value="scatter" />
