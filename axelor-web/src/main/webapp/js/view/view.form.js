@@ -205,27 +205,10 @@ function FormViewCtrl($scope, $element) {
 	
 	function updateSelected(field, records) {
 		if (!records) return;
-		
-		var child = $element.find('#' + field.widgetId);
-		if (child.size() === 0) {
-			var path = $scope.formPath ? $scope.formPath + '.' + field.name : field.name;
-			child = $element.find('[x-path="' + path + '"]:first');
-		}
-		
-		childScope = child.data('$scope');
-		
-		if (childScope == null || child.is(':hidden')) {
-			return records;
-		}
-
-		var selected = childScope.selection || [];
-		var items = records;
-		
-		if (childScope.getItems) {
-			items = childScope.getItems() || items;
-		}
 
 		function compact(item) {
+			if (!item) return item;
+			if (item.id <= 0) item.id = null;
 			if (item.id > 0 && item.version === undefined) {
 				return {
 					id: item.id,
@@ -233,6 +216,24 @@ function FormViewCtrl($scope, $element) {
 				};
 			}
 			return item;
+		}
+
+		var child = $element.find('#' + field.widgetId);
+		if (child.size() === 0) {
+			var path = $scope.formPath ? $scope.formPath + '.' + field.name : field.name;
+			child = $element.find('[x-path="' + path + '"]:first');
+		}
+
+		childScope = child.data('$scope');
+		if (childScope == null || child.is(':hidden')) {
+			return _.map(records, compact);
+		}
+
+		var selected = childScope.selection || [];
+		var items = records;
+		
+		if (childScope.getItems) {
+			items = childScope.getItems() || items;
 		}
 
 		return _.map(items, function(item, i) {
