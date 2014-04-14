@@ -402,7 +402,7 @@ ui.formInput('OneToMany', {
 				});
 				scope.$watch("isReadonly()", function(readonly) {
 					grid.setOptions({
-						editable: !readonly && scope.canEdit()
+						editable: !readonly
 					});
 					
 					var _editIcon = scope.canView() || (!readonly && scope.canEdit());
