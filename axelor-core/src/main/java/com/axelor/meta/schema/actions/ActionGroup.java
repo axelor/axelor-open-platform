@@ -247,7 +247,7 @@ public class ActionGroup extends ActionIndex {
     	
     	if (values instanceof Map) {
     		for (Object key : ((Map) values).keySet()) {
-    			String name = (String) key;
+    			String name = key.toString();
     			Map attrs = (Map) ((Map) values).get(key);
     			if (name.indexOf('$') == 0) name = name.substring(1);
     			if (attrs.containsKey("value")) {
