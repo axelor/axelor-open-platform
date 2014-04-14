@@ -139,10 +139,11 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 
 	$scope.removeSelected = function(selection) {
 		if (_.isEmpty(selection)) return;
-		var items = _.map(selection, function(i) {
-			return $scope.getItem(i);
+		var items = _.filter($scope.getItems(), function (item, i) {
+			return selection.indexOf(i) === -1;
 		});
-		return $scope.removeItems(items, true);
+		$scope.setValue(items, true);
+		$scope.applyLater();
 	};
 	
 	$scope.canEdit = function () {
