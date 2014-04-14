@@ -235,6 +235,11 @@ function FormViewCtrl($scope, $element) {
 		if (childScope.getItems) {
 			items = childScope.getItems() || items;
 		}
+		
+		if (items.length !== records.length) {
+			items = records;
+			selected = [];
+		}
 
 		return _.map(items, function(item, i) {
 			return _.extend({}, compact(item), {
