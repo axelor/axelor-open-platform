@@ -832,6 +832,17 @@ table.field-details .help-text hr {
 	        box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(82,168,236,.6);
 }
 
+.tag-select-placeholder {
+	position: absolute;
+	top: 2px;
+	left: 6px;
+	right: 16px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	color: #999999;
+}
+
 .ng-invalid > .tag-select:focus,
 .ng-invalid > .tag-select.focus {
 	border-color: #953B39;
@@ -873,19 +884,20 @@ table.field-details .help-text hr {
 	cursor: pointer;
 }
 
-.tag-select .tag-text {
-
+.tag-select .tag-text,
+.tag-select .tag-link,
+.tag-select-single .tag-link {
+	display: inline-block;
+	height: 15px;
+	max-width: 140px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	vertical-align: middle;
 }
 
 .tag-select .tag-link,
 .tag-select-single .tag-link {
 	cursor: pointer;
-	display: inline-block;
-	max-width: 140px;
-	height: 15px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	vertical-align: middle;
 }
 
 .tag-select .tag-link:hover,
