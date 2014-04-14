@@ -128,6 +128,9 @@ public class Search extends AbstractView {
 		@XmlAttribute
 		private String type;
 
+		@XmlAttribute
+		private String target;
+
 		public String getType() {
 			return type;
 		}
@@ -138,6 +141,11 @@ public class Search extends AbstractView {
 		
 		public static Map<String, ?> getTypes() {
 			return TYPES;
+		}
+
+		@Override
+		public String getTarget() {
+			return target;
 		}
 
 		public String getTargetName() {
