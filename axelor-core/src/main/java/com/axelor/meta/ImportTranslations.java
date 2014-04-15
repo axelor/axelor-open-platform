@@ -23,6 +23,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.db.JPA;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
 import com.google.common.base.Strings;
@@ -95,33 +96,41 @@ public class ImportTranslations {
 
 		return MetaTranslation.all().filter(query, params.toArray()).fetchOne();
 	}
+	
+	private static final int BATCH_SIZE = 20;
+	private int counter = 0;
+
+	private void save(MetaTranslation entity) {
+		
+		if (JPA.em().contains(entity) || entity.getId() == null) {
+			JPA.em().persist(entity);
+		} else {
+			JPA.em().merge(entity);
+		}
+		
+		if (++counter % BATCH_SIZE == 0) {
+			JPA.flush();
+			JPA.clear();
+		}
+	}
 
 	private void createOrUpdateTranslation(MetaTranslation meta) {
-
-		MetaTranslation foundedTranslation = searchMetaTranslation(meta);
-
-		if(foundedTranslation != null) {
-			LOG.trace("Found translation : " + foundedTranslation);
-			foundedTranslation.setTranslation(meta.getTranslation());
-			foundedTranslation.save();
-			return ;
+		MetaTranslation found = searchMetaTranslation(meta);
+		if(found != null) {
+			LOG.trace("Found translation : " + found);
+			found.setTranslation(meta.getTranslation());
+		} else {
+			save(meta);
 		}
-
-		meta.save();
 	}
 
 	private void createOrUpdateTranslation(String key, String type, String module, String domain, String translation, String language) {
-
-		MetaTranslation founded = MetaTranslation.findByAll(key, language, domain, type, module);
-
-		if(founded == null) {
-			founded = new MetaTranslation(key, language, translation, domain, type, module);
+		MetaTranslation found = MetaTranslation.findByAll(key, language, domain, type, module);
+		if (found == null) {
+			found = new MetaTranslation(key, language, translation, domain, type, module);
+		} else {
+			found.setTranslation(translation);
 		}
-		else {
-			founded.setTranslation(translation);
-		}
-
-		founded.save();
+		save(found);
 	}
-
 }
