@@ -368,7 +368,7 @@ class Property {
 	}
 
 	boolean isIndexable() {
-		if (this.isFormula() || this.isTransient() || attrs['index'] == 'false')
+		if (this.isUnique() || this.isFormula() || this.isTransient() || attrs['index'] == 'false')
 			return false
 		String index = attrs['index'] as String
 		return index =~ /true|^idx_/ ||
