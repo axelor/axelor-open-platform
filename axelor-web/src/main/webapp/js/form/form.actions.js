@@ -175,7 +175,9 @@ ActionHandler.prototype = {
 			});
 			return promise;
 		}
-		return this.handle();
+		return this._fireBeforeSave().then(function() {
+			return self.handle();
+		});
 	},
 
 	onChange: function(event) {
@@ -224,8 +226,38 @@ ActionHandler.prototype = {
 		// block the entire ui (auto unblocks when actions are complete)
 		_.delay(axelor.blockUI, 100);
 	},
-	
+
+	_fireBeforeSave: function() {
+		var form = this._getFormElement();
+		var scope = form.scope();
+		var event = scope.$broadcast('on:before-save', scope.record);
+		var deferred = this.ws.defer();
+
+		if (event.defaultPrevented) {
+			if (event.error) {
+				axelor.dialogs.error(event.error);
+			}
+			setTimeout(function() {
+				deferred.reject(event.error);
+			});
+		} else {
+			scope.$timeout(function() {
+				scope.ajaxStop(function() {
+					deferred.resolve();
+				}, 100);
+			}, 50);
+		}
+		return deferred.promise;
+	},
+
 	_handleSave: function() {
+		var self = this;
+		return this._fireBeforeSave().then(function() {
+			return self.__doHandleSave();
+		});
+	},
+
+	__doHandleSave: function() {
 
 		this._blockUI();
 
@@ -327,19 +359,9 @@ ActionHandler.prototype = {
 		var pattern = /(^sync\s*,\s*)|(^sync$)/;
 		if (pattern.test(action)) {
 			action = action.replace(pattern, '');
-			var formElement = this._getFormElement();
-			var formScope = formElement.scope();
-			var event = formScope.$broadcast('on:before-save');
-			if (event.defaultPrevented) {
-				if (event.error) {
-					axelor.dialogs.error(event.error);
-				}
-				setTimeout(function() {
-					deferred.reject(event.error);
-				});
-				return deferred.promise;
-			}
-			return self._handleAction(action);
+			return this._fireBeforeSave().then(function() {
+				return self._handleAction(action);
+			});
 		}
 
 		if (action === 'save') {
