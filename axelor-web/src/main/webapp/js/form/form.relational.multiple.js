@@ -192,9 +192,19 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	var _onSelectionChanged = $scope.onSelectionChanged;
 	$scope.onSelectionChanged = function(e, args) {
 		_onSelectionChanged(e, args);
-		if (detailView === null)
+
+		var field = $scope.field,
+			record = $scope.record || {},
+			selection = $scope.selection || [];
+
+		record.$many = record.$many || (record.$many = {});
+		record.$many[field.name] = selection.length ? $scope.getItems : null;
+
+		if (detailView === null) {
 			return;
-		$scope.$timeout(function(){
+		}
+
+		$scope.$timeout(function() {
 			var dvs = detailView.scope();
 			var rec = $scope.getSelectedRecord() || {};
 			detailView.show();
