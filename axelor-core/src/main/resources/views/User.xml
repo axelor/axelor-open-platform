@@ -35,7 +35,8 @@
         <group title="Preferences">
 			<field name="email" widget="Email" />
 			<field name="language" />
-			<field name="action" domain="self.type = 'action-view'" widget="SuggestBox" canNew="false"/>
+			<field name="homeAction" x-bind="{{actionSelect.name}}" hidden="true"/>
+			<field name="actionSelect" title="Action" x-target="com.axelor.meta.db.MetaAction" x-target-name="name" x-domain="self.type = 'action-view'" widget="SuggestBox" canNew="false"/>
         </group>
         <field name="roles" grid-view="role-grid" form-view="role-form" />
         <field name="permissions"/>
