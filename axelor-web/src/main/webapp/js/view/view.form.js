@@ -53,10 +53,7 @@ function FormViewCtrl($scope, $element) {
 		}
 		
 		attrs = _.extend({}, $scope.fields[name], $scope.fields_view[id]);
-		if ($scope.fields_view[id]) {
-			$scope.fields_view[id].widgetId = attrs.widgetId = id;
-		}
-		
+
 		return attrs;
 	};
 
@@ -203,89 +200,60 @@ function FormViewCtrl($scope, $element) {
 		});
 	};
 	
-	function updateSelected(field, records) {
-		if (!records) return;
-
-		function compact(item) {
-			if (!item) return item;
-			if (item.id <= 0) item.id = null;
-			if (item.id > 0 && item.version === undefined) {
-				return {
-					id: item.id,
-					$version: item.$version
-				};
-			}
-			return item;
-		}
-
-		var child = $element.find('#' + field.widgetId);
-		if (child.size() === 0) {
-			var path = $scope.formPath ? $scope.formPath + '.' + field.name : field.name;
-			child = $element.find('[x-path="' + path + '"]:first');
-		}
-
-		childScope = child.data('$scope');
-		if (childScope == null || child.is(':hidden')) {
-			return _.map(records, compact);
-		}
-
-		var selected = childScope.selection || [];
-		var items = records;
-		
-		if (childScope.getItems) {
-			items = childScope.getItems() || items;
-		}
-		
-		if (items.length !== records.length) {
-			items = records;
-			selected = [];
-		}
-
-		return _.map(items, function(item, i) {
-			return _.extend({}, compact(item), {
-				selected: _.contains(selected, i)
-			});
-		});
-	}
-	
 	$scope.getContext = function() {
 		var context = _.extend({}, $scope._routeSearch, $scope.record);
 		if ($scope.$parent && $scope.$parent.getContext) {
 			context._parent = $scope.$parent.getContext();
 		}
-		
-		_.each($scope.fields, function(field, name) {
-			if (/-many$/.test(field.type)) {
-				var items = updateSelected(field, context[name]);
-				if (items) {
-					context[name] = items;
-				}
+
+		function compact(item) {
+			if (!item) return item;;
+			if (item.id > 0 && item.version === undefined) {
+				return {
+					id: item.id,
+					selected: item.selected,
+					$version: item.$version
+				};
 			}
-		});
+			item = _.extend({}, item);
+			if (item.id <= 0) {
+				item.id = null;
+			}
+			return item;
+		}
 
-		var dummyFields = $scope.getDummyFields();
-		var dummyValues = $scope.getDummyValues();
-
-		_.each(dummyValues, function (value, name) {
+		var dummy = $scope.getDummyValues();
+		_.each(dummy, function (value, name) {
 			if (value && value.$updatedValues) {
-				dummyValues[name] = value.$updatedValues;
+				dummy[name] = value.$updatedValues;
 			}
 			if (name.indexOf('$') === 0) {
-				dummyValues[name.substring(1)] = dummyValues[name];
+				dummy[name.substring(1)] = dummy[name];
 			}
 		});
-		
-		_.each(dummyFields, function (field) {
-			if (/-many$/.test(field.type)) {
-				var items = updateSelected(field, dummyValues[field.name]);
-				if (items) {
-					dummyValues[field.name] = items;
-				}
-			}
-		});
-		
-		context = _.extend(context, dummyValues);
+
+		context = _.extend(context, dummy);
 		context._model = ds._model;
+
+		// use selected flag for o2m/m2m fields
+		// see onSelectionChanged in o2m controller
+		_.each(context.$many, function (getItems, name) {
+			if (!getItems) return;
+			if (name.indexOf('$') === 0) name = name.substring(1);
+			var items = getItems();
+			var value = context[name] || [];
+			if (items && items.length === value.length) {
+				context[name] = items;
+			}
+		});
+
+		// compact o2m/m2m records
+		_.each(context, function (value, name) {
+			if (_.isArray(value)) {
+				context[name] = _.map(value, compact);
+			}
+		});
+
 		return context;
 	};
 
@@ -468,18 +436,16 @@ function FormViewCtrl($scope, $element) {
 			record._dirty = true;
 		});
 	};
-
-	$scope.getDummyFields = function() {
-		var fields = _.keys($scope.fields);
-		return _.filter($scope.fields_view, function(f){
-			return f.name && !_.contains(fields, f.name);
-		});
-	};
 	
 	$scope.getDummyValues = function() {
 		if (!$scope.record) return {};
-		var names = _.pluck($scope.getDummyFields(), 'name');
-		return _.pick($scope.record, names);
+		var fields = _.keys($scope.fields);
+		var extra = _.chain($scope.fields_view)
+					  .filter(function(f){ return f.name && !_.contains(fields, f.name); })
+					  .pluck('name')
+					  .compact()
+					  .value();
+		return _.pick($scope.record, extra);
 	};
 
 	$scope.onSave = function(options) {

@@ -404,10 +404,16 @@ function GridViewCtrl($scope, $element) {
 	};
 	
 	$scope.onSelectionChanged = function(event, args) {
+		var items = $scope.getItems();
 		var selection = _.filter(args.rows, function(index) {
-			var item = $scope.dataView.getItem(index);
+			var item = items[index];
 			return item && item.id !== 0;
 		});
+
+		_.each(items, function (item, i) {
+			item.selected = selection.indexOf(i) > -1;
+		});
+
 		$scope.selection = selection;
 		$scope.applyLater();
 	};
