@@ -15,7 +15,8 @@
 		<field name="group"/>
     </grid>
     
-    <form name="user-form" title="User" model="com.axelor.auth.db.User" cols="1" onSave="com.axelor.auth.AuthService:validate">
+    <form name="user-form" title="User" model="com.axelor.auth.db.User" cols="1" onSave="com.axelor.auth.AuthService:validate"
+        onLoad="com.axelor.auth.AuthService:preferences">
         <group title="General Info">
             <field name="name" placeholder="user name" validIf="name.length &gt;= 2" onChange="action-condition-user-validName"/>
             <field name="group" placeholder="user group"/>
@@ -35,8 +36,8 @@
         <group title="Preferences">
 			<field name="email" widget="Email" />
 			<field name="language" />
-			<field name="homeAction" x-bind="{{actionSelect.name}}" hidden="true"/>
-			<field name="actionSelect" title="Action" x-target="com.axelor.meta.db.MetaAction" x-target-name="name" x-domain="self.type = 'action-view'" widget="SuggestBox" canNew="false"/>
+			<field name="homeAction" x-bind="{{__actionSelect.name}}" hidden="true"/>
+            <field name="__actionSelect" title="Action" x-target="com.axelor.meta.db.MetaAction" x-target-name="name" x-domain="self.type = 'action-view'" widget="SuggestBox" canNew="false"/>
         </group>
         <field name="roles" grid-view="role-grid" form-view="role-form" />
         <field name="permissions"/>
@@ -46,8 +47,8 @@
 		onNew="com.axelor.auth.AuthService:preferences">
 		<field name="email" widget="Email" />
 		<field name="language" />
-        <field name="homeAction" x-bind="{{actionSelect.name}}" hidden="true"/>
-		<field name="actionSelect" title="Action" x-target="com.axelor.meta.db.MetaAction" x-target-name="name" x-domain="self.type = 'action-view'" widget="SuggestBox" canNew="false"/>
+        <field name="homeAction" x-bind="{{__actionSelect.name}}" hidden="true"/>
+		<field name="__actionSelect" title="Action" x-target="com.axelor.meta.db.MetaAction" x-target-name="name" x-domain="self.type = 'action-view'" widget="SuggestBox" canNew="false"/>
 	</form>
 	
     <action-condition name="action-condition-user-validCode">

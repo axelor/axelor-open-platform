@@ -40,6 +40,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Longs;
 import com.google.inject.persist.Transactional;
 
 /**
@@ -234,25 +235,37 @@ public class AuthService {
 	 */
 	@Transactional
 	public void preferences(ActionRequest request, ActionResponse response) {
-		final User user = AuthUtils.getUser();
+		Long id = null;
+		User user = null;
+		try {
+			id = Longs.tryParse(request.getContext().get("id").toString());
+			user = User.find(id);
+		} catch (Exception e) {
+		}
+
+		if (user == null) {
+			user = AuthUtils.getUser();
+		}
 		if (user == null) {
 			response.setStatus(ActionResponse.STATUS_FAILURE);
 			return;
 		}
-		
+
 		final Map<String, Object> values = Maps.newHashMap();
 		final MetaAction action = MetaAction.findByName(user.getHomeAction());
-		
-		values.put("id", user.getId());
-		values.put("version", user.getVersion());
-		values.put("email", user.getEmail());
-		values.put("language", user.getLanguage());
-		values.put("homeAction", user.getHomeAction());
-		
-		if (action != null) {
-			values.put("actionSelect", Resource.toMapCompact(action));
+
+		if (id == null) {
+			values.put("id", user.getId());
+			values.put("version", user.getVersion());
+			values.put("email", user.getEmail());
+			values.put("language", user.getLanguage());
+			values.put("homeAction", user.getHomeAction());
 		}
-		
+
+		if (action != null) {
+			values.put("__actionSelect", Resource.toMapCompact(action));
+		}
+
 		response.setValues(values);
 		response.setStatus(ActionResponse.STATUS_SUCCESS);
 	}
