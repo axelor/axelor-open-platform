@@ -525,7 +525,13 @@ function Chart(scope, element, data) {
 		chart.noData(_t('No Data Available.'));
 		var tickFormats = {
 			"month" : function(d) {
-				return moment([2000, d - 1, 1]).format("MMM");
+				if (_.isNumber(d)) {
+					return moment([2000, d - 1, 1]).format("MMM");
+				}
+				if (_.isString(d) && d.indexOf('-') > 0) {
+					return moment(d).format('MMM, YYYY');
+				}
+				return d;
 			},
 			"year" : function(d) {
 				return moment([2000, d - 1, 1]).format("YYYY");
