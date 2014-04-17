@@ -178,7 +178,7 @@ public class ViewLoader extends AbstractLoader {
 		}
 
 		// set priority higher to existing view
-		if (other != null && !Objects.equal(xmlId, other.getXmlId())) {
+		if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
 			entity.setPriority(other.getPriority() + 1);
 		}
 
@@ -227,7 +227,7 @@ public class ViewLoader extends AbstractLoader {
 		}
 
 		// set priority higher to existing view
-		if (other != null && !Objects.equal(xmlId, other.getXmlId())) {
+		if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
 			entity.setPriority(other.getPriority() + 1);
 		}
 		
