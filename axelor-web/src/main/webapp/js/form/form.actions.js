@@ -573,10 +573,24 @@ ActionHandler.prototype = {
 				return;
 			}
 
+			function isDotted() {
+				var name = item.attr('x-field') || '';
+				var dotted = name.indexOf('.') > -1;
+				if (dotted) {
+					itemAttrs.$hasDotted = true;
+				}
+				return dotted;
+			}
+
 			forEach(itemAttrs, function(value, attr){
-				
-				if (itemIndex > 0 && attr && (attr === "value" || attr.indexOf("value:") === 0)) {
-					return;
+
+				if ((attr === "value" || attr.indexOf('value:') === 0)) {
+					if (isDotted()) return;
+					if (itemAttrs.$hasDotted) {
+						itemAttrs.$hasDotted = false;
+					} else if (itemIndex > 0) {
+						return;
+					}
 				}
 				
 				switch(attr) {
