@@ -274,9 +274,9 @@ var NestedEditor = {
 				icons = {};
 				names = scope.field.icons || scope.$parent.field.icons;
 				if (names === false) {
-					icons[which] = false;
-				} else if (names === true) {
-					icons[which] = true;
+					icons.$all = false;
+				} else if (names === true || names === undefined) {
+					icons.$all = true;
 				} else if (names) {
 					names = names.split(',');
 					names.forEach(function (name) {
@@ -284,7 +284,9 @@ var NestedEditor = {
 					});
 				}
 			}
-			return icons[which];
+			if (icons.$all !== undefined) return icons.$all;
+			if (icons[which] !== undefined) return icons[which];
+			return true;
 		};
 		
 		scope.canClose = function() {
@@ -329,7 +331,7 @@ var NestedEditor = {
 	'<fieldset class="form-item-group bordered-box" ui-show="visible">'+
 		'<legend>'+
 			'<span ng-bind-html-unsafe="title"></span> '+
-			'<span class="legend-toolbar" ng-show="!isReadonly()">'+
+			'<span class="legend-toolbar" style="display: none;" ng-show="!isReadonly()">'+
 				'<a href="" tabindex="-1" ng-click="onClear()" title="{{\'Clear\' | t}}" ng-show="canShowIcon(\'clear\')"><i class="fa fa-ban"></i></a> '+
 				'<a href="" tabindex="-1" ng-click="onSelect()" title="{{\'Select\' | t}}" ng-show="canShowIcon(\'select\')"><i class="fa fa-search"></i></a> '+
 				'<a href="" tabindex="-1" ng-click="onClose()" title="{{\'Close\' | t}}" ng-show="canClose()"><i class="fa fa-times-circle"></i></a>'+
