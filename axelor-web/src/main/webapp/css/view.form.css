@@ -447,6 +447,10 @@ td.form-item > * {
 	bottom: 12px;
 }
 
+.form-item .nested-editor > legend > .legend-toolbar a {
+	outline: none;
+}
+
 .form-item .nested-editor > legend > .legend-toolbar a:hover {
 	text-decoration: none;
 }
