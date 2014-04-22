@@ -251,6 +251,12 @@ var NestedEditor = {
 				updateFlag = true;
 				setValidity(nested, nested.isValid());
 			}, true);
+			nested.$on('on:attrs-change:value', function (e, opts) {
+				var itemScope = opts.scope;
+				if (itemScope && itemScope.record === nested.record) {
+					updateFlag = true;
+				}
+			});
 		}
 		
 		scope.ngModel = model;
