@@ -633,6 +633,11 @@ ActionHandler.prototype = {
 				case 'value:set':
 					if (itemScope.setValue) {
 						itemScope.setValue(value);
+						formScope.$broadcast('on:attrs-change:value', {
+							item: item,
+							scope: itemScope,
+							value: value
+						});
 					}
 					break;
 				case 'value:add':
