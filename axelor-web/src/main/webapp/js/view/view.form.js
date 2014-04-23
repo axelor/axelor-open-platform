@@ -684,8 +684,12 @@ function FormViewCtrl($scope, $element) {
 
 	$scope.onHotKey = function (e, action) {
 		
-		if (action === "save" && $scope.canSave()) {
-			$scope.onSave();
+		if (action === "save") {
+			if (!$scope.canSave()) {
+				$scope.showErrorNotice();
+			} else {
+				$scope.onSave();
+			}
 		}
 		if (action === "refresh") {
 			$scope.onRefresh();
