@@ -25,7 +25,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
-import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 import org.slf4j.Logger;
@@ -81,6 +80,7 @@ public class ActionHandler {
 
 		this.scriptHelper = new GroovyScriptHelper(this.context);
 		this.bindings = this.scriptHelper.getBindings();
+		this.bindings.put("__me__", this);
 	}
 
 	@Inject
@@ -206,9 +206,10 @@ public class ActionHandler {
 
 	public Object selectOne(String query, Object... params) {
 		Query q = select(query, params);
+		q.setMaxResults(1);
 		try {
-			return q.getSingleResult();
-		} catch (NoResultException e) {
+			return q.getResultList().get(0);
+		} catch (Exception e) {
 		}
 		return null;
 	}
