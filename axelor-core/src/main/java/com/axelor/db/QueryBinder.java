@@ -22,6 +22,7 @@ import java.util.Map;
 import javax.persistence.FlushModeType;
 import javax.persistence.Parameter;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Adapter;
 import com.axelor.script.ScriptBindings;
 import com.google.common.collect.Maps;
@@ -147,7 +148,9 @@ public class QueryBinder {
 		if (params != null) {
 			for (int i = 0; i < params.length; i++) {
 				Object param = params[i];
-				if (param instanceof String && bindings.containsKey(param)) {
+				if (param instanceof String
+						&& !StringUtils.isBlank((String) param)
+						&& bindings.containsKey(param)) {
 					param = bindings.get(param);
 				}
 				try {
