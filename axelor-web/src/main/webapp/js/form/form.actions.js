@@ -181,14 +181,10 @@ ActionHandler.prototype = {
 	},
 
 	onChange: function(event) {
-		var deferred = this.ws.defer(),
-			promise = deferred.promise;
-
 		var self = this;
-		setTimeout(function(){
-			self.handle().then(deferred.resolve, deferred.reject);
+		return this._fireBeforeSave().then(function() {
+			return self.handle();
 		});
-		return promise;
 	},
 	
 	_getContext: function() {
