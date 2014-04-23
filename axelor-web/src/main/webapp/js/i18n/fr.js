@@ -148,6 +148,7 @@ _t.put({
 "Filter": "Filtre",
 "Reference": "Référence",
 "Create \"{0}\" and add...": "Créer \"{0}\" et ajouter...",
+"Create \"{0}\" and select...": "Créer \"{0}\" et sélectionner...",
 "Create \"{0}\"...": "Créer \"{0}\"...",
 "Search...": "Rechercher...",
 "Create...": "Créer...",
