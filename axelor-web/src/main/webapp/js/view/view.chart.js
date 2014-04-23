@@ -589,14 +589,16 @@ var directiveFn = function(){
 		link: function(scope, element, attrs) {
 			
 			var initialized = false;
-
+			var svg = element.children('svg');
+			var form = element.children('.chart-controls');
+			
 			scope.render = function(data) {
-				var elem = element.children('svg');
-				if (elem.is(":hidden")) {
+				if (svg.is(":hidden")) {
 					return initialized = false;
 				}
+				svg.height(element.height() - form.height());
 				scope.title = data.title;
-				Chart(scope, elem, data);
+				Chart(scope, svg, data);
 				return initialized = true;
 			};
 
