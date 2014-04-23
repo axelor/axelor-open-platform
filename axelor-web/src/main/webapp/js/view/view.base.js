@@ -197,7 +197,11 @@ function DSViewCtrl(type, $scope, $element) {
 					}
 					toolbar.push(button);
 				});
-				if (!params.forceTitle && schema.title) {
+				var forceTitle = params.forceTitle;
+				if (forceTitle === undefined) {
+					forceTitle = (params.params||{}).forceTitle;
+				}
+				if (!forceTitle && schema.title) {
 					$scope.viewTitle = schema.title;
 				}
 				$scope.fields = fields;
