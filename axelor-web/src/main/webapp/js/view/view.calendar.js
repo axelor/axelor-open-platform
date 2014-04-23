@@ -187,8 +187,8 @@ function CalendarViewCtrl($scope, $element) {
 
 		var diff = moment(info.end).diff(info.start, "minutes");
 		var title = this.fields[view.title];
-		var titleText = _t('Unknown');
-
+		var titleText = null;
+		
 		if (title) {
 			value = record[title.name];
 			if (title.targetName) {
@@ -201,7 +201,7 @@ function CalendarViewCtrl($scope, $element) {
 					titleText = select.title;
 				}
 			}
-			titleText = titleText || value;
+			titleText = titleText || value || _t('Unknown');
 		}
 		
 		info.title = ("" + titleText);
