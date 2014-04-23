@@ -23,6 +23,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("spacer")
-public class Spacer extends AbstractWidget {
+public class Spacer extends SimpleWidget {
 
 }
