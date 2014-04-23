@@ -829,7 +829,12 @@
 					}
 					
 					if (index > -1) {
-						records.splice(index, 1, data);
+						var old = records.splice(index, 1, data)[0];
+						_.each(old, function (value, key) {
+							if (key.indexOf('.') > -1 && !data.hasOwnProperty(key)) {
+								data[key] = value;
+							}
+						});
 					} else {
 						records.push(record);
 						page.total += 1;
