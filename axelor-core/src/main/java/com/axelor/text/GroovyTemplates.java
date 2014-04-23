@@ -17,7 +17,7 @@
  */
 package com.axelor.text;
 
-import groovy.text.GStringTemplateEngine;
+import groovy.text.StreamingTemplateEngine;
 import groovy.text.TemplateEngine;
 import groovy.xml.XmlUtil;
 
@@ -50,7 +50,7 @@ import com.google.common.io.CharStreams;
  */
 public class GroovyTemplates implements Templates {
 
-	private static final TemplateEngine engine = new GStringTemplateEngine();
+	private static final TemplateEngine engine = new StreamingTemplateEngine();
 
 	class GroovyTemplate implements Template {
 

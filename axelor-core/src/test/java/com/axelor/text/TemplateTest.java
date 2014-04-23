@@ -28,6 +28,8 @@ import com.google.common.collect.Maps;
 
 public class TemplateTest extends AbstractTest {
 
+	private static final String GROOVY_SPECIAL = "Hello: \\@ ${firstName} \\\"${lastName}\\\" = \\* ${nested.message}";
+	
 	private static final String GROOVY_TEMPLATE = "Hello: ${firstName} ${lastName} = ${nested.message}";
 
 	private static final String STRING_TEMPLATE = "Hello: <firstName> <lastName> = <nested.message>";
@@ -47,6 +49,19 @@ public class TemplateTest extends AbstractTest {
 		vars.put("nested", Maps.newHashMap(vars));
 	}
 	
+	@Test
+	public void testGroovySpecial() {
+
+		Templates templates = new GroovyTemplates();
+		Template template = templates.fromText(GROOVY_SPECIAL);
+		
+		try {
+			template.make(vars).render();
+		} catch (Exception e) {
+			Assert.fail();
+		}
+	}
+
 	@Test
 	public void testGroovyTemplate() {
 
