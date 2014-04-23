@@ -147,11 +147,7 @@ public class QueryBinder {
 		if (params != null) {
 			for (int i = 0; i < params.length; i++) {
 				Object param = params[i];
-				if (param instanceof String
-						&& ((String) param).startsWith("__")
-						&& ((String) param).endsWith("__")
-						&& bindings.containsKey(param)) {
-					// special variable
+				if (param instanceof String && bindings.containsKey(param)) {
 					param = bindings.get(param);
 				}
 				try {
