@@ -28,7 +28,7 @@ import com.google.common.collect.Maps;
 
 public class TemplateTest extends AbstractTest {
 
-	private static final String GROOVY_SPECIAL = "Hello: \\@ ${firstName} \\\"${lastName}\\\" = \\* ${nested.message}";
+	private static final String GROOVY_SPECIAL = "<?mso-application progid=\"Word.Document\"?> \\@ ${firstName} \\\"${lastName}\\\" = \\* ${nested.message}";
 	
 	private static final String GROOVY_TEMPLATE = "Hello: ${firstName} ${lastName} = ${nested.message}";
 

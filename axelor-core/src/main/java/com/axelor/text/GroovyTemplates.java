@@ -17,6 +17,7 @@
  */
 package com.axelor.text;
 
+import groovy.text.GStringTemplateEngine;
 import groovy.text.StreamingTemplateEngine;
 import groovy.text.TemplateEngine;
 import groovy.xml.XmlUtil;
@@ -50,14 +51,20 @@ import com.google.common.io.CharStreams;
  */
 public class GroovyTemplates implements Templates {
 
-	private static final TemplateEngine engine = new StreamingTemplateEngine();
-
+	private static final TemplateEngine GSTRING_ENGINE = new GStringTemplateEngine();
+	private static final TemplateEngine STREAMING_ENGINE = new StreamingTemplateEngine();
+	
 	class GroovyTemplate implements Template {
 
 		private String text;
 
 		public GroovyTemplate(String text) {
 			this.text = text;
+		}
+
+		private boolean isWordTemplate(String text) {
+			if (StringUtils.isBlank(text)) return false;
+			return text.indexOf("<?mso-application") > -1;
 		}
 
 		private String process(String text) {
@@ -77,6 +84,7 @@ public class GroovyTemplates implements Templates {
 		public Renderer make(final Map<String, Object> context) {
 			final ScriptBindings bindings = new ScriptBindings(context);
 			final String text = process(this.text);
+			final TemplateEngine engine = isWordTemplate(text) ? STREAMING_ENGINE : GSTRING_ENGINE;
 			
 			bindings.put("__fmt__", new FormatHelper());
 			
