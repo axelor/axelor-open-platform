@@ -25,6 +25,8 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
+import com.axelor.common.ClassUtils;
+import com.axelor.db.mapper.Mapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -91,6 +93,14 @@ public abstract class AbstractWidget {
 			if (name.startsWith("x-") || name.startsWith("data-")) {
 				name = name.replaceFirst("^(x|data)-", "");
 				attrs.put(name, value);
+			}
+		}
+		if (attrs.containsKey("target") && !attrs.containsKey("targetName")) {
+			try {
+				Class<?> target = ClassUtils.findClass(attrs.get("target").toString());
+				String targetName = Mapper.of(target).getNameField().getName();
+				attrs.put("targetName", targetName);
+			} catch (Exception e) {
 			}
 		}
 		return attrs;
