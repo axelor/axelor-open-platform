@@ -685,8 +685,17 @@ public class Resource<T extends Model> {
 
 		Mapper mapper = Mapper.of(model);
 		Map<String, Object> data = request.getData();
+		
+		Property property = null;
+		try {
+			property = mapper.getProperty(request.getFields().get(0));
+		} catch (Exception e) {
+		}
 
-		Property property = mapper.getNameField();
+		if (property == null) {
+			property = mapper.getNameField();
+		}
+
 		if (property != null) {
 			String qs = String.format(
 					"SELECT self.%s FROM %s self WHERE self.id = :id",
