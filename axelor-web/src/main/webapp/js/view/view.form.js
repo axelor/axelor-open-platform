@@ -64,12 +64,12 @@ function FormViewCtrl($scope, $element) {
 		return ds.read(id, params);
 	};
 
-	function doEdit(id, dummy) {
+	function doEdit(id, dummy, fireOnLoad) {
 		return $scope.doRead(id).success(function(record){
 			if (dummy) {
 				record = _.extend(dummy, record);
 			}
-			$scope.edit(record);
+			$scope.edit(record, fireOnLoad);
 		});
 	}
 	
@@ -176,9 +176,10 @@ function FormViewCtrl($scope, $element) {
 		return state ? doEdit(state) : $scope.edit(null);
 	};
 
-	$scope.edit = function(record) {
+	$scope.edit = function(record, fireOnLoad) {
 		$scope.editRecord(record);
 		$scope.updateRoute();
+		if (fireOnLoad === false) return;
 		$scope._viewPromise.then(function(){
 			$scope.ajaxStop(function(){
 				var handler = $scope.$events.onLoad,
@@ -453,9 +454,11 @@ function FormViewCtrl($scope, $element) {
 		var defer = $scope._defer();
 		var event = $scope.$broadcast('on:before-save', $scope.record);
 		var saveAction = $scope.$events.onSave;
+		var fireOnLoad = true;
 		
 		if (options && options.callOnSave === false) {
 			saveAction = null;
+			fireOnLoad = false;
 		}
 
 		if (event.defaultPrevented) {
@@ -475,7 +478,7 @@ function FormViewCtrl($scope, $element) {
 			
 			values = ds.diff(values, $scope.$$original);
 			promise = ds.save(values).success(function(record, page) {
-				return doEdit(record.id, dummy);
+				return doEdit(record.id, dummy, fireOnLoad);
 			});
 
 			promise.success(function(record) {
