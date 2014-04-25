@@ -72,13 +72,9 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	};
 	
 	$scope.select = function(value) {
-		var items = value,
+		var items = _.chain([value]).flatten(true).compact().value(),
 			records;
-	
-		if (!_.isArray(value)) {
-			items = [value];
-		}
-
+		
 		records = _.map($scope.getItems(), function(item){
 			return _.clone(item);
 		});
