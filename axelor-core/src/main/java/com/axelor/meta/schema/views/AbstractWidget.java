@@ -35,6 +35,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
 
 @XmlType
@@ -92,6 +93,7 @@ public abstract class AbstractWidget {
 			String value = otherAttributes.get(qn);
 			if (name.startsWith("x-") || name.startsWith("data-")) {
 				name = name.replaceFirst("^(x|data)-", "");
+				name = CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, name);
 				attrs.put(name, value);
 			}
 		}
