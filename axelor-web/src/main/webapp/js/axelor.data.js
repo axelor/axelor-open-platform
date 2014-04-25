@@ -698,8 +698,12 @@
 				return promise;
 			},
 			
-			details: function(id) {
-				var promise = this._request('details', id).get();
+			details: function(id, name) {
+				var promise = this._request('details', id).get({
+					params: {
+						name: name
+					}
+				});
 				promise.success = function(fn){
 					promise.then(function(response){
 						var res = response.data,

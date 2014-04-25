@@ -92,7 +92,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 			};
 			record[nameField] = value[nameField];
 			if (nameField && _.isUndefined(value[nameField])) {
-				return ds.details(value.id).success(function(rec){
+				return ds.details(value.id, nameField).success(function(rec){
 					$scope.setValue(rec, true);
 				});
 			}

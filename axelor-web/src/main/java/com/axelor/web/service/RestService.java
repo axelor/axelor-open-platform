@@ -67,6 +67,7 @@ import com.google.common.base.Charsets;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.inject.servlet.RequestScoped;
@@ -223,13 +224,14 @@ public class RestService extends ResourceService {
 
 	@GET
 	@Path("{id}/details")
-	public Response details(@PathParam("id") long id) {
+	public Response details(@PathParam("id") long id, @QueryParam("name") String name) {
 		Request request = new Request();
 		Map<String, Object> data = new HashMap<String, Object>();
 
 		data.put("id", id);
 		request.setModel(getModel());
 		request.setData(data);
+		request.setFields(Lists.newArrayList(name));
 
 		return getResource().getRecordName(request);
 	}
