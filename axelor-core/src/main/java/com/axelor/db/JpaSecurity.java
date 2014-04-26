@@ -33,11 +33,11 @@ public interface JpaSecurity {
 
 		private String message;
 		private AccessType(String message) {
-			this.message = JPA.translate(message);
+			this.message = message;
 		}
 		
 		public String getMessage() {
-			return message;
+			return JPA.translate(message);
 		}
 	}
 	

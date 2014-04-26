@@ -189,7 +189,8 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
 		if (isPermitted(type, model, ids)) {
 			return;
 		}
-		throw new UnauthorizedException(type.getMessage());
+		final AuthSecurityException cause = new AuthSecurityException(type, model, ids);
+		throw new UnauthorizedException(type.getMessage(), cause);
 	}
 
 	@Override

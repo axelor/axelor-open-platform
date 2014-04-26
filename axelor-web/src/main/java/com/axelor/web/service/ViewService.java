@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.TypedQuery;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -34,7 +33,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import com.axelor.auth.AuthUtils;
-import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
@@ -287,37 +285,19 @@ public class ViewService extends AbstractService {
 		return response;
 	}
 
+	@SuppressWarnings("all")
 	private Map<String, Object> perms(Class<?> model) {
-		User user = AuthUtils.getUser();
-		if (user == null || user.getGroup() == null
-				|| "admin".equals(user.getCode())
-				|| "admins".equals(user.getGroup().getCode())) {
-			return null;
-		}
+		final User user = AuthUtils.getUser();
+		if (user == null || "admin".equals(user.getCode())) return null;
+		if (user.getGroup() != null && "admins".equals(user.getGroup().getCode())) return null;
 
-		TypedQuery<Permission> q = JPA.em().createQuery(
-				"SELECT p FROM User u " +
-				"LEFT JOIN u.group AS g " +
-				"LEFT JOIN g.permissions AS p " +
-				"WHERE u.code = :code AND p.object = :object", Permission.class);
+		final Map<String, Object> map = Maps.newHashMap();
 
-		q.setParameter("code", user.getCode());
-		q.setParameter("object", model.getName());
-		q.setMaxResults(1);
-
-		Permission p;
-		try {
-			p = q.getResultList().get(0);
-		} catch (IndexOutOfBoundsException e){
-			return null;
-		}
-
-		Map<String, Object> map = Maps.newHashMap();
-		map.put("read", p.getCanRead());
-		map.put("write", p.getCanWrite());
-		map.put("create", p.getCanCreate());
-		map.put("remove", p.getCanRemove());
-		map.put("export", p.getCanExport());
+		map.put("read", security.isPermitted(AccessType.READ, (Class) model));
+		map.put("write", security.isPermitted(AccessType.WRITE, (Class) model));
+		map.put("create", security.isPermitted(AccessType.CREATE, (Class) model));
+		map.put("remove", security.isPermitted(AccessType.REMOVE, (Class) model));
+		map.put("export", security.isPermitted(AccessType.EXPORT, (Class) model));
 
 		return map;
 	}
