@@ -462,7 +462,7 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			element.find(':input:first').focus();
 			
 			//XXX: ui-dialog issue
-			element.find('.slick-headerrow-column').zIndex(element.zIndex());
+			element.find('.slick-headerrow-column,.slickgrid').zIndex(element.zIndex());
 			
 			axelor.$adjustSize();
 
