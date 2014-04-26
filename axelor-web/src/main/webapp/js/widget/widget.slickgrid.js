@@ -127,6 +127,7 @@ var Editor = function(args) {
 		element.appendTo(element.data('$parent') || form)
 			   .removeData('$parent');
 		element.trigger("hide:slick-editor");
+		element.parent().zIndex('');
 	};
 	
 	this.position = function(pos) {
@@ -134,6 +135,11 @@ var Editor = function(args) {
 		scope.applyLater(function(){
 			element.trigger("show:slick-editor");
 		});
+		//XXX: ui-dialog issue
+		var zIndex = element.parents('.slickgrid:first').zIndex();
+		if (zIndex) {
+			element.parent().zIndex(zIndex);
+		}
 	};
 	
 	function focus() {
