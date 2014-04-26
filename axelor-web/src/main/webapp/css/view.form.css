@@ -1041,7 +1041,7 @@ table.field-details .help-text hr {
 	position: relative;
 	display: inline-block;
 	margin: 0 5px;
-	margin-bottom: 0;
+	margin-top: 2px;
 }
 
 .filter-box > input {

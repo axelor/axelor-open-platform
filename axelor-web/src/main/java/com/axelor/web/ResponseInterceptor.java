@@ -26,7 +26,9 @@ import org.apache.shiro.authz.AuthorizationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.auth.AuthSecurityException;
 import com.axelor.db.JPA;
+import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.rpc.Response;
 
 public class ResponseInterceptor implements MethodInterceptor {
@@ -59,17 +61,26 @@ public class ResponseInterceptor implements MethodInterceptor {
 					txn.begin();
 				} catch(Exception ex){}
 			}
-			response = new Response();
-			if (e instanceof AuthorizationException) {
-				if (!e.toString().contains("not authorized to read")) {
-					response.setException(e);
-				}
-			} else {
-				response.setException(e);
-			}
-			log.error("Error: {}", e, e);
+			response = onException(e);
 		} finally {
 			running.remove();
+		}
+		return response;
+	}
+
+	private Response onException(Exception e) {
+		final Response response = new Response();
+		if (!(e instanceof AuthorizationException)) {
+			response.setException(e);
+			log.error("Error: {}", e, e);
+			return response;
+		}
+		if (e.getCause() instanceof AuthSecurityException) {
+			AuthSecurityException cause = (AuthSecurityException) e.getCause();
+			if (cause.getType() != AccessType.READ) {
+				response.setException(cause);
+			}
+			log.error("Access Error: {}", cause.getMessage());
 		}
 		return response;
 	}
