@@ -603,11 +603,17 @@ ActionHandler.prototype = {
 					itemScope.attr('collapse', value);
 					break;
 				case 'title':
-					if (label) {
-						label.html(value);
-					} else if (item.is('label')) {
-						item.html(value);
-					}
+					(function () {
+						var span = $(label).add(item).children('span[ui-help-popover]:first');
+						if (span.size() === 0) {
+							span = label;
+						}
+						if (span.size() > 0) {
+							span.html(value);
+						} else if (item.is('label')) {
+							item.html(value);
+						}
+					})();
 					itemScope.attr('title', value);
 					break;
 				case 'color':
