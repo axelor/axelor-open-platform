@@ -25,15 +25,22 @@ import groovy.xml.XmlUtil;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.app.AppSettings;
+import com.axelor.common.ClassUtils;
+import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
@@ -53,6 +60,9 @@ public class GroovyTemplates implements Templates {
 
 	private static final TemplateEngine GSTRING_ENGINE = new GStringTemplateEngine();
 	private static final TemplateEngine STREAMING_ENGINE = new StreamingTemplateEngine();
+
+	private static final String TEMPLATE_DIR = AppSettings.get().getPath("template.search.dir", "{java.io.tmpdir}/axelor/templates");
+	private static final Pattern INCLUDE_PAT = Pattern.compile("\\{\\{\\<\\s*(.*?)\\s*\\>\\}\\}");
 	
 	class GroovyTemplate implements Template {
 
@@ -66,6 +76,30 @@ public class GroovyTemplates implements Templates {
 			if (StringUtils.isBlank(text)) return false;
 			return text.indexOf("<?mso-application") > -1;
 		}
+		
+		private String read(String included) throws IOException {
+
+			Reader reader = null;
+			File file = FileUtils.getFile(TEMPLATE_DIR, included);
+			if (file.isFile()) {
+				reader = new FileReader(file);
+			} else {
+				InputStream stream = ClassUtils.getResourceStream(included);
+				if (stream != null) {
+					reader = new InputStreamReader(stream);
+				}
+			}
+			
+			if (reader == null) {
+				return "";
+			}
+			
+			try {
+				return CharStreams.toString(reader);
+			} finally {
+				reader.close();
+			}
+		}
 
 		private String process(String text) {
 			if (StringUtils.isBlank(text)) {
@@ -77,7 +111,21 @@ public class GroovyTemplates implements Templates {
 			if (text.trim().startsWith("<?xml ")) {
 				text = text.replaceAll("\\$\\{(.*?)\\}", "\\${__fmt__.escape($1)}");
 			}
-			return text;
+
+			StringBuilder builder = new StringBuilder();
+			Matcher matcher = INCLUDE_PAT.matcher(text);
+			int position = 0;
+			while (matcher.find()) {
+				builder.append(text.substring(position, matcher.start()));
+				position = matcher.end();
+				try {
+					String include = read(matcher.group(1));
+					builder.append(process(include));
+				} catch (IOException e) {
+				}
+			}
+			builder.append(text.substring(position));
+			return builder.toString();
 		}
 		
 		@Override
