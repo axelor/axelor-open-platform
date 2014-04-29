@@ -17,6 +17,12 @@
  */
 package com.axelor.text;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -24,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.axelor.AbstractTest;
+import com.axelor.common.ClassUtils;
 import com.google.common.collect.Maps;
 
 public class TemplateTest extends AbstractTest {
@@ -49,6 +56,23 @@ public class TemplateTest extends AbstractTest {
 		vars.put("nested", Maps.newHashMap(vars));
 	}
 	
+	@Test
+	public void testGroovyInclude() throws Exception {
+	
+		InputStream stream = ClassUtils.getResourceStream("com/axelor/text/include-test.tmpl");
+		Reader reader = new InputStreamReader(stream);
+		
+		Templates templates = new GroovyTemplates();
+		Template template = templates.from(reader);
+
+		String output = template.make(vars).render();
+
+		assertNotNull(output);
+		assertTrue(output.indexOf("{{<") == -1);
+		assertTrue(output.contains("This is nested 1"));
+		assertTrue(output.contains("This is nested 2"));
+	}
+
 	@Test
 	public void testGroovySpecial() {
 
