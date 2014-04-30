@@ -608,7 +608,7 @@ ActionHandler.prototype = {
 						if (span.size() === 0) {
 							span = label;
 						}
-						if (span.size() > 0) {
+						if (span && span.size() > 0) {
 							span.html(value);
 						} else if (item.is('label')) {
 							item.html(value);
