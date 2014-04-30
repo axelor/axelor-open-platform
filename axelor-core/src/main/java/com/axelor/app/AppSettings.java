@@ -27,7 +27,7 @@ import com.axelor.common.StringUtils;
 public final class AppSettings {
 
 	private static final String DEFAULT_CONFIG_LOCATION = "application.properties";
-	private static final String CUSTOM_CONFIG_LOCATION = "app.config";
+	private static final String CUSTOM_CONFIG_LOCATION = "axelor.config";
 
 	private Properties properties;
 
