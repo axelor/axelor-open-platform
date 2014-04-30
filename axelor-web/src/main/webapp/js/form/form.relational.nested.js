@@ -199,8 +199,7 @@ var NestedEditor = {
 	controller: NestedEditorCtrl,
 	link: function(scope, element, attrs, model) {
 		
-		var configured = false,
-			updateFlag = true;
+		var configured = false;
 		
 		function setValidity(nested, valid) {
 			model.$setValidity('valid', nested.isValid());
@@ -224,7 +223,6 @@ var NestedEditor = {
 				if (!nested || !value) return;
 				var record = nested.record || {};
 				if (record.id === value.id) {
-					updateFlag = true;
 					_.extend(record, value);
 				}
 			});
@@ -238,25 +236,20 @@ var NestedEditor = {
 				setValidity(nested, valid);
 			});
 			nested.$watch('record', function(rec, old){
-				if (updateFlag && rec != old) {
+				if (rec != old) {
 					if (_.isEmpty(rec)) {
 						rec = null;
 					} else {
 						rec.$dirty = true;
 					}
-					if (rec) {
+					if (rec.$updateLock && _.isEmpty(old)) {
+						rec.$updateLock = false;
+					} else if (rec) {
 						model.$setViewValue(rec);
 					}
 				}
-				updateFlag = true;
 				setValidity(nested, nested.isValid());
 			}, true);
-			nested.$on('on:attrs-change:value', function (e, opts) {
-				var itemScope = opts.scope;
-				if (itemScope && itemScope.record === nested.record) {
-					updateFlag = true;
-				}
-			});
 		}
 		
 		scope.ngModel = model;
@@ -327,7 +320,7 @@ var NestedEditor = {
 					return nested.edit(value);
 				}
 				return nested.doRead(value.id).success(function(record){
-					updateFlag = false;
+					record.$updateLock = true;
 					return nested.edit(record);
 				});
 			});
