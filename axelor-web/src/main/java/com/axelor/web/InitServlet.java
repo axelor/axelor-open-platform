@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.app.AppSettings;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.quartz.JobRunner;
 
@@ -46,7 +47,7 @@ public class InitServlet extends HttpServlet {
 		LOG.info("Initializing...");
 
 		try {
-			moduleManager.initialize(false, false);
+			moduleManager.initialize(false, AppSettings.get().getBoolean("data.import.demo-data", true));
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		}
