@@ -270,14 +270,11 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			criteria: [criterion]
 		};
 		
-		return $scope._viewPromise.then(function(view) {
-
-			var sortBy = view.orderBy;
-			
+		function doFetch(view) {
+			var sortBy = view.sortBy || view.orderBy;
 			if (sortBy) {
 				sortBy = sortBy.split(",");
 			}
-			
 			return fetchDS().search({
 				filter: filter,
 				fields: fields,
@@ -295,7 +292,14 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 				});
 				success(items, page);
 			});
-		
+		}
+
+		if ($scope.isHidden()) {
+			return doFetch($scope.view || {});
+		}
+
+		return $scope._viewPromise.then(function(view) {
+			return doFetch(view || {});
 		});
 	};
 	
