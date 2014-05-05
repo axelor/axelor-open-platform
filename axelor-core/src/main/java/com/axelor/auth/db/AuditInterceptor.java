@@ -86,6 +86,9 @@ public class AuditInterceptor extends EmptyInterceptor {
 		}
 		User user = this.getUser();
 		for (int i = 0; i < propertyNames.length; i++) {
+			if (state[i] != null) {
+				continue;
+			}
 			if ("createdOn".equals(propertyNames[i])) {
 				state[i] = new LocalDateTime();
 			}

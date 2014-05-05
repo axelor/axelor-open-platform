@@ -27,6 +27,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.data.AuditHelper;
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
@@ -279,11 +280,10 @@ public class CSVBinder {
 					p.addAll(bean, (Collection<?>) value);
 				else
 					p.add(bean, value);
-			}
-			else {
+			} else if (!AuditHelper.update(bean, field, value)) {
 				p.set(bean, value);
 			}
-			
+
 			if(value == null && (p.isReference() || p.isCollection()) && isValueGiven(cb, values)) {
 				LOG.warn("Bind null value to {} with context: {}", p.getName(), Arrays.asList(values));
 			}
