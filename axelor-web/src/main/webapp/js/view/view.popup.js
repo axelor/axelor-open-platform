@@ -470,12 +470,14 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			   (initialized === 'readonly' && isReadonly())) {
 				return;
 			}
+			
+			var delay = initialized ? 100 : 300;
+			
 			initialized = isReadonly() ? 'readonly' : 'editable';
-			adjust(autoSize);
-
 			return scope.ajaxStop(function() {
+				adjust(autoSize);
 				element.closest('.ui-dialog').css('visibility', '');
-			}, 100);
+			}, delay);
 		}
 		
 		function autoSize() {
