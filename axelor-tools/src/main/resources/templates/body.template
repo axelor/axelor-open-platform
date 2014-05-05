@@ -186,7 +186,7 @@ ${p.documentation}
 	public static $pojo.name find(Long id) {
 		return JPA.find(${pojo.name}.class, id);
 	}
-	
+<% if (!pojo.hasExtends) { %>
 	/**
 	 * Return a {@link Query} instance for <code>$pojo.name</code> to filter
 	 * on all the records.
@@ -203,5 +203,6 @@ ${p.documentation}
 	public static Query<$pojo.name> filter(String filter, Object... params) {
 		return JPA.all(${pojo.name}.class).filter(filter, params);
 	}
+<% } %>\
 	${pojo.extraCode}
 }
