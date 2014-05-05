@@ -415,6 +415,22 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 			__tab_closable: false
 		});
 	});
+	
+	var confirm = _t('Current changes will be lost.');
+	
+	function onbeforeunload(e) {
+		var tabs = $scope.navTabs || [];
+		for (var i = 0; i < tabs.length; i++) {
+			var vs = (tabs[i]||{}).$viewScope;
+			if (vs && vs.$$dirty) {
+				return confirm;
+			}
+		}
+	}
+	
+	$(function () {
+		 $(window).on('beforeunload', onbeforeunload);
+	});
 }
 
 TabCtrl.$inject = ['$scope', '$location', '$routeParams'];
