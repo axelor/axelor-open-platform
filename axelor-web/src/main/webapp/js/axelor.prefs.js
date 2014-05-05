@@ -32,6 +32,14 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 	$scope.onClose = function() {
 		$scope.confirmDirty(doClose);
 	};
+
+	var __version = null;
+
+	$scope.$watch('record.version', function (value) {
+		if (value === null || value === undefined) return;
+		if (__version !== null) return 
+		__version = value;
+	});
 	
 	function doClose() {
 		if (!$scope.isDirty()) {
@@ -39,7 +47,16 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 			var rec = $scope.record || {};
 			app.homeAction = rec.homeAction;
 		}
-		$location.path('/');
+		
+		window.history.back();
+		
+		if (__version === ($scope.record || {}).version) {
+			return;
+		}
+
+		setTimeout(function() {
+			window.location.reload();
+		}, 100);
 	};
 
 	$scope.setEditable();
