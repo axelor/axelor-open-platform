@@ -34,6 +34,7 @@ public class ModuleController {
 		try {
 			loader.install(name, false, false);
 			response.setReload(true);
+			response.setSignal("refresh-app", true);
 		} catch (Exception e) {
 			response.setException(e);
 		}
@@ -46,6 +47,7 @@ public class ModuleController {
 		try {
 			loader.uninstall(name);
 			response.setReload(true);
+			response.setSignal("refresh-app", true);
 		} catch (Exception e) {
 			response.setException(e);
 		}
