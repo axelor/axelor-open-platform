@@ -111,7 +111,7 @@ public final class EntityHelper {
 	 *
 	 * @return true if both the objects are equals by their hashing keys
 	 */
-	public static <T extends Model> boolean equals(T entity, T other) {
+	public static <T extends Model> boolean equals(T entity, Object other) {
 		if (entity == other)
 			return true;
 		if (entity == null || other == null)
@@ -119,8 +119,9 @@ public final class EntityHelper {
 		if (!entity.getClass().isInstance(other))
 			return false;
 
-		if (entity.getId() != null && other.getId() != null) {
-			return Objects.equal(entity.getId(), other.getId());
+		final Model that = (Model) other;
+		if (entity.getId() != null && that.getId() != null) {
+			return Objects.equal(entity.getId(), that.getId());
 		}
 
 		final Mapper mapper = Mapper.of(entity.getClass());

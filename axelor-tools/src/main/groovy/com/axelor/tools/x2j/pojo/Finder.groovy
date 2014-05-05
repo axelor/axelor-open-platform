@@ -121,7 +121,7 @@ class Finder {
 		def lines = []
 
 		lines += "public static ${type} ${name}(${params}) {"
-		lines += "\treturn ${entity.name}.all()"
+		lines += "\treturn Query.of(${entity.name}.class)"
 		lines += "\t\t\t.filter(\"${query}\")"
 
 		args.each { n ->
