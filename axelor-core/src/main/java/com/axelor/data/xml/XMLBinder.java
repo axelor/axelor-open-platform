@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import com.axelor.data.AuditHelper;
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
@@ -177,7 +178,10 @@ public abstract class XMLBinder {
 
 			LOG.trace("set value: {} = {}", property.getName(), value);
 			isNull = false;
-			property.set(bean, value);
+
+			if (!AuditHelper.update(bean, field, value)) {
+				property.set(bean, value);
+			}
 		}
 
 		return isNull ? null : bean;
