@@ -450,6 +450,10 @@ ActionHandler.prototype = {
 			return deferred.promise;
 		}
 		
+		if (data.signal === 'refresh-app') {
+			window.location.reload();
+		}
+		
 		if (data.values) {
 			updateValues(data.values, scope.record, scope, formScope);
 			if (scope.onChangeNotify) {
