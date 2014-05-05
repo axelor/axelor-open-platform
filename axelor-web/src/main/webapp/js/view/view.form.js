@@ -295,7 +295,7 @@ function FormViewCtrl($scope, $element) {
 	};
 
 	$scope.canDelete = function() {
-		return $scope.hasButton('delete');
+		return $scope.hasButton('delete') && ($scope.record || {}).id > 0;
 	};
 	
 	$scope.canCopy = function() {
@@ -519,6 +519,22 @@ function FormViewCtrl($scope, $element) {
 			$scope.applyLater(callback);
 		});
 	};
+	
+	$scope.onDelete = function() {
+		var record = $scope.record || {};
+		if (!record.id  || record.id < 0) {
+			return;
+		}
+		axelor.dialogs.confirm(_t("Do you really want to delete the selected record?"),
+		function(confirmed){
+			if (!confirmed) {
+				return;
+			}
+			ds.removeAll([record]).success(function(records, page){
+				$scope.switchTo("grid");
+			});
+		});
+	};
 
 	$scope.onBack = function() {
 		var record = $scope.record || {};
@@ -666,6 +682,14 @@ function FormViewCtrl($scope, $element) {
 			title: _t('Refresh'),
 			click: function(e) {
 				$scope.onRefresh();
+			}
+		}, {
+			title: _t('Delete'),
+			active: function () {
+				return $scope.canDelete();
+			},
+			click: function(e) {
+				$scope.onDelete();
 			}
 		}, {
 			title: _t('Duplicate'),
