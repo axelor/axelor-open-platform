@@ -452,8 +452,8 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			return scope.isReadonly && scope.isReadonly();
 		}
 		
-		function adjust(how) {
-			scope.ajaxStop(how, 100);
+		function adjust(how, delay) {
+			scope.ajaxStop(how, delay || 100);
 		}
 		
 		function initSize() {
@@ -474,12 +474,18 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			var delay = initialized ? 100 : 300;
 			
 			initialized = isReadonly() ? 'readonly' : 'editable';
-			return scope.ajaxStop(function() {
-				adjust(autoSize);
-				element.closest('.ui-dialog').css('visibility', '');
-			}, delay);
+			
+			function show() {
+				autoSize();
+				setTimeout(function() {
+					element.closest('.ui-dialog').css('visibility', '');
+				}, 100);
+			}
+			return scope.$timeout(function() {
+				return scope.ajaxStop(show, delay);
+			});
 		}
-		
+
 		function autoSize() {
 			var maxWidth = $(document).width() - 8,
 				maxHeight = $(document).height() - 8,
