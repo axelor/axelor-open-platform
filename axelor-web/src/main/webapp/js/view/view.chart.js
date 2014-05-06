@@ -54,14 +54,14 @@ function ChartCtrl($scope, $element, $http) {
 
 	var loading = false;
 
-	function refresh() {
-		
-		if (loading || $element.is(":hidden")) {
+	function refresh(force) {
+
+		if (loading || ($element.is(":hidden") && !force)) {
 			return;
 		}
 
 		// in case of onInit
-		if ($scope.searchInit && !viewValues) {
+		if ($scope.searchInit && !viewValues && !force) {
 			return;
 		}
 
@@ -69,6 +69,9 @@ function ChartCtrl($scope, $element, $http) {
 		if ($scope.getContext) {
 			context = _.extend({}, $scope.getContext(), context);
 			if ($scope.onSave && !context.id) { // if embedded inside form view
+				if (viewChart) {
+					$scope.render(_.omit(viewChart, 'dataset'));
+				}
 				return;
 			}
 		}
@@ -106,8 +109,8 @@ function ChartCtrl($scope, $element, $http) {
 
 	setTimeout(refresh);
 
-	$scope.onRefresh = function() {
-		refresh();
+	$scope.onRefresh = function(force) {
+		refresh(force);
 	};
 
 	$scope.setViewValues = function (values) {
@@ -607,10 +610,10 @@ var directiveFn = function(){
 			});
 			
 			scope.$on("on:new", function(e) {
-				scope.onRefresh();
+				scope.onRefresh(true);
 			});
 			scope.$on("on:edit", function(e) {
-				scope.onRefresh();
+				scope.onRefresh(true);
 			});
 		},
 		replace: true,
