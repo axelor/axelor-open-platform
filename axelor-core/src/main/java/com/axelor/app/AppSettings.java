@@ -95,6 +95,12 @@ public final class AppSettings {
 				System.getProperty("user.home"));
 	}
 
+	public String getBaseURL() {
+		String appUrl = get("application.baseUrl");
+		String reqUrl = get("application.request.baseUrl", appUrl);
+		return reqUrl;
+	}
+
 	public boolean isProduction() {
 		return !"dev".equals(get("application.mode", "dev"));
 	}
