@@ -17,11 +17,11 @@
             <i class="fa fa-trash-o"></i> <span ng-hide="tbTitleHide" x-translate>Delete</span>
           </button>
         </div>
-        <div ui-filter-box x-handler="this"></div>
         <div class="btn-group" ng-if="toolbar" ui-btn-group-helper>
           <button ng-repeat="btn in toolbar | filter:{custom: true}" class="btn" ui-tool-button="btn">{{btn.title}}</button>
         </div>
         <div ui-menu-bar menus="menubar" handler="this"></div>
+        <div ui-filter-box x-handler="this"></div>
         <div ui-view-switcher class="pull-right"></div>
         <div ui-record-pager class="pull-right"></div>
       </div>

@@ -1027,10 +1027,6 @@ table.field-details .help-text hr {
 	opacity: 0.55;
 }
 
-.record-toolbar .button-item {
-	line-height: 20px;
-}
-
 .record-toolbar .button-item.button-icon img {
 	margin-top: -2px;
 }
@@ -1053,7 +1049,7 @@ table.field-details .help-text hr {
 	display: inline-block;
 	top: 0;
 	right: 0;
-	padding-top: 9px;
+	padding-top: 8px;
 	padding-right: 6px;
 }
 
