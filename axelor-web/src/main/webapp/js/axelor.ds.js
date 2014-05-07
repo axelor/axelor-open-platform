@@ -156,9 +156,7 @@
 			var items = [];
 			var fields = view.items || view.pages;
 
-			if (fields == null)
-				return [];
-
+			if (!fields) return items;
 			if (view.items && !view._included) {
 				view._included = true;
 				fields = view.items = useIncluded(view);
@@ -167,8 +165,7 @@
 			_.each(fields, function(item) {
 				if (item.items || item.pages) {
 					items = items.concat(findFields(item));
-				}
-				else if (item.type === 'field') {
+				} else if (item.type === 'field') {
 					items.push(item.name);
 				}
 			});
@@ -181,14 +178,32 @@
 
 			return _.compact(items);
 		}
+
+		var viewCache = $cacheFactory("viewFields", { capacity: 1000 });
+
+		function viewGet(key) {
+			var result = viewCache.get(key);
+			return angular.copy(result);
+		}
 		
-		var fieldsCache = $cacheFactory("viewFields", { capacity: 1000 });
+		function viewSet(key, result) {
+			if (result.then) {
+				return viewCache.put(key, result);
+			}
+			var view = result.view;
+			if (view && _.isArray(view.items)) {
+				return;
+			}
+			viewCache.put(key, angular.copy(result));
+		}
 
 		ViewService.prototype.getMetaDef = function(model, view) {
-			var self = this,
-				deferred = $q.defer();
 
-			var promise = deferred.promise;
+			var self = this,
+				hasItems = _.isArray(view.items),
+				deferred = $q.defer(),
+				promise = deferred.promise;
+
 			promise.success = function(fn) {
 				promise.then(function(res){
 					fn(res.fields, res.view);
@@ -209,11 +224,11 @@
 
 			function loadFields(data) {
 
-				var fields = (findFields(data.view) || []).sort();
-				var key = model + "|" + data.view.type + "|" + data.view.name + "|" + fields.join("|");
+				var fields = findFields(data.view).sort();
+				var key = _.flatten([model, data.view.type, data.view.name, fields]).join();
 
 				if (!_.isEmpty(data.fields)) {
-					fieldsCache.put(key, angular.copy(data));
+					viewSet(key, data);
 					deferred.resolve(process(data));
 					return promise;
 				}
@@ -223,9 +238,9 @@
 					return promise;
 				}
 
-				var result = fieldsCache.get(key);
+				var result = viewGet(key);
 				if (result && result.fields) {
-					deferred.resolve(angular.copy(result));
+					deferred.resolve(result);
 					return promise;
 				}
 				if (result && result.then) {
@@ -239,8 +254,9 @@
 
 					result.view = data.view || view;
 					result = process(result);
-					fieldsCache.put(key, angular.copy(result));
-					
+
+					viewSet(key, result);
+
 					deferred.resolve(result);
 
 					return promise;
@@ -252,12 +268,13 @@
 				});
 
 				_promise.then(resolver);
-				fieldsCache.put(key, _promise);
+
+				if (!hasItems) viewSet(key, _promise);
 
 				return promise;
 			}
 
-			if (_.isArray(view.items)) {
+			if (hasItems) {
 				return loadFields({view: view});
 			};
 
