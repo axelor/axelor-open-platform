@@ -26,19 +26,36 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import com.axelor.app.AppSettings;
 import com.axelor.meta.service.MetaTranslations;
 import com.google.inject.Singleton;
 
 @Singleton
 public class LocaleFilter implements Filter {
 
+	private static String baseUrl;
+	
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
+	}
+	
+	private void setBaseUrl(ServletRequest req) {
+		if (req.getServerPort() == 80 ||
+			req.getServerPort() == 443) {
+			baseUrl = req.getScheme() + "://" + req.getServerName() + req.getServletContext().getContextPath();
+		} else {
+			baseUrl = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + req.getServletContext().getContextPath();
+		}
+		AppSettings.get().getProperties().put("application.request.baseUrl", baseUrl);
 	}
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
+		
+		if (baseUrl == null) {
+			setBaseUrl(request);
+		}
 		
 		MetaTranslations.language.set(request.getLocale());
 		try {
