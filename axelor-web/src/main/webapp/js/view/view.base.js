@@ -56,6 +56,10 @@ function ViewCtrl($scope, DataSource, ViewService) {
 		}
 		return ViewService.getMetaDef($scope._model, view);
 	};
+
+	$scope.loadFields = function() {
+		return ViewService.getFields($scope._model);
+	};
 	
 	$scope.updateRoute = function() {
 		this.$emit("on:update-route");

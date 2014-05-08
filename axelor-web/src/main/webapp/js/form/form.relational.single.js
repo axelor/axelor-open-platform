@@ -464,7 +464,7 @@ ui.formInput('RefItem', 'ManyToOne', {
 		var target = element.attr('x-target');
 		var data = (_.findWhere(scope.$parent.field.selectionList, {value: target})||{}).data || {};
 
-		scope.loadView('grid', data.grid).success(function(fields, view) {
+		scope.loadFields().success(function(fields) {
 			var name = false,
 				search = [];
 
