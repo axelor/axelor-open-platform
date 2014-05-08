@@ -29,6 +29,8 @@ public final class AppSettings {
 	private static final String DEFAULT_CONFIG_LOCATION = "application.properties";
 	private static final String CUSTOM_CONFIG_LOCATION = "axelor.config";
 
+	private static final ThreadLocal<String> BASE_URL = new ThreadLocal<>();
+
 	private Properties properties;
 
 	private static AppSettings instance;
@@ -95,20 +97,31 @@ public final class AppSettings {
 				System.getProperty("user.home"));
 	}
 
+	/**
+	 * Get the application base URL.
+	 * <p>
+	 * This method tries to calculate the base url from current http request. If
+	 * the method is called outside of http request scope, it returns the value
+	 * of <code>application.baseUrl</code> configuration setting.
+	 * </p>
+	 * 
+	 * @return application base url
+	 */
 	public String getBaseURL() {
-		String appUrl = get("application.baseUrl");
-		String reqUrl = get("application.request.baseUrl", appUrl);
-		return reqUrl;
+		String url = BASE_URL.get();
+		if (url == null) {
+			url = get("application.baseUrl");
+		}
+		return url;
 	}
 
 	public boolean isProduction() {
 		return !"dev".equals(get("application.mode", "dev"));
 	}
 
-	public void putAll(Properties properties) {
-		this.properties.putAll(properties);
-	}
-
+	/**
+	 * For internal use only.
+	 */
 	public Properties getProperties() {
 		return properties;
 	}
