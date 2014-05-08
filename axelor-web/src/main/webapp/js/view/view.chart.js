@@ -390,13 +390,27 @@ function HBarChart(scope, element, data) {
 	return chart;
 }
 
+function applyXY(chart, data) {
+	var type = data.xType;
+	chart.y(function (d) { return d.y; });
+	if (type == "date") {
+		return chart.x(function (d) { return moment(d.x).toDate(); });
+	}
+	return chart.x(function (d) { return d.x; });
+}
+
 REGISTRY["line"] = LineChart;
 function LineChart(scope, element, data) {
 
 	var chart_data = PlotData(scope, data, "line");
 	var chart = nv.models.lineChart()
+		.showLegend(true)
+		.showYAxis(true)
+		.showXAxis(true)
 		.color(d3.scale.category10().range());
 
+	applyXY(chart, data);
+	
 	d3.select(element[0])
 	  .datum(chart_data)
 	  .transition().duration(500).call(chart);
@@ -497,6 +511,7 @@ function GaugeCharter(scope, element, data) {
 function Chart(scope, element, data) {
 	
 	var type = null;
+	var config = data.config || {};
 
 	for(var i = 0 ; i < data.series.length ; i++) {
 		type = data.series[i].type;
@@ -527,12 +542,19 @@ function Chart(scope, element, data) {
 
 		chart.noData(_t('No Data Available.'));
 		var tickFormats = {
+			"date" : function (d) {
+				var f = config.xFormat;
+				return moment(d).format(f || 'YYYY-MM-DD');
+			},
 			"month" : function(d) {
+				var v = "" + d;
+				var f = config.xFormat;
+				if (v.indexOf(".") > -1) return "";
 				if (_.isNumber(d)) {
-					return moment([2000, d - 1, 1]).format("MMM");
+					return moment([2000, d - 1, 1]).format(f || "MMM");
 				}
 				if (_.isString(d) && d.indexOf('-') > 0) {
-					return moment(d).format('MMM, YYYY');
+					return moment(d).format(f || 'MMM, YYYY');
 				}
 				return d;
 			},
