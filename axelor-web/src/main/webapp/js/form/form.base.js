@@ -114,12 +114,13 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			if (scope._isPopup && !parent._isPopup) {
 				return readonly || false;
 			}
-			if (readonly !== undefined) {
-				return readonly || false;
-			}
 			if (parent.isReadonlyExclusive && parent.isReadonlyExclusive()) {
 				return true;
 			}
+			if (readonly !== undefined) {
+				return readonly || false;
+			}
+
 			return readonly || false;
 		};
 		
