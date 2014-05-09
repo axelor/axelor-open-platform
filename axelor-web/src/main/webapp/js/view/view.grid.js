@@ -29,8 +29,10 @@ function GridViewCtrl($scope, $element) {
 	ds.on('change', function(e, records, page){
 		$scope.setItems(records, page);
 	});
-	
+
 	var initialized = false;
+	var reloadDotted = null;
+	
 	$scope.onShow = function(viewPromise) {
 		
 		if (!initialized) {
@@ -60,6 +62,16 @@ function GridViewCtrl($scope, $element) {
 			
 			initialized = true;
 		} else {
+			if (reloadDotted === null) {
+				reloadDotted = !!__appSettings['view.grid.reload-dotted'] && !!_.find($scope.fields, function (field) {
+					return field.name && field.name.indexOf('.') > -1;
+				});
+			}
+			if (reloadDotted) {
+				return $scope.reload().then(function() {
+					$scope.updateRoute();
+				});
+			}
 			var current = $scope.dataView.getItem(_.first($scope.selection));
 			if (current && current.id) {
 				$scope.dataView.updateItem(current.id, current);
