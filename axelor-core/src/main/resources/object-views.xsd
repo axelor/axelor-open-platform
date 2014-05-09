@@ -1138,6 +1138,7 @@
     <xsd:attribute name="selection" type="xsd:string" />
     <xsd:attribute name="widget" type="xsd:string" />
     <xsd:attribute name="width" type="xsd:string" />
+    <xsd:anyAttribute processContents="skip" />
   </xsd:complexType>
 
   <xsd:complexType name="SearchSelect">
