@@ -31,7 +31,7 @@ function GridViewCtrl($scope, $element) {
 	});
 
 	var initialized = false;
-	var reloadDotted = null;
+	var reloadDotted = false;
 	
 	$scope.onShow = function(viewPromise) {
 		
@@ -51,6 +51,8 @@ function GridViewCtrl($scope, $element) {
 					$scope._routeSearch = params.options.search;
 				}
 
+				reloadDotted = params.params && params.params['reload-dotted'];
+
 				$scope.view = view;
 				$scope.filter({
 					_sortBy: sortBy,
@@ -62,11 +64,6 @@ function GridViewCtrl($scope, $element) {
 			
 			initialized = true;
 		} else {
-			if (reloadDotted === null) {
-				reloadDotted = !!__appSettings['view.grid.reload-dotted'] && !!_.find($scope.fields, function (field) {
-					return field.name && field.name.indexOf('.') > -1;
-				});
-			}
 			if (reloadDotted) {
 				return $scope.reload().then(function() {
 					$scope.updateRoute();
