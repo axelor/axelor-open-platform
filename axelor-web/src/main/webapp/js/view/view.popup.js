@@ -108,25 +108,15 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			}
 			closeCallback = null;
 		};
-		
-		function doSave() {
-			var values = ds.diff(record, $scope.$$original);
-			values._original = $scope.$$original;
-			ds.save(values).success(function(record, page){
-				$scope.applyLater(function(){
-					close(record);
-				});
-			});
-		}
-		
+
 		if ($scope.editorCanSave && $scope.isDirty()) {
 			if (record.id < 0)
 				record.id = null;
-			if (saveAction) {
-				saveAction().then(doSave);
-			} else {
-				doSave();
-			}
+			$scope.onSave().then(function () {
+				$scope.applyLater(function(){
+					close($scope.record);
+				});
+			});
 		} else {
 			close(record);
 		}
