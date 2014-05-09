@@ -73,10 +73,15 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	
 	$scope.select = function(value) {
 		var items = _.chain([value]).flatten(true).compact().value(),
-			records;
-		
-		records = _.map($scope.getItems(), function(item){
-			return _.clone(item);
+			records = _.map($scope.getItems(), _.clone);
+
+		_.each($scope.itemsPending, function (item) {
+			var find = _.find(records, function(rec) {
+				return rec.id && rec.id == item.id;
+			});
+			if (!find) {
+				records.push(item);
+			}
 		});
 
 		_.each(items, function(item){
@@ -85,16 +90,18 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 				return rec.id && rec.id == item.id;
 			});
 			
-			if (find)
+			if (find) {
 				_.extend(find, item);
-			else
+			} else {
 				records.push(item);
+			}
 		});
 		
 		_.each(records, function(rec){
 			if (rec.id <= 0) rec.id = null;
 		});
 		
+		$scope.itemsPending = records;
 		$scope.setValue(records, true);
 		$scope.applyLater(function(){
 			$scope.$broadcast('grid:changed');
@@ -104,6 +111,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	var _setItems = $scope.setItems;
 	$scope.setItems = function(items) {
 		_setItems(items);
+		$scope.itemsPending = [];
 		if (embedded !== null) {
 			embedded.data('$scope').onClose();
 		}
