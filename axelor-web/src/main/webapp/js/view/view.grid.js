@@ -624,18 +624,24 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 			$scope.onItemDblClick = function(event, args) {
 				doEdit(false);
 			};
-			
+
+			function doReload() {
+				var tab = NavService.getSelected();
+				var type = tab.viewType || tab.type;
+				if (type !== 'grid') {
+					$scope.ajaxStop(function () {
+						$scope.filter({});
+					});
+				}
+			}
+
 			$scope.$on("on:new", function(e) {
-				$scope.ajaxStop(function () {
-					$scope.filter({});
-				});
+				$scope.$timeout(doReload, 100);
 			});
 			$scope.$on("on:edit", function(e) {
-				$scope.ajaxStop(function () {
-					$scope.filter({});
-				});
+				$scope.$timeout(doReload, 100);
 			});
-			
+
 			$scope.onRefresh = function() {
 				$scope.filter({});
 			};
