@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
+import com.axelor.app.internal.AppFilter;
 import com.axelor.common.ClassUtils;
 import com.axelor.common.StringUtils;
 
@@ -28,8 +29,6 @@ public final class AppSettings {
 
 	private static final String DEFAULT_CONFIG_LOCATION = "application.properties";
 	private static final String CUSTOM_CONFIG_LOCATION = "axelor.config";
-
-	private static final ThreadLocal<String> BASE_URL = new ThreadLocal<>();
 
 	private Properties properties;
 
@@ -108,7 +107,7 @@ public final class AppSettings {
 	 * @return application base url
 	 */
 	public String getBaseURL() {
-		String url = BASE_URL.get();
+		String url = AppFilter.getBaseURL();
 		if (url == null) {
 			url = get("application.baseUrl");
 		}

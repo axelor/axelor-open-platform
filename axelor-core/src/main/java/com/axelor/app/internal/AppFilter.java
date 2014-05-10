@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.web;
+package com.axelor.app.internal;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.util.Locale;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -27,64 +27,52 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import com.axelor.app.AppSettings;
-import com.axelor.meta.service.MetaTranslations;
 import com.google.inject.Singleton;
 
 @Singleton
-public class LocaleFilter implements Filter {
+public class AppFilter implements Filter {
 
-	private static ThreadLocal<String> BASE_URL;
-	
+	private static final ThreadLocal<String> BASE_URL = new ThreadLocal<>();
+	private static final ThreadLocal<Locale> LANGUAGE = new ThreadLocal<>();
+
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
+	
 	}
 
-	@SuppressWarnings("all")
-	private void setBaseUrl(ServletRequest req) {
-		String baseUrl;
+	public static String getBaseURL() {
+		return BASE_URL.get();
+	}
+
+	public static Locale getLocale() {
+		return LANGUAGE.get();
+	}
+
+	private String getBaseUrl(ServletRequest req) {
 		if (req.getServerPort() == 80 ||
 			req.getServerPort() == 443) {
-			baseUrl = req.getScheme() + "://" + req.getServerName() + req.getServletContext().getContextPath();
-		} else {
-			baseUrl = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + req.getServletContext().getContextPath();
+			return req.getScheme() + "://" + req.getServerName() + req.getServletContext().getContextPath();
 		}
-
-		if (BASE_URL == null) {
-			try {
-				Field field = AppSettings.class.getDeclaredField("BASE_URL");
-				field.setAccessible(true);
-				BASE_URL = (ThreadLocal<String>) field.get(AppSettings.class);
-			} catch (Exception e) {
-			}
-		}
-
-		if (BASE_URL != null) {
-			BASE_URL.set(baseUrl);
-		}
+		return req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + req.getServletContext().getContextPath();
 	}
-	
+
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 
-		setBaseUrl(request);
-		MetaTranslations.language.set(request.getLocale());
+		BASE_URL.set(getBaseUrl(request));
+		LANGUAGE.set(request.getLocale());
 		try {
 			chain.doFilter(request, response);
 		} finally {
-			MetaTranslations.language.remove();
-			if (BASE_URL != null) {
-				BASE_URL.remove();
-			}
+			LANGUAGE.remove();
+			BASE_URL.remove();
 		}
 	}
 
 	@Override
 	public void destroy() {
-		if (BASE_URL != null) {
-			BASE_URL.remove();
-			BASE_URL = null;
-		}
+		LANGUAGE.remove();
+		BASE_URL.remove();
 	}
 }
