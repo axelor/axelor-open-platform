@@ -34,7 +34,16 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 	};
 
 	var __version = null;
-
+	var __getContext = $scope.getContext;
+	
+	$scope.getContext = function() {
+		var context = __getContext.apply($scope, arguments) || {};
+		if (!context.code) {
+			context.code = __appSettings['user.login'];
+		}
+		return context;
+	};
+	
 	$scope.$watch('record.version', function (value) {
 		if (value === null || value === undefined) return;
 		if (__version !== null) return 
