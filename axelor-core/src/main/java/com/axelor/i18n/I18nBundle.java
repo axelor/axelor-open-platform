@@ -1,0 +1,95 @@
+/**
+ * Axelor Business Solutions
+ *
+ * Copyright (C) 2012-2014 Axelor (<http://axelor.com>).
+ *
+ * This program is free software: you can redistribute it and/or  modify
+ * it under the terms of the GNU Affero General Public License, version 3,
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.axelor.i18n;
+
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import com.axelor.common.StringUtils;
+import com.axelor.db.Query;
+import com.axelor.meta.db.MetaTranslation;
+
+/**
+ * The database backed {@link ResourceBundle} that loads translations from the
+ * axelor database.
+ * 
+ */
+public class I18nBundle extends ResourceBundle {
+
+	private final Locale locale;
+	private final Map<String, String> messages = new ConcurrentHashMap<>();
+
+	public I18nBundle(Locale locale) {
+		this.locale = locale;
+	}
+
+	@Override
+	protected Object handleGetObject(String key) {
+		if (StringUtils.isBlank(key)) {
+			return key;
+		}
+		final String result = load().get(key);
+		if (StringUtils.isBlank(result)) {
+			return key;
+		}
+		return result;
+	}
+
+	@Override
+	protected Set<String> handleKeySet() {
+		return load().keySet();
+	}
+
+	@Override
+	public Enumeration<String> getKeys() {
+		return Collections.enumeration(load().keySet());
+	}
+	
+	private Map<String, String> load() {
+		
+		if (!messages.isEmpty()) {
+			return messages;
+		}
+
+		final Query<MetaTranslation> query = Query.of(MetaTranslation.class)
+				.filter("self.language = ?", locale.getLanguage());
+
+		long total = query.count();
+		long count = 0;
+		int page = 100;
+
+		while (count < total) {
+			for (MetaTranslation tr : query.fetch(page)) {
+				messages.put(tr.getKey(), tr.getMessage());
+			}
+			count += page;
+		}
+		return messages;
+	}
+
+	public static void invalidate(String key, String value) {
+		I18nBundle bundle = (I18nBundle) I18n.getBundle();
+		if (bundle.messages.isEmpty() || !bundle.messages.containsKey(key)) return;
+		bundle.messages.put(key, value);
+	}
+}
