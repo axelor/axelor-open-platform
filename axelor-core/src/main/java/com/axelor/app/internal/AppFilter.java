@@ -27,6 +27,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -45,6 +47,10 @@ public class AppFilter implements Filter {
 	}
 
 	public static Locale getLocale() {
+		User user = AuthUtils.getUser();
+		if (user != null && user.getLanguage() != null) {
+			return new Locale(user.getLanguage());
+		}
 		return LANGUAGE.get();
 	}
 
