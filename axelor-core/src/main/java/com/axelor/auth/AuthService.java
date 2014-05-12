@@ -40,7 +40,6 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.google.common.primitives.Longs;
 import com.google.inject.persist.Transactional;
 
 /**
@@ -235,17 +234,15 @@ public class AuthService {
 	 */
 	@Transactional
 	public void preferences(ActionRequest request, ActionResponse response) {
-		Long id = null;
-		User user = null;
-		try {
-			id = Longs.tryParse(request.getContext().get("id").toString());
-			user = User.find(id);
-		} catch (Exception e) {
-		}
 
-		if (user == null) {
-			user = AuthUtils.getUser();
+		User user = null;
+		User context = request.getContext().asType(User.class);
+		if (context.getId() != null) {
+			user = User.find(context.getId());
+		} else {
+			user = User.findByCode(context.getCode());
 		}
+		
 		if (user == null) {
 			response.setStatus(ActionResponse.STATUS_FAILURE);
 			return;
@@ -254,7 +251,7 @@ public class AuthService {
 		final Map<String, Object> values = Maps.newHashMap();
 		final MetaAction action = MetaAction.findByName(user.getHomeAction());
 
-		if (id == null) {
+		if (context.getId() == null) {
 			values.put("id", user.getId());
 			values.put("version", user.getVersion());
 			values.put("email", user.getEmail());
