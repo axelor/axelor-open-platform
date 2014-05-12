@@ -1,500 +1,365 @@
-"domain","name","type","title","title_t","help","help_t"
-,,"menu","Administration","Administration",,
-,,"menu","User Management","Gestion des utilisateurs",,
-,,"menu","Groups","Les Groupes",,
-,,"menu","Permissions","Les Permissions",,
-,,"menu","Roles","Les Roles",,
-,,"menu","Users","Les Utilisateurs",,
-,,"menu","All Schedules","Les Planificateurs",,
-,,"menu","Job Management","Gestion des planificateurs",,
-,,"menu","All Models","Les Modèles",,
-,,"menu","All Modules","Les Modules",,
-,,"menu","Model Management","Gestion des modèles",,
-,,"menu","Module Management","Gestion des modules",,
-,,"menu","Action Menus","Les Action Menus",,
-,,"menu","All Actions","Les Actions",,
-,,"menu","All Views","Les Vues",,
-,,"menu","All Charts","Les Graphiques",,
-,,"menu","View Management","Gestion des vues",,
-,,"menu","All Menus","Les Menus",,
-,,"menu","All Selects","Les Selections",,
-,,"menu","All Translations","Les Traductions",,
-"com.axelor.auth.db.Group","code","field",,"Code",,
-"com.axelor.auth.db.Group","name","field",,"Nom",,
-"com.axelor.auth.db.Group","navigation","field",,"Navigation",,
-"com.axelor.auth.db.Group","technicalStaff","field",,"Données techniques","Specify whether the members of this group are technical staff.","Indiquez si les membres de ce groupe sont des utilisateurs technique."
-"com.axelor.auth.db.Group","roles","field",,"Roles",,
-"com.axelor.auth.db.Group","permissions","field",,"Permissions",,
-"com.axelor.auth.db.Group","menus","field",,"Menus",,
-"com.axelor.auth.db.Group","views","field",,"Vues",,
-"com.axelor.meta.db.MetaModule","name","field",,"Nom",,
-"com.axelor.meta.db.MetaModule","title","field",,"Libellé",,
-"com.axelor.meta.db.MetaModule","description","field",,"Description",,
-"com.axelor.meta.db.MetaModule","depends","field",,"Dépend de",,
-"com.axelor.meta.db.MetaModule","moduleVersion","field","Version","Version",,
-"com.axelor.meta.db.MetaModule","removable","field",,"Supprimable ?",,
-"com.axelor.meta.db.MetaModule","installed","field",,"Installé ?",,
-"com.axelor.meta.db.MetaView","name","field",,"Nom",,
-"com.axelor.meta.db.MetaView","title","field",,"Libellé",,
-"com.axelor.meta.db.MetaView","type","field",,"Type",,
-"com.axelor.meta.db.MetaView","priority","field",,"Priorité",,
-"com.axelor.meta.db.MetaView","model","field",,"Objet",,
-"com.axelor.meta.db.MetaView","module","field",,"Module",,
-"com.axelor.meta.db.MetaView","xml","field",,"XML",,
-"com.axelor.meta.db.MetaView","xmlId","field",,"ID XML",,
-"com.axelor.meta.db.MetaView","groups","field",,"Groupes",,
-"com.axelor.meta.db.MetaMenu","priority","field",,"Priorité",,
-"com.axelor.meta.db.MetaMenu","name","field",,"Nom",,
-"com.axelor.meta.db.MetaMenu","title","field",,"Libellé",,
-"com.axelor.meta.db.MetaMenu","icon","field",,"Icone",,
-"com.axelor.meta.db.MetaMenu","module","field",,"Module",,
-"com.axelor.meta.db.MetaMenu","top","field",,"Menu du haut ?",,
-"com.axelor.meta.db.MetaMenu","left","field",,"Menu à gauche ?",,
-"com.axelor.meta.db.MetaMenu","mobile","field",,"Menu mobile ?",,
-"com.axelor.meta.db.MetaMenu","parent","field",,"Parent",,
-"com.axelor.meta.db.MetaMenu","action","field",,"Action",,
-"com.axelor.meta.db.MetaMenu","groups","field",,"Groupes",,
-"com.axelor.meta.db.MetaActionMenu","name","field",,"Nom",,
-"com.axelor.meta.db.MetaActionMenu","title","field",,"Libellé",,
-"com.axelor.meta.db.MetaActionMenu","category","field",,"Catégorie","Category name to group action menus.","Nom de la catégorie pour grouper les actions menus"
-"com.axelor.meta.db.MetaActionMenu","module","field",,"Module",,
-"com.axelor.meta.db.MetaActionMenu","parent","field",,"Parent",,
-"com.axelor.meta.db.MetaActionMenu","action","field",,"Action",,
-"com.axelor.meta.db.MetaAction","name","field",,"Nom",,
-"com.axelor.meta.db.MetaAction","type","field",,"Type",,
-"com.axelor.meta.db.MetaAction","model","field",,"Modèle",,
-"com.axelor.meta.db.MetaAction","module","field",,"Module",,
-"com.axelor.meta.db.MetaAction","xml","field",,"XML",,
-"com.axelor.meta.db.MetaSelect","xmlId","field",,"ID XML",,
-"com.axelor.meta.db.MetaSelect","name","field",,"Nom",,
-"com.axelor.meta.db.MetaSelect","priority","field",,"Priorité",,
-"com.axelor.meta.db.MetaSelect","module","field",,"Module",,
-"com.axelor.meta.db.MetaSelect","items","field",,"Elément",,
-"com.axelor.meta.db.MetaSelectItem","title","field",,"Libellé","The select item title.","Label de la selection"
-"com.axelor.meta.db.MetaSelectItem","value","field",,"Valeur","The select item value.","Valeur de la selection"
-"com.axelor.meta.db.MetaSelectItem","data","field",,"Données","The addition data for UI widgets.","Données additionnelles utilisés par l'interface"
-"com.axelor.meta.db.MetaSelectItem","order","field",,"Ordre",,
-"com.axelor.meta.db.MetaSelectItem","select","field",,"Sélection",,
-"com.axelor.meta.db.MetaModel","name","field","Name","Nom",,
-"com.axelor.meta.db.MetaModel","packageName","field","Package","Package",,
-"com.axelor.meta.db.MetaModel","tableName","field","Table","Table",,
-"com.axelor.meta.db.MetaModel","metaFields","field","Fields","Champs",,
-"com.axelor.meta.db.MetaModel","fullName","field","Fullname","Nom complet",,
-"com.axelor.meta.db.MetaField","metaModel","field",,"Modèle",,
-"com.axelor.meta.db.MetaField","name","field","Name","Nom",,
-"com.axelor.meta.db.MetaField","packageName","field","Package","Nom du package",,
-"com.axelor.meta.db.MetaField","typeName","field","Type","Type",,
-"com.axelor.meta.db.MetaField","label","field","Label","Libellé",,
-"com.axelor.meta.db.MetaField","relationship","field","Relationship","Relation",,
-"com.axelor.meta.db.MetaField","mappedBy","field","Mapped by","Mappé avec",,
-"com.axelor.meta.db.MetaField","description","field","Description","Description",,
-"com.axelor.meta.db.MetaTranslation","key","field",,"Clé",,
-"com.axelor.meta.db.MetaTranslation","language","field",,"Langue",,
-"com.axelor.meta.db.MetaTranslation","translation","field",,"Traduction",,
-"com.axelor.meta.db.MetaTranslation","domain","field",,"Domain",,
-"com.axelor.meta.db.MetaTranslation","type","field",,"Type",,
-"com.axelor.meta.db.MetaTranslation","module","field",,"Module",,
-"com.axelor.meta.db.MetaFile","fileName","field",,"Nom du fichier",,
-"com.axelor.meta.db.MetaFile","filePath","field",,"Chemin du fichier",,
-"com.axelor.meta.db.MetaFile","size","field","Size in bytes","Taille en bytes",,
-"com.axelor.meta.db.MetaFile","mime","field","File type","Type",,
-"com.axelor.meta.db.MetaFile","description","field",,"Description",,
-"com.axelor.meta.db.MetaFile","sizeText","field","Size","Taille",,
-"com.axelor.meta.db.MetaAttachment","objectName","field",,"Nom de l'objet",,
-"com.axelor.meta.db.MetaAttachment","objectId","field",,"ID de l'objet",,
-"com.axelor.meta.db.MetaAttachment","metaFile","field","File","Fichier",,
-"com.axelor.meta.db.MetaFilter","name","field",,"Nom",,
-"com.axelor.meta.db.MetaFilter","title","field",,"Titre",,
-"com.axelor.meta.db.MetaFilter","filters","field",,"Filtres",,
-"com.axelor.meta.db.MetaFilter","filterCustom","field",,"Filtre personnalisé",,
-"com.axelor.meta.db.MetaFilter","filterView","field",,"Filtre de vue",,
-"com.axelor.meta.db.MetaFilter","shared","field",,"Partagé ?",,
-"com.axelor.meta.db.MetaFilter","user","field",,"Utilisateur",,
-"com.axelor.meta.db.MetaScheduleParam","name","field",,"Nom",,
-"com.axelor.meta.db.MetaScheduleParam","value","field",,"Valeur",,
-"com.axelor.meta.db.MetaScheduleParam","schedule","field",,"Planificateur",,
-"com.axelor.meta.db.MetaSchedule","active","field",,"Actif",,
-"com.axelor.meta.db.MetaSchedule","name","field",,"Nom",,
-"com.axelor.meta.db.MetaSchedule","description","field",,"Description",,
-"com.axelor.meta.db.MetaSchedule","job","field",,"Job",,
-"com.axelor.meta.db.MetaSchedule","cron","field",,"Cron",,
-"com.axelor.meta.db.MetaSchedule","params","field",,"Paramètres",,
-"com.axelor.meta.db.MetaSequence","name","field",,"Nom",,
-"com.axelor.meta.db.MetaSequence","prefix","field",,"Prefix",,
-"com.axelor.meta.db.MetaSequence","suffix","field",,"Suffix",,
-"com.axelor.meta.db.MetaSequence","padding","field",,"Remplissage",,
-"com.axelor.meta.db.MetaSequence","increment","field",,"Increment",,
-"com.axelor.meta.db.MetaSequence","initial","field",,"Valeur origine",,
-"com.axelor.meta.db.MetaSequence","next","field",,"Valeur suivante",,
-"com.axelor.auth.db.Permission","name","field",,"Nom","An unique permission name.","Nom unique de la permission"
-"com.axelor.auth.db.Permission","object","field",,"Objet","Fully qualified object name or wild card package name.","Nom de l'objet"
-"com.axelor.auth.db.Permission","canRead","field","Read","Lecture","Whether to grant read access.","Autorise un accès en lecture"
-"com.axelor.auth.db.Permission","canWrite","field","Write","Modification","Whether to grant write access.","Autorise un accès en modification"
-"com.axelor.auth.db.Permission","canCreate","field","Create","Création","Whether to grant create access.","Autorise un accès en creation"
-"com.axelor.auth.db.Permission","canRemove","field","Remove","Suppression","Whether to grant remove access.","Autorise un accès en suppression"
-"com.axelor.auth.db.Permission","canExport","field","Export","Export","Whether to grant export access.","Autorise l'export"
-"com.axelor.auth.db.Permission","condition","field",,"Condition","Domain filter as condition.","Condition d'application des accès"
-"com.axelor.auth.db.Permission","conditionParams","field",,"Paramètres","Comma separated list of params for the condition.","Liste de paramètres séparée par des virgules"
-"com.axelor.auth.db.Role","name","field",,"Nom",,
-"com.axelor.auth.db.Role","description","field",,"Description",,
-"com.axelor.auth.db.Role","permissions","field",,"Permissions",,
-"com.axelor.auth.db.User","code","field","Login","Identifiant",,
-"com.axelor.auth.db.User","name","field",,"Nom",,
-"com.axelor.auth.db.User","password","field",,"Mot de passe",,
-"com.axelor.auth.db.User","email","field",,"Email",,
-"com.axelor.auth.db.User","language","field",,"Langue",,
-"com.axelor.auth.db.User","action","field",,"Action",,
-"com.axelor.auth.db.User","blocked","field",,"Bloquer utilisateur ?","Specify whether to block the user for an indeterminate times.","Bloque l'utilisateur pour une période indéterminée."
-"com.axelor.auth.db.User","activateOn","field",,"Autoriser à partir de","Activate the user from the specified date.","Active l'utilisateur à partir de la date spécifiée."
-"com.axelor.auth.db.User","expiresOn","field",,"Autoriser jusqu'au","Disable the user from the specified date.","Bloque l'utilisateur à partir de la date spécifiée."
-"com.axelor.auth.db.User","group","field",,"Groupe",,
-"com.axelor.auth.db.User","roles","field",,"Roles",,
-"com.axelor.auth.db.User","permissions","field",,"Permissions",,
-,,"select","action-workflow","action-workflow",,
-,,"select","action-ws","action-ws",,
-,,"select","action-export","action-export",,
-,,"select","action-import","action-import",,
-,,"select","action-method","action-method",,
-,,"select","action-record","action-record",,
-,,"select","action-condition","action-condition",,
-,,"select","action-validate","action-validate",,
-,,"select","action-group","action-group",,
-,,"select","action-view","action-view",,
-,,"select","action-attrs","action-attrs",,
-,,"select","Other","Autre",,
-,,"select","Select","Sélection",,
-,,"select","Action","Action",,
-,,"select","Filter","Filtre",,
-,,"select","Search","Recherche",,
-,,"select","Portlet","Portlet",,
-,,"select","Chart","Graphique",,
-,,"select","Tree","Arbre",,
-,,"select","View","Vue",,
-,,"select","Action Menu","Action de menu",,
-,,"select","Menu","Menu",,
-,,"select","Button","Bouton",,
-,,"select","Label","Label",,
-,,"select","Separator","Separateur",,
-,,"select","Page","Page",,
-,,"select","Group","Groupe",,
-,,"select","Documentation","Documentation",,
-,,"select","PlaceHolder","Texte par défaut",,
-,,"select","Help","Aide",,
-,,"select","Field","Champ",,
-,,"select","ManyToMany","ManyToMany",,
-,,"select","OneToMany","OneToMany",,
-,,"select","ManyToOne","ManyToOne",,
-,,"select","OneToOne","OneToOne",,
-,,"select","From directory","A partir d'un dossier",,
-,,"select","From sources","A partir des sources",,
-,,"select","French","Français",,
-,,"select","English","Anglais",,
-,,"select","Collapse","Regrouper",,
-,,"select","Hidden","Caché",,
-,,"select","Visible","Visible",,
-,,"select","Filters","Filtres",,
-,,"select","Calendar","Calendrier",,
-,,"select","Portal","Portail",,
-,,"select","Search","Recherche",,
-,,"select","Chart","Graphique",,
-,,"select","Tree","Arbre",,
-,,"select","Form","Formulaire",,
-,,"select","Grid","Liste",,
-"com.axelor.auth.db.Group",,"button","Show permissions","Voir les permissions",,
-"com.axelor.auth.db.Group",,"view","Group","Groupe",,
-"com.axelor.auth.db.Permission",,"view","Permissions","Permissions",,
-"com.axelor.meta.db.MetaMenu",,"view","Menus","Menus",,
-"com.axelor.meta.db.MetaView",,"view","View","Vue",,
-"com.axelor.auth.db.Group",,"view","Groups","Groupes",,
-"com.axelor.meta.db.MetaAction",,"view","Action","Action",,
-"com.axelor.meta.db.MetaAction",,"page","XML","XML",,
-"com.axelor.meta.db.MetaAction",,"view","All Actions","Les Actions",,
-"com.axelor.meta.db.MetaActionMenu",,"view","Action Menu","Action de menu",,
-"com.axelor.meta.db.MetaActionMenu",,"view","Action Menus","Les Action Menus",,
-"com.axelor.meta.db.MetaAttachment",,"view","MetaAttachment","Les pièces jointes",,
-"com.axelor.meta.db.MetaAttachment","archived","field",,,,
-"com.axelor.meta.db.MetaAttachment",,"view","MetaAttachment","Les pièces jointes",,
-"com.axelor.meta.db.MetaAttachment","archived","field",,,,
-"com.axelor.meta.db.MetaField",,"view","Field","Champ",,
-"com.axelor.meta.db.MetaField",,"button","Show Model","Voir le modèle",,
-"com.axelor.meta.db.MetaField",,"separator","Description","Description",,
-"com.axelor.meta.db.MetaField",,"view","Fields","Champs",,
-"com.axelor.meta.db.MetaFile",,"view","Files","Fichiers",,
-"com.axelor.meta.db.MetaFile",,"view","Files","Fichiers",,
-"com.axelor.meta.db.MetaFile","createdBy","field",,"Crée par",,
-"com.axelor.meta.db.MetaFile","createdOn","field",,"Crée le",,
-"com.axelor.meta.db.MetaFilter",,"view","MetaFilter","Filtres",,
-"com.axelor.meta.db.MetaFilter","archived","field",,,,
-"com.axelor.meta.db.MetaFilter",,"view","MetaFilter","Filtres",,
-"com.axelor.meta.db.MetaFilter","archived","field",,,,
-"com.axelor.meta.db.MetaMenu",,"view","Menu Item","Menu Item",,
-"com.axelor.meta.db.MetaMenu",,"page","Groups","Groupes",,
-"com.axelor.meta.db.MetaMenu",,"view","Menu Items","Menu Items",,
-"com.axelor.meta.db.MetaModel",,"view","Model","Objet",,
-"com.axelor.meta.db.MetaModel",,"view","Models","Objets",,
-"com.axelor.meta.db.MetaModule",,"view","Module","Module",,
-"com.axelor.meta.db.MetaModule",,"separator","Module","Module",,
-"com.axelor.meta.db.MetaModule",,"button","Install","Installer",,
-"com.axelor.meta.db.MetaModule",,"button","Uninstall","Désinstaller",,
-"com.axelor.meta.db.MetaModule",,"separator","Details","Détails",,
-"com.axelor.meta.db.MetaModule",,"view","All Modules","Les Modules",,
-"com.axelor.meta.db.MetaSchedule",,"view","Schedule","Planificateur",,
-"com.axelor.meta.db.MetaSchedule",,"group","Job Details","Détails tâche",,
-"com.axelor.meta.db.MetaSchedule",,"group","Actions","Actions",,
-"com.axelor.meta.db.MetaSchedule",,"button","Validate","Valider",,
-"com.axelor.meta.db.MetaSchedule",,"button","Restart jobs...","Redémarrer",,
-"com.axelor.meta.db.MetaSchedule",,"button","This may terminate any running jobs. Are sure to continue?","Cela va arrêter les instances en cours. Voulez-vous continuer ?",,
-"com.axelor.meta.db.MetaScheduleParam",,"view","Params","Paramètres",,
-"com.axelor.meta.db.MetaScheduleParam",,"view","Param","Paramètre",,
-"com.axelor.meta.db.MetaSchedule",,"view","Schedules","Planificateurs",,
-"com.axelor.meta.db.MetaScheduleParam",,"view","MetaScheduleParam","Paramètre planificateurs",,
-"com.axelor.meta.db.MetaScheduleParam","archived","field",,,,
-"com.axelor.meta.db.MetaScheduleParam",,"view","MetaScheduleParam","Paramètre planificateurs",,
-"com.axelor.meta.db.MetaScheduleParam","archived","field",,,,
-"com.axelor.meta.db.MetaSelect",,"view","Select","Sélection",,
-"com.axelor.meta.db.MetaSelectItem",,"view","Select Items","Eléments de la selection",,
-"com.axelor.meta.db.MetaSelectItem",,"view","Select Item","Elément de la selection",,
-"com.axelor.meta.db.MetaSelectItem",,"viewField","order","Ordre","Sequence order","Ordre d'affichage"
-"com.axelor.meta.db.MetaSelect",,"view","All Selects","Les Sélections",,
-"com.axelor.meta.db.MetaSelectItem",,"view","MetaSelectItem","MetaSelectItem",,
-"com.axelor.meta.db.MetaSelectItem","archived","field",,,,
-"com.axelor.meta.db.MetaSelectItem",,"view","MetaSelectItem","MetaSelectItem",,
-"com.axelor.meta.db.MetaSelectItem","archived","field",,,,
-"com.axelor.meta.db.MetaSequence",,"view","MetaSequence","Séquence",,
-"com.axelor.meta.db.MetaSequence","archived","field",,,,
-"com.axelor.meta.db.MetaSequence",,"view","MetaSequence","Séquence",,
-"com.axelor.meta.db.MetaSequence","archived","field",,,,
-"com.axelor.meta.db.MetaTranslation",,"view","Translation","Traduction",,
-"com.axelor.meta.db.MetaTranslation",,"group","Actions","Actions",,
-"com.axelor.meta.db.MetaTranslation",,"button","Restore All","Tout restaurer",,
-"com.axelor.meta.db.MetaTranslation",,"button","Export All","Tout exporter",,
-"com.axelor.meta.db.MetaTranslation",,"group","Configuration","Configuration",,
-"com.axelor.meta.db.MetaTranslation",,"viewField","Export language","Langue d'export",,
-"com.axelor.meta.db.MetaTranslation",,"viewField","Export path","Chemin d'export",,
-"com.axelor.meta.db.MetaTranslation",,"button","Export","Export",,
-"com.axelor.meta.db.MetaTranslation",,"group","Configuration","Configuration",,
-"com.axelor.meta.db.MetaTranslation",,"viewField","Import type","Type d'import",,
-"com.axelor.meta.db.MetaTranslation",,"viewField","Import path","Chemin d'import",,
-"com.axelor.meta.db.MetaTranslation",,"button","Import","Import",,
-"com.axelor.meta.db.MetaTranslation",,"button","All the customizations will be lost. Are you sure?","Tous les changements seront perdus. Voulez-vous continuer ?",,
-"com.axelor.meta.db.MetaTranslation",,"view","All Translations","Les Traductions",,
-"com.axelor.meta.db.MetaView",,"view","All Charts","Les Graphiques",,
-"com.axelor.meta.db.MetaView",,"view","View","Vue",,
-"com.axelor.meta.db.MetaView",,"group","View Details","Détails de la vue",,
-"com.axelor.meta.db.MetaView",,"group","Actions","Actions",,
-"com.axelor.meta.db.MetaView",,"button","Validate","Valider",,
-"com.axelor.meta.db.MetaView",,"button","Restore","Restaurer",,
-"com.axelor.meta.db.MetaView",,"button","All the customizations made for this view will be lost. Are you sure ?","Tous les changements de cette vue seront perdus. Voulez-vous continuer ?",,
-"com.axelor.meta.db.MetaView",,"button","Restore all","Tout restaurer",,
-"com.axelor.meta.db.MetaView",,"button","All the customizations will be lost. Are you sure ?","Tous les changements seront perdus. Voulez-vous continuer ?",,
-"com.axelor.meta.db.MetaView",,"view","All Views","Les Vues",,
-"com.axelor.auth.db.Permission",,"view","Permission","Permission",,
-"com.axelor.auth.db.Permission",,"group","General","Général",,
-"com.axelor.auth.db.Permission",,"group","Allow","Autorisations",,
-"com.axelor.auth.db.Permission",,"group","Condition","Conditons d'application",,
-"com.axelor.auth.db.Permission",,"viewField","Condition","Conditon",,
-"com.axelor.auth.db.Permission",,"viewField","Params","Parametres",,
-"com.axelor.auth.db.Permission",,"view","Permissions","Permissions",,
-"com.axelor.auth.db.Role",,"view","Role","Role",,
-"com.axelor.auth.db.Role",,"view","Roles","Roles",,
-"com.axelor.auth.db.User",,"view","User","Utilisateurs",,
-"com.axelor.auth.db.User",,"group","General Info","Informations général",,
-"com.axelor.auth.db.User",,"placeholder","user name","nom",,
-"com.axelor.auth.db.User",,"placeholder","user group","groupe",,
-"com.axelor.auth.db.User",,"placeholder","login name","login",,
-"com.axelor.auth.db.User",,"viewField","Change password?","Changer mot de passe ?",,
-"com.axelor.auth.db.User",,"viewField","Password","Mot de passe",,
-"com.axelor.auth.db.User",,"placeholder","new password","nouveau",,
-"com.axelor.auth.db.User",,"placeholder","confirm password","confirmation",,
-"com.axelor.auth.db.User",,"group","Authorization","Autorisation",,
-"com.axelor.auth.db.User",,"group","Preferences","Préférences",,
-"com.axelor.auth.db.User",,"view","Users","Utilisateurs",,
-"com.axelor.auth.db.User",,"view","Preferences","Préférences",,
-,,"action","Groups","Les Groupes",,
-,,"action","Permissions","Les Permissions",,
-,,"action","Roles","Les Roles",,
-,,"action","Users","Les Utilisateurs",,
-,,"action","Code length should be greater than 2.","La longueur de l'identifiant doit être supérieur à 2",,
-,,"action","Name length should be greater than 2.","La longueur du nom doit être supérieur à 2",,
-,,"action","Code length should be greater than 2.","La longueur de l'identifiant doit être supérieur à 2",,
-,,"action","Name length should be greater than 2.","La longueur du nom doit être supérieur à 2",,
-,,"action","Permissions","Les Permissions",,
-,,"action","Action Menus","Les Action Menus",,
-,,"action","Actions","Les Actions",,
-,,"action","Menus","Les Menus",,
-,,"action","Models","Les Modèles",,
-,,"action","Selects","Les Selections",,
-,,"action","Not implemented yet!","Pas encore implémenté!",,
-,,"action","All Translations","Les Traductions",,
-,,"action","Views","Les Vues",,
-,,"action","All Charts","Les Graphiques",,
-,,"action","All Schedules","Les Planificateurs",,
-,,"action","Modules","Les Modules",,
-,,"other","All the customizations will be lost. Are you sure?","Tous les changements seront perdus. Voulez-vous continuer ?",,
-,,"other","Duplicates found:","Doublons trouvés:",,
-,,"other","Export done.","Export terminé.",,
-,,"other","exportPath","Chemin d'export",,
-,,"other","Field is required.","Champ requis.",,
-,,"other","Import done.","Import terminé.",,
-,,"other","Invalid field value.","Valeur non valide.",,
-,,"other","Not a valid object.","Objet non valide.",,
-,,"other","Not implemented yet!","Pas encore implémenté!",,
-,,"other","Object found:","Objet trouvés:",,
-,,"other","Only one permission per object is required.","Une seule permission par objet est requise.",,
-,,"other","Password doesn't match","Le mot de passe ne correspond pas",,
-,,"other","Please enter your export path fisrt.","Merci de renseigner un chemin d'export.",,
-,,"other","Please enter your import path fisrt.","Merci de renseigner un chemin d'import.",,
-,,"other","Please select an import type first.","Merci de renseigner un type d'import.",,
-,,"other","Please specify the module name.","Merci de renseigner le nom du module concerné.",,
-,,"other","Please specify the view name.","Merci de renseigner le nom de la vue concerné.",,
-,,"other","You are not authorized to create this resource.","Vous n'êtes pas autorisé à créer cette ressource.",,
-,,"other","You are not authorized to read this resource.","Vous n'êtes pas autorisé à lire cette ressource.",,
-,,"other","You are not authorized to remove this resource.","Vous n'êtes pas autorisé à supprimer cette ressource.",,
-,,"other","You are not authorized to update this resource.","Vous n'êtes pas autorisé à modifier cette ressource.",,
-"action-auth-users","action-auth-users","documentation",,,,
-"action-auth-groups","action-auth-groups","documentation",,,,
-"action-auth-roles","action-auth-roles","documentation",,,,
-"action-auth-permissions","action-auth-permissions","documentation",,,,
-"action-meta-model-views","action-meta-model-views","documentation",,,,
-"action-meta-views","action-meta-views","documentation",,,,
-"action-meta-menus","action-meta-menus","documentation",,,,
-"action-meta-actions","action-meta-actions","documentation",,,,
-"action-meta-select","action-meta-select","documentation",,,,
-"action-meta-action-menus","action-meta-action-menus","documentation",,,,
-"action-meta-translations","action-meta-translations","documentation",,,,
-"meta.charts","meta.charts","documentation",,,,
-"meta.modules","meta.modules","documentation",,,,
-"meta.jobs","meta.jobs","documentation",,,,
-"user-form","user-form","documentation",,,,
-"user-form","name","documentation",,,,
-"user-form","group","documentation",,,,
-"user-form","code","documentation",,,,
-"user-form","change","documentation",,,,
-"user-form","newPassword","documentation",,,,
-"user-form","confirm","documentation",,,,
-"user-form","blocked","documentation",,,,
-"user-form","activateOn","documentation",,,,
-"user-form","expiresOn","documentation",,,,
-"user-form","email","documentation",,,,
-"user-form","language","documentation",,,,
-"user-form","action","documentation",,,,
-"user-form","roles","documentation",,,,
-"user-form","permissions","documentation",,,,
-"group-form","group-form","documentation",,,,
-"group-form","showPermissions","documentation",,,,
-"group-form","name","documentation",,,,
-"group-form","code","documentation",,,,
-"group-form","navigation","documentation",,,,
-"group-form","technicalStaff","documentation",,,,
-"group-form","roles","documentation",,,,
-"group-form","permissions","documentation",,,,
-"group-form","menus","documentation",,,,
-"group-form","views","documentation",,,,
-"role-form","role-form","documentation",,,,
-"role-form","name","documentation",,,,
-"role-form","description","documentation",,,,
-"role-form","permissions","documentation",,,,
-"permission-form","permission-form","documentation",,,,
-"permission-form","name","documentation",,,,
-"permission-form","object","documentation",,,,
-"permission-form","canRead","documentation",,,,
-"permission-form","canWrite","documentation",,,,
-"permission-form","canCreate","documentation",,,,
-"permission-form","canRemove","documentation",,,,
-"permission-form","canExport","documentation",,,,
-"permission-form","condition","documentation",,,,
-"permission-form","conditionParams","documentation",,,,
-"meta-model-form","meta-model-form","documentation",,,,
-"meta-model-form","packageName","documentation",,,,
-"meta-model-form","name","documentation",,,,
-"meta-model-form","tableName","documentation",,,,
-"meta-model-form","metaFields","documentation",,,,
-"meta-field-form","meta-field-form","documentation",,,,
-"meta-field-form","name","documentation",,,,
-"meta-field-form","packageName","documentation",,,,
-"meta-field-form","typeName","documentation",,,,
-"meta-field-form","label","documentation",,,,
-"meta-field-form","relationship","documentation",,,,
-"meta-field-form","mappedBy","documentation",,,,
-"meta-field-form","openModel","documentation",,,,
-"meta-field-form","description","documentation",,,,
-"meta-view-form","meta-view-form","documentation",,,,
-"meta-view-form","name","documentation",,,,
-"meta-view-form","priority","documentation",,,,
-"meta-view-form","title","documentation",,,,
-"meta-view-form","type","documentation",,,,
-"meta-view-form","model","documentation",,,,
-"meta-view-form","module","documentation",,,,
-"meta-view-form","groups","documentation",,,,
-"meta-view-form","validate","documentation",,,,
-"meta-view-form","restore","documentation",,,,
-"meta-view-form","restoreAll","documentation",,,,
-"meta-view-form","xml","documentation",,,,
-"meta-menu-form","meta-menu-form","documentation",,,,
-"meta-menu-form","name","documentation",,,,
-"meta-menu-form","parent","documentation",,,,
-"meta-menu-form","title","documentation",,,,
-"meta-menu-form","icon","documentation",,,,
-"meta-menu-form","action","documentation",,,,
-"meta-menu-form","top","documentation",,,,
-"meta-menu-form","module","documentation",,,,
-"meta-menu-form","left","documentation",,,,
-"meta-menu-form","priority","documentation",,,,
-"meta-menu-form","mobile","documentation",,,,
-"meta-menu-form","groups","documentation",,,,
-"meta-action-form","meta-action-form","documentation",,,,
-"meta-action-form","name","documentation",,,,
-"meta-action-form","type","documentation",,,,
-"meta-action-form","model","documentation",,,,
-"meta-action-form","module","documentation",,,,
-"meta-action-form","xml","documentation",,,,
-"meta-select-form","meta-select-form","documentation",,,,
-"meta-select-form","name","documentation",,,,
-"meta-select-form","priority","documentation",,,,
-"meta-select-form","module","documentation",,,,
-"meta-select-form","items","documentation",,,,
-"meta-select-form","title","documentation",,,,
-"meta-select-form","value","documentation",,,,
-"meta-select-form","data","documentation",,,,
-"meta-select-form","order","documentation",,,"Sequence order",
-"meta-action-menu-form","meta-action-menu-form","documentation",,,,
-"meta-action-menu-form","name","documentation",,,,
-"meta-action-menu-form","title","documentation",,,,
-"meta-action-menu-form","parent","documentation",,,,
-"meta-action-menu-form","category","documentation",,,,
-"meta-action-menu-form","action","documentation",,,,
-"meta-action-menu-form","module","documentation",,,,
-"meta-translations-form","meta-translations-form","documentation",,,,
-"meta-translations-form","key","documentation",,,,
-"meta-translations-form","language","documentation",,,,
-"meta-translations-form","translation","documentation",,,,
-"meta-translations-form","domain","documentation",,,,
-"meta-translations-form","type","documentation",,,,
-"meta-translations-form","module","documentation",,,,
-"meta-translations-form","restoreAll","documentation",,,,
-"meta-translations-form","export","documentation",,,,
-"meta-translations-form","exportLanguage","documentation",,,,
-"meta-translations-form","exportPath","documentation",,,,
-"meta-translations-form","lauchExport","documentation",,,,
-"meta-translations-form","importType","documentation",,,,
-"meta-translations-form","importPath","documentation",,,,
-"meta-translations-form","lauchImport","documentation",,,,
-"meta-module-form","meta-module-form","documentation",,,,
-"meta-module-form","title","documentation",,,,
-"meta-module-form","name","documentation",,,,
-"meta-module-form","moduleVersion","documentation",,,,
-"meta-module-form","depends","documentation",,,,
-"meta-module-form","installed","documentation",,,,
-"meta-module-form","btnInstall","documentation",,,,
-"meta-module-form","btnUninstall","documentation",,,,
-"meta-module-form","description","documentation",,,,
-"meta-schedule-form","meta-schedule-form","documentation",,,,
-"meta-schedule-form","name","documentation",,,,
-"meta-schedule-form","active","documentation",,,,
-"meta-schedule-form","description","documentation",,,,
-"meta-schedule-form","job","documentation",,,,
-"meta-schedule-form","cron","documentation",,,,
-"meta-schedule-form","btnValidate","documentation",,,,
-"meta-schedule-form","btnRestart","documentation",,,,
-"meta-schedule-form","params","documentation",,,,
-"meta-schedule-form","value","documentation",,,,
+key,message
+Administration,Administration
+Action,Action
+Action Menu,Action de menu
+Action Menus,Les Action Menus
+Actions,Actions
+Activate on,Autoriser à partir de
+Active,Actif
+All Actions,Les Actions
+All Charts,Les Graphiques
+All Menus,Les Menus
+All Models,Les Modèles
+All Modules,Les Modules
+All Schedules,Les Planificateurs
+All Selects,Les Selections
+All Translations,Les Traductions
+All Views,Les Vues
+Blocked,Bloquer utilisateur ?
+Button,Bouton
+Calendar,Calendrier
+Category,Catégorie
+Chart,Graphique
+Code,Code
+Collapse,Regrouper
+Condition,Condition
+Condition params,Paramètres
+Create,Création
+Created by,Crée par
+Created on,Crée le
+Cron,Cron
+Data,Données
+Depends,Dépend de
+Description,Description
+Details,Détails
+Documentation,Documentation
+Domain,Domain
+Email,Email
+English,English
+Expires on,Autoriser jusqu'au
+Export,Export
+Field,Champ
+Fields,Champs
+File,Fichier
+File type,Type
+File name,Nom du fichier
+File path,Chemin du fichier
+Files,Fichiers
+Filter,Filtre
+Filter custom,Filtre personnalisé
+Filters,Filtres
+Filter view,Filtre de vue
+Form,Formulaire
+French,Français
+From directory,A partir d'un dossier
+From sources,A partir des sources
+Full name,Nom complet
+Grid,Liste
+Group,Groupe
+Groups,Les Groupes
+Help,Aide
+Hidden,Caché
+Icon,Icone
+Increment,Increment
+Initial,Valeur origine
+Install,Installer
+Installed,Installé ?
+Items,Elément
+Job,Job
+Job Details,Détails tâche
+Job Management,Gestion des planificateurs
+key,Clé
+Label,Libellé
+Language,Langue
+Left,Menu à gauche ?
+Login,Identifiant
+Many to many,ManyToMany
+Many to one,ManyToOne
+Mapped by,Mappé avec
+Menu,Menu
+Menu Item,Menu Item
+Menu Items,Menu Items
+Menus,Menus
+Attachment,Les pièces jointes
+Filter,Filtres
+Schedule param,Paramètre planificateurs
+Select Item,MetaSelectItem
+Mobile,Menu mobile ?
+model,Modèle
+Model Management,Gestion des modèles
+Models,Objets
+Module,Module
+Module Management,Gestion des modules
+Name,Nom
+Next,Valeur suivante
+Object,Objet
+Object ID,ID de l'objet
+Object name,Nom de l'objet
+Other,Autre
+Package,Nom du package
+Padding,Remplissage
+Page,Page
+Param,Paramètre
+Params,Paramètres
+Parent,Parent
+Password,Mot de passe
+Permissions,Permissions
+PlaceHolder,Texte par défaut
+Portal,Portail
+Portlet,Portlet
+Prefix,Prefix
+Priority,Priorité
+Read,Lecture
+Relationship,Relation
+Removable,Supprimable ?
+Remove,Suppression
+Restart jobs...,Redémarrer
+Roles,Les Roles
+Schedule,Planificateur
+Schedules,Planificateurs
+Search,Recherche
+Select,Sélection
+Select Item,Elément de la selection
+Select Items,Eléments de la selection
+Separator,Separateur
+Shared,Partagé ?
+Show Model,Voir le modèle
+Show permissions,Voir les permissions
+Size,Taille
+Size in bytes,Taille en bytes
+suffix,Suffix
+Table,Table
+Technical staff,Données techniques
+This may terminate any running jobs. Are sure to continue?,Cela va arrêter les instances en cours. Voulez-vous continuer ?
+Title,Libellé
+Top,Menu du haut ?
+Translation,Traduction
+Tree,Arbre
+Type,Type
+Uninstall,Désinstaller
+User,Utilisateur
+User Management,Gestion des utilisateurs
+Users,Les Utilisateurs
+Validate,Valider
+Value,Valeur
+Version,Version
+View,Vue
+View Management,Gestion des vues
+Views,Vues
+Visible,Visible
+Write,Modification
+XML,XML
+Xml ID,ID XML
+MetaSequence,Séquence
+Translation,Traduction
+Actions,Actions
+Restore All,Tout restaurer
+Export All,Tout exporter
+Configuration,Configuration
+Export language,Langue d'export
+Export path,Chemin d'export
+Export,Export
+Configuration,Configuration
+Import type,Type d'import
+Import path,Chemin d'import
+Import,Import
+All the customizations will be lost. Are you sure?,Tous les changements seront perdus. Voulez-vous continuer ?
+All Translations,Les Traductions
+All Charts,Les Graphiques
+View,Vue
+View Details,Détails de la vue
+Actions,Actions
+Validate,Valider
+Restore,Restaurer
+All the customizations made for this view will be lost. Are you sure ?,Tous les changements de cette vue seront perdus. Voulez-vous continuer ?
+Restore all,Tout restaurer
+All the customizations will be lost. Are you sure ?,Tous les changements seront perdus. Voulez-vous continuer ?
+All Views,Les Vues
+Permission,Permission
+General,Général
+Allow,Autorisations
+Condition,Conditons d'application
+Condition,Conditon
+Params,Parametres
+Permissions,Permissions
+Role,Role
+Roles,Roles
+User,Utilisateurs
+General Info,Informations général
+user name,nom
+user group,groupe
+login name,login
+Change password?,Changer mot de passe ?
+Password,Mot de passe
+new password,nouveau
+confirm password,confirmation
+Authorization,Autorisation
+Preferences,Préférences
+Users,Utilisateurs
+Preferences,Préférences
+Groups,Les Groupes
+Permissions,Les Permissions
+Roles,Les Roles
+Users,Les Utilisateurs
+Code length should be greater than 2.,La longueur de l'identifiant doit être supérieur à 2
+Name length should be greater than 2.,La longueur du nom doit être supérieur à 2
+Code length should be greater than 2.,La longueur de l'identifiant doit être supérieur à 2
+Name length should be greater than 2.,La longueur du nom doit être supérieur à 2
+Permissions,Les Permissions
+Action Menus,Les Action Menus
+Actions,Les Actions
+Menus,Les Menus
+Models,Les Modèles
+Selects,Les Selections
+Not implemented yet!,Pas encore implémenté!
+All Translations,Les Traductions
+Views,Les Vues
+All Charts,Les Graphiques
+All Schedules,Les Planificateurs
+Modules,Les Modules
+All the customizations will be lost. Are you sure?,Tous les changements seront perdus. Voulez-vous continuer ?
+Duplicates found:,Doublons trouvés:
+Export done.,Export terminé.
+exportPath,Chemin d'export
+Field is required.,Champ requis.
+Import done.,Import terminé.
+Invalid field value.,Valeur non valide.
+Not a valid object.,Objet non valide.
+Not implemented yet!,Pas encore implémenté!
+Object found:,Objet trouvés:
+Only one permission per object is required.,Une seule permission par objet est requise.
+Password doesn't match,Le mot de passe ne correspond pas
+Please enter your export path fisrt.,Merci de renseigner un chemin d'export.
+Please enter your import path fisrt.,Merci de renseigner un chemin d'import.
+Please select an import type first.,Merci de renseigner un type d'import.
+Please specify the module name.,Merci de renseigner le nom du module concerné.
+Please specify the view name.,Merci de renseigner le nom de la vue concerné.
+You are not authorized to create this resource.,Vous n'êtes pas autorisé à créer cette ressource.
+You are not authorized to read this resource.,Vous n'êtes pas autorisé à lire cette ressource.
+You are not authorized to remove this resource.,Vous n'êtes pas autorisé à supprimer cette ressource.
+You are not authorized to update this resource.,Vous n'êtes pas autorisé à modifier cette ressource.
+Specify whether the members of this group are technical staff.,Indiquez si les membres de ce groupe sont des utilisateurs technique.
+Category name to group action menus.,Nom de la catégorie pour grouper les actions menus
+The select item title.,Label de la selection
+The select item value.,Valeur de la selection
+The addition data for UI widgets.,Données additionnelles utilisés par l'interface
+An unique permission name.,Nom unique de la permission
+Fully qualified object name or wild card package name.,Nom de l'objet
+Whether to grant read access.,Autorise un accès en lecture
+Whether to grant write access.,Autorise un accès en modification
+Whether to grant create access.,Autorise un accès en creation
+Whether to grant remove access.,Autorise un accès en suppression
+Whether to grant export access.,Autorise l'export
+Domain filter as condition.,Condition d'application des accès
+Comma separated list of params for the condition.,Liste de paramètres séparée par des virgules
+Specify whether to block the user for an indeterminate times.,Bloque l'utilisateur pour une période indéterminée.
+Activate the user from the specified date.,Active l'utilisateur à partir de la date spécifiée.
+Disable the user from the specified date.,Bloque l'utilisateur à partir de la date spécifiée.
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+Sequence order,Ordre d'affichage

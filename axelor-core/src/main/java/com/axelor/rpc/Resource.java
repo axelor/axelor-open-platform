@@ -49,6 +49,9 @@ import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
+import com.axelor.i18n.I18n;
+import com.axelor.i18n.I18nBundle;
+import com.axelor.meta.db.MetaTranslation;
 import com.axelor.rpc.filter.Filter;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Function;
@@ -383,8 +386,7 @@ public class Resource<T extends Model> {
 					continue;
 				}
 				name = name + '.' + prop.getName();
-			}
-			else if(prop.getSelection() != null && !"".equals(prop.getSelection().trim())) {
+			} else if(prop.getSelection() != null && !"".equals(prop.getSelection().trim())) {
 				javax.persistence.Query q = JPA.em().createQuery("SELECT new List(self.value, self.title) FROM MetaSelectItem self "
 						+ "JOIN self.select metaSelect "
 						+ "WHERE metaSelect.name = ?1");
@@ -402,7 +404,7 @@ public class Resource<T extends Model> {
 				selection.put(header.size(), map);
 			}
 
-			title = JPA.translate(title, title, prop.getEntity().getName());
+			title = I18n.get(title);
 
 			names.add(name);
 			header.add(escapeCsv(title));
@@ -532,6 +534,13 @@ public class Resource<T extends Model> {
 
 			bean = JPA.manage(bean);
 			data.add(bean);
+			
+			// if it's a translation object, invalidate cache
+			if (bean instanceof MetaTranslation) {
+				I18nBundle.invalidate(
+						((MetaTranslation) bean).getKey(),
+						((MetaTranslation) bean).getMessage());
+			}
 		}
 
 		response.setData(data);

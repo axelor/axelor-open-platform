@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.common.StringUtils;
-import com.axelor.db.JPA;
+import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
@@ -94,7 +94,7 @@ public class ActionCondition extends Action {
 
 		public String getCondition(String field) {
 			String condition = this.getCondition();
-			if (isEmpty(condition) && !isEmpty(field)) {
+			if (StringUtils.isBlank(condition) && !StringUtils.isBlank(field)) {
 				return field + " == null";
 			}
 			return condition != null ? condition.trim() : condition;
@@ -104,22 +104,18 @@ public class ActionCondition extends Action {
 			return field;
 		}
 
-		public String getDefaultError() {
+		public String getError() {
 			return error;
 		}
 
-		public String getError() {
-			if (isEmpty(error)) {
-				if (isEmpty(this.getCondition())) {
-					return JPA.translate("Field is required.", "Field is required.", null, "action");
+		public String getLocalizedError() {
+			if (StringUtils.isBlank(error)) {
+				if (StringUtils.isBlank(this.getCondition())) {
+					return I18n.get("Field is required.");
 				}
-				return JPA.translate("Invalid field value.", "Invalid field value.", null, "action");
+				return I18n.get("Invalid field value.");
 			}
-			return JPA.translate(error, error, null, "action");
-		}
-
-		private boolean isEmpty(String str) {
-			return str == null || "".equals(str.trim());
+			return I18n.get(error);
 		}
 
 		@Override

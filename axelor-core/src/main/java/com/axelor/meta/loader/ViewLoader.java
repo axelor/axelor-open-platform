@@ -187,7 +187,7 @@ public class ViewLoader extends AbstractLoader {
 		}
 
 		entity.setXmlId(xmlId);
-		entity.setTitle(view.getDefaultTitle());
+		entity.setTitle(view.getTitle());
 		entity.setType(type);
 		entity.setModel(modelName);
 		entity.setModule(module.getName());
@@ -242,7 +242,7 @@ public class ViewLoader extends AbstractLoader {
 		for(Selection.Option opt : selection.getOptions()) {
 			MetaSelectItem item = new MetaSelectItem();
 			item.setValue(opt.getValue());
-			item.setTitle(opt.getDefaultTitle());
+			item.setTitle(opt.getTitle());
 			item.setOrder(sequence++);
 			entity.addItem(item);
 			if (opt.getData() == null) {
@@ -342,7 +342,7 @@ public class ViewLoader extends AbstractLoader {
 		}
 
 		menu.setPriority(menuItem.getPriority());
-		menu.setTitle(menuItem.getDefaultTitle());
+		menu.setTitle(menuItem.getTitle());
 		menu.setIcon(menuItem.getIcon());
 		menu.setModule(module.getName());
 		menu.setTop(menuItem.getTop());
@@ -398,7 +398,7 @@ public class ViewLoader extends AbstractLoader {
 			return;
 		}
 
-		menu.setTitle(menuItem.getDefaultTitle());
+		menu.setTitle(menuItem.getTitle());
 		menu.setModule(module.getName());
 		menu.setCategory(menuItem.getCategory());
 

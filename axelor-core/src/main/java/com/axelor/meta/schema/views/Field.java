@@ -24,14 +24,14 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.PropertyType;
+import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
@@ -128,30 +128,13 @@ public class Field extends SimpleWidget {
 	@JsonIgnore
 	private Boolean documentation;
 
-	@Override
-	public String getTitle() {
-		if(!Strings.isNullOrEmpty(super.getDefaultTitle())) {
-			return JPA.translate(super.getDefaultTitle(), super.getDefaultTitle(), this.getModel(), "field");
-		}
-		return JPA.translate(this.getName(), super.getDefaultTitle(), this.getModel(), "field");
-	}
-
-	@Override
-	public String getHelp() {
-		if(!Strings.isNullOrEmpty(super.getDefaultHelp())) {
-			return JPA.translate(super.getDefaultHelp(), super.getDefaultHelp(), this.getModel(), "help");
-		}
-		return JPA.translate(this.getName(), super.getDefaultHelp(), this.getModel(), "help");
-	}
-
-	public String getDefaultPlaceholder() {
+	@JsonGetter("placeholder")
+	public String getLocalizedPlaceholder() {
 		return placeholder;
 	}
 
+	@JsonIgnore
 	public String getPlaceholder() {
-		if (!Strings.isNullOrEmpty(placeholder)) {
-			return JPA.translate(placeholder, placeholder, this.getModel(), "placeholder");
-		}
 		return placeholder;
 	}
 
@@ -273,7 +256,7 @@ public class Field extends SimpleWidget {
 			return null;
 		}
 		for(MetaSelectItem item : items) {
-			all.add(ImmutableMap.of("value", item.getValue(), "title", JPA.translate(item.getTitle(), item.getTitle(), null, "select")));
+			all.add(ImmutableMap.of("value", item.getValue(), "title", I18n.get(item.getTitle())));
 		}
 		return all;
 	}

@@ -1,366 +1,108 @@
-"domain","name","type","title","title_t","help","help_t"
-"menu-wkf","Wkf Management","menu","Wkf Management","Gestion des processus","",""
-"menu-wkf-configurations","Configurations","menu","Configurations","Configurations","",""
-"menu-wkf-instances","Instances","menu","Instances","Instances","",""
-"menu-wkf-nodes-root","Nodes","menu","Nodes","Nœuds","",""
-"menu-wkf-nodes-root-event","Events","menu","Events","Evènements","",""
-"menu-wkf-start-event","Start events","menu","Start events","Evènements de départ","",""
-"menu-wkf-intermediate-timer-event","Timer events","menu","Timer events","Evènements minuteurs","",""
-"menu-wkf-end-event","End events","menu","End events","Evènements de fin","",""
-"menu-wkf-nodes-root-message","Messages","menu","Messages","Messages","",""
-"menu-wkf-intermediate-email-message-event","E-mail events","menu","E-mail events","E-mails","",""
-"menu-wkf-intermediate-mail-event","Mail events","menu","Mail events","Courriers","",""
-"menu-wkf-intermediate-sms-event","Sms events","menu","Sms events","Sms","",""
-"menu-wkf-intermediate-phone-call-event","Phone call events","menu","Phone call events","Appels téléphoniques","",""
-"menu-wkf-intermediate-internet-site-event","Internet site events","menu","Internet site events","Site internet","",""
-"menu-wkf-nodes-root-social-network","Social networks","menu","Social networks","Réseaux sociaux","",""
-"menu-wkf-intermediate-facebook-event","Facebook events","menu","Facebook events","Facebook","",""
-"menu-wkf-intermediate-linkedin-event","Linkedin events","menu","Linkedin events","Linkedin","",""
-"menu-wkf-intermediate-twitter-event","twitter events","menu","twitter events","twitter","",""
-"menu-wkf-nodes-root-filter","Filters","menu","Filters","Filtres","",""
-"menu-wkf-filter-event","Filters","menu","Filters","Filtres","",""
-"menu-wkf-stop-filter-event","Stop filters","menu","Stop filters","Fin filtres","",""
-"menu-wkf-nodes-root-activity","Activities","menu","Activities","Activités","",""
-"menu-wkf-activity","Activities","menu","Activities","Activités","",""
-"menu-wkf-nodes-root-gateway","Gateways","menu","Gateways","Passerelles","",""
-"menu-wkf-inclusive-gateway","Inclusive gateways","menu","Inclusive gateways","Inclusives","",""
-"menu-wkf-exclusive-gateway","Exclusive gateways","menu","Exclusive gateways","Exclusives","",""
-"menu-wkf-parallel-gateway","Parallel gateways","menu","Parallel gateways","Parallèles","",""
-"menu-wkf-transitions","Transitions","menu","Transitions","Transitions","",""
-"menu-wkf-workflows","Workflows","menu","Workflows","Les Processus","",""
-"com.axelor.wkf.db.Instance","workflow","field","Workflow","Processus","",""
-"com.axelor.wkf.db.Instance","metaModelId","field","Model ID","Modèle ID","",""
-"com.axelor.wkf.db.Instance","nodes","field","Nodes","Les Noeuds","",""
-"com.axelor.wkf.db.Instance","executedTransitions","field","Executed transitions","Les transitions exécutées","",""
-"com.axelor.wkf.db.Instance","creationDate","field","Creation date","Date de création","",""
-"com.axelor.wkf.db.Instance","creationUser","field","User","Utilisateur","",""
-"com.axelor.wkf.db.Instance","histories","field","Histories","Historique","",""
-"com.axelor.wkf.db.Instance","counters","field","Counters","Compteurs","",""
-"com.axelor.wkf.db.InstanceHistory","instance","field","","Instance","",""
-"com.axelor.wkf.db.InstanceHistory","transition","field","Transition","Transition","",""
-"com.axelor.wkf.db.InstanceHistory","creationDate","field","Création date","Date de création","",""
-"com.axelor.wkf.db.InstanceHistory","creationUser","field","User","Utilisateur","",""
-"com.axelor.wkf.db.InstanceCounter","instance","field","","Instance","",""
-"com.axelor.wkf.db.InstanceCounter","node","field","Node","Noeud","",""
-"com.axelor.wkf.db.InstanceCounter","counter","field","Counter","Compteur","",""
-"com.axelor.wkf.db.Workflow","name","field","","Nom","",""
-"com.axelor.wkf.db.Workflow","metaModel","field","","Model","",""
-"com.axelor.wkf.db.Workflow","node","field","","Noeud","",""
-"com.axelor.wkf.db.Workflow","maxNodeCounter","field","","Nombre de noeuds maximun","",""
-"com.axelor.wkf.db.Workflow","condition","field","Condition","Condition","",""
-"com.axelor.wkf.db.Workflow","sequence","field","","Sequence","",""
-"com.axelor.wkf.db.Workflow","description","field","","Description","",""
-"com.axelor.wkf.db.Workflow","active","field","","Actif ?","",""
-"com.axelor.wkf.db.Workflow","archived","field","","Archivé ?","",""
-"com.axelor.wkf.db.Workflow","bpmn","field","","BPMN","",""
-"com.axelor.wkf.db.Workflow","xmlData","field","","Données XML","",""
-"com.axelor.wkf.db.Workflow","ref","field","","Ref","",""
-"com.axelor.wkf.db.Node","name","field","","Nom","",""
-"com.axelor.wkf.db.Node","type","field","","Type","",""
-"com.axelor.wkf.db.Node","action","field","","Action","",""
-"com.axelor.wkf.db.Node","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.Node","messageType","field","","Type de message","",""
-"com.axelor.wkf.db.Node","socialNetwork","field","","Réseau social","",""
-"com.axelor.wkf.db.Node","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.Node","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.Node","description","field","","Description","",""
-"com.axelor.wkf.db.Node","ref","field","","Ref","",""
-"com.axelor.wkf.db.Node","account","field","","Compte","",""
-"com.axelor.wkf.db.Node","persist","field","","Persister ?","",""
-"com.axelor.wkf.db.Node","template","field","","Template","",""
-"com.axelor.wkf.db.Node","templateModel","field","","Model de template","",""
-"com.axelor.wkf.db.Node","privateMessage","field","","Message privé ?","",""
-"com.axelor.wkf.db.Node","targetPage","field","","Page cible","",""
-"com.axelor.wkf.db.Node","timeDuration","field","","Durée","",""
-"com.axelor.wkf.db.Node","timeCycle","field","","Cycle","",""
-"com.axelor.wkf.db.Node","timeDate","field","","Date","",""
-"com.axelor.wkf.db.node.StartEvent","name","field","","Nom","",""
-"com.axelor.wkf.db.node.StartEvent","type","field","","Type","",""
-"com.axelor.wkf.db.node.StartEvent","action","field","","Action","",""
-"com.axelor.wkf.db.node.StartEvent","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.StartEvent","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.StartEvent","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.StartEvent","description","field","","Description","",""
-"com.axelor.wkf.db.node.StartEvent","ref","field","","Ref","",""
-"com.axelor.wkf.db.node.EndEvent","name","field","","Nom","",""
-"com.axelor.wkf.db.node.EndEvent","type","field","","Type","",""
-"com.axelor.wkf.db.node.EndEvent","action","field","","Action","",""
-"com.axelor.wkf.db.node.EndEvent","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.EndEvent","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.EndEvent","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.EndEvent","description","field","","Description","",""
-"com.axelor.wkf.db.node.EndEvent","ref","field","","Ref","",""
-"com.axelor.wkf.db.node.Activity","name","field","","Nom","",""
-"com.axelor.wkf.db.node.Activity","type","field","","Type","",""
-"com.axelor.wkf.db.node.Activity","action","field","","Action","",""
-"com.axelor.wkf.db.node.Activity","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.Activity","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.Activity","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.Activity","description","field","","Description","",""
-"com.axelor.wkf.db.node.Activity","ref","field","","Ref","",""
-"com.axelor.wkf.db.node.IntermediateTimerEvent","name","field","","Nom","",""
-"com.axelor.wkf.db.node.IntermediateTimerEvent","type","field","","Type","",""
-"com.axelor.wkf.db.node.IntermediateTimerEvent","action","field","","Action","",""
-"com.axelor.wkf.db.node.IntermediateTimerEvent","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.IntermediateTimerEvent","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.IntermediateTimerEvent","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.IntermediateTimerEvent","description","field","","Description","",""
-"com.axelor.wkf.db.node.IntermediateTimerEvent","ref","field","","Ref","",""
-"com.axelor.wkf.db.node.IntermediateTimerEvent","timeDuration","field","","Durée","",""
-"com.axelor.wkf.db.node.IntermediateTimerEvent","timeCycle","field","","Cycle","",""
-"com.axelor.wkf.db.node.IntermediateTimerEvent","timeDate","field","","Date","",""
-"com.axelor.wkf.db.node.message.IntermediateEmailEvent","name","field","","Nom","",""
-"com.axelor.wkf.db.node.message.IntermediateEmailEvent","type","field","","Type","",""
-"com.axelor.wkf.db.node.message.IntermediateEmailEvent","action","field","","Action","",""
-"com.axelor.wkf.db.node.message.IntermediateEmailEvent","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.message.IntermediateEmailEvent","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.message.IntermediateEmailEvent","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.message.IntermediateEmailEvent","description","field","","Description","",""
-"com.axelor.wkf.db.node.message.IntermediateEmailEvent","ref","field","","Ref","",""
-"com.axelor.wkf.db.node.message.IntermediateEmailEvent","account","field","","Compte","",""
-"com.axelor.wkf.db.node.message.IntermediateEmailEvent","persist","field","","Persister ?","",""
-"com.axelor.wkf.db.node.message.IntermediateEmailEvent","template","field","","Template","",""
-"com.axelor.wkf.db.node.message.IntermediateEmailEvent","templateModel","field","","Model de template","",""
-"com.axelor.wkf.db.node.message.IntermediateMailEvent","name","field","","Nom","",""
-"com.axelor.wkf.db.node.message.IntermediateMailEvent","type","field","","Type","",""
-"com.axelor.wkf.db.node.message.IntermediateMailEvent","action","field","","Action","",""
-"com.axelor.wkf.db.node.message.IntermediateMailEvent","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.message.IntermediateMailEvent","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.message.IntermediateMailEvent","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.message.IntermediateMailEvent","description","field","","Description","",""
-"com.axelor.wkf.db.node.message.IntermediateMailEvent","ref","field","","Ref","",""
-"com.axelor.wkf.db.node.message.IntermediateMailEvent","account","field","","Compte","",""
-"com.axelor.wkf.db.node.message.IntermediateMailEvent","persist","field","","Persister ?","",""
-"com.axelor.wkf.db.node.message.IntermediateMailEvent","template","field","","Template","",""
-"com.axelor.wkf.db.node.message.IntermediateMailEvent","templateModel","field","","Model de template","",""
-"com.axelor.wkf.db.node.message.IntermediateSmsEvent","name","field","","Nom","",""
-"com.axelor.wkf.db.node.message.IntermediateSmsEvent","type","field","","Type","",""
-"com.axelor.wkf.db.node.message.IntermediateSmsEvent","action","field","","Action","",""
-"com.axelor.wkf.db.node.message.IntermediateSmsEvent","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.message.IntermediateSmsEvent","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.message.IntermediateSmsEvent","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.message.IntermediateSmsEvent","description","field","","Description","",""
-"com.axelor.wkf.db.node.message.IntermediateSmsEvent","ref","field","","Ref","",""
-"com.axelor.wkf.db.node.message.IntermediateSmsEvent","account","field","","Compte","",""
-"com.axelor.wkf.db.node.message.IntermediateSmsEvent","persist","field","","Persister ?","",""
-"com.axelor.wkf.db.node.message.IntermediateSmsEvent","template","field","","Template","",""
-"com.axelor.wkf.db.node.message.IntermediateSmsEvent","templateModel","field","","Model de template","",""
-"com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent","name","field","","Nom","",""
-"com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent","type","field","","Type","",""
-"com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent","action","field","","Action","",""
-"com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent","description","field","","Description","",""
-"com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent","ref","field","","Ref","",""
-"com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent","account","field","","Compte","",""
-"com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent","persist","field","","Persister ?","",""
-"com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent","template","field","","Template","",""
-"com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent","templateModel","field","","Model de template","",""
-"com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent","name","field","","Nom","",""
-"com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent","type","field","","Type","",""
-"com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent","action","field","","Action","",""
-"com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent","description","field","","Description","",""
-"com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent","ref","field","","Ref","",""
-"com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent","account","field","","Compte","",""
-"com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent","persist","field","","Persister ?","",""
-"com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent","template","field","","Template","",""
-"com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent","templateModel","field","","Model de template","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent","name","field","","Nom","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent","type","field","","Type","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent","action","field","","Action","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent","description","field","","Description","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent","ref","field","","Ref","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent","account","field","","Compte","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent","persist","field","","Persister ?","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent","template","field","","Template","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent","templateModel","field","","Model de template","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent","privateMessage","field","","Message privé ?","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent","targetPage","field","","Page cible","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent","name","field","","Nom","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent","type","field","","Type","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent","action","field","","Action","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent","description","field","","Description","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent","ref","field","","Ref","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent","account","field","","Compte","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent","persist","field","","Persister ?","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent","template","field","","Template","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent","templateModel","field","","Model de template","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent","privateMessage","field","","Message privé ?","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent","name","field","","Nom","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent","type","field","","Type","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent","action","field","","Action","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent","description","field","","Description","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent","ref","field","","Ref","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent","account","field","","Compte","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent","persist","field","","Persister ?","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent","template","field","","Template","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent","templateModel","field","","Model de template","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent","privateMessage","field","","Message privé ?","",""
-"com.axelor.wkf.db.node.FilterEvent","name","field","","Nom","",""
-"com.axelor.wkf.db.node.FilterEvent","type","field","","Type","",""
-"com.axelor.wkf.db.node.FilterEvent","action","field","","Action","",""
-"com.axelor.wkf.db.node.FilterEvent","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.FilterEvent","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.FilterEvent","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.FilterEvent","description","field","","Description","",""
-"com.axelor.wkf.db.node.FilterEvent","ref","field","","Ref","",""
-"com.axelor.wkf.db.node.FilterEvent","filter","field","","Filtre","",""
-"com.axelor.wkf.db.node.StopFilterEvent","name","field","","Nom","",""
-"com.axelor.wkf.db.node.StopFilterEvent","type","field","","Type","",""
-"com.axelor.wkf.db.node.StopFilterEvent","action","field","","Action","",""
-"com.axelor.wkf.db.node.StopFilterEvent","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.StopFilterEvent","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.StopFilterEvent","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.StopFilterEvent","description","field","","Description","",""
-"com.axelor.wkf.db.node.StopFilterEvent","ref","field","","Ref","",""
-"com.axelor.wkf.db.Gateway","name","field","","Nom","",""
-"com.axelor.wkf.db.Gateway","type","field","","Type","",""
-"com.axelor.wkf.db.Gateway","action","field","","Action","",""
-"com.axelor.wkf.db.Gateway","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.Gateway","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.Gateway","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.Gateway","description","field","","Description","",""
-"com.axelor.wkf.db.Gateway","ref","field","","Ref","",""
-"com.axelor.wkf.db.node.gateway.InclusiveGateway","name","field","","Nom","",""
-"com.axelor.wkf.db.node.gateway.InclusiveGateway","type","field","","Type","",""
-"com.axelor.wkf.db.node.gateway.InclusiveGateway","action","field","","Action","",""
-"com.axelor.wkf.db.node.gateway.InclusiveGateway","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.gateway.InclusiveGateway","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.gateway.InclusiveGateway","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.gateway.InclusiveGateway","description","field","","Description","",""
-"com.axelor.wkf.db.node.gateway.InclusiveGateway","ref","field","","Ref","",""
-"com.axelor.wkf.db.node.gateway.ExclusiveGateway","name","field","","Nom","",""
-"com.axelor.wkf.db.node.gateway.ExclusiveGateway","type","field","","Type","",""
-"com.axelor.wkf.db.node.gateway.ExclusiveGateway","action","field","","Action","",""
-"com.axelor.wkf.db.node.gateway.ExclusiveGateway","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.gateway.ExclusiveGateway","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.gateway.ExclusiveGateway","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.gateway.ExclusiveGateway","description","field","","Description","",""
-"com.axelor.wkf.db.node.gateway.ExclusiveGateway","ref","field","","Ref","",""
-"com.axelor.wkf.db.node.gateway.ParallelGateway","name","field","","Nom","",""
-"com.axelor.wkf.db.node.gateway.ParallelGateway","type","field","","Type","",""
-"com.axelor.wkf.db.node.gateway.ParallelGateway","action","field","","Action","",""
-"com.axelor.wkf.db.node.gateway.ParallelGateway","operator","field","","Opérateur Logique","",""
-"com.axelor.wkf.db.node.gateway.ParallelGateway","startTransitions","field","","Transition de départ","",""
-"com.axelor.wkf.db.node.gateway.ParallelGateway","endTransitions","field","","Transition de fin","",""
-"com.axelor.wkf.db.node.gateway.ParallelGateway","description","field","","Description","",""
-"com.axelor.wkf.db.node.gateway.ParallelGateway","ref","field","","Ref","",""
-"com.axelor.wkf.db.Transition","startNode","field","Start node","Noeud de départ","",""
-"com.axelor.wkf.db.Transition","nextNode","field","Next node","Prochain noeud","",""
-"com.axelor.wkf.db.Transition","name","field","Name","Nom","",""
-"com.axelor.wkf.db.Transition","condition","field","Condition","Condition","",""
-"com.axelor.wkf.db.Transition","sequence","field","Sequence","Séquence","",""
-"com.axelor.wkf.db.Transition","description","field","Description","Description","",""
-"com.axelor.wkf.db.Transition","signal","field","Signam","Signal","",""
-"com.axelor.wkf.db.Transition","role","field","Role","Rôle","",""
-"com.axelor.wkf.db.Transition","ref","field","Ref","Ref","",""
-"node.logic.operator.selection","","select","","","",""
-"node.logic.operator.selection","parallel","select","AND","ET","",""
-"node.logic.operator.selection","inclusive","select","OR","OU","",""
-"node.logic.operator.selection","exclusive","select","XOR","XOR","",""
-"node.type.selection","startEvent","select","Start event","Démarrer","",""
-"node.type.selection","activity","select","Activity","Activité","",""
-"node.type.selection","endEvent","select","End event","Arrêt","",""
-"node.type.selection","gateway","select","Gateway","Passerelle","",""
-"node.type.selection","message","select","Message","Message","",""
-"node.type.selection","timer","select","Timer","Minuteur","",""
-"node.type.selection","filterEvent","select","Filter","Filtre","",""
-"node.type.selection","stopFilterEvent","select","Stop Filter","Fin filtre","",""
-"node.message.type.selection","email","select","E-mail","E-mail","",""
-"node.message.type.selection","mail","select","Mail","Courrier","",""
-"node.message.type.selection","phoneCall","select","Phone call","Appel téléphonique","",""
-"node.message.type.selection","sms","select","SMS","SMS","",""
-"node.message.type.selection","internetSite","select","Internet site","Site internet","",""
-"node.message.type.selection","socialNetwork","select","Social network","Réseaux sociaux","",""
-"node.social.network.selection","facebook","select","Facebook","Facebook","",""
-"node.social.network.selection","linkedin","select","Linkedin","Linkedin","",""
-"node.social.network.selection","twitter","select","Twitter","Twitter","",""
-"com.axelor.wkf.db.Transition","end-transition-form","form","Transition","Transition","",""
-"end-transition-form","","separator","Description","Description","",""
-"com.axelor.wkf.db.Transition","end-transition-grid","grid","Transitions","Transitions","",""
-"com.axelor.wkf.db.InstanceCounter","instance-counter-form","form","Counter","Compteur","",""
-"com.axelor.wkf.db.InstanceCounter","instance-counter-grid","grid","Counters","Compteurs","",""
-"com.axelor.wkf.db.Instance","instance-form","form","Instances","Instances","",""
-"instance-form","","page","History","Historique","",""
-"instance-form","","page","Counter","Compteur","",""
-"instance-form","","page","Diagram","Diagramme","",""
-"com.axelor.wkf.db.Instance","instance-grid","grid","Instances","Instances","",""
-"com.axelor.wkf.db.InstanceHistory","instance-history-form","form","History","Historique","",""
-"com.axelor.wkf.db.InstanceHistory","instance-history-grid","grid","Histories","Historiques","",""
-"com.axelor.wkf.db.Node","node-grid","grid","Nodes","Nœuds","",""
-"com.axelor.wkf.db.Node","node-form","form","Node","Nœud","",""
-"node-form","","separator","Description","Description","",""
-"com.axelor.wkf.db.node.StartEvent","start-event-grid","grid","Start events","Evènements de départ","",""
-"com.axelor.wkf.db.node.StartEvent","start-event-form","form","Start event","Evènement de départ","",""
-"start-event-form","","separator","Description","Description","",""
-"com.axelor.wkf.db.node.EndEvent","end-event-grid","grid","End events","Evènements de fin","",""
-"com.axelor.wkf.db.node.EndEvent","end-event-form","form","End event","Evènement de fin","",""
-"end-event-form","","separator","Description","Description","",""
-"com.axelor.wkf.db.node.Activity","activity-grid","grid","Activities","Activités","",""
-"com.axelor.wkf.db.node.Activity","activity-form","form","Activity","Activité","",""
-"activity-form","","separator","Description","Description","",""
-"com.axelor.wkf.db.node.gateway.InclusiveGateway","inclusive-gateway-grid","grid","Inclusive gateways","Passerelles inclusives","",""
-"com.axelor.wkf.db.node.gateway.InclusiveGateway","inclusive-gateway-form","form","Inclusive gateway","Passerelle inclusive","",""
-"inclusive-gateway-form","","separator","Description","Description","",""
-"com.axelor.wkf.db.node.gateway.ExclusiveGateway","exclusive-gateway-grid","grid","Exclusive gateways","Passerelles exclusives","",""
-"com.axelor.wkf.db.node.gateway.ExclusiveGateway","exclusive-gateway-form","form","Exclusive gateway","Passerelle exclusive","",""
-"exclusive-gateway-form","","separator","Description","Description","",""
-"com.axelor.wkf.db.node.gateway.ParallelGateway","parallel-gateway-grid","grid","Parallel gateways","Passerelles parallèles","",""
-"com.axelor.wkf.db.node.gateway.ParallelGateway","parallel-gateway-form","form","Parallel gateway","Passerelle parallèles","",""
-"parallel-gateway-form","","separator","Description","Description","",""
-"com.axelor.wkf.db.Transition","start-transition-form","form","Transition","Transition","",""
-"start-transition-form","","separator","Description","Description","",""
-"com.axelor.wkf.db.Transition","start-transition-grid","grid","Transitions","Transitions","",""
-"com.axelor.wkf.db.Transition","transition-form","form","Transition","Transition","",""
-"transition-form","","separator","Description","Description","",""
-"com.axelor.wkf.db.Transition","transition-grid","grid","Transitions","Transitions","",""
-"workflow-form","openEditor","button","Editor","Éditeur","",""
-"workflow-form","openInstances","button","Instances","Instances","",""
-"com.axelor.wkf.db.Workflow","workflow-form","form","Workflow","Processus","",""
-"workflow-form","","page","Description","Description","",""
-"workflow-form","","page","BPMN","BPMN","",""
-"workflow-form","importWorkflow","button","Import","Import","",""
-"workflow-form","","page","XML","XML","",""
-"com.axelor.wkf.db.Workflow","workflow-grid","grid","Workflows","Les Processus","",""
-"com.axelor.wkf.db.node.IntermediateTimerEvent","intermediate-timer-event-form","form","Timer event","Evènement minuteur","",""
-"com.axelor.wkf.db.node.IntermediateTimerEvent","intermediate-timer-event-grid","grid","Timer events","Evènements minuteur","",""
-"com.axelor.wkf.db.node.message.IntermediateEmailEvent","intermediate-email-event-form","form","E-mail event","Evènement e-mail","",""
-"com.axelor.wkf.db.node.message.IntermediateEmailEvent","intermediate-email-event-grid","grid","E-mail events","Evènements e-mail","",""
-"com.axelor.wkf.db.node.message.IntermediateMailEvent","intermediate-mail-event-form","form","Mail event","Evènement courrier","",""
-"com.axelor.wkf.db.node.message.IntermediateMailEvent","intermediate-mail-event-grid","grid","Mail events","Evènements courrier","",""
-"com.axelor.wkf.db.node.message.IntermediateSmsEvent","intermediate-sms-event-form","form","Sms event","Evènement sms","",""
-"com.axelor.wkf.db.node.message.IntermediateSmsEvent","intermediate-sms-event-grid","grid","Sms events","Evènements sms","",""
-"com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent","intermediate-phone-call-event-form","form","Phone call event","Evènement appel téléphonique","",""
-"com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent","intermediate-phone-call-event-grid","grid","Phone call events","Evènements appel téléphonique","",""
-"com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent","intermediate-internet-site-event-form","form","Internet site event","Evènement site internet","",""
-"com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent","intermediate-internet-site-event-grid","grid","Internet site events","Evènements site internet","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent","intermediate-facebook-event-form","form","Facebook event","Evènement Facebook","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent","intermediate-facebook-event-grid","grid","Facebook events","Evènements Facebook","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent","intermediate-linkedin-event-form","form","Linkedin event","Evènement Linkedin","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent","intermediate-linkedin-event-grid","grid","Linkedin events","Evènements Linkedin","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent","intermediate-twitter-event-form","form","Twitter event","Evènement Twitter","",""
-"com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent","intermediate-twitter-event-grid","grid","Twitter events","Evènements Twitter","",""
-"com.axelor.wkf.db.node.FilterEvent","filter-event-form","form","Filter","Filtre","",""
-"com.axelor.wkf.db.node.FilterEvent","filter-event-grid","grid","Filters","Filtres","",""
-"com.axelor.wkf.db.node.StopFilterEvent","stop-filter-event-form","form","Stop filter","Fin filtre","",""
-"com.axelor.wkf.db.node.StopFilterEvent","stop-filter-event-grid","grid","Stop filters","Fin filtres","",""
-"action-wkf-instances","action-wkf-instances","action","Instances","Instances","",""
-"action-wkf-my-process","action-wkf-my-process","action","Process","Processus","",""
-"action-wkf-nodes","action-wkf-nodes","action","Nodes","Nœuds","",""
-"action-wkf-transitions","action-wkf-transitions","action","Transitions","Transitions","",""
-"action-wkf-workflows","action-wkf-workflows","action","Worklows","Processus","",""
-"wkf-validate","wkf-validate","action","Can't save workflow without start node","Impossible de sauvegarder le processus sans le nœud de départ","",""
-"axelor-wkf","You have no sufficient rights.","other","You have no sufficient rights.","Vous n'avez pas les droits suffisants.","",""
+key,message
+Wkf Management,Gestion des processus
+Account,Compte
+Action,Action
+Active,Actif ?
+Activities,Activités
+Activity,Activité
+AND,ET
+Archived,Archivé ?
+BPMN,BPMN
+Can't save workflow without start node,Impossible de sauvegarder le processus sans le nœud de départ
+Condition,Condition
+Configurations,Configurations
+Counter,Compteur
+Counters,Compteurs
+Création date,Date de création
+Description,Description
+Diagram,Diagramme
+E-mail,E-mail
+E-mail event,Evènement e-mail
+E-mail events,Evènements e-mail
+Editor,Éditeur
+End event,Evènement de fin
+End events,Evènements de fin
+End transitions,Transition de fin
+Events,Evènements
+Exclusive gateway,Passerelle exclusive
+Exclusive gateways,Passerelles exclusives
+Executed transitions,Les transitions exécutées
+Facebook,Facebook
+Facebook event,Evènement Facebook
+Facebook events,Facebook
+Filter,Filtre
+Filters,Filtres
+Gateway,Passerelle
+Gateways,Passerelles
+Histories,Historiques
+History,Historique
+Import,Import
+Inclusive gateway,Passerelle inclusive
+Inclusive gateways,Passerelles inclusives
+Instances,Instances
+Internet site,Site internet
+Internet site event,Evènement site internet
+Internet site events,Evènements site internet
+Linkedin,Linkedin
+Linkedin event,Evènement Linkedin
+Linkedin events,Evènements Linkedin
+Mail,Courrier
+Mail event,Evènement courrier
+Mail events,Evènements courrier
+Max node counter,Nombre de noeuds maximun
+Message,Message
+Message type,Type de message
+Messages,Messages
+Model ID,Modèle ID
+Name,Nom
+Next node,Prochain noeud
+Node,Nœud
+Nodes,Nœuds
+Operator,Opérateur Logique
+OR,OU
+Parallel gateway,Passerelle parallèles
+Parallel gateways,Passerelles parallèles
+Persist,Persister ?
+Phone call,Appel téléphonique
+Phone call event,Evènement appel téléphonique
+Phone call events,Evènements appel téléphonique
+Private message,Message privé ?
+Process,Processus
+Ref,Ref
+Role,Rôle
+Sequence,Sequence
+Sequence,Séquence
+Signam,Signal
+SMS,SMS
+Sms event,Evènement sms
+Sms events,Sms
+Social network,Réseau social
+Social networks,Réseaux sociaux
+Start event,Démarrer
+Start events,Evènements de départ
+Start node,Noeud de départ
+Start transitions,Transition de départ
+Stop filter,Fin filtre
+Stop filters,Fin filtres
+Target page,Page cible
+Template,Template
+Template model,Model de template
+Time cycle,Cycle
+Time date,Date
+Time duration,Durée
+Timer event,Evènement minuteur
+Timer events,Evènements minuteurs
+Transition,Transition
+Transitions,Transitions
+Twitter,Twitter
+Twitter event,Evènement Twitter
+Twitter events,Evènements Twitter
+Type,Type
+User,Utilisateur
+User,Utilisateur
+Workflow,Processus
+Worklows,Processus
+XML,XML
+Xml data,Données XML
+XOR,XOR
+You have no sufficient rights.,Vous n'avez pas les droits suffisants.

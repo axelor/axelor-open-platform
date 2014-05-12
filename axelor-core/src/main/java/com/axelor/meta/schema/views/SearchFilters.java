@@ -24,7 +24,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.db.JPA;
+import com.axelor.i18n.I18n;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -64,13 +65,14 @@ public class SearchFilters extends AbstractView {
 		@XmlElement(name = "context")
 		private List<SearchContext> contexts;
 
-		@JsonIgnore
-		public String getDefaultTitle() {
-			return title;
+		@JsonGetter("title")
+		public String getLocalizedTitle() {
+			return I18n.get(title);
 		}
 
+		@JsonIgnore
 		public String getTitle() {
-			return JPA.translate(title, title, model, "filter");
+			return title;
 		}
 
 		public String getDomain() {

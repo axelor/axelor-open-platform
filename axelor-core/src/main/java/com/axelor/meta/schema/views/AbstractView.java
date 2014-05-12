@@ -25,8 +25,9 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.db.JPA;
+import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaView;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -88,13 +89,14 @@ public abstract class AbstractView {
 		this.name = name;
 	}
 
-	@JsonIgnore
-	public String getDefaultTitle() {
-		return title;
+	@JsonGetter("title")
+	public String getLocalizedTitle() {
+		return I18n.get(title);
 	}
 
+	@JsonIgnore
 	public String getTitle() {
-		return JPA.translate(title, title, this.getModel(), "view");
+		return title;
 	}
 
 	public void setTitle(String title) {

@@ -46,6 +46,7 @@ import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
+import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.db.MetaAction;
 import com.google.common.base.Objects;
@@ -317,7 +318,7 @@ public class Transition extends AuditableModel {
 			
 			if ( !AuthUtils.hasRole(user, role.getName()) ) {
 				logger.debug( "Role ::: {}", role.getName() );
-				context.put("flash", JPA.translate("You have no sufficient rights."));
+				context.put("flash", I18n.get("You have no sufficient rights."));
 				return false;
 			}
 			

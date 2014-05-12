@@ -19,6 +19,7 @@ package com.axelor.db;
 
 import java.util.Set;
 
+import com.axelor.i18n.I18n;
 import com.axelor.rpc.filter.Filter;
 
 public interface JpaSecurity {
@@ -37,7 +38,7 @@ public interface JpaSecurity {
 		}
 		
 		public String getMessage() {
-			return JPA.translate(message);
+			return I18n.get(message);
 		}
 	}
 	

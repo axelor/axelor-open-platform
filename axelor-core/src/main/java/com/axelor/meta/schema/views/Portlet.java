@@ -20,7 +20,6 @@ package com.axelor.meta.schema.views;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.db.JPA;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
@@ -47,10 +46,5 @@ public class Portlet extends AbstractContainer {
 
 	public void setCanSearch(Boolean canSearch) {
 		this.canSearch = canSearch;
-	}
-
-	@Override
-	public String getTitle() {
-		return JPA.translate(getDefaultTitle(), getDefaultTitle(), null, "portlet");
 	}
 }

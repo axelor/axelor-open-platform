@@ -27,8 +27,10 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.axelor.rpc.ActionResponse;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -101,13 +103,14 @@ public class ActionView extends Action {
 	@XmlElement(name = "view-param")
 	private List<ActionView.Param> params;
 
-	@JsonIgnore
-	public String getDefaultTitle() {
-		return title;
+	@JsonGetter("title")
+	public String getLocalizedTitle() {
+		return I18n.get(title);
 	}
-
+	
+	@JsonIgnore
 	public String getTitle() {
-		return JPA.translate(title, title, null, "action");
+		return title;
 	}
 
 	public String getIcon() {
@@ -199,7 +202,7 @@ public class ActionView extends Action {
 			domain = handler.evaluate("eval: \"" + domain + "\"").toString();
 		}
 
-		String title = this.getTitle();
+		String title = this.getLocalizedTitle();
 		if (title != null && title.contains("$")) {
 			title = handler.evaluate("eval: \"" + title + "\"").toString();
 		}

@@ -37,7 +37,6 @@ import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.MetaSelect;
-import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
@@ -167,7 +166,6 @@ public class ModuleManager {
 		MetaSelect.findByModule(module).remove();
 		MetaMenu.findByModule(module).remove();
 		MetaAction.findByModule(module).remove();
-		MetaTranslation.findByModule(module).remove();
 
 		entity.setInstalled(false);
 		entity.save();

@@ -30,7 +30,7 @@ import org.apache.shiro.crypto.hash.format.ParsableHashFormat;
 import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 
 import com.axelor.auth.db.User;
-import com.axelor.db.JPA;
+import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
@@ -220,7 +220,7 @@ public class AuthService {
 			response.setValue("confirm", null);
 			response.setValue("change", false);
 		} else {
-			response.setData(ImmutableList.of(ImmutableMap.of("error", JPA.translate("Password doesn't match"))));
+			response.setData(ImmutableList.of(ImmutableMap.of("error", I18n.get("Password doesn't match"))));
 		}
 	}
 	
