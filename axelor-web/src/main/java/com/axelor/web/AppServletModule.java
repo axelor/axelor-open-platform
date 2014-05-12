@@ -28,11 +28,10 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppModule;
 import com.axelor.app.AppSettings;
+import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthModule;
 import com.axelor.common.reflections.Reflections;
 import com.axelor.db.JpaModule;
-import com.axelor.db.Translations;
-import com.axelor.meta.service.MetaTranslations;
 import com.axelor.quartz.SchedulerModule;
 import com.axelor.rpc.ObjectMapperProvider;
 import com.axelor.rpc.Response;
@@ -95,16 +94,13 @@ public class AppServletModule extends JerseyServletModule {
 			protected void configureServlets() {
 				// order is important, PersistFilter must be the first filter
 				filter("*").through(PersistFilter.class);
-				filter("*").through(LocaleFilter.class);
+				filter("*").through(AppFilter.class);
 				filter("*").through(GuiceShiroFilter.class);
 			}
 		});
 
 		// install the auth module
 		install(new AuthModule(getServletContext()).properties(settings.getProperties()));
-
-		// bind to translations provider
-		bind(Translations.class).toProvider(MetaTranslations.class);
 
 		// install the app modules
 		install(new AppModule());

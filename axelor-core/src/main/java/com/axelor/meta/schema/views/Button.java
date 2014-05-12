@@ -20,7 +20,9 @@ package com.axelor.meta.schema.views;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.db.JPA;
+import com.axelor.i18n.I18n;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
@@ -54,12 +56,14 @@ public class Button extends SimpleWidget {
 		return link;
 	}
 
-	public String getDefaultPrompt() {
-		return prompt;
+	@JsonGetter("prompt")
+	public String getLocalizedPrompt() {
+		return I18n.get(prompt);
 	}
 
+	@JsonIgnore
 	public String getPrompt() {
-		return JPA.translate(prompt, prompt, super.getModel(), "button");
+		return prompt;
 	}
 
 	public void setPrompt(String prompt) {
@@ -72,15 +76,5 @@ public class Button extends SimpleWidget {
 
 	public void setOnClick(String onClick) {
 		this.onClick = onClick;
-	}
-
-	@Override
-	public String getHelp() {
-		return JPA.translate(super.getDefaultHelp(), super.getDefaultHelp(), super.getModel(), "button");
-	}
-
-	@Override
-	public String getTitle() {
-		return JPA.translate(super.getDefaultTitle(), super.getDefaultTitle(), super.getModel(), "button");
 	}
 }

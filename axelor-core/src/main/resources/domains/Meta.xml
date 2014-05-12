@@ -152,22 +152,14 @@
     <string name="description" title="Description" large="true" />
   </entity>
   
-  <entity name="MetaTranslation" table="META_TRANSLATION" cachable="true">
-    <![CDATA[
-    This object store the translation.
-    ]]>
-    
-  	<string name="key" required="true" initParam="true"/>
-  	<string name="language" required="true" initParam="true"/>
-  	<string name="translation" large="true" initParam="true"/>
-  	<string name="domain" initParam="true"/>
-  	<string name="type" selection="meta.translation.type.selection" initParam="true"/>
-    <string name="module" initParam="true"/>
-  	<unique-constraint columns="key,type,language,domain,module"/>
-    <finder-method name="findByAll" using="key,language,domain,type,module" cacheable="true"/>
-    <finder-method name="findByModule" using="module" all="true"/>
+  <entity name="MetaTranslation" table="META_TRANSLATION" logUpdates="false">
+    <string name="key" required="true" />
+    <string name="message" />
+    <string name="language" required="true" />
+    <unique-constraint columns="key,language"/>
+    <finder-method name="findByKey" using="key,language" cacheable="true" />
   </entity>
-  
+
   <entity name="MetaFile" table="META_FILE">
     <![CDATA[
     This object store the files.

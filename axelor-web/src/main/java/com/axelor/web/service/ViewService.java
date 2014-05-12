@@ -39,6 +39,7 @@ import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.schema.views.AbstractView;
@@ -330,7 +331,7 @@ public class ViewService extends AbstractService {
 			Map<String, Object> current = Maps.newHashMap();
 			String data = item.getData();
 			current.put("value", item.getValue());
-			current.put("title", JPA.translate(item.getTitle(), item.getTitle(), null, "select"));
+			current.put("title", I18n.get(item.getTitle()));
 			if (data != null) {
 				current.put("data", data);
 			}

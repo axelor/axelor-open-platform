@@ -21,7 +21,10 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.db.JPA;
+import com.axelor.common.Inflector;
+import com.axelor.common.StringUtils;
+import com.axelor.i18n.I18n;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @XmlType
@@ -72,28 +75,31 @@ public abstract class SimpleWidget extends AbstractWidget {
 		this.name = name;
 	}
 
-	@JsonIgnore
-	public String getDefaultTitle(){
-		return title;
+	@JsonGetter("title")
+	public String getLocalizedTitle() {
+		if (StringUtils.isBlank(title) && !StringUtils.isBlank(name)) {
+			return I18n.get(Inflector.getInstance().humanize(name));
+		}
+		return I18n.get(title);
 	}
 
+	@JsonIgnore
 	public String getTitle() {
-		if (title == null || "".equals(title.trim())) {
-			return title;
-		}
-		return JPA.translate(title);
+		return title;
 	}
 
 	public void setTitle(String title) {
 		this.title = title;
 	}
 
-	public String getDefaultHelp(){
+	@JsonGetter("help")
+	public String getLocalizedHelp(){
 		return help;
 	}
 
+	@JsonIgnore
 	public String getHelp() {
-		return JPA.translate(help);
+		return I18n.get(help);
 	}
 
 	public void setHelp(String help) {

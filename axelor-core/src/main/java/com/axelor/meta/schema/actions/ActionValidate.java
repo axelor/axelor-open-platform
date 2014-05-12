@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.common.StringUtils;
-import com.axelor.db.JPA;
+import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
@@ -108,7 +108,7 @@ public class ActionValidate extends ActionIndex {
 			}
 
 			String key = validator.getClass().getSimpleName().toLowerCase();
-			String value = JPA.translate(validator.getMessage(), validator.getMessage(), null, "action");
+			String value = I18n.get(validator.getMessage());
 
 			if (!StringUtils.isBlank(value)) {
 				value = handler.evaluate("eval: " + "\"\"\"" + value + "\"\"\"").toString();

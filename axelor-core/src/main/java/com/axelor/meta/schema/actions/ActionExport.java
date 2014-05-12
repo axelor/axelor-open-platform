@@ -35,7 +35,7 @@ import org.joda.time.DateTime;
 import com.axelor.app.AppSettings;
 import com.axelor.common.ClassUtils;
 import com.axelor.common.FileUtils;
-import com.axelor.db.JPA;
+import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.axelor.text.GroovyTemplates;
 import com.axelor.text.StringTemplates;
@@ -143,9 +143,9 @@ public class ActionExport extends Action {
 			try {
 				String file = doExport(dir, export, handler);
 				if (getDownload() == Boolean.TRUE) {
-					return ImmutableMap.of("exportFile", file, "notify", JPA.translate("Export complete."));
+					return ImmutableMap.of("exportFile", file, "notify", I18n.get("Export complete."));
 				}
-				return ImmutableMap.of("notify", JPA.translate("Export complete."));
+				return ImmutableMap.of("notify", I18n.get("Export complete."));
 			} catch (Exception e) {
 				log.error("error while exporting: ", e);
 				return ImmutableMap.of("error", e.getMessage());

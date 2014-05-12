@@ -24,7 +24,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.db.JPA;
+import com.axelor.i18n.I18n;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @XmlType
@@ -43,16 +44,16 @@ public class Menu {
 		public void setModel(String model) {
 			this.model = model;
 		}
-
-		@Override
-		public String getTitle() {
-			return JPA.translate(super.getDefaultTitle(), super.getDefaultTitle(), model, "button");
-		}
 	}
 
 	@XmlType
 	public static class Devider extends Item {
 
+		@Override
+		public String getLocalizedTitle() {
+			return null;
+		}
+		
 		@Override
 		public String getTitle() {
 			return null;
@@ -77,13 +78,14 @@ public class Menu {
 	@JsonIgnore
 	private String model;
 
-	@JsonIgnore
-	public String getDefaultTitle() {
-		return title;
+	@JsonGetter("title")
+	public String getLocalizedTitle() {
+		return I18n.get(title);
 	}
 
+	@JsonIgnore
 	public String getTitle() {
-		return JPA.translate(title, title, getModel(), "button");
+		return title;
 	}
 
 	public void setTitle(String title) {

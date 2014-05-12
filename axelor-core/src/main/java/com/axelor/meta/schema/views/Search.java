@@ -37,9 +37,11 @@ import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Adapter;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.i18n.I18n;
 import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -281,21 +283,19 @@ public class Search extends AbstractView {
 			return model;
 		}
 
-		@JsonIgnore
-		public String getDefaultTitle() {
+		@JsonGetter("title")
+		public String getLocalizedTitle() {
 			if (title == null && model != null) {
-				return model.substring(model.lastIndexOf('.')+1);
+				return model.substring(model.lastIndexOf('.') + 1);
 			}
+			return I18n.get(title);
+		}
+
+		@JsonIgnore
+		public String getTitle() {
 			return title;
 		}
 
-		public String getTitle() {
-			if (title == null && model != null) {
-				title = this.getDefaultTitle();
-			}
-			return JPA.translate(title, title, null, "search");
-		}
-		
 		public String getViewTitle() {
 			return viewTitle;
 		}

@@ -27,7 +27,8 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.namespace.QName;
 
-import com.axelor.db.JPA;
+import com.axelor.i18n.I18n;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @XmlType
@@ -86,13 +87,14 @@ public class Selection {
 			this.value = value;
 		}
 
-		@JsonIgnore
-		public String getDefaultTitle(){
-			return title;
+		@JsonGetter("title")
+		public String getLocalizedTitle(){
+			return I18n.get(title);
 		}
 
+		@JsonIgnore
 		public String getTitle() {
-			return JPA.translate(title, title, null, "select");
+			return title;
 		}
 
 		public void setTitle(String title) {

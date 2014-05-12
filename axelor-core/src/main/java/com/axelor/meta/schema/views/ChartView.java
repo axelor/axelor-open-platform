@@ -25,8 +25,9 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
-import com.axelor.db.JPA;
+import com.axelor.i18n.I18n;
 import com.axelor.meta.schema.views.Search.SearchField;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
@@ -123,13 +124,14 @@ public class ChartView extends AbstractView {
 			return type;
 		}
 
-		@JsonIgnore
-		public String getDefaultTitle() {
-			return title;
+		@JsonGetter("title")
+		public String getLocalizedTitle() {
+			return I18n.get(title);
 		}
 
+		@JsonIgnore
 		public String getTitle() {
-			return JPA.translate(title, title, null, "chart");
+			return title;
 		}
 	}
 
@@ -171,13 +173,14 @@ public class ChartView extends AbstractView {
 			return side;
 		}
 
-		@JsonIgnore
-		public String getDefaultTitle() {
-			return title;
+		@JsonGetter("title")
+		public String getLocalizedTitle() {
+			return I18n.get(title);
 		}
 
+		@JsonIgnore
 		public String getTitle() {
-			return JPA.translate(title, title, null, "chart");
+			return title;
 		}
 
 		public String getAggregate() {

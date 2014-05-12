@@ -55,29 +55,6 @@
     <field name="description" colSpan="4" showTitle="false" />
   </form>
 
-  <selection name="meta.translation.type.selection">
-  	<option value="field">Field</option>
-  	<option value="help">Help</option>
-    <option value="placeholder">PlaceHolder</option>
-    <option value="documentation">Documentation</option>
-    <option value="group">Group</option>
-    <option value="page">Page</option>
-    <option value="separator">Separator</option>
-    <option value="label">Label</option>
-    <option value="button">Button</option>
-    <option value="menu">Menu</option>
-    <option value="actionMenu">Action Menu</option>
-    <option value="view">View</option>
-    <option value="tree">Tree</option>
-    <option value="chart">Chart</option>
-    <option value="portlet">Portlet</option>
-    <option value="search">Search</option>
-    <option value="filter">Filter</option>
-    <option value="action">Action</option>
-    <option value="select">Select</option>
-    <option value="other">Other</option>
-  </selection>
-
   <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView" orderBy="priority,name">
     <toolbar>
       <button name="restoreAll" icon="fa-undo" help="Restore all..." prompt="All the customizations will be lost. Are you sure ?" onClick="action-meta-restore-all"/>
@@ -274,41 +251,15 @@
 
   <grid title="All Translations" name="meta-translations-grid" model="com.axelor.meta.db.MetaTranslation" editable="true">
     <field name="key"/>
+    <field name="message"/>
     <field name="language"/>
-    <field name="translation"/>
-    <field name="domain"/>
-    <field name="type" selection="meta.translation.type.selection"/>
-    <field name="module"/>
   </grid>
-
-  <form title="Translation" name="meta-translations-form" model="com.axelor.meta.db.MetaTranslation" colWidths="*,250">
-    <group showTitle="false" cols="4">
+  
+  <form title="Translation" name="meta-translations-form" model="com.axelor.meta.db.MetaTranslation" cols="2">
       <field name="key"/>
+      <field name="message"/>
       <field name="language"/>
-      <field name="translation"/>
-      <field name="domain"/>
-      <field name="type" selection="meta.translation.type.selection"/>
-      <field name="module"/>
-    </group>
-    <group title="Actions" cols="2" colSpan="1" hideIf="$readonly()">
-      <button name="restoreAll" colSpan="2" title="Restore All" onClick="action-meta-show-import-group"/>
-      <button name="export" colSpan="2" title="Export All" onClick="action-meta-show-export-group"/>
-    </group>
-    <group name="exportGroup" title="Configuration" colSpan="4" hidden="true">
-    	<field name="exportLanguage" title="Export language" selection="select.language"/>
-    	<field name="exportPath" title="Export path"/>
-    	<button name="lauchExport" colSpan="2" title="Export" onClick="action-meta-export-translations" readonlyIf="!exportPath &amp;&amp; !exportLanguage"/>
-    </group>
-    <group name="importGroup" title="Configuration" hidden="true" colSpan="4">
-        <field name="importType" title="Import type" selection="selection.translation.import.type" widget="RadioSelect"/>
-        <field name="importPath" title="Import path" showIf="importType == 2"/>
-        <button name="lauchImport" colSpan="2" title="Import" readonlyIf="!importPath &amp;&amp; !importType" prompt="All the customizations will be lost. Are you sure?" onClick="action-meta-restore-translations"/>
-    </group>
   </form>
-
-  <action-method name="action-meta-restore-translations">
-    <call class="com.axelor.meta.web.MetaController" method="restoreTranslations"/>
-  </action-method>
 
   <action-attrs name="action-meta-show-export-group">
     <attribute name="hidden" for="exportGroup" expr="eval: false"/>
@@ -319,10 +270,6 @@
     <attribute name="hidden" for="exportGroup" expr="eval: true"/>
     <attribute name="hidden" for="importGroup" expr="eval: false"/>
   </action-attrs>
-
-  <action-method name="action-meta-export-translations">
-    <call class="com.axelor.meta.web.MetaController" method="exportTranslations"/>
-  </action-method>
 
   <grid title="Files" name="meta-files-grid" model="com.axelor.meta.db.MetaFile">
     <field name="fileName"/>
@@ -339,10 +286,5 @@
     <field name="mime"/>
     <field name="description"/>
   </form>
-
-  <selection name="selection.translation.import.type">
-    <option value="1">From sources</option>
-    <option value="2">From directory</option>
-  </selection>
 
 </object-views>

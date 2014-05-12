@@ -23,7 +23,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.schema.views.Search.SearchField;
@@ -59,11 +58,6 @@ public class TreeView extends AbstractView {
 	@XmlType
 	@JsonInclude(Include.NON_NULL)
 	public static class TreeColumn extends SearchField {
-
-		@Override
-		public String getTitle() {
-			return JPA.translate(getDefaultTitle(), getDefaultTitle(), null, "tree");
-		}
 
 	}
 

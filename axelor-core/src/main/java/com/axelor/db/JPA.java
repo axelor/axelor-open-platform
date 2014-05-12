@@ -68,13 +68,11 @@ import com.google.inject.Provider;
 public final class JPA {
 
 	private Provider<EntityManager> emp;
-	private Provider<Translations> translations;
 	private static JPA INSTANCE = null;
 
 	@Inject
-	private JPA(Provider<EntityManager> emp, Provider<Translations> translations) {
+	private JPA(Provider<EntityManager> emp) {
 		this.emp = emp;
-		this.translations = translations;
 		INSTANCE = this;
 	}
 
@@ -699,21 +697,4 @@ public final class JPA {
 		 */
 		void execute(Connection connection) throws SQLException;
 	}
-	
-	public static String translate(String key){
-		return INSTANCE.translations.get().get(key);
-	}
-	
-	public static String translate(String key, String defaultValue){
-		return INSTANCE.translations.get().get(key, defaultValue);
-	}
-	
-	public static String translate(String key, String defaultValue, String domain){
-		return INSTANCE.translations.get().get(key, defaultValue, domain);
-	}
-	
-	public static String translate(String key, String defaultValue, String domain, String type){
-		return INSTANCE.translations.get().get(key, defaultValue, domain, type);
-	}
-	
 }
