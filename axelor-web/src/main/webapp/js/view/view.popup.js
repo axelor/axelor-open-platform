@@ -115,9 +115,9 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		if ($scope.editorCanSave && $scope.isDirty()) {
 			if (record.id < 0)
 				record.id = null;
-			$scope.onSave().then(function () {
+			$scope.onSave().then(function(record, page) {
 				$scope.applyLater(function(){
-					close($scope.record);
+					close(record);
 				});
 			});
 		} else {
