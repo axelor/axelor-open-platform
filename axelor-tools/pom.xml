@@ -20,6 +20,13 @@
       <artifactId>jersey-server</artifactId>
     </dependency>
   
+    <!-- Axelor Common -->
+    <dependency>
+      <groupId>com.axelor</groupId>
+      <artifactId>axelor-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Axelor Test API -->
     <dependency>
       <groupId>com.axelor</groupId>
@@ -27,7 +34,25 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    
+    <!-- OpenCSV -->
+    <dependency>
+      <groupId>net.sf.opencsv</groupId>
+      <artifactId>opencsv</artifactId>
+    </dependency>
 
   </dependencies>
+  
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.axelor</groupId>
+          <artifactId>axelor-maven-plugin</artifactId>
+          <version>${project.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
 </project>
