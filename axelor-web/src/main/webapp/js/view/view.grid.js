@@ -414,13 +414,17 @@ function GridViewCtrl($scope, $element) {
 	
 	$scope.onSelectionChanged = function(event, args) {
 		var items = $scope.getItems();
-		var selection = _.filter(args.rows, function(index) {
-			var item = items[index];
-			return item && item.id !== 0;
-		});
+		var selection = [];
 
-		_.each(items, function (item, i) {
-			item.selected = selection.indexOf(i) > -1;
+		_.each(items, function (item) {
+			item.selected = false;
+		});
+		_.each(args.rows, function(index) {
+			var item = args.grid.getDataItem(index);
+			if (item && item.id !== 0) {
+				item.selected = true;
+				selection.push(index);
+			}
 		});
 
 		$scope.selection = selection;
