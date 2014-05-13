@@ -75,12 +75,8 @@ class WkfController {
 	 */
 	def openEditor( ActionRequest request, ActionResponse response ) {
 		def appUrl = AppSettings.get().getBaseURL();
-		def wkfUrl = AppSettings.get().get(CONFIG_WKF_BASE, '')
+		def wkfUrl = AppSettings.get().get(CONFIG_WKF_BASE, 'http://localhost:8080/axelorbpm')
 		def wkfLang = AppSettings.get().get(CONFIG_WKF_LANG, 'fr');
-
-		if (wkfUrl) {
-			wkfUrl = appUrl.substring(appUrl.lastIndexOf('/')) + wkfUrl;
-		}
 
 		def context = request.context as Workflow
 		def resource = "${wkfUrl}/p/editor?id=${context.id}&name=${context.name}&model=${context.metaModel.fullName}&url=${appUrl}&lang=${wkfLang}&sessionId=${AuthUtils.subject.session.id.toString()}"
