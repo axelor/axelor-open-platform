@@ -19,13 +19,12 @@ package com.axelor.common;
 
 import java.util.Map;
 
-import javax.persistence.Entity;
-
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.axelor.common.reflections.Reflections;
 
+@SuppressWarnings("all")
 public class TestReflections {
 
 	@Test
@@ -34,7 +33,7 @@ public class TestReflections {
 		Assert.assertNotNull(Reflections
 				.findTypes()
 				.within("com.axelor")
-				.having(Entity.class)
+				.having(SuppressWarnings.class)
 				.find());
 	}
 	
@@ -42,7 +41,7 @@ public class TestReflections {
 	public void testResourceFinder() {
 		Assert.assertNotNull(Reflections
 				.findResources()
-				.byName("views/(.*)\\.xml")
+				.byName("(.*)\\.java")
 				.find());
 	}
 }

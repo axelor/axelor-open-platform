@@ -22,6 +22,11 @@
     <!-- Local -->
     <dependency>
       <groupId>com.axelor</groupId>
+      <artifactId>axelor-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.axelor</groupId>
       <artifactId>axelor-test</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
