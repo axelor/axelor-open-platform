@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.axelor.common.StringUtils;
+import com.axelor.db.JPA;
 import com.axelor.db.Query;
 import com.axelor.meta.db.MetaTranslation;
 
@@ -68,6 +69,12 @@ public class I18nBundle extends ResourceBundle {
 	private Map<String, String> load() {
 		
 		if (!messages.isEmpty()) {
+			return messages;
+		}
+		
+		try {
+			JPA.em();
+		} catch (Throwable e) {
 			return messages;
 		}
 
