@@ -82,14 +82,14 @@ public class I18nBundle extends ResourceBundle {
 				.filter("self.language = ?", locale.getLanguage());
 
 		long total = query.count();
-		long count = 0;
-		int page = 100;
+		int offset = 0;
+		int limit = 100;
 
-		while (count < total) {
-			for (MetaTranslation tr : query.fetch(page)) {
+		while (offset < total) {
+			for (MetaTranslation tr : query.fetch(limit, offset)) {
 				messages.put(tr.getKey(), tr.getMessage());
 			}
-			count += page;
+			offset += limit;
 		}
 		return messages;
 	}
