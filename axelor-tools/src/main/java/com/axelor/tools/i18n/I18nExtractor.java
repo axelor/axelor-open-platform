@@ -259,6 +259,11 @@ public class I18nExtractor {
 		};
 		
 		visitor.walk();
+
+		// don't generate empty templates
+		if (items.isEmpty()) {
+			return;
+		}
 		
 		List<String> keys = new ArrayList<>(items.keySet());
 		List<String[]> values = new ArrayList<>();
