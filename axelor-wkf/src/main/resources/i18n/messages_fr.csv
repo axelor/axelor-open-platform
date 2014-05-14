@@ -1,0 +1,155 @@
+"key","message","comment","context"
+"AND","","","resources/views/Node.xml:21"
+"Activities","","","resources/views/Menu.xml:173
+resources/views/Menu.xml:170
+resources/views/Menu.xml:167
+resources/views/Node.xml:112"
+"BPMN","","","resources/views/Workflow.xml:35"
+"Configurations","","","resources/views/Menu.xml:29"
+"Counter","","","resources/views/Instance.xml:31
+resources/views/Instance.xml:56"
+"Counters","","","resources/views/Instance.xml:51"
+"Description","","","resources/views/Workflow.xml:63
+resources/views/Node.xml:325
+resources/views/Node.xml:144
+resources/views/Node.xml:94
+resources/views/Workflow.xml:83
+resources/views/Node.xml:200
+resources/views/Workflow.xml:32
+resources/views/Node.xml:300
+resources/views/Node.xml:250
+resources/views/Node.xml:379
+resources/views/Node.xml:423
+resources/views/Node.xml:405
+resources/views/Node.xml:108
+resources/views/Node.xml:353
+resources/views/Node.xml:440
+resources/views/Node.xml:275
+resources/views/Node.xml:161
+resources/views/Node.xml:127
+resources/views/Node.xml:178
+resources/views/Workflow.xml:103
+resources/views/Node.xml:80
+resources/views/Node.xml:225"
+"Details","","","resources/views/Instance.xml:22"
+"Diagram","","","resources/views/Instance.xml:19"
+"E-mail","","","resources/views/Node.xml:28"
+"E-mail event","","","resources/views/Node.xml:212"
+"E-mail events","","","resources/views/Menu.xml:77
+resources/views/Node.xml:204
+resources/views/Menu.xml:74"
+"Editor","","","resources/views/Workflow.xml:19"
+"End event","","","resources/views/Node.xml:11
+resources/views/Node.xml:102"
+"End events","","","resources/views/Menu.xml:63
+resources/views/Node.xml:98
+resources/views/Menu.xml:66"
+"Events","","","resources/views/Menu.xml:42"
+"Exclusive gateway","","","resources/views/Node.xml:152"
+"Exclusive gateways","","","resources/views/Menu.xml:202
+resources/views/Menu.xml:199
+resources/views/Node.xml:148"
+"Facebook","","","resources/views/Node.xml:38"
+"Facebook event","","","resources/views/Node.xml:339"
+"Facebook events","","","resources/views/Menu.xml:121
+resources/views/Menu.xml:124
+resources/views/Node.xml:329"
+"Filter","","","resources/views/Node.xml:414"
+"Filter event","","","resources/views/Node.xml:15"
+"Filters","","","resources/views/Menu.xml:147
+resources/views/Node.xml:409
+resources/views/Menu.xml:150
+resources/views/Menu.xml:153"
+"Gateway","","","resources/views/Node.xml:12"
+"Gateways","","","resources/views/Menu.xml:178"
+"Histories","","","resources/views/Instance.xml:39"
+"History","","","resources/views/Instance.xml:45
+resources/views/Instance.xml:26"
+"Import","","","resources/views/Workflow.xml:21"
+"Inclusive gateway","","","resources/views/Node.xml:135"
+"Inclusive gateways","","","resources/views/Menu.xml:184
+resources/views/Node.xml:131
+resources/views/Menu.xml:181"
+"Instances","","","resources/views/Menu.xml:23
+resources/views/Workflow.xml:20
+resources/views/Instance.xml:6
+resources/views/Instance.xml:14
+resources/views/Menu.xml:20"
+"Internet site","","","resources/views/Node.xml:32"
+"Internet site event","","","resources/views/Node.xml:312"
+"Internet site events","","","resources/views/Menu.xml:113
+resources/views/Menu.xml:110
+resources/views/Node.xml:304"
+"Linkedin","","","resources/views/Node.xml:39"
+"Linkedin event","","","resources/views/Node.xml:366"
+"Linkedin events","","","resources/views/Menu.xml:130
+resources/views/Menu.xml:133
+resources/views/Node.xml:357"
+"Mail","","","resources/views/Node.xml:29"
+"Mail event","","","resources/views/Node.xml:237"
+"Mail events","","","resources/views/Menu.xml:83
+resources/views/Node.xml:229
+resources/views/Menu.xml:86"
+"Message","","","resources/views/Node.xml:13"
+"Messages","","","resources/views/Menu.xml:71"
+"Meta model","","","resources/views/Instance.xml:16
+resources/views/Instance.xml:8"
+"Node","","","resources/views/Node.xml:51"
+"NodeTask","","","resources/views/Node.xml:117
+resources/views/Node.xml:10"
+"Nodes","","","resources/views/Menu.xml:40
+resources/views/Node.xml:45"
+"OR","","","resources/views/Node.xml:22"
+"Parallel gateway","","","resources/views/Node.xml:169"
+"Parallel gateways","","","resources/views/Node.xml:165
+resources/views/Menu.xml:193
+resources/views/Menu.xml:190"
+"Phone call","","","resources/views/Node.xml:30"
+"Phone call event","","","resources/views/Node.xml:287"
+"Phone call events","","","resources/views/Menu.xml:104
+resources/views/Menu.xml:101
+resources/views/Node.xml:279"
+"Process","","","resources/views/Instance.xml:67"
+"SMS","","","resources/views/Node.xml:31"
+"Sms event","","","resources/views/Node.xml:262"
+"Sms events","","","resources/views/Menu.xml:92
+resources/views/Node.xml:254
+resources/views/Menu.xml:95"
+"Social network","","","resources/views/Node.xml:33"
+"Social networks","","","resources/views/Menu.xml:118"
+"Start event","","","resources/views/Node.xml:88
+resources/views/Node.xml:9"
+"Start events","","","resources/views/Node.xml:84
+resources/views/Menu.xml:45
+resources/views/Menu.xml:48"
+"Stop filter","","","resources/views/Node.xml:431"
+"Stop filter event","","","resources/views/Node.xml:16"
+"Stop filters","","","resources/views/Menu.xml:159
+resources/views/Node.xml:427
+resources/views/Menu.xml:162"
+"Timer","","","resources/views/Node.xml:14"
+"Timer event","","","resources/views/Node.xml:189"
+"Timer events","","","resources/views/Menu.xml:54
+resources/views/Menu.xml:57
+resources/views/Node.xml:182"
+"Transition","","","resources/views/Workflow.xml:96
+resources/views/Workflow.xml:55
+resources/views/Workflow.xml:76"
+"Transitions","","","resources/views/Workflow.xml:87
+resources/views/Workflow.xml:45
+resources/views/Menu.xml:35
+resources/views/Menu.xml:32
+resources/views/Workflow.xml:67"
+"Twitter","","","resources/views/Node.xml:40"
+"Twitter event","","","resources/views/Node.xml:392"
+"Twitter events","","","resources/views/Node.xml:383"
+"Wkf Management","","","resources/views/Menu.xml:7"
+"Workflow","","","resources/views/Workflow.xml:17"
+"Workflows","","","resources/views/Menu.xml:10
+resources/views/Workflow.xml:9"
+"Worklows","","","resources/views/Menu.xml:13"
+"XML","","","resources/views/Workflow.xml:38"
+"XOR","","","resources/views/Node.xml:23"
+"You have no sufficient rights.","","","java/com/axelor/wkf/db/Transition.java:321"
+"twitter events","","","resources/views/Menu.xml:142
+resources/views/Menu.xml:139"
