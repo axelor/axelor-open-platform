@@ -24,6 +24,7 @@
 
   <modules>
     <module>axelor-test</module>
+    <module>axelor-common</module>
     <module>axelor-core</module>
     <module>axelor-tools</module>
     <module>axelor-web</module>
