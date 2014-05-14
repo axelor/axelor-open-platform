@@ -29,31 +29,31 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 
@@ -61,19 +61,28 @@ public class I18nExtractor {
 	
 	private static Logger log = LoggerFactory.getLogger(I18nExtractor.class);
 
-	private static final DocumentBuilderFactory DOC_FACTORY = DocumentBuilderFactory.newInstance();
-	private static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
-	
 	private static final Pattern PATTERN_XML = Pattern.compile("/(domains|objects|views)/");
 	private static final Pattern PATTERN_I18N = Pattern.compile("((I18n.get\\s*\\()|(/\\*\\$\\$\\(\\*/))\\s*");
 
-	private static final Set<String> ROOT_NODES = Sets.newHashSet(
-			"domain-models", "object-views");
-	
 	private static final Set<String> FIELD_NODES = Sets.newHashSet(
 			"string", "boolean", "integer", "long", "decimal", "date", "time", "datetime", "binary",
 			"one-to-one", "many-to-one", "one-to-many", "many-to-many");
 	
+	private static final String[] CSV_HEADER = {"key", "message", "comment", "context" };
+
+	private static class I18nItem {
+		
+		private String text;
+		private Path file;
+		private int line;
+		
+		public I18nItem(String text, Path file, int line) {
+			this.text = text;
+			this.file = file;
+			this.line = line;
+		}
+	}
+
 	private static abstract class I18nTextVisitor extends SimpleFileVisitor<Path> {
 		
 		private Path base;
@@ -86,61 +95,85 @@ public class I18nExtractor {
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 			String name = file.getFileName().toString();
 			try {
-				if (name.endsWith(".xml"))processXml(file);
-				if (name.endsWith(".java"))processJava(file);
-				if (name.endsWith(".groovy"))processJava(file);
+				if (name.endsWith(".xml")) processXml(file);
+				if (name.endsWith(".java")) processJava(file);
+				if (name.endsWith(".groovy")) processJava(file);
 			} catch (Exception e) {
 				log.error(e.getMessage());
 			}
 			return FileVisitResult.CONTINUE;
 		}
 		
-		protected abstract void accept(String text);
+		protected abstract void accept(I18nItem item);
 		
-		private void processXml(Path file) throws Exception {
+		private void processXml(final Path file) throws Exception {
 			
-			String path = file.toString();
-			Matcher match = PATTERN_XML.matcher(path);
-			
-			if (!match.find()) {
-				return;
-			}
-			
-			DocumentBuilder builder = DOC_FACTORY.newDocumentBuilder();
-			Document doc = builder.parse(file.toFile());
-			
-			if (!ROOT_NODES.contains(doc.getDocumentElement().getNodeName())) {
+			if (!PATTERN_XML.matcher(file.toString()).find()) {
 				return;
 			}
 			
 			log.debug("processing: {}", base.getParent().relativize(file));
 			
-			XPath xpath = XPATH_FACTORY.newXPath();
-			XPathExpression xpr = xpath.compile("//*");
-			
-			NodeList nodes = (NodeList) xpr.evaluate(doc, XPathConstants.NODESET);
-			
-			for (int i = 0; i < nodes.getLength(); i++) {
-				Element node = (Element) nodes.item(i);
-				String title = node.getAttribute("title");
-				if (StringUtils.isBlank(title) && FIELD_NODES.contains(node.getNodeName())) {
-					title = node.getAttribute("name");
-					title = Inflector.getInstance().humanize(title);
+			final SAXParserFactory factory = SAXParserFactory.newInstance();
+			final SAXParser parser = factory.newSAXParser();
+			final DefaultHandler handler = new DefaultHandler() {
+				
+				private Locator locator;
+				private boolean readText = false;
+				
+				@Override
+				public void setDocumentLocator(Locator locator) {
+					this.locator = locator;
 				}
-				accept(title);
-				accept(node.getAttribute("help"));
-				accept(node.getAttribute("prompt"));
-				accept(node.getAttribute("placeholder"));
-			}
+				
+				@Override
+				public void startElement(String uri, String localName,
+						String qName, Attributes attributes)
+						throws SAXException {
+
+					String title = attributes.getValue("title");
+					if (StringUtils.isBlank(title) && FIELD_NODES.contains(qName)) {
+						title = attributes.getValue("name");
+						title = Inflector.getInstance().humanize(title);
+					}
+					
+					accept(new I18nItem(title, file, locator.getLineNumber()));
+					accept(new I18nItem(attributes.getValue("help"), file, locator.getLineNumber()));
+					accept(new I18nItem(attributes.getValue("prompt"), file, locator.getLineNumber()));
+					accept(new I18nItem(attributes.getValue("placeholder"), file, locator.getLineNumber()));
+					
+					if ("option".equals(qName)) {
+						readText = true;
+					}
+				}
+				
+				@Override
+				public void endElement(String uri, String localName, String qName) throws SAXException {
+					if ("option".equals(qName)) {
+						readText = false;
+					}
+				}
+				
+				@Override
+				public void characters(char[] ch, int start, int length) throws SAXException {
+					if (readText) {
+						String text = new String(ch, start, length);
+						I18nItem item = new I18nItem(text, file, locator.getLineNumber());
+						accept(item);
+					}
+				}
+			};
+			
+			parser.parse(file.toFile(), handler);
 		}
 
-		private int consume(String source) {
+		private int consume(String source, Path file, int line) {
 			
 			char first = source.charAt(0);
 			if (first != '"') {
 				return 0;
 			}
-			
+
 			StringBuilder sb = new StringBuilder();
 			
 			int i = 1;
@@ -161,11 +194,11 @@ public class I18nExtractor {
 				if (isString) {
 					sb.append(next);
 				} else if (next == ',') { // next argument
-					accept(sb.toString().trim());
+					accept(new I18nItem(sb.toString().trim(), file, line));
 					sb = new StringBuilder();
 				}
 			}
-			accept(sb.toString().trim());
+			accept(new I18nItem(sb.toString().trim(), file, line));
 			return i;
 		}
 		
@@ -182,9 +215,15 @@ public class I18nExtractor {
 			
 			Matcher matcher = PATTERN_I18N.matcher(source);
 			while (matcher.find()) {
-				int end = consume(source.substring(matcher.end()));
+				int line = getLine(source, matcher.end());
+				int end = consume(source.substring(matcher.end()), file, line);
 				matcher.region(matcher.end() + end, source.length());
 			}
+		}
+		
+		private int getLine(String source, int index) {
+			String sub = source.substring(0, index);
+			return Splitter.on('\n').splitToList(sub).size();
 		}
 		
 		public void walk() {
@@ -195,34 +234,40 @@ public class I18nExtractor {
 		}
 	}
 	
-	public void extract(Path base) {
+	public void extract(final Path base) {
 		
-		final Path srcPath = base.resolve("src");
+		final Path srcPath = base.resolve("src/main");
 		if (!Files.exists(srcPath)) {
 			return;
 		}
 
 		log.info("extracting: {}", "translatable strings...");
 		
-		final Set<String> items = new HashSet<>();
+		final Multimap<String, String> items =  HashMultimap.create();
+		
 		final I18nTextVisitor visitor = new I18nTextVisitor(srcPath) {
 			
 			@Override
-			protected void accept(String text) {
-				if (StringUtils.isBlank(text)) return;
-				items.add(text);
+			protected void accept(I18nItem item) {
+				if (StringUtils.isBlank(item.text)) return;
+				String location = null;
+				if (item.file != null) {
+					location = "" + srcPath.relativize(item.file) + ":" + item.line;
+				}
+				items.put(item.text.trim(), location);
 			}
 		};
 		
 		visitor.walk();
 		
-		List<String> keys = new ArrayList<>(items);
+		List<String> keys = new ArrayList<>(items.keySet());
 		List<String[]> values = new ArrayList<>();
 		
 		Collections.sort(keys);
-		
+
 		for (String key : keys) {
-			String[] line = { key, "", "" };
+			String context = Joiner.on('\n').join(items.get(key)).trim();
+			String[] line = { key, "", "", context };
 			values.add(line);
 		}
 		
@@ -312,7 +357,7 @@ public class I18nExtractor {
 		Files.createDirectories(file.getParent());
 		FileWriter writer = new FileWriter(file.toFile());
 		try (CSVWriter csv = new CSVWriter(writer)) {
-			csv.writeNext(new String[] { "key", "message", "comment" });
+			csv.writeNext(CSV_HEADER);
 			for (String[] line : values) {
 				csv.writeNext(line);
 			}
