@@ -249,6 +249,9 @@ function GridViewCtrl($scope, $element) {
 					console.warn("Can't search on field: ", key);
 				}
 			}
+			if (field.selection) {
+				type = 'selection';
+			}
 
 			function stripOperator(val) {
 				if (val.indexOf('>') === 0) operator = '>';
@@ -282,6 +285,9 @@ function GridViewCtrl($scope, $element) {
 					var val = moment(value, 'DD/MM/YYYY');
 					value = val.startOf('day').toDate().toISOString();
 					value2 = val.endOf('day').toDate().toISOString();
+					break;
+				case 'selection':
+					operator = '=';
 					break;
 			}
 
