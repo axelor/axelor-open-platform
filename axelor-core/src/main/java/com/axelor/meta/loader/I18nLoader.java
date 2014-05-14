@@ -100,11 +100,11 @@ public class I18nLoader extends AbstractLoader {
 		
 		// Get language name from the file name
 		String language = "";
-		Pattern pattern = Pattern.compile(".*(?:/|\\\\)(.+)\\.(\\w+)$");
+		Pattern pattern = Pattern.compile(".*(?:messages_)([a-zA-Z_]+)\\.csv$");
 		Matcher matcher = pattern.matcher(fileName);
-		if (matcher.matches()) {
-			language = matcher.group(1);
-		}
+		if (!matcher.matches()) return;
+		
+		language = matcher.group(1);
 
 		Reader reader = new InputStreamReader(stream);
 		CSVReader csvReader = new CSVReader(reader);
@@ -112,10 +112,6 @@ public class I18nLoader extends AbstractLoader {
 		try {
 			String[] fields = csvReader.readNext();
 			String[] values = null;
-			
-			if (fields.length > 2) {
-				throw new IOException("Old translation file format.");
-			}
 			
 			while((values = csvReader.readNext()) != null) {
 				if (isEmpty(values)) {
