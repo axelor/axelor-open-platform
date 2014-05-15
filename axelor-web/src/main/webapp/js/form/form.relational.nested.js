@@ -242,7 +242,7 @@ var NestedEditor = {
 					} else {
 						rec.$dirty = true;
 					}
-					if (rec && rec.$updateLock && _.isEmpty(old)) {
+					if (rec && rec.$updateLock) {
 						rec.$updateLock = false;
 					} else if (rec) {
 						model.$setViewValue(rec);
