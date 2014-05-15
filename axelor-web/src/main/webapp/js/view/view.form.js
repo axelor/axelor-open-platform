@@ -265,7 +265,7 @@ function FormViewCtrl($scope, $element) {
 	$scope.$watch("record", function(rec, old) {
 		var view = $scope.schema;
 		if (view && view.readonlyIf) {
-			var readonly = axelor.$eval($scope, view.readonlyIf, rec);
+			var readonly = axelor.$eval($scope, view.readonlyIf, _.extend({}, $scope._context, rec));
 			if (_.isFunction($scope.attr)) {
 				$scope.attr('readonly', readonly);
 			}
