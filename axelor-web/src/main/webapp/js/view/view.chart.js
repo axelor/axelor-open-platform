@@ -183,7 +183,7 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 			if (interval === undefined) {
 				return interval = null;
 			}
-			delayedReload();
+			if ($scope.isValid()) delayedReload();
 		}, true);
 		
 		$scope.$watch('$events.onLoad', function (handler) {
