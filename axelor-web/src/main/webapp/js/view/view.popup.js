@@ -27,11 +27,13 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	ViewCtrl.call(this, $scope, DataSource, ViewService);
 	FormViewCtrl.call(this, $scope, $element);
 	
-	var ds = $scope._dataSource;
 	var closeCallback = null;
 	var originalEdit = $scope.edit;
 	var originalShow = $scope.show;
 
+	var canClose = false;
+	var isClosed = true;
+	
 	$scope.show = function(record, callback) {
 		originalShow();
 		if (_.isFunction(record)) {
@@ -39,6 +41,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			record = null;
 		}
 		closeCallback = callback;
+		isClosed = false;
 		this.edit(record);
 	};
 	
@@ -82,19 +85,16 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	};
 
 	$scope.edit = function(record) {
+		if (isClosed) return;
 		$scope._viewPromise.then(function(){
 			doEdit(record);
 			$scope.setEditable(!$scope.$parent.$$readonly);
 		});
 	};
 
-	var canClose = false;
-
 	function onOK() {
 
-		var record = $scope.record,
-			events = $scope.$events,
-			saveAction = events.onSave;
+		var record = $scope.record;
 
 		function close(value) {
 			if (value) {
@@ -110,6 +110,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 				closeCallback(value);
 			}
 			closeCallback = null;
+			isClosed = true;
 		};
 
 		if ($scope.editorCanSave && $scope.isDirty()) {
