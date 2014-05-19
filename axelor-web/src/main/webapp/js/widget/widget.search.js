@@ -779,6 +779,7 @@ ui.directive('uiFilterBox', function() {
 						operator = '=';
 						value = number;
 						break;
+					case 'text':
 					case 'string':
 						fieldName = name;
 						break;
