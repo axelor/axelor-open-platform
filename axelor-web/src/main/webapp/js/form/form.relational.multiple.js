@@ -229,6 +229,37 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		}
 	};
 
+	(function (scope) {
+
+		var dummyId = 0;
+
+		function ensureIds(records) {
+			var items = [];
+			angular.forEach(records, function(record){
+				var item = angular.copy(record, {});
+				if (item.id == null)
+					item.id = --dummyId;
+				items.push(item);
+			});
+			return items;
+		};
+
+		function fetchData() {
+			var items = scope.getValue();
+			scope.fetchData(items, function(records){
+				records =  ensureIds(records);
+				scope.setItems(records);
+			});
+		}
+
+		scope.$$fetchData = fetchData;
+
+	})($scope);
+
+	$scope.reload = function() {
+		return $scope.$$fetchData();
+	};
+
 	$scope.filter = function() {
 		
 	};
@@ -332,27 +363,6 @@ ui.formInput('OneToMany', {
 		
 		scope.formPath = scope.formPath ? scope.formPath + "." + attrs.name : attrs.name;
 		
-		var dummyId = 0;
-
-		function ensureIds(records) {
-			var items = [];
-			angular.forEach(records, function(record){
-				var item = angular.copy(record, {});
-				if (item.id == null)
-					item.id = --dummyId;
-				items.push(item);
-			});
-			return items;
-		};
-		
-		function fetchData() {
-			var items = scope.getValue();
-			scope.fetchData(items, function(records){
-				records =  ensureIds(records);
-				scope.setItems(records);
-			});
-		}
-
 		var doRenderUnwatch = null;
 		var doViewPromised = false;
 
@@ -366,7 +376,7 @@ ui.formInput('OneToMany', {
 				}
 				doRenderUnwatch();
 				doRenderUnwatch = null;
-					fetchData();
+					scope.$$fetchData();
 				});
 		};
 		
