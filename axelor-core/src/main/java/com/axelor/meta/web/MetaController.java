@@ -17,16 +17,31 @@
  */
 package com.axelor.meta.web;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
+
+import com.axelor.app.AppSettings;
+import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
+import com.axelor.meta.MetaScanner;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaField;
 import com.axelor.meta.db.MetaModel;
+import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
@@ -34,8 +49,10 @@ import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import com.google.common.io.Files;
 import com.google.inject.Inject;
 
 public class MetaController {
@@ -126,5 +143,77 @@ public class MetaController {
 		}
 
 		response.setData(ImmutableList.of(data));
+	}
+	
+	private static final String EXPORT_DIR = AppSettings.get().getPath("data.export.dir", "{java.io.tmpdir}");
+	
+	private void exportI18n(String module, URL file) throws IOException {
+
+		String name = Paths.get(file.getFile()).getFileName().toString();
+		if (!name.startsWith("messages_")) {
+			return;
+		}
+		
+		Path path = Paths.get(EXPORT_DIR, "i18n");
+		String lang = name.substring(9, name.length() - 4);
+		Path target = path.resolve(Paths.get(module, "src/main/resources/i18n", name));
+
+		List<String[]> items = new ArrayList<>();
+		CSVReader reader = new CSVReader(new InputStreamReader(file.openStream()));
+		try {
+			String[] header = reader.readNext();
+			String[] values = null;
+			while ((values = reader.readNext()) != null) {
+				if (header.length != values.length) {
+					continue;
+				}
+				
+				final Map<String, String> map = new HashMap<>();
+				for (int i = 0; i < header.length; i++) {
+					map.put(header[i], values[i]);
+				}
+				
+				String key = map.get("key");
+				String value = map.get("value");
+				
+				if (StringUtils.isBlank(key)) {
+					continue;
+				}
+				
+				MetaTranslation tr = MetaTranslation.findByKey(key, lang);
+				if (tr != null) {
+					value = tr.getMessage();
+				}
+				String[] row = {
+					key, value, map.get("comment"), map.get("context")
+				};
+				items.add(row);
+			}
+		} finally {
+			reader.close();
+		}
+		
+		Files.createParentDirs(target.toFile());
+
+		CSVWriter writer = new CSVWriter(new FileWriter(target.toFile()));
+		try {
+			writer.writeNext(new String[]{"key", "message", "comment", "context"});
+			writer.writeAll(items);
+		} finally {
+			writer.close();
+		}
+	}
+
+	public void exportI18n(ActionRequest request, ActionResponse response) {
+		for (String module : ModuleManager.getResolution()) {
+			for (URL file : MetaScanner.findAll(module, "i18n", "(.*?)\\.csv")) {
+				try {
+					exportI18n(module, file);
+				} catch (IOException e) {
+					throw Throwables.propagate(e);
+				}
+			}
+		}
+		response.setFlash(I18n.get("Export complete."));
 	}
 }

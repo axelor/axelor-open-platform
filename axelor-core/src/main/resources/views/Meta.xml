@@ -250,6 +250,9 @@
   </action-method>
 
   <grid title="All Translations" name="meta-translations-grid" model="com.axelor.meta.db.MetaTranslation" editable="true">
+    <toolbar>
+      <button name="btnExport" icon="fa-rocket" title="Export" onClick="com.axelor.meta.web.MetaController:exportI18n"/>
+    </toolbar>
     <field name="key"/>
     <field name="message"/>
     <field name="language"/>
@@ -260,16 +263,6 @@
       <field name="message"/>
       <field name="language"/>
   </form>
-
-  <action-attrs name="action-meta-show-export-group">
-    <attribute name="hidden" for="exportGroup" expr="eval: false"/>
-    <attribute name="hidden" for="importGroup" expr="eval: true"/>
-  </action-attrs>
-  
-  <action-attrs name="action-meta-show-import-group">
-    <attribute name="hidden" for="exportGroup" expr="eval: true"/>
-    <attribute name="hidden" for="importGroup" expr="eval: false"/>
-  </action-attrs>
 
   <grid title="Files" name="meta-files-grid" model="com.axelor.meta.db.MetaFile">
     <field name="fileName"/>
