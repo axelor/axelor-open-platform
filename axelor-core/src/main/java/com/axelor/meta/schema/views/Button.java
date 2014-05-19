@@ -20,6 +20,7 @@ package com.axelor.meta.schema.views;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -43,6 +44,15 @@ public class Button extends SimpleWidget {
 
 	@XmlAttribute
 	private String onClick;
+	
+	@JsonGetter("title")
+	public String getLocalizedTitle() {
+		String title = getTitle();
+		if (StringUtils.isBlank(title)) {
+			return null;
+		}
+		return I18n.get(title);
+	}
 
 	public String getIcon() {
 		return icon;
