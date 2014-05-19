@@ -87,6 +87,7 @@ public class I18nExtractor {
 		
 		private Path base;
 		
+		private String entityName;
 		public I18nTextVisitor(Path base) {
 			this.base = base;
 		}
@@ -131,14 +132,24 @@ public class I18nExtractor {
 						String qName, Attributes attributes)
 						throws SAXException {
 
+					String name = attributes.getValue("name");
 					String title = attributes.getValue("title");
-					if (StringUtils.isBlank(title) && FIELD_NODES.contains(qName)) {
-						title = attributes.getValue("name");
-						title = Inflector.getInstance().humanize(title);
+					String help = attributes.getValue("help");
+					
+					if ("entity".equals(qName)) {
+						entityName = name;
 					}
 					
+					if (StringUtils.isBlank(title) && FIELD_NODES.contains(qName) && name != null) {
+						title = Inflector.getInstance().humanize(name);
+					}
+
+					if ("true".equals(help) && entityName != null && name != null) {
+						help = "help:" + entityName + "." + name;
+					}
+
 					accept(new I18nItem(title, file, locator.getLineNumber()));
-					accept(new I18nItem(attributes.getValue("help"), file, locator.getLineNumber()));
+					accept(new I18nItem(help, file, locator.getLineNumber()));
 					accept(new I18nItem(attributes.getValue("prompt"), file, locator.getLineNumber()));
 					accept(new I18nItem(attributes.getValue("placeholder"), file, locator.getLineNumber()));
 					
@@ -151,6 +162,9 @@ public class I18nExtractor {
 				public void endElement(String uri, String localName, String qName) throws SAXException {
 					if ("option".equals(qName)) {
 						readText = false;
+					}
+					if ("entity".equals(qName)) {
+						entityName = null;
 					}
 				}
 				
