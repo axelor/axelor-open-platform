@@ -91,7 +91,9 @@ public class I18nBundle extends ResourceBundle {
 
 		while (offset < total) {
 			for (MetaTranslation tr : query.fetch(limit, offset)) {
-				messages.put(tr.getKey(), tr.getMessage());
+				if (tr.getMessage() != null) {
+					messages.put(tr.getKey(), tr.getMessage());
+				}
 			}
 			offset += limit;
 		}
@@ -100,7 +102,11 @@ public class I18nBundle extends ResourceBundle {
 
 	public static void invalidate(String key, String value) {
 		I18nBundle bundle = (I18nBundle) I18n.getBundle();
-		if (bundle.messages.isEmpty() || !bundle.messages.containsKey(key)) return;
-		bundle.messages.put(key, value);
+		if (key == null) return;
+		if (StringUtils.isBlank(value)) {
+			bundle.messages.remove(key);
+		} else {
+			bundle.messages.put(key, value);
+		}
 	}
 }
