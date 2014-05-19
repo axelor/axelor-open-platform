@@ -147,7 +147,7 @@ ui.directive('uiFilterItem', function() {
 						"<a href='' ng-click='remove(filter)'><i class='fa fa-times'></i></a>" +
 					"</td>" +
 					"<td class='form-item filter-select'>" +
-						"<select ng-model='filter.field' ng-options='v.name as v.title for v in options' ng-change='onFieldChange()' class='input-medium'></select> " +
+						"<select ng-model='filter.$fieldName' ng-options='v.name as v.title for v in options' ng-change='onFieldChange()' class='input-medium'></select> " +
 					"</td>" +
 					"<td class='form-item filter-select'>" +
 						"<select ng-model='filter.operator' ng-options='o.name as o.title for o in getOperators()' class='input-medium'></select> "+
@@ -297,14 +297,21 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		$scope.operator = criteria.operator || 'and';
 
 		_.each(criteria.criteria, function(item) {
+			
+			var fieldName = item.fieldName || '';
+			if (fieldName && fieldName.indexOf('.') > -1) {
+				fieldName = fieldName.substring(0, fieldName.indexOf('.'));
+			}
+
+			var field = $scope.fields[fieldName] || {};
 			var filter = {
 				field: item.fieldName,
 				value: item.value,
 				value2: item.value2
 			};
-
-			var field = $scope.fields[item.fieldName] || {};
-
+			
+			filter.$fieldName = fieldName;
+			
 			filter.type = field.type || 'string';
 			filter.operator = item.operator;
 
