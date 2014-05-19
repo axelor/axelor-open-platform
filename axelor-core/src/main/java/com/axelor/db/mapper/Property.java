@@ -54,6 +54,7 @@ import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.Sequence;
 import com.axelor.db.annotations.VirtualColumn;
 import com.axelor.db.annotations.Widget;
+import com.axelor.i18n.I18n;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -668,7 +669,18 @@ public class Property {
 					|| (value instanceof Object[] && ((Object[]) value).length == 0)) {
 				continue;
 			}
-			map.put(field.getName().replaceAll("_+$", ""), value);
+
+			String key = field.getName().replaceAll("_+$", "");
+
+			if ("help".equals(key) &&
+				"true".equals(value)) {
+				value = "help:" + entity.getSimpleName() + "." + name;
+			}
+			if (value != null && key.matches("help|title")) {
+				value = I18n.get(value.toString());
+			}
+
+			map.put(key, value);
 		}
 
 		return update(map);
