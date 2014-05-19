@@ -133,10 +133,6 @@ public class I18nLoader extends AbstractLoader {
 					entity.setLanguage(language);
 				}
 				
-				if (StringUtils.isBlank(message)) {
-					message = key;
-				}
-				
 				entity.setMessage(message);
 				entity.save();
 			}
