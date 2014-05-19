@@ -78,8 +78,12 @@ public class I18nBundle extends ResourceBundle {
 			return messages;
 		}
 
-		final Query<MetaTranslation> query = Query.of(MetaTranslation.class)
-				.filter("self.language = ?", locale.getLanguage());
+		String lang = locale.getLanguage();
+		Query<MetaTranslation> query = MetaTranslation.all().filter("self.language = ?", lang);
+
+		if (query.count() == 0 && lang.length() > 2) {
+			query = MetaTranslation.all().filter("self.language = ?", lang.substring(0, 2));
+		}
 
 		long total = query.count();
 		int offset = 0;
