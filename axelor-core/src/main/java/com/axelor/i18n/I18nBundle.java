@@ -100,13 +100,7 @@ public class I18nBundle extends ResourceBundle {
 		return messages;
 	}
 
-	public static void invalidate(String key, String value) {
-		I18nBundle bundle = (I18nBundle) I18n.getBundle();
-		if (key == null) return;
-		if (StringUtils.isBlank(value)) {
-			bundle.messages.remove(key);
-		} else {
-			bundle.messages.put(key, value);
-		}
+	public static void invalidate() {
+		ResourceBundle.clearCache();
 	}
 }

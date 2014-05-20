@@ -537,9 +537,7 @@ public class Resource<T extends Model> {
 			
 			// if it's a translation object, invalidate cache
 			if (bean instanceof MetaTranslation) {
-				I18nBundle.invalidate(
-						((MetaTranslation) bean).getKey(),
-						((MetaTranslation) bean).getMessage());
+				I18nBundle.invalidate();
 			}
 		}
 
