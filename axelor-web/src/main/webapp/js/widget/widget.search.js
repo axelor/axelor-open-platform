@@ -147,7 +147,7 @@ ui.directive('uiFilterItem', function() {
 						"<a href='' ng-click='remove(filter)'><i class='fa fa-times'></i></a>" +
 					"</td>" +
 					"<td class='form-item filter-select'>" +
-						"<select ng-model='filter.$fieldName' ng-options='v.name as v.title for v in options' ng-change='onFieldChange()' class='input-medium'></select> " +
+						"<select ng-model='filter.field' ng-options='v.name as v.title for v in options' ng-change='onFieldChange()' class='input-medium'></select> " +
 					"</td>" +
 					"<td class='form-item filter-select'>" +
 						"<select ng-model='filter.operator' ng-options='o.name as o.title for o in getOperators()' class='input-medium'></select> "+
@@ -305,13 +305,11 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
 			var field = $scope.fields[fieldName] || {};
 			var filter = {
-				field: item.fieldName,
+				field: fieldName,
 				value: item.value,
 				value2: item.value2
 			};
-			
-			filter.$fieldName = fieldName;
-			
+
 			filter.type = field.type || 'string';
 			filter.operator = item.operator;
 
@@ -329,6 +327,10 @@ function FilterFormCtrl($scope, $element, ViewService) {
 				if (filter.value2) {
 					filter.value2 = moment(filter.value2).toDate();
 				}
+			}
+			
+			if (filter.type == 'many-to-one') {
+				filter.targetName = field.targetName;
 			}
 
 			$scope.addFilter(filter);
