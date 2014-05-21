@@ -75,12 +75,17 @@ public abstract class SimpleWidget extends AbstractWidget {
 		this.name = name;
 	}
 
-	@JsonGetter("title")
-	public String getLocalizedTitle() {
+	@JsonGetter("autoTitle")
+	public String getAutoTitle() {
 		if (StringUtils.isBlank(title) && !StringUtils.isBlank(name)) {
 			String last = name.substring(name.lastIndexOf('.') + 1);
 			return I18n.get(Inflector.getInstance().humanize(last));
 		}
+		return null;
+	}
+	
+	@JsonGetter("title")
+	public String getLocalizedTitle() {
 		return I18n.get(title);
 	}
 
