@@ -21,8 +21,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.common.Inflector;
-import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -77,10 +75,6 @@ public abstract class SimpleWidget extends AbstractWidget {
 
 	@JsonGetter("title")
 	public String getLocalizedTitle() {
-		if (StringUtils.isBlank(title) && !StringUtils.isBlank(name)) {
-			String last = name.substring(name.lastIndexOf('.') + 1);
-			return I18n.get(Inflector.getInstance().humanize(last));
-		}
 		return I18n.get(title);
 	}
 

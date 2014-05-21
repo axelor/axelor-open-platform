@@ -49,6 +49,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.axelor.common.Inflector;
 import com.axelor.db.Model;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.Sequence;
@@ -681,6 +682,10 @@ public class Property {
 			}
 
 			map.put(key, value);
+		}
+		
+		if (!map.containsKey("title")) {
+			map.put("title", I18n.get(Inflector.getInstance().humanize(getName())));
 		}
 
 		return update(map);
