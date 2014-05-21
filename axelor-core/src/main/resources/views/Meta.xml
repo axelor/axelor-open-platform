@@ -251,7 +251,7 @@
 
   <grid title="All Translations" name="meta-translations-grid" model="com.axelor.meta.db.MetaTranslation" editable="true">
     <toolbar>
-      <button name="btnExport" icon="fa-rocket" title="Export" onClick="com.axelor.meta.web.MetaController:exportI18n"/>
+      <button name="btnExport" icon="fa-rocket" help="Export" onClick="com.axelor.meta.web.MetaController:exportI18n"/>
     </toolbar>
     <field name="key"/>
     <field name="message"/>
