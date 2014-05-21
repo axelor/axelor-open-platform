@@ -8,7 +8,7 @@ resources/domains/Meta.xml:82"
 "Action Menus","","","resources/views/Menu.xml:105
 resources/views/Meta.xml:142
 resources/views/Menu.xml:103"
-"Action name can't be changed.","","","java/com/axelor/meta/web/MetaController.java:78"
+"Action name can't be changed.","","","java/com/axelor/meta/web/MetaController.java:95"
 "Actions","","","resources/views/Menu.xml:88
 resources/views/Schedules.xml:21"
 "Activate on","","","resources/domains/User.xml:22"
@@ -66,8 +66,10 @@ resources/domains/Role.xml:14"
 "Email","","","resources/domains/User.xml:17"
 "English","","","resources/views/User.xml:6"
 "Expires on","","","resources/domains/User.xml:23"
-"Export","","","resources/domains/Permission.xml:19"
+"Export","","","resources/domains/Permission.xml:19
+resources/views/Meta.xml:254"
 "Export complete.","","","java/com/axelor/meta/schema/actions/ActionExport.java:146
+java/com/axelor/meta/web/MetaController.java:217
 java/com/axelor/meta/schema/actions/ActionExport.java:148"
 "Field","","","resources/views/Meta.xml:236"
 "Field is required.","","","java/com/axelor/meta/schema/actions/ActionCondition.java:114"
@@ -77,8 +79,8 @@ resources/views/Meta.xml:228"
 "File name","","","resources/domains/Meta.xml:167"
 "File path","","","resources/domains/Meta.xml:168"
 "File type","","","resources/domains/Meta.xml:170"
-"Files","","","resources/views/Meta.xml:282
-resources/views/Meta.xml:274"
+"Files","","","resources/views/Meta.xml:275
+resources/views/Meta.xml:267"
 "Filter custom","","","resources/domains/MetaFilter.xml:17"
 "Filter view","","","resources/domains/MetaFilter.xml:18"
 "Filters","","","resources/domains/MetaFilter.xml:16
@@ -105,7 +107,7 @@ resources/views/Menu.xml:22"
 "Initial","","","resources/domains/MetaSequence.xml:17"
 "Install","","","resources/views/Meta.xml:49"
 "Installed","","","resources/domains/Meta.xml:19"
-"Invalid XML.","","","java/com/axelor/meta/web/MetaController.java:50"
+"Invalid XML.","","","java/com/axelor/meta/web/MetaController.java:67"
 "Invalid field value.","","","java/com/axelor/meta/schema/actions/ActionCondition.java:116"
 "Items","","","resources/domains/Meta.xml:109"
 "Job","","","resources/domains/MetaSchedule.xml:22"
@@ -238,7 +240,7 @@ resources/domains/Meta.xml:78
 resources/domains/Meta.xml:57
 resources/domains/Meta.xml:28"
 "Top","","","resources/domains/Meta.xml:60"
-"Translation","","","resources/views/Meta.xml:258"
+"Translation","","","resources/views/Meta.xml:261"
 "Tree","","","resources/views/Meta.xml:9"
 "Type","","","resources/domains/Meta.xml:148
 resources/domains/Meta.xml:93
