@@ -271,7 +271,7 @@ ui.formItem('Label', {
 		}
 	},
 
-	template: '<label><span ui-help-popover ng-transclude></span></label>'
+	template: '<label><sup ng-if="field.help">?</sup><span ui-help-popover ng-transclude></span></label>'
 });
 
 /**
