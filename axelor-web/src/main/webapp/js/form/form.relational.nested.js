@@ -317,10 +317,12 @@ var NestedEditor = {
 					return;
 				}
 				if (!value || !value.id || value.$dirty) {
-					return nested.edit(value);
+					return nested.edit(value, false);
 				}
+				if (value.$fetched) return;
 				return nested.doRead(value.id).success(function(record){
 					record.$updateLock = true;
+					value.$fetched = true;
 					return nested.edit(record);
 				});
 			});
