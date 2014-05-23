@@ -226,9 +226,11 @@ var NestedEditor = {
 					_.extend(record, value);
 				}
 			});
-			scope.$on("on:attrs-change:value", function (e, data) {
-				if (!nested || nested.visible || scope !== e.currentScope) return;
-				var value = scope.getValue();
+			nested.$on('on:attrs-change:value', function (e, data) {
+				if (!nested || nested.visible || nested !== data.scope.$parent) {
+					return;
+				}
+				var value = scope.getValue() || {};
 				_.extend(value, nested.record);
 			});
 
@@ -345,8 +347,9 @@ var NestedEditor = {
 				if (!value || !value.id || value.$dirty) {
 					return nestedEdit(value, false);
 				}
-				if (value.$fetched) return;
+				if (value.$fetched && (nested.record||{}).$fetched) return;
 				return nested.doRead(value.id).success(function(record){
+					record.$fetched = true;
 					value.$fetched = true;
 					return nestedEdit(record);
 				});
