@@ -226,6 +226,11 @@ var NestedEditor = {
 					_.extend(record, value);
 				}
 			});
+			scope.$on("on:attrs-change:value", function (e, data) {
+				if (!nested || nested.visible || scope !== e.currentScope) return;
+				var value = scope.getValue();
+				_.extend(value, nested.record);
+			});
 
 			var validitySet = false;
 			nested.$watch('form.$valid', function(valid, old){
@@ -235,21 +240,42 @@ var NestedEditor = {
 				validitySet = true;
 				setValidity(nested, valid);
 			});
-			nested.$watch('record', function(rec, old){
-				if (rec != old) {
-					if (_.isEmpty(rec)) {
-						rec = null;
-					} else {
-						rec.$dirty = true;
-					}
-					if (rec && rec.$updateLock) {
-						rec.$updateLock = false;
-					} else if (rec) {
-						model.$setViewValue(rec);
-					}
+		}
+
+		var unwatch = null;
+		var original = null;
+
+		function nestedEdit(record, fireOnLoad) {
+
+			var nested = scope.nested;
+			var counter = 0;
+
+			if (!nested) return;
+			if (unwatch) unwatch();
+
+			original = angular.copy(record);
+
+			unwatch = nested.$watch('record', function(rec, old) {
+
+				if (counter++ === 0) {
+					return;
+				}
+
+				var ds = nested._dataSource;
+				var name = scope.field.name;
+				var orig = (scope.$$original||{})[name];
+
+				if (_.isEmpty(rec)) rec = null;
+				if (_.isEmpty(old)) old = null;
+
+				if (rec) {
+					rec.$dirty = !ds.equals(rec, original);
+					model.$setViewValue(rec.$dirty ? rec : orig);
 				}
 				setValidity(nested, nested.isValid());
 			}, true);
+
+			return nested.edit(record, fireOnLoad);
 		}
 		
 		scope.ngModel = model;
@@ -317,13 +343,12 @@ var NestedEditor = {
 					return;
 				}
 				if (!value || !value.id || value.$dirty) {
-					return nested.edit(value, false);
+					return nestedEdit(value, false);
 				}
 				if (value.$fetched) return;
 				return nested.doRead(value.id).success(function(record){
-					record.$updateLock = true;
 					value.$fetched = true;
-					return nested.edit(record);
+					return nestedEdit(record);
 				});
 			});
 		};
