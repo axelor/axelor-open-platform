@@ -26,6 +26,7 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.db.mapper.PropertyType;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -140,6 +141,10 @@ public class Context extends HashMap<String, Object> {
 					items.add(createOrFind(p, item));
 				}
 				value = items;
+			}
+			// non-owning side can't handle the relationship
+			else if (p.getType() == PropertyType.ONE_TO_ONE && p.getMappedBy() != null) {
+				continue;
 			}
 			else if (p.isReference()) {
 				value = createOrFind(p, value);
