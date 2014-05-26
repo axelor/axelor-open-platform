@@ -117,7 +117,6 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 			if (field.target) {
 				if (value) {
 					record[field.name] = {id: +value};
-					record[field.name][field.nameField] = value;
 				}
 			} else {
 				record[field.name] = value;
@@ -130,7 +129,7 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 			});
 		}
 		
-		scopes.form.editRecord(record);
+		scopes.form.editSearch(record, fields);
 		
 		function _doSearch() {
 			var promise = $scope.doSearch();
@@ -311,6 +310,21 @@ function SearchFormCtrl($scope, $element, ViewService) {
 		var ctx = getContext.apply(this, arguments) || {};
 		ctx._model = model;
 		return ctx;
+	};
+	
+	$scope.editSearch = function (record, fields) {
+		$scope.editRecord(record);
+		setTimeout(function () {
+			_.each(fields, function (field) {
+				if (!field.target || !$scope.record) return;
+				var item = $element.find('[x-field=' + field.name + ']');
+				var itemScope = item.data('$scope');
+				var value = itemScope.getValue();
+				if (value && itemScope && !itemScope.text && itemScope.select) {
+					itemScope.select(value);
+				}
+			});
+		});
 	};
 }
 
