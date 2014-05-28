@@ -34,6 +34,7 @@ resources/views/Menu.xml:112"
 "All Views","","","resources/views/Menu.xml:68
 resources/views/Meta.xml:58"
 "All the customizations will be lost. Are you sure ?","","","resources/views/Meta.xml:60"
+"All views have been restored.","","","java/com/axelor/meta/web/MetaController.java:139"
 "Allow","","","resources/views/Permission.xml:22"
 "An unique permission name.","","","resources/domains/Permission.xml:13"
 "Authorization","","","resources/views/User.xml:30"
@@ -70,8 +71,8 @@ resources/domains/Role.xml:14"
 "Expires on","","","resources/domains/User.xml:23"
 "Export","","","resources/domains/Permission.xml:19
 resources/views/Meta.xml:254"
-"Export complete.","","","java/com/axelor/meta/schema/actions/ActionExport.java:146
-java/com/axelor/meta/web/MetaController.java:217
+"Export complete.","","","java/com/axelor/meta/web/MetaController.java:214
+java/com/axelor/meta/schema/actions/ActionExport.java:146
 java/com/axelor/meta/schema/actions/ActionExport.java:148"
 "Field","","","resources/views/Meta.xml:236"
 "Field is required.","","","java/com/axelor/meta/schema/actions/ActionCondition.java:114"
