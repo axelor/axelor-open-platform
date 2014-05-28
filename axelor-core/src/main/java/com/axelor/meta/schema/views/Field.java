@@ -130,7 +130,7 @@ public class Field extends SimpleWidget {
 
 	@JsonGetter("placeholder")
 	public String getLocalizedPlaceholder() {
-		return placeholder;
+		return I18n.get(placeholder);
 	}
 
 	@JsonIgnore
