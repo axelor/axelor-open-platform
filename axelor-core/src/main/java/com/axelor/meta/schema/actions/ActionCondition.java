@@ -48,7 +48,7 @@ public class ActionCondition extends Action {
 		boolean allCheck = true;
 		for(Check check : conditions) {
 			String names = check.getField();
-			String error = check.getError();
+			String error = check.getLocalizedError();
 			if (Strings.isNullOrEmpty(names)
 					&& Strings.isNullOrEmpty(error)
 					&& !check.test(handler)) {
