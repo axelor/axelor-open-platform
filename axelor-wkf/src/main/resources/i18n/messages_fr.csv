@@ -1,15 +1,15 @@
 "key","message","comment","context"
-"AND","ET",,"resources/views/Node.xml:21"
-"Activities","Activités",,"resources/views/Menu.xml:173
+"AND","ET","","resources/views/Node.xml:21"
+"Activities","Activités","","resources/views/Menu.xml:173
 resources/views/Menu.xml:170
 resources/views/Menu.xml:167
 resources/views/Node.xml:112"
-"BPMN","BPMN",,"resources/views/Workflow.xml:35"
-"Configurations","Configurations",,"resources/views/Menu.xml:29"
-"Counter","Compteur",,"resources/views/Instance.xml:31
+"BPMN","BPMN","","resources/views/Workflow.xml:35"
+"Configurations","Configurations","","resources/views/Menu.xml:29"
+"Counter","Compteur","","resources/views/Instance.xml:31
 resources/views/Instance.xml:56"
-"Counters","Compteurs",,"resources/views/Instance.xml:51"
-"Description","Description",,"resources/views/Workflow.xml:63
+"Counters","Compteurs","","resources/views/Instance.xml:51"
+"Description","Description","","resources/views/Workflow.xml:63
 resources/views/Node.xml:325
 resources/views/Node.xml:144
 resources/views/Node.xml:94
@@ -32,124 +32,124 @@ resources/views/Workflow.xml:103
 resources/views/Node.xml:80
 resources/views/Node.xml:225"
 "Details","","","resources/views/Instance.xml:22"
-"Diagram","Diagramme",,"resources/views/Instance.xml:19"
-"E-mail","E-mail",,"resources/views/Node.xml:28"
-"E-mail event","Evènement e-mail",,"resources/views/Node.xml:212"
-"E-mail events","Evènements e-mail",,"resources/views/Menu.xml:77
+"Diagram","Diagramme","","resources/views/Instance.xml:19"
+"E-mail","E-mail","","resources/views/Node.xml:28"
+"E-mail event","Evènement e-mail","","resources/views/Node.xml:212"
+"E-mail events","Evènements e-mail","","resources/views/Menu.xml:77
 resources/views/Node.xml:204
 resources/views/Menu.xml:74"
-"Editor","Éditeur",,"resources/views/Workflow.xml:19"
-"End event","Evènement de fin",,"resources/views/Node.xml:11
+"Editor","Éditeur","","resources/views/Workflow.xml:19"
+"End event","Evènement de fin","","resources/views/Node.xml:11
 resources/views/Node.xml:102"
-"End events","Evènements de fin",,"resources/views/Menu.xml:63
+"End events","Evènements de fin","","resources/views/Menu.xml:63
 resources/views/Node.xml:98
 resources/views/Menu.xml:66"
-"Events","Evènements",,"resources/views/Menu.xml:42"
-"Exclusive gateway","Passerelle exclusive",,"resources/views/Node.xml:152"
-"Exclusive gateways","Passerelles exclusives",,"resources/views/Menu.xml:202
+"Events","Evènements","","resources/views/Menu.xml:42"
+"Exclusive gateway","Passerelle exclusive","","resources/views/Node.xml:152"
+"Exclusive gateways","Passerelles exclusives","","resources/views/Menu.xml:202
 resources/views/Menu.xml:199
 resources/views/Node.xml:148"
-"Facebook","Facebook",,"resources/views/Node.xml:38"
-"Facebook event","Evènement Facebook",,"resources/views/Node.xml:339"
-"Facebook events","Evènements Facebook",,"resources/views/Menu.xml:121
+"Facebook","Facebook","","resources/views/Node.xml:38"
+"Facebook event","Evènement Facebook","","resources/views/Node.xml:339"
+"Facebook events","Evènements Facebook","","resources/views/Menu.xml:121
 resources/views/Menu.xml:124
 resources/views/Node.xml:329"
-"Filter","Filtre",,"resources/views/Node.xml:414"
+"Filter","Filtre","","resources/views/Node.xml:414"
 "Filter event","","","resources/views/Node.xml:15"
-"Filters","Filtres",,"resources/views/Menu.xml:147
+"Filters","Filtres","","resources/views/Menu.xml:147
 resources/views/Node.xml:409
 resources/views/Menu.xml:150
 resources/views/Menu.xml:153"
-"Gateway","Passerelle",,"resources/views/Node.xml:12"
-"Gateways","Passerelles",,"resources/views/Menu.xml:178"
-"Histories","Historiques",,"resources/views/Instance.xml:39"
-"History","Historique",,"resources/views/Instance.xml:45
+"Gateway","Passerelle","","resources/views/Node.xml:12"
+"Gateways","Passerelles","","resources/views/Menu.xml:178"
+"Histories","Historiques","","resources/views/Instance.xml:39"
+"History","Historique","","resources/views/Instance.xml:45
 resources/views/Instance.xml:26"
-"Import","Import",,"resources/views/Workflow.xml:21"
-"Inclusive gateway","Passerelle inclusive",,"resources/views/Node.xml:135"
-"Inclusive gateways","Passerelles inclusives",,"resources/views/Menu.xml:184
+"Import","Import","","resources/views/Workflow.xml:21"
+"Inclusive gateway","Passerelle inclusive","","resources/views/Node.xml:135"
+"Inclusive gateways","Passerelles inclusives","","resources/views/Menu.xml:184
 resources/views/Node.xml:131
 resources/views/Menu.xml:181"
-"Instances","Instances",,"resources/views/Menu.xml:23
+"Instances","Instances","","resources/views/Menu.xml:23
 resources/views/Workflow.xml:20
 resources/views/Instance.xml:6
 resources/views/Instance.xml:14
 resources/views/Menu.xml:20"
-"Internet site","Site internet",,"resources/views/Node.xml:32"
-"Internet site event","Evènement site internet",,"resources/views/Node.xml:312"
-"Internet site events","Evènements site internet",,"resources/views/Menu.xml:113
+"Internet site","Site internet","","resources/views/Node.xml:32"
+"Internet site event","Evènement site internet","","resources/views/Node.xml:312"
+"Internet site events","Evènements site internet","","resources/views/Menu.xml:113
 resources/views/Menu.xml:110
 resources/views/Node.xml:304"
-"Linkedin","Linkedin",,"resources/views/Node.xml:39"
-"Linkedin event","Evènement Linkedin",,"resources/views/Node.xml:366"
-"Linkedin events","Evènements Linkedin",,"resources/views/Menu.xml:130
+"Linkedin","Linkedin","","resources/views/Node.xml:39"
+"Linkedin event","Evènement Linkedin","","resources/views/Node.xml:366"
+"Linkedin events","Evènements Linkedin","","resources/views/Menu.xml:130
 resources/views/Menu.xml:133
 resources/views/Node.xml:357"
-"Mail","Courrier",,"resources/views/Node.xml:29"
-"Mail event","Evènement courrier",,"resources/views/Node.xml:237"
-"Mail events","Evènements courrier",,"resources/views/Menu.xml:83
+"Mail","Courrier","","resources/views/Node.xml:29"
+"Mail event","Evènement courrier","","resources/views/Node.xml:237"
+"Mail events","Evènements courrier","","resources/views/Menu.xml:83
 resources/views/Node.xml:229
 resources/views/Menu.xml:86"
-"Message","Message",,"resources/views/Node.xml:13"
-"Messages","Messages",,"resources/views/Menu.xml:71"
-"Meta model","Model",,"resources/views/Instance.xml:16
+"Message","Message","","resources/views/Node.xml:13"
+"Messages","Messages","","resources/views/Menu.xml:71"
+"Meta model","Model","","resources/views/Instance.xml:16
 resources/views/Instance.xml:8"
-"Node","Nœud",,"resources/views/Node.xml:51"
+"Node","Nœud","","resources/views/Node.xml:51"
 "NodeTask","","","resources/views/Node.xml:117
 resources/views/Node.xml:10"
-"Nodes","Nœuds",,"resources/views/Menu.xml:40
+"Nodes","Nœuds","","resources/views/Menu.xml:40
 resources/views/Node.xml:45"
-"OR","OU",,"resources/views/Node.xml:22"
-"Parallel gateway","Passerelle parallèles",,"resources/views/Node.xml:169"
-"Parallel gateways","Passerelles parallèles",,"resources/views/Node.xml:165
+"OR","OU","","resources/views/Node.xml:22"
+"Parallel gateway","Passerelle parallèles","","resources/views/Node.xml:169"
+"Parallel gateways","Passerelles parallèles","","resources/views/Node.xml:165
 resources/views/Menu.xml:193
 resources/views/Menu.xml:190"
-"Phone call","Appel téléphonique",,"resources/views/Node.xml:30"
-"Phone call event","Evènement appel téléphonique",,"resources/views/Node.xml:287"
-"Phone call events","Evènements appel téléphonique",,"resources/views/Menu.xml:104
+"Phone call","Appel téléphonique","","resources/views/Node.xml:30"
+"Phone call event","Evènement appel téléphonique","","resources/views/Node.xml:287"
+"Phone call events","Evènements appel téléphonique","","resources/views/Menu.xml:104
 resources/views/Menu.xml:101
 resources/views/Node.xml:279"
-"Process","Processus",,"resources/views/Instance.xml:67"
-"SMS","SMS",,"resources/views/Node.xml:31"
-"Sms event","Evènement sms",,"resources/views/Node.xml:262"
-"Sms events","Evènements sms",,"resources/views/Menu.xml:92
+"Process","Processus","","resources/views/Instance.xml:67"
+"SMS","SMS","","resources/views/Node.xml:31"
+"Sms event","Evènement sms","","resources/views/Node.xml:262"
+"Sms events","Evènements sms","","resources/views/Menu.xml:92
 resources/views/Node.xml:254
 resources/views/Menu.xml:95"
-"Social network","Réseaux sociaux",,"resources/views/Node.xml:33"
-"Social networks","Réseaux sociaux",,"resources/views/Menu.xml:118"
-"Start event","Evènement de départ",,"resources/views/Node.xml:88
+"Social network","Réseaux sociaux","","resources/views/Node.xml:33"
+"Social networks","Réseaux sociaux","","resources/views/Menu.xml:118"
+"Start event","Evènement de départ","","resources/views/Node.xml:88
 resources/views/Node.xml:9"
-"Start events","Evènements de départ",,"resources/views/Node.xml:84
+"Start events","Evènements de départ","","resources/views/Node.xml:84
 resources/views/Menu.xml:45
 resources/views/Menu.xml:48"
-"Stop filter","Fin filtre",,"resources/views/Node.xml:431"
+"Stop filter","Fin filtre","","resources/views/Node.xml:431"
 "Stop filter event","","","resources/views/Node.xml:16"
-"Stop filters","Fin filtres",,"resources/views/Menu.xml:159
+"Stop filters","Fin filtres","","resources/views/Menu.xml:159
 resources/views/Node.xml:427
 resources/views/Menu.xml:162"
-"Timer","Minuteur",,"resources/views/Node.xml:14"
-"Timer event","Evènement minuteur",,"resources/views/Node.xml:189"
-"Timer events","Evènements minuteur",,"resources/views/Menu.xml:54
+"Timer","Minuteur","","resources/views/Node.xml:14"
+"Timer event","Evènement minuteur","","resources/views/Node.xml:189"
+"Timer events","Evènements minuteur","","resources/views/Menu.xml:54
 resources/views/Menu.xml:57
 resources/views/Node.xml:182"
-"Transition","Transition",,"resources/views/Workflow.xml:96
+"Transition","Transition","","resources/views/Workflow.xml:96
 resources/views/Workflow.xml:55
 resources/views/Workflow.xml:76"
-"Transitions","Transitions",,"resources/views/Workflow.xml:87
+"Transitions","Transitions","","resources/views/Workflow.xml:87
 resources/views/Workflow.xml:45
 resources/views/Menu.xml:35
 resources/views/Menu.xml:32
 resources/views/Workflow.xml:67"
-"Twitter","Twitter",,"resources/views/Node.xml:40"
-"Twitter event","Evènement Twitter",,"resources/views/Node.xml:392"
-"Twitter events","Evènements Twitter",,"resources/views/Node.xml:383"
-"Wkf Management","Gestion des processus",,"resources/views/Menu.xml:7"
-"Workflow","Processus",,"resources/views/Workflow.xml:17"
-"Workflows","Les Processus",,"resources/views/Menu.xml:10
+"Twitter","Twitter","","resources/views/Node.xml:40"
+"Twitter event","Evènement Twitter","","resources/views/Node.xml:392"
+"Twitter events","Evènements Twitter","","resources/views/Node.xml:383"
+"Wkf Management","Gestion des processus","","resources/views/Menu.xml:7"
+"Workflow","Processus","","resources/views/Workflow.xml:17"
+"Workflows","Les Processus","","resources/views/Menu.xml:10
 resources/views/Workflow.xml:9"
-"Worklows","Processus",,"resources/views/Menu.xml:13"
-"XML","XML",,"resources/views/Workflow.xml:38"
-"XOR","XOR",,"resources/views/Node.xml:23"
-"You have no sufficient rights.","Vous n'avez pas les droits suffisants.",,"java/com/axelor/wkf/db/Transition.java:321"
-"twitter events","twitter",,"resources/views/Menu.xml:142
+"Worklows","Processus","","resources/views/Menu.xml:13"
+"XML","XML","","resources/views/Workflow.xml:38"
+"XOR","XOR","","resources/views/Node.xml:23"
+"You have no sufficient rights.","Vous n'avez pas les droits suffisants.","","java/com/axelor/wkf/db/Transition.java:321"
+"twitter events","twitter","","resources/views/Menu.xml:142
 resources/views/Menu.xml:139"
