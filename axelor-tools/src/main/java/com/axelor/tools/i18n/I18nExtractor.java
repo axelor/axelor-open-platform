@@ -136,7 +136,7 @@ public class I18nExtractor {
 					String title = attributes.getValue("title");
 					String help = attributes.getValue("help");
 					String message = attributes.getValue("message");
-					String error = attributes.getValue("message");
+					String error = attributes.getValue("error");
 					
 					if ("entity".equals(qName)) {
 						entityName = name;
