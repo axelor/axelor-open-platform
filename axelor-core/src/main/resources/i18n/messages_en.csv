@@ -44,6 +44,8 @@ resources/views/Meta.xml:58"
 "Change password?","","","resources/views/User.xml:24"
 "Chart","","","resources/views/Meta.xml:10"
 "Code","","","resources/domains/Group.xml:13"
+"Code length should be greater than 2.","","","resources/views/Group.xml:55
+resources/views/User.xml:55"
 "Collapse","","","resources/views/Group.xml:9"
 "Comma separated list of params for the condition.","","","resources/domains/Permission.xml:21"
 "Condition","","","resources/domains/Permission.xml:20
@@ -161,6 +163,8 @@ resources/domains/Meta.xml:146
 resources/domains/Permission.xml:13
 resources/domains/Group.xml:14
 resources/domains/Meta.xml:92"
+"Name length should be greater than 2.","","","resources/views/Group.xml:51
+resources/views/User.xml:59"
 "Navigation","","","resources/domains/Group.xml:15"
 "Next","","","resources/domains/MetaSequence.xml:18"
 "Not implemented yet!","","","resources/views/Meta.xml:205"
