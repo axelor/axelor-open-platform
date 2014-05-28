@@ -1,151 +1,151 @@
 "key","message","comment","context"
-"Action","Action",,"resources/domains/Meta.xml:64
+"Action","Action","","resources/domains/Meta.xml:64
 resources/views/User.xml:40
 resources/views/User.xml:51
 resources/views/Meta.xml:99
 resources/domains/Meta.xml:82"
-"Action Menu","Action de menu",,"resources/views/Meta.xml:151"
-"Action Menus","Les Action Menus",,"resources/views/Menu.xml:105
+"Action Menu","Action de menu","","resources/views/Meta.xml:151"
+"Action Menus","Les Action Menus","","resources/views/Menu.xml:105
 resources/views/Meta.xml:142
 resources/views/Menu.xml:103"
 "Action name can't be changed.","","","java/com/axelor/meta/web/MetaController.java:95"
-"Actions","Les Actions",,"resources/views/Menu.xml:88
+"Actions","Les Actions","","resources/views/Menu.xml:88
 resources/views/Schedules.xml:21"
-"Activate on","Autoriser à partir de",,"resources/domains/User.xml:22"
-"Activate the user from the specified date.","Active l'utilisateur à partir de la date spécifiée.",,"resources/domains/User.xml:22"
-"Active","Actif",,"resources/domains/MetaSchedule.xml:19"
-"Administration","Administration",,"resources/views/Menu.xml:6"
-"All Actions","Les Actions",,"resources/views/Meta.xml:91
+"Activate on","Autoriser à partir de","","resources/domains/User.xml:22"
+"Activate the user from the specified date.","Active l'utilisateur à partir de la date spécifiée.","","resources/domains/User.xml:22"
+"Active","Actif","","resources/domains/MetaSchedule.xml:19"
+"Administration","Administration","","resources/views/Menu.xml:6"
+"All Actions","Les Actions","","resources/views/Meta.xml:91
 resources/views/Menu.xml:86"
-"All Charts","Les Graphiques",,"resources/views/Menu.xml:121
+"All Charts","Les Graphiques","","resources/views/Menu.xml:121
 resources/views/Menu.xml:123
 resources/views/Meta.xml:70"
-"All Menus","Les Menus",,"resources/views/Menu.xml:77"
-"All Models","Les Modèles",,"resources/views/Menu.xml:59"
-"All Modules","Les Modules",,"resources/views/Meta.xml:31
+"All Menus","Les Menus","","resources/views/Menu.xml:77"
+"All Models","Les Modèles","","resources/views/Menu.xml:59"
+"All Modules","Les Modules","","resources/views/Meta.xml:31
 resources/views/Menu.xml:50"
-"All Schedules","Les Planificateurs",,"resources/views/Menu.xml:133
+"All Schedules","Les Planificateurs","","resources/views/Menu.xml:133
 resources/views/Menu.xml:131"
-"All Selects","Les Sélections",,"resources/views/Meta.xml:160
+"All Selects","Les Sélections","","resources/views/Meta.xml:160
 resources/views/Menu.xml:94"
-"All Translations","Les Traductions",,"resources/views/Meta.xml:252
+"All Translations","Les Traductions","","resources/views/Meta.xml:252
 resources/views/Menu.xml:114
 resources/views/Menu.xml:112"
-"All Views","Les Vues",,"resources/views/Menu.xml:68
+"All Views","Les Vues","","resources/views/Menu.xml:68
 resources/views/Meta.xml:58"
-"All the customizations will be lost. Are you sure ?","Tous les changements seront perdus. Voulez-vous continuer ?",,"resources/views/Meta.xml:60"
-"Allow","Autorisations",,"resources/views/Permission.xml:22"
-"An unique permission name.","Nom unique de la permission",,"resources/domains/Permission.xml:13"
-"Authorization","Autorisation",,"resources/views/User.xml:30"
-"Blocked","Bloquer utilisateur ?",,"resources/domains/User.xml:21"
-"Calendar","Calendrier",,"resources/views/Meta.xml:13"
-"Category","Catégorie",,"resources/domains/Meta.xml:79"
-"Category name to group action menus.","Nom de la catégorie pour grouper les actions menus",,"resources/domains/Meta.xml:79"
-"Change password?","Changer mot de passe ?",,"resources/views/User.xml:24"
-"Chart","Graphique",,"resources/views/Meta.xml:10"
-"Code","Code",,"resources/domains/Group.xml:13"
-"Collapse","Regrouper",,"resources/views/Group.xml:9"
-"Comma separated list of params for the condition.","Liste de paramètres séparée par des virgules",,"resources/domains/Permission.xml:21"
-"Condition","Conditon",,"resources/domains/Permission.xml:20
+"All the customizations will be lost. Are you sure ?","Tous les changements seront perdus. Voulez-vous continuer ?","","resources/views/Meta.xml:60"
+"Allow","Autorisations","","resources/views/Permission.xml:22"
+"An unique permission name.","Nom unique de la permission","","resources/domains/Permission.xml:13"
+"Authorization","Autorisation","","resources/views/User.xml:30"
+"Blocked","Bloquer utilisateur ?","","resources/domains/User.xml:21"
+"Calendar","Calendrier","","resources/views/Meta.xml:13"
+"Category","Catégorie","","resources/domains/Meta.xml:79"
+"Category name to group action menus.","Nom de la catégorie pour grouper les actions menus","","resources/domains/Meta.xml:79"
+"Change password?","Changer mot de passe ?","","resources/views/User.xml:24"
+"Chart","Graphique","","resources/views/Meta.xml:10"
+"Code","Code","","resources/domains/Group.xml:13"
+"Collapse","Regrouper","","resources/views/Group.xml:9"
+"Comma separated list of params for the condition.","Liste de paramètres séparée par des virgules","","resources/domains/Permission.xml:21"
+"Condition","Conditon","","resources/domains/Permission.xml:20
 resources/views/Permission.xml:30
 resources/views/Permission.xml:29"
-"Condition params","Paramètres",,"resources/domains/Permission.xml:21"
-"Create","Création",,"resources/domains/Permission.xml:17"
-"Cron","Cron",,"resources/domains/MetaSchedule.xml:23"
-"Data","Données",,"resources/domains/Meta.xml:123"
-"Depends","Dépend de",,"resources/domains/Meta.xml:16"
-"Description","Description",,"resources/domains/MetaSchedule.xml:21
+"Condition params","Paramètres","","resources/domains/Permission.xml:21"
+"Create","Création","","resources/domains/Permission.xml:17"
+"Cron","Cron","","resources/domains/MetaSchedule.xml:23"
+"Data","Données","","resources/domains/Meta.xml:123"
+"Depends","Dépend de","","resources/domains/Meta.xml:16"
+"Description","Description","","resources/domains/MetaSchedule.xml:21
 resources/domains/Meta.xml:15
 resources/views/Meta.xml:244
 resources/domains/Meta.xml:171
 resources/domains/Meta.xml:152
 resources/domains/Role.xml:14"
-"Details","Détails",,"resources/views/Meta.xml:54"
-"Disable the user from the specified date.","Bloque l'utilisateur à partir de la date spécifiée.",,"resources/domains/User.xml:23"
-"Domain filter as condition.","Condition d'application des accès",,"resources/domains/Permission.xml:20"
-"Email","Email",,"resources/domains/User.xml:17"
-"English","Anglais",,"resources/views/User.xml:6"
-"Expires on","Autoriser jusqu'au",,"resources/domains/User.xml:23"
-"Export","Export",,"resources/domains/Permission.xml:19
+"Details","Détails","","resources/views/Meta.xml:54"
+"Disable the user from the specified date.","Bloque l'utilisateur à partir de la date spécifiée.","","resources/domains/User.xml:23"
+"Domain filter as condition.","Condition d'application des accès","","resources/domains/Permission.xml:20"
+"Email","Email","","resources/domains/User.xml:17"
+"English","Anglais","","resources/views/User.xml:6"
+"Expires on","Autoriser jusqu'au","","resources/domains/User.xml:23"
+"Export","Export","","resources/domains/Permission.xml:19
 resources/views/Meta.xml:254"
 "Export complete.","","","java/com/axelor/meta/schema/actions/ActionExport.java:146
 java/com/axelor/meta/web/MetaController.java:217
 java/com/axelor/meta/schema/actions/ActionExport.java:148"
-"Field","Champ",,"resources/views/Meta.xml:236"
-"Field is required.","Champ requis.",,"java/com/axelor/meta/schema/actions/ActionCondition.java:114"
-"Fields","Champs",,"resources/domains/Meta.xml:136
+"Field","Champ","","resources/views/Meta.xml:236"
+"Field is required.","Champ requis.","","java/com/axelor/meta/schema/actions/ActionCondition.java:114"
+"Fields","Champs","","resources/domains/Meta.xml:136
 resources/views/Meta.xml:228"
-"File","Fichier",,"resources/domains/Meta.xml:188"
-"File name","Nom du fichier",,"resources/domains/Meta.xml:167"
-"File path","Chemin du fichier",,"resources/domains/Meta.xml:168"
-"File type","Type",,"resources/domains/Meta.xml:170"
-"Files","Fichiers",,"resources/views/Meta.xml:275
+"File","Fichier","","resources/domains/Meta.xml:188"
+"File name","Nom du fichier","","resources/domains/Meta.xml:167"
+"File path","Chemin du fichier","","resources/domains/Meta.xml:168"
+"File type","Type","","resources/domains/Meta.xml:170"
+"Files","Fichiers","","resources/views/Meta.xml:275
 resources/views/Meta.xml:267"
-"Filter custom","Filtre personnalisé",,"resources/domains/MetaFilter.xml:17"
-"Filter view","Filtre de vue",,"resources/domains/MetaFilter.xml:18"
-"Filters","Filtres",,"resources/domains/MetaFilter.xml:16
+"Filter custom","Filtre personnalisé","","resources/domains/MetaFilter.xml:17"
+"Filter view","Filtre de vue","","resources/domains/MetaFilter.xml:18"
+"Filters","Filtres","","resources/domains/MetaFilter.xml:16
 resources/views/Meta.xml:14"
-"Form","Formulaire",,"resources/views/Meta.xml:8"
-"French","Français",,"resources/views/User.xml:7"
-"Fullname","Nom complet",,"resources/domains/Meta.xml:137"
-"Fully qualified object name or wild card package name.","Nom de l'objet",,"resources/domains/Permission.xml:14"
-"General","Général",,"resources/views/Permission.xml:18"
-"General Info","Informations général",,"resources/views/User.xml:20"
-"Grid","Liste",,"resources/views/Meta.xml:7"
-"Group","Groupe",,"resources/views/Group.xml:18
+"Form","Formulaire","","resources/views/Meta.xml:8"
+"French","Français","","resources/views/User.xml:7"
+"Fullname","Nom complet","","resources/domains/Meta.xml:137"
+"Fully qualified object name or wild card package name.","Nom de l'objet","","resources/domains/Permission.xml:14"
+"General","Général","","resources/views/Permission.xml:18"
+"General Info","Informations général","","resources/views/User.xml:20"
+"Grid","Liste","","resources/views/Meta.xml:7"
+"Group","Groupe","","resources/views/Group.xml:18
 resources/domains/User.xml:25"
-"Groups","Les Groupes",,"resources/views/Meta.xml:136
+"Groups","Les Groupes","","resources/views/Meta.xml:136
 resources/domains/Meta.xml:65
 resources/views/Group.xml:12
 resources/views/Menu.xml:25
 resources/domains/Meta.xml:35
 resources/views/Menu.xml:22"
-"Hidden","Caché",,"resources/views/Group.xml:8"
+"Hidden","Caché","","resources/views/Group.xml:8"
 "Home action","","","resources/domains/User.xml:19"
-"Icon","Icone",,"resources/domains/Meta.xml:58"
-"Increment","Increment",,"resources/domains/MetaSequence.xml:16"
-"Initial","Valeur origine",,"resources/domains/MetaSequence.xml:17"
-"Install","Installer",,"resources/views/Meta.xml:49"
-"Installed","Installé ?",,"resources/domains/Meta.xml:19"
+"Icon","Icone","","resources/domains/Meta.xml:58"
+"Increment","Increment","","resources/domains/MetaSequence.xml:16"
+"Initial","Valeur origine","","resources/domains/MetaSequence.xml:17"
+"Install","Installer","","resources/views/Meta.xml:49"
+"Installed","Installé ?","","resources/domains/Meta.xml:19"
 "Invalid XML.","","","java/com/axelor/meta/web/MetaController.java:67"
-"Invalid field value.","Valeur non valide.",,"java/com/axelor/meta/schema/actions/ActionCondition.java:116"
-"Items","Elément",,"resources/domains/Meta.xml:109"
-"Job","Job",,"resources/domains/MetaSchedule.xml:22"
-"Job Details","Détails tâche",,"resources/views/Schedules.xml:14"
-"Job Management","Gestion des planificateurs",,"resources/views/Menu.xml:11"
-"Key","Clé",,"resources/domains/Meta.xml:156"
-"Label","Label",,"resources/domains/Meta.xml:149"
-"Language","Langue",,"resources/domains/Meta.xml:158
+"Invalid field value.","Valeur non valide.","","java/com/axelor/meta/schema/actions/ActionCondition.java:116"
+"Items","Elément","","resources/domains/Meta.xml:109"
+"Job","Job","","resources/domains/MetaSchedule.xml:22"
+"Job Details","Détails tâche","","resources/views/Schedules.xml:14"
+"Job Management","Gestion des planificateurs","","resources/views/Menu.xml:11"
+"Key","Clé","","resources/domains/Meta.xml:156"
+"Label","Label","","resources/domains/Meta.xml:149"
+"Language","Langue","","resources/domains/Meta.xml:158
 resources/domains/User.xml:18"
-"Left","Menu à gauche ?",,"resources/domains/Meta.xml:61"
-"Login","Identifiant",,"resources/domains/User.xml:13"
-"ManyToMany","ManyToMany",,"resources/views/Meta.xml:225"
-"ManyToOne","ManyToOne",,"resources/views/Meta.xml:223"
-"Mapped by","Mappé avec",,"resources/domains/Meta.xml:151"
-"Menu Item","Menu Item",,"resources/views/Meta.xml:123"
-"Menu Items","Menu Items",,"resources/views/Meta.xml:111"
-"Menus","Les Menus",,"resources/domains/Group.xml:22
+"Left","Menu à gauche ?","","resources/domains/Meta.xml:61"
+"Login","Identifiant","","resources/domains/User.xml:13"
+"ManyToMany","ManyToMany","","resources/views/Meta.xml:225"
+"ManyToOne","ManyToOne","","resources/views/Meta.xml:223"
+"Mapped by","Mappé avec","","resources/domains/Meta.xml:151"
+"Menu Item","Menu Item","","resources/views/Meta.xml:123"
+"Menu Items","Menu Items","","resources/views/Meta.xml:111"
+"Menus","Les Menus","","resources/domains/Group.xml:22
 resources/views/Group.xml:35
 resources/views/Menu.xml:79"
 "Message","","","resources/domains/Meta.xml:157"
-"Meta model","Modèle",,"resources/domains/Meta.xml:145"
-"Mobile","Menu mobile ?",,"resources/domains/Meta.xml:62"
-"Model","Objet",,"resources/domains/Meta.xml:94
+"Meta model","Modèle","","resources/domains/Meta.xml:145"
+"Mobile","Menu mobile ?","","resources/domains/Meta.xml:62"
+"Model","Objet","","resources/domains/Meta.xml:94
 resources/domains/Meta.xml:31
 resources/views/Meta.xml:214"
-"Model Management","Gestion des modèles",,"resources/views/Menu.xml:8"
-"Models","Les Modèles",,"resources/views/Meta.xml:208
+"Model Management","Gestion des modèles","","resources/views/Menu.xml:8"
+"Models","Les Modèles","","resources/views/Meta.xml:208
 resources/views/Menu.xml:61"
-"Module","Module",,"resources/domains/Meta.xml:32
+"Module","Module","","resources/domains/Meta.xml:32
 resources/views/Meta.xml:41
 resources/views/Meta.xml:40
 resources/domains/Meta.xml:95
 resources/domains/Meta.xml:59
 resources/domains/Meta.xml:80
 resources/domains/Meta.xml:108"
-"Module Management","Gestion des modules",,"resources/views/Menu.xml:10"
-"Modules","Les Modules",,"resources/views/Menu.xml:52"
-"Name","Nom",,"resources/domains/MetaSchedule.xml:10
+"Module Management","Gestion des modules","","resources/views/Menu.xml:10"
+"Modules","Les Modules","","resources/views/Menu.xml:52"
+"Name","Nom","","resources/domains/MetaSchedule.xml:10
 resources/domains/MetaSchedule.xml:20
 resources/domains/Meta.xml:56
 resources/domains/Meta.xml:133
@@ -161,28 +161,29 @@ resources/domains/Meta.xml:146
 resources/domains/Permission.xml:13
 resources/domains/Group.xml:14
 resources/domains/Meta.xml:92"
-"Navigation","Navigation",,"resources/domains/Group.xml:15"
-"Next","Valeur suivante",,"resources/domains/MetaSequence.xml:18"
-"Object","Objet",,"resources/domains/Meta.xml:187
+"Navigation","Navigation","","resources/domains/Group.xml:15"
+"Next","Valeur suivante","","resources/domains/MetaSequence.xml:18"
+"Not implemented yet!","","","resources/views/Meta.xml:205"
+"Object","Objet","","resources/domains/Meta.xml:187
 resources/domains/Permission.xml:14"
-"Object name","Nom de l'objet",,"resources/domains/Meta.xml:186"
-"OneToMany","OneToMany",,"resources/views/Meta.xml:224"
-"OneToOne","OneToOne",,"resources/views/Meta.xml:222"
-"Order","Ordre",,"resources/domains/Meta.xml:124"
-"Package","Nom du package",,"resources/domains/Meta.xml:147
+"Object name","Nom de l'objet","","resources/domains/Meta.xml:186"
+"OneToMany","OneToMany","","resources/views/Meta.xml:224"
+"OneToOne","OneToOne","","resources/views/Meta.xml:222"
+"Order","Ordre","","resources/domains/Meta.xml:124"
+"Package","Nom du package","","resources/domains/Meta.xml:147
 resources/domains/Meta.xml:134"
-"Padding","Remplissage",,"resources/domains/MetaSequence.xml:15"
-"Param","Paramètre",,"resources/views/Schedules.xml:30"
-"Params","Parametres",,"resources/domains/MetaSchedule.xml:24
+"Padding","Remplissage","","resources/domains/MetaSequence.xml:15"
+"Param","Paramètre","","resources/views/Schedules.xml:30"
+"Params","Parametres","","resources/domains/MetaSchedule.xml:24
 resources/views/Schedules.xml:26
 resources/views/Permission.xml:31"
-"Parent","Parent",,"resources/domains/Meta.xml:81
+"Parent","Parent","","resources/domains/Meta.xml:81
 resources/domains/Meta.xml:63"
-"Password","Mot de passe",,"resources/domains/User.xml:15
+"Password","Mot de passe","","resources/domains/User.xml:15
 resources/views/User.xml:27"
-"Password doesn't match","Le mot de passe ne correspond pas",,"java/com/axelor/auth/AuthService.java:223"
-"Permission","Permission",,"resources/views/Permission.xml:17"
-"Permissions","Les Permissions",,"resources/views/Group.xml:58
+"Password doesn't match","Le mot de passe ne correspond pas","","java/com/axelor/auth/AuthService.java:223"
+"Permission","Permission","","resources/views/Permission.xml:17"
+"Permissions","Les Permissions","","resources/views/Group.xml:58
 resources/domains/Group.xml:20
 resources/views/Menu.xml:43
 resources/domains/Role.xml:15
@@ -190,103 +191,103 @@ resources/views/Menu.xml:40
 resources/views/Group.xml:29
 resources/domains/User.xml:27
 resources/views/Permission.xml:7"
-"Portal","Portail",,"resources/views/Meta.xml:12"
-"Preferences","Préférences",,"resources/views/User.xml:47
+"Portal","Portail","","resources/views/Meta.xml:12"
+"Preferences","Préférences","","resources/views/User.xml:47
 resources/views/User.xml:36"
-"Prefix","Prefix",,"resources/domains/MetaSequence.xml:13"
-"Priority","Priorité",,"resources/domains/Meta.xml:55
+"Prefix","Prefix","","resources/domains/MetaSequence.xml:13"
+"Priority","Priorité","","resources/domains/Meta.xml:55
 resources/domains/Meta.xml:30
 resources/domains/Meta.xml:107"
-"Read","Lecture",,"resources/domains/Permission.xml:15"
-"Relationship","Relation",,"resources/domains/Meta.xml:150"
-"Removable","Supprimable ?",,"resources/domains/Meta.xml:18"
-"Remove","Suppression",,"resources/domains/Permission.xml:18"
-"Restart jobs...","Redémarrer",,"resources/views/Schedules.xml:23"
+"Read","Lecture","","resources/domains/Permission.xml:15"
+"Relationship","Relation","","resources/domains/Meta.xml:150"
+"Removable","Supprimable ?","","resources/domains/Meta.xml:18"
+"Remove","Suppression","","resources/domains/Permission.xml:18"
+"Restart jobs...","Redémarrer","","resources/views/Schedules.xml:23"
 "Restore all...","","","resources/views/Meta.xml:60"
-"Role","Role",,"resources/views/Role.xml:10"
-"Roles","Les Roles",,"resources/views/Menu.xml:34
+"Role","Role","","resources/views/Role.xml:10"
+"Roles","Les Roles","","resources/views/Menu.xml:34
 resources/views/Role.xml:6
 resources/domains/Group.xml:19
 resources/domains/User.xml:26
 resources/views/Menu.xml:31"
-"Schedule","Planificateur",,"resources/domains/MetaSchedule.xml:12
+"Schedule","Planificateur","","resources/domains/MetaSchedule.xml:12
 resources/views/Schedules.xml:13"
-"Schedules","Planificateurs",,"resources/views/Schedules.xml:6"
-"Search","Recherche",,"resources/views/Meta.xml:11"
-"Select","Sélection",,"resources/domains/Meta.xml:125
+"Schedules","Planificateurs","","resources/views/Schedules.xml:6"
+"Search","Recherche","","resources/views/Meta.xml:11"
+"Select","Sélection","","resources/domains/Meta.xml:125
 resources/views/Meta.xml:167"
-"Select Item","Elément de la selection",,"resources/views/Meta.xml:179"
-"Select Items","Eléments de la selection",,"resources/views/Meta.xml:173"
-"Selects","Les Selections",,"resources/views/Menu.xml:96"
-"Sequence order","Ordre d'affichage",,"resources/views/Meta.xml:183"
-"Shared","Partagé ?",,"resources/domains/MetaFilter.xml:20"
-"Show Model","Voir le modèle",,"resources/views/Meta.xml:243"
-"Show permissions","Voir les permissions",,"resources/views/Group.xml:20"
-"Size","Taille",,"resources/domains/Meta.xml:172"
-"Size in bytes","Taille en bytes",,"resources/domains/Meta.xml:169"
-"Specify whether the members of this group are technical staff.","Indiquez si les membres de ce groupe sont des utilisateurs technique.",,"resources/domains/Group.xml:17"
-"Specify whether to block the user for an indeterminate times.","Bloque l'utilisateur pour une période indéterminée.",,"resources/domains/User.xml:21"
-"Suffix","Suffix",,"resources/domains/MetaSequence.xml:14"
-"Table","Table",,"resources/domains/Meta.xml:135"
-"Technical staff","Données techniques",,"resources/domains/Group.xml:17"
-"The addition data for UI widgets.","Données additionnelles utilisés par l'interface",,"resources/domains/Meta.xml:123"
-"The select item title.","Label de la selection",,"resources/domains/Meta.xml:121"
-"The select item value.","Valeur de la selection",,"resources/domains/Meta.xml:122"
-"This may terminate any running jobs. Are sure to continue?","Cela va arrêter les instances en cours. Voulez-vous continuer ?",,"resources/views/Schedules.xml:23"
-"Title","Titre",,"resources/domains/Meta.xml:14
+"Select Item","Elément de la selection","","resources/views/Meta.xml:179"
+"Select Items","Eléments de la selection","","resources/views/Meta.xml:173"
+"Selects","Les Selections","","resources/views/Menu.xml:96"
+"Sequence order","Ordre d'affichage","","resources/views/Meta.xml:183"
+"Shared","Partagé ?","","resources/domains/MetaFilter.xml:20"
+"Show Model","Voir le modèle","","resources/views/Meta.xml:243"
+"Show permissions","Voir les permissions","","resources/views/Group.xml:20"
+"Size","Taille","","resources/domains/Meta.xml:172"
+"Size in bytes","Taille en bytes","","resources/domains/Meta.xml:169"
+"Specify whether the members of this group are technical staff.","Indiquez si les membres de ce groupe sont des utilisateurs technique.","","resources/domains/Group.xml:17"
+"Specify whether to block the user for an indeterminate times.","Bloque l'utilisateur pour une période indéterminée.","","resources/domains/User.xml:21"
+"Suffix","Suffix","","resources/domains/MetaSequence.xml:14"
+"Table","Table","","resources/domains/Meta.xml:135"
+"Technical staff","Données techniques","","resources/domains/Group.xml:17"
+"The addition data for UI widgets.","Données additionnelles utilisés par l'interface","","resources/domains/Meta.xml:123"
+"The select item title.","Label de la selection","","resources/domains/Meta.xml:121"
+"The select item value.","Valeur de la selection","","resources/domains/Meta.xml:122"
+"This may terminate any running jobs. Are sure to continue?","Cela va arrêter les instances en cours. Voulez-vous continuer ?","","resources/views/Schedules.xml:23"
+"Title","Titre","","resources/domains/Meta.xml:14
 resources/domains/Meta.xml:121
 resources/domains/MetaFilter.xml:15
 resources/domains/Meta.xml:78
 resources/domains/Meta.xml:57
 resources/domains/Meta.xml:28"
-"Top","Menu du haut ?",,"resources/domains/Meta.xml:60"
-"Translation","Traduction",,"resources/views/Meta.xml:261"
-"Tree","Arbre",,"resources/views/Meta.xml:9"
-"Type","Type",,"resources/domains/Meta.xml:148
+"Top","Menu du haut ?","","resources/domains/Meta.xml:60"
+"Translation","Traduction","","resources/views/Meta.xml:261"
+"Tree","Arbre","","resources/views/Meta.xml:9"
+"Type","Type","","resources/domains/Meta.xml:148
 resources/domains/Meta.xml:93
 resources/domains/Meta.xml:29"
-"Uninstall","Désinstaller",,"resources/views/Meta.xml:51"
-"User","Utilisateurs",,"resources/domains/MetaFilter.xml:21
+"Uninstall","Désinstaller","","resources/views/Meta.xml:51"
+"User","Utilisateurs","","resources/domains/MetaFilter.xml:21
 resources/views/User.xml:19"
-"User Management","Gestion des utilisateurs",,"resources/views/Menu.xml:7"
-"Users","Les Utilisateurs",,"resources/views/Menu.xml:14
+"User Management","Gestion des utilisateurs","","resources/views/Menu.xml:7"
+"Users","Les Utilisateurs","","resources/views/Menu.xml:14
 resources/views/Menu.xml:16
 resources/views/User.xml:10"
-"Validate","Valider",,"resources/views/Schedules.xml:22"
-"Value","Valeur",,"resources/domains/Meta.xml:122
+"Validate","Valider","","resources/views/Schedules.xml:22"
+"Value","Valeur","","resources/domains/Meta.xml:122
 resources/domains/MetaSchedule.xml:11"
-"Version","Version",,"resources/domains/Meta.xml:17"
-"View","Vue",,"resources/views/Meta.xml:78
+"Version","Version","","resources/domains/Meta.xml:17"
+"View","Vue","","resources/views/Meta.xml:78
 resources/views/Group.xml:41"
-"View Details","Détails de la vue",,"resources/views/Meta.xml:79"
-"View Management","Gestion des vues",,"resources/views/Menu.xml:9"
-"Views","Les Vues",,"resources/domains/Group.xml:23
+"View Details","Détails de la vue","","resources/views/Meta.xml:79"
+"View Management","Gestion des vues","","resources/views/Menu.xml:9"
+"Views","Les Vues","","resources/domains/Group.xml:23
 resources/views/Menu.xml:70"
-"Visible","Visible",,"resources/views/Group.xml:7"
-"Whether to grant create access.","Autorise un accès en creation",,"resources/domains/Permission.xml:17"
-"Whether to grant export access.","Autorise l'export",,"resources/domains/Permission.xml:19"
-"Whether to grant read access.","Autorise un accès en lecture",,"resources/domains/Permission.xml:15"
-"Whether to grant remove access.","Autorise un accès en suppression",,"resources/domains/Permission.xml:18"
-"Whether to grant write access.","Autorise un accès en modification",,"resources/domains/Permission.xml:16"
-"Write","Modification",,"resources/domains/Permission.xml:16"
-"XML","XML",,"resources/views/Meta.xml:105"
-"Xml","ID XML",,"resources/domains/Meta.xml:105
+"Visible","Visible","","resources/views/Group.xml:7"
+"Whether to grant create access.","Autorise un accès en creation","","resources/domains/Permission.xml:17"
+"Whether to grant export access.","Autorise l'export","","resources/domains/Permission.xml:19"
+"Whether to grant read access.","Autorise un accès en lecture","","resources/domains/Permission.xml:15"
+"Whether to grant remove access.","Autorise un accès en suppression","","resources/domains/Permission.xml:18"
+"Whether to grant write access.","Autorise un accès en modification","","resources/domains/Permission.xml:16"
+"Write","Modification","","resources/domains/Permission.xml:16"
+"XML","XML","","resources/views/Meta.xml:105"
+"Xml","ID XML","","resources/domains/Meta.xml:105
 resources/domains/Meta.xml:96
 resources/domains/Meta.xml:34
 resources/domains/Meta.xml:33"
-"action-attrs","action-attrs",,"resources/views/Meta.xml:18"
-"action-condition","action-condition",,"resources/views/Meta.xml:22"
-"action-export","action-export",,"resources/views/Meta.xml:26"
-"action-group","action-group",,"resources/views/Meta.xml:20"
-"action-import","action-import",,"resources/views/Meta.xml:25"
-"action-method","action-method",,"resources/views/Meta.xml:24"
-"action-record","action-record",,"resources/views/Meta.xml:23"
-"action-validate","action-validate",,"resources/views/Meta.xml:21"
-"action-view","action-view",,"resources/views/Meta.xml:19"
-"action-workflow","action-workflow",,"resources/views/Meta.xml:28"
-"action-ws","action-ws",,"resources/views/Meta.xml:27"
-"confirm password","confirmation",,"resources/views/User.xml:28"
-"login name","login",,"resources/views/User.xml:23"
-"new password","nouveau",,"resources/views/User.xml:27"
-"user group","groupe",,"resources/views/User.xml:22"
-"user name","nom",,"resources/views/User.xml:21"
+"action-attrs","action-attrs","","resources/views/Meta.xml:18"
+"action-condition","action-condition","","resources/views/Meta.xml:22"
+"action-export","action-export","","resources/views/Meta.xml:26"
+"action-group","action-group","","resources/views/Meta.xml:20"
+"action-import","action-import","","resources/views/Meta.xml:25"
+"action-method","action-method","","resources/views/Meta.xml:24"
+"action-record","action-record","","resources/views/Meta.xml:23"
+"action-validate","action-validate","","resources/views/Meta.xml:21"
+"action-view","action-view","","resources/views/Meta.xml:19"
+"action-workflow","action-workflow","","resources/views/Meta.xml:28"
+"action-ws","action-ws","","resources/views/Meta.xml:27"
+"confirm password","confirmation","","resources/views/User.xml:28"
+"login name","login","","resources/views/User.xml:23"
+"new password","nouveau","","resources/views/User.xml:27"
+"user group","groupe","","resources/views/User.xml:22"
+"user name","nom","","resources/views/User.xml:21"
