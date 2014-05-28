@@ -401,6 +401,19 @@ ActionHandler.prototype = {
 			scope = this.scope,
 			formElement = this._getFormElement(),
 			formScope = formElement.data('$scope') || scope;
+		
+		if (data.signal === 'refresh-app') {
+			if(data.flash || data.info) {
+				axelor.dialogs.box(data.flash || data.info, {
+					onClose: function () {
+						window.location.reload();
+					}
+				});
+			} else {
+				window.location.reload();
+			}
+			return deferred.promise;
+		}
 
 		if(data.flash || data.info) {
 			axelor.dialogs.say(data.flash || data.info);
@@ -448,10 +461,6 @@ ActionHandler.prototype = {
 			});
 			deferred.reject();
 			return deferred.promise;
-		}
-		
-		if (data.signal === 'refresh-app') {
-			window.location.reload();
 		}
 		
 		if (data.values) {

@@ -88,6 +88,8 @@ resources/views/Meta.xml:267"
 "Filter view","","","resources/domains/MetaFilter.xml:18"
 "Filters","","","resources/domains/MetaFilter.xml:16
 resources/views/Meta.xml:14"
+"Following modules have been installed:","","","java/com/axelor/meta/web/ModuleController.java:51"
+"Following modules have been uninstalled:","","","java/com/axelor/meta/web/ModuleController.java:48"
 "Form","","","resources/views/Meta.xml:8"
 "French","","","resources/views/User.xml:7"
 "Fullname","","","resources/domains/Meta.xml:137"
