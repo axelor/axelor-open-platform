@@ -100,12 +100,12 @@ public abstract class SimpleWidget extends AbstractWidget {
 
 	@JsonGetter("help")
 	public String getLocalizedHelp(){
-		return help;
+		return I18n.get(help);
 	}
 
 	@JsonIgnore
 	public String getHelp() {
-		return I18n.get(help);
+		return help;
 	}
 
 	public void setHelp(String help) {
