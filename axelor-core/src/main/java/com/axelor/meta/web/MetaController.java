@@ -133,16 +133,13 @@ public class MetaController {
 	}
 
 	public void restoreAll(ActionRequest request, ActionResponse response) {
-		Map<String, String> data = Maps.newHashMap();
-
 		try {
 			MetaStore.clear();
-			moduleManager.update(false);
+			moduleManager.restoreMeta();
+			response.setNotify(I18n.get("All views have been restored."));
 		} catch (Exception e){
-			data.put("error", e.getMessage());
+			response.setException(e);
 		}
-
-		response.setData(ImmutableList.of(data));
 	}
 	
 	private static final String EXPORT_DIR = AppSettings.get().getPath("data.export.dir", "{java.io.tmpdir}");

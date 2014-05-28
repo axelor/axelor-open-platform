@@ -24,7 +24,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,12 +43,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.persist.Transactional;
 
-@Singleton
 public class ModuleManager {
 
 	private static final Logger log = LoggerFactory.getLogger(ModuleManager.class);
 
 	private static final Resolver resolver = new Resolver();
+
+	private boolean loadData = true;
 
 	@Inject
 	private AuthService authService;
@@ -129,7 +129,16 @@ public class ModuleManager {
 			}
 		}
 	}
-
+	
+	public void restoreMeta() {
+		try {
+			loadData = false;
+			update(false);
+		} finally {
+			loadData = true;
+		}
+	}
+	
 	public static List<String> getResolution() {
 		return resolver.names();
 	}
@@ -210,9 +219,11 @@ public class ModuleManager {
 		installMeta(module, update);
 
 		// load data (runs in it's own transaction)
-		dataLoader.load(module, update);
-		if (withDemo) {
-			demoLoader.load(module, update);
+		if (loadData) {
+			dataLoader.load(module, update);
+			if (withDemo) {
+				demoLoader.load(module, update);
+			}
 		}
 
 		// finally update install state
