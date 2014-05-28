@@ -135,6 +135,7 @@ public class I18nExtractor {
 					String name = attributes.getValue("name");
 					String title = attributes.getValue("title");
 					String help = attributes.getValue("help");
+					String message = attributes.getValue("message");
 					
 					if ("entity".equals(qName)) {
 						entityName = name;
@@ -150,6 +151,7 @@ public class I18nExtractor {
 
 					accept(new I18nItem(title, file, locator.getLineNumber()));
 					accept(new I18nItem(help, file, locator.getLineNumber()));
+					accept(new I18nItem(message, file, locator.getLineNumber()));
 					accept(new I18nItem(attributes.getValue("prompt"), file, locator.getLineNumber()));
 					accept(new I18nItem(attributes.getValue("placeholder"), file, locator.getLineNumber()));
 					
