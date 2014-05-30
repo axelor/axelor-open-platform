@@ -383,6 +383,7 @@
 			upload: function(values, field, file) {
 				var that = this,
 					page = this._page,
+					record = null,
 					deferred = $q.defer(),
 					promise = deferred.promise;
 				
@@ -393,18 +394,17 @@
 				var data = new FormData();
 				var progress_cb = angular.noop;
 
+				promise.then(function(response) {
+					var res = response.data;
+					res.data = res.data[0];
+					record = that._accept(res);
+				});
 				promise.progress = function(fn) {
 					progress_cb = fn;
 					return promise;
 				};
 				promise.success = function(fn) {
 					promise.then(function(response) {
-						var res = response.data,
-							record;
-
-						res.data = res.data[0];
-						record = that._accept(res);
-
 						fn(record, page);
 					});
 					return promise;
