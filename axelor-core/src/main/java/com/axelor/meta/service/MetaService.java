@@ -435,12 +435,12 @@ public class MetaService {
 			return response;
 		}
 
-		data.put("title", chart.getTitle());
+		data.put("title", chart.getLocalizedTitle());
 		data.put("stacked", chart.getStacked());
 
 		data.put("xAxis", chart.getCategory().getKey());
 		data.put("xType", chart.getCategory().getType());
-		data.put("xTitle", chart.getCategory().getTitle());
+		data.put("xTitle", chart.getCategory().getLocalizedTitle());
 
 		List<Object> series = Lists.newArrayList();
 		Map<String, Object> config = Maps.newHashMap();
@@ -451,7 +451,7 @@ public class MetaService {
 			map.put("type", cs.getType());
 			map.put("groupBy", cs.getGroupBy());
 			map.put("aggregate", cs.getAggregate());
-			map.put("title", cs.getTitle());
+			map.put("title", cs.getLocalizedTitle());
 			series.add(map);
 		}
 
