@@ -29,6 +29,10 @@
   </selection>
 
   <grid title="All Modules" name="meta-module-grid" model="com.axelor.meta.db.MetaModule">
+    <toolbar>
+      <button name="btnInstall" icon="fa-download" help="Install selected modules" readonlyIf="!_ids || _ids.length == 0"
+        onClick="com.axelor.meta.web.ModuleController:install"/>
+    </toolbar>
     <field name="name"/>
     <field name="title"/>
     <field name="moduleVersion" width="200"/>
