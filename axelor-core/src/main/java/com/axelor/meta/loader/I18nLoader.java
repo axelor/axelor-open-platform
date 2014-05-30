@@ -38,6 +38,7 @@ import au.com.bytecode.opencsv.CSVReader;
 
 import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.db.JPA;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaTranslation;
 import com.google.common.base.Strings;
@@ -113,6 +114,8 @@ public class I18nLoader extends AbstractLoader {
 			String[] fields = csvReader.readNext();
 			String[] values = null;
 			
+			int counter = 0;
+			
 			while((values = csvReader.readNext()) != null) {
 				if (isEmpty(values)) {
 					continue;
@@ -135,6 +138,11 @@ public class I18nLoader extends AbstractLoader {
 				
 				entity.setMessage(message);
 				entity.save();
+				
+				if (counter++ % 20 == 0) {
+					JPA.em().flush();
+					JPA.em().clear();
+				}
 			}
 		} finally {
 			csvReader.close();
