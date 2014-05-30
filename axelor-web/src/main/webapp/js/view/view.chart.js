@@ -179,6 +179,15 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 			interval = setTimeout(reload, 500);
 		}
 
+		function onNewOrEdit() {
+			if ($scope.$events.onLoad) {
+				$scope.$events.onLoad().then(delayedReload);
+			}
+		}
+
+		$scope.$on('on:new', onNewOrEdit);
+		$scope.$on('on:edit', onNewOrEdit);
+
 		$scope.$watch('record', function (record) {
 			if (interval === undefined) {
 				return interval = null;
@@ -630,13 +639,16 @@ var directiveFn = function(){
 			element.on("adjustSize", function(e){
 				if (!initialized) scope.onRefresh();
 			});
+
+			function onNewOrEdit() {
+				if (scope.searchInit && scope.searchFields) {
+					return;
+				}
+				scope.onRefresh(true);
+			}
 			
-			scope.$on("on:new", function(e) {
-				scope.onRefresh(true);
-			});
-			scope.$on("on:edit", function(e) {
-				scope.onRefresh(true);
-			});
+			scope.$on('on:new', onNewOrEdit);
+			scope.$on('on:edit', onNewOrEdit);
 		},
 		replace: true,
 		template:
