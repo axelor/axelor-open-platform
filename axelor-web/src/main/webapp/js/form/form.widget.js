@@ -206,6 +206,9 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 				handle(rec);
 			}
 		});
+		scope.$on("on:grid-selection-change", function(e, context) {
+			handle(context);
+		});
 
 		scope.$watch("isReadonly()", watcher);
 		scope.$watch("isRequired()", watcher);
@@ -214,7 +217,12 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		var expr = $parse(condition);
 
 		function watcher(current, old) {
-			if (current !== old) handle(scope.record);
+			if (current === old) return;
+			var rec = scope.record;
+			if (rec === undefined && scope.getContext) {
+				rec = scope.getContext();
+			}
+			handle(rec);
 		}
 
 		function handle(rec) {

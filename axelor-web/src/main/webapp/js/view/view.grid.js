@@ -58,6 +58,7 @@ function GridViewCtrl($scope, $element) {
 					_sortBy: sortBy,
 					_pageNum: pageNum
 				}).then(function(){
+					$scope.$broadcast('on:grid-selection-change', $scope.getContext());
 					$scope.updateRoute();
 				});
 			});
@@ -450,7 +451,9 @@ function GridViewCtrl($scope, $element) {
 		});
 
 		$scope.selection = selection;
-		$scope.applyLater();
+		$scope.applyLater(function () {
+			$scope.$broadcast('on:grid-selection-change', $scope.getContext());
+		});
 	};
 	
 	$scope.onItemClick = function(event, args) {
