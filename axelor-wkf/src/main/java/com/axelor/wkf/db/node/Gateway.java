@@ -66,7 +66,7 @@ public class Gateway extends Node {
 	 * on all the records.
 	 *
 	 */
-	public static Query<Gateway> allGateway() {
+	public static Query<? extends Gateway> all() {
 		return JPA.all(Gateway.class);
 	}
 	
@@ -74,8 +74,8 @@ public class Gateway extends Node {
 	 * A shortcut method to <code>Gateway.all().filter(...)</code>
 	 *
 	 */
-	public static Query<Gateway> filterGateway(String filter, Object... params) {
-		return JPA.all(Gateway.class).filter(filter, params);
+	public static Query<? extends Gateway> filter(String filter, Object... params) {
+		return all().filter(filter, params);
 	}
 	
 }

@@ -3,7 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_2.0.xsd">
 	
-    <grid name="instance-grid" title="Instances" model="com.axelor.wkf.db.Instance">
+    <grid name="instance-grid" title="Instances" model="com.axelor.wkf.db.Instance" canDelete="false" canNew="false">
         <field name="workflow"/>
         <field name="workflow.metaModel.name" title="Meta model"/>
         <field name="metaModelId"/>
@@ -11,25 +11,25 @@
         <field name="creationUser"/>
     </grid>
     
-    <form name="instance-form" title="Instances" cols="6" model="com.axelor.wkf.db.Instance" onLoad="action-instance-load-diagram">
+    <form name="instance-form" title="Instance" cols="6" model="com.axelor.wkf.db.Instance" onLoad="action-instance-load-diagram" canCopy="false" canDelete="false" canNew="false">
         <field name="workflow"/>
-        <field name="workflow.metaModel.name" title="Meta model"/>
-        <field name="metaModelId"/>
+        <field name="workflow.metaModel.name" title="Model" />
+        <field name="metaModelId" title="id"/>
         <notebook colSpan="6">
         	<page title="Diagram" cols="4">
         		<field name="diagram" showTitle="false" readonly="true"  widget="html" colSpan="4" />
         	</page>
         	<page title="Details" cols="4">
-		        <field name="nodes" colSpan="4" showTitle="false" />
-		        <field name="executedTransitions" colSpan="4" hideIf="!executedTransitions || executedTransitions.length &lt; 1" showTitle="false"/>
+		        <field name="nodes" colSpan="4" readonly="true" />
+		        <field name="executedTransitions" colSpan="4" hideIf="!executedTransitions || executedTransitions.length &lt; 1" readonly="true"/>
 		        <notebook colSpan="4">
 		        	<page title="History" cols="4">
 		        		<field name="createdOn" />
 		        		<field name="createdBy" />
-		        		<field name="histories" colSpan="4" grid-view="instance-history-grid" form-view="instance-history-form" showTitle="false"/>
+		        		<field name="histories" colSpan="4" grid-view="instance-history-grid" form-view="instance-history-form" readonly="true"/>
 		        	</page>
 		        	<page title="Counter" cols="4">
-		        		<field name="counters" colSpan="4" grid-view="instance-counter-grid" form-view="instance-counter-form" showTitle="false"/>
+		        		<field name="counters" colSpan="4" grid-view="instance-counter-grid" form-view="instance-counter-form" readonly="true"/>
 		        	</page>
 		        </notebook>
         	</page>

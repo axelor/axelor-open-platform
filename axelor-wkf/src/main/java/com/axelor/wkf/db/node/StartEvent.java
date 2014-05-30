@@ -39,7 +39,7 @@ public class StartEvent extends Node {
 	 * on all the records.
 	 *
 	 */
-	public static Query<StartEvent> allStartEvent() {
+	public static Query<? extends StartEvent> all() {
 		return JPA.all(StartEvent.class);
 	}
 	
@@ -47,8 +47,8 @@ public class StartEvent extends Node {
 	 * A shortcut method to <code>StartEvent.all().filter(...)</code>
 	 *
 	 */
-	public static Query<StartEvent> filterStartEvent(String filter, Object... params) {
-		return JPA.all(StartEvent.class).filter(filter, params);
+	public static Query<? extends StartEvent> filter(String filter, Object... params) {
+		return all().filter(filter, params);
 	}
 	
 }

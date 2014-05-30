@@ -33,7 +33,8 @@ import com.axelor.test.GuiceRunner;
 import com.axelor.wkf.WkfTest;
 import com.axelor.wkf.db.Node;
 import com.axelor.wkf.db.Workflow;
-import com.axelor.wkf.workflow.WorkflowImporter;
+import com.axelor.wkf.db.node.StartEvent;
+import com.axelor.wkf.service.WorkflowImporter;
 
 @RunWith(GuiceRunner.class)
 @GuiceModules({ WkfTest.class })
@@ -53,7 +54,7 @@ public class WorkflowImporterTest {
 				
 				Workflow workflow = new Workflow();
 				workflow.setName("Test");
-				workflow.setMetaModel( MetaModel.all().filter("self.fullName = ?1", "com.axelor.wkf.db.Workflow").fetchOne() );
+				workflow.setMetaModel( MetaModel.filter("self.fullName = ?1", "com.axelor.wkf.db.Workflow").fetchOne() );
 				workflow.save();
 			}
 
@@ -70,12 +71,10 @@ public class WorkflowImporterTest {
 		
 		String bpmnXml = WorkflowImporter.convertStreamToString( Thread.currentThread().getContextClassLoader().getResourceAsStream("data/OrderBpmn2.0.xml") );
 		workflowImporter.run( bpmnXml );
-		
-		System.out.println( Node.all().count() );
-		
-//		Assert.assertNotNull(workflow.getNode());
-//		Assert.assertNotNull(Node.all().fetch());
-//		Assert.assertEquals(1, StartEvent.allStartEvent().count());
+				
+		Assert.assertNotNull(workflow.getNode());
+		Assert.assertNotNull(Node.all().fetch());
+		Assert.assertEquals(1, StartEvent.all().count());
 		
 	}
 }

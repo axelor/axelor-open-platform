@@ -45,7 +45,7 @@ public class ExclusiveGateway extends Gateway {
 	 * on all the records.
 	 *
 	 */
-	public static Query<ExclusiveGateway> allExclusiveGateway() {
+	public static Query<? extends ExclusiveGateway> all() {
 		return JPA.all(ExclusiveGateway.class);
 	}
 	
@@ -53,8 +53,8 @@ public class ExclusiveGateway extends Gateway {
 	 * A shortcut method to <code>ExclusiveGateway.all().filter(...)</code>
 	 *
 	 */
-	public static Query<ExclusiveGateway> filterExclusiveGateway(String filter, Object... params) {
-		return JPA.all(ExclusiveGateway.class).filter(filter, params);
+	public static Query<? extends ExclusiveGateway> filter(String filter, Object... params) {
+		return all().filter(filter, params);
 	}
 	
 	@Override

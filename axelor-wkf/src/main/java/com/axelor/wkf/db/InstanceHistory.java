@@ -186,6 +186,6 @@ public class InstanceHistory extends AuditableModel {
 	 *
 	 */
 	public static Query<InstanceHistory> filter(String filter, Object... params) {
-		return JPA.all(InstanceHistory.class).filter(filter, params);
+		return all().filter(filter, params);
 	}
 }

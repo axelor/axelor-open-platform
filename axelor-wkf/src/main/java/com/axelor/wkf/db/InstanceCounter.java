@@ -205,6 +205,6 @@ public class InstanceCounter extends AuditableModel {
 	 *
 	 */
 	public static Query<InstanceCounter> filter(String filter, Object... params) {
-		return JPA.all(InstanceCounter.class).filter(filter, params);
+		return all().filter(filter, params);
 	}
 }
