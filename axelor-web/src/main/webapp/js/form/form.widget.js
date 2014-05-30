@@ -271,6 +271,9 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 			var value = undefined;
 			try {
 				value = expr(withContext(scope, rec)).trim();
+				if (value.length == 0) {
+					value = null;
+				}
 			} catch (e) {}
 			
 			if (scope.setValue) {
