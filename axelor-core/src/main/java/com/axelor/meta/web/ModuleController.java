@@ -18,13 +18,17 @@
 package com.axelor.meta.web;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
 import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.loader.ModuleManager;
+import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
 import com.google.inject.persist.Transactional;
@@ -33,22 +37,35 @@ public class ModuleController {
 	
 	@Inject
 	private ModuleManager loader;
+
+	private String doMessage(Collection<String> names, boolean uninstall) {
+		final StringBuilder sb = new StringBuilder();
+		if (uninstall) {
+			sb.append(I18n.get("Following modules have been uninstalled:"));
+		} else {
+			sb.append(I18n.get("Following modules have been installed:"));
+		}
+		sb.append("<br><br>");
+		sb.append("<ul>");
+		for (String mn : names) {
+			sb.append("<li>").append(mn).append("</li>");
+		}
+		sb.append("</ul>");
+		return sb.toString();
+	}
 	
-	private String doAction(String module, boolean uninstall) {
+	private List<String> doAction(String module, boolean uninstall) {
 		final List<String> previous = new ArrayList<>();
 		final List<String> updated = new ArrayList<>();
-		final StringBuilder sb = new StringBuilder();
-		
+
 		for (MetaModule m : MetaModule.all().filter("installed = true").fetch()) {
 			previous.add(m.getName());
 		}
 		
 		if (uninstall) {
 			loader.uninstall(module);
-			sb.append(I18n.get("Following modules have been uninstalled:"));
 		} else {
 			loader.install(module, false, false);
-			sb.append(I18n.get("Following modules have been installed:"));
 		}
 		
 		for (MetaModule m : MetaModule.all().filter("installed = true").fetch()) {
@@ -65,32 +82,54 @@ public class ModuleController {
 			updated.addAll(previous);
 		}
 		
-		sb.append("<br><br>");
-		sb.append("<ul>");
-		for (String mn : updated) {
-			sb.append("<li>").append(mn).append("</li>");
-		}
-		sb.append("</ul>");
-		
-		return sb.toString();
+		return updated;
 	}
 
 	public Response install(final String name) {
 		final ActionResponse response = new ActionResponse();
 		try {
-			response.setFlash(doAction(name, false));
+			String message = doMessage(doAction(name, false), false);
+			response.setFlash(message);
 			response.setSignal("refresh-app", true);
 		} catch (Exception e) {
 			response.setException(e);
 		}
 		return response;
 	}
+	
+	public void install(ActionRequest request, ActionResponse response) {
+		List<?> ids = null;
+		try {
+			ids = (List<?>) request.getContext().get("_ids");
+		} catch (Exception e) {
+		}
+		
+		if (ids == null || ids.isEmpty()) {
+			return;
+		}
+
+		try {
+			Set<String> all = new HashSet<>();
+			for (MetaModule m : MetaModule.all().filter("id in (:ids)").bind("ids", ids).fetch()) {
+				if (m.getInstalled() != Boolean.TRUE) {
+					all.addAll(doAction(m.getName(), false));
+				}
+			}
+			if (!all.isEmpty()) {
+				response.setFlash(doMessage(all, false));
+				response.setSignal("refresh-app", true);
+			}
+		} catch (Exception e) {
+			response.setException(e);
+		}
+	}
 
 	@Transactional
 	public Response uninstall(final String name) {
 		final ActionResponse response = new ActionResponse();
 		try {
-			response.setFlash(doAction(name, true));
+			String message = doMessage(doAction(name, true), true);
+			response.setFlash(message);
 			response.setSignal("refresh-app", true);
 		} catch (Exception e) {
 			response.setException(e);
