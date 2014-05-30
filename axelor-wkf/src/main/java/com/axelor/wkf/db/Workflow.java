@@ -322,7 +322,7 @@ public class Workflow extends AuditableModel {
 	 *
 	 */
 	public static Query<Workflow> filter(String filter, Object... params) {
-		return JPA.all(Workflow.class).filter(filter, params);
+		return all().filter(filter, params);
 	}
 	
 	@SuppressWarnings("rawtypes")

@@ -358,7 +358,7 @@ public class Node extends AuditableModel {
 	 * on all the records.
 	 *
 	 */
-	public static Query<Node> all() {
+	public static Query<? extends Node> all() {
 		return JPA.all(Node.class);
 	}
 	
@@ -366,9 +366,11 @@ public class Node extends AuditableModel {
 	 * A shortcut method to <code>Node.all().filter(...)</code>
 	 *
 	 */
-	public static Query<Node> filter(String filter, Object... params) {
-		return JPA.all(Node.class).filter(filter, params);
+	public static Query<? extends Node> filter(String filter, Object... params) {
+		return all().filter(filter, params);
 	}
+	
+	// NODE EXECUTION
 	
 	public void execute( ActionHandler actionHandler, User user, Instance instance, Map<Object, Object> context ){
 		

@@ -45,7 +45,7 @@ public class EndEvent extends Node {
 	 * on all the records.
 	 *
 	 */
-	public static Query<EndEvent> allEndEvent() {
+	public static Query<EndEvent> all() {
 		return JPA.all(EndEvent.class);
 	}
 	
@@ -53,8 +53,8 @@ public class EndEvent extends Node {
 	 * A shortcut method to <code>EndEvent.all().filter(...)</code>
 	 *
 	 */
-	public static Query<EndEvent> filterEndEvent(String filter, Object... params) {
-		return JPA.all(EndEvent.class).filter(filter, params);
+	public static Query<EndEvent> filter(String filter, Object... params) {
+		return all().filter(filter, params);
 	}
 	
 	@Override

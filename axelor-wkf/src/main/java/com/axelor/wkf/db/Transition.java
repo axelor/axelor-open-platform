@@ -299,7 +299,7 @@ public class Transition extends AuditableModel {
 	 *
 	 */
 	public static Query<Transition> filter(String filter, Object... params) {
-		return JPA.all(Transition.class).filter(filter, params);
+		return all().filter(filter, params);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

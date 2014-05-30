@@ -407,6 +407,6 @@ public class Instance extends AuditableModel {
 	 *
 	 */
 	public static Query<Instance> filter(String filter, Object... params) {
-		return JPA.all(Instance.class).filter(filter, params);
+		return all().filter(filter, params);
 	}
 }

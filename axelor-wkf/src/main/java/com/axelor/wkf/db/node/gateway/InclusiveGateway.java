@@ -39,7 +39,7 @@ public class InclusiveGateway extends Gateway {
 	 * on all the records.
 	 *
 	 */
-	public static Query<InclusiveGateway> allInclusiveGateway() {
+	public static Query<? extends InclusiveGateway> all() {
 		return JPA.all(InclusiveGateway.class);
 	}
 	
@@ -47,8 +47,8 @@ public class InclusiveGateway extends Gateway {
 	 * A shortcut method to <code>InclusiveGateway.all().filter(...)</code>
 	 *
 	 */
-	public static Query<InclusiveGateway> filterInclusiveGateway(String filter, Object... params) {
-		return JPA.all(InclusiveGateway.class).filter(filter, params);
+	public static Query<? extends InclusiveGateway> filter(String filter, Object... params) {
+		return all().filter(filter, params);
 	}
 	
 }

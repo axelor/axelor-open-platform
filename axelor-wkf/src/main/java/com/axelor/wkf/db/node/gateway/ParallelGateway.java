@@ -46,7 +46,7 @@ public class ParallelGateway extends Gateway {
 	 * on all the records.
 	 *
 	 */
-	public static Query<ParallelGateway> allParallelGateway() {
+	public static Query<? extends ParallelGateway> all() {
 		return JPA.all(ParallelGateway.class);
 	}
 	
@@ -54,8 +54,8 @@ public class ParallelGateway extends Gateway {
 	 * A shortcut method to <code>ParallelGateway.all().filter(...)</code>
 	 *
 	 */
-	public static Query<ParallelGateway> filterParallelGateway(String filter, Object... params) {
-		return JPA.all( ParallelGateway.class ).filter(filter, params);
+	public static Query<? extends ParallelGateway> filter(String filter, Object... params) {
+		return all().filter(filter, params);
 	}
 
 	@Override

@@ -49,9 +49,9 @@ public class WorkFlowDbTest {
 
 		});
 		
-		Assert.assertEquals(1, StartEvent.allStartEvent().count());
-		Assert.assertEquals(2, NodeTask.allNodeTask().count());
-		Assert.assertEquals(1, EndEvent.allEndEvent().count());
+		Assert.assertEquals(1, StartEvent.all().count());
+		Assert.assertEquals(2, NodeTask.all().count());
+		Assert.assertEquals(1, EndEvent.all().count());
 		Assert.assertEquals(4, Node.all().count());
 		
 	}

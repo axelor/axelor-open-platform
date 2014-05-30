@@ -29,7 +29,7 @@ import com.google.common.collect.Maps;
 @XmlType
 public class ActionWorkflow extends Action {
 	
-	public static final String className = "com.axelor.wkf.workflow.WorkflowService",
+	public static final String className = "com.axelor.wkf.service.WorkflowService",
 			method = "run";
 	
 	@XmlAttribute

@@ -45,7 +45,7 @@ public class NodeTask extends Node {
 	 * on all the records.
 	 *
 	 */
-	public static Query<NodeTask> allNodeTask() {
+	public static Query<? extends NodeTask> all() {
 		return JPA.all(NodeTask.class);
 	}
 	
@@ -53,8 +53,8 @@ public class NodeTask extends Node {
 	 * A shortcut method to <code>NodeTask.all().filter(...)</code>
 	 *
 	 */
-	public static Query<NodeTask> filterNodeTask(String filter, Object... params) {
-		return JPA.all(NodeTask.class).filter(filter, params);
+	public static Query<? extends NodeTask> filter(String filter, Object... params) {
+		return all().filter(filter, params);
 	}
 	
 	@Override

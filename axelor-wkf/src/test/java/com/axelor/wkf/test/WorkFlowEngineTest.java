@@ -37,7 +37,7 @@ import com.axelor.test.GuiceRunner;
 import com.axelor.wkf.WkfTest;
 import com.axelor.wkf.data.CreateData;
 import com.axelor.wkf.db.Workflow;
-import com.axelor.wkf.workflow.WorkflowService;
+import com.axelor.wkf.service.WorkflowService;
 import com.google.common.collect.Maps;
 
 @RunWith(GuiceRunner.class)

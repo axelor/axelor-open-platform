@@ -122,15 +122,15 @@
     
     <!-- METHOD -->
     <action-method name="wkf-method-open-instances">
-    	<call class="com.axelor.wkf.web.WkfController" method="openInstances"/>
+    	<call class="com.axelor.wkf.web.WorkflowController" method="openInstances"/>
     </action-method>
     
     <action-method name="wkf-method-open-editor">
-    	<call class="com.axelor.wkf.web.WkfController" method="openEditor"/>
+    	<call class="com.axelor.wkf.web.WorkflowController" method="openEditor"/>
     </action-method>
     
     <action-method name="wkf-method-import-workflow">
-    	<call class="com.axelor.wkf.web.WkfController" method="importWorkflow"/>
+    	<call class="com.axelor.wkf.web.WorkflowController" method="importWorkflow"/>
     </action-method>
     
 </object-views>
