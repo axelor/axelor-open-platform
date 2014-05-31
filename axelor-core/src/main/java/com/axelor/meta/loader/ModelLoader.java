@@ -20,36 +20,29 @@ package com.axelor.meta.loader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import com.axelor.db.JPA;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaSequence;
-import com.axelor.meta.domains.DomainModels;
-import com.axelor.meta.domains.Sequence;
 import com.axelor.meta.service.MetaModelService;
 import com.google.common.base.Throwables;
-import com.google.common.io.Resources;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 
-@Singleton
 public class ModelLoader extends AbstractLoader {
 
 	private static Logger log = LoggerFactory.getLogger(ModelLoader.class);
-
-	private static final String LOCAL_SCHEMA_DOMAIN = "domain-models.xsd";
-	private static Unmarshaller unmarshaller;
 	
 	@Inject
 	private MetaModelService service;
@@ -65,68 +58,66 @@ public class ModelLoader extends AbstractLoader {
 		
 		loadSequences(module, update);
 	}
-	
+
 	private void loadSequences(Module module, boolean update) {
 		for (URL file : MetaScanner.findAll(module.getName(), "domains", "(.*?)\\.xml")) {
 			try {
-				DomainModels models = unmarshal(file.openStream());
-				if (models.getSequences() != null) {
-					log.info("importing sequence data: {}", file.getFile());
-					importSequences(models.getSequences(), update);
-				}
-			} catch (IOException | JAXBException e) {
+				importSequences(file, update);
+			} catch (Exception e) {
 				throw Throwables.propagate(e);
 			}
 		}
 	}
 	
-	private void importSequences(List<Sequence> sequences, boolean update) {
-		
-		for (Sequence sequence : sequences) {
-			if (isVisited(Sequence.class, sequence.getName())) {
-				continue;
-			}
-			log.info("importing sequence: {}", sequence.getName());
-			if (MetaSequence.findByName(sequence.getName()) != null) {
-				continue;
-			}
-			
-			MetaSequence entity = new MetaSequence(sequence.getName());
-			
-			entity.setPrefix(sequence.getPrefix());
-			entity.setSuffix(entity.getSuffix());
-			if (sequence.getPadding() != null) {
-				entity.setPadding(sequence.getPadding());
-			}
-			if (sequence.getInitial() != null) {
-				entity.setInitial(sequence.getInitial());
-			}
-			if (sequence.getIncrement() != null) {
-				entity.setIncrement(sequence.getIncrement());
-			}
-			entity.save();
-		}
-	}
-	
-	private DomainModels unmarshal(InputStream stream) throws JAXBException {
-		if (unmarshaller == null) {
-			init();
-		}
-		synchronized (unmarshaller) {
-			return (DomainModels) unmarshaller.unmarshal(stream);
-		}
-	}
+	private void importSequences(URL file, boolean update)
+			throws IOException, ParserConfigurationException {
 
-	private static void init() {
-		try {
-			JAXBContext context = JAXBContext.newInstance(DomainModels.class);
-			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-			Schema schema = schemaFactory.newSchema(Resources.getResource(LOCAL_SCHEMA_DOMAIN));
-			
-			unmarshaller = context.createUnmarshaller();
-			unmarshaller.setSchema(schema);
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		DocumentBuilder db = dbf.newDocumentBuilder();
+		Document doc = null;
+
+		try (InputStream is = file.openStream()){
+			doc = db.parse(is);
 		} catch (Exception e) {
 			throw Throwables.propagate(e);
+		}
+
+		NodeList elements = doc.getElementsByTagName("sequence");
+		
+		if (elements.getLength() == 0) {
+			return;
+		}
+		
+		log.info("importing sequence data: {}", file);
+		
+		for (int i = 0; i < elements.getLength(); i++) {
+			
+			Element element = (Element) elements.item(i);
+			String name = element.getAttribute("name");
+			
+			if (isVisited(MetaSequence.class, name)) {
+				continue;
+			}
+			if (MetaSequence.findByName(name) != null) {
+				continue;
+			}
+			
+			log.info("importing sequence: {}", name);
+			
+			MetaSequence entity = new MetaSequence(name);
+			
+			entity.setPrefix(element.getAttribute("prefix"));
+			entity.setSuffix(element.getAttribute("suffix"));
+			
+			Integer padding = Ints.tryParse(element.getAttribute("padding"));
+			Integer increment = Ints.tryParse(element.getAttribute("padding"));
+			Long initial = Longs.tryParse(element.getAttribute("initial"));
+
+			if (padding != null) entity.setPadding(padding);
+			if (increment != null) entity.setIncrement(increment);
+			if (initial != null) entity.setInitial(initial);
+			
+			entity.save();
 		}
 	}
 }
