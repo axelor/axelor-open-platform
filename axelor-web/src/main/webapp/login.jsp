@@ -17,6 +17,23 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page language="java" session="true" %>
+<%@ page import="com.axelor.i18n.I18n" %>
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%
+String linkHome = I18n.get("Home");
+String linkAbout = I18n.get("About");
+String linkContact = I18n.get("Contact");
+
+String loginTitle = I18n.get("Please sign in");
+String loginRemember = I18n.get("Remember me");
+String loginSubmit = I18n.get("Login");
+
+String loginUserName = I18n.get("User name");
+String loginPassword = I18n.get("Password");
+
+String pageTitle = I18n.get("DEMO");
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -88,9 +105,9 @@ body {
 				</a>
 				<div class="nav-collapse collapse pull-right">
 					<ul class="nav">
-						<li class="active"><a href="#">Home</a></li>
-						<li><a href="#about">About</a></li>
-						<li><a href="#contact">Contact</a></li>
+						<li class="active"><a href="#"><%= linkHome %></a></li>
+						<li><a href="#about"><%= linkAbout %></a></li>
+						<li><a href="#contact"><%= linkContact %></a></li>
 					</ul>
 				</div>
 				<!--/.nav-collapse -->
@@ -100,18 +117,18 @@ body {
 
 	<div class="container">
 		<div class="app-title">
-			<h2 class="muted">DEMO</h2>
+			<h2 class="muted"><%= pageTitle %></h2>
 		</div>
 		<form class="form-signin" action="" method="POST">
-			<h2 class="form-signin-heading">Please sign in</h2>
-			<input type="text" class="input-block-level" placeholder="User name"
+			<h2 class="form-signin-heading"><%= loginTitle %></h2>
+			<input type="text" class="input-block-level" placeholder="<%= loginUserName %>"
 				tabindex="1" name="username">
-			<input type="password" class="input-block-level" placeholder="Password"
+			<input type="password" class="input-block-level" placeholder="<%= loginPassword %>"
 				tabindex="2" name="password">
 			<label class="checkbox"> <input type="checkbox"
-				tabindex="3" value="rememberMe" name="rememberMe"> Remember me
+				tabindex="3" value="rememberMe" name="rememberMe"> <%= loginRemember %>
 			</label>
-			<button tabindex="4" class="btn btn-large btn-primary" type="submit">Login</button>
+			<button tabindex="4" class="btn btn-large btn-primary" type="submit"><%= loginSubmit %></button>
 		</form>
 		<div id="footer">
 			<div class="container">
