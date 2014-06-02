@@ -33,17 +33,15 @@ import com.google.common.io.Files;
 
 public class Extender extends Generator {
 
-	private static final String PROJECT_PATH = "axelor-objects";
-
 	private static final String OBJECT_PATH = "src/main/resources/objects";
 
 	private  File projectPath;
 
-	public Extender(File base, File target) {
+	public Extender(File base, File target, String project) {
 		super(base, target);
-		this.target = this.file(base, PROJECT_PATH, target.getName());
+		this.target = this.file(base, project, target.getName());
 		this.outputPath = this.file(this.target, OUTPUT_PATH);
-		this.projectPath = this.file(base, PROJECT_PATH);
+		this.projectPath = this.file(base, project);
 	}
 
 	private List<String> modules() {
