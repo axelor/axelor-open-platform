@@ -97,7 +97,7 @@ public class I18nExtractor {
 			String name = file.getFileName().toString();
 			try {
 				if (name.endsWith(".xml")) processXml(file);
-				if (name.endsWith(".java")) processJava(file);
+				if (name.endsWith(".jsp")) processJava(file);
 				if (name.endsWith(".java")) processJava(file);
 				if (name.endsWith(".groovy")) processJava(file);
 			} catch (Exception e) {
