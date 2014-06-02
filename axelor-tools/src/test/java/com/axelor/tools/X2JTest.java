@@ -55,7 +55,7 @@ public class X2JTest {
 		File basePath = new File(base);
 		File targetPath = new File(target);
 
-		Extender gen = new Extender(basePath, targetPath);
+		Extender gen = new Extender(basePath, targetPath, "axelor-objects");
 		gen.clean();
 		gen.start();
 	}
