@@ -416,7 +416,18 @@ ActionHandler.prototype = {
 		}
 
 		if(data.flash || data.info) {
-			axelor.dialogs.say(data.flash || data.info);
+			axelor.dialogs.box(data.flash || data.info, {
+				onClose: function () {
+					if (data.pending) {
+						scope.applyLater(function(){
+							deferred.resolve(data.pending);
+						});
+					}
+				}
+			});
+			if (data.pending) {
+				return deferred.promise;
+			}
 		}
 
 		if(data.notify) {
