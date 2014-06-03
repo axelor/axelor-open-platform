@@ -184,10 +184,15 @@ public class ModuleManager {
 		log.info("Module uninstalled: {}", module);
 	}
 
+	@Transactional
+	MetaModule findModule(String name) {
+		return MetaModule.findByName(name);
+	}
+	
 	private void install(String moduleName, boolean update, boolean withDemo, boolean force) {
 
 		final Module module = resolver.get(moduleName);
-		final MetaModule metaModule = MetaModule.findByName(moduleName);
+		final MetaModule metaModule = findModule(moduleName);
 
 		if (metaModule == null) {
 			return;
