@@ -1565,20 +1565,6 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="export" type="xsd:boolean">
-          <xsd:annotation>
-            <xsd:documentation>
-              Whether to export the documentation of the field.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="documentation" type="xsd:boolean">
-          <xsd:annotation>
-            <xsd:documentation>
-              Whether to export the documentation of the M2O/O2M/M2M.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
