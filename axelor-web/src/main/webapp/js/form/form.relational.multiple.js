@@ -77,7 +77,12 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 
 		_.each($scope.itemsPending, function (item) {
 			var find = _.find(records, function(rec) {
-				return rec.id && rec.id == item.id;
+				if (rec.id && rec.id == item.id) {
+					return true;
+				}
+				var a = _.omit(item, 'id', 'version');
+				var b = _.omit(rec, 'id', 'version');
+				return $scope._dataSource.equals(a, b);
 			});
 			if (!find) {
 				records.push(item);
