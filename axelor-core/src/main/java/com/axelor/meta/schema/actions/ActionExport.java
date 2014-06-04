@@ -75,18 +75,18 @@ public class ActionExport extends Action {
 	}
 
 	protected String doExport(String dir, Export export, ActionHandler handler) throws IOException {
-		export.template = handler.evaluate(export.template).toString();
+		String templatePath = handler.evaluate(export.template).toString();
 
 		Reader reader = null;
-		File template = new File(export.template);
+		File template = new File(templatePath);
 		if (template.isFile()) {
 			reader = new FileReader(template);
 		}
 
 		if (reader == null) {
-			InputStream is = ClassUtils.getResourceStream(export.template);
+			InputStream is = ClassUtils.getResourceStream(templatePath);
 			if (is == null) {
-				throw new FileNotFoundException("No such template: " + export.template);
+				throw new FileNotFoundException("No such template: " + templatePath);
 			}
 			reader = new InputStreamReader(is);
 		}
@@ -96,7 +96,7 @@ public class ActionExport extends Action {
 			name = handler.evaluate("eval: \"\"\"" + name + "\"\"\"").toString();
 		}
 
-		log.info("export {} as {}", export.getTemplate(), name);
+		log.info("export {} as {}", templatePath, name);
 
 		Templates engine = new StringTemplates('$', '$');
 		if ("groovy".equals(export.engine)) {
