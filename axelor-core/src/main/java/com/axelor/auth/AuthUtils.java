@@ -24,6 +24,7 @@ import javax.persistence.TypedQuery;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
+import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.subject.Subject;
 import org.joda.time.LocalDate;
 
@@ -42,10 +43,11 @@ public class AuthUtils {
 	}
 
 	public static User getUser() {
-		Subject subject = getSubject();
-		if (subject == null || subject.getPrincipal() == null)
-			return null;
-		return getUser(subject.getPrincipal().toString());
+		try {
+			return getUser(getSubject().getPrincipal().toString());
+		} catch (NullPointerException | InvalidSessionException e) {
+		}
+		return null;
 	}
 
 	public static User getUser(String code) {
