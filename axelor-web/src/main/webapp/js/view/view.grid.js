@@ -271,7 +271,7 @@ function GridViewCtrl($scope, $element) {
 
 			function toDate(val) {
 				var format = 'MM/YYYY';
-				if (/\d+\/\d+\/d+/.test(val)) format = 'DD/MM/YYYY';
+				if (/\d+\/\d+\/\d+/.test(val)) format = 'DD/MM/YYYY';
 				return val ? moment(val, format).format('YYYY-MM-DD') : val;
 			}
 
