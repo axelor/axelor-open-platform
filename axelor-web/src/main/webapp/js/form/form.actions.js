@@ -401,6 +401,17 @@ ActionHandler.prototype = {
 			scope = this.scope,
 			formElement = this._getFormElement(),
 			formScope = formElement.data('$scope') || scope;
+
+		function doReload(pending) {
+			self._invalidateContext = true;
+			var promise = scope.reload(true);
+			if (promise) {
+				promise.then(function(){
+					deferred.resolve(pending);
+				});
+			}
+			return deferred.promise;
+		}
 		
 		if (data.signal === 'refresh-app') {
 			if(data.flash || data.info) {
@@ -420,6 +431,9 @@ ActionHandler.prototype = {
 				onClose: function () {
 					if (data.pending) {
 						scope.applyLater(function(){
+							if (data.reload) {
+								return doReload(data.pending);
+							}
 							deferred.resolve(data.pending);
 						});
 					}
@@ -484,14 +498,7 @@ ActionHandler.prototype = {
 		}
 		
 		if (data.reload) {
-			this._invalidateContext = true;
-			var promise = scope.reload(true);
-			if (promise) {
-				promise.then(function(){
-					deferred.resolve(data.pending);
-				});
-			}
-			return deferred.promise;
+			return doReload(data.pending);
 		}
 		
 		if (data.save) {
