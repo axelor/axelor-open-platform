@@ -32,8 +32,10 @@ ui.formInput('Number', {
 		
 		var props = scope.field,
 			precision = props.precision || 18,
-			scale = props.scale || 2;
-		
+			scale = props.scale || 2,
+			minSize = +props.minSize,
+			maxSize = +props.maxSize;
+
 		var isDecimal = props.serverType === "decimal" || props.widget === "decimal",
 			pattern = isDecimal ? /^(-)?\d+(\.\d+)?$/ : /^\s*-?[0-9]*\s*$/;
 		
@@ -42,15 +44,10 @@ ui.formInput('Number', {
 		};
 
 		scope.validate = scope.isValid = function(value) {
-			var valid = scope.isNumber(value),
-				minSize = +props.minSize,
-				maxSize = +props.maxSize;
-            if (valid && _.isString(value)) {
-            	var text = (value.length - value.lastIndexOf('.') - 1) > scale ? scope.format(value) : value,
-            		parts = text.split(/\./),
-            		integer = parts[0] || "",
-            		decimal = parts[1] || "";
-            	valid = (integer.length <= precision - scale) && (decimal.length <= scale);
+			var valid = scope.isNumber(value);
+            if (valid && isDecimal && _.isString(value)) {
+            	value = scope.format(value);
+            	valid = _.string.trim(value, '-').length - 1 <= precision;
             	value = +value;
             }
 
@@ -63,29 +60,14 @@ ui.formInput('Number', {
 
         	return valid;
 		};
-
+		
 		scope.format = function format(value) {
 			if (isDecimal && _.isString(value)) {
-				var parts = value.split(/\./),
-					integer = parts[0] || "",
-					decimal = parts[1] || "",
-					negative = integer.indexOf("-") === 0;
-
-				integer = "" + (+integer); // remove leading zero if any
-				if (negative && integer.indexOf("-") !== 0) {
-				    integer = "-" + integer;
-				}
-
-				if (decimal.length <= scale) {
-					return integer + '.' + _.string.rpad(decimal, scale, '0');
-				}
-				decimal = (+decimal.slice(0, scale)) + Math.round("." + decimal.slice(scale));
-				decimal = _.string.pad(decimal, scale, '0');
-				return integer + '.' + decimal;
+				return parseFloat(value).toFixed(scale);
 			}
 			return value;
 		};
-		
+
 		scope.parse = function(value) {
 			if (isDecimal) return value;
 			if (value && _.isString(value)) return +value;
@@ -133,18 +115,18 @@ ui.formInput('Number', {
 
 		function updateModel(value, handle) {
 			if (!scope.isNumber(value)) {
-				return;
+				return model.$setViewValue(value); // force validation
             }
 			var val = scope.parse(value);
 			var old = scope.getValue();
+			var text = scope.format(value);
+
+			element.val(text);
 
 			if (equals(val, old)) {
 				return handleChange();
 			};
-			
-			var text = scope.format(value);
 
-			element.val(text);
 			scope.setValue(val);
 			scope.applyLater();
 			
