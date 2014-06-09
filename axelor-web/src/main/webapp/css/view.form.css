@@ -558,11 +558,14 @@ td.form-item > * {
 .form-item .ui-spinner .ui-spinner-down {
 	margin-bottom: 1px;
 }
+.form-item-container .ui-spinner .ui-spinner-button {
+	cursor: pointer;
+}
 
 .form-item-container .ui-spinner input {
 	width: 100%;
 	text-align: right;
-	padding-right: 16px;
+	padding-right: 18px;
 	margin: 0;
 }
 
