@@ -28,6 +28,7 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -63,7 +64,7 @@ import com.google.common.collect.Maps;
 public class Context extends HashMap<String, Object> {
 
 	private static final long serialVersionUID = -5405070533303843069L;
-	
+
 	private static final String FIELD_ID = "id";
 	private static final String FIELD_VERSION = "version";
 	private static final String FIELD_SELECTED = "selected";
@@ -78,7 +79,7 @@ public class Context extends HashMap<String, Object> {
 		super(data);
 		this.beanInstance = bean;
 	}
-	
+
 	@SuppressWarnings("all")
 	public static Object createOrFind(Property p, Object value) {
 
@@ -143,7 +144,7 @@ public class Context extends HashMap<String, Object> {
 				value = items;
 			}
 			// non-owning side can't handle the relationship
-			else if (p.getType() == PropertyType.ONE_TO_ONE && p.getMappedBy() != null) {
+			else if (p.getType() == PropertyType.ONE_TO_ONE && !Strings.isNullOrEmpty(p.getMappedBy())) {
 				continue;
 			}
 			else if (p.isReference()) {
