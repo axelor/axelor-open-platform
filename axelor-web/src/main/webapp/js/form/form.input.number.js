@@ -46,7 +46,8 @@ ui.formInput('Number', {
 				minSize = +props.minSize,
 				maxSize = +props.maxSize;
             if (valid && _.isString(value)) {
-            	var parts = value.split(/\./),
+            	var text = (value.length - value.lastIndexOf('.') - 1) > scale ? scope.format(value) : value,
+            		parts = text.split(/\./),
             		integer = parts[0] || "",
             		decimal = parts[1] || "";
             	valid = (integer.length <= precision - scale) && (decimal.length <= scale);
