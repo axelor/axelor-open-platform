@@ -453,6 +453,7 @@ function FormViewCtrl($scope, $element) {
 		
 		var defer = $scope._defer();
 		var event = $scope.$broadcast('on:before-save', $scope.record);
+		var lastAction = $scope.$$lastActionPromise;
 		var saveAction = $scope.$events.onSave;
 		var fireOnLoad = true;
 		
@@ -488,19 +489,28 @@ function FormViewCtrl($scope, $element) {
 				defer.reject(error);
 			});
 		}
+		
+		function waitAndSave() {
+			$scope.$timeout(function() {
+				$scope.ajaxStop(function() {
+					if (!$scope.canSave()) {
+						$scope.showErrorNotice();
+						return defer.promise;
+					}
+					if (saveAction) {
+						return saveAction().then(doSave);
+					}
+					return doSave();
+				}, 100);
+			}, 100);
+		}
+		
+		if (lastAction) {
+			lastAction.then(waitAndSave);
+		} else {
+			waitAndSave();
+		}
 
-		$scope.applyLater(function() {
-			$scope.ajaxStop(function() {
-				if (!$scope.canSave()) {
-					$scope.showErrorNotice();
-					return defer.promise;
-				}
-				if (saveAction) {
-					return saveAction().then(doSave);
-				}
-				return doSave();
-			});
-		});
 		return defer.promise;
 	};
 	

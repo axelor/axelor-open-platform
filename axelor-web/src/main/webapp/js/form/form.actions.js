@@ -182,9 +182,25 @@ ActionHandler.prototype = {
 
 	onChange: function(event) {
 		var self = this;
+		var scope = this._getFormElement().scope();
+		var deferred = this.ws.defer();
+		
+		scope.$$lastActionPromise = deferred.promise;
+
+		function clear() {
+			scope.$timeout(function () {
+				scope.$$lastActionPromise = null;
+			}, 300);
+		}
+		
 		return this._fireBeforeSave().then(function() {
-			return self.handle();
-		});
+			var promise = self.handle();
+			promise.then(function () {
+				deferred.resolve();
+			});
+			promise.then(clear, clear);
+			return promise;
+		}, clear);
 	},
 	
 	_getContext: function() {
@@ -383,6 +399,8 @@ ActionHandler.prototype = {
 
 		promise.then(function(){
 			deferred.resolve();
+		}, function() {
+			deferred.reject();
 		});
 		
 		return deferred.promise;
