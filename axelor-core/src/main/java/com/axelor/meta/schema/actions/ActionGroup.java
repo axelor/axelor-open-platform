@@ -216,7 +216,7 @@ public class ActionGroup extends ActionIndex {
             		last = (Map) result.get(result.size() - 1);
             	} catch (ClassCastException e) {
             	}
-                if (last != null && (last.containsKey("alert") || last.containsKey("error") || last.containsKey("save"))) {
+                if (last != null && (last.containsKey("info") || last.containsKey("alert") || last.containsKey("error") || last.containsKey("save"))) {
             		String previous = (String) last.get("pending");
             		String pending = this.getPending(i, previous);
             		last.put("pending", pending);
