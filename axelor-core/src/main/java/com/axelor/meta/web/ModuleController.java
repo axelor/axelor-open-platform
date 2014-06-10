@@ -25,6 +25,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import com.axelor.app.AppSettings;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.loader.ModuleManager;
@@ -65,7 +66,7 @@ public class ModuleController {
 		if (uninstall) {
 			loader.uninstall(module);
 		} else {
-			loader.install(module, false, false);
+			loader.install(module, false, AppSettings.get().getBoolean("data.import.demo-data", true));
 		}
 		
 		for (MetaModule m : MetaModule.all().filter("installed = true").fetch()) {
