@@ -38,7 +38,7 @@ public class MetaScanner {
 		if (path == null) {
 			return ImmutableList.of();
 		}
-		final String namePattern = directory + "(/|\\\\)" + pattern;
+		final String namePattern = "(^|/|\\\\)" + directory + "(/|\\\\)" + pattern;
 		final String pathPattern = String.format("^(%s)", path.replaceFirst("module\\.properties$", ""));
 		return Reflections.findResources().byName(namePattern).byURL(pathPattern).find();
 	}
