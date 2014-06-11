@@ -146,8 +146,11 @@ public class JpaModule extends AbstractModule {
 			}
 		}
 		
-		updatePersistenceProperties(properties);
-
+		try {
+			updatePersistenceProperties(properties);
+		} catch (Exception e) {
+		}
+		
 		install(new JpaPersistModule(jpaUnit).properties(properties));
 		if (this.autostart) {
 			bind(Initializer.class).asEagerSingleton();
