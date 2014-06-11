@@ -281,7 +281,7 @@ public class CSVImporter implements Importer {
 		BufferedReader streamReader = new BufferedReader(reader);
 		CSVReader csvReader = new CSVReader(streamReader, csvInput.getSeparator());
 		String[] fields;
-		
+
 		if (StringUtils.isBlank(csvInput.getHeader())) {
 			fields = csvReader.readNext();
 		} else {
@@ -419,15 +419,16 @@ public class CSVImporter implements Importer {
 
 		if (bean != null) {
 			JPA.manage((Model) bean);
-			if(!onRollback) {
-				valuesStack.add(values);
-
-				for(Listener listener : listeners) {
-					listener.imported((Model) bean);
-				}
-			}
 
 			LOG.trace("bean saved: {}", bean);
+		}
+
+		if(!onRollback) {
+			valuesStack.add(values);
+
+			for(Listener listener : listeners) {
+				listener.imported((Model) bean);
+			}
 		}
 
 		return bean;
