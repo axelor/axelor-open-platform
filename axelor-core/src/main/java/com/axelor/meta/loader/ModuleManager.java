@@ -33,6 +33,7 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaAction;
+import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.MetaSelect;
@@ -175,6 +176,7 @@ public class ModuleManager {
 		MetaSelect.findByModule(module).remove();
 		MetaMenu.findByModule(module).remove();
 		MetaAction.findByModule(module).remove();
+		MetaActionMenu.findByModule(module).remove();
 
 		entity.setInstalled(false);
 		entity.save();
