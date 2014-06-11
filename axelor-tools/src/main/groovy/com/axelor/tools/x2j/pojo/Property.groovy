@@ -88,9 +88,11 @@ class Property {
 			case "many-to-one":
 				return entity.importType(targetFqn)
 			case "one-to-many":
-				return entity.importType("java.util.List<$target>")
+				def targetName = entity.importType(targetFqn)
+				return entity.importType("java.util.List<$targetName>")
 			case "many-to-many":
-				return entity.importType("java.util.Set<$target>")
+				def targetName = entity.importType(targetFqn)
+				return entity.importType("java.util.Set<$targetName>")
 		}
 		throw new IllegalArgumentException("Invalid type: " + type)
 	}
