@@ -261,7 +261,7 @@ function GridViewCtrl($scope, $element) {
 					value2 = match[2].trim();
 					return match[4].trim();
 				}
-				match = /(<=?|>=?)(.*)/.exec(val);
+				match = /(<=?|>=?|=)(.*)/.exec(val);
 				if (match) {
 					operator = match[1];
 					return match[2].trim();
@@ -269,10 +269,15 @@ function GridViewCtrl($scope, $element) {
 				return val;
 			}
 
-			function toDate(val) {
+			function toMoment(val) {
 				var format = 'MM/YYYY';
 				if (/\d+\/\d+\/\d+/.test(val)) format = 'DD/MM/YYYY';
-				return val ? moment(val, format).format('YYYY-MM-DD') : val;
+				if (/\d+\/\d+\/\d+\s+\d+:\d+/.test(val)) format = 'DD/MM/YYYY HH:mm';
+				return val ? moment(val, format) : moment();
+			}
+
+			function toDate(val) {
+				return val ? toMoment(val).format('YYYY-MM-DD') : val;
 			}
 
 			switch(type) {
@@ -291,7 +296,8 @@ function GridViewCtrl($scope, $element) {
 				case 'date':
 					operator = '=';
 					value = stripOperator(value);
-					value = toDate(value);
+					value = toMoment(value);
+					if (value) value = value.startOf('day').toDate().toISOString();
 					value2 = toDate(value2);
 					break;
 				case 'time':
@@ -300,8 +306,9 @@ function GridViewCtrl($scope, $element) {
 				case 'datetime':
 					operator = 'between';
 					value = stripOperator(value);
-					value = toDate(value);
-					value2 = toDate(value2 || value);
+					var val = toMoment(value);
+					value = (operator == 'between' ? val.startOf('day') : val).toDate().toISOString();
+					value2 = (operator == 'between' ? val.endOf('day') : val).toDate().toISOString();
 					break;
 				case 'selection':
 					operator = '=';
