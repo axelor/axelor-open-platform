@@ -18,7 +18,6 @@
 package com.axelor.meta.loader;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
@@ -100,19 +99,6 @@ final class Module {
 		if (!depends.contains(module)) {
 			depends.add(module);
 		}
-	}
-	
-	private Pattern pat;
-	
-	public boolean hasEntity(Class<?> klass) {
-		if (pat == null) {
-			String mod = name.replace("axelor-", "");
-			if ("core".equals(mod)) {
-				mod = "(core|auth|meta)";
-			}
-			pat = Pattern.compile("\\." + mod + "\\.db\\.");
-		}
-		return pat.matcher(klass.getName()).find();
 	}
 	
 	@Override

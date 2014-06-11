@@ -434,8 +434,10 @@ public class ViewLoader extends AbstractLoader {
 	private static final File outputDir = FileUtils.getFile(System.getProperty("java.io.tmpdir"), "axelor", "generated");
 
 	private void importDefault(Module module) {
-		for (Class<?> klass: JPA.models()) {
-			if (module.hasEntity(klass) && MetaView.all().filter("self.model = ?1", klass.getName()).count() == 0) {
+		for (String name : ModelLoader.findEntities(module)) {
+			Class<?> klass = JPA.model(name);
+			if (klass == null) continue;
+			if (MetaView.all().filter("self.model = ?1", klass.getName()).count() == 0) {
 				File out = FileUtils.getFile(outputDir, "views", klass.getSimpleName() + ".xml");
 				String xml = createDefaultViews(module, klass);
 				try {
