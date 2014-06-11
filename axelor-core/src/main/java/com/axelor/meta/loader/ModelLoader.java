@@ -17,9 +17,10 @@
  */
 package com.axelor.meta.loader;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
@@ -49,41 +50,74 @@ public class ModelLoader extends AbstractLoader {
 
 	@Override
 	protected void doLoad(Module module, boolean update) {
-
-		for (Class<?> klass : JPA.models()) {
-			if (module.hasEntity(klass)) {
-				service.process(klass);
-			}
-		}
 		
-		loadSequences(module, update);
-	}
+		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		final DocumentBuilder db;
+		try {
+			db = dbf.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			return;
+		}
 
-	private void loadSequences(Module module, boolean update) {
-		for (URL file : MetaScanner.findAll(module.getName(), "domains", "(.*?)\\.xml")) {
-			try {
-				importSequences(file, update);
+		for (URL file : MetaScanner.findAll(module.getName(), "(domains|objects)", "(.*?)\\.xml")) {
+			try (InputStream is = file.openStream()) {
+				final Document doc = db.parse(is);
+				importModels(doc, file, update);
+				importSequences(doc, file, update);
 			} catch (Exception e) {
 				throw Throwables.propagate(e);
 			}
 		}
 	}
 	
-	private void importSequences(URL file, boolean update)
-			throws IOException, ParserConfigurationException {
-
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		DocumentBuilder db = dbf.newDocumentBuilder();
-		Document doc = null;
-
-		try (InputStream is = file.openStream()){
-			doc = db.parse(is);
-		} catch (Exception e) {
-			throw Throwables.propagate(e);
+	static Set<String> findEntities(Module module) {
+		
+		final Set<String> names = new HashSet<>();
+		
+		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		final DocumentBuilder db;		
+		try {
+			db = dbf.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			return names;
 		}
 
-		NodeList elements = doc.getElementsByTagName("sequence");
+		for (URL file : MetaScanner.findAll(module.getName(), "(domains|objects)", "(.*?)\\.xml")) {
+			try (InputStream is = file.openStream()) {
+				final Document doc = db.parse(is);
+				final NodeList elements = doc.getElementsByTagName("entity");
+				for (int i = 0; i < elements.getLength(); i++) {
+					final Element element = (Element) elements.item(i);
+					names.add(element.getAttribute("name"));
+				}
+				
+			} catch (Exception e) {
+			}
+		}
+		return names;
+	}
+	
+	private void importModels(Document doc, URL file, boolean update) {
+		final NodeList elements = doc.getElementsByTagName("entity");
+		if (elements.getLength() == 0) {
+			return;
+		}
+
+		log.info("importing model data: {}", file);
 		
+		for (int i = 0; i < elements.getLength(); i++) {
+			
+			Element element = (Element) elements.item(i);
+			String name = element.getAttribute("name");
+			
+			log.info("importing model: {}", name);
+			
+			service.process(JPA.model(name));
+		}
+	}
+
+	private void importSequences(Document doc, URL file, boolean update) {
+		final NodeList elements = doc.getElementsByTagName("sequence");
 		if (elements.getLength() == 0) {
 			return;
 		}
