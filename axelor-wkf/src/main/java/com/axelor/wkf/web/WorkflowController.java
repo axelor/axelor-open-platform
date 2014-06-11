@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
@@ -38,7 +39,6 @@ public class WorkflowController {
 	protected Logger log = LoggerFactory.getLogger( getClass() );
 	
 	private static final String CONFIG_WKF_BASE = "workflow.editor.base";
-	private static final String CONFIG_WKF_LANG = "workflow.editor.lang";
 
 	@Inject
 	private WorkflowImporter workflowImporter;
@@ -79,15 +79,15 @@ public class WorkflowController {
 	public void openEditor( ActionRequest request, ActionResponse response ) {
 
 		Workflow workflow = request.getContext().asType( Workflow.class );
-		
+				
 		String resource = String.format(
 			"%s/p/editor?id=%s&name=%s&model=%s&url=%s&lang=%s&sessionId=%s}", 
-			AppSettings.get().get(CONFIG_WKF_BASE, "http://localhost:8080/axelorbpm"),
+			AppSettings.get().get(CONFIG_WKF_BASE, "http://localhost:8080/axelor-bpm"),
 			workflow.getId(),
 			workflow.getName(),
 			workflow.getMetaModel().getFullName(),
 			AppSettings.get().getBaseURL(),
-			AppSettings.get().get(CONFIG_WKF_LANG, "fr"),
+			AppFilter.getLocale().getLanguage(),
 			AuthUtils.getSubject().getSession().getId()
 		);			
 		
