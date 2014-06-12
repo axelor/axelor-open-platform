@@ -132,6 +132,10 @@ public class ViewLoader extends AbstractLoader {
 	}
 	
 	private void importView(AbstractView view, Module module, boolean update) {
+		importView(view, module, update, -1);
+	}
+	
+	private void importView(AbstractView view, Module module, boolean update, int priority) {
 
 		String xmlId = view.getId();
 		String name = view.getName();
@@ -188,6 +192,10 @@ public class ViewLoader extends AbstractLoader {
 
 		if (entity.getId() != null && !update) {
 			return;
+		}
+
+		if (priority > -1) {
+			entity.setPriority(priority);
 		}
 
 		entity.setXmlId(xmlId);
@@ -500,10 +508,9 @@ public class ViewLoader extends AbstractLoader {
 
 		formView.setItems(formItems);
 		gridView.setItems(gridItems);
-
-
-		importView(formView, module, false);
-		importView(gridView, module, false);
+		
+		importView(formView, module, false, 10);
+		importView(gridView, module, false, 10);
 
 		return XMLViews.toXml(ImmutableList.of(gridView, formView), false);
 	}
