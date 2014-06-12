@@ -108,6 +108,7 @@
 		evalScope.$moment = function(d) { return moment(d); };		// moment.js helper
 		evalScope.$number = function(d) { return +d; };				// number helper
 		evalScope.$popup = function() { return scope._isPopup; };	// popup detect
+		evalScope.$iif = function(c, t, f) { return c ? t : f; };
 
 		evalScope.$contains = function(iter, item) {
 			if (iter && iter.indexOf)
