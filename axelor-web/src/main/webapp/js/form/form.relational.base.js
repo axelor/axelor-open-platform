@@ -310,7 +310,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		var fn = fetchSelection.bind(this);
 		var onSelect = this.$events.onSelect;
 		if (onSelect) {
-			return onSelect().then(function() {
+			return onSelect(true).then(function() {
 				return fn(request, response);
 			});
 		}
