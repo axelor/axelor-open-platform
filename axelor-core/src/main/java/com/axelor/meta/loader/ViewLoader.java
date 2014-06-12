@@ -91,7 +91,11 @@ public class ViewLoader extends AbstractLoader {
 			log.error("unresolved items: {}", unresolved);
 			throw new PersistenceException("There are some unresolve items, check the log.");
 		}
+	}
 
+	@Override
+	@Transactional
+	void doLast(Module module, boolean update) {
 		// generate default views
 		importDefault(module);
 	}
