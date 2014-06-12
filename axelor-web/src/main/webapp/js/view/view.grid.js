@@ -426,22 +426,16 @@ function GridViewCtrl($scope, $element) {
 	};
 
 	$scope.onSort = function(event, args) {
-
-		var sortBy = [],
-			fields = _.pluck($scope.fields, 'name');
-
-		angular.forEach(args.sortCols, function(column){
+		var sortBy = _.map(args.sortCols, function(column) {
 			var name = column.sortCol.field;
 			var spec = column.sortAsc ? name : '-' + name;
-			sortBy.push(spec);
+			return spec;
 		});
-		
-		ds.search({
-			sortBy: sortBy,
-			fields: fields
+		return $scope.filter({
+			_sortBy: sortBy
 		});
 	};
-	
+
 	$scope.onSelectionChanged = function(event, args) {
 		var items = $scope.getItems();
 		var selection = [];
@@ -687,11 +681,16 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 			var _action = $scope._viewAction;
 
 			$scope.filter = function (searchFilter) {
-				var opts = searchFilter;
+				var opts = searchFilter || {};
 				if ($scope.$parent._model) {
 					opts = _.extend({}, opts, {
 						_action: _action
 					});
+				}
+				var ds = $scope._dataSource;
+				var view = $scope.schema || {};
+				if (!opts._sortBy && !ds._sortBy && view.orderBy) {
+					opts._sortBy = view.orderBy.split(',');
 				}
 				return _filter.call($scope, opts);
 			};
