@@ -155,8 +155,18 @@ ActionHandler.prototype = {
 		return this.handle();
 	},
 	
-	onSelect: function() {
-		return this.handle();
+	onSelect: function(unblocked) {
+		var self = this;
+		var blockUI = this._blockUI;
+		if (unblocked) {
+			this._blockUI = angular.noop;
+		}
+		function reset() {
+			self._blockUI = blockUI;
+		}
+		var promise = this.handle();
+		promise.then(reset, reset);
+		return promise;
 	},
 	
 	onClick: function(event) {

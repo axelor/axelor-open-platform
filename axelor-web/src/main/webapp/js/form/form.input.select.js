@@ -77,15 +77,31 @@ ui.formWidget('BaseSelect', {
 		var showOn = this.showSelectionOn;
 		var doSetup = _.once(function (input) {
 		
+			var loading = false;
+			var pending = null;
+
+			function doLoad(request, response) {
+				if (loading) {
+					return pending = _.partial(doLoad, request, response);
+				}
+				loading = true;
+				scope.loadSelection(request, function() {
+					loading = false;
+					response.apply(null, arguments);
+					if (pending) {
+						pending();
+						pending = null;
+					}
+				});
+			}
+
 			input.autocomplete({
 				
 				minLength: 0,
 				
 				position: {  collision: "flip"  },
 				
-				source: function(request, response) {
-					scope.loadSelection(request, response);
-				},
+				source: doLoad,
 	
 				focus: function(event, ui) {
 					return false;
