@@ -94,6 +94,11 @@ public class ModuleManager {
 				install(module.getName(), update, withDemo, false);
 			}
 		}
+		for (Module module : resolver.all()) {
+			if (!module.isRemovable() || module.isInstalled()) {
+				viewLoader.doLast(module, update);
+			}
+		}
 	}
 
 	public void updateAll(boolean withDemo) {
@@ -159,6 +164,9 @@ public class ModuleManager {
 	public void install(String moduleName, boolean update, boolean withDemo) {
 		for (Module module: resolver.resolve(moduleName)) {
 			install(module.getName(), update, withDemo, true);
+		}
+		for (Module module: resolver.resolve(moduleName)) {
+			viewLoader.doLast(module, update);
 		}
 	}
 

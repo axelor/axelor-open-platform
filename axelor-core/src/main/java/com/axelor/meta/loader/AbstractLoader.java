@@ -142,6 +142,19 @@ abstract class AbstractLoader {
 	 */
 	protected abstract void doLoad(Module module, boolean update);
 
+	/**
+	 * This method is called by the module installer as last step when loading
+	 * of all modules is complete.
+	 * 
+	 * @param module
+	 *            the module the process
+	 * @param update
+	 *            whether to update
+	 */
+	void doLast(Module module, boolean update) {
+
+	}
+
 	public final void load(Module module, boolean update) {
 		try {
 			doLoad(module, update);
