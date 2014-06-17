@@ -584,7 +584,12 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 			}
 			
 			var tab = scope.selectedTab,
+				dlg = $('[ui-editor-popup]:visible:last'),
 				vs = tab ? tab.$viewScope : null;
+
+			if (dlg.size()) {
+				vs = dlg.scope();
+			}
 			
 			if (!vs || !keys.hasOwnProperty(e.which)) {
 				return;
