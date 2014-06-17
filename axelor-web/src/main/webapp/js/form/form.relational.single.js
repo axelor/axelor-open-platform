@@ -96,6 +96,9 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 					$scope.setValue(rec, true);
 				});
 			}
+			if (value.code) {
+				record.code = value.code;
+			}
 		}
 
 		$scope.setValue(record, true);
