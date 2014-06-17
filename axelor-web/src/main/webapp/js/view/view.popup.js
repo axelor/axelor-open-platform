@@ -152,6 +152,17 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			$element.dialog('close');
 		});
 	};
+	
+	$scope.onHotKey = function (e, action) {
+		
+		if (action === "save") {
+			$scope.onOK();
+		}
+		
+		$scope.applyLater();
+		
+		return false;
+	};
 }
 
 SelectorCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewService'];
