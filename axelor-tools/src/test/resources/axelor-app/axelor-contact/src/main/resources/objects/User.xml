@@ -8,6 +8,15 @@
   <entity name="User">
     <string name="email" />
     <string name="testing" required="true"/>
+    <finder-method name="findByEmail" using="email" />
+    <extra-imports>
+    import java.io.File;
+    </extra-imports>
+    <extra-code>
+    public void doSomeThing() {
+      System.out.println("blah blah");
+    }
+    </extra-code>
   </entity>
 
 </domain-models>

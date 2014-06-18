@@ -64,7 +64,7 @@ class Entity {
 
 	private ImportManager importManager
 	
-	private String extraImports;
+	private String extraImports
 	
 	private String extraCode
 
@@ -156,6 +156,24 @@ class Entity {
 				}
 			}
 		}
+	}
+	
+	void merge(Entity other) {
+		
+		for (Property prop : other.properties) {
+			if (!propertyMap.containsKey(prop.name)) {
+				prop.entity = this
+				properties.add(prop)
+				propertyMap[prop.name] = prop;
+			}
+		}
+		
+		indexes.addAll(other.indexes)
+		constraints.addAll(other.constraints)
+		finders.addAll(other.finders)
+		
+		extraImports = extraImports?:"" + other.extraImports?:""
+		extraCode = extraCode?:"" + other.extraCode?:""
 	}
 
 	boolean addField(Property field) {
