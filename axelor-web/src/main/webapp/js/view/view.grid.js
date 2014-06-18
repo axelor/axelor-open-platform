@@ -426,13 +426,15 @@ function GridViewCtrl($scope, $element) {
 	};
 
 	$scope.onSort = function(event, args) {
+		var fields = _.pluck($scope.fields, 'name');
 		var sortBy = _.map(args.sortCols, function(column) {
 			var name = column.sortCol.field;
 			var spec = column.sortAsc ? name : '-' + name;
 			return spec;
 		});
-		return $scope.filter({
-			_sortBy: sortBy
+		ds.search({
+			sortBy: sortBy,
+			fields: fields
 		});
 	};
 
