@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.axelor.tools.x2j.pojo.Entity;
-import com.axelor.tools.x2j.pojo.Property;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
@@ -74,9 +73,7 @@ public class Extender extends Generator {
 	}
 
 	private Entity merge(Entity target, Entity source) {
-		for(Property property : source.getProperties()) {
-			target.addField(property);
-		}
+		target.merge(source);
 		return target;
 	}
 
