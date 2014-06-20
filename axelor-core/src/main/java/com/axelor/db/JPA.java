@@ -49,9 +49,11 @@ import com.axelor.db.mapper.PropertyType;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.inject.Provider;
 
@@ -305,15 +307,17 @@ public final class JPA {
 	 */
 	public static <T extends Model> T edit(Class<T> klass, Map<String, Object> values) {
 		Set<Model> visited = Sets.newHashSet();
+		Multimap<String, Long> edited = HashMultimap.create();
 		try {
-			return _edit(klass, values, visited);
+			return _edit(klass, values, visited, edited);
 		} finally {
 			visited.clear();
+			edited.clear();
 		}
 	}
 
 	@SuppressWarnings("all")
-	private static <T extends Model> T _edit(Class<T> klass, Map<String, Object> values, Set<Model> visited) {
+	private static <T extends Model> T _edit(Class<T> klass, Map<String, Object> values, Set<Model> visited, Multimap<String, Long> edited) {
 
 		if (values == null)
 			return null;
@@ -350,11 +354,15 @@ public final class JPA {
 		if (visited.contains(bean) && beanVersion == null) {
 			return bean;
 		}
+		
 		visited.add(bean);
 		
 		// don't update reference objects
-		if (id != null && beanVersion == null) {
+		if (id != null && (beanVersion == null || edited.containsEntry(klass.getName(), id))) {
 			return bean;
+		}
+		if (id != null) {
+			edited.put(klass.getName(), id);
 		}
 		
 		for (String name : values.keySet()) {
@@ -385,7 +393,7 @@ public final class JPA {
 									val = Maps.newHashMap((Map) val);
 								((Map) val).remove(p.getMappedBy());
 							}
-							Model item = _edit(target, (Map) val, visited);
+							Model item = _edit(target, (Map) val, visited, edited);
 							items.add(p.setAssociation(item, bean));
 						} else if (val instanceof Number) {
 							items.add(JPA.find(target,
@@ -424,7 +432,7 @@ public final class JPA {
 				}
 				value = items;
 			} else if (value instanceof Map) {
-				value = _edit(target, (Map) value, visited);
+				value = _edit(target, (Map) value, visited, edited);
 			}
 			Object oldValue = mapper.set(bean, name, value);
 			if (p.valueChanged(bean, oldValue)) {
@@ -434,6 +442,8 @@ public final class JPA {
 		
 		if (beanChanged) {
 			checkVersion(bean, beanVersion);
+		} else if (id != null) {
+			edited.remove(klass.getName(), id);
 		}
 		
 		return bean;

@@ -29,6 +29,14 @@ var NestedForm = {
 			
 		};
 		
+		$scope.$$forceWatch = false;
+		$scope.$$forceCounter = false;
+
+		$scope.$setForceWatch = function () {
+			$scope.$$forceWatch = true;
+			$scope.$$forceCounter = true;
+		};
+
 		$scope.registerNested($scope);
 		$scope.show();
 	}],
@@ -226,13 +234,6 @@ var NestedEditor = {
 					_.extend(record, value);
 				}
 			});
-			nested.$on('on:attrs-change:value', function (e, data) {
-				if (!nested || nested.visible || nested !== data.scope.$parent) {
-					return;
-				}
-				var value = scope.getValue() || {};
-				_.extend(value, nested.record);
-			});
 
 			var validitySet = false;
 			nested.$watch('form.$valid', function(valid, old){
@@ -242,6 +243,11 @@ var NestedEditor = {
 				validitySet = true;
 				setValidity(nested, valid);
 			});
+
+			var parentAttrs = scope.$parent.field || {};
+			if (parentAttrs.forceWatch) {
+				nested.$$forceWatch = true;
+			}
 		}
 
 		var unwatch = null;
@@ -258,8 +264,8 @@ var NestedEditor = {
 			original = angular.copy(record);
 
 			unwatch = nested.$watch('record', function(rec, old) {
-
-				if (counter++ === 0) {
+				
+				if (counter++ === 0 && !nested.$$forceCounter) {
 					return;
 				}
 

@@ -362,6 +362,8 @@ ActionHandler.prototype = {
 			return resolveLater();
 		}
 		
+		action = action.replace(/(^\s*,?\s*)|(\s*,?\s*$)/, '');
+
 		var pattern = /(^sync\s*,\s*)|(^sync$)/;
 		if (pattern.test(action)) {
 			action = action.replace(pattern, '');
@@ -622,6 +624,9 @@ ActionHandler.prototype = {
 			forEach(itemAttrs, function(value, attr){
 
 				if ((attr === "value" || attr.indexOf('value:') === 0)) {
+					if (itemScope.$setForceWatch) {
+						itemScope.$setForceWatch(true);
+					}
 					if (isDotted()) return;
 					if (itemAttrs.$hasDotted) {
 						itemAttrs.$hasDotted = false;
@@ -676,11 +681,6 @@ ActionHandler.prototype = {
 				case 'value:set':
 					if (itemScope.setValue) {
 						itemScope.setValue(value);
-						formScope.$broadcast('on:attrs-change:value', {
-							item: item,
-							scope: itemScope,
-							value: value
-						});
 					}
 					break;
 				case 'value:add':
