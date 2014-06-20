@@ -70,6 +70,9 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 				}).get();
 
 		relatives = _.unique(relatives);
+		relatives = _.filter(relatives, function (name) {
+			return !value || value[name] === undefined;
+		});
 		if (relatives.length > 0 && value && value.id) {
 			return ds.read(value.id, {
 				fields: relatives

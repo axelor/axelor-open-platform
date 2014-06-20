@@ -46,7 +46,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	};
 	
 	function doEdit(record) {
-		if (record && record.id > 0 && !record.$fetched) {
+		if (record && record.id > 0 && (!record.version || !record.$fetched)) {
 			$scope.doRead(record.id).success(function(record){
 				originalEdit(record);
 			});
