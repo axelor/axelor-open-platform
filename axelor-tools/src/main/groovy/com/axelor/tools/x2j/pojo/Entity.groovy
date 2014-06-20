@@ -121,7 +121,8 @@ class Entity {
 			} else {
 				baseClass = "com.axelor.db.Model"
 			}
-			properties.add(Property.idProperty(this));
+			propertyMap.put("id", Property.idProperty(this));
+			properties.add(propertyMap.get("id"));
 		} else {
 			if (!strategy || strategy == 'SINGLE') {
 				table = null
