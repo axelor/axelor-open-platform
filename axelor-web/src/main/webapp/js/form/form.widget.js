@@ -115,6 +115,10 @@ ui.directive('uiFormGate', function() {
 						if (parent === null) {
 							parent = element.parents('[ui-show]:first');
 						}
+						// hack for hidden nested editors (#2173)
+						if (scope.$$forceWatch) {
+							return true;
+						}
 						return !(parent.hasClass('ui-hide') || parent.hasClass('ui-hide'));
 					});
 				}
