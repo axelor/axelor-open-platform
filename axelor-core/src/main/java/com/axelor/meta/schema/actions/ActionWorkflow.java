@@ -20,7 +20,6 @@ package com.axelor.meta.schema.actions;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.meta.ActionHandler;
@@ -31,17 +30,6 @@ public class ActionWorkflow extends Action {
 	
 	public static final String className = "com.axelor.wkf.service.WorkflowService",
 			method = "run";
-	
-	@XmlAttribute
-	private String model;
-	
-	public String getModel() {
-		return model;
-	}
-	
-	public void setModel(String model) {
-		this.model = model;
-	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
@@ -58,7 +46,7 @@ public class ActionWorkflow extends Action {
 			Class<?> klass = Class.forName( className );
 			Method m = klass.getMethod( method, String.class, ActionHandler.class );
 			Object obj = handler.getInjector().getInstance(klass);
-			result.putAll( (Map) m.invoke(obj, model.trim(), handler) );
+			result.putAll( (Map) m.invoke(obj, getModel().trim(), handler) );
 			
 		} catch (Exception e) { 
 			log.error( "{}", e);
