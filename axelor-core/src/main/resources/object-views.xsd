@@ -1650,6 +1650,31 @@
       </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
+  
+  <xsd:complexType name="AbstractBaseAction">
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractAction">
+        <xsd:attribute name="model" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Fully qualified name of the model object.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="AbstractModelAction">
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractAction">
+        <xsd:attribute name="model" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>Fully qualified name of the model object.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
   <xsd:complexType name="AbstractAct" abstract="true">
     <xsd:attribute name="if" type="xsd:string">
       <xsd:annotation>
@@ -1788,7 +1813,7 @@
 
   <xsd:complexType name="ActionValidate">
     <xsd:complexContent>
-      <xsd:extension base="tns:AbstractAction">
+      <xsd:extension base="tns:AbstractBaseAction">
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="error" type="tns:ActMessage" />
           <xsd:element name="alert" type="tns:ActMessage" />
@@ -1801,19 +1826,10 @@
 
   <xsd:complexType name="ActionRecord">
     <xsd:complexContent>
-      <xsd:extension base="tns:AbstractAction">
+      <xsd:extension base="tns:AbstractModelAction">
         <xsd:sequence>
           <xsd:element name="field" type="tns:ActField" maxOccurs="unbounded" />
         </xsd:sequence>
-        <xsd:attribute name="model" type="xsd:string" use="required">
-          <xsd:annotation>
-            <xsd:documentation>
-              The fully qualified class name of the entity type.
-              Should be provided when creating
-              default value record.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="search" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
@@ -1853,7 +1869,7 @@
 
   <xsd:complexType name="ActionAttrs">
     <xsd:complexContent>
-      <xsd:extension base="tns:AbstractAction">
+      <xsd:extension base="tns:AbstractBaseAction">
         <xsd:sequence>
           <xsd:element name="attribute" type="tns:ActAttribute" maxOccurs="unbounded" />
         </xsd:sequence>
@@ -1863,7 +1879,7 @@
 
   <xsd:complexType name="ActionMethod">
     <xsd:complexContent>
-      <xsd:extension base="tns:AbstractAction">
+      <xsd:extension base="tns:AbstractBaseAction">
         <xsd:sequence>
           <xsd:element name="call" type="tns:ActCall">
             <xsd:annotation>
@@ -1887,7 +1903,7 @@
 
   <xsd:complexType name="ActionView">
     <xsd:complexContent>
-      <xsd:extension base="tns:AbstractAction">
+      <xsd:extension base="tns:AbstractBaseAction">
         <xsd:sequence>
           <xsd:element name="view" type="tns:ActView" minOccurs="0" maxOccurs="unbounded" />
           <xsd:element name="view-param" minOccurs="0" maxOccurs="unbounded">
@@ -1926,14 +1942,6 @@
             <xsd:documentation>Path of the image.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="model" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>
-              If this is an object view action then provide the fully qualified name of the object
-              model.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1949,7 +1957,7 @@
       </xsd:documentation>
     </xsd:annotation>
     <xsd:complexContent>
-      <xsd:extension base="tns:AbstractAction">
+      <xsd:extension base="tns:AbstractBaseAction">
         <xsd:sequence>
           <xsd:element name="action" maxOccurs="unbounded">
             <xsd:complexType>
@@ -2009,7 +2017,7 @@
       </xsd:documentation>
     </xsd:annotation>
     <xsd:complexContent>
-      <xsd:extension base="tns:AbstractAction">
+      <xsd:extension base="tns:AbstractBaseAction">
         <xsd:sequence>
           <xsd:element name="import" maxOccurs="unbounded">
             <xsd:complexType>
@@ -2049,7 +2057,7 @@
 
   <xsd:complexType name="ActionExport">
     <xsd:complexContent>
-      <xsd:extension base="tns:AbstractAction">
+      <xsd:extension base="tns:AbstractBaseAction">
         <xsd:sequence>
           <xsd:element name="export" maxOccurs="unbounded">
             <xsd:annotation>
@@ -2106,7 +2114,7 @@
       </xsd:documentation>
     </xsd:annotation>
     <xsd:complexContent>
-      <xsd:extension base="tns:AbstractAction">
+      <xsd:extension base="tns:AbstractBaseAction">
         <xsd:sequence>
           <xsd:element name="check" maxOccurs="unbounded">
             <xsd:annotation>
@@ -2146,7 +2154,7 @@
 
   <xsd:complexType name="ActionGroup">
     <xsd:complexContent>
-      <xsd:extension base="tns:AbstractAction">
+      <xsd:extension base="tns:AbstractBaseAction">
         <xsd:sequence>
           <xsd:element name="action" type="tns:ActAction" maxOccurs="unbounded" />
         </xsd:sequence>
@@ -2156,17 +2164,7 @@
 
   <xsd:complexType name="ActionWorkflow">
     <xsd:complexContent>
-      <xsd:extension base="tns:AbstractAction">
-        <xsd:attribute name="model" type="xsd:string" use="required">
-          <xsd:annotation>
-            <xsd:documentation>
-              The fully qualified class name of the entity type.
-              Should be provided when creating
-              default value record.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-      </xsd:extension>
+      <xsd:extension base="tns:AbstractModelAction"></xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
 

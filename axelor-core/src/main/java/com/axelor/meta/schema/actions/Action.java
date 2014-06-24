@@ -37,6 +37,9 @@ public abstract class Action {
 	@XmlAttribute
 	private String name;
 	
+	@XmlAttribute
+	private String model;
+	
 	public String getName() {
 		return name;
 	}
@@ -45,6 +48,14 @@ public abstract class Action {
 		this.name = name;
 	}
 	
+	public String getModel() {
+		return model;
+	}
+	
+	public void setModel(String model) {
+		this.model = model;
+	}
+
 	public abstract Object wrap(ActionHandler handler);
 	
 	public abstract Object evaluate(ActionHandler handler);

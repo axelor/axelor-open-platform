@@ -88,9 +88,6 @@ public class ActionView extends Action {
 	@XmlAttribute
 	private String icon;
 
-	@XmlAttribute
-	private String model;
-
 	@XmlElement
 	private String domain;
 
@@ -115,10 +112,6 @@ public class ActionView extends Action {
 
 	public String getIcon() {
 		return icon;
-	}
-
-	public String getModel() {
-		return model;
 	}
 
 	public String getDomain() {
@@ -259,7 +252,7 @@ public class ActionView extends Action {
 		}
 
 		public ActionViewBuilder model(String model) {
-			view.model = model;
+			view.setModel(model);
 			return this;
 		}
 		
@@ -351,7 +344,7 @@ public class ActionView extends Action {
 
 			result.put("title", view.title);
 			result.put("icon", view.icon);
-			result.put("model", view.model);
+			result.put("model", view.getModel());
 			result.put("viewType", type);
 			result.put("views", items);
 			result.put("domain", view.domain);

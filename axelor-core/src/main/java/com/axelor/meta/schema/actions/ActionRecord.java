@@ -50,9 +50,6 @@ public class ActionRecord extends Action {
 	}
 	
 	@XmlAttribute
-	private String model;
-	
-	@XmlAttribute
 	private String search;
 	
 	@XmlAttribute
@@ -66,14 +63,6 @@ public class ActionRecord extends Action {
 	
 	@XmlElement(name = "field")
 	private List<RecordField> fields;
-	
-	public String getModel() {
-		return model;
-	}
-	
-	public void setModel(String model) {
-		this.model = model;
-	}
 	
 	public String getSearch() {
 		return search;
@@ -131,7 +120,7 @@ public class ActionRecord extends Action {
 	
 	private Object _evaluate(final ActionHandler handler, final Map<String, Object> map) {
 		
-		final Class<?> entityClass = findClass(model);
+		final Class<?> entityClass = findClass(getModel());
 		if (ref != null) {
 			Object result = handler.evaluate(ref);
 			if (result != null) {
