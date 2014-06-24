@@ -250,9 +250,14 @@ public class Resource<T extends Model> {
 		} else if (filter != null) {
 			query = filter.build(model);
 		}
+		
+		List<String> sortBy = getSortBy(request);
 
-		for(String sortBy : getSortBy(request)) {
-			query = query.order(sortBy);
+		if (!sortBy.contains("id") || !sortBy.contains("-id")) {
+			sortBy.add("id");
+		}
+		for(String spec : sortBy) {
+			query = query.order(spec);
 		}
 
 		return query;
