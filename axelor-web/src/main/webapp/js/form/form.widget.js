@@ -192,11 +192,14 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 	}
 	
 	function withContext(scope, record) {
-		var values = record;
+		var values = _.extend({}, record);
 		if (scope._context) {
 			values = _.extend({}, scope._context, values);
 		}
-		return values;
+		return _.extend(values, {
+			$user: __appSettings['user.login'],
+			$group: __appSettings['user.group']
+		});
 	}
 	
 	function handleCondition(scope, field, attr, condition, negative) {
