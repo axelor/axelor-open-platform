@@ -60,6 +60,7 @@ public final class AppInfo {
 			if (group != null) {
 				map.put("user.navigator", group.getNavigation());
 				map.put("user.technical", group.getTechnicalStaff());
+				map.put("user.group", group.getCode());
 			}
 			map.put("user.lang", user.getLanguage());
 			map.put("user.action", user.getHomeAction());
