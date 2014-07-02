@@ -1,0 +1,37 @@
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply from: '../libs.gradle'
+
+repositories {
+	jcenter()
+	mavenCentral()
+	mavenLocal()
+	maven {
+		name "axelor-nexus"
+		url	"http://repository.axelor.com/nexus/content/groups/public/"
+	}
+}
+
+dependencies {
+
+	testCompile	libs.junit
+
+	compile gradleApi()
+
+	compile libs.groovy
+	compile	libs.slf4j
+	compile	libs.guava
+	compile libs.opencsv
+
+	// TODO: replace inlfection used from jersey server with axelor-common
+	compile libs.jersey_server
+	compile "com.axelor:axelor-common:2.0.0-SNAPSHOT"
+	compile 'org.gradle.api.plugins:gradle-tomcat-plugin:1.2.4'
+}
+
+sourceSets {
+	main {
+		java.srcDirs = []
+		groovy.srcDirs = ['src/main']
+	}
+}

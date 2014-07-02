@@ -1,0 +1,27 @@
+apply plugin: "axelor-module"
+
+module {
+	name "axelor-test"
+	title "Axelor :: Test"
+}
+
+dependencies {
+
+	compile libs.junit
+	compile libs.slf4j
+	
+	compile	libs.guice
+	compile libs.guice_servlet
+	compile libs.guice_persist
+
+	compile libs.jdbc_hsqldb
+	compile libs.jdbc_postgres
+	compile libs.hibernate
+
+	compile libs.javax_el
+	
+	compile libs.jersey_server
+	compile libs.jersey_client
+	compile libs.jersey_guice
+	compile libs.jersey_test
+}
