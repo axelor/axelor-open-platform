@@ -34,42 +34,15 @@ public class Extender extends Generator {
 
 	private static final String OBJECT_PATH = "src/main/resources/objects";
 
-	private  File projectPath;
+	private List<File> modulePaths;
 
-	public Extender(File base, File target, String project) {
+	public Extender(File base, File target, List<File> modulePaths) {
 		super(base, target);
-		this.target = this.file(base, project, target.getName());
-		this.outputPath = this.file(this.target, OUTPUT_PATH);
-		this.projectPath = this.file(base, project);
+		this.modulePaths = modulePaths;
 	}
 
-	private List<String> modules() {
-		final File props = this.file(outputPath, "modules.txt");
-		final File basePom = this.file(base, "pom.xml");
-		try {
-			if (props.lastModified() > basePom.lastModified()) {
-				return Files.readLines(props, Charsets.UTF_8);
-			}
-		} catch (Exception e) {
-		}
-
-		if (!basePom.exists()) {
-			return Lists.newArrayList();
-		}
-
-		final List<String> all = XmlHelper.modules(basePom);
-		try {
-			Files.write(Joiner.on("\n").join(all), props, Charsets.UTF_8);
-		} catch (Exception e) {
-		}
-
-		return all;
-	}
-
-	private boolean hasAggregator() {
-		final File basePom = this.file(base, "pom.xml");
-		final File thisPom = this.file(projectPath, "pom.xml");
-		return basePom.exists() && thisPom.exists();
+	public Extender(String base, String target, List<File> modulePaths) {
+		this(new File(base), new File(target), modulePaths);
 	}
 
 	private Entity merge(Entity target, Entity source) {
@@ -104,16 +77,24 @@ public class Extender extends Generator {
 	@Override
 	public void start() throws IOException {
 
-		if (!hasAggregator()) {
-			return;
-		}
-
 		Map<String, List<File>> all = Maps.newHashMap();
+		List<File> searchPaths = Lists.newArrayList();
 
-		for (String module : modules()) {
-			File path = this.file(base, module, OBJECT_PATH);
-			if (!path.exists()) continue;
-			for (File input : path.listFiles()) {
+		searchPaths.addAll(modulePaths);
+		searchPaths.add(this.base);
+
+		for (File searchPath : searchPaths) {
+			List<File> found = Lists.newArrayList();
+			File path = this.file(searchPath, OBJECT_PATH);
+			if (path.exists()) {
+				found.addAll(Lists.newArrayList(path.listFiles()));
+			}
+			path = this.file(searchPath, DOMAIN_PATH);
+			if (path.exists()) {
+				found.addAll(Lists.newArrayList(path.listFiles()));
+			}
+			if (found.isEmpty()) continue;
+			for (File input : found) {
 				List<File> set = all.get(input.getName());
 				if (set == null) {
 					set = Lists.newArrayList();

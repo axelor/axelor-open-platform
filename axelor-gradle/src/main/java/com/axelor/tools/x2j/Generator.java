@@ -67,7 +67,7 @@ public class Generator {
 
 		//TODO: check before parsing
 		if (input.lastModified() < output.lastModified()) {
-			return;
+			//XXX: return;
 		}
 
 		output.getParentFile().mkdirs();
