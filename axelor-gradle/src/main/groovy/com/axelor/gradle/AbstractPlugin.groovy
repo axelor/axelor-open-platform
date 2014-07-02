@@ -1,5 +1,7 @@
 package com.axelor.gradle
 
+import com.axelor.gradle.tasks.I18nTask
+
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -29,6 +31,10 @@ abstract class AbstractPlugin implements Plugin<Project> {
 			dependencies {
 				compile libs.slf4j
 				testCompile	libs.junit
+			}
+
+			task('i18n-extract', type: I18nTask) {
+
 			}
 
 			afterEvaluate {
