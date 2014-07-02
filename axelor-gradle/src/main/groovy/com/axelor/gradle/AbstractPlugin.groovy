@@ -1,0 +1,63 @@
+package com.axelor.gradle
+
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+
+abstract class AbstractPlugin implements Plugin<Project> {
+    
+	protected void applyCommon(Project project, AbstractDefinition definition) {
+
+		project.configure(project) {
+
+			apply plugin: 'java'
+
+			apply from: rootDir.path + '/core/libs.gradle'
+
+			sourceCompatibility = 1.7
+			targetCompatibility = 1.7
+
+			repositories {
+				jcenter()
+				mavenCentral()
+				mavenLocal()
+				maven {
+					name "axelor-nexus"
+					url	"http://repository.axelor.com/nexus/content/groups/public/"
+				}
+			}
+
+			dependencies {
+				compile libs.slf4j
+				testCompile	libs.junit
+			}
+
+			afterEvaluate {
+	
+				// add module dependency
+				definition.modules.each { module ->
+					dependencies {
+						compile project.project(":${module}")
+					}
+                }
+
+				// force groovy compiler
+				if (plugins.hasPlugin("groovy")) {
+					sourceSets {
+						main {
+							java.srcDirs = []
+							groovy.srcDirs = ['src/main', rootDir.path + '/build/src-gen']
+						}
+						test {
+							java.srcDirs = []
+							groovy.srcDirs = ['src/main', rootDir.path + '/build/src-gen']
+						}
+					}
+				}
+
+				// add generated source/classes to compile classpath
+				sourceSets.main.compileClasspath += files([rootDir.path + '/build/src-gen'])
+				sourceSets.main.compileClasspath += files([rootDir.path + '/build/classes/main'])
+            }
+		}
+	}
+}
