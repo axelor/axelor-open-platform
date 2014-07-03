@@ -4,7 +4,6 @@ module {
 	name "axelor-web"
 	title "Axelor :: Web"
 
-	module "core:axelor-core"
 	module "core:axelor-wkf"
 }
 

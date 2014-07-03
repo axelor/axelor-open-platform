@@ -5,38 +5,20 @@ import org.gradle.api.Project
 
 import com.axelor.gradle.tasks.GenerateCode
 
-class ModulePlugin extends AbstractPlugin {
+class ModulePlugin extends BasePlugin {
 
 	void apply(Project project) {
-        
+
+		super.apply(project)
+
 		project.configure(project) {
 
-			def definition = extensions.create("module", ModuleDefinition)
-
-			applyCommon(project, definition)
-
-			ext.isModule = true
-
-			// add code generation tasl
-			task("generateCode", type: GenerateCode) {
-				base = project.projectDir
-				target = rootProject.buildDir
+			// add dependency to some base modules
+			afterEvaluate {
+				dependencies {
+					compile project.project(":core:axelor-core")
+				}
 			}
-
-			compileJava.dependsOn "generateCode"
-
-			// don't include class & webapp files in jar
-			jar {
-				exclude(['**/*.class', 'webapp'])
-				includeEmptyDirs = false
-			}
-
-			task("copyClasses", type: org.gradle.api.tasks.Copy) {
-				from "${buildDir}/classes"
-				into "${rootProject.buildDir}/classes"
-			}
-
-			jar.dependsOn "copyClasses"	
         }
     }
 }
