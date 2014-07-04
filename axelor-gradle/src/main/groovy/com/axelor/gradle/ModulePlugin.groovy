@@ -12,11 +12,11 @@ class ModulePlugin extends BasePlugin {
 		super.apply(project)
 
 		project.configure(project) {
-
-			// add dependency to some base modules
+			// add some common dependencies
 			afterEvaluate {
 				dependencies {
 					compile project.project(":core:axelor-core")
+					testCompile project.project(":core:axelor-test")
 				}
 			}
         }
