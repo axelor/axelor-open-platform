@@ -1,16 +1,8 @@
 apply plugin: 'java'
 apply plugin: 'groovy'
-apply from: '../libs.gradle'
 
-repositories {
-	jcenter()
-	mavenCentral()
-	mavenLocal()
-	maven {
-		name "axelor-nexus"
-		url	"http://repository.axelor.com/nexus/content/groups/public/"
-	}
-}
+apply from: '../libs.gradle'
+apply from: '../repo.gradle'
 
 dependencies {
 

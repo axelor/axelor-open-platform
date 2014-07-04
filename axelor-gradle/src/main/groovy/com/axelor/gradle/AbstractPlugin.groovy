@@ -14,19 +14,10 @@ abstract class AbstractPlugin implements Plugin<Project> {
 			apply plugin: 'java'
 
 			apply from: rootDir.path + '/core/libs.gradle'
+			apply from: rootDir.path + '/core/repo.gradle'
 
 			sourceCompatibility = 1.7
 			targetCompatibility = 1.7
-
-			repositories {
-				jcenter()
-				mavenCentral()
-				mavenLocal()
-				maven {
-					name "axelor-nexus"
-					url	"http://repository.axelor.com/nexus/content/groups/public/"
-				}
-			}
 
 			dependencies {
 				compile libs.slf4j
