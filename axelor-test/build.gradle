@@ -5,6 +5,8 @@ module {
 	title "Axelor :: Test"
 }
 
+ext.useSrcGen = false
+
 dependencies {
 
 	compile libs.junit

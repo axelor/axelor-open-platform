@@ -5,6 +5,8 @@ module {
 	title "Axelor :: Common"
 }
 
+ext.useSrcGen = false
+
 dependencies {
 	compile libs.guava
 	compile libs.axelor_cglib

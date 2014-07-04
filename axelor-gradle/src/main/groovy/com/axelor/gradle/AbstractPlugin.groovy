@@ -12,6 +12,8 @@ abstract class AbstractPlugin implements Plugin<Project> {
 		project.configure(project) {
 
 			apply plugin: 'java'
+			apply plugin: 'groovy'
+			apply plugin: 'eclipse'
 
 			apply from: rootDir.path + '/core/libs.gradle'
 			apply from: rootDir.path + '/core/repo.gradle'
@@ -28,25 +30,60 @@ abstract class AbstractPlugin implements Plugin<Project> {
 
 			}
 
+			tasks.eclipse.dependsOn "cleanEclipse"
+
+			eclipse {
+				classpath {
+					defaultOutputDir = file("${buildDir}/eclipse")
+				}
+			}
+
 			afterEvaluate {
 	
+				def useSrcGen = true
+				try {
+					useSrcGen = project.useSrcGen
+				} catch (Exception e) {}
+
 				// add module dependency
 				definition.modules.each { module ->
 					dependencies {
 						compile project.project(":${module}")
 					}
                 }
+				
+				// add src-gen as source directory
+				if (useSrcGen) {
+					sourceSets {
+						main {
+							java {
+								srcDir "${rootDir}/build/src-gen"
+							}
+						}
+					}
+				}
 
 				// force groovy compiler
 				if (plugins.hasPlugin("groovy")) {
 					sourceSets {
 						main {
-							java.srcDirs = []
-							groovy.srcDirs = ['src/main', rootDir.path + '/build/src-gen']
+							java {
+								srcDirs = []
+							}
+							groovy {
+								srcDirs = ["src/main/java", "src/main/groovy"]
+								if (useSrcGen) {
+									srcDir "${rootDir}/build/src-gen"
+								}
+							}
 						}
 						test {
-							java.srcDirs = []
-							groovy.srcDirs = ['src/main', rootDir.path + '/build/src-gen']
+							java {
+								srcDirs = []
+							}
+							groovy {
+								srcDirs = ["src/test/java", "src/test/groovy"]
+							}
 						}
 					}
 				}
