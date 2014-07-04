@@ -23,6 +23,7 @@ abstract class AbstractPlugin implements Plugin<Project> {
 
 			dependencies {
 				compile libs.slf4j
+				compile libs.groovy
 				testCompile	libs.junit
 			}
 
