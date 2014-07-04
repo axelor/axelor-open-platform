@@ -6,6 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.wrapper.Wrapper
 
 class AppPlugin extends AbstractPlugin {
     
@@ -19,6 +20,11 @@ class AppPlugin extends AbstractPlugin {
             def definition = extensions.create("application", AppDefinition)
 
 			applyCommon(project, definition)
+
+			// define wrapper task with proper gradle version
+			task("wrapper", type: Wrapper) {
+				gradleVersion = '2.0'
+			}
 
 			dependencies {
 
