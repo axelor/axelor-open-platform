@@ -15,12 +15,6 @@ class GenerateCode extends DefaultTask {
 
 	List<String> IGNORE = ["axelor-common", "axelor-test"]
 
-	@TaskAction
-	def generate() {
-		generateInfo()
-		generateCode()
-	}
-
 	def findAllModules(Project project, Set<Project> found) {
 		def name = project.name
 		if (found == null) {
@@ -31,7 +25,7 @@ class GenerateCode extends DefaultTask {
 		}
 		project.configurations.compile.allDependencies.withType(ProjectDependency).each {
 			def dep = it.dependencyProject
-			if (!found.contains(dep) && !IGNORE.contains(dep.name)) {
+			if (!found.contains(dep) && !IGNORE.contains(dep.name) && dep.isModule) {
 				found.add(dep)
 				findAllModules(dep, found)
 			}
@@ -39,15 +33,22 @@ class GenerateCode extends DefaultTask {
 		return found
 	}
 
-	def generateCode() {
-		
-		def definition = project.extensions.findByName("module")
-		def generator = new Generator(base, target)
+	@TaskAction
+	def generate() {
+		generateCode("module")
+		generateCode("application")
+	}
 
-		if (IGNORE.contains(definition.name)) {
+	def generateCode(String extension) {
+
+		def definition = project.extensions.findByName(extension)
+		if (definition == null || IGNORE.contains(definition.name)) {
 			return
 		}
 
+		generateInfo(extension)
+
+		def generator = new Generator(base, target)
 		generator.start()
 
 		def objects = new File(project.projectDir, "src/main/resources/objects")
@@ -58,9 +59,13 @@ class GenerateCode extends DefaultTask {
 		}
 	}
 
-	def generateInfo() {
+	def generateInfo(String extension) {
 		
-		def definition = project.extensions.findByName("module")
+		def definition = project.extensions.findByName(extension)
+		if (definition == null) {
+			return
+		}
+
 		def outputPath = new File(project.buildDir, "resources/main/module.properties")
 		try {
 			outputPath.parentFile.mkdirs()
@@ -74,12 +79,15 @@ class GenerateCode extends DefaultTask {
 			
 			def desc = (definition.description?:"").replaceAll("\n", "\\\n")
 			def deps = []
+			def removable = false
 
-			project.configurations.compile.allDependencies.withType(ProjectDependency).each {
-				def dep = it.dependencyProject
-				if (dep.isModule && !IGNORE.contains(dep.name)) {
-					deps += "\t" + dep.name
-				}
+			try {
+				removable = definition.removable
+			} catch (Exception e) {
+			}
+
+			findAllModules(project, null).each {
+				deps += "\t" + it.name
 			}
 
 			out << """\
@@ -89,8 +97,15 @@ version = ${project.version}
 title = ${definition.title?:""}
 description = ${definition.description?:""}
 
+"""
+			if (removable) {
+				out << """\
 removable = ${definition.removable == true}
 
+"""
+			}
+
+			out << """\
 depends = \\
 ${deps.join("\\\n")}
 """

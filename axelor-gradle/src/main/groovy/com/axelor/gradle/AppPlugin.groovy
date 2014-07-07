@@ -8,6 +8,8 @@ import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.wrapper.Wrapper
 
+import com.axelor.gradle.tasks.GenerateCode
+
 class AppPlugin extends AbstractPlugin {
     
 	void apply(Project project) {
@@ -25,6 +27,14 @@ class AppPlugin extends AbstractPlugin {
 			task("wrapper", type: Wrapper) {
 				gradleVersion = '2.0'
 			}
+
+			// add code generation tasl
+			task("generateCode", type: GenerateCode) {
+				base = project.projectDir
+				target = rootProject.buildDir
+			}
+
+			compileJava.dependsOn "generateCode"
 
 			dependencies {
 
