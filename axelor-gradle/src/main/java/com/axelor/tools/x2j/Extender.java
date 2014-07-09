@@ -23,12 +23,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.axelor.tools.x2j.pojo.Entity;
-import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.io.Files;
 
 public class Extender extends Generator {
 
