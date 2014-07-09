@@ -20,6 +20,7 @@ package com.axelor.tools.x2j;
 import java.io.File;
 import java.io.IOException;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.tools.x2j.pojo.Entity;
@@ -33,7 +34,7 @@ public class Generator {
 
 	static final String OUTPUT_PATH = "src-gen";
 
-	protected Log log = new Log(LoggerFactory.getLogger(getClass()));
+	protected Logger log = LoggerFactory.getLogger(getClass());
 
 	protected File domainPath;
 
@@ -50,10 +51,6 @@ public class Generator {
 
 	public Generator(String base, String target) {
 		this(new File(base), new File(target));
-	}
-
-	public Log getLog() {
-		return log;
 	}
 
 	protected File file(File base, String... parts) {
