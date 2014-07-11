@@ -142,6 +142,7 @@ public class Generator {
 	}
 
 	private void processAll(boolean verbose) throws IOException {
+		if (!domainPath.exists()) return;
 		for (File file : domainPath.listFiles()) {
 			if (file.getName().endsWith(".xml")) {
 				process(file, verbose);
