@@ -4,6 +4,11 @@ apply plugin: "eclipse"
 apply from: "../repo.gradle"
 apply from: "../libs.gradle"
 
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+version 2.0
+
 dependencies {
 
 	testCompile libs.junit
