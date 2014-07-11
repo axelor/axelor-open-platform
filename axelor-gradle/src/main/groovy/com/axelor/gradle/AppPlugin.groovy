@@ -23,16 +23,6 @@ class AppPlugin extends AbstractPlugin {
 
 			applyCommon(project, definition)
 
-			// define wrapper task with proper gradle version
-			task("wrapper", type: Wrapper) {
-				gradleVersion = '2.0'
-			}
-
-			// add code generation tasl
-			task("generateCode", type: GenerateCode)
-
-			compileJava.dependsOn "generateCode"
-
 			dependencies {
 
 				testCompile owner.project(":core:axelor-test")
@@ -49,14 +39,57 @@ class AppPlugin extends AbstractPlugin {
 					exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
 				}
 			}
-
+			
             afterEvaluate {
+				
+				def self = owner
 				owner.version definition.version
 				owner.subprojects {
-					version definition.version 
+					version definition.version
+					afterEvaluate {
+						try {
+							self.tasks.copyClasses.dependsOn tasks.generateCode
+						} catch (Exception e){}
+					}
 				}
             }
 
+			// define wrapper task with proper gradle version
+			task("wrapper", type: Wrapper) {
+				gradleVersion = '2.0'
+			}
+			
+			task("generateCode", type: GenerateCode)
+
+			
+			def genCard = [:]
+			def genPath = [:]
+
+			ext.classGenerated = { String name, String path, int cardinality ->
+				if (cardinality < 2) return
+				def n = genCard[name]
+				if (n == null || n < cardinality) {
+					genCard[name] = cardinality
+					genPath[name] = path
+				}
+			}
+
+			task("copyClasses", dependsOn: "generateCode") << {
+				genPath.each {
+					def source = it.value
+					def output = source.substring(source.indexOf('src-gen') + 8)
+					
+					output = "${buildDir}/src-gen/${output}"
+					
+					copy {
+						from file(source)
+						into file(output).parent
+					}
+				}
+			}
+			
+			compileJava.dependsOn "copyClasses"
+			
 			def webappDir = "${rootProject.buildDir}/webapp"
 
 			// copy webapp to root build dir
