@@ -11,15 +11,14 @@ dependencies {
 
 	compile gradleApi()
 
-	compile libs.groovy
-	compile	libs.slf4j
 	compile	libs.guava
 	compile libs.opencsv
 
 	// TODO: replace inlfection used from jersey server with axelor-common
 	compile libs.jersey_server
-	compile "com.axelor:axelor-common:2.0.0-SNAPSHOT"
-	compile 'org.gradle.api.plugins:gradle-tomcat-plugin:1.2.4'
+	compile ("com.axelor:axelor-common:2.0.0-SNAPSHOT") {
+		exclude module: "slf4j-log4j12"
+	}
 }
 
 sourceSets {
