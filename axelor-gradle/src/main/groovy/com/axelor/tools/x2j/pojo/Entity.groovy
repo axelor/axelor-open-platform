@@ -32,6 +32,8 @@ class Entity {
 
 	String namespace
 	
+	transient long lastModified
+
 	private String interfaces
 
 	String baseClass

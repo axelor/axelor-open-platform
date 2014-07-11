@@ -19,6 +19,9 @@ package com.axelor.tools.x2j;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,47 +29,76 @@ import org.slf4j.LoggerFactory;
 import com.axelor.tools.x2j.pojo.Entity;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
 
 public class Generator {
 
-	static final String DOMAIN_PATH = "src/main/resources/domains";
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	static final String OUTPUT_PATH = "src-gen";
+	private File domainPath;
 
-	protected Logger log = LoggerFactory.getLogger(getClass());
+	private File outputPath;
 
-	protected File domainPath;
+	private final Multimap<String, Entity> lookup = LinkedHashMultimap.create();
+	private final Multimap<String, Entity> entities = LinkedHashMultimap.create();
 
-	protected File outputPath;
-
-	protected File base;
-	protected File target;
-
-	public Generator(File base, File target) {
-		this.base = base;
-		this.domainPath = this.file(base, DOMAIN_PATH);
-		this.outputPath = this.file(target, OUTPUT_PATH);
+	public Generator(File domainPath, File outputPath) {
+		this.domainPath = domainPath;
+		this.outputPath = outputPath;
 	}
 
-	public Generator(String base, String target) {
-		this(new File(base), new File(target));
-	}
-
-	protected File file(File base, String... parts) {
+	private File file(File base, String... parts) {
 		return new File(base.getPath() + "/" + Joiner.on("/").join(parts));
 	}
 
-	protected void expand(File input, File outputPath, Entity entity) throws IOException {
+	private void expand(Collection<Entity> items) throws IOException {
 
-		File output = this.file(outputPath, entity.getFile());
-		String fileName = output.getPath();
-
-		//TODO: check before parsing
-		if (input.lastModified() < output.lastModified()) {
-			//XXX: return;
+		if (items == null || items.isEmpty()) {
+			return;
 		}
 
+		final List<Entity> all = new ArrayList<>(items);
+		final Entity first = all.get(0);
+
+		final String ns = first.getNamespace();
+		final String name = first.getName();
+
+		// prepend all lookup entities
+		if (lookup.get(name) != null) {
+			all.addAll(0, lookup.get(name));
+		}
+		
+		// check that all entities have same namespace
+		for (Entity it : all) {
+			if (!ns.equals(it.getNamespace())) {
+				throw new IllegalArgumentException(String.format(
+						"Invalid namespace: %s.%s != %s.%s", ns, name,
+						it.getNamespace(), name));
+			}
+		}
+
+		final Entity entity = all.remove(0);
+		final File output = this.file(outputPath, entity.getFile());
+		final String fileName = output.getPath();
+		
+		long lastModified = entity.getLastModified();
+		
+		for (Entity it : all) {
+			if (lastModified < it.getLastModified()) {
+				lastModified = it.getLastModified();
+			}
+		}
+		
+		if (lastModified < output.lastModified()) {
+			return;
+		}
+		
+		for (Entity it : all) {
+			entity.merge(it);
+		}
+		
 		output.getParentFile().mkdirs();
 
 		String[] existing = {
@@ -74,8 +106,8 @@ public class Generator {
 			entity.getName() + ".groovy"
 		};
 
-		for (String name : existing) {
-			File ex = this.file(output.getParentFile(), name);
+		for (String fname : existing) {
+			File ex = this.file(output.getParentFile(), fname);
 			if (ex.exists()) {
 				ex.delete();
 			}
@@ -88,12 +120,15 @@ public class Generator {
 		Files.write(code, output, Charsets.UTF_8);
 	}
 
-	protected void process(File input, File outputPath) throws IOException {
-
-		log.info("Processing: " + input);
-
-		for (Entity it : XmlHelper.entities(input)) {
-			expand(input, outputPath, it);
+	private void process(File input, boolean verbose) throws IOException {
+		
+		if (verbose) {
+			log.info("Processing: " + input);
+		}
+		
+		for (Entity entity : XmlHelper.entities(input)) {
+			entity.setLastModified(input.lastModified());
+			entities.put(entity.getName(), entity);
 		}
 	}
 
@@ -106,6 +141,22 @@ public class Generator {
 		file.delete();
 	}
 
+	private void processAll(boolean verbose) throws IOException {
+		for (File file : domainPath.listFiles()) {
+			if (file.getName().endsWith(".xml")) {
+				process(file, verbose);
+			}
+		}
+	}
+	
+	public void addLookupSource(Generator generator) throws IOException {
+		if (generator == null) return;
+		if (generator.entities.isEmpty()) {
+			generator.processAll(false);
+		}
+		lookup.putAll(generator.entities);
+	}
+	
 	public void clean() {
 
 		if (!this.outputPath.exists()) return;
@@ -130,8 +181,12 @@ public class Generator {
 
 		for (File file : domainPath.listFiles()) {
 			if (file.getName().endsWith(".xml")) {
-				process(file, outputPath);
+				process(file, true);
 			}
+		}
+		
+		for (String name : entities.keySet()) {
+			expand(entities.get(name));
 		}
 	}
 }

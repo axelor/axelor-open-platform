@@ -22,9 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import com.axelor.tools.x2j.Extender;
 import com.axelor.tools.x2j.Generator;
 
 public class X2JTest {
@@ -33,25 +31,20 @@ public class X2JTest {
 		return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
 	}
 
-	//@Test
+	@Test
 	public void testDomains() throws IOException {
-		Generator gen = new Generator(
-				"src/test/resources/axelor-app/axelor-contact",
-				"src/test/resources/axelor-app/axelor-contact/target");
-		gen.clean();
-		gen.start();
-	}
 
-	//@Test
-	public void testObjects() throws IOException {
+		File domainPath = new File("src/test/resources/domains");
+		File outputPath = new File("build/src-gen");
 
-		String base = "src/test/resources/axelor-app";
-		String target = "src/test/resources/axelor-app/axelor-objects/target";
+		Generator gen = new Generator(domainPath, outputPath);
+		
+		// add lookup source
+		domainPath = new File("src/test/resources/search");
+		Generator lookup = new Generator(domainPath, outputPath);
+		
+		gen.addLookupSource(lookup);
 
-		File basePath = new File(base);
-		File targetPath = new File(target);
-
-		Extender gen = new Extender(basePath, targetPath, null);
 		gen.clean();
 		gen.start();
 	}
