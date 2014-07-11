@@ -43,6 +43,8 @@ public class Generator {
 
 	private final Multimap<String, Entity> lookup = LinkedHashMultimap.create();
 	private final Multimap<String, Entity> entities = LinkedHashMultimap.create();
+	
+	private final List<GeneratorListener> listeners = new ArrayList<>();
 
 	public Generator(File domainPath, File outputPath) {
 		this.domainPath = domainPath;
@@ -118,6 +120,10 @@ public class Generator {
 		String code = Expander.expand(entity);
 
 		Files.write(code, output, Charsets.UTF_8);
+		
+		for (GeneratorListener listener : listeners) {
+			listener.onGenerate(name, output.getAbsolutePath(), all.size() + 1);
+		}
 	}
 
 	private void process(File input, boolean verbose) throws IOException {
@@ -148,6 +154,10 @@ public class Generator {
 				process(file, verbose);
 			}
 		}
+	}
+	
+	public void addListener(GeneratorListener listener) {
+		listeners.add(listener);
 	}
 	
 	public void addLookupSource(Generator generator) throws IOException {
