@@ -1,13 +1,13 @@
-apply plugin: "axelor-base"
+apply plugin: "java"
+apply plugin: "eclipse"
 
-module {
-	name "axelor-common"
-	title "Axelor :: Common"
-}
-
-ext.useSrcGen = false
+apply from: "../repo.gradle"
+apply from: "../libs.gradle"
 
 dependencies {
+
+	testCompile libs.junit
+
 	compile libs.guava
 	compile libs.axelor_cglib
 }
