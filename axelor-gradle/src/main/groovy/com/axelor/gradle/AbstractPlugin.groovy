@@ -33,12 +33,6 @@ abstract class AbstractPlugin implements Plugin<Project> {
 
 			tasks.eclipse.dependsOn "cleanEclipse"
 
-			eclipse {
-				classpath {
-					defaultOutputDir = file("${buildDir}/eclipse")
-				}
-			}
-
 			afterEvaluate {
 	
 				def useSrcGen = true
@@ -58,7 +52,7 @@ abstract class AbstractPlugin implements Plugin<Project> {
 					sourceSets {
 						main {
 							java {
-								srcDir "${rootDir}/build/src-gen"
+								srcDir "${buildDir}/src-gen"
 							}
 						}
 					}
@@ -74,7 +68,7 @@ abstract class AbstractPlugin implements Plugin<Project> {
 							groovy {
 								srcDirs = ["src/main/java", "src/main/groovy"]
 								if (useSrcGen) {
-									srcDir "${rootDir}/build/src-gen"
+									srcDir "${buildDir}/src-gen"
 								}
 							}
 						}
@@ -88,10 +82,6 @@ abstract class AbstractPlugin implements Plugin<Project> {
 						}
 					}
 				}
-
-				// add generated source/classes to compile classpath
-				sourceSets.main.compileClasspath += files([rootDir.path + '/build/src-gen'])
-				sourceSets.main.compileClasspath += files([rootDir.path + '/build/classes/main'])
             }
 		}
 	}

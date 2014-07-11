@@ -17,23 +17,9 @@ class BasePlugin extends AbstractPlugin {
 
 			ext.isModule = true
 
-			// add code generation tasl
 			task("generateCode", type: GenerateCode)
 
 			compileJava.dependsOn "generateCode"
-
-			// don't include class & webapp files in jar
-			jar {
-				exclude(['**/*.class', 'webapp'])
-				includeEmptyDirs = false
-			}
-
-			task("copyClasses", type: org.gradle.api.tasks.Copy) {
-				from "${buildDir}/classes"
-				into "${rootProject.buildDir}/classes"
-			}
-
-			jar.dependsOn "copyClasses"	
         }
     }
 }
