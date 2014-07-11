@@ -9,9 +9,6 @@ import com.axelor.tools.x2j.Generator
 
 class GenerateCode extends DefaultTask {
 
-	String base
-	String target
-
 	List<String> IGNORE = ["axelor-common", "axelor-test"]
 
 	def findAllModules(Project project, Set<Project> found) {
@@ -38,6 +35,13 @@ class GenerateCode extends DefaultTask {
 		generateCode("application")
 	}
 
+	def buildGenerator(Project project) {
+		def domainPath = new File(project.projectDir, "src/main/resources/domains")
+		def targetPath = new File(project.buildDir, "src-gen")
+		def generator = new Generator(domainPath, targetPath)
+		return generator
+	}
+
 	def generateCode(String extension) {
 
 		def definition = project.extensions.findByName(extension)
@@ -47,7 +51,12 @@ class GenerateCode extends DefaultTask {
 
 		generateInfo(extension)
 
-		def generator = new Generator(base, target)
+		def generator = buildGenerator(project)
+		findAllModules(project, null).each {
+			def lookup = buildGenerator(it)
+			generator.addLookupSource(lookup)
+		}
+
 		generator.start()
 	}
 

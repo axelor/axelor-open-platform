@@ -29,10 +29,7 @@ class AppPlugin extends AbstractPlugin {
 			}
 
 			// add code generation tasl
-			task("generateCode", type: GenerateCode) {
-				base = project.projectDir
-				target = rootProject.buildDir
-			}
+			task("generateCode", type: GenerateCode)
 
 			compileJava.dependsOn "generateCode"
 
