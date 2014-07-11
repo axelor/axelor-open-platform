@@ -16,9 +16,7 @@ dependencies {
 
 	// TODO: replace inlfection used from jersey server with axelor-common
 	compile libs.jersey_server
-	compile ("com.axelor:axelor-common:2.0.0-SNAPSHOT") {
-		exclude module: "slf4j-log4j12"
-	}
+	compile project(':core:axelor-common')
 }
 
 sourceSets {
