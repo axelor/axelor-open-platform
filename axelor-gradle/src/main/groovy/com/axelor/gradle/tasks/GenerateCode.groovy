@@ -1,12 +1,11 @@
 package com.axelor.gradle.tasks
 
-import com.axelor.tools.x2j.Generator
-import com.axelor.tools.x2j.Extender
-
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
-import org.gradle.api.tasks.TaskAction
 import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.tasks.TaskAction
+
+import com.axelor.tools.x2j.Generator
 
 class GenerateCode extends DefaultTask {
 
@@ -50,13 +49,6 @@ class GenerateCode extends DefaultTask {
 
 		def generator = new Generator(base, target)
 		generator.start()
-
-		def objects = new File(project.projectDir, "src/main/resources/objects")
-		if (objects.exists()) {
-			def all = findAllModules(project, null).collect { it.projectDir }
-			def extender = new Extender(base, target, all)
-			extender.start()
-		}
 	}
 
 	def generateInfo(String extension) {

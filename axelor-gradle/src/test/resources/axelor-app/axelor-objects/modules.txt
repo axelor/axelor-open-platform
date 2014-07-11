@@ -1,2 +1,0 @@
-axelor-auth
-axelor-contact
