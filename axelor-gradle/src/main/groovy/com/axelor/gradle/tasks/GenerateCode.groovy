@@ -1,13 +1,15 @@
 package com.axelor.gradle.tasks
 
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Suspendable;
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.tasks.TaskAction
 
 import com.axelor.tools.x2j.Generator
+import com.axelor.tools.x2j.GeneratorListener
 
-class GenerateCode extends DefaultTask {
+class GenerateCode extends DefaultTask implements GeneratorListener {
 
 	List<String> IGNORE = ["axelor-common", "axelor-test"]
 
@@ -34,6 +36,11 @@ class GenerateCode extends DefaultTask {
 		generateCode("module")
 		generateCode("application")
 	}
+	
+	@Override
+	public void onGenerate(String name, String path, int cardinality) {
+		project.getParent().classGenerated(name, path, cardinality)
+	}
 
 	def buildGenerator(Project project) {
 		def domainPath = new File(project.projectDir, "src/main/resources/domains")
@@ -56,6 +63,8 @@ class GenerateCode extends DefaultTask {
 			def lookup = buildGenerator(it)
 			generator.addLookupSource(lookup)
 		}
+		
+		generator.addListener(this)
 
 		generator.start()
 	}
