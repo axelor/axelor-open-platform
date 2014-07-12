@@ -103,6 +103,21 @@ class AppPlugin extends AbstractPlugin {
 
 			tomcatRun.dependsOn "copyWebapp"
 			tomcatRun.webAppSourceDirectory = file(webappDir)
+
+			eclipse {
+				
+				//XXX: running inside eclipse requires commons logging
+				dependencies {
+					compile	libs.commons_logging
+				}
+
+				wtp {
+					component {
+						resource sourcePath: "core/axelor-web/src/main/webapp", deployPath: "/"
+						resource sourcePath: "src/main/webapp", deployPath: "/"
+					}
+				}
+			}
         }
     }
 }
