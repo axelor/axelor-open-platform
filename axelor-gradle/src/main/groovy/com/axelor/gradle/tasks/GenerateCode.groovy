@@ -76,7 +76,7 @@ class GenerateCode extends DefaultTask implements GeneratorListener {
 			return
 		}
 
-		def outputPath = new File(project.buildDir, "resources/main/module.properties")
+		def outputPath = new File(project.buildDir, "src-gen/module.properties")
 		try {
 			outputPath.parentFile.mkdirs()
 		} catch (Exception e) {
@@ -117,7 +117,7 @@ removable = ${definition.removable == true}
 
 			out << """\
 depends = \\
-${deps.join("\\\n")}
+${deps.join(" \\\n")}
 """
 		}
 	}
