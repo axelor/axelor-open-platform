@@ -67,6 +67,12 @@ class GenerateCode extends DefaultTask implements GeneratorListener {
 		generator.addListener(this)
 
 		generator.start()
+
+		// copy module.properties
+		project.copy {
+			from "${project.buildDir}/src-gen/module.properties"
+			into "${project.buildDir}/classes/main"
+		}
 	}
 
 	def generateInfo(String extension) {
