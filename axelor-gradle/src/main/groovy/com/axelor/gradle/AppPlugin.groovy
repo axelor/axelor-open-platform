@@ -100,6 +100,7 @@ class AppPlugin extends AbstractPlugin {
 
 			war.dependsOn "copyWebapp"
 			war.from webappDir
+			war.duplicatesStrategy = "EXCLUDE"
 
 			tomcatRun.dependsOn "copyWebapp"
 			tomcatRun.webAppSourceDirectory = file(webappDir)
