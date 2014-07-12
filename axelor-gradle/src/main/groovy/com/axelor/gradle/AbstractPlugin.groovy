@@ -4,6 +4,7 @@ import com.axelor.gradle.tasks.I18nTask
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.plugins.ide.eclipse.model.SourceFolder
 
 abstract class AbstractPlugin implements Plugin<Project> {
     
@@ -14,6 +15,7 @@ abstract class AbstractPlugin implements Plugin<Project> {
 			apply plugin: 'java'
 			apply plugin: 'groovy'
 			apply plugin: 'eclipse'
+			apply plugin: 'eclipse-wtp'
 
 			apply from: rootDir.path + '/core/libs.gradle'
 			apply from: rootDir.path + '/core/repo.gradle'
@@ -32,6 +34,23 @@ abstract class AbstractPlugin implements Plugin<Project> {
 			}
 
 			tasks.eclipse.dependsOn "cleanEclipse"
+
+			eclipse {
+
+				// create src-gen directory so that it's picked up as source folder
+				file("${buildDir}/src-gen").mkdirs()
+
+				// seperate classpath for main & test sources
+				classpath {
+					defaultOutputDir = file("bin/main")	
+					file {
+						whenMerged {  cp -> 
+							cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/main/") }*.output = "bin/main" 
+							cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/test/") }*.output = "bin/test" 
+						}
+					}
+				}
+			}
 
 			afterEvaluate {
 	
