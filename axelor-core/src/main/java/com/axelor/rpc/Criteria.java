@@ -105,13 +105,20 @@ public class Criteria {
 
 	@SuppressWarnings("unchecked")
 	public static Criteria parse(Map<String, Object> rawCriteria, Class<?> beanClass) {
-		Filter search = Criteria.parseCriterion(rawCriteria, beanClass);
-		List<Filter> all = Lists.newArrayList();
-		Map<String, Object> context = Maps.newHashMap();
-		
-		List<?> domains = (List<?>) rawCriteria.get("_domains");
+		final Filter search = Criteria.parseCriterion(rawCriteria, beanClass);
+		final List<Filter> all = Lists.newArrayList();
+		final Map<String, Object> context = Maps.newHashMap();
+		final List<?> domains = (List<?>) rawCriteria.get("_domains");
+
 		if (domains != null) {
 			all.addAll(parseDomains(domains, context));
+			try {
+				if (Operator.get((String) rawCriteria.get("operator")) == Operator.OR && all.size() > 0) {
+					all.clear();
+					all.add(Filter.or(parseDomains(domains, context)));
+				}
+			} catch (Exception e) {
+			}
 		}
 
 		String domain = (String) rawCriteria.get("_domain");
