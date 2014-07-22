@@ -1,10 +1,6 @@
 package com.axelor.gradle
 
-import org.gradle.api.Plugin
 import org.gradle.api.Project
-
-import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.wrapper.Wrapper
 
@@ -48,7 +44,7 @@ class AppPlugin extends AbstractPlugin {
 					version definition.version
 					afterEvaluate {
 						try {
-							self.tasks.copyClasses.dependsOn tasks.generateCode
+							self.tasks.generateCode.dependsOn tasks.generateCode
 						} catch (Exception e){}
 					}
 				}
@@ -58,38 +54,13 @@ class AppPlugin extends AbstractPlugin {
 			task("wrapper", type: Wrapper) {
 				gradleVersion = '2.0'
 			}
-			
-			task("generateCode", type: GenerateCode)
 
-			
-			def genCard = [:]
-			def genPath = [:]
-
-			ext.classGenerated = { String name, String path, int cardinality ->
-				if (cardinality < 2) return
-				def n = genCard[name]
-				if (n == null || n < cardinality) {
-					genCard[name] = cardinality
-					genPath[name] = path
-				}
+			task("generateCode", type: GenerateCode) << {
+				expandAll()
 			}
 
-			task("copyClasses", dependsOn: "generateCode") << {
-				genPath.each {
-					def source = it.value
-					def output = source.substring(source.indexOf('src-gen') + 8)
-					
-					output = "${buildDir}/src-gen/${output}"
-					
-					copy {
-						from file(source)
-						into file(output).parent
-					}
-				}
-			}
-			
-			compileJava.dependsOn "copyClasses"
-			
+			compileJava.dependsOn "generateCode"
+
 			def webappDir = "${rootProject.buildDir}/webapp"
 
 			// copy webapp to root build dir
