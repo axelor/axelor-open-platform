@@ -43,9 +43,9 @@ public class Generator {
 
 	private final Multimap<String, Entity> lookup = LinkedHashMultimap.create();
 	private final Multimap<String, Entity> entities = LinkedHashMultimap.create();
-	
-	private final List<GeneratorListener> listeners = new ArrayList<>();
 
+	private static final List<File> CACHE_KEYS = new ArrayList<>();
+	
 	public Generator(File domainPath, File outputPath) {
 		this.domainPath = domainPath;
 		this.outputPath = outputPath;
@@ -56,6 +56,10 @@ public class Generator {
 	}
 
 	private void expand(Collection<Entity> items) throws IOException {
+		expand(outputPath, items);
+	}
+	
+	private void expand(File outputPath, Collection<Entity> items) throws IOException {
 
 		if (items == null || items.isEmpty()) {
 			return;
@@ -120,10 +124,6 @@ public class Generator {
 		String code = Expander.expand(entity);
 
 		Files.write(code, output, Charsets.UTF_8);
-		
-		for (GeneratorListener listener : listeners) {
-			listener.onGenerate(name, output.getAbsolutePath(), all.size() + 1);
-		}
 	}
 
 	private void process(File input, boolean verbose) throws IOException {
@@ -132,9 +132,14 @@ public class Generator {
 			log.info("Processing: " + input);
 		}
 		
-		for (Entity entity : XmlHelper.entities(input)) {
+		final List<Entity> all = XmlHelper.entities(input);
+		for (Entity entity : all) {
 			entity.setLastModified(input.lastModified());
 			entities.put(entity.getName(), entity);
+		}
+		
+		if (CACHE_KEYS.indexOf(input) == -1) {
+			CACHE_KEYS.add(input);
 		}
 	}
 
@@ -154,10 +159,6 @@ public class Generator {
 				process(file, verbose);
 			}
 		}
-	}
-	
-	public void addListener(GeneratorListener listener) {
-		listeners.add(listener);
 	}
 	
 	public void addLookupSource(Generator generator) throws IOException {
@@ -198,6 +199,34 @@ public class Generator {
 		
 		for (String name : entities.keySet()) {
 			expand(entities.get(name));
+		}
+	}
+	
+	/**
+	 * Combine all multiple objects.
+	 * 
+	 * This method should be called from application after all other code
+	 * generation tasks are complete.
+	 * 
+	 * @param outputPath
+	 *            output path
+	 * @throws IOException
+	 *             if error processing any file
+	 */
+	public static void combineAll(File outputPath) throws IOException {
+		
+		final Generator generator = new Generator(null, outputPath);
+		try {
+			for (File input : CACHE_KEYS) {
+				generator.process(input, false);
+			}
+			for (String name : generator.entities.keySet()) {
+				if (generator.entities.get(name).size() > 1) {
+					generator.expand(outputPath, generator.entities.get(name));
+				}
+			}
+		} finally {
+			CACHE_KEYS.clear();
 		}
 	}
 }
