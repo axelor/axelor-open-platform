@@ -168,6 +168,13 @@
                 <xsd:documentation>Readonly if the given JavaScript expression is true.</xsd:documentation>
               </xsd:annotation>
             </xsd:attribute>
+            <xsd:attribute name="if-module" type="xsd:string">
+		      <xsd:annotation>
+		        <xsd:documentation>
+		          Only show if the given module is installed.
+		        </xsd:documentation>
+		      </xsd:annotation>
+		    </xsd:attribute>
           </xsd:complexType>
         </xsd:element>
         <xsd:element name="divider">
@@ -182,6 +189,13 @@
                 <xsd:documentation>Hide if the given JavaScript expression is true.</xsd:documentation>
               </xsd:annotation>
             </xsd:attribute>
+            <xsd:attribute name="if-module" type="xsd:string">
+		      <xsd:annotation>
+		        <xsd:documentation>
+		          Only show if the given module is installed.
+		        </xsd:documentation>
+		      </xsd:annotation>
+		    </xsd:attribute>
           </xsd:complexType>
         </xsd:element>
         <xsd:element name="menu" type="tns:MenubarItem">
@@ -204,6 +218,13 @@
     <xsd:attribute name="showTitle" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>Specify whether to show the title.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="if-module" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Only show if the given module is installed.
+        </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
