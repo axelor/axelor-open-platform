@@ -154,7 +154,7 @@ public class ActionGroup extends ActionIndex {
 
 			Action action = this.findAction(name);
 			if (action == null) {
-				log.error("action doesn't exist: {}", name);
+				log.warn("action doesn't exist or module dependency is not resolved: {}", name);
                 continue;
 			}
 

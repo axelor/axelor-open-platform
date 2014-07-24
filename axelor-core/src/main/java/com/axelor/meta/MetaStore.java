@@ -19,6 +19,8 @@ package com.axelor.meta;
 
 import java.util.concurrent.ConcurrentMap;
 
+import com.axelor.common.StringUtils;
+import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
@@ -78,14 +80,22 @@ public class MetaStore {
 	}
 
 	public static Action getAction(String name) {
-		if (CACHE.containsKey(name)) {
-			return (Action) CACHE.get(name);
+		Action action = (Action) CACHE.get(name);
+		if (action == null) {
+			action = XMLViews.findAction(name);
+			if (action != null) {
+				register(name, action);
+			}
 		}
-		Action action = XMLViews.findAction(name);
-		if (action != null) {
-			register(name, action);
+
+		if (action == null) return null;
+
+		final String module = action.getModuleToCheck();
+		if (StringUtils.isBlank(module) || ModuleManager.isInstalled(module)) {
+			return action;
 		}
-		return action;
+
+		return null;
 	}
 	
 	public static void clear() {

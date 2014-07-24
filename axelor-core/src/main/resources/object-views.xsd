@@ -1670,6 +1670,13 @@
         <xsd:documentation>Action name.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="if-module" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Only execute the action if the given module is installed.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
   
   <xsd:complexType name="AbstractBaseAction">
