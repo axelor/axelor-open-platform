@@ -104,6 +104,8 @@ table.treetable tbody tr.accept {
 	top: 27px; left: 0; right: 0; bottom: 0;
 }
 
-.tree-header th {
+.tree-header th,
+.tree-table td,
+.tree-table td span {
 	box-sizing: content-box;
 }
