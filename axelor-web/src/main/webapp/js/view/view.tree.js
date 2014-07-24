@@ -423,7 +423,7 @@ ui.directive('uiViewTree', function(){
 
 			table.treetable({
 				
-				indent: 32,
+				indent: 16,
 				
 				expandable: true,
 				
