@@ -192,17 +192,7 @@ ${p.documentation}
 	 * on all the records.
 	 *
 	 */
-	public static Query<? extends $pojo.name> all_() {
-		return JPA.all(${pojo.name}.class);
-	}
-<% if (!pojo.hasExtends) { %>
-	/**
-	 * Return a {@link Query} instance for <code>$pojo.name</code> to filter
-	 * on all the records.
-	 *
-	 */
-	@Deprecated
-	public static Query<$pojo.name> all() {
+	public static Query<? extends $pojo.name> all() {
 		return JPA.all(${pojo.name}.class);
 	}
 	
@@ -210,10 +200,8 @@ ${p.documentation}
 	 * A shortcut method to <code>${pojo.name}.all().filter(...)</code>
 	 *
 	 */
-	@Deprecated
-	public static Query<$pojo.name> filter(String filter, Object... params) {
+	public static Query<? extends $pojo.name> filter(String filter, Object... params) {
 		return JPA.all(${pojo.name}.class).filter(filter, params);
 	}
-<% } %>\
 	${pojo.extraCode}
 }
