@@ -17,7 +17,7 @@
  */
 package com.axelor.test;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
