@@ -23,6 +23,7 @@ import org.apache.shiro.authz.AuthorizationException;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.db.Query;
 import com.axelor.meta.db.MetaFilter;
 import com.google.common.base.Objects;
 import com.google.inject.persist.Transactional;
@@ -71,6 +72,6 @@ public class MetaFilterService {
 	public List<MetaFilter> getFilters(String filterView) {
 		User user = AuthUtils.getUser();
 		String query = "self.filterView = ?1 AND (self.user.code = ?2 OR self.shared = true)";
-		return MetaFilter.filter(query, filterView, user.getCode()).order("id").fetch();
+		return Query.of(MetaFilter.class).filter(query, filterView, user.getCode()).order("id").fetch();
 	}
 }

@@ -37,6 +37,7 @@ import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
+import com.axelor.db.Query;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
@@ -323,7 +324,7 @@ public class ViewService extends AbstractService {
 		if (select == null || select.getItems() == null) {
 			return all;
 		}
-		List<MetaSelectItem> items = MetaSelectItem.all().filter("self.select.id = ?", select.getId()).order("order").fetch();
+		List<MetaSelectItem> items = Query.of(MetaSelectItem.class).filter("self.select.id = ?", select.getId()).order("order").fetch();
 		if (items == null || items.isEmpty()) {
 			return null;
 		}

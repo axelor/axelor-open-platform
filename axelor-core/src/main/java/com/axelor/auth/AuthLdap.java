@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
+import com.axelor.db.Query;
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
 import com.google.inject.persist.Transactional;
@@ -279,7 +280,7 @@ public class AuthLdap {
 			found.add(name);
 		}
 
-		final List<Group> groups = Group.all().filter("self.code not in (:names)").bind("names", found).fetch();
+		final List<Group> groups = Query.of(Group.class).filter("self.code not in (:names)").bind("names", found).fetch();
 		for (Group group : groups) {
 			uploadGroup(group);
 		}
