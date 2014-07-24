@@ -17,7 +17,7 @@
  */
 package com.axelor.test;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
