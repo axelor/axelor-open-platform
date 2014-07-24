@@ -40,6 +40,9 @@ public abstract class Action {
 	@XmlAttribute
 	private String model;
 	
+	@XmlAttribute(name = "if-module")
+	private String moduleToCheck;
+
 	public String getName() {
 		return name;
 	}
@@ -54,6 +57,14 @@ public abstract class Action {
 	
 	public void setModel(String model) {
 		this.model = model;
+	}
+	
+	public String getModuleToCheck() {
+		return moduleToCheck;
+	}
+
+	public void setModuleToCheck(String moduleToCheck) {
+		this.moduleToCheck = moduleToCheck;
 	}
 
 	public abstract Object wrap(ActionHandler handler);
