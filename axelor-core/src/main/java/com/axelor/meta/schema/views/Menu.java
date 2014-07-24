@@ -29,7 +29,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @XmlType
-public class Menu {
+public class Menu extends AbstractWidget {
 
 	@XmlType
 	public static class Item extends MenuItem {
@@ -73,7 +73,7 @@ public class Menu {
 		@XmlElement(name = "item", type = Item.class),
 		@XmlElement(name = "menu", type = Menu.class),
 		@XmlElement(name = "divider", type = Devider.class) })
-	private List<Object> items;
+	private List<AbstractWidget> items;
 
 	@JsonIgnore
 	private String model;
@@ -108,7 +108,7 @@ public class Menu {
 		this.showTitle = showTitle;
 	}
 
-	public List<Object> getItems() {
+	public List<AbstractWidget> getItems() {
 		if(items != null) {
 			for (Object item : items) {
 				if (item instanceof Item) {
@@ -122,7 +122,7 @@ public class Menu {
 		return items;
 	}
 
-	public void setItems(List<Object> items) {
+	public void setItems(List<AbstractWidget> items) {
 		this.items = items;
 	}
 

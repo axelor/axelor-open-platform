@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @XmlType
-public class MenuItem {
+public class MenuItem extends AbstractWidget {
 
 	@XmlAttribute
 	private String name;
