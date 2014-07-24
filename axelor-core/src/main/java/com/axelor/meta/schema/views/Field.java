@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.db.Query;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaSelect;
@@ -242,7 +243,7 @@ public class Field extends SimpleWidget {
 		if (select == null || select.getItems() == null) {
 			return all;
 		}
-		List<MetaSelectItem> items = MetaSelectItem.all().filter("self.select.id = ?", select.getId()).order("order").fetch();
+		List<MetaSelectItem> items = Query.of(MetaSelectItem.class).filter("self.select.id = ?", select.getId()).order("order").fetch();
 		if (items == null || items.isEmpty()) {
 			return null;
 		}
