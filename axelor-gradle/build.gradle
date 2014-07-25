@@ -4,6 +4,15 @@ apply plugin: 'eclipse'
 
 apply from: '../libs.gradle'
 apply from: '../repo.gradle'
+apply from: '../license.gradle'
+
+buildscript {
+	apply from: '../repo.gradle'
+	apply from: '../libs.gradle'
+	dependencies {
+		classpath libs.plugin_license
+	}
+}
 
 dependencies {
 
@@ -18,6 +27,7 @@ dependencies {
 	compile libs.jersey_server
 	compile project(':core:axelor-common')
 
+	compile libs.plugin_license
 	compile libs.plugin_tomcat
 }
 

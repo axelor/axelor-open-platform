@@ -1,0 +1,48 @@
+
+def findHeaderFile() {
+	def files = ["header.txt", "../header.txt", "${rootDir}/core/header.txt"]
+	for (name in files) {
+		if (file(name).exists()) {
+			return file(name)
+		}
+	}
+	return "src/license/header.txt"
+}
+
+project.apply plugin: "license"
+
+project.license {
+
+	header findHeaderFile()
+
+	ignoreFailures true
+
+	ext.product = "Axelor Business Solutions"
+	ext.inception = "2012"
+	ext.year = Calendar.getInstance().get(Calendar.YEAR)
+	ext.owner = "Axelor"
+	ext.website = "http://axelor.com"
+
+	include "**/*.java"
+	include "**/*.groovy"
+	include "**/*.scala"
+	include "**/*.js"
+
+	excludes(["**/LICENSE", "**/LICENSE.md"])
+	excludes(["**/README", "**/README.md"])
+	excludes(["**/*.properties", "**/*.txt", "**/*.json"])
+}
+
+project.tasks.findAll { it.class.simpleName.startsWith 'License' }.each {
+
+	it.source = fileTree(dir: 'src', excludes: [
+		"**/data/**",
+		"**/data-init/**",
+		"**/data-demo/**",
+		"**/src-gen/**",
+		"**/resources/**",
+		"**/webapp/lib/**",
+		"**/webapp/WEB-INF/web.xml"
+	])
+}
+

@@ -81,6 +81,7 @@ ext {
 		ST4:				"org.antlr:ST4:4.0.7",
 
 		// gradle plugins
+		plugin_license: "nl.javadude.gradle.plugins:license-gradle-plugin:0.10.0",
 		plugin_tomcat: "org.gradle.api.plugins:gradle-tomcat-plugin:1.2.4",
 	]
 }
