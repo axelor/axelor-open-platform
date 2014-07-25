@@ -18,7 +18,7 @@ dependencies {
 	compile libs.jersey_server
 	compile project(':core:axelor-common')
 
-	compile 'org.gradle.api.plugins:gradle-tomcat-plugin:1.2.4'
+	compile libs.plugin_tomcat
 }
 
 sourceSets {

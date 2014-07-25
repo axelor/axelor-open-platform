@@ -79,6 +79,9 @@ ext {
 
 		// StringTemplate
 		ST4:				"org.antlr:ST4:4.0.7",
+
+		// gradle plugins
+		plugin_tomcat: "org.gradle.api.plugins:gradle-tomcat-plugin:1.2.4",
 	]
 }
 
