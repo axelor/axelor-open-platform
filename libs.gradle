@@ -9,7 +9,8 @@ ext {
 		slf4j:			["org.slf4j:slf4j-api:1.7.6", "org.slf4j:slf4j-log4j12:1.7.6"],
 
 		// guava
-		guava:			["com.google.guava:guava:16.0.1", "com.google.code.findbugs:jsr305:2.0.3"],
+		guava:			"com.google.guava:guava:17.0",
+		jsr305:			"com.google.code.findbugs:jsr305:2.0.3",
 
 		// joda
 		joda_time:		["joda-time:joda-time:2.3", "org.jadira.usertype:usertype.core:3.0.0.GA"],
