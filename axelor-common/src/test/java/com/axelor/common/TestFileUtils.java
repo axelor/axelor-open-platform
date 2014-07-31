@@ -18,6 +18,7 @@
 package com.axelor.common;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,5 +33,30 @@ public class TestFileUtils {
 		
 		file = FileUtils.getFile("my", "dir", "file.text");
 		Assert.assertEquals("my/dir/file.text".replace("/", File.separator), file.getPath());
+	}
+	
+	@Test
+	public void testDirUtils() {
+
+		File source = new File("src");
+		File target = new File("bin/src-copy");
+
+		try {
+			FileUtils.copyDirectory(source, target);
+		} catch (IOException e) {
+			Assert.fail();
+		}
+		
+		Assert.assertTrue(target.exists() && target.isDirectory());
+		Assert.assertNotNull(target.listFiles());
+		Assert.assertTrue(target.listFiles().length > 0);
+
+		try {
+			FileUtils.deleteDerectory(target);
+		} catch (IOException e) {
+			Assert.fail();
+		}
+
+		Assert.assertFalse(target.exists());
 	}
 }
