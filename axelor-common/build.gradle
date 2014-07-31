@@ -8,15 +8,11 @@ apply from: "../license.gradle"
 
 buildscript {
 	apply from: "../repo.gradle"
+	apply from: "../libs.gradle"
 	dependencies {
 		classpath libs.plugin_license
 	}
 }
-
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
-
-version 2.0
 
 dependencies {
 
