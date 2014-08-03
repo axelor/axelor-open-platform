@@ -17,30 +17,35 @@
  */
 package com.axelor.gradle
 
-import com.axelor.gradle.tasks.I18nTask
-
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.plugins.ide.eclipse.model.SourceFolder
 
+import com.axelor.gradle.tasks.I18nTask
+
 abstract class AbstractPlugin implements Plugin<Project> {
-    
+
+	String sdkVersion
+	
+	protected String getSdkVersion() {
+		if (sdkVersion) {
+			return sdkVersion
+		}
+		try {
+			sdkVersion = getClass().classLoader.getResource("axelor-gradle-version.txt").text
+		} catch (Exception e) {
+		}
+		return sdkVersion;
+	}
+
 	protected void applyCommon(Project project, AbstractDefinition definition) {
 
 		project.configure(project) {
 
-			apply plugin: 'java'
 			apply plugin: 'groovy'
 			apply plugin: 'eclipse'
 			apply plugin: 'eclipse-wtp'
-
-			apply from: rootDir.path + '/core/libs.gradle'
-			apply from: rootDir.path + '/core/repo.gradle'
-			apply from: rootDir.path + '/core/license.gradle'
-
-			sourceCompatibility = 1.7
-			targetCompatibility = 1.7
-
+		
 			dependencies {
 				compile libs.slf4j
 				compile libs.groovy
@@ -58,7 +63,7 @@ abstract class AbstractPlugin implements Plugin<Project> {
 				// create src-gen directory so that it's picked up as source folder
 				file("${buildDir}/src-gen").mkdirs()
 
-				// seperate classpath for main & test sources
+				// seperate output for main & test sources
 				classpath {
 					defaultOutputDir = file("bin/main")	
 					file {
@@ -71,11 +76,6 @@ abstract class AbstractPlugin implements Plugin<Project> {
 			}
 
 			afterEvaluate {
-	
-				def useSrcGen = true
-				try {
-					useSrcGen = project.useSrcGen
-				} catch (Exception e) {}
 
 				// add module dependency
 				definition.modules.each { module ->
@@ -85,12 +85,10 @@ abstract class AbstractPlugin implements Plugin<Project> {
                 }
 				
 				// add src-gen as source directory
-				if (useSrcGen) {
-					sourceSets {
-						main {
-							java {
-								srcDir "${buildDir}/src-gen"
-							}
+				sourceSets {
+					main {
+						java {
+							srcDir "${buildDir}/src-gen"
 						}
 					}
 				}
@@ -103,10 +101,7 @@ abstract class AbstractPlugin implements Plugin<Project> {
 								srcDirs = []
 							}
 							groovy {
-								srcDirs = ["src/main/java", "src/main/groovy"]
-								if (useSrcGen) {
-									srcDir "${buildDir}/src-gen"
-								}
+								srcDirs = ["src/main/java", "src/main/groovy", "${buildDir}/src-gen"]
 							}
 						}
 						test {

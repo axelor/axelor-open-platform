@@ -7,8 +7,8 @@ module {
 
 dependencies {
 
-	testCompile project(":core:axelor-test")
-	compile project(":core:axelor-common")
+	testCompile project(":axelor-test")
+	compile project(":axelor-common")
 
 	compile libs.groovy
 

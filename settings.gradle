@@ -1,0 +1,7 @@
+include "axelor-common"
+include "axelor-gradle"
+include "axelor-shell"
+include "axelor-test"
+include "axelor-core"
+include "axelor-web"
+include "axelor-wkf"

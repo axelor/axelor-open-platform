@@ -3,8 +3,8 @@ apply plugin: "axelor-module"
 module {
 	name "axelor-web"
 	title "Axelor :: Web"
-
-	module "core:axelor-wkf"
+	
+	module "axelor-wkf"
 }
 
 dependencies {
@@ -14,3 +14,8 @@ dependencies {
 	compile libs.jackson_libs
 }
 
+jar {
+	into("webapp") {
+		from("src/main/webapp")
+	}
+}

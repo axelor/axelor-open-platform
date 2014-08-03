@@ -1,31 +1,23 @@
-apply plugin: 'java'
 apply plugin: 'groovy'
-apply plugin: 'eclipse'
 
-apply from: '../libs.gradle'
-apply from: '../repo.gradle'
-apply from: '../license.gradle'
-
-buildscript {
-	apply from: '../repo.gradle'
-	apply from: '../libs.gradle'
-	dependencies {
-		classpath libs.plugin_license
-	}
+configurations {
+    gradleApi
+    gradleApi.extendsFrom groovy
+    compile.extendsFrom gradleApi
 }
 
 dependencies {
 
 	testCompile	libs.junit
 
-	compile gradleApi()
+	gradleApi gradleApi()
 
 	compile	libs.guava
 	compile libs.opencsv
 
 	// TODO: replace inlfection used from jersey server with axelor-common
 	compile libs.jersey_server
-	compile project(':core:axelor-common')
+	compile project(':axelor-common')
 
 	compile libs.plugin_license
 	compile libs.plugin_tomcat
@@ -37,3 +29,44 @@ sourceSets {
 		groovy.srcDirs = ['src/main/java', 'src/main/groovy']
 	}
 }
+
+allprojects {
+
+	apply from: '../version.gradle'
+
+	repositories {
+		ivy {
+			name "localRepo"
+			url "file://${projectDir}/../ivy"
+		}
+	}
+
+	uploadArchives {
+		repositories {
+			add project.repositories.localRepo
+		}
+	}
+}
+
+task distGradle(type: Zip) {
+	archiveName = "axelor-gradle-${gradle.gradleVersion}.zip"
+	into("axelor-gradle-${gradle.gradleVersion}") {
+		into('init.d') { from 'src/init.d' }
+		into('init.d/libs') {
+			from jar
+			from configurations.runtime - configurations.gradleApi
+		}
+		from gradle.gradleHomeDir
+	}
+}
+
+task dist(type: Copy) {
+	destinationDir = file("${rootProject.buildDir}/dist")
+	into('init.d') { from 'src/init.d' }
+    into('init.d/libs') {
+		from jar
+        from configurations.runtime - configurations.gradleApi
+    }
+}
+
+uploadArchives.dependsOn project(":axelor-common").uploadArchives
