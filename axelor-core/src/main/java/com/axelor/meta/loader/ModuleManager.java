@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.loader;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -275,6 +276,10 @@ public class ModuleManager {
 		final List<String> found = Lists.newArrayList();
 
 		for (URL file : MetaScanner.findAll("module\\.properties")) {
+			File urlFile = new File(file.getFile());
+			if (!"module.properties".equals(urlFile.getName())) {
+				continue;
+			}
 			Properties properties = new Properties();
 			try {
 				properties.load(file.openStream());
@@ -308,6 +313,10 @@ public class ModuleManager {
 	@Transactional
 	void resolve(boolean update) {
 		for (URL file : MetaScanner.findAll("module\\.properties")) {
+			File urlFile = new File(file.getFile());
+			if (!"module.properties".equals(urlFile.getName())) {
+				continue;
+			}
 			Properties properties = new Properties();
 			try {
 				properties.load(file.openStream());
