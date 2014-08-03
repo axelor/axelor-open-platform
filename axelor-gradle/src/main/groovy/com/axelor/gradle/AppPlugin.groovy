@@ -38,11 +38,11 @@ class AppPlugin extends AbstractPlugin {
 
 			dependencies {
 
-				testCompile owner.project(":core:axelor-test")
-				compile 	owner.project(":core:axelor-common")
-				compile		owner.project(":core:axelor-core")
-				compile		owner.project(":core:axelor-web")
-
+				testCompile "com.axelor:axelor-test:${sdkVersion}"
+				compile 	"com.axelor:axelor-common:${sdkVersion}"
+				compile		"com.axelor:axelor-core:${sdkVersion}"
+				compile		"com.axelor:axelor-web:${sdkVersion}"
+				
 				providedCompile	libs.javax_servlet
 
 				def tomcatVersion = '7.0.54'
@@ -67,11 +67,6 @@ class AppPlugin extends AbstractPlugin {
 				}
             }
 
-			// define wrapper task with proper gradle version
-			task("wrapper", type: Wrapper) {
-				gradleVersion = '2.0'
-			}
-
 			task("generateCode", type: GenerateCode) << {
 				expandAll()
 			}
@@ -81,9 +76,20 @@ class AppPlugin extends AbstractPlugin {
 			def webappDir = "${rootProject.buildDir}/webapp"
 
 			// copy webapp to root build dir
-			task("copyWebapp", type: Copy) {
-				from files(["${projectDir}/core/axelor-web/src/main/webapp", "${projectDir}/src/main/webapp"])
-				into webappDir
+			task("copyWebapp") {
+				war.project.configurations.runtime.each {
+					if (it.name.startsWith("axelor-web")) {
+						def fileList = war.project.zipTree(it)
+						copy {
+							from fileList.matching { include "webapp/**/*" }
+							into file(webappDir).parentFile
+						}
+					}
+				}
+				copy {
+					from files(["${projectDir}/src/main/webapp"])
+					into webappDir
+				}
 			}
 
 			war.dependsOn "copyWebapp"
@@ -102,7 +108,7 @@ class AppPlugin extends AbstractPlugin {
 
 				wtp {
 					component {
-						resource sourcePath: "core/axelor-web/src/main/webapp", deployPath: "/"
+						resource sourcePath: "../axelor-platform/axelor-web/src/main/webapp", deployPath: "/"
 						resource sourcePath: "src/main/webapp", deployPath: "/"
 					}
 				}

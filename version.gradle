@@ -1,0 +1,4 @@
+apply plugin: "maven"
+
+group "com.axelor"
+version "2.1.0"

@@ -1,0 +1,55 @@
+initscript {
+	repositories repos
+	dependencies {
+		classpath libs.plugin_license
+	}
+}
+
+def findHeaderFile(p) {
+	def files = ["header.txt", "../header.txt", "${p.rootDir}/header.txt"]
+	for (name in files) {
+		if (p.file(name).exists()) {
+			return p.file(name)
+		}
+	}
+	return p.file("src/license/header.txt")
+}
+
+allprojects {
+
+	apply plugin: nl.javadude.gradle.plugins.license.LicensePlugin
+
+	license {
+
+		header findHeaderFile(project)
+
+		ignoreFailures true
+
+		ext.product = "Axelor Business Solutions"
+		ext.inception = "2012"
+		ext.year = Calendar.getInstance().get(Calendar.YEAR)
+		ext.owner = "Axelor"
+		ext.website = "http://axelor.com"
+
+		include "**/*.java"
+		include "**/*.groovy"
+		include "**/*.scala"
+		include "**/*.js"
+
+		excludes(["**/LICENSE", "**/LICENSE.md"])
+		excludes(["**/README", "**/README.md"])
+		excludes(["**/*.properties", "**/*.txt", "**/*.json"])
+	}
+
+	tasks.findAll { it.class.simpleName.startsWith 'License' }.each {
+		it.source = fileTree(dir: 'src', excludes: [
+			"**/data/**",
+			"**/data-init/**",
+			"**/data-demo/**",
+			"**/src-gen/**",
+			"**/resources/**",
+			"**/webapp/lib/**",
+			"**/webapp/WEB-INF/web.xml"
+		])
+	}
+}

@@ -2,18 +2,6 @@ apply plugin: "java"
 apply plugin: "eclipse"
 apply plugin: "eclipse-wtp"
 
-apply from: "../repo.gradle"
-apply from: "../libs.gradle"
-apply from: "../license.gradle"
-
-buildscript {
-	apply from: "../repo.gradle"
-	apply from: "../libs.gradle"
-	dependencies {
-		classpath libs.plugin_license
-	}
-}
-
 dependencies {
 
 	testCompile libs.junit

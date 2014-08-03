@@ -1,11 +1,4 @@
-apply plugin: "axelor-base"
-
-module {
-	name "axelor-test"
-	title "Axelor :: Test"
-}
-
-ext.useSrcGen = false
+apply plugin: "java"
 
 dependencies {
 

@@ -1,0 +1,99 @@
+apply plugin: 'application'
+
+buildscript {
+	apply from: "version.gradle"
+	repositories {
+		ivy {
+			url "file://${projectDir}/ivy"
+		}
+	}
+	dependencies {
+		classpath "com.axelor:axelor-gradle:${version}"
+	}
+}
+
+dependencies {
+	compile project(":axelor-shell")
+}
+
+def localDist = "${rootProject.buildDir}/dist"
+def localRepo = "${localDist}/ivy"
+
+task repo(dependsOn: [uploadArchives, ':axelor-gradle:dist']) {
+	outputs.dir localDist
+}
+
+allprojects {
+
+	apply from: "${rootDir}/version.gradle"
+
+	sourceCompatibility = 1.7
+	targetCompatibility = 1.7
+
+	repositories {
+		ivy {
+			name "localRepo"
+			url "file://${localRepo}"
+		}
+	}
+
+	uploadArchives {
+		repositories {
+			add project.repositories.localRepo
+		}
+	}
+	
+	task generateVersion() {
+		onlyIf { project.group == "com.axelor" }
+		doLast {
+			def vf = file("${buildDir}/resources/main/${project.name}-version.txt")
+			vf.parentFile.mkdirs()
+			vf.text = project.version
+		}
+	}
+	
+	compileJava.dependsOn generateVersion
+
+	if (project != owner) {
+		owner.tasks.repo.dependsOn project.uploadArchives
+	}
+}
+
+jar.enabled = false
+uploadArchives.enabled = false
+
+applicationName = "axelor"
+mainClassName = "com.axelor.shell.Main"
+
+run {
+	standardInput = System.in
+	standardOutput = System.out
+}
+
+applicationDistribution.from(repo) {
+	
+}
+
+def distName = "axelor-platform"
+def distConfig = {
+	baseName distName
+	eachFile {
+		if (it.name.endsWith('.bat')) {
+			it.mode = 0644
+		}
+	}
+}
+
+distZip distConfig
+distTar distConfig
+distTar.compression Compression.GZIP
+
+task dist(dependsOn: [distZip, distTar])
+
+installApp {
+	destinationDir = file("${buildDir}/install/${distName}")
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = "2.0"
+}
