@@ -1,0 +1,17 @@
+apply plugin: 'axelor-app'
+
+application {
+
+	name "${name}"
+	title "${title}"
+
+	version "1.0"
+
+	// module dependencies
+	// module "modules:axelor-contact"
+}
+
+tomcat {
+	httpPort = 8080
+	stopPort = 9451
+}

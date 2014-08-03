@@ -1,0 +1,23 @@
+apply plugin: 'groovy'
+
+dependencies {
+
+	testCompile	libs.junit
+
+	compile localGroovy()
+
+	compile	libs.guava
+	compile libs.jline
+	compile libs.commons_cli
+	
+	compile project(':axelor-common')
+	
+	compile "org.gradle:gradle-tooling-api:${gradle.gradleVersion}"
+}
+
+sourceSets {
+	main {
+		java.srcDirs = []
+		groovy.srcDirs = ['src/main/java', 'src/main/groovy']
+	}
+}
