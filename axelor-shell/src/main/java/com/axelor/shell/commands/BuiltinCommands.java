@@ -38,7 +38,7 @@ public class BuiltinCommands implements CommandProvider {
 		this.shell = shell;
 	}
 	
-	private static String getVersion() {
+	public static String getVersion() {
 		if (version != null) {
 			return version;
 		}
@@ -66,7 +66,7 @@ public class BuiltinCommands implements CommandProvider {
 		out.println();
 	}
 	
-	@CliCommand(name = "help", usage = "[COMMAND]", help = "show command usages help")
+	@CliCommand(name = "help", usage = "[COMMAND]", help = "show command usages help", priority = -1010)
 	public void showHelp(String... commands) {
 		Parser parser = shell.getParser();
 		if (commands == null || commands.length == 0) {
@@ -76,12 +76,12 @@ public class BuiltinCommands implements CommandProvider {
 		}
 	}
 
-	@CliCommand(name = "about", help = "show infomation about this shell")
+	@CliCommand(name = "about", help = "show infomation about this shell", priority = -1009)
 	public void showAbout() {
 		banner(System.out);
 	}
 	
-	@CliCommand(name = "exit", help = "exit the shell")
+	@CliCommand(name = "exit", help = "exit the shell", priority = -1008)
 	public void exitShell() {
 		shell.stop();
 	}
