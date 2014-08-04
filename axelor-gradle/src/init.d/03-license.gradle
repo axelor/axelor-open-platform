@@ -6,10 +6,9 @@ initscript {
 }
 
 def findHeaderFile(p) {
-	def files = ["header.txt", "../header.txt", "${p.rootDir}/header.txt"]
-	for (name in files) {
-		if (p.file(name).exists()) {
-			return p.file(name)
+	for (dir in [".", "..", "${p.rootDir}", "${p.rootDir}/src/license"]) {
+		if (p.file("${dir}/header.txt").exists()) {
+			return p.file("${dir}/header.txt")
 		}
 	}
 	return p.file("src/license/header.txt")
@@ -41,15 +40,17 @@ allprojects {
 		excludes(["**/*.properties", "**/*.txt", "**/*.json"])
 	}
 
-	tasks.findAll { it.class.simpleName.startsWith 'License' }.each {
-		it.source = fileTree(dir: 'src', excludes: [
-			"**/data/**",
-			"**/data-init/**",
-			"**/data-demo/**",
-			"**/src-gen/**",
-			"**/resources/**",
-			"**/webapp/lib/**",
-			"**/webapp/WEB-INF/web.xml"
-		])
+	afterEvaluate {
+		tasks.findAll { it.class.simpleName.startsWith 'License' }.each {
+			it.source = fileTree(dir: 'src', excludes: [
+				"**/data/**",
+				"**/data-init/**",
+				"**/data-demo/**",
+				"**/src-gen/**",
+				"**/resources/**",
+				"**/webapp/lib/**",
+				"**/webapp/WEB-INF/web.xml"
+			])
+		}
 	}
 }
