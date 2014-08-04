@@ -55,6 +55,11 @@ public @interface CliCommand {
 	String notes() default "";
 	
 	/**
+	 * @return command sort order priority.
+	 */
+	int priority() default -1;
+	
+	/**
 	 * @return whether to show this command in usage help.
 	 */
 	boolean hidden() default false;

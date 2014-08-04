@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -130,31 +131,37 @@ public class Parser {
 				continue;
 			}
 			String name = attrs.name();
-			String usage = attrs.usage();
-			String left = name;
-			if (usage != null) {
-				left += " " + usage;
-			}
-			if (left.length() > leftWidth) {
-				leftWidth = left.length();
+			if (name.length() > leftWidth) {
+				leftWidth = name.length();
 			}
 			commands.add(name);
 		}
 		
-		Collections.sort(commands);
+		Collections.sort(commands, new Comparator<String>() {
+			
+			@Override
+			public int compare(String o1, String o2) {
+				Target t1 = targets.get(o1);
+				Target t2 = targets.get(o2);
+				CliCommand c1 = t1.getCliCommand();
+				CliCommand c2 = t2.getCliCommand();
+				if (c1.priority() == c2.priority()) {
+					return o1.compareTo(o2);
+				}
+				return c1.priority() - c2.priority();
+			}
+		});
 		
 		System.out.println();
 		System.out.println("Available commands");
 		System.out.println("------------------\n");
 		
 		for (String name : commands) {
-			String usage = targets.get(name).getCliCommand().usage();
 			String help = targets.get(name).getCliCommand().help();
-			usage = usage == null ? name : name + " " + usage;
 			if (help == null) {
 				help = "";
 			}
-			System.out.println(String.format("  %-" + leftWidth + "s    %s", usage, help));
+			System.out.println(String.format("  %-" + leftWidth + "s    %s", name, help));
 		}
 		
 		System.out.println();
