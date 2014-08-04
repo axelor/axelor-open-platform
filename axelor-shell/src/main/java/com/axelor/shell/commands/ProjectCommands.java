@@ -31,6 +31,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 import java.util.regex.Pattern;
 
 import org.codehaus.groovy.control.CompilationFailedException;
@@ -68,6 +69,12 @@ public class ProjectCommands implements CommandProvider {
 		TEMPLATES.put("templates/app/gitignore.tmpl", ".gitignore");
 		TEMPLATES.put("templates/app/build.gradle.tmpl", "build.gradle");
 		TEMPLATES.put("templates/app/settings.gradle.tmpl", "settings.gradle");
+		TEMPLATES.put("templates/app/application.properties.tmpl", "src/main/resources/application.properties");
+		TEMPLATES.put("templates/app/persistence.xml.tmpl", "src/main/resources/META-INF/persistence.xml");
+		TEMPLATES.put("templates/app/log4j.properties.tmpl", "src/main/resources/log4j.properties");
+		TEMPLATES.put("templates/app/header.txt.tmpl", "src/license/header.txt");
+		//TEMPLATES.put("templates/app/ehcache.xml.tmpl", "src/main/resources/ehcache.xml");
+		
 		TEMPLATES.put("templates/module/build.gradle.tmpl", "build.gradle");
 		TEMPLATES.put("templates/module/Entity.xml.tmpl", "src/main/resources/domains/<%= model %>.xml");
 		TEMPLATES.put("templates/module/View.xml.tmpl", "src/main/resources/views/<%= model %>.xml");
@@ -141,12 +148,16 @@ public class ProjectCommands implements CommandProvider {
 		
 		vars.put("name", name);
 		vars.put("title", title);
+		vars.put("sdkVersion", BuiltinCommands.getVersion());
 		
 		try {
-			expand(target, "templates/app/gitignore.tmpl", vars);
-			expand(target, "templates/app/build.gradle.tmpl", vars);
-			expand(target, "templates/app/settings.gradle.tmpl", vars);
+			for (String template : TEMPLATES.keySet()) {
+				if (template.startsWith("templates/app/")) {
+					expand(target, template, vars);
+				}
+			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			shell.error("Unable to create the application.\n");
 			return new CommandResult(false);
 		}
@@ -190,9 +201,11 @@ public class ProjectCommands implements CommandProvider {
 		vars.put("model", "Hello" + Inflector.getInstance().camelize(ns, false));
 		
 		try {
-			expand(target, "templates/module/build.gradle.tmpl", vars);
-			expand(target, "templates/module/Entity.xml.tmpl", vars);
-			expand(target, "templates/module/View.xml.tmpl", vars);
+			for (String template : TEMPLATES.keySet()) {
+				if (template.startsWith("templates/module/")) {
+					expand(target, template, vars);
+				}
+			}
 		} catch (Exception e) {
 			shell.error("Unable to create the module.\n");
 			return new CommandResult(false);
