@@ -18,6 +18,6 @@ license {
 }
 
 tomcat {
-	httpPort = 8080
+	httpPort = project.properties.get("http.port", 8080) as Integer
 	stopPort = 9451
 }
