@@ -20,6 +20,15 @@ for f in `ls $APP_DIR/axelor-gradle/src/init.d/*.gradle` ; do
 	INIT_SCRIPT_ARGS="$INIT_SCRIPT_ARGS -I $f"
 done
 
+# Make sure the axelor-gradle is deployed in local ivy repo
+if [ ! -d "$APP_DIR/ivy" ] ; then
+	mkdir -p "$APP_DIR/ivy"
+	echo "Configuring axelor-gradle, please wait..."
+	$0 -q -p axelor-gradle -x test uploadArchives &>/dev/null
+	$0 $@
+	exit
+fi
+
 # Use the maximum available, or set MAX_FD != -1 to use that value.
 MAX_FD="maximum"
 
