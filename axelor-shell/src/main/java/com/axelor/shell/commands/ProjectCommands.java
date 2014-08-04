@@ -29,9 +29,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 import java.util.regex.Pattern;
 
 import org.codehaus.groovy.control.CompilationFailedException;
@@ -75,6 +75,12 @@ public class ProjectCommands implements CommandProvider {
 		TEMPLATES.put("templates/app/header.txt.tmpl", "src/license/header.txt");
 		//TEMPLATES.put("templates/app/ehcache.xml.tmpl", "src/main/resources/ehcache.xml");
 		
+		// gradle wrapper
+		TEMPLATES.put("templates/app/wrapper/gradlew","gradlew");
+		TEMPLATES.put("templates/app/wrapper/gradlew.bat","gradlew.bat");
+		TEMPLATES.put("templates/app/wrapper/gradle/wrapper/gradle-wrapper.jar","gradle/wrapper/gradle-wrapper.jar");
+		TEMPLATES.put("templates/app/wrapper/gradle/wrapper/gradle-wrapper.properties","gradle/wrapper/gradle-wrapper.properties");
+		
 		TEMPLATES.put("templates/module/build.gradle.tmpl", "build.gradle");
 		TEMPLATES.put("templates/module/Entity.xml.tmpl", "src/main/resources/domains/<%= model %>.xml");
 		TEMPLATES.put("templates/module/View.xml.tmpl", "src/main/resources/views/<%= model %>.xml");
@@ -100,7 +106,17 @@ public class ProjectCommands implements CommandProvider {
 		if (!target.getParentFile().exists()) {
 			target.getParentFile().mkdirs();
 		}
-		
+
+		// not a template
+		if (!templateName.endsWith(".tmpl")) {
+			try {
+				Files.copy(is, target.toPath());
+			} finally {
+				is.close();
+			}
+			return;
+		}
+
 		try (
 			Reader reader = new BufferedReader(new InputStreamReader(is));
 			Writer writer = new BufferedWriter(new FileWriter(target))) {
@@ -156,6 +172,13 @@ public class ProjectCommands implements CommandProvider {
 					expand(target, template, vars);
 				}
 			}
+			
+			// finally fix permission on gradlew scripts
+			File gradlew = new File(target, "gradlew");
+			if (gradlew.exists()) {
+				gradlew.setExecutable(true);
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			shell.error("Unable to create the application.\n");
