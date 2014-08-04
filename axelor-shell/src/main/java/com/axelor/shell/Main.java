@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.axelor.shell.commands.BuiltinCommands;
+import com.axelor.shell.commands.GradleCommands;
 import com.axelor.shell.commands.ProjectCommands;
 import com.axelor.shell.core.Shell;
 import com.google.common.io.Files;
@@ -53,7 +54,15 @@ public class Main {
 		System.out.println("  -v, --version       display version information");
 		System.out.println("      --new <NAME>    create a new application project");
 		System.out.println();
-		System.out.println("You can also see more detailed docs at http://axelor.com/docs.");
+		System.out.println("You can also execute shell commands directly like:");
+		System.out.println();
+		System.out.println("  axelor help");
+		System.out.println("  axelor help run");
+		System.out.println("  axelor clean");
+		System.out.println("  axelor build");
+		System.out.println("  axelor run -p 8000");
+		System.out.println();
+		System.out.println("See detailed documentation at http://axelor.com/docs.");
 	}
 	
 	public static void main(String[] args) throws Exception {
@@ -63,6 +72,7 @@ public class Main {
 		
 		shell.addCommand(builtins);
 		shell.addCommand(new ProjectCommands(shell));
+		shell.addCommand(new GradleCommands(shell));
 		
 		if (args.length > 0) {
 			
@@ -79,8 +89,12 @@ public class Main {
 			case "--version":
 				builtins.showAbout();
 				return;
-			default:
+			case "-h":
+			case "--help":
 				printHelp();
+				return;
+			default:
+				shell.execute(args);
 				return;
 			}
 		}

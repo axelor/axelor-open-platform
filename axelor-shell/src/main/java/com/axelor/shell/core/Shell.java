@@ -72,8 +72,8 @@ public class Shell implements Runnable {
 		}
 	}
 	
-	public CommandResult executeCommand(String line) {
-		ParserResult result = parser.parse(line);
+	public CommandResult execute(String... args) {
+		ParserResult result = parser.parse(args);
 		if (result == null) {
 			return new CommandResult(false);
 		}
@@ -86,6 +86,10 @@ public class Shell implements Runnable {
 			e.printStackTrace();
 			return new CommandResult(false, e);
 		}
+	}
+	
+	public CommandResult executeCommand(String line) {
+		return execute(parser.toArgs(line));
 	}
 	
 	private ConsoleReader createConsoleReader() {
