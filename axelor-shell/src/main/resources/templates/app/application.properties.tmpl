@@ -1,0 +1,133 @@
+# Application Information
+# ~~~~~
+application.name = <%= name %>
+application.description = <%= title %>
+application.version = 1.0.0
+application.sdk.version = <%= sdkVersion %>
+
+# application header logo, should be 40px in height
+application.logo =
+
+# link to be used with header logo
+application.home =
+
+# Application Mode
+# ~~~~~
+# Set to 'dev' for development mode else 'prod'
+application.mode = dev
+
+# CSS Theme
+# ~~~~~
+# Set default CSS theme, for example `blue`
+application.theme =
+
+# Default Locale (language)
+# ~~~~~
+# Set default application locale (en, fr, fr_FR, en_US)
+application.locale =
+
+# Link to the online help
+# ~~~~~
+application.help.location = http://wiki.axelor.com/
+
+# Database settings
+# ~~~~~
+#db.default.dialect = org.hibernate.dialect.PostgreSQLDialect
+#db.default.driver = org.postgresql.Driver
+#db.default.ddl = update
+#db.default.url = jdbc:postgresql://localhost:5432/<%= name %>-dev
+#db.default.user = postgresql
+#db.default.password =
+
+# Date Format
+# ~~~~~
+date.format = dd/MM/yyyy
+
+# Timezone
+# ~~~~~
+date.timezone = UTC
+
+# Session timeout (in minutes)
+# ~~~~~
+session.timeout = 60
+
+# Location of temp directory
+# ~~~~~
+temp.dir = /tmp
+
+# Storage path for upload files (attachments)
+# ~~~~~
+# use {user.home} key to save files under user home directory, or
+# use absolute path where server user have write permission.
+file.upload.dir = {java.io.tmpdir}/axelor/attachments
+
+# Maximum upload size (in MB)
+# ~~~~~
+file.upload.size = 5
+
+# Data export (csv) encoding
+# ~~~~
+# Use Windows-1252, ISO-8859-1 or ISO-8859-15 if targeting ms excel
+# (excel does not recognize utf8 encoded csv)
+data.export.encoding = UTF-8
+
+# Storage path for export action
+# ~~~~~
+data.export.dir = {java.io.tmpdir}/axelor/data-export
+
+# Data Import Settings
+# ~~~~~
+#smooks.config.file = /path/to/csv/config.xml
+#smooks.data.dir = /path/to/csv/data
+
+# LDAP Configuration
+# ~~~~~
+#ldap.server.url = ldap://localhost:10389
+
+# can be "simple" or "CRAM-MD5"
+ldap.auth.type = simple
+
+ldap.system.user = uid=admin,ou=system
+ldap.system.password = secret
+
+# group search base
+ldap.group.base = ou=groups,dc=example,dc=com
+
+# if set, create groups on ldap server under ldap.group.base
+#ldap.group.object.class = groupOfUniqueNames
+
+# a template to search groups by user login id
+ldap.group.filter = (uniqueMember=uid={0})
+
+# user search base
+ldap.user.base = ou=users,dc=example,dc=com
+
+# a template to search user by user login id
+ldap.user.filter = (uid={0})
+
+##
+# Quartz Scheduler
+##
+
+# Specify whether to enable quartz scheduler
+quartz.enable = false
+
+# total number of threads in quartz thread pool
+# the number of jobs that can run simultaneously
+quartz.threadCount = 3
+
+##
+# View configuration
+##
+
+# Set menu style (left, top, both)
+view.menubar.location = both
+
+# Show button titles in toolbar
+view.toolbar.titles = false
+
+# Show confirm dialog with yes/no buttons (default is Cancel/OK)
+view.confirm.yes-no = false
+
+# Whether to enable hot-edit feature
+view.form.hot-edit = true
