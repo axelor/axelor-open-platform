@@ -4,7 +4,9 @@ def libs = [
 	junit:			"junit:junit:4.11",
 
 	// logging
-	slf4j:			["org.slf4j:slf4j-api:1.7.6", "org.slf4j:slf4j-log4j12:1.7.6"],
+	slf4j:			["org.slf4j:slf4j-api:1.7.7", "org.slf4j:slf4j-log4j12:1.7.7"],
+	slf4j_simple:	["org.slf4j:slf4j-api:1.7.7", "org.slf4j:slf4j-simple:1.7.7"],
+	slf4j_logback:	["org.slf4j:slf4j-api:1.7.7", "ch.qos.logback:logback-classic:1.1.2"],
 
 	// guava
 	guava:			"com.google.guava:guava:17.0",
