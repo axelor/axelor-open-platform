@@ -46,8 +46,13 @@ class AppPlugin extends AbstractPlugin {
 				compile 	"com.axelor:axelor-common:${sdkVersion}"
 				compile		"com.axelor:axelor-core:${sdkVersion}"
 				compile		"com.axelor:axelor-web:${sdkVersion}"
+
+				axelor 		"com.axelor:axelor-common:${sdkVersion}"
+				axelor		"com.axelor:axelor-core:${sdkVersion}"
 				axelor		"com.axelor:axelor-web:${sdkVersion}"
-				
+				axelor		"com.axelor:axelor-wkf:${sdkVersion}"
+				axelor		"com.axelor:axelor-test:${sdkVersion}"
+
 				providedCompile	libs.javax_servlet
 
 				def tomcatVersion = '7.0.54'
@@ -65,6 +70,10 @@ class AppPlugin extends AbstractPlugin {
 					try {
 						project.tasks.generateCode.dependsOn p.generateCode
 					} catch (Exception e) {}
+				}
+
+				if (project.hasProperty('linkCoreInEclipse')) {
+					linkCoreProjects(project)
 				}
             }
 
@@ -99,11 +108,50 @@ class AppPlugin extends AbstractPlugin {
 
 				wtp {
 					component {
-						resource sourcePath: "../axelor-platform/axelor-web/src/main/webapp", deployPath: "/"
 						resource sourcePath: "src/main/webapp", deployPath: "/"
 					}
 				}
 			}
         }
     }
+
+	private void linkCoreProjects(Project project) {
+
+		def linked = ['axelor-common', 'axelor-core', 'axelor-web', 'axelor-wkf', 'axelor-test']
+		def wtpLinked = linked - ['axelor-test']
+
+		project.eclipse.classpath {
+			minusConfigurations += [project.configurations.axelor]
+		}
+		project.eclipse.wtp.component {
+			minusConfigurations += [project.configurations.axelor]
+		}
+		project.eclipse.classpath.file {
+			withXml {
+				def node = it.asNode()
+				node.find { it.@path == "org.eclipse.jst.j2ee.internal.web.container" }?.plus {
+					linked.collect { name ->
+						classpathentry(kind: 'src', path: "/${name}", exported: 'true')
+					}
+				}
+			}
+		}
+		project.eclipse.wtp.component.file {
+			withXml {
+				def node = it.asNode()['wb-module'][0]
+				node.find { it.'@source-path' == "src/main/webapp" }?.replaceNode {
+					['wb-resource'('deploy-path': "/", 'source-path': "axelor-webapp"),
+					 'wb-resource'('deploy-path': "/", 'source-path': "src/main/webapp")] +
+					wtpLinked.collect { name ->
+						'dependent-module'('deploy-path': "/WEB-INF/lib", handle: "module:/resource/${name}/${name}") {
+							'dependency-type'('uses')
+						}
+					}
+				}
+			}
+		}
+		project.eclipse.project {
+			linkedResource name: 'axelor-webapp', type: '2', location: '${WORKSPACE_LOC}/axelor-platform/axelor-web/src/main/webapp'
+		}
+	}
 }
