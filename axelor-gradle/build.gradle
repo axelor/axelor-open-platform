@@ -48,18 +48,6 @@ allprojects {
 	}
 }
 
-task distGradle(type: Zip) {
-	archiveName = "axelor-gradle-${gradle.gradleVersion}.zip"
-	into("axelor-gradle-${gradle.gradleVersion}") {
-		into('init.d') { from 'src/init.d' }
-		into('init.d/libs') {
-			from jar
-			from configurations.runtime - configurations.gradleApi
-		}
-		from gradle.gradleHomeDir
-	}
-}
-
 task dist(type: Copy) {
 	destinationDir = file("${rootProject.buildDir}/dist")
 	into('init.d') { from 'src/init.d' }
