@@ -35,13 +35,18 @@ class AppPlugin extends AbstractPlugin {
             def definition = extensions.create("application", AppDefinition)
 
 			applyCommon(project, definition)
-
+			
+			configurations {
+				axelor
+			}
+			
 			dependencies {
 
 				testCompile "com.axelor:axelor-test:${sdkVersion}"
 				compile 	"com.axelor:axelor-common:${sdkVersion}"
 				compile		"com.axelor:axelor-core:${sdkVersion}"
 				compile		"com.axelor:axelor-web:${sdkVersion}"
+				axelor		"com.axelor:axelor-web:${sdkVersion}"
 				
 				providedCompile	libs.javax_servlet
 
@@ -53,17 +58,13 @@ class AppPlugin extends AbstractPlugin {
 				}
 			}
 			
-            afterEvaluate {
-				
-				def self = owner
-				owner.version definition.version
-				owner.subprojects {
-					version definition.version
-					afterEvaluate {
-						try {
-							self.tasks.generateCode.dependsOn tasks.generateCode
-						} catch (Exception e){}
-					}
+			afterEvaluate {
+				project.version = definition.version
+				subprojects { p ->
+					p.version = definition.version
+					try {
+						project.tasks.generateCode.dependsOn p.generateCode
+					} catch (Exception e) {}
 				}
             }
 
@@ -71,33 +72,23 @@ class AppPlugin extends AbstractPlugin {
 				expandAll()
 			}
 
-			compileJava.dependsOn "generateCode"
-
-			def webappDir = "${rootProject.buildDir}/webapp"
-
 			// copy webapp to root build dir
-			task("copyWebapp") {
-				war.project.configurations.runtime.each {
-					if (it.name.startsWith("axelor-web")) {
-						def fileList = war.project.zipTree(it)
-						copy {
-							from fileList.matching { include "webapp/**/*" }
-							into file(webappDir).parentFile
-						}
-					}
-				}
-				copy {
-					from files(["${projectDir}/src/main/webapp"])
-					into webappDir
+			task("copyWebapp", type: Copy) {
+				destinationDir = file(buildDir)
+				from zipTree(configurations.axelor.find { it.name.startsWith('axelor-web') }).matching { include 'webapp/**/*' }
+				into("webapp") {
+					from "src/main/webapp"
 				}
 			}
 
+			compileJava.dependsOn "generateCode"
+
 			war.dependsOn "copyWebapp"
-			war.from webappDir
+			war.from "${buildDir}/webapp"
 			war.duplicatesStrategy = "EXCLUDE"
 
 			tomcatRun.dependsOn "copyWebapp"
-			tomcatRun.webAppSourceDirectory = file(webappDir)
+			tomcatRun.webAppSourceDirectory = file("${buildDir}/webapp")
 
 			eclipse {
 				
