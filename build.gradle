@@ -42,24 +42,12 @@ allprojects {
 			add project.repositories.localRepo
 		}
 	}
-	
-	task generateVersion() {
-		onlyIf { project.group == "com.axelor" }
-		doLast {
-			def vf = file("${buildDir}/resources/main/${project.name}-version.txt")
-			vf.parentFile.mkdirs()
-			vf.text = project.version
-		}
-	}
-	
-	compileJava.dependsOn generateVersion
-
-	if (project != owner) {
-		owner.tasks.repo.dependsOn project.uploadArchives
-	}
 }
 
+tasks.repo.dependsOn subprojects*.uploadArchives
+
 jar.enabled = false
+install.enabled = false
 uploadArchives.enabled = false
 
 applicationName = "axelor"

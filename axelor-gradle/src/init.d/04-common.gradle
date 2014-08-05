@@ -32,4 +32,18 @@ allprojects { project ->
 		options.compilerArgs = ['-Xlint:-options']
 		groovyOptions.encoding = 'utf-8'
 	}
+
+	// generate version file for axelor projects
+	task generateVersion() {
+		onlyIf { project.group == "com.axelor" }
+		doLast {
+			def vf = file("${buildDir}/resources/main/${project.name}-version.txt")
+			vf.parentFile.mkdirs()
+			vf.text = project.version
+		}
+	}
+
+	afterEvaluate {
+		tasks.withType(JavaCompile)*.dependsOn generateVersion
+	}
 }
