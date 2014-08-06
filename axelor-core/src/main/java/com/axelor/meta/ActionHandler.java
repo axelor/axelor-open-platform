@@ -20,6 +20,10 @@ package com.axelor.meta;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.db.JPA;
+import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.actions.ActionGroup;
@@ -38,12 +43,15 @@ import com.axelor.meta.schema.actions.ActionMethod;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
+import com.axelor.rpc.Resource;
 import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.axelor.text.Templates;
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Collections2;
 import com.google.common.io.CharStreams;
 import com.google.inject.Injector;
 import com.google.inject.servlet.RequestScoped;
@@ -292,6 +300,69 @@ public class ActionHandler {
 		return action.evaluate(this);
 	}
 
+	private static final String KEY_VALUES = "values";
+	private static final String KEY_ATTRS = "attrs";
+	private static final String KEY_VALUE = "value";
+
+	private Object toCompact(final Object item) {
+		if (item == null) return null;
+		if (item instanceof Collection) {
+			return Collections2.transform((Collection<?>) item, new Function<Object, Object>() {
+				@Override
+				public Object apply(Object input) {
+					return toCompact(item);
+				}
+			});
+		}
+		if (item instanceof Model) {
+			Model bean = (Model) item;
+			if (bean.getId() != null && JPA.em().contains(bean)) {
+				return Resource.toMapCompact(bean);
+			}
+		}
+		return item;
+	}
+
+	/**
+	 * This method finds m2o values which are managed instances and converts
+	 * them to compact maps to avoid unnecessary data transmission and prevents
+	 * object graph recreation issues.
+	 */
+	@SuppressWarnings("all")
+	private Object process(Object data) {
+		if (data == null) return data;
+		if (data instanceof Collection) {
+			final List items = new ArrayList<>();
+			for (Object item : (Collection) data) {
+				items.add(process(item));
+			}
+			return items;
+		}
+		if (data instanceof Map) {
+			final Map<String, Object> item = new HashMap<>((Map) data);
+			if (item.containsKey(KEY_VALUES) && item.get(KEY_VALUES) instanceof Map) {
+				final Map<String, Object> values = (Map) item.get(KEY_VALUES);
+				for (String key : values.keySet()) {
+					Object value = values.get(key);
+					if (value instanceof Model) {
+						values.put(key, toCompact(value));
+					}
+				}
+			}
+			if (item.containsKey(KEY_ATTRS) && item.get(KEY_ATTRS) instanceof Map) {
+				final Map<String, Object> values = (Map) item.get(KEY_ATTRS);
+				for (String key : values.keySet()) {
+					final Map<String, Object> attrs = (Map) values.get(key);
+					if (attrs.containsKey(KEY_VALUE)) {
+						attrs.put(KEY_VALUE, toCompact(attrs.get(KEY_VALUE)));
+					}
+				}
+			}
+			return item;
+		}
+		return data;
+	}
+
 	public ActionResponse execute() {
 
 		ActionResponse response = new ActionResponse();
@@ -313,7 +384,7 @@ public class ActionHandler {
 			return (ActionResponse) data;
 		}
 
-		response.setData(data);
+		response.setData(process(data));
 		response.setStatus(ActionResponse.STATUS_SUCCESS);
 
 		return response;
