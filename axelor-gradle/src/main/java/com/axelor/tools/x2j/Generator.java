@@ -203,6 +203,39 @@ public class Generator {
 	}
 	
 	/**
+	 * Get a {@link Generator} instance for the given source files.
+	 * <p>
+	 * Used by code generator task to add lookup source to core modules.
+	 * 
+	 * @param files
+	 *            input files
+	 * @return a {@link Generator} instance
+	 */
+	public static Generator forFiles(Collection<File> files) {
+		if (files == null || files.isEmpty()) {
+			return null;
+		}
+		final Generator gen = new Generator(null, null) {
+
+			@Override
+			public void start() throws IOException {}
+
+			@Override
+			public void clean() {}
+
+			@Override
+			public void addLookupSource(Generator generator) throws IOException {}
+		};
+		for (File file : files) {
+			try {
+				gen.process(file, false);
+			} catch (IOException e) {
+			}
+		}
+		return gen;
+	}
+
+	/**
 	 * Combine all multiple objects.
 	 * 
 	 * This method should be called from application after all other code
