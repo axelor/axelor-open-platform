@@ -32,12 +32,9 @@ class BasePlugin extends AbstractPlugin {
 
 			applyCommon(project, definition)
 
-			ext.isModule = true
-
 			task("generateCode", type: GenerateCode)
 
 			compileJava.dependsOn "generateCode"
         }
     }
 }
-

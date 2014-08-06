@@ -19,6 +19,7 @@ package com.axelor.gradle.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.tasks.TaskAction
 
@@ -26,24 +27,33 @@ import com.axelor.tools.x2j.Generator
 
 class GenerateCode extends DefaultTask {
 
-	List<String> IGNORE = ["axelor-common", "axelor-test"]
-
 	def findAllModules(Project project, Set<Project> found) {
 		def name = project.name
 		if (found == null) {
 			found = []
 		}
-		if (IGNORE.contains(name)) {
-			return found
-		}
 		project.configurations.compile.allDependencies.withType(ProjectDependency).each {
 			def dep = it.dependencyProject
-			if (!found.contains(dep) && !IGNORE.contains(dep.name) && dep.isModule) {
+			if (!found.contains(dep)) {
 				found.add(dep)
 				findAllModules(dep, found)
 			}
 		}
 		return found
+	}
+
+	def findCoreFiles(Project project) {
+		def all = project.configurations.compile.allDependencies.withType(ExternalModuleDependency)
+			.findAll { ['axelor-core', 'axelor-web'].contains(it.name) }
+			.collect { it.name }
+
+		if (all == null || all.empty) {
+			return null
+		}
+		return project.configurations.compile
+			.findAll { f -> all.find { n -> f.name.startsWith n } }
+			.collect { project.rootProject.zipTree(it).matching { include "**/domains/**" }.files }
+			.flatten()
 	}
 
 	@TaskAction
@@ -67,13 +77,19 @@ class GenerateCode extends DefaultTask {
 	def generateCode(String extension) {
 
 		def definition = project.extensions.findByName(extension)
-		if (definition == null || IGNORE.contains(definition.name)) {
+		if (definition == null) {
 			return
 		}
 
 		generateInfo(extension)
 
 		def generator = buildGenerator(project)
+
+		def coreFiles = findCoreFiles(project)
+		if (coreFiles && !coreFiles.empty) {
+			generator.addLookupSource(Generator.forFiles(coreFiles))
+		}
+
 		findAllModules(project, null).each {
 			def lookup = buildGenerator(it)
 			generator.addLookupSource(lookup)
