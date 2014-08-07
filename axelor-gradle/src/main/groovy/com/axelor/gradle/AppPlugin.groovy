@@ -112,6 +112,9 @@ class AppPlugin extends AbstractPlugin {
 					}
 				}
 			}
+
+			// add eclipse launcher
+			eclipseLaunchers(project)
         }
     }
 
@@ -152,6 +155,27 @@ class AppPlugin extends AbstractPlugin {
 		}
 		project.eclipse.project {
 			linkedResource name: 'axelor-webapp', type: '2', location: '${WORKSPACE_LOC}/axelor-platform/axelor-web/src/main/webapp'
+		}
+	}
+
+	private void eclipseLaunchers(Project project) {
+		project.tasks.eclipse.doLast {
+			def home = System.getenv("AXELOR_HOME")
+			def launcher = project.file(".settings/Generate Code (${project.name}).launch")
+			launcher.text = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.ui.externaltools.ProgramLaunchConfigurationType">
+<stringAttribute key="org.eclipse.debug.core.ATTR_REFRESH_SCOPE" value="\${workspace}"/>
+<mapAttribute key="org.eclipse.debug.core.environmentVariables">
+<mapEntry key="AXELOR_HOME" value="${home}"/>
+</mapAttribute>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_LAUNCH_CONFIGURATION_BUILD_SCOPE" value="\${none}"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${project.projectDir}/gradlew"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_RUN_BUILD_KINDS" value="full,"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="generateCode"/>
+<booleanAttribute key="org.eclipse.ui.externaltools.ATTR_TRIGGERS_CONFIGURED" value="true"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_WORKING_DIRECTORY" value="${project.projectDir}"/>
+</launchConfiguration>
+"""
 		}
 	}
 }
