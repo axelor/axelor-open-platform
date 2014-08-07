@@ -85,3 +85,6 @@ installApp {
 task wrapper(type: Wrapper) {
 	gradleVersion = "2.0"
 }
+
+// force wtp settings on subprojects
+apply from: 'gradle/force-wtp.gradle'
