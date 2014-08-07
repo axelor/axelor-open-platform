@@ -17,9 +17,10 @@
  */
 package com.axelor.gradle
 
+import java.util.regex.Pattern
+
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.wrapper.Wrapper
 
 import com.axelor.gradle.tasks.GenerateCode
 
@@ -36,23 +37,13 @@ class AppPlugin extends AbstractPlugin {
 
 			applyCommon(project, definition)
 			
-			configurations {
-				axelor
-			}
-			
 			dependencies {
 
 				testCompile "com.axelor:axelor-test:${sdkVersion}"
 				compile 	"com.axelor:axelor-common:${sdkVersion}"
 				compile		"com.axelor:axelor-core:${sdkVersion}"
 				compile		"com.axelor:axelor-web:${sdkVersion}"
-
-				axelor 		"com.axelor:axelor-common:${sdkVersion}"
-				axelor		"com.axelor:axelor-core:${sdkVersion}"
-				axelor		"com.axelor:axelor-web:${sdkVersion}"
-				axelor		"com.axelor:axelor-wkf:${sdkVersion}"
-				axelor		"com.axelor:axelor-test:${sdkVersion}"
-
+				
 				providedCompile	libs.javax_servlet
 
 				def tomcatVersion = '7.0.54'
@@ -60,6 +51,20 @@ class AppPlugin extends AbstractPlugin {
 					   "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}"
 				tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}") {
 					exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
+				}
+			}
+
+			allprojects {
+				configurations {
+					axelorCore
+					axelorCore.transitive = false
+				}
+				dependencies {
+					axelorCore "com.axelor:axelor-common:${sdkVersion}"
+					axelorCore "com.axelor:axelor-core:${sdkVersion}"
+					axelorCore "com.axelor:axelor-web:${sdkVersion}"
+					axelorCore "com.axelor:axelor-wkf:${sdkVersion}"
+					axelorCore "com.axelor:axelor-test:${sdkVersion}"
 				}
 			}
 			
@@ -74,6 +79,11 @@ class AppPlugin extends AbstractPlugin {
 
 				if (project.hasProperty('linkCoreInEclipse')) {
 					linkCoreProjects(project)
+					project.subprojects { sub ->
+						if (sub.plugins.hasPlugin('axelor-module')) {
+							linkCoreProjects(sub)
+						}
+					}
 				}
             }
 
@@ -84,7 +94,7 @@ class AppPlugin extends AbstractPlugin {
 			// copy webapp to root build dir
 			task("copyWebapp", type: Copy) {
 				destinationDir = file(buildDir)
-				from zipTree(configurations.axelor.find { it.name.startsWith('axelor-web') }).matching { include 'webapp/**/*' }
+				from zipTree(configurations.axelorCore.find { it.name.startsWith('axelor-web') }).matching { include 'webapp/**/*' }
 				into("webapp") {
 					from "src/main/webapp"
 				}
@@ -99,45 +109,52 @@ class AppPlugin extends AbstractPlugin {
 			tomcatRun.dependsOn "copyWebapp"
 			tomcatRun.webAppSourceDirectory = file("${buildDir}/webapp")
 
-			eclipse {
-				
-				//XXX: running inside eclipse requires commons logging
-				dependencies {
-					compile	libs.commons_logging
-				}
-
-				wtp {
-					component {
-						resource sourcePath: "src/main/webapp", deployPath: "/"
-					}
-				}
-			}
-
 			// add eclipse launcher
 			eclipseLaunchers(project)
         }
     }
 
+	private Pattern namePattern = ~/^(axelor-(?:common|core|web|wkf))-/
+
+	private List<String> findCoreModules(Project project) {
+		def all = []
+		project.configurations.runtime.each { File lib ->
+			def m = namePattern.matcher(lib.name)
+			if (m.find()) {
+				all += [m.group(1)]
+			}
+		}
+		return all
+	}
+
 	private void linkCoreProjects(Project project) {
 
-		def linked = ['axelor-common', 'axelor-core', 'axelor-web', 'axelor-wkf', 'axelor-test']
+		def linked = findCoreModules(project)
 		def wtpLinked = linked - ['axelor-test']
 
 		project.eclipse.classpath {
-			minusConfigurations += [project.configurations.axelor]
-		}
-		project.eclipse.wtp.component {
-			minusConfigurations += [project.configurations.axelor]
+			minusConfigurations += [project.configurations.axelorCore]
 		}
 		project.eclipse.classpath.file {
 			withXml {
 				def node = it.asNode()
-				node.find { it.@path == "org.eclipse.jst.j2ee.internal.web.container" }?.plus {
-					linked.collect { name ->
-						classpathentry(kind: 'src', path: "/${name}", exported: 'true')
+				def ref = node.find { it.@path == "org.eclipse.jst.j2ee.internal.web.container" }
+				if (ref) {
+					ref.plus {
+						linked.collect { name -> classpathentry(kind: 'src', path: "/${name}", exported: 'true')}
 					}
+				} else {
+					linked.each { name -> node.appendNode('classpathentry', [kind: 'src', path: "/${name}", exported: 'true']) }
 				}
 			}
+		}
+
+		if (!project.plugins.hasPlugin("war")) {
+			return
+		}
+
+		project.eclipse.wtp.component {
+			minusConfigurations += [project.configurations.axelorCore]
 		}
 		project.eclipse.wtp.component.file {
 			withXml {
