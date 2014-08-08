@@ -160,7 +160,7 @@ table.form-layout td.form-item.v-align-top {
 }
 
 .form-item-container input {
-	height: 26px;
+	height: 28px;
 	padding: 2px 6px;
 	min-width: 170px;
 }
@@ -293,9 +293,10 @@ table.form-layout fieldset {
 	cursor: pointer;
 	margin-right: 1px;
 	padding: 2px;
-	padding-top: 3px;
+	padding-top: 4px;
 	display: inline-block;
 	line-height: 20px;
+	height: 100%;
 }
 
 .picker-input > input,

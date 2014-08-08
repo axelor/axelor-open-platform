@@ -163,7 +163,9 @@
 			}
 
 			_.each(fields, function(item) {
-				if (item.items || item.pages) {
+				if (item.type === 'panel-related') {
+					items.push(item.name);
+				} else if (item.items || item.pages) {
 					items = items.concat(findFields(item));
 				} else if (item.type === 'field') {
 					items.push(item.name);
