@@ -546,6 +546,41 @@ ui.formInput('ManyToMany', 'OneToMany', {
 	controller: ManyToManyCtrl
 });
 
+var panelRelatedTemplate = 
+"<div class='panel panel-related'>" +
+	"<div class='panel-header'>" +
+		"<div class='icons-bar pull-right' ng-show='!isReadonly()'>" +
+			"<i ng-click='onEdit()' ng-show='hasPermission(\"read\") && canEdit()' class='fa fa-pencil'></i>" +
+			"<i ng-click='onNew()' ng-show='hasPermission(\"write\") && !isDisabled() && canNew()' class='fa fa-plus'></i>" +
+			"<i ng-click='onRemove()' ng-show='hasPermission(\"remove\") && !isDisabled() && canRemove()' class='fa fa-minus'></i>" +
+			"<i ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()' class='fa fa-search'></i>" +
+		"</div>" +
+		"<div class='panel-title'>{{field.title}}</div>" +
+	"</div>" +
+	"<div class='panel-body'>" +
+		"<div ui-view-grid " +
+			"x-view='schema' " +
+			"x-data-view='dataView' " +
+			"x-handler='this' " +
+			"x-no-filter='true' " +
+			"x-on-init='onGridInit' " +
+			"x-on-before-save='onGridBeforeSave' " +
+			"x-on-after-save='onGridAfterSave'></div>" +
+	"</div>" +
+"</div>";
+
+ui.formInput('PanelOneToMany', 'OneToMany', {
+	template_editable: null,
+	template_readonly: null,
+	template: panelRelatedTemplate
+});
+
+ui.formInput('PanelManyToMany', 'ManyToMany', {
+	template_editable: null,
+	template_readonly: null,
+	template: panelRelatedTemplate
+});
+
 ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 
 	css	: 'many2many-tags',

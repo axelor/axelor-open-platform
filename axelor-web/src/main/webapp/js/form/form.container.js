@@ -335,4 +335,23 @@ ui.formWidget('Tab', {
 	'</div>'
 });
 
+ui.formWidget('Panel', {
+	
+	widgets: ['PanelSide'],
+
+	link: function (scope, element, attrs) {
+		var field = scope.field || {};
+		element.addClass(field.serverType);
+	},
+
+	transclude: true,
+	template:
+		"<div class='panel'>" +
+			"<div class='panel-header' ng-show='field.title'>" +
+				"<div class='panel-title'>{{field.title}}</div>" +
+			"</div>" +
+			"<div class='panel-body' ui-transclude></div>" +
+		"</div>"
+});
+
 })(this);

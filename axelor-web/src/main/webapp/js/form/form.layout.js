@@ -181,4 +181,118 @@ ui.directive('uiTableLayout', ['$compile', function($compile) {
 
 }]);
 
+function PanelLayout(items, attrs, $scope, $compile) {
+	
+	var colWidths = attrs.widths,
+		numCols = +attrs.cols || 2,
+		curCol = 0,
+		layout = [$('<div class="row-fluid">')];
+	
+	numCols = Math.min(numCols, 2);
+
+	function add(item, label) {
+		var row = _.last(layout),
+			cell = $('<div>'),
+			colspan = +item.attr('x-colspan') || 1;
+		
+		colspan = Math.min(colspan, numCols);
+
+		if (item.is('.spacer-item')) {
+			curCol += colspan;
+			item.remove();
+			return;
+		}
+
+		if (curCol + colspan >= numCols + 1) {
+			curCol = 0, row = $('<div class="row-fluid">');
+			layout.push(row);
+		}
+		if (label) {
+			label.appendTo(cell);
+		}
+
+		cell.addClass(item.attr('x-cell-css'));
+		cell.addClass('span' + (colspan * (12/numCols)));
+
+		cell.append(item);
+		cell.appendTo(row);
+
+		curCol += colspan;
+	}
+
+	items.each(function (item, i) {
+		var el = $(this),
+			title = el.attr('x-title'),
+			noTitle = el.attr('x-show-title') == 'false';
+		
+		var labelScope = el.data('$scope');
+		if (labelScope) {
+			labelScope = labelScope.$new();
+		}
+	
+		if (!noTitle && title) {
+			var label = $('<label ui-label></label>').html(title).attr('x-for-widget', el.attr('id')),
+				labelElem = $compile(label)(labelScope || $scope);
+			el.data('label', labelElem);
+			return add(el, labelElem);
+		}
+		add(el);
+	});
+	
+	var container = $('<div class="panel-layout"></div').append(layout);
+
+	return container;
+}
+
+ui.directive('uiPanelLayout', ['$compile', function($compile) {
+
+	return function(scope, element, attrs) {
+		var elem = element.children('[ui-transclude]:first');
+		var items = elem.children();
+		var layout = PanelLayout(items, attrs, scope, $compile);
+		elem.append(layout);
+	};
+
+}]);
+
+function BarLayout(items, attrs, $scope, $compile) {
+	
+	var main = $('<div class="span8">');
+	var side = $('<div class="span4">');
+
+	items.each(function(item, i) {
+		var elem = $(this);
+		if (elem.hasClass('panel-side')) {
+			elem.appendTo(side);
+		} else {
+			elem.appendTo(main);
+		}
+	});
+
+	if (side.children().size() == 0) {
+		main.removeClass("span8").addClass("span12");
+		side = null;
+	}
+
+	var row = $('<div class="row">').append(main);
+	
+	if (side) {
+		side.appendTo(row);
+	}
+	
+	return row;
+}
+
+ui.directive('uiBarLayout', ['$compile', function($compile) {
+	
+	return function(scope, element, attrs) {
+		var items = element.children();
+		var layout = BarLayout(items, attrs, scope, $compile);
+		
+		scope._isPanelForm = true;
+		
+		element.append(layout);
+	};
+}]);
+
 })(this);

@@ -82,7 +82,10 @@ public class FormView extends AbstractView {
         @XmlElement(name = "spacer", type = Spacer.class),
         @XmlElement(name = "separator", type = Separator.class),
         @XmlElement(name = "label", type = Label.class),
-        @XmlElement(name = "button", type = Button.class)
+        @XmlElement(name = "button", type = Button.class),
+        @XmlElement(name = "panel", type = Panel.class),
+        @XmlElement(name = "panel-related", type = PanelRelated.class),
+        @XmlElement(name = "panel-side", type = PanelSide.class)
 	})
 	private List<AbstractWidget> items;
 

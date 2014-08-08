@@ -754,6 +754,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 	function parse(scope, schema, fields) {
 		
 		var path = scope.formPath || "";
+		var hasPanels = false;
 		
 		function update(e, attrs) {
 			_.each(attrs, function(v, k) {
@@ -769,11 +770,13 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 				if (this.type == 'break') {
 					return $('<br>').appendTo(parent);
 				}
-				
 				if (this.type == 'field') {
 					delete this.type;
 				}
-				
+				if (['panel', 'panel-related', 'panel-side'].indexOf(this.type) > -1) {
+					hasPanels = true;
+				}
+
 				var widget = this.widget,
 					widgetAttrs = {},
 					attrs = {};
@@ -805,7 +808,18 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 
 				attrs.serverType = attrs.type;
 				attrs.type = type;
-				
+
+				if (type == 'panel-related') {
+					type = 'panel-' + field.type
+					if (attrs.items) {
+						attrs.views = [{
+							type: 'grid',
+							items: attrs.items
+						}]
+					}
+					this.items = attrs.items = null;
+				}
+
 				item.attr('ui-' + type, '');
 				item.attr('id', widgetId);
 				
@@ -851,9 +865,11 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 				}
 			
 				var items = this.items || this.pages;
-				if (items) {
+				if (items && this.type != 'panel-related') {
 					process(items, item);
-					if (type != 'tabs') {
+					if (['panel', 'panel-side'].indexOf(type) > -1) {
+						item.attr('ui-panel-layout', '')
+					} else if (['tabs', 'panel-related'].indexOf(type) == -1) {
 						item.attr('ui-table-layout', '');
 					}
 				}
@@ -874,6 +890,10 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 		
 		process(schema.items, elem);
 		
+		if (hasPanels) {
+			elem.removeAttr('ui-table-layout').attr('ui-bar-layout', '');
+		}
+
 		return elem;
 	}
 	
@@ -972,7 +992,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			form = $compile(form)(scope);
 			element.append(form);
 
-			if (!scope._isPopup) {
+			if (!scope._isPopup && !scope._isPanelForm) {
 				element.addClass('has-width');
 			}
 
