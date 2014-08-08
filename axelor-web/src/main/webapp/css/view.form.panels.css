@@ -26,12 +26,8 @@ form[ui-bar-layout] {
 }
 
 .panel {
-	margin-bottom: 18px;
-
 	border: 1px solid #d4d4d4;
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
-	
-	border-radius: 4px;
 }
 
 .panel .panel-header {
@@ -40,9 +36,6 @@ form[ui-bar-layout] {
 	border-bottom: 1px solid #d4d4d4;
 
 	padding: 6px 10px;
-	
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
 }
 
 .panel .panel-title {
@@ -51,6 +44,17 @@ form[ui-bar-layout] {
 
 .panel .panel-body {
 	padding: 14px;	
+}
+
+.panel {
+	margin-bottom: 18px;
+	margin-top: -19px;
+}
+
+.panel:first-child,
+.panel.panel-related,
+.panel.panel-side {
+	margin-top: 0;
 }
 
 .panel .row-fluid > .form-item {
