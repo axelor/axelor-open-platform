@@ -25,7 +25,6 @@ html, body {
 
 #container {
 	left: 0px; right: 0px; top: 41px; bottom: 0px;
-	min-width:	600px;
 	position:	absolute;
 }
 
@@ -40,10 +39,6 @@ header > .navbar-fixed-top .navbar-inner {
 }
 }
 
-.navbar .navbar-inner .container-fluid {
-	min-width: 940px;
-}
-
 .navbar .brand-logo {
 	float: left;
 }
@@ -54,12 +49,23 @@ header > .navbar-fixed-top .navbar-inner {
 }
 
 .view-tabs {
+	position: absolute;
+	top: 0; right: 0; bottom: 0; left: 0;
 	background-color: white;
 }
 
 header .container-fluid {
-	padding-left: 10px;
-	padding-right: 10px;
+	padding: 0 10px;
+}
+
+@media (max-width: 767px) {
+header .container-fluid {
+	padding: 0 10px;
+}
+header .navbar-fixed-top {
+	margin-left: 0;
+	margin-right: 0;
+}
 }
 
 header .navbar .nav-shortcuts > li > a {
@@ -514,7 +520,6 @@ input[readonly], select[readonly], textarea[readonly] {
 
 .record-toolbar {
 	margin: 0;
-	min-width: 480px;
 }
 
 .record-toolbar .navbar-inner {
