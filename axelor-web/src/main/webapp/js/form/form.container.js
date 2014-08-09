@@ -342,6 +342,9 @@ ui.formWidget('Panel', {
 	link: function (scope, element, attrs) {
 		var field = scope.field || {};
 		element.addClass(field.serverType);
+		if (field.serverType === 'panel-side') {
+			attrs.$set('cols', 1);
+		}
 	},
 
 	transclude: true,

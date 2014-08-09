@@ -182,28 +182,26 @@ ui.directive('uiTableLayout', ['$compile', function($compile) {
 }]);
 
 function PanelLayout(items, attrs, $scope, $compile) {
-	
-	var colWidths = attrs.widths,
-		numCols = +attrs.cols || 2,
+
+	var numCols = 12,
+		defSpan = 12 / (+attrs.cols || 2)
 		curCol = 0,
 		layout = [$('<div class="row-fluid">')];
 	
-	numCols = Math.min(numCols, 2);
-
 	function add(item, label) {
 		var row = _.last(layout),
 			cell = $('<div>'),
-			colspan = +item.attr('x-colspan') || 1;
-		
-		colspan = Math.min(colspan, numCols);
+			span = +item.attr('x-span') || defSpan;
+
+		span = Math.min(span, numCols);
 
 		if (item.is('.spacer-item')) {
-			curCol += colspan;
+			curCol += span;
 			item.remove();
 			return;
 		}
 
-		if (curCol + colspan >= numCols + 1) {
+		if (curCol + span >= numCols + 1) {
 			curCol = 0, row = $('<div class="row-fluid">');
 			layout.push(row);
 		}
@@ -212,12 +210,12 @@ function PanelLayout(items, attrs, $scope, $compile) {
 		}
 
 		cell.addClass(item.attr('x-cell-css'));
-		cell.addClass('span' + (colspan * (12/numCols)));
+		cell.addClass('span' + span);
 
 		cell.append(item);
 		cell.appendTo(row);
 
-		curCol += colspan;
+		curCol += span;
 	}
 
 	items.each(function (item, i) {
