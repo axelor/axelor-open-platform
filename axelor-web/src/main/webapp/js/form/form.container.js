@@ -357,4 +357,48 @@ ui.formWidget('Panel', {
 		"</div>"
 });
 
+ui.formWidget('PanelTabs', {
+
+	link: function (scope, element, attrs) {
+		scope.tabs = [];
+		element.find('> .tab-content > div').each(function () {
+			var elem = $(this);
+			var tab = {
+				title: elem.attr('x-title'),
+				selected: false,
+				elem: elem
+			}
+			scope.tabs.push(tab);
+		});
+
+		scope.selectTab = function(tab) {
+			scope.tabs.forEach(function (current) {
+				current.selected = false;
+				current.elem.hide();
+			})
+			tab.selected = true;
+			tab.elem.show();
+		}
+
+		scope.$timeout(function() {
+			scope.selectTab(_.first(scope.tabs));
+		})
+	},
+
+	transclude: true,
+	template:
+		"<div class='panel-tabs tabbable-tabs'>" +
+			"<div class='nav-tabs-wrap'>" +
+			"<div class='nav-tabs-strip'>" +
+			"<ul class='nav nav-tabs'>" +
+				"<li tabindex='-1' ng-repeat='tab in tabs' ng-class='{active: tab.selected}'>" +
+					"<a tabindex='-1' href='' ng-click='selectTab(tab)' ng-bind-html-unsafe='tab.title'></a>" +
+				"</li>" +
+			"</ul>" +
+			"</div>" +
+			"</div>" +
+			"<div class='tab-content' ui-transclude></div>" +
+		"</div>"
+});
+
 })(this);

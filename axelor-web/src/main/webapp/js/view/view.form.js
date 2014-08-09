@@ -868,7 +868,7 @@ ui.formBuild = function (scope, schema, fields) {
 				process(items, item);
 				if (['panel', 'panel-side'].indexOf(type) > -1) {
 					item.attr('ui-panel-layout', '')
-				} else if (['tabs', 'panel-related'].indexOf(type) == -1) {
+				} else if (['tabs', 'panel-tabs', 'panel-related'].indexOf(type) == -1) {
 					item.attr('ui-table-layout', '');
 				}
 			}
