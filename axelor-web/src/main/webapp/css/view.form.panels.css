@@ -128,3 +128,10 @@ form[ui-bar-layout] {
 	bottom: 0px;
 	border: none;
 }
+.panel-tabs .tab-content {
+	padding-top: 4px;
+}
+
+.panel-tabs .tab-content > .panel {
+	margin-top: 0;
+}

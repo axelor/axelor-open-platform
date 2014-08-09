@@ -579,16 +579,22 @@
     </xsd:complexContent>
   </xsd:complexType>
 
-  <xsd:complexType name="Panel">
+  <xsd:complexType name="AbstractPanel" abstract="true">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractWidget">
+        <xsd:attribute name="title" type="xsd:string" />
+        <xsd:anyAttribute processContents="skip" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="Panel">
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractPanel">
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="field" type="tns:PanelField" />
           <xsd:element name="spacer" type="tns:Spacer" />
           <xsd:element name="label" type="tns:Label" />
         </xsd:choice>
-        <xsd:attribute name="title" type="xsd:string" />
-        <xsd:anyAttribute processContents="skip" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -598,6 +604,17 @@
         <xsd:attribute name="field" type="xsd:string" use="required" />
         <xsd:attribute name="form-view" type="xsd:string" />
         <xsd:attribute name="grid-view" type="xsd:string" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="PanelTabs">
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractPanel">
+        <xsd:choice maxOccurs="8">
+          <xsd:element name="panel" type="tns:Panel" />
+          <xsd:element name="panel-related" type="tns:PanelRelated"/>
+        </xsd:choice>
+        <xsd:attribute name="title" use="prohibited"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -631,6 +648,7 @@
               <xsd:sequence maxOccurs="unbounded">
                 <xsd:element name="panel" type="tns:Panel" minOccurs="1" maxOccurs="unbounded" />
                 <xsd:element name="panel-related" type="tns:PanelRelated" minOccurs="0" maxOccurs="unbounded" />
+                <xsd:element name="panel-tabs" type="tns:PanelTabs" minOccurs="0" maxOccurs="unbounded" />
                 <xsd:element name="panel-side" type="tns:Panel" minOccurs="0" maxOccurs="unbounded" />
               </xsd:sequence>
               <xsd:choice maxOccurs="unbounded">
