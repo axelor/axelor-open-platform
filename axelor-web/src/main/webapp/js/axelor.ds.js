@@ -163,6 +163,17 @@
 			}
 
 			_.each(fields, function(item) {
+
+				// include editor fields (only simple types supported)
+				if (item.target && item.editor) {
+					item.editor = null;
+				}
+				_.each((item.editor||{}).items, function (child) {
+					if (child.type === 'field' && child.name) {
+						items.push(item.target ? item.name + '.' + child.name : child.name);
+					}
+				});
+
 				if (item.type === 'panel-related') {
 					items.push(item.name);
 				} else if (item.items || item.pages) {
@@ -178,7 +189,7 @@
 				items.push(view.colorBy);
 			}
 
-			return _.compact(items);
+			return _.unique(_.compact(items));
 		}
 
 		var viewCache = $cacheFactory("viewFields", { capacity: 1000 });

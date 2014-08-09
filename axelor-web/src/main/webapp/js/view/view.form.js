@@ -749,154 +749,154 @@ function FormViewCtrl($scope, $element) {
 	};
 };
 
-ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewService){
-	
-	function parse(scope, schema, fields) {
-		
-		var path = scope.formPath || "";
-		var hasPanels = false;
-		
-		function update(e, attrs) {
-			_.each(attrs, function(v, k) {
-				if (_.isUndefined(v)) return;
-				e.attr(k, v);
+ui.formBuild = function (scope, schema, fields) {
+
+	var path = scope.formPath || "";
+	var hasPanels = false;
+
+	function update(e, attrs) {
+		_.each(attrs, function(v, k) {
+			if (_.isUndefined(v)) return;
+			e.attr(k, v);
+		});
+	}
+
+	function process(items, parent) {
+
+		$(items).each(function(){
+
+			if (this.type == 'break') {
+				return $('<br>').appendTo(parent);
+			}
+			if (this.type == 'field') {
+				delete this.type;
+			}
+			if (['panel', 'panel-related', 'panel-side'].indexOf(this.type) > -1) {
+				hasPanels = true;
+			}
+
+			var widget = this.widget,
+				widgetAttrs = {},
+				attrs = {};
+
+			_.extend(attrs, this.widgetAttrs);
+
+			_.each(this.widgetAttrs, function(value, key) {
+				widgetAttrs['x-' + key] = value;
 			});
-		}
-		
-		function process(items, parent) {
-		
-			$(items).each(function(){
+
+			var item = $('<div></div>').appendTo(parent),
+				field = fields[this.name] || {},
+				widgetId = _.uniqueId('_formWidget'),
+				type = widget;
+
+			attrs = angular.extend(attrs, field, this);
+			type = ui.getWidget(widget) || ui.getWidget(attrs.type) || attrs.type || 'string';
+
+			if (_.isArray(attrs.selectionList) && !widget) {
+				type = attrs.multiple ? 'multi-select' : 'select';
+			}
+
+			if (attrs.image ==  true) {
+				type = "image";
+			}
+			if (type == 'label') { //TODO: allow <static> tag in xml view
+				type = 'static';
+			}
+
+			attrs.serverType = attrs.type;
+			attrs.type = type;
+
+			if (type == 'panel-related') {
+				type = 'panel-' + field.type
+				if (attrs.items) {
+					attrs.views = [{
+						type: 'grid',
+						items: attrs.items
+					}]
+				}
+				this.items = attrs.items = null;
+			}
+
+			item.attr('ui-' + type, '');
+			item.attr('id', widgetId);
 			
-				if (this.type == 'break') {
-					return $('<br>').appendTo(parent);
-				}
-				if (this.type == 'field') {
-					delete this.type;
-				}
-				if (['panel', 'panel-related', 'panel-side'].indexOf(this.type) > -1) {
-					hasPanels = true;
-				}
+			scope.fields_view[widgetId] = attrs;
 
-				var widget = this.widget,
-					widgetAttrs = {},
-					attrs = {};
-
-				_.extend(attrs, this.widgetAttrs);
-
-				_.each(this.widgetAttrs, function(value, key) {
-					widgetAttrs['x-' + key] = value;
+			//TODO: cover all attributes
+			var _attrs = _.extend({}, attrs.attrs, this.attrs, widgetAttrs, {
+					'name'			: attrs.name || this.name,
+					'x-cols'		: this.cols,
+					'x-colspan'		: this.colSpan,
+					'x-rowspan'		: this.rowSpan,
+					'x-widths'		: this.colWidths,
+					'x-field'		: this.name,
+					'x-title'		: attrs.title
 				});
 
-				var item = $('<div></div>').appendTo(parent),
-					field = fields[this.name] || {},
-					widgetId = _.uniqueId('_formWidget'),
-					type = widget;
+			if (attrs.showTitle !== undefined) {
+				attrs.showTitle = attrs.showTitle !== false;
+				_attrs['x-show-title'] = attrs.showTitle;
+			}
 
-				attrs = angular.extend(attrs, field, this);
-				type = ui.getWidget(widget) || ui.getWidget(attrs.type) || attrs.type || 'string';
+			if (attrs.required)
+				_attrs['ng-required'] = true;
+			if (attrs.readonly)
+				_attrs['x-readonly'] = true;
 
-				if (_.isArray(attrs.selectionList) && !widget) {
-					type = attrs.multiple ? 'multi-select' : 'select';
-				}
+			if (_attrs.name) {
+				_attrs['x-path'] = path ? path + "." + _attrs.name : _attrs.name;
+			}
 
-				if (attrs.image ==  true) {
-					type = "image";
-				}
-				if (type == 'label') { //TODO: allow <static> tag in xml view
-					type = 'static';
-				}
+			update(item, _attrs);
 
-				attrs.serverType = attrs.type;
-				attrs.type = type;
+			// enable actions & conditional expressions
+			item.attr('ui-actions', '');
+			item.attr('ui-widget-states', '');
 
-				if (type == 'panel-related') {
-					type = 'panel-' + field.type
-					if (attrs.items) {
-						attrs.views = [{
-							type: 'grid',
-							items: attrs.items
-						}]
-					}
-					this.items = attrs.items = null;
-				}
+			if (type == 'button' || type == 'static') {
+				item.html(this.title);
+			}
 
-				item.attr('ui-' + type, '');
-				item.attr('id', widgetId);
-				
-				scope.fields_view[widgetId] = attrs;
-
-				//TODO: cover all attributes
-				var _attrs = _.extend({}, attrs.attrs, this.attrs, widgetAttrs, {
-						'name'			: attrs.name || this.name,
-						'x-cols'		: this.cols,
-						'x-colspan'		: this.colSpan,
-						'x-rowspan'		: this.rowSpan,
-						'x-widths'		: this.colWidths,
-						'x-field'		: this.name,
-						'x-title'		: attrs.title
-					});
-
-				if (attrs.showTitle !== undefined) {
-					attrs.showTitle = attrs.showTitle !== false;
-					_attrs['x-show-title'] = attrs.showTitle;
-				}
-
-				if (attrs.required)
-					_attrs['ng-required'] = true;
-				if (attrs.readonly)
-					_attrs['x-readonly'] = true;
-				
-				if (_attrs.name) {
-					_attrs['x-path'] = path ? path + "." + _attrs.name : _attrs.name;
-				}
-				
-				update(item, _attrs);
-
-				// enable actions & conditional expressions
-				item.attr('ui-actions', '');
-				item.attr('ui-widget-states', '');
-
-				if (type == 'button' || type == 'static') {
-					item.html(this.title);
-				}
-				
-				if (/button|group|tabs|tab|separator|spacer|static/.test(type)) {
-					item.attr('x-show-title', false);
-				}
-			
-				var items = this.items || this.pages;
-				if (items && this.type != 'panel-related') {
-					process(items, item);
-					if (['panel', 'panel-side'].indexOf(type) > -1) {
-						item.attr('ui-panel-layout', '')
-					} else if (['tabs', 'panel-related'].indexOf(type) == -1) {
-						item.attr('ui-table-layout', '');
-					}
-				}
-				if (type === 'group' && _.all(items, function (x){ return x.type === 'button'; })) {
-					item.addClass('button-group');
-				}
-			});
-			return parent;
-		}
-
-		var elem = $('<form name="form" ui-form-gate ui-form ui-table-layout ui-actions ui-widget-states></form>');
-		elem.attr('x-cols', schema.cols)
-		  	.attr('x-widths', schema.colWidths);
-
-		if (schema.css) {
-			elem.addClass(schema.css);
-		}
+			if (/button|group|tabs|tab|separator|spacer|static/.test(type)) {
+				item.attr('x-show-title', false);
+			}
 		
-		process(schema.items, elem);
-		
-		if (hasPanels) {
-			elem.removeAttr('ui-table-layout').attr('ui-bar-layout', '');
-		}
-
-		return elem;
+			var items = this.items || this.pages;
+			if (items && this.type != 'panel-related') {
+				process(items, item);
+				if (['panel', 'panel-side'].indexOf(type) > -1) {
+					item.attr('ui-panel-layout', '')
+				} else if (['tabs', 'panel-related'].indexOf(type) == -1) {
+					item.attr('ui-table-layout', '');
+				}
+			}
+			if (type === 'group' && _.all(items, function (x){ return x.type === 'button'; })) {
+				item.addClass('button-group');
+			}
+		});
+		return parent;
 	}
-	
+
+	var elem = $('<form name="form" ui-form-gate ui-form ui-table-layout ui-actions ui-widget-states></form>');
+	elem.attr('x-cols', schema.cols)
+		.attr('x-widths', schema.colWidths);
+
+	if (schema.css) {
+		elem.addClass(schema.css);
+	}
+
+	process(schema.items, elem);
+
+	if (hasPanels) {
+		elem.removeAttr('ui-table-layout').attr('ui-bar-layout', '');
+	}
+
+	return elem;
+}
+
+ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewService){
+
 	return function(scope, element, attrs) {
 		
 		scope.canShowAttachments = function() {
@@ -987,7 +987,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 
 			var params = (scope._viewParams || {}).params || {};
 			var schema = scope.schema;
-			var form = parse(scope, schema, scope.fields);
+			var form = ui.formBuild(scope, schema, scope.fields);
 
 			form = $compile(form)(scope);
 			element.append(form);
