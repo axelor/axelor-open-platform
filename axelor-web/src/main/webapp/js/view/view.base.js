@@ -470,7 +470,7 @@ angular.module('axelor.ui').directive('uiRecordPager', function(){
 			});
 		},
 		template:
-		'<div class="record-pager">'+
+		'<div class="record-pager hidden-phone">'+
 	    '<span>'+
 	    	'<span class="record-pager-text">{{pagerText()}}</span>'+
 			'<span class="input-append record-pager-change">'+
@@ -519,7 +519,7 @@ angular.module('axelor.ui').directive('uiViewSwitcher', function(){
 		},
 		replace: true,
 		template:
-		'<div class="view-switcher pull-right">'+
+		'<div class="view-switcher pull-right hidden-phone">'+
 		  	'<div class="btn-group">'+
 		  		'<button class="btn" x-view-type="grid"><i class="fa fa-list"></i></button>'+
 		  		'<button class="btn" x-view-type="calendar"><i class="fa fa-calendar"></i></button>'+

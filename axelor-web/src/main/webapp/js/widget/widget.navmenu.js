@@ -191,7 +191,7 @@ module.directive('navMenuBar', function() {
 					"</a>" +
 					"<ul nav-menu='menu'></ul>" +
 				"</li>" +
-				"<li class='nav-menu nav-menu-more dropdown'>" +
+				"<li class='nav-menu nav-menu-more dropdown' style='display: none;'>" +
 					"<a href='' class='dropdown-toggle' data-toggle='dropdown'>" +
 						"<span x-translate>More</span>" +
 						"<b class='caret'></b>" +
