@@ -812,7 +812,8 @@ ui.formBuild = function (scope, schema, fields) {
 				if (attrs.items) {
 					attrs.views = [{
 						type: 'grid',
-						items: attrs.items
+						items: attrs.items,
+						editable: attrs.editable
 					}]
 				}
 				this.items = attrs.items = null;
