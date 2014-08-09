@@ -282,11 +282,15 @@ ui.formDirective = function(name, object) {
 			scope.$elem_readonly = null;
 			
 			function showEditable() {
-				if (!self.template_editable) {
+				var template_editable = self.template_editable;
+				if (scope.field && scope.field.editor) {
+					template_editable = $('<div ui-panel-field-editor>');
+				}
+				if (!template_editable) {
 					return false;
 				}
 				if (scope.$elem_editable == null) {
-					scope.$elem_editable = $compile(self.template_editable)(scope);
+					scope.$elem_editable = $compile(template_editable)(scope);
 					if (self.link_editable) {
 						self.link_editable.call(self, scope, scope.$elem_editable, attrs, model);
 					}

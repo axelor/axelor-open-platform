@@ -293,4 +293,31 @@ ui.directive('uiBarLayout', ['$compile', function($compile) {
 	};
 }]);
 
+ui.directive('uiPanelFieldEditor', ['$compile', function($compile) {
+
+	return function(scope, element, attrs) {
+		var field = scope.field;
+		var items = (field.editor || {}).items || [];
+		var schema = {
+			items: {
+				type: 'panel',
+				items: items
+			}
+		}
+
+		_.each(items, function (item) {
+			item.placeholder = item.placeholder || item.title || item.autoTitle;
+			item.showTitle = false;
+		});
+
+		var form = ui.formBuild(scope, schema, scope.fields);
+		form.removeAttr('ui-table-layout').attr('ui-panel-layout', '');
+
+		form = $compile(form)(scope);
+		form.children('div.row').removeClass('row').addClass('row-fluid');
+
+		element.append(form);
+	};
+}]);
+
 })(this);

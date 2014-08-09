@@ -17,23 +17,12 @@
  */
 package com.axelor.meta.schema.views;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
-@JsonTypeName("field")
-public class PanelField extends Field {
+@JsonTypeName("editor")
+public class PanelFieldEditor extends Panel {
 
-	@XmlElement
-	private PanelFieldEditor editor;
-
-	public PanelFieldEditor getEditor() {
-		return editor;
-	}
-	
-	public void setEditor(PanelFieldEditor editor) {
-		this.editor = editor;
-	}
 }
