@@ -25,10 +25,4 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("panel-side")
 public class PanelSide extends Panel {
 
-	private static final int NUM_COLS = 1;
-	
-	@Override
-	public Integer getCols() {
-		return NUM_COLS;
-	}
 }

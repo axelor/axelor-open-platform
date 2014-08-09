@@ -19,7 +19,6 @@ package com.axelor.meta.schema.views;
 
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
@@ -30,23 +29,12 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("panel")
 public class Panel extends AbstractContainer {
 	
-	@XmlAttribute
-	private Integer cols;
-
 	@XmlElements({
 		@XmlElement(name = "field", type = PanelField.class),
 		@XmlElement(name = "spacer", type = Spacer.class),
 		@XmlElement(name = "label", type = Label.class),
 	})
 	private List<AbstractWidget> items;
-
-	public Integer getCols() {
-		return cols;
-	}
-
-	public void setCols(Integer cols) {
-		this.cols = cols;
-	}
 
 	public List<AbstractWidget> getItems() {
 		if(items != null) {
