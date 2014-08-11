@@ -1,11 +1,9 @@
- <div ng-controller="NavCtrl">
-  <div ui-splitter nav-menu-toggle x-orientation="vertical" x-position="250">
-    <div class="sidebar">
-       <div nav-tree x-item-click="menuClick" class="splitter-center webkit-scrollbar"></div>
-    </div> <!--/.sidebar-->
-    <div class="view-tabs">
-      <div nav-tabs ng-model="tabs"></div>
-    </div> <!--/.view-tabs-->
-    <span ng-hide="true" ng-view></span> <!-- dummy views -->
-  </div>
+<div ng-controller="NavCtrl" id="offcanvas">
+	<div class="sidebar" id="sidebar">
+		<div nav-tree x-item-click="menuClick" class="webkit-scrollbar"></div>
+	</div>
+	<div class="view-tabs" id="view-tabs">
+		<div nav-tabs ng-model="tabs"></div>
+	</div>
+	<span ng-hide="true" ng-view></span>
 </div>

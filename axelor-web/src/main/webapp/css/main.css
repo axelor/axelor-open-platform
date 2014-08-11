@@ -48,12 +48,6 @@ header > .navbar-fixed-top .navbar-inner {
 	margin-top: 4px;
 }
 
-.view-tabs {
-	position: absolute;
-	top: 0; right: 0; bottom: 0; left: 0;
-	background-color: white;
-}
-
 header .container-fluid {
 	padding: 0 10px;
 }
@@ -130,6 +124,14 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 	background-image: none;
 	background-color: #111;
 	color: #fff;
+}
+
+.fill-parent {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
 }
 
 .footer {
@@ -455,6 +457,61 @@ input[readonly], select[readonly], textarea[readonly] {
 }
 
 /* end Browser fixes */
+
+#offcanvas {
+	height: 100%;
+}
+
+#offcanvas-toggle {
+	display: none;
+}
+
+#offcanvas-toggle a {
+	padding-left: 2px;
+	padding-right: 2px;
+}
+
+#sidebar {
+	width: inherit;
+	min-width: 249px;
+	max-width: 249px;
+	float: left;
+	height: 100%;
+	position: relative;
+	overflow-x: hidden;
+	overflow-y: auto;
+	
+	border-right: 1px solid #d3d3d3;
+}
+
+#view-tabs {
+	height: 100%;
+	position: absolute;
+	left: 250px;
+	right: 0px;
+}
+
+@media screen and (max-width: 979px) {
+	#offcanvas-toggle {
+		display: block;
+	}
+	#offcanvas {
+		position: relative;
+		transition: all 0.25s ease-out;
+		left: -250px;
+		width: calc(100% + 250px);
+	}
+	#sidebar {
+		position: absolute;
+		top: 0;
+	}
+	#offcanvas.active {
+		left: 0;
+	}
+	#offcanvas.active #sidebar {
+		position: relative;
+	}
+}
 
 .navigation-tabs ul.nav-tabs-main {
 	margin-bottom: 0px;
