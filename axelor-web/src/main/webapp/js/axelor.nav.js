@@ -306,6 +306,7 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 	$scope.menuClick = function(event, record) {
 		if (record.isFolder)
 			return;
+		$("#offcanvas").removeClass("active");
 		$scope.openTabByName(record.action);
 		$scope.$apply();
 	};

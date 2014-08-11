@@ -78,6 +78,12 @@ String langJS = AppInfo.getLangJS(request, getServletContext());
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
+          <ul class="nav" id="offcanvas-toggle">
+            <li>
+              <a href=""><i class="fa fa-bars"></i></a>
+            </li>
+            <li class="divider-vertical"></li>
+          </ul>
           <% if (appLogo == null || "".equals(appLogo)) { %>
           <a class="brand" href="<%= appHome %>"><%= appName %></a>
           <% } else { %>
@@ -94,7 +100,7 @@ String langJS = AppInfo.getLangJS(request, getServletContext());
             	<a href="#/"><i class="fa fa-home"></i></a>
             </li>
             <li class="divider-vertical"></li>
-            <li class="dropdown">
+            <li class="dropdown hidden-phone">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <i class="fa fa-info-circle"></i> <b class="caret"></b>
               </a>
@@ -105,10 +111,10 @@ String langJS = AppInfo.getLangJS(request, getServletContext());
                 <li ng-show="app.sdk"><a href="http://axelor.com/" target="_blank"><i>Axelor Framework - v{{app.sdk}}</i></a></li>
               </ul>
             </li>
-            <li class="divider-vertical"></li>
+            <li class="divider-vertical hidden-phone"></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              	<i class="fa fa-user"></i> <span>{{app.user}}</span> <b class="caret"></b>
+                <i class="fa fa-user"></i> <span class="hidden-phone">{{app.user}}</span> <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
                 <li><a href="#/preferences"><i class="icon-cog"></i> <span x-translate>Preferences</span></a></li>
@@ -127,9 +133,9 @@ String langJS = AppInfo.getLangJS(request, getServletContext());
   
   <section role="main" id="container" ng-switch on="routePath[0]">
     <% if ("top".equals(appMenu)) { %>
-	<div ng-show="routePath[0] == 'main'" ng-include src="'partials/main-nomenu.html'"></div>
+	<div class="fill-parent" ng-show="routePath[0] == 'main'" ng-include src="'partials/main-nomenu.html'"></div>
     <% } else { %>
-    <div ng-show="routePath[0] == 'main'" ng-include src="'partials/main.html'"></div>
+    <div class="fill-parent" ng-show="routePath[0] == 'main'" ng-include src="'partials/main.html'"></div>
     <% } %>
 	<div ng-switch-when="about" ng-include src="'partials/about.html'"></div>
 	<div ng-switch-when="welcome" ng-include src="'partials/welcome.html'"></div>
@@ -150,6 +156,9 @@ String langJS = AppInfo.getLangJS(request, getServletContext());
   			if (!event.isTrigger)
   				$.event.trigger('adjustSize');
   		});
+        $('#offcanvas-toggle').find('a').click(function (e) {
+            $("#offcanvas").toggleClass("active");
+        });
   	});
   </script>
 </body>

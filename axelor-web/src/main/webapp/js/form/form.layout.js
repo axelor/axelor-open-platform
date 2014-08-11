@@ -272,7 +272,7 @@ function BarLayout(items, attrs, $scope, $compile) {
 		side = null;
 	}
 
-	var row = $('<div class="row">').append(main);
+	var row = $('<div class="row-fluid">').append(main);
 	
 	if (side) {
 		side.appendTo(row);

@@ -70,7 +70,6 @@ header {
 
 .sidebar .nav-tree li.active a {
 	background-color: #5377b1;
-	background-image: linear-gradient(to bottom, #5d83c3, #456697);
 }
 
 .sidebar .splitter-header {
