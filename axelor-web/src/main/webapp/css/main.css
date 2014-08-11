@@ -17,6 +17,8 @@
  */
 html, body {
 	overflow: hidden;
+	padding: 0 !important;
+	margin: 0 !important;
 }
 
 [ng\:cloak], [ng-cloak], .ng-cloak {
@@ -247,8 +249,9 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 	background: none;
 	
 	padding: 9px 15px;
-	font-size: 24.5px;
-	line-height: 30px;
+	font-size: 20.5px;
+	font-weight: 400;
+	line-height: 26px;
 }
 
 .ui-dialog .ui-dialog-title {
@@ -271,7 +274,7 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 }
 
 .ui-dialog .ui-dialog-titlebar-close {
-	margin-top: -16px;
+	margin-top: -12px;
 	margin-right: 4px;
 	height: auto;
 	width: auto;
@@ -305,11 +308,7 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 }
 
 .ui-dialog-buttonpane {
-	background-color: #f5f5f5;
 	border-top: 1px solid #DDD;
-	-webkit-box-shadow: inset 0 1px 0 white;
-       -moz-box-shadow: inset 0 1px 0 #ffffff;
-            box-shadow: inset 0 1px 0 white;
 }
 
 .ui-dialog-buttonpane .btn {

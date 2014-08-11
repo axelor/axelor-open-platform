@@ -50,7 +50,38 @@
 	overflow: auto;
 }
 
-@media (max-width: 979px) {
+.ui-dialog-responsive {
+	position: relative;
+	left: inherit !important;
+	top: 0 !important;
+	
+	width: auto !important;
+	margin: 10px;
+	
+	max-width: 1200px !important;
+	max-height: 100% !important;
+	
+	border: none;
+}
+
+.ui-dialog-responsive,
+.ui-dialog-responsive .ui-dialog-title {
+	border-radius: 0;
+}
+
+@media screen and (min-width: 768px) {
+	.ui-dialog-responsive {
+		width: 740px !important;
+		margin: 10px auto;
+	}
+}
+@media screen and (min-width: 1024px) {
+	.ui-dialog-responsive {
+		width: 900px !important;
+	}
+}
+
+@media screen and (max-width: 979px) {
 	.view-container .form-view > div[ui-view-form].has-width {
 		padding: 4px;
 		background-color: #fff !important;
