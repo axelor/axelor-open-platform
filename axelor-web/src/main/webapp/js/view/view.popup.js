@@ -494,43 +494,28 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 		}
 
 		function autoSize() {
-			var maxWidth = $(document).width() - 8,
-				maxHeight = $(document).height() - 8,
-				width = element[0].scrollWidth + 32,
+			var maxHeight = $(document).height() - 16,
 				height = element[0].scrollHeight + 16;
 
 			var elem = element.find('.view-pane [ui-view-form]:first').first();
 			if (elem.size()) {
 				height = elem[0].scrollHeight + 16;
-				width = Math.max(width, elem[0].scrollWidth + 32);
 			}
 			elem = element.find('.record-toolbar:first').first();
 			if (elem.size()) {
 				height += elem[0].scrollHeight + 16;
-				width = Math.max(width, elem[0].scrollWidth + 32);
 			}
 			
 			height += element.parent().children('.ui-dialog-titlebar').outerHeight(true);
 			height += element.parent().children('.ui-dialog-buttonpane').outerHeight(true);
 			
-			width = Math.min(maxWidth, width) || 'auto';
 			height = Math.min(maxHeight, height) || 'auto';
 
-			if (scope._calcWidth) {
-				width = scope._calcWidth(width) || width;
-			}
 			if (scope._calcHeight) {
 				height = scope._calcHeight(height) || height;
 			}
 
-			element.dialog('option', 'width', width);
 			element.dialog('option', 'height', height);
-			
-			element.closest('.ui-dialog').position({
-		      my: "center",
-		      at: "center",
-		      of: window
-		    });
 		}
 		
 		// a flag used by evalScope to detect popup (see form.base.js)
@@ -592,15 +577,8 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 		},
 		link: function(scope, element, attrs) {
 
-			var width = $(window).width();
 			var height = $(window).height();
-						
-			width = (60 * width / 100);
 			height = (70 * height / 100);
-			
-			scope._calcWidth = function (w) {
-				return width;
-			};
 			
 			scope._calcHeight = function (h) {
 				return height;

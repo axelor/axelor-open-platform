@@ -52,6 +52,9 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 			}
 			
 			var dialog = element.dialog({
+				dialogClass: 'ui-dialog-responsive',
+				resizable: false,
+				draggable: false,
 				autoOpen: false,
 				closeOnEscape: true,
 				modal: true,
@@ -82,10 +85,6 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 				$('body .ui-dialog:visible:last').focus();
 			});
 			
-			dialog.on('dialogresizestop', function(){
-				axelor.$adjustSize();
-			});
-
 			dialog.on('dialogopen', onOpen)
 				  .on('dialogclose', onClose)
 				  .on('dialogbeforeclose', onBeforeClose);
