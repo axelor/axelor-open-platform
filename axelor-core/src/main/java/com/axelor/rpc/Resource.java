@@ -58,6 +58,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -479,16 +480,43 @@ public class Resource<T extends Model> {
 
 	public Response fetch(long id, Request request) {
 		security.get().check(JpaSecurity.CAN_READ, model, id);
-		Response response = new Response();
-		List<Object> data = Lists.newArrayList();
 
-		Model entity = JPA.find(model, id);
-		if (entity != null) {
-			data.add(toMap(entity, request.getFields().toArray(new String[]{})));
-		}
-		response.setData(data);
+		final Response response = new Response();
+		final Model entity = JPA.find(model, id);
+
 		response.setStatus(Response.STATUS_SUCCESS);
+		if (entity == null) {
+			return response;
+		}
 
+		final List<Object> data = Lists.newArrayList();
+		final String[] fields = request.getFields().toArray(new String[]{});
+		final Map<String, List<String>> related = request.getRelated();
+		final Map<String, Object> values = toMap(entity, fields);
+
+		if (related != null) {
+			final Mapper mapper = Mapper.of(model);
+			for (final String name : related.keySet()) {
+				final String[] names = related.get(name).toArray(new String[] {});
+				Object value = mapper.get(entity, name);
+				if (value instanceof Collection<?>) {
+					value = Collections2.transform(
+						(Collection<?>) value,
+						new Function<Object, Object>() {
+							@Override
+							public Object apply(Object input) {
+								return toMap(input, names);
+							}
+						});
+				} else if (value instanceof Model) {
+					value = toMap(value, names);
+				}
+				values.put(name, value);
+			}
+		}
+
+		data.add(values);
+		response.setData(data);
 		return response;
 	}
 

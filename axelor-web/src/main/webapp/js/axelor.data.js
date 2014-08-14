@@ -303,7 +303,7 @@
 			},
 			
 			/**
-			 * Reade the object with the given id.
+			 * Read the object with the given id.
 			 * 
 			 * If options are provided then POST request is used otherwise GET is used. 
 			 * @param id record id
@@ -314,7 +314,8 @@
 				var promise, record;
 				if (options) {
 					promise = this._request('fetch', id).post({
-						fields: options.fields
+						fields: options.fields,
+						related: options.related
 					});
 				} else {
 					promise = this._request(null, id).get();

@@ -186,12 +186,15 @@ function DSViewCtrl(type, $scope, $element) {
 	}
 
 	$scope.fields = {};
+	$scope.fields_related = {};
 	$scope.schema = null;
-	
+
 	$scope.show = function() {
 		if (viewPromise == null) {
 			viewPromise = $scope.loadView(type, view.name);
-			viewPromise.success(function(fields, schema){
+			viewPromise.then(function(meta){
+				var schema = meta.view;
+				var fields = meta.fields;
 				var toolbar = [];
 				_.each(schema.toolbar, function(button){
 					button.custom = true;
@@ -209,6 +212,7 @@ function DSViewCtrl(type, $scope, $element) {
 					$scope.viewTitle = schema.title;
 				}
 				$scope.fields = fields;
+				$scope.fields_related = meta.related;
 				$scope.schema = schema;
 				$scope.toolbar = toolbar;
 				$scope.menubar = schema.menubar;

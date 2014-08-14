@@ -152,8 +152,12 @@
 			return items;
 		}
 
-		function findFields(view) {
-			var items = [];
+		function findFields(view, res) {
+			var result = res || {
+				fields: [],
+				related: {}
+			};
+			var items = result.fields;
 			var fields = view.items || view.pages;
 
 			if (!fields) return items;
@@ -162,22 +166,24 @@
 				fields = view.items = useIncluded(view);
 			}
 
-			_.each(fields, function(item) {
-
-				// include editor fields (only simple types supported)
-				if (item.target && item.editor) {
-					item.editor = null;
+			function acceptEditor(item) {
+				var collect = items;
+				if (item.target) {
+					collect = result.related[item.name] || (result.related[item.name] = []);
 				}
-				_.each((item.editor||{}).items, function (child) {
-					if (child.type === 'field' && child.name) {
-						items.push(item.target ? item.name + '.' + child.name : child.name);
+				_.each(item.editor.items, function (child) {
+					if (child.name && collect.indexOf(child.name) === -1 && child.type === 'field') {
+						collect.push(child.name);
 					}
 				});
+			}
 
+			_.each(fields, function(item) {
+				if (item.editor) acceptEditor(item);
 				if (item.type === 'panel-related') {
 					items.push(item.name);
 				} else if (item.items || item.pages) {
-					items = items.concat(findFields(item));
+					findFields(item, result);
 				} else if (item.type === 'field') {
 					items.push(item.name);
 				}
@@ -189,7 +195,8 @@
 				items.push(view.colorBy);
 			}
 
-			return _.unique(_.compact(items));
+			result.fields = _.unique(_.compact(result.fields));
+			return result;
 		}
 
 		var viewCache = $cacheFactory("viewFields", { capacity: 1000 });
@@ -237,8 +244,11 @@
 
 			function loadFields(data) {
 
-				var fields = findFields(data.view).sort();
+				var fields_data = findFields(data.view);
+				var fields = fields_data.fields.sort();
 				var key = _.flatten([model, data.view.type, data.view.name, fields]).join();
+
+				data.related = fields_data.related;
 
 				if (!_.isEmpty(data.fields)) {
 					viewSet(key, data);
@@ -267,6 +277,7 @@
 
 					result.view = data.view || view;
 					result = process(result);
+					result.related = fields_data.related;
 
 					viewSet(key, result);
 

@@ -293,30 +293,56 @@ ui.directive('uiBarLayout', ['$compile', function($compile) {
 	};
 }]);
 
-ui.directive('uiPanelFieldEditor', ['$compile', function($compile) {
+function InlineLayout(items, attrs, $scope, $compile) {
+
+	var div = $("<div class='panel-inline'></div>")
+	items.each(function(item, i) {
+		var elem = $(this);
+		div.append(elem);
+	});
+	return div;
+}
+
+ui.directive('uiInlineLayout', ['$compile', function($compile) {
 
 	return function(scope, element, attrs) {
-		var field = scope.field;
-		var items = (field.editor || {}).items || [];
-		var schema = {
-			items: {
-				type: 'panel',
+		var elem = element.children('[ui-transclude]:first');
+		var items = elem.children();
+		var layout = InlineLayout(items, attrs, scope, $compile);
+		elem.append(layout);
+	};
+}]);
+
+ui.directive('uiPanelEditor', ['$compile', function($compile) {
+
+	return {
+		scope: true,
+		link: function(scope, element, attrs) {
+			var field = scope.field;
+			var items = (field.editor || {}).items || [];
+			var schema = {
+				cols: items.length,
 				items: items
 			}
+
+			var widths = [];
+
+			_.each(items, function (item) {
+				item.placeholder = item.placeholder || item.title || item.autoTitle;
+				item.showTitle = false;
+				widths.push(item.width || '*');
+			});
+
+			schema.colWidths = widths.join(',');
+
+			var form = ui.formBuild(scope, schema, scope.fields);
+			if (attrs.uiPanelEditor === 'inline') {
+				form.children().removeAttr('ui-panel-layout').attr('ui-inline-layout', '');
+			}
+			form = $compile(form)(scope);
+			form.children('div.row').removeClass('row').addClass('row-fluid');
+			element.append(form);
 		}
-
-		_.each(items, function (item) {
-			item.placeholder = item.placeholder || item.title || item.autoTitle;
-			item.showTitle = false;
-		});
-
-		var form = ui.formBuild(scope, schema, scope.fields);
-		form.removeAttr('ui-table-layout').attr('ui-panel-layout', '');
-
-		form = $compile(form)(scope);
-		form.children('div.row').removeClass('row').addClass('row-fluid');
-
-		element.append(form);
 	};
 }]);
 
