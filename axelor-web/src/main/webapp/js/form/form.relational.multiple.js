@@ -778,6 +778,10 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			var items = model.$viewValue || [];
 			items.splice(index, 1);
 		};
+
+		scope.setValidity = function (key, value) {
+			model.$setValidity(key, value);
+		};
 	},
 
 	template_readonly:function (scope) {
