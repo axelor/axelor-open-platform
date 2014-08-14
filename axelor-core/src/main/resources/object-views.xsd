@@ -622,7 +622,19 @@
     <xsd:complexContent>
       <xsd:extension base="tns:BaseField">
         <xsd:sequence>
+          <xsd:element name="viewer" minOccurs="0">
+            <xsd:annotation>
+              <xsd:documentation>
+                Template to display the field value.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
           <xsd:element name="editor" minOccurs="0">
+            <xsd:annotation>
+              <xsd:documentation>
+                Custom editor for relational and calculated fields.
+              </xsd:documentation>
+            </xsd:annotation>
             <xsd:complexType>
               <xsd:choice minOccurs="0" maxOccurs="unbounded">
                 <xsd:element name="field" type="tns:BaseField"/>
