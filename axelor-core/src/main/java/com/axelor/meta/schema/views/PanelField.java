@@ -27,7 +27,18 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 public class PanelField extends Field {
 
 	@XmlElement
+	private String viewer;
+
+	@XmlElement
 	private PanelFieldEditor editor;
+
+	public String getViewer() {
+		return viewer;
+	}
+
+	public void setViewer(String viewer) {
+		this.viewer = viewer;
+	}
 
 	public PanelFieldEditor getEditor() {
 		return editor;
