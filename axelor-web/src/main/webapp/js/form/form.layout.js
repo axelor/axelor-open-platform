@@ -342,6 +342,12 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 			form = $compile(form)(scope);
 			form.children('div.row').removeClass('row').addClass('row-fluid');
 			element.append(form);
+
+			scope.$watch('form.$valid', function (valid, old) {
+				if (scope.setValidity) {
+					scope.setValidity('valid', valid);
+				}
+			});
 		}
 	};
 }]);
