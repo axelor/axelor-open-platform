@@ -74,15 +74,19 @@ form[ui-bar-layout] {
 	}
 }
 
-.panel-layout .form-item-container .panel {
+.panel-layout .panel {
 	border: none;
 	box-shadow: none;
 	margin-bottom: 0;
 }
 
-.panel-layout .form-item-container form[ui-bar-layout],
-.panel-layout .form-item-container .panel .panel-body {
+.panel-layout form[ui-bar-layout],
+.panel-layout .panel .panel-body {
 	padding: 0;
+}
+
+.panel-layout .o2m-list .panel .row-fluid > .form-item {
+	margin-bottom: 2px;
 }
 
 .panel-layout .form-item-container.readonly > a,
@@ -143,4 +147,41 @@ form[ui-bar-layout] {
 
 .panel-tabs .tab-content > .panel {
 	margin-top: 0;
+}
+
+.panel-layout .o2m-list .form-item {
+	padding: 0;
+}
+
+.panel-layout .o2m-list input,
+.panel-layout .o2m-list button {
+	border-radius: 0;
+}
+
+.panel-layout .o2m-list .panel {
+	margin-bottom: 0;
+}
+
+.panel-layout .o2m-list {
+	display: table;
+}
+
+.panel-layout .o2m-list-row {
+	display: table-row;
+}
+
+.panel-layout .o2m-list-row > div,
+.panel-layout .o2m-list-row > span {
+	display: table-cell;
+	padding: 1px;
+}
+
+.panel-layout .o2m-list-row > span.o2m-list-remove {
+	vertical-align: middle;
+}
+
+.panel-layout .o2m-list-row > span.o2m-list-remove a,
+.panel-layout .o2m-list-row > a {
+	outline: none;
+	padding: 0 6px;
 }

@@ -399,7 +399,8 @@ ui.formInput('OneToMany', {
 			});
 
 		model.$render = doRender;
-		
+
+		var adjustHeight = false;
 		var adjustSize = (function() {
 			var rowSize = 26,
 				minSize = 56,
@@ -411,7 +412,9 @@ ui.formInput('OneToMany', {
 				if (count > 0) {
 					height = (rowSize * count) + (minSize + rowSize);
 				}
-				element.css('min-height', Math.min(height, maxSize));
+				if (adjustHeight) {
+					element.css('min-height', Math.min(height, maxSize));
+				}
 				axelor.$adjustSize();
 			};
 		})();
@@ -425,6 +428,9 @@ ui.formInput('OneToMany', {
 		scope.onGridInit = function(grid, inst) {
 			var editIcon = scope.canView() || (!scope.isReadonly() && scope.canEdit());
 			var editable = grid.getOptions().editable;
+
+			adjustHeight = true;
+
 			if (editable) {
 				element.addClass('inline-editable');
 				scope.$on('on:new', function(event){
@@ -714,6 +720,99 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 	}
 });
 
+ui.InlineOneToManyCtrl = InlineOneToManyCtrl;
+ui.InlineOneToManyCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewService'];
+
+function InlineOneToManyCtrl($scope, $element, DataSource, ViewService) {
+
+	var field = $scope.field || $scope.getViewDef($element);
+	var params = {
+		model: field.target
+	};
+
+	if (!field.editor) {
+		throw "No editor defined.";
+	}
+
+	params.views = [{
+		type: 'grid',
+		items: field.editor.items
+	}];
+
+	$scope._viewParams = params;
+
+	OneToManyCtrl.call(this, $scope, $element, DataSource, ViewService, function(){
+		$scope.editorCanSave = false;
+		$scope.selectEnable = false;
+	});
+}
+
+// used in panel form
+ui.formInput('InlineOneToMany', 'OneToMany', {
+
+	showTitle: true,
+
+	controller: InlineOneToManyCtrl,
+
+	link: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+
+		scope.onGridInit = function() {};
+
+		scope.getItems = function () {
+			return model.$viewValue;
+		}
+
+		var last = {};
+		scope.addItem = function () {
+			var items = model.$viewValue || [];
+			var item = _.last(items);
+			if (angular.equals(last, item)) {
+				return;
+			}
+			last = {};
+			items.push({});
+		};
+
+		scope.removeItem = function (index) {
+			var items = model.$viewValue || [];
+			items.splice(index, 1);
+		};
+	},
+
+	template_readonly:function (scope) {
+		var field = scope.field;
+		var tmpl = field.viewer;
+		if (!tmpl) {
+			tmpl = "{{record.id}}";
+		}
+		return "<div class='o2m-list'>" +
+		"<div ng-repeat='record in getItems()' ng-bind-html='tmpl'>" + tmpl + "</div>" +
+		"</div>"
+	},
+
+	template_editable: function (scope) {
+		return "<div class='o2m-list'>" +
+			"<div class='o2m-list-row' ng-repeat='record in getItems()'>" +
+				"<div ui-panel-editor='inline'></div>" +
+				"<span class='o2m-list-remove'>" +
+					"<a tabindex='-1' href='' ng-click='removeItem($index)'><i class='fa fa-times'></i></a>" +
+				"</span>" +
+			"</div>" +
+			"<div class='o2m-list-row'>" +
+				"<a tabindex='-1' href='' ng-click='addItem()'><i class='fa fa-plus'></i></a>" +
+			"</div>" +
+		"</div>"
+	},
+	template: null
+});
+
+//used in panel form
+ui.formInput('InlineManyToMany', 'InlineOneToMany', {
+
+});
+
+// used in editable grid
 ui.formInput('OneToManyInline', 'OneToMany', {
 
 	css	: 'one2many-inline',

@@ -37,7 +37,9 @@ public class Request {
 	private Criteria criteria;
 	
 	private List<String> fields;
-	
+
+	private Map<String, List<String>> related;
+
 	private String model;
 	
 	public String getModel() {
@@ -114,6 +116,14 @@ public class Request {
 	
 	public void setFields(List<String> fields) {
 		this.fields = fields;
+	}
+
+	public Map<String, List<String>> getRelated() {
+		return related;
+	}
+
+	public void setRelated(Map<String, List<String>> related) {
+		this.related = related;
 	}
 
 	@JsonIgnore

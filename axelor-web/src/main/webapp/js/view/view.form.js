@@ -30,7 +30,8 @@ function FormViewCtrl($scope, $element) {
 
 	$scope.fields = {};
 	$scope.fields_view = {};
-	
+	$scope.fields_related = {};
+
 	$scope.record = {};
 	$scope.$$original = null;
 	$scope.$$dirty = false;
@@ -59,7 +60,8 @@ function FormViewCtrl($scope, $element) {
 
 	$scope.doRead = function(id) {
 		var params = {
-			fields : _.pluck($scope.fields, 'name')
+			fields : _.pluck($scope.fields, 'name'),
+			related: $scope.fields_related
 		};
 		return ds.read(id, params);
 	};
@@ -817,6 +819,10 @@ ui.formBuild = function (scope, schema, fields) {
 					}]
 				}
 				this.items = attrs.items = null;
+			}
+
+			if (attrs.editor && attrs.target) {
+				type = 'inline-' + type;
 			}
 
 			item.attr('ui-' + type, '');
