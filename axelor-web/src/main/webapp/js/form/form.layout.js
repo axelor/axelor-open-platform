@@ -293,26 +293,6 @@ ui.directive('uiBarLayout', ['$compile', function($compile) {
 	};
 }]);
 
-function InlineLayout(items, attrs, $scope, $compile) {
-
-	var div = $("<div class='panel-inline'></div>")
-	items.each(function(item, i) {
-		var elem = $(this);
-		div.append(elem);
-	});
-	return div;
-}
-
-ui.directive('uiInlineLayout', ['$compile', function($compile) {
-
-	return function(scope, element, attrs) {
-		var elem = element.children('[ui-transclude]:first');
-		var items = elem.children();
-		var layout = InlineLayout(items, attrs, scope, $compile);
-		elem.append(layout);
-	};
-}]);
-
 ui.directive('uiPanelEditor', ['$compile', function($compile) {
 
 	return {
@@ -320,25 +300,30 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 		link: function(scope, element, attrs) {
 			var field = scope.field;
 			var items = (field.editor || {}).items || [];
-			var schema = {
-				cols: items.length,
-				items: items
-			}
+			var inline = attrs.uiPanelEditor === 'inline';
 
-			var widths = [];
-
-			_.each(items, function (item) {
+			var widths = _.map(items, function (item) {
 				item.placeholder = item.placeholder || item.title || item.autoTitle;
 				item.showTitle = false;
-				widths.push(item.width || '*');
+				var width = item.width || (item.widgetAttrs||{}).width;
+				return width ? width : (item.widget === 'toggle' ? 24 : '*');
 			});
 
-			schema.colWidths = widths.join(',');
+			var schema = {
+				cols: items.length,
+				colWidths: widths.join(','),
+				items: items
+			};
+			if (attrs.uiPanelEditor !== 'inline') {
+				schema = {
+					items: [{
+						type: 'panel',
+						items: items
+					}]
+				};
+			}
 
 			var form = ui.formBuild(scope, schema, scope.fields);
-			if (attrs.uiPanelEditor === 'inline') {
-				form.children().removeAttr('ui-panel-layout').attr('ui-inline-layout', '');
-			}
 			form = $compile(form)(scope);
 			form.children('div.row').removeClass('row').addClass('row-fluid');
 			element.append(form);

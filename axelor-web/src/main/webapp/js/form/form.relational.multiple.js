@@ -758,16 +758,34 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		this._super.apply(this, arguments);
 
 		scope.onGridInit = function() {};
+		scope.items = [];
 
-		scope.getItems = function () {
-			return model.$viewValue;
-		}
+		var unwatch = null;
+
+		model.$render = function () {
+			if (unwatch) {
+				unwatch();
+				unwatch = null;
+			}
+			scope.items = model.$viewValue;
+			if (scope.items) {
+				return;
+			}
+			scope.items = [{}];
+			unwatch = scope.$watch('items[0]', function (item, old) {
+				if (item.$changed) {
+					unwatch();
+					model.$setViewValue(scope.items);
+				}
+				item.$changed = true;
+			}, true);
+		};
 
 		var last = {};
 		scope.addItem = function () {
-			var items = model.$viewValue || [];
+			var items = scope.items;
 			var item = _.last(items);
-			if (angular.equals(last, item)) {
+			if (items.length && angular.equals(last, item)) {
 				return;
 			}
 			last = {};
@@ -775,12 +793,20 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		};
 
 		scope.removeItem = function (index) {
-			var items = model.$viewValue || [];
+			var items = scope.items;
 			items.splice(index, 1);
 		};
 
 		scope.setValidity = function (key, value) {
 			model.$setValidity(key, value);
+		};
+
+		scope.setExclusive = function (name, record) {
+			_.each(scope.items, function (item) {
+				if (record !== item) {
+					item[name] = false;
+				}
+			});
 		};
 	},
 
@@ -791,13 +817,13 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			tmpl = "{{record.id}}";
 		}
 		return "<div class='o2m-list'>" +
-		"<div ng-repeat='record in getItems()' ng-bind-html='tmpl'>" + tmpl + "</div>" +
+		"<div ng-repeat='record in items' ng-bind-html='tmpl'>" + tmpl + "</div>" +
 		"</div>"
 	},
 
 	template_editable: function (scope) {
 		return "<div class='o2m-list'>" +
-			"<div class='o2m-list-row' ng-repeat='record in getItems()'>" +
+			"<div class='o2m-list-row' ng-repeat='record in items'>" +
 				"<div ui-panel-editor='inline'></div>" +
 				"<span class='o2m-list-remove'>" +
 					"<a tabindex='-1' href='' ng-click='removeItem($index)'><i class='fa fa-times'></i></a>" +
