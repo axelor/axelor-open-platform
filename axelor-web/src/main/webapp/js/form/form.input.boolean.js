@@ -63,4 +63,35 @@ ui.formInput('InlineCheckbox', 'Boolean', {
 	template_readonly: '<label class="checkbox"><input type="checkbox" disabled="disabled" ng-checked="text"> {{label}}</label>'
 });
 
+ui.formInput('Toggle', 'Boolean', {
+	cellCss: 'form-item toggle-item',
+	link: function (scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+
+		var field = scope.field;
+		var icon = element.find('i');
+
+		scope.icon = function () {
+			return model.$viewValue && field.iconActive ? field.iconActive : field.icon;
+		};
+
+		scope.toggle = function () {
+			model.$setViewValue(!model.$viewValue);
+			if (scope.setExclusive && field.exclusive) {
+				scope.setExclusive(field.name, scope.record);
+			}
+		};
+
+		if (field.help || field.title) {
+			element.attr('title', field.help || field.title);
+		}
+	},
+	template_editable: null,
+	template_readonly: null,
+	template:
+		"<button tabindex='-1' class='btn btn-default' ng-class='{active: record[field.name]}' ng-click='toggle()'>" +
+			"<i class='fa {{icon()}}'></i>" +
+		"</button>"
+});
+
 })(this);
