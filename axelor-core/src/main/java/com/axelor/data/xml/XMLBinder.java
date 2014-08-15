@@ -193,6 +193,12 @@ public abstract class XMLBinder {
 		Map<String, Object> values = ctx;
 		if (value instanceof Map) {
 			values = (Map) value;
+			// copy underscored context variables
+			for (String key : ctx.keySet()) {
+				if (key.startsWith("_")) {
+					values.put(key, ctx.get(key));
+				}
+			}
 		}
 
 		Object result = bind(bind, property.getTarget(), values);
@@ -221,6 +227,14 @@ public abstract class XMLBinder {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private boolean validate(XMLBind binding, Object value, Map<String, Object> values) {
 		Map<String, Object> ctx = toContext(value instanceof Map ? ((Map) value) : values);
+		if (values != null) {
+			// copy underscored context variables
+			for (String key : values.keySet()) {
+				if (key.startsWith("_")) {
+					ctx.put(key, values.get(key));
+				}
+			}
+		}
 		return binding.validate(ctx);
 	}
 
