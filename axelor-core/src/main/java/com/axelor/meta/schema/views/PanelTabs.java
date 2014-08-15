@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("panel-tabs")
-public class PanelTabs extends Panel {
+public class PanelTabs extends AbstractPanel {
 
 	@XmlElements({
 		@XmlElement(name = "panel", type = Panel.class),
@@ -36,12 +36,7 @@ public class PanelTabs extends Panel {
 	private List<AbstractWidget> items;
 
 	public List<AbstractWidget> getItems() {
-		if(items != null) {
-			for (AbstractWidget widget : items) {
-				widget.setModel(super.getModel());
-			}
-		}
-		return items;
+		return process(items);
 	}
 
 	public void setItems(List<AbstractWidget> items) {
