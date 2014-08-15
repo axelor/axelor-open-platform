@@ -17,14 +17,18 @@
  */
 package com.axelor.meta.schema.views;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("panel-related")
-public class PanelRelated extends Panel {
+public class PanelRelated extends AbstractPanel {
 
 	@XmlAttribute(name = "field")
 	private String name;
@@ -35,16 +39,20 @@ public class PanelRelated extends Panel {
 	@XmlAttribute(name = "grid-view")
 	private String gridView;
 
-	@Override
+	@XmlElements({
+		@XmlElement(name = "field", type = PanelField.class),
+		@XmlElement(name = "button", type = Button.class),
+	})
+	private List<AbstractWidget> items;
+
 	public String getName() {
 		return name;
 	}
 
-	@Override
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public String getFormView() {
 		return formView;
 	}
@@ -59,5 +67,13 @@ public class PanelRelated extends Panel {
 	
 	public void setGridView(String gridView) {
 		this.gridView = gridView;
+	}
+
+	public List<AbstractWidget> getItems() {
+		return process(items);
+	}
+
+	public void setItems(List<AbstractWidget> items) {
+		this.items = items;
 	}
 }

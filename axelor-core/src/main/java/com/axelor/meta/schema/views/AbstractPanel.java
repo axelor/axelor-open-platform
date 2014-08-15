@@ -17,12 +17,33 @@
  */
 package com.axelor.meta.schema.views;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
-
 @XmlType
-@JsonTypeName("editor")
-public class PanelFieldEditor extends Panel {
+public abstract class AbstractPanel extends AbstractWidget {
 
+	@XmlAttribute
+	protected String title;
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	protected List<AbstractWidget> process(List<AbstractWidget> items) {
+		if (items == null) {
+			items = new ArrayList<>();
+		}
+		for (AbstractWidget item : items) {
+			item.setModel(getModel());
+		}
+		return items;
+	}
 }

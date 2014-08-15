@@ -30,7 +30,7 @@ public class PanelField extends Field {
 	private String viewer;
 
 	@XmlElement
-	private PanelFieldEditor editor;
+	private PanelEditor editor;
 
 	public String getViewer() {
 		return viewer;
@@ -40,11 +40,11 @@ public class PanelField extends Field {
 		this.viewer = viewer;
 	}
 
-	public PanelFieldEditor getEditor() {
+	public PanelEditor getEditor() {
 		return editor;
 	}
 	
-	public void setEditor(PanelFieldEditor editor) {
+	public void setEditor(PanelEditor editor) {
 		this.editor = editor;
 	}
 }

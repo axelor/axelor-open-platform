@@ -26,8 +26,8 @@ import javax.xml.bind.annotation.XmlType;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
-@JsonTypeName( "panel-side")
-public class PanelSide extends AbstractPanel {
+@JsonTypeName("editor")
+public class PanelEditor extends AbstractPanel {
 
 	@XmlElements({
 		@XmlElement(name = "field", type = PanelField.class),
