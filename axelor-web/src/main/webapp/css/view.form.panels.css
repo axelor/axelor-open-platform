@@ -164,6 +164,7 @@ form[ui-bar-layout] {
 
 .panel-layout .o2m-list {
 	display: table;
+	width: 100%;
 }
 
 .panel-layout .o2m-list-row {
@@ -178,10 +179,16 @@ form[ui-bar-layout] {
 
 .panel-layout .o2m-list-row > span.o2m-list-remove {
 	vertical-align: middle;
+	width: 24px;
 }
 
 .panel-layout .o2m-list-row > span.o2m-list-remove a,
 .panel-layout .o2m-list-row > a {
 	outline: none;
 	padding: 0 6px;
+}
+
+.panel-layout .o2m-list-row .toggle-item button {
+	border-left: 0;
+	outline: none;
 }
