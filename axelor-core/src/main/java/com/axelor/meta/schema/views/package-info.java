@@ -19,7 +19,10 @@
 	javax.xml.bind.annotation.XmlAccessType.FIELD
 )
 @javax.xml.bind.annotation.XmlSchema(
-	namespace = com.axelor.meta.schema.ObjectViews.NAMESPACE, 
+	namespace = com.axelor.meta.schema.ObjectViews.NAMESPACE,
+	xmlns = {
+		@javax.xml.bind.annotation.XmlNs(namespaceURI=com.axelor.meta.schema.ObjectViews.NAMESPACE, prefix=""),
+	},
 	elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED
 )
 package com.axelor.meta.schema.views;
