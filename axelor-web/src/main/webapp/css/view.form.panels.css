@@ -86,7 +86,7 @@ form[ui-bar-layout] {
 }
 
 .panel-layout .o2m-list .panel .row-fluid > .form-item {
-	margin-bottom: 2px;
+	margin-bottom: 4px;
 }
 
 .panel-layout .form-item-container.readonly > a,
@@ -174,7 +174,7 @@ form[ui-bar-layout] {
 .panel-layout .o2m-list-row > div,
 .panel-layout .o2m-list-row > span {
 	display: table-cell;
-	padding: 1px;
+	padding: 2px 0;
 }
 
 .panel-layout .o2m-list-row > span.o2m-list-remove {
@@ -191,4 +191,13 @@ form[ui-bar-layout] {
 .panel-layout .o2m-list-row .toggle-item button {
 	border-left: 0;
 	outline: none;
+}
+
+/** remove rounded corners */
+.panel-layout input,
+.panel-layout textarea,
+.panel-layout button,
+.panel-layout pre,
+.panel-layout .btn {
+	border-radius: 0;
 }

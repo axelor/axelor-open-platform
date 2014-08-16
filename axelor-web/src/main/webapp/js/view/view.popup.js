@@ -453,17 +453,35 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			return;
 		}
 		
-		var initialized = false;
+		var addMaximizeButton = _.once(function () {
+			var elemDialog = element.parent();
+			var elemTitle = elemDialog.find('.ui-dialog-title');
+			$('<a href="#" class="ui-dialog-titlebar-max"><i class="fa fa-expand"></i></a>').click(function (e) {
+				$(this).children('i').toggleClass('fa-expand fa-compress');
+				elemDialog.toggleClass('maximized');
+				axelor.$adjustSize();
+				return false;
+			}).insertAfter(elemTitle);
+		});
 		
-		function isReadonly() {
-			return scope.isReadonly && scope.isReadonly();
+		element.on('adjustSize', _.throttle(adjustSize));
+		
+		function adjustSize() {
+			var maxHeight = $(document).height() - 32;
+			var height = maxHeight;
+
+			height -= element.parent().children('.ui-dialog-titlebar').outerHeight(true);
+			height -= element.parent().children('.ui-dialog-buttonpane').outerHeight(true);
+
+			if (element.is('[ui-selector-popup]')) {
+				height = Math.min(height, 480);
+			} else if (height > element[0].scrollHeight) {
+				height = 'auto';
+			}
+			element.height(height);
 		}
-		
-		function adjust(how, delay) {
-			scope.ajaxStop(how, delay || 100);
-		}
-		
-		function initSize() {
+
+		function doShow() {
 
 			// focus first element
 			element.find(':input:first').focus();
@@ -473,49 +491,12 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			
 			axelor.$adjustSize();
 
-			if (initialized === 'editable' ||
-			   (initialized === 'readonly' && isReadonly())) {
-				return;
-			}
-			
-			var delay = initialized ? 100 : 300;
-			
-			initialized = isReadonly() ? 'readonly' : 'editable';
-			
-			function show() {
-				autoSize();
-				setTimeout(function() {
-					element.closest('.ui-dialog').css('visibility', '');
-				}, 100);
-			}
-			return scope.$timeout(function() {
-				return scope.ajaxStop(show, delay);
-			});
-		}
+			addMaximizeButton();
 
-		function autoSize() {
-			var maxHeight = $(document).height() - 16,
-				height = element[0].scrollHeight + 16;
-
-			var elem = element.find('.view-pane [ui-view-form]:first').first();
-			if (elem.size()) {
-				height = elem[0].scrollHeight + 16;
-			}
-			elem = element.find('.record-toolbar:first').first();
-			if (elem.size()) {
-				height += elem[0].scrollHeight + 16;
-			}
-			
-			height += element.parent().children('.ui-dialog-titlebar').outerHeight(true);
-			height += element.parent().children('.ui-dialog-buttonpane').outerHeight(true);
-			
-			height = Math.min(maxHeight, height) || 'auto';
-
-			if (scope._calcHeight) {
-				height = scope._calcHeight(height) || height;
-			}
-
-			element.dialog('option', 'height', height);
+			return scope.ajaxStop(function () {
+				adjustSize();
+				element.closest('.ui-dialog').css('visibility', '');
+			}, 100);
 		}
 		
 		// a flag used by evalScope to detect popup (see form.base.js)
@@ -523,11 +504,9 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 		scope._doShow = function(viewPromise) {
 			
 			viewPromise.then(function(s) {
-				if (!initialized) {
-					element.closest('.ui-dialog').css('visibility', 'hidden');
-				}
+				element.closest('.ui-dialog').css('visibility', 'hidden');
 				element.dialog('open');
-				adjust(initSize);
+				scope.ajaxStop(doShow, 100);
 			});
 		};
 		
@@ -538,7 +517,7 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 		};
 
 		scope.adjustSize = function() {
-			adjust(autoSize);
+
 		};
 	};
 });
