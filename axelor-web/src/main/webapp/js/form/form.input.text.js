@@ -118,7 +118,7 @@ ui.formInput('Text', {
 		}
     },
 	template_editable: '<textarea></textarea >',
-	template_readonly: '<pre>{{text}}</pre>'
+	template_readonly: '<pre ng-show="text">{{text}}</pre>'
 });
 
 ui.formInput('Password', 'String', {
