@@ -195,7 +195,6 @@
 				items.push(view.colorBy);
 			}
 
-			result.fields = _.unique(_.compact(result.fields));
 			return result;
 		}
 
@@ -245,7 +244,7 @@
 			function loadFields(data) {
 
 				var fields_data = findFields(data.view);
-				var fields = fields_data.fields.sort();
+				var fields = _.unique(_.compact(fields_data.fields.sort()));
 				var key = _.flatten([model, data.view.type, data.view.name, fields]).join();
 
 				data.related = fields_data.related;
