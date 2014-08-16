@@ -102,6 +102,16 @@ form[ui-bar-layout] {
 	width: 100%;
 }
 
+.panel-layout .tag-select {
+	min-height: 28px;
+}
+.panel-layout .tag-select .tag-text,
+.panel-layout .tag-select .tag-link,
+.panel-layout .tag-select-single .tag-link {
+	height: 18px;
+	line-height: 18px;
+}
+
 .panel-layout .label-item {
 	color: #999;
 	font-weight: 400;
