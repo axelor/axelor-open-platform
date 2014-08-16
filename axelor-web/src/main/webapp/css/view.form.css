@@ -878,6 +878,10 @@ table.field-details .help-text hr {
 	margin-right: 0;
 }
 
+.tag-select span.label:first-child {
+	margin-left: 0;
+}
+
 .tag-select li.tag-item {
 	
 }
