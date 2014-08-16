@@ -211,3 +211,15 @@ form[ui-bar-layout] {
 .panel-layout .btn {
 	border-radius: 0;
 }
+
+/** some special classes */
+.border-left-none,
+.border-left-none.form-item-container,
+.border-left-none.form-item-container > input {
+	border-left: none;
+}
+.border-right-none,
+.border-left-none.form-item-container,
+.border-left-none.form-item-container > input  {
+	border-left: none;
+}
