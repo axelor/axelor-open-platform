@@ -21,10 +21,6 @@
 <%@ page import="com.axelor.i18n.I18n" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%
-String linkHome = I18n.get("Home");
-String linkAbout = I18n.get("About");
-String linkContact = I18n.get("Contact");
-
 String loginTitle = I18n.get("Please sign in");
 String loginRemember = I18n.get("Remember me");
 String loginSubmit = I18n.get("Login");
@@ -32,16 +28,15 @@ String loginSubmit = I18n.get("Login");
 String loginUserName = I18n.get("User name");
 String loginPassword = I18n.get("Password");
 
-String pageTitle = I18n.get("DEMO");
+String pageTitle = I18n.get("Axelor");
 %>
 <!DOCTYPE html>
 <html>
 <head>
-<link href="lib/bootstrap/css/bootstrap.css" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style type="text/css">
-
 body {
-	padding-top: 60px;
+	padding-top: 40px;
 	padding-bottom: 40px;
 	background-color: #f5f5f5;
 }
@@ -86,35 +81,18 @@ body {
 }
 
 .app-title {
-	height: 60px;
 	font-size: 32px;
 	text-align: center;
-	margin: 40px 0 20px;
+}
+</style>
+<link href="lib/bootstrap/css/bootstrap.css" rel="stylesheet">
+<style>
+body {
+	background-color: #f5f5f5;
 }
 </style>
 </head>
 <body>
-	<div class="navbar navbar-inverse navbar-fixed-top">
-		<div class="navbar-inner">
-			<div class="container">
-				<button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-					<span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
-				</button>
-				<a class="brand" href="http://axelor.com/" style="padding: 3px;">
-					<img src="img/axelor.png" style="height: 34px;">
-				</a>
-				<div class="nav-collapse collapse pull-right">
-					<ul class="nav">
-						<li class="active"><a href="#"><%= linkHome %></a></li>
-						<li><a href="#about"><%= linkAbout %></a></li>
-						<li><a href="#contact"><%= linkContact %></a></li>
-					</ul>
-				</div>
-				<!--/.nav-collapse -->
-			</div>
-		</div>
-	</div>
-
 	<div class="container">
 		<div class="app-title">
 			<h2 class="muted"><%= pageTitle %></h2>
