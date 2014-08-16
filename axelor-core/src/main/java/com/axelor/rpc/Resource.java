@@ -230,9 +230,8 @@ public class Resource<T extends Model> {
 			Object domain = request.getData().get("_domain");
 			if (domain != null) {
 				try {
-					JPA.em().createQuery(
-							"SELECT self FROM " + model.getSimpleName() +
-							" self WHERE " + domain);
+					String qs = request.getCriteria().createQuery(model).toString();
+					JPA.em().createQuery(qs);
 				} catch (Exception e) {
 					throw new IllegalArgumentException("Invalid domain: " + domain);
 				}
