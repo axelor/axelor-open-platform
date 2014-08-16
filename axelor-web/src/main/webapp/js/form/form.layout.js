@@ -299,9 +299,13 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 		scope: true,
 		link: function(scope, element, attrs) {
 			var field = scope.field;
-			var items = (field.editor || {}).items || [];
-			var inline = attrs.uiPanelEditor === 'inline';
+			var editor = field.editor;
 
+			if (!editor) {
+				return;
+			}
+
+			var items = editor.items || [];
 			var widths = _.map(items, function (item) {
 				item.placeholder = item.placeholder || item.title || item.autoTitle;
 				item.showTitle = false;
@@ -314,7 +318,8 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 				colWidths: widths.join(','),
 				items: items
 			};
-			if (attrs.uiPanelEditor !== 'inline') {
+
+			if ((editor.widgetAttrs||{}).layout !== 'table') {
 				schema = {
 					items: [{
 						type: 'panel',

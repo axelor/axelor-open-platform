@@ -824,7 +824,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 	template_editable: function (scope) {
 		return "<div class='o2m-list'>" +
 			"<div class='o2m-list-row' ng-repeat='record in items'>" +
-				"<div ui-panel-editor='inline'></div>" +
+				"<div ui-panel-editor></div>" +
 				"<span class='o2m-list-remove'>" +
 					"<a tabindex='-1' href='' ng-click='removeItem($index)'><i class='fa fa-times'></i></a>" +
 				"</span>" +
