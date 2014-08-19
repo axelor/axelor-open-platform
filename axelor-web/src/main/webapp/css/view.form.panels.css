@@ -172,33 +172,33 @@ form[ui-bar-layout] {
 	margin-bottom: 0;
 }
 
-.panel-layout .o2m-list {
+.panel-layout .editable > .o2m-list {
 	display: table;
 	width: 100%;
 }
 
-.panel-layout .o2m-list-row {
+.panel-layout .editable > .o2m-list .o2m-list-row {
 	display: table-row;
 }
 
-.panel-layout .o2m-list-row > div,
-.panel-layout .o2m-list-row > span {
+.panel-layout .editable > .o2m-list .o2m-list-row > div,
+.panel-layout .editable > .o2m-list .o2m-list-row > span {
 	display: table-cell;
 	padding: 2px 0;
 }
 
-.panel-layout .o2m-list-row > span.o2m-list-remove {
+.panel-layout .editable > .o2m-list .o2m-list-row > span.o2m-list-remove {
 	vertical-align: middle;
 	width: 24px;
 }
 
-.panel-layout .o2m-list-row > span.o2m-list-remove a,
-.panel-layout .o2m-list-row > a {
+.panel-layout .editable > .o2m-list .o2m-list-row > span.o2m-list-remove a,
+.panel-layout .editable > .o2m-list .o2m-list-row > a {
 	outline: none;
 	padding: 0 6px;
 }
 
-.panel-layout .o2m-list-row .toggle-item button {
+.panel-layout .editable > .o2m-list .o2m-list-row .toggle-item button {
 	border-left: 0;
 	outline: none;
 }
@@ -225,16 +225,22 @@ form[ui-bar-layout] {
 }
 
 .address-list .o2m-list-row {
-	width: 50%;
+	width: 48.71%;
 	float: left;
+	margin-left: 2.56%;
 }
 .address-list .o2m-list-add {
 	width: 100%;
+	margin-left: 0;
+}
+.address-list .o2m-list-row:first-child {
+	margin-left: 0;
 }
 
 @media (max-width: 767px) {
 	.address-list .o2m-list-row {
 		width: 100%;
-		float: inherit;
+		float: none;
+		margin-left: 0;
 	}
 }
