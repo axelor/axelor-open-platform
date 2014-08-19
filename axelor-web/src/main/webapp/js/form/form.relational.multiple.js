@@ -817,7 +817,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			tmpl = "{{record.id}}";
 		}
 		return "<div class='o2m-list'>" +
-		"<div ng-repeat='record in items' ng-bind-html='tmpl'>" + tmpl + "</div>" +
+		"<div class='o2m-list-row' ng-repeat='record in items' ng-bind-html='tmpl'>" + tmpl + "</div>" +
 		"</div>"
 	},
 
@@ -829,7 +829,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 					"<a tabindex='-1' href='' ng-click='removeItem($index)'><i class='fa fa-times'></i></a>" +
 				"</span>" +
 			"</div>" +
-			"<div class='o2m-list-row'>" +
+			"<div class='o2m-list-row o2m-list-add'>" +
 				"<a tabindex='-1' href='' ng-click='addItem()'><i class='fa fa-plus'></i></a>" +
 			"</div>" +
 		"</div>"
