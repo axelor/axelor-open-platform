@@ -20,6 +20,8 @@ package com.axelor.meta.schema.views;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.eclipse.persistence.oxm.annotations.XmlCDATA;
+
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
@@ -27,6 +29,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 public class PanelField extends Field {
 
 	@XmlElement
+	@XmlCDATA
 	private String viewer;
 
 	@XmlElement
