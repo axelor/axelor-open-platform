@@ -19,9 +19,7 @@ package com.axelor.meta.schema.views;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import com.axelor.meta.schema.AdapterCDATA;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
@@ -29,7 +27,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 public class PanelField extends Field {
 
 	@XmlElement
-	@XmlJavaTypeAdapter(AdapterCDATA.class)
 	private String viewer;
 
 	@XmlElement

@@ -17,7 +17,6 @@
  */
 package com.axelor.meta.loader;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -51,8 +50,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
-import com.google.common.xml.XmlEscapers;
-import com.sun.xml.internal.bind.marshaller.CharacterEscapeHandler;
 
 public class XMLViews {
 	
@@ -81,22 +78,6 @@ public class XMLViews {
 		marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, ObjectViews.NAMESPACE + " " + ObjectViews.NAMESPACE + "/" + REMOTE_SCHEMA);
-		marshaller.setProperty(CharacterEscapeHandler.class.getName(),
-				new CharacterEscapeHandler() {
-					@Override
-					public void escape(char[] ac, int i, int j, boolean flag,
-							Writer writer) throws IOException {
-						final StringBuilder builder = new StringBuilder();
-						for (int n = i ; n < i + j; n++) {
-							builder.append(ac[n]);
-						}
-						String st = builder.toString();
-						if (st.indexOf("CDATA") == -1) {
-							st = XmlEscapers.xmlContentEscaper().escape(st);
-						}
-						writer.write(st);
-					}
-				});
 
 		SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		Schema schema = schemaFactory.newSchema(Resources.getResource(LOCAL_SCHEMA));

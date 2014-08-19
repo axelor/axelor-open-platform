@@ -24,10 +24,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.axelor.i18n.I18n;
-import com.axelor.meta.schema.AdapterCDATA;
 import com.axelor.meta.schema.views.Search.SearchField;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -94,7 +92,6 @@ public class ChartView extends AbstractView {
 		private String type;
 
 		@XmlValue
-		@XmlJavaTypeAdapter(AdapterCDATA.class)
 		private String text;
 
 		public String getType() {
