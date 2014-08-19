@@ -42,15 +42,13 @@ import com.axelor.text.StringTemplates;
 import com.axelor.text.Templates;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 
 @XmlType
 public class ActionExport extends Action {
-
-	public static final String EXPORT_PATH = AppSettings.get().getPath("data.export.dir", "");
-
+	
+	private static final String DEFAULT_EXPORT_DIR = "{java.io.tmpdir}/axelor/data-export";
 	private static final String DEFAULT_DIR = "${date}/${name}";
 
 	@XmlAttribute(name = "output")
@@ -72,6 +70,11 @@ public class ActionExport extends Action {
 
 	public List<Export> getExports() {
 		return exports;
+	}
+	
+	public static File getExportPath() {
+		final String path = AppSettings.get().getPath("data.export.dir", DEFAULT_EXPORT_DIR);
+		return new File(path);
 	}
 
 	protected String doExport(String dir, Export export, ActionHandler handler) throws IOException {
@@ -103,13 +106,9 @@ public class ActionExport extends Action {
 			engine = new GroovyTemplates();
 		}
 
-		File output = null;
-		if(Strings.isNullOrEmpty(EXPORT_PATH)) {
-			output = FileUtils.getFile(dir, name);
-		}
-		else {
-			output = FileUtils.getFile(EXPORT_PATH, dir, name);
-		}
+		File output = getExportPath();
+		output = FileUtils.getFile(output, dir, name);
+
 		String contents = null;
 		try {
 			contents = handler.template(engine, reader);

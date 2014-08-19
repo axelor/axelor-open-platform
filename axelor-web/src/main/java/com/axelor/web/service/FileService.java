@@ -36,7 +36,7 @@ public class FileService extends AbstractService {
 	@GET
 	@Path("data-export/{name:.*}")
 	public javax.ws.rs.core.Response exportFile(@PathParam("name") final String name) {
-		final File file = FileUtils.getFile(ActionExport.EXPORT_PATH, name);
+		final File file = FileUtils.getFile(ActionExport.getExportPath(), name);
 		if (!file.isFile()) {
 			throw new IllegalArgumentException(new FileNotFoundException(name));
 		}
