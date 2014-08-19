@@ -23,7 +23,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -33,12 +32,14 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.eclipse.persistence.jaxb.MarshallerProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.common.StringUtils;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.schema.ObjectViews;
@@ -79,6 +80,9 @@ public class XMLViews {
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, ObjectViews.NAMESPACE + " " + ObjectViews.NAMESPACE + "/" + REMOTE_SCHEMA);
 
+		// MOXy specific
+		marshaller.setProperty(MarshallerProperties.INDENT_STRING, "  ");
+
 		SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		Schema schema = schemaFactory.newSchema(Resources.getResource(LOCAL_SCHEMA));
 
@@ -117,10 +121,6 @@ public class XMLViews {
 		return sb.toString();
 	}
 
-	private static final String INDENT_STRING = "  ";
-	private static final Pattern INDENT_PATTERN = Pattern.compile("(    |\t)", Pattern.MULTILINE);
-	private static final Pattern STRIP_INDENT_PATTERN = Pattern.compile("^(    |\t)", Pattern.MULTILINE);
-
 	private static String strip(String xml) {
 		String[] lines = xml.split("\n");
 		StringBuilder sb = new StringBuilder();
@@ -128,8 +128,7 @@ public class XMLViews {
 			sb.append(lines[i] + "\n");
 		}
 		sb.deleteCharAt(sb.length()-1);
-		
-		return STRIP_INDENT_PATTERN.matcher(sb).replaceAll("");
+		return StringUtils.stripIndent(sb.toString());
 	}
 	
 	@SuppressWarnings("all")
@@ -156,7 +155,7 @@ public class XMLViews {
 		if (strip) {
 			text = strip(text);
 		}
-		return INDENT_PATTERN.matcher(text).replaceAll(INDENT_STRING);
+		return text;
 	}
 	
 	public static ObjectViews fromXML(String xml) throws JAXBException {

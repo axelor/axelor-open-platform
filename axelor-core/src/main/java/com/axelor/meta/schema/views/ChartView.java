@@ -25,6 +25,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
+import org.eclipse.persistence.oxm.annotations.XmlCDATA;
+
 import com.axelor.i18n.I18n;
 import com.axelor.meta.schema.views.Search.SearchField;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -92,6 +94,7 @@ public class ChartView extends AbstractView {
 		private String type;
 
 		@XmlValue
+		@XmlCDATA
 		private String text;
 
 		public String getType() {
