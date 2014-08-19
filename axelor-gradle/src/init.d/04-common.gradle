@@ -18,6 +18,10 @@ allprojects { project ->
 					cp.entries.removeAll { it.path.contains("$project.name") && it.kind=='src' }
 					cp.entries.removeAll { it.path.contains("$project.name/build") && it.kind=='lib' }
 				}
+				file.withXml {
+					def node = it.asNode()
+					node.findAll { it.@output == "bin/test" }*.@excluding = "**"
+				}
 			}
 		}
 	}
