@@ -223,3 +223,18 @@ form[ui-bar-layout] {
 .border-left-none.form-item-container > input  {
 	border-left: none;
 }
+
+.address-list .o2m-list-row {
+	width: 50%;
+	float: left;
+}
+.address-list .o2m-list-add {
+	width: 100%;
+}
+
+@media (max-width: 767px) {
+	.address-list .o2m-list-row {
+		width: 100%;
+		float: inherit;
+	}
+}
