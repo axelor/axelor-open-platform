@@ -192,9 +192,12 @@ form[ui-bar-layout] {
 	width: 24px;
 }
 
-.panel-layout .editable > .o2m-list .o2m-list-row > span.o2m-list-remove a,
-.panel-layout .editable > .o2m-list .o2m-list-row > a {
+.panel-layout .editable > .o2m-list .o2m-list-row > a,
+.panel-layout .editable > .o2m-list .o2m-list-row > span.o2m-list-remove a {
+	color: #333333;
 	outline: none;
+}
+.panel-layout .editable > .o2m-list .o2m-list-row > span.o2m-list-remove a {
 	padding: 0 6px;
 }
 
@@ -210,6 +213,13 @@ form[ui-bar-layout] {
 .panel-layout pre,
 .panel-layout .btn {
 	border-radius: 0;
+}
+.panel-layout .btn:active,
+.panel-layout .btn.active {
+  background-color: #e0e0e0;
+}
+.panel-layout .btn:focus {
+  background-position: inherit;
 }
 
 /** some special classes */
