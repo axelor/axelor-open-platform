@@ -37,7 +37,7 @@ public class Portal extends AbstractView {
 		@XmlElement(name = "portlet", type = Portlet.class),
 		@XmlElement(name = "tabs", type = PortalTabs.class)
 	})
-	private List<AbstractContainer> items;
+	private List<AbstractWidget> items;
 
 	public Integer getCols() {
 		return cols;
@@ -46,8 +46,8 @@ public class Portal extends AbstractView {
 	public void setCols(Integer cols) {
 		this.cols = cols;
 	}
-
-	public List<AbstractContainer> getItems() {
+	
+	public List<AbstractWidget> getItems() {
 		return items;
 	}
 
