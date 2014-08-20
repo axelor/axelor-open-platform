@@ -467,7 +467,7 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 		element.on('adjustSize', _.throttle(adjustSize));
 		
 		function adjustSize() {
-			var maxHeight = $(document).height() - 32;
+			var maxHeight = $(document).height() - 16;
 			var height = maxHeight;
 
 			height -= element.parent().children('.ui-dialog-titlebar').outerHeight(true);
@@ -475,7 +475,7 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 
 			if (element.is('[ui-selector-popup]')) {
 				height = Math.min(height, 480);
-			} else if (height > element[0].scrollHeight) {
+			} else if (height > element[0].scrollHeight - 16) {
 				height = 'auto';
 			}
 			element.height(height);
