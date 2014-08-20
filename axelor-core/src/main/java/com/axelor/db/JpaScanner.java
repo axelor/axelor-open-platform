@@ -31,6 +31,7 @@ import org.hibernate.ejb.packaging.NativeScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.common.reflections.ClassFinder;
 import com.axelor.common.reflections.Reflections;
 import com.google.common.collect.MapMaker;
 
@@ -47,7 +48,30 @@ public class JpaScanner extends NativeScanner {
 
 	private static ConcurrentMap<String, String> nameCache = new MapMaker().makeMap();
 
+	private static Set<String> excludes = new HashSet<>();
+	private static Set<String> includes = new HashSet<>();
+
 	public static ClassLoader loader = new JpaClassLoader();
+
+	/**
+	 * Exclude classes from the given package.
+	 *
+	 * @param pkg the package name
+	 */
+	public static void exclude(String pkg) {
+		includes.remove(pkg);
+		excludes.add(pkg);
+	}
+
+	/**
+	 * Include classes from the given package.
+	 *
+	 * @param pkg the package name
+	 */
+	public static void include(String pkg) {
+		excludes.remove(pkg);
+		includes.add(pkg);
+	}
 
 	@Override
 	public Set<Class<?>> getClassesInJar(URL jarToScan, Set<Class<? extends Annotation>> annotationsToLookFor) {
@@ -73,15 +97,22 @@ public class JpaScanner extends NativeScanner {
 			log.info("Searching for model classes...");
 			
 			register(Model.class);
-			
-			final Set<Class<? extends Model>> models = Reflections.findSubTypesOf(Model.class)
+
+			ClassFinder<Model> finder = Reflections.findSubTypesOf(Model.class)
 					.within("com.axelor")
 					.having(Entity.class)
 					.having(Embeddable.class)
-					.having(MappedSuperclass.class)
-					.any().find();
+					.having(MappedSuperclass.class);
+
+			for (String pkg : includes) {
+				finder = finder.within(pkg);
+			}
+
+			final Set<Class<? extends Model>> models = finder.any().find();
+
 			for (Class<?> klass : models) {
-				if (cache.containsKey(klass.getName())) {
+				if (cache.containsKey(klass.getName()) ||
+					excludes.contains(klass.getPackage().getName())) {
 					continue;
 				}
 				register(klass);
