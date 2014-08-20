@@ -3,13 +3,24 @@
 	xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_2.1.xsd">
 
 	<grid name="hello-<%= namespace %>-grid" title="<%= model %> List" model="com.axelor.<%= namespace %>.db.<%= model %>">
-		<field name="name"/>
-		<field name="code"/>
+		<field name="title"/>
 	</grid>
 
 	<form name="hello-<%= namespace %>-form" title="<%= model %>" model="com.axelor.<%= namespace %>.db.<%= model %>">
-		<field name="name"/>
-		<field name="code"/>
+		<panel title="Overview">
+			<field name="title" x-span="12"/>
+			<field name="publishedOn"/>
+			<field name="tags"/>
+		</panel>
+		<panel title="Message">
+			<field name="message" showTitle="false" x-span="12"/>
+		</panel>
+		<panel-side>
+			<field name="createdOn"/>
+			<field name="createdBy"/>
+			<field name="updatedOn"/>
+			<field name="updatedBy"/>
+		</panel-side>
 	</form>
 
 </object-views>
