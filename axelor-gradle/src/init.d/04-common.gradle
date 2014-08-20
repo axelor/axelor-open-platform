@@ -11,16 +11,13 @@ allprojects { project ->
 				defaultOutputDir = file("bin/main")	
 				file.whenMerged { cp ->
 					// seperate output for main & test sources
+					cp.entries.findAll { it instanceof SourceFolder && it.path == "build/src-gen" }*.output = "bin/main"
 					cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/main/") }*.output = "bin/main"
 					cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/test/") }*.output = "bin/test"
 
 					// remove self-dependency
-					cp.entries.removeAll { it.path.contains("$project.name") && it.kind=='src' }
-					cp.entries.removeAll { it.path.contains("$project.name/build") && it.kind=='lib' }
-				}
-				file.withXml {
-					def node = it.asNode()
-					node.findAll { it.@output == "bin/test" }*.@excluding = "**"
+					cp.entries.removeAll { it.path.contains("$project.name") && it.kind == 'src' }
+					cp.entries.removeAll { it.path.contains("$project.name/build") && it.kind == 'lib' }
 				}
 			}
 		}
