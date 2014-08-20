@@ -80,8 +80,7 @@ public class XMLViews {
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, ObjectViews.NAMESPACE + " " + ObjectViews.NAMESPACE + "/" + REMOTE_SCHEMA);
 
-		// MOXy specific
-		marshaller.setProperty(MarshallerProperties.INDENT_STRING, "  ");
+		marshaller.setProperty("com.sun.xml.internal.bind.indentString", "  ");
 
 		SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		Schema schema = schemaFactory.newSchema(Resources.getResource(LOCAL_SCHEMA));
