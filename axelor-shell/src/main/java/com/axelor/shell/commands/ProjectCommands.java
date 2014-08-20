@@ -84,6 +84,7 @@ public class ProjectCommands implements CommandProvider {
 		TEMPLATES.put("templates/module/build.gradle.tmpl", "build.gradle");
 		TEMPLATES.put("templates/module/Entity.xml.tmpl", "src/main/resources/domains/<%= model %>.xml");
 		TEMPLATES.put("templates/module/View.xml.tmpl", "src/main/resources/views/<%= model %>.xml");
+		TEMPLATES.put("templates/module/Menu.xml.tmpl", "src/main/resources/views/Menu.xml");
 	}
 	
 	public void createStandardDirs(File target) {
