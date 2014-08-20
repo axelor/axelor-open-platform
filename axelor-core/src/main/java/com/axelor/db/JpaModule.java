@@ -58,6 +58,11 @@ public class JpaModule extends AbstractModule {
 
 	private Properties properties;
 
+	static {
+		JpaScanner.exclude("com.axelor.test.db");
+		JpaScanner.exclude("com.axelor.web.db");
+	}
+
 	/**
 	 * Create new instance of the {@link JpaModule} with the given persistence
 	 * unit name.
@@ -90,6 +95,11 @@ public class JpaModule extends AbstractModule {
 	 */
 	public JpaModule(String jpaUnit) {
 		this(jpaUnit, true, true);
+	}
+
+	public JpaModule scan(String pkg) {
+		JpaScanner.include(pkg);
+		return this;
 	}
 
 	/**
