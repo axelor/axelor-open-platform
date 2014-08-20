@@ -227,20 +227,20 @@ form[ui-bar-layout] {
 .address-list .o2m-list-row {
 	width: 48.71%;
 	float: left;
-	margin-left: 2.56%;
+	margin-left: 0;
 }
 .address-list .o2m-list-add {
 	width: 100%;
 	margin-left: 0;
 }
-.address-list .o2m-list-row:first-child {
-	margin-left: 0;
+.address-list .o2m-list-row.even {
+	margin-left: 2.56%;
 }
 
 @media (max-width: 767px) {
 	.address-list .o2m-list-row {
 		width: 100%;
 		float: none;
-		margin-left: 0;
+		margin-left: 0 !important;
 	}
 }

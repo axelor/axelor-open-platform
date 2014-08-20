@@ -817,13 +817,13 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			tmpl = "{{record.id}}";
 		}
 		return "<div class='o2m-list'>" +
-		"<div class='o2m-list-row' ng-repeat='record in items' ng-bind-html='tmpl'>" + tmpl + "</div>" +
+		"<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items' ng-bind-html='tmpl'>" + tmpl + "</div>" +
 		"</div>"
 	},
 
 	template_editable: function (scope) {
 		return "<div class='o2m-list'>" +
-			"<div class='o2m-list-row' ng-repeat='record in items'>" +
+			"<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items'>" +
 				"<div ui-panel-editor></div>" +
 				"<span class='o2m-list-remove'>" +
 					"<a tabindex='-1' href='' ng-click='removeItem($index)'><i class='fa fa-times'></i></a>" +
