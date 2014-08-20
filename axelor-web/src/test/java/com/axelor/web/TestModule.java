@@ -27,14 +27,14 @@ import com.google.inject.AbstractModule;
 
 public class TestModule extends AbstractModule {
 
-protected Properties properties = new Properties();
-	
+	protected Properties properties = new Properties();
+
 	@Override
 	protected void configure() {
-		
+
 		bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
 
-		install(new JpaModule("testUnit").properties(properties));
+		install(new JpaModule("testUnit", true, false).scan("com.axelor.web.db").properties(properties));
 		install(new AuthModule.Simple().properties(properties));
 	}
 }
