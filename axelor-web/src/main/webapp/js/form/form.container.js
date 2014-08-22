@@ -345,12 +345,17 @@ ui.formWidget('Panel', {
 		if (field.serverType === 'panel-side') {
 			attrs.$set('cols', 1);
 		}
+
+		if (field.menu) {
+			scope.menus = [field.menu];
+		}
 	},
 
 	transclude: true,
 	template:
 		"<div class='panel'>" +
 			"<div class='panel-header' ng-show='field.title'>" +
+				"<div ng-if='menus' ui-menu-bar menus='menus' handler='this' class='pull-right'></div>" +
 				"<div class='panel-title'>{{field.title}}</div>" +
 			"</div>" +
 			"<div class='panel-body' ui-transclude></div>" +

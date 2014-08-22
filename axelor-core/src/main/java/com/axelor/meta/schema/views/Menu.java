@@ -27,11 +27,14 @@ import javax.xml.bind.annotation.XmlType;
 import com.axelor.i18n.I18n;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
+@JsonTypeName("menu")
 public class Menu extends AbstractWidget {
 
 	@XmlType
+	@JsonTypeName("menu-item")
 	public static class Item extends MenuItem {
 
 		@JsonIgnore
@@ -47,6 +50,7 @@ public class Menu extends AbstractWidget {
 	}
 
 	@XmlType
+	@JsonTypeName("menu-item-devider")
 	public static class Devider extends Item {
 
 		@Override

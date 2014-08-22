@@ -130,53 +130,53 @@
 
   <xsd:complexType name="Menubar">
     <xsd:sequence>
-      <xsd:element name="menu" type="tns:MenubarItem" maxOccurs="unbounded">
+      <xsd:element name="menu" type="tns:MenubarMenu" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation>Define a menu.</xsd:documentation>
         </xsd:annotation>
       </xsd:element>
     </xsd:sequence>
   </xsd:complexType>
+
+  <xsd:complexType name="MenubarMenuItem">
+    <xsd:attribute name="title" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>The display text</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="action" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>Comma separate list of actions to execute on click event.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="showIf" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Show if the given JavaScript expression is true.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="hideIf" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Hide if the given JavaScript expression is true.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="readonlyIf" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Readonly if the given JavaScript expression is true.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="if-module" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Only show if the given module is installed.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
   
-  <xsd:complexType name="MenubarItem">
+  <xsd:complexType name="MenubarMenu">
     <xsd:sequence>
       <xsd:choice maxOccurs="unbounded">
-        <xsd:element name="item">
-          <xsd:complexType>
-            <xsd:attribute name="title" type="xsd:string" use="required">
-              <xsd:annotation>
-                <xsd:documentation>The display text</xsd:documentation>
-              </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="action" type="xsd:string" use="required">
-              <xsd:annotation>
-                <xsd:documentation>Comma separate list of actions to execute on click event.</xsd:documentation>
-              </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="showIf" type="xsd:string">
-              <xsd:annotation>
-                <xsd:documentation>Show if the given JavaScript expression is true.</xsd:documentation>
-              </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="hideIf" type="xsd:string">
-              <xsd:annotation>
-                <xsd:documentation>Hide if the given JavaScript expression is true.</xsd:documentation>
-              </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="readonlyIf" type="xsd:string">
-              <xsd:annotation>
-                <xsd:documentation>Readonly if the given JavaScript expression is true.</xsd:documentation>
-              </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="if-module" type="xsd:string">
-		      <xsd:annotation>
-		        <xsd:documentation>
-		          Only show if the given module is installed.
-		        </xsd:documentation>
-		      </xsd:annotation>
-		    </xsd:attribute>
-          </xsd:complexType>
-        </xsd:element>
+        <xsd:element name="item" type="tns:MenubarMenuItem" />
         <xsd:element name="divider">
           <xsd:complexType>
             <xsd:attribute name="showIf" type="xsd:string">
@@ -198,7 +198,7 @@
 		    </xsd:attribute>
           </xsd:complexType>
         </xsd:element>
-        <xsd:element name="menu" type="tns:MenubarItem">
+        <xsd:element name="menu" type="tns:MenubarMenu">
           <xsd:annotation>
             <xsd:documentation>Define a submenu.</xsd:documentation>
           </xsd:annotation>
@@ -590,12 +590,21 @@
   <xsd:complexType name="Panel">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractPanel">
-        <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="field" type="tns:PanelField" />
-          <xsd:element name="label" type="tns:Label" />
-          <xsd:element name="spacer" type="tns:Spacer" />
-          <xsd:element name="button" type="tns:Spacer" />
-        </xsd:choice>
+        <xsd:sequence>
+          <xsd:element name="menu" minOccurs="0">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="item" type="tns:MenubarMenuItem" maxOccurs="unbounded"/>
+              </xsd:sequence>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="field" type="tns:PanelField" />
+            <xsd:element name="label" type="tns:Label" />
+            <xsd:element name="spacer" type="tns:Spacer" />
+            <xsd:element name="button" type="tns:Spacer" />
+          </xsd:choice>
+        </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
