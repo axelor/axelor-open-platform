@@ -115,6 +115,9 @@ form[ui-bar-layout] {
 .panel-layout .label-item {
 	color: #999;
 	font-weight: 400;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .panel-layout .boolean-item label,
