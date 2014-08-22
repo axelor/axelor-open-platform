@@ -161,7 +161,7 @@ ui.formInput('Image', 'ImageLink', {
 
 			var reader = new FileReader();
 			reader.onload = function(e) {
-				doUpdate(file.name, e.target.result);
+				doUpdate(e.target.result, file.name);
 			};
 
 			reader.readAsDataURL(file);
@@ -220,7 +220,7 @@ ui.formInput('Image', 'ImageLink', {
 		};
 	},
 	template_editable:
-	'<div ng-style="styles[0]">' +
+	'<div ng-style="styles[0]" class="image-wrapper">' +
 		'<input type="file" accept="image/*">' +
 		'<img class="img-polaroid" ng-style="styles[1]" style="display: inline-block;">' +
 		'<div class="btn-group">' +
