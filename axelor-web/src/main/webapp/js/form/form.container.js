@@ -336,7 +336,8 @@ ui.formWidget('Tab', {
 });
 
 ui.formWidget('Panel', {
-	
+
+	showTitle: false,
 	widgets: ['PanelSide'],
 
 	link: function (scope, element, attrs) {
@@ -348,6 +349,11 @@ ui.formWidget('Panel', {
 		scope.menus = null;
 		if (field.menu) {
 			scope.menus = [field.menu];
+		}
+
+		var nested = element.parents('.panel:first').size() > 0;
+		if (nested) {
+			element.addClass("panel-nested");
 		}
 	},
 

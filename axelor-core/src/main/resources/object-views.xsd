@@ -587,6 +587,23 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
+  <xsd:group name="PanelItems">
+    <xsd:choice>
+      <xsd:element name="field" type="tns:PanelField" />
+      <xsd:element name="label" type="tns:Label" />
+      <xsd:element name="spacer" type="tns:Spacer" />
+      <xsd:element name="button" type="tns:Button" />
+      <xsd:element name="panel">
+        <xsd:complexType>
+          <xsd:complexContent>
+            <xsd:extension base="tns:AbstractPanel">
+              <xsd:group ref="tns:PanelItems" maxOccurs="unbounded"/>
+            </xsd:extension>
+          </xsd:complexContent>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:choice>
+  </xsd:group>
   <xsd:complexType name="Panel">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractPanel">
@@ -598,12 +615,7 @@
               </xsd:sequence>
             </xsd:complexType>
           </xsd:element>
-          <xsd:choice maxOccurs="unbounded">
-            <xsd:element name="field" type="tns:PanelField" />
-            <xsd:element name="label" type="tns:Label" />
-            <xsd:element name="spacer" type="tns:Spacer" />
-            <xsd:element name="button" type="tns:Spacer" />
-          </xsd:choice>
+          <xsd:group ref="tns:PanelItems" maxOccurs="unbounded"/>
         </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>
