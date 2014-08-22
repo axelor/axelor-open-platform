@@ -17,44 +17,12 @@
  */
 package com.axelor.meta.schema.views;
 
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
-@JsonTypeName("panel")
-public class Panel extends AbstractPanel {
+@JsonTypeName("button-group")
+public class ButtonGroup extends SimpleContainer {
 
-	@XmlElement
-	private Menu menu;
-
-	@XmlElements({
-		@XmlElement(name = "field", type = PanelField.class),
-		@XmlElement(name = "spacer", type = Spacer.class),
-		@XmlElement(name = "label", type = Label.class),
-		@XmlElement(name = "button", type = Button.class),
-		@XmlElement(name = "button-group", type = ButtonGroup.class),
-		@XmlElement(name = "panel", type = Panel.class)
-	})
-	private List<AbstractWidget> items;
-
-	public Menu getMenu() {
-		return menu;
-	}
-
-	public void setMenu(Menu menu) {
-		this.menu = menu;
-	}
-
-	public List<AbstractWidget> getItems() {
-		return process(items);
-	}
-
-	public void setItems(List<AbstractWidget> items) {
-		this.items = items;
-	}
 }
