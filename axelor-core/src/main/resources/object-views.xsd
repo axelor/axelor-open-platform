@@ -593,6 +593,17 @@
       <xsd:element name="label" type="tns:Label" />
       <xsd:element name="spacer" type="tns:Spacer" />
       <xsd:element name="button" type="tns:Button" />
+      <xsd:element name="button-group">
+        <xsd:complexType>
+          <xsd:complexContent>
+            <xsd:extension base="tns:AbstractContainer">
+              <xsd:sequence>
+                <xsd:element name="button" type="tns:Button" maxOccurs="unbounded"/>
+              </xsd:sequence>
+            </xsd:extension>
+          </xsd:complexContent>
+        </xsd:complexType>
+      </xsd:element>
       <xsd:element name="panel">
         <xsd:complexType>
           <xsd:complexContent>

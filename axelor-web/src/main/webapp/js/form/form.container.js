@@ -335,6 +335,14 @@ ui.formWidget('Tab', {
 	'</div>'
 });
 
+ui.formWidget('ButtonGroup', {
+	transclude: true,
+	template_editable: null,
+	template_readonly: null,
+	template:
+		"<div class='btn-group' ui-transclude></div>"
+});
+
 ui.formWidget('Panel', {
 
 	showTitle: false,
