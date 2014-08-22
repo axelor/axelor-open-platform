@@ -217,6 +217,13 @@ form[ui-bar-layout] {
 .panel-layout .btn {
 	border-radius: 0;
 }
+.panel-layout .tag-select,
+.panel-layout .tag-select .label {
+	border-radius: 0;
+}
+.panel-layout .tag-select .picker-icons > i.fa {
+	padding-top: 3px;
+}
 .panel-layout .btn:active,
 .panel-layout .btn.active {
   background-color: #e0e0e0;
