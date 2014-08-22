@@ -58,6 +58,13 @@ public class XMLViews {
 	private static final String LOCAL_SCHEMA = "object-views.xsd";
 	private static final String REMOTE_SCHEMA = "object-views_" + ObjectViews.VERSION + ".xsd";
 	
+	private static final String INDENT_STRING = "  ";
+	private static final String[] INDENT_PROPERTIES = {
+		"eclipselink.indent-string",
+		"com.sun.xml.internal.bind.indentString",
+		"com.sun.xml.bind.indentString"
+	};
+
 	private static Marshaller marshaller;
 	private static Unmarshaller unmarshaller;
 
@@ -79,7 +86,14 @@ public class XMLViews {
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, ObjectViews.NAMESPACE + " " + ObjectViews.NAMESPACE + "/" + REMOTE_SCHEMA);
 
-		marshaller.setProperty("com.sun.xml.internal.bind.indentString", "  ");
+		for (String name : INDENT_PROPERTIES) {
+			try {
+				marshaller.setProperty(name, INDENT_STRING);
+				break;
+			} catch (Exception e) {
+				log.info("JAXB marshaller doesn't support property: " + name);
+			}
+		}
 
 		SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		Schema schema = schemaFactory.newSchema(Resources.getResource(LOCAL_SCHEMA));
