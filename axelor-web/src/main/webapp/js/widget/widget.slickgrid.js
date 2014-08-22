@@ -896,7 +896,22 @@ Grid.prototype.adjustSize = function() {
 		return;
 	}
 	this.doInit();
+	this.adjustToScreen();
 	this.grid.resizeCanvas();
+};
+
+Grid.prototype.adjustToScreen = function() {
+	_.each(this.cols, function (col, i) {
+		var field = col.descriptor || {};
+		if (field.hidden) {
+			return;
+		}
+		var hidden = col.hidden;
+		col.hidden = (axelor.device.small && i > 3);
+		if (hidden !== col.hidden) {
+			this.showColumn(col.field, !col.hidden);
+		}
+	}, this);
 };
 
 Grid.prototype.getColumn = function(indexOrName) {
