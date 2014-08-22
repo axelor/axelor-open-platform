@@ -28,13 +28,24 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @XmlType
 @JsonTypeName("panel")
 public class Panel extends AbstractPanel {
-	
+
+	@XmlElement
+	private Menu menu;
+
 	@XmlElements({
 		@XmlElement(name = "field", type = PanelField.class),
 		@XmlElement(name = "spacer", type = Spacer.class),
 		@XmlElement(name = "label", type = Label.class),
 	})
 	private List<AbstractWidget> items;
+
+	public Menu getMenu() {
+		return menu;
+	}
+
+	public void setMenu(Menu menu) {
+		this.menu = menu;
+	}
 
 	public List<AbstractWidget> getItems() {
 		return process(items);
