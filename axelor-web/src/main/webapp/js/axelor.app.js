@@ -72,7 +72,21 @@
 		updateLoadingCounter(-1);
 		hideLoading();
 	}
-	
+
+	// screen size detection
+	Object.defineProperty(axelor, 'device', {
+		enumerable: true,
+		get: function () {
+			var device = {
+				small: false,
+				large: false
+			};
+			device.large = $(window).width() > 767;
+			device.small = !device.large;
+			return device;
+		}
+	});
+
 	axelor.$eval = function (scope, expr, context) {
 		if (!scope || !expr) {
 			return null;
