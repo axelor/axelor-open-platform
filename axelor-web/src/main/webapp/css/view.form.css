@@ -438,6 +438,10 @@ td.form-item > * {
 	min-height: 250px;
 }
 
+.form-item .image-item .image-wrapper {
+	position: relative;
+}
+
 .form-item .image-item div.btn-group {
 	position: absolute;
 	left: 20px;
