@@ -111,14 +111,13 @@
 			
 			var element = $('<div class="message-box" style="padding: 15px;"></div>').attr('title', title).html(str);
 			var dialog = element.dialog({
+				dialogClass: 'ui-dialog-responsive ui-dialog-small',
 				resizable: false,
 				draggable: false,
 				autoOpen: false,
 				closeOnEscape: true,
 				modal: true,
 				zIndex: 1100,
-				minWidth: 450,
-				maxHeight: 500,
 				close: function(e) {
 					onClose(e);
 					element.dialog('destroy');

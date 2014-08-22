@@ -177,16 +177,33 @@
 	font-size: 24px;
 }
 
+.ui-dialog-small .ui-dialog-content {
+	height: auto !important;
+	overflow: inherit;
+}
+
+.ui-dialog-small .ui-dialog-buttonpane {
+	position: relative;
+}
+
 @media screen and (min-width: 768px) {
 	.ui-dialog-responsive {
 		width: 740px !important;
 		left: calc(50% - 370px) !important;
+	}
+	.ui-dialog-small {
+		width: 480px !important;
+		left: calc(50% - 240px) !important;
 	}
 }
 @media screen and (min-width: 1024px) {
 	.ui-dialog-responsive {
 		width: 900px !important;
 		left: calc(50% - 450px) !important;
+	}
+	.ui-dialog-small {
+		width: 480px !important;
+		left: calc(50% - 240px) !important;
 	}
 }
 .ui-dialog-responsive.maximized .ui-dialog-titlebar,
@@ -236,5 +253,14 @@
 	}
 	.ui-dialog .ui-dialog-content[ui-selector-popup] {
 		min-height: inherit !important;
+	}
+	.ui-dialog-small {
+		height: auto !important;
+	}
+	.ui-dialog-small .ui-dialog-content {
+		height: auto !important;
+	}
+	.ui-dialog-small .ui-dialog-buttonpane {
+		position: relative;
 	}
 }
