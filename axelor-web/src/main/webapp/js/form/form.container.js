@@ -345,7 +345,7 @@ ui.formWidget('Panel', {
 		if (field.serverType === 'panel-side') {
 			attrs.$set('cols', 1);
 		}
-
+		scope.menus = null;
 		if (field.menu) {
 			scope.menus = [field.menu];
 		}
