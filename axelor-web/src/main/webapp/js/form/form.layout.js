@@ -191,17 +191,18 @@ function PanelLayout(items, attrs, $scope, $compile) {
 	function add(item, label) {
 		var row = _.last(layout),
 			cell = $('<div>'),
-			span = +item.attr('x-span') || defSpan;
+			span = +item.attr('x-span') || defSpan,
+			offset = +item.attr('x-offset') || 0;
 
 		span = Math.min(span, numCols);
 
 		if (item.is('.spacer-item')) {
-			curCol += span;
+			curCol += (span + offset);
 			item.remove();
 			return;
 		}
 
-		if (curCol + span >= numCols + 1) {
+		if (curCol + (span + offset) >= numCols + 1) {
 			curCol = 0, row = $('<div class="row-fluid">');
 			layout.push(row);
 		}
@@ -211,11 +212,14 @@ function PanelLayout(items, attrs, $scope, $compile) {
 
 		cell.addClass(item.attr('x-cell-css'));
 		cell.addClass('span' + span);
+		if (offset) {
+			cell.addClass('offset' + offset);
+		}
 
 		cell.append(item);
 		cell.appendTo(row);
 
-		curCol += span;
+		curCol += (span + offset);
 	}
 
 	items.each(function (item, i) {
