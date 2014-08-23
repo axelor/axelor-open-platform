@@ -644,6 +644,10 @@
         <xsd:attribute name="field" type="xsd:string" use="required" />
         <xsd:attribute name="form-view" type="xsd:string" />
         <xsd:attribute name="grid-view" type="xsd:string" />
+        <xsd:attribute name="editable" type="xsd:boolean" />
+        <xsd:attribute name="domain" type="xsd:string" />
+        <xsd:attribute name="onChange" type="xsd:string" />
+        <xsd:attribute name="onSelect" type="xsd:string" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

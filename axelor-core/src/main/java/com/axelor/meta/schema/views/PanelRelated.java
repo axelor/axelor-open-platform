@@ -38,6 +38,18 @@ public class PanelRelated extends AbstractPanel {
 	
 	@XmlAttribute(name = "grid-view")
 	private String gridView;
+	
+	@XmlAttribute
+	private Boolean editable;
+	
+	@XmlAttribute
+	private String domain;
+	
+	@XmlAttribute
+	private String onChange;
+	
+	@XmlAttribute
+	private String onSelect;
 
 	@XmlElements({
 		@XmlElement(name = "field", type = PanelField.class),
@@ -67,6 +79,38 @@ public class PanelRelated extends AbstractPanel {
 	
 	public void setGridView(String gridView) {
 		this.gridView = gridView;
+	}
+	
+	public Boolean getEditable() {
+		return editable;
+	}
+	
+	public void setEditable(Boolean editable) {
+		this.editable = editable;
+	}
+	
+	public String getDomain() {
+		return domain;
+	}
+	
+	public void setDomain(String domain) {
+		this.domain = domain;
+	}
+	
+	public String getOnChange() {
+		return onChange;
+	}
+	
+	public void setOnChange(String onChange) {
+		this.onChange = onChange;
+	}
+	
+	public String getOnSelect() {
+		return onSelect;
+	}
+	
+	public void setOnSelect(String onSelect) {
+		this.onSelect = onSelect;
 	}
 
 	public List<AbstractWidget> getItems() {
