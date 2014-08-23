@@ -302,3 +302,34 @@ form[ui-bar-layout].mini-form {
 		margin-left: 0 !important;
 	}
 }
+.panel-layout .order-subtotal dl {
+	width: 280px;
+	float: right;
+}
+.panel-layout .order-subtotal dt,
+.panel-layout .order-subtotal dd {
+	padding: 4px;
+}
+
+.panel-layout .order-subtotal dt {
+	padding-right: 8px;
+	font-weight: normal;
+}
+.panel-layout .order-subtotal dd {
+	margin-left: 0;
+	text-align: right;
+}
+
+.panel-layout .order-subtotal-total {
+	border-top: 1px solid #ccc;
+	font-size: 18px;
+	font-weight: bold;
+}
+
+@media (max-width: 767px) {
+	.panel-layout .order-subtotal dt {
+		float: left;
+		text-align: right;
+		width: 48%;
+	}
+}
