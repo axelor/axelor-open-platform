@@ -133,6 +133,7 @@ form[ui-bar-layout].mini-form {
 .panel-layout .form-item-container input {
 	min-width: inherit;
 }
+.panel-layout .form-item-container.time-item input,
 .panel-layout .form-item-container.datetime-item .picker-input {
 	width: 100%;
 }
