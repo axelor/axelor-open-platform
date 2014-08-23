@@ -329,6 +329,9 @@ ui.formDirective = function(name, object) {
 
 			function showReadonly() {
 				var template_readonly = self.template_readonly;
+				if (scope.field && scope.field.viewer) {
+					template_readonly = scope.field.viewer;
+				}
 				if (_.isFunction(self.template_readonly)) {
 					template_readonly = self.template_readonly(scope);
 				}
