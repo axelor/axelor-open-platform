@@ -563,7 +563,7 @@ var panelRelatedTemplate =
 		"</div>" +
 		"<div class='panel-title'>{{field.title}}</div>" +
 	"</div>" +
-	"<div class='panel-body'>" +
+	"<div class='panel-body panel-layout'>" +
 		"<div ui-view-grid " +
 			"x-view='schema' " +
 			"x-data-view='dataView' " +
