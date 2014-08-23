@@ -20,6 +20,12 @@ form[ui-bar-layout] {
 	margin: auto;
 	padding: 14px;
 }
+form[ui-bar-layout].mid-form {
+	max-width: 768px;
+}
+form[ui-bar-layout].mini-form {
+	max-width: 480px;
+}
 
 .panel-layout * {
 	box-sizing: border-box;
@@ -183,8 +189,11 @@ form[ui-bar-layout] {
 	bottom: 0px;
 	border: none;
 }
+.panel-tabs {
+	margin-bottom: 18px;
+}
 .panel-tabs .tab-content {
-	padding-top: 4px;
+	padding-top: 6px;
 }
 
 .panel-tabs .tab-content > .panel {

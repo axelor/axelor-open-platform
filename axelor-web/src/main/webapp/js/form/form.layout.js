@@ -294,6 +294,10 @@ ui.directive('uiBarLayout', ['$compile', function($compile) {
 		scope._isPanelForm = true;
 		
 		element.append(layout);
+
+		if (element.has('.panel-side').size() === 0) {
+			element.addClass('mid-form');
+		}
 	};
 }]);
 
