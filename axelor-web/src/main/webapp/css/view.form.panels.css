@@ -190,7 +190,8 @@ form[ui-bar-layout].mini-form {
 	bottom: 0px;
 	border: none;
 }
-.panel-tabs {
+.panel-tabs,
+.panel-stack {
 	margin-bottom: 18px;
 }
 .panel-tabs .tab-content {
@@ -199,6 +200,10 @@ form[ui-bar-layout].mini-form {
 
 .panel-tabs .tab-content > .panel {
 	margin-top: 0;
+}
+
+.panel-stack > .panel {
+	margin: 0;
 }
 
 .panel-layout .o2m-list .form-item {

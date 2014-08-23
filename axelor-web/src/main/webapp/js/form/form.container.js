@@ -376,6 +376,11 @@ ui.formWidget('Panel', {
 		"</div>"
 });
 
+ui.formWidget('PanelStack', {
+	transclude: true,
+	template: "<div class='panel-stack' ui-transclude></div>"
+});
+
 ui.formWidget('PanelTabs', {
 
 	link: function (scope, element, attrs) {

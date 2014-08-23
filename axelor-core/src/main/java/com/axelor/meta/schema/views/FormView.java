@@ -87,6 +87,7 @@ public class FormView extends AbstractView {
         @XmlElement(name = "panel-include", type = FormInclude.class),
         @XmlElement(name = "panel-dashlet", type = Portlet.class),
         @XmlElement(name = "panel-related", type = PanelRelated.class),
+        @XmlElement(name = "panel-stack", type = PanelStack.class),
         @XmlElement(name = "panel-tabs", type = PanelTabs.class),
         @XmlElement(name = "panel-side", type = PanelSide.class)
 	})
