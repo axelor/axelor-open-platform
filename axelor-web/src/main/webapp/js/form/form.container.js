@@ -352,7 +352,7 @@ ui.formWidget('Panel', {
 		var field = scope.field || {};
 		element.addClass(field.serverType);
 		if (field.serverType === 'panel-side') {
-			attrs.$set('cols', 1);
+			attrs.$set('itemspan', 12);
 		}
 		scope.menus = null;
 		if (field.menu) {

@@ -182,16 +182,16 @@ ui.directive('uiTableLayout', ['$compile', function($compile) {
 }]);
 
 function PanelLayout(items, attrs, $scope, $compile) {
-
+	
 	var numCols = 12,
-		defSpan = 12 / (+attrs.cols || 2)
+		numSpan = +(attrs.itemspan) || 6,
 		curCol = 0,
 		layout = [$('<div class="row-fluid">')];
 	
 	function add(item, label) {
 		var row = _.last(layout),
 			cell = $('<div>'),
-			span = +item.attr('x-span') || defSpan,
+			span = +item.attr('x-span') || numSpan,
 			offset = +item.attr('x-offset') || 0;
 
 		span = Math.min(span, numCols);
