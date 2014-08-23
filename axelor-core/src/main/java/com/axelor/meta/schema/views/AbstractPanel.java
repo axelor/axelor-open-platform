@@ -20,22 +20,10 @@ package com.axelor.meta.schema.views;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
-public abstract class AbstractPanel extends AbstractWidget {
-
-	@XmlAttribute
-	protected String title;
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
+public abstract class AbstractPanel extends AbstractContainer {
 
 	protected List<AbstractWidget> process(List<AbstractWidget> items) {
 		if (items == null) {
