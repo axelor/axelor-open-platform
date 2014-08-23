@@ -629,7 +629,7 @@
               </xsd:sequence>
             </xsd:complexType>
           </xsd:element>
-          <xsd:group ref="tns:PanelItems" maxOccurs="unbounded"/>
+          <xsd:group ref="tns:PanelItems" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>
@@ -657,6 +657,7 @@
         <xsd:choice maxOccurs="8">
           <xsd:element name="panel" type="tns:Panel" />
           <xsd:element name="panel-related" type="tns:PanelRelated"/>
+          <xsd:element name="panel-dashlet" type="tns:Portlet" />
         </xsd:choice>
         <xsd:attribute name="title" use="prohibited"/>
       </xsd:extension>
@@ -705,12 +706,14 @@
           <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0" />
           <xsd:element name="menubar" type="tns:Menubar" minOccurs="0" />
             <xsd:choice minOccurs="0" maxOccurs="1">
-              <xsd:sequence maxOccurs="unbounded">
-                <xsd:element name="panel" type="tns:Panel" minOccurs="1" maxOccurs="unbounded" />
-                <xsd:element name="panel-related" type="tns:PanelRelated" minOccurs="0" maxOccurs="unbounded" />
-                <xsd:element name="panel-tabs" type="tns:PanelTabs" minOccurs="0" maxOccurs="unbounded" />
-                <xsd:element name="panel-side" type="tns:Panel" minOccurs="0" maxOccurs="unbounded" />
-              </xsd:sequence>
+              <xsd:choice maxOccurs="unbounded">
+                <xsd:element name="panel" type="tns:Panel" />
+                <xsd:element name="panel-include" type="tns:FormInclude" />
+                <xsd:element name="panel-dashlet" type="tns:Portlet" />
+                <xsd:element name="panel-related" type="tns:PanelRelated" />
+                <xsd:element name="panel-tabs" type="tns:PanelTabs" />
+                <xsd:element name="panel-side" type="tns:Panel" />
+              </xsd:choice>
               <xsd:choice maxOccurs="unbounded">
                 <xsd:group ref="tns:FormWidgets" />
               </xsd:choice>
