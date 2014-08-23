@@ -638,8 +638,8 @@
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractPanel">
         <xsd:sequence>
-          <xsd:element name="field" type="tns:PanelField" maxOccurs="unbounded" />
-          <xsd:element name="button" type="tns:Spacer" minOccurs="0" maxOccurs="unbounded" />
+          <xsd:element name="field" type="tns:PanelField" minOccurs="0" maxOccurs="unbounded" />
+          <xsd:element name="button" type="tns:Button" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="field" type="xsd:string" use="required" />
         <xsd:attribute name="form-view" type="xsd:string" />
