@@ -31,7 +31,8 @@ public class PanelTabs extends AbstractPanel {
 
 	@XmlElements({
 		@XmlElement(name = "panel", type = Panel.class),
-		@XmlElement(name = "panel-related", type = PanelRelated.class)
+		@XmlElement(name = "panel-related", type = PanelRelated.class),
+		@XmlElement(name = "panel-dashlet", type = Portlet.class)
 	})
 	private List<AbstractWidget> items;
 
