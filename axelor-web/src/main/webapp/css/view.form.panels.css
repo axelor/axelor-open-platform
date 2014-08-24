@@ -286,6 +286,10 @@ form[ui-bar-layout].mini-form {
 	outline: none;
 }
 
+.panel-layout .row-fluid [class*="span"] {
+	min-height: inherit !important;
+}
+
 /** remove rounded corners */
 .panel-layout input,
 .panel-layout textarea,
