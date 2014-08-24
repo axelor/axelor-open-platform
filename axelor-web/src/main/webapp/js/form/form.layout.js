@@ -192,9 +192,13 @@ function PanelLayout(items, attrs, $scope, $compile) {
 		var row = _.last(layout),
 			cell = $('<div>'),
 			span = +item.attr('x-span') || numSpan,
-			offset = +item.attr('x-offset') || 0;
+			offset = +item.attr('x-offset') || 0,
+			stacked = attrs.stacked;
 
 		span = Math.min(span, numCols);
+		if (stacked) {
+			span = 0;
+		}
 
 		if (item.is('.spacer-item')) {
 			curCol += (span + offset);
@@ -202,7 +206,7 @@ function PanelLayout(items, attrs, $scope, $compile) {
 			return;
 		}
 
-		if (curCol + (span + offset) >= numCols + 1) {
+		if (curCol + (span + offset) >= numCols + 1 && !stacked) {
 			curCol = 0, row = $('<div class="row-fluid">');
 			layout.push(row);
 		}
@@ -211,7 +215,10 @@ function PanelLayout(items, attrs, $scope, $compile) {
 		}
 
 		cell.addClass(item.attr('x-cell-css'));
-		cell.addClass('span' + span);
+
+		if (span) {
+			cell.addClass('span' + span);
+		}
 		if (offset) {
 			cell.addClass('offset' + offset);
 		}
