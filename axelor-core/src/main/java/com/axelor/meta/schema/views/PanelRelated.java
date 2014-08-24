@@ -41,7 +41,10 @@ public class PanelRelated extends AbstractPanel {
 	
 	@XmlAttribute
 	private Boolean editable;
-	
+
+	@XmlAttribute
+	private String orderBy;
+
 	@XmlAttribute
 	private String domain;
 	
@@ -80,7 +83,15 @@ public class PanelRelated extends AbstractPanel {
 	public void setGridView(String gridView) {
 		this.gridView = gridView;
 	}
-	
+
+	public String getOrderBy() {
+		return orderBy;
+	}
+
+	public void setOrderBy(String orderBy) {
+		this.orderBy = orderBy;
+	}
+
 	public Boolean getEditable() {
 		return editable;
 	}
