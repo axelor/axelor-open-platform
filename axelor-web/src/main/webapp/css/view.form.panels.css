@@ -92,6 +92,14 @@ form[ui-bar-layout].mini-form {
 	margin-top: 0;
 }
 
+.panel.noframe {
+	border: none;
+	box-shadow: none;
+}
+.panel.noframe .panel-body {
+	padding: 0;
+}
+
 .panel .row-fluid > .form-item {
 	margin-bottom: 12px;
 }

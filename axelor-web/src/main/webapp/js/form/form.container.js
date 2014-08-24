@@ -363,12 +363,15 @@ ui.formWidget('Panel', {
 		if (nested) {
 			element.addClass("panel-nested");
 		}
+		if (field.noframe) {
+			element.addClass('noframe');
+		}
 	},
 
 	transclude: true,
 	template:
 		"<div class='panel'>" +
-			"<div class='panel-header' ng-show='field.title'>" +
+			"<div class='panel-header' ng-show='field.title' ng-if='!field.noframe'>" +
 				"<div ng-if='menus' ui-menu-bar menus='menus' handler='this' class='pull-right'></div>" +
 				"<div class='panel-title'>{{field.title}}</div>" +
 			"</div>" +
