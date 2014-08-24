@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <object-views xmlns="http://apps.axelor.com/xml/ns/object-views"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_2.0.xsd">
-    
-    <grid name="role-grid" title="Roles" model="com.axelor.auth.db.Role">
-        <field name="name"/>
-    </grid>
-    
-    <form name="role-form" title="Role" cols="2" colWidths="150,*" model="com.axelor.auth.db.Role">
-        <field name="name" />
-        <field name="description" />
-		<field name="permissions" colSpan="2" />
-    </form>
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_2.1.xsd">
+
+  <grid name="role-grid" title="Roles" model="com.axelor.auth.db.Role">
+    <field name="name" />
+  </grid>
+
+  <form name="role-form" title="Role" model="com.axelor.auth.db.Role">
+    <panel title="Overview">
+      <field name="name" />
+      <field name="description" />
+    </panel>
+    <panel-related field="permissions" />
+  </form>
 
 </object-views>
