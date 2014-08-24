@@ -297,14 +297,21 @@ ui.directive('uiBarLayout', ['$compile', function($compile) {
 	return function(scope, element, attrs) {
 		var items = element.children();
 		var layout = BarLayout(items, attrs, scope, $compile);
-		
+		var css = null;
+
 		scope._isPanelForm = true;
-		
+
 		element.append(layout);
 		element.addClass('bar-layout');
 
 		if (element.has('.panel-side').size() === 0) {
-			element.addClass('mid-form');
+			css = "mid";
+		}
+		if (element.is('form') && ["mini", "mid", "large"].indexOf(scope.schema.width) > -1) {
+			css = scope.schema.width;
+		}
+		if (css) {
+			element.addClass(css + '-form');
 		}
 	};
 }]);

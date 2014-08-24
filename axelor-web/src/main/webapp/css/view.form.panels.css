@@ -28,6 +28,9 @@
 .bar-layout.mini-form {
 	max-width: 480px;
 }
+.bar-layout.large-form {
+	max-width: 1200px;
+}
 
 .panel-layout * {
 	box-sizing: border-box;
