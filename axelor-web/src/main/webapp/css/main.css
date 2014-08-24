@@ -640,10 +640,8 @@ img.prefix-icon {
 .fa, [class^=fa-] {
 	font-size: 14px;
 }
-
-.user-preferences-body {
-	width: 400px;
-	margin: auto;
+.user-preferences form {
+	padding: 0;
 }
 
 .user-preferences-header {

@@ -1,14 +1,20 @@
-<div class="user-preferences form-view" ng-controller="UserCtrl">
-	<div class="user-preferences-body">
-		<div class="user-preferences-header">
+<div class="user-preferences form-view bar-layout mini-form" ng-controller="UserCtrl">
+	<div class="row-fluid">
+		<div class="user-preferences-header span12">
 			<h2>Preferences</h2>
-			<hr/>
+			<hr />
 		</div>
-		<div ui-view-form x-handler="this"></div>
-		<hr/>
-		<div class="user-preferences-footer pull-right">
-			<button class="btn btn-primary" ng-click="onSave()" ng-disabled="!canSave()" x-translate>Save</button>
-			<button class="btn" x-translate ng-click="onClose()">Close</button>
+	</div>
+	<div class="row-fluid">
+		<div ui-view-form x-handler="this" class="span12"></div>
+	</div>
+	<div class="row-fluid">
+		<div class="user-preferences-footer span12">
+			<hr />
+			<div class="pull-right">
+				<button class="btn btn-primary" ng-click="onSave()" ng-disabled="!canSave()" x-translate>Save</button>
+				<button class="btn" x-translate ng-click="onClose()">Close</button>
+			</div>
 		</div>
 	</div>
 </div>

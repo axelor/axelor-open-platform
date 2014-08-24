@@ -15,15 +15,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-form[ui-bar-layout] {
+.bar-layout {
 	max-width: 1200px;
 	margin: auto;
 	padding: 14px;
 }
-form[ui-bar-layout].mid-form {
+
+.bar-layout.mid-form {
 	max-width: 768px;
 }
-form[ui-bar-layout].mini-form {
+
+.bar-layout.mini-form {
 	max-width: 480px;
 }
 
@@ -123,7 +125,7 @@ form[ui-bar-layout].mini-form {
 	margin-bottom: 0;
 }
 
-.panel-layout form[ui-bar-layout],
+.panel-layout .bar-layout,
 .panel-layout .panel .panel-body {
 	padding: 0;
 }
