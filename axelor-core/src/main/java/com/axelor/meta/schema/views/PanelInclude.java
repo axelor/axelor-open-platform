@@ -17,30 +17,12 @@
  */
 package com.axelor.meta.schema.views;
 
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
-@JsonTypeName("panel-tabs")
-public class PanelTabs extends AbstractPanel {
+@JsonTypeName("include")
+public class PanelInclude extends FormInclude {
 
-	@XmlElements({
-		@XmlElement(name = "panel", type = Panel.class),
-		@XmlElement(name = "panel-related", type = PanelRelated.class),
-		@XmlElement(name = "panel-dashlet", type = PanelDashlet.class)
-	})
-	private List<AbstractWidget> items;
-
-	public List<AbstractWidget> getItems() {
-		return process(items);
-	}
-
-	public void setItems(List<AbstractWidget> items) {
-		this.items = items;
-	}
 }
