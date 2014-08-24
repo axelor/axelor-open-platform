@@ -166,15 +166,6 @@
 	white-space: nowrap;
 }
 
-.panel-layout .boolean-item label,
-.panel-layout .boolean-item input {
-	float: left;
-}
-
-.panel-layout .boolean-item input {
-	margin-top: 3px !important;
-}
-
 .panel-related .panel-header {
 	border-bottom: none;
 }
