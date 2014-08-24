@@ -206,6 +206,31 @@ form[ui-bar-layout].mini-form {
 	margin: 0;
 }
 
+.bar-layout .portlet {
+	margin-bottom: 18px;
+}
+
+.bar-layout .portlet,
+.bar-layout .portlet-header .navbar-inner,
+.bar-layout .portlet-body,
+.bar-layout .portlet-content {
+	border-radius: 0 !important;
+}
+.bar-layout .portlet-header .navbar-inner {
+	background-image: none;
+	background-color: #f5f5f5;
+	border-bottom: 1px solid #d4d4d4;
+}
+.bar-layout .portlet-header .divider-vertical {
+	border-left: 1px solid #D3D3D3;
+}
+
+.bar-layout .form-item .form-item-portlet,
+.bar-layout .form-item .form-item-portlet .portlet {
+	height: auto;
+	min-height: inherit !important;
+}
+
 .panel-layout .o2m-list .form-item {
 	padding: 0;
 }
