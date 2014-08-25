@@ -372,6 +372,103 @@ ui.formInput('ManyToOne', 'Select', {
 	'<a href="" ng-show="text" ng-click="onEdit()">{{text}}</a>'
 });
 
+ui.InlineManyToOneCtrl = InlineManyToOneCtrl;
+ui.InlineManyToOneCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewService'];
+
+function InlineManyToOneCtrl($scope, $element, DataSource, ViewService) {
+
+	var field = $scope.field || $scope.getViewDef($element);
+	var params = {
+		model: field.target
+	};
+
+	if (!field.editor) {
+		throw "No editor defined.";
+	}
+
+	params.views = [{
+		type: 'form',
+		items: field.editor.items
+	}];
+
+	$scope._viewParams = params;
+
+	ManyToOneCtrl.call(this, $scope, $element, DataSource, ViewService);
+
+	$scope.select = function (value) {
+		var editor = field.editor;
+		var names = [];
+
+		if (_.isArray(value)) {
+			value = _.first(value);
+		}
+		if (_.isEmpty(value)) {
+			return $scope.setValue(null, true);
+		}
+
+		names = _.pluck(editor.items, 'name');
+		names = _.compact(names);
+
+		if ($scope.field.targetName) {
+			names.push($scope.field.targetName);
+		}
+
+		names = _.unique(names);
+
+		function set(val) {
+			var record = _.pick(val, names);
+			record.id = val.id;
+			record.version = val.version || val.$version;
+			$scope.setValue(record, true);
+		}
+
+		var record = _.pick(value, names);
+
+		// if some field is missing
+		if (_.keys(record).length !== names.length && value.id) {
+			return $scope._dataSource.read(value.id, {
+				fields: names
+			}).success(function (rec) {
+				set(rec);
+			});
+		}
+		set(record);
+	};
+
+	$scope.onClear = function() {
+		$scope.setValue(null, true);
+	};
+}
+
+ui.formInput('InlineManyToOne', 'ManyToOne', {
+
+	widgets: ['InlineOneToOne'],
+
+	controller: InlineManyToOneCtrl,
+
+	template_readonly: function (scope) {
+		var field = scope.field || {};
+		if (field.viewer) {
+			return viewer;
+		}
+		return '<a href="" ng-show="text" ng-click="onEdit()">{{text}}</a>'
+	},
+
+	template_editable: function (scope) {
+		return "" +
+		"<div class='m2o-editor'>" +
+			"<div class='m2o-editor-controls'>" +
+				"<a href='' ng-click='onEdit()'><i class='fa fa-pencil'></i></a>" +
+				"<a href='' ng-click='onSelect()'><i class='fa fa-search'></i></a>" +
+				"<a href='' ng-click='onClear()'><i class='fa fa-times-circle'></i></a>" +
+			"</div>" +
+			"<div class='m2o-editor-form' ui-panel-editor></div>" +
+		"</div>";
+	},
+
+	template: null
+});
+
 ui.formInput('SuggestBox', 'ManyToOne', {
 
 	showSelectionOn: "click",
