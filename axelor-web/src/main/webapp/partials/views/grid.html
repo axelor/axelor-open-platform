@@ -17,7 +17,7 @@
             <i class="fa fa-trash-o"></i> <span ng-hide="tbTitleHide" x-translate>Delete</span>
           </button>
         </div>
-        <div class="btn-group" ng-if="toolbar" ui-btn-group-helper>
+        <div class="btn-group" ng-if="toolbar">
           <button ng-repeat="btn in toolbar | filter:{custom: true}" class="btn" ui-tool-button="btn">{{btn.title}}</button>
         </div>
         <div ui-menu-bar menus="menubar" handler="this"></div>
