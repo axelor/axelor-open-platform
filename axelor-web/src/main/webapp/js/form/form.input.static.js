@@ -401,18 +401,4 @@ ui.formItem('ToolButton', 'Button', {
 	template: '<button class="btn" ui-show="!isHidden()" name="{{btn.name}}" ui-actions ui-widget-states>{{title}}</button>'
 });
 
-ui.directive('uiBtnGroupHelper', function () {
-	
-	return function (scope, element, attrs) {
-		if (!element.is('.btn-group')) {
-			return;
-		}
-		scope.$watch(function() {
-			element.children().removeClass('btn-fix-left btn-fix-right');
-			element.children(':not(.ui-hide):first').addClass('btn-fix-left');
-			element.children(':not(.ui-hide):last').addClass('btn-fix-right');
-		});
-	};
-});
-
 })(this);

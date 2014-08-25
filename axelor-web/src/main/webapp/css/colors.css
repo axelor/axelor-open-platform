@@ -167,3 +167,34 @@ table.form-layout .tabbable-tabs .tab-content {
 .view-container .form-view > div[ui-view-form].has-width {
 	background-color: #f7f7f9;
 }
+
+/** remove corners */
+.btn,
+.ui-menu,
+.dropdown-menu,
+.slick-header-menu,
+[class*="ui-corner"] {
+	border-radius: 0 !important;
+}
+.portlet,
+.portlet-header .navbar-inner,
+.portlet-body,
+.portlet-content {
+	border-radius: 0 !important;
+}
+input, button, textarea, select, fieldset, pre {
+	border-radius: 0 !important;
+}
+.tag-select,
+.tag-select .label {
+	border-radius: 0;
+}
+.tag-select .picker-icons > i.fa {
+	padding-top: 3px;
+}
+
+.progress,
+.progress .bar {
+	border-radius: 0 !important;
+	box-shadow: none;
+}

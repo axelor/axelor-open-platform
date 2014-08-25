@@ -79,7 +79,6 @@
 .panel .panel-header .dropdown-menu {
 	left: inherit;
 	right: 0;
-	border-radius: 0;
 }
 
 .panel .panel-body {
@@ -214,12 +213,6 @@
 	margin-bottom: 18px;
 }
 
-.bar-layout .portlet,
-.bar-layout .portlet-header .navbar-inner,
-.bar-layout .portlet-body,
-.bar-layout .portlet-content {
-	border-radius: 0 !important;
-}
 .bar-layout .portlet-header .navbar-inner {
 	background-image: none;
 	background-color: #f5f5f5;
@@ -237,11 +230,6 @@
 
 .panel-layout .o2m-list .form-item {
 	padding: 0;
-}
-
-.panel-layout .o2m-list input,
-.panel-layout .o2m-list button {
-	border-radius: 0;
 }
 
 .panel-layout .o2m-list .panel {
@@ -286,21 +274,6 @@
 	min-height: inherit !important;
 }
 
-/** remove rounded corners */
-.panel-layout input,
-.panel-layout textarea,
-.panel-layout button,
-.panel-layout pre,
-.panel-layout .btn {
-	border-radius: 0;
-}
-.panel-layout .tag-select,
-.panel-layout .tag-select .label {
-	border-radius: 0;
-}
-.panel-layout .tag-select .picker-icons > i.fa {
-	padding-top: 3px;
-}
 .panel-layout .btn:active,
 .panel-layout .btn.active {
   background-color: #e0e0e0;
