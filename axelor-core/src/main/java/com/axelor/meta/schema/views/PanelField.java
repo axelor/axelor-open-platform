@@ -44,9 +44,12 @@ public class PanelField extends Field {
 	}
 
 	public PanelEditor getEditor() {
+		if (editor != null) {
+			editor.forField = this;
+		}
 		return editor;
 	}
-	
+
 	public void setEditor(PanelEditor editor) {
 		this.editor = editor;
 	}

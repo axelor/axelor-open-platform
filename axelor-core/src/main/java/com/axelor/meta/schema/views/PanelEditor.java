@@ -17,17 +17,23 @@
  */
 package com.axelor.meta.schema.views;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.common.ClassUtils;
+import com.axelor.db.mapper.Mapper;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("editor")
 public class PanelEditor extends AbstractPanel {
+
+	transient PanelField forField;
 
 	@XmlElements({
 		@XmlElement(name = "field", type = PanelField.class),
@@ -42,5 +48,24 @@ public class PanelEditor extends AbstractPanel {
 
 	public void setItems(List<AbstractWidget> items) {
 		this.items = items;
+	}
+
+	@JsonGetter("fields")
+	public List<Object> getTargetFields() {
+		if (items == null || forField == null || forField.getTarget() == null) {
+			return null;
+		}
+		final Class<?> target = ClassUtils.findClass(forField.getTarget());
+		if (target == null) {
+			return null;
+		}
+		final List<Object> fields = new ArrayList<>();
+		final Mapper mapper = Mapper.of(target);
+		for (AbstractWidget item : items) {
+			try {
+				fields.add(mapper.getProperty(((Field) item).getName()).toMap());
+			} catch (Exception e) {}
+		}
+		return fields;
 	}
 }
