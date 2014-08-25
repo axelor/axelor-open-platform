@@ -86,6 +86,10 @@
 	font-weight: inherit;
 }
 
+.ui-dialog .ui-dialog-content a {
+	color: #0088cc;
+}
+
 .ui-dialog-buttonpane {
 	border-top: 1px solid #DDD;
 }
