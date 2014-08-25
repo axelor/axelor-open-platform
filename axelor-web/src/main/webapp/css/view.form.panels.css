@@ -209,6 +209,10 @@
 	margin: 0;
 }
 
+.panel-tabs[x-sidebar] {
+	margin-bottom: 0;
+}
+
 .bar-layout .portlet {
 	margin-bottom: 18px;
 }

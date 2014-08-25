@@ -271,7 +271,7 @@ function BarLayout(items, attrs, $scope, $compile) {
 
 	items.each(function(item, i) {
 		var elem = $(this);
-		if (elem.hasClass('panel-side')) {
+		if (elem.hasClass('panel-side') || elem.attr('x-sidebar')) {
 			elem.appendTo(side);
 		} else {
 			elem.appendTo(main);
