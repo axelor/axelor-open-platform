@@ -305,7 +305,7 @@ ui.directive('uiBarLayout', ['$compile', function($compile) {
 		element.append(layout);
 		element.addClass('bar-layout');
 
-		if (element.has('.panel-side').size() === 0) {
+		if (element.has('.panel-side,[x-sidebar]').size() === 0) {
 			css = "mid";
 		}
 		if (element.is('form') && ["mini", "mid", "large"].indexOf(schema.width) > -1) {
