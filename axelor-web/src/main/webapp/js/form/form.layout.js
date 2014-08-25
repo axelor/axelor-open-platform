@@ -352,7 +352,14 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 				};
 			}
 
+			scope.fields = editor.fields || scope.fields;
+
 			var form = ui.formBuild(scope, schema, scope.fields);
+
+			if (/-to-one$/.test(field.type)) {
+				form.attr('x-model-prefix', 'record.' + field.name);
+			}
+
 			form = $compile(form)(scope);
 			form.children('div.row').removeClass('row').addClass('row-fluid');
 			element.append(form);

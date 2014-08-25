@@ -241,6 +241,20 @@
 	min-height: inherit !important;
 }
 
+.panel-layout .m2o-editor {
+	position: relative;
+}
+.panel-layout .m2o-editor-controls {
+	position: absolute;
+	top: -20px;
+	right: 0;
+}
+
+.panel-layout .m2o-editor-controls a {
+	margin: 0 4px;
+	color: #333;
+}
+
 .panel-layout .o2m-list .form-item {
 	padding: 0;
 }

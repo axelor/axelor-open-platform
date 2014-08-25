@@ -84,22 +84,7 @@
 			meta = meta || {};
 			view = view || {};
 
-			if (isArray(meta.fields)) {
-				forEach(meta.fields, function(field){
-					field.type = _.chain(field.type || 'string').underscored().dasherize().value();
-					field.title = field.title || field.autoTitle;
-					fields[field.name] = field;
-					// if nested field then make it readonly
-					if (field.name.indexOf('.') > -1) {
-						field.readonly = true;
-						field.required = false;
-					}
-					processSelection(field);
-				});
-				meta.fields = fields;
-			} else {
-				fields = meta.fields || {};
-			}
+			meta.fields = processFields(meta.fields);
 
 			forEach(view.items || view.pages, function(item) {
 				processWidget(item);
@@ -118,6 +103,26 @@
 			});
 		};
 		
+		function processFields(fields) {
+			var result = {};
+			if (isArray(fields)) {
+				forEach(fields, function(field){
+					field.type = _.chain(field.type || 'string').underscored().dasherize().value();
+					field.title = field.title || field.autoTitle;
+					result[field.name] = field;
+					// if nested field then make it readonly
+					if (field.name.indexOf('.') > -1) {
+						field.readonly = true;
+						field.required = false;
+					}
+					processSelection(field);
+				});
+			} else {
+				result = fields || {};
+			}
+			return result;
+		}
+
 		function processSelection(field) {
 			_.each(field.selectionList, function (item) {
 				if (_.isString(item.data)) {
@@ -168,10 +173,14 @@
 
 			function acceptEditor(item) {
 				var collect = items;
+				var editor = item.editor;
 				if (item.target) {
 					collect = result.related[item.name] || (result.related[item.name] = []);
 				}
-				_.each(item.editor.items, function (child) {
+				if (editor.fields) {
+					editor.fields = processFields(editor.fields);
+				}
+				_.each(editor.items, function (child) {
 					if (child.name && collect.indexOf(child.name) === -1 && child.type === 'field') {
 						collect.push(child.name);
 					}
