@@ -86,8 +86,8 @@
 }
 
 .panel {
-	margin-bottom: 18px;
-	margin-top: -19px;
+	margin-bottom: 8px;
+	margin-top: -9px;
 }
 
 .panel:first-child,
@@ -105,7 +105,7 @@
 }
 
 .panel .row-fluid > .form-item {
-	margin-bottom: 12px;
+	margin-bottom: 6px;
 }
 
 .panel .row-fluid:last-child > .form-item {
@@ -114,11 +114,15 @@
 
 @media (max-width: 767px) {
 	.panel .row-fluid:last-child > .form-item {
-		margin-bottom: 12px;
+		margin-bottom: 6px;
 	}
 	.panel .row-fluid:last-child > .form-item:last-child {
 		margin-bottom: 0;
 	}
+}
+
+.panel .row-fluid > .form-item > .form-item-container {
+	margin-top: -2px;
 }
 
 .panel-layout .panel {
@@ -133,7 +137,7 @@
 }
 
 .panel-layout .o2m-list .panel .row-fluid > .form-item {
-	margin-bottom: 4px;
+	margin-bottom: 6px;
 }
 
 .panel-layout .form-item-container.readonly > a,
@@ -148,6 +152,10 @@
 .panel-layout .form-item-container.time-item input,
 .panel-layout .form-item-container.datetime-item .picker-input {
 	width: 100%;
+}
+.panel-layout .form-item-container input[type="radio"],
+.panel-layout .form-item-container input[type="checkbox"] {
+	margin-top: 0 !important;
 }
 
 .panel-layout .tag-select {
@@ -166,6 +174,10 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	display: inline-block;
+	margin: 0;
+	font-size: 12px;
+	line-height: 1em;
 }
 
 .panel-related .panel-header {
@@ -194,8 +206,9 @@
 	border: none;
 }
 .panel-tabs,
-.panel-stack {
-	margin-bottom: 18px;
+.panel-stack,
+.bar-layout .portlet {
+	margin-bottom: 8px;
 }
 .panel-tabs .tab-content {
 	padding-top: 6px;
@@ -211,10 +224,6 @@
 
 .panel-tabs[x-sidebar] {
 	margin-bottom: 0;
-}
-
-.bar-layout .portlet {
-	margin-bottom: 18px;
 }
 
 .bar-layout .portlet-header .navbar-inner {
