@@ -228,7 +228,9 @@
 	right: 0;
 }
 .ui-dialog-responsive.maximized {
+	top: 0 !important;
 	left: 0 !important;
+	margin: 8px !important;
 	width: calc(100% - 16px) !important;
 	height: calc(100% - 16px) !important;
 }
