@@ -655,10 +655,11 @@
   <xsd:complexType name="PanelTabs">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractPanel">
-        <xsd:choice maxOccurs="8">
+        <xsd:choice maxOccurs="unbounded">
           <xsd:element name="panel" type="tns:Panel" />
           <xsd:element name="panel-related" type="tns:PanelRelated"/>
           <xsd:element name="panel-dashlet" type="tns:Portlet" />
+          <xsd:element name="panel-include" type="tns:FormInclude" />
         </xsd:choice>
         <xsd:attribute name="title" use="prohibited"/>
       </xsd:extension>
