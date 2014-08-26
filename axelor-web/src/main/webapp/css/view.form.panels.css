@@ -125,7 +125,7 @@
 	margin-top: -2px;
 }
 
-.panel-layout .panel {
+.panel-layout .panel:not(.panel-related) {
 	border: none;
 	box-shadow: none;
 	margin-bottom: 0;

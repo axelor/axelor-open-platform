@@ -616,6 +616,7 @@
           </xsd:complexContent>
         </xsd:complexType>
       </xsd:element>
+      <xsd:element name="panel-related" type="tns:PanelRelated"/>
     </xsd:choice>
   </xsd:group>
   <xsd:complexType name="Panel">
