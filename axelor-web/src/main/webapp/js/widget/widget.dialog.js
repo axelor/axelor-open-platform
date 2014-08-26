@@ -54,12 +54,18 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 			var dialog = element.dialog({
 				dialogClass: 'ui-dialog-responsive',
 				resizable: false,
-				draggable: false,
+				draggable: true,
 				autoOpen: false,
 				closeOnEscape: true,
 				modal: true,
 				zIndex: 1100,
-				buttons: buttons
+				buttons: buttons,
+				dragStart: function(event, ui) {
+					var parent = $(this).parent();
+					if (!parent.hasClass('ui-dialog-draggable')) {
+						parent.addClass('ui-dialog-draggable');
+					}
+				}
 			});
 			
 			// maintain overlay opacity

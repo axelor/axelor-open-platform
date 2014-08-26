@@ -142,8 +142,6 @@
 
 .ui-dialog-responsive {
 	position: absolute;
-	top: 0 !important;
-	left: 0 !important;
 
 	width: 100% !important;
 	margin: 8px !important;
@@ -152,6 +150,15 @@
 	max-height: calc(100% - 16px) !important;
 
 	border: none;
+}
+
+.ui-dialog-responsive:not(.ui-dialog-draggable) {
+	top: 0 !important;
+	left: 0 !important;
+}
+
+.ui-dialog-responsive.ui-dialog-draggable {
+	margin: 0 !important;
 }
 
 .ui-dialog-responsive,
@@ -193,6 +200,8 @@
 @media screen and (min-width: 768px) {
 	.ui-dialog-responsive {
 		width: 740px !important;
+	}
+	.ui-dialog-responsive:not(.ui-dialog-draggable) {
 		left: calc(50% - 370px) !important;
 	}
 	.ui-dialog-small {
@@ -203,6 +212,8 @@
 @media screen and (min-width: 1024px) {
 	.ui-dialog-responsive {
 		width: 900px !important;
+	}
+	.ui-dialog-responsive:not(.ui-dialog-draggable) {
 		left: calc(50% - 450px) !important;
 	}
 	.ui-dialog-small {
@@ -240,9 +251,13 @@
 		right: 0;
 	}
 	.ui-dialog-responsive {
+		top: 0 !important;
 		left: 0 !important;
 		width: calc(100% - 16px) !important;
 		height: calc(100% - 16px) !important;
+	}
+	.ui-dialog-responsive.ui-dialog-draggable {
+		margin: 8px !important;
 	}
 	.ui-dialog-responsive .ui-dialog-title {
 		top: 0;
