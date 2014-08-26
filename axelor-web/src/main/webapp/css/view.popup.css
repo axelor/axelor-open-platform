@@ -201,10 +201,13 @@
 	.ui-dialog-responsive {
 		width: 740px !important;
 	}
+	.ui-dialog-small {
+		width: 480px !important;
+	}
 	.ui-dialog-responsive:not(.ui-dialog-draggable) {
 		left: calc(50% - 370px) !important;
 	}
-	.ui-dialog-small {
+	.ui-dialog-small:not(.ui-dialog-draggable) {
 		width: 480px !important;
 		left: calc(50% - 240px) !important;
 	}
@@ -213,11 +216,13 @@
 	.ui-dialog-responsive {
 		width: 900px !important;
 	}
+	.ui-dialog-small {
+		width: 480px !important;
+	}
 	.ui-dialog-responsive:not(.ui-dialog-draggable) {
 		left: calc(50% - 450px) !important;
 	}
-	.ui-dialog-small {
-		width: 480px !important;
+	.ui-dialog-small:not(.ui-dialog-draggable) {
 		left: calc(50% - 240px) !important;
 	}
 }
