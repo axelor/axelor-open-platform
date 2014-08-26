@@ -62,6 +62,11 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 				buttons: buttons,
 				dragStart: function(event, ui) {
 					var parent = $(this).parent();
+					if (parent.hasClass('maximized') || axelor.device.small) {
+						event.preventDefault();
+						event.stopPropagation();
+						return false;
+					}
 					if (!parent.hasClass('ui-dialog-draggable')) {
 						parent.addClass('ui-dialog-draggable');
 					}
