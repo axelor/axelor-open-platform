@@ -315,6 +315,29 @@
   background-position: inherit;
 }
 
+.panel-tabs .nav-tabs-responsive {
+	margin-bottom: 0;
+	padding-left: 8px;
+	padding-right: 8px;
+}
+
+.panel-tabs .nav-tabs-responsive > li.dropdown {
+	max-width: 120px;
+}
+
+.panel-tabs .nav-tabs-responsive a,
+.panel-tabs .nav-tabs-responsive > li.dropdown > a > span {
+	outline: none;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.panel-tabs .nav-tabs-responsive > li.dropdown > a > span {
+	display: inline-block;
+	max-width: 74px;
+	margin-bottom: -4px;
+}
+
 /** some special classes */
 .border-left-none,
 .border-left-none.form-item-container,
