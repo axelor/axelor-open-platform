@@ -217,6 +217,17 @@ function DSViewCtrl(type, $scope, $element) {
 				$scope.toolbar = toolbar;
 				$scope.menubar = schema.menubar;
 
+				$scope.toolbarAsMenu = [{
+					icon: 'fa-wrench',
+					isButton: true,
+					items: _.map(toolbar, function (item) {
+						return _.extend({}, item, {
+							action: item.onClick,
+							title: item.title || item.autoTitle || item.name
+						});
+					})
+				}];
+
 				// watch on view.loaded to improve performance
 				schema.loaded = true;
 			});
