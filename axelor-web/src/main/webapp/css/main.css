@@ -497,6 +497,12 @@ input[readonly], select[readonly], textarea[readonly] {
 	margin-top: 6px;
 }
 
+@media (max-width: 767px) {
+	.menu-bar.visible-phone {
+		display: inline-block !important;
+	}
+}
+
 .record-pager-text {
 	display: inline-block;
 	margin-top: 9px;
