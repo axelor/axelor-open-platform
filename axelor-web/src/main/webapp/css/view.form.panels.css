@@ -365,6 +365,10 @@
 	text-align: right;
 }
 
+.panel-layout .order-subtotal dd:empty {
+	height: 26px;
+}
+
 .panel-layout .order-subtotal-total {
 	border-top: 1px solid #ccc;
 	font-size: 18px;
