@@ -643,7 +643,7 @@ ui.formInput('NavSelect', {
 		var selection = field.selectionList || [];
 
 		scope.getSelection = function () {
-			return filterSelection(scope, field, selection, scope.getValue());
+			return filterSelection(scope, field, selection, scope.getValue()) || [];
 		};
 		
 		scope.onSelect = function(select) {
@@ -652,23 +652,116 @@ ui.formInput('NavSelect', {
 			}
 			this.setValue(select.value, true);
 			
+			elemNavs.removeClass('open');
+			elemMenu.removeClass('open');
+			setMenuTitle();
+
 			// if selection change is used to show/hide some elements
 			// the layout should be adjustted
 			axelor.$adjustSize();
 		};
 
+		scope.isSelected = function (select) {
+			return select && scope.getValue() === select.value;
+		};
+
+		scope.onMenuClick = _.once(function(e) {
+			var elem = $(e.currentTarget);
+			elem.dropdown();
+			elem.dropdown('toggle');
+		});
+
+		var lastWidth = 0;
+		var menuWidth = 120; // max-width
+		var elemNavs = null;
+		var elemMenu = null;
+		var elemMenuItems = null;
+
+		function setup() {
+			elemNavs = element.children('.nav-steps').children('li:not(.dropdown,.ignore)');
+			elemMenu = element.children('.nav-steps').children('li.dropdown');
+			elemMenuItems = elemMenu.find('li');
+		}
+
+		function setMenuTitle() {
+			var more = null;
+			var show = false;
+			var navs = scope.getSelection();
+			elemMenuItems.each(function (i) {
+				var elem = $(this);
+				var nav = navs[i] || {};
+				if (elem.data('visible')) show = true;
+				if (scope.isSelected(nav) && show) {
+					more = nav;
+				}
+			});
+			scope.more = more;
+			if (show) {
+				elemMenu.show();
+			}
+		}
+
+		function adjust() {
+			if (elemNavs === null) {
+				return;
+			}
+			var parentWidth = element.width() - menuWidth;
+			if (parentWidth === lastWidth) {
+				return;
+			}
+			lastWidth = parentWidth;
+
+			elemNavs.hide();
+			elemMenu.hide();
+			elemMenuItems.hide().data('visible', null);
+			scope.more = null;
+
+			var count = 0;
+			var width = 0;
+			var last = null;
+			var navs = scope.getSelection();
+
+			while (count < navs.length) {
+				var elem = $(elemNavs[count]).show();
+				width += elem.width();
+				if (width > parentWidth && last) {
+					// show menu...
+					elem.hide();
+					break;
+				}
+				last = elem;
+				count++;
+			}
+			if (count === elemNavs.size()) {
+				elemMenu.hide();
+			}
+			while(count < elemNavs.size()) {
+				$(elemMenuItems[count++]).show().data('visible', true);
+			}
+			setMenuTitle();
+		}
+
+		element.on('adjustSize', adjust);
+		scope.$timeout(setup);
 	},
 	template_editable: null,
 	template_readonly: null,
 	template:
-	'<div class="nav-select">'+
-	'<ul class="steps">'+
-		'<li ng-repeat="select in getSelection()" ng-class="{ active: getValue() == select.value }">'+
-			'<a href="" tabindex="-1" ng-click="onSelect(select)">{{select.title}}</a>'+
-		'</li>'+
-		'<li></li>'+
-	'</ul>'+
-	'</div>'
+		"<div class='nav-select'>" +
+		"<ul class='nav-steps'>" +
+			"<li class='nav-step' ng-repeat='select in getSelection()' ng-class='{ active: isSelected(select), last: $last }'>" +
+				"<a href='' class='nav-label' ng-click='onSelect(select)' ng-bind-html-unsafe='select.title'></a>" +
+			"</li>" +
+			"<li class='nav-step dropdown' ng-class='{ active: isSelected(more) }'>" +
+				"<a href='' class='nav-label dropdown-toggle' ng-click='onMenuClick($event)' ng-bind-html-unsafe='more.title'></a>" +
+				"<ul class='dropdown-menu pull-right' data-toggle='dropdown'>" +
+					"<li ng-repeat='select in getSelection()' ng-class='{active: getValue() == select.value}'>" +
+						"<a tabindex='-1' href='' ng-click='onSelect(select)' ng-bind-html-unsafe='select.title'></a>" +
+					"</li>" +
+				"</ul>" +
+			"</li>" +
+		"</ul>"+
+		"</div>"
 });
 
 })(this);
