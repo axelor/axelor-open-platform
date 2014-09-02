@@ -64,8 +64,8 @@ module.directive('uiMenuBar', function() {
 
 		template:
 			"<ul class='nav menu-bar'>" +
-				"<li class='menu dropdown' ng-class='{\"button-menu\": menu.isButton}' ng-repeat='menu in menus'>" +
-					"<a href='' class='dropdown-toggle' ng-class='{\"btn\": menu.isButton}' data-toggle='dropdown' ng-click='onMenuClick($event)'>" +
+				"<li class='menu dropdown button-menu' ng-class='{\"button-menu\": menu.isButton}' ng-repeat='menu in menus'>" +
+					"<a href='' class='dropdown-toggle btn' ng-class='{\"btn\": menu.isButton}' data-toggle='dropdown' ng-click='onMenuClick($event)'>" +
 						"<img ng-if='isImage(menu)' ng-src='{{menu.icon}}'> " +
 						"<i class='fa {{menu.icon}}' ng-if='isIcon(menu)'></i> " +
 						"<span ng-show='canShowTitle(menu)'>{{menu.title}}</span> " +
