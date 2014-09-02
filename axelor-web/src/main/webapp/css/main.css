@@ -218,8 +218,12 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
-.ui-menu {
+.ui-menu,
+.ui-datepicker {
 	z-index: 9999999999 !important;
+}
+
+.ui-menu {
 	border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
