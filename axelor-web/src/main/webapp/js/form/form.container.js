@@ -413,6 +413,8 @@ ui.formWidget('PanelTabs', {
 
 			elemTabs.removeClass('open');
 			elemMenu.removeClass('open');
+
+			axelor.$adjustSize();
 		};
 
 		scope.onMenuClick = _.once(function(e) {
