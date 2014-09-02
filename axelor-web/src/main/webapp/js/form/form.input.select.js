@@ -662,7 +662,7 @@ ui.formInput('NavSelect', {
 		};
 
 		scope.isSelected = function (select) {
-			return select && scope.getValue() === select.value;
+			return select && scope.getValue() == select.value;
 		};
 
 		scope.onMenuClick = _.once(function(e) {
@@ -706,7 +706,7 @@ ui.formInput('NavSelect', {
 				return;
 			}
 			var parentWidth = element.width() - menuWidth;
-			if (parentWidth === lastWidth) {
+			if (parentWidth === lastWidth || parentWidth <= 0) {
 				return;
 			}
 			lastWidth = parentWidth;
