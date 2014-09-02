@@ -47,6 +47,15 @@ ui.formInput('ImageLink', {
 			'width': width,
 			'height': height
 		}];
+
+		if (field.noframe) {
+			_.extend(scope.styles[1], {
+				border: 0,
+				padding: 0,
+				background: 'none',
+				boxShadow: 'none'
+			});
+		}
 	},
 
 	link_readonly: function(scope, element, attrs, model) {
