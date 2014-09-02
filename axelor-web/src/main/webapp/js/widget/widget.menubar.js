@@ -186,4 +186,73 @@ module.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, 
 	};
 }]);
 
+module.directive('uiToolbarAdjust', function() {
+
+	return function (scope, element, attrs) {
+
+		var elemMenubar = null;
+		var elemToolbar = null;
+		var elemSiblings = null;
+
+		var elemMenubarMobile = null;
+		var elemToolbarMobile = null;
+
+		var lastWidth = 0;
+
+		function setup() {
+			elemMenubar = element.children('.view-menubar');
+			elemToolbar = element.children('.view-toolbar');
+			elemSiblings = element.children(':not(.view-menubar,.view-toolbar)');
+
+			elemMenubarMobile = element.children('.view-menubar-mobile');
+			elemToolbarMobile = element.children('.view-toolbar-mobile');
+		}
+
+		function adjust() {
+
+			if (elemMenubar === null || lastWidth === element.width()) {
+				return;
+			}
+
+			if (axelor.device.small) {
+				elemToolbar.hide();
+				elemMenubar.hide();
+				elemMenubarMobile.show();
+				elemToolbarMobile.show();
+				return;
+			}
+
+			elemMenubarMobile.hide();
+			elemToolbarMobile.hide();
+			elemToolbar.show();
+			elemMenubar.show();
+
+			var total = elemToolbar.width() + elemMenubar.width();
+			if (total === 0) {
+				return;
+			}
+
+			lastWidth = element.width();
+			var restWidth = 0;
+			elemSiblings.each(function () {
+				restWidth += $(this).width();
+			});
+
+			var width = lastWidth - restWidth;
+			if (width <= total) {
+				total -= elemMenubar.width();
+				elemMenubar.hide();
+				elemMenubarMobile.show();
+			}
+			if (width <= total) {
+				elemToolbar.hide();
+				elemToolbarMobile.show();
+			}
+		}
+
+		element.on('adjustSize', adjust);
+		setTimeout(setup, 100);
+	};
+});
+
 }).call(this);
