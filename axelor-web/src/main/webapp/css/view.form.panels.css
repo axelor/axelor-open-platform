@@ -220,6 +220,14 @@
 .bar-layout .portlet {
 	margin-bottom: 8px;
 }
+
+.panel-tabs .nav-tabs > li > a {
+	border-color: #d4d4d4 !important;
+}
+.panel-tabs .nav-tabs > li.active > a {
+	color: #333;
+	border-bottom-color: transparent !important;
+}
 .panel-tabs .tab-content {
 	padding: 4px;
 	overflow: inherit;
