@@ -184,8 +184,6 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	display: inline-block;
-	margin: 0;
 	font-size: 12px;
 	line-height: 1em;
 }
