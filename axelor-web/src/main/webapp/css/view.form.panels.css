@@ -221,12 +221,15 @@
 	margin-bottom: 8px;
 }
 .panel-tabs .tab-content {
-	padding-top: 6px;
+	padding: 4px;
 	overflow: inherit;
+
+	border: 1px solid #d4d4d4;
+	border-top: none;
 }
 
 .panel-tabs .tab-content > .panel {
-	margin-top: 0;
+	margin: 0;
 }
 
 .panel-stack > .panel {
@@ -322,8 +325,6 @@
 
 .panel-tabs .nav-tabs-responsive {
 	margin-bottom: 0;
-	padding-left: 8px;
-	padding-right: 8px;
 }
 
 .panel-tabs .nav-tabs-responsive > li.dropdown {
