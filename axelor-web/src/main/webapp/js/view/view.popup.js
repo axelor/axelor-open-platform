@@ -537,6 +537,20 @@ angular.module('axelor.ui').directive('uiEditorPopup', function() {
 			scope.$watch('schema.title', function (title) {
 				scope._setTitle(title);
 			});
+
+			var btnOK = null;
+
+			function buttonState(canSave) {
+				if (btnOK === null) {
+					btnOK = element.siblings('.ui-dialog-buttonpane').find('.btn:last');
+				}
+				if (canSave) {
+					return btnOK.show();
+				}
+				return btnOK.hide();
+			}
+
+			scope.$watch('isDirty()', buttonState);
 		},
 		replace: true,
 		template:
