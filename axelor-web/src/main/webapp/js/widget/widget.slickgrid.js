@@ -495,7 +495,7 @@ Grid.prototype.parse = function(view) {
 		}
 
 		var column = {
-			name: item.title || _.chain(item.name).humanize().titleize().value(),
+			name: item.title || item.autoTitle || _.chain(item.name).humanize().titleize().value(),
 			id: item.name,
 			field: item.name,
 			forEdit: item.forEdit,
