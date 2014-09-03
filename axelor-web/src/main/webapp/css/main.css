@@ -510,6 +510,21 @@ input[readonly], select[readonly], textarea[readonly] {
 	.menu-bar.visible-phone {
 		display: inline-block !important;
 	}
+	.view-toolbar-mobile > li > .dropdown-menu,
+	.view-menubar-mobile > li > .dropdown-menu {
+		left: auto;
+		right: 0;
+	}
+	.view-toolbar-mobile > li > .dropdown-menu:before,
+	.view-menubar-mobile > li > .dropdown-menu:before {
+		left: auto !important;
+		right: 12px;
+	}
+	.view-toolbar-mobile > li > .dropdown-menu:after,
+	.view-menubar-mobile > li > .dropdown-menu:after {
+		left: auto !important;
+		right: 13px;
+	}
 }
 
 .record-pager-text {
