@@ -774,7 +774,7 @@ ui.formBuild = function (scope, schema, fields) {
 				delete this.type;
 			}
 			if (['panel', 'panel-related', 'panel-side'].indexOf(this.type) > -1) {
-				hasPanels = true;
+				scope.$hasPanels = hasPanels = true;
 			}
 
 			var widget = this.widget,
