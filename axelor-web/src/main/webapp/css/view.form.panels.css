@@ -49,7 +49,7 @@
 	padding: 6px 10px;
 }
 
-.panel-nested .panel-header {
+.panel-nested > .panel-header {
 	background-color: #fff;
 	padding: 6px 0;
 	margin-bottom: 4px;
