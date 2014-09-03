@@ -810,7 +810,7 @@ ui.formBuild = function (scope, schema, fields) {
 			attrs.type = type;
 
 			if (type == 'panel-related') {
-				type = 'panel-' + field.type
+				type = 'panel-' + (field.type || (attrs.widgetAttrs||{}).type);
 				if (attrs.items && attrs.items.length) {
 					attrs.views = [{
 						type: 'grid',
