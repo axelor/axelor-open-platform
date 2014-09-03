@@ -152,6 +152,10 @@
 	padding-left: 0;	
 }
 
+.panel-layout .readonly > .o2m-list > .o2m-list-row > a {
+	color: #0088cc;
+}
+
 .panel-layout .form-item-container input {
 	min-width: inherit;
 }
