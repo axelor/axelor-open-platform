@@ -215,7 +215,7 @@ ui.directive('uiHelpPopover', function() {
 			}
 			value = value.join('');
 		}
-		if (value && /-many$/.test(field.serverType)) {
+		if (value && /(panel-related|one-to-many|many-to-many)/.test(field.serverType)) {
 			var length = value.length;
 			value = _.first(value, 5);
 			value = _.map(value, function(v){

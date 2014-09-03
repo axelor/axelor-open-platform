@@ -561,7 +561,7 @@ var panelRelatedTemplate =
 			"<i ng-click='onRemove()' ng-show='hasPermission(\"remove\") && !isDisabled() && canRemove()' class='fa fa-minus'></i>" +
 			"<i ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()' class='fa fa-search'></i>" +
 		"</div>" +
-		"<div class='panel-title'>{{field.title}}</div>" +
+		"<div class='panel-title'><span ui-help-popover ng-bind-html-unsafe='title'></span></div>" +
 	"</div>" +
 	"<div class='panel-body panel-layout'>" +
 		"<div ui-view-grid " +
