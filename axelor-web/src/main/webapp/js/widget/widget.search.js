@@ -889,10 +889,10 @@ ui.directive('uiFilterBox', function() {
 		"<div class='filter-box'>" +
 			"<input type='text' class='search-query' ng-model='custTerm'>" +
 			"<span class='search-icons'>" +
-				"<i ng-click='onSearch($event)' class='fa fa-caret-down'></i>"+
+				"<i ng-click='onSearch($event)' class='fa fa-caret-down hidden-phone'></i>"+
 				"<i ng-click='onRefresh()' class='fa fa-search'></i>" +
 			"</span>" +
-			"<div class='filter-menu' ui-watch-if='visible'>" +
+			"<div class='filter-menu hidden-phone' ui-watch-if='visible'>" +
 				"<strong x-translate>Advanced Search</strong>" +
 				"<hr>"+
 				"<div class='filter-list'>" +
