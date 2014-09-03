@@ -70,6 +70,35 @@ header {
 
 .sidebar .nav-tree li.active a {
 	background-color: #5377b1;
+	background-image: none;
+}
+
+.slick-header-menuitem:hover,
+.dropdown-menu > li > a:hover {
+	color: #333;
+	background-color: #f5f5f5;
+	background-image: none;
+}
+.dropdown-menu > .active > a,
+.dropdown-menu > .active > a:hover,
+.dropdown-menu > .active > a:focus {
+	background-color: #5377b1;
+	background-image: none;
+}
+
+.ui-datepicker .ui-state-active,
+.ui-datepicker .ui-slider-handle.ui-state-hover {
+	background-color: #5377b1 !important;
+	background-image: none !important;
+}
+.ui-datepicker .ui-state-highlight {
+	border: 1px solid #5377b1 !important
+}
+.ui-menu .ui-menu-item a.ui-state-focus {
+	color: #333;
+	border-color: #f5f5f5;
+	background-color: #f5f5f5;
+	background-image: none;
 }
 
 .sidebar .splitter-header {
