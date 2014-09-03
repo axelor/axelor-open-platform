@@ -124,6 +124,15 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		$scope.showEditor(record);
 	};
 
+	$scope.hasCanNew = function () {
+		var field = $scope.field || {};
+		// in panel forms, disable new icon
+		if (field.canNew === undefined && $scope.$hasPanels) {
+			return false;
+		}
+		return $scope.canNew();
+	};
+
 	$scope._isNestedOpen = false;
 	$scope.onSummary = function() {
 		$scope._isNestedOpen = !$scope._isNestedOpen;
@@ -364,7 +373,7 @@ ui.formInput('ManyToOne', 'Select', {
 		'<span class="picker-icons">'+
 			'<i class="fa fa-eye" ng-click="onSummary()" ng-show="hasPermission(\'read\') && _viewParams.summaryView && canToggle()"></i>'+
 			'<i class="fa fa-pencil" ng-click="onEdit()" ng-show="hasPermission(\'read\') && canView() && canEdit()" title="{{\'Edit\' | t}}"></i>'+
-			'<i class="fa fa-plus" ng-click="onNew()" ng-show="canNew() && hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}"></i>'+
+			'<i class="fa fa-plus" ng-click="onNew()" ng-show="hasCanNew() && hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}"></i>'+
 			'<i class="fa fa-search" ng-click="onSelect()" ng-show="canSelect() && hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}"></i>'+
 		'</span>'+
 	'</div>',
