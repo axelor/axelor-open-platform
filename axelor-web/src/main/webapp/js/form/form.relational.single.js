@@ -126,8 +126,8 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 
 	$scope.hasCanNew = function () {
 		var field = $scope.field || {};
-		// in panel forms, disable new icon
-		if (field.canNew === undefined && $scope.$hasPanels) {
+		// disable new icon
+		if (field.canNew === undefined) {
 			return false;
 		}
 		return $scope.canNew();
