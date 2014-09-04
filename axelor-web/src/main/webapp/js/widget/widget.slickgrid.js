@@ -901,6 +901,11 @@ Grid.prototype.adjustSize = function() {
 };
 
 Grid.prototype.adjustToScreen = function() {
+	var width = this.lastWidth;
+	if (width === (this.lastWidth = this.element.width()) || !width) {
+		return;
+	}
+
 	_.each(this.cols, function (col, i) {
 		var field = col.descriptor || {};
 		if (field.hidden) {
