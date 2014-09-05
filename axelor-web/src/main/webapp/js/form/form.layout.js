@@ -212,6 +212,7 @@ function PanelLayout(items, attrs, $scope, $compile) {
 		}
 		if (label) {
 			label.appendTo(cell);
+			row.addClass('has-labels');
 		}
 
 		cell.addClass(item.attr('x-cell-css'));
