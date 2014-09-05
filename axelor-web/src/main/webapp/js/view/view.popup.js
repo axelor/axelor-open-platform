@@ -483,12 +483,6 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 
 		function doShow() {
 
-			// focus first element
-			element.find(':input:first').focus();
-			
-			//XXX: ui-dialog issue
-			element.find('.slick-headerrow-column,.slickgrid').zIndex(element.zIndex());
-			
 			axelor.$adjustSize();
 
 			addMaximizeButton();
@@ -496,6 +490,13 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			return scope.ajaxStop(function () {
 				adjustSize();
 				element.closest('.ui-dialog').css('visibility', '');
+
+				// focus first element
+				element.find(':input:first').focus();
+
+				//XXX: ui-dialog issue
+				element.find('.slick-headerrow-column,.slickgrid').zIndex(element.zIndex());
+
 			}, 100);
 		}
 		
