@@ -124,13 +124,14 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		$scope.showEditor(record);
 	};
 
-	$scope.hasCanNew = function () {
+	var canNew = $scope.canNew;
+	$scope.canNew = function () {
 		var field = $scope.field || {};
 		// disable new icon
 		if (field.canNew === undefined) {
 			return false;
 		}
-		return $scope.canNew();
+		return canNew();
 	};
 
 	$scope._isNestedOpen = false;
