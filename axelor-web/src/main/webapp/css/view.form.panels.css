@@ -321,12 +321,23 @@
 	min-height: inherit !important;
 }
 
+.panel-layout .form-item > a.btn,
+.panel-layout .form-item-container button {
+	max-width: 100%;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
 .panel-layout .btn:active,
 .panel-layout .btn.active {
   background-color: #e0e0e0;
 }
 .panel-layout .btn:focus {
   background-position: inherit;
+}
+
+.panel-layout .row-fluid.has-labels .form-item > a.btn {
+	margin-top: 15px;
 }
 
 .panel-tabs .nav-tabs-responsive {
