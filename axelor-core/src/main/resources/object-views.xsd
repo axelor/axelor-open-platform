@@ -650,6 +650,9 @@
         <xsd:attribute name="domain" type="xsd:string" />
         <xsd:attribute name="onChange" type="xsd:string" />
         <xsd:attribute name="onSelect" type="xsd:string" />
+        <xsd:attribute name="canNew" type="xsd:boolean" />
+        <xsd:attribute name="canView" type="xsd:boolean" />
+        <xsd:attribute name="canRemove" type="xsd:boolean" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
