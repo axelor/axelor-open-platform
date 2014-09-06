@@ -42,7 +42,8 @@ ui.formInput('ImageLink', {
 		var height = field.height || 140;
 		
 		scope.styles = [{
-			'min-width' : width
+			'min-width': width,
+			'width': width
 		}, {
 			'width': width,
 			'height': height
@@ -234,7 +235,6 @@ ui.formInput('Image', 'ImageLink', {
 		'<img class="img-polaroid" ng-style="styles[1]" style="display: inline-block;">' +
 		'<div class="btn-group">' +
 			'<button ng-click="doSelect()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
-			'<button ng-click="doSave()" class="btn" type="button"><i class="fa fa-arrow-circle-down"></i></button>' +
 			'<button ng-click="doRemove()" class="btn" type="button"><i class="fa fa-times"></i></button>' +
 		'</div>' +
 	'</div>'
@@ -300,7 +300,6 @@ ui.formInput('Binary', {
 		'<input type="file">' +
 		'<div class="btn-group">' +
 			'<button ng-click="doSelect()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
-			'<button ng-click="doSave()" class="btn" type="button"><i class="fa fa-arrow-circle-down"></i></button>' +
 			'<button ng-click="doRemove()" class="btn" type="button"><i class="fa fa-times"></i></button>' +
 		'</div>' +
 	'</div>'

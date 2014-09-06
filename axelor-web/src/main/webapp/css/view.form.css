@@ -444,8 +444,11 @@ td.form-item > * {
 
 .form-item .image-item div.btn-group {
 	position: absolute;
-	left: 20px;
+	left: calc(50% - 30px);
 	bottom: 12px;
+}
+.form-item .image-item div.btn-group .btn {
+	padding: 2px 6px 2px;
 }
 
 .form-item .nested-editor > legend > .legend-toolbar a {
