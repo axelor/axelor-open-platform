@@ -392,29 +392,103 @@ ui.formWidget('PanelTabs', {
 		scope.tabs = [];
 		scope.more = null;
 
-		element.find('> .tab-content > div').each(function () {
+		element.find('> .tab-content > div').each(function (index) {
 			var elem = $(this);
 			var tab = {
 				title: elem.attr('x-title'),
 				selected: false,
-				elem: elem
+				hidden: false,
+				elem: elem,
+				tabItem: $(),
+				menuItem: $()
 			}
 			scope.tabs.push(tab);
 		});
 
+		function findTab(tab) {
+			var found = scope.tabs[tab] || tab;
+			if (!found || _.isNumber(found)) {
+				return null;
+			}
+			return found;
+		}
+
+		var selected = null;
+
 		scope.selectTab = function(tab) {
+			var found = findTab(tab);
+			if (!found) {
+				return;
+			}
 			scope.tabs.forEach(function (current) {
 				current.selected = false;
 				current.elem.hide();
-			})
-			tab.selected = true;
-			tab.elem.show();
+			});
+
+			selected = found;
+
+			found.selected = true;
+			found.elem.show();
+
+			found.elem
+				.add(found.tabItem)
+				.add(found.menuItem)
+				.addClass('active');
+
 			setMenuTitle();
 
 			elemTabs.removeClass('open');
 			elemMenu.removeClass('open');
 
 			axelor.$adjustSize();
+		};
+
+		scope.showTab = function (tab) {
+			var found = findTab(tab);
+			if (!found) {
+				return;
+			}
+
+			found.hidden = false;
+			found.tabItem.show();
+
+			adjust(true);
+
+			if (!selected || selected === found) {
+				return scope.selectTab(found);
+			}
+
+			found.elem.hide();
+
+			axelor.$adjustSize();
+		};
+
+		scope.hideTab = function (tab) {
+			var found = findTab(tab);
+			if (!found) {
+				return;
+			}
+
+			var wasHidden = found.hidden;
+
+			found.hidden = true;
+			found.selected = false;
+			found.elem.hide();
+
+			found.tabItem.add(found.menuItem).hide().removeClass('active');
+
+			if (!wasHidden && selected && selected !== found) {
+				return axelor.$adjustSize();
+			}
+
+			var tabs = scope.tabs;
+			for(var i = 0 ; i < tabs.length ; i++) {
+				var tab = tabs[i];
+				if (!tab.hidden) {
+					return scope.selectTab(tabs[i]);
+				}
+			}
+			selected = null;
 		};
 
 		scope.onMenuClick = _.once(function(e) {
@@ -425,14 +499,19 @@ ui.formWidget('PanelTabs', {
 
 		var lastWidth = 0;
 		var menuWidth = 120; // max-width
-		var elemTabs = null;
-		var elemMenu = null;
-		var elemMenuItems = null;
+		var elemTabs = $();
+		var elemMenu = $();
+		var elemMenuItems = $();
 
 		function setup() {
 			elemTabs = element.children('.nav-tabs').children('li:not(.dropdown)');
 			elemMenu = element.children('.nav-tabs').children('li.dropdown');
 			elemMenuItems = elemMenu.find('li');
+
+			_.each(scope.tabs, function (tab, index) {
+				tab.tabItem = $(elemTabs[index]);
+				tab.menuItem = $(elemMenuItems[index]);
+			});
 		}
 
 		function setMenuTitle() {
@@ -452,15 +531,17 @@ ui.formWidget('PanelTabs', {
 			}
 		}
 
-		function adjust() {
+		function adjust(force) {
 			if (elemTabs === null) {
 				return;
 			}
 			var parentWidth = element.width() - menuWidth - 16;
-			if (parentWidth === lastWidth) {
+			if (parentWidth === lastWidth && force !== true) {
 				return;
 			}
-			lastWidth = parentWidth;
+			if (!force) {
+				lastWidth = parentWidth;
+			}
 
 			elemTabs.hide();
 			elemMenu.hide();
@@ -472,7 +553,13 @@ ui.formWidget('PanelTabs', {
 			var last = null;
 
 			while (count < scope.tabs.length) {
-				var elem = $(elemTabs[count]).show();
+				var tab = scope.tabs[count];
+				var elem = tab.tabItem;
+
+				if (!tab.hidden) {
+					elem.show();
+				}
+
 				width += elem.width();
 				if (width > parentWidth && last) {
 					// show menu...
@@ -496,7 +583,7 @@ ui.formWidget('PanelTabs', {
 		scope.$timeout(function() {
 			setup();
 			scope.selectTab(_.first(scope.tabs));
-		})
+		});
 	},
 
 	transclude: true,
@@ -519,6 +606,37 @@ ui.formWidget('PanelTabs', {
 			"</ul>" +
 			"<div class='tab-content' ui-transclude></div>" +
 		"</div>"
+});
+
+ui.formWidget('PanelTab', {
+
+	link: function (scope, element, attrs) {
+
+		var index = element.parent().children().index(element);
+		var tab = null;
+		var isHidden = scope.isHidden;
+
+		function findTab() {
+			return tab || (tab = (scope.tabs||[])[index]) || {};
+		}
+
+		scope.isHidden = function () {
+			var tab = findTab();
+			return !tab.selected || isHidden.call(scope);
+		};
+
+		attrs.$observe('title', function(value) {
+			var tab = findTab();
+			tab.title = value;
+		});
+
+		scope.$watch("attr('hidden')", function(hidden, old) {
+			if (hidden) {
+				return scope.hideTab(index);
+			}
+			return scope.showTab(index);
+		});
+	}
 });
 
 })(this);
