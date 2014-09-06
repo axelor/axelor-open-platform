@@ -177,6 +177,7 @@ table.form-layout td.form-item.v-align-top {
 
 .slick-cell .form-item-container {
 	width: 100%;
+	min-height: 100% !important;
 }
 
 .form-item-container input,
