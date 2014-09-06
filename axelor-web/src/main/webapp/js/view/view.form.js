@@ -828,6 +828,10 @@ ui.formBuild = function (scope, schema, fields) {
 			item.attr('ui-' + type, '');
 			item.attr('id', widgetId);
 			
+			if (parent.is('[ui-panel-tabs]')) {
+				item.attr('ui-panel-tab', '');
+			}
+
 			scope.fields_view[widgetId] = attrs;
 
 			//TODO: cover all attributes
