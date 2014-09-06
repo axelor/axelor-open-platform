@@ -887,6 +887,10 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 		function adjust() {
 			if (!wrapper.is(":visible"))
 				return;
+			if (axelor.device.small) {
+				dropdownVisible = false;
+				return wrapper.hide();
+			}
 			wrapper.position({
 				my: "left top",
 				at: "left bottom",
@@ -897,16 +901,33 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 			.width(element.width());
 		}
 		
-		element.on("show:slick-editor", function(e){
+		var dropdownVisible = false;
+		scope.onDropdown = function () {
+			dropdownVisible = !dropdownVisible;
+			if (!dropdownVisible) {
+				return wrapper.hide();
+			}
 			if (renderPending) {
 				renderPending = false;
 				render();
+				setTimeout(function () {
+					axelor.$adjustSize();
+				});
 			}
 			wrapper.show();
 			adjust();
-		});
+		};
+
+		scope.canDropdown = function () {
+			return !axelor.device.small;
+		};
+
+		scope.canShowRemove = function () {
+			return dropdownVisible && scope.canRemove();
+		};
 
 		element.on("hide:slick-editor", function(e){
+			dropdownVisible = false;
 			wrapper.hide();
 		});
 		
@@ -963,7 +984,8 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 		'<input type="text" readonly>'+
 		'<span class="picker-icons">'+
 			'<i class="fa fa-plus" ng-click="onNew()" ng-show="canEdit()" title="{{\'Select\' | t}}"></i>'+
-			'<i class="fa fa-minus" ng-click="onRemove()" ng-show="canRemove()" title="{{\'Select\' | t}}"></i>'+
+			'<i class="fa fa-minus" ng-click="onRemove()" ng-show="canShowRemove()" title="{{\'Select\' | t}}"></i>'+
+			'<i class="fa fa-caret-down" ng-show="canDropdown()" ng-click="onDropdown()" title="{{\'Show\' | t}}"></i>'+
 		'</span>'+
 		'<div ui-view-grid ' +
 			'x-view="schema" '+

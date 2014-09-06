@@ -131,10 +131,6 @@ var Editor = function(args) {
 	};
 	
 	this.position = function(pos) {
-		element.trigger("show:slick-editor");
-		scope.applyLater(function(){
-			element.trigger("show:slick-editor");
-		});
 		//XXX: ui-dialog issue
 		var zIndex = element.parents('.slickgrid:first').zIndex();
 		if (zIndex) {
