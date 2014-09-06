@@ -37,6 +37,8 @@ final class Module {
 	
 	private boolean removable = false;
 
+	private boolean pending = false;
+
 	private transient String path = null;
 
 	public Module(String name) {
@@ -83,6 +85,14 @@ final class Module {
 		this.removable = removable;
 	}
 	
+	public boolean isPending() {
+		return pending;
+	}
+
+	public void setPending(boolean pending) {
+		this.pending = pending;
+	}
+
 	public boolean isUpgradable() {
 		return installed && !Objects.equal(version, installedVersion);
 	}
