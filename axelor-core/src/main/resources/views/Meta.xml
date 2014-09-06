@@ -47,9 +47,10 @@
       <field name="moduleVersion"/>
       <field name="depends" widget="Tags"/>
       <field name="installed" readonly="true"/>
-      <panel x-stacked="true">
+      <field name="pending" readonly="true"/>
+      <panel x-stacked="true" showIf="removable">
         <button name="btnInstall" title="Install" showIf="!installed" onClick="com.axelor.meta.web.ModuleController:install(name)"/>
-        <button name="btnUninstall" title="Uninstall" showIf="installed &amp;&amp; removable" onClick="com.axelor.meta.web.ModuleController:uninstall(name)"/>
+        <button name="btnUninstall" title="Uninstall" showIf="installed" onClick="com.axelor.meta.web.ModuleController:uninstall(name)"/>
       </panel>
     </panel>
     <panel title="Description">

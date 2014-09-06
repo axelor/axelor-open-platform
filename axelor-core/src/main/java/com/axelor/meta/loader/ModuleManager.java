@@ -20,6 +20,11 @@ package com.axelor.meta.loader;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -29,6 +34,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
@@ -72,6 +78,7 @@ public class ModuleManager {
 	private DemoLoader demoLoader;
 
 	private static final Set<String> SKIP = Sets.newHashSet(
+			"axelor-common",
 			"axelor-cglib",
 			"axelor-test",
 			"axelor-web");
@@ -90,14 +97,22 @@ public class ModuleManager {
 			log.info("  " + name);
 		}
 
+		// install modules
 		for (Module module : resolver.all()) {
-			if (!module.isRemovable() || module.isInstalled()) {
+			if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
 				install(module.getName(), update, withDemo, false);
 			}
 		}
+		// second iteration ensures proper view sequence
 		for (Module module : resolver.all()) {
-			if (!module.isRemovable() || module.isInstalled()) {
+			if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
 				viewLoader.doLast(module, update);
+			}
+		}
+		// uninstall pending modules
+		for (Module module : resolver.all()) {
+			if (module.isRemovable() && !module.isInstalled() && module.isPending()) {
+				uninstall(module.getName());
 			}
 		}
 	}
@@ -177,9 +192,6 @@ public class ModuleManager {
 		log.info("Uninstall module: {}", module);
 
 		MetaModule entity = MetaModule.findByName(module);
-		if (entity == null || entity.getInstalled() != Boolean.TRUE) {
-			log.error("Module not installed: {}", module);
-		}
 
 		MetaView.findByModule(module).remove();
 		MetaSelect.findByModule(module).remove();
@@ -188,9 +200,11 @@ public class ModuleManager {
 		MetaActionMenu.findByModule(module).remove();
 
 		entity.setInstalled(false);
+		entity.setPending(false);
 		entity.save();
 
 		resolver.get(module).setInstalled(false);
+		resolver.get(module).setPending(false);
 
 		log.info("Module uninstalled: {}", module);
 	}
@@ -211,7 +225,7 @@ public class ModuleManager {
 		if (!module.isInstalled() && module.isRemovable() && !force) {
 			return;
 		}
-		if (module.isInstalled() && !(update || module.isUpgradable())) {
+		if (module.isInstalled() && !(update || module.isUpgradable() || module.isPending())) {
 			return;
 		}
 
@@ -262,8 +276,10 @@ public class ModuleManager {
 	void updateState(Module module) {
 		MetaModule metaModule = MetaModule.findByName(module.getName());
 		module.setInstalled(true);
-		metaModule.setInstalled(true);
+		module.setPending(false);
 		module.setInstalledVersion(module.getVersion());
+		metaModule.setInstalled(true);
+		metaModule.setPending(false);
 	}
 
 	public static boolean isInstalled(String module) {
@@ -271,8 +287,42 @@ public class ModuleManager {
 		return mod != null && mod.isInstalled();
 	}
 
-	public static List<String> findInClassPath(boolean includeRemovables) {
+	private static Set<String> getInstalledModules() {
+		final Set<String> all = new HashSet<String>();
+		final AppSettings settings = AppSettings.get();
+
+		final String jdbcDriver = settings.get("db.default.driver");
+		final String jdbcUrl = settings.get("db.default.url");
+		final String jdbcUser = settings.get("db.default.user");
+		final String jdbcPass = settings.get("db.default.password");
+
+		try {
+			Class.forName(jdbcDriver);
+		} catch (Exception e) {
+			return all;
+		}
+
+		try(
+			final Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass);
+			final Statement statement = connection.createStatement();
+			final ResultSet rs = statement.executeQuery("select name from meta_module where installed = true")) {
+			while (rs.next()) {
+				all.add(rs.getString("name"));
+			}
+		} catch (Exception e) {
+		}
+
+		return all;
+	}
+
+	/**
+	 * Find all modules which are installed or non-removable (default
+	 * candidates).
+	 *
+	 */
+	public static List<String> findInstalled() {
 		final Resolver resolver = new Resolver();
+		final Set<String> installed = getInstalledModules();
 		final List<String> found = Lists.newArrayList();
 
 		for (URL file : MetaScanner.findAll("module\\.properties")) {
@@ -302,10 +352,14 @@ public class ModuleManager {
 		}
 
 		for (Module module : resolver.all()) {
-			if (!includeRemovables && module.isRemovable()) {
-				continue;
+			String name = module.getName();
+			if (SKIP.contains(name)) continue;
+			if (installed.contains(name)) {
+				module.setInstalled(true);
 			}
-			found.add(module.getName());
+			if (module.isInstalled() || !module.isRemovable()) {
+				found.add(name);
+			}
 		}
 		return found;
 	}
@@ -356,6 +410,7 @@ public class ModuleManager {
 			module.setVersion(version);
 			module.setRemovable(removable);
 			module.setInstalled(stored.getInstalled() == Boolean.TRUE);
+			module.setPending(stored.getPending() == Boolean.TRUE);
 			module.setInstalledVersion(stored.getModuleVersion());
 		}
 	}

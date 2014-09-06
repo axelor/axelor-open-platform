@@ -17,6 +17,7 @@
     <string name="moduleVersion" required="true" title="Version"/>
     <boolean name="removable" />
     <boolean name="installed" />
+    <boolean name="pending" />
   </entity>
   
   <entity name="MetaView" table="META_VIEW" cachable="true">
