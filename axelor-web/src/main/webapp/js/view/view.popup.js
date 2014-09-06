@@ -230,6 +230,15 @@ function SelectorCtrl($scope, $element, DataSource, ViewService) {
 
 		$element.dialog('close');
 	};
+
+	$scope.onCreate = function () {
+		$element.dialog('close');
+		$scope.$parent.onNew();
+	};
+
+	$scope.canNew = function () {
+		return $scope.$parent.canNew();
+	};
 }
 
 AttachmentCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewService'];
@@ -590,8 +599,10 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 
 			setTimeout(function(){
 				var footer = element.closest('.ui-dialog').find('.ui-dialog-buttonpane'),
-					pager = element.find('.record-pager');
+					pager = element.find('.record-pager'),
+					buttons = element.find('.ui-dialog-buttonset');
 				footer.prepend(pager);
+				footer.append(buttons);
 			});
 		},
 		replace: true,
@@ -604,6 +615,9 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 			      '<button class="btn" ng-disabled="!canNext()" ng-click="onNext()"><i class="fa fa-chevron-right"></i></button>'+
 			    '</div>'+
 			    '<span class="record-pager-text">{{pagerText()}}</span>'+
+		    '</div>'+
+		    '<div class="ui-dialog-buttonset" ng-show="canNew()">'+
+		    	'<button class="btn" ng-click="onCreate()" x-translate>Create</button>'+
 		    '</div>'+
 		'</div>'
 	};
