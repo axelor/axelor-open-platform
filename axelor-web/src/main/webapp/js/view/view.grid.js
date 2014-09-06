@@ -34,7 +34,7 @@ function GridViewCtrl($scope, $element) {
 	var reloadDotted = false;
 	
 	$scope.onShow = function(viewPromise) {
-		
+
 		if (!initialized) {
 			
 			viewPromise.then(function(){
@@ -61,10 +61,13 @@ function GridViewCtrl($scope, $element) {
 					$scope.$broadcast('on:grid-selection-change', $scope.getContext());
 					$scope.updateRoute();
 				});
+
+				setTimeout(focusFilter);
 			});
 			
 			initialized = true;
 		} else {
+			setTimeout(focusFilter);
 			if (reloadDotted) {
 				return $scope.reload().then(function() {
 					$scope.updateRoute();
@@ -509,6 +512,13 @@ function GridViewCtrl($scope, $element) {
 		}
 	}
 	
+	function focusFilter() {
+		var filterBox = $('.filter-box .search-query:visible');
+		if (filterBox.size()) {
+			filterBox.focus().select();
+		}
+	}
+
 	$scope.onHotKey = function (e, action) {
 		if (action === "save" && $scope.canSave()) {
 			$scope.onSave();
