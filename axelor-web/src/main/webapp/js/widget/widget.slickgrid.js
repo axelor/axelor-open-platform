@@ -646,6 +646,12 @@ Grid.prototype.parse = function(view) {
 		element.removeClass('slickgrid-empty');
 	}.bind(this));
 
+	handler._dataSource.on('change', function (e, records, page) {
+		element.toggleClass('slickgrid-empty-message', page && page.size === 0);
+	});
+
+	element.append($("<div class='slickgrid-empty-text'>").hide().text(_t("No records found.")));
+
 	return grid;
 };
 

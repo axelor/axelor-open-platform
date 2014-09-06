@@ -364,3 +364,16 @@
 	padding: 4px 7px;
 	cursor: pointer;
 }
+
+.slickgrid-empty-text {
+	display: none;
+}
+
+.slickgrid-empty-message .slickgrid-empty-text {
+	display: block !important;
+	position: absolute;
+	top: 48%;
+	width: 100%;
+	font-weight: 400;
+	text-align: center;
+}
