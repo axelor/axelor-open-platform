@@ -127,10 +127,6 @@
 	}
 }
 
-.panel .row-fluid > .form-item > .form-item-container {
-	margin-top: -2px;
-}
-
 .panel-layout .panel:not(.panel-related) {
 	border: none;
 	box-shadow: none;
@@ -191,6 +187,7 @@
 	white-space: nowrap;
 	font-size: 12px;
 	line-height: 1em;
+	margin-bottom: 2px;
 }
 
 .panel-related .panel-header {
@@ -232,7 +229,7 @@
 	border-bottom-color: transparent !important;
 }
 .panel-tabs .tab-content {
-	padding: 4px;
+	padding: 6px;
 	overflow: inherit;
 
 	border: 1px solid #d4d4d4;
