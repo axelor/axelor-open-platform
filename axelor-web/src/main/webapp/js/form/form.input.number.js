@@ -62,7 +62,7 @@ ui.formInput('Number', {
 		};
 		
 		scope.format = function format(value) {
-			if (isDecimal && _.isString(value)) {
+			if (isDecimal && _.isString(value) && value.trim().length > 0) {
 				return parseFloat(value).toFixed(scale);
 			}
 			return value;
