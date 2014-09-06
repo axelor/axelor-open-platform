@@ -168,6 +168,11 @@
 	margin-top: 0 !important;
 }
 
+.panel-layout .form-item-container,
+.panel-layout .form-item-container > span.display-text {
+	min-height: 28px;
+}
+
 .panel-layout .tag-select {
 	min-height: 28px;
 }
@@ -334,6 +339,9 @@
 }
 .panel-layout .btn:focus {
   background-position: inherit;
+}
+.panel-layout .form-item.btn-group {
+	width: 100%;
 }
 
 .panel-layout .row-fluid.has-labels .form-item > a.btn {
