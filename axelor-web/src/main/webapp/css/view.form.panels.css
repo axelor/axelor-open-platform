@@ -68,6 +68,8 @@
 
 .panel .panel-header .menu-bar > .menu > a {
 	padding: 6px 10px;
+	background-image: none;
+	border: 0;
 }
 
 .panel .panel-header .menu-bar .caret {
