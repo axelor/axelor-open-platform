@@ -989,7 +989,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 	'<span class="picker-input picker-icons-2" style="position: absolute;">'+
 		'<input type="text" readonly>'+
 		'<span class="picker-icons">'+
-			'<i class="fa fa-plus" ng-click="onNew()" ng-show="canEdit()" title="{{\'Select\' | t}}"></i>'+
+			'<i class="fa fa-plus" ng-click="onSelect()" ng-show="canEdit()" title="{{\'Select\' | t}}"></i>'+
 			'<i class="fa fa-minus" ng-click="onRemove()" ng-show="canShowRemove()" title="{{\'Select\' | t}}"></i>'+
 			'<i class="fa fa-caret-down" ng-show="canDropdown()" ng-click="onDropdown()" title="{{\'Show\' | t}}"></i>'+
 		'</span>'+
@@ -1013,7 +1013,6 @@ ui.formInput('ManyToManyInline', 'OneToManyInline', {
 	
 	link: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);
-		scope.onNew = scope.onSelect;
 	}
 });
 
