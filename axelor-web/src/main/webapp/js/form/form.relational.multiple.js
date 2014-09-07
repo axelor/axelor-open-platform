@@ -933,6 +933,12 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 		
 		element.on("adjustSize", _.debounce(adjust, 300));
 		
+		input.on('keydown', function (e) {
+			if (e.keyCode === 40 && e.ctrlKey && !dropdownVisible) {
+				scope.onDropdown();
+			}
+		});
+
 		function hidePopup(e) {
 			if (element.is(':hidden')) {
 				return;
