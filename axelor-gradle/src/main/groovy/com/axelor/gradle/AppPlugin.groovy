@@ -21,6 +21,7 @@ import java.util.regex.Pattern
 
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.JavaExec
 
 import com.axelor.gradle.tasks.GenerateCode
 
@@ -98,6 +99,14 @@ class AppPlugin extends AbstractPlugin {
 				into("webapp") {
 					from "src/main/webapp"
 				}
+			}
+
+			task("init", dependsOn: "classes", type: JavaExec) {
+				main = "com.axelor.commands.DBCommands"
+				classpath = sourceSets.main.runtimeClasspath
+				if (project.properties.update) args "-u" else args "-i"
+				if (project.properties.modules) args "-m " + project.properties.modules
+				jvmArgs "-Daxelor.config=" + System.getProperty('axelor.config')
 			}
 
 			compileJava.dependsOn "generateCode"
