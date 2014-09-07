@@ -17,6 +17,7 @@ import com.axelor.shell.core.CommandResult;
 import com.axelor.shell.core.Shell;
 import com.axelor.shell.core.annotations.CliCommand;
 import com.axelor.shell.core.annotations.CliOption;
+import com.google.common.base.Joiner;
 
 public class GradleCommands implements CommandProvider {
 	
@@ -109,15 +110,6 @@ public class GradleCommands implements CommandProvider {
 		return execute("-q", "-x", "test", "build");
 	}
 	
-	@CliCommand(name = "i18n", usage = "[OPTIONS]", help = "extract/update translatable messages")
-	public CommandResult i18n(
-			@CliOption(name = "extract", shortName = 'e', help = "extract messages.")
-			boolean extract,
-			@CliOption(name = "update", shortName = 'u', help = "update messages.")
-			boolean update) {
-		return execute("-q", "-x", "test", "i18n-extract");
-	}
-	
 	@CliCommand(name = "run", usage = "[OPTIONS]", help = "run the embedded tomcat server")
 	public CommandResult run(
 			@CliOption(name = "port", shortName = 'p', argName = "PORT", help = "alternative port, default is 8080")
@@ -141,7 +133,33 @@ public class GradleCommands implements CommandProvider {
 		} else {
 			args.add("tomcatRun");
 		}
-		
+		return execute(args.toArray(new String[] {}));
+	}
+
+	@CliCommand(name = "i18n", usage = "[OPTIONS]", help = "extract/update translatable messages")
+	public CommandResult i18n(
+			@CliOption(name = "extract", shortName = 'e', help = "extract messages.")
+			boolean extract,
+			@CliOption(name = "update", shortName = 'u', help = "update messages.")
+			boolean update) {
+		return execute("-q", "-x", "test", "i18n-extract");
+	}
+
+	@CliCommand(name = "init", usage = "[OPTIONS] [MODULES...]", help = "initialize or update the database")
+	public CommandResult init(
+			@CliOption(name = "config", shortName = 'c', argName = "FILE", help = "application configuration file", required = true)
+			String config,
+			@CliOption(name = "update", shortName = 'u', help = "update the installed or given modules")
+			boolean update,
+			String... modules) {
+
+		final List<String> args = Lists.newArrayList("-q", "-x", "test", "init", "-Daxelor.config=" + config);
+		if (update) {
+			args.add("-Pupdate=true");
+		}
+		if (modules != null && modules.length > 0) {
+			args.add("-Pmodules=" + Joiner.on(",").join(modules));
+		}
 		return execute(args.toArray(new String[] {}));
 	}
 }
