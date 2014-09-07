@@ -82,9 +82,8 @@ public class Main {
 					shell.executeCommand("new-project --name " + args[1]);
 				} else {
 					printHelp();
-					return;
 				}
-				break;
+				return;
 			case "-v":
 			case "--version":
 				builtins.showAbout();
