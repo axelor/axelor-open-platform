@@ -157,11 +157,13 @@ public class Target {
 			
 			Option opt = options.getOption(key);
 			
-			Object value = true;
+			Object value = false;
 			if (opt.hasArgs()) {
 				value = cmdLine.getOptionValues(key);
 			} else if (opt.hasArg()) {
 				value = cmdLine.getOptionValue(key);
+			} else {
+				value = cmdLine.hasOption(key);
 			}
 			
 			arguments.add(value);
