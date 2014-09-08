@@ -231,8 +231,8 @@ function FilterFormCtrl($scope, $element, ViewService) {
 			_.each(fields, function(field, name) {
 				if (field.name === 'id' || field.name === 'version' ||
 					field.name === 'archived' || field.name === 'selected') return;
-				if (field.name === 'createdOn' || field.name === 'updatedOn') return;
-				if (field.name === 'createdBy' || field.name === 'updatedBy') return;
+				//if (field.name === 'createdOn' || field.name === 'updatedOn') return;
+				//if (field.name === 'createdBy' || field.name === 'updatedBy') return;
 				if (field.type === 'binary' || field.large) return;
 				$scope.fields[name] = field;
 				if (field.nameColumn) {
