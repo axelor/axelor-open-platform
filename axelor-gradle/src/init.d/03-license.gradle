@@ -14,7 +14,7 @@ def findHeaderFile(p) {
 	return p.file("src/license/header.txt")
 }
 
-allprojects {
+allprojects { p ->
 
 	apply plugin: nl.javadude.gradle.plugins.license.LicensePlugin
 
@@ -42,7 +42,7 @@ allprojects {
 
 	afterEvaluate {
 		tasks.findAll { it.class.simpleName.startsWith 'License' }.each {
-			it.source = fileTree(dir: 'src', excludes: [
+			it.source = p.fileTree(dir: 'src', excludes: [
 				"**/data/**",
 				"**/data-init/**",
 				"**/data-demo/**",
