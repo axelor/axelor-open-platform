@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.common.reflections.Reflections;
+import com.axelor.inject.Beans;
 import com.axelor.meta.loader.ModuleManager;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -57,7 +58,10 @@ public class AppModule extends AbstractModule {
 	
 	@Override
 	protected void configure() {
-		
+
+		// initialize Beans helps
+		bind(Beans.class).asEagerSingleton();
+
 		final List<Class<? extends AxelorModule>> all = findAll();
 		if (all.isEmpty()) {
 			return;

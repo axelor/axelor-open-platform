@@ -1,0 +1,83 @@
+package com.axelor.db;
+
+import java.util.List;
+import java.util.Map;
+
+import com.axelor.db.mapper.Property;
+
+/**
+ * The repository interface defines common data access methods.
+ *
+ * @param <T>
+ *            the domain model type the repository manages
+ */
+public interface Repository<T extends Model> {
+
+	/**
+	 * Return list of properties on the domain model managed by this repository.
+	 *
+	 * @return list of {@link Property}
+	 */
+	List<Property> fields();
+
+	/**
+	 * Get the {@link Query} instance of the managed domain class.
+	 *
+	 * @return instance of {@link Query}
+	 */
+	Query<T> all();
+
+	/**
+	 * Create a new instance of the domain model with the given default values.
+	 *
+	 * @param values
+	 *            the default values
+	 * @return an instance of the domain model managed by this repository
+	 */
+	T create(Map<String, Object> values);
+
+	/**
+	 * Create a duplicate copy of the given entity.<br>
+	 * <br>
+	 * In case of deep copy, one-to-many records are duplicated. Otherwise,
+	 * one-to-many records will be skipped.
+	 *
+	 * @param entity
+	 *            the entity bean to copy
+	 * @param deep
+	 *            whether to create a deep copy
+	 * @return a copy of the given entity
+	 */
+	T copy(T entity, boolean deep);
+
+	/**
+	 * Find by primary key.
+	 *
+	 * @param id
+	 *            the record id
+	 * @return a domain object found by the given id, null otherwise
+	 */
+	T find(Long id);
+
+	/**
+	 * Save the given entity.
+	 * <p>
+	 * Depending on the implementation, it may return same entity or a copy of
+	 * it. For example JPA implementation may return a copy if the given entity
+	 * can't be managed.
+	 * </p>
+	 *
+	 * @param entity
+	 *            the entity object to save
+	 * @return an instance of the entity with saved state
+	 */
+	T save(T entity);
+
+	/**
+	 * Remove the given entity.
+	 *
+	 * @param entity
+	 *            the entity object
+	 */
+	void remove(T entity);
+}
