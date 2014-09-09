@@ -1,0 +1,17 @@
+package ${repo.namespace};
+
+<% repo.importStatements.each { %>\
+${it}
+<% } %>\
+${repo.extraImports}\
+
+public class ${repo.name} extends ${repo.baseClass} {
+
+	public ${repo.name}() {
+		super(${repo.modelClass}.class);
+	}
+	<% repo.finderMethods.each { %>\
+		${it.code}\
+	<% } %>\
+	${repo.extraCode}
+}

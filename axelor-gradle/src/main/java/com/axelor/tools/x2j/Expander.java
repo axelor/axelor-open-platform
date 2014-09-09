@@ -30,6 +30,7 @@ import java.util.Map;
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import com.axelor.tools.x2j.pojo.Entity;
+import com.axelor.tools.x2j.pojo.Repository;
 import com.google.common.collect.Maps;
 
 final class Expander {
@@ -42,12 +43,15 @@ final class Expander {
 
 	private Template headTemplate;
 
+	private Template repoTemplate;
+
 	private static Expander instance;
 
 	private Expander() {
 		pojoTemplate = template("templates/pojo.template");
 		headTemplate = template("templates/head.template");
 		bodyTemplate = template("templates/body.template");
+		repoTemplate = template("templates/repo.template");
 	}
 
 	public static Expander getInstance() {
@@ -57,8 +61,11 @@ final class Expander {
 		return instance;
 	}
 
-	public static String expand(Entity entity) {
-		return Expander.getInstance().doExpand(entity);
+	public static String expand(Entity entity, boolean repo) {
+		if (repo) {
+			return Expander.getInstance().toRepositoryString(entity);
+		}
+		return Expander.getInstance().toEntityString(entity);
 	}
 
 	private Reader read(String resource) {
@@ -75,7 +82,7 @@ final class Expander {
 		}
 	}
 
-	private String doExpand(Entity entity) {
+	private String toEntityString(Entity entity) {
 
 		final Map<String, Object> binding = Maps.newHashMap();
 
@@ -89,5 +96,15 @@ final class Expander {
 		binding.put("imports", imports);
 
 		return pojoTemplate.make(binding).toString();
+	}
+
+	private String toRepositoryString(Entity entity) {
+
+		final Map<String, Object> binding = Maps.newHashMap();
+		final Repository repo = entity.getRepository();
+
+		binding.put("repo", repo);
+
+		return repoTemplate.make(binding).toString();
 	}
 }
