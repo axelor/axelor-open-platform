@@ -17,9 +17,14 @@
  */
 package com.axelor.tools.x2j;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.codehaus.groovy.runtime.StringGroovyMethods;
 
 public class Utils {
+
+	private static final Pattern TRAILING_WS = Pattern.compile("\\s+$", Pattern.MULTILINE);
 
 	/**
 	 * Strip the extra leading white space from the code string.
@@ -32,6 +37,14 @@ public class Utils {
 		String text = StringGroovyMethods.stripIndent(code.replaceAll("    ", "\t"));
 		text = text.trim().replaceAll("\n", joinWith).trim();
 		return text;
+	}
+
+	public static String stringTrailing(String code) {
+		if (code == null || code.trim().length() == 0) {
+			return "";
+		}
+		Matcher matcher = TRAILING_WS.matcher(code);
+		return matcher.replaceAll("\n");
 	}
 
 	public static String firstUpper(String string) {

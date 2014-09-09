@@ -64,6 +64,8 @@ class Entity {
 
 	Map<String, Property> propertyMap
 
+	private Repository repository
+
 	private ImportManager importManager
 	
 	private String extraImports
@@ -100,6 +102,7 @@ class Entity {
 		}
 
 		importManager = new ImportManager(namespace, groovy)
+		repository = new Repository(this)
 		
 		importType("javax.persistence.EntityManager")
 		importType("com.axelor.db.Model")
@@ -161,6 +164,10 @@ class Entity {
 		}
 	}
 	
+	Repository getRepository() {
+		return this.repository
+	}
+
 	void merge(Entity other) {
 		
 		for (Property prop : other.properties) {

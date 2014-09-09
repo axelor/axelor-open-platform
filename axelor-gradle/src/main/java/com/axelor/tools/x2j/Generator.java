@@ -86,8 +86,8 @@ public class Generator {
 		}
 
 		final Entity entity = all.remove(0);
-		final File output = this.file(outputPath, entity.getFile());
-		final String fileName = output.getPath();
+		final File entityFile = this.file(outputPath, entity.getFile());
+		final File repoFile = this.file(outputPath, entity.getRepository().getFile());
 		
 		long lastModified = entity.getLastModified();
 		
@@ -97,7 +97,7 @@ public class Generator {
 			}
 		}
 		
-		if (lastModified < output.lastModified()) {
+		if (lastModified < entityFile.lastModified()) {
 			return;
 		}
 		
@@ -105,7 +105,8 @@ public class Generator {
 			entity.merge(it);
 		}
 		
-		output.getParentFile().mkdirs();
+		entityFile.getParentFile().mkdirs();
+		repoFile.getParentFile().mkdirs();
 
 		String[] existing = {
 			entity.getName() + ".java",
@@ -113,17 +114,19 @@ public class Generator {
 		};
 
 		for (String fname : existing) {
-			File ex = this.file(output.getParentFile(), fname);
+			File ex = this.file(entityFile.getParentFile(), fname);
 			if (ex.exists()) {
 				ex.delete();
 			}
 		}
 
-		log.info("Generating: " + fileName);
+		log.info("Generating: " + entityFile.getPath());
+		String code = Expander.expand(entity, false);
+		Files.write(Utils.stringTrailing(code), entityFile, Charsets.UTF_8);
 
-		String code = Expander.expand(entity);
-
-		Files.write(code, output, Charsets.UTF_8);
+		log.info("Generating: " + repoFile.getPath());
+		String repo = Expander.expand(entity, true);
+		Files.write(Utils.stringTrailing(repo), repoFile, Charsets.UTF_8);
 	}
 
 	private void process(File input, boolean verbose) throws IOException {
