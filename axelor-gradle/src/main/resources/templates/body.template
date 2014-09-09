@@ -115,6 +115,7 @@ ${p.documentation}
 	public String toString() {
 		${pojo.toStringCode}
 	}
+<% if (!pojo.pojo) { %>\
 <% pojo.finderMethods.each { %>\
 	${it.code}\
 <% } %>\
@@ -203,5 +204,6 @@ ${p.documentation}
 	public static Query<? extends $pojo.name> filter(String filter, Object... params) {
 		return JPA.all(${pojo.name}.class).filter(filter, params);
 	}
-	${pojo.extraCode}
+	${pojo.extraCode}\
+<% } %>
 }
