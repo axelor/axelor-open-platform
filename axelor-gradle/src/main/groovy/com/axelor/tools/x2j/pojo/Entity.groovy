@@ -104,10 +104,12 @@ class Entity {
 		importManager = new ImportManager(namespace, groovy)
 		repository = new Repository(this)
 		
-		importType("javax.persistence.EntityManager")
-		importType("com.axelor.db.Model")
-		importType("com.axelor.db.JPA")
-		importType("com.axelor.db.Query")
+		if (!this.pojo) {
+			importType("javax.persistence.EntityManager")
+			importType("com.axelor.db.Model")
+			importType("com.axelor.db.JPA")
+			importType("com.axelor.db.Query")
+		}
 
 		properties = []
 		propertyMap = [:]
@@ -166,6 +168,10 @@ class Entity {
 	
 	Repository getRepository() {
 		return this.repository
+	}
+
+	boolean isPojo() {
+		return System.getProperty("codegen.pojo", "false") == "true"
 	}
 
 	void merge(Entity other) {
