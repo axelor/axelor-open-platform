@@ -44,9 +44,11 @@ public class JpaScanner extends NativeScanner {
 
 	private static Logger log = LoggerFactory.getLogger(JpaScanner.class);
 	
-	private static ConcurrentMap<String, Class<?>> cache = null;
+	private static ConcurrentMap<String, Class<?>> modelCache = null;
+	private static ConcurrentMap<String, Class<?>> repoCache = null;
 
-	private static ConcurrentMap<String, String> nameCache = new MapMaker().makeMap();
+	private static ConcurrentMap<String, String> modelNames = new MapMaker().makeMap();
+	private static ConcurrentMap<String, String> repoNames = new MapMaker().makeMap();
 
 	private static Set<String> excludes = new HashSet<>();
 	private static Set<String> includes = new HashSet<>();
@@ -87,12 +89,14 @@ public class JpaScanner extends NativeScanner {
 
 	public static Set<Class<?>> findModels() {
 
-		if (cache != null) {
-			return new HashSet<Class<?>>(cache.values());
+		if (modelCache != null) {
+			return new HashSet<Class<?>>(modelCache.values());
 		}
 
-		cache = new MapMaker().makeMap();
-		synchronized (cache) {
+		modelCache = new MapMaker().makeMap();
+		repoCache = new MapMaker().makeMap();
+
+		synchronized (modelCache) {
 			
 			log.info("Searching for model classes...");
 			
@@ -111,20 +115,38 @@ public class JpaScanner extends NativeScanner {
 			final Set<Class<? extends Model>> models = finder.any().find();
 
 			for (Class<?> klass : models) {
-				if (cache.containsKey(klass.getName()) ||
+				if (modelCache.containsKey(klass.getName()) ||
 					excludes.contains(klass.getPackage().getName())) {
 					continue;
 				}
 				register(klass);
 			}
-			log.info("Total found: {}", cache.size());
+			log.info("Total found: {}", modelCache.size());
 		}
-		return new HashSet<Class<?>>(cache.values());
+
+		synchronized (repoCache) {
+			log.info("Searching for repository classes...");
+			ClassFinder<?> finder = Reflections.findSubTypesOf(JpaRepository.class)
+					.within("com.axelor");
+
+			for (String pkg : includes) {
+				finder = finder.within(pkg);
+			}
+			for (Class<?> klass : finder.any().find()) {
+				if (repoCache.containsKey(klass.getName()) ||
+					excludes.contains(klass.getPackage().getName())) {
+					continue;
+				}
+				repoCache.put(klass.getName(), klass);
+				repoNames.put(klass.getSimpleName(), klass.getName());
+			}
+		}
+		return new HashSet<Class<?>>(modelCache.values());
 	}
 
 	private static void register(Class<?> model) {
-		cache.put(model.getName(), model);
-		nameCache.put(model.getSimpleName(), model.getName());
+		modelCache.put(model.getName(), model);
+		modelNames.put(model.getSimpleName(), model.getName());
 	}
 
 	public static ClassLoader getClassLoader() {
@@ -132,10 +154,18 @@ public class JpaScanner extends NativeScanner {
 	}
 
 	public static Class<?> findModel(String name) {
-		if (cache == null) {
+		if (modelCache == null) {
 			findModels();
 		}
-		String className = nameCache.containsKey(name) ? nameCache.get(name) : name;
-		return cache.get(className);
+		String className = modelNames.containsKey(name) ? modelNames.get(name) : name;
+		return modelCache.get(className);
+	}
+
+	public static Class<?> findRepository(String name) {
+		if (modelCache == null) {
+			findModels();
+		}
+		String className = repoNames.containsKey(name) ? repoNames.get(name) : name;
+		return repoCache.get(className);
 	}
 }
