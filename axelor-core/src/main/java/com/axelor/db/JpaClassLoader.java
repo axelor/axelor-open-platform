@@ -46,12 +46,17 @@ public class JpaClassLoader extends URLClassLoader {
 	}
 
 	/**
-	 * try to find domain class in cache.
+	 * try to find domain or repository class in cache.
 	 *
 	 */
-	private Class<?> findModelClass(String name) {
-		if (!name.startsWith("java.lang.") || name.contains("$"))
+	private Class<?> findModelClass(String className) {
+		if (!className.startsWith("java.lang.") || className.contains("$"))
 			return null;
-		return JpaScanner.findModel(name.substring(name.lastIndexOf('.') + 1));
+		String name = className.substring(className.lastIndexOf('.') + 1);
+		Class<?> klass = JpaScanner.findRepository(name);
+		if (klass == null) {
+			return JpaScanner.findModel(name);
+		}
+		return klass;
 	}
 }

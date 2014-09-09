@@ -71,6 +71,8 @@ public class GroovyScriptHelper implements ScriptHelper {
 
 		final ImportCustomizer importCustomizer = new ImportCustomizer();
 
+		importCustomizer.addImport("__repo__", "com.axelor.db.JpaRepository");
+
 		importCustomizer.addImports("org.joda.time.DateTime");
 		importCustomizer.addImports("org.joda.time.LocalDateTime");
 		importCustomizer.addImports("org.joda.time.LocalDate");

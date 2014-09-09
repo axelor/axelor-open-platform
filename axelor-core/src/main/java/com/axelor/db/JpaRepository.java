@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.inject.Beans;
 
 public class JpaRepository<T extends Model> implements Repository<T> {
 
@@ -52,5 +53,14 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 	@Override
 	public void remove(T entity) {
 		JPA.remove(entity);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static  <U extends Model>  JpaRepository<U> of(Class<U> type) {
+		final Class<?> klass = JpaScanner.findRepository(type.getSimpleName() + "Repository");
+		if (klass == null) {
+			return null;
+		}
+		return (JpaRepository<U>) Beans.get(klass);
 	}
 }
