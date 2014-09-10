@@ -95,7 +95,6 @@ ${p.documentation}
 			${p.delinkAllCode}
 <% } %>\
 			${p.name}.clear();
-			this.flush();
 		}
 	}
 <% } %>\
