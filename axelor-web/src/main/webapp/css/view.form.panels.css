@@ -217,6 +217,10 @@
 	bottom: 0px;
 	border: none;
 }
+.panel-related.readonly .edit-icon i:before {
+	content: "\f0f6";
+}
+
 .panel-tabs,
 .panel-stack,
 .bar-layout .portlet {
