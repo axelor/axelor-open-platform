@@ -1449,7 +1449,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 	grid.setOptions({
 		editable: true,
 		asyncEditorLoading: false,
-		enableAddRow: forEdit,
+		enableAddRow: forEdit && this.handler.canNew(),
 		editorLock: new Slick.EditorLock()
 	});
 	
@@ -1617,7 +1617,7 @@ Grid.prototype.onRowsChanged = function(event, args) {
 		data = this.scope.dataView,
 		forEdit = this.editorForEdit;
 	
-	if(this.editable && !data.getItemById(0)) {
+	if(this.editable && this.handler.canNew() && !data.getItemById(0)) {
 		grid.setOptions({
 			enableAddRow: forEdit === undefined ? true : forEdit
 		});
