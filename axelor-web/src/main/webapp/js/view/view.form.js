@@ -815,7 +815,8 @@ ui.formBuild = function (scope, schema, fields) {
 					attrs.views = [{
 						type: 'grid',
 						items: attrs.items,
-						editable: attrs.editable
+						editable: attrs.editable,
+						editIcon: attrs.editIcon === undefined ? true : attrs.editIcon
 					}]
 				}
 				this.items = attrs.items = null;
