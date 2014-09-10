@@ -155,8 +155,16 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 		var meta = { fields: fixFields(fields) };
 		var view = {
 			type: 'form',
-			cols: 4,
-			items: meta.fields
+			items: [{
+				type: 'panel',
+				noframe: true,
+				items: _.map(meta.fields, function (item) {
+					return _.extend({}, item, {
+						showTitle: false,
+						placeholder: item.title || item.autoTitle
+					});
+				})
+			}]
 		};
 
 		ViewService.process(meta, view);
