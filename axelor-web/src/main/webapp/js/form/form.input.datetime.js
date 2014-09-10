@@ -169,12 +169,19 @@ ui.formInput('DateTime', {
 		var onChange = scope.$events.onChange;
 		var props = scope.field;
 		var isDate = this.isDate;
+		var isShowing = false;
 		
 		var options = {
 			dateFormat: 'dd/mm/yy',
 			showButtonsPanel: false,
 			showTime: false,
 			showOn: null,
+			beforeShow: function (e, ui) {
+				isShowing = true;
+			},
+			onClose: function (e, ui) {
+				isShowing = false;
+			},
 			onSelect: function(dateText, inst) {
 				input.mask('value', dateText);
 				updateModel();
@@ -240,6 +247,13 @@ ui.formInput('DateTime', {
 				return;
 			}
 			input.datetimepicker('show');
+		});
+
+		element.on('adjustSize adjustScroll', function (e) {
+			if (isShowing) {
+				input.datepicker('widget').hide();
+				input.datetimepicker('hide');
+			}
 		});
 
 		function updateModel() {

@@ -548,6 +548,10 @@ angular.module('axelor.ui').directive('uiEditorPopup', function() {
 				scope._setTitle(title);
 			});
 
+			element.scroll(function (e) {
+				$.event.trigger('adjustScroll');
+			});
+
 			var btnOK = null;
 
 			function buttonState(canSave) {
