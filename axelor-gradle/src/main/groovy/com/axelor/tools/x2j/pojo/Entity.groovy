@@ -19,8 +19,8 @@ package com.axelor.tools.x2j.pojo
 
 import groovy.util.slurpersupport.NodeChild
 
+import com.axelor.common.Inflector
 import com.axelor.tools.x2j.Utils
-import com.google.common.base.CaseFormat
 
 class Entity {
 
@@ -98,7 +98,7 @@ class Entity {
 		if (!table) {
 			table = namespace.replaceAll(/\.db$/, "")
 			table = table.substring(table.lastIndexOf('.') + 1)
-			table = table.toUpperCase() + "_" + CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, name)
+			table = Inflector.getInstance().underscore(table + '_' + name).toUpperCase()
 		}
 
 		importManager = new ImportManager(namespace, groovy)
