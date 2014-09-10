@@ -15,8 +15,6 @@ dependencies {
 	compile	libs.guava
 	compile libs.opencsv
 
-	// TODO: replace inlfection used from jersey server with axelor-common
-	compile libs.jersey_server
 	compile project(':axelor-common')
 
 	compile libs.plugin_license

@@ -19,9 +19,8 @@ package com.axelor.tools.x2j.pojo
 
 import groovy.util.slurpersupport.NodeChild
 
+import com.axelor.common.Inflector
 import com.axelor.tools.x2j.Utils
-import com.google.common.base.CaseFormat
-import com.sun.jersey.core.impl.provider.entity.Inflector
 
 class Property {
 
@@ -258,7 +257,7 @@ class Property {
 		if (col) {
 			return col
 		}
-		return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name)
+		return Inflector.getInstance().underscore(name)
 	}
 
 	boolean isInitParam() {
