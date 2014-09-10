@@ -114,7 +114,7 @@ class Finder {
 				t = p.type
 
 				if (p.targetFqn) {
-					t = p.targetFqn.indexOf('.') == -1 ? entity.namespace + '.' + t : t
+					t = p.targetFqn.indexOf('.') == -1 ? entity.namespace + '.' + t : p.targetFqn
 					t = entity.repository.importType(t)
 				}
 				query += "self.${n} = :${n}"

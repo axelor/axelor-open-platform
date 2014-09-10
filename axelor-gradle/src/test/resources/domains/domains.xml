@@ -98,10 +98,13 @@
     <string name="area" required="true" />
     <string name="city" required="true" />
     <many-to-one name="country" ref="Country" required="true" />
+    <many-to-one name="user" ref="com.axelor.auth.db.User" />
     <finder-method name="findByContact" using="long:contactId, String:name" filter="self.customer.id = :contactId OR self.customer.fullName = :name" all="true"/>
     <finder-method name="findByContact" using="String:email" filter="self.customer.email = :email" all="true"/>
 
     <finder-method name="findByContact" using="contact" all="false"/>
+    <finder-method name="findByUser" using="user" all="false"/>
+    
   </entity>
   
   <entity name="ConstraintTester">
