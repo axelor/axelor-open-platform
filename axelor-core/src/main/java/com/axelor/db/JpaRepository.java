@@ -21,6 +21,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
@@ -70,6 +72,27 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 	@Override
 	public void remove(T entity) {
 		JPA.remove(entity);
+	}
+
+	/**
+	 * Refresh the state of the instance from the database, overwriting changes
+	 * made to the entity, if any.
+	 *
+	 * @see EntityManager#refresh(Object)
+	 */
+	@Override
+	public void refresh(T entity) {
+		JPA.refresh(entity);
+	}
+
+	/**
+	 * Synchronize the persistence context to the underlying database.
+	 *
+	 * @see EntityManager#flush()
+	 */
+	@Override
+	public void flush() {
+		JPA.flush();
 	}
 
 	@SuppressWarnings("unchecked")
