@@ -991,6 +991,10 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			});
 		};
 
+		element.scroll(function (e) {
+			$.event.trigger('adjustScroll');
+		});
+
 		var unwatch = scope.$watch('schema.loaded', function(viewLoaded){
 
 			if (!viewLoaded) return;
