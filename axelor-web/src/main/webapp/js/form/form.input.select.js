@@ -79,6 +79,7 @@ ui.formWidget('BaseSelect', {
 		
 			var loading = false;
 			var pending = null;
+			var showing = false;
 
 			function doLoad(request, response) {
 				if (loading) {
@@ -116,10 +117,12 @@ ui.formWidget('BaseSelect', {
 				},
 				
 				open: function(event, ui) {
+					showing = true;
 					scope.handleOpen(event, ui);
 				},
 				
 				close: function(event, ui) {
+					showing = false;
 					scope.handleClose(event, ui);
 				}
 			});
@@ -133,6 +136,12 @@ ui.formWidget('BaseSelect', {
 				}
 				return el;
 			};
+
+			element.on('adjustSize adjustScroll', function (e) {
+				if (showing) {
+					input.autocomplete('close');
+				}
+			});
 		});
 		
 		input.focus(function() {
