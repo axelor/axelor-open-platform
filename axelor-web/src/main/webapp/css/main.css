@@ -583,6 +583,10 @@ input[readonly], select[readonly], textarea[readonly] {
 	padding: 4px 8px;
 	margin: 0;
 	margin-left: -10px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: calc(100% - 100px);
 }
 
 .stackbar .navbar .navbar-inner .container-fluid {
