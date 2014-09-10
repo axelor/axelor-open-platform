@@ -45,6 +45,10 @@ final class Expander {
 
 	private Template repoTemplate;
 
+	private Template repoBodyTemplate;
+
+	private Template repoHeadTemplate;
+
 	private static Expander instance;
 
 	private Expander() {
@@ -52,6 +56,8 @@ final class Expander {
 		headTemplate = template("templates/head.template");
 		bodyTemplate = template("templates/body.template");
 		repoTemplate = template("templates/repo.template");
+		repoHeadTemplate = template("templates/repo-head.template");
+		repoBodyTemplate = template("templates/repo-body.template");
 	}
 
 	public static Expander getInstance() {
@@ -104,6 +110,12 @@ final class Expander {
 		final Repository repo = entity.getRepository();
 
 		binding.put("repo", repo);
+
+		final String body = repoBodyTemplate.make(binding).toString();
+		final String imports = repoHeadTemplate.make(binding).toString();
+
+		binding.put("body", body);
+		binding.put("imports", imports);
 
 		return repoTemplate.make(binding).toString();
 	}

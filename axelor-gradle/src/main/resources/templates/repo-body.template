@@ -1,0 +1,11 @@
+
+public class ${repo.name} extends ${repo.baseClass} {
+
+	public ${repo.name}() {
+		super(${repo.modelClass}.class);
+	}
+	<% repo.finderMethods.each { %>\
+		${it.getCode(false)}\
+	<% } %>\
+	${repo.extraCode}
+}

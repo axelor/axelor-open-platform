@@ -24,8 +24,6 @@ class Repository {
 
 	private ImportManager importManager
 
-	private List<Finder> finderMethods
-
 	String namespace
 	String baseClass
 	String modelClass
@@ -56,16 +54,11 @@ class Repository {
 	}
 
 	List<String> getImportStatements() {
-		// make sure to include imports from finders
-		getFinderMethods();
 		return importManager.getImportStatements()
 	}
 
 	List<Finder> getFinderMethods() {
-		if (finderMethods == null) {
-			finderMethods = this.entity.getFinderMethods()
-		}
-		return finderMethods
+		return this.entity.getFinderMethods()
 	}
 
 	String getExtraImports() {

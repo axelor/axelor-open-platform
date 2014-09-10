@@ -116,7 +116,7 @@ ${p.documentation}
 	}
 <% if (!pojo.pojo) { %>\
 <% pojo.finderMethods.each { %>\
-	${it.code}\
+	${it.getCode(true)}\
 <% } %>\
 
 	/**
