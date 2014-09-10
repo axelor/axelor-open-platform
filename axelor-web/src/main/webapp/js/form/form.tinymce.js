@@ -126,6 +126,7 @@ ui.formInput('Html', {
 		};
 		
 		options = _.extend(options, scope.field.lite ? liteOptions : heavyOptions);
+		options.height = scope.field.height || options.height;
 
 		function textTemplate(value) {
 			if (!value || value.trim().length === 0) return "";
