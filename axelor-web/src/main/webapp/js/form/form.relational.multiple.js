@@ -433,11 +433,12 @@ ui.formInput('OneToMany', {
 
 			if (editable) {
 				element.addClass('inline-editable');
+				grid.setOptions({enableAddRow: scope.canNew()});
 				scope.$on('on:new', function(event){
 					if (scope.dataView.getItemById(0)) {
 						scope.dataView.deleteItem(0);
 					}
-					grid.setOptions({enableAddRow: true});
+					grid.setOptions({enableAddRow: scope.canNew()});
 				});
 				scope.$watch("isReadonly()", function(readonly) {
 					grid.setOptions({
