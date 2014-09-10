@@ -923,7 +923,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 		};
 
 		scope.canShowRemove = function () {
-			return dropdownVisible && scope.canRemove();
+			return dropdownVisible && scope.canRemove() && !_.isEmpty(scope.selection);
 		};
 
 		element.on("hide:slick-editor", function(e){
