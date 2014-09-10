@@ -286,6 +286,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		}
 		
 		var expr = $interpolate(field.bind);
+		var last = null;
 
 		function handle(rec) {
 			var value = undefined;
@@ -295,9 +296,9 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 					value = null;
 				}
 			} catch (e) {}
-			
-			if (scope.setValue) {
-				scope.setValue(value);
+
+			if (scope.setValue && last !== value) {
+				scope.setValue(last = value);
 			}
 		}
 		
