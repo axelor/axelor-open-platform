@@ -97,4 +97,19 @@ public interface Repository<T extends Model> {
 	 *            the entity object
 	 */
 	void remove(T entity);
+
+	/**
+	 * Refresh the state of the instance from the database, overwriting changes
+	 * made to the entity, if any.
+	 *
+	 * @param entity
+	 *            the entity object to refresh
+	 */
+	void refresh(T entity);
+
+	/**
+	 * Synchronize the persistence context to the underlying database.
+	 *
+	 */
+	void flush();
 }
