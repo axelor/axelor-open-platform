@@ -161,6 +161,7 @@ _t.put({
 "Logout": "Déconnexion",
 "Preferences": "Préférences",
 "Create new": "Créer nouveau",
+"Create": "Créer",
 "Validation error": "Erreur de validation",
 "Please correct the invalid form values.": "Merci de corriger les champs du formulaire non valides.",
 "The following fields are invalid:": "Les champs suivants sont invalides:",
