@@ -100,6 +100,8 @@
     <many-to-one name="country" ref="Country" required="true" />
     <finder-method name="findByContact" using="long:contactId, String:name" filter="self.customer.id = :contactId OR self.customer.fullName = :name" all="true"/>
     <finder-method name="findByContact" using="String:email" filter="self.customer.email = :email" all="true"/>
+
+    <finder-method name="findByContact" using="contact" all="false"/>
   </entity>
   
   <entity name="ConstraintTester">

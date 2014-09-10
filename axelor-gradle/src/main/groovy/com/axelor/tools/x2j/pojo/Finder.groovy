@@ -87,7 +87,7 @@ class Finder {
 		"BigDecimal"	: "java.math.BigDecimal"
 	]
 
-	String getCode() {
+	String getCode(boolean useStatic) {
 
 		def query = []
 		def params = []
@@ -112,6 +112,11 @@ class Finder {
 				p = entity.getField(n)
 				if (!p) return ""
 				t = p.type
+
+				if (p.targetFqn) {
+					t = p.targetFqn.indexOf('.') == -1 ? entity.namespace + '.' + t : t
+					t = entity.repository.importType(t)
+				}
 				query += "self.${n} = :${n}"
 			}
 			n = Utils.firstLower(n);
@@ -125,7 +130,12 @@ class Finder {
 
 		def lines = []
 
-		lines += "public static ${type} ${name}(${params}) {"
+		if (useStatic) {
+			lines += "public static ${type} ${name}(${params}) {"
+		} else {
+			lines += "public ${type} ${name}(${params}) {"
+		}
+
 		lines += "\treturn Query.of(${entity.name}.class)"
 		lines += "\t\t\t.filter(\"${query}\")"
 
