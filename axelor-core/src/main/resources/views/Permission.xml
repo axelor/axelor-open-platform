@@ -18,14 +18,14 @@
       <field name="name" />
       <field name="object" />
     </panel>
-    <panel title="Allow" x-item-span="2">
+    <panel title="Allow" itemSpan="2">
       <field name="canRead" widget="inline-checkbox" />
       <field name="canWrite" widget="inline-checkbox" />
       <field name="canCreate" widget="inline-checkbox" />
       <field name="canRemove" widget="inline-checkbox" />
       <field name="canExport" widget="inline-checkbox" />
     </panel>
-    <panel title="Condition" x-item-span="12">
+    <panel title="Condition" itemSpan="12">
       <field name="condition" title="Condition" />
       <field name="conditionParams" title="Params" />
     </panel>

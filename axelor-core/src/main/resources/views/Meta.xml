@@ -54,7 +54,7 @@
       </panel>
     </panel>
     <panel title="Description">
-      <field name="description" showTitle="false" x-span="12"/>
+      <field name="description" showTitle="false" colSpan="12"/>
     </panel>
   </form>
 
@@ -81,19 +81,19 @@
         onSave="action-view-validate,com.axelor.meta.web.MetaController:clearCache" width="large" >
     <panel title="Overview">
       <panel>
-        <field name="name" x-span="12"/>
-        <field name="title" x-span="12"/>
+        <field name="name" colSpan="12"/>
+        <field name="title" colSpan="12"/>
         <field name="type" selection="view.type.selection"/>
         <field name="priority"/>
       </panel>
-      <panel x-item-span="12">
+      <panel itemSpan="12">
         <field name="model"/>
         <field name="module"/>
         <field name="groups" widget="TagSelect" x-create="code,name"/>
       </panel>
     </panel>
     <panel title="Schema">
-      <field name="xml" showTitle="false" widget="CodeEditor" x-height="500" x-syntax="xml" x-span="12"/>
+      <field name="xml" showTitle="false" widget="CodeEditor" height="500" x-syntax="xml" colSpan="12"/>
     </panel>
   </form>
 
@@ -113,7 +113,7 @@
       <field name="module"/>
     </panel>
     <panel title="Schema">
-      <field name="xml" showTitle="false" widget="CodeEditor" x-height="500" x-syntax="xml" x-span="12"/>
+      <field name="xml" showTitle="false" widget="CodeEditor" height="500" x-syntax="xml" colSpan="12"/>
     </panel>
   </form>
 
@@ -138,7 +138,7 @@
       <field name="action"/>
       <field name="module"/>
       <field name="priority"/>
-      <panel x-item-span="4">
+      <panel itemSpan="4">
         <field name="top"/>
         <field name="left"/>
         <field name="mobile"/>
@@ -257,7 +257,7 @@
       <button name="openModel" title="Show Model" hideIf="!relationship" onClick="meta-field-method-open-model"/>
     </panel>
     <panel title="Description">
-      <field name="description" showTitle="false" x-span="12"/>
+      <field name="description" showTitle="false" colSpan="12"/>
     </panel>
   </form>
 
@@ -275,7 +275,7 @@
   </grid>
   
   <form title="Translation" name="meta-translations-form" model="com.axelor.meta.db.MetaTranslation">
-    <panel title="Translation" x-item-span="12">
+    <panel title="Translation" itemSpan="12">
       <field name="key"/>
       <field name="message"/>
       <field name="language"/>

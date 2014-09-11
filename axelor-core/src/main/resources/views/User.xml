@@ -26,7 +26,7 @@
       <field name="language"/>
       <panel x-stacked="true">
         <field name="homeAction" hidden="true" x-bind="{{__actionSelect.name}}"/>
-        <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" x-target="com.axelor.meta.db.MetaAction" x-target-name="name" x-domain="self.type = 'action-view'"/>
+        <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" x-target="com.axelor.meta.db.MetaAction" target-name="name" x-domain="self.type = 'action-view'"/>
       </panel>
     </panel>
     <panel title="Authorization">
@@ -34,7 +34,7 @@
       <field name="expiresOn" validIf="!expiresOn || (!activateOn &amp;&amp; expiresOn) || (activateOn &amp;&amp; expiresOn &amp;&amp; $moment(expiresOn) >= $moment(activateOn))"/>
       <field name="blocked"/>
       <field name="change" title="Change password?" showIf="id &amp;&amp; !$readonly()" widget="boolean"/>
-      <panel x-span="12" showIf="change || !id" >
+      <panel colSpan="12" showIf="change || !id" >
         <field name="newPassword" title="Password" placeholder="new password" widget="password" requiredIf="!id" validIf="(!change &amp;&amp; id) || (newPassword.length >= 4 &amp;&amp; confirm == newPassword)"/>
         <field name="confirm" title="Confirm" placeholder="confirm password" widget="password"/>
       </panel>
@@ -47,12 +47,12 @@
 
   <form name="user-preferences-form" title="Preferences" model="com.axelor.auth.db.User"
     onNew="com.axelor.auth.AuthService:preferences">
-    <panel title="User preferences" x-item-span="12">
+    <panel title="User preferences" itemSpan="12">
       <field name="email" widget="Email"/>
       <field name="language"/>
       <panel x-stacked="true">
         <field name="homeAction" hidden="true" x-bind="{{__actionSelect.name}}"/>
-        <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" x-target="com.axelor.meta.db.MetaAction" x-target-name="name" x-domain="self.type = 'action-view'"/>
+        <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" x-target="com.axelor.meta.db.MetaAction" target-name="name" x-domain="self.type = 'action-view'"/>
       </panel>
     </panel>
   </form>
