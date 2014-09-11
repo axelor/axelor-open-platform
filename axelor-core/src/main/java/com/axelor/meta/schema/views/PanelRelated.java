@@ -49,6 +49,12 @@ public class PanelRelated extends AbstractPanel {
 	private String domain;
 	
 	@XmlAttribute
+	private String target;
+
+	@XmlAttribute(name = "target-name")
+	private String targetName;
+
+	@XmlAttribute
 	private String onChange;
 	
 	@XmlAttribute
@@ -117,6 +123,22 @@ public class PanelRelated extends AbstractPanel {
 		this.domain = domain;
 	}
 	
+	public String getTarget() {
+		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
+	}
+
+	public String getTargetName() {
+		return targetName;
+	}
+
+	public void setTargetName(String targetName) {
+		this.targetName = targetName;
+	}
+
 	public String getOnChange() {
 		return onChange;
 	}

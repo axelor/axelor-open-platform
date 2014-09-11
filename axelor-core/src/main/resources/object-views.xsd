@@ -321,6 +321,13 @@
             <xsd:documentation>Specify the number of columns taken by the widget.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="colOffset" type="xsd:int">
+          <xsd:annotation>
+            <xsd:documentation>Specify the column offset. The widget is moved to the right
+            by skipping the specified number of columns.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="css" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>Custom css class to apply.</xsd:documentation>
@@ -471,6 +478,155 @@
     </xsd:attribute>
   </xsd:complexType>
 
+  <xsd:attributeGroup name="ExtraAttributes">
+    <xsd:attribute name="x-icon" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify an icon.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-icon-hover" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify an icon for hover state.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-icon-active" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify an icon for active state.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-exclusive" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify whether the boolean field used inside the
+        repeat editor should be exclusive.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-show-icons" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify the name of icons to show on nested editor.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-direction" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify the layout direction (horizontal, vertical) of some widgets(e.g. RadioSelect)</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-code-syntax" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Syntax highlighting for the code editor widget.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-code-theme" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Color scheme for the code editor.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-lite" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether to use compact version of the widget.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:attributeGroup>
+
+  <xsd:attributeGroup name="RelationalAttributes">
+    <xsd:attribute name="target">
+      <xsd:annotation>
+        <xsd:documentation>Specify fully qualified name of the target class, can be used for dummy fields.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="target-name">
+      <xsd:annotation>
+        <xsd:documentation>Specify the name field of the target class.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="domain" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify the default domain.&lt;br&gt;&lt;br&gt;
+
+          For example:
+          &lt;br&gt;&lt;pre&gt;
+          self.isActive = true
+          self.partner = :partner&lt;/pre&gt;
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="edit-window">
+      <xsd:annotation>
+        <xsd:documentation>
+          Display mode of edit window for relational fields.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="self" />
+          <xsd:enumeration value="blank" />
+          <xsd:enumeration value="popup" />
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="form-view" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify the form view for relational field.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="grid-view" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify the grid view for relational field.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="summary-view" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify the summary view (form) for relational field.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="onSelect" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          For relational fields only. The actions will be executed
+          just before the selection window
+          appears.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="canSelect" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          If this is a relational field, specify whether to allow selecting
+          existing record(s).
+          Generally, used with NestedEditor widget.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="canNew" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          If this is a relational field, specify whether to allow creating new record(s).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="canView" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          If this is a relational field, specify whether to allow view the record(s).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="canRemove" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          If this is a relational field, specify whether to allow removing record(s).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:attributeGroup>
+
   <xsd:attributeGroup name="ObjectViewAttributes">
     <xsd:attribute name="name" type="xsd:string" use="required">
       <xsd:annotation>
@@ -582,11 +738,23 @@
   <xsd:complexType name="AbstractPanel" abstract="true">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractContainer">
-        <xsd:attribute name="showTitle" use="prohibited"/>
-        <xsd:attribute name="colSpan" use="prohibited"/>
+        <xsd:attribute name="itemSpan" type="xsd:int" default="6">
+          <xsd:annotation>
+            <xsd:documentation>Specify the default span for child items.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="showFrame" type="xsd:boolean" default="true">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show frame arround the panel.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="sidebar" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show this panel in sidebar.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="rowSpan" use="prohibited"/>
         <xsd:attribute name="width" use="prohibited"/>
-        <xsd:attribute name="height" use="prohibited"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -642,17 +810,11 @@
           <xsd:element name="field" type="tns:PanelField" minOccurs="0" maxOccurs="unbounded" />
           <xsd:element name="button" type="tns:Button" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
+        <xsd:attribute name="itemSpan" use="prohibited"/>
         <xsd:attribute name="field" type="xsd:string" use="required" />
-        <xsd:attribute name="form-view" type="xsd:string" />
-        <xsd:attribute name="grid-view" type="xsd:string" />
         <xsd:attribute name="editable" type="xsd:boolean" />
         <xsd:attribute name="orderBy" type="xsd:string" />
-        <xsd:attribute name="domain" type="xsd:string" />
-        <xsd:attribute name="onChange" type="xsd:string" />
-        <xsd:attribute name="onSelect" type="xsd:string" />
-        <xsd:attribute name="canNew" type="xsd:boolean" />
-        <xsd:attribute name="canView" type="xsd:boolean" />
-        <xsd:attribute name="canRemove" type="xsd:boolean" />
+        <xsd:attributeGroup ref="tns:RelationalAttributes" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -665,6 +827,8 @@
           <xsd:element name="panel-dashlet" type="tns:Portlet" />
           <xsd:element name="panel-include" type="tns:FormInclude" />
         </xsd:choice>
+        <xsd:attribute name="itemSpan" use="prohibited"/>
+        <xsd:attribute name="showTitle" use="prohibited"/>
         <xsd:attribute name="title" use="prohibited"/>
       </xsd:extension>
     </xsd:complexContent>
@@ -688,8 +852,6 @@
             </xsd:annotation>
           </xsd:element>
         </xsd:sequence>
-        <xsd:attribute name="width" use="prohibited"/>
-        <xsd:attribute name="colSpan" use="prohibited"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1495,7 +1657,7 @@
         <xsd:attribute name="icon" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-              Path of the image.
+              Specify the button icon (an image or FontAwesome icon).
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -1557,6 +1719,11 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="type" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Specify the type for the dummy field.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="widget" type="xsd:string" />
         <xsd:attribute name="selection" type="xsd:string">
           <xsd:annotation>
@@ -1601,27 +1768,6 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="onSelect" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>
-              For relational fields only. The actions will be executed
-              just before the selection window
-              appears.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="domain" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>
-              Specify the default domain.&lt;br&gt;&lt;br&gt;
-
-              For example:
-              &lt;br&gt;&lt;pre&gt;
-              self.isActive = true
-              self.partner = :partner&lt;/pre&gt;
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="min" type="xsd:decimal">
           <xsd:annotation>
             <xsd:documentation>
@@ -1657,6 +1803,8 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+       <xsd:attributeGroup ref="tns:RelationalAttributes"/>
+        <xsd:attributeGroup ref="tns:ExtraAttributes"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1667,71 +1815,6 @@
           <xsd:element name="grid" type="tns:NestedGridView" minOccurs="0" />
           <xsd:element name="form" type="tns:NestedFormView" minOccurs="0" />
         </xsd:sequence>
-        <xsd:attribute name="edit-window">
-          <xsd:annotation>
-            <xsd:documentation>
-              Display mode of edit window for relational fields.
-            </xsd:documentation>
-          </xsd:annotation>
-          <xsd:simpleType>
-            <xsd:restriction base="xsd:string">
-              <xsd:enumeration value="self" />
-              <xsd:enumeration value="blank" />
-              <xsd:enumeration value="popup" />
-            </xsd:restriction>
-          </xsd:simpleType>
-        </xsd:attribute>
-        <xsd:attribute name="form-view" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>
-              Specify the form view for relational field.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="grid-view" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>
-              Specify the grid view for relational field.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="summary-view" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>
-              Specify the summary view (form) for relational field.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="canSelect" type="xsd:boolean">
-          <xsd:annotation>
-            <xsd:documentation>
-              If this is a relational field, specify whether to allow selecting
-              existing record(s).
-              Generally, used with NestedEditor widget.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="canNew" type="xsd:boolean">
-          <xsd:annotation>
-            <xsd:documentation>
-              If this is a relational field, specify whether to allow creating new record(s).
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="canView" type="xsd:boolean">
-          <xsd:annotation>
-            <xsd:documentation>
-              If this is a relational field, specify whether to allow view the record(s).
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="canRemove" type="xsd:boolean">
-          <xsd:annotation>
-            <xsd:documentation>
-              If this is a relational field, specify whether to allow removing record(s).
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
