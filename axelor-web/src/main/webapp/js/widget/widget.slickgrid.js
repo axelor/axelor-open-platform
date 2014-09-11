@@ -1439,18 +1439,22 @@ Grid.prototype.onAddNewRow = function(event, args) {
 	}
 };
 
+Grid.prototype.canAdd = function () {
+	var handler = this.handler;
+	return this.editable && (!handler || (handler.canNew() && !handler.isReadonly()));
+}
+
 Grid.prototype.setEditors = function(form, formScope, forEdit) {
 	var grid = this.grid,
 		data = this.scope.dataView,
-		element = this.element,
-		canAdd = this.handler.canNew() && !this.handler.isReadonly();
+		element = this.element;
 	
 	forEdit = forEdit === undefined ? true : forEdit;
 
 	grid.setOptions({
 		editable: true,
 		asyncEditorLoading: false,
-		enableAddRow: forEdit && canAdd,
+		enableAddRow: forEdit && this.canAdd(),
 		editorLock: new Slick.EditorLock()
 	});
 	
@@ -1616,10 +1620,9 @@ Grid.prototype.onRowCountChanged = function(event, args) {
 Grid.prototype.onRowsChanged = function(event, args) {
 	var grid = this.grid,
 		data = this.scope.dataView,
-		forEdit = this.editorForEdit,
-		canAdd = this.handler.canNew() && !this.handler.isReadonly();
+		forEdit = this.editorForEdit;
 
-	if(canAdd && this.editable && !data.getItemById(0)) {
+	if(this.canAdd() && !data.getItemById(0)) {
 		grid.setOptions({
 			enableAddRow: forEdit === undefined ? true : forEdit
 		});
