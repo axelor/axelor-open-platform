@@ -363,7 +363,7 @@ ui.formWidget('Panel', {
 	link: function (scope, element, attrs) {
 		var field = scope.field || {};
 		element.addClass(field.serverType);
-		if (field.serverType === 'panel-side' && !attrs.itemspan) {
+		if (field.serverType === 'panel-side' && !attrs.itemSpan) {
 			attrs.$set('itemspan', 12);
 		}
 		scope.menus = null;
@@ -375,10 +375,10 @@ ui.formWidget('Panel', {
 		if (nested) {
 			element.addClass("panel-nested");
 		}
-		if (field.noframe) {
+		if (field.showFrame === false) {
 			element.addClass('noframe');
 		}
-		scope.notitle = field.noframe || field.showTitle === false;
+		scope.notitle = field.showFrame === false || field.showTitle === false;
 	},
 
 	transclude: true,
