@@ -305,7 +305,7 @@ var NestedEditor = {
 			var names;
 			if (icons === null) {
 				icons = {};
-				names = scope.field.icons || scope.$parent.field.icons;
+				names = scope.field.showIcons || scope.$parent.field.showIcons;
 				if (names === false) {
 					icons.$all = false;
 				} else if (names === true || names === undefined) {

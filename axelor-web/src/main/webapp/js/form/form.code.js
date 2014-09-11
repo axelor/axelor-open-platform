@@ -55,17 +55,14 @@ ui.formInput('CodeEditor', {
 		var field = scope.field;
 		var props = {
 			autofocus: true,
-			lineNumbers: true
+			lineNumbers: true,
+			theme: field.codeTheme || "default"
 		};
 
-		if (field.mode || field.syntax) {
-			props.mode = field.mode || field.syntax;
+		if (field.mode || field.codeSyntax) {
+			props.mode = field.mode || field.codeSyntax;
 		}
-		
-		if (field.theme) {
-			props.theme = field.theme || "default";
-		}
-		
+
 		if (props.mode === "xml") {
 			props = _.extend(props, {
 				foldGutter : true,

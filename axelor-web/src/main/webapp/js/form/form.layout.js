@@ -191,8 +191,8 @@ function PanelLayout(items, attrs, $scope, $compile) {
 	function add(item, label) {
 		var row = _.last(layout),
 			cell = $('<div>'),
-			span = +item.attr('x-span') || numSpan,
-			offset = +item.attr('x-offset') || 0,
+			span = +item.attr('x-colspan') || numSpan,
+			offset = +item.attr('x-coloffset') || 0,
 			stacked = attrs.stacked;
 
 		span = Math.min(span, numCols);

@@ -806,7 +806,7 @@ ui.formBuild = function (scope, schema, fields) {
 				type = 'static';
 			}
 
-			attrs.serverType = attrs.type;
+			attrs.serverType = field.serverType || attrs.serverType || attrs.type;
 			attrs.type = type;
 
 			if (type == 'panel-related') {
@@ -840,7 +840,9 @@ ui.formBuild = function (scope, schema, fields) {
 					'name'			: attrs.name || this.name,
 					'x-cols'		: this.cols,
 					'x-colspan'		: this.colSpan,
+					'x-coloffset'	: this.colOffset,
 					'x-rowspan'		: this.rowSpan,
+					'x-sidebar'		: this.sidebar,
 					'x-widths'		: this.colWidths,
 					'x-field'		: this.name,
 					'x-title'		: attrs.title
