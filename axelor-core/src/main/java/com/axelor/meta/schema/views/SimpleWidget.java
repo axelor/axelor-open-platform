@@ -62,6 +62,9 @@ public abstract class SimpleWidget extends AbstractWidget {
 	private Integer colSpan;
 
 	@XmlAttribute
+	private Integer colOffset;
+
+	@XmlAttribute
 	private String css;
 
 	@XmlAttribute
@@ -166,6 +169,14 @@ public abstract class SimpleWidget extends AbstractWidget {
 
 	public void setColSpan(Integer colSpan) {
 		this.colSpan = colSpan;
+	}
+
+	public Integer getColOffset() {
+		return colOffset;
+	}
+
+	public void setColOffset(Integer colOffset) {
+		this.colOffset = colOffset;
 	}
 
 	public String getCss() {

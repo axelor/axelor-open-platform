@@ -20,10 +20,32 @@ package com.axelor.meta.schema.views;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 public abstract class AbstractPanel extends AbstractContainer {
+
+	@XmlAttribute
+	private Integer itemSpan;
+
+	@XmlAttribute
+	private Boolean showFrame;
+
+	@XmlAttribute
+	private Boolean sidebar;
+
+	public Integer getItemSpan() {
+		return itemSpan;
+	}
+
+	public Boolean getShowFrame() {
+		return showFrame;
+	}
+
+	public Boolean getSidebar() {
+		return sidebar;
+	}
 
 	protected List<AbstractWidget> process(List<AbstractWidget> items) {
 		if (items == null) {

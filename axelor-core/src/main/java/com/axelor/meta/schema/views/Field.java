@@ -39,6 +39,9 @@ import com.google.common.collect.Lists;
 @JsonTypeName("field")
 public class Field extends SimpleWidget {
 
+	@XmlAttribute(name = "type")
+	private String serverType;
+
 	@XmlAttribute
 	private String placeholder;
 
@@ -111,6 +114,33 @@ public class Field extends SimpleWidget {
 	@XmlAttribute(name = "summary-view")
 	private String summaryView;
 
+	@XmlAttribute(name = "x-icon")
+	private String icon;
+
+	@XmlAttribute(name = "x-icon-hover")
+	private String iconHover;
+
+	@XmlAttribute(name = "x-icon-active")
+	private String iconActive;
+
+	@XmlAttribute(name = "x-exclusive")
+	private Boolean exclusive;
+
+	@XmlAttribute(name = "x-show-icon")
+	private String showIcons;
+
+	@XmlAttribute(name = "x-direction")
+	private String direction;
+
+	@XmlAttribute(name = "x-code-syntax")
+	private String codeSyntax;
+
+	@XmlAttribute(name = "x-code-theme")
+	private String codeTheme;
+
+	@XmlAttribute(name = "x-lite")
+	private String lite;
+
 	@XmlElement(name = "hilite")
 	private List<Hilite> hilites;
 
@@ -119,6 +149,14 @@ public class Field extends SimpleWidget {
 		@XmlElement(name = "grid", type = GridView.class)
 	})
 	private List<AbstractView> views;
+
+	public String getServerType() {
+		return serverType;
+	}
+
+	public void setServerType(String serverType) {
+		this.serverType = serverType;
+	}
 
 	@JsonGetter("placeholder")
 	public String getLocalizedPlaceholder() {
@@ -263,6 +301,78 @@ public class Field extends SimpleWidget {
 
 	public void setAggregate(String aggregate) {
 		this.aggregate = aggregate;
+	}
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+
+	public String getIconHover() {
+		return iconHover;
+	}
+
+	public void setIconHover(String iconHover) {
+		this.iconHover = iconHover;
+	}
+
+	public String getIconActive() {
+		return iconActive;
+	}
+
+	public void setIconActive(String iconActive) {
+		this.iconActive = iconActive;
+	}
+
+	public Boolean getExclusive() {
+		return exclusive;
+	}
+
+	public void setExclusive(Boolean exclusive) {
+		this.exclusive = exclusive;
+	}
+
+	public String getShowIcons() {
+		return showIcons;
+	}
+
+	public void setShowIcons(String showIcons) {
+		this.showIcons = showIcons;
+	}
+
+	public String getDirection() {
+		return direction;
+	}
+
+	public void setDirection(String direction) {
+		this.direction = direction;
+	}
+
+	public String getCodeSyntax() {
+		return codeSyntax;
+	}
+
+	public void setCodeSyntax(String codeSyntax) {
+		this.codeSyntax = codeSyntax;
+	}
+
+	public String getCodeTheme() {
+		return codeTheme;
+	}
+
+	public void setCodeTheme(String codeTheme) {
+		this.codeTheme = codeTheme;
+	}
+
+	public String getLite() {
+		return lite;
+	}
+
+	public void setLite(String lite) {
+		this.lite = lite;
 	}
 
 	public List<Hilite> getHilites() {
