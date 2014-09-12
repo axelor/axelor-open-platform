@@ -608,25 +608,27 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 
 			setTimeout(function(){
 				var footer = element.closest('.ui-dialog').find('.ui-dialog-buttonpane'),
+					header = element.closest('.ui-dialog').find('.ui-dialog-titlebar'),
 					pager = element.find('.record-pager'),
-					buttons = element.find('.ui-dialog-buttonset');
-				footer.prepend(pager);
-				footer.append(buttons);
+					buttons = element.find('.ui-dialog-buttonset-left');
+				header.find('.ui-dialog-title').after(pager);
+				footer.prepend(buttons);
+				footer.find('.button-ok').html(_t("Select"));
 			});
 		},
 		replace: true,
 		template:
 		'<div ui-dialog ui-dialog-size x-on-ok="onOK">'+
 		    '<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-editable="false" x-selector="{{selectMode}}"></div>'+
-		    '<div class="record-pager pull-left">'+
+		    '<div class="record-pager">'+
+		    	'<span class="record-pager-text">{{pagerText()}}</span>'+
 			    '<div class="btn-group">'+
 			      '<button class="btn" ng-disabled="!canPrev()" ng-click="onPrev()"><i class="fa fa-chevron-left"></i></button>'+
 			      '<button class="btn" ng-disabled="!canNext()" ng-click="onNext()"><i class="fa fa-chevron-right"></i></button>'+
 			    '</div>'+
-			    '<span class="record-pager-text">{{pagerText()}}</span>'+
 		    '</div>'+
-		    '<div class="ui-dialog-buttonset" ng-show="canNew()">'+
-		    	'<button class="btn" ng-click="onCreate()" x-translate>Create</button>'+
+		    '<div class="ui-dialog-buttonset-left pull-left" ng-show="canNew()">'+
+		    	'<button class="btn btn-info" ng-click="onCreate()" x-translate>Create</button>'+
 		    '</div>'+
 		'</div>'
 	};

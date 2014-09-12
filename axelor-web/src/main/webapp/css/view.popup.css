@@ -107,10 +107,6 @@
 	margin: 0;
 }
 
-.ui-dialog-buttonpane .record-pager {
-	margin: .5em .4em .5em 0;
-}
-
 .ui-dialog-buttonpane .btn-group > .btn:first-child {
 	margin-left: 0;
 }
@@ -119,8 +115,18 @@
 	margin-left: -1px;
 }
 
-.ui-dialog-buttonpane .record-pager-text {
-	margin-top: 5px;
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset-left button {
+	margin-left: 0.4em;
+}
+
+.ui-dialog-titlebar .record-pager {
+	position: absolute;
+	right: 60px;
+	top: 6px;
+}
+
+.ui-dialog-titlebar .record-pager-text {
+	margin-top: 0;
 }
 
 .no-close .ui-dialog-titlebar-close {
