@@ -1440,8 +1440,9 @@ Grid.prototype.onAddNewRow = function(event, args) {
 };
 
 Grid.prototype.canAdd = function () {
-	var handler = this.handler;
-	return this.editable && (!handler || (handler.canNew() && !handler.isReadonly()));
+	var handler = this.handler || {},
+		truth = function () { return function () {return true;}};
+	return this.editable && (handler.canNew||truth())() && !(handler.isReadonly||truth())();
 }
 
 Grid.prototype.setEditors = function(form, formScope, forEdit) {
