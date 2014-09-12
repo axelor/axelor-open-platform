@@ -30,7 +30,7 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 			if(_.isUndefined(onClose) || _.isFunction(onClose)){
 				buttons.push({
 			    	text: _t('Close'),
-			    	'class': 'btn',
+			    	'class': 'btn button-close',
 			    	click: function() {
 			    		element.dialog('close');
 			    	}
@@ -40,7 +40,7 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 			if(_.isEmpty(buttons) || _.isUndefined(onOK) || _.isFunction(onOK)){
 				buttons.push({
 			    	text: _t('OK'),
-			    	'class': 'btn btn-primary',
+			    	'class': 'btn btn-primary button-ok',
 			    	click: function() {
 			    		if (onOK) {
 			    			onOK();
