@@ -196,7 +196,9 @@ module.directive('uiToolbarAdjust', function() {
 
 		var elemMenubarMobile = null;
 		var elemToolbarMobile = null;
-
+		
+		var hasMenubar = false;
+		var hasToolbar = false;
 		var lastWidth = 0;
 
 		function setup() {
@@ -206,6 +208,9 @@ module.directive('uiToolbarAdjust', function() {
 
 			elemMenubarMobile = element.children('.view-menubar-mobile');
 			elemToolbarMobile = element.children('.view-toolbar-mobile');
+			
+			hasMenubar = !_.isEmpty(scope.menubar);
+			hasToolbar = !_.isEmpty(scope.toolbar);
 		}
 
 		function adjust() {
@@ -213,12 +218,12 @@ module.directive('uiToolbarAdjust', function() {
 			if (elemMenubar === null || lastWidth === element.width()) {
 				return;
 			}
-
+			
 			if (axelor.device.small) {
 				elemToolbar.hide();
 				elemMenubar.hide();
-				elemMenubarMobile.show();
-				elemToolbarMobile.show();
+				if (hasMenubar) elemMenubarMobile.show();
+				if (hasToolbar) elemToolbarMobile.show();
 				return;
 			}
 
@@ -239,12 +244,12 @@ module.directive('uiToolbarAdjust', function() {
 			});
 
 			var width = lastWidth - restWidth;
-			if (width <= total) {
+			if (width <= total && hasMenubar) {
 				total -= elemMenubar.width();
 				elemMenubar.hide();
 				elemMenubarMobile.show();
 			}
-			if (width <= total) {
+			if (width <= total && hasToolbar) {
 				elemToolbar.hide();
 				elemToolbarMobile.show();
 			}
