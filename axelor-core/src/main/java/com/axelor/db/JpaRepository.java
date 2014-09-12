@@ -69,6 +69,24 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 		return JPA.save(entity);
 	}
 
+	/**
+	 * Make an entity managed and persistent.
+	 * 
+	 * @see EntityManager#persist(Object)
+	 */
+	public void persist(T entity) {
+		JPA.persist(entity);
+	}
+
+	/**
+	 * Merge the state of the given entity into the current persistence context.
+	 * 
+	 * @see EntityManager#merge(Object)
+	 */
+	public T merge(T entity) {
+		return JPA.merge(entity);
+	}
+
 	@Override
 	public void remove(T entity) {
 		JPA.remove(entity);
