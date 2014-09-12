@@ -482,7 +482,12 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			height -= element.parent().children('.ui-dialog-titlebar').outerHeight(true) + 4;
 			height -= element.parent().children('.ui-dialog-buttonpane').outerHeight(true) + 4;
 
-			if (element.is('[ui-selector-popup]')) {
+			if (element.is('.nav-tabs-popup')) {
+				var toolbar = element.find('.form-view:first > .record-toolbar');
+				var form = element.find('.form-view:first > [ui-view-form]');
+				var h = toolbar.height() + form[0].scrollHeight - 16;
+				height = Math.min(height, h);
+			} else if (element.is('[ui-selector-popup]')) {
 				height = Math.min(height, 480);
 			} else if (height > element[0].scrollHeight - 16) {
 				height = 'auto';
