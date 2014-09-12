@@ -17,7 +17,6 @@
  */
 package com.axelor.meta.loader;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -169,7 +168,7 @@ public class ModuleManager {
 		return resolver.all();
 	}
 
-	public static String getModulePath(String module) {
+	public static URL getModulePath(String module) {
 		try {
 			return resolver.get(module).getPath();
 		} catch (NullPointerException e) {
@@ -326,8 +325,7 @@ public class ModuleManager {
 		final List<String> found = Lists.newArrayList();
 
 		for (URL file : MetaScanner.findAll("module\\.properties")) {
-			File urlFile = new File(file.getFile());
-			if (!"module.properties".equals(urlFile.getName())) {
+			if (!file.getFile().endsWith("/module.properties")) {
 				continue;
 			}
 			Properties properties = new Properties();
@@ -348,7 +346,7 @@ public class ModuleManager {
 
 			Module module = resolver.add(name, deps);
 			module.setRemovable(removable);
-			module.setPath(file.getPath());
+			module.setPath(file);
 		}
 
 		for (Module module : resolver.all()) {
@@ -367,8 +365,7 @@ public class ModuleManager {
 	@Transactional
 	void resolve(boolean update) {
 		for (URL file : MetaScanner.findAll("module\\.properties")) {
-			File urlFile = new File(file.getFile());
-			if (!"module.properties".equals(urlFile.getName())) {
+			if (!file.getFile().endsWith("/module.properties")) {
 				continue;
 			}
 			Properties properties = new Properties();
@@ -406,7 +403,7 @@ public class ModuleManager {
 				stored = stored.save();
 			}
 
-			module.setPath(file.getPath());
+			module.setPath(file);
 			module.setVersion(version);
 			module.setRemovable(removable);
 			module.setInstalled(stored.getInstalled() == Boolean.TRUE);

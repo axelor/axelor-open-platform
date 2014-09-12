@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.loader;
 
+import java.net.URL;
 import java.util.List;
 
 import com.google.common.base.Objects;
@@ -39,7 +40,7 @@ final class Module {
 
 	private boolean pending = false;
 
-	private transient String path = null;
+	private transient URL path = null;
 
 	public Module(String name) {
 		this.name = name;
@@ -97,11 +98,11 @@ final class Module {
 		return installed && !Objects.equal(version, installedVersion);
 	}
 	
-	public String getPath() {
+	public URL getPath() {
 		return path;
 	}
 
-	public void setPath(String path) {
+	public void setPath(URL path) {
 		this.path = path;
 	}
 
