@@ -263,8 +263,8 @@
 	border-left: 1px solid #D3D3D3;
 }
 
-.bar-layout .form-item .form-item-portlet,
-.bar-layout .form-item .form-item-portlet .portlet {
+.bar-layout .form-item-portlet,
+.bar-layout .form-item-portlet .portlet-minimized {
 	height: auto;
 	min-height: inherit !important;
 }
