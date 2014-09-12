@@ -38,20 +38,24 @@ public class MetaScanner {
 	
 	public static ImmutableList<URL> findAll(String module, String directory, String pattern) {
 
-		String path = ModuleManager.getModulePath(module);
-		if (path == null) {
+		URL pathUrl = ModuleManager.getModulePath(module);
+		if (pathUrl == null) {
 			return ImmutableList.of();
 		}
 
-		String namePattern = "(^|/|\\\\)" + directory + "(/|\\\\)" + pattern;
+		String path = pathUrl.getPath();
 		String pathPattern = String.format("^%s", path.replaceFirst("module\\.properties$", ""));
+		String namePattern = "(^|/|\\\\)" + directory + "(/|\\\\)" + pattern;
 
-		Path parent = Paths.get(path).getParent();
-		Path resources = parent.resolve("../../resources/main").normalize();
-
-		if (Files.exists(resources)) {
-			pathPattern = String.format("(%s)|(^%s)", pathPattern, resources);
+		try {
+			Path parent = Paths.get(path).getParent();
+			Path resources = parent.resolve("../../resources/main").normalize();
+			if (Files.exists(resources)) {
+				pathPattern = String.format("(%s)|(^%s)", pathPattern, resources);
+			}
+		} catch (Exception e) {
 		}
+
 		return Reflections.findResources().byName(namePattern).byURL(pathPattern).find();
 	}
 }
