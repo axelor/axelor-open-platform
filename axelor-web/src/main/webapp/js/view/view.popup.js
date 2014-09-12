@@ -479,8 +479,8 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			var maxHeight = $(document).height() - 16;
 			var height = maxHeight;
 
-			height -= element.parent().children('.ui-dialog-titlebar').outerHeight(true);
-			height -= element.parent().children('.ui-dialog-buttonpane').outerHeight(true);
+			height -= element.parent().children('.ui-dialog-titlebar').outerHeight(true) + 4;
+			height -= element.parent().children('.ui-dialog-buttonpane').outerHeight(true) + 4;
 
 			if (element.is('[ui-selector-popup]')) {
 				height = Math.min(height, 480);
