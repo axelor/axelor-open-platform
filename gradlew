@@ -9,9 +9,24 @@
 # Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 DEFAULT_JVM_OPTS=""
 
-APP_DIR=`dirname $(readlink -f "$0")`
 APP_NAME="Gradle"
 APP_BASE_NAME=`basename "$0"`
+
+# resolve links - $0 may be a softlink
+PRG="$0"
+
+while [ -h "$PRG" ]; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG=`dirname "$PRG"`/"$link"
+  fi
+done
+
+APP_DIR=`dirname "$PRG"`
+APP_DIR=`cd "$APP_DIR" >/dev/null; pwd`
 
 # Add some init scripts.
 INIT_SCRIPT_ARGS=""
