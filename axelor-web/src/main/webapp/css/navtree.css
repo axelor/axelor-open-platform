@@ -33,13 +33,14 @@
 	text-overflow: ellipsis;
 }
 
-.nav-tree li i.fa {
+.nav-tree li i.handle {
 	width: 16px;
 	display: inline-block;
 	text-align: center;
 }
 
-.nav-tree img {
+.nav-tree img,
+.nav-tree li i.icon {
 	width: 16px;
 	height: 16px;
 	max-width: 16px;

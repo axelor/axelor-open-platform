@@ -76,6 +76,18 @@ function NavMenuCtrl($scope, $element, MenuService, NavService) {
 		}
 		NavService.openTabByName(item.action);
 	};
+
+	$scope.hasImage = function (menu) {
+		return menu.icon && menu.icon.indexOf('fa-') !== 0;
+	};
+
+	$scope.hasIcon = function (menu) {
+		return menu.icon && menu.icon.indexOf('fa-') === 0;
+	};
+
+	$scope.hasText = function (menu) {
+		return !menu.icon || menu.icon.indexOf('empty') === -1;
+	}
 }
 
 module.directive('navMenuBar', function() {
@@ -183,10 +195,11 @@ module.directive('navMenuBar', function() {
 
 		template:
 			"<ul class='nav nav-menu-bar'>" +
-				"<li class='nav-menu dropdown' ng-repeat='menu in menus'>" +
+				"<li class='nav-menu dropdown' ng-class='{notext: !hasText(menu)}' ng-repeat='menu in menus'>" +
 					"<a href='' class='dropdown-toggle' data-toggle='dropdown'>" +
-						"<img ng-show='menu.icon != null' ng-src='{{menu.icon}}'> " +
-						"<span>{{menu.title}}</span> " +
+						"<img ng-if='hasImage(menu.icon)' ng-src='{{menu.icon}}'> " +
+						"<i ng-if='hasIcon(menu)' class='fa {{menu.icon}}'></i> " +
+						"<span ng-if='hasText(menu)' ng-bind='menu.title'></span> " +
 						"<b class='caret'></b>" +
 					"</a>" +
 					"<ul nav-menu='menu'></ul>" +
