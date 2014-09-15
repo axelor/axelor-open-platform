@@ -64,6 +64,10 @@ header .navbar-fixed-top {
 }
 }
 
+header .nav-menu-bar li.empty > a > i {
+	font-size: 20px;
+}
+header .nav-menu-bar li.empty > a,
 header .navbar .nav-shortcuts > li > a {
 	padding: 10px 8px 9px;
 }
@@ -126,13 +130,6 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 	background-image: none;
 	background-color: #111;
 	color: #fff;
-}
-
-header .nav-menu-bar i.large {
-	font-size: 20px;
-}
-header .nav-menu-bar .notext > a {
-	padding: 10px 8px 9px;
 }
 
 .fill-parent {
