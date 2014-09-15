@@ -94,6 +94,10 @@
 	padding: 16px auto;
 }
 
+.ui-dialog-buttonpane .btn[disabled] {
+	cursor: inherit;
+}
+
 .ui-dialog .ui-dialog-content {
 	padding: 4px;
 }

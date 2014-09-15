@@ -598,6 +598,10 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 
 			var onShow = scope.onShow;
 			scope.onShow = function (viewPromise) {
+				if (scope.clearFilters) {
+					scope.clearFilters();
+					scope.selection = [];
+				}
 				onShow(viewPromise);
 				scope._doShow(viewPromise);
 			};
@@ -605,6 +609,17 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 			scope.$watch('schema.title', function(title){
 				scope._setTitle(title);
 			});
+
+			var btnOK = null;
+
+			function buttonState(count) {
+				if (btnOK === null) {
+					btnOK = element.siblings('.ui-dialog-buttonpane').find('.btn:last');
+				}
+				return btnOK.attr('disabled', !count || count <= 0);
+			}
+
+			scope.$watch('selection.length', buttonState);
 
 			setTimeout(function(){
 				var footer = element.closest('.ui-dialog').find('.ui-dialog-buttonpane'),
@@ -628,7 +643,7 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 			    '</div>'+
 		    '</div>'+
 		    '<div class="ui-dialog-buttonset-left pull-left" ng-show="canNew()">'+
-		    	'<button class="btn btn-info" ng-click="onCreate()" x-translate>Create</button>'+
+		    	'<button class="btn" ng-click="onCreate()" x-translate>Create</button>'+
 		    '</div>'+
 		'</div>'
 	};
