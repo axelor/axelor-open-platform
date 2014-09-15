@@ -793,7 +793,10 @@ ui.formBuild = function (scope, schema, fields) {
 				type = widget;
 
 			attrs = angular.extend(attrs, field, this);
-			type = ui.getWidget(widget) || ui.getWidget(attrs.type) || attrs.type || 'string';
+			type = ui.getWidget(widget) ||
+				   ui.getWidget(attrs.type) ||
+				   ui.getWidget(attrs.serverType) ||
+				   attrs.type || attrs.serverType || 'string';
 
 			if (_.isArray(attrs.selectionList) && !widget) {
 				type = attrs.multiple ? 'multi-select' : 'select';
@@ -806,11 +809,8 @@ ui.formBuild = function (scope, schema, fields) {
 				type = 'static';
 			}
 
-			attrs.serverType = field.serverType || attrs.serverType || attrs.type;
-			attrs.type = type;
-
-			if (type == 'panel-related') {
-				type = 'panel-' + (field.type || (attrs.widgetAttrs||{}).type);
+			if (attrs.type == 'panel-related') {
+				type = 'panel-' + (field.type || attrs.serverType || type);
 				if (attrs.items && attrs.items.length) {
 					attrs.views = [{
 						type: 'grid',
@@ -825,6 +825,9 @@ ui.formBuild = function (scope, schema, fields) {
 			if (attrs.editor && attrs.target) {
 				type = 'inline-' + type;
 			}
+
+			attrs.serverType = field.serverType || attrs.serverType || attrs.type;
+			attrs.type = type;
 
 			item.attr('ui-' + type, '');
 			item.attr('id', widgetId);
