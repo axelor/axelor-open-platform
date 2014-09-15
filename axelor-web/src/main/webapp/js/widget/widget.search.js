@@ -176,6 +176,7 @@ ui.directive('uiFilterInput', function() {
 
 			var picker = null;
 			var pattern = /^(\d{2}\/\d{2}\/\d{4})$/;
+			var isopattern = /^(\d{4}-\d{2}-\d{2}T.*)$/;
 
 			var options = {
 				dateFormat: 'dd/mm/yy',
@@ -201,12 +202,15 @@ ui.directive('uiFilterInput', function() {
 			});
 
 			model.$parsers.push(function(value) {
-				if (/^date/.test(scope.filter.type) && !_.isDate(value)) {
-					if (pattern.test(value)) {
-						value = moment(value, 'DD/MM/YYYY').toDate();
-					} else {
-						value = null;
+				if (/^date/.test(scope.filter.type)) {
+					if (isopattern.test(value)) {
+						return value;
+					} else if (pattern.test(value)) {
+						var isValue2 = _.str.endsWith(attrs.ngModel, 'value2');
+						return isValue2 ? moment(value, 'DD/MM/YYYY').endOf('day').toDate() :
+										  moment(value, 'DD/MM/YYYY').startOf('day').toDate();
 					}
+					return null;
 				}
 				return value;
 			});
