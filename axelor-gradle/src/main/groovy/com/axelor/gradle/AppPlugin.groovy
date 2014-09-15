@@ -21,7 +21,9 @@ import java.util.regex.Pattern
 
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.JavaExec
+import org.gradle.internal.os.OperatingSystem
 
 import com.axelor.gradle.tasks.GenerateCode
 
@@ -99,6 +101,22 @@ class AppPlugin extends AbstractPlugin {
 				into("webapp") {
 					from "src/main/webapp"
 				}
+			}
+
+			task("npm", type: Exec, dependsOn: 'copyWebapp') {
+				workingDir "${buildDir}/webapp"
+				commandLine = ["npm", "install"]
+				inputs.file "package.json"
+				outputs.dir "node_modules"
+			}
+
+			task("grunt", type: Exec, dependsOn: 'npm') {
+				def command = "grunt"
+				if (OperatingSystem.current().isWindows()) {
+					command = "grunt.cmd"
+				}
+				workingDir "${buildDir}/webapp"
+				commandLine = [command]
 			}
 
 			task("init", dependsOn: "classes", type: JavaExec) {
