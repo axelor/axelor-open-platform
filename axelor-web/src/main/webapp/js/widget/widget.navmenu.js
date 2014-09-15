@@ -250,7 +250,7 @@ module.directive('navMenuItem', ['$compile', function($compile) {
 
 			scope.onClick = function(e, item) {
 				ctrl.onItemClick(item);
-				$(e.srcElement).parents('.dropdown').dropdown('toggle');
+				$(e.target).parents('.dropdown').dropdown('toggle');
 			};
 
 			scope.cssClass = function() {
