@@ -93,10 +93,17 @@
 
 			var icon = "img/tree-document.png";
 			if (item.isFolder) {
-				$('<i class="fa fa-caret-right"></i>').appendTo(el);
+				$('<i class="fa fa-caret-right handle"></i>').appendTo(el);
 				icon = "img/tree-folder.png";
 			}
-			$('<img>').attr('src', item.icon || icon).appendTo(el);
+			if (item.icon) {
+				icon = item.icon;
+			}
+			if (icon.indexOf('fa-') === 0) {
+				$('<i class="icon fa">').addClass(icon).appendTo(el);
+			} else {
+				$('<img>').attr('src', item.icon || icon).appendTo(el);
+			}
 			el.append(item.title);
 
 			li.attr('data-id', item[this.opts.idField]);
@@ -160,7 +167,7 @@
 			if (openState && !state.isLoaded) {
 
 				state.isLoading = true;
-				el.find('i').attr('class', 'fa fa-spinner');
+				el.find('i.handle').attr('class', 'fa fa-spinner handle');
 
 				return this.opts.onLazyFetch(record, function success(items) {
 
@@ -168,7 +175,7 @@
 
 					state.isOpen = true;
 					state.isLoaded = true;
-					el.find('i').attr('class', 'fa fa-caret-down');
+					el.find('i.handle').attr('class', 'fa fa-caret-down handle');
 
 					delete state.isLoading;
 
@@ -179,12 +186,12 @@
 			var children = this.$findChildren(id);
 			if (openState) {
 				children.filter('li[data-parent=' + id + ']').show();
-				el.find('i').attr('class', 'fa fa-caret-down');
+				el.find('i.handle').attr('class', 'fa fa-caret-down handle');
 			} else {
 				children.hide().each(function(){
 					self.toggleItem(this, false);
 				});
-				children.add(el).find('i').attr('class', 'fa fa-caret-right');
+				children.add(el).find('i.handle').attr('class', 'fa fa-caret-right handle');
 			}
 			state.isOpen = openState;
 

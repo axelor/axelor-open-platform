@@ -128,6 +128,13 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 	color: #fff;
 }
 
+header .nav-menu-bar i.large {
+	font-size: 20px;
+}
+header .nav-menu-bar .notext > a {
+	padding: 10px 8px 9px;
+}
+
 .fill-parent {
 	position: absolute;
 	top: 0;
