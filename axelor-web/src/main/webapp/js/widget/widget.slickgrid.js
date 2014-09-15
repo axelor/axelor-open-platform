@@ -455,7 +455,7 @@ Grid.prototype.parse = function(view) {
 		var field = handler.fields[item.name] || {},
 			path = handler.formPath, type;
 
-		type = field.type || item.type || 'string';
+		type = field.type || item.serverType || item.type || 'string';
 
 		field = _.extend({}, field, item, {type: type});
 		scope.fields_view[item.name] = field;
