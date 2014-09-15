@@ -447,7 +447,7 @@ input[readonly], select[readonly], textarea[readonly] {
 }
 
 .view-pane > .view-container,
-.view-pane > .view-container > div {
+.view-pane > .view-container > div:not(.slick-editor-dropdown) {
 	position: absolute;
 	top: 0px; left: 0px; right: 0px; bottom: 0px;
 }
