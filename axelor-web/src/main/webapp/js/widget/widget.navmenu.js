@@ -195,7 +195,7 @@ module.directive('navMenuBar', function() {
 
 		template:
 			"<ul class='nav nav-menu-bar'>" +
-				"<li class='nav-menu dropdown' ng-class='{notext: !hasText(menu)}' ng-repeat='menu in menus'>" +
+				"<li class='nav-menu dropdown' ng-class='{empty: !hasText(menu)}' ng-repeat='menu in menus'>" +
 					"<a href='' class='dropdown-toggle' data-toggle='dropdown'>" +
 						"<img ng-if='hasImage(menu.icon)' ng-src='{{menu.icon}}'> " +
 						"<i ng-if='hasIcon(menu)' class='fa {{menu.icon}}'></i> " +
