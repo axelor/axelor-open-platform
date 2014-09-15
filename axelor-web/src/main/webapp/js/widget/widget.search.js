@@ -175,6 +175,7 @@ ui.directive('uiFilterInput', function() {
 		link: function(scope, element, attrs, model) {
 
 			var picker = null;
+			var pattern = /^(\d{2}\/\d{2}\/\d{4})$/;
 
 			var options = {
 				dateFormat: 'dd/mm/yy',
@@ -195,6 +196,17 @@ ui.directive('uiFilterInput', function() {
 			model.$formatters.push(function(value) {
 				if (_.isDate(value)) {
 					value = moment(value).format('DD/MM/YYYY');
+				}
+				return value;
+			});
+
+			model.$parsers.push(function(value) {
+				if (/^date/.test(scope.filter.type) && !_.isDate(value)) {
+					if (pattern.test(value)) {
+						value = moment(value, 'DD/MM/YYYY').toDate();
+					} else {
+						value = null;
+					}
 				}
 				return value;
 			});
