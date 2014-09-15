@@ -33,6 +33,9 @@ public class PanelRelated extends AbstractPanel {
 	@XmlAttribute(name = "field")
 	private String name;
 
+	@XmlAttribute(name = "type")
+	private String serverType;
+
 	@XmlAttribute(name = "form-view")
 	private String formView;
 	
@@ -81,6 +84,14 @@ public class PanelRelated extends AbstractPanel {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getServerType() {
+		return serverType;
+	}
+
+	public void setServerType(String serverType) {
+		this.serverType = serverType;
 	}
 
 	public String getFormView() {
