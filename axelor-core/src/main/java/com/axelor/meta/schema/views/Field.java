@@ -67,6 +67,12 @@ public class Field extends SimpleWidget {
 	private String onSelect;
 
 	@XmlAttribute
+	private String target;
+
+	@XmlAttribute(name = "target-name")
+	private String targetName;
+
+	@XmlAttribute
 	private String domain;
 
 	@XmlAttribute
@@ -234,6 +240,17 @@ public class Field extends SimpleWidget {
 
 	public void setDomain(String domain) {
 		this.domain = domain;
+	}
+
+	public String getTarget() {
+		if (target == null) {
+			return getTargetModel();
+		}
+		return target;
+	}
+
+	public String getTargetName() {
+		return targetName;
 	}
 
 	public Boolean getRequired() {
@@ -468,7 +485,7 @@ public class Field extends SimpleWidget {
 		this.summaryView = summaryView;
 	}
 
-	public String getTarget() {
+	private String getTargetModel() {
 		Mapper mapper = null;
 		try {
 			mapper = Mapper.of(Class.forName(this.getModel()));
