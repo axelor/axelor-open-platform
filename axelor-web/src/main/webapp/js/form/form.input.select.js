@@ -715,7 +715,7 @@ ui.formInput('NavSelect', {
 				return;
 			}
 			var parentWidth = element.width() - menuWidth;
-			if (parentWidth === lastWidth || parentWidth <= 0) {
+			if (parentWidth === lastWidth) {
 				return;
 			}
 			lastWidth = parentWidth;
