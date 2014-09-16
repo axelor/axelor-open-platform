@@ -774,6 +774,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			}
 			scope.items = [{}];
 			unwatch = scope.$watch('items[0]', function (item, old) {
+				if (!item) return;
 				if (item.$changed) {
 					unwatch();
 					model.$setViewValue(scope.items);

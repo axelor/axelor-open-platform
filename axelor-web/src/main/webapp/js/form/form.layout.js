@@ -371,6 +371,12 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 					scope.setValidity('valid', valid);
 				}
 			});
+
+			scope.$on('$destroy', function () {
+				if (scope.setValidity) {
+					scope.setValidity('valid', true);
+				}
+			});
 		}
 	};
 }]);
