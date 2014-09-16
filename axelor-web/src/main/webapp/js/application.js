@@ -110,6 +110,7 @@ load([
 	'js/widget/widget.menubar.js',
 
 	'js/form/form.base.js',
+	'js/form/form.converters.js',
 	'js/form/form.actions.js',
 	'js/form/form.widget.js',
 	'js/form/form.layout.js',

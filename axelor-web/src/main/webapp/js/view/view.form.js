@@ -749,6 +749,16 @@ function FormViewCtrl($scope, $element) {
 		
 		return false;
 	};
+	
+	$scope.$text = function (name) {
+		var field = $scope.fields[name] || {},
+			format = ui.formatters[field.type],
+			record = $scope.record || {};
+		if (format) {
+			return format(field, record[name]);
+		}
+		return record[name];
+	};
 };
 
 ui.formBuild = function (scope, schema, fields) {
