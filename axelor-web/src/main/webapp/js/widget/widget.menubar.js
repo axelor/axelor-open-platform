@@ -152,7 +152,7 @@ module.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, 
 			}
 
 			scope.onClick = function(e) {
-				$(e.srcElement).parents('.dropdown').dropdown('toggle');
+				element.parents('.dropdown').dropdown('toggle');
 				if (scope.isSubMenu) return;
 				if (item.action) {
 					return handler.onClick();
