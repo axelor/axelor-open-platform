@@ -226,6 +226,7 @@ ui.formInput('ManyToOne', 'Select', {
 	link_editable: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);
 		var input = this.findInput(element);
+		var field = scope.field;
 
 		function create(term, popup) {
 			scope.createOnTheFly(term, popup, function (record) {
@@ -249,7 +250,7 @@ ui.formInput('ManyToOne', 'Select', {
 					});
 				}
 				
-				if (term && scope.canNew()) {
+				if (field.create && term && scope.canNew()) {
 					items.push({
 						label : _t('Create "{0}" and select...', '<b>' + term + '</b>'),
 						click : function() { create(term); }
@@ -260,7 +261,7 @@ ui.formInput('ManyToOne', 'Select', {
 					});
 				}
 				
-				if (!term && scope.canNew()) {
+				if (field.create && !term && scope.canNew()) {
 					items.push({
 						label: _t("Create..."),
 						click: function() { scope.showPopupEditor(); }
