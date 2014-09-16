@@ -33,10 +33,10 @@
         		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
 		    </page>
 		    <page title="BPMN" onSelect="wkf-import-display">
-           		<field name="bpmn" colSpan="4" showTitle="false" widget="CodeEditor" x-syntax="xml"/>
+           		<field name="bpmn" colSpan="4" showTitle="false" widget="CodeEditor" x-code-syntax="xml"/>
 		    </page>
 		    <page title="XML" onSelect="wkf-import-hidden">
-           		<field name="xmlData" colSpan="4" showTitle="false" widget="CodeEditor" x-syntax="xml"/>
+           		<field name="xmlData" colSpan="4" showTitle="false" widget="CodeEditor" x-code-syntax="xml"/>
 		    </page>
         </notebook>
     </form>
