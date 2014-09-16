@@ -42,10 +42,12 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
+import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.QueryBinder;
+import com.axelor.db.Repository;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -107,18 +109,23 @@ public class Resource<T extends Model> {
 
 	public Response fields() {
 
-		Response response = new Response();
-		Map<String, Object> meta = Maps.newHashMap();
+		final Response response = new Response();
+		final Repository<?> repository = JpaRepository.of(model);
 
-		List<Object> fields = Lists.newArrayList();
-		for (Property p : JPA.fields(model)) {
-			fields.add(p.toMap());
+		final Map<String, Object> meta = Maps.newHashMap();
+		final List<Object> fields = Lists.newArrayList();
+
+		if (repository == null) {
+			for (Property p : JPA.fields(model)) {
+				fields.add(p.toMap());
+			}
+		} else {
+			for (Property p : repository.fields()) {
+				fields.add(p.toMap());
+			}
 		}
 
 		meta.put("model", model.getName());
-		//TODO: meta.put("title", "");
-		//TODO: meta.put("description", "");
-		//TODO: meta.put("defaults", null);
 		meta.put("fields", fields);
 
 		response.setData(meta);
@@ -531,9 +538,11 @@ public class Resource<T extends Model> {
 	}
 
 	@Transactional
+	@SuppressWarnings("all")
 	public Response save(final Request request) {
 
-		Response response = new Response();
+		final Response response = new Response();
+		final Repository repository = JpaRepository.of(model);
 
 		List<Object> records = request.getRecords();
 		List<Object> data = Lists.newArrayList();
@@ -545,18 +554,15 @@ public class Resource<T extends Model> {
 
 		for(Object record : records) {
 
-			@SuppressWarnings("all")
 			Long id = findId((Map) record);
 
 			if (id == null || id <= 0L) {
 				security.get().check(JpaSecurity.CAN_CREATE, model);
 			}
 
-			@SuppressWarnings("all")
 			Map<String, Object> orig = (Map) ((Map) record).get("_original");
 			JPA.verify(model, orig);
 
-			@SuppressWarnings("all")
 			Model bean = JPA.edit(model, (Map) record);
 			id = bean.getId();
 
@@ -565,6 +571,10 @@ public class Resource<T extends Model> {
 			}
 
 			bean = JPA.manage(bean);
+			if (repository != null) {
+				bean = repository.save(bean);
+			}
+
 			data.add(bean);
 			
 			// if it's a translation object, invalidate cache
@@ -605,10 +615,12 @@ public class Resource<T extends Model> {
 	}
 
 	@Transactional
+	@SuppressWarnings("all")
 	public Response remove(long id, Request request) {
 
 		security.get().check(JpaSecurity.CAN_REMOVE, model, id);
 		final Response response = new Response();
+		final Repository repository = JpaRepository.of(model);
 		final Map<String, Object> data = Maps.newHashMap();
 
 		data.put("id", id);
@@ -616,7 +628,11 @@ public class Resource<T extends Model> {
 
 		Model bean = JPA.edit(model, data);
 		if (bean.getId() != null) {
-			JPA.remove(bean);
+			if (repository == null) {
+				JPA.remove(bean);
+			} else {
+				repository.remove(bean);
+			}
 		}
 
 		response.setData(ImmutableList.of(toMapCompact(bean)));
@@ -630,6 +646,7 @@ public class Resource<T extends Model> {
 	public Response remove(Request request) {
 
 		final Response response = new Response();
+		final Repository repository = JpaRepository.of(model);
 		final List<Object> records = request.getRecords();
 
 		if (records == null || records.isEmpty()) {
@@ -656,7 +673,11 @@ public class Resource<T extends Model> {
 
 		for(Model entity : entities) {
 			if (JPA.em().contains(entity)) {
-				JPA.remove(entity);
+				if (repository == null) {
+					JPA.remove(entity);
+				} else {
+					repository.remove(entity);
+				}
 			}
 		}
 
@@ -666,12 +687,19 @@ public class Resource<T extends Model> {
 		return response;
 	}
 
+	@SuppressWarnings("all")
 	public Response copy(long id) {
 		security.get().check(JpaSecurity.CAN_CREATE, model, id);
-		Response response = new Response();
-		Model bean = JPA.find(model, id);
+		final Response response = new Response();
+		final Repository repository = JpaRepository.of(model);
 
-		bean = JPA.copy(bean, true);
+		Model bean = JPA.find(model, id);
+		if (repository == null) {
+			bean = JPA.copy(bean, true);
+		} else {
+			bean = repository.copy(bean, true);
+		}
+
 		response.setData(ImmutableList.of(bean));
 		response.setStatus(Response.STATUS_SUCCESS);
 
