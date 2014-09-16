@@ -110,12 +110,14 @@
 	margin-bottom: 6px;
 }
 
+.panel .row-fluid:last-child > .form-item-hidden,
 .panel .row-fluid:last-child > .form-item {
 	margin-bottom: 0;
 }
 .panel[x-stacked] .row-fluid:last-child > .form-item {
 	margin-bottom: 6px;
 }
+.panel[x-stacked] .row-fluid:last-child > .form-item-hidden,
 .panel[x-stacked] .row-fluid:last-child > .form-item:last-child {
 	margin-bottom: 0;
 }

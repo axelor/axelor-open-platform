@@ -167,25 +167,28 @@ ui.formCompile = function(element, attrs, linkerFn) {
 
 		function hideWidget(hidden) {
 			var elem = element,
-				parent = elem.parent('td'),
+				parent = elem.parent('td,.form-item'),
 				label = elem.data('label') || $(),
-				label_parent = label.parent('td');
+				label_parent = label.parent('td,.form-item'),
+				isTable = parent.is('td');
 
 			// label scope should use same isHidden method (#1514)
 			var lScope = label.data('$scope');
 			if (lScope && lScope.isHidden !== scope.isHidden) {
 				lScope.isHidden = scope.isHidden;
 			}
-
-			if (parent.size() == 0)
-				parent = elem;
-			if (label_parent.size())
-				label = label_parent;
 			
+			elem = isTable && parent.size() ? parent : elem;
+			label = isTable && label_parent.size() ? label_parent : label;
+
+			if (!isTable) {
+				parent.toggleClass("form-item-hidden", hidden);
+			}
+
 			if (hidden) {
-				parent.add(label).hide();
+				elem.add(label).hide();
 			} else {
-				parent.add(label).show();
+				elem.add(label).show();
 			}
 
 			return axelor.$adjustSize();
