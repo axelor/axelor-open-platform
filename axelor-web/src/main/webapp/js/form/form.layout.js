@@ -184,7 +184,7 @@ ui.directive('uiTableLayout', ['$compile', function($compile) {
 function PanelLayout(items, attrs, $scope, $compile) {
 	
 	var numCols = 12,
-		numSpan = +(attrs.itemspan) || 6,
+		numSpan = +(attrs.itemSpan) || 6,
 		curCol = 0,
 		layout = [$('<div class="row-fluid">')];
 	
