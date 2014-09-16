@@ -786,11 +786,24 @@ table.field-details .help-text hr {
 }
 .nav-select li.dropdown a.nav-label {
 	padding-right: 6px;
+	display: inline-block;
+	padding: 0;
+	height: 32px;
 }
 
-.nav-select li.dropdown a.nav-label:empty {
-	height: 32px;
-	padding: 0 20px 0 0;
+.nav-select li.dropdown a.nav-label > span {
+	display: inline-block;
+	float: left;
+	max-width: 96px;
+	margin-left: 24px;
+	margin-right: 6px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.nav-select li.dropdown a.nav-label > span:empty {
+	margin-right: 0;
 }
 
 .nav-select li.dropdown a.nav-label:after {

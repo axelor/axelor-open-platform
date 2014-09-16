@@ -764,7 +764,7 @@ ui.formInput('NavSelect', {
 				"<a href='' class='nav-label' ng-click='onSelect(select)' ng-bind-html-unsafe='select.title'></a>" +
 			"</li>" +
 			"<li class='nav-step dropdown' ng-class='{ active: isSelected(more) }'>" +
-				"<a href='' class='nav-label dropdown-toggle' ng-click='onMenuClick($event)' ng-bind-html-unsafe='more.title'></a>" +
+				"<a href='' class='nav-label dropdown-toggle' ng-click='onMenuClick($event)'><span ng-bind-html-unsafe='more.title'></span></a>" +
 				"<ul class='dropdown-menu pull-right' data-toggle='dropdown'>" +
 					"<li ng-repeat='select in getSelection()' ng-class='{active: getValue() == select.value}'>" +
 						"<a tabindex='-1' href='' ng-click='onSelect(select)' ng-bind-html-unsafe='select.title'></a>" +
