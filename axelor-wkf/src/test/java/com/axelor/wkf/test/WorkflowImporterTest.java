@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.axelor.db.JPA;
+import com.axelor.db.Query;
 import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.service.MetaModelService;
 import com.axelor.test.GuiceModules;
@@ -54,7 +55,7 @@ public class WorkflowImporterTest {
 				
 				Workflow workflow = new Workflow();
 				workflow.setName("Test");
-				workflow.setMetaModel( MetaModel.filter("self.fullName = ?1", "com.axelor.wkf.db.Workflow").fetchOne() );
+				workflow.setMetaModel(Query.of(MetaModel.class).filter("self.fullName = ?1", "com.axelor.wkf.db.Workflow").fetchOne() );
 				workflow.save();
 			}
 
