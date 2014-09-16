@@ -19,18 +19,22 @@ package com.axelor.wkf.data;
 
 import java.util.ArrayList;
 
+import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaAction;
+import com.axelor.meta.db.repo.MetaActionRepository;
 import com.axelor.meta.service.MetaModelService;
 import com.axelor.wkf.db.Node;
 import com.axelor.wkf.db.Transition;
 import com.axelor.wkf.db.Workflow;
 import com.axelor.wkf.db.node.EndEvent;
-import com.axelor.wkf.db.node.StartEvent;
 import com.axelor.wkf.db.node.NodeTask;
+import com.axelor.wkf.db.node.StartEvent;
 
 public class CreateData {
 
 	public static Workflow createWorkflow() {
+
+		final MetaActionRepository actions = Beans.get(MetaActionRepository.class);
 		
 		Transition startTransition = new Transition();
 		startTransition.setName("startTransition");
@@ -48,25 +52,25 @@ public class CreateData {
 		metaAction1.setName("action-test-1");
 		metaAction1.setXml("<action-record name=\"action-test-1\" model=\"com.axelor.wkf.db.Workflow\"><field name=\"archived\" expr=\"eval: true\"/></action-record>");
 		metaAction1.setType("action-record");
-		metaAction1.save();
+		actions.save(metaAction1);
 		
 		MetaAction metaAction2 = new MetaAction();
 		metaAction2.setName("action-test-2");
 		metaAction2.setXml("<action-record name=\"action-test-2\" model=\"com.axelor.wkf.db.Workflow\"><field name=\"active\" expr=\"eval: !archived\"/></action-record>");
 		metaAction2.setType("action-record");
-		metaAction2.save();
+		actions.save(metaAction2);
 		
 		MetaAction metaAction3 = new MetaAction();
 		metaAction3.setName("action-test-3");
 		metaAction3.setXml("<action-attrs name=\"action-test-3\" ><attribute name=\"hidden\" for=\"archived\" expr=\"eval: true\"/></action-attrs>");
 		metaAction3.setType("action-attrs");
-		metaAction3.save();
+		actions.save(metaAction3);
 		
 		MetaAction metaAction4 = new MetaAction();
 		metaAction4.setName("action-test-4");
 		metaAction4.setXml("<action-attrs name=\"action-test-4\" ><attribute name=\"readonly\" for=\"archived\" expr=\"eval: true\"/></action-attrs>");
 		metaAction4.setType("action-attrs");
-		metaAction4.save();
+		actions.save(metaAction4);
 
 		MetaAction metaAction5 = new MetaAction();
 		metaAction5.setName("action-test-5");
@@ -82,7 +86,7 @@ public class CreateData {
 		metaCondition.setName("action-condition");
 		metaCondition.setXml("<action-condition name=\"action-condition\" ><check field=\"archived\" if=\"archived\" error=\"This is an error !\"/></action-condition>");
 		metaCondition.setType("action-condition");
-		metaCondition.save();
+		actions.save(metaCondition);
 		
 		Node start = new StartEvent();
 		start.setName("Start");
@@ -129,6 +133,4 @@ public class CreateData {
 		
 		return workflow.save();
 	}
-	
-
 }
