@@ -190,8 +190,7 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	font-size: 12px;
-	line-height: 1em;
-	margin-bottom: 2px;
+	margin-bottom: 0;
 }
 
 .panel-related .panel-header {
