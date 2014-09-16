@@ -37,12 +37,9 @@ import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
-import com.axelor.db.Query;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
-import com.axelor.i18n.I18n;
-import com.axelor.meta.db.MetaSelect;
-import com.axelor.meta.db.MetaSelectItem;
+import com.axelor.meta.MetaStore;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.AbstractWidget;
 import com.axelor.meta.schema.views.Field;
@@ -315,30 +312,11 @@ public class ViewService extends AbstractService {
 		return property;
 	}
 
-	private List<Object> findSelection(Property property) {
+	private List<?> findSelection(Property property) {
 		if (property.getSelection() == null) {
 			return null;
 		}
-		final List<Object> all = Lists.newArrayList();
-		final MetaSelect select = MetaSelect.findByName(property.getSelection());
-		if (select == null || select.getItems() == null) {
-			return all;
-		}
-		List<MetaSelectItem> items = Query.of(MetaSelectItem.class).filter("self.select.id = ?", select.getId()).order("order").fetch();
-		if (items == null || items.isEmpty()) {
-			return null;
-		}
-		for(MetaSelectItem item : items) {
-			Map<String, Object> current = Maps.newHashMap();
-			String data = item.getData();
-			current.put("value", item.getValue());
-			current.put("title", I18n.get(item.getTitle()));
-			if (data != null) {
-				current.put("data", data);
-			}
-			all.add(current);
-		}
-		return all;
+		return MetaStore.getSelectionList(property.getSelection());
 	}
 
 	@GET

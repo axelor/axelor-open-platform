@@ -52,6 +52,7 @@ import com.axelor.app.AppSettings;
 import com.axelor.common.FileUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.db.Query;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
@@ -165,8 +166,8 @@ public class RestService extends ResourceService {
 			@PathParam("id") long id, Request request) {
 
 		Response response = getResource().fetch(id, request);
-		long attachments = MetaAttachment
-				.all().filter("self.objectId = ?1 AND self.objectName = ?2", id, getModel())
+		long attachments = Query.of(MetaAttachment.class)
+				.filter("self.objectId = ?1 AND self.objectName = ?2", id, getModel())
 				.cacheable().count();
 
 		if(response.getItem(0) != null) {
