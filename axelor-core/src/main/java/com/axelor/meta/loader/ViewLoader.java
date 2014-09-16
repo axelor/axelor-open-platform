@@ -35,6 +35,7 @@ import javax.xml.namespace.QName;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.common.FileUtils;
+import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
@@ -59,15 +60,16 @@ import com.axelor.meta.schema.views.Field;
 import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.MenuItem;
+import com.axelor.meta.schema.views.Panel;
+import com.axelor.meta.schema.views.PanelField;
+import com.axelor.meta.schema.views.PanelRelated;
 import com.axelor.meta.schema.views.Selection;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.CaseFormat;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -475,7 +477,7 @@ public class ViewLoader extends AbstractLoader {
 			if (klass == null) continue;
 			if (views.all().filter("self.model = ?1", klass.getName()).count() == 0) {
 				File out = FileUtils.getFile(outputDir, "views", klass.getSimpleName() + ".xml");
-				String xml = createDefaultViews(module, klass);
+				String xml = createDefaults(module, klass);
 				try {
 					log.debug("Creating default views: {}", out);
 					Files.createParentDirs(out);
@@ -487,56 +489,87 @@ public class ViewLoader extends AbstractLoader {
 		}
 	}
 
-	@SuppressWarnings("all")
-	private String createDefaultViews(Module module, final Class<?> klass) {
+	private String createDefaults(Module module, final Class<?> klass) {
+		List<AbstractView> views = createDefaults(klass);
+		for (AbstractView view : views) {
+			importView(view, module, false, 10);
+		}
+		return XMLViews.toXml(views, false);
+	}
 
+	List<AbstractView> createDefaults(final Class<?> klass) {
+
+		final List<AbstractView> all = new ArrayList<>();
 		final FormView formView = new FormView();
 		final GridView gridView = new GridView();
 
-		String name = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, klass.getSimpleName());
-		String title = klass.getSimpleName();
+		final Inflector inflector = Inflector.getInstance();
 
-		formView.setName(name + "-form");
-		gridView.setName(name + "-grid");
+		String viewName = inflector.underscore(klass.getSimpleName());
+		String viewTitle = klass.getSimpleName();
+
+		viewName = inflector.dasherize(viewName);
+		viewTitle = inflector.humanize(viewTitle);
+
+		formView.setName(viewName + "-form");
+		gridView.setName(viewName + "-grid");
 
 		formView.setModel(klass.getName());
 		gridView.setModel(klass.getName());
 
-		formView.setTitle(title);
-		gridView.setTitle(title);
+		formView.setTitle(viewTitle);
+		gridView.setTitle(inflector.pluralize(viewTitle));
 
-		List<AbstractWidget> formItems = Lists.newArrayList();
-		List<AbstractWidget> gridItems = Lists.newArrayList();
+		List<AbstractWidget> formItems = new ArrayList<>();
+		List<AbstractWidget> gridItems = new ArrayList<>();
+		List<AbstractWidget> related = new ArrayList<>();
 
 		Mapper mapper = Mapper.of(klass);
 		List<String> fields = Lists.reverse(fieldNames(klass));
 
 		for(String n : fields) {
-
 			Property p = mapper.getProperty(n);
-
-			if (p == null || p.isPrimary() || p.isVersion())
+			if (p == null || p.isPrimary() || p.isVersion()) {
 				continue;
-
-			Field field = new Field();
-			field.setName(p.getName());
-
-			if (p.isCollection()) {
-				field.setColSpan(4);
-				field.setShowTitle(false);
-			} else {
-				gridItems.add(field);
 			}
-			formItems.add(field);
+			if (p.isCollection()) {
+				if (p.getTargetName() == null) {
+					continue;
+				}
+				PanelRelated panel = new PanelRelated();
+				List<AbstractWidget> items = new ArrayList<>();
+				Field item = new PanelField();
+				item.setName(p.getTargetName());
+				items.add(item);
+				panel.setName(p.getName());
+				panel.setTarget(p.getTarget().getName());
+				panel.setItems(items);
+				related.add(panel);
+			} else {
+				Field formItem = new PanelField();
+				Field gridItem = new Field();
+				formItem.setName(p.getName());
+				gridItem.setName(p.getName());
+				formItems.add(formItem);
+				gridItems.add(gridItem);
+			}
 		}
+
+		Panel overview = new Panel();
+		overview.setTitle("Overview");
+		overview.setItems(formItems);
+
+		formItems = new ArrayList<>();
+		formItems.add(overview);
+		formItems.addAll(related);
 
 		formView.setItems(formItems);
 		gridView.setItems(gridItems);
 		
-		importView(formView, module, false, 10);
-		importView(gridView, module, false, 10);
+		all.add(gridView);
+		all.add(formView);
 
-		return XMLViews.toXml(ImmutableList.of(gridView, formView), false);
+		return all;
 	}
 
 	// Fields names are not in ordered but some JVM implementation can.
