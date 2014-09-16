@@ -116,6 +116,15 @@ public class Field extends SimpleWidget {
 	@XmlAttribute(name = "summary-view")
 	private String summaryView;
 
+	@XmlAttribute(name = "x-bind")
+	private String bind;
+
+	@XmlAttribute(name = "x-related")
+	private String related;
+
+	@XmlAttribute(name = "x-create")
+	private String create;
+
 	@XmlAttribute(name = "x-icon")
 	private String icon;
 
@@ -299,6 +308,18 @@ public class Field extends SimpleWidget {
 
 	public void setAggregate(String aggregate) {
 		this.aggregate = aggregate;
+	}
+
+	public String getBind() {
+		return bind;
+	}
+
+	public String getRelated() {
+		return related;
+	}
+
+	public String getCreate() {
+		return create;
 	}
 
 	public String getIcon() {

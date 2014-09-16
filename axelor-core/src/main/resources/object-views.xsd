@@ -479,6 +479,24 @@
   </xsd:complexType>
 
   <xsd:attributeGroup name="ExtraAttributes">
+    <xsd:attribute name="x-bind" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify an angular.js expression to bind to the field.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-related" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify the name of the related field (for RefSelect widget).</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-create" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify the names of required fields to be used for
+        quick record creation from select widget.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="x-icon" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>Specify an icon.</xsd:documentation>
@@ -753,6 +771,11 @@
             <xsd:documentation>Specify whether to show this panel in sidebar.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="stacked" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether the stack panel items.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="rowSpan" use="prohibited"/>
         <xsd:attribute name="width" use="prohibited"/>
       </xsd:extension>
@@ -863,6 +886,11 @@
           <xsd:element name="spacer" type="tns:Spacer" />
           <xsd:element name="label" type="tns:Label" />
         </xsd:choice>
+        <xsd:attribute name="layout" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Specify alternative layout (e.g. table)</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

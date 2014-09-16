@@ -35,6 +35,9 @@ public abstract class AbstractPanel extends AbstractContainer {
 	@XmlAttribute
 	private Boolean sidebar;
 
+	@XmlAttribute
+	private Boolean stacked;
+
 	public Integer getItemSpan() {
 		return itemSpan;
 	}
@@ -45,6 +48,10 @@ public abstract class AbstractPanel extends AbstractContainer {
 
 	public Boolean getSidebar() {
 		return sidebar;
+	}
+
+	public Boolean getStacked() {
+		return stacked;
 	}
 
 	protected List<AbstractWidget> process(List<AbstractWidget> items) {

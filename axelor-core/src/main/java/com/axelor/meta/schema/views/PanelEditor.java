@@ -20,6 +20,7 @@ package com.axelor.meta.schema.views;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
@@ -35,12 +36,19 @@ public class PanelEditor extends AbstractPanel {
 
 	transient PanelField forField;
 
+	@XmlAttribute
+	private String layout;
+
 	@XmlElements({
 		@XmlElement(name = "field", type = PanelField.class),
 		@XmlElement(name = "spacer", type = Spacer.class),
 		@XmlElement(name = "label", type = Label.class),
 	})
 	private List<AbstractWidget> items;
+
+	public String getLayout() {
+		return layout;
+	}
 
 	public List<AbstractWidget> getItems() {
 		return process(items);
