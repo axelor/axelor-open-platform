@@ -720,6 +720,7 @@ ui.formInput('NavSelect', {
 			}
 			lastWidth = parentWidth;
 
+			elemNavs.parent().css('visibility', 'hidden');
 			elemNavs.hide();
 			elemMenu.hide();
 			elemMenuItems.hide().data('visible', null);
@@ -748,6 +749,7 @@ ui.formInput('NavSelect', {
 				$(elemMenuItems[count++]).show().data('visible', true);
 			}
 			setMenuTitle();
+			elemNavs.parent().css('visibility', '');
 		}
 
 		element.on('adjustSize', adjust);
@@ -757,7 +759,7 @@ ui.formInput('NavSelect', {
 	template_readonly: null,
 	template:
 		"<div class='nav-select'>" +
-		"<ul class='nav-steps'>" +
+		"<ul class='nav-steps' style='display: inline-flex; visibility: hidden;'>" +
 			"<li class='nav-step' ng-repeat='select in getSelection()' ng-class='{ active: isSelected(select), last: $last }'>" +
 				"<a href='' class='nav-label' ng-click='onSelect(select)' ng-bind-html-unsafe='select.title'></a>" +
 			"</li>" +

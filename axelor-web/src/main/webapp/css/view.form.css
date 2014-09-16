@@ -758,9 +758,13 @@ table.field-details .help-text hr {
 	display: block;
 	position: relative;
 	line-height: 32px;
-	padding: 0 20px 0 30px;
+	padding: 0 14px 0 24px;
 
 	background: #e2e2e2;
+}
+
+.nav-select li.nav-step:first-child a.nav-label {
+	padding-left: 18px;
 }
 
 .nav-select a.nav-label:after {
