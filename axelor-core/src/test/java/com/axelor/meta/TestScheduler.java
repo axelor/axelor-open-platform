@@ -31,6 +31,7 @@ import org.quartz.SchedulerException;
 import com.axelor.AbstractTest;
 import com.axelor.JpaTestModule;
 import com.axelor.meta.db.MetaSchedule;
+import com.axelor.meta.db.repo.MetaScheduleRepository;
 import com.axelor.quartz.JobRunner;
 import com.axelor.quartz.SchedulerModule;
 import com.axelor.test.GuiceModules;
@@ -62,13 +63,16 @@ public class TestScheduler extends AbstractTest {
 	
 	@Inject
 	private JobRunner runner;
+	
+	@Inject
+	private MetaScheduleRepository schedules;
 
 	private static int jobCounter = 0;
 	
 	@Before
 	@Transactional
 	public void setUp() {
-		if (MetaSchedule.all().count() > 0) {
+		if (schedules.all().count() > 0) {
 			return;
 		}
 		
@@ -77,7 +81,7 @@ public class TestScheduler extends AbstractTest {
 		meta.setCron("0/1 * * * * ?");
 		meta.setJob(MyJob.class.getName());
 		meta.setActive(true);
-		meta.save();
+		schedules.save(meta);
 	}
 	
 	@Test

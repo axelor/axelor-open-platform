@@ -19,22 +19,28 @@ package com.axelor.meta.service;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.apache.shiro.authz.AuthorizationException;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.db.Query;
 import com.axelor.meta.db.MetaFilter;
+import com.axelor.meta.db.repo.MetaFilterRepository;
 import com.google.common.base.Objects;
 import com.google.inject.persist.Transactional;
 
 public class MetaFilterService {
+	
+	@Inject
+	private MetaFilterRepository filters;
 
 	@Transactional
 	public MetaFilter saveFilter(MetaFilter ctx) {
 		User user = AuthUtils.getUser();
 		String query = "self.name = ?1 AND self.filterView = ?2 AND (self.user.code = ?3 OR self.shared = true)";
-		MetaFilter filter = MetaFilter.filter(query, ctx.getName(), ctx.getFilterView(), user.getCode()).fetchOne();
+		MetaFilter filter = filters.all().filter(query, ctx.getName(), ctx.getFilterView(), user.getCode()).fetchOne();
 		
 		if (filter == null) {
 			filter = new MetaFilter();
@@ -51,20 +57,20 @@ public class MetaFilterService {
 			filter.setShared(ctx.getShared());
 		}
 		
-		return filter.save();
+		return filters.save(filter);
 	}
 	
 	@Transactional
 	public MetaFilter removeFilter(MetaFilter ctx) {
 		User user = AuthUtils.getUser();
 		String query = "self.name = ?1 AND self.filterView = ?2 AND (self.user.code = ?3 OR self.shared = true)";
-		MetaFilter filter = MetaFilter.filter(query, ctx.getName(), ctx.getFilterView(), user.getCode()).fetchOne();
+		MetaFilter filter = filters.all().filter(query, ctx.getName(), ctx.getFilterView(), user.getCode()).fetchOne();
 		
 		if (!Objects.equal(filter.getUser(), user)) {
 			throw new AuthorizationException("You are not allowed to remove this filter");
 		}
 		
-		filter.remove();
+		filters.remove(filter);
 
 		return ctx;
 	}

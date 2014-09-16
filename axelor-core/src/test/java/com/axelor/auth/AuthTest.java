@@ -30,6 +30,7 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
+import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.google.inject.persist.Transactional;
@@ -41,11 +42,14 @@ public class AuthTest extends JpaTest {
 	
 	@Inject
 	private AuthSecurity authSecurity;
+	
+	@Inject
+	private UserRepository users;
 
 	@Before
 	@Transactional
 	public void setUp() {
-		if (User.all().count() == 0) {
+		if (users.all().count() == 0) {
 			createDemoData();
 		}
 	}
@@ -67,21 +71,21 @@ public class AuthTest extends JpaTest {
 		demo.setPassword("demo");
 		guest.setPassword("guest");
 		
-		Group admins = new Group("admins", "Administrators");
-		Group users = new Group("users", "Users");
+		Group adminGroup = new Group("admins", "Administrators");
+		Group userGroup = new Group("users", "Users");
 		
-		admin.setGroup(admins);
-		demo.setGroup(users);
-		guest.setGroup(users);
+		admin.setGroup(adminGroup);
+		demo.setGroup(userGroup);
+		guest.setGroup(userGroup);
 		
 		authService.encrypt(admin);
 		authService.encrypt(demo);
 		authService.encrypt(guest);
-		
-		admin.save();
-		demo.save();
-		guest.save();
-		
+
+		users.save(admin);
+		users.save(demo);
+		users.save(guest);
+
 		Role superUserRole = new Role("super.user");
 		Role normalUserRole = new Role("normal.user");
 		Role guestUserRole = new Role("guest.user");
@@ -127,14 +131,14 @@ public class AuthTest extends JpaTest {
 		normalUserRole.addPermission(grantReadSelf);
 		guestUserRole.addPermission(grantReadSelf);
 
-		admins.addRole(superUserRole);
-		users.addRole(normalUserRole);
+		adminGroup.addRole(superUserRole);
+		userGroup.addRole(normalUserRole);
 		
 		guest.addRole(guestUserRole);
 		
-		admin.save();
-		demo.save();
-		guest.save();
+		users.save(admin);
+		users.save(demo);
+		users.save(guest);
 	}
 	
 	@Test
@@ -178,9 +182,9 @@ public class AuthTest extends JpaTest {
 		Assert.assertFalse(authSecurity.isPermitted(AccessType.READ, Permission.class));
 		
 		// check if can update own user instance
-		Assert.assertTrue(authSecurity.isPermitted(AccessType.WRITE, User.class, User.findByCode("demo").getId()));
+		Assert.assertTrue(authSecurity.isPermitted(AccessType.WRITE, User.class, users.findByCode("demo").getId()));
 		// but not others
-		Assert.assertFalse(authSecurity.isPermitted(AccessType.WRITE, User.class, User.findByCode("admin").getId()));
+		Assert.assertFalse(authSecurity.isPermitted(AccessType.WRITE, User.class, users.findByCode("admin").getId()));
 	}
 	
 	@Test
@@ -200,9 +204,9 @@ public class AuthTest extends JpaTest {
 		// check if has read access to User model
 		Assert.assertTrue(authSecurity.isPermitted(AccessType.READ, User.class));
 		// and can only read self record
-		Assert.assertTrue(authSecurity.isPermitted(AccessType.READ, User.class, User.findByCode("guest").getId()));
+		Assert.assertTrue(authSecurity.isPermitted(AccessType.READ, User.class, users.findByCode("guest").getId()));
 		// and not others
-		Assert.assertFalse(authSecurity.isPermitted(AccessType.READ, User.class, User.findByCode("demo").getId()));
+		Assert.assertFalse(authSecurity.isPermitted(AccessType.READ, User.class, users.findByCode("demo").getId()));
 		
 		// check if no other models are accessible
 		Assert.assertFalse(authSecurity.isPermitted(AccessType.READ, Group.class));
@@ -210,9 +214,9 @@ public class AuthTest extends JpaTest {
 		Assert.assertFalse(authSecurity.isPermitted(AccessType.READ, Permission.class));
 		
 		// check if can update own user instance
-		Assert.assertTrue(authSecurity.isPermitted(AccessType.WRITE, User.class, User.findByCode("guest").getId()));
+		Assert.assertTrue(authSecurity.isPermitted(AccessType.WRITE, User.class, users.findByCode("guest").getId()));
 		// but not others
-		Assert.assertFalse(authSecurity.isPermitted(AccessType.WRITE, User.class, User.findByCode("demo").getId()));
+		Assert.assertFalse(authSecurity.isPermitted(AccessType.WRITE, User.class, users.findByCode("demo").getId()));
 	}
 
 	@Test
@@ -224,7 +228,7 @@ public class AuthTest extends JpaTest {
 	@Transactional
 	public void encryptTest() {
 		
-		User user = User.all().filter("self.code = ?", "demo").fetchOne();
+		User user = users.all().filter("self.code = ?", "demo").fetchOne();
 
 		Assert.assertNotNull(user);
 
@@ -243,7 +247,7 @@ public class AuthTest extends JpaTest {
 
 		authService.encrypt(user2);
 
-		user2.save();
+		users.save(user2);
 
 		Assert.assertNotNull(user2.getCreatedBy());
 

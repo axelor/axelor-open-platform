@@ -39,8 +39,11 @@ import org.xml.sax.SAXException;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
+import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaView;
+import com.axelor.meta.db.repo.MetaActionRepository;
+import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
@@ -198,24 +201,27 @@ public class XMLViews {
 	}
 
 	public static AbstractView findView(String model, String name, String type) {
+
+		final MetaViewRepository views = Beans.get(MetaViewRepository.class);
+
 		MetaView view = null;
 		User user = AuthUtils.getUser();
 		Long group = user != null && user.getGroup() != null ? user.getGroup().getId() : null;
 
 		if (name != null) {
-			view = MetaView.findByName(name, model, group);
+			view = views.findByName(name, model, group);
 			if (view == null) {
-				view = MetaView.findByName(name, model);
+				view = views.findByName(name, model);
 				if (view == null) {
-					view = MetaView.findByName(name);
+					view = views.findByName(name);
 				}
 			}
 		}
 
 		if (view == null) {
-			view = MetaView.findByType(type, model, group);
+			view = views.findByType(type, model, group);
 			if (view == null) {
-				view = MetaView.findByType(type, model);
+				view = views.findByType(type, model);
 			}
 		}
 
@@ -227,7 +233,7 @@ public class XMLViews {
 	}
 
 	public static AbstractView findView(String name, String module) {
-		MetaView view = MetaView.all()
+		MetaView view = Beans.get(MetaViewRepository.class).all()
 				.filter("self.name = :name AND self.module = :module")
 				.bind("name", name)
 				.bind("module", module)
@@ -242,7 +248,7 @@ public class XMLViews {
 	}
 
 	public static Action findAction(String name) {
-		MetaAction action = MetaAction.findByName(name);
+		MetaAction action = Beans.get(MetaActionRepository.class).findByName(name);
 		try {
 			return ((ObjectViews) XMLViews.unmarshal(action.getXml())).getActions().get(0);
 		} catch (Exception e) {

@@ -45,7 +45,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
-import com.axelor.meta.db.MetaSelectItem;
+import com.axelor.meta.MetaStore;
 import com.axelor.script.ScriptBindings;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -193,18 +193,15 @@ public class GroovyTemplates implements Templates {
 			if (value == null) {
 				return "";
 			}
-			Property property = this.getProperty(klass, expr);
-			if (property == null || property.getSelection() == null) {
-				return value == null ? "" : value.toString();
+			final Property property = this.getProperty(klass, expr);
+			final String val = value == null ? "" : value.toString();
+			try {
+				return MetaStore
+						.getSelectionItem(property.getSelection(), val)
+						.getLocalizedTitle();
+			} catch (Exception e) {
 			}
-			MetaSelectItem item = MetaSelectItem
-					.all()
-					.filter("self.select.name = ?1 AND self.value = ?2",
-							property.getSelection(), value).fetchOne();
-			if (item != null) {
-				return item.getTitle();
-			}
-			return value == null ? "" : value.toString();
+			return val;
 		}
 
 		private Property getProperty(Class<?> beanClass, String name) {

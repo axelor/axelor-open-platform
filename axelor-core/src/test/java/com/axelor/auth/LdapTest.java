@@ -36,6 +36,8 @@ import org.junit.runner.RunWith;
 import com.axelor.JpaTestModule;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
+import com.axelor.auth.db.repo.GroupRepository;
+import com.axelor.auth.db.repo.UserRepository;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.persist.Transactional;
@@ -76,11 +78,20 @@ public class LdapTest extends AbstractLdapTestUnit {
 
 		@Inject
 		private AuthLdap authLdap;
+		
+		@Inject
+		private UserRepository users;
+		
+		@Inject
+		private GroupRepository groups;
 
 		public void test() {
 
-			new Group("test", "Test").save();
-			new Group("my", "My").save();
+			Group testGroup = new Group("test", "Test");
+			Group myGroup = new Group("my", "My");
+
+			groups.save(testGroup);
+			groups.save(myGroup);
 
 			ensureUsers(0);
 			loginFailed();
@@ -96,20 +107,20 @@ public class LdapTest extends AbstractLdapTestUnit {
 		}
 
 		void ensureUsers(int count) {
-			Assert.assertEquals(count, User.all().count());
+			Assert.assertEquals(count, users.all().count());
 		}
 
 		void loginFailed() {
 			try {
 				authLdap.login("jsmith", "Secret");
 			} catch (AuthenticationException e) {}
-			User user = User.findByCode("jsmith");
+			User user = users.findByCode("jsmith");
 			Assert.assertNull(user);
 		}
 
 		void loginSuccess() {
 			authLdap.login("jsmith", "secret");
-			User user = User.findByCode("jsmith");
+			User user = users.findByCode("jsmith");
 			Assert.assertNotNull(user);
 			Assert.assertEquals("John Smith", user.getName());
 			Assert.assertNotNull(user.getGroup());

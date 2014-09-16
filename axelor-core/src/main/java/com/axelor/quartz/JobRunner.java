@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppSettings;
 import com.axelor.common.ClassUtils;
+import com.axelor.db.Query;
 import com.axelor.meta.db.MetaSchedule;
 import com.axelor.meta.db.MetaScheduleParam;
 import com.google.common.base.Throwables;
@@ -55,7 +56,7 @@ public class JobRunner {
 	private Scheduler scheduler;
 	
 	private int total;
-
+	
 	@Inject
 	public JobRunner(Scheduler scheduler) {
 		this.scheduler = scheduler;
@@ -71,7 +72,7 @@ public class JobRunner {
 		}
 		total = 0;
 		log.info("Configuring scheduled jobs...");
-		for (MetaSchedule meta : MetaSchedule.all().fetch()) {
+		for (MetaSchedule meta : Query.of(MetaSchedule.class).fetch()) {
 			configure(meta);
 		}
 		log.info("Configured total jobs: {}", total);

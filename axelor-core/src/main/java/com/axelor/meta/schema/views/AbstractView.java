@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.db.Query;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaView;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -107,7 +108,7 @@ public abstract class AbstractView {
 		if(model != null)
 			return model;
 
-		MetaView view = MetaView.all().filter("self.name = ?1", name).fetchOne();
+		MetaView view = Query.of(MetaView.class).filter("self.name = ?1", name).fetchOne();
 		if(view != null && view.getModel() != null){
 			model = view.getModel();
 		}

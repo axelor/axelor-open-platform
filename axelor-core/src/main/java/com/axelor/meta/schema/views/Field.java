@@ -24,16 +24,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.db.Query;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.i18n.I18n;
-import com.axelor.meta.db.MetaSelect;
-import com.axelor.meta.db.MetaSelectItem;
+import com.axelor.meta.MetaStore;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 
 @XmlType
 @JsonTypeName("field")
@@ -289,23 +285,8 @@ public class Field extends SimpleWidget {
 		this.selectionIn = selectionIn;
 	}
 
-	public List<Object> getSelectionList() {
-		String selection = getSelection();
-		if (selection == null || "".equals(selection.trim()))
-			return null;
-		final MetaSelect select = MetaSelect.findByName(selection);
-		final List<Object> all = Lists.newArrayList();
-		if (select == null || select.getItems() == null) {
-			return all;
-		}
-		List<MetaSelectItem> items = Query.of(MetaSelectItem.class).filter("self.select.id = ?", select.getId()).order("order").fetch();
-		if (items == null || items.isEmpty()) {
-			return null;
-		}
-		for(MetaSelectItem item : items) {
-			all.add(ImmutableMap.of("value", item.getValue(), "title", I18n.get(item.getTitle())));
-		}
-		return all;
+	public List<?> getSelectionList() {
+		return MetaStore.getSelectionList(selection);
 	}
 
 	public void setSelection(String selection) {

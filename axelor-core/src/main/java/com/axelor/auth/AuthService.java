@@ -30,8 +30,11 @@ import org.apache.shiro.crypto.hash.format.ParsableHashFormat;
 import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 
 import com.axelor.auth.db.User;
+import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.i18n.I18n;
+import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaAction;
+import com.axelor.meta.db.repo.MetaActionRepository;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
@@ -62,7 +65,7 @@ public class AuthService {
 	private final ParsableHashFormat hashFormat = new Shiro1CryptFormat();
 
 	public static AuthService instance;
-
+	
 	@Inject
 	public AuthService(
 			@Named("auth.hash.algorithm") String hashAlgorihm,
@@ -235,12 +238,15 @@ public class AuthService {
 	@Transactional
 	public void preferences(ActionRequest request, ActionResponse response) {
 
+		final UserRepository users = Beans.get(UserRepository.class);
+		final MetaActionRepository actions = Beans.get(MetaActionRepository.class);
+
 		User user = null;
 		User context = request.getContext().asType(User.class);
 		if (context.getId() != null) {
-			user = User.find(context.getId());
+			user = users.find(context.getId());
 		} else {
-			user = User.findByCode(context.getCode());
+			user = users.findByCode(context.getCode());
 		}
 		
 		if (user == null) {
@@ -249,7 +255,7 @@ public class AuthService {
 		}
 
 		final Map<String, Object> values = Maps.newHashMap();
-		final MetaAction action = MetaAction.findByName(user.getHomeAction());
+		final MetaAction action = actions.findByName(user.getHomeAction());
 
 		if (context.getId() == null) {
 			values.put("id", user.getId());

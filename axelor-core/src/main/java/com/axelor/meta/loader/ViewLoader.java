@@ -26,12 +26,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.PersistenceException;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import com.axelor.auth.db.Group;
+import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
@@ -44,6 +46,11 @@ import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.db.MetaView;
+import com.axelor.meta.db.repo.MetaActionMenuRepository;
+import com.axelor.meta.db.repo.MetaActionRepository;
+import com.axelor.meta.db.repo.MetaMenuRepository;
+import com.axelor.meta.db.repo.MetaSelectRepository;
+import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
@@ -65,7 +72,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
-import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 
 @Singleton
@@ -73,6 +79,24 @@ public class ViewLoader extends AbstractLoader {
 	
 	@Inject
 	private ObjectMapper objectMapper;
+	
+	@Inject
+	private MetaViewRepository views;
+	
+	@Inject
+	private MetaSelectRepository selects;
+	
+	@Inject
+	private MetaActionRepository actions;
+	
+	@Inject
+	private MetaMenuRepository menus;
+	
+	@Inject
+	private MetaActionMenuRepository actionMenus;
+	
+	@Inject
+	private GroupRepository groups;
 
 	@Override
 	@Transactional
@@ -171,10 +195,10 @@ public class ViewLoader extends AbstractLoader {
 			modelName = model.getName();
 		}
 		
-		MetaView entity = MetaView.findByID(xmlId);
-		MetaView other = MetaView.findByName(name);
+		MetaView entity = views.findByID(xmlId);
+		MetaView other = views.findByName(name);
 		if (entity == null) {
-			entity = MetaView.findByModule(name, module.getName());
+			entity = views.findByModule(name, module.getName());
 		}
 		
 		if (entity == null) {
@@ -205,7 +229,7 @@ public class ViewLoader extends AbstractLoader {
 		entity.setModule(module.getName());
 		entity.setXml(xml);
 
-		entity = entity.save();
+		entity = views.save(entity);
 	}
 
 	private void importSelection(Selection selection, Module module, boolean update) {
@@ -224,10 +248,10 @@ public class ViewLoader extends AbstractLoader {
 
 		log.debug("Loading selection : {}", name);
 
-		MetaSelect entity = MetaSelect.findByID(xmlId);
-		MetaSelect other = MetaSelect.findByName(selection.getName());
+		MetaSelect entity = selects.findByID(xmlId);
+		MetaSelect other = selects.findByName(selection.getName());
 		if (entity == null) {
-			entity = MetaSelect.filter("self.name = ? AND self.module = ?", name, module.getName()).fetchOne();
+			entity = selects.all().filter("self.name = ? AND self.module = ?", name, module.getName()).fetchOne();
 		}
 
 		if (entity == null) {
@@ -274,23 +298,23 @@ public class ViewLoader extends AbstractLoader {
 			}
 		}
 
-		entity.save();
+		selects.save(entity);
 	}
 
-	private Set<Group> findGroups(String groups) {
-		if (StringUtils.isBlank(groups)) {
+	private Set<Group> findGroups(String names) {
+		if (StringUtils.isBlank(names)) {
 			return null;
 		}
 
 		Set<Group> all = Sets.newHashSet();
-		for(String name : groups.split(",")) {
-			Group group = Group.all().filter("self.code = ?1", name).fetchOne();
+		for(String name : names.split(",")) {
+			Group group = groups.all().filter("self.code = ?1", name).fetchOne();
 			if (group == null) {
 				log.info("Creating a new user group: {}", name);
 				group = new Group();
 				group.setCode(name);
 				group.setName(name);
-				group = group.save();
+				group = groups.save(group);
 			}
 			all.add(group);
 		}
@@ -309,7 +333,7 @@ public class ViewLoader extends AbstractLoader {
 		Class<?> klass = action.getClass();
 		Mapper mapper = Mapper.of(klass);
 
-		MetaAction entity = MetaAction.findByName(action.getName());
+		MetaAction entity = actions.findByName(action.getName());
 		if (entity == null) {
 			entity = new MetaAction(action.getName());
 		}
@@ -327,12 +351,12 @@ public class ViewLoader extends AbstractLoader {
 		String type = klass.getSimpleName().replaceAll("([a-z\\d])([A-Z]+)", "$1-$2").toLowerCase();
 		entity.setType(type);
 
-		entity = entity.save();
+		entity = actions.save(entity);
 
 		for (MetaMenu pending : this.resolve(MetaMenu.class, entity.getName())) {
 			log.debug("Resolved menu: {}", pending.getName());
 			pending.setAction(entity);
-			pending.save();
+			pending = menus.save(pending);
 		}
 	}
 
@@ -344,7 +368,7 @@ public class ViewLoader extends AbstractLoader {
 
 		log.debug("Loading menu : {}", menuItem.getName());
 
-		MetaMenu menu = MetaMenu.findByName(menuItem.getName());
+		MetaMenu menu = menus.findByName(menuItem.getName());
 		if (menu == null) {
 			menu = new MetaMenu(menuItem.getName());
 		}
@@ -365,7 +389,7 @@ public class ViewLoader extends AbstractLoader {
 		menu.setGroups(this.findGroups(menuItem.getGroups()));
 
 		if (!Strings.isNullOrEmpty(menuItem.getParent())) {
-			MetaMenu parent = MetaMenu.findByName(menuItem.getParent());
+			MetaMenu parent = menus.findByName(menuItem.getParent());
 			if (parent == null) {
 				log.debug("Unresolved parent : {}", menuItem.getParent());
 				this.setUnresolved(MetaMenu.class, menuItem.getParent(), menu);
@@ -375,7 +399,7 @@ public class ViewLoader extends AbstractLoader {
 		}
 
 		if (!StringUtils.isBlank(menuItem.getAction())) {
-			MetaAction action = MetaAction.findByName(menuItem.getAction());
+			MetaAction action = actions.findByName(menuItem.getAction());
 			if (action == null) {
 				log.debug("Unresolved action: {}", menuItem.getAction());
 				setUnresolved(MetaMenu.class, menuItem.getAction(), menu);
@@ -384,12 +408,12 @@ public class ViewLoader extends AbstractLoader {
 			}
 		}
 
-		menu = menu.save();
+		menu = menus.save(menu);
 
 		for (MetaMenu pending : this.resolve(MetaMenu.class, menu.getName())) {
 			log.debug("Resolved menu : {}", pending.getName());
 			pending.setParent(menu);
-			pending.save();
+			pending = menus.save(pending);
 		}
 	}
 
@@ -401,7 +425,7 @@ public class ViewLoader extends AbstractLoader {
 
 		log.debug("Loading action menu : {}", menuItem.getName());
 
-		MetaActionMenu menu = MetaActionMenu.findByName(menuItem.getName());
+		MetaActionMenu menu = actionMenus.findByName(menuItem.getName());
 		if (menu == null) {
 			menu = new MetaActionMenu(menuItem.getName());
 		}
@@ -415,7 +439,7 @@ public class ViewLoader extends AbstractLoader {
 		menu.setCategory(menuItem.getCategory());
 
 		if (!StringUtils.isBlank(menuItem.getParent())) {
-			MetaActionMenu parent = MetaActionMenu.findByName(menuItem.getParent());
+			MetaActionMenu parent = actionMenus.findByName(menuItem.getParent());
 			if (parent == null) {
 				log.debug("Unresolved parent : {}", menuItem.getParent());
 				this.setUnresolved(MetaActionMenu.class, menuItem.getParent(), menu);
@@ -425,7 +449,7 @@ public class ViewLoader extends AbstractLoader {
 		}
 
 		if (!Strings.isNullOrEmpty(menuItem.getAction())) {
-			MetaAction action = MetaAction.findByName(menuItem.getAction());
+			MetaAction action = actions.findByName(menuItem.getAction());
 			if (action == null) {
 				log.debug("Unresolved action: {}", menuItem.getAction());
 				this.setUnresolved(MetaActionMenu.class, menuItem.getAction(), menu);
@@ -434,12 +458,12 @@ public class ViewLoader extends AbstractLoader {
 			}
 		}
 
-		menu = menu.save();
+		menu = actionMenus.save(menu);
 
 		for (MetaActionMenu pending : this.resolve(MetaActionMenu.class, menu.getName())) {
 			log.debug("Resolved action menu : {}", pending.getName());
 			pending.setParent(menu);
-			pending.save();
+			pending = actionMenus.save(pending);
 		}
 	}
 
@@ -449,7 +473,7 @@ public class ViewLoader extends AbstractLoader {
 		for (String name : ModelLoader.findEntities(module)) {
 			Class<?> klass = JPA.model(name);
 			if (klass == null) continue;
-			if (MetaView.all().filter("self.model = ?1", klass.getName()).count() == 0) {
+			if (views.all().filter("self.model = ?1", klass.getName()).count() == 0) {
 				File out = FileUtils.getFile(outputDir, "views", klass.getSimpleName() + ".xml");
 				String xml = createDefaultViews(module, klass);
 				try {

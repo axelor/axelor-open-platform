@@ -36,6 +36,7 @@ import org.w3c.dom.NodeList;
 import com.axelor.db.JPA;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaSequence;
+import com.axelor.meta.db.repo.MetaSequenceRepository;
 import com.axelor.meta.service.MetaModelService;
 import com.google.common.base.Throwables;
 import com.google.common.primitives.Ints;
@@ -47,6 +48,9 @@ public class ModelLoader extends AbstractLoader {
 	
 	@Inject
 	private MetaModelService service;
+	
+	@Inject
+	private MetaSequenceRepository sequences;
 
 	@Override
 	protected void doLoad(Module module, boolean update) {
@@ -132,7 +136,7 @@ public class ModelLoader extends AbstractLoader {
 			if (isVisited(MetaSequence.class, name)) {
 				continue;
 			}
-			if (MetaSequence.findByName(name) != null) {
+			if (sequences.findByName(name) != null) {
 				continue;
 			}
 			
@@ -151,7 +155,7 @@ public class ModelLoader extends AbstractLoader {
 			if (increment != null) entity.setIncrement(increment);
 			if (initial != null) entity.setInitial(initial);
 			
-			entity.save();
+			sequences.save(entity);
 		}
 	}
 }
