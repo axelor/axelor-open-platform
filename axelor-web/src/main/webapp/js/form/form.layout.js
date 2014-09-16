@@ -183,7 +183,8 @@ ui.directive('uiTableLayout', ['$compile', function($compile) {
 
 function PanelLayout(items, attrs, $scope, $compile) {
 	
-	var numCols = 12,
+	var panelAttrs = $scope.field || {},
+		numCols = 12,
 		numSpan = +(attrs.itemSpan) || 6,
 		curCol = 0,
 		layout = [$('<div class="row-fluid">')];
@@ -193,7 +194,7 @@ function PanelLayout(items, attrs, $scope, $compile) {
 			cell = $('<div>'),
 			span = +item.attr('x-colspan') || numSpan,
 			offset = +item.attr('x-coloffset') || 0,
-			stacked = attrs.stacked;
+			stacked = panelAttrs.stacked;
 
 		span = Math.min(span, numCols);
 		if (stacked) {
@@ -344,7 +345,7 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 				items: items
 			};
 
-			if ((editor.widgetAttrs||{}).layout !== 'table') {
+			if (editor.layout !== 'table') {
 				schema = {
 					items: [{
 						type: 'panel',
