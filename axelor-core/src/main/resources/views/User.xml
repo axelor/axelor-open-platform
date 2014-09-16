@@ -24,9 +24,9 @@
       <field name="group" placeholder="user group"/>
       <field name="email" widget="Email"/>
       <field name="language"/>
-      <panel x-stacked="true">
+      <panel stacked="true">
         <field name="homeAction" hidden="true" x-bind="{{__actionSelect.name}}"/>
-        <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" x-target="com.axelor.meta.db.MetaAction" target-name="name" x-domain="self.type = 'action-view'"/>
+        <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" target="com.axelor.meta.db.MetaAction" target-name="name" domain="self.type = 'action-view'"/>
       </panel>
     </panel>
     <panel title="Authorization">
@@ -50,9 +50,9 @@
     <panel title="User preferences" itemSpan="12">
       <field name="email" widget="Email"/>
       <field name="language"/>
-      <panel x-stacked="true">
+      <panel stacked="true">
         <field name="homeAction" hidden="true" x-bind="{{__actionSelect.name}}"/>
-        <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" x-target="com.axelor.meta.db.MetaAction" target-name="name" x-domain="self.type = 'action-view'"/>
+        <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" target="com.axelor.meta.db.MetaAction" target-name="name" domain="self.type = 'action-view'"/>
       </panel>
     </panel>
   </form>

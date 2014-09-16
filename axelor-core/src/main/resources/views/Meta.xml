@@ -48,7 +48,7 @@
       <field name="depends" widget="Tags"/>
       <field name="installed" readonly="true"/>
       <field name="pending" readonly="true"/>
-      <panel x-stacked="true" showIf="removable">
+      <panel stacked="true" showIf="removable">
         <button name="btnInstall" title="Install" showIf="!installed" onClick="com.axelor.meta.web.ModuleController:install(name)"/>
         <button name="btnUninstall" title="Uninstall" showIf="installed" onClick="com.axelor.meta.web.ModuleController:uninstall(name)"/>
       </panel>
@@ -93,7 +93,7 @@
       </panel>
     </panel>
     <panel title="Schema">
-      <field name="xml" showTitle="false" widget="CodeEditor" height="500" x-syntax="xml" colSpan="12"/>
+      <field name="xml" showTitle="false" widget="CodeEditor" height="500" x-code-syntax="xml" colSpan="12"/>
     </panel>
   </form>
 
@@ -113,7 +113,7 @@
       <field name="module"/>
     </panel>
     <panel title="Schema">
-      <field name="xml" showTitle="false" widget="CodeEditor" height="500" x-syntax="xml" colSpan="12"/>
+      <field name="xml" showTitle="false" widget="CodeEditor" height="500" x-code-syntax="xml" colSpan="12"/>
     </panel>
   </form>
 
