@@ -516,7 +516,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 		};
 		
 		$("body").on("mousedown", function(e){
-			var elem = $(e.srcElement);
+			var elem = $(e.target || e.srcElement);
 			if (!bubble || bubble.is(elem) || bubble.has(elem).length) {
 				return;
 			}

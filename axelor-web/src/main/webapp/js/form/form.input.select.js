@@ -494,7 +494,7 @@ ui.formInput('MultiSelect', 'Select', {
 		
 		var __showSelection = scope.showSelection;
 		scope.showSelection = function(e) {
-			if (e && $(e.srcElement).is('li,i,span.tag-text')) {
+			if (e && $(e.target || e.srcElement).is('li,i,span.tag-text')) {
 				return;
 			}
 			return __showSelection(e);
