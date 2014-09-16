@@ -17,9 +17,12 @@
  */
 package com.axelor.meta;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.xml.namespace.QName;
@@ -27,17 +30,14 @@ import javax.xml.namespace.QName;
 import com.axelor.common.StringUtils;
 import com.axelor.db.Query;
 import com.axelor.inject.Beans;
-import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.db.repo.MetaSelectItemRepository;
-import com.axelor.meta.db.repo.MetaSelectRepository;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.Selection;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class MetaStore {
@@ -115,15 +115,9 @@ public class MetaStore {
 		if (StringUtils.isBlank(selection)) {
 			return null;
 		}
-		final MetaSelect select = Beans.get(MetaSelectRepository.class).findByName(selection);
-		final List<Selection.Option> all = Lists.newArrayList();
-		if (select == null || select.getItems() == null) {
-			return all;
-		}
-
 		final List<MetaSelectItem> items = Query
 				.of(MetaSelectItem.class)
-				.filter("self.select.id = ?", select.getId())
+				.filter("self.select.name = ?", selection)
 				.order("order")
 				.fetch();
 
@@ -131,18 +125,15 @@ public class MetaStore {
 			return null;
 		}
 
+		final List<Selection.Option> all = new ArrayList<>();
+		final Set<String> visited = new HashSet<>();
+
 		for(MetaSelectItem item : items) {
-			Selection.Option option = new Selection.Option();
-			option.setValue(item.getValue());
-			option.setTitle(item.getTitle());
-			String data = item.getData();
-			if (data != null) {
-				Map<QName, String> attrs = new HashMap<>();
-				QName qn = new QName("x-data");
-				attrs.put(qn, data);
-				option.setData(attrs);
+			if (visited.contains(item.getValue())) {
+				continue;
 			}
-			all.add(option);
+			visited.add(item.getValue());
+			all.add(getSelectionItem(item));
 		}
 
 		return all;
@@ -155,9 +146,20 @@ public class MetaStore {
 		if (item == null) {
 			return null;
 		}
-		final Selection.Option option = new Selection.Option();
+		return getSelectionItem(item);
+	}
+
+	private static Selection.Option getSelectionItem(MetaSelectItem item) {
+		Selection.Option option = new Selection.Option();
 		option.setValue(item.getValue());
 		option.setTitle(item.getTitle());
+		String data = item.getData();
+		if (data != null) {
+			Map<QName, String> attrs = new HashMap<>();
+			QName qn = new QName("x-data");
+			attrs.put(qn, data);
+			option.setData(attrs);
+		}
 		return option;
 	}
 
