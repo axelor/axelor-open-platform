@@ -18,7 +18,9 @@
 package com.axelor.db;
 
 import com.axelor.common.StringUtils;
+import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaSequence;
+import com.axelor.meta.db.repo.MetaSequenceRepository;
 import com.google.common.base.Strings;
 
 /**
@@ -29,9 +31,13 @@ public final class JpaSequence {
 
 	private JpaSequence() {
 	}
+	
+	private static MetaSequenceRepository repo() {
+		return Beans.get(MetaSequenceRepository.class);
+	}
 
 	private static MetaSequence find(String name) {
-		MetaSequence sequence = MetaSequence.findByName(name);
+		MetaSequence sequence =  repo().findByName(name);
 		if (sequence == null) {
 			throw new IllegalArgumentException("No such sequence: " + name);
 		}
@@ -65,9 +71,10 @@ public final class JpaSequence {
 		if (!StringUtils.isBlank(suffix)) {
 			value = value + suffix;
 		}
-
+		
 		sequence.setNext(next + sequence.getIncrement());
-		sequence.save();
+
+		repo().save(sequence);
 
 		return value;
 	}
@@ -90,6 +97,6 @@ public final class JpaSequence {
 	public static void nextValue(final String name, final long next) {
 		final MetaSequence sequence = find(name);
 		sequence.setNext(next);
-		sequence.save();
+		repo().save(sequence);
 	}
 }

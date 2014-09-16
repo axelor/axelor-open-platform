@@ -39,7 +39,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
-import com.axelor.meta.db.MetaSelectItem;
+import com.axelor.meta.MetaStore;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
@@ -190,8 +190,14 @@ public class StringTemplates implements Templates {
 	}
 
 	private String getSelectionTitle(String name, Object value) {
-		if (StringUtils.isBlank(name)) return valueOf(value);
-		final MetaSelectItem item = MetaSelectItem.filter("self.select.name = ? and self.value = ?", name, value).fetchOne();
-		return item == null ? valueOf(value) : item.getTitle();
+		final String val = valueOf(value);
+		if (StringUtils.isBlank(val)) return val;
+		try {
+			return MetaStore
+					.getSelectionItem(name, val)
+					.getLocalizedTitle();
+		} catch (Exception e) {
+		}
+		return val;
 	}
 }

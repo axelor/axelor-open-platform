@@ -28,13 +28,15 @@ import org.joda.time.Period;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.axelor.db.JPA;
+import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
+import com.axelor.meta.db.repo.MetaSelectRepository;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.test.db.Contact;
+import com.axelor.test.db.ContactRepository;
 import com.axelor.text.GroovyTemplates;
 import com.axelor.text.Templates;
 import com.google.common.collect.ImmutableMap;
@@ -114,19 +116,23 @@ public class TestWS extends MetaTest {
 		final MetaSelect select = new MetaSelect();
 		final MetaSelectItem item = new MetaSelectItem();
 		
+		final MetaSelectRepository selects = Beans.get(MetaSelectRepository.class);
+		final ContactRepository contacts = Beans.get(ContactRepository.class);
+		
 		item.setValue("pizza");
 		item.setTitle("Pizza");
 		select.addItem(item);
 		select.setName("food.selection");
 
-		select.save();
+		selects.save(select);
 		
 		Contact c = new Contact();
 		c.setFirstName("John");
 		c.setLastName("Smith");
 		c.setEmail("john.smith@gmail.com");
 		c.setFood("pizza");
-		JPA.save(c);
+		
+		contacts.save(c);
 	}
 
 	@Test

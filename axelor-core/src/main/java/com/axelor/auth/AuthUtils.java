@@ -30,6 +30,7 @@ import org.joda.time.LocalDate;
 
 import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
+import com.axelor.db.JpaRepository;
 import com.axelor.db.QueryBinder;
 
 public class AuthUtils {
@@ -54,7 +55,8 @@ public class AuthUtils {
 		if (code == null) {
 			return null;
 		}
-		return User.all().filter("self.code = ?", code)
+		return JpaRepository.of(User.class).all()
+				.filter("self.code = ?", code)
 				.cacheable().autoFlush(false).fetchOne();
 	}
 	

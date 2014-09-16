@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -41,6 +42,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaTranslation;
+import com.axelor.meta.db.repo.MetaTranslationRepository;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -50,6 +52,9 @@ import com.google.inject.persist.Transactional;
 public class I18nLoader extends AbstractLoader {
 
 	private Logger log = LoggerFactory.getLogger(I18nLoader.class);
+
+	@Inject
+	private MetaTranslationRepository translations;
 
 	@Override
 	protected void doLoad(Module module, boolean update) {
@@ -129,7 +134,7 @@ public class I18nLoader extends AbstractLoader {
 					continue;
 				}
 				
-				MetaTranslation entity = MetaTranslation.findByKey(key, language);
+				MetaTranslation entity = translations.findByKey(key, language);
 				if (entity == null) {
 					entity = new MetaTranslation();
 					entity.setKey(key);
@@ -138,9 +143,9 @@ public class I18nLoader extends AbstractLoader {
 				} else if (!StringUtils.isBlank(message)) {
 					entity.setMessage(message);
 				}
-				
-				entity.save();
-				
+
+				translations.save(entity);
+
 				if (counter++ % 20 == 0) {
 					JPA.em().flush();
 					JPA.em().clear();

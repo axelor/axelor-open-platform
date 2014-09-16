@@ -43,6 +43,7 @@ import com.axelor.meta.db.MetaField;
 import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
+import com.axelor.meta.db.repo.MetaTranslationRepository;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
@@ -59,6 +60,9 @@ public class MetaController {
 
 	@Inject
 	private ModuleManager moduleManager;
+	
+	@Inject
+	private MetaTranslationRepository translations;
 
 	private ObjectViews validateXML(String xml) {
 		try {
@@ -177,7 +181,7 @@ public class MetaController {
 					continue;
 				}
 				
-				MetaTranslation tr = MetaTranslation.findByKey(key, lang);
+				MetaTranslation tr = translations.findByKey(key, lang);
 				if (tr != null) {
 					value = tr.getMessage();
 				}

@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -34,9 +35,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.db.JPA;
+import com.axelor.db.Query;
 import com.axelor.db.annotations.Widget;
 import com.axelor.meta.db.MetaField;
 import com.axelor.meta.db.MetaModel;
+import com.axelor.meta.db.repo.MetaFieldRepository;
+import com.axelor.meta.db.repo.MetaModelRepository;
 import com.google.inject.persist.Transactional;
 
 /**
@@ -49,6 +53,12 @@ import com.google.inject.persist.Transactional;
 public class MetaModelService {
 	
 	private static Logger log = LoggerFactory.getLogger(MetaModelService.class);
+	
+	@Inject
+	private MetaModelRepository models;
+	
+	@Inject
+	private MetaFieldRepository fields;
 
 	/**
 	 * Process to create all MetaModel with MetaField.
@@ -65,11 +75,13 @@ public class MetaModelService {
 	
 	@Transactional
 	public void process(Class<?> klass){
-		if (MetaModel.all().filter("fullName = ?1", klass.getName()).count() == 0){
-			this.createEntity(klass).save();
+		final MetaModel entity;
+		if (models.all().filter("fullName = ?1", klass.getName()).count() == 0){
+			entity = this.createEntity(klass);
 		} else {
-			this.updateEntity(klass).save();
+			entity = this.updateEntity(klass);
 		}
+		models.save(entity);
 	}
 	
 	/**
@@ -112,7 +124,7 @@ public class MetaModelService {
 	private MetaModel updateEntity(Class<?> klass){
 		MetaModel metaModel = getMetaModel(klass);
 		for (Field field : klass.getDeclaredFields()){
-			if (MetaField.all().filter("metaModel = ?1 AND name = ?2", metaModel, field.getName()).count() == 0){
+			if (fields.all().filter("metaModel = ?1 AND name = ?2", metaModel, field.getName()).count() == 0){
 				metaModel.getMetaFields().add(createField(metaModel, field));
 			}
 		}
@@ -282,6 +294,6 @@ public class MetaModelService {
 	 * @return
 	 */
 	public static MetaModel getMetaModel(Class<?> klass){
-		return MetaModel.all().filter("self.fullName = ?1", klass.getName()).fetchOne();
+		return Query.of(MetaModel.class).filter("self.fullName = ?1", klass.getName()).fetchOne();
 	}
 }

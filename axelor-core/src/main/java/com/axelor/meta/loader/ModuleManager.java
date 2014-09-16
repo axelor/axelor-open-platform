@@ -37,13 +37,17 @@ import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
+import com.axelor.auth.db.repo.GroupRepository;
+import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
-import com.axelor.meta.db.MetaAction;
-import com.axelor.meta.db.MetaActionMenu;
-import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaModule;
-import com.axelor.meta.db.MetaSelect;
-import com.axelor.meta.db.MetaView;
+import com.axelor.meta.db.repo.MetaActionMenuRepository;
+import com.axelor.meta.db.repo.MetaActionRepository;
+import com.axelor.meta.db.repo.MetaMenuRepository;
+import com.axelor.meta.db.repo.MetaModuleRepository;
+import com.axelor.meta.db.repo.MetaSelectRepository;
+import com.axelor.meta.db.repo.MetaViewRepository;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -60,6 +64,9 @@ public class ModuleManager {
 
 	@Inject
 	private AuthService authService;
+	
+	@Inject
+	private MetaModuleRepository modules;
 
 	@Inject
 	private ViewLoader viewLoader;
@@ -126,14 +133,14 @@ public class ModuleManager {
 		}
 	}
 
-	public void update(boolean withDemo, String... modules) {
+	public void update(boolean withDemo, String... moduleNames) {
 
 		this.createUsers();
 		this.resolve(true);
 
 		List<String> names = Lists.newArrayList();
-		if (modules != null) {
-			names = Lists.newArrayList(modules);
+		if (moduleNames != null) {
+			names = Lists.newArrayList(moduleNames);
 		}
 
 		if (names.isEmpty()) {
@@ -189,18 +196,19 @@ public class ModuleManager {
 	public void uninstall(String module) {
 
 		log.info("Uninstall module: {}", module);
+		
+		MetaModule entity = modules.findByName(module);
 
-		MetaModule entity = MetaModule.findByName(module);
-
-		MetaView.findByModule(module).remove();
-		MetaSelect.findByModule(module).remove();
-		MetaMenu.findByModule(module).remove();
-		MetaAction.findByModule(module).remove();
-		MetaActionMenu.findByModule(module).remove();
+		Beans.get(MetaViewRepository.class).findByModule(module).remove();
+		Beans.get(MetaSelectRepository.class).findByModule(module).remove();
+		Beans.get(MetaMenuRepository.class).findByModule(module).remove();
+		Beans.get(MetaActionRepository.class).findByModule(module).remove();
+		Beans.get(MetaActionMenuRepository.class).findByModule(module).remove();
 
 		entity.setInstalled(false);
 		entity.setPending(false);
-		entity.save();
+
+		modules.save(entity);
 
 		resolver.get(module).setInstalled(false);
 		resolver.get(module).setPending(false);
@@ -210,7 +218,7 @@ public class ModuleManager {
 
 	@Transactional
 	MetaModule findModule(String name) {
-		return MetaModule.findByName(name);
+		return modules.findByName(name);
 	}
 	
 	private void install(String moduleName, boolean update, boolean withDemo, boolean force) {
@@ -273,7 +281,7 @@ public class ModuleManager {
 
 	@Transactional
 	void updateState(Module module) {
-		MetaModule metaModule = MetaModule.findByName(module.getName());
+		MetaModule metaModule = modules.findByName(module.getName());
 		module.setInstalled(true);
 		module.setPending(false);
 		module.setInstalledVersion(module.getVersion());
@@ -388,7 +396,7 @@ public class ModuleManager {
 			boolean removable = "true".equals(properties.getProperty("removable"));
 
 			Module module = resolver.add(name, deps);
-			MetaModule stored = MetaModule.findByName(name);
+			MetaModule stored = modules.findByName(name);
 			if (stored == null) {
 				stored = new MetaModule();
 				stored.setName(name);
@@ -400,7 +408,7 @@ public class ModuleManager {
 				stored.setDescription(description);
 				stored.setModuleVersion(version);
 				stored.setRemovable(removable);
-				stored = stored.save();
+				stored = modules.save(stored);
 			}
 
 			module.setPath(file);
@@ -414,37 +422,40 @@ public class ModuleManager {
 
 	@Transactional
 	void createUsers() {
+		
+		final UserRepository users = Beans.get(UserRepository.class);
+		final GroupRepository groups = Beans.get(GroupRepository.class);
 
-		if(User.all().count() != 0) {
+		if(users.all().count() != 0) {
 			return;
 		}
 
-		User admin = User.findByCode("admin");
+		User admin = users.findByCode("admin");
 		if (admin != null) {
 			return;
 		}
 
-		Group admins = Group.findByCode("admins");
-		Group users = Group.findByCode("users");
+		Group adminGroup = groups.findByCode("admins");
+		Group userGroup = groups.findByCode("users");
 
-		if (admins == null) {
-			admins = new Group("admins", "Administrators");
-			admins = admins.save();
+		if (adminGroup == null) {
+			adminGroup = new Group("admins", "Administrators");
+			adminGroup = groups.save(adminGroup);
 		}
 
-		if (users == null) {
-			users = new Group("users", "Users");
-			users = users.save();
+		if (userGroup == null) {
+			userGroup = new Group("users", "Users");
+			userGroup = groups.save(userGroup);
 		}
 
 		admin = new User("admin", "Administrator");
 		admin.setPassword(authService.encrypt("admin"));
-		admin.setGroup(admins);
-		admin = admin.save();
+		admin.setGroup(adminGroup);
+		admin = users.save(admin);
 
 		User demo = new User("demo", "Demo User");
 		demo.setPassword(authService.encrypt("demo"));
-		demo.setGroup(users);
-		demo = demo.save();
+		demo.setGroup(userGroup);
+		demo = users.save(demo);
 	}
 }

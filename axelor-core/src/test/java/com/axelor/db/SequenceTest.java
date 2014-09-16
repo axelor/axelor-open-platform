@@ -29,7 +29,7 @@ public class SequenceTest extends JpaTest {
 	
 	@Before
 	public void setUp() {
-		if (MetaSequence.all().count() == 0) {
+		if (Query.of(MetaSequence.class).count() == 0) {
 			fixture("sequence-data.yml");
 		}
 	}

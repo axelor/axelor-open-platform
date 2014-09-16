@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
+import com.axelor.auth.db.repo.GroupRepository;
+import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.db.Query;
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
@@ -89,6 +91,12 @@ public class AuthLdap {
 	private JndiLdapContextFactory factory = new JndiLdapContextFactory();
 
 	private AuthService authService;
+	
+	@Inject
+	private UserRepository users;
+	
+	@Inject
+	private GroupRepository groups;
 
 	@Inject
 	public AuthLdap(@Named("auth.ldap.config") Properties properties, AuthService authService) {
@@ -181,7 +189,7 @@ public class AuthLdap {
 	private User findOrCreateUser(String code, SearchResult result)
 			throws NamingException {
 
-		User user = User.findByCode(code);
+		User user = users.findByCode(code);
 		if (user != null) {
 			return user;
 		}
@@ -210,7 +218,7 @@ public class AuthLdap {
 			log.warn("unable to create ldap groups", e);
 		}
 
-		return user.save();
+		return users.save(user);
 	}
 
 	private Group findOrCreateGroup(User user) throws NamingException {
@@ -224,7 +232,7 @@ public class AuthLdap {
 			SearchResult result = (SearchResult) all.next();
 			Attributes attributes = result.getAttributes();
 			String name = (String) attributes.get("cn").get();
-			group = Group.findByCode(name);
+			group = groups.findByCode(name);
 			if (group == null) {
 				group = new Group(name, name.substring(0, 1).toUpperCase() + name.substring(1));
 			}

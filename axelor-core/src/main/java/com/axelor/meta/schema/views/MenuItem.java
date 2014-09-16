@@ -20,6 +20,7 @@ package com.axelor.meta.schema.views;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.db.Query;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaMenu;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -165,7 +166,7 @@ public class MenuItem extends AbstractWidget {
 	}
 
 	public Boolean getIsFolder() {
-		return MetaMenu.all().filter("self.parent.name = ?1", name).cacheable().count() > 0;
+		return Query.of(MetaMenu.class).filter("self.parent.name = ?1", name).cacheable().count() > 0;
 	}
 
 	public String getShowIf() {

@@ -17,14 +17,27 @@
  */
 package com.axelor.meta;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
+import javax.xml.namespace.QName;
+
 import com.axelor.common.StringUtils;
+import com.axelor.db.Query;
+import com.axelor.inject.Beans;
+import com.axelor.meta.db.MetaSelect;
+import com.axelor.meta.db.MetaSelectItem;
+import com.axelor.meta.db.repo.MetaSelectItemRepository;
+import com.axelor.meta.db.repo.MetaSelectRepository;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
+import com.axelor.meta.schema.views.Selection;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class MetaStore {
@@ -98,6 +111,56 @@ public class MetaStore {
 		return null;
 	}
 	
+	public static List<Selection.Option> getSelectionList(String selection) {
+		if (StringUtils.isBlank(selection)) {
+			return null;
+		}
+		final MetaSelect select = Beans.get(MetaSelectRepository.class).findByName(selection);
+		final List<Selection.Option> all = Lists.newArrayList();
+		if (select == null || select.getItems() == null) {
+			return all;
+		}
+
+		final List<MetaSelectItem> items = Query
+				.of(MetaSelectItem.class)
+				.filter("self.select.id = ?", select.getId())
+				.order("order")
+				.fetch();
+
+		if (items == null || items.isEmpty()) {
+			return null;
+		}
+
+		for(MetaSelectItem item : items) {
+			Selection.Option option = new Selection.Option();
+			option.setValue(item.getValue());
+			option.setTitle(item.getTitle());
+			String data = item.getData();
+			if (data != null) {
+				Map<QName, String> attrs = new HashMap<>();
+				QName qn = new QName("x-data");
+				attrs.put(qn, data);
+				option.setData(attrs);
+			}
+			all.add(option);
+		}
+
+		return all;
+	}
+
+	public static Selection.Option getSelectionItem(String selection, String value) {
+		final MetaSelectItem item = Beans.get(MetaSelectItemRepository.class).all()
+				.filter("self.select.name = ?1 AND self.value = ?2", selection, value)
+				.fetchOne();
+		if (item == null) {
+			return null;
+		}
+		final Selection.Option option = new Selection.Option();
+		option.setValue(item.getValue());
+		option.setTitle(item.getTitle());
+		return option;
+	}
+
 	public static void clear() {
 		CACHE.clear();
 	}

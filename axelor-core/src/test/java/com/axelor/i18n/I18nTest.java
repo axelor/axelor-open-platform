@@ -19,19 +19,25 @@ package com.axelor.i18n;
 
 import static org.junit.Assert.assertEquals;
 
+import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import com.axelor.JpaTest;
 import com.axelor.meta.db.MetaTranslation;
+import com.axelor.meta.db.repo.MetaTranslationRepository;
 import com.google.inject.persist.Transactional;
 
 public class I18nTest extends JpaTest {
+	
+	@Inject
+	private MetaTranslationRepository translations;
 
 	@Before
 	@Transactional
 	public void setup() {
-		if (MetaTranslation.all().count() > 0) {
+		if (translations.all().count() > 0) {
 			return;
 		}
 		MetaTranslation obj;
@@ -40,19 +46,19 @@ public class I18nTest extends JpaTest {
 		obj.setKey("Hello World!!!");
 		obj.setMessage("Hello...");
 		obj.setLanguage("en");
-		obj.save();
+		obj = translations.save(obj);
 
 		obj = new MetaTranslation();
 		obj.setKey("{0} record selected.");
 		obj.setMessage("{0} record selected.");
 		obj.setLanguage("en");
-		obj.save();
+		obj = translations.save(obj);
 
 		obj = new MetaTranslation();
 		obj.setKey("{0} records selected.");
 		obj.setMessage("{0} records selected.");
 		obj.setLanguage("en");
-		obj.save();
+		obj = translations.save(obj);
 	}
 
 	@Test

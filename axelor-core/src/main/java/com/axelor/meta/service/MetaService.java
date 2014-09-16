@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
@@ -41,6 +42,9 @@ import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaView;
+import com.axelor.meta.db.repo.MetaAttachmentRepository;
+import com.axelor.meta.db.repo.MetaFileRepository;
+import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
@@ -60,6 +64,15 @@ import com.google.inject.persist.Transactional;
 public class MetaService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MetaService.class);
+	
+	@Inject
+	private MetaViewRepository views;
+	
+	@Inject
+	private MetaFileRepository files;
+	
+	@Inject
+	private MetaAttachmentRepository attachments;
 
 	@SuppressWarnings("unchecked")
 	private List<MenuItem> findMenus(Query query) {
@@ -339,7 +352,7 @@ public class MetaService {
 			Long fileId = Long.valueOf(((Map) record).get("id").toString());
 
 			if (fileId != null) {
-				MetaFile obj = MetaFile.find(fileId);
+				MetaFile obj = files.find(fileId);
 				if (uploadPath != null) {
 					File file = FileUtils.getFile(uploadPath, obj.getFilePath());
 					if (file.exists() && !file.delete()) {
@@ -347,8 +360,8 @@ public class MetaService {
 					}
 				}
 
-				MetaAttachment.all().filter("self.metaFile.id = ?1", fileId).delete();
-				obj.remove();
+				attachments.all().filter("self.metaFile.id = ?1", fileId).delete();
+				files.remove(obj);
 
 				result.add(record);
 			}
@@ -384,7 +397,7 @@ public class MetaService {
 	public Response getChart(final String name, final Request request) {
 
 		final Response response = new Response();
-		final MetaView view = MetaView.findByName(name);
+		final MetaView view = views.findByName(name);
 		
 		if (view == null) {
 			return response;
