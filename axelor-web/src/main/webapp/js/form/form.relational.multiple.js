@@ -407,6 +407,7 @@ ui.formInput('OneToMany', {
 				maxSize = (rowSize * 10) + minSize;
 			var inc = 0;
 			return function(value) {
+				if (scope.$hasPanels) return;
 				inc = arguments[1] || inc;
 				var count = _.size(value) + inc, height = minSize;
 				if (count > 0) {
