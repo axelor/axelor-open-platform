@@ -129,6 +129,8 @@ ui.directive('uiFilterItem', function() {
 
 				if (field.type === 'many-to-one') {
 					filter.targetName = field.targetName;
+				} else {
+					filter.targetName = null;
 				}
 			};
 
