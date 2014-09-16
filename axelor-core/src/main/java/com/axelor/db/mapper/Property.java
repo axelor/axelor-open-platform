@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,7 +59,6 @@ import com.axelor.db.annotations.Widget;
 import com.axelor.i18n.I18n;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 
 public class Property {
 
@@ -75,6 +75,10 @@ public class Property {
 	private String mappedBy;
 
 	private Class<?> target;
+
+	private String targetName;
+
+	private List<String> targetSearch;
 
 	private boolean primary;
 
@@ -297,6 +301,48 @@ public class Property {
 
 	public Class<?> getTarget() {
 		return target;
+	}
+
+	public String getTargetName() {
+		if (targetName == null) {
+			findTargetName();
+		}
+		return targetName;
+	}
+
+	public List<String> getTargetSearch() {
+		if (targetName == null) {
+			findTargetName();
+		}
+		return targetSearch;
+	}
+
+	private void findTargetName() {
+
+		if (target == null) {
+			return;
+		}
+
+		Mapper mapper = Mapper.of(target);
+		Property nameField = mapper.getNameField();
+		Property codeField = mapper.getProperty("code");
+
+		String targetName = null;
+		Set<String> targetSearch = new LinkedHashSet<>();
+
+		if (nameField != null) {
+			targetName = nameField.getName();
+			targetSearch.add(targetName);
+			if (nameField.getNameSearch() != null) {
+				targetSearch.addAll(Arrays.asList(nameField.getNameSearch()));
+			}
+		}
+		if (codeField != null) {
+			targetSearch.add(codeField.getName());
+		}
+
+		this.targetName = targetName;
+		this.targetSearch = new ArrayList<>(targetSearch);
 	}
 
 	public boolean isPrimary() {
@@ -610,36 +656,6 @@ public class Property {
 		return !Objects.equal(current, oldValue);
 	}
 
-	private Map<String, Object> update(Map<String, Object> attrs) {
-
-		if (target == null) {
-			return attrs;
-		}
-
-		Mapper mapper = Mapper.of(target);
-		Property nameField = mapper.getNameField();
-		Property codeField = mapper.getProperty("code");
-
-		String targetName = null;
-		LinkedHashSet<String> targetSearch = Sets.newLinkedHashSet();
-
-		if (nameField != null) {
-			targetName = nameField.getName();
-			targetSearch.add(targetName);
-			if (nameField.getNameSearch() != null) {
-				targetSearch.addAll(Arrays.asList(nameField.getNameSearch()));
-			}
-		}
-		if (codeField != null) {
-			targetSearch.add(codeField.getName());
-		}
-
-		attrs.put("targetName", targetName);
-		attrs.put("targetSearch", targetSearch.size() > 0 ? targetSearch : null);
-
-		return attrs;
-	}
-
 	/**
 	 * Create a {@link Map} of property attributes. Transient and null valued
 	 * attributes with be omitted.
@@ -688,7 +704,12 @@ public class Property {
 			map.put("title", I18n.get(Inflector.getInstance().humanize(getName())));
 		}
 
-		return update(map);
+		if (target != null) {
+			map.put("targetName", getTargetName());
+			map.put("targetSearch", getTargetSearch());
+		}
+
+		return map;
 	}
 
 	@Override
