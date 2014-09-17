@@ -32,7 +32,7 @@ public interface MailAccount {
 	 * Default connection timeout.
 	 *
 	 */
-	static final int DEFAULT_TIMEOUT = 6000;
+	static final int DEFAULT_TIMEOUT = 60000;
 
 	/**
 	 * Socket connection timeout value in milliseconds.
