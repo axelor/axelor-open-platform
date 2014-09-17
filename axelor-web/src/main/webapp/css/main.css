@@ -349,10 +349,6 @@ input[readonly], select[readonly], textarea[readonly] {
 	height: 100%;
 }
 
-#offcanvas-toggle {
-	display: none;
-}
-
 #offcanvas-toggle a {
 	padding-left: 2px;
 	padding-right: 2px;
@@ -371,6 +367,17 @@ input[readonly], select[readonly], textarea[readonly] {
 	border-right: 1px solid #d3d3d3;
 }
 
+#offcanvas.hidden-menu {
+	position: relative;
+	left: -250px;
+	width: calc(100% + 250px);
+}
+
+#offcanvas.hidden-menu #sidebar,
+#offcanvas-toggle.hidden-menu {
+	display: none !important;
+}
+
 #view-tabs {
 	height: 100%;
 	position: absolute;
@@ -378,10 +385,31 @@ input[readonly], select[readonly], textarea[readonly] {
 	right: 0px;
 }
 
-@media screen and (max-width: 979px) {
-	#offcanvas-toggle {
-		display: block;
+@media screen and (min-width: 980px) {
+	#offcanvas:not(.hidden-menu) {
+		left: 0;
+		width: 100%;
+		position: relative;
+		transition: all 0.25s ease-out;
 	}
+	#offcanvas.inactive {
+		position: relative;
+		left: -250px;
+		width: calc(100% + 250px);
+	}
+	#offcanvas.inactive #sidebar {
+		position: absolute;
+		top: 0;
+	}
+	.nav-tree li a {
+		overflow: inherit !important;
+	}
+	#sidebar {
+		overflow: auto !important;
+	}
+}
+
+@media screen and (max-width: 979px) {
 	#offcanvas {
 		position: relative;
 		transition: all 0.25s ease-out;

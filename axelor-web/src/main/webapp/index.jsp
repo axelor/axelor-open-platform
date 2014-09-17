@@ -78,7 +78,7 @@ String langJS = AppInfo.getLangJS(request, getServletContext());
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
-          <ul class="nav" id="offcanvas-toggle">
+          <ul class="nav hidden" id="offcanvas-toggle">
             <li>
               <a href=""><i class="fa fa-bars"></i></a>
             </li>
@@ -156,9 +156,6 @@ String langJS = AppInfo.getLangJS(request, getServletContext());
   			if (!event.isTrigger)
   				$.event.trigger('adjustSize');
   		});
-        $('#offcanvas-toggle').find('a').click(function (e) {
-            $("#offcanvas").toggleClass("active");
-        });
   	});
   </script>
 </body>

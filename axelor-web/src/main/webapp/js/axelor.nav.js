@@ -306,7 +306,9 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 	$scope.menuClick = function(event, record) {
 		if (record.isFolder)
 			return;
-		$("#offcanvas").removeClass("active");
+		if (axelor.device.small) {
+			$("#offcanvas").removeClass("active");
+		}
 		$scope.openTabByName(record.action);
 		$scope.$apply();
 	};
@@ -430,6 +432,35 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 	}
 	
 	$(function () {
+
+		 // menu toggle logic
+		 var menuToggled = false;
+		 var navigator = $scope.app.navigator;
+
+		 if (navigator !== 'hidden') {
+			 $('#offcanvas-toggle').find('a').click(function (e) {
+				 var active = !$("#offcanvas").hasClass("active");
+				 if (active && !menuToggled && !axelor.device.small) {
+					 active = false;
+				 }
+				 menuToggled = true;
+			     $("#offcanvas").toggleClass("active", active);
+			     $("#offcanvas").toggleClass("inactive", !active);
+			 });
+		 }
+
+		 $("#offcanvas,#offcanvas-toggle").toggleClass("hidden-menu", navigator === "hidden");
+		 if (navigator === "collapse") {
+			 menuToggled = true;
+			 $("#offcanvas").addClass("inactive");
+		 }
+		 $scope.ajaxStop(function () {
+			 setTimeout(function () {
+				 $("#offcanvas,#offcanvas-toggle").removeClass("hidden");
+			 }, 100);
+		 }, 100)
+
+		 // confirm dirty
 		 $(window).on('beforeunload', onbeforeunload);
 	});
 }
