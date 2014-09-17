@@ -808,6 +808,8 @@
         </xsd:complexType>
       </xsd:element>
       <xsd:element name="panel-related" type="tns:PanelRelated"/>
+      <xsd:element name="panel-dashlet" type="tns:Portlet"/>
+      <xsd:element name="panel-include" type="tns:FormInclude"/>
     </xsd:choice>
   </xsd:group>
   <xsd:complexType name="Panel">
