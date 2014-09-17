@@ -35,6 +35,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.MimePart;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -70,6 +71,17 @@ public final class MailBuilder {
 		String text;
 		String name;
 		String file;
+		boolean html;
+
+		public MimePart apply(MimePart message) throws MessagingException {
+			if (text == null) return message;
+			if (html) {
+				message.setText(text, "UTF-8", "html");
+			} else {
+				message.setText(text);
+			}
+			return message;
+		}
 	}
 
 	public MailBuilder(Session session) {
@@ -116,9 +128,18 @@ public final class MailBuilder {
 	}
 
 	public MailBuilder text(String text) {
+		return text(text, false);
+	}
+
+	public MailBuilder html(String text) {
+		return text(text, true);
+	}
+
+	private MailBuilder text(String text, boolean html) {
 		Preconditions.checkNotNull(text, "text can't be null");
 		Content content = new Content();
 		content.text = text;
+		content.html = html;
 		contents.add(content);
 		textOnly = contents.size() == 1;
 		return this;
@@ -151,10 +172,9 @@ public final class MailBuilder {
 		for (String name : headers.keySet()) {
 			message.setHeader(name, headers.get(name));
 		}
-		
+
 		if (textOnly) {
-			String text = (String) contents.get(0).text;
-			message.setText(text);
+			contents.get(0).apply(message);
 			return message;
 		}
 
@@ -170,7 +190,7 @@ public final class MailBuilder {
 					part.attachFile(content.file);
 				}
 			} else {
-				part.setText(content.text);
+				content.apply(part);
 			}
 			mp.addBodyPart(part);
 		}
