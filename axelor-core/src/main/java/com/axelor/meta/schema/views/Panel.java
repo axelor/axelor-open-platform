@@ -39,7 +39,9 @@ public class Panel extends AbstractPanel {
 		@XmlElement(name = "button", type = Button.class),
 		@XmlElement(name = "button-group", type = ButtonGroup.class),
 		@XmlElement(name = "panel", type = Panel.class),
-		@XmlElement(name = "panel-related", type = PanelRelated.class)
+		@XmlElement(name = "panel-related", type = PanelRelated.class),
+		@XmlElement(name = "panel-dashlet", type = PanelDashlet.class),
+		@XmlElement(name = "panel-include", type = PanelInclude.class)
 	})
 	private List<AbstractWidget> items;
 
