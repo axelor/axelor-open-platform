@@ -903,11 +903,17 @@ Grid.prototype.adjustSize = function() {
 };
 
 Grid.prototype.adjustToScreen = function() {
-	var width = this.lastWidth;
-	this.lastWidth = this.element.width();
-	if (width !== undefined && width === this.lastWidth) {
+	var compact = this.__compact;
+	var mobile = axelor.device.small;
+
+	if (!compact && !mobile) {
 		return;
 	}
+	if (mobile && compact) {
+		return;
+	}
+
+	this.__compact = mobile;
 
 	_.each(this.cols, function (col, i) {
 		var field = col.descriptor || {};
@@ -915,7 +921,7 @@ Grid.prototype.adjustToScreen = function() {
 			return;
 		}
 		var hidden = col.hidden;
-		col.hidden = (axelor.device.small && i > 3);
+		col.hidden = (mobile && i > 3);
 		if (hidden !== col.hidden) {
 			this.showColumn(col.field, !col.hidden);
 		}
