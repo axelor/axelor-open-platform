@@ -128,19 +128,14 @@ public class Search extends AbstractView {
 	public static class SearchField extends Field {
 
 		@XmlAttribute
-		private String type;
-
-		@XmlAttribute
 		private String target;
 
-		public String getType() {
-			return type;
+		@JsonGetter("type")
+		@Override
+		public String getServerType() {
+			return super.getServerType();
 		}
 
-		public void setType(String type) {
-			this.type = type;
-		}
-		
 		public static Map<String, ?> getTypes() {
 			return TYPES;
 		}
@@ -168,8 +163,8 @@ public class Search extends AbstractView {
 		@SuppressWarnings("rawtypes")
 		public Object validate(Object input) {
 			try {
-				Class<?> klass = (Class<?>) TYPES.get(type);
-				if ("reference".equals(type)) {
+				Class<?> klass = (Class<?>) TYPES.get(getServerType());
+				if ("reference".equals(getServerType())) {
 					klass = Class.forName(getTarget());
 					return JPA.em().find(klass, ((Map)input).get("id"));
 				}
