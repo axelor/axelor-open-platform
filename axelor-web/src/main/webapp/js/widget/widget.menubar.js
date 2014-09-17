@@ -222,6 +222,8 @@ module.directive('uiToolbarAdjust', function() {
 			if (axelor.device.small) {
 				elemToolbar.hide();
 				elemMenubar.hide();
+				elemMenubarMobile.hide();
+				elemToolbarMobile.hide();
 				if (hasMenubar) elemMenubarMobile.show();
 				if (hasToolbar) elemToolbarMobile.show();
 				return;

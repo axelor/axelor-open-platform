@@ -904,7 +904,8 @@ Grid.prototype.adjustSize = function() {
 
 Grid.prototype.adjustToScreen = function() {
 	var width = this.lastWidth;
-	if (width === (this.lastWidth = this.element.width()) || !width) {
+	this.lastWidth = this.element.width();
+	if (width !== undefined && width === this.lastWidth) {
 		return;
 	}
 
