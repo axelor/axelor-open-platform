@@ -567,7 +567,7 @@ Grid.prototype.parse = function(view) {
 			onClick: function (e, args) {
 				if (handler && handler.onEdit) {
 					handler.applyLater(function () {
-						handler.onEdit(true);
+						handler.onEdit(!axelor.device.mobile);
 					}, 10);
 				}
 			}
