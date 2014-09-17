@@ -45,7 +45,8 @@ body {
 }
 
 .panel-layout .editable > .o2m-list .o2m-list-row .toggle-item button {
-	padding: 5px 8px 2px;
+	padding-top: 5px;
+	padding-bottom: 3px;
 }
 
 .ui-dialog .ui-dialog-buttonpane button {
