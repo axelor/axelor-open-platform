@@ -35,15 +35,20 @@ public class SmtpAccount implements MailAccount {
 	public static final String ENCRYPTION_TLS = "tls";
 
 	public static final String ENCRYPTION_SSL = "ssl";
-	
-	private static final String DEFAULT_PORT = "25";
-	
+
+	public static final String DEFAULT_PORT = "25";
+
 	private String host;
 	private String port;
 	private String user;
 	private String password;
 	private String encryption;
-	
+
+	private int connectionTimeout = DEFAULT_TIMEOUT;
+	private int timeout = DEFAULT_TIMEOUT;
+
+	private Properties properties;
+
 	private Session session;
 
 	/**
@@ -87,9 +92,24 @@ public class SmtpAccount implements MailAccount {
 		final Properties props = new Properties();
 		final String port = StringUtils.isBlank(this.port) ? DEFAULT_PORT : this.port;
 
+		props.setProperty("mail.smtp.connectiontimeout", "" + DEFAULT_TIMEOUT);
+		props.setProperty("mail.smtp.timeout", "" + DEFAULT_TIMEOUT);
+
+		if (properties != null) {
+			props.putAll(properties);
+		}
+
 		props.setProperty("mail.smtp.host", host);
 		props.setProperty("mail.smtp.port", port);
 		props.setProperty("mail.smtp.auth", "" + authenticating);
+
+		// respect manually set timeout
+		if (connectionTimeout != DEFAULT_TIMEOUT) {
+			props.setProperty("mail.smtp.connectiontimeout", "" + connectionTimeout);
+		}
+		if (timeout != DEFAULT_TIMEOUT) {
+			props.setProperty("mail.smtp.timeout", "" + timeout);
+		}
 
 		if (!authenticating) {
 			return Session.getInstance(props);
@@ -114,6 +134,22 @@ public class SmtpAccount implements MailAccount {
 		return Session.getInstance(props, authenticator);
 	}
 
+	@Override
+	public void setConnectionTimeout(int connectionTimeout) {
+		this.connectionTimeout = connectionTimeout;
+	}
+
+	@Override
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
+	}
+
+	@Override
+	public void setProperties(Properties properties) {
+		this.properties = new Properties(properties);
+	}
+
+	@Override
 	public Session getSession() {
 		if (session == null) {
 			session = init();

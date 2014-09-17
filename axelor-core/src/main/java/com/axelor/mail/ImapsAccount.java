@@ -36,6 +36,11 @@ public class ImapsAccount implements MailAccount {
 	private String user;
 	private String password;
 	
+	private int connectionTimeout = DEFAULT_TIMEOUT;
+	private int timeout = DEFAULT_TIMEOUT;
+
+	private Properties properties;
+
 	private Session session;
 
 	public ImapsAccount(String host, String port, String user, String password) {
@@ -49,11 +54,25 @@ public class ImapsAccount implements MailAccount {
 
 		final Properties props = new Properties();
 
+		props.setProperty("mail.imaps.connectiontimeout", "" + DEFAULT_TIMEOUT);
+		props.setProperty("mail.imaps.timeout", "" + DEFAULT_TIMEOUT);
+
+		if (properties != null) {
+			props.putAll(properties);
+		}
+
 		props.setProperty("mail.store.protocol", "imaps");
-		
 		props.setProperty("mail.imaps.host", host);
 		if (!StringUtils.isBlank(port)) {
 			props.setProperty("mail.imaps.port", port);
+		}
+
+		// respect manually set timeout
+		if (connectionTimeout != DEFAULT_TIMEOUT) {
+			props.setProperty("mail.imaps.connectiontimeout", "" + connectionTimeout);
+		}
+		if (timeout != DEFAULT_TIMEOUT) {
+			props.setProperty("mail.imaps.timeout", "" + timeout);
 		}
 
 		final Authenticator authenticator = new Authenticator() {
@@ -65,6 +84,21 @@ public class ImapsAccount implements MailAccount {
 		};
 
 		return Session.getInstance(props, authenticator);
+	}
+
+	@Override
+	public void setConnectionTimeout(int connectionTimeout) {
+		this.connectionTimeout = connectionTimeout;
+	}
+
+	@Override
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
+	}
+
+	@Override
+	public void setProperties(Properties properties) {
+		this.properties = new Properties(properties);
 	}
 
 	public Session getSession() {
