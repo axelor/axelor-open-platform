@@ -83,6 +83,7 @@
 			};
 			device.large = $(window).width() > 767;
 			device.small = !device.large;
+			device.mobile = /Mobile/.test(navigator.userAgent);
 			return device;
 		}
 	});
