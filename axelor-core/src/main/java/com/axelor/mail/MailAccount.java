@@ -17,6 +17,8 @@
  */
 package com.axelor.mail;
 
+import java.util.Properties;
+
 import javax.mail.Session;
 
 /**
@@ -25,6 +27,34 @@ import javax.mail.Session;
  * 
  */
 public interface MailAccount {
+
+	/**
+	 * Default connection timeout.
+	 *
+	 */
+	static final int DEFAULT_TIMEOUT = 6000;
+
+	/**
+	 * Socket connection timeout value in milliseconds.
+	 *
+	 * @param connectionTimeout
+	 *            timeout value
+	 */
+	void setConnectionTimeout(int connectionTimeout);
+
+	/**
+	 * Socket read timeout value in milliseconds.
+	 *
+	 * @param timeout
+	 *            timeout value
+	 */
+	void setTimeout(int timeout);
+
+	/**
+	 * Set additional properties.
+	 *
+	 */
+	void setProperties(Properties properties);
 
 	/**
 	 * Get a {@link Session} for this account.<br>
