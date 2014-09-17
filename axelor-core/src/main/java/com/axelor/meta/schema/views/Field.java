@@ -255,7 +255,12 @@ public class Field extends SimpleWidget {
 	}
 
 	public String getTargetName() {
-		return targetName;
+		if (targetName != null) return targetName;
+		if (target == null) return null;
+		try {
+			return Mapper.of(Class.forName(getTarget())).getNameField().getName();
+		} catch (Exception e){}
+		return null;
 	}
 
 	public Boolean getRequired() {

@@ -1482,10 +1482,10 @@
       </xsd:simpleType>
     </xsd:attribute>
     <xsd:attribute name="target" type="xsd:string" />
+    <xsd:attribute name="target-name" type="xsd:string" />
     <xsd:attribute name="domain" type="xsd:string" />
     <xsd:attribute name="selection" type="xsd:string" />
     <xsd:attribute name="widget" type="xsd:string" />
-    <xsd:attribute name="width" type="xsd:string" />
     <xsd:anyAttribute processContents="skip" />
   </xsd:complexType>
 
