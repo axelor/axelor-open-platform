@@ -17,10 +17,15 @@
  */
 package com.axelor.mail;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+
 import org.junit.Test;
 
 import com.axelor.AbstractTest;
 import com.axelor.common.ClassUtils;
+import com.google.common.io.CharStreams;
 
 public class MailSenderTest extends AbstractTest {
 
@@ -39,16 +44,24 @@ public class MailSenderTest extends AbstractTest {
 			return;
 		}
 
-		MailAccount account = new SmtpAccount(SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SmtpAccount.ENCRYPTION_SSL);
+		MailAccount account = new SmtpAccount(SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SmtpAccount.ENCRYPTION_TLS);
 		MailSender sender = new MailSender(account);
 
 		String file = ClassUtils.getResource("log4j.properties").getFile();
-		String url = "http://axelor.com/sites/default/files/logo.png";
+		String url = "http://apps.axelor.com/axelor-demo/img/axelor-logo.png";
+
+		String text = "Hello world...";
+
+		try (InputStream is = ClassUtils.getResourceStream("com/axelor/mail/test-mail.html");
+			 Reader reader = new InputStreamReader(is)) {
+			text = CharStreams.toString(reader);
+		} catch (Exception e) {
+		}
 
 		sender.compose()
 			.to(SEND_TO)
 			.subject("Hello...")
-			.text("Hello!!!")
+			.html(text)
 			.attach("log4j.properties", file)
 			.attach("logo.png", url)
 			.send();
