@@ -127,9 +127,6 @@ public class Search extends AbstractView {
 	@JsonInclude(Include.NON_NULL)
 	public static class SearchField extends Field {
 
-		@XmlAttribute
-		private String target;
-
 		@JsonGetter("type")
 		@Override
 		public String getServerType() {
@@ -138,18 +135,6 @@ public class Search extends AbstractView {
 
 		public static Map<String, ?> getTypes() {
 			return TYPES;
-		}
-
-		@Override
-		public String getTarget() {
-			return target;
-		}
-
-		public String getTargetName() {
-			try {
-				return Mapper.of(Class.forName(getTarget())).getNameField().getName();
-			} catch (Exception e){}
-			return null;
 		}
 
 		private static final Map<String, ?> TYPES = ImmutableMap.of(
