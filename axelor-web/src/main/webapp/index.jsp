@@ -41,6 +41,15 @@ if (appDesc != null)
 String appJS = AppInfo.getAppJS(getServletContext());
 String appCss = AppInfo.getAppCSS(getServletContext());
 String langJS = AppInfo.getLangJS(request, getServletContext());
+String webkitCss = null;
+
+String userAgent = request.getHeader("User-Agent");
+if (userAgent != null &&
+	userAgent.indexOf("Chrome") > -1 &&
+	userAgent.indexOf("Mobile") > -1) {
+	webkitCss = "css/webkit.mobile.css";
+}
+
 %>
 <!DOCTYPE html>
 <html lang="en" ng-app="axelor.app" ng-controller="AppCtrl" ng-cloak>
@@ -53,6 +62,13 @@ String langJS = AppInfo.getLangJS(request, getServletContext());
 
   <!-- Le styles -->
   <link href="<%= appCss %>" rel="stylesheet">
+  <%
+  	if (webkitCss != null) {
+  %>
+  <link href="<%= webkitCss %>" rel="stylesheet">
+  <%
+  	}
+  %>
   <%
   	if (appTheme != null) {
   %>
