@@ -633,13 +633,13 @@ Grid.prototype.parse = function(view) {
 	}
 
 	element.on('adjustSize', _.debounce(adjustSize, 100));
-	
-	if (element.is(':visible')) {
-		setTimeout(function () {
-			element.trigger('adjustSize');
-		});
-	}
-	
+
+	scope.$callWhen(function () {
+		return element.is(':visible');
+	}, function () {
+		return element.trigger('adjustSize');
+	}, 100);
+
 	element.addClass('slickgrid-empty');
 	this.doInit = _.once(function doInit() {
 		this._doInit(view);

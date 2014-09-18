@@ -181,11 +181,7 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 
 				element.removeClass('hidden');
 
-				scope.ajaxStop(function () {
-					scope.$timeout(function () {
-						scope.show();
-					}, 100);
-				}, 100);
+				scope.show();
 			});
 
 			scope.onDashletToggle = function(event) {

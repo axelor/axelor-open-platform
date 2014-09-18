@@ -107,9 +107,11 @@ function ChartCtrl($scope, $element, $http) {
 		});
 	}
 
-	setTimeout(function() {
-		refresh(true);
-	});
+	$scope.$callWhen(function () {
+		return $element.is(":visible");
+	}, function() {
+		return refresh(true);
+	}, 100);
 
 	$scope.onRefresh = function(force) {
 		refresh(force);
