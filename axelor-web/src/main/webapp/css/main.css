@@ -72,6 +72,13 @@ header .navbar .nav-shortcuts > li > a {
 	padding: 10px 8px 9px;
 }
 
+header .nav-menu-bar li > a > img {
+	width: 16px;
+	height: 16px;
+	max-width: 16px;
+	max-height: 16px;
+}
+
 header .navbar .nav-shortcuts > .divider-vertical {
 	margin: 0 4px;
 }
