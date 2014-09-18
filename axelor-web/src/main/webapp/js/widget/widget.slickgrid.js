@@ -1455,8 +1455,7 @@ Grid.prototype.onAddNewRow = function(event, args) {
 		grid.invalidateRow(dataView.length);
 		dataView.addItem(item);
 	    
-		grid.updateRowCount();
-	    grid.render();
+		grid.resizeCanvas();
 	}
 };
 
