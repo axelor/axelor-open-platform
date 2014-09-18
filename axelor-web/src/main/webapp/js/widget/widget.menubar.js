@@ -197,8 +197,6 @@ module.directive('uiToolbarAdjust', function() {
 		var elemMenubarMobile = null;
 		var elemToolbarMobile = null;
 		
-		var hasMenubar = false;
-		var hasToolbar = false;
 		var lastWidth = 0;
 
 		function setup() {
@@ -206,11 +204,8 @@ module.directive('uiToolbarAdjust', function() {
 			elemToolbar = element.children('.view-toolbar');
 			elemSiblings = element.children(':not(.view-menubar,.view-toolbar)');
 
-			elemMenubarMobile = element.children('.view-menubar-mobile');
-			elemToolbarMobile = element.children('.view-toolbar-mobile');
-			
-			hasMenubar = !_.isEmpty(scope.menubar);
-			hasToolbar = !_.isEmpty(scope.toolbar);
+			elemMenubarMobile = element.children('.view-menubar-mobile').hide();
+			elemToolbarMobile = element.children('.view-toolbar-mobile').hide();
 		}
 
 		function adjust() {
@@ -219,6 +214,9 @@ module.directive('uiToolbarAdjust', function() {
 				return;
 			}
 			
+			var hasMenubar = !_.isEmpty(scope.menubar);
+			var hasToolbar = !_.isEmpty(scope.toolbar);
+
 			if (axelor.device.small) {
 				elemToolbar.hide();
 				elemMenubar.hide();
