@@ -629,7 +629,9 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
         function create(term, popup) {
 			scope.createOnTheFly(term, popup, function (record) {
 				scope.select(record);
-				input.width(50);
+				setTimeout(function() {
+					input.focus();
+				});
 			});
 		}
 
