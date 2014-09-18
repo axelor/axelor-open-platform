@@ -188,10 +188,10 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 
 .blocker-overlay .blocker-spinner i {
 	font-size: 42px;
-	-webkit-animation: spin 1.05s infinite linear;
-	   -moz-animation: spin 1.05s infinite linear;
-	     -o-animation: spin 1.05s infinite linear;
-		    animation: spin 1.05s infinite linear;
+	-webkit-animation: fa-spin 1.05s infinite linear;
+	   -moz-animation: fa-spin 1.05s infinite linear;
+	     -o-animation: fa-spin 1.05s infinite linear;
+		    animation: fa-spin 1.05s infinite linear;
 }
 
 .blocker-overlay.wait .blocker-wait {
