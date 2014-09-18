@@ -90,7 +90,9 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 				var target = element.data('$target');
 				if (target) {
 					return setTimeout(function(){
-						target.find(':input:first').focus().select();
+						if (!axelor.device.mobile) {
+							target.find(':input:first').focus().select();
+						}
 					});
 				}
 				$('body .ui-dialog:visible:last').focus();

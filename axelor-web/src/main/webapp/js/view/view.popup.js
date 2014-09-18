@@ -506,7 +506,9 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 				element.closest('.ui-dialog').css('visibility', '');
 
 				// focus first element
-				element.find(':input:first').focus();
+				if (!axelor.device.mobile) {
+					element.find(':input:first').focus();
+				}
 
 				//XXX: ui-dialog issue
 				element.find('.slick-headerrow-column,.slickgrid').zIndex(element.zIndex());

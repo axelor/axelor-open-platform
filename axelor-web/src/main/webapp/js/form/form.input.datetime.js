@@ -246,7 +246,16 @@ ui.formInput('DateTime', {
 			if (scope.isReadonly()) {
 				return;
 			}
+			var mobile = axelor.device.mobile;
+			if (mobile) {
+				input.attr('disabled', 'disabled')
+					 .addClass('mobile-disabled-input');
+			}
 			input.datetimepicker('show');
+			if (mobile) {
+				input.removeAttr('disabled')
+					 .removeClass('mobile-disabled-input');
+			}
 		});
 
 		element.on('adjustSize adjustScroll', function (e) {

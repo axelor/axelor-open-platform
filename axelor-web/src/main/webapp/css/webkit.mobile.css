@@ -53,3 +53,13 @@ body {
 .ui-dialog .ui-dialog-buttonpane button {
 	padding: 5px 12px 3px;
 }
+
+.mobile-disabled-input {
+	color: #333;
+	background-color: white;
+}
+
+.picker-input > .picker-icons > i.fa {
+	padding-top: 4px;
+	font-size: 20px;
+}

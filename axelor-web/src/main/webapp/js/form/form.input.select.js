@@ -54,7 +54,9 @@ ui.formWidget('BaseSelect', {
 			if (scope.isReadonly()) {
 				return;
 			}
-			input.focus();
+			if (!axelor.device.mobile) {
+				input.focus();
+			}
 			input.autocomplete("search" , '');
 		};
 
