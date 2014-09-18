@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlType;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
-@JsonTypeName("portlet")
-public class PanelDashlet extends Portlet {
+@JsonTypeName("dashlet")
+public class Dashlet extends Portlet {
 
 }

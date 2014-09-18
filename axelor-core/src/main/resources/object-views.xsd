@@ -11,6 +11,7 @@
         <xsd:element name="calendar" type="tns:CalendarView" />
         <xsd:element name="chart" type="tns:ChartView" />
         <xsd:element name="portal" type="tns:Portal" />
+        <xsd:element name="dashboard" type="tns:Dashboard" />
         <xsd:element name="search" type="tns:Search" />
         <xsd:element name="search-filters" type="tns:SearchFilters" />
         <xsd:element name="menuitem" type="tns:MenuItem" />
@@ -808,7 +809,7 @@
         </xsd:complexType>
       </xsd:element>
       <xsd:element name="panel-related" type="tns:PanelRelated"/>
-      <xsd:element name="panel-dashlet" type="tns:Portlet"/>
+      <xsd:element name="panel-dashlet" type="tns:Dashlet"/>
       <xsd:element name="panel-include" type="tns:FormInclude"/>
     </xsd:choice>
   </xsd:group>
@@ -849,7 +850,7 @@
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="panel" type="tns:Panel" />
           <xsd:element name="panel-related" type="tns:PanelRelated"/>
-          <xsd:element name="panel-dashlet" type="tns:Portlet" />
+          <xsd:element name="panel-dashlet" type="tns:Dashlet" />
           <xsd:element name="panel-include" type="tns:FormInclude" />
         </xsd:choice>
         <xsd:attribute name="itemSpan" use="prohibited"/>
@@ -897,6 +898,34 @@
     </xsd:complexContent>
   </xsd:complexType>
 
+  <xsd:complexType name="Dashlet">
+    <xsd:complexContent>
+      <xsd:extension base="tns:Portlet">
+        <xsd:attribute name="rowSpan" use="prohibited"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="Dashboard">
+    <xsd:sequence>
+      <xsd:element name="dashlet" type="tns:Dashlet" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>Specify an action view as a dashlet.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="name" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>Specify an unique name for this dashboard.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="title" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>The display title.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+
   <xsd:complexType name="AbstractFormView" abstract="true">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractView">
@@ -907,7 +936,7 @@
               <xsd:choice maxOccurs="unbounded">
                 <xsd:element name="panel" type="tns:Panel" />
                 <xsd:element name="panel-include" type="tns:FormInclude" />
-                <xsd:element name="panel-dashlet" type="tns:Portlet" />
+                <xsd:element name="panel-dashlet" type="tns:Dashlet" />
                 <xsd:element name="panel-related" type="tns:PanelRelated" />
                 <xsd:element name="panel-stack" type="tns:PanelTabs" />
                 <xsd:element name="panel-tabs" type="tns:PanelTabs" />

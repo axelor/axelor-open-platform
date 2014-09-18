@@ -107,7 +107,9 @@ function ChartCtrl($scope, $element, $http) {
 		});
 	}
 
-	setTimeout(refresh);
+	setTimeout(function() {
+		refresh(true);
+	});
 
 	$scope.onRefresh = function(force) {
 		refresh(force);
@@ -594,7 +596,7 @@ function Chart(scope, element, data) {
 			chart.yAxis.axisLabel(data.yTitle);
 		}
 		
-		chart.margin({ left: 90, top: 25 });
+		//XXX: chart.margin({ left: 90, top: 25 });
 
 		var lastWidth = 0;
 		var lastHeight = 0;
