@@ -476,11 +476,14 @@ ui.formInput('MultiSelect', 'Select', {
 		function update(value) {
 			scope.setValue(value, true);
 			scope.applyLater();
+			setTimeout(function () {
+				scaleInput(50);
+			});
 		}
 		
 		scope.removeItem = function(item) {
 			var items = this.getSelection(),
-				value = _.isString(item) ? item : item.value;
+				value = _.isString(item) ? item : (item||{}).value;
 
 			items = _.chain(items)
 				     .pluck('value')
