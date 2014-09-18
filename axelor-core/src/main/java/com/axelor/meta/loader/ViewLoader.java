@@ -181,7 +181,7 @@ public class ViewLoader extends AbstractLoader {
 		
 		String xml = XMLViews.toXml(view, true);
 
-		if (type.matches("tree|chart|portal|search")) {
+		if (type.matches("tree|chart|portal|dashboard|search")) {
 			modelName = null;
 		} else if (StringUtils.isBlank(modelName)) {
 			throw new IllegalArgumentException("Invalid view, model name missing.");
