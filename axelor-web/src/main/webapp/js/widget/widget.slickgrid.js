@@ -567,7 +567,7 @@ Grid.prototype.parse = function(view) {
 			onClick: function (e, args) {
 				if (handler && handler.onEdit) {
 					handler.applyLater(function () {
-						handler.onEdit(!axelor.device.mobile);
+						handler.onEdit(true);
 					}, 10);
 				}
 			}
@@ -1516,7 +1516,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 	this.editorForm = form;
 	this.editorScope = formScope;
 	this.editorForEdit = forEdit;
-	this.editable = true;
+	this.editable = forEdit;
 };
 
 Grid.prototype.onSelectionChanged = function(event, args) {

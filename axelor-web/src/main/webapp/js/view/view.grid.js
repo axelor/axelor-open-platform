@@ -463,7 +463,11 @@ function GridViewCtrl($scope, $element) {
 	};
 	
 	$scope.onItemClick = function(event, args) {
-		
+		if (axelor.device.mobile) {
+			$scope.$timeout(function () {
+				$scope.onEdit();
+			});
+		}
 	};
 	
 	$scope.onItemDblClick = function(event, args) {
