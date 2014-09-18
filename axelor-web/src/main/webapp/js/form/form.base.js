@@ -310,7 +310,9 @@ ui.formDirective = function(name, object) {
 					// focus the first input field
 					if (scope.$elem_editable.is('.input-append,.picker-input')) {
 						scope.$elem_editable.on('click', '.btn, i', function(){
-							scope.$elem_editable.find('input:first').focus();
+							if (!axelor.device.mobile) {
+								scope.$elem_editable.find('input:first').focus();
+							}
 						});
 					}
 
