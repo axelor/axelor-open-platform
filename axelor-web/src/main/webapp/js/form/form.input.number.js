@@ -51,10 +51,10 @@ ui.formInput('Number', {
             	value = +value;
             }
 
-            if (valid && minSize) {
+            if (valid && (minSize || minSize === 0)) {
 				valid = value >= minSize;
 			}
-			if (valid && maxSize) {
+			if (valid && (maxSize || maxSize === 0)) {
 				valid = value <= maxSize;
 			}
 
