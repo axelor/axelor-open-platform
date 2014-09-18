@@ -26,38 +26,15 @@ import javax.xml.bind.annotation.XmlType;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
-@JsonTypeName("panel")
-public class Panel extends AbstractPanel {
-
-	@XmlElement
-	private Menu menu;
+@JsonTypeName("dashboard")
+public class Dashboard extends AbstractView {
 
 	@XmlElements({
-		@XmlElement(name = "field", type = PanelField.class),
-		@XmlElement(name = "spacer", type = Spacer.class),
-		@XmlElement(name = "label", type = Label.class),
-		@XmlElement(name = "button", type = Button.class),
-		@XmlElement(name = "button-group", type = ButtonGroup.class),
-		@XmlElement(name = "panel", type = Panel.class),
-		@XmlElement(name = "panel-related", type = PanelRelated.class),
-		@XmlElement(name = "panel-dashlet", type = Dashlet.class),
-		@XmlElement(name = "panel-include", type = PanelInclude.class)
+		@XmlElement(name = "dashlet", type = Dashlet.class),
 	})
 	private List<AbstractWidget> items;
 
-	public Menu getMenu() {
-		return menu;
-	}
-
-	public void setMenu(Menu menu) {
-		this.menu = menu;
-	}
-
 	public List<AbstractWidget> getItems() {
-		return process(items);
-	}
-
-	public void setItems(List<AbstractWidget> items) {
-		this.items = items;
+		return items;
 	}
 }

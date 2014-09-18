@@ -39,6 +39,7 @@ import com.axelor.meta.schema.actions.ActionWorkflow;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.CalendarView;
 import com.axelor.meta.schema.views.ChartView;
+import com.axelor.meta.schema.views.Dashboard;
 import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.MenuItem;
@@ -71,6 +72,7 @@ public class ObjectViews {
 		@XmlElement(name = "tree", type = TreeView.class),
 		@XmlElement(name = "chart", type = ChartView.class),
 		@XmlElement(name = "portal", type = Portal.class),
+		@XmlElement(name = "dashboard", type = Dashboard.class),
 		@XmlElement(name = "search", type = Search.class),
 		@XmlElement(name = "calendar", type = CalendarView.class),
 		@XmlElement(name = "search-filters", type = SearchFilters.class),

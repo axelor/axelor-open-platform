@@ -10,6 +10,7 @@
     <option value="chart">Chart</option>
     <option value="search">Search</option>
     <option value="portal">Portal</option>
+    <option value="dashboard">Dashboard</option>
     <option value="calendar">Calendar</option>
     <option value="search-filters">Filters</option>
   </selection>
