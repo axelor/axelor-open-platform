@@ -649,7 +649,7 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
         scope.loadSelection = function(request, response) {
 
 			var canSelect = field.canSelect !== false;
-			var canCreate = field.canNew !== false;
+			var canCreate = field.canNew !== false && field.create;
 
 			if (!canSelect) {
 				return response([]);
