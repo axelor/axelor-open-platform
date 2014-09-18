@@ -1298,6 +1298,20 @@ Grid.prototype.findPrevEditable = function(posY, posX) {
 
 Grid.prototype.saveChanges = function(args, callback) {
 
+	// onBeforeSave may cause recursion
+	if (this._saveChangesRunning) {
+		return;
+	}
+
+	this._saveChangesRunning = true;
+	var res = this.__saveChanges(args, callback);
+	this._saveChangesRunning = false;
+
+	return res;
+}
+
+Grid.prototype.__saveChanges = function(args, callback) {
+
 	var grid = this.grid,
 		lock = grid.getEditorLock();
 
