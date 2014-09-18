@@ -402,19 +402,28 @@ ui.formInput('OneToMany', {
 
 		var adjustHeight = false;
 		var adjustSize = (function() {
-			var rowSize = 26,
-				minSize = 56,
-				maxSize = (rowSize * 10) + minSize;
+			var rowSize = 26;
+			var	minSize = 56;
+			var elem = element;
+			if (elem.is('.panel-related')) {
+				elem = element.children('.panel-body');
+				minSize = 28;
+			}
+			if (elem.is('.picker-input')) {
+				elem = null;
+			}
+
 			var inc = 0;
+			var maxSize = (rowSize * 10) + minSize;
+
 			return function(value) {
-				if (scope.$hasPanels) return;
 				inc = arguments[1] || inc;
 				var count = _.size(value) + inc, height = minSize;
 				if (count > 0) {
 					height = (rowSize * count) + (minSize + rowSize);
 				}
-				if (adjustHeight) {
-					element.css('min-height', Math.min(height, maxSize));
+				if (elem && adjustHeight) {
+					elem.css('min-height', Math.min(height, maxSize));
 				}
 				axelor.$adjustSize();
 			};
@@ -453,6 +462,8 @@ ui.formInput('OneToMany', {
 				});
 				
 				adjustSize(scope.getValue(), 1);
+			} else {
+				adjustSize(scope.getValue());
 			}
 
 			inst.showColumn('_edit_column', editIcon);
