@@ -645,12 +645,15 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 		}
 
 		main.on("adjustSize", _.debounce(adjustSize, 100));
-		setTimeout(function() {
+
+		scope.$callWhen(function () {
+			return main.is(':visible');
+		}, function() {
 			scope.onMode(mode);
 			adjustSize();
-		});
+		}, 100);
 	}
-	
+
 	return {
 		link: function(scope, element, attrs, controller) {
 			scope._viewPromise.then(function(){
