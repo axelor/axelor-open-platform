@@ -62,6 +62,19 @@
 				return this.$timeout(func ||angular.noop, wait);
 			};
 
+			__custom__.$callWhen = function (predicate, callback, wait) {
+				var count = wait || 100;
+
+				function later() {
+					if (count-- === 0 || (_.isFunction(predicate) && predicate())) {
+						return callback();
+					}
+					return _.delay(later, count);
+				}
+
+				this.$timeout(later, wait);
+			};
+
 			__custom__.$timeout = function(func, wait, invokeApply) {
 				if ($timeout === null) {
 					$timeout = $injector.get('$timeout');
