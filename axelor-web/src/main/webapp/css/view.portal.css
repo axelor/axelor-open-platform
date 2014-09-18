@@ -277,3 +277,17 @@
 		width: calc(100% - 10px);
 	}
 }
+
+.chart-controls .span6 {
+	width: calc(50% - 4px) !important;
+	margin: 0 4px !important;
+	float: left !important;
+}
+
+.chart-controls .span6:first-child {
+	margin-left: 0 !important;
+}
+
+.chart-controls .span6:last-child {
+	margin-right: 0 !important;
+}
