@@ -1606,7 +1606,7 @@ Grid.prototype.onItemClick = function(event, args) {
 		return this.onButtonClick(event, args);
 	}
 	
-	if (!this.scope.selector && this.editable) {
+	if (!this.scope.selector && this.editable && this.canAdd()) {
 		return this.grid.setActiveCell();
 	}
 	if (this.handler.onItemClick) {
