@@ -158,12 +158,12 @@
 	border: none;
 }
 
-.ui-dialog-responsive:not(.ui-dialog-draggable) {
+.ui-dialog-responsive:not(.ui-dialog-dragged) {
 	top: 0 !important;
 	left: 0 !important;
 }
 
-.ui-dialog-responsive.ui-dialog-draggable {
+.ui-dialog-responsive.ui-dialog-dragged {
 	margin: 0 !important;
 }
 
@@ -211,10 +211,10 @@
 	.ui-dialog-small {
 		width: 480px !important;
 	}
-	.ui-dialog-responsive:not(.ui-dialog-draggable) {
+	.ui-dialog-responsive:not(.ui-dialog-dragged) {
 		left: calc(50% - 370px) !important;
 	}
-	.ui-dialog-small:not(.ui-dialog-draggable) {
+	.ui-dialog-small:not(.ui-dialog-dragged) {
 		width: 480px !important;
 		left: calc(50% - 240px) !important;
 	}
@@ -226,10 +226,10 @@
 	.ui-dialog-small {
 		width: 480px !important;
 	}
-	.ui-dialog-responsive:not(.ui-dialog-draggable) {
+	.ui-dialog-responsive:not(.ui-dialog-dragged) {
 		left: calc(50% - 450px) !important;
 	}
-	.ui-dialog-small:not(.ui-dialog-draggable) {
+	.ui-dialog-small:not(.ui-dialog-dragged) {
 		left: calc(50% - 240px) !important;
 	}
 }
@@ -270,7 +270,7 @@
 		width: calc(100% - 16px) !important;
 		height: calc(100% - 16px) !important;
 	}
-	.ui-dialog-responsive.ui-dialog-draggable {
+	.ui-dialog-responsive.ui-dialog-dragged {
 		margin: 8px !important;
 	}
 	.ui-dialog-responsive .ui-dialog-title {

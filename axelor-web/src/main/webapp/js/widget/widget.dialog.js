@@ -67,8 +67,8 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 						event.stopPropagation();
 						return false;
 					}
-					if (!parent.hasClass('ui-dialog-draggable')) {
-						parent.addClass('ui-dialog-draggable');
+					if (!parent.hasClass('ui-dialog-dragged')) {
+						parent.addClass('ui-dialog-dragged');
 					}
 				}
 			});
