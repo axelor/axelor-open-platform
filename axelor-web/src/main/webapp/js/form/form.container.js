@@ -125,6 +125,42 @@ ui.formWidget('Portlet', {
 	'</div>'
 });
 
+ui.formWidget('Dashlet', {
+
+	css: 'dashboard',
+
+	showTitle: false,
+
+	link: function(scope, element, attrs) {
+
+		var field = scope.field;
+		var dashlet = _.extend({}, scope.field);
+
+		scope.dashlet = dashlet;
+
+		if (field.name) {
+			scope.formPath = field.name;
+		}
+
+		if (field.height) {
+			element.height(field.height);
+		}
+
+		element.resizable({
+			handles: 's',
+			resize: _.debounce(function() {
+				axelor.$adjustSize();
+				element.width('auto');
+			}, 100)
+		});
+	},
+
+	template:
+	'<div>'+
+		'<div ui-view-dashlet></div>'+
+	'</div>'
+});
+
 /**
  * The Tabs widget (notebook).
  */
