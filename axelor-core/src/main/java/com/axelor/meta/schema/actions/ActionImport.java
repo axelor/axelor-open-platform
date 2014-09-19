@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,6 @@ import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
 import com.google.common.base.Objects;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -167,8 +167,9 @@ public class ActionImport extends Action {
 
 	@Override
 	public Object wrap(ActionHandler handler) {
-		Object records = evaluate(handler);
-		return ImmutableMap.of("values", records);
+		final Map<String, Object> result = new HashMap<>();
+		result.put("values", evaluate(handler));
+		return result;
 	}
 
 	@Override

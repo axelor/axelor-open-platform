@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.schema.actions;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +27,6 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.meta.ActionHandler;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 @XmlType
@@ -88,10 +88,12 @@ public class ActionAttrs extends Action {
 	
 	@Override
 	public Object wrap(ActionHandler handler) {
-		Object value = evaluate(handler);
+		final Object value = evaluate(handler);
 		if (value == null) {
 			return null;
 		}
-		return ImmutableMap.of("attrs", value);
+		final Map<String, Object> result = new HashMap<>();
+		result.put("attrs", value);
+		return result;
 	}
 }
