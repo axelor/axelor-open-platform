@@ -275,13 +275,17 @@
 }
 .panel-layout .m2o-editor-controls {
 	position: absolute;
-	top: -20px;
+	top: -18px;
 	right: 0;
 }
 
 .panel-layout .m2o-editor-controls a {
 	margin: 0 4px;
 	color: #333;
+}
+
+[x-show-title="false"] .m2o-editor {
+	margin-top: 18px;
 }
 
 .panel-layout .o2m-list .form-item {
