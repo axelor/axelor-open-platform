@@ -27,17 +27,6 @@ public abstract class AbstractContainer extends SimpleWidget {
 
 	@XmlAttribute
 	private Integer rowSpan;
-	
-	@XmlAttribute
-	private String height;
-	
-	public String getHeight() {
-		return height;
-	}
-	
-	public void setHeight(String height) {
-		this.height = height;
-	}
 
 	public Integer getRowSpan() {
 		return rowSpan;
