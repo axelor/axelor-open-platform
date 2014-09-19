@@ -219,6 +219,15 @@
 	margin: 4px !important;
 }
 
+.form-item .dashboard {
+	padding: 0 !important;
+}
+.form-item .dashboard .dashlet {
+	margin: 0 !important;
+}
+
+/** responsive dashlet classes */
+
 [class*="dashlet-cs"] {
   float: left;
   min-height: 1px;

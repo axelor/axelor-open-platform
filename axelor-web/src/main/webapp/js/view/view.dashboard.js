@@ -114,7 +114,6 @@ DashletCtrl.$inject = ['$scope', '$element', 'MenuService', 'DataSource', 'ViewS
 function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 
 	var self = this;
-	var dashlet = $scope.dashlet;
 
 	function init() {
 
@@ -129,7 +128,7 @@ function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 		};
 	}
 
-	function doLoad() {
+	function doLoad(dashlet) {
 
 		var action = dashlet.action;
 		if (!action) {
@@ -152,7 +151,13 @@ function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 		});
 	};
 
-	doLoad();
+	var unwatch;
+	unwatch = $scope.$watch('dashlet', function (dashlet) {
+		if (dashlet) {
+			doLoad(dashlet);
+			unwatch();
+		}
+	});
 
 	$scope.$on('on:attrs-change:refresh', function(e) {
 		e.preventDefault();
