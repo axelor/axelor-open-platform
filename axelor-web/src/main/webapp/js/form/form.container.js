@@ -466,8 +466,6 @@ ui.formWidget('PanelTabs', {
 			found.hidden = false;
 			found.tabItem.show();
 
-			adjust(true);
-
 			if (!selected || selected === found) {
 				return scope.selectTab(found);
 			}
@@ -513,15 +511,16 @@ ui.formWidget('PanelTabs', {
 			});
 		});
 
-		var lastWidth = 0;
 		var menuWidth = 120; // max-width
 		var elemTabs = $();
 		var elemMenu = $();
+		var elemMenuTitle = $();
 		var elemMenuItems = $();
 
 		function setup() {
 			elemTabs = element.children('.nav-tabs').children('li:not(.dropdown)');
 			elemMenu = element.children('.nav-tabs').children('li.dropdown');
+			elemMenuTitle = elemMenu.children('a:first').children('span');
 			elemMenuItems = elemMenu.find('li');
 
 			_.each(scope.tabs, function (tab, index) {
@@ -544,57 +543,68 @@ ui.formWidget('PanelTabs', {
 			scope.more = more;
 			if (show) {
 				elemMenu.show();
+				elemMenuTitle.html((more||{}).title);
 			}
 		}
 
-		function adjust(force) {
-			if (elemTabs === null) {
+		var adjusting = false;
+
+		function adjust() {
+
+			if (elemTabs === null || adjusting) {
 				return;
-			}
-			var parentWidth = element.width() - menuWidth - 16;
-			if (parentWidth === lastWidth && force !== true) {
-				return;
-			}
-			if (!force) {
-				lastWidth = parentWidth;
 			}
 
-			elemTabs.hide();
+			var parentWidth = element.width() - 32;
+			if (parentWidth <= 0) {
+				return;
+			}
+
+			adjusting = true;
+
+			elemTabs.hide().css('visibility', 'hidden');
 			elemMenu.hide();
+			elemMenuTitle.empty();
 			elemMenuItems.hide().data('visible', null);
-			scope.more = null;
 
 			var count = 0;
 			var width = 0;
 			var last = null;
 
 			while (count < scope.tabs.length) {
-				var tab = scope.tabs[count];
+				var tab = scope.tabs[count++];
 				var elem = tab.tabItem;
 
-				if (!tab.hidden) {
-					elem.show();
+				if (tab.hidden) {
+					continue;
 				}
 
-				width += elem.width();
+				width += elem.show().width() + 3;
 				if (width > parentWidth && last) {
-					// show menu...
+					// requires menu...
 					elem.hide();
+					count--;
+					if (width + menuWidth - elem.width() > parentWidth) {
+						last.hide();
+						count--;
+					}
 					break;
 				}
-				last = elem;
-				count++;
+				last = elem.css('visibility', '');
+			}
+			while(count < elemTabs.size()) {
+				var tab = scope.tabs[count++];
+				if (tab.hidden) continue;
+				$(elemMenuItems[count-1]).show().data('visible', true);
 			}
 			if (count === elemTabs.size()) {
 				elemMenu.hide();
 			}
-			while(count < elemTabs.size()) {
-				$(elemMenuItems[count++]).show().data('visible', true);
-			}
 			setMenuTitle();
+			adjusting = false;
 		}
 
-		element.on('adjustSize', adjust);
+		element.on('adjustSize', _.debounce(adjust, 10));
 
 		scope.$timeout(function() {
 			setup();
@@ -611,7 +621,7 @@ ui.formWidget('PanelTabs', {
 				"</li>" +
 				"<li class='dropdown' ng-class='{active: more.selected}' style='display: none'>" +
 					"<a tabindex='-1' href='' title='{{more.title}}' class='dropdown-toggle' ng-click='onMenuClick($event)'>" +
-						"<span ng-bind-html-unsafe='more.title'></span><b class='caret'></b>" +
+						"<span></span><b class='caret'></b>" +
 					"</a>" +
 					"<ul class='dropdown-menu pull-right' data-toggle='dropdown'>" +
 						"<li ng-repeat='tab in tabs' ng-class='{active: tab.selected}'>" +
