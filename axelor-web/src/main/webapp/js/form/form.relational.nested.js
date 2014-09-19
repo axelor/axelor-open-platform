@@ -300,28 +300,6 @@ var NestedEditor = {
 			element.hide();
 		};
 		
-		var icons = null;
-		scope.canShowIcon = function (which) {
-			var names;
-			if (icons === null) {
-				icons = {};
-				names = scope.field.showIcons || scope.$parent.field.showIcons;
-				if (names === false) {
-					icons.$all = false;
-				} else if (names === true || names === undefined) {
-					icons.$all = true;
-				} else if (names) {
-					names = names.split(',');
-					names.forEach(function (name) {
-						icons[name.trim()] = true;
-					});
-				}
-			}
-			if (icons.$all !== undefined) return icons.$all;
-			if (icons[which] !== undefined) return icons[which];
-			return true;
-		};
-		
 		scope.canClose = function() {
 			return scope.canToggle() && scope.canSelect();
 		};
