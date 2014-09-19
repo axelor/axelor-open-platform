@@ -179,7 +179,7 @@ module.directive('navMenuBar', function() {
 
 			element.on('$destroy', function () {
 				if (element) {
-					window.off("resize.menubar");
+					$(window).off("resize.menubar");
 					element = null;
 				}
 			});
