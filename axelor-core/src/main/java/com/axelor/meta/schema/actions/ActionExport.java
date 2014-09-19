@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -42,7 +44,6 @@ import com.axelor.text.StringTemplates;
 import com.axelor.text.Templates;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 
 @XmlType
@@ -139,15 +140,20 @@ public class ActionExport extends Action {
 			if(!export.test(handler)){
 				continue;
 			}
+			final Map<String, Object> result = new HashMap<>();
 			try {
 				String file = doExport(dir, export, handler);
 				if (getDownload() == Boolean.TRUE) {
-					return ImmutableMap.of("exportFile", file, "notify", I18n.get("Export complete."));
+					result.put("exportFile", file);
+					result.put("notify", I18n.get("Export complete."));
+					return result;
 				}
-				return ImmutableMap.of("notify", I18n.get("Export complete."));
+				result.put("notify", I18n.get("Export complete."));
+				return result;
 			} catch (Exception e) {
 				log.error("error while exporting: ", e);
-				return ImmutableMap.of("error", e.getMessage());
+				result.put("error", e.getMessage());
+				return result;
 			}
 		}
 		return null;

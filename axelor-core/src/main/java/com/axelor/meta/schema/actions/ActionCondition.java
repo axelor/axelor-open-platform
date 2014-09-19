@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.schema.actions;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,6 @@ import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 @XmlType
@@ -76,9 +76,11 @@ public class ActionCondition extends Action {
 
 	@Override
 	public Object wrap(ActionHandler handler) {
-		Object value = evaluate(handler);
+		final Object value = evaluate(handler);
+		final Map<String, Object> result = new HashMap<>();
 		if (value instanceof Map) {
-			return ImmutableMap.of("errors", value);
+			result.put("errors", value);
+			return result;
 		}
 		return value;
 	}

@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.schema.actions;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,6 @@ import com.axelor.db.mapper.Property;
 import com.axelor.meta.ActionHandler;
 import com.axelor.rpc.Resource;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 @XmlType
@@ -211,11 +211,13 @@ public class ActionRecord extends Action {
 	
 	@Override
 	public Object wrap(ActionHandler handler) {
-		Map<String, Object> map = Maps.newHashMap();
+		final Map<String, Object> map = new HashMap<>();
 		Object value = _evaluate(handler, map);
 		if (value == null) {
 			return null;
 		}
-		return ImmutableMap.of("values", map);
+		final Map<String, Object> result = new HashMap<>();
+		result.put("values", map);
+		return map;
 	}
 }
