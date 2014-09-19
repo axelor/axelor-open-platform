@@ -145,6 +145,28 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		}
 		$scope.showNestedEditor($scope._isNestedOpen);
 	};
+	
+	var icons = null;
+	$scope.canShowIcon = function (which) {
+		var names;
+		if (icons === null) {
+			icons = {};
+			names = $scope.field.showIcons || $scope.$parent.field.showIcons;
+			if (names === false) {
+				icons.$all = false;
+			} else if (names === true || names === undefined) {
+				icons.$all = true;
+			} else if (names) {
+				names = names.split(',');
+				names.forEach(function (name) {
+					icons[name.trim()] = true;
+				});
+			}
+		}
+		if (icons.$all !== undefined) return icons.$all;
+		if (icons[which] !== undefined) return icons[which];
+		return true;
+	};
 }
 
 ui.formInput('ManyToOne', 'Select', {
@@ -469,9 +491,9 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 		return "" +
 		"<div class='m2o-editor'>" +
 			"<div class='m2o-editor-controls'>" +
-				"<a href='' ng-click='onEdit()'><i class='fa fa-pencil'></i></a>" +
-				"<a href='' ng-click='onSelect()'><i class='fa fa-search'></i></a>" +
-				"<a href='' ng-click='onClear()'><i class='fa fa-times-circle'></i></a>" +
+				"<a href='' ng-show='canEdit()' ng-click='onEdit()'><i class='fa fa-pencil'></i></a>" +
+				"<a href='' ng-show='canShowIcon(\"select\")' ng-click='onSelect()'><i class='fa fa-search'></i></a>" +
+				"<a href='' ng-show='canShowIcon(\"clear\")' ng-click='onClear()'><i class='fa fa-times-circle'></i></a>" +
 			"</div>" +
 			"<div class='m2o-editor-form' ui-panel-editor></div>" +
 		"</div>";
