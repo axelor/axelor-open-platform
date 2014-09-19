@@ -449,10 +449,12 @@ ui.formWidget('PanelTabs', {
 
 			setMenuTitle();
 
-			elemTabs.removeClass('open');
-			elemMenu.removeClass('open');
+			setTimeout(function () {
+				elemTabs.removeClass('open');
+				elemMenu.removeClass('open');
 
-			axelor.$adjustSize();
+				axelor.$adjustSize();
+			});
 		};
 
 		scope.showTab = function (tab) {
@@ -506,7 +508,9 @@ ui.formWidget('PanelTabs', {
 		scope.onMenuClick = _.once(function(e) {
 			var elem = $(e.currentTarget);
 			elem.dropdown();
-			elem.dropdown('toggle');
+			setTimeout(function () {
+				elem.dropdown('toggle');
+			});
 		});
 
 		var lastWidth = 0;
