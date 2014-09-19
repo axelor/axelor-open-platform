@@ -509,6 +509,13 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-can-reload" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify whether the popup editor can reload the parent form on close.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="x-icon" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>Specify an icon.</xsd:documentation>
