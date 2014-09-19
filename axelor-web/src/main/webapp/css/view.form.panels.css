@@ -207,7 +207,7 @@
 .panel-related .panel-body {
 	padding: 0;
 	position: relative;
-	min-height: 200px;
+	min-height: 1px;
 }
 
 .panel-related .panel-body .slickgrid {
