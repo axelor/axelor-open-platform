@@ -334,7 +334,36 @@
             <xsd:documentation>Custom css class to apply.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="height">
+          <xsd:annotation>
+            <xsd:documentation>
+              Specify the widget height.&lt;br&gt;&lt;br&gt;
+
+              The height can be specified as percentage
+              or fixed value.&lt;br&gt;&lt;br&gt;
+
+              The fix height can be either in 'px'
+              or 'em', 'px' is assumed if not specified.
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:pattern value="\d+(%|px|pt|em)?"></xsd:pattern>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
         <xsd:attribute name="width">
+          <xsd:annotation>
+            <xsd:documentation>
+              Specify the widget width.&lt;br&gt;&lt;br&gt;
+
+              The width can be specified as percentage
+              or fixed value.&lt;br&gt;&lt;br&gt;
+
+              The fix width can be either in 'px'
+              or 'em', 'px' is assumed if not specified.
+            </xsd:documentation>
+          </xsd:annotation>
           <xsd:simpleType>
             <xsd:restriction base="xsd:string">
               <xsd:pattern value="(\*)|(\d+(%|px|em)?)"></xsd:pattern>
@@ -376,24 +405,6 @@
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="rowSpan" type="xsd:int" />
-        <xsd:attribute name="height">
-          <xsd:annotation>
-            <xsd:documentation>
-              Container height.&lt;br&gt;&lt;br&gt;
-              
-              The width can be specified as percentage 
-              or fixed value.&lt;br&gt;&lt;br&gt;
-    
-              The fix width can be either in 'px'
-              or 'em', 'px' is assumed if not specified.
-            </xsd:documentation>
-          </xsd:annotation>
-          <xsd:simpleType>
-            <xsd:restriction base="xsd:string">
-              <xsd:pattern value="\d+(%|px|pt|em)?"></xsd:pattern>
-            </xsd:restriction>
-          </xsd:simpleType>
-        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
