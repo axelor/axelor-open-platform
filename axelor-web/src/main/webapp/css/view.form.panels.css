@@ -336,6 +336,10 @@
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
+
+	padding: 3px 10px 3px;
+	min-width: 28px;
+	height: 28px;
 }
 .panel-layout .btn:active,
 .panel-layout .btn.active {
@@ -349,7 +353,7 @@
 }
 
 .panel-layout .row-fluid.has-labels .form-item > a.btn {
-	margin-top: 15px;
+	margin-top: 17px;
 }
 
 .panel-tabs .nav-tabs-responsive {
