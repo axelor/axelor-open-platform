@@ -111,9 +111,9 @@
 			
 			var element = $('<div class="message-box" style="padding: 15px;"></div>').attr('title', title).html(str);
 			var dialog = element.dialog({
-				dialogClass: 'ui-dialog-responsive ui-dialog-small',
+				dialogClass: 'ui-dialog-responsive ui-dialog-small ui-dialog-dragged',
 				resizable: false,
-				draggable: false,
+				draggable: true,
 				autoOpen: false,
 				closeOnEscape: true,
 				modal: true,
