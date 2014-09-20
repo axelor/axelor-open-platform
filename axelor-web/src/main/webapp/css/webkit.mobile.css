@@ -35,13 +35,13 @@ body {
 	margin-top: 5px !important;
 }
 
-.form-item > a.btn {
+.panel-layout .form-item > a.btn {
 	padding: 5px 10px;
 	min-width: 28px;
 	height: 28px;
 }
 
-.form-item > a.btn > i {
+.panel-layout .form-item > a.btn > i {
 	margin-top: 2px;
 }
 
@@ -61,5 +61,5 @@ body {
 
 .picker-input > .picker-icons > i.fa {
 	padding-top: 4px;
-	font-size: 20px;
+	font-size: 18px;
 }
