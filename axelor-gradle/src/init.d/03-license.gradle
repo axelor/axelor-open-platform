@@ -24,6 +24,12 @@ allprojects { p ->
 
 		ignoreFailures true
 
+		mapping {
+			java = 'JAVADOC_STYLE'
+			groovy = 'JAVADOC_STYLE'
+			javascript = 'JAVADOC_STYLE'
+		}
+
 		ext.product = "Axelor Business Solutions"
 		ext.inception = "2012"
 		ext.year = Calendar.getInstance().get(Calendar.YEAR)
