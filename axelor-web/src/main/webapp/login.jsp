@@ -29,90 +29,58 @@ String loginUserName = I18n.get("User name");
 String loginPassword = I18n.get("Password");
 
 String pageTitle = I18n.get("Axelor");
+
+String loginHeader = "login-header.jsp";
+if (pageContext.getServletContext().getResource(loginHeader) == null) {
+  loginHeader = null;
+}
 %>
 <!DOCTYPE html>
 <html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style type="text/css">
-body {
-	padding-top: 40px;
-	padding-bottom: 40px;
-	background-color: #f5f5f5;
-}
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+      }
+    </style>
+    <link href="lib/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="lib/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="css/colors.css" rel="stylesheet">
+    <link href="css/login.css" rel="stylesheet">
+    <script type="text/javascript" src="lib/jquery.ui/js/jquery.js"></script>
+    <script type="text/javascript" src="lib/bootstrap/js/bootstrap.js"></script>
+  </head>
+  <body>
 
-.form-signin {
-	max-width: 300px;
-	padding: 19px 29px 29px;
-	margin: 0 auto 20px;
+    <% if (loginHeader != null) { %>
+    <jsp:include page="<%= loginHeader %>" />
+    <% } %>
 
-	border: 1px solid #e5e5e5;
-	background-color: #fff;
-	
-	-webkit-border-radius: 5px;
-  	   -moz-border-radius: 5px;
-	        border-radius: 5px;
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="panel login-panel span4 offset4">
+          <div class="panel-header panel-default">
+            <span class="panel-title"><%= loginTitle %></span>
+          </div>
+          <div class="panel-body">
+            <form id="login-form" action="" method="POST">
+              <label for="usernameId"><%= loginUserName %></label>
+              <input type="text" class="input-block-level" id="usernameId" name="username">
+              <label for="passwordId"><%= loginPassword %></label>
+              <input type="password" class="input-block-level" id="passwordId" name="password">
+              <label class="checkbox"> <input type="checkbox" value="rememberMe" name="rememberMe"> <%= loginRemember %>
+              </label>
+              <button class="btn btn-primary" type="submit"><%= loginSubmit %></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
 
-	-webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
-	   -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
-	        box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
-}
-
-.form-signin .form-signin-heading,
-.form-signin .checkbox {
-	margin-bottom: 10px;
-}
-
-.form-signin input[type="text"],
-.form-signin input[type="password"] {
-	font-size: 16px;
-	height: auto;
-	margin-bottom: 15px;
-	padding: 7px 9px;
-}
-
-#footer {
-	height: 60px;
-}
-
-.container .credit {
-	margin: 20px 0;
-	text-align: center;
-}
-
-.app-title {
-	font-size: 32px;
-	text-align: center;
-}
-</style>
-<link href="lib/bootstrap/css/bootstrap.css" rel="stylesheet">
-<style>
-body {
-	background-color: #f5f5f5;
-}
-</style>
-</head>
-<body>
-	<div class="container">
-		<div class="app-title">
-			<h2 class="muted"><%= pageTitle %></h2>
-		</div>
-		<form class="form-signin" action="" method="POST">
-			<h2 class="form-signin-heading"><%= loginTitle %></h2>
-			<input type="text" class="input-block-level" placeholder="<%= loginUserName %>"
-				tabindex="1" name="username">
-			<input type="password" class="input-block-level" placeholder="<%= loginPassword %>"
-				tabindex="2" name="password">
-			<label class="checkbox"> <input type="checkbox"
-				tabindex="3" value="rememberMe" name="rememberMe"> <%= loginRemember %>
-			</label>
-			<button tabindex="4" class="btn btn-large btn-primary" type="submit"><%= loginSubmit %></button>
-		</form>
-		<div id="footer">
-			<div class="container">
-				<p class="muted credit">&copy; Axelor. All Rights Reserved.</p>
-			</div>
-		</div>
-	</div>
-</body>
+    <footer class="container-fluid">
+      <p class="credit small">&copy; 2014 <a href="http://www.axelor.com">Axelor</a>. All Rights Reserved.</p>
+    </footer>
+  </body>
 </html>
