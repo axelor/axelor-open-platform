@@ -5,7 +5,7 @@
 
   <module name="contact" package="com.axelor.contact.db" />
   
-  <entity name="Title" cachable="true" implements="java.io.Serializable">
+  <entity name="Title" cachable="true">
     <![CDATA[
     This class represents the name initial like Mr., Mrs. etc.
     

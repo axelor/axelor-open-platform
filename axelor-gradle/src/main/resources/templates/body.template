@@ -2,7 +2,7 @@ ${ pojo.documentation }\
 <% pojo.annotations.each { a -> %>
 ${a}\
 <% } %>
-public class ${pojo.name} extends ${pojo.baseClass}${pojo.implementStmt} {
+public class ${pojo.name} extends ${pojo.baseClass} {
 <% pojo.fields.each { p -> %>\
 <% p.annotations.each { a -> %>
 	${a}\
