@@ -106,8 +106,6 @@ class AppPlugin extends AbstractPlugin {
 			task("npm", type: Exec, dependsOn: 'copyWebapp') {
 				workingDir "${buildDir}/webapp"
 				commandLine = ["npm", "install"]
-				inputs.file "package.json"
-				outputs.dir "node_modules"
 			}
 
 			task("grunt", type: Exec, dependsOn: 'npm') {
@@ -131,6 +129,7 @@ class AppPlugin extends AbstractPlugin {
 
 			war.dependsOn "copyWebapp"
 			war.from "${buildDir}/webapp"
+			war.exclude "node_modules", "Gruntfile.js", "package.json"
 			war.duplicatesStrategy = "EXCLUDE"
 
 			tomcatRun.dependsOn "copyWebapp"
