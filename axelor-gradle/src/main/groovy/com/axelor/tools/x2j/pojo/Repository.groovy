@@ -30,6 +30,8 @@ class Repository {
 
 	String name
 
+	boolean concrete = true
+
 	public Repository(Entity entity) {
 
 		this.entity = entity
