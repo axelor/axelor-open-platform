@@ -684,9 +684,7 @@
       <xsd:element name="extra-code" minOccurs="0" type="xsd:string">
       	<xsd:annotation>
       		<xsd:documentation>
-      		Put extra code to the end of the class body (generally interface implementation).
-      		Be careful of this feature else you may have unexpected results. Only provide methods
-      		and try to avoid storing states to any variables except fields defined above.
+            Provide extra code.
       		</xsd:documentation>
       	</xsd:annotation>
       </xsd:element>
@@ -790,6 +788,27 @@
           <xsd:enumeration value="CLASS">
             <xsd:annotation>
               <xsd:documentation>Table per class inheritance strategy</xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="repository">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="none">
+            <xsd:annotation>
+              <xsd:documentation>Do not generate repository.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+          <xsd:enumeration value="default">
+            <xsd:annotation>
+              <xsd:documentation>Generate default repository</xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+          <xsd:enumeration value="abstract">
+            <xsd:annotation>
+              <xsd:documentation>Generate abstract repository</xsd:documentation>
             </xsd:annotation>
           </xsd:enumeration>
         </xsd:restriction>

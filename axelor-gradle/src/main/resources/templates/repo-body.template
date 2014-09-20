@@ -1,5 +1,5 @@
 
-public class ${repo.name} extends ${repo.baseClass} {
+public <% if (!repo.concrete) { %>abstract <% } %>class ${repo.name} extends ${repo.baseClass} {
 
 	public ${repo.name}() {
 		super(${repo.modelClass}.class);

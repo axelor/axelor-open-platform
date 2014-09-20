@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.tools.x2j.pojo.Entity;
+import com.axelor.tools.x2j.pojo.Repository;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.LinkedHashMultimap;
@@ -86,9 +87,11 @@ public class Generator {
 		}
 
 		final Entity entity = all.remove(0);
+		final Repository repository = entity.getRepository();
+
 		final File entityFile = this.file(outputPath, entity.getFile());
-		final File repoFile = this.file(outputPath, entity.getRepository().getFile());
-		
+		final File repoFile = repository == null ? null : this.file(outputPath, repository.getFile());
+
 		long lastModified = entity.getLastModified();
 		
 		for (Entity it : all) {
@@ -106,7 +109,9 @@ public class Generator {
 		}
 		
 		entityFile.getParentFile().mkdirs();
-		repoFile.getParentFile().mkdirs();
+		if (repoFile != null) {
+			repoFile.getParentFile().mkdirs();
+		}
 
 		String[] existing = {
 			entity.getName() + ".java",
@@ -123,6 +128,8 @@ public class Generator {
 		log.info("Generating: " + entityFile.getPath());
 		String code = Expander.expand(entity, false);
 		Files.write(Utils.stringTrailing(code), entityFile, Charsets.UTF_8);
+		
+		if (repoFile == null) return;
 
 		log.info("Generating: " + repoFile.getPath());
 		String repo = Expander.expand(entity, true);

@@ -99,7 +99,11 @@ class Entity {
 		}
 
 		importManager = new ImportManager(namespace, groovy)
-		repository = new Repository(this)
+
+		if (node.@repository != "none") {
+			repository = new Repository(this)
+			repository.concrete = node.@repository != "abstract"
+		}
 		
 		if (!this.pojo) {
 			importType("javax.persistence.EntityManager")

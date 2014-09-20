@@ -5,7 +5,7 @@
 
   <module name="contact" package="com.axelor.contact.db" />
   
-  <entity name="Title" cachable="true">
+  <entity name="Title" cachable="true" repository="abstract">
     <![CDATA[
     This class represents the name initial like Mr., Mrs. etc.
     
@@ -54,7 +54,7 @@
     </extra-code>
   </entity>
 
-  <entity name="Group">
+  <entity name="Group" repository="none">
     <string name="code" required="true" unique="true" min="2" />
     <string name="name" required="true" unique="true" min="2" />
     <one-to-one name="test1" ref="Title" mappedBy="testG"/>
