@@ -60,8 +60,46 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 	color: #fff;
 }
 
+header .navbar-inverse .nav .active > a,
+header .navbar-inverse .nav .active > a:hover,
+header .navbar-inverse .nav .active > a:focus {
+	color: #fff;
+	background-color: #3f3f3f;
+}
+
+header .navbar-inverse .btn-navbar:hover,
+header .navbar-inverse .btn-navbar:focus,
+header .navbar-inverse .btn-navbar:active,
+header .navbar-inverse .btn-navbar.active,
+header .navbar-inverse .btn-navbar.disabled,
+header .navbar-inverse .btn-navbar[disabled] {
+	background-color: #3f3f3f;
+}
+
+header .navbar-inverse .nav-collapse .nav > li > a:hover,
+header .navbar-inverse .nav-collapse .nav > li > a:focus,
+header .navbar-inverse .nav-collapse .dropdown-menu a:hover,
+header .navbar-inverse .nav-collapse .dropdown-menu a:focus {
+	background-color: #3f3f3f;
+}
+
+header .navbar-inverse .btn-navbar {
+	background-color: #3f3f3f;
+	background-image: none;
+	box-shadow: none;
+}
+
 header {
 	font-weight: bold;
+}
+
+.navbar .brand-logo {
+	float: left;
+}
+
+.navbar .brand-logo img {
+	height: 32px;
+	margin-top: 5px;
 }
 
 .sidebar {
