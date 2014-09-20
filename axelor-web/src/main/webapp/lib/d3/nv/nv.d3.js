@@ -8186,6 +8186,9 @@ nv.models.multiBarChart = function() {
             .datum(controlsData)
             .attr('transform', 'translate(0,' + (-margin.top) +')')
             .call(controls);
+
+        g.select('.nv-controlsWrap .nv-legend > g')
+        	.attr('transform', 'translate(-20,5)');
       }
 
       //------------------------------------------------------------
