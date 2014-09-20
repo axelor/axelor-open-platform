@@ -1059,12 +1059,17 @@ table.field-details .help-text hr {
 .filter-box {
 	position: relative;
 	display: inline-block;
-	margin: 0 5px;
-	margin-top: 2px;
+	margin: 2px 5px 0;
+	box-sizing: border-box;
+	width: 200px;
 }
 
 .filter-box > input {
 	margin-top: 4px;
+	padding: 4px 8px;
+	box-sizing: border-box;
+	height: 28px;
+	width: 100%;
 }
 
 .filter-box .search-icons {
@@ -1073,11 +1078,11 @@ table.field-details .help-text hr {
 	top: 0;
 	right: 0;
 	padding-top: 8px;
-	padding-right: 6px;
+	padding-right: 4px;
 }
 
 .filter-box .search-icons i {
-	padding: 3px;
+	margin: 3px;
 	cursor: pointer;
 	color: silver;
 }
