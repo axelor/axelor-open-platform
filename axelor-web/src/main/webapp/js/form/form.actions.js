@@ -154,7 +154,11 @@ ActionHandler.prototype = {
 	onSave: function() {
 		return this.handle();
 	},
-	
+
+	onTabSelect: function(unblocked) {
+		return this.onSelect.apply(this, arguments);
+	},
+
 	onSelect: function(unblocked) {
 		var self = this;
 		var blockUI = this._blockUI;
@@ -770,7 +774,7 @@ ui.factory('ActionService', ['ViewService', function(ViewService) {
 	};
 }]);
 
-var EVENTS = ['onClick', 'onChange', 'onSelect', 'onNew', 'onLoad', 'onSave'];
+var EVENTS = ['onClick', 'onChange', 'onSelect', 'onTabSelect', 'onNew', 'onLoad', 'onSave'];
 
 ui.directive('uiActions', ['ViewService', function(ViewService) {
 
