@@ -1,116 +1,106 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<object-views xmlns="http://apps.axelor.com/xml/ns/object-views"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_2.1.xsd">
 
-	<menuitem name="menu-wkf" priority="-99" title="Wkf Management"
-		groups="admins,workflow" icon="img/wkf.png" />
+  <menuitem name="menu-wkf" priority="-99" title="Wkf Management"
+  groups="admins,workflow" icon="img/wkf.png" />
 
-		<menuitem name="menu-wkf-workflows" parent="menu-wkf" title="Workflows"
-			action="action-wkf-workflows" />
-	
-		<action-view name="action-wkf-workflows" title="Workflows"
-			model="com.axelor.wkf.db.Workflow">
-			<view type="grid" name="workflow-grid" />
-			<view type="form" name="workflow-form" />
-	        <context name="__check_version" expr="true"/>
-		</action-view>
-	
-		<menuitem name="menu-wkf-instances" parent="menu-wkf" title="Instances"
-			action="action-wkf-instances" />
-	
-		<action-view name="action-wkf-instances" title="Instances"
-			model="com.axelor.wkf.db.Instance">
-			<view type="grid" name="instance-grid" />
-			<view type="form" name="instance-form" />
-		</action-view>
-	
-		<menuitem name="menu-wkf-configurations" parent="menu-wkf"
-			title="Configurations" icon="img/wrench.png" />
-		
-			<menuitem name="menu-wkf-start-event" parent="menu-wkf-configurations" title="Start events"
-				action="action-wkf-start-event" />
-		
-			<action-view name="action-wkf-start-event" title="Start events"
-				model="com.axelor.wkf.db.node.StartEvent">
-				<view type="grid" name="start-event-grid" />
-				<view type="form" name="start-event-form" />
-			</action-view>
-		
-			<menuitem name="menu-wkf-transitions" parent="menu-wkf-configurations" title="Transitions"
-				action="action-wkf-transitions" />
-		
-			<action-view name="action-wkf-transitions" title="Transitions"
-				model="com.axelor.wkf.db.Transition">
-				<view type="grid" name="transition-grid" />
-				<view type="form" name="transition-form" />
-			</action-view>
-		
-			<menuitem name="menu-wkf-node-task" parent="menu-wkf-configurations" title="Activities"
-				action="action-wkf-node-task" />
-		
-			<action-view name="action-wkf-node-task" title="Activities"
-				model="com.axelor.wkf.db.node.NodeTask">
-				<view type="grid" name="node-task-grid" />
-				<view type="form" name="node-task-form" />
-			</action-view>
-		
-			<menuitem name="menu-wkf-end-event" parent="menu-wkf-configurations" title="End events"
-				action="action-wkf-end-event" />
-		
-			<action-view name="action-wkf-end-event" title="End events"
-				model="com.axelor.wkf.db.node.EndEvent">
-				<view type="grid" name="end-event-grid" />
-				<view type="form" name="end-event-form" />
-			</action-view>
-		
-			<menuitem name="menu-wkf-configurations-events" parent="menu-wkf-configurations" title="Other events" />
-		
-				<menuitem name="menu-wkf-timer-event" parent="menu-wkf-configurations-events" title="Timer events"
-					action="action-wkf-timer-event" />
-			
-				<action-view name="action-wkf-timer-event" title="Timer events"
-					model="com.axelor.wkf.db.node.TimerEvent">
-					<view type="grid" name="timer-event-grid" />
-					<view type="form" name="timer-event-form" />
-				</action-view>
-		
-				<menuitem name="menu-wkf-message-event" parent="menu-wkf-configurations-events" title="Message events"
-					action="action-wkf-message-event" />
-			
-				<action-view name="action-wkf-message-event" title="Message events"
-					model="com.axelor.wkf.db.node.MessageEvent">
-					<view type="grid" name="message-event-grid" />
-					<view type="form" name="message-event-form" />
-				</action-view>
-		
-			<menuitem name="menu-wkf-configurations-gateway" parent="menu-wkf-configurations" title="Gateways" />
-		
-				<menuitem name="menu-wkf-inclusive-gateway" parent="menu-wkf-configurations-gateway" title="Inclusive gateways"
-					action="action-wkf-inclusive-gateway" />
-			
-				<action-view name="action-wkf-inclusive-gateway" title="Inclusive gateways"
-					model="com.axelor.wkf.db.node.gateway.InclusiveGateway">
-					<view type="grid" name="inclusive-gateway-grid" />
-					<view type="form" name="inclusive-gateway-form" />
-				</action-view>
-			
-				<menuitem name="menu-wkf-parallel-gateway" parent="menu-wkf-configurations-gateway" title="Parallel gateways"
-					action="action-wkf-parallel-gateway" />
-			
-				<action-view name="action-wkf-parallel-gateway" title="Parallel gateways"
-					model="com.axelor.wkf.db.node.gateway.ParallelGateway">
-					<view type="grid" name="parallel-gateway-grid" />
-					<view type="form" name="parallel-gateway-form" />
-				</action-view>
-			
-				<menuitem name="menu-wkf-exclusive-gateway" parent="menu-wkf-configurations-gateway" title="Exclusive gateways"
-					action="action-wkf-exclusive-gateway" />
-			
-				<action-view name="action-wkf-exclusive-gateway" title="Exclusive gateways"
-					model="com.axelor.wkf.db.node.gateway.ExclusiveGateway">
-					<view type="grid" name="exclusive-gateway-grid" />
-					<view type="form" name="exclusive-gateway-form" />
-				</action-view>
+  <menuitem name="menu-wkf-workflows" parent="menu-wkf" title="Workflows"
+    action="action-wkf-workflows" />
+
+  <action-view name="action-wkf-workflows" title="Workflows" model="com.axelor.wkf.db.Workflow">
+    <view type="grid" name="workflow-grid" />
+    <view type="form" name="workflow-form" />
+    <context name="__check_version" expr="true" />
+  </action-view>
+
+  <menuitem name="menu-wkf-instances" parent="menu-wkf" title="Instances"
+    action="action-wkf-instances" />
+
+  <action-view name="action-wkf-instances" title="Instances" model="com.axelor.wkf.db.Instance">
+    <view type="grid" name="instance-grid" />
+    <view type="form" name="instance-form" />
+  </action-view>
+
+  <menuitem name="menu-wkf-configurations" parent="menu-wkf"
+    title="Configurations" icon="img/wrench.png" />
+
+  <menuitem name="menu-wkf-start-event" parent="menu-wkf-configurations"
+    title="Start events" action="action-wkf-start-event" />
+
+  <action-view name="action-wkf-start-event" title="Start events" model="com.axelor.wkf.db.node.StartEvent">
+    <view type="grid" name="start-event-grid" />
+    <view type="form" name="start-event-form" />
+  </action-view>
+
+  <menuitem name="menu-wkf-transitions" parent="menu-wkf-configurations"
+    title="Transitions" action="action-wkf-transitions" />
+
+  <action-view name="action-wkf-transitions" title="Transitions" model="com.axelor.wkf.db.Transition">
+    <view type="grid" name="transition-grid" />
+    <view type="form" name="transition-form" />
+  </action-view>
+
+  <menuitem name="menu-wkf-node-task" parent="menu-wkf-configurations"
+    title="Activities" action="action-wkf-node-task" />
+
+  <action-view name="action-wkf-node-task" title="Activities" model="com.axelor.wkf.db.node.NodeTask">
+    <view type="grid" name="node-task-grid" />
+    <view type="form" name="node-task-form" />
+  </action-view>
+
+  <menuitem name="menu-wkf-end-event" parent="menu-wkf-configurations"
+    title="End events" action="action-wkf-end-event" />
+
+  <action-view name="action-wkf-end-event" title="End events" model="com.axelor.wkf.db.node.EndEvent">
+    <view type="grid" name="end-event-grid" />
+    <view type="form" name="end-event-form" />
+  </action-view>
+
+  <menuitem name="menu-wkf-configurations-events" parent="menu-wkf-configurations"
+    title="Other events" />
+
+  <menuitem name="menu-wkf-timer-event" parent="menu-wkf-configurations-events"
+    title="Timer events" action="action-wkf-timer-event" />
+
+  <action-view name="action-wkf-timer-event" title="Timer events" model="com.axelor.wkf.db.node.TimerEvent">
+    <view type="grid" name="timer-event-grid" />
+    <view type="form" name="timer-event-form" />
+  </action-view>
+
+  <menuitem name="menu-wkf-message-event" parent="menu-wkf-configurations-events"
+    title="Message events" action="action-wkf-message-event" />
+
+  <action-view name="action-wkf-message-event" title="Message events" model="com.axelor.wkf.db.node.MessageEvent">
+    <view type="grid" name="message-event-grid" />
+    <view type="form" name="message-event-form" />
+  </action-view>
+
+  <menuitem name="menu-wkf-configurations-gateway" parent="menu-wkf-configurations"
+    title="Gateways" />
+
+  <menuitem name="menu-wkf-inclusive-gateway" parent="menu-wkf-configurations-gateway"
+    title="Inclusive gateways" action="action-wkf-inclusive-gateway" />
+
+  <action-view name="action-wkf-inclusive-gateway" title="Inclusive gateways" model="com.axelor.wkf.db.node.gateway.InclusiveGateway">
+    <view type="grid" name="inclusive-gateway-grid" />
+    <view type="form" name="inclusive-gateway-form" />
+  </action-view>
+
+  <menuitem name="menu-wkf-parallel-gateway" parent="menu-wkf-configurations-gateway"
+    title="Parallel gateways" action="action-wkf-parallel-gateway" />
+
+  <action-view name="action-wkf-parallel-gateway" title="Parallel gateways" model="com.axelor.wkf.db.node.gateway.ParallelGateway">
+    <view type="grid" name="parallel-gateway-grid" />
+    <view type="form" name="parallel-gateway-form" />
+  </action-view>
+
+  <menuitem name="menu-wkf-exclusive-gateway" parent="menu-wkf-configurations-gateway"
+    title="Exclusive gateways" action="action-wkf-exclusive-gateway" />
+
+  <action-view name="action-wkf-exclusive-gateway" title="Exclusive gateways" model="com.axelor.wkf.db.node.gateway.ExclusiveGateway">
+    <view type="grid" name="exclusive-gateway-grid" />
+    <view type="form" name="exclusive-gateway-form" />
+  </action-view>
 
 </object-views>
