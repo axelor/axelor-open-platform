@@ -89,12 +89,10 @@
 
 .panel {
 	margin-bottom: 8px;
-	margin-top: -9px;
 }
 
-.panel:first-child,
-.panel.panel-related {
-	margin-top: 0;
+.panel.attached {
+	margin-top: -9px;
 }
 
 .panel.noframe {
