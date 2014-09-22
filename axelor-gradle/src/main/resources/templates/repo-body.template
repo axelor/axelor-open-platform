@@ -1,7 +1,7 @@
 
-public <% if (!repo.concrete) { %>abstract <% } %>class ${repo.name} extends ${repo.baseClass} {
+public ${repo.classStatement} extends ${repo.baseClass} {
 
-	public ${repo.name}() {
+	public ${repo.className}() {
 		super(${repo.modelClass}.class);
 	}
 	<% repo.finderMethods.each { %>\
