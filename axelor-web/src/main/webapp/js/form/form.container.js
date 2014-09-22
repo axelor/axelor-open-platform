@@ -394,12 +394,11 @@ ui.formWidget('ButtonGroup', {
 ui.formWidget('Panel', {
 
 	showTitle: false,
-	widgets: ['PanelSide'],
 
 	link: function (scope, element, attrs) {
 		var field = scope.field || {};
 		element.addClass(field.serverType);
-		if (field.serverType === 'panel-side' && !attrs.itemSpan) {
+		if (field.sidebar && !attrs.itemSpan) {
 			attrs.$set('itemSpan', 12);
 		}
 		scope.menus = null;

@@ -783,7 +783,7 @@ ui.formBuild = function (scope, schema, fields) {
 			if (this.type == 'field') {
 				delete this.type;
 			}
-			if (['panel', 'panel-related', 'panel-side'].indexOf(this.type) > -1) {
+			if (['panel', 'panel-related'].indexOf(this.type) > -1) {
 				scope.$hasPanels = hasPanels = true;
 			}
 
@@ -893,7 +893,7 @@ ui.formBuild = function (scope, schema, fields) {
 			var items = this.items || this.pages;
 			if (items && this.type != 'panel-related') {
 				process(items, item);
-				if (['panel', 'panel-side'].indexOf(type) > -1) {
+				if (type === 'panel') {
 					item.attr('ui-panel-layout', '');
 					item.attr('x-item-span', attrs.itemSpan);
 				} else if (['tabs', 'panel-tabs', 'panel-stack', 'panel-related', 'button-group'].indexOf(type) == -1) {

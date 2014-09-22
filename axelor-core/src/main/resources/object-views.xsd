@@ -965,7 +965,6 @@
                 <xsd:element name="panel-related" type="tns:PanelRelated" />
                 <xsd:element name="panel-stack" type="tns:PanelTabs" />
                 <xsd:element name="panel-tabs" type="tns:PanelTabs" />
-                <xsd:element name="panel-side" type="tns:Panel" />
               </xsd:choice>
               <xsd:choice maxOccurs="unbounded">
                 <xsd:group ref="tns:FormWidgets" />
