@@ -291,7 +291,7 @@ public class MetaService {
 			for(Object item : items) {
 				if (item instanceof Map) {
 					((Map) item).put("_model", select.getModel());
-					((Map) item).put("_modelTitle", select.getTitle());
+					((Map) item).put("_modelTitle", select.getLocalizedTitle());
 					((Map) item).put("_form", select.getFormView());
 					((Map) item).put("_grid", select.getGridView());
 				}
