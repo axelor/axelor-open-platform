@@ -86,8 +86,7 @@ public class ModuleManager {
 	private static final Set<String> SKIP = Sets.newHashSet(
 			"axelor-common",
 			"axelor-cglib",
-			"axelor-test",
-			"axelor-web");
+			"axelor-test");
 
 	public ModuleManager() {
 
