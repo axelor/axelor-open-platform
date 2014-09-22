@@ -43,10 +43,7 @@ String appCss = AppInfo.getAppCSS(getServletContext());
 String langJS = AppInfo.getLangJS(request, getServletContext());
 String webkitCss = null;
 
-String userAgent = request.getHeader("User-Agent");
-if (userAgent != null &&
-	userAgent.indexOf("Chrome") > -1 &&
-	userAgent.indexOf("Mobile") > -1) {
+if (AppInfo.isMobile(request) && AppInfo.isWebKit(request)) {
 	webkitCss = "css/webkit.mobile.css";
 }
 

@@ -20,6 +20,7 @@ package com.axelor.web.internal;
 import java.net.MalformedURLException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +46,9 @@ public final class AppInfo {
 	
 	private static final Locale DEFAULT_LOCALE = new Locale("en");
 	
+	private static final Pattern MOBILE_PATTERN = Pattern.compile("(Mobile|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone)", Pattern.CASE_INSENSITIVE);
+	private static final Pattern WEBKIT_PATTERN = Pattern.compile("WebKit", Pattern.CASE_INSENSITIVE);
+
 	private static final AppSettings settings = AppSettings.get();
 
 	public static String asJson() {
@@ -129,6 +133,22 @@ public final class AppInfo {
 		}
 		
 		return String.format(APPLICATION_LANG_JS, language);
+	}
+
+	public static boolean isMobile(HttpServletRequest request) {
+		String agent = request.getHeader("user-agent");
+		if (agent == null) {
+			return false;
+		}
+		return MOBILE_PATTERN.matcher(agent).find();
+	}
+
+	public static boolean isWebKit(HttpServletRequest request) {
+		String agent = request.getHeader("user-agent");
+		if (agent == null) {
+			return false;
+		}
+		return WEBKIT_PATTERN.matcher(agent).find();
 	}
 
 	public static String getAppJS(ServletContext context) {

@@ -83,7 +83,8 @@
 			};
 			device.large = $(window).width() > 767;
 			device.small = !device.large;
-			device.mobile = /Mobile/.test(navigator.userAgent);
+			device.mobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(navigator.userAgent);
+			device.webkit = /Webkit/i.test(navigator.userAgent);
 			return device;
 		}
 	});
