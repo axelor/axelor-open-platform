@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.db.mapper.Mapper;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
@@ -87,6 +88,13 @@ public class PanelRelated extends AbstractPanel {
 	}
 
 	public String getServerType() {
+		if (serverType == null) {
+			try {
+				Mapper mapper = Mapper.of(Class.forName(this.getModel()));
+				serverType = mapper.getProperty(getName()).getType().name();
+			} catch (Exception e) {
+			}
+		}
 		return serverType;
 	}
 
