@@ -35,7 +35,7 @@
     	<bind node="documentation" to="description"/>
     	
     	<bind node="timerEventDefinition/timeDate" to="timeDate" adapter="LocalDate" />
-    	<bind node="timerEventDefinition/timeCycle" to="timeCycle" adapter="timeCyle" />
+    	<bind node="timerEventDefinition/timeCycle" to="timeCycle" adapter="timeCycle" />
     	<bind node="timerEventDefinition/timeDuration" to="timeDuration" adapter="LocalTime" />
     	
     	<bind eval="'timer'" to="type" />
