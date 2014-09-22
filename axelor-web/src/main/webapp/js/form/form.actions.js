@@ -604,7 +604,7 @@ ActionHandler.prototype = {
 			}
 
 			// handle notebook
-			if (item.is('.tab-pane,[ui-panel-tab]')) {
+			if (item.is('.tab-pane')) {
 				forEach(itemAttrs, function(value, attr){
 					if (attr == 'hidden') {
 						itemScope.attr('hidden', value);
