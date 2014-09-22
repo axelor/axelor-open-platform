@@ -140,6 +140,9 @@
 				if (/^(-)?\d+$/.test(value)) value = +(value);
 				attrs[_.str.camelize(name)] = value;
 			});
+			if (field.serverType) {
+				field.serverType = _.chain(field.serverType).underscored().dasherize().value();
+			}
 			field.widgetAttrs = attrs;
 		}
 
