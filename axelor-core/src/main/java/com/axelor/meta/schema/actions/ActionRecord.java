@@ -217,7 +217,7 @@ public class ActionRecord extends Action {
 			return null;
 		}
 		final Map<String, Object> result = new HashMap<>();
-		result.put("values", value);
+		result.put("values", map);
 		return result;
 	}
 }
