@@ -93,8 +93,7 @@
 }
 
 .panel:first-child,
-.panel.panel-related,
-.panel.panel-side {
+.panel.panel-related {
 	margin-top: 0;
 }
 
