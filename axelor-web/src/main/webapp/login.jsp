@@ -23,12 +23,10 @@
 <%
 String loginTitle = I18n.get("Please sign in");
 String loginRemember = I18n.get("Remember me");
-String loginSubmit = I18n.get("Login");
+String loginSubmit = I18n.get("Log in");
 
 String loginUserName = I18n.get("User name");
 String loginPassword = I18n.get("Password");
-
-String pageTitle = I18n.get("Axelor");
 
 String loginHeader = "login-header.jsp";
 if (pageContext.getServletContext().getResource(loginHeader) == null) {
