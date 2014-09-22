@@ -152,20 +152,19 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		if (icons === null) {
 			icons = {};
 			names = $scope.field.showIcons || $scope.$parent.field.showIcons;
-			if (names === false) {
+			if (names === false || names === 'false') {
 				icons.$all = false;
-			} else if (names === true || names === undefined) {
+			} else if (names === true || names === 'true' || names === undefined) {
 				icons.$all = true;
 			} else if (names) {
+				icons.$all = false;
 				names = names.split(',');
 				names.forEach(function (name) {
 					icons[name.trim()] = true;
 				});
 			}
 		}
-		if (icons.$all !== undefined) return icons.$all;
-		if (icons[which] !== undefined) return icons[which];
-		return true;
+		return icons.$all || !!icons[which];
 	};
 }
 

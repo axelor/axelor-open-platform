@@ -137,7 +137,7 @@ public class Field extends SimpleWidget {
 	@XmlAttribute(name = "x-exclusive")
 	private Boolean exclusive;
 
-	@XmlAttribute(name = "x-show-icon")
+	@XmlAttribute(name = "x-show-icons")
 	private String showIcons;
 
 	@XmlAttribute(name = "x-direction")
