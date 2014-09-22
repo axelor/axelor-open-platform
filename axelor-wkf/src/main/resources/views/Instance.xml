@@ -1,76 +1,80 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<object-views xmlns="http://apps.axelor.com/xml/ns/object-views"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_2.1.xsd">
 	
-    <grid name="instance-grid" title="Instances" model="com.axelor.wkf.db.Instance" canDelete="false" canNew="false">
-        <field name="workflow"/>
-        <field name="workflow.metaModel.name" title="Meta model"/>
-        <field name="metaModelId"/>
-        <field name="creationDate"/>
-        <field name="creationUser"/>
-    </grid>
+  <grid name="instance-grid" title="Instances" model="com.axelor.wkf.db.Instance" canDelete="false" canNew="false">
+    <field name="workflow"/>
+    <field name="workflow.metaModel.name" title="Meta model"/>
+    <field name="metaModelId"/>
+    <field name="creationDate"/>
+    <field name="creationUser"/>
+  </grid>
     
-    <form name="instance-form" title="Instance" cols="6" model="com.axelor.wkf.db.Instance" onLoad="action-instance-load-diagram" canCopy="false" canDelete="false" canNew="false">
-        <field name="workflow"/>
-        <field name="workflow.metaModel.name" title="Model" />
-        <field name="metaModelId" title="id"/>
-        <notebook colSpan="6">
-        	<page title="Diagram" cols="4">
-        		<field name="diagram" showTitle="false" readonly="true"  widget="html" colSpan="4" />
-        	</page>
-        	<page title="Details" cols="4">
-		        <field name="nodes" colSpan="4" readonly="true" />
-		        <field name="executedTransitions" colSpan="4" hideIf="!executedTransitions || executedTransitions.length &lt; 1" readonly="true"/>
-		        <notebook colSpan="4">
-		        	<page title="History" cols="4">
-		        		<field name="createdOn" />
-		        		<field name="createdBy" />
-		        		<field name="histories" colSpan="4" grid-view="instance-history-grid" form-view="instance-history-form" readonly="true"/>
-		        	</page>
-		        	<page title="Counter" cols="4">
-		        		<field name="counters" colSpan="4" grid-view="instance-counter-grid" form-view="instance-counter-form" readonly="true"/>
-		        	</page>
-		        </notebook>
-        	</page>
-        </notebook>
-    </form>
+  <form name="instance-form" title="Instance" model="com.axelor.wkf.db.Instance" width="large"
+    canCopy="false" canDelete="false" canNew="false" onLoad="action-instance-load-diagram">
+    <panel title="Overview">
+      <field name="workflow"/>
+      <field name="workflow.metaModel.name" title="Model" />
+      <field name="metaModelId" title="id"/>
+    </panel>
+    <panel-tabs>
+      <panel title="Diagram" showFrame="false">
+        <field name="diagram" showTitle="false" readonly="true"  widget="html" colSpan="12"/>
+      </panel>
+      <panel title="Details" showFrame="false">
+        <panel-related field="nodes" colSpan="12" readonly="true"/>
+        <panel-related field="executedTransitions" colSpan="12" hideIf="!executedTransitions || executedTransitions.length &lt; 1" readonly="true"/>
+      </panel>
+      <panel title="History" showFrame="false">
+        <field name="createdOn" />
+        <field name="createdBy" />
+        <panel-related field="histories" colSpan="12" grid-view="instance-history-grid" form-view="instance-history-form" readonly="true"/>
+      </panel>
+      <panel title="Counter" showFrame="false">
+        <panel-related field="counters" colSpan="12" grid-view="instance-counter-grid" form-view="instance-counter-form" readonly="true"/>
+      </panel>
+    </panel-tabs>
+  </form>
     
-    <grid name="instance-history-grid" title="Histories" model="com.axelor.wkf.db.InstanceHistory">
-    	<field name="createdOn" />
-    	<field name="createdBy" />
-    	<field name="transition"/>
-    </grid>
+  <grid name="instance-history-grid" title="Histories" model="com.axelor.wkf.db.InstanceHistory">
+    <field name="createdOn" />
+    <field name="createdBy" />
+    <field name="transition"/>
+  </grid>
     
-    <form name="instance-history-form" title="History" cols="4"  model="com.axelor.wkf.db.InstanceHistory">
-    	<field name="createdOn" />
-    	<field name="createdBy" />
-    	<field name="transition" canSelect="false" widget="NestedEditor" summary-view="transition-form" form-view="transition-form" edit-window="self" />
-    </form>
+  <form name="instance-history-form" title="History" model="com.axelor.wkf.db.InstanceHistory">
+    <panel showTitle="false">
+      <field name="createdOn" />
+      <field name="createdBy" />
+      <field name="transition" canSelect="false" widget="NestedEditor" summary-view="transition-form" form-view="transition-form" edit-window="self" />
+    </panel>
+  </form>
     
-    <grid name="instance-counter-grid" title="Counters" model="com.axelor.wkf.db.InstanceCounter">
-    	<field name="node" />
-    	<field name="counter" />
-    </grid>
+  <grid name="instance-counter-grid" title="Counters" model="com.axelor.wkf.db.InstanceCounter">
+    <field name="node" />
+    <field name="counter" />
+  </grid>
     
-    <form name="instance-counter-form" title="Counter" cols="4"  model="com.axelor.wkf.db.InstanceCounter">
-    	<field name="node" />
-    	<field name="counter" />
-    </form>
+  <form name="instance-counter-form" title="Counter" model="com.axelor.wkf.db.InstanceCounter">
+    <panel showTitle="false">
+      <field name="node" />
+      <field name="counter" />
+    </panel>
+  </form>
     
     <!-- ACTION RECORD -->
-    <action-record name="action-instance-load-diagram" model="com.axelor.wkf.db.Instance">
-    	<field name="diagram" expr="call: com.axelor.wkf.helper.DiagramHelper:generateDiagram(__this__)"/>
-    </action-record>
+  <action-record name="action-instance-load-diagram" model="com.axelor.wkf.db.Instance">
+  	<field name="diagram" expr="call: com.axelor.wkf.helper.DiagramHelper:generateDiagram(__this__)"/>
+  </action-record>
     
     <!-- ACTION VIEW -->
-    <action-view name="action-wkf-my-process" title="Process" model="com.axelor.wkf.db.Instance">
-    	<view type="grid" name="instance-grid"/>
-    	<view type="form" name="instance-form"/>
-    	<domain>self.workflow.metaModel.fullName = :model AND self.metaModelId = :id</domain>
-    	<context name="id" expr="eval: __this__.id" />
-    	<context name="model" expr="eval: _model" />
-		<context name="_showSingle" expr="true" />
-    </action-view>
+  <action-view name="action-wkf-my-process" title="Process" model="com.axelor.wkf.db.Instance">
+    <view type="grid" name="instance-grid"/>
+    <view type="form" name="instance-form"/>
+    <domain>self.workflow.metaModel.fullName = :model AND self.metaModelId = :id</domain>
+    <context name="id" expr="eval: __this__.id" />
+    <context name="model" expr="eval: _model" />
+    <context name="_showSingle" expr="true" />
+  </action-view>
     
 </object-views>

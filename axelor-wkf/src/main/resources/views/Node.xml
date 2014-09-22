@@ -1,261 +1,252 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<object-views xmlns="http://apps.axelor.com/xml/ns/object-views"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<object-views xmlns="http://apps.axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://apps.axelor.com/xml/ns/object-views http://apps.axelor.com/xml/ns/object-views/object-views_2.1.xsd">
  
 <!-- SELECTS -->
 
-    <selection name="node.type.selection">
-		<option value="startEvent">Start event</option>
-		<option value="nodeTask">Node Task</option>
-		<option value="endEvent">End event</option>
-		<option value="gateway">Gateway</option>
-		<option value="message">Message</option>
-		<option value="timer">Timer</option>
-	</selection>
+  <selection name="node.type.selection">
+    <option value="startEvent">Start event</option>
+    <option value="nodeTask">Node Task</option>
+    <option value="endEvent">End event</option>
+    <option value="gateway">Gateway</option>
+    <option value="message">Message</option>
+    <option value="timer">Timer</option>
+  </selection>
     
-    <selection name="node.logic.operator.selection">
-    	<option value=""></option>
-		<option value="parallel">AND</option>
-		<option value="inclusive">OR</option>
-		<option value="exclusive">XOR</option>
-	</selection>
+  <selection name="node.logic.operator.selection">
+    <option value=""></option>
+    <option value="parallel">AND</option>
+    <option value="inclusive">OR</option>
+    <option value="exclusive">XOR</option>
+  </selection>
 
 <!-- VIEWS -->
     
-    <grid name="node-grid" title="Nodes" model="com.axelor.wkf.db.Node">
-        <field name="name"/>
-        <field name="type"/>
-        <field name="action"/>
-    </grid>
+  <grid name="node-grid" title="Nodes" model="com.axelor.wkf.db.Node">
+    <field name="name"/>
+    <field name="type"/>
+    <field name="action"/>
+  </grid>
     
-    <form name="node-form" title="Node" cols="4" model="com.axelor.wkf.db.Node" onNew="node-default-record-group" >
-        <field name="type" onChange="node-record-name"/>
-        <field name="name"/>
-        <field name="action" showIf="type == 'nodeTask'"/>
-        <field name="operator" showIf="type == 'gateway'" />
-        <field name="messageType" showIf="type == 'message'" />
-        <break/>
-        <group showIf="type == 'timer'" colSpan="4" cols="6">
-        	<field name="timeDate" />
-        	<field name="timeCycle" />
-        	<field name="timeDuration" />
-        </group>
-        <group showIf="type == 'message'" colSpan="4" cols="6">
-        	<field name="account" />
-        	<field name="template" />
-        	<field name="templateModel" />
-        </group>
-        <group name="startGroup" colSpan="2" cols="2" hideIf="type == 'startEvent'" >
-	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
-        </group>
-        <group name="endGroup" colSpan="2" cols="2" hideIf="type == 'endEvent'">
-	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
-        </group>
-        <separator title="Description" colSpan="4"/>
-   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
-    </form>
+  <form name="node-form" title="Node" model="com.axelor.wkf.db.Node" onNew="node-default-record-group" >
+    <panel>
+      <field name="type" onChange="node-record-name"/>
+      <field name="name"/>
+      <field name="action" showIf="type == 'nodeTask'"/>
+      <field name="operator" showIf="type == 'gateway'" />
+      <field name="messageType" showIf="type == 'message'" />
+    </panel>
+    <panel showIf="type == 'timer'">
+      <field name="timeDate" />
+      <field name="timeCycle" />
+      <field name="timeDuration" />
+    </panel>
+    <panel showIf="type == 'message'">
+      <field name="account" />
+      <field name="template" />
+      <field name="templateModel" />
+    </panel>
+    <panel showIf="type == 'startEvent'">
+      <panel-related field="startTransitions" colSpan="12" grid-view="start-transition-grid" form-view="start-transition-form"/>
+    </panel>
+    <panel showIf="type == 'endEvent'">
+      <panel-related field="endTransitions" colSpan="12" grid-view="end-transition-grid" form-view="end-transition-form"/>
+    </panel>
+    <panel>
+      <field name="description" colSpan="12" showTitle="false" widget="Html" x-lite="true"/>
+    </panel>
+  </form>
     
-    <grid name="start-event-grid" title="Start events" model="com.axelor.wkf.db.node.StartEvent">
-        <field name="name"/>
-    </grid>
+  <grid name="start-event-grid" title="Start events" model="com.axelor.wkf.db.node.StartEvent">
+    <field name="name"/>
+  </grid>
     
-    <form name="start-event-form" title="Start event" cols="4" model="com.axelor.wkf.db.node.StartEvent" onNew="start-event-default-record" >
-        <field name="name"/>
-        <break/>
-        <group name="endGroup" colSpan="2" cols="2" >
-	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
-        </group>
-        <separator title="Description" colSpan="4"/>
-   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
-    </form>
+  <form name="start-event-form" title="Start event" model="com.axelor.wkf.db.node.StartEvent" onNew="start-event-default-record">
+    <panel>
+      <field name="name"/>
+      <panel-related field="endTransitions" colSpan="12" grid-view="end-transition-grid" form-view="end-transition-form"/>
+    </panel>
+    <panel>
+      <field name="description" colSpan="12" showTitle="false" widget="Html" x-lite="true"/>
+    </panel>
+  </form>
     
-    <grid name="end-event-grid" title="End events" model="com.axelor.wkf.db.node.EndEvent">
-        <field name="name"/>
-    </grid>
+  <grid name="end-event-grid" title="End events" model="com.axelor.wkf.db.node.EndEvent">
+    <field name="name"/>
+  </grid>
     
-    <form name="end-event-form" title="End event" cols="4" model="com.axelor.wkf.db.node.EndEvent" onNew="end-event-default-record" >
-        <field name="name"/>
-        <break/>
-        <group name="startGroup" colSpan="2" cols="2" >
-	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
-        </group>
-        <separator title="Description" colSpan="4"/>
-   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
-    </form>
+  <form name="end-event-form" title="End event" model="com.axelor.wkf.db.node.EndEvent" onNew="end-event-default-record" >
+    <panel>
+      <field name="name"/>
+      <panel-related field="startTransitions" colSpan="12" grid-view="start-transition-grid" form-view="start-transition-form"/>
+    </panel>
+    <panel>
+      <field name="description" colSpan="12" showTitle="false" widget="Html" x-lite="true"/>
+    </panel>
+  </form>
     
-    <grid name="node-task-grid" title="Activities" model="com.axelor.wkf.db.node.NodeTask">
-        <field name="name"/>
-        <field name="action"/>
-    </grid>
+  <grid name="node-task-grid" title="Activities" model="com.axelor.wkf.db.node.NodeTask">
+    <field name="name"/>
+    <field name="action"/>
+  </grid>
     
-    <form name="node-task-form" title="Activity" cols="4" model="com.axelor.wkf.db.node.NodeTask" onNew="node-task-default-record" >
-        <field name="name"/>
-        <field name="action"/>
-        <break/>
-        <group name="startGroup" colSpan="2" cols="2" >
-	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
-        </group>
-        <group name="endGroup" colSpan="2" cols="2" >
-	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
-        </group>
-        <separator title="Description" colSpan="4"/>
-   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
-    </form>
+  <form name="node-task-form" title="Activity" model="com.axelor.wkf.db.node.NodeTask" onNew="node-task-default-record" >
+    <panel>
+      <field name="name"/>
+      <field name="action"/>
+      <panel-related field="startTransitions" grid-view="start-transition-grid" form-view="start-transition-form"/>
+      <panel-related field="endTransitions" grid-view="end-transition-grid" form-view="end-transition-form"/>
+    </panel>
+    <panel>
+      <field name="description" colSpan="12" showTitle="false" widget="Html" x-lite="true"/>
+    </panel>
+  </form>
     
-    <grid name="inclusive-gateway-grid" title="Inclusive gateways" model="com.axelor.wkf.db.node.gateway.InclusiveGateway">
-        <field name="name"/>
-    </grid>
+  <grid name="inclusive-gateway-grid" title="Inclusive gateways" model="com.axelor.wkf.db.node.gateway.InclusiveGateway">
+    <field name="name"/>
+  </grid>
     
-    <form name="inclusive-gateway-form" title="Inclusive gateway" cols="4" model="com.axelor.wkf.db.node.gateway.InclusiveGateway" onNew="inclusive-gateway-default-record" >
-        <field name="name"/>
-        <break/>
-        <group name="startGroup" colSpan="2" cols="2" >
-	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
-        </group>
-        <group name="endGroup" colSpan="2" cols="2" >
-	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
-        </group>
-        <separator title="Description" colSpan="4"/>
-   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
-    </form>
+  <form name="inclusive-gateway-form" title="Inclusive gateway" model="com.axelor.wkf.db.node.gateway.InclusiveGateway" onNew="inclusive-gateway-default-record" >
+    <panel itemSpan="12">
+      <field name="name"/>
+      <panel-related field="startTransitions" form-view="start-transition-form" grid-view="start-transition-grid"/>
+      <panel-related field="endTransitions" form-view="end-transition-form" grid-view="end-transition-grid"/>
+    </panel>
+    <panel>
+      <field name="description" colSpan="12" showTitle="false" widget="Html" x-lite="true"/>
+    </panel>
+  </form>
     
-    <grid name="exclusive-gateway-grid" title="Exclusive gateways" model="com.axelor.wkf.db.node.gateway.ExclusiveGateway">
-        <field name="name"/>
-    </grid>
+  <grid name="exclusive-gateway-grid" title="Exclusive gateways" model="com.axelor.wkf.db.node.gateway.ExclusiveGateway">
+    <field name="name"/>
+  </grid>
     
-    <form name="exclusive-gateway-form" title="Exclusive gateway" cols="4" model="com.axelor.wkf.db.node.gateway.ExclusiveGateway" onNew="exclusive-gateway-default-record" >
-        <field name="name"/>
-        <break/>
-        <group name="startGroup" colSpan="2" cols="2" >
-	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
-        </group>
-        <group name="endGroup" colSpan="2" cols="2" >
-	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
-        </group>
-        <separator title="Description" colSpan="4"/>
-   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
-    </form>
+  <form name="exclusive-gateway-form" title="Exclusive gateway" model="com.axelor.wkf.db.node.gateway.ExclusiveGateway" onNew="exclusive-gateway-default-record" >
+    <panel itemSpan="12">
+      <field name="name"/>
+      <panel-related field="startTransitions" form-view="start-transition-form" grid-view="start-transition-grid"/>
+      <panel-related field="endTransitions" form-view="end-transition-form" grid-view="end-transition-grid"/>
+    </panel>
+    <panel>
+      <field name="description" colSpan="12" showTitle="false" widget="Html" x-lite="true"/>
+    </panel>
+  </form>
     
-    <grid name="parallel-gateway-grid" title="Parallel gateways" model="com.axelor.wkf.db.node.gateway.ParallelGateway">
-        <field name="name"/>
-    </grid>
+  <grid name="parallel-gateway-grid" title="Parallel gateways" model="com.axelor.wkf.db.node.gateway.ParallelGateway">
+    <field name="name"/>
+  </grid>
     
-    <form name="parallel-gateway-form" title="Parallel gateway" cols="4" model="com.axelor.wkf.db.node.gateway.ParallelGateway" onNew="parallel-gateway-default-record" >
-        <field name="name"/>
-        <break/>
-        <group name="startGroup" colSpan="2" cols="2" >
-	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
-        </group>
-        <group name="endGroup" colSpan="2" cols="2" >
-	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
-        </group>
-        <separator title="Description" colSpan="4"/>
-   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
-    </form>
+  <form name="parallel-gateway-form" title="Parallel gateway" model="com.axelor.wkf.db.node.gateway.ParallelGateway" onNew="parallel-gateway-default-record" >
+    <panel itemSpan="12">
+      <field name="name"/>
+      <panel-related field="startTransitions" form-view="start-transition-form" grid-view="start-transition-grid"/>
+      <panel-related field="endTransitions" form-view="end-transition-form" grid-view="end-transition-grid"/>
+    </panel>
+    <panel>
+      <field name="description" colSpan="12" showTitle="false" widget="Html" x-lite="true"/>
+    </panel>
+  </form>
     
-    <grid name="timer-event-grid" title="Timer events" model="com.axelor.wkf.db.node.TimerEvent">
-        <field name="name"/>
-       	<field name="timeDate" />
-       	<field name="timeCycle" />
-       	<field name="timeDuration" />
-    </grid>
+  <grid name="timer-event-grid" title="Timer events" model="com.axelor.wkf.db.node.TimerEvent">
+    <field name="name"/>
+    <field name="timeDate" />
+    <field name="timeCycle" />
+    <field name="timeDuration" />
+  </grid>
     
-    <form name="timer-event-form" title="Timer event" cols="4" model="com.axelor.wkf.db.node.TimerEvent" onNew="timer-event-default-record" >
-        <field name="name"/>
-       	<field name="timeDate" />
-       	<field name="timeCycle" />
-       	<field name="timeDuration" />
-        <group name="startGroup" colSpan="2" cols="2" >
-	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
-        </group>
-        <group name="endGroup" colSpan="2" cols="2" >
-	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
-        </group>
-        <separator title="Description" colSpan="4"/>
-   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
-    </form>
+  <form name="timer-event-form" title="Timer event" model="com.axelor.wkf.db.node.TimerEvent" onNew="timer-event-default-record" >
+    <panel>
+      <field name="name"/>
+      <field name="timeDate" />
+      <field name="timeCycle" />
+      <field name="timeDuration" />
+      <panel-related field="startTransitions" grid-view="start-transition-grid" form-view="start-transition-form"/>
+      <panel-related field="endTransitions" grid-view="end-transition-grid" form-view="end-transition-form"/>
+    </panel>
+    <panel>
+      <field name="description" colSpan="12" showTitle="false" widget="Html" x-lite="true"/>
+    </panel>
+  </form>
     
-    <grid name="message-event-grid" title="Message events" model="com.axelor.wkf.db.node.MessageEvent" >
-        <field name="name"/>
-       	<field name="account" />
-       	<field name="persist" />
-       	<field name="template" />
-       	<field name="templateModel" />
-    </grid>
+  <grid name="message-event-grid" title="Message events" model="com.axelor.wkf.db.node.MessageEvent" >
+    <field name="name"/>
+    <field name="account" />
+    <field name="persist" />
+    <field name="template" />
+    <field name="templateModel" />
+  </grid>
     
-    <form name="message-event-form" title="Message event" cols="4" model="com.axelor.wkf.db.node.MessageEvent" onNew="message-event-default-record" >
-        <field name="name"/>
-        <break/>
-       	<field name="account" />
-       	<field name="persist" />
-       	<field name="template" />
-       	<field name="templateModel" />
-        <group name="startGroup" colSpan="2" cols="2" >
-	        <field name="startTransitions" colSpan="2" grid-view="start-transition-grid" form-view="start-transition-form" showTitle="false"/>
-        </group>
-        <group name="endGroup" colSpan="2" cols="2" >
-	        <field name="endTransitions" colSpan="2" grid-view="end-transition-grid" form-view="end-transition-form" showTitle="false"/>
-        </group>
-        <separator title="Description" colSpan="4"/>
-   		<field name="description" colSpan="4" showTitle="false" widget="Html"/>
-    </form>
+  <form name="message-event-form" title="Message event" model="com.axelor.wkf.db.node.MessageEvent" onNew="message-event-default-record" >
+    <panel>
+      <field name="name"/>
+      <spacer colSpan="12"/>
+      <field name="account" />
+      <field name="persist" />
+      <field name="template" />
+      <field name="templateModel" />
+      <panel-related field="startTransitions" grid-view="start-transition-grid" form-view="start-transition-form"/>
+      <panel-related field="endTransitions" grid-view="end-transition-grid" form-view="end-transition-form"/>
+    </panel>
+    <panel>
+      <field name="description" colSpan="12" showTitle="false" widget="Html" x-lite="true"/>
+    </panel>
+  </form>
     
 <!-- ACTION -->
     
-    <!-- RECORD -->
-    
-    <action-record name="start-event-default-record" model="com.axelor.wkf.db.node.StartEvent">
-    	<field name="type" expr="startEvent"/>
-    	<field name="name" expr="Start event :"/>
-    </action-record>
-    
-    <action-record name="end-event-default-record" model="com.axelor.wkf.db.node.EndEvent">
-    	<field name="type" expr="endEvent"/>
-    	<field name="name" expr="End event :"/>
-    </action-record>
-    
-    <action-record name="node-task-default-record" model="com.axelor.wkf.db.node.NodeTask">
-    	<field name="type" expr="NodeTask"/>
-    	<field name="name" expr="eval: 'NodeTask:'"/>
-    </action-record>
-    
-    <action-record name="inclusive-gateway-default-record" model="com.axelor.wkf.db.node.gateway.InclusiveGateway">
-    	<field name="type" expr="gateway"/>
-    	<field name="operator" expr="inclusive"/>
-    	<field name="name" expr="eval: 'Inclusive :'"/>
-    </action-record>
-    
-    <action-record name="exclusive-gateway-default-record" model="com.axelor.wkf.db.node.gateway.ExclusiveGateway">
-    	<field name="type" expr="gateway"/>
-    	<field name="operator" expr="exclusive"/>
-    	<field name="name" expr="eval: 'Exclusive :'"/>
-    </action-record>
-    
-    <action-record name="parallel-gateway-default-record" model="com.axelor.wkf.db.node.gateway.ParallelGateway">
-    	<field name="type" expr="gateway"/>
-    	<field name="operator" expr="parallel"/>
-    	<field name="name" expr="eval: 'Parallel :'"/>
-    </action-record>
-    
-    <action-record name="timer-event-default-record" model="com.axelor.wkf.db.node.TimerEvent">
-    	<field name="type" expr="timer"/>
-    	<field name="name" expr="eval: 'Timer event :'"/>
-    </action-record>
-    
-    <action-record name="message-event-default-record" model="com.axelor.wkf.db.node.MessageEvent">
-    	<field name="type" expr="message"/>
-    	<field name="name" expr="eval: 'Message event :'"/>
-    </action-record>
-    
-    <action-record name="node-record-name" model="com.axelor.wkf.db.Node">
-    	<field name="name" expr="eval: type?.toUpperCase() + ':'"/>
-    </action-record>
-	
-	<!-- GROUP -->
-	<action-group name="node-default-record-group">
-		<action name="start-event-default-record" if="_parent?._model == 'com.axelor.wkf.db.Workflow'"/>
-		<action name="node-task-default-record" if="_parent?._model != 'com.axelor.wkf.db.Workflow'"/>
-	</action-group>
+  <!-- RECORD -->
+
+  <action-record name="start-event-default-record" model="com.axelor.wkf.db.node.StartEvent">
+    <field name="type" expr="startEvent" />
+    <field name="name" expr="Start event :" />
+  </action-record>
+
+  <action-record name="end-event-default-record" model="com.axelor.wkf.db.node.EndEvent">
+    <field name="type" expr="endEvent" />
+    <field name="name" expr="End event :" />
+  </action-record>
+
+  <action-record name="node-task-default-record" model="com.axelor.wkf.db.node.NodeTask">
+    <field name="type" expr="NodeTask" />
+    <field name="name" expr="eval: 'NodeTask:'" />
+  </action-record>
+
+  <action-record name="inclusive-gateway-default-record" model="com.axelor.wkf.db.node.gateway.InclusiveGateway">
+    <field name="type" expr="gateway" />
+    <field name="operator" expr="inclusive" />
+    <field name="name" expr="eval: 'Inclusive :'" />
+  </action-record>
+
+  <action-record name="exclusive-gateway-default-record" model="com.axelor.wkf.db.node.gateway.ExclusiveGateway">
+    <field name="type" expr="gateway" />
+    <field name="operator" expr="exclusive" />
+    <field name="name" expr="eval: 'Exclusive :'" />
+  </action-record>
+
+  <action-record name="parallel-gateway-default-record" model="com.axelor.wkf.db.node.gateway.ParallelGateway">
+    <field name="type" expr="gateway" />
+    <field name="operator" expr="parallel" />
+    <field name="name" expr="eval: 'Parallel :'" />
+  </action-record>
+
+  <action-record name="timer-event-default-record" model="com.axelor.wkf.db.node.TimerEvent">
+    <field name="type" expr="timer" />
+    <field name="name" expr="eval: 'Timer event :'" />
+  </action-record>
+
+  <action-record name="message-event-default-record" model="com.axelor.wkf.db.node.MessageEvent">
+    <field name="type" expr="message" />
+    <field name="name" expr="eval: 'Message event :'" />
+  </action-record>
+
+  <action-record name="node-record-name" model="com.axelor.wkf.db.Node">
+    <field name="name" expr="eval: type?.toUpperCase() + ':'" />
+  </action-record>
+
+  <!-- GROUP -->
+  <action-group name="node-default-record-group">
+    <action name="start-event-default-record" if="_parent?._model == 'com.axelor.wkf.db.Workflow'" />
+    <action name="node-task-default-record" if="_parent?._model != 'com.axelor.wkf.db.Workflow'" />
+  </action-group>
     
 </object-views>
