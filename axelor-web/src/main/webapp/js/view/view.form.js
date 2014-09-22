@@ -845,6 +845,12 @@ ui.formBuild = function (scope, schema, fields) {
 			
 			if (parent.is('[ui-panel-tabs]')) {
 				item.attr('ui-panel-tab', '');
+				if (attrs.showTitle === undefined) {
+					attrs.showTitle = false;
+				}
+				if (attrs.showFrame === undefined) {
+					attrs.showFrame = false;
+				}
 			}
 
 			scope.fields_view[widgetId] = attrs;
