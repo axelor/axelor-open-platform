@@ -795,6 +795,13 @@
             <xsd:documentation>Specify whether the stack panel items.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="onTabSelect" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            Specify an action to execute when the panel tab is selected (if it's top-level in panel-tabs).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="rowSpan" use="prohibited"/>
         <xsd:attribute name="width" use="prohibited"/>
       </xsd:extension>

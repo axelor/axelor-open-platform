@@ -452,6 +452,8 @@ ui.formWidget('PanelTabs', {
 			}
 			scope.tabs.push(tab);
 		});
+		
+		var selected = null;
 
 		function findTab(tab) {
 			var found = scope.tabs[tab] || tab;
@@ -460,10 +462,19 @@ ui.formWidget('PanelTabs', {
 			}
 			return found;
 		}
-
-		var selected = null;
+		
+		var doSelect = _.debounce(function doSelect() {
+			if (!selected || !selected.elem) {
+				return;
+			}
+			var scope = selected.elem.scope();
+			if (scope.handleSelect) {
+				scope.handleSelect();
+			}
+		}, 100);
 
 		scope.selectTab = function(tab) {
+			var current = selected;
 			var found = findTab(tab);
 			if (!found) {
 				return;
@@ -488,8 +499,10 @@ ui.formWidget('PanelTabs', {
 			setTimeout(function () {
 				elemTabs.removeClass('open');
 				elemMenu.removeClass('open');
-
 				axelor.$adjustSize();
+				if (current != selected) {
+					doSelect();
+				}
 			});
 		};
 
@@ -681,6 +694,13 @@ ui.formWidget('PanelTab', {
 		function findTab() {
 			return tab || (tab = (scope.tabs||[])[index]) || {};
 		}
+
+		scope.handleSelect = function () {
+			var onTabSelect = scope.$events.onTabSelect;
+			if (onTabSelect && !element.is(":hidden")) {
+				onTabSelect();
+			}
+		};
 
 		scope.isHidden = function () {
 			var tab = findTab();

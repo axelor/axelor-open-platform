@@ -38,6 +38,9 @@ public abstract class AbstractPanel extends AbstractContainer {
 	@XmlAttribute
 	private Boolean stacked;
 
+	@XmlAttribute
+	private String onTabSelect;
+
 	public Integer getItemSpan() {
 		return itemSpan;
 	}
@@ -52,6 +55,10 @@ public abstract class AbstractPanel extends AbstractContainer {
 
 	public Boolean getStacked() {
 		return stacked;
+	}
+
+	public String getOnTabSelect() {
+		return onTabSelect;
 	}
 
 	protected List<AbstractWidget> process(List<AbstractWidget> items) {
