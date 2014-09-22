@@ -31,14 +31,13 @@ import com.google.common.base.Objects.ToStringHelper;
 
 @Entity
 public class TimerEvent extends Node {
-	
-	private LocalTime timeDuration;
-	
-	private LocalDate timeDate;
-	
-	private DateTime timeCyle;
 
-	
+	private LocalTime timeDuration;
+
+	private LocalDate timeDate;
+
+	private DateTime timeCycle;
+
 	public LocalTime getTimeDuration() {
 		return timeDuration;
 	}
@@ -55,12 +54,12 @@ public class TimerEvent extends Node {
 		this.timeDate = timeDate;
 	}
 
-	public DateTime getTimeCyle() {
-		return timeCyle;
+	public DateTime getTimeCycle() {
+		return timeCycle;
 	}
 
-	public void setTimeCyle(DateTime timeCyle) {
-		this.timeCyle = timeCyle;
+	public void setTimeCycle(DateTime timeCycle) {
+		this.timeCycle = timeCycle;
 	}
 
 	@Override
@@ -73,11 +72,11 @@ public class TimerEvent extends Node {
 		tsh.add("ref", this.getRef());
 		tsh.add("timeDuration", this.getTimeDuration());
 		tsh.add("timeDate", this.getTimeDate());
-		tsh.add("timeCyle", this.getTimeCyle());
+		tsh.add("timeCycle", this.getTimeCycle());
 
 		return tsh.omitNullValues().toString();
 	}
-	
+
 	/**
 	 * Find a <code>IntermediateTimerEvent</code> by <code>id</code>.
 	 *
@@ -85,7 +84,7 @@ public class TimerEvent extends Node {
 	public static TimerEvent find(Long id) {
 		return JPA.find(TimerEvent.class, id);
 	}
-	
+
 	/**
 	 * Return a {@link Query} instance for <code>IntermediateTimerEvent</code> to filter
 	 * on all the records.
@@ -94,7 +93,7 @@ public class TimerEvent extends Node {
 	public static Query<? extends TimerEvent> all() {
 		return JPA.all(TimerEvent.class);
 	}
-	
+
 	/**
 	 * A shortcut method to <code>IntermediateTimerEvent.all().filter(...)</code>
 	 *
@@ -102,5 +101,5 @@ public class TimerEvent extends Node {
 	public static Query<? extends TimerEvent> filter(String filter, Object... params) {
 		return all().filter(filter, params);
 	}
-	
+
 }
