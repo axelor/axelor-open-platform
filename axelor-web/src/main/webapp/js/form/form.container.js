@@ -418,7 +418,7 @@ ui.formWidget('Panel', {
 
 	transclude: true,
 	template:
-		"<div class='panel'>" +
+		"<div class='panel panel-default'>" +
 			"<div class='panel-header' ng-show='field.title' ng-if='!notitle'>" +
 				"<div ng-if='menus' ui-menu-bar menus='menus' handler='this' class='pull-right'></div>" +
 				"<div class='panel-title'>{{field.title}}</div>" +
