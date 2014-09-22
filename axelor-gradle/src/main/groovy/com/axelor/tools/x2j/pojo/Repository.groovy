@@ -47,8 +47,22 @@ class Repository {
 		this.importManager.importType("${entity.namespace}.${entity.name}");
 	}
 
+	String getClassName() {
+		if (concrete) {
+			return name;
+		}
+		return "Abstract${name}"
+	}
+
+	String getClassStatement() {
+		if (concrete) {
+			return "class $className"
+		}
+		return "abstract class $className"
+	}
+
 	String getFile() {
-		namespace.replace(".", "/") + "/" + name + ".java"
+		return namespace.replace(".", "/") + "/${className}.java"
 	}
 
 	String importType(String fqn) {
