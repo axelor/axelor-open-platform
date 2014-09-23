@@ -42,11 +42,14 @@ ui.formInput('ImageLink', {
 		var height = field.height || 140;
 		
 		scope.styles = [{
-			'min-width': width,
-			'width': width
+			'width': width,
+			'max-width': '100%',
+			'max-height': '100%'
 		}, {
 			'width': width,
-			'height': height
+			'height': height,
+			'max-width': '100%',
+			'max-height': '100%'
 		}];
 
 		if (field.noframe) {
