@@ -67,7 +67,7 @@ public class MessageEvent extends Node {
 	public void setPersist(Boolean persist) {
 		this.persist = persist;
 	}
-	
+
 	@Override
 	public String toString() {
 		ToStringHelper tsh = Objects.toStringHelper(this);
@@ -80,7 +80,7 @@ public class MessageEvent extends Node {
 
 		return tsh.omitNullValues().toString();
 	}
-	
+
 	/**
 	 * Find a <code>IntermediateMessageEvent</code> by <code>id</code>.
 	 *
@@ -88,7 +88,7 @@ public class MessageEvent extends Node {
 	public static MessageEvent find(Long id) {
 		return JPA.find(MessageEvent.class, id);
 	}
-	
+
 	/**
 	 * Return a {@link Query} instance for <code>IntermediateMessageEvent</code> to filter
 	 * on all the records.
@@ -97,7 +97,7 @@ public class MessageEvent extends Node {
 	public static Query<? extends MessageEvent> all() {
 		return JPA.all(MessageEvent.class);
 	}
-	
+
 	/**
 	 * A shortcut method to <code>IntermediateMessageEvent.all().filter(...)</code>
 	 *
@@ -105,5 +105,5 @@ public class MessageEvent extends Node {
 	public static Query<? extends MessageEvent> filter(String filter, Object... params) {
 		return all().filter(filter, params);
 	}
-	
+
 }

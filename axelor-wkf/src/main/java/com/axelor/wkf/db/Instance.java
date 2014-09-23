@@ -104,7 +104,7 @@ public class Instance extends AuditableModel {
 	public void setNodes(Set<Node> nodes) {
 		this.nodes = nodes;
 	}
-	
+
 	/**
 	 * Add the given {@link #Node} item to the {@code nodes}.
 	 *
@@ -119,14 +119,14 @@ public class Instance extends AuditableModel {
 	/**
 	 * Remove the given {@link #Node} item from the {@code nodes}.
 	 *
-	 */	
+	 */
 	public void removeNode(Node item) {
 		if (nodes == null) {
 			return;
 		}
 		nodes.remove(item);
 	}
-	
+
 	/**
 	 * Clear the {@code nodes} collection.
 	 *
@@ -134,11 +134,10 @@ public class Instance extends AuditableModel {
 	 * It calls the {@code this.flush()} method to avoid unexpected errors
 	 * if any of the item in the collection is changed.
 	 * </p>
-	 */	
+	 */
 	public void clearNodes() {
 		if (nodes != null) {
 			nodes.clear();
-			this.flush();
 		}
 	}
 
@@ -149,7 +148,7 @@ public class Instance extends AuditableModel {
 	public void setExecutedTransitions(Set<Transition> executedTransitions) {
 		this.executedTransitions = executedTransitions;
 	}
-	
+
 	/**
 	 * Add the given {@link #Transition} item to the {@code executedTransitions}.
 	 *
@@ -164,7 +163,7 @@ public class Instance extends AuditableModel {
 	/**
 	 * Remove the given {@link #Transition} item from the {@code executedTransitions}.
 	 *
-	 */	
+	 */
 	public void removeExecutedTransition(Transition item) {
 		if (executedTransitions == null) {
 			return;
@@ -175,14 +174,14 @@ public class Instance extends AuditableModel {
 	/**
 	 * Remove the given {@link #Transition} item from the {@code executedTransitions}.
 	 *
-	 */	
+	 */
 	public void removeAllExecutedTransition(List<Transition> items) {
 		if (executedTransitions == null) {
 			return;
 		}
 		executedTransitions.removeAll(items);
 	}
-	
+
 	/**
 	 * Clear the {@code executedTransitions} collection.
 	 *
@@ -190,11 +189,10 @@ public class Instance extends AuditableModel {
 	 * It calls the {@code this.flush()} method to avoid unexpected errors
 	 * if any of the item in the collection is changed.
 	 * </p>
-	 */	
+	 */
 	public void clearExecutedTransitions() {
 		if (executedTransitions != null) {
 			executedTransitions.clear();
-			this.flush();
 		}
 	}
 
@@ -205,7 +203,7 @@ public class Instance extends AuditableModel {
 	public void setHistories(List<InstanceHistory> histories) {
 		this.histories = histories;
 	}
-	
+
 	/**
 	 * Add the given {@link #InstanceHistory} item to the {@code histories}.
 	 *
@@ -224,14 +222,14 @@ public class Instance extends AuditableModel {
 	/**
 	 * Remove the given {@link #InstanceHistory} item from the {@code histories}.
 	 *
-	 */	
+	 */
 	public void removeHistory(InstanceHistory item) {
 		if (histories == null) {
 			return;
 		}
 		histories.remove(item);
 	}
-	
+
 	/**
 	 * Clear the {@code histories} collection.
 	 *
@@ -239,11 +237,10 @@ public class Instance extends AuditableModel {
 	 * It calls the {@code this.flush()} method to avoid unexpected errors
 	 * if any of the item in the collection is changed.
 	 * </p>
-	 */	
+	 */
 	public void clearHistories() {
 		if (histories != null) {
 			histories.clear();
-			this.flush();
 		}
 	}
 
@@ -254,7 +251,7 @@ public class Instance extends AuditableModel {
 	public void setCounters(List<InstanceCounter> counters) {
 		this.counters = counters;
 	}
-	
+
 	/**
 	 * Add the given {@link #InstanceCounter} item to the {@code counters}.
 	 *
@@ -273,14 +270,14 @@ public class Instance extends AuditableModel {
 	/**
 	 * Remove the given {@link #InstanceCounter} item from the {@code counters}.
 	 *
-	 */	
+	 */
 	public void removeCounter(InstanceCounter item) {
 		if (counters == null) {
 			return;
 		}
 		counters.remove(item);
 	}
-	
+
 	/**
 	 * Clear the {@code counters} collection.
 	 *
@@ -288,33 +285,32 @@ public class Instance extends AuditableModel {
 	 * It calls the {@code this.flush()} method to avoid unexpected errors
 	 * if any of the item in the collection is changed.
 	 * </p>
-	 */	
+	 */
 	public void clearCounters() {
 		if (counters != null) {
 			counters.clear();
-			this.flush();
 		}
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
 		if (this == obj) return true;
 		if (!(obj instanceof Instance)) return false;
-		
+
 		Instance other = (Instance) obj;
 		if (this.getId() != null && other.getId() != null) {
 			return Objects.equal(this.getId(), other.getId());
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();
 	}
-	
+
 	@Override
 	public String toString() {
 		ToStringHelper tsh = Objects.toStringHelper(this);
@@ -327,7 +323,7 @@ public class Instance extends AuditableModel {
 
 	/**
 	 * Make the entity managed and persistent.
-	 * 
+	 *
 	 * @see EntityManager#persist(Object)
 	 */
 	public Instance persist() {
@@ -336,7 +332,7 @@ public class Instance extends AuditableModel {
 
 	/**
 	 * Merge the state of the entity into the current persistence context.
-	 * 
+	 *
 	 * @see EntityManager#merge(Object)
 	 */
 	public Instance merge() {
@@ -348,43 +344,43 @@ public class Instance extends AuditableModel {
 	 * <br>
 	 * It uses either {@link #persist()} or {@link #merge()} and calls
 	 * {@link #flush()} to synchronize values with database.
-	 * 
+	 *
 	 * @see #persist(Model)
 	 * @see #merge(Model)
-	 * 
+	 *
 	 */
 	public Instance save() {
 		return JPA.save(this);
 	}
-	
+
 	/**
 	 * Remove the entity instance.
-	 * 
+	 *
 	 * @see EntityManager#remove(Object)
 	 */
 	public void remove() {
 		JPA.remove(this);
 	}
-	
+
 	/**
 	 * Refresh the state of the instance from the database, overwriting changes
 	 * made to the entity, if any.
-	 * 
+	 *
 	 * @see EntityManager#refresh(Object)
 	 */
 	public void refresh() {
 		JPA.refresh(this);
 	}
-	
+
 	/**
 	 * Synchronize the persistence context to the underlying database.
-	 * 
+	 *
 	 * @see EntityManager#flush()
 	 */
 	public void flush() {
 		JPA.flush();
 	}
-	
+
 	/**
 	 * Find a <code>Instance</code> by <code>id</code>.
 	 *
@@ -392,21 +388,21 @@ public class Instance extends AuditableModel {
 	public static Instance find(Long id) {
 		return JPA.find(Instance.class, id);
 	}
-	
+
 	/**
 	 * Return a {@link Query} instance for <code>Instance</code> to filter
 	 * on all the records.
 	 *
 	 */
-	public static Query<Instance> all() {
+	public static Query<? extends Instance> all() {
 		return JPA.all(Instance.class);
 	}
-	
+
 	/**
 	 * A shortcut method to <code>Instance.all().filter(...)</code>
 	 *
 	 */
-	public static Query<Instance> filter(String filter, Object... params) {
-		return all().filter(filter, params);
+	public static Query<? extends Instance> filter(String filter, Object... params) {
+		return JPA.all(Instance.class).filter(filter, params);
 	}
 }

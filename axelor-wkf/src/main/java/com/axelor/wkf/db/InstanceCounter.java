@@ -85,26 +85,26 @@ public class InstanceCounter extends AuditableModel {
 	public void setCounter(Integer counter) {
 		this.counter = counter;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
 		if (this == obj) return true;
 		if (!(obj instanceof InstanceCounter)) return false;
-		
+
 		InstanceCounter other = (InstanceCounter) obj;
 		if (this.getId() != null && other.getId() != null) {
 			return Objects.equal(this.getId(), other.getId());
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();
 	}
-	
+
 	@Override
 	public String toString() {
 		ToStringHelper tsh = Objects.toStringHelper(this);
@@ -114,7 +114,7 @@ public class InstanceCounter extends AuditableModel {
 
 		return tsh.omitNullValues().toString();
 	}
-	
+
 	public static InstanceCounter findByInstanceAndNode(Instance instance, Node node) {
 		return InstanceCounter.all()
 				.filter("self.instance = :instance AND self.node = :node")
@@ -125,7 +125,7 @@ public class InstanceCounter extends AuditableModel {
 
 	/**
 	 * Make the entity managed and persistent.
-	 * 
+	 *
 	 * @see EntityManager#persist(Object)
 	 */
 	public InstanceCounter persist() {
@@ -134,7 +134,7 @@ public class InstanceCounter extends AuditableModel {
 
 	/**
 	 * Merge the state of the entity into the current persistence context.
-	 * 
+	 *
 	 * @see EntityManager#merge(Object)
 	 */
 	public InstanceCounter merge() {
@@ -146,43 +146,43 @@ public class InstanceCounter extends AuditableModel {
 	 * <br>
 	 * It uses either {@link #persist()} or {@link #merge()} and calls
 	 * {@link #flush()} to synchronize values with database.
-	 * 
+	 *
 	 * @see #persist(Model)
 	 * @see #merge(Model)
-	 * 
+	 *
 	 */
 	public InstanceCounter save() {
 		return JPA.save(this);
 	}
-	
+
 	/**
 	 * Remove the entity instance.
-	 * 
+	 *
 	 * @see EntityManager#remove(Object)
 	 */
 	public void remove() {
 		JPA.remove(this);
 	}
-	
+
 	/**
 	 * Refresh the state of the instance from the database, overwriting changes
 	 * made to the entity, if any.
-	 * 
+	 *
 	 * @see EntityManager#refresh(Object)
 	 */
 	public void refresh() {
 		JPA.refresh(this);
 	}
-	
+
 	/**
 	 * Synchronize the persistence context to the underlying database.
-	 * 
+	 *
 	 * @see EntityManager#flush()
 	 */
 	public void flush() {
 		JPA.flush();
 	}
-	
+
 	/**
 	 * Find a <code>InstanceCounter</code> by <code>id</code>.
 	 *
@@ -190,21 +190,21 @@ public class InstanceCounter extends AuditableModel {
 	public static InstanceCounter find(Long id) {
 		return JPA.find(InstanceCounter.class, id);
 	}
-	
+
 	/**
 	 * Return a {@link Query} instance for <code>InstanceCounter</code> to filter
 	 * on all the records.
 	 *
 	 */
-	public static Query<InstanceCounter> all() {
+	public static Query<? extends InstanceCounter> all() {
 		return JPA.all(InstanceCounter.class);
 	}
-	
+
 	/**
 	 * A shortcut method to <code>InstanceCounter.all().filter(...)</code>
 	 *
 	 */
-	public static Query<InstanceCounter> filter(String filter, Object... params) {
-		return all().filter(filter, params);
+	public static Query<? extends InstanceCounter> filter(String filter, Object... params) {
+		return JPA.all(InstanceCounter.class).filter(filter, params);
 	}
 }
