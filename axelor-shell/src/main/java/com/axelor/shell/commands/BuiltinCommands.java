@@ -17,16 +17,13 @@
  */
 package com.axelor.shell.commands;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 
-import com.axelor.common.ClassUtils;
+import com.axelor.common.VersionUtils;
 import com.axelor.shell.core.CommandProvider;
 import com.axelor.shell.core.Parser;
 import com.axelor.shell.core.Shell;
 import com.axelor.shell.core.annotations.CliCommand;
-import com.google.common.io.CharStreams;
 
 public class BuiltinCommands implements CommandProvider {
 
@@ -42,11 +39,10 @@ public class BuiltinCommands implements CommandProvider {
 		if (version != null) {
 			return version;
 		}
-		version = "UNKNOWN";
-		try (InputStream is = ClassUtils
-				.getResourceStream("axelor-shell-version.txt")) {
-			version = CharStreams.toString(new InputStreamReader(is));
+		try {
+			version = VersionUtils.getVersion().version;
 		} catch (Exception e) {
+			version = "UNKNOWN";
 		}
 		return version;
 	}
