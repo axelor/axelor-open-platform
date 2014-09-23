@@ -21,6 +21,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.plugins.ide.eclipse.model.SourceFolder
 
+import com.axelor.common.VersionUtils
 import com.axelor.gradle.tasks.I18nTask
 
 abstract class AbstractPlugin implements Plugin<Project> {
@@ -31,11 +32,7 @@ abstract class AbstractPlugin implements Plugin<Project> {
 		if (sdkVersion) {
 			return sdkVersion
 		}
-		try {
-			sdkVersion = getClass().classLoader.getResource("axelor-gradle-version.txt").text
-		} catch (Exception e) {
-		}
-		return sdkVersion;
+		return sdkVersion = VersionUtils.getVersion().version;
 	}
 
 	protected void applyCommon(Project project, AbstractDefinition definition) {

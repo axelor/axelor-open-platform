@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.common.VersionUtils;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.actions.ActionAttrs;
 import com.axelor.meta.schema.actions.ActionCondition;
@@ -55,7 +56,7 @@ public class ObjectViews {
 
 	public static final String NAMESPACE = "http://apps.axelor.com/xml/ns/object-views";
 
-	public static final String VERSION = "2.1";
+	public static final String VERSION = VersionUtils.getVersion().feature;
 
 	@XmlElement(name = "menuitem", type = MenuItem.class)
 	private List<MenuItem> menus;
