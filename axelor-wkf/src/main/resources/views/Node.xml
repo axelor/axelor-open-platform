@@ -184,8 +184,8 @@
       <field name="persist"/>
       <field name="template"/>
       <field name="templateModel"/>
-      <panel-related field="startTransitions" grid-view="start-transition-grid" form-view="start-transition-form"/>
-      <panel-related field="endTransitions" grid-view="end-transition-grid" form-view="end-transition-form"/>
+      <panel-related colSpan="12" field="startTransitions" grid-view="start-transition-grid" form-view="start-transition-form"/>
+      <panel-related colSpan="12" field="endTransitions" grid-view="end-transition-grid" form-view="end-transition-form"/>
     </panel>
     <panel>
       <field name="description" colSpan="12" showTitle="false" widget="Html" x-lite="true"/>
