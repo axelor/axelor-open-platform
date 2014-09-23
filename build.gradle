@@ -88,3 +88,17 @@ task wrapper(type: Wrapper) {
 
 // force wtp settings on subprojects
 apply from: 'gradle/force-wtp.gradle'
+
+import com.axelor.gradle.tasks.VersionTask
+
+task('update-xsd', type: VersionTask) {
+	processFiles = fileTree(projectDir) {
+		include '**/resources/**/*.xml'
+		include '**/resources/domain-models.xsd'
+		include '**/resources/object-views.xsd'
+		include '**/resources/data-import.xsd'
+		include '**/resources/templates/**/*.tmpl'
+		include '**/data/**/*config.xml'
+		include '**/webapp/package.json'
+	}
+}

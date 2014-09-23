@@ -24,6 +24,7 @@ import org.gradle.plugins.ide.eclipse.model.SourceFolder
 import com.axelor.common.VersionUtils
 import com.axelor.gradle.tasks.I18nTask
 
+
 abstract class AbstractPlugin implements Plugin<Project> {
 
 	String sdkVersion
