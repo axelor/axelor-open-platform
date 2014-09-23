@@ -113,4 +113,5 @@ table.treetable tbody tr.accept {
 .dashlet .tree-view-container {
 	position: relative;
 	height: 100%;
+	border: 1px solid #d4d4d4;
 }
