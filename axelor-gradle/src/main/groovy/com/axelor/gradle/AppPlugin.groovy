@@ -26,6 +26,7 @@ import org.gradle.api.tasks.JavaExec
 import org.gradle.internal.os.OperatingSystem
 
 import com.axelor.gradle.tasks.GenerateCode
+import com.axelor.gradle.tasks.VersionTask
 
 class AppPlugin extends AbstractPlugin {
     
@@ -89,6 +90,13 @@ class AppPlugin extends AbstractPlugin {
 					}
 				}
             }
+
+			task('update-xsd', type: VersionTask) {
+				processFiles = fileTree('src') {
+					include '**/resources/**/*.xml'
+					include '**/data/**/*config.xml'
+				}
+			}
 
 			task("generateCode", type: GenerateCode) << {
 				expandAll()
