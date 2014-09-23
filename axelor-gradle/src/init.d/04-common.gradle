@@ -38,9 +38,16 @@ allprojects { project ->
 	task generateVersion() {
 		onlyIf { project.group == "com.axelor" }
 		doLast {
-			def vf = file("${buildDir}/resources/main/${project.name}-version.txt")
-			vf.parentFile.mkdirs()
-			vf.text = project.version
+			def versionFile = file("${buildDir}/resources/main/${project.name}-version.txt")
+			versionFile.parentFile.mkdirs()
+			versionFile.text = project.version
+
+			// also generate under bin directory for eclipse
+			if (file("${projectDir}/.project").exists()) {
+				versionFile = file("${projectDir}/bin/main/${project.name}-version.txt")
+				versionFile.parentFile.mkdirs()
+				versionFile.text = project.version
+			}
 		}
 	}
 
