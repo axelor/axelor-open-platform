@@ -30,6 +30,7 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
+import com.axelor.common.VersionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -77,8 +78,13 @@ public final class AppInfo {
 		map.put("application.mode", settings.get("application.mode"));
 		
 		map.put("help.location", settings.get("application.help.location"));
-		map.put("sdk.version", settings.get("application.sdk.version"));
 		map.put("file.upload.size", settings.get("file.upload.size"));
+
+		try {
+			map.put("sdk.version", VersionUtils.getVersion().version);
+			map.put("application.version", VersionUtils.getVersion(settings.get("application.name")).version);
+		} catch (Exception e) {
+		}
 
 		for (String key : settings.getProperties().stringPropertyNames()) {
 			if (key.startsWith("view.")) {
