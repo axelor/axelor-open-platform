@@ -15,22 +15,22 @@
     <panel title="Overview">
       <field name="workflow"/>
       <field name="workflow.metaModel.name" title="Model" />
-      <field name="metaModelId" title="id"/>
+      <field name="metaModelId"/>
     </panel>
     <panel-tabs>
-      <panel title="Diagram" showFrame="false">
-        <field name="diagram" showTitle="false" readonly="true"  widget="html" colSpan="12"/>
+      <panel title="Diagram">
+        <field name="diagram" showTitle="false" readonly="true" widget="html" colSpan="12" x-lite="true"/>
       </panel>
-      <panel title="Details" showFrame="false">
+      <panel title="Details">
         <panel-related field="nodes" colSpan="12" readonly="true"/>
         <panel-related field="executedTransitions" colSpan="12" hideIf="!executedTransitions || executedTransitions.length &lt; 1" readonly="true"/>
       </panel>
-      <panel title="History" showFrame="false">
-        <field name="createdOn" />
-        <field name="createdBy" />
+      <panel title="History">
+        <field name="createdOn"/>
+        <field name="createdBy"/>
         <panel-related field="histories" colSpan="12" grid-view="instance-history-grid" form-view="instance-history-form" readonly="true"/>
       </panel>
-      <panel title="Counter" showFrame="false">
+      <panel title="Counter">
         <panel-related field="counters" colSpan="12" grid-view="instance-counter-grid" form-view="instance-counter-form" readonly="true"/>
       </panel>
     </panel-tabs>
