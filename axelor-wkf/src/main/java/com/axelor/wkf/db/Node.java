@@ -55,11 +55,11 @@ import com.axelor.meta.db.MetaAction;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 
-@Entity 
+@Entity
 @Inheritance(strategy=InheritanceType.SINGLE_TABLE)
 @Table(name = "WORKFLOW_NODE")
 public class Node extends AuditableModel {
-	
+
 	@Transient
 	protected Logger logger = LoggerFactory.getLogger( getClass() );
 
@@ -67,36 +67,41 @@ public class Node extends AuditableModel {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
+	@Widget(title = /*$$(*/"Name"/*)*/)
 	@NotNull
 	@Index(name = "WORKFLOW_NODE_NAME_IDX")
 	private String name;
 
-	@Widget(selection = "node.type.selection")
+	@Widget(selection = "node.type.selection", title = /*$$(*/"Type"/*)*/)
 	@NotNull
 	private String type = "";
 
+	@Widget(title = /*$$(*/"Action"/*)*/)
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private MetaAction action;
 
-	@Widget(readonly = true)
+	@Widget(readonly = true, title = /*$$(*/"Start transitions"/*)*/)
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "nextNode", cascade = CascadeType.ALL, orphanRemoval = true)
 	@OrderBy("sequence")
 	private List<Transition> startTransitions;
 
+	@Widget(title = /*$$(*/"End transitions"/*)*/)
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "startNode", cascade = CascadeType.ALL, orphanRemoval = true)
 	@OrderBy("sequence")
 	private List<Transition> endTransitions;
 
 	@Lob
+	@Widget(title = /*$$(*/"Description"/*)*/)
 	@Basic(fetch = FetchType.LAZY)
 	@Type(type = "org.hibernate.type.TextType")
 	private String description;
 
+	@Widget(title = /*$$(*/"Ref"/*)*/)
 	private String ref;
 
 	public Node() {
 	}
-	
+
 	public Node(String name) {
 		this.name = name;
 	}

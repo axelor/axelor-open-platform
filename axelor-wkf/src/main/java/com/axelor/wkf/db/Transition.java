@@ -46,6 +46,7 @@ import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
+import com.axelor.db.annotations.Widget;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.db.MetaAction;
@@ -55,7 +56,7 @@ import com.google.common.base.Objects.ToStringHelper;
 @Entity
 @Table(name = "WORKFLOW_TRANSITION")
 public class Transition extends AuditableModel {
-	
+
 	@Transient
 	protected Logger logger = LoggerFactory.getLogger( getClass() );
 
@@ -63,28 +64,36 @@ public class Transition extends AuditableModel {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
+	@Widget(title = /*$$(*/"Start node"/*)*/)
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private Node startNode;
 
 	@NotNull
+	@Widget(title = /*$$(*/"Next node"/*)*/)
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private Node nextNode;
 
+	@Widget(title = /*$$(*/"Name"/*)*/)
 	@Index(name = "WORKFLOW_TRANSITION_NAME_IDX")
 	private String name;
 
+	@Widget(title = /*$$(*/"Condition"/*)*/)
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private MetaAction condition;
 
+	@Widget(title = /*$$(*/"Sequence"/*)*/)
 	private Integer sequence = 0;
 
 	@Lob
+	@Widget(title = /*$$(*/"Description"/*)*/)
 	@Basic(fetch = FetchType.LAZY)
 	@Type(type = "org.hibernate.type.TextType")
 	private String description;
 
+	@Widget(title = /*$$(*/"Signal"/*)*/)
 	private String signal;
 
+	@Widget(title = /*$$(*/"Role"/*)*/)
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private Role role;
 

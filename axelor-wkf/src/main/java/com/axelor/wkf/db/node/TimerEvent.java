@@ -25,6 +25,7 @@ import org.joda.time.LocalTime;
 
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
+import com.axelor.db.annotations.Widget;
 import com.axelor.wkf.db.Node;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
@@ -32,10 +33,13 @@ import com.google.common.base.Objects.ToStringHelper;
 @Entity
 public class TimerEvent extends Node {
 
+	@Widget(title = /*$$(*/"Time duration"/*)*/)
 	private LocalTime timeDuration;
 
+	@Widget(title = /*$$(*/"Time date"/*)*/)
 	private LocalDate timeDate;
 
+	@Widget(title = /*$$(*/"Time cycle"/*)*/)
 	private DateTime timeCycle;
 
 	public LocalTime getTimeDuration() {

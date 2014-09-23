@@ -31,6 +31,7 @@ import com.axelor.auth.db.AuditableModel;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
+import com.axelor.db.annotations.Widget;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 
@@ -42,9 +43,11 @@ public class InstanceHistory extends AuditableModel {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
+	@Widget(title = /*$$(*/"Instance"/*)*/)
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private Instance instance;
 
+	@Widget(title = /*$$(*/"Transition"/*)*/)
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private Transition transition;
 
