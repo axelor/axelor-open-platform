@@ -41,6 +41,7 @@ import com.axelor.auth.db.AuditableModel;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
+import com.axelor.db.annotations.Widget;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaModel;
@@ -51,39 +52,48 @@ import com.google.common.base.Objects.ToStringHelper;
 @Cacheable
 @Table(name = "WORKFLOW_WORKFLOW")
 public class Workflow extends AuditableModel {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
 	@NotNull
+	@Widget(title = /*$$(*/"Name"/*)*/)
 	@Index(name = "WORKFLOW_WORKFLOW_NAME_IDX")
 	private String name;
 
 	@NotNull
+	@Widget(title = /*$$(*/"Model"/*)*/)
 	@Index(name = "WORKFLOW_WORKFLOW_META_MODEL_IDX")
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private MetaModel metaModel;
 
+	@Widget(title = /*$$(*/"Node"/*)*/)
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private Node node;
 
+	@Widget(title = /*$$(*/"Max node counter"/*)*/)
 	private Integer maxNodeCounter = 1;
 
+	@Widget(title = /*$$(*/"Condition"/*)*/)
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private MetaAction condition;
 
+	@Widget(title = /*$$(*/"Sequence"/*)*/)
 	private Integer sequence = 0;
 
 	@Lob
 	@Basic(fetch = FetchType.LAZY)
+	@Widget(title = /*$$(*/"Description"/*)*/)
 	@Type(type = "org.hibernate.type.TextType")
 	private String description;
 
+	@Widget(title = /*$$(*/"Active"/*)*/)
 	private Boolean active = Boolean.TRUE;
 
 	@Lob
 	@Basic(fetch = FetchType.LAZY)
+	@Widget(title = /*$$(*/"BPMN"/*)*/)
 	@Type(type = "org.hibernate.type.TextType")
 	private String bpmn;
 

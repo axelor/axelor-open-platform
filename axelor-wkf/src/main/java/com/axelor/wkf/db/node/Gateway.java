@@ -29,7 +29,7 @@ import com.google.common.base.Objects.ToStringHelper;
 @Entity
 public class Gateway extends Node {
 
-	@Widget(selection = "node.logic.operator.selection")
+	@Widget(selection = "node.logic.operator.selection", title = /*$$(*/"Operator"/*)*/)
 	private String operator;
 
 	public String getOperator() {

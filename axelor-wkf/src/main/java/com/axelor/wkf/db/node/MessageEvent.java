@@ -21,19 +21,24 @@ import javax.persistence.Entity;
 
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
+import com.axelor.db.annotations.Widget;
 import com.axelor.wkf.db.Node;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 
 @Entity
 public class MessageEvent extends Node {
-	
+
+	@Widget(title = /*$$(*/"Account"/*)*/)
 	private String account;
-	
+
+	@Widget(title = /*$$(*/"Template"/*)*/)
 	private String template;
-	
+
+	@Widget(title = /*$$(*/"Template model"/*)*/)
 	private String templateModel;
-	
+
+	@Widget(title = /*$$(*/"Persist"/*)*/)
 	private Boolean persist;
 
 	public String getAccount() {

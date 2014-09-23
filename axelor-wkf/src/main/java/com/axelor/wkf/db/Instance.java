@@ -40,6 +40,7 @@ import com.axelor.auth.db.AuditableModel;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
+import com.axelor.db.annotations.Widget;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 
@@ -52,20 +53,26 @@ public class Instance extends AuditableModel {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
+	@Widget(title = /*$$(*/"Workflow"/*)*/)
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private Workflow workflow;
 
+	@Widget(title = /*$$(*/"Model Id"/*)*/)
 	private Long metaModelId = 0L;
 
+	@Widget(title = /*$$(*/"Nodes"/*)*/)
 	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private Set<Node> nodes;
 
+	@Widget(title = /*$$(*/"Executed transitions"/*)*/)
 	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private Set<Transition> executedTransitions;
 
+	@Widget(title = /*$$(*/"Histories"/*)*/)
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "instance", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<InstanceHistory> histories;
 
+	@Widget(title = /*$$(*/"Counters"/*)*/)
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "instance", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<InstanceCounter> counters;
 
