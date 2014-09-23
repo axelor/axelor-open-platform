@@ -70,6 +70,6 @@ class VersionTask extends DefaultTask {
 	}
 
 	private String process_json(String text) {
-		return text.replaceAll(JSON_PATTERN, "\"version\": \"${version}\"")
+		return text.replaceAll(JSON_PATTERN, "\"version\": \"${version}\",")
 	}
 }
