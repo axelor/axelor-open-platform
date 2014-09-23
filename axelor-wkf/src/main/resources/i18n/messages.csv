@@ -1,97 +1,133 @@
 "key","message","comment","context"
-"AND",,,"resources/views/Node.xml:19"
-"Activities",,,"resources/views/Menu.xml:50
-resources/views/Menu.xml:53
-resources/views/Node.xml:87"
-"Activity",,,"resources/views/Node.xml:92"
-"BPMN",,,"resources/views/Workflow.xml:35"
-"Configurations",,,"resources/views/Menu.xml:29"
-"Counter",,,"resources/views/Instance.xml:31
-resources/views/Instance.xml:56"
-"Counters",,,"resources/views/Instance.xml:51"
-"Description",,,"resources/views/Node.xml:55
-resources/views/Workflow.xml:63
-resources/views/Node.xml:200
-resources/views/Node.xml:69
-resources/views/Workflow.xml:83
-resources/views/Workflow.xml:32
-resources/views/Node.xml:102
-resources/views/Node.xml:153
-resources/views/Workflow.xml:103
-resources/views/Node.xml:136
-resources/views/Node.xml:119
-resources/views/Node.xml:175
-resources/views/Node.xml:83"
-"Details",,,"resources/views/Instance.xml:22"
-"Diagram",,,"resources/views/Instance.xml:19"
-"Editor",,,"resources/views/Workflow.xml:19"
-"End event",,,"resources/views/Node.xml:11
-resources/views/Node.xml:77"
-"End events",,,"resources/views/Menu.xml:59
-resources/views/Node.xml:73
-resources/views/Menu.xml:62"
-"Exclusive gateway",,,"resources/views/Node.xml:127"
-"Exclusive gateways",,,"resources/views/Node.xml:123
-resources/views/Menu.xml:108
-resources/views/Menu.xml:111"
-"Gateway",,,"resources/views/Node.xml:12"
-"Gateways",,,"resources/views/Menu.xml:87"
-"Histories",,,"resources/views/Instance.xml:39"
-"History",,,"resources/views/Instance.xml:45
-resources/views/Instance.xml:26"
-"Import",,,"resources/views/Workflow.xml:21"
-"Inclusive gateway",,,"resources/views/Node.xml:110"
-"Inclusive gateways",,,"resources/views/Node.xml:106
-resources/views/Menu.xml:93
-resources/views/Menu.xml:90"
-"Instance",,,"resources/views/Instance.xml:14"
-"Instances",,,"resources/views/Menu.xml:23
-resources/views/Workflow.xml:20
-resources/views/Instance.xml:6
-resources/views/Menu.xml:20"
-"Message",,,"resources/views/Node.xml:13"
-"Message event",,,"resources/views/Node.xml:187"
-"Message events",,,"resources/views/Node.xml:179
-resources/views/Menu.xml:79
-resources/views/Menu.xml:82"
-"Meta model",,,"resources/views/Instance.xml:8"
-"Model",,,"resources/views/Instance.xml:16"
-"Node",,,"resources/views/Node.xml:32"
-"Node Task",,,"resources/views/Node.xml:10"
-"Nodes",,,"resources/views/Node.xml:26"
-"OR",,,"resources/views/Node.xml:20"
-"Other events",,,"resources/views/Menu.xml:67"
-"Parallel gateway",,,"resources/views/Node.xml:144"
-"Parallel gateways",,,"resources/views/Node.xml:140
-resources/views/Menu.xml:102
+"AND","","","resources/views/Node.xml:18"
+"Account","","","java/com/axelor/wkf/db/node/MessageEvent.java:32"
+"Action","","","java/com/axelor/wkf/db/Node.java:79"
+"Active","","","java/com/axelor/wkf/db/Workflow.java:91"
+"Activities","","","resources/views/Node.xml:88
+resources/views/Menu.xml:45
+resources/views/Menu.xml:47"
+"Activity","","","resources/views/Node.xml:93"
+"BPMN","","","resources/views/Workflow.xml:36
+java/com/axelor/wkf/db/Workflow.java:96"
+"Condition","","","java/com/axelor/wkf/db/Workflow.java:78
+java/com/axelor/wkf/db/Transition.java:80"
+"Configurations","","","resources/views/Menu.xml:26"
+"Counter","","","resources/views/Instance.xml:58
+java/com/axelor/wkf/db/InstanceCounter.java:54
+resources/views/Instance.xml:33"
+"Counters","","","java/com/axelor/wkf/db/Instance.java:75
+resources/views/Instance.xml:53"
+"Description","","","java/com/axelor/wkf/db/Transition.java:88
+java/com/axelor/wkf/db/Node.java:94
+resources/views/Workflow.xml:112
+resources/views/Workflow.xml:66
+resources/views/Workflow.xml:33
+resources/views/Workflow.xml:89
+java/com/axelor/wkf/db/Workflow.java:87"
+"Details","","","resources/views/Instance.xml:24"
+"Diagram","","","resources/views/Instance.xml:21"
+"Editor","","","resources/views/Workflow.xml:18"
+"End event","","","resources/views/Node.xml:78
+resources/views/Node.xml:10"
+"End events","","","resources/views/Menu.xml:55
+resources/views/Node.xml:74
+resources/views/Menu.xml:53"
+"End transitions","","","java/com/axelor/wkf/db/Node.java:88"
+"Exclusive gateway","","","resources/views/Node.xml:124"
+"Exclusive gateways","","","resources/views/Node.xml:120
+resources/views/Menu.xml:101
 resources/views/Menu.xml:99"
-"Process",,,"resources/views/Instance.xml:67"
-"Start event",,,"resources/views/Node.xml:9
-resources/views/Node.xml:63"
-"Start events",,,"resources/views/Menu.xml:32
-resources/views/Node.xml:59
-resources/views/Menu.xml:35"
-"Timer",,,"resources/views/Node.xml:14"
-"Timer event",,,"resources/views/Node.xml:164"
-"Timer events",,,"resources/views/Menu.xml:73
-resources/views/Node.xml:157
-resources/views/Menu.xml:70"
-"Transition",,,"resources/views/Workflow.xml:96
-resources/views/Workflow.xml:55
-resources/views/Workflow.xml:76"
-"Transitions",,,"resources/views/Workflow.xml:87
-resources/views/Menu.xml:41
-resources/views/Workflow.xml:45
-resources/views/Menu.xml:44
-resources/views/Workflow.xml:67"
-"Wkf Management",,,"resources/views/Menu.xml:7"
-"Workflow",,,"resources/views/Workflow.xml:17"
-"Workflows",,,"resources/views/Menu.xml:10
-resources/views/Workflow.xml:9"
-"XML",,,"resources/views/Workflow.xml:38"
-"XOR",,,"resources/views/Node.xml:21"
-"You have no sufficient rights.",,,"java/com/axelor/wkf/db/Transition.java:321"
-"id",,,"resources/views/Instance.xml:17"
-"Name",,,
-"Max node counter",,,
-"Archived",,,
+"Executed transitions","","","java/com/axelor/wkf/db/Instance.java:67"
+"Gateway","","","resources/views/Node.xml:11"
+"Gateways","","","resources/views/Menu.xml:80"
+"Histories","","","resources/views/Instance.xml:39
+java/com/axelor/wkf/db/Instance.java:71"
+"History","","","resources/views/Instance.xml:45
+resources/views/Instance.xml:28"
+"Import","","","resources/views/Workflow.xml:20"
+"Inclusive gateway","","","resources/views/Node.xml:109"
+"Inclusive gateways","","","resources/views/Menu.xml:83
+resources/views/Node.xml:105
+resources/views/Menu.xml:85"
+"Instance","","","java/com/axelor/wkf/db/InstanceCounter.java:46
+java/com/axelor/wkf/db/InstanceHistory.java:46
+resources/views/Instance.xml:14"
+"Instances","","","resources/views/Menu.xml:18
+resources/views/Workflow.xml:19
+resources/views/Instance.xml:5
+resources/views/Menu.xml:20"
+"Max node counter","","","java/com/axelor/wkf/db/Workflow.java:75"
+"Message","","","resources/views/Node.xml:12"
+"Message event","","","resources/views/Node.xml:179"
+"Message events","","","resources/views/Menu.xml:72
+resources/views/Node.xml:171
+resources/views/Menu.xml:74"
+"Meta model","","","resources/views/Instance.xml:7"
+"Model","","","resources/views/Instance.xml:17
+java/com/axelor/wkf/db/Workflow.java:66"
+"Model Id","","","java/com/axelor/wkf/db/Instance.java:60"
+"Name","","","java/com/axelor/wkf/db/Workflow.java:61
+java/com/axelor/wkf/db/Node.java:70
+java/com/axelor/wkf/db/Transition.java:76"
+"Next node","","","java/com/axelor/wkf/db/Transition.java:72"
+"Node","","","java/com/axelor/wkf/db/InstanceCounter.java:50
+resources/views/Node.xml:31
+java/com/axelor/wkf/db/Workflow.java:71"
+"Node Task","","","resources/views/Node.xml:9"
+"Nodes","","","resources/views/Node.xml:25
+java/com/axelor/wkf/db/Instance.java:63"
+"OR","","","resources/views/Node.xml:19"
+"Operator","","","java/com/axelor/wkf/db/node/Gateway.java:32"
+"Other events","","","resources/views/Menu.xml:61"
+"Overview","","","resources/views/Workflow.xml:104
+resources/views/Instance.xml:15
+resources/views/Workflow.xml:22
+resources/views/Workflow.xml:81
+resources/views/Workflow.xml:57"
+"Parallel gateway","","","resources/views/Node.xml:139"
+"Parallel gateways","","","resources/views/Menu.xml:91
+resources/views/Menu.xml:93
+resources/views/Node.xml:135"
+"Persist","","","java/com/axelor/wkf/db/node/MessageEvent.java:41"
+"Process","","","resources/views/Instance.xml:71"
+"Ref","","","java/com/axelor/wkf/db/Node.java:99"
+"Role","","","java/com/axelor/wkf/db/Transition.java:96"
+"Sequence","","","java/com/axelor/wkf/db/Workflow.java:82
+java/com/axelor/wkf/db/Transition.java:84"
+"Signal","","","java/com/axelor/wkf/db/Transition.java:93"
+"Start event","","","resources/views/Node.xml:64
+resources/views/Node.xml:8"
+"Start events","","","resources/views/Menu.xml:29
+resources/views/Node.xml:60
+resources/views/Menu.xml:31"
+"Start node","","","java/com/axelor/wkf/db/Transition.java:67"
+"Start transitions","","","java/com/axelor/wkf/db/Node.java:83"
+"Template","","","java/com/axelor/wkf/db/node/MessageEvent.java:35"
+"Template model","","","java/com/axelor/wkf/db/node/MessageEvent.java:38"
+"Time cycle","","","java/com/axelor/wkf/db/node/TimerEvent.java:42"
+"Time date","","","java/com/axelor/wkf/db/node/TimerEvent.java:39"
+"Time duration","","","java/com/axelor/wkf/db/node/TimerEvent.java:36"
+"Timer","","","resources/views/Node.xml:13"
+"Timer event","","","resources/views/Node.xml:157"
+"Timer events","","","resources/views/Menu.xml:64
+resources/views/Menu.xml:66
+resources/views/Node.xml:150"
+"Transition","","","java/com/axelor/wkf/db/InstanceHistory.java:50
+resources/views/Workflow.xml:103
+resources/views/Workflow.xml:80
+resources/views/Workflow.xml:56"
+"Transitions","","","resources/views/Workflow.xml:46
+resources/views/Menu.xml:37
+resources/views/Workflow.xml:94
+resources/views/Workflow.xml:71
+resources/views/Menu.xml:39"
+"Type","","","java/com/axelor/wkf/db/Node.java:75"
+"Wkf Management","","","resources/views/Menu.xml:6"
+"Workflow","","","java/com/axelor/wkf/db/Instance.java:56
+resources/views/Workflow.xml:16"
+"Workflows","","","resources/views/Workflow.xml:8
+resources/views/Menu.xml:11
+resources/views/Menu.xml:9"
+"XML","","","resources/views/Workflow.xml:39"
+"XOR","","","resources/views/Node.xml:20"
+"You have no sufficient rights.","","","java/com/axelor/wkf/db/Transition.java:330"
