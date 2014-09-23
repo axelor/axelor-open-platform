@@ -56,7 +56,7 @@ public class WorkflowService implements IWorkflow {
 
 		this.context = Maps.newHashMap();
 		this.user = AuthUtils.getUser();
-		
+
 	}
 
 // ACTION REQUEST
@@ -112,15 +112,16 @@ public class WorkflowService implements IWorkflow {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Workflow getWorkflow( String klass ){
 
-		List<Workflow> workflows = Workflow.filter("self.metaModel.fullName = ?1 AND self.active = true", klass).order("self.sequence").fetch();
+		List<Workflow> workflows = ( List<Workflow> ) Workflow.filter("self.metaModel.fullName = ?1 AND self.active = true", klass).order("self.sequence").fetch();
 
 		for (Workflow workflow : workflows){
-			
+
 			if ( workflow.isRunnable(actionHandler) ){ return workflow; }
-			
+
 		}
 
 		return null;
@@ -134,7 +135,7 @@ public class WorkflowService implements IWorkflow {
 
 		init( klass, handler ).playNodes( instance.getNodes() );
 		persist();
-		
+
 		log.debug( "Final context ::: {}", context );
 		return this.context;
 
@@ -155,13 +156,13 @@ public class WorkflowService implements IWorkflow {
 
 		log.debug("Play nodes" );
 
-		for (Node node : nodes){ 
-			
+		for (Node node : nodes){
+
 			log.debug("Play node ::: {}", node.getName() );
 			node.execute(actionHandler, user, instance, context);
 			log.debug( "Context ::: {}", context );
 		}
-		
+
 	}
 
 // HELPER
@@ -193,12 +194,12 @@ public class WorkflowService implements IWorkflow {
 		return instance.save();
 
 	}
-	
+
 	@Transactional
 	protected Instance persist(){
 
 		return instance.save();
-		
+
 	}
 
 }

@@ -92,7 +92,7 @@ public class Transition extends AuditableModel {
 
 	public Transition() {
 	}
-	
+
 	public Transition(String name) {
 		this.name = name;
 	}
@@ -177,26 +177,26 @@ public class Transition extends AuditableModel {
 	public void setRef(String ref) {
 		this.ref = ref;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
 		if (this == obj) return true;
 		if (!(obj instanceof Transition)) return false;
-		
+
 		Transition other = (Transition) obj;
 		if (this.getId() != null && other.getId() != null) {
 			return Objects.equal(this.getId(), other.getId());
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();
 	}
-	
+
 	@Override
 	public String toString() {
 		ToStringHelper tsh = Objects.toStringHelper(this);
@@ -209,7 +209,7 @@ public class Transition extends AuditableModel {
 
 		return tsh.omitNullValues().toString();
 	}
-	
+
 	public static Transition findByName(String name) {
 		return Transition.all()
 				.filter("self.name = :name")
@@ -219,7 +219,7 @@ public class Transition extends AuditableModel {
 
 	/**
 	 * Make the entity managed and persistent.
-	 * 
+	 *
 	 * @see EntityManager#persist(Object)
 	 */
 	public Transition persist() {
@@ -228,7 +228,7 @@ public class Transition extends AuditableModel {
 
 	/**
 	 * Merge the state of the entity into the current persistence context.
-	 * 
+	 *
 	 * @see EntityManager#merge(Object)
 	 */
 	public Transition merge() {
@@ -240,43 +240,43 @@ public class Transition extends AuditableModel {
 	 * <br>
 	 * It uses either {@link #persist()} or {@link #merge()} and calls
 	 * {@link #flush()} to synchronize values with database.
-	 * 
+	 *
 	 * @see #persist(Model)
 	 * @see #merge(Model)
-	 * 
+	 *
 	 */
 	public Transition save() {
 		return JPA.save(this);
 	}
-	
+
 	/**
 	 * Remove the entity instance.
-	 * 
+	 *
 	 * @see EntityManager#remove(Object)
 	 */
 	public void remove() {
 		JPA.remove(this);
 	}
-	
+
 	/**
 	 * Refresh the state of the instance from the database, overwriting changes
 	 * made to the entity, if any.
-	 * 
+	 *
 	 * @see EntityManager#refresh(Object)
 	 */
 	public void refresh() {
 		JPA.refresh(this);
 	}
-	
+
 	/**
 	 * Synchronize the persistence context to the underlying database.
-	 * 
+	 *
 	 * @see EntityManager#flush()
 	 */
 	public void flush() {
 		JPA.flush();
 	}
-	
+
 	/**
 	 * Find a <code>Transition</code> by <code>id</code>.
 	 *
@@ -284,44 +284,44 @@ public class Transition extends AuditableModel {
 	public static Transition find(Long id) {
 		return JPA.find(Transition.class, id);
 	}
-	
+
 	/**
 	 * Return a {@link Query} instance for <code>Transition</code> to filter
 	 * on all the records.
 	 *
 	 */
-	public static Query<Transition> all() {
+	public static Query<? extends Transition> all() {
 		return JPA.all(Transition.class);
 	}
-	
+
 	/**
 	 * A shortcut method to <code>Transition.all().filter(...)</code>
 	 *
 	 */
-	public static Query<Transition> filter(String filter, Object... params) {
-		return all().filter(filter, params);
+	public static Query<? extends Transition> filter(String filter, Object... params) {
+		return JPA.all(Transition.class).filter(filter, params);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public boolean execute( ActionHandler actionHandler, Map<Object, Object> context, User user ){ 
+	public boolean execute( ActionHandler actionHandler, Map<Object, Object> context, User user ){
 
 		logger.debug("Execute transition ::: {}", getName() );
-		
+
 		if ( signal != null && (!actionHandler.getContext().containsKey("_signal") || !actionHandler.getContext().get("_signal").equals( signal )) ) {
 			logger.debug("Signal ::: {}", signal);
 			return false;
 		}
-		
+
 		if ( role != null ){
 
 			if ( user == null ) { return false; }
-			
+
 			if ( !AuthUtils.hasRole(user, role.getName()) ) {
 				logger.debug( "Role ::: {}", role.getName() );
 				context.put("flash", I18n.get("You have no sufficient rights."));
 				return false;
 			}
-			
+
 		}
 
 		if ( condition != null ) {
@@ -335,7 +335,7 @@ public class Transition extends AuditableModel {
 					logger.debug( "Context with Errors ::: {}", data );
 					context.putAll( (Map) data );
 					return false;
-					
+
 				}
 
 			}

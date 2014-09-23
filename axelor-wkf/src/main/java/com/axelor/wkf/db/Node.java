@@ -140,7 +140,7 @@ public class Node extends AuditableModel {
 	public void setStartTransitions(List<Transition> startTransitions) {
 		this.startTransitions = startTransitions;
 	}
-	
+
 	/**
 	 * Add the given {@link #Transition} item to the {@code startTransitions}.
 	 *
@@ -159,14 +159,14 @@ public class Node extends AuditableModel {
 	/**
 	 * Remove the given {@link #Transition} item from the {@code startTransitions}.
 	 *
-	 */	
+	 */
 	public void removeStartTransition(Transition item) {
 		if (startTransitions == null) {
 			return;
 		}
 		startTransitions.remove(item);
 	}
-	
+
 	/**
 	 * Clear the {@code startTransitions} collection.
 	 *
@@ -174,11 +174,10 @@ public class Node extends AuditableModel {
 	 * It calls the {@code this.flush()} method to avoid unexpected errors
 	 * if any of the item in the collection is changed.
 	 * </p>
-	 */	
+	 */
 	public void clearStartTransitions() {
 		if (startTransitions != null) {
 			startTransitions.clear();
-			this.flush();
 		}
 	}
 
@@ -189,7 +188,7 @@ public class Node extends AuditableModel {
 	public void setEndTransitions(List<Transition> endTransitions) {
 		this.endTransitions = endTransitions;
 	}
-	
+
 	/**
 	 * Add the given {@link #Transition} item to the {@code endTransitions}.
 	 *
@@ -208,14 +207,14 @@ public class Node extends AuditableModel {
 	/**
 	 * Remove the given {@link #Transition} item from the {@code endTransitions}.
 	 *
-	 */	
+	 */
 	public void removeEndTransition(Transition item) {
 		if (endTransitions == null) {
 			return;
 		}
 		endTransitions.remove(item);
 	}
-	
+
 	/**
 	 * Clear the {@code endTransitions} collection.
 	 *
@@ -223,11 +222,10 @@ public class Node extends AuditableModel {
 	 * It calls the {@code this.flush()} method to avoid unexpected errors
 	 * if any of the item in the collection is changed.
 	 * </p>
-	 */	
+	 */
 	public void clearEndTransitions() {
 		if (endTransitions != null) {
 			endTransitions.clear();
-			this.flush();
 		}
 	}
 
@@ -246,26 +244,26 @@ public class Node extends AuditableModel {
 	public void setRef(String ref) {
 		this.ref = ref;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
 		if (this == obj) return true;
 		if (!(obj instanceof Node)) return false;
-		
+
 		Node other = (Node) obj;
 		if (this.getId() != null && other.getId() != null) {
 			return Objects.equal(this.getId(), other.getId());
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();
 	}
-	
+
 	@Override
 	public String toString() {
 		ToStringHelper tsh = Objects.toStringHelper(this);
@@ -277,7 +275,7 @@ public class Node extends AuditableModel {
 
 		return tsh.omitNullValues().toString();
 	}
-	
+
 	public static Node findByName(String name) {
 		return Node.all()
 				.filter("self.name = :name")
@@ -287,7 +285,7 @@ public class Node extends AuditableModel {
 
 	/**
 	 * Make the entity managed and persistent.
-	 * 
+	 *
 	 * @see EntityManager#persist(Object)
 	 */
 	public Node persist() {
@@ -296,7 +294,7 @@ public class Node extends AuditableModel {
 
 	/**
 	 * Merge the state of the entity into the current persistence context.
-	 * 
+	 *
 	 * @see EntityManager#merge(Object)
 	 */
 	public Node merge() {
@@ -308,43 +306,43 @@ public class Node extends AuditableModel {
 	 * <br>
 	 * It uses either {@link #persist()} or {@link #merge()} and calls
 	 * {@link #flush()} to synchronize values with database.
-	 * 
+	 *
 	 * @see #persist(Model)
 	 * @see #merge(Model)
-	 * 
+	 *
 	 */
 	public Node save() {
 		return JPA.save(this);
 	}
-	
+
 	/**
 	 * Remove the entity instance.
-	 * 
+	 *
 	 * @see EntityManager#remove(Object)
 	 */
 	public void remove() {
 		JPA.remove(this);
 	}
-	
+
 	/**
 	 * Refresh the state of the instance from the database, overwriting changes
 	 * made to the entity, if any.
-	 * 
+	 *
 	 * @see EntityManager#refresh(Object)
 	 */
 	public void refresh() {
 		JPA.refresh(this);
 	}
-	
+
 	/**
 	 * Synchronize the persistence context to the underlying database.
-	 * 
+	 *
 	 * @see EntityManager#flush()
 	 */
 	public void flush() {
 		JPA.flush();
 	}
-	
+
 	/**
 	 * Find a <code>Node</code> by <code>id</code>.
 	 *
@@ -352,7 +350,7 @@ public class Node extends AuditableModel {
 	public static Node find(Long id) {
 		return JPA.find(Node.class, id);
 	}
-	
+
 	/**
 	 * Return a {@link Query} instance for <code>Node</code> to filter
 	 * on all the records.
@@ -361,39 +359,39 @@ public class Node extends AuditableModel {
 	public static Query<? extends Node> all() {
 		return JPA.all(Node.class);
 	}
-	
+
 	/**
 	 * A shortcut method to <code>Node.all().filter(...)</code>
 	 *
 	 */
 	public static Query<? extends Node> filter(String filter, Object... params) {
-		return all().filter(filter, params);
+		return JPA.all(Node.class).filter(filter, params);
 	}
-	
+
 	// NODE EXECUTION
-	
+
 	public void execute( ActionHandler actionHandler, User user, Instance instance, Map<Object, Object> context ){
-		
+
 		for ( Transition transition : getEndTransitions() ){
-			
+
 			if ( transition.execute( actionHandler, context, user ) ) {
 
 				transition.getNextNode().execute( actionHandler, user, instance, transition, context );
-				
+
 			}
 
 		}
 	}
-	
-	public void execute( ActionHandler actionHandler, User user, Instance instance, Transition transition, Map<Object, Object> context ) { 
+
+	public void execute( ActionHandler actionHandler, User user, Instance instance, Transition transition, Map<Object, Object> context ) {
 
 		logger.debug("Execute node ::: {}", getName() );
-		
+
 		testMaxPassedNode( instance );
 		historize( instance, transition );
-		
+
 		execute( actionHandler, user, instance, context );
-		
+
 	}
 
 	/**
@@ -410,36 +408,36 @@ public class Node extends AuditableModel {
 
 		history.setTransition( transition );
 		instance.addHistory( history );
-		
+
 		instance.addNode( this );
 		instance.removeNode( transition.getStartNode() );
-		
+
 		logger.debug("Instance state ::: {}", instance.getNodes() );
 
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void updateContext( Map<Object, Object> context, Object data ){
-		
+
 		if ( data instanceof List ) {
-			
+
 			for (Object data2 : (List) data) { updateContext(context, data2); }
 		}
 		else if ( data instanceof Map ) {
-			
+
 			Map data2 = (Map) data;
-			
+
 			for ( Object key : data2.keySet()) {
-		
+
 				if ( !context.containsKey(key) ) { context.put(key, data2.get(key)); }
 				else {
 					if ( context.get(key) instanceof Map ) { updateContext( (Map) context.get(key), data2.get(key) ); }
 					else { context.put(key, data2.get(key)); }
 				}
 			}
-			
+
 		}
-		
+
 	}
 
 	// RAISING EXCEPTION
@@ -451,7 +449,7 @@ public class Node extends AuditableModel {
 
 			int max = instance.getWorkflow().getMaxNodeCounter();
 			int counter = counterAdd(instance);
-			
+
 			logger.debug( "compteur {} ::: max {}", counter, max);
 
 			if ( counter > max) {
@@ -486,9 +484,9 @@ public class Node extends AuditableModel {
 				instance.addCounter( counter );
 
 			}
-			
+
 			return counter.getCounter();
 
 		}
-	
+
 }

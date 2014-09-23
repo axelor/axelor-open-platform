@@ -39,7 +39,7 @@ public class Gateway extends Node {
 	public void setOperator(String logicOperator) {
 		this.operator = logicOperator;
 	}
-	
+
 	@Override
 	public String toString() {
 		ToStringHelper tsh = Objects.toStringHelper(this);
@@ -52,7 +52,7 @@ public class Gateway extends Node {
 
 		return tsh.omitNullValues().toString();
 	}
-	
+
 	/**
 	 * Find a <code>Gateway</code> by <code>id</code>.
 	 *
@@ -60,7 +60,7 @@ public class Gateway extends Node {
 	public static Gateway find(Long id) {
 		return JPA.find(Gateway.class, id);
 	}
-	
+
 	/**
 	 * Return a {@link Query} instance for <code>Gateway</code> to filter
 	 * on all the records.
@@ -69,7 +69,7 @@ public class Gateway extends Node {
 	public static Query<? extends Gateway> all() {
 		return JPA.all(Gateway.class);
 	}
-	
+
 	/**
 	 * A shortcut method to <code>Gateway.all().filter(...)</code>
 	 *
@@ -77,5 +77,5 @@ public class Gateway extends Node {
 	public static Query<? extends Gateway> filter(String filter, Object... params) {
 		return all().filter(filter, params);
 	}
-	
+
 }

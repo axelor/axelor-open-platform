@@ -75,26 +75,26 @@ public class InstanceHistory extends AuditableModel {
 	public void setTransition(Transition transition) {
 		this.transition = transition;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
 		if (this == obj) return true;
 		if (!(obj instanceof InstanceHistory)) return false;
-		
+
 		InstanceHistory other = (InstanceHistory) obj;
 		if (this.getId() != null && other.getId() != null) {
 			return Objects.equal(this.getId(), other.getId());
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();
 	}
-	
+
 	@Override
 	public String toString() {
 		ToStringHelper tsh = Objects.toStringHelper(this);
@@ -106,7 +106,7 @@ public class InstanceHistory extends AuditableModel {
 
 	/**
 	 * Make the entity managed and persistent.
-	 * 
+	 *
 	 * @see EntityManager#persist(Object)
 	 */
 	public InstanceHistory persist() {
@@ -115,7 +115,7 @@ public class InstanceHistory extends AuditableModel {
 
 	/**
 	 * Merge the state of the entity into the current persistence context.
-	 * 
+	 *
 	 * @see EntityManager#merge(Object)
 	 */
 	public InstanceHistory merge() {
@@ -127,43 +127,43 @@ public class InstanceHistory extends AuditableModel {
 	 * <br>
 	 * It uses either {@link #persist()} or {@link #merge()} and calls
 	 * {@link #flush()} to synchronize values with database.
-	 * 
+	 *
 	 * @see #persist(Model)
 	 * @see #merge(Model)
-	 * 
+	 *
 	 */
 	public InstanceHistory save() {
 		return JPA.save(this);
 	}
-	
+
 	/**
 	 * Remove the entity instance.
-	 * 
+	 *
 	 * @see EntityManager#remove(Object)
 	 */
 	public void remove() {
 		JPA.remove(this);
 	}
-	
+
 	/**
 	 * Refresh the state of the instance from the database, overwriting changes
 	 * made to the entity, if any.
-	 * 
+	 *
 	 * @see EntityManager#refresh(Object)
 	 */
 	public void refresh() {
 		JPA.refresh(this);
 	}
-	
+
 	/**
 	 * Synchronize the persistence context to the underlying database.
-	 * 
+	 *
 	 * @see EntityManager#flush()
 	 */
 	public void flush() {
 		JPA.flush();
 	}
-	
+
 	/**
 	 * Find a <code>InstanceHistory</code> by <code>id</code>.
 	 *
@@ -171,21 +171,21 @@ public class InstanceHistory extends AuditableModel {
 	public static InstanceHistory find(Long id) {
 		return JPA.find(InstanceHistory.class, id);
 	}
-	
+
 	/**
 	 * Return a {@link Query} instance for <code>InstanceHistory</code> to filter
 	 * on all the records.
 	 *
 	 */
-	public static Query<InstanceHistory> all() {
+	public static Query<? extends InstanceHistory> all() {
 		return JPA.all(InstanceHistory.class);
 	}
-	
+
 	/**
 	 * A shortcut method to <code>InstanceHistory.all().filter(...)</code>
 	 *
 	 */
-	public static Query<InstanceHistory> filter(String filter, Object... params) {
-		return all().filter(filter, params);
+	public static Query<? extends InstanceHistory> filter(String filter, Object... params) {
+		return JPA.all(InstanceHistory.class).filter(filter, params);
 	}
 }
