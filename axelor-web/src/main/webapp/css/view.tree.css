@@ -109,3 +109,8 @@ table.treetable tbody tr.accept {
 .tree-table td span {
 	box-sizing: content-box;
 }
+
+.dashlet .tree-view-container {
+	position: relative;
+	height: 100%;
+}
