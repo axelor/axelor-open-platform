@@ -40,17 +40,17 @@ import com.axelor.db.annotations.Widget;
 @MappedSuperclass
 public abstract class AuditableModel extends Model {
 
-	@Widget(readonly = true)
+	@Widget(readonly = true, title = /*$$(*/"Created on"/*)*/)
 	private LocalDateTime createdOn;
 
-	@Widget(readonly = true)
+	@Widget(readonly = true, title = /*$$(*/"Updated on"/*)*/)
 	private LocalDateTime updatedOn;
 
-	@Widget(readonly = true)
+	@Widget(readonly = true, title = /*$$(*/"Created by"/*)*/)
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private User createdBy;
 
-	@Widget(readonly = true)
+	@Widget(readonly = true, title = /*$$(*/"Updated by"/*)*/)
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private User updatedBy;
 
