@@ -92,7 +92,7 @@ class AppPlugin extends AbstractPlugin {
             }
 
 			task('update-xsd', type: VersionTask) {
-				processFiles = fileTree('src') {
+				processFiles = fileTree(projectDir) {
 					include '**/resources/**/*.xml'
 					include '**/data/**/*config.xml'
 				}
