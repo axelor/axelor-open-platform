@@ -30,13 +30,13 @@
       <field name="archived" onChange="wkf-record-archived" />
     </panel>
     <panel-tabs>
-      <panel title="Description" onSelect="wkf-import-hidden" showTitle="false">
+      <panel title="Description" onTabSelect="wkf-import-hidden">
         <field name="description" showTitle="false" widget="Html" colSpan="12" x-lite="true"/>
       </panel>
-      <panel title="BPMN" onSelect="wkf-import-display" showTitle="false">
+      <panel title="BPMN" onTabSelect="wkf-import-display">
         <field name="bpmn" showTitle="false" widget="CodeEditor" x-code-syntax="xml" colSpan="12"/>
       </panel>
-      <panel title="XML" onSelect="wkf-import-hidden" showTitle="false">
+      <panel title="XML" onTabSelect="wkf-import-hidden">
         <field name="xmlData" showTitle="false" widget="CodeEditor" x-code-syntax="xml" colSpan="12"/>
       </panel>
     </panel-tabs>

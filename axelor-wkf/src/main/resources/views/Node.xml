@@ -160,9 +160,9 @@
       <field name="timeDate"/>
       <field name="timeCycle"/>
       <field name="timeDuration"/>
-      <panel-related field="startTransitions" grid-view="start-transition-grid" form-view="start-transition-form"/>
-      <panel-related field="endTransitions" grid-view="end-transition-grid" form-view="end-transition-form"/>
     </panel>
+    <panel-related field="startTransitions" grid-view="start-transition-grid" form-view="start-transition-form"/>
+    <panel-related field="endTransitions" grid-view="end-transition-grid" form-view="end-transition-form"/>
     <panel>
       <field name="description" colSpan="12" showTitle="false" widget="Html" x-lite="true"/>
     </panel>
