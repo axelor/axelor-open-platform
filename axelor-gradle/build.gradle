@@ -46,6 +46,9 @@ allprojects {
 	}
 }
 
+// sometime installApp fails to process resources
+processResources.outputs.upToDateWhen { false }
+
 task dist(type: Copy) {
 	destinationDir = file("${rootProject.buildDir}/dist")
 	into('init.d') { from 'src/init.d' }

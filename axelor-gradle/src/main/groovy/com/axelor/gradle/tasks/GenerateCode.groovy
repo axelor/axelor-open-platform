@@ -140,12 +140,12 @@ name = ${definition.name}
 version = ${project.version}
 
 title = ${definition.title?:""}
-description = ${definition.description?:""}
+description = ${desc}
 
 """
 			if (removable) {
 				out << """\
-removable = ${definition.removable == true}
+removable = ${removable}
 
 """
 			}
