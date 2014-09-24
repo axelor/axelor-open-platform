@@ -201,7 +201,7 @@ resources/domains/Meta.xml:82"
 "Password","Mot de passe",,"resources/domains/User.xml:15
 resources/views/User.xml:38"
 "Password doesn't match","Le mot de passe ne correspond pas",,"java/com/axelor/auth/AuthService.java:226"
-"Pending","En attente",,"resources/domains/Meta.xml:20"
+"Pending","En attente ?",,"resources/domains/Meta.xml:20"
 "Permission","Permission",,"resources/views/Permission.xml:16"
 "Permissions","Les Permissions",,"resources/views/Group.xml:55
 resources/views/Permission.xml:6
