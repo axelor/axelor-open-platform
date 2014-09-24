@@ -215,6 +215,9 @@
 	bottom: 0px;
 	border: none;
 }
+.panel-related .panel-body .slick-viewport {
+	overflow-x: hidden !important;
+}
 .panel-related.readonly .edit-icon i:before {
 	content: "\f0f6";
 }
