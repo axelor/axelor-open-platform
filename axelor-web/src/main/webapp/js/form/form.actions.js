@@ -85,7 +85,7 @@ function handleError(scope, item, message) {
 	}
 
 	var e = $('<span class="error"></span>').text(message);
-	var p = item.parent('td.form-item');
+	var p = item.parent('.form-item');
 
 	if (item.children(':first').is(':input,.input-append,.picker-input')) {
 		p.append(e);
