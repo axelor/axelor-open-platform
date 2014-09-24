@@ -27,6 +27,8 @@ import com.axelor.tools.x2j.Generator
 
 class GenerateCode extends DefaultTask {
 
+	private static final Set<String> IGNORE = ["axelor-common", "axelor-test"]
+
 	def findAllModules(Project project, Set<Project> found) {
 		def name = project.name
 		if (found == null) {
@@ -34,7 +36,7 @@ class GenerateCode extends DefaultTask {
 		}
 		project.configurations.compile.allDependencies.withType(ProjectDependency).each {
 			def dep = it.dependencyProject
-			if (!found.contains(dep)) {
+			if (!found.contains(dep) && !IGNORE.contains(dep.name)) {
 				found.add(dep)
 				findAllModules(dep, found)
 			}
@@ -122,8 +124,8 @@ class GenerateCode extends DefaultTask {
 
 		outputPath.withWriter('UTF-8') { out ->
 			
-			def desc = (definition.description?:"").replaceAll("\n", "\\\n")
-			def deps = []
+			def description = (definition.description?:"").trim().split("\n").collect { it.trim() };
+			def depends = findAllModules(project, null).collect { it.name }
 			def removable = false
 
 			try {
@@ -131,16 +133,12 @@ class GenerateCode extends DefaultTask {
 			} catch (Exception e) {
 			}
 
-			findAllModules(project, null).each {
-				deps += "\t" + it.name
-			}
-
 			out << """\
 name = ${definition.name}
 version = ${project.version}
 
 title = ${definition.title?:""}
-description = ${desc}
+description = ${description.join("\\n")}
 
 """
 			if (removable) {
@@ -151,8 +149,7 @@ removable = ${removable}
 			}
 
 			out << """\
-depends = \\
-${deps.join(" \\\n")}
+depends = ${depends.join(", ")}
 """
 		}
 	}
