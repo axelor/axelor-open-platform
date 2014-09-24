@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.common.ClassUtils;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
@@ -35,6 +36,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 public class PanelEditor extends AbstractPanel {
 
 	transient PanelField forField;
+	transient List<Object> targetFields;
 
 	@XmlAttribute
 	private String layout;
@@ -51,6 +53,8 @@ public class PanelEditor extends AbstractPanel {
 	}
 
 	public List<AbstractWidget> getItems() {
+		// process target fields
+		getTargetFields();
 		return process(items);
 	}
 
@@ -60,6 +64,9 @@ public class PanelEditor extends AbstractPanel {
 
 	@JsonGetter("fields")
 	public List<Object> getTargetFields() {
+		if (targetFields != null) {
+			return targetFields;
+		}
 		if (items == null || forField == null || forField.getTarget() == null) {
 			return null;
 		}
@@ -67,13 +74,18 @@ public class PanelEditor extends AbstractPanel {
 		if (target == null) {
 			return null;
 		}
-		final List<Object> fields = new ArrayList<>();
+		this.targetFields = new ArrayList<>();
 		final Mapper mapper = Mapper.of(target);
 		for (AbstractWidget item : items) {
 			try {
-				fields.add(mapper.getProperty(((Field) item).getName()).toMap());
+				Field field = (Field) item;
+				Property prop = mapper.getProperty(field.getName());
+				if (field.getSelection() == null) {
+					field.setSelection(prop.getSelection());
+				}
+				targetFields.add(prop.toMap());
 			} catch (Exception e) {}
 		}
-		return fields;
+		return targetFields;
 	}
 }
