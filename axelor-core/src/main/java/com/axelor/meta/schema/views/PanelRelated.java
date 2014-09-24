@@ -71,7 +71,13 @@ public class PanelRelated extends AbstractPanel {
 	private Boolean canView;
 
 	@XmlAttribute
+	private Boolean canEdit;
+
+	@XmlAttribute
 	private Boolean canRemove;
+
+	@XmlAttribute
+	private Boolean canSelect;
 
 	@XmlElements({
 		@XmlElement(name = "field", type = PanelField.class),
@@ -190,12 +196,28 @@ public class PanelRelated extends AbstractPanel {
 		this.canView = canView;
 	}
 
+	public Boolean getCanEdit() {
+		return canEdit;
+	}
+
+	public void setCanEdit(Boolean canEdit) {
+		this.canEdit = canEdit;
+	}
+
 	public Boolean getCanRemove() {
 		return canRemove;
 	}
 
 	public void setCanRemove(Boolean canRemove) {
 		this.canRemove = canRemove;
+	}
+
+	public Boolean getCanSelect() {
+		return canSelect;
+	}
+
+	public void setCanSelect(Boolean canSelect) {
+		this.canSelect = canSelect;
 	}
 
 	public List<AbstractWidget> getItems() {
