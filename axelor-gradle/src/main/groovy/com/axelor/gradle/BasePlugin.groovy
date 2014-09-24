@@ -32,7 +32,7 @@ class BasePlugin extends AbstractPlugin {
 
 			applyCommon(project, definition)
 
-			task("generateCode", type: GenerateCode)
+			task("generateCode", type: GenerateCode, dependsOn: "generateVersion")
 
 			compileJava.dependsOn "generateCode"
         }
