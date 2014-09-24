@@ -42,6 +42,14 @@ allprojects {
 			add project.repositories.localRepo
 		}
 	}
+
+	afterEvaluate {
+		try {
+			// define generateCode task if missing
+			task("generateCode", dependsOn: "generateVersion")
+		} catch (Exception e) {
+		}
+	}
 }
 
 tasks.repo.dependsOn subprojects*.uploadArchives
