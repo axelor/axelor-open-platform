@@ -210,13 +210,18 @@ public class ActionGroup extends ActionIndex {
             	}
             }
 
-            if (action instanceof ActionGroup && !result.isEmpty() && iter.hasNext()) {
+            if ((action instanceof ActionGroup || action instanceof ActionMethod)
+            	&& !result.isEmpty() && iter.hasNext()) {
             	Map<String, Object> last = null;
             	try {
             		last = (Map) result.get(result.size() - 1);
             	} catch (ClassCastException e) {
             	}
-                if (last != null && (last.containsKey("info") || last.containsKey("alert") || last.containsKey("error") || last.containsKey("save"))) {
+            	if (last == null) continue;
+                if (last.containsKey("info") ||
+                	last.containsKey("alert") ||
+                	last.containsKey("error") ||
+                	last.containsKey("save")) {
             		String previous = (String) last.get("pending");
             		String pending = this.getPending(i, previous);
             		last.put("pending", pending);
