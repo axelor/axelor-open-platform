@@ -656,6 +656,13 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="canEdit" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+        If this is a  relational field, specify whether to allow editing existing record(s).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="canRemove" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>

@@ -158,10 +158,19 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		$scope.setValue(items, true);
 		$scope.applyLater();
 	};
+
+	$scope.canEditTarget = function () {
+		return $scope.canEdit() && $scope.field.canEdit !== false;
+	};
+
+	$scope.canShowEdit = function () {
+		var selected = $scope.selection.length ? $scope.selection[0] : null;
+		return selected !== null && $scope.canView();
+	}
 	
 	$scope.canEdit = function () {
-		var selected = $scope.selection.length ? $scope.selection[0] : null;
-		return $scope.canView() && selected !== null;
+		var field = $scope.field || {};
+		return field.canEdit !== false && $scope.canShowEdit();
 	};
 	
 	var _canRemove = $scope.canRemove;
@@ -451,7 +460,7 @@ ui.formInput('OneToMany', {
 				});
 				scope.$watch("isReadonly()", function(readonly) {
 					grid.setOptions({
-						editable: !readonly,
+						editable: !readonly && scope.canEdit(),
 						enableAddRow: !readonly && scope.canNew()
 					});
 					
@@ -538,7 +547,7 @@ ui.formInput('OneToMany', {
 			'<div class="container-fluid">'+
 				'<span class="brand" href="" ui-help-popover ng-bind-html-unsafe="title"></span>'+
 				'<span class="icons-bar pull-right" ng-show="!isReadonly()">'+
-					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canEdit()" title="{{\'Edit\' | t}}" class="fa fa-pencil"></i>'+
+					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowEdit()" title="{{\'Edit\' | t}}" class="fa fa-pencil"></i>'+
 					'<i ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled() && canNew()" title="{{\'New\' | t}}" class="fa fa-plus"></i>'+
 					'<i ng-click="onRemove()" ng-show="hasPermission(\'remove\') && !isDisabled() && canRemove()" title="{{\'Remove\' | t}}" class="fa fa-minus"></i>'+
 					'<i ng-click="onSelect()" ng-show="hasPermission(\'read\') && !isDisabled() && canSelect()" title="{{\'Select\' | t}}" class="fa fa-search"></i>'+
@@ -569,7 +578,7 @@ var panelRelatedTemplate =
 "<div class='panel panel-related'>" +
 	"<div class='panel-header'>" +
 		"<div class='icons-bar pull-right' ng-show='!isReadonly()'>" +
-			"<i ng-click='onEdit()' ng-show='hasPermission(\"read\") && canEdit()' class='fa fa-pencil'></i>" +
+			"<i ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()' class='fa fa-pencil'></i>" +
 			"<i ng-click='onNew()' ng-show='hasPermission(\"write\") && !isDisabled() && canNew()' class='fa fa-plus'></i>" +
 			"<i ng-click='onRemove()' ng-show='hasPermission(\"remove\") && !isDisabled() && canRemove()' class='fa fa-minus'></i>" +
 			"<i ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()' class='fa fa-search'></i>" +
