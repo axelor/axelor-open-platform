@@ -348,7 +348,7 @@ public class ModuleManager {
 				continue;
 			}
 
-			String[] deps = properties.getProperty("depends", "").trim().split("\\s+");
+			String[] deps = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
 			boolean removable = "true".equals(properties.getProperty("removable"));
 
 			Module module = resolver.add(name, deps);
@@ -388,7 +388,7 @@ public class ModuleManager {
 				continue;
 			}
 
-			String[] deps = properties.getProperty("depends", "").trim().split("\\s+");
+			String[] deps = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
 			String title = properties.getProperty("title");
 			String description = properties.getProperty("description");
 			String version = properties.getProperty("version");
