@@ -41,7 +41,8 @@ public class ModuleController {
 	private static final String messageRestart = I18n.get("Restart the server for updates to take effect.");
 	private static final String alertInstall = I18n.get("Following modules will be installed : <br/> %s <br/> Are you sure ?");
 	private static final String alertUninstall = I18n.get("Following modules will be uninstalled : <br/> %s <br/> Are you sure ?");
-	private static final String error = I18n.get("The module can't be uninstalled because other non-removable modules depend on it.");
+	private static final String errorDepends = I18n.get("The module can't be uninstalled because other non-removable modules depend on it.");
+	private static final String errorPending = I18n.get("The module can't be uninstalled because other modules are pending. Please restart the server before.");
 
 	@Inject
 	private MetaModuleRepository modules;
@@ -66,7 +67,7 @@ public class ModuleController {
 		if (module == null) {
 			throw new IllegalArgumentException("No such module: " + name);
 		}
-		for (String dep : resolveLink(module)) {
+		for (String dep : resolveLink(module, getMainModule())) {
 			MetaModule mod = modules.findByName(dep);
 			mod.setInstalled(false);
 			mod.setPending(true);
@@ -95,20 +96,21 @@ public class ModuleController {
 		return list.get(list.size() - 1);
 	}
 
-	private Set<String> resolveLink(MetaModule module) {
+	private Set<String> resolveLink(MetaModule module, String mainModule) {
 		final Set<String> all = new HashSet<>();
 		all.add(module.getName());
-
-		String mainModule = getMainModule();
 
 		for (MetaModule metaModule : MetaModule.all().filter("self.depends LIKE ?1", "%" + module.getName() + "%").fetch()) {
 			if(metaModule.getInstalled() != Boolean.TRUE || mainModule.equals(metaModule.getName())) {
 				continue;
 			}
-			if(metaModule.getRemovable() != Boolean.TRUE) {
-				throw new IllegalArgumentException(error);
+			if(metaModule.getPending() == Boolean.TRUE) {
+				throw new IllegalArgumentException(errorPending);
 			}
-			all.addAll(resolveLink(metaModule));
+			if(metaModule.getRemovable() != Boolean.TRUE) {
+				throw new IllegalArgumentException(errorDepends);
+			}
+			all.addAll(resolveLink(metaModule, mainModule));
 		}
 		return all;
 	}
@@ -166,7 +168,7 @@ public class ModuleController {
 				throw new IllegalArgumentException("No such module: " + name);
 			}
 
-			data.put("alert", String.format(alertUninstall, Joiner.on("<br/>").join(resolveLink(module))));
+			data.put("alert", String.format(alertUninstall, Joiner.on("<br/>").join(resolveLink(module, getMainModule()))));
 			response.setData(ImmutableList.of(data));
 		} catch (Exception e) {
 			response.setException(e);

@@ -33,7 +33,6 @@
     canDelete="false" canNew="false" canEdit="false" edit-icon="false">
     <hilite color="danger" if="!installed &amp;&amp; !pending"/>
     <hilite color="warning" if="pending"/>
-    <hilite color="primary" if="installed"/>
     <field name="name"/>
     <field name="title"/>
     <field name="moduleVersion" width="200"/>
