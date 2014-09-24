@@ -19,6 +19,7 @@ package com.axelor.meta.web;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -27,60 +28,96 @@ import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.repo.MetaModuleRepository;
-import com.axelor.rpc.ActionRequest;
+import com.axelor.meta.loader.ModuleManager;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
 public class ModuleController {
-	
-	private static final String message = I18n.get("Restart the server for updates to take effect.");
-	
+
+	private static final String messageRestart = I18n.get("Restart the server for updates to take effect.");
+	private static final String alertInstall = I18n.get("Following modules will be installed : <br/> %s <br/> Are you sure ?");
+	private static final String alertUninstall = I18n.get("Following modules will be uninstalled : <br/> %s <br/> Are you sure ?");
+	private static final String error = I18n.get("The module can't be uninstalled because other non-removable modules depend on it.");
+
 	@Inject
 	private MetaModuleRepository modules;
 
 	@Transactional
-	protected void doAction(String name, boolean uninstall) {
+	protected void doInstall(String name) {
 		final MetaModule module = modules.findByName(name);
 		if (module == null) {
 			throw new IllegalArgumentException("No such module: " + name);
 		}
 
-		module.setInstalled(!uninstall);
-		module.setPending(true);
-
-		if (uninstall) {
-			return;
-		}
-
 		for (String dep : resolve(module)) {
 			MetaModule mod = modules.findByName(dep);
-			if (mod != null && mod.getInstalled() != Boolean.TRUE) {
-				mod.setInstalled(true);
-				mod.setPending(true);
-			}
+			mod.setInstalled(true);
+			mod.setPending(true);
+		}
+	}
+
+	@Transactional
+	protected void doUninstall(String name) {
+		final MetaModule module = modules.findByName(name);
+		if (module == null) {
+			throw new IllegalArgumentException("No such module: " + name);
+		}
+		for (String dep : resolveLink(module)) {
+			MetaModule mod = modules.findByName(dep);
+			mod.setInstalled(false);
+			mod.setPending(true);
 		}
 	}
 
 	private Set<String> resolve(MetaModule module) {
 		final Set<String> all = new HashSet<>();
+		all.add(module.getName());
+
 		final String depends = module.getDepends();
 		if (StringUtils.isBlank(depends)) {
 			return all;
 		}
 		for (String name : depends.trim().split("\\s*,\\s*")) {
-			if (!name.equals(module.getName())) {
+			MetaModule mod = modules.findByName(name);
+			if (mod != null && mod.getInstalled() != Boolean.TRUE) {
 				all.add(name);
 			}
 		}
 		return all;
 	}
 
-	public Response install(final String name) {
+	private String getMainModule() {
+		List<String> list = ModuleManager.getResolution();
+		return list.get(list.size() - 1);
+	}
+
+	private Set<String> resolveLink(MetaModule module) {
+		final Set<String> all = new HashSet<>();
+		all.add(module.getName());
+
+		String mainModule = getMainModule();
+
+		for (MetaModule metaModule : MetaModule.all().filter("self.depends LIKE ?1", "%" + module.getName() + "%").fetch()) {
+			if(metaModule.getInstalled() != Boolean.TRUE || mainModule.equals(metaModule.getName())) {
+				continue;
+			}
+			if(metaModule.getRemovable() != Boolean.TRUE) {
+				throw new IllegalArgumentException(error);
+			}
+			all.addAll(resolveLink(metaModule));
+		}
+		return all;
+	}
+
+	public Response install(String name) {
 		final ActionResponse response = new ActionResponse();
 		try {
-			doAction(name, false);
-			response.setFlash(message);
+			doInstall(name);
+			response.setFlash(messageRestart);
 			response.setReload(true);
 		} catch (Exception e) {
 			response.setException(e);
@@ -88,36 +125,49 @@ public class ModuleController {
 		return response;
 	}
 
-	public void install(ActionRequest request, ActionResponse response) {
-		List<?> ids = null;
+	@Transactional
+	public Response uninstall(String name) {
+		final ActionResponse response = new ActionResponse();
 		try {
-			ids = (List<?>) request.getContext().get("_ids");
-		} catch (Exception e) {
-		}
-		
-		if (ids == null || ids.isEmpty()) {
-			return;
-		}
-		try {
-			for (MetaModule m : modules.all().filter("id in (:ids)").bind("ids", ids).fetch()) {
-				if (m.getInstalled() != Boolean.TRUE) {
-					doAction(m.getName(), false);
-				}
-			}
-			response.setFlash(message);
+			doUninstall(name);
+			response.setFlash(messageRestart);
 			response.setReload(true);
 		} catch (Exception e) {
 			response.setException(e);
 		}
+		return response;
 	}
 
-	@Transactional
-	public Response uninstall(final String name) {
+	public Response validInstall(String name) {
 		final ActionResponse response = new ActionResponse();
+		Map<String, String> data = Maps.newHashMap();
 		try {
-			doAction(name, true);
-			response.setFlash(message);
-			response.setReload(true);
+
+			final MetaModule module = modules.findByName(name);
+			if (module == null) {
+				throw new IllegalArgumentException("No such module: " + name);
+			}
+
+			data.put("alert", String.format(alertInstall, Joiner.on("<br/>").join(resolve(module))));
+			response.setData(ImmutableList.of(data));
+		} catch (Exception e) {
+			response.setException(e);
+		}
+		return response;
+	}
+
+	public Response validUninstall(String name) {
+		final ActionResponse response = new ActionResponse();
+		Map<String, String> data = Maps.newHashMap();
+		try {
+
+			final MetaModule module = modules.findByName(name);
+			if (module == null) {
+				throw new IllegalArgumentException("No such module: " + name);
+			}
+
+			data.put("alert", String.format(alertUninstall, Joiner.on("<br/>").join(resolveLink(module))));
+			response.setData(ImmutableList.of(data));
 		} catch (Exception e) {
 			response.setException(e);
 		}
