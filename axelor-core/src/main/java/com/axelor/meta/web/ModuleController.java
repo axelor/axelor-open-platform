@@ -100,7 +100,7 @@ public class ModuleController {
 		final Set<String> all = new HashSet<>();
 		all.add(module.getName());
 
-		for (MetaModule metaModule : MetaModule.all().filter("self.depends LIKE ?1", "%" + module.getName() + "%").fetch()) {
+		for (MetaModule metaModule : modules.all().filter("self.depends LIKE ?1", "%" + module.getName() + "%").fetch()) {
 			if(metaModule.getInstalled() != Boolean.TRUE || mainModule.equals(metaModule.getName())) {
 				continue;
 			}
