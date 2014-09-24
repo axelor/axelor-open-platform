@@ -27,7 +27,9 @@ allprojects { p ->
 		mapping {
 			java = 'JAVADOC_STYLE'
 			groovy = 'JAVADOC_STYLE'
+			scala = 'JAVADOC_STYLE'
 			javascript = 'JAVADOC_STYLE'
+			xml = 'XML_STYLE'
 		}
 
 		ext.product = "Axelor Business Solutions"
@@ -40,6 +42,7 @@ allprojects { p ->
 		include "**/*.groovy"
 		include "**/*.scala"
 		include "**/*.js"
+		include "**/*.xml"
 
 		excludes(["**/LICENSE", "**/LICENSE.md"])
 		excludes(["**/README", "**/README.md"])
@@ -48,15 +51,22 @@ allprojects { p ->
 
 	afterEvaluate {
 		tasks.findAll { it.class.simpleName.startsWith 'License' }.each {
-			it.source = p.fileTree(dir: 'src', excludes: [
+
+			def src = p.fileTree(dir: 'src', excludes: [
 				"**/data/**",
 				"**/data-init/**",
 				"**/data-demo/**",
-				"**/src-gen/**",
 				"**/resources/**",
 				"**/webapp/lib/**",
 				"**/webapp/WEB-INF/web.xml"
 			])
+
+			def gen = p.fileTree('build/src-gen') {
+				include '**/*.java'
+				include '**/*.groovy'
+			}
+
+			it.source = p.files([src, gen])
 		}
 	}
 }
