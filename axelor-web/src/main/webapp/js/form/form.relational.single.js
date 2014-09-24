@@ -316,14 +316,20 @@ ui.formInput('ManyToOne', 'Select', {
 			var handled = false;
 			if (e.keyCode == 113) { // F2
 				if (e.shiftKey || !scope.getValue()) {
-					scope.onNew();
+					if (scope.canNew()) {
+						scope.onNew();
+					}
 				} else {
-					scope.onEdit();
+					if (scope.canEdit()) {
+						scope.onEdit();
+					}
 				}
 				handled = true;
 			}
 			if (e.keyCode == 114) { // F3
-				scope.onSelect();
+				if (scope.canSelect()) {
+					scope.onSelect();
+				}
 				handled = true;
 			}
 			if (!handled) {
