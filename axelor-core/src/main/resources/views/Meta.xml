@@ -216,10 +216,6 @@
     <call class="com.axelor.meta.web.MetaController" method="restoreSingle"/>
   </action-method>
 
-  <action-validate name="action-meta-todo">
-    <error message="Not implemented yet!"/>
-  </action-validate>
-
   <grid name="meta-model-grid" title="Models" model="com.axelor.meta.db.MetaModel">
     <field name="packageName"/>
     <field name="name"/>
