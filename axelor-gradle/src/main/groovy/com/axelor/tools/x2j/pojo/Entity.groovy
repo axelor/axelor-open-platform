@@ -168,7 +168,7 @@ class Entity {
 	}
 
 	boolean isPojo() {
-		return System.getProperty("codegen.pojo", "false") == "true"
+		return System.getProperty("codegen.pojo", "true") == "true"
 	}
 
 	void merge(Entity other) {
