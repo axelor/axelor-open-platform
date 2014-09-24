@@ -29,36 +29,39 @@
     <option value="action-workflow">action-workflow</option>
   </selection>
 
-  <grid title="All Modules" name="meta-module-grid" model="com.axelor.meta.db.MetaModule">
-    <toolbar>
-      <button name="btnInstall" icon="fa-download" help="Install selected modules" readonlyIf="!_ids || _ids.length == 0"
-        onClick="com.axelor.meta.web.ModuleController:install"/>
-    </toolbar>
+  <grid title="All Modules" name="meta-module-grid" model="com.axelor.meta.db.MetaModule"
+    canDelete="false" canNew="false" canEdit="false" edit-icon="false">
+    <hilite color="danger" if="!installed &amp;&amp; !pending"/>
+    <hilite color="warning" if="pending"/>
+    <hilite color="primary" if="installed"/>
     <field name="name"/>
     <field name="title"/>
     <field name="moduleVersion" width="200"/>
     <field name="installed" width="100"/>
-    <field name="removable" width="100"/>
+    <field name="pending" width="100"/>
+    <button name="btnInstall" icon="fa-download" help="Install module" onClick="com.axelor.meta.web.ModuleController:validInstall(name),com.axelor.meta.web.ModuleController:install(name)" readonlyIf="installed || pending"/>
   </grid>
   
-  <form name="meta-module-form" title="Module" model="com.axelor.meta.db.MetaModule">
+  <form name="meta-module-form" title="Module" model="com.axelor.meta.db.MetaModule"
+    canAttach="false" canCopy="false" canNew="false" canDelete="false" canEdit="false">
     <panel title="Module">
       <field name="title"/>
       <field name="name"/>
       <field name="moduleVersion"/>
-      <field name="depends" widget="Tags"/>
-      <field name="installed" readonly="true"/>
-      <field name="pending" readonly="true"/>
+      <field name="depends"/>
+      <field name="installed" colSpan="4"/>
+      <field name="pending" colSpan="4"/>
+      <field name="removable" colSpan="4"/>
       <panel stacked="true" showIf="removable">
-        <button name="btnInstall" title="Install" showIf="!installed" onClick="com.axelor.meta.web.ModuleController:install(name)"/>
-        <button name="btnUninstall" title="Uninstall" showIf="installed" onClick="com.axelor.meta.web.ModuleController:uninstall(name)"/>
+        <button name="btnInstall" title="Install" showIf="!installed &amp;&amp; !pending" onClick="com.axelor.meta.web.ModuleController:validInstall(name),com.axelor.meta.web.ModuleController:install(name)"/>
+        <button name="btnUninstall" title="Uninstall" showIf="installed &amp;&amp; !pending &amp;&amp; removable" onClick="com.axelor.meta.web.ModuleController:validUninstall(name),com.axelor.meta.web.ModuleController:uninstall(name)"/>
       </panel>
     </panel>
     <panel title="Description">
       <field name="description" showTitle="false" colSpan="12"/>
     </panel>
   </form>
-
+  
   <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView" orderBy="priority,name">
     <toolbar>
       <button name="restoreAll" icon="fa-undo" help="Restore all..." prompt="All the customizations will be lost. Are you sure ?" onClick="action-meta-restore-all"/>
