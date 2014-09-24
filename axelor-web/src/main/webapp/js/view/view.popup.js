@@ -56,7 +56,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 				originalEdit(record);
 			});
 		} else {
-			if (recordVersion === -1) {
+			if (recordVersion === -1 && record) {
 				recordVersion = record.version;
 			}
 			originalEdit(record);
