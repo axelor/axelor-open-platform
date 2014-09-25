@@ -112,25 +112,14 @@ if (AppInfo.isMobile(request) && AppInfo.isWebKit(request)) {
             <li>
             	<a href="#/"><i class="fa fa-home"></i></a>
             </li>
-            <li class="divider-vertical"></li>
-            <li class="dropdown hidden-phone">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <i class="fa fa-info-circle"></i> <b class="caret"></b>
-              </a>
-              <ul class="dropdown-menu">
-                <li><a href="{{app.help}}" target="_blank"><span x-translate>Help</span></a></li>
-                <li class="divider"></li>
-                <li><a href="#/about"><i>{{app.name}} - v{{app.version}}</i></a></li>
-                <li ng-show="app.sdk"><a href="http://axelor.com/" target="_blank"><i>Axelor SDK - v{{app.sdk}}</i></a></li>
-              </ul>
-            </li>
             <li class="divider-vertical hidden-phone"></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <i class="fa fa-user"></i> <span class="hidden-phone">{{app.user}}</span> <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
-                <li><a href="#/preferences"><i class="icon-cog"></i> <span x-translate>Preferences</span></a></li>
+                <li><a href="#/preferences"><i class="fa fa-cog"></i> <span x-translate>Preferences</span></a></li>
+				<li><a href="#/about"><i class="fa fa-info-circle"></i> <span x-translate>About</span></a></li>
                 <li class="divider"></li>
                 <li><a href="logout"><i class="fa fa-power-off"></i> <span x-translate>Logout</span></a></li>
               </ul>

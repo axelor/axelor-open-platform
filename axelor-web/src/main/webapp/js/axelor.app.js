@@ -295,9 +295,11 @@
 				name: settings['application.name'],
 				description: settings['application.description'],
 				version: settings['application.version'],
-				mode: settings['application.mode'],
+				author: settings['application.author'],
+				copyright: settings['application.copyright'],
 				home: settings['application.home'],
 				help: settings['application.help'],
+				mode: settings['application.mode'],
 				sdk: settings['application.sdk'],
 				user: settings['user.name'],
 				login: settings['user.login'],
@@ -324,6 +326,7 @@
 	
 		// See index.jsp
 		$scope.app = getAppInfo(__appSettings);
+		$scope.$year = moment().year();
 	
 		var loginAttempts = 0;
 		var loginWindow = null;

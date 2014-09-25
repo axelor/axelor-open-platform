@@ -1,12 +1,51 @@
-<div class="container">
-	<div class="about-app">
-		<h1>{{app.name}}</h1>
-		<h2>{{app.description}}</h2>
-		<b x-translate>Version:</b> <i>{{app.version}}</i>
+<div class="about-page">
+	<div class="container content">
+		<div class="page-header">
+			<h3>{{app.name}} - {{app.description}}</h3>
+		</div>
+		<div class="row">
+			<div class="span7">
+				<p>
+					<strong>Version: {{app.version}}</strong>
+				</p>
+				<p>{{app.copyright}}</p>
+				<p>Website: <a ng-href="{{app.home}}">{{app.home}}</a>.
+				<p>
+					<strong>Links</strong>
+				</p>
+				<ul>
+					<li ng-if="app.help"><a ng-href="{{app.help}}">Documentation</a></li>
+					<li><a href="http://www.gnu.org/licenses/agpl.html">License</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="page-header">
+			<h3>Axelor SDK</h3>
+		</div>
+		<div class="row">
+			<div class="span7">
+				<p>
+					<strong>Version: {{app.sdk}}</strong>
+				</p>
+				<p>Copyright (c) 2012-{{$year}} Axelor. All Rights Reserved.</p>
+				<p>Website: <a ng-href="http://www.axelor.com">http://www.axelor.com</a>.
+				<p>
+					<strong>Links</strong>
+				</p>
+				<ul>
+					<li><a href="http://wiki.axelor.com">Documentation</a></li>
+					<li><a href="http://www.gnu.org/licenses/agpl.html">License</a></li>
+				</ul>
+			</div>
+		</div>
+		<br><br>
+		<div class="row">
+			<div class="span2">
+				<a class="btn btn-default" href="#/" x-translate>Close</a>
+			</div>
+		</div>
 	</div>
 	<footer class="footer">
-		<div class="container">
-			<p>© Axelor. All Rights Reserved.</p>
-		</div>
+		<p class="credit">Copyright (c) 2012-{{$year}} <a href="http://www.axelor.com">Axelor</a>. All Rights Reserved.</p>
 	</footer>
 </div>

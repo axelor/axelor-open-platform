@@ -75,10 +75,12 @@ public final class AppInfo {
 		map.put("application.name", settings.get("application.name"));
 		map.put("application.description", settings.get("application.description"));
 		map.put("application.version", settings.get("application.version"));
-		map.put("application.mode", settings.get("application.mode"));
-
+		map.put("application.author", settings.get("application.author"));
+		map.put("application.copyright", settings.get("application.copyright"));
 		map.put("application.home", settings.get("application.home"));
 		map.put("application.help", settings.get("application.help"));
+		map.put("application.mode", settings.get("application.mode"));
+
 		map.put("file.upload.size", settings.get("file.upload.size"));
 
 		try {

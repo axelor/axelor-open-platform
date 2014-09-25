@@ -150,16 +150,13 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 .footer {
 	position: absolute;
 	left: 0px; right: 0px; bottom: 0px;
-	padding-top: 4px;
-	background-color: #333;
-	color: white;
+	padding: 4px 4px 0 4px;
+	background-color: #eee;
 }
 
 .footer p {
-	font-size: smaller;
 	margin-bottom: 4px;
-	text-shadow: 0 1px 1px #111;
-	text-align: center;
+	text-shadow: 0 1px 1px #f0f0f0;
 }
 
 .loading-counter {
@@ -767,4 +764,43 @@ img.prefix-icon {
 .nvtooltip h3 {
 	font-size: 13px;
 	font-weight: bold;
+}
+
+.about-page {
+	font-size: 14px;
+	position: absolute;
+	top: 0; left: 0; bottom: 0; right: 0;
+	overflow: auto;
+}
+
+.about-page .page-header {
+	padding-bottom: 4px;
+	margin: 18px 0 14px;
+}
+
+.about-page .page-header h3 {
+	font-size: 24px;
+	font-weight: 500;
+	line-height: 1;
+}
+
+.about-page > .content {
+	padding: 0 18px;
+	max-width: 980px;
+	min-height: calc(100% - 42px);
+	height: auto;
+	padding-bottom: 42px;
+}
+
+.about-page footer {
+	font-size: 13px;
+	clear: both;
+	position: relative;
+	padding: 0;
+	margin-top: -26px;
+}
+
+.about-page footer p {
+	margin: 0;
+	padding: 4px;
 }
