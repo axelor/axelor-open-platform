@@ -863,6 +863,7 @@ ui.formBuild = function (scope, schema, fields) {
 					'x-coloffset'	: this.colOffset,
 					'x-rowspan'		: this.rowSpan,
 					'x-sidebar'		: this.sidebar,
+					'x-stacked'		: this.stacked,
 					'x-widths'		: this.colWidths,
 					'x-field'		: this.name,
 					'x-title'		: attrs.title

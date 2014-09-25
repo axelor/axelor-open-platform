@@ -119,6 +119,12 @@
 	margin-bottom: 0;
 }
 
+.panel[x-stacked] .row-fluid:last-child > .form-item-hidden,
+.panel[x-stacked] .row-fluid:last-child > .form-item:last-child,
+.panel[x-stacked] .row-fluid:last-child > .form-item:last-child > .panel {
+	margin-bottom: 0;
+}
+
 @media (max-width: 767px) {
 	.panel .row-fluid:last-child > .form-item {
 		margin-bottom: 6px;
