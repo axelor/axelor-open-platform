@@ -39,10 +39,11 @@ ui.formInput('ImageLink', {
 		var field = scope.field;
 
 		var width = field.width || 140;
-		var height = field.height || 140;
+		var height = field.height || '100%';
 		
 		scope.styles = [{
 			'width': width,
+			'height': height,
 			'max-width': '100%',
 			'max-height': '100%'
 		}, {
