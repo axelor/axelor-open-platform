@@ -339,6 +339,7 @@
 
 .panel-layout .form-item > a.btn,
 .panel-layout .form-item-container button {
+	width: 100%;
 	max-width: 100%;
 	overflow: hidden;
 	white-space: nowrap;
@@ -357,6 +358,9 @@
 }
 .panel-layout .form-item.btn-group {
 	width: 100%;
+}
+.panel-layout .form-item.btn-group > a.btn {
+	width: auto;
 }
 
 .panel-layout .row-fluid.has-labels .form-item > a.btn {

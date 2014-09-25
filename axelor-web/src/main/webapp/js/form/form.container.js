@@ -374,15 +374,18 @@ ui.formWidget('Tab', {
 ui.formWidget('ButtonGroup', {
 
 	link: function (scope, element, attrs) {
-		var count = 0;
-		scope.$watch(function () {
+		function adjust() {
 			var visible = element.children('a.btn:visible').size();
-			if (visible !== count) {
+			if (visible) {
 				element.children('a.btn:visible')
-					.css('max-width', Math.round(100/visible) + '%')
-					.css('width', Math.round(100/visible) + '%');
+					.css('max-width', (100.00/visible) + '%')
+					.css('width', (100.00/visible) + '%');
 			}
-		});
+		}
+		scope.$watch(adjust);
+		scope.$callWhen(function () {
+			return element.is(':visible')
+		}, adjust);
 	},
 	transclude: true,
 	template_editable: null,
