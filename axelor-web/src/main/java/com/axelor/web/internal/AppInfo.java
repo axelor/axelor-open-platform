@@ -76,12 +76,13 @@ public final class AppInfo {
 		map.put("application.description", settings.get("application.description"));
 		map.put("application.version", settings.get("application.version"));
 		map.put("application.mode", settings.get("application.mode"));
-		
-		map.put("help.location", settings.get("application.help.location"));
+
+		map.put("application.home", settings.get("application.home"));
+		map.put("application.help", settings.get("application.help"));
 		map.put("file.upload.size", settings.get("file.upload.size"));
 
 		try {
-			map.put("sdk.version", VersionUtils.getVersion().version);
+			map.put("application.sdk", VersionUtils.getVersion().version);
 			map.put("application.version", VersionUtils.getVersion(settings.get("application.name")).version);
 		} catch (Exception e) {
 		}

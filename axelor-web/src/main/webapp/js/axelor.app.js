@@ -296,12 +296,13 @@
 				description: settings['application.description'],
 				version: settings['application.version'],
 				mode: settings['application.mode'],
+				home: settings['application.home'],
+				help: settings['application.help'],
+				sdk: settings['application.sdk'],
 				user: settings['user.name'],
 				login: settings['user.login'],
 				homeAction: settings['user.action'],
 				navigator: settings['user.navigator'],
-				help: settings['help.location'],
-				sdk: settings['sdk.version'],
 				fileUploadSize: settings['file.upload.size']
 			};
 
