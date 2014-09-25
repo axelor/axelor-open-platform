@@ -145,7 +145,9 @@ public class ProjectCommands implements CommandProvider {
 			@CliOption(name = "name", shortName = 'n', help = "name of the project", required = true)
 			String name,
 			@CliOption(name = "title", shortName = 't', help = "display name of the application")
-			String title
+			String title,
+			@CliOption(name = "author", shortName = 'a', help = "the author/company name")
+			String author
 			) {
 		
 		title = validateNameAndGetTitle(name, title);
@@ -161,10 +163,15 @@ public class ProjectCommands implements CommandProvider {
 			return new CommandResult(false);
 		}
 
+		if (StringUtils.isBlank(author)) {
+			author = "Axelor";
+		}
+
 		final Map<String, Object> vars = new HashMap<>();
 		
 		vars.put("name", name);
 		vars.put("title", title);
+		vars.put("author", author);
 		vars.put("sdkVersion", BuiltinCommands.getVersion());
 		
 		try {
