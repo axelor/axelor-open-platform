@@ -31,7 +31,7 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 
 	protected Class<T> modelClass;
 
-	public JpaRepository(Class<T> modelClass) {
+	protected JpaRepository(Class<T> modelClass) {
 		this.modelClass = modelClass;
 	}
 
@@ -47,6 +47,17 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 	@Override
 	public Query<T> all() {
 		return JPA.all(modelClass);
+	}
+
+	/**
+	 * Get the {@link Query} instance of the given type.
+	 *
+	 * @param type
+	 *            the subtype of the managed model class.
+	 * @return instance of {@link Query}
+	 */
+	public <U extends T> Query<U> all(Class<U> type) {
+		return JPA.all(type);
 	}
 
 	@Override
