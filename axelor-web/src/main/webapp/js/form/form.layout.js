@@ -183,7 +183,7 @@ ui.directive('uiTableLayout', ['$compile', function($compile) {
 
 function PanelLayout(items, attrs, $scope, $compile) {
 	
-	var panelAttrs = $scope.field || {},
+	var stacked = attrs.stacked || false,
 		numCols = 12,
 		numSpan = +(attrs.itemSpan) || 6,
 		curCol = 0,
@@ -193,9 +193,8 @@ function PanelLayout(items, attrs, $scope, $compile) {
 		var row = _.last(layout),
 			cell = $('<div>'),
 			span = +item.attr('x-colspan') || numSpan,
-			offset = +item.attr('x-coloffset') || 0,
-			stacked = panelAttrs.stacked;
-
+			offset = +item.attr('x-coloffset') || 0;
+		
 		span = Math.min(span, numCols);
 		if (stacked) {
 			span = 0;
