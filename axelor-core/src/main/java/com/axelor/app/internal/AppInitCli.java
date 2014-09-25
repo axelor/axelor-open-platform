@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.commands;
+package com.axelor.app.internal;
 
 import java.util.List;
 import java.util.Properties;
@@ -33,7 +33,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-public class DBCommands {
+public class AppInitCli {
 
 	private static final String PROGRAM_NAME = "axelor";
 	private static final String PERSISTENCE_UNIT = "persistenceUnit";

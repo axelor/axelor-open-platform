@@ -126,7 +126,7 @@ class AppPlugin extends AbstractPlugin {
 			}
 
 			task("init", dependsOn: "classes", type: JavaExec) {
-				main = "com.axelor.commands.DBCommands"
+				main = "com.axelor.app.internal.AppInitCli"
 				classpath = sourceSets.main.runtimeClasspath
 				if (project.properties.update) args "-u" else args "-i"
 				if (project.properties.modules) args "-m " + project.properties.modules
