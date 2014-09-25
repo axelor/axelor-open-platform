@@ -661,6 +661,8 @@ ui.formWidget('PanelTabs', {
 			setup();
 			scope.selectTab(_.first(scope.tabs));
 		});
+
+		scope.$on('on:edit', doSelect);
 	},
 
 	transclude: true,
