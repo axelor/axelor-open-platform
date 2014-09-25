@@ -33,7 +33,7 @@ allprojects { p ->
 		}
 
 		ext.product = "Axelor Business Solutions"
-		ext.inception = "2012"
+		ext.inception = "2005"
 		ext.year = Calendar.getInstance().get(Calendar.YEAR)
 		ext.owner = "Axelor"
 		ext.website = "http://axelor.com"
