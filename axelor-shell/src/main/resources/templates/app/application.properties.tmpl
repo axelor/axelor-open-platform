@@ -4,13 +4,21 @@ application.name = <%= name %>
 application.description = <%= title %>
 application.version = 1.0.0
 
-# application header logo, should be 40px in height
+# Header Logo
+# ~~~~~
+# Should be 40px in height with transparent background
 application.logo =
 
-# link to be used with header logo
-application.home =
+# Home Website
+# ~~~~~
+# Link to be used with header logo
+application.home = http://www.axelor.com
 
-# Application Mode
+# Link to the online help
+# ~~~~~
+application.help = http://wiki.axelor.com/
+
+# Application deployment mode
 # ~~~~~
 # Set to 'dev' for development mode else 'prod'
 application.mode = dev
@@ -25,12 +33,9 @@ application.theme =
 # Set default application locale (en, fr, fr_FR, en_US)
 application.locale =
 
-# Link to the online help
-# ~~~~~
-application.help.location = http://wiki.axelor.com/
-
 # Database settings
 # ~~~~~
+# See hibernate documentation for connection parameters
 #db.default.dialect = org.hibernate.dialect.PostgreSQLDialect
 #db.default.driver = org.postgresql.Driver
 #db.default.ddl = update
@@ -49,10 +54,6 @@ date.timezone = UTC
 # Session timeout (in minutes)
 # ~~~~~
 session.timeout = 60
-
-# Location of temp directory
-# ~~~~~
-temp.dir = /tmp
 
 # Storage path for upload files (attachments)
 # ~~~~~
