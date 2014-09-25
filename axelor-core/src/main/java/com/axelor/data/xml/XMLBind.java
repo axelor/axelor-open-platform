@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.axelor.data.ImportException;
-import com.axelor.data.ScriptHelper;
+import com.axelor.data.DataScriptHelper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.google.inject.Injector;
@@ -182,7 +182,7 @@ public class XMLBind {
 		}
 	}
 
-	private static ScriptHelper helper = new ScriptHelper(100, 10, false);
+	private static DataScriptHelper helper = new DataScriptHelper(100, 10, false);
 
 	public Object eval(Map<String, Object> context) {
 		if (Strings.isNullOrEmpty(expression)) {

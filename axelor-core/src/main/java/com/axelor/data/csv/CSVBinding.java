@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 
 import org.codehaus.groovy.runtime.InvokerHelper;
 
-import com.axelor.data.ScriptHelper;
+import com.axelor.data.DataScriptHelper;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
@@ -166,7 +166,7 @@ public class CSVBinding {
 		return cb;
 	}
 
-	private static ScriptHelper helper = new ScriptHelper(100, 10, false);
+	private static DataScriptHelper helper = new DataScriptHelper(100, 10, false);
 
 	public Object evaluate(Map<String, Object> context, Injector injector) {
 		if (Strings.isNullOrEmpty(expression)) {
