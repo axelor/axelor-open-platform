@@ -182,9 +182,6 @@
 .dashboard .dashlet-body .slickgrid {
 	height: 100%;
 }
-.dashboard .dashlet-body .slick-viewport {
-	overflow-x: hidden !important;
-}
 
 .dashboard .dashlet-pager {
 	margin-right: 8px;
