@@ -27,9 +27,7 @@ import javax.persistence.Table;
 
 import org.joda.time.LocalDate;
 
-import com.axelor.db.JPA;
 import com.axelor.db.JpaModel;
-import com.axelor.db.Query;
 
 @Entity
 @Table(name = "TEST_MOVE_LINE")
@@ -97,37 +95,5 @@ public class MoveLine extends JpaModel {
 	
 	public void setDebit(BigDecimal debit) {
 		this.debit = debit;
-	}
-	
-	public MoveLine persist() {
-		return JPA.persist(this);
-	}
-	
-	public MoveLine merge() {
-		return JPA.merge(this);
-	}
-	
-	public MoveLine save() {
-		return JPA.save(this);
-	}
-	
-	public void remove() {
-		JPA.remove(this);
-	}
-	
-	public void refresh() {
-		JPA.refresh(this);
-	}
-	
-	public void flush() {
-		JPA.flush();
-	}
-	
-	public static MoveLine find(Long id) {
-		return JPA.find(MoveLine.class, id);
-	}
-	
-	public static Query<MoveLine> all() {
-		return JPA.all(MoveLine.class);
 	}
 }

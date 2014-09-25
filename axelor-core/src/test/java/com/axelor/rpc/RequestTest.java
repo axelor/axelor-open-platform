@@ -20,21 +20,26 @@ package com.axelor.rpc;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.axelor.db.JPA;
 import com.axelor.db.Query;
 import com.axelor.test.db.Address;
 import com.axelor.test.db.Circle;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.Title;
+import com.axelor.test.db.repo.ContactRepository;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
 public class RequestTest extends RpcTest {
+
+	@Inject
+	private ContactRepository contacts;
 
 	@Test
 	public void testObjects() {
@@ -113,7 +118,7 @@ public class RequestTest extends RpcTest {
 		Assert.assertEquals("Sparrow", data.get("lastName"));
 		Assert.assertEquals("jack.sparrow@gmail.com", data.get("email"));
 
-		Contact p = Contact.edit(data);
+		Contact p = contacts.edit(data);
 
 		Assert.assertEquals(Title.class, p.getTitle().getClass());
 		Assert.assertEquals(Address.class, p.getAddresses().get(0).getClass());
@@ -125,14 +130,14 @@ public class RequestTest extends RpcTest {
 		Assert.assertEquals("family", p.getCircle(0).getCode());
 		Assert.assertEquals("1977-05-01", p.getDateOfBirth().toString());
 		
-		JPA.manage(p);
+		contacts.manage(p);
 	}
 	
 	@Test
 	@Transactional
 	public void testUpdate() {
 		
-		Contact c = Contact.all().fetchOne();
+		Contact c = contacts.all().fetchOne();
 		Map<String, Object> data = Maps.newHashMap();
 
 		data.put("id", c.getId());
@@ -150,8 +155,8 @@ public class RequestTest extends RpcTest {
 		Assert.assertEquals("Some", data.get("firstName"));
 		Assert.assertEquals("thing", data.get("lastName"));
 
-		Contact o = Contact.edit(data);
+		Contact o = contacts.edit(data);
 		
-		o = JPA.manage(o);
+		o = contacts.manage(o);
 	}
 }

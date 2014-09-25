@@ -15,46 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.web.db;
+package com.axelor.test.db.repo;
 
-import javax.persistence.Entity;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import java.util.Map;
 
-import com.axelor.db.JpaModel;
+import com.axelor.db.JPA;
+import com.axelor.db.JpaRepository;
+import com.axelor.test.db.Contact;
 
-@Entity
-public class Title extends JpaModel {
+public class ContactRepository extends JpaRepository<Contact> {
 
-	@NotNull
-	@Size( min = 2 )
-	private String code;
-	
-	@NotNull
-	@Size( min = 2 )
-	private String name;
-	
-	public Title() {
+	public ContactRepository() {
+		super(Contact.class);
 	}
 
-	public Title(String code, String name) {
-		this.code = code;
-		this.name = name;
+	public Contact findByEmail(String email) {
+		return all().filter("self.email = ?", email).fetchOne();
 	}
 
-	public String getCode() {
-		return code;
+	public Contact edit(Map<String, Object> values) {
+		return JPA.edit(Contact.class, values);
 	}
 
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	public Contact manage(Contact contact) {
+		return JPA.manage(contact);
 	}
 }

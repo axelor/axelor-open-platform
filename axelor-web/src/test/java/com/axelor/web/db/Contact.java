@@ -28,9 +28,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
-import com.axelor.db.JPA;
 import com.axelor.db.JpaModel;
-import com.axelor.db.Query;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.VirtualColumn;
 import com.axelor.db.annotations.Widget;
@@ -132,13 +130,5 @@ public class Contact extends JpaModel {
 	protected String computeFullName() {
 		if (title == null) return firstName + " " + lastName;
 		return title.getName() + " " + firstName + " " + lastName;
-	}
-	
-	public static Query<Contact> all() {
-		return JPA.all(Contact.class);
-	}
-	
-	public Contact save() {
-		return JPA.save(this);
 	}
 }

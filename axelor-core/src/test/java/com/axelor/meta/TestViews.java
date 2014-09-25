@@ -79,7 +79,7 @@ public class TestViews extends MetaTest {
 
 		Search search = (Search) views.getViews().get(0);
 
-		Title title = Title.all().filter("self.code = ?", "mr").fetchOne();
+		Title title = all(Title.class).filter("self.code = ?", "mr").fetchOne();
 		Assert.assertNotNull(title);
 
 		Map<String, Object> binding = Maps.newHashMap();

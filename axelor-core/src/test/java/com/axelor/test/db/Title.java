@@ -26,9 +26,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.axelor.db.JPA;
 import com.axelor.db.Model;
-import com.axelor.db.Query;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 
@@ -83,9 +81,4 @@ public class Title extends Model {
 		
 		return tsh.omitNullValues().toString();
 	}
-
-	public static Query<Title> all() {
-		return JPA.all(Title.class);
-	}
-
 }

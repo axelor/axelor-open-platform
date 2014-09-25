@@ -15,46 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.web.db;
+package com.axelor.test.db.repo;
 
-import javax.persistence.Entity;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import com.axelor.db.JpaRepository;
+import com.axelor.test.db.Move;
 
-import com.axelor.db.JpaModel;
+public class MoveRepository extends JpaRepository<Move> {
 
-@Entity
-public class Title extends JpaModel {
-
-	@NotNull
-	@Size( min = 2 )
-	private String code;
-	
-	@NotNull
-	@Size( min = 2 )
-	private String name;
-	
-	public Title() {
-	}
-
-	public Title(String code, String name) {
-		this.code = code;
-		this.name = name;
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	public MoveRepository() {
+		super(Move.class);
 	}
 }

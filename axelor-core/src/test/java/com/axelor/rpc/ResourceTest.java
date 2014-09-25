@@ -26,11 +26,11 @@ import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.axelor.db.JPA;
 import com.axelor.test.db.Address;
 import com.axelor.test.db.Circle;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.Title;
+import com.axelor.test.db.repo.ContactRepository;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
@@ -40,6 +40,9 @@ public class ResourceTest extends RpcTest {
 	@Inject
 	Resource<Contact> resource;
 	
+	@Inject
+	ContactRepository contacts;
+
 	@Test
 	public void testFields() throws Exception {
 
@@ -90,7 +93,7 @@ public class ResourceTest extends RpcTest {
 	@Transactional
 	public void testUpdate() throws Exception {
 
-		Contact c = Contact.all().fetchOne();
+		Contact c = contacts.all().fetchOne();
 		Map<String, Object> data = Maps.newHashMap();
 		
 		data.put("id", c.getId());
@@ -118,8 +121,8 @@ public class ResourceTest extends RpcTest {
 	@Test
 	public void testCopy() {
 		
-		Contact c = Contact.all().filter("firstName = ?", "James").fetchOne();
-		Contact n = JPA.copy(c, true);
+		Contact c = contacts.all().filter("firstName = ?", "James").fetchOne();
+		Contact n = contacts.copy(c, true);
 		
 		Assert.assertNotSame(c, n);
 		Assert.assertNotSame(c.getAddresses(), n.getAddresses());

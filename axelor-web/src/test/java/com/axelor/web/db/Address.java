@@ -23,9 +23,7 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
-import com.axelor.db.JPA;
 import com.axelor.db.JpaModel;
-import com.axelor.db.Query;
 
 @Entity
 public class Address extends JpaModel {
@@ -93,13 +91,5 @@ public class Address extends JpaModel {
 
 	public void setZip(String zip) {
 		this.zip = zip;
-	}
-
-	public static Query<Address> all() {
-		return JPA.all(Address.class);
-	}
-
-	public Address save() {
-		return JPA.save(this);
 	}
 }

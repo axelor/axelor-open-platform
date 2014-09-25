@@ -25,6 +25,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
 import com.axelor.db.JpaFixture;
+import com.axelor.db.JpaSupport;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.GuiceRunner;
 import com.axelor.test.db.Contact;
@@ -33,7 +34,7 @@ import com.google.inject.persist.Transactional;
 @RunWith(GuiceRunner.class)
 @GuiceModules({ JpaTestModule.class })
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public abstract class JpaTest {
+public abstract class JpaTest extends JpaSupport {
 
 	@Inject
 	private JpaFixture fixture;
@@ -41,7 +42,7 @@ public abstract class JpaTest {
 	@Before
 	@Transactional
 	public void setUp() {
-		if (Contact.all().count() == 0) {
+		if (all(Contact.class).count() == 0) {
 			fixture.load("demo-data.yml");
 		}
 	}

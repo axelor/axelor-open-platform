@@ -19,26 +19,31 @@ package com.axelor.script;
 
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.junit.Before;
 
 import com.axelor.AbstractTest;
-import com.axelor.db.JPA;
 import com.axelor.rpc.Context;
 import com.axelor.test.db.Contact;
+import com.axelor.test.db.repo.ContactRepository;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
 public abstract class ScriptTest extends AbstractTest {
 
+	@Inject
+	private ContactRepository contacts;
+
 	@Before
     @Transactional
     public void prepare() {
-    	if (Contact.all().count() > 0) return;
+	if (contacts.all().count() > 0) return;
     	Contact c = new Contact();
     	c.setFirstName("John");
     	c.setLastName("Smith");
-    	JPA.save(c);
+	contacts.save(c);
     }
 
     protected Context context() {

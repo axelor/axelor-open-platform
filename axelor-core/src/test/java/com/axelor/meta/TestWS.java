@@ -36,7 +36,7 @@ import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.test.db.Contact;
-import com.axelor.test.db.ContactRepository;
+import com.axelor.test.db.repo.ContactRepository;
 import com.axelor.text.GroovyTemplates;
 import com.axelor.text.Templates;
 import com.google.common.collect.ImmutableMap;
@@ -138,7 +138,7 @@ public class TestWS extends MetaTest {
 	@Test
 	public void test3() throws Exception {
 		prepareTest3();
-		Contact c = Contact.all().filter("self.email = ?", "john.smith@gmail.com").fetchOne();
+		Contact c = all(Contact.class).filter("self.email = ?", "john.smith@gmail.com").fetchOne();
 		Map<String, Object> context = ImmutableMap.<String, Object>of("person", c);
 		
 		ActionHandler actionHandler = createHandler("dummy", context);

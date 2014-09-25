@@ -26,9 +26,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.axelor.db.JPA;
 import com.axelor.db.JpaModel;
-import com.axelor.db.Query;
 
 @Entity
 @Table(name = "TEST_MOVE")
@@ -54,37 +52,5 @@ public class Move extends JpaModel {
 	
 	public void setInvoice(Invoice invoice) {
 		this.invoice = invoice;
-	}
-	
-	public Move persist() {
-		return JPA.persist(this);
-	}
-	
-	public Move merge() {
-		return JPA.merge(this);
-	}
-	
-	public Move save() {
-		return JPA.save(this);
-	}
-	
-	public void remove() {
-		JPA.remove(this);
-	}
-	
-	public void refresh() {
-		JPA.refresh(this);
-	}
-	
-	public void flush() {
-		JPA.flush();
-	}
-	
-	public static Move find(Long id) {
-		return JPA.find(Move.class, id);
-	}
-	
-	public static Query<Move> all() {
-		return JPA.all(Move.class);
 	}
 }

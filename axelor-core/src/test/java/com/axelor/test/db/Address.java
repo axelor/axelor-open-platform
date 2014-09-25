@@ -24,9 +24,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.axelor.db.JPA;
 import com.axelor.db.JpaModel;
-import com.axelor.db.Query;
 import com.axelor.db.internal.EntityHelper;
 
 @Entity
@@ -112,9 +110,4 @@ public class Address extends JpaModel {
 	public String toString() {
 		return EntityHelper.toString(this);
 	}
-	
-	public static Query<Address> all() {
-		return JPA.all(Address.class);
-	}
-
 }
