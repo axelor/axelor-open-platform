@@ -18,7 +18,7 @@
 package com.axelor.script;
 
 /**
- * The ScriptHelper interface to implement dynamic script evaluation support.
+ * The DataScriptHelper interface to implement dynamic script evaluation support.
  *
  */
 public interface ScriptHelper {

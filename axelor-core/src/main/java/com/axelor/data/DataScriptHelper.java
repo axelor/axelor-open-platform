@@ -35,21 +35,21 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 /**
- * This {@link ScriptHelper} class can be used to effectively use the
- * {@link GroovyShell} to evaluate dymanic groovy expressions. <br>
+ * This {@link DataScriptHelper} class can be used to effectively use the
+ * {@link GroovyShell} to evaluate dynamic groovy expressions. <br>
  * <br>
- * The {@link ScriptHelper} maintains an internal LRU cache to reuse the parsed
+ * The {@link DataScriptHelper} maintains an internal LRU cache to reuse the parsed
  * script. If the specified expiry time is elapsed without any access to the
- * cached script, the cache is evited to regain the memory.
+ * cached script, the cache is evicted to regain the memory.
  *
  */
-public final class ScriptHelper {
+public final class DataScriptHelper {
 
 	private static final int DEFAULT_CACHE_SIZE = 100;
 
 	private static final int DEFAULT_EXPIRE_TIME = 10;
 
-	private static final Logger log = LoggerFactory.getLogger(ScriptHelper.class);
+	private static final Logger log = LoggerFactory.getLogger(DataScriptHelper.class);
 
 	final static CompilerConfiguration config = new CompilerConfiguration();
 
@@ -80,7 +80,7 @@ public final class ScriptHelper {
 			});
 
 	/**
-	 * Create a new {@link ScriptHelper} with the given {@link #cacheSize} and
+	 * Create a new {@link DataScriptHelper} with the given {@link #cacheSize} and
 	 * {@link #expireTime} in minutes.
 	 *
 	 * @param cacheSize
@@ -91,7 +91,7 @@ public final class ScriptHelper {
 	 * @param indy
 	 *            Whether to use the invoke dynamic feature.
 	 */
-	public ScriptHelper(int cacheSize, int expireTime, boolean indy) {
+	public DataScriptHelper(int cacheSize, int expireTime, boolean indy) {
 		this.cacheSize = cacheSize;
 		this.expireTime = expireTime;
 		this.indy = indy;
