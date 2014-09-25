@@ -29,7 +29,6 @@ allprojects { p ->
 			groovy = 'JAVADOC_STYLE'
 			scala = 'JAVADOC_STYLE'
 			javascript = 'JAVADOC_STYLE'
-			xml = 'XML_STYLE'
 		}
 
 		ext.product = "Axelor Business Solutions"
@@ -42,7 +41,6 @@ allprojects { p ->
 		include "**/*.groovy"
 		include "**/*.scala"
 		include "**/*.js"
-		include "**/*.xml"
 
 		excludes(["**/LICENSE", "**/LICENSE.md"])
 		excludes(["**/README", "**/README.md"])
