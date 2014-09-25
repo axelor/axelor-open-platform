@@ -21,39 +21,36 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.axelor.db.JPA;
+import com.axelor.db.JpaSupport;
 import com.axelor.meta.service.MetaModelService;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.GuiceRunner;
 import com.axelor.wkf.WkfTest;
 import com.axelor.wkf.data.CreateData;
+import com.axelor.wkf.db.EndEvent;
 import com.axelor.wkf.db.Node;
-import com.axelor.wkf.db.node.EndEvent;
-import com.axelor.wkf.db.node.NodeTask;
-import com.axelor.wkf.db.node.StartEvent;
+import com.axelor.wkf.db.NodeTask;
+import com.axelor.wkf.db.StartEvent;
 
 @RunWith(GuiceRunner.class)
 @GuiceModules({ WkfTest.class })
-public class WorkFlowDbTest {
+public class WorkFlowDbTest extends JpaSupport {
 
 	@Test
 	public void test() {
 		
-		JPA.runInTransaction(new Runnable() {
+		inTransaction(new Runnable() {
 
 			@Override
 			public void run() {
 				new MetaModelService().process();
 				CreateData.createWorkflow();
 			}
-
 		});
-		
-		Assert.assertEquals(1, StartEvent.all().count());
-		Assert.assertEquals(2, NodeTask.all().count());
-		Assert.assertEquals(1, EndEvent.all().count());
-		Assert.assertEquals(4, Node.all().count());
-		
-	}
 
+		Assert.assertEquals(1, all(StartEvent.class).count());
+		Assert.assertEquals(2, all(NodeTask.class).count());
+		Assert.assertEquals(1, all(EndEvent.class).count());
+		Assert.assertEquals(4, all(Node.class).count());
+	}
 }
