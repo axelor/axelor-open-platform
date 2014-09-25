@@ -19,6 +19,7 @@ package com.axelor.app;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Calendar;
 import java.util.Properties;
 
 import com.axelor.app.internal.AppFilter;
@@ -62,14 +63,15 @@ public final class AppSettings {
 	}
 
 	public String get(String key) {
-		return properties.getProperty(key);
+		return sub(properties.getProperty(key));
 	}
 
 	public String get(String key, String defaultValue) {
 		String value = properties.getProperty(key, defaultValue);
-		if (value == null || "".equals(value.trim()))
-			return defaultValue;
-		return value;
+		if (value == null || "".equals(value.trim())) {
+			value = defaultValue;
+		}
+		return sub(value);
 	}
 
 	public int getInt(String key, int defaultValue) {
@@ -91,9 +93,19 @@ public final class AppSettings {
 		if (path == null) {
 			return null;
 		}
-		return path.replace("{java.io.tmpdir}",
-				System.getProperty("java.io.tmpdir")).replace("{user.home}",
-				System.getProperty("user.home"));
+		return sub(path);
+	}
+
+	private String sub(String value) {
+		if (value == null) {
+			return null;
+		}
+		final Calendar cal = Calendar.getInstance();
+		return value.replace("{year}", "" + cal.get(Calendar.YEAR))
+					.replace("{month}", "" + cal.get(Calendar.MONTH))
+					.replace("{day}", "" + cal.get(Calendar.DAY_OF_MONTH))
+					.replace("{java.io.tmpdir}", System.getProperty("java.io.tmpdir"))
+					.replace("{user.home}", System.getProperty("user.home"));
 	}
 
 	/**
