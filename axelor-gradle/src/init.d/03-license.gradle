@@ -50,6 +50,8 @@ allprojects { p ->
 	afterEvaluate {
 		tasks.findAll { it.class.simpleName.startsWith 'License' }.each {
 
+			it.onlyIf { license.header && license.header.exists() }
+
 			def src = p.fileTree(dir: 'src', excludes: [
 				"**/data/**",
 				"**/data-init/**",
