@@ -23,19 +23,21 @@ import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.repo.MetaActionRepository;
 import com.axelor.meta.service.MetaModelService;
+import com.axelor.wkf.db.EndEvent;
 import com.axelor.wkf.db.Node;
+import com.axelor.wkf.db.NodeTask;
+import com.axelor.wkf.db.StartEvent;
 import com.axelor.wkf.db.Transition;
 import com.axelor.wkf.db.Workflow;
-import com.axelor.wkf.db.node.EndEvent;
-import com.axelor.wkf.db.node.NodeTask;
-import com.axelor.wkf.db.node.StartEvent;
+import com.axelor.wkf.db.repo.WorkflowRepository;
 
 public class CreateData {
 
 	public static Workflow createWorkflow() {
 
 		final MetaActionRepository actions = Beans.get(MetaActionRepository.class);
-		
+		final WorkflowRepository workflows = Beans.get(WorkflowRepository.class);
+
 		Transition startTransition = new Transition();
 		startTransition.setName("startTransition");
 		startTransition.setSequence(0);
@@ -131,6 +133,6 @@ public class CreateData {
 		workflow.setNode(start);
 		workflow.setMaxNodeCounter(1);
 		
-		return workflow.save();
+		return workflows.save(workflow);
 	}
 }

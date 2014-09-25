@@ -1,0 +1,91 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://apps.axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://apps.axelor.com/xml/ns/domain-models http://apps.axelor.com/xml/ns/domain-models/domain-models_3.0.xsd">
+
+  <module name="wkf" package="com.axelor.wkf.db" />
+
+  <entity name="Workflow" repository="abstract">
+    <string name="name" required="true" />
+    <boolean name="active" default="true" />
+    <many-to-one name="metaModel" ref="com.axelor.meta.db.MetaModel" required="true" />
+    <many-to-one name="condition" ref="com.axelor.meta.db.MetaAction" />
+    <many-to-one name="node" ref="Node" />
+    <integer name="maxNodeCounter" />
+    <integer name="sequence" />
+    <string name="description" large="true" />
+    <string name="bpmn" large="true" />
+    <string name="xmlData" large="true" />
+    <string name="ref" />
+  </entity>
+
+  <entity name="Instance">
+    <long name="metaModelId" />
+    <many-to-one name="workflow" ref="Workflow" />
+    <many-to-many name="nodes" ref="Node" />
+    <many-to-many name="executedTransitions" ref="Transition" />
+    <one-to-many name="histories" ref="InstanceHistory" mappedBy="instance" />
+    <many-to-many name="counters" ref="InstanceCounter" mappedBy="instance" />
+  </entity>
+
+  <entity name="InstanceCounter">
+    <many-to-one name="instance" ref="Instance" />
+    <many-to-one name="node" ref="Node" />
+    <integer name="counter" />
+    <finder-method name="findByInstanceAndNode" using="instance,node"/>
+  </entity>
+
+  <entity name="InstanceHistory">
+    <many-to-one name="instance" ref="Instance" />
+    <many-to-one name="transition" ref="Transition" />
+  </entity>
+
+  <entity name="Transition" repository="abstract">
+    <string name="name" />
+    <string name="signal" />
+    <string name="ref" />
+    <string name="description" large="true" />
+    <integer name="sequence" />
+
+    <many-to-one name="startNode" ref="Node" />
+    <many-to-one name="nextNode" ref="Node" required="true" />
+    <many-to-one name="condition" ref="com.axelor.meta.db.MetaAction" />
+    <many-to-one name="role" ref="com.axelor.auth.db.Role" />
+  </entity>
+
+  <entity name="Node" repository="none">
+    <string name="name" required="true" />
+    <string name="type" readonly="true" default="" selection="node.type.selection" />
+    <string name="ref" />
+    <string name="description" large="true" />
+    <many-to-one name="action" ref="com.axelor.meta.db.MetaAction" />
+    <one-to-many name="startTransitions" ref="Transition" mappedBy="nextNode" />
+    <one-to-many name="endTransitions" ref="Transition" mappedBy="startNode" />
+  </entity>
+
+  <entity name="StartEvent" extends="Node" repository="none" />
+  <entity name="EndEvent" extends="Node" repository="none" />
+  <entity name="NodeTask" extends="Node" repository="none" />
+
+  <entity name="MessageEvent" extends="Node" repository="none">
+    <string name="account" />
+    <string name="template" />
+    <string name="templateModel" />
+    <boolean name="persist" />
+  </entity>
+
+  <entity name="TimerEvent" extends="Node" repository="none">
+    <date name="timeDate" />
+    <time name="timeDuration" />
+    <time name="timeCycle" />
+  </entity>
+
+  <entity name="Gateway" extends="Node" repository="none">
+    <string name="operator" selection="node.logic.operator.selection"/>
+  </entity>
+
+  <entity name="ExclusiveGateway" extends="Gateway" repository="none"/>
+  <entity name="InclusiveGateway" extends="Gateway" repository="none"/>
+  <entity name="ParallelGateway" extends="Gateway" repository="none"/>
+
+</domain-models>

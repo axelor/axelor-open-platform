@@ -35,6 +35,9 @@ import com.axelor.wkf.db.Instance;
 import com.axelor.wkf.db.Node;
 import com.axelor.wkf.db.Transition;
 import com.axelor.wkf.db.Workflow;
+import com.axelor.wkf.db.repo.InstanceRepository;
+import com.axelor.wkf.db.repo.NodeRepository;
+import com.axelor.wkf.db.repo.WorkflowRepository;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
@@ -51,12 +54,16 @@ public class WorkflowService implements IWorkflow {
 
 	protected Instance instance;
 
-	@Inject
-	public WorkflowService ( ){
+	private WorkflowRepository workflows;
+	private InstanceRepository instances;
+	private NodeRepository nodes;
 
+	@Inject
+	public WorkflowService (WorkflowRepository workflows, InstanceRepository instances, NodeRepository nodes) {
+		this.workflows = workflows;
+		this.instances = instances;
 		this.context = Maps.newHashMap();
 		this.user = AuthUtils.getUser();
-
 	}
 
 // ACTION REQUEST
@@ -102,7 +109,9 @@ public class WorkflowService implements IWorkflow {
 	@Override
 	public Instance getInstance(String klass, long id){
 
-		Instance instance = Instance.filter("self.workflow.metaModel.fullName = ?1 AND self.metaModelId = ?2", klass, id).fetchOne();
+		Instance instance = instances.all()
+				.filter("self.workflow.metaModel.fullName = ?1 AND self.metaModelId = ?2", klass, id)
+				.fetchOne();
 
 		if (instance != null){ return instance; }
 		else {
@@ -112,20 +121,18 @@ public class WorkflowService implements IWorkflow {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Workflow getWorkflow( String klass ){
+		final List<Workflow> all = ( List<Workflow> ) workflows.all()
+				.filter("self.metaModel.fullName = ?1 AND self.active = true", klass).order("self.sequence")
+				.fetch();
 
-		List<Workflow> workflows = ( List<Workflow> ) Workflow.filter("self.metaModel.fullName = ?1 AND self.active = true", klass).order("self.sequence").fetch();
-
-		for (Workflow workflow : workflows){
-
-			if ( workflow.isRunnable(actionHandler) ){ return workflow; }
-
+		for (Workflow workflow : all){
+			if (workflows.isRunnable(workflow, actionHandler) ) {
+				return workflow;
+			}
 		}
-
 		return null;
-
 	}
 
 // RUN WKF
@@ -153,16 +160,12 @@ public class WorkflowService implements IWorkflow {
 	 * 		Set of running nodes.
 	 */
 	protected void playNodes(Set<Node> nodes){
-
 		log.debug("Play nodes" );
-
 		for (Node node : nodes){
-
 			log.debug("Play node ::: {}", node.getName() );
-			node.execute(actionHandler, user, instance, context);
+			this.nodes.execute(node, instance, user, actionHandler, context);
 			log.debug( "Context ::: {}", context );
 		}
-
 	}
 
 // HELPER
@@ -191,15 +194,12 @@ public class WorkflowService implements IWorkflow {
 
 		instance.addNode( wkf.getNode() );
 
-		return instance.save();
-
+		return instances.save(instance);
 	}
 
 	@Transactional
 	protected Instance persist(){
-
-		return instance.save();
-
+		return instances.save(instance);
 	}
 
 }
