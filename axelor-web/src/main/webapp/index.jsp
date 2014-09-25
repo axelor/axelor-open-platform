@@ -121,7 +121,7 @@ if (AppInfo.isMobile(request) && AppInfo.isWebKit(request)) {
                 <li><a href="{{app.help}}" target="_blank"><span x-translate>Help</span></a></li>
                 <li class="divider"></li>
                 <li><a href="#/about"><i>{{app.name}} - v{{app.version}}</i></a></li>
-                <li ng-show="app.sdk"><a href="http://axelor.com/" target="_blank"><i>Axelor Framework - v{{app.sdk}}</i></a></li>
+                <li ng-show="app.sdk"><a href="http://axelor.com/" target="_blank"><i>Axelor SDK - v{{app.sdk}}</i></a></li>
               </ul>
             </li>
             <li class="divider-vertical hidden-phone"></li>
