@@ -153,3 +153,25 @@ input {
 	width: 0 !important;
 	border: none !important;
 }
+
+
+/** responsive */
+
+header {
+	display: none;
+}
+
+#sidebar {
+	display: none;
+}
+
+#view-tabs {
+	left: 0;
+}
+
+#container,
+.view-content,
+.view-container .form-view > div:last-child,
+.navigation-tabs {
+	top: 0 !important;
+}
