@@ -43,7 +43,6 @@ ui.formInput('ImageLink', {
 		
 		scope.styles = [{
 			'width': width,
-			'height': height,
 			'max-width': '100%',
 			'max-height': '100%'
 		}, {
