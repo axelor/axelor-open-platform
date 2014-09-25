@@ -25,9 +25,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.axelor.db.JPA;
 import com.axelor.db.Model;
-import com.axelor.db.Query;
 import com.axelor.db.internal.EntityHelper;
 
 @Entity
@@ -81,9 +79,4 @@ public class Circle extends Model {
 	public String toString() {
 		return EntityHelper.toString(this);
 	}
-	
-	public static Query<Circle> all() {
-		return JPA.all(Circle.class);
-	}
-
 }

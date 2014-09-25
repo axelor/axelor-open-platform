@@ -18,6 +18,7 @@
 package com.axelor.auth;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
@@ -31,7 +32,6 @@ import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.UserRepository;
-import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.google.inject.persist.Transactional;
 
@@ -228,17 +228,18 @@ public class AuthTest extends JpaTest {
 	@Transactional
 	public void encryptTest() {
 		
+		EntityManager em = getEntityManager();
 		User user = users.all().filter("self.code = ?", "demo").fetchOne();
 
 		Assert.assertNotNull(user);
 
 		User current = AuthUtils.getUser();
 
-		Assert.assertTrue(JPA.em().contains(current));
+		Assert.assertTrue(em.contains(current));
 
-		JPA.clear();
+		em.clear();
 
-		Assert.assertFalse(JPA.em().contains(current));
+		Assert.assertFalse(em.contains(current));
 
 		User user2 = new User();
 		user2.setCode("demo2");

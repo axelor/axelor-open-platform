@@ -15,15 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.test.db;
+package com.axelor.test.db.repo;
 
-import com.axelor.db.JpaRepository;
+import com.axelor.test.db.Contact;
 
-public class ContactRepository extends JpaRepository<Contact> {
-
-	public ContactRepository() {
-		super(Contact.class);
-	}
+public class ContactRepositoryEx extends ContactRepository {
 
 	public Contact findByEmail(String email) {
 		return all().filter("self.email = ?", email).fetchOne();

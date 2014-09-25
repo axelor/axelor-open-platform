@@ -38,8 +38,8 @@ public class QueryTest extends JpaTest {
 
 	@Test
 	public void testCount() {
-		Assert.assertTrue(Circle.all().count() > 0);
-		Assert.assertTrue(Contact.all().count() > 0);
+		Assert.assertTrue(all(Circle.class).count() > 0);
+		Assert.assertTrue(all(Contact.class).count() > 0);
 	}
 
 	@Test
@@ -48,15 +48,15 @@ public class QueryTest extends JpaTest {
 		String filter = "self.firstName < ? AND self.lastName LIKE ?";
 		String expected = "SELECT self FROM Contact self WHERE self.firstName < ? AND self.lastName LIKE ?";
 
-		Query<Contact> q = Contact.all().filter(filter, "some", "thing");
+		Query<Contact> q = all(Contact.class).filter(filter, "some", "thing");
 
 		Assert.assertEquals(expected, q.toString());
 	}
 
 	@Test
 	public void testAdaptInt() {
-		Contact.all().filter("self.id = ?", 1).fetchOne();
-		Contact.all().filter("self.id IN (?, ?, ?)", 1, 2, 3).fetch();
+		all(Contact.class).filter("self.id = ?", 1).fetchOne();
+		all(Contact.class).filter("self.id IN (?, ?, ?)", 1, 2, 3).fetch();
 	}
 
 	@Test
@@ -70,7 +70,7 @@ public class QueryTest extends JpaTest {
 				+ "WHERE (_addresses_country.code = ?1 AND _title.code = ?2) OR self.firstName = ?3 "
 				+ "ORDER BY _addresses_country.name DESC";
 
-		Query<Contact> q = Contact.all().filter(filter, "FR", "MR", "John").order("-addresses[].country.name");
+		Query<Contact> q = all(Contact.class).filter(filter, "FR", "MR", "John").order("-addresses[].country.name");
 		Assert.assertEquals(expected, q.toString());
 
 		List<?> result = q.fetch();	
@@ -81,13 +81,13 @@ public class QueryTest extends JpaTest {
 	@Test
 	@Transactional
 	public void testBulkUpdate() {
-		Query<Contact> q = Contact.all().filter("self.title.code = ?1", "mr");
+		Query<Contact> q = all(Contact.class).filter("self.title.code = ?1", "mr");
 		for (Contact c : q.fetch()) {
 			Assert.assertNull(c.getLang());
 		}
 		// managed instances are not affected with mass update
 		// so clear the session to avoid unexpected results
-		JPA.clear();
+		getEntityManager().clear();
 		q.update("self.lang", "EN");
 		for (Contact c : q.fetch()) {
 			Assert.assertEquals("EN", c.getLang());
@@ -97,7 +97,7 @@ public class QueryTest extends JpaTest {
 	@Test
 	public void testJDBC() {
 
-		JPA.jdbcWork(new JPA.JDBCWork() {
+		jdbcTask(new JDBCTask() {
 
 			@Override
 			public void execute(Connection connection) throws SQLException {

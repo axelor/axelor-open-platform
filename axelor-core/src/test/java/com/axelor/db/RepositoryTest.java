@@ -33,8 +33,8 @@ import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.db.Contact;
-import com.axelor.test.db.ContactRepository;
-import com.axelor.test.db.ContactRepositoryEx;
+import com.axelor.test.db.repo.ContactRepository;
+import com.axelor.test.db.repo.ContactRepositoryEx;
 
 @GuiceModules(RepositoryTest.MyModule.class)
 public class RepositoryTest extends JpaTest {

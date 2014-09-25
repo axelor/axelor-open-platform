@@ -19,7 +19,6 @@ package com.axelor.test.db;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Access;
@@ -38,9 +37,7 @@ import javax.validation.constraints.NotNull;
 
 import org.joda.time.LocalDate;
 
-import com.axelor.db.JPA;
 import com.axelor.db.JpaModel;
-import com.axelor.db.Query;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.VirtualColumn;
 import com.axelor.db.annotations.Widget;
@@ -243,17 +240,5 @@ public class Contact extends JpaModel {
 	@Override
 	public String toString() {
 		return EntityHelper.toString(this);
-	}
-
-	public Contact find(Long id) {
-		return JPA.find(Contact.class, id);
-	}
-
-	public static Contact edit(Map<String, Object> values) {
-		return JPA.edit(Contact.class, values);
-	}
-
-	public static Query<Contact> all() {
-		return JPA.all(Contact.class);
 	}
 }

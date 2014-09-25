@@ -29,18 +29,19 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.axelor.db.JPA;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.FormView;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.test.db.Contact;
+import com.axelor.test.db.repo.ContactRepository;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.persist.Transactional;
 
 public class TestActions extends MetaTest {
 	
@@ -49,6 +50,9 @@ public class TestActions extends MetaTest {
 	@Inject
 	private Injector injector;
 	
+	@Inject
+	private ContactRepository contacts;
+
 	@Before
 	public void setUp() {
 		try {
@@ -61,22 +65,20 @@ public class TestActions extends MetaTest {
 		assertNotNull(views.getActions());
 		
 		MetaStore.resister(views);
-		
-		if (Contact.all().count() == 0) {
-			JPA.runInTransaction(new Runnable() {
-				
-				@Override
-				public void run() {
-					Contact c = new Contact();
-					c.setFirstName("John");
-					c.setLastName("Smith");
-					c.setEmail("john.smith@gmail.com");
-					JPA.save(c);
-				}
-			});
+		ensureContact();
+	}
+
+	@Transactional
+	void ensureContact() {
+		if (contacts.all().count() == 0) {
+			Contact c = new Contact();
+			c.setFirstName("John");
+			c.setLastName("Smith");
+			c.setEmail("john.smith@gmail.com");
+			contacts.save(c);
 		}
 	}
-	
+
 	private ActionHandler createHandler(String action, Map<String, Object> context) {
 		
 		ActionRequest request = new ActionRequest();

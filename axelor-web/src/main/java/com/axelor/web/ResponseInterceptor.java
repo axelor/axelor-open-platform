@@ -27,11 +27,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.AuthSecurityException;
-import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity.AccessType;
+import com.axelor.db.JpaSupport;
 import com.axelor.rpc.Response;
 
-public class ResponseInterceptor implements MethodInterceptor {
+public class ResponseInterceptor extends JpaSupport implements MethodInterceptor {
 	
 	private final Logger log = LoggerFactory.getLogger(ResponseInterceptor.class);
 	
@@ -52,7 +52,7 @@ public class ResponseInterceptor implements MethodInterceptor {
 		try {
 			response = (Response) invocation.proceed();
 		} catch (Exception e) {
-			EntityTransaction txn = JPA.em().getTransaction();
+			EntityTransaction txn = getEntityManager().getTransaction();
 			if (txn.isActive()) {
 				txn.rollback();
 			} else if (e instanceof PersistenceException) {

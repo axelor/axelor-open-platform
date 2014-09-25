@@ -17,15 +17,16 @@
  */
 package com.axelor.web.db;
 
+import com.axelor.db.JpaSupport;
 import com.google.inject.persist.Transactional;
 
-public class Repository {
+public class Repository extends JpaSupport {
 
 	@Transactional
 	public void load() {
 		
-		if (Title.all().count() > 0) return;
-		
+		if (all(Title.class).count() > 0) return;
+
 		Title[] titles = {
 			new Title("mr", "Mr."),
 			new Title("mrs", "Mrs."),
@@ -49,9 +50,9 @@ public class Repository {
 		
 		addresses[0].setContact(contacts[0]);
 		addresses[1].setContact(contacts[0]);
-		
-		for (Title e: titles) e.save();
-		for (Contact e : contacts) e.save();
-		for (Address e : addresses) e.save();
+
+		for (Contact c : contacts) {
+			getEntityManager().persist(c);
+		}
 	}
 }

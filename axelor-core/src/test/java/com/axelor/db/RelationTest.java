@@ -19,6 +19,7 @@ package com.axelor.db;
 
 import java.math.BigDecimal;
 
+import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 
 import org.junit.Assert;
@@ -29,21 +30,29 @@ import com.axelor.JpaTest;
 import com.axelor.test.db.Invoice;
 import com.axelor.test.db.Move;
 import com.axelor.test.db.MoveLine;
+import com.axelor.test.db.repo.InvoiceRepository;
+import com.axelor.test.db.repo.MoveRepository;
 import com.google.common.collect.Lists;
 import com.google.inject.persist.Transactional;
 
 public class RelationTest extends JpaTest {
 
+	@Inject
+	private InvoiceRepository invoices;
+
+	@Inject
+	private MoveRepository moves;
+
 	@Before
 	@Transactional
 	public void createInvoice() {
 		Invoice invoice = new Invoice();
-		invoice.save();
+		invoices.save(invoice);
 	}
 	
 	@Transactional
 	protected void testErrors() {
-		Invoice invoice = Invoice.all().fetchOne();
+		Invoice invoice = invoices.all().fetchOne();
 
 		Move move = new Move();
 		move.setMoveLines(Lists.<MoveLine>newArrayList());
@@ -60,7 +69,7 @@ public class RelationTest extends JpaTest {
 		invoice.setRejectMoveLine(line1);
 		invoice.setMove(move);
 		
-		invoice.save();
+		invoices.save(invoice);
 
 		Assert.assertSame(line1, invoice.getRejectMoveLine());
 		Assert.assertSame(line1, move.getMoveLines().get(0));
@@ -68,14 +77,14 @@ public class RelationTest extends JpaTest {
 		Assert.assertEquals(new BigDecimal("20"), line1.getCredit());
 		Assert.assertEquals(BigDecimal.ZERO, line1.getDebit());
 
-		move.save();
+		moves.save(move);
 	}
 	
 	@Transactional
 	protected void testRelations() {
-		Move move = Move.all().fetchOne();
-		MoveLine line = MoveLine.all().fetchOne();
-		Invoice invoice = Invoice.all().fetchOne();
+		Move move = all(Move.class).fetchOne();
+		MoveLine line = all(MoveLine.class).fetchOne();
+		Invoice invoice = all(Invoice.class).fetchOne();
 		
 		Assert.assertSame(move, line.getMove());
 		Assert.assertSame(move, invoice.getMove());
@@ -86,7 +95,7 @@ public class RelationTest extends JpaTest {
 	
 	@Transactional
 	protected void testRemoveCollection() {
-		Move move = Move.all().fetchOne();
+		Move move = all(Move.class).fetchOne();
 		
 		// the moveLines is exclusive o2m field, so clear would delete all
 		// the move lines but one of move line is referenced outside so the
@@ -96,13 +105,13 @@ public class RelationTest extends JpaTest {
 	
 	@Transactional
 	protected void testRemoveCollectionImproper() {
-		Move move = Move.all().fetchOne();
-		Invoice invoice = Invoice.all().fetchOne();
+		Move move = all(Move.class).fetchOne();
+		Invoice invoice = all(Invoice.class).fetchOne();
 		
 		// before trying to clear moveLines, we remove invoice itself that
 		// refers one of the move line but the invoice again is referenced
 		// in a move
-		invoice.remove();
+		invoices.remove(invoice);
 		
 		// invoice is removed but still referenced in move so on transaction
 		//completion entity manager will throw an exception
@@ -111,8 +120,8 @@ public class RelationTest extends JpaTest {
 
 	@Transactional
 	protected void testRemoveCollectionProper() {
-		Move move = Move.all().fetchOne();
-		Invoice invoice = Invoice.all().fetchOne();
+		Move move = all(Move.class).fetchOne();
+		Invoice invoice = all(Invoice.class).fetchOne();
 
 		// clear the reference
 		invoice.setRejectMoveLine(null);

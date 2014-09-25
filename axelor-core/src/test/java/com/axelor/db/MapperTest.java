@@ -26,19 +26,19 @@ import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.axelor.AbstractTest;
+import com.axelor.JpaTest;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.TypeCheck;
 
-public class MapperTest extends AbstractTest {
+public class MapperTest extends JpaTest {
 
 	private Mapper mapper = Mapper.of(Contact.class);
 
 	@Test
 	public void testGet() {
 	
-		Contact contact = Contact.all().fetchOne();
+		Contact contact = all(Contact.class).fetchOne();
 		
 		String firstName = contact.getFirstName();
 		String lastName = contact.getLastName();
@@ -52,7 +52,7 @@ public class MapperTest extends AbstractTest {
 	@Test
 	public void testSet() {
 	
-		Contact contact = Contact.all().fetchOne();
+		Contact contact = all(Contact.class).fetchOne();
 		
 		contact.setFirstName("Some");
 		contact.setLastName("Name");
