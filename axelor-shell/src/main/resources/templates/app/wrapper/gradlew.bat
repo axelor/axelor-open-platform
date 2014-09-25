@@ -22,7 +22,7 @@ if exist "%AXELOR_HOME%\bin\axelor.bat" goto initScriptCheck
 
 echo.
 echo Please set the AXELOR_HOME variable in your environment to match the
-echo location of your Axelor Platform installation."
+echo location of your Axelor SDK installation."
 echo.
 
 goto fail

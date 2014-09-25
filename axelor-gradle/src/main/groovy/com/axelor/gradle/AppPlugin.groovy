@@ -205,7 +205,7 @@ class AppPlugin extends AbstractPlugin {
 			}
 		}
 		project.eclipse.project {
-			linkedResource name: 'axelor-webapp', type: '2', location: '${WORKSPACE_LOC}/axelor-platform/axelor-web/src/main/webapp'
+			linkedResource name: 'axelor-webapp', type: '2', location: '${WORKSPACE_LOC}/axelor-sdk/axelor-web/src/main/webapp'
 		}
 	}
 

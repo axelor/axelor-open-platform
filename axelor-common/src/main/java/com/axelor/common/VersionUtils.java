@@ -74,7 +74,7 @@ public final class VersionUtils {
 	}
 
 	/**
-	 * Get the axelor platform version.
+	 * Get the Axelor SDK version.
 	 *
 	 * @return an instance of {@link Version}
 	 */
