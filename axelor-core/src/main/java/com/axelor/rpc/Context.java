@@ -28,7 +28,6 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -86,17 +85,22 @@ public class Context extends HashMap<String, Object> {
 		Object bean = value;
 
 		if (value instanceof Map) {
-			Map map = (Map) value;
-			Object id = map.get(FIELD_ID);
+			final Map map = (Map) value;
+			final Object id = map.get(FIELD_ID);
+
+			// non-owning side can't handle the relationship
+			boolean isOwner = p.getType() != PropertyType.ONE_TO_ONE || p.getMappedBy() == null;
+
 			// if new/updated then create map
-			if (map.containsKey(FIELD_VERSION) || id == null) {
+			if (isOwner && (map.containsKey(FIELD_VERSION) || id == null)) {
 				Context ctx =  create(map, p.getTarget());
 				bean = ctx.beanInstance;
-			} else {
+			} else if (id != null) {
 				bean = JPA.find((Class) p.getTarget(), Long.parseLong(id.toString()));
 			}
-			if (bean != null && map.containsKey(FIELD_SELECTED))
+			if (bean != null && map.containsKey(FIELD_SELECTED)) {
 				Mapper.of(p.getTarget()).set(bean, FIELD_SELECTED, map.get(FIELD_SELECTED));
+			}
 		}
 		if (bean instanceof Model) {
 			return bean;
@@ -142,10 +146,6 @@ public class Context extends HashMap<String, Object> {
 					items.add(createOrFind(p, item));
 				}
 				value = items;
-			}
-			// non-owning side can't handle the relationship
-			else if (p.getType() == PropertyType.ONE_TO_ONE && !Strings.isNullOrEmpty(p.getMappedBy())) {
-				continue;
 			}
 			else if (p.isReference()) {
 				value = createOrFind(p, value);
