@@ -87,18 +87,18 @@ public class NodeRepository extends JpaRepository<Node> {
 		logger.debug("Instance state ::: {}", instance.getNodes() );
 	}
 
-	@SuppressWarnings("all")
-	protected void updateContext(Map<Object, Object> context, Object data){
+	@SuppressWarnings("unchecked")
+	protected void updateContext(Map<String, Object> context, Object data){
 		if (data instanceof List) {
-			for (Object data2 : (List) data) {
+			for (Object data2 : (List<?>) data) {
 				updateContext(context, data2);
 			}
 		}
 		if (data instanceof Map) {
-			final Map data2 = (Map) data;
-			for (Object key : data2.keySet()) {
+			final Map<String, Object> data2 = (Map<String, Object>) data;
+			for (String key : data2.keySet()) {
 				if (context.get(key) instanceof Map) {
-					updateContext((Map) context.get(key), data2.get(key));
+					updateContext((Map<String, Object>) context.get(key), data2.get(key));
 				} else if (context.containsKey(key)) {
 					context.put(key, data2.get(key));
 				} else {
