@@ -20,15 +20,15 @@
 	
   <input file="[wkf.import]" root="definitions">
     
-    <bind node="process/task" type="com.axelor.wkf.db.node.Task" search="self.name = :name" update="true">
+    <bind node="process/task" type="com.axelor.wkf.db.NodeTask" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="@action" to="action" search="self.name = :action" />
     	<bind node="documentation" to="description" />
-    	<bind eval="'task'" to="type" />
+    	<bind eval="'nodeTask'" to="type" />
     </bind>
     
-    <bind node="process/intermediateCatchEvent[timerEventDefinition]" type="com.axelor.wkf.db.node.IntermediateTimerEvent" search="self.name = :name" update="true" >
+    <bind node="process/intermediateCatchEvent[timerEventDefinition]" type="com.axelor.wkf.db.TimerEvent" search="self.name = :name" update="true" >
     	
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
@@ -42,7 +42,7 @@
     	
     </bind>
     
-    <bind node="process/intermediateCatchEvent[messageEventDefinition]" type="com.axelor.wkf.db.node.message.IntermediateEmailEvent" search="self.name = :name" update="true" >
+    <bind node="process/intermediateCatchEvent[messageEventDefinition]" type="com.axelor.wkf.db.MessageEvent" search="self.name = :name" update="true" >
         
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
@@ -54,166 +54,24 @@
     	<bind node="messageEventDefinition/account/@name" to="account" />
     	
     	<bind eval="'message'" to="type" />
-    	<bind eval="'email'" to="messageType" />
     	
     </bind>
     
-    <bind node="process/intermediateCatchEvent[smsEventDefinition]" type="com.axelor.wkf.db.node.message.IntermediateSmsEvent" search="self.name = :name" update="true" >
-        
-    	<bind node="@name" to="name"/>
-    	<bind node="@id" to="ref" />
-    	<bind node="documentation" to="description" />
-    	
-    	<bind node="smsEventDefinition/@persist" to="persist" />
-    	<bind node="smsEventDefinition/template/@name" to="template" />
-    	<bind node="smsEventDefinition/templateRule/@name" to="templateModel" />
-    	<bind node="smsEventDefinition/account/@name" to="account" />
-    	
-    	<bind eval="'message'" to="type" />
-    	<bind eval="'sms'" to="messageType" />
-    	
-    </bind>
-    
-    <bind node="process/intermediateCatchEvent[phoneCallEventDefinition]" type="com.axelor.wkf.db.node.message.IntermediatePhoneCallEvent" search="self.name = :name" update="true" >
-    
-    	<bind node="@name" to="name"/>
-    	<bind node="@id" to="ref" />
-    	<bind node="documentation" to="description" />
-    	
-    	<bind node="phoneCallEventDefinition/@persist" to="persist" />
-    	<bind node="phoneCallEventDefinition/template/@name" to="template" />
-    	<bind node="phoneCallEventDefinition/templateRule/@name" to="templateModel" />
-    	<bind node="phoneCallEventDefinition/account/@name" to="account" />
-    	
-    	<bind eval="'message'" to="type" />
-    	<bind eval="'phoneCall'" to="messageType" />
-    	
-    </bind>
-    
-    <bind node="process/intermediateCatchEvent[internetSiteEventDefinition]" type="com.axelor.wkf.db.node.message.IntermediateInternetSiteEvent" search="self.name = :name" update="true" >
-        
-    	<bind node="@name" to="name"/>
-    	<bind node="@id" to="ref" />
-    	<bind node="documentation" to="description" />
-    	
-    	<bind node="internetSiteEventDefinition/@persist" to="persist" />
-    	<bind node="internetSiteEventDefinition/template/@name" to="template" />
-    	<bind node="internetSiteEventDefinition/templateRule/@name" to="templateModel" />
-    	<bind node="internetSiteEventDefinition/account/@name" to="account" />
-    	
-    	<bind eval="'message'" to="type" />
-    	<bind eval="'internetSite'" to="messageType" />
-    	
-    </bind>
-    
-    <bind node="process/intermediateCatchEvent[mailEventDefinition]" type="com.axelor.wkf.db.node.message.IntermediateMailEvent" search="self.name = :name" update="true" >
-        
-    	<bind node="@name" to="name"/>
-    	<bind node="@id" to="ref" />
-    	<bind node="documentation" to="description" />
-    	
-    	<bind node="mailEventDefinition/@persist" to="persist" />
-    	<bind node="mailEventDefinition/template/@name" to="template" />
-    	<bind node="mailEventDefinition/templateRule/@name" to="templateModel" />
-    	<bind node="mailEventDefinition/account/@name" to="account" />
-    	
-    	<bind eval="'message'" to="type" />
-    	<bind eval="'mail'" to="messageType" />
-    	
-    </bind>
-    
-    <bind node="process/socialNetworkEvent[facebookEventDefinition]" type="com.axelor.wkf.db.node.message.socialnetwork.IntermediateFacebookEvent" search="self.name = :name" update="true">
-        
-    	<bind node="@name" to="name"/>
-    	<bind node="@id" to="ref" />
-    	<bind node="documentation" to="description" />
-    	
-    	<bind node="facebookEventDefinition/@persist" to="persist" />
-    	<bind node="facebookEventDefinition/@privateMessage" to="privateMessage" />
-    	<bind node="facebookEventDefinition/@targetPage" to="targetPage" />
-    	<bind node="facebookEventDefinition/template/@name" to="template" />
-    	<bind node="facebookEventDefinition/templateRule/@name" to="templateModel" />
-    	<bind node="facebookEventDefinition/account/@name" to="account" />
-    	
-    	<bind eval="'message'" to="type" />
-    	<bind eval="'socialNetwork'" to="messageType" />
-    	<bind eval="'facebook'" to="socialNetwork" />
-    	
-    </bind>
-    
-    <bind node="process/socialNetworkEvent[twitterEventDefinition]" type="com.axelor.wkf.db.node.message.socialnetwork.IntermediateTwitterEvent" search="self.name = :name" update="true">
-        
-    	<bind node="@name" to="name"/>
-    	<bind node="@id" to="ref" />
-    	<bind node="documentation" to="description" />
-    	
-    	<bind node="twitterEventDefinition/@persist" to="persist" />
-    	<bind node="twitterEventDefinition/@privateMessage" to="privateMessage" />
-    	<bind node="twitterEventDefinition/template/@name" to="template" />
-    	<bind node="twitterEventDefinition/templateRule/@name" to="templateModel" />
-    	<bind node="twitterEventDefinition/account/@name" to="account" />
-    	
-    	<bind eval="'message'" to="type" />
-    	<bind eval="'socialNetwork'" to="messageType" />
-    	<bind eval="'twitter'" to="socialNetwork" />
-    	
-    </bind>
-    
-    <bind node="process/socialNetworkEvent[linkedinEventDefinition]" type="com.axelor.wkf.db.node.message.socialnetwork.IntermediateLinkedinEvent" search="self.name = :name" update="true">
-        
-    	<bind node="@name" to="name"/>
-    	<bind node="@id" to="ref" />
-    	<bind node="documentation" to="description" />
-    	
-    	<bind node="linkedinEventDefinition/@persist" to="persist" />
-    	<bind node="linkedinEventDefinition/@privateMessage" to="privateMessage" />
-    	<bind node="linkedinEventDefinition/template/@name" to="template" />
-    	<bind node="linkedinEventDefinition/templateRule/@name" to="templateModel" />
-    	<bind node="linkedinEventDefinition/account/@name" to="account" />
-    	
-    	<bind eval="'message'" to="type" />
-    	<bind eval="'socialNetwork'" to="messageType" />
-    	<bind eval="'linkedin'" to="socialNetwork" />
-    	
-    </bind>
-    
-    <bind node="process/intermediateCatchEvent[filterEventDefinition]" type="com.axelor.wkf.db.node.Filter" search="self.name = :name" update="true" >
-        
-    	<bind node="@name" to="name"/>
-    	<bind node="@id" to="ref" />
-    	<bind node="documentation" to="description" />
-    	
-    	<bind node="filterEventDefinition/filter/@name" to="filter" />
-    	
-    	<bind eval="'filter'" to="type" />
-    	
-    </bind>
-    
-    <bind node="process/intermediateCatchEvent[stopFilterEventDefinition]" type="com.axelor.wkf.db.node.StopFilter" search="self.name = :name" update="true" >
-        
-    	<bind node="@name" to="name"/>
-    	<bind node="@id" to="ref" />
-    	<bind node="documentation" to="description" />
-    	
-    	<bind eval="'stopFilter'" to="type" />
-    	
-    </bind>
-    
-    <bind node="process/endEvent" type="com.axelor.wkf.db.node.EndEvent" search="self.name = :name" update="true">
+    <bind node="process/endEvent" type="com.axelor.wkf.db.EndEvent" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="documentation" to="description" />
     	<bind eval="'endEvent'" to="type" />
     </bind>
     
-    <bind node="process/startEvent" type="com.axelor.wkf.db.node.StartEvent" search="self.name = :name" update="true">
+    <bind node="process/startEvent" type="com.axelor.wkf.db.StartEvent" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="documentation" to="description" />
     	<bind eval="'startEvent'" to="type" />
     </bind>
     
-    <bind node="process/inclusiveGateway" type="com.axelor.wkf.db.node.gateway.InclusiveGateway" search="self.name = :name" update="true">
+    <bind node="process/inclusiveGateway" type="com.axelor.wkf.db.InclusiveGateway" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="documentation" to="description" />
@@ -221,7 +79,7 @@
     	<bind eval="'inclusive'" to="operator" />
     </bind>
     
-    <bind node="process/exclusiveGateway" type="com.axelor.wkf.db.node.gateway.ExclusiveGateway" search="self.name = :name" update="true">
+    <bind node="process/exclusiveGateway" type="com.axelor.wkf.db.ExclusiveGateway" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="documentation" to="description" />
@@ -229,7 +87,7 @@
     	<bind eval="'exclusive'" to="operator" />
     </bind>
     
-    <bind node="process/parallelGateway" type="com.axelor.wkf.db.node.gateway.ParallelGateway" search="self.name = :name" update="true">
+    <bind node="process/parallelGateway" type="com.axelor.wkf.db.ParallelGateway" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="documentation" to="description" />
@@ -242,7 +100,7 @@
     	<bind node="@id" to="ref" />
     	<bind node="@sourceRef" to="startNode" search="self.ref = :startNode" />
     	<bind node="@targetRef" to="nextNode" search="self.ref = :nextNode" />
-    	<bind node="@sequence" to="sequence" />
+    	<bind node="@sequence" to="sequence" eval="sequence ? sequence : 0" />
     	<bind node="@condition" to="condition" search="self.name = :condition" />
     	<bind node="@signal" to="signal" />
     	<bind node="@role" to="role" search="self.name = :role" />
@@ -253,7 +111,7 @@
 		<bind node="@name" alias="name" />
 		<bind node="@model" alias="metaModel" />
     	<bind node="@id" to="ref" />
-    	<bind node="@sequence" to="sequence" />
+    	<bind node="@sequence" to="sequence" eval="sequence ? sequence : 0" />
     	<bind node="@condition" to="condition" search="self.name = :condition" />
     	<bind node="startEvent/@id" to="node" search="self.ref = :node" />
     	<bind node="documentation" to="description" />

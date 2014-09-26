@@ -20,7 +20,7 @@
 	
   <input file="[wkf.import]" root="definitions">
     
-    <bind node="process/task" type="com.axelor.wkf.db.node.NodeTask" search="self.name = :name" update="true">
+    <bind node="process/task" type="com.axelor.wkf.db.NodeTask" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="@action" to="action" search="self.name = :action" />
@@ -28,7 +28,7 @@
     	<bind eval="'nodeTask'" to="type" />
     </bind>
     
-    <bind node="process/intermediateCatchEvent[timerEventDefinition]" type="com.axelor.wkf.db.node.TimerEvent" search="self.name = :name" update="true" >
+    <bind node="process/intermediateCatchEvent[timerEventDefinition]" type="com.axelor.wkf.db.TimerEvent" search="self.name = :name" update="true" >
     	
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
@@ -42,7 +42,7 @@
     	
     </bind>
     
-    <bind node="process/intermediateCatchEvent[messageEventDefinition]" type="com.axelor.wkf.db.node.MessageEvent" search="self.name = :name" update="true" >
+    <bind node="process/intermediateCatchEvent[messageEventDefinition]" type="com.axelor.wkf.db.MessageEvent" search="self.name = :name" update="true" >
         
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
@@ -57,21 +57,21 @@
     	
     </bind>
     
-    <bind node="process/endEvent" type="com.axelor.wkf.db.node.EndEvent" search="self.name = :name" update="true">
+    <bind node="process/endEvent" type="com.axelor.wkf.db.EndEvent" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="documentation" to="description" />
     	<bind eval="'endEvent'" to="type" />
     </bind>
     
-    <bind node="process/startEvent" type="com.axelor.wkf.db.node.StartEvent" search="self.name = :name" update="true">
+    <bind node="process/startEvent" type="com.axelor.wkf.db.StartEvent" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="documentation" to="description" />
     	<bind eval="'startEvent'" to="type" />
     </bind>
     
-    <bind node="process/inclusiveGateway" type="com.axelor.wkf.db.node.gateway.InclusiveGateway" search="self.name = :name" update="true">
+    <bind node="process/inclusiveGateway" type="com.axelor.wkf.db.InclusiveGateway" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="documentation" to="description" />
@@ -79,7 +79,7 @@
     	<bind eval="'inclusive'" to="operator" />
     </bind>
     
-    <bind node="process/exclusiveGateway" type="com.axelor.wkf.db.node.gateway.ExclusiveGateway" search="self.name = :name" update="true">
+    <bind node="process/exclusiveGateway" type="com.axelor.wkf.db.ExclusiveGateway" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="documentation" to="description" />
@@ -87,7 +87,7 @@
     	<bind eval="'exclusive'" to="operator" />
     </bind>
     
-    <bind node="process/parallelGateway" type="com.axelor.wkf.db.node.gateway.ParallelGateway" search="self.name = :name" update="true">
+    <bind node="process/parallelGateway" type="com.axelor.wkf.db.ParallelGateway" search="self.name = :name" update="true">
     	<bind node="@name" to="name"/>
     	<bind node="@id" to="ref" />
     	<bind node="documentation" to="description" />
