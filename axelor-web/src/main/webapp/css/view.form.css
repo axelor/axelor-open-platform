@@ -827,6 +827,11 @@ table.field-details .help-text hr {
 	color: #f0f0f0;
 }
 
+.nav-select .nav-step > .dropdown-menu {
+	right: -16px;
+	margin-top: -2px;
+}
+
 .tag-select {
 	border: 1px solid #c1c1c1;
 	border-radius: 4px;
