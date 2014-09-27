@@ -786,8 +786,9 @@ img.prefix-icon {
 
 .about-page > .content {
 	padding: 0 18px;
+	padding-top: 8px;
 	max-width: 980px;
-	min-height: calc(100% - 42px);
+	min-height: calc(100% - 50px);
 	height: auto;
 	padding-bottom: 42px;
 }
