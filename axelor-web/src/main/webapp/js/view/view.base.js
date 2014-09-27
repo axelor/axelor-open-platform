@@ -581,7 +581,7 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 			var action = keys[e.which];
 			
 			if (action === "toggle-menu") {
-				$('[nav-menu-toggle]').splitter('toggle');
+				$('#offcanvas-toggle a').click();
 				return false;
 			}
 			

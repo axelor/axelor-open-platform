@@ -89,7 +89,6 @@ load([
 	'js/lib/dialogs.js',
 	'js/lib/tabs.js',
 	'js/lib/navtree.js',
-	'js/lib/splitter.js',
 
 	'js/axelor.auth.js',
 	'js/axelor.app.js',
@@ -102,7 +101,6 @@ load([
 	'js/widget/widget.navtabs.js',
 	'js/widget/widget.navtree.js',
 	'js/widget/widget.navmenu.js',
-	'js/widget/widget.splitter.js',
 	'js/widget/widget.slickgrid.js',
 	'js/widget/widget.dialog.js',
 	'js/widget/widget.update.js',
