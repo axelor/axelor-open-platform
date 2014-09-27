@@ -1,10 +1,11 @@
-<div class="about-page">
+<div class="about-page text-center">
 	<div class="container content">
+		<img src="img/axelor.png" width="200px">
 		<div class="page-header">
 			<h3>{{app.name}} - {{app.description}}</h3>
 		</div>
-		<div class="row">
-			<div class="span7">
+		<div class="row-fluid">
+			<div class="span12">
 				<p>
 					<strong>Version: {{app.version}}</strong>
 				</p>
@@ -13,7 +14,7 @@
 				<p>
 					<strong>Links</strong>
 				</p>
-				<ul>
+				<ul class="unstyled">
 					<li ng-if="app.help"><a ng-href="{{app.help}}">Documentation</a></li>
 					<li><a href="http://www.gnu.org/licenses/agpl.html">License</a></li>
 				</ul>
@@ -22,8 +23,8 @@
 		<div class="page-header">
 			<h3>Axelor SDK</h3>
 		</div>
-		<div class="row">
-			<div class="span7">
+		<div class="row-fluid">
+			<div class="span12">
 				<p>
 					<strong>Version: {{app.sdk}}</strong>
 				</p>
@@ -32,15 +33,15 @@
 				<p>
 					<strong>Links</strong>
 				</p>
-				<ul>
+				<ul class="unstyled">
 					<li><a href="http://wiki.axelor.fr">Documentation</a></li>
 					<li><a href="http://www.gnu.org/licenses/agpl.html">License</a></li>
 				</ul>
 			</div>
 		</div>
 		<br><br>
-		<div class="row">
-			<div class="span2">
+		<div class="row-fluid">
+			<div class="span12">
 				<a class="btn btn-default" href="#/" x-translate>Close</a>
 			</div>
 		</div>
