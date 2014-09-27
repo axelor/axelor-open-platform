@@ -446,6 +446,9 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 				 menuToggled = true;
 			     $("#offcanvas").toggleClass("active", active);
 			     $("#offcanvas").toggleClass("inactive", !active);
+			     if (!axelor.device.mobile) {
+			    	 axelor.$adjustSize();
+				 }
 			 });
 		 }
 
