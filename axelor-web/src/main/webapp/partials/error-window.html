@@ -1,19 +1,17 @@
-<div id="errorWindow" class="hide" title="Error">
-	<div class="modal-body">
-		<div class="errorMessage" ng-bind-html-unsafe="httpError.message"></div>
-		<div class="errorDetails" ng-show="httpError.show">
-			<ul class="nav nav-tabs">
-				<li ng-class="{active: httpError.show == 'stacktrace'}">
-					<a href="" ng-click="onErrorWindowShow('stacktrace')">Stacktrace</a>
-				</li>
-				<li ng-class="{active: httpError.show == 'cause'}">
-					<a href="" ng-click="onErrorWindowShow('cause')">Cause</a>
-				</li>
-			</ul>
-			<div class="tab-contents">
-				<div ng-show="httpError.show == 'stacktrace'"><pre ng-bind-html-unsafe="httpError.stacktrace"></pre></div>
-				<div ng-show="httpError.show == 'cause'"><pre ng-bind-html-unsafe="httpError.cause"></pre></div>
-			</div>
+<div id="errorWindow" class="hide ui-dialog-content" title="Error" ui-dialog-size>
+	<div class="errorMessage" ng-bind-html-unsafe="httpError.message"></div>
+	<div class="errorDetails" ng-show="httpError.show">
+		<ul class="nav nav-tabs">
+			<li ng-class="{active: httpError.show == 'stacktrace'}">
+				<a href="" ng-click="onErrorWindowShow('stacktrace')">Stacktrace</a>
+			</li>
+			<li ng-class="{active: httpError.show == 'cause'}">
+				<a href="" ng-click="onErrorWindowShow('cause')">Cause</a>
+			</li>
+		</ul>
+		<div class="tab-contents">
+			<div ng-show="httpError.show == 'stacktrace'"><pre ng-bind-html-unsafe="httpError.stacktrace"></pre></div>
+			<div ng-show="httpError.show == 'cause'"><pre ng-bind-html-unsafe="httpError.cause"></pre></div>
 		</div>
 	</div>
 </div>

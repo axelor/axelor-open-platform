@@ -297,3 +297,19 @@
 		position: relative;
 	}
 }
+
+#errorWindow .errorMessage,
+#errorWindow .errorDetails {
+	margin: 8px;
+}
+
+#errorWindow .errorDetails .nav-tabs,
+#errorWindow .errorDetails pre {
+	margin-bottom: 0;
+}
+
+#errorWindow .errorDetails .tab-contents {
+	padding: 4px;
+	border: 1px solid #d4d4d4;
+	border-top: none;
+}
