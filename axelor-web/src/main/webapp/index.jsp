@@ -112,7 +112,7 @@ if (AppInfo.isMobile(request) && AppInfo.isWebKit(request)) {
             <li>
             	<a href="#/"><i class="fa fa-home"></i></a>
             </li>
-            <li class="divider-vertical hidden-phone"></li>
+            <li class="divider-vertical"></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <i class="fa fa-user"></i> <span class="hidden-phone">{{app.user}}</span> <b class="caret"></b>
