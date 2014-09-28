@@ -31,7 +31,7 @@ $ sudo apt-get install postgresql
 Installation
 ------------
 
-[Download]((https://github.com/axelor/axelor-sdk/releases) the latest
+[Download](https://github.com/axelor/axelor-sdk/releases) the latest
 distribution package and extract the package somewhere and set following
 environment variables.
 
