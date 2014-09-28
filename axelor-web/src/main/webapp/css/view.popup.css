@@ -298,6 +298,23 @@
 	}
 }
 
+#loginWindow * {
+	box-sizing: border-box;
+}
+
+#loginWindow {
+	padding: 16px;
+}
+
+#loginWindow form {
+	margin-bottom: 0;
+}
+
+#loginWindow input {
+	width: 100%;
+	height: 33px;
+}
+
 #errorWindow .errorMessage,
 #errorWindow .errorDetails {
 	margin: 8px;
