@@ -473,8 +473,8 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 
 	return function (scope, element, attrs) {
 		
-		// use only with ui-dialog directive
-		if (attrs.uiDialog === undefined) {
+		// use only with dialogs
+		if (attrs.uiDialog === undefined && !element.hasClass('ui-dialog-content')) {
 			return;
 		}
 		

@@ -368,10 +368,13 @@
 				errorWindow = $('#errorWindow')
 				.attr('title', _t('Error'))
 				.dialog({
-					modal: true,
-					position: "center",
-					width: 480,
+					dialogClass: 'ui-dialog-responsive',
+					draggable: true,
 					resizable: false,
+					closeOnEscape: true,
+					modal: true,
+					zIndex: 1100,
+					width: 420,
 					close: function() {
 						$scope.httpError = {};
 						$scope.$apply();
@@ -381,7 +384,8 @@
 						'class': 'btn',
 						click: function(){
 							$scope.onErrorWindowShow('stacktrace');
-							$scope.$apply();
+							$scope.applyLater();
+							axelor.$adjustSize();
 						}
 					}, {
 						text: _t("Close"),
