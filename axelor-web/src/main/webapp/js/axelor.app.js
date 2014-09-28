@@ -338,13 +338,13 @@
 				loginWindow = $('#loginWindow')
 				.attr('title', _t('Login'))
 				.dialog({
+					dialogClass: 'no-close ui-dialog-responsive ui-dialog-small',
 					autoOpen: false,
 					modal: true,
 					position: "center",
 					width: "auto",
 					resizable: false,
 					closeOnEscape: false,
-					dialogClass: 'no-close',
 					zIndex: 100001,
 					buttons: [{
 						text: _t("Login"),
