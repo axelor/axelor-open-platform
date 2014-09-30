@@ -87,13 +87,12 @@ runs in a special shell from where you can issue various commands.
 What’s Next?
 ------------
 
-Follow the [Quickstart Guide](http://apps.axelor.com/docs/quickstart/) for more
+Follow the [Quickstart Guide](http://axelor.com/docs/sdk/quickstart/) for more
 detailed introduction.
 
 Links
 -----
 
 * [Axelor](http://axelor.com)
-* [Documentation](http://apps.axelor.com/docs)
-* [Online Demo](http://apps.axelor.com/axelor-demo)
+* [Documentation](http://axelor.com/docs/sdk)
 * [License](http://www.gnu.org/licenses/agpl.html)
