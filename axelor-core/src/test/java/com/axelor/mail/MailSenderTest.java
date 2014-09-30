@@ -48,7 +48,7 @@ public class MailSenderTest extends AbstractTest {
 		MailSender sender = new MailSender(account);
 
 		String file = ClassUtils.getResource("log4j.properties").getFile();
-		String url = "http://apps.axelor.com/axelor-demo/img/axelor-logo.png";
+		String url = "http://www.axelor.com/wp-content/uploads/2014/08/Logo-site.png";
 
 		String text = "Hello world...";
 
