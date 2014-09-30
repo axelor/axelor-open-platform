@@ -29,7 +29,7 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 @XStreamAlias("csv-inputs")
 public class CSVConfig {
 
-	public static final String NAMESPACE = "http://apps.axelor.com/xml/ns/data-import";
+	public static final String NAMESPACE = "http://axelor.com/xml/ns/data-import";
 
 	public static final String VERSION = "2.0";
 
