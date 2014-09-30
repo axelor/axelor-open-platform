@@ -54,7 +54,7 @@ import com.axelor.meta.schema.views.TreeView;
 @XmlRootElement(name = "object-views")
 public class ObjectViews {
 
-	public static final String NAMESPACE = "http://apps.axelor.com/xml/ns/object-views";
+	public static final String NAMESPACE = "http://axelor.com/xml/ns/object-views";
 
 	public static final String VERSION = VersionUtils.getVersion().feature;
 

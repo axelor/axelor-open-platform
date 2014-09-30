@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema targetNamespace="http://apps.axelor.com/xml/ns/domain-models"
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dm="http://apps.axelor.com/xml/ns/domain-models"
+<xsd:schema targetNamespace="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dm="http://axelor.com/xml/ns/domain-models"
   elementFormDefault="qualified" attributeFormDefault="unqualified" version="3.0">
 
   <xsd:element name="domain-models">
