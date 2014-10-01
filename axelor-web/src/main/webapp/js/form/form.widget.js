@@ -213,8 +213,8 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 			return;
 		}
 
-		scope.$on("on:record-change", function(e, rec) {
-			if (rec === scope.record) {
+		scope.$on("on:record-change", function(e, rec, force) {
+			if (rec === scope.record || force) {
 				handle(rec);
 			}
 		});
