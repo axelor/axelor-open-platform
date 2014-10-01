@@ -361,14 +361,22 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 			scope.fields = editor.fields || scope.fields;
 
 			var form = ui.formBuild(scope, schema, scope.fields);
+			var watchFor = "record";
 
 			if (/-to-one$/.test(field.type)) {
-				form.attr('x-model-prefix', 'record.' + field.name);
+				watchFor = 'record.' + field.name
+				form.attr('x-model-prefix', watchFor);
 			}
 
 			form = $compile(form)(scope);
 			form.children('div.row').removeClass('row').addClass('row-fluid');
 			element.append(form);
+
+			scope.$watch(watchFor, function(rec, old) {
+				if (rec !== old) {
+					scope.$broadcast("on:record-change", rec, true);
+				}
+			}, true);
 
 			scope.$watch('form.$valid', function (valid, old) {
 				if (scope.setValidity) {
