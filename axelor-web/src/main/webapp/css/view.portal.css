@@ -152,6 +152,15 @@
 .dashboard .dashlet {
 	border: 1px solid #d4d4d4;
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+	height: 300px;
+}
+
+.bar-layout .dashboard {
+	height: 300px;
+}
+
+.bar-layout .dashlet {
+	height: 100%;
 }
 
 .dashboard .dashlet-header {
@@ -172,11 +181,11 @@
 
 .dashboard .dashlet-body {
 	padding: 4px;
-	height: 270px;
+	height: calc(100% - 32px);
 }
 
 .dashboard .dashlet-body > * {
-	height: calc(100% - 1px);
+	height: calc(100% - 9px);
 }
 
 .dashboard .dashlet-body .slickgrid {
