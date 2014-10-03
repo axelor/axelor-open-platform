@@ -272,10 +272,14 @@ function BarLayout(items, attrs, $scope, $compile) {
 
 	items.each(function(item, i) {
 		var elem = $(this);
+		var prop = elem.scope().field || {};
 		if (elem.attr('x-sidebar')) {
 			elem.appendTo(side);
 		} else {
 			elem.appendTo(main);
+		}
+		if (prop.attached) {
+			elem.addClass("attached");
 		}
 	});
 
