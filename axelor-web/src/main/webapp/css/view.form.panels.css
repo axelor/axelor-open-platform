@@ -421,7 +421,7 @@
 	}
 }
 .panel-layout .order-subtotal dl {
-	width: 280px;
+	max-width: 280px;
 	float: right;
 }
 .panel-layout .order-subtotal dt,
@@ -432,6 +432,8 @@
 .panel-layout .order-subtotal dt {
 	padding-right: 8px;
 	font-weight: normal;
+	white-space: normal;
+	width: 55%;
 }
 .panel-layout .order-subtotal dd {
 	margin-left: 0;
