@@ -17,7 +17,7 @@ distributions may work but we have tested only with the Oracle JDK 1.7.
 
 ```bash
 $ export JAVA_HOME=/path/to/jdk
-$ export $PATH=$JAVA_HOME/bin:$PATH
+$ export PATH=$JAVA_HOME/bin:$PATH
 ```
 
 Install PostgreSQL from your linux distribution’s package repositories.
