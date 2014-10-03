@@ -303,7 +303,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		}
 		
 		scope.$on("on:record-change", function(e, rec) {
-			if (rec === scope.record) {
+			if (rec && rec === scope.record) {
 				handle(rec);
 			}
 		});
