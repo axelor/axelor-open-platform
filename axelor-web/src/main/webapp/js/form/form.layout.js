@@ -269,7 +269,6 @@ function BarLayout(items, attrs, $scope, $compile) {
 	
 	var main = $('<div class="span8">');
 	var side = $('<div class="span4">');
-	var attached = false;
 
 	items.each(function(item, i) {
 		var elem = $(this);
@@ -277,10 +276,6 @@ function BarLayout(items, attrs, $scope, $compile) {
 			elem.appendTo(side);
 		} else {
 			elem.appendTo(main);
-			if (elem.hasClass('panel-default') && attached) {
-				elem.addClass('attached');
-			}
-			attached = elem.hasClass('panel-default');
 		}
 	});
 
