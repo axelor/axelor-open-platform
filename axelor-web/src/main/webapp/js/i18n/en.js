@@ -118,7 +118,6 @@ _t.put({
 "My Filters": "My Filters",
 "Share": "Share",
 "Save as": "Save as",
-"Delete": "Delete",
 "Save filter as": "Save filter as",
 "({0} items)": "({0} items)",
 "and {0} more": "and {0} more",
