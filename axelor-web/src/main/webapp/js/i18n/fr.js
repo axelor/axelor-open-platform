@@ -138,7 +138,6 @@ _t.put({
 "My Filters": "Mes Filtres",
 "Share": "Partager",
 "Save as": "Save as",
-"Delete": "Supprimer",
 "Save filter as": "Sauver filtre comme",
 "({0} items)": "({0} éléments)",
 "and {0} more": "et {0} plus",
