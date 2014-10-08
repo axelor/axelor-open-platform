@@ -31,7 +31,6 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	var originalEdit = $scope.edit;
 	var originalShow = $scope.show;
 
-	var recordVersion = -1;
 	var canClose = false;
 	var isClosed = true;
 
@@ -43,22 +42,15 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		}
 		closeCallback = callback;
 		isClosed = false;
-		recordVersion = -1;
 		this.edit(record);
 	};
 
 	function doEdit(record) {
 		if (record && record.id > 0 && (!(record.version >= 0) || !record.$fetched)) {
 			$scope.doRead(record.id).success(function(record){
-				if (recordVersion === -1) {
-					recordVersion = record.version;
-				}
 				originalEdit(record);
 			});
 		} else {
-			if (recordVersion === -1 && record) {
-				recordVersion = record.version;
-			}
 			originalEdit(record);
 		}
 		canClose = false;
@@ -98,14 +90,6 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			doEdit(record);
 			$scope.setEditable(!$scope.$parent.$$readonly);
 		});
-	};
-
-	$scope.canOK = function() {
-		if (isClosed) return false;
-		if ($scope.isDirty()) return true;
-		var record = $scope.record || {};
-		var version = record.version;
-		return recordVersion !== version;
 	};
 
 	function onOK() {
@@ -574,19 +558,6 @@ angular.module('axelor.ui').directive('uiEditorPopup', function() {
 			element.scroll(function (e) {
 				$.event.trigger('adjustScroll');
 			});
-
-			var btnOK = null;
-			function buttonState(canSave) {
-				if (btnOK === null) {
-					btnOK = element.siblings('.ui-dialog-buttonpane').find('.button-ok');
-				}
-				if (canSave) {
-					return btnOK.show();
-				}
-				return btnOK.hide();
-			}
-
-			scope.$watch('canOK()', buttonState);
 		},
 		replace: true,
 		template:
