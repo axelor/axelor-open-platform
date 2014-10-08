@@ -803,6 +803,11 @@
             <xsd:documentation>Specify whether the stack panel items.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="attached" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to attach the panel with previous one.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="onTabSelect" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>

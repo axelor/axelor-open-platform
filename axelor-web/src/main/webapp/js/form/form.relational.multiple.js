@@ -170,7 +170,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	
 	$scope.canEdit = function () {
 		var field = $scope.field || {};
-		return field.canEdit !== false && $scope.canShowEdit();
+		return field.canEdit !== false && $scope.canView();
 	};
 	
 	var _canRemove = $scope.canRemove;

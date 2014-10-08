@@ -348,7 +348,7 @@ public class XMLImporter implements Importer {
 		try {
 			stream.fromXML(reader);
 			binder.finish();
-			if (txn.isActive() && !txn.getRollbackOnly() && started) {
+			if (txn.isActive() && started) {
 				txn.commit();
 				if (canClear) {
 					em.clear();
