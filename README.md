@@ -78,7 +78,7 @@ You can also execute shell commands directly like:
   axelor build
   axelor run -p 8000
 
-See detailed documentation at http://axelor.com/docs.
+See detailed documentation at http://axelor.com/docs/sdk.
 ```
 
 The command line utility can also be used in interactive mode where the utility
