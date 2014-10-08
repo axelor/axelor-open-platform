@@ -53,6 +53,7 @@ _t.put({
 "Login": "Login",
 "Login attempt failed.": "Login attempt failed.",
 "Month": "Month",
+"More": "More",
 "Navigation": "Navigation",
 "New": "New",
 "No": "No",

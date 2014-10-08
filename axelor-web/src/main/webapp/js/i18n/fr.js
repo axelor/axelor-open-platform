@@ -72,6 +72,7 @@ _t.put({
 "Login": "Se connecter",
 "Login attempt failed.": "La tentative de connexion a échoué.",
 "Month": "Mois",
+"More": "Plus",
 "Navigation": "Menu",
 "New": "Nouveau",
 "No": "Non",
