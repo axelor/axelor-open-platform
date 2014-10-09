@@ -62,7 +62,9 @@ public class I18nExtractor {
 	private static Logger log = LoggerFactory.getLogger(I18nExtractor.class);
 
 	private static final Pattern PATTERN_XML = Pattern.compile("/(domains|objects|views)/");
-	private static final Pattern PATTERN_I18N = Pattern.compile("((I18n.get\\s*\\()|(/\\*\\$\\$\\(\\*/))\\s*");
+	private static final Pattern PATTERN_I18N = Pattern.compile("((_t\\s*\\()|(I18n.get\\s*\\()|(/\\*\\$\\$\\(\\*/))\\s*");
+	private static final Pattern PATTERN_HTML = Pattern.compile("((\\{\\{(.*?)\\|\\s*t\\s*\\}\\})|(x-translate.*?\\>(.*?)\\<))");
+	private static final Pattern PATTERN_EXCLUDE = Pattern.compile("(\\.min\\.)|(main.webapp.lib)|(js.i18n)");
 
 	private static final Set<String> FIELD_NODES = Sets.newHashSet(
 			"string", "boolean", "integer", "long", "decimal", "date", "time", "datetime", "binary",
@@ -97,9 +99,13 @@ public class I18nExtractor {
 			String name = file.getFileName().toString();
 			try {
 				if (name.endsWith(".xml")) processXml(file);
+				if (name.endsWith(".html")) processHtml(file);
 				if (name.endsWith(".jsp")) processJava(file);
 				if (name.endsWith(".java")) processJava(file);
 				if (name.endsWith(".groovy")) processJava(file);
+
+				if (name.endsWith(".js") && !PATTERN_EXCLUDE.matcher(file.toString()).find()) processJava(file);
+
 			} catch (Exception e) {
 				log.error(e.getMessage());
 			}
@@ -110,11 +116,18 @@ public class I18nExtractor {
 		
 		private void processXml(final Path file) throws Exception {
 			
+			boolean isView = file.toString().indexOf("views") > -1;
+			if (isView) {
+				processHtml(file);
+			}
+
 			if (!PATTERN_XML.matcher(file.toString()).find()) {
 				return;
 			}
 			
-			log.debug("processing: {}", base.getParent().relativize(file));
+			if (!isView) {
+				log.debug("processing: {}", base.getParent().relativize(file));
+			}
 			
 			final SAXParserFactory factory = SAXParserFactory.newInstance();
 			final SAXParser parser = factory.newSAXParser();
@@ -186,10 +199,42 @@ public class I18nExtractor {
 			parser.parse(file.toFile(), handler);
 		}
 
+		private void processHtml(Path file) throws Exception {
+
+			String source = null;
+			try (Reader reader = new FileReader(file.toFile())) {
+				source = CharStreams.toString(reader);
+			} catch (IOException e) {
+				throw e;
+			}
+
+			log.debug("processing: {}", base.getParent().relativize(file));
+
+			Matcher matcher = PATTERN_HTML.matcher(source);
+			while (matcher.find()) {
+				int line = getLine(source, matcher.end());
+				String text = matcher.group(3);
+				if (text == null) {
+					text = matcher.group(5);
+				}
+				consumePlain(text, file, line);
+				matcher.region(matcher.end(), source.length());
+			}
+		}
+
+		private int consumePlain(String text, Path file, int line) {
+			String str = text.trim();
+			if (str.indexOf('\'') == 0 || str.indexOf('"') == 0) {
+				str = str.substring(1, str.length() - 1);
+			}
+			accept(new I18nItem(str, file, line));
+			return text.length();
+		}
+
 		private int consume(String source, Path file, int line) {
 			
 			char first = source.charAt(0);
-			if (first != '"') {
+			if (first != '"' && first != '\'') {
 				return 0;
 			}
 
@@ -203,11 +248,11 @@ public class I18nExtractor {
 				if (!isString && next == ')') {
 					break;
 				}
-				if (!isString && next == '"') {
+				if (!isString && next == first) {
 					isString = true;
 					continue;
 				}
-				if (next == '"') {
+				if (next == first) {
 					isString = source.charAt(i - 2) == '\\';
 				}
 				if (isString) {
