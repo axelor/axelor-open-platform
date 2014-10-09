@@ -245,6 +245,10 @@ var Formatters = {
 		return value ? moment(value).format('DD/MM/YYYY HH:mm') : "";
 	},
 	
+	"one-to-one": function(field, value) {
+		return value ? value[field.targetName] : "";
+	},
+
 	"many-to-one": function(field, value) {
 		return value ? value[field.targetName] : "";
 	},
