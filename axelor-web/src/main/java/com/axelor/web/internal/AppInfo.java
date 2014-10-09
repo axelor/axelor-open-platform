@@ -18,7 +18,6 @@
 package com.axelor.web.internal;
 
 import java.net.MalformedURLException;
-import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -29,10 +28,8 @@ import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
-import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public final class AppInfo {
@@ -43,10 +40,6 @@ public final class AppInfo {
 	private static final String APPLICATION_CSS = "css/application.css";
 	private static final String APPLICATION_CSS_MIN = "css/application.min.css";
 
-	private static final String APPLICATION_LANG_JS = "js/i18n/%s.js";
-	
-	private static final Locale DEFAULT_LOCALE = new Locale("en");
-	
 	private static final Pattern MOBILE_PATTERN = Pattern.compile("(Mobile|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone)", Pattern.CASE_INSENSITIVE);
 	private static final Pattern WEBKIT_PATTERN = Pattern.compile("WebKit", Pattern.CASE_INSENSITIVE);
 
@@ -107,43 +100,6 @@ public final class AppInfo {
 		return "{}";
 	}
 
-	private static String getUserLanguage() {
-		final User user = AuthUtils.getUser();
-		if (user == null) {
-			return null;
-		}
-		return user.getLanguage();
-	}
-
-	public static String getLangJS(HttpServletRequest request, ServletContext context){
-
-		Locale locale = null;
-		String language = getUserLanguage();
-		
-		if (!StringUtils.isBlank(language)) {
-			locale = toLocale(language);
-		}
-		if (locale == null) {
-			locale = request.getLocale();
-		}
-		if (locale == null) {
-			locale = toLocale(settings.get("application.locale", DEFAULT_LOCALE.getLanguage()));
-		}
-
-		for(String lang : Lists.newArrayList(toLanguage(locale, false), toLanguage(locale, true))) {
-			if (checkResources(context, "/js/i18n/" + lang + ".js")) {
-				language = lang;
-				break;
-			}
-		}
-		
-		if (language == null) {
-			language = DEFAULT_LOCALE.getLanguage();
-		}
-		
-		return String.format(APPLICATION_LANG_JS, language);
-	}
-
 	public static boolean isMobile(HttpServletRequest request) {
 		String agent = request.getHeader("user-agent");
 		if (agent == null) {
@@ -172,22 +128,6 @@ public final class AppInfo {
 			return APPLICATION_CSS_MIN;
 		}
 		return APPLICATION_CSS;
-	}
-
-	private static String toLanguage(Locale locale, boolean minimize) {
-		final String lang = locale.getLanguage().toLowerCase();
-		if (minimize || StringUtils.isBlank(locale.getCountry())) {
-			return lang;
-		}
-		return lang + "_" + locale.getCountry().toUpperCase();
-	}
-
-	private static Locale toLocale(String language) {
-	    final String parts[] = language.split("_", -1);
-	    if (parts.length == 1) {
-	    	return new Locale(parts[0].toLowerCase());
-	    }
-	    return new Locale(parts[0].toLowerCase(), parts[1].toUpperCase());
 	}
 
 	private static boolean checkResources(ServletContext context, String resourcesPath) {

@@ -40,7 +40,6 @@ if (appDesc != null)
 
 String appJS = AppInfo.getAppJS(getServletContext());
 String appCss = AppInfo.getAppCSS(getServletContext());
-String langJS = AppInfo.getLangJS(request, getServletContext());
 String webkitCss = null;
 
 if (AppInfo.isMobile(request) && AppInfo.isWebKit(request)) {
@@ -146,10 +145,7 @@ if (AppInfo.isMobile(request) && AppInfo.isWebKit(request)) {
 
   <!-- JavaScript at the bottom for fast page loading -->
   <script src="js/lib/i18n.js"></script>
-  <script src="js/i18n/en.js"></script>
-  <% if ( langJS != null) { %>
-  <script src="<%= langJS %>"></script>
-  <% } %>
+  <script src="ws/i18n/messages.js"></script>
   <script src="<%= appJS %>"></script>
   <!-- trigger adjustSize event on window resize -->  
   <script type="text/javascript">
