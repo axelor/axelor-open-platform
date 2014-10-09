@@ -668,11 +668,11 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 				var term = request.term;
 				if (term && canCreate) {
 					items.push({
-						label : _t('Create "{0}" and add...', '<b>' + term + '</b>'),
+						label : _t('Create "{0}" and add...', term),
 						click : function() { create(term); }
 					});
 					items.push({
-						label : _t('Create "{0}"...', '<b>' + term + '</b>'),
+						label : _t('Create "{0}"...', term),
 						click : function() { create(term, true); }
 					});
 				}
