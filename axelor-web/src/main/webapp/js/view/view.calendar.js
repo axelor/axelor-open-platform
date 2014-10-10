@@ -445,15 +445,15 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 
 			allDayText: _t('All Day'),
 
-			monthNames: (_t.calendar || {}).monthNames,
+			monthNames: ($.datepicker._defaults || {}).monthNames,
 
-			monthNamesShort: (_t.calendar || {}).monthNamesShort,
+			monthNamesShort: ($.datepicker._defaults || {}).monthNamesShort,
 
-			dayNames: (_t.calendar || {}).dayNames,
+			dayNames: ($.datepicker._defaults || {}).dayNames,
 
-			dayNamesShort: (_t.calendar || {}).dayNamesShort,
+			dayNamesShort: ($.datepicker._defaults || {}).dayNamesShort,
 
-			firstDay: (_t.calendar || {}).firstDay
+			firstDay: ($.datepicker._defaults || {}).firstDay
 		});
 		
 		var editor = null;
