@@ -146,7 +146,7 @@
 	padding: 0;
 	border-radius: 0;
 	box-sizing: border-box;
-	width: 100%;
+	width: 100% !important;
 	height: 100% !important;
 	min-width: inherit !important;
 	min-height: 23px;
