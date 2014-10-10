@@ -19,11 +19,60 @@
 
 var ui = angular.module('axelor.ui');
 
-// configure datepicker
-if (_t.calendar) {
-	$.timepicker.setDefaults(_t.calendar);
-	$.datepicker.setDefaults(_t.calendar);
-}
+var regional = {
+	monthNames: [
+		_t('January'),
+		_t('February'),
+		_t('March'),
+		_t('April'),
+		_t('May'),
+		_t('June'),
+		_t('July'),
+		_t('August'),
+		_t('September'),
+		_t('October'),
+		_t('November'),
+		_t('December')],
+
+	monthNamesShort: [
+		_t('Jan'),
+		_t('Feb'),
+		_t('Mar'),
+		_t('Apr'),
+		_t('May'),
+		_t('Jun'),
+		_t('Jul'),
+		_t('Aug'),
+		_t('Sep'),
+		_t('Oct'),
+		_t('Nov'),
+		_t('Dec')],
+
+	dayNames: [
+		_t('Sunday'),
+		_t('Monday'),
+		_t('Tuesday'),
+		_t('Wednesday'),
+		_t('Thursday'),
+		_t('Friday'),
+		_t('Saturday')],
+
+	dayNamesShort :	[_t('Sun'), _t('Mon'), _t('Tue'), _t('Wed'), _t('Thu'), _t('Fri'), _t('Sat')],
+ 	dayNamesMin :	[_t('Su'), _t('Mo'), _t('Tu'), _t('We'), _t('Th'), _t('Fr'), _t('Sa')],
+	weekHeader : 	_t('Wk'),
+	hourText : 		_t('Hour'),
+	minuteText : 	_t('Minute'),
+	secondText : 	_t('Second'),
+	currentText : 	_t('Now'),
+	closeText :		_t('Done'),
+	prevText : 		_t('Prev'),
+	nextText : 		_t('Next'),
+	firstDay: 		1,
+};
+
+//configure datepicker
+$.timepicker.setDefaults(regional);
+$.datepicker.setDefaults(regional);
 
 // configure ui.mask
 function createTwoDigitDefinition( maximum ) {
