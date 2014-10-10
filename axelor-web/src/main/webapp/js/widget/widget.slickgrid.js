@@ -1056,6 +1056,10 @@ Grid.prototype.hilite = function (row, field) {
 			pass = axelor.$eval(this.scope, condition, ctx);
 		} catch (e) {
 		}
+		if (!pass && field) {
+			styles = record.$styles || (record.$styles = {});
+			styles[field.name] = null;
+		}
 		if (!pass) {
 			continue;
 		}
