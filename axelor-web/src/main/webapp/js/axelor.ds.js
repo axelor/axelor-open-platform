@@ -270,7 +270,7 @@
 				data.view.perms = data.view.perms || data.perms;
 				self.process(data, data.view);
 				
-				if (data.perms && !data.perms.write) {
+				if (data.perms && data.perms.write === false) {
 					data.view.editable = false;
 				}
 
