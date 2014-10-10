@@ -477,6 +477,12 @@ ui.formInput('OneToMany', {
 
 			inst.showColumn('_edit_column', editIcon);
 
+			grid.onAddNewRow.subscribe(function (e, args) {
+				var items = scope.getValue() || [];
+				var rows = grid.getDataLength();
+				adjustSize(items, rows - items.length + 1);
+			});
+
 			if (!(scope._viewParams || {}).summaryView) {
 				return;
 			}
