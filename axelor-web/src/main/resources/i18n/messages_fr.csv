@@ -70,7 +70,7 @@ Field Name,Nom du champ,,webapp/js/form/form.input.static.js:188
 Field Type,Type de champ,,webapp/js/form/form.input.static.js:189
 Filter,Filtre,,webapp/js/form/form.input.static.js:196
 Fr,V,,webapp/js/form/form.input.datetime.js:61
-Fri,Fri,,webapp/js/form/form.input.datetime.js:60
+Fri,Ven,,webapp/js/form/form.input.datetime.js:60
 Friday,Vendredi,,webapp/js/form/form.input.datetime.js:57
 Go,Lancer,,"webapp/js/view/view.search.js:795
 webapp/js/view/view.search.js:599"
@@ -101,7 +101,7 @@ May,Mai,,"webapp/js/form/form.input.datetime.js:42
 webapp/js/form/form.input.datetime.js:28"
 Minute,Minute,,webapp/js/form/form.input.datetime.js:64
 Mo,L,,webapp/js/form/form.input.datetime.js:61
-Mon,Mon,,webapp/js/form/form.input.datetime.js:60
+Mon,Lun,,webapp/js/form/form.input.datetime.js:60
 Monday,Lundi,,webapp/js/form/form.input.datetime.js:53
 Month,Mois,,webapp/partials/views/calendar.html:6
 New,Nouveau,,"webapp/partials/views/form.html:7
@@ -139,7 +139,7 @@ webapp/partials/views/calendar.html:11
 webapp/partials/views/trail.html:10"
 Remember me,,,webapp/login.jsp:25
 Sa,S,,webapp/js/form/form.input.datetime.js:61
-Sat,Sat,,webapp/js/form/form.input.datetime.js:60
+Sat,Sam,,webapp/js/form/form.input.datetime.js:60
 Saturday,Samedi,,webapp/js/form/form.input.datetime.js:58
 Save,Enregistrer,,"webapp/partials/views/form.html:12
 webapp/partials/views/form.html:13
@@ -163,16 +163,16 @@ Sort Descending,Tri décroissant,,webapp/js/widget/widget.slickgrid.js:527
 Stacked,Empilé,,webapp/js/view/view.chart.js:39
 Su,D,,webapp/js/form/form.input.datetime.js:61
 Success,,,webapp/js/lib/dialogs.js:213
-Sun,Sun,,webapp/js/form/form.input.datetime.js:60
+Sun,Dim,,webapp/js/form/form.input.datetime.js:60
 Sunday,Dimanche,,webapp/js/form/form.input.datetime.js:52
 Th,J,,webapp/js/form/form.input.datetime.js:61
 The following fields are invalid:,,,webapp/js/view/view.form.js:1014
 The record has been updated or delete by another action.,L'enregistrement a été modifié ou supprimé par une autre action.,,webapp/js/view/view.form.js:418
-Thu,Thu,,webapp/js/form/form.input.datetime.js:60
+Thu,Jeu,,webapp/js/form/form.input.datetime.js:60
 Thursday,Jeudi,,webapp/js/form/form.input.datetime.js:56
 Today,Aujourd'hui,,webapp/partials/views/calendar.html:16
 Tu,M,,webapp/js/form/form.input.datetime.js:61
-Tue,Tue,,webapp/js/form/form.input.datetime.js:60
+Tue,Mar,,webapp/js/form/form.input.datetime.js:60
 Tuesday,Mardi,,webapp/js/form/form.input.datetime.js:54
 Ungroup,Dégrouper,,webapp/js/widget/widget.slickgrid.js:535
 Unknown,Inconnue,,"webapp/js/view/view.calendar.js:204
@@ -186,7 +186,7 @@ View,,,webapp/js/form/form.input.static.js:158
 Warning,Avertissement,,"webapp/js/lib/dialogs.js:34
 webapp/js/form/form.actions.js:491"
 We,M,,webapp/js/form/form.input.datetime.js:61
-Wed,Wed,,webapp/js/form/form.input.datetime.js:60
+Wed,Mer,,webapp/js/form/form.input.datetime.js:60
 Wednesday,Mercredi,,webapp/js/form/form.input.datetime.js:55
 Week,Semaine,,webapp/partials/views/calendar.html:7
 Wk,Sem.,,webapp/js/form/form.input.datetime.js:62
