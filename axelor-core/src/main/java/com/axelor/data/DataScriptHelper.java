@@ -31,6 +31,7 @@ import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.db.JpaScanner;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -79,10 +80,8 @@ public final class DataScriptHelper {
 
 				@Override
 				public Script load(String expr) throws Exception {
-					if (indy) {
-						return new GroovyShell(configIndy).parse(expr);
-					}
-					return new GroovyShell(config).parse(expr);
+					final CompilerConfiguration cfg = indy ? configIndy : config;
+					return new GroovyShell(JpaScanner.getClassLoader(), new Binding(), cfg).parse(expr);
 				}
 			});
 
