@@ -146,10 +146,14 @@
 	padding: 0;
 	border-radius: 0;
 	box-sizing: border-box;
-	width: 100% !important;
+	width: 100%;
 	height: 100% !important;
 	min-width: inherit !important;
 	min-height: 23px;
+}
+
+.slick-cell .picker-input {
+	width: 100% !important;
 }
 
 .slick-cell .ui-spinner {
