@@ -23,6 +23,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -329,7 +331,7 @@ public class ModuleManager {
 	public static List<String> findInstalled() {
 		final Resolver resolver = new Resolver();
 		final Set<String> installed = getInstalledModules();
-		final List<String> found = Lists.newArrayList();
+		final List<String> found = new ArrayList<>();
 
 		for (URL file : MetaScanner.findAll("module\\.properties")) {
 			if (!file.getFile().endsWith("/module.properties")) {
@@ -348,12 +350,18 @@ public class ModuleManager {
 				continue;
 			}
 
-			String[] deps = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
+			String[] depends = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
+			String[] installs = properties.getProperty("installs", "").trim().split("\\s*,\\s*");
 			boolean removable = "true".equals(properties.getProperty("removable"));
 
-			Module module = resolver.add(name, deps);
+			Module module = resolver.add(name, depends);
 			module.setRemovable(removable);
 			module.setPath(file);
+
+			// install forced modules on init
+			if (installed.isEmpty()) {
+				installed.addAll(Arrays.asList(installs));
+			}
 		}
 
 		for (Module module : resolver.all()) {
@@ -371,6 +379,10 @@ public class ModuleManager {
 
 	@Transactional
 	void resolve(boolean update) {
+
+		final Set<String> forceInstall = new HashSet<>();
+		final boolean forceInit = modules.all().count() == 0;
+
 		for (URL file : MetaScanner.findAll("module\\.properties")) {
 			if (!file.getFile().endsWith("/module.properties")) {
 				continue;
@@ -388,18 +400,23 @@ public class ModuleManager {
 				continue;
 			}
 
-			String[] deps = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
+			String[] depends = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
 			String title = properties.getProperty("title");
 			String description = properties.getProperty("description");
 			String version = properties.getProperty("version");
 			boolean removable = "true".equals(properties.getProperty("removable"));
 
-			Module module = resolver.add(name, deps);
+			if (forceInit && forceInstall.isEmpty()) {
+				String[] installs = properties.getProperty("installs", "").trim().split("\\s*,\\s*");
+				forceInstall.addAll(Arrays.asList(installs));
+			}
+
+			Module module = resolver.add(name, depends);
 			MetaModule stored = modules.findByName(name);
 			if (stored == null) {
 				stored = new MetaModule();
 				stored.setName(name);
-				stored.setDepends(Joiner.on(",").join(deps));
+				stored.setDepends(Joiner.on(",").join(depends));
 			}
 
 			if (stored.getId() == null || update) {
@@ -416,6 +433,18 @@ public class ModuleManager {
 			module.setInstalled(stored.getInstalled() == Boolean.TRUE);
 			module.setPending(stored.getPending() == Boolean.TRUE);
 			module.setInstalledVersion(stored.getModuleVersion());
+		}
+
+		for (String name : forceInstall) {
+			Module module = resolver.get(name);
+			MetaModule stored = modules.findByName(name);
+			if (module == null || stored == null) {
+				continue;
+			}
+			module.setPending(stored.getInstalled() != Boolean.TRUE);
+			stored.setPending(stored.getInstalled() != Boolean.TRUE);
+			module.setInstalled(true);
+			stored.setInstalled(true);
 		}
 	}
 
