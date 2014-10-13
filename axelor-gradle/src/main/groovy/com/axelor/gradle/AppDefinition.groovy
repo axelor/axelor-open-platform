@@ -17,13 +17,18 @@
  */
 package com.axelor.gradle
 
-import org.gradle.api.Project
 
 class AppDefinition extends AbstractDefinition {
 
 	String version
-    
+
+	List<String> installs = []
+
 	def version(String version) {
         this.version = version
     }
+
+	def install(String module) {
+		installs << module
+	}
 }
