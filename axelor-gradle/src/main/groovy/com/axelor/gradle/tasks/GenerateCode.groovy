@@ -126,10 +126,16 @@ class GenerateCode extends DefaultTask {
 			
 			def description = (definition.description?:"").trim().split("\n").collect { it.trim() };
 			def depends = findAllModules(project, null).collect { it.name }
+			def installs = null
 			def removable = false
 
 			try {
 				removable = definition.removable
+			} catch (Exception e) {
+			}
+
+			try {
+				installs = definition.installs
 			} catch (Exception e) {
 			}
 
@@ -139,18 +145,24 @@ version = ${project.version}
 
 title = ${definition.title?:""}
 description = ${description.join("\\n")}
-
 """
 			if (removable) {
 				out << """\
-removable = ${removable}
 
+removable = ${removable}
 """
 			}
 
 			out << """\
+
 depends = ${depends.join(", ")}
 """
+			if (installs) {
+				out << """\
+
+installs = ${installs.join(", ")}
+"""
+			}
 		}
 	}
 }

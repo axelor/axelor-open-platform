@@ -561,7 +561,7 @@ function Chart(scope, element, data) {
 			return;
 		}
 
-		chart.noData(_t('No Data Available.'));
+		chart.noData(_t('No records found.'));
 		var tickFormats = {
 			"date" : function (d) {
 				var f = config.xFormat;

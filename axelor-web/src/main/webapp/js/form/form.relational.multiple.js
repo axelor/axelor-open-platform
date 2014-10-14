@@ -477,6 +477,12 @@ ui.formInput('OneToMany', {
 
 			inst.showColumn('_edit_column', editIcon);
 
+			grid.onAddNewRow.subscribe(function (e, args) {
+				var items = scope.getValue() || [];
+				var rows = grid.getDataLength();
+				adjustSize(items, rows - items.length + 1);
+			});
+
 			if (!(scope._viewParams || {}).summaryView) {
 				return;
 			}
@@ -668,11 +674,11 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 				var term = request.term;
 				if (term && canCreate) {
 					items.push({
-						label : _t('Create "{0}" and add...', '<b>' + term + '</b>'),
+						label : _t('Create "{0}" and add...', term),
 						click : function() { create(term); }
 					});
 					items.push({
-						label : _t('Create "{0}"...', '<b>' + term + '</b>'),
+						label : _t('Create "{0}"...', term),
 						click : function() { create(term, true); }
 					});
 				}

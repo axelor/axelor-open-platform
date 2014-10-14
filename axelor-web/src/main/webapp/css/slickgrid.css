@@ -152,6 +152,10 @@
 	min-height: 23px;
 }
 
+.slick-cell .picker-input {
+	width: 100% !important;
+}
+
 .slick-cell .ui-spinner {
 	border: none;
 }

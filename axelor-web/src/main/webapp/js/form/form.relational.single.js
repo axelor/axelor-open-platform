@@ -273,11 +273,11 @@ ui.formInput('ManyToOne', 'Select', {
 				
 				if (field.create && term && scope.canNew()) {
 					items.push({
-						label : _t('Create "{0}" and select...', '<b>' + term + '</b>'),
+						label : _t('Create "{0}" and select...', term),
 						click : function() { create(term); }
 					});
 					items.push({
-						label : _t('Create "{0}"...', '<b>' + term + '</b>'),
+						label : _t('Create "{0}"...', term),
 						click : function() { create(term, true); }
 					});
 				}

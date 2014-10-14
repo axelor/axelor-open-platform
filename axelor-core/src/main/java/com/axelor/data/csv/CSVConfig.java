@@ -20,6 +20,7 @@ package com.axelor.data.csv;
 import java.io.File;
 import java.util.List;
 
+import com.axelor.common.VersionUtils;
 import com.axelor.data.adapter.DataAdapter;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
@@ -31,7 +32,7 @@ public class CSVConfig {
 
 	public static final String NAMESPACE = "http://axelor.com/xml/ns/data-import";
 
-	public static final String VERSION = "2.0";
+	public static final String VERSION = VersionUtils.getVersion().feature;
 
 	@XStreamImplicit(itemFieldName = "input")
 	private List<CSVInput> inputs = Lists.newArrayList();
