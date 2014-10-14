@@ -27,9 +27,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.codehaus.groovy.control.CompilerConfiguration;
+import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.db.JpaScanner;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -51,11 +53,17 @@ public final class DataScriptHelper {
 
 	private static final Logger log = LoggerFactory.getLogger(DataScriptHelper.class);
 
-	final static CompilerConfiguration config = new CompilerConfiguration();
+	private final static CompilerConfiguration config = new CompilerConfiguration();
+	private final static CompilerConfiguration configIndy = new CompilerConfiguration();
 
 	static {
-		config.getOptimizationOptions().put("indy", true);
-		config.getOptimizationOptions().put("int", false);
+		final ImportCustomizer importCustomizer = new ImportCustomizer();
+		importCustomizer.addImport("__repo__", "com.axelor.db.JpaRepository");
+
+		configIndy.getOptimizationOptions().put("indy", true);
+		configIndy.getOptimizationOptions().put("int", false);
+		configIndy.addCompilationCustomizers(importCustomizer);
+		config.addCompilationCustomizers(importCustomizer);
 	}
 
 	private boolean indy = true;
@@ -72,10 +80,8 @@ public final class DataScriptHelper {
 
 				@Override
 				public Script load(String expr) throws Exception {
-					if (indy) {
-						return new GroovyShell(config).parse(expr);
-					}
-					return new GroovyShell().parse(expr);
+					final CompilerConfiguration cfg = indy ? configIndy : config;
+					return new GroovyShell(JpaScanner.getClassLoader(), new Binding(), cfg).parse(expr);
 				}
 			});
 

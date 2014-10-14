@@ -1,6 +1,215 @@
 "key","message","comment","context"
+"({0} items)","","","webapp/js/widget/widget.slickgrid.js:1709"
+"Action","","","webapp/js/view/view.search.js:563
+webapp/js/form/form.input.static.js:149
+webapp/js/view/view.search.js:772"
+"Action Category","","","webapp/js/view/view.search.js:547
+webapp/js/view/view.search.js:756"
+"Action Sub-Category","","","webapp/js/view/view.search.js:764
+webapp/js/view/view.search.js:555"
+"Alert","","","webapp/js/lib/dialogs.js:206"
+"All Day","","","webapp/js/view/view.calendar.js:446"
+"Apr","Avril","","webapp/js/form/form.input.datetime.js:41"
+"April","Avril","","webapp/js/form/form.input.datetime.js:27"
+"Aug","Août","","webapp/js/form/form.input.datetime.js:45"
+"August","Août","","webapp/js/form/form.input.datetime.js:31"
+"Back","","","webapp/partials/views/form.html:18
+webapp/partials/views/form.html:19"
+"Cancel","","","webapp/partials/views/trail.html:7
+webapp/partials/views/form.html:15
+webapp/js/lib/dialogs.js:63
+webapp/partials/views/form.html:16"
+"Clear","","","webapp/js/view/view.search.js:582"
+"Close","","","webapp/partials/about.html:45
+webapp/js/widget/widget.dialog.js:32
+webapp/js/axelor.app.js:391
+webapp/partials/preferences.html:16
+webapp/partials/nav-tabs.html:21"
+"Close All","","","webapp/partials/nav-tabs.html:23"
+"Close Others","","","webapp/partials/nav-tabs.html:22"
+"Concurrent updates error.","","","webapp/js/axelor.app.js:444"
+"Create ""{0}"" and add...","","","webapp/js/form/form.relational.multiple.js:671"
+"Create ""{0}"" and select...","","","webapp/js/form/form.relational.single.js:276"
+"Create ""{0}""...","","","webapp/js/form/form.relational.single.js:280
+webapp/js/form/form.relational.multiple.js:675"
+"Create new","","","webapp/partials/views/trail.html:6"
+"Create...","","","webapp/js/form/form.relational.multiple.js:693
+webapp/js/form/form.relational.single.js:287"
+"Created By:","","","webapp/js/view/view.form.js:664"
+"Created On:","","","webapp/js/view/view.form.js:660"
+"Current changes will be lost.","","","webapp/js/axelor.nav.js:422"
+"Current changes will be lost. Do you really want to proceed?","","","webapp/js/view/view.form.js:514"
+"Day","","","webapp/partials/views/calendar.html:8"
+"Dec","Déc","","webapp/js/form/form.input.datetime.js:49"
+"December","Décembre","","webapp/js/form/form.input.datetime.js:35"
+"Delete","","","webapp/js/view/view.calendar.js:489
+webapp/partials/views/grid.html:16
+webapp/partials/views/grid.html:17
+webapp/js/view/view.form.js:689"
+"Do you really want to delete the selected record(s)?","","","webapp/js/view/view.popup.js:332
+webapp/js/form/form.relational.multiple.js:194
+webapp/js/view/view.grid.js:403"
+"Do you really want to delete the selected record?","","","webapp/js/view/view.form.js:530"
+"Do you really want to update all {0} records?","","","webapp/js/widget/widget.update.js:305"
+"Domain","","","webapp/js/form/form.input.static.js:155"
+"Done","Choisir","","webapp/js/form/form.input.datetime.js:67"
+"Duplicate","","","webapp/js/view/view.form.js:697"
+"Edit","","","webapp/partials/views/form.html:10
+webapp/partials/views/grid.html:10
+webapp/partials/views/form.html:9
+webapp/partials/views/grid.html:9"
+"Edit event","","","webapp/js/view/view.calendar.js:502"
+"Error","","","webapp/js/lib/dialogs.js:41
+webapp/js/axelor.app.js:369
+webapp/js/lib/dialogs.js:221"
+"Export in progress ...","","","webapp/js/view/view.grid.js:610"
+"Failed!","","","webapp/partials/login-window.html:11"
+"Feb","Févr","","webapp/js/form/form.input.datetime.js:39"
+"February","Février","","webapp/js/form/form.input.datetime.js:25"
+"Field Name","","","webapp/js/form/form.input.static.js:188"
+"Field Type","","","webapp/js/form/form.input.static.js:189"
+"Filter","","","webapp/js/form/form.input.static.js:196"
+"Fr","V","","webapp/js/form/form.input.datetime.js:61"
+"Fri","Fri","","webapp/js/form/form.input.datetime.js:60"
+"Friday","Vendredi","","webapp/js/form/form.input.datetime.js:57"
+"Go","","","webapp/js/view/view.search.js:795
+webapp/js/view/view.search.js:599"
+"Group by","","","webapp/js/widget/widget.slickgrid.js:532"
+"Grouped","","","webapp/js/view/view.chart.js:38"
+"Hide","","","webapp/js/widget/widget.slickgrid.js:540"
+"Hour","Heure","","webapp/js/form/form.input.datetime.js:63"
+"Information","","","webapp/js/lib/dialogs.js:28
+webapp/js/lib/dialogs.js:96
+webapp/js/lib/dialogs.js:198"
+"Internal Server Error","","","webapp/js/axelor.app.js:436"
+"Jan","Janv","","webapp/js/form/form.input.datetime.js:38"
+"January","","","webapp/js/form/form.input.datetime.js:24"
+"Jul","Juil","","webapp/js/form/form.input.datetime.js:44"
+"July","Juillet","","webapp/js/form/form.input.datetime.js:30"
+"Jun","Juin","","webapp/js/form/form.input.datetime.js:43"
+"June","Juin","","webapp/js/form/form.input.datetime.js:29"
+"Loading","","","webapp/js/axelor.app.js:58"
 "Log in","","","webapp/login.jsp:26"
-"Password","","","webapp/login.jsp:29"
+"Log...","","","webapp/js/view/view.form.js:706"
+"Login","","","webapp/js/axelor.app.js:350
+webapp/js/axelor.app.js:339"
+"Login attempt failed.","","","webapp/partials/login-window.html:11"
+"Mar","Mars","","webapp/js/form/form.input.datetime.js:40"
+"March","Mars","","webapp/js/form/form.input.datetime.js:26"
+"Mass Update","","","webapp/partials/views/grid.html:12"
+"May","Mai","","webapp/js/form/form.input.datetime.js:42
+webapp/js/form/form.input.datetime.js:28"
+"Minute","Minute","","webapp/js/form/form.input.datetime.js:64"
+"Mo","L","","webapp/js/form/form.input.datetime.js:61"
+"Mon","Mon","","webapp/js/form/form.input.datetime.js:60"
+"Monday","Lundi","","webapp/js/form/form.input.datetime.js:53"
+"Month","","","webapp/partials/views/calendar.html:6"
+"New","","","webapp/partials/views/form.html:7
+webapp/partials/views/grid.html:7
+webapp/partials/views/grid.html:6
+webapp/partials/views/form.html:6"
+"Next","Suivant","","webapp/js/form/form.input.datetime.js:69"
+"No","","","webapp/js/lib/dialogs.js:63"
+"No Data Available.","","","webapp/js/view/view.chart.js:564"
+"No records found.","","","webapp/js/widget/widget.slickgrid.js:657
+webapp/js/view/view.search.js:194"
+"Nov","Nov","","webapp/js/form/form.input.datetime.js:48"
+"November","Novembre","","webapp/js/form/form.input.datetime.js:34"
+"Now","Aujourd'hui","","webapp/js/form/form.input.datetime.js:66"
+"OK","","","webapp/js/widget/widget.dialog.js:42
+webapp/js/lib/dialogs.js:103
+webapp/js/lib/dialogs.js:62"
+"Object","","","webapp/js/form/form.input.static.js:152
+webapp/js/form/form.input.static.js:187
+webapp/js/view/view.search.js:353"
+"Oct","Oct","","webapp/js/form/form.input.datetime.js:47"
+"October","Octobre","","webapp/js/form/form.input.datetime.js:33"
+"Offline!","","","webapp/partials/login-window.html:14"
+"Orig. Value","","","webapp/js/form/form.input.static.js:230"
+"Password","","","webapp/partials/login-window.html:6
+webapp/login.jsp:29"
+"Please correct the invalid form values.","","","webapp/js/form/form.actions.js:281"
 "Please sign in","","","webapp/login.jsp:24"
+"Please wait...","","","webapp/js/axelor.app.js:202"
+"Prev","Précédent","","webapp/js/form/form.input.datetime.js:68"
+"Question","","","webapp/js/lib/dialogs.js:59"
+"Reference","","","webapp/js/form/form.input.static.js:200"
+"Refresh","","","webapp/js/view/view.form.js:684
+webapp/partials/views/calendar.html:11
+webapp/partials/views/trail.html:10"
 "Remember me","","","webapp/login.jsp:25"
+"Sa","S","","webapp/js/form/form.input.datetime.js:61"
+"Sat","Sat","","webapp/js/form/form.input.datetime.js:60"
+"Saturday","Samedi","","webapp/js/form/form.input.datetime.js:58"
+"Save","","","webapp/partials/views/form.html:12
+webapp/partials/views/form.html:13
+webapp/partials/views/grid.html:13
+webapp/partials/views/grid.html:14
+webapp/partials/preferences.html:15"
+"Search","","","webapp/js/view/view.search.js:576"
+"Search Objects","","","webapp/js/view/view.search.js:533"
+"Search...","","","webapp/js/form/form.relational.multiple.js:687
+webapp/js/form/form.relational.multiple.js:681
+webapp/js/form/form.relational.single.js:269"
+"Second","Seconde","","webapp/js/form/form.input.datetime.js:65"
+"Select","","","webapp/js/view/view.popup.js:619"
+"Sep","Sept","","webapp/js/form/form.input.datetime.js:46"
+"September","Septembre","","webapp/js/form/form.input.datetime.js:32"
+"Server is not responding.","","","webapp/partials/login-window.html:14"
+"Show","","","webapp/js/widget/widget.slickgrid.js:1086"
+"Show Details","","","webapp/js/axelor.app.js:383"
+"Sort Ascending","","","webapp/js/widget/widget.slickgrid.js:523"
+"Sort Descending","","","webapp/js/widget/widget.slickgrid.js:527"
+"Stacked","","","webapp/js/view/view.chart.js:39"
+"Su","D","","webapp/js/form/form.input.datetime.js:61"
+"Success","","","webapp/js/lib/dialogs.js:213"
+"Sun","Sun","","webapp/js/form/form.input.datetime.js:60"
+"Sunday","Dimanche","","webapp/js/form/form.input.datetime.js:52"
+"Th","J","","webapp/js/form/form.input.datetime.js:61"
+"The following fields are invalid:","","","webapp/js/view/view.form.js:1014"
+"The record has been updated or delete by another action.","","","webapp/js/view/view.form.js:418"
+"Thu","Thu","","webapp/js/form/form.input.datetime.js:60"
+"Thursday","Jeudi","","webapp/js/form/form.input.datetime.js:56"
+"Today","","","webapp/partials/views/calendar.html:16"
+"Tu","M","","webapp/js/form/form.input.datetime.js:61"
+"Tue","Tue","","webapp/js/form/form.input.datetime.js:60"
+"Tuesday","Mardi","","webapp/js/form/form.input.datetime.js:54"
+"Ungroup","","","webapp/js/widget/widget.slickgrid.js:535"
+"Unknown","","","webapp/js/view/view.calendar.js:204
+webapp/js/view/view.calendar.js:144"
+"Updated By:","","","webapp/js/view/view.form.js:672"
+"Updated On:","","","webapp/js/view/view.form.js:668"
+"User","","","webapp/partials/login-window.html:4"
 "User name","","","webapp/login.jsp:28"
+"Validation error","","","webapp/js/form/form.actions.js:282"
+"View","","","webapp/js/form/form.input.static.js:158"
+"Warning","","","webapp/js/lib/dialogs.js:34
+webapp/js/form/form.actions.js:491"
+"We","M","","webapp/js/form/form.input.datetime.js:61"
+"Wed","Wed","","webapp/js/form/form.input.datetime.js:60"
+"Wednesday","Mercredi","","webapp/js/form/form.input.datetime.js:55"
+"Week","","","webapp/partials/views/calendar.html:7"
+"Wk","Sem.","","webapp/js/form/form.input.datetime.js:62"
+"Would you like to reload the current record?","","","webapp/js/view/view.form.js:419"
+"Would you like to remove the filter?","","","webapp/js/widget/widget.search.js:691"
+"Yes","","","webapp/js/lib/dialogs.js:62"
+"You are not allow to upload a file bigger than","","","webapp/js/view/view.popup.js:371
+webapp/js/form/form.input.binary.js:168"
+"and {0} more","","","webapp/js/form/form.input.select.js:424"
+"contains","","","webapp/js/widget/widget.search.js:32"
+"doesn't contain","","","webapp/js/widget/widget.search.js:33"
+"equals","","","webapp/js/widget/widget.search.js:25"
+"greater or equal","","","webapp/js/widget/widget.search.js:27"
+"greater than","","","webapp/js/widget/widget.search.js:29"
+"in range","","","webapp/js/widget/widget.search.js:35"
+"is false","","","webapp/js/widget/widget.search.js:42"
+"is not null","","","webapp/js/widget/widget.search.js:39"
+"is null","","","webapp/js/widget/widget.search.js:38"
+"is true","","","webapp/js/widget/widget.search.js:41"
+"less or equal","","","webapp/js/widget/widget.search.js:28"
+"less than","","","webapp/js/widget/widget.search.js:30"
+"not equal","","","webapp/js/widget/widget.search.js:26"
+"not in range","","","webapp/js/widget/widget.search.js:36"
+"{0} of {1}","","","webapp/js/view/view.form.js:606"
+"{0} to {1} of {2}","","","webapp/js/view/view.grid.js:353
+webapp/js/view/view.tree.js:409"

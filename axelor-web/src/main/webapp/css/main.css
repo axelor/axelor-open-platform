@@ -227,7 +227,8 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 }
 
 .ui-menu,
-.ui-datepicker {
+.ui-datepicker,
+.dropdown-menu {
 	z-index: 9999999999 !important;
 }
 

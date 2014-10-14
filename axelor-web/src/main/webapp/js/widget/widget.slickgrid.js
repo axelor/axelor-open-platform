@@ -245,6 +245,10 @@ var Formatters = {
 		return value ? moment(value).format('DD/MM/YYYY HH:mm') : "";
 	},
 	
+	"one-to-one": function(field, value) {
+		return value ? value[field.targetName] : "";
+	},
+
 	"many-to-one": function(field, value) {
 		return value ? value[field.targetName] : "";
 	},
@@ -1052,6 +1056,10 @@ Grid.prototype.hilite = function (row, field) {
 			pass = axelor.$eval(this.scope, condition, ctx);
 		} catch (e) {
 		}
+		if (!pass && field) {
+			styles = record.$styles || (record.$styles = {});
+			styles[field.name] = null;
+		}
 		if (!pass) {
 			continue;
 		}
@@ -1460,17 +1468,19 @@ Grid.prototype.onAddNewRow = function(event, args) {
 };
 
 Grid.prototype.canAdd = function () {
-	var handler = this.handler || {},
-		truth = function () { return function () {return true;}};
-	return this.editable && (handler.canNew||truth())() && !(handler.isReadonly||truth())();
+	var handler = this.handler || {};
+	if (!this.editable) return false;
+	if (handler.canNew && !handler.canNew()) return false;
+	if (handler.isReadonly && handler.isReadonly()) return false;
+	return true;
 }
 
 Grid.prototype.setEditors = function(form, formScope, forEdit) {
 	var grid = this.grid,
 		data = this.scope.dataView,
 		element = this.element;
-	
-	forEdit = forEdit === undefined ? true : forEdit;
+
+	this.editable = forEdit = forEdit === undefined ? true : forEdit;
 
 	grid.setOptions({
 		editable: true,
@@ -1516,7 +1526,6 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 	this.editorForm = form;
 	this.editorScope = formScope;
 	this.editorForEdit = forEdit;
-	this.editable = forEdit;
 };
 
 Grid.prototype.onSelectionChanged = function(event, args) {
