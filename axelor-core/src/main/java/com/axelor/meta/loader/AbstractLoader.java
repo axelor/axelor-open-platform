@@ -35,11 +35,6 @@ abstract class AbstractLoader {
 	private final ThreadLocal<Set<String>> visited = new ThreadLocal<>();
 	private final ThreadLocal<Map<Class<?>, Multimap<String, Object>>> unresolved = new ThreadLocal<>();
 
-	protected final void clear() {
-		visited.remove();
-		unresolved.remove();
-	}
-
 	/**
 	 * Check whether the given name is already visited.
 	 * 
@@ -156,10 +151,6 @@ abstract class AbstractLoader {
 	}
 
 	public final void load(Module module, boolean update) {
-		try {
-			doLoad(module, update);
-		} finally {
-			clear();
-		}
+		doLoad(module, update);
 	}
 }
