@@ -193,7 +193,7 @@ public class ProjectCommands implements CommandProvider {
 			return new CommandResult(false);
 		}
 		
-		shell.info("OK, application created.\n\nEnojoy!\n");
+		shell.info("OK, application created.\n\nEnjoy!\n");
 		shell.setPrompt(target.toPath());
 
 		return new CommandResult(true, target);
@@ -242,8 +242,8 @@ public class ProjectCommands implements CommandProvider {
 			return new CommandResult(false);
 		}
 		
-		shell.info("OK, module created.\n\nEnojoy!\n");
 		
+		shell.info("OK, module created.\n\nEnjoy!\n");
 		return new CommandResult(true);
 	}
 }
