@@ -1,0 +1,60 @@
+<div class="about-page system-page" ng-controller="SystemCtrl">
+  <div class="container content">
+    <div class="page-header">
+      <h3 x-translate>System Information</h3>
+    </div>
+    <div class="row-fluid">
+      <div class="span12">
+        <dl class="dl-horizontal">
+          <dt x-translate>Operating System</dt>
+          <dd>{{info.osName}} {{info.osVersion}} [{{info.osArch}}]</dd>
+          <dt x-translate>Java Runtime</dt>
+          <dd>{{info.javaRuntime}}</dd>
+          <dt x-translate>Java Version</dt>
+          <dd>{{info.javaVersion}}</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="page-header">
+      <h3 x-translate>Memory Information</h3>
+    </div>
+    <div class="row-fluid">
+      <div class="span12">
+        <dl class="dl-horizontal">
+          <dt x-translate>Total Memory</dt>
+          <dd>{{info.memTotal}}</dd>
+          <dt x-translate>Max Memory</dt>
+          <dd>{{info.memMax}}</dd>
+          <dt x-translate>Used Memory</dt>
+          <dd>{{info.memUsed}}</dd>
+          <dt x-translate>Free Memory</dt>
+          <dd>{{info.memFree}}</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="page-header">
+      <h3 x-translate>Session Information</h3>
+    </div>
+    <div class="row-fluid">
+      <div class="span12">
+        <dl class="dl-horizontal">
+          <dt x-translate>Active Users</dt>
+          <dd>{{info.sessionCount}}</dd>
+        </dl>
+      </div>
+    </div>
+    <br>
+    <div class="row-fluid">
+      <div class="span12">
+        <a class="btn btn-default" href="" ng-click="onRefresh()" x-translate>Refresh</a>
+        <a class="btn btn-default" href="" ng-click="onClose()" x-translate>Close</a>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p class="credit">
+      Copyright (c) 2005-{{$year}} <a href="http://www.axelor.com">Axelor</a>.
+      All Rights Reserved.
+    </p>
+  </footer>
+</div>

@@ -17,12 +17,16 @@
  */
 package com.axelor.web;
 
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 import com.axelor.app.AppSettings;
+import com.google.common.collect.Sets;
 
 /**
  * The {@link AppSessionListener} configures the session timeout.
@@ -31,7 +35,9 @@ import com.axelor.app.AppSettings;
 @Singleton
 public final class AppSessionListener implements HttpSessionListener {
 
-	private int timeout;
+	private final int timeout;
+
+	private static final Set<String> sessions = Sets.newConcurrentHashSet();
 
 	/**
 	 * Create a new {@link AppSessionListener} with the given app settings.
@@ -46,11 +52,18 @@ public final class AppSessionListener implements HttpSessionListener {
 
 	@Override
 	public void sessionCreated(HttpSessionEvent event) {
-		event.getSession().setMaxInactiveInterval(timeout * 60);
+		final HttpSession session = event.getSession();
+		sessions.add(session.getId());
+		session.setMaxInactiveInterval(timeout * 60);
 	}
 
 	@Override
 	public void sessionDestroyed(HttpSessionEvent event) {
+		final HttpSession session = event.getSession();
+		sessions.remove(session.getId());
+	}
 
+	public static Set<String> getActiveSessions() {
+		return sessions;
 	}
 }

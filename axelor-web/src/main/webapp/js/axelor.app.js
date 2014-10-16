@@ -170,6 +170,7 @@
 		.when('/preferences', { action: 'preferences' })
 		.when('/welcome', { action: 'welcome' })
 		.when('/about', { action: 'about' })
+		.when('/system', { action: 'system' })
 		.when('/', { action: 'main' })
 
 		.when('/ds/:resource', tabResource)

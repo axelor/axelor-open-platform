@@ -807,3 +807,11 @@ img.prefix-icon {
 	padding: 4px;
 	text-align: center;
 }
+
+.about-page hr {
+	margin: 14px 0;
+}
+
+.system-page dt {
+	text-align: left;
+}

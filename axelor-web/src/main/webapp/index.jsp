@@ -139,6 +139,7 @@ if (AppInfo.isMobile(request) && AppInfo.isWebKit(request)) {
     <div class="fill-parent" ng-show="routePath[0] == 'main'" ng-include src="'partials/main.html'"></div>
     <% } %>
 	<div ng-switch-when="about" ng-include src="'partials/about.html'"></div>
+    <div ng-switch-when="system" ng-include src="'partials/system.html'"></div>
 	<div ng-switch-when="welcome" ng-include src="'partials/welcome.html'"></div>
 	<div ng-switch-when="preferences" ng-include src="'partials/preferences.html'"></div>
   </section>
