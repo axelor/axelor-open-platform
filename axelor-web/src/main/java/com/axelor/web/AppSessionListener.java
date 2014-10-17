@@ -17,6 +17,7 @@
  */
 package com.axelor.web;
 
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -25,8 +26,9 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
+import net.sf.ehcache.util.concurrent.ConcurrentHashMap;
+
 import com.axelor.app.AppSettings;
-import com.google.common.collect.Sets;
 
 /**
  * The {@link AppSessionListener} configures the session timeout.
@@ -37,7 +39,7 @@ public final class AppSessionListener implements HttpSessionListener {
 
 	private final int timeout;
 
-	private static final Set<String> sessions = Sets.newConcurrentHashSet();
+	private static final Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
 
 	/**
 	 * Create a new {@link AppSessionListener} with the given app settings.
@@ -53,7 +55,7 @@ public final class AppSessionListener implements HttpSessionListener {
 	@Override
 	public void sessionCreated(HttpSessionEvent event) {
 		final HttpSession session = event.getSession();
-		sessions.add(session.getId());
+		sessions.put(session.getId(), session);
 		session.setMaxInactiveInterval(timeout * 60);
 	}
 
@@ -64,6 +66,10 @@ public final class AppSessionListener implements HttpSessionListener {
 	}
 
 	public static Set<String> getActiveSessions() {
-		return sessions;
+		return sessions.keySet();
+	}
+
+	public static HttpSession getSession(String id) {
+		return sessions.get(id);
 	}
 }
