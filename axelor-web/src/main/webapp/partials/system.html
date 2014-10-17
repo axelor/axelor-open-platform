@@ -32,17 +32,29 @@
         </dl>
       </div>
     </div>
-    <div class="page-header">
-      <h3 x-translate>Session Information</h3>
+    <div class="page-header" ng-show="info.users">
+      <h3 x-translate>Active Users</h3>
     </div>
-    <div class="row-fluid">
+    <div class="row-fluid" ng-show="info.users">
       <div class="span12">
-        <dl class="dl-horizontal">
-          <dt x-translate>Active Sessions</dt>
-          <dd>{{info.sessionCount}}</dd>
-          <dt x-translate>Active Users</dt>
-          <dd>{{info.sessionUsers}}</dd>
-        </dl>
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th x-translate>User</th>
+              <th x-translate>Log in time</th>
+              <th x-translate>Last access time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="login in info.users">
+              <td>{{$index+1}}</td>
+              <td>{{login.user}}</td>
+              <td>{{login.loginTime}}</td>
+              <td>{{login.accessTime}}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     <br>

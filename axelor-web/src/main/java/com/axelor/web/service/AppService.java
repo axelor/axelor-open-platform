@@ -17,8 +17,14 @@
  */
 package com.axelor.web.service;
 
+import static java.lang.Boolean.TRUE;
 import static org.apache.shiro.subject.support.DefaultSubjectContext.AUTHENTICATED_SESSION_KEY;
+import static org.apache.shiro.subject.support.DefaultSubjectContext.PRINCIPALS_SESSION_KEY;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -32,6 +38,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.web.AppSessionListener;
 import com.axelor.web.internal.AppInfo;
 import com.google.inject.servlet.RequestScoped;
@@ -60,16 +68,27 @@ public class AppService extends AbstractService {
 		final Properties info = new Properties();
 		final Runtime runtime = Runtime.getRuntime();
 		final Set<String> sessions = AppSessionListener.getActiveSessions();
+		final User user = AuthUtils.getUser();
+		final List<Map<String,Object>> users = new ArrayList<>();
 
-		int users = 0;
 		int mb = 1024;
+
+		final boolean isTechnicalStaff = ("admin".equals(user.getCode()) ||
+				(user.getGroup() != null && user.getGroup().getTechnicalStaff() == TRUE));
 
 		for (String id : sessions) {
 			HttpSession session = AppSessionListener.getSession(id);
-			if (session == null || session.getAttribute(AUTHENTICATED_SESSION_KEY) != Boolean.TRUE) {
+			if (session == null ||
+				session.getAttribute(PRINCIPALS_SESSION_KEY) == null ||
+				session.getAttribute(AUTHENTICATED_SESSION_KEY) != TRUE) {
 				continue;
 			}
-			users += 1;
+			String login = session.getAttribute(PRINCIPALS_SESSION_KEY).toString();
+			Map<String, Object> map = new HashMap<>();
+			map.put("user", login);
+			map.put("loginTime", session.getCreationTime());
+			map.put("accessTime", session.getLastAccessedTime());
+			users.add(map);
 		}
 
 		info.setProperty("osName", System.getProperty("os.name"));
@@ -84,8 +103,9 @@ public class AppService extends AbstractService {
 		info.setProperty("memUsed", ((runtime.totalMemory() - runtime.freeMemory()) / mb) + " Kb");
 		info.setProperty("memFree", (runtime.freeMemory() / mb) + " Kb");
 
-		info.setProperty("sessionCount", "" + sessions.size());
-		info.setProperty("sessionUsers", "" + users);
+		if (isTechnicalStaff) {
+			info.put("users", users);
+		}
 
 		return info;
 	}

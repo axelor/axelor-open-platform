@@ -85,7 +85,12 @@ function SystemCtrl($scope, $element, $location, $http) {
 			return;
 		}
 		promise = $http.get("ws/app/sysinfo").then(function (res) {
-			$scope.info = res.data;
+			var info = res.data;
+			_.each(info.users, function (item) {
+				item.loginTime = moment(item.loginTime).format('L LT');
+				item.accessTime = moment(item.accessTime).format('L LT');
+			});
+			$scope.info = info;
 			promise = null;
 		});
 		return promise;
