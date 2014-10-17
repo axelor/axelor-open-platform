@@ -120,7 +120,7 @@ if (AppInfo.isMobile(request) && AppInfo.isWebKit(request)) {
                 <li><a href="#/preferences"><i class="fa fa-cog"></i> <span x-translate>Preferences</span></a></li>
 				<li><a href="#/about"><i class="fa fa-info-circle"></i> <span x-translate>About</span></a></li>
                 <li class="divider"></li>
-                <li><a href="logout"><i class="fa fa-power-off"></i> <span x-translate>Logout</span></a></li>
+                <li><a href="logout"><i class="fa fa-power-off"></i> <span x-translate>Log out</span></a></li>
               </ul>
             </li>
           </ul>
