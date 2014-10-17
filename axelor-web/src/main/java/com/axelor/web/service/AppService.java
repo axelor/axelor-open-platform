@@ -73,8 +73,8 @@ public class AppService extends AbstractService {
 
 		int mb = 1024;
 
-		final boolean isTechnicalStaff = ("admin".equals(user.getCode()) ||
-				(user.getGroup() != null && user.getGroup().getTechnicalStaff() == TRUE));
+		final boolean isTechnicalStaff = user.getGroup() != null
+				&& user.getGroup().getTechnicalStaff() == TRUE;
 
 		for (String id : sessions) {
 			HttpSession session = AppSessionListener.getSession(id);
