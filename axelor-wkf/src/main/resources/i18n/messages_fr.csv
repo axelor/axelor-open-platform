@@ -3,87 +3,87 @@
 "Account","Compte",,"resources/domains/Workflow.xml:71"
 "Action","Action",,"resources/domains/Workflow.xml:61"
 "Active","Active",,"resources/domains/Workflow.xml:10"
-"Activities","Activités",,"resources/views/Node.xml:88
-resources/views/Menu.xml:45
-resources/views/Menu.xml:47"
+"Activities","Activités",,"resources/views/Menu.xml:45
+resources/views/Menu.xml:47
+resources/views/Node.xml:88"
 "Activity","Activité",,"resources/views/Node.xml:93"
-"BPMN","BPMN",,"resources/views/Workflow.xml:36
-resources/domains/Workflow.xml:17"
+"BPMN","BPMN",,"resources/domains/Workflow.xml:17
+resources/views/Workflow.xml:36"
 "Condition","Condition",,"resources/domains/Workflow.xml:12
 resources/domains/Workflow.xml:52"
 "Configurations","Configurations",,"resources/views/Menu.xml:26"
 "Counter","Compteur",,"resources/domains/Workflow.xml:34
-resources/views/Instance.xml:58
-resources/views/Instance.xml:33"
+resources/views/Instance.xml:33
+resources/views/Instance.xml:58"
 "Counters","Compteurs",,"resources/domains/Workflow.xml:28
 resources/views/Instance.xml:53"
-"Description","Description",,"resources/views/Workflow.xml:66
-resources/views/Workflow.xml:33
-resources/domains/Workflow.xml:16
+"Description","Description",,"resources/domains/Workflow.xml:16
 resources/domains/Workflow.xml:47
 resources/domains/Workflow.xml:60
 resources/views/Workflow.xml:112
+resources/views/Workflow.xml:33
+resources/views/Workflow.xml:66
 resources/views/Workflow.xml:89"
 "Details","Détails",,"resources/views/Instance.xml:24"
 "Diagram","Diagramme",,"resources/views/Instance.xml:21"
 "Editor","Editeur",,"resources/views/Workflow.xml:18"
-"End event","Evénement de fin",,"resources/views/Node.xml:78
-resources/views/Node.xml:10"
-"End events","Evénements de fin",,"resources/views/Menu.xml:55
-resources/views/Node.xml:74
-resources/views/Menu.xml:53"
+"End event","Evénement de fin",,"resources/views/Node.xml:10
+resources/views/Node.xml:78"
+"End events","Evénements de fin",,"resources/views/Menu.xml:53
+resources/views/Menu.xml:55
+resources/views/Node.xml:74"
 "End transitions","Transitions de fin",,"resources/domains/Workflow.xml:63"
 "Exclusive gateway","Passerelle exclusive",,"resources/views/Node.xml:124"
-"Exclusive gateways","Passerelles exclusives",,"resources/views/Node.xml:120
-resources/views/Menu.xml:101
-resources/views/Menu.xml:99"
+"Exclusive gateways","Passerelles exclusives",,"resources/views/Menu.xml:101
+resources/views/Menu.xml:99
+resources/views/Node.xml:120"
 "Executed transitions","Transitions exclusives",,"resources/domains/Workflow.xml:26"
 "Gateway","Passerelle",,"resources/views/Node.xml:11"
 "Gateways","Passerelles",,"resources/views/Menu.xml:80"
-"Histories","Historiques",,"resources/views/Instance.xml:39
-resources/domains/Workflow.xml:27"
-"History","Historique",,"resources/views/Instance.xml:45
-resources/views/Instance.xml:28"
+"Histories","Historiques",,"resources/domains/Workflow.xml:27
+resources/views/Instance.xml:39"
+"History","Historique",,"resources/views/Instance.xml:28
+resources/views/Instance.xml:45"
 "Import","Import",,"resources/views/Workflow.xml:20"
 "Inclusive gateway","Passerelle inclusive",,"resources/views/Node.xml:109"
 "Inclusive gateways","Passerelles inclusives",,"resources/views/Menu.xml:83
-resources/views/Node.xml:105
-resources/views/Menu.xml:85"
+resources/views/Menu.xml:85
+resources/views/Node.xml:105"
 "Instance","Instance",,"resources/domains/Workflow.xml:32
-resources/views/Instance.xml:14
-resources/domains/Workflow.xml:39"
-"Instances","Instances",,"resources/views/Menu.xml:18
-resources/views/Workflow.xml:19
-resources/views/Instance.xml:5
-resources/views/Menu.xml:20"
+resources/domains/Workflow.xml:39
+resources/views/Instance.xml:14"
+"Instances","Instances",,"resources/views/Instance.xml:5
+resources/views/Menu.xml:18
+resources/views/Menu.xml:20
+resources/views/Workflow.xml:19"
 "Max node counter","Nombre de noeud max",,"resources/domains/Workflow.xml:14"
 "Message","Message",,"resources/views/Node.xml:12"
 "Message event","Evénement message",,"resources/views/Node.xml:179"
 "Message events","Evénéments messages",,"resources/views/Menu.xml:72
-resources/views/Node.xml:171
-resources/views/Menu.xml:74"
+resources/views/Menu.xml:74
+resources/views/Node.xml:171"
 "Meta model","Méta modèle",,"resources/views/Instance.xml:7"
 "Model","Modèle",,"resources/domains/Workflow.xml:11
 resources/views/Instance.xml:17"
 "Model Id","Id du model",,"resources/domains/Workflow.xml:23"
-"Name","Nom",,"resources/domains/Workflow.xml:57
-resources/domains/Workflow.xml:9
-resources/domains/Workflow.xml:44"
+"Name","Nom",,"resources/domains/Workflow.xml:44
+resources/domains/Workflow.xml:57
+resources/domains/Workflow.xml:9"
 "Next node","Prochain noeud",,"resources/domains/Workflow.xml:51"
-"Node","Noeud",,"resources/domains/Workflow.xml:33
-resources/views/Node.xml:31
-resources/domains/Workflow.xml:13"
+"Node","Noeud",,"resources/domains/Workflow.xml:13
+resources/domains/Workflow.xml:33
+resources/views/Node.xml:31"
 "Node Task","Activité",,"resources/views/Node.xml:9"
 "Nodes","Noeuds",,"resources/domains/Workflow.xml:25
 resources/views/Node.xml:25"
 "OR","OU",,"resources/views/Node.xml:19"
 "Operator","Opérateur",,"resources/domains/Workflow.xml:84"
 "Other events","Autres événements",,"resources/views/Menu.xml:61"
-"Overview","Général",,"resources/views/Workflow.xml:104
-resources/views/Instance.xml:15
+"Overview","Général",,"resources/views/Instance.xml:15
+resources/views/Workflow.xml:104
 resources/views/Workflow.xml:22
-resources/views/Workflow.xml:81
-resources/views/Workflow.xml:57"
+resources/views/Workflow.xml:57
+resources/views/Workflow.xml:81"
 "Parallel gateway","Passerelle parallèle",,"resources/views/Node.xml:139"
 "Parallel gateways","Passerelles parallèles",,"resources/views/Menu.xml:91
 resources/views/Menu.xml:93
@@ -100,8 +100,8 @@ resources/domains/Workflow.xml:48"
 "Start event","Evénement de départ",,"resources/views/Node.xml:64
 resources/views/Node.xml:8"
 "Start events","Evénements de départ",,"resources/views/Menu.xml:29
-resources/views/Node.xml:60
-resources/views/Menu.xml:31"
+resources/views/Menu.xml:31
+resources/views/Node.xml:60"
 "Start node","Noeud de départ",,"resources/domains/Workflow.xml:50"
 "Start transitions","Transitions de départ",,"resources/domains/Workflow.xml:62"
 "Template","Template",,"resources/domains/Workflow.xml:72"
@@ -114,22 +114,22 @@ resources/views/Menu.xml:31"
 "Timer events","Evénements minuteurs",,"resources/views/Menu.xml:64
 resources/views/Menu.xml:66
 resources/views/Node.xml:150"
-"Transition","Transition",,"resources/views/Workflow.xml:80
+"Transition","Transition",,"resources/domains/Workflow.xml:40
 resources/views/Workflow.xml:103
-resources/domains/Workflow.xml:40
-resources/views/Workflow.xml:56"
-"Transitions","Transitions",,"resources/views/Workflow.xml:46
-resources/views/Menu.xml:37
-resources/views/Workflow.xml:94
+resources/views/Workflow.xml:56
+resources/views/Workflow.xml:80"
+"Transitions","Transitions",,"resources/views/Menu.xml:37
+resources/views/Menu.xml:39
+resources/views/Workflow.xml:46
 resources/views/Workflow.xml:71
-resources/views/Menu.xml:39"
+resources/views/Workflow.xml:94"
 "Type","Type",,"resources/domains/Workflow.xml:58"
 "Wkf Management","Gestion des processus",,"resources/views/Menu.xml:6"
 "Workflow","Processus",,"resources/domains/Workflow.xml:24
 resources/views/Workflow.xml:16"
-"Workflows","Processus",,"resources/views/Workflow.xml:8
-resources/views/Menu.xml:11
-resources/views/Menu.xml:9"
+"Workflows","Processus",,"resources/views/Menu.xml:11
+resources/views/Menu.xml:9
+resources/views/Workflow.xml:8"
 "XML","XML",,"resources/domains/Workflow.xml:18
 resources/views/Workflow.xml:39"
 "XOR","OU (Exclusif)",,"resources/views/Node.xml:20"
