@@ -335,7 +335,9 @@ public class I18nExtractor {
 		Collections.sort(keys);
 
 		for (String key : keys) {
-			String context = Joiner.on('\n').join(items.get(key)).trim();
+			List<String> locations = new ArrayList<>(items.get(key));
+			Collections.sort(locations);
+			String context = Joiner.on('\n').join(locations).trim();
 			String[] line = { key, "", "", context };
 			values.add(line);
 		}
@@ -428,6 +430,8 @@ public class I18nExtractor {
 		try (CSVWriter csv = new CSVWriter(writer)) {
 			csv.writeNext(CSV_HEADER);
 			for (String[] line : values) {
+				line[1] = StringUtils.isBlank(line[1]) ? null : line[1];
+				line[2] = StringUtils.isBlank(line[2]) ? null : line[2];
 				csv.writeNext(line);
 			}
 		} catch (IOException e) {
