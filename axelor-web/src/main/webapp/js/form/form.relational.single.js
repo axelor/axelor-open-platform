@@ -537,11 +537,12 @@ ui.formInput('RefSelect', {
 			return ViewService.compile(elem)($scope);
 		};
 
-		$scope.createElement = function(name, selectionList, related) {
+		$scope.createElement = function(id, name, selectionList, related) {
 
 			var elemGroup = $('<div ui-group ui-table-layout cols="2" x-widths="150,*"></div>');
 			var elemSelect = $('<input ui-select showTitle="false">')
 				.attr("name", name)
+				.attr("x-for-widget", id)
 				.attr("ng-model", "record." + name);
 
 			var elemSelects = $('<div ui-group></div>');
@@ -581,7 +582,7 @@ ui.formInput('RefSelect', {
 			}
 		};
 		
-		var elem = scope.createElement(name, selectionList, related);
+		var elem = scope.createElement(element.attr('id'), name, selectionList, related);
 		setTimeout(function() {
 			element.append(elem);
 		});
