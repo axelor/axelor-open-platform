@@ -337,7 +337,7 @@
 			
 			if (loginWindow == null) {
 				loginWindow = $('#loginWindow')
-				.attr('title', _t('Login'))
+				.attr('title', _t('Log in'))
 				.dialog({
 					dialogClass: 'no-close ui-dialog-responsive ui-dialog-small',
 					autoOpen: false,
@@ -348,7 +348,7 @@
 					closeOnEscape: false,
 					zIndex: 100001,
 					buttons: [{
-						text: _t("Login"),
+						text: _t("Log in"),
 						'class': 'btn btn-primary',
 						click: function(){
 							$scope.doLogin();
