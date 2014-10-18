@@ -100,6 +100,7 @@ public class I18nExtractor {
 			try {
 				if (name.endsWith(".xml")) processXml(file);
 				if (name.endsWith(".html")) processHtml(file);
+				if (name.endsWith(".jsp")) processHtml(file);
 				if (name.endsWith(".jsp")) processJava(file);
 				if (name.endsWith(".java")) processJava(file);
 				if (name.endsWith(".groovy")) processJava(file);
