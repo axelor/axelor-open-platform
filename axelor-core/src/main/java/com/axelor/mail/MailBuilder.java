@@ -17,6 +17,8 @@
  */
 package com.axelor.mail;
 
+import static com.axelor.common.StringUtils.isBlank;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -166,8 +168,8 @@ public final class MailBuilder {
 
 		message.setReplyTo(InternetAddress.parse(Joiner.on(",").join(replyRecipients)));
 		
-		if (!"".equals(from)) message.setFrom(new InternetAddress(from));
-		if (!"".equals(sender)) message.setSender(new InternetAddress(sender));
+		if (!isBlank(from)) message.setFrom(new InternetAddress(from));
+		if (!isBlank(sender)) message.setSender(new InternetAddress(sender));
 		
 		for (String name : headers.keySet()) {
 			message.setHeader(name, headers.get(name));
