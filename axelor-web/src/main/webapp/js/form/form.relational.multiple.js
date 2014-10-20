@@ -444,6 +444,18 @@ ui.formInput('OneToMany', {
 			});
 		}
 
+		function deleteItemsById(id) {
+			var items = scope.dataView.getItems() || [];
+			while (items.length > 0) {
+				var item = _.findWhere(items, {id: id});
+				var index = _.indexOf(items, item);
+				if (index === -1) {
+					break;
+				}
+				items.splice(index, 1);
+			}
+		}
+
 		scope.onGridInit = function(grid, inst) {
 			var editIcon = scope.canView() || (!scope.isReadonly() && scope.canEdit());
 			var editable = grid.getOptions().editable;
@@ -453,9 +465,7 @@ ui.formInput('OneToMany', {
 			if (editable) {
 				element.addClass('inline-editable');
 				scope.$on('on:new', function(event){
-					if (scope.dataView.getItemById(0)) {
-						scope.dataView.deleteItem(0);
-					}
+					deleteItemsById(0);
 					grid.setOptions({enableAddRow: scope.canNew() && !scope.isReadonly()});
 				});
 				scope.$watch("isReadonly()", function(readonly) {
@@ -511,9 +521,7 @@ ui.formInput('OneToMany', {
 		
 		scope.onGridBeforeSave = function(records) {
 			if (!scope.editorCanSave) {
-				if (scope.dataView.getItemById(0)) {
-					scope.dataView.deleteItem(0);
-				}
+				deleteItemsById(0);
 				scope.select(records);
 				return false;
 			}
