@@ -29,6 +29,7 @@ import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
 
+import com.axelor.common.StringUtils;
 import com.axelor.shell.core.CommandProvider;
 import com.axelor.shell.core.CommandResult;
 import com.axelor.shell.core.Shell;
@@ -155,11 +156,16 @@ public class GradleCommands implements CommandProvider {
 
 	@CliCommand(name = "i18n", usage = "[OPTIONS]", help = "extract/update translatable messages")
 	public CommandResult i18n(
+			@CliOption(name = "project-dir", shortName = 'p', help = "specify the module directory")
+			String module,
 			@CliOption(name = "extract", shortName = 'e', help = "extract messages.")
 			boolean extract,
 			@CliOption(name = "update", shortName = 'u', help = "update messages.")
 			boolean update) {
-		return execute("-q", "-x", "test", "i18n-extract");
+		if (StringUtils.isBlank(module)) {
+			return execute("-q", "-x", "test", "i18n-extract");
+		}
+		return execute("-q", "-x", "test", "-p", module, "i18n-extract");
 	}
 
 	@CliCommand(name = "init", usage = "[OPTIONS] [MODULES...]", help = "initialize or update the database")
