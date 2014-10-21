@@ -23,7 +23,7 @@ import javax.inject.Inject;
 
 import org.junit.Before;
 
-import com.axelor.AbstractTest;
+import com.axelor.JpaTest;
 import com.axelor.rpc.Context;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.repo.ContactRepository;
@@ -31,20 +31,21 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
-public abstract class ScriptTest extends AbstractTest {
+public abstract class ScriptTest extends JpaTest {
 
 	@Inject
 	private ContactRepository contacts;
 
 	@Before
-    @Transactional
-    public void prepare() {
-	if (contacts.all().count() > 0) return;
-    	Contact c = new Contact();
-    	c.setFirstName("John");
-    	c.setLastName("Smith");
-	contacts.save(c);
-    }
+	@Transactional
+	public void prepare() {
+		if (contacts.all().count() > 0)
+			return;
+		Contact c = new Contact();
+		c.setFirstName("John");
+		c.setLastName("Smith");
+		contacts.save(c);
+	}
 
     protected Context context() {
         final Map<String, Object> data = Maps.newHashMap();
