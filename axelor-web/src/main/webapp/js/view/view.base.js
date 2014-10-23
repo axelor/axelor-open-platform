@@ -519,8 +519,13 @@ angular.module('axelor.ui').directive('uiViewSwitcher', function(){
 					if (page.index === -1) page.index = 0;
 				}
 
-				if (scope.selectedTab.viewType === 'grid' && !_.isEmpty(scope.selection)) {
-					page.index = _.first(scope.selection);
+				if (scope.selectedTab.viewType === 'grid') {
+					var items = scope.getItems() || [];
+					var index = _.first(scope.selection || []);
+					if (index === undefined && items.length === 0 && scope.schema.canNew === false) {
+						return;
+					}
+					if (index !== undefined) page.index = index;
 				}
 
 				scope.switchTo(type);
