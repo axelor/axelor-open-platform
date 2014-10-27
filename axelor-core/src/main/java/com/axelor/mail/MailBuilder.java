@@ -113,6 +113,12 @@ public final class MailBuilder {
 		return this;
 	}
 
+	public MailBuilder replyTo(String... recipients) {
+		Preconditions.checkNotNull(recipients, "recipients can't be null");
+		this.replyRecipients.addAll(Arrays.asList(recipients));
+		return this;
+	}
+
 	public MailBuilder from(String from) {
 		this.from = from;
 		return this;
