@@ -238,6 +238,10 @@ function FormViewCtrl($scope, $element) {
 		context = _.extend(context, dummy);
 		context._model = ds._model;
 
+		if (!$scope.$hasPanels) {
+			context._form = true;
+		}
+
 		// use selected flag for o2m/m2m fields
 		// see onSelectionChanged in o2m controller
 		_.each(context.$many, function (getItems, name) {
