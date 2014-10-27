@@ -1,7 +1,8 @@
-Axelor SDK
-==========
+Axelor Development Kit
+======================
 
-Axelor SDK is an open source Java framework for business application development.
+Axelor Development Kit (ADK) is an open source Java framework for business
+application development.
 
 This README describes how to get started quickly and prepare the development
 environment for working with the sources.
@@ -31,25 +32,25 @@ $ sudo apt-get install postgresql
 Installation
 ------------
 
-[Download](https://github.com/axelor/axelor-sdk/releases) the latest
+[Download](https://github.com/axelor/axelor-development-kit/releases) the latest
 distribution package and extract the package somewhere and set following
 environment variables.
 
 ```bash
-$ export AXELOR_HOME=/path/to/axelor-sdk
+$ export AXELOR_HOME=/path/to/axelor-development-kit
 $ export PATH=$AXELOR_HOME/bin:$PATH
 ```
 
 or you can build from the latest source like this:
 
 ```bash
-$ git clone https://github.com/axelor/axelor-sdk.git
-$ cd axelor-sdk
+$ git clone https://github.com/axelor/axelor-development-kit.git
+$ cd axelor-development-kit
 $ ./gradlew installApp
 ```
 
 ```bash
-$ export AXELOR_HOME=/path/to/axelor-sdk/build/install/axelor-sdk
+$ export AXELOR_HOME=/path/to/axelor-development-kit/build/install/axelor-development-kit
 $ export PATH=$AXELOR_HOME/bin:$PATH
 ```
 
