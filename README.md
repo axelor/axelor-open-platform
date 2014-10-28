@@ -79,7 +79,7 @@ You can also execute shell commands directly like:
   axelor build
   axelor run -p 8000
 
-See detailed documentation at http://axelor.com/docs/sdk.
+See detailed documentation at http://axelor.com/docs/adk.
 ```
 
 The command line utility can also be used in interactive mode where the utility
@@ -88,12 +88,12 @@ runs in a special shell from where you can issue various commands.
 What’s Next?
 ------------
 
-Follow the [Quickstart Guide](http://axelor.com/docs/sdk/quickstart/) for more
+Follow the [Quickstart Guide](http://axelor.com/docs/adk/quickstart/) for more
 detailed introduction.
 
 Links
 -----
 
 * [Axelor](http://axelor.com)
-* [Documentation](http://axelor.com/docs/sdk)
+* [Documentation](http://axelor.com/docs/adk)
 * [License](http://www.gnu.org/licenses/agpl.html)
