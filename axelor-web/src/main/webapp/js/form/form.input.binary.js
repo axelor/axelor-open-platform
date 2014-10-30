@@ -185,11 +185,6 @@ ui.formInput('Image', 'ImageLink', {
 		}
 		
 		function doUpload(file) {
-
-			if (!scope.record || !scope.record.id) {
-				return;
-			}
-
 			var ds = scope._dataSource._new(META_FILE);
 			var record = {
 				fileName: file.name,
