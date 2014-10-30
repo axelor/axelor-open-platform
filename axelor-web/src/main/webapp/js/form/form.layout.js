@@ -336,8 +336,10 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 
 			var items = editor.items || [];
 			var widths = _.map(items, function (item) {
-				item.placeholder = item.placeholder || item.title || item.autoTitle;
-				item.showTitle = false;
+				if (!item.showTitle) {
+					item.placeholder = item.placeholder || item.title || item.autoTitle;
+				}
+				item.showTitle = item.showTitle === true;
 				var width = item.width || (item.widgetAttrs||{}).width;
 				return width ? width : (item.widget === 'toggle' ? 24 : '*');
 			});
