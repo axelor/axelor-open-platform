@@ -343,14 +343,19 @@ ui.formItem('Button', {
 			element.attr("href", field.link);
 		}
 		
-		if (field.help) {
-			element.tooltip({
-				html: true,
-				title: field.help,
-				delay: { show: 500, hide: 100 },
-				container: 'body'
-			});
-		}
+		element.tooltip({
+			html: true,
+			title: function() {
+				if (field.help) {
+					return field.help;
+				}
+				if (element.innerWidth() < element[0].scrollWidth) {
+					return field.title;
+				}
+			},
+			delay: { show: 1000, hide: 100 },
+			container: 'body'
+		});
 
 		element.on("click", function(e) {
 			if (!scope.isReadonlyExclusive()) {
