@@ -445,7 +445,7 @@ td.form-item > * {
 
 .form-item .image-item div.btn-group {
 	position: absolute;
-	left: calc(50% - 30px);
+	left: calc(50% - 32px);
 	bottom: 12px;
 }
 .form-item .image-item div.btn-group .btn {

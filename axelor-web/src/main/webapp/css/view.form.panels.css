@@ -176,6 +176,11 @@
 	min-height: 28px;
 }
 
+.panel-layout .image-item .btn,
+.panel-layout .file-item .btn {
+	width: 32px;
+}
+
 .panel-layout .tag-select {
 	min-height: 28px;
 }

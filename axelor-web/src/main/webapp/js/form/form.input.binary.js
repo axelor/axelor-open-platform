@@ -269,6 +269,11 @@ ui.formInput('Binary', {
 			input.val(null);
 			model.$setViewValue(null);
 			record.$upload = null;
+			if(scope._model == 'com.axelor.meta.db.MetaFile'){
+				record.fileName = null;
+				record.mime = null;
+			}
+			record.size = null;
 		};
 
 		input.change(function(e) {
@@ -298,6 +303,7 @@ ui.formInput('Binary', {
 		'<input type="file">' +
 		'<div class="btn-group">' +
 			'<button ng-click="doSelect()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
+			'<button ng-click="doSave()" class="btn" type="button"><i class="fa fa-arrow-circle-down"></i></button>' +
 			'<button ng-click="doRemove()" class="btn" type="button"><i class="fa fa-times"></i></button>' +
 		'</div>' +
 	'</div>'
