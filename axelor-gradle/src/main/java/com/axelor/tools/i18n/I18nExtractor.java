@@ -221,6 +221,10 @@ public class I18nExtractor {
 				if (text == null) {
 					text = matcher.group(5);
 				}
+				text = text.trim();
+				if (text.startsWith("\\'") && text.endsWith("\\'")) {
+					text = text.substring(2, text.length() - 2);
+				}
 				consumePlain(text, file, line);
 				matcher.region(matcher.end(), source.length());
 			}
