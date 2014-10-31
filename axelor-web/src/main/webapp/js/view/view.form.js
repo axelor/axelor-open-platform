@@ -76,6 +76,7 @@ function FormViewCtrl($scope, $element) {
 	}
 	
 	var initialized = false;
+	var routeId = null;
 	$scope.onShow = function(viewPromise) {
 		
 		var params = this._viewParams;
@@ -91,6 +92,7 @@ function FormViewCtrl($scope, $element) {
 		}
 
 		if (recordId) {
+			routeId = recordId;
 			return viewPromise.then(function(){
 				var forceEdit = params.forceEdit || (params.params && params.params.forceEdit);
 				doEdit(recordId);
@@ -105,6 +107,7 @@ function FormViewCtrl($scope, $element) {
 			$scope._routeSearch = params.options.search;
 			var recordId = +params.options.state;
 			if (recordId > 0) {
+				routeId = recordId;
 				return viewPromise.then(function(){
 					doEdit(recordId);
 				});
@@ -117,6 +120,9 @@ function FormViewCtrl($scope, $element) {
 		if (page.index > -1) {
 			record = ds.at(page.index);
 		}
+
+		routeId = record && record.id > 0 ? record.id : null;
+
 		viewPromise.then(function(){
 			$scope.ajaxStop(function(){
 				record = ($scope.record || {}).id ? $scope.record : record;
@@ -151,6 +157,8 @@ function FormViewCtrl($scope, $element) {
 		
 		if (rec && rec.id > 0) {
 			args.push(rec.id);
+		} else if (routeId > 0) {
+			args.push(routeId);
 		}
 
 		return {
