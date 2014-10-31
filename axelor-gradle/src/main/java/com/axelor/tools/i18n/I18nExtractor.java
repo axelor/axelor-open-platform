@@ -105,7 +105,10 @@ public class I18nExtractor {
 				if (name.endsWith(".java")) processJava(file);
 				if (name.endsWith(".groovy")) processJava(file);
 
-				if (name.endsWith(".js") && !PATTERN_EXCLUDE.matcher(file.toString()).find()) processJava(file);
+				if (name.endsWith(".js") && !PATTERN_EXCLUDE.matcher(file.toString()).find()) {
+					processJava(file);
+					processHtml(file);
+				}
 
 			} catch (Exception e) {
 				log.error(e.getMessage());
