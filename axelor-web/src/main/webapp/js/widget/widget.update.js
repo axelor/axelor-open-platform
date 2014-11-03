@@ -392,7 +392,7 @@ ui.directive('uiUpdateMenu', function () {
 	return {
 		replace: true,
 		scope: {
-			handler: '=',
+			handler: '='
 		},
 		link: function (scope, element, attrs) {
 			

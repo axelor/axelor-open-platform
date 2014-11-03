@@ -993,7 +993,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			var items = elems.map(function () {
 				return {
 					name: $(this).attr('x-field'),
-					title: $(this).attr('x-title'),
+					title: $(this).attr('x-title')
 				};
 			});
 

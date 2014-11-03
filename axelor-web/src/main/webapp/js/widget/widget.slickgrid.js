@@ -1572,7 +1572,7 @@ Grid.prototype.onButtonClick = function(event, args) {
 		}
 		field.handler.scope.getContext = function() {
 			return _.extend({
-				_model: model,
+				_model: model
 			}, record);
 		};
 		field.handler.onClick().then(function(res){

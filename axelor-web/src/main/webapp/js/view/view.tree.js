@@ -151,7 +151,7 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 			record.$handler.scope.record = context;
 			record.$handler.scope.getContext = function() {
 				return _.extend({
-					_model: model,
+					_model: model
 				}, context);
 			};
 
