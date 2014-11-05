@@ -852,8 +852,13 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 	template_readonly:function (scope) {
 		var field = scope.field;
 		var tmpl = field.viewer;
-		if (!tmpl) {
-			tmpl = "{{record.id}}";
+		if (!tmpl && field.editor && !field.targetName) {
+			tmpl = '<div ui-panel-editor>';
+		}
+		if (!tmpl && field.targetName) {
+			tmpl = '{{record.' + field.targetName + '}}';
+		} else {
+			tmpl = '{{record.id}}';
 		}
 		return "<div class='o2m-list'>" +
 		"<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items' ng-bind-html='tmpl'>" + tmpl + "</div>" +
