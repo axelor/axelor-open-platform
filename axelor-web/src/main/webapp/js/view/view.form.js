@@ -330,6 +330,7 @@ function FormViewCtrl($scope, $element) {
 
 	$scope.onNew = function() {
 		$scope.confirmDirty(function(){
+			routeId = null;
 			$scope.edit(null);
 			$scope.setEditable();
 			$scope.$broadcast("on:new");
@@ -340,7 +341,9 @@ function FormViewCtrl($scope, $element) {
 	$scope.defaultValues = null;
 	
 	$scope.$on("on:new", function onNewHandler(event) {
-	
+
+		routeId = null;
+
 		function handleOnNew() {
 			
 			var handler = $scope.$events.onNew;
