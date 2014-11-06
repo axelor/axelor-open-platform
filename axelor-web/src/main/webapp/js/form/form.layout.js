@@ -373,6 +373,17 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 			form.children('div.row').removeClass('row').addClass('row-fluid');
 			element.append(form);
 
+			var getContext = scope.getContext;
+			scope.getContext = function () {
+				var context = getContext.apply(scope, arguments) || {};
+				if (watchFor === "record") {
+					return context;
+				}
+				context = _.extend({}, context[field.name]);
+				context._model = scope._model;
+				return context;
+			};
+
 			scope.$watch(watchFor, function(rec, old) {
 				if (rec !== old) {
 					scope.$broadcast("on:record-change", rec, true);
