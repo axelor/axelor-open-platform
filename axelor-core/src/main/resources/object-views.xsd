@@ -510,13 +510,6 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="x-can-reload" type="xsd:boolean">
-      <xsd:annotation>
-        <xsd:documentation>
-        Specify whether the popup editor can reload the parent form on close.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
     <xsd:attribute name="x-icon" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>Specify an icon.</xsd:documentation>
@@ -667,6 +660,20 @@
       <xsd:annotation>
         <xsd:documentation>
           If this is a relational field, specify whether to allow removing record(s).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-can-reload" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify whether the popup editor can reload the parent form on close.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-call-onSave" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify whether to call onSave event when saving parent record if x-can-reload is true.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
