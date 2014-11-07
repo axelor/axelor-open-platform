@@ -19,11 +19,12 @@
 
 var ui = angular.module('axelor.ui');
 
+var BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+var META_FILE = "com.axelor.meta.db.MetaFile";
+
 ui.formInput('ImageLink', {
 	css: 'image-item',
 	cssClass: 'from-item image-item',
-
-	BLANK: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
 
 	controller: ['$scope', '$element', '$interpolate', function($scope, $element, $interpolate) {
 
@@ -64,7 +65,6 @@ ui.formInput('ImageLink', {
 
 	link_readonly: function(scope, element, attrs, model) {
 
-		var BLANK = this.BLANK;
 		var image = element.children('img:first');
 
 		scope.$render_readonly = function() {
@@ -94,8 +94,6 @@ ui.formInput('Image', 'ImageLink', {
 
 		var field = scope.field;
 		var isBinary = field.serverType === 'binary';
-		var BLANK = this.BLANK;
-		var META_FILE = "com.axelor.meta.db.MetaFile";
 		
 		if (!isBinary && field.target !== META_FILE) {
 			throw new Error("Invalid field type for Image widget.");
@@ -119,7 +117,6 @@ ui.formInput('Image', 'ImageLink', {
 		var input = element.children('input:first');
 		var image = element.children('img:first');
 		var buttons = element.children('.btn-group');
-		var META_FILE = "com.axelor.meta.db.MetaFile";
 		
 		var isBinary = field.serverType === 'binary';
 		var timer = null;
@@ -269,7 +266,7 @@ ui.formInput('Binary', {
 			input.val(null);
 			model.$setViewValue(null);
 			record.$upload = null;
-			if(scope._model == 'com.axelor.meta.db.MetaFile'){
+			if(scope._model === META_FILE) {
 				record.fileName = null;
 				record.mime = null;
 			}
@@ -284,18 +281,16 @@ ui.formInput('Binary', {
 					field: field.name,
 					file: file
 				};
-				//Update file and mime just in case of new record
-				if(!record.id && scope._model == 'com.axelor.meta.db.MetaFile'){
+				if(scope._model === META_FILE && !record.fileName) {
 					record.fileName = file.name;
-					record.mime = file.type;
 				}
+				record.mime = file.type;
 				record.size = file.size;
-				scope.applyLater(function(){
+				scope.applyLater(function() {
 					model.$setViewValue(0); // mark form for save
 				});
 			}
 		});
-
 	},
 	template_editable:
 	'<div>' +
