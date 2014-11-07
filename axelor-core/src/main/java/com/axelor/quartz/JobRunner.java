@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.axelor.app.AppSettings;
 import com.axelor.common.ClassUtils;
 import com.axelor.db.Query;
+import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaSchedule;
 import com.axelor.meta.db.MetaScheduleParam;
 import com.google.common.base.Throwables;
@@ -143,7 +144,7 @@ public class JobRunner {
 		try {
 			CronScheduleBuilder.cronSchedule(cron);
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Invalid cron: " + cron);
+			throw new IllegalArgumentException(I18n.get("Invalid cron: ") + cron);
 		}
 	}
 
@@ -153,7 +154,7 @@ public class JobRunner {
 	 */
 	public void start() {
 		if (!isEnabled()) {
-			throw new IllegalStateException("The scheduler service is disabled.");
+			throw new IllegalStateException(I18n.get("The scheduler service is disabled."));
 		}
 		this.configure();
 		log.info("Starting scheduler...");
