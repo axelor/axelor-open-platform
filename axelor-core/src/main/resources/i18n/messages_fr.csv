@@ -300,6 +300,7 @@ resources/views/Menu.xml:70"
 resources/domains/Meta.xml:34
 resources/domains/Meta.xml:35
 resources/domains/Meta.xml:97"
+"You are not allowed to remove this filter","Vous n'êtes pas autorisé à supprimer ce filtre.",,"java/com/axelor/meta/service/MetaFilterService.java:71"
 "You are not authorized to create this resource.","Vous n'êtes pas autorisé à créer cette ressource.",,"java/com/axelor/db/JpaSecurity.java:31"
 "You are not authorized to export the data.","Vous n'êtes pas autorisé à exporter cette ressource.",,"java/com/axelor/db/JpaSecurity.java:33"
 "You are not authorized to read this resource.","Vous n'êtes pas autorisé à lire cette ressource.",,"java/com/axelor/db/JpaSecurity.java:29"

@@ -26,6 +26,7 @@ import org.apache.shiro.authz.AuthorizationException;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.db.Query;
+import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaFilter;
 import com.axelor.meta.db.repo.MetaFilterRepository;
 import com.google.common.base.Objects;
@@ -67,7 +68,7 @@ public class MetaFilterService {
 		MetaFilter filter = filters.all().filter(query, ctx.getName(), ctx.getFilterView(), user.getCode()).fetchOne();
 		
 		if (!Objects.equal(filter.getUser(), user)) {
-			throw new AuthorizationException("You are not allowed to remove this filter");
+			throw new AuthorizationException(I18n.get("You are not allowed to remove this filter"));
 		}
 		
 		filters.remove(filter);
