@@ -1,3 +1,41 @@
+# Current
+
+## Bug Fixes
+
+- fixed a regression that prevented duplicate view finding
+- fixed menu user groups on view reset
+- fixed menu rendering issue
+- fixed i18n extract
+- fixed RefSelect dummy widget issue
+- fixed duplicate records in nested o2m
+- fixed non-owning bi-directional o2o field issue
+- fixed empty grid with canNew=false allows new record
+- fixed image widget upload issue
+- fixed binary widget download/update issue
+- fixed tree view column title overflow
+- fixed route issue on form view 
+- fixed code editor empty issue
+- fixed unnecessary dirty state from popup
+- fixed missing attributes on panel-related
+- fixed wrong context on m2o editor
+- fixed o2m/m2m resize issue
+- fixed help tooltip on prod mode
+- fixed create default views
+
+## Improvements
+
+- add system information page
+- add active user list
+- allow i18n shell command per module
+- provide default 'from' address for smtp server
+- add replayTo to mail build 
+- allow title on editor fields 
+- show truncated button text as tooltip
+- remove trailing comma in array and object literals
+- allow editor as viewer
+- improve placeholder style in form views
+- improve MetaModel view
+
 # 3.0.2 (2014-10-14)
 
 Bug fix release.
