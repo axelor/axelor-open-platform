@@ -390,7 +390,7 @@ input[readonly], select[readonly], textarea[readonly] {
 	right: 0px;
 }
 
-@media screen and (min-width: 980px) {
+@media screen and (min-width: 769px) {
 	#offcanvas:not(.hidden-menu) {
 		left: 0;
 		width: 100%;
@@ -414,7 +414,7 @@ input[readonly], select[readonly], textarea[readonly] {
 	}
 }
 
-@media screen and (max-width: 979px) {
+@media screen and (max-width: 768px) {
 	#offcanvas {
 		position: relative;
 		transition: all 0.25s ease-out;
@@ -806,4 +806,12 @@ img.prefix-icon {
 	margin: 0;
 	padding: 4px;
 	text-align: center;
+}
+
+.about-page hr {
+	margin: 14px 0;
+}
+
+.system-page dt {
+	text-align: left;
 }

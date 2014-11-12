@@ -215,13 +215,15 @@
     <call class="com.axelor.meta.web.MetaController" method="restoreSingle"/>
   </action-method>
 
-  <grid name="meta-model-grid" title="Models" model="com.axelor.meta.db.MetaModel">
+  <grid name="meta-model-grid" title="Models" model="com.axelor.meta.db.MetaModel" 
+  	canNew="false" canEdit="false" canDelete="false" edit-icon="false">
     <field name="packageName"/>
     <field name="name"/>
     <field name="tableName"/>
   </grid>
 
-  <form name="meta-model-form" title="Model" model="com.axelor.meta.db.MetaModel">
+  <form name="meta-model-form" title="Model" model="com.axelor.meta.db.MetaModel"
+  	canAttach="false" canCopy="false" canNew="false" canDelete="false" canEdit="false">
     <panel title="Overview">
       <field name="name"/>
       <field name="tableName"/>

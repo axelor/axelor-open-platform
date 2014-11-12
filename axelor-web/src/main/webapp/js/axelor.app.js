@@ -81,7 +81,7 @@
 				small: false,
 				large: false
 			};
-			device.large = $(window).width() > 767;
+			device.large = $(window).width() > 768;
 			device.small = !device.large;
 			device.mobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(navigator.userAgent);
 			device.webkit = /Webkit/i.test(navigator.userAgent);
@@ -170,6 +170,7 @@
 		.when('/preferences', { action: 'preferences' })
 		.when('/welcome', { action: 'welcome' })
 		.when('/about', { action: 'about' })
+		.when('/system', { action: 'system' })
 		.when('/', { action: 'main' })
 
 		.when('/ds/:resource', tabResource)
@@ -336,7 +337,7 @@
 			
 			if (loginWindow == null) {
 				loginWindow = $('#loginWindow')
-				.attr('title', _t('Login'))
+				.attr('title', _t('Log in'))
 				.dialog({
 					dialogClass: 'no-close ui-dialog-responsive ui-dialog-small',
 					autoOpen: false,
@@ -347,7 +348,7 @@
 					closeOnEscape: false,
 					zIndex: 100001,
 					buttons: [{
-						text: _t("Login"),
+						text: _t("Log in"),
 						'class': 'btn btn-primary',
 						click: function(){
 							$scope.doLogin();

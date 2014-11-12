@@ -76,6 +76,7 @@ function FormViewCtrl($scope, $element) {
 	}
 	
 	var initialized = false;
+	var routeId = null;
 	$scope.onShow = function(viewPromise) {
 		
 		var params = this._viewParams;
@@ -91,6 +92,7 @@ function FormViewCtrl($scope, $element) {
 		}
 
 		if (recordId) {
+			routeId = recordId;
 			return viewPromise.then(function(){
 				var forceEdit = params.forceEdit || (params.params && params.params.forceEdit);
 				doEdit(recordId);
@@ -105,6 +107,7 @@ function FormViewCtrl($scope, $element) {
 			$scope._routeSearch = params.options.search;
 			var recordId = +params.options.state;
 			if (recordId > 0) {
+				routeId = recordId;
 				return viewPromise.then(function(){
 					doEdit(recordId);
 				});
@@ -117,6 +120,9 @@ function FormViewCtrl($scope, $element) {
 		if (page.index > -1) {
 			record = ds.at(page.index);
 		}
+
+		routeId = record && record.id > 0 ? record.id : null;
+
 		viewPromise.then(function(){
 			$scope.ajaxStop(function(){
 				record = ($scope.record || {}).id ? $scope.record : record;
@@ -151,6 +157,8 @@ function FormViewCtrl($scope, $element) {
 		
 		if (rec && rec.id > 0) {
 			args.push(rec.id);
+		} else if (routeId > 0) {
+			args.push(routeId);
 		}
 
 		return {
@@ -238,6 +246,10 @@ function FormViewCtrl($scope, $element) {
 		context = _.extend(context, dummy);
 		context._model = ds._model;
 
+		if (!$scope.$hasPanels) {
+			context._form = true;
+		}
+
 		// use selected flag for o2m/m2m fields
 		// see onSelectionChanged in o2m controller
 		_.each(context.$many, function (getItems, name) {
@@ -318,6 +330,7 @@ function FormViewCtrl($scope, $element) {
 
 	$scope.onNew = function() {
 		$scope.confirmDirty(function(){
+			routeId = null;
 			$scope.edit(null);
 			$scope.setEditable();
 			$scope.$broadcast("on:new");
@@ -328,7 +341,9 @@ function FormViewCtrl($scope, $element) {
 	$scope.defaultValues = null;
 	
 	$scope.$on("on:new", function onNewHandler(event) {
-	
+
+		routeId = null;
+
 		function handleOnNew() {
 			
 			var handler = $scope.$events.onNew;
@@ -981,7 +996,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			var items = elems.map(function () {
 				return {
 					name: $(this).attr('x-field'),
-					title: $(this).attr('x-title'),
+					title: $(this).attr('x-title')
 				};
 			});
 

@@ -336,8 +336,10 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 
 			var items = editor.items || [];
 			var widths = _.map(items, function (item) {
-				item.placeholder = item.placeholder || item.title || item.autoTitle;
-				item.showTitle = false;
+				if (!item.showTitle) {
+					item.placeholder = item.placeholder || item.title || item.autoTitle;
+				}
+				item.showTitle = item.showTitle === true;
 				var width = item.width || (item.widgetAttrs||{}).width;
 				return width ? width : (item.widget === 'toggle' ? 24 : '*');
 			});
@@ -370,6 +372,17 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 			form = $compile(form)(scope);
 			form.children('div.row').removeClass('row').addClass('row-fluid');
 			element.append(form);
+
+			var getContext = scope.getContext;
+			scope.getContext = function () {
+				var context = getContext.apply(scope, arguments) || {};
+				if (watchFor === "record") {
+					return context;
+				}
+				context = _.extend({}, context[field.name]);
+				context._model = scope._model;
+				return context;
+			};
 
 			scope.$watch(watchFor, function(rec, old) {
 				if (rec !== old) {

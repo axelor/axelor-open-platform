@@ -387,8 +387,9 @@ public class ViewLoader extends AbstractLoader {
 		menu.setLeft(menuItem.getLeft() == null ? true : menuItem.getLeft());
 		menu.setMobile(menuItem.getMobile());
 
-		menu.clearGroups();
-		menu.setGroups(this.findGroups(menuItem.getGroups()));
+		if (menu.getGroups() == null || menu.getGroups().isEmpty()) {
+			menu.setGroups(this.findGroups(menuItem.getGroups()));
+		}
 
 		if (!Strings.isNullOrEmpty(menuItem.getParent())) {
 			MetaMenu parent = menus.findByName(menuItem.getParent());

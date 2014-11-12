@@ -102,6 +102,7 @@ public class SmtpAccount implements MailAccount {
 		props.setProperty("mail.smtp.host", host);
 		props.setProperty("mail.smtp.port", port);
 		props.setProperty("mail.smtp.auth", "" + authenticating);
+		props.setProperty("mail.smtp.from", user);
 
 		// respect manually set timeout
 		if (connectionTimeout != DEFAULT_TIMEOUT) {

@@ -1,12 +1,12 @@
 "key","message","comment","context"
 "Action","Action",,"resources/domains/Meta.xml:65
 resources/domains/Meta.xml:83
+resources/views/Meta.xml:111
 resources/views/User.xml:29
-resources/views/User.xml:55
-resources/views/Meta.xml:111"
+resources/views/User.xml:55"
 "Action Menu","Action de menu",,"resources/views/Meta.xml:162"
-"Action Menus","Les Action Menus",,"resources/views/Menu.xml:105
-resources/views/Menu.xml:103
+"Action Menus","Les Action Menus",,"resources/views/Menu.xml:103
+resources/views/Menu.xml:105
 resources/views/Meta.xml:153"
 "Action name can't be changed.","Le nom de l'action ne peut pas être changé.",,"java/com/axelor/meta/web/MetaController.java:99"
 "Actions","Les Actions",,"resources/views/Menu.xml:88"
@@ -23,12 +23,12 @@ resources/views/Meta.xml:76"
 "All Models","Les Modèles",,"resources/views/Menu.xml:59"
 "All Modules","Les Modules",,"resources/views/Menu.xml:50
 resources/views/Meta.xml:33"
-"All Schedules","Les Planificateurs",,"resources/views/Menu.xml:133
-resources/views/Menu.xml:131"
-"All Selects","Les Sélections",,"resources/views/Meta.xml:173
-resources/views/Menu.xml:94"
-"All Translations","Les Traductions",,"resources/views/Menu.xml:114
-resources/views/Menu.xml:112
+"All Schedules","Les Planificateurs",,"resources/views/Menu.xml:131
+resources/views/Menu.xml:133"
+"All Selects","Les Sélections",,"resources/views/Menu.xml:94
+resources/views/Meta.xml:173"
+"All Translations","Les Traductions",,"resources/views/Menu.xml:112
+resources/views/Menu.xml:114
 resources/views/Meta.xml:267"
 "All Views","Les Vues",,"resources/views/Menu.xml:68
 resources/views/Meta.xml:64"
@@ -60,27 +60,27 @@ resources/views/Permission.xml:29"
 "Dashboard","Dashboard",,"resources/views/Meta.xml:13"
 "Data","Données",,"resources/domains/Meta.xml:124"
 "Depends","Dépend de",,"resources/domains/Meta.xml:16"
-"Description","Description",,"resources/domains/MetaSchedule.xml:21
-resources/domains/Meta.xml:15
+"Description","Description",,"resources/domains/Meta.xml:15
 resources/domains/Meta.xml:153
-resources/domains/Role.xml:14
 resources/domains/Meta.xml:172
-resources/views/Meta.xml:59
-resources/views/Meta.xml:258"
+resources/domains/MetaSchedule.xml:21
+resources/domains/Role.xml:14
+resources/views/Meta.xml:258
+resources/views/Meta.xml:59"
 "Disable the user from the specified date.","Bloque l'utilisateur à partir de la date spécifiée.",,"resources/domains/User.xml:23"
 "Domain filter as condition.","Condition d'application des accès",,"resources/domains/Permission.xml:20"
 "Email","Email",,"resources/domains/User.xml:17"
 "English","Anglais",,"resources/views/User.xml:7"
 "Expires on","Autoriser jusqu'au",,"resources/domains/User.xml:23"
-"Export","Export",,"resources/views/Meta.xml:269
-resources/domains/Permission.xml:19"
-"Export complete.","Export complet.",,"java/com/axelor/meta/web/MetaController.java:218
+"Export","Export",,"resources/domains/Permission.xml:19
+resources/views/Meta.xml:269"
+"Export complete.","Export complet.",,"java/com/axelor/meta/schema/actions/ActionExport.java:148
 java/com/axelor/meta/schema/actions/ActionExport.java:151
-java/com/axelor/meta/schema/actions/ActionExport.java:148"
+java/com/axelor/meta/web/MetaController.java:218"
 "Field","Champ",,"resources/views/Meta.xml:248"
 "Field is required.","Champ requis.",,"java/com/axelor/meta/schema/actions/ActionCondition.java:116"
-"Fields","Champs",,"resources/views/Meta.xml:240
-resources/domains/Meta.xml:137"
+"Fields","Champs",,"resources/domains/Meta.xml:137
+resources/views/Meta.xml:240"
 "File","Fichier",,"resources/domains/Meta.xml:189"
 "File name","Nom du fichier",,"resources/domains/Meta.xml:168"
 "File path","Chemin du fichier",,"resources/domains/Meta.xml:169"
@@ -98,13 +98,13 @@ resources/views/Meta.xml:15"
 "Fullname","Nom complet",,"resources/domains/Meta.xml:138"
 "Fully qualified object name or wild card package name.","Nom de l'objet",,"resources/domains/Permission.xml:14"
 "Grid","Liste",,"resources/views/Meta.xml:7"
-"Group","Groupe",,"resources/views/Group.xml:18
-resources/domains/User.xml:25"
-"Groups","Les Groupes",,"resources/domains/Meta.xml:66
-resources/views/Menu.xml:25
+"Group","Groupe",,"resources/domains/User.xml:25
+resources/views/Group.xml:18"
+"Groups","Les Groupes",,"resources/domains/Meta.xml:36
+resources/domains/Meta.xml:66
 resources/views/Group.xml:12
-resources/domains/Meta.xml:36
-resources/views/Menu.xml:22"
+resources/views/Menu.xml:22
+resources/views/Menu.xml:25"
 "Hidden","Caché",,"resources/views/Group.xml:8"
 "Home action","Action",,"resources/domains/User.xml:19"
 "Icon","Icone",,"resources/domains/Meta.xml:59"
@@ -114,14 +114,15 @@ resources/views/Menu.xml:22"
 "Install module","Installer le module",,"resources/views/Meta.xml:41"
 "Installed","Installé ?",,"resources/domains/Meta.xml:19"
 "Invalid XML.","XML invalide.",,"java/com/axelor/meta/web/MetaController.java:71"
+"Invalid cron:","Cron non valide:",,"java/com/axelor/quartz/JobRunner.java:147"
 "Invalid field value.","Valeur non valide.",,"java/com/axelor/meta/schema/actions/ActionCondition.java:118"
 "Items","Elément",,"resources/domains/Meta.xml:110"
 "Job","Job",,"resources/domains/MetaSchedule.xml:22"
 "Job Management","Gestion des planificateurs",,"resources/views/Menu.xml:11"
 "Key","Clé",,"resources/domains/Meta.xml:157"
 "Label","Label",,"resources/domains/Meta.xml:150"
-"Language","Langue",,"resources/domains/User.xml:18
-resources/domains/Meta.xml:159"
+"Language","Langue",,"resources/domains/Meta.xml:159
+resources/domains/User.xml:18"
 "Left","Menu à gauche ?",,"resources/domains/Meta.xml:62"
 "Login","Identifiant",,"resources/domains/User.xml:13"
 "ManyToMany","ManyToMany",,"resources/views/Meta.xml:237"
@@ -139,35 +140,35 @@ resources/views/Menu.xml:79"
 resources/domains/Meta.xml:95
 resources/views/Meta.xml:224"
 "Model Management","Gestion des modèles",,"resources/views/Menu.xml:8"
-"Models","Les Modèles",,"resources/views/Meta.xml:218
-resources/views/Menu.xml:61"
+"Models","Les Modèles",,"resources/views/Menu.xml:61
+resources/views/Meta.xml:218"
 "Module","Module",,"resources/domains/Meta.xml:109
-resources/domains/Meta.xml:96
 resources/domains/Meta.xml:33
-resources/domains/Meta.xml:81
-resources/views/Meta.xml:45
 resources/domains/Meta.xml:60
+resources/domains/Meta.xml:81
+resources/domains/Meta.xml:96
+resources/views/Meta.xml:45
 resources/views/Meta.xml:46"
 "Module Management","Gestion des modules",,"resources/views/Menu.xml:10"
 "Modules","Les Modules",,"resources/views/Menu.xml:52"
-"Name","Nom",,"resources/domains/MetaSchedule.xml:10
-resources/domains/MetaSchedule.xml:20
-resources/domains/Meta.xml:78
-resources/domains/Meta.xml:57
-resources/domains/MetaSequence.xml:12
+"Name","Nom",,"resources/domains/Group.xml:14
 resources/domains/Meta.xml:107
-resources/domains/User.xml:14
-resources/domains/Role.xml:13
-resources/domains/MetaFilter.xml:14
 resources/domains/Meta.xml:13
-resources/domains/Meta.xml:147
-resources/domains/Meta.xml:93
-resources/domains/Permission.xml:13
 resources/domains/Meta.xml:134
-resources/domains/Group.xml:14
-resources/domains/Meta.xml:28"
-"Name length should be greater than 2.","La longueur du nom doit être supérieur à 2",,"resources/views/User.xml:65
-resources/views/Group.xml:48"
+resources/domains/Meta.xml:147
+resources/domains/Meta.xml:28
+resources/domains/Meta.xml:57
+resources/domains/Meta.xml:78
+resources/domains/Meta.xml:93
+resources/domains/MetaFilter.xml:14
+resources/domains/MetaSchedule.xml:10
+resources/domains/MetaSchedule.xml:20
+resources/domains/MetaSequence.xml:12
+resources/domains/Permission.xml:13
+resources/domains/Role.xml:13
+resources/domains/User.xml:14"
+"Name length should be greater than 2.","La longueur du nom doit être supérieur à 2",,"resources/views/Group.xml:48
+resources/views/User.xml:65"
 "Navigation","Navigation",,"resources/domains/Group.xml:15"
 "Next","Valeur suivante",,"resources/domains/MetaSequence.xml:18"
 "Object","Objet",,"resources/domains/Meta.xml:188
@@ -176,23 +177,23 @@ resources/domains/Permission.xml:14"
 "OneToMany","OneToMany",,"resources/views/Meta.xml:236"
 "OneToOne","OneToOne",,"resources/views/Meta.xml:234"
 "Order","Ordre",,"resources/domains/Meta.xml:125"
-"Overview","Général",,"resources/views/Schedules.xml:32
-resources/views/Role.xml:11
-resources/views/Meta.xml:249
+"Overview","Général",,"resources/views/Group.xml:22
+resources/views/Meta.xml:112
+resources/views/Meta.xml:136
 resources/views/Meta.xml:163
 resources/views/Meta.xml:180
 resources/views/Meta.xml:194
 resources/views/Meta.xml:225
+resources/views/Meta.xml:249
 resources/views/Meta.xml:293
-resources/views/Group.xml:22
-resources/views/User.xml:21
-resources/views/Meta.xml:136
-resources/views/Permission.xml:17
 resources/views/Meta.xml:85
+resources/views/Permission.xml:17
+resources/views/Role.xml:11
 resources/views/Schedules.xml:14
-resources/views/Meta.xml:112"
-"Package","Nom du package",,"resources/domains/Meta.xml:148
-resources/domains/Meta.xml:135"
+resources/views/Schedules.xml:32
+resources/views/User.xml:21"
+"Package","Nom du package",,"resources/domains/Meta.xml:135
+resources/domains/Meta.xml:148"
 "Padding","Remplissage",,"resources/domains/MetaSequence.xml:15"
 "Params","Paramètres",,"resources/domains/MetaSchedule.xml:24
 resources/views/Permission.xml:30"
@@ -203,19 +204,19 @@ resources/views/User.xml:38"
 "Password doesn't match","Le mot de passe ne correspond pas",,"java/com/axelor/auth/AuthService.java:226"
 "Pending","En attente ?",,"resources/domains/Meta.xml:20"
 "Permission","Permission",,"resources/views/Permission.xml:16"
-"Permissions","Les Permissions",,"resources/views/Group.xml:55
-resources/views/Permission.xml:6
-resources/domains/User.xml:27
-resources/domains/Group.xml:20
-resources/views/Menu.xml:43
+"Permissions","Les Permissions",,"resources/domains/Group.xml:20
 resources/domains/Role.xml:15
-resources/views/Menu.xml:40"
+resources/domains/User.xml:27
+resources/views/Group.xml:55
+resources/views/Menu.xml:40
+resources/views/Menu.xml:43
+resources/views/Permission.xml:6"
 "Portal","Portail",,"resources/views/Meta.xml:12"
 "Preferences","Préférences",,"resources/views/User.xml:49"
 "Prefix","Prefix",,"resources/domains/MetaSequence.xml:13"
-"Priority","Priorité",,"resources/domains/Meta.xml:56
+"Priority","Priorité",,"resources/domains/Meta.xml:108
 resources/domains/Meta.xml:31
-resources/domains/Meta.xml:108"
+resources/domains/Meta.xml:56"
 "Read","Lecture",,"resources/domains/Permission.xml:15"
 "Relationship","Relation",,"resources/domains/Meta.xml:151"
 "Removable","Supprimable ?",,"resources/domains/Meta.xml:18"
@@ -224,11 +225,11 @@ resources/domains/Meta.xml:108"
 "Restart the server for updates to take effect.","Redémarrez le serveur pour que les mises à jour prennent effet.",,"java/com/axelor/meta/web/ModuleController.java:41"
 "Restore all...","Tous restaurer.",,"resources/views/Meta.xml:66"
 "Role","Role",,"resources/views/Role.xml:10"
-"Roles","Les Roles",,"resources/views/Menu.xml:34
-resources/views/Role.xml:6
-resources/domains/Group.xml:19
+"Roles","Les Roles",,"resources/domains/Group.xml:19
 resources/domains/User.xml:26
-resources/views/Menu.xml:31"
+resources/views/Menu.xml:31
+resources/views/Menu.xml:34
+resources/views/Role.xml:6"
 "Schedule","Planificateur",,"resources/domains/MetaSchedule.xml:12
 resources/views/Schedules.xml:13"
 "Schedules","Planificateurs",,"resources/views/Schedules.xml:6"
@@ -253,22 +254,23 @@ resources/views/Meta.xml:179"
 "The addition data for UI widgets.","Données additionnelles utilisés par l'interface",,"resources/domains/Meta.xml:124"
 "The module can't be uninstalled because other modules are pending. Please restart the server before.","Le module ne peut pas être désinstallé car d'autres modules sont en attente. Redémarrer le serveur avant.",,"java/com/axelor/meta/web/ModuleController.java:45"
 "The module can't be uninstalled because other non-removable modules depend on it.","Le module ne peut pas être désinstallé car d'autres modules non supprimable en dépendent.",,"java/com/axelor/meta/web/ModuleController.java:44"
+"The scheduler service is disabled.","Le service de planificateur est désactivé.",,"java/com/axelor/quartz/JobRunner.java:157"
 "The select item title.","Label de la selection",,"resources/domains/Meta.xml:122"
 "The select item value.","Valeur de la selection",,"resources/domains/Meta.xml:123"
 "This may terminate any running jobs. Are sure to continue?","Cela va arrêter les instances en cours. Voulez-vous continuer ?",,"resources/views/Schedules.xml:22"
 "Title","Titre",,"resources/domains/Meta.xml:122
 resources/domains/Meta.xml:14
-resources/domains/MetaFilter.xml:15
-resources/domains/Meta.xml:79
 resources/domains/Meta.xml:29
-resources/domains/Meta.xml:58"
+resources/domains/Meta.xml:58
+resources/domains/Meta.xml:79
+resources/domains/MetaFilter.xml:15"
 "Top","Menu du haut ?",,"resources/domains/Meta.xml:61"
 "Translation","Traduction",,"resources/views/Meta.xml:276
 resources/views/Meta.xml:277"
 "Tree","Arbre",,"resources/views/Meta.xml:9"
-"Type","Type",,"resources/domains/Meta.xml:94
+"Type","Type",,"resources/domains/Meta.xml:149
 resources/domains/Meta.xml:30
-resources/domains/Meta.xml:149"
+resources/domains/Meta.xml:94"
 "Uninstall","Désinstaller",,"resources/views/Meta.xml:56"
 "Updated by","Mis à jour par",,"java/com/axelor/auth/db/AuditableModel.java:53"
 "Updated on","Mis à jour le",,"java/com/axelor/auth/db/AuditableModel.java:46"
@@ -280,8 +282,8 @@ resources/views/User.xml:20"
 resources/views/Menu.xml:16
 resources/views/User.xml:11"
 "Validate","Valider",,"resources/views/Schedules.xml:21"
-"Value","Valeur",,"resources/domains/MetaSchedule.xml:11
-resources/domains/Meta.xml:123"
+"Value","Valeur",,"resources/domains/Meta.xml:123
+resources/domains/MetaSchedule.xml:11"
 "Version","Version",,"resources/domains/Meta.xml:17"
 "View","Vue",,"resources/views/Meta.xml:84"
 "View Management","Gestion des vues",,"resources/views/Menu.xml:9"
@@ -295,9 +297,10 @@ resources/views/Menu.xml:70"
 "Whether to grant write access.","Autorise un accès en modification",,"resources/domains/Permission.xml:16"
 "Write","Modification",,"resources/domains/Permission.xml:16"
 "Xml","Xml",,"resources/domains/Meta.xml:106
-resources/domains/Meta.xml:35
 resources/domains/Meta.xml:34
+resources/domains/Meta.xml:35
 resources/domains/Meta.xml:97"
+"You are not allowed to remove this filter","Vous n'êtes pas autorisé à supprimer ce filtre.",,"java/com/axelor/meta/service/MetaFilterService.java:71"
 "You are not authorized to create this resource.","Vous n'êtes pas autorisé à créer cette ressource.",,"java/com/axelor/db/JpaSecurity.java:31"
 "You are not authorized to export the data.","Vous n'êtes pas autorisé à exporter cette ressource.",,"java/com/axelor/db/JpaSecurity.java:33"
 "You are not authorized to read this resource.","Vous n'êtes pas autorisé à lire cette ressource.",,"java/com/axelor/db/JpaSecurity.java:29"

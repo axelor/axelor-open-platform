@@ -100,11 +100,15 @@ public class I18nExtractor {
 			try {
 				if (name.endsWith(".xml")) processXml(file);
 				if (name.endsWith(".html")) processHtml(file);
+				if (name.endsWith(".jsp")) processHtml(file);
 				if (name.endsWith(".jsp")) processJava(file);
 				if (name.endsWith(".java")) processJava(file);
 				if (name.endsWith(".groovy")) processJava(file);
 
-				if (name.endsWith(".js") && !PATTERN_EXCLUDE.matcher(file.toString()).find()) processJava(file);
+				if (name.endsWith(".js") && !PATTERN_EXCLUDE.matcher(file.toString()).find()) {
+					processJava(file);
+					processHtml(file);
+				}
 
 			} catch (Exception e) {
 				log.error(e.getMessage());
@@ -216,6 +220,12 @@ public class I18nExtractor {
 				String text = matcher.group(3);
 				if (text == null) {
 					text = matcher.group(5);
+				}
+				text = text.trim();
+				if (text.startsWith("\\'") && text.endsWith("\\'")) {
+					text = text.substring(2, text.length() - 2);
+				} else if(text.startsWith("\\\"") && text.endsWith("\\\"")) {
+					text = text.substring(2, text.length() - 2);
 				}
 				consumePlain(text, file, line);
 				matcher.region(matcher.end(), source.length());
@@ -335,7 +345,9 @@ public class I18nExtractor {
 		Collections.sort(keys);
 
 		for (String key : keys) {
-			String context = Joiner.on('\n').join(items.get(key)).trim();
+			List<String> locations = new ArrayList<>(items.get(key));
+			Collections.sort(locations);
+			String context = Joiner.on('\n').join(locations).trim();
 			String[] line = { key, "", "", context };
 			values.add(line);
 		}
@@ -428,6 +440,8 @@ public class I18nExtractor {
 		try (CSVWriter csv = new CSVWriter(writer)) {
 			csv.writeNext(CSV_HEADER);
 			for (String[] line : values) {
+				line[1] = StringUtils.isBlank(line[1]) ? null : line[1];
+				line[2] = StringUtils.isBlank(line[2]) ? null : line[2];
 				csv.writeNext(line);
 			}
 		} catch (IOException e) {

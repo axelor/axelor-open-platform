@@ -88,10 +88,10 @@ table.treetable tbody tr.accept {
 	height: 100%;
 	padding: 4px;
 	padding-left: 6px;
-	
 	border-left: 1px solid #ddd;
-	
 	text-align: left;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 .tree-view-container .tree-header th:first-of-type {

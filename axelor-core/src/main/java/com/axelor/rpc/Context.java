@@ -28,6 +28,7 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -71,6 +72,7 @@ public class Context extends HashMap<String, Object> {
 	private static final String KEY_MODEL = "_model";
 	private static final String KEY_PARENT = "_parent";
 	private static final String KEY_PARENT_CONTEXT = "parentContext";
+	private static final String KEY_FORM = "_form";
 
 	private Object beanInstance;
 
@@ -80,27 +82,22 @@ public class Context extends HashMap<String, Object> {
 	}
 
 	@SuppressWarnings("all")
-	public static Object createOrFind(Property p, Object value) {
+	private static Object createOrFind(Property p, Object value, boolean nested) {
 
 		Object bean = value;
 
 		if (value instanceof Map) {
-			final Map map = (Map) value;
-			final Object id = map.get(FIELD_ID);
-
-			// non-owning side can't handle the relationship
-			boolean isOwner = p.getType() != PropertyType.ONE_TO_ONE || p.getMappedBy() == null;
-
+			Map map = (Map) value;
+			Object id = map.get(FIELD_ID);
 			// if new/updated then create map
-			if (isOwner && (map.containsKey(FIELD_VERSION) || id == null)) {
-				Context ctx =  create(map, p.getTarget());
+			if (map.containsKey(FIELD_VERSION) || id == null) {
+				Context ctx =  create(map, p.getTarget(), nested);
 				bean = ctx.beanInstance;
-			} else if (id != null) {
+			} else {
 				bean = JPA.find((Class) p.getTarget(), Long.parseLong(id.toString()));
 			}
-			if (bean != null && map.containsKey(FIELD_SELECTED)) {
+			if (bean != null && map.containsKey(FIELD_SELECTED))
 				Mapper.of(p.getTarget()).set(bean, FIELD_SELECTED, map.get(FIELD_SELECTED));
-			}
 		}
 		if (bean instanceof Model) {
 			return bean;
@@ -110,11 +107,20 @@ public class Context extends HashMap<String, Object> {
 
 	@SuppressWarnings("all")
 	public static Context create(Map<String, Object> data, Class<?> beanClass) {
+		Preconditions.checkNotNull(beanClass);
+		if (data == null) {
+			data = Maps.newHashMap();
+		}
+		return create(data, beanClass, data.containsKey(KEY_FORM));
+	}
+
+	@SuppressWarnings("all")
+	private static Context create(Map<String, Object> data, Class<?> beanClass, boolean nested) {
 
 		Preconditions.checkNotNull(beanClass);
-
-		if (data == null)
+		if (data == null) {
 			data = Maps.newHashMap();
+		}
 
 		Mapper mapper = Mapper.of(beanClass);
 		Object bean = Mapper.toBean(beanClass, null);
@@ -131,7 +137,7 @@ public class Context extends HashMap<String, Object> {
 				if (KEY_PARENT.equals(name)) {
 					try {
 						Class<?> parentClass = Class.forName((String) ((Map) value).get(KEY_MODEL));
-						value = create((Map) value, parentClass);
+						value = create((Map) value, parentClass, nested);
 					} catch (Exception e) {
 					}
 				}
@@ -143,12 +149,21 @@ public class Context extends HashMap<String, Object> {
 			else if (p.isCollection() && value instanceof Collection) {
 				List items = Lists.newArrayList();
 				for(Object item : (Collection) value) {
-					items.add(createOrFind(p, item));
+					items.add(createOrFind(p, item, nested));
 				}
 				value = items;
 			}
+			// non-owning side can't handle the relationship (RM-2616, RM-2457)
+			else if (p.getType() == PropertyType.ONE_TO_ONE && !Strings.isNullOrEmpty(p.getMappedBy())) {
+				if (nested) continue;
+				try {
+					value = JPA.em().find(p.getTarget(), Long.parseLong(((Map) value).get(FIELD_ID).toString()));
+				} catch (Exception e) {
+					continue;
+				}
+			}
 			else if (p.isReference()) {
-				value = createOrFind(p, value);
+				value = createOrFind(p, value, nested);
 			}
 
 			if (p != null) {

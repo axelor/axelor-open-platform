@@ -17,12 +17,30 @@
  */
 package com.axelor.web.service;
 
+import static java.lang.Boolean.TRUE;
+import static org.apache.shiro.subject.support.DefaultSubjectContext.AUTHENTICATED_SESSION_KEY;
+import static org.apache.shiro.subject.support.DefaultSubjectContext.PRINCIPALS_SESSION_KEY;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
+import com.axelor.web.AppSessionListener;
 import com.axelor.web.internal.AppInfo;
 import com.google.inject.servlet.RequestScoped;
 
@@ -32,9 +50,63 @@ import com.google.inject.servlet.RequestScoped;
 @Path("/app")
 public class AppService extends AbstractService {
 
+	@Context
+	private HttpServletRequest  request;
+
+	@Context
+	private HttpServletResponse response;
+
 	@GET
 	@Path("info")
 	public String info() {
 		return AppInfo.asJson();
+	}
+
+	@GET
+	@Path("sysinfo")
+	public Properties getSystemInfo() {
+		final Properties info = new Properties();
+		final Runtime runtime = Runtime.getRuntime();
+		final Set<String> sessions = AppSessionListener.getActiveSessions();
+		final User user = AuthUtils.getUser();
+		final List<Map<String,Object>> users = new ArrayList<>();
+
+		int mb = 1024;
+
+		final boolean isTechnicalStaff = user.getGroup() != null
+				&& user.getGroup().getTechnicalStaff() == TRUE;
+
+		for (String id : sessions) {
+			HttpSession session = AppSessionListener.getSession(id);
+			if (session == null ||
+				session.getAttribute(PRINCIPALS_SESSION_KEY) == null ||
+				session.getAttribute(AUTHENTICATED_SESSION_KEY) != TRUE) {
+				continue;
+			}
+			String login = session.getAttribute(PRINCIPALS_SESSION_KEY).toString();
+			Map<String, Object> map = new HashMap<>();
+			map.put("user", login);
+			map.put("loginTime", session.getCreationTime());
+			map.put("accessTime", session.getLastAccessedTime());
+			users.add(map);
+		}
+
+		info.setProperty("osName", System.getProperty("os.name"));
+		info.setProperty("osArch", System.getProperty("os.arch"));
+		info.setProperty("osVersion", System.getProperty("os.version"));
+
+		info.setProperty("javaRuntime", System.getProperty("java.runtime.name"));
+		info.setProperty("javaVersion", System.getProperty("java.runtime.version"));
+
+		info.setProperty("memTotal", (runtime.totalMemory() / mb) + " Kb");
+		info.setProperty("memMax", (runtime.maxMemory() / mb) + " Kb");
+		info.setProperty("memUsed", ((runtime.totalMemory() - runtime.freeMemory()) / mb) + " Kb");
+		info.setProperty("memFree", (runtime.freeMemory() / mb) + " Kb");
+
+		if (isTechnicalStaff) {
+			info.put("users", users);
+		}
+
+		return info;
 	}
 }

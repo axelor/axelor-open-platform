@@ -501,7 +501,7 @@ Grid.prototype.parse = function(view) {
 			forEdit: item.forEdit,
 			descriptor: field,
 			sortable: sortable,
-			width: +(item.width) || null,
+			width: parseInt(item.width) || null,
 			hasWidth: item.width ? true : false,
 			cssClass: type,
 			headerCssClass: type,
@@ -1572,7 +1572,7 @@ Grid.prototype.onButtonClick = function(event, args) {
 		}
 		field.handler.scope.getContext = function() {
 			return _.extend({
-				_model: model,
+				_model: model
 			}, record);
 		};
 		field.handler.onClick().then(function(res){

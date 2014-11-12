@@ -266,3 +266,9 @@ input, button, textarea, select, fieldset, pre {
 	border-radius: 0 !important;
 	box-shadow: none;
 }
+
+.nvd3.nv-noData {
+	font: normal 13px "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-weight: 400;
+	fill: #333333;
+}

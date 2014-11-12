@@ -83,6 +83,7 @@ ui.formInput('CodeEditor', {
 		setTimeout(function () {
 			props.readOnly = scope.$$readonly;
 			editor = CodeMirror(element.get(0), props);
+			model.$render();
 			readonlySet(props.readOnly);
 			editor.on("change", changed);
 		});

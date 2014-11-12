@@ -31,6 +31,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	var originalEdit = $scope.edit;
 	var originalShow = $scope.show;
 
+	var recordVersion = -1;
 	var canClose = false;
 	var isClosed = true;
 
@@ -42,15 +43,22 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		}
 		closeCallback = callback;
 		isClosed = false;
+		recordVersion = -1;
 		this.edit(record);
 	};
 
 	function doEdit(record) {
 		if (record && record.id > 0 && (!(record.version >= 0) || !record.$fetched)) {
 			$scope.doRead(record.id).success(function(record){
+				if (recordVersion === -1) {
+					recordVersion = record.version;
+				}
 				originalEdit(record);
 			});
 		} else {
+			if (recordVersion === -1 && record) {
+				recordVersion = record.version;
+			}
 			originalEdit(record);
 		}
 		canClose = false;
@@ -92,12 +100,20 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		});
 	};
 
+	function canOK() {
+		if (isClosed) return false;
+		if ($scope.isDirty()) return true;
+		var record = $scope.record || {};
+		var version = record.version;
+		return recordVersion !== version;
+	};
+
 	function onOK() {
 
 		var record = $scope.record;
 
-		function close(value) {
-			if (value) {
+		function close(value, forceSelect) {
+			if (value && (forceSelect || canOK())) {
 				value.$fetched = true;
 				$scope.$parent.select(value);
 			}
@@ -118,7 +134,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 				record.id = null;
 			$scope.onSave().then(function(record, page) {
 				$scope.applyLater(function(){
-					close(record);
+					close(record, true);
 				});
 			});
 		} else {

@@ -120,7 +120,7 @@ if (AppInfo.isMobile(request) && AppInfo.isWebKit(request)) {
                 <li><a href="#/preferences"><i class="fa fa-cog"></i> <span x-translate>Preferences</span></a></li>
 				<li><a href="#/about"><i class="fa fa-info-circle"></i> <span x-translate>About</span></a></li>
                 <li class="divider"></li>
-                <li><a href="logout"><i class="fa fa-power-off"></i> <span x-translate>Logout</span></a></li>
+                <li><a href="logout"><i class="fa fa-power-off"></i> <span x-translate>Log out</span></a></li>
               </ul>
             </li>
           </ul>
@@ -139,6 +139,7 @@ if (AppInfo.isMobile(request) && AppInfo.isWebKit(request)) {
     <div class="fill-parent" ng-show="routePath[0] == 'main'" ng-include src="'partials/main.html'"></div>
     <% } %>
 	<div ng-switch-when="about" ng-include src="'partials/about.html'"></div>
+    <div ng-switch-when="system" ng-include src="'partials/system.html'"></div>
 	<div ng-switch-when="welcome" ng-include src="'partials/welcome.html'"></div>
 	<div ng-switch-when="preferences" ng-include src="'partials/preferences.html'"></div>
   </section>

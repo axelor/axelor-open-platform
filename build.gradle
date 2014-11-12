@@ -77,7 +77,7 @@ applicationDistribution.from(repo) {
 	
 }
 
-def distName = "axelor-sdk"
+def distName = "axelor-development-kit"
 def distConfig = {
 	baseName distName
 	eachFile {

@@ -112,7 +112,7 @@ public class ModuleManager {
 		}
 		// second iteration ensures proper view sequence
 		for (Module module : resolver.all()) {
-			if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
+			if (module.isInstalled()) {
 				viewLoader.doLast(module, update);
 			}
 		}

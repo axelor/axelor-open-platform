@@ -325,16 +325,23 @@ table.form-layout .tabbable-tabs .tab-content {
 	background-color: #fff;
 }
 
-table.form-layout td.form-item .stackbar {
+.form-item .stackbar {
 	position: relative;
 }
 
-table.form-layout td.form-item .stackbar.inline-editable {
+.form-item .stackbar.inline-editable {
 	min-height: 200px;
 }
 
-table.form-layout td.form-item .stackbar.readonly .edit-icon i:before {
+.form-item .stackbar.readonly .edit-icon i:before {
 	content: "\f0f6";
+}
+
+.form-item .stackbar .slickgrid {
+	position: absolute;
+	left: 0px; right: 0px;
+	top: 26px; bottom: 0px;
+	border-top: none;
 }
 	
 .icons-bar {
@@ -346,13 +353,6 @@ table.form-layout td.form-item .stackbar.readonly .edit-icon i:before {
 	margin: 2px;
 	padding: 2px;
 	cursor: pointer;
-}
-
-table.form-layout td.form-item .slickgrid {
-	position: absolute;
-	left: 0px; right: 0px;
-	top: 26px; bottom: 0px;
-	border-top: none;
 }
 
 td.form-item > * {
@@ -445,7 +445,7 @@ td.form-item > * {
 
 .form-item .image-item div.btn-group {
 	position: absolute;
-	left: calc(50% - 30px);
+	left: calc(50% - 32px);
 	bottom: 12px;
 }
 .form-item .image-item div.btn-group .btn {
@@ -617,7 +617,7 @@ form.readonly .form-item-container:hover .hot-edit-icon {
 }
 
 table.field-details {
-	width: 100px;
+	width: 220px;
 }
 
 table.field-details th {
@@ -641,6 +641,7 @@ table.field-details .help-text hr {
 .popover {
 	width: auto;
 	max-width: 480px;
+	min-width: 220px;
 	z-index: 2147483647;
 }
 
@@ -1233,4 +1234,24 @@ table.field-details .help-text hr {
 
 .notify-stack {
 	width: 340px;
+}
+
+::-webkit-input-placeholder {
+	font-size: 12px;
+	font-style: italic;
+}
+
+:-moz-placeholder { /* older Firefox*/
+	font-size: 12px;
+	font-style: italic;
+}
+
+::-moz-placeholder { /* Firefox 19+ */
+	font-size: 12px; 
+	font-style: italic;
+} 
+
+:-ms-input-placeholder {
+	font-size: 12px;
+	font-style: italic;
 }

@@ -439,13 +439,12 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 
 		 if (navigator !== 'hidden') {
 			 $('#offcanvas-toggle').find('a').click(function (e) {
-				 var active = !$("#offcanvas").hasClass("active");
-				 if (active && !menuToggled && !axelor.device.small) {
-					 active = false;
+				 var active = ! $("#offcanvas").hasClass('inactive');
+				 if (active && axelor.device.small) {
+					 active =  $("#offcanvas").hasClass('active');
 				 }
-				 menuToggled = true;
-			     $("#offcanvas").toggleClass("active", active);
-			     $("#offcanvas").toggleClass("inactive", !active);
+			     $("#offcanvas").toggleClass("active", !active && axelor.device.small);
+			     $("#offcanvas").toggleClass("inactive", active && !axelor.device.small);
 			     if (!axelor.device.mobile) {
 			    	 axelor.$adjustSize();
 				 }
@@ -454,7 +453,6 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 
 		 $("#offcanvas,#offcanvas-toggle").toggleClass("hidden-menu", navigator === "hidden");
 		 if (navigator === "collapse") {
-			 menuToggled = true;
 			 $("#offcanvas").addClass("inactive");
 		 }
 		 $scope.ajaxStop(function () {
@@ -462,6 +460,10 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 				 $("#offcanvas,#offcanvas-toggle").removeClass("hidden");
 			 }, 100);
 		 }, 100)
+
+		 $(window).on('resize', _.debounce(function () {
+			 $("#offcanvas").removeClass(axelor.device.small ? 'inactive' : 'active');
+		 }, 100));
 
 		 // confirm dirty
 		 $(window).on('beforeunload', onbeforeunload);

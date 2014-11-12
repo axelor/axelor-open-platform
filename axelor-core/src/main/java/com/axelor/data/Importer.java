@@ -47,6 +47,33 @@ public interface Importer {
 	};
 
 	/**
+	 * Set global context.
+	 *
+	 * @param context the global context
+	 */
+	void setContext(Map<String, Object> context);
+
+	/**
+	 * Add a data import event listener.
+	 *
+	 * @param listener the listener
+	 */
+	void addListener(Listener listener);
+
+	/**
+	 * Clear listeners.
+	 *
+	 */
+	void clearListener();
+
+	/**
+	 * Run the specified import task.
+	 *
+	 * @param task the task to run
+	 */
+	void runTask(ImportTask task);
+
+	/**
 	 * Run the data import task.
 	 *
 	 * The file name mappings should be passed to process data from multiple

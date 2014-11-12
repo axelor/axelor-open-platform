@@ -67,7 +67,7 @@ var regional = {
 	closeText :		_t('Done'),
 	prevText : 		_t('Prev'),
 	nextText : 		_t('Next'),
-	firstDay: 		1,
+	firstDay: 		1
 };
 
 //configure datepicker

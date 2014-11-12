@@ -76,6 +76,34 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 	});
 }
 
+function SystemCtrl($scope, $element, $location, $http) {
+
+	var promise = null;
+
+	$scope.onRefresh = function () {
+		if (promise) {
+			return;
+		}
+		promise = $http.get("ws/app/sysinfo").then(function (res) {
+			var info = res.data;
+			_.each(info.users, function (item) {
+				item.loginTime = moment(item.loginTime).format('L LT');
+				item.accessTime = moment(item.accessTime).format('L LT');
+			});
+			$scope.info = info;
+			promise = null;
+		});
+		return promise;
+	};
+
+	$scope.onClose = function () {
+		window.history.back();
+	};
+
+	$scope.onRefresh();
+}
+
 app.controller("UserCtrl", ['$scope', '$element', '$location', 'DataSource', 'ViewService', UserCtrl]);
+app.controller("SystemCtrl", ['$scope', '$element', '$location', '$http', SystemCtrl]);
 
 }).call(this);

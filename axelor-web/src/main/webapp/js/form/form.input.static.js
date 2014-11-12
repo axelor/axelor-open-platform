@@ -21,16 +21,23 @@ var ui = angular.module('axelor.ui');
 var popoverElem = null;
 var popoverTimer = null;
 
+function canDisplayPopover(scope, details) {
+	var mode = __appSettings['application.mode'];
+	var tech = __appSettings['user.technical'];
+	
+	if(mode == 'prod' && !tech) {
+		return details ? false : scope.field && scope.field.help;
+	}
+
+	return true;
+}
+
 function makePopover(scope, element, callback, placement) {
 	
 	var mode = __appSettings['application.mode'];
 	var tech = __appSettings['user.technical'];
 	var doc = $(document);
 	
-	if (mode != 'dev' && !tech) {
-		return;
-	}
-
 	var table = null;
 
 	function addRow(label, text, klass) {
@@ -160,7 +167,9 @@ ui.directive('uiTabPopover', function() {
 	}
 
 	return function (scope, element, attrs) {
-		return makePopover(scope, element, getHelp, 'bottom');
+		if(canDisplayPopover(scope, true)) {
+			return makePopover(scope, element, getHelp, 'bottom');
+		}
 	};
 });
 
@@ -177,6 +186,10 @@ ui.directive('uiHelpPopover', function() {
 
 		if (text) {
 			addRow(null, '<hr noshade>', 'help-text');
+		}
+		
+		if(!canDisplayPopover(scope, true)) {
+			return;
 		}
 		
 		var model = scope._model;
@@ -235,7 +248,9 @@ ui.directive('uiHelpPopover', function() {
 		if (field == null) {
 			return;
 		}
-		makePopover(scope, element, getHelp);
+		if(canDisplayPopover(scope, false)) {
+			makePopover(scope, element, getHelp);
+		}
 	};
 
 	return function(scope, element, attrs) {
@@ -343,14 +358,19 @@ ui.formItem('Button', {
 			element.attr("href", field.link);
 		}
 		
-		if (field.help) {
-			element.tooltip({
-				html: true,
-				title: field.help,
-				delay: { show: 500, hide: 100 },
-				container: 'body'
-			});
-		}
+		element.tooltip({
+			html: true,
+			title: function() {
+				if (field.help) {
+					return field.help;
+				}
+				if (element.innerWidth() < element[0].scrollWidth) {
+					return field.title;
+				}
+			},
+			delay: { show: 1000, hide: 100 },
+			container: 'body'
+		});
 
 		element.on("click", function(e) {
 			if (!scope.isReadonlyExclusive()) {

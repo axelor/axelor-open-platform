@@ -128,6 +128,12 @@ public class Field extends SimpleWidget {
 	@XmlAttribute(name = "x-create")
 	private String create;
 
+	@XmlAttribute(name = "x-can-reload")
+	private Boolean canReload;
+
+	@XmlAttribute(name = "x-call-onSave")
+	private Boolean callOnSave;
+
 	@XmlAttribute(name = "x-icon")
 	private String icon;
 
@@ -336,6 +342,22 @@ public class Field extends SimpleWidget {
 
 	public String getCreate() {
 		return create;
+	}
+
+	public Boolean getCanReload() {
+		return canReload;
+	}
+
+	public void setCanReload(Boolean canReload) {
+		this.canReload = canReload;
+	}
+
+	public Boolean getCallOnSave() {
+		return callOnSave;
+	}
+
+	public void setCallOnSave(Boolean callOnSave) {
+		this.callOnSave = callOnSave;
 	}
 
 	public String getIcon() {
