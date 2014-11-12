@@ -1235,3 +1235,23 @@ table.field-details .help-text hr {
 .notify-stack {
 	width: 340px;
 }
+
+::-webkit-input-placeholder {
+	font-size: 12px;
+	font-style: italic;
+}
+
+:-moz-placeholder { /* older Firefox*/
+	font-size: 12px;
+	font-style: italic;
+}
+
+::-moz-placeholder { /* Firefox 19+ */
+	font-size: 12px; 
+	font-style: italic;
+} 
+
+:-ms-input-placeholder {
+	font-size: 12px;
+	font-style: italic;
+}
