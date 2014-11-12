@@ -48,6 +48,7 @@ import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
+import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.google.common.base.Throwables;
@@ -129,11 +130,12 @@ public class MetaController {
 		MetaField metaField = request.getContext().asType(MetaField.class);
 
 		String domain = String.format("self.packageName = '%s' AND self.name = '%s'", metaField.getPackageName(), metaField.getTypeName());
-		Map<String, Object> view = new HashMap<String, Object>();
-		view.put("title", metaField.getTypeName());
-		view.put("resource", MetaModel.class.getName());
-		view.put("domain", domain);
-		response.setView(view);
+		response.setView(ActionView
+			.define(metaField.getTypeName())
+			.model(MetaModel.class.getName())
+			.domain(domain)
+			.map());
+		response.setCanClose(true);
 	}
 
 	public void restoreAll(ActionRequest request, ActionResponse response) {
