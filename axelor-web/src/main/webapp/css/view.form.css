@@ -617,7 +617,7 @@ form.readonly .form-item-container:hover .hot-edit-icon {
 }
 
 table.field-details {
-	width: 100px;
+	width: 220px;
 }
 
 table.field-details th {
@@ -641,6 +641,7 @@ table.field-details .help-text hr {
 .popover {
 	width: auto;
 	max-width: 480px;
+	min-width: 220px;
 	z-index: 2147483647;
 }
 
