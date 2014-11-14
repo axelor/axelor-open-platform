@@ -489,7 +489,7 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 		if (field.viewer) {
 			return viewer;
 		}
-		if (field.editor && !field.targetName) {
+		if (field.editor && (field.editor.viewer || !field.targetName)) {
 			return '<div ui-panel-editor>';
 		}
 		return '<a href="" ng-show="text" ng-click="onEdit()">{{text}}</a>'

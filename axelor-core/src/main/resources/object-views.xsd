@@ -939,6 +939,11 @@
             <xsd:documentation>Specify alternative layout (e.g. table)</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="x-viewer" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to use editor as viewer</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
