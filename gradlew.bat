@@ -85,6 +85,11 @@ set CMD_LINE_ARGS=%$
 
 set CLASSPATH=%APP_HOME%\gradle\wrapper\gradle-wrapper.jar
 
+@rem Clean ivy directory
+if "%1%"=="clean" (
+if exist "%APP_HOME%\ivy" @rd /q /s "%APP_HOME%\ivy"
+)
+
 @rem Deploy axelor-gradle
 if not exist "%APP_HOME%\ivy" (
 "%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -classpath "%CLASSPATH%" org.gradle.wrapper.GradleWrapperMain %INIT_SCRIPT_ARGS% -q -p axelor-gradle -x test uploadArchives 2> nul
