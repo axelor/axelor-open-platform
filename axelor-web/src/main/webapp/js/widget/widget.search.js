@@ -301,6 +301,12 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		return $scope.applyFilter();
 	});
 
+	$scope.$on('on:select-domain', function(e, filter) {
+		$scope.filters.length = 0;
+		$scope.addFilter();
+		return $scope.applyFilter();
+	});
+
 	$scope.$on('on:before-save', function(e, data) {
 		var criteria = $scope.prepareFilter();
 		if (data) {
@@ -587,7 +593,7 @@ ui.directive('uiFilterBox', function() {
 				}
 
 				if (live) {
-					$scope.onFilter();
+					$scope.$broadcast('on:select-domain', filter);
 				}
 			};
 
