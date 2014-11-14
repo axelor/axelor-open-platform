@@ -875,6 +875,9 @@ Grid.prototype._doInit = function(view) {
 		if (!that.isDirty() || that.saveChanges()) {
 			return;
 		}
+		if (!that.editorScope || that.editorScope.isValid()) {
+			return;
+		}
 		
 		var args = that.grid.getActiveCell();
 		that.focusInvalidCell(args);
