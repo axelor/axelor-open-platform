@@ -798,6 +798,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		scope.onGridInit = function() {};
 		scope.items = [];
 
+		var showOnNew = (scope.field.editor||{}).showOnNew !== false;
 		var unwatch = null;
 
 		model.$render = function () {
@@ -809,7 +810,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			if (scope.items) {
 				return;
 			}
-			scope.items = [{}];
+			scope.items = showOnNew ? [{}] : [];
 			unwatch = scope.$watch('items[0]', function (item, old) {
 				if (!item) return;
 				if (item.$changed) {
