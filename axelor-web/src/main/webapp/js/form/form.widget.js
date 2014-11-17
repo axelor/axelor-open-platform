@@ -213,8 +213,16 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 			return;
 		}
 
+		function getRecord() {
+			if (scope.getEditorRecord) {
+				return scope.getEditorRecord();
+			}
+			return scope.record;
+		}
+
 		scope.$on("on:record-change", function(e, rec, force) {
-			if (rec === scope.record || force) {
+			var ref = getRecord();
+			if (rec === ref || force) {
 				handle(rec);
 			}
 		});
@@ -230,7 +238,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 
 		function watcher(current, old) {
 			if (current === old) return;
-			var rec = scope.record;
+			var rec = getRecord();
 			if (rec === undefined && scope.getContext) {
 				rec = scope.getContext();
 			}

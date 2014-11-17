@@ -384,6 +384,13 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 				return context;
 			};
 
+			scope.getEditorRecord = function () {
+				if (watchFor === "record" || !scope.record) {
+					return scope.record;
+				}
+				return scope.record[field.name];
+			};
+
 			scope.$watch(watchFor, function(rec, old) {
 				if (rec !== old) {
 					scope.$broadcast("on:record-change", rec, true);
