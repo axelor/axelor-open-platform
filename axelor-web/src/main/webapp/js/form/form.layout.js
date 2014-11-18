@@ -362,33 +362,28 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 			scope.fields = editor.fields || scope.fields;
 
 			var form = ui.formBuild(scope, schema, scope.fields);
-			var watchFor = "record";
+			var isRelational = /-to-one$/.test(field.type);
 
-			if (/-to-one$/.test(field.type)) {
-				watchFor = 'record.' + field.name
-				form.attr('x-model-prefix', watchFor);
+			if (isRelational) {
+				Object.defineProperty(scope, 'record', {
+					enumerable: true,
+					get: function () {
+						return (scope.$parent.record||{})[field.name];
+					},
+					set: function (value) {
+						scope.setValue(value, true);
+					}
+				});
+				scope.getContext = function () {
+					var context = _.extend({}, scope.record);
+					context._model = scope._model;
+					return context;
+				};
 			}
 
 			form = $compile(form)(scope);
 			form.children('div.row').removeClass('row').addClass('row-fluid');
 			element.append(form);
-
-			var getContext = scope.getContext;
-			scope.getContext = function () {
-				var context = getContext.apply(scope, arguments) || {};
-				if (watchFor === "record") {
-					return context;
-				}
-				context = _.extend({}, context[field.name]);
-				context._model = scope._model;
-				return context;
-			};
-
-			scope.$watch(watchFor, function(rec, old) {
-				if (rec !== old) {
-					scope.$broadcast("on:record-change", rec, true);
-				}
-			}, true);
 
 			scope.$watch('form.$valid', function (valid, old) {
 				if (scope.setValidity) {
