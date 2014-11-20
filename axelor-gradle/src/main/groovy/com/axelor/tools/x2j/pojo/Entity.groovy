@@ -186,11 +186,11 @@ class Entity {
 		indexes.addAll(other.indexes)
 		constraints.addAll(other.constraints)
 		finders.addAll(other.finders)
-		
-		extraImports = extraImports?:"" + other.extraImports?:""
-		extraCode = extraCode?:"" + other.extraCode?:""
 
 		other.baseEntity = this;
+
+		extraImports = stripCode(extraImports, "") + stripCode(other.extraImports, "")
+		extraCode = stripCode(extraCode, "\n\t") + "\n" + stripCode(other.extraCode, "\n\t")
 	}
 
 	boolean addField(Property field) {
@@ -262,10 +262,14 @@ class Entity {
 
 		return "\t" + Utils.stripCode(lines.join("\n"), "\n\t")
 	}
-	
+
+	private String stripCode(code, prefix) {
+		if (!code || code.trim().empty) return "";
+		return prefix + Utils.stripCode(code, prefix)
+	}
+
 	String getExtraCode() {
-		if (!extraCode || extraCode.trim().isEmpty()) return "";
-		return "\n\t" + Utils.stripCode(extraCode, "\n\t")
+		return stripCode(extraCode, "\n\t");
 	}
 	
 	String getExtraImports() {

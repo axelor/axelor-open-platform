@@ -8,6 +8,12 @@
 	<entity name="User" cachable="true">
 		<string name="code" required="true" unique="true" min="2" title="Login" />
 		<string name="name" required="true" unique="true" min="2" />
+        <finder-method name="findByAny" using="code,name"/>
+        <extra-code>
+        public void test1() {
+
+        }
+        </extra-code>
 	</entity>
 
 </domain-models>
