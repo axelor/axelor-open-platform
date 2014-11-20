@@ -405,6 +405,9 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 			element.append(form);
 
 			scope.$watch('form.$valid', function (valid, old) {
+				if (isRelational && editor.showOnNew === false && !scope.canShowEditor()) {
+					return;
+				}
 				if (scope.setValidity) {
 					scope.setValidity('valid', valid);
 				}

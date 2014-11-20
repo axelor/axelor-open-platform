@@ -990,7 +990,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			}
 
 			var elems = element.find('[x-field].ng-invalid:not(fieldset)').filter(function() {
-				var isInline = $(this).parents('.slickgrid').size() > 0;
+				var isInline = $(this).parents('.slickgrid,.m2o-editor').size() > 0;
 				return !isInline || (isInline && $(this).is(':visible'));
 			});
 			var items = elems.map(function () {
