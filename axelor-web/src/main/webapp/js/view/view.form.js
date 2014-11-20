@@ -449,6 +449,7 @@ function FormViewCtrl($scope, $element) {
 	$scope.onCopy = function() {
 		var record = $scope.record;
 		ds.copy(record.id).success(function(record){
+			routeId = null;
 			$scope.edit(record);
 			$scope.setEditable();
 			record._dirty = true;
