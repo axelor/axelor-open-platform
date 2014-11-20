@@ -515,10 +515,22 @@ ui.directive('uiViewTree', function(){
 				var row = ui.draggable,
 					record = row.data('$record'),
 					current = $(this).data('$record'),
-					node = table.treetable("node", row.data("id"));
+					node = table.treetable("node", row.data("id")),
+					nodeParent = node.parentNode();
 
 				table.treetable("move", node.id, $(this).data("id"));
-				
+
+				// make sure to remove expander icon if no children left
+				if (nodeParent && nodeParent.children.length === 0) {
+					nodeParent.row.removeClass('expanded');
+					nodeParent.row.removeClass('branch');
+					nodeParent.row.addClass('leaf');
+
+					nodeParent.treeCell.off('click.treetable');
+					nodeParent.treeCell.off('keydown.treetable');
+					nodeParent.indenter.empty();
+				}
+
 				record.$parentId = current.$record.id;
 				record.$move(function(result) {
 				
