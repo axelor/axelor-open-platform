@@ -110,6 +110,7 @@ class Finder {
 				}
 			} else {
 				p = entity.getField(n)
+				if (!p && entity.baseEntity) p = entity.baseEntity.getField(n)
 				if (!p) return ""
 				t = p.type
 

@@ -70,6 +70,8 @@ class Entity {
 	
 	private String extraCode
 
+	Entity baseEntity
+
 	Entity(NodeChild node) {
 		name = node.@name
 		table = node.@table
@@ -187,6 +189,8 @@ class Entity {
 		
 		extraImports = extraImports?:"" + other.extraImports?:""
 		extraCode = extraCode?:"" + other.extraCode?:""
+
+		other.baseEntity = this;
 	}
 
 	boolean addField(Property field) {
