@@ -379,6 +379,25 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 					context._model = scope._model;
 					return context;
 				};
+				// make sure to fetch missing values
+				scope.$watch('record.id', function (value, old) {
+					var ds = scope._dataSource;
+					var record = scope.record;
+					if (value <= 0 || !value || record.$fetched || record.$fetchedRelated) {
+						return;
+					}
+					var missing = _.filter(_.keys(editor.fields), function (name) {
+						return !record.hasOwnProperty(name);
+					});
+					if (missing.length === 0) {
+						return;
+					}
+					record.$fetchedRelated = true;
+					return ds.read(value.id).success(function(rec) {
+						var values = _.pick(rec, missing);
+						record = _.extend(record, values);
+					});
+				});
 			}
 
 			form = $compile(form)(scope);
