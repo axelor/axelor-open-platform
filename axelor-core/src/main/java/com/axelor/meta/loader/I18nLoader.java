@@ -35,6 +35,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
 
 import com.axelor.common.FileUtils;
@@ -113,7 +114,9 @@ public class I18nLoader extends AbstractLoader {
 		language = matcher.group(1);
 
 		Reader reader = new InputStreamReader(stream);
-		CSVReader csvReader = new CSVReader(reader);
+		CSVReader csvReader = new CSVReader(reader,
+				CSVParser.DEFAULT_SEPARATOR,
+				CSVParser.DEFAULT_QUOTE_CHARACTER, '\0');
 
 		try {
 			String[] fields = csvReader.readNext();

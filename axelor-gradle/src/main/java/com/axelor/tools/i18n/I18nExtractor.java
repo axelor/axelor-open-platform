@@ -45,6 +45,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -407,9 +408,10 @@ public class I18nExtractor {
 	
 	private void update(Path file, List<String[]> lines) throws IOException {
 		if (!file.toFile().exists()) return;
-		
 		final Map<String, Map<String, String>> values = new HashMap<>();
-		try(final CSVReader reader = new CSVReader(new FileReader(file.toFile()))) {
+		try(final CSVReader reader = new CSVReader(new FileReader(file.toFile()),
+				CSVParser.DEFAULT_SEPARATOR,
+				CSVParser.DEFAULT_QUOTE_CHARACTER, '\0')) {
 			String[] headers = reader.readNext();
 			if (headers.length < 2) {
 				throw new IOException("Invalid language file: " + file);
