@@ -162,10 +162,11 @@ public class GradleCommands implements CommandProvider {
 			boolean extract,
 			@CliOption(name = "update", shortName = 'u', help = "update messages.")
 			boolean update) {
+		final String task = update ? "i18n-update" : "i18n-extract";
 		if (StringUtils.isBlank(module)) {
-			return execute("-q", "-x", "test", "i18n-extract");
+			return execute("-q", "-x", "test", task);
 		}
-		return execute("-q", "-x", "test", "-p", module, "i18n-extract");
+		return execute("-q", "-x", "test", "-p", module, task);
 	}
 
 	@CliCommand(name = "init", usage = "[OPTIONS] [MODULES...]", help = "initialize or update the database")

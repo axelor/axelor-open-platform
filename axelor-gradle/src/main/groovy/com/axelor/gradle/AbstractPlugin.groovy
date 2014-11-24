@@ -51,7 +51,10 @@ abstract class AbstractPlugin implements Plugin<Project> {
 			}
 
 			task('i18n-extract', type: I18nTask) {
-
+				update = false
+			}
+			task('i18n-update', type: I18nTask) {
+				update = true
 			}
 
 			tasks.eclipse.dependsOn "cleanEclipse"
