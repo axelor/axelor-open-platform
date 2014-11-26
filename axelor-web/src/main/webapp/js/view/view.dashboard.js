@@ -179,7 +179,7 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 
 				var template = $('<div ui-portlet-' + view.viewType + '></div>');
 
-				scope.noFilter = dashlet.canSearch != "true";
+				scope.noFilter = !dashlet.canSearch;
 
 				template = $compile(template)(scope);
 				body.append(template);
