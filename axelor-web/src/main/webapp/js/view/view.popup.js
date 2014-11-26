@@ -132,13 +132,24 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		if ($scope.editorCanSave && $scope.isDirty()) {
 			if (record.id < 0)
 				record.id = null;
-			$scope.onSave().then(function(record, page) {
+			return $scope.onSave().then(function(record, page) {
 				$scope.applyLater(function(){
 					close(record, true);
 				});
 			});
-		} else {
-			close(record);
+		}
+
+		var event = $scope.$broadcast('on:before-save', record);
+		if (event.defaultPrevented) {
+			if (event.error) {
+				axelor.dialogs.error(event.error);
+			}
+ 		} else {
+			$scope.applyLater(function() {
+				$scope.ajaxStop(function() {
+					close(record);
+				});
+			});
 		}
 	};
 	
