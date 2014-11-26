@@ -374,6 +374,13 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 						scope.setValue(value, true);
 					}
 				});
+				Object.defineProperty(scope, '$$original', {
+					enumerable: true,
+					get: function () {
+						return (scope.$parent.$$original||{})[field.name];
+					},
+					set: function (value) {}
+				});
 				scope.getContext = function () {
 					var context = _.extend({}, scope.record);
 					context._model = scope._model;
