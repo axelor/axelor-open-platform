@@ -157,6 +157,11 @@ var Editor = function(args) {
 			updated = false;
 			
 		if (record.id !== current.id || record.version !== current.version) {
+			if (current && (!current.id || current.id < 0)) {
+				if (current[column.field] === null || current[column.field] === undefined) {
+					current[column.field] = (scope.defaultValues||{})[column.field];
+				}
+			}
 			scope.editRecord(current);
 		} else {
 			record[column.field] = current[column.field];
@@ -1146,9 +1151,19 @@ Grid.prototype.onBeforeEditCell = function(event, args) {
 	if (args.item && args.item._original === undefined) {
 		args.item._original = _.clone(args.item);
 	}
-	if (!args.item) {
-		this.editorScope.editRecord(null);
+	if (args.item) {
+		return;
 	}
+	var es = this.editorScope;
+	if (es.defaultValues === null) {
+		es.defaultValues = {};
+		_.each(es.fields, function (field, name) {
+			if (field.defaultValue !== undefined) {
+				es.defaultValues[name] = field.defaultValue;
+			}
+		});
+	}
+	this.editorScope.editRecord(es.defaultValues);
 };
 
 Grid.prototype.onKeyDown = function(e, args) {
