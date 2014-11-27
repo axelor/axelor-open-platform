@@ -156,12 +156,12 @@ var Editor = function(args) {
 			current = item || { id: 0 },
 			updated = false;
 			
+		if (current && (!current.id || current.id < 0)
+					&& (current[column.field] === undefined)) {
+			current[column.field] = (scope.defaultValues||{})[column.field];
+		}
+
 		if (record.id !== current.id || record.version !== current.version) {
-			if (current && (!current.id || current.id < 0)) {
-				if (current[column.field] === null || current[column.field] === undefined) {
-					current[column.field] = (scope.defaultValues||{})[column.field];
-				}
-			}
 			scope.editRecord(current);
 		} else {
 			record[column.field] = current[column.field];
