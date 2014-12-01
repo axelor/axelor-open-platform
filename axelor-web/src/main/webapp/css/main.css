@@ -760,11 +760,16 @@ img.prefix-icon {
 .nvtooltip {
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;;
 	font-size: inherit;
+	padding: 0;
+	opacity: 0.94 !important;
+	border-radius: 4px;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .nvtooltip h3 {
 	font-size: 13px;
 	font-weight: bold;
+	background: none !important;
 }
 
 .about-page {
