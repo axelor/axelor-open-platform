@@ -37,6 +37,8 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.inject.Beans;
+import com.axelor.meta.ActionHandler;
 import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
@@ -53,6 +55,8 @@ import com.axelor.meta.schema.views.ChartView.ChartConfig;
 import com.axelor.meta.schema.views.ChartView.ChartSeries;
 import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.schema.views.Search;
+import com.axelor.rpc.ActionRequest;
+import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.axelor.script.ScriptHelper;
@@ -418,15 +422,7 @@ public class MetaService {
 		
 		if (hasDataSet || !hasOnInit) {
 			
-			final String string = chart.getQuery().getText();
-			final Query query = "sql".equals(chart.getQuery().getType()) ?
-					JPA.em().createNativeQuery(string) :
-					JPA.em().createQuery(string);
-	
-			// return result as list of map
-			((org.hibernate.ejb.QueryImpl<?>) query).getHibernateQuery()
-				.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-	
+			final String string = chart.getDataset().getText();
 			final Map<String, Object> context = Maps.newHashMap();
 			if (request.getData() != null) {
 				context.putAll(request.getData());
@@ -436,12 +432,35 @@ public class MetaService {
 				context.put("__userId__", AuthUtils.getUser().getId());
 				context.put("__userCode__", AuthUtils.getSubject());
 			}
-	
-			if (request.getData() != null) {
-				QueryBinder.of(query).bind(context);
-			}
 
-			data.put("dataset", query.getResultList());
+			if ("call".equals(chart.getDataset().getType())) {
+				ActionHandler handler = Beans.get(ActionHandler.class);
+				ActionRequest req = new ActionRequest();
+				ActionResponse res = new ActionResponse();
+
+				req.setData(request.getData());
+				req.setAction(string);
+
+				handler = handler.forRequest(req);
+				res = handler.execute();
+
+				data.put("dataset", res.getData());
+
+			} else {
+				Query query = "sql".equals(chart.getDataset().getType()) ?
+						JPA.em().createNativeQuery(string) :
+						JPA.em().createQuery(string);
+
+				// return result as list of map
+				((org.hibernate.ejb.QueryImpl<?>) query).getHibernateQuery()
+					.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+
+				if (request.getData() != null) {
+					QueryBinder.of(query).bind(context);
+				}
+
+				data.put("dataset", query.getResultList());
+			}
 		}
 
 		if (hasDataSet) {

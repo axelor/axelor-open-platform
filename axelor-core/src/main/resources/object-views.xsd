@@ -1337,8 +1337,9 @@
           <xsd:element name="dataset">
             <xsd:annotation>
               <xsd:documentation>
-                Specify the dataset using JPQL or SQL query.
-                The query select names should be assgined aliases.
+                Specify the chart dataset using JPQL, SQL or a method call.
+                The query select names should be have aliases.
+                The controller method should provide list of records or maps.
               </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
@@ -1349,6 +1350,7 @@
                       <xsd:restriction base="xsd:string">
                         <xsd:enumeration value="jpql" />
                         <xsd:enumeration value="sql" />
+                        <xsd:enumeration value="rpc" />
                       </xsd:restriction>
                     </xsd:simpleType>
                   </xsd:attribute>
