@@ -59,6 +59,7 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
+import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -433,13 +434,18 @@ public class MetaService {
 				context.put("__userCode__", AuthUtils.getSubject());
 			}
 
-			if ("call".equals(chart.getDataset().getType())) {
+			if ("rpc".equals(chart.getDataset().getType())) {
 				ActionHandler handler = Beans.get(ActionHandler.class);
 				ActionRequest req = new ActionRequest();
 				ActionResponse res = new ActionResponse();
 
+				req.setModel(request.getModel());
 				req.setData(request.getData());
 				req.setAction(string);
+
+				if (req.getModel() == null) {
+					req.setModel(ScriptBindings.class.getName());
+				}
 
 				handler = handler.forRequest(req);
 				res = handler.execute();

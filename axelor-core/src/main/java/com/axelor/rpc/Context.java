@@ -27,6 +27,7 @@ import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
+import com.axelor.script.ScriptBindings;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -110,6 +111,9 @@ public class Context extends HashMap<String, Object> {
 		Preconditions.checkNotNull(beanClass);
 		if (data == null) {
 			data = Maps.newHashMap();
+		}
+		if (ScriptBindings.class.isAssignableFrom(beanClass)) {
+			return new Context(data, new ScriptBindings(data));
 		}
 		return create(data, beanClass, data.containsKey(KEY_FORM));
 	}
