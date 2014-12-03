@@ -253,6 +253,13 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		closeTabOthers();
 	}
 
+	function reloadTab(current) {
+		var viewScope = current.$viewScope;
+		if (viewScope) {
+			viewScope.$broadcast('on:tab-reload', current);
+		}
+	}
+
 	function getTabs() {
 		return tabs;
 	}
@@ -269,6 +276,7 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		openTabByName: openTabByName,
 		openTab: openTab,
 		canCloseTab: canCloseTab,
+		reloadTab: reloadTab,
 		closeTab: closeTab,
 		closeTabOthers: closeTabOthers,
 		closeTabAll: closeTabAll,
@@ -386,6 +394,10 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 		return NavService.closeTabAll();
 	};
 	
+	$scope.reloadTab = function(tab) {
+		return NavService.reloadTab(tab);
+	};
+
 	$scope.tabTitle = function(tab) {
 		var vs = tab.$viewScope || {};
 		if (vs.viewType === "form") {

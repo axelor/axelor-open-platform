@@ -352,6 +352,12 @@ function DSViewCtrl(type, $scope, $element) {
 	if (view.deferred) {
 		view.deferred.resolve($scope);
 	}
+
+	$scope.$on('on:tab-reload', function(e, tab) {
+		if ($scope === e.targetScope && $scope.onRefresh) {
+			$scope.onRefresh();
+		}
+	});
 }
 
 angular.module('axelor.ui').directive('uiViewPane', function() {

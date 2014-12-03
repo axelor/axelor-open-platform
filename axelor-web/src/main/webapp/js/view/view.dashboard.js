@@ -165,6 +165,12 @@ function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 			$scope.onRefresh();
 		}
 	});
+
+	$scope.$on('on:tab-reload', function(e) {
+		if ($scope.onRefresh) {
+			$scope.onRefresh();
+		}
+	});
 }
 
 ui.directive('uiViewDashlet', ['$compile', function($compile){

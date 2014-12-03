@@ -175,6 +175,12 @@ function PortletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 			$scope.onRefresh();
 		}
 	});
+
+	$scope.$on('on:tab-reload', function(e) {
+		if ($scope.onRefresh) {
+			$scope.onRefresh();
+		}
+	});
 }
 
 function setPortletSize(scope, element, attrs) {
