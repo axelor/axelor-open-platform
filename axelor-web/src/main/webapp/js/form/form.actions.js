@@ -175,10 +175,11 @@ ActionHandler.prototype = {
 	
 	onClick: function(event) {
 		var self = this;
-		if (this.prompt) {
+		var prompt = this._getPrompt();
+		if (prompt) {
 			var deferred = this.ws.defer(),
 				promise = deferred.promise;
-			axelor.dialogs.confirm(this.prompt, function(confirmed){
+			axelor.dialogs.confirm(prompt, function(confirmed){
 				if (confirmed) {
 					self.handle().then(deferred.resolve, deferred.reject);
 				} else {
@@ -201,6 +202,14 @@ ActionHandler.prototype = {
 		});
 	},
 	
+	_getPrompt: function () {
+		var prompt = this.prompt;
+		if (_.isFunction(this.scope.attr)) {
+			prompt = this.scope.attr('prompt') || prompt;
+		}
+		return prompt;
+	},
+
 	_getContext: function() {
 		var scope = this.scope,
 			context = scope.getContext ? scope.getContext() : scope.record,
@@ -666,8 +675,9 @@ ActionHandler.prototype = {
 					})();
 					itemScope.attr('title', value);
 					break;
-				case 'color':
-					//TODO: set color
+				case 'prompt':
+					itemScope.attr('prompt', value);
+					break;
 				case 'domain':
 					if (itemScope.setDomain)
 						itemScope.setDomain(value);
