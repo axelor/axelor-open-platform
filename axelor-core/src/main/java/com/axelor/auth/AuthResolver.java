@@ -39,10 +39,13 @@ final class AuthResolver {
 	 * @param permission
 	 *            the permission instance to check
 	 * @param accessType
-	 *            the required access type
-	 * @return true if can confirm false otherwise
+	 *            the required access type, if null, returns true always
+	 * @return true if can confirm or given accessType is null otherwise false
 	 */
-	private boolean hasAccess(Permission permission, AccessType accessType) {
+	boolean hasAccess(Permission permission, AccessType accessType) {
+		if (accessType == null) {
+			return true;
+		}
 		switch(accessType) {
 		case READ:
 			return permission.getCanRead() == Boolean.TRUE;
@@ -62,9 +65,10 @@ final class AuthResolver {
 	/**
 	 * Filter the given set of permissions for the given object with the
 	 * required access type. <br>
-	 * <br>
-	 * It first tried to find exact match for the given object else it tries to
-	 * find wild card (by package name).
+	 * <p>
+	 * It first tries to find exact match for the given object else it tries to
+	 * find wild card (by package name). The permissions on objects without
+	 * condition gets preference over wild card permissions.
 	 * 
 	 * @param permissions
 	 *            set of permissions to filter
@@ -83,7 +87,8 @@ final class AuthResolver {
 		final Set<Permission> all = Sets.newLinkedHashSet();
 		
 		for (final Permission permission : permissions) {
-			if (Objects.equal(object, permission.getObject()) && (type == null || hasAccess(permission, type))) {
+			if (Objects.equal(object, permission.getObject())
+					&& (permission.getCondition() == null || hasAccess(permission, type))) {
 				all.add(permission);
 			}
 		}
@@ -94,7 +99,8 @@ final class AuthResolver {
 		final String pkg = object.substring(0, object.lastIndexOf('.')) + ".*";
 		
 		for (final Permission permission : permissions) {
-			if (Objects.equal(pkg, permission.getObject()) && (type == null || hasAccess(permission, type))) {
+			if (Objects.equal(pkg, permission.getObject()) &&
+				(permission.getCondition() == null || hasAccess(permission, type))) {
 				all.add(permission);
 			}
 		}

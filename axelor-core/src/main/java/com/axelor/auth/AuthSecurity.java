@@ -171,7 +171,14 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
 		if (permissions.isEmpty()) {
 			return false;
 		}
-		
+
+		// check whether non-conditional permissions are granted
+		for (Permission permission : permissions) {
+			if (permission.getCondition() == null && !authResolver.hasAccess(permission, type)) {
+				return false;
+			}
+		}
+
 		if (ids == null || ids.length == 0) {
 			return true;
 		}
