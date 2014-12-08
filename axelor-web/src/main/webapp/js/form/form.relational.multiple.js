@@ -593,8 +593,8 @@ var panelRelatedTemplate =
 	"<div class='panel-header'>" +
 		"<div class='icons-bar pull-right' ng-show='!isReadonly()'>" +
 			"<i ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()' class='fa fa-pencil'></i>" +
-			"<i ng-click='onNew()' ng-show='hasPermission(\"write\") && !isDisabled() && canNew()' class='fa fa-plus'></i>" +
-			"<i ng-click='onRemove()' ng-show='hasPermission(\"remove\") && !isDisabled() && canRemove()' class='fa fa-minus'></i>" +
+			"<i ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()' class='fa fa-plus'></i>" +
+			"<i ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()' class='fa fa-minus'></i>" +
 			"<i ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()' class='fa fa-search'></i>" +
 		"</div>" +
 		"<div class='panel-title'><span ui-help-popover ng-bind-html-unsafe='title'></span></div>" +

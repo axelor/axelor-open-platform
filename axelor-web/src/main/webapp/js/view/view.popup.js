@@ -82,9 +82,11 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	var isEditable = $scope.isEditable;
 	$scope.isEditable = function () {
 		if (!($scope.record || {}).id > 0) {
-			return true;
+			return $scope.hasPermission('create');
 		}
-		return $scope.canEditTarget() && isEditable.call($scope);
+		return $scope.hasPermission('write') &&
+			$scope.canEditTarget() &&
+			isEditable.call($scope);
 	};
 	
 	var canEdit = $scope.canEdit;
