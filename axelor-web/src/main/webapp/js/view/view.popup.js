@@ -266,7 +266,7 @@ function SelectorCtrl($scope, $element, DataSource, ViewService) {
 	};
 
 	$scope.canNew = function () {
-		return $scope.$parent.canNew();
+		return $scope.hasPermission('create') && $scope.$parent.canNew();
 	};
 }
 
