@@ -799,9 +799,26 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		scope.items = [];
 
 		var showOnNew = (scope.field.editor||{}).showOnNew !== false;
+		var unwatch = null;
 
 		model.$render = function () {
+			if (unwatch) {
+				unwatch();
+				unwatch = null;
+			}
 			scope.items = model.$viewValue;
+			if (scope.items) {
+				return;
+			}
+			scope.items = showOnNew ? [{}] : [];
+			unwatch = scope.$watch('items[0]', function (item, old) {
+				if (!item) return;
+				if (item.$changed) {
+					unwatch();
+					model.$setViewValue(scope.items);
+				}
+				item.$changed = true;
+			}, true);
 		};
 		
 		scope.$watch('$$readonly', function (readonly, old) {
@@ -816,7 +833,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		scope.addItem = function () {
 			var items = scope.items;
 			var item = _.last(items);
-			if (items.length && angular.equals(last, item)) {
+			if (items && items.length && angular.equals(last, item)) {
 				return;
 			}
 			last = {};
