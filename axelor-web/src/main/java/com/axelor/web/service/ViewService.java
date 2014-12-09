@@ -32,8 +32,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
-import com.axelor.auth.AuthUtils;
-import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
@@ -168,7 +166,7 @@ public class ViewService extends AbstractService {
 					map.put("selectionList", findSelection(p));
 				}
 				if (p.getTarget() != null) {
-					map.put("perms", perms(p.getTarget()));
+					map.put("perms", MetaStore.getPermissions(p.getTarget()));
 				}
 				if (p.isMassUpdate()) {
 					massUpdate = true;
@@ -194,7 +192,7 @@ public class ViewService extends AbstractService {
 			}
 		}
 
-		Map<String, Object> perms = this.perms(modelClass);
+		Map<String, Object> perms = MetaStore.getPermissions(modelClass);
 
 		if (massUpdate) {
 			if (perms == null) {
@@ -282,23 +280,6 @@ public class ViewService extends AbstractService {
 		final Response response = new Response();
 		response.setData(findFields(request.getModel(), request.getFields()));
 		return response;
-	}
-
-	@SuppressWarnings("all")
-	private Map<String, Object> perms(Class<?> model) {
-		final User user = AuthUtils.getUser();
-		if (user == null || "admin".equals(user.getCode())) return null;
-		if (user.getGroup() != null && "admins".equals(user.getGroup().getCode())) return null;
-
-		final Map<String, Object> map = Maps.newHashMap();
-
-		map.put("read", security.isPermitted(AccessType.READ, (Class) model));
-		map.put("write", security.isPermitted(AccessType.WRITE, (Class) model));
-		map.put("create", security.isPermitted(AccessType.CREATE, (Class) model));
-		map.put("remove", security.isPermitted(AccessType.REMOVE, (Class) model));
-		map.put("export", security.isPermitted(AccessType.EXPORT, (Class) model));
-
-		return map;
 	}
 
 	private Property findField(final Mapper mapper, String name) {
