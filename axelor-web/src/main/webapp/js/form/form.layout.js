@@ -405,18 +405,33 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 						record = _.extend(record, values);
 					});
 				});
+
+				// make sure to trigger record-change with proper record data
+				scope.$watch('record', function (value, old) {
+					scope.$broadcast("on:record-change", value);
+				}, true);
+				scope.$timeout(function () {
+					scope.$broadcast("on:record-change", scope.record);
+				});
 			}
 
 			form = $compile(form)(scope);
 			form.children('div.row').removeClass('row').addClass('row-fluid');
 			element.append(form);
 
-			scope.$watch('form.$valid', function (valid, old) {
+			scope.isValid = function () {
+				return scope.form && scope.form.$valid;
+			};
+
+			scope.$watch(function () {
 				if (isRelational && editor.showOnNew === false && !scope.canShowEditor()) {
 					return;
 				}
+				var valid = scope.isValid();
 				if (scope.setValidity) {
 					scope.setValidity('valid', valid);
+				} else {
+					scope.$parent.form.$setValidity('valid', valid, scope.form);
 				}
 			});
 
