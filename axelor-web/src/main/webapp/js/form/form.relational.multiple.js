@@ -799,27 +799,18 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		scope.items = [];
 
 		var showOnNew = (scope.field.editor||{}).showOnNew !== false;
-		var unwatch = null;
 
 		model.$render = function () {
-			if (unwatch) {
-				unwatch();
-				unwatch = null;
-			}
 			scope.items = model.$viewValue;
-			if (scope.items) {
-				return;
-			}
-			scope.items = showOnNew ? [{}] : [];
-			unwatch = scope.$watch('items[0]', function (item, old) {
-				if (!item) return;
-				if (item.$changed) {
-					unwatch();
-					model.$setViewValue(scope.items);
-				}
-				item.$changed = true;
-			}, true);
 		};
+		
+		scope.$watch('$$readonly', function (readonly, old) {
+			if (readonly === undefined) return;
+			var items = model.$viewValue;
+			if (_.isEmpty(items)) {
+				scope.items = (showOnNew && !readonly) ? [{}] : items;
+			}
+		});
 
 		var last = {};
 		scope.addItem = function () {
@@ -835,6 +826,9 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		scope.removeItem = function (index) {
 			var items = scope.items;
 			items.splice(index, 1);
+			if (items.length === 0) {
+				scope.addItem();
+			}
 		};
 
 		scope.setValidity = function (key, value) {

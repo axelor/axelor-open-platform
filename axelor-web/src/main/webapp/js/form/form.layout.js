@@ -423,13 +423,25 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 				return scope.form && scope.form.$valid;
 			};
 
+			function isEmpty(record) {
+				if (!record || _.isEmpty(record)) return true;
+				var values = _.filter(record, function (value, name) {
+					return !(/[\$_]/.test(name) || value === null || value === undefined);
+				});
+				return values.length === 0;
+			}
+
 			scope.$watch(function () {
 				if (isRelational && editor.showOnNew === false && !scope.canShowEditor()) {
 					return;
 				}
 				var valid = scope.isValid();
+				if (!valid && !scope.isRequired() && isEmpty(scope.record)) {
+					valid = true;
+				}
 				if (scope.setValidity) {
 					scope.setValidity('valid', valid);
+					element.toggleClass('nested-not-required', valid);
 				} else {
 					scope.$parent.form.$setValidity('valid', valid, scope.form);
 				}
