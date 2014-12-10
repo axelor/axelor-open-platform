@@ -147,10 +147,8 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 				axelor.dialogs.error(event.error);
 			}
  		} else {
-			$scope.applyLater(function() {
-				$scope.ajaxStop(function() {
-					close(record);
-				});
+			$scope.waitForActions(function() {
+				close(record);
 			});
 		}
 	};

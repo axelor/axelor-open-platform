@@ -373,7 +373,12 @@ ui.formItem('Button', {
 		});
 
 		element.on("click", function(e) {
-			if (!scope.isReadonlyExclusive()) {
+			if (scope.isReadonlyExclusive()) return;
+			if (scope.waitForActions) {
+				scope.waitForActions(function () {
+					scope.fireAction("onClick");
+				});
+			} else {
 				scope.fireAction("onClick");
 			}
 		});
