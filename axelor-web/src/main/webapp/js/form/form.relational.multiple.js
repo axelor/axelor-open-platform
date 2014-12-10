@@ -807,7 +807,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 				unwatch = null;
 			}
 			scope.items = model.$viewValue;
-			if (scope.items) {
+			if ((scope.items && scope.items.length > 0) || scope.$$readonly) {
 				return;
 			}
 			scope.items = showOnNew ? [{}] : [];
@@ -821,6 +821,24 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			}, true);
 		};
 		
+		function isEmpty(record) {
+			if (!record || _.isEmpty(record)) return true;
+			var values = _.filter(record, function (value, name) {
+				return !(/[\$_]/.test(name) || value === null || value === undefined);
+			});
+			return values.length === 0;
+		}
+
+		scope.$watch('items', function (items, old) {
+			if (!items || items.length === 0) return;
+			var values = _.filter(items, function (item) {
+				return !isEmpty(item);
+			});
+			if (values.length !== items.length) {
+				model.$setViewValue(values);
+			}
+		}, true);
+
 		scope.$watch('$$readonly', function (readonly, old) {
 			if (readonly === undefined) return;
 			var items = model.$viewValue;
@@ -829,14 +847,12 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			}
 		});
 
-		var last = {};
 		scope.addItem = function () {
 			var items = scope.items;
 			var item = _.last(items);
-			if (items && items.length && angular.equals(last, item)) {
+			if (items && items.length && isEmpty(item)) {
 				return;
 			}
-			last = {};
 			items.push({});
 		};
 
