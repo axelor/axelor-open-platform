@@ -834,9 +834,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			var values = _.filter(items, function (item) {
 				return !isEmpty(item);
 			});
-			if (values.length !== items.length) {
-				model.$setViewValue(values);
-			}
+			model.$setViewValue(values);
 		}, true);
 
 		scope.$watch('$$readonly', function (readonly, old) {
