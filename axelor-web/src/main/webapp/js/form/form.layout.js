@@ -381,11 +381,6 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 					},
 					set: function (value) {}
 				});
-				scope.getContext = function () {
-					var context = _.extend({}, scope.record);
-					context._model = scope._model;
-					return context;
-				};
 				// make sure to fetch missing values
 				scope.$watch('record.id', function (value, old) {
 					var ds = scope._dataSource;
@@ -413,6 +408,14 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 				scope.$timeout(function () {
 					scope.$broadcast("on:record-change", scope.record);
 				});
+			}
+
+			if (field.target) {
+				scope.getContext = function () {
+					var context = _.extend({}, scope.record);
+					context._model = scope._model;
+					return context;
+				};
 			}
 
 			form = $compile(form)(scope);
