@@ -218,7 +218,8 @@ public class ActionGroup extends ActionIndex {
             	} catch (ClassCastException e) {
             	}
             	if (last == null) continue;
-                if (last.containsKey("info") ||
+            	if (Objects.equal(Boolean.TRUE, last.get("reload")) ||
+            		last.containsKey("info") ||
                 	last.containsKey("alert") ||
                 	last.containsKey("error") ||
                 	last.containsKey("save")) {
