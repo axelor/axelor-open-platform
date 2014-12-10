@@ -400,14 +400,6 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 						record = _.extend(record, values);
 					});
 				});
-
-				// make sure to trigger record-change with proper record data
-				scope.$watch('record', function (value, old) {
-					scope.$broadcast("on:record-change", value);
-				}, true);
-				scope.$timeout(function () {
-					scope.$broadcast("on:record-change", scope.record);
-				});
 			}
 
 			if (field.target) {
@@ -416,6 +408,13 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 					context._model = scope._model;
 					return context;
 				};
+				// make sure to trigger record-change with proper record data
+				scope.$watch('record', function (value, old) {
+					scope.$broadcast("on:record-change", value);
+				}, true);
+				scope.$timeout(function () {
+					scope.$broadcast("on:record-change", scope.record);
+				});
 			}
 
 			form = $compile(form)(scope);
