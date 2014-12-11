@@ -369,11 +369,21 @@ ui.formInput('ManyToOne', 'Select', {
 		};
 		
 		scope.$render_editable = function() {
-			if (!scope.canShowTag) {
-				input.val(scope.getText());
-			} else {
-				setTimeout(adjustPadding, 100);
+
+			if (scope.canShowTag) {
+				return setTimeout(adjustPadding, 100);
 			}
+
+			var value = scope.getValue();
+			var name = scope.field.targetName;
+			if (value && value.id > 0 && !value[name]) {
+				return scope._dataSource.details(value.id, name).success(function(rec) {
+					value[name] = rec[name];
+					input.val(scope.getText());
+				});
+			}
+
+			input.val(scope.getText());
 		};
 		
 		if (scope.field && scope.field['tag-edit']) {
