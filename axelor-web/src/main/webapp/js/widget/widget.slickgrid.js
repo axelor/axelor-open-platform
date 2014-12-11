@@ -1485,12 +1485,17 @@ Grid.prototype.onAddNewRow = function(event, args) {
 	}
 };
 
-Grid.prototype.canAdd = function () {
+Grid.prototype.canEdit = function () {
 	var handler = this.handler || {};
 	if (!this.editable) return false;
-	if (handler.canNew && !handler.canNew()) return false;
+	if (handler.canEdit && !handler.canEdit()) return false;
 	if (handler.isReadonly && handler.isReadonly()) return false;
 	return true;
+}
+
+Grid.prototype.canAdd = function () {
+	var handler = this.handler || {};
+	return this.canEdit() && handler.canNew && handler.canNew();
 }
 
 Grid.prototype.setEditors = function(form, formScope, forEdit) {
@@ -1633,7 +1638,7 @@ Grid.prototype.onItemClick = function(event, args) {
 		return this.onButtonClick(event, args);
 	}
 	
-	if (!this.scope.selector && this.editable && this.canAdd()) {
+	if (!this.scope.selector && this.canEdit()) {
 		return this.grid.setActiveCell();
 	}
 	if (this.handler.onItemClick) {
