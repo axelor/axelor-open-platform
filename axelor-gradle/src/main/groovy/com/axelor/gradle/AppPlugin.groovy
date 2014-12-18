@@ -91,7 +91,9 @@ class AppPlugin extends AbstractPlugin {
 				}
             }
 
-			task('update-xsd', type: VersionTask) {
+			task('updateVersion', type: VersionTask) {
+				description "Update version text in source files."
+				group "Axelor"
 				processFiles = fileTree(projectDir) {
 					include '**/resources/**/*.xml'
 					include '**/data/**/*config.xml'
@@ -99,6 +101,8 @@ class AppPlugin extends AbstractPlugin {
 			}
 
 			task("generateCode", type: GenerateCode) << {
+				description "Generate code for domain models from xml definitions."
+				group "Axelor"
 				expandAll()
 			}
 
@@ -112,11 +116,15 @@ class AppPlugin extends AbstractPlugin {
 			}
 
 			task("npm", type: Exec, dependsOn: 'copyWebapp') {
+				description "Run 'npm install' command to install npm packages."
+				group "Axelor web"
 				workingDir "${buildDir}/webapp"
 				commandLine = ["npm", "install"]
 			}
 
 			task("grunt", type: Exec, dependsOn: 'npm') {
+				description "Run grunt command to build web resources."
+				group "Axelor web"
 				def command = "grunt"
 				if (OperatingSystem.current().isWindows()) {
 					command = "grunt.cmd"
@@ -126,6 +134,8 @@ class AppPlugin extends AbstractPlugin {
 			}
 
 			task("init", dependsOn: "classes", type: JavaExec) {
+				description "Initialize application database."
+				group "Axelor web"
 				main = "com.axelor.app.internal.AppInitCli"
 				classpath = sourceSets.main.runtimeClasspath
 				if (project.properties.update) args "-u" else args "-i"

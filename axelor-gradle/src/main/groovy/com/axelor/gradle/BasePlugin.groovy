@@ -32,7 +32,10 @@ class BasePlugin extends AbstractPlugin {
 
 			applyCommon(project, definition)
 
-			task("generateCode", type: GenerateCode)
+			task("generateCode", type: GenerateCode) {
+				description "Generate code for domain models from xml definitions."
+				group "Axelor"
+			}
 
 			compileJava.dependsOn "generateCode"
         }

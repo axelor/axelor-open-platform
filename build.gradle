@@ -99,7 +99,9 @@ apply from: 'gradle/force-wtp.gradle'
 
 import com.axelor.gradle.tasks.VersionTask
 
-task('update-xsd', type: VersionTask) {
+task("updateVersion", type: VersionTask) {
+	description "Update version text in source files."
+	group "Axelor"
 	processFiles = fileTree(projectDir) {
 		include '**/resources/**/*.xml'
 		include '**/resources/domain-models.xsd'
