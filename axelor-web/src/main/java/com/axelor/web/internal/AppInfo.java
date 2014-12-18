@@ -78,7 +78,6 @@ public final class AppInfo {
 
 		try {
 			map.put("application.sdk", VersionUtils.getVersion().version);
-			map.put("application.version", VersionUtils.getVersion(settings.get("application.name")).version);
 		} catch (Exception e) {
 		}
 

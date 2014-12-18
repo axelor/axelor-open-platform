@@ -44,17 +44,10 @@ allprojects {
 	}
 
 	afterEvaluate {
-
 		// only run test suites
 		test {
 			scanForTestClasses = false
 			include "**/*Suite.class"
-		}
-
-		try {
-			// define generateCode task if missing
-			task("generateCode", dependsOn: "generateVersion")
-		} catch (Exception e) {
 		}
 	}
 }

@@ -17,8 +17,13 @@
  */
 package com.axelor.common;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,8 +37,10 @@ public final class VersionUtils {
 
 	private static Version version;
 
-	private static final String AXELOR_COMMON = "axelor-common";
+	private static final String VERSION_FILE = "axelor-common-version.txt";
+	private static final String VERSION_GRADLE_FILE = "version.gradle";
 	private static final Pattern VERSION_PATTERN = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+)(?:\\-rc(\\d+))?$");
+	private static final Pattern VERSION_GRADLE_PATTERN = Pattern.compile("^version\\s+(\"|')(.*?)(\"|')", Pattern.MULTILINE);
 
 	/**
 	 * This class stores version details of axelor modules.
@@ -80,24 +87,42 @@ public final class VersionUtils {
 	 */
 	public static Version getVersion() {
 		if (version == null) {
-			version = getVersion(AXELOR_COMMON);
+			version = getVersion(VERSION_FILE);
 		}
 		return version;
 	}
 
-	/**
-	 * Get the version details for the given module.
-	 *
-	 * @param module
-	 *            the name of the module
-	 * @return an instance of {@link Version}
-	 */
-	public static Version getVersion(String module) {
-		try (InputStream is = ClassUtils.getResourceStream(module + "-version.txt")) {
+	private static Version getVersion(String file) {
+		try (InputStream is = ClassUtils.getResourceStream(file)) {
 			String version = CharStreams.toString(new InputStreamReader(is));
 			return new Version(version);
 		} catch (Exception e) {
-			throw new IllegalStateException("Unable to read version details: " + module, e);
 		}
+		try {
+			return fromGradle();
+		} catch (Exception e) {
+			throw new IllegalStateException("Unable to read version details.");
+		}
+	}
+
+	private static Version fromGradle() throws IOException {
+		File file = Paths.get(VERSION_GRADLE_FILE).toFile();
+		if (!file.exists()) {
+			file = Paths.get("..", VERSION_GRADLE_FILE).toFile();
+		}
+		if (!file.exists()) {
+			throw new FileNotFoundException("Unable to find version.gradle.");
+		}
+		final InputStream is = new FileInputStream(file);
+		try {
+			final String text = CharStreams.toString(new InputStreamReader(is));
+			final Matcher matcher = VERSION_GRADLE_PATTERN.matcher(text);
+			if (matcher.find()) {
+				return new Version(matcher.group(2));
+			}
+		} finally {
+			is.close();
+		}
+		throw new IOException("Unable to read version.gradle.");
 	}
 }
