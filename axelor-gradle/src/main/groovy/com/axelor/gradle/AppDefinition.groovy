@@ -21,6 +21,7 @@ package com.axelor.gradle
 class AppDefinition extends AbstractDefinition {
 
 	String version
+	String adkVersion
 
 	List<String> installs = []
 
@@ -30,5 +31,9 @@ class AppDefinition extends AbstractDefinition {
 
 	def install(String module) {
 		installs << module
+	}
+
+	def adkVersion(String adkVersion) {
+		this.adkVersion = adkVersion
 	}
 }

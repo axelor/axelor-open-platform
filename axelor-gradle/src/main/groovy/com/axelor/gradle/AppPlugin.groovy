@@ -19,12 +19,14 @@ package com.axelor.gradle
 
 import java.util.regex.Pattern
 
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.JavaExec
 import org.gradle.internal.os.OperatingSystem
 
+import com.axelor.common.VersionUtils
 import com.axelor.gradle.tasks.GenerateCode
 import com.axelor.gradle.tasks.VersionTask
 
@@ -38,6 +40,10 @@ class AppPlugin extends AbstractPlugin {
 			apply plugin: 'tomcat'
 
             def definition = extensions.create("application", AppDefinition)
+
+			afterEvaluate {
+				checkVersion(project, definition)
+			}
 
 			applyCommon(project, definition)
 			
@@ -159,6 +165,13 @@ class AppPlugin extends AbstractPlugin {
     }
 
 	private Pattern namePattern = ~/^(axelor-(?:common|core|web|wkf))-/
+
+	private void checkVersion(Project project, AppDefinition definition) {
+		if (!definition.adkVersion || VersionUtils.version.matches(definition.adkVersion)) {
+			return;
+		}
+		throw new GradleException("ADK version mismatch, requires: " + definition.adkVersion);
+	}
 
 	private List<String> findCoreModules(Project project) {
 		def all = []
