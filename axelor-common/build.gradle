@@ -13,17 +13,12 @@ configurations {
 	runtime.exclude module: "jsr305"
 }
 
-task generateVersion() {
-	description "Generate version file."
-	group "Axelor"
-	onlyIf { project.group == "com.axelor" }
-	doLast {
-		def versionFile = file("${buildDir}/resources/main/${project.name}-version.txt")
-		versionFile.parentFile.mkdirs()
-		versionFile.text = project.version
-	}
+task updateVersion() {
+	def versionFile = file("${projectDir}/src/main/resources/axelor-version.txt")
+	onlyIf { versionFile.text != project.version }
+	doLast { versionFile.text = project.version }
 }
 
 afterEvaluate {
-	tasks.withType(JavaCompile)*.dependsOn generateVersion
+	tasks.withType(JavaCompile)*.dependsOn updateVersion
 }
