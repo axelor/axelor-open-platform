@@ -109,7 +109,6 @@ class AppPlugin extends AbstractPlugin {
 			task("generateCode", type: GenerateCode) << {
 				description "Generate code for domain models from xml definitions."
 				group "Axelor"
-				expandAll()
 			}
 
 			// copy webapp to root build dir

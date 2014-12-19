@@ -56,8 +56,6 @@ class Finder {
 
 		if (node.@cacheable == "true") cacheable = true
 		if (node.@flush == "false") flush = false
-
-		entity.repository.importType("com.axelor.db.Query")
 	}
 
 	Finder(Entity entity, String field) {
@@ -66,8 +64,6 @@ class Finder {
 		this.type = entity.name
 		this.fields = [field]
 		this.filter = ""
-
-		entity.repository.importType("com.axelor.db.Query")
 	}
 
 	private static final def TYPES = [
@@ -125,6 +121,8 @@ class Finder {
 			args += n
 			params += t + " " + n
 		}
+
+		entity.repository.importType("com.axelor.db.Query")
 
 		query = filter.empty ? query.join(" AND ") : filter
 		params = params.join(", ")

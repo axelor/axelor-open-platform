@@ -64,11 +64,6 @@ class GenerateCode extends DefaultTask {
 		generateCode("application")
 	}
 	
-	def expandAll() {
-		def outputPath = new File(project.rootProject.buildDir, "src-gen")
-		Generator.combineAll(outputPath)
-	}
-
 	def buildGenerator(Project project) {
 		def domainPath = new File(project.projectDir, "src/main/resources/domains")
 		def targetPath = new File(project.buildDir, "src-gen")

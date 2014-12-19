@@ -45,8 +45,6 @@ public class Generator {
 	private final Multimap<String, Entity> lookup = LinkedHashMultimap.create();
 	private final Multimap<String, Entity> entities = LinkedHashMultimap.create();
 
-	private static final List<File> CACHE_KEYS = new ArrayList<>();
-	
 	public Generator(File domainPath, File outputPath) {
 		this.domainPath = domainPath;
 		this.outputPath = outputPath;
@@ -56,11 +54,11 @@ public class Generator {
 		return new File(base.getPath() + "/" + Joiner.on("/").join(parts));
 	}
 
-	private void expand(Collection<Entity> items) throws IOException {
-		expand(outputPath, items);
+	private void expand(Collection<Entity> items, boolean doLookup) throws IOException {
+		expand(outputPath, items, doLookup);
 	}
 	
-	private void expand(File outputPath, Collection<Entity> items) throws IOException {
+	private void expand(File outputPath, Collection<Entity> items, boolean doLookup) throws IOException {
 
 		if (items == null || items.isEmpty()) {
 			return;
@@ -73,7 +71,7 @@ public class Generator {
 		final String name = first.getName();
 
 		// prepend all lookup entities
-		if (lookup.get(name) != null) {
+		if (doLookup && lookup.get(name) != null) {
 			all.addAll(0, lookup.get(name));
 		}
 		
@@ -147,10 +145,6 @@ public class Generator {
 			entity.setLastModified(input.lastModified());
 			entities.put(entity.getName(), entity);
 		}
-		
-		if (CACHE_KEYS.indexOf(input) == -1) {
-			CACHE_KEYS.add(input);
-		}
 	}
 
 	private void delete(File file) {
@@ -193,22 +187,34 @@ public class Generator {
 
 	public void start() throws IOException {
 
-		if (!this.domainPath.exists()) return;
-
 		log.info("Generating JPA classes.");
 		log.info("Domain path: " + domainPath);
 		log.info("Output path: " + outputPath);
 
 		outputPath.mkdirs();
 
-		for (File file : domainPath.listFiles()) {
-			if (file.getName().endsWith(".xml")) {
-				process(file, true);
+		if (this.domainPath.exists()) {
+			for (File file : domainPath.listFiles()) {
+				if (file.getName().endsWith(".xml")) {
+					process(file, true);
+				}
 			}
 		}
 		
 		for (String name : entities.keySet()) {
-			expand(entities.get(name));
+			expand(entities.get(name), true);
+		}
+
+		// make sure to generate extended entities from parent modules
+		for (String name : lookup.keySet()) {
+			if (entities.containsKey(name)) {
+				continue;
+			}
+			final Collection<Entity> all = lookup.get(name);
+			if (all == null || all.size() < 2) {
+				continue;
+			}
+			expand(all, false);
 		}
 	}
 	
@@ -243,33 +249,5 @@ public class Generator {
 			}
 		}
 		return gen;
-	}
-
-	/**
-	 * Combine all multiple objects.
-	 * 
-	 * This method should be called from application after all other code
-	 * generation tasks are complete.
-	 * 
-	 * @param outputPath
-	 *            output path
-	 * @throws IOException
-	 *             if error processing any file
-	 */
-	public static void combineAll(File outputPath) throws IOException {
-		
-		final Generator generator = new Generator(null, outputPath);
-		try {
-			for (File input : CACHE_KEYS) {
-				generator.process(input, false);
-			}
-			for (String name : generator.entities.keySet()) {
-				if (generator.entities.get(name).size() > 1) {
-					generator.expand(outputPath, generator.entities.get(name));
-				}
-			}
-		} finally {
-			CACHE_KEYS.clear();
-		}
 	}
 }
