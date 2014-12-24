@@ -503,11 +503,8 @@ var FormInput = {
 				}
 			}
 			
-			var field = scope.field || {};
-			if (!field.bind) {
-				element.bind('input', listener);
-			}
-
+			element.bind('input', listener);
+			
 			element.change(listener);
 			
 			element.blur(function(e){
