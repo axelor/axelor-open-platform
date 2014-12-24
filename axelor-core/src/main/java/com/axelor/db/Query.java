@@ -495,23 +495,13 @@ public class Query<T extends Model> {
 			selects.add("self.id");
 			selects.add("self.version");
 			for(String name : names) {
-				Property property = getProperty(name);
-				if (property != null) {
+				if (isExists(name)) {
 					String alias = joinHelper.joinName(name);
 					if (alias != null) {
 						selects.add(alias);
 						this.names.add(name);
 					} else {
 						collections.add(name);
-					}
-					// select id,version,name field for m2o
-					if (property.isReference() && property.getTargetName() != null) {
-						this.names.add(name + ".id");
-						this.names.add(name + ".version");
-						this.names.add(name + "." + property.getTargetName());
-						selects.add(joinHelper.joinName(name + ".id"));
-						selects.add(joinHelper.joinName(name + ".version"));
-						selects.add(joinHelper.joinName(name + "." + property.getTargetName()));
 					}
 				}
 			}
@@ -527,23 +517,22 @@ public class Query<T extends Model> {
 			query = sb.toString();
 		}
 
-		private Property getProperty(String field) {
+		private boolean isExists(String field) {
 			if (field == null || "".equals(field.trim()))
-				return null;
+				return false;
 			Mapper mapper = this.mapper;
-			Property property = null;
 			Iterator<String> names = Splitter.on(".").split(field).iterator();
 			while(names.hasNext()) {
-				property = mapper.getProperty(names.next());
+				Property property = mapper.getProperty(names.next());
 				if (property == null)
-					return null;
+					return false;
 				if (names.hasNext()) {
 					if (property.getTarget() == null)
-						return null;
+						return false;
 					mapper = Mapper.of(property.getTarget());
 				}
 			}
-			return property;
+			return true;
 		}
 
 		@SuppressWarnings("all")
@@ -567,43 +556,22 @@ public class Query<T extends Model> {
 			List<List> data = values(limit, offset);
 			List<Map> result = Lists.newArrayList();
 
-			for(List items : data) {
+			for(List item : data) {
 				Map<String, Object> map = Maps.newHashMap();
 				for(int i = 0 ; i < names.size() ; i++) {
-					Object value = items.get(i);
-					String name = names.get(i);
-					Property property = getProperty(name);
-					// in case of m2o, get the id,version,name tuple
-					if (property != null && property.isReference() && property.getTargetName() != null) {
-						value = getReferenceValue(items, i);
-						i += 3;
-					} else if (value instanceof Model) {
+					Object value = item.get(i);
+					if (value instanceof Model) {
 						value = Resource.toMapCompact(value);
 					}
-					map.put(name, value);
+					map.put(names.get(i), value);
 				}
 				if (collections.size() > 0) {
-					map.putAll(this.fetchCollections(items.get(0)));
+					map.putAll(this.fetchCollections(item.get(0)));
 				}
 				result.add(map);
 			}
 
 			return result;
-		}
-
-		private Object getReferenceValue(List<?> items, int at) {
-			if (items.get(at) == null) {
-				return null;
-			}
-			Map<String, Object> value = Maps.newHashMap();
-			String name = names.get(at);
-			String nameField = names.get(at + 3).replace(name + ".", "");
-
-			value.put("id", items.get(at+1));
-			value.put("$version", items.get(at+2));
-			value.put(nameField, items.get(at+3));
-
-			return value;
 		}
 
 		@SuppressWarnings("all")
