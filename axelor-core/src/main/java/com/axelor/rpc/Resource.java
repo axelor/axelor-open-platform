@@ -193,40 +193,57 @@ public class Resource<T extends Model> {
 
 	private List<String> getSortBy(Request request) {
 
-		List<String> sortBy = Lists.newArrayList();
-		Mapper mapper = Mapper.of(model);
+		final List<String> sortBy = Lists.newArrayList();
+		final List<String> sortOn = Lists.newArrayList();
+		final Mapper mapper = Mapper.of(model);
+
+		boolean unique = true;
+		boolean desc = true;
 
 		if (request.getSortBy() != null) {
-			for(String spec : request.getSortBy()) {
-				String name = spec;
-				if (name.startsWith("-")) {
-					name = name.substring(1);
-				}
-				Property property = mapper.getProperty(name);
-				if (property != null && property.isReference()) {
-					// use name field to sort many-to-one column
-					Mapper m = Mapper.of(property.getTarget());
-					Property p = m.getNameField();
-					if (p != null) {
-						spec = spec + "." + p.getName();
-					}
-				}
-				sortBy.add(spec);
+			sortOn.addAll(request.getSortBy());
+		}
+		if (sortOn.isEmpty()) {
+			Property nameField = mapper.getNameField();
+			if (nameField == null) {
+				nameField = mapper.getProperty("name");
+			}
+			if (nameField == null) {
+				nameField = mapper.getProperty("code");
+			}
+			if (nameField != null) {
+				sortOn.add(nameField.getName());
 			}
 		}
 
-		if (sortBy.size() > 0) {
-			return sortBy;
+		for(String spec : sortOn) {
+			String name = spec;
+			if (name.startsWith("-")) {
+				name = name.substring(1);
+			} else {
+				desc = false;
+			}
+			Property property = mapper.getProperty(name);
+			if (property == null || property.isPrimary()) {
+				sortOn.add(spec);
+				continue;
+			}
+			if (property.isReference()) {
+				// use name field to sort many-to-one column
+				Mapper m = Mapper.of(property.getTarget());
+				Property p = m.getNameField();
+				if (p != null) {
+					spec = spec + "." + p.getName();
+				}
+			}
+			if (!property.isUnique()) {
+				unique = false;
+			}
+			sortBy.add(spec);
 		}
 
-		if (mapper.getNameField() != null) {
-			sortBy.add(mapper.getNameField().getName());
-			return sortBy;
-		}
-
-		if (mapper.getProperty("code") != null) {
-			sortBy.add("code");
-			return sortBy;
+		if (!unique && (!sortBy.contains("id") || !sortBy.contains("-id"))) {
+			sortBy.add(desc ? "-id" : "id");
 		}
 
 		return sortBy;
@@ -257,13 +274,8 @@ public class Resource<T extends Model> {
 		} else if (filter != null) {
 			query = filter.build(model);
 		}
-		
-		List<String> sortBy = getSortBy(request);
 
-		if (!sortBy.contains("id") || !sortBy.contains("-id")) {
-			sortBy.add("id");
-		}
-		for(String spec : sortBy) {
+		for(String spec : getSortBy(request)) {
 			query = query.order(spec);
 		}
 
