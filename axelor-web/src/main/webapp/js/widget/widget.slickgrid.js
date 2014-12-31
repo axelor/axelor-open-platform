@@ -1660,6 +1660,12 @@ Grid.prototype.onItemDblClick = function(event, args) {
 	}
 	if (this.canSave())
 		return;
+
+	var selected = this.grid.getSelectedRows() || [];
+	if (selected.length === 0) {
+		this.grid.setSelectedRows([args.row]);
+	}
+
 	if (this.handler.onItemDblClick)
 		this.handler.onItemDblClick(event, args);
 	event.stopImmediatePropagation();
