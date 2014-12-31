@@ -53,7 +53,7 @@ function FormViewCtrl($scope, $element) {
 			id = elem.attr('x-for-widget') || elem.attr('id') || name;
 		}
 		
-		attrs = _.extend({}, $scope.fields[name], $scope.fields_view[id]);
+		attrs = _.extend({}, this.fields[name], this.fields_view[id]);
 
 		return attrs;
 	};
@@ -836,6 +836,9 @@ ui.formBuild = function (scope, schema, fields) {
 				type = attrs.multiple ? 'multi-select' : 'select';
 			}
 
+			if (attrs.password) {
+				type = 'password';
+			}
 			if (attrs.image ==  true) {
 				type = "image";
 			}
