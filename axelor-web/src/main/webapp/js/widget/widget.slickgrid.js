@@ -86,6 +86,7 @@ var Editor = function(args) {
 	if (!element.parent().is('td.form-item'))
 		element = element.parent();
 	element.data('$parent', element.parent());
+	element.data('$editorForm', form);
 
 	this.init = function() {
 
@@ -125,7 +126,8 @@ var Editor = function(args) {
 	
 	this.destroy = function() {
 		element.appendTo(element.data('$parent') || form)
-			   .removeData('$parent');
+			   .removeData('$parent')
+			   .removeData('$editorForm');
 		element.trigger("hide:slick-editor");
 		element.parent().zIndex('');
 	};

@@ -226,8 +226,11 @@ ActionHandler.prototype = {
 	},
 	
 	_getFormElement: function () {
-		var formElement = this.element.parents('form:first');
-		if (!formElement.get(0)) { // toolbar button
+
+		var elem = $(this.element);
+		var formElement = elem.data('$editorForm') || elem.parents('form:first');
+
+		if (!formElement || !formElement.get(0)) { // toolbar button
 			formElement = this.element.parents('.form-view:first').find('form:first');
 		}
 		if (formElement.length == 0) {
