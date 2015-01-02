@@ -1477,6 +1477,9 @@ Grid.prototype.onAddNewRow = function(event, args) {
 		item = args.item;
 
 	if (!item.id) {
+		if (this.editorScope) {
+			item = _.extend(this.editorScope.record, item);
+		}
 		item.id = 0;
 		grid.invalidateRow(dataView.length);
 		dataView.addItem(item);
