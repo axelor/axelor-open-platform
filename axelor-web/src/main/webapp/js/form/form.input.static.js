@@ -137,7 +137,7 @@ function makePopover(scope, element, callback, placement) {
 		doc.off('mousemove.popover');
 	}
 	
-	element.on('$destroy', destroy);
+	scope.$on('$destroy', destroy);
 }
 
 ui.directive('uiTabPopover', function() {
