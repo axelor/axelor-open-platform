@@ -557,6 +557,11 @@
         <xsd:documentation>Specify whether to use compact version of the widget.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-labels" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether to show lebels in ImageSelect widget.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:attributeGroup name="RelationalAttributes">
