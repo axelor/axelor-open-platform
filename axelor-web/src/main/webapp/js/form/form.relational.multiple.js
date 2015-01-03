@@ -72,8 +72,14 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	};
 	
 	$scope.select = function(value) {
-		var items = _.chain([value]).flatten(true).compact().value(),
-			records = _.map($scope.getItems(), _.clone);
+
+		// if items are same, no need to set values
+		if (angular.equals(value, $scope.getItems())) {
+			return;
+		}
+
+		var items = _.chain([value]).flatten(true).compact().value();
+		var records = _.map($scope.getItems(), _.clone);
 
 		_.each($scope.itemsPending, function (item) {
 			var find = _.find(records, function(rec) {
