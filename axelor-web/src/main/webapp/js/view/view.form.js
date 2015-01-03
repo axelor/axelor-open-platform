@@ -507,17 +507,15 @@ function FormViewCtrl($scope, $element) {
 			});
 		}
 
-		$scope.applyLater(function() {
-			$scope.ajaxStop(function() {
-				if (!$scope.canSave()) {
-					$scope.showErrorNotice();
-					return defer.promise;
-				}
-				if (saveAction) {
-					return saveAction().then(doSave);
-				}
-				$scope.waitForActions(doSave);
-			});
+		$scope.waitForActions(function() {
+			if (!$scope.canSave()) {
+				$scope.showErrorNotice();
+				return defer.promise;
+			}
+			if (saveAction) {
+				return saveAction().then(doSave);
+			}
+			$scope.waitForActions(doSave);
 		});
 		return defer.promise;
 	};
