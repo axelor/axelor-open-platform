@@ -1,3 +1,44 @@
+# Current
+
+## Bug Fixes
+
+- fixed onSave/onChange issue
+- fixed default values issue on editable grid
+- fixed selection change issue on grid
+- fixed exported file download issue
+- fixed version info under eclipse
+- fixed ImageSelect issue
+- fixed m2o not showing name value
+- fixed active cell not editing in editable grid
+- fixed successive actions not updating context
+- fixed pending action issue on reload request
+- fixed inline o2m
+- fixed permission issue
+- fixed field editor validation issue
+- fixed demo data
+- fixed dashlet filter issue
+- fixed image widget rendering issue
+- fixed i18n extract issues
+- fixed extra-code/extra-import merge issue
+- fixed finder method generation issue
+- fixed tree view empty parent node issue
+- fixed route issue on record duplicate
+
+## Improvements
+
+- always generate code for extended entities
+- update nvd3
+- support for ADK version requirement
+- document gradle tasks
+- remove static groovy expression compilation
+- improve m2o/m2m editor rendering
+- allow reload from tab
+- allow method as chart dataset provider
+- allow prompt attribute from action-attrs
+- improved help popover
+- add option to save record from view popup
+- add option to disable editor on o2m/m2m
+
 # 3.0.3 (2014-11-12)
 
 ## Bug Fixes
