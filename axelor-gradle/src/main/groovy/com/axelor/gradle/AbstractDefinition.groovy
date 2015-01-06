@@ -24,7 +24,8 @@ abstract class AbstractDefinition {
 	String name
 	String title
 	String description
-    
+    String adkVersion
+
 	List<String> modules = []
 
 	def name(String name) {
@@ -38,6 +39,10 @@ abstract class AbstractDefinition {
 	def description(String description) {
         this.description = description
     }
+
+	def adkVersion(String adkVersion) {
+		this.adkVersion = adkVersion
+	}
 
 	def module(String module) {
 		modules << module

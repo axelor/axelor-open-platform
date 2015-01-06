@@ -165,13 +165,6 @@ class AppPlugin extends AbstractPlugin {
 
 	private Pattern namePattern = ~/^(axelor-(?:common|core|web|wkf))-/
 
-	private void checkVersion(Project project, AppDefinition definition) {
-		if (!definition.adkVersion || VersionUtils.version.matches(definition.adkVersion)) {
-			return;
-		}
-		throw new GradleException("ADK version mismatch, requires: " + definition.adkVersion);
-	}
-
 	private List<String> findCoreModules(Project project) {
 		def all = []
 		project.configurations.runtime.each { File lib ->

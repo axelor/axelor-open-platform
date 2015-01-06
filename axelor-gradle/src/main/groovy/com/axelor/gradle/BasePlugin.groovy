@@ -30,6 +30,10 @@ class BasePlugin extends AbstractPlugin {
 
 			def definition = extensions.create("module", ModuleDefinition)
 
+			afterEvaluate {
+				checkVersion(project, definition)
+			}
+
 			applyCommon(project, definition)
 
 			task("generateCode", type: GenerateCode) {

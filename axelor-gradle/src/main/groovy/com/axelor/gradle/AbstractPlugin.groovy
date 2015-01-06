@@ -17,6 +17,7 @@
  */
 package com.axelor.gradle
 
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.plugins.ide.eclipse.model.SourceFolder
@@ -34,6 +35,15 @@ abstract class AbstractPlugin implements Plugin<Project> {
 			return sdkVersion
 		}
 		return sdkVersion = VersionUtils.getVersion().version;
+	}
+	
+	protected void checkVersion(Project project, AbstractDefinition definition) {
+		if (!definition.adkVersion || VersionUtils.version.matches(definition.adkVersion)) {
+			return;
+		}
+		throw new GradleException(
+			String.format("ADK version mismatch, '%s' requires: %s",
+				definition.name, definition.adkVersion));
 	}
 
 	protected void applyCommon(Project project, AbstractDefinition definition) {
