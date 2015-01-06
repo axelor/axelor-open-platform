@@ -460,6 +460,7 @@ ui.formInput('OneToMany', {
 				}
 				items.splice(index, 1);
 			}
+			return items;
 		}
 
 		scope.onGridInit = function(grid, inst) {
@@ -471,7 +472,11 @@ ui.formInput('OneToMany', {
 			if (editable) {
 				element.addClass('inline-editable');
 				scope.$on('on:new', function(event){
-					deleteItemsById(0);
+					var items = deleteItemsById(0);
+					if (items.length === 0) {
+						scope.dataView.setItems([]);
+						grid.setSelectedRows([]);
+					}
 					grid.setOptions({enableAddRow: scope.canNew() && !scope.isReadonly()});
 				});
 				scope.$watch("isReadonly()", function(readonly) {
