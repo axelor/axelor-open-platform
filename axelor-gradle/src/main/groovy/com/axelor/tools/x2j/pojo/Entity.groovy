@@ -187,7 +187,8 @@ class Entity {
 		constraints.addAll(other.constraints)
 		finders.addAll(other.finders)
 
-		other.baseEntity = this;
+		other.baseEntity = this
+		other.repository = this.repository
 
 		extraImports = stripCode(extraImports, "") + stripCode(other.extraImports, "")
 		extraCode = stripCode(extraCode, "\n\t") + "\n" + stripCode(other.extraCode, "\n\t")
