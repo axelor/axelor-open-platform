@@ -1165,7 +1165,9 @@ Grid.prototype.onBeforeEditCell = function(event, args) {
 			}
 		});
 	}
-	this.editorScope.editRecord(es.defaultValues);
+	es.editRecord(es.defaultValues);
+	args.item = es.record;
+	this.onAddNewRow(event, args);
 };
 
 Grid.prototype.onKeyDown = function(e, args) {
@@ -1479,9 +1481,6 @@ Grid.prototype.onAddNewRow = function(event, args) {
 		item = args.item;
 
 	if (!item.id) {
-		if (this.editorScope) {
-			item = _.extend(this.editorScope.record, item);
-		}
 		item.id = 0;
 		grid.invalidateRow(dataView.length);
 		dataView.addItem(item);

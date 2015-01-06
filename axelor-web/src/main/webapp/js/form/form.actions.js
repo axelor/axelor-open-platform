@@ -589,6 +589,7 @@ ActionHandler.prototype = {
 			
 			var label = item.data('label'),
 				itemScope = item.data('$scope'),
+				hasValues = false,
 				column;
 
 			// handle o2m/m2m columns
@@ -640,6 +641,7 @@ ActionHandler.prototype = {
 			forEach(itemAttrs, function(value, attr){
 
 				if ((attr === "value" || attr.indexOf('value:') === 0)) {
+					hasValues = true;
 					if (itemScope.$setForceWatch) {
 						itemScope.$setForceWatch(true);
 					}
@@ -714,6 +716,10 @@ ActionHandler.prototype = {
 					break;
 				}
 			});
+
+			if (hasValues && formScope.onChangeNotify) {
+				formScope.onChangeNotify(formScope, formScope.record);
+			}
 		}
 		
 		forEach(data.attrs, function(itemAttrs, itemName) {
