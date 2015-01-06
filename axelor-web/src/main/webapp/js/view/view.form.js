@@ -739,6 +739,7 @@ function FormViewCtrl($scope, $element) {
 			if (!$scope.canSave()) {
 				$scope.showErrorNotice();
 			} else {
+				$(e.target).blur().focus();
 				$scope.onSave();
 			}
 		}
