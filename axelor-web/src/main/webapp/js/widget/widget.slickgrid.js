@@ -887,7 +887,11 @@ Grid.prototype._doInit = function(view) {
 		}
 		
 		var args = that.grid.getActiveCell();
-		that.focusInvalidCell(args);
+		if (args) {
+			that.focusInvalidCell(args);
+		} else {
+			axelor.dialogs.error(_t('There are some invalid rows.'));
+		}
 
 		e.preventDefault();
 		return false;
