@@ -841,10 +841,15 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		}
 
 		scope.$watch('items', function (items, old) {
+			if (!items || items.length === 0) return;
+			var changed = false;
 			var values = _.filter(items, function (item) {
+				if (item.$changed) {
+					changed = true;
+				}
 				return !isEmpty(item);
 			});
-			if (values.length > 0) {
+			if (changed) {
 				model.$setViewValue(values);
 			}
 		}, true);
@@ -869,9 +874,13 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		scope.removeItem = function (index) {
 			var items = scope.items;
 			items.splice(index, 1);
+			var values = _.filter(items, function (item) {
+				return !isEmpty(item);
+			});
 			if (items.length === 0) {
 				scope.addItem();
 			}
+			model.$setViewValue(values);
 		};
 
 		scope.setValidity = function (key, value) {

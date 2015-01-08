@@ -410,6 +410,9 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 				};
 				// make sure to trigger record-change with proper record data
 				scope.$watch('record', function (value, old) {
+					if (value && value !== old) {
+						value.$changed = true;
+					}
 					scope.$broadcast("on:record-change", value);
 				}, true);
 				scope.$timeout(function () {
