@@ -301,7 +301,7 @@ class Entity {
 		code += "if (!(obj instanceof ${name})) return false;"
 		code += ""
 		code += "${name} other = (${name}) obj;"
-		code += "if (this.getId() != null && other.getId() != null) {"
+		code += "if (this.getId() != null || other.getId() != null) {"
 		code += "\treturn Objects.equal(this.getId(), other.getId());"
 		code += "}"
 		if (!hashables.empty) {

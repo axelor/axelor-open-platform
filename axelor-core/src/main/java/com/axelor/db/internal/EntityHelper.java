@@ -120,7 +120,7 @@ public final class EntityHelper {
 			return false;
 
 		final Model that = (Model) other;
-		if (entity.getId() != null && that.getId() != null) {
+		if (entity.getId() != null || that.getId() != null) {
 			return Objects.equal(entity.getId(), that.getId());
 		}
 
