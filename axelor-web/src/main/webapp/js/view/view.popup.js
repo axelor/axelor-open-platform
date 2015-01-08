@@ -183,6 +183,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	$scope.onHotKey = function (e, action) {
 		
 		if (action === "save") {
+			$(e.target).blur().focus();
 			$scope.onOK();
 		}
 		
