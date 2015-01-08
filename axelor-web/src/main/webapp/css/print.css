@@ -16,14 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 html, body {
-	height: 100%;
-	overflow: auto;
+	overflow: inherit;
 }
 
+#container,
+#container > .fill-parent,
+#offcanvas,
+#view-tabs,
+#view-tabs > .navigation-tabs,
+.view-content,
+.view-pane,
 .view-pane > .view-container,
-.view-container .form-view > div:last-child,
+.view-pane > .view-container .form-view > div:last-child,
 .view-pane > .view-container > div:not(.slick-editor-dropdown) {
-	overflow: inherit !important;
+	position: inherit !important;
 }
 
 abbr[title]:after,
