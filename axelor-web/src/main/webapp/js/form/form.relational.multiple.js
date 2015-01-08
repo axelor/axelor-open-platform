@@ -841,11 +841,12 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		}
 
 		scope.$watch('items', function (items, old) {
-			if (!items || items.length === 0) return;
 			var values = _.filter(items, function (item) {
 				return !isEmpty(item);
 			});
-			model.$setViewValue(values);
+			if (values.length > 0) {
+				model.$setViewValue(values);
+			}
 		}, true);
 
 		scope.$watch('$$readonly', function (readonly, old) {
