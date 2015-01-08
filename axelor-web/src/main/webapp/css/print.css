@@ -17,6 +17,13 @@
  */
 html, body {
 	height: 100%;
+	overflow: auto;
+}
+
+.view-pane > .view-container,
+.view-container .form-view > div:last-child,
+.view-pane > .view-container > div:not(.slick-editor-dropdown) {
+	overflow: inherit !important;
 }
 
 abbr[title]:after,
