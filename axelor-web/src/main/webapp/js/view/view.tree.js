@@ -237,6 +237,8 @@ function Loader(scope, node, DataSource) {
 		}
 	}
 
+	this.node = node;
+
 	this.child = null;
 	
 	this.model = node.model;
@@ -285,6 +287,12 @@ function Loader(scope, node, DataSource) {
 
 		if (scope._countOn) {
 			context._countOn = scope._countOn;
+		} else if (this.child) {
+			var child = this.child.node;
+			context._childOn = {
+				model: child.model,
+				parent: child.parent
+			};
 		}
 
 		var opts = _.extend(this.getDomain(context), {
@@ -496,7 +504,7 @@ ui.directive('uiViewTree', function(){
 					$('<td>').html(col.cellText(record)).appendTo(tr);
 				});
 				
-				if (scope.draggable && (record.$folder || scope._countOn)) {
+				if (scope.draggable && (record.$folder || scope._countOn || !record.$parent)) {
 					makeDroppable(tr);
 				}
 				if (record.$draggable || (scope.draggable && scope._countOn)) {
