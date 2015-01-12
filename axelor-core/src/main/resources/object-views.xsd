@@ -1612,6 +1612,7 @@
                   </xsd:simpleType>
                 </xsd:attribute>
                 <xsd:attribute name="if" type="xsd:string" />
+                <xsd:attribute name="expr" type="xsd:string" />
               </xsd:complexType>
             </xsd:element>
           </xsd:sequence>
