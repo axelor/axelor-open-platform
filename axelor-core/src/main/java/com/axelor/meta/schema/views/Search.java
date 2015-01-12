@@ -133,17 +133,18 @@ public class Search extends AbstractView {
 			return super.getServerType();
 		}
 
-		public static Map<String, ?> getTypes() {
+		public static Map<String, Class<?>> getTypes() {
 			return TYPES;
 		}
 
-		private static final Map<String, ?> TYPES = ImmutableMap.of(
-			"integer", Integer.class,
-			"decimal", BigDecimal.class,
-			"date", LocalDate.class,
-			"datetime", LocalDateTime.class,
-			"boolean", Boolean.class
-		);
+		private static final Map<String, Class<?>> TYPES = new ImmutableMap.Builder<String, Class<?>>()
+			.put("string", String.class)
+			.put("integer", Integer.class)
+			.put("decimal", BigDecimal.class)
+			.put("date", LocalDate.class)
+			.put("datetime", LocalDateTime.class)
+			.put("boolean", Boolean.class)
+			.build();
 
 		@SuppressWarnings("rawtypes")
 		public Object validate(Object input) {
@@ -151,9 +152,13 @@ public class Search extends AbstractView {
 				Class<?> klass = (Class<?>) TYPES.get(getServerType());
 				if ("reference".equals(getServerType())) {
 					klass = Class.forName(getTarget());
-					return JPA.em().find(klass, ((Map)input).get("id"));
+					if(input != null) {
+						return JPA.em().find(klass, Long.valueOf(((Map)input).get("id").toString()));
+					}
 				}
-				return Adapter.adapt(input, klass, klass, null);
+				if(klass != null) {
+					return Adapter.adapt(input, klass, klass, null);
+				}
 			} catch (Exception e) {
 			}
 			return input;
