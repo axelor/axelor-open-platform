@@ -8,7 +8,7 @@ resources/views/User.xml:55"
 "Action Menus",,,"resources/views/Menu.xml:103
 resources/views/Menu.xml:105
 resources/views/Meta.xml:153"
-"Action name can't be changed.",,,"java/com/axelor/meta/web/MetaController.java:99"
+"Action name can't be changed.",,,"java/com/axelor/meta/web/MetaController.java:100"
 "Actions",,,"resources/views/Menu.xml:88"
 "Activate on",,,"resources/domains/User.xml:22"
 "Activate the user from the specified date.",,,"resources/domains/User.xml:22"
@@ -29,11 +29,11 @@ resources/views/Menu.xml:133"
 resources/views/Meta.xml:173"
 "All Translations",,,"resources/views/Menu.xml:112
 resources/views/Menu.xml:114
-resources/views/Meta.xml:267"
+resources/views/Meta.xml:269"
 "All Views",,,"resources/views/Menu.xml:68
 resources/views/Meta.xml:64"
 "All the customizations will be lost. Are you sure ?",,,"resources/views/Meta.xml:66"
-"All views have been restored.",,,"java/com/axelor/meta/web/MetaController.java:143"
+"All views have been restored.",,,"java/com/axelor/meta/web/MetaController.java:145"
 "Allow",,,"resources/views/Permission.xml:21"
 "An unique permission name.",,,"resources/domains/Permission.xml:13"
 "Authorization",,,"resources/views/User.xml:32"
@@ -65,7 +65,7 @@ resources/domains/Meta.xml:153
 resources/domains/Meta.xml:172
 resources/domains/MetaSchedule.xml:21
 resources/domains/Role.xml:14
-resources/views/Meta.xml:258
+resources/views/Meta.xml:260
 resources/views/Meta.xml:59"
 "Disable the user from the specified date.",,,"resources/domains/User.xml:23"
 "Domain filter as condition.",,,"resources/domains/Permission.xml:20"
@@ -73,20 +73,20 @@ resources/views/Meta.xml:59"
 "English",,,"resources/views/User.xml:7"
 "Expires on",,,"resources/domains/User.xml:23"
 "Export",,,"resources/domains/Permission.xml:19
-resources/views/Meta.xml:269"
+resources/views/Meta.xml:271"
 "Export complete.",,,"java/com/axelor/meta/schema/actions/ActionExport.java:148
 java/com/axelor/meta/schema/actions/ActionExport.java:151
-java/com/axelor/meta/web/MetaController.java:218"
-"Field",,,"resources/views/Meta.xml:248"
+java/com/axelor/meta/web/MetaController.java:220"
+"Field",,,"resources/views/Meta.xml:250"
 "Field is required.",,,"java/com/axelor/meta/schema/actions/ActionCondition.java:116"
 "Fields",,,"resources/domains/Meta.xml:137
-resources/views/Meta.xml:240"
+resources/views/Meta.xml:242"
 "File",,,"resources/domains/Meta.xml:189"
 "File name",,,"resources/domains/Meta.xml:168"
 "File path",,,"resources/domains/Meta.xml:169"
 "File type",,,"resources/domains/Meta.xml:171"
-"Files",,,"resources/views/Meta.xml:284
-resources/views/Meta.xml:292"
+"Files",,,"resources/views/Meta.xml:286
+resources/views/Meta.xml:294"
 "Filter custom",,,"resources/domains/MetaFilter.xml:17"
 "Filter view",,,"resources/domains/MetaFilter.xml:18"
 "Filters",,,"resources/domains/MetaFilter.xml:16
@@ -113,7 +113,7 @@ resources/views/Menu.xml:25"
 "Install",,,"resources/views/Meta.xml:55"
 "Install module",,,"resources/views/Meta.xml:41"
 "Installed",,,"resources/domains/Meta.xml:19"
-"Invalid XML.",,,"java/com/axelor/meta/web/MetaController.java:71"
+"Invalid XML.",,,"java/com/axelor/meta/web/MetaController.java:72"
 "Invalid cron:",,,"java/com/axelor/quartz/JobRunner.java:147"
 "Invalid field value.",,,"java/com/axelor/meta/schema/actions/ActionCondition.java:118"
 "Items",,,"resources/domains/Meta.xml:110"
@@ -125,8 +125,8 @@ resources/views/Menu.xml:25"
 resources/domains/User.xml:18"
 "Left",,,"resources/domains/Meta.xml:62"
 "Login",,,"resources/domains/User.xml:13"
-"ManyToMany",,,"resources/views/Meta.xml:237"
-"ManyToOne",,,"resources/views/Meta.xml:235"
+"ManyToMany",,,"resources/views/Meta.xml:239"
+"ManyToOne",,,"resources/views/Meta.xml:237"
 "Mapped by",,,"resources/domains/Meta.xml:152"
 "Menu Item",,,"resources/views/Meta.xml:135"
 "Menu Items",,,"resources/views/Meta.xml:123"
@@ -138,10 +138,10 @@ resources/views/Menu.xml:79"
 "Mobile",,,"resources/domains/Meta.xml:63"
 "Model",,,"resources/domains/Meta.xml:32
 resources/domains/Meta.xml:95
-resources/views/Meta.xml:224"
+resources/views/Meta.xml:226"
 "Model Management",,,"resources/views/Menu.xml:8"
 "Models",,,"resources/views/Menu.xml:61
-resources/views/Meta.xml:218"
+resources/views/Meta.xml:219"
 "Module",,,"resources/domains/Meta.xml:109
 resources/domains/Meta.xml:33
 resources/domains/Meta.xml:60
@@ -174,8 +174,8 @@ resources/views/User.xml:65"
 "Object",,,"resources/domains/Meta.xml:188
 resources/domains/Permission.xml:14"
 "Object name",,,"resources/domains/Meta.xml:187"
-"OneToMany",,,"resources/views/Meta.xml:236"
-"OneToOne",,,"resources/views/Meta.xml:234"
+"OneToMany",,,"resources/views/Meta.xml:238"
+"OneToOne",,,"resources/views/Meta.xml:236"
 "Order",,,"resources/domains/Meta.xml:125"
 "Overview",,,"resources/views/Group.xml:22
 resources/views/Meta.xml:112
@@ -183,9 +183,9 @@ resources/views/Meta.xml:136
 resources/views/Meta.xml:163
 resources/views/Meta.xml:180
 resources/views/Meta.xml:194
-resources/views/Meta.xml:225
-resources/views/Meta.xml:249
-resources/views/Meta.xml:293
+resources/views/Meta.xml:227
+resources/views/Meta.xml:251
+resources/views/Meta.xml:295
 resources/views/Meta.xml:85
 resources/views/Permission.xml:17
 resources/views/Role.xml:11
@@ -242,7 +242,7 @@ resources/views/Meta.xml:179"
 "Selects",,,"resources/views/Menu.xml:96"
 "Sequence order",,,"resources/views/Meta.xml:198"
 "Shared",,,"resources/domains/MetaFilter.xml:20"
-"Show Model",,,"resources/views/Meta.xml:256"
+"Show Model",,,"resources/views/Meta.xml:258"
 "Show permissions",,,"resources/views/Group.xml:20"
 "Size",,,"resources/domains/Meta.xml:173"
 "Size in bytes",,,"resources/domains/Meta.xml:170"
@@ -265,8 +265,8 @@ resources/domains/Meta.xml:58
 resources/domains/Meta.xml:79
 resources/domains/MetaFilter.xml:15"
 "Top",,,"resources/domains/Meta.xml:61"
-"Translation",,,"resources/views/Meta.xml:276
-resources/views/Meta.xml:277"
+"Translation",,,"resources/views/Meta.xml:278
+resources/views/Meta.xml:279"
 "Tree",,,"resources/views/Meta.xml:9"
 "Type",,,"resources/domains/Meta.xml:149
 resources/domains/Meta.xml:30

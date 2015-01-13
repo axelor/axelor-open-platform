@@ -1,7 +1,7 @@
 "key","message","comment","context"
-"({0} items)",,,"webapp/js/widget/widget.slickgrid.js:1714"
+"({0} items)",,,"webapp/js/widget/widget.slickgrid.js:1751"
 "About",,,"webapp/index.jsp:121"
-"Action",,,"webapp/js/form/form.input.static.js:149
+"Action",,,"webapp/js/form/form.input.static.js:156
 webapp/js/view/view.search.js:563
 webapp/js/view/view.search.js:772"
 "Action Category",,,"webapp/js/view/view.search.js:547
@@ -11,11 +11,11 @@ webapp/js/view/view.search.js:764"
 "Active Users",,,"webapp/partials/system.html:36"
 "Add",,,"webapp/js/form/form.relational.nested.js:174"
 "Add Field",,,"webapp/js/widget/widget.update.js:381"
-"Add filter",,,"webapp/js/widget/widget.search.js:480"
-"Advanced Search",,,"webapp/js/widget/widget.search.js:914"
+"Add filter",,,"webapp/js/widget/widget.search.js:486"
+"Advanced Search",,,"webapp/js/widget/widget.search.js:920"
 "Alert",,,"webapp/js/lib/dialogs.js:206"
 "All Day",,,"webapp/js/view/view.calendar.js:446"
-"Apply",,,"webapp/js/widget/widget.search.js:486"
+"Apply",,,"webapp/js/widget/widget.search.js:492"
 "Apr",,,"webapp/js/form/form.input.datetime.js:41"
 "April",,,"webapp/js/form/form.input.datetime.js:27"
 "Aug",,,"webapp/js/form/form.input.datetime.js:45"
@@ -31,49 +31,49 @@ webapp/partials/views/form.html:16
 webapp/partials/views/trail.html:7"
 "Clear",,,"webapp/js/form/form.relational.nested.js:348
 webapp/js/view/view.search.js:582
-webapp/js/widget/widget.search.js:482
+webapp/js/widget/widget.search.js:488
 webapp/js/widget/widget.update.js:383"
 "Close",,,"webapp/js/axelor.app.js:392
 webapp/js/form/form.relational.nested.js:350
 webapp/js/widget/widget.dialog.js:32
 webapp/partials/about.html:51
-webapp/partials/nav-tabs.html:21
+webapp/partials/nav-tabs.html:23
 webapp/partials/preferences.html:16
 webapp/partials/system.html:64"
-"Close All",,,"webapp/partials/nav-tabs.html:23"
-"Close Others",,,"webapp/partials/nav-tabs.html:22"
+"Close All",,,"webapp/partials/nav-tabs.html:25"
+"Close Others",,,"webapp/partials/nav-tabs.html:24"
 "Concurrent updates error.",,,"webapp/js/axelor.app.js:445"
-"Create",,,"webapp/js/view/view.popup.js:634"
-"Create ""{0}"" and add...",,,"webapp/js/form/form.relational.multiple.js:685"
-"Create ""{0}"" and select...",,,"webapp/js/form/form.relational.single.js:276"
-"Create ""{0}""...",,,"webapp/js/form/form.relational.multiple.js:689
-webapp/js/form/form.relational.single.js:280"
+"Create",,,"webapp/js/view/view.popup.js:662"
+"Create ""{0}"" and add...",,,"webapp/js/form/form.relational.multiple.js:696"
+"Create ""{0}"" and select...",,,"webapp/js/form/form.relational.single.js:291"
+"Create ""{0}""...",,,"webapp/js/form/form.relational.multiple.js:700
+webapp/js/form/form.relational.single.js:295"
 "Create new",,,"webapp/partials/views/trail.html:6"
-"Create...",,,"webapp/js/form/form.relational.multiple.js:707
-webapp/js/form/form.relational.single.js:287"
-"Created By:",,,"webapp/js/view/view.form.js:676"
-"Created On:",,,"webapp/js/view/view.form.js:672"
-"Current changes will be lost.",,,"webapp/js/axelor.nav.js:422"
-"Current changes will be lost. Do you really want to proceed?",,,"webapp/js/view/view.form.js:526"
+"Create...",,,"webapp/js/form/form.relational.multiple.js:718
+webapp/js/form/form.relational.single.js:302"
+"Created By:",,,"webapp/js/view/view.form.js:686"
+"Created On:",,,"webapp/js/view/view.form.js:682"
+"Current changes will be lost.",,,"webapp/js/axelor.nav.js:434"
+"Current changes will be lost. Do you really want to proceed?",,,"webapp/js/view/view.form.js:536"
 "Day",,,"webapp/partials/views/calendar.html:8"
 "Dec",,,"webapp/js/form/form.input.datetime.js:49"
 "December",,,"webapp/js/form/form.input.datetime.js:35"
 "Delete",,,"webapp/js/view/view.calendar.js:489
-webapp/js/view/view.form.js:701
-webapp/js/widget/widget.search.js:948
+webapp/js/view/view.form.js:711
+webapp/js/widget/widget.search.js:954
 webapp/partials/views/grid.html:16
 webapp/partials/views/grid.html:17"
-"Do you really want to delete the selected record(s)?",,,"webapp/js/form/form.relational.multiple.js:194
+"Do you really want to delete the selected record(s)?",,,"webapp/js/form/form.relational.multiple.js:200
 webapp/js/view/view.grid.js:403
-webapp/js/view/view.popup.js:332"
-"Do you really want to delete the selected record?",,,"webapp/js/view/view.form.js:542"
+webapp/js/view/view.popup.js:360"
+"Do you really want to delete the selected record?",,,"webapp/js/view/view.form.js:552"
 "Do you really want to update all {0} records?",,,"webapp/js/widget/widget.update.js:305"
-"Domain",,,"webapp/js/form/form.input.static.js:155"
+"Domain",,,"webapp/js/form/form.input.static.js:162"
 "Done",,,"webapp/js/form/form.input.datetime.js:67"
-"Download",,,"webapp/js/view/view.popup.js:695"
-"Duplicate",,,"webapp/js/view/view.form.js:709"
-"Edit",,,"webapp/js/form/form.relational.multiple.js:564
-webapp/js/form/form.relational.single.js:404
+"Download",,,"webapp/js/view/view.popup.js:723"
+"Duplicate",,,"webapp/js/view/view.form.js:719"
+"Edit",,,"webapp/js/form/form.relational.multiple.js:575
+webapp/js/form/form.relational.single.js:180
 webapp/partials/views/form.html:10
 webapp/partials/views/form.html:9
 webapp/partials/views/grid.html:10
@@ -82,24 +82,24 @@ webapp/partials/views/grid.html:9"
 "Error",,,"webapp/js/axelor.app.js:370
 webapp/js/lib/dialogs.js:221
 webapp/js/lib/dialogs.js:41"
-"Export",,,"webapp/js/widget/widget.search.js:484"
+"Export",,,"webapp/js/widget/widget.search.js:490"
 "Export in progress ...",,,"webapp/js/view/view.grid.js:610"
 "Failed!",,,"webapp/partials/login-window.html:11"
 "Feb",,,"webapp/js/form/form.input.datetime.js:39"
 "February",,,"webapp/js/form/form.input.datetime.js:25"
-"Field Name",,,"webapp/js/form/form.input.static.js:188"
-"Field Type",,,"webapp/js/form/form.input.static.js:189"
-"Filter",,,"webapp/js/form/form.input.static.js:196"
-"Filters",,,"webapp/js/widget/widget.search.js:918"
+"Field Name",,,"webapp/js/form/form.input.static.js:201"
+"Field Type",,,"webapp/js/form/form.input.static.js:202"
+"Filter",,,"webapp/js/form/form.input.static.js:209"
+"Filters",,,"webapp/js/widget/widget.search.js:924"
 "Fr",,,"webapp/js/form/form.input.datetime.js:61"
 "Free Memory",,,"webapp/partials/system.html:30"
 "Fri",,,"webapp/js/form/form.input.datetime.js:60"
 "Friday",,,"webapp/js/form/form.input.datetime.js:57"
 "Go",,,"webapp/js/view/view.search.js:599
 webapp/js/view/view.search.js:795"
-"Group by",,,"webapp/js/widget/widget.slickgrid.js:532"
-"Grouped",,,"webapp/js/view/view.chart.js:38"
-"Hide",,,"webapp/js/widget/widget.slickgrid.js:540"
+"Group by",,,"webapp/js/widget/widget.slickgrid.js:539"
+"Grouped",,,"webapp/js/view/view.chart.js:26"
+"Hide",,,"webapp/js/widget/widget.slickgrid.js:547"
 "Hour",,,"webapp/js/form/form.input.datetime.js:63"
 "Information",,,"webapp/js/lib/dialogs.js:198
 webapp/js/lib/dialogs.js:28
@@ -121,7 +121,7 @@ webapp/login.jsp:26"
 "Log in attempt failed.",,,"webapp/partials/login-window.html:11"
 "Log in time",,,"webapp/partials/system.html:45"
 "Log out",,,"webapp/index.jsp:123"
-"Log...",,,"webapp/js/view/view.form.js:718"
+"Log...",,,"webapp/js/view/view.form.js:728"
 "Mar",,,"webapp/js/form/form.input.datetime.js:40"
 "March",,,"webapp/js/form/form.input.datetime.js:26"
 "Mass Update",,,"webapp/js/widget/widget.update.js:364
@@ -136,18 +136,18 @@ webapp/js/form/form.input.datetime.js:42"
 "Monday",,,"webapp/js/form/form.input.datetime.js:53"
 "Month",,,"webapp/partials/views/calendar.html:6"
 "More",,,"webapp/js/widget/widget.navmenu.js:209"
-"My Filters",,,"webapp/js/widget/widget.search.js:927"
-"New",,,"webapp/js/form/form.relational.multiple.js:565
-webapp/js/form/form.relational.single.js:405
+"My Filters",,,"webapp/js/widget/widget.search.js:933"
+"New",,,"webapp/js/form/form.relational.multiple.js:576
+webapp/js/form/form.relational.single.js:181
 webapp/partials/views/form.html:6
 webapp/partials/views/form.html:7
 webapp/partials/views/grid.html:6
 webapp/partials/views/grid.html:7"
 "Next",,,"webapp/js/form/form.input.datetime.js:69"
 "No",,,"webapp/js/lib/dialogs.js:63"
-"No records found.",,,"webapp/js/view/view.chart.js:564
+"No records found.",,,"webapp/js/view/view.chart.js:559
 webapp/js/view/view.search.js:194
-webapp/js/widget/widget.slickgrid.js:657"
+webapp/js/widget/widget.slickgrid.js:664"
 "Nov",,,"webapp/js/form/form.input.datetime.js:48"
 "November",,,"webapp/js/form/form.input.datetime.js:34"
 "Now",,,"webapp/js/form/form.input.datetime.js:66"
@@ -155,65 +155,66 @@ webapp/js/widget/widget.slickgrid.js:657"
 webapp/js/lib/dialogs.js:103
 webapp/js/lib/dialogs.js:62
 webapp/js/widget/widget.dialog.js:42"
-"Object",,,"webapp/js/form/form.input.static.js:152
-webapp/js/form/form.input.static.js:187
+"Object",,,"webapp/js/form/form.input.static.js:159
+webapp/js/form/form.input.static.js:200
 webapp/js/view/view.search.js:353"
 "Oct",,,"webapp/js/form/form.input.datetime.js:47"
 "October",,,"webapp/js/form/form.input.datetime.js:33"
 "Offline!",,,"webapp/partials/login-window.html:14"
 "Operating System",,,"webapp/partials/system.html:9"
-"Orig. Value",,,"webapp/js/form/form.input.static.js:230"
+"Orig. Value",,,"webapp/js/form/form.input.static.js:243"
 "Password",,,"webapp/login.jsp:29
 webapp/partials/login-window.html:6"
-"Please correct the invalid form values.",,,"webapp/js/form/form.actions.js:281"
+"Please correct the invalid form values.",,,"webapp/js/form/form.actions.js:293"
 "Please sign in",,,"webapp/login.jsp:24"
 "Please wait...",,,"webapp/js/axelor.app.js:203"
 "Preferences",,,"webapp/index.jsp:120"
 "Prev",,,"webapp/js/form/form.input.datetime.js:68"
 "Question",,,"webapp/js/lib/dialogs.js:59"
-"Reference",,,"webapp/js/form/form.input.static.js:200"
-"Refresh",,,"webapp/js/view/view.form.js:696
-webapp/js/view/view.portal.js:261
+"Reference",,,"webapp/js/form/form.input.static.js:213"
+"Refresh",,,"webapp/js/view/view.form.js:706
+webapp/js/view/view.portal.js:267
+webapp/partials/nav-tabs.html:21
 webapp/partials/system.html:63
 webapp/partials/views/calendar.html:11
 webapp/partials/views/trail.html:10"
 "Remember me",,,"webapp/login.jsp:25"
-"Remove",,,"webapp/js/form/form.relational.multiple.js:566
-webapp/js/view/view.popup.js:696"
+"Remove",,,"webapp/js/form/form.relational.multiple.js:577
+webapp/js/view/view.popup.js:724"
 "Sa",,,"webapp/js/form/form.input.datetime.js:61"
 "Sat",,,"webapp/js/form/form.input.datetime.js:60"
 "Saturday",,,"webapp/js/form/form.input.datetime.js:58"
-"Save",,,"webapp/js/widget/widget.search.js:946
+"Save",,,"webapp/js/widget/widget.search.js:952
 webapp/partials/preferences.html:15
 webapp/partials/views/form.html:12
 webapp/partials/views/form.html:13
 webapp/partials/views/grid.html:13
 webapp/partials/views/grid.html:14"
-"Save as",,,"webapp/js/widget/widget.search.js:947"
-"Save filter as",,,"webapp/js/widget/widget.search.js:941"
+"Save as",,,"webapp/js/widget/widget.search.js:953"
+"Save filter as",,,"webapp/js/widget/widget.search.js:947"
 "Search",,,"webapp/js/view/view.search.js:576"
 "Search Objects",,,"webapp/js/view/view.search.js:533"
-"Search...",,,"webapp/js/form/form.relational.multiple.js:695
-webapp/js/form/form.relational.multiple.js:701
-webapp/js/form/form.relational.single.js:269"
+"Search...",,,"webapp/js/form/form.relational.multiple.js:706
+webapp/js/form/form.relational.multiple.js:712
+webapp/js/form/form.relational.single.js:284"
 "Second",,,"webapp/js/form/form.input.datetime.js:65"
-"Select",,,"webapp/js/form/form.relational.multiple.js:1031
-webapp/js/form/form.relational.multiple.js:1032
-webapp/js/form/form.relational.multiple.js:567
+"Select",,,"webapp/js/form/form.relational.multiple.js:1082
+webapp/js/form/form.relational.multiple.js:1083
+webapp/js/form/form.relational.multiple.js:578
 webapp/js/form/form.relational.nested.js:349
-webapp/js/form/form.relational.single.js:406
-webapp/js/view/view.popup.js:619"
+webapp/js/form/form.relational.single.js:182
+webapp/js/view/view.popup.js:647"
 "Sep",,,"webapp/js/form/form.input.datetime.js:46"
 "September",,,"webapp/js/form/form.input.datetime.js:32"
 "Server is not responding.",,,"webapp/partials/login-window.html:14"
-"Share",,,"webapp/js/widget/widget.search.js:943"
-"Show",,,"webapp/js/form/form.relational.multiple.js:1033
-webapp/js/widget/widget.slickgrid.js:1090"
+"Share",,,"webapp/js/widget/widget.search.js:949"
+"Show",,,"webapp/js/form/form.relational.multiple.js:1084
+webapp/js/widget/widget.slickgrid.js:1104"
 "Show Details",,,"webapp/js/axelor.app.js:384"
-"Show archived",,,"webapp/js/widget/widget.search.js:475"
-"Sort Ascending",,,"webapp/js/widget/widget.slickgrid.js:523"
-"Sort Descending",,,"webapp/js/widget/widget.slickgrid.js:527"
-"Stacked",,,"webapp/js/view/view.chart.js:39"
+"Show archived",,,"webapp/js/widget/widget.search.js:481"
+"Sort Ascending",,,"webapp/js/widget/widget.slickgrid.js:530"
+"Sort Descending",,,"webapp/js/widget/widget.slickgrid.js:534"
+"Stacked",,,"webapp/js/view/view.chart.js:27"
 "Su",,,"webapp/js/form/form.input.datetime.js:61"
 "Success",,,"webapp/js/lib/dialogs.js:213"
 "Sun",,,"webapp/js/form/form.input.datetime.js:60"
@@ -221,44 +222,45 @@ webapp/js/widget/widget.slickgrid.js:1090"
 "System Information",,,"webapp/partials/about.html:45
 webapp/partials/system.html:4"
 "Th",,,"webapp/js/form/form.input.datetime.js:61"
-"The following fields are invalid:",,,"webapp/js/view/view.form.js:1026"
-"The record has been updated or delete by another action.",,,"webapp/js/view/view.form.js:430"
+"The following fields are invalid:",,,"webapp/js/view/view.form.js:1040"
+"The record has been updated or delete by another action.",,,"webapp/js/view/view.form.js:433"
+"There are some invalid rows.",,,"webapp/js/widget/widget.slickgrid.js:893"
 "Thu",,,"webapp/js/form/form.input.datetime.js:60"
 "Thursday",,,"webapp/js/form/form.input.datetime.js:56"
 "Today",,,"webapp/partials/views/calendar.html:16"
-"Toggle",,,"webapp/js/view/view.portal.js:262"
+"Toggle",,,"webapp/js/view/view.portal.js:268"
 "Total Memory",,,"webapp/partials/system.html:24"
 "Tu",,,"webapp/js/form/form.input.datetime.js:61"
 "Tue",,,"webapp/js/form/form.input.datetime.js:60"
 "Tuesday",,,"webapp/js/form/form.input.datetime.js:54"
-"Ungroup",,,"webapp/js/widget/widget.slickgrid.js:535"
+"Ungroup",,,"webapp/js/widget/widget.slickgrid.js:542"
 "Unknown",,,"webapp/js/view/view.calendar.js:144
 webapp/js/view/view.calendar.js:204"
 "Update",,,"webapp/js/widget/widget.update.js:419"
 "Update all",,,"webapp/js/widget/widget.update.js:422"
-"Updated By:",,,"webapp/js/view/view.form.js:684"
-"Updated On:",,,"webapp/js/view/view.form.js:680"
-"Upload",,,"webapp/js/view/view.popup.js:694"
+"Updated By:",,,"webapp/js/view/view.form.js:694"
+"Updated On:",,,"webapp/js/view/view.form.js:690"
+"Upload",,,"webapp/js/view/view.popup.js:722"
 "Used Memory",,,"webapp/partials/system.html:28"
 "User",,,"webapp/partials/login-window.html:4
 webapp/partials/system.html:44"
 "User name",,,"webapp/login.jsp:28"
-"Validation error",,,"webapp/js/form/form.actions.js:282"
-"View",,,"webapp/js/form/form.input.static.js:158"
-"Warning",,,"webapp/js/form/form.actions.js:491
+"Validation error",,,"webapp/js/form/form.actions.js:294"
+"View",,,"webapp/js/form/form.input.static.js:165"
+"Warning",,,"webapp/js/form/form.actions.js:503
 webapp/js/lib/dialogs.js:34"
 "We",,,"webapp/js/form/form.input.datetime.js:61"
 "Wed",,,"webapp/js/form/form.input.datetime.js:60"
 "Wednesday",,,"webapp/js/form/form.input.datetime.js:55"
 "Week",,,"webapp/partials/views/calendar.html:7"
 "Wk",,,"webapp/js/form/form.input.datetime.js:62"
-"Would you like to reload the current record?",,,"webapp/js/view/view.form.js:431"
-"Would you like to remove the filter?",,,"webapp/js/widget/widget.search.js:691"
+"Would you like to reload the current record?",,,"webapp/js/view/view.form.js:434"
+"Would you like to remove the filter?",,,"webapp/js/widget/widget.search.js:697"
 "Yes",,,"webapp/js/lib/dialogs.js:62"
 "You are not allow to upload a file bigger than",,,"webapp/js/form/form.input.binary.js:168
-webapp/js/view/view.popup.js:371"
-"and",,,"webapp/js/widget/widget.search.js:469"
-"and {0} more",,,"webapp/js/form/form.input.select.js:424"
+webapp/js/view/view.popup.js:399"
+"and",,,"webapp/js/widget/widget.search.js:475"
+"and {0} more",,,"webapp/js/form/form.input.select.js:425"
 "contains",,,"webapp/js/widget/widget.search.js:32"
 "doesn't contain",,,"webapp/js/widget/widget.search.js:33"
 "equals",,,"webapp/js/widget/widget.search.js:25"
@@ -273,7 +275,7 @@ webapp/js/view/view.popup.js:371"
 "less than",,,"webapp/js/widget/widget.search.js:30"
 "not equal",,,"webapp/js/widget/widget.search.js:26"
 "not in range",,,"webapp/js/widget/widget.search.js:36"
-"or",,,"webapp/js/widget/widget.search.js:472"
-"{0} of {1}",,,"webapp/js/view/view.form.js:618"
+"or",,,"webapp/js/widget/widget.search.js:478"
+"{0} of {1}",,,"webapp/js/view/view.form.js:628"
 "{0} to {1} of {2}",,,"webapp/js/view/view.grid.js:353
-webapp/js/view/view.tree.js:409"
+webapp/js/view/view.tree.js:417"
