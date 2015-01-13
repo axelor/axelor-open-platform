@@ -558,6 +558,15 @@ function Chart(scope, element, data) {
 		if (chart.noData) {
 			chart.noData(_t('No records found.'));
 		}
+		if(chart.controlLabels) {
+			chart.controlLabels({
+				stacked: _t('Stacked'),
+				stream: _t('Stream'),
+				expanded: _t('Expanded'),
+				stack_percent: _t('Stack %')
+			});
+		}
+		
 		var tickFormats = {
 			"date" : function (d) {
 				var f = config.xFormat;
