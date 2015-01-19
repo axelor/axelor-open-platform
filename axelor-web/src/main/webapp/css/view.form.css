@@ -478,24 +478,40 @@ td.form-item > * {
 	padding-top: 8px; 
 }
 
-.form-item .form-item-container.ng-invalid > textarea,
-.form-item .form-item-container.ng-invalid > .picker-input input,
-.form-item .form-item-container.ng-invalid > .ui-spinner input,
-.form-item .form-item-container.ng-invalid > input,
-.form-item .form-item-container.ng-invalid > .tag-select,
-.form-item .input-append.ng-invalid > input,
-.form-item .picker-input.ng-invalid > input {
+.form-item .ng-invalid > input,
+.form-item .ng-invalid > textarea,
+.form-item .ng-invalid > .picker-input input,
+.form-item .ng-invalid > .ui-spinner input,
+.form-item .ng-invalid > .tag-select {
 	border-color: #B94A48;
 }
 
-.form-item .form-item-container.ng-invalid:focus,
-.form-item .form-item-container.ng-invalid > input:focus,
-.form-item .picker-input.ng-invalid > input:focus {
+.form-item .ng-invalid:focus,
+.form-item .ng-invalid > input:focus,
+.form-item .ng-invalid > textarea:focus,
+.form-item .ng-invalid > .picker-input input:focus,
+.form-item .ng-invalid > .ui-spinner input:focus {
 	border-color: #953B39;
 	
 	-webkit-box-shadow: 0 0 6px #D59392;
 	   -moz-box-shadow: 0 0 6px #D59392;
-	        box-shadow: 0 0 6px #D59392;
+	        box-shadow: 0 0 6px #D59392 !important;
+}
+
+.nested-not-required .form-item .ng-invalid > input,
+.nested-not-required .form-item .ng-invalid > textarea,
+.nested-not-required .form-item .ng-invalid > .picker-input input,
+.nested-not-required .form-item .ng-invalid > .ui-spinner input,
+.nested-not-required .form-item .ng-invalid > .tag-select {
+	border-color: #ccc;
+}
+
+.nested-not-required .form-item .ng-invalid:focus,
+.nested-not-required .form-item .ng-invalid > input:focus,
+.nested-not-required .form-item .ng-invalid > textarea:focus,
+.nested-not-required .form-item .ng-invalid > .picker-input input:focus,
+.nested-not-required .form-item .ng-invalid > .ui-spinner input:focus {
+	border-color: #953B39;
 }
 
 .form-item form {

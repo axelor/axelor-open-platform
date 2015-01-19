@@ -237,6 +237,8 @@ function Loader(scope, node, DataSource) {
 		}
 	}
 
+	this.node = node;
+
 	this.child = null;
 	
 	this.model = node.model;
@@ -285,6 +287,12 @@ function Loader(scope, node, DataSource) {
 
 		if (scope._countOn) {
 			context._countOn = scope._countOn;
+		} else if (this.child) {
+			var child = this.child.node;
+			context._childOn = {
+				model: child.model,
+				parent: child.parent
+			};
 		}
 
 		var opts = _.extend(this.getDomain(context), {
@@ -496,7 +504,7 @@ ui.directive('uiViewTree', function(){
 					$('<td>').html(col.cellText(record)).appendTo(tr);
 				});
 				
-				if (scope.draggable && (record.$folder || scope._countOn)) {
+				if (scope.draggable && (record.$folder || scope._countOn || !record.$parent)) {
 					makeDroppable(tr);
 				}
 				if (record.$draggable || (scope.draggable && scope._countOn)) {
@@ -515,10 +523,22 @@ ui.directive('uiViewTree', function(){
 				var row = ui.draggable,
 					record = row.data('$record'),
 					current = $(this).data('$record'),
-					node = table.treetable("node", row.data("id"));
+					node = table.treetable("node", row.data("id")),
+					nodeParent = node.parentNode();
 
 				table.treetable("move", node.id, $(this).data("id"));
-				
+
+				// make sure to remove expander icon if no children left
+				if (nodeParent && nodeParent.children.length === 0) {
+					nodeParent.row.removeClass('expanded');
+					nodeParent.row.removeClass('branch');
+					nodeParent.row.addClass('leaf');
+
+					nodeParent.treeCell.off('click.treetable');
+					nodeParent.treeCell.off('keydown.treetable');
+					nodeParent.indenter.empty();
+				}
+
 				record.$parentId = current.$record.id;
 				record.$move(function(result) {
 				

@@ -133,17 +133,18 @@ public class Search extends AbstractView {
 			return super.getServerType();
 		}
 
-		public static Map<String, ?> getTypes() {
+		public static Map<String, Class<?>> getTypes() {
 			return TYPES;
 		}
 
-		private static final Map<String, ?> TYPES = ImmutableMap.of(
-			"integer", Integer.class,
-			"decimal", BigDecimal.class,
-			"date", LocalDate.class,
-			"datetime", LocalDateTime.class,
-			"boolean", Boolean.class
-		);
+		private static final Map<String, Class<?>> TYPES = new ImmutableMap.Builder<String, Class<?>>()
+			.put("string", String.class)
+			.put("integer", Integer.class)
+			.put("decimal", BigDecimal.class)
+			.put("date", LocalDate.class)
+			.put("datetime", LocalDateTime.class)
+			.put("boolean", Boolean.class)
+			.build();
 
 		@SuppressWarnings("rawtypes")
 		public Object validate(Object input) {
@@ -151,9 +152,13 @@ public class Search extends AbstractView {
 				Class<?> klass = (Class<?>) TYPES.get(getServerType());
 				if ("reference".equals(getServerType())) {
 					klass = Class.forName(getTarget());
-					return JPA.em().find(klass, ((Map)input).get("id"));
+					if(input != null) {
+						return JPA.em().find(klass, Long.valueOf(((Map)input).get("id").toString()));
+					}
 				}
-				return Adapter.adapt(input, klass, klass, null);
+				if(klass != null) {
+					return Adapter.adapt(input, klass, klass, null);
+				}
 			} catch (Exception e) {
 			}
 			return input;
@@ -400,12 +405,13 @@ public class Search extends AbstractView {
 		}
 
 		@SuppressWarnings("rawtypes")
-		private Object getValue(Map<String, Object> params, String name) {
+		private Object getValue(SearchSelectInput input, ScriptHelper handler) {
 			Object value = null;
-			String[] names = name.split("\\.");
+			String[] names = input.getName().split("\\.");
 
-			value = params.get(names[0]);
-			if (value == null || names.length == 1) return value;
+			value = handler.getBindings().get(names[0]);
+			if(input.getExpression() != null) { return handler.eval(input.getExpression()); }
+			if (value == null || names.length == 1) { return value; }
 
 			for(int i = 1 ; i < names.length ; i ++) {
 				if (value instanceof Map) {
@@ -421,7 +427,6 @@ public class Search extends AbstractView {
 		Map<String, Object> build(StringBuilder builder, JoinHelper joinHelper, ScriptHelper handler) {
 
 			List<String> where = Lists.newArrayList();
-			Map<String, Object> params = handler.getBindings();
 			Map<String, Object> binding = Maps.newHashMap();
 			Multimap<String, String> groups = HashMultimap.create();
 
@@ -434,7 +439,7 @@ public class Search extends AbstractView {
 
 				String name = input.getField();
 				String as = input.getName();
-				Object value = this.getValue(params, as);
+				Object value = this.getValue(input, handler);
 
 				if (value != null) {
 
@@ -521,6 +526,9 @@ public class Search extends AbstractView {
 
 		@XmlAttribute(name = "if")
 		private String condition;
+		
+		@XmlAttribute(name = "expr")
+		private String expression;
 
 		public String getName() {
 			return name;
@@ -552,6 +560,14 @@ public class Search extends AbstractView {
 
 		public void setCondition(String condition) {
 			this.condition = condition;
+		}
+		
+		public String getExpression() {
+			return expression;
+		}
+		
+		public void setExpression(String expression) {
+			this.expression = expression;
 		}
 	}
 }

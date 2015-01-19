@@ -17,12 +17,9 @@
  */
 package com.axelor.script;
 
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 
 import com.axelor.rpc.Context;
-import com.axelor.script.GroovyScriptHelper;
 import com.axelor.test.db.Contact;
 
 @SuppressWarnings("all")
@@ -43,57 +40,36 @@ public class TestSpeed extends ScriptTest {
     private static final String EXPR_CONDITION =
     		"(title instanceof Contact || fullName == 'foo') || (__ref__ instanceof Title) || (__parent__ == 0.102) || (__self__ == __this__)";
 
-    private void doTest(String expr, boolean dynamic) {
+    private void doTest(String expr) {
     	GroovyScriptHelper helper = new GroovyScriptHelper(context());
         for(int i = 0 ; i < COUNT ; i ++) {
-        	Object result = dynamic ? helper.evalDynamic(expr) : helper.evalStatic(expr);
+        	Object result = helper.eval(expr);
         }
     }
 
     @Test
     public void test10_warmup() {
-    	doTest(EXPR_INTERPOLATION, true);
-    	doTest(EXPR_INTERPOLATION, false);
+    	doTest(EXPR_INTERPOLATION);
     }
 
     @Test
-    public void test20_interpolation_d() {
-    	doTest(EXPR_INTERPOLATION, true);
+    public void test20_interpolation() {
+    	doTest(EXPR_INTERPOLATION);
     }
 
     @Test
-    public void test20_interpolation_s() {
-    	doTest(EXPR_INTERPOLATION, false);
+    public void test21_concat() {
+    	doTest(EXPR_CONCAT);
     }
 
     @Test
-    public void test21_concat_d() {
-    	doTest(EXPR_CONCAT, true);
+    public void test22_elvis() {
+    	doTest(EXPR_ELVIS);
     }
 
     @Test
-    public void test21_concat_s() {
-    	doTest(EXPR_CONCAT, false);
-    }
-
-    @Test
-    public void test22_elvis_d() {
-    	doTest(EXPR_ELVIS, true);
-    }
-
-    @Test
-    public void test22_elvis_s() {
-    	doTest(EXPR_ELVIS, false);
-    }
-
-    @Test
-    public void test23_condition_d() {
-    	doTest(EXPR_CONDITION, true);
-    }
-
-    @Test
-    public void test23_condition_s() {
-    	doTest(EXPR_CONDITION, false);
+    public void test23_condition() {
+    	doTest(EXPR_CONDITION);
     }
 
 	@Test

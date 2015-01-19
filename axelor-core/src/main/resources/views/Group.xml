@@ -38,7 +38,7 @@
       <panel-related field="views">
         <field name="name"/>
         <field name="title"/>
-        <field name="type" selection="view.type.selection"/>
+        <field name="type"/>
         <field name="priority" width="75"/>
       </panel-related>
     </panel-tabs>

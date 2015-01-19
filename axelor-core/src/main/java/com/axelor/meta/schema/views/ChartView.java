@@ -48,7 +48,7 @@ public class ChartView extends AbstractView {
 	private List<SearchField> searchFields;
 
 	@XmlElement(name = "dataset")
-	private ChartQuery query;
+	private ChartDataset dataset;
 
 	@XmlElement
 	private ChartCategory category;
@@ -71,8 +71,8 @@ public class ChartView extends AbstractView {
 		return searchFields;
 	}
 
-	public ChartQuery getQuery() {
-		return query;
+	public ChartDataset getDataset() {
+		return dataset;
 	}
 
 	public ChartCategory getCategory() {
@@ -88,7 +88,7 @@ public class ChartView extends AbstractView {
 	}
 
 	@XmlType
-	public static class ChartQuery {
+	public static class ChartDataset {
 
 		@XmlAttribute
 		private String type;

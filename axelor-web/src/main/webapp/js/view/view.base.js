@@ -352,6 +352,12 @@ function DSViewCtrl(type, $scope, $element) {
 	if (view.deferred) {
 		view.deferred.resolve($scope);
 	}
+
+	$scope.$on('on:tab-reload', function(e, tab) {
+		if ($scope === e.targetScope && $scope.onRefresh) {
+			$scope.onRefresh();
+		}
+	});
 }
 
 angular.module('axelor.ui').directive('uiViewPane', function() {
@@ -443,6 +449,24 @@ angular.module('axelor.ui').directive('uiViewPopup', function() {
 				}
 				scope.applyLater();
 			};
+
+			scope.onPopupOK = function () {
+				var viewScope = scope._viewParams.$viewScope;
+				if (!viewScope.onSave || (!viewScope.isDirty() && viewScope.id)) {
+					return scope.onOK();
+				}
+				return viewScope.onSave().then(function(record, page) {
+					viewScope.edit(record);
+					viewScope.applyLater(function() {
+						scope.onOK();
+					});
+				});
+			};
+
+			var params = scope.tab.params || {};
+			if (!params['popup-save']) {
+				scope.onPopupOK = false;
+			}
 			
 			scope.$watch('viewTitle', function (title) {
 				scope._setTitle(title);
@@ -461,7 +485,7 @@ angular.module('axelor.ui').directive('uiViewPopup', function() {
 		},
 		replace: true,
 		template:
-			'<div ui-dialog ui-dialog-size x-on-close="onPopupClose" x-on-ok="false" x-on-before-close="onBeforeClose">' +
+			'<div ui-dialog ui-dialog-size x-on-close="onPopupClose" x-on-ok="onPopupOK" x-on-before-close="onBeforeClose">' +
 				'<div ui-view-pane="tab"></div>' +
 			'</div>'
 	};

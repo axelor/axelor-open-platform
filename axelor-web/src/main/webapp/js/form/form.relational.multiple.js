@@ -72,8 +72,14 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	};
 	
 	$scope.select = function(value) {
-		var items = _.chain([value]).flatten(true).compact().value(),
-			records = _.map($scope.getItems(), _.clone);
+
+		// if items are same, no need to set values
+		if (angular.equals(value, $scope.getValue())) {
+			return;
+		}
+
+		var items = _.chain([value]).flatten(true).compact().value();
+		var records = _.map($scope.getItems(), _.clone);
 
 		_.each($scope.itemsPending, function (item) {
 			var find = _.find(records, function(rec) {
@@ -454,6 +460,7 @@ ui.formInput('OneToMany', {
 				}
 				items.splice(index, 1);
 			}
+			return items;
 		}
 
 		scope.onGridInit = function(grid, inst) {
@@ -465,7 +472,11 @@ ui.formInput('OneToMany', {
 			if (editable) {
 				element.addClass('inline-editable');
 				scope.$on('on:new', function(event){
-					deleteItemsById(0);
+					var items = deleteItemsById(0);
+					if (items.length === 0) {
+						scope.dataView.setItems([]);
+						grid.setSelectedRows([]);
+					}
 					grid.setOptions({enableAddRow: scope.canNew() && !scope.isReadonly()});
 				});
 				scope.$watch("isReadonly()", function(readonly) {
@@ -593,8 +604,8 @@ var panelRelatedTemplate =
 	"<div class='panel-header'>" +
 		"<div class='icons-bar pull-right' ng-show='!isReadonly()'>" +
 			"<i ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()' class='fa fa-pencil'></i>" +
-			"<i ng-click='onNew()' ng-show='hasPermission(\"write\") && !isDisabled() && canNew()' class='fa fa-plus'></i>" +
-			"<i ng-click='onRemove()' ng-show='hasPermission(\"remove\") && !isDisabled() && canRemove()' class='fa fa-minus'></i>" +
+			"<i ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()' class='fa fa-plus'></i>" +
+			"<i ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()' class='fa fa-minus'></i>" +
 			"<i ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()' class='fa fa-search'></i>" +
 		"</div>" +
 		"<div class='panel-title'><span ui-help-popover ng-bind-html-unsafe='title'></span></div>" +
@@ -798,6 +809,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		scope.onGridInit = function() {};
 		scope.items = [];
 
+		var showOnNew = (scope.field.editor||{}).showOnNew !== false;
 		var unwatch = null;
 
 		model.$render = function () {
@@ -806,10 +818,10 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 				unwatch = null;
 			}
 			scope.items = model.$viewValue;
-			if (scope.items) {
+			if ((scope.items && scope.items.length > 0) || scope.$$readonly) {
 				return;
 			}
-			scope.items = [{}];
+			scope.items = showOnNew ? [{}] : [];
 			unwatch = scope.$watch('items[0]', function (item, old) {
 				if (!item) return;
 				if (item.$changed) {
@@ -819,21 +831,56 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 				item.$changed = true;
 			}, true);
 		};
+		
+		function isEmpty(record) {
+			if (!record || _.isEmpty(record)) return true;
+			var values = _.filter(record, function (value, name) {
+				return !(/[\$_]/.test(name) || value === null || value === undefined);
+			});
+			return values.length === 0;
+		}
 
-		var last = {};
+		scope.$watch('items', function (items, old) {
+			if (!items || items.length === 0) return;
+			var changed = false;
+			var values = _.filter(items, function (item) {
+				if (item.$changed) {
+					changed = true;
+				}
+				return !isEmpty(item);
+			});
+			if (changed) {
+				model.$setViewValue(values);
+			}
+		}, true);
+
+		scope.$watch('$$readonly', function (readonly, old) {
+			if (readonly === undefined) return;
+			var items = model.$viewValue;
+			if (_.isEmpty(items)) {
+				scope.items = (showOnNew && !readonly) ? [{}] : items;
+			}
+		});
+
 		scope.addItem = function () {
 			var items = scope.items;
 			var item = _.last(items);
-			if (items.length && angular.equals(last, item)) {
+			if (items && items.length && isEmpty(item)) {
 				return;
 			}
-			last = {};
 			items.push({});
 		};
 
 		scope.removeItem = function (index) {
 			var items = scope.items;
 			items.splice(index, 1);
+			var values = _.filter(items, function (item) {
+				return !isEmpty(item);
+			});
+			if (items.length === 0) {
+				scope.addItem();
+			}
+			model.$setViewValue(values);
 		};
 
 		scope.setValidity = function (key, value) {
@@ -852,14 +899,13 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 	template_readonly:function (scope) {
 		var field = scope.field;
 		var tmpl = field.viewer;
-		if (!tmpl && field.editor && !field.targetName) {
+		if (!tmpl && field.editor && (field.editor.viewer || !field.targetName)) {
 			tmpl = '<div ui-panel-editor>';
 		}
 		if (!tmpl && field.targetName) {
 			tmpl = '{{record.' + field.targetName + '}}';
-		} else {
-			tmpl = '{{record.id}}';
 		}
+		tmpl = tmpl || '{{record.id}}';
 		return "<div class='o2m-list'>" +
 		"<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items' ng-bind-html='tmpl'>" + tmpl + "</div>" +
 		"</div>"

@@ -109,7 +109,7 @@ public class AppServletModule extends JerseyServletModule {
 		install(new SchedulerModule());
 
 		// no-cache filter
-		if ("dev".equals(settings.get("application.mode", "dev"))) {
+		if (!settings.isProduction()) {
 			filter("*").through(NoCacheFilter.class);
 		}
 

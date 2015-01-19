@@ -86,6 +86,7 @@ var Editor = function(args) {
 	if (!element.parent().is('td.form-item'))
 		element = element.parent();
 	element.data('$parent', element.parent());
+	element.data('$editorForm', form);
 
 	this.init = function() {
 
@@ -125,7 +126,8 @@ var Editor = function(args) {
 	
 	this.destroy = function() {
 		element.appendTo(element.data('$parent') || form)
-			   .removeData('$parent');
+			   .removeData('$parent')
+			   .removeData('$editorForm');
 		element.trigger("hide:slick-editor");
 		element.parent().zIndex('');
 	};
@@ -156,6 +158,11 @@ var Editor = function(args) {
 			current = item || { id: 0 },
 			updated = false;
 			
+		if (current && (!current.id || current.id < 0)
+					&& (current[column.field] === undefined)) {
+			current[column.field] = (scope.defaultValues||{})[column.field];
+		}
+
 		if (record.id !== current.id || record.version !== current.version) {
 			scope.editRecord(current);
 		} else {
@@ -875,9 +882,16 @@ Grid.prototype._doInit = function(view) {
 		if (!that.isDirty() || that.saveChanges()) {
 			return;
 		}
+		if (!that.editorScope || that.editorScope.isValid()) {
+			return;
+		}
 		
 		var args = that.grid.getActiveCell();
-		that.focusInvalidCell(args);
+		if (args) {
+			that.focusInvalidCell(args);
+		} else {
+			axelor.dialogs.error(_t('There are some invalid rows.'));
+		}
 
 		e.preventDefault();
 		return false;
@@ -1143,9 +1157,21 @@ Grid.prototype.onBeforeEditCell = function(event, args) {
 	if (args.item && args.item._original === undefined) {
 		args.item._original = _.clone(args.item);
 	}
-	if (!args.item) {
-		this.editorScope.editRecord(null);
+	if (args.item) {
+		return;
 	}
+	var es = this.editorScope;
+	if (es.defaultValues === null) {
+		es.defaultValues = {};
+		_.each(es.fields, function (field, name) {
+			if (field.defaultValue !== undefined) {
+				es.defaultValues[name] = field.defaultValue;
+			}
+		});
+	}
+	es.editRecord(es.defaultValues);
+	args.item = es.record;
+	this.onAddNewRow(event, args);
 };
 
 Grid.prototype.onKeyDown = function(e, args) {
@@ -1467,12 +1493,17 @@ Grid.prototype.onAddNewRow = function(event, args) {
 	}
 };
 
-Grid.prototype.canAdd = function () {
+Grid.prototype.canEdit = function () {
 	var handler = this.handler || {};
 	if (!this.editable) return false;
-	if (handler.canNew && !handler.canNew()) return false;
+	if (handler.canEdit && !handler.canEdit()) return false;
 	if (handler.isReadonly && handler.isReadonly()) return false;
 	return true;
+}
+
+Grid.prototype.canAdd = function () {
+	var handler = this.handler || {};
+	return this.canEdit() && handler.canNew && handler.canNew();
 }
 
 Grid.prototype.setEditors = function(form, formScope, forEdit) {
@@ -1615,7 +1646,7 @@ Grid.prototype.onItemClick = function(event, args) {
 		return this.onButtonClick(event, args);
 	}
 	
-	if (!this.scope.selector && this.editable && this.canAdd()) {
+	if (!this.scope.selector && this.canEdit()) {
 		return this.grid.setActiveCell();
 	}
 	if (this.handler.onItemClick) {
@@ -1637,6 +1668,12 @@ Grid.prototype.onItemDblClick = function(event, args) {
 	}
 	if (this.canSave())
 		return;
+
+	var selected = this.grid.getSelectedRows() || [];
+	if (selected.length === 0) {
+		this.grid.setSelectedRows([args.row]);
+	}
+
 	if (this.handler.onItemDblClick)
 		this.handler.onItemDblClick(event, args);
 	event.stopImmediatePropagation();

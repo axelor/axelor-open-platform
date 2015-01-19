@@ -21,18 +21,6 @@
 
 nv.dev = false;
 
-var tooltipShow = nv.tooltip.show;
-nv.tooltip.show = function(pos, content, gravity, dist, parentContainer, classes) {
-	var body = parentContainer;
-	if (body && !$("body").is(body)) {
-		var diff = $(body).offset();
-		pos[0] += diff.left;
-		pos[1] += diff.top;
-		body = $("body")[0];
-	}
-	tooltipShow(pos, content, gravity, dist, body, classes);
-};
-
 // i18n
 _.extend(nv.messages, {
 	'Grouped': _t('Grouped'),
@@ -224,193 +212,6 @@ function $conv(value) {
 	return value;
 }
 
-var REGISTRY = {};
-
-function PlusData(scope, data, type) {
-	var result = [];
-	_.each(data.series, function(series) {
-		if (series.type !== type) return;
-		var key = series.key;
-		_.chain(data.dataset).groupBy(data.xAxis).each(function(group, name) {
-			var value = 0;
-			_.each(group, function(item) {
-				value += $conv(item[key]);
-			});
-			result.push({x: name, y: value});
-		});
-	});
-	return result;
-}
-
-function PlotData(scope, data, type) {
-	var chart_data = [];
-	var points = _.chain(data.dataset).pluck(data.xAxis).unique().value();
-	_.each(data.series, function(series) {
-		if (series.type !== type) return;
-		var key = series.key;
-		var groupBy = series.groupBy || data.xAxis;
-		_.chain(data.dataset).groupBy(groupBy).each(function(group, name) {
-			var my = [];
-			var values = _.map(group, function(item) {
-				var x = $conv(item[data.xAxis]) || 0;
-				var y = $conv(item[key] || name);
-				my.push(x);
-				return { x: x, y: y };
-			});
-
-			var missing = _.difference(points, my);
-			if (points.length === missing.length) return;
-
-			_.each(missing, function(x) {
-				values.push({ x: x, y: 0 });
-			});
-
-			values = _.sortBy(values, "x");
-
-			chart_data.push({
-				key: name,
-				type: type,
-				values: values
-			});
-		});
-		
-		if (series.title) {
-			if (series.side === "right") {
-				data.y2Title = series.title;
-			} else {
-				data.yTitle = series.title;
-			}
-		}
-	});
-
-	return chart_data;
-}
-
-REGISTRY["pie"] = PieChart;
-function PieChart(scope, element, data, type) {
-
-	var chart_data = PlusData(scope, data, type || "pie");
-	
-	var config = data.config || {};
-	var chart = nv.models.pieChart()
-		.showLabels(false)
-		.x(function(d) { return d.x; })
-	    .y(function(d) { return d.y; })
-	    .values(function(d) { return d; })
-	    .color(d3.scale.category10().range());
-
-	if (type === "donut") {
-		config.percent = true;
-		chart.donut(true)
-			 .donutRatio(0.40);
-	}
-	
-	if (_.toBoolean(config.percent)) {
-		chart.showLabels(true)
-			.labelType("percent")
-			.labelThreshold(.05);
-	}
-	
-	d3.select(element[0])
-	  .datum(chart_data)
-	  .transition().duration(1200).call(chart);
-
-	return chart;
-}
-
-REGISTRY["donut"] = DonutChart;
-function DonutChart(scope, element, data) {
-	return PieChart(scope, element, data, "donut");
-}
-
-REGISTRY["text"] = TextChart;
-function TextChart(scope, element, data) {	
-	
-	var config = _.extend({
-		strong: true,
-		shadow: false,
-		fontSize: 22
-	}, data.config);
-	
-	var values = _.first(data.dataset) || {};
-	var series = _.first(data.series) || {};
-	
-	var value = values[series.key];
-	
-	if (config.format) {
-		value = _t(config.format, value);
-	}
-	
-	var svg = d3.select(element.empty()[0]);
-	var text = svg.append("svg:text")
-		.attr("x", "50%")
-		.attr("y", "50%")
-		.attr("dy", ".3em")
-	    .attr("text-anchor", "middle")
-		.text(value);
-
-	if (config.color) text.attr("fill", config.color);
-	if (config.fontSize) text.style("font-size", config.fontSize);
-	if (_.toBoolean(config.strong)) text.style("font-weight", "bold");
-	if (_.toBoolean(config.shadow)) text.style("text-shadow", "0 1px 2px rgba(0, 0, 0, .5)");
-}
-
-REGISTRY["dbar"] = DBarChart;
-function DBarChart(scope, element, data) {
-	
-	var chart_data = PlusData(scope, data, "bar");
-	chart_data = [{
-		key: data.title,
-		values: chart_data
-	}];
-	
-	var chart = nv.models.discreteBarChart()
-	    .x(function(d) { return d.x; })
-	    .y(function(d) { return d.y; })
-	    .staggerLabels(true)
-	    .showValues(true);
-	
-	d3.select(element[0])
-	  .datum(chart_data)
-	  .transition().duration(500).call(chart);
-	
-	return chart;
-}
-
-REGISTRY["bar"] = BarChart;
-function BarChart(scope, element, data) {
-	
-	var chart_data = PlotData(scope, data, "bar");
-	var chart = nv.models.multiBarChart()
-		.reduceXTicks(false)
-		.color(d3.scale.category10().range());
-
-	chart.multibar.hideable(true);
-	chart.stacked(data.stacked);
-
-	d3.select(element[0])
-	  .datum(chart_data)
-	  .transition().duration(500).call(chart);
-	
-	return chart;
-}
-
-REGISTRY["hbar"] = HBarChart;
-function HBarChart(scope, element, data) {
-	
-	var chart_data = PlotData(scope, data, "hbar");
-	var chart = nv.models.multiBarHorizontalChart()
-		.color(d3.scale.category10().range());
-
-	chart.stacked(data.stacked);
-
-	d3.select(element[0])
-	  .datum(chart_data)
-	  .transition().duration(500).call(chart);
-	
-	return chart;
-}
-
 function applyXY(chart, data) {
 	var type = data.xType;
 	chart.y(function (d) { return d.y; });
@@ -420,10 +221,160 @@ function applyXY(chart, data) {
 	return chart.x(function (d) { return d.x; });
 }
 
-REGISTRY["line"] = LineChart;
+var CHARTS = {};
+
+function PlusData(series, data) {
+	var result = _.chain(data.dataset)
+	.groupBy(data.xAxis)
+	.map(function (group, name) {
+		var value = 0;
+		_.each(group, function (item) {
+			value += $conv(item[series.key]);
+		});
+		return {
+			x: name,
+			y: value
+		};
+	 }).value();
+
+	return result;
+}
+
+function PlotData(series, data) {
+	var ticks = _.chain(data.dataset).pluck(data.xAxis).unique().value();
+	var groupBy = series.groupBy;
+	var datum = [];
+
+	_.chain(data.dataset).groupBy(groupBy)
+	.map(function (group, groupName) {
+		var name = groupBy ? groupName : null;
+		var values = _.map(group, function (item) {
+			var x = $conv(item[data.xAxis]) || 0;
+			var y = $conv(item[series.key] || name || 0);
+			return { x: x, y: y };
+		});
+
+		var my = _.pluck(values, 'x');
+		var missing = _.difference(ticks, my);
+		if (ticks.length === missing.length) {
+			return;
+		}
+
+		_.each(missing, function(x) {
+			values.push({ x: x, y: 0 });
+		});
+
+		values = _.sortBy(values, 'x');
+
+		datum.push({
+			key: name || series.title,
+			type: series.type,
+			values: values
+		});
+	});
+
+	return datum;
+}
+
+function PieChart(scope, element, data) {
+	
+	var series = _.first(data.series);
+	var datum = PlusData(series, data);
+	var config = data.config || {};
+
+	var chart = nv.models.pieChart()
+		.showLabels(false)
+		.x(function(d) { return d.x; })
+		.y(function(d) { return d.y; })
+	    .color(d3.scale.category10().range());
+
+	if (series.type === "donut") {
+		chart.donut(true)
+			 .donutRatio(0.40);
+	}
+
+	if (_.toBoolean(config.percent)) {
+		chart.showLabels(true)
+			.labelType("percent")
+			.labelThreshold(.05);
+	}
+	
+	d3.select(element[0])
+	  .datum(datum)
+	  .transition().duration(1200).call(chart);
+}
+
+CHARTS.pie = PieChart;
+CHARTS.donut = PieChart;
+
+function DBarChart(scope, element, data) {
+
+	var series = _.first(data.series);
+	var datum = PlusData(series, data);
+
+	datum = [{
+		key: data.title,
+		values: datum
+	}];
+
+	var chart = nv.models.discreteBarChart()
+	    .x(function(d) { return d.x; })
+	    .y(function(d) { return d.y; })
+	    .staggerLabels(true)
+	    .showValues(true);
+	
+	d3.select(element[0])
+	  .datum(datum)
+	  .transition().duration(500).call(chart);
+	
+	return chart;
+}
+
+function BarChart(scope, element, data) {
+	
+	var series = _.first(data.series);
+	var datum = PlotData(series, data);
+
+	var chart = nv.models.multiBarChart()
+		.reduceXTicks(false)
+		.color(d3.scale.category10().range());
+
+	chart.multibar.hideable(true);
+	chart.stacked(data.stacked);
+
+	d3.select(element[0])
+	  .datum(datum)
+	  .transition().duration(500).call(chart);
+	
+	return chart;
+}
+
+function HBarChart(scope, element, data) {
+	
+	var series = _.first(data.series);
+	var datum = PlotData(series, data);
+
+	var chart = nv.models.multiBarHorizontalChart()
+		.color(d3.scale.category10().range());
+
+	chart.stacked(data.stacked);
+
+	d3.select(element[0])
+	  .datum(datum)
+	  .transition().duration(500).call(chart);
+	
+	return chart;
+}
+
+CHARTS.bar = BarChart;
+CHARTS.dbar = DBarChart;
+CHARTS.hbar = HBarChart;
+
 function LineChart(scope, element, data) {
 
-	var chart_data = PlotData(scope, data, "line");
+	var series = _.first(data.series);
+	var datum = PlotData(series, data);
+
 	var chart = nv.models.lineChart()
 		.showLegend(true)
 		.showYAxis(true)
@@ -433,27 +384,32 @@ function LineChart(scope, element, data) {
 	applyXY(chart, data);
 	
 	d3.select(element[0])
-	  .datum(chart_data)
+	  .datum(datum)
 	  .transition().duration(500).call(chart);
 	
 	return chart;
 }
 
-REGISTRY["area"] = AreaChart;
 function AreaChart(scope, element, data) {
 
-	var chart_data = PlotData(scope, data, "area");
+	var series = _.first(data.series);
+	var datum = PlotData(series, data);
+
 	var chart = nv.models.stackedAreaChart()
 				  .color(d3.scale.category10().range());
 
+	applyXY(chart, data);
+
 	d3.select(element[0])
-	  .datum(chart_data)
+	  .datum(datum)
 	  .transition().duration(500).call(chart);
 
 	return chart;
 }
 
-REGISTRY["radar"] = RadarCharter;
+CHARTS.line = LineChart;
+CHARTS.area = AreaChart;
+
 function RadarCharter(scope, element, data) {
 
 	var result = _.map(data.dataset, function(item) {
@@ -489,7 +445,6 @@ function RadarCharter(scope, element, data) {
 	return null;
 }
 
-REGISTRY["gauge"] = GaugeCharter;
 function GaugeCharter(scope, element, data) {
 	
 	var config = data.config,
@@ -505,6 +460,9 @@ function GaugeCharter(scope, element, data) {
 		value = item[key] || value;
 	}
 	
+	var w = element.width();
+	var h = element.height();
+
 	var parent = element.hide().parent();
 	
 	parent.children('svg').remove();
@@ -513,7 +471,7 @@ function GaugeCharter(scope, element, data) {
 	var chart = GaugeChart(parent[0], {
 		size: 300,
 		clipWidth: 300,
-		clipHeight: 300,
+		clipHeight: h,
 		ringWidth: 60,
 		minValue: min,
 		maxValue: max,
@@ -524,10 +482,46 @@ function GaugeCharter(scope, element, data) {
 	chart.update(value);
 
 	parent.children('svg:last')
+		.css('display', 'block')
 		.css('width', 'auto')
 		.css('margin', 'auto')
-		.css('margin-top', 10);
+		.css('margin-top', 0);
 }
+
+function TextChart(scope, element, data) {
+
+	var config = _.extend({
+		strong: true,
+		shadow: false,
+		fontSize: 22
+	}, data.config);
+
+	var values = _.first(data.dataset) || {};
+	var series = _.first(data.series) || {};
+
+	var value = values[series.key];
+
+	if (config.format) {
+		value = _t(config.format, value);
+	}
+
+	var svg = d3.select(element.empty()[0]);
+	var text = svg.append("svg:text")
+		.attr("x", "50%")
+		.attr("y", "50%")
+		.attr("dy", ".3em")
+	    .attr("text-anchor", "middle")
+		.text(value);
+
+	if (config.color) text.attr("fill", config.color);
+	if (config.fontSize) text.style("font-size", config.fontSize);
+	if (_.toBoolean(config.strong)) text.style("font-weight", "bold");
+	if (_.toBoolean(config.shadow)) text.style("text-shadow", "0 1px 2px rgba(0, 0, 0, .5)");
+}
+
+CHARTS.text = TextChart;
+CHARTS.radar = RadarCharter;
+CHARTS.gauge = GaugeCharter;
 
 function Chart(scope, element, data) {
 	
@@ -554,14 +548,25 @@ function Chart(scope, element, data) {
 
 	nv.addGraph(function generate() {
 		
-		var maker = REGISTRY[type] || REGISTRY["bar"];
+		var maker = CHARTS[type] || CHARTS.bar || function () {};
 		var chart = maker(scope, element, data);
 
 		if (chart == null) {
 			return;
 		}
 
-		chart.noData(_t('No records found.'));
+		if (chart.noData) {
+			chart.noData(_t('No records found.'));
+		}
+		if(chart.controlLabels) {
+			chart.controlLabels({
+				stacked: _t('Stacked'),
+				stream: _t('Stream'),
+				expanded: _t('Expanded'),
+				stack_percent: _t('Stack %')
+			});
+		}
+		
 		var tickFormats = {
 			"date" : function (d) {
 				var f = config.xFormat;
@@ -598,8 +603,6 @@ function Chart(scope, element, data) {
 			chart.yAxis.axisLabel(data.yTitle);
 		}
 		
-		//XXX: chart.margin({ left: 90, top: 25 });
-
 		var lastWidth = 0;
 		var lastHeight = 0;
 		
@@ -642,7 +645,7 @@ var directiveFn = function(){
 				if (svg.is(":hidden")) {
 					return initialized = false;
 				}
-				svg.height(element.height() - form.height());
+				svg.height(element.height() - form.height()).width('100%');
 				scope.title = data.title;
 				Chart(scope, svg, data);
 				return initialized = true;

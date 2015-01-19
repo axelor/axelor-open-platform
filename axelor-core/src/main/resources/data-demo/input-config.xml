@@ -12,8 +12,8 @@
       <bind node="can/@write" to="canWrite" />
       <bind node="can/@remove" to="canRemove" />
       <bind node="can/@export" to="canExport" />
-      <bind node="domain/text()" to="domain"/>
-      <bind node="domain-param/text()" to="domainParams"/>
+      <bind node="domain/text()" to="condition"/>
+      <bind node="domain-params/text()" to="conditionParams"/>
     </bind>
     
     <bind node="role" type="com.axelor.auth.db.Role" search="self.name = :name" update="false">

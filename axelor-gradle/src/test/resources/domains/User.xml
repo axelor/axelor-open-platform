@@ -7,6 +7,15 @@
 	
 	<entity name="User">
 		<string name="email" />
+        <finder-method name="findByAny" using="code,name,email"/>
+        <extra-imports>
+        import java.io.*;
+        </extra-imports>
+        <extra-code>
+        public void test2() {
+
+        }
+        </extra-code>
 	</entity>
 
 </domain-models>

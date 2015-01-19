@@ -53,7 +53,7 @@ function FormViewCtrl($scope, $element) {
 			id = elem.attr('x-for-widget') || elem.attr('id') || name;
 		}
 		
-		attrs = _.extend({}, $scope.fields[name], $scope.fields_view[id]);
+		attrs = _.extend({}, this.fields[name], this.fields_view[id]);
 
 		return attrs;
 	};
@@ -449,6 +449,7 @@ function FormViewCtrl($scope, $element) {
 	$scope.onCopy = function() {
 		var record = $scope.record;
 		ds.copy(record.id).success(function(record){
+			routeId = null;
 			$scope.edit(record);
 			$scope.setEditable();
 			record._dirty = true;
@@ -506,21 +507,27 @@ function FormViewCtrl($scope, $element) {
 			});
 		}
 
-		$scope.applyLater(function() {
-			$scope.ajaxStop(function() {
-				if (!$scope.canSave()) {
-					$scope.showErrorNotice();
-					return defer.promise;
-				}
-				if (saveAction) {
-					return saveAction().then(doSave);
-				}
-				return doSave();
-			});
+		$scope.waitForActions(function() {
+			if (!$scope.canSave()) {
+				$scope.showErrorNotice();
+				return defer.promise;
+			}
+			if (saveAction) {
+				return saveAction().then(doSave);
+			}
+			$scope.waitForActions(doSave);
 		});
 		return defer.promise;
 	};
 	
+	$scope.waitForActions = function (callback) {
+		$scope.$timeout(function () {
+			$scope.ajaxStop(function () {
+				$scope.$timeout(callback, 100);
+			}, 200);
+		}, 100);
+	},
+
 	$scope.confirmDirty = function(callback, cancelCallback) {
 		var params = $scope._viewParams || {};
 		if (!$scope.isDirty() || (params.params && params.params['show-confirm'] === false)) {
@@ -732,6 +739,7 @@ function FormViewCtrl($scope, $element) {
 			if (!$scope.canSave()) {
 				$scope.showErrorNotice();
 			} else {
+				$(e.target).blur().focus();
 				$scope.onSave();
 			}
 		}
@@ -827,6 +835,9 @@ ui.formBuild = function (scope, schema, fields) {
 				type = attrs.multiple ? 'multi-select' : 'select';
 			}
 
+			if (attrs.password) {
+				type = 'password';
+			}
 			if (attrs.image ==  true) {
 				type = "image";
 			}
@@ -990,7 +1001,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			}
 
 			var elems = element.find('[x-field].ng-invalid:not(fieldset)').filter(function() {
-				var isInline = $(this).parents('.slickgrid').size() > 0;
+				var isInline = $(this).parents('.slickgrid,.m2o-editor').size() > 0;
 				return !isInline || (isInline && $(this).is(':visible'));
 			});
 			var items = elems.map(function () {

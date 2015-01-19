@@ -175,10 +175,11 @@ ActionHandler.prototype = {
 	
 	onClick: function(event) {
 		var self = this;
-		if (this.prompt) {
+		var prompt = this._getPrompt();
+		if (prompt) {
 			var deferred = this.ws.defer(),
 				promise = deferred.promise;
-			axelor.dialogs.confirm(this.prompt, function(confirmed){
+			axelor.dialogs.confirm(prompt, function(confirmed){
 				if (confirmed) {
 					self.handle().then(deferred.resolve, deferred.reject);
 				} else {
@@ -201,6 +202,14 @@ ActionHandler.prototype = {
 		});
 	},
 	
+	_getPrompt: function () {
+		var prompt = this.prompt;
+		if (_.isFunction(this.scope.attr)) {
+			prompt = this.scope.attr('prompt') || prompt;
+		}
+		return prompt;
+	},
+
 	_getContext: function() {
 		var scope = this.scope,
 			context = scope.getContext ? scope.getContext() : scope.record,
@@ -217,8 +226,11 @@ ActionHandler.prototype = {
 	},
 	
 	_getFormElement: function () {
-		var formElement = this.element.parents('form:first');
-		if (!formElement.get(0)) { // toolbar button
+
+		var elem = $(this.element);
+		var formElement = elem.data('$editorForm') || elem.parents('form:first');
+
+		if (!formElement || !formElement.get(0)) { // toolbar button
 			formElement = this.element.parents('.form-view:first').find('form:first');
 		}
 		if (formElement.length == 0) {
@@ -577,6 +589,7 @@ ActionHandler.prototype = {
 			
 			var label = item.data('label'),
 				itemScope = item.data('$scope'),
+				hasValues = false,
 				column;
 
 			// handle o2m/m2m columns
@@ -628,6 +641,7 @@ ActionHandler.prototype = {
 			forEach(itemAttrs, function(value, attr){
 
 				if ((attr === "value" || attr.indexOf('value:') === 0)) {
+					hasValues = true;
 					if (itemScope.$setForceWatch) {
 						itemScope.$setForceWatch(true);
 					}
@@ -666,8 +680,9 @@ ActionHandler.prototype = {
 					})();
 					itemScope.attr('title', value);
 					break;
-				case 'color':
-					//TODO: set color
+				case 'prompt':
+					itemScope.attr('prompt', value);
+					break;
 				case 'domain':
 					if (itemScope.setDomain)
 						itemScope.setDomain(value);
@@ -701,6 +716,10 @@ ActionHandler.prototype = {
 					break;
 				}
 			});
+
+			if (hasValues && formScope.onChangeNotify) {
+				formScope.onChangeNotify(formScope, formScope.record);
+			}
 		}
 		
 		forEach(data.attrs, function(itemAttrs, itemName) {

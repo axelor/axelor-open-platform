@@ -137,7 +137,7 @@ function makePopover(scope, element, callback, placement) {
 		doc.off('mousemove.popover');
 	}
 	
-	element.on('$destroy', destroy);
+	scope.$on('$destroy', destroy);
 }
 
 ui.directive('uiTabPopover', function() {
@@ -215,7 +215,7 @@ ui.directive('uiHelpPopover', function() {
 
 		var value = scope.$eval('$$original.' + field.name);
 		if (value && /-one$/.test(field.serverType)) {
-			value = value.id;
+			value = value[field.targetName] || value.id;
 		}
 		if (value && field.type === "password") {
 			value = _.str.repeat('*', value.length);
@@ -373,7 +373,12 @@ ui.formItem('Button', {
 		});
 
 		element.on("click", function(e) {
-			if (!scope.isReadonlyExclusive()) {
+			if (scope.isReadonlyExclusive()) return;
+			if (scope.waitForActions) {
+				scope.waitForActions(function () {
+					scope.fireAction("onClick");
+				});
+			} else {
 				scope.fireAction("onClick");
 			}
 		});

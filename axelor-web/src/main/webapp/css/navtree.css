@@ -18,6 +18,7 @@
 
  .nav-tree {
 	display: inline-block;
+	box-sizing: border-box;
 	min-width: 100%;
  }
 

@@ -18,13 +18,16 @@
 package com.axelor.meta.schema.views;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.common.ClassUtils;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.meta.MetaStore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
@@ -226,5 +229,12 @@ public class PanelRelated extends AbstractPanel {
 
 	public void setItems(List<AbstractWidget> items) {
 		this.items = items;
+	}
+
+	public Map<String, Object> getPerms() {
+		try {
+			return MetaStore.getPermissions(ClassUtils.findClass(getTarget()));
+		} catch (Exception e) {}
+		return null;
 	}
 }

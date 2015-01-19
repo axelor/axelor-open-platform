@@ -93,6 +93,15 @@ public class Mapper {
 						continue;
 					}
 				}
+				if (setter == null) {
+					try {
+						setter = beanClass.getDeclaredMethod(
+								"set" + name.substring(0, 1).toUpperCase()
+									  + name.substring(1), type);
+						setter.setAccessible(true);
+					} catch (NoSuchMethodException | SecurityException e) {
+					}
+				}
 				if (setter != null) {
 					setters.put(name, setter);
 				}

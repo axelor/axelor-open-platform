@@ -33,11 +33,6 @@ ui.formWidget('Form', {
 	
 	compile: function(element, attrs) {
 
-		var prefix = element.attr('x-model-prefix') || "";
-		if (prefix.trim() === "") {
-			prefix = "record";
-		}
-
 		element.hide();
 		element.find('[x-field],[data-field]').each(function(){
 
@@ -46,7 +41,7 @@ ui.formWidget('Form', {
 
 			if (name && elem.attr('ui-button') === undefined) {
 				if (!elem.attr('ng-model')) {
-					elem.attr('ng-model', prefix + '.' + name);
+					elem.attr('ng-model', 'record.' + name);
 				}
 				if (!elem.attr('ng-required')) {
 					// always attache a required validator to make

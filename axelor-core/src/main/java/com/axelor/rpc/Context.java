@@ -22,11 +22,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.axelor.auth.db.AuditableModel;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
+import com.axelor.script.ScriptBindings;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -111,6 +113,9 @@ public class Context extends HashMap<String, Object> {
 		if (data == null) {
 			data = Maps.newHashMap();
 		}
+		if (ScriptBindings.class.isAssignableFrom(beanClass)) {
+			return new Context(data, new ScriptBindings(data));
+		}
 		return create(data, beanClass, data.containsKey(KEY_FORM));
 	}
 
@@ -166,13 +171,18 @@ public class Context extends HashMap<String, Object> {
 				value = createOrFind(p, value, nested);
 			}
 
+			Mapper my = mapper;
+			if (my.getSetter(name) == null && bean instanceof AuditableModel) {
+				my = Mapper.of(AuditableModel.class);
+			}
+
 			if (p != null) {
-				if (!JPA.em().contains(bean) && p.isCollection()) {
+				if (!JPA.em().contains(bean) && p.getTarget() != null) {
 					// prevent automatic association handling
 					// causing detached entity exception
-					mapper.set(bean, p.getName(), value);
+					my.set(bean, name, value);
 				} else {
-					p.set(bean, value);
+					my.getProperty(name).set(bean, value);
 				}
 				value = p.get(bean);
 			}

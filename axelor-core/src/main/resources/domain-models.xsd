@@ -655,7 +655,7 @@
       <xsd:element name="unique-constraint" type="dm:Index" minOccurs="0" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation>
-            Define an uniqe constraint on the specified columns(s).
+            Define an unique constraint on the specified columns(s).
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>

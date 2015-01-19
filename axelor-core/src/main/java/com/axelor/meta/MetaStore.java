@@ -27,7 +27,11 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.xml.namespace.QName;
 
+import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
+import com.axelor.db.JpaSecurity;
+import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Query;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaSelectItem;
@@ -111,6 +115,25 @@ public class MetaStore {
 		return null;
 	}
 	
+	@SuppressWarnings("all")
+	public static Map<String, Object> getPermissions(Class<?> model) {
+		final User user = AuthUtils.getUser();
+
+		if (user == null || "admin".equals(user.getCode())) return null;
+		if (user.getGroup() != null && "admins".equals(user.getGroup().getCode())) return null;
+
+		final Map<String, Object> map = new HashMap<>();
+		final JpaSecurity security = Beans.get(JpaSecurity.class);
+
+		map.put("read", security.isPermitted(AccessType.READ, (Class) model));
+		map.put("write", security.isPermitted(AccessType.WRITE, (Class) model));
+		map.put("create", security.isPermitted(AccessType.CREATE, (Class) model));
+		map.put("remove", security.isPermitted(AccessType.REMOVE, (Class) model));
+		map.put("export", security.isPermitted(AccessType.EXPORT, (Class) model));
+
+		return map;
+	}
+
 	public static List<Selection.Option> getSelectionList(String selection) {
 		if (StringUtils.isBlank(selection)) {
 			return null;

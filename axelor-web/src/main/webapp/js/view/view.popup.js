@@ -82,9 +82,11 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	var isEditable = $scope.isEditable;
 	$scope.isEditable = function () {
 		if (!($scope.record || {}).id > 0) {
-			return true;
+			return $scope.hasPermission('create');
 		}
-		return $scope.canEditTarget() && isEditable.call($scope);
+		return $scope.hasPermission('write') &&
+			$scope.canEditTarget() &&
+			isEditable.call($scope);
 	};
 	
 	var canEdit = $scope.canEdit;
@@ -132,13 +134,22 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		if ($scope.editorCanSave && $scope.isDirty()) {
 			if (record.id < 0)
 				record.id = null;
-			$scope.onSave().then(function(record, page) {
+			return $scope.onSave().then(function(record, page) {
 				$scope.applyLater(function(){
 					close(record, true);
 				});
 			});
-		} else {
-			close(record);
+		}
+
+		var event = $scope.$broadcast('on:before-save', record);
+		if (event.defaultPrevented) {
+			if (event.error) {
+				axelor.dialogs.error(event.error);
+			}
+ 		} else {
+			$scope.waitForActions(function() {
+				close(record);
+			});
 		}
 	};
 	
@@ -172,6 +183,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	$scope.onHotKey = function (e, action) {
 		
 		if (action === "save") {
+			$(e.target).blur().focus();
 			$scope.onOK();
 		}
 		
@@ -253,7 +265,7 @@ function SelectorCtrl($scope, $element, DataSource, ViewService) {
 	};
 
 	$scope.canNew = function () {
-		return $scope.$parent.canNew();
+		return $scope.hasPermission('create') && $scope.$parent.canNew();
 	};
 }
 

@@ -32,8 +32,9 @@ public final class VersionUtils {
 
 	private static Version version;
 
-	private static final String AXELOR_COMMON = "axelor-common";
+	private static final String VERSION_FILE = "axelor-version.txt";
 	private static final Pattern VERSION_PATTERN = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+)(?:\\-rc(\\d+))?$");
+	private static final Pattern VERSION_SPEC_PATTERN = Pattern.compile("(~)?((\\d+)\\.(\\d+)\\.(\\d+)(?:\\-rc(\\d+))?)");
 
 	/**
 	 * This class stores version details of axelor modules.
@@ -67,6 +68,45 @@ public final class VersionUtils {
 			this.feature = String.format("%s.%s", major, minor);
 		}
 
+		/**
+		 * Check whether the given version spec matches with current version.
+		 *
+		 * <p>
+		 * The version spec can be exact version number, or version number
+		 * prefixed with <code>~</code> it matches all subsequent patch
+		 * versions.
+		 * <p>
+		 * Giver a version <code>3.0.4<code> following holds:
+		 *
+		 * <ul>
+		 * <li> 3.0.4 (matches)</li>
+		 * <li> 3.0.0 (doesn't match)</li>
+		 * <li> ~3.0.0 (matches)</li>
+		 * <li> ~3.0.1 (matches)</li>
+		 * <li> ~3.0.5 (doesn't match)</li>
+		 * </ul>
+		 *
+		 * @param spec
+		 *            the version spec to test
+		 * @return true if matches false otherwise
+		 */
+		public boolean matches(String spec) {
+			if (spec == null || spec.trim().length() == 0) {
+				return true;
+			}
+			Matcher matcher = VERSION_SPEC_PATTERN.matcher(spec);
+			if (!matcher.matches()) {
+				return false;
+			}
+			boolean all = matcher.group(1) != null;
+			Version ver = new Version(matcher.group(2));
+			if (ver.version.equals(version)) return true;
+			if (all && ver.major == major && ver.minor == minor && ver.patch <= patch) {
+				return true;
+			}
+			return false;
+		}
+
 		@Override
 		public String toString() {
 			return version;
@@ -80,24 +120,17 @@ public final class VersionUtils {
 	 */
 	public static Version getVersion() {
 		if (version == null) {
-			version = getVersion(AXELOR_COMMON);
+			version = getVersion(VERSION_FILE);
 		}
 		return version;
 	}
 
-	/**
-	 * Get the version details for the given module.
-	 *
-	 * @param module
-	 *            the name of the module
-	 * @return an instance of {@link Version}
-	 */
-	public static Version getVersion(String module) {
-		try (InputStream is = ClassUtils.getResourceStream(module + "-version.txt")) {
+	private static Version getVersion(String file) {
+		try (InputStream is = ClassUtils.getResourceStream(file)) {
 			String version = CharStreams.toString(new InputStreamReader(is));
 			return new Version(version);
 		} catch (Exception e) {
-			throw new IllegalStateException("Unable to read version details: " + module, e);
+			throw new IllegalStateException("Unable to read version details.", e);
 		}
 	}
 }

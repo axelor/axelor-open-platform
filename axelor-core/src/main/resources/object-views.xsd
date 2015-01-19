@@ -557,6 +557,11 @@
         <xsd:documentation>Specify whether to use compact version of the widget.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-labels" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether to show lebels in ImageSelect widget.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:attributeGroup name="RelationalAttributes">
@@ -937,6 +942,16 @@
         <xsd:attribute name="layout" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>Specify alternative layout (e.g. table)</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="x-viewer" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to use editor as viewer</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="x-show-on-new" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show editor on new record (o2m/m2m fields)</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>
@@ -1327,8 +1342,9 @@
           <xsd:element name="dataset">
             <xsd:annotation>
               <xsd:documentation>
-                Specify the dataset using JPQL or SQL query.
-                The query select names should be assgined aliases.
+                Specify the chart dataset using JPQL, SQL or a method call.
+                The query select names should be have aliases.
+                The controller method should provide list of records or maps.
               </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
@@ -1339,6 +1355,7 @@
                       <xsd:restriction base="xsd:string">
                         <xsd:enumeration value="jpql" />
                         <xsd:enumeration value="sql" />
+                        <xsd:enumeration value="rpc" />
                       </xsd:restriction>
                     </xsd:simpleType>
                   </xsd:attribute>
@@ -1595,6 +1612,7 @@
                   </xsd:simpleType>
                 </xsd:attribute>
                 <xsd:attribute name="if" type="xsd:string" />
+                <xsd:attribute name="expr" type="xsd:string" />
               </xsd:complexType>
             </xsd:element>
           </xsd:sequence>

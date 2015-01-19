@@ -67,7 +67,7 @@
     </toolbar>
     <field name="name"/>
     <field name="title"/>
-    <field name="type" selection="view.type.selection"/>
+    <field name="type"/>
     <field name="model"/>
     <field name="module"/>
     <field name="priority" width="75"/>
@@ -86,7 +86,7 @@
       <panel>
         <field name="name" colSpan="12"/>
         <field name="title" colSpan="12"/>
-        <field name="type" selection="view.type.selection"/>
+        <field name="type"/>
         <field name="priority"/>
       </panel>
       <panel itemSpan="12">
@@ -102,7 +102,7 @@
 
   <grid title="All Actions" name="meta-action-grid" model="com.axelor.meta.db.MetaAction">
     <field name="name" />
-    <field name="type" selection="action.type.selection"/>
+    <field name="type"/>
     <field name="model" />
     <field name="module"/>
   </grid>
@@ -111,7 +111,7 @@
     onSave="action-action-validate,com.axelor.meta.web.MetaController:clearCache" width="large">
     <panel title="Overview">
       <field name="name" readonlyIf="id"/>
-      <field name="type" readonlyIf="id" selection="action.type.selection"/>
+      <field name="type" readonlyIf="id"/>
       <field name="model"/>
       <field name="module"/>
     </panel>

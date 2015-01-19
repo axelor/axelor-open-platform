@@ -76,6 +76,15 @@ ui.formWidget('BaseSelect', {
 			
 		};
 
+		function renderItem(ul, item) {
+			var el = $("<li>").append( $("<a>").html(item.label)).appendTo(ul);
+			if (item.click) {
+				el.addClass("tag-select-action");
+				ul.addClass("tag-select-action-menu");
+			}
+			return el;
+		};
+
 		var showOn = this.showSelectionOn;
 		var doSetup = _.once(function (input) {
 		
@@ -129,15 +138,7 @@ ui.formWidget('BaseSelect', {
 				}
 			});
 	
-			input.data('ui-autocomplete')._renderItem = function(ul, item) {
-				var el = $("<li>").append( $("<a>").html( item.label ) )
-								  .appendTo(ul);
-				if (item.click) {
-					el.addClass("tag-select-action");
-					ul.addClass("tag-select-action-menu");
-				}
-				return el;
-			};
+			input.data('ui-autocomplete')._renderItem = scope.renderSelectItem || renderItem;
 
 			element.on('adjustSize adjustScroll', function (e) {
 				if (showing) {
@@ -346,7 +347,7 @@ ui.formInput('ImageSelect', 'Select', {
 		this._super(scope, element, attrs);
 		var input = this.findInput(element);
 		
-		input.data('ui-autocomplete')._renderItem = function(ul, item) {
+		scope.renderSelectItem = function(ul, item) {
 			var a = $("<a>").append($("<img>").attr("src", item.value));
 			var el = $("<li>").addClass("image-select-item").append(a).appendTo(ul);
 			

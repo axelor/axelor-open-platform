@@ -19,17 +19,19 @@ package com.axelor.gradle.tasks
 
 import java.nio.file.Paths
 
-import com.axelor.tools.i18n.I18nExtractor
-
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 
+import com.axelor.tools.i18n.I18nExtractor
+
 class I18nTask extends DefaultTask {
+
+	boolean update = false
 
 	@TaskAction
 	def extract() {
 		def extractor = new I18nExtractor()
-		extractor.extract(Paths.get(project.projectDir.path))
+		extractor.extract(Paths.get(project.projectDir.path), update)
 	}
 }

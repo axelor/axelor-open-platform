@@ -27,7 +27,7 @@
     
   	<string name="name" required="true"/>
 	<string name="title" required="true" namecolumn="true"/>
-  	<string name="type" required="true"/>
+  	<string name="type" required="true" selection="view.type.selection"/>
     <integer name="priority" required="true" default="20"/>
   	<string name="model"/>
     <string name="module"/>
@@ -91,7 +91,7 @@
     ]]>
     
   	<string name="name" unique="true" required="true"/>
-    <string name="type" required="true"/>
+    <string name="type" required="true" selection="action.type.selection"/>
     <string name="model" />
     <string name="module" />
   	<string name="xml" required="true" large="true"/>

@@ -40,6 +40,9 @@ public class FileService extends AbstractService {
 		if (!file.isFile()) {
 			throw new IllegalArgumentException(new FileNotFoundException(name));
 		}
-		return javax.ws.rs.core.Response.ok(file, MediaType.APPLICATION_OCTET_STREAM_TYPE).build();
+		return javax.ws.rs.core.Response.ok(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)
+				.header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"")
+				.header("Content-Transfer-Encoding", "binary")
+				.build();
 	}
 }

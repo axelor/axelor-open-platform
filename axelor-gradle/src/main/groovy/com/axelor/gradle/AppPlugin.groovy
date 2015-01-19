@@ -19,12 +19,14 @@ package com.axelor.gradle
 
 import java.util.regex.Pattern
 
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.JavaExec
 import org.gradle.internal.os.OperatingSystem
 
+import com.axelor.common.VersionUtils
 import com.axelor.gradle.tasks.GenerateCode
 import com.axelor.gradle.tasks.VersionTask
 
@@ -38,6 +40,10 @@ class AppPlugin extends AbstractPlugin {
 			apply plugin: 'tomcat'
 
             def definition = extensions.create("application", AppDefinition)
+
+			afterEvaluate {
+				checkVersion(project, definition)
+			}
 
 			applyCommon(project, definition)
 			
@@ -91,7 +97,9 @@ class AppPlugin extends AbstractPlugin {
 				}
             }
 
-			task('update-xsd', type: VersionTask) {
+			task('updateVersion', type: VersionTask) {
+				description "Update version text in source files."
+				group "Axelor"
 				processFiles = fileTree(projectDir) {
 					include '**/resources/**/*.xml'
 					include '**/data/**/*config.xml'
@@ -99,7 +107,8 @@ class AppPlugin extends AbstractPlugin {
 			}
 
 			task("generateCode", type: GenerateCode) << {
-				expandAll()
+				description "Generate code for domain models from xml definitions."
+				group "Axelor"
 			}
 
 			// copy webapp to root build dir
@@ -112,11 +121,15 @@ class AppPlugin extends AbstractPlugin {
 			}
 
 			task("npm", type: Exec, dependsOn: 'copyWebapp') {
+				description "Run 'npm install' command to install npm packages."
+				group "Axelor web"
 				workingDir "${buildDir}/webapp"
 				commandLine = ["npm", "install"]
 			}
 
 			task("grunt", type: Exec, dependsOn: 'npm') {
+				description "Run grunt command to build web resources."
+				group "Axelor web"
 				def command = "grunt"
 				if (OperatingSystem.current().isWindows()) {
 					command = "grunt.cmd"
@@ -126,6 +139,8 @@ class AppPlugin extends AbstractPlugin {
 			}
 
 			task("init", dependsOn: "classes", type: JavaExec) {
+				description "Initialize application database."
+				group "Axelor web"
 				main = "com.axelor.app.internal.AppInitCli"
 				classpath = sourceSets.main.runtimeClasspath
 				if (project.properties.update) args "-u" else args "-i"

@@ -40,7 +40,6 @@ import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaSecurity;
@@ -329,22 +328,36 @@ public class Resource<T extends Model> {
 	@SuppressWarnings("all")
 	private void doChildCount(Request request, List<?> result) throws NullPointerException, ClassCastException {
 
+		if (result == null || result.isEmpty()) {
+			return;
+		}
+
 		final Map context = (Map) request.getData().get("_domainContext");
-		final String parent = (String) context.get("_countOn");
-		if (StringUtils.isBlank(parent) || result == null || result.isEmpty()) {
+		final Map childOn = (Map) context.get("_childOn");
+		final String countOn = (String) context.get("_countOn");
+
+		if (countOn == null && childOn == null) {
 			return;
 		}
 
 		final StringBuilder builder = new StringBuilder();
-		builder.append("SELECT new map(_parent.id as id, count(self.id) as count) FROM ")
-			   .append(model.getName()).append(" self ")
-			   .append("LEFT JOIN self.").append(parent).append(" AS _parent ")
-			   .append("WHERE _parent.id IN (:ids) GROUP BY _parent");
-
 		final List ids = Lists.newArrayList();
+
 		for (Object item : result) {
 			ids.add(((Map) item).get("id"));
 		}
+
+		String modelName = model.getName();
+		String parentName = countOn;
+		if (childOn != null) {
+			modelName = (String) childOn.get("model");
+			parentName = (String) childOn.get("parent");
+		}
+
+		builder.append("SELECT new map(_parent.id as id, count(self.id) as count) FROM ")
+			   .append(modelName).append(" self ")
+			   .append("LEFT JOIN self.").append(parentName).append(" AS _parent ")
+			   .append("WHERE _parent.id IN (:ids) GROUP BY _parent");
 
 		javax.persistence.Query q = JPA.em().createQuery(builder.toString());
 		q.setParameter("ids", ids);

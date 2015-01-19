@@ -66,9 +66,11 @@ ui.formInput('ImageLink', {
 	link_readonly: function(scope, element, attrs, model) {
 
 		var image = element.children('img:first');
+		var rendered = false;
 
 		scope.$render_readonly = function() {
 			var content = model.$viewValue || null;
+			var x = scope.parseText(content) || BLANK;
 			if (!content) {
 				image.get(0).src = BLANK;
 			}
@@ -76,7 +78,8 @@ ui.formInput('ImageLink', {
 		};
 
 		scope.$watch('isReadonly()', function(readonly, old) {
-			if (!readonly || readonly === old) return;
+			if (rendered && (!readonly || readonly === old)) return;
+			rendered = true;
 			scope.$render_readonly();
 		});
 	},

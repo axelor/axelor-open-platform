@@ -161,6 +161,9 @@ public class Field extends SimpleWidget {
 	@XmlAttribute(name = "x-lite")
 	private String lite;
 
+	@XmlAttribute(name = "x-labels")
+	private Boolean labels;
+
 	@XmlElement(name = "hilite")
 	private List<Hilite> hilites;
 
@@ -430,6 +433,14 @@ public class Field extends SimpleWidget {
 
 	public void setLite(String lite) {
 		this.lite = lite;
+	}
+
+	public Boolean getLabels() {
+		return labels;
+	}
+
+	public void setLabels(Boolean labels) {
+		this.labels = labels;
 	}
 
 	public List<Hilite> getHilites() {

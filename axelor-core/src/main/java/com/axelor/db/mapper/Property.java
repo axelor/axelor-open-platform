@@ -600,7 +600,7 @@ public class Property {
 			return child;
 		}
 
-		if (!Objects.equal(mapped.get(child), bean)) { // o2m -> m2o
+		if (mapped.get(child) != bean) { // o2m -> m2o
 			mapped.set(child, bean);
 		}
 

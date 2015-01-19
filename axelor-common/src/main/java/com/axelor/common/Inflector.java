@@ -243,6 +243,7 @@ public final class Inflector {
 	 * inflection.ordinalize(3); // &quot;3rd&quot;
 	 * inflection.ordinalize(100); // &quot;100th&quot;
 	 * inflection.ordinalize(103); // &quot;103rd&quot;
+	 * inflection.ordinalize(10013); // &quot;10013th&quot;
 	 * </pre>
 	 * 
 	 * @param number
@@ -250,6 +251,10 @@ public final class Inflector {
 	 * @return the converted string
 	 */
 	public String ordinalize(int number) {
+		int mod100 = number % 100;
+	    if (mod100 == 11 || mod100 == 12 || mod100 == 13) {
+	      return String.valueOf(number) + "th";
+	    }
 		switch (number % 10) {
 		case 1: return number + "st";
 		case 2: return number + "nd";
@@ -349,7 +354,8 @@ public final class Inflector {
 	    inflect.irregular("sex", "sexes");
 	    inflect.irregular("move", "moves");
 	    inflect.irregular("zombie", "zombies");
+	    inflect.irregular("stadium", "stadiums");
 	    
-	    inflect.ignore("equipment information rice money species series fish sheep jeans police".split(" "));
+	    inflect.ignore("equipment information rice money species series fish sheep jeans police data".split(" "));
 	}
 }

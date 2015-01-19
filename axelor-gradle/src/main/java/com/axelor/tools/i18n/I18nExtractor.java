@@ -45,6 +45,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -308,7 +309,7 @@ public class I18nExtractor {
 		}
 	}
 	
-	public void extract(final Path base) {
+	public void extract(final Path base, boolean update) {
 		
 		final Path srcPath = base.resolve("src/main");
 		if (!Files.exists(srcPath)) {
@@ -353,12 +354,12 @@ public class I18nExtractor {
 		}
 		
 		try {
-			updateAll(base, values);
+			update(base, values, update);
 		} catch (IOException e) {
 		}
 	}
-	
-	private void updateAll(final Path base, final List<String[]> lines) throws IOException {
+
+	private void update(final Path base, final List<String[]> lines, boolean all) throws IOException {
 
 		// first save the template
 		Path template = base.resolve("src/main/resources/i18n/messages.csv");
@@ -366,6 +367,10 @@ public class I18nExtractor {
 		log.info("generating: " + base.relativize(template));
 		
 		save(template, lines);
+
+		if (!all) {
+			return;
+		}
 
 		// then update all languages
 		Files.walkFileTree(template.getParent(), new SimpleFileVisitor<Path>() {
@@ -403,9 +408,10 @@ public class I18nExtractor {
 	
 	private void update(Path file, List<String[]> lines) throws IOException {
 		if (!file.toFile().exists()) return;
-		
 		final Map<String, Map<String, String>> values = new HashMap<>();
-		try(final CSVReader reader = new CSVReader(new FileReader(file.toFile()))) {
+		try(final CSVReader reader = new CSVReader(new FileReader(file.toFile()),
+				CSVParser.DEFAULT_SEPARATOR,
+				CSVParser.DEFAULT_QUOTE_CHARACTER, '\0')) {
 			String[] headers = reader.readNext();
 			if (headers.length < 2) {
 				throw new IOException("Invalid language file: " + file);

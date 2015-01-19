@@ -168,6 +168,21 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 	};
 }
 
+var m2oTemplateEditable = '' +
+'<div class="picker-input picker-icons-3 tag-select-single">'+
+'<input type="text" autocomplete="off">'+
+'<span class="tag-item label label-info" ng-if="canShowTag" ng-show="text">'+
+	'<span class="tag-link tag-text" ng-click="onTagSelect($event)">{{text}}</span> '+
+	'<i class="fa fa-times fa-small" ng-click="onTagRemove($event)"></i>'+
+'</span>'+
+'<span class="picker-icons">'+
+	'<i class="fa fa-eye" ng-click="onSummary()" ng-show="hasPermission(\'read\') && _viewParams.summaryView && canToggle()"></i>'+
+	'<i class="fa fa-pencil" ng-click="onEdit()" ng-show="hasPermission(\'read\') && canView() && canEdit()" title="{{\'Edit\' | t}}"></i>'+
+	'<i class="fa fa-plus" ng-click="onNew()" ng-show="canNew() && hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}"></i>'+
+	'<i class="fa fa-search" ng-click="onSelect()" ng-show="canSelect() && hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}"></i>'+
+'</span>'+
+'</div>';
+
 ui.formInput('ManyToOne', 'Select', {
 
 	css	: 'many2one-item',
@@ -354,11 +369,21 @@ ui.formInput('ManyToOne', 'Select', {
 		};
 		
 		scope.$render_editable = function() {
-			if (!scope.canShowTag) {
-				input.val(scope.getText());
-			} else {
-				setTimeout(adjustPadding, 100);
+
+			if (scope.canShowTag) {
+				return setTimeout(adjustPadding, 100);
 			}
+
+			var value = scope.getValue();
+			var name = scope.field.targetName;
+			if (value && value.id > 0 && !value[name]) {
+				return scope._dataSource.details(value.id, name).success(function(rec) {
+					value[name] = rec[name];
+					input.val(scope.getText());
+				});
+			}
+
+			input.val(scope.getText());
 		};
 		
 		if (scope.field && scope.field['tag-edit']) {
@@ -392,20 +417,7 @@ ui.formInput('ManyToOne', 'Select', {
 			input.focus(adjustPadding);
 		}
 	},
-	template_editable:
-	'<div class="picker-input picker-icons-3 tag-select-single">'+
-		'<input type="text" autocomplete="off">'+
-		'<span class="tag-item label label-info" ng-if="canShowTag" ng-show="text">'+
-			'<span class="tag-link tag-text" ng-click="onTagSelect($event)">{{text}}</span> '+
-			'<i class="fa fa-times fa-small" ng-click="onTagRemove($event)"></i>'+
-		'</span>'+
-		'<span class="picker-icons">'+
-			'<i class="fa fa-eye" ng-click="onSummary()" ng-show="hasPermission(\'read\') && _viewParams.summaryView && canToggle()"></i>'+
-			'<i class="fa fa-pencil" ng-click="onEdit()" ng-show="hasPermission(\'read\') && canView() && canEdit()" title="{{\'Edit\' | t}}"></i>'+
-			'<i class="fa fa-plus" ng-click="onNew()" ng-show="canNew() && hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}"></i>'+
-			'<i class="fa fa-search" ng-click="onSelect()" ng-show="canSelect() && hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}"></i>'+
-		'</span>'+
-	'</div>',
+	template_editable: m2oTemplateEditable,
 	template_readonly:
 	'<a href="" ng-show="text" ng-click="onEdit()">{{text}}</a>'
 });
@@ -489,14 +501,15 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 		if (field.viewer) {
 			return viewer;
 		}
-		if (field.editor && !field.targetName) {
+		if (field.editor && (field.editor.viewer || !field.targetName)) {
 			return '<div ui-panel-editor>';
 		}
 		return '<a href="" ng-show="text" ng-click="onEdit()">{{text}}</a>'
 	},
 
 	template_editable: function (scope) {
-		return "" +
+		var editor = scope.field.editor || {};
+		var template = "" +
 		"<div class='m2o-editor'>" +
 			"<div class='m2o-editor-controls'>" +
 				"<a href='' ng-show='canEdit() && canShowIcon(\"edit\")' ng-click='onEdit()'><i class='fa fa-pencil'></i></a>" +
@@ -505,6 +518,18 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 			"</div>" +
 			"<div class='m2o-editor-form' ui-panel-editor></div>" +
 		"</div>";
+		if (editor.showOnNew !== false) {
+			return template;
+		}
+		scope.canShowEditor = function () {
+			return (scope.record || {}).id > 0 || !!scope.getValue();
+		}
+		template =
+			"<div class='m2o-editor-switcher'>" +
+			"<div ng-show='!canShowEditor()' class='form-item-container'>"+ m2oTemplateEditable +"</div>" +
+			"<div ng-show='canShowEditor()'>"+ template +"</div>" +
+			"</div>";
+		return template;
 	},
 
 	template: null

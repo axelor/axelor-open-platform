@@ -30,9 +30,16 @@ class BasePlugin extends AbstractPlugin {
 
 			def definition = extensions.create("module", ModuleDefinition)
 
+			afterEvaluate {
+				checkVersion(project, definition)
+			}
+
 			applyCommon(project, definition)
 
-			task("generateCode", type: GenerateCode, dependsOn: "generateVersion")
+			task("generateCode", type: GenerateCode) {
+				description "Generate code for domain models from xml definitions."
+				group "Axelor"
+			}
 
 			compileJava.dependsOn "generateCode"
         }

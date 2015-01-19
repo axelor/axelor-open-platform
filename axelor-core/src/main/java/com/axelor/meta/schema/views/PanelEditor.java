@@ -41,6 +41,12 @@ public class PanelEditor extends AbstractPanel {
 	@XmlAttribute
 	private String layout;
 
+	@XmlAttribute(name = "x-viewer")
+	private Boolean viewer;
+
+	@XmlAttribute(name = "x-show-on-new")
+	private Boolean showOnNew;
+
 	@XmlElements({
 		@XmlElement(name = "field", type = PanelField.class),
 		@XmlElement(name = "spacer", type = Spacer.class),
@@ -50,6 +56,14 @@ public class PanelEditor extends AbstractPanel {
 
 	public String getLayout() {
 		return layout;
+	}
+
+	public Boolean getViewer() {
+		return viewer;
+	}
+
+	public Boolean getShowOnNew() {
+		return showOnNew;
 	}
 
 	public List<AbstractWidget> getItems() {

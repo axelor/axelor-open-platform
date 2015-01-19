@@ -333,9 +333,12 @@ ui.formDirective = function(name, object) {
 			}
 
 			function showReadonly() {
+				var field = scope.field || {};
 				var template_readonly = self.template_readonly;
-				if (scope.field && scope.field.viewer) {
-					template_readonly = scope.field.viewer;
+				if (field.viewer) {
+					template_readonly = field.viewer;
+				} else if (field.editor && field.editor.viewer) {
+					template_readonly = $('<div ui-panel-editor>');
 				}
 				if (_.isFunction(self.template_readonly)) {
 					template_readonly = self.template_readonly(scope);
@@ -500,8 +503,11 @@ var FormInput = {
 				}
 			}
 			
-			element.bind('input', listener);
-			
+			var field = scope.field || {};
+			if (!field.bind) {
+				element.bind('input', listener);
+			}
+
 			element.change(listener);
 			
 			element.blur(function(e){

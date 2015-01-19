@@ -44,17 +44,10 @@ allprojects {
 	}
 
 	afterEvaluate {
-
 		// only run test suites
 		test {
 			scanForTestClasses = false
 			include "**/*Suite.class"
-		}
-
-		try {
-			// define generateCode task if missing
-			task("generateCode", dependsOn: "generateVersion")
-		} catch (Exception e) {
 		}
 	}
 }
@@ -106,7 +99,9 @@ apply from: 'gradle/force-wtp.gradle'
 
 import com.axelor.gradle.tasks.VersionTask
 
-task('update-xsd', type: VersionTask) {
+task("updateVersion", type: VersionTask) {
+	description "Update version text in source files."
+	group "Axelor"
 	processFiles = fileTree(projectDir) {
 		include '**/resources/**/*.xml'
 		include '**/resources/domain-models.xsd'
