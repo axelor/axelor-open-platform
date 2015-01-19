@@ -1,4 +1,4 @@
-# Current
+# 3.0.4 (2015-01-19)
 
 ## Bug Fixes
 
@@ -23,6 +23,15 @@
 - fixed finder method generation issue
 - fixed tree view empty parent node issue
 - fixed route issue on record duplicate
+- fixed editable grid cell value update and persistent row issues
+- fixed cursor x-bind issue
+- fixed missing import statements issue
+- fixed generic Model.equals test 
+- fixed automatic bi-direction association setup
+- fixed print media css
+- fixed child count in tree view
+- fixed detached entity passed to persist
+- fixed missing audit fields in context
 
 ## Improvements
 
@@ -38,6 +47,10 @@
 - improved help popover
 - add option to save record from view popup
 - add option to disable editor on o2m/m2m
+- allow expr in search engine.
+- update translation
+- move 'selection' field definition into object definition.
+- allow private setters in bean mapper
 
 # 3.0.3 (2014-11-12)
 
