@@ -36,6 +36,8 @@ class Property {
 
 	Entity entity
 
+	boolean initParam
+
 	private Map<String, Object> attrs = new HashMap()
 
 	private Property(Entity entity, String name, String type) {
@@ -54,6 +56,7 @@ class Property {
 		targetFqn = node.@ref.toString()
 		target = entity.importType(targetFqn)
 		attrs = node.attributes()
+		initParam = attrs["initParam"] == "true"
 
 		if (!name) {
 			throw new IllegalArgumentException("Property name not given.")
@@ -261,7 +264,7 @@ class Property {
 	}
 
 	boolean isInitParam() {
-		return attrs["initParam"] == "true"
+		return initParam
 	}
 
 	boolean isNullable() {
