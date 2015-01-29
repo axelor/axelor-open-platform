@@ -23,8 +23,11 @@ def libs = [
 	guice_servlet:	"com.google.inject.extensions:guice-servlet:3.0",
 	guice_persist:	"com.google.inject.extensions:guice-persist:3.0",
 
-	// CGLIB & ASM (repackaged to avoid version conflicts
+	// CGLIB & ASM (repackaged to avoid version conflicts)
 	axelor_cglib:	"com.axelor:axelor-cglib:3.0",
+
+	// Tomcat EL (repackaged to avoid version conflicts)
+	axelor_el:		"com.axelor:axelor-el:8.0.17",
 
 	// jdbc
 	jdbc_hsqldb:		"org.hsqldb:hsqldb:2.3.2",

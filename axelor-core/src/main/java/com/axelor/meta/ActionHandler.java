@@ -34,6 +34,7 @@ import javax.persistence.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
@@ -44,6 +45,7 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.Resource;
+import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.axelor.text.Templates;
@@ -51,6 +53,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
 import com.google.common.io.CharStreams;
 import com.google.inject.Injector;
 import com.google.inject.servlet.RequestScoped;
@@ -81,7 +85,7 @@ public class ActionHandler {
 
 		this.context = context;
 
-		this.scriptHelper = request.getScriptHelper();
+		this.scriptHelper = new CompositeScriptHelper(this.context);
 		this.bindings = this.scriptHelper.getBindings();
 		this.bindings.put("__me__", this);
 	}
@@ -119,12 +123,16 @@ public class ActionHandler {
 	 */
 	public Object evaluate(String expression) {
 
-		if (Strings.isNullOrEmpty(expression)) {
+		if (StringUtils.isEmpty(expression)) {
 			return null;
 		}
 
+		String expr = expression.trim();
+		if (expr.startsWith("#{") && expr.endsWith("}")) {
+			return handleScript(expr);
+		}
+
 		String kind = null;
-		String expr = expression;
 		Matcher matcher = pattern.matcher(expression);
 
 		if (matcher.matches()) {
@@ -135,7 +143,7 @@ public class ActionHandler {
 		}
 
 		if ("eval".equals(kind)) {
-			return handleGroovy(expr);
+			return handleScript(expr);
 		}
 
 		if ("action".equals(kind)) {
@@ -229,7 +237,7 @@ public class ActionHandler {
 	public Object search(Class<?> entityClass, String filter, Map params) {
 		filter = makeMethodCall("filter", filter);
 		filter = String.format("__repo__.of(%s.class).all().%s", entityClass.getName(), filter);
-		com.axelor.db.Query q = (com.axelor.db.Query) handleGroovy(filter);
+		com.axelor.db.Query q = (com.axelor.db.Query) handleScript(filter);
 
 		q = q.bind(bindings);
 		q = q.bind(params);
@@ -237,12 +245,14 @@ public class ActionHandler {
 		return q.fetchOne();
 	}
 
+	private static final Escaper STRING_ESCAPER = Escapers.builder().addEscape('"', "\\\"").build();
+
 	private String makeMethodCall(String method, String expression) {
 		expression = expression.trim();
 		// check if expression is parameterized
 		if (!expression.startsWith("(")) {
 			if (!expression.matches("('|\")")) {
-				expression = "\"\"\"" + expression + "\"\"\"";
+				expression = "\"" + STRING_ESCAPER.escape(expression) + "\"";
 			}
 			expression = "(" + expression + ")";
 		}
@@ -251,15 +261,15 @@ public class ActionHandler {
 
 	private Object handleSelectOne(String expression) {
 		expression = makeMethodCall("__me__.selectOne", expression);
-		return handleGroovy(expression);
+		return handleScript(expression);
 	}
 
 	private Object handleSelectAll(String expression) {
 		expression = makeMethodCall("__me__.selectAll", expression);
-		return handleGroovy(expression);
+		return handleScript(expression);
 	}
 
-	private Object handleGroovy(String expression) {
+	private Object handleScript(String expression) {
 		return scriptHelper.eval(expression);
 	}
 

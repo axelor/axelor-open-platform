@@ -38,6 +38,7 @@ dependencies {
 	compile libs.javax_servlet
 	compile libs.javax_mail
 	compile libs.subetha_smtp
+	compile libs.axelor_el
 
 	compile(libs.quartz) {
 		exclude module: "c3p0"

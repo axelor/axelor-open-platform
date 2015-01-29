@@ -57,7 +57,7 @@ public abstract class ScriptTest extends JpaTest {
 
         Map<String, Object> ref = Maps.newHashMap();
         ref.put("_model", Contact.class.getName());
-        ref.put("id", 1);
+        ref.put("id", contacts.all().fetchOne().getId());
 
         data.put("_ref", ref);
         data.put("_parent", ref);

@@ -23,23 +23,18 @@ import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
-import org.codehaus.groovy.runtime.InvokerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.db.JpaScanner;
 import com.axelor.rpc.Context;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-public class GroovyScriptHelper implements ScriptHelper {
+public class GroovyScriptHelper extends AbstractScriptHelper {
 
 	private static final CompilerConfiguration config = new CompilerConfiguration();
 
@@ -93,24 +88,12 @@ public class GroovyScriptHelper implements ScriptHelper {
 		GCL = new GroovyClassLoader(JpaScanner.getClassLoader(), config);
 	}
 
-	private ScriptBindings bindings;
-
 	public GroovyScriptHelper(ScriptBindings bindings) {
-		this.bindings = bindings;
+		this.setBindings(bindings);
 	}
 
 	public GroovyScriptHelper(Context context) {
 		this(new ScriptBindings(context));
-	}
-
-	@Override
-	public ScriptBindings getBindings() {
-		return bindings;
-	}
-
-	@Override
-	public void setBindings(ScriptBindings bindings) {
-		this.bindings = bindings;
 	}
 
 	private Class<?> parseClass(String code) {
@@ -136,7 +119,7 @@ public class GroovyScriptHelper implements ScriptHelper {
 		try {
 			Class<?> klass = parseClass(expr);
 			Script script = (Script) klass.newInstance();
-			script.setBinding(new Binding(bindings) {
+			script.setBinding(new Binding(getBindings()) {
 
 				@Override
 				public Object getVariable(String name) {
@@ -155,40 +138,10 @@ public class GroovyScriptHelper implements ScriptHelper {
 	}
 
 	@Override
-	public final boolean test(String expr) {
-		if (Strings.isNullOrEmpty(expr))
-			return true;
-		Object result = eval(expr);
-		if (result == null)
-			return false;
-		if (result instanceof Number && result.equals(0))
-			return false;
-		if (result instanceof Boolean)
-			return (Boolean) result;
-		return true;
-	}
-
-	@Override
-	public Object call(Object obj, String method, Object... args) {
-		Preconditions.checkNotNull(obj);
-		Preconditions.checkNotNull(method);
-		return InvokerHelper.invokeMethod(obj, method, args);
-	}
-
-	@Override
-	public Object call(Object obj, String methodCall) {
-		Preconditions.checkNotNull(obj);
-		Preconditions.checkNotNull(methodCall);
-
-		Pattern p = Pattern.compile("(\\w+)\\((.*?)\\)");
-		Matcher m = p.matcher(methodCall);
-
-		if (!m.matches()) return null;
-
-		String method = m.group(1);
-		String params = "[" + m.group(2) + "] as Object[]";
-		Object[] arguments = (Object[]) eval(params);
-
-		return call(obj, method, arguments);
+	protected Object doCall(Object obj, String methodCall) {
+		ScriptBindings bindings = new ScriptBindings(getBindings());
+		GroovyScriptHelper sh = new GroovyScriptHelper(bindings);
+		bindings.put("__obj__", obj);
+		return sh.eval("__obj__." + methodCall);
 	}
 }

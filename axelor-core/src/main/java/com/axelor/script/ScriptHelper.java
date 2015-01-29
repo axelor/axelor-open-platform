@@ -57,20 +57,6 @@ public interface ScriptHelper {
 	boolean test(String expr);
 
 	/**
-	 * Call a method on the given object with the provided arguments.
-	 *
-	 * @param obj
-	 *            the object on which method should be called
-	 * @param method
-	 *            the name of the method
-	 * @param args
-	 *            method arguments
-	 *
-	 * @return return value of the method
-	 */
-	Object call(Object obj, String method, Object... args);
-
-	/**
 	 * Call a method on the given object.
 	 *
 	 * The methodCall is a string expression containing arguments to be passed.
