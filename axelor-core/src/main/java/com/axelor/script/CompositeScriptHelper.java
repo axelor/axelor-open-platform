@@ -45,10 +45,8 @@ public class CompositeScriptHelper extends AbstractScriptHelper {
 
 	@Override
 	public Object call(Object obj, String methodCall) {
-		if (isEL(methodCall)) {
-			return getESH().call(obj, strip(methodCall));
-		}
-		return getGSH().call(obj, methodCall);
+		// allways use EL
+		return getESH().call(obj, methodCall);
 	}
 
 	@Override

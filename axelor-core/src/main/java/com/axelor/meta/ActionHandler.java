@@ -233,6 +233,14 @@ public class ActionHandler {
 		return null;
 	}
 
+	public Object selectOne(String query) {
+		return selectOne(query, new Object[]{});
+	}
+
+	public Object selectAll(String query) {
+		return selectAll(query, new Object[]{});
+	}
+
 	@SuppressWarnings("all")
 	public Object search(Class<?> entityClass, String filter, Map params) {
 		filter = makeMethodCall("filter", filter);
@@ -256,7 +264,7 @@ public class ActionHandler {
 			}
 			expression = "(" + expression + ")";
 		}
-		return method + expression;
+		return "#{" + method + expression + "}";
 	}
 
 	private Object handleSelectOne(String expression) {
