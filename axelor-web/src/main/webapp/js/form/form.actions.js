@@ -409,9 +409,7 @@ ActionHandler.prototype = {
 			return chain(data);
 		});
 
-		promise.then(function(){
-			deferred.resolve();
-		});
+		promise.then(deferred.resolve, deferred.reject);
 		
 		return deferred.promise;
 	},
