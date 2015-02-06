@@ -5,6 +5,7 @@ import com.axelor.db.JpaScanner;
 import com.axelor.internal.javax.el.ELClass;
 import com.axelor.internal.javax.el.ELContext;
 import com.axelor.internal.javax.el.ELProcessor;
+import com.axelor.internal.javax.el.ImportHandler;
 import com.axelor.internal.javax.el.MapELResolver;
 import com.axelor.rpc.Context;
 import com.google.common.primitives.Ints;
@@ -55,8 +56,20 @@ public class ELScriptHelper extends AbstractScriptHelper {
 			if (bindings == null || base != null) {
 				return null;
 			}
+
+			final String name = (String) property;
+			if (bindings.containsKey(name))  {
+				context.setPropertyResolved(true);
+				return bindings.get(name);
+			}
+
+			final ImportHandler handler = context.getImportHandler();
+			Object value = handler.resolveClass(name);
+			if (value == null) {
+				value = handler.resolveStatic(name);
+			}
 			context.setPropertyResolved(true);
-			return bindings.get(property);
+			return value;
 		}
 	}
 
@@ -126,8 +139,20 @@ public class ELScriptHelper extends AbstractScriptHelper {
 		} catch (Exception e) {
 		}
 
-		this.processor.getELManager().importPackage("java.util");
-		this.processor.getELManager().importPackage("org.joda.time");
+		final String[] packages = {
+			"java.util",
+			"org.joda.time",
+			"com.axelor.common",
+			"com.axelor.script.util",
+			"com.axelor.apps.tool"
+		};
+
+		for (String pkg : packages) {
+			try {
+				this.processor.getELManager().importPackage(pkg);
+			} catch (Exception e) {
+			}
+		}
 
 		this.setBindings(bindings);
 	}
