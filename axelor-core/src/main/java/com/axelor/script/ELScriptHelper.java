@@ -1,7 +1,9 @@
 package com.axelor.script;
 
 import com.axelor.common.ClassUtils;
+import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
+import com.axelor.db.Model;
 import com.axelor.internal.javax.el.ELClass;
 import com.axelor.internal.javax.el.ELContext;
 import com.axelor.internal.javax.el.ELProcessor;
@@ -102,6 +104,10 @@ public class ELScriptHelper extends AbstractScriptHelper {
 			return ClassUtils.findClass(name);
 		}
 
+		public static <T extends Model> JpaRepository<T> repo(Class<T> model) {
+			return JpaRepository.of(model);
+		}
+
 		public static Integer toInt(Object value) {
 			if (value == null) {
 				return null;
@@ -142,6 +148,7 @@ public class ELScriptHelper extends AbstractScriptHelper {
 			this.processor.defineFunction("", "int", className, "toInt");
 			this.processor.defineFunction("", "str", className, "text");
 			this.processor.defineFunction("", "imp", className, "importClass");
+			this.processor.defineFunction("", "__repo__", className, "repo");
 			this.processor.defineFunction("fmt", "text", className, "formatText");
 		} catch (Exception e) {
 		}

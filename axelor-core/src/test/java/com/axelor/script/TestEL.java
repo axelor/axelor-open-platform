@@ -22,6 +22,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.axelor.db.JpaRepository;
 import com.axelor.rpc.Context;
 import com.axelor.test.db.Contact;
 
@@ -58,6 +59,9 @@ public class TestEL extends ScriptTest {
 
 		actual = helper.eval("__parent__.asType(Contact)");
 		Assert.assertTrue(actual instanceof Contact);
+
+		actual = helper.eval("__repo__(Contact)");
+		Assert.assertTrue(actual instanceof JpaRepository);
 
 		actual = helper.eval("__ref__.fullName");
 		Assert.assertTrue(actual instanceof String);
