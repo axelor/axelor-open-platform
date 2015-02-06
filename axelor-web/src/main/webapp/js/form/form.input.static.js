@@ -373,24 +373,49 @@ ui.formItem('Button', {
 		});
 
 		element.on("click", function(e) {
-			if (scope.isReadonlyExclusive()) return;
-			if (scope.waitForActions) {
-				scope.waitForActions(function () {
-					scope.fireAction("onClick");
-				});
-			} else {
-				scope.fireAction("onClick");
+
+			if (scope.isReadonlyExclusive() || element.hasClass('disabled')) {
+				return;
 			}
+
+			function enable() {
+				scope.ajaxStop(function () {
+					setDisabled(false);
+				}, 100);
+			}
+
+			function setEnable(p) {
+				if (p && p.then) {
+					p.then(enable, enable);
+				} else {
+					scope.ajaxStop(enable, 500);
+				}
+			}
+
+			function doClick() {
+				setEnable(scope.fireAction("onClick"));
+			}
+
+			setDisabled(true);
+
+			if (scope.waitForActions) {
+				return scope.waitForActions(doClick);
+			}
+			return doClick();
 		});
 		
+		function setDisabled(disabled) {
+			if (disabled || disabled === undefined) {
+				return element.addClass("disabled").attr('tabindex', -1);
+			}
+			return element.removeClass("disabled").removeAttr('tabindex');
+		}
+
 		var readonlySet = false;
 		scope.$watch('isReadonlyExclusive()', function(readonly, old) {
 			if (readonly === old && readonlySet) return;
 			readonlySet = true;
-			if (readonly) {
-				return element.addClass("disabled").attr('tabindex', -1);
-			}
-			return element.removeClass("disabled").removeAttr('tabindex');
+			return setDisabled(readonly);
 		});
 		
 		scope.$watch('attr("title")', function(title, old) {
