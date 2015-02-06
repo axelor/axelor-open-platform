@@ -98,6 +98,10 @@ public class ELScriptHelper extends AbstractScriptHelper {
 			return klass.isInstance(base);
 		}
 
+		public static Class<?> importClass(String name) {
+			return ClassUtils.findClass(name);
+		}
+
 		public static Integer toInt(Object value) {
 			if (value == null) {
 				return null;
@@ -130,12 +134,15 @@ public class ELScriptHelper extends AbstractScriptHelper {
 		this.processor.getELManager().addELResolver(new ClassResolver());
 		this.processor.getELManager().addELResolver(new ContextResolver());
 
+		final String className = Helpers.class.getName();
+
 		try {
-			this.processor.defineFunction("", "as", Helpers.class.getName(), "as");
-			this.processor.defineFunction("", "is", Helpers.class.getName(), "is");
-			this.processor.defineFunction("", "int", Helpers.class.getName(), "toInt");
-			this.processor.defineFunction("", "str", Helpers.class.getName(), "text");
-			this.processor.defineFunction("fmt", "text", Helpers.class.getName(), "formatText");
+			this.processor.defineFunction("", "as", className, "as");
+			this.processor.defineFunction("", "is", className, "is");
+			this.processor.defineFunction("", "int", className, "toInt");
+			this.processor.defineFunction("", "str", className, "text");
+			this.processor.defineFunction("", "imp", className, "importClass");
+			this.processor.defineFunction("fmt", "text", className, "formatText");
 		} catch (Exception e) {
 		}
 
@@ -153,6 +160,10 @@ public class ELScriptHelper extends AbstractScriptHelper {
 			} catch (Exception e) {
 			}
 		}
+
+		this.processor.getELManager().importClass("com.axelor.db.Model");
+		this.processor.getELManager().importClass("com.axelor.db.Query");
+		this.processor.getELManager().importClass("com.axelor.db.Repository");
 
 		this.setBindings(bindings);
 	}
