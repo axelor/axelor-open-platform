@@ -720,8 +720,9 @@
           <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0" />
           <xsd:element name="menubar" type="tns:Menubar" minOccurs="0" />
           <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" maxOccurs="unbounded" />
-          <xsd:element name="field" type="tns:GridField" maxOccurs="unbounded" />
-          <xsd:element name="button" type="tns:Button" minOccurs="0" maxOccurs="unbounded" />
+          <xsd:choice maxOccurs="unbounded">
+            <xsd:group ref="tns:GridWidgets" />
+          </xsd:choice>
         </xsd:sequence>
         <xsd:attribute name="expandable" type="xsd:boolean" />
         <xsd:attribute name="orderBy" type="xsd:string">
@@ -1980,6 +1981,13 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
+
+  <xsd:group name="GridWidgets">
+    <xsd:choice>
+      <xsd:element name="field" type="tns:GridField" />
+      <xsd:element name="button" type="tns:Button" />
+    </xsd:choice>
+  </xsd:group>
 
   <xsd:group name="FormWidgets">
     <xsd:choice>
