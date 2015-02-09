@@ -43,6 +43,9 @@ dependencies {
 
 	compile libs.eclipselink_moxy
 
+	// CAS
+	compile libs.apache_shiro_cas
+
 	compile "commons-jxpath:commons-jxpath:1.3"
 	compile "com.beust:jcommander:1.32"
 
