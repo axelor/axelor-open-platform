@@ -60,6 +60,10 @@ ui.formWidget('BaseSelect', {
 			input.autocomplete("search" , '');
 		};
 
+		scope.handleClear = function(e) {
+			scope.setValue(null, true);
+		};
+
 		scope.handleDelete = function(e) {
 
 		};
@@ -173,7 +177,8 @@ ui.formWidget('BaseSelect', {
 	template_editable:
 	'<span class="picker-input">'+
 		'<input type="text" autocomplete="off">'+
-		'<span class="picker-icons">'+
+		'<span class="picker-icons picker-icons-2">'+
+			'<i class="fa fa-times" ng-show="text" ng-click="handleClear()"></i>'+
 			'<i class="fa fa-caret-down" ng-click="showSelection()"></i>'+
 		'</span>'+
 	'</span>'

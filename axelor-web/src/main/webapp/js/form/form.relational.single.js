@@ -543,6 +543,7 @@ ui.formInput('SuggestBox', 'ManyToOne', {
 	'<span class="picker-input">'+
 		'<input type="text" autocomplete="off">'+
 		'<span class="picker-icons">'+
+			'<i class="fa fa-times" ng-show="text" ng-click="handleClear()"></i>'+
 			'<i class="fa fa-caret-down" ng-click="showSelection()"></i>'+
 		'</span>'+
    '</span>'
