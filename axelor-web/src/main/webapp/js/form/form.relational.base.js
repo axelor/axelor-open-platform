@@ -322,7 +322,9 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		var field = this.field;
 		var nameField = field.targetName || 'id',
 			fields = field.targetSearch || [],
-			filter = {};
+			filter = {},
+			limit = field.limit || 6,
+			sortBy = field.orderBy;
 
 		fields = ["id", nameField].concat(fields);
 		fields = _.chain(fields).compact().unique().value();
@@ -339,12 +341,17 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		if (domain && this.getContext) {
 			context = _.extend({}, context, this.getContext());
 		}
-	
+
+		if (sortBy) {
+			sortBy = sortBy.split(",");
+		}
+
 		var params = {
 			filter: filter,
 			fields: fields,
 			archived: true,
-			limit: 6
+			sortBy: sortBy,
+			limit: limit
 		};
 
 		if (domain) {

@@ -562,6 +562,16 @@
         <xsd:documentation>Specify whether to show lebels in ImageSelect widget.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-order" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify the order of suggest box list.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-limit" type="xsd:int">
+      <xsd:annotation>
+        <xsd:documentation>Specify the maximum number of items in suggest box list.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:attributeGroup name="RelationalAttributes">

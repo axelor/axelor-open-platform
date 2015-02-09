@@ -164,6 +164,12 @@ public class Field extends SimpleWidget {
 	@XmlAttribute(name = "x-labels")
 	private Boolean labels;
 
+	@XmlAttribute(name = "x-order")
+	private String orderBy;
+
+	@XmlAttribute(name = "x-limit")
+	private Integer limit;
+
 	@XmlElement(name = "hilite")
 	private List<Hilite> hilites;
 
@@ -441,6 +447,22 @@ public class Field extends SimpleWidget {
 
 	public void setLabels(Boolean labels) {
 		this.labels = labels;
+	}
+
+	public String getOrderBy() {
+		return orderBy;
+	}
+
+	public void setOrderBy(String orderBy) {
+		this.orderBy = orderBy;
+	}
+
+	public Integer getLimit() {
+		return limit;
+	}
+
+	public void setLimit(Integer limit) {
+		this.limit = limit;
 	}
 
 	public List<Hilite> getHilites() {
