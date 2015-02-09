@@ -23,6 +23,10 @@
       <field name="name" onChange="action-condition-group-validName" validIf="name.length >= 2"/>
       <field name="code" onChange="action-condition-group-validCode" validIf="code.length >= 2"/>
       <field name="navigation"/>
+      <panel stacked="true">
+        <field name="homeAction" hidden="true" x-bind="{{__actionSelect.name}}"/>
+        <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" target="com.axelor.meta.db.MetaAction" target-name="name" domain="self.type = 'action-view'"/>
+      </panel>
       <field name="technicalStaff"/>
     </panel>
     <panel-tabs>

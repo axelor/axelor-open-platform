@@ -52,6 +52,7 @@ import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
+import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.rpc.filter.Filter;
 import com.google.common.base.CaseFormat;
@@ -543,6 +544,16 @@ public class Resource<T extends Model> {
 					value = toMap(value, names);
 				}
 				values.put(name, value);
+			}
+		}
+
+		// special case for User/Group objects
+		if (values.get("homeAction") != null) {
+			MetaAction act = JpaRepository.of(MetaAction.class).all()
+					.filter("self.name = ?", values.get("homeAction"))
+					.fetchOne();
+			if (act != null) {
+				values.put("__actionSelect", toMapCompact(act));
 			}
 		}
 
