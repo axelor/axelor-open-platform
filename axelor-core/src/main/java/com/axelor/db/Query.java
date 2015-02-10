@@ -143,6 +143,11 @@ public class Query<T extends Model> {
 		return this;
 	}
 
+	public Query<T> filter(String filter) {
+		final Object[] params = {};
+		return filter(filter, params);
+	}
+
 	/**
 	 * Set order by clause for the query. This method can be chained to provide
 	 * multiple fields.

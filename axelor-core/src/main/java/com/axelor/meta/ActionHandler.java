@@ -243,8 +243,7 @@ public class ActionHandler {
 
 	@SuppressWarnings("all")
 	public Object search(Class<?> entityClass, String filter, Map params) {
-		filter = makeMethodCall("filter", filter);
-		filter = String.format("__repo__.of(%s.class).all().%s", entityClass.getName(), filter);
+		filter = makeMethodCall(String.format("__repo__(%s).all().filter", entityClass.getSimpleName()), filter);
 		com.axelor.db.Query q = (com.axelor.db.Query) handleScript(filter);
 
 		q = q.bind(bindings);
