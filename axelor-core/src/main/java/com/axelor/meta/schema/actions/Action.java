@@ -94,7 +94,7 @@ public abstract class Action {
 			return true;
 		if (expression.equals("false"))
 			return false;
-		Pattern pattern = Pattern.compile("^(eval|select|action):");
+		Pattern pattern = Pattern.compile("^(#\\{|(eval|select|action):)");
 		if (expression != null && !pattern.matcher(expression).find()) {
 			expression = "eval:" + expression;
 		}
