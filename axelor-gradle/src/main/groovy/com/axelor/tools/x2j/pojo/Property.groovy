@@ -36,7 +36,9 @@ class Property {
 
 	Entity entity
 
-	boolean initParam
+	Entity ownEntity
+
+	private boolean initParam
 
 	private Map<String, Object> attrs = new HashMap()
 
@@ -264,7 +266,7 @@ class Property {
 	}
 
 	boolean isInitParam() {
-		return initParam
+		return !ownEntity && initParam
 	}
 
 	boolean isNullable() {
