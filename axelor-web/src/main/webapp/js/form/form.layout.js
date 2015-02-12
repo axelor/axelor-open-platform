@@ -406,6 +406,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 				scope.getContext = function () {
 					var context = _.extend({}, scope.record);
 					context._model = scope._model;
+					context._parent = scope.$parent.getContext();
 					return context;
 				};
 				// make sure to trigger record-change with proper record data
