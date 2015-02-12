@@ -396,7 +396,7 @@ function FormViewCtrl($scope, $element) {
 		}
 		
 		$scope._viewPromise.then(function() {
-			$scope.$timeout(afterVewLoaded);
+			$scope.waitForActions(afterVewLoaded);
 		});
 	});
 	
