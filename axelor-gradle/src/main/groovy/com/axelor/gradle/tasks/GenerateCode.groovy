@@ -29,7 +29,7 @@ class GenerateCode extends DefaultTask {
 
 	private static final Set<String> IGNORE = ["axelor-common", "axelor-test"]
 
-	def findAllModules(Project project, Set<Project> found) {
+	def findAllModules(Project project, List<Project> found) {
 		def name = project.name
 		if (found == null) {
 			found = []
