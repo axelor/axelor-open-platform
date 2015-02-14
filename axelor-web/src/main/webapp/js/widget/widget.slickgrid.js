@@ -185,6 +185,9 @@ var Editor = function(args) {
 	};
 	
 	this.applyValue = function(item, state) {
+		if (item.id === undefined) {
+			item = _.extend(item, scope.defaultValues);
+		}
 		item[column.field] = state;
 		item.$dirty = true;
 		if (item.id === undefined) {
@@ -1178,9 +1181,9 @@ Grid.prototype.onBeforeEditCell = function(event, args) {
 			}
 		});
 	}
-	es.editRecord(es.defaultValues);
-	args.item = es.record;
-	this.onAddNewRow(event, args);
+	var item = angular.copy(es.defaultValues);
+	es.editRecord(item);
+	this.grid.updateRow(args.row, item);
 };
 
 Grid.prototype.onKeyDown = function(e, args) {
@@ -1401,11 +1404,12 @@ Grid.prototype.__saveChanges = function(args, callback) {
 		return res;
 	});
 	
+	var that = this;
 	function focus() {
 		grid.setActiveCell(args.row, args.cell);
 		grid.focus();
 		if (callback) {
-			callback();
+			that.handler.waitForActions(callback);
 		}
 	}
 
@@ -1510,15 +1514,13 @@ Grid.prototype.onAddNewRow = function(event, args) {
 		item.id = 0;
 		grid.invalidateRow(dataView.length);
 		dataView.addItem(item);
-	    
-		grid.resizeCanvas();
 	}
 };
 
 Grid.prototype.canEdit = function () {
 	var handler = this.handler || {};
 	if (!this.editable) return false;
-	if (handler.canEdit && !handler.canEdit()) return false;
+	if (handler.canEdit && handler.canView && !handler.canEdit()) return false;
 	if (handler.isReadonly && handler.isReadonly()) return false;
 	return true;
 }
@@ -1591,7 +1593,10 @@ Grid.prototype.onCellChange = function(event, args) {
 		cols = grid.getColumns(),
 		name = cols[args.cell].field;
 
-	this.markDirty(args.row, name);
+	var es = this.editorScope;
+	if (es.isDirty()) {
+		this.markDirty(args.row, name);
+	}
 };
 
 Grid.prototype.onSort = function(event, args) {
@@ -1711,11 +1716,13 @@ Grid.prototype.onRowsChanged = function(event, args) {
 		data = this.scope.dataView,
 		forEdit = this.editorForEdit;
 
-	if(this.canAdd() && !data.getItemById(0)) {
-		grid.setOptions({
-			enableAddRow: forEdit === undefined ? true : forEdit
-		});
+	var enableAddRow = forEdit === undefined ? true : forEdit;
+	if (enableAddRow) {
+		enableAddRow = this.canAdd() && !data.getItemById(0);
 	}
+	grid.setOptions({
+		enableAddRow: enableAddRow
+	});
 	
 	if (!this.isDirty()) {
 		this.clearDirty();
