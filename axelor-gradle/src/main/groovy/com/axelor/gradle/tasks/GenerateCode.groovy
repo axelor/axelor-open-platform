@@ -29,20 +29,51 @@ class GenerateCode extends DefaultTask {
 
 	private static final Set<String> IGNORE = ["axelor-common", "axelor-test"]
 
-	def findAllModules(Project project, List<Project> found) {
-		def name = project.name
-		if (found == null) {
-			found = []
+	def _findDeps(Project project) {
+		return project.configurations.compile.allDependencies.withType(ProjectDependency).collect { it.dependencyProject }
+	}
+
+	def _findAllModules(Project project, Map visited) {
+		def found = []
+		def all = visited.get(project.name)
+		if (all == null) {
+			all = _findDeps(project)
+			visited[project.name] = all
 		}
-		project.configurations.compile.allDependencies.withType(ProjectDependency).each {
-			def dep = it.dependencyProject
+
+		all.each { dep ->
 			if (!found.contains(dep) && !IGNORE.contains(dep.name)) {
 				found.add(dep)
-				findAllModules(dep, found)
+				found.addAll(_findAllModules(dep, visited))
 			}
 		}
-		return found
+
+		return found.unique()
 	}
+
+	/**
+	 * Find all the module dependencies in topological order
+	 *
+	 */
+	def findAllModules(Project project) {
+
+		def graph = [:]
+		def found = _findAllModules(project, graph)
+
+		found.each {
+			if (!graph.containsKey(it.name)) graph[it.name] = _findDeps(it)
+		}
+
+		def all = found.sort { a, b ->
+			def ad = graph.get(a.name)
+			def bd = graph.get(b.name)
+			if (ad.contains(b)) return 1;
+			if (bd.contains(a)) return -1;
+			return 0;
+		}
+
+		return all
+    }
 
 	def findCoreFiles(Project project) {
 		def all = project.configurations.compile.allDependencies.withType(ExternalModuleDependency)
@@ -87,7 +118,7 @@ class GenerateCode extends DefaultTask {
 			generator.addLookupSource(Generator.forFiles(coreFiles))
 		}
 
-		findAllModules(project, null).each {
+		findAllModules(project).each {
 			def lookup = buildGenerator(it)
 			generator.addLookupSource(lookup)
 		}
@@ -120,7 +151,7 @@ class GenerateCode extends DefaultTask {
 		outputPath.withWriter('UTF-8') { out ->
 			
 			def description = (definition.description?:"").trim().split("\n").collect { it.trim() };
-			def depends = findAllModules(project, null).collect { it.name }
+			def depends = findAllModules(project).collect { it.name }
 			def installs = null
 			def removable = false
 
