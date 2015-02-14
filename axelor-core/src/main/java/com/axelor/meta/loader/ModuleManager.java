@@ -96,66 +96,77 @@ public class ModuleManager {
 
 	public void initialize(boolean update, boolean withDemo) {
 
-		this.createUsers();
-		this.resolve(true);
+		try {
+			this.createUsers();
+			this.resolve(true);
 
-		log.info("modules found:");
-		for (String name : resolver.names()) {
-			log.info("  " + name);
-		}
+			log.info("modules found:");
+			for (String name : resolver.names()) {
+				log.info("  " + name);
+			}
 
-		// install modules
-		for (Module module : resolver.all()) {
-			if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
-				install(module.getName(), update, withDemo, false);
+			// install modules
+			for (Module module : resolver.all()) {
+				if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
+					install(module.getName(), update, withDemo, false);
+				}
 			}
-		}
-		// second iteration ensures proper view sequence
-		for (Module module : resolver.all()) {
-			if (module.isInstalled()) {
-				viewLoader.doLast(module, update);
+			// second iteration ensures proper view sequence
+			for (Module module : resolver.all()) {
+				if (module.isInstalled()) {
+					viewLoader.doLast(module, update);
+				}
 			}
-		}
-		// uninstall pending modules
-		for (Module module : resolver.all()) {
-			if (module.isRemovable() && !module.isInstalled() && module.isPending()) {
-				uninstall(module.getName());
+			// uninstall pending modules
+			for (Module module : resolver.all()) {
+				if (module.isRemovable() && !module.isInstalled() && module.isPending()) {
+					uninstall(module.getName());
+				}
 			}
+		} finally {
+			this.doCleanUp();
 		}
 	}
 
 	public void updateAll(boolean withDemo) {
+		try {
+			this.createUsers();
+			this.resolve(true);
 
-		this.createUsers();
-		this.resolve(true);
-
-		for (Module module : resolver.all()) {
-			install(module.getName(), true, withDemo, false);
+			for (Module module : resolver.all()) {
+				install(module.getName(), true, withDemo, false);
+			}
+		} finally {
+			this.doCleanUp();
 		}
 	}
 
 	public void update(boolean withDemo, String... moduleNames) {
 
-		this.createUsers();
-		this.resolve(true);
+		try {
+			this.createUsers();
+			this.resolve(true);
 
-		List<String> names = Lists.newArrayList();
-		if (moduleNames != null) {
-			names = Lists.newArrayList(moduleNames);
-		}
+			List<String> names = Lists.newArrayList();
+			if (moduleNames != null) {
+				names = Lists.newArrayList(moduleNames);
+			}
 
-		if (names.isEmpty()) {
-			for (Module module : resolver.all()) {
-				if (module.isInstalled()) {
-					names.add(module.getName());
+			if (names.isEmpty()) {
+				for (Module module : resolver.all()) {
+					if (module.isInstalled()) {
+						names.add(module.getName());
+					}
 				}
 			}
-		}
 
-		for (Module module : resolver.all()) {
-			if (names.contains(module.getName())) {
-				install(module, true, withDemo);
+			for (Module module : resolver.all()) {
+				if (names.contains(module.getName())) {
+					install(module, true, withDemo);
+				}
 			}
+		} finally {
+			this.doCleanUp();
 		}
 	}
 	
@@ -185,11 +196,15 @@ public class ModuleManager {
 	}
 
 	public void install(String moduleName, boolean update, boolean withDemo) {
-		for (Module module: resolver.resolve(moduleName)) {
-			install(module.getName(), update, withDemo, true);
-		}
-		for (Module module: resolver.resolve(moduleName)) {
-			viewLoader.doLast(module, update);
+		try {
+			for (Module module: resolver.resolve(moduleName)) {
+				install(module.getName(), update, withDemo, true);
+			}
+			for (Module module: resolver.resolve(moduleName)) {
+				viewLoader.doLast(module, update);
+			}
+		} finally {
+			this.doCleanUp();
 		}
 	}
 
@@ -215,6 +230,10 @@ public class ModuleManager {
 		resolver.get(module).setPending(false);
 
 		log.info("Module uninstalled: {}", module);
+	}
+
+	public void doCleanUp() {
+		AbstractLoader.doCleanUp();
 	}
 
 	@Transactional
