@@ -515,6 +515,15 @@ Grid.prototype.parse = function(view) {
 			xpath: path
 		};
 		
+		var css = [type];
+		if (!field.readonly && item.forEdit !== false) {
+			css.push('slick-cell-editable');
+			if (field.required) {
+				css.push('slick-cell-required')
+			}
+		}
+		column.cssClass = css.join(' ');
+
 		cols.push(column);
 		
 		if (field.aggregate) {
@@ -1950,6 +1959,10 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 					form = makeForm(formScope, handler._model, schema.items, handler.fields, forEdit);
 				}
 								
+				if (forEdit) {
+					element.addClass('slickgrid-editable');
+				}
+
 				grid = new Grid(scope, element, attrs, ViewService, ActionService);
 				if (form) {
 					formScope.grid = grid;
