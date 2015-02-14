@@ -183,7 +183,7 @@ ActionHandler.prototype = {
 				if (confirmed) {
 					self.handle().then(deferred.resolve, deferred.reject);
 				} else {
-					deferred.reject();
+					self.scope.$timeout(deferred.reject);
 				}
 			}, {
 				yesNo: false
@@ -326,9 +326,7 @@ ActionHandler.prototype = {
 			scope.onSave({
 				values: values,
 				callOnSave: false
-			}).then(function () {
-				deferred.resolve();
-			});
+			}).then(deferred.resolve, deferred.reject);
 		} else {
 			doSave(values);
 		}
@@ -357,7 +355,7 @@ ActionHandler.prototype = {
 				return resolveLater();
 			}
 			return self._handleSingle(first).then(function(pending) {
-				if (_.isString(pending)) {
+				if (_.isString(pending) && pending.trim().length) {
 					return self._handleAction(pending);
 				}
 				
@@ -541,7 +539,7 @@ ActionHandler.prototype = {
 					scope.ajaxStop(function () {
 						deferred.resolve(data.pending);
 					}, 100);
-				});
+				}, deferred.reject);
 			});
 			return deferred.promise;
 		}
