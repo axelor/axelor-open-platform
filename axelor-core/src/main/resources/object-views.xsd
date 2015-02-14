@@ -239,6 +239,13 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="groups" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Comma separated list of authorized groups.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="width">
       <xsd:annotation>
         <xsd:documentation>

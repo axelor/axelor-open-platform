@@ -231,6 +231,10 @@ public class ViewLoader extends AbstractLoader {
 		entity.setModule(module.getName());
 		entity.setXml(xml);
 
+		if (entity.getGroups() == null || entity.getGroups().isEmpty()) {
+			entity.setGroups(this.findGroups(view.getGroups()));
+		}
+
 		entity = views.save(entity);
 	}
 
