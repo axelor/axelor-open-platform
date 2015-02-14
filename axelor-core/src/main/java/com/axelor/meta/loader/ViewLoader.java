@@ -199,8 +199,8 @@ public class ViewLoader extends AbstractLoader {
 		
 		MetaView entity = views.findByID(xmlId);
 		MetaView other = views.findByName(name);
-		if (entity == null) {
-			entity = views.findByModule(name, module.getName());
+		if (entity == null && StringUtils.isBlank(xmlId)) {
+			entity = views.all().filter("self.name = ? AND self.module = ? AND self.xmlId is null", name, module.getName()).fetchOne();
 		}
 		
 		if (entity == null) {
