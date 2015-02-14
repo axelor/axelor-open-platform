@@ -1063,7 +1063,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			}
 
 			var width = schema.width || params.width;
-			if (width) {
+			if (width && !scope.$hasPanels) {
 				if (width === '100%' || width === '*') {
 					element.removeClass('has-width');
 				}
