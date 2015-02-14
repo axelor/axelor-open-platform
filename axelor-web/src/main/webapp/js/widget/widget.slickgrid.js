@@ -1290,7 +1290,20 @@ Grid.prototype.isCellEditable = function(cell) {
 		return false;
 	}
 	var field = col.descriptor || {};
-	return !field.readonly && field.type !== 'button';
+	var form = this.editorForm;
+
+	if (field.type === 'button') {
+		return false;
+	}
+	if (!form) {
+		return !field.readonly;
+	}
+
+	var item = this.element.find('[x-field=' + field.name + ']:first');
+	if (item.size()) {
+		return !item.scope().isReadonly();
+	}
+	return !field.readonly;
 };
 
 Grid.prototype.findNextEditable = function(posY, posX) {
