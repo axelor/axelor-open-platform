@@ -63,7 +63,7 @@ public class ModelLoader extends AbstractLoader {
 			return;
 		}
 
-		for (URL file : MetaScanner.findAll(module.getName(), "(domains|objects)", "(.*?)\\.xml")) {
+		for (URL file : MetaScanner.findAll(module.getName(), "(domains|objects)", "(.*?)\\.xml$")) {
 			try (InputStream is = file.openStream()) {
 				final Document doc = db.parse(is);
 				importModels(doc, file, update);
@@ -86,7 +86,7 @@ public class ModelLoader extends AbstractLoader {
 			return names;
 		}
 
-		for (URL file : MetaScanner.findAll(module.getName(), "(domains|objects)", "(.*?)\\.xml")) {
+		for (URL file : MetaScanner.findAll(module.getName(), "(domains|objects)", "(.*?)\\.xml$")) {
 			try (InputStream is = file.openStream()) {
 				final Document doc = db.parse(is);
 				final NodeList elements = doc.getElementsByTagName("entity");
