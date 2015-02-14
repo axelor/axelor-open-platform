@@ -434,7 +434,7 @@ ActionHandler.prototype = {
 			if (promise) {
 				promise.then(function(){
 					deferred.resolve(pending);
-				});
+				}, deferred.reject);
 			}
 			return deferred.promise;
 		}
@@ -524,7 +524,15 @@ ActionHandler.prototype = {
 		}
 		
 		if (data.reload) {
-			return doReload(data.pending);
+			return (function () {
+				var promise = doReload(data.pending);
+				if (data.view) {
+					promise.then(function () {
+						doOpenView(data.view);
+					});
+				}
+				return promise;
+			})();
 		}
 		
 		if (data.save) {
@@ -738,8 +746,7 @@ ActionHandler.prototype = {
 			}
 		}
 
-		if (data.view) {
-			var tab = data.view;
+		function doOpenView(tab) {
 			tab.action = _.uniqueId('$act');
 			if (!tab.viewType)
 				tab.viewType = 'grid';
@@ -767,6 +774,10 @@ ActionHandler.prototype = {
 			scope.applyLater();
 		}
 		
+		if (data.view) {
+			doOpenView(data.view);
+		}
+
 		if (data.canClose) {
 			if (scope.onOK) {
 				scope.onOK();
