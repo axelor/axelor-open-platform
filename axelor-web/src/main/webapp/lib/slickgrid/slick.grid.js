@@ -1530,7 +1530,7 @@ if (typeof Slick === "undefined") {
       }
     }
 
-    function updateRow(row) {
+    function updateRow(row, defaults) {
       var cacheEntry = rowsCache[row];
       if (!cacheEntry) {
         return;
@@ -1545,7 +1545,7 @@ if (typeof Slick === "undefined") {
 
         columnIdx = columnIdx | 0;
         var m = columns[columnIdx],
-            d = getDataItem(row),
+            d = defaults || getDataItem(row),
             node = cacheEntry.cellNodesByColumnIdx[columnIdx];
 
         if (row === activeRow && columnIdx === activeCell && currentEditor) {
