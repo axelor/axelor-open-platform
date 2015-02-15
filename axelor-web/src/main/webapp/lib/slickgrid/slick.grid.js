@@ -1451,6 +1451,8 @@ if (typeof Slick === "undefined") {
       if (d) {
         var value = getDataItemValueForColumn(d, m);
         stringArray.push(getFormatter(row, m)(row, cell, value, m, d));
+      } else {
+	stringArray.push(getFormatter(row, m)(row, cell, null, m, {}));
       }
 
       stringArray.push("</div>");

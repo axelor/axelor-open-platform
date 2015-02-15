@@ -588,6 +588,8 @@ Grid.prototype.parse = function(view) {
 	if (!scope.selector && view.editIcon && (!handler.hasPermission || handler.hasPermission('write'))) {
 		editColumn = new EditIconColumn({
 			onClick: function (e, args) {
+				var source = $(e.target);
+				if (source.is('.fa-plus')) return;
 				if (handler && handler.onEdit) {
 					handler.applyLater(function () {
 						handler.onEdit(true);
@@ -1504,6 +1506,42 @@ Grid.prototype.focusInvalidCell = function(args) {
 	}
 };
 
+Grid.prototype.doAddNewRow = function (args) {
+	var self = this,
+		grid = this.grid,
+		lock = grid.getEditorLock(),
+		item = grid.getDataItem(args.row);
+
+	if (lock.isActive()) {
+		lock.commitCurrentEdit();
+	}
+
+	var cell = self.findNextEditable(args.row, 0);
+
+	function edit() {
+		grid.focus();
+		grid.setActiveCell(cell.row, cell.cell);
+		grid.editActiveCell();
+	}
+
+	function handle() {
+		if (!item) {
+			return edit(cell);
+		}
+
+		var saved = self.saveChanges(args, function () {
+			cell.row += 1;
+			edit(cell);
+		});
+		if (!saved) {
+			self.focusInvalidCell(args);
+		}
+	}
+
+	// differ the handling to fix focus issue
+	setTimeout(handle);
+}
+
 Grid.prototype.onAddNewRow = function(event, args) {
 	var scope = this.scope,
 		grid = this.grid,
@@ -1649,6 +1687,19 @@ Grid.prototype.onItemClick = function(event, args) {
 		event.stopImmediatePropagation();
 		return false;
 	}
+
+	var source = $(event.target);
+	if (source.is('img.slick-img-button,i.slick-icon-button')) {
+		return this.onButtonClick(event, args);
+	}
+
+	var col = this.grid.getColumns()[args.cell];
+	if (col.id === '_edit_column' && source.is('.fa-plus') && this.editable) {
+		event.stopImmediatePropagation();
+		this.doAddNewRow(args);
+		return false;
+	}
+
 	// checkbox column
 	if (this.scope.selector && args.cell == 0) {
 		return false;
@@ -1668,11 +1719,6 @@ Grid.prototype.onItemClick = function(event, args) {
 		}
 	}
 
-	var source = $(event.target);
-	if (source.is('img.slick-img-button,i.slick-icon-button')) {
-		return this.onButtonClick(event, args);
-	}
-	
 	if (!this.scope.selector && this.canEdit()) {
 		return this.grid.setActiveCell();
 	}
@@ -1815,7 +1861,9 @@ function EditIconColumn(options) {
     }
     	
     function editFormatter(row, cell, value, columnDef, dataContext) {
-    	if (!dataContext || !dataContext.id) return "";
+	if (!dataContext || !dataContext.id) {
+		return '<i class="fa fa-plus"></i>';
+	}
     	return '<i class="fa fa-pencil"></i>';
     }
 
