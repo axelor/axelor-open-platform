@@ -519,14 +519,6 @@ function FormViewCtrl($scope, $element) {
 		});
 		return defer.promise;
 	};
-	
-	$scope.waitForActions = function (callback) {
-		$scope.$timeout(function () {
-			$scope.ajaxStop(function () {
-				$scope.$timeout(callback, 100);
-			}, 200);
-		}, 100);
-	},
 
 	$scope.confirmDirty = function(callback, cancelCallback) {
 		var params = $scope._viewParams || {};
