@@ -477,12 +477,10 @@ ui.formInput('OneToMany', {
 						scope.dataView.setItems([]);
 						grid.setSelectedRows([]);
 					}
-					grid.setOptions({enableAddRow: scope.canNew() && !scope.isReadonly()});
 				});
 				scope.$watch("isReadonly()", function(readonly) {
 					grid.setOptions({
-						editable: !readonly && scope.canEdit(),
-						enableAddRow: !readonly && scope.canNew()
+						editable: !readonly && scope.canEdit()
 					});
 					
 					var _editIcon = scope.canView() || (!readonly && scope.canEdit());
