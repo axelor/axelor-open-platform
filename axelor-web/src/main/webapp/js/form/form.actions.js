@@ -228,8 +228,13 @@ ActionHandler.prototype = {
 	_getFormElement: function () {
 
 		var elem = $(this.element);
-		var formElement = elem.data('$editorForm') || elem.parents('form:first');
+		var formElement = elem;
 
+		if (formElement.is('form')) {
+			return formElement;
+		}
+
+		formElement = elem.data('$editorForm') || elem.parents('form:first');
 		if (!formElement || !formElement.get(0)) { // toolbar button
 			formElement = this.element.parents('.form-view:first').find('form:first');
 		}
