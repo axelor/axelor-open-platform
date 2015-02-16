@@ -3268,6 +3268,7 @@ if (typeof Slick === "undefined") {
       "getCellFromEvent": getCellFromEvent,
       "getActiveCell": getActiveCell,
       "setActiveCell": setActiveCell,
+      "setActiveNode": setActiveCellInternal,
       "getActiveCellNode": getActiveCellNode,
       "getActiveCellPosition": getActiveCellPosition,
       "resetActiveCell": resetActiveCell,

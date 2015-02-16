@@ -893,6 +893,14 @@ Grid.prototype._doInit = function(view) {
 			lock.commitCurrentEdit();
 		}
 		
+		var empty = that.element.find('.slick-cell-required:empty').get(0);
+		if (empty) {
+			that.grid.setActiveNode(empty);
+			that.grid.editActiveCell();
+			e.preventDefault();
+			return false;
+		}
+
 		if (!that.isDirty() || that.saveChanges()) {
 			return;
 		}
