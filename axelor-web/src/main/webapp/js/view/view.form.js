@@ -340,7 +340,7 @@ function FormViewCtrl($scope, $element) {
 	$scope.onNewPromise = null;
 	$scope.defaultValues = null;
 	
-	$scope.$on("on:new", function onNewHandler(event) {
+	$scope.onNewHandler = function onNewHandler(event) {
 
 		routeId = null;
 
@@ -398,6 +398,10 @@ function FormViewCtrl($scope, $element) {
 		$scope._viewPromise.then(function() {
 			$scope.waitForActions(afterVewLoaded);
 		});
+	}
+
+	$scope.$on("on:new", function (event) {
+		$scope.onNewHandler(event);
 	});
 	
 	$scope.$on("on:nav-click", function(event, tab) {
