@@ -160,6 +160,10 @@
 				return __super__.$apply.apply(this, arguments);
 			};
 
+			__custom__.$applyNow = function $applyNow() {
+				return __super__.$apply.apply(this, arguments);
+			};
+
 			angular.extend(__proto__, __custom__);
 			angular.extend($rootScope, __custom__);
 
