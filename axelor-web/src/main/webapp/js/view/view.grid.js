@@ -675,7 +675,7 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 				var tab = NavService.getSelected();
 				var type = tab.viewType || tab.type;
 				if (type !== 'grid') {
-					$scope.ajaxStop(function () {
+					$scope.waitForActions(function () {
 						$scope.filter({});
 					});
 				}
