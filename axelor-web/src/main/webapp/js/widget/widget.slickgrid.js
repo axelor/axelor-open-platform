@@ -1504,6 +1504,9 @@ Grid.prototype.addNewRow = function (args) {
 		lock.commitCurrentEdit();
 	}
 
+	args.row = Math.max(0, args.row);
+	args.cell = Math.max(0, args.cell);
+
 	var cell = self.findNextEditable(args.row, 0);
 
 	function addRow(defaults) {
@@ -1535,7 +1538,7 @@ Grid.prototype.addNewRow = function (args) {
 		});
 	}
 
-	if (args.item) {
+	if (args.item || grid.getDataLength() === 0) {
 		return focus();
 	}
 	var saved = self.saveChanges(args, function () {
