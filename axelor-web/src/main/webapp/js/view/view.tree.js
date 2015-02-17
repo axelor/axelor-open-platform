@@ -266,7 +266,7 @@ function Loader(scope, node, DataSource) {
 
 	this.load = function(item, callback) {
 
-		var context = {},
+		var context = _.extend({}, scope._context),
 			current = item && item.$record;
 		
 		var sortBy = _.find(node.fields, function(field) {
