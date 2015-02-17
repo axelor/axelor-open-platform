@@ -38,7 +38,10 @@ public class GridView extends AbstractView {
 
 	@XmlAttribute
 	private String groupBy;
-	
+
+	@XmlAttribute
+	private String onNew;
+
 	@XmlAttribute
 	private Boolean canNew;
 	
@@ -85,6 +88,14 @@ public class GridView extends AbstractView {
 
 	public void setGroupBy(String groupBy) {
 		this.groupBy = groupBy;
+	}
+
+	public String getOnNew() {
+		return onNew;
+	}
+
+	public void setOnNew(String onNew) {
+		this.onNew = onNew;
 	}
 
 	public Boolean getCanNew() {
