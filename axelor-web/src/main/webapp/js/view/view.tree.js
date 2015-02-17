@@ -378,7 +378,7 @@ function Loader(scope, node, DataSource) {
 			_.each(fields, function(field) {
 				var name = field.as || field.name;
 				item[name] = record[field.name];
-				item.$selection[name] = field.selection;
+				item.$selection[name] = field.selectionList;
 			});
 
 			return item;
