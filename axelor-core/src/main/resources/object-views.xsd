@@ -748,6 +748,11 @@
             <xsd:documentation>Whether to show edit icon.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="onNew" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Comma separate list of actions to execute on new event.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="canNew" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>Specify whether to show the 'New' button.</xsd:documentation>
