@@ -48,6 +48,28 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		return tab.name || "Unknown";
 	}
 
+	function openView(view, options) {
+		if (view && (view.type || view.viewType) == 'html') {
+			var first = _.first(view.views) || view;
+			view.views = [{
+				name: first.name,
+				resource: first.resource,
+				title: first.title,
+				type: 'html'
+			}];
+		}
+
+		var closable = options && options.__tab_closable;
+		if (closable == undefined && view.params) {
+			closable = view.params.closable;
+		}
+
+		tab = view;
+		tab.closable = closable;
+
+		openTab(tab, options);
+	}
+
 	function openTabByName(name, options) {
 
 		var tab = findTab(name);
@@ -56,33 +78,12 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		}
 
 		return MenuService.action(name).success(function(result){
-
 			if (!result.data) {
 				return;
 			}
-
 			var view = result.data[0].view;
-
-			if (view && (view.type || view.viewType) == 'html') {
-				var first = _.first(view.views) || view;
-				view.views = [{
-					name: first.name,
-					resource: first.resource,
-					title: first.title,
-					type: 'html'
-				}];
-			}
-
-			var closable = options && options.__tab_closable;
-			if (closable == undefined && view.params) {
-				closable = view.params.closable;
-			}
-
-			tab = view;
-			tab.action = name;
-			tab.closable = closable;
-
-			openTab(tab, options);
+			view.action = name;
+			return openView(view, options);
 		});
 	}
 	
@@ -275,6 +276,7 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 	return {
 		openTabByName: openTabByName,
 		openTab: openTab,
+		openView: openView,
 		canCloseTab: canCloseTab,
 		reloadTab: reloadTab,
 		closeTab: closeTab,
