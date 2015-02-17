@@ -154,15 +154,9 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	};
 	
 	$scope.onOK = function() {
-
 		if (!$scope.isValid())
 			return;
-
-		$scope.ajaxStop(function() {
-			setTimeout(function() {
-				onOK();
-			}, 100);
-		});
+		$scope.waitForActions(onOK);
 	};
 
 	$scope.onBeforeClose = function(event, ui) {
@@ -540,7 +534,7 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 
 				//XXX: ui-dialog issue
 				element.find('.slick-headerrow-column,.slickgrid').zIndex(element.zIndex());
-
+				element.find('.record-toolbar .btn').zIndex(element.zIndex()+1);
 			}, 100);
 		}
 		
