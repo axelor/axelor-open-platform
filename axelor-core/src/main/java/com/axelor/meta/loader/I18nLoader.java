@@ -44,6 +44,7 @@ import com.axelor.db.JPA;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.repo.MetaTranslationRepository;
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -113,7 +114,7 @@ public class I18nLoader extends AbstractLoader {
 		
 		language = matcher.group(1);
 
-		Reader reader = new InputStreamReader(stream);
+		Reader reader = new InputStreamReader(stream, Charsets.UTF_8);
 		CSVReader csvReader = new CSVReader(reader,
 				CSVParser.DEFAULT_SEPARATOR,
 				CSVParser.DEFAULT_QUOTE_CHARACTER, '\0');
