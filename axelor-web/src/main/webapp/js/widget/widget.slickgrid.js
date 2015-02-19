@@ -912,6 +912,11 @@ Grid.prototype._doInit = function(view) {
 		if (args) {
 			that.focusInvalidCell(args);
 		} else {
+			var item = that.editorScope.record;
+			if (item && item.id === 0) {
+				// new row was canceled
+				return;
+			}
 			axelor.dialogs.error(_t('There are some invalid rows.'));
 		}
 
