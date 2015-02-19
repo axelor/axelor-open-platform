@@ -580,6 +580,13 @@ angular.module('axelor.ui').directive('uiEditorPopup', function() {
 			element.scroll(function (e) {
 				$.event.trigger('adjustScroll');
 			});
+
+			var onNewHandler = scope.onNewHandler;
+			scope.onNewHandler = function (event) {
+				if (element.dialog('isOpen')) {
+					return onNewHandler.apply(scope, arguments);
+				}
+			};
 		},
 		replace: true,
 		template:
