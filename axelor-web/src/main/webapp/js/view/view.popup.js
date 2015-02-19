@@ -49,11 +49,14 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 
 	function doEdit(record) {
 		if (record && record.id > 0 && (!(record.version >= 0) || !record.$fetched)) {
-			$scope.doRead(record.id).success(function(record){
+			$scope.doRead(record.id).success(function(rec) {
 				if (recordVersion === -1) {
-					recordVersion = record.version;
+					recordVersion = rec.version;
 				}
-				originalEdit(record);
+				if (record.$dirty) {
+					rec = _.extend({}, rec, record);
+				}
+				originalEdit(rec);
 			});
 		} else {
 			if (recordVersion === -1 && record) {
