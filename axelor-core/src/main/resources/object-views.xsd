@@ -471,6 +471,11 @@
                   <xsd:documentation>Value stored in database.</xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
+              <xsd:attribute name="icon" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>Image icon to show for this item.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
               <xsd:anyAttribute processContents="skip" />
             </xsd:extension>
           </xsd:simpleContent>

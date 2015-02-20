@@ -330,6 +330,11 @@ ui.formInput('ImageSelect', 'Select', {
 		
 		var field = scope.field;
 		var formatItem = scope.formatItem;
+		var selectIcons = {};
+
+		_.each(field.selectionList, function (item) {
+			selectIcons[item.value] = item.icon || item.value;
+		});
 
 		scope.canShowText = function () {
 			return field.labels === undefined || field.labels;
@@ -342,8 +347,12 @@ ui.formInput('ImageSelect', 'Select', {
 			return "";
 		};
 		
+		scope.findImage = function (value) {
+			return selectIcons[value] || this.BLANK;
+		}
+
 		scope.$watch('getValue()', function (value, old) {
-			scope.image = value || this.BLANK;
+			scope.image = scope.findImage(value);
 			element.toggleClass('empty', !value);
 		}.bind(this));
 	},
@@ -351,9 +360,13 @@ ui.formInput('ImageSelect', 'Select', {
 	link_editable: function(scope, element, attrs) {
 		this._super(scope, element, attrs);
 		var input = this.findInput(element);
-		
+		var selects = {};
+		_.each(scope.field.selectionList, function (item) {
+			selects[item.value] = (item.data||{}).icon || item.value;
+		});
+
 		scope.renderSelectItem = function(ul, item) {
-			var a = $("<a>").append($("<img>").attr("src", item.value));
+			var a = $("<a>").append($("<img>").attr("src", scope.findImage(item.value)));
 			var el = $("<li>").addClass("image-select-item").append(a).appendTo(ul);
 			
 			if (scope.canShowText()) {

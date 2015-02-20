@@ -77,6 +77,9 @@ public class Selection {
 		@XmlValue
 		private String title;
 
+		@XmlAttribute
+		private String icon;
+
 		@JsonIgnore
 		@XmlAnyAttribute
 		private Map<QName, String> dataAttributes;
@@ -104,6 +107,14 @@ public class Selection {
 
 		public void setTitle(String title) {
 			this.title = title;
+		}
+
+		public String getIcon() {
+			return icon;
+		}
+
+		public void setIcon(String icon) {
+			this.icon = icon;
 		}
 
 		public Map<QName, String> getDataAttributes() {

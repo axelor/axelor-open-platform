@@ -281,6 +281,7 @@ public class ViewLoader extends AbstractLoader {
 			MetaSelectItem item = new MetaSelectItem();
 			item.setValue(opt.getValue());
 			item.setTitle(opt.getTitle());
+			item.setIcon(opt.getIcon());
 			item.setOrder(sequence++);
 			entity.addItem(item);
 			if (opt.getDataAttributes() == null) {

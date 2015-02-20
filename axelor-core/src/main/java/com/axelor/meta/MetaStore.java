@@ -176,6 +176,7 @@ public class MetaStore {
 		Selection.Option option = new Selection.Option();
 		option.setValue(item.getValue());
 		option.setTitle(item.getTitle());
+		option.setIcon(item.getIcon());
 		ObjectMapper objectMapper = Beans.get(ObjectMapper.class);
 		try {
 			option.setData(objectMapper.readValue(item.getData(), Map.class));
