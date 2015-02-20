@@ -148,7 +148,7 @@ public class ModelLoader extends AbstractLoader {
 			entity.setSuffix(element.getAttribute("suffix"));
 			
 			Integer padding = Ints.tryParse(element.getAttribute("padding"));
-			Integer increment = Ints.tryParse(element.getAttribute("padding"));
+			Integer increment = Ints.tryParse(element.getAttribute("increment"));
 			Long initial = Longs.tryParse(element.getAttribute("initial"));
 
 			if (padding != null) entity.setPadding(padding);
