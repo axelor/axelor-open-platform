@@ -231,7 +231,7 @@ public final class JPA {
 		Model entity = JPA.find(klass, bean.getId());
 		if (entity == null || !Objects.equal(version, entity.getVersion())) {
 			Exception cause = new StaleObjectStateException(klass.getName(), bean.getId());
-			throw new OptimisticLockException(cause);
+			throw new OptimisticLockException(cause.getMessage(), cause, bean);
 		}
 	}
 
