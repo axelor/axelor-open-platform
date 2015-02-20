@@ -365,6 +365,15 @@ public final class JPA {
 			edited.put(klass.getName(), id);
 		}
 		
+		// set sequence values
+		if (id == null) {
+			for (Property p : mapper.getSequenceFields()) {
+				if (values.get(p.getName()) == null) {
+					values.put(p.getName(), JpaSequence.nextValue(p.getSequenceName()));
+				}
+			}
+		}
+
 		for (String name : values.keySet()) {
 
 			Property p = mapper.getProperty(name);
@@ -373,11 +382,6 @@ public final class JPA {
 
 			Object value = values.get(name);
 			Class<Model> target = (Class<Model>) p.getTarget();
-
-			// set sequence value
-			if (p.isSequence() && bean.getId() == null && value == null) {
-				value = JpaSequence.nextValue(p.getSequenceName());
-			}
 
 			if (p.isCollection()) {
 

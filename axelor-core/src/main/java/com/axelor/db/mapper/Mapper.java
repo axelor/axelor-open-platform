@@ -26,11 +26,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import com.axelor.db.annotations.NameColumn;
+import com.axelor.db.annotations.Sequence;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -66,6 +69,8 @@ public class Mapper {
 	private Map<String, Class<?>> types = new HashMap<String, Class<?>>();
 	private Map<String, Property> fields = new HashMap<String, Property>();
 
+	private Set<Property> sequenceFields = new HashSet<Property>();
+
 	private Property nameField;
 
 	private Class<?> beanClass;
@@ -85,11 +90,14 @@ public class Mapper {
 				if (getter != null) {
 					getters.put(name, getter);
 					try {
-						fields.put(name, new Property(
-								beanClass, name, type,
+						Property property = new Property(beanClass, name, type,
 								getter.getGenericReturnType(),
-								getAnnotations(name, getter)));
-					}catch(Exception e){
+								getAnnotations(name, getter));
+						fields.put(name, property);
+						if (property.isSequence()) {
+							sequenceFields.add(property);
+						}
+					} catch(Exception e) {
 						continue;
 					}
 				}
@@ -206,6 +214,15 @@ public class Mapper {
 			}
 		}
 		return nameField = getProperty("name");
+	}
+
+	/**
+	 * Get all the {@link Sequence} fields.
+	 * 
+	 * @return copy of the original set of fields.
+	 */
+	public Property[] getSequenceFields() {
+		return sequenceFields.toArray(new Property[]{});
 	}
 
 	/**
