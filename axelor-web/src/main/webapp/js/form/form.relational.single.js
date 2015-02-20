@@ -539,6 +539,16 @@ ui.formInput('SuggestBox', 'ManyToOne', {
 
 	showSelectionOn: "click",
 
+	link_editable: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+		var field = scope.field;
+		if (field.canNew === undefined && field.create) {
+			field.canNew = true;
+		}
+		if (field.create === undefined && field.canNew) {
+			field.create = true;
+		}
+	},
 	template_editable:
 	'<span class="picker-input">'+
 		'<input type="text" autocomplete="off">'+
