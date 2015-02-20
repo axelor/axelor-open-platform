@@ -283,15 +283,15 @@ public class ViewLoader extends AbstractLoader {
 			item.setTitle(opt.getTitle());
 			item.setOrder(sequence++);
 			entity.addItem(item);
-			if (opt.getData() == null) {
+			if (opt.getDataAttributes() == null) {
 				continue;
 			}
 
 			Map<String, Object> data = Maps.newHashMap();
-			for (QName param : opt.getData().keySet()) {
+			for (QName param : opt.getDataAttributes().keySet()) {
 				String paramName = param.getLocalPart();
 				if (paramName.startsWith("data-")) {
-					data.put(paramName.substring(5), opt.getData().get(param));
+					data.put(paramName.substring(5), opt.getDataAttributes().get(param));
 				}
 			}
 			try {

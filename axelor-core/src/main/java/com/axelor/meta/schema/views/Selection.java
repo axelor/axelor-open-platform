@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlAnyAttribute;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.namespace.QName;
@@ -76,8 +77,12 @@ public class Selection {
 		@XmlValue
 		private String title;
 
+		@JsonIgnore
 		@XmlAnyAttribute
-		private Map<QName, String> data;
+		private Map<QName, String> dataAttributes;
+
+		@XmlTransient
+		private Map<String, Object> data;
 
 		public String getValue() {
 			return value;
@@ -101,13 +106,17 @@ public class Selection {
 			this.title = title;
 		}
 
-		public Map<QName, String> getData() {
+		public Map<QName, String> getDataAttributes() {
+			return dataAttributes;
+		}
+
+		@JsonGetter
+		public Map<String, Object> getData() {
 			return data;
 		}
-		
-		public void setData(Map<QName, String> data) {
+
+		public void setData(Map<String, Object> data) {
 			this.data = data;
 		}
 	}
-
 }
