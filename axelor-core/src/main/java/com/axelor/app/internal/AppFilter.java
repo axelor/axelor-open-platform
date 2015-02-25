@@ -51,6 +51,9 @@ public class AppFilter implements Filter {
 		if (user != null && user.getLanguage() != null) {
 			return new Locale(user.getLanguage());
 		}
+		if (LANGUAGE.get() == null) {
+			return Locale.getDefault();
+		}
 		return LANGUAGE.get();
 	}
 
