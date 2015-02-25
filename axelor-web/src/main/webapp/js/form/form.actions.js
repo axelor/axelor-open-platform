@@ -763,6 +763,48 @@ ActionHandler.prototype = {
 				setAttrs($(this), itemAttrs, i);
 			});
 		});
+
+		if (data.report) {
+			return openReport(data);
+		}
+
+		function openReport(data) {
+			var record = formScope.record || {};
+			if (data.attached) {
+				record.$attachments = (record.$attachments || 0) + 1;
+				axelor.dialogs.confirm(_t('Report attached to current object. Would you like to download?'),
+				function(confirmed) {
+					scope.applyLater(function() {
+						if (confirmed) {
+							var url = "ws/rest/com.axelor.meta.db.MetaFile/" + data.attached.id + "/content/download";
+							axelor.download(url);
+							return deferred.resolve();
+						}
+						deferred.reject();
+					});
+				}, {
+					title: _t('Download'),
+					yesNo: false
+				});
+				return deferred.promise;
+			}
+
+			var url = "ws/files/report/" + data.reportLink;
+			var tab = {
+				title: data.reportFile,
+				resource: url,
+				viewType: 'html'
+			}
+
+			if (['pdf', 'html'].indexOf(data.reportFormat) > -1) {
+				doOpenView(tab);
+			} else {
+				axelor.download(url);
+			}
+
+			scope.$timeout(deferred.resolve);
+			return deferred.promise;
+		}
 		
 		function openTab(scope, tab) {
 			if (scope.openTab) {

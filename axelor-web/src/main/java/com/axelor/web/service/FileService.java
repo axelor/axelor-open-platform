@@ -24,9 +24,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import com.axelor.common.FileUtils;
 import com.axelor.meta.schema.actions.ActionExport;
+import com.axelor.meta.schema.actions.ActionReport;
 import com.google.inject.servlet.RequestScoped;
 
 @RequestScoped
@@ -41,6 +43,29 @@ public class FileService extends AbstractService {
 			throw new IllegalArgumentException(new FileNotFoundException(name));
 		}
 		return javax.ws.rs.core.Response.ok(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)
+				.header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"")
+				.header("Content-Transfer-Encoding", "binary")
+				.build();
+	}
+
+	@GET
+	@Path("report/{name:.*}")
+	public javax.ws.rs.core.Response reportFile(@PathParam("name") final String name) {
+		final File file = FileUtils.getFile(ActionReport.getOutputPath(), name);
+		if (!file.isFile()) {
+			throw new IllegalArgumentException(new FileNotFoundException(name));
+		}
+
+		MediaType type = MediaType.APPLICATION_OCTET_STREAM_TYPE;
+		if (name.endsWith("pdf")) type = new MediaType("application", "pdf");
+		if (name.endsWith("html")) type = new MediaType("text", "html");
+
+		ResponseBuilder builder = javax.ws.rs.core.Response.ok(file, type);
+		if (type != MediaType.APPLICATION_OCTET_STREAM_TYPE) {
+			return builder.build();
+		}
+
+		return builder
 				.header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"")
 				.header("Content-Transfer-Encoding", "binary")
 				.build();

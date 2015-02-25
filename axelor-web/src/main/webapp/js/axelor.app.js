@@ -89,6 +89,20 @@
 		}
 	});
 
+	axelor.download = function (url, target) {
+
+		if (target == "_blank") {
+			return window.open(url);
+		}
+
+		var frame = $('<iframe>').appendTo('body');
+		frame.attr("src", url);
+		setTimeout(function(){
+			frame.attr("src", "");
+			frame.remove();
+		}, 100);
+	};
+
 	axelor.$eval = function (scope, expr, context) {
 		if (!scope || !expr) {
 			return null;

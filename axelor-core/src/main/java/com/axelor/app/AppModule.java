@@ -19,12 +19,14 @@ package com.axelor.app;
 
 import java.util.List;
 
+import org.eclipse.birt.report.engine.api.IReportEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.common.reflections.Reflections;
 import com.axelor.inject.Beans;
 import com.axelor.meta.loader.ModuleManager;
+import com.axelor.report.ReportEngineProvider;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
@@ -61,6 +63,9 @@ public class AppModule extends AbstractModule {
 
 		// initialize Beans helps
 		bind(Beans.class).asEagerSingleton();
+
+		// report engine
+		bind(IReportEngine.class).toProvider(ReportEngineProvider.class);
 
 		final List<Class<? extends AxelorModule>> all = findAll();
 		if (all.isEmpty()) {

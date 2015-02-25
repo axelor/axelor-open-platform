@@ -29,6 +29,7 @@
         <xsd:element name="action-export" type="tns:ActionExport" />
         <xsd:element name="action-group" type="tns:ActionGroup" />
         <xsd:element name="action-workflow" type="tns:ActionWorkflow" />
+        <xsd:element name="action-report" type="tns:ActionReport" />
       </xsd:choice>
     </xsd:complexType>
   </xsd:element>
@@ -2680,6 +2681,48 @@
   <xsd:complexType name="ActionWorkflow">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractModelAction"></xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="ActionReport">
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractAction">
+        <xsd:sequence>
+          <xsd:element name="param" type="tns:ActContext" minOccurs="0" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>Define a report parameter.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="design" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>Specify the report design name (rptdesign)</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="output" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>Specify the report output name</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="format">
+          <xsd:annotation>
+            <xsd:documentation>Specify the output format.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:enumeration value="pdf" />
+              <xsd:enumeration value="html" />
+              <xsd:enumeration value="doc" />
+              <xsd:enumeration value="xsl" />
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="attachment" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to attach the generatd report to current object</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
 
