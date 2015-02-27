@@ -896,6 +896,7 @@
         <xsd:attribute name="editable" type="xsd:boolean" />
         <xsd:attribute name="orderBy" type="xsd:string" />
         <xsd:attribute name="onNew" type="xsd:string" />
+        <xsd:attribute name="onChange" type="xsd:string"/>
         <xsd:attributeGroup ref="tns:RelationalAttributes" />
       </xsd:extension>
     </xsd:complexContent>
