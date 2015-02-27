@@ -72,13 +72,13 @@ webapp/js/view/view.popup.js:360"
 "Done","Choisir",,"webapp/js/form/form.input.datetime.js:67"
 "Download","Télécharger",,"webapp/js/view/view.popup.js:723"
 "Duplicate","Copier",,"webapp/js/view/view.form.js:719"
-"Edit","Editer",,"webapp/js/form/form.relational.multiple.js:575
+"Edit","Modifier",,"webapp/js/form/form.relational.multiple.js:575
 webapp/js/form/form.relational.single.js:180
 webapp/partials/views/form.html:10
 webapp/partials/views/form.html:9
 webapp/partials/views/grid.html:10
 webapp/partials/views/grid.html:9"
-"Edit event","Editer évènement",,"webapp/js/view/view.calendar.js:502"
+"Edit event","Modifier évènement",,"webapp/js/view/view.calendar.js:502"
 "Error","Erreur",,"webapp/js/axelor.app.js:370
 webapp/js/lib/dialogs.js:221
 webapp/js/lib/dialogs.js:41"
