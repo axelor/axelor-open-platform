@@ -70,9 +70,33 @@ var regional = {
 	firstDay: 		1
 };
 
-//configure datepicker
+// configure datepicker
 $.timepicker.setDefaults(regional);
 $.datepicker.setDefaults(regional);
+
+// configure moment.js
+moment.lang('en', {
+	months: regional.monthNames,
+	monthsShort: regional.monthNamesShort,
+	weekdays: regional.dayNames,
+	weekdaysShort: regional.dayNamesShort,
+	weekdaysMin: regional.dayNamesMin,
+	relativeTime : {
+        future : _t("in %s"),
+        past : _t("%s ago"),
+        s : _t("a few seconds"),
+        m : _t("a minute"),
+        mm : _t("%d minutes"),
+        h : _t("an hour"),
+        hh : _t("%d hours"),
+        d : _t("a day"),
+        dd : _t("%d days"),
+        M : _t("a month"),
+        MM : _t("%d months"),
+        y : _t("a year"),
+        yy : _t("%d years")
+    }
+});
 
 // configure ui.mask
 function createTwoDigitDefinition( maximum ) {
