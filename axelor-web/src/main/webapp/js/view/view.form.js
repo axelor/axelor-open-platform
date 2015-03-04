@@ -421,8 +421,11 @@ function FormViewCtrl($scope, $element) {
 		function compact(rec) {
 			var res = {
 				id: rec.id,
-				version: rec.version || rec.$version
+				version: rec.version
 			};
+			if (res.version === undefined) {
+				res.version = rec.$version;
+			}
 			_.each(rec, function(v, k) {
 				if (!v) return;
 				if (v.id) res[k] = compact(v);
