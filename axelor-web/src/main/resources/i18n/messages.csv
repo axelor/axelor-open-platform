@@ -67,7 +67,7 @@ webapp/partials/views/grid.html:17"
 webapp/js/view/view.grid.js:403
 webapp/js/view/view.popup.js:360"
 "Do you really want to delete the selected record?",,,"webapp/js/view/view.form.js:552"
-"Do you really want to update all {0} records?",,,"webapp/js/widget/widget.update.js:305"
+"Do you really want to update all {0} record(s)?",,,"webapp/js/widget/widget.update.js:305"
 "Domain",,,"webapp/js/form/form.input.static.js:162"
 "Done",,,"webapp/js/form/form.input.datetime.js:67"
 "Download",,,"webapp/js/view/view.popup.js:723"
