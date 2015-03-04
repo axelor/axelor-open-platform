@@ -67,7 +67,7 @@ webapp/partials/views/grid.html:17"
 webapp/js/view/view.grid.js:403
 webapp/js/view/view.popup.js:360"
 "Do you really want to delete the selected record?","Etes-vous sûr de vouloir supprimer l'enregistrement sélectionné ?",,"webapp/js/view/view.form.js:552"
-"Do you really want to update all {0} records?","Etes-vous sûr de vouloir mettre à jour ces {0} enregistrement(s) ?",,"webapp/js/widget/widget.update.js:305"
+"Do you really want to update all {0} record(s)?","Etes-vous sûr de vouloir mettre à jour ces {0} enregistrement(s) ?",,"webapp/js/widget/widget.update.js:305"
 "Domain","Domain",,"webapp/js/form/form.input.static.js:162"
 "Done","Choisir",,"webapp/js/form/form.input.datetime.js:67"
 "Download","Télécharger",,"webapp/js/view/view.popup.js:723"
