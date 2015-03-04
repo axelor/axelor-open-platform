@@ -148,7 +148,8 @@ public class MetaController {
 		}
 	}
 	
-	private static final String EXPORT_DIR = AppSettings.get().getPath("data.export.dir", "{java.io.tmpdir}");
+	private static final String DEFAULT_EXPORT_DIR = "{java.io.tmpdir}/axelor/data-export";
+	private static final String EXPORT_DIR = AppSettings.get().getPath("data.export.dir", DEFAULT_EXPORT_DIR);
 	
 	private void exportI18n(String module, URL file) throws IOException {
 
