@@ -576,6 +576,9 @@ function Chart(scope, element, data) {
 				var v = "" + d;
 				var f = config.xFormat;
 				if (v.indexOf(".") > -1) return "";
+				if (_.isString(d) && /\d+/.test(d)) {
+					d = parseInt(d);
+				}
 				if (_.isNumber(d)) {
 					return moment([2000, d - 1, 1]).format(f || "MMM");
 				}
