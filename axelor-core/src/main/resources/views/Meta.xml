@@ -140,7 +140,6 @@
       <field name="icon"/>
       <field name="action"/>
       <field name="module"/>
-      <field name="prompt" colSpan="12"/>
       <field name="priority"/>
       <panel itemSpan="4">
         <field name="top"/>

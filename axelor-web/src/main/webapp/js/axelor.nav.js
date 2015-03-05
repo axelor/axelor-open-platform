@@ -322,20 +322,8 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 			$("#offcanvas").removeClass("active");
 		}
 
-		function doOpen() {
-			$scope.openTabByName(record.action);
-			$scope.$apply();
-		}
-
-		if (record.prompt) {
-			axelor.dialogs.confirm(record.prompt, function(confirmed) {
-				if (confirmed) {
-					doOpen();
-				}
-			});
-		} else {
-			doOpen();
-		}
+		$scope.openTabByName(record.action);
+		$scope.$apply();
 	};
 
 	$scope.navClick = function(tab) {
