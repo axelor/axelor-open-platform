@@ -134,6 +134,14 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			isClosed = true;
 		};
 
+		var event = $scope.$broadcast('on:before-save', record);
+		if (event.defaultPrevented) {
+			if (event.error) {
+				axelor.dialogs.error(event.error);
+			}
+			return;
+ 		}
+
 		if ($scope.editorCanSave && $scope.isDirty()) {
 			if (record.id < 0)
 				record.id = null;
@@ -144,16 +152,9 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			});
 		}
 
-		var event = $scope.$broadcast('on:before-save', record);
-		if (event.defaultPrevented) {
-			if (event.error) {
-				axelor.dialogs.error(event.error);
-			}
- 		} else {
-			$scope.waitForActions(function() {
-				close(record);
-			});
-		}
+		$scope.waitForActions(function() {
+			close(record);
+		});
 	};
 	
 	$scope.onOK = function() {
