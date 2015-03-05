@@ -18,10 +18,12 @@
 package com.axelor.meta.loader;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,9 +33,17 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthService;
@@ -41,6 +51,8 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.common.ClassUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaModule;
@@ -314,8 +326,27 @@ public class ModuleManager {
 		return mod != null && mod.isInstalled();
 	}
 
-	private static Set<String> getInstalledModules() {
-		final Set<String> all = new HashSet<String>();
+	// get the jdbc connection configured
+	private static Connection getConnection() throws NamingException, SQLException {
+
+		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		final XPathFactory xpf = XPathFactory.newInstance();
+		final XPath xpath = xpf.newXPath();
+
+		String jndiName = null;
+
+		try (InputStream res = ClassUtils.getResourceStream("META-INF/persistence.xml")) {
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document document = db.parse(res);
+			jndiName = (String) xpath.evaluate("/persistence/persistence-unit[@name='persistenceUnit']/non-jta-data-source", document);
+		} catch (Exception e) {
+		}
+
+		if (!StringUtils.isBlank(jndiName)) {
+			DataSource ds = (DataSource) InitialContext.doLookup(jndiName);
+			return ds.getConnection();
+		}
+
 		final AppSettings settings = AppSettings.get();
 
 		final String jdbcDriver = settings.get("db.default.driver");
@@ -326,11 +357,16 @@ public class ModuleManager {
 		try {
 			Class.forName(jdbcDriver);
 		} catch (Exception e) {
-			return all;
+			throw Throwables.propagate(e);
 		}
 
+		return DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass);
+	}
+
+	private static Set<String> getInstalledModules() {
+		final Set<String> all = new HashSet<String>();
 		try(
-			final Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass);
+			final Connection connection = getConnection();
 			final Statement statement = connection.createStatement();
 			final ResultSet rs = statement.executeQuery("select name from meta_module where installed = true")) {
 			while (rs.next()) {
