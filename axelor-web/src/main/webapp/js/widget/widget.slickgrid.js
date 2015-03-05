@@ -2015,6 +2015,11 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 			var field = _fields[item.name] || item,
 				type = types[field.type];
 
+			// force text widget for html
+			if (item.widget && item.widget.toLowerCase() === 'html') {
+				item.widget = 'Text';
+			}
+
 			if (!type && !forEdit) {
 				return item.forEdit = false;
 			}
