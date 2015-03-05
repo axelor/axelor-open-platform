@@ -336,8 +336,7 @@ function BarChart(scope, element, data) {
 	var datum = PlotData(series, data);
 
 	var chart = nv.models.multiBarChart()
-		.reduceXTicks(false)
-		.color(d3.scale.category10().range());
+		.reduceXTicks(false);
 
 	chart.multibar.hideable(true);
 	chart.stacked(data.stacked);
@@ -354,8 +353,7 @@ function HBarChart(scope, element, data) {
 	var series = _.first(data.series);
 	var datum = PlotData(series, data);
 
-	var chart = nv.models.multiBarHorizontalChart()
-		.color(d3.scale.category10().range());
+	var chart = nv.models.multiBarHorizontalChart();
 
 	chart.stacked(data.stacked);
 
@@ -378,8 +376,7 @@ function LineChart(scope, element, data) {
 	var chart = nv.models.lineChart()
 		.showLegend(true)
 		.showYAxis(true)
-		.showXAxis(true)
-		.color(d3.scale.category10().range());
+		.showXAxis(true);
 
 	applyXY(chart, data);
 	
@@ -395,8 +392,7 @@ function AreaChart(scope, element, data) {
 	var series = _.first(data.series);
 	var datum = PlotData(series, data);
 
-	var chart = nv.models.stackedAreaChart()
-				  .color(d3.scale.category10().range());
+	var chart = nv.models.stackedAreaChart();
 
 	applyXY(chart, data);
 
