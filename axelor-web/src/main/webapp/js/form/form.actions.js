@@ -181,7 +181,9 @@ ActionHandler.prototype = {
 				promise = deferred.promise;
 			axelor.dialogs.confirm(prompt, function(confirmed){
 				if (confirmed) {
-					self.handle().then(deferred.resolve, deferred.reject);
+					self._fireBeforeSave().then(function() {
+						self.handle().then(deferred.resolve, deferred.reject);
+					});
 				} else {
 					self.scope.$timeout(deferred.reject);
 				}
