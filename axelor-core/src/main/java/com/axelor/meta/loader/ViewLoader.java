@@ -387,7 +387,6 @@ public class ViewLoader extends AbstractLoader {
 		menu.setTitle(menuItem.getTitle());
 		menu.setIcon(menuItem.getIcon());
 		menu.setModule(module.getName());
-		menu.setPrompt(menuItem.getPrompt());
 		menu.setTop(menuItem.getTop());
 		menu.setLeft(menuItem.getLeft() == null ? true : menuItem.getLeft());
 		menu.setMobile(menuItem.getMobile());
