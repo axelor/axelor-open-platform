@@ -114,7 +114,8 @@ module.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, 
 
 			if (item.action) {
 				handler = ActionService.handler(ctrl.handler, element, {
-					action: item.action
+					action: item.action,
+					prompt: item.prompt
 				});
 			}
 

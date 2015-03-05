@@ -167,7 +167,13 @@ public class MenuItem extends AbstractWidget {
 	public void setAction(String action) {
 		this.action = action;
 	}
+	
+	@JsonGetter("prompt")
+	public String getLocalizedPrompt() {
+		return I18n.get(prompt);
+	}
 
+	@JsonIgnore
 	public String getPrompt() {
 		return prompt;
 	}
