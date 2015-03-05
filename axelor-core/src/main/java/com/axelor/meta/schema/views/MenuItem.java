@@ -45,6 +45,9 @@ public class MenuItem extends AbstractWidget {
 	private String action;
 
 	@XmlAttribute
+	private String prompt;
+
+	@XmlAttribute
 	private Integer priority;
 
 	@XmlAttribute
@@ -163,6 +166,14 @@ public class MenuItem extends AbstractWidget {
 
 	public void setAction(String action) {
 		this.action = action;
+	}
+
+	public String getPrompt() {
+		return prompt;
+	}
+
+	public void setPrompt(String prompt) {
+		this.prompt = prompt;
 	}
 
 	public Boolean getIsFolder() {
