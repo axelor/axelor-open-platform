@@ -34,6 +34,7 @@ import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Query;
 import com.axelor.inject.Beans;
+import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.db.repo.MetaSelectItemRepository;
 import com.axelor.meta.loader.ModuleManager;
@@ -138,9 +139,19 @@ public class MetaStore {
 		if (StringUtils.isBlank(selection)) {
 			return null;
 		}
+
+		final MetaSelect select = Query.of(MetaSelect.class)
+				.filter("self.name = ?", selection)
+				.order("-priority")
+				.fetchOne();
+
+		if (select == null) {
+			return null;
+		}
+
 		final List<MetaSelectItem> items = Query
 				.of(MetaSelectItem.class)
-				.filter("self.select.name = ?", selection)
+				.filter("self.select.id = ?", select.getId())
 				.order("order")
 				.fetch();
 
