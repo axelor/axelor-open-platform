@@ -75,6 +75,7 @@ var Editor = function(args) {
 	var element;
 	var column = args.column;
 	var scope;
+	var external;
 
 	var form = $(args.container)
 		.parents('[ui-slick-grid]:first')
@@ -88,10 +89,17 @@ var Editor = function(args) {
 	element.data('$parent', element.parent());
 	element.data('$editorForm', form);
 
+	external = element.is('.text-item');
+
 	this.init = function() {
 
+		var container = $(args.container);
+		if (external) {
+			container = container.parents('.view-container:first');
+		}
+
 		element.css('display', 'inline-block')
-			.appendTo(args.container);
+			.appendTo(container);
 
 		if (element.data('keydown.nav') == null) {
 			element.data('keydown.nav', true);
@@ -106,6 +114,11 @@ var Editor = function(args) {
 				case 40: // DOWN
 					if ($(e.target).is('textarea')) {
 						e.stopImmediatePropagation();
+					}
+				case 9: // TAB
+					if (external) {
+						args.grid.onKeyDown.notify(args.grid.getActiveCell(), e);
+						return false;
 					}
 				}
 			});
@@ -138,6 +151,25 @@ var Editor = function(args) {
 		if (zIndex) {
 			element.parent().zIndex(zIndex);
 		}
+		if (external) {
+			setTimeout(adjustExternal);
+		}
+	}
+
+	function adjustExternal() {
+
+		element.css('position', 'absolute');
+		element.position({
+			my: 'left top',
+			at: 'left top',
+			of: args.container
+		});
+		var container = $(args.container);
+		element.css({
+			border: 0,
+			width: container.width(),
+			zIndex: container.zIndex() + 1
+		});
 	};
 	
 	function focus() {
