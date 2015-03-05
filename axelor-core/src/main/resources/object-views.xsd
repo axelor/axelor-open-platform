@@ -158,6 +158,13 @@
         <xsd:documentation>Comma separate list of actions to execute on click event.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="prompt" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Show a confirmation message before performing client action.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="showIf" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>Show if the given JavaScript expression is true.</xsd:documentation>
