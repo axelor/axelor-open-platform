@@ -174,7 +174,7 @@ ui.formInput('Image', 'ImageLink', {
 
 			var reader = new FileReader();
 			reader.onload = function(e) {
-				doUpdate(e.target.result, file.name);
+				update(e.target.result, file.name);
 			};
 
 			reader.readAsDataURL(file);
