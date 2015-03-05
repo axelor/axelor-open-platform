@@ -95,6 +95,7 @@ public class MetaService {
 			item.setPriority(menu.getPriority());
 			item.setTitle(menu.getTitle());
 			item.setIcon(menu.getIcon());
+			item.setPrompt(menu.getPrompt());
 			item.setTop(menu.getTop());
 			item.setLeft(menu.getLeft());
 			item.setMobile(menu.getMobile());

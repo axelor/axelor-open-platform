@@ -314,13 +314,28 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 	};
 
 	$scope.menuClick = function(event, record) {
+
 		if (record.isFolder)
 			return;
+
 		if (axelor.device.small) {
 			$("#offcanvas").removeClass("active");
 		}
-		$scope.openTabByName(record.action);
-		$scope.$apply();
+
+		function doOpen() {
+			$scope.openTabByName(record.action);
+			$scope.$apply();
+		}
+
+		if (record.prompt) {
+			axelor.dialogs.confirm(record.prompt, function(confirmed) {
+				if (confirmed) {
+					doOpen();
+				}
+			});
+		} else {
+			doOpen();
+		}
 	};
 
 	$scope.navClick = function(tab) {
