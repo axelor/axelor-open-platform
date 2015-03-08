@@ -546,6 +546,12 @@ ui.formInput('MultiSelect', 'Select', {
 			}
 			return input.val('');
 		};
+
+		scope.$watch('items.length', function (value, old) {
+			setTimeout(function () {
+				scaleInput(50);
+			});
+		});
 	},
 	template_editable:
 	'<div class="tag-select picker-input">'+
