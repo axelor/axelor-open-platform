@@ -101,6 +101,11 @@ function makePopover(scope, element, callback, placement) {
 				popoverElem = element;
 				popoverElem.popover('show');
 			}
+			var tip = element.data('popover').$tip;
+			if (tip) {
+				tip.attr('tabIndex', 0);
+				tip.css('outline', 'none');
+			}
 		}, 1000);
 	}
 	
