@@ -655,6 +655,13 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 			return _.pluck(this.getSelection(), "value");
 		};
 		
+		var _select = scope.select;
+		scope.select = function (value) {
+			var res = _select.apply(scope, arguments);
+			scope.itemsPending = [];
+			return res;
+		};
+
 		scope.handleClick = function(e, item) {
 			if (scope.field['tag-edit'] && scope.onTagEdit && !scope.isReadonly()) {
 				return scope.onTagEdit(e, item);
