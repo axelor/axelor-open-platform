@@ -215,7 +215,8 @@ ui.directive('uiHelpPopover', function() {
 
 		var value = scope.$eval('$$original.' + field.name);
 		if (value && /-one$/.test(field.serverType)) {
-			value = value[field.targetName] || value.id;
+			value = _.compact([value.id, value[field.targetName]]).join(',');
+			value = '(' + value + ')';
 		}
 		if (value && field.type === "password") {
 			value = _.str.repeat('*', value.length);
