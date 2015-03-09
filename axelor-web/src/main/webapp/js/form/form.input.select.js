@@ -19,6 +19,30 @@
 
 var ui = angular.module('axelor.ui');
 
+function acceptNumber(value) {
+	if (value === null || value === undefined) {
+		return value;
+	}
+	if (_.isNumber(value)) {
+		return +value;
+	}
+	return value;
+}
+
+function parseNumber(field, value) {
+	if (value === null || value === undefined) {
+		return value;
+	}
+	if (!field || ['integer', 'long'].indexOf(field.serverType) === -1) {
+		return value;
+	}
+	var num = +value;
+	if (num === NaN) {
+		return value;
+	}
+	return num;
+}
+
 ui.formWidget('BaseSelect', {
 	
 	showSelectionOn: "click",
@@ -189,22 +213,17 @@ function filterSelection(scope, field, selection, current) {
 		expr = '[' + expr + ']';
 	}
 
-	function conv(v) {
-		if (v === null || v === undefined) return v;
-		return '' + v;
-	}
-	
 	var list = axelor.$eval(scope, expr, context);
-	var value = conv(current);
+	var value = acceptNumber(current);
 	
 	if (_.isEmpty(list)) {
 		return selection;
 	}
 	
-	list = _.map(list, conv);
+	list = _.map(list, acceptNumber);
 	
 	return _.filter(selection, function (item) {
-		var val = conv(item.value);
+		var val = acceptNumber(item.value);
 		return val === value || list.indexOf(val) > -1;
 	});
 }
@@ -290,7 +309,8 @@ ui.formInput('Select', 'BaseSelect', {
 		var input = this.findInput(element);
 		
 		function update(value) {
-			scope.setValue(value, true);
+			var val = parseNumber(scope.field, value);
+			scope.setValue(val, true);
 			scope.applyLater();
 		}
 
@@ -477,7 +497,8 @@ ui.formInput('MultiSelect', 'Select', {
 		}
 
 		function update(value) {
-			scope.setValue(value, true);
+			var val = parseNumber(scope.field, value);
+			scope.setValue(val, true);
 			scope.applyLater();
 			setTimeout(function () {
 				scaleInput(50);
@@ -630,7 +651,8 @@ ui.formInput('RadioSelect', {
 		};
 
 		element.on("change", ":input", function(e) {
-			scope.setValue($(e.target).val(), true);
+			var val = parseNumber(scope.field, $(e.target).val());
+			scope.setValue(val, true);
 			scope.$apply();
 		});
 		
@@ -671,7 +693,8 @@ ui.formInput('NavSelect', {
 			if (scope.attr('readonly')) {
 				return;
 			}
-			this.setValue(select.value, true);
+			var val = parseNumber(scope.field, select.value);
+			this.setValue(val, true);
 			
 			elemNavs.removeClass('open');
 			elemMenu.removeClass('open');
