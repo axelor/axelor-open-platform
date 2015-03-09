@@ -279,7 +279,7 @@ ui.formInput('ManyToOne', 'Select', {
 			this.fetchSelection(request, function(items, page) {
 				var term = request.term;
 				
-				if (scope.canSelect() && (!page || page.total > items.length)) {
+				if (scope.canSelect()) {
 					items.push({
 						label: _t("Search..."),
 						click: function() { scope.showSelector(); }
@@ -297,7 +297,7 @@ ui.formInput('ManyToOne', 'Select', {
 					});
 				}
 				
-				if (field.create && !term && scope.canNew()) {
+				if ((field.create === undefined || (field.create && !term)) && scope.canNew()) {
 					items.push({
 						label: _t("Create..."),
 						click: function() { scope.showPopupEditor(); }
@@ -539,16 +539,6 @@ ui.formInput('SuggestBox', 'ManyToOne', {
 
 	showSelectionOn: "click",
 
-	link_editable: function(scope, element, attrs, model) {
-		this._super.apply(this, arguments);
-		var field = scope.field;
-		if (field.canNew === undefined && field.create) {
-			field.canNew = true;
-		}
-		if (field.create === undefined && field.canNew) {
-			field.create = true;
-		}
-	},
 	template_editable:
 	'<span class="picker-input">'+
 		'<input type="text" autocomplete="off">'+
