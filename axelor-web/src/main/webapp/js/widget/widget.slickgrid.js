@@ -1446,7 +1446,13 @@ Grid.prototype.__saveChanges = function(args, callback) {
 		return setTimeout(focus, 200);
 	}
 
-	return ds.saveAll(records).success(function(records, page) {
+	// prevent cache
+	var saveDS = ds._new(ds._model, {
+		domain: ds._domain,
+		context: ds._context
+	});
+
+	return saveDS.saveAll(records).success(function(records, page) {
 		if (data.getItemById(0)) {
 			data.deleteItem(0);
 		}
