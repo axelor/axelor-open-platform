@@ -693,6 +693,7 @@ ui.formInput('NavSelect', {
 		});
 
 		var lastWidth = 0;
+		var lastValue = null;
 		var menuWidth = 120; // max-width
 		var elemNavs = null;
 		var elemMenu = null;
@@ -726,11 +727,13 @@ ui.formInput('NavSelect', {
 			if (elemNavs === null) {
 				return;
 			}
+			var currentValue = scope.getValue();
 			var parentWidth = element.width() - menuWidth;
-			if (parentWidth === lastWidth) {
+			if (parentWidth === lastWidth && currentValue === lastValue) {
 				return;
 			}
 			lastWidth = parentWidth;
+			lastValue = currentValue;
 
 			elemNavs.parent().css('visibility', 'hidden');
 			elemNavs.hide();
