@@ -2,10 +2,16 @@
 <csv-inputs xmlns="http://axelor.com/xml/ns/data-import" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://axelor.com/xml/ns/data-import http://axelor.com/xml/ns/data-import/data-import_3.0.xsd">
 
-  <input file="groups.csv" type="com.axelor.auth.db.Group" search="self.code = :code" />
+  <input file="groups.csv" type="com.axelor.auth.db.Group" search="self.code = :code">
+  	<bind column="code" to="code" if-empty="true"/>
+  	<bind column="name" to="name" if-empty="true"/>
+  </input>
 
   <input file="users.csv" type="com.axelor.auth.db.User" search="self.code = :code" call="com.axelor.auth.AuthService:encrypt">
-    <bind column="group" to="group" search="self.code = :group" />
+  	<bind column="code" to="code" if-empty="true"/>
+  	<bind column="name" to="name" if-empty="true"/>
+  	<bind column="password" to="password" if-empty="true"/>
+    <bind column="group" to="group" search="self.code = :group" if-empty="true"/>
   </input>
 
 </csv-inputs>
