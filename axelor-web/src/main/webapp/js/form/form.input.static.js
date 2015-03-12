@@ -426,6 +426,9 @@ ui.formItem('Button', {
 		
 		scope.$watch('attr("title")', function(title, old) {
 			if (!title || title === old) return;
+			if (element.is('button')) {
+				return element.html(title);
+			}
 			element.children('.btn-text').html(title);
 		});
 	},
