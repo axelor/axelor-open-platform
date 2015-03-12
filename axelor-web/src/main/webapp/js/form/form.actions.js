@@ -71,6 +71,10 @@ function updateValues(source, target, itemScope, formScope) {
 		}
 		return target[key] = value;
 	});
+
+	if (target) {
+		target.$dirty = true;
+	}
 }
 
 function handleError(scope, item, message) {
