@@ -241,7 +241,7 @@ webapp/partials/system.html:4"
 "Unknown","Inconnue",,"webapp/js/view/view.calendar.js:144
 webapp/js/view/view.calendar.js:204"
 "Update","Mettre à jour",,"webapp/js/widget/widget.update.js:431"
-"Update all","Mettre tous à jour",,"webapp/js/widget/widget.update.js:434"
+"Update all","Tout mettre à jour",,"webapp/js/widget/widget.update.js:434"
 "Updated By:","Mise à jour par:",,"webapp/js/view/view.form.js:693"
 "Updated On:","Mise à jour le:",,"webapp/js/view/view.form.js:689"
 "Upload",,,"webapp/js/view/view.popup.js:726"
