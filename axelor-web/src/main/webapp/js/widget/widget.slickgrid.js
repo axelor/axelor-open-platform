@@ -107,11 +107,11 @@ var Editor = function(args) {
 				switch (e.keyCode) {
 				case 37: // LEFT
 				case 39: // RIGHT
+				case 38: // UP
+				case 40: // DOWN
 					e.stopImmediatePropagation();
 					break;
 				case 13: // ENTER
-				case 38: // UP
-				case 40: // DOWN
 					if ($(e.target).is('textarea')) {
 						e.stopImmediatePropagation();
 					}
@@ -136,8 +136,17 @@ var Editor = function(args) {
 			element.hide();
 		this.focus();
 	};
+
+	this.shouldWait = function () {
+		var es = element.scope();
+		if (es.field && es.field.onChange) {
+			return true;
+		}
+		return false;
+	}
 	
 	this.destroy = function() {
+		scope.$lastEditor = this;
 		element.appendTo(element.data('$parent') || form)
 			   .removeData('$parent')
 			   .removeData('$editorForm');
@@ -194,7 +203,14 @@ var Editor = function(args) {
 			current[column.field] = (scope.record||{})[column.field] || null;
 		}
 
-		if (record.id !== current.id || record.version !== current.version) {
+		var changed = record.id !== current.id;
+		if (record.version !== undefined) {
+			changed = record.version !== current.version;
+		} else if (record.$version !== undefined) {
+			changed = record.$version !== current.$version;
+		}
+
+		if (changed) {
 			scope.editRecord(current);
 		} else {
 			record[column.field] = current[column.field];
@@ -1777,13 +1793,19 @@ Grid.prototype.onButtonClick = function(event, args) {
 };
 
 Grid.prototype.onItemClick = function(event, args) {
-	if (this.grid.getEditorLock().isActive()) {
-		this.grid.getEditorLock().commitCurrentEdit();
+
+	var lock = this.grid.getEditorLock();
+	if (lock.isActive()) {
+		lock.commitCurrentEdit();
+		if (this.editorScope &&
+			this.editorScope.$lastEditor &&
+			this.editorScope.$lastEditor.shouldWait()) {
+			return 200;
+		}
 	}
 	// prevent edit if some action is still in progress
 	if (this.isDirty() && axelor.blockUI()) {
-		event.stopImmediatePropagation();
-		return false;
+		return 100;
 	}
 
 	var source = $(event.target);

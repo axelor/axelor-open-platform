@@ -156,7 +156,10 @@ ActionHandler.prototype = {
 	},
 	
 	onSave: function() {
-		return this.handle();
+		var self = this;
+		return this._fireBeforeSave().then(function() {
+			return self.handle();
+		});
 	},
 
 	onTabSelect: function(unblocked) {
@@ -575,9 +578,15 @@ ActionHandler.prototype = {
 		function findItems(name) {
 
 			var items;
-			var containers = formElement.parents('.form-view:first')
+			var containers;
+
+			if (formElement.parent().is('[ui-slick-editors]')) {
+				containers = formElement.parent().parent().add(formElement);
+			} else {
+				containers = formElement.parents('.form-view:first')
 										.find('.record-toolbar:first')
 										.add(formElement);
+			}
 
 			// first search by nested x-path
 			if (scope.formPath) {

@@ -479,22 +479,29 @@ function FormViewCtrl($scope, $element) {
 	$scope.onSave = function(options) {
 		
 		var defer = $scope._defer();
-		var event = $scope.$broadcast('on:before-save', $scope.record);
 		var saveAction = $scope.$events.onSave;
 		var fireOnLoad = true;
 		
+		function fireBeforeSave() {
+			var event = $scope.$broadcast('on:before-save', $scope.record);
+			if (event.defaultPrevented) {
+				if (event.error) {
+					axelor.dialogs.error(event.error);
+				}
+				setTimeout(function() {
+					defer.reject(event.error);
+				});
+				return false;
+			}
+			return true;
+		}
+
 		if (options && options.callOnSave === false) {
 			saveAction = null;
 			fireOnLoad = false;
 		}
 
-		if (event.defaultPrevented) {
-			if (event.error) {
-				axelor.dialogs.error(event.error);
-			}
-			setTimeout(function() {
-				defer.reject(event.error);
-			});
+		if (fireBeforeSave() === false) {
 			return defer.promise;
 		}
 
@@ -524,7 +531,10 @@ function FormViewCtrl($scope, $element) {
 			if (saveAction) {
 				return saveAction().then(doSave);
 			}
-			$scope.waitForActions(doSave);
+			// repeat on:before-save to ensure if any o2m/m2m is updated gets applied
+			if (fireBeforeSave()) {
+				$scope.waitForActions(doSave);
+			}
 		});
 		return defer.promise;
 	};
