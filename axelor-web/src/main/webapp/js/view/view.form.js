@@ -91,6 +91,8 @@ function FormViewCtrl($scope, $element) {
 			context._showRecord = undefined;
 		}
 
+		$scope.$broadcast("on:form-show");
+
 		if (recordId) {
 			routeId = recordId;
 			return viewPromise.then(function(){
@@ -1042,6 +1044,12 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 
 		element.scroll(function (e) {
 			$.event.trigger('adjustScroll');
+		});
+
+		scope.$on("on:form-show", function () {
+			setTimeout(function () {
+				element.scrollTop(0);
+			});
 		});
 
 		var unwatch = scope.$watch('schema.loaded', function(viewLoaded){
