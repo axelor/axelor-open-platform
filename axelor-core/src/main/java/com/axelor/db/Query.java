@@ -505,7 +505,7 @@ public class Query<T extends Model> {
 					}
 				}
 			}
-			StringBuilder sb = new StringBuilder("SELECT")
+			StringBuilder sb = new StringBuilder("SELECT DISTINCT")
 				.append(" new List(" + Joiner.on(", ").join(selects) + ")")
 				.append(" FROM ")
 				.append(beanClass.getSimpleName())
