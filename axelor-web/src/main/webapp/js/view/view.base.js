@@ -31,6 +31,10 @@ function ViewCtrl($scope, DataSource, ViewService) {
 	$scope._views = ViewService.accept(params);
 	$scope._viewType = params.viewType;
 
+	if ($scope.$parent && $scope.$parent._model) {
+		$scope._parentModel = $scope.$parent._model;
+	}
+
 	$scope._model = params.model;
 	$scope._fields = {};
 

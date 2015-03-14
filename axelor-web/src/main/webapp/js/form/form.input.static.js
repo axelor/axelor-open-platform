@@ -199,7 +199,7 @@ ui.directive('uiHelpPopover', function() {
 		
 		var model = scope._model;
 		if (model === field.target) {
-			model = scope.$parent._model;
+			model = scope._parentModel || scope.$parent._model;
 		}
 
 		addRow(_t('Object'), model);
