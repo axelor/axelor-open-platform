@@ -159,7 +159,10 @@ ui.formInput('Image', 'ImageLink', {
 		input.change(function(e, ui) {
 			var file = input.get(0).files[0];
 			var uploadSize = scope.$eval('app.fileUploadSize');
-			
+
+			// reset file selection
+			input.get(0).value = null;
+
 			if (!file) {
 				return;
 			}
@@ -279,6 +282,10 @@ ui.formInput('Binary', {
 		input.change(function(e) {
 			var file = input.get(0).files[0];
 			var record = scope.record;
+
+			// reset file selection
+			input.get(0).value = null;
+
 			if (file) {
 				record.$upload = {
 					field: field.name,
