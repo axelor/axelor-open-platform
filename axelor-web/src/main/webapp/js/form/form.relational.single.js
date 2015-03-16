@@ -147,8 +147,23 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 	};
 	
 	var icons = null;
+	var actions = {
+		'new': 'canNew',
+		'create': 'canNew',
+		'edit': 'canEdit',
+		'select': 'canSelect',
+		'remove': 'canRemove',
+		'clear': 'canRemove'
+	};
+
 	$scope.canShowIcon = function (which) {
 		var names;
+		var field = $scope.field || {};
+		var prop = actions[which];
+		if (prop !== undefined && field[prop] === false) {
+			return false;
+		}
+
 		if (icons === null) {
 			icons = {};
 			names = $scope.field.showIcons || $scope.$parent.field.showIcons;
