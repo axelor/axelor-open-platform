@@ -1416,7 +1416,7 @@ Grid.prototype.__saveChanges = function(args, callback) {
 	var grid = this.grid,
 		lock = grid.getEditorLock();
 
-	if ((lock.isActive() && !lock.commitCurrentEdit()) || !this.editorScope.isValid()) {
+	if ((lock.isActive() && !lock.commitCurrentEdit()) || (this.editorScope && !this.editorScope.isValid())) {
 		return false;
 	}
 
