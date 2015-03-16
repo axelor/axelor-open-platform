@@ -109,9 +109,7 @@ public class AppServletModule extends JerseyServletModule {
 		install(new SchedulerModule());
 
 		// no-cache filter
-		if (!settings.isProduction()) {
-			filter("*").through(NoCacheFilter.class);
-		}
+		filter("/js/*", NoCacheFilter.STATIC_URL_PATTERNS).through(NoCacheFilter.class);
 
 		// intercept all response methods
 		bindInterceptor(Matchers.any(),
