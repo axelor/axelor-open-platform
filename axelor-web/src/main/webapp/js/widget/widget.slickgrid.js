@@ -940,12 +940,34 @@ Grid.prototype._doInit = function(view) {
 		if (lock.isActive()) {
 			lock.commitCurrentEdit();
 		}
+
+		function showErrorNotice() {
+
+			var args = that.grid.getActiveCell() || {};
+			var col = that.getColumn(args.cell);
+
+			if (!col || !col.xpath) {
+				return;
+			}
+
+			var name = col.name;
+			if (that.handler.field &&
+				that.handler.field.title) {
+				name = that.handler.field.title + "[" + args.row +"] / " + name;
+			}
+
+			var items = "<ul><li>" + name + "</li></ul>";
+			axelor.notify.error(items, {
+				title: _t("The following fields are invalid:")
+			});
+		}
 		
 		var empty = that.element.find('.slick-cell-required:empty').get(0);
 		if (empty) {
 			that.grid.setActiveNode(empty);
 			that.grid.editActiveCell();
 			e.preventDefault();
+			showErrorNotice();
 			return false;
 		}
 
@@ -959,6 +981,7 @@ Grid.prototype._doInit = function(view) {
 		var args = that.grid.getActiveCell();
 		if (args) {
 			that.focusInvalidCell(args);
+			showErrorNotice();
 		} else {
 			var item = that.editorScope.record;
 			if (item && item.id === 0) {
