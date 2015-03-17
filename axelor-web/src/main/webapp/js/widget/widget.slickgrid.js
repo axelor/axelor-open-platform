@@ -1769,14 +1769,26 @@ Grid.prototype.onButtonClick = function(event, args) {
 	var data = this.scope.dataView;
 	var cols = this.getColumn(args.cell);
 	var field = (cols || {}).descriptor || {};
-	
+
+	// set selection
+	grid.setSelectedRows([args.row]);
+	grid.setActiveCell(args.row, args.cell);
+
 	if (field.handler) {
 		
 		var handlerScope = this.scope.handler;
 		var model = handlerScope._model;
 		var record = data.getItem(args.row) || {};
-		
-		field.handler.scope.record = record;
+
+		// defer record access so that any pending changes are applied
+		Object.defineProperty(field.handler.scope, 'record', {
+			enumerable: true,
+			configurable: true,
+			get: function () {
+				return data.getItem(args.row) || {};
+			}
+		});
+
 		if(field.prompt) {
 			field.handler.prompt = field.prompt;
 		}
@@ -1786,6 +1798,7 @@ Grid.prototype.onButtonClick = function(event, args) {
 			}, record);
 		};
 		field.handler.onClick().then(function(res){
+			delete field.handler.scope.record;
 			grid.invalidateRows([args.row]);
 			grid.render();
 		});
