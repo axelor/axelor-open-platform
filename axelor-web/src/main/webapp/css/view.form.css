@@ -478,6 +478,10 @@ td.form-item > * {
 	padding-top: 8px; 
 }
 
+.form-item .not-readonly {
+	background: inherit !important;
+}
+
 .ng-invalid > input,
 .ng-invalid > textarea,
 .ng-invalid > .picker-input input,

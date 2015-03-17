@@ -638,6 +638,14 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="canSuggest" type="xsd:boolean" default="true">
+      <xsd:annotation>
+        <xsd:documentation>
+        If this is relational field, specify whether to show auto suggestions
+        (default is true).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="canSelect" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>
