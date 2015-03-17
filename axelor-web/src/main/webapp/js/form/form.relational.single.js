@@ -183,9 +183,21 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 	};
 }
 
+ui.directive('uiCanSuggest', function () {
+
+	return function (scope, element, attrs) {
+		var field = scope.field || {};
+		if (field.canSuggest !== false) {
+			return;
+		}
+		element.attr("readonly", "readonly");
+		element.addClass("not-readonly");
+	};
+});
+
 var m2oTemplateEditable = '' +
 '<div class="picker-input picker-icons-3 tag-select-single">'+
-'<input type="text" autocomplete="off">'+
+'<input type="text" autocomplete="off" ui-can-suggest>'+
 '<span class="tag-item label label-info" ng-if="canShowTag" ng-show="text">'+
 	'<span class="tag-link tag-text" ng-click="onTagSelect($event)">{{text}}</span> '+
 	'<i class="fa fa-times fa-small" ng-click="onTagRemove($event)"></i>'+
@@ -556,7 +568,7 @@ ui.formInput('SuggestBox', 'ManyToOne', {
 
 	template_editable:
 	'<span class="picker-input">'+
-		'<input type="text" autocomplete="off">'+
+		'<input type="text" autocomplete="off" ui-can-suggest>'+
 		'<span class="picker-icons">'+
 			'<i class="fa fa-caret-down" ng-click="showSelection()"></i>'+
 		'</span>'+
