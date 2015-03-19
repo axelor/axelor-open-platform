@@ -1043,20 +1043,11 @@ table.field-details .help-text hr {
 }
 
 .button-item.img-button {
-	
 	background: #fff !important;
 	width: auto !important;
 	border: none  !important;
 	padding: 2px !important;
 	height: inherit !important;
-}
-
-.button-item.img-button:hover img {
-	padding: 1px;
-	
-	-webkit-transform: scale(1.2, 1.2);
-	   -moz-transform: scale(1.2, 1.2);
-	        transform: scale(1.5, 1.5);
 }
 
 .button-item.img-button img {
