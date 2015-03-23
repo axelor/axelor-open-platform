@@ -1624,7 +1624,9 @@ Grid.prototype.addNewRow = function (args) {
 
 		self.editorScope.doOnNew();
 		self.scope.waitForActions(function () {
-			addRow(self.editorScope.record);
+			self.scope.waitForActions(function () {
+				addRow(self.editorScope.record);
+			});
 		});
 	}
 
