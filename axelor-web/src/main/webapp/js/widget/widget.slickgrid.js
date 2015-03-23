@@ -1293,13 +1293,16 @@ Grid.prototype.onKeyDown = function(e, args) {
 		return false;
 	}
 
-	function commit(row, cell) {
+	function commitChanges() {
 		if (lock.commitCurrentEdit() && !blocked()) {
-			grid.setActiveCell(row, cell);
-			grid.editActiveCell();
 			return true;
 		}
 		return false;
+	}
+
+	function focusCell(row, cell) {
+		grid.setActiveCell(row, cell);
+		grid.editActiveCell();
 	}
 
 	// firefox & IE fails to trigger onChange
@@ -1319,10 +1322,15 @@ Grid.prototype.onKeyDown = function(e, args) {
 		var cell = e.shiftKey ? this.findPrevEditable(args.row, args.cell) :
 								this.findNextEditable(args.row, args.cell);
 
-		if (cell && commit(cell.row, cell.cell) && cell.row > args.row && this.isDirty()) {
+		if (commitChanges() && cell && cell.row > args.row && this.isDirty()) {
 			args.item = null;
-			this.addNewRow(args);
+			this.scope.waitForActions(function () {
+				that.addNewRow(args);
+			});
+		} else if (cell) {
+			focusCell(cell.row, cell.cell);
 		}
+
 		handled = true;
 	}
 
