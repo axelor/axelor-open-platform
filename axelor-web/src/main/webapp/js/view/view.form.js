@@ -220,7 +220,7 @@ function FormViewCtrl($scope, $element) {
 		}
 
 		function compact(item) {
-			if (!item) return item;;
+			if (!item || _.isNumber(item)) return item;
 			if (item.id > 0 && item.version === undefined) {
 				return {
 					id: item.id,
