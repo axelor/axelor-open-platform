@@ -139,7 +139,7 @@ var Editor = function(args) {
 
 	this.shouldWait = function () {
 		var es = element.scope();
-		if (es.field && es.field.onChange) {
+		if (es && es.field && es.field.onChange) {
 			return true;
 		}
 		return false;
