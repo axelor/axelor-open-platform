@@ -526,7 +526,7 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 	template_readonly: function (scope) {
 		var field = scope.field || {};
 		if (field.viewer) {
-			return viewer;
+			return field.viewer;
 		}
 		if (field.editor && (field.editor.viewer || !field.targetName)) {
 			return '<div ui-panel-editor>';
