@@ -151,6 +151,13 @@
         <xsd:documentation>Comma separate list of actions to execute on click event.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="prompt" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Show a confirmation message before performing client action.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="showIf" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>Show if the given JavaScript expression is true.</xsd:documentation>
@@ -239,23 +246,23 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="groups" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Comma separated list of authorized groups.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="width">
       <xsd:annotation>
         <xsd:documentation>
-          The preferred width of the view.&lt;br&gt;&lt;br&gt;
-
-          The width can be specified as percentage
-          or fixed value followed by
-          optional min/max widths separated by ':' character.&lt;br&gt;&lt;br&gt;
+          The preferred width style of the view.&lt;br&gt;&lt;br&gt;
 
           For example:
           &lt;br&gt;&lt;pre&gt;
-          width="720"
-          width="80%"
-          width="80%:600:700"&lt;/pre&gt;
-
-          The fix width can be either in 'px'
-          or 'em', 'px' is assumed if not specified.
+          width="mini"
+          width="mid"
+          width="large"&lt;/pre&gt;
         </xsd:documentation>
       </xsd:annotation>
       <xsd:simpleType>
@@ -631,6 +638,14 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="canSuggest" type="xsd:boolean" default="true">
+      <xsd:annotation>
+        <xsd:documentation>
+        If this is relational field, specify whether to show auto suggestions
+        (default is true).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="canSelect" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>
@@ -746,6 +761,11 @@
         <xsd:attribute name="edit-icon" type="xsd:boolean" default="true">
           <xsd:annotation>
             <xsd:documentation>Whether to show edit icon.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="onNew" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Comma separate list of actions to execute on new event.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canNew" type="xsd:boolean">
@@ -890,6 +910,8 @@
         <xsd:attribute name="field" type="xsd:string" use="required" />
         <xsd:attribute name="editable" type="xsd:boolean" />
         <xsd:attribute name="orderBy" type="xsd:string" />
+        <xsd:attribute name="onNew" type="xsd:string" />
+        <xsd:attribute name="onChange" type="xsd:string"/>
         <xsd:attributeGroup ref="tns:RelationalAttributes" />
       </xsd:extension>
     </xsd:complexContent>
@@ -942,6 +964,11 @@
         <xsd:attribute name="layout" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>Specify alternative layout (e.g. table)</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="onNew" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Specify an onNew action</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="x-viewer" type="xsd:boolean">

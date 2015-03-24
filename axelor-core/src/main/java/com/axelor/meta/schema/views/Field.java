@@ -45,6 +45,9 @@ public class Field extends SimpleWidget {
 	private String widget;
 
 	@XmlAttribute
+	private Boolean canSuggest;
+
+	@XmlAttribute
 	private Boolean canSelect;
 
 	@XmlAttribute
@@ -201,6 +204,14 @@ public class Field extends SimpleWidget {
 
 	public void setWidget(String widget) {
 		this.widget = widget;
+	}
+
+	public Boolean getCanSuggest() {
+		return canSuggest;
+	}
+
+	public void setCanSuggest(Boolean canSuggest) {
+		this.canSuggest = canSuggest;
 	}
 
 	public Boolean getCanSelect() {

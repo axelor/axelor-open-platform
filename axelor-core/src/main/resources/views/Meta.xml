@@ -293,7 +293,7 @@
 
   <form title="Files" name="meta-files-form" model="com.axelor.meta.db.MetaFile">
     <panel title="Overview">
-      <field name="content" widget="binary"/>
+      <field name="content" widget="binary" title="File"/>
       <field name="fileName"/>
       <field name="size"/>
       <field name="mime"/>

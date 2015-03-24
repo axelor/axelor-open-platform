@@ -71,6 +71,10 @@ function updateValues(source, target, itemScope, formScope) {
 		}
 		return target[key] = value;
 	});
+
+	if (target) {
+		target.$dirty = true;
+	}
 }
 
 function handleError(scope, item, message) {
@@ -152,7 +156,10 @@ ActionHandler.prototype = {
 	},
 	
 	onSave: function() {
-		return this.handle();
+		var self = this;
+		return this._fireBeforeSave().then(function() {
+			return self.handle();
+		});
 	},
 
 	onTabSelect: function(unblocked) {
@@ -181,9 +188,11 @@ ActionHandler.prototype = {
 				promise = deferred.promise;
 			axelor.dialogs.confirm(prompt, function(confirmed){
 				if (confirmed) {
-					self.handle().then(deferred.resolve, deferred.reject);
+					self._fireBeforeSave().then(function() {
+						self.handle().then(deferred.resolve, deferred.reject);
+					});
 				} else {
-					deferred.reject();
+					self.scope.$timeout(deferred.reject);
 				}
 			}, {
 				yesNo: false
@@ -228,8 +237,13 @@ ActionHandler.prototype = {
 	_getFormElement: function () {
 
 		var elem = $(this.element);
-		var formElement = elem.data('$editorForm') || elem.parents('form:first');
+		var formElement = elem;
 
+		if (formElement.is('form')) {
+			return formElement;
+		}
+
+		formElement = elem.data('$editorForm') || elem.parents('form:first');
 		if (!formElement || !formElement.get(0)) { // toolbar button
 			formElement = this.element.parents('.form-view:first').find('form:first');
 		}
@@ -326,9 +340,7 @@ ActionHandler.prototype = {
 			scope.onSave({
 				values: values,
 				callOnSave: false
-			}).then(function () {
-				deferred.resolve();
-			});
+			}).then(deferred.resolve, deferred.reject);
 		} else {
 			doSave(values);
 		}
@@ -357,7 +369,7 @@ ActionHandler.prototype = {
 				return resolveLater();
 			}
 			return self._handleSingle(first).then(function(pending) {
-				if (_.isString(pending)) {
+				if (_.isString(pending) && pending.trim().length) {
 					return self._handleAction(pending);
 				}
 				
@@ -409,9 +421,7 @@ ActionHandler.prototype = {
 			return chain(data);
 		});
 
-		promise.then(function(){
-			deferred.resolve();
-		});
+		promise.then(deferred.resolve, deferred.reject);
 		
 		return deferred.promise;
 	},
@@ -436,7 +446,7 @@ ActionHandler.prototype = {
 			if (promise) {
 				promise.then(function(){
 					deferred.resolve(pending);
-				});
+				}, deferred.reject);
 			}
 			return deferred.promise;
 		}
@@ -526,7 +536,15 @@ ActionHandler.prototype = {
 		}
 		
 		if (data.reload) {
-			return doReload(data.pending);
+			return (function () {
+				var promise = doReload(data.pending);
+				if (data.view) {
+					promise.then(function () {
+						doOpenView(data.view);
+					});
+				}
+				return promise;
+			})();
 		}
 		
 		if (data.save) {
@@ -535,7 +553,7 @@ ActionHandler.prototype = {
 					scope.ajaxStop(function () {
 						deferred.resolve(data.pending);
 					}, 100);
-				});
+				}, deferred.reject);
 			});
 			return deferred.promise;
 		}
@@ -560,9 +578,17 @@ ActionHandler.prototype = {
 		function findItems(name) {
 
 			var items;
-			var containers = formElement.parents('.form-view:first')
+			var containers;
+
+			if (formElement.is('[ui-slick-editors]')) {
+				containers = formElement.parent().add(formElement);
+			} else if (formElement.parent().is('[ui-slick-editors],.slick-cell')) {
+				containers = formElement.parent().parent().add(formElement);
+			} else {
+				containers = formElement.parents('.form-view:first')
 										.find('.record-toolbar:first')
 										.add(formElement);
+			}
 
 			// first search by nested x-path
 			if (scope.formPath) {
@@ -740,8 +766,7 @@ ActionHandler.prototype = {
 			}
 		}
 
-		if (data.view) {
-			var tab = data.view;
+		function doOpenView(tab) {
 			tab.action = _.uniqueId('$act');
 			if (!tab.viewType)
 				tab.viewType = 'grid';
@@ -769,6 +794,10 @@ ActionHandler.prototype = {
 			scope.applyLater();
 		}
 		
+		if (data.view) {
+			doOpenView(data.view);
+		}
+
 		if (data.canClose) {
 			if (scope.onOK) {
 				scope.onOK();

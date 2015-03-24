@@ -217,6 +217,30 @@ ui.directive('uiFilterInput', function() {
 				return value;
 			});
 
+			model.$parsers.push(function(value) {
+				var type = scope.filter.type;
+				if (!(type == 'date' || type == 'datetime') || isDate(value)) {
+					return value;
+				}
+				return toMoment(value).toDate();
+			});
+
+			function isDate(value) {
+				if (value === null || value === undefined) return true;
+				if (_.isDate(value)) return true;
+				if (/\d+-\d+-\d+T/.test(value)) return true;
+			}
+
+			function toMoment(value) {
+				var format = null;
+				if (/\d+\/\d+\/\d+/.test(value)) format = 'DD/MM/YYYY';
+				if (/\d+\/\d+\/\d+\s+\d+:\d+/.test(value)) format = 'DD/MM/YYYY HH:mm';
+				if (format === null) {
+					return moment();
+				}
+				return moment(value, format);
+			}
+
 			element.focus(function(e) {
 				var type = scope.filter.type;
 				if (!(type == 'date' || type == 'datetime')) {
@@ -757,12 +781,34 @@ ui.directive('uiFilterBox', function() {
 					});
 				});
 
-				search._domains = domains;
-
 				if (customs.length > 0) {
 					search.criteria.push({
 						operator: criteria.operator || 'and',
 						criteria: customs
+					});
+				}
+
+				search._domains = domains;
+				search.criteria = process(search.criteria);
+
+				// process criteria for datetime fields, always use between operator
+				function process(filter) {
+					if (_.isArray(filter)) return _.map(filter, process);
+					if (_.isArray(filter.criteria)) {
+						filter.criteria = process(filter.criteria);
+						return filter;
+					}
+					if (filter.operator != '=') return filter;
+					if (($scope.fields[filter.fieldName]||{}).type != 'datetime') return filter;
+					if (!(/\d+-\d+\d+T/.test(filter.value) || _.isDate(filter.value))) {
+						return filter;
+					}
+					var v1 = moment(filter.value).startOf('day').toDate();
+					var v2 = moment(filter.value).endOf('day').toDate();
+					return _.extend({}, filter, {
+						operator: 'between',
+						value: v1,
+						value2: v2
 					});
 				}
 

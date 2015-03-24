@@ -76,12 +76,13 @@ resources/views/Meta.xml:59"
 resources/views/Meta.xml:271"
 "Export complete.","Export complet.",,"java/com/axelor/meta/schema/actions/ActionExport.java:148
 java/com/axelor/meta/schema/actions/ActionExport.java:151
-java/com/axelor/meta/web/MetaController.java:220"
+java/com/axelor/meta/web/MetaController.java:221"
 "Field","Champ",,"resources/views/Meta.xml:250"
 "Field is required.","Champ requis.",,"java/com/axelor/meta/schema/actions/ActionCondition.java:116"
 "Fields","Champs",,"resources/domains/Meta.xml:137
 resources/views/Meta.xml:242"
-"File","Fichier",,"resources/domains/Meta.xml:189"
+"File","Fichier",,"resources/domains/Meta.xml:189
+resources/views/Meta.xml:296"
 "File name","Nom du fichier",,"resources/domains/Meta.xml:168"
 "File path","Chemin du fichier",,"resources/domains/Meta.xml:169"
 "File type","Type",,"resources/domains/Meta.xml:171"

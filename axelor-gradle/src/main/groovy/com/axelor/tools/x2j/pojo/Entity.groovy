@@ -177,6 +177,7 @@ class Entity {
 		
 		for (Property prop : other.properties) {
 			if (!propertyMap.containsKey(prop.name)) {
+				prop.ownEntity = prop.entity
 				prop.entity = this
 				properties.add(prop)
 				propertyMap[prop.name] = prop;
