@@ -29,6 +29,8 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.common.VersionUtils;
+import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 
@@ -52,8 +54,13 @@ public final class AppInfo {
 			User user = AuthUtils.getUser();
 			Group group = user.getGroup();
 
-			map.put("user.name", user.getName());
+			// if name field is overridden
+			Property nameField = Mapper.of(User.class).getNameField();
+			Object nameValue = nameField.get(user);
+
+			map.put("user.name", nameValue);
 			map.put("user.login", user.getCode());
+			map.put("user.nameField", nameField.getName());
 
 			if (group != null) {
 				map.put("user.navigator", group.getNavigation());

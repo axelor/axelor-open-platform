@@ -675,16 +675,24 @@ function FormViewCtrl($scope, $element) {
 	}
 	
 	function showLog() {
+
+		function nameOf(user) {
+			if (!user) {
+				return "";
+			}
+			var name = __appSettings['user.nameField'] || 'name';
+			return user[name] || "";
+		}
 		
 		var info = {};
 			record = $scope.record || {};
 		if (record.createdOn) {
 			info.createdOn = moment(record.createdOn).format('DD/MM/YYYY HH:mm');
-			info.createdBy = (record.createdBy || {}).name;
+			info.createdBy = nameOf(record.createdBy);
 		}
 		if (record.updatedOn) {
 			info.updatedOn = moment(record.updatedOn).format('DD/MM/YYYY HH:mm');
-			info.updatedBy = (record.updatedBy || {}).name;
+			info.updatedBy = nameOf(record.updatedBy);
 		}
 		var table = $("<table class='field-details'>");
 		var tr;
