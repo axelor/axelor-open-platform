@@ -30,6 +30,17 @@
 - fixed NavSelect rendering issue
 - fixed	integer field handling with selection widget
 - fixed SuggestBox canNew and x-create behavior
+- fixed data-init issue
+- fixed button in toolbar doesn't update title
+- fixed duplicate records in search result
+- fixed permission check on relational fields
+- fixed file selection issue
+- fixed wrong model name in help popover
+- fixed m2o editor icons issue
+- fixed undefined value error in viewer
+- fixed attachment list not showing all records
+- fixed grid portlet
+- fixed wkf missing param
 
 ## Improvements
 
@@ -48,6 +59,11 @@
 - support for custom translation files
 - support prompt message on item menu bar
 - support for non-jta datasource
+- reset form view scrolling
+- show validation error for invalid grid fields
+- add support for disable auto suggest
+- remove hover effect from image button
+- add missing title in MetaFile form view.
 
 # 3.0.4 (2015-01-19)
 
