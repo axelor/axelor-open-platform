@@ -580,7 +580,9 @@ ActionHandler.prototype = {
 			var items;
 			var containers;
 
-			if (formElement.parent().is('[ui-slick-editors]')) {
+			if (formElement.is('[ui-slick-editors]')) {
+				containers = formElement.parent().add(formElement);
+			} else if (formElement.parent().is('[ui-slick-editors],.slick-cell')) {
 				containers = formElement.parent().parent().add(formElement);
 			} else {
 				containers = formElement.parents('.form-view:first')
