@@ -62,6 +62,7 @@ public class WorkflowService implements IWorkflow {
 	public WorkflowService (WorkflowRepository workflows, InstanceRepository instances, NodeRepository nodes) {
 		this.workflows = workflows;
 		this.instances = instances;
+		this.nodes = nodes;
 		this.context = Maps.newHashMap();
 		this.user = AuthUtils.getUser();
 	}
