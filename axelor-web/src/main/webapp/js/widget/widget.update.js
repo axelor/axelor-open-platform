@@ -55,9 +55,13 @@ ui.directive('uiUpdateButton', ['$compile', function ($compile) {
 			};
 			
 			scope.canMassUpdate = function () {
-				return scope.handler && scope.handler.canEdit();
-			};
+				true;
+			}
 			
+			if (scope.handler && scope.handler.canMassUpdate) {
+				scope.canMassUpdate = scope.handler.canMassUpdate;
+			}
+
 			function hideMenu() {
 				$(document).off('mousedown.update-menu', onMouseDown);
 				if (toggleButton) {
@@ -283,11 +287,15 @@ ui.directive('uiUpdateForm',  function () {
 				function doUpdate() {
 					var promise, items;
 					
-					if (!$scope.updateAll) {
-						items = _.map(handler.selection, function(index) {
-							return handler.dataView.getItem(index);
-						});
-						items = _.pluck(items, "id");
+					items = _.map(handler.selection, function(index) {
+						return handler.dataView.getItem(index);
+					});
+					items = _.pluck(items, "id");
+
+					if ($scope.updateAll) {
+						items = null;
+					} else if (items.length === 0) {
+						return $scope.onCancel();
 					}
 					
 					promise = ds.updateMass(values, items);
@@ -297,12 +305,16 @@ ui.directive('uiUpdateForm',  function () {
 					});
 				}
 
-				if (!$scope.updateAll) {
-					return doUpdate();
+				var count;
+				if ($scope.updateAll) {
+					count = ds._page.total;
+				} else if(handler.selection && handler.selection.length > 0) {
+					count = handler.selection.length
+				} else {
+					return;
 				}
 				
-				var count = ds._page.total;
-				var message = _t('Do you really want to update all {0} records?', count);
+				var message = _t('Do you really want to update all {0} record(s)?', count);
 				axelor.dialogs.confirm(message, function (confirmed) {
 					if (confirmed) {
 						doUpdate();

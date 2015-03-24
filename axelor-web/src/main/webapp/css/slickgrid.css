@@ -385,3 +385,14 @@
 	font-weight: 400;
 	text-align: center;
 }
+
+.grid-view .slickgrid-editable .slick-row.active .slick-cell-editable,
+.inline-editable.editable .slickgrid-editable .slick-row.active .slick-cell-editable {
+	border: 1px solid #8080FF !important;
+	background-color: #fff;
+}
+
+.grid-view .slickgrid-editable .slick-row.active .slick-cell-required,
+.inline-editable.editable .slickgrid-editable .slick-row.active .slick-cell-required {
+	background-color: #D2D2FF;
+}

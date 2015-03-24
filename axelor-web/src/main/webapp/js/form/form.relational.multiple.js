@@ -477,12 +477,10 @@ ui.formInput('OneToMany', {
 						scope.dataView.setItems([]);
 						grid.setSelectedRows([]);
 					}
-					grid.setOptions({enableAddRow: scope.canNew() && !scope.isReadonly()});
 				});
 				scope.$watch("isReadonly()", function(readonly) {
 					grid.setOptions({
-						editable: !readonly && scope.canEdit(),
-						enableAddRow: !readonly && scope.canNew()
+						editable: !readonly && scope.canEdit()
 					});
 					
 					var _editIcon = scope.canView() || (!readonly && scope.canEdit());
@@ -657,6 +655,13 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 			return _.pluck(this.getSelection(), "value");
 		};
 		
+		var _select = scope.select;
+		scope.select = function (value) {
+			var res = _select.apply(scope, arguments);
+			scope.itemsPending = [];
+			return res;
+		};
+
 		scope.handleClick = function(e, item) {
 			if (scope.field['tag-edit'] && scope.onTagEdit && !scope.isReadonly()) {
 				return scope.onTagEdit(e, item);
@@ -682,16 +687,13 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 
         scope.loadSelection = function(request, response) {
 
-			var canSelect = field.canSelect !== false;
-			var canCreate = field.canNew !== false && field.create;
-
-			if (!canSelect) {
+			if (!scope.canSelect()) {
 				return response([]);
 			}
 
 			this.fetchSelection(request, function(items) {
 				var term = request.term;
-				if (term && canCreate) {
+				if (field.create && term && scope.canNew()) {
 					items.push({
 						label : _t('Create "{0}" and add...', term),
 						click : function() { create(term); }
@@ -701,19 +703,13 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 						click : function() { create(term, true); }
 					});
 				}
-				if (term && canSelect) {
+				if (scope.canSelect()) {
 					items.push({
 						label : _t("Search..."),
 						click : function() { scope.showSelector(); }
 					});
 				}
-				if (!term && canSelect) {
-					items.push({
-						label: _t("Search..."),
-						click: function() { scope.showSelector(); }
-					});
-				}
-				if (!term && canCreate) {
+				if ((field.create === undefined || (field.create && !term)) && scope.canNew()) {
 					items.push({
 						label: _t("Create..."),
 						click: function() { scope.showPopupEditor(); }

@@ -49,11 +49,14 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 
 	function doEdit(record) {
 		if (record && record.id > 0 && (!(record.version >= 0) || !record.$fetched)) {
-			$scope.doRead(record.id).success(function(record){
+			$scope.doRead(record.id).success(function(rec) {
 				if (recordVersion === -1) {
-					recordVersion = record.version;
+					recordVersion = rec.version;
 				}
-				originalEdit(record);
+				if (record.$dirty) {
+					rec = _.extend({}, rec, record);
+				}
+				originalEdit(rec);
 			});
 		} else {
 			if (recordVersion === -1 && record) {
@@ -131,6 +134,14 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			isClosed = true;
 		};
 
+		var event = $scope.$broadcast('on:before-save', record);
+		if (event.defaultPrevented) {
+			if (event.error) {
+				axelor.dialogs.error(event.error);
+			}
+			return;
+ 		}
+
 		if ($scope.editorCanSave && $scope.isDirty()) {
 			if (record.id < 0)
 				record.id = null;
@@ -141,28 +152,15 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			});
 		}
 
-		var event = $scope.$broadcast('on:before-save', record);
-		if (event.defaultPrevented) {
-			if (event.error) {
-				axelor.dialogs.error(event.error);
-			}
- 		} else {
-			$scope.waitForActions(function() {
-				close(record);
-			});
-		}
+		$scope.waitForActions(function() {
+			close(record);
+		});
 	};
 	
 	$scope.onOK = function() {
-
 		if (!$scope.isValid())
 			return;
-
-		$scope.ajaxStop(function() {
-			setTimeout(function() {
-				onOK();
-			}, 100);
-		});
+		$scope.waitForActions(onOK);
 	};
 
 	$scope.onBeforeClose = function(event, ui) {
@@ -540,7 +538,7 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 
 				//XXX: ui-dialog issue
 				element.find('.slick-headerrow-column,.slickgrid').zIndex(element.zIndex());
-
+				element.find('.record-toolbar .btn').zIndex(element.zIndex()+1);
 			}, 100);
 		}
 		
@@ -586,6 +584,13 @@ angular.module('axelor.ui').directive('uiEditorPopup', function() {
 			element.scroll(function (e) {
 				$.event.trigger('adjustScroll');
 			});
+
+			var onNewHandler = scope.onNewHandler;
+			scope.onNewHandler = function (event) {
+				if (element.dialog('isOpen')) {
+					return onNewHandler.apply(scope, arguments);
+				}
+			};
 		},
 		replace: true,
 		template:

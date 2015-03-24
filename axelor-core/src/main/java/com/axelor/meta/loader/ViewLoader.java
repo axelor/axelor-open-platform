@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,7 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.common.FileUtils;
 import com.axelor.common.Inflector;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
@@ -199,8 +201,8 @@ public class ViewLoader extends AbstractLoader {
 		
 		MetaView entity = views.findByID(xmlId);
 		MetaView other = views.findByName(name);
-		if (entity == null) {
-			entity = views.findByModule(name, module.getName());
+		if (entity == null && StringUtils.isBlank(xmlId)) {
+			entity = views.all().filter("self.name = ? AND self.module = ? AND self.xmlId is null", name, module.getName()).fetchOne();
 		}
 		
 		if (entity == null) {
@@ -230,6 +232,7 @@ public class ViewLoader extends AbstractLoader {
 		entity.setModel(modelName);
 		entity.setModule(module.getName());
 		entity.setXml(xml);
+		entity.setGroups(this.findGroups(view.getGroups(), entity.getGroups()));
 
 		entity = views.save(entity);
 	}
@@ -303,19 +306,19 @@ public class ViewLoader extends AbstractLoader {
 		selects.save(entity);
 	}
 
-	private Set<Group> findGroups(String names) {
+	private Set<Group> findGroups(String names, Set<Group> existing) {
 		if (StringUtils.isBlank(names)) {
-			return null;
+			return existing;
 		}
 
-		Set<Group> all = Sets.newHashSet();
-		for(String name : names.split(",")) {
-			Group group = groups.all().filter("self.code = ?1", name).fetchOne();
+		Set<Group> all = ObjectUtils.isEmpty(existing) ? new HashSet<Group>() : Sets.newHashSet(existing);
+		for(String code : names.split(",")) {
+			Group group = groups.all().filter("self.code = ?1", code).fetchOne();
 			if (group == null) {
-				log.info("Creating a new user group: {}", name);
+				log.info("Creating a new user group: {}", code);
 				group = new Group();
-				group.setCode(name);
-				group.setName(name);
+				group.setCode(code);
+				group.setName(code);
 				group = groups.save(group);
 			}
 			all.add(group);
@@ -386,10 +389,7 @@ public class ViewLoader extends AbstractLoader {
 		menu.setTop(menuItem.getTop());
 		menu.setLeft(menuItem.getLeft() == null ? true : menuItem.getLeft());
 		menu.setMobile(menuItem.getMobile());
-
-		if (menu.getGroups() == null || menu.getGroups().isEmpty()) {
-			menu.setGroups(this.findGroups(menuItem.getGroups()));
-		}
+		menu.setGroups(this.findGroups(menuItem.getGroups(), menu.getGroups()));
 
 		if (!Strings.isNullOrEmpty(menuItem.getParent())) {
 			MetaMenu parent = menus.findByName(menuItem.getParent());

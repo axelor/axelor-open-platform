@@ -70,6 +70,9 @@ public abstract class AbstractView {
 	@XmlAttribute(name = "id")
 	private String id;
 
+	@XmlAttribute
+	private String groups;
+
 	@JsonIgnore
 	@XmlAttribute( name = "width")
 	private String widthSpec;
@@ -134,6 +137,14 @@ public abstract class AbstractView {
 	
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getGroups() {
+		return groups;
+	}
+
+	public void setGroups(String groups) {
+		this.groups = groups;
 	}
 
 	private String widthPart(int which) {

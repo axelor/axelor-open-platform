@@ -38,11 +38,11 @@
 			return $http.get('ws/action/menu/all');
 		}
 
-		function action(name) {
+		function action(name, options) {
 
 			return $http.post('ws/action/' + name, {
 				model : 'com.axelor.meta.db.MetaAction',
-				data : {}
+				data : options
 			});
 		}
 

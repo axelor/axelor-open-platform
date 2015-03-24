@@ -26,8 +26,8 @@ import com.google.common.base.Preconditions;
 
 public final class MetaFiles {
 
-	private static final String UPLOAD_PATH = AppSettings.get().getPath(
-			"file.upload.dir", "{java.io.tmpdir}/axelor/attachments");
+	private static final String DEFAULT_UPLOAD_PATH = "{java.io.tmpdir}/axelor/attachments";
+	private static final String UPLOAD_PATH = AppSettings.get().getPath("file.upload.dir", DEFAULT_UPLOAD_PATH);
 	
 	private MetaFiles() {
 		

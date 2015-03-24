@@ -91,6 +91,8 @@ function FormViewCtrl($scope, $element) {
 			context._showRecord = undefined;
 		}
 
+		$scope.$broadcast("on:form-show");
+
 		if (recordId) {
 			routeId = recordId;
 			return viewPromise.then(function(){
@@ -218,7 +220,7 @@ function FormViewCtrl($scope, $element) {
 		}
 
 		function compact(item) {
-			if (!item) return item;;
+			if (!item || _.isNumber(item)) return item;
 			if (item.id > 0 && item.version === undefined) {
 				return {
 					id: item.id,
@@ -340,7 +342,7 @@ function FormViewCtrl($scope, $element) {
 	$scope.onNewPromise = null;
 	$scope.defaultValues = null;
 	
-	$scope.$on("on:new", function onNewHandler(event) {
+	$scope.onNewHandler = function onNewHandler(event) {
 
 		routeId = null;
 
@@ -396,8 +398,12 @@ function FormViewCtrl($scope, $element) {
 		}
 		
 		$scope._viewPromise.then(function() {
-			$scope.$timeout(afterVewLoaded);
+			$scope.waitForActions(afterVewLoaded);
 		});
+	}
+
+	$scope.$on("on:new", function (event) {
+		$scope.onNewHandler(event);
 	});
 	
 	$scope.$on("on:nav-click", function(event, tab) {
@@ -417,8 +423,11 @@ function FormViewCtrl($scope, $element) {
 		function compact(rec) {
 			var res = {
 				id: rec.id,
-				version: rec.version || rec.$version
+				version: rec.version
 			};
+			if (res.version === undefined) {
+				res.version = rec.$version;
+			}
 			_.each(rec, function(v, k) {
 				if (!v) return;
 				if (v.id) res[k] = compact(v);
@@ -470,22 +479,29 @@ function FormViewCtrl($scope, $element) {
 	$scope.onSave = function(options) {
 		
 		var defer = $scope._defer();
-		var event = $scope.$broadcast('on:before-save', $scope.record);
 		var saveAction = $scope.$events.onSave;
 		var fireOnLoad = true;
 		
+		function fireBeforeSave() {
+			var event = $scope.$broadcast('on:before-save', $scope.record);
+			if (event.defaultPrevented) {
+				if (event.error) {
+					axelor.dialogs.error(event.error);
+				}
+				setTimeout(function() {
+					defer.reject(event.error);
+				});
+				return false;
+			}
+			return true;
+		}
+
 		if (options && options.callOnSave === false) {
 			saveAction = null;
 			fireOnLoad = false;
 		}
 
-		if (event.defaultPrevented) {
-			if (event.error) {
-				axelor.dialogs.error(event.error);
-			}
-			setTimeout(function() {
-				defer.reject(event.error);
-			});
+		if (fireBeforeSave() === false) {
 			return defer.promise;
 		}
 
@@ -515,18 +531,13 @@ function FormViewCtrl($scope, $element) {
 			if (saveAction) {
 				return saveAction().then(doSave);
 			}
-			$scope.waitForActions(doSave);
+			// repeat on:before-save to ensure if any o2m/m2m is updated gets applied
+			if (fireBeforeSave()) {
+				$scope.waitForActions(doSave);
+			}
 		});
 		return defer.promise;
 	};
-	
-	$scope.waitForActions = function (callback) {
-		$scope.$timeout(function () {
-			$scope.ajaxStop(function () {
-				$scope.$timeout(callback, 100);
-			}, 200);
-		}, 100);
-	},
 
 	$scope.confirmDirty = function(callback, cancelCallback) {
 		var params = $scope._viewParams || {};
@@ -664,16 +675,24 @@ function FormViewCtrl($scope, $element) {
 	}
 	
 	function showLog() {
+
+		function nameOf(user) {
+			if (!user) {
+				return "";
+			}
+			var name = __appSettings['user.nameField'] || 'name';
+			return user[name] || "";
+		}
 		
 		var info = {};
 			record = $scope.record || {};
 		if (record.createdOn) {
 			info.createdOn = moment(record.createdOn).format('DD/MM/YYYY HH:mm');
-			info.createdBy = (record.createdBy || {}).name;
+			info.createdBy = nameOf(record.createdBy);
 		}
 		if (record.updatedOn) {
 			info.updatedOn = moment(record.updatedOn).format('DD/MM/YYYY HH:mm');
-			info.updatedBy = (record.updatedBy || {}).name;
+			info.updatedBy = nameOf(record.updatedBy);
 		}
 		var table = $("<table class='field-details'>");
 		var tr;
@@ -1045,6 +1064,12 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			$.event.trigger('adjustScroll');
 		});
 
+		scope.$on("on:form-show", function () {
+			setTimeout(function () {
+				element.scrollTop(0);
+			});
+		});
+
 		var unwatch = scope.$watch('schema.loaded', function(viewLoaded){
 
 			if (!viewLoaded) return;
@@ -1063,7 +1088,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			}
 
 			var width = schema.width || params.width;
-			if (width) {
+			if (width && !scope.$hasPanels) {
 				if (width === '100%' || width === '*') {
 					element.removeClass('has-width');
 				}

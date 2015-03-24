@@ -313,28 +313,18 @@ public class MetaService {
 		return response;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Response getAttachment(long id, String model, Request request){
 		Response response = new Response();
-		List<MetaFile> data = Lists.newArrayList();
 		List<String> fields = request.getFields();
 
-		StringBuilder map = new StringBuilder();
-		map.append("meta.id as id, meta.version as version");
-		for (String fielName : fields) {
-			if(fielName.equals("id") || fielName.equals("version")){
-				continue;
-			}
-			map.append(", meta." + fielName + " as " + fielName);
-		}
+		com.axelor.db.Query<MetaFile> query = JPA.all(MetaFile.class).filter(
+				"self.id IN (SELECT a.metaFile FROM MetaAttachment a WHERE a.objectName = :model AND a.objectId = :id)");
 
-		javax.persistence.Query query = JPA.em().createQuery(
-				"SELECT new map(" + map.toString() + ") FROM MetaFile meta " +
-				"WHERE meta.id IN (SELECT attch.metaFile FROM MetaAttachment attch WHERE attch.objectName = ?1 AND attch.objectId = ?2)");
-		query.setParameter(1, model);
-		query.setParameter(2, id);
-
-		data = query.getResultList();
+		query.bind("model", model);
+		query.bind("id", id);
+		
+		Object data = query.select(fields.toArray(new String[]{})).fetch(-1, -1);
+		
 		response.setData(data);
 		response.setStatus(Response.STATUS_SUCCESS);
 

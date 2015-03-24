@@ -1,3 +1,72 @@
+# Current 3.0.5
+
+## Bug Fixes
+
+- fixed dependency order issue
+- fixed editor context issue
+- fixed wait for actions before onNew
+- fixed response.view along with response.reload
+- fixed meta scanner (search xml files only)
+- fixed module loader clean up issues
+- fixed duplicate views were not imported properly
+- fixed advance search issue on datetime field 
+- fixed context issue in tree view
+- fixed context issue on portlet
+- fixed selection issue in tree
+- fixed onChange issue on view popup
+- fixed I18nLoader encoding
+- fixed onNew issue on closed popup editor
+- fixed sequence when create records from the web application views
+- fixed version check issue
+- fixed multiline widget display in grid
+- fixed html widget in grid : force multiline editor
+- fixed image widget update issue
+- fixed month format issue in chart
+- fixed color issues in charts
+- fixed build.gradle template for app stub
+- fixed onClick handler issue when action has prompt
+- fixed TagSelect widget issues
+- fixed technical info popup
+- fixed NavSelect rendering issue
+- fixed	integer field handling with selection widget
+- fixed SuggestBox canNew and x-create behavior
+- fixed data-init issue
+- fixed button in toolbar doesn't update title
+- fixed duplicate records in search result
+- fixed permission check on relational fields
+- fixed file selection issue
+- fixed wrong model name in help popover
+- fixed m2o editor icons issue
+- fixed undefined value error in viewer
+- fixed attachment list not showing all records
+- fixed grid portlet
+- fixed wkf missing param
+- fixed SmtpAccount NPE
+
+## Improvements
+
+- prevent double click on button
+- don't allow init param from extending entity
+- support onNew on o2m/m2o editor
+- don't allow number width on panel forms
+- improved editable grid
+- support onNew support to grid widget
+- add onNew support on panel-related
+- disable hot keys on view popup
+- minor code refactoring
+- enable mass update button by default
+- harmonize application default values
+- update translation
+- support for custom translation files
+- support prompt message on item menu bar
+- support for non-jta datasource
+- reset form view scrolling
+- show validation error for invalid grid fields
+- add support for disable auto suggest
+- remove hover effect from image button
+- add missing title in MetaFile form view
+- upgrade TinyMCE to 4.0.1
+
 # 3.0.4 (2015-01-19)
 
 ## Bug Fixes

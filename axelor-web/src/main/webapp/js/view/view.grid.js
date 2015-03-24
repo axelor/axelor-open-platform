@@ -618,23 +618,35 @@ angular.module('axelor.ui').directive('uiGridExport', function(){
 
 angular.module('axelor.ui').directive('uiPortletGrid', function(){
 	return {
-		controller: ['$scope', '$element', 'ViewService', 'NavService', function($scope, $element, ViewService, NavService) {
-			
+		controller: ['$scope', '$element', 'ViewService', 'NavService', 'MenuService',
+		             function($scope, $element, ViewService, NavService, MenuService) {
+
 			GridViewCtrl.call(this, $scope, $element);
 			
 			var ds = $scope._dataSource;
 			var counter = 0;
 			
 			function doEdit(force) {
+				var promise = MenuService.action($scope._viewAction, {
+					context: $scope.getContext()
+				});
+
+				promise.success(function (result) {
+					if (!result.data) return;
+					view = result.data[0].view;
+
+					return doOpen(force, view);
+				});
+			}
+
+			function doOpen(force, tab) {
 				var index = $scope.pagerIndex(true);
 				var record = ds.at(index);
 
-				var tab = angular.copy($scope._viewParams);
-
 				tab.viewType = "form";
 				tab.recordId = record.id;
-				tab.action = $scope._viewAction;
-				
+				tab.action = _.uniqueId('$act');
+
 				if ($scope._isPopup) {
 					tab.$popupParent = $scope;
 					tab.params = tab.params || {};
@@ -644,7 +656,7 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 				}
 
 				setTimeout(function(){
-					NavService.openTab(tab);
+					NavService.openView(tab);
 					$scope.$apply();
 					if (counter++ === 0) {
 						return;
@@ -675,8 +687,10 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 				var tab = NavService.getSelected();
 				var type = tab.viewType || tab.type;
 				if (type !== 'grid') {
-					$scope.ajaxStop(function () {
-						$scope.filter({});
+					$scope.waitForActions(function () {
+						$scope.ajaxStop(function () {
+							$scope.filter({});
+						});
 					});
 				}
 			}

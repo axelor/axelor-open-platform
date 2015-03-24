@@ -18,12 +18,9 @@
 package com.axelor.db;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -33,9 +30,7 @@ import org.slf4j.LoggerFactory;
 import com.axelor.app.AppSettings;
 import com.axelor.common.ClassUtils;
 import com.axelor.common.StringUtils;
-import com.google.common.base.Charsets;
-import com.google.common.collect.Maps;
-import com.google.common.io.CharStreams;
+import com.axelor.db.internal.DBHelper;
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.PersistService;
 import com.google.inject.persist.jpa.JpaPersistModule;
@@ -43,7 +38,7 @@ import com.google.inject.persist.jpa.JpaPersistModule;
 /**
  * A Guice module to configure JPA.
  *
- * This module takes care of initialising JPA and registers an Hibernate custom
+ * This module takes care of initializing JPA and registers an Hibernate custom
  * scanner that automatically scans all the classpath entries for Entity
  * classes.
  *
@@ -114,16 +109,6 @@ public class JpaModule extends AbstractModule {
 		return this;
 	}
 
-	private boolean isCacheEnabled() {
-		try (InputStream res = ClassUtils.getResourceStream("META-INF/persistence.xml")) {
-			String text = CharStreams.toString(new InputStreamReader(res, Charsets.UTF_8));
-			Pattern pat = Pattern.compile("<shared-cache-mode>\\s*(ENABLE_SELECTIVE|ALL)\\s*</shared-cache-mode>");
-			Matcher mat = pat.matcher(text);
-			return mat.find();
-		} catch (Exception e) {}
-		return false;
-	}
-
 	@Override
 	protected void configure() {
 		log.info("Configuring JPA...");
@@ -146,7 +131,7 @@ public class JpaModule extends AbstractModule {
 		properties.put("jadira.usertype.autoRegisterUserTypes", "true");
 		properties.put("jadira.usertype.databaseZone", "jvm");
 
-		if (isCacheEnabled()) {
+		if (DBHelper.isCacheEnabled()) {
 			properties.put("hibernate.cache.use_second_level_cache", "true");
 			properties.put("hibernate.cache.use_query_cache", "true");
 			properties.put("hibernate.cache.region.factory_class", "org.hibernate.cache.ehcache.EhCacheRegionFactory");
@@ -169,8 +154,13 @@ public class JpaModule extends AbstractModule {
 	}
 
 	private Properties updatePersistenceProperties(Properties properties) {
+
+		if (DBHelper.isDataSourceUsed()) {
+			return properties;
+		}
+
 		final AppSettings settings = AppSettings.get();
-		final Map<String, String> keys = Maps.newLinkedHashMap();
+		final Map<String, String> keys = new HashMap<>();
 		final String unit = jpaUnit.replaceAll("(PU|Unit)$", "").replaceAll("^persistence$", "default");
 
 		keys.put("db.%s.dialect", "hibernate.dialect");

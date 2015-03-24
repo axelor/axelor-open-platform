@@ -310,7 +310,7 @@ public class ActionHandler {
 			return Collections2.transform((Collection<?>) item, new Function<Object, Object>() {
 				@Override
 				public Object apply(Object input) {
-					return toCompact(item);
+					return toCompact(input);
 				}
 			});
 		}
