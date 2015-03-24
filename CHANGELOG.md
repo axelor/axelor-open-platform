@@ -41,6 +41,7 @@
 - fixed attachment list not showing all records
 - fixed grid portlet
 - fixed wkf missing param
+- fixed SmtpAccount NPE
 
 ## Improvements
 
@@ -63,7 +64,8 @@
 - show validation error for invalid grid fields
 - add support for disable auto suggest
 - remove hover effect from image button
-- add missing title in MetaFile form view.
+- add missing title in MetaFile form view
+- upgrade TinyMCE to 4.0.1
 
 # 3.0.4 (2015-01-19)
 
