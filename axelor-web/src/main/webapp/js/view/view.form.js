@@ -1020,8 +1020,16 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			}
 
 			var elems = element.find('[x-field].ng-invalid:not(fieldset)').filter(function() {
-				var isInline = $(this).parents('.slickgrid,.m2o-editor').size() > 0;
-				return !isInline || (isInline && $(this).is(':visible'));
+				var isInline = $(this).parents('.slickgrid,.nested-not-required').size() > 0;
+				if (isInline) {
+					return false;
+				}
+				var elemScope = $(this).scope();
+				if (elemScope.isHidden &&
+					elemScope.isHidden()) {
+					return false;
+				}
+				return true;
 			});
 			var items = elems.map(function () {
 				return {

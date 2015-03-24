@@ -185,6 +185,7 @@
     <panel-related field="items" editable="true" orderBy="order">
       <field name="title"/>
       <field name="value"/>
+      <field name="icon"/>
       <field name="data"/>
       <field name="order" width="100"/>
     </panel-related>
@@ -194,6 +195,7 @@
     <panel title="Overview">
       <field name="title" />
       <field name="value" />
+      <field name="icon" />
       <field name="data" />
       <field name="order" help="Sequence order" width="100" />
     </panel>

@@ -408,6 +408,12 @@
 			
 			return errorWindow.dialog(hide ? 'close' : 'open').height('auto');
 		}
+
+		function showNotification(options) {
+			axelor.notify.error('<p>' + options.message.replace('\n', '<br>') + '</p>', {
+				title: options.title || options.type || _t('Error')
+			});
+		}
 	
 		$scope.doLogin = function() {
 			
@@ -455,6 +461,8 @@
 	
 				stacktrace = report.stacktrace;
 				cause = report.cause;
+			} else if (report.message) {
+				return showNotification(report);
 			} else if (_.isString(report)) {
 				stacktrace = report.replace(/.*<body>|<\/body>.*/g, '');
 			} else {

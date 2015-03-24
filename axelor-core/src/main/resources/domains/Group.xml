@@ -13,6 +13,7 @@
   	<string name="code" required="true" unique="true" min="2"/>
   	<string name="name" required="true" unique="true" min="2"/>
     <string name="navigation" selection="select.user.navigation"/>
+    <string name="homeAction" help="Default home action."/>
 
     <boolean name="technicalStaff" help="Specify whether the members of this group are technical staff." />
 

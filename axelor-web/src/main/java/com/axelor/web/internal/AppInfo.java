@@ -69,6 +69,10 @@ public final class AppInfo {
 			}
 			map.put("user.lang", user.getLanguage());
 			map.put("user.action", user.getHomeAction());
+
+			if (user.getHomeAction() == null) {
+				map.put("user.action", group.getHomeAction());
+			}
 		} catch (Exception e){
 		}
 

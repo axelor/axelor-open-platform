@@ -46,13 +46,19 @@
   </form>
 
   <form name="user-preferences-form" title="Preferences" model="com.axelor.auth.db.User"
-    onNew="com.axelor.auth.AuthService:preferences">
+    onNew="com.axelor.auth.AuthService:preferences"
+    onSave="com.axelor.auth.AuthService:validate">
     <panel title="User preferences" itemSpan="12">
       <field name="email" widget="Email"/>
       <field name="language"/>
       <panel stacked="true">
         <field name="homeAction" hidden="true" x-bind="{{__actionSelect.name}}"/>
         <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" target="com.axelor.meta.db.MetaAction" target-name="name" domain="self.type = 'action-view'"/>
+      </panel>
+      <field name="change" title="Change password?" widget="boolean"/>
+      <panel showIf="change">
+        <field name="newPassword" title="Password" placeholder="new password" widget="password" requiredIf="change" validIf="(!change) || (newPassword.length >= 4 &amp;&amp; confirm == newPassword)"/>
+        <field name="confirm" title="Confirm" placeholder="confirm password" widget="password"/>
       </panel>
     </panel>
   </form>

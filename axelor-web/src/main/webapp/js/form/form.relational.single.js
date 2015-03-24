@@ -566,10 +566,21 @@ ui.formInput('SuggestBox', 'ManyToOne', {
 
 	showSelectionOn: "click",
 
+	link_editable: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+		var field = scope.field;
+		if (field.canNew === undefined && field.create) {
+			field.canNew = true;
+		}
+		if (field.create === undefined && field.canNew) {
+			field.create = true;
+		}
+	},
 	template_editable:
 	'<span class="picker-input">'+
 		'<input type="text" autocomplete="off" ui-can-suggest>'+
 		'<span class="picker-icons">'+
+			'<i class="fa fa-times" ng-show="text" ng-click="handleClear()"></i>'+
 			'<i class="fa fa-caret-down" ng-click="showSelection()"></i>'+
 		'</span>'+
    '</span>'
