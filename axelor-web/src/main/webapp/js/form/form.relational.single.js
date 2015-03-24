@@ -147,8 +147,23 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 	};
 	
 	var icons = null;
+	var actions = {
+		'new': 'canNew',
+		'create': 'canNew',
+		'edit': 'canEdit',
+		'select': 'canSelect',
+		'remove': 'canRemove',
+		'clear': 'canRemove'
+	};
+
 	$scope.canShowIcon = function (which) {
 		var names;
+		var field = $scope.field || {};
+		var prop = actions[which];
+		if (prop !== undefined && field[prop] === false) {
+			return false;
+		}
+
 		if (icons === null) {
 			icons = {};
 			names = $scope.field.showIcons || $scope.$parent.field.showIcons;
@@ -168,9 +183,21 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 	};
 }
 
+ui.directive('uiCanSuggest', function () {
+
+	return function (scope, element, attrs) {
+		var field = scope.field || {};
+		if (field.canSuggest !== false) {
+			return;
+		}
+		element.attr("readonly", "readonly");
+		element.addClass("not-readonly");
+	};
+});
+
 var m2oTemplateEditable = '' +
 '<div class="picker-input picker-icons-3 tag-select-single">'+
-'<input type="text" autocomplete="off">'+
+'<input type="text" autocomplete="off" ui-can-suggest>'+
 '<span class="tag-item label label-info" ng-if="canShowTag" ng-show="text">'+
 	'<span class="tag-link tag-text" ng-click="onTagSelect($event)">{{text}}</span> '+
 	'<i class="fa fa-times fa-small" ng-click="onTagRemove($event)"></i>'+
@@ -279,7 +306,7 @@ ui.formInput('ManyToOne', 'Select', {
 			this.fetchSelection(request, function(items, page) {
 				var term = request.term;
 				
-				if (scope.canSelect() && (!page || page.total > items.length)) {
+				if (scope.canSelect()) {
 					items.push({
 						label: _t("Search..."),
 						click: function() { scope.showSelector(); }
@@ -297,7 +324,7 @@ ui.formInput('ManyToOne', 'Select', {
 					});
 				}
 				
-				if (field.create && !term && scope.canNew()) {
+				if ((field.create === undefined || (field.create && !term)) && scope.canNew()) {
 					items.push({
 						label: _t("Create..."),
 						click: function() { scope.showPopupEditor(); }
@@ -499,7 +526,7 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 	template_readonly: function (scope) {
 		var field = scope.field || {};
 		if (field.viewer) {
-			return viewer;
+			return field.viewer;
 		}
 		if (field.editor && (field.editor.viewer || !field.targetName)) {
 			return '<div ui-panel-editor>';
@@ -541,7 +568,7 @@ ui.formInput('SuggestBox', 'ManyToOne', {
 
 	template_editable:
 	'<span class="picker-input">'+
-		'<input type="text" autocomplete="off">'+
+		'<input type="text" autocomplete="off" ui-can-suggest>'+
 		'<span class="picker-icons">'+
 			'<i class="fa fa-caret-down" ng-click="showSelection()"></i>'+
 		'</span>'+

@@ -322,7 +322,7 @@ ui.directive('uiBarLayout', ['$compile', function($compile) {
 	};
 }]);
 
-ui.directive('uiPanelEditor', ['$compile', function($compile) {
+ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, ActionService) {
 
 	return {
 		scope: true,
@@ -395,7 +395,7 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 						return;
 					}
 					record.$fetchedRelated = true;
-					return ds.read(value.id).success(function(rec) {
+					return ds.read(value, {fields: missing}).success(function(rec) {
 						var values = _.pick(rec, missing);
 						record = _.extend(record, values);
 					});
@@ -406,6 +406,7 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 				scope.getContext = function () {
 					var context = _.extend({}, scope.record);
 					context._model = scope._model;
+					context._parent = scope.$parent.getContext();
 					return context;
 				};
 				// make sure to trigger record-change with proper record data
@@ -423,6 +424,22 @@ ui.directive('uiPanelEditor', ['$compile', function($compile) {
 			form = $compile(form)(scope);
 			form.children('div.row').removeClass('row').addClass('row-fluid');
 			element.append(form);
+
+			if (field.target) {
+				var handler = null;
+				if (editor.onNew) {
+					schema.onNew = editor.onNew;
+					form.data('$editorForm', form);
+					handler = ActionService.handler(scope, form, {
+						action: editor.onNew
+					});
+				}
+				scope.$watch('record.id', function (value, old) {
+					if (!value && handler) {
+						handler.onNew();
+					}
+				});
+			}
 
 			scope.isValid = function () {
 				return scope.form && scope.form.$valid;

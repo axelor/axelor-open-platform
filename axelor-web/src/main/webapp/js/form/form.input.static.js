@@ -101,6 +101,11 @@ function makePopover(scope, element, callback, placement) {
 				popoverElem = element;
 				popoverElem.popover('show');
 			}
+			var tip = element.data('popover').$tip;
+			if (tip) {
+				tip.attr('tabIndex', 0);
+				tip.css('outline', 'none');
+			}
 		}, 1000);
 	}
 	
@@ -194,7 +199,7 @@ ui.directive('uiHelpPopover', function() {
 		
 		var model = scope._model;
 		if (model === field.target) {
-			model = scope.$parent._model;
+			model = scope._parentModel || scope.$parent._model;
 		}
 
 		addRow(_t('Object'), model);
@@ -215,7 +220,8 @@ ui.directive('uiHelpPopover', function() {
 
 		var value = scope.$eval('$$original.' + field.name);
 		if (value && /-one$/.test(field.serverType)) {
-			value = value[field.targetName] || value.id;
+			value = _.compact([value.id, value[field.targetName]]).join(',');
+			value = '(' + value + ')';
 		}
 		if (value && field.type === "password") {
 			value = _.str.repeat('*', value.length);
@@ -373,28 +379,56 @@ ui.formItem('Button', {
 		});
 
 		element.on("click", function(e) {
-			if (scope.isReadonlyExclusive()) return;
-			if (scope.waitForActions) {
-				scope.waitForActions(function () {
-					scope.fireAction("onClick");
-				});
-			} else {
-				scope.fireAction("onClick");
+
+			if (scope.isReadonlyExclusive() || element.hasClass('disabled')) {
+				return;
 			}
+
+			function enable() {
+				scope.ajaxStop(function () {
+					setDisabled(false);
+				}, 100);
+			}
+
+			function setEnable(p) {
+				if (p && p.then) {
+					p.then(enable, enable);
+				} else {
+					scope.ajaxStop(enable, 500);
+				}
+			}
+
+			function doClick() {
+				setEnable(scope.fireAction("onClick"));
+			}
+
+			setDisabled(true);
+
+			if (scope.waitForActions) {
+				return scope.waitForActions(doClick);
+			}
+			return doClick();
 		});
 		
+		function setDisabled(disabled) {
+			if (disabled || disabled === undefined) {
+				return element.addClass("disabled").attr('tabindex', -1);
+			}
+			return element.removeClass("disabled").removeAttr('tabindex');
+		}
+
 		var readonlySet = false;
 		scope.$watch('isReadonlyExclusive()', function(readonly, old) {
 			if (readonly === old && readonlySet) return;
 			readonlySet = true;
-			if (readonly) {
-				return element.addClass("disabled").attr('tabindex', -1);
-			}
-			return element.removeClass("disabled").removeAttr('tabindex');
+			return setDisabled(readonly);
 		});
 		
 		scope.$watch('attr("title")', function(title, old) {
 			if (!title || title === old) return;
+			if (element.is('button')) {
+				return element.html(title);
+			}
 			element.children('.btn-text').html(title);
 		});
 	},

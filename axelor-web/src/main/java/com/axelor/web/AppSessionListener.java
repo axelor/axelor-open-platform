@@ -49,7 +49,7 @@ public final class AppSessionListener implements HttpSessionListener {
 	 */
 	@Inject
 	public AppSessionListener(AppSettings settings) {
-		this.timeout = settings.getInt("session.timeout", 30);
+		this.timeout = settings.getInt("session.timeout", 60);
 	}
 
 	@Override

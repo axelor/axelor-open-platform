@@ -62,6 +62,9 @@ public class PanelRelated extends AbstractPanel {
 	private String targetName;
 
 	@XmlAttribute
+	private String onNew;
+
+	@XmlAttribute
 	private String onChange;
 	
 	@XmlAttribute
@@ -165,6 +168,14 @@ public class PanelRelated extends AbstractPanel {
 
 	public void setTargetName(String targetName) {
 		this.targetName = targetName;
+	}
+
+	public String getOnNew() {
+		return onNew;
+	}
+
+	public void setOnNew(String onNew) {
+		this.onNew = onNew;
 	}
 
 	public String getOnChange() {

@@ -266,7 +266,7 @@ function Loader(scope, node, DataSource) {
 
 	this.load = function(item, callback) {
 
-		var context = {},
+		var context = _.extend({}, scope._context),
 			current = item && item.$record;
 		
 		var sortBy = _.find(node.fields, function(field) {
@@ -378,7 +378,7 @@ function Loader(scope, node, DataSource) {
 			_.each(fields, function(field) {
 				var name = field.as || field.name;
 				item[name] = record[field.name];
-				item.$selection[name] = field.selection;
+				item.$selection[name] = field.selectionList;
 			});
 
 			return item;

@@ -20,7 +20,6 @@ package com.axelor.meta.loader;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -35,12 +34,12 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.db.internal.DBHelper;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaModule;
@@ -96,66 +95,77 @@ public class ModuleManager {
 
 	public void initialize(boolean update, boolean withDemo) {
 
-		this.createUsers();
-		this.resolve(true);
+		try {
+			this.createUsers();
+			this.resolve(true);
 
-		log.info("modules found:");
-		for (String name : resolver.names()) {
-			log.info("  " + name);
-		}
+			log.info("modules found:");
+			for (String name : resolver.names()) {
+				log.info("  " + name);
+			}
 
-		// install modules
-		for (Module module : resolver.all()) {
-			if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
-				install(module.getName(), update, withDemo, false);
+			// install modules
+			for (Module module : resolver.all()) {
+				if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
+					install(module.getName(), update, withDemo, false);
+				}
 			}
-		}
-		// second iteration ensures proper view sequence
-		for (Module module : resolver.all()) {
-			if (module.isInstalled()) {
-				viewLoader.doLast(module, update);
+			// second iteration ensures proper view sequence
+			for (Module module : resolver.all()) {
+				if (module.isInstalled()) {
+					viewLoader.doLast(module, update);
+				}
 			}
-		}
-		// uninstall pending modules
-		for (Module module : resolver.all()) {
-			if (module.isRemovable() && !module.isInstalled() && module.isPending()) {
-				uninstall(module.getName());
+			// uninstall pending modules
+			for (Module module : resolver.all()) {
+				if (module.isRemovable() && !module.isInstalled() && module.isPending()) {
+					uninstall(module.getName());
+				}
 			}
+		} finally {
+			this.doCleanUp();
 		}
 	}
 
 	public void updateAll(boolean withDemo) {
+		try {
+			this.createUsers();
+			this.resolve(true);
 
-		this.createUsers();
-		this.resolve(true);
-
-		for (Module module : resolver.all()) {
-			install(module.getName(), true, withDemo, false);
+			for (Module module : resolver.all()) {
+				install(module.getName(), true, withDemo, false);
+			}
+		} finally {
+			this.doCleanUp();
 		}
 	}
 
 	public void update(boolean withDemo, String... moduleNames) {
 
-		this.createUsers();
-		this.resolve(true);
+		try {
+			this.createUsers();
+			this.resolve(true);
 
-		List<String> names = Lists.newArrayList();
-		if (moduleNames != null) {
-			names = Lists.newArrayList(moduleNames);
-		}
+			List<String> names = Lists.newArrayList();
+			if (moduleNames != null) {
+				names = Lists.newArrayList(moduleNames);
+			}
 
-		if (names.isEmpty()) {
-			for (Module module : resolver.all()) {
-				if (module.isInstalled()) {
-					names.add(module.getName());
+			if (names.isEmpty()) {
+				for (Module module : resolver.all()) {
+					if (module.isInstalled()) {
+						names.add(module.getName());
+					}
 				}
 			}
-		}
 
-		for (Module module : resolver.all()) {
-			if (names.contains(module.getName())) {
-				install(module, true, withDemo);
+			for (Module module : resolver.all()) {
+				if (names.contains(module.getName())) {
+					install(module, true, withDemo);
+				}
 			}
+		} finally {
+			this.doCleanUp();
 		}
 	}
 	
@@ -185,11 +195,15 @@ public class ModuleManager {
 	}
 
 	public void install(String moduleName, boolean update, boolean withDemo) {
-		for (Module module: resolver.resolve(moduleName)) {
-			install(module.getName(), update, withDemo, true);
-		}
-		for (Module module: resolver.resolve(moduleName)) {
-			viewLoader.doLast(module, update);
+		try {
+			for (Module module: resolver.resolve(moduleName)) {
+				install(module.getName(), update, withDemo, true);
+			}
+			for (Module module: resolver.resolve(moduleName)) {
+				viewLoader.doLast(module, update);
+			}
+		} finally {
+			this.doCleanUp();
 		}
 	}
 
@@ -215,6 +229,10 @@ public class ModuleManager {
 		resolver.get(module).setPending(false);
 
 		log.info("Module uninstalled: {}", module);
+	}
+
+	public void doCleanUp() {
+		AbstractLoader.doCleanUp();
 	}
 
 	@Transactional
@@ -297,21 +315,8 @@ public class ModuleManager {
 
 	private static Set<String> getInstalledModules() {
 		final Set<String> all = new HashSet<String>();
-		final AppSettings settings = AppSettings.get();
-
-		final String jdbcDriver = settings.get("db.default.driver");
-		final String jdbcUrl = settings.get("db.default.url");
-		final String jdbcUser = settings.get("db.default.user");
-		final String jdbcPass = settings.get("db.default.password");
-
-		try {
-			Class.forName(jdbcDriver);
-		} catch (Exception e) {
-			return all;
-		}
-
 		try(
-			final Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass);
+			final Connection connection = DBHelper.getConnection();
 			final Statement statement = connection.createStatement();
 			final ResultSet rs = statement.executeQuery("select name from meta_module where installed = true")) {
 			while (rs.next()) {

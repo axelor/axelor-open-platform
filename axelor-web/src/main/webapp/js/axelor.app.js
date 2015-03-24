@@ -204,13 +204,14 @@
 			.appendTo(blocker);
 
 		var blocked = false;
+		var blockedCounter = 0;
 		var blockedTimer = null;
 		var spinnerTimer = 0;
 
 		function block(callback) {
 			if (blocked) return true;
 			if (blockedTimer) { clearTimeout(blockedTimer); blockedTimer = null; };
-			if (loadingCounter > 0) {
+			if (loadingCounter > 0 || blockedCounter > 0) {
 				blocked = true;
 				doc.on("keydown.blockui mousedown.blockui", function(e) {
 					if ($('#loginWindow').is(':visible')) {
@@ -228,10 +229,13 @@
 
 		function unblock(callback) {
 			if (blockedTimer) { clearTimeout(blockedTimer); blockedTimer = null; };
-			if (loadingCounter > 0 || loadingTimer) {
+			if (loadingCounter > 0 || blockedCounter > 0 || loadingTimer) {
 				spinnerTimer += 1;
 				if (spinnerTimer > 300) {
 					blocker.addClass('wait');
+				}
+				if (blockedCounter > 0) {
+					blockedCounter = blockedCounter - 10;
 				}
 				return blockedTimer = _.delay(unblock, 10, callback);
 			}
@@ -245,8 +249,12 @@
 			blocked = false;
 		}
 
-		axelor.blockUI = function() {
-			return block(arguments[0]);
+		axelor.blockUI = function(callback, minimum) {
+			if (minimum && minimum > blockedCounter) {
+				blockedCounter = Math.max(0, blockedCounter);
+				blockedCounter = Math.max(minimum, blockedCounter);
+			}
+			return block(callback);
 		};
 
 		axelor.unblockUI = function() {
