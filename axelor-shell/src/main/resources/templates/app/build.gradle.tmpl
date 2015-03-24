@@ -14,10 +14,12 @@ application {
 	// module "modules:axelor-contact"
 }
 
-license {
-	ext.product = "<%= name %>"
-	ext.owner = "My Company"
-	ext.website = "http://my-company.com"
+allprojects {
+	license {
+		ext.product = "<%= name %>"
+		ext.owner = "My Company"
+		ext.website = "http://my-company.com"
+	}
 }
 
 tomcat {

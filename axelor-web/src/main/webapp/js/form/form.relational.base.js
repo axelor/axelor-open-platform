@@ -518,7 +518,11 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		
 	};
 
+	var hasPermission = $scope.hasPermission;
 	$scope.hasPermission = function(perm) {
+		if (hasPermission && !hasPermission.apply($scope, arguments)) {
+			return false;
+		}
 		if (!field.perms) return true;
 		var perms = field.perms;
 		var permitted = perms[perm];

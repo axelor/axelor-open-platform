@@ -80,10 +80,13 @@ data.export.encoding = UTF-8
 # ~~~~~
 data.export.dir = {java.io.tmpdir}/axelor/data-export
 
-# Data Import Settings
+# Specify whether to import demo data for the application
 # ~~~~~
-#smooks.config.file = /path/to/csv/config.xml
-#smooks.data.dir = /path/to/csv/data
+data.import.demo-data = true
+
+# Storage path for templates
+# ~~~~~
+template.search.dir = {java.io.tmpdir}/axelor/templates
 
 # LDAP Configuration
 # ~~~~~

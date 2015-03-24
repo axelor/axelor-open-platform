@@ -478,19 +478,23 @@ td.form-item > * {
 	padding-top: 8px; 
 }
 
-.form-item .ng-invalid > input,
-.form-item .ng-invalid > textarea,
-.form-item .ng-invalid > .picker-input input,
-.form-item .ng-invalid > .ui-spinner input,
-.form-item .ng-invalid > .tag-select {
+.form-item .not-readonly {
+	background: inherit !important;
+}
+
+.ng-invalid > input,
+.ng-invalid > textarea,
+.ng-invalid > .picker-input input,
+.ng-invalid > .ui-spinner input,
+.ng-invalid > .tag-select {
 	border-color: #B94A48;
 }
 
-.form-item .ng-invalid:focus,
-.form-item .ng-invalid > input:focus,
-.form-item .ng-invalid > textarea:focus,
-.form-item .ng-invalid > .picker-input input:focus,
-.form-item .ng-invalid > .ui-spinner input:focus {
+.ng-invalid:focus,
+.ng-invalid > input:focus,
+.ng-invalid > textarea:focus,
+.ng-invalid > .picker-input input:focus,
+.ng-invalid > .ui-spinner input:focus {
 	border-color: #953B39;
 	
 	-webkit-box-shadow: 0 0 6px #D59392;
@@ -1039,20 +1043,11 @@ table.field-details .help-text hr {
 }
 
 .button-item.img-button {
-	
 	background: #fff !important;
 	width: auto !important;
 	border: none  !important;
 	padding: 2px !important;
 	height: inherit !important;
-}
-
-.button-item.img-button:hover img {
-	padding: 1px;
-	
-	-webkit-transform: scale(1.2, 1.2);
-	   -moz-transform: scale(1.2, 1.2);
-	        transform: scale(1.5, 1.5);
 }
 
 .button-item.img-button img {

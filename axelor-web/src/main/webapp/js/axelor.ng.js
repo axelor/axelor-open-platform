@@ -58,6 +58,15 @@
 				}
 			};
 
+			__custom__.waitForActions = function waitForActions(callback) {
+				var that = this;
+				this.$timeout(function () {
+					that.ajaxStop(function () {
+						that.$timeout(callback, 100);
+					}, 200);
+				}, 100);
+			};
+
 			__custom__.applyLater = function applyLater(func, wait) {
 				return this.$timeout(func ||angular.noop, wait);
 			};
@@ -148,6 +157,10 @@
 				if (arguments.length === 0) {
 					return $debouncedApply.call(this);
 				}
+				return __super__.$apply.apply(this, arguments);
+			};
+
+			__custom__.$applyNow = function $applyNow() {
 				return __super__.$apply.apply(this, arguments);
 			};
 

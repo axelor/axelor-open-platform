@@ -61,7 +61,8 @@ public class GroovyTemplates implements Templates {
 	private static final TemplateEngine GSTRING_ENGINE = new GStringTemplateEngine();
 	private static final TemplateEngine STREAMING_ENGINE = new StreamingTemplateEngine();
 
-	private static final String TEMPLATE_DIR = AppSettings.get().getPath("template.search.dir", "{java.io.tmpdir}/axelor/templates");
+	private static final String DEFAULT_TEMPLATE_DIR = "{java.io.tmpdir}/axelor/templates";
+	private static final String TEMPLATE_DIR = AppSettings.get().getPath("template.search.dir", DEFAULT_TEMPLATE_DIR);
 	private static final Pattern INCLUDE_PAT = Pattern.compile("\\{\\{\\<\\s*(.*?)\\s*\\>\\}\\}");
 	
 	class GroovyTemplate implements Template {

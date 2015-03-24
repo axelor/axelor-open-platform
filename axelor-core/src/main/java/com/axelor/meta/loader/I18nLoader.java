@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -44,8 +46,8 @@ import com.axelor.db.JPA;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.repo.MetaTranslationRepository;
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
@@ -56,12 +58,35 @@ public class I18nLoader extends AbstractLoader {
 
 	@Inject
 	private MetaTranslationRepository translations;
+	
+	/**
+	 * Move custom csv files at the end of the list.
+	 */
+	private <T> List<T> orderFiles(List<T> files) {
+
+		final List<T> all = new ArrayList<>();
+		final List<T> custom = new ArrayList<>();
+		final Pattern pattern = Pattern.compile(".*(?:custom_)([a-zA-Z_]+)\\.csv$");
+
+		for (T file : files) {
+			String name = file.toString();
+			if (pattern.matcher(name).matches()) {
+				custom.add(file);
+			} else {
+				all.add(file);
+			}
+		}
+
+		all.addAll(custom);
+
+		return all;
+	}
 
 	@Override
 	protected void doLoad(Module module, boolean update) {
 
 		final List<URL> files = MetaScanner.findAll(module.getName(), "i18n", "(.*?)\\.csv");
-		final List<URL> sorted = Lists.newArrayList(files);
+		final List<URL> sorted = orderFiles(files);
 		
 		for(final URL resource : sorted) {
 			try(InputStream is = resource.openStream()) {
@@ -93,7 +118,9 @@ public class I18nLoader extends AbstractLoader {
 		}
 		
 		log.debug("Load {} translations", module.getName());
-		for(File file : moduleDir.listFiles()) {
+		
+		final List<File> files = orderFiles(Arrays.asList(moduleDir.listFiles()));
+		for(File file : files) {
 			try {
 				log.debug("Load {} translations", file.getPath());
 				process(new FileInputStream(file), file.getPath(), module.getName());
@@ -107,13 +134,15 @@ public class I18nLoader extends AbstractLoader {
 		
 		// Get language name from the file name
 		String language = "";
-		Pattern pattern = Pattern.compile(".*(?:messages_)([a-zA-Z_]+)\\.csv$");
+		Pattern pattern = Pattern.compile(".*(?:messages_|custom_)([a-zA-Z_]+)\\.csv$");
 		Matcher matcher = pattern.matcher(fileName);
-		if (!matcher.matches()) return;
+		if (!matcher.matches()) {
+			return;
+		}
 		
 		language = matcher.group(1);
 
-		Reader reader = new InputStreamReader(stream);
+		Reader reader = new InputStreamReader(stream, Charsets.UTF_8);
 		CSVReader csvReader = new CSVReader(reader,
 				CSVParser.DEFAULT_SEPARATOR,
 				CSVParser.DEFAULT_QUOTE_CHARACTER, '\0');

@@ -31,6 +31,10 @@ function ViewCtrl($scope, DataSource, ViewService) {
 	$scope._views = ViewService.accept(params);
 	$scope._viewType = params.viewType;
 
+	if ($scope.$parent && $scope.$parent._model) {
+		$scope._parentModel = $scope.$parent._model;
+	}
+
 	$scope._model = params.model;
 	$scope._fields = {};
 
@@ -418,6 +422,10 @@ angular.module('axelor.ui').directive('uiViewPopup', function() {
 
 			$scope.tab = params;
 			$scope._isPopup = true;
+
+			$scope.onHotKey = function (e, action) {
+				return false;
+			};
 		}],
 		link: function (scope, element, attrs) {
 			
@@ -632,7 +640,7 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 			}
 			
 			var tab = scope.selectedTab,
-				dlg = $('[ui-editor-popup]:visible:last'),
+				dlg = $('[ui-editor-popup]:visible:last,[ui-view-popup]:visible:last').first(),
 				vs = tab ? tab.$viewScope : null;
 
 			if (dlg.size()) {

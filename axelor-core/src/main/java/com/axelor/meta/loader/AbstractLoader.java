@@ -32,8 +32,8 @@ abstract class AbstractLoader {
 	
 	protected Logger log = LoggerFactory.getLogger(getClass().getSuperclass());
 
-	private final ThreadLocal<Set<String>> visited = new ThreadLocal<>();
-	private final ThreadLocal<Map<Class<?>, Multimap<String, Object>>> unresolved = new ThreadLocal<>();
+	private static final ThreadLocal<Set<String>> visited = new ThreadLocal<>();
+	private static final ThreadLocal<Map<Class<?>, Multimap<String, Object>>> unresolved = new ThreadLocal<>();
 
 	/**
 	 * Check whether the given name is already visited.
@@ -148,6 +148,11 @@ abstract class AbstractLoader {
 	 */
 	void doLast(Module module, boolean update) {
 
+	}
+
+	static void doCleanUp() {
+		visited.remove();
+		unresolved.remove();
 	}
 
 	public final void load(Module module, boolean update) {
