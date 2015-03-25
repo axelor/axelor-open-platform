@@ -1325,7 +1325,9 @@ Grid.prototype.onKeyDown = function(e, args) {
 		if (commitChanges() && cell && cell.row > args.row && this.isDirty()) {
 			args.item = null;
 			this.scope.waitForActions(function () {
-				that.addNewRow(args);
+				that.scope.waitForActions(function () {
+					that.addNewRow(args);
+				});
 			});
 		} else if (cell) {
 			focusCell(cell.row, cell.cell);
@@ -1850,12 +1852,12 @@ Grid.prototype.onItemClick = function(event, args) {
 		if (this.editorScope &&
 			this.editorScope.$lastEditor &&
 			this.editorScope.$lastEditor.shouldWait()) {
-			return 200;
+			return 300;
 		}
 	}
 	// prevent edit if some action is still in progress
 	if (this.isDirty() && axelor.blockUI()) {
-		return 100;
+		return 200;
 	}
 
 	var source = $(event.target);
