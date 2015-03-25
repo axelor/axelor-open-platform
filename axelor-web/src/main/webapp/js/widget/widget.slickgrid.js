@@ -1494,10 +1494,14 @@ Grid.prototype.__saveChanges = function(args, callback) {
 	}
 
 	// prevent cache
-	var saveDS = ds._new(ds._model, {
-		domain: ds._domain,
-		context: ds._context
-	});
+	var saveDS = ds;
+	var handler = this.handler || {};
+	if (handler.field && handler.field.target) {
+		saveDS = ds._new(ds._model, {
+			domain: ds._domain,
+			context: ds._context
+		});
+	}
 
 	return saveDS.saveAll(records).success(function(records, page) {
 		if (data.getItemById(0)) {
