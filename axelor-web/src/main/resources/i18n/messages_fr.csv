@@ -42,7 +42,8 @@ webapp/partials/preferences.html:16
 webapp/partials/system.html:64"
 "Close All","Fermer tout",,"webapp/partials/nav-tabs.html:25"
 "Close Others","Fermer les autres",,"webapp/partials/nav-tabs.html:24"
-"Concurrent updates error.","Erreur , Modification concurrente détectée.",,"webapp/js/axelor.app.js:453"
+"Concurrent updates error","Modification concurrente détectée",,"java/com/axelor/web/ResponseInterceptor.java:121
+webapp/js/axelor.app.js:459"
 "Create","Créer",,"webapp/js/view/view.popup.js:667"
 "Create ""{0}"" and add...","Créer ""{0}"" et ajouter...",,"webapp/js/form/form.relational.multiple.js:698"
 "Create ""{0}"" and select...","Créer ""{0}"" et sélectionner...",,"webapp/js/form/form.relational.single.js:318"
@@ -51,15 +52,15 @@ webapp/js/form/form.relational.single.js:322"
 "Create new","Créer nouveau",,"webapp/partials/views/trail.html:6"
 "Create...","Créer...",,"webapp/js/form/form.relational.multiple.js:714
 webapp/js/form/form.relational.single.js:329"
-"Created By:","Crée par:",,"webapp/js/view/view.form.js:697"
-"Created On:","Crée le:",,"webapp/js/view/view.form.js:693"
+"Created By:","Crée par:",,"webapp/js/view/view.form.js:705"
+"Created On:","Crée le:",,"webapp/js/view/view.form.js:701"
 "Current changes will be lost.","Les modifications en cours vont être perdues.",,"webapp/js/axelor.nav.js:439"
 "Current changes will be lost. Do you really want to proceed?","Les modifications en cours vont être perdues, voulez-vous continuer ?",,"webapp/js/view/view.form.js:547"
 "Day","Journée",,"webapp/partials/views/calendar.html:8"
 "Dec","Déc",,"webapp/js/form/form.input.datetime.js:49"
 "December","Décembre",,"webapp/js/form/form.input.datetime.js:35"
 "Delete","Supprimer",,"webapp/js/view/view.calendar.js:489
-webapp/js/view/view.form.js:722
+webapp/js/view/view.form.js:730
 webapp/js/widget/widget.search.js:1000
 webapp/partials/views/grid.html:16
 webapp/partials/views/grid.html:17"
@@ -71,7 +72,7 @@ webapp/js/view/view.popup.js:358"
 "Domain","Domain",,"webapp/js/form/form.input.static.js:167"
 "Done","Choisir",,"webapp/js/form/form.input.datetime.js:67"
 "Download","Télécharger",,"webapp/js/view/view.popup.js:728"
-"Duplicate","Copier",,"webapp/js/view/view.form.js:730"
+"Duplicate","Copier",,"webapp/js/view/view.form.js:738"
 "Edit","Modifier",,"webapp/js/form/form.relational.multiple.js:573
 webapp/js/form/form.relational.single.js:207
 webapp/partials/views/form.html:10
@@ -80,6 +81,7 @@ webapp/partials/views/grid.html:10
 webapp/partials/views/grid.html:9"
 "Edit event","Modifier évènement",,"webapp/js/view/view.calendar.js:502"
 "Error","Erreur",,"webapp/js/axelor.app.js:378
+webapp/js/axelor.app.js:414
 webapp/js/lib/dialogs.js:221
 webapp/js/lib/dialogs.js:41"
 "Expanded","Etendu",,"webapp/js/view/view.chart.js:561"
@@ -92,6 +94,7 @@ webapp/js/lib/dialogs.js:41"
 "Field Type","Type de champ",,"webapp/js/form/form.input.static.js:207"
 "Filter","Filtre",,"webapp/js/form/form.input.static.js:214"
 "Filters","Filtres",,"webapp/js/widget/widget.search.js:970"
+"Foreign key violation","Violation de clé étrangère",,"java/com/axelor/web/ResponseInterceptor.java:174"
 "Fr","V",,"webapp/js/form/form.input.datetime.js:61"
 "Free Memory","Mémoire libre",,"webapp/partials/system.html:30"
 "Fri","Ven",,"webapp/js/form/form.input.datetime.js:60"
@@ -105,7 +108,7 @@ webapp/js/view/view.search.js:795"
 "Information","Information",,"webapp/js/lib/dialogs.js:198
 webapp/js/lib/dialogs.js:28
 webapp/js/lib/dialogs.js:96"
-"Internal Server Error","Erreur interne du serveur",,"webapp/js/axelor.app.js:445"
+"Internal Server Error","Erreur interne du serveur",,"webapp/js/axelor.app.js:451"
 "Jan","Janv",,"webapp/js/form/form.input.datetime.js:38"
 "January","Janvier",,"webapp/js/form/form.input.datetime.js:24"
 "Java Runtime","Runtime Java",,"webapp/partials/system.html:11"
@@ -122,7 +125,7 @@ webapp/login.jsp:26"
 "Log in attempt failed.","Tentative de connexion échoué.",,"webapp/partials/login-window.html:11"
 "Log in time","Heure de connexion",,"webapp/partials/system.html:45"
 "Log out","Déconnexion",,"webapp/index.jsp:123"
-"Log...","Log...",,"webapp/js/view/view.form.js:739"
+"Log...","Log...",,"webapp/js/view/view.form.js:747"
 "Mar","Mars",,"webapp/js/form/form.input.datetime.js:40"
 "March","Mars",,"webapp/js/form/form.input.datetime.js:26"
 "Mass Update","Mise à jour en masse",,"webapp/js/widget/widget.update.js:376
@@ -172,8 +175,9 @@ webapp/partials/login-window.html:6"
 "Preferences","Préférences",,"webapp/index.jsp:120"
 "Prev","Précédent",,"webapp/js/form/form.input.datetime.js:68"
 "Question","Question",,"webapp/js/lib/dialogs.js:59"
+"Record was updated or deleted by another transaction","L'enregistrement a été mis à jour ou supprimé par une autre transaction",,"java/com/axelor/web/ResponseInterceptor.java:122"
 "Reference","Référence",,"webapp/js/form/form.input.static.js:218"
-"Refresh","Actualiser",,"webapp/js/view/view.form.js:717
+"Refresh","Actualiser",,"webapp/js/view/view.form.js:725
 webapp/js/view/view.portal.js:267
 webapp/partials/nav-tabs.html:21
 webapp/partials/system.html:63
@@ -182,6 +186,7 @@ webapp/partials/views/trail.html:10"
 "Remember me","Se souvenir",,"webapp/login.jsp:25"
 "Remove","Supprimer",,"webapp/js/form/form.relational.multiple.js:575
 webapp/js/view/view.popup.js:729"
+"SQL error","Erreur SQL",,"java/com/axelor/web/ResponseInterceptor.java:180"
 "Sa","S",,"webapp/js/form/form.input.datetime.js:61"
 "Sat","Sam",,"webapp/js/form/form.input.datetime.js:60"
 "Saturday","Samedi",,"webapp/js/form/form.input.datetime.js:58"
@@ -225,7 +230,7 @@ webapp/js/view/view.chart.js:559"
 "System Information","Information système",,"webapp/partials/about.html:45
 webapp/partials/system.html:4"
 "Th","J",,"webapp/js/form/form.input.datetime.js:61"
-"The following fields are invalid:","Les champs suivants sont invalides:",,"webapp/js/view/view.form.js:1051
+"The following fields are invalid:","Les champs suivants sont invalides:",,"webapp/js/view/view.form.js:1067
 webapp/js/widget/widget.slickgrid.js:961"
 "The record has been updated or delete by another action.","L'enregistrement a été modifié ou supprimé par une autre action.",,"webapp/js/view/view.form.js:442"
 "There are some invalid rows.","Il y a des lignes invalides.",,"webapp/js/widget/widget.slickgrid.js:991"
@@ -238,18 +243,20 @@ webapp/js/widget/widget.slickgrid.js:961"
 "Tue","Mar",,"webapp/js/form/form.input.datetime.js:60"
 "Tuesday","Mardi",,"webapp/js/form/form.input.datetime.js:54"
 "Ungroup","Dégrouper",,"webapp/js/widget/widget.slickgrid.js:601"
+"Unique constraint violation","Violation de contrainte unique",,"java/com/axelor/web/ResponseInterceptor.java:177"
 "Unknown","Inconnue",,"webapp/js/view/view.calendar.js:144
 webapp/js/view/view.calendar.js:204"
 "Update","Mettre à jour",,"webapp/js/widget/widget.update.js:431"
 "Update all","Tout mettre à jour",,"webapp/js/widget/widget.update.js:434"
-"Updated By:","Mise à jour par:",,"webapp/js/view/view.form.js:705"
-"Updated On:","Mise à jour le:",,"webapp/js/view/view.form.js:701"
+"Updated By:","Mise à jour par:",,"webapp/js/view/view.form.js:713"
+"Updated On:","Mise à jour le:",,"webapp/js/view/view.form.js:709"
 "Upload",,,"webapp/js/view/view.popup.js:727"
 "Used Memory","Mémoire utilisé",,"webapp/partials/system.html:28"
 "User","Utilisateur",,"webapp/partials/login-window.html:4
 webapp/partials/system.html:44"
 "User name","Utilisateur",,"webapp/login.jsp:28"
-"Validation error","Erreur de validation",,"webapp/js/form/form.actions.js:308"
+"Validation error","Erreur de validation",,"java/com/axelor/web/ResponseInterceptor.java:145
+webapp/js/form/form.actions.js:308"
 "View","Vue",,"webapp/js/form/form.input.static.js:170"
 "Warning","Avertissement",,"webapp/js/form/form.actions.js:513
 webapp/js/lib/dialogs.js:34"
@@ -264,7 +271,7 @@ webapp/js/lib/dialogs.js:34"
 "You are not allow to upload a file bigger than","Vous n'êtes pas autoriser à uploader un fichier plus grand que",,"webapp/js/form/form.input.binary.js:171
 webapp/js/view/view.popup.js:397"
 "and","et",,"webapp/js/widget/widget.search.js:499"
-"and {0} more","et {0} plus",,"webapp/js/form/form.input.select.js:445"
+"and {0} more","et {0} plus",,"webapp/js/form/form.input.select.js:463"
 "contains","contient",,"webapp/js/widget/widget.search.js:32"
 "doesn't contain","ne contient pas",,"webapp/js/widget/widget.search.js:33"
 "equals","égal",,"webapp/js/widget/widget.search.js:25"

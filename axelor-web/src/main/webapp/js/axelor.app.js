@@ -456,7 +456,7 @@
 				exception = report['class'] || '';
 				
 				if (exception.match(/(OptimisticLockException|StaleObjectStateException)/)) {
-					message = "<b>" + _t('Concurrent updates error.') + '</b><br>' + message;
+					message = "<b>" + _t('Concurrent updates error') + '</b><br>' + message;
 				}
 	
 				stacktrace = report.stacktrace;
