@@ -203,13 +203,7 @@ var Editor = function(args) {
 			current[column.field] = (scope.record||{})[column.field] || null;
 		}
 
-		var changed = record.id !== current.id;
-		if (record.version !== undefined) {
-			changed = record.version !== current.version;
-		} else if (record.$version !== undefined) {
-			changed = record.$version !== current.$version;
-		}
-
+		var changed = (record.id !== item.id || record.version !== current.version);
 		if (changed) {
 			scope.editRecord(current);
 		} else {
