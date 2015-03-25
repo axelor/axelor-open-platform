@@ -225,7 +225,8 @@ public class Resource<T extends Model> {
 			}
 			Property property = mapper.getProperty(name);
 			if (property == null || property.isPrimary()) {
-				sortOn.add(spec);
+				// dotted field or primary key
+				sortBy.add(spec);
 				continue;
 			}
 			if (property.isReference()) {
