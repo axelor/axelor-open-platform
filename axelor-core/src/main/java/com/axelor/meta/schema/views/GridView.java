@@ -40,6 +40,9 @@ public class GridView extends AbstractView {
 	private String groupBy;
 
 	@XmlAttribute
+	private String freeSearch;
+
+	@XmlAttribute
 	private String onNew;
 
 	@XmlAttribute
@@ -88,6 +91,14 @@ public class GridView extends AbstractView {
 
 	public void setGroupBy(String groupBy) {
 		this.groupBy = groupBy;
+	}
+
+	public String getFreeSearch() {
+		return freeSearch;
+	}
+
+	public void setFreeSearch(String freeSearch) {
+		this.freeSearch = freeSearch;
 	}
 
 	public String getOnNew() {

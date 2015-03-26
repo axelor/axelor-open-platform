@@ -755,6 +755,30 @@
           </xsd:choice>
         </xsd:sequence>
         <xsd:attribute name="expandable" type="xsd:boolean" />
+        <xsd:attribute name="freeSearch" default="name">
+          <xsd:annotation>
+            <xsd:documentation>Specify the free search mode</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:enumeration value="name">
+                <xsd:annotation>
+                  <xsd:documentation>Search on name field only.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:enumeration>
+              <xsd:enumeration value="all">
+                <xsd:annotation>
+                  <xsd:documentation>Search all searchable fields.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:enumeration>
+              <xsd:enumeration value="none">
+                <xsd:annotation>
+                  <xsd:documentation>Don't allow free search.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:enumeration>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
         <xsd:attribute name="orderBy" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>

@@ -817,13 +817,16 @@ ui.directive('uiFilterBox', function() {
 
 			$scope.onFreeSearch = function() {
 
-				var filters = new Array(),
+				var filters = [],
 					fields = {},
 					text = this.custTerm,
 					number = +(text);
 
-				fields = _.extend({}, this.$parent.fields, this.fields);
 				text = text ? text.trim() : null;
+
+				if ((handler.schema || {}).freeSearch === 'all') {
+					fields = _.extend({}, this.$parent.fields, this.fields);
+				}
 
 				if (this.nameField && text) {
 					filters.push({
@@ -945,6 +948,12 @@ ui.directive('uiFilterBox', function() {
 					hideMenu();
 				}
 			}
+
+			scope.handler.$watch('schema.freeSearch', function (value, old) {
+				if (value === 'none') {
+					element.hide();
+				}
+			});
 
 			element.on('$destroy', function() {
 				$(document).on('mousedown.search-menu', onMouseDown);
