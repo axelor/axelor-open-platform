@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.auth.db;
+package com.axelor.auth;
 
 import java.io.Serializable;
 
@@ -24,7 +24,8 @@ import org.hibernate.Transaction;
 import org.hibernate.type.Type;
 import org.joda.time.LocalDateTime;
 
-import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.AuditableModel;
+import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 
 @SuppressWarnings("serial")
@@ -44,6 +45,9 @@ public class AuditInterceptor extends EmptyInterceptor {
 
 	private User getUser() {
 		User user = currentUser.get();
+		if (user == null) {
+			user = AuditableRunner.batchUser.get();
+		}
 		if (user == null || JPA.em().contains(user)) {
 			return user;
 		}

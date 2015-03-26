@@ -18,6 +18,7 @@
 package com.axelor.meta.loader;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -34,7 +35,9 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.auth.AuditableRunner;
 import com.axelor.auth.AuthService;
+import com.axelor.auth.db.AuditableModel;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
@@ -84,6 +87,9 @@ public class ModuleManager {
 	@Inject
 	private DemoLoader demoLoader;
 
+	@Inject
+	private AuditableRunner jobRunner;
+
 	private static final Set<String> SKIP = Sets.newHashSet(
 			"axelor-common",
 			"axelor-cglib",
@@ -93,35 +99,43 @@ public class ModuleManager {
 
 	}
 
-	public void initialize(boolean update, boolean withDemo) {
+	public void initialize(final boolean update, final boolean withDemo) {
+
+		final Runnable job = new Runnable() {
+
+			@Override
+			public void run() {
+
+				log.info("modules found:");
+				for (String name : resolver.names()) {
+					log.info("  " + name);
+				}
+
+				// install modules
+				for (Module module : resolver.all()) {
+					if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
+						install(module.getName(), update, withDemo, false);
+					}
+				}
+				// second iteration ensures proper view sequence
+				for (Module module : resolver.all()) {
+					if (module.isInstalled()) {
+						viewLoader.doLast(module, update);
+					}
+				}
+				// uninstall pending modules
+				for (Module module : resolver.all()) {
+					if (module.isRemovable() && !module.isInstalled() && module.isPending()) {
+						uninstall(module.getName());
+					}
+				}
+			}
+		};
 
 		try {
 			this.createUsers();
 			this.resolve(true);
-
-			log.info("modules found:");
-			for (String name : resolver.names()) {
-				log.info("  " + name);
-			}
-
-			// install modules
-			for (Module module : resolver.all()) {
-				if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
-					install(module.getName(), update, withDemo, false);
-				}
-			}
-			// second iteration ensures proper view sequence
-			for (Module module : resolver.all()) {
-				if (module.isInstalled()) {
-					viewLoader.doLast(module, update);
-				}
-			}
-			// uninstall pending modules
-			for (Module module : resolver.all()) {
-				if (module.isRemovable() && !module.isInstalled() && module.isPending()) {
-					uninstall(module.getName());
-				}
-			}
+			jobRunner.run(job);
 		} finally {
 			this.doCleanUp();
 		}
@@ -473,22 +487,32 @@ public class ModuleManager {
 
 		if (adminGroup == null) {
 			adminGroup = new Group("admins", "Administrators");
-			adminGroup = groups.save(adminGroup);
 		}
 
 		if (userGroup == null) {
 			userGroup = new Group("users", "Users");
-			userGroup = groups.save(userGroup);
 		}
 
 		admin = new User("admin", "Administrator");
 		admin.setPassword(authService.encrypt("admin"));
 		admin.setGroup(adminGroup);
-		admin = users.save(admin);
 
 		User demo = new User("demo", "Demo User");
 		demo.setPassword(authService.encrypt("demo"));
 		demo.setGroup(userGroup);
+
+		// set createdBy property to admin
+		try {
+			Field createdBy = AuditableModel.class.getDeclaredField("createdBy");
+			createdBy.setAccessible(true);
+			createdBy.set(adminGroup, admin);
+			createdBy.set(userGroup, admin);
+			createdBy.set(admin, admin);
+			createdBy.set(demo, admin);
+		} catch (Exception e) {
+		}
+
+		admin = users.save(admin);
 		demo = users.save(demo);
 	}
 }
