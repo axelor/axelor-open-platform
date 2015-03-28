@@ -173,6 +173,11 @@ public class ActionView extends Action {
 						value = JPA.copy((Model)value, true);
 					}
 					context.put(ctx.getName(), value);
+
+					// make it available to the evaluation context
+					if (ctx.getName().startsWith("_")) {
+						handler.getContext().put(ctx.getName(), value);
+					}
 				}
 			}
 		}
