@@ -75,11 +75,18 @@ ui.directive('uiFilterItem', function() {
 				}
 
 				var filter = scope.filter || {};
-				if (filter.type === undefined) {
+				if (filter.type === undefined || !filter.field) {
 					return [];
 				}
 
-				return _.map(OPERATORS_BY_TYPE[filter.type], function(name) {
+				var field = scope.fields[filter.field] || {};
+				var operators = OPERATORS_BY_TYPE[filter.type] || [];
+
+				if (field.target && !field.targetName) {
+					operators = ["isNull", "notNull"];
+				}
+
+				return _.map(operators, function(name) {
 					return {
 						name: name,
 						title: OPERATORS[name]
@@ -424,6 +431,11 @@ function FilterFormCtrl($scope, $element, ViewService) {
 					filter.operator !== 'isNull' ||
 					filter.operator !== 'notNull')) {
 				criterion.fieldName += '.' + filter.targetName;
+			}
+			if (/-many/.test(filter.type) && (
+					filter.operator !== 'isNull' ||
+					filter.operator !== 'notNull')) {
+				criterion.fieldName += '.id';
 			}
 
 			if (criterion.operator == "true") {
