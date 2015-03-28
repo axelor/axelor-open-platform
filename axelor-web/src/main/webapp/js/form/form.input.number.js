@@ -108,6 +108,7 @@ ui.formInput('Number', {
 			if (b === "" && a === undefined) return true;
 			if (a === undefined || b === undefined) return false;
 			if (a === null || b === null) return false;
+			if (!scope.isNumber(a) || !scope.isNumber(b)) return false;
 			a = a === "" ? a : ((+a) || 0);
 			b = b === "" ? b : ((+b) || 0);
 			return a === b;
