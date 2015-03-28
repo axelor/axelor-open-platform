@@ -17,8 +17,35 @@
  */
 package com.axelor.rpc.filter;
 
+import com.axelor.db.JPA;
 
 class LikeFilter extends SimpleFilter {
+
+	private static Boolean unaccentSupport = null;
+
+	private static final String UNACCENT_CHECK = "SELECT unaccent('text')";
+	private static final String UNACCENT_CREATE = "CREATE EXTENSION IF NOT EXISTS unaccent";
+
+	private static boolean testUnaccent() {
+		try {
+			JPA.em().createNativeQuery(UNACCENT_CHECK).getResultList();
+			return true;
+		} catch (Exception e) {
+		}
+		try {
+			JPA.em().createNativeQuery(UNACCENT_CREATE).executeUpdate();
+			return true;
+		} catch (Exception e) {
+		}
+		return false;
+	}
+
+	private static boolean hasUnaccentSupport() {
+		if (unaccentSupport == null) {
+			unaccentSupport = testUnaccent();
+		}
+		return unaccentSupport == Boolean.TRUE;
+	}
 
 	private LikeFilter(Operator operator, String fieldName, String value) {
 		super(operator, fieldName, value);
@@ -42,6 +69,9 @@ class LikeFilter extends SimpleFilter {
 
 	@Override
 	public String getQuery() {
+		if (hasUnaccentSupport()) {
+			return String.format("(unaccent(UPPER(self.%s)) %s unaccent(?))", getFieldName(), getOperator());
+		}
 		return String.format("(UPPER(self.%s) %s ?)", getFieldName(), getOperator());
 	}
 
