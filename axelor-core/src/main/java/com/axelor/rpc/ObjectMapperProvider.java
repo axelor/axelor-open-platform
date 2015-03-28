@@ -17,6 +17,8 @@
  */
 package com.axelor.rpc;
 
+import static com.axelor.common.StringUtils.isBlank;
+import static com.axelor.meta.loader.ModuleManager.isInstalled;
 import groovy.lang.GString;
 
 import java.io.IOException;
@@ -32,10 +34,9 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
 
-import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
-import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.schema.views.AbstractWidget;
+import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -133,6 +134,26 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 
 	static class WidgetListSerializer extends JsonSerializer<List<AbstractWidget>> {
 
+		private boolean test(AbstractWidget widget) {
+
+			final String module = widget.getModuleToCheck();
+			final String condition =  widget.getConditionToCheck();
+			if (!isBlank(module) && !isInstalled(module)) {
+				return false;
+			}
+			if (isBlank(condition)) {
+				return true;
+			}
+
+			final Request request = Request.current();
+			if (request == null) {
+				return true;
+			}
+
+			final ScriptHelper helper = request.getScriptHelper();
+			return helper.test(condition);
+		}
+
 		@Override
 		public void serialize(List<AbstractWidget> value, JsonGenerator jgen,
 				SerializerProvider provider) throws IOException,
@@ -145,8 +166,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 			jgen.writeStartArray();
 			
 			for (AbstractWidget widget : value) {
-				String module = widget.getModuleToCheck();
-				if (StringUtils.isBlank(module) || ModuleManager.isInstalled(module)) {
+				if (test(widget)) {
 					jgen.writeObject(widget);
 				}
 			}

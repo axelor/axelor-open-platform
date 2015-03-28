@@ -17,7 +17,11 @@
  */
 package com.axelor.script;
 
+import static com.axelor.common.StringUtils.isBlank;
+
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.script.SimpleBindings;
@@ -26,9 +30,11 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.inject.Beans;
 import com.axelor.rpc.Context;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
@@ -54,9 +60,11 @@ public class ScriptBindings extends SimpleBindings {
 			);
 
 	private Map<String, Object> variables;
+	private Map<String, Object> configContext;
 
 	public ScriptBindings(Map<String, Object> variables) {
 		this.variables = this.tryContext(variables);
+		this.configContext = this.configContext();
 	}
 	
 	private Map<String, Object> tryContext(Map<String, Object> variables) {
@@ -113,17 +121,16 @@ public class ScriptBindings extends SimpleBindings {
 
 	@Override
 	public boolean containsKey(Object key) {
-		if (META_VARS.contains(key) || super.containsKey(key)) {
-			return true;
-		}
-		return variables.containsKey(key);
+		return META_VARS.contains(key) || super.containsKey(key)
+				|| variables.containsKey(key) || configContext.containsKey(key);
 	}
 
 	@Override
 	public Set<String> keySet() {
 		Set<String> keys = Sets.newHashSet(super.keySet());
-		keys.addAll(META_VARS);
 		keys.addAll(variables.keySet());
+		keys.addAll(META_VARS);
+		keys.addAll(configContext.keySet());
 		return keys;
 	}
 
@@ -148,7 +155,7 @@ public class ScriptBindings extends SimpleBindings {
 			return value;
 		}
 
-		return null;
+		return configContext.get(key);
 	}
 
 	@Override
@@ -171,5 +178,44 @@ public class ScriptBindings extends SimpleBindings {
 			}
 		}
 		variables.putAll(values);
+	}
+
+	private Map<String, Object> configContext() {
+
+		final Properties properties = AppSettings.get().getProperties();
+		final Map<String, Object> vars = new HashMap<>();
+
+		for (final Object key : properties.keySet()) {
+
+			final String name = key.toString();
+			final String expr = properties.getProperty(name);
+
+			if (!name.startsWith("context.") || isBlank(expr)) {
+				continue;
+			}
+
+			final String[] parts = expr.split("\\:", 2);
+			final Class<?> klass;
+
+			try {
+				klass = Class.forName(parts[0]);
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+
+			Object value = Beans.get(klass);
+
+			if (parts.length > 1) {
+				try {
+					value = klass.getMethod(parts[1]).invoke(value);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+			vars.put(name.substring(8), value);
+		}
+
+		return vars;
 	}
 }

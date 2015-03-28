@@ -55,6 +55,9 @@ import com.google.common.collect.Maps;
 })
 public abstract class AbstractWidget {
 	
+	@XmlAttribute(name = "if")
+	private String conditionToCheck;
+
 	@XmlAttribute(name = "if-module")
 	private String moduleToCheck;
 	
@@ -66,6 +69,14 @@ public abstract class AbstractWidget {
 	@JsonIgnore
 	private String model;
 	
+	public String getConditionToCheck() {
+		return conditionToCheck;
+	}
+
+	public void setConditionToCheck(String conditionToCheck) {
+		this.conditionToCheck = conditionToCheck;
+	}
+
 	public String getModuleToCheck() {
 		return moduleToCheck;
 	}

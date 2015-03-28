@@ -288,6 +288,13 @@
   </xsd:complexType>
 
   <xsd:complexType name="AbstractWidget" abstract="true">
+    <xsd:attribute name="if" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Only use this widget if the given expression is true.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="if-module" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
