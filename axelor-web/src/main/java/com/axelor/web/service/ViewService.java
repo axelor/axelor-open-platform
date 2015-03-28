@@ -275,6 +275,17 @@ public class ViewService extends AbstractService {
 	}
 
 	@POST
+	@Path("view")
+	public Response view(Request request) {
+
+		final Map<String, Object> data = request.getData();
+		final String name = (String) data.get("name");
+		final String type = (String) data.get("type");
+
+		return view(request.getModel(), name, type);
+	}
+
+	@POST
 	@Path("view/fields")
 	public Response viewFields(Request request) {
 		final Response response = new Response();

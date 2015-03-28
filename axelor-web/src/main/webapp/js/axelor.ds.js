@@ -252,7 +252,7 @@
 			viewCache.put(key, angular.copy(result));
 		}
 
-		ViewService.prototype.getMetaDef = function(model, view) {
+		ViewService.prototype.getMetaDef = function(model, view, context) {
 
 			var self = this,
 				hasItems = _.isArray(view.items),
@@ -337,12 +337,12 @@
 				return loadFields({view: view});
 			};
 
-			$http.get('ws/meta/view', {
-				cache: true,
-				params: {
-					model: model,
+			$http.post('ws/meta/view', {
+				model: model,
+				data: {
 					type: view.type,
-					name: view.name
+					name: view.name,
+					context: context
 				}
 			}).then(function(response) {
 				var res = response.data,

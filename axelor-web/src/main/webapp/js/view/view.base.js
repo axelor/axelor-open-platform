@@ -58,7 +58,11 @@ function ViewCtrl($scope, DataSource, ViewService) {
 				name: viewName
 			};
 		}
-		return ViewService.getMetaDef($scope._model, view);
+		var ctx = $scope._context;
+		if ($scope.getContext) {
+			ctx = $scope.getContext();
+		}
+		return ViewService.getMetaDef($scope._model, view, ctx);
 	};
 
 	$scope.loadFields = function() {
