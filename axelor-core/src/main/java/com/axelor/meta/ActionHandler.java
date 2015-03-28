@@ -44,7 +44,6 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.Resource;
-import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.axelor.text.Templates;
@@ -75,18 +74,14 @@ public class ActionHandler {
 	
 	private ActionHandler(Injector injector, ActionRequest request) {
 
-		Context context = request.getContext();
-		if (context == null) {
-			log.debug("null context for action: {}", request.getAction());
-			context = Context.create(null, request.getBeanClass());
-		}
+		final Context context = request.getContext();
 
 		this.injector = injector;
 		this.request = request;
 
 		this.context = context;
 
-		this.scriptHelper = new GroovyScriptHelper(this.context);
+		this.scriptHelper = request.getScriptHelper();
 		this.bindings = this.scriptHelper.getBindings();
 		this.bindings.put("__me__", this);
 	}

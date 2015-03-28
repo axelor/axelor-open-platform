@@ -17,12 +17,18 @@
  */
 package com.axelor.rpc;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.axelor.script.GroovyScriptHelper;
+import com.axelor.script.ScriptBindings;
+import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Request {
+
+	static final ThreadLocal<Request> CURRENT = new ThreadLocal<Request>();
 
 	private int limit;
 
@@ -42,6 +48,14 @@ public class Request {
 
 	private String model;
 	
+	private Context context;
+
+	private ScriptHelper scriptHelper;
+
+	public static Request current() {
+		return CURRENT.get();
+	}
+
 	public String getModel() {
 		return model;
 	}
@@ -49,7 +63,8 @@ public class Request {
 	/**
 	 * Set the model class that represents the request {@link #data}.
 	 * 
-	 * @param model the model class
+	 * @param model
+	 *            the model class
 	 */
 	public void setModel(String model) {
 		this.model = model;
@@ -139,5 +154,53 @@ public class Request {
 		}
 
 		return null;
+	}
+
+	@SuppressWarnings("all")
+	private Map<String, Object> findContext() {
+
+		final Map<String, Object> data = getData();
+		final Map<String, Object> ctx = new HashMap<>();
+
+		if (data == null) {
+			return ctx;
+		}
+
+		if (data.get("context") != null) {
+			ctx.putAll((Map) data.get("context"));
+		}
+		if (data.get("_domainContext") != null) {
+			ctx.putAll((Map) data.get("_domainContext"));
+		}
+
+		return ctx;
+	}
+
+	/**
+	 * Get a {@link ScriptHelper} to evaluate expressions with current context.
+	 *
+	 */
+	@JsonIgnore
+	public ScriptHelper getScriptHelper() {
+		if (scriptHelper != null) {
+			return scriptHelper;
+		}
+		Map<String, Object> ctx = getContext();
+		if (ctx == null) {
+			ctx = findContext();
+		}
+		return scriptHelper = new GroovyScriptHelper(new ScriptBindings(ctx));
+	}
+
+	/**
+	 * Get the domain object context.
+	 *
+	 */
+	@JsonIgnore
+	public Context getContext() {
+		if (context != null || getBeanClass() == null) {
+			return context;
+		}
+		return context = Context.create(findContext(), getBeanClass());
 	}
 }

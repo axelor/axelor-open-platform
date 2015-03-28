@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.web;
+package com.axelor.rpc;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -39,17 +39,16 @@ import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.JpaSupport;
 import com.axelor.db.Model;
 import com.axelor.i18n.I18n;
-import com.axelor.rpc.Response;
 
 public class ResponseInterceptor extends JpaSupport implements MethodInterceptor {
-	
+
 	private final Logger log = LoggerFactory.getLogger(ResponseInterceptor.class);
-	
+
 	private final ThreadLocal<Boolean> running = new ThreadLocal<Boolean>();
-	
+
 	@Override
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
-		
+
 		if (running.get() == Boolean.TRUE) {
 			return invocation.proceed();
 		}
@@ -57,7 +56,7 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 		log.trace("Web Service: {}", invocation.getMethod());
 
 		Response response = null;
-		
+
 		running.set(true);
 		try {
 			response = (Response) invocation.proceed();

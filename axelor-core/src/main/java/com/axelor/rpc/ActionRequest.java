@@ -17,16 +17,9 @@
  */
 package com.axelor.rpc;
 
-import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.collect.Maps;
-
 public class ActionRequest extends Request {
 
 	private String action;
-	
-	private Context context;
 	
 	public String getAction() {
 		return action;
@@ -34,28 +27,5 @@ public class ActionRequest extends Request {
 	
 	public void setAction(String action) {
 		this.action = action;
-	}
-	
-	@JsonIgnore
-	@SuppressWarnings("all")
-	public Context getContext() {
-		if (context != null) {
-			return context;
-		}
-		if (getData() == null) {
-			return null;
-		}
-		
-		Map<String, Object> data = getData();
-		Map<String, Object> ctx = Maps.newHashMap();
-
-		if (data.get("context") != null) {
-			ctx.putAll((Map) data.get("context"));
-		}
-		if (data.get("_domainContext") != null) {
-			ctx.putAll((Map) data.get("_domainContext"));
-		}
-
-		return context = Context.create(ctx, getBeanClass());
 	}
 }
