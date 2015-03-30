@@ -24,6 +24,8 @@ dependencies {
 	}
 	compile libs.ehcache
 
+	compile libs.jersey_server
+	compile libs.jersey_guice
 	compile libs.jackson_libs
 
 	compile libs.ST4
