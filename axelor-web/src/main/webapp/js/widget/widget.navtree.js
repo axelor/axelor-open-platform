@@ -26,7 +26,13 @@ angular.module('axelor.ui').directive('navTree', function() {
 		controller: ['$scope', '$element', 'MenuService', function($scope, $element, MenuService) {
 
 			function canAccept(item) {
-				return item.left || item.left === undefined;
+				if (item.left === false) {
+					return false;
+				}
+				if (axelor.device.mobile && item.mobile === false) {
+					return false;
+				}
+				return true;
 			}
 
 			$scope.load = function(parent, successFn) {
@@ -34,13 +40,9 @@ angular.module('axelor.ui').directive('navTree', function() {
 				var name = parent ? parent.name : null;
 
 				MenuService.get(name).success(function(res){
-					var items = res.data;
+					var items = _.filter(res.data, canAccept);
 					if (successFn) {
 						return successFn(items);
-					}
-
-					if (name == null) {
-						items = _.filter(items, canAccept);
 					}
 					$element.navtree('addItems', items);
 				});

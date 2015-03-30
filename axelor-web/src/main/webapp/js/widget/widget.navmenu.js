@@ -44,11 +44,11 @@ function NavMenuCtrl($scope, $element, MenuService, NavService) {
 
 		_.each(data, function(item) {
 
-			if (hasSideBar && !item.parent && !item.top) {
+			if (hasSideBar && !item.top) {
 				return;
 			}
 
-			if (item.parent == null) {
+			if (!item.parent) {
 				return all.push(item);
 			}
 			var parent = items[item.parent];
