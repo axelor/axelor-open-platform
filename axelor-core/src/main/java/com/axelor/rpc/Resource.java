@@ -17,6 +17,8 @@
  */
 package com.axelor.rpc;
 
+import static com.axelor.common.StringUtils.isBlank;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Method;
@@ -40,6 +42,7 @@ import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.common.Inflector;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaSecurity;
@@ -52,8 +55,10 @@ import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
+import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaTranslation;
+import com.axelor.meta.schema.views.Selection;
 import com.axelor.rpc.filter.Filter;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Function;
@@ -386,7 +391,6 @@ public class Resource<T extends Model> {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public void export(Request request, Writer writer) throws IOException {
 		security.get().check(JpaSecurity.CAN_READ, model);
 		LOG.debug("Exporting '{}' with {}", model.getName(), request.getData());
@@ -414,9 +418,9 @@ public class Resource<T extends Model> {
 				name = field;
 			}
 
-			if (title == null) {
+			if (isBlank(title)) {
 				title = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, prop.getName());
-				title = humanize(title);
+				title = Inflector.getInstance().humanize(title);
 			}
 
 			if (prop.isReference()) {
@@ -425,20 +429,15 @@ public class Resource<T extends Model> {
 					continue;
 				}
 				name = name + '.' + prop.getName();
-			} else if(prop.getSelection() != null && !"".equals(prop.getSelection().trim())) {
-				javax.persistence.Query q = JPA.em().createQuery("SELECT new List(self.value, self.title) FROM MetaSelectItem self "
-						+ "JOIN self.select metaSelect "
-						+ "WHERE metaSelect.name = ?1");
-				q.setParameter(1, prop.getSelection());
-
-				List<List<?>> result = q.getResultList();
-				if (result == null || result.isEmpty()) {
+			} else if(!isBlank(prop.getSelection())) {
+				List<Selection.Option> options = MetaStore.getSelectionList(prop.getSelection());
+				if (options == null || options.isEmpty()) {
 					continue;
 				}
 
 				Map<String, String> map = Maps.newHashMap();
-				for (List<?> object : result) {
-					map.put(object.get(0).toString(), object.get(1).toString());
+				for (Selection.Option option : options) {
+					map.put(option.getValue(), option.getLocalizedTitle());
 				}
 				selection.put(header.size(), map);
 			}
@@ -487,14 +486,6 @@ public class Resource<T extends Model> {
 		if (value == null) return "";
 		if (value.indexOf('"') > -1) value = value.replaceAll("\"", "\"\"");
 		return '"' + value + '"';
-	}
-
-	private String humanize(String value) {
-		if (value.endsWith("_id")) value = value.substring(0, value.length() - 3);
-		if (value.endsWith("_set")) value = value.substring(0, value.length() - 5);
-		if (value.endsWith("_list")) value = value.substring(0, value.length() - 6);
-		return value.substring(0, 1).toUpperCase() +
-			   value.substring(1).replaceAll("_+", " ");
 	}
 
 	public Response read(long id) {

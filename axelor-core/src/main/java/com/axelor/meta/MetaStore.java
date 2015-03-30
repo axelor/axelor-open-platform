@@ -32,7 +32,6 @@ import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Query;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaSelectItem;
-import com.axelor.meta.db.repo.MetaSelectItemRepository;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
@@ -137,6 +136,28 @@ public class MetaStore {
 			return null;
 		}
 
+		final Map<String, Selection.Option> all = buildSelectionMap(selection);
+		if(all == null) {
+			return null;
+		}
+
+		return new ArrayList<>(all.values());
+	}
+
+	public static Selection.Option getSelectionItem(String selection, String value) {
+		if (StringUtils.isBlank(selection)) {
+			return null;
+		}
+
+		final Map<String, Selection.Option> all = buildSelectionMap(selection);
+		if(all == null) {
+			return null;
+		}
+
+		return all.get(value);
+	}
+
+	private static Map<String, Selection.Option> buildSelectionMap(String selection) {
 		final List<MetaSelectItem> items = Query.of(MetaSelectItem.class)
 				.filter("self.select.name = ?", selection)
 				.order("order")
@@ -157,17 +178,7 @@ public class MetaStore {
 			}
 		}
 
-		return new ArrayList<>(all.values());
-	}
-
-	public static Selection.Option getSelectionItem(String selection, String value) {
-		final MetaSelectItem item = Beans.get(MetaSelectItemRepository.class).all()
-				.filter("self.select.name = ?1 AND self.value = ?2", selection, value)
-				.fetchOne();
-		if (item == null) {
-			return null;
-		}
-		return getSelectionItem(item);
+		return all;
 	}
 
 	@SuppressWarnings("unchecked")
