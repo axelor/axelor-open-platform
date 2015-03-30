@@ -19,10 +19,9 @@ package com.axelor.meta;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
 import com.axelor.auth.AuthUtils;
@@ -32,7 +31,6 @@ import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Query;
 import com.axelor.inject.Beans;
-import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.db.repo.MetaSelectItemRepository;
 import com.axelor.meta.loader.ModuleManager;
@@ -139,37 +137,27 @@ public class MetaStore {
 			return null;
 		}
 
-		final MetaSelect select = Query.of(MetaSelect.class)
-				.filter("self.name = ?", selection)
-				.order("-priority")
-				.fetchOne();
-
-		if (select == null) {
-			return null;
-		}
-
-		final List<MetaSelectItem> items = Query
-				.of(MetaSelectItem.class)
-				.filter("self.select.id = ?", select.getId())
+		final List<MetaSelectItem> items = Query.of(MetaSelectItem.class)
+				.filter("self.select.name = ?", selection)
 				.order("order")
+				.order("createdOn")
 				.fetch();
 
-		if (items == null || items.isEmpty()) {
+		if (items.isEmpty()) {
 			return null;
 		}
 
-		final List<Selection.Option> all = new ArrayList<>();
-		final Set<String> visited = new HashSet<>();
+		final Map<String, Selection.Option> all = new LinkedHashMap<>();
 
-		for(MetaSelectItem item : items) {
-			if (visited.contains(item.getValue())) {
-				continue;
+		for (MetaSelectItem item : items) {
+			if (item.getHidden() == Boolean.TRUE) {
+				all.remove(item.getValue());
+			} else {
+				all.put(item.getValue(), getSelectionItem(item));
 			}
-			visited.add(item.getValue());
-			all.add(getSelectionItem(item));
 		}
 
-		return all;
+		return new ArrayList<>(all.values());
 	}
 
 	public static Selection.Option getSelectionItem(String selection, String value) {
@@ -188,6 +176,8 @@ public class MetaStore {
 		option.setValue(item.getValue());
 		option.setTitle(item.getTitle());
 		option.setIcon(item.getIcon());
+		option.setOrder(item.getOrder());
+		option.setHidden(item.getHidden());
 		ObjectMapper objectMapper = Beans.get(ObjectMapper.class);
 		try {
 			option.setData(objectMapper.readValue(item.getData(), Map.class));

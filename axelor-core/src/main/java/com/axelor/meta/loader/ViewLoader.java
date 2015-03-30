@@ -281,11 +281,20 @@ public class ViewLoader extends AbstractLoader {
 
 		int sequence = 0;
 		for(Selection.Option opt : selection.getOptions()) {
+
 			MetaSelectItem item = new MetaSelectItem();
+			Integer seq = sequence++;
+
+			if (opt.getOrder() != null) {
+				seq = opt.getOrder();
+			}
+
 			item.setValue(opt.getValue());
 			item.setTitle(opt.getTitle());
 			item.setIcon(opt.getIcon());
-			item.setOrder(sequence++);
+			item.setOrder(seq);
+			item.setHidden(opt.getHidden());
+
 			entity.addItem(item);
 			if (opt.getDataAttributes() == null) {
 				continue;

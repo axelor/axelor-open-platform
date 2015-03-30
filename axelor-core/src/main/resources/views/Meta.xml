@@ -187,6 +187,7 @@
       <field name="value"/>
       <field name="icon"/>
       <field name="data"/>
+      <field name="hidden" />
       <field name="order" width="100"/>
     </panel-related>
   </form>
@@ -197,6 +198,7 @@
       <field name="value" />
       <field name="icon" />
       <field name="data" />
+      <field name="hidden" />
       <field name="order" help="Sequence order" width="100" />
     </panel>
   </form>

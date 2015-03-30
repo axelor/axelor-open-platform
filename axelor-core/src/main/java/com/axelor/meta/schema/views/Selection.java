@@ -80,6 +80,12 @@ public class Selection {
 		@XmlAttribute
 		private String icon;
 
+		@XmlAttribute
+		private Integer order;
+
+		@XmlAttribute
+		private Boolean hidden;
+
 		@JsonIgnore
 		@XmlAnyAttribute
 		private Map<QName, String> dataAttributes;
@@ -115,6 +121,22 @@ public class Selection {
 
 		public void setIcon(String icon) {
 			this.icon = icon;
+		}
+
+		public Integer getOrder() {
+			return order;
+		}
+
+		public void setOrder(Integer order) {
+			this.order = order;
+		}
+
+		public Boolean getHidden() {
+			return hidden;
+		}
+
+		public void setHidden(Boolean hidden) {
+			this.hidden = hidden;
 		}
 
 		public Map<QName, String> getDataAttributes() {

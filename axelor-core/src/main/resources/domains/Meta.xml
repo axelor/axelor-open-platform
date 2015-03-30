@@ -124,6 +124,7 @@
     <string name="icon" help="The image icon to show in UI wigets." />
     <string name="data" help="The addition data for UI widgets." />
     <integer name="order" column="order_seq"/>
+    <boolean name="hidden" />
     <many-to-one name="select" ref="MetaSelect" column="select_id" required="true"/>
   </entity>
   

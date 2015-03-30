@@ -482,12 +482,26 @@
             <xsd:extension base="xsd:string">
               <xsd:attribute name="value" type="xsd:string" use="required">
                 <xsd:annotation>
-                  <xsd:documentation>Value stored in database.</xsd:documentation>
+                  <xsd:documentation>Option value stored in database.</xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
               <xsd:attribute name="icon" type="xsd:string">
                 <xsd:annotation>
                   <xsd:documentation>Image icon to show for this item.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
+              <xsd:attribute name="order" type="xsd:int">
+                <xsd:annotation>
+                  <xsd:documentation>
+                  Specify the sequence number to order the option.
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
+              <xsd:attribute name="hidden" type="xsd:boolean">
+                <xsd:annotation>
+                  <xsd:documentation>
+                  Specify whether to hide this option from selection.
+                  </xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
               <xsd:anyAttribute processContents="skip" />
