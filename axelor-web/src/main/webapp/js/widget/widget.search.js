@@ -963,7 +963,10 @@ ui.directive('uiFilterBox', function() {
 
 			scope.handler.$watch('schema.freeSearch', function (value, old) {
 				if (value === 'none') {
-					element.hide();
+					var input = element.find('input:first')
+						.addClass('not-readonly')
+						.attr('readonly', true)
+						.click(scope.onSearch.bind(scope));
 				}
 			});
 

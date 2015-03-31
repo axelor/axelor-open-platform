@@ -1089,6 +1089,10 @@ table.field-details .help-text hr {
 	width: 100%;
 }
 
+.filter-box > input.not-readonly {
+	background-color: #fff;
+}
+
 .filter-box .search-icons {
 	position: absolute;
 	display: inline-block;
