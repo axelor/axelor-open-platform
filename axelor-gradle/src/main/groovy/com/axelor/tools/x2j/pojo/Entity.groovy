@@ -62,6 +62,8 @@ class Entity {
 
 	Map<String, Property> propertyMap
 
+	Property nameField
+
 	private Repository repository
 
 	private ImportManager importManager
@@ -161,6 +163,9 @@ class Entity {
 				if (field.isVirtual() && !field.isTransient()) {
 					dynamicUpdate = true
 				}
+				if (field.isNameField()) {
+					nameField = field
+				}
 			}
 		}
 	}
@@ -180,7 +185,10 @@ class Entity {
 				prop.ownEntity = prop.entity
 				prop.entity = this
 				properties.add(prop)
-				propertyMap[prop.name] = prop;
+				propertyMap[prop.name] = prop
+				if (prop.isNameField()) {
+					nameField = prop
+				}
 			}
 		}
 		

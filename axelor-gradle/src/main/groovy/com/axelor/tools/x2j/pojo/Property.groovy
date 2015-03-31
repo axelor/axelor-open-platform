@@ -512,7 +512,9 @@ class Property {
 	}
 
 	private Annotation $nameColumn() {
-		if (isNameField())
+		if (!entity && isNameField())
+			return annon("com.axelor.db.annotations.NameColumn", true)
+		if (entity.nameField == this || (!entity.nameField && isNameField()))
 			annon("com.axelor.db.annotations.NameColumn", true)
 	}
 

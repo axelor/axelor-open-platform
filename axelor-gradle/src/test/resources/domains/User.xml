@@ -7,6 +7,11 @@
 	
 	<entity name="User">
 		<string name="email" />
+        <string name="fullName" namecolumn="true">
+        <![CDATA[
+          return this.getName();
+        ]]>
+        </string>
         <finder-method name="findByAny" using="code,name,email"/>
         <extra-imports>
         import java.io.*;
