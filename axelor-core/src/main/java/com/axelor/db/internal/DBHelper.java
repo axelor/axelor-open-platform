@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -43,6 +44,11 @@ import com.google.common.base.Throwables;
  *
  */
 public class DBHelper {
+
+	private static Boolean unaccentSupport = null;
+
+	private static final String UNACCENT_CHECK = "SELECT unaccent('text')";
+	private static final String UNACCENT_CREATE = "CREATE EXTENSION IF NOT EXISTS unaccent";
 
 	private static final String XPATH_ROOT = "/persistence/persistence-unit[@name='persistenceUnit']";
 
@@ -161,6 +167,42 @@ public class DBHelper {
 		if (isBlank(cacheMode)) return false;
 		if (cacheMode.equals("ALL")) return true;
 		if (cacheMode.equals("ENABLE_SELECTIVE")) return true;
+		return false;
+	}
+
+	/**
+	 * Check whether the database has unaccent support.
+	 *
+	 */
+	public static boolean isUnaccentEnabled() {
+		if (unaccentSupport == null) {
+			try {
+				unaccentSupport = testUnaccent();
+			} catch (Exception e) {
+				unaccentSupport = Boolean.FALSE;
+			}
+		}
+		return unaccentSupport == Boolean.TRUE;
+	}
+
+	private static boolean testUnaccent() throws Exception {
+		Connection connection = getConnection();
+		Statement stmt = connection.createStatement();
+		try {
+			try {
+				stmt.executeQuery(UNACCENT_CHECK);
+				return true;
+			} catch (Exception e) {
+			}
+			try {
+				stmt.executeUpdate(UNACCENT_CREATE);
+				return true;
+			} catch (Exception e) {
+			}
+		} finally {
+			stmt.close();
+			connection.close();
+		}
 		return false;
 	}
 }
