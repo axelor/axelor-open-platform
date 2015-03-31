@@ -18,12 +18,16 @@
 package com.axelor.meta.service;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.slf4j.Logger;
@@ -79,25 +83,60 @@ public class MetaService {
 	@Inject
 	private MetaAttachmentRepository attachments;
 
+	private List<MenuItem> filter(List<MenuItem> items) {
+
+		Set<String> visited = new HashSet<>();
+		List<MenuItem> all = new ArrayList<>();
+
+		for (MenuItem item : items) {
+			String name = item.getName();
+			if (visited.contains(name)) {
+				continue;
+			}
+			visited.add(name);
+			if (item.getHidden() != Boolean.TRUE) {
+				all.add(item);
+			}
+		}
+
+		Collections.sort(all, new Comparator<MenuItem>() {
+
+			@Override
+			public int compare(MenuItem a, MenuItem b) {
+				Integer n = a.getOrder();
+				Integer m = b.getOrder();
+
+				if (n == null) n = 0;
+				if (m == null) m = 0;
+
+				return Integer.compare(n, m);
+			}
+		});
+
+		return all;
+	}
+
 	@SuppressWarnings("unchecked")
 	private List<MenuItem> findMenus(Query query) {
 
 		QueryBinder.of(query).setCacheable();
 
-		List<MenuItem> menus = Lists.newArrayList();
+		List<MenuItem> menus = new ArrayList<>();
 		List<Object[]> all = query.getResultList();
 
 		for(Object[] items : all) {
 
 			MetaMenu menu = (MetaMenu) items[0];
 			MenuItem item = new MenuItem();
+
 			item.setName(menu.getName());
-			item.setPriority(menu.getPriority());
+			item.setOrder(menu.getOrder());
 			item.setTitle(menu.getTitle());
 			item.setIcon(menu.getIcon());
 			item.setTop(menu.getTop());
 			item.setLeft(menu.getLeft());
 			item.setMobile(menu.getMobile());
+			item.setHidden(menu.getHidden());
 
 			if (menu.getParent() != null) {
 				item.setParent(menu.getParent().getName());
@@ -110,7 +149,7 @@ public class MetaService {
 			menus.add(item);
 		}
 
-		return menus;
+		return filter(menus);
 	}
 
 	public List<MenuItem> getMenus() {
@@ -176,6 +215,7 @@ public class MetaService {
 		return findMenus(query);
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<MenuItem> getActionMenus(String parent, String category) {
 
 		if ("null".equals(parent))
@@ -183,16 +223,16 @@ public class MetaService {
 		if ("null".equals(category))
 			category = null;
 
-		String str = "SELECT self FROM MetaActionMenu self WHERE self.parent.name = ?1";
+		String str = "SELECT self, COALESCE(self.priority, 0) AS priority FROM MetaActionMenu self WHERE self.parent.name = ?1";
 		if (Strings.isNullOrEmpty(parent)) {
-			str = "SELECT self FROM MetaActionMenu self WHERE self.parent IS NULL";
+			str = "SELECT self, COALESCE(self.priority, 0) AS priority FROM MetaActionMenu self WHERE self.parent IS NULL";
 		}
 		if (!Strings.isNullOrEmpty(category)) {
 			str += " AND self.category = ?2";
 		}
-		str += " ORDER BY self.name";
+		str += " ORDER BY self.name, priority DESC";
 
-		TypedQuery<MetaActionMenu> query = JPA.em().createQuery(str, MetaActionMenu.class);
+		Query query = JPA.em().createQuery(str);
 		if (!Strings.isNullOrEmpty(parent)) {
 			query.setParameter(1, parent);
 		}
@@ -202,14 +242,18 @@ public class MetaService {
 
 		QueryBinder.of(query).setCacheable();
 
-		List<MenuItem> menus = Lists.newArrayList();
-		List<MetaActionMenu> all = query.getResultList();
+		List<MenuItem> menus = new ArrayList<>();
+		List<Object[]> all = query.getResultList();
 
-		for(MetaActionMenu menu : all) {
+		for(Object[] items : all) {
 
+			MetaActionMenu menu = (MetaActionMenu) items[0];
 			MenuItem item = new MenuItem();
+
 			item.setName(menu.getName());
 			item.setTitle(menu.getTitle());
+			item.setOrder(menu.getOrder());
+			item.setHidden(menu.getHidden());
 
 			if (menu.getParent() != null) {
 				item.setParent(menu.getParent().getName());
@@ -224,7 +268,7 @@ public class MetaService {
 			menus.add(item);
 		}
 
-		return menus;
+		return filter(menus);
 	}
 
 	public Action getAction(String name) {

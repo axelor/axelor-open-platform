@@ -55,6 +55,9 @@ import com.google.common.base.Strings;
 })
 public abstract class AbstractView {
 
+	@XmlAttribute(name = "id")
+	private String xmlId;
+
 	@XmlAttribute
 	private String name;
 
@@ -66,9 +69,6 @@ public abstract class AbstractView {
 
 	@XmlAttribute
 	private Boolean editable;
-
-	@XmlAttribute(name = "id")
-	private String id;
 
 	@XmlAttribute
 	private String groups;
@@ -84,6 +84,14 @@ public abstract class AbstractView {
 	@XmlElementWrapper
 	@XmlElement(name = "menu")
 	private List<Menu> menubar;
+
+	public String getXmlId() {
+		return xmlId;
+	}
+
+	public void setXmlId(String xmlId) {
+		this.xmlId = xmlId;
+	}
 
 	public String getName() {
 		return name;
@@ -129,14 +137,6 @@ public abstract class AbstractView {
 
 	public void setEditable(Boolean editable) {
 		this.editable = editable;
-	}
-
-	public String getId() {
-		return id;
-	}
-	
-	public void setId(String id) {
-		this.id = id;
 	}
 
 	public String getGroups() {

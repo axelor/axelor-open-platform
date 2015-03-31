@@ -29,6 +29,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @XmlType
 public class MenuItem extends AbstractWidget {
 
+	@XmlAttribute(name = "id")
+	private String xmlId;
+
 	@XmlAttribute
 	private String name;
 
@@ -48,7 +51,7 @@ public class MenuItem extends AbstractWidget {
 	private String prompt;
 
 	@XmlAttribute
-	private Integer priority;
+	private Integer order;
 
 	@XmlAttribute
 	private String groups;
@@ -66,6 +69,9 @@ public class MenuItem extends AbstractWidget {
 	private String category;
 
 	@XmlAttribute
+	private Boolean hidden;
+
+	@XmlAttribute
 	private String showIf;
 
 	@XmlAttribute
@@ -73,6 +79,14 @@ public class MenuItem extends AbstractWidget {
 
 	@XmlAttribute
 	private String readonlyIf;
+
+	public String getXmlId() {
+		return xmlId;
+	}
+
+	public void setXmlId(String xmlId) {
+		this.xmlId = xmlId;
+	}
 
 	public String getName() {
 		return name;
@@ -90,12 +104,12 @@ public class MenuItem extends AbstractWidget {
 		this.parent = parent;
 	}
 
-	public Integer getPriority() {
-		return priority;
+	public Integer getOrder() {
+		return order;
 	}
 
-	public void setPriority(Integer priority) {
-		this.priority = priority;
+	public void setOrder(Integer order) {
+		this.order = order;
 	}
 
 	public String getGroups() {
@@ -184,6 +198,14 @@ public class MenuItem extends AbstractWidget {
 
 	public Boolean getIsFolder() {
 		return Query.of(MetaMenu.class).filter("self.parent.name = ?1", name).cacheable().count() > 0;
+	}
+
+	public Boolean getHidden() {
+		return hidden;
+	}
+
+	public void setHidden(Boolean hidden) {
+		this.hidden = hidden;
 	}
 
 	public String getShowIf() {

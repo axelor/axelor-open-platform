@@ -165,7 +165,7 @@ public class ViewLoader extends AbstractLoader {
 	
 	private void importView(AbstractView view, Module module, boolean update, int priority) {
 
-		String xmlId = view.getId();
+		String xmlId = view.getXmlId();
 		String name = view.getName();
 		String type = view.getType();
 		String modelName = view.getModel();
@@ -339,23 +339,47 @@ public class ViewLoader extends AbstractLoader {
 
 	private void importAction(Action action, Module module, boolean update) {
 
-		if (isVisited(Action.class, action.getName())) {
+		String name = action.getName();
+		String xmlId = action.getXmlId();
+
+		if (StringUtils.isBlank(xmlId)) {
+			if (isVisited(Action.class, name)) {
+				log.error("duplicate action without 'id': {}", name);
+				return;
+			}
+		} else if (isVisited(Action.class, xmlId)) {
 			return;
 		}
 
-		log.debug("Loading action : {}", action.getName());
+		log.debug("Loading action : {}", name);
 
-		Class<?> klass = action.getClass();
-		Mapper mapper = Mapper.of(klass);
-
-		MetaAction entity = actions.findByName(action.getName());
+		MetaAction entity = actions.findByID(xmlId);
+		MetaAction other = actions.findByName(name);
 		if (entity == null) {
-			entity = new MetaAction(action.getName());
+			entity = actions.all()
+					.filter("self.name = ? AND self.module = ?", name, module.getName())
+					.fetchOne();
+		}
+
+		if (entity == null) {
+			entity = new MetaAction(name);
+		}
+
+		if (other == entity) {
+			other = null;
+		}
+
+		// set priority higher to existing menu
+		if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+			entity.setPriority(other.getPriority() + 1);
 		}
 
 		if (entity.getId() != null && !update) {
 			return;
 		}
+
+		Class<?> klass = action.getClass();
+		Mapper mapper = Mapper.of(klass);
 
 		entity.setXml(XMLViews.toXml(action,  true));
 
@@ -377,37 +401,64 @@ public class ViewLoader extends AbstractLoader {
 
 	private void importMenu(MenuItem menuItem, Module module, boolean update) {
 
-		if (isVisited(MenuItem.class, menuItem.getName())) {
+		String name = menuItem.getName();
+		String xmlId = menuItem.getXmlId();
+
+		if (StringUtils.isBlank(xmlId)) {
+			if (isVisited(MenuItem.class, name)) {
+				log.error("duplicate menu without 'id': {}", name);
+				return;
+			}
+		} else if (isVisited(MenuItem.class, xmlId)) {
 			return;
 		}
 
-		log.debug("Loading menu : {}", menuItem.getName());
+		log.debug("Loading menu : {}", name);
 
-		MetaMenu menu = menus.findByName(menuItem.getName());
-		if (menu == null) {
-			menu = new MetaMenu(menuItem.getName());
+		MetaMenu entity = menus.findByID(xmlId);
+		MetaMenu other = menus.findByName(name);
+		if (entity == null) {
+			entity = menus.all()
+					.filter("self.name = ? AND self.module = ?", name, module.getName())
+					.fetchOne();
+		}
+
+		if (entity == null) {
+			entity = new MetaMenu(name);
+		}
+
+		if (other == entity) {
+			other = null;
+		}
+
+		// set priority higher to existing menu
+		if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+			entity.setPriority(other.getPriority() + 1);
 		}
 		
-		if (menu.getId() != null && !update) {
+		if (entity.getId() != null && !update) {
 			return;
 		}
 
-		menu.setPriority(menuItem.getPriority());
-		menu.setTitle(menuItem.getTitle());
-		menu.setIcon(menuItem.getIcon());
-		menu.setModule(module.getName());
-		menu.setTop(menuItem.getTop());
-		menu.setLeft(menuItem.getLeft() == null ? true : menuItem.getLeft());
-		menu.setMobile(menuItem.getMobile());
-		menu.setGroups(this.findGroups(menuItem.getGroups(), menu.getGroups()));
+		entity.setTitle(menuItem.getTitle());
+		entity.setIcon(menuItem.getIcon());
+		entity.setModule(module.getName());
+		entity.setTop(menuItem.getTop());
+		entity.setLeft(menuItem.getLeft() == null ? true : menuItem.getLeft());
+		entity.setMobile(menuItem.getMobile());
+		entity.setGroups(this.findGroups(menuItem.getGroups(), entity.getGroups()));
+
+		if (menuItem.getOrder() != null) {
+			entity.setOrder(menuItem.getOrder());
+		}
 
 		if (!Strings.isNullOrEmpty(menuItem.getParent())) {
 			MetaMenu parent = menus.findByName(menuItem.getParent());
 			if (parent == null) {
 				log.debug("Unresolved parent : {}", menuItem.getParent());
-				this.setUnresolved(MetaMenu.class, menuItem.getParent(), menu);
+				this.setUnresolved(MetaMenu.class, menuItem.getParent(), entity);
 			} else {
-				menu.setParent(parent);
+				entity.setParent(parent);
 			}
 		}
 
@@ -415,67 +466,94 @@ public class ViewLoader extends AbstractLoader {
 			MetaAction action = actions.findByName(menuItem.getAction());
 			if (action == null) {
 				log.debug("Unresolved action: {}", menuItem.getAction());
-				setUnresolved(MetaMenu.class, menuItem.getAction(), menu);
+				setUnresolved(MetaMenu.class, menuItem.getAction(), entity);
 			} else {
-				menu.setAction(action);
+				entity.setAction(action);
 			}
 		}
 
-		menu = menus.save(menu);
+		entity = menus.save(entity);
 
-		for (MetaMenu pending : this.resolve(MetaMenu.class, menu.getName())) {
+		for (MetaMenu pending : this.resolve(MetaMenu.class, name)) {
 			log.debug("Resolved menu : {}", pending.getName());
-			pending.setParent(menu);
+			pending.setParent(entity);
 			pending = menus.save(pending);
 		}
 	}
 
 	private void importActionMenu(MenuItem menuItem, Module module, boolean update) {
+		String name = menuItem.getName();
+		String xmlId = menuItem.getXmlId();
 
-		if (isVisited(MenuItem.class, menuItem.getName())) {
+		if (StringUtils.isBlank(xmlId)) {
+			if (isVisited(MenuItem.class, name)) {
+				log.error("duplicate action menu without 'id': {}", name);
+				return;
+			}
+		} else if (isVisited(MenuItem.class, xmlId)) {
 			return;
 		}
 
-		log.debug("Loading action menu : {}", menuItem.getName());
+		log.debug("Loading action menu : {}", name);
 
-		MetaActionMenu menu = actionMenus.findByName(menuItem.getName());
-		if (menu == null) {
-			menu = new MetaActionMenu(menuItem.getName());
+		MetaActionMenu entity = actionMenus.findByID(xmlId);
+		MetaActionMenu other = actionMenus.findByName(name);
+		if (entity == null) {
+			entity = actionMenus.all()
+					.filter("self.name = ? AND self.module = ?", name, module.getName())
+					.fetchOne();
 		}
 
-		if (menu.getId() != null && !update) {
+		if (entity == null) {
+			entity = new MetaActionMenu(name);
+		}
+
+		if (other == entity) {
+			other = null;
+		}
+
+		// set priority higher to existing menu
+		if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+			entity.setPriority(other.getPriority() + 1);
+		}
+
+		if (entity.getId() != null && !update) {
 			return;
 		}
 
-		menu.setTitle(menuItem.getTitle());
-		menu.setModule(module.getName());
-		menu.setCategory(menuItem.getCategory());
+		entity.setTitle(menuItem.getTitle());
+		entity.setModule(module.getName());
+		entity.setCategory(menuItem.getCategory());
 
-		if (!StringUtils.isBlank(menuItem.getParent())) {
+		if (menuItem.getOrder() != null) {
+			entity.setOrder(menuItem.getOrder());
+		}
+
+		if (!Strings.isNullOrEmpty(menuItem.getParent())) {
 			MetaActionMenu parent = actionMenus.findByName(menuItem.getParent());
 			if (parent == null) {
 				log.debug("Unresolved parent : {}", menuItem.getParent());
-				this.setUnresolved(MetaActionMenu.class, menuItem.getParent(), menu);
+				this.setUnresolved(MetaActionMenu.class, menuItem.getParent(), entity);
 			} else {
-				menu.setParent(parent);
+				entity.setParent(parent);
 			}
 		}
 
-		if (!Strings.isNullOrEmpty(menuItem.getAction())) {
+		if (!StringUtils.isBlank(menuItem.getAction())) {
 			MetaAction action = actions.findByName(menuItem.getAction());
 			if (action == null) {
 				log.debug("Unresolved action: {}", menuItem.getAction());
-				this.setUnresolved(MetaActionMenu.class, menuItem.getAction(), menu);
+				setUnresolved(MetaActionMenu.class, menuItem.getAction(), entity);
 			} else {
-				menu.setAction(action);
+				entity.setAction(action);
 			}
 		}
 
-		menu = actionMenus.save(menu);
+		entity = actionMenus.save(entity);
 
-		for (MetaActionMenu pending : this.resolve(MetaActionMenu.class, menu.getName())) {
+		for (MetaActionMenu pending : this.resolve(MetaActionMenu.class, name)) {
 			log.debug("Resolved action menu : {}", pending.getName());
-			pending.setParent(menu);
+			pending.setParent(entity);
 			pending = actionMenus.save(pending);
 		}
 	}

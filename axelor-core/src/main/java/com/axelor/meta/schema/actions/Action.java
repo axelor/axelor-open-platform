@@ -34,6 +34,9 @@ public abstract class Action {
 	
 	protected final transient Logger log = LoggerFactory.getLogger(getClass());
 	
+	@XmlAttribute(name = "id")
+	private String xmlId;
+
 	@XmlAttribute
 	private String name;
 	
@@ -42,6 +45,14 @@ public abstract class Action {
 	
 	@XmlAttribute(name = "if-module")
 	private String moduleToCheck;
+
+	public String getXmlId() {
+		return xmlId;
+	}
+
+	public void setXmlId(String xmlId) {
+		this.xmlId = xmlId;
+	}
 
 	public String getName() {
 		return name;

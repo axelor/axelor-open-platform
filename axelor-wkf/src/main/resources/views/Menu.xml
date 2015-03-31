@@ -2,7 +2,7 @@
 <object-views xmlns="http://axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_3.1.xsd">
 
-  <menuitem name="menu-wkf" priority="-99" title="Wkf Management"
+  <menuitem name="menu-wkf" order="99" title="Wkf Management"
   groups="admins,workflow" icon="img/wkf.png" />
 
   <menuitem name="menu-wkf-workflows" parent="menu-wkf" title="Workflows"

@@ -34,6 +34,13 @@
   </xsd:element>
 
   <xsd:complexType name="MenuItem">
+    <xsd:attribute name="id" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+        If overriding some existing one, provide an unique id to identify this one.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="name" type="xsd:string" use="required">
       <xsd:annotation>
         <xsd:documentation>
@@ -69,11 +76,9 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="priority" type="xsd:string">
+    <xsd:attribute name="order" type="xsd:string">
       <xsd:annotation>
-        <xsd:documentation>
-          Define menu sequence priority. Higher priority menu item shows up then the lower one.
-        </xsd:documentation>
+        <xsd:documentation>Specify menu sequence order.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="groups" type="xsd:string">
@@ -104,6 +109,11 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="hidden" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether to hide the menu with given name.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 
   <xsd:complexType name="ActionMenuItem">
@@ -111,7 +121,6 @@
       <xsd:extension base="tns:MenuItem">
         <xsd:attribute name="icon" use="prohibited" />
         <xsd:attribute name="groups" use="prohibited" />
-        <xsd:attribute name="priority" use="prohibited" />
         <xsd:attribute name="category" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
@@ -2110,6 +2119,13 @@
   </xsd:group>
 
   <xsd:complexType name="AbstractAction" abstract="true">
+    <xsd:attribute name="id" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+        If overriding some existing one, provide an unique id to identify this one.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="name" type="xsd:string" use="required">
       <xsd:annotation>
         <xsd:documentation>Action name.</xsd:documentation>

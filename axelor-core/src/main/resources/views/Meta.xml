@@ -105,6 +105,7 @@
     <field name="type"/>
     <field name="model" />
     <field name="module"/>
+    <field name="priority" />
   </grid>
 
   <form title="Action" name="meta-action-form" model="com.axelor.meta.db.MetaAction"
@@ -114,6 +115,7 @@
       <field name="type" readonlyIf="id"/>
       <field name="model"/>
       <field name="module"/>
+      <field name="priority"/>
     </panel>
     <panel title="Schema">
       <field name="xml" showTitle="false" widget="CodeEditor" height="500" x-code-syntax="xml" colSpan="12"/>
@@ -129,6 +131,8 @@
     <field name="top"/>
     <field name="left"/>
     <field name="mobile"/>
+    <field name="hidden"/>
+    <field name="sequence"/>
     <field name="priority"/>
   </grid>
 
@@ -140,11 +144,13 @@
       <field name="icon"/>
       <field name="action"/>
       <field name="module"/>
+      <field name="order"/>
       <field name="priority"/>
       <panel itemSpan="4">
         <field name="top"/>
         <field name="left"/>
         <field name="mobile"/>
+        <field name="hidden"/>
       </panel>
     </panel>
     <panel-related field="groups" />
@@ -157,6 +163,9 @@
     <field name="category"/>
     <field name="action"/>
     <field name="module"/>
+    <field name="hidden"/>
+    <field name="order"/>
+    <field name="priority"/>
   </grid>
 
   <form title="Action Menu" name="meta-action-menu-form" model="com.axelor.meta.db.MetaActionMenu">
@@ -167,6 +176,9 @@
       <field name="category"/>
       <field name="action"/>
       <field name="module"/>
+      <field name="hidden"/>
+      <field name="sequence"/>
+      <field name="priority"/>
     </panel>
   </form>
 

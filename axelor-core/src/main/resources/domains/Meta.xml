@@ -53,19 +53,23 @@
     This object store the menus.
     ]]>
     
-  	<integer name="priority"/>
-  	<string name="name" unique="true" required="true"/>
+	<integer name="priority" />
+    <integer name="order" column="order_seq" />
+    <string name="xmlId" unique="true" />
+	<string name="name" required="true"/>
   	<string name="title" required="true" namecolumn="true"/>
   	<string name="icon"/>
     <string name="module"/>
     <boolean name="top" column="top_menu"/>
     <boolean name="left" column="left_menu" default="true"/>
     <boolean name="mobile" column="mobile_menu"/>
+    <boolean name="hidden" />
   	<many-to-one name="parent" ref="MetaMenu"/>
   	<many-to-one name="action" ref="MetaAction"/>
   	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
     
-    <finder-method name="findByName" using="name" orderBy="-priority" cacheable="true"/>
+    <finder-method name="findByID" using="xmlId" cacheable="true" />
+    <finder-method name="findByName" using="name" orderBy="-order" cacheable="true"/>
     <finder-method name="findByParent" using="Long:id" filter="self.parent.id = :id" all="true" cacheable="true"/>
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
@@ -75,13 +79,19 @@
     This object store the actions menu.
     ]]>
     
-  	<string name="name" unique="true" required="true"/>
+    <integer name="priority" />
+    <integer name="order" column="order_seq" />
+    <string name="xmlId" unique="true" />
+	<string name="name" required="true"/>
   	<string name="title" required="true" namecolumn="true"/>
     <string name="category" help="Category name to group action menus."/>
     <string name="module"/>
+    <boolean name="hidden" />
   	<many-to-one name="parent" ref="MetaActionMenu"/>
   	<many-to-one name="action" ref="MetaAction"/>
     
+    <finder-method name="findByID" using="xmlId" cacheable="true" />
+    <finder-method name="findByName" using="name" orderBy="-order" cacheable="true"/>
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
    
@@ -90,12 +100,16 @@
     This object store the xml actions.
     ]]>
     
-  	<string name="name" unique="true" required="true"/>
+    <integer name="priority" />
+    <string name="xmlId" unique="true" />
+	<string name="name" required="true"/>
     <string name="type" required="true" selection="action.type.selection"/>
     <string name="model" />
     <string name="module" />
   	<string name="xml" required="true" large="true"/>
     
+    <finder-method name="findByID" using="xmlId" cacheable="true" />
+    <finder-method name="findByName" using="name" orderBy="-priority" cacheable="true" />
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
   
