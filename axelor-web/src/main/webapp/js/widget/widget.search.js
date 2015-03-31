@@ -1009,19 +1009,21 @@ ui.directive('uiFilterBox', function() {
 						"</dd>" +
 					"</dl>" +
 				"</div>" +
-				"<hr ng-show='hasFilters()'>" +
-				"<div ui-filter-form x-model='model'></div>" +
-				"<hr>" +
-				"<div class='form-inline'>" +
-					"<div class='control-group'>" +
-						"<input type='text' placeholder='{{\"Save filter as\" | t}}' ng-model='custTitle'> " +
-						"<label class='checkbox'>" +
-							"<input type='checkbox' ng-model='custShared'><span x-translate>Share</span>" +
-						"</label>" +
+				"<div ng-hide='handler.schema.customSearch == false'>" +
+					"<hr ng-show='hasFilters()'>" +
+					"<div ui-filter-form x-model='model'></div>" +
+					"<hr>" +
+					"<div class='form-inline'>" +
+						"<div class='control-group'>" +
+							"<input type='text' placeholder='{{\"Save filter as\" | t}}' ng-model='custTitle'> " +
+							"<label class='checkbox'>" +
+								"<input type='checkbox' ng-model='custShared'><span x-translate>Share</span>" +
+							"</label>" +
+						"</div>" +
+						"<button class='btn btn-small' ng-click='onSave()' ng-disabled='!custTitle'><span x-translate>Save</span></button> " +
+						"<button class='btn btn-small' ng-click='onSave(true)' ng-show='canSaveNew()'><span x-translate>Save as</span></button> " +
+						"<button class='btn btn-small' ng-click='onDelete()' ng-show='custName'><span x-translate>Delete</span></button>" +
 					"</div>" +
-					"<button class='btn btn-small' ng-click='onSave()' ng-disabled='!custTitle'><span x-translate>Save</span></button> " +
-					"<button class='btn btn-small' ng-click='onSave(true)' ng-show='canSaveNew()'><span x-translate>Save as</span></button> " +
-					"<button class='btn btn-small' ng-click='onDelete()' ng-show='custName'><span x-translate>Delete</span></button>" +
 				"</div>" +
 			"</div>" +
 		"</div>"

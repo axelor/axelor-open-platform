@@ -842,6 +842,11 @@
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractGridView">
         <xsd:attributeGroup ref="tns:ObjectViewAttributes" />
+        <xsd:attribute name="customSearch" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether advanced custom search is enabled.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="freeSearch" default="name">
           <xsd:annotation>
             <xsd:documentation>Specify the free search mode</xsd:documentation>
