@@ -346,6 +346,12 @@ ui.formDirective = function(name, object) {
 				if (!template_readonly) {
 					return false;
 				}
+				if (_.isString(template_readonly)) {
+					template_readonly = template_readonly.trim();
+					if (template_readonly[0] !== '<') {
+						template_readonly = '<span>' + template_readonly + '</span>';
+					}
+				}
 				if (scope.$elem_readonly == null) {
 					scope.$elem_readonly = $compile(template_readonly)(scope);
 					if (self.link_readonly) {
