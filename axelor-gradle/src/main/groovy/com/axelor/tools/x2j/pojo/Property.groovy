@@ -539,7 +539,7 @@ class Property {
 			selection = selection.replaceAll("\\],\\s*\\[", '], [')
 		}
 
-		if (title || help || readonly || hidden || multiline || selection || image || isPassword() || massUpdate)
+		if (title || help || readonly || hidden || multiline || selection || image || isPassword() || massUpdate || search)
 			annon("com.axelor.db.annotations.Widget")
 				.add("image", image, false)
 				.add("title", title)
