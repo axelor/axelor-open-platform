@@ -26,6 +26,9 @@ function acceptNumber(value) {
 	if (_.isNumber(value)) {
 		return +value;
 	}
+	if (/^(-)?\d+(\.\d+)?$/.test(value)) {
+		return +value;
+	}
 	return value;
 }
 
