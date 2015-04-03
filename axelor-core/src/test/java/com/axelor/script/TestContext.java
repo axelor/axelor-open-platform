@@ -22,7 +22,13 @@ import org.junit.Test;
 
 public class TestContext extends ScriptTest {
 
+	public static final String STATIC_FIELD = "A static value...";
+
 	private String message = "Hello world...";
+
+	public static String staticMethod() {
+		return STATIC_FIELD;
+	}
 
 	public String hello() {
 		return message;
@@ -45,5 +51,23 @@ public class TestContext extends ScriptTest {
 		Assert.assertTrue(hello instanceof TestContext);
 		Assert.assertEquals(message, world);
 		Assert.assertEquals(message, result);
+
+		Object some = helper.eval("some");
+		Object thing = helper.eval("thing");
+		Object flag = helper.eval("flag");
+		Object string = helper.eval("string");
+		Object number = helper.eval("number");
+
+		Assert.assertNotNull(some);
+		Assert.assertNotNull(thing);
+		Assert.assertNotNull(flag);
+		Assert.assertNotNull(string);
+		Assert.assertNotNull(number);
+
+		Assert.assertEquals(some, STATIC_FIELD);
+		Assert.assertEquals(thing, STATIC_FIELD);
+		Assert.assertEquals(flag, Boolean.TRUE);
+		Assert.assertEquals(string, "some static text value");
+		Assert.assertEquals(number, 100);
 	}
 }

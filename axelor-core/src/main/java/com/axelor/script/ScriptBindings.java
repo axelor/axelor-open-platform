@@ -185,37 +185,83 @@ public class ScriptBindings extends SimpleBindings {
 		final Properties properties = AppSettings.get().getProperties();
 		final Map<String, Object> vars = new HashMap<>();
 
-		for (final Object key : properties.keySet()) {
+		for (final Object item : properties.keySet()) {
 
-			final String name = key.toString();
+			final String name = item.toString();
 			final String expr = properties.getProperty(name);
 
 			if (!name.startsWith("context.") || isBlank(expr)) {
 				continue;
 			}
 
+			final String key = name.substring(8);
 			final String[] parts = expr.split("\\:", 2);
-			final Class<?> klass;
+
+			Class<?> klass = null;
+
+			Object invalid = new Object();
+			Object value = invalid;
 
 			try {
 				klass = Class.forName(parts[0]);
 			} catch (ClassNotFoundException e) {
-				throw new RuntimeException(e);
 			}
 
-			Object value = Beans.get(klass);
-
-			if (parts.length > 1) {
-				try {
-					value = klass.getMethod(parts[1]).invoke(value);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
+			if (klass == null) {
+				vars.put(key, adapt(expr));
+				continue;
 			}
 
-			vars.put(name.substring(8), value);
+			try {
+				value = klass.getField(parts[1]).get(null);
+			} catch (Exception e) {
+			}
+			try {
+				value = klass.getMethod(parts[1]).invoke(null);
+			} catch (Exception e) {
+			}
+
+			if (value != invalid) {
+				vars.put(key, value);
+				continue;
+			}
+
+			final Object instance = Beans.get(klass);
+
+			if (parts.length == 1) {
+				vars.put(key, instance);
+				continue;
+			}
+
+			try {
+				value = klass.getMethod(parts[1]).invoke(instance);
+			} catch (Exception e) {
+			}
+
+			if (value == invalid) {
+				throw new RuntimeException("Invalid configuration: " + name + " = " + expr);
+			}
+
+			vars.put(key, value);
 		}
 
 		return vars;
+	}
+
+	private Object adapt(String value) {
+		if (isBlank(value)) {
+			return null;
+		}
+		if ("true".equals(value.toLowerCase())) {
+			return true;
+		}
+		if ("false".equals(value.toLowerCase())) {
+			return false;
+		}
+		try {
+			return Integer.parseInt(value);
+		} catch (Exception e) {
+		}
+		return value;
 	}
 }
