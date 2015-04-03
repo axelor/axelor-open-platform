@@ -111,10 +111,6 @@ var Editor = function(args) {
 				case 40: // DOWN
 					e.stopImmediatePropagation();
 					break;
-				case 13: // ENTER
-					if ($(e.target).is('textarea')) {
-						e.stopImmediatePropagation();
-					}
 				case 9: // TAB
 					if (external) {
 						args.grid.onKeyDown.notify(args.grid.getActiveCell(), e);
@@ -203,13 +199,7 @@ var Editor = function(args) {
 			current[column.field] = (scope.record||{})[column.field] || null;
 		}
 
-		var changed = record.id !== current.id;
-		if (record.version !== undefined) {
-			changed = record.version !== current.version;
-		} else if (record.$version !== undefined) {
-			changed = record.$version !== current.$version;
-		}
-
+		var changed = (record.id !== item.id || record.version !== current.version);
 		if (changed) {
 			scope.editRecord(current);
 		} else {
@@ -1262,6 +1252,10 @@ Grid.prototype.onKeyDown = function(e, args) {
 		grid = this.grid,
 		lock = grid.getEditorLock();
 
+	if (e.which === $.ui.keyCode.ENTER && $(e.target).is('textarea')) {
+		return;
+	}
+
 	if (e.isDefaultPrevented()){
 		e.stopImmediatePropagation();
 		return false;
@@ -1325,7 +1319,9 @@ Grid.prototype.onKeyDown = function(e, args) {
 		if (commitChanges() && cell && cell.row > args.row && this.isDirty()) {
 			args.item = null;
 			this.scope.waitForActions(function () {
-				that.addNewRow(args);
+				that.scope.waitForActions(function () {
+					that.addNewRow(args);
+				});
 			});
 		} else if (cell) {
 			focusCell(cell.row, cell.cell);
@@ -1494,10 +1490,14 @@ Grid.prototype.__saveChanges = function(args, callback) {
 	}
 
 	// prevent cache
-	var saveDS = ds._new(ds._model, {
-		domain: ds._domain,
-		context: ds._context
-	});
+	var saveDS = ds;
+	var handler = this.handler || {};
+	if (handler.field && handler.field.target) {
+		saveDS = ds._new(ds._model, {
+			domain: ds._domain,
+			context: ds._context
+		});
+	}
 
 	return saveDS.saveAll(records).success(function(records, page) {
 		if (data.getItemById(0)) {
@@ -1846,12 +1846,12 @@ Grid.prototype.onItemClick = function(event, args) {
 		if (this.editorScope &&
 			this.editorScope.$lastEditor &&
 			this.editorScope.$lastEditor.shouldWait()) {
-			return 200;
+			return 300;
 		}
 	}
 	// prevent edit if some action is still in progress
 	if (this.isDirty() && axelor.blockUI()) {
-		return 100;
+		return 200;
 	}
 
 	var source = $(event.target);

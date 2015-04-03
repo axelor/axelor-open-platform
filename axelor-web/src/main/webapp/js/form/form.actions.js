@@ -293,7 +293,7 @@ ActionHandler.prototype = {
 		});
 	},
 
-	__doHandleSave: function() {
+	__doHandleSave: function(validateOnly) {
 
 		this._blockUI();
 
@@ -311,7 +311,7 @@ ActionHandler.prototype = {
 			deferred.reject();
 			return deferred.promise;
 		}
-		if (scope.isDirty && !scope.isDirty()) {
+		if (validateOnly || (scope.isDirty && !scope.isDirty())) {
 			deferred.resolve();
 			return deferred.promise;
 		}
@@ -392,11 +392,29 @@ ActionHandler.prototype = {
 		
 		action = action.replace(/(^\s*,?\s*)|(\s*,?\s*$)/, '');
 
-		var pattern = /(^sync\s*,\s*)|(^sync$)/;
+		var pattern = /,\s*(sync|validate)\s*(,|$)/;
+		if (pattern.test(action)) {
+			var which = pattern.exec(action)[1];
+			axelor.dialogs.error(_t('Invalid use of "{0}" action, must be the first action.', which));
+			deferred.reject();
+			return deferred.promise;
+		}
+
+		pattern = /(^sync\s*,\s*)|(^sync$)/;
 		if (pattern.test(action)) {
 			action = action.replace(pattern, '');
 			return this._fireBeforeSave().then(function() {
 				return self._handleAction(action);
+			});
+		}
+
+		pattern = /(^validate\s*,\s*)|(^validate$)/;
+		if (pattern.test(action)) {
+			action = action.replace(pattern, '');
+			return this._fireBeforeSave().then(function() {
+				return self.__doHandleSave(true).then(function () {
+					return self._handleAction(action);
+				});
 			});
 		}
 

@@ -195,6 +195,9 @@ ui.directive('uiCanSuggest', function () {
 	};
 });
 
+var m2oTemplateReadonly = '<a href="" ng-show="text" ng-click="onEdit()">{{text}}</a>'
+var m2oTemplateReadonlyPlain = '<span class="display-text" ng-show="text">{{text}}</span>';
+
 var m2oTemplateEditable = '' +
 '<div class="picker-input picker-icons-3 tag-select-single">'+
 '<input type="text" autocomplete="off" ui-can-suggest>'+
@@ -445,8 +448,11 @@ ui.formInput('ManyToOne', 'Select', {
 		}
 	},
 	template_editable: m2oTemplateEditable,
-	template_readonly:
-	'<a href="" ng-show="text" ng-click="onEdit()">{{text}}</a>'
+	template_readonly: function (scope) {
+		return scope.canView() ?
+			m2oTemplateReadonly :
+			m2oTemplateReadonlyPlain;
+	}
 });
 
 ui.InlineManyToOneCtrl = InlineManyToOneCtrl;
@@ -531,7 +537,9 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 		if (field.editor && (field.editor.viewer || !field.targetName)) {
 			return '<div ui-panel-editor>';
 		}
-		return '<a href="" ng-show="text" ng-click="onEdit()">{{text}}</a>'
+		return scope.canView() ?
+				m2oTemplateReadonly:
+				m2oTemplateReadonlyPlain;
 	},
 
 	template_editable: function (scope) {
