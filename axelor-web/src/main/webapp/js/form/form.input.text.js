@@ -110,11 +110,10 @@ ui.formInput('Text', {
 		var field = scope.field,
 			textarea = element.get(0);
 
-		textarea.rows = field.height || 8;
-
-		//Firefox add one more line
-		if ($.browser.mozilla){
-			textarea.rows -= 1;
+		if (field.height) {
+			element.height(field.height);
+		} else {
+			textarea.rows = $.browser.mozilla ? 7 : 8;
 		}
     },
 	template_editable: '<textarea></textarea >',
