@@ -606,6 +606,7 @@ ui.directive('uiFilterBox', function() {
 
 				var selected = live ? !filter.$selected : filter.$selected;
 				var selection = isCustom ? current.customs : current.domains;
+				var applyAll = (handler.schema||{}).customSearch === false;
 
 				if (live) {
 					$scope.onClear();
@@ -621,14 +622,14 @@ ui.directive('uiFilterBox', function() {
 					selection.splice(index, 1);
 				}
 
-				if (isCustom && live) {
+				if (isCustom && (live || applyAll)) {
 					$scope.custName = filter.$selected ? filter.name : null;
 					$scope.custTitle = filter.$selected ? filter.title : '';
 					$scope.custShared = filter.$selected ? filter.shared : false;
 					return $scope.$broadcast('on:select-custom', filter, selection);
 				}
 
-				if (live) {
+				if (live || applyAll) {
 					$scope.$broadcast('on:select-domain', filter);
 				}
 			};
@@ -990,6 +991,9 @@ ui.directive('uiFilterBox', function() {
 				"<strong x-translate>Advanced Search</strong>" +
 				"<hr>"+
 				"<div class='filter-list'>" +
+					"<dl ng-show='!hasFilters() && handler.schema.customSearch == false' style='display: hidden;'>" +
+						"<dd><span x-translate>No filters available</span></dd>" +
+					"</dl>" +
 					"<dl ng-show='hasFilters(1)'>" +
 						"<dt><i class='fa fa-floppy-o'></i><span x-translate> Filters</span></dt>" +
 						"<dd ng-repeat='filter in viewFilters' class='checkbox'>" +
