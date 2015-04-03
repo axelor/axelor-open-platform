@@ -111,10 +111,6 @@ var Editor = function(args) {
 				case 40: // DOWN
 					e.stopImmediatePropagation();
 					break;
-				case 13: // ENTER
-					if ($(e.target).is('textarea')) {
-						e.stopImmediatePropagation();
-					}
 				case 9: // TAB
 					if (external) {
 						args.grid.onKeyDown.notify(args.grid.getActiveCell(), e);
@@ -1255,6 +1251,10 @@ Grid.prototype.onKeyDown = function(e, args) {
 	var that = this,
 		grid = this.grid,
 		lock = grid.getEditorLock();
+
+	if (e.which === $.ui.keyCode.ENTER && $(e.target).is('textarea')) {
+		return;
+	}
 
 	if (e.isDefaultPrevented()){
 		e.stopImmediatePropagation();
