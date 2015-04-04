@@ -28,11 +28,15 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 
 public class AuthRealm extends AuthorizingRealm {
+
+	private static Logger log = LoggerFactory.getLogger(AuthRealm.class);
 
 	public static class AuthMatcher extends PasswordMatcher {
 
@@ -52,6 +56,7 @@ public class AuthRealm extends AuthorizingRealm {
 				return service.ldapLogin((String) token.getPrincipal(), (String) plain);
 			} catch (IllegalStateException e) {
 			} catch (AuthenticationException e) {
+				log.error("Password authentication failed for user: {}", token.getPrincipal());
 				return false;
 			}
 
@@ -82,6 +87,7 @@ public class AuthRealm extends AuthorizingRealm {
 				service.ldapLogin(code, passwd);
 			} catch (IllegalStateException e) {
 			} catch (AuthenticationException e) {
+				log.error("LDAP authentication failed for user: {}", code);
 			}
 		}
 

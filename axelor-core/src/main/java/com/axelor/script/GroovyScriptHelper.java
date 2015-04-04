@@ -29,6 +29,8 @@ import java.util.regex.Pattern;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.codehaus.groovy.runtime.InvokerHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axelor.db.JpaScanner;
 import com.axelor.rpc.Context;
@@ -49,6 +51,8 @@ public class GroovyScriptHelper implements ScriptHelper {
 
 	private static final GroovyClassLoader GCL;
 	private static final Cache<String, Class<?>> SCRIPT_CACHE;
+
+	private static Logger log = LoggerFactory.getLogger(GroovyScriptHelper.class);
 
 	static {
 		config.getOptimizationOptions().put("indy", Boolean.TRUE);
@@ -145,6 +149,7 @@ public class GroovyScriptHelper implements ScriptHelper {
 			});
 			return script.run();
 		} catch (Exception e) {
+			log.error("Script error: {}", expr, e);
 		}
 		return null;
 	}
