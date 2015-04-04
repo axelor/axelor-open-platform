@@ -116,6 +116,7 @@
       <field name="model"/>
       <field name="module"/>
       <field name="priority"/>
+      <field name="home" />
     </panel>
     <panel title="Schema">
       <field name="xml" showTitle="false" widget="CodeEditor" height="500" x-code-syntax="xml" colSpan="12"/>

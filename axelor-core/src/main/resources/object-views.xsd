@@ -2419,6 +2419,13 @@
                   <xsd:documentation>Param value.</xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
+              <xsd:attribute name="home" type="xsd:boolean">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    Specify whether this action can be used as home action.
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="domain" type="xsd:string" minOccurs="0">

@@ -56,6 +56,7 @@ import com.axelor.meta.db.repo.MetaSelectRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
+import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.AbstractWidget;
 import com.axelor.meta.schema.views.Field;
@@ -389,6 +390,20 @@ public class ViewLoader extends AbstractLoader {
 
 		String type = klass.getSimpleName().replaceAll("([a-z\\d])([A-Z]+)", "$1-$2").toLowerCase();
 		entity.setType(type);
+
+		if (action instanceof ActionView) {
+			ActionView view = (ActionView) action;
+			Boolean home = view.getHome();
+			if (home == null) {
+				for (ActionView.View item : view.getViews()) {
+					if ("dashboard".equals(item.getType())) {
+						home = Boolean.TRUE;
+						break;
+					}
+				}
+			}
+			entity.setHome(home);
+		}
 
 		entity = actions.save(entity);
 

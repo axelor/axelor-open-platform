@@ -88,6 +88,9 @@ public class ActionView extends Action {
 	@XmlAttribute
 	private String icon;
 
+	@XmlAttribute
+	private Boolean home;
+
 	@XmlElement
 	private String domain;
 
@@ -112,6 +115,10 @@ public class ActionView extends Action {
 
 	public String getIcon() {
 		return icon;
+	}
+
+	public Boolean getHome() {
+		return home;
 	}
 
 	public String getDomain() {
