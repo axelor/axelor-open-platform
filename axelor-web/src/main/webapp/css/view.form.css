@@ -1080,20 +1080,43 @@ table.field-details .help-text hr {
 .filter-box {
 	position: relative;
 	display: inline-block;
-	margin: 2px 5px 0;
+	margin: 5px 5px 0;
 	box-sizing: border-box;
 	width: 200px;
+	vertical-align: middle;
 }
 
-.filter-box > input {
-	margin-top: 4px;
-	padding: 4px 8px;
-	box-sizing: border-box;
-	height: 28px;
+.filter-box .search-query {
+	width: 100%;
+	min-height: 28px;
+}
+
+.filter-box .tag-select ul {
+	padding-bottom: 0;
+}
+
+.filter-box .tag-select li {
+	margin: 3px;
+	margin-right: 0;
+	margin-bottom: 0;
+	max-width: 150px !important;
+	text-overflow: ellipsis;
+}
+
+.filter-box .tag-select li.tag-item {
+	line-height: 13px;
+}
+
+.filter-box .tag-select li.tag-selector {
+	width: 100%;
+	max-width: 100% !important;
+}
+
+.filter-box .tag-select li.tag-selector input {
 	width: 100%;
 }
 
-.filter-box > input.not-readonly {
+.filter-box .tag-select input.not-readonly {
 	background-color: #fff;
 }
 

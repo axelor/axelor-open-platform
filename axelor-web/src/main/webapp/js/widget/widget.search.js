@@ -345,6 +345,10 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		}
 	});
 
+	$scope.$on('on:clear-filter', function (e) {
+		$scope.clearFilter();
+	});
+
 	function select(custom) {
 
 		var criteria = custom.criteria;
@@ -756,6 +760,8 @@ ui.directive('uiFilterBox', function() {
 				}
 			};
 
+			$scope.tagItems = [];
+
 			$scope.onFilter = function(criteria) {
 
 				if (criteria) {
@@ -823,6 +829,34 @@ ui.directive('uiFilterBox', function() {
 						value: v1,
 						value2: v2
 					});
+				}
+
+				var tag = {};
+				var all = _.chain([$scope.viewFilters, $scope.custFilters])
+				   .flatten()
+				   .filter(function (item) {
+					  return item.$selected;
+				   })
+				   .pluck('title')
+				   .value();
+
+				if (all.length === 1) {
+					tag.title = all[0];
+				}
+				if (all.length > 1) {
+					tag.title = _t('Filters ({0})', all.length);
+					tag.help = all.join(', ');
+				}
+
+				if (all.length === 0 && search.criteria.length) {
+					tag.title = _t('Custom ({0})', search.criteria.length);
+					all.push(tag.title);
+				}
+
+				if (all.length === 0) {
+					$scope.tagItems = [];
+				} else {
+					$scope.tagItems = [tag];
 				}
 
 				handler.filter(search);
@@ -925,6 +959,15 @@ ui.directive('uiFilterBox', function() {
 				});
 			};
 			
+			scope.onClearFilter = function () {
+				hideMenu();
+				scope.visible = true;
+				scope.$broadcast('on:clear-filter');
+				scope.$timeout(function () {
+					scope.visible = false;
+				});
+			};
+
 			// append menu to view page to overlap the view
 			scope.$timeout(function() {
 				element.parents('.view-container').after(menu);
@@ -982,11 +1025,21 @@ ui.directive('uiFilterBox', function() {
 		replace: true,
 		template:
 		"<div class='filter-box'>" +
-			"<input type='text' class='search-query' ng-model='custTerm'>" +
-			"<span class='search-icons'>" +
+			"<div class='tag-select picker-input search-query'>" +
+			  "<ul>" +
+				"<li class='tag-item label label-info' ng-repeat='item in tagItems'>" +
+					"<span class='tag-text' title='{{item.help}}'>{{item.title}}</span> " +
+					"<i class='fa fa-times fa-small' ng-click='onClearFilter()'></i>" +
+				"</li>" +
+				"<li class='tag-selector' ng-show='!tagItems.length'>" +
+					"<input type='text' autocomplete='off' ng-model='custTerm'>" +
+				"</li>" +
+			  "</ul>" +
+			  "<span class='picker-icons'>" +
 				"<i ng-click='onSearch($event)' class='fa fa-caret-down hidden-phone'></i>"+
 				"<i ng-click='onRefresh()' class='fa fa-search'></i>" +
-			"</span>" +
+			  "</span>" +
+			"</div>" +
 			"<div class='filter-menu hidden-phone' ui-watch-if='visible'>" +
 				"<strong x-translate>Advanced Search</strong>" +
 				"<hr>"+
