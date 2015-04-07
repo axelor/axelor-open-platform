@@ -431,9 +431,9 @@ _.extend(Factory.prototype, {
 
 		var fn = Formatters[type];
 		if (fn) {
-			return fn(field, value, dataContext, this.grid);
+			value = fn(field, value, dataContext, this.grid);
 		}
-		return value;
+		return value === undefined ? '' : value;
 	},
 	
 	formatProgress: function(field, value) {
