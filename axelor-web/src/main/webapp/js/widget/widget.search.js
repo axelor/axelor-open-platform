@@ -840,17 +840,16 @@ ui.directive('uiFilterBox', function() {
 				   .pluck('title')
 				   .value();
 
+				if ((((criteria||{}).criteria)||[]).length) {
+					all.push(_t('Custom ({0})', criteria.criteria.length));
+				}
+
 				if (all.length === 1) {
 					tag.title = all[0];
 				}
 				if (all.length > 1) {
 					tag.title = _t('Filters ({0})', all.length);
 					tag.help = all.join(', ');
-				}
-
-				if (all.length === 0 && search.criteria.length) {
-					tag.title = _t('Custom ({0})', search.criteria.length);
-					all.push(tag.title);
 				}
 
 				if (all.length === 0) {
