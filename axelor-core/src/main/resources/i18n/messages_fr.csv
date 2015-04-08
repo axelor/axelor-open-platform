@@ -136,8 +136,7 @@ resources/views/Menu.xml:25"
 resources/domains/Meta.xml:66
 resources/domains/Meta.xml:89
 resources/views/Group.xml:8"
-"Home",,,"resources/domains/Meta.xml:107"
-"Home action","Action",,"resources/domains/Group.xml:16
+"Home action","Action d'accueil",,"resources/domains/Group.xml:16
 resources/domains/User.xml:19"
 "Icon","Icone",,"resources/domains/Meta.xml:139
 resources/domains/Meta.xml:61"
@@ -327,6 +326,7 @@ resources/domains/Meta.xml:30"
 "Updated by","Mis à jour par",,"java/com/axelor/auth/db/AuditableModel.java:53"
 "Updated on","Mis à jour le",,"java/com/axelor/auth/db/AuditableModel.java:46"
 "Url",,,"resources/domains/Calendar.xml:17"
+"Used as home action","Utilisable comme action d'accueil",,"resources/domains/Meta.xml:107"
 "User","Utilisateurs",,"resources/domains/MetaFilter.xml:21
 resources/views/User.xml:20"
 "User Management","Gestion des utilisateurs",,"resources/views/Menu.xml:7"

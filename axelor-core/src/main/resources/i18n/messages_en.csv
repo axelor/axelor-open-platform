@@ -136,7 +136,6 @@ resources/views/Menu.xml:25"
 resources/domains/Meta.xml:66
 resources/domains/Meta.xml:89
 resources/views/Group.xml:8"
-"Home",,,"resources/domains/Meta.xml:107"
 "Home action",,,"resources/domains/Group.xml:16
 resources/domains/User.xml:19"
 "Icon",,,"resources/domains/Meta.xml:139
@@ -301,7 +300,7 @@ resources/views/Meta.xml:192"
 "Table",,,"resources/domains/Meta.xml:153"
 "Technical staff",,,"resources/domains/Group.xml:18"
 "The addition data for UI widgets.",,,"resources/domains/Meta.xml:140"
-"The image icon to show in UI wigets.",,,"resources/domains/Meta.xml:139"
+"The image icon to show in UI widgets.",,,"resources/domains/Meta.xml:139"
 "The module can't be uninstalled because other modules are pending. Please restart the server before.",,,"java/com/axelor/meta/web/ModuleController.java:45"
 "The module can't be uninstalled because other non-removable modules depend on it.",,,"java/com/axelor/meta/web/ModuleController.java:44"
 "The scheduler service is disabled.",,,"java/com/axelor/quartz/JobRunner.java:157"
@@ -327,6 +326,7 @@ resources/domains/Meta.xml:30"
 "Updated by",,,"java/com/axelor/auth/db/AuditableModel.java:53"
 "Updated on",,,"java/com/axelor/auth/db/AuditableModel.java:46"
 "Url",,,"resources/domains/Calendar.xml:17"
+"Used as home action",,,"resources/domains/Meta.xml:107"
 "User",,,"resources/domains/MetaFilter.xml:21
 resources/views/User.xml:20"
 "User Management",,,"resources/views/Menu.xml:7"
