@@ -40,9 +40,9 @@ public class TestContext extends ScriptTest {
 		ScriptBindings bindings = new ScriptBindings(this.context());
 		ScriptHelper helper = new GroovyScriptHelper(bindings);
 
-		Object hello = helper.eval("hello");
-		Object world = helper.eval("world");
-		Object result = helper.eval("hello.hello()");
+		Object hello = helper.eval("__config__.hello");
+		Object world = helper.eval("__config__.world");
+		Object result = helper.eval("__config__.hello.hello()");
 
 		Assert.assertNotNull(hello);
 		Assert.assertNotNull(world);
@@ -52,11 +52,11 @@ public class TestContext extends ScriptTest {
 		Assert.assertEquals(message, world);
 		Assert.assertEquals(message, result);
 
-		Object some = helper.eval("some");
-		Object thing = helper.eval("thing");
-		Object flag = helper.eval("flag");
-		Object string = helper.eval("string");
-		Object number = helper.eval("number");
+		Object some = helper.eval("__config__.some");
+		Object thing = helper.eval("__config__.thing");
+		Object flag = helper.eval("__config__.flag");
+		Object string = helper.eval("__config__.string");
+		Object number = helper.eval("__config__.number");
 
 		Assert.assertNotNull(some);
 		Assert.assertNotNull(thing);

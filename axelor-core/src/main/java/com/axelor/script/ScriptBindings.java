@@ -56,7 +56,8 @@ public class ScriptBindings extends SimpleBindings {
 			"__parent__",
 			"__date__",
 			"__time__",
-			"__datetime__"
+			"__datetime__",
+			"__config__"
 			);
 
 	private Map<String, Object> variables;
@@ -99,6 +100,8 @@ public class ScriptBindings extends SimpleBindings {
 			return new LocalDateTime();
 		case "__datetime__":
 			return new DateTime();
+		case "__config__":
+			return configContext;
 		case "__user__":
 			return AuthUtils.getUser();
 		case "__self__":
@@ -122,7 +125,7 @@ public class ScriptBindings extends SimpleBindings {
 	@Override
 	public boolean containsKey(Object key) {
 		return META_VARS.contains(key) || super.containsKey(key)
-				|| variables.containsKey(key) || configContext.containsKey(key);
+				|| variables.containsKey(key);
 	}
 
 	@Override
@@ -130,7 +133,6 @@ public class ScriptBindings extends SimpleBindings {
 		Set<String> keys = Sets.newHashSet(super.keySet());
 		keys.addAll(variables.keySet());
 		keys.addAll(META_VARS);
-		keys.addAll(configContext.keySet());
 		return keys;
 	}
 
@@ -155,7 +157,7 @@ public class ScriptBindings extends SimpleBindings {
 			return value;
 		}
 
-		return configContext.get(key);
+		return null;
 	}
 
 	@Override
