@@ -25,7 +25,7 @@
       <field name="navigation"/>
       <panel stacked="true">
         <field name="homeAction" hidden="true" x-bind="{{__actionSelect.name}}"/>
-        <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" target="com.axelor.meta.db.MetaAction" target-name="name" domain="self.type = 'action-view'"/>
+        <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" target="com.axelor.meta.db.MetaAction" target-name="name" domain="self.type = 'action-view' and self.home = true"/>
       </panel>
       <field name="technicalStaff"/>
     </panel>
