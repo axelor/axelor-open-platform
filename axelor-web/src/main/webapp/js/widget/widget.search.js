@@ -896,6 +896,7 @@ ui.directive('uiFilterBox', function() {
 					case 'integer':
 					case 'decimal':
 						if (_.isNaN(number) || !text || !_.isNumber(number)) continue;
+						if (field.type === 'integer' && (number > 2147483647 || number < -2147483648)) continue;
 						fieldName = name;
 						operator = '=';
 						value = number;
