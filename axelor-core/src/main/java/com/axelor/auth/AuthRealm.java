@@ -60,11 +60,12 @@ public class AuthRealm extends AuthorizingRealm {
 				return false;
 			}
 
-			if (service.match((String) plain, (String) saved)) {
+			if (service.match((String) plain, (String) saved) || super.doCredentialsMatch(token, info)) {
 				return true;
 			}
-
-			return super.doCredentialsMatch(token, info);
+			
+			log.error("Password authentication failed for user: {}", token.getPrincipal());
+			return false;
 		}
 	}
 

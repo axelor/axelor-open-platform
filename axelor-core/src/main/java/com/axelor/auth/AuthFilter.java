@@ -35,10 +35,14 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class AuthFilter extends FormAuthenticationFilter {
+	
+	private static Logger log = LoggerFactory.getLogger(AuthFilter.class);
 
 	@Inject
 	@Named("app.loginUrl")
@@ -90,6 +94,7 @@ public class AuthFilter extends FormAuthenticationFilter {
 			subject.login(token);
 			return onLoginSuccess(token, subject, request, response);
 		} catch (AuthenticationException e) {
+			log.error("Password authentication failed for user: {}", token.getPrincipal());
 		}
 		return false;
 	}
