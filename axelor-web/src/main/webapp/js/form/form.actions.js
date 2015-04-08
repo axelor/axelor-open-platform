@@ -286,10 +286,10 @@ ActionHandler.prototype = {
 		return deferred.promise;
 	},
 
-	_handleSave: function() {
+	_handleSave: function(validateOnly) {
 		var self = this;
 		return this._fireBeforeSave().then(function() {
-			return self.__doHandleSave();
+			return self.__doHandleSave(validateOnly);
 		});
 	},
 
@@ -392,7 +392,7 @@ ActionHandler.prototype = {
 		
 		action = action.replace(/(^\s*,?\s*)|(\s*,?\s*$)/, '');
 
-		var pattern = /,\s*(sync|validate)\s*(,|$)/;
+		var pattern = /,\s*(sync)\s*(,|$)/;
 		if (pattern.test(action)) {
 			var which = pattern.exec(action)[1];
 			axelor.dialogs.error(_t('Invalid use of "{0}" action, must be the first action.', which));
@@ -408,14 +408,8 @@ ActionHandler.prototype = {
 			});
 		}
 
-		pattern = /(^validate\s*,\s*)|(^validate$)/;
-		if (pattern.test(action)) {
-			action = action.replace(pattern, '');
-			return this._fireBeforeSave().then(function() {
-				return self.__doHandleSave(true).then(function () {
-					return self._handleAction(action);
-				});
-			});
+		if (action === 'validate') {
+			return this._handleSave(true);
 		}
 
 		if (action === 'save') {
@@ -564,10 +558,10 @@ ActionHandler.prototype = {
 				return promise;
 			})();
 		}
-		
-		if (data.save) {
+
+		if (data.validate || data.save) {
 			scope.$timeout(function () {
-				self._handleSave().then(function(){
+				self._handleSave(!!data.validate).then(function(){
 					scope.ajaxStop(function () {
 						deferred.resolve(data.pending);
 					}, 100);
