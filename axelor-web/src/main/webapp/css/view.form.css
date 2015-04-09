@@ -1038,6 +1038,10 @@ table.field-details .help-text hr {
 	box-sizing: border-box;
 }
 
+.form-item-container pre {
+	color: inherit;
+}
+
 .form-item-container > .mce-tinymce {
 	box-sizing: content-box !important;
 }

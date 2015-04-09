@@ -120,7 +120,7 @@
 
 }
 
-[class *= hilite-].form-item-container,
+[class *= hilite-].form-item-container {
 	background-color: inherit !important;
 }
 
