@@ -290,7 +290,7 @@ public class ActionView extends Action {
 			return this;
 		}
 		
-		public ActionViewBuilder context(String key, String value) {
+		public ActionViewBuilder context(String key, Object value) {
 			this.context.put(key, value);
 			return this;
 		}
