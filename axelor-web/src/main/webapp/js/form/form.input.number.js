@@ -31,14 +31,34 @@ ui.formInput('Number', {
 	link: function(scope, element, attrs, model) {
 		
 		var props = scope.field,
-			precision = props.precision || 18,
-			scale = props.scale || 2,
 			minSize = +props.minSize,
 			maxSize = +props.maxSize;
 
 		var isDecimal = props.serverType === "decimal" || props.widget === "decimal",
 			pattern = isDecimal ? /^(-)?\d+(\.\d+)?$/ : /^\s*-?[0-9]*\s*$/;
 		
+		function scale() {
+			var scale = scope.attr('scale');
+			if (scale) {
+				return scale;
+			}
+			if ((props.widgetAttrs||{}).scale) {
+				return props.widgetAttrs.scale;
+			}
+			return props.scale || 2;
+		}
+
+		function precision() {
+			var precision = scope.attr('precision');
+			if (precision) {
+				return precision;
+			}
+			if ((props.widgetAttrs||{}).precision) {
+				return props.widgetAttrs.precision;
+			}
+			return props.precision || 18;
+		}
+
 		scope.isNumber = function(value) {
 			return _.isEmpty(value) || _.isNumber(value) || pattern.test(value);
 		};
@@ -47,7 +67,7 @@ ui.formInput('Number', {
 			var valid = scope.isNumber(value);
             if (valid && isDecimal && _.isString(value)) {
             	value = scope.format(value);
-            	valid = _.string.trim(value, '-').length - 1 <= precision;
+		valid = _.string.trim(value, '-').length - 1 <= precision();
             	value = +value;
             }
 
@@ -63,7 +83,7 @@ ui.formInput('Number', {
 		
 		scope.format = function format(value) {
 			if (isDecimal && _.isString(value) && value.trim().length > 0) {
-				return parseFloat(value).toFixed(scale);
+				return parseFloat(value).toFixed(scale());
 			}
 			return value;
 		};
@@ -73,6 +93,12 @@ ui.formInput('Number', {
 			if (value && _.isString(value)) return +value;
 			return value;
 		};
+
+		scope.$on("on:attrs-changed", function (e, attr) {
+			if (attr.name === 'scale' || attr.name === 'precision') {
+				model.$render();
+			}
+		});
 	},
 	
 	link_editable: function(scope, element, attrs, model) {
