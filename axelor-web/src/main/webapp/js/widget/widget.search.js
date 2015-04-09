@@ -294,7 +294,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	};
 
 	$scope.fields = {};
-	$scope.filters = [{}];
+	$scope.filters = [{ $new: true }];
 	$scope.operator = 'and';
 	$scope.showArchived = false;
 
@@ -306,7 +306,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	$scope.addFilter = function(filter) {
 		var last = _.last($scope.filters);
 		if (last && !(last.field && last.operator)) return;
-		$scope.filters.push(filter || {});
+		$scope.filters.push(filter || { $new: true });
 	};
 
 	this.removeFilter = function(filter) {
@@ -465,6 +465,10 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
 			if (criterion.operator == "between" || criterion.operator == "notBetween") {
 				criterion.value2 = filter.value2;
+			}
+
+			if (filter.$new) {
+				criterion.$new = true;
 			}
 
 			criteria.criteria.push(criterion);
@@ -840,8 +844,9 @@ ui.directive('uiFilterBox', function() {
 				   .pluck('title')
 				   .value();
 
-				if ((((criteria||{}).criteria)||[]).length) {
-					all.push(_t('Custom ({0})', criteria.criteria.length));
+				var nCustom = _.filter((criteria||{}).criteria, function (item) { return item.$new; }).length;
+				if (nCustom > 0) {
+					all.push(_t('Custom ({0})', nCustom));
 				}
 
 				if (all.length === 1) {
