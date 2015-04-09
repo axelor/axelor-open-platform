@@ -692,17 +692,14 @@ ActionHandler.prototype = {
 				}
 				
 				switch(attr) {
-				case 'required':
-					itemScope.attr('required', value);
-					break;
-				case 'readonly':
-					itemScope.attr('readonly', value);
-					break;
 				case 'hidden':
-					itemScope.attr('hidden', value);
-					break;
+				case 'required':
+				case 'readonly':
 				case 'collapse':
-					itemScope.attr('collapse', value);
+				case 'precision':
+				case 'scale':
+				case 'prompt':
+					itemScope.attr(attr, value);
 					break;
 				case 'title':
 					(function () {
@@ -717,9 +714,6 @@ ActionHandler.prototype = {
 						}
 					})();
 					itemScope.attr('title', value);
-					break;
-				case 'prompt':
-					itemScope.attr('prompt', value);
 					break;
 				case 'domain':
 					if (itemScope.setDomain)
