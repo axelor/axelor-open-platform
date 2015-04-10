@@ -55,7 +55,7 @@ function updateValues(source, target, itemScope, formScope) {
 		if (isObject(value)) {
 			var dest = target[key] || {};
 			if (dest.id === value.id) {
-				if (dest.version) {
+				if (_.isNumber(dest.version)) {
 					dest = _.extend({}, dest);
 					updateValues(value, dest, itemScope. formScope);
 				} else {
