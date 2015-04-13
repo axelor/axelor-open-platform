@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <auth>
 
+  <group name="users" title="Users" />
+  <user code="demo" name="Demo User" group="users" />
+
   <permission name="perm.auth.all" object="com.axelor.auth.db.*">
     <can create="true" read="true" write="true" remove="true" export="true"/>
   </permission>
