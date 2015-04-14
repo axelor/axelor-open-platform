@@ -753,6 +753,11 @@ public class Query<T extends Model> {
 
 					if (i == path.length - 2) {
 						property = currentMapper.getProperty(variable);
+						if (property == null) {
+							throw new IllegalArgumentException(
+									String.format("No such field '%s' in object '%s'",
+											variable, currentMapper.getBeanClass().getName()));
+						}
 						if (property != null && property.getTarget() != null) {
 							joinOn = prefix + "." + variable;
 							prefix = prefix + "_" + variable;

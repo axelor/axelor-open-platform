@@ -21,7 +21,7 @@
     </toolbar>
     <panel title="Overview">
       <field name="name" onChange="action-condition-group-validName" validIf="name.length >= 2"/>
-      <field name="code" onChange="action-condition-group-validCode" validIf="code.length >= 2"/>
+      <field name="code" onChange="action-condition-group-validCode" validIf="code.length >= 2" readonlyIf="id &amp;&amp; code == 'admins'"/>
       <field name="navigation"/>
       <panel stacked="true">
         <field name="homeAction" hidden="true" x-bind="{{__actionSelect.name}}"/>

@@ -19,19 +19,32 @@ package com.axelor.auth;
 
 import java.io.Serializable;
 
+import javax.persistence.PersistenceException;
+
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.Transaction;
 import org.hibernate.type.Type;
 import org.joda.time.LocalDateTime;
 
 import com.axelor.auth.db.AuditableModel;
+import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
+import com.axelor.db.Model;
 
 @SuppressWarnings("serial")
 public class AuditInterceptor extends EmptyInterceptor {
 
 	private ThreadLocal<User> currentUser = new ThreadLocal<User>();
+
+	private static final String UPDATED_BY = "updatedBy";
+	private static final String UPDATED_ON = "updatedOn";
+	private static final String CREATED_BY = "createdBy";
+	private static final String CREATED_ON = "createdOn";
+
+	private static final String ADMIN_USER = "admin";
+	private static final String ADMIN_GROUP = "admins";
+	private static final String ADMIN_CHECK_FIELD = "code";
 
 	@Override
 	public void afterTransactionBegin(Transaction tx) {
@@ -63,6 +76,38 @@ public class AuditInterceptor extends EmptyInterceptor {
 		return user;
 	}
 
+	private boolean canUpdate(Object entity, String field, Object prevValue, Object newValue) {
+		if (!(entity instanceof Model) || ((Model) entity).getId() == null) {
+			return true;
+		}
+		if (entity instanceof User || entity instanceof Group) {
+			if (!ADMIN_CHECK_FIELD.equals(field)) {
+				return true;
+			}
+			if (entity instanceof User &&
+					ADMIN_USER.equals(prevValue) &&
+					!ADMIN_USER.equals(newValue)) {
+				return false;
+			}
+			if (entity instanceof Group &&
+					ADMIN_GROUP.equals(prevValue) &&
+					!ADMIN_GROUP.equals(newValue)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean canDelete(Object entity) {
+		if (entity instanceof User && ADMIN_USER.equals(((User) entity).getCode())) {
+			return false;
+		}
+		if (entity instanceof Group && ADMIN_GROUP.equals(((Group) entity).getCode())) {
+			return false;
+		}
+		return true;
+	}
+
 	@Override
 	public boolean onFlushDirty(Object entity, Serializable id,
 			Object[] currentState, Object[] previousState,
@@ -72,10 +117,16 @@ public class AuditInterceptor extends EmptyInterceptor {
 		}
 		User user = this.getUser();
 		for (int i = 0; i < propertyNames.length; i++) {
-			if ("updatedOn".equals(propertyNames[i])) {
+			if (!canUpdate(entity, propertyNames[i], previousState[i], currentState[i])) {
+				throw new PersistenceException(
+						String.format("You can't update: %s#%s, values (%s=%s)",
+								entity.getClass().getName(), id,
+								propertyNames[i], currentState[i]));
+			}
+			if (UPDATED_ON.equals(propertyNames[i])) {
 				currentState[i] = new LocalDateTime();
 			}
-			if ("updatedBy".equals(propertyNames[i]) && user != null) {
+			if (UPDATED_BY.equals(propertyNames[i]) && user != null) {
 				currentState[i] = user;
 			}
 		}
@@ -93,13 +144,24 @@ public class AuditInterceptor extends EmptyInterceptor {
 			if (state[i] != null) {
 				continue;
 			}
-			if ("createdOn".equals(propertyNames[i])) {
+			if (CREATED_ON.equals(propertyNames[i])) {
 				state[i] = new LocalDateTime();
 			}
-			if ("createdBy".equals(propertyNames[i]) && user != null) {
+			if (CREATED_BY.equals(propertyNames[i]) && user != null) {
 				state[i] = user;
 			}
 		}
 		return true;
+	}
+	
+	@Override
+	public void onDelete(Object entity, Serializable id, Object[] state,
+			String[] propertyNames, Type[] types) {
+		if (!canDelete(entity)) {
+			throw new PersistenceException(
+				String.format("You can't delete: %s#%s",
+					entity.getClass().getName(), id));
+		}
+		super.onDelete(entity, id, state, propertyNames, types);
 	}
 }

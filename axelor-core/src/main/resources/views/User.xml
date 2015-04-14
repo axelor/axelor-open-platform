@@ -20,7 +20,7 @@
     onLoad="com.axelor.auth.AuthService:preferences">
     <panel title="Overview">
       <field name="name" placeholder="user name" onChange="action-condition-user-validName" validIf="name.length >= 2"/>
-      <field name="code" placeholder="login name" onChange="action-condition-user-validCode" validIf="code.length >= 2"/>
+      <field name="code" placeholder="login name" onChange="action-condition-user-validCode" validIf="code.length >= 2" readonlyIf="id &amp;&amp; code == 'admin'"/>
       <field name="group" placeholder="user group"/>
       <field name="email" widget="Email"/>
       <field name="language"/>
@@ -51,10 +51,6 @@
     <panel title="User preferences" itemSpan="12">
       <field name="email" widget="Email"/>
       <field name="language"/>
-      <panel stacked="true">
-        <field name="homeAction" hidden="true" x-bind="{{__actionSelect.name}}"/>
-        <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" target="com.axelor.meta.db.MetaAction" target-name="name" domain="self.type = 'action-view' and self.home = true"/>
-      </panel>
       <field name="change" title="Change password?" widget="boolean"/>
       <panel showIf="change">
         <field name="newPassword" title="Password" placeholder="new password" widget="password" requiredIf="change" validIf="(!change) || (newPassword.length >= 4 &amp;&amp; confirm == newPassword)"/>

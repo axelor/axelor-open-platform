@@ -68,7 +68,7 @@ public class ModuleManager {
 
 	@Inject
 	private AuthService authService;
-	
+
 	@Inject
 	private MetaModuleRepository modules;
 
@@ -182,7 +182,7 @@ public class ModuleManager {
 			this.doCleanUp();
 		}
 	}
-	
+
 	public void restoreMeta() {
 		try {
 			loadData = false;
@@ -191,7 +191,7 @@ public class ModuleManager {
 			loadData = true;
 		}
 	}
-	
+
 	public static List<String> getResolution() {
 		return resolver.names();
 	}
@@ -225,7 +225,7 @@ public class ModuleManager {
 	public void uninstall(String module) {
 
 		log.info("Uninstall module: {}", module);
-		
+
 		MetaModule entity = modules.findByName(module);
 
 		Beans.get(MetaViewRepository.class).findByModule(module).remove();
@@ -253,7 +253,7 @@ public class ModuleManager {
 	MetaModule findModule(String name) {
 		return modules.findByName(name);
 	}
-	
+
 	private void install(String moduleName, boolean update, boolean withDemo, boolean force) {
 
 		final Module module = resolver.get(moduleName);
@@ -469,7 +469,7 @@ public class ModuleManager {
 
 	@Transactional
 	void createUsers() {
-		
+
 		final UserRepository users = Beans.get(UserRepository.class);
 		final GroupRepository groups = Beans.get(GroupRepository.class);
 
@@ -497,10 +497,6 @@ public class ModuleManager {
 		admin.setPassword(authService.encrypt("admin"));
 		admin.setGroup(adminGroup);
 
-		User demo = new User("demo", "Demo User");
-		demo.setPassword(authService.encrypt("demo"));
-		demo.setGroup(userGroup);
-
 		// set createdBy property to admin
 		try {
 			Field createdBy = AuditableModel.class.getDeclaredField("createdBy");
@@ -508,11 +504,9 @@ public class ModuleManager {
 			createdBy.set(adminGroup, admin);
 			createdBy.set(userGroup, admin);
 			createdBy.set(admin, admin);
-			createdBy.set(demo, admin);
 		} catch (Exception e) {
 		}
 
 		admin = users.save(admin);
-		demo = users.save(demo);
 	}
 }

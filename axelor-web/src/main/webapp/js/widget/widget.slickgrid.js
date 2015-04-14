@@ -96,6 +96,12 @@ var Editor = function(args) {
 		var container = $(args.container);
 		if (external) {
 			container = container.parents('.view-container:first');
+			$(document).on('mousedown.slick-external', function (e) {
+				if (element.is(e.target) || element.find(e.target).size() > 0) {
+					return;
+				}
+				args.grid.getEditorLock().commitCurrentEdit();
+			});
 		}
 
 		element.css('display', 'inline-block')
@@ -148,6 +154,7 @@ var Editor = function(args) {
 			   .removeData('$editorForm');
 		element.trigger("hide:slick-editor");
 		element.parent().zIndex('');
+		$(document).off('mousedown.slick-external');
 	};
 	
 	this.position = function(pos) {
@@ -424,9 +431,9 @@ _.extend(Factory.prototype, {
 
 		var fn = Formatters[type];
 		if (fn) {
-			return fn(field, value, dataContext, this.grid);
+			value = fn(field, value, dataContext, this.grid);
 		}
-		return value;
+		return value === undefined ? '' : value;
 	},
 	
 	formatProgress: function(field, value) {
