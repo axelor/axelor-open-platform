@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <auth>
 
-  <group name="users" title="Users" />
+  <group code="users" name="Users" />
   <user code="demo" name="Demo User" group="users" />
 
   <permission name="perm.auth.all" object="com.axelor.auth.db.*">
