@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_4.0.xsd">
+
+  <module name="mail" package="com.axelor.mail.db"/>
+
+  <entity name="MailMessage" table="MAIL_MESSAGE" cachable="true" repository="none">
+    <![CDATA[
+    The model to store different kind of messages like system notifications,
+    comments, email messages etc.
+    ]]>
+    <string name="type" selection="message.type.selection" />
+    <many-to-one name="author" ref="com.axelor.auth.db.User" />
+    <many-to-many name="recipients" ref="com.axelor.auth.db.User" />
+
+    <string name="subject" namecolumn="true" />
+    <string name="body" multiline="true" />
+
+    <long name="relatedId" title="Related document id" />
+    <string name="relatedModel" title="Related document model" />
+    <string name="relatedName" title="Related document name" />
+
+    <many-to-one name="parent" ref="MailMessage" />
+    <one-to-many name="replies" ref="MailMessage" mappedBy="parent" />
+  </entity>
+
+  <entity name="MailFlags" table="MAIL_FLAGS" cachable="true" repository="none">
+    <![CDATA[
+    The model to store message flags like unread, starred, voted etc.
+    ]]>
+    <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" required="true" />
+    <many-to-one name="message" ref="MailMessage" />
+    <boolean name="unread" />
+    <boolean name="starred" />
+    <boolean name="voted" />
+  </entity>
+
+  <entity name="MailFollower" table="MAIL_FOLLOWER" cachable="true" repository="none">
+    <![CDATA[
+    The model to store followers details of a document.
+    ]]>
+    <long name="relatedId" />
+    <string name="relatedModel" />
+    <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" />
+  </entity>
+
+  <entity name="MailGroup" table="MAIL_GROUP" cachable="true" repository="none">
+    <![CDATA[
+    The model to define mail groups to share message in discussion groups.
+    ]]>
+    <string name="name" unique="true" namecolumn="true" />
+    <string name="description" multiline="true" />
+    <binary name="image" title="Photo" />
+    <many-to-many name="groups" ref="com.axelor.auth.db.Group"
+      help="Users of these groups are automatically added as followers of this mail group." />
+  </entity>
+
+</domain-models>

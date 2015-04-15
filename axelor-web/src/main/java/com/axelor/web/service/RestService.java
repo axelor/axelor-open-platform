@@ -28,7 +28,9 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -49,18 +51,31 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
 import com.axelor.app.AppSettings;
+import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
+import com.axelor.common.ClassUtils;
 import com.axelor.common.FileUtils;
 import com.axelor.db.JPA;
+import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
+import com.axelor.db.Repository;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.inject.Beans;
+import com.axelor.mail.db.MailMessage;
+import com.axelor.mail.db.repo.MailFollowerRepository;
+import com.axelor.mail.db.repo.MailMessageRepository;
+import com.axelor.mail.web.MailController;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
+import com.axelor.meta.db.repo.MetaFileRepository;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
+import com.axelor.rpc.ActionResponse;
+import com.axelor.rpc.Context;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.google.common.base.CaseFormat;
@@ -71,6 +86,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
+import com.google.common.primitives.Longs;
 import com.google.inject.servlet.RequestScoped;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataBodyPart;
@@ -87,6 +103,12 @@ public class RestService extends ResourceService {
 	
 	@Inject
 	private ActionHandler handler;
+
+	@Inject
+	private MailMessageRepository messages;
+
+	@Inject
+	private MailFollowerRepository followers;
 
 	@GET
 	public Response find(
@@ -446,4 +468,154 @@ public class RestService extends ResourceService {
 		return response;
 	}
 
+	@GET
+	@Path("messagesAll")
+	public Response messagesAll(
+			@QueryParam("flag") Boolean all,
+			@QueryParam("relatedId") Long relatedId,
+			@QueryParam("relatedModel") String relatedModel) {
+
+		final Response response = new Response();
+		final MailController ctrl = Beans.get(MailController.class);
+		final List<Object> result = new ArrayList<>();
+
+		Class<?> relatedClass = null;
+		Model related = null;
+
+		try {
+			relatedClass = ClassUtils.findClass(relatedModel);
+		} catch (Exception e) {}
+
+		if (relatedClass != null && relatedId != null) {
+			@SuppressWarnings("all")
+			JpaRepository<?> repo = JpaRepository.of((Class) relatedClass);
+			if (repo != null) {
+				related = repo.find(relatedId);
+			}
+		}
+
+		if (related != null) {
+			result.add(messages.details(related));
+			response.setData(result);
+			response.setStatus(Response.STATUS_SUCCESS);
+			return response;
+		}
+
+		ActionRequest req = new ActionRequest();
+		ActionResponse res = new ActionResponse();
+
+		if (all == Boolean.TRUE) {
+			ctrl.inbox(req, res);
+			return res;
+		}
+
+		ctrl.archived(req, res);
+		return res;
+	}
+
+	@GET
+	@Path("{id}/followers")
+	public Response messageFollowers(@PathParam("id") long id, Request request) {
+
+		@SuppressWarnings("all")
+		final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
+		final Model entity = repo.find(id);
+		final Response response = new Response();
+
+		final Object all = followers.findFollowers(entity);
+
+		response.setData(all);
+		response.setStatus(Response.STATUS_SUCCESS);
+
+		return response;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@POST
+	@Path("{id}/follow")
+	public Response messageFollow(@PathParam("id") long id, Request request) {
+
+		@SuppressWarnings("all")
+		final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
+		final Repository<User> users = JpaRepository.of(User.class);
+		final Model entity = repo.find(id);
+
+		List<Object> records = request.getRecords();
+		if (records == null || records.isEmpty()) {
+			records = new ArrayList<>();
+			records.add(AuthUtils.getUser());
+		}
+
+		for (Object item  : records) {
+			User user = null;
+			if (item instanceof User) {
+				user = (User) item;
+			} else if (item instanceof Map){
+				user = users.find(Longs.tryParse(((Map) item).get("id").toString()));
+			}
+			if (user != null) {
+				followers.follow(entity, user);
+			}
+		}
+
+		return messageFollowers(id, request);
+	}
+
+	@SuppressWarnings("rawtypes")
+	@POST
+	@Path("{id}/unfollow")
+	public Response messageUnfollow(@PathParam("id") long id, Request request) {
+		@SuppressWarnings("all")
+		final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
+		final Repository<User> users = JpaRepository.of(User.class);
+		final Model entity = repo.find(id);
+
+		List<Object> records = request.getRecords();
+		if (records == null || records.isEmpty()) {
+			records = new ArrayList<>();
+			records.add(AuthUtils.getUser());
+		}
+
+		for (Object item  : records) {
+			User user = null;
+			if (item instanceof User) {
+				user = (User) item;
+			} else if (item instanceof Map){
+				user = users.find(Longs.tryParse(((Map) item).get("id").toString()));
+			}
+			if (user != null) {
+				followers.unfollow(entity, user);
+			}
+		}
+
+		return messageFollowers(id, request);
+	}
+
+	@POST
+	@Path("{id}/message")
+	public Response messagePost(@PathParam("id") long id, Request request) {
+
+		final Response response = new Response();
+		@SuppressWarnings("all")
+		final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
+		final Context ctx = Context.create(request.getData(), MailMessage.class);
+		final MailMessage msg = ctx.asType(MailMessage.class);
+
+		final Model entity = repo.find(id);
+		final List<?> ids = (List<?>) request.getData().get("files");
+		List<MetaFile> files = null;
+
+		if (ids != null && ids.size() > 0) {
+			final MetaFileRepository repoFiles = Beans.get(MetaFileRepository.class);
+			files = repoFiles.all().filter("self.id IN :ids").bind("ids", ids).fetch();
+		}
+
+		MailMessage saved = messages.post(entity, msg, files);
+		Object item = messages.details(saved);
+
+		response.setData(Lists.newArrayList(item));
+		response.setStatus(Response.STATUS_SUCCESS);
+
+		return response;
+	}
 }

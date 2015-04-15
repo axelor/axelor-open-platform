@@ -221,6 +221,7 @@ function DSViewCtrl(type, $scope, $element) {
 				}
 				$scope.fields = fields;
 				$scope.fields_related = meta.related;
+				$scope.$hasMessages = meta.hasMessages;
 				$scope.schema = schema;
 				$scope.toolbar = toolbar;
 				$scope.menubar = schema.menubar;

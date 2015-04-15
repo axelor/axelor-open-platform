@@ -136,4 +136,20 @@ ui.formInput('Password', 'String', {
 	template_editable: '<input type="password">'
 });
 
+ui.directive('uiTextareaAutoSize', function () {
+
+	return function (scope, element, attrs) {
+
+		if (!element.is('textarea')) return;
+
+		function resize() {
+			var diff = element.outerHeight() - element.innerHeight();
+			element.css('height', 'auto').css('height', element[0].scrollHeight + diff);
+		}
+
+		element.on('focus keyup input', resize);
+		setTimeout(resize);
+	};
+});
+
 })(this);

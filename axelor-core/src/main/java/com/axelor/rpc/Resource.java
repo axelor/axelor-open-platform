@@ -56,6 +56,8 @@ import com.axelor.db.mapper.PropertyType;
 import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.meta.MetaStore;
+import com.axelor.inject.Beans;
+import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.schema.views.Selection;
@@ -385,7 +387,7 @@ public class Resource<T extends Model> {
 		for (Object item : q.getResultList()) {
 			counts.put(((Map)item).get("id"), ((Map)item).get("count"));
 		}
-		
+
 		for (Object item : result) {
 			((Map) item).put("_children", counts.get(((Map) item).get("id")));
 		}
@@ -549,6 +551,12 @@ public class Resource<T extends Model> {
 			}
 		}
 
+		// if need to fetch messages
+		if (request.getHasMessages() == Boolean.TRUE) {
+			MailMessageRepository messages = Beans.get(MailMessageRepository.class);
+			values.putAll(messages.details(entity));
+		}
+
 		data.add(values);
 		response.setData(data);
 		return response;
@@ -604,7 +612,7 @@ public class Resource<T extends Model> {
 			}
 
 			data.add(bean);
-			
+
 			// if it's a translation object, invalidate cache
 			if (bean instanceof MetaTranslation) {
 				I18nBundle.invalidate();
@@ -780,7 +788,7 @@ public class Resource<T extends Model> {
 
 		Mapper mapper = Mapper.of(model);
 		Map<String, Object> data = request.getData();
-		
+
 		Property property = null;
 		try {
 			property = mapper.getProperty(request.getFields().get(0));

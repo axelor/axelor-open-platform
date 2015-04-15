@@ -61,7 +61,8 @@ function FormViewCtrl($scope, $element) {
 	$scope.doRead = function(id) {
 		var params = {
 			fields : _.pluck($scope.fields, 'name'),
-			related: $scope.fields_related
+			related: $scope.fields_related,
+			hasMessages: $scope.$hasMessages
 		};
 		return ds.read(id, params);
 	};
@@ -948,7 +949,7 @@ ui.formBuild = function (scope, schema, fields) {
 				if (type === 'panel') {
 					item.attr('ui-panel-layout', '');
 					item.attr('x-item-span', attrs.itemSpan);
-				} else if (['tabs', 'panel-tabs', 'panel-stack', 'panel-related', 'button-group'].indexOf(type) == -1) {
+				} else if (['tabs', 'panel-tabs', 'panel-stack', 'panel-related', 'panel-mail', 'button-group'].indexOf(type) == -1) {
 					item.attr('ui-table-layout', '');
 				}
 			}

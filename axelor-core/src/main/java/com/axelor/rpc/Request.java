@@ -46,6 +46,8 @@ public class Request {
 
 	private Map<String, List<String>> related;
 
+	private Boolean hasMessages;
+
 	private String model;
 	
 	private Context context;
@@ -139,6 +141,14 @@ public class Request {
 
 	public void setRelated(Map<String, List<String>> related) {
 		this.related = related;
+	}
+
+	public Boolean getHasMessages() {
+		return hasMessages;
+	}
+
+	public void setHasMessages(Boolean hasMessages) {
+		this.hasMessages = hasMessages;
 	}
 
 	@JsonIgnore

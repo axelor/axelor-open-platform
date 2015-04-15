@@ -325,6 +325,7 @@
 				mode: settings['application.mode'],
 				sdk: settings['application.sdk'],
 				user: settings['user.name'],
+				userId: settings['user.id'],
 				login: settings['user.login'],
 				homeAction: settings['user.action'],
 				navigator: settings['user.navigator'],

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_4.0.xsd">
+
+  <!-- selection -->
+  <selection name="message.type.selection">
+    <option value="email">Email</option>
+    <option value="comment">Comment</option>
+    <option value="notification">System notification</option>
+  </selection>
+
+  <!-- views -->
+
+  <form name="mail-thread-inbox" title="Inbox" model="com.axelor.mail.db.MailMessage" width="100%"
+        css="mail-thread-view"
+        onNew="com.axelor.mail.web.MailController:inbox">
+    <panel x-item-span="12" showIf="__emptyTitle">
+      <field name="__emptyTitle" readonly="true" showTitle="false" css="bold large"></field>
+      <field name="__emptyDesc" readonly="true" showTitle="false" css="italic big"></field>
+    </panel>
+    <panel-mail>
+      <mail-messages limit="30"/>
+    </panel-mail>
+  </form>
+
+  <form name="mail-thread-archive" title="Archived" model="com.axelor.mail.db.MailMessage" width="100%"
+        css="mail-thread-view"
+        onNew="com.axelor.mail.web.MailController:archived">
+    <panel x-item-span="12" showIf="__emptyTitle">
+      <field name="__emptyTitle" readonly="true" showTitle="false" css="bold large"></field>
+      <field name="__emptyDesc" readonly="true" showTitle="false" css="italic big"></field>
+    </panel>
+    <panel-mail>
+      <mail-messages limit="30"/>
+    </panel-mail>
+  </form>
+
+
+  <grid name="mail-group-grid" title="Groups" model="com.axelor.mail.db.MailGroup">
+    <field name="name"/>
+    <field name="description"/>
+  </grid>
+
+  <form name="mail-group-from" title="Group" model="com.axelor.mail.db.MailGroup">
+    <panel title="Overview">
+      <panel colSpan="3">
+        <field name="image" widget="Image" showTitle="false" colSpan="12"/>
+      </panel>
+      <panel colSpan="9">
+        <field name="name"/>
+      </panel>
+    </panel>
+    <panel title="Description">
+        <field name="description" colSpan="12" showTitle="false"/>
+    </panel>
+    <panel-mail>
+      <mail-messages limit="30"/>
+      <mail-followers/>
+    </panel-mail>
+  </form>
+
+  <!-- actions -->
+  <action-view name="mail.inbox" model="com.axelor.mail.db.MailMessage" title="Inbox">
+    <view name="mail-thread-inbox" type="form" />
+    <view-param name="show-toolbar" value="false"/>
+  </action-view>
+
+  <action-view name="mail.archive" model="com.axelor.mail.db.MailMessage" title="Archived">
+    <view name="mail-thread-archive" type="form" />
+    <view-param name="show-toolbar" value="false"/>
+  </action-view>
+
+  <action-view name="mail.groups" model="com.axelor.mail.db.MailGroup" title="Archived">
+    <view name="mail-group-grid" type="grid" />
+    <view name="mail-group-form" type="form" />
+  </action-view>
+
+  <!-- menu -->
+  <menuitem name="menu-mail" order="-110"
+    title="Messaging" icon="img/mail-open.png"/>
+
+  <menuitem name="menu-mail-inbox" title="Inbox" parent="menu-mail"
+    action="mail.inbox" icon="fa-envelope" order="-90"/>
+  <menuitem name="menu-mail-archive" title="Archived" parent="menu-mail"
+    action="mail.archive" icon="fa-archive"  order="-80"/>
+  <menuitem name="menu-mail-groups" title="Groups" parent="menu-mail"
+    action="mail.groups" icon="fa-group"  order="-70"/>
+
+</object-views>

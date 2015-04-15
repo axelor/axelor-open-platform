@@ -127,6 +127,8 @@ load([
 	'js/form/form.relational.single.js',
 	'js/form/form.relational.multiple.js',
 	'js/form/form.relational.nested.js',
+
+	'js/form/form.mail.js',
 	'js/form/form.code.js',
 	'js/form/form.tinymce.js',
 

@@ -1,0 +1,143 @@
+/**
+ * Axelor Business Solutions
+ *
+ * Copyright (C) 2012-2014 Axelor (<http://axelor.com>).
+ *
+ * This program is free software: you can redistribute it and/or  modify
+ * it under the terms of the GNU Affero General Public License, version 3,
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* thread view */
+
+.mail-thread-view {
+	max-width: 720px;
+	margin: 0 4px 0 !important;
+}
+
+.mail-thread-view .panel {
+	border: none;
+	box-shadow: none;
+}
+
+.mail-thread-view .mail-message:first-child {
+	margin-top: 0;
+}
+
+/* form widgets */
+
+.mail-composer {
+	margin-bottom: 8px;
+}
+
+.mail-composer textarea {
+	max-width: 100%;
+	margin-bottom: 0;
+}
+
+.mail-composer .btn {
+	margin-right: 12px;
+}
+
+.mail-composer-buttons {
+	padding-top: 8px;
+}
+
+.mail-composer-files {
+	padding-top: 8px;
+}
+
+.mail-composer-files ul {
+	margin: 0;
+	list-style: none;
+}
+
+.mail-composer-files ul .fa-close {
+	cursor: pointer;
+	margin-right: 6px;
+}
+
+.mail-thread .mail-message {
+	position: relative;
+	margin: 8px 0;
+	padding: 8px 14px;
+}
+
+.mail-thread .mail-message-left {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 40px;
+	overflow: hidden;
+	display: none;
+}
+
+.mail-thread .mail-message-subject {
+	font-weight: bold;
+}
+
+.mail-thread .mail-message-icons {
+	float: right;
+}
+
+.mail-thread .mail-message-icons i {
+	cursor: pointer;
+	margin-left: 4px;
+}
+
+.mail-thread .mail-message-body {
+	padding: 4px 0;
+}
+
+.mail-thread .mail-message-center {
+	position: relative;
+	/*margin-left: 40px;*/
+}
+
+.mail-thread .mail-message-footer {
+	font-size: smaller;
+}
+
+.mail-thread .mail-message-files {
+	margin: 4px 0 4px -4px;
+}
+
+.mail-thread .mail-message-files ul {
+	margin:  0;
+}
+
+.mail-thread .mail-message.alert {
+	margin-left: 18px;
+	background-color: "";
+}
+
+.mail-thread .mail-message.alert-info {
+	margin-left: 0;
+	background-color: #d9e0f7;
+	border-color: #bccff1;
+}
+
+.mail-followers .panel-title .icons i {
+	margin-left: 8px;
+	cursor: pointer;
+}
+
+.mail-followers .links i.fa-remove {
+	cursor: pointer;
+	float: right;
+	margin-top: 3px;
+}
+
+.mail-message i.fa:hover,
+.mail-followers i.fa:hover {
+	color: black;
+}

@@ -315,7 +315,8 @@
 				if (options) {
 					promise = this._request('fetch', id).post({
 						fields: options.fields,
-						related: options.related
+						related: options.related,
+						hasMessages: options.hasMessages
 					});
 				} else {
 					promise = this._request(null, id).get();
@@ -332,6 +333,91 @@
 				promise.success = function(fn){
 					promise.then(function(response){
 						fn(record);
+					});
+					return promise;
+				};
+				promise.error = function(fn) {
+					promise.then(null, fn);
+					return promise;
+				};
+				return promise;
+			},
+
+			// find messages for the given record
+			messages: function (options) {
+
+				var opts = _.extend({}, options);
+				var promise = this._request('messagesAll').get({
+					params: opts
+				});
+
+				promise.success = function(fn) {
+					promise.then(function(response){
+						fn(response.data);
+					});
+					return promise;
+				};
+				promise.error = function(fn) {
+					promise.then(null, fn);
+					return promise;
+				};
+				return promise;
+			},
+
+			messagePost: function (id, text, options) {
+
+				var opts = _.extend({}, options);
+				var data = _.extend({
+					body : text,
+					parent: opts.parent,
+					files: opts.files
+				});
+
+				var promise = this._request('message', id).post({
+					data: data
+				});
+
+				promise.success = function(fn) {
+					promise.then(function(response){
+						fn(response.data);
+					});
+					return promise;
+				};
+				promise.error = function(fn) {
+					promise.then(null, fn);
+					return promise;
+				};
+				return promise;
+			},
+
+			messageFollow: function (id, options) {
+				var opts = _.extend({}, options);
+				var promise = this._request('follow', id).post({
+					records: opts.records
+				});
+
+				promise.success = function(fn) {
+					promise.then(function(response){
+						fn(response.data);
+					});
+					return promise;
+				};
+				promise.error = function(fn) {
+					promise.then(null, fn);
+					return promise;
+				};
+				return promise;
+			},
+
+			messageUnfollow: function (id, options) {
+				var opts = _.extend({}, options);
+				var promise = this._request('unfollow', id).post({
+					records: opts.records
+				});
+
+				promise.success = function(fn) {
+					promise.then(function(response){
+						fn(response.data);
 					});
 					return promise;
 				};

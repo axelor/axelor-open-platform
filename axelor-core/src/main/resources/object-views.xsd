@@ -1074,6 +1074,20 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
+    <xsd:complexType name="PanelMail">
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractPanel">
+        <xsd:sequence>
+          <xsd:element name="mail-messages">
+            <xsd:complexType>
+              <xsd:attribute name="limit" type="xsd:int"></xsd:attribute>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="mail-followers" minOccurs="0"></xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
 
   <xsd:complexType name="Dashlet">
     <xsd:complexContent>
@@ -1109,19 +1123,20 @@
         <xsd:sequence>
           <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0" />
           <xsd:element name="menubar" type="tns:Menubar" minOccurs="0" />
-            <xsd:choice minOccurs="0" maxOccurs="1">
-              <xsd:choice maxOccurs="unbounded">
-                <xsd:element name="panel" type="tns:Panel" />
-                <xsd:element name="panel-include" type="tns:FormInclude" />
-                <xsd:element name="panel-dashlet" type="tns:Dashlet" />
-                <xsd:element name="panel-related" type="tns:PanelRelated" />
-                <xsd:element name="panel-stack" type="tns:PanelTabs" />
-                <xsd:element name="panel-tabs" type="tns:PanelTabs" />
-              </xsd:choice>
-              <xsd:choice maxOccurs="unbounded">
-                <xsd:group ref="tns:FormWidgets" />
-              </xsd:choice>
+          <xsd:choice minOccurs="0" maxOccurs="1">
+            <xsd:choice maxOccurs="unbounded">
+              <xsd:element name="panel" type="tns:Panel" />
+              <xsd:element name="panel-include" type="tns:FormInclude" />
+              <xsd:element name="panel-dashlet" type="tns:Dashlet" />
+              <xsd:element name="panel-related" type="tns:PanelRelated" />
+              <xsd:element name="panel-stack" type="tns:PanelTabs" />
+              <xsd:element name="panel-tabs" type="tns:PanelTabs" />
             </xsd:choice>
+            <xsd:choice maxOccurs="unbounded">
+              <xsd:group ref="tns:FormWidgets" />
+            </xsd:choice>
+          </xsd:choice>
+          <xsd:element name="panel-mail" type="tns:PanelMail" minOccurs="0" />
         </xsd:sequence>
         <xsd:attribute name="css" type="xsd:string"/>
         <xsd:attribute name="cols" type="xsd:int">

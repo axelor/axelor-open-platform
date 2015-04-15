@@ -26,7 +26,8 @@ var equals = angular.equals,
 	isDate = angular.isDate;
 
 function updateValues(source, target, itemScope, formScope) {
-	if (equals(source, target))
+
+	if (equals(source, target) && (!source || !source.$force))
 		return;
 
 	function compact(value) {

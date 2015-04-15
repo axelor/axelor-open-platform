@@ -58,6 +58,7 @@ public final class AppInfo {
 			Property nameField = Mapper.of(User.class).getNameField();
 			Object nameValue = nameField.get(user);
 
+			map.put("user.id", user.getId());
 			map.put("user.name", nameValue);
 			map.put("user.login", user.getCode());
 			map.put("user.nameField", nameField.getName());
