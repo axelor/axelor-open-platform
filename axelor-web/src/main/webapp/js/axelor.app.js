@@ -309,8 +309,8 @@
 	
 	module.controller('AppCtrl', AppCtrl);
 	
-	AppCtrl.$inject = ['$rootScope', '$exceptionHandler', '$scope', '$http', '$route', 'authService'];
-	function AppCtrl($rootScope, $exceptionHandler, $scope, $http, $route, authService) {
+	AppCtrl.$inject = ['$rootScope', '$exceptionHandler', '$scope', '$http', '$route', 'authService', 'MessageService', 'NavService'];
+	function AppCtrl($rootScope, $exceptionHandler, $scope, $http, $route, authService, MessageService, NavService) {
 		
 		function getAppInfo(settings) {
 			
@@ -351,6 +351,19 @@
 		// See index.jsp
 		$scope.app = getAppInfo(__appSettings);
 		$scope.$year = moment().year();
+		$scope.$unreadMailCount = function () {
+			return MessageService.unreadCount();
+		};
+
+		$scope.showMailBox = function() {
+			NavService.openTabByName('mail.inbox');
+			$scope.$timeout(function () {
+				var tab = NavService.getSelected();
+				if (tab) {
+					$scope.$broadcast('on:nav-click', tab);
+				}
+			})
+		};
 	
 		var loginAttempts = 0;
 		var loginWindow = null;

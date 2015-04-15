@@ -91,6 +91,11 @@ header .navbar .nav-shortcuts > li > a > span {
 	vertical-align: top;
 }
 
+header .navbar .nav-shortcuts .nav-link-mail sup {
+	position: absolute;
+	top: 8px;
+}
+
 header .dropdown > ul.dropdown-menu {
     margin: 0;
 }

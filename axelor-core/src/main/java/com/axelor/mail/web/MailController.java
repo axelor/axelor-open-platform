@@ -26,16 +26,23 @@ import javax.persistence.TypedQuery;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.db.JpaSupport;
+import com.axelor.db.QueryBinder;
 import com.axelor.i18n.I18n;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
+import com.axelor.rpc.Response;
 
 public class MailController extends JpaSupport {
 
 	@Inject
 	private MailMessageRepository messages;
+
+	public void unread(ActionRequest request, ActionResponse response) {
+		 response.setValue("unread", countUnread());
+		 response.setStatus(Response.STATUS_SUCCESS);
+	}
 
 	public void inbox(ActionRequest request, ActionResponse response) {
 
@@ -79,14 +86,34 @@ public class MailController extends JpaSupport {
 		return all;
 	}
 
-	public List<Object> find(boolean unread, int limit) {
-
+	public long countUnread() {
 		final String SQL_INBOX = ""
-				+ "SELECT DISTINCT(m) FROM MailMessage m, MailFlags g "
+				+ "SELECT COUNT(m) FROM MailMessage m LEFT JOIN m.flags g "
 				+ "WHERE (m.parent IS NULL) AND "
 				+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
 				+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
-				+ "(m.id = g.message.id AND g.unread = true) ORDER BY m.createdOn ASC";
+				+ "((g IS NULL) OR (g.user.id = :uid AND g.isRead = false))";
+
+		final TypedQuery<Long> query = getEntityManager().createQuery(SQL_INBOX, Long.class);
+		QueryBinder.of(query).setCacheable();
+
+		query.setParameter("uid", AuthUtils.getUser().getId());
+		try {
+			return query.getSingleResult();
+		} catch (Exception e) {
+		}
+		return 0;
+	}
+
+	public List<Object> find(boolean unread, int limit) {
+
+		final String SQL_INBOX = ""
+				+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
+				+ "WHERE (m.parent IS NULL) AND "
+				+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
+				+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
+				+ "((g IS NULL) OR (g.user.id = :uid AND g.isRead = false)) "
+				+ "ORDER BY m.createdOn ASC";
 
 		final String SQL_ARCHIVE = ""
 				+ "SELECT DISTINCT(m) FROM MailMessage m "

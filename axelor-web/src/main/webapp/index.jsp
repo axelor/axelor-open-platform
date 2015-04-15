@@ -109,11 +109,17 @@ if (AppInfo.isMobile(request) && AppInfo.isWebKit(request)) {
           <ul class="nav nav-shortcuts pull-right">
             <li class="divider-vertical"></li>
             <li>
-            	<a href="#/"><i class="fa fa-home"></i></a>
+		<a href="#/" class="nav-link-home"><i class="fa fa-home"></i></a>
+            </li>
+            <li class="divider-vertical"></li>
+            <li>
+		<a href="" class="nav-link-mail"
+			ng-click="showMailBox()"><i class="fa fa-envelope"></i><sup
+			ng-show="unreadCount=$unreadMailCount()">{{unreadCount}}</sup></a>
             </li>
             <li class="divider-vertical"></li>
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <a href="#" class="dropdown-toggle nav-link-user" data-toggle="dropdown">
                 <i class="fa fa-user"></i> <span class="hidden-phone">{{app.user}}</span> <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">

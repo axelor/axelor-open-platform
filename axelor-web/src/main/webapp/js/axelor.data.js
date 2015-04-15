@@ -80,6 +80,11 @@
 					},
 					post: function(data, config) {
 						return $http.post(url, data, config);
+					},
+					send: function (config) {
+						return $http(_.extend({}, config, {
+							url: url
+						}));
 					}
 				};
 			},
@@ -347,8 +352,10 @@
 			messages: function (options) {
 
 				var opts = _.extend({}, options);
-				var promise = this._request('messagesAll').get({
-					params: opts
+				var promise = this._request('messagesAll').send({
+					method: 'GET',
+					params: opts,
+					transformRequest: opts.countOnly ? [] : undefined
 				});
 
 				promise.success = function(fn) {
@@ -362,6 +369,13 @@
 					return promise;
 				};
 				return promise;
+			},
+
+			messageCount: function (options) {
+				var opts = _.extend({}, options, {
+					countOnly: true
+				});
+				return this.messages(opts);
 			},
 
 			messagePost: function (id, text, options) {

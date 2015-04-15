@@ -471,7 +471,8 @@ public class RestService extends ResourceService {
 	@GET
 	@Path("messagesAll")
 	public Response messagesAll(
-			@QueryParam("flag") Boolean all,
+			@QueryParam("inboxOnly") Boolean inboxOnly,
+			@QueryParam("countOnly") Boolean countOnly,
 			@QueryParam("relatedId") Long relatedId,
 			@QueryParam("relatedModel") String relatedModel) {
 
@@ -504,7 +505,12 @@ public class RestService extends ResourceService {
 		ActionRequest req = new ActionRequest();
 		ActionResponse res = new ActionResponse();
 
-		if (all == Boolean.TRUE) {
+		if (countOnly == Boolean.TRUE) {
+			ctrl.unread(req, res);
+			return res;
+		}
+
+		if (inboxOnly == Boolean.TRUE) {
 			ctrl.inbox(req, res);
 			return res;
 		}

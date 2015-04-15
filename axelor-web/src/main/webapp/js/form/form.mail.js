@@ -19,25 +19,130 @@
 
 var ui = angular.module('axelor.ui');
 
+ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $timeout, DataSource) {
+
+	var POLL_INTERVAL = 10000;
+
+	var dsFlags = DataSource.create('com.axelor.mail.db.MailFlags');
+	var dsMessage = DataSource.create('com.axelor.mail.db.MailMessage');
+
+	var pollResult = {};
+	var pollPromise = null;
+
+	function checkUnreadMessages() {
+
+		if (pollPromise) {
+			$timeout.cancel(pollPromise);
+		}
+
+		var params = {
+			inboxOnly: true,
+			countOnly: true
+		};
+
+		dsMessage.messages(params).success(function (res) {
+			var item = _.first(res.data) || {};
+			var count = item.values || {};
+			pollResult = count;
+			pollPromise = $timeout(checkUnreadMessages, POLL_INTERVAL);
+		});
+	};
+
+	/**
+	 * Get messages with the given options.
+	 *
+	 * The options can have following values:
+	 *
+	 * - relatedId = related record id
+	 * - relatedModel = related model
+	 * - inboxOnly = only unread messages
+	 *
+	 * @param {Object} options - search options
+	 * @return {Promise}
+	 */
+	function getMessages(options) {
+
+		var opts = _.extend({}, options);
+		var deferred = $q.defer();
+
+		var promise = dsMessage.messages(opts).success(function (res) {
+			var records = res.data;
+			var first = _.first(records) || {};
+			var data = {};
+
+			if (opts.relatedId > 0) {
+				data.$following = first.$following;
+				data.$followers = first.$followers;
+				data.$messages = first.$messages;
+			} else {
+				data.__emptyTitle = first.values.__emptyTitle;
+				data.__emptyDesc = first.values.__emptyDesc;
+				data = _.extend(data, first.values);
+			}
+
+			deferred.resolve(data);
+		});
+
+		promise.error(deferred.reject);
+
+		return deferred.promise;
+	};
+
+	/**
+	 * Toggle flags on the given message.
+	 *
+	 * Flag state can be:
+	 *
+	 * 1 = mark starred
+	 * 2 = mark read
+	 *
+	 * Negative value unmarks the flag.
+	 *
+	 * @param {object} message - the message
+	 * @param {number} flagState - flag state
+	 */
+	function flagMessage(message, flagState) {
+		var flags = _.extend({}, message.$flags);
+		if (flagState === 1) flags.isStarred = true;
+		if (flagState === -1) flags.isStarred = false;
+		if (flagState === 2) flags.isRead = true;
+		if (flagState === -2) flags.isRead = false;
+
+		flags.message = _.pick(message, 'id');
+		flags.user = {
+			id: __appSettings['user.id']
+		};
+
+		var promise = dsFlags.save(flags);
+		promise.success(function (rec) {
+			message.$flags = _.pick(rec, ['id', 'version', 'isStarred', 'isRead']);
+			if (flags.unread !== undefined) {
+				checkUnreadMessages(); // force unread check
+			}
+		});
+
+		return promise;
+	}
+
+	// start polling
+	checkUnreadMessages();
+
+	return {
+		getMessages: getMessages,
+		flagMessage: flagMessage,
+		checkUnreadMessages: checkUnreadMessages,
+		unreadCount: function () {
+			return pollResult.unread;
+		}
+	};
+}]);
+
 ui.formWidget('uiMailMessages', {
 	scope: true,
-	controller: ['$scope', 'DataSource', function ($scope, DataSource) {
-
-		var dsFlags = DataSource.create('com.axelor.mail.db.MailFlags');
+	controller: ['$scope', 'MessageService', function ($scope, MessageService) {
 
 		$scope.onFlag = function (message, flagState) {
-			var flags = _.extend({}, message.$flags);
-			if (flagState === 1) flags.starred = true;
-			if (flagState === -1) flags.starred = false;
-			if (flagState === 2) flags.unread = false;
-			if (flagState === -2) flags.unread = true;
-
-			flags.message = _.pick(message, 'id');
-			flags.user = {
-				id: $scope.app.userId
-			};
-			dsFlags.save(flags).success(function (rec) {
-				message.$flags = _.pick(rec, ['id', 'version', 'starred', 'unread', 'voted']);
+			MessageService.flagMessage(message, flagState).success(function (res) {
 				if ($scope.isInbox) {
 					$scope.onLoadMessages();
 				}
@@ -86,11 +191,11 @@ ui.formWidget('uiMailMessages', {
 						"</div>" +
 						"<div class='mail-message-center'>" +
 							"<div class='mail-message-icons'>" +
-								"<i class='fa fa-star-o' ng-show='!message.$flags.starred' ng-click='onFlag(message, 1)'></i> " +
-								"<i class='fa fa-star' ng-show='message.$flags.starred' ng-click='onFlag(message, -1)'></i> " +
+								"<i class='fa fa-star-o' ng-show='!message.$flags.isStarred' ng-click='onFlag(message, 1)'></i> " +
+								"<i class='fa fa-star' ng-show='message.$flags.isStarred' ng-click='onFlag(message, -1)'></i> " +
 								"<i class='fa fa-reply' ng-show='message.$thread' ng-click='onReply(message)'></i> " +
-								"<i class='fa fa-check' ng-show='message.$flags.unread' ng-click='onFlag(message, 2)'></i> " +
-								"<i class='fa fa-upload' ng-show='!message.$flags.unread' ng-click='onFlag(message, -2)'></i>" +
+								"<i class='fa fa-check' ng-show='!message.parent && !message.$flags.isRead' ng-click='onFlag(message, 2)'></i> " +
+								"<i class='fa fa-upload' ng-show='!message.parent && message.$flags.isRead' ng-click='onFlag(message, -2)'></i>" +
 							"</div>" +
 							"<div class='mail-message-subject'>{{message.subject}}</div>" +
 							"<div class='mail-message-body' ui-bind-template x-text='message.body'></div>" +
@@ -349,7 +454,7 @@ ui.formWidget('uiMailFollowers', {
 ui.formWidget('PanelMail', {
 
 	scope: true,
-	controller: ['$scope', 'DataSource', 'ViewService', function ($scope, DataSource, ViewService) {
+	controller: ['$scope', '$timeout', 'ViewService', 'MessageService', function ($scope, $timeout, ViewService, MessageService) {
 
 		var userEditor = null;
 		var userSelector = null;
@@ -417,35 +522,21 @@ ui.formWidget('PanelMail', {
 			popup.show();
 		};
 
-		var messageDS = DataSource.create("com.axelor.mail.db.MailMessage");
-
 		$scope.isInbox = $scope.tab && $scope.tab.action === "mail.inbox";
 
 		$scope.onLoadMessages = function () {
-
 			var record = $scope.record || {};
-			var params = {};
+			var params = {
+				inboxOnly: $scope.isInbox
+			};
 
 			if (record.id > 0) {
 				params.relatedId = record.id;
 				params.relatedModel = $scope._model;
 			}
 
-			params.flag = $scope.isInbox;
-
-			messageDS.messages(params).success(function (res) {
-				var records = res.data;
-				var first = _.first(records);
-
-				if (record.id > 0 && first) {
-					record.$following = first.$following;
-					record.$followers = first.$followers;
-					record.$messages = first.$messages;
-				} else {
-					record.__emptyTitle = first.values.__emptyTitle;
-					record.__emptyDesc = first.values.__emptyDesc;
-					record = _.extend(record, first.values);
-				}
+			MessageService.getMessages(params).then(function (res) {
+				record = _.extend(record, res);
 			});
 		};
 

@@ -109,7 +109,10 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 	}
 
 	public Map<String, Object> details(MailMessage message) {
-		final Map<String, Object> details = Resource.toMap(message);
+		final String[] fields = {
+				"id", "version", "type", "author", "recipients",
+				"subject", "body", "relatedId", "relatedModel", "relatedName"};
+		final Map<String, Object> details = Resource.toMap(message, fields);
 		final List<Object> files = new ArrayList<>();
 
 		final MetaAttachmentRepository repoAttachments = Beans.get(MetaAttachmentRepository.class);
@@ -126,7 +129,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		}
 
 		if (flags != null) {
-			details.put("$flags", Resource.toMap(flags, "starred", "unread", "voted"));
+			details.put("$flags", Resource.toMap(flags, "isRead", "isStarred"));
 		}
 
 		details.put("$files", files);

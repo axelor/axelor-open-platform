@@ -23,6 +23,9 @@
 
     <many-to-one name="parent" ref="MailMessage" />
     <one-to-many name="replies" ref="MailMessage" mappedBy="parent" />
+
+    <one-to-many name="flags" ref="MailFlags" mappedBy="message" />
+
   </entity>
 
   <entity name="MailFlags" table="MAIL_FLAGS" cachable="true" repository="none">
@@ -31,9 +34,8 @@
     ]]>
     <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" required="true" />
     <many-to-one name="message" ref="MailMessage" />
-    <boolean name="unread" />
-    <boolean name="starred" />
-    <boolean name="voted" />
+    <boolean name="isStarred" />
+    <boolean name="isRead" />
   </entity>
 
   <entity name="MailFollower" table="MAIL_FOLLOWER" cachable="true" repository="none">
