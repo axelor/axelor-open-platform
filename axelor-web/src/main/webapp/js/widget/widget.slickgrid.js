@@ -1833,9 +1833,13 @@ Grid.prototype.onButtonClick = function(event, args) {
 			field.handler.prompt = field.prompt;
 		}
 		field.handler.scope.getContext = function() {
-			return _.extend({
-				_model: model
+			var context = _.extend({
+				_model: model,
 			}, record);
+			if (handlerScope.field && handlerScope.field.target) {
+				context._parent = handlerScope.getContext();
+			}
+			return context;
 		};
 		field.handler.onClick().then(function(res){
 			delete field.handler.scope.record;
