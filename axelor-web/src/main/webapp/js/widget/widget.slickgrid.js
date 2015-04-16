@@ -632,6 +632,10 @@ Grid.prototype.parse = function(view) {
 	if (!scope.selector && view.editIcon && (!handler.hasPermission || handler.hasPermission('write'))) {
 		editColumn = new EditIconColumn({
 			onClick: function (e, args) {
+				if (e.isDefaultPrevented()) {
+					return;
+				}
+				e.preventDefault();
 				var elem = $(e.target);
 				if (elem.is('.fa-minus') && handler) {
 					return handler.dataView.deleteItem(0);
