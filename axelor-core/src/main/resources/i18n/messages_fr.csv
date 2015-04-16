@@ -2,8 +2,7 @@
 "Action","Action",,"resources/domains/Meta.xml:65
 resources/domains/Meta.xml:83
 resources/views/Meta.xml:111
-resources/views/User.xml:29
-resources/views/User.xml:55"
+resources/views/User.xml:29"
 "Action Menu","Action de menu",,"resources/views/Meta.xml:162"
 "Action Menus","Les Action Menus",,"resources/views/Menu.xml:103
 resources/views/Menu.xml:105
@@ -41,18 +40,20 @@ resources/views/Meta.xml:64"
 "Calendar","Calendrier",,"resources/views/Meta.xml:14"
 "Category","Catégorie",,"resources/domains/Meta.xml:80"
 "Category name to group action menus.","Nom de la catégorie pour grouper les actions menus",,"resources/domains/Meta.xml:80"
-"Change password?","Changer mot de passe ?",,"resources/views/User.xml:36"
+"Change password?","Changer mot de passe ?",,"resources/views/User.xml:36
+resources/views/User.xml:54"
 "Chart","Graphique",,"resources/views/Meta.xml:10"
 "Code","Code",,"resources/domains/Group.xml:13"
 "Code length should be greater than 2.","La longueur de l'identifiant doit être supérieur à 2",,"resources/views/Group.xml:52
-resources/views/User.xml:61"
+resources/views/User.xml:63"
 "Collapse","Regrouper",,"resources/views/Group.xml:9"
 "Comma separated list of params for the condition.","Liste de paramètres séparée par des virgules",,"resources/domains/Permission.xml:21"
 "Condition","Conditon",,"resources/domains/Permission.xml:20
 resources/views/Permission.xml:28
 resources/views/Permission.xml:29"
 "Condition params","Paramètres",,"resources/domains/Permission.xml:21"
-"Confirm","Confirmation",,"resources/views/User.xml:39"
+"Confirm","Confirmation",,"resources/views/User.xml:39
+resources/views/User.xml:57"
 "Create","Création",,"resources/domains/Permission.xml:17"
 "Created by","Créé par",,"java/com/axelor/auth/db/AuditableModel.java:49"
 "Created on","Créé le",,"java/com/axelor/auth/db/AuditableModel.java:43"
@@ -169,7 +170,7 @@ resources/domains/Permission.xml:13
 resources/domains/Role.xml:13
 resources/domains/User.xml:14"
 "Name length should be greater than 2.","La longueur du nom doit être supérieur à 2",,"resources/views/Group.xml:48
-resources/views/User.xml:65"
+resources/views/User.xml:67"
 "Navigation","Navigation",,"resources/domains/Group.xml:15"
 "Next","Valeur suivante",,"resources/domains/MetaSequence.xml:18"
 "Object","Objet",,"resources/domains/Meta.xml:188
@@ -201,7 +202,8 @@ resources/views/Permission.xml:30"
 "Parent","Parent",,"resources/domains/Meta.xml:64
 resources/domains/Meta.xml:82"
 "Password","Mot de passe",,"resources/domains/User.xml:15
-resources/views/User.xml:38"
+resources/views/User.xml:38
+resources/views/User.xml:56"
 "Password doesn't match","Le mot de passe ne correspond pas",,"java/com/axelor/auth/AuthService.java:226"
 "Pending","En attente ?",,"resources/domains/Meta.xml:20"
 "Permission","Permission",,"resources/views/Permission.xml:16"
@@ -213,7 +215,7 @@ resources/views/Menu.xml:40
 resources/views/Menu.xml:43
 resources/views/Permission.xml:6"
 "Portal","Portail",,"resources/views/Meta.xml:12"
-"Preferences","Préférences",,"resources/views/User.xml:49"
+"Preferences","Préférences",,"resources/views/User.xml:50"
 "Prefix","Prefix",,"resources/domains/MetaSequence.xml:13"
 "Priority","Priorité",,"resources/domains/Meta.xml:108
 resources/domains/Meta.xml:31
@@ -278,7 +280,7 @@ resources/domains/Meta.xml:94"
 "User","Utilisateurs",,"resources/domains/MetaFilter.xml:21
 resources/views/User.xml:20"
 "User Management","Gestion des utilisateurs",,"resources/views/Menu.xml:7"
-"User preferences","Préférences",,"resources/views/User.xml:50"
+"User preferences","Préférences",,"resources/views/User.xml:51"
 "Users","Les Utilisateurs",,"resources/views/Menu.xml:14
 resources/views/Menu.xml:16
 resources/views/User.xml:11"
@@ -307,6 +309,8 @@ resources/domains/Meta.xml:97"
 "You are not authorized to read this resource.","Vous n'êtes pas autorisé à lire cette ressource.",,"java/com/axelor/db/JpaSecurity.java:29"
 "You are not authorized to remove this resource.","Vous n'êtes pas autorisé à supprimer cette ressource.",,"java/com/axelor/db/JpaSecurity.java:32"
 "You are not authorized to update this resource.","Vous n'êtes pas autorisé à modifier cette ressource.",,"java/com/axelor/db/JpaSecurity.java:30"
+"You can't delete: %s#%s","Vous ne pouvez pas supprimer la ressource : %s#%s",,"java/com/axelor/auth/db/AuditInterceptor.java:158"
+"You can't update: %s#%s, values (%s=%s)","Vous ne pouvez pas mettre à jour la ressource : %s#%s, valeurs (%s=%s)",,"java/com/axelor/auth/db/AuditInterceptor.java:118"
 "action-attrs","action-attrs",,"resources/views/Meta.xml:19"
 "action-condition","action-condition",,"resources/views/Meta.xml:23"
 "action-export","action-export",,"resources/views/Meta.xml:27"
@@ -318,8 +322,10 @@ resources/domains/Meta.xml:97"
 "action-view","action-view",,"resources/views/Meta.xml:20"
 "action-workflow","action-workflow",,"resources/views/Meta.xml:29"
 "action-ws","action-ws",,"resources/views/Meta.xml:28"
-"confirm password","confirmation",,"resources/views/User.xml:39"
+"confirm password","confirmation",,"resources/views/User.xml:39
+resources/views/User.xml:57"
 "login name","login",,"resources/views/User.xml:23"
-"new password","nouveau",,"resources/views/User.xml:38"
+"new password","nouveau",,"resources/views/User.xml:38
+resources/views/User.xml:56"
 "user group","groupe",,"resources/views/User.xml:24"
 "user name","nom",,"resources/views/User.xml:22"

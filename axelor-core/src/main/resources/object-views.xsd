@@ -569,6 +569,20 @@
         <xsd:documentation>Specify whether to show lebels in ImageSelect widget.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-precision" type="xsd:integer">
+      <xsd:annotation>
+        <xsd:documentation>
+          The precision of the decimal value (total number of digits).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-scale" type="xsd:integer">
+      <xsd:annotation>
+        <xsd:documentation>
+          The scale of the decimal value (total number of digits in decimal part).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:attributeGroup name="RelationalAttributes">

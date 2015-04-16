@@ -485,10 +485,5 @@ public class ModuleManager {
 		admin.setPassword(authService.encrypt("admin"));
 		admin.setGroup(adminGroup);
 		admin = users.save(admin);
-
-		User demo = new User("demo", "Demo User");
-		demo.setPassword(authService.encrypt("demo"));
-		demo.setGroup(userGroup);
-		demo = users.save(demo);
 	}
 }

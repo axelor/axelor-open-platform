@@ -2,8 +2,7 @@
 "Action",,,"resources/domains/Meta.xml:65
 resources/domains/Meta.xml:83
 resources/views/Meta.xml:111
-resources/views/User.xml:29
-resources/views/User.xml:55"
+resources/views/User.xml:29"
 "Action Menu",,,"resources/views/Meta.xml:162"
 "Action Menus",,,"resources/views/Menu.xml:103
 resources/views/Menu.xml:105
@@ -41,18 +40,20 @@ resources/views/Meta.xml:64"
 "Calendar",,,"resources/views/Meta.xml:14"
 "Category",,,"resources/domains/Meta.xml:80"
 "Category name to group action menus.",,,"resources/domains/Meta.xml:80"
-"Change password?",,,"resources/views/User.xml:36"
+"Change password?",,,"resources/views/User.xml:36
+resources/views/User.xml:54"
 "Chart",,,"resources/views/Meta.xml:10"
 "Code",,,"resources/domains/Group.xml:13"
 "Code length should be greater than 2.",,,"resources/views/Group.xml:52
-resources/views/User.xml:61"
+resources/views/User.xml:63"
 "Collapse",,,"resources/views/Group.xml:9"
 "Comma separated list of params for the condition.",,,"resources/domains/Permission.xml:21"
 "Condition",,,"resources/domains/Permission.xml:20
 resources/views/Permission.xml:28
 resources/views/Permission.xml:29"
 "Condition params",,,"resources/domains/Permission.xml:21"
-"Confirm",,,"resources/views/User.xml:39"
+"Confirm",,,"resources/views/User.xml:39
+resources/views/User.xml:57"
 "Create",,,"resources/domains/Permission.xml:17"
 "Created by",,,"java/com/axelor/auth/db/AuditableModel.java:49"
 "Created on",,,"java/com/axelor/auth/db/AuditableModel.java:43"
@@ -169,7 +170,7 @@ resources/domains/Permission.xml:13
 resources/domains/Role.xml:13
 resources/domains/User.xml:14"
 "Name length should be greater than 2.",,,"resources/views/Group.xml:48
-resources/views/User.xml:65"
+resources/views/User.xml:67"
 "Navigation",,,"resources/domains/Group.xml:15"
 "Next",,,"resources/domains/MetaSequence.xml:18"
 "Object",,,"resources/domains/Meta.xml:188
@@ -201,7 +202,8 @@ resources/views/Permission.xml:30"
 "Parent",,,"resources/domains/Meta.xml:64
 resources/domains/Meta.xml:82"
 "Password",,,"resources/domains/User.xml:15
-resources/views/User.xml:38"
+resources/views/User.xml:38
+resources/views/User.xml:56"
 "Password doesn't match",,,"java/com/axelor/auth/AuthService.java:226"
 "Pending",,,"resources/domains/Meta.xml:20"
 "Permission",,,"resources/views/Permission.xml:16"
@@ -213,7 +215,7 @@ resources/views/Menu.xml:40
 resources/views/Menu.xml:43
 resources/views/Permission.xml:6"
 "Portal",,,"resources/views/Meta.xml:12"
-"Preferences",,,"resources/views/User.xml:49"
+"Preferences",,,"resources/views/User.xml:50"
 "Prefix",,,"resources/domains/MetaSequence.xml:13"
 "Priority",,,"resources/domains/Meta.xml:108
 resources/domains/Meta.xml:31
@@ -278,7 +280,7 @@ resources/domains/Meta.xml:94"
 "User",,,"resources/domains/MetaFilter.xml:21
 resources/views/User.xml:20"
 "User Management",,,"resources/views/Menu.xml:7"
-"User preferences",,,"resources/views/User.xml:50"
+"User preferences",,,"resources/views/User.xml:51"
 "Users",,,"resources/views/Menu.xml:14
 resources/views/Menu.xml:16
 resources/views/User.xml:11"
@@ -307,6 +309,8 @@ resources/domains/Meta.xml:97"
 "You are not authorized to read this resource.",,,"java/com/axelor/db/JpaSecurity.java:29"
 "You are not authorized to remove this resource.",,,"java/com/axelor/db/JpaSecurity.java:32"
 "You are not authorized to update this resource.",,,"java/com/axelor/db/JpaSecurity.java:30"
+"You can't delete: %s#%s",,,"java/com/axelor/auth/db/AuditInterceptor.java:158"
+"You can't update: %s#%s, values (%s=%s)",,,"java/com/axelor/auth/db/AuditInterceptor.java:118"
 "action-attrs",,,"resources/views/Meta.xml:19"
 "action-condition",,,"resources/views/Meta.xml:23"
 "action-export",,,"resources/views/Meta.xml:27"
@@ -318,8 +322,10 @@ resources/domains/Meta.xml:97"
 "action-view",,,"resources/views/Meta.xml:20"
 "action-workflow",,,"resources/views/Meta.xml:29"
 "action-ws",,,"resources/views/Meta.xml:28"
-"confirm password",,,"resources/views/User.xml:39"
+"confirm password",,,"resources/views/User.xml:39
+resources/views/User.xml:57"
 "login name",,,"resources/views/User.xml:23"
-"new password",,,"resources/views/User.xml:38"
+"new password",,,"resources/views/User.xml:38
+resources/views/User.xml:56"
 "user group",,,"resources/views/User.xml:24"
 "user name",,,"resources/views/User.xml:22"

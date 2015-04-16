@@ -31,6 +31,10 @@ ui.ProgressMixin = {
 
 		scope.$watch("getValue()", function(value, old) {
 			var props = that.compute(field, value);
+			scope.cssClasses = 'progress ' + props.css;
+			scope.styles = {
+				width: props.width + '%'
+			}
 			scope.css = props.css;
 			scope.width = props.width;
 		});
@@ -88,8 +92,8 @@ ui.ProgressMixin = {
 	},
 	
 	template_readonly:
-	'<div class="progress {{css}}">'+
-	  '<div class="bar" style="width: {{width}}%;"></div>'+
+	'<div ng-class="cssClasses">'+
+	  '<div class="bar" ng-style="styles"></div>'+
 	'</div>'
 };
 
