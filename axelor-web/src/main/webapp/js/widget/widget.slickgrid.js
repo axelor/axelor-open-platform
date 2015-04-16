@@ -271,7 +271,7 @@ var Formatters = {
 	},
 
 	"decimal": function(field, value) {
-		var scale = field.scale || 2,
+		var scale = (field.widgetAttrs||{}).scale || field.scale || 2,
 			num = +(value);
 		if (num) {
 			return num.toFixed(scale);
