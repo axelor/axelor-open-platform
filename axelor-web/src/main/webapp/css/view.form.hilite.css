@@ -18,89 +18,104 @@
  
  /* hilite */
 [class *= hilite-].strong,
-[class *= hilite-].strong input:first-of-type {
+[class *= hilite-].strong input:first-of-type,
+[class *= hilite-].strong textarea:first-of-type {
 	font-weight: bold !important;
 }
 
 .hilite-primary-text,
-.hilite-primary-text input:first-of-type {
+.hilite-primary-text input:first-of-type,
+.hilite-primary-text textarea:first-of-type {
 	color: #428bca !important;
 }
 
 .hilite-primary,
 .hilite-primary input:first-of-type,
+.hilite-primary textarea:first-of-type,
 .hilite-primary .slick-cell {
 	color: #fff !important;
 	background-color: #428bca !important;
 }
 
 .hilite-warning-text,
-.hilite-warning-text input:first-of-type {
+.hilite-warning-text input:first-of-type,
+.hilite-warning-text textarea:first-of-type {
 	color: #f0ad4e !important;
 }
 
 .hilite-warning,
 .hilite-warning input:first-of-type,
+.hilite-warning textarea:first-of-type,
 .hilite-warning .slick-cell {
 	color: #fff !important;
 	background-color: #f0ad4e !important;
 }
 
 .hilite-success-text,
-.hilite-success-text input:first-of-type {
+.hilite-success-text input:first-of-type,
+.hilite-success-text textarea:first-of-type {
 	color: #5cb85c !important;
 }
 
 .hilite-success,
 .hilite-success input:first-of-type,
+.hilite-success textarea:first-of-type,
 .hilite-success .slick-cell {
 	color: #fff !important;
 	background-color: #5cb85c !important;
 }
 
 .hilite-danger-text,
-.hilite-danger-text input:first-of-type {
+.hilite-danger-text input:first-of-type,
+.hilite-danger-text textarea:first-of-type {
 	color: #d9534f !important;
 }
 
 .hilite-danger,
 .hilite-danger input:first-of-type,
+.hilite-danger textarea:first-of-type,
 .hilite-danger .slick-cell {
 	color: #fff !important;
 	background-color: #d9534f !important;
 }
 
 .hilite-error-text,
-.hilite-error-text input:first-of-type {
+.hilite-error-text input:first-of-type,
+.hilite-error-text textarea:first-of-type {
 	color: #b94a48 !important;
 }
 
 .hilite-error,
 .hilite-error input:first-of-type,
+.hilite-error textarea:first-of-type,
 .hilite-error .slick-cell {
 	color: #fff !important;
 	background-color: #b94a48 !important;
 }
 
 .hilite-info-text,
-.hilite-info-text input:first-of-type {
+.hilite-info-text input:first-of-type,
+.hilite-info-text textarea:first-of-type {
 	color: #5bc0de !important;
 }
 
 .hilite-info,
 .hilite-info input:first-of-type,
+.hilite-info textarea:first-of-type,
 .hilite-info .slick-cell {
 	color: #fff !important;
 	background-color: #5bc0de !important;
 }
 
 .hilite-default-text,
-.hilite-default-text input:first-of-type {
+.hilite-default-text input:first-of-type,
+.hilite-default-text textarea:first-of-type {
 
 }
 
 .hilite-default,
 .hilite-default input:first-of-type,
+.hilite-default textarea:first-of-type,
 .hilite-default .slick-cell {
 
 }
@@ -113,157 +128,183 @@
 
 .form-item label.label-bold,
 .form-item-container.bold,
-.form-item-container.bold input:first-of-type {
+.form-item-container.bold input:first-of-type,
+.form-item-container.bold textarea:first-of-type {
 	font-weight: bold !important;
 }
 
 .form-item label.label-italic,
 .form-item-container.italic,
-.form-item-container.italic input:first-of-type {
+.form-item-container.italic input:first-of-type,
+.form-item-container.italic textarea:first-of-type {
 	font-style: italic !important;
 }
 
 .form-item label.label-underline,
 .form-item-container.underline,
-.form-item-container.underline input:first-of-type {
+.form-item-container.underline input:first-of-type,
+.form-item-container.underline textarea:first-of-type {
 	text-decoration: underline !important;
 }
 
 .form-item label.label-overline,
 .form-item-container.overline,
-.form-item-container.overline input:first-of-type {
+.form-item-container.overline input:first-of-type,
+.form-item-container.overline textarea:first-of-type {
 	text-decoration: overline !important;
 }
 
 .form-item label.label-line-through,
 .form-item-container.line-through,
-.form-item-container.line-through input:first-of-type {
+.form-item-container.line-through input:first-of-type,
+.form-item-container.line-through textarea:first-of-type {
 	text-decoration: line-through !important;
 }
 
 .form-item label.label-small,
 .form-item-container.small,
-.form-item-container.small input:first-of-type {
+.form-item-container.small input:first-of-type,
+.form-item-container.small textarea:first-of-type {
 	font-size: 10px !important;
 }
 
 .form-item label.label-big,
 .form-item-container.big,
+.form-item-container.big input:first-of-type,
 .form-item-container.big input:first-of-type {
 	font-size: 16px !important;
 }
 
 .form-item label.label-large,
 .form-item-container.large,
-.form-item-container.large input:first-of-type {
+.form-item-container.large input:first-of-type,
+.form-item-container.large textarea:first-of-type {
 	font-size: 18px !important;
 }
 
 .form-item label.label-left,
 .form-item-container.left,
-.form-item-container.left input:first-of-type {
+.form-item-container.left input:first-of-type,
+.form-item-container.left textarea:first-of-type {
 	text-align: left !important;
 }
 
 .form-item label.label-right,
 .form-item-container.right,
-.form-item-container.right input:first-of-type {
+.form-item-container.right input:first-of-type,
+.form-item-container.right textarea:first-of-type {
 	text-align: right !important;
 }
 
 .form-item label.label-center,
 .form-item-container.center,
-.form-item-container.center input:first-of-type {
+.form-item-container.center input:first-of-type,
+.form-item-container.center textarea:first-of-type {
 	text-align: center !important;
 }
 
 .form-item label.label-justify,
 .form-item-container.justify,
-.form-item-container.justify input:first-of-type {
+.form-item-container.justify input:first-of-type,
+.form-item-container.justify textarea:first-of-type {
 	text-align: justify !important;
 }
 
 .form-item label.label-red,
 .form-item-container.red,
-.form-item-container.red input:first-of-type {
+.form-item-container.red input:first-of-type,
+.form-item-container.red textarea:first-of-type {
 	color: red !important;
 }
 
 .form-item label.label-blue,
 .form-item-container.blue,
-.form-item-container.blue input:first-of-type {
+.form-item-container.blue input:first-of-type,
+.form-item-container.blue textarea:first-of-type {
 	color: blue !important;
 }
 
 .form-item label.label-green,
 .form-item-container.green,
+.form-item-container.green input:first-of-type,
 .form-item-container.green input:first-of-type {
 	color: green !important;
 }
 
 .form-item label.label-muted,
 .form-item-container.muted,
-.form-item-container.muted input:first-of-type {
+.form-item-container.muted input:first-of-type,
+.form-item-container.muted textarea:first-of-type {
 	color: #777 !important;
 }
 
 .form-item label.label-primary,
 .form-item-container.primary,
-.form-item-container.primary input:first-of-type {
+.form-item-container.primary input:first-of-type,
+.form-item-container.primary textarea:first-of-type {
 	color: #428bca !important;
 }
 
 .form-item label.label-success,
 .form-item-container.success,
-.form-item-container.success input:first-of-type {
+.form-item-container.success input:first-of-type,
+.form-item-container.success textarea:first-of-type {
 	color: #3c763d !important;
 }
 
 .form-item label.label-info,
 .form-item-container.info,
-.form-item-container.info input:first-of-type {
+.form-item-container.info input:first-of-type,
+.form-item-container.info textarea:first-of-type {
 	color: #31708f !important;
 }
 
 .form-item label.label-warning,
 .form-item-container.warning,
-.form-item-container.warning input:first-of-type {
+.form-item-container.warning input:first-of-type,
+.form-item-container.warning textarea:first-of-type {
 	color: #8a6d3b !important;
 }
 
 .form-item label.label-danger,
 .form-item-container.danger,
-.form-item-container.danger input:first-of-type {
+.form-item-container.danger input:first-of-type,
+.form-item-container.danger textarea:first-of-type {
 	color: #a94442 !important;
 }
 
 .form-item label.label-bg-primary,
 .form-item-container.bg-primary,
-.form-item-container.bg-primary input:first-of-type {
+.form-item-container.bg-primary input:first-of-type,
+.form-item-container.bg-primary textarea:first-of-type {
 	color: #fff;
 	background-color: #428bca !important;
 }
 
 .form-item label.label-bg-success,
 .form-item-container.bg-success,
-.form-item-container.bg-success input:first-of-type {
+.form-item-container.bg-success input:first-of-type,
+.form-item-container.bg-success textarea:first-of-type {
 	background-color: #dff0d8 !important;
 }
 
 .form-item label.label-bg-info,
 .form-item-container.bg-info,
-.form-item-container.bg-info input:first-of-type {
+.form-item-container.bg-info input:first-of-type,
+.form-item-container.bg-info textarea:first-of-type {
 	background-color: #d9edf7 !important;
 }
 
 .form-item label.label-bg-warning,
 .form-item-container.bg-warning,
-.form-item-container.bg-warning input:first-of-type {
+.form-item-container.bg-warning input:first-of-type,
+.form-item-container.bg-warning textarea:first-of-type {
 	background-color: #fcf8e3 !important;
 }
 
 .form-item label.label-bg-danger,
 .form-item-container.bg-danger,
-.form-item-container.bg-danger input:first-of-type {
+.form-item-container.bg-danger input:first-of-type,
+.form-item-container.bg-danger textarea:first-of-type {
 	background-color: #f2dede !important;
 }

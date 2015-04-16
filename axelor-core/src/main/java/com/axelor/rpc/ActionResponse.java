@@ -100,6 +100,59 @@ public class ActionResponse extends Response {
 	}
 
 	/**
+	 * Set an alert message.
+	 * <p>
+	 * The message will be shown on the client screen as an alert dialog.
+	 * </p>
+	 * 
+	 * @param message
+	 *            the message to show as an alert
+	 */
+	public void setAlert(String message) {
+		set("alert", message);
+	}
+
+	/**
+	 * Set an error message.
+	 * <p>
+	 * The message will be shown on the client screen as an error dialog.
+	 * </p>
+	 * 
+	 * @param message
+	 *            the message to show as an error
+	 */
+	public void setError(String message) {
+		set("error", message);
+	}
+
+	/**
+	 * Set the comma separated list of pending actions.
+	 * <p>
+	 * This can be used along with {@link #setAlert(String)},
+	 * {@link #setError(String)} methods.
+	 * </p>
+	 * 
+	 * @param actions
+	 *            the list of pending actions
+	 */
+	public void setPending(String actions) {
+		set("pending", actions);
+	}
+
+	/**
+	 * Set the file path relative to the data export directory.
+	 * <p>
+	 * The client will initiate downloading the exported file.
+	 * </p>
+	 * 
+	 * @param path
+	 *            the relative path to the exported file
+	 */
+	public void setExportFile(String path) {
+		set("exportFile", path);
+	}
+	
+	/**
 	 * Set record values.
 	 * <p>
 	 * The client updates current view with these values.
