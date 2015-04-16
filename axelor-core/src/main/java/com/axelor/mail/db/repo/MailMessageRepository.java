@@ -17,10 +17,14 @@
  */
 package com.axelor.mail.db.repo;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
+import javax.persistence.PersistenceException;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.db.JpaRepository;
@@ -30,6 +34,7 @@ import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailFlags;
 import com.axelor.mail.db.MailMessage;
+import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
@@ -37,6 +42,12 @@ import com.axelor.rpc.Resource;
 import com.google.inject.persist.Transactional;
 
 public class MailMessageRepository extends JpaRepository<MailMessage> {
+
+	@Inject
+	private MetaFiles files;
+
+	@Inject
+	private MetaAttachmentRepository attachmentRepo;
 
 	public MailMessageRepository() {
 		super(MailMessage.class);
@@ -52,6 +63,23 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 				entity.getId())
 				.order("-createdOn")
 				.fetch(limit);
+	}
+
+	@Override
+	public void remove(MailMessage message) {
+		// delete all attachments
+		List<MetaAttachment> attachments = attachmentRepo.all()
+				.filter("self.objectId = ? AND self.objectName = ?", message.getId(), MailMessage.class.getName())
+				.fetch();
+
+		for (MetaAttachment attachment : attachments) {
+			try {
+				files.delete(attachment);
+			} catch (IOException e) {
+				throw new PersistenceException(e);
+			}
+		}
+		super.remove(message);
 	}
 
 	@Transactional

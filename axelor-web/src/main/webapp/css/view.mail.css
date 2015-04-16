@@ -35,7 +35,6 @@
 /* form widgets */
 
 .mail-composer {
-	margin-bottom: 8px;
 }
 
 .mail-composer textarea {
@@ -44,7 +43,7 @@
 }
 
 .mail-composer .btn {
-	margin-right: 12px;
+	margin-right: 8px;
 }
 
 .mail-composer-buttons {
@@ -63,6 +62,14 @@
 .mail-composer-files ul .fa-close {
 	cursor: pointer;
 	margin-right: 6px;
+}
+
+.mail-thread .mail-composer {
+	margin-bottom: 8px;
+}
+
+.mail-thread span:last-child .mail-composer {
+	margin-top: 8px;
 }
 
 .mail-thread .mail-message {
@@ -87,11 +94,24 @@
 
 .mail-thread .mail-message-icons {
 	float: right;
+	margin-top: -4px;
+	margin-right: -8px;
 }
 
 .mail-thread .mail-message-icons i {
 	cursor: pointer;
 	margin-left: 4px;
+	color: #0088cc;
+}
+
+.mail-thread .mail-message-icons .btn {
+	padding: 0;
+	margin-top: -4px;
+}
+
+.mail-thread .mail-message-icons .btn i {
+	margin: 0;
+	padding: 4px;
 }
 
 .mail-thread .mail-message-body {
@@ -124,6 +144,10 @@
 	margin-left: 0;
 	background-color: #d9e0f7;
 	border-color: #bccff1;
+}
+
+.mail-thread > span:last-child .mail-message {
+	margin-bottom: 0;
 }
 
 .mail-followers .panel-title .icons i {

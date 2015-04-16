@@ -124,12 +124,21 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 		return promise;
 	}
 
+	function removeMessage(message) {
+		var promise = dsMessage.remove(message);
+		promise.then(function () {
+			checkUnreadMessages(); // force unread check
+		});
+		return promise;
+	};
+
 	// start polling
 	checkUnreadMessages();
 
 	return {
 		getMessages: getMessages,
 		flagMessage: flagMessage,
+		removeMessage: removeMessage,
 		checkUnreadMessages: checkUnreadMessages,
 		unreadCount: function () {
 			return pollResult.unread;
@@ -146,6 +155,12 @@ ui.formWidget('uiMailMessages', {
 				if ($scope.isInbox) {
 					$scope.onLoadMessages();
 				}
+			});
+		};
+
+		$scope.onRemove = function(message) {
+			MessageService.removeMessage(message).success(function (res) {
+				$scope.onLoadMessages();
 			});
 		};
 
@@ -191,11 +206,20 @@ ui.formWidget('uiMailMessages', {
 						"</div>" +
 						"<div class='mail-message-center'>" +
 							"<div class='mail-message-icons'>" +
-								"<i class='fa fa-star-o' ng-show='!message.$flags.isStarred' ng-click='onFlag(message, 1)'></i> " +
-								"<i class='fa fa-star' ng-show='message.$flags.isStarred' ng-click='onFlag(message, -1)'></i> " +
-								"<i class='fa fa-reply' ng-show='message.$thread' ng-click='onReply(message)'></i> " +
-								"<i class='fa fa-check' ng-show='!message.parent && !message.$flags.isRead' ng-click='onFlag(message, 2)'></i> " +
-								"<i class='fa fa-upload' ng-show='!message.parent && message.$flags.isRead' ng-click='onFlag(message, -2)'></i>" +
+								"<span ng-if='message.$thread'>" +
+									"<i class='fa fa-star-o' ng-show='!message.$flags.isStarred' ng-click='onFlag(message, 1)'></i> " +
+									"<i class='fa fa-star' ng-show='message.$flags.isStarred' ng-click='onFlag(message, -1)'></i> " +
+									"<i class='fa fa-reply' ng-show='message.$thread' ng-click='onReply(message)'></i> " +
+								"</span>" +
+								"<div class='btn-group'>" +
+									"<button type='button' class='btn btn-link dropdown-toggle' data-toggle='dropdown'>" +
+										"<i class='fa fa-caret-down'></i>" +
+									"</button>" +
+									"<ul class='dropdown-menu pull-right'>" +
+										"<li ng-if='message.$thread' ng-show='!message.parent && !message.$flags.isRead'><a href='javascript:' ng-click='onFlag(message, 2)'>Archive</a></li>" +
+								"<li><a href='javascript:' ng-click='onRemove(message)'>Remove</a></li>" +
+						            "</ul>" +
+								"</div>" +
 							"</div>" +
 							"<div class='mail-message-subject'>{{message.subject}}</div>" +
 							"<div class='mail-message-body' ui-bind-template x-text='message.body'></div>" +
