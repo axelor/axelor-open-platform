@@ -29,6 +29,7 @@ import org.joda.time.LocalDateTime;
 import com.axelor.auth.AuthUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.i18n.I18n;
 
 @SuppressWarnings("serial")
 public class AuditInterceptor extends EmptyInterceptor {
@@ -114,7 +115,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 		for (int i = 0; i < propertyNames.length; i++) {
 			if (!canUpdate(entity, propertyNames[i], previousState[i], currentState[i])) {
 				throw new PersistenceException(
-						String.format("You can't update: %s#%s, values (%s=%s)",
+						String.format(I18n.get("You can't update: %s#%s, values (%s=%s)"),
 								entity.getClass().getName(), id,
 								propertyNames[i], currentState[i]));
 			}
@@ -154,7 +155,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 			String[] propertyNames, Type[] types) {
 		if (!canDelete(entity)) {
 			throw new PersistenceException(
-				String.format("You can't delete: %s#%s",
+				String.format(I18n.get("You can't delete: %s#%s"),
 					entity.getClass().getName(), id));
 		}
 		super.onDelete(entity, id, state, propertyNames, types);
