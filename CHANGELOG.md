@@ -1,4 +1,39 @@
-# Current 3.0.5
+# 3.0.6 (2015-04-16)
+
+## Bug Fixes
+
+- fixed top-level editable grid save issue
+- fixed editable grid update issue (IE only)
+- fixed a regression (wrong change detection)
+- fixed progress bar widget (IE)
+- fixed advance search on o2m/m2m fields
+- fixed decimal field issue 
+- fixed unwrapped viewer template issue
+- fixed selection-in on integer selection
+- fixed textarea height issue
+- fixed text widget issue in editable grid
+- fixed grid widget cell formatting issue
+- fixed hilite/css issue on text field
+- fixed action-method conditional call issue
+- fixed nested record update issue
+- fixed dirty checking issue on html widget
+- fixed parent context issue
+
+## Improvements
+
+- add special client side action 'validate'
+- don't show m2o link if canView is false
+- add some helper methods to ActionResponse
+- hide text field on click outside the grid field
+- throw exception if join field not found
+- allow decimal scale/precision change on view
+- allow password change from user preferences
+- don't create demo user from data-init
+- prevent certain operations on admin user/group
+
+
+
+# 3.0.5 (2015-03-24)
 
 ## Bug Fixes
 
