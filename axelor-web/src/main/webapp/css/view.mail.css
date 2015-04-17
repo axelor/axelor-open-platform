@@ -165,3 +165,23 @@
 .mail-followers i.fa:hover {
 	color: black;
 }
+
+.mail-message .track-container {
+
+}
+
+.mail-message .track-message {
+
+}
+
+.mail-message .track-fields {
+	margin:  8px 25px;
+}
+
+.mail-message .track-tags {
+
+}
+
+.mail-message .track-tags .label {
+	margin-right: 2px;
+}

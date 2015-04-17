@@ -181,10 +181,11 @@ final class AuditTracker {
 			}
 		}
 
-		builder.append("<span>").append(msg).append("</span>");
+		builder.append("<div class='track-container'>");
+		builder.append("<span class='track-message'>").append(msg).append("</span>");
 
 		if (track.fields().length > 0) {
-			builder.append("<ul>");
+			builder.append("<ul class='track-fields'>");
 		}
 
 		for (TrackField field : track.fields()) {
@@ -229,14 +230,15 @@ final class AuditTracker {
 			builder.append("</ul>");
 		}
 
-		builder.append("<div class='tags'>");
+		builder.append("<div class='track-tags'>");
 		for (String tag : tags.keySet()) {
 			builder.append("<span class='label label-" + tags.get(tag) + "'>").append(tag).append("</span>");
 		}
-		builder.append("<div>");
+		builder.append("</div>"); // track-tags
+		builder.append("</div>"); // track-container
 
 		message.setBody(builder.toString());
-		message.setAuthor(AuthUtils.getUser());
+		message.setAuthor(user);
 		message.setRelatedId(entity.getId());
 		message.setRelatedModel(entity.getClass().getName());
 		add(message);
