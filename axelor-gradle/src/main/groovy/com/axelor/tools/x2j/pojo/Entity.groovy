@@ -72,6 +72,8 @@ class Entity {
 	
 	private String extraCode
 
+	private Track track
+
 	Entity baseEntity
 
 	Entity(NodeChild node) {
@@ -155,6 +157,9 @@ class Entity {
 				break
 			case "extra-code":
 				extraCode = it.text()
+				break
+			case "track":
+				track = new Track(this, it)
 				break
 			default:
 				Property field = new Property(this, it)
@@ -377,6 +382,7 @@ class Entity {
 
 		all += $table()
 		all += $strategy()
+		all += $track()
 
 		return all.grep { it != null }.flatten()
 				  .grep { Annotation a -> !a.empty }
@@ -449,6 +455,11 @@ class Entity {
 
 		return new Annotation(this, "javax.persistence.Inheritance")
 				.add("strategy", "javax.persistence.InheritanceType.${type}", false)
+	}
+
+	Annotation $track() {
+		if (!track) return null
+		return track.$track()
 	}
 
 	@Override

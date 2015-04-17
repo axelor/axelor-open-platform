@@ -73,14 +73,14 @@
     <finder-method name="findByNameAndCode" using="code, name" all="true"/>
   </entity>
 
-  <entity name="Contact" sequential="true" lang="groovy" hashAll="true" cachable="false">
+  <entity name="Contact" sequential="true" hashAll="true" cachable="false">
     <string name="empId" sequence="emp.seq"/>
     <many-to-one name="title" ref="Title" unique="true" />
     <string name="firstName" required="true" initParam="true"/>
     <string name="lastName" required="true" initParam="true"/>
     <string name="fullName" namecolumn="true" search="firstName,lastName" transient="true">
       <![CDATA[
-      title ? "$title.name $firstName $lastName" : "$firstName $lastName"
+      return title ? title.getName() + " " + firstName + " " + lastName : firstName + " " + lastName
       ]]>
     </string>
     <string name="email" required="true" unique="true" initParam="true" massUpdate="true"/>
@@ -90,6 +90,13 @@
     <one-to-many name="addresses" ref="Address" mappedBy="contact" orderBy="area" />
     <index name="IDX_NAMES" columns="firstName,lastName,fullName"/>
     <index columns="id,fullName,email"/>
+    <track>
+      <field name="fullName" />
+      <field name="email" />
+      <field name="phone" if="!email" on="UPDATE" />
+      <message if="true" on="CREATE">Contact created.</message>
+      <message if="firstName == 'admin'" on="UPDATE" tag="important">Admin</message>
+    </track>
   </entity>
 
   <entity name="Address" hashAll="true">

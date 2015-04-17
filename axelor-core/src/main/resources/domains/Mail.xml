@@ -15,7 +15,7 @@
     <many-to-many name="recipients" ref="com.axelor.auth.db.User" />
 
     <string name="subject" namecolumn="true" />
-    <string name="body" multiline="true" />
+    <string name="body" multiline="true" large="true" />
 
     <long name="relatedId" title="Related document id" />
     <string name="relatedModel" title="Related document model" />

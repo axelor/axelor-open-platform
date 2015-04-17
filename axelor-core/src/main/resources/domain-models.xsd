@@ -554,6 +554,113 @@
     </xsd:attribute>
   </xsd:complexType>
 
+  <xsd:simpleType name="TrackEvent">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="ALWAYS">
+        <xsd:annotation>
+          <xsd:documentation>Always track the changes</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="CREATE">
+        <xsd:annotation>
+          <xsd:documentation>Only track when creating new record</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="UPDATE">
+        <xsd:annotation>
+          <xsd:documentation>Only track when updating the record</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="TrackTag">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="success">
+        <xsd:annotation>
+          <xsd:documentation>Success style</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="warning">
+        <xsd:annotation>
+          <xsd:documentation>Warning style</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="important">
+        <xsd:annotation>
+          <xsd:documentation>Important style</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="info">
+        <xsd:annotation>
+          <xsd:documentation>Information style</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="TrackField">
+    <xsd:attribute name="name" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>Name of the field</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="if" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Only track the change if given condition is true (JEL expression)</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="on" type="dm:TrackEvent" default="ALWAYS">
+      <xsd:annotation>
+        <xsd:documentation>Specify on which event to track the changes</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="TrackMessage">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="if" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>Only use  this message if given condition is true (JEL expression)</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="on" type="dm:TrackEvent" default="ALWAYS">
+          <xsd:annotation>
+            <xsd:documentation>Specify on which event to track the changes</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="tag" type="dm:TrackTag">
+          <xsd:annotation>
+            <xsd:documentation>Specify tag style, if this message is a tag.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="Track">
+    <xsd:sequence>
+      <xsd:element name="field" type="dm:TrackField" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>Specify a field to track</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="message" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>Specify a change message</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:simpleContent >
+            <xsd:restriction base="dm:TrackMessage">
+              <xsd:minLength value="1"/>
+            </xsd:restriction>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
   <xsd:complexType name="Entity" mixed="true">
     <xsd:annotation>
       <xsd:documentation>Entity represent domain model.</xsd:documentation>
@@ -686,6 +793,13 @@
             Provide extra code.
       		</xsd:documentation>
       	</xsd:annotation>
+      </xsd:element>
+      <xsd:element name="track" type="dm:Track" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+          Provide change tracking details.
+          </xsd:documentation>
+        </xsd:annotation>
       </xsd:element>
     </xsd:sequence>
 

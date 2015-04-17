@@ -36,6 +36,7 @@ import com.axelor.db.Model;
 public class AuditInterceptor extends EmptyInterceptor {
 
 	private ThreadLocal<User> currentUser = new ThreadLocal<User>();
+	private ThreadLocal<AuditTracker> tracker = new ThreadLocal<>();
 
 	private static final String UPDATED_BY = "updatedBy";
 	private static final String UPDATED_ON = "updatedOn";
@@ -49,11 +50,18 @@ public class AuditInterceptor extends EmptyInterceptor {
 	@Override
 	public void afterTransactionBegin(Transaction tx) {
 		currentUser.set(AuthUtils.getUser());
+		tracker.set(new AuditTracker());
 	}
 
 	@Override
 	public void afterTransactionCompletion(Transaction tx) {
+		tracker.remove();
 		currentUser.remove();
+	}
+
+	@Override
+	public void beforeTransactionCompletion(Transaction tx) {
+		tracker.get().onComplete(tx);
 	}
 
 	private User getUser() {
@@ -130,6 +138,12 @@ public class AuditInterceptor extends EmptyInterceptor {
 				currentState[i] = user;
 			}
 		}
+
+		// change tracking
+		if (tracker.get() != null) {
+			tracker.get().track(getUser(), (AuditableModel) entity, propertyNames, currentState, previousState);
+		}
+
 		return true;
 	}
 
@@ -151,6 +165,12 @@ public class AuditInterceptor extends EmptyInterceptor {
 				state[i] = user;
 			}
 		}
+
+		// change tracking
+		if (tracker.get() != null) {
+			tracker.get().track(user, (AuditableModel) entity, propertyNames, state, null);
+		}
+
 		return true;
 	}
 	
@@ -162,6 +182,5 @@ public class AuditInterceptor extends EmptyInterceptor {
 				String.format("You can't delete: %s#%s",
 					entity.getClass().getName(), id));
 		}
-		super.onDelete(entity, id, state, propertyNames, types);
 	}
 }
