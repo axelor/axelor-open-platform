@@ -44,7 +44,7 @@ import com.axelor.mail.db.MailMessage;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
-import com.sun.org.apache.bcel.internal.util.Objects;
+import com.google.common.base.Objects;
 
 /**
  * This class provides change tracking for auditing and notifications.
@@ -210,7 +210,7 @@ final class AuditTracker {
 			final Object oldValue = oldValues.get(name);
 
 			String dispayValue = format(property, value);
-			if (previousState != null && oldValue != null && !Objects.equals(value, oldValue)) {
+			if (previousState != null && oldValue != null && !Objects.equal(value, oldValue)) {
 				dispayValue = format(property, oldValue) + " &raquo; " + dispayValue;
 			}
 
