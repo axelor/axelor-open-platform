@@ -210,8 +210,13 @@ final class AuditTracker {
 			final Object oldValue = oldValues.get(name);
 
 			String dispayValue = format(property, value);
-			if (previousState != null && oldValue != null && !Objects.equal(value, oldValue)) {
-				dispayValue = format(property, oldValue) + " &raquo; " + dispayValue;
+			if (previousState != null) {
+				if (Objects.equal(value, oldValue)) {
+					continue;
+				}
+				if (oldValue != null) {
+					dispayValue = format(property, oldValue) + " &raquo; " + dispayValue;
+				}
 			}
 
 			builder
