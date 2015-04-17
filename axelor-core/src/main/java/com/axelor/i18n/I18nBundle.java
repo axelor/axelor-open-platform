@@ -79,7 +79,7 @@ public class I18nBundle extends ResourceBundle {
 		}
 
 		String lang = locale.getLanguage();
-		Query<MetaTranslation> query = Query.of(MetaTranslation.class).filter("self.language = ?", lang);
+		Query<MetaTranslation> query = Query.of(MetaTranslation.class).filter("self.language = ?", lang).autoFlush(false);
 		
 		if (query.count() == 0 && lang.length() > 2) {
 			query = Query.of(MetaTranslation.class).filter("self.language = ?", lang.substring(0, 2));
