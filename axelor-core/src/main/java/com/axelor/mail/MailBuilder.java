@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -208,7 +209,16 @@ public final class MailBuilder {
 		return message;
 	}
 
+	public void send(Date date) throws MessagingException, IOException {
+		final MimeMessage message = build();
+		try {
+			message.setSentDate(date);
+		} catch (Exception e) {
+		}
+		Transport.send(message);
+	}
+
 	public void send() throws MessagingException, IOException {
-		Transport.send(build());
+		send(new Date());
 	}
 }
