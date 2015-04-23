@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import org.joda.time.LocalDateTime;
 import org.junit.Test;
 
 import com.axelor.AbstractTest;
@@ -65,5 +66,13 @@ public class MailSenderTest extends AbstractTest {
 			.attach("log4j.properties", file)
 			.attach("logo.png", url)
 			.send();
+
+		sender.compose()
+		.to(SEND_TO)
+		.subject("Hello again...")
+		.html(text)
+		.attach("log4j.properties", file)
+		.attach("logo.png", url)
+		.send((new LocalDateTime().minusDays(15)).toDate());
 	}
 }
