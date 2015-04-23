@@ -264,7 +264,7 @@ ui.formInput('Binary', {
 			frame.attr("src", url);
 			setTimeout(function(){
 				frame.attr("src", "");
-			},100);
+			}, 300);
 		};
 
 		scope.doRemove = function() {
