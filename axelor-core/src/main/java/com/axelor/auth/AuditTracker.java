@@ -39,8 +39,10 @@ import com.axelor.db.annotations.TrackMessage;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
+import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailFollower;
 import com.axelor.mail.db.MailMessage;
+import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
@@ -241,6 +243,7 @@ final class AuditTracker {
 		message.setAuthor(user);
 		message.setRelatedId(entity.getId());
 		message.setRelatedModel(entity.getClass().getName());
+		message.setType("notification");
 		add(message);
 
 		try {
@@ -273,8 +276,12 @@ final class AuditTracker {
 		// prevent concurrent update
 		PENDING.remove();
 		try {
-			for (Model message : pending) {
-				JPA.em().persist(message);
+			for (Model entity : pending) {
+				if (entity instanceof MailMessage) {
+					Beans.get(MailMessageRepository.class).save((MailMessage) entity);
+				} else {
+					JPA.em().persist(entity);
+				}
 			}
 		} finally {
 			JPA.em().flush();
