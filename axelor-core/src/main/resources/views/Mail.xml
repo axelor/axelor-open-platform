@@ -23,6 +23,18 @@
       <mail-messages limit="30"/>
     </panel-mail>
   </form>
+  
+  <form name="mail-thread-important" title="Important" model="com.axelor.mail.db.MailMessage" width="100%"
+        css="mail-thread-view"
+        onNew="com.axelor.mail.web.MailController:important">
+    <panel x-item-span="12" showIf="__emptyTitle">
+      <field name="__emptyTitle" readonly="true" showTitle="false" css="bold large"></field>
+      <field name="__emptyDesc" readonly="true" showTitle="false" css="italic big"></field>
+    </panel>
+    <panel-mail>
+      <mail-messages limit="30"/>
+    </panel-mail>
+  </form>
 
   <form name="mail-thread-archive" title="Archived" model="com.axelor.mail.db.MailMessage" width="100%"
         css="mail-thread-view"
@@ -65,13 +77,18 @@
     <view name="mail-thread-inbox" type="form" />
     <view-param name="show-toolbar" value="false"/>
   </action-view>
+  
+  <action-view name="mail.important" model="com.axelor.mail.db.MailMessage" title="Important">
+    <view name="mail-thread-important" type="form" />
+    <view-param name="show-toolbar" value="false"/>
+  </action-view>
 
   <action-view name="mail.archive" model="com.axelor.mail.db.MailMessage" title="Archived">
     <view name="mail-thread-archive" type="form" />
     <view-param name="show-toolbar" value="false"/>
   </action-view>
 
-  <action-view name="mail.groups" model="com.axelor.mail.db.MailGroup" title="Archived">
+  <action-view name="mail.groups" model="com.axelor.mail.db.MailGroup" title="Groups">
     <view name="mail-group-grid" type="grid" />
     <view name="mail-group-form" type="form" />
   </action-view>
@@ -82,6 +99,8 @@
 
   <menuitem name="menu-mail-inbox" title="Inbox" parent="menu-mail"
     action="mail.inbox" icon="fa-envelope" order="-90"/>
+   <menuitem name="menu-mail-important" title="Important" parent="menu-mail"
+    action="mail.important" icon="fa-envelope" order="-85"/>
   <menuitem name="menu-mail-archive" title="Archived" parent="menu-mail"
     action="mail.archive" icon="fa-archive"  order="-80"/>
   <menuitem name="menu-mail-groups" title="Groups" parent="menu-mail"

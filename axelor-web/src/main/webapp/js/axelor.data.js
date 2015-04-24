@@ -355,7 +355,7 @@
 				var promise = this._request('messagesAll').send({
 					method: 'GET',
 					params: opts,
-					transformRequest: opts.countOnly ? [] : undefined
+					transformRequest: opts.count ? [] : undefined
 				});
 
 				promise.success = function(fn) {
@@ -383,6 +383,7 @@
 				var opts = _.extend({}, options);
 				var data = _.extend({
 					body : text,
+					type: opts.type,
 					parent: opts.parent,
 					files: opts.files
 				});

@@ -35,6 +35,30 @@ import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
 
 public class MailController extends JpaSupport {
+	
+	private static final String SQL_INBOX = ""
+			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
+			+ "WHERE (m.parent IS NULL) AND "
+			+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
+			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
+			+ "((g IS NULL) OR (g.user.id = :uid AND g.isRead = false)) "
+			+ "ORDER BY m.createdOn ASC";
+
+	private static final String SQL_IMPORTANT = ""
+			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
+			+ "WHERE (m.parent IS NULL) AND "
+			+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
+			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
+			+ "((g.user.id = :uid AND g.isStarred = true)) "
+			+ "ORDER BY m.createdOn ASC";
+
+	private static final String SQL_ARCHIVE = ""
+			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
+			+ "WHERE (m.parent IS NULL) AND "
+			+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
+			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
+			+ "((g.user.id = :uid AND g.isRead = true)) "
+			+ "ORDER BY m.createdOn ASC";
 
 	@Inject
 	private MailMessageRepository messages;
@@ -46,14 +70,10 @@ public class MailController extends JpaSupport {
 
 	public void inbox(ActionRequest request, ActionResponse response) {
 
-		final List<Object> all = find(true, request.getLimit());
+		final List<Object> all = find(SQL_INBOX, request.getLimit());
 
 		response.setValue("$force", true);
 		response.setValue("$messages", all);
-
-		if (all.isEmpty()) {
-			response.setValue("$emptyTitle", I18n.get("Inbox is empty!"));
-		}
 
 		if (all.isEmpty()) {
 			response.setValue("__emptyTitle", I18n.get("Inbox is empty!"));
@@ -61,15 +81,28 @@ public class MailController extends JpaSupport {
 		}
 	}
 
-	public void archived(ActionRequest request, ActionResponse response) {
+	public void important(ActionRequest request, ActionResponse response) {
 
-		final List<Object> all = find(false, request.getLimit());
+		final List<Object> all = find(SQL_IMPORTANT, request.getLimit());
 
 		response.setValue("$force", true);
 		response.setValue("$messages", all);
 
 		if (all.isEmpty()) {
-			response.setValue("__emptyTitle", I18n.get("There are no archived messages!"));
+			response.setValue("__emptyTitle", I18n.get("No important messages!"));
+			response.setValue("__emptyDesc", I18n.get("Come back later. There are no messages in this folder..."));
+		}
+	}
+
+	public void archived(ActionRequest request, ActionResponse response) {
+
+		final List<Object> all = find(SQL_ARCHIVE, request.getLimit());
+
+		response.setValue("$force", true);
+		response.setValue("$messages", all);
+
+		if (all.isEmpty()) {
+			response.setValue("__emptyTitle", I18n.get("No archived messages!"));
 			response.setValue("__emptyDesc", I18n.get("Come back later. There are no messages in this folder..."));
 		}
 	}
@@ -105,24 +138,8 @@ public class MailController extends JpaSupport {
 		return 0;
 	}
 
-	public List<Object> find(boolean unread, int limit) {
+	public List<Object> find(String queryString, int limit) {
 
-		final String SQL_INBOX = ""
-				+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
-				+ "WHERE (m.parent IS NULL) AND "
-				+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
-				+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
-				+ "((g IS NULL) OR (g.user.id = :uid AND g.isRead = false)) "
-				+ "ORDER BY m.createdOn ASC";
-
-		final String SQL_ARCHIVE = ""
-				+ "SELECT DISTINCT(m) FROM MailMessage m "
-				+ "WHERE (m.parent IS NULL) AND "
-				+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
-				+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) "
-				+ "ORDER BY m.createdOn ASC";
-
-		final String queryString = unread ? SQL_INBOX : SQL_ARCHIVE;
 		final TypedQuery<MailMessage> query = getEntityManager().createQuery(queryString, MailMessage.class);
 		final List<MailMessage> found = new ArrayList<>();
 

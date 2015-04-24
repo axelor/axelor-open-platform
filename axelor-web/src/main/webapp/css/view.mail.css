@@ -179,7 +179,14 @@
 }
 
 .mail-message .track-tags {
+  float: left;
+  margin-top: 3px;
+}
 
+.mail-message .track-tags:after {
+  content: '\b7';
+  font-weight: bold;
+  margin: 0 2px;
 }
 
 .mail-message .track-tags .label {

@@ -179,9 +179,15 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 			details.put("$flags", Resource.toMap(flags, "isRead", "isStarred"));
 		}
 
+		String eventType = message.getType();
+		String eventText = I18n.get("updated document");
+		if ("comment".equals(eventType)) {
+			eventText = I18n.get("added comment");
+		}
+
 		details.put("$files", files);
-		details.put("$eventType", "comment");
-		details.put("$eventText", I18n.get("added comment"));
+		details.put("$eventType", eventType);
+		details.put("$eventText", eventText);
 		details.put("$eventTime", message.getCreatedOn());
 
 		return details;

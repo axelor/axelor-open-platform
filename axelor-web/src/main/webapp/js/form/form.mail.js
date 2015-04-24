@@ -36,8 +36,8 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 		}
 
 		var params = {
-			inboxOnly: true,
-			countOnly: true
+			folder: 'inbox',
+			count: true
 		};
 
 		dsMessage.messages(params).success(function (res) {
@@ -55,7 +55,7 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 	 *
 	 * - relatedId = related record id
 	 * - relatedModel = related model
-	 * - inboxOnly = only unread messages
+	 * - folder = only from given folder
 	 *
 	 * @param {Object} options - search options
 	 * @return {Promise}
@@ -207,8 +207,6 @@ ui.formWidget('uiMailMessages', {
 						"<div class='mail-message-center'>" +
 							"<div class='mail-message-icons'>" +
 								"<span ng-if='message.$thread'>" +
-									"<i class='fa fa-star-o' ng-show='!message.$flags.isStarred' ng-click='onFlag(message, 1)'></i> " +
-									"<i class='fa fa-star' ng-show='message.$flags.isStarred' ng-click='onFlag(message, -1)'></i> " +
 									"<i class='fa fa-reply' ng-show='message.$thread' ng-click='onReply(message)'></i> " +
 								"</span>" +
 								"<div class='btn-group'>" +
@@ -216,8 +214,14 @@ ui.formWidget('uiMailMessages', {
 										"<i class='fa fa-caret-down'></i>" +
 									"</button>" +
 									"<ul class='dropdown-menu pull-right'>" +
-										"<li ng-if='message.$thread' ng-show='!message.parent && !message.$flags.isRead'><a href='javascript:' ng-click='onFlag(message, 2)'>Archive</a></li>" +
-								"<li><a href='javascript:' ng-click='onRemove(message)'>Remove</a></li>" +
+										"<li>" +
+											"<a href='javascript:' ng-show='!message.$flags.isStarred' ng-click='onFlag(message, 1)' x-translate>Mark as important</a>" +
+											"<a href='javascript:' ng-show='message.$flags.isStarred' ng-click='onFlag(message, -1)' x-translate>Mark as not important</a>" +
+										"</li>" +
+										"<li ng-if='message.$thread' ng-show='!message.parent'>" +
+											"<a href='javascript:' ng-show='!message.$flags.isRead' ng-click='onFlag(message, 2)'>Move to archive</a>" +
+											"<a href='javascript:' ng-show='message.$flags.isRead' ng-click='onFlag(message, -2)'>Move to inbox</a>" +
+										"</li>" +
 						            "</ul>" +
 								"</div>" +
 							"</div>" +
@@ -293,6 +297,7 @@ ui.formWidget('uiMailComposer', {
 			var files = _.pluck($scope.files, 'id');
 
 			ds.messagePost(record.id, text, {
+				type: 'comment',
 				parent: parent.id && parent,
 				files: files
 			}).success(function (res) {
@@ -546,12 +551,17 @@ ui.formWidget('PanelMail', {
 			popup.show();
 		};
 
-		$scope.isInbox = $scope.tab && $scope.tab.action === "mail.inbox";
+		var folder = undefined;
+		if ($scope.tab.action === "mail.inbox") folder = "inbox";
+		if ($scope.tab.action === "mail.important") folder = "important";
+		if ($scope.tab.action === "mail.archive") folder = "archive";
+
+		$scope.isInbox = folder === "inbox";
 
 		$scope.onLoadMessages = function () {
 			var record = $scope.record || {};
 			var params = {
-				inboxOnly: $scope.isInbox
+				folder: folder
 			};
 
 			if (record.id > 0) {
