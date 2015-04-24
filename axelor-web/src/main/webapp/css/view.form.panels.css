@@ -179,6 +179,8 @@
 .panel-layout .image-item .btn,
 .panel-layout .file-item .btn {
 	width: 32px;
+	padding: 2px 6px 2px;
+	height: 28px;
 }
 
 .panel-layout .tag-select {
