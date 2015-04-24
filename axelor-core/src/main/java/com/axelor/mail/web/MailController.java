@@ -107,16 +107,37 @@ public class MailController extends JpaSupport {
 		}
 	}
 
-	private List<MailMessage> findChildren(MailMessage message, int level) {
+	private List<MailMessage> findChildren(MailMessage message) {
 		final List<MailMessage> all = new ArrayList<>();
-		all.add(message);
-		if (message.getReplies() == null || level > 2) {
+		if (message.getReplies() == null) {
 			return all;
 		}
 		for (MailMessage msg : message.getReplies()) {
-			all.addAll(findChildren(msg, level + 1));
+			all.add(msg);
+			all.addAll(findChildren(msg));
 		}
 		return all;
+	}
+
+	public void replies(ActionRequest request, ActionResponse response) {
+
+		if (request.getRecords() == null ||
+			request.getRecords().isEmpty()) {
+			return;
+		}
+
+		final MailMessage parent = messages.find((Long) request.getRecords().get(0));
+		final List<MailMessage> found = findChildren(parent);
+		final List<Object> all = new ArrayList<>();
+
+		for (MailMessage message : found) {
+			Map<String, Object> details = messages.details(message);
+			details.put("$thread", true);
+			all.add(details);
+		}
+
+		response.setData(all);
+		response.setStatus(ActionResponse.STATUS_SUCCESS);
 	}
 
 	public long countUnread() {
@@ -141,20 +162,20 @@ public class MailController extends JpaSupport {
 	public List<Object> find(String queryString, int limit) {
 
 		final TypedQuery<MailMessage> query = getEntityManager().createQuery(queryString, MailMessage.class);
-		final List<MailMessage> found = new ArrayList<>();
 
 		query.setParameter("uid", AuthUtils.getUser().getId());
 		query.setMaxResults(limit);
 
-		for (MailMessage message : query.getResultList()) {
-			found.addAll(findChildren(message, 0));
-		}
-
+		final List<MailMessage> found = query.getResultList();
 		final List<Object> all = new ArrayList<>();
+
 		for (MailMessage message : found) {
 			Map<String, Object> details = messages.details(message);
+			long replies = messages.all().filter("self.root.id = ?", message.getId()).count();
+
 			details.put("subject", details.get("relatedName"));
 			details.put("$thread", true);
+			details.put("$numReplies", replies);
 			all.add(details);
 		}
 

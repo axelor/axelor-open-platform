@@ -89,6 +89,26 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 	};
 
 	/**
+	 * Get replies of the given message.
+	 *
+	 */
+	function getReplies(parent) {
+		var deferred = $q.defer();
+		var opts = {
+			parent: parent.id
+		};
+
+		var promise = dsMessage.messages(opts)
+		.error(deferred.reject)
+		.success(function (res) {
+			var records = res.data || [];
+			deferred.resolve(records);
+		});
+
+		return deferred.promise;
+	}
+
+	/**
 	 * Toggle flags on the given message.
 	 *
 	 * Flag state can be:
@@ -137,6 +157,7 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 
 	return {
 		getMessages: getMessages,
+		getReplies: getReplies,
 		flagMessage: flagMessage,
 		removeMessage: removeMessage,
 		checkUnreadMessages: checkUnreadMessages,
@@ -145,6 +166,67 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 		}
 	};
 }]);
+
+ui.directive('uiMailMessage', function () {
+	return {
+		require: '^uiMailMessages',
+		replace: true,
+		template: "" +
+			"<div>" +
+				"<div class='mail-message alert' ng-class='{ \"alert-info\": !message.parent || record.id > 0}'>" +
+				"<div class='mail-message-left'>" +
+					"<a href=''>" +
+						"<img ng-src=''>" +
+					"</a>" +
+				"</div>" +
+				"<div class='mail-message-center'>" +
+					"<div class='mail-message-icons'>" +
+						"<span ng-if='message.$thread'>" +
+							"<i class='fa fa-reply' ng-show='message.$thread' ng-click='onReply(message)'></i> " +
+						"</span>" +
+						"<div class='btn-group'>" +
+							"<button type='button' class='btn btn-link dropdown-toggle' data-toggle='dropdown'>" +
+								"<i class='fa fa-caret-down'></i>" +
+							"</button>" +
+							"<ul class='dropdown-menu pull-right'>" +
+								"<li>" +
+									"<a href='javascript:' ng-show='!message.$flags.isStarred' ng-click='onFlag(message, 1)' x-translate>Mark as important</a>" +
+									"<a href='javascript:' ng-show='message.$flags.isStarred' ng-click='onFlag(message, -1)' x-translate>Mark as not important</a>" +
+								"</li>" +
+								"<li ng-if='message.$thread' ng-show='!message.parent'>" +
+									"<a href='javascript:' ng-show='!message.$flags.isRead' ng-click='onFlag(message, 2)'>Move to archive</a>" +
+									"<a href='javascript:' ng-show='message.$flags.isRead' ng-click='onFlag(message, -2)'>Move to inbox</a>" +
+								"</li>" +
+								"<li>" +
+									"<a href='javascript:' ng-show='message.$canDelete' ng-click='onRemove(message)'>Delete</a>" +
+								"</li>" +
+				            "</ul>" +
+						"</div>" +
+					"</div>" +
+					"<div class='mail-message-subject'>{{message.subject}}</div>" +
+					"<div class='mail-message-body' ui-bind-template x-text='message.body'></div>" +
+					"<div class='mail-message-files' ng-show='message.$files.length'>" +
+						"<ul class='inline'>" +
+							"<li ng-repeat='file in message.$files'>" +
+								"<i class='fa fa-paperclip'></i> <a href='' ng-click='onDownload(file)'>{{file.fileName}}</a>" +
+							"</li>" +
+						"</ul>" +
+					"</div>" +
+					"<div class='mail-message-footer'>" +
+						"<span>" +
+							"<a href='' ng-click='showUser(message.author)'>{{message.author.name}}</a> " +
+							"<span>{{formatEvent(message)}}</span>" +
+						"</span>" +
+						"<span ng-if='message.$numReplies' class='pull-right'>" +
+							"<a href='' ng-click='onReplies(message)'>{{formatNumReplies(message)}}</a>" +
+						"</span>" +
+					"</div>" +
+				"</div>" +
+			"</div>" +
+			"<div ui-mail-composer ng-if='message.$thread'></div>" +
+		"</div>"
+	};
+});
 
 ui.formWidget('uiMailMessages', {
 	scope: true,
@@ -160,13 +242,28 @@ ui.formWidget('uiMailMessages', {
 
 		$scope.onRemove = function(message) {
 			MessageService.removeMessage(message).success(function (res) {
-				$scope.onLoadMessages();
+				if (message.$afterDelete) {
+					message.$afterDelete();
+				}
 			});
 		};
 
 		$scope.onReply = function (message) {
 			message.$reply = true;
 			$scope.$broadcast("on:message-add");
+		};
+
+		$scope.onReplies = function (message) {
+			MessageService.getReplies(message)
+			.then(function (data) {
+				_.each(data, function (item, i) {
+					item.$afterReply = item.$afterDelete = function () {
+						$scope.onReplies(message);
+					};
+				});
+				message.$numReplies = data.length;
+				message.$children = data;
+			});
 		};
 
 		$scope.formatEvent = function (message) {
@@ -176,6 +273,10 @@ ui.formWidget('uiMailMessages', {
 			var line = message.$eventText + " - " + moment(message.$eventTime).fromNow();
 			message.$eventLine = line;
 			return line;
+		}
+
+		$scope.formatNumReplies = function (message) {
+			return _t('replies ({0})', message.$numReplies);
 		}
 	}],
 	link: function (scope, element, attrs) {
@@ -197,51 +298,10 @@ ui.formWidget('uiMailMessages', {
 			"<div class='panel-body'>" +
 				"<div class='mail-composer' ui-mail-composer></div>" +
 				"<div class='mail-thread'>" +
-				"<span ng-repeat='message in record.$messages'>" +
-					"<div class='mail-message alert' ng-class='{ \"alert-info\": !message.parent || record.id > 0}'>" +
-						"<div class='mail-message-left'>" +
-							"<a href=''>" +
-								"<img ng-src=''>" +
-							"</a>" +
-						"</div>" +
-						"<div class='mail-message-center'>" +
-							"<div class='mail-message-icons'>" +
-								"<span ng-if='message.$thread'>" +
-									"<i class='fa fa-reply' ng-show='message.$thread' ng-click='onReply(message)'></i> " +
-								"</span>" +
-								"<div class='btn-group'>" +
-									"<button type='button' class='btn btn-link dropdown-toggle' data-toggle='dropdown'>" +
-										"<i class='fa fa-caret-down'></i>" +
-									"</button>" +
-									"<ul class='dropdown-menu pull-right'>" +
-										"<li>" +
-											"<a href='javascript:' ng-show='!message.$flags.isStarred' ng-click='onFlag(message, 1)' x-translate>Mark as important</a>" +
-											"<a href='javascript:' ng-show='message.$flags.isStarred' ng-click='onFlag(message, -1)' x-translate>Mark as not important</a>" +
-										"</li>" +
-										"<li ng-if='message.$thread' ng-show='!message.parent'>" +
-											"<a href='javascript:' ng-show='!message.$flags.isRead' ng-click='onFlag(message, 2)'>Move to archive</a>" +
-											"<a href='javascript:' ng-show='message.$flags.isRead' ng-click='onFlag(message, -2)'>Move to inbox</a>" +
-										"</li>" +
-						            "</ul>" +
-								"</div>" +
-							"</div>" +
-							"<div class='mail-message-subject'>{{message.subject}}</div>" +
-							"<div class='mail-message-body' ui-bind-template x-text='message.body'></div>" +
-							"<div class='mail-message-files' ng-show='message.$files.length'>" +
-								"<ul class='inline'>" +
-									"<li ng-repeat='file in message.$files'>" +
-										"<i class='fa fa-paperclip'></i> <a href='' ng-click='onDownload(file)'>{{file.fileName}}</a>" +
-									"</li>" +
-								"</ul>" +
-							"</div>" +
-							"<div class='mail-message-footer'>" +
-								"<a href='' ng-click='showUser(message.author)'>{{message.author.name}}</a> " +
-								"<span>{{formatEvent(message)}}</span>" +
-							"</div>" +
-						"</div>" +
-					"</div>" +
-					"<div ui-mail-composer ng-if='message.$thread'></div>" +
-				"</span>" +
+					"<span ng-repeat='message in record.$messages'>" +
+						"<div ui-mail-message></div>" +
+						"<div ng-repeat='message in message.$children' ui-mail-message></div>" +
+					"</span>" +
 				"</div>" +
 			"</div>" +
 		"</div>"
@@ -311,7 +371,10 @@ ui.formWidget('uiMailComposer', {
 
 				if (parent.id && $scope.message) {
 					$scope.message.$reply = false;
-					return $scope.onNewHandler();
+					if ($scope.message.$afterReply) {
+						return $scope.message.$afterReply();
+					}
+					return $scope.onReplies($scope.message);
 				}
 
 				$scope.$broadcast('on:message-add');
@@ -335,6 +398,7 @@ ui.formWidget('uiMailComposer', {
 
 		scope.$on('on:message-add', function () {
 			if (scope.canShow()) {
+				scope.post = null;
 				setTimeout(function () {
 					textarea.focus();
 				});

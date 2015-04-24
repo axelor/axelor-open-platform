@@ -28,10 +28,6 @@
 	box-shadow: none;
 }
 
-.mail-thread-view .mail-message:first-child {
-	margin-top: 0;
-}
-
 /* form widgets */
 
 .mail-composer {

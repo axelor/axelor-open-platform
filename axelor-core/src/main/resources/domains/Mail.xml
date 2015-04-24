@@ -21,6 +21,7 @@
     <string name="relatedModel" title="Related document model" />
     <string name="relatedName" title="Related document name" />
 
+    <many-to-one name="root" ref="MailMessage" />
     <many-to-one name="parent" ref="MailMessage" />
     <one-to-many name="replies" ref="MailMessage" mappedBy="parent" />
 

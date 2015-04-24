@@ -84,7 +84,6 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 
 	@Override
 	public MailMessage save(MailMessage entity) {
-
 		if (entity.getParent() == null && entity.getRelatedId() != null) {
 			MailMessage parent = all()
 				.filter("self.parent is null AND "
@@ -98,6 +97,16 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 				.fetchOne();
 			entity.setParent(parent);
 		}
+
+		MailMessage root = entity.getRoot();
+		if (root == null) {
+			root = entity.getParent();
+		}
+		if (root != null && root.getRoot() != null) {
+			root = root.getRoot();
+		}
+		entity.setRoot(root);
+
 		return super.save(entity);
 	}
 
@@ -183,6 +192,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		String eventText = I18n.get("updated document");
 		if ("comment".equals(eventType)) {
 			eventText = I18n.get("added comment");
+			details.put("$canDelete", message.getCreatedBy() == AuthUtils.getUser());
 		}
 
 		details.put("$files", files);

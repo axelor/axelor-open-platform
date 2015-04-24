@@ -472,7 +472,9 @@ public class RestService extends ResourceService {
 	@Path("messagesAll")
 	public Response messagesAll(
 			@QueryParam("folder") String folder,
+			@QueryParam("parent") Long parentId,
 			@QueryParam("count") Boolean count,
+			@QueryParam("limit") Integer limit,
 			@QueryParam("relatedId") Long relatedId,
 			@QueryParam("relatedModel") String relatedModel) {
 
@@ -510,6 +512,18 @@ public class RestService extends ResourceService {
 			return res;
 		}
 		
+		if (parentId != null) {
+			List<Object> records = new ArrayList<>();
+			records.add(parentId);
+			req.setRecords(records);
+			ctrl.replies(req, res);
+			return res;
+		}
+
+		if (folder == null) {
+			return res;
+		}
+
 		switch (folder) {
 		case "archive":
 			ctrl.archived(req, res);
