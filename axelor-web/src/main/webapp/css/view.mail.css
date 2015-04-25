@@ -68,10 +68,16 @@
 	margin-top: 8px;
 }
 
+.mail-thread .mail-message-indent {
+	padding-left: 18px;
+}
+
 .mail-thread .mail-message {
 	position: relative;
 	margin: 8px 0;
 	padding: 8px 14px;
+	border-radius: 0;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
 }
 
 .mail-thread .mail-message-left {
@@ -129,11 +135,6 @@
 
 .mail-thread .mail-message-files ul {
 	margin:  0;
-}
-
-.mail-thread .mail-message.alert {
-	margin-left: 18px;
-	background-color: "";
 }
 
 .mail-thread .mail-message.alert-info {

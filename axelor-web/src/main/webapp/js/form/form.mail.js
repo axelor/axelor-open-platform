@@ -185,9 +185,9 @@ ui.directive('uiMailMessage', function () {
 							"<i class='fa fa-reply' ng-show='message.$thread' ng-click='onReply(message)'></i> " +
 						"</span>" +
 						"<div class='btn-group'>" +
-							"<button type='button' class='btn btn-link dropdown-toggle' data-toggle='dropdown'>" +
+							"<a href='javascript:' class='btn btn-link dropdown-toggle' data-toggle='dropdown'>" +
 								"<i class='fa fa-caret-down'></i>" +
-							"</button>" +
+							"</a>" +
 							"<ul class='dropdown-menu pull-right'>" +
 								"<li>" +
 									"<a href='javascript:' ng-show='!message.$flags.isStarred' ng-click='onFlag(message, 1)' x-translate>Mark as important</a>" +
@@ -300,7 +300,7 @@ ui.formWidget('uiMailMessages', {
 				"<div class='mail-thread'>" +
 					"<span ng-repeat='message in record.$messages'>" +
 						"<div ui-mail-message></div>" +
-						"<div ng-repeat='message in message.$children' ui-mail-message></div>" +
+						"<div ng-repeat='message in message.$children' class='mail-message-indent' ui-mail-message></div>" +
 					"</span>" +
 				"</div>" +
 			"</div>" +
