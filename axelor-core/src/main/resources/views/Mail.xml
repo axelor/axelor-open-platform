@@ -13,11 +13,10 @@
   <!-- views -->
 
   <form name="mail-thread-inbox" title="Inbox" model="com.axelor.mail.db.MailMessage" width="100%"
-        css="mail-thread-view"
-        onNew="com.axelor.mail.web.MailController:inbox">
-    <panel x-item-span="12" showIf="__emptyTitle">
-      <field name="__emptyTitle" readonly="true" showTitle="false" css="bold large"></field>
-      <field name="__emptyDesc" readonly="true" showTitle="false" css="italic big"></field>
+        css="mail-thread-view">
+    <panel showIf="__empty" hidden="true" x-item-span="12">
+      <label title="Inbox is empty!" css="label-bold label-large"/>
+      <label title="Come back later. There are no messages in this folder..." css="label-italic label-big" />
     </panel>
     <panel-mail>
       <mail-messages limit="30"/>
@@ -25,11 +24,10 @@
   </form>
   
   <form name="mail-thread-important" title="Important" model="com.axelor.mail.db.MailMessage" width="100%"
-        css="mail-thread-view"
-        onNew="com.axelor.mail.web.MailController:important">
-    <panel x-item-span="12" showIf="__emptyTitle">
-      <field name="__emptyTitle" readonly="true" showTitle="false" css="bold large"></field>
-      <field name="__emptyDesc" readonly="true" showTitle="false" css="italic big"></field>
+        css="mail-thread-view">
+    <panel showIf="__empty" hidden="true" x-item-span="12">
+      <label title="No important messages!" css="label-bold label-large"/>
+      <label title="Come back later. There are no messages in this folder..." css="label-italic label-big" />
     </panel>
     <panel-mail>
       <mail-messages limit="30"/>
@@ -37,11 +35,10 @@
   </form>
 
   <form name="mail-thread-archive" title="Archived" model="com.axelor.mail.db.MailMessage" width="100%"
-        css="mail-thread-view"
-        onNew="com.axelor.mail.web.MailController:archived">
-    <panel x-item-span="12" showIf="__emptyTitle">
-      <field name="__emptyTitle" readonly="true" showTitle="false" css="bold large"></field>
-      <field name="__emptyDesc" readonly="true" showTitle="false" css="italic big"></field>
+        css="mail-thread-view">
+    <panel showIf="__empty" hidden="true" x-item-span="12">
+      <label title="No archived messages!" css="label-bold label-large"/>
+      <label title="Come back later. There are no messages in this folder..." css="label-italic label-big" />
     </panel>
     <panel-mail>
       <mail-messages limit="30"/>

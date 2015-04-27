@@ -49,6 +49,15 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 	};
 
 	/**
+	 * Get the followers of the given record.
+	 *
+	 */
+	function getFollowers(relatedModel, relatedId) {
+		var ds = DataSource.create(relatedModel);
+		return ds.followers(relatedId);
+	}
+
+	/**
 	 * Get messages with the given options.
 	 *
 	 * The options can have following values:
@@ -61,31 +70,8 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 	 * @return {Promise}
 	 */
 	function getMessages(options) {
-
 		var opts = _.extend({}, options);
-		var deferred = $q.defer();
-
-		var promise = dsMessage.messages(opts).success(function (res) {
-			var records = res.data;
-			var first = _.first(records) || {};
-			var data = {};
-
-			if (opts.relatedId > 0) {
-				data.$following = first.$following;
-				data.$followers = first.$followers;
-				data.$messages = first.$messages;
-			} else {
-				data.__emptyTitle = first.values.__emptyTitle;
-				data.__emptyDesc = first.values.__emptyDesc;
-				data = _.extend(data, first.values);
-			}
-
-			deferred.resolve(data);
-		});
-
-		promise.error(deferred.reject);
-
-		return deferred.promise;
+		return dsMessage.messages(opts);
 	};
 
 	/**
@@ -156,6 +142,7 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 	checkUnreadMessages();
 
 	return {
+		getFollowers: getFollowers,
 		getMessages: getMessages,
 		getReplies: getReplies,
 		flagMessage: flagMessage,
@@ -234,16 +221,17 @@ ui.formWidget('uiMailMessages', {
 
 		$scope.onFlag = function (message, flagState) {
 			MessageService.flagMessage(message, flagState).success(function (res) {
-				if ($scope.isInbox) {
-					$scope.onLoadMessages();
-				}
+				$scope.onLoadMessages();
 			});
 		};
 
 		$scope.onRemove = function(message) {
+			var index = $scope.messages.indexOf(message);
 			MessageService.removeMessage(message).success(function (res) {
 				if (message.$afterDelete) {
 					message.$afterDelete();
+				} else if (index > -1) {
+					$scope.messages.splice(index, 1);
 				}
 			});
 		};
@@ -278,6 +266,72 @@ ui.formWidget('uiMailMessages', {
 		$scope.formatNumReplies = function (message) {
 			return _t('replies ({0})', message.$numReplies);
 		}
+
+		var folder = $scope.folder;
+
+		$scope.messages = [];
+		$scope.hasMore = false;
+		$scope.hasMessages = true;
+
+		$scope.onLoadMessages = function (offset) {
+
+			var record = $scope.record || {};
+			var limit = ($scope.field || {}).limit || 10;
+			var params = {
+				limit: limit,
+				offset: offset,
+				folder: folder
+			};
+
+			if (record.id > 0) {
+				params.relatedId = record.id;
+				params.relatedModel = $scope._model;
+			}
+
+			return MessageService.getMessages(params).success(function (res) {
+				var found = res.data;
+				var count = res.total;
+
+				if (!offset) {
+					$scope.hasMore = false;
+					$scope.messages.length = 0;
+				}
+
+				Array.prototype.push.apply($scope.messages, found);
+				$scope.hasMore = $scope.messages.length < count;
+				if (folder) {
+					$scope.waitForActions(function () {
+						$scope.record.__empty = count === 0;
+					});
+				}
+			});
+		};
+
+		$scope.onLoadMore = function () {
+			var offset = $scope.messages.length;
+			$scope.onLoadMessages(offset);
+		};
+
+		$scope.$on("on:new", function (e) {
+			if (folder) {
+				$scope.onLoadMessages();
+			}
+		});
+
+		$scope.$watch("record", function (record, old) {
+			if (record === old) { return; }
+			if (record && record.id) {
+				$scope.onLoadMessages();
+			}
+		});
+
+		$scope.$on("on:nav-click", function (e, tab) {
+			var action = $scope.tab.action;
+			if (action !== tab.action) { return ; }
+			if (folder) {
+				$scope.onLoadMessages();
+			}
+		});
 	}],
 	link: function (scope, element, attrs) {
 
@@ -298,10 +352,13 @@ ui.formWidget('uiMailMessages', {
 			"<div class='panel-body'>" +
 				"<div class='mail-composer' ui-mail-composer></div>" +
 				"<div class='mail-thread'>" +
-					"<span ng-repeat='message in record.$messages'>" +
+					"<span ng-repeat='message in messages'>" +
 						"<div ui-mail-message></div>" +
 						"<div ng-repeat='message in message.$children' class='mail-message-indent' ui-mail-message></div>" +
 					"</span>" +
+					"<div ng-show='hasMore' class='mail-thread-more'>" +
+						"<a href='' ng-click='onLoadMore()' class='muted' x-translate>load more</a>" +
+					"</div>" +
 				"</div>" +
 			"</div>" +
 		"</div>"
@@ -362,10 +419,8 @@ ui.formWidget('uiMailComposer', {
 				files: files
 			}).success(function (res) {
 				var message = _.first(res.data);
-				var messages = record.$messages || [];
+				var messages = $scope.$parent.messages || [];
 
-				messages.unshift(message);
-				record.$messages = messages;
 				$scope.post = null;
 				$scope.files = [];
 
@@ -375,6 +430,8 @@ ui.formWidget('uiMailComposer', {
 						return $scope.message.$afterReply();
 					}
 					return $scope.onReplies($scope.message);
+				} else {
+					messages.unshift(message);
 				}
 
 				$scope.$broadcast('on:message-add');
@@ -477,9 +534,45 @@ ui.formWidget('uiMailComposer', {
 ui.formWidget('uiMailFollowers', {
 
 	scope: true,
-	controller: ['$scope', function ($scope) {
+	controller: ['$scope', 'ViewService', 'MessageService', function ($scope, ViewService, MessageService) {
 
 		var ds = $scope._dataSource;
+		var userSelector = null;
+
+		$scope.following = false;
+		$scope.followers = [];
+
+		$scope.updateStatus = function() {
+			var followers = $scope.followers || [];
+			var found = _.findWhere(followers, {
+				code: $scope.app.login
+			});
+			$scope.following = !!found;
+		}
+
+		$scope.select = function (records) {
+
+			var ds = $scope._dataSource;
+			var record = $scope.record || {};
+			var promise = ds.messageFollow(record.id, {
+				records: records
+			});
+
+			promise.success(function (res) {
+				$scope.followers = res.data || [];
+				$scope.updateStatus();
+			});
+		};
+
+		$scope.onAddFollowers = function () {
+
+			if (userSelector == null) {
+				userSelector = ViewService.compile('<div ui-selector-popup x-select-mode="multi"></div>')($scope);
+			}
+
+			var popup = userSelector.data('$scope');
+			popup.show();
+		};
 
 		$scope.onFollow = function () {
 
@@ -487,7 +580,7 @@ ui.formWidget('uiMailFollowers', {
 			var promise = ds.messageFollow(record.id);
 
 			promise.success(function (res) {
-				record.$followers = res.data;
+				$scope.followers = res.data || [];
 				$scope.updateStatus();
 			});
 		};
@@ -510,11 +603,24 @@ ui.formWidget('uiMailFollowers', {
 			});
 
 			promise.success(function (res) {
-				record.$followers = res.data;
+				$scope.followers = res.data || [];
 				$scope.updateStatus();
 			});
 		};
 
+		function doLoadFollowers(record) {
+			MessageService.getFollowers($scope._model, record.id)
+			.success(function (res) {
+				$scope.followers = res.data;
+				$scope.updateStatus();
+			});
+		}
+
+		$scope.$watch("record", function (record) {
+			if (record && record.id) {
+				doLoadFollowers(record);
+			}
+		});
 	}],
 	link: function (scope, element, attrs) {
 
@@ -527,15 +633,15 @@ ui.formWidget('uiMailFollowers', {
 			"<div class='panel-title'>" +
 				"<span x-translate>Followers</span>" +
 				"<div class='icons pull-right'>" +
-					"<i class='fa fa-star-o' ng-click='onFollow()' ng-show='!record.$following'></i>" +
-					"<i class='fa fa-star' ng-click='onUnfollow()' ng-show='record.$following'></i>" +
+					"<i class='fa fa-star-o' ng-click='onFollow()' ng-show='!following'></i>" +
+					"<i class='fa fa-star' ng-click='onUnfollow()' ng-show='following'></i>" +
 					"<i class='fa fa-plus' ng-click='onAddFollowers()'></i>" +
 				"</div>" +
 			"</div>" +
 			"</div>" +
 			"<div class='panel-body'>" +
 			"<ul class='links'>" +
-				"<li ng-repeat='follower in record.$followers'>" +
+				"<li ng-repeat='follower in followers'>" +
 				"<a href='' ng-click='showUser(follower)'>{{follower.name}}</a> " +
 				"<i class='fa fa-remove' ng-click='onUnfollow(follower)'></i>" +
 				"</li>" +
@@ -550,7 +656,6 @@ ui.formWidget('PanelMail', {
 	controller: ['$scope', '$timeout', 'ViewService', 'MessageService', function ($scope, $timeout, ViewService, MessageService) {
 
 		var userEditor = null;
-		var userSelector = null;
 
 		$scope.editorCanSave = false;
 		$scope._viewParams = {
@@ -561,31 +666,6 @@ ui.formWidget('PanelMail', {
 
 		$scope.getDomain = function () {
 			return {};
-		};
-
-		$scope.updateStatus = function() {
-			var record = $scope.record || {};
-			var followers = record.$followers;
-
-			var found = _.findWhere(followers, {
-				code: $scope.app.login
-			});
-
-			record.$following = !!found;
-		}
-
-		$scope.select = function (records) {
-
-			var ds = $scope._dataSource;
-			var record = $scope.record || {};
-			var promise = ds.messageFollow(record.id, {
-				records: records
-			});
-
-			promise.success(function (res) {
-				record.$followers = res.data;
-				$scope.updateStatus();
-			});
 		};
 
 		$scope.showUser = function (user) {
@@ -605,46 +685,13 @@ ui.formWidget('PanelMail', {
 			popup.show(user);
 		};
 
-		$scope.onAddFollowers = function () {
-
-			if (userSelector == null) {
-				userSelector = ViewService.compile('<div ui-selector-popup x-select-mode="multi"></div>')($scope);
-			}
-
-			var popup = userSelector.data('$scope');
-			popup.show();
-		};
-
 		var folder = undefined;
+
 		if ($scope.tab.action === "mail.inbox") folder = "inbox";
 		if ($scope.tab.action === "mail.important") folder = "important";
 		if ($scope.tab.action === "mail.archive") folder = "archive";
 
-		$scope.isInbox = folder === "inbox";
-
-		$scope.onLoadMessages = function () {
-			var record = $scope.record || {};
-			var params = {
-				folder: folder
-			};
-
-			if (record.id > 0) {
-				params.relatedId = record.id;
-				params.relatedModel = $scope._model;
-			}
-
-			MessageService.getMessages(params).then(function (res) {
-				record = _.extend(record, res);
-			});
-		};
-
-		$scope.$on("on:nav-click", function (e) {
-			var rec = $scope.record;
-			var tab = $scope.tab || {};
-			if (tab.selected && rec) {
-				$scope.onLoadMessages();
-			}
-		});
+		$scope.folder = folder;
 	}],
 	link: function (scope, element, attrs) {
 		var field = scope.field;
@@ -658,7 +705,7 @@ ui.formWidget('PanelMail', {
 	transclude: true,
 	template_readonly: null,
 	template_editable: null,
-	template: "<div class='form-mail row-fluid' ng-show='record.id > 0 || record.$messages.length > 0' ui-transclude></div>"
+	template: "<div class='form-mail row-fluid' ng-show='record.id > 0 || folder' ui-transclude></div>"
 })
 
 })(this);

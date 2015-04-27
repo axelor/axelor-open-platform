@@ -147,6 +147,19 @@
 	margin-bottom: 0;
 }
 
+.mail-thread-more {
+	border-bottom: 1px #c0c0c0 dashed;
+	text-align: center;
+	margin-top: -12px;
+}
+
+.mail-thread-more a {
+	position: relative;
+	top: 8px;
+	background: #fff;
+	padding: 0 4px;
+}
+
 .mail-followers .panel-title .icons i {
 	margin-left: 8px;
 	cursor: pointer;

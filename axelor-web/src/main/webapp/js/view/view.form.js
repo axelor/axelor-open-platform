@@ -61,8 +61,7 @@ function FormViewCtrl($scope, $element) {
 	$scope.doRead = function(id) {
 		var params = {
 			fields : _.pluck($scope.fields, 'name'),
-			related: $scope.fields_related,
-			hasMessages: $scope.$hasMessages
+			related: $scope.fields_related
 		};
 		return ds.read(id, params);
 	};
@@ -208,9 +207,11 @@ function FormViewCtrl($scope, $element) {
 		$scope.$$original = record || {};
 		$scope.$$dirty = false;
 		$scope.record = angular.copy($scope.$$original);
-		$scope.ajaxStop(function(){
-			$scope.$broadcast("on:edit", $scope.record);
-			$scope.$broadcast("on:record-change", $scope.record);
+		$scope._viewPromise.then(function(){
+			$scope.ajaxStop(function(){
+				$scope.$broadcast("on:edit", $scope.record);
+				$scope.$broadcast("on:record-change", $scope.record);
+			});
 		});
 	};
 	

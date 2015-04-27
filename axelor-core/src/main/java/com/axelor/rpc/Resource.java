@@ -56,8 +56,6 @@ import com.axelor.db.mapper.PropertyType;
 import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.meta.MetaStore;
-import com.axelor.inject.Beans;
-import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.schema.views.Selection;
@@ -549,12 +547,6 @@ public class Resource<T extends Model> {
 			if (act != null) {
 				values.put("__actionSelect", toMapCompact(act));
 			}
-		}
-
-		// if need to fetch messages
-		if (request.getHasMessages() == Boolean.TRUE) {
-			MailMessageRepository messages = Beans.get(MailMessageRepository.class);
-			values.putAll(messages.details(entity));
 		}
 
 		data.add(values);

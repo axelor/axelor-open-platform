@@ -474,13 +474,19 @@ public class RestService extends ResourceService {
 			@QueryParam("folder") String folder,
 			@QueryParam("parent") Long parentId,
 			@QueryParam("count") Boolean count,
-			@QueryParam("limit") Integer limit,
+			@QueryParam("limit") @DefaultValue("10") Integer limit,
+			@QueryParam("offset") @DefaultValue("0") Integer offset,
 			@QueryParam("relatedId") Long relatedId,
 			@QueryParam("relatedModel") String relatedModel) {
 
-		final Response response = new Response();
 		final MailController ctrl = Beans.get(MailController.class);
-		final List<Object> result = new ArrayList<>();
+
+		final ActionRequest req = new ActionRequest();
+		final ActionResponse res = new ActionResponse();
+
+		req.setModel(relatedModel);
+		req.setOffset(offset);
+		req.setLimit(limit);
 
 		Class<?> relatedClass = null;
 		Model related = null;
@@ -498,14 +504,12 @@ public class RestService extends ResourceService {
 		}
 
 		if (related != null) {
-			result.add(messages.details(related));
-			response.setData(result);
-			response.setStatus(Response.STATUS_SUCCESS);
-			return response;
+			final List<Object> records = new ArrayList<>();
+			records.add(related);
+			req.setRecords(records);
+			ctrl.related(req, res);
+			return res;
 		}
-
-		ActionRequest req = new ActionRequest();
-		ActionResponse res = new ActionResponse();
 
 		if (count == Boolean.TRUE) {
 			ctrl.unread(req, res);
@@ -539,7 +543,7 @@ public class RestService extends ResourceService {
 
 	@GET
 	@Path("{id}/followers")
-	public Response messageFollowers(@PathParam("id") long id, Request request) {
+	public Response messageFollowers(@PathParam("id") long id) {
 
 		@SuppressWarnings("all")
 		final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
@@ -582,7 +586,7 @@ public class RestService extends ResourceService {
 			}
 		}
 
-		return messageFollowers(id, request);
+		return messageFollowers(id);
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -612,7 +616,7 @@ public class RestService extends ResourceService {
 			}
 		}
 
-		return messageFollowers(id, request);
+		return messageFollowers(id);
 	}
 
 	@POST

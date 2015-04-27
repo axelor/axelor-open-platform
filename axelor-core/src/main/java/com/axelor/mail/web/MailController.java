@@ -26,8 +26,8 @@ import javax.persistence.TypedQuery;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.db.JpaSupport;
+import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
-import com.axelor.i18n.I18n;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.rpc.ActionRequest;
@@ -70,41 +70,53 @@ public class MailController extends JpaSupport {
 
 	public void inbox(ActionRequest request, ActionResponse response) {
 
-		final List<Object> all = find(SQL_INBOX, request.getLimit());
+		final List<Object> all = find(SQL_INBOX, request.getOffset(), request.getLimit());
+		final Long total = count(SQL_INBOX);
 
-		response.setValue("$force", true);
-		response.setValue("$messages", all);
-
-		if (all.isEmpty()) {
-			response.setValue("__emptyTitle", I18n.get("Inbox is empty!"));
-			response.setValue("__emptyDesc", I18n.get("Come back later. There are no messages in this folder..."));
-		}
+		response.setData(all);
+		response.setOffset(request.getOffset());
+		response.setTotal(total);
 	}
 
 	public void important(ActionRequest request, ActionResponse response) {
 
-		final List<Object> all = find(SQL_IMPORTANT, request.getLimit());
+		final List<Object> all = find(SQL_IMPORTANT, request.getOffset(), request.getLimit());
+		final Long total = count(SQL_IMPORTANT);
 
-		response.setValue("$force", true);
-		response.setValue("$messages", all);
-
-		if (all.isEmpty()) {
-			response.setValue("__emptyTitle", I18n.get("No important messages!"));
-			response.setValue("__emptyDesc", I18n.get("Come back later. There are no messages in this folder..."));
-		}
+		response.setData(all);
+		response.setOffset(request.getOffset());
+		response.setTotal(total);
 	}
 
 	public void archived(ActionRequest request, ActionResponse response) {
 
-		final List<Object> all = find(SQL_ARCHIVE, request.getLimit());
+		final List<Object> all = find(SQL_ARCHIVE, request.getOffset(), request.getLimit());
+		final Long total = count(SQL_ARCHIVE);
 
-		response.setValue("$force", true);
-		response.setValue("$messages", all);
+		response.setData(all);
+		response.setOffset(request.getOffset());
+		response.setTotal(total);
+	}
 
-		if (all.isEmpty()) {
-			response.setValue("__emptyTitle", I18n.get("No archived messages!"));
-			response.setValue("__emptyDesc", I18n.get("Come back later. There are no messages in this folder..."));
+	public void related(ActionRequest request, ActionResponse response) {
+
+		if (request.getRecords() == null ||
+			request.getRecords().isEmpty()) {
+			return;
 		}
+
+		final Model related = (Model) request.getRecords().get(0);
+		final List<MailMessage> all = messages.findRelated(related, request.getLimit(), request.getOffset());
+		final Long count = messages.countRelated(related);
+
+		final List<Object> data = new ArrayList<>();
+		for (MailMessage message : all) {
+			data.add(messages.details(message));
+		}
+
+		response.setData(data);
+		response.setOffset(request.getOffset());
+		response.setTotal(count);
 	}
 
 	private List<MailMessage> findChildren(MailMessage message) {
@@ -159,12 +171,31 @@ public class MailController extends JpaSupport {
 		return 0;
 	}
 
-	public List<Object> find(String queryString, int limit) {
+	public Long count(String queryString) {
+
+		final String countString = queryString
+				.replace("DISTINCT(m)", "COUNT(DISTINCT m)")
+				.replace(" ORDER BY m.createdOn ASC", "");
+
+		final TypedQuery<Long> query = getEntityManager().createQuery(countString, Long.class);
+
+		query.setParameter("uid", AuthUtils.getUser().getId());
+
+		try {
+			return query.getSingleResult();
+		} catch (Exception e) {
+		}
+		return 0L;
+	}
+
+	public List<Object> find(String queryString, int offset, int limit) {
 
 		final TypedQuery<MailMessage> query = getEntityManager().createQuery(queryString, MailMessage.class);
 
 		query.setParameter("uid", AuthUtils.getUser().getId());
-		query.setMaxResults(limit);
+
+		if (offset > 0) query.setFirstResult(offset);
+		if (limit > 0) query.setMaxResults(limit);
 
 		final List<MailMessage> found = query.getResultList();
 		final List<Object> all = new ArrayList<>();

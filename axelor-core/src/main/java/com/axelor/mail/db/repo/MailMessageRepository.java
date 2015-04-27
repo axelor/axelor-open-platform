@@ -19,7 +19,6 @@ package com.axelor.mail.db.repo;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,16 +52,18 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		super(MailMessage.class);
 	}
 
-	public List<MailMessage> findAll(Model entity) {
-		return findAll(entity, -1);
-	}
-
-	public List<MailMessage> findAll(Model entity, int limit) {
+	public List<MailMessage> findRelated(Model entity, int limit, int offset) {
 		return all().filter("self.relatedModel = ? AND self.relatedId = ?",
 				entity.getClass().getName(),
 				entity.getId())
 				.order("-createdOn")
-				.fetch(limit);
+				.fetch(limit, offset);
+	}
+
+	public long countRelated(Model entity) {
+		return all().filter("self.relatedModel = ? AND self.relatedId = ?",
+				entity.getClass().getName(),
+				entity.getId()).count();
 	}
 
 	@Override
@@ -144,24 +145,6 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		}
 
 		return message;
-	}
-
-	public Map<String, Object> details(Model entity) {
-		final MailFollowerRepository followers = Beans.get(MailFollowerRepository.class);
-		final Map<String, Object> details = new HashMap<>();
-		final List<MailMessage> messages = findAll(entity);
-
-		final List<Object> all = new ArrayList<>();
-
-		for (MailMessage message : messages) {
-			all.add(details(message));
-		}
-
-		details.put("$messages", all);
-		details.put("$followers", followers.findFollowers(entity));
-		details.put("$following", followers.isFollowing(entity, AuthUtils.getUser()));
-
-		return details;
 	}
 
 	public Map<String, Object> details(MailMessage message) {

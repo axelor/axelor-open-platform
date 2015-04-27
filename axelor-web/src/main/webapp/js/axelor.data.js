@@ -320,8 +320,7 @@
 				if (options) {
 					promise = this._request('fetch', id).post({
 						fields: options.fields,
-						related: options.related,
-						hasMessages: options.hasMessages
+						related: options.related
 					});
 				} else {
 					promise = this._request(null, id).get();
@@ -348,6 +347,22 @@
 				return promise;
 			},
 
+			// find followers of the given record
+			followers: function (id) {
+				var promise = this._request('followers', id).get();
+				promise.success = function(fn) {
+					promise.then(function(res) {
+						fn(res.data);
+					});
+					return promise;
+				};
+				promise.error = function(fn) {
+					promise.then(null, fn);
+					return promise;
+				};
+				return promise;
+			},
+
 			// find messages for the given record
 			messages: function (options) {
 
@@ -359,7 +374,7 @@
 				});
 
 				promise.success = function(fn) {
-					promise.then(function(response){
+					promise.then(function(response) {
 						fn(response.data);
 					});
 					return promise;
