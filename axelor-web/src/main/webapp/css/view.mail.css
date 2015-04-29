@@ -31,6 +31,7 @@
 /* form widgets */
 
 .mail-composer {
+	margin-bottom: 8px;
 }
 
 .mail-composer textarea {
@@ -143,14 +144,18 @@
 	border-color: #bccff1;
 }
 
-.mail-thread > span:last-child .mail-message {
+.mail-thread > span:first-of-type .mail-message {
+	margin-top: 0;
+}
+
+.mail-thread > span:last-of-type .mail-message {
 	margin-bottom: 0;
 }
 
 .mail-thread-more {
 	border-bottom: 1px #c0c0c0 dashed;
 	text-align: center;
-	margin-top: -12px;
+	margin-top: -4px;
 }
 
 .mail-thread-more a {
@@ -201,4 +206,14 @@
 
 .mail-message .track-tags .label {
 	margin-right: 2px;
+}
+
+.form-mail .fade {
+	opacity: 0.1;
+}
+
+.form-mail .fadeIn {
+	opacity: 1;
+	-webkit-transition:all linear 0.5s;
+			transition:all linear 0.5s;
 }

@@ -158,8 +158,13 @@ ui.directive('uiMailMessage', function () {
 	return {
 		require: '^uiMailMessages',
 		replace: true,
+		link: function (scope, element, attrs) {
+			setTimeout(function () {
+				element.addClass('fadeIn');
+			});
+		},
 		template: "" +
-			"<div>" +
+			"<div class='fade'>" +
 				"<div class='mail-message alert' ng-class='{ \"alert-info\": !message.parent || record.id > 0}'>" +
 				"<div class='mail-message-left'>" +
 					"<a href=''>" +
@@ -273,6 +278,8 @@ ui.formWidget('uiMailMessages', {
 		$scope.hasMore = false;
 		$scope.hasMessages = true;
 
+		$scope.animation = {};
+
 		$scope.onLoadMessages = function (offset) {
 
 			var record = $scope.record || {};
@@ -286,6 +293,13 @@ ui.formWidget('uiMailMessages', {
 			if (record.id > 0) {
 				params.relatedId = record.id;
 				params.relatedModel = $scope._model;
+			}
+
+			if (!offset) {
+				$scope.animation = {
+					"fade": true,
+					"hide": true
+				};
 			}
 
 			return MessageService.getMessages(params).success(function (res) {
@@ -304,6 +318,11 @@ ui.formWidget('uiMailMessages', {
 						$scope.record.__empty = count === 0;
 					});
 				}
+
+				$scope.animation = {
+					'fade': true,
+					'fadeIn': true
+				};
 			});
 		};
 
@@ -348,7 +367,7 @@ ui.formWidget('uiMailMessages', {
 	template_readonly: null,
 	template_editable: null,
 	template:
-		"<div class='mail-messages panel panel-default span9'>" +
+		"<div class='mail-messages panel panel-default span9' ng-class='animation'>" +
 			"<div class='panel-body'>" +
 				"<div class='mail-composer' ui-mail-composer></div>" +
 				"<div class='mail-thread'>" +
@@ -706,6 +725,6 @@ ui.formWidget('PanelMail', {
 	template_readonly: null,
 	template_editable: null,
 	template: "<div class='form-mail row-fluid' ng-show='record.id > 0 || folder' ui-transclude></div>"
-})
+});
 
 })(this);
