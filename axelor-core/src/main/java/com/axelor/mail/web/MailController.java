@@ -42,7 +42,7 @@ public class MailController extends JpaSupport {
 			+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
 			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
 			+ "((g IS NULL) OR (g.user.id = :uid AND g.isRead = false)) "
-			+ "ORDER BY m.createdOn ASC";
+			+ "ORDER BY m.createdOn DESC";
 
 	private static final String SQL_IMPORTANT = ""
 			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
@@ -50,7 +50,7 @@ public class MailController extends JpaSupport {
 			+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
 			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
 			+ "((g.user.id = :uid AND g.isStarred = true)) "
-			+ "ORDER BY m.createdOn ASC";
+			+ "ORDER BY m.createdOn DESC";
 
 	private static final String SQL_ARCHIVE = ""
 			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
@@ -58,7 +58,7 @@ public class MailController extends JpaSupport {
 			+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
 			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
 			+ "((g.user.id = :uid AND g.isRead = true)) "
-			+ "ORDER BY m.createdOn ASC";
+			+ "ORDER BY m.createdOn DESC";
 
 	@Inject
 	private MailMessageRepository messages;
@@ -175,7 +175,7 @@ public class MailController extends JpaSupport {
 
 		final String countString = queryString
 				.replace("DISTINCT(m)", "COUNT(DISTINCT m)")
-				.replace(" ORDER BY m.createdOn ASC", "");
+				.replace(" ORDER BY m.createdOn DESC", "");
 
 		final TypedQuery<Long> query = getEntityManager().createQuery(countString, Long.class);
 
