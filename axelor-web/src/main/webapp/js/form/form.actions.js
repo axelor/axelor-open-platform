@@ -205,10 +205,15 @@ ActionHandler.prototype = {
 	},
 
 	onChange: function(event) {
-		var self = this;
-		return this._fireBeforeSave().then(function() {
-			return self.handle();
+		var deferred = this.ws.defer(),
+			promise = deferred.promise;
+
+		var self = this,
+			scope = this.scope;
+		scope.waitForActions(function() {
+			self.handle().then(deferred.resolve, deferred.reject);
 		});
+		return promise;
 	},
 	
 	_getPrompt: function () {
