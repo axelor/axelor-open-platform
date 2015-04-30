@@ -297,8 +297,7 @@ ui.formWidget('uiMailMessages', {
 
 			if (!offset) {
 				$scope.animation = {
-					"fade": true,
-					"hide": true
+					"fadeDim": true
 				};
 			}
 
