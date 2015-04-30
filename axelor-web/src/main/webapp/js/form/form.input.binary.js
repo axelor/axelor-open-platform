@@ -246,7 +246,7 @@ ui.formInput('Binary', {
 	css: 'file-item',
 	cellCss: 'form-item file-item',
 
-	link_editable: function(scope, element, attrs, model) {
+	link: function(scope, element, attrs, model) {
 
 		var field = scope.field;
 		var input = element.children('input:first').hide();
@@ -264,7 +264,7 @@ ui.formInput('Binary', {
 			frame.attr("src", url);
 			setTimeout(function(){
 				frame.attr("src", "");
-			},100);
+			}, 300);
 		};
 
 		scope.doRemove = function() {
@@ -277,6 +277,15 @@ ui.formInput('Binary', {
 				record.mime = null;
 			}
 			record.size = null;
+		};
+
+		scope.canDownload = function() {
+			var record = scope.record || {};
+			if (!record.id) return false;
+			if (scope._model === META_FILE) {
+				return !!record.fileName;
+			}
+			return true;
 		};
 
 		input.change(function(e) {
@@ -302,14 +311,16 @@ ui.formInput('Binary', {
 			}
 		});
 	},
-	template_editable:
+	template_readonly: null,
+	template_editable: null,
+	template:
 	'<div>' +
 		'<iframe></iframe>' +
 		'<input type="file">' +
 		'<div class="btn-group">' +
-			'<button ng-click="doSelect()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
-			'<button ng-click="doSave()" class="btn" type="button"><i class="fa fa-arrow-circle-down"></i></button>' +
-			'<button ng-click="doRemove()" class="btn" type="button"><i class="fa fa-times"></i></button>' +
+			'<button ng-click="doSelect()" ng-show="!isReadonly()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
+			'<button ng-click="doSave()" ng-show="canDownload()" class="btn" type="button"><i class="fa fa-arrow-circle-down"></i></button>' +
+			'<button ng-click="doRemove()" ng-show="!isReadonly()" class="btn" type="button"><i class="fa fa-times"></i></button>' +
 		'</div>' +
 	'</div>'
 });
