@@ -370,6 +370,7 @@
 				var promise = this._request('messagesAll').send({
 					method: 'GET',
 					params: opts,
+					silent: opts.count ? true : undefined,
 					transformRequest: opts.count ? [] : undefined
 				});
 

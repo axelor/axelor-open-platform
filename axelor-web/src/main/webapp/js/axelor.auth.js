@@ -79,12 +79,14 @@ angular.module('axelor.auth', [])
         if (response.status === 401 || response.status === 502 || (response.status === 0 && response.data === "")) {
           var deferred = $q.defer();
           authServiceProvider.pushToBuffer(response.config, deferred);
-          $rootScope.$broadcast('event:auth-loginRequired', response.status);
+          if (!response.config.silent) {
+            $rootScope.$broadcast('event:auth-loginRequired', response.status);
+          }
           return deferred.promise;
         }
         // redirect to the CAS login page
         if (response.status === 302 || response.status === 307) {
-		window.location.reload();
+          window.location.reload();
         }
         // otherwise
         return $q.reject(response);
