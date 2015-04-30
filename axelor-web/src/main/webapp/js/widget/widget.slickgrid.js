@@ -1475,7 +1475,7 @@ Grid.prototype.__saveChanges = function(args, callback) {
 				val = null;
 			res[key] = val;
 		}
-		if (res.id <= 0) {
+		if (res.id === 0) {
 			res.id = null;
 		}
 		if (res.$dirty && _.isUndefined(res.version)) {
