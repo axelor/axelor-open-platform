@@ -1,3 +1,13 @@
+# 3.0.7 (2015-04-30)
+
+## Bug Fixes
+
+- fix wrong email sent date issue 
+- fix file download issue
+- fix binary widget download issue
+- fix onChange issues on o2m fields
+- fix recursion issue caused by an old fix
+
 # 3.0.6 (2015-04-16)
 
 ## Bug Fixes
