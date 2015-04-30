@@ -21,10 +21,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
+import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailFollower;
+import com.axelor.mail.db.MailGroup;
+import com.axelor.meta.db.MetaAction;
+import com.axelor.meta.db.MetaMenu;
+import com.axelor.meta.db.repo.MetaActionRepository;
+import com.axelor.meta.db.repo.MetaMenuRepository;
 import com.axelor.rpc.Resource;
 import com.google.inject.persist.Transactional;
 
@@ -71,6 +78,57 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 		return all;
 	}
 
+	private void createOrDeleteMenu(MailGroup entity,  boolean delete) {
+		final MetaActionRepository actionRepo = Beans.get(MetaActionRepository.class);
+		final MetaMenuRepository menuRepo = Beans.get(MetaMenuRepository.class);
+		final MetaMenu parent = menuRepo.findByName("menu-mail-groups");
+
+		if (parent == null) {
+			return;
+		}
+
+		final String name = "menu-mail-groups-" + entity.getId();
+		final String actionName = "mail.groups." + entity.getId();
+
+		MetaMenu menu = menuRepo.all().filter("self.name = ? AND self.user = ?", name, AuthUtils.getUser()).fetchOne();
+		MetaAction action = actionRepo.findByName(actionName);
+
+		if (delete) {
+			if (menu != null) {
+				menuRepo.remove(menu);
+			}
+			if (action != null) {
+				actionRepo.remove(action);
+			}
+			return;
+		}
+
+		if (action == null) {
+			action = new MetaAction(actionName);
+			action.setType("action-view");
+			action.setModel(MailGroup.class.getName());
+			action.setXml(""
+					+ "<action-view title='"+ entity.getName() + "' name='" + actionName + "' model='"+ MailGroup.class.getName() +"'>\n"
+					+ "  <view type='form'/>\n"
+					+ "  <view-param name='show-toolbar' value='false'/>\n"
+					+ "  <context name='_showRecord' expr='eval: "+ entity.getId() +"'/>\n"
+					+ "</action-view>");
+		}
+
+		if (menu == null) {
+			menu = new MetaMenu();
+			menu.setName(name);
+			menu.setTitle(entity.getName());
+			menu.setIcon("fa-group");
+			menu.setOrder(-50);
+			menu.setParent(parent);
+			menu.setAction(action);
+			menu.setUser(AuthUtils.getUser());
+		}
+
+		menuRepo.save(menu);
+	}
+
 	@Transactional
 	public void follow(Model entity, User user) {
 
@@ -82,6 +140,11 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 		follower.setRelatedId(entity.getId());
 		follower.setRelatedModel(entity.getClass().getName());
 		follower.setUser(user);
+
+		// create menu
+		if (entity instanceof MailGroup) {
+			createOrDeleteMenu((MailGroup) entity, false);
+		}
 
 		save(follower);
 	}
@@ -97,6 +160,11 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 
 		if (follower != null) {
 			remove(follower);
+		}
+
+		// remove menu
+		if (entity instanceof MailGroup) {
+			createOrDeleteMenu((MailGroup) entity, true);
 		}
 	}
 

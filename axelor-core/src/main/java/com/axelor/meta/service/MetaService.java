@@ -129,6 +129,11 @@ public class MetaService {
 			MetaMenu menu = (MetaMenu) items[0];
 			MenuItem item = new MenuItem();
 
+			// check user
+			if (menu.getUser() != null && menu.getUser() != AuthUtils.getUser()) {
+				continue;
+			}
+
 			item.setName(menu.getName());
 			item.setOrder(menu.getOrder());
 			item.setTitle(menu.getTitle());

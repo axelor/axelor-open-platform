@@ -101,6 +101,8 @@
   <menuitem name="menu-mail-archive" title="Archived" parent="menu-mail"
     action="mail.archive" icon="fa-archive"  order="-80"/>
   <menuitem name="menu-mail-groups" title="Groups" parent="menu-mail"
-    action="mail.groups" icon="fa-group"  order="-70"/>
+    icon="fa-group"  order="-70"/>
+  <menuitem name="menu-mail-groups-all" title="All Groups" parent="menu-mail-groups"
+    action="mail.groups" icon="fa-group"  order="-10"/>
 
 </object-views>
