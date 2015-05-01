@@ -19,7 +19,7 @@
       <label title="Come back later. There are no messages in this folder..." css="label-italic label-big" />
     </panel>
     <panel-mail>
-      <mail-messages limit="30"/>
+      <mail-messages limit="10"/>
     </panel-mail>
   </form>
   
@@ -30,7 +30,7 @@
       <label title="Come back later. There are no messages in this folder..." css="label-italic label-big" />
     </panel>
     <panel-mail>
-      <mail-messages limit="30"/>
+      <mail-messages limit="10"/>
     </panel-mail>
   </form>
 
@@ -41,7 +41,7 @@
       <label title="Come back later. There are no messages in this folder..." css="label-italic label-big" />
     </panel>
     <panel-mail>
-      <mail-messages limit="30"/>
+      <mail-messages limit="10"/>
     </panel-mail>
   </form>
 
@@ -64,7 +64,7 @@
         <field name="description" colSpan="12" showTitle="false"/>
     </panel>
     <panel-mail>
-      <mail-messages limit="30"/>
+      <mail-messages limit="5"/>
       <mail-followers/>
     </panel-mail>
   </form>
