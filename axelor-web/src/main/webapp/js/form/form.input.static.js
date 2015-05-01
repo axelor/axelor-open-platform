@@ -25,6 +25,10 @@ function canDisplayPopover(scope, details) {
 	var mode = __appSettings['application.mode'];
 	var tech = __appSettings['user.technical'];
 	
+	if (axelor.device.mobile) {
+		return false;
+	}
+
 	if(mode == 'prod' && !tech) {
 		return details ? false : scope.field && scope.field.help;
 	}
