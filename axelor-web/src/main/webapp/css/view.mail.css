@@ -218,6 +218,7 @@
 			transition:all linear 0.5s;
 }
 
-.form-mail .fadeDim .fade {
+.form-mail .fadeDim .fade,
+.form-mail .fadeDim .mail-thread-more {
 	display: none;
 }
