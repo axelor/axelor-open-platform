@@ -25,12 +25,17 @@ angular.module('axelor.ui').directive('navTree', function() {
 
 		controller: ['$scope', '$element', 'MenuService', function($scope, $element, MenuService) {
 
+			var hasMobileMenus = false;
+
 			function canAccept(item) {
 				if (item.left === false) {
 					return false;
 				}
-				if (axelor.device.mobile && item.mobile === false) {
+				if (axelor.device.mobile && item.mobile === false && hasMobileMenus) {
 					return false;
+				}
+				if (item.mobile) {
+					hasMobileMenus = true;
 				}
 				return true;
 			}
