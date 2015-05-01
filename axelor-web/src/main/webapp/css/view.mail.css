@@ -20,7 +20,8 @@
 
 .mail-thread-view {
 	max-width: 720px;
-	margin: 0 4px 0 !important;
+	margin: -8px 4px 0 !important;
+	padding: 0;
 }
 
 .mail-thread-view .panel {
@@ -31,7 +32,7 @@
 /* form widgets */
 
 .mail-composer {
-	margin-bottom: 8px;
+	margin-top: 8px;
 }
 
 .mail-composer textarea {
@@ -61,22 +62,14 @@
 	margin-right: 6px;
 }
 
-.mail-thread .mail-composer {
-	margin-bottom: 8px;
-}
-
-.mail-thread span:last-child .mail-composer {
-	margin-top: 8px;
-}
-
 .mail-thread .mail-message-indent {
-	padding-left: 18px;
+	padding-left: 8px;
 }
 
 .mail-thread .mail-message {
 	position: relative;
-	margin: 8px 0;
-	padding: 8px 14px;
+	margin: 8px 0 0 0;
+	padding: 8px 10px;
 	border-radius: 0;
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
 }
@@ -144,14 +137,6 @@
 	border-color: #bccff1;
 }
 
-.mail-thread > span:first-of-type .mail-message {
-	margin-top: 0;
-}
-
-.mail-thread > span:last-of-type .mail-message {
-	margin-bottom: 0;
-}
-
 .mail-thread-more {
 	border-bottom: 1px #c0c0c0 dashed;
 	text-align: center;
@@ -163,6 +148,10 @@
 	top: 8px;
 	background: #fff;
 	padding: 0 4px;
+}
+
+.mail-messages > div > .mail-composer:first-child {
+	margin-top: 0;
 }
 
 .mail-followers .panel-title .icons i {
@@ -194,14 +183,6 @@
 }
 
 .mail-message .track-tags {
-  float: left;
-  margin-top: 3px;
-}
-
-.mail-message .track-tags:after {
-  content: '\b7';
-  font-weight: bold;
-  margin: 0 2px;
 }
 
 .mail-message .track-tags .label {

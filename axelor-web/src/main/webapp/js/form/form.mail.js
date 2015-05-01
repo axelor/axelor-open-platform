@@ -205,12 +205,12 @@ ui.directive('uiMailMessage', function () {
 						"</ul>" +
 					"</div>" +
 					"<div class='mail-message-footer'>" +
+						"<span ng-if='message.$numReplies' class='pull-right'>" +
+							"<a href='' ng-click='onReplies(message)'>{{formatNumReplies(message)}}</a>" +
+						"</span>" +
 						"<span>" +
 							"<a href='' ng-click='showUser(message.author)'>{{message.author.name}}</a> " +
 							"<span>{{formatEvent(message)}}</span>" +
-						"</span>" +
-						"<span ng-if='message.$numReplies' class='pull-right'>" +
-							"<a href='' ng-click='onReplies(message)'>{{formatNumReplies(message)}}</a>" +
 						"</span>" +
 					"</div>" +
 				"</div>" +
