@@ -386,7 +386,7 @@ ui.formItem('Button', {
 
 			function enable() {
 				scope.ajaxStop(function () {
-					setDisabled(false);
+					setDisabled(scope.isReadonly());
 				}, 100);
 			}
 
