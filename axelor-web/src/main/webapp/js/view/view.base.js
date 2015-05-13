@@ -403,7 +403,12 @@ angular.module('axelor.ui').directive('uiViewPane', function() {
 			});
 
 			$scope.viewTemplate = function (type) {
-				return 'partials/views/' + type + '.html';
+				var tname = "ui-template:" + type;
+				var template = type;
+				if (params.params && params.params[tname]) {
+					template = params.params[tname];
+				}
+				return 'partials/views/' + template + '.html';
 			};
 
 			$scope.switchTo((params.viewType || params.type));
