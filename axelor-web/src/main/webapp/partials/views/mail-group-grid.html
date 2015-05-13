@@ -12,7 +12,7 @@
   <div class="grid-cards">
     <div class="grid-card" ng-repeat="record in dataView.getItems()">
       <div class="grid-card-left">
-        <img class="img-polaroid" src="img/user.png">
+        <img class="img-polaroid" ng-src="{{getUrl(record)}}">
       </div>
       <div class="grid-card-right">
         <a href="" ng-click="onEdit(record)"><strong>{{record.name}}</strong></a>

@@ -51,9 +51,8 @@ public class MailGroupRepository extends JpaRepository<MailGroup> {
 		final MailFollowerRepository followers = Beans.get(MailFollowerRepository.class);
 		final MailFollower follower = followers.findOne(entity, AuthUtils.getUser());
 		
-		if (follower != null) {
-			json.put("$following", true);
-		}
+		json.put("$following", follower != null);
+		json.put("$image", entity.getImage() != null);
 
 		return json;
 	}
