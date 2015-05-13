@@ -2,7 +2,7 @@
 <auth>
 
   <group code="users" name="Users" />
-  <user code="demo" name="Demo User" group="users" />
+  <user code="demo" password="demo" name="Demo User" group="users" />
 
   <permission name="perm.auth.all" object="com.axelor.auth.db.*">
     <can create="true" read="true" write="true" remove="true" export="true"/>
