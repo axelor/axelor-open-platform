@@ -1,0 +1,27 @@
+<div class="mail-group-List" ng-controller="MailGroupListCtrl" ui-tab-gate>
+  <div class="navbar record-toolbar">
+    <div class="navbar-inner">
+      <div class="container">
+        <button ng-click="onNew()" class="btn btn-primary">Create</button>
+        <div ui-filter-box x-handler="this"></div>
+        <div ui-view-switcher class="pull-right"></div>
+        <div ui-record-pager class="pull-right"></div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-cards">
+    <div class="grid-card" ng-repeat="record in dataView.getItems()">
+      <div class="grid-card-left">
+        <img class="img-polaroid" src="img/user.png">
+      </div>
+      <div class="grid-card-right">
+        <a href="" ng-click="onEdit(record)"><strong>{{record.name}}</strong></a>
+        <div class="muted">{{record.description}}</div>
+        <div class="buttons">
+          <a class="btn btn-small" href="" ng-if="!record.$following" ng-click="onFollow(record)" x-translate>Subscribe</a>
+          <a class="btn btn-small btn-danger" href="" ng-if="record.$following" ng-click="onUnfollow(record)" x-translate>Unsubscribe</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

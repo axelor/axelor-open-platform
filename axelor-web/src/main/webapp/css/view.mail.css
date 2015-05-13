@@ -206,3 +206,56 @@
 .form-mail .fadeDim .mail-thread-more {
 	display: none;
 }
+
+.grid-cards {
+	padding: 12px;
+}
+
+.grid-cards .grid-card {
+	padding: 6px;
+	margin: 4px;
+	border: 1px solid #c0c0c0;
+	border-radius: 0;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+	width: calc(25% - 22px);
+	min-width: 300px;
+}
+
+@media (max-width: 768px) {
+	.grid-cards .grid-card {
+		width: calc(50% - 22px);
+	}
+}
+
+@media (max-width: 480px) {
+	.grid-cards .grid-card {
+		width: calc(100% - 22px);
+	}
+}
+
+.grid-cards .grid-card,
+.grid-cards .grid-card-left,
+.grid-cards .grid-card-right {
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+}
+
+.grid-cards .grid-card-left {
+	overflow: hidden;
+	border-collapse: separate;
+}
+
+.grid-cards .grid-card-left img {
+	width: 64px;
+}
+
+.grid-cards .grid-card-right {
+	width: calc(100% - 86px);
+	min-height: 120px;
+	margin-left: 4px;
+}
+
+.grid-cards .grid-card-right .buttons {
+	margin-top: 4px;
+}

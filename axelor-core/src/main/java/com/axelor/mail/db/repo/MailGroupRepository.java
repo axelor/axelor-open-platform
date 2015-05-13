@@ -17,7 +17,12 @@
  */
 package com.axelor.mail.db.repo;
 
+import java.util.Map;
+
+import com.axelor.auth.AuthUtils;
 import com.axelor.db.JpaRepository;
+import com.axelor.inject.Beans;
+import com.axelor.mail.db.MailFollower;
 import com.axelor.mail.db.MailGroup;
 
 public class MailGroupRepository extends JpaRepository<MailGroup> {
@@ -30,5 +35,26 @@ public class MailGroupRepository extends JpaRepository<MailGroup> {
 		return all().filter("self.name = :name")
 				.bind("name", name)
 				.fetchOne();
+	}
+	
+	@Override
+	public Map<String, Object> populate(Map<String, Object> json) {
+		if (json == null || json.get("id") == null) {
+			return json;
+		}
+
+		final MailGroup entity = find((Long) json.get("id"));
+		if (entity == null) {
+			return json;
+		}
+
+		final MailFollowerRepository followers = Beans.get(MailFollowerRepository.class);
+		final MailFollower follower = followers.findOne(entity, AuthUtils.getUser());
+		
+		if (follower != null) {
+			json.put("$following", true);
+		}
+
+		return json;
 	}
 }

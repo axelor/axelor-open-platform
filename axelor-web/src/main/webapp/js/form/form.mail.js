@@ -714,4 +714,48 @@ ui.formWidget('PanelMail', {
 	template: "<div class='form-mail row-fluid' ng-show='record.id > 0 || folder' ui-transclude></div>"
 });
 
+ui.controller("MailGroupListCtrl", MailGroupListCtrl);
+MailGroupListCtrl.$inject = ['$scope', '$element'];
+function MailGroupListCtrl($scope, $element) {
+	GridViewCtrl.call(this, $scope, $element);
+	
+	$scope.onEdit = function(record) {
+		$scope.switchTo('form', function (formScope) {
+			if (formScope.canEdit()) {
+				formScope.edit(record);
+			}
+		});
+	};
+	
+	$scope.onFollow = function (record) {
+
+		var ds = $scope._dataSource;
+		var promise = ds.messageFollow(record.id);
+
+		promise.success(function (res) {
+			record.$following = true;
+		});
+	};
+
+	$scope.onUnfollow = function (record) {
+
+		axelor.dialogs.confirm(_t('Are you sure to unfollow this group?'),
+		function (confirmed) {
+			if (confirmed) {
+				doUnfollow(record);
+			}
+		});
+	}
+
+	function doUnfollow(record) {
+
+		var ds = $scope._dataSource;
+		var promise = ds.messageUnfollow(record.id);
+
+		promise.success(function (res) {
+			record.$following = false;
+		});
+	};
+}
+
 })(this);
