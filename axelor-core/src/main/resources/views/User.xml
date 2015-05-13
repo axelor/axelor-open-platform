@@ -49,6 +49,7 @@
     onNew="com.axelor.auth.AuthService:preferences"
     onSave="com.axelor.auth.AuthService:validate">
     <panel title="User preferences" itemSpan="12">
+      <field name="image" showTitle="false" />
       <field name="email" widget="Email"/>
       <field name="language"/>
       <field name="change" title="Change password?" widget="boolean"/>

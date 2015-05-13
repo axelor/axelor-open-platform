@@ -263,6 +263,9 @@ public class AuthService {
 			values.put("email", user.getEmail());
 			values.put("language", user.getLanguage());
 			values.put("homeAction", user.getHomeAction());
+			if (user.getImage() != null) {
+				values.put("image", new String(user.getImage()));
+			}
 		}
 
 		if (action != null) {

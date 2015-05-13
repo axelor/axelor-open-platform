@@ -14,6 +14,7 @@
     <string name="name" required="true" unique="true" min="2"/>
     <string name="password" password="true" required="true" min="4"/>
 
+    <binary name="image" title="Photo" help="Max size 4MB." image="true"/>
     <string name="email" unique="true"/>
     <string name="language" selection="select.language"/>
     <string name="homeAction"/>
