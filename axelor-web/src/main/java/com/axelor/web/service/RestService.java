@@ -49,6 +49,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
+import javax.xml.bind.DatatypeConverter;
 
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
@@ -331,7 +332,8 @@ public class RestService extends ResourceService {
 	@SuppressWarnings("all")
 	public javax.ws.rs.core.Response download(
 			@PathParam("id") Long id,
-			@PathParam("field") String field) throws IOException {
+			@PathParam("field") String field,
+			@QueryParam("image") Boolean isImage) throws IOException {
 
 		boolean isAttachment = MetaFile.class.getName().equals(getModel());
 
@@ -359,6 +361,18 @@ public class RestService extends ResourceService {
 
 		String fileName = getModel() + "_" + field;
 		Object data = mapper.get(bean, field);
+
+		if (isImage == Boolean.TRUE && data != null) {
+			if (data instanceof byte[]) {
+				String base64 = new String((byte[]) data);
+				try {
+					base64 = base64.substring(base64.indexOf(";base64,") + 8);
+					data = DatatypeConverter.parseBase64Binary(base64);
+				} catch (Exception e) {
+				}
+			}
+			return javax.ws.rs.core.Response.ok(data).build();
+		}
 
 		fileName = fileName.replaceAll("\\s", "") + "_" + id;
 		fileName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fileName);
