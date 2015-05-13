@@ -24,6 +24,7 @@ import java.io.Writer;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -288,6 +289,7 @@ public class Resource<T extends Model> {
 		return query;
 	}
 
+	@SuppressWarnings("all")
 	public Response search(Request request) {
 
 		security.get().check(JpaSecurity.CAN_READ, model);
@@ -321,23 +323,26 @@ public class Resource<T extends Model> {
 		}
 
 		LOG.debug("Records found: {}", data.size());
+		
+		final Repository repo = JpaRepository.of(model);
+		final List<Object> jsonData = new ArrayList<>();
 
-		data = Lists.transform(data, new Function<Object, Object>() {
-			@Override
-			public Object apply(Object input) {
-				if (input instanceof Model) {
-					return toMap((Model) input);
-				}
-				return input;
-			};
-		});
+		for (Object item : data) {
+			if (item instanceof Model) {
+				item = toMap(item);
+			}
+			if (item instanceof Map) {
+				item = repo.populate((Map) item);
+			}
+			jsonData.add(item);
+		}
 
 		try {
 			// check for children (used by tree view)
-			doChildCount(request, data);
+			doChildCount(request, jsonData);
 		} catch (NullPointerException | ClassCastException e) {};
 
-		response.setData(data);
+		response.setData(jsonData);
 		response.setOffset(offset);
 		response.setStatus(Response.STATUS_SUCCESS);
 

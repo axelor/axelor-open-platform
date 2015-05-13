@@ -112,4 +112,13 @@ public interface Repository<T extends Model> {
 	 *
 	 */
 	void flush();
+	
+	/**
+	 * Populate the given json map with additional data.
+	 * 
+	 * @param json
+	 *            the json map to populate
+	 * @return the json map itself
+	 */
+	Map<String, Object> populate(Map<String, Object> json);
 }
