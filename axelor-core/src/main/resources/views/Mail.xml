@@ -88,6 +88,7 @@
   <action-view name="mail.groups" model="com.axelor.mail.db.MailGroup" title="Groups">
     <view name="mail-group-grid" type="grid" />
     <view name="mail-group-form" type="form" />
+    <view-param name="ui-template:grid" value="mail-group-grid"/>
   </action-view>
 
   <!-- menu -->
