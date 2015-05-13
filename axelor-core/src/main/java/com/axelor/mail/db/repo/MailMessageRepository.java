@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
@@ -39,6 +40,7 @@ import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.rpc.Resource;
 import com.google.inject.persist.Transactional;
+import com.ibm.icu.util.Calendar;
 
 public class MailMessageRepository extends JpaRepository<MailMessage> {
 
@@ -178,6 +180,13 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 			details.put("$canDelete", message.getCreatedBy() == AuthUtils.getUser());
 		}
 
+		String avatar = "img/user.png";
+		User author = message.getAuthor();
+		if (author != null && author.getImage() != null) {
+			avatar = "ws/rest/" + User.class.getName() + "/" + author.getId() + "/image/download?image=true&t=" + Calendar.getInstance().getTimeInMillis();
+		}
+
+		details.put("$avatar", avatar);
 		details.put("$files", files);
 		details.put("$eventType", eventType);
 		details.put("$eventText", eventText);

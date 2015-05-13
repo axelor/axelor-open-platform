@@ -167,8 +167,8 @@ ui.directive('uiMailMessage', function () {
 			"<div class='fade'>" +
 				"<div class='mail-message alert' ng-class='{ \"alert-info\": !message.parent || record.id > 0}'>" +
 				"<div class='mail-message-left'>" +
-					"<a href=''>" +
-						"<img ng-src=''>" +
+					"<a href='' title='{{message.createdBy.name}}' ng-click='showUser(message.author)'>" +
+						"<img ng-src='{{message.$avatar}}' width='32px'>" +
 					"</a>" +
 				"</div>" +
 				"<div class='mail-message-center'>" +
@@ -673,35 +673,19 @@ ui.formWidget('PanelMail', {
 	scope: true,
 	controller: ['$scope', '$timeout', 'ViewService', 'MessageService', function ($scope, $timeout, ViewService, MessageService) {
 
-		var userEditor = null;
-
-		$scope.editorCanSave = false;
-		$scope._viewParams = {
-			model: 'com.axelor.auth.db.User',
-			viewType: 'form',
-			views: [{type: 'form', type: 'grid'}]
-		};
-
 		$scope.getDomain = function () {
 			return {};
 		};
 
-		$scope.showUser = function (user) {
-
-			if (!user || !user.id) {
+		$scope.showUser = function (author) {
+			if (!author) {
 				return;
 			}
-
-			if (userEditor == null) {
-				userEditor = ViewService.compile('<div ui-editor-popup></div>')($scope);
-			}
-
-			var popup = userEditor.scope();
-			popup.isEditable = function () {
-				return false;
-			};
-			popup.show(user);
-		};
+			$scope.openTabByName("action-auth-users", {
+				mode: "edit",
+				state: author.id
+			});
+		}
 
 		var folder = undefined;
 

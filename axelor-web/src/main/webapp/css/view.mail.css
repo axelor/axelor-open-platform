@@ -69,7 +69,7 @@
 .mail-thread .mail-message {
 	position: relative;
 	margin: 8px 0 0 0;
-	padding: 8px 10px;
+	padding: 4px 8px;
 	border-radius: 0;
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
 }
@@ -81,7 +81,11 @@
 	left: 0;
 	width: 40px;
 	overflow: hidden;
-	display: none;
+}
+
+.mail-thread .mail-message-left img {
+	margin: 4px;
+	border-radius: 4px;
 }
 
 .mail-thread .mail-message-subject {
@@ -90,8 +94,7 @@
 
 .mail-thread .mail-message-icons {
 	float: right;
-	margin-top: -4px;
-	margin-right: -8px;
+	margin-right: -4px;
 }
 
 .mail-thread .mail-message-icons i {
@@ -116,7 +119,7 @@
 
 .mail-thread .mail-message-center {
 	position: relative;
-	/*margin-left: 40px;*/
+	margin-left: 40px;
 }
 
 .mail-thread .mail-message-footer {
