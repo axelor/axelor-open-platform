@@ -204,7 +204,7 @@ public class MailController extends JpaSupport {
 			Map<String, Object> details = messages.details(message);
 			long replies = messages.all().filter("self.root.id = ?", message.getId()).count();
 
-			details.put("subject", details.get("relatedName"));
+			details.put("$name", details.get("relatedName"));
 			details.put("$thread", true);
 			details.put("$numReplies", replies);
 			all.add(details);

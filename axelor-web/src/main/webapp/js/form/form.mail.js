@@ -195,7 +195,11 @@ ui.directive('uiMailMessage', function () {
 				            "</ul>" +
 						"</div>" +
 					"</div>" +
-					"<div class='mail-message-subject'>{{message.subject}}</div>" +
+					"<div class='mail-message-subject' ng-if='message.$name'>" +
+						"<a ng-if='message.relatedId' href='#ds/form::{{message.relatedModel}}/edit/{{message.relatedId}}'>{{message.$name}}</a>" +
+						"<span ng-if='!message.relatedId'>{{message.$name}}</span>" +
+						"<span ng-if='message.subject'> : {{message.subject}}</span>" +
+					"</div>" +
 					"<div class='mail-message-body' ui-bind-template x-text='message.body'></div>" +
 					"<div class='mail-message-files' ng-show='message.$files.length'>" +
 						"<ul class='inline'>" +
@@ -681,7 +685,7 @@ ui.formWidget('PanelMail', {
 			if (!author) {
 				return;
 			}
-			$scope.openTabByName("action-auth-users", {
+			$scope.openTabByName("form:user-form", {
 				mode: "edit",
 				state: author.id
 			});
