@@ -25,12 +25,15 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.common.ClassUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
+import com.axelor.meta.loader.XMLViews;
+import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.rpc.Response;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
@@ -96,7 +99,6 @@ public class ActionGroup extends ActionIndex {
 	}
 
 	private Action findAction(String name) {
-
 		if (name == null || "".equals(name.trim())) {
 			return null;
 		}
@@ -104,35 +106,49 @@ public class ActionGroup extends ActionIndex {
 		String actionName = name.trim();
 
 		if (actionName.contains(":")) {
-
-			Action action;
-			String[] parts = name.split("\\:", 2);
-
+			final String[] parts = name.split("\\:", 3);
 			if (parts[0].matches("grid|form|tree|portal|calendar|chart|search|html")) {
+				ActionView actionView = new ActionView();
 				ActionView.View view = new ActionView.View();
+				AbstractView xml = XMLViews.findView(null, parts[1], parts[0]);
+
 				view.setType(parts[0]);
 				view.setName(parts[1]);
-				action = new ActionView();
-				((ActionView) action).setViews(ImmutableList.of(view));
-			} else {
-				ActionMethod.Call method = new ActionMethod.Call();
-				method.setController(parts[0]);
-				method.setMethod(parts[1]);
-				action = new ActionMethod();
-				((ActionMethod) action).setCall(method);
+
+				actionView.setViews(ImmutableList.of(view));
+
+				if (parts.length == 3) {
+					Class<?> model = ClassUtils.findClass(parts[2]);
+					actionView.setModel(model.getName());
+					xml = XMLViews.findView(model.getName(), parts[1], parts[0]);
+				}
+				if (xml != null) {
+					actionView.setTitle(xml.getTitle());
+					if (actionView.getModel() == null) {
+						actionView.setModel(xml.getModel());
+					}
+				}
+				return actionView;
+			}
+			ActionMethod.Call method = new ActionMethod.Call();
+			method.setController(parts[0]);
+			method.setMethod(parts[1]);
+			ActionMethod action = new ActionMethod();
+			action.setCall(method);
+			return action;
+		}
+
+		if (actionName.indexOf("[") > -1 && actionName.endsWith("]")) {
+			String idx = actionName.substring(actionName.lastIndexOf('[') + 1, actionName.lastIndexOf(']'));
+			actionName = actionName.substring(0, actionName.lastIndexOf('['));
+			int index = Integer.parseInt(idx);
+			log.debug("continue action-validate: {}", actionName);
+			log.debug("continue at: {}", index);
+			Action action = MetaStore.getAction(actionName);
+			if (action instanceof ActionIndex) {
+				((ActionIndex) action).setIndex(index);
 			}
 			return action;
-		} else if (actionName.indexOf("[") > -1 && actionName.endsWith("]")) {
-				String idx = actionName.substring(actionName.lastIndexOf('[') + 1, actionName.lastIndexOf(']'));
-				actionName = actionName.substring(0, actionName.lastIndexOf('['));
-				int index = Integer.parseInt(idx);
-				log.debug("continue action-validate: {}", actionName);
-				log.debug("continue at: {}", index);
-				Action action = MetaStore.getAction(actionName);
-				if (action instanceof ActionIndex) {
-					((ActionIndex) action).setIndex(index);
-				}
-				return action;
 		}
 
 		return MetaStore.getAction(actionName);
