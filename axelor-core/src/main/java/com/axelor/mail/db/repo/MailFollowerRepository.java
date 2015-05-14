@@ -98,7 +98,10 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 				menuRepo.remove(menu);
 			}
 			if (action != null) {
-				actionRepo.remove(action);
+				// check if action is referenced by other users
+				if (menuRepo.all().filter("self.action.name = ?", actionName).count() == 0) {
+					actionRepo.remove(action);
+				}
 			}
 			return;
 		}
