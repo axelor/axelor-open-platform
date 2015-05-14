@@ -511,7 +511,8 @@ public class Resource<T extends Model> {
 		security.get().check(JpaSecurity.CAN_READ, model, id);
 
 		final Response response = new Response();
-		final Model entity = JPA.find(model, id);
+		final Repository<?> repository = JpaRepository.of(model);
+		final Model entity = repository.find(id);
 
 		response.setStatus(Response.STATUS_SUCCESS);
 		if (entity == null) {
@@ -554,7 +555,7 @@ public class Resource<T extends Model> {
 			}
 		}
 
-		data.add(values);
+		data.add(repository.populate(values));
 		response.setData(data);
 		return response;
 	}
@@ -608,12 +609,12 @@ public class Resource<T extends Model> {
 				bean = repository.save(bean);
 			}
 
-			data.add(bean);
-
 			// if it's a translation object, invalidate cache
 			if (bean instanceof MetaTranslation) {
 				I18nBundle.invalidate();
 			}
+
+			data.add(repository.populate(toMap(bean)));
 		}
 
 		response.setData(data);
