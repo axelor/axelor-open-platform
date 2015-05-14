@@ -157,6 +157,10 @@ public class MailController extends JpaSupport {
 		final MailGroupRepository groups = Beans.get(MailGroupRepository.class);
 		final MailGroup group = request.getContext().asType(MailGroup.class);
 
+		if (group == null || group.getId() == null) {
+			return;
+		}
+
 		final TypedQuery<User> query = getEntityManager().createQuery(SQL_SUBSCRIBERS, User.class);
 		query.setParameter("id", group.getId());
 		query.setParameter("model", MailGroup.class.getName());
