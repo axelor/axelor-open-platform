@@ -45,23 +45,23 @@
     </panel-mail>
   </form>
 
-
   <grid name="mail-group-grid" title="Groups" model="com.axelor.mail.db.MailGroup">
     <field name="name"/>
     <field name="description"/>
   </grid>
 
-  <form name="mail-group-from" title="Group" model="com.axelor.mail.db.MailGroup">
-    <panel title="Overview">
+  <form name="mail-group-from" title="Group" model="com.axelor.mail.db.MailGroup"
+    onSave="com.axelor.mail.web.MailController:autoSubscribe">
+    <panel title="Overview" css="fix-child-3">
       <panel colSpan="3">
-        <field name="image" widget="Image" showTitle="false" colSpan="12"/>
+        <field name="image" showTitle="false" colSpan="12" widget="Image"/>
       </panel>
-      <panel colSpan="9">
+      <panel colSpan="9" itemSpan="12">
         <field name="name"/>
+        <field name="description" showTitle="false" height="4"/>
+        <field name="groups" widget="TagSelect"/>
+        <field name="users" widget="TagSelect"/>
       </panel>
-    </panel>
-    <panel title="Description">
-        <field name="description" colSpan="12" showTitle="false"/>
     </panel>
     <panel-mail>
       <mail-messages limit="5"/>

@@ -56,7 +56,9 @@
     <string name="description" multiline="true" />
     <binary name="image" title="Photo" />
     <many-to-many name="groups" ref="com.axelor.auth.db.Group"
-      help="Users of these groups are automatically added as followers of this mail group." />
+      title="Authorized groups" />
+    <many-to-many name="users" ref="com.axelor.auth.db.User"
+      title="Authorized users" />
   </entity>
 
 </domain-models>

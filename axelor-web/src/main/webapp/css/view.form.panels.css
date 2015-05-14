@@ -462,3 +462,19 @@
 		width: 48%;
 	}
 }
+
+/* fix-child-3 fixes width of span3 child */
+.panel.fix-child-3 > .panel-body > .panel-layout > .row-fluid > .span3 {
+	width: 140px;
+}
+
+.panel.fix-child-3 > .panel-body > .panel-layout > .row-fluid > .span9 {
+	width: calc(100% - 160px);
+}
+
+@media (max-width: 767px) {
+	.panel.fix-child-3 > .panel-body > .panel-layout > .row-fluid > .span9 {
+		margin-left: 0;
+		width: 100%;
+	}
+}

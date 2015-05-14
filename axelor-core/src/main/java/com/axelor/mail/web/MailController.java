@@ -25,10 +25,15 @@ import javax.inject.Inject;
 import javax.persistence.TypedQuery;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.db.JpaSupport;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
+import com.axelor.inject.Beans;
+import com.axelor.mail.db.MailGroup;
 import com.axelor.mail.db.MailMessage;
+import com.axelor.mail.db.repo.MailFollowerRepository;
+import com.axelor.mail.db.repo.MailGroupRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
@@ -59,6 +64,12 @@ public class MailController extends JpaSupport {
 			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
 			+ "((g.user.id = :uid AND g.isRead = true)) "
 			+ "ORDER BY m.createdOn DESC";
+
+	private static final String SQL_SUBSCRIBERS = ""
+			+ "SELECT DISTINCT(u) FROM User u LEFT JOIN u.group g WHERE "
+			+ "(u.id NOT IN (SELECT fu.id FROM MailFollower f LEFT JOIN f.user fu WHERE f.relatedId = :id AND f.relatedModel = :model)) AND "
+			+ "((u.id IN (SELECT mu.id FROM MailGroup m LEFT JOIN m.users mu WHERE m.id = :id)) OR "
+			+ "	(g.id IN (SELECT mg.id FROM MailGroup m LEFT JOIN m.groups mg WHERE m.id = :id)))";
 
 	@Inject
 	private MailMessageRepository messages;
@@ -119,18 +130,6 @@ public class MailController extends JpaSupport {
 		response.setTotal(count);
 	}
 
-	private List<MailMessage> findChildren(MailMessage message) {
-		final List<MailMessage> all = new ArrayList<>();
-		if (message.getReplies() == null) {
-			return all;
-		}
-		for (MailMessage msg : message.getReplies()) {
-			all.add(msg);
-			all.addAll(findChildren(msg));
-		}
-		return all;
-	}
-
 	public void replies(ActionRequest request, ActionResponse response) {
 
 		if (request.getRecords() == null ||
@@ -152,7 +151,38 @@ public class MailController extends JpaSupport {
 		response.setStatus(ActionResponse.STATUS_SUCCESS);
 	}
 
-	public long countUnread() {
+	public void autoSubscribe(ActionRequest request, ActionResponse response) {
+
+		final MailFollowerRepository followers = Beans.get(MailFollowerRepository.class);
+		final MailGroupRepository groups = Beans.get(MailGroupRepository.class);
+		final MailGroup group = request.getContext().asType(MailGroup.class);
+
+		final TypedQuery<User> query = getEntityManager().createQuery(SQL_SUBSCRIBERS, User.class);
+		query.setParameter("id", group.getId());
+		query.setParameter("model", MailGroup.class.getName());
+
+		final List<User> users = query.getResultList();
+		final MailGroup entity = groups.find(group.getId());
+		for (User user : users) {
+			followers.follow(entity, user);
+		}
+
+		response.setStatus(ActionResponse.STATUS_SUCCESS);
+	}
+
+	private List<MailMessage> findChildren(MailMessage message) {
+		final List<MailMessage> all = new ArrayList<>();
+		if (message.getReplies() == null) {
+			return all;
+		}
+		for (MailMessage msg : message.getReplies()) {
+			all.add(msg);
+			all.addAll(findChildren(msg));
+		}
+		return all;
+	}
+
+	private long countUnread() {
 		final String SQL_INBOX = ""
 				+ "SELECT COUNT(m) FROM MailMessage m LEFT JOIN m.flags g "
 				+ "WHERE (m.parent IS NULL) AND "
@@ -171,7 +201,7 @@ public class MailController extends JpaSupport {
 		return 0;
 	}
 
-	public Long count(String queryString) {
+	private Long count(String queryString) {
 
 		final String countString = queryString
 				.replace("DISTINCT(m)", "COUNT(DISTINCT m)")
@@ -188,7 +218,7 @@ public class MailController extends JpaSupport {
 		return 0L;
 	}
 
-	public List<Object> find(String queryString, int offset, int limit) {
+	private List<Object> find(String queryString, int offset, int limit) {
 
 		final TypedQuery<MailMessage> query = getEntityManager().createQuery(queryString, MailMessage.class);
 
