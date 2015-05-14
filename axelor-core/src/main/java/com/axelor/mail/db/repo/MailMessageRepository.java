@@ -40,7 +40,6 @@ import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.rpc.Resource;
 import com.google.inject.persist.Transactional;
-import com.ibm.icu.util.Calendar;
 
 public class MailMessageRepository extends JpaRepository<MailMessage> {
 
@@ -183,7 +182,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		String avatar = "img/user.png";
 		User author = message.getAuthor();
 		if (author != null && author.getImage() != null) {
-			avatar = "ws/rest/" + User.class.getName() + "/" + author.getId() + "/image/download?image=true&t=" + Calendar.getInstance().getTimeInMillis();
+			avatar = "ws/rest/" + User.class.getName() + "/" + author.getId() + "/image/download?image=true&v=" + author.getVersion();
 		}
 
 		details.put("$avatar", avatar);

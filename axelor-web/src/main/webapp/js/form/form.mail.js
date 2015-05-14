@@ -721,12 +721,9 @@ function MailGroupListCtrl($scope, $element) {
 
 	$scope.getUrl = function (record) {
 		if (!record || !record.id) return null;
-		if (record.$image) {
-			return "ws/rest/com.axelor.mail.db.MailGroup/" + record.id + "/image/download?image=true";
-		}
-		return null;
+		return "ws/rest/com.axelor.mail.db.MailGroup/" + record.id + "/image/download?image=true&v=" + record.version;
 	}
-	
+
 	$scope.onEdit = function(record) {
 		$scope.switchTo('form', function (formScope) {
 			if (formScope.canEdit()) {
