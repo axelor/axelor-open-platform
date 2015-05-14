@@ -115,7 +115,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 			action.setXml(""
 					+ "<action-view title='"+ entity.getName() + "' name='" + actionName + "' model='"+ MailGroup.class.getName() +"'>\n"
 					+ "  <view type='form'/>\n"
-					+ "  <view-param name='show-toolbar' value='false'/>\n"
+					+ "  <view-param name='ui-template:form' value='mail-group-form'/>\n"
 					+ "  <context name='_showRecord' expr='eval: "+ entity.getId() +"'/>\n"
 					+ "</action-view>");
 		}
