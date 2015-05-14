@@ -21,9 +21,11 @@ import static com.axelor.common.StringUtils.isBlank;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.Transaction;
 
@@ -157,6 +159,7 @@ final class AuditTracker {
 
 		final StringBuilder builder = new StringBuilder();
 		final Map<String, String> tags = new LinkedHashMap<>();
+		final Set<String> tagFields = new HashSet<>();
 
 		String msg = previousState == null ?
 				I18n.get("Record created") :
@@ -169,16 +172,6 @@ final class AuditTracker {
 				if (isBlank(tm.tag()) && scriptHelper.test(tm.condition())) {
 					msg = tm.message();
 					break;
-				}
-			}
-		}
-
-		// find matched tags
-		for (TrackMessage tm : track.messages()) {
-			if (hasEvent(tm, TrackEvent.ALWAYS) ||
-				hasEvent(tm, previousState == null ? TrackEvent.CREATE: TrackEvent.UPDATE)) {
-				if (!isBlank(tm.tag()) && scriptHelper.test(tm.condition())) {
-					tags.put(tm.message(), tm.tag());
 				}
 			}
 		}
@@ -222,6 +215,8 @@ final class AuditTracker {
 				}
 			}
 
+			tagFields.add(name);
+
 			builder
 			.append("<li>")
 			.append("<strong>").append(title).append("</strong>: ").append(dispayValue)
@@ -230,6 +225,22 @@ final class AuditTracker {
 
 		if (track.fields().length > 0) {
 			builder.append("</ul>");
+		}
+
+		// find matched tags
+		for (TrackMessage tm : track.messages()) {
+			boolean canTag = tm.fields().length == 0;
+			for (String name : tm.fields()) {
+				canTag = tagFields.contains(name);
+				if (canTag) { break; }
+			}
+			if (!canTag) { continue; }
+			if (hasEvent(tm, TrackEvent.ALWAYS) ||
+				hasEvent(tm, previousState == null ? TrackEvent.CREATE: TrackEvent.UPDATE)) {
+				if (!isBlank(tm.tag()) && scriptHelper.test(tm.condition())) {
+					tags.put(tm.message(), tm.tag());
+				}
+			}
 		}
 
 		builder.append("<div class='track-tags'>");

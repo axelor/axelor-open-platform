@@ -61,4 +61,10 @@ public @interface TrackMessage {
 	 *
 	 */
 	String tag() default "";
+
+	/**
+	 * Only use the message if these fields are changed.
+	 *
+	 */
+	String[] fields() default "";
 }

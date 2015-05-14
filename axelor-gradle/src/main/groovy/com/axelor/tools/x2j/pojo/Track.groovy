@@ -44,6 +44,7 @@ class Track {
 		String tag = node.'@tag'
 		String message = node.text()
 		String condition = node.'@if'
+		String fields = node.'@fields'
 
 		def annon = new Annotation(this.entity, "com.axelor.db.annotations.TrackMessage")
 			.add("message", message)
@@ -53,6 +54,11 @@ class Track {
 		if (on) {
 			this.entity.importType("com.axelor.db.annotations.TrackEvent");
 			annon.add("on", "TrackEvent.${on}", false)
+		}
+
+		if (fields) {
+			List<String> names = fields.trim().split(/\s*,\s*/) as List;
+			annon.add("fields", names, true, true);
 		}
 
 		return annon

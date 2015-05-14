@@ -622,7 +622,7 @@
       <xsd:extension base="xsd:string">
         <xsd:attribute name="if" type="xsd:string" use="required">
           <xsd:annotation>
-            <xsd:documentation>Only use  this message if given condition is true (JEL expression)</xsd:documentation>
+            <xsd:documentation>Only use this message if given condition is true (JEL expression)</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="on" type="dm:TrackEvent" default="ALWAYS">
@@ -633,6 +633,11 @@
         <xsd:attribute name="tag" type="dm:TrackTag">
           <xsd:annotation>
             <xsd:documentation>Specify tag style, if this message is a tag.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="fields" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Only use this message as tag if any of the given field changed.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>

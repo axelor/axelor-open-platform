@@ -96,6 +96,8 @@
       <field name="phone" if="!email" on="UPDATE" />
       <message if="true" on="CREATE">Contact created.</message>
       <message if="firstName == 'admin'" on="UPDATE" tag="important">Admin</message>
+      <message if="some == 'thing'" tag="success" fields="email,phone">Success</message>
+      <message if="!some" tag="error" fields="email">Failed</message>
     </track>
   </entity>
 
