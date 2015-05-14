@@ -326,6 +326,8 @@ public class RestService extends ResourceService {
 		return response;
 	}
 
+	private static final String BLANK_IMAGE = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
 	@GET
 	@Path("{id}/{field}/download")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
@@ -362,14 +364,15 @@ public class RestService extends ResourceService {
 		String fileName = getModel() + "_" + field;
 		Object data = mapper.get(bean, field);
 
-		if (isImage == Boolean.TRUE && data != null) {
+		if (isImage == Boolean.TRUE) {
+			String base64 = BLANK_IMAGE;
 			if (data instanceof byte[]) {
-				String base64 = new String((byte[]) data);
-				try {
-					base64 = base64.substring(base64.indexOf(";base64,") + 8);
-					data = DatatypeConverter.parseBase64Binary(base64);
-				} catch (Exception e) {
-				}
+				base64 = new String((byte[]) data);
+			}
+			try {
+				base64 = base64.substring(base64.indexOf(";base64,") + 8);
+				data = DatatypeConverter.parseBase64Binary(base64);
+			} catch (Exception e) {
 			}
 			return javax.ws.rs.core.Response.ok(data).build();
 		}
@@ -380,6 +383,7 @@ public class RestService extends ResourceService {
 		if (data == null) {
 			return javax.ws.rs.core.Response.noContent().build();
 		}
+
 		return javax.ws.rs.core.Response
 				.ok(data)
 				.header("Content-Disposition", "attachment; filename=" + fileName)

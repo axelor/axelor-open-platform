@@ -873,7 +873,7 @@ public class Resource<T extends Model> {
 			String name = prop.getName();
 			PropertyType type = prop.getType();
 
-			if (type == PropertyType.BINARY && !name.toLowerCase().matches(".*(image|photo|picture).*")) {
+			if (type == PropertyType.BINARY) {
 				continue;
 			}
 

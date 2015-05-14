@@ -29,7 +29,8 @@ ui.formInput('ImageLink', {
 	controller: ['$scope', '$element', '$interpolate', function($scope, $element, $interpolate) {
 
 		$scope.parseText = function(text) {
-			if (!text|| !text.match(/{{.*?}}/)) {
+			if (!text) return BLANK;
+			if (!text.match(/{{.*?}}/)) {
 				return text;
 			}
 			return $interpolate(text)($scope.record);
@@ -66,21 +67,15 @@ ui.formInput('ImageLink', {
 	link_readonly: function(scope, element, attrs, model) {
 
 		var image = element.children('img:first');
-		var rendered = false;
 
 		scope.$render_readonly = function() {
-			var content = model.$viewValue || null;
-			var x = scope.parseText(content) || BLANK;
-			if (!content) {
-				image.get(0).src = BLANK;
-			}
-			image.get(0).src = scope.parseText(content) || BLANK;
+			image.get(0).src = scope.parseText(model.$viewValue) || BLANK;
 		};
 
-		scope.$watch('isReadonly()', function(readonly, old) {
-			if (rendered && (!readonly || readonly === old)) return;
-			rendered = true;
-			scope.$render_readonly();
+		scope.$watch("record.id", function(id, old) {
+			if (scope.isReadonly()) {
+				scope.$render_readonly();
+			}
 		});
 	},
 	template_editable: '<input type="text">',
@@ -107,8 +102,12 @@ ui.formInput('Image', 'ImageLink', {
 		};
 
 		scope.getLink = function (value) {
-			if (!value || isBinary) {
-				return value || BLANK;
+			var record = scope.record || {};
+			var model = scope._model;
+			if (!record.id || value === null) return value || BLANK;
+			if (isBinary) {
+				if (value) return value;
+				return "ws/rest/" + model + "/" + record.id + "/" + field.name + "/download?image=true&v=" + record.version;
 			}
 			return "ws/rest/" + META_FILE + "/" + (value.id || value) + "/content/download";
 		};
@@ -229,6 +228,12 @@ ui.formInput('Image', 'ImageLink', {
 		scope.$render_editable = function() {
 			image.get(0).src = scope.getLink(model.$viewValue);
 		};
+
+		scope.$watch("record.id", function(id, old) {
+			if (!scope.isReadonly()) {
+				scope.$render_editable();
+			}
+		});
 	},
 	template_editable:
 	'<div ng-style="styles[0]" class="image-wrapper">' +
