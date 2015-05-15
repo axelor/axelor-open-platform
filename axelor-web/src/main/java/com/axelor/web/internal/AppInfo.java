@@ -81,7 +81,7 @@ public final class AppInfo {
 		map.put("application.help", settings.get("application.help"));
 		map.put("application.mode", settings.get("application.mode"));
 
-		map.put("file.upload.size", settings.get("file.upload.size"));
+		map.put("file.upload.size", settings.get("file.upload.size", "5"));
 
 		try {
 			map.put("application.sdk", VersionUtils.getVersion().version);
