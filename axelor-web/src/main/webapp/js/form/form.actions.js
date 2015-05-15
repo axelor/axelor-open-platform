@@ -601,6 +601,8 @@ ActionHandler.prototype = {
 				containers = formElement.parent().add(formElement);
 			} else if (formElement.parent().is('[ui-slick-editors],.slick-cell')) {
 				containers = formElement.parent().parent().add(formElement);
+			} else if (formElement.parent().is('[ui-panel-editor')) {
+				containers = formElement.parents('[ui-form]:first').add(formElement);
 			} else {
 				containers = formElement.parents('.form-view:first')
 										.find('.record-toolbar:first')
