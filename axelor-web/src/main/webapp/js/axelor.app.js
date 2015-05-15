@@ -326,6 +326,7 @@
 				sdk: settings['application.sdk'],
 				user: settings['user.name'],
 				userId: settings['user.id'],
+				userImage: settings['user.image'],
 				login: settings['user.login'],
 				homeAction: settings['user.action'],
 				navigator: settings['user.navigator'],

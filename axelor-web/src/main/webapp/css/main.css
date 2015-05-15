@@ -712,6 +712,31 @@ img.prefix-icon {
 .fa, [class^=fa-] {
 	font-size: 14px;
 }
+
+header .navbar .dropdown {
+	font-size: 12px;
+}
+
+header .navbar .dropdown .devider {
+	margin: 4px 1px;
+}
+
+.nav-link-user > img {
+	width: 20px;
+	height: 20px;
+	margin-bottom: 1px;
+	background-color: white;
+}
+
+.nav-link-user-name,
+.nav-link-user-sub {
+	display: block;
+}
+.nav-link-user-sub {
+	font-size: 10px;
+	color: #a0a0a0;
+}
+
 .user-preferences form {
 	padding: 0;
 }

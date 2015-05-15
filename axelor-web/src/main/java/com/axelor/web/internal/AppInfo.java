@@ -63,6 +63,12 @@ public final class AppInfo {
 			map.put("user.login", user.getCode());
 			map.put("user.nameField", nameField.getName());
 
+			if (user.getImage() != null) {
+				map.put("user.image", "ws/rest/" + User.class.getName() + "/" + user.getId() + "/image/download?image=true&v=" + user.getVersion());
+			} else {
+				map.put("user.image", "img/user.png");
+			}
+
 			if (group != null) {
 				map.put("user.navigator", group.getNavigation());
 				map.put("user.technical", group.getTechnicalStaff());
