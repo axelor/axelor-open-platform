@@ -17,9 +17,6 @@
  */
 package com.axelor.web;
 
-import javax.persistence.EntityTransaction;
-import javax.persistence.PersistenceException;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;
@@ -28,10 +25,9 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.AuthSecurityException;
 import com.axelor.db.JpaSecurity.AccessType;
-import com.axelor.db.JpaSupport;
 import com.axelor.rpc.Response;
 
-public class ResponseInterceptor extends JpaSupport implements MethodInterceptor {
+public class ResponseInterceptor implements MethodInterceptor {
 	
 	private final Logger log = LoggerFactory.getLogger(ResponseInterceptor.class);
 	
@@ -52,15 +48,6 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 		try {
 			response = (Response) invocation.proceed();
 		} catch (Exception e) {
-			EntityTransaction txn = getEntityManager().getTransaction();
-			if (txn.isActive()) {
-				txn.rollback();
-			} else if (e instanceof PersistenceException) {
-				// recover the transaction
-				try {
-					txn.begin();
-				} catch(Exception ex){}
-			}
 			response = onException(e);
 		} finally {
 			running.remove();
