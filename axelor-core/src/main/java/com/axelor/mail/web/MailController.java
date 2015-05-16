@@ -41,12 +41,19 @@ import com.axelor.rpc.Response;
 
 public class MailController extends JpaSupport {
 	
+	private static final String SQL_UNREAD = ""
+			+ "SELECT COUNT(DISTINCT m) FROM MailMessage m LEFT JOIN m.flags g "
+			+ "WHERE (m.parent IS NULL) AND "
+			+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
+			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
+			+ "((g IS NULL) OR (g.user.id = :uid AND g.isRead = false AND g.isArchived = false))";
+
 	private static final String SQL_INBOX = ""
 			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
 			+ "WHERE (m.parent IS NULL) AND "
 			+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
 			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
-			+ "((g IS NULL) OR (g.user.id = :uid AND g.isRead = false)) "
+			+ "((g IS NULL) OR (g.user.id = :uid AND g.isArchived = false)) "
 			+ "ORDER BY m.createdOn DESC";
 
 	private static final String SQL_IMPORTANT = ""
@@ -62,7 +69,7 @@ public class MailController extends JpaSupport {
 			+ "WHERE (m.parent IS NULL) AND "
 			+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
 			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
-			+ "((g.user.id = :uid AND g.isRead = true)) "
+			+ "((g.user.id = :uid AND g.isArchived = true)) "
 			+ "ORDER BY m.createdOn DESC";
 
 	private static final String SQL_SUBSCRIBERS = ""
@@ -187,14 +194,7 @@ public class MailController extends JpaSupport {
 	}
 
 	private long countUnread() {
-		final String SQL_INBOX = ""
-				+ "SELECT COUNT(m) FROM MailMessage m LEFT JOIN m.flags g "
-				+ "WHERE (m.parent IS NULL) AND "
-				+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
-				+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
-				+ "((g IS NULL) OR (g.user.id = :uid AND g.isRead = false))";
-
-		final TypedQuery<Long> query = getEntityManager().createQuery(SQL_INBOX, Long.class);
+		final TypedQuery<Long> query = getEntityManager().createQuery(SQL_UNREAD, Long.class);
 		QueryBinder.of(query).setCacheable();
 
 		query.setParameter("uid", AuthUtils.getUser().getId());

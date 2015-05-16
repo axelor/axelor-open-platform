@@ -389,7 +389,7 @@
 
 			messageCount: function (options) {
 				var opts = _.extend({}, options, {
-					countOnly: true
+					count: true
 				});
 				return this.messages(opts);
 			},

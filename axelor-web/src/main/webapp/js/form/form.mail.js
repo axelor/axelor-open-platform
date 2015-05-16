@@ -99,31 +99,48 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 	 *
 	 * Flag state can be:
 	 *
-	 * 1 = mark starred
-	 * 2 = mark read
+	 * 1 = mark read
+	 * 2 = mark starred
+	 * 3 = mark archived
 	 *
 	 * Negative value unmarks the flag.
 	 *
-	 * @param {object} message - the message
+	 * @param {object|array} message - the message
 	 * @param {number} flagState - flag state
 	 */
 	function flagMessage(message, flagState) {
-		var flags = _.extend({}, message.$flags);
-		if (flagState === 1) flags.isStarred = true;
-		if (flagState === -1) flags.isStarred = false;
-		if (flagState === 2) flags.isRead = true;
-		if (flagState === -2) flags.isRead = false;
+		var messages = _.isArray(message) ? message : [message];
+		var ref = {};
+		var all = _.map(messages, function (message) {
+			var flags = _.extend({}, message.$flags);
+			if (flagState === 1) flags.isRead = true;
+			if (flagState === -1) flags.isRead = false;
+			if (flagState === 2) flags.isStarred = true;
+			if (flagState === -2) flags.isStarred = false;
+			if (flagState === 3) flags.isArchived = true;
+			if (flagState === -3) flags.isArchived = false;
 
-		flags.message = _.pick(message, 'id');
-		flags.user = {
-			id: __appSettings['user.id']
-		};
+			flags.message = _.pick(message, 'id');
+			flags.user = {
+				id: __appSettings['user.id']
+			};
 
-		var promise = dsFlags.save(flags);
-		promise.success(function (rec) {
-			message.$flags = _.pick(rec, ['id', 'version', 'isStarred', 'isRead']);
-			if (flags.unread !== undefined) {
-				checkUnreadMessages(); // force unread check
+			ref[""+message.id] = message;
+
+			return flags;
+		});
+
+		var promise = dsFlags.saveAll(all);
+		promise.success(function (records) {
+			_.each(records, function (rec) {
+				var msg = ref[""+rec.message.id];
+				if (msg) {
+					msg.$flags = _.pick(rec, ['id', 'version', 'isStarred', 'isRead', 'isArchived']);
+				}
+			});
+			// force unread check
+			if (flagState === 1 || flagState == -1) {
+				checkUnreadMessages();
 			}
 		});
 
@@ -182,12 +199,16 @@ ui.directive('uiMailMessage', function () {
 							"</a>" +
 							"<ul class='dropdown-menu pull-right'>" +
 								"<li>" +
-									"<a href='javascript:' ng-show='!message.$flags.isStarred' ng-click='onFlag(message, 1)' x-translate>Mark as important</a>" +
-									"<a href='javascript:' ng-show='message.$flags.isStarred' ng-click='onFlag(message, -1)' x-translate>Mark as not important</a>" +
+									"<a href='javascript:' ng-show='!message.$flags.isRead' ng-click='onFlag(message, 1)' x-translate>Mark as read</a>" +
+									"<a href='javascript:' ng-show='message.$flags.isRead' ng-click='onFlag(message, -1)' x-translate>Mark as unread</a>" +
+								"</li>" +
+								"<li>" +
+									"<a href='javascript:' ng-show='!message.$flags.isStarred' ng-click='onFlag(message, 2)' x-translate>Mark as important</a>" +
+									"<a href='javascript:' ng-show='message.$flags.isStarred' ng-click='onFlag(message, -2)' x-translate>Mark as not important</a>" +
 								"</li>" +
 								"<li ng-if='message.$thread' ng-show='!message.parent'>" +
-									"<a href='javascript:' ng-show='!message.$flags.isRead' ng-click='onFlag(message, 2)'>Move to archive</a>" +
-									"<a href='javascript:' ng-show='message.$flags.isRead' ng-click='onFlag(message, -2)'>Move to inbox</a>" +
+									"<a href='javascript:' ng-show='!message.$flags.isArchived' ng-click='onFlag(message, 3)'>Move to archive</a>" +
+									"<a href='javascript:' ng-show='message.$flags.isArchived' ng-click='onFlag(message, -3)'>Move to inbox</a>" +
 								"</li>" +
 								"<li>" +
 									"<a href='javascript:' ng-show='message.$canDelete' ng-click='onRemove(message)'>Delete</a>" +
@@ -230,7 +251,9 @@ ui.formWidget('uiMailMessages', {
 
 		$scope.onFlag = function (message, flagState) {
 			MessageService.flagMessage(message, flagState).success(function (res) {
-				$scope.onLoadMessages();
+				if (flagState !== 1 && flagState !== -1) {
+					$scope.onLoadMessages();
+				}
 			});
 		};
 
@@ -299,10 +322,19 @@ ui.formWidget('uiMailMessages', {
 				params.relatedModel = $scope._model;
 			}
 
-			if (!offset) {
+			if (!offset && folder) {
 				$scope.animation = {
 					"fadeDim": true
 				};
+			}
+
+			function updateReadCount(messages) {
+				var unread = _.filter(messages, function (msg) {
+					return !msg.$flags.isRead;
+				});
+				if (unread.length) {
+					MessageService.flagMessage(unread, 1);
+				}
 			}
 
 			return MessageService.getMessages(params).success(function (res) {
@@ -319,6 +351,7 @@ ui.formWidget('uiMailMessages', {
 				if (folder) {
 					$scope.waitForActions(function () {
 						$scope.record.__empty = count === 0;
+						updateReadCount(found);
 					});
 				}
 

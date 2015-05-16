@@ -37,6 +37,7 @@
     <many-to-one name="message" ref="MailMessage" />
     <boolean name="isStarred" />
     <boolean name="isRead" />
+    <boolean name="isArchived" />
   </entity>
 
   <entity name="MailFollower" table="MAIL_FOLLOWER" cachable="true" repository="none">
