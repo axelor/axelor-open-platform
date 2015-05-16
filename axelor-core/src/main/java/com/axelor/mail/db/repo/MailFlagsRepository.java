@@ -17,6 +17,8 @@
  */
 package com.axelor.mail.db.repo;
 
+import java.util.List;
+
 import com.axelor.auth.db.User;
 import com.axelor.db.JpaRepository;
 import com.axelor.mail.db.MailFlags;
@@ -32,5 +34,35 @@ public class MailFlagsRepository extends JpaRepository<MailFlags> {
 		return all().filter("self.message = :message AND self.user = :user")
 				.bind("message", message)
 				.bind("user", user).fetchOne();
+	}
+
+	@Override
+	public MailFlags save(MailFlags entity) {
+		final MailFlags flags = super.save(entity);
+		final MailMessage message = flags.getMessage();
+		final MailMessage root = message.getRoot();
+
+		if (flags.getIsStarred() == Boolean.FALSE) {
+			// message is root, so unflag children
+			if (root == null) {
+				List<MailFlags> childFlags = all().filter("self.message.root.id = ?", message.getId()).fetch();
+				for (MailFlags child : childFlags) {
+					child.setIsStarred(flags.getIsStarred());
+				}
+			}
+			return flags;
+		}
+
+		MailFlags rootFlags = findBy(root, flags.getUser());
+		if (rootFlags == null) {
+			rootFlags = new MailFlags();
+			rootFlags.setMessage(root);
+			rootFlags.setUser(flags.getUser());
+		}
+
+		rootFlags.setIsStarred(flags.getIsStarred());
+		super.save(rootFlags);
+
+		return flags;
 	}
 }
