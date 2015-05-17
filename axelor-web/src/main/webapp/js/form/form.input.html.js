@@ -19,26 +19,15 @@
 
 var ui = angular.module('axelor.ui');
 
-function getHeaders(element) {
+function getStylePopup(element, styles) {
 
 	return function ($popup, $button) {
-
-		var list_headers = {
-	        'Header 1' : '<h1>',
-	        'Header 2' : '<h2>',
-	        'Header 3' : '<h3>',
-	        'Header 4' : '<h4>',
-	        'Header 5' : '<h5>',
-	        'Header 6' : '<h6>',
-	        'Code'     : '<pre>'
-	    };
 
 		var $list = $('<div/>').addClass('wysiwyg-plugin-list')
 	                           .attr('unselectable', 'on');
 
-		$.each(list_headers, function(name, format) {
+		$.each(styles, function(format, name) {
 	        var $link = $('<a/>').attr('href','#')
-	                             .css('font-family', format)
 	                             .html(name)
 	                             .click(function(event) {
 	                                $(element).wysiwyg('shell').format(format).closePopup();
@@ -56,10 +45,26 @@ function getHeaders(element) {
 function getButtons(element, lite) {
 
 	return {
+		style: lite ? false : {
+			title: _t('Style'),
+			image: '\uf1dd',
+			popup: getStylePopup(element, {
+		        '<p>' 			: _t('Normal'),
+		        '<pre>' 		: _t('Formated'),
+	        	'<blockquote>'	: _t('Blockquote')
+		    })
+		},
 		header: lite ? false : {
 			title: _t('Header'),
 			image: '\uf1dc',
-			popup: getHeaders(element)
+			popup: getStylePopup(element, {
+		        '<h1>': _t('Header 1'),
+        		'<h2>': _t('Header 2'),
+				'<h3>': _t('Header 3'),
+				'<h4>': _t('Header 4'),
+				'<h5>': _t('Header 5'),
+				'<h6>': _t('Header 6'),
+		    })
 		},
 		d1: lite ? false : {
 			html: $('<span class="wysiwyg-toolbar-divider"></span>')
@@ -207,7 +212,16 @@ ui.formInput('Html', {
 			shell.setHTML(value);
 		}
 
-		editor.on('input', _.debounce(onChange, 300));
+		editor.on('input', _.debounce(onChange, 100));
+		editor.on('keypress', function(e) {
+			// always start new paragraph on ENTER
+		    if(e.keyCode == '13' && !e.shiftKey) {
+		    	var current = document.queryCommandValue('formatBlock');
+		    	if (!current) {
+		    		document.execCommand('formatBlock', false, 'p');
+		    	}
+			}
+		});
 	},
 
 	template_readonly:
