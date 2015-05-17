@@ -42,6 +42,10 @@
     background-color: #5377b1;
 }
 
+.wysiwyg-popup.wysiwyg-popuphover {
+	width: auto;
+}
+
 input.wysiwyg-input {
 	margin: 0;
 }
@@ -54,4 +58,14 @@ input.wysiwyg-input {
 	margin-right: 0px;
 	vertical-align: middle;
 	width: 1px;
+}
+
+.slick-external-editor.html-item {
+	background-color: white;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	min-width: 380px;
+}
+
+.slick-external-editor.html-item input.wysiwyg-input {
+	box-sizing: border-box;
 }

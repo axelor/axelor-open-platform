@@ -89,7 +89,7 @@ var Editor = function(args) {
 	element.data('$parent', element.parent());
 	element.data('$editorForm', form);
 
-	external = element.is('.text-item');
+	external = element.is('.text-item,.html-item');
 
 	this.init = function() {
 
@@ -105,6 +105,7 @@ var Editor = function(args) {
 		}
 
 		element.css('display', 'inline-block')
+			.addClass('slick-external-editor')
 			.appendTo(container);
 
 		if (element.data('keydown.nav') == null) {
@@ -182,6 +183,11 @@ var Editor = function(args) {
 			width: container.width(),
 			zIndex: container.zIndex() + 1
 		});
+
+		// focus html editor
+		if (element.is('.html-item')) {
+			element.find('[contenteditable]').focus();
+		}
 	};
 	
 	function focus() {
@@ -1259,7 +1265,7 @@ Grid.prototype.onKeyDown = function(e, args) {
 		grid = this.grid,
 		lock = grid.getEditorLock();
 
-	if (e.which === $.ui.keyCode.ENTER && $(e.target).is('textarea')) {
+	if (e.which === $.ui.keyCode.ENTER && $(e.target).is('textarea,[contenteditable]')) {
 		return;
 	}
 
@@ -2096,9 +2102,9 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 			var field = _fields[item.name] || item,
 				type = types[field.type];
 
-			// force text widget for html
+			// force lite html widget
 			if (item.widget && item.widget.toLowerCase() === 'html') {
-				item.widget = 'Text';
+				item.lite = true;
 			}
 
 			if (!type && !forEdit) {
