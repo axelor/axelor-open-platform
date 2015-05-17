@@ -1,0 +1,57 @@
+.wysiwyg-container {
+	border-radius: 0;
+}
+
+.wysiwyg-popup {
+	border-radius: 0;
+	background: #fff;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	background-clip: padding-box;
+}
+
+.wysiwyg-toolbar-icon {
+	padding: 6px 8px;
+	font-size: 14px;
+}
+
+.wysiwyg-toolbar a,
+.wysiwyg-toolbar a:hover,
+.wysiwyg-toolbar a:link,
+.wysiwyg-toolbar a:visited {
+	text-decoration: none;
+}
+
+.wysiwyg-plugin-list {
+    max-height: 16em;
+    overflow: hidden;
+}
+
+.wysiwyg-plugin-list a,
+.wysiwyg-plugin-list a:link,
+.wysiwyg-plugin-list a:visited {
+    display: block;
+    color: black;
+    padding: 5px 10px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.wysiwyg-toolbar-icon:hover,
+.wysiwyg-plugin-list a:hover {
+    color: #fff;
+    background-color: #5377b1;
+}
+
+input.wysiwyg-input {
+	margin: 0;
+}
+
+.wysiwyg-toolbar-divider {
+	background-color: #ddd;
+	display: inline-block;
+	height: 26px;
+	margin-left: 0px;
+	margin-right: 0px;
+	vertical-align: middle;
+	width: 1px;
+}

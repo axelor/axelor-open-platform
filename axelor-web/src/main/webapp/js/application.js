@@ -76,7 +76,8 @@ load([
 	'lib/d3/gauge/gauge-chart.js',
 
 	'lib/codemirror/codemirror.min.js',
-	'lib/tinymce/tinymce.min.js',
+	'lib/wysiwyg/wysiwyg.js',
+	'lib/wysiwyg/wysiwyg-editor.js',
 
 	'lib/angular/angular.js',
 	'lib/angular/angular-resource.js',
@@ -117,6 +118,7 @@ load([
 	'js/form/form.input.static.js',
 	'js/form/form.input.boolean.js',
 	'js/form/form.input.text.js',
+	'js/form/form.input.html.js',
 	'js/form/form.input.number.js',
 	'js/form/form.input.datetime.js',
 	'js/form/form.input.select.js',
@@ -130,7 +132,6 @@ load([
 
 	'js/form/form.mail.js',
 	'js/form/form.code.js',
-	'js/form/form.tinymce.js',
 
 	'js/view/view.base.js',
 	'js/view/view.form.js',

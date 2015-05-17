@@ -1042,14 +1042,6 @@ table.field-details .help-text hr {
 	color: inherit;
 }
 
-.form-item-container > .mce-tinymce {
-	box-sizing: content-box !important;
-}
-
-.form-item-container > .html-display-text {
-	padding-top: 4px;
-}
-
 .button-item.img-button {
 	background: #fff !important;
 	width: auto !important;
