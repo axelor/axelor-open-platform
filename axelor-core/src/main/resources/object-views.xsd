@@ -922,7 +922,7 @@
         </xsd:attribute>
         <xsd:attribute name="stacked" type="xsd:boolean">
           <xsd:annotation>
-            <xsd:documentation>Specify whether the stack panel items.</xsd:documentation>
+            <xsd:documentation>Specify whether to stack panel items.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="attached" type="xsd:boolean">
@@ -997,6 +997,7 @@
           <xsd:element name="button" type="tns:Button" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="itemSpan" use="prohibited"/>
+        <xsd:attribute name="stacked" use="prohibited"/>
         <xsd:attribute name="field" type="xsd:string" use="required" />
         <xsd:attribute name="editable" type="xsd:boolean" />
         <xsd:attribute name="orderBy" type="xsd:string" />
@@ -1015,9 +1016,13 @@
           <xsd:element name="panel-dashlet" type="tns:Dashlet" />
           <xsd:element name="panel-include" type="tns:FormInclude" />
         </xsd:choice>
+        <xsd:attribute name="stacked" use="prohibited"/>
         <xsd:attribute name="itemSpan" use="prohibited"/>
+        <xsd:attribute name="showFrame" use="prohibited"/>
         <xsd:attribute name="showTitle" use="prohibited"/>
         <xsd:attribute name="title" use="prohibited"/>
+        <xsd:attribute name="help" use="prohibited"/>
+        <xsd:attribute name="onTabSelect" use="prohibited"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1123,19 +1128,19 @@
         <xsd:sequence>
           <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0" />
           <xsd:element name="menubar" type="tns:Menubar" minOccurs="0" />
-          <xsd:choice minOccurs="0" maxOccurs="1">
-            <xsd:choice maxOccurs="unbounded">
-              <xsd:element name="panel" type="tns:Panel" />
-              <xsd:element name="panel-include" type="tns:FormInclude" />
-              <xsd:element name="panel-dashlet" type="tns:Dashlet" />
-              <xsd:element name="panel-related" type="tns:PanelRelated" />
-              <xsd:element name="panel-stack" type="tns:PanelTabs" />
-              <xsd:element name="panel-tabs" type="tns:PanelTabs" />
+            <xsd:choice minOccurs="0" maxOccurs="1">
+              <xsd:choice maxOccurs="unbounded">
+                <xsd:element name="panel" type="tns:Panel" />
+                <xsd:element name="panel-include" type="tns:FormInclude" />
+                <xsd:element name="panel-dashlet" type="tns:Dashlet" />
+                <xsd:element name="panel-related" type="tns:PanelRelated" />
+                <xsd:element name="panel-stack" type="tns:PanelTabs" />
+                <xsd:element name="panel-tabs" type="tns:PanelTabs" />
+              </xsd:choice>
+              <xsd:choice maxOccurs="unbounded">
+                <xsd:group ref="tns:FormWidgets" />
+              </xsd:choice>
             </xsd:choice>
-            <xsd:choice maxOccurs="unbounded">
-              <xsd:group ref="tns:FormWidgets" />
-            </xsd:choice>
-          </xsd:choice>
           <xsd:element name="panel-mail" type="tns:PanelMail" minOccurs="0" />
         </xsd:sequence>
         <xsd:attribute name="css" type="xsd:string"/>

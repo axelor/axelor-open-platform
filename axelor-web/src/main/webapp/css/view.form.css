@@ -1065,6 +1065,7 @@ table.field-details .help-text hr {
 .button-item.disabled {
 	outline: none;
 	opacity: 0.55;
+	background-color: #e0e0e0;
 }
 
 .record-toolbar .button-item.button-icon img {

@@ -277,7 +277,7 @@ var Formatters = {
 	},
 
 	"decimal": function(field, value) {
-		var scale = field.scale || 2,
+		var scale = (field.widgetAttrs||{}).scale || field.scale || 2,
 			num = +(value);
 		if (num) {
 			return num.toFixed(scale);
@@ -638,6 +638,10 @@ Grid.prototype.parse = function(view) {
 	if (!scope.selector && view.editIcon && (!handler.hasPermission || handler.hasPermission('write'))) {
 		editColumn = new EditIconColumn({
 			onClick: function (e, args) {
+				if (e.isDefaultPrevented()) {
+					return;
+				}
+				e.preventDefault();
 				var elem = $(e.target);
 				if (elem.is('.fa-minus') && handler) {
 					return handler.dataView.deleteItem(0);
@@ -1839,9 +1843,13 @@ Grid.prototype.onButtonClick = function(event, args) {
 			field.handler.prompt = field.prompt;
 		}
 		field.handler.scope.getContext = function() {
-			return _.extend({
-				_model: model
+			var context = _.extend({
+				_model: model,
 			}, record);
+			if (handlerScope.field && handlerScope.field.target) {
+				context._parent = handlerScope.getContext();
+			}
+			return context;
 		};
 		field.handler.onClick().then(function(res){
 			delete field.handler.scope.record;

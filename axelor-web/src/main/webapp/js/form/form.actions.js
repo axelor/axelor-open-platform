@@ -206,10 +206,15 @@ ActionHandler.prototype = {
 	},
 
 	onChange: function(event) {
-		var self = this;
-		return this._fireBeforeSave().then(function() {
-			return self.handle();
+		var deferred = this.ws.defer(),
+			promise = deferred.promise;
+
+		var self = this,
+			scope = this.scope;
+		scope.waitForActions(function() {
+			self.handle().then(deferred.resolve, deferred.reject);
 		});
+		return promise;
 	},
 	
 	_getPrompt: function () {
@@ -597,6 +602,8 @@ ActionHandler.prototype = {
 				containers = formElement.parent().add(formElement);
 			} else if (formElement.parent().is('[ui-slick-editors],.slick-cell')) {
 				containers = formElement.parent().parent().add(formElement);
+			} else if (formElement.parent().is('[ui-panel-editor')) {
+				containers = formElement.parents('[ui-form]:first').add(formElement);
 			} else {
 				containers = formElement.parents('.form-view:first')
 										.find('.record-toolbar:first')

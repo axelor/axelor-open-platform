@@ -156,6 +156,7 @@
 					var res = {};
 					_.each(obj, function(v, k) {
 						if (k.substring(0, 2) === '__') return;
+						if (k === 'selected') return; // selected is transient field
 						res[k] = compact(v);
 					});
 					return res;

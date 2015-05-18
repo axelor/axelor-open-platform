@@ -357,7 +357,7 @@ public class RestService extends ResourceService {
 					uploadSave(new FileInputStream(inputFile), output);
 				}
 			})
-			.header("Content-Disposition", "attachment; filename=" + fileName)
+			.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
 			.build();
 		}
 
@@ -386,7 +386,7 @@ public class RestService extends ResourceService {
 
 		return javax.ws.rs.core.Response
 				.ok(data)
-				.header("Content-Disposition", "attachment; filename=" + fileName)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
 				.build();
 	}
 

@@ -68,7 +68,7 @@ public class ModuleManager {
 
 	@Inject
 	private AuthService authService;
-
+	
 	@Inject
 	private MetaModuleRepository modules;
 
@@ -106,29 +106,29 @@ public class ModuleManager {
 			@Override
 			public void run() {
 
-				log.info("modules found:");
-				for (String name : resolver.names()) {
-					log.info("  " + name);
-				}
+			log.info("modules found:");
+			for (String name : resolver.names()) {
+				log.info("  " + name);
+			}
 
-				// install modules
-				for (Module module : resolver.all()) {
-					if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
-						install(module.getName(), update, withDemo, false);
-					}
+			// install modules
+			for (Module module : resolver.all()) {
+				if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
+					install(module.getName(), update, withDemo, false);
 				}
-				// second iteration ensures proper view sequence
-				for (Module module : resolver.all()) {
-					if (module.isInstalled()) {
-						viewLoader.doLast(module, update);
-					}
+			}
+			// second iteration ensures proper view sequence
+			for (Module module : resolver.all()) {
+				if (module.isInstalled()) {
+					viewLoader.doLast(module, update);
 				}
-				// uninstall pending modules
-				for (Module module : resolver.all()) {
-					if (module.isRemovable() && !module.isInstalled() && module.isPending()) {
-						uninstall(module.getName());
-					}
+			}
+			// uninstall pending modules
+			for (Module module : resolver.all()) {
+				if (module.isRemovable() && !module.isInstalled() && module.isPending()) {
+					uninstall(module.getName());
 				}
+			}
 			}
 		};
 
@@ -182,7 +182,7 @@ public class ModuleManager {
 			this.doCleanUp();
 		}
 	}
-
+	
 	public void restoreMeta() {
 		try {
 			loadData = false;
@@ -191,7 +191,7 @@ public class ModuleManager {
 			loadData = true;
 		}
 	}
-
+	
 	public static List<String> getResolution() {
 		return resolver.names();
 	}
@@ -225,7 +225,7 @@ public class ModuleManager {
 	public void uninstall(String module) {
 
 		log.info("Uninstall module: {}", module);
-
+		
 		MetaModule entity = modules.findByName(module);
 
 		Beans.get(MetaViewRepository.class).findByModule(module).remove();
@@ -253,7 +253,7 @@ public class ModuleManager {
 	MetaModule findModule(String name) {
 		return modules.findByName(name);
 	}
-
+	
 	private void install(String moduleName, boolean update, boolean withDemo, boolean force) {
 
 		final Module module = resolver.get(moduleName);
@@ -469,7 +469,7 @@ public class ModuleManager {
 
 	@Transactional
 	void createUsers() {
-
+		
 		final UserRepository users = Beans.get(UserRepository.class);
 		final GroupRepository groups = Beans.get(GroupRepository.class);
 

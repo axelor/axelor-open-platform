@@ -156,10 +156,14 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		var selected, items;
 		if (_.isEmpty(selection)) return;
 		selected = _.map(selection, function (i) {
-			return $scope.dataView.getItem(i);
+			return $scope.dataView.getItem(i).id;
 		});
 		items = _.filter($scope.getItems(), function (item) {
-			return selected.indexOf(item) === -1;
+			return selected.indexOf(item.id) === -1;
+		});
+		// remove selected from data view
+		_.each(selected, function (id) {
+			$scope.dataView.deleteItem(id);
 		});
 		$scope.setValue(items, true);
 		$scope.applyLater();
