@@ -130,7 +130,11 @@ public class Criteria {
 		} catch(Exception e){
 		}
 
-		if (!Objects.equal(Boolean.TRUE, rawCriteria.get("_archived"))) {
+		Object archived = rawCriteria.get("_archived");
+		if (archived != null) {
+			archived = "true".equals(archived.toString().toLowerCase());
+		}
+		if (archived != Boolean.TRUE) {
 			all.add(new JPQLFilter("self.archived is null OR self.archived = false"));
 		}
 		
