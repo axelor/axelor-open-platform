@@ -70,6 +70,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
@@ -693,7 +694,11 @@ public class Resource<T extends Model> {
 		for(Object record : records) {
 			Map map = (Map) record;
 			Long id = Longs.tryParse(map.get("id").toString());
-			Object version = map.get("version");
+			Integer version = null;
+			try {
+				version = Ints.tryParse(map.get("version").toString());
+			} catch (Exception e) {
+			}
 
 			security.get().check(JpaSecurity.CAN_REMOVE, model, id);
 			Model bean = JPA.find(model, id);
