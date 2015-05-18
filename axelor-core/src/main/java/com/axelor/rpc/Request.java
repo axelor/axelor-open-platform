@@ -143,17 +143,10 @@ public class Request {
 
 	@JsonIgnore
 	public Criteria getCriteria() {
-
-		if (criteria != null) {
-			return criteria;
+		if (criteria == null) {
+			criteria = Criteria.parse(this);
 		}
-		
-		try {
-			return criteria = Criteria.parse(this);
-		} catch (Exception ex) {
-		}
-
-		return null;
+		return criteria;
 	}
 
 	@SuppressWarnings("all")
