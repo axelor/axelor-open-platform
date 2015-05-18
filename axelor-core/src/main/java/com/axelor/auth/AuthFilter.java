@@ -35,14 +35,10 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class AuthFilter extends FormAuthenticationFilter {
-	
-	private static Logger log = LoggerFactory.getLogger(AuthFilter.class);
 
 	@Inject
 	@Named("app.loginUrl")
@@ -67,36 +63,45 @@ public class AuthFilter extends FormAuthenticationFilter {
 
 	@Override
 	protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-
+		
 		if (isXHR(request)) {
+			
+			int status = 401;
 			if (isLoginRequest(request, response) && isLoginSubmission(request, response)) {
-				return doLogin(request, response);
+				if (doLogin(request, response)) {
+					status = 200;
+				}
 			}
-			((HttpServletResponse) response).setStatus(401);
+
+			// set HTTP status for ajax requests
+			((HttpServletResponse) response).setStatus(status);
+
+			// don't process further, otherwise login.jsp will be rendered as response data
 			return false;
 		}
+
 		return super.onAccessDenied(request, response);
 	}
 
 	@SuppressWarnings("unchecked")
 	private boolean doLogin(ServletRequest request, ServletResponse response) throws Exception {
 
-		ObjectMapper mapper = new ObjectMapper();
-		Map<String, String> data = mapper.readValue(request.getInputStream(), Map.class);
+		final ObjectMapper mapper = new ObjectMapper();
+		final Map<String, String> data = mapper.readValue(request.getInputStream(), Map.class);
 
-		String username = data.get("username");
-		String password = data.get("password");
+		final String username = data.get("username");
+		final String password = data.get("password");
 
-		AuthenticationToken token = createToken(username, password, request, response);
+		final AuthenticationToken token = createToken(username, password, request, response);
+		final Subject subject = getSubject(request, response);
 
 		try {
-			Subject subject = getSubject(request, response);
 			subject.login(token);
-			return onLoginSuccess(token, subject, request, response);
 		} catch (AuthenticationException e) {
-			log.error("Password authentication failed for user: {}", token.getPrincipal());
+			return false;
 		}
-		return false;
+
+		return true;
 	}
 
 	private boolean isXHR(ServletRequest request) {
