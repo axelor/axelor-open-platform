@@ -196,7 +196,10 @@ public class Criteria {
 		if (operator == Operator.BETWEEN) {
 			return Filter.between(fieldName, rawCriteria.get("value"), rawCriteria.get("value2"));
 		}
-		
+		if (operator == Operator.NOT_BETWEEN) {
+			return Filter.notBetween(fieldName, rawCriteria.get("value"), rawCriteria.get("value2"));
+		}
+
 		if (value instanceof String) {
 			value = ((String) value).trim();
 		}
