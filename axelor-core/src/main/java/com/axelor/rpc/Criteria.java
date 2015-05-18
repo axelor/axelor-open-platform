@@ -30,7 +30,6 @@ import com.axelor.db.mapper.Property;
 import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
 import com.axelor.rpc.filter.Operator;
-import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -73,33 +72,38 @@ public class Criteria {
 
 	public static Criteria parse(Request request) {
 
-		if (request.getData().get("operator") != null) {
-			try {
-				return parse(request.getData(), request.getBeanClass());
-			} catch(IllegalArgumentException e) {
-				System.err.println(e);
-			}
-		}
-		
-		Map<String, Object> raw = new HashMap<String, Object>();
-		List<Map<?, ?>> items = new ArrayList<Map<?, ?>>();
+		final Map<String, Object> data = request.getData();
+		final Map<String, Object> raw = new HashMap<>();
 
+		// default root operator
+		if (data.get("operator") == null) {
+			raw.put("operator", "or");
+		}
+		// if data itself is criteria root
+		if (data.get("criteria") != null) {
+			raw.putAll(data);
+			return parse(raw, request.getBeanClass());
+		}
+
+		// simple search where data is field -> search value map
 		raw.put("operator", "or");
-		raw.put("criteria", items);
 		raw.put("_domain", request.getData().get("_domain"));
 		raw.put("_domainContext", request.getData().get("_domainContext"));
 		
+		final List<Map<String, Object>> items = new ArrayList<>();
 		for (String key : request.getData().keySet()) {
-			
-			if (!key.matches("^[a-zA-Z].*$"))
+			if (!key.matches("^[a-zA-Z].*$")) {
 				continue;
-			
-			Map<String, Object> criterion = new HashMap<String, Object>();
+			}
+			final Map<String, Object> criterion = new HashMap<String, Object>();
 			criterion.put("fieldName", key);
 			criterion.put("operator", "like");
 			criterion.put("value", request.getData().get(key));
 			items.add(criterion);
 		}
+
+		raw.put("criteria", items);
+
 		return parse(raw, request.getBeanClass());
 	}
 
