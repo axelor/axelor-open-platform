@@ -115,11 +115,18 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 	@Transactional
 	public MailMessage post(Model entity, MailMessage message, List<MetaFile> files) {
 
-		Mapper mapper = Mapper.of(entity.getClass());
+		final Mapper mapper = Mapper.of(entity.getClass());
+		final MailFlags  flags = new MailFlags();
 
 		message.setRelatedId(entity.getId());
 		message.setRelatedModel(entity.getClass().getName());
 		message.setAuthor(AuthUtils.getUser());
+
+		// mark message as read
+		flags.setMessage(message);
+		flags.setUser(AuthUtils.getUser());
+		flags.setIsRead(Boolean.TRUE);
+		message.addFlag(flags);
 
 		try {
 			message.setRelatedName(mapper.getNameField().get(entity).toString());

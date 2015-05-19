@@ -249,6 +249,15 @@ ui.formWidget('uiMailMessages', {
 	scope: true,
 	controller: ['$scope', 'MessageService', function ($scope, MessageService) {
 
+		function updateReadCount(messages) {
+			var unread = _.filter(messages, function (msg) {
+				return !(msg.$flags||{}).isRead;
+			});
+			if (unread.length) {
+				MessageService.flagMessage(unread, 1);
+			}
+		}
+
 		$scope.onFlag = function (message, flagState) {
 			MessageService.flagMessage(message, flagState).success(function (res) {
 				if (flagState !== 1 && flagState !== -1) {
@@ -283,6 +292,7 @@ ui.formWidget('uiMailMessages', {
 				});
 				message.$numReplies = data.length;
 				message.$children = data;
+				updateReadCount(data);
 			});
 		};
 
@@ -328,15 +338,6 @@ ui.formWidget('uiMailMessages', {
 				};
 			}
 
-			function updateReadCount(messages) {
-				var unread = _.filter(messages, function (msg) {
-					return !msg.$flags.isRead;
-				});
-				if (unread.length) {
-					MessageService.flagMessage(unread, 1);
-				}
-			}
-
 			return MessageService.getMessages(params).success(function (res) {
 				var found = res.data;
 				var count = res.total;
@@ -348,12 +349,13 @@ ui.formWidget('uiMailMessages', {
 
 				Array.prototype.push.apply($scope.messages, found);
 				$scope.hasMore = $scope.messages.length < count;
-				if (folder) {
-					$scope.waitForActions(function () {
+
+				$scope.waitForActions(function () {
+					if (folder) {
 						$scope.record.__empty = count === 0;
-						updateReadCount(found);
-					});
-				}
+					}
+					updateReadCount(found);
+				});
 
 				$scope.animation = {
 					'fade': true,
