@@ -586,7 +586,7 @@ class Property {
 		if (name != "id")
 			return null
 
-		if (!entity.sequential) {
+		if (!entity.sequential || entity.mappedSuper) {
 			return [
 				annon("javax.persistence.Id", true),
 				annon("javax.persistence.GeneratedValue")

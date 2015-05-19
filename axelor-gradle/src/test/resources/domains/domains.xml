@@ -115,8 +115,8 @@
     <finder-method name="findByUser" using="user" all="false"/>
     
   </entity>
-  
-  <entity name="ConstraintTester">
+
+  <entity name="ConstraintTester" persistable="false">
     <string name="someName"/>
     <string name="anotherName" column="another"/>
     <many-to-one name="myTitle" ref="Title"/>

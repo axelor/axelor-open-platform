@@ -878,6 +878,15 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="persistable" type="xsd:boolean" default="true">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify whether this entity is persistable (in database).
+        Non-persistable entity classes as annotated with @MappedSuperclass and
+        can be used as base class of other entities.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="implements" type="xsd:string">
 	<xsd:annotation>
 		<xsd:documentation>
