@@ -878,6 +878,13 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="implements" type="xsd:string">
+	<xsd:annotation>
+		<xsd:documentation>
+		Specify the list of interfaces to implement.
+		</xsd:documentation>
+	</xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="extends"  type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>

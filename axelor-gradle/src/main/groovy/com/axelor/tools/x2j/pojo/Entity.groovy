@@ -34,6 +34,8 @@ class Entity {
 	
 	transient long lastModified
 
+	private String interfaces
+
 	String baseClass
 
 	String strategy
@@ -86,6 +88,7 @@ class Entity {
 		groovy = node.'@lang' == "groovy"
 		hashAll = node.'@hashAll' == "true"
 		cachable = node.'@cachable'
+		interfaces = node.'@implements'
 		baseClass = node.'@extends'
 		strategy = node.'@strategy'
 		documentation = findDocs(node)
@@ -124,6 +127,10 @@ class Entity {
 		indexes = []
 		finders = []
 		extraCode = null
+
+		if (interfaces) {
+			interfaces = interfaces.split(",").collect { importType(it.trim()) }.join(", ")
+		}
 
 		if (!baseClass) {
 			if (node.@logUpdates != "false") {
@@ -228,6 +235,11 @@ class Entity {
 
 	String getBaseClass() {
 		return importType(baseClass)
+	}
+
+	String getImplementStmt() {
+		if (!interfaces || interfaces.trim() == "") return ""
+		return " implements " + interfaces
 	}
 
 	String findDocs(parent) {
