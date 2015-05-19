@@ -24,7 +24,7 @@ ${p.documentation}
 		}
 		return $p.name;
 	}
-	
+
 	protected $p.type compute${p.firstUpper(p.name)}() {
 		$p.code
 	}
@@ -38,7 +38,7 @@ ${p.documentation}
 		$p.setterBody
 	}
 <% if (p.isCollection()) { %>\
-	
+
 	/**
 	 * Add the given {@link #${p.target}} item to the {@code ${p.name}}.
 	 *
@@ -66,7 +66,7 @@ ${p.documentation}
 	 * It sets {@code item.${p.mappedBy} = null} to break the relationship.
 	 * </p>
 <% } %>\
-	 */	
+	 */
 	public void remove${p.firstUpper(p.singularName)}($p.target item) {
 		if (${p.name} == null) {
 			return;
@@ -76,7 +76,7 @@ ${p.documentation}
 		${p.delinkCode}
 <% } %>\
 	}
-	
+
 	/**
 	 * Clear the {@code ${p.name}} collection.
 	 *
@@ -88,7 +88,7 @@ ${p.documentation}
 	 * if any of the item in the collection is changed.
 <% } %>\
 	 * </p>
-	 */	
+	 */
 	public void clear${p.firstUpper(p.name)}() {
 		if (${p.name} != null) {
 <% if (p.delinkAllCode) { %>\
@@ -99,110 +99,19 @@ ${p.documentation}
 	}
 <% } %>\
 <% } %>\
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		${pojo.equalsCode}
 	}
-	
+
 	@Override
 	public int hashCode() {
 		${pojo.hashCodeCode}
 	}
-	
+
 	@Override
 	public String toString() {
 		${pojo.toStringCode}
 	}
-<% if (!pojo.pojo) { %>\
-<% pojo.finderMethods.each { %>\
-	${it.getCode(true)}\
-<% } %>\
-
-	/**
-	 * Make the entity managed and persistent.
-	 * 
-	 * @see EntityManager#persist(Object)
-	 */
-	public $pojo.name persist() {
-		return JPA.persist(this);
-	}
-
-	/**
-	 * Merge the state of the entity into the current persistence context.
-	 * 
-	 * @see EntityManager#merge(Object)
-	 */
-	public $pojo.name merge() {
-		return JPA.merge(this);
-	}
-
-	/**
-	 * Save the state of the entity.<br>
-	 * <br>
-	 * It uses either {@link #persist()} or {@link #merge()} and calls
-	 * {@link #flush()} to synchronize values with database.
-	 * 
-	 * @see #persist(Model)
-	 * @see #merge(Model)
-	 * 
-	 */
-	public $pojo.name save() {
-		return JPA.save(this);
-	}
-	
-	/**
-	 * Remove the entity instance.
-	 * 
-	 * @see EntityManager#remove(Object)
-	 */
-	public void remove() {
-		JPA.remove(this);
-	}
-	
-	/**
-	 * Refresh the state of the instance from the database, overwriting changes
-	 * made to the entity, if any.
-	 * 
-	 * @see EntityManager#refresh(Object)
-	 */
-	public void refresh() {
-		JPA.refresh(this);
-	}
-	
-	/**
-	 * Synchronize the persistence context to the underlying database.
-	 * 
-	 * @see EntityManager#flush()
-	 */
-	public void flush() {
-		JPA.flush();
-	}
-	
-	/**
-	 * Find a <code>$pojo.name</code> by <code>id</code>.
-	 *
-	 */
-	public static $pojo.name find(Long id) {
-		return JPA.find(${pojo.name}.class, id);
-	}
-	
-	/**
-	 * Return a {@link Query} instance for <code>$pojo.name</code> to filter
-	 * on all the records.
-	 *
-	 */
-	public static Query<? extends $pojo.name> all() {
-		return JPA.all(${pojo.name}.class);
-	}
-	
-	/**
-	 * A shortcut method to <code>${pojo.name}.all().filter(...)</code>
-	 *
-	 */
-	public static Query<? extends $pojo.name> filter(String filter, Object... params) {
-		return JPA.all(${pojo.name}.class).filter(filter, params);
-	}
-	${pojo.extraCode}\
-<% } %>
 }

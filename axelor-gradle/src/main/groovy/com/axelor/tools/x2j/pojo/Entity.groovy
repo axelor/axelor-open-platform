@@ -117,13 +117,6 @@ class Entity {
 			repository.concrete = node.@repository != "abstract"
 		}
 		
-		if (!this.pojo) {
-			importType("javax.persistence.EntityManager")
-			importType("com.axelor.db.Model")
-			importType("com.axelor.db.JPA")
-			importType("com.axelor.db.Query")
-		}
-
 		properties = []
 		propertyMap = [:]
 		constraints = []
@@ -187,10 +180,6 @@ class Entity {
 	
 	Repository getRepository() {
 		return this.repository
-	}
-
-	boolean isPojo() {
-		return System.getProperty("codegen.pojo", "true") == "true"
 	}
 
 	void merge(Entity other) {

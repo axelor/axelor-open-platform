@@ -34,8 +34,6 @@ public class X2JTest {
 	@Test
 	public void testDomains() throws IOException {
 
-		System.setProperty("codegen.pojo", "true");
-
 		File domainPath = new File("src/test/resources/domains");
 		File outputPath = new File("build/src-gen");
 
