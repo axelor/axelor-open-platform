@@ -510,13 +510,16 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 
 			if (element.is('.nav-tabs-popup')) {
 				var toolbar = element.find('.form-view:first > .record-toolbar');
-				var form = element.find('.form-view:first > [ui-view-form]');
-				var h = toolbar.height() + form[0].scrollHeight - 16;
+				var form = element.find('.form-view:first > [ui-view-form] > form');
+				var h = toolbar.height() + form.height() - 16;
 				height = Math.min(height, h);
 			} else if (element.is('[ui-selector-popup]')) {
 				height = Math.min(height, 480);
 			} else if (height > element[0].scrollHeight - 16) {
 				height = 'auto';
+			}
+			if (height !== "auto" && element.height() >= height) {
+				return;
 			}
 			element.height(height);
 		}
