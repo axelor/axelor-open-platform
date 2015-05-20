@@ -741,8 +741,9 @@ Grid.prototype.parse = function(view) {
 	handler._dataSource.on('change', function (e, records, page) {
 		element.toggleClass('slickgrid-empty-message', page && page.size === 0);
 	});
-
-	element.append($("<div class='slickgrid-empty-text'>").hide().text(_t("No records found.")));
+	
+	var emptyMessage = handler.$emptyMessage || _t("No records found.");
+	element.append($("<div class='slickgrid-empty-text'>").hide().text(emptyMessage));
 
 	return grid;
 };
