@@ -1,0 +1,52 @@
+<div class="grid-view dms-file-list" ng-controller="DMSFileListCtrl"  ui-dms-uploader ui-tab-gate>
+  <div class="navbar record-toolbar">
+    <div class="navbar-inner">
+      <div class="container">
+        <ul class="breadcrumb pull-left">
+          <li><a href="javascript:" ng-click="onFolder()"><i class="fa fa-home"></i></a> <span class="divider">/</span></li>
+          <li ng-repeat="folder in currentPaths" ng-class="{'active': $last}">
+            <span ng-if="$last">{{folder.fileName}}</span>
+            <a ng-if="!$last" href="javascript:" ng-click="onFolder(folder)">{{folder.fileName}}</a>
+            <span class="divider">/</span>
+          </li>
+        </ul>
+        <div ui-record-pager="no-text" class="pull-right"></div>
+        <div class="dms-buttons btn-group pull-right">
+          <button ng-click="onNewFolder()" class="btn" title="{{ 'Create folder' | t }}"><i class="fa fa-plus"></i></button>
+          <button class="btn" ng-click="onDelete()" ng-if="hasButton('delete')" ng-disabled="!canDelete()" title="{{ 'Delete' | t}}">
+            <i class="fa fa-trash-o"></i>
+          </button>
+          <button ng-click="onUpload()" class="btn" title="{{ 'Upload file' | t }}"><i class="fa fa-upload"></i></button>
+          <button ng-click="onDownload()" class="btn" title="{{ 'Download file' | t }}"><i class="fa fa-download"></i></button>
+        </div>
+        <div ui-filter-box x-handler="this" class="pull-right"></div>
+      </div>
+    </div>
+  </div>
+  <div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-no-filter="true"></div>
+  <div class="dms-file-upload">
+    <input type="file" class="upload-input hide">
+    <div class="upload-overlay"></div>
+    <div class="upload-dropzone">
+      <div class="drop-image">
+        <i class="fa fa-upload"></i>
+      </div>
+      <div class="drop-message" x-translate>Drop your files to start upload.</div>
+    </div>
+    <div class="upload-files panel" ng-show="uploadFiles.length">
+      <div class="panel-header">
+        <div class="panel-title" x-translate>Uploading files...</div>
+      </div>
+      <div class="panel-body">
+        <table>
+          <tr ng-repeat="file in uploadFiles | filter:{complete: false}">
+            <td width="5%">{{file.name}}</td>
+            <td>
+              <div class="progress progress-striped"><div class="bar" ng-style="{width: file.progress}"></div></div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

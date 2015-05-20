@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_4.0.xsd">
+
+  <!-- views -->
+  <grid name="dms-file-grid" title="Documents" model="com.axelor.dms.db.DMSFile" edit-icon="false">
+    <field name="typeIcon" x-type="icon"/>
+    <field name="fileName"/>
+    <field name="lastModified" title="Last modified" width="150" x-type="datetime"/>
+    <field name="metaFile.sizeText" title="Size" width="100"/>
+  </grid>
+
+  <form name="dms-file-form" title="Document" model="com.axelor.dms.db.DMSFile">
+    <panel title="Overview">
+      <field name="fileName" title="Name" />
+      <field name="parent" domain="self.isDirectory = true" form-view="dms-folder-form" grid-view="dms-folder-grid" />
+      <field name="metaFile"/>
+    </panel>
+    <panel-tabs>
+      <panel-related field="groups" target="com.axelor.auth.db.Group">
+        <field name="name"/>
+      </panel-related>
+      <panel-related field="users" target="com.axelor.auth.db.User">
+        <field name="name"/>
+      </panel-related>
+    </panel-tabs>
+  </form>
+
+  <grid name="dms-folder-grid" title="Directories" model="com.axelor.dms.db.DMSFile" edit-icon="false">
+    <field name="fileName"/>
+  </grid>
+
+  <form name="dms-folder-form" title="Directory" model="com.axelor.dms.db.DMSFile">
+    <panel title="Overview">
+      <field name="fileName" title="Name" />
+      <field name="parent" domain="self.isDirectory = true" form-view="dms-folder-form" grid-view="dms-folder-grid" />
+    </panel>
+    <panel-tabs>
+      <panel-related field="groups" target="com.axelor.auth.db.Group">
+        <field name="name"/>
+      </panel-related>
+      <panel-related field="users" target="com.axelor.auth.db.User">
+        <field name="name"/>
+      </panel-related>
+    </panel-tabs>
+  </form>
+
+  <!-- actions -->
+  <action-view name="dms.all" model="com.axelor.dms.db.DMSFile" title="All Documents">
+    <view name="dms-file-grid" type="grid" />
+    <view-param name="ui-template:grid" value="dms-file-list"/>
+  </action-view>
+
+  <action-view name="dms.my" model="com.axelor.dms.db.DMSFile" title="All Documents">
+    <view name="dms-file-grid" type="grid" />
+    <view-param name="ui-template:grid" value="dms-file-list"/>
+    <domain>self.createdBy = :__user__</domain>
+  </action-view>
+
+  <!-- menu -->
+  <menuitem name="menu-dms" order="-109"
+    title="Documents" icon="img/inbox-document.png"/>
+  <menuitem name="menu-dms-all" title="All Documents" parent="menu-dms"
+    action="dms.all" order="-90"/>
+  <menuitem name="menu-dms-my" title="My Documents" parent="menu-dms"
+    action="dms.my" order="-80"/>
+
+</object-views>

@@ -1,0 +1,80 @@
+.dms-file-list {
+	position: relative;
+}
+
+.dms-file-list .record-toolbar .breadcrumb {
+	margin: 0;
+	padding: 10px 8px;
+	font-weight: bold;
+}
+
+.dms-file-list .record-toolbar .dms-buttons {
+	margin-right: 6px;
+}
+
+.dms-folder-dialog input {
+	box-sizing: border-box;
+	width: 100%;
+	height: 28px;
+	margin: 0;
+}
+
+.dms-file-upload .upload-files,
+.dms-file-upload .upload-dropzone {
+	position: absolute;
+	z-index: 10000;
+	background: white;
+}
+
+.dms-file-upload .upload-dropzone {
+	border: 1px solid #d4d4d4;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+	width: 250px;
+	height: 250px;
+	border-radius: 125px;
+	text-align: center;
+	top: calc(50% - 125px);
+	left: calc(50% - 125px);
+	z-index: 10001;
+	display: none;
+}
+
+.dms-file-upload .upload-dropzone .drop-image {
+	margin-top: 36%;
+	margin-bottom: 12px;
+}
+
+.dms-file-upload .upload-dropzone .drop-image i {
+	font-size: 32px !important;
+}
+
+.dms-file-upload .upload-files {
+	bottom: 0;
+	right: 10px;
+	max-width: 480px;
+	white-space: nowrap;
+}
+
+.dms-file-upload .upload-files .progress {
+	margin-bottom: 0;
+}
+
+.dms-file-upload .upload-overlay {
+	opacity: 0.3;
+	with: 100%;
+	height: 100%;
+	overflow: hidden;
+	z-index: 10000;
+	position: absolute;
+	top: 0px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: gray;
+	display: none;
+}
+
+.dms-file-list.dropping .upload-overlay,
+.dms-file-list.dropping .upload-dropzone {
+	display: block;
+}

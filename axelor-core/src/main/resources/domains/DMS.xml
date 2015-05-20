@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_4.0.xsd">
+
+  <module name="dms" package="com.axelor.dms.db"/>
+
+  <entity name="DMSFile" table="DMS_FILE" repository="none">
+    <string name="fileName" required="true" namecolumn="true" />
+    <boolean name="isDirectory" />
+    <many-to-one name="parent" ref="DMSFile" />
+    <many-to-one name="metaFile" ref="com.axelor.meta.db.MetaFile" />
+    <many-to-many name="groups" ref="com.axelor.auth.db.Group" />
+    <many-to-many name="users" ref="com.axelor.auth.db.User" />
+  </entity>
+
+</domain-models>
