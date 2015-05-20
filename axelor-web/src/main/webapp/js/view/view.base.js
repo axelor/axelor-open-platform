@@ -518,6 +518,8 @@ angular.module('axelor.ui').directive('uiRecordPager', function(){
 				elChanger = element.find('.record-pager-change').hide(),
 				elInput = elChanger.find('input');
 			
+			scope.showText = attrs.uiRecordPager !== "no-text";
+			
 			elText.click(function(e) {
 				elText.add(elChanger).toggle();
 			});
@@ -531,7 +533,7 @@ angular.module('axelor.ui').directive('uiRecordPager', function(){
 		},
 		template:
 		'<div class="record-pager hidden-phone">'+
-	    '<span>'+
+	    '<span ng-show="showText">'+
 	    	'<span class="record-pager-text">{{pagerText()}}</span>'+
 			'<span class="input-append record-pager-change">'+
 				'<input type="text" style="width: 30px;" value="{{getPageSize()}}">'+
