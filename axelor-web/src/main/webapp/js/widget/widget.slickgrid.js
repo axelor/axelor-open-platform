@@ -364,6 +364,13 @@ var Formatters = {
 
 	"url": function(field, value) {
 		return '<a target="_blank" ng-show="text" href="' + value + '">' + value + '</a>';
+	},
+	
+	"icon": function(field, value) {
+		if (value && value.indexOf("fa-") > -1) {
+			return '<i class="slick-icon ' + value + '"></i>';
+		}
+		return Formatters["button"](field, value);
 	}
 };
 
@@ -519,7 +526,7 @@ Grid.prototype.parse = function(view) {
 		var field = handler.fields[item.name] || {},
 			path = handler.formPath, type;
 
-		type = field.type || item.serverType || item.type || 'string';
+		type = (item.widgetAttrs||{}).type || field.type || item.serverType || item.type || 'string';
 
 		field = _.extend({}, field, item, {type: type});
 		scope.fields_view[item.name] = field;
@@ -535,6 +542,7 @@ Grid.prototype.parse = function(view) {
 		
 		var sortable = true;
 		switch (field.type) {
+		case 'icon':
 		case 'button':
 		case 'one-to-many':
 		case 'many-to-many':
@@ -550,6 +558,9 @@ Grid.prototype.parse = function(view) {
 			field.handler = that.newActionHandler(buttonScope(scope), element, {
 				action: field.onClick
 			});
+		}
+
+		if (field.type == "button" || field.type == "icon") {
 			item.title = "&nbsp;";
 			item.width = 10;
 		}
@@ -583,7 +594,7 @@ Grid.prototype.parse = function(view) {
 			column.groupTotalsFormatter = totalsFormatter;
 		}
 		
-		if (field.type === "button" || field.type === "boolean") {
+		if (field.type === "button" || field.type === "boolean" || field.type === "icon") {
 			return;
 		}
 

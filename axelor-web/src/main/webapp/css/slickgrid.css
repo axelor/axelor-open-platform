@@ -368,7 +368,8 @@
 	color: #0088cc;
 }
 
-.slick-cell.edit-icon i {
+.slick-cell.edit-icon i,
+.slick-cell i.slick-icon {
 	padding: 4px 7px;
 	cursor: pointer;
 }
