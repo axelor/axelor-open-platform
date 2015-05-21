@@ -1,15 +1,38 @@
 .dms-file-list {
 	position: relative;
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	    -ms-user-select: none;
+			user-select: none;
 }
 
 .dms-file-list .record-toolbar .breadcrumb {
 	margin: 0;
 	padding: 10px 8px;
 	font-weight: bold;
+	white-space: nowrap;
+	overflow: hidden;
 }
 
-.dms-file-list .record-toolbar .dms-buttons {
-	margin-right: 6px;
+.dms-file-list .record-toolbar .btn {
+	outline: none;
+}
+
+.dms-file-list .dms-folder-tree {
+	position: absolute;
+	overflow: auto;
+	width: 0;
+	top: 41px;
+	bottom: 0;
+	border-right: 1px solid #d3d3d3;
+}
+
+.dms-file-list.has-tree .dms-folder-tree {
+	width: 249px;
+}
+
+.dms-file-list.has-tree > .slickgrid {
+	left: 250px !important;
 }
 
 .dms-folder-dialog input {
@@ -77,4 +100,88 @@
 .dms-file-list.dropping .upload-overlay,
 .dms-file-list.dropping .upload-dropzone {
 	display: block;
+}
+
+.dms-folder-tree {
+	box-sizing: border-box;
+}
+
+.dms-folder-tree * {
+	box-sizing: border-box;
+}
+
+.dms-folder-tree ul {
+	margin: 0 0 0px 15px;
+}
+
+.dms-folder-tree ul,
+.dms-folder-tree li {
+	list-style: none;
+}
+
+.dms-folder-tree > ul {
+	margin: 1px 4px;
+}
+
+.dms-folder-tree a {
+	color: #333;
+	text-decoration: none;
+	line-height: 2em;
+	padding: 4px;
+}
+
+.dms-folder-tree a * {
+	position: relative;
+}
+
+.dms-folder-tree a span.highlight {
+	position: absolute;
+	box-sizing: border-box;
+	width: 100%;
+	height: 2em;
+	left: 0;
+}
+
+.dms-folder-tree a i.handle {
+	width: 16px;
+	display: inline-block;
+	text-align: center;
+}
+
+.dms-folder-tree li.empty i.handle {
+	visibility: hidden;
+}
+
+.dms-folder-tree a:hover span.highlight {
+	background-color: #eeeeee;
+}
+
+.dms-folder-tree a.active span.highlight {
+	background-color: #e6e6e6;
+}
+
+.dms-folder-tree a.dropping span.highlight {
+	border: 1px solid rgba(82, 168, 236, 0.8);
+}
+
+.dms-folder-tree a.active {
+	color: #222;
+	font-weight: bold;
+}
+
+.grid-dnd-proxy {
+	position: absolute;
+	display: inline-block;
+	padding: 6px 12px;
+	background: #fff;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: 4px;
+	z-index: 100000;
+}
+
+.grid-dnd-proxy .badge {
+	position: absolute;
+	bottom: calc(100% - 6px);
+	left: calc(100% - 6px);
 }

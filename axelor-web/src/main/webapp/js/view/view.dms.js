@@ -61,9 +61,9 @@ function DMSFileListCtrl($scope, $element) {
 		});
 	};
 
-	$scope.onFolder = function(folder) {
+	$scope.onFolder = function(folder, currentPaths) {
 
-		var paths = $scope.currentPaths || [];
+		var paths = currentPaths || $scope.currentPaths || [];
 		var index = paths.indexOf(folder);
 
 		if (index > -1) {
@@ -81,58 +81,6 @@ function DMSFileListCtrl($scope, $element) {
 
 		return $scope.reload();
 	}
-
-	$scope.onNewFolder = function () {
-
-		var html = "" +
-				"<div>" +
-					"<input type='text' value='" + _t("New Folder") +"'>" +
-				"</div>";
-
-		var dialog = axelor.dialogs.box(html, {
-			title: _t("Create folder"),
-			buttons: [{
-				'text': _t("Cancel"),
-				'class': 'btn',
-				'click': close
-			}, {
-				'text': _t("Create"),
-				'class': 'btn btn-primary',
-				'click': function (e) {
-					var val = dialog.find("input").val();
-					if (val && val.trim().length) {
-						createFolder(val);
-					} else {
-						close();
-					}
-				}
-			}]
-		});
-
-		function close() {
-			if (dialog) {
-				dialog.dialog("close");
-				dialog = null;
-			}
-		}
-
-		function createFolder(name) {
-			var ds = $scope._dataSource;
-			var record = {
-				fileName: name,
-				isDirectory: true
-			};
-			if ($scope.currentFolder) {
-				record.parent = _.pick($scope.currentFolder, "id");
-			}
-			ds.save(record).then(close, close);
-		}
-
-		dialog.parent().addClass("dms-folder-dialog");
-		setTimeout(function() {
-			dialog.find("input").focus().select();
-		});
-	};
 
 	$scope.onItemClick = function(event, args) {
 		var elem = $(event.target);
@@ -300,6 +248,399 @@ ui.directive('uiDmsUploader', function () {
 	};
 });
 
+DmsFolderTreeCtrl.$inject = ["$scope", "DataSource"];
+function DmsFolderTreeCtrl($scope, DataSource) {
+
+	var ds = DataSource.create("com.axelor.dms.db.DMSFile");
+	var domain = "self.isDirectory = true";
+
+	$scope.folders = {};
+	$scope.rootFolders = [];
+
+	function doSync(records) {
+		var folders = {};
+
+		_.each(records, function (item) {
+			folders[item.id] = item;
+			item.nodes = [];
+		});
+		_.each(records, function (item) {
+			var parent = folders[item["parent.id"]];
+			if (parent) {
+				parent.nodes.push(item);
+				item.parent = parent;
+			}
+		});
+
+		var rootFolders = _.filter(folders, function (item) {
+			return !item.parent;
+		});
+
+		rootFolders = [{
+			fileName: _t("Home"),
+			nodes: rootFolders,
+			active: true,
+			open: true
+		}];
+
+		// sync with old state
+		_.each($scope.folders, function (item, id) {
+			var folder = folders[id];
+			if (folder) {
+				folder.open = item.open;
+				folder.active = item.active;
+			}
+		});
+		_.each($scope.rootFolders, function (root, i) {
+			var folder = rootFolders[i];
+			if (folder) {
+				folder.open = root.open;
+				folder.active = root.active;
+			}
+		});
+
+		$scope.folders = folders;
+		$scope.rootFolders = rootFolders;
+	}
+
+	$scope.getTreeDomain = function () {
+		return domain;
+	};
+
+	$scope.getSelected = function () {
+		for (var id in $scope.folders) {
+			var folder = $scope.folders[id];
+			if (folder && folder.active) {
+				return folder;
+			}
+		}
+		var home = _.first($scope.rootFolders);
+		if (home && home.active) {
+			return home;
+		}
+	};
+
+	$scope.sync = function () {
+		return ds.search({
+			fields: ["fileName", "parent.id"],
+			domain: $scope.getTreeDomain(),
+			limit: -1,
+		}).success(doSync);
+	};
+
+	$scope.onMoveFiles = function (files, target) {
+
+		_.each(files, function (item) {
+			if (target && target.id) {
+				item.parent = {
+					id: target.id
+				};
+			} else {
+				item.parent = null;
+			}
+		});
+
+		return ds.saveAll(files);
+	};
+
+	$scope.onNewFolder = function () {
+
+		var count = 1;
+		var selected = $scope.getSelected() || {};
+		var existing = _.pluck((selected.nodes || []), "fileName");
+
+		var name = _t("New Folder");
+		var _name = name;
+		while(existing.indexOf(_name) > -1) {
+			_name = name + " (" + ++count + ")";
+		}
+		name = _name;
+
+		var html = "" +
+			"<div>" +
+				"<input type='text' value='" + name +"'>" +
+			"</div>";
+
+		var dialog = axelor.dialogs.box(html, {
+			title: _t("Create folder"),
+			buttons: [{
+				'text': _t("Cancel"),
+				'class': 'btn',
+				'click': close
+			}, {
+				'text': _t("Create"),
+				'class': 'btn btn-primary',
+				'click': function (e) {
+					var val = dialog.find("input").val();
+					if (val && val.trim().length) {
+						createFolder(val);
+					} else {
+						close();
+					}
+				}
+			}]
+		});
+
+		function close() {
+			if (dialog) {
+				dialog.dialog("close");
+				dialog = null;
+			}
+		}
+
+		function createFolder(name) {
+			var record = {
+				fileName: name,
+				isDirectory: true
+			};
+			if ($scope.currentFolder) {
+				record.parent = _.pick($scope.currentFolder, "id");
+			}
+			var promise = ds.save(record);
+			promise.then(close, close);
+			promise.success(function (record) {
+				$scope.sync();
+				if ($scope.reload) {
+					$scope.reload();
+				}
+			});
+		}
+
+		dialog.parent().addClass("dms-folder-dialog");
+		setTimeout(function() {
+			dialog.find("input").focus().select();
+		});
+	};
+
+	$scope.onFolderClick = function (folder) {
+
+	};
+}
+
+ui.directive("uiDmsFolders", function () {
+	return {
+		controller: DmsFolderTreeCtrl,
+		link: function (scope, element, attrs) {
+
+			var domain = "self.isDirectory = true";
+			if (scope.tab.domain) {
+				domain += " AND " + scope.tab.domain;
+			}
+
+			scope.getTreeDomain = function () {
+				return domain;
+			}
+
+			scope.showTree = true;
+
+			scope.onToggleTree = function () {
+				scope.showTree = !scope.showTree;
+				axelor.$adjustSize();
+			};
+
+			scope.onFolderClick = function (node) {
+				if (!node || !node.id) {
+					scope.onFolder();
+					scope.applyLater();
+					return;
+				}
+				var paths = [];
+				var parent = node.parent;
+				while (parent) {
+					paths.unshift(parent);
+					parent = parent.parent;
+				}
+				scope.onFolder(node, paths);
+				scope.applyLater();
+			};
+
+			var __onMoveFiles = scope.onMoveFiles;
+			scope.onMoveFiles = function (files, toFolder) {
+				var promise = __onMoveFiles.call(scope, files, toFolder);
+				promise.success(function (records) {
+					scope.reload();
+					scope._dataSource.trigger("on:save", []);
+				});
+				return promise;
+			}
+
+			scope.onGridInit = _.once(function (grid, instance) {
+
+				grid.onDragInit.subscribe(function (e, dd) {
+					e.stopImmediatePropagation();
+				});
+
+				grid.onDragStart.subscribe(function (e, dd) {
+
+					var cell = grid.getCellFromEvent(e);
+					if (!cell) return;
+
+					dd.row = cell.row;
+					var record = grid.getDataItem(dd.row);
+					if (!record || !record.id) {
+						return;
+					}
+
+					e.stopImmediatePropagation();
+					dd.mode = "recycle";
+
+					var rows = grid.getSelectedRows();
+					if (rows.length === 0 || rows.indexOf(dd.row) === -1) {
+						rows = [dd.row];
+					}
+
+					grid.setSelectedRows(rows);
+					grid.setActiveCell(cell.row, cell.cell);
+
+					dd.rows = rows;
+					dd.count = rows.length;
+					dd.records = _.map(rows, function (i) {
+						return grid.getDataItem(i);
+					});
+
+					var text = "<span>" + record.fileName + "</span>";
+					if (dd.count > 1) {
+						text += " <span class='badge badge-important'>"+ dd.count +"</span>";
+					}
+
+					var proxy = $("<div class='grid-dnd-proxy'></div>")
+						.hide()
+						.html(text)
+						.appendTo("body");
+
+					return dd.helper = proxy;
+				});
+
+				grid.onDrag.subscribe(function (e, dd) {
+					if (dd.mode != "recycle") { return; }
+					dd.helper.show().css({top: e.pageY + 5, left: e.pageX + 5});
+				});
+
+				grid.onDragEnd.subscribe(function (e, dd) {
+					if (dd.mode != "recycle") { return; }
+					dd.helper.remove();
+				});
+
+				$.drop({
+					mode: "intersect"
+				});
+			});
+
+			scope.$watch("currentFolder", function (folder) {
+				var folders = scope.folders || {};
+				var rootFolders = scope.rootFolders || [];
+
+				for (var id in folders) {
+					folders[id].active = false;
+				}
+
+				(rootFolders[0]||{}).active = false;
+
+				var id = (folder||{}).id;
+				var node = folders[id] || rootFolders[0];
+				if (node) {
+					node.active = true;
+				}
+			});
+
+			function sync() {
+				return scope.sync();
+			}
+
+			scope._dataSource.on("on:save", sync);
+			scope._dataSource.on("on:remove", sync);
+
+			sync();
+		},
+		template: "<ul ui-dms-tree x-handler='this' x-nodes='rootFolders' class='dms-tree'></ul>"
+	};
+});
+
+ui.directive("uiDmsTreeNode", function () {
+
+	return {
+		scope: true,
+		link: function (scope, element, attrs) {
+
+			element.children('.highlight').on("dropstart", function (e, dd) {
+				var records = dd.records;
+				if (!records || records.length === 0) {
+					return;
+				}
+				if (scope.node.active) {
+					return;
+				}
+				for (var i = 0; i < records.length; i++) {
+					var record = records[i];
+					var current = scope.node;
+					while(current) {
+						if (record.id === current.id) { return; }
+						if (record.parent && record.parent.id === current.id) { return; }
+						current = current.parent;
+					}
+				}
+				element.addClass("dropping");
+			});
+
+			element.children('.highlight').on("dropend", function (e, dd) {
+				element.removeClass("dropping");
+			});
+
+			element.children('.highlight').on("drop", function (e, dd) {
+				var records = dd.records;
+				if (!records || records.length === 0 || !scope.node) {
+					return;
+				}
+				if (!element.hasClass("dropping")) {
+					return;
+				}
+				scope.onMoveFiles(records, scope.node);
+			});
+		},
+		replace: true,
+		template: "" +
+		"<a ng-click='onClick($event, node)' ng-class='{active: node.active}'>" +
+			"<span class='highlight'></span>" +
+			"<i class='fa fa-caret-down handle' ng-show='node.open'></i> " +
+			"<i class='fa fa-caret-right handle' ng-show='!node.open'></i> " +
+			"<i class='fa fa-folder'></i> " +
+			"<span class='title'>{{node.fileName}}</span>" +
+		"</a>"
+	};
+});
+
+ui.directive("uiDmsTree", ['$compile', function ($compile) {
+
+	var template = "" +
+	"<li ng-repeat='node in nodes' ng-class='{empty: !node.nodes.length}' class='dms-tree-folder'>" +
+		"<a x-node='node' ui-dms-tree-node></a>" +
+		"<ul ng-show='parent.open' x-parent='node' x-handler='handler' x-nodes='node.nodes' ui-dms-tree></ul>" +
+	"</li>";
+
+	return {
+		scope: {
+			parent: "=",
+			nodes: "=",
+			handler: "="
+		},
+		link: function (scope, element, attrs) {
+			var handler = scope.handler;
+
+			scope.onClick = function (e, node) {
+				if ($(e.target).is("i.handle")) {
+					return node.open = !node.open;
+				}
+				return handler.onFolderClick(node);
+			};
+
+			scope.onMoveFiles = function (files, toFolder) {
+				return handler.onMoveFiles(files, toFolder);
+			}
+
+			$compile(template)(scope).appendTo(element);
+		}
+	};
+}]);
 
 // prevent download on droping files
 $(function () {

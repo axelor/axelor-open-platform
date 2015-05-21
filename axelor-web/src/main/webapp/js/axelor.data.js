@@ -594,6 +594,7 @@
 					var res = response.data;
 					res.data = res.data[0];
 					record = that._accept(res);
+					that.trigger('on:save', [values]);
 				});
 
 				promise.success = function(fn) {
@@ -646,6 +647,7 @@
 					}
 
 					that.trigger('change', records, page);
+					that.trigger('on:save', items);
 				});
 				
 				promise.success = function(fn) {
@@ -734,6 +736,7 @@
 					}
 					
 					that.trigger('change', records, page);
+					that.trigger('on:remove', [record]);
 				});
 
 				promise.success = function(fn) {
@@ -782,6 +785,7 @@
 						remove(record.id);
 					});
 					that.trigger('change', records, page);
+					that.trigger('on:remove', selection);
 				});
 
 				promise.success = function(fn) {

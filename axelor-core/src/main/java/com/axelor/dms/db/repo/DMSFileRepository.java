@@ -30,10 +30,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 			dt = file.getCreatedOn();
 		}
 
-		json.put("editIcon", "fa fa-pencil");
-		json.put("removeIcon", "fa fa-remove");
 		json.put("typeIcon", isFile ? "fa fa-file" : "fa fa-folder");
-		json.put("downloadIcon", "fa fa-download");
 		json.put("lastModified", dt);
 
 		return json;

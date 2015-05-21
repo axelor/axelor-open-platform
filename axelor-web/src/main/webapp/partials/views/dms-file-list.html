@@ -1,8 +1,25 @@
-<div class="grid-view dms-file-list" ng-controller="DMSFileListCtrl"  ui-dms-uploader ui-tab-gate>
+<div class="grid-view dms-file-list" ng-class="{'has-tree': showTree }" ng-controller="DMSFileListCtrl"  ui-dms-uploader ui-tab-gate>
   <div class="navbar record-toolbar">
     <div class="navbar-inner">
       <div class="container">
-        <ul class="breadcrumb pull-left">
+        <div class="btn-group pull-left">
+          <button class="btn" ng-click="onToggleTree()" tabIndex="-1"><i class="fa fa-bars"></i></button>
+        </div>
+        <div class="btn-group pull-left">
+          <button class="btn btn-primary" ng-click="onNewFolder()" tabIndex="-1">New</button>
+          <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" tabIndex="-1"><span class="caret"></span></button>
+          <ul class="dropdown-menu">
+            <li><a href="javascript:" ng-click="onNewFolder()" x-translate>Folder</a></li>
+            <li class="divider"></li>
+            <li><a href="javascript:" ng-click="onUpload()" x-translate>File upload</a></li>
+          </ul>
+        </div>
+        <div class="btn-group pull-left">
+          <button class="btn btn-danger" ng-click="onDelete()" ng-if="hasButton('delete')" ng-disabled="!canDelete()" x-translate>Delete</button>
+        </div>
+        <div ui-record-pager="no-text" class="pull-right"></div>
+        <div ui-filter-box x-handler="this" class="pull-right"></div>
+        <ul class="breadcrumb">
           <li><a href="javascript:" ng-click="onFolder()"><i class="fa fa-home"></i></a> <span class="divider">/</span></li>
           <li ng-repeat="folder in currentPaths" ng-class="{'active': $last}">
             <span ng-if="$last">{{folder.fileName}}</span>
@@ -10,22 +27,13 @@
             <span class="divider">/</span>
           </li>
         </ul>
-        <div ui-record-pager="no-text" class="pull-right"></div>
-        <div class="dms-buttons btn-group pull-right">
-          <button ng-click="onNewFolder()" class="btn" title="{{ 'Create folder' | t }}"><i class="fa fa-plus"></i></button>
-          <button class="btn" ng-click="onDelete()" ng-if="hasButton('delete')" ng-disabled="!canDelete()" title="{{ 'Delete' | t}}">
-            <i class="fa fa-trash-o"></i>
-          </button>
-          <button ng-click="onUpload()" class="btn" title="{{ 'Upload file' | t }}"><i class="fa fa-upload"></i></button>
-          <button ng-click="onDownload()" class="btn" title="{{ 'Download file' | t }}"><i class="fa fa-download"></i></button>
-        </div>
-        <div ui-filter-box x-handler="this" class="pull-right"></div>
       </div>
     </div>
   </div>
-  <div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-no-filter="true"></div>
+  <div class="dms-folder-tree" ui-dms-folders></div>
+  <div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-no-filter="true" x-on-init="onGridInit"></div>
   <div class="dms-file-upload">
-    <input type="file" class="upload-input hide">
+    <input type="file" class="upload-input hide" multiple>
     <div class="upload-overlay"></div>
     <div class="upload-dropzone">
       <div class="drop-image">
