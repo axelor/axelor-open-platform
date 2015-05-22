@@ -30,6 +30,7 @@ function DMSFileListCtrl($scope, $element) {
 	}
 
 	$scope.$emptyMessage = _t("No documents found.");
+	$scope.$confirmMessage = _t("Are you sure you want to delete selected documents?");
 
 	$scope.currentFolder = null;
 	$scope.currentPaths = [];

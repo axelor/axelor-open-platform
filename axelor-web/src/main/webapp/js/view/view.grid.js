@@ -398,9 +398,11 @@ function GridViewCtrl($scope, $element) {
 		});
 	};
 
+	$scope.$confirmMessage = _t("Do you really want to delete the selected record(s)?");
+
 	$scope.onDelete = function() {
 		
-		axelor.dialogs.confirm(_t("Do you really want to delete the selected record(s)?"), function(confirmed){
+		axelor.dialogs.confirm($scope.$confirmMessage, function(confirmed){
 
 			if (!confirmed)
 				return;
