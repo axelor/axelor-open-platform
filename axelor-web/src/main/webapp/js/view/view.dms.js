@@ -19,6 +19,59 @@
 
 var ui = angular.module('axelor.ui');
 
+function inputDialog(options, callback) {
+
+	var opts = _.extend({
+		value: "",
+		title: "",
+		titleOK: _t("OK"),
+		titleCancel: _t("Cancel"),
+	}, options);
+
+	var html = "" +
+	"<div>" +
+		"<input type='text' value='" + opts.value +"'>" +
+	"</div>";
+
+	var dialog = axelor.dialogs.box(html, {
+		title: opts.title,
+		buttons: [{
+			'text': opts.titleCancel,
+			'class': 'btn',
+			'click': close
+		}, {
+			'text': opts.titleOK,
+			'class': 'btn btn-primary',
+			'click': submit
+		}]
+	})
+	.on("keypress", "input", function (e) {
+		if (e.keyCode === 13) {
+			submit();
+		}
+	});
+
+	function close() {
+		if (dialog) {
+			dialog.dialog("close");
+			dialog = null;
+		}
+	}
+
+	function submit() {
+		var value = dialog.find("input").val().trim();
+		if (value) {
+			return callback(value, close);
+		}
+		return close();
+	}
+
+	dialog.parent().addClass("dms-folder-dialog");
+	setTimeout(function() {
+		dialog.find("input").focus().select();
+	});
+}
+
 ui.controller("DMSFileListCtrl", DMSFileListCtrl);
 DMSFileListCtrl.$inject = ['$scope', '$element'];
 function DMSFileListCtrl($scope, $element) {
@@ -102,67 +155,80 @@ function DMSFileListCtrl($scope, $element) {
 		return $scope.dataView.getItem(index);
 	}
 
-	$scope.onRename = function () {
+	$scope.onNewFolder = function () {
+		var count = 1;
+		var selected = $scope.getSelected() || {};
+		var existing = _.pluck((selected.nodes || []), "fileName");
 
+		var name = _t("New Folder");
+		var _name = name;
+		while(existing.indexOf(_name) > -1) {
+			_name = name + " (" + ++count + ")";
+		}
+		name = _name;
+
+		inputDialog({
+			value: name,
+			title: _t("Create folder"),
+			titleOK: _t("Create")
+		}, function (value, done) {
+			var record = {
+				fileName: value,
+				isDirectory: true
+			};
+			if ($scope.currentFolder) {
+				record.parent = _.pick($scope.currentFolder, "id");
+			}
+			var promise = $scope._dataSource.save(record);
+			promise.then(done, done);
+			promise.success(function (record) {
+				$scope.reload();
+			});
+		});
+	};
+
+	$scope.onRename = function () {
 		var record = getSelected();
 		if (!record || !record.id) {
 			return;
 		}
 
-		var html = "" +
-			"<div>" +
-				"<input type='text' value='" + record.fileName +"'>" +
-			"</div>";
-
-		var dialog = axelor.dialogs.box(html, {
-			title: _t("Rename"),
-			buttons: [{
-				'text': _t("Cancel"),
-				'class': 'btn',
-				'click': close
-			}, {
-				'text': _t("OK"),
-				'class': 'btn btn-primary',
-				'click': submit
-			}]
-		})
-		.on("keypress", "input", function (e) {
-			if (e.keyCode === 13) {
-				submit();
+		inputDialog({
+			value: record.fileName
+		}, function(value, done) {
+			if (record.fileName !== value) {
+				record.fileName = value;
+				rename(record, done);
+			} else {
+				done();
 			}
 		});
 
-		function close() {
-			if (dialog) {
-				dialog.dialog("close");
-				dialog = null;
-			}
-		}
-
-		function submit() {
-			var val = (dialog.find("input").val() || "").trim();
-			if (record.fileName !== val && val.length) {
-				record.fileName = val;
-				rename(record);
-			} else {
-				close();
-			}
-		}
-
-		function rename(record) {
+		function rename(record, done) {
 			var promise = $scope._dataSource.save(record);
-			promise.then(close, close);
+			promise.then(done, done);
 			promise.success(function (record) {
-				$scope.sync();
-				if ($scope.reload) {
-					$scope.reload();
-				}
+				$scope.reload();
 			});
 		}
+	};
 
-		dialog.parent().addClass("dms-folder-dialog");
-		setTimeout(function() {
-			dialog.find("input").focus().select();
+	$scope.onMoveFiles = function (files, toFolder) {
+		if (_.isEmpty(files)) { return; }
+		_.each(files, function (item) {
+			if (toFolder && toFolder.id) {
+				item.parent = {
+					id: toFolder.id
+				};
+			} else {
+				item.parent = null;
+			}
+		});
+
+		$scope._dataSource.saveAll(files)
+		.success(function (records) {
+			$scope.reload();
+			$scope._dataSource.trigger("on:save", []);
 		});
 	};
 }
@@ -318,12 +384,19 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 
 	var ds = DataSource.create("com.axelor.dms.db.DMSFile");
 	var domain = "self.isDirectory = true";
+	var params = $scope._viewParams;
+	if (params.domain) {
+		domain += " AND " + params.domain;
+	}
 
 	$scope.folders = {};
 	$scope.rootFolders = [];
 
-	function doSync(records) {
+	function syncFolders(records) {
+
+		var home = {};
 		var folders = {};
+		var rootFolders = [];
 
 		_.each(records, function (item) {
 			folders[item.id] = item;
@@ -337,16 +410,16 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 			}
 		});
 
-		var rootFolders = _.filter(folders, function (item) {
+		home = {
+			fileName: _t("Home")
+		};
+		home.open = true;
+		home.active = true;
+		home.nodes = _.filter(folders, function (item) {
 			return !item.parent;
 		});
 
-		rootFolders = [{
-			fileName: _t("Home"),
-			nodes: rootFolders,
-			active: true,
-			open: true
-		}];
+		rootFolders = [home];
 
 		// sync with old state
 		_.each($scope.folders, function (item, id) {
@@ -368,10 +441,6 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 		$scope.rootFolders = rootFolders;
 	}
 
-	$scope.getTreeDomain = function () {
-		return domain;
-	};
-
 	$scope.getSelected = function () {
 		for (var id in $scope.folders) {
 			var folder = $scope.folders[id];
@@ -388,104 +457,32 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 	$scope.sync = function () {
 		return ds.search({
 			fields: ["fileName", "parent.id"],
-			domain: $scope.getTreeDomain(),
+			domain: domain,
 			limit: -1,
-		}).success(doSync);
+		}).success(syncFolders);
 	};
 
-	$scope.onMoveFiles = function (files, target) {
+	$scope.showTree = true;
 
-		_.each(files, function (item) {
-			if (target && target.id) {
-				item.parent = {
-					id: target.id
-				};
-			} else {
-				item.parent = null;
-			}
-		});
-
-		return ds.saveAll(files);
+	$scope.onToggleTree = function () {
+		$scope.showTree = !$scope.showTree;
+		axelor.$adjustSize();
 	};
 
-	$scope.onNewFolder = function () {
-
-		var count = 1;
-		var selected = $scope.getSelected() || {};
-		var existing = _.pluck((selected.nodes || []), "fileName");
-
-		var name = _t("New Folder");
-		var _name = name;
-		while(existing.indexOf(_name) > -1) {
-			_name = name + " (" + ++count + ")";
+	$scope.onFolderClick = function (node) {
+		if (!node || !node.id) {
+			$scope.onFolder();
+			$scope.applyLater();
+			return;
 		}
-		name = _name;
-
-		var html = "" +
-			"<div>" +
-				"<input type='text' value='" + name +"'>" +
-			"</div>";
-
-		var dialog = axelor.dialogs.box(html, {
-			title: _t("Create folder"),
-			buttons: [{
-				'text': _t("Cancel"),
-				'class': 'btn',
-				'click': close
-			}, {
-				'text': _t("Create"),
-				'class': 'btn btn-primary',
-				'click': submit
-			}]
-		})
-		.on("keypress", "input", function (e) {
-			if (e.keyCode === 13) {
-				submit();
-			}
-		});
-
-		function close() {
-			if (dialog) {
-				dialog.dialog("close");
-				dialog = null;
-			}
+		var paths = [];
+		var parent = node.parent;
+		while (parent) {
+			paths.unshift(parent);
+			parent = parent.parent;
 		}
-
-		function submit() {
-			var val = (dialog.find("input").val() || "").trim();
-			if (val.length) {
-				createFolder(val);
-			} else {
-				close();
-			}
-		}
-
-		function createFolder(name) {
-			var record = {
-				fileName: name,
-				isDirectory: true
-			};
-			if ($scope.currentFolder) {
-				record.parent = _.pick($scope.currentFolder, "id");
-			}
-			var promise = ds.save(record);
-			promise.then(close, close);
-			promise.success(function (record) {
-				$scope.sync();
-				if ($scope.reload) {
-					$scope.reload();
-				}
-			});
-		}
-
-		dialog.parent().addClass("dms-folder-dialog");
-		setTimeout(function() {
-			dialog.find("input").focus().select();
-		});
-	};
-
-	$scope.onFolderClick = function (folder) {
-
+		$scope.onFolder(node, paths);
+		$scope.applyLater();
 	};
 }
 
@@ -493,48 +490,6 @@ ui.directive("uiDmsFolders", function () {
 	return {
 		controller: DmsFolderTreeCtrl,
 		link: function (scope, element, attrs) {
-
-			var domain = "self.isDirectory = true";
-			if (scope.tab.domain) {
-				domain += " AND " + scope.tab.domain;
-			}
-
-			scope.getTreeDomain = function () {
-				return domain;
-			}
-
-			scope.showTree = true;
-
-			scope.onToggleTree = function () {
-				scope.showTree = !scope.showTree;
-				axelor.$adjustSize();
-			};
-
-			scope.onFolderClick = function (node) {
-				if (!node || !node.id) {
-					scope.onFolder();
-					scope.applyLater();
-					return;
-				}
-				var paths = [];
-				var parent = node.parent;
-				while (parent) {
-					paths.unshift(parent);
-					parent = parent.parent;
-				}
-				scope.onFolder(node, paths);
-				scope.applyLater();
-			};
-
-			var __onMoveFiles = scope.onMoveFiles;
-			scope.onMoveFiles = function (files, toFolder) {
-				var promise = __onMoveFiles.call(scope, files, toFolder);
-				promise.success(function (records) {
-					scope.reload();
-					scope._dataSource.trigger("on:save", []);
-				});
-				return promise;
-			}
 
 			scope.onGridInit = _.once(function (grid, instance) {
 
