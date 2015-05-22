@@ -190,7 +190,7 @@
 	min-width: 250px;
 }
 
-.ui-dialog .slickgrid {
+.ui-dialog [ui-dialog] > .slickgrid {
 	position: absolute;
 	top: 4px; right: 4px; bottom: 4px; left: 4px;
 }

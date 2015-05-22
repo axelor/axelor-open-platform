@@ -14,6 +14,10 @@
 	overflow: hidden;
 }
 
+.dms-file-list .record-toolbar .breadcrumb a {
+	color: #0088cc;
+}
+
 .dms-file-list .record-toolbar .btn {
 	outline: none;
 }
@@ -28,7 +32,7 @@
 }
 
 .dms-file-list.has-tree .dms-folder-tree {
-	width: 249px;
+	width: 250px;
 }
 
 .dms-file-list.has-tree > .slickgrid {
@@ -123,18 +127,19 @@
 	margin: 1px 4px;
 }
 
-.dms-folder-tree a {
+.dms-folder-tree li > a {
 	color: #333;
 	text-decoration: none;
 	line-height: 2em;
 	padding: 4px;
+	outline: none;
 }
 
-.dms-folder-tree a * {
+.dms-folder-tree li > a * {
 	position: relative;
 }
 
-.dms-folder-tree a span.highlight {
+.dms-folder-tree li > a span.highlight {
 	position: absolute;
 	box-sizing: border-box;
 	width: 100%;
@@ -142,7 +147,7 @@
 	left: 0;
 }
 
-.dms-folder-tree a i.handle {
+.dms-folder-tree li > a i.handle {
 	width: 16px;
 	display: inline-block;
 	text-align: center;
@@ -152,19 +157,19 @@
 	visibility: hidden;
 }
 
-.dms-folder-tree a:hover span.highlight {
+.dms-folder-tree li > a:hover span.highlight {
 	background-color: #eeeeee;
 }
 
-.dms-folder-tree a.active span.highlight {
+.dms-folder-tree li > a.active span.highlight {
 	background-color: #e6e6e6;
 }
 
-.dms-folder-tree a.dropping span.highlight {
+.dms-folder-tree li > a.dropping span.highlight {
 	border: 1px solid rgba(82, 168, 236, 0.8);
 }
 
-.dms-folder-tree a.active {
+.dms-folder-tree li > a.active {
 	color: #222;
 	font-weight: bold;
 }

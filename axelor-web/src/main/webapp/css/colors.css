@@ -272,3 +272,12 @@ input, button, textarea, select, fieldset, pre {
 	font-weight: 400;
 	fill: #333333;
 }
+
+/* jquery fixes */
+.ui-widget-header a,
+.ui-widget-content a {
+	color: #0088cc;
+}
+.ui-dialog .ui-dialog-titlebar a {
+	color: #222;
+}
