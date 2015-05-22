@@ -1,5 +1,6 @@
 package com.axelor.dms.db.repo;
 
+import java.util.List;
 import java.util.Map;
 
 import org.joda.time.LocalDateTime;
@@ -11,6 +12,20 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 
 	public DMSFileRepository() {
 		super(DMSFile.class);
+	}
+
+	@Override
+	public void remove(DMSFile entity) {
+		// remove all children
+		if (entity.getIsDirectory() == Boolean.TRUE) {
+			final List<DMSFile> children = all().filter("self.parent.id = ?", entity.getId()).fetch();
+			for (DMSFile child : children) {
+				if (child != entity) {
+					remove(child);;
+				}
+			}
+		}
+		super.remove(entity);
 	}
 
 	@Override
