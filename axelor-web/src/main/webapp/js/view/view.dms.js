@@ -101,6 +101,70 @@ function DMSFileListCtrl($scope, $element) {
 		var index = _.first($scope.selection || []);
 		return $scope.dataView.getItem(index);
 	}
+
+	$scope.onRename = function () {
+
+		var record = getSelected();
+		if (!record || !record.id) {
+			return;
+		}
+
+		var html = "" +
+			"<div>" +
+				"<input type='text' value='" + record.fileName +"'>" +
+			"</div>";
+
+		var dialog = axelor.dialogs.box(html, {
+			title: _t("Rename"),
+			buttons: [{
+				'text': _t("Cancel"),
+				'class': 'btn',
+				'click': close
+			}, {
+				'text': _t("OK"),
+				'class': 'btn btn-primary',
+				'click': submit
+			}]
+		})
+		.on("keypress", "input", function (e) {
+			if (e.keyCode === 13) {
+				submit();
+			}
+		});
+
+		function close() {
+			if (dialog) {
+				dialog.dialog("close");
+				dialog = null;
+			}
+		}
+
+		function submit() {
+			var val = (dialog.find("input").val() || "").trim();
+			if (record.fileName !== val && val.length) {
+				record.fileName = val;
+				rename(record);
+			} else {
+				close();
+			}
+		}
+
+		function rename(record) {
+			var promise = $scope._dataSource.save(record);
+			promise.then(close, close);
+			promise.success(function (record) {
+				$scope.sync();
+				if ($scope.reload) {
+					$scope.reload();
+				}
+			});
+		}
+
+		dialog.parent().addClass("dms-folder-dialog");
+		setTimeout(function() {
+			dialog.find("input").focus().select();
+		});
+	};
 }
 
 ui.directive('uiDmsUploader', function () {
@@ -371,21 +435,28 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 			}, {
 				'text': _t("Create"),
 				'class': 'btn btn-primary',
-				'click': function (e) {
-					var val = dialog.find("input").val();
-					if (val && val.trim().length) {
-						createFolder(val);
-					} else {
-						close();
-					}
-				}
+				'click': submit
 			}]
+		})
+		.on("keypress", "input", function (e) {
+			if (e.keyCode === 13) {
+				submit();
+			}
 		});
 
 		function close() {
 			if (dialog) {
 				dialog.dialog("close");
 				dialog = null;
+			}
+		}
+
+		function submit() {
+			var val = (dialog.find("input").val() || "").trim();
+			if (val.length) {
+				createFolder(val);
+			} else {
+				close();
 			}
 		}
 
