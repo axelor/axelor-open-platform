@@ -15,12 +15,17 @@
           </ul>
         </div>
         <div class="btn-group pull-left">
-          <button class="btn" ng-click="onDelete()" ng-if="hasButton('delete')" ng-disabled="!canDelete()" title="{{ 'Delete' | t}}">
-            <i class="fa fa-trash"></i>
-          </button>
-          <button class="btn" ng-click="onRename()" ng-disabled="!canEdit()" tabIndex="-1" title="{{ 'Rename' | t }}">
-            <i class="fa fa-pencil"></i>
-          </button>
+          <button class="btn dropdown-toggle" data-toggle="dropdown" ng-disabled="!canEdit()" tabIndex="-1" title="{{ 'More actions' | t }}"><i class="fa fa-ellipsis-v"></i></button>
+          <ul class="dropdown-menu">
+            <li><a href="javascript:" ng-click="onRename()" x-translate>Rename...</a></li>
+            <li ng-show="canShowRelated()"><a href="javascript:" ng-click="onShowRelated()" x-translate>Attached to...</a></li>
+            <li class="divider"></li>
+            <li><a href="javascript:" ng-click="onDownload()" x-translate>Download</a></li>
+            <li class="divider" ng-if="hasButton('delete')"></li>
+            <li ng-if="hasButton('delete')" ng-disabled="!canDelete()">
+              <a href="javascript:" ng-click="onDelete()" x-translate>Delete...</a>
+            </li>
+          </ul>
         </div>
         <div ui-record-pager="no-text" class="pull-right"></div>
         <div ui-filter-box ng-show="!$parent._isPopup" x-handler="this" class="pull-right"></div>

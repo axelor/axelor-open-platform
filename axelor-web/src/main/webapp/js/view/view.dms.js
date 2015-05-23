@@ -139,8 +139,11 @@ function DMSFileListCtrl($scope, $element) {
 	function doReload() {
 		var fields = _.pluck($scope.fields, 'name');
 		var ds = $scope._dataSource;
+
+		fields.push("relatedId", "relatedModel");
+
 		return ds.search({
-			fields: fields,
+			fields: _.unique(fields),
 			domain: $scope._domain
 		});
 	};
@@ -273,6 +276,23 @@ function DMSFileListCtrl($scope, $element) {
 		.success(function (records) {
 			$scope.reloadNoSync();
 		});
+	};
+
+	$scope.onShowRelated = function () {
+		var record = getSelected() || {};
+		var id = record.relatedId
+		var model = record.relatedModel;
+		if (id && model) {
+			$scope.openTabByName("form::" + model, {
+				"mode": "edit",
+				"state": id
+			});
+		}
+	};
+
+	$scope.canShowRelated = function () {
+		var record = getSelected();
+		return record && !!record.relatedId;
 	};
 }
 
@@ -703,7 +723,7 @@ ui.directive("uiDmsTreeNode", function () {
 		},
 		replace: true,
 		template: "" +
-		"<a ng-click='onClick($event, node)' ng-class='{active: node.active}'>" +
+		"<a href='javascript:' ng-click='onClick($event, node)' ng-class='{active: node.active}'>" +
 			"<span class='highlight'></span>" +
 			"<i class='fa fa-caret-down handle' ng-show='node.open'></i> " +
 			"<i class='fa fa-caret-right handle' ng-show='!node.open'></i> " +
