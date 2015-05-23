@@ -17,6 +17,7 @@ import com.axelor.dms.db.DMSFile;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaAttachment;
+import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.google.common.base.Strings;
 
@@ -114,18 +115,26 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 			}
 		}
 
-		// remove attachment
-		if (entity.getMetaFile() != null && entity.getRelatedId() != null && entity.getRelatedModel() != null) {
-			MetaAttachmentRepository attachmentRepo = Beans.get(MetaAttachmentRepository.class);
-			MetaAttachment attachment = attachmentRepo.all().filter(
-					"self.metaFile.id = ? AND self.objectId = ? AND self.objectName = ?",
-					entity.getMetaFile().getId(),
-					entity.getRelatedId(),
-					entity.getRelatedModel()).fetchOne();
-
-			if (attachment != null) {
+		// remove attached file
+		if (entity.getMetaFile() != null) {
+			final MetaAttachmentRepository attachments = Beans.get(MetaAttachmentRepository.class);
+			final MetaFile metaFile = entity.getMetaFile();
+			long count = attachments.all()
+					.filter("self.metaFile = ?", metaFile)
+					.count();
+			if (count == 1) {
+				final MetaAttachment attachment = attachments.all()
+						.filter("self.metaFile = ?", metaFile)
+						.fetchOne();
+				attachments.remove(attachment);
+			}
+			count = all()
+					.filter("self.metaFile = ?", metaFile)
+					.count();
+			if (count == 1) {
+				entity.setMetaFile(null);
 				try {
-					metaFiles.delete(attachment);
+					metaFiles.delete(metaFile);
 				} catch (IOException e) {
 					throw new PersistenceException(e);
 				}
