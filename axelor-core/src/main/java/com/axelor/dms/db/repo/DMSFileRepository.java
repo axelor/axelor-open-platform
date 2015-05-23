@@ -115,7 +115,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 		}
 
 		// remove attachment
-		if (entity.getMetaFile() != null) {
+		if (entity.getMetaFile() != null && entity.getRelatedId() != null && entity.getRelatedModel() != null) {
 			MetaAttachmentRepository attachmentRepo = Beans.get(MetaAttachmentRepository.class);
 			MetaAttachment attachment = attachmentRepo.all().filter(
 					"self.metaFile.id = ? AND self.objectId = ? AND self.objectName = ?",
