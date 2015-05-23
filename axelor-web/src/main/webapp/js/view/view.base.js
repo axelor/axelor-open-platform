@@ -651,7 +651,7 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 			}
 			
 			var tab = scope.selectedTab,
-				dlg = $('[ui-editor-popup]:visible:last,[ui-view-popup]:visible:last').first(),
+				dlg = $('[ui-editor-popup]:visible:last,[ui-view-popup]:visible:last,[ui-dms-popup]:visible:last').first(),
 				vs = tab ? tab.$viewScope : null;
 
 			if (dlg.size()) {

@@ -23,9 +23,9 @@
           </button>
         </div>
         <div ui-record-pager="no-text" class="pull-right"></div>
-        <div ui-filter-box x-handler="this" class="pull-right"></div>
+        <div ui-filter-box ng-show="!$parent._isPopup" x-handler="this" class="pull-right"></div>
         <ul class="breadcrumb">
-          <li><a href="javascript:" ng-click="onFolder()"><i class="fa fa-home"></i></a> <span class="divider">/</span></li>
+          <li><a href="javascript:" ng-click="onFolder()" tabindex="-1"><i class="fa fa-home"></i></a> <span class="divider">/</span></li>
           <li ng-repeat="folder in currentPaths" ng-class="{'active': $last}">
             <span ng-if="$last">{{folder.fileName}}</span>
             <a ng-if="!$last" href="javascript:" ng-click="onFolder(folder)">{{folder.fileName}}</a>

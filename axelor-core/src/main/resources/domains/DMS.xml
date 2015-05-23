@@ -9,7 +9,14 @@
     <string name="fileName" required="true" namecolumn="true" />
     <boolean name="isDirectory" />
     <many-to-one name="parent" ref="DMSFile" />
+
+    <!-- for internal use only, used for attachments -->
+    <long name="relatedId" title="Related document id" />
+    <string name="relatedModel" title="Related document model" />
+
+    <!-- the real file -->
     <many-to-one name="metaFile" ref="com.axelor.meta.db.MetaFile" />
+
     <many-to-many name="groups" ref="com.axelor.auth.db.Group" />
     <many-to-many name="users" ref="com.axelor.auth.db.User" />
   </entity>

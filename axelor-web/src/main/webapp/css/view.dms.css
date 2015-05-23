@@ -190,3 +190,18 @@
 	bottom: calc(100% - 6px);
 	left: calc(100% - 6px);
 }
+
+.dms-popup {
+	margin-top: -1px;
+}
+
+.dms-popup > div,
+.dms-popup > div > .grid-view {
+	height: 100%;
+	box-sizing: border-box;
+}
+
+.dms-popup > div > .grid-view {
+	border: 1px solid #d4d4d4;
+	border-top: 0;
+}

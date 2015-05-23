@@ -77,6 +77,7 @@ DMSFileListCtrl.$inject = ['$scope', '$element'];
 function DMSFileListCtrl($scope, $element) {
 	GridViewCtrl.call(this, $scope, $element);
 
+	var _params = $scope._viewParams;
 	var _domain = $scope._domain || "";
 	if (_domain) {
 		_domain += " AND ";
@@ -90,14 +91,40 @@ function DMSFileListCtrl($scope, $element) {
 
 	Object.defineProperty($scope, "_domain", {
 		get: function () {
-			if ($scope.currentFolder) {
-				return _domain + "self.parent.id = " + $scope.currentFolder.id;
+			var parent = $scope.getCurrentParent();
+			if (parent && parent.id) {
+				return _domain + "self.parent.id = " + parent.id;
 			}
 			return _domain + "self.parent is null";
 		},
 		set: function () {
 		}
 	});
+
+	$scope.getCurrentHome = function () {
+		return _params.currentHome;
+	}
+
+	$scope.getCurrentParent = function () {
+		var base = $scope.currentFolder || $scope.getCurrentHome();
+		if (base && base.id > 0) {
+			return _.pick(base, "id");
+		}
+		return base;
+	};
+
+	$scope.addRelatedValues = function (record) {
+		// apply details about related object
+		var base = $scope.currentFolder;
+		if (!base || !base.relatedModel) {
+			base = $scope.getCurrentHome();
+		}
+		if (base) {
+			record.relatedId = base.relatedId;
+			record.relatedModel = base.relatedModel;
+		}
+		return record;
+	};
 
 	$scope.onEdit = function() {
 		var rec = getSelected();
@@ -106,13 +133,27 @@ function DMSFileListCtrl($scope, $element) {
 		}
 	};
 
-	$scope.reload = function () {
+	$scope.sync = function () {
+	}
+
+	function doReload() {
 		var fields = _.pluck($scope.fields, 'name');
 		var ds = $scope._dataSource;
 		return ds.search({
 			fields: fields,
 			domain: $scope._domain
 		});
+	};
+
+	$scope.reload = function () {
+		var promise = doReload();
+		promise.then(function () {
+			return $scope.sync();
+		});
+	}
+
+	$scope.reloadNoSync = function () {
+		return doReload();
 	};
 
 	$scope.onFolder = function(folder, currentPaths) {
@@ -133,7 +174,7 @@ function DMSFileListCtrl($scope, $element) {
 		$scope.currentFolder = folder;
 		$scope.currentPaths = paths;
 
-		return $scope.reload();
+		return $scope.reloadNoSync();
 	}
 
 	$scope.onItemClick = function(event, args) {
@@ -172,17 +213,19 @@ function DMSFileListCtrl($scope, $element) {
 			title: _t("Create folder"),
 			titleOK: _t("Create")
 		}, function (value, done) {
+			var parent = $scope.getCurrentParent();
 			var record = {
 				fileName: value,
 				isDirectory: true
 			};
-			if ($scope.currentFolder) {
-				record.parent = _.pick($scope.currentFolder, "id");
+			if (parent && parent.id > 0) {
+				record.parent = parent;
 			}
+			record = $scope.addRelatedValues(record);
 			var promise = $scope._dataSource.save(record);
 			promise.then(done, done);
 			promise.success(function (record) {
-				$scope.reload();
+				$scope.reloadNoSync();
 			});
 		});
 	};
@@ -223,12 +266,12 @@ function DMSFileListCtrl($scope, $element) {
 			} else {
 				item.parent = null;
 			}
+			$scope.addRelatedValues(item);
 		});
 
 		$scope._dataSource.saveAll(files)
 		.success(function (records) {
-			$scope.reload();
-			$scope._dataSource.trigger("on:save", []);
+			$scope.reloadNoSync();
 		});
 	};
 }
@@ -349,13 +392,15 @@ ui.directive('uiDmsUploader', function () {
 			metaDS.save(record).progress(function(fn) {
 				info.progress = (fn > 95 ? 95 : fn) + "%";
 			}).success(function(metaFile) {
+				var parent = scope.getCurrentParent();
 				var record = {
 					fileName: metaFile.fileName,
 					metaFile: _.pick(metaFile, "id")
 				};
-				if (scope.currentFolder) {
-					record.parent = _.pick(scope.currentFolder, "id");
+				if (parent && parent.id > 0) {
+					record.parent = parent;
 				}
+				record = scope.addRelatedValues(record);
 				ds.save(record).success(function (dmsFile) {
 					info.progress = "100%";
 					info.complete = true;
@@ -383,18 +428,13 @@ DmsFolderTreeCtrl.$inject = ["$scope", "DataSource"];
 function DmsFolderTreeCtrl($scope, DataSource) {
 
 	var ds = DataSource.create("com.axelor.dms.db.DMSFile");
-	var domain = "self.isDirectory = true";
-	var params = $scope._viewParams;
-	if (params.domain) {
-		domain += " AND " + params.domain;
-	}
 
 	$scope.folders = {};
 	$scope.rootFolders = [];
 
 	function syncFolders(records) {
 
-		var home = {};
+		var home = $scope.getCurrentHome();
 		var folders = {};
 		var rootFolders = [];
 
@@ -410,11 +450,13 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 			}
 		});
 
-		home = {
+		home = home || {
+			open: true,
+			active: true,
 			fileName: _t("Home")
 		};
+
 		home.open = true;
-		home.active = true;
 		home.nodes = _.filter(folders, function (item) {
 			return !item.parent;
 		});
@@ -454,10 +496,30 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 		}
 	};
 
+	function getDomain() {
+		var params = $scope._viewParams;
+		var domain = params.domain || "";
+		var home = $scope.getCurrentHome();
+		if (domain) {
+			domain = domain + " AND ";
+		}
+		domain += "self.isDirectory = true";
+		if (home && home.id > 0) {
+			domain += " AND self.id != " + home.id;
+		}
+		if (home && home.relatedModel) {
+			domain += " AND self.relatedModel = '" + home.relatedModel + "'";
+		}
+		if (home && home.relatedId) {
+			domain += " AND self.relatedId = " + home.relatedId;
+		}
+		return domain;
+	}
+
 	$scope.sync = function () {
 		return ds.search({
-			fields: ["fileName", "parent.id"],
-			domain: domain,
+			fields: ["fileName", "parent.id", "relatedId", "relatedModel"],
+			domain: getDomain(),
 			limit: -1,
 		}).success(syncFolders);
 	};
@@ -470,7 +532,7 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 	};
 
 	$scope.onFolderClick = function (node) {
-		if (!node || !node.id) {
+		if (!node || !node.id || node.home) {
 			$scope.onFolder();
 			$scope.applyLater();
 			return;
@@ -570,14 +632,23 @@ ui.directive("uiDmsFolders", function () {
 				}
 			});
 
-			function sync() {
-				return scope.sync();
+			function syncHome(record) {
+				var home = scope.getCurrentHome();
+				if (home && home.id > 0) return;
+				if (home && record && record.parent) {
+					home.id = record.parent.id;
+				}
 			}
 
-			scope._dataSource.on("on:save", sync);
-			scope._dataSource.on("on:remove", sync);
+			scope._dataSource.on("on:save", function (e) {
+				syncHome(scope._dataSource.at(0));
+				return scope.sync();
+			});
+			scope._dataSource.on("on:remove", function () {
+				return scope.sync();
+			});
 
-			sync();
+			scope.sync();
 		},
 		template: "<ul ui-dms-tree x-handler='this' x-nodes='rootFolders' class='dms-tree'></ul>"
 	};
@@ -666,6 +737,130 @@ ui.directive("uiDmsTree", ['$compile', function ($compile) {
 
 			$compile(template)(scope).appendTo(element);
 		}
+	};
+}]);
+
+// attachment popup
+ui.directive("uiDmsPopup", ['$compile', function ($compile) {
+
+	return {
+		scope: true,
+		controller: ["$scope", 'DataSource', 'ViewService', function($scope, DataSource, ViewService) {
+
+			$scope._isPopup = true;
+			$scope._viewParams = {
+				action: _.uniqueId('$act'),
+				model: "com.axelor.dms.db.DMSFile",
+				viewType: "grid",
+				views: [{
+					type: "grid",
+					name: "dms-file-grid"
+				}]
+			};
+
+			ViewCtrl.apply(this, arguments);
+
+			var ds = DataSource.create("com.axelor.dms.db.DMSFile");
+
+			$scope.findHome = function (forScope, success) {
+
+				var home = {};
+				var record = forScope.record;
+
+				function objectName() {
+					return _.humanize(_.last(forScope._model.split(".")));
+				}
+
+				function findName() {
+					for (var name in forScope.fields) {
+						if (forScope.fields[name].nameColumn) {
+							return record[name];
+						}
+					}
+					return record.name || _.lpad(record.id, 5, '0');
+				}
+
+				var domain = "self.isDirectory = true AND self.relatedId = :rid AND self.relatedModel = :rmodel";
+
+				domain = "" +
+						"self.isDirectory = true AND " +
+						"self.relatedId = :rid AND " +
+						"self.relatedModel = :rmodel AND " +
+						"self.parent.relatedModel = :rmodel AND " +
+						"(self.parent.relatedId is null OR self.parent.relatedId = 0)";
+
+				var context = {
+					"rid": record.id,
+					"rmodel": forScope._model
+				};
+
+				function process(home) {
+					if (!home) {
+						home = {};
+						home.id = -1;
+						home.fileName = findName();
+						home.relatedModel = forScope._model;
+						home.relatedId = record.id;
+					}
+					home.home = true;
+					home.open = true;
+					home.active = true;
+					return home;
+				}
+
+				ds.search({
+					limit: 1,
+					fields: ['fileName', 'relatedModel', 'relatedId'],
+					domain: domain,
+					context: context
+				}).success(function (records) {
+					success(process(_.first(records)));
+				});
+			};
+		}],
+		link: function (scope, element, attrs) {
+
+			setTimeout(function () {
+				var elemDialog = element.parent();
+				var elemTitle = elemDialog.find('.ui-dialog-title');
+				$('<a href="#" class="ui-dialog-titlebar-max"><i class="fa fa-expand"></i></a>').click(function (e) {
+					$(this).children('i').toggleClass('fa-expand fa-compress');
+					elemDialog.toggleClass('maximized');
+					axelor.$adjustSize();
+					return false;
+				}).insertAfter(elemTitle);
+
+				var height = $(window).height();
+				height = Math.min(480, height);
+				element.dialog('option', 'height', height);
+			});
+
+			scope.showPopup = function (forScope) {
+				scope.findHome(forScope, function (home) {
+					scope._viewParams.currentHome = home;
+					var content = "<div ng-include='\"partials/views/dms-file-list.html\"'></div>";
+					content = $compile(content)(scope);
+					content.appendTo(element);
+					setTimeout(function () {
+						element.dialog("open");
+					});
+				});
+			};
+
+			scope.onHotKey = function (e, action) {
+				var elem = element.find(".grid-view:first");
+				var viewScope = elem.scope();
+				if (viewScope && viewScope.onHotKey) {
+					return viewScope.onHotKey(e, action);
+				}
+			};
+
+			scope.onClose = function () {
+				scope.$destroy();
+			};
+		},
+		replace: true,
+		template: "<div ui-dialog x-on-ok='false' x-on-close='onClose' class='dms-popup' title='Attachments'></div>"
 	};
 }]);
 

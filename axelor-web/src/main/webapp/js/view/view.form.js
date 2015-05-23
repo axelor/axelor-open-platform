@@ -987,9 +987,8 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 		};
 		
 		scope.onShowAttachments = function(){
-			var attachment = ViewService.compile('<div ui-attachment-popup></div>')(scope.$new());
-			var popup = attachment.data('$scope');
-			popup.show();
+			var popup = ViewService.compile('<div ui-dms-popup></div>')(scope.$new(true));
+			popup.scope().showPopup(scope);
 		};
 		
 		scope.hasAuditLog = function() {

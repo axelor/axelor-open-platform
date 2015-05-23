@@ -52,10 +52,15 @@
     <view-param name="ui-template:grid" value="dms-file-list"/>
   </action-view>
 
-  <action-view name="dms.my" model="com.axelor.dms.db.DMSFile" title="All Documents">
+  <action-view name="dms.my" model="com.axelor.dms.db.DMSFile" title="My Documents">
     <view name="dms-file-grid" type="grid" />
     <view-param name="ui-template:grid" value="dms-file-list"/>
     <domain>self.createdBy = :__user__</domain>
+  </action-view>
+
+  <action-view name="dms.attach" model="com.axelor.dms.db.DMSFile" title="Attachments">
+    <view name="dms-file-grid" type="grid" />
+    <view-param name="ui-template:grid" value="dms-file-list"/>
   </action-view>
 
   <!-- menu -->
