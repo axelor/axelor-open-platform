@@ -304,6 +304,11 @@ ui.directive('uiDmsUploader', function () {
 		}
 
 		function dragAndDropHandler(e) {
+
+			if (element.is(":hidden")) {
+				return;
+			}
+
 			switch (e.type) {
 			case "dragstart":
 			case "dragend":
@@ -316,6 +321,7 @@ ui.directive('uiDmsUploader', function () {
 				break;
 			case "dragleave":
 				clearClassName();
+				break;
 			case "drop":
 				clearClassName();
 				onDropFiles(e);
