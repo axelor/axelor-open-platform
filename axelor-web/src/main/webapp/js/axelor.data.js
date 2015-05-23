@@ -69,6 +69,8 @@
 
 			constructor: DataSource,
 			
+			_http: $http,
+
 			_request: function(action, id) {
 				var url = 'ws/rest/' + this._model;
 				if (id) url += '/' + id;

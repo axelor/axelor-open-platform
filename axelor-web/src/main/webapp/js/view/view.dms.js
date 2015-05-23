@@ -278,6 +278,29 @@ function DMSFileListCtrl($scope, $element) {
 		});
 	};
 
+	$scope.onDownload = function () {
+
+		var http = $scope._dataSource._http;
+		var records = _.map($scope.selection, function (i) { return $scope.dataView.getItem(i); });
+		var ids = _.pluck(_.compact(records), "id");
+		if (ids.length === 0) {
+			return;
+		}
+
+		http.post("ws/dms/download/batch", {
+			model: $scope._model,
+			records: ids
+		})
+		.then(function (res) {
+			var data = res.data;
+			var batchId = data.batchId;
+			var batchName = data.batchName;
+			if (batchId) {
+				$scope.doDownload("ws/dms/download/" + batchId, batchName);
+			}
+		});
+	};
+
 	$scope.onShowRelated = function () {
 		var record = getSelected() || {};
 		var id = record.relatedId
@@ -446,6 +469,29 @@ ui.directive('uiDmsUploader', function () {
 
 		scope.onUpload = function () {
 			input.click();
+		};
+
+		scope.doDownload = function (url, fileName) {
+			var link = document.createElement('a');
+
+			link.onclick = function(e) {
+				setTimeout(function () {
+					document.body.removeChild(e.target);
+				}, 100);
+			};
+
+			link.href = url;
+			link.download = fileName;
+			link.innerHTML = fileName;
+			link.style.display = "none";
+
+			document.body.appendChild(link);
+
+			setTimeout(function () {
+				link.click();
+			}, 300);
+
+			axelor.notify.info(_t("Downloading {0}...", fileName));
 		};
 	};
 });
