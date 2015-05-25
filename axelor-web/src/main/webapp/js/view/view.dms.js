@@ -317,6 +317,10 @@ function DMSFileListCtrl($scope, $element) {
 		var record = getSelected();
 		return record && !!record.relatedId;
 	};
+
+	$scope.onShowMembers = function () {
+
+	}
 }
 
 ui.directive('uiDmsUploader', ['$q', function ($q) {
@@ -848,6 +852,130 @@ ui.directive("uiDmsTree", ['$compile', function ($compile) {
 		}
 	};
 }]);
+
+// members popup
+ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
+	return {
+		link: function (scope, element, attrs) {
+
+			var form = null;
+
+			scope.canShare = function () {
+				if (!scope.selection || scope.selection.length === 0) return false;
+				var selected = _.first(scope.selection);
+				var record = scope.dataView.getItem(selected);
+				return record && record.canShare;
+			};
+
+			scope.onPermissions = function () {
+
+				if (form === null) {
+					form = $compile("<div ui-dms-members-form></div>")(scope.$new(true));
+					form.appendTo(element);
+					form.width("100%");
+				}
+
+				var selected = _.first(scope.selection);
+				var record = scope.dataView.getItem(selected);
+
+				var formScope = form.scope();
+
+				formScope.doRead(record.id).success(function (rec) {
+					formScope.edit(rec);
+					setTimeout(function () {
+						element.dialog("option", "height", 320);
+						element.dialog("open");
+					});
+				});
+			};
+
+			scope.onSavePermissions = function () {
+
+				var ds = scope._dataSource._new("com.axelor.dms.db.DMSPermission");
+				var formScope = form.scope();
+
+				if (!formScope.isValid()) {
+					return axelor.notify.error(_t("Invalid permissions"));
+				}
+
+				var record = formScope.record;
+				var original = formScope.$$original.permissions || [];
+
+				var toSave = _.map(record.permissions, function (item) {
+					item.file = _.pick(record, "id");
+					return item;
+				});
+
+				var toRemove = _.filter(original, function (item) {
+					return !_.findWhere(toSave, { id: item.id });
+				});
+
+				function doClose() {
+					element.dialog("close");
+					formScope.edit(null);
+				}
+
+				var promise = null;
+				if (toRemove.length) {
+					promise = ds._request('removeAll').post({
+						records: toRemove
+					});
+				}
+				if (toSave.length) {
+					promise = promise ? promise.then(function () {
+						return ds.saveAll(toSave);
+					}) : ds.saveAll(toSave);
+				}
+
+				if (promise) {
+					promise.then(doClose);
+				} else {
+					doClose();
+				}
+			};
+
+			scope.$on("$destroy", function () {
+				if (form) {
+					form.scope().$destroy();
+					form = null;
+				}
+			});
+		},
+		replace: true,
+		template:
+			"<div ui-dialog x-on-ok='onSavePermissions' x-css='ui-dialog-small dms-permission-popup' title='Permissions'></div>"
+	};
+}]);
+
+ui.directive("uiDmsMembersForm", function () {
+	return {
+		scope: true,
+		controller: ["$scope", "$element", 'DataSource', 'ViewService', function($scope, $element, DataSource, ViewService) {
+			$scope._viewParams = {
+				action: _.uniqueId('$act'),
+				title: _t("Permissions"),
+				model: "com.axelor.dms.db.DMSFile",
+				viewType: "form",
+				views: [{
+					type: "form",
+					name: "dms-file-permission-form"
+				}]
+			};
+			ViewCtrl.call(this, $scope, DataSource, ViewService);
+			FormViewCtrl.call(this, $scope, $element);
+
+			$scope.setEditable();
+			$scope.onHotKey = function (e) {
+				e.preventDefault();
+				return false;
+			};
+		}],
+		link: function (scope, element, attrs) {
+
+		},
+		template: "<div ui-view-form x-handler='true'></div>"
+	};
+});
 
 // attachment popup
 ui.directive("uiDmsPopup", ['$compile', function ($compile) {

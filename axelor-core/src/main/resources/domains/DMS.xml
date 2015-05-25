@@ -17,8 +17,17 @@
     <!-- the real file -->
     <many-to-one name="metaFile" ref="com.axelor.meta.db.MetaFile" />
 
-    <many-to-many name="groups" ref="com.axelor.auth.db.Group" />
-    <many-to-many name="users" ref="com.axelor.auth.db.User" />
+    <!-- permissions -->
+    <one-to-many name="permissions" ref="DMSPermission" mappedBy="file" />
+
+  </entity>
+
+  <entity name="DMSPermission" table="DMS_PERMISSION" repository="none">
+    <string name="value" required="true" selection="dms.permission.selection" />
+    <many-to-one name="file" ref="DMSFile" />
+    <many-to-one name="group" column="group_id" ref="com.axelor.auth.db.Group" />
+    <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" />
+    <many-to-one name="permission" column="permission_id" ref="com.axelor.auth.db.Permission" />
   </entity>
 
 </domain-models>

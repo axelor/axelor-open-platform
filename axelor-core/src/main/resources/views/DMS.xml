@@ -46,6 +46,40 @@
     </panel-tabs>
   </form>
 
+  <selection name="dms.permission.selection">
+    <option value="READ">Can read</option>
+    <option value="WRITE">Can write</option>
+    <option value="FULL">Can share</option>
+  </selection>
+
+  <grid name="dms-permission-grid" title="Permissions" model="com.axelor.dms.db.DMSPermission">
+    <field name="file.fileName" />
+    <field name="user.name" />
+    <field name="group.name" />
+    <field name="value"/>
+  </grid>
+
+  <form name="dms-permission-form" title="Permission" model="com.axelor.dms.db.DMSPermission">
+    <panel title="General">
+      <field name="file" />
+      <field name="value" />
+      <field name="user" />
+      <field name="group" />
+    </panel>
+  </form>
+
+  <form name="dms-file-permission-form" title="Permission" model="com.axelor.dms.db.DMSFile">
+    <panel itemSpan="12" showFrame="false">
+      <field name="permissions" showTitle="false">
+        <editor layout="table" x-viewer="true">
+          <field name="user" widget="SuggestBox" />
+          <field name="group" widget="SuggestBox" />
+          <field name="value" width="120px"/>
+        </editor>
+      </field>
+    </panel>
+  </form>
+
   <!-- actions -->
   <action-view name="dms.all" model="com.axelor.dms.db.DMSFile" title="All Documents">
     <view name="dms-file-grid" type="grid" />

@@ -26,13 +26,16 @@ import javax.persistence.PersistenceException;
 
 import org.joda.time.LocalDateTime;
 
+import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.common.ClassUtils;
 import com.axelor.common.Inflector;
 import com.axelor.db.JpaRepository;
+import com.axelor.db.JpaSecurity;
+import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.dms.db.DMSFile;
-import com.axelor.inject.Beans;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
@@ -43,6 +46,15 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 
 	@Inject
 	private MetaFiles metaFiles;
+
+	@Inject
+	private JpaSecurity security;
+
+	@Inject
+	private DMSPermissionRepository dmsPermissions;
+
+	@Inject
+	private MetaAttachmentRepository attachments;
 
 	public DMSFileRepository() {
 		super(DMSFile.class);
@@ -72,8 +84,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 
 		// if new attachment, save attachment reference
 		if (isAttachment) {
-			MetaAttachmentRepository repo = Beans.get(MetaAttachmentRepository.class);
-			MetaAttachment attachment = repo.all()
+			MetaAttachment attachment = attachments.all()
 					.filter("self.metaFile.id = ? AND self.objectId = ? AND self.objectName = ?",
 							entity.getMetaFile().getId(),
 							related.getId(),
@@ -81,7 +92,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 					.fetchOne();
 			if (attachment == null) {
 				attachment = metaFiles.attach(entity.getMetaFile(), related);
-				repo.save(attachment);
+				attachments.save(attachment);
 			}
 		}
 
@@ -143,7 +154,6 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 
 		// remove attached file
 		if (entity.getMetaFile() != null) {
-			final MetaAttachmentRepository attachments = Beans.get(MetaAttachmentRepository.class);
 			final MetaFile metaFile = entity.getMetaFile();
 			long count = attachments.all()
 					.filter("self.metaFile = ?", metaFile)
@@ -187,8 +197,17 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 			dt = file.getCreatedOn();
 		}
 
+		final User user = AuthUtils.getUser();
+
+		boolean canShare = file.getCreatedBy() == user ||
+				security.isPermitted(AccessType.CREATE, DMSFile.class, file.getId()) ||
+				dmsPermissions.all().filter(
+					"self.file = ? AND self.value = 'FULL' AND (self.user = ? OR self.group = ?)",
+					file, user, user.getGroup()).count() > 0;
+
 		json.put("typeIcon", isFile ? "fa fa-file" : "fa fa-folder");
 		json.put("lastModified", dt);
+		json.put("canShare", canShare);
 
 		return json;
 	}

@@ -1,4 +1,5 @@
-<div class="grid-view dms-file-list" ng-class="{'has-tree': showTree }" ng-controller="DMSFileListCtrl"  ui-dms-uploader ui-tab-gate>
+<div class="grid-view dms-file-list" ng-class="{'has-tree': showTree }" ng-controller="DMSFileListCtrl"
+  ui-dms-uploader ui-tab-gate>
   <div class="navbar record-toolbar">
     <div class="navbar-inner">
       <div class="container">
@@ -15,9 +16,10 @@
           </ul>
         </div>
         <div class="btn-group pull-left">
-          <button class="btn dropdown-toggle" data-toggle="dropdown" ng-disabled="!canEdit()" tabIndex="-1" title="{{ 'More actions' | t }}"><i class="fa fa-ellipsis-v"></i></button>
+          <button class="btn dropdown-toggle" data-toggle="dropdown" ng-disabled="!selection.length" tabIndex="-1" title="{{ 'More actions' | t }}"><i class="fa fa-ellipsis-v"></i></button>
           <ul class="dropdown-menu">
             <li><a href="javascript:" ng-click="onRename()" x-translate>Rename...</a></li>
+            <li><a href="javascript:" ng-click="onPermissions()" ng-show="canShare()" x-translate>Permissions...</a></li>
             <li ng-show="canShowRelated()"><a href="javascript:" ng-click="onShowRelated()" x-translate>Attached to...</a></li>
             <li class="divider"></li>
             <li><a href="javascript:" ng-click="onDownload()" x-translate>Download</a></li>
@@ -67,4 +69,5 @@
       </div>
     </div>
   </div>
+  <div ui-dms-members-popup></div>
 </div>

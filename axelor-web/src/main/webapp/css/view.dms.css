@@ -205,3 +205,23 @@
 	border: 1px solid #d4d4d4;
 	border-top: 0;
 }
+
+.dms-permission-popup {
+
+}
+
+.dms-permission-popup [x-field="user"] input,
+.dms-permission-popup [x-field="group"] input {
+	border-right: none;
+}
+
+.dms-permission-popup .picker-input i.fa-times {
+	font-size: 11px;
+	position: relative;
+	top: -1px;
+	color: #d4d4d4;
+}
+
+.dms-permission-popup .picker-input i.fa-times:hover {
+	color: #222;
+}
