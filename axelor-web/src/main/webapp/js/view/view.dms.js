@@ -305,7 +305,7 @@ function DMSFileListCtrl($scope, $element) {
 		var record = getSelected() || {};
 		var id = record.relatedId
 		var model = record.relatedModel;
-		if (id && model) {
+		if (id && model && $scope.openTabByName) {
 			$scope.openTabByName("form::" + model, {
 				"mode": "edit",
 				"state": id
