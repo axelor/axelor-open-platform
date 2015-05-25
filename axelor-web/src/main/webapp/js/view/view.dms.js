@@ -319,13 +319,11 @@ function DMSFileListCtrl($scope, $element) {
 	};
 }
 
-ui.directive('uiDmsUploader', function () {
+ui.directive('uiDmsUploader', ['$q', function ($q) {
 
 	return function (scope, element, attrs) {
 
 		var input = element.find("input.upload-input");
-
-		scope.uploadFiles = []
 
 		var dndTimer = null;
 		var dndInternal = false;
@@ -399,6 +397,8 @@ ui.directive('uiDmsUploader', function () {
 			});
 		});
 
+		scope.uploadQueue = []
+
 		function doUpload(files) {
 			var all = files;
 			if (files.fileName) {
@@ -410,20 +410,55 @@ ui.directive('uiDmsUploader', function () {
 				file = all[i];
 			}
 			for (i = 0; i < all.length; i++) {
-				uploadSingle(all[i]);
+				var file = all[i];
+				var info = {
+					file: file,
+					progress: "0%",
+					complete: false
+				};
+				scope.uploadQueue.push(info);
 			}
+			processQueue();
 		}
 
-		function uploadSingle(file) {
+		var uploadRunning;
 
-			var info = {
-				name: file.name,
-				progress: "0%",
-				complete: false
-			};
+		function processQueue() {
+			var promise;
+			var queue = scope.uploadQueue;
+			if (queue.length === 0 || uploadRunning) {
+				return;
+			}
 
-			scope.uploadFiles.push(info);
+			function failed(reason) {
+				uploadRunning = false;
+				queue.length = 0;
+				axelor.notify.error(_t("Upload failed..."));
+			}
 
+			function success(info) {
+				uploadRunning = false;
+				processNext();
+			}
+
+			function processNext() {
+				uploadRunning = true;
+				var next = _.findWhere(queue, { complete: false });
+				if (next) {
+					promise = uploadSingle(next);
+					promise.then(success, failed);
+				} else {
+					queue.length = 0;
+					axelor.notify.info(_t("Upload complete..."));
+				}
+			}
+
+			return processNext();
+		}
+
+		function uploadSingle(info) {
+
+			var file = info.file;
 			var record = {
 				fileName: file.name,
 				mime: file.type,
@@ -438,6 +473,9 @@ ui.directive('uiDmsUploader', function () {
 
 			var ds = scope._dataSource;
 			var metaDS = ds._new("com.axelor.meta.db.MetaFile");
+			var deferred = $q.defer();
+			var promise = deferred.promise;
+
 			metaDS.save(record).progress(function(fn) {
 				info.progress = (fn > 95 ? 95 : fn) + "%";
 			}).success(function(metaFile) {
@@ -453,12 +491,11 @@ ui.directive('uiDmsUploader', function () {
 				ds.save(record).success(function (dmsFile) {
 					info.progress = "100%";
 					info.complete = true;
-					var index = scope.uploadFiles.indexOf(info);
-					if (index > -1) {
-						scope.uploadFiles.splice(index, 1);
-					}
-				});
-			});
+					deferred.resolve(info);
+				}).error(deferred.reject);
+			}).error(deferred.reject);
+
+			return promise;
 		}
 
 		input.change(function() {
@@ -494,7 +531,7 @@ ui.directive('uiDmsUploader', function () {
 			axelor.notify.info(_t("Downloading {0}...", fileName));
 		};
 	};
-});
+}]);
 
 DmsFolderTreeCtrl.$inject = ["$scope", "DataSource"];
 function DmsFolderTreeCtrl($scope, DataSource) {

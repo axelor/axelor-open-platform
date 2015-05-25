@@ -51,16 +51,16 @@
       </div>
       <div class="drop-message" x-translate>Drop your files to start upload.</div>
     </div>
-    <div class="upload-files panel" ng-show="uploadFiles.length">
+    <div class="upload-files panel" ng-show="uploadQueue.length">
       <div class="panel-header">
         <div class="panel-title" x-translate>Uploading files...</div>
       </div>
       <div class="panel-body">
         <table>
-          <tr ng-repeat="file in uploadFiles | filter:{complete: false}">
-            <td width="5%">{{file.name}}</td>
+          <tr ng-repeat="info in uploadQueue">
+            <td width="5%">{{info.file.name}}</td>
             <td>
-              <div class="progress progress-striped"><div class="bar" ng-style="{width: file.progress}"></div></div>
+              <div class="progress progress-striped"><div class="bar" ng-style="{width: info.progress}"></div></div>
             </td>
           </tr>
         </table>
