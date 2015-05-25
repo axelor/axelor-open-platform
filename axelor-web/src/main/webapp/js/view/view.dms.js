@@ -442,9 +442,9 @@ ui.directive('uiDmsUploader', ['$q', function ($q) {
 			}
 
 			function processNext() {
-				uploadRunning = true;
 				var next = _.findWhere(queue, { complete: false });
 				if (next) {
+					uploadRunning = true;
 					promise = uploadSingle(next);
 					promise.then(success, failed);
 				} else {
@@ -453,49 +453,49 @@ ui.directive('uiDmsUploader', ['$q', function ($q) {
 				}
 			}
 
-			return processNext();
-		}
+			function uploadSingle(info) {
 
-		function uploadSingle(info) {
-
-			var file = info.file;
-			var record = {
-				fileName: file.name,
-				mime: file.type,
-				size: file.size,
-				id: null,
-				version: null
-			};
-
-			record.$upload = {
-				file: file
-			};
-
-			var ds = scope._dataSource;
-			var metaDS = ds._new("com.axelor.meta.db.MetaFile");
-			var deferred = $q.defer();
-			var promise = deferred.promise;
-
-			metaDS.save(record).progress(function(fn) {
-				info.progress = (fn > 95 ? 95 : fn) + "%";
-			}).success(function(metaFile) {
-				var parent = scope.getCurrentParent();
+				var file = info.file;
 				var record = {
-					fileName: metaFile.fileName,
-					metaFile: _.pick(metaFile, "id")
+					fileName: file.name,
+					mime: file.type,
+					size: file.size,
+					id: null,
+					version: null
 				};
-				if (parent && parent.id > 0) {
-					record.parent = parent;
-				}
-				record = scope.addRelatedValues(record);
-				ds.save(record).success(function (dmsFile) {
-					info.progress = "100%";
-					info.complete = true;
-					deferred.resolve(info);
-				}).error(deferred.reject);
-			}).error(deferred.reject);
 
-			return promise;
+				record.$upload = {
+					file: file
+				};
+
+				var ds = scope._dataSource;
+				var metaDS = ds._new("com.axelor.meta.db.MetaFile");
+				var deferred = $q.defer();
+				var promise = deferred.promise;
+
+				metaDS.save(record).progress(function(fn) {
+					info.progress = (fn > 95 ? 95 : fn) + "%";
+				}).success(function(metaFile) {
+					var parent = scope.getCurrentParent();
+					var record = {
+						fileName: metaFile.fileName,
+						metaFile: _.pick(metaFile, "id")
+					};
+					if (parent && parent.id > 0) {
+						record.parent = parent;
+					}
+					record = scope.addRelatedValues(record);
+					ds.save(record).success(function (dmsFile) {
+						info.progress = "100%";
+						info.complete = true;
+						deferred.resolve(info);
+					}).error(deferred.reject);
+				}).error(deferred.reject);
+
+				return promise;
+			}
+
+			return processNext();
 		}
 
 		input.change(function() {
