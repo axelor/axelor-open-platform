@@ -926,6 +926,24 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 					success(process(_.first(records)));
 				});
 			};
+
+			$scope.countAttachments = function (forScope, done) {
+				var ds = DataSource.create("com.axelor.meta.db.MetaAttachment");
+				var record = forScope.record;
+				var domain = "self.objectName = :name AND self.objectId = :id";
+				var context = {name: forScope._model, id: record.id };
+				var promise = ds.search({
+					fields: ['id'],
+					domain: domain,
+					context: context
+				});
+
+				promise.success(function (records) {
+					record.$attachments = _.size(records);
+				});
+
+				return promise.then(done, done);
+			};
 		}],
 		link: function (scope, element, attrs) {
 
@@ -965,7 +983,9 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 			};
 
 			scope.onClose = function () {
-				scope.$destroy();
+				scope.countAttachments(scope.$parent.$parent, function () {
+					scope.$destroy();
+				});
 			};
 		},
 		replace: true,
