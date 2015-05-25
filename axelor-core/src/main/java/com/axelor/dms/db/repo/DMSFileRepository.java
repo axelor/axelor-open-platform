@@ -1,3 +1,20 @@
+/**
+ * Axelor Business Solutions
+ *
+ * Copyright (C) 2005-2015 Axelor (<http://axelor.com>).
+ *
+ * This program is free software: you can redistribute it and/or  modify
+ * it under the terms of the GNU Affero General Public License, version 3,
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.axelor.dms.db.repo;
 
 import java.io.IOException;
@@ -10,6 +27,7 @@ import javax.persistence.PersistenceException;
 import org.joda.time.LocalDateTime;
 
 import com.axelor.common.ClassUtils;
+import com.axelor.common.Inflector;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
@@ -84,11 +102,19 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 			homeName = Strings.padStart(""+related.getId(), 5, '0');
 		}
 
-		DMSFile dmsRoot = new DMSFile();
-		dmsRoot.setFileName(entity.getRelatedModel());
-		dmsRoot.setRelatedModel(entity.getRelatedModel());
-		dmsRoot.setIsDirectory(true);
-		dmsRoot = super.save(dmsRoot); // should get id before it's child
+		DMSFile dmsRoot = all().filter(
+				"(self.relatedId is null OR self.relatedId = 0) AND self.relatedModel = ? and self.isDirectory = true",
+				entity.getRelatedModel()).fetchOne();
+
+		final Inflector inflector = Inflector.getInstance();
+
+		if (dmsRoot == null) {
+			dmsRoot = new DMSFile();
+			dmsRoot.setFileName(inflector.pluralize(inflector.humanize(related.getClass().getSimpleName())));
+			dmsRoot.setRelatedModel(entity.getRelatedModel());
+			dmsRoot.setIsDirectory(true);
+			dmsRoot = super.save(dmsRoot); // should get id before it's child
+		}
 
 		DMSFile dmsHome = new DMSFile();
 		dmsHome.setFileName(homeName);
