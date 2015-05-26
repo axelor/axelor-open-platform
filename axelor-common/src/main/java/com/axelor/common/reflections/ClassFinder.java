@@ -20,6 +20,7 @@ package com.axelor.common.reflections;
 import java.lang.annotation.Annotation;
 import java.util.Set;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
@@ -32,6 +33,7 @@ public final class ClassFinder<T> {
 	private Class<T> type;
 	private Set<Class<? extends Annotation>> annotations = Sets.newLinkedHashSet();
 	private Set<String> packages = Sets.newLinkedHashSet();
+	private Set<String> pathPatterns = Sets.newLinkedHashSet();
 	private ClassLoader loader = Thread.currentThread().getContextClassLoader();
 	
 	private boolean matchAll = true;
@@ -40,6 +42,19 @@ public final class ClassFinder<T> {
 		this.type = type;
 	}
 	
+	/**
+	 * Find with the given URL pattern.
+	 *
+	 * @param pattern
+	 *            the URL pattern
+	 * @return the same finder
+	 */
+	public ClassFinder<T> byURL(String pattern) {
+		Preconditions.checkNotNull(pattern, "pattern must not be null");
+		pathPatterns.add(pattern);
+		return this;
+	}
+
 	/**
 	 * Only search within the given package name.
 	 * 
@@ -111,6 +126,10 @@ public final class ClassFinder<T> {
 	public ImmutableSet<Class<? extends T>> find() {
 		final ImmutableSet.Builder<Class<? extends T>> builder = ImmutableSet.builder();
 		final ClassScanner scanner = new ClassScanner(loader, packages.toArray(new String[] {}));
+
+		for (String pattern : pathPatterns) {
+			scanner.byURL(pattern);
+		}
 
 		if (Object.class == type && annotations.isEmpty()) {
 			throw new IllegalStateException("please provide some annnotations.");

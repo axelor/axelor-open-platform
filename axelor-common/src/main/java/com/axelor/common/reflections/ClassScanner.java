@@ -20,6 +20,7 @@ package com.axelor.common.reflections;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,11 +28,13 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.regex.Pattern;
 
 import com.axelor.internal.asm.AnnotationVisitor;
 import com.axelor.internal.asm.ClassReader;
 import com.axelor.internal.asm.ClassVisitor;
 import com.axelor.internal.asm.Opcodes;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -53,7 +56,8 @@ final class ClassScanner {
 	private ClassLoader loader;
 	
 	private Map<String, Collector> collectors = Maps.newConcurrentMap();
-	private Set<String> packages = Sets.newHashSet();
+	private Set<String> packages = Sets.newLinkedHashSet();
+	private Set<Pattern> pathPatterns = Sets.newLinkedHashSet();
 
 	/**
 	 * Create a new instance of {@link ClassScanner} using the given
@@ -76,6 +80,19 @@ final class ClassScanner {
 		}
 	}
 	
+	/**
+	 * Find with the given URL pattern.
+	 *
+	 * @param pattern
+	 *            the URL pattern
+	 * @return the same finder
+	 */
+	public ClassScanner byURL(String pattern) {
+		Preconditions.checkNotNull(pattern, "pattern must not be null");
+		pathPatterns.add(Pattern.compile(pattern));
+		return this;
+	}
+
 	@SuppressWarnings("all")
 	public <T> ImmutableSet<Class<? extends T>> getSubTypesOf(Class<T> type) {
 		ImmutableSet.Builder<Class<? extends T>> builder = ImmutableSet.builder();
@@ -191,10 +208,20 @@ final class ClassScanner {
 		if (collector != null) {
 			return;
 		}
-		
-		String resouce = type.replace('.', '/') + ".class";
+
+		URL resource = loader.getResource(type.replace('.', '/') + ".class");
+		boolean matched = pathPatterns.isEmpty();
+		for (Pattern pathPattern : pathPatterns) {
+			matched = pathPattern.matcher(resource.getFile()).matches();
+			if (matched) break;
+		}
+
+		if (!matched) {
+			return;
+		}
+
 		try {
-			InputStream stream = loader.getResourceAsStream(resouce);
+			InputStream stream = resource.openStream();
 			try {
 				BufferedInputStream in = new BufferedInputStream(stream);
 				ClassReader reader = new ClassReader(in);
