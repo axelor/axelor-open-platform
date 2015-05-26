@@ -1856,7 +1856,7 @@ Grid.prototype.onButtonClick = function(event, args) {
 		}
 		field.handler.scope.getContext = function() {
 			var context = _.extend({
-				_model: model,
+				_model: model
 			}, record);
 			if (handlerScope.field && handlerScope.field.target) {
 				context._parent = handlerScope.getContext();

@@ -63,7 +63,7 @@ function getButtons(element, lite) {
 				'<h3>': _t('Header 3'),
 				'<h4>': _t('Header 4'),
 				'<h5>': _t('Header 5'),
-				'<h6>': _t('Header 6'),
+				'<h6>': _t('Header 6')
 		    })
 		},
 		d1: lite ? false : {
