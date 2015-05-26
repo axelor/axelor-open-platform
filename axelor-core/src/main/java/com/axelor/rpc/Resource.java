@@ -589,6 +589,8 @@ public class Resource<T extends Model> {
 
 		for(Object record : records) {
 
+			record = (Map) repository.validate((Map) record);
+
 			Long id = findId((Map) record);
 
 			if (id == null || id <= 0L) {

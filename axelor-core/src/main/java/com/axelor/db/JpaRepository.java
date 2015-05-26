@@ -123,7 +123,12 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 	public void flush() {
 		JPA.flush();
 	}
-	
+
+	@Override
+	public Map<String, Object> validate(Map<String, Object> json) {
+		return json;
+	}
+
 	@Override
 	public Map<String, Object> populate(Map<String, Object> json) {
 		return json;
