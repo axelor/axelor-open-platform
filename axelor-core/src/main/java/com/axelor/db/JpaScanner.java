@@ -140,6 +140,7 @@ public class JpaScanner extends NativeScanner {
 				repoCache.put(klass.getName(), klass);
 				repoNames.put(klass.getSimpleName(), klass.getName());
 			}
+			log.info("Total found: {}", repoCache.size());
 		}
 		return new HashSet<Class<?>>(modelCache.values());
 	}

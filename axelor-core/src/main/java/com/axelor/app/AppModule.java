@@ -17,18 +17,21 @@
  */
 package com.axelor.app;
 
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.birt.report.engine.api.IReportEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.common.reflections.ClassFinder;
 import com.axelor.common.reflections.Reflections;
 import com.axelor.inject.Beans;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.report.ReportEngineProvider;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 
 /**
@@ -41,20 +44,13 @@ public class AppModule extends AbstractModule {
 	private static Logger log = LoggerFactory.getLogger(AppModule.class);
 
 	private List<Class<? extends AxelorModule>> findAll() {
-		
-		final List<String> mods = ModuleManager.findInstalled();
-		final List<Class<? extends AxelorModule>> all = Lists.newArrayList();
-		
+		final List<Class<? extends AxelorModule>> all = new ArrayList<>();
 		for (Class<? extends AxelorModule> module : Reflections
 				.findSubTypesOf(AxelorModule.class)
-				.having(AxelorModuleInfo.class)
+				.within("com.axelor")
 				.find()) {
-			String name = module.getAnnotation(AxelorModuleInfo.class).name();
-			if (mods.contains(name)) {
-				all.add(module);
-			}
+			all.add(module);
 		}
-		
 		return all;
 	}
 	
@@ -71,9 +67,34 @@ public class AppModule extends AbstractModule {
 		if (all.isEmpty()) {
 			return;
 		}
-		
+
+		final Map<String, URL> modulePaths = ModuleManager.findInstalled();
+		if (modulePaths.isEmpty()) {
+			return;
+		}
+
+		final List<Class<? extends AxelorModule>> moduleClasses = new ArrayList<>();
+
+		for (String name : modulePaths.keySet()) {
+			final URL url = modulePaths.get(name);
+			final String path = url.getPath().replaceFirst("module\\.properties$", "");
+			final String pattern = String.format("^(%s).*", path);
+			final ClassFinder<AxelorModule> finders = Reflections
+					.findSubTypesOf(AxelorModule.class)
+					.within("com.axelor")
+					.byURL(pattern);
+			for (Class<? extends AxelorModule> klass : finders.find()) {
+				moduleClasses.add(klass);
+			}
+		}
+
+		if (moduleClasses.isEmpty()) {
+			return;
+		}
+
 		log.info("Configuring app modules...");
-		for (Class<? extends AxelorModule> module : all) {
+
+		for (Class<? extends AxelorModule> module : moduleClasses) {
 			try {
 				log.info("Configure: {}", module.getName());
 				install(module.newInstance());
