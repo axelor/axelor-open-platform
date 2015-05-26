@@ -1,17 +1,41 @@
 <?xml version="1.0"?>
-<csv-inputs xmlns="http://axelor.com/xml/ns/data-import" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<xml-inputs xmlns="http://axelor.com/xml/ns/data-import" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://axelor.com/xml/ns/data-import http://axelor.com/xml/ns/data-import/data-import_4.0.xsd">
 
-  <input file="groups.csv" type="com.axelor.auth.db.Group" search="self.code = :code">
-  	<bind column="code" to="code" if-empty="true"/>
-  	<bind column="name" to="name" if-empty="true"/>
+  <input file="auth.xml" root="auth">
+
+	<bind node="group" type="com.axelor.auth.db.Group" search="self.code = :code" update="false">
+	  <bind node="@code" to="code" />
+	  <bind node="@name" to="name" />
+	</bind>
+
+	<bind node="user" type="com.axelor.auth.db.User" search="self.code = :code" update="false" call="com.axelor.auth.AuthService:encrypt">
+	  <bind node="@code" to="code" />
+	  <bind node="@name" to="name" />
+      <bind node="@password" to="password" />
+	  <bind node="@group" to="group" search="self.code = :group" update="false" />
+	</bind>
+
+    <bind node="permission" type="com.axelor.auth.db.Permission" search="self.name = :name" update="false">
+      <bind node="@name" to="name" />
+      <bind node="@object" to="object" />
+      <bind node="can/@create" to="canCreate" />
+      <bind node="can/@read" to="canRead" />
+      <bind node="can/@write" to="canWrite" />
+      <bind node="can/@remove" to="canRemove" />
+      <bind node="can/@export" to="canExport" />
+      <bind node="domain/text()" to="condition"/>
+      <bind node="domain-params/text()" to="conditionParams"/>
+    </bind>
+
+    <bind node="role" type="com.axelor.auth.db.Role" search="self.name = :name" update="false">
+      <bind node="@name" to="name"/>
+      <bind node="@title" to="description"/>
+      <bind node="permission" to="permissions" search="self.name = :name">
+        <bind node="@name" to="name"/>
+      </bind>
+    </bind>
+
   </input>
 
-  <input file="users.csv" type="com.axelor.auth.db.User" search="self.code = :code" call="com.axelor.auth.AuthService:encrypt">
-  	<bind column="code" to="code" if-empty="true"/>
-  	<bind column="name" to="name" if-empty="true"/>
-  	<bind column="password" to="password" if-empty="true"/>
-    <bind column="group" to="group" search="self.code = :group" if-empty="true"/>
-  </input>
-
-</csv-inputs>
+</xml-inputs>

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<auth>
+
+  <group code="admins" name="Administrator" />
+  <group code="users" name="Users" />
+
+  <user code="admin" name="Administrator" group="admins" password="admin" />
+
+</auth>
