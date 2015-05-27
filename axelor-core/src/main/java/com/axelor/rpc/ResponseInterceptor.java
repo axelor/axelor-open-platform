@@ -103,6 +103,15 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 	}
 
 	private Response onAuthorizationException(AuthorizationException e, Response response) {
+		final Map<String, Object> report = new HashMap<>();
+		final String title = I18n.get("Access error");
+		final String message = e.getMessage();
+
+		report.put("title", title);
+		report.put("message", message);
+		response.setData(report);
+
+		response.setStatus(Response.STATUS_FAILURE);
 		return response;
 	}
 
