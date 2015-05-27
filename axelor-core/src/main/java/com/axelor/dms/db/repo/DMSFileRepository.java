@@ -24,9 +24,11 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 
+import org.apache.shiro.authz.UnauthorizedException;
 import org.joda.time.LocalDateTime;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.common.ClassUtils;
 import com.axelor.common.Inflector;
@@ -36,11 +38,13 @@ import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.dms.db.DMSFile;
+import com.axelor.i18n.I18n;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.google.common.base.Strings;
+import com.google.common.primitives.Longs;
 
 public class DMSFileRepository extends JpaRepository<DMSFile> {
 
@@ -180,13 +184,53 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 		super.remove(entity);
 	}
 
+	private DMSFile findFrom(Map<String, Object> json) {
+		if (json == null || json.get("id") == null) {
+			return null;
+		}
+		final Long id = Longs.tryParse(json.get("id").toString());
+		return find(id);
+	}
+
+	private boolean canCreate(DMSFile parent) {
+		final User user = AuthUtils.getUser();
+		final Group group = user.getGroup();
+		return dmsPermissions.all()
+			.filter("self.file = :file AND self.permission.canWrite = true AND "
+					+ "(self.createdBy = :user OR (self.user = :user OR self.group = :group))")
+			.bind("file", parent)
+			.bind("user", user)
+			.bind("group", group)
+			.autoFlush(false)
+			.count() > 0;
+	}
+
 	@Override
-	public Map<String, Object> populate(Map<String, Object> json) {
-		final Object id = json.get("id");
-		if (id == null) {
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> validate(Map<String, Object> json) {
+		final DMSFile file = findFrom(json);
+		final DMSFile parent = findFrom((Map<String, Object>) json.get("parent"));
+		if (parent == null) {
 			return json;
 		}
-		final DMSFile file = find((Long) id);
+		if (file != null && file.getParent() == parent) {
+			return json;
+		}
+
+		// check whether user can create/move document here
+		if (file == null  && !canCreate(parent)) {
+			throw new UnauthorizedException(I18n.get("You can't create document here."));
+		}
+		if (file != null && file.getParent() != parent) {
+			throw new UnauthorizedException(I18n.get("You can't move document here."));
+		}
+
+		return json;
+	}
+
+	@Override
+	public Map<String, Object> populate(Map<String, Object> json) {
+		final DMSFile file = findFrom(json);
 		if (file == null) {
 			return json;
 		}
