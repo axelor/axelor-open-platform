@@ -1,7 +1,7 @@
 /**
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2014 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2015 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -140,6 +140,7 @@ public class JpaScanner extends NativeScanner {
 				repoCache.put(klass.getName(), klass);
 				repoNames.put(klass.getSimpleName(), klass.getName());
 			}
+			log.info("Total found: {}", repoCache.size());
 		}
 		return new HashSet<Class<?>>(modelCache.values());
 	}

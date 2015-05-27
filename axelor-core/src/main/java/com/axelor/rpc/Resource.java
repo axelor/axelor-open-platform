@@ -1,7 +1,7 @@
 /**
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2014 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2015 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -588,6 +588,8 @@ public class Resource<T extends Model> {
 		}
 
 		for(Object record : records) {
+
+			record = (Map) repository.validate((Map) record);
 
 			Long id = findId((Map) record);
 

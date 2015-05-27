@@ -1,7 +1,7 @@
 /**
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2014 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2015 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -26,7 +26,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -106,29 +108,29 @@ public class ModuleManager {
 			@Override
 			public void run() {
 
-			log.info("modules found:");
-			for (String name : resolver.names()) {
-				log.info("  " + name);
-			}
+				log.info("modules found:");
+				for (String name : resolver.names()) {
+					log.info("  " + name);
+				}
 
-			// install modules
-			for (Module module : resolver.all()) {
-				if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
-					install(module.getName(), update, withDemo, false);
+				// install modules
+				for (Module module : resolver.all()) {
+					if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
+						install(module.getName(), update, withDemo, false);
+					}
 				}
-			}
-			// second iteration ensures proper view sequence
-			for (Module module : resolver.all()) {
-				if (module.isInstalled()) {
-					viewLoader.doLast(module, update);
+				// second iteration ensures proper view sequence
+				for (Module module : resolver.all()) {
+					if (module.isInstalled()) {
+						viewLoader.doLast(module, update);
+					}
 				}
-			}
-			// uninstall pending modules
-			for (Module module : resolver.all()) {
-				if (module.isRemovable() && !module.isInstalled() && module.isPending()) {
-					uninstall(module.getName());
+				// uninstall pending modules
+				for (Module module : resolver.all()) {
+					if (module.isRemovable() && !module.isInstalled() && module.isPending()) {
+						uninstall(module.getName());
+					}
 				}
-			}
 			}
 		};
 
@@ -347,7 +349,7 @@ public class ModuleManager {
 	 * candidates).
 	 *
 	 */
-	public static List<String> findInstalled() {
+	public static Map<String, URL> findInstalled() {
 		final Resolver resolver = new Resolver();
 		final Set<String> installed = getInstalledModules();
 		final List<String> found = new ArrayList<>();
@@ -393,7 +395,13 @@ public class ModuleManager {
 				found.add(name);
 			}
 		}
-		return found;
+
+		final Map<String, URL> result = new LinkedHashMap<>();
+		for (String name : found) {
+			result.put(name, resolver.get(name).getPath());
+		}
+
+		return result;
 	}
 
 	@Transactional

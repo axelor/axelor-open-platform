@@ -1,7 +1,7 @@
 /**
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2014 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2015 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -123,7 +123,12 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 	public void flush() {
 		JPA.flush();
 	}
-	
+
+	@Override
+	public Map<String, Object> validate(Map<String, Object> json) {
+		return json;
+	}
+
 	@Override
 	public Map<String, Object> populate(Map<String, Object> json) {
 		return json;
