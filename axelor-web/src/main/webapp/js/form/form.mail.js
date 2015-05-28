@@ -421,6 +421,30 @@ ui.formWidget('uiMailMessages', {
 		"</div>"
 });
 
+ui.directive('uiMailUploader', ["$compile", function ($compile) {
+
+	return function (scope, element, attrs) {
+
+		scope.onSelect = function (items) {
+			for (var i = 0; i < items.length; i++) {
+				var file = items[i];
+				var fileId = file['metaFile.id'];
+				if (file.isDirectory || !fileId) continue;
+				if (_.findWhere(scope.files, {id: fileId})) continue;
+				scope.files.push({
+					id: fileId,
+					fileName: file.fileName
+				});
+			}
+		};
+
+		scope.onUpload = function () {
+			var popup = $compile('<div ui-dms-popup x-on-select="onSelect"></div>')(scope);
+			popup.scope().showPopup();
+		};
+	};
+}]);
+
 ui.formWidget('uiMailComposer', {
 	scope: true,
 	require: '^uiMailMessages',
@@ -499,10 +523,6 @@ ui.formWidget('uiMailComposer', {
 	link: function (scope, element, attrs) {
 
 		var textarea = element.find('textarea');
-		var input = element.find('input[type=file]').hide();
-
-		var uploadSize = scope.$eval('app.fileUploadSize');
-		var fileModel = 'com.axelor.meta.db.MetaFile';
 
 		textarea.on('blur', function () {
 			if (scope.post || !scope.message) return;
@@ -519,58 +539,16 @@ ui.formWidget('uiMailComposer', {
 			}
 		});
 
-		scope.uploading = false;
-		scope.onUpload = function() {
-			input.click();
-		};
-
 		scope.onRemoveFile = function (file) {
 			var i = scope.files.indexOf(file);
 			if (i > -1) {
 				scope.files.splice(i, 1);
 			}
 		};
-
-		input.change(function(e) {
-
-			var file = input.get(0).files[0];
-			if (!file) {
-				return;
-			}
-
-			if(file.size > 1048576 * parseInt(uploadSize)) {
-				return axelor.dialogs.say(_t("You are not allow to upload a file bigger than") + ' ' + uploadSize + 'MB');
-			}
-
-		    var record = {
-				fileName: file.name,
-				mime: file.type,
-				size: file.size,
-				id: null,
-				version: null
-		    };
-
-		    record.$upload = {
-			    file: file
-		    };
-
-		    scope.uploading = true;
-
-		    var newDS = scope._dataSource._new(fileModel, {});
-		    newDS.save(record).progress(function(fn) {
-			scope.uploading = fn < 100;
-		    }).success(function(file) {
-				scope.uploading = false;
-				scope.files.push(file);
-			}).error(function() {
-				scope.uploading = false;
-			});
-		});
 	},
 	template: "" +
 		"<div class='mail-composer' ng-show='canShow()'>" +
 			"<textarea rows='1' ng-model='post' ui-textarea-auto-size class='span12' placeholder='Write your comment here'></textarea>" +
-			"<input type='file' class='hidden'>" +
 			"<iframe class='hidden'></iframe>" +
 			"<div class='mail-composer-files' ng-show='files.length'>" +
 				"<ul>" +
@@ -581,7 +559,7 @@ ui.formWidget('uiMailComposer', {
 			"</div>" +
 			"<div class='mail-composer-buttons' ng-show='canPost()'>" +
 				"<button class='btn btn-primary' ng-click='onPost()' x-translate>Post</button>" +
-				"<span class='btn btn-default' ng-click='onUpload()'>" +
+				"<span class='btn btn-default' ui-mail-uploader ng-click='onUpload()'>" +
 					"<i class='fa fa-paperclip'></i>" +
 				"</span>" +
 			"</div>" +

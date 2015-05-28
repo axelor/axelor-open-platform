@@ -30,6 +30,7 @@ import javax.persistence.PersistenceException;
 
 import com.axelor.app.AppSettings;
 import com.axelor.db.Model;
+import com.axelor.dms.db.repo.DMSFileRepository;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
@@ -206,13 +207,25 @@ public class MetaFiles {
 
 		MetaAttachmentRepository attachments = Beans.get(MetaAttachmentRepository.class);
 		MetaFileRepository files = Beans.get(MetaFileRepository.class);
-
-		MetaFile metaFile = attachment.getMetaFile();
-		Path target = Paths.get(UPLOAD_PATH, metaFile.getFilePath());
+		DMSFileRepository dms = Beans.get(DMSFileRepository.class);
 
 		attachments.remove(attachment);
-		files.remove(metaFile);
 
+		MetaFile metaFile = attachment.getMetaFile();
+		long count = dms.all().filter("self.metaFile = ?", metaFile).count();
+		if (count == 0) {
+			count = attachments.all()
+			.filter("self.metaFile = ? and self.id != ?", metaFile, attachment.getId())
+			.count();
+		}
+
+		// only delete real file if not reference anywhere else
+		if (count > 0) {
+			return;
+		}
+
+		files.remove(metaFile);
+		Path target = Paths.get(UPLOAD_PATH, metaFile.getFilePath());
 		Files.deleteIfExists(target);
 	}
 

@@ -144,7 +144,7 @@ function DMSFileListCtrl($scope, $element) {
 		var fields = _.pluck($scope.fields, 'name');
 		var ds = $scope._dataSource;
 
-		fields.push("relatedId", "relatedModel");
+		fields.push("relatedId", "relatedModel", "isDirectory", "metaFile.id");
 
 		var context = $scope.getContext();
 		var nameFilter = $scope.currentFilter;
@@ -1032,7 +1032,9 @@ ui.directive("uiDmsMembersForm", function () {
 ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 
 	return {
-		scope: true,
+		scope: {
+			onSelect: "&"
+		},
 		controller: ["$scope", 'DataSource', 'ViewService', function($scope, DataSource, ViewService) {
 
 			$scope._isPopup = true;
@@ -1126,6 +1128,31 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 		}],
 		link: function (scope, element, attrs) {
 
+			var onSelect = scope.onSelect();
+
+			if (onSelect) {
+				scope.buttons = [{
+					text: _t("Select"),
+					'class': 'btn btn-primary',
+					click: function (e) {
+						var viewScope = $(this).find(".grid-view").scope();
+						var items = _.map(viewScope.selection, function (i) {
+							return viewScope.dataView.getItem(i);
+						});
+						scope.applyLater(function () {
+							var promise = onSelect(items);
+							if (promise && promise.then) {
+								promise.then(function () {
+									element.dialog("close");
+								});
+							} else {
+								element.dialog("close");
+							}
+						});
+					}
+				}];
+			}
+
 			setTimeout(function () {
 				var elemDialog = element.parent();
 				var elemTitle = elemDialog.find('.ui-dialog-title');
@@ -1141,18 +1168,6 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 				element.dialog('option', 'height', height);
 			});
 
-			scope.showPopup = function (forScope) {
-				scope.findHome(forScope, function (home) {
-					scope._viewParams.currentHome = home;
-					var content = "<div ng-include='\"partials/views/dms-file-list.html\"'></div>";
-					content = $compile(content)(scope);
-					content.appendTo(element);
-					setTimeout(function () {
-						element.dialog("open");
-					});
-				});
-			};
-
 			scope.onHotKey = function (e, action) {
 				var elem = element.find(".grid-view:first");
 				var viewScope = elem.scope();
@@ -1161,14 +1176,45 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 				}
 			};
 
+			var formScope = null;
+
 			scope.onClose = function () {
-				scope.countAttachments(scope.$parent.$parent, function () {
+				if (formScope) {
+					scope.countAttachments(formScope, function () {
+						scope.$destroy();
+					});
+				} else {
 					scope.$destroy();
+				}
+				formScope = null;
+			};
+
+			scope.showPopup = function (forScope) {
+
+				formScope = forScope;
+
+				function doOpen() {
+					var content = "<div ng-include='\"partials/views/dms-file-list.html\"'></div>";
+					content = $compile(content)(scope);
+					content.appendTo(element);
+					setTimeout(function () {
+						element.dialog("open");
+					});
+				}
+
+				if (!formScope) {
+					return doOpen();
+				}
+
+				scope.findHome(forScope, function (home) {
+					scope._viewParams.currentHome = home;
+					doOpen();
 				});
 			};
+
 		},
 		replace: true,
-		template: "<div ui-dialog x-on-ok='false' x-on-close='onClose' class='dms-popup' title='Attachments'></div>"
+		template: "<div ui-dialog x-buttons='buttons' x-on-ok='false' x-on-close='onClose' class='dms-popup' title='Attachments'></div>"
 	};
 }]);
 
