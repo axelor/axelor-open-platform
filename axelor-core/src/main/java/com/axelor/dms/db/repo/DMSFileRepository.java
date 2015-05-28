@@ -226,7 +226,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 		if (file == null  && !canCreate(parent)) {
 			throw new UnauthorizedException(I18n.get("You can't create document here."));
 		}
-		if (file != null && file.getParent() != parent) {
+		if (file != null && file.getParent() != parent && !canCreate(parent)) {
 			throw new UnauthorizedException(I18n.get("You can't move document here."));
 		}
 
