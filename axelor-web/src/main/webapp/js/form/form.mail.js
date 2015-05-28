@@ -428,7 +428,7 @@ ui.directive('uiMailUploader', ["$compile", function ($compile) {
 		scope.onSelect = function (items) {
 			for (var i = 0; i < items.length; i++) {
 				var file = items[i];
-				var fileId = file['metaFile.id'];
+				var fileId = file.metaFile ? file.metaFile.id : file['metaFile.id'];
 				if (file.isDirectory || !fileId) continue;
 				if (_.findWhere(scope.files, {id: fileId})) continue;
 				scope.files.push({

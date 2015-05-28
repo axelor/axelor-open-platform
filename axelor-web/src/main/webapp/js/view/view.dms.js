@@ -144,8 +144,6 @@ function DMSFileListCtrl($scope, $element) {
 		var fields = _.pluck($scope.fields, 'name');
 		var ds = $scope._dataSource;
 
-		fields.push("relatedId", "relatedModel", "isDirectory", "metaFile.id");
-
 		var context = $scope.getContext();
 		var nameFilter = $scope.currentFilter;
 		if (nameFilter) {
@@ -176,6 +174,16 @@ function DMSFileListCtrl($scope, $element) {
 		$scope.currentPaths.length = 0;
 
 		return $scope.reload();
+	};
+
+	var __filter = $scope.filter;
+	$scope.filter = function (searchFilter) {
+		var fields = $scope.fields || {};
+		["relatedId", "relatedModel", "isDirectory", "metaFile.id"]
+		.forEach(function (name) {
+			fields[name] = fields[name] || { name: name };
+		});
+		return __filter.apply($scope, arguments);
 	};
 
 	$scope.onFolder = function(folder, currentPaths) {
