@@ -195,9 +195,14 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 	private boolean canCreate(DMSFile parent) {
 		final User user = AuthUtils.getUser();
 		final Group group = user.getGroup();
+		if (parent.getCreatedBy() == user ||
+			security.hasRole("role.super") ||
+			security.hasRole("role.admin")) {
+			return true;
+		}
 		return dmsPermissions.all()
 			.filter("self.file = :file AND self.permission.canWrite = true AND "
-					+ "(self.createdBy = :user OR (self.user = :user OR self.group = :group))")
+					+ "(self.user = :user OR self.group = :group)")
 			.bind("file", parent)
 			.bind("user", user)
 			.bind("group", group)
