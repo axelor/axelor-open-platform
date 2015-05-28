@@ -257,6 +257,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 		json.put("typeIcon", isFile ? "fa fa-file" : "fa fa-folder");
 		json.put("lastModified", dt);
 		json.put("canShare", canShare);
+		json.put("canWrite", canCreate(file));
 
 		return json;
 	}

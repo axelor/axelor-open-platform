@@ -200,6 +200,11 @@ function DMSFileListCtrl($scope, $element) {
 	}
 
 	$scope.onNewFolder = function () {
+
+		if (!$scope.canCreateDocument(true)) {
+			return;
+		}
+
 		var count = 1;
 		var selected = $scope.getSelected() || {};
 		var existing = _.pluck((selected.nodes || []), "fileName");
@@ -320,6 +325,17 @@ function DMSFileListCtrl($scope, $element) {
 
 	$scope.onShowMembers = function () {
 
+	};
+
+	$scope.canCreateDocument = function (notify) {
+		var parent = $scope.currentFolder || $scope.getCurrentHome();
+		if (parent && !parent.canWrite) {
+			if (notify) {
+				axelor.notify.error(_t("You can't create document here."));
+			}
+			return false;
+		}
+		return true;
 	}
 }
 
@@ -404,6 +420,11 @@ ui.directive('uiDmsUploader', ['$q', function ($q) {
 		scope.uploadQueue = []
 
 		function doUpload(files) {
+
+			if (!scope.canCreateDocument(true)) {
+				return;
+			}
+
 			var all = files;
 			if (files.fileName) {
 				files = [files];

@@ -96,6 +96,7 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
 
 		final Permission __self__ = findOrCreate("perm.dms.file.__self__", "self.createdBy = ?", "__user__", DMSFile.class.getName());
 		final Permission __create__ = findOrCreate("perm.dms.__create__", null, null, "com.axelor.dms.db.*");
+		final Permission __meta__ = findOrCreate("perm.meta.file.__create__", null, null, "com.axelor.meta.db.MetaFile");
 
 		__self__.setCanCreate(false);
 		__self__.setCanRead(true);
@@ -107,15 +108,22 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
 		__create__.setCanWrite(false);
 		__create__.setCanRemove(false);
 
+		__meta__.setCanCreate(true);
+		__meta__.setCanRead(false);
+		__meta__.setCanWrite(false);
+		__meta__.setCanRemove(false);
+
 		if (user != null) {
 			user.addPermission(permission);
 			user.addPermission(__self__);
 			user.addPermission(__create__);
+			user.addPermission(__meta__);
 		}
 		if (group != null) {
 			group.addPermission(permission);
 			group.addPermission(__self__);
 			group.addPermission(__create__);
+			user.addPermission(__meta__);
 		}
 
 		entity.setPermission(permission);
