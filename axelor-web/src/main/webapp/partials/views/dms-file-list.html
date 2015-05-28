@@ -30,7 +30,18 @@
           </ul>
         </div>
         <div ui-record-pager="no-text" class="pull-right"></div>
-        <div ui-filter-box ng-show="!$parent._isPopup" x-handler="this" class="pull-right"></div>
+        <div class="filter-box pull-right">
+          <div class="tag-select picker-input search-query">
+            <ul>
+              <li class="tag-selector">
+                <input class="search-input" type="text" autocomplete="off" ng-model="currentFilter">
+              </li>
+            </ul>
+            <span class="picker-icons">
+              <i ng-click="onSearch()" class="fa fa-search"></i>
+            </span>
+          </div>
+        </div>
         <ul class="breadcrumb">
           <li><a href="javascript:" ng-click="onFolder()" tabindex="-1"><i class="fa fa-home"></i></a> <span class="divider">/</span></li>
           <li ng-repeat="folder in currentPaths" ng-class="{'active': $last}">

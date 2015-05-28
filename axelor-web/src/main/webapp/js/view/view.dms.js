@@ -86,11 +86,15 @@ function DMSFileListCtrl($scope, $element) {
 	$scope.$emptyMessage = _t("No documents found.");
 	$scope.$confirmMessage = _t("Are you sure you want to delete selected documents?");
 
+	$scope.currentFilter = null;
 	$scope.currentFolder = null;
 	$scope.currentPaths = [];
 
 	Object.defineProperty($scope, "_domain", {
 		get: function () {
+			if ($scope.currentFilter) {
+				return _domain + "self.isDirectory = false AND LOWER(self.fileName) like LOWER(:nameFilter)";
+			}
 			var parent = $scope.getCurrentParent();
 			if (parent && parent.id) {
 				return _domain + "self.parent.id = " + parent.id;
@@ -142,9 +146,16 @@ function DMSFileListCtrl($scope, $element) {
 
 		fields.push("relatedId", "relatedModel");
 
+		var context = $scope.getContext();
+		var nameFilter = $scope.currentFilter;
+		if (nameFilter) {
+			context.nameFilter = "%" + nameFilter.toLowerCase() + "%";
+		}
+
 		return ds.search({
 			fields: _.unique(fields),
-			domain: $scope._domain
+			domain: $scope._domain,
+			context: context
 		});
 	};
 
@@ -159,7 +170,18 @@ function DMSFileListCtrl($scope, $element) {
 		return doReload();
 	};
 
+	$scope.onSearch = function () {
+
+		$scope.currentFolder = null;
+		$scope.currentPaths.length = 0;
+
+		return $scope.reload();
+	};
+
 	$scope.onFolder = function(folder, currentPaths) {
+
+		// reset filter
+		$scope.currentFilter = null;
 
 		var paths = currentPaths || $scope.currentPaths || [];
 		var index = paths.indexOf(folder);
@@ -556,6 +578,13 @@ ui.directive('uiDmsUploader', ['$q', function ($q) {
 
 			axelor.notify.info(_t("Downloading {0}...", fileName));
 		};
+
+		var searchInput = element.find("input.search-input");
+		searchInput.on("keypress", function (e) {
+			if (e.keyCode === 13) {
+				return scope.onSearch();
+			}
+		});
 	};
 }]);
 
