@@ -505,6 +505,7 @@ ui.directive('uiDmsUploader', ['$q', function ($q) {
 		input.change(function() {
 			scope.applyLater(function () {
 				doUpload(input.get(0).files);
+				input.val(null);
 			});
 		});
 
