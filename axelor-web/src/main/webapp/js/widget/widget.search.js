@@ -345,8 +345,8 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		}
 	});
 
-	$scope.$on('on:clear-filter', function (e) {
-		$scope.clearFilter();
+	$scope.$on('on:clear-filter', function (e, options) {
+		$scope.clearFilter(options);
 	});
 
 	function select(custom) {
@@ -396,7 +396,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		});
 	}
 
-	$scope.clearFilter = function() {
+	$scope.clearFilter = function(options) {
 		$scope.filters.length = 0;
 		$scope.addFilter();
 
@@ -404,8 +404,10 @@ function FilterFormCtrl($scope, $element, ViewService) {
 			$scope.$parent.onClear();
 		}
 
-		$scope.applyFilter();
-		
+		if (!options || !options.silent) {
+			$scope.applyFilter();
+		}
+
 		if ($scope.$parent) {
 			$scope.$parent.$broadcast('on:hide-menu');
 		}
@@ -758,7 +760,8 @@ ui.directive('uiFilterBox', function() {
 				$scope.custTitle = null;
 				$scope.custShared = false;
 				$scope.custTerm = null;
-				
+				$scope.tagItems = [];
+
 				if ($scope.handler && $scope.handler.clearFilters) {
 					$scope.handler.clearFilters();
 				}
@@ -973,9 +976,10 @@ ui.directive('uiFilterBox', function() {
 				});
 			};
 
-			// append menu to view page to overlap the view
+			// append menu to body to fix overlaping issue
 			scope.$timeout(function() {
-				element.parents('.view-container').after(menu);
+				menu.zIndex(element.zIndex() + 1);
+				menu.appendTo("body");
 			});
 
 			element.on('keydown.search-query', '.search-query', function(e) {
@@ -986,6 +990,14 @@ ui.directive('uiFilterBox', function() {
 			
 			scope.$on('on:hide-menu', function () {
 				hideMenu();
+			});
+			
+			scope.$on('on:clear-filter-silent', function () {
+				scope.visible = true;
+				scope.$broadcast('on:clear-filter', { silent: true });
+				scope.$timeout(function () {
+					scope.visible = false;
+				});
 			});
 
 			function hideMenu() {
@@ -1001,11 +1013,10 @@ ui.directive('uiFilterBox', function() {
 				if (all.is(e.target) || all.has(e.target).size() > 0) {
 					return;
 				}
-				all = $('.ui-widget-overlay,.ui-datepicker:visible,.ui-dialog:visible');
-				if (all.is(e.target) || all.has(e.target).size() > 0) {
+				if ($(e.target).zIndex() > $(menu).zIndex()) {
 					return;
 				}
-				if(menu){
+				if(menu) {
 					hideMenu();
 				}
 			}
