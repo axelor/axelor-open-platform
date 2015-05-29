@@ -127,7 +127,9 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 				promise = view ? view.deferred.promise : null;
 			if (promise) {
 				promise.then(function(viewScope) {
-					viewScope.setRouteOptions(options);
+					viewScope.waitForActions(function() {
+						viewScope.setRouteOptions(options);
+					});
 				});
 			}
 		}
