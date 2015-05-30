@@ -75,15 +75,54 @@
 	font-size: 32px !important;
 }
 
+.dms-file-upload .panel-header {
+	overflow: hidden;
+}
+
+.dms-file-upload .panel-body {
+	padding: 0;
+}
+
 .dms-file-upload .upload-files {
 	bottom: 0;
 	right: 10px;
-	max-width: 480px;
+	max-height: 320px;
+	font-size: 12px;
+}
+
+.dms-file-upload .upload-files tr {
+	border-bottom: 1px solid #d4d4d4;
+}
+
+.dms-file-upload .upload-files td {
+	float: left;
+	padding: 4px;
+	vertical-align: top;
+}
+
+.dms-file-upload .upload-files tr:last-child {
+	border-bottom: 0;
+}
+
+.dms-file-upload .upload-files td.file-name {
+	width: 200px;
+}
+
+.dms-file-upload .upload-files td.file-complete {
+	width: 130px;
 	white-space: nowrap;
+	text-overflow: clip;
+	text-align: right;
+}
+
+.dms-file-upload .upload-files td.file-progress {
+	width: 120px;
+	padding: 8px;
 }
 
 .dms-file-upload .upload-files .progress {
 	margin-bottom: 0;
+	height: 6px;
 }
 
 .dms-file-upload .upload-overlay {

@@ -53,16 +53,29 @@
       </div>
       <div class="drop-message" x-translate>Drop your files to start upload.</div>
     </div>
-    <div class="upload-files panel" ng-show="uploadQueue.length">
+    <div class="upload-files panel" ng-show="uploads.items.length">
       <div class="panel-header">
-        <div class="panel-title" x-translate>Uploading files...</div>
+        <div class="panel-title pull-left" ng-show="uploads.running" x-translate>Uploading files...</div>
+        <div class="panel-title pull-left" ng-show="!uploads.running" x-translate>Upload complete</div>
+        <div class="panel-buttons pull-right" ng-show="!uploads.running">
+          <a href='' ng-click="onCloseUploadFiles()"><i class="fa fa-times"></i></a>
+        </div>
       </div>
       <div class="panel-body">
         <table>
-          <tr ng-repeat="info in uploadQueue">
-            <td width="5%">{{info.file.name}}</td>
-            <td>
-              <div class="progress progress-striped"><div class="bar" ng-style="{width: info.progress}"></div></div>
+          <tr ng-repeat="info in uploads.items">
+            <td class="file-name">
+              <span>{{info.file.name}}</span>
+            </td>
+            <td class="file-complete">
+              <div>{{info.transfer}}</div>
+            </td>
+            <td class="file-progress">
+              <div class="progress"><div class="bar" ng-style="{width: info.progress}"></div></div>
+            </td>
+            <td class="file-op" ng-show="!info.loaded">
+              <a href='' ng-show='info.pending' ng-click='info.abort()' x-translate>Cancel</a>
+              <a href='' ng-show='!info.pending' ng-click='info.retry()' x-translate>Retry</a>
             </td>
           </tr>
         </table>

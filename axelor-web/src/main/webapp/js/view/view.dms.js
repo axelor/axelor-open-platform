@@ -381,7 +381,7 @@ function DMSFileListCtrl($scope, $element) {
 	}
 }
 
-ui.directive('uiDmsUploader', ['$q', function ($q) {
+ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 
 	return function (scope, element, attrs) {
 
@@ -459,10 +459,74 @@ ui.directive('uiDmsUploader', ['$q', function ($q) {
 			});
 		});
 
-		scope.uploadQueue = []
+		var uploads = {
+			items: [],
+			pending: [],
+			running: false,
+			queue: function (info) {
+				info.pending = true;
+				info.progress = 0;
+				info.transfer = _t("Pending");
+				info.abort = function () {
+					info.transfer = _t("Cancelled");
+					info.pending = false;
+				};
+				info.retry = function () {
+					uploads.queue(info);
+					uploads.process();
+				};
+				if (this.items.indexOf(info) === -1) {
+					this.items.push(info);
+				}
+				if (this.pending.indexOf(info) === -1) {
+					this.pending.push(info);
+				}
+			},
+			process: function () {
+				if (this.running || this.pending.length === 0) {
+					return;
+				}
+				this.running = true;
+				var info = this.pending.shift();
+				while (info && !info.pending) {
+					info = this.pending.shift();
+				}
+				if (!info) {
+					this.running = false;
+					return;
+				}
+
+				var that = this;
+				var promise = uploadSingle(info);
+
+				function error(reason) {
+					that.running = false;
+					info.pending = false;
+					info.progress = 0;
+					info.transfer = reason.message;
+					return that.process();
+				}
+
+				function success() {
+					that.running = false;
+					info.pending = false;
+					info.complete = true;
+					info.progress = "100%";
+					return that.process();
+				}
+
+				return promise.then(success, error);
+			}
+		};
+
+		// expose uploads
+		scope.uploads = uploads;
+		scope.onCloseUploadFiles = function() {
+			uploads.items.length = 0;
+			uploads.pending.length = 0;
+		};
 
 		function doUpload(files) {
-
 			if (!scope.canCreateDocument(true)) {
 				return;
 			}
@@ -479,90 +543,102 @@ ui.directive('uiDmsUploader', ['$q', function ($q) {
 			for (i = 0; i < all.length; i++) {
 				var file = all[i];
 				var info = {
-					file: file,
-					progress: "0%",
-					complete: false
+					file: file
 				};
-				scope.uploadQueue.push(info);
+				uploads.queue(info);
 			}
-			processQueue();
+			uploads.process();
 		}
 
-		var uploadRunning;
+		function uploadSingle(info) {
+			var deferred = $q.defer();
+			var promise = deferred.promise;
+			var file = info.file;
+			var xhr = new XMLHttpRequest();
 
-		function processQueue() {
-			var promise;
-			var queue = scope.uploadQueue;
-			if (queue.length === 0 || uploadRunning) {
-				return;
+			function formatSize(done, total) {
+				function format(size) {
+					if(size > 1000000000) return parseFloat(size/1000000000).toFixed(2) + " GB";
+					if(size > 1000000) return parseFloat(size/1000000).toFixed(2) + " MB";
+					if(size >= 1000) return parseFloat(size/1000).toFixed(2) + " KB";
+					return size + " B";
+				}
+				return format(done || 0) + "/" + format(total);
 			}
 
-			function failed(reason) {
-				uploadRunning = false;
-				queue.length = 0;
-				axelor.notify.error(_t("Upload failed..."));
+			function onError(reason) {
+				deferred.reject({ message: _t("Failed"), failed: true });
 			}
 
-			function success(info) {
-				uploadRunning = false;
-				processNext();
+			function onCancel() {
+				deferred.reject({ message: _t("Cancelled"), cancelled: true });
 			}
 
-			function processNext() {
-				var next = _.findWhere(queue, { complete: false });
-				if (next) {
-					uploadRunning = true;
-					promise = uploadSingle(next);
-					promise.then(success, failed);
-				} else {
-					queue.length = 0;
-					axelor.notify.info(_t("Upload complete..."));
+			function onSuccess(meta) {
+				var ds = scope._dataSource;
+				var parent = scope.getCurrentParent();
+				var record = {
+					fileName: meta.fileName,
+					metaFile: _.pick(meta, "id")
+				};
+				if (parent && parent.id > 0) {
+					record.parent = parent;
+				}
+				record = scope.addRelatedValues(record);
+				ds.save(record).success(function (dmsFile) {
+					deferred.resolve(info);
+				}).error(onError);
+			}
+
+			info.transfer = formatSize(0, file.size);
+			info.abort = function () {
+				xhr.abort();
+				onCancel();
+			};
+			info.retry = function () {
+				// put back on queue
+				uploads.queue(info);
+				uploads.process();
+			};
+
+			xhr.upload.addEventListener("progress", function (e) {
+				var done = ((e.loaded / file.size) * 100);
+				info.progress = done > 98 ? "99%" : done + "%";
+				info.transfer = formatSize(e.loaded, file.size);
+				info.loaded = e.loaded === file.size;
+				scope.applyLater();
+			});
+
+			xhr.onreadystatechange = function(e) {
+				if (xhr.readyState == 4) {
+					switch(xhr.status) {
+					case 0:
+					case 406:
+						onCancel();
+						break;
+					case 200:
+						onSuccess(angular.fromJson(xhr.responseText));
+						break;
+					default:
+						onError();
+					}
+					scope.applyLater();
 				}
 			}
 
-			function uploadSingle(info) {
+			xhr.open("POST", "ws/files/upload", true);
 
-				var file = info.file;
-				var record = {
-					fileName: file.name,
-					mime: file.type,
-					size: file.size,
-					id: null,
-					version: null
-				};
+	        xhr.overrideMimeType("application/octet-stream");
+	        xhr.setRequestHeader("Content-Type", "application/octet-stream");
+			xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 
-				record.$upload = {
-					file: file
-				};
+			xhr.setRequestHeader("X-File-Name", file.name);
+			xhr.setRequestHeader("X-File-Type", file.type);
+			xhr.setRequestHeader("X-File-Size", file.size);
 
-				var ds = scope._dataSource;
-				var metaDS = ds._new("com.axelor.meta.db.MetaFile");
-				var deferred = $q.defer();
-				var promise = deferred.promise;
+	        xhr.send(file);
 
-				metaDS.save(record).progress(function(fn) {
-					info.progress = (fn > 95 ? 95 : fn) + "%";
-				}).success(function(metaFile) {
-					var parent = scope.getCurrentParent();
-					var record = {
-						fileName: metaFile.fileName,
-						metaFile: _.pick(metaFile, "id")
-					};
-					if (parent && parent.id > 0) {
-						record.parent = parent;
-					}
-					record = scope.addRelatedValues(record);
-					ds.save(record).success(function (dmsFile) {
-						info.progress = "100%";
-						info.complete = true;
-						deferred.resolve(info);
-					}).error(deferred.reject);
-				}).error(deferred.reject);
-
-				return promise;
-			}
-
-			return processNext();
+			return promise;
 		}
 
 		input.change(function() {
