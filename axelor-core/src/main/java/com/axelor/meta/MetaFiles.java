@@ -21,11 +21,13 @@ import static com.axelor.common.StringUtils.isBlank;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 
 import com.axelor.app.AppSettings;
@@ -48,8 +50,11 @@ public class MetaFiles {
 	private static final String DEFAULT_UPLOAD_PATH = "{java.io.tmpdir}/axelor/attachments";
 	private static final String UPLOAD_PATH = AppSettings.get().getPath("file.upload.dir", DEFAULT_UPLOAD_PATH);
 
-	public MetaFiles() {
+	private MetaFileRepository filesRepo;
 
+	@Inject
+	public MetaFiles(MetaFileRepository filesRepo) {
+		this.filesRepo = filesRepo;
 	}
 
 	/**
@@ -123,13 +128,19 @@ public class MetaFiles {
 		Preconditions.checkNotNull(metaFile);
 		Preconditions.checkNotNull(file);
 
+		final CopyOption[] copyOptions = {
+			StandardCopyOption.REPLACE_EXISTING,
+			StandardCopyOption.COPY_ATTRIBUTES
+		};
+
 		final boolean update = !isBlank(metaFile.getFilePath());
-		final String targetName = update ? metaFile.getFilePath() : file.getName();
+		final String targetName = update ? metaFile.getFilePath() :
+			(isBlank(metaFile.getFileName()) ? file.getName() : metaFile.getFileName());
 		final Path path = Paths.get(UPLOAD_PATH, targetName);
 		final Path tmp = update ? Files.createTempFile(null, null) : null;
 
 		if (update && Files.exists(path)) {
-			Files.move(path, tmp, StandardCopyOption.REPLACE_EXISTING);
+			Files.move(path, tmp, copyOptions);
 		}
 
 		try {
@@ -140,21 +151,26 @@ public class MetaFiles {
 			Files.createDirectories(Paths.get(UPLOAD_PATH));
 
 			// copy the file to upload directory
-			Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(source, target, copyOptions);
 
-			final String mime = Files.probeContentType(file.toPath());
+			// only update file name if not provides from meta file
+			if (isBlank(metaFile.getFileName())) {
+				metaFile.setFileName(file.getName());
+			}
 
-			metaFile.setFileName(file.getName());
-			metaFile.setMime(mime);
+			metaFile.setMime(Files.probeContentType(file.toPath()));
 			metaFile.setSize(Files.size(file.toPath()));
 			metaFile.setFilePath(target.toFile().getName());
 
-			final MetaFileRepository repo = Beans.get(MetaFileRepository.class);
 			try {
-				return repo.save(metaFile);
+				return filesRepo.save(metaFile);
 			} catch (Exception e) {
 				// delete the uploaded file
 				Files.deleteIfExists(target);
+				// restore original file
+				if (tmp != null) {
+					Files.move(tmp, target, copyOptions);
+				}
 				throw new PersistenceException(e);
 			}
 		} finally {

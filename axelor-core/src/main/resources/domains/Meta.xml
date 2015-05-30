@@ -190,13 +190,10 @@
   	<string name="description" multiline="true"/>
   	<string name="sizeText" title="Size" readonly="true">
       <![CDATA[
-      	if(size >= 1024)
-      		return (size / 1024) + " KB";
-      	else if(size > 1048576)
-      		return (size / 1048576) + " MB";
-      	else if(size > 1073741824)
-      		return (size / 1073741824) + " GB";
-      	return size + " Bytes";
+	if(size > 1000000000) return (size / 1000000000) + " GB";
+	if(size > 1000000) return (size / 1000000) + " MB";
+	if(size >= 1000) return (size / 1000) + " KB";
+	return size + " B";
       ]]>
   	</string>
   </entity>
