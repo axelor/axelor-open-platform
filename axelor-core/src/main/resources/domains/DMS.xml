@@ -11,8 +11,8 @@
     <many-to-one name="parent" ref="DMSFile" />
 
     <!-- for internal use only, used for attachments -->
-    <long name="relatedId" title="Related document id" />
-    <string name="relatedModel" title="Related document model" />
+    <long name="relatedId" hidden="true" />
+    <string name="relatedModel" hidden="true" title="Related object" />
 
     <!-- the real file -->
     <many-to-one name="metaFile" ref="com.axelor.meta.db.MetaFile" />

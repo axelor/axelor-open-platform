@@ -272,6 +272,11 @@ ui.directive('uiFilterInput', function() {
 FilterFormCtrl.$inject = ['$scope', '$element', 'ViewService'];
 function FilterFormCtrl($scope, $element, ViewService) {
 
+	var handler = $scope.$parent.handler;
+	if (handler && handler._dataSource) {
+		$scope.showArchived = handler._dataSource._showArchived;
+	}
+
 	this.doInit = function(model) {
 		return ViewService
 		.getFields(model)
@@ -283,6 +288,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 				//if (field.name === 'createdOn' || field.name === 'updatedOn') return;
 				//if (field.name === 'createdBy' || field.name === 'updatedBy') return;
 				if (field.type === 'binary' || field.large) return;
+				if (handler && handler.canSearchOn && !handler.canSearchOn(field)) return;
 				$scope.fields[name] = field;
 				if (field.nameColumn) {
 					nameField = name;
@@ -297,11 +303,6 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	$scope.filters = [{ $new: true }];
 	$scope.operator = 'and';
 	$scope.showArchived = false;
-
-	var handler = $scope.$parent.handler;
-	if (handler && handler._dataSource) {
-		$scope.showArchived = handler._dataSource._showArchived;
-	}
 
 	$scope.addFilter = function(filter) {
 		var last = _.last($scope.filters);

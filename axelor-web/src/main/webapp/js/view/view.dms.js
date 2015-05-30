@@ -194,6 +194,10 @@ function DMSFileListCtrl($scope, $element) {
 		return __filter.call($scope, filter);
 	};
 
+	$scope.canSearchOn = function (field) {
+		return ["parent", "metaFile", "isDirectory", "relatedId", "permissions"].indexOf(field.name) === -1;
+	};
+
 	$scope.onFolder = function(folder, currentPaths) {
 
 		// reset filter
