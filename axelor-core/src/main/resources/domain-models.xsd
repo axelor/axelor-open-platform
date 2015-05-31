@@ -314,6 +314,7 @@
     <xsd:complexContent mixed="true">
       <xsd:restriction base="dm:RelationalColumn">
         <xsd:attribute name="orderBy" type="xsd:string" use="prohibited"/>
+        <xsd:attribute name="orphan" type="xsd:string" use="prohibited"/>
       </xsd:restriction>
     </xsd:complexContent>
   </xsd:complexType>
@@ -323,7 +324,10 @@
       <xsd:documentation>ManyToOne Type.</xsd:documentation>
     </xsd:annotation>
     <xsd:complexContent mixed="true">
-    	<xsd:restriction base="dm:RelationalColumn"></xsd:restriction>
+      <xsd:restriction base="dm:RelationalColumn">
+        <xsd:attribute name="orderBy" type="xsd:string" use="prohibited"/>
+        <xsd:attribute name="orphan" type="xsd:string" use="prohibited"/>
+      </xsd:restriction>
     </xsd:complexContent>
   </xsd:complexType>
 
@@ -707,7 +711,7 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:element>
-        <xsd:element name="date" type="dm:DateTimeColumn">
+        <xsd:element name="date" type="dm:SimpleColumn">
           <xsd:annotation>
             <xsd:documentation>
               Date type field (date value).
@@ -724,7 +728,7 @@
         <xsd:element name="datetime" type="dm:DateTimeColumn">
           <xsd:annotation>
             <xsd:documentation>
-              DateTime type field (datetime field.
+              DateTime type field (datetime field).
             </xsd:documentation>
           </xsd:annotation>
         </xsd:element>

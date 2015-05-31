@@ -41,7 +41,6 @@
 
 @import url('scrollbar.css');
 @import url('main.css');
-@import url('print.css') print;
 
 @import url('tabs.css');
 @import url('navtree.css');
@@ -58,3 +57,5 @@
 @import url('view.dms.css');
 
 @import url('colors.css');
+
+@import url('print.css') print;
