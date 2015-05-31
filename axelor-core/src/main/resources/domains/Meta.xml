@@ -190,10 +190,11 @@
   	<string name="description" multiline="true"/>
   	<string name="sizeText" title="Size" readonly="true">
       <![CDATA[
-	if(size > 1000000000) return (size / 1000000000) + " GB";
-	if(size > 1000000) return (size / 1000000) + " MB";
-	if(size >= 1000) return (size / 1000) + " KB";
-	return size + " B";
+      if (size == null) return null;
+      if(size > 1000000000) return String.format("%.2f GB", size / 1000000000.00);
+      if(size > 1000000) return String.format("%.2f MB", size / 1000000.00);
+      if(size >= 1000) return String.format("%.2f KB", size / 1000.00);
+      return size + " B";
       ]]>
   	</string>
   </entity>
