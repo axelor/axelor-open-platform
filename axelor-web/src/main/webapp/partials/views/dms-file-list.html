@@ -62,13 +62,13 @@
         </div>
       </div>
       <div class="panel-body">
-        <div class="row-fluid upload-list-item" ng-repeat="info in uploads.items">
-            <div class="span5 file-name">{{info.file.name}}</div>
-            <div class="span3 file-complete hidden-phone">{{info.transfer}}</div>
-            <div class="span3 file-progress">
+        <div class="upload-list-item" ng-repeat="info in uploads.items">
+            <div class="file-name">{{info.file.name}}</div>
+            <div class="file-complete hidden-phone">{{info.transfer}}</div>
+            <div class="file-progress">
               <div class="progress progress-striped" ng-class="{ active: info.active }"><div class="bar" ng-style="{width: info.progress}"></div></div>
             </div>
-            <div class="span1 file-op" ng-show="!info.loaded">
+            <div class="file-op" ng-show="!info.loaded">
               <a href='' ng-show='info.pending' ng-click='info.abort()' x-translate>Cancel</a>
               <a href='' ng-show='!info.pending' ng-click='info.retry()' x-translate>Retry</a>
             </div>
