@@ -19,13 +19,19 @@ package com.axelor.meta;
 
 import static com.axelor.common.StringUtils.isBlank;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.CopyOption;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
@@ -47,7 +53,23 @@ import com.google.inject.persist.Transactional;
 public class MetaFiles {
 
 	private static final String DEFAULT_UPLOAD_PATH = "{java.io.tmpdir}/axelor/attachments";
-	private static final String UPLOAD_PATH = AppSettings.get().getPath("file.upload.dir", DEFAULT_UPLOAD_PATH);
+
+	private static final Path UPLOAD_PATH = Paths.get(AppSettings.get().get("file.upload.dir", DEFAULT_UPLOAD_PATH));
+	private static final Path UPLOAD_PATH_TEMP = UPLOAD_PATH.resolve("tmp");
+
+	private static final CopyOption[] COPY_OPTIONS = {
+		StandardCopyOption.REPLACE_EXISTING,
+		StandardCopyOption.COPY_ATTRIBUTES
+	};
+
+	private static final CopyOption[] MOVE_OPTIONS = {
+		StandardCopyOption.REPLACE_EXISTING
+	};
+
+	// temp clean up threshold 24 hours
+	private static final long TEMP_THRESHOLD = 24 * 3600 * 1000;
+
+	private static final Object lock = new Object();
 
 	private MetaFileRepository filesRepo;
 
@@ -66,24 +88,126 @@ public class MetaFiles {
 	 */
 	public static Path getPath(MetaFile file) {
 		Preconditions.checkNotNull(file, "file instance can't be null");
-		return Paths.get(UPLOAD_PATH, file.getFilePath());
+		return UPLOAD_PATH.resolve(file.getFilePath());
 	}
 
 	private Path getNextPath(String fileName) {
-		int dotIndex = fileName.lastIndexOf('.');
-		int counter = 1;
-		String fileNameBase = fileName.substring(0, dotIndex);
-		String fileNameExt = "";
-		if (dotIndex > -1) {
-			fileNameExt = fileName.substring(dotIndex);
+		synchronized (lock) {
+			int dotIndex = fileName.lastIndexOf('.');
+			int counter = 1;
+			String fileNameBase = fileName.substring(0, dotIndex);
+			String fileNameExt = "";
+			if (dotIndex > -1) {
+				fileNameExt = fileName.substring(dotIndex);
+			}
+			String targetName = fileName;
+			Path target = UPLOAD_PATH.resolve(targetName);
+			while (Files.exists(target)) {
+				targetName = fileNameBase + " (" + counter++ + ")" + fileNameExt;
+				target = UPLOAD_PATH.resolve(targetName);
+			}
+			return target;
 		}
-		String targetName = fileName;
-		Path target = Paths.get(UPLOAD_PATH, targetName);
-		while (Files.exists(target)) {
-			targetName = fileNameBase + " (" + counter++ + ")" + fileNameExt;
-			target = Paths.get(UPLOAD_PATH, targetName);
+	}
+
+	/**
+	 * Clean up obsolete temporary files from upload directory.
+	 *
+	 */
+	public void clean() throws IOException {
+		if (!Files.isDirectory(UPLOAD_PATH_TEMP)) {
+			return;
 		}
-		return target;
+		final long currentTime = System.currentTimeMillis();
+		Files.walkFileTree(UPLOAD_PATH_TEMP, new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult visitFile(Path file,
+					BasicFileAttributes attrs) throws IOException {
+				long diff = currentTime - Files.getLastModifiedTime(file).toMillis();
+				if (diff >= TEMP_THRESHOLD) {
+					Files.deleteIfExists(file);
+				}
+				return FileVisitResult.CONTINUE;
+			}
+		});
+	}
+
+	/**
+	 * This method can be used to delete temporary file of an incomplete upload.
+	 *
+	 * @param fileId
+	 *            the upload file id
+	 */
+	public void clean(String fileId) throws IOException {
+		Files.deleteIfExists(UPLOAD_PATH_TEMP.resolve(fileId));
+	}
+
+	/**
+	 * Upload the given chunk of file data to a temporary file identified by the
+	 * given file id.
+	 *
+	 * <p>
+	 * Upload would restart if startOffset is 0 (zero), otherwise upload file
+	 * size is checked against given startOffset. The startOffset must be less
+	 * than expected fileSize.
+	 *
+	 * <p>
+	 * Unlike the {@link #upload(File, MetaFile)} or {@link #upload(File)}
+	 * methods, this method doesn't create {@link MetaFile} instance.
+	 *
+	 * <p>
+	 * The temporary file generated should be manually uploaded again using
+	 * {@link #upload(File, MetaFile)} or should be deleted using
+	 * {@link #clean(String)} method if something went wrong.
+	 *
+	 * @param chunk
+	 *            the input stream
+	 * @param startOffset
+	 *            the start offset byte position
+	 * @param fileSize
+	 *            the actual file size
+	 * @param fileId
+	 *            an unique upload file identifier
+	 * @return a temporary file where upload is being saved
+	 * @throws IOException
+	 *             if there is any error during io operations
+	 */
+	public File upload(InputStream chunk, long startOffset, long fileSize, String fileId) throws IOException {
+		final Path tmp = UPLOAD_PATH_TEMP.resolve(fileId);
+		if ((startOffset > fileSize)
+				|| (Files.exists(tmp) && Files.size(tmp) != startOffset)
+				|| (!Files.exists(tmp) && startOffset > 0)) {
+			throw new IllegalArgumentException("Start offset is out of bound.");
+		}
+
+		// make sure the upload directories exist
+		Files.createDirectories(UPLOAD_PATH_TEMP);
+
+		// clean up obsolete temporary files
+		try {
+			clean();
+		} catch (Exception e) {
+		}
+
+		final File file = tmp.toFile();
+		final BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file, startOffset > 0));
+		try {
+			int read = 0;
+			long total = startOffset;
+			byte[] bytes = new byte[4096];
+			while ((read = chunk.read(bytes)) != -1) {
+				total += read;
+				if (total > fileSize) {
+					throw new IllegalArgumentException("Invalid chunk, oversized upload.");
+				}
+				bos.write(bytes, 0, read);
+			}
+			bos.flush();
+		} finally {
+			bos.close();
+		}
+
+		return file;
 	}
 
 	/**
@@ -127,19 +251,14 @@ public class MetaFiles {
 		Preconditions.checkNotNull(metaFile);
 		Preconditions.checkNotNull(file);
 
-		final CopyOption[] copyOptions = {
-			StandardCopyOption.REPLACE_EXISTING,
-			StandardCopyOption.COPY_ATTRIBUTES
-		};
-
 		final boolean update = !isBlank(metaFile.getFilePath());
 		final String targetName = update ? metaFile.getFilePath() :
 			(isBlank(metaFile.getFileName()) ? file.getName() : metaFile.getFileName());
-		final Path path = Paths.get(UPLOAD_PATH, targetName);
-		final Path tmp = update ? Files.createTempFile(null, null) : null;
+		final Path path = UPLOAD_PATH.resolve(targetName);
+		final Path tmp = update ? Files.createTempFile(UPLOAD_PATH_TEMP, null, null) : null;
 
 		if (update && Files.exists(path)) {
-			Files.move(path, tmp, copyOptions);
+			Files.move(path, tmp, MOVE_OPTIONS);
 		}
 
 		try {
@@ -147,18 +266,22 @@ public class MetaFiles {
 			final Path target = getNextPath(targetName);
 
 			// make sure the upload path exists
-			Files.createDirectories(Paths.get(UPLOAD_PATH));
+			Files.createDirectories(UPLOAD_PATH);
 
-			// copy the file to upload directory
-			Files.copy(source, target, copyOptions);
+			// if source is in tmp directory, move it otherwise copy
+			if (UPLOAD_PATH_TEMP.equals(source.getParent())) {
+				Files.move(source, target, MOVE_OPTIONS);
+			} else {
+				Files.copy(source, target, COPY_OPTIONS);
+			}
 
 			// only update file name if not provides from meta file
 			if (isBlank(metaFile.getFileName())) {
 				metaFile.setFileName(file.getName());
 			}
 
-			metaFile.setMime(Files.probeContentType(file.toPath()));
-			metaFile.setSize(Files.size(file.toPath()));
+			metaFile.setMime(Files.probeContentType(target));
+			metaFile.setSize(Files.size(target));
 			metaFile.setFilePath(target.toFile().getName());
 
 			try {
@@ -168,7 +291,7 @@ public class MetaFiles {
 				Files.deleteIfExists(target);
 				// restore original file
 				if (tmp != null) {
-					Files.move(tmp, target, copyOptions);
+					Files.move(tmp, target, MOVE_OPTIONS);
 				}
 				throw new PersistenceException(e);
 			}
@@ -224,7 +347,7 @@ public class MetaFiles {
 		MetaFileRepository files = Beans.get(MetaFileRepository.class);
 
 		MetaFile metaFile = attachment.getMetaFile();
-		Path target = Paths.get(UPLOAD_PATH, metaFile.getFilePath());
+		Path target = UPLOAD_PATH.resolve(metaFile.getFilePath());
 
 		attachments.remove(attachment);
 		files.remove(metaFile);
@@ -245,7 +368,7 @@ public class MetaFiles {
 		Preconditions.checkNotNull(metaFile);
 		MetaFileRepository files = Beans.get(MetaFileRepository.class);
 
-		Path target = Paths.get(UPLOAD_PATH, metaFile.getFilePath());
+		Path target = UPLOAD_PATH.resolve(metaFile.getFilePath());
 		files.remove(metaFile);
 
 		Files.deleteIfExists(target);
