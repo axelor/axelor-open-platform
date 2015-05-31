@@ -17,17 +17,18 @@
  */
 package com.axelor.web.service;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -89,67 +90,63 @@ public class FileService extends AbstractService {
 				.build();
 	}
 
+	@DELETE
+	@Path("upload/{fileId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public javax.ws.rs.core.Response clean(@PathParam("fileId") String fileId) {
+		try {
+			files.clean(fileId);
+		} catch (IOException e) {
+		}
+		return javax.ws.rs.core.Response.ok().build();
+	}
+
 	@POST
 	@Path("upload")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	@Transactional
 	public javax.ws.rs.core.Response upload(
+			@HeaderParam("X-File-Id") String fileId,
 			@HeaderParam("X-File-Name") String fileName,
 			@HeaderParam("X-File-Type") String fileType,
 			@HeaderParam("X-File-Size") Long fileSize,
+			@HeaderParam("X-File-Offset") Long fileOffset,
 			InputStream stream) {
 
-		final MetaFile bean = new MetaFile();
-
-		if (fileSize == null) {
-			fileSize = 0L;
+		if (fileName == null || fileSize == null || fileOffset == null) {
+			return javax.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
+		}
+		if (fileId == null && fileOffset == 0L) {
+			fileId = UUID.randomUUID().toString();
+		}
+		if (fileId == null) {
+			return javax.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
 		}
 
-		bean.setFileName(fileName);
-		bean.setMime(fileType);
-		bean.setSize(fileSize);
-
+		final Map<String, Object> data = new HashMap<>();
 		try {
-			File file = Files.createTempFile(null, null).toFile();
-			try {
-				files.upload(file, bean);
-			} finally {
-				Files.deleteIfExists(file.toPath());
+			final File file = files.upload(stream, fileOffset, fileSize, fileId);
+			if (Files.size(file.toPath()) == fileSize) {
+				final MetaFile meta = new MetaFile();
+				meta.setFileName(fileName);
+				meta.setMime(fileType);
+				files.upload(file, meta);
+				return javax.ws.rs.core.Response.ok(meta).build();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			return javax.ws.rs.core.Response.status(Status.INTERNAL_SERVER_ERROR).build();
-		}
-
-		final File file = MetaFiles.getPath(bean).toFile();
-		int total = 0;
-
-		try(BufferedInputStream bis = new BufferedInputStream(stream);
-			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));) {
-			int read = 0;
-			byte[] bytes = new byte[2 * 8192];
-			while ((read = bis.read(bytes)) != -1) {
-				total += read;
-				bos.write(bytes, 0, read);
-			}
-			//bos.flush();
-			bean.setSize(Files.size(file.toPath()));
+		} catch (IllegalArgumentException e) {
+			data.put("error", e.getMessage());
+			return javax.ws.rs.core.Response.status(Status.BAD_REQUEST).entity(data).build();
 		} catch (Exception e) {
-			try {
-				files.delete(bean);
-			} catch (Exception x) {}
 			e.printStackTrace();
-			return javax.ws.rs.core.Response.status(Status.INTERNAL_SERVER_ERROR).build();
+			data.put("error", e.getMessage());
+			return javax.ws.rs.core.Response.status(Status.INTERNAL_SERVER_ERROR).entity(data).build();
 		}
 
-		if (fileSize > 0 && total < fileSize) {
-			try {
-				files.delete(bean);
-			} catch (Exception x) {}
-			return javax.ws.rs.core.Response.status(Status.NOT_ACCEPTABLE).build();
+		if (fileOffset == 0L) {
+			data.put("fileId", fileId);
 		}
 
-		return javax.ws.rs.core.Response.ok(bean).build();
+		return javax.ws.rs.core.Response.ok(data).build();
 	}
 }

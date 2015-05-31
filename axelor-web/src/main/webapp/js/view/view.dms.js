@@ -566,12 +566,27 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 				return format(done || 0) + "/" + format(total);
 			}
 
-			function onError(reason) {
-				deferred.reject({ message: _t("Failed"), failed: true });
+			function doClean() {
+				return $http({
+					method: "DELETE",
+					url: "ws/files/upload/" + info.uuid,
+					silent: true,
+					transformRequest: []
+				});
 			}
 
-			function onCancel() {
-				deferred.reject({ message: _t("Cancelled"), cancelled: true });
+			function onError(reason) {
+				function done() {
+					deferred.reject({ message: _t("Failed"), failed: true });
+				}
+				doClean().then(done, done);
+			}
+
+			function onCancel(clean) {
+				function done() {
+					deferred.reject({ message: _t("Cancelled"), cancelled: true });
+				}
+				return clean ? doClean().then(done, done) : done();
 			}
 
 			function onSuccess(meta) {
@@ -590,6 +605,56 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 				}).error(onError);
 			}
 
+			function onChunk(response) {
+
+				info._start = info._end;
+				info._end = Math.min(info._end + info._size, file.size);
+
+				if (response && response.fileId) {
+					info.uuid = response.fileId;
+				}
+				if (response && response.id) {
+					return onSuccess(response);
+				}
+
+				if (info.loaded) {
+					return onError();
+				}
+
+				// continue with next chunk
+				sendChunk();
+				scope.applyLater();
+			}
+
+			function sendChunk() {
+				xhr.open("POST", "ws/files/upload", true);
+		        xhr.overrideMimeType("application/octet-stream");
+		        xhr.setRequestHeader("Content-Type", "application/octet-stream");
+				xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+
+				if (info.uuid) {
+					xhr.setRequestHeader("X-File-Id", info.uuid);
+				}
+
+				xhr.setRequestHeader("X-File-Name", file.name);
+				xhr.setRequestHeader("X-File-Type", file.type);
+				xhr.setRequestHeader("X-File-Size", file.size);
+				xhr.setRequestHeader("X-File-Offset", info._start);
+
+				if (info._end > file.size) {
+					info._end = file.size;
+				}
+
+				var chunk = file.slice(info._start, info._end);
+
+		        xhr.send(chunk);
+			}
+
+			info.uuid = null;
+			info._start = 0;
+			info._size = 1000 * 1000; // 1MB
+			info._end = info._size;
+
 			info.transfer = formatSize(0, file.size);
 			info.abort = function () {
 				xhr.abort();
@@ -602,10 +667,11 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 			};
 
 			xhr.upload.addEventListener("progress", function (e) {
-				var done = ((e.loaded / file.size) * 100);
-				info.progress = done > 98 ? "99%" : done + "%";
-				info.transfer = formatSize(e.loaded, file.size);
-				info.loaded = e.loaded === file.size;
+				var total = info._start + e.loaded;
+				var done = Math.round((total / file.size) * 100);
+				info.progress = done > 95 ? "95%" : done + "%";
+				info.transfer = formatSize(total, file.size);
+				info.loaded = total === file.size;
 				scope.applyLater();
 			});
 
@@ -614,10 +680,10 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 					switch(xhr.status) {
 					case 0:
 					case 406:
-						onCancel();
+						onCancel(true);
 						break;
 					case 200:
-						onSuccess(angular.fromJson(xhr.responseText));
+						onChunk(xhr.responseText ? angular.fromJson(xhr.responseText) : null);
 						break;
 					default:
 						onError();
@@ -626,17 +692,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 				}
 			}
 
-			xhr.open("POST", "ws/files/upload", true);
-
-	        xhr.overrideMimeType("application/octet-stream");
-	        xhr.setRequestHeader("Content-Type", "application/octet-stream");
-			xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-
-			xhr.setRequestHeader("X-File-Name", file.name);
-			xhr.setRequestHeader("X-File-Type", file.type);
-			xhr.setRequestHeader("X-File-Size", file.size);
-
-	        xhr.send(file);
+			sendChunk();
 
 			return promise;
 		}

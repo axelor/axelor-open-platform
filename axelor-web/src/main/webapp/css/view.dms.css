@@ -79,6 +79,10 @@
 	overflow: hidden;
 }
 
+.dms-file-upload .panel-header a {
+	color: #222;
+}
+
 .dms-file-upload .panel-body {
 	padding: 0;
 }
@@ -123,6 +127,12 @@
 .dms-file-upload .upload-files .progress {
 	margin-bottom: 0;
 	height: 6px;
+}
+
+.dms-file-upload .upload-files .progress,
+.dms-file-upload .upload-files .progress .bar {
+	-webkit-transition: inherit;
+	        transition: inherit;
 }
 
 .dms-file-upload .upload-overlay {
