@@ -47,7 +47,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		this.edit(record);
 	};
 
-	function doEdit(record) {
+	function doEdit(record, fireOnLoad) {
 		if (record && record.id > 0 && (!(record.version >= 0) || !record.$fetched)) {
 			$scope.doRead(record.id).success(function(rec) {
 				if (recordVersion === -1) {
@@ -56,13 +56,13 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 				if (record.$dirty) {
 					rec = _.extend({}, rec, record);
 				}
-				originalEdit(rec);
+				originalEdit(rec, fireOnLoad);
 			});
 		} else {
 			if (recordVersion === -1 && record) {
 				recordVersion = record.version;
 			}
-			originalEdit(record);
+			originalEdit(record, fireOnLoad);
 		}
 		canClose = false;
 	};
@@ -97,10 +97,10 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		return $scope.canEditTarget() && canEdit.call($scope);
 	};
 
-	$scope.edit = function(record) {
+	$scope.edit = function(record, fireOnLoad) {
 		if (isClosed) return;
 		$scope._viewPromise.then(function(){
-			doEdit(record);
+			doEdit(record, fireOnLoad);
 			$scope.setEditable(!$scope.$parent.$$readonly);
 		});
 	};
