@@ -501,6 +501,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 
 				function error(reason) {
 					that.running = false;
+					info.active = false;
 					info.pending = false;
 					info.progress = 0;
 					info.transfer = reason.message;
@@ -509,6 +510,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 
 				function success() {
 					that.running = false;
+					info.active = false;
 					info.pending = false;
 					info.complete = true;
 					info.progress = "100%";
@@ -655,6 +657,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 			info._size = 1000 * 1000; // 1MB
 			info._end = info._size;
 
+			info.active = true;
 			info.transfer = formatSize(0, file.size);
 			info.abort = function () {
 				xhr.abort();
@@ -833,7 +836,7 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 		}).success(syncFolders);
 	};
 
-	$scope.showTree = true;
+	$scope.showTree = !axelor.device.small;
 
 	$scope.onToggleTree = function () {
 		$scope.showTree = !$scope.showTree;

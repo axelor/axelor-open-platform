@@ -30,7 +30,7 @@
           </ul>
         </div>
         <div ui-record-pager="no-text" class="pull-right"></div>
-        <div ui-filter-box x-handler="this" class="pull-right"></div>
+        <div ui-filter-box x-handler="this" class="hidden-phone pull-right"></div>
         <ul class="breadcrumb">
           <li><a href="javascript:" ng-click="onFolder()" tabindex="-1"><i class="fa fa-home"></i></a> <span class="divider">/</span></li>
           <li ng-repeat="folder in currentPaths" ng-class="{'active': $last}">
@@ -53,7 +53,7 @@
       </div>
       <div class="drop-message" x-translate>Drop your files to start upload.</div>
     </div>
-    <div class="upload-files panel" ng-show="uploads.items.length">
+    <div class="upload-list panel" ng-show="uploads.items.length">
       <div class="panel-header">
         <div class="panel-title pull-left" ng-show="uploads.running" x-translate>Uploading files...</div>
         <div class="panel-title pull-left" ng-show="!uploads.running" x-translate>Upload complete</div>
@@ -62,23 +62,17 @@
         </div>
       </div>
       <div class="panel-body">
-        <table>
-          <tr ng-repeat="info in uploads.items">
-            <td class="file-name">
-              <span>{{info.file.name}}</span>
-            </td>
-            <td class="file-complete">
-              <div>{{info.transfer}}</div>
-            </td>
-            <td class="file-progress">
-              <div class="progress"><div class="bar" ng-style="{width: info.progress}"></div></div>
-            </td>
-            <td class="file-op" ng-show="!info.loaded">
+        <div class="row-fluid upload-list-item" ng-repeat="info in uploads.items">
+            <div class="span5 file-name">{{info.file.name}}</div>
+            <div class="span3 file-complete hidden-phone">{{info.transfer}}</div>
+            <div class="span3 file-progress">
+              <div class="progress progress-striped" ng-class="{ active: info.active }"><div class="bar" ng-style="{width: info.progress}"></div></div>
+            </div>
+            <div class="span1 file-op" ng-show="!info.loaded">
               <a href='' ng-show='info.pending' ng-click='info.abort()' x-translate>Cancel</a>
               <a href='' ng-show='!info.pending' ng-click='info.retry()' x-translate>Retry</a>
-            </td>
-          </tr>
-        </table>
+            </div>
+        </div>
       </div>
     </div>
   </div>
