@@ -371,7 +371,7 @@ function DMSFileListCtrl($scope, $element) {
 
 	$scope.canCreateDocument = function (notify) {
 		var parent = $scope.currentFolder || $scope.getCurrentHome();
-		if (parent && !parent.canWrite) {
+		if (parent && parent.canWrite === false) {
 			if (notify) {
 				axelor.notify.error(_t("You can't create document here."));
 			}
