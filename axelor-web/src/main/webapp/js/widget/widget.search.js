@@ -272,22 +272,33 @@ ui.directive('uiFilterInput', function() {
 FilterFormCtrl.$inject = ['$scope', '$element', 'ViewService'];
 function FilterFormCtrl($scope, $element, ViewService) {
 
-	this.doInit = function(model) {
+	this.doInit = function(model, viewItems) {
 		return ViewService
 		.getFields(model)
 		.success(function(fields) {
+
+			var items = {};
 			var nameField = null;
+
 			_.each(fields, function(field, name) {
 				if (field.name === 'id' || field.name === 'version' ||
 					field.name === 'archived' || field.name === 'selected') return;
-				//if (field.name === 'createdOn' || field.name === 'updatedOn') return;
-				//if (field.name === 'createdBy' || field.name === 'updatedBy') return;
 				if (field.type === 'binary' || field.large) return;
-				$scope.fields[name] = field;
 				if (field.nameColumn) {
 					nameField = name;
 				}
+				items[name] = field;
 			});
+
+			_.each(viewItems, function (item) {
+				if (item.hidden) {
+					delete items[item.name];
+				} else {
+					items[item.name] = item;
+				}
+			});
+
+			$scope.fields = items;
 			$scope.$parent.fields = $scope.fields;
 			$scope.$parent.nameField = nameField || ($scope.fields['name'] ? 'name' : null);
 		});
@@ -511,8 +522,11 @@ ui.directive('uiFilterForm', function() {
 		controller: FilterFormCtrl,
 
 		link: function(scope, element, attrs, ctrl) {
-
-			ctrl.doInit(scope.model);
+			var unwatch = scope.$watch("$parent.viewItems", function (items) {
+				if (items === undefined) return;
+				unwatch();
+				ctrl.doInit(scope.model, items);
+			});
 		},
 		template:
 		"<div class='filter-form'>" +
@@ -566,9 +580,15 @@ ui.directive('uiFilterBox', function() {
 				ViewService.getMetaDef($scope.model, {name: filterView, type: 'search-filters'})
 				.success(function(fields, view) {
 					$scope.view = view;
+					$scope.viewItems = angular.copy(view.items) || [];
 					$scope.viewFilters = angular.copy(view.filters);
+					_.each($scope.viewItems, function (item) {
+						item.type = fields[item.name].type;
+						item.title = item.title || fields[item.name].title;
+					});
 				});
 			} else {
+				$scope.viewItems = [];
 				filterView = 'act:' + (handler._viewParams || {}).action;
 			}
 

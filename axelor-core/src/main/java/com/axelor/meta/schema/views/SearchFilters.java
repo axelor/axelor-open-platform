@@ -36,8 +36,15 @@ import com.google.common.collect.Maps;
 @JsonTypeName("search-filters")
 public class SearchFilters extends AbstractView {
 
+	@XmlElement(name = "field", type = Field.class)
+	private List<AbstractWidget> items;
+
 	@XmlElement(name = "filter")
 	private List<SearchFilter> filters;
+
+	public List<AbstractWidget> getItems() {
+		return items;
+	}
 
 	public List<SearchFilter> getFilters() {
 		if(filters != null) {
