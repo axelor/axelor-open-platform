@@ -94,4 +94,107 @@ ui.formInput('Toggle', 'Boolean', {
 		"</button>"
 });
 
+ui.formInput('BooleanSelect', 'Boolean', {
+	css: 'form-item boolean-select-item',
+	init: function (scope) {
+		var field = scope.field;
+		var trueText = (field.widgetAttrs||{}).trueText || _t('Yes');
+		var falseText = (field.widgetAttrs||{}).falseText || _t('No');
+
+		scope.$selection = [trueText, falseText];
+		scope.format = function (value) {
+			return value ? scope.$selection[0] : scope.$selection[1];
+		}
+	},
+	link_editable: function (scope, element, attrs, model) {
+		var input = element.find('input');
+		var items = scope.$selection;
+
+		input.autocomplete({
+			minLength: 0,
+			source: items,
+			select: function (e, u) {
+				var value = items.indexOf(u.item.value) === 0;
+				scope.setValue(value, true);
+				scope.applyLater();
+			}
+		}).click(function (e) {
+			input.autocomplete("search" , '');
+		});
+
+		scope.$render_editable = function () {
+			var value = model.$viewValue || false;
+			var current = items.indexOf(input.val()) === 0;
+			value ? input.val(items[0]) : input.val(items[1]);
+		};
+
+		scope.$watch('isReadonly()', function (readonly) {
+			input.autocomplete(readonly ? "disable" : "enable");
+			input.toggleClass('not-readonly', !readonly);
+		});
+	},
+	template_readonly: '<span>{{text}}</span>',
+	template_editable: "<span class='picker-input'>" +
+				"<input type='text' readonly='readonly'>" +
+				"<span class='picker-icons picker-icons-1'>" +
+					"<i class='fa fa-caret-down'></i>" +
+				"</span>" +
+			"</span>"
+});
+
+ui.formInput('BooleanRadio', 'BooleanSelect', {
+	css: 'form-item boolean-radio-item',
+	link_editable: function (scope, element, attrs, model) {
+
+		var inputName = _.uniqueId('boolean-radio');
+		var trueInput = $('<input type="radio" data-value="true" name="' + inputName + '">');
+		var falseInput = $('<input type="radio" data-value="false" name="' + inputName + '">');
+
+		var items = scope.$selection;
+
+		$('<label class="radio">').text(items[0]).append(trueInput).appendTo(element);
+		$('<label class="radio">').text(items[1]).append(falseInput).appendTo(element);
+
+		scope.$render_editable = function () {
+			var value = model.$viewValue || false;
+			var input = value ? trueInput : falseInput;
+			input.attr('checked', true);
+		};
+
+		element.on('change', 'input', function (e) {
+			var value = $(this).data('value') === true;
+			scope.setValue(value, true);
+			scope.applyLater();
+		});
+	},
+	template_editable: "<span></span>"
+});
+
+ui.formInput('BooleanSwitch', 'Boolean', {
+	css: 'form-item boolean-switch-item',
+	link: function(scope, element, attrs, model) {
+
+		var input = $('<input type="checkbox" id="'+ attrs.id +'_switch">').appendTo(element);
+		$('<label for="'+ attrs.id +'_switch">').appendTo(element);
+
+		model.$render = function() {
+			input[0].checked = scope.parse(model.$viewValue);
+		};
+
+		input.change(function() {
+			if (scope.isReadonly()) return;
+			scope.setValue(this.checked, true);
+			scope.applyLater();
+		});
+
+		scope.$watch("isReadonly()", function (readonly) {
+			input[0].disabled = readonly;
+		});
+	},
+	template_readonly: null,
+	template_editable: null,
+	template:
+		"<div class='boolean-switch'></div>"
+});
+
 })(this);

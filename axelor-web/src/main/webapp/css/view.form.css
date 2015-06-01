@@ -209,8 +209,9 @@ table.form-layout td.form-item.v-align-top {
 	cursor: default;
 }
 
+.form-item-container label.radio input[type="radio"],
 .form-item-container label.checkbox input[type="checkbox"] {
-	margin-top: 4px !important;
+	margin-top: 3px !important;
 }
 
 .form-item > a.btn,
@@ -480,6 +481,64 @@ td.form-item > * {
 
 .form-item .not-readonly {
 	background: inherit !important;
+}
+
+.form-item.boolean-radio-item {
+	padding: 4px 0;
+}
+
+.form-item.boolean-radio-item.horizontal label.radio {
+	float: left;
+	margin: 0;
+	margin-right: 12px;
+}
+
+.form-item .boolean-switch input {
+	position: absolute;
+	margin-left: -9999px;
+	visibility: hidden;
+}
+
+.form-item .boolean-switch label {
+	display: block;
+	position: relative;
+	cursor: pointer;
+	outline: none;
+
+	padding: 2px;
+	width: 56px;
+	height: 28px;
+	background-color: #dddddd;
+	border-radius: 56px;
+}
+
+.form-item .boolean-switch label:after,
+.form-item .boolean-switch label:before {
+	display: block;
+	position: absolute;
+	top: 1px;
+	left: 1px;
+	bottom: 1px;
+	content: "";
+}
+.form-item .boolean-switch label:before {
+	right: 1px;
+	background-color: #f1f1f1;
+	border-radius: 28px;
+	transition: background 0.4s;
+}
+.form-item .boolean-switch label:after {
+	width: 28px;
+	background-color: #fff;
+	border-radius: 28px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+	transition: margin 0.4s;
+}
+.form-item .boolean-switch input:checked + label:before {
+	background-color: #5377b1;
+}
+.form-item .boolean-switch input:checked + label:after {
+	margin-left: 28px;
 }
 
 .ng-invalid > input,

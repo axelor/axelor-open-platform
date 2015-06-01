@@ -629,6 +629,20 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-true-text" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify the display value for "true" state of a boolean widget.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-false-text" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify the display value for "false" state of a boolean widget.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:attributeGroup name="RelationalAttributes">
