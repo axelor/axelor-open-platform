@@ -144,6 +144,27 @@ header .navbar-inner {
 
 input {
 	border: none !important;
+	box-shadow: none !important;
+	-webkit-box-shadow: none !important;
+	transition: inherit;
+}
+
+.grid-view,
+form[ui-form] {
+	overflow: hidden;
+}
+
+.panel-body .slickgrid,
+.grid-view > .slickgrid,
+.panel-body .slickgrid .slick-viewport,
+.grid-view > .slickgrid .slick-viewport {
+	overflow: inherit !important;
+	position: relative !important;
+}
+
+.panel-body .slickgrid .slick-viewport,
+.grid-view > .slickgrid .slick-viewport {
+	height: auto !important;
 }
 
 .slick-row, .slick-cell {
@@ -187,4 +208,8 @@ header {
 .view-container .form-view > div:last-child,
 .navigation-tabs {
 	top: 0 !important;
+}
+
+.panel-header .menu-bar {
+	display: none;
 }

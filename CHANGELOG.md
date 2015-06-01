@@ -1,3 +1,19 @@
+# Current (3.0.8)
+
+## Bug Fixes
+
+- fix permission check for users without any group
+- fix button widget readonly issue
+- fix missing data demo value.
+- fix action-attrs issue from editor fields
+- fix schema definition
+- fix button disable status issue
+- fix transaction issue on exception
+- fix some french translations
+- fix print screen issues
+- fix onload action issues
+- fix mappedBy annotation
+
 # 3.0.7 (2015-04-30)
 
 ## Bug Fixes
