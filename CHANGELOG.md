@@ -9,7 +9,10 @@
 - fix schema definition
 - fix button disable status issue
 - fix transaction issue on exception
-- fix some french translations.
+- fix some french translations
+- fix print screen issues
+- fix onload action issues
+- fix mappedBy annotation
 
 # 3.0.7 (2015-04-30)
 
