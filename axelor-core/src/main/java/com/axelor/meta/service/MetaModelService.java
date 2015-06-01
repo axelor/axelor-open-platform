@@ -172,6 +172,7 @@ public class MetaModelService {
 			
 			if (field.isAnnotationPresent(ManyToMany.class)){
 				metaField.setRelationship(ManyToMany.class.getSimpleName());
+				metaField.setMappedBy(field.getAnnotation(ManyToMany.class).mappedBy());
 				metaField.setTypeName(this.getGenericClassName(field));
 				metaField.setPackageName(this.getGenericPackageName(field));
 			}
