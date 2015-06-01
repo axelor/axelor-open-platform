@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 
 import org.apache.shiro.authz.UnauthorizedException;
 
+import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.User;
 import com.axelor.db.JpaSecurity;
@@ -84,11 +85,12 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
 	private AuthResolver authResolver = new AuthResolver();
 
 	private User getUser() {
-		User user = AuthUtils.getUser();
-		if (user == null || "admin".equals(user.getCode())
-				|| user.getGroup() == null
-				|| "admins".equals(user.getGroup().getCode())
-				|| user.getGroup().getPermissions() == null) {
+		final User user = AuthUtils.getUser();
+		final Group group = user != null ? user.getGroup() : null;
+		if (user == null || "admin".equals(user.getCode())) {
+			return null;
+		}
+		if (group != null && "admins".equals(group.getCode())) {
 			return null;
 		}
 		return user;

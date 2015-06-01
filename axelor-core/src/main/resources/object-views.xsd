@@ -846,7 +846,7 @@
         </xsd:attribute>
         <xsd:attribute name="stacked" type="xsd:boolean">
           <xsd:annotation>
-            <xsd:documentation>Specify whether the stack panel items.</xsd:documentation>
+            <xsd:documentation>Specify whether to stack panel items.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="attached" type="xsd:boolean">
@@ -921,6 +921,7 @@
           <xsd:element name="button" type="tns:Button" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="itemSpan" use="prohibited"/>
+        <xsd:attribute name="stacked" use="prohibited"/>
         <xsd:attribute name="field" type="xsd:string" use="required" />
         <xsd:attribute name="editable" type="xsd:boolean" />
         <xsd:attribute name="orderBy" type="xsd:string" />
@@ -939,9 +940,13 @@
           <xsd:element name="panel-dashlet" type="tns:Dashlet" />
           <xsd:element name="panel-include" type="tns:FormInclude" />
         </xsd:choice>
+        <xsd:attribute name="stacked" use="prohibited"/>
         <xsd:attribute name="itemSpan" use="prohibited"/>
+        <xsd:attribute name="showFrame" use="prohibited"/>
         <xsd:attribute name="showTitle" use="prohibited"/>
         <xsd:attribute name="title" use="prohibited"/>
+        <xsd:attribute name="help" use="prohibited"/>
+        <xsd:attribute name="onTabSelect" use="prohibited"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
