@@ -254,7 +254,7 @@
       <field name="typeName"/>
       <field name="label"/>
       <field name="relationship"/>
-      <field name="mappedBy" hideIf="relationship != 'OneToMany' || relationship != 'OneToOne'"/>
+      <field name="mappedBy" showIf="relationship == 'OneToMany' || relationship == 'OneToOne' || relationship == 'ManyToMany'"/>
       <button name="openModel" title="Show Model" hideIf="!relationship" onClick="meta-field-method-open-model"/>
     </panel>
     <panel title="Description">

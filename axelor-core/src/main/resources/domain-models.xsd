@@ -325,6 +325,7 @@
     </xsd:annotation>
     <xsd:complexContent mixed="true">
       <xsd:restriction base="dm:RelationalColumn">
+        <xsd:attribute name="mappedBy" type="xsd:string" use="prohibited"/>
         <xsd:attribute name="orderBy" type="xsd:string" use="prohibited"/>
         <xsd:attribute name="orphan" type="xsd:string" use="prohibited"/>
       </xsd:restriction>
