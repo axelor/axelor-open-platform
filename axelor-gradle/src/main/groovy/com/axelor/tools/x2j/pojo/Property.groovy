@@ -216,7 +216,7 @@ class Property {
 
 	String getDelinkCode() {
 		def mapped = attrs["mappedBy"]
-		def orphan = attrs["orphan"] == "true"
+		def orphan = this.isOrphan()
 		if (!orphan || !mapped || type != "one-to-many") {
 			return null
 		}
@@ -225,7 +225,7 @@ class Property {
 
 	String getDelinkAllCode() {
 		def mapped = attrs["mappedBy"]
-		def orphan = attrs["orphan"] == "true"
+		def orphan = this.isOrphan()
 		if (!orphan || !mapped || type != "one-to-many") {
 			return null
 		}
@@ -274,7 +274,7 @@ class Property {
 	}
 
 	boolean isOrphan() {
-		return attrs["orphan"] == "true"
+		return attrs["orphan"] != "false"
 	}
 
 	boolean isPassword() {
@@ -612,7 +612,7 @@ class Property {
 		if (type != "one-to-one") return null
 
 		def mapped = attrs.get('mappedBy')
-		def orphan = attrs.containsKey('orphan') ? attrs.get('orphan') : true
+		def orphan = this.isOrphan()
 
 		def a = annon("javax.persistence.OneToOne")
 			.add("fetch", "javax.persistence.FetchType.LAZY", false)
@@ -640,13 +640,13 @@ class Property {
 		if (type != "one-to-many") return null
 
 		def mapped = attrs.get('mappedBy')
-		def orphan = attrs.get('orphan')
+		def orphan = this.isOrphan()
 
 		def a = annon("javax.persistence.OneToMany")
 			.add("fetch", "javax.persistence.FetchType.LAZY", false)
 			.add("mappedBy", mapped)
 
-		if (orphan != null) {
+		if (orphan) {
 			a.add("cascade", ["javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"], false)
 		} else {
 			a.add("cascade", "javax.persistence.CascadeType.ALL", false)

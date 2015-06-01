@@ -87,7 +87,7 @@
     <string name="phone" max="20"  hashKey="false" massUpdate="true"/>
     <string name="notes" multiline="true" title="About Me" />
     <many-to-many name="groups" ref="Group" mappedBy="contacts"/>
-    <one-to-many name="addresses" ref="Address" mappedBy="contact" orderBy="area" />
+    <one-to-many name="addresses" ref="Address" mappedBy="contact" orderBy="area" orphan="false"/>
     <index name="IDX_NAMES" columns="firstName,lastName,fullName"/>
     <index columns="id,fullName,email"/>
     <track>
