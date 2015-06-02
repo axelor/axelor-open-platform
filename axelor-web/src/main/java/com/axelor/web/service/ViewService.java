@@ -46,6 +46,7 @@ import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.Notebook;
 import com.axelor.meta.schema.views.Search;
+import com.axelor.meta.schema.views.SearchFilters;
 import com.axelor.meta.schema.views.SimpleContainer;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.Request;
@@ -235,6 +236,9 @@ public class ViewService extends AbstractService {
 		}
 		if (view instanceof GridView) {
 			items = ((GridView) view).getItems();
+		}
+		if (view instanceof SearchFilters) {
+			items = ((SearchFilters) view).getItems();
 		}
 		if (items == null || items.isEmpty()) {
 			return names;

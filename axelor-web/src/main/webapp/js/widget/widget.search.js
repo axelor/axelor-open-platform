@@ -272,28 +272,33 @@ ui.directive('uiFilterInput', function() {
 FilterFormCtrl.$inject = ['$scope', '$element', 'ViewService'];
 function FilterFormCtrl($scope, $element, ViewService) {
 
-	var handler = $scope.$parent.handler;
-	if (handler && handler._dataSource) {
-		$scope.showArchived = handler._dataSource._showArchived;
-	}
-
-	this.doInit = function(model) {
+	this.doInit = function(model, viewItems) {
 		return ViewService
 		.getFields(model)
 		.success(function(fields) {
+
+			var items = {};
 			var nameField = null;
+
 			_.each(fields, function(field, name) {
 				if (field.name === 'id' || field.name === 'version' ||
 					field.name === 'archived' || field.name === 'selected') return;
-				//if (field.name === 'createdOn' || field.name === 'updatedOn') return;
-				//if (field.name === 'createdBy' || field.name === 'updatedBy') return;
 				if (field.type === 'binary' || field.large) return;
-				if (handler && handler.canSearchOn && !handler.canSearchOn(field)) return;
-				$scope.fields[name] = field;
 				if (field.nameColumn) {
 					nameField = name;
 				}
+				items[name] = field;
 			});
+
+			_.each(viewItems, function (item) {
+				if (item.hidden) {
+					delete items[item.name];
+				} else {
+					items[item.name] = item;
+				}
+			});
+
+			$scope.fields = items;
 			$scope.$parent.fields = $scope.fields;
 			$scope.$parent.nameField = nameField || ($scope.fields['name'] ? 'name' : null);
 		});
@@ -303,6 +308,11 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	$scope.filters = [{ $new: true }];
 	$scope.operator = 'and';
 	$scope.showArchived = false;
+
+	var handler = $scope.$parent.handler;
+	if (handler && handler._dataSource) {
+		$scope.showArchived = handler._dataSource._showArchived;
+	}
 
 	$scope.addFilter = function(filter) {
 		var last = _.last($scope.filters);
@@ -405,11 +415,14 @@ function FilterFormCtrl($scope, $element, ViewService) {
 			$scope.$parent.onClear();
 		}
 
-		if (!options || !options.silent) {
+		var hide = options === true;
+		var silent = !hide && options && options.silent;
+
+		if (!silent) {
 			$scope.applyFilter();
 		}
 
-		if ($scope.$parent) {
+		if ($scope.$parent && hide) {
 			$scope.$parent.$broadcast('on:hide-menu');
 		}
 	};
@@ -512,8 +525,11 @@ ui.directive('uiFilterForm', function() {
 		controller: FilterFormCtrl,
 
 		link: function(scope, element, attrs, ctrl) {
-
-			ctrl.doInit(scope.model);
+			var unwatch = scope.$watch("$parent.viewItems", function (items) {
+				if (items === undefined) return;
+				unwatch();
+				ctrl.doInit(scope.model, items);
+			});
 		},
 		template:
 		"<div class='filter-form'>" +
@@ -532,7 +548,7 @@ ui.directive('uiFilterForm', function() {
 			"<div class='links'>"+
 				"<a href='' ng-click='addFilter()' x-translate>Add filter</a>"+
 				"<span class='divider'>|</span>"+
-				"<a href='' ng-click='clearFilter()' x-translate>Clear</a></li>"+
+				"<a href='' ng-click='clearFilter(true)' x-translate>Clear</a></li>"+
 				"<span class='divider' ng-if='canExport()'>|</span>"+
 				"<a href='' ng-if='canExport()' ui-grid-export x-translate>Export</a></li>"+
 				"<span class='divider'>|</span>"+
@@ -567,9 +583,15 @@ ui.directive('uiFilterBox', function() {
 				ViewService.getMetaDef($scope.model, {name: filterView, type: 'search-filters'})
 				.success(function(fields, view) {
 					$scope.view = view;
+					$scope.viewItems = angular.copy(view.items) || [];
 					$scope.viewFilters = angular.copy(view.filters);
+					_.each($scope.viewItems, function (item) {
+						item.type = fields[item.name].type;
+						item.title = item.title || fields[item.name].title;
+					});
 				});
 			} else {
+				$scope.viewItems = [];
 				filterView = 'act:' + (handler._viewParams || {}).action;
 			}
 
@@ -994,10 +1016,11 @@ ui.directive('uiFilterBox', function() {
 			});
 			
 			scope.$on('on:clear-filter-silent', function () {
+				var visible = scope.visible;
 				scope.visible = true;
 				scope.$broadcast('on:clear-filter', { silent: true });
 				scope.$timeout(function () {
-					scope.visible = false;
+					scope.visible = visible;
 				});
 			});
 
