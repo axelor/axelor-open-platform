@@ -482,6 +482,9 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 			},
 			process: function () {
 				if (this.running || this.pending.length === 0) {
+					if (_.all(this.items, function (item) { return item.complete; })) {
+						this.items.length = 0;
+					}
 					return;
 				}
 				this.running = true;
