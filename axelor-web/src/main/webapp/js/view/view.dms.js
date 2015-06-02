@@ -223,6 +223,7 @@ function DMSFileListCtrl($scope, $element) {
 		var elem = $(event.target);
 		$scope.$timeout(function () {
 			if (elem.is('.fa-folder')) return $scope.onFolder(getSelected());
+			if (elem.is('.fa-download')) return $scope.onDownload();
 		});
 	};
 

@@ -7,8 +7,9 @@
   <grid name="dms-file-grid" title="Documents" model="com.axelor.dms.db.DMSFile" edit-icon="false">
     <field name="typeIcon" x-type="icon"/>
     <field name="fileName"/>
-    <field name="lastModified" title="Last modified" width="150" x-type="datetime"/>
-    <field name="metaFile.sizeText" title="Size" width="100"/>
+    <field name="downloadIcon" x-type="icon"/>
+    <field name="lastModified" title="Last modified" width="120" x-type="datetime"/>
+    <field name="metaFile.sizeText" title="Size" width="80"/>
   </grid>
 
   <form name="dms-file-form" title="Document" model="com.axelor.dms.db.DMSFile">
