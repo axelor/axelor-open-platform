@@ -173,29 +173,26 @@ function DMSFileListCtrl($scope, $element) {
 	var __filter = $scope.filter;
 	$scope.filter = function (searchFilter) {
 
+		var filter = _.extend({}, searchFilter);
 		var fields = $scope.fields || {};
 
 		_.each(["relatedId", "relatedModel", "isDirectory", "metaFile.id"], function (name) {
 			fields[name] = fields[name] || { name: name };
 		});
 
-		var filter = _.extend({}, searchFilter);
-		if (_.isEmpty(filter.criteria)) {
-			resetFilter();
-		} else {
+		var advance = !_.isEmpty(filter.criteria) || !_.isEmpty(filter._domains);
+		if (advance) {
 			$scope.currentFilter = filter;
 			$scope.currentFolder = null;
 			$scope.currentPaths.length = 0;
+		} else {
+			resetFilter();
 		}
 
 		filter._domain = $scope._domain;
 		filter._context = $scope.getContext();
 
 		return __filter.call($scope, filter);
-	};
-
-	$scope.canSearchOn = function (field) {
-		return ["parent", "metaFile", "isDirectory", "relatedId", "permissions"].indexOf(field.name) === -1;
 	};
 
 	$scope.onFolder = function(folder, currentPaths) {
@@ -1059,6 +1056,9 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 
 			var form = null;
 
+			scope.permissionFormName = "dms-file-permission-form";
+			scope.permissionFormTitle = _t("Permissions");
+
 			scope.canShare = function () {
 				if (!scope.selection || scope.selection.length === 0) return false;
 				var selected = _.first(scope.selection);
@@ -1069,7 +1069,10 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 			scope.onPermissions = function () {
 
 				if (form === null) {
-					form = $compile("<div ui-dms-members-form></div>")(scope.$new(true));
+					form = $("<div ui-dms-popup-form></div>")
+						.attr("x-form-name", "permissionFormName")
+						.attr("x-form-title", "permissionFormTitle");
+					form = $compile(form)(scope);
 					form.appendTo(element);
 					form.width("100%");
 				}
@@ -1146,18 +1149,90 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 	};
 }]);
 
-ui.directive("uiDmsMembersForm", function () {
+// tags popup
+ui.directive("uiDmsTagsPopup", ["$compile", function ($compile) {
 	return {
-		scope: true,
+		link: function (scope, element, attrs) {
+
+			var form = null;
+
+			scope.tagsFormName = "dms-file-tags-form";
+			scope.tagsFormTitle = _t("Tags");
+
+			scope.canShare = function () {
+				if (!scope.selection || scope.selection.length === 0) return false;
+				var selected = _.first(scope.selection);
+				var record = scope.dataView.getItem(selected);
+				return record && record.canShare;
+			};
+
+			scope.onTags = function () {
+
+				if (form === null) {
+					form = $("<div ui-dms-popup-form></div>")
+						.attr("x-form-name", "tagsFormName")
+						.attr("x-form-title", "tagsFormTitle");
+					form = $compile(form)(scope);
+					form.appendTo(element);
+					form.width("100%");
+				}
+
+				var selected = _.first(scope.selection);
+				var record = scope.dataView.getItem(selected);
+
+				var formScope = form.scope();
+
+				formScope.doRead(record.id).success(function (rec) {
+					formScope.edit(rec);
+					setTimeout(function () {
+						element.dialog("option", "height", 320);
+						element.dialog("open");
+					});
+				});
+			};
+
+			scope.onSaveTags = function () {
+
+				var ds = scope._dataSource;
+				var formScope = form.scope();
+
+				var record = formScope.record;
+
+				function doClose() {
+					element.dialog("close");
+					formScope.edit(null);
+				}
+				ds.save(record).success(doClose);
+			};
+
+			scope.$on("$destroy", function () {
+				if (form) {
+					form.scope().$destroy();
+					form = null;
+				}
+			});
+		},
+		replace: true,
+		template:
+			"<div ui-dialog x-on-ok='onSaveTags' x-css='ui-dialog-small dms-popup-form' title='Tags'></div>"
+	};
+}]);
+
+ui.directive("uiDmsPopupForm", function () {
+	return {
+		scope: {
+			formName: "=",
+			formTitle: "="
+		},
 		controller: ["$scope", "$element", 'DataSource', 'ViewService', function($scope, $element, DataSource, ViewService) {
 			$scope._viewParams = {
 				action: _.uniqueId('$act'),
-				title: _t("Permissions"),
+				title: $scope.formTitle,
 				model: "com.axelor.dms.db.DMSFile",
 				viewType: "form",
 				views: [{
 					type: "form",
-					name: "dms-file-permission-form"
+					name: $scope.formName
 				}]
 			};
 			ViewCtrl.call(this, $scope, DataSource, ViewService);

@@ -3,7 +3,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_4.0.xsd">
 
-  <!-- views -->
+  <!-- DMSFile views -->
   <grid name="dms-file-grid" title="Documents" model="com.axelor.dms.db.DMSFile" edit-icon="false">
     <field name="typeIcon" x-type="icon"/>
     <field name="fileName"/>
@@ -46,6 +46,7 @@
     </panel-tabs>
   </form>
 
+  <!-- DMSPermission views -->
   <selection name="dms.permission.selection">
     <option value="READ">Can read</option>
     <option value="WRITE">Can write</option>
@@ -68,6 +69,7 @@
     </panel>
   </form>
 
+  <!-- popup forms -->
   <form name="dms-file-permission-form" title="Permission" model="com.axelor.dms.db.DMSFile">
     <panel itemSpan="12" showFrame="false">
       <field name="permissions" showTitle="false">
@@ -80,21 +82,57 @@
     </panel>
   </form>
 
+  <form name="dms-file-tags-form" title="Tags" model="com.axelor.dms.db.DMSFile">
+    <panel itemSpan="12" showFrame="false">
+      <field name="tags" showTitle="false" widget="TagSelect" x-create="code,name" />
+    </panel>
+  </form>
+
+  <!-- DMSFileTag views -->
+  <grid name="dms-tag-grid" title="Tags" model="com.axelor.dms.db.DMSFileTag">
+    <field name="code" />
+    <field name="name" />
+  </grid>
+
+  <form name="dms-tag-form" title="Tag" model="com.axelor.dms.db.DMSFileTag">
+    <panel showFrame="false" itemSpan="6">
+      <field name="code" />
+      <field name="name" />
+    </panel>
+  </form>
+
+  <!-- filters -->
+  <search-filters name="dms-file-filters" model="com.axelor.dms.db.DMSFile" title="Filter files">
+    <field name="relatedModel" title="Attached to" />
+    <field name="relatedId" hidden="true" />
+    <field name="metaFile" hidden="true" />
+    <field name="parent" hidden="true" />
+    <field name="tags" hidden="true" />
+    <field name="permissions" hidden="true" />
+    <field name="tags.name" title="Tag" />
+    <filter title="Shared with me">
+      <domain>self.isDirectory = false AND self.createdBy != :__user__</domain>
+    </filter>
+  </search-filters>
+
   <!-- actions -->
   <action-view name="dms.all" model="com.axelor.dms.db.DMSFile" title="All Documents">
     <view name="dms-file-grid" type="grid" />
     <view-param name="ui-template:grid" value="dms-file-list"/>
+    <view-param name="search-filters" value="dms-file-filters"/>
   </action-view>
 
   <action-view name="dms.my" model="com.axelor.dms.db.DMSFile" title="My Documents">
     <view name="dms-file-grid" type="grid" />
     <view-param name="ui-template:grid" value="dms-file-list"/>
+    <view-param name="search-filters" value="dms-file-filters"/>
     <domain>self.createdBy = :__user__</domain>
   </action-view>
 
   <action-view name="dms.attach" model="com.axelor.dms.db.DMSFile" title="Attachments">
     <view name="dms-file-grid" type="grid" />
     <view-param name="ui-template:grid" value="dms-file-list"/>
+    <view-param name="search-filters" value="dms-file-filters"/>
   </action-view>
 
   <!-- menu -->

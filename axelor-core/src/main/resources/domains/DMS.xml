@@ -20,6 +20,14 @@
     <!-- permissions -->
     <one-to-many name="permissions" ref="DMSPermission" mappedBy="file" />
 
+    <!-- tags -->
+    <many-to-many name="tags" ref="DMSFileTag" orderBy="name" />
+
+  </entity>
+
+  <entity name="DMSFileTag" table="DMS_FILE_TAG" repository="none">
+    <string name="code" required="true" unique="true" min="2"/>
+    <string name="name" namecolumn="true" required="true" unique="true" min="2" />
   </entity>
 
   <entity name="DMSPermission" table="DMS_PERMISSION" repository="none">
