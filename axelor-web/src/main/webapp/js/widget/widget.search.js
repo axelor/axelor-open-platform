@@ -415,11 +415,14 @@ function FilterFormCtrl($scope, $element, ViewService) {
 			$scope.$parent.onClear();
 		}
 
-		if (!options || !options.silent) {
+		var hide = options === true;
+		var silent = !hide && options && options.silent;
+
+		if (!silent) {
 			$scope.applyFilter();
 		}
 
-		if ($scope.$parent) {
+		if ($scope.$parent && hide) {
 			$scope.$parent.$broadcast('on:hide-menu');
 		}
 	};
@@ -545,7 +548,7 @@ ui.directive('uiFilterForm', function() {
 			"<div class='links'>"+
 				"<a href='' ng-click='addFilter()' x-translate>Add filter</a>"+
 				"<span class='divider'>|</span>"+
-				"<a href='' ng-click='clearFilter()' x-translate>Clear</a></li>"+
+				"<a href='' ng-click='clearFilter(true)' x-translate>Clear</a></li>"+
 				"<span class='divider' ng-if='canExport()'>|</span>"+
 				"<a href='' ng-if='canExport()' ui-grid-export x-translate>Export</a></li>"+
 				"<span class='divider'>|</span>"+
@@ -1013,10 +1016,11 @@ ui.directive('uiFilterBox', function() {
 			});
 			
 			scope.$on('on:clear-filter-silent', function () {
+				var visible = scope.visible;
 				scope.visible = true;
 				scope.$broadcast('on:clear-filter', { silent: true });
 				scope.$timeout(function () {
-					scope.visible = false;
+					scope.visible = visible;
 				});
 			});
 
