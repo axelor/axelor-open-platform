@@ -20,15 +20,15 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 		restrict: 'EA',
 		link: function(scope, element, attrs) {
 
+			var resizable = !!attrs.resizable && !axelor.device.small;
 			var onBeforeClose = scope.$eval(attrs.onBeforeClose);
 			
 			var onOpen = scope.$eval(attrs.onOpen);
 			var onClose = scope.$eval(attrs.onClose);
 			var onOK = scope.$eval(attrs.onOk);
-			var cssClass = attrs.css;
-			var buttons = scope.$eval(attrs.buttons) || [];
-
-			if(_.isEmpty(buttons) || (_.isUndefined(onClose) || _.isFunction(onClose))) {
+			var buttons = [];
+			
+			if(_.isUndefined(onClose) || _.isFunction(onClose)){
 				buttons.push({
 			    	text: _t('Close'),
 			    	'class': 'btn button-close',
@@ -54,13 +54,22 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 			
 			var dialog = element.dialog({
 				dialogClass: 'ui-dialog-responsive ' + (cssClass || ''),
-				resizable: false,
+				resizable: resizable,
 				draggable: true,
 				autoOpen: false,
 				closeOnEscape: true,
 				modal: true,
 				zIndex: 1100,
 				buttons: buttons,
+				resizeStart: function () {
+					var parent = $(this).parent();
+					if (!parent.hasClass('ui-dialog-resized')) {
+						parent.addClass('ui-dialog-resized');
+					}
+					if (!parent.hasClass('ui-dialog-dragged')) {
+						parent.addClass('ui-dialog-dragged');
+					}
+				},
 				dragStart: function(event, ui) {
 					var parent = $(this).parent();
 					if (parent.hasClass('maximized') || axelor.device.small) {
