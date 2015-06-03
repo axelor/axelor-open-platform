@@ -54,6 +54,14 @@
 	overflow: auto;
 }
 
+.dms-file-list .dms-details > .panel-header .panel-title {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: calc(100% - 20px);
+	box-sizing: border-box;
+}
+
 .dms-file-list.has-details .dms-details {
 	right: 0;
 	max-width: 100%;
