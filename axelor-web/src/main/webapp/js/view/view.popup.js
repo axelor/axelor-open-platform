@@ -508,6 +508,10 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			height -= element.parent().children('.ui-dialog-titlebar').outerHeight(true) + 4;
 			height -= element.parent().children('.ui-dialog-buttonpane').outerHeight(true) + 4;
 
+			if (element.find("> [ui-view-form] > form").is(".mini-form")) {
+				element.parent().addClass("ui-dialog-small");
+			}
+
 			if (element.is('.nav-tabs-popup')) {
 				var toolbar = element.find('.form-view:first > .record-toolbar');
 				var form = element.find('.form-view:first > [ui-view-form] > form');
