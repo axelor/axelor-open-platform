@@ -18,6 +18,7 @@
 package com.axelor.dms.db.repo;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -38,11 +39,13 @@ import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.dms.db.DMSFile;
+import com.axelor.dms.db.DMSFileTag;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
+import com.axelor.rpc.Resource;
 import com.google.common.base.Strings;
 import com.google.common.primitives.Longs;
 
@@ -247,6 +250,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 		}
 
 		final User user = AuthUtils.getUser();
+		final MetaFile metaFile = file.getMetaFile();
 
 		boolean canShare = file.getCreatedBy() == user ||
 				security.isPermitted(AccessType.CREATE, DMSFile.class, file.getId()) ||
@@ -256,10 +260,28 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 
 		json.put("typeIcon", isFile ? "fa fa-file" : "fa fa-folder");
 		json.put("downloadIcon", "fa fa-download");
+		json.put("detailsIcon", "fa fa-info-circle");
 
-		json.put("lastModified", dt);
 		json.put("canShare", canShare);
 		json.put("canWrite", canCreate(file));
+
+		json.put("lastModified", dt);
+		json.put("createdOn", file.getCreatedOn());
+		json.put("createdBy", file.getCreatedBy());
+		json.put("updatedBy", file.getUpdatedBy());
+		json.put("updatedOn", file.getUpdatedOn());
+
+		if (metaFile != null) {
+			json.put("fileType", metaFile.getMime());
+		}
+
+		if (file.getTags() != null) {
+			final List<Object> tags = new ArrayList<>();
+			for (DMSFileTag tag : file.getTags()) {
+				tags.add(Resource.toMap(tag, "id", "code", "name", "style"));
+			}
+			json.put("tags", tags);
+		}
 
 		return json;
 	}

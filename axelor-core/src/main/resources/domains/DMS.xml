@@ -26,8 +26,9 @@
   </entity>
 
   <entity name="DMSFileTag" table="DMS_FILE_TAG" repository="none">
-    <string name="code" required="true" unique="true" min="2"/>
+    <string name="code" required="true" unique="true" min="2" />
     <string name="name" namecolumn="true" required="true" unique="true" min="2" />
+    <string name="style" selection="dms.tag.style.selection" />
   </entity>
 
   <entity name="DMSPermission" table="DMS_PERMISSION" repository="none">

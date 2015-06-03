@@ -223,7 +223,8 @@ function DMSFileListCtrl($scope, $element) {
 		var elem = $(event.target);
 		$scope.$timeout(function () {
 			if (elem.is('.fa-folder')) return $scope.onFolder(getSelected());
-			if (elem.is('.fa-download')) return $scope.onDownload();
+			if (elem.is('.fa-download')) return $scope.onDownload(getSelected());
+			if (elem.is('.fa-info-circle')) return $scope.onDetails(getSelected());
 		});
 	};
 
@@ -1053,6 +1054,71 @@ ui.directive("uiDmsTree", ['$compile', function ($compile) {
 	};
 }]);
 
+ui.directive("uiDmsDetails", function () {
+
+	return {
+		controller: ["$scope", function ($scope) {
+
+			function set(record) {
+				var info = $scope.details = {};
+				if (record) {
+					info.id = record.id;
+					info.version = record.version;
+					info.name = record.fileName;
+					info.type = record.fileType || _t("Unknown");
+					info.tags = record.tags;
+					info.owner = (record.createdBy||{}).name;
+					info.created = moment(record.createdOn).format('DD/MM/YYYY HH:mm');
+					info.updated = moment(record.lastModifiedOn).format('DD/MM/YYYY HH:mm');
+				}
+			}
+
+			$scope.tagsFormName = "dms-file-tags-form";
+			$scope.showDetails = false;
+			$scope.showTagEditor = false;
+
+			$scope.onDetails = function (record) {
+				$scope.showDetails = true;
+				axelor.$adjustSize();
+				set(record);
+			};
+
+			$scope.onCloseDetails = function () {
+				$scope.showDetails = false;
+				$scope.showTagEditor = false;
+				axelor.$adjustSize();
+			};
+
+			$scope.onAddTags = function () {
+				$scope.showTagEditor = true;
+			};
+
+			$scope.onSaveTags = function () {
+				var ds = $scope._dataSource;
+				function doClose(rec) {
+					$scope.showTagEditor = false;
+					$scope.details.tags = rec.tags;
+					$scope.details.version = rec.version;
+				}
+				var record = _.pick($scope.details, "id", "version", "tags");
+				ds.save(record).success(doClose);
+			};
+
+			$scope.$watch("selection[0]", function (index) {
+				if (index === undefined || !$scope.showDetails) return;
+				var details = $scope.details || {};
+				var record = $scope.dataView.getItem(index) || {};
+				if (details.id !== record.id) {
+					$scope.onCloseDetails();
+				}
+			});
+		}],
+		link: function (scope, element, attrs) {
+
+		}
+	}
+});
+
 // members popup
 ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 	return {
@@ -1073,7 +1139,7 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 			scope.onPermissions = function () {
 
 				if (form === null) {
-					form = $("<div ui-dms-popup-form></div>")
+					form = $("<div ui-dms-inline-form></div>")
 						.attr("x-form-name", "permissionFormName")
 						.attr("x-form-title", "permissionFormTitle");
 					form = $compile(form)(scope);
@@ -1153,80 +1219,12 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 	};
 }]);
 
-// tags popup
-ui.directive("uiDmsTagsPopup", ["$compile", function ($compile) {
-	return {
-		link: function (scope, element, attrs) {
-
-			var form = null;
-
-			scope.tagsFormName = "dms-file-tags-form";
-			scope.tagsFormTitle = _t("Tags");
-
-			scope.canShare = function () {
-				if (!scope.selection || scope.selection.length === 0) return false;
-				var selected = _.first(scope.selection);
-				var record = scope.dataView.getItem(selected);
-				return record && record.canShare;
-			};
-
-			scope.onTags = function () {
-
-				if (form === null) {
-					form = $("<div ui-dms-popup-form></div>")
-						.attr("x-form-name", "tagsFormName")
-						.attr("x-form-title", "tagsFormTitle");
-					form = $compile(form)(scope);
-					form.appendTo(element);
-					form.width("100%");
-				}
-
-				var selected = _.first(scope.selection);
-				var record = scope.dataView.getItem(selected);
-
-				var formScope = form.scope();
-
-				formScope.doRead(record.id).success(function (rec) {
-					formScope.edit(rec);
-					setTimeout(function () {
-						element.dialog("option", "height", 320);
-						element.dialog("open");
-					});
-				});
-			};
-
-			scope.onSaveTags = function () {
-
-				var ds = scope._dataSource;
-				var formScope = form.scope();
-
-				var record = formScope.record;
-
-				function doClose() {
-					element.dialog("close");
-					formScope.edit(null);
-				}
-				ds.save(record).success(doClose);
-			};
-
-			scope.$on("$destroy", function () {
-				if (form) {
-					form.scope().$destroy();
-					form = null;
-				}
-			});
-		},
-		replace: true,
-		template:
-			"<div ui-dialog x-on-ok='onSaveTags' x-css='ui-dialog-small dms-popup-form' title='Tags'></div>"
-	};
-}]);
-
-ui.directive("uiDmsPopupForm", function () {
+ui.directive("uiDmsInlineForm", function () {
 	return {
 		scope: {
 			formName: "=",
-			formTitle: "="
+			formTitle: "=",
+			record: "="
 		},
 		controller: ["$scope", "$element", 'DataSource', 'ViewService', function($scope, $element, DataSource, ViewService) {
 			$scope._viewParams = {

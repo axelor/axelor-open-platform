@@ -1,5 +1,6 @@
 .dms-file-list {
 	position: relative;
+	overflow: hidden;
 	-webkit-user-select: none;
 	   -moz-user-select: none;
 	    -ms-user-select: none;
@@ -29,6 +30,69 @@
 	top: 41px;
 	bottom: 0;
 	border-right: 1px solid #d3d3d3;
+}
+
+.dms-file-list .dms-details {
+	position: absolute;
+	right: -250px;
+	top: 41px;
+	bottom: 0;
+	width: 249px;
+	margin: 0;
+	border-bottom: 0;
+	background-color: white;
+	transition: all 0.25s;
+	z-index: 2;
+}
+
+.dms-file-list .dms-details > .panel-body {
+	position: absolute;
+	top: 32px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	overflow: auto;
+}
+
+.dms-file-list.has-details .dms-details {
+	right: 0;
+	max-width: 100%;
+}
+
+.dms-file-list .dms-details input.not-readonly {
+	background: inherit !important;
+	border: 0;
+	box-shadow: none;
+	margin-bottom: 5px;
+}
+
+.dms-file-list .dms-details label {
+	cursor: default;
+	font-weight: bold;
+}
+
+.dms-file-list .dms-details .tags > .label {
+	float: left;
+	margin-right: 5px;
+	margin-bottom: 5px;
+	padding: 4px 6px;
+	border-radius: 0;
+}
+
+.dms-file-list .dms-details .tags form {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+
+.dms-file-list .dms-details .tags .panel {
+	margin: 0;
+}
+
+.dms-file-list .dms-details .tags a {
+	color: #222;
+	float: left;
+	margin-right: 5px;
 }
 
 .dms-file-list.has-tree .dms-folder-tree {
@@ -75,10 +139,12 @@
 	font-size: 32px !important;
 }
 
+.dms-file-list .dms-details .panel-header,
 .dms-file-upload .panel-header {
 	overflow: hidden;
 }
 
+.dms-file-list .dms-details .panel-header a,
 .dms-file-upload .panel-header a {
 	color: #222;
 }

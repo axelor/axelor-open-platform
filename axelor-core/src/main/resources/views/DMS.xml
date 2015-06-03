@@ -8,6 +8,7 @@
     <field name="typeIcon" x-type="icon"/>
     <field name="fileName"/>
     <field name="downloadIcon" x-type="icon"/>
+    <field name="detailsIcon" x-type="icon" />
     <field name="lastModified" title="Last modified" width="120" x-type="datetime"/>
     <field name="metaFile.sizeText" title="Size" width="80"/>
   </grid>
@@ -90,15 +91,26 @@
   </form>
 
   <!-- DMSFileTag views -->
-  <grid name="dms-tag-grid" title="Tags" model="com.axelor.dms.db.DMSFileTag">
+  <selection name="dms.tag.style.selection">
+    <option value="label">Default</option>
+    <option value="label-success">Success</option>
+    <option value="label-warning">Warning</option>
+    <option value="label-important">Important</option>
+    <option value="label-info">Information</option>
+    <option value="label-inverse">Inverse</option>
+  </selection>
+
+  <grid name="dms-tag-grid" title="Tags" model="com.axelor.dms.db.DMSFileTag" editable="true">
     <field name="code" />
     <field name="name" />
+    <field name="style" />
   </grid>
 
-  <form name="dms-tag-form" title="Tag" model="com.axelor.dms.db.DMSFileTag">
-    <panel showFrame="false" itemSpan="6">
+  <form name="dms-tag-form" title="Tag" model="com.axelor.dms.db.DMSFileTag" css="mini-form">
+    <panel showFrame="false" itemSpan="4">
       <field name="code" />
       <field name="name" />
+      <field name="style" />
     </panel>
   </form>
 
@@ -135,6 +147,10 @@
     <view-param name="ui-template:grid" value="dms-file-list"/>
     <view-param name="search-filters" value="dms-file-filters"/>
   </action-view>
+  <action-view name="dms.tags" model="com.axelor.dms.db.DMSFileTag" title="Tags">
+    <view name="dms-tag-grid" type="grid" />
+    <view name="dms-tag-form" type="form" />
+  </action-view>
 
   <!-- menu -->
   <menuitem name="menu-dms" order="-109"
@@ -143,5 +159,8 @@
     action="dms.all" order="-90"/>
   <menuitem name="menu-dms-my" title="My Documents" parent="menu-dms"
     action="dms.my" order="-80"/>
+  <menuitem name="menu-dms-config" title="Configuration" parent="menu-dms" order="-70"/>
+  <menuitem name="menu-dms-config-tags" title="Tags" parent="menu-dms-config"
+    action="dms.tags"/>
 
 </object-views>

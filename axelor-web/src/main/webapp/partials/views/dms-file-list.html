@@ -1,4 +1,4 @@
-<div class="grid-view dms-file-list" ng-class="{'has-tree': showTree }" ng-controller="DMSFileListCtrl"
+<div class="grid-view dms-file-list" ng-class="{'has-tree': showTree, 'has-details': showDetails }" ng-controller="DMSFileListCtrl"
   ui-dms-uploader ui-tab-gate>
   <div class="navbar record-toolbar">
     <div class="navbar-inner">
@@ -19,8 +19,6 @@
           <button class="btn dropdown-toggle" data-toggle="dropdown" ng-disabled="!selection.length" tabIndex="-1" title="{{ 'More actions' | t }}"><i class="fa fa-ellipsis-v"></i></button>
           <ul class="dropdown-menu">
             <li><a href="javascript:" ng-click="onRename()" x-translate>Rename...</a></li>
-            <li class="divider"></li>
-            <li><a href="javascript:" ng-click="onTags()" x-translate>Tags...</a></li>
             <li><a href="javascript:" ng-click="onPermissions()" ng-show="canShare()" x-translate>Permissions...</a></li>
             <li ng-show="canShowRelated()"><a href="javascript:" ng-click="onShowRelated()" x-translate>Attached to...</a></li>
             <li class="divider"></li>
@@ -46,6 +44,36 @@
   </div>
   <div class="dms-folder-tree" ui-dms-folders></div>
   <div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-no-filter="true" x-on-init="onGridInit"></div>
+  <div ui-dms-details class="dms-details panel">
+    <div class="panel-header">
+      <div class="panel-title pull-left">{{details.name}}</div>
+      <div class="panel-buttons pull-right">
+        <a href='' ng-click="onCloseDetails()"><i class="fa fa-times"></i></a>
+      </div>
+    </div>
+    <div class="panel-body">
+      <form class="form-horizontal">
+        <label>Type</label>
+        <input type="text" readonly="true" class="not-readonly" ng-model="details.type">
+        <label>Owner</label>
+        <input type="text" readonly="true" class="not-readonly" ng-model="details.owner">
+        <label>Created</label>
+        <input type="text" readonly="true" class="not-readonly" ng-model="details.created">
+        <label>Modified</label>
+        <input type="text" readonly="true" class="not-readonly" ng-model="details.updated">
+      </form>
+      <hr>
+      <div class="tags" ng-show="!showTagEditor">
+        <span ng-repeat="tag in details.tags" ng-class="tag.style" class="label">{{tag.name}}</span>
+        <span ng-show="!details.tags.length">Add some tags</span>
+        <a href="" ng-click="onAddTags()"><i class="fa fa-pencil"></i></a>
+      </div>
+      <div class="tags" ng-show="showTagEditor">
+        <div ui-dms-inline-form x-form-name="tagsFormName" x-record="details"></div>
+        <a href="" ng-click="onSaveTags()"><i class="fa fa-check"></i></a>
+      </div>
+    </div>
+  </div>
   <div class="dms-file-upload">
     <input type="file" class="upload-input hide" multiple>
     <div class="upload-overlay"></div>
