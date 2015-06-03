@@ -53,20 +53,20 @@
     </div>
     <div class="panel-body">
       <form class="form-horizontal">
-        <label>Type</label>
+        <label x-translate>Type</label>
         <input type="text" readonly="true" class="not-readonly" ng-model="details.type">
-        <label>Owner</label>
+        <label x-translate>Owner</label>
         <input type="text" readonly="true" class="not-readonly" ng-model="details.owner">
-        <label>Created</label>
+        <label x-translate>Created</label>
         <input type="text" readonly="true" class="not-readonly" ng-model="details.created">
-        <label>Modified</label>
+        <label x-translate>Modified</label>
         <input type="text" readonly="true" class="not-readonly" ng-model="details.updated">
       </form>
       <hr>
       <div class="tags" ng-show="!showTagEditor">
         <span ng-repeat="tag in details.tags" ng-class="tag.style" class="label">{{tag.name}}</span>
-        <span ng-show="!details.tags.length">Add some tags</span>
-        <a href="" ng-click="onAddTags()"><i class="fa fa-pencil"></i></a>
+        <a href="" ng-show="details.tags.length" ng-click="onAddTags()"><i class="fa fa-pencil"></i></a>
+        <a href="" ng-show="!details.tags.length" ng-click="onAddTags()" x-translate>Add some tags</a>
       </div>
       <div class="tags" ng-show="showTagEditor">
         <div ui-dms-inline-form x-form-name="tagsFormName" x-record="details"></div>
