@@ -26,9 +26,10 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 			var onOpen = scope.$eval(attrs.onOpen);
 			var onClose = scope.$eval(attrs.onClose);
 			var onOK = scope.$eval(attrs.onOk);
-			var buttons = [];
-			
-			if(_.isUndefined(onClose) || _.isFunction(onClose)){
+			var cssClass = attrs.css;
+			var buttons = scope.$eval(attrs.buttons) || [];
+
+			if(_.isEmpty(buttons) || (_.isUndefined(onClose) || _.isFunction(onClose))) {
 				buttons.push({
 			    	text: _t('Close'),
 			    	'class': 'btn button-close',
