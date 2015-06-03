@@ -146,7 +146,7 @@
 	padding-bottom: 0px;
 }
 
-.ui-dialog-responsive:not(.ui-dialog-resized) {
+.ui-dialog-responsive {
 	position: absolute;
 
 	width: 100% !important;
@@ -204,19 +204,11 @@
 	position: relative;
 }
 
-.ui-dialog.ui-resizable > [ui-dialog] > [ui-view-form] > form {
-	min-width: 720px;
-}
-
-.ui-dialog.ui-resizable.ui-dialog-small > [ui-dialog] > [ui-view-form] > form {
-	min-width: 444px;
-}
-
 @media screen and (min-width: 768px) {
-	.ui-dialog-responsive:not(.ui-dialog-resized) {
+	.ui-dialog-responsive {
 		width: 740px !important;
 	}
-	.ui-dialog-small:not(.ui-dialog-resized) {
+	.ui-dialog-small {
 		width: 480px !important;
 	}
 	.ui-dialog-responsive:not(.ui-dialog-dragged) {
@@ -228,10 +220,10 @@
 	}
 }
 @media screen and (min-width: 1024px) {
-	.ui-dialog-responsive:not(.ui-dialog-resized) {
+	.ui-dialog-responsive {
 		width: 900px !important;
 	}
-	.ui-dialog-small:not(.ui-dialog-resized) {
+	.ui-dialog-small {
 		width: 480px !important;
 	}
 	.ui-dialog-responsive:not(.ui-dialog-dragged) {
@@ -289,6 +281,8 @@
 		bottom: 0;
 	}
 	.ui-dialog-responsive .ui-dialog-content {
+  		box-sizing: border-box;
+		width: 100% !important;
 		height: calc(100% - 45px - 60px) !important;
 		overflow: auto;
 		margin-top: 45px;
@@ -304,6 +298,18 @@
 	}
 	.ui-dialog-small .ui-dialog-buttonpane {
 		position: relative;
+	}
+}
+
+@media screen and (min-width: 768px) {
+	.ui-dialog-responsive.ui-dialog-resized > [ui-dialog] > [ui-view-form] > form {
+		min-width: 720px;
+	}
+	.ui-dialog-responsive.ui-dialog-resized.ui-dialog-small > [ui-dialog] > [ui-view-form] > form {
+		min-width: 444px;
+	}
+	.ui-dialog-responsive.ui-dialog-resized:not(.maximized) {
+		width: inherit !important;
 	}
 }
 
