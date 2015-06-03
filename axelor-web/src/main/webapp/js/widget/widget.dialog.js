@@ -20,6 +20,7 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 		restrict: 'EA',
 		link: function(scope, element, attrs) {
 
+			var resizable = !!attrs.resizable && !axelor.device.small;
 			var onBeforeClose = scope.$eval(attrs.onBeforeClose);
 			
 			var onOpen = scope.$eval(attrs.onOpen);
@@ -53,13 +54,22 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 			
 			var dialog = element.dialog({
 				dialogClass: 'ui-dialog-responsive',
-				resizable: false,
+				resizable: resizable,
 				draggable: true,
 				autoOpen: false,
 				closeOnEscape: true,
 				modal: true,
 				zIndex: 1100,
 				buttons: buttons,
+				resizeStart: function () {
+					var parent = $(this).parent();
+					if (!parent.hasClass('ui-dialog-resized')) {
+						parent.addClass('ui-dialog-resized');
+					}
+					if (!parent.hasClass('ui-dialog-dragged')) {
+						parent.addClass('ui-dialog-dragged');
+					}
+				},
 				dragStart: function(event, ui) {
 					var parent = $(this).parent();
 					if (parent.hasClass('maximized') || axelor.device.small) {

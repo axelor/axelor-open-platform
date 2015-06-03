@@ -146,7 +146,7 @@
 	padding-bottom: 0px;
 }
 
-.ui-dialog-responsive {
+.ui-dialog-responsive:not(.ui-dialog-resized) {
 	position: absolute;
 
 	width: 100% !important;
@@ -204,11 +204,19 @@
 	position: relative;
 }
 
+.ui-dialog.ui-resizable > [ui-dialog] > [ui-view-form] > form {
+	min-width: 720px;
+}
+
+.ui-dialog.ui-resizable.ui-dialog-small > [ui-dialog] > [ui-view-form] > form {
+	min-width: 444px;
+}
+
 @media screen and (min-width: 768px) {
-	.ui-dialog-responsive {
+	.ui-dialog-responsive:not(.ui-dialog-resized) {
 		width: 740px !important;
 	}
-	.ui-dialog-small {
+	.ui-dialog-small:not(.ui-dialog-resized) {
 		width: 480px !important;
 	}
 	.ui-dialog-responsive:not(.ui-dialog-dragged) {
@@ -220,10 +228,10 @@
 	}
 }
 @media screen and (min-width: 1024px) {
-	.ui-dialog-responsive {
+	.ui-dialog-responsive:not(.ui-dialog-resized) {
 		width: 900px !important;
 	}
-	.ui-dialog-small {
+	.ui-dialog-small:not(.ui-dialog-resized) {
 		width: 480px !important;
 	}
 	.ui-dialog-responsive:not(.ui-dialog-dragged) {
@@ -253,6 +261,7 @@
 	bottom: 0;
 }
 .ui-dialog-responsive.maximized .ui-dialog-content {
+	width: auto !important;
 	height: calc(100% - 45px - 60px) !important;
 	overflow: auto;
 	margin-top: 45px;
