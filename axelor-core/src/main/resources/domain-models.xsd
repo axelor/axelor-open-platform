@@ -412,6 +412,13 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="translatable" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+            Specify whether the field value is translatable.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

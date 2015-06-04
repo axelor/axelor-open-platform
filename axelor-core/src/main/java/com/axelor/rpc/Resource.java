@@ -334,6 +334,7 @@ public class Resource<T extends Model> {
 			}
 			if (item instanceof Map) {
 				item = repo.populate((Map) item);
+				Translator.applyTranslatables((Map) item, model);
 			}
 			jsonData.add(item);
 		}
@@ -599,6 +600,9 @@ public class Resource<T extends Model> {
 
 			Map<String, Object> orig = (Map) ((Map) record).get("_original");
 			JPA.verify(model, orig);
+
+			// save translatable values and remove them from record
+			Translator.saveTranslatables((Map) record, model);
 
 			Model bean = JPA.edit(model, (Map) record);
 			id = bean.getId();
@@ -925,6 +929,11 @@ public class Resource<T extends Model> {
 				}
 				value = items;
 			}
+
+			if (prop.isTranslatable() && value instanceof String) {
+				value = Translator.getTranslation(prop, (String) value);
+			}
+
 			result.put(name, value);
 		}
 

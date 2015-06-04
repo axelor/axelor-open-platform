@@ -82,6 +82,12 @@ public @interface Widget {
 	boolean massUpdate() default false;
 
 	/**
+	 * Whether the field value is translatable.
+	 *
+	 */
+	boolean translatable() default false;
+
+	/**
 	 * List of the columns to be used to search this record.
 	 *
 	 * Used by auto-complete widget. By default the same column will be

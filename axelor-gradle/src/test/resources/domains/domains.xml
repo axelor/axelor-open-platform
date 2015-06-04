@@ -125,7 +125,7 @@
   
   <!-- inheritance -->
   <entity name="Hello" strategy="SINGLE">
-    <string name="title" required="true"/>
+    <string name="title" required="true" translatable="true"/>
     <string name="message" required="true"/>
   </entity>
   

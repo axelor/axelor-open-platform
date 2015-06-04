@@ -122,6 +122,8 @@ public class Property {
 
 	private boolean sequence;
 
+	private boolean translatable;
+
 	private transient String sequenceName;
 
 	private String[] nameSearch;
@@ -257,6 +259,7 @@ public class Property {
 				selection = w.selection();
 				password = w.password();
 				massUpdate = w.massUpdate();
+				translatable = w.translatable();
 
 				if (w.multiline() && type == PropertyType.STRING) {
 					type = PropertyType.TEXT;
@@ -441,7 +444,11 @@ public class Property {
 	public boolean isSequence() {
 		return sequence;
 	}
-	
+
+	public boolean isTranslatable() {
+		return translatable;
+	}
+
 	public String getSequenceName() {
 		return sequenceName;
 	}
