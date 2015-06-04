@@ -580,6 +580,11 @@
         <xsd:documentation>Specify the name of icons to show on nested editor.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-can-copy" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether to allow copy of o2m/m2m field items.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="x-direction" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>Specify the layout direction (horizontal, vertical) of some widgets(e.g. RadioSelect)</xsd:documentation>
