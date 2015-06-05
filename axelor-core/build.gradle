@@ -23,6 +23,7 @@ dependencies {
 		exclude group: "net.sf.ehcache"
 	}
 	compile libs.ehcache
+	compile libs.flywaydb
 
 	compile libs.jersey_server
 	compile libs.jersey_guice

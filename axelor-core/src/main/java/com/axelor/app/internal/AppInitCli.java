@@ -24,6 +24,7 @@ import com.axelor.app.AppModule;
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
+import com.axelor.db.internal.DBHelper;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.rpc.ObjectMapperProvider;
 import com.beust.jcommander.JCommander;
@@ -49,6 +50,12 @@ public class AppInitCli {
 		@Parameter( names = { "-u", "--update" }, description = "update the installed modules")
 		public Boolean update;
 
+		@Parameter( names = { "-M", "--migrate" }, description = "run the db migration scripts")
+		public Boolean migrate;
+		
+		@Parameter( names = { "--verbose" }, description = "verbose ouput")
+		public Boolean verbose;
+
 		@Parameter( names = { "-m", "--modules" }, description = "list of modules to update", variableArity = true)
 		public List<String> modules;
 	}
@@ -73,6 +80,10 @@ public class AppInitCli {
 			install(new AppModule());
 		}
 	}
+	
+	private static void println(String msg) {
+		JCommander.getConsole().println(msg);
+	}
 
 	public static int process(String[] args) {
 
@@ -84,15 +95,33 @@ public class AppInitCli {
 		try {
 			cmd.parse(args);
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			println(e.getMessage());
 			cmd.usage();
 			return -1;
 		}
 
-		if ((opts.showHelp == Boolean.TRUE)
-				|| (opts.init == Boolean.FALSE && opts.update == Boolean.FALSE)) {
+		if ((opts.showHelp == Boolean.TRUE) ||
+				(opts.init == Boolean.FALSE &&
+				 opts.update == Boolean.FALSE &&
+				 opts.migrate == Boolean.FALSE)) {
 			cmd.usage();
 			return 0;
+		}
+
+		if (opts.migrate == Boolean.TRUE) {
+			try {
+				println("Start db migration...");
+				DBHelper.migrate();
+				println("db migration complete.");
+				return 0;
+			} catch (Exception e) {
+				println("db migration failed.");
+				println(e.getMessage());
+				if (opts.verbose == Boolean.TRUE) {
+					e.printStackTrace();
+				}
+				return -1;
+			}
 		}
 
 		Injector injector = Guice.createInjector(new MyModule(PERSISTENCE_UNIT));

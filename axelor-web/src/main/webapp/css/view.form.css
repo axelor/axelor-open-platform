@@ -136,6 +136,14 @@ table.form-layout td.form-item > *,
 	width: 100%;
 }
 
+.form-item-container.editable.translatable::before {
+	font-family: FontAwesome;
+	font-size: 12px;
+	content: "\f024";
+	float: right;
+  	margin-top: -18px;
+}
+
 table.form-layout td.form-item.v-align-top {
 	vertical-align: top;	
 }

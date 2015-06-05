@@ -57,6 +57,9 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		if (field.width && field.width !== '*' && !element.is('label')) {
 			element.width(field.width);
 		}
+		if (field.translatable) {
+			element.addClass("translatable");
+		}
 		
 		scope.$events = {};
 		scope.field = field || {};

@@ -188,7 +188,26 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		var selected = $scope.selection.length ? $scope.selection[0] : null;
 		return _canRemove() && selected !== null;
 	};
-	
+
+	$scope.canCopy = function () {
+		if (!$scope.field || !($scope.field.widgetAttrs||{}).canCopy) return false;
+		if (!$scope.canNew()) return false;
+		if (!$scope.selection || $scope.selection.length !== 1) return false;
+		var record = $scope.dataView.getItem(_.first($scope.selection));
+		return record && record.id > -1;
+	};
+
+	$scope.onCopy = function() {
+		var ds = $scope._dataSource;
+		var index = _.first($scope.selection);
+		var item = $scope.dataView.getItem(index);
+		if (item && item.id > 0) {
+			ds.copy(item.id).success(function(record) {
+				$scope.select([record]);
+			});
+		}
+	};
+
 	$scope.onEdit = function() {
 		var selected = $scope.selection.length ? $scope.selection[0] : null;
 		if (selected !== null) {
@@ -607,6 +626,7 @@ var panelRelatedTemplate =
 		"<div class='icons-bar pull-right' ng-show='!isReadonly()'>" +
 			"<i ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()' class='fa fa-pencil'></i>" +
 			"<i ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()' class='fa fa-plus'></i>" +
+			"<i ng-click='onCopy()' ng-show='hasPermission(\"create\") && !isDisabled() && canCopy()' class='fa fa-plus-circle'></i>" +
 			"<i ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()' class='fa fa-minus'></i>" +
 			"<i ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()' class='fa fa-search'></i>" +
 		"</div>" +
