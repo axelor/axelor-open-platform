@@ -21,6 +21,10 @@ html, body {
 	margin: 0 !important;
 }
 
+body {
+	font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
 [ng\:cloak], [ng-cloak], .ng-cloak {
    display: none;
 }
@@ -217,7 +221,7 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 }
 
 .ui-widget {
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;;
+	font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size: inherit;
 }
 
@@ -788,7 +792,7 @@ header .navbar .dropdown .devider {
 }
 
 .nvtooltip {
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;;
+	font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size: inherit;
 	padding: 0;
 	opacity: 0.94 !important;
