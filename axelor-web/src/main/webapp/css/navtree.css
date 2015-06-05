@@ -16,58 +16,116 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
- .nav-tree {
-	display: inline-block;
+.nav-tree,
+.nav-tree * {
 	box-sizing: border-box;
-	min-width: 100%;
- }
-
-.nav-tree .nav-header {
-	margin-top: 0px;
-	text-transform: none;
 }
 
+.nav-tree,
+.nav-tree ul {
+	margin: 0 0 0px 15px;
+}
+
+.nav-tree ul,
 .nav-tree li {
-	white-space: nowrap;
+	list-style: none;
 }
 
-.nav-tree li a {
-	color: #333;
-	padding: 3px 6px;
-	cursor: pointer;
-	outline: none;
+.nav-tree > ul {
+	margin: 1px 4px;
+}
+
+.nav-tree li > ul {
+	display: none;
+}
+
+.nav-tree li.open > ul {
+	display: block;
+}
+
+.nav-tree li.animate > ul  {
+	display: block;
+	height: 0;
+	position: relative;
 	overflow: hidden;
-	text-overflow: ellipsis;
+	transition: height .35s ease;
 }
 
-.nav-tree li i.handle {
-	width: 16px;
-	display: inline-block;
-	text-align: center;
+.nav-tree li > a {
+	color: #a7b1c2;
+	text-decoration: none;
+	outline: none;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 1);
+	font-weight: 600;
 }
 
-.nav-tree img,
-.nav-tree li i.icon {
-	width: 16px;
-	height: 16px;
-	max-width: 16px;
-	min-width: 16px;
-	margin-top: -4px;
-	margin-right: 4px
+.nav-tree li > a,
+.nav-tree li > a::before {
+	line-height: 2.5em;
+	height: 2.5em;
 }
 
-.nav-tree li.active a {
-	background-color: #0074CC;
-	border-color: #05C #05C #003580;
-	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+.nav-tree li > a,
+.nav-tree li > a:focus {
+	background: transparent;
 }
 
-@media screen and (max-width: 768px) {
-	.nav-tree li a {
-		padding: 10px 0;
-	}
-	.nav-tree li i.fa {
-		width: 22px;
-		font-size: 16px;
-	}
+.nav-tree li > a > img,
+.nav-tree li > a > i {
+	padding-right: 8px;
+	width: 24px;
+}
+
+.nav-tree li > a * {
+	position: relative;
+}
+
+.nav-tree li > a::before {
+	content: " ";
+	position: absolute;
+	box-sizing: border-box;
+	width: 100%;
+	left: 0;
+}
+
+.nav-tree > li > a,
+.nav-tree > li > a::before {
+	line-height: 3.5em;
+	height: 3.5em;
+}
+
+.nav-tree li > a:hover::before {
+	background-color: #293846;
+}
+
+.nav-tree li.active > a::before {
+	background-color: #293846;
+	border-left: 3px solid #19aa8d;
+}
+
+.nav-tree li.active > a {
+	color: #fff;
+}
+
+.nav-tree li.folder > a::after {
+	font-family: "FontAwesome";
+	font-size: 10px;
+	content: "\f053";
+	position: absolute;
+	right: 16px;
+	z-index: 2;
+}
+
+.nav-tree li.folder.animate > a::after {
+	transform: rotate(-90deg);
+	transition: all .35s ease;
+}
+
+.nav-tree li.folder.open.animate > a::after {
+	transform: rotate(0deg);
+	transition: all .35s ease;
+}
+
+.nav-tree li.folder.open > a::after {
+	transform: rotate(-90deg);
 }

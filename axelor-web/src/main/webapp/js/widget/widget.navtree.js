@@ -15,64 +15,164 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-angular.module('axelor.ui').directive('navTree', function() {
+
+var ui = angular.module('axelor.ui');
+
+ui.directive('navTree', ['MenuService', function(MenuService) {
+
 	return {
-		restrict: 'EA',
-		require: '?ngModel',
 		scope: {
-			itemClick: '&' 
+			itemClick: "&"
 		},
+		controller: ["$scope", function ($scope) {
 
-		controller: ['$scope', '$element', 'MenuService', function($scope, $element, MenuService) {
+			var items = [];
+			var menus = [];
+			var nodes = {};
 
-			var hasMobileMenus = false;
+			this.onClick = $scope.itemClick();
 
-			function canAccept(item) {
-				if (item.left === false) {
-					return false;
-				}
-				if (axelor.device.mobile && item.mobile === false && hasMobileMenus) {
-					return false;
-				}
-				if (item.mobile) {
-					hasMobileMenus = true;
-				}
-				return true;
-			}
+			this.load = function (data) {
+				if (!data || !data.length) return;
 
-			$scope.load = function(parent, successFn) {
-
-				var name = parent ? parent.name : null;
-
-				MenuService.get(name).success(function(res){
-					var items = _.filter(res.data, canAccept);
-					if (successFn) {
-						return successFn(items);
-					}
-					$element.navtree('addItems', items);
+				items = data;
+				items.forEach(function (item) {
+					nodes[item.name] = item;
+					item.children = [];
 				});
+
+				items.forEach(function (item) {
+					var node = nodes[item.parent];
+					if (node) {
+						node.children.push(item);
+					} else {
+						menus.push(item);
+					}
+				});
+
+				items.forEach(function (item) {
+					if (item.children.length === 0) {
+						delete item.children;
+					}
+				});
+				$scope.menus = menus;
 			};
 		}],
-		
-		link: function(scope, elem, attrs) {
+		link: function (scope, element, attrs, ctrl) {
 			
-			var onClickHandler = scope.itemClick();
+			MenuService.all().success(function (res) {
+				ctrl.load(res.data);
+			});
+		},
+		replace: true,
+		template:
+			"<ul class='nav nav-tree'>" +
+				"<li ng-repeat='menu in menus' nav-sub-tree x-menu='menu'></li>" +
+			"</ul>"
+	};
+}]);
 
-			$(elem).navtree({
-				idField: 'name',
-				onLazyFetch: function(parent, successFn) {
-					scope.load(parent, successFn);
-				},
-				onClick: function(e, record) {
-					if (record.isFolder)
-						return;
-					onClickHandler(e, record);
+ui.directive('navSubTree', ['$compile', function ($compile) {
+
+	return {
+		scope: {
+			menu: "="
+		},
+		require: "^navTree",
+		link: function (scope, element, attrs, ctrl) {
+			var menu = scope.menu;
+			if (menu.icon && menu.icon.indexOf('fa') === 0) {
+				menu.fa = menu.icon;
+				delete menu.icon;
+			} else if (!menu.icon) {
+				menu.fa = 'fa';
+			}
+			if (menu.children) {
+				var sub = $(
+					"<ul class='nav nav-sub-tree'>" +
+						"<li ng-repeat='child in menu.children' nav-sub-tree x-menu='child'></li>" +
+					"</ul>");
+				sub = $compile(sub)(scope);
+				sub.appendTo(element);
+			}
+
+			var animation = false;
+
+			function show(el) {
+
+				if (animation || element.hasClass('open')) {
+					return;
+				}
+
+				function done() {
+					element.addClass('open');
+					element.removeClass('animate');
+					el.height('');
+					animation = false;
+				}
+
+				hide(element.siblings().children('ul.open'));
+
+				animation = true;
+
+				element.addClass('animate');
+				el.height(el[0].scrollHeight);
+
+				setTimeout(done, 300);
+			}
+
+			function hide(el) {
+
+				if (animation || !element.hasClass('open')) {
+					return;
+				}
+
+				function done() {
+					element.removeClass('open');
+					element.removeClass('animate');
+					animation = false;
+				}
+
+				animation = true;
+
+				el.height(el.height())[0].offsetHeight;
+				element.addClass('animate');
+				el.height(0);
+
+				setTimeout(done, 300);
+			}
+
+			element.on('click', '> a', function (e) {
+				e.preventDefault();
+
+				if (animation) return;
+
+				var $list = element.children('ul');
+
+				element.parents('.nav-tree').find('li.active').not(element).removeClass('active');
+				element.addClass('active');
+
+				if (!menu.isFolder) {
+					scope.applyLater(function () {
+						ctrl.onClick(e, menu);
+					});
+				}
+				if ($list.size() === 0) return;
+				if (element.hasClass('open')) {
+					hide($list)
+				} else {
+					show($list);
 				}
 			});
-
-			scope.load();
 		},
-		template: '<div></div>',
-		replace: true
-	};
-});
+		replace: true,
+		template:
+			"<li ng-class='{folder: menu.children}'>" +
+				"<a href='#'>" +
+					"<img ng-if='menu.icon' ng-src='{{menu.icon}}'></img>" +
+					"<i ng-if='menu.fa' class='fa' ng-class='menu.fa'></i>" +
+					"<span>{{menu.title}}</span>" +
+				"</a>" +
+			"</li>"
+	}
+}]);

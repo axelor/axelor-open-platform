@@ -415,9 +415,6 @@ input[readonly], select[readonly], textarea[readonly] {
 		position: absolute;
 		top: 0;
 	}
-	.nav-tree li a {
-		overflow: inherit !important;
-	}
 	#sidebar {
 		overflow: auto !important;
 	}
