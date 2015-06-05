@@ -148,6 +148,16 @@ class AppPlugin extends AbstractPlugin {
 				jvmArgs "-Daxelor.config=" + System.getProperty('axelor.config')
 			}
 
+			task("migrate", dependsOn: "classes", type: JavaExec) {
+				description "Run database migration scripts."
+				group "Axelor"
+				main = "com.axelor.app.internal.AppInitCli"
+				classpath = sourceSets.main.runtimeClasspath
+				args "-M"
+				if (project.properties.verbose) args "--verbose"
+				jvmArgs "-Daxelor.config=" + System.getProperty('axelor.config')
+			}
+
 			compileJava.dependsOn "generateCode"
 
 			war.dependsOn "copyWebapp"

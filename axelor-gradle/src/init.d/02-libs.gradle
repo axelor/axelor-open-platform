@@ -42,6 +42,9 @@ def libs = [
 	hibernate_ehcache: 	"org.hibernate:hibernate-ehcache:4.2.8.Final",
 	ehcache:		   	"net.sf.ehcache:ehcache:2.8.1",
 
+	// flyway
+	flywaydb:			"org.flywaydb:flyway-core:3.2.1",
+
 	// eclipselink
 	eclipselink_moxy:	"org.eclipse.persistence:org.eclipse.persistence.moxy:2.5.2",
 

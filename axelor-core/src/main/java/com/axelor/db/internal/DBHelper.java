@@ -33,6 +33,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.FlywayException;
 import org.w3c.dom.Document;
 
 import com.axelor.app.AppSettings;
@@ -51,6 +53,7 @@ public class DBHelper {
 	private static final String UNACCENT_CREATE = "CREATE EXTENSION IF NOT EXISTS unaccent";
 
 	private static final String XPATH_ROOT = "/persistence/persistence-unit[@name='persistenceUnit']";
+	private static final String XPATH_ROOT_TEST = "/persistence/persistence-unit[@name='testUnit']";
 
 	private static final String XPATH_NON_JTA_DATA_SOURCE 	= "non-jta-data-source";
 	private static final String XPATH_SHARED_CACHE_MODE 	= "shared-cache-mode";
@@ -80,9 +83,9 @@ public class DBHelper {
 	private DBHelper() {
 	}
 
-	private static String evaluate(XPath xpath, String path, Document document) {
+	private static String evaluate(XPath xpath, String base, String path, Document document) {
 		try {
-			return xpath.evaluate(XPATH_ROOT + "/" + path, document).trim();
+			return xpath.evaluate(base + "/" + path, document).trim();
 		} catch (Exception e) {
 		}
 		return null;
@@ -106,14 +109,20 @@ public class DBHelper {
 			final DocumentBuilder db = dbf.newDocumentBuilder();
 			final Document document = db.parse(res);
 
-			jndiName = evaluate(xpath, XPATH_NON_JTA_DATA_SOURCE, document);
-			cacheMode = evaluate(xpath, XPATH_SHARED_CACHE_MODE, document);
+			jndiName = evaluate(xpath, XPATH_ROOT, XPATH_NON_JTA_DATA_SOURCE, document);
+			cacheMode = evaluate(xpath, XPATH_ROOT, XPATH_SHARED_CACHE_MODE, document);
 
 			if (isBlank(jndiName) && isBlank(jdbcDriver)) {
-				jdbcDriver		= evaluate(xpath, XPATH_PERSISTENCE_DRIVER, document);
-				jdbcUrl 		= evaluate(xpath, XPATH_PERSISTENCE_URL, document);
-				jdbcUser 		= evaluate(xpath, XPATH_PERSISTENCE_USER, document);
-				jdbcPassword 	= evaluate(xpath, XPATH_PERSISTENCE_PASSWORD, document);
+				jdbcDriver		= evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_DRIVER, document);
+				jdbcUrl 		= evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_URL, document);
+				jdbcUser 		= evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_USER, document);
+				jdbcPassword 	= evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_PASSWORD, document);
+			}
+			if (isBlank(jndiName) && isBlank(jdbcDriver)) {
+				jdbcDriver		= evaluate(xpath, XPATH_ROOT_TEST, XPATH_PERSISTENCE_DRIVER, document);
+				jdbcUrl 		= evaluate(xpath, XPATH_ROOT_TEST, XPATH_PERSISTENCE_URL, document);
+				jdbcUser 		= evaluate(xpath, XPATH_ROOT_TEST, XPATH_PERSISTENCE_USER, document);
+				jdbcPassword 	= evaluate(xpath, XPATH_ROOT_TEST, XPATH_PERSISTENCE_PASSWORD, document);
 			}
 
 		} catch (Exception e) {
@@ -149,6 +158,24 @@ public class DBHelper {
 		}
 
 		return DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPassword);
+	}
+
+	/**
+	 * Run database migration scripts using flyway migration engine.
+	 * 
+	 */
+	public static void migrate() {
+		final Flyway flyway = new Flyway();
+		if (!isBlank(jndiName)) {
+			try {
+				flyway.setDataSource((DataSource) InitialContext.doLookup(jndiName));
+			} catch (NamingException e) {
+				throw new FlywayException(e);
+			}
+		} else {
+			flyway.setDataSource(jdbcUrl, jdbcUser, jdbcPassword);
+		}
+		flyway.migrate();
 	}
 
 	/**

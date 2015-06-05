@@ -106,6 +106,8 @@ public class GradleCommands implements CommandProvider {
 			launcher.withArguments(arguments.toArray(new String[] {}));
 			// Run the build
 			launcher.run();
+		} catch (Exception e) {
+			System.err.println("Command failed: " + e);
 		} finally {
 			connection.close();
 		}
@@ -183,6 +185,19 @@ public class GradleCommands implements CommandProvider {
 		}
 		if (modules != null && modules.length > 0) {
 			args.add("-Pmodules=" + Joiner.on(",").join(modules));
+		}
+		return execute(args.toArray(new String[] {}));
+	}
+
+	@CliCommand(name = "migrate", usage = "[OPTIONS]", help = "run database migration scripts")
+	public CommandResult migrate(
+			@CliOption(name = "config", shortName = 'c', argName = "FILE", help = "application configuration file", required = true)
+			String config,
+			@CliOption(name = "verbose", shortName = 'v', help = "verbose output")
+			boolean verbose) {
+		final List<String> args = Lists.newArrayList("-q", "-x", "test", "migrate", "-Daxelor.config=" + config);
+		if (verbose) {
+			args.add("-Pverbose=true");
 		}
 		return execute(args.toArray(new String[] {}));
 	}
