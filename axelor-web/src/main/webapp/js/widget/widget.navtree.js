@@ -45,6 +45,7 @@ ui.directive('navTree', ['MenuService', function(MenuService) {
 					var node = nodes[item.parent];
 					if (node) {
 						node.children.push(item);
+						item.icon = null;
 					} else {
 						menus.push(item);
 					}
@@ -84,8 +85,6 @@ ui.directive('navSubTree', ['$compile', function ($compile) {
 			if (menu.icon && menu.icon.indexOf('fa') === 0) {
 				menu.fa = menu.icon;
 				delete menu.icon;
-			} else if (!menu.icon) {
-				menu.fa = 'fa';
 			}
 			if (menu.children) {
 				var sub = $(
