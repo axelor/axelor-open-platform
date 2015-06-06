@@ -21,7 +21,6 @@
 	box-sizing: border-box;
 }
 
-.nav-tree,
 .nav-tree ul {
 	margin: 0 0 0px 15px;
 }
@@ -48,7 +47,7 @@
 	height: 0;
 	position: relative;
 	overflow: hidden;
-	transition: height .35s ease;
+	transition: all .35s ease;
 }
 
 .nav-tree li > a {
@@ -94,17 +93,53 @@
 	height: 3.5em;
 }
 
+.nav-tree li > a:hover,
+.nav-tree li.active > a {
+	color: #fff;
+}
+
 .nav-tree li > a:hover::before {
 	background-color: #293846;
 }
 
-.nav-tree li.active > a::before {
-	background-color: #293846;
-	border-left: 3px solid #19aa8d;
+.nav-tree li.open a:hover::before {
+	left: 3px;
 }
 
-.nav-tree li.active > a {
-	color: #fff;
+.nav-tree > li {
+	position: relative;
+	overflow: hidden;
+}
+
+.nav-tree > li > a {
+	padding-left: 16px;
+}
+
+.nav-tree > li > ul {
+	padding-left: 15px;
+}
+
+.nav-tree > li > ul > li:last-child {
+	margin-bottom: 16px;
+}
+
+.nav-tree > li.open::before,
+.nav-tree > li.active::before {
+	content: " ";
+	background-color: #293846;
+	position: absolute;
+	width: 100%;
+	left: 0;
+	height: 100%;
+}
+
+.nav-tree > li.animate::before {
+	border-left: 0;
+}
+
+.nav-tree > li.open::before {
+	border-left: 3px solid #19aa8d;
+	transition: all .35s ease;
 }
 
 .nav-tree li.folder > a::after {
