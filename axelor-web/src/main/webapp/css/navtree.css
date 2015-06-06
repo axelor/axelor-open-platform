@@ -110,7 +110,7 @@
 	transform: rotate(-90deg);
 }
 
-.nav-tree ul > li:last-child {
+.nav-tree > li > ul > li:last-child {
 	margin-bottom: 10px;
 }
 
