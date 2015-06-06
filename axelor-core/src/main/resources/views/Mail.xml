@@ -96,7 +96,7 @@
     title="Messaging" icon="fa-envelope"/>
 
   <menuitem name="menu-mail-inbox" title="Inbox" parent="menu-mail"
-    action="mail.inbox" order="-90"/>
+    action="mail.inbox" order="-90" tag-get="com.axelor.mail.web.MailController:inboxMenuTag()" tag-style="warning"/>
    <menuitem name="menu-mail-important" title="Important" parent="menu-mail"
     action="mail.important" order="-85"/>
   <menuitem name="menu-mail-archive" title="Archived" parent="menu-mail"

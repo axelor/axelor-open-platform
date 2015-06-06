@@ -120,6 +120,16 @@
         <xsd:documentation>Specify a tag to show on menu item.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="tag-count" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether to use count of menu action records as tag.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="tag-get" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify a method call to get tag value.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="tag-style" type="tns:LabelStyle">
       <xsd:annotation>
         <xsd:documentation>Specify the tag display style.</xsd:documentation>

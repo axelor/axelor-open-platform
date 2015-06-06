@@ -30,7 +30,17 @@ ui.directive('navTree', ['MenuService', function(MenuService) {
 			var menus = [];
 			var nodes = {};
 
-			this.onClick = $scope.itemClick();
+			var handler = $scope.itemClick();
+
+			this.onClick = function (e, menu) {
+				if (menu.isFolder) {
+					return;
+				}
+				handler(e, menu);
+				MenuService.tags().success(function (res) {
+					this.update(res.data);
+				}.bind(this));
+			}
 
 			this.load = function (data) {
 				if (!data || !data.length) return;
@@ -57,6 +67,20 @@ ui.directive('navTree', ['MenuService', function(MenuService) {
 					}
 				});
 				$scope.menus = menus;
+			};
+
+			this.update = function (data) {
+				if (!data || data.length === 0) return;
+				data.forEach(function (item) {
+					var node = nodes[item.name];
+					if (node) {
+						node.tag = item.tag;
+						node.tagStyle = item.tagStyle;
+						if (node.tagStyle) {
+							node.tagCss = "label-" + node.tagStyle;
+						}
+					}
+				});
 			};
 		}],
 		link: function (scope, element, attrs, ctrl) {

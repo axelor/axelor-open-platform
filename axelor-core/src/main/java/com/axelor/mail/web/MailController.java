@@ -180,6 +180,18 @@ public class MailController extends JpaSupport {
 		response.setStatus(ActionResponse.STATUS_SUCCESS);
 	}
 
+	public String inboxMenuTag() {
+		Long total = count(SQL_INBOX);
+		Long unread = countUnread();
+		if (total == null) {
+			return null;
+		}
+		if (unread == null) {
+			unread = 0L;
+		}
+		return String.format("%s/%s", unread, total);
+	}
+
 	private List<MailMessage> findChildren(MailMessage message) {
 		final List<MailMessage> all = new ArrayList<>();
 		if (message.getReplies() == null) {

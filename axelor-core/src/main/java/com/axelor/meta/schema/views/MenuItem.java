@@ -83,6 +83,12 @@ public class MenuItem extends AbstractWidget {
 	@XmlAttribute
 	private String tag;
 
+	@XmlAttribute(name = "tag-get")
+	private String tagGet;
+
+	@XmlAttribute(name = "tag-count")
+	private Boolean tagCount;
+
 	@XmlAttribute(name = "tag-style")
 	private String tagStyle;
 
@@ -238,12 +244,34 @@ public class MenuItem extends AbstractWidget {
 		this.readonlyIf = readonlyIf;
 	}
 
+	@JsonIgnore
 	public String getTag() {
 		return tag;
 	}
 
+	@JsonGetter("tag")
+	public String getLocalizedTag() {
+		return I18n.get(tag);
+	}
+
 	public void setTag(String tag) {
 		this.tag = tag;
+	}
+
+	public String getTagGet() {
+		return tagGet;
+	}
+
+	public void setTagGet(String tagGet) {
+		this.tagGet = tagGet;
+	}
+
+	public Boolean getTagCount() {
+		return tagCount;
+	}
+
+	public void setTagCount(Boolean tagCount) {
+		this.tagCount = tagCount;
 	}
 
 	public String getTagStyle() {

@@ -29,13 +29,12 @@
     <option value="action-workflow">action-workflow</option>
   </selection>
 
-  <selection name="hilite.style.selection">
+  <selection name="label.style.selection">
     <option value="default">Default</option>
-    <option value="primary">Primary</option>
     <option value="important">Important</option>
     <option value="success">Success</option>
-    <option value="inverse">Inverse</option>
     <option value="warning">Warning</option>
+    <option value="inverse">Inverse</option>
     <option value="info">Information</option>
   </selection>
 
@@ -149,22 +148,28 @@
 
   <form name="meta-menu-form" title="Menu Item" model="com.axelor.meta.db.MetaMenu">
     <panel title="Overview">
-      <field name="name"/>
-      <field name="parent" domain="self.name != :name"/>
-      <field name="title"/>
-      <field name="icon"/>
-      <field name="action"/>
-      <field name="module"/>
-      <field name="tag" />
-      <field name="tagStyle" />
-    </panel>
-    <panel title="Visibility" colSpan="12">
-      <field name="order"/>
-      <field name="priority"/>
-      <field name="top" widget="inline-checkbox"/>
-      <field name="left" widget="inline-checkbox"/>
-      <field name="mobile" widget="inline-checkbox"/>
-      <field name="hidden" widget="inline-checkbox"/>
+      <panel title="General" colSpan="12">
+        <field name="name"/>
+        <field name="parent" domain="self.name != :name"/>
+        <field name="title"/>
+        <field name="icon"/>
+        <field name="action"/>
+        <field name="module"/>
+      </panel>
+      <panel title="Visibility" colSpan="6">
+        <field name="order"/>
+        <field name="priority"/>
+        <field name="top" widget="inline-checkbox"/>
+        <field name="left" widget="inline-checkbox"/>
+        <field name="mobile" widget="inline-checkbox"/>
+        <field name="hidden" widget="inline-checkbox"/>
+      </panel>
+      <panel title="Tag" colSpan="6">
+        <field name="tag"/>
+        <field name="tagStyle"/>
+        <field name="tagGet" title="Call" hideIf="tag"/>
+        <field name="tagCount" title="Count" hideIf="tag"/>
+      </panel>
     </panel>
     <panel-related field="groups"/>
   </form>
