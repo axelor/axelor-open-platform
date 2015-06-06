@@ -93,17 +93,16 @@
 
   <!-- menu -->
   <menuitem name="menu-mail" order="-110"
-    title="Messaging" icon="img/mail-open.png"/>
+    title="Messaging" icon="fa-envelope"/>
 
   <menuitem name="menu-mail-inbox" title="Inbox" parent="menu-mail"
-    action="mail.inbox" icon="fa-envelope" order="-90"/>
+    action="mail.inbox" order="-90" tag-get="com.axelor.mail.web.MailController:inboxMenuTag()" tag-style="warning"/>
    <menuitem name="menu-mail-important" title="Important" parent="menu-mail"
-    action="mail.important" icon="fa-envelope" order="-85"/>
+    action="mail.important" order="-85"/>
   <menuitem name="menu-mail-archive" title="Archived" parent="menu-mail"
-    action="mail.archive" icon="fa-archive"  order="-80"/>
-  <menuitem name="menu-mail-groups" title="Groups" parent="menu-mail"
-    icon="fa-group"  order="-70"/>
+    action="mail.archive" order="-80"/>
+  <menuitem name="menu-mail-groups" title="Groups" parent="menu-mail" order="-70"/>
   <menuitem name="menu-mail-groups-all" title="All Groups" parent="menu-mail-groups"
-    action="mail.groups" icon="fa-group"  order="-10"/>
+    action="mail.groups" order="-10"/>
 
 </object-views>

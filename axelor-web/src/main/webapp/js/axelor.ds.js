@@ -28,6 +28,7 @@
 		function get(parent) {
 
 			return $http.get('ws/action/menu', {
+				cache: true,
 				params : {
 					parent : parent
 				}
@@ -35,7 +36,16 @@
 		}
 
 		function all() {
-			return $http.get('ws/action/menu/all');
+			return $http.get('ws/action/menu/all', {
+				cache: true
+			});
+		}
+
+		function tags() {
+			return $http.get('ws/action/menu/tags', {
+				silent: true,
+				transformRequest: []
+			});
 		}
 
 		function action(name, options) {
@@ -49,6 +59,7 @@
 		return {
 			get: get,
 			all: all,
+			tags: tags,
 			action: action
 		};
 	}]);

@@ -103,12 +103,7 @@ header {
 }
 
 .sidebar {
-	background-color: #f5f5f5;
-}
-
-.sidebar .nav-tree li.active a {
-	background-color: #5377b1;
-	background-image: none;
+	background-color: #2f4050;
 }
 
 .slick-header-menuitem:hover,

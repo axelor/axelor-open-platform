@@ -90,7 +90,6 @@ load([
 	'js/lib/utils.js',
 	'js/lib/dialogs.js',
 	'js/lib/tabs.js',
-	'js/lib/navtree.js',
 
 	'js/axelor.auth.js',
 	'js/axelor.app.js',

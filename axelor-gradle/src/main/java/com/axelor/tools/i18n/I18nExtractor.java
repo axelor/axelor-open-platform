@@ -173,6 +173,7 @@ public class I18nExtractor {
 					accept(new I18nItem(help, file, locator.getLineNumber()));
 					accept(new I18nItem(message, file, locator.getLineNumber()));
 					accept(new I18nItem(error, file, locator.getLineNumber()));
+					accept(new I18nItem(attributes.getValue("tag"), file, locator.getLineNumber()));
 					accept(new I18nItem(attributes.getValue("prompt"), file, locator.getLineNumber()));
 					accept(new I18nItem(attributes.getValue("placeholder"), file, locator.getLineNumber()));
 					

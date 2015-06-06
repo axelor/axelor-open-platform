@@ -274,7 +274,7 @@ class Property {
 	}
 
 	boolean isOrphan() {
-		return attrs["orphan"] != "false"
+		return attrs["orphan"] == "true"
 	}
 
 	boolean isPassword() {

@@ -115,6 +115,26 @@
         <xsd:documentation>Specify whether to hide the menu with given name.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="tag" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify a tag to show on menu item.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="tag-count" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether to use count of menu action records as tag.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="tag-get" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify a method call to get tag value.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="tag-style" type="tns:LabelStyle">
+      <xsd:annotation>
+        <xsd:documentation>Specify the tag display style.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 
   <xsd:complexType name="ActionMenuItem">
@@ -457,6 +477,17 @@
       <xsd:enumeration value="warning"/>
       <xsd:enumeration value="success"/>
       <xsd:enumeration value="danger"/>
+      <xsd:enumeration value="info"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="LabelStyle">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="default"/>
+      <xsd:enumeration value="important"/>
+      <xsd:enumeration value="success"/>
+      <xsd:enumeration value="warning"/>
+      <xsd:enumeration value="inverse"/>
       <xsd:enumeration value="info"/>
     </xsd:restriction>
   </xsd:simpleType>

@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,11 +39,14 @@ import com.axelor.auth.db.User;
 import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
+import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.inject.Beans;
 import com.axelor.meta.ActionHandler;
+import com.axelor.meta.MetaStore;
+import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
@@ -53,6 +57,7 @@ import com.axelor.meta.db.repo.MetaFileRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.actions.Action;
+import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.ChartView;
 import com.axelor.meta.schema.views.ChartView.ChartConfig;
@@ -138,6 +143,8 @@ public class MetaService {
 			item.setOrder(menu.getOrder());
 			item.setTitle(menu.getTitle());
 			item.setIcon(menu.getIcon());
+			item.setTag(getTag(menu));
+			item.setTagStyle(menu.getTagStyle());
 			item.setTop(menu.getTop());
 			item.setLeft(menu.getLeft());
 			item.setMobile(menu.getMobile());
@@ -155,6 +162,69 @@ public class MetaService {
 		}
 
 		return filter(menus);
+	}
+
+	@SuppressWarnings("all")
+	private String getTag(MetaMenu item) {
+
+		final String tag = item.getTag();
+		final String call = item.getTagGet();
+		final MetaAction action = item.getAction();
+
+		if (tag != null) { return tag; }
+		if (call != null) {
+			final ActionRequest request = new ActionRequest();
+			final ActionHandler handler = Beans.get(ActionHandler.class).forRequest(request);
+			request.setAction(call);
+			try {
+				return (String) handler.execute().getItem(0);
+			} catch (Exception e) {
+				LOG.error("Unable to read tag for menu: {}", item.getName());
+				LOG.trace("Error", e);
+			}
+		}
+
+		if (item.getTagCount() == Boolean.TRUE && action != null) {
+			final ActionView act;
+			try {
+				act = (ActionView) MetaStore.getAction(action.getName());
+			} catch (Exception e) {
+				return null;
+			}
+			if (act == null) {
+				return null;
+			}
+			final ActionRequest request = new ActionRequest();
+			request.setAction(action.getName());
+			request.setModel(action.getModel());
+			request.setData(new HashMap<String, Object>());
+			final ActionHandler handler = Beans.get(ActionHandler.class).forRequest(request);
+			try {
+				final Map<String, Object> data = (Map) ((Map) handler.execute().getItem(0)).get("view");
+				final Map<String, Object> context = (Map) data.get("context");
+				final String domain = (String) data.get("domain");
+				final JpaRepository<?> repo = JpaRepository.of((Class) request.getBeanClass());
+				return "" + (domain == null ?
+						repo.all().count() :
+						repo.all().filter(domain).bind(context).count());
+			} catch (Exception e) {
+				LOG.error("Unable to read tag for menu: {}", item.getName());
+				LOG.trace("Error", e);
+			}
+		}
+
+		return null;
+	}
+
+	public List<MenuItem> getMenusWithTag() {
+		final List<MenuItem> all = getMenus();
+		final List<MenuItem> res = new ArrayList<>();
+		for (MenuItem item : all) {
+			if (item.getTag() != null) {
+				res.add(item);
+			}
+		}
+		return res;
 	}
 
 	public List<MenuItem> getMenus() {

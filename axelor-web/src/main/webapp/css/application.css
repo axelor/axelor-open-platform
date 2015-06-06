@@ -15,9 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 /**
  * Master CSS file.
  */
+
+@import url("../lib/open-sans/css/open-sans.css");
 @import url('../lib/jquery.ui/css/smoothness/jquery-ui.css');
 @import url('../lib/jquery.timepicker/jquery-ui-timepicker-addon.css');
 

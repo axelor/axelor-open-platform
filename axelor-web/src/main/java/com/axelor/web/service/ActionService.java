@@ -17,6 +17,11 @@
  */
 package com.axelor.web.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -29,6 +34,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import com.axelor.meta.ActionHandler;
+import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.Response;
@@ -67,6 +73,29 @@ public class ActionService extends AbstractService {
 		Response response = new Response();
 		try {
 			response.setData(service.getMenus());
+			response.setStatus(Response.STATUS_SUCCESS);
+		} catch (Exception e) {
+			if (LOG.isErrorEnabled())
+				LOG.error(e.getMessage(), e);
+			response.setException(e);
+		}
+		return response;
+	}
+
+	@GET
+	@Path("menu/tags")
+	public Response tags() {
+		Response response = new Response();
+		List<Object> data = new ArrayList<>();
+		try {
+			for (MenuItem item : service.getMenusWithTag()) {
+				Map<String, Object> tag = new HashMap<>();
+				tag.put("name", item.getName());
+				tag.put("tag", item.getTag());
+				tag.put("tagStyle", item.getTagStyle());
+				data.add(tag);
+			}
+			response.setData(data);
 			response.setStatus(Response.STATUS_SUCCESS);
 		} catch (Exception e) {
 			if (LOG.isErrorEnabled())
