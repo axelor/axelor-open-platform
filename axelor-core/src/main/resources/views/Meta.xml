@@ -29,6 +29,16 @@
     <option value="action-workflow">action-workflow</option>
   </selection>
 
+  <selection name="hilite.style.selection">
+    <option value="default">Default</option>
+    <option value="primary">Primary</option>
+    <option value="important">Important</option>
+    <option value="success">Success</option>
+    <option value="inverse">Inverse</option>
+    <option value="warning">Warning</option>
+    <option value="info">Information</option>
+  </selection>
+
   <grid title="All Modules" name="meta-module-grid" model="com.axelor.meta.db.MetaModule"
     canDelete="false" canNew="false" canEdit="false" edit-icon="false">
     <hilite color="danger" if="!installed &amp;&amp; !pending"/>
@@ -137,7 +147,7 @@
     <field name="priority"/>
   </grid>
 
-  <form title="Menu Item" name="meta-menu-form" model="com.axelor.meta.db.MetaMenu">
+  <form name="meta-menu-form" title="Menu Item" model="com.axelor.meta.db.MetaMenu">
     <panel title="Overview">
       <field name="name"/>
       <field name="parent" domain="self.name != :name"/>
@@ -145,16 +155,18 @@
       <field name="icon"/>
       <field name="action"/>
       <field name="module"/>
+      <field name="tag" />
+      <field name="tagStyle" />
+    </panel>
+    <panel title="Visibility" colSpan="12">
       <field name="order"/>
       <field name="priority"/>
-      <panel itemSpan="4">
-        <field name="top"/>
-        <field name="left"/>
-        <field name="mobile"/>
-        <field name="hidden"/>
-      </panel>
+      <field name="top" widget="inline-checkbox"/>
+      <field name="left" widget="inline-checkbox"/>
+      <field name="mobile" widget="inline-checkbox"/>
+      <field name="hidden" widget="inline-checkbox"/>
     </panel>
-    <panel-related field="groups" />
+    <panel-related field="groups"/>
   </form>
 
   <grid title="Action Menus" name="meta-action-menu-grid" model="com.axelor.meta.db.MetaActionMenu">

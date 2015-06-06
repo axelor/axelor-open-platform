@@ -80,6 +80,12 @@ public class MenuItem extends AbstractWidget {
 	@XmlAttribute
 	private String readonlyIf;
 
+	@XmlAttribute
+	private String tag;
+
+	@XmlAttribute(name = "tag-style")
+	private String tagStyle;
+
 	public String getXmlId() {
 		return xmlId;
 	}
@@ -230,5 +236,21 @@ public class MenuItem extends AbstractWidget {
 
 	public void setReadonlyIf(String readonlyIf) {
 		this.readonlyIf = readonlyIf;
+	}
+
+	public String getTag() {
+		return tag;
+	}
+
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
+
+	public String getTagStyle() {
+		return tagStyle;
+	}
+
+	public void setTagStyle(String tagStyle) {
+		this.tagStyle = tagStyle;
 	}
 }

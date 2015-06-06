@@ -115,6 +115,16 @@
         <xsd:documentation>Specify whether to hide the menu with given name.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="tag" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify a tag to show on menu item.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="tag-style" type="tns:HiliteStyle">
+      <xsd:annotation>
+        <xsd:documentation>Specify the tag display style.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 
   <xsd:complexType name="ActionMenuItem">
@@ -456,6 +466,8 @@
       <xsd:enumeration value="primary"/>
       <xsd:enumeration value="warning"/>
       <xsd:enumeration value="success"/>
+      <xsd:enumeration value="important"/>
+      <xsd:enumeration value="inverse"/>
       <xsd:enumeration value="danger"/>
       <xsd:enumeration value="info"/>
     </xsd:restriction>

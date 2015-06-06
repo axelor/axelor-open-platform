@@ -138,6 +138,8 @@ public class MetaService {
 			item.setOrder(menu.getOrder());
 			item.setTitle(menu.getTitle());
 			item.setIcon(menu.getIcon());
+			item.setTag(menu.getTag());
+			item.setTagStyle(menu.getTagStyle());
 			item.setTop(menu.getTop());
 			item.setLeft(menu.getLeft());
 			item.setMobile(menu.getMobile());

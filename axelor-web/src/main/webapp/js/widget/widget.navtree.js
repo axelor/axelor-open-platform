@@ -86,6 +86,9 @@ ui.directive('navSubTree', ['$compile', function ($compile) {
 				menu.fa = menu.icon;
 				delete menu.icon;
 			}
+			if (menu.tagStyle) {
+				menu.tagCss = "label-" + menu.tagStyle;
+			}
 			if (menu.children) {
 				var sub = $(
 					"<ul class='nav nav-sub-tree'>" +
@@ -170,11 +173,12 @@ ui.directive('navSubTree', ['$compile', function ($compile) {
 		},
 		replace: true,
 		template:
-			"<li ng-class='{folder: menu.children}'>" +
+			"<li ng-class='{folder: menu.children, tagged: menu.tag }'>" +
 				"<a href='#'>" +
-					"<img ng-if='menu.icon' ng-src='{{menu.icon}}'></img>" +
-					"<i ng-if='menu.fa' class='fa' ng-class='menu.fa'></i>" +
-					"<span>{{menu.title}}</span>" +
+					"<img class='nav-image' ng-if='menu.icon' ng-src='{{menu.icon}}'></img>" +
+					"<i ng-if='menu.fa' class='nav-icon fa' ng-class='menu.fa'></i>" +
+					"<span class='nav-title'>{{menu.title}}</span>" +
+					"<span ng-show='menu.tag' ng-class='menu.tagCss' class='nav-tag label'>{{menu.tag}}</span>" +
 				"</a>" +
 			"</li>"
 	}

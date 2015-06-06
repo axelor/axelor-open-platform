@@ -60,6 +60,8 @@
   	<string name="title" required="true" namecolumn="true"/>
   	<string name="icon"/>
     <string name="module"/>
+    <string name="tag" />
+    <string name="tagStyle" selection="hilite.style.selection" />
     <boolean name="top" column="top_menu"/>
     <boolean name="left" column="left_menu" default="true"/>
     <boolean name="mobile" column="mobile_menu"/>
