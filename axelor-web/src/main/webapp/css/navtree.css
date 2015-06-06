@@ -21,21 +21,14 @@
 	box-sizing: border-box;
 }
 
-.nav-tree ul {
-	margin: 0 0 0px 15px;
-}
-
 .nav-tree ul,
 .nav-tree li {
 	list-style: none;
 }
 
-.nav-tree > ul {
-	margin: 1px 4px;
-}
-
 .nav-tree li > ul {
 	display: none;
+	margin: 0;
 }
 
 .nav-tree li.open > ul {
@@ -59,19 +52,13 @@
 }
 
 .nav-tree li > a,
-.nav-tree li > a::before {
-	line-height: 2.5em;
-	height: 2.5em;
-}
-
-.nav-tree li > a,
 .nav-tree li > a:focus {
 	background: transparent;
 }
 
 .nav-tree li > a > img,
 .nav-tree li > a > i {
-	padding-right: 8px;
+	padding-right: 6px;
 	width: 24px;
 }
 
@@ -79,66 +66,24 @@
 	position: relative;
 }
 
-.nav-tree li > a::before {
-	content: " ";
-	position: absolute;
-	box-sizing: border-box;
-	width: 100%;
-	left: 0;
-}
-
-.nav-tree > li > a,
-.nav-tree > li > a::before {
-	line-height: 3.5em;
-	height: 3.5em;
-}
-
 .nav-tree li > a:hover,
 .nav-tree li.active > a {
 	color: #fff;
-}
-
-.nav-tree li > a:hover::before {
 	background-color: #293846;
-}
-
-.nav-tree li.open a:hover::before {
-	left: 3px;
 }
 
 .nav-tree > li {
-	position: relative;
 	overflow: hidden;
-}
-
-.nav-tree > li > a {
-	padding-left: 16px;
-}
-
-.nav-tree > li > ul {
-	padding-left: 15px;
-}
-
-.nav-tree > li > ul > li:last-child {
-	margin-bottom: 16px;
-}
-
-.nav-tree > li.open::before,
-.nav-tree > li.active::before {
-	content: " ";
-	background-color: #293846;
-	position: absolute;
-	width: 100%;
-	left: 0;
-	height: 100%;
-}
-
-.nav-tree > li.animate::before {
 	border-left: 0;
 }
 
-.nav-tree > li.open::before {
-	border-left: 3px solid #19aa8d;
+.nav-tree > li.open,
+.nav-tree > li.active {
+	background-color: #293846;
+}
+
+.nav-tree > li.open {
+	border-left: 4px solid #19aa8d;
 	transition: all .35s ease;
 }
 
@@ -163,4 +108,32 @@
 
 .nav-tree li.folder.open > a::after {
 	transform: rotate(-90deg);
+}
+
+.nav-tree ul > li:last-child {
+	margin-bottom: 10px;
+}
+
+.nav-tree li > a {
+	padding: 7px 8px;
+}
+
+/* 1st level */
+.nav-tree > li > a {
+	padding: 13px 16px;
+}
+
+/* 2nd level */
+.nav-tree > li > ul > li > a {
+	padding-left: 42px;
+}
+
+/* 3rd level */
+.nav-tree > li > ul > li > ul > li > a {
+	padding-left: 52px;
+}
+
+/* 4th level and beyond */
+.nav-tree > li > ul > li > ul > li > ul li > a {
+	padding-left: 62px;
 }
