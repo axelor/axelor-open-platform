@@ -100,22 +100,24 @@ ui.directive('navSubTree', ['$compile', function ($compile) {
 
 			function show(el) {
 
-				if (animation || element.hasClass('open')) {
+				var parent = el.parent("li");
+
+				if (animation || parent.hasClass('open')) {
 					return;
 				}
 
 				function done() {
-					element.addClass('open');
-					element.removeClass('animate');
+					parent.addClass('open');
+					parent.removeClass('animate');
 					el.height('');
 					animation = false;
 				}
 
-				hide(element.siblings().children('ul.open'));
+				hide(parent.siblings("li.open").children('ul'));
 
 				animation = true;
 
-				element.addClass('animate');
+				parent.addClass('animate');
 				el.height(el[0].scrollHeight);
 
 				setTimeout(done, 300);
@@ -123,20 +125,22 @@ ui.directive('navSubTree', ['$compile', function ($compile) {
 
 			function hide(el) {
 
-				if (animation || !element.hasClass('open')) {
+				var parent = el.parent("li");
+
+				if (animation || !parent.hasClass('open')) {
 					return;
 				}
 
 				function done() {
-					element.removeClass('open');
-					element.removeClass('animate');
+					parent.removeClass('open');
+					parent.removeClass('animate');
 					animation = false;
 				}
 
 				animation = true;
 
 				el.height(el.height())[0].offsetHeight;
-				element.addClass('animate');
+				parent.addClass('animate');
 				el.height(0);
 
 				setTimeout(done, 300);
