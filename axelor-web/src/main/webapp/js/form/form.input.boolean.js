@@ -76,10 +76,11 @@ ui.formInput('Toggle', 'Boolean', {
 		};
 
 		scope.toggle = function () {
-			model.$setViewValue(!model.$viewValue);
+			var value = !model.$viewValue;
 			if (scope.setExclusive && field.exclusive) {
 				scope.setExclusive(field.name, scope.record);
 			}
+			scope.setValue(value, true);
 		};
 
 		if (field.help || field.title) {
