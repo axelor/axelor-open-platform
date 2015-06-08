@@ -239,6 +239,13 @@
   </xsd:complexType>
 
   <xsd:complexType name="AbstractView" abstract="true">
+    <xsd:attribute name="id" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+        If overriding some existing view, provide an unique id to identify current view.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="title" type="xsd:string" use="required">
       <xsd:annotation>
         <xsd:documentation>
@@ -725,13 +732,6 @@
       <xsd:annotation>
         <xsd:documentation>
           Name of the model class of this view.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="id" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>
-        If overriding some existing one, provide an unique id to identify this one.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
