@@ -309,7 +309,7 @@ public class I18nExtractor {
 		}
 	}
 	
-	public void extract(final Path base, boolean update) {
+	public void extract(final Path base, boolean update, boolean withContext) {
 		
 		final Path srcPath = base.resolve("src/main");
 		if (!Files.exists(srcPath)) {
@@ -346,9 +346,12 @@ public class I18nExtractor {
 		Collections.sort(keys);
 
 		for (String key : keys) {
-			List<String> locations = new ArrayList<>(items.get(key));
-			Collections.sort(locations);
-			String context = Joiner.on('\n').join(locations).trim();
+			String context = "";
+			if (withContext) {
+				List<String> locations = new ArrayList<>(items.get(key));
+				Collections.sort(locations);
+				context = Joiner.on('\n').join(locations).trim();
+			}
 			String[] line = { key, "", "", context };
 			values.add(line);
 		}
