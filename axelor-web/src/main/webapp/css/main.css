@@ -15,18 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+[ng\:cloak], [ng-cloak], .ng-cloak {
+   display: none;
+}
+
 html, body {
 	overflow: hidden;
 	padding: 0 !important;
 	margin: 0 !important;
-}
-
-body {
-	font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-[ng\:cloak], [ng-cloak], .ng-cloak {
-   display: none;
 }
 
 #container {
@@ -35,21 +32,21 @@ body {
 }
 
 @media (max-width: 979px) {
-header > .navbar-fixed-top {
-	position: fixed;
-	margin-bottom: 0;
+	header > .navbar-fixed-top {
+		position: fixed;
+		margin-bottom: 0;
+	}
+	
+	header > .navbar-fixed-top .navbar-inner {
+		padding: 0;
+	}
 }
 
-header > .navbar-fixed-top .navbar-inner {
-	padding: 0;
-}
-}
-
-.navbar .brand-logo {
+header .navbar .brand-logo {
 	float: left;
 }
 
-.navbar .brand-logo img {
+header .navbar .brand-logo img {
 	height: 32px;
 	margin-top: 4px;
 }
@@ -59,21 +56,26 @@ header .container-fluid {
 }
 
 @media (max-width: 767px) {
-header .container-fluid {
-	padding: 0 10px;
-}
-header .navbar-fixed-top {
-	margin-left: 0;
-	margin-right: 0;
-}
+	header .container-fluid {
+		padding: 0 10px;
+	}
+	header .navbar-fixed-top {
+		margin-left: 0;
+		margin-right: 0;
+	}
 }
 
 header .nav-menu-bar li.empty > a > i {
 	font-size: 20px;
 }
+
 header .nav-menu-bar li.empty > a,
 header .navbar .nav-shortcuts > li > a {
 	padding: 10px 6px 9px;
+}
+
+header .navbar .nav-shortcuts > li > a.nav-link-user {
+	padding: 9px 6px 9px;
 }
 
 header .nav-menu-bar li > a > img {
@@ -100,52 +102,20 @@ header .navbar .nav-shortcuts .nav-link-mail sup {
 	top: 8px;
 }
 
-header .dropdown > ul.dropdown-menu {
-    margin: 0;
+header .navbar .nav-link-user > img {
+	width: 20px;
+	height: 20px;
+	margin-bottom: 1px;
+	background-color: white;
 }
 
-header .dropdown ul.dropdown-menu {
-    border-top: 1px solid transparent;
+header .navbar .nav-link-user-name,
+header .navbar .nav-link-user-sub {
+	display: block;
 }
-
-header .dropdown-menu:after,
-header .dropdown-menu:before {
-    border: none;
-    content: none !important;
-}
-
-header .dropdown-menu {
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
-}
-
-header .navbar-inverse .dropdown-menu {
-	background-color: #1b1b1b;
-}
-
-header .navbar-inverse .dropdown-menu {
-	border-top: 0;
-}
-
-header .navbar-inverse .dropdown-menu .divider {
-	height: inherit;
-	background-color: inherit;
-	border-top: 1px solid #111;
-	border-bottom: 1px solid #222;
-}
-
-header .navbar-inverse .dropdown-menu > li > a {
-	color: #999999;
-	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-}
-
-header .navbar-inverse .dropdown-menu > li > a:hover,
-header .navbar-inverse .dropdown-menu > li > a:focus,
-header .navbar-inverse .dropdown-submenu:hover > a,
-header .navbar-inverse .dropdown-submenu:focus > a {
-	background-image: none;
-	background-color: #111;
-	color: #fff;
+header .navbar .nav-link-user-sub {
+	font-size: 10px;
+	color: #a0a0a0;
 }
 
 .fill-parent {
@@ -341,24 +311,6 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 
 /* end jQuery UI fixes */
 
-/* Browser fixes */
-
-/* Remove box-shadow from buttons (dotted outline issue in Firefox) */
-.btn {
-	box-shadow: none !important;
-}
-
-.tooltip {
-	z-index: 2100;
-}
-
-input[disabled], select[disabled], textarea[disabled],
-input[readonly], select[readonly], textarea[readonly] {
-	cursor: default;
-}
-
-/* end Browser fixes */
-
 #offcanvas {
 	height: 100%;
 }
@@ -458,10 +410,6 @@ input[readonly], select[readonly], textarea[readonly] {
 	padding-right: 12px;	
 }
 
-.navigation-tabs > .axelor-logo {
-	border-bottom: 1px solid #ddd;
-}
-
 .visible-false {
 	visibility: hidden;
 }
@@ -472,7 +420,7 @@ input[readonly], select[readonly], textarea[readonly] {
 
 .view-content {
 	position: absolute;
-	top: 36px; left: 0px; right: 0px; bottom: 0px;
+	top: 38px; left: 0px; right: 0px; bottom: 0px;
 }
 
 .view-pane {
@@ -502,14 +450,10 @@ input[readonly], select[readonly], textarea[readonly] {
 }
 
 .record-toolbar .navbar-inner {
-	border: 1px solid #d4d4d4;
 	border-left: none;
 	border-right: none;
-
-	background-color: #f5f5f5;
-	background-image: none;
 	border-radius: 0;
-	
+
 	margin: 0;
 	padding: 0 4px;
 }
@@ -529,7 +473,6 @@ input[readonly], select[readonly], textarea[readonly] {
 
 .record-toolbar .view-title {
 	display: inline-block;
-	font-size: 13px;
 	font-weight: bold;
 	padding-top: 10px;
 	padding-left: 8px;
@@ -603,7 +546,6 @@ input[readonly], select[readonly], textarea[readonly] {
 
 .record-pager-change input {
 	margin-top: 5px;
-	height: 20px;
 }
 
 .stackbar {
@@ -714,30 +656,6 @@ img.prefix-icon {
 	font-size: 14px;
 }
 
-header .navbar .dropdown {
-	font-size: 12px;
-}
-
-header .navbar .dropdown .devider {
-	margin: 4px 1px;
-}
-
-.nav-link-user > img {
-	width: 20px;
-	height: 20px;
-	margin-bottom: 1px;
-	background-color: white;
-}
-
-.nav-link-user-name,
-.nav-link-user-sub {
-	display: block;
-}
-.nav-link-user-sub {
-	font-size: 10px;
-	color: #a0a0a0;
-}
-
 .user-preferences form {
 	padding: 0;
 }
@@ -761,12 +679,6 @@ header .navbar .dropdown .devider {
 .record-toolbar .button-menu a.btn {
 	padding: 4px 8px 4px;
 	margin-top: 5px;
-	color: #333;
-}
-
-.record-toolbar .button-menu a.btn:hover,
-.record-toolbar .button-menu a.btn:focus {
-	background: #eeeeee;
 }
 
 .record-toolbar .button-menu a.btn {
@@ -817,7 +729,7 @@ header .navbar .dropdown .devider {
 
 .about-page .page-header h3 {
 	font-size: 24px;
-	font-weight: 500;
+	font-weight: 600;
 	line-height: 1;
 }
 
