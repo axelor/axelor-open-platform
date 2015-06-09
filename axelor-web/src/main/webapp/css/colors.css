@@ -15,111 +15,30 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-header .navbar-inverse .navbar-inner {
-	background-color: #535353;
-	background-image: linear-gradient(#5B5B5B, #424242);
-	border-color: #333;
-	border-bottom-color: #2C3440;
-	color: #fff;
-}
-
-header .navbar-inverse .nav li.dropdown.open > .dropdown-toggle,
-header .navbar-inverse .nav li.dropdown.active > .dropdown-toggle,
-header .navbar-inverse .nav li.dropdown.open.active > .dropdown-toggle {
-	background-color: #3f3f3f;
-	color: #fff;
-}
-
-header .navbar-inverse .dropdown-menu {
-	background-color: #535353;
-}
-
-header .navbar-inverse .divider-vertical {
-	border-left-color: #2d2d2d;
-	border-right-color: #5d5d5d;	
-}
-
-header .navbar-inverse .dropdown-menu .divider {
-	border-top-color: #3d3d3d;
-	border-bottom-color: #5d5d5d;
-}
-
-header .navbar-inverse .brand,
-header .navbar-inverse .nav > li > a,
-header .navbar-inverse .dropdown-menu > li > a {
-	color: #fff;
-	text-shadow: 0 -1px 0 rgba(0, 0, 0, 1);
-}
-
-header .navbar-inverse .dropdown-menu > li > a:hover,
-header .navbar-inverse .dropdown-menu > li > a:focus,
-header .navbar-inverse .dropdown-submenu:hover > a,
-header .navbar-inverse .dropdown-submenu:focus > a {
-	background-image: none;
-	background-color: #3f3f3f;
-	color: #fff;
-}
-
-header .navbar-inverse .nav .active > a,
-header .navbar-inverse .nav .active > a:hover,
-header .navbar-inverse .nav .active > a:focus {
-	color: #fff;
-	background-color: #3f3f3f;
-}
-
-header .navbar-inverse .btn-navbar:hover,
-header .navbar-inverse .btn-navbar:focus,
-header .navbar-inverse .btn-navbar:active,
-header .navbar-inverse .btn-navbar.active,
-header .navbar-inverse .btn-navbar.disabled,
-header .navbar-inverse .btn-navbar[disabled] {
-	background-color: #3f3f3f;
-}
-
-header .navbar-inverse .nav-collapse .nav > li > a:hover,
-header .navbar-inverse .nav-collapse .nav > li > a:focus,
-header .navbar-inverse .nav-collapse .dropdown-menu a:hover,
-header .navbar-inverse .nav-collapse .dropdown-menu a:focus {
-	background-color: #3f3f3f;
-}
-
-header .navbar-inverse .btn-navbar {
-	background-color: #3f3f3f;
-	background-image: none;
-	box-shadow: none;
-}
-
+ 
 header {
 	font-weight: bold;
 }
 
-.navbar .brand-logo {
-	float: left;
+header .navbar-inner {
+	background-color: #fff;
+	box-shadow: none !important;
 }
 
-.navbar .brand-logo img {
-	height: 32px;
-	margin-top: 5px;
+header .navbar .nav > li > a {
+	color: #676a6c;
+	font-weight: 600;
 }
 
-.sidebar {
-	background-color: #2f4050;
+header .navbar .nav li.dropdown.open > .dropdown-toggle {
+	background-color: #fff;
 }
 
-.slick-header-menuitem:hover,
-.dropdown-menu > li > a:hover,
-.dropdown-menu > li > a:focus {
+.slick-header-menuitem:hover {
 	color: #fff;
 	background-color: #5377b1;
 	background-image: none;
 }
-.dropdown-menu > .active > a,
-.dropdown-menu > .active > a:hover,
-.dropdown-menu > .active > a:focus {
-	background-color: #5377b1;
-	background-image: none;
-}
-
 .ui-datepicker .ui-state-active,
 .ui-datepicker .ui-slider-handle.ui-state-hover {
 	background-color: #5377b1 !important;
@@ -135,18 +54,20 @@ header {
 	background-image: none;
 }
 
-.sidebar .splitter-header {
-	background-color: #efefef;
-	background-image: linear-gradient(to bottom, #f6f6f6, #e5e5e5);
-	border-bottom: 1px solid #c1c1c1;
-	height: 26px;
+.sidebar {
+	background-color: #2f4050;
 }
 
-.sidebar .splitter-header .splitter-title {	
-	color: #2f5e92;
-	line-height: 26px;
-	padding: 0 10px;
-	text-shadow: 0 1px 1px #FFF;
+.view-tabs {
+	background-color: #f3f3f4;	
+}
+
+.navigation-tabs {
+	background-color: #fff;
+}
+
+.nav-tabs-wrap {
+	background-color: #f3f3f4;
 }
 
 .nav-tabs > li {
@@ -156,39 +77,39 @@ header {
 
 .nav-tabs > li > a {
 	color: #555;
-	background-color: #f1f1f1;
+	background-color: #fff;
+	padding-top: 6px;
+	padding-bottom: 6px;
 }
 
 .nav-tabs > li.active > a {
-	color: #555;
+	color: #333;
 }
 
 .nav-tabs > li > a,
 .nav-tabs > li.active > a {
 	margin: 0;
 	border-radius: 0;
-	border: 1px solid #c1c1c1;
+	border: 1px solid #e7e7e7;
 }
 
 .nav-tabs > li > a:hover,
 .nav-tabs > li > a:focus,
 .nav-tabs > li:hover > a {
-	color: #000;
-	border: 1px solid #c1c1c1;
-	background-color: #f8f8f8;
+	color: #333;
+	border: 1px solid #e7e7e7;
+	background-color: #fff;
 }
 
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
-	border: 1px solid #c1c1c1;
+	font-weight: 600;
+	border: 1px solid #e7e7e7;
 	border-bottom: 1px solid transparent;
 	background-color: #fff;
-}
-
-.nav-tabs > li > a {
-	padding-top: 6px;
-	padding-bottom: 6px;
+	border-top: 2px solid #19aa8d !important;
+	padding-top: 5px;
 }
 
 .nav-tabs-strip {
@@ -197,38 +118,24 @@ header {
 
 .nav-tabs-strip .nav-tabs {
 	padding: 0 8px;
-	border-bottom-color: #c1c1c1;
+	border-bottom-color: #e7e7e7;
 }
 
 .navigation-tabs ul.nav-tabs-main {
 	height: 31px;
 }
 
-.view-tabs,
-.navigation-tabs > .nav-tabs-wrap {
-	background-color: #e3e3e3;
-}
-
-.navigation-tabs {
-	background-color: #fff;
-}
-
 table.form-layout .tabbable-tabs .tab-content {
-	border-color: #c1c1c1;
-}
-
-.navigation-tabs > .axelor-logo {
-	border-bottom-color: #c1c1c1;
-	background-color: #e3e3e3;
+	border-color: #e7e7e7;
 }
 
 .bordered,
 .bordered-box {
-	border-color: #c1c1c1;
+	border-color: #e7e7e7;
 }
 
 .view-container .form-view > div[ui-view-form].has-width {
-	background-color: #f7f7f9;
+	background-color: #f3f3f4;
 }
 
 /** remove corners */
@@ -263,7 +170,6 @@ input, button, textarea, select, fieldset, pre {
 }
 
 .nvd3.nv-noData {
-	font: normal 13px "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-weight: 400;
 	fill: #333333;
 }
