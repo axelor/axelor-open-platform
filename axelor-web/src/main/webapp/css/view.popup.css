@@ -253,6 +253,7 @@
 	bottom: 0;
 }
 .ui-dialog-responsive.maximized .ui-dialog-content {
+	width: auto !important;
 	height: calc(100% - 45px - 60px) !important;
 	overflow: auto;
 	margin-top: 45px;
@@ -280,6 +281,8 @@
 		bottom: 0;
 	}
 	.ui-dialog-responsive .ui-dialog-content {
+  		box-sizing: border-box;
+		width: 100% !important;
 		height: calc(100% - 45px - 60px) !important;
 		overflow: auto;
 		margin-top: 45px;
@@ -295,6 +298,18 @@
 	}
 	.ui-dialog-small .ui-dialog-buttonpane {
 		position: relative;
+	}
+}
+
+@media screen and (min-width: 768px) {
+	.ui-dialog-responsive.ui-dialog-resized > [ui-dialog] > [ui-view-form] > form {
+		min-width: 720px;
+	}
+	.ui-dialog-responsive.ui-dialog-resized.ui-dialog-small > [ui-dialog] > [ui-view-form] > form {
+		min-width: 444px;
+	}
+	.ui-dialog-responsive.ui-dialog-resized:not(.maximized) {
+		width: inherit !important;
 	}
 }
 
