@@ -71,11 +71,7 @@ header .nav-menu-bar li.empty > a > i {
 
 header .nav-menu-bar li.empty > a,
 header .navbar .nav-shortcuts > li > a {
-	padding: 10px 6px 9px;
-}
-
-header .navbar .nav-shortcuts > li > a.nav-link-user {
-	padding: 9px 6px 9px;
+	padding: 9px 6px 10px;
 }
 
 header .nav-menu-bar li > a > img {
@@ -90,7 +86,7 @@ header .navbar .nav-shortcuts > .divider-vertical {
 }
 
 header .navbar .nav-shortcuts > li > a > i {
-	font-size: 18px;
+	font-size: 20px;
 }
 
 header .navbar .nav-shortcuts > li > a > span {
@@ -115,7 +111,7 @@ header .navbar .nav-link-user-sub {
 }
 header .navbar .nav-link-user-sub {
 	font-size: 10px;
-	color: #a0a0a0;
+	opacity: .5;
 }
 
 .fill-parent {
@@ -393,7 +389,7 @@ header .navbar .nav-link-user-sub {
 
 .navigation-tabs ul.nav-tabs-main {
 	margin-bottom: 0px;
-	height: 35px;
+	height: 31px;
 }
 
 .navigation-tabs {
@@ -447,6 +443,7 @@ header .navbar .nav-link-user-sub {
 
 .record-toolbar {
 	margin: 0;
+	margin-top: -4px;
 }
 
 .record-toolbar .navbar-inner {
@@ -455,7 +452,10 @@ header .navbar .nav-link-user-sub {
 	border-radius: 0;
 
 	margin: 0;
-	padding: 0 4px;
+	padding: 0 6px;
+
+	border-top: 0;
+	background-color: #fff;
 }
 
 .record-toolbar button {

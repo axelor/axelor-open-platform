@@ -21,6 +21,15 @@
   display: none;
 }
 
+input[disabled],
+select[disabled],
+textarea[disabled],
+input[readonly],
+select[readonly],
+textarea[readonly] {
+	cursor: default;
+}
+
 .view-container .form-view > div:last-child {
 	position: absolute;
 	top: 42px;
