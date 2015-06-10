@@ -90,15 +90,17 @@ header .navbar .nav .dropdown-submenu:focus > a {
 }
 
 .view-tabs {
-	background-color: #f3f3f4;	
-}
-
-.navigation-tabs {
-	background-color: #fff;
+	background-color: #f3f3f4;
 }
 
 .nav-tabs-wrap {
-	background-color: #f3f3f4;
+	height: 38px;
+	background-color: #fff;
+	border-bottom: 1px solid #e7e7e7;
+}
+
+.nav-tabs-wrap.empty {
+	display: none;
 }
 
 .nav-tabs > li {
@@ -145,15 +147,12 @@ header .navbar .nav .dropdown-submenu:focus > a {
 
 .nav-tabs-strip {
 	height: 32px;
+	background-color: #f3f3f4;
 }
 
 .nav-tabs-strip .nav-tabs {
 	padding: 0 8px;
 	border-bottom-color: #e7e7e7;
-}
-
-.navigation-tabs ul.nav-tabs-main {
-	height: 31px;
 }
 
 table.form-layout .tabbable-tabs .tab-content {
