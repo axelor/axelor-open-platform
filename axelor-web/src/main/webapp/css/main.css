@@ -71,11 +71,7 @@ header .nav-menu-bar li.empty > a > i {
 
 header .nav-menu-bar li.empty > a,
 header .navbar .nav-shortcuts > li > a {
-	padding: 10px 6px 9px;
-}
-
-header .navbar .nav-shortcuts > li > a.nav-link-user {
-	padding: 9px 6px 9px;
+	padding: 9px 6px 10px;
 }
 
 header .nav-menu-bar li > a > img {
@@ -90,7 +86,7 @@ header .navbar .nav-shortcuts > .divider-vertical {
 }
 
 header .navbar .nav-shortcuts > li > a > i {
-	font-size: 18px;
+	font-size: 20px;
 }
 
 header .navbar .nav-shortcuts > li > a > span {
@@ -115,7 +111,7 @@ header .navbar .nav-link-user-sub {
 }
 header .navbar .nav-link-user-sub {
 	font-size: 10px;
-	color: #a0a0a0;
+	opacity: .5;
 }
 
 .fill-parent {
