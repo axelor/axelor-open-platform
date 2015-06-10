@@ -594,7 +594,7 @@ angular.module('axelor.ui').directive('uiEditorPopup', function() {
 		},
 		replace: true,
 		template:
-		'<div ui-dialog ui-dialog-size x-on-ok="onOK" x-on-before-close="onBeforeClose">'+
+		'<div ui-dialog x-resizable="true" ui-dialog-size x-on-ok="onOK" x-on-before-close="onBeforeClose">'+
 		    '<div ui-view-form x-handler="this"></div>'+
 		'</div>'
 	};

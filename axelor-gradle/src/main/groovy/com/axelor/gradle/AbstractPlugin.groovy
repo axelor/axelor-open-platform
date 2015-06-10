@@ -64,6 +64,7 @@ abstract class AbstractPlugin implements Plugin<Project> {
 				description "Extract i18n messages from source files."
 				group "Axelor i18n"
 				update = false
+				withContext = project.properties['with.context'] ? true : false
 			}
 			task('i18n-update', type: I18nTask) {
 				description "Update i18 messages from message catalog."
