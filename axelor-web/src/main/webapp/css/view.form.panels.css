@@ -37,8 +37,7 @@
 }
 
 .panel {
-	border: 1px solid #d4d4d4;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+	background-color: #fff;
 }
 
 .panel .panel-header {
@@ -84,7 +83,7 @@
 }
 
 .panel .panel-body {
-	padding: 14px;	
+	padding: 14px;
 }
 
 .panel {
