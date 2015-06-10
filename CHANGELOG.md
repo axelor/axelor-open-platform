@@ -1,5 +1,17 @@
 # Current (3.0.9)
 
+## Bug fixes
+
+- fix action handler issue (typo)
+- fix search view overriding issue
+- fix onChange event on toggle widget
+
+## Improvements
+
+- allow resizing popup editor on desktop
+- use full width for dashboard on big screens
+- don't include context details in i18n catalogs
+
 # 3.0.8 (2015-06-01)
 
 ## Bug Fixes
