@@ -40,22 +40,25 @@
 	background-color: #fff;
 }
 
+.panel-tabs .panel {
+	border: 1px solid #e7e7e7;
+}
+
 .panel .panel-header {
-
-	background-color: #f5f5f5;
-	border-bottom: 1px solid #d4d4d4;
-
-	padding: 6px 10px;
+	padding: 11px 15px 14px;
+	border-top: 4px solid #e7e7e7;
+	border-bottom: 1px solid #e7e7e7;
 }
 
 .panel-nested > .panel-header {
-	background-color: #fff;
+	border-top: 0;
 	padding: 6px 0;
 	margin-bottom: 4px;
 }
 
 .panel .panel-title {
-	font-size: 16px;
+	font-size: 14px;
+	font-weight: 600;
 }
 
 .panel .panel-header .menu-bar {
@@ -72,8 +75,6 @@
 }
 
 .panel .panel-header .menu-bar .caret {
-	border-top-color: #333333 !important;
-	border-bottom-color: #333333 !important;
 	margin-top: 7px;
 }
 
@@ -238,7 +239,7 @@
 }
 
 .panel-tabs .nav-tabs > li > a {
-	border-color: #d4d4d4 !important;
+	border-color: #e7e7e7 !important;
 }
 .panel-tabs .nav-tabs > li.active > a {
 	color: #333;
@@ -247,8 +248,8 @@
 .panel-tabs .tab-content {
 	padding: 6px;
 	overflow: inherit;
-
-	border: 1px solid #d4d4d4;
+	background-color: #fff;
+	border: 1px solid #e7e7e7;
 	border-top: none;
 }
 
@@ -267,7 +268,7 @@
 .bar-layout .portlet-header .navbar-inner {
 	background-image: none;
 	background-color: #f5f5f5;
-	border-bottom: 1px solid #d4d4d4;
+	border-bottom: 1px solid #e7e7e7;
 }
 .bar-layout .portlet-header .divider-vertical {
 	border-left: 1px solid #D3D3D3;
@@ -453,7 +454,7 @@
 .panel-layout .order-subtotal-total {
 	border-top: 1px solid #ccc;
 	font-size: 18px;
-	font-weight: bold;
+	font-weight: 600;
 }
 
 @media (max-width: 767px) {
