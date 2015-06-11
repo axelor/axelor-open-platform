@@ -37,20 +37,7 @@ table.treetable tbody tr.branch {
 }
 
 table.treetable tbody tr.selected {
-  	color: #fff;
-	
-	background-color: #0074CC;
-	background-repeat: repeat-x;
-
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#08C), to(#05C));
-	background-image: -webkit-linear-gradient(top, #08C, #05C);
-	background-image:    -moz-linear-gradient(top, #08C, #05C);
-	background-image:     -ms-linear-gradient(top, #08C, #05C);
-	background-image:      -o-linear-gradient(top, #08C, #05C);
-	background-image:         linear-gradient(top, #08C, #05C);
-	
-	border-color: #05C #05C #003580;
-	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+	background-color: #337ab7;
 }
 
 table.treetable tbody tr.accept {
@@ -59,29 +46,15 @@ table.treetable tbody tr.accept {
 }
 
 .tree-view-container .tree-header {
-	
 	height: 24px;
-	
 	color: #333;
-	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
-	
-	background-color: #f5f5f5;
-	background-repeat: repeat-x;
-
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#E6E6E6));
-	background-image: -webkit-linear-gradient(top, white, #E6E6E6);
-	background-image:    -moz-linear-gradient(top, white, #E6E6E6);
-	background-image:     -ms-linear-gradient(top, white, #E6E6E6);
-	background-image:      -o-linear-gradient(top, white, #E6E6E6);
-	background-image:         linear-gradient(top, white, #E6E6E6);
-	
-	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+	background-color: #fff;
 }
 
 .tree-view-container .tree-header {
 	width: 100%;
 	white-space: nowrap;
-	border-bottom: 1px solid #d2d2d2;
+	border-bottom: 1px solid #e7e7e7;
 }
 
 .tree-view-container .tree-header th {
@@ -89,10 +62,11 @@ table.treetable tbody tr.accept {
 	height: 100%;
 	padding: 4px;
 	padding-left: 6px;
-	border-left: 1px solid #ddd;
+	border-left: 1px solid #e7e7e7;
 	text-align: left;
 	text-overflow: ellipsis;
 	overflow: hidden;
+	font-weight: 600;
 }
 
 .tree-view-container .tree-header th:first-of-type {
