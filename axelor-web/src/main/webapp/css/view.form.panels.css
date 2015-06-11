@@ -40,10 +40,6 @@
 	background-color: #fff;
 }
 
-.panel-tabs .panel {
-	border: 1px solid #e7e7e7;
-}
-
 .panel .panel-header {
 	padding: 11px 15px 14px;
 	border-top: 4px solid #e7e7e7;
@@ -88,11 +84,12 @@
 }
 
 .panel {
-	margin-bottom: 8px;
+	margin-bottom: 16px;
+	border: 1px solid #e7e7e7;
 }
 
 .panel.attached {
-	margin-top: -9px;
+	margin-top: -16px;
 }
 
 .panel.noframe {
@@ -235,7 +232,7 @@
 .panel-tabs,
 .panel-stack,
 .bar-layout .dashboard {
-	margin-bottom: 8px;
+	margin-bottom: 16px;
 }
 
 .panel-tabs .nav-tabs > li > a {
@@ -246,7 +243,7 @@
 	border-bottom-color: transparent !important;
 }
 .panel-tabs .tab-content {
-	padding: 6px;
+	padding: 14px;
 	overflow: inherit;
 	background-color: #fff;
 	border: 1px solid #e7e7e7;
