@@ -36,6 +36,7 @@
 .slickgrid .slick-header {
 	border: 0;
 	border-top: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
 }
 
 .slickgrid .slick-header-column {
@@ -73,7 +74,7 @@
 
 .slick-row .slick-cell {
 	border: 0;
-	border-top: 1px solid #e7eaec;
+	border-bottom: 1px solid #e7eaec;
 	padding: 2px 8px;
 }
 
@@ -94,7 +95,7 @@
 .slick-headerrow {
 	height: 24px;
 	border: 0;
-	border-top: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
 	background: #fff;
 	background-image: none !important;
 }
@@ -166,7 +167,7 @@
 }
 
 .slick-cell input {
-	padding-left: 2px !important;
+	padding-left: 6px !important;
 }
 
 .slick-cell textarea {
