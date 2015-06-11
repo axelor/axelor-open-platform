@@ -13,6 +13,7 @@
 	font-weight: bold;
 	white-space: nowrap;
 	overflow: hidden;
+	background-color: #fff;
 }
 
 .dms-file-list .record-toolbar .breadcrumb a {
@@ -27,9 +28,10 @@
 	position: absolute;
 	overflow: auto;
 	width: 0;
-	top: 41px;
+	top: 37px;
 	bottom: 0;
 	border-right: 1px solid #d3d3d3;
+	background-color: #fff;
 }
 
 .dms-file-list .dms-details {
