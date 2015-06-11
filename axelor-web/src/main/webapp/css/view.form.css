@@ -32,7 +32,7 @@ textarea[readonly] {
 
 .view-container .form-view > div:last-child {
 	position: absolute;
-	top: 42px;
+	top: 37px;
 	bottom: 0; left: 0; right: 0;
 	overflow: auto;
 }
