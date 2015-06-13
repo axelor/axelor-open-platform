@@ -251,26 +251,17 @@ header .navbar .nav-link-user-sub {
 
 .ui-datepicker .ui-slider-handle {
 	padding: 0;
-	border: 1px solid #cccccc !important;
-	
-	background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6) !important;
-	background-image:    -moz-linear-gradient(top, #ffffff, #e6e6e6) !important;
-	background-image:     -ms-linear-gradient(top, #ffffff, #e6e6e6) !important;
-	background-image:      -o-linear-gradient(top, #ffffff, #e6e6e6) !important;
-	background-image:         linear-gradient(top, #ffffff, #e6e6e6) !important;
+	border: 1px solid #ddd !important;
+	background-image: none !important;
+	background: #eee !important;
 }
 
 .ui-datepicker .ui-slider-handle.ui-state-hover,
 .ui-datepicker .ui-state-active {
 	color: white !important;
-	border-color: rgba(0,0,0,.1) rgba(0,0,0,.1) rgba(0,0,0,.25) !important;
-	background-color: #0074CC;
-
-	background-image: -webkit-linear-gradient(top, #08C, #05C) !important;
-	background-image:    -moz-linear-gradient(top, #08C, #05C) !important;
-	background-image:     -ms-linear-gradient(top, #08C, #05C) !important;
-	background-image:      -o-linear-gradient(top, #08C, #05C) !important;
-	background-image:         linear-gradient(top, #08C, #05C) !important;
+	border-color: #ccc !important;
+	background-color: #0074CC !important;
+	background-image: none !important;
 }
 
 .ui-datepicker .ui-state-highlight {

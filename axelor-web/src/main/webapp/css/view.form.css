@@ -944,7 +944,7 @@ table.field-details .help-text hr {
 
 .tag-select:focus,
 .tag-select.focus {
-	border-color: rgba(82, 168, 236, 0.8);
+	border-color: #16a765;
 	outline: 0;
 }
 
