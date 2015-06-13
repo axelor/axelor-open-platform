@@ -1156,7 +1156,6 @@ table.field-details .help-text hr {
 }
 
 .filter-box .tag-select li {
-	margin: 3px;
 	margin-right: 0;
 	margin-bottom: 0;
 	max-width: 150px !important;
@@ -1164,7 +1163,11 @@ table.field-details .help-text hr {
 }
 
 .filter-box .tag-select li.tag-item {
-	line-height: 13px;
+	line-height: 17px;
+}
+
+.filter-box .tag-select .tag-text {
+	height: 16px;
 }
 
 .filter-box .tag-select li.tag-selector {
