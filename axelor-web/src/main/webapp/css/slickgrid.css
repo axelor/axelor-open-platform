@@ -191,6 +191,11 @@
 	margin-top: 0 !important;
 }
 
+.slick-cell .ibox {
+	width: auto;
+	margin-top: 2px !important;
+}
+
 .slick-editor-dropdown {
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 	min-width: 250px;
@@ -368,7 +373,6 @@
 
 .slick-cell.edit-icon i,
 .slick-cell i.slick-icon {
-	padding: 4px 7px;
 	cursor: pointer;
 }
 

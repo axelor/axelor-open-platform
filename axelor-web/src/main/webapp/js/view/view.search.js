@@ -262,7 +262,7 @@ function SearchFormCtrl($scope, $element, ViewService) {
 			type: 'form',
 			cols: 1,
 			items: [{
-				type: 'group',
+				type: 'panel',
 				title: schema.title,
 				items: schema.searchFields
 			}]
@@ -570,16 +570,19 @@ function SearchToolbarCtrl($scope, $element, $http) {
 
 		var items1 = [{
 			name : 'objectSelect',
-			showTitle : false
+			showTitle : false,
+			colSpan: 8
 		}, {
 			type : 'button',
 			title : _t('Search'),
+			colSpan: 2,
 			attrs: {
 				'ng-click': 'doSearch()'
 			}
 		}, {
 			type : 'button',
 			title : _t('Clear'),
+			colSpan: 2,
 			attrs: {
 				'ng-click': 'doClear(true)'
 			}
@@ -587,29 +590,45 @@ function SearchToolbarCtrl($scope, $element, $http) {
 		
 		var items2 = [{
 			name : 'menuRoot',
-			showTitle : false
+			showTitle : false,
+			colSpan: 3
 		}, {
 			name : 'menuSub',
-			showTitle : false
+			showTitle : false,
+			colSpan: 3
 		}, {
 			name : 'menuItem',
-			showTitle : false
+			showTitle : false,
+			colSpan: 4
 		}, {
 			type : 'button',
 			title : _t('Go'),
+			colSpan: 2,
 			attrs: {
 				'ng-click': 'doAction()'
 			}
 		}];
-
-		var schema = {
-			cols : 7,
-			colWidths : '250px,auto,auto,150px,150px,150px,auto',
-			type : 'form'
+		
+		var item1 = {
+			type: "panel",
+			colSpan: $scope._hideActions ? 12 : 6,
+			items: items1
 		};
 		
-		schema.items = $scope._hideActions ? items1 : _.union(items1, items2);
-		
+		var item2 = {
+			type: "panel",
+			colSpan: 6,
+			items: items2
+		};
+
+		var schema = {
+			type : 'form',
+			items: [{
+				type: 'panel',
+				items: $scope._hideActions ? [item1] : [item1, item2]
+			}]
+		};
+
 		$scope.schema = schema;
 		$scope.schema.loaded = true;
 

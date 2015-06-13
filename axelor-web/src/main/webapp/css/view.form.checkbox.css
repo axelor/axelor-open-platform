@@ -1,0 +1,107 @@
+/**
+ * Axelor Business Solutions
+ *
+ * Copyright (C) 2012-2014 Axelor (<http://axelor.com>).
+ *
+ * This program is free software: you can redistribute it and/or  modify
+ * it under the terms of the GNU Affero General Public License, version 3,
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.ibox {
+	position: relative;
+	display: inline-block;
+	margin: 0;
+	padding: 4px;
+	padding-left: 0;
+	overflow: hidden;
+}
+
+.ibox.readonly {
+	cursor: default;
+}
+
+.ibox .box {
+	display: inline-block;
+	position: relative;
+	width: 20px;
+	height: 20px;
+	float: left;
+	outline: none;
+}
+
+.ibox input {
+	position: absolute;
+	left: -100px;
+}
+
+.ibox .title {
+	margin-left: 4px;
+}
+
+.ibox .item-label {
+	color: #999;
+}
+
+.ibox .box:before,
+.ibox .box:after {
+	box-sizing: border-box;
+}
+
+.ibox.round .box:before {
+	border-radius: 20px;
+}
+
+.ibox .box:before {
+	content: " ";
+	display: inline-block;
+	border: 1px solid #ccc;
+	height: 100%;
+	width: 100%;
+}
+
+.ibox input:focus + .box:before {
+	border: 1px solid #16a765;
+}
+
+.ibox:hover .box:before,
+.ibox:hover input:focus + .box:before {
+	border: 2px solid #16a765;
+}
+
+.ibox input:checked + .box:before {
+	border: 1px solid #16a765;
+	background-color: #16a765;
+}
+
+.ibox input:checked + .box:after {
+	content: " ";
+	display: inline-block;
+	position: absolute;
+	top: 5px;
+	left: 4px;
+	width: 12px;
+	height: 7px;
+	border: 2px solid #fff;
+	border-top: 0;
+	border-right: 0;
+	transform: rotate(-45deg);	
+}
+
+.ibox input:disabled + .box {
+	opacity: .4;
+}
+.ibox:hover input:disabled + .box:before {
+	border: 1px solid #ccc;
+}
+.ibox:hover input:disabled:checked + .box:before {
+	border: 1px solid #16a765;
+}

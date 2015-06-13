@@ -186,8 +186,9 @@
 .panel-layout .tag-select .tag-text,
 .panel-layout .tag-select .tag-link,
 .panel-layout .tag-select-single .tag-link {
-	height: 18px;
-	line-height: 18px;
+	height: 17px;
+	line-height: 17px;
+	font-size: 11px;
 }
 
 .panel-layout .label-item {

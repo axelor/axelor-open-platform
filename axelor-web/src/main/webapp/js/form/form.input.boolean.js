@@ -28,23 +28,26 @@ ui.formInput('Boolean', {
 	
 	cellCss: 'form-item boolean-item',
 	
-	link_editable: function(scope, element, attrs, model) {
-
+	link: function (scope, element, attrs, model) {
+		
+		var field = scope.field;
 		var onChange = scope.$events.onChange || angular.noop;
-		
-		scope.$render_editable = function() {
-			element[0].checked = scope.parse(model.$viewValue);
-		};
-		
-		element.click(function(){
-			scope.setValue(this.checked);
-			scope.applyLater(function(){
+		var input = element.find('input');
+
+		input.click(function () {
+			scope.setValue(input[0].checked);
+			scope.applyLater(function() {
 				setTimeout(onChange);
 			});
 		});
 	},
-	template_editable: '<input type="checkbox">',
-	template_readonly: '<input type="checkbox" disabled="disabled" ng-checked="text">'
+	template_readonly: null,
+	template_editable: null,
+	template:
+		"<label class='ibox'>" +
+			"<input type='checkbox' ng-model='record[field.name]' ng-disabled='isReadonly()'>" +
+			"<div class='box'></div>" +
+		"</label>"
 });
 
 /**
@@ -59,8 +62,14 @@ ui.formInput('InlineCheckbox', 'Boolean', {
 			scope.label = title;
 		});
 	},
-	template_editable: '<label class="checkbox"><input type="checkbox" ng-model="record[field.name]"> {{label}}</label>',
-	template_readonly: '<label class="checkbox"><input type="checkbox" disabled="disabled" ng-checked="text"> {{label}}</label>'
+	template_readonly: null,
+	template_editable: null,
+	template:
+		"<label class='ibox'>" +
+			"<input type='checkbox' ng-model='record[field.name]' ng-disabled='isReadonly()'>" +
+			"<div class='box'></div>" +
+			"<span class='title'>{{label}}</span>" +
+		"</label>"
 });
 
 ui.formInput('Toggle', 'Boolean', {
