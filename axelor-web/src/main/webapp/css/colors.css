@@ -66,6 +66,10 @@ header .navbar .nav .dropdown-submenu:focus > a {
 	background-color: #16a765;
 }
 
+header .navbar .nav .dropdown-submenu:hover > a:after {
+	border-left-color: #fff;
+}
+
 .slick-header-menuitem:hover {
 	color: #fff;
 	background-color: #5377b1;
