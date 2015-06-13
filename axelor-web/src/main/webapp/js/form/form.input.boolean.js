@@ -34,10 +34,6 @@ ui.formInput('Boolean', {
 		var onChange = scope.$events.onChange || angular.noop;
 		var input = element.find('input');
 
-		model.$render = function() {
-			input[0].checked = scope.parse(model.$viewValue);
-		};
-		
 		input.click(function () {
 			scope.setValue(input[0].checked);
 			scope.applyLater(function() {
