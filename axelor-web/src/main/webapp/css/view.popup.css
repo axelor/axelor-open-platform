@@ -63,7 +63,7 @@
 .ui-dialog .ui-dialog-titlebar-close.ui-state-hover {
 	border: 0;
 	background: transparent;
-	font-weight: bold;
+	font-weight: 600;
 	opacity: 0.4;
 }
 
@@ -187,7 +187,7 @@
 	opacity: 0.2;
 }
 .ui-dialog-responsive .ui-dialog-titlebar-max:hover {
-	font-weight: bold;
+	font-weight: 600;
 	color: #212121;
 	opacity: 0.4;
 }

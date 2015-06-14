@@ -463,7 +463,7 @@ header .navbar .nav-link-user-sub {
 
 .record-toolbar .view-title {
 	display: inline-block;
-	font-weight: bold;
+	font-weight: 600;
 	padding-top: 10px;
 	padding-left: 8px;
 }
@@ -549,7 +549,7 @@ header .navbar .nav-link-user-sub {
 
 .stackbar .navbar .navbar-inner .brand {
 	font-size: small;
-	font-weight: bold;
+	font-weight: 600;
 	padding: 4px 8px;
 	margin: 0;
 	margin-left: -10px;
@@ -706,7 +706,7 @@ img.prefix-icon {
 
 .nvtooltip h3 {
 	font-size: 13px;
-	font-weight: bold;
+	font-weight: 600;
 	background: none !important;
 }
 
