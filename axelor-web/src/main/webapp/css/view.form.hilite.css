@@ -20,7 +20,7 @@
 [class *= hilite-].strong,
 [class *= hilite-].strong input:first-of-type,
 [class *= hilite-].strong textarea:first-of-type {
-	font-weight: bold !important;
+	font-weight: 600 !important;
 }
 
 .hilite-primary-text,
@@ -130,7 +130,7 @@
 .form-item-container.bold,
 .form-item-container.bold input:first-of-type,
 .form-item-container.bold textarea:first-of-type {
-	font-weight: bold !important;
+	font-weight: 600 !important;
 }
 
 .form-item label.label-italic,

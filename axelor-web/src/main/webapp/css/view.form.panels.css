@@ -192,8 +192,7 @@
 }
 
 .panel-layout .label-item {
-	color: #999;
-	font-weight: 400;
+	font-weight: 600;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;

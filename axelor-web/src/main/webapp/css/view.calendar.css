@@ -17,8 +17,9 @@
  */
 .view-container .calendar-view > div:last-child {
 	position: absolute;
-	top: 45px;
-	bottom: 0; left: 4px; right: 0;
+	top: 40px;
+	bottom: 0; left: 0; right: 0;
+	background-color: #fff;
 }
 
 .calendar-main {
@@ -26,7 +27,6 @@
 	top: 0; left: 0; bottom: 0;
 	right: 250px;
 	overflow: auto;
-	background-color: #fff;
 }
 
 .calendar-side {
@@ -53,7 +53,7 @@
 }
 
 .calendar-view .record-pager > span {
-	font-weight: bold;
+	font-weight: 600;
 	padding: 10px 4px 0;
 }
 

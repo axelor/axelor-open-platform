@@ -298,7 +298,7 @@
 
 .slick-group-text,
 .slick-group-count {
-	font-weight: bold;
+	font-weight: 600;
 }
 
 .slick-group-count {
@@ -310,7 +310,7 @@
 }
 
 .slick-group-totals {
-	font-weight: bold;
+	font-weight: 600;
 }
 
 .slick-group-totals,
