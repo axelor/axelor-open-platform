@@ -9,8 +9,8 @@
 
 .dms-file-list .record-toolbar .breadcrumb {
 	margin: 0;
-	padding: 10px 8px;
-	font-weight: bold;
+	padding: 11px 8px;
+	font-weight: 600;
 	white-space: nowrap;
 	overflow: hidden;
 	background-color: #fff;
@@ -28,7 +28,7 @@
 	position: absolute;
 	overflow: auto;
 	width: 0;
-	top: 37px;
+	top: 41px;
 	bottom: 0;
 	border-right: 1px solid #d3d3d3;
 	background-color: #fff;
@@ -36,8 +36,8 @@
 
 .dms-file-list .dms-details {
 	position: absolute;
-	right: -250px;
-	top: 37px;
+	right: -260px;
+	top: 41px;
 	bottom: 0;
 	width: 249px;
 	margin: 0;
@@ -50,7 +50,7 @@
 
 .dms-file-list .dms-details > .panel-body {
 	position: absolute;
-	top: 32px;
+	top: 48px;
 	right: 0;
 	bottom: 0;
 	left: 0;
@@ -66,7 +66,7 @@
 }
 
 .dms-file-list.has-details .dms-details {
-	right: 0;
+	right: -1px;
 	max-width: 100%;
 }
 
@@ -79,7 +79,7 @@
 
 .dms-file-list .dms-details label {
 	cursor: default;
-	font-weight: bold;
+	font-weight: 600;
 }
 
 .dms-file-list .dms-details .tags > .label {
@@ -323,7 +323,7 @@
 
 .dms-folder-tree li > a.active {
 	color: #222;
-	font-weight: bold;
+	font-weight: 600;
 }
 
 .grid-dnd-proxy {
@@ -354,8 +354,7 @@
 }
 
 .dms-popup > div > .grid-view {
-	border: 1px solid #d4d4d4;
-	border-top: 0;
+	border: 1px solid #e7e7e7;
 }
 
 .dms-permission-popup {
