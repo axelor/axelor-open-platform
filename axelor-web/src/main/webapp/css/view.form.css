@@ -32,7 +32,7 @@ textarea[readonly] {
 
 .view-container .form-view > div:last-child {
 	position: absolute;
-	top: 37px;
+	top: 41px;
 	bottom: 0; left: 0; right: 0;
 	overflow: auto;
 }
@@ -1140,7 +1140,7 @@ table.field-details .help-text hr {
 .filter-box {
 	position: relative;
 	display: inline-block;
-	margin: 5px 5px 0;
+	margin: 6px 4px 0;
 	box-sizing: border-box;
 	width: 200px;
 	vertical-align: middle;

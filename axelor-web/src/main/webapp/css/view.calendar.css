@@ -17,7 +17,7 @@
  */
 .view-container .calendar-view > div:last-child {
 	position: absolute;
-	top: 42px;
+	top: 45px;
 	bottom: 0; left: 4px; right: 0;
 }
 

@@ -17,7 +17,7 @@
  */
 .view-container .tree-view > .tree-view-container {
 	position: absolute;
-	top: 36px;
+	top: 40px;
 	bottom: 0; left: 0; right: 0;
 	border-top: 1px solid #e7e7e7;
   	background-color: #fff;
