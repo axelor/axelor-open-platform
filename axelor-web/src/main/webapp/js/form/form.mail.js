@@ -176,19 +176,32 @@ ui.directive('uiMailMessage', function () {
 		require: '^uiMailMessages',
 		replace: true,
 		link: function (scope, element, attrs) {
+
+			var body = scope.message.body || "{}";
+			if (body.indexOf("{") === 0) {
+				body = angular.fromJson(body);
+				body.tags = _.map(body.tags, function (tag) {
+					if (tag.style) {
+						tag.css = 'label-' + tag.style;
+					}
+					return tag;
+				});
+				scope.body = body;
+			} else {
+				scope.body = null;
+			}
+
 			setTimeout(function () {
 				element.addClass('fadeIn');
 			});
 		},
 		template: "" +
 			"<div class='fade'>" +
-				"<div class='mail-message alert' ng-class='{ \"alert-info\": !message.parent || record.id > 0}'>" +
-				"<div class='mail-message-left'>" +
-					"<a href='' title='{{message.createdBy.name}}' ng-click='showUser(message.author)'>" +
-						"<img ng-src='{{message.$avatar}}' width='32px'>" +
-					"</a>" +
-				"</div>" +
-				"<div class='mail-message-center'>" +
+				"<a href='' class='pull-left avatar' title='{{message.createdBy.name}}' ng-click='showUser(message.author)'>" +
+					"<img ng-src='{{message.$avatar}}' width='32px'>" +
+				"</a>" +
+				"<div class='mail-message'>" +
+					"<span class='arrow left'></span>" +
 					"<div class='mail-message-icons'>" +
 						"<span ng-if='message.$thread'>" +
 							"<i class='fa fa-reply' ng-show='message.$thread' ng-click='onReply(message)'></i> " +
@@ -216,32 +229,44 @@ ui.directive('uiMailMessage', function () {
 				            "</ul>" +
 						"</div>" +
 					"</div>" +
-					"<div class='mail-message-subject' ng-if='message.$name'>" +
-						"<a ng-if='message.relatedId' href='#ds/form::{{message.relatedModel}}/edit/{{message.relatedId}}'>{{message.$name}}</a>" +
-						"<span ng-if='!message.relatedId'>{{message.$name}}</span>" +
-						"<span ng-if='message.subject'> : {{message.subject}}</span>" +
+					"<div class='mail-message-header' ng-if='message.$name || body.title'>" +
+						"<span class='subject' ng-if='message.$name'>" +
+							"<a ng-if='message.relatedId' href='#ds/form::{{message.relatedModel}}/edit/{{message.relatedId}}'>{{message.$name}}</a>" +
+							"<span ng-if='!message.relatedId'>{{message.$name}}</span>" +
+							"<span ng-if='message.subject'> : {{message.subject}}</span>" +
+						"</span>" +
+						"<span class='track-message'>{{body.title}}</span>" +
+						"<span class='track-tags'>" +
+							"<span class='label' ng-class='item.css' ng-repeat='item in body.tags'>{{item.title}}</span>" +
+						"</span>" +
 					"</div>" +
-					"<div class='mail-message-body' ui-bind-template x-text='message.body'></div>" +
-					"<div class='mail-message-files' ng-show='message.$files.length'>" +
-						"<ul class='inline'>" +
-							"<li ng-repeat='file in message.$files'>" +
-								"<i class='fa fa-paperclip'></i> <a href='' ng-click='onDownload(file)'>{{file.fileName}}</a>" +
+					"<div class='mail-message-body'>" +
+						"<ul class='track-fields' ng-if='body'>" +
+							"<li ng-repeat='item in body.tracks'>" +
+								"<strong>{{item.title}}</strong> : <span ng-bind-html-unsafe='item.value'></span>" +
 							"</li>" +
 						"</ul>" +
-					"</div>" +
-					"<div class='mail-message-footer'>" +
-						"<span ng-if='message.$numReplies' class='pull-right'>" +
-							"<a href='' ng-click='onReplies(message)'>{{formatNumReplies(message)}}</a>" +
-						"</span>" +
-						"<span>" +
-							"<a href='' ng-click='showUser(message.author)'>{{message.author.name}}</a> " +
-							"<span>{{formatEvent(message)}}</span>" +
-						"</span>" +
+						"<div ng-if='!body' ui-bind-template x-text='message.body'></div>" +
+						"<div class='mail-message-files' ng-show='message.$files.length'>" +
+							"<ul class='inline'>" +
+								"<li ng-repeat='file in message.$files'>" +
+									"<i class='fa fa-paperclip'></i> <a href='' ng-click='onDownload(file)'>{{file.fileName}}</a>" +
+								"</li>" +
+							"</ul>" +
+						"</div>" +
+						"<div class='mail-message-footer'>" +
+							"<span ng-if='message.$numReplies' class='pull-right'>" +
+								"<a href='' ng-click='onReplies(message)'>{{formatNumReplies(message)}}</a>" +
+							"</span>" +
+							"<span>" +
+								"<a href='' ng-click='showUser(message.author)'>{{message.author.name}}</a> " +
+								"<span>{{formatEvent(message)}}</span>" +
+							"</span>" +
+						"</div>" +
 					"</div>" +
 				"</div>" +
-			"</div>" +
-			"<div ui-mail-composer ng-if='message.$thread'></div>" +
-		"</div>"
+				"<div ui-mail-composer ng-if='message.$thread'></div>" +
+			"</div>"
 	};
 });
 

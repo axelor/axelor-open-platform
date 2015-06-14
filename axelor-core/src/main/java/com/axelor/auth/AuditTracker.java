@@ -22,7 +22,6 @@ import static com.axelor.common.StringUtils.isBlank;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,6 +47,7 @@ import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
 
 /**
@@ -58,11 +58,23 @@ final class AuditTracker {
 
 	private static final ThreadLocal<List<Model>> PENDING = new ThreadLocal<>();
 
+	private ObjectMapper objectMapper;
+
 	private void add(Model entity) {
 		if (PENDING.get() == null) {
 			PENDING.set(new ArrayList<Model>());
 		}
 		PENDING.get().add(entity);
+	}
+
+	private String toJSON(Object value) {
+		if (objectMapper == null) {
+			objectMapper = Beans.get(ObjectMapper.class);
+		}
+		try {
+			return objectMapper.writeValueAsString(value);
+		} catch (Exception e) {}
+		return null;
 	}
 
 	private Track getTrack(AuditableModel entity) {
@@ -157,8 +169,8 @@ final class AuditTracker {
 		final ScriptBindings bindings = new ScriptBindings(values);
 		final ScriptHelper scriptHelper = new CompositeScriptHelper(bindings);
 
-		final StringBuilder builder = new StringBuilder();
-		final Map<String, String> tags = new LinkedHashMap<>();
+		final List<Map<String, String>> tags = new ArrayList<>();
+		final List<Map<String, String>> tracks = new ArrayList<>();
 		final Set<String> tagFields = new HashSet<>();
 
 		String msg = previousState == null ?
@@ -174,13 +186,6 @@ final class AuditTracker {
 					break;
 				}
 			}
-		}
-
-		builder.append("<div class='track-container'>");
-		builder.append("<span class='track-message'>").append(msg).append("</span>");
-
-		if (track.fields().length > 0) {
-			builder.append("<ul class='track-fields'>");
 		}
 
 		for (TrackField field : track.fields()) {
@@ -217,20 +222,18 @@ final class AuditTracker {
 
 			tagFields.add(name);
 
-			builder
-			.append("<li>")
-			.append("<strong>").append(title).append("</strong>: ").append(dispayValue)
-			.append("</li>");
-		}
+			final Map<String, String> item = new HashMap<>();
+			item.put("title", title);
+			item.put("value", dispayValue);
 
-		if (track.fields().length > 0) {
-			builder.append("</ul>");
+			tracks.add(item);
 		}
 
 		// find matched tags
 		for (TrackMessage tm : track.messages()) {
-			boolean canTag = tm.fields().length == 0;
+			boolean canTag = tm.fields().length == 0 || (tm.fields().length == 1 && isBlank(tm.fields()[0]));
 			for (String name : tm.fields()) {
+				if (isBlank(name)) { continue; }
 				canTag = tagFields.contains(name);
 				if (canTag) { break; }
 			}
@@ -238,19 +241,20 @@ final class AuditTracker {
 			if (hasEvent(tm, TrackEvent.ALWAYS) ||
 				hasEvent(tm, previousState == null ? TrackEvent.CREATE: TrackEvent.UPDATE)) {
 				if (!isBlank(tm.tag()) && scriptHelper.test(tm.condition())) {
-					tags.put(tm.message(), tm.tag());
+					final Map<String, String> item = new HashMap<>();
+					item.put("title", tm.message());
+					item.put("style", tm.tag());
+					tags.add(item);
 				}
 			}
 		}
 
-		builder.append("<div class='track-tags'>");
-		for (String tag : tags.keySet()) {
-			builder.append("<span class='label label-" + tags.get(tag) + "'>").append(tag).append("</span>");
-		}
-		builder.append("</div>"); // track-tags
-		builder.append("</div>"); // track-container
+		final Map<String, Object> json = new HashMap<>();
+		json.put("title", msg);
+		json.put("tags", tags);
+		json.put("tracks", tracks);
 
-		message.setBody(builder.toString());
+		message.setBody(toJSON(json));
 		message.setAuthor(user);
 		message.setRelatedId(entity.getId());
 		message.setRelatedModel(entity.getClass().getName());
@@ -280,7 +284,7 @@ final class AuditTracker {
 	 *            the transaction in which the change tracking is being done
 	 */
 	public void onComplete(Transaction tx) {
-	final List<Model> pending = PENDING.get();
+		final List<Model> pending = PENDING.get();
 		if (pending == null) {
 			return;
 		}

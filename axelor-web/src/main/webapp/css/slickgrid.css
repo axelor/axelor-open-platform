@@ -94,9 +94,9 @@
 
 .slick-headerrow {
 	height: 24px;
-	border: 0;
-	border-bottom: 1px solid #ddd;
-	background: #fff;
+	border: 0 !important;
+	border-bottom: 1px solid #ddd !important;
+	background: #fff !important;
 	background-image: none !important;
 }
 
@@ -112,6 +112,10 @@
 	-webkit-box-sizing: border-box;
 	   -moz-box-sizing: border-box;
 	     box-sizing: border-box;
+}
+
+.slick-headerrow-column:last-child {
+	border-right: transparent !important;
 }
 
 .slick-headerrow input {

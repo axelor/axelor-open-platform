@@ -407,7 +407,7 @@ header .navbar .nav-link-user-sub {
 
 .view-content {
 	position: absolute;
-	top: 38px; left: 0px; right: 0px; bottom: 0px;
+	top: 39px; left: 0px; right: 0px; bottom: 0px;
 }
 
 .view-pane {
@@ -428,13 +428,12 @@ header .navbar .nav-link-user-sub {
 
 .grid-view > .slickgrid {
 	position: absolute !important;
-	top: 36px; left: 0px; right: 0px; bottom: 0px;
+	top: 40px; left: 0px; right: 0px; bottom: 0px;
 	border: none;
 }
 
 .record-toolbar {
 	margin: 0;
-	margin-top: -4px;
 }
 
 .record-toolbar .navbar-inner {
@@ -532,11 +531,6 @@ header .navbar .nav-link-user-sub {
 
 .record-pager-change button {
 	height: auto !important;
-	margin-top: 5px !important;
-}
-
-.record-pager-change input {
-	margin-top: 5px;
 }
 
 .stackbar {
@@ -667,11 +661,19 @@ img.prefix-icon {
 	float: inherit;
 	vertical-align: middle;
 	white-space: nowrap;
+	margin-left: 5px;
+  	margin-right: 0;
+}
+
+.record-toolbar .btn-group,
+.record-toolbar .button-menu a.btn,
+.record-toolbar .record-pager-change button,
+.record-toolbar .record-pager-change input {
+	margin-top: 6px !important;
 }
 
 .record-toolbar .button-menu a.btn {
 	padding: 4px 8px 4px;
-	margin-top: 5px;
 }
 
 .record-toolbar .button-menu a.btn {
