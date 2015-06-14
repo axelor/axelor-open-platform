@@ -229,8 +229,9 @@ final class AuditTracker {
 
 		// find matched tags
 		for (TrackMessage tm : track.messages()) {
-			boolean canTag = tm.fields().length == 0;
+			boolean canTag = tm.fields().length == 0 || (tm.fields().length == 1 && isBlank(tm.fields()[0]));
 			for (String name : tm.fields()) {
+				if (isBlank(name)) { continue; }
 				canTag = tagFields.contains(name);
 				if (canTag) { break; }
 			}
