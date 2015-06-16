@@ -711,10 +711,13 @@ img.prefix-icon {
 }
 
 .about-page {
-	font-size: 14px;
 	position: absolute;
 	top: 0; left: 0; bottom: 0; right: 0;
 	overflow: auto;
+}
+
+.about-page strong {
+	font-weight: 600;
 }
 
 .about-page .page-header {

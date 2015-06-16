@@ -17,6 +17,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="java.util.Calendar"%>
+<%@page import="java.util.Date"%>
 <%@ page language="java" session="true" %>
 <%@ page import="com.axelor.i18n.I18n" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
@@ -25,8 +27,11 @@ String loginTitle = I18n.get("Please sign in");
 String loginRemember = I18n.get("Remember me");
 String loginSubmit = I18n.get("Log in");
 
-String loginUserName = I18n.get("User name");
+String loginUserName = I18n.get("Username");
 String loginPassword = I18n.get("Password");
+
+int year = Calendar.getInstance().get(Calendar.YEAR);
+String copyright = String.format("&copy; 2005 - %s Axelor. All Rights Reserved.", year);
 
 String loginHeader = "login-header.jsp";
 if (pageContext.getServletContext().getResource(loginHeader) == null) {
@@ -44,7 +49,9 @@ if (pageContext.getServletContext().getResource(loginHeader) == null) {
       }
     </style>
     <link href="lib/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="lib/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
     <link href="lib/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="css/view.form.checkbox.css" rel="stylesheet">
     <link href="css/colors.css" rel="stylesheet">
     <link href="css/login.css" rel="stylesheet">
     <script type="text/javascript" src="lib/jquery.ui/js/jquery.js"></script>
@@ -57,28 +64,37 @@ if (pageContext.getServletContext().getResource(loginHeader) == null) {
     <% } %>
 
     <div class="container-fluid">
-      <div class="row-fluid">
-        <div class="panel login-panel span4 offset4">
-          <div class="panel-header panel-default">
-            <span class="panel-title"><%= loginTitle %></span>
-          </div>
-          <div class="panel-body">
-            <form id="login-form" action="" method="POST">
-              <label for="usernameId"><%= loginUserName %></label>
-              <input type="text" class="input-block-level" id="usernameId" name="username">
-              <label for="passwordId"><%= loginPassword %></label>
-              <input type="password" class="input-block-level" id="passwordId" name="password">
-              <label class="checkbox"> <input type="checkbox" value="rememberMe" name="rememberMe"> <%= loginRemember %>
+      <div class="panel login-panel">
+        <div class="panel-header panel-default">
+          <img src="img/axelor.png" width="192px">
+        </div>
+        <div class="panel-body">
+          <form id="login-form" action="" method="POST">
+            <div class="form-fields">
+              <div class="input-prepend">
+                <span class="add-on"><i class="fa fa-envelope"></i></span>
+                <input type="text" id="usernameId" name="username"  placeholder="<%= loginUserName %>">
+              </div>
+              <div class="input-prepend">
+                <span class="add-on"><i class="fa fa-lock"></i></span>
+                <input type="password" id="passwordId" name="password" placeholder="<%= loginPassword %>">
+              </div>
+              <label class="ibox">
+                <input type="checkbox" value="rememberMe" name="rememberMe">
+                <span class="box"></span>
+                <span class="title"><%= loginRemember %></span>
               </label>
-              <button class="btn btn-primary" type="submit"><%= loginSubmit %></button>
-            </form>
-          </div>
+            </div>
+            <div class="form-footer">
+              <button class="btn btn-success" type="submit"><%= loginSubmit %></button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
 
     <footer class="container-fluid">
-      <p class="credit small">&copy; 2014 <a href="http://www.axelor.com">Axelor</a>. All Rights Reserved.</p>
+      <p class="credit small"><%= copyright %></p>
     </footer>
   </body>
 </html>
