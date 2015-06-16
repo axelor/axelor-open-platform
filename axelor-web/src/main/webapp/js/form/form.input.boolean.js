@@ -142,6 +142,7 @@ ui.formInput('BooleanSelect', 'Boolean', {
 			input.toggleClass('not-readonly', !readonly);
 		});
 	},
+	template: "<span class='form-item-container'></span>",
 	template_readonly: '<span>{{text}}</span>',
 	template_editable: "<span class='picker-input'>" +
 				"<input type='text' readonly='readonly'>" +
@@ -161,8 +162,16 @@ ui.formInput('BooleanRadio', 'BooleanSelect', {
 
 		var items = scope.$selection;
 
-		$('<label class="radio">').text(items[0]).append(trueInput).appendTo(element);
-		$('<label class="radio">').text(items[1]).append(falseInput).appendTo(element);
+		$('<label class="ibox round">')
+			.append(trueInput)
+			.append($('<i class="box">'))
+			.append($('<span class="title">').text(items[0]))
+			.appendTo(element);
+		$('<label class="ibox round">')
+			.append(falseInput)
+			.append($('<i class="box">'))
+			.append($('<span class="title">').text(items[1]))
+			.appendTo(element);
 
 		scope.$render_editable = function () {
 			var value = model.$viewValue || false;
@@ -180,30 +189,14 @@ ui.formInput('BooleanRadio', 'BooleanSelect', {
 });
 
 ui.formInput('BooleanSwitch', 'Boolean', {
-	css: 'form-item boolean-switch-item',
-	link: function(scope, element, attrs, model) {
-
-		var input = $('<input type="checkbox" id="'+ attrs.id +'_switch">').appendTo(element);
-		$('<label for="'+ attrs.id +'_switch">').appendTo(element);
-
-		model.$render = function() {
-			input[0].checked = scope.parse(model.$viewValue);
-		};
-
-		input.change(function() {
-			if (scope.isReadonly()) return;
-			scope.setValue(this.checked, true);
-			scope.applyLater();
-		});
-
-		scope.$watch("isReadonly()", function (readonly) {
-			input[0].disabled = readonly;
-		});
-	},
+	css: 'form-item',
 	template_readonly: null,
 	template_editable: null,
 	template:
-		"<div class='boolean-switch'></div>"
+		"<label class='iswitch'>" +
+			"<input type='checkbox' ng-model='record[field.name]' ng-disabled='isReadonly()'>" +
+			"<span class='box'></span>" +
+		"</label>"
 });
 
 })(this);

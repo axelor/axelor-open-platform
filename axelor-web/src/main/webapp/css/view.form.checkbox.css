@@ -104,3 +104,66 @@
 .ibox:hover input:disabled:checked + .box:before {
 	border: 1px solid #16a765;
 }
+
+.form-item.iswitch {
+	margin-top: 4px;
+}
+
+.iswitch {
+    position: relative;
+    display: inline-block;
+    width: 35px;
+    height: 20px;
+    margin: 0;
+    cursor: pointer;
+    background-color: #16a765;
+    border-radius: 30px
+}
+
+.iswitch.readonly {
+	cursor: default;
+}
+
+.iswitch input {
+    position: absolute;
+    opacity: 0;
+    filter: alpha(opacity=0)
+}
+
+.iswitch input:checked + .box:before {
+    top: 50%;
+    right: 5px;
+    bottom: 50%;
+    left: 50%;
+    border-width: 0;
+    border-radius: 5px
+}
+
+.iswitch input:checked + .box:after {
+    margin-left: 16px
+}
+
+.iswitch .box:before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    bottom: -1px;
+    left: -1px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 30px;
+    transition: all .2s
+}
+
+.iswitch .box:after {
+    content: "";
+    position: absolute;
+    top: 1px;
+    bottom: 1px;
+    width: 18px;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.25);
+    transition: margin-left .3s
+}
