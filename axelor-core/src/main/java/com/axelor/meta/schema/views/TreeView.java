@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.db.mapper.Mapper;
@@ -83,8 +84,11 @@ public class TreeView extends AbstractView {
 		@XmlAttribute
 		private String orderBy;
 
-		@XmlElement(name = "field")
-		private List<NodeField> fields;
+		@XmlElements({
+			@XmlElement(name = "field", type = NodeField.class),
+			@XmlElement(name = "button", type = Button.class)
+		})
+		private List<AbstractWidget> items;
 
 		public String getModel() {
 			return model;
@@ -110,13 +114,13 @@ public class TreeView extends AbstractView {
 			return orderBy;
 		}
 
-		public List<NodeField> getFields() {
-			if (fields != null) {
-				for(NodeField field : fields) {
-					field.setModel(model);
+		public List<AbstractWidget> getItems() {
+			if (items != null) {
+				for(AbstractWidget item : items) {
+					item.setModel(model);
 				}
 			}
-			return fields;
+			return items;
 		}
 	}
 

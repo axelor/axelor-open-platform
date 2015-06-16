@@ -133,13 +133,21 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 		var loader = options.loader,
 			record = options.record;
 
-		if (!loader.action) {
+		var target = $(e.target);
+		if (target.is('img,i')) {
+			target = target.parent();
+		}
+		if (e.type === 'click' && !target.is('.tree-button')) {
+			return;
+		}
+		var action = target.attr('x-action') || loader.action;
+		if (!action) {
 			return;
 		}
 
 		if (record.$handler === undefined) {
 			record.$handler = ActionService.handler($scope.$new(), $(e.currentTarget), {
-				action: loader.action
+				action: action
 			});
 		}
 		
@@ -175,12 +183,36 @@ function Column(scope, col) {
 	if (this.title === null || this.title === undefined) {
 		this.title = _.humanize(col.name);
 	}
+	if (col.type == 'button') {
+		this.title = null;
+	}
 
 	this.cellCss = function(record) {
 		return this.css;
 	};
 	
 	this.cellText = function(record) {
+
+		if (col.type === 'button') {
+			var template = "---";
+			var item = _.findWhere(record.$node.items, { type: 'button', name: col.name });
+			if (item) {
+				template = "<a href='javascript:' class='tree-button' x-action='"+ item.onClick +"'>";
+				if (item.icon) {
+					if (item.icon.indexOf('fa') === 0) {
+						template += "<i class='" + item.icon + "'></i>";
+					} else {
+						template += "<img width='16px' src='"+ item.icon +"'>";
+					}
+				}
+				if (item.title) {
+					template += item.title;
+				}
+				template += "</a>";
+			}
+			return template;
+		}
+
 		var value = record[this.name];
 		if (value === undefined || value === null) {
 			return '---';
@@ -222,7 +254,7 @@ function Column(scope, col) {
 function Loader(scope, node, DataSource) {
 
 	var ds = DataSource.create(node.model);
-	var names = _.pluck(node.fields, 'name');
+	var names = _.pluck(node.items, 'name');
 	var domain = null;
 	
 	if (node.parent) {
@@ -269,7 +301,7 @@ function Loader(scope, node, DataSource) {
 		var context = _.extend({}, scope._context),
 			current = item && item.$record;
 		
-		var sortBy = _.find(node.fields, function(field) {
+		var sortBy = _.find(node.items, function(field) {
 			return field.as === scope.sortBy;
 		});
 
@@ -334,7 +366,7 @@ function Loader(scope, node, DataSource) {
 	
 	function accept(current, records) {
 
-		var fields = node.fields,
+		var fields = node.items,
 			parent = current && current.$record,
 			child = that.child;
 
@@ -346,6 +378,7 @@ function Loader(scope, node, DataSource) {
 			var item = {
 				'$id': $id,
 				'$model': node.model,
+				'$node': node,
 				'$record': record,
 				'$selection': {},
 				'$parent': $parent,
@@ -511,7 +544,7 @@ ui.directive('uiViewTree', function(){
 					makeDraggable(tr);
 				}
 
-				tr.on('dblclick', function(e) {
+				tr.on('click dblclick', function(e) {
 					record.$click(e);
 				});
 				
