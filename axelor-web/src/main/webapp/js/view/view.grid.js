@@ -624,7 +624,6 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 			GridViewCtrl.call(this, $scope, $element);
 			
 			var ds = $scope._dataSource;
-			var counter = 0;
 			
 			function doEdit(force) {
 				var promise = MenuService.action($scope._viewAction, {
@@ -658,22 +657,14 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 				setTimeout(function(){
 					NavService.openView(tab);
 					$scope.$apply();
-					if (counter++ === 0) {
-						return;
+					if (force) {
+						$scope.waitForActions(function() {
+							var scope = ($scope.selectedTab || {}).$viewScope;
+							if (scope && scope.onEdit) {
+								scope.onEdit();
+							}
+						});
 					}
-					setTimeout(function() {
-						var scope = ($scope.selectedTab || {}).$viewScope;
-						if (scope && scope.editRecord) {
-							scope.confirmDirty(function() {
-								scope.doRead(record.id).success(function(record){
-									scope.edit(record);
-									if (force) {
-										scope.onEdit();
-									}
-								});
-							});
-						}
-					});
 				});
 			}
 
