@@ -688,10 +688,12 @@ ui.formInput('RadioSelect', {
 	template:
 	'<ul ng-class="{ readonly: isReadonly() }">'+
 		'<li ng-repeat="select in getSelection()">'+
-		'<label>'+
+		'<label class="ibox round">'+
 			'<input type="radio" name="radio_{{$parent.$id}}" value="{{select.value}}"'+
 			' ng-disabled="isReadonly()"'+
-			' ng-checked="getValue() == select.value"> {{select.title}}'+
+			' ng-checked="getValue() == select.value">'+
+			'<span class="box"></span>'+
+			'<span class="title">{{select.title}}</span>'+
 		'</label>'+
 		'</li>'+
 	'</ul>'
