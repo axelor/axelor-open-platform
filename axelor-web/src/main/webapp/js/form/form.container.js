@@ -417,6 +417,11 @@ ui.formWidget('Panel', {
 			element.addClass('noframe');
 		}
 		scope.notitle = field.showFrame === false || field.showTitle === false;
+		scope.title = field.title;
+		scope.$watch('attr("title")', function (title, old) {
+			if (title === undefined || title === old) return;
+			scope.title = title;
+		});
 	},
 
 	transclude: true,
@@ -424,7 +429,7 @@ ui.formWidget('Panel', {
 		"<div class='panel panel-default'>" +
 			"<div class='panel-header' ng-show='field.title' ng-if='!notitle'>" +
 				"<div ng-if='menus' ui-menu-bar menus='menus' handler='this' class='pull-right'></div>" +
-				"<div class='panel-title'>{{attr('title')}}</div>" +
+				"<div class='panel-title'>{{title}}</div>" +
 			"</div>" +
 			"<div class='panel-body' ui-transclude></div>" +
 		"</div>"
