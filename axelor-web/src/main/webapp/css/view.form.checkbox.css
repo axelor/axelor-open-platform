@@ -40,7 +40,7 @@
 
 .ibox input {
 	position: absolute;
-	left: -100px;
+	left: -20px;
 }
 
 .ibox .title {
@@ -66,6 +66,7 @@
 	border: 1px solid #ccc;
 	height: 100%;
 	width: 100%;
+	transition: all .2s;
 }
 
 .ibox input:focus + .box:before {
@@ -96,12 +97,10 @@
 	transform: rotate(-45deg);	
 }
 
-.ibox input:disabled + .box {
-	opacity: .4;
-}
 .ibox:hover input:disabled + .box:before {
 	border: 1px solid #ccc;
 }
+
 .ibox:hover input:disabled:checked + .box:before {
 	border: 1px solid #16a765;
 }

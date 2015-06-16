@@ -46,7 +46,7 @@ ui.formInput('Boolean', {
 	template:
 		"<label class='ibox'>" +
 			"<input type='checkbox' ng-model='record[field.name]' ng-disabled='isReadonly()'>" +
-			"<div class='box'></div>" +
+			"<span class='box'></span>" +
 		"</label>"
 });
 
