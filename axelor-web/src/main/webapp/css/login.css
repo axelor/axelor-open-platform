@@ -16,28 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-html, body {
+body {
 	height: 100%;
+	background-color: #2f4050;
 }
 
-* {
-	box-sizing: border-box;
+header .navbar .brand-logo {
+	float: left;
 }
 
-body, label, button, .btn {
-	font-size: 14px;
+header .navbar .brand-logo img {
+	height: 32px;
+	margin-top: 4px;
 }
 
 .panel {
 	border: 1px solid #d4d4d4;
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+	background-color: #fff;
 }
 
 .panel .panel-header {
-	color: #f0f0f0;
-	background-color: #5377b1;
-	border-bottom: 1px solid #4A6492;
+	background-color: #dadada;
 	padding: 10px;
+	text-align: center;
 }
 
 .panel .panel-title {
@@ -54,21 +56,80 @@ body, label, button, .btn {
 	margin-bottom: 18px;
 }
 
+.login-panel {
+	float: inherit !important;
+	margin: auto !important;
+	width: 420px;
+	border: 0;
+	box-shadow: none;
+	background-color: transparent;
+}
+
+@media (min-width: 1200px) {
+	.login-panel {
+		width: 420px;
+	}
+}
+
+@media (max-width: 767px) {
+	.login-panel {
+		width: 100%;
+	}
+}
+
+.login-panel .panel-header {
+	padding: 22px;
+}
+
+.login-panel .panel-body {
+	padding: 0;
+}
+
+.login-panel .form-fields,
+.login-panel .form-footer {
+	padding: 22px;
+}
+
+.login-panel .form-fields {
+	margin-top: 8px;
+	background-color: #eaeaea;
+}
+
+.login-panel .form-footer {
+	background-color: #fff;
+}
+
+.login-panel .form-footer button {
+	width: 100%;
+	padding: 8px 16px;
+	font-weight: 600;
+}
+
 #login-form {
 	margin: 0;
 }
 
 #login-form input[type="text"],
-#login-form input[type="password"] {
-	border-radius: 0;
-	height: 33px;
+#login-form input[type="password"],
+#login-form .add-on {
+	border-radius: 0 !important;
 	padding: 6px 10px;
 	font-size: 14px;
-	line-height: 1.36;
+	line-height: 20px;
+	height: 20px;
 }
 
 #login-form input[type="checkbox"] {
 	margin-top: 3px;
+}
+
+#login-form .input-prepend {
+	width: 100%;
+	margin-bottom: 16px;
+}
+
+#login-form .input-prepend input {
+	width: calc(100% - 60px);
 }
 
 button.btn {
@@ -107,7 +168,7 @@ button.btn-default:hover {
 }
 
 #login-form label.checkbox {
-	margin-bottom: 10px;
+	margin-bottom: 0;
 }
 
 body > footer {
@@ -127,5 +188,5 @@ body > footer > p a,
 body > footer > p a:hover,
 body > footer > p a:active,
 body > footer > p a:visited {
-	color: #555;
+	color: #f2f2f2;
 }
