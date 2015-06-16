@@ -1172,6 +1172,7 @@
                     <xsd:attribute name="selection" type="xsd:string" />
                   </xsd:complexType>
                 </xsd:element>
+                <xsd:element name="button" type="tns:Button" minOccurs="0" maxOccurs="unbounded" />
               </xsd:sequence>
               <xsd:attribute name="model" type="xsd:string" use="required">
                 <xsd:annotation>
@@ -1616,6 +1617,7 @@
           <xsd:enumeration value="datetime" />
           <xsd:enumeration value="date" />
           <xsd:enumeration value="reference" />
+          <xsd:enumeration value="button" />
         </xsd:restriction>
       </xsd:simpleType>
     </xsd:attribute>
