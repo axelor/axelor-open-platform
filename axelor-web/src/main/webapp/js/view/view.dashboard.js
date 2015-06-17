@@ -175,10 +175,13 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 			var lazy = false;
 
 			var unwatch = scope.$watch(function () {
-				if (element.parent().is(":hidden")) {
+
+				// if embedded inside a form
+				if (scope.editRecord && element.parent().is(":hidden")) {
 					lazy = true;
 					return;
 				}
+
 				var dashlet = scope.dashlet;
 				if (dashlet) {
 					unwatch();
@@ -199,8 +202,8 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 
 				scope.show();
 
-				// if lazy and embedded inside a form
-				if (lazy && scope.editRecord && scope.onRefresh) {
+				// if lazy, load data
+				if (scope.onRefresh && lazy) {
 					scope.onRefresh();
 				}
 			});
