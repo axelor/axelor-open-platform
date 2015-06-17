@@ -128,7 +128,7 @@ function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 		};
 	}
 
-	function doLoad(dashlet) {
+	$scope.initDashlet = function(dashlet) {
 
 		var action = dashlet.action;
 		if (!action) {
@@ -151,14 +151,6 @@ function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 		});
 	};
 
-	var unwatch;
-	unwatch = $scope.$watch('dashlet', function (dashlet) {
-		if (dashlet) {
-			doLoad(dashlet);
-			unwatch();
-		}
-	});
-
 	$scope.$on('on:attrs-change:refresh', function(e) {
 		e.preventDefault();
 		if ($scope.onRefresh) {
@@ -180,6 +172,19 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 		link: function(scope, element, attrs) {
 
 			var body = element.find('.dashlet-body:first');
+			var lazy = false;
+
+			var unwatch = scope.$watch(function () {
+				if (element.parent().is(":hidden")) {
+					lazy = true;
+					return;
+				}
+				var dashlet = scope.dashlet;
+				if (dashlet) {
+					unwatch();
+					scope.initDashlet(dashlet);
+				}
+			});
 
 			scope.parseDashlet = _.once(function(dashlet, view) {
 
@@ -193,6 +198,11 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 				element.removeClass('hidden');
 
 				scope.show();
+
+				// if lazy and embedded inside a form
+				if (lazy && scope.editRecord && scope.onRefresh) {
+					scope.onRefresh();
+				}
 			});
 
 			scope.onDashletToggle = function(event) {
