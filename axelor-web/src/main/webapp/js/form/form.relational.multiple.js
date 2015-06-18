@@ -405,7 +405,7 @@ ui.formInput('OneToMany', {
 		};
 		
 		function isVisible() {
-			return element.parents('.tab-content.form-item').filter(':hidden').size() === 0;
+			return element.parent().filter(':hidden').size() === 0;
 		}
 
 		scope._viewPromise.then(function () {
