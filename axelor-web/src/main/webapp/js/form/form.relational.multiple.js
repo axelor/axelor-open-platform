@@ -405,7 +405,7 @@ ui.formInput('OneToMany', {
 		};
 		
 		function isVisible() {
-			return element.parent().filter(':hidden').size() === 0;
+			return !element.is(':hidden');
 		}
 
 		scope._viewPromise.then(function () {
