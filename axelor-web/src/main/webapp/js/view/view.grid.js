@@ -674,30 +674,47 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 				doEdit(false);
 			};
 
-			function doReload() {
-				if ($scope.editRecord && $element.parent().is(":hidden")) {
-					return;
-				}
+			$scope.$on("on:new", function(e) {
+				$scope.onRefresh();
+			});
+			$scope.$on("on:edit", function(e) {
+				$scope.onRefresh();
+			});
+
+			var unwatch = false;
+			var loading = false;
+
+			$scope.onRefresh = function () {
 				var tab = NavService.getSelected();
 				var type = tab.viewType || tab.type;
-				if (type !== 'grid') {
+				if (type === "grid") {
+					if (unwatch) {
+						unwatch();
+						unwatch = null;
+					}
+					return;
+				}
+
+				if (unwatch || loading) {
+					return;
+				}
+
+				unwatch =  $scope.$watch(function () {
+					if ($element.is(":hidden")) {
+						return;
+					}
+
+					unwatch();
+					unwatch = null;
+					loading = true;
+
 					$scope.waitForActions(function () {
 						$scope.ajaxStop(function () {
+							loading = false;
 							$scope.filter({});
 						});
 					});
-				}
-			}
-
-			$scope.$on("on:new", function(e) {
-				$scope.$timeout(doReload, 100);
-			});
-			$scope.$on("on:edit", function(e) {
-				$scope.$timeout(doReload, 100);
-			});
-
-			$scope.onRefresh = function() {
-				$scope.filter({});
+				});
 			};
 			
 			var _onShow = $scope.onShow;
