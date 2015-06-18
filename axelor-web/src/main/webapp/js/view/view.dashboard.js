@@ -173,20 +173,26 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 
 			var body = element.find('.dashlet-body:first');
 			var lazy = false;
+			var wait = false;
 
 			var unwatch = scope.$watch(function () {
 
-				// if embedded inside a form
-				if (scope.editRecord && element.parent().is(":hidden")) {
-					lazy = true;
-					return;
-				}
-
 				var dashlet = scope.dashlet;
-				if (dashlet) {
-					unwatch();
-					scope.initDashlet(dashlet);
-				}
+				if (!dashlet || wait) return;
+
+				wait = scope.$timeout(function () {
+
+					wait = false;
+
+					// if embedded inside a form
+					if (scope.editRecord && element.parent().is(":hidden")) {
+						lazy = true;
+					} else {
+						unwatch();
+						scope.initDashlet(dashlet);
+					}
+				});
+
 			});
 
 			scope.parseDashlet = _.once(function(dashlet, view) {
