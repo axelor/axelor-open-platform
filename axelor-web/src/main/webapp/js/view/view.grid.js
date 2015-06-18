@@ -674,11 +674,8 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 				doEdit(false);
 			};
 
-			var reloadPending = false;
-
 			function doReload() {
-				reloadPending = $scope.editRecord && $element.parent().is(":hidden");
-				if (reloadPending) {
+				if ($scope.editRecord && $element.parent().is(":hidden")) {
 					return;
 				}
 				var tab = NavService.getSelected();
@@ -697,11 +694,6 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 			});
 			$scope.$on("on:edit", function(e) {
 				$scope.$timeout(doReload, 100);
-			});
-			$scope.$watch(function () {
-				if (reloadPending) {
-					doReload();
-				}
 			});
 
 			$scope.onRefresh = function() {
