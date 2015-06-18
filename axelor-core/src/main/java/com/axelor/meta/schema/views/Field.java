@@ -331,7 +331,7 @@ public class Field extends SimpleWidget {
 	}
 
 	public List<?> getSelectionList() {
-		return MetaStore.getSelectionList(selection);
+		return MetaStore.getSelectionList(getSelection());
 	}
 
 	public void setSelection(String selection) {
