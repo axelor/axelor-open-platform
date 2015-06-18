@@ -151,9 +151,9 @@ function PortletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 		};
 	}
 	
-	$scope.initPortlet = function(action) {
+	$scope.initPortlet = function(action, options) {
 
-		MenuService.action(action).success(function(result){
+		MenuService.action(action, options).success(function(result){
 			if (_.isEmpty(result.data)) {
 				return;
 			}
@@ -221,7 +221,13 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 					} else {
 						unwatch();
 						scope.waitForActions(function () {
-							scope.initPortlet(action);
+							var ctx = undefined;
+							if (scope.getContext) {
+								ctx = scope.getContext();
+							}
+							scope.initPortlet(action, {
+								context: ctx
+							});
 						});
 					}
 				});

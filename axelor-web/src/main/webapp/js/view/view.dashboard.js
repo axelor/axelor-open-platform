@@ -128,14 +128,14 @@ function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 		};
 	}
 
-	$scope.initDashlet = function(dashlet) {
+	$scope.initDashlet = function(dashlet, options) {
 
 		var action = dashlet.action;
 		if (!action) {
 			return init();
 		}
 
-		MenuService.action(action).success(function(result){
+		MenuService.action(action, options).success(function(result){
 			if (_.isEmpty(result.data)) {
 				return;
 			}
@@ -191,7 +191,15 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 						lazy = true;
 					} else {
 						unwatch();
-						scope.initDashlet(dashlet);
+						scope.waitForActions(function () {
+							var ctx = undefined;
+							if (scope.getContext) {
+								ctx = scope.getContext();
+							}
+							scope.initDashlet(dashlet, {
+								context: ctx
+							});
+						});
 					}
 				});
 
