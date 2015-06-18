@@ -178,9 +178,11 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 			var unwatch = scope.$watch(function () {
 
 				var dashlet = scope.dashlet;
-				if (!dashlet || wait) return;
-
-				wait = scope.$timeout(function () {
+				if (!dashlet) return;
+				if (wait) {
+					clearTimeout(wait);
+				}
+				wait = setTimeout(function () {
 
 					wait = false;
 
