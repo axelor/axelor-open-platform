@@ -171,42 +171,31 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 		controller: DashletCtrl,
 		link: function(scope, element, attrs) {
 
-			var body = element.find('.dashlet-body:first');
-			var lazy = false;
-			var wait = false;
-
+			var lazy = true;
 			var unwatch = scope.$watch(function () {
-
 				var dashlet = scope.dashlet;
-				if (!dashlet) return;
-				if (wait) {
-					clearTimeout(wait);
+				if (!dashlet) {
+					return;
 				}
-				wait = setTimeout(function () {
 
-					wait = false;
+				if (element.parent().is(":hidden")) {
+					return lazy = true;
+				}
 
-					// if embedded inside a form
-					if (scope.editRecord && element.parent().is(":hidden")) {
-						lazy = true;
-					} else {
-						unwatch();
-						scope.waitForActions(function () {
-							var ctx = undefined;
-							if (scope.getContext) {
-								ctx = scope.getContext();
-							}
-							scope.initDashlet(dashlet, {
-								context: ctx
-							});
-						});
-					}
+				unwatch();
+				unwatch = null;
+
+				var ctx = undefined;
+				if (scope.getContext) {
+					ctx = scope.getContext();
+				}
+				scope.initDashlet(dashlet, {
+					context: ctx
 				});
-
 			});
 
 			scope.parseDashlet = _.once(function(dashlet, view) {
-
+				var body = element.find('.dashlet-body:first');
 				var template = $('<div ui-portlet-' + view.viewType + '></div>');
 
 				scope.noFilter = !dashlet.canSearch;

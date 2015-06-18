@@ -203,49 +203,35 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 		link: function(scope, element, attrs) {
 
 			var lazy = false;
-			var wait = false;
-
 			var unwatch = scope.$watch(function () {
 				var action = attrs.action;
-				if (!action) return;
-				if (wait) {
-					clearTimeout(wait);
+				if (!action) {
+					return;
 				}
-				wait = setTimeout(function () {
 
-					wait = false;
+				if (element.parent().is(":hidden")) {
+					return lazy = true;
+				}
 
-					// if embedded inside a form
-					if (scope.editRecord && element.parent().is(":hidden")) {
-						lazy = true;
-					} else {
-						unwatch();
-						scope.waitForActions(function () {
-							var ctx = undefined;
-							if (scope.getContext) {
-								ctx = scope.getContext();
-							}
-							scope.initPortlet(action, {
-								context: ctx
-							});
-						});
-					}
+				unwatch();
+				unwatch = null;
+
+				var ctx = undefined;
+				if (scope.getContext) {
+					ctx = scope.getContext();
+				}
+				scope.initPortlet(action, {
+					context: ctx
 				});
 			});
 			
-			var initialized = false;
-			scope.parsePortlet = function(view) {
-				
-				if (initialized) {
-					return;
-				}
-				initialized = true;
-				
+			scope.parsePortlet = _.once(function(view) {
+
 				scope.noFilter = attrs.canSearch != "true";
 
 				var template = $compile($('<div ui-portlet-' + view.viewType + '></div>'))(scope);
 				element.find('.portlet-content:first').append(template);
-				
+
 				scope.show();
 				
 				if (scope.portletCols) {
@@ -256,7 +242,7 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 				if (scope.onRefresh && lazy) {
 					scope.onRefresh();
 				}
-			};
+			});
 			
 			scope.onPortletToggle = function(event) {
 				var e = $(event.target);
