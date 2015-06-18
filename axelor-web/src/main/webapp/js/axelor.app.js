@@ -35,14 +35,14 @@
 			loadingTimer = null;
 		}
 		if (loadingCounter > 0) {
-			return loadingTimer = _.delay(hideLoading, 300);
+			return loadingTimer = _.delay(hideLoading, 500);
 		}
 		loadingTimer = _.delay(function () {
 			loadingTimer = null;
 			if (loadingElem) {
 				loadingElem.fadeOut(100);
 			}
-		}, 100);
+		}, 500);
 	}
 
 	function onHttpStart(data, headersGetter) {
