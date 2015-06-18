@@ -201,11 +201,30 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 		scope: true,
 		controller: PortletCtrl,
 		link: function(scope, element, attrs) {
-			
-			attrs.$observe('action', function (action) {
-				if (action) {
-					scope.initPortlet(action)
+
+			var lazy = false;
+			var wait = false;
+
+			var unwatch = scope.$watch(function () {
+				var action = attrs.action;
+				if (!action) return;
+				if (wait) {
+					clearTimeout(wait);
 				}
+				wait = setTimeout(function () {
+
+					wait = false;
+
+					// if embedded inside a form
+					if (scope.editRecord && element.parent().is(":hidden")) {
+						lazy = true;
+					} else {
+						unwatch();
+						scope.waitForActions(function () {
+							scope.initPortlet(action);
+						});
+					}
+				});
 			});
 			
 			var initialized = false;
@@ -225,6 +244,11 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 				
 				if (scope.portletCols) {
 					setPortletSize(scope, element, attrs);
+				}
+
+				// if lazy, load data
+				if (scope.onRefresh && lazy) {
+					scope.onRefresh();
 				}
 			};
 			
