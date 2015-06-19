@@ -15,8 +15,8 @@ configurations {
 
 task updateVersion() {
 	def versionFile = file("${projectDir}/src/main/resources/axelor-version.txt")
-	onlyIf { versionFile.text != project.version }
-	doLast { versionFile.text = project.version }
+	onlyIf { versionFile.text.trim() != project.version }
+	doLast { versionFile.text = project.version + "\n" }
 }
 
 afterEvaluate {

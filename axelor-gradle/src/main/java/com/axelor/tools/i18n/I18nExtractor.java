@@ -449,8 +449,11 @@ public class I18nExtractor {
 		try (CSVWriter csv = new CSVWriter(writer)) {
 			csv.writeNext(CSV_HEADER);
 			for (String[] line : values) {
-				line[1] = StringUtils.isBlank(line[1]) ? null : line[1];
-				line[2] = StringUtils.isBlank(line[2]) ? null : line[2];
+				for (int i = 0; i < line.length; i++) {
+					if (StringUtils.isBlank(line[i])) {
+						line[i] = null;
+					}
+				}
 				csv.writeNext(line);
 			}
 		} catch (IOException e) {

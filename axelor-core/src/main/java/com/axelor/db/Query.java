@@ -17,7 +17,6 @@
  */
 package com.axelor.db;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -59,8 +58,6 @@ public class Query<T extends Model> {
 
 	private String orderBy;
 
-	private List<String> orderByNames;
-
 	private JoinHelper joinHelper;
 
 	private boolean cacheable;
@@ -86,7 +83,6 @@ public class Query<T extends Model> {
 	public Query(Class<T> beanClass) {
 		this.beanClass = beanClass;
 		this.orderBy = "";
-		this.orderByNames = new ArrayList<>();
 		this.joinHelper = new JoinHelper(beanClass);
 	}
 
@@ -186,8 +182,6 @@ public class Query<T extends Model> {
 		}
 
 		String name = this.joinHelper.joinName(m.group(2));
-
-		orderByNames.add(name);
 		orderBy += name + ("-".equals(m.group(1)) ? " DESC" : "");
 
 		return this;
@@ -514,15 +508,7 @@ public class Query<T extends Model> {
 				}
 			}
 
-			// order by names are required for SELECT DISTINCT
-			for (String name : orderByNames) {
-				if (!selects.contains(name)) {
-					selects.add(name);
-					this.names.add(name);
-				}
-			}
-
-			StringBuilder sb = new StringBuilder("SELECT DISTINCT")
+			StringBuilder sb = new StringBuilder("SELECT ")
 				.append(" new List(" + Joiner.on(", ").join(selects) + ")")
 				.append(" FROM ")
 				.append(beanClass.getSimpleName())
