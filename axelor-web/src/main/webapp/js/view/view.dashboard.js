@@ -128,14 +128,14 @@ function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 		};
 	}
 
-	function doLoad(dashlet) {
+	$scope.initDashlet = function(dashlet, options) {
 
 		var action = dashlet.action;
 		if (!action) {
 			return init();
 		}
 
-		MenuService.action(action).success(function(result){
+		MenuService.action(action, options).success(function(result){
 			if (_.isEmpty(result.data)) {
 				return;
 			}
@@ -150,14 +150,6 @@ function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 			$scope.parseDashlet(dashlet, view);
 		});
 	};
-
-	var unwatch;
-	unwatch = $scope.$watch('dashlet', function (dashlet) {
-		if (dashlet) {
-			doLoad(dashlet);
-			unwatch();
-		}
-	});
 
 	$scope.$on('on:attrs-change:refresh', function(e) {
 		e.preventDefault();
@@ -179,10 +171,31 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 		controller: DashletCtrl,
 		link: function(scope, element, attrs) {
 
-			var body = element.find('.dashlet-body:first');
+			var lazy = true;
+			var unwatch = scope.$watch(function () {
+				var dashlet = scope.dashlet;
+				if (!dashlet) {
+					return;
+				}
+
+				if (element.parent().is(":hidden")) {
+					return lazy = true;
+				}
+
+				unwatch();
+				unwatch = null;
+
+				var ctx = undefined;
+				if (scope.getContext) {
+					ctx = scope.getContext();
+				}
+				scope.initDashlet(dashlet, {
+					context: ctx
+				});
+			});
 
 			scope.parseDashlet = _.once(function(dashlet, view) {
-
+				var body = element.find('.dashlet-body:first');
 				var template = $('<div ui-portlet-' + view.viewType + '></div>');
 
 				scope.noFilter = !dashlet.canSearch;
@@ -193,6 +206,11 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 				element.removeClass('hidden');
 
 				scope.show();
+
+				// if lazy, load data
+				if (scope.onRefresh && lazy) {
+					scope.onRefresh();
+				}
 			});
 
 			scope.onDashletToggle = function(event) {

@@ -624,7 +624,6 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 			GridViewCtrl.call(this, $scope, $element);
 			
 			var ds = $scope._dataSource;
-			var counter = 0;
 			
 			function doEdit(force) {
 				var promise = MenuService.action($scope._viewAction, {
@@ -658,22 +657,14 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 				setTimeout(function(){
 					NavService.openView(tab);
 					$scope.$apply();
-					if (counter++ === 0) {
-						return;
+					if (force) {
+						$scope.waitForActions(function() {
+							var scope = ($scope.selectedTab || {}).$viewScope;
+							if (scope && scope.onEdit) {
+								scope.onEdit();
+							}
+						});
 					}
-					setTimeout(function() {
-						var scope = ($scope.selectedTab || {}).$viewScope;
-						if (scope && scope.editRecord) {
-							scope.confirmDirty(function() {
-								scope.doRead(record.id).success(function(record){
-									scope.edit(record);
-									if (force) {
-										scope.onEdit();
-									}
-								});
-							});
-						}
-					});
 				});
 			}
 
@@ -683,27 +674,47 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 				doEdit(false);
 			};
 
-			function doReload() {
+			$scope.$on("on:new", function(e) {
+				$scope.onRefresh();
+			});
+			$scope.$on("on:edit", function(e) {
+				$scope.onRefresh();
+			});
+
+			var unwatch = false;
+			var loading = false;
+
+			$scope.onRefresh = function () {
 				var tab = NavService.getSelected();
 				var type = tab.viewType || tab.type;
-				if (type !== 'grid') {
+				if (type === "grid") {
+					if (unwatch) {
+						unwatch();
+						unwatch = null;
+					}
+					return;
+				}
+
+				if (unwatch || loading) {
+					return;
+				}
+
+				unwatch =  $scope.$watch(function () {
+					if ($element.is(":hidden")) {
+						return;
+					}
+
+					unwatch();
+					unwatch = null;
+					loading = true;
+
 					$scope.waitForActions(function () {
 						$scope.ajaxStop(function () {
+							loading = false;
 							$scope.filter({});
 						});
 					});
-				}
-			}
-
-			$scope.$on("on:new", function(e) {
-				$scope.$timeout(doReload, 100);
-			});
-			$scope.$on("on:edit", function(e) {
-				$scope.$timeout(doReload, 100);
-			});
-
-			$scope.onRefresh = function() {
-				$scope.filter({});
+				});
 			};
 			
 			var _onShow = $scope.onShow;

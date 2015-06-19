@@ -17,16 +17,11 @@
  */
 package com.axelor.mail;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-
 import org.joda.time.LocalDateTime;
 import org.junit.Test;
 
 import com.axelor.AbstractTest;
 import com.axelor.common.ClassUtils;
-import com.google.common.io.CharStreams;
 
 public class MailSenderTest extends AbstractTest {
 
@@ -48,31 +43,34 @@ public class MailSenderTest extends AbstractTest {
 		MailAccount account = new SmtpAccount(SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SmtpAccount.ENCRYPTION_TLS);
 		MailSender sender = new MailSender(account);
 
-		String file = ClassUtils.getResource("log4j.properties").getFile();
-		String url = "http://www.axelor.com/wp-content/uploads/2014/08/Logo-site.png";
+		String file = ClassUtils.getResource("com/axelor/mail/test-file.txt").getFile();
+		String image = ClassUtils.getResource("com/axelor/mail/test-image.png").getFile();
 
-		String text = "Hello world...";
-
-		try (InputStream is = ClassUtils.getResourceStream("com/axelor/mail/test-mail.html");
-			 Reader reader = new InputStreamReader(is)) {
-			text = CharStreams.toString(reader);
-		} catch (Exception e) {
-		}
+		String text = "<strong>Hello world...</strong>"
+				+ "<hr>"
+				+ "<p>This is a testing email and not a <strong><span style='color: red;'>spam...</span></strong></p>"
+				+ "<p>This is a link image...</p>"
+				+ "<img src='http://www.axelor.com/wp-content/uploads/2014/08/Logo-site.png'>"
+				+ "<p>This is an inline image...</p>"
+				+ "<img src='cid:logo.png'></img>"  // refer <logo.png> (don't include angle brackets)
+				+ "<br>"
+				+ "---"
+				+ "<span style='color: blue;'><i>John Smith</i></span>";
 
 		sender.compose()
 			.to(SEND_TO)
 			.subject("Hello...")
 			.html(text)
-			.attach("log4j.properties", file)
-			.attach("logo.png", url)
+			.attach("text.txt", file)
+			.attach("logo.png", image, "<logo.png>") // as hidden content to refer as "cid:data", note the angle brackets
 			.send();
 
 		sender.compose()
 		.to(SEND_TO)
 		.subject("Hello again...")
 		.html(text)
-		.attach("log4j.properties", file)
-		.attach("logo.png", url)
+		.attach("text.txt", file)
+		.attach("logo.png", image)  // cid is not set, can't be referenced as inline image
 		.send((new LocalDateTime().minusDays(15)).toDate());
 	}
 }

@@ -151,9 +151,9 @@ function PortletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 		};
 	}
 	
-	$scope.initPortlet = function(action) {
+	$scope.initPortlet = function(action, options) {
 
-		MenuService.action(action).success(function(result){
+		MenuService.action(action, options).success(function(result){
 			if (_.isEmpty(result.data)) {
 				return;
 			}
@@ -201,32 +201,48 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 		scope: true,
 		controller: PortletCtrl,
 		link: function(scope, element, attrs) {
-			
-			attrs.$observe('action', function (action) {
-				if (action) {
-					scope.initPortlet(action)
-				}
-			});
-			
-			var initialized = false;
-			scope.parsePortlet = function(view) {
-				
-				if (initialized) {
+
+			var lazy = false;
+			var unwatch = scope.$watch(function () {
+				var action = attrs.action;
+				if (!action) {
 					return;
 				}
-				initialized = true;
-				
+
+				if (element.parent().is(":hidden")) {
+					return lazy = true;
+				}
+
+				unwatch();
+				unwatch = null;
+
+				var ctx = undefined;
+				if (scope.getContext) {
+					ctx = scope.getContext();
+				}
+				scope.initPortlet(action, {
+					context: ctx
+				});
+			});
+			
+			scope.parsePortlet = _.once(function(view) {
+
 				scope.noFilter = attrs.canSearch != "true";
 
 				var template = $compile($('<div ui-portlet-' + view.viewType + '></div>'))(scope);
 				element.find('.portlet-content:first').append(template);
-				
+
 				scope.show();
 				
 				if (scope.portletCols) {
 					setPortletSize(scope, element, attrs);
 				}
-			};
+
+				// if lazy, load data
+				if (scope.onRefresh && lazy) {
+					scope.onRefresh();
+				}
+			});
 			
 			scope.onPortletToggle = function(event) {
 				var e = $(event.target);
