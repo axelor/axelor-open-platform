@@ -1,6 +1,4 @@
-# Current (3.0.10)
-
-# 3.0.9 (2015-06-19)
+# 3.0.10 (2015-06-19)
 
 ## Bug fixes
 
@@ -16,6 +14,8 @@
 - support for buttons in tree view
 - allow changing panel title with action-attrs
 - don't show search option in m2o dropdown if all items are fetched
+
+# 3.0.9 (2015-06-10)
 
 ## Bug fixes
 
