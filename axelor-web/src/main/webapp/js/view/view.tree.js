@@ -329,7 +329,8 @@ function Loader(scope, node, DataSource) {
 
 		var opts = _.extend(this.getDomain(context), {
 			fields: names,
-			archived: true
+			archived: true,
+			action: scope._viewAction
 		});
 
 		if (sortBy) {
