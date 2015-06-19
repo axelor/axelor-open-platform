@@ -311,10 +311,11 @@ function Loader(scope, node, DataSource) {
 		
 		sortBy = sortBy || node.orderBy;
 
+		if (scope.getContext) {
+			context = _.extend(context, scope.getContext());
+		}
 		if (current) {
 			context.parentId = current.id;
-		} else if (scope.getContext) {
-			context = scope.getContext() || {};
 		}
 
 		if (scope._countOn) {
