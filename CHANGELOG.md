@@ -1,6 +1,21 @@
 # Current (3.0.10)
 
-# 3.0.9 (2015-06-10)
+# 3.0.9 (2015-06-19)
+
+## Bug fixes
+
+- fix tree view context issues
+- fix x-bind issues (empty value)
+- fix form view not in edit mode when opened from dashlet
+- fix performance issue caused by distinct select
+
+## Improvements
+
+- lazy loading dashlet/portlet
+- support for setting content id from main builder api
+- support for buttons in tree view
+- allow changing panel title with action-attrs
+- don't show search option in m2o dropdown if all items are fetched
 
 ## Bug fixes
 
