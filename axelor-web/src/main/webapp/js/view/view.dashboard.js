@@ -65,27 +65,18 @@ function DashboardCtrl($scope, $element) {
 
 	$scope.parse = function(schema) {
 		var items = schema.items || [];
-		var rows = [[]];
-		var last = _.last(rows);
-		var lastCol = 0;
+		var row = [];
 
 		items.forEach(function (item) {
 			var span = item.colSpan || 6;
 
-			if (lastCol + span > 12) {
-				lastCol = 0;
-				last = [];
-				rows.push(last);
-			}
-
 			item.spanCss = {};
 			item.spanCss['dashlet-cs' + span] = true;
 
-			last.push(item);
-			lastCol += span;
+			row.push(item);
 		});
 
-		$scope.rows = rows;
+		$scope.row = row;
 	};
 }
 
@@ -96,16 +87,33 @@ ui.directive('uiViewDashboard', ['$compile', function($compile) {
 		controller: DashboardCtrl,
 		link: function(scope, element, attrs) {
 
+			function makeSortable() {
+				element.sortable({
+					handle: ".dashlet-header",
+					cancel: ".dashlet-buttons",
+					items: ".dashlet",
+					activate: function(e, ui) {
+						var height = ui.helper.height();
+						ui.placeholder.height(height);
+					},
+					deactivate: function(event, ui) {
+						axelor.$adjustSize();
+					}
+				});
+			}
+
+			var unwatch = scope.$watch("row.length", function (length) {
+				if (!length) { return; }
+				unwatch();
+				unwatch = null;
+				scope.waitForActions(makeSortable);
+			});
 		},
 		replace: true,
 		transclude: true,
 		template:
 		"<div>" +
-			"<div class='dashlet-container container-fluid' ui-transclude>" +
-				"<div class='dashlet-row' ng-repeat='row in rows'>" +
-					"<div class='dashlet' ng-class='dashlet.spanCss' ng-repeat='dashlet in row' ui-view-dashlet></div>" +
-				"</div>" +
-			"</div>" +
+			"<div class='dashlet' ng-class='dashlet.spanCss' ng-repeat='dashlet in row' ui-view-dashlet></div>" +
 		"</div>"
 	};
 }]);
