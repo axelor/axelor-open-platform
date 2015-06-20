@@ -309,7 +309,7 @@ ui.formInput('ManyToOne', 'Select', {
 			this.fetchSelection(request, function(items, page) {
 				var term = request.term;
 				
-				if (scope.canSelect()) {
+				if (scope.canSelect() && items.length < page.total) {
 					items.push({
 						label: _t("Search..."),
 						click: function() { scope.showSelector(); }

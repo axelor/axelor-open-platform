@@ -1,4 +1,35 @@
-# Current (3.0.9)
+# Current (3.0.11)
+
+# 3.0.10 (2015-06-19)
+
+## Bug fixes
+
+- fix tree view context issues
+- fix x-bind issues (empty value)
+- fix form view not in edit mode when opened from dashlet
+- fix performance issue caused by distinct select
+
+## Improvements
+
+- lazy loading dashlet/portlet
+- support for setting content id from main builder api
+- support for buttons in tree view
+- allow changing panel title with action-attrs
+- don't show search option in m2o dropdown if all items are fetched
+
+# 3.0.9 (2015-06-10)
+
+## Bug fixes
+
+- fix action handler issue (typo)
+- fix search view overriding issue
+- fix onChange event on toggle widget
+
+## Improvements
+
+- allow resizing popup editor on desktop
+- use full width for dashboard on big screens
+- don't include context details in i18n catalogs
 
 # 3.0.8 (2015-06-01)
 

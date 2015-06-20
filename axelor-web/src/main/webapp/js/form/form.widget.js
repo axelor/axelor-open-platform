@@ -292,7 +292,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 				}
 			} catch (e) {}
 
-			if (scope.setValue && last !== value) {
+			if (scope.setValue && scope.record && last !== value) {
 				scope.setValue(last = value);
 			}
 		}

@@ -163,12 +163,20 @@ public class GradleCommands implements CommandProvider {
 			@CliOption(name = "extract", shortName = 'e', help = "extract messages.")
 			boolean extract,
 			@CliOption(name = "update", shortName = 'u', help = "update messages.")
-			boolean update) {
+			boolean update,
+			@CliOption(name = "with-context", shortName = 'c', help = "extract context details.")
+			boolean withContext) {
 		final String task = update ? "i18n-update" : "i18n-extract";
-		if (StringUtils.isBlank(module)) {
-			return execute("-q", "-x", "test", task);
+		final List<String> args = Lists.newArrayList("-q", "-x", "test");
+		if (withContext) {
+			args.add("-Pwith.context=true");
 		}
-		return execute("-q", "-x", "test", "-p", module, task);
+		if (!StringUtils.isBlank(module)) {
+			args.add("-p");
+			args.add(module);
+		}
+		args.add(task);
+		return execute(args.toArray(new String[] {}));
 	}
 
 	@CliCommand(name = "init", usage = "[OPTIONS] [MODULES...]", help = "initialize or update the database")
