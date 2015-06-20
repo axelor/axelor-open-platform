@@ -218,7 +218,8 @@ class AppPlugin extends AbstractPlugin {
 		project.eclipse.wtp.component.file {
 			withXml {
 				def node = it.asNode()['wb-module'][0]
-				node.find { it.'@source-path' == "src/main/webapp" }?.replaceNode {
+				def refs = node.findAll { it.name() == 'wb-resource' }
+				def extra = {
 					['wb-resource'('deploy-path': "/", 'source-path': "axelor-webapp"),
 					 'wb-resource'('deploy-path': "/", 'source-path': "src/main/webapp")] +
 					wtpLinked.collect { name ->
@@ -226,6 +227,12 @@ class AppPlugin extends AbstractPlugin {
 							'dependency-type'('uses')
 						}
 					}
+				}
+				def ref = refs.find { it.'@source-path' == "src/main/webapp" };
+				if (ref) {
+					ref.replaceNode extra
+				} else {
+					refs.last()?.plus extra
 				}
 			}
 		}
