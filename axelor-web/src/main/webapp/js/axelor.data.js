@@ -274,7 +274,8 @@
 				promise = promise.then(function(response){
 					var res = response.data;
 					res.offset = offset;
-					res.data = res.data || [];
+					res.data = _.unique(res.data, function (a) { return a.id; });
+
 					if (opts.store) {
 						that._accept(res);
 						page.index = -1;
