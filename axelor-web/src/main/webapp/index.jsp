@@ -41,11 +41,6 @@ if (appDesc != null) {
 
 String appJS = AppInfo.getAppJS(getServletContext());
 String appCss = AppInfo.getAppCSS(getServletContext());
-String webkitCss = null;
-
-if (AppInfo.isMobile(request) && AppInfo.isWebKit(request)) {
-  webkitCss = "css/webkit.mobile.css";
-}
 %>
 <!DOCTYPE html>
 <html lang="en" ng-app="axelor.app" ng-controller="AppCtrl" ng-cloak>
@@ -58,9 +53,6 @@ if (AppInfo.isMobile(request) && AppInfo.isWebKit(request)) {
 
     <!-- Le styles -->
     <link href="<%= appCss %>" rel="stylesheet">
-    <% if (webkitCss != null) { %>
-    <link href="<%= webkitCss %>" rel="stylesheet">
-    <% } %>
     <% if (appTheme != null) { %>
     <link href="css/<%= appTheme %>/theme.css" rel="stylesheet">
     <% } %>
