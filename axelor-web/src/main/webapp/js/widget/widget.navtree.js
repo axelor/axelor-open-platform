@@ -32,6 +32,10 @@ ui.directive('navTree', ['MenuService', function(MenuService) {
 
 			var handler = $scope.itemClick();
 
+			function canAccept(item) {
+				return item.left || item.left === undefined;
+			}
+
 			this.onClick = function (e, menu) {
 				if (menu.isFolder) {
 					return;
@@ -56,7 +60,7 @@ ui.directive('navTree', ['MenuService', function(MenuService) {
 					if (node) {
 						node.children.push(item);
 						item.icon = null;
-					} else {
+					} else if (canAccept(item)){
 						menus.push(item);
 					}
 				});
