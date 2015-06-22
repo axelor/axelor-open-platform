@@ -72,6 +72,16 @@
     <view type="form" name="meta-view-form"/>
   </action-view>
 
+  <menuitem name="menu-view-my" parent="menu-view-management"
+    title="My Views"
+    action="action-meta-views-my"/>
+
+  <action-view name="action-meta-views-my" title="My Views" model="com.axelor.meta.db.MetaViewCustom">
+    <view type="grid" name="meta-view-custom-grid"/>
+    <view type="form" name="meta-view-custom-form"/>
+    <domain>self.user = :__user__</domain>
+  </action-view>
+
   <menuitem name="menu-view-menus" parent="menu-view-management"
     title="All Menus"
     action="action-meta-menus"/>

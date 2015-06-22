@@ -49,8 +49,8 @@
   </entity>
 
   <entity name="MetaViewCustom" table="META_VIEW_CUSTOM" cachable="true">
-    <string name="name" readonly="true" />
-    <string name="title" readonly="true" namecolumn="true" />
+    <string name="name" required="true" />
+    <string name="title" required="true" namecolumn="true" />
     <string name="type" required="true" selection="view.type.selection"/>
     <string name="model" />
     <string name="xml" required="true" large="true"/>

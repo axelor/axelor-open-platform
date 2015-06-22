@@ -109,6 +109,27 @@
     </panel>
   </form>
 
+  <grid title="Personalized Views" name="meta-view-custom-grid" model="com.axelor.meta.db.MetaViewCustom">
+    <field name="name"/>
+    <field name="title"/>
+    <field name="type"/>
+    <field name="model"/>
+    <field name="user"/>
+  </grid>
+
+  <form name="meta-view-custom-form" title="Personalized View" model="com.axelor.meta.db.MetaViewCustom"
+        onSave="com.axelor.meta.web.MetaController:clearCache" width="large">
+    <panel title="Overview">
+      <field name="name"/>
+      <field name="title"/>
+      <field name="type"/>
+      <field name="user"/>
+    </panel>
+    <panel title="Schema">
+      <field name="xml" showTitle="false" widget="CodeEditor" height="500" x-code-syntax="xml" colSpan="12"/>
+    </panel>
+  </form>
+
   <grid title="All Actions" name="meta-action-grid" model="com.axelor.meta.db.MetaAction">
     <field name="name" />
     <field name="type"/>

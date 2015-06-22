@@ -148,7 +148,14 @@
 	padding: 14px;
 }
 
+
+.dashboard,
+.dashboard .dashlet {
+	box-sizing: border-box;
+}
+
 .dashboard .ui-sortable-placeholder {
+	border: 1px dashed #cecece !important;
 	visibility: visible !important;
 	background: #e7eaec !important;
 }
