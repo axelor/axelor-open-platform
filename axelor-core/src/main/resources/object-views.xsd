@@ -1153,23 +1153,17 @@
   </xsd:complexType>
 
   <xsd:complexType name="Dashboard">
-    <xsd:sequence>
-      <xsd:element name="dashlet" type="tns:Dashlet" maxOccurs="unbounded">
-        <xsd:annotation>
-          <xsd:documentation>Specify an action view as a dashlet.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-    </xsd:sequence>
-    <xsd:attribute name="name" type="xsd:string" use="required">
-      <xsd:annotation>
-        <xsd:documentation>Specify an unique name for this dashboard.</xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="title" type="xsd:string" use="required">
-      <xsd:annotation>
-        <xsd:documentation>The display title.</xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
+    <xsd:complexContent>
+      <xsd:extension base="tns:SimpleView">
+        <xsd:sequence>
+        <xsd:element name="dashlet" type="tns:Dashlet" maxOccurs="unbounded">
+          <xsd:annotation>
+            <xsd:documentation>Specify an action view as a dashlet.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+      </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
   </xsd:complexType>
 
   <xsd:complexType name="AbstractFormView" abstract="true">

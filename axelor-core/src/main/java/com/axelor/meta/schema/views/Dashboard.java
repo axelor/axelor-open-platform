@@ -37,4 +37,8 @@ public class Dashboard extends AbstractView {
 	public List<AbstractWidget> getItems() {
 		return items;
 	}
+
+	public void setItems(List<AbstractWidget> items) {
+		this.items = items;
+	}
 }

@@ -32,6 +32,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -49,6 +50,7 @@ import com.google.common.base.Strings;
 	@Type(TreeView.class),
 	@Type(ChartView.class),
 	@Type(CalendarView.class),
+	@Type(Dashboard.class),
 	@Type(Portal.class),
 	@Type(Search.class),
 	@Type(SearchFilters.class)
@@ -111,6 +113,7 @@ public abstract class AbstractView {
 		return title;
 	}
 
+	@JsonSetter
 	public void setTitle(String title) {
 		this.title = title;
 	}
