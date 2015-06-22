@@ -152,6 +152,9 @@
 	visibility: visible !important;
 	background: #e7eaec !important;
 }
+.dashboard .ui-sortable-helper {
+	box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
 
 .dashboard .dashlet {
 	background-color: #fff;

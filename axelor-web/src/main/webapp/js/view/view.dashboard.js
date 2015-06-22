@@ -110,6 +110,7 @@ ui.directive('uiViewDashboard', ['$compile', 'ViewService', function($compile, V
 					handle: ".dashlet-header",
 					cancel: ".dashlet-buttons",
 					items: ".dashlet",
+					tolerance: "pointer",
 					activate: function(e, ui) {
 						var height = ui.helper.height();
 						ui.placeholder.height(height);
