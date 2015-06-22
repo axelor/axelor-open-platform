@@ -51,7 +51,8 @@ import com.google.common.collect.Maps;
 	@Type(Group.class),
 	@Type(Notebook.class),
 	@Type(Page.class),
-	@Type(Portlet.class)
+	@Type(Portlet.class),
+	@Type(Dashlet.class)
 })
 public abstract class AbstractWidget {
 	

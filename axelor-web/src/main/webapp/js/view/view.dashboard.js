@@ -64,7 +64,7 @@ function DashboardCtrl($scope, $element) {
 	};
 
 	$scope.parse = function(schema) {
-		var items = schema.items || [];
+		var items = angular.copy(schema.items || []);
 		var row = [];
 
 		items.forEach(function (item) {
@@ -76,16 +76,34 @@ function DashboardCtrl($scope, $element) {
 			row.push(item);
 		});
 
+		$scope.schema = schema;
 		$scope.row = row;
 	};
 }
 
-ui.directive('uiViewDashboard', ['$compile', function($compile) {
+ui.directive('uiViewDashboard', ['$compile', 'ViewService', function($compile, ViewService) {
 
 	return {
 		scope: true,
 		controller: DashboardCtrl,
 		link: function(scope, element, attrs) {
+
+			function save() {
+				var schema = scope.schema;
+				var items = [];
+
+				element.find('.dashlet').each(function () {
+					var i = $(this).data('index');
+					items.push(schema.items[i]);
+				});
+
+				if (angular.equals(schema.items, items)) {
+					return;
+				}
+
+				schema.items = items;
+				return ViewService.save(schema);
+			}
 
 			function makeSortable() {
 				element.sortable({
@@ -98,6 +116,9 @@ ui.directive('uiViewDashboard', ['$compile', function($compile) {
 					},
 					deactivate: function(event, ui) {
 						axelor.$adjustSize();
+					},
+					stop: function (event, ui) {
+						save();
 					}
 				});
 			}
@@ -113,7 +134,7 @@ ui.directive('uiViewDashboard', ['$compile', function($compile) {
 		transclude: true,
 		template:
 		"<div>" +
-			"<div class='dashlet' ng-class='dashlet.spanCss' ng-repeat='dashlet in row' ui-view-dashlet></div>" +
+			"<div class='dashlet' ng-class='dashlet.spanCss' ng-repeat='dashlet in row' data-index='{{$index}}' ui-view-dashlet></div>" +
 		"</div>"
 	};
 }]);

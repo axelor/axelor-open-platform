@@ -42,7 +42,9 @@ import com.axelor.common.StringUtils;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaView;
+import com.axelor.meta.db.MetaViewCustom;
 import com.axelor.meta.db.repo.MetaActionRepository;
+import com.axelor.meta.db.repo.MetaViewCustomRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
@@ -203,30 +205,38 @@ public class XMLViews {
 	public static AbstractView findView(String model, String name, String type) {
 
 		final MetaViewRepository views = Beans.get(MetaViewRepository.class);
+		final MetaViewCustomRepository customViews = Beans.get(MetaViewCustomRepository.class);
 
 		MetaView view = null;
+		MetaViewCustom custom = null;
+
 		User user = AuthUtils.getUser();
 		Long group = user != null && user.getGroup() != null ? user.getGroup().getId() : null;
 
 		if (name != null) {
-			view = views.findByName(name, model, group);
-			if (view == null) {
-				view = views.findByName(name, model);
-				if (view == null) {
-					view = views.findByName(name);
-				}
+
+			// first find personalized view
+			if (user != null) {
+				custom = customViews.findByUser(name, model, user);
+				custom = custom == null ? customViews.findByUser(name, user) : custom;
+			}
+
+			// else find default view
+			if (custom == null) {
+				view = views.findByName(name, model, group);
+				view = view == null ? views.findByName(name, model) : view;
+				view = view == null ? views.findByName(name) : view;
 			}
 		}
 
 		if (view == null) {
 			view = views.findByType(type, model, group);
-			if (view == null) {
-				view = views.findByType(type, model);
-			}
+			view = view == null ? views.findByType(type, model) : view;
 		}
 
 		try {
-			return ((ObjectViews) XMLViews.unmarshal(view.getXml())).getViews().get(0);
+			final String xml = custom == null ? view.getXml() : custom.getXml();
+			return ((ObjectViews) XMLViews.unmarshal(xml)).getViews().get(0);
 		} catch (Exception e) {
 		}
 		return null;

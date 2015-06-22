@@ -53,6 +53,7 @@ import com.axelor.meta.db.repo.MetaActionMenuRepository;
 import com.axelor.meta.db.repo.MetaActionRepository;
 import com.axelor.meta.db.repo.MetaMenuRepository;
 import com.axelor.meta.db.repo.MetaSelectRepository;
+import com.axelor.meta.db.repo.MetaViewCustomRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
@@ -88,6 +89,9 @@ public class ViewLoader extends AbstractLoader {
 	@Inject
 	private MetaViewRepository views;
 	
+	@Inject
+	private MetaViewCustomRepository customViews;
+
 	@Inject
 	private MetaSelectRepository selects;
 	
@@ -225,6 +229,11 @@ public class ViewLoader extends AbstractLoader {
 
 		if (priority > -1) {
 			entity.setPriority(priority);
+		}
+
+		// delete personalized dashboards
+		if ("dashboard".equals(type) && !xml.equals(entity.getXml())) {
+			customViews.all().filter("self.name = ? AND self.user is not null", entity.getName()).remove();
 		}
 
 		entity.setXmlId(xmlId);
