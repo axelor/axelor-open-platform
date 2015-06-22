@@ -92,9 +92,10 @@ ui.directive('uiViewDashboard', ['$compile', 'ViewService', function($compile, V
 				var schema = scope.schema;
 				var items = [];
 
-				element.find('.dashlet').each(function () {
-					var i = $(this).data('index');
-					items.push(schema.items[i]);
+				element.find('.dashlet').each(function (i) {
+					var j = $(this).data('index');
+					$(this).data("index", i);
+					items.push(schema.items[j]);
 				});
 
 				if (angular.equals(schema.items, items)) {
