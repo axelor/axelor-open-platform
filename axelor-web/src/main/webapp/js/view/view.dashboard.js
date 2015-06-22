@@ -64,48 +64,79 @@ function DashboardCtrl($scope, $element) {
 	};
 
 	$scope.parse = function(schema) {
-		var items = schema.items || [];
-		var rows = [[]];
-		var last = _.last(rows);
-		var lastCol = 0;
+		var items = angular.copy(schema.items || []);
+		var row = [];
 
 		items.forEach(function (item) {
 			var span = item.colSpan || 6;
 
-			if (lastCol + span > 12) {
-				lastCol = 0;
-				last = [];
-				rows.push(last);
-			}
-
 			item.spanCss = {};
 			item.spanCss['dashlet-cs' + span] = true;
 
-			last.push(item);
-			lastCol += span;
+			row.push(item);
 		});
 
-		$scope.rows = rows;
+		$scope.schema = schema;
+		$scope.row = row;
 	};
 }
 
-ui.directive('uiViewDashboard', ['$compile', function($compile) {
+ui.directive('uiViewDashboard', ['$compile', 'ViewService', function($compile, ViewService) {
 
 	return {
 		scope: true,
 		controller: DashboardCtrl,
 		link: function(scope, element, attrs) {
 
+			function save() {
+				var schema = scope.schema;
+				var items = [];
+
+				element.find('.dashlet').each(function (i) {
+					var j = $(this).data('index');
+					$(this).data("index", i);
+					items.push(schema.items[j]);
+				});
+
+				if (angular.equals(schema.items, items)) {
+					return;
+				}
+
+				schema.items = items;
+				return ViewService.save(schema);
+			}
+
+			function makeSortable() {
+				element.sortable({
+					handle: ".dashlet-header",
+					cancel: ".dashlet-buttons",
+					items: ".dashlet",
+					tolerance: "pointer",
+					activate: function(e, ui) {
+						var height = ui.helper.height();
+						ui.placeholder.height(height);
+					},
+					deactivate: function(event, ui) {
+						axelor.$adjustSize();
+					},
+					stop: function (event, ui) {
+						save();
+					}
+				});
+			}
+
+			var unwatch = scope.$watch("row.length", function (length) {
+				if (!length) { return; }
+				unwatch();
+				unwatch = null;
+				scope.waitForActions(makeSortable);
+			});
 		},
 		replace: true,
 		transclude: true,
 		template:
 		"<div>" +
-			"<div class='dashlet-container container-fluid' ui-transclude>" +
-				"<div class='dashlet-row' ng-repeat='row in rows'>" +
-					"<div class='dashlet' ng-class='dashlet.spanCss' ng-repeat='dashlet in row' ui-view-dashlet></div>" +
-				"</div>" +
-			"</div>" +
+			"<div class='dashlet' ng-class='dashlet.spanCss' ng-repeat='dashlet in row' data-index='{{$index}}' ui-view-dashlet></div>" +
 		"</div>"
 	};
 }]);
@@ -128,14 +159,14 @@ function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 		};
 	}
 
-	function doLoad(dashlet) {
+	$scope.initDashlet = function(dashlet, options) {
 
 		var action = dashlet.action;
 		if (!action) {
 			return init();
 		}
 
-		MenuService.action(action).success(function(result){
+		MenuService.action(action, options).success(function(result){
 			if (_.isEmpty(result.data)) {
 				return;
 			}
@@ -150,14 +181,6 @@ function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 			$scope.parseDashlet(dashlet, view);
 		});
 	};
-
-	var unwatch;
-	unwatch = $scope.$watch('dashlet', function (dashlet) {
-		if (dashlet) {
-			doLoad(dashlet);
-			unwatch();
-		}
-	});
 
 	$scope.$on('on:attrs-change:refresh', function(e) {
 		e.preventDefault();
@@ -179,10 +202,31 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 		controller: DashletCtrl,
 		link: function(scope, element, attrs) {
 
-			var body = element.find('.dashlet-body:first');
+			var lazy = true;
+			var unwatch = scope.$watch(function () {
+				var dashlet = scope.dashlet;
+				if (!dashlet) {
+					return;
+				}
+
+				if (element.parent().is(":hidden")) {
+					return lazy = true;
+				}
+
+				unwatch();
+				unwatch = null;
+
+				var ctx = undefined;
+				if (scope.getContext) {
+					ctx = scope.getContext();
+				}
+				scope.initDashlet(dashlet, {
+					context: ctx
+				});
+			});
 
 			scope.parseDashlet = _.once(function(dashlet, view) {
-
+				var body = element.find('.dashlet-body:first');
 				var template = $('<div ui-portlet-' + view.viewType + '></div>');
 
 				scope.noFilter = !dashlet.canSearch;
@@ -193,6 +237,11 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 				element.removeClass('hidden');
 
 				scope.show();
+
+				// if lazy, load data
+				if (scope.onRefresh && lazy) {
+					scope.onRefresh();
+				}
 			});
 
 			scope.onDashletToggle = function(event) {

@@ -26,6 +26,13 @@ html, body {
 	margin: 0 !important;
 }
 
+body {
+	height: 100%;
+	width: 100%;
+	display: block;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
 #container {
 	left: 0px; right: 0px; top: 41px; bottom: 0px;
 	position:	absolute;

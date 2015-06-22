@@ -28,10 +28,12 @@ import com.axelor.tools.i18n.I18nExtractor
 class I18nTask extends DefaultTask {
 
 	boolean update = false
+	
+	boolean withContext = false
 
 	@TaskAction
 	def extract() {
 		def extractor = new I18nExtractor()
-		extractor.extract(Paths.get(project.projectDir.path), update)
+		extractor.extract(Paths.get(project.projectDir.path), update, withContext)
 	}
 }

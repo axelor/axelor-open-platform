@@ -100,33 +100,18 @@
 	box-shadow: 0 1px 1px rgba(0,0,0,0.05);
 }
 
-.mail-thread .mail-message .arrow,
-.mail-thread .mail-message .arrow:after {
-	position: absolute;
-	display: block;
-	width: 0;
-	height: 0;
-	border-color: transparent;
-	border-style: solid;
-}
-
 .mail-thread .mail-message .arrow {
-	top: 20px;
-	left: -9px;
-	margin-top: -9px;
-	border-width: 9px;
-	border-right-color: rgba(0,0,0,0.25);
-	border-left-width: 0;
-	z-index: 10;
-}
-
-.mail-thread .mail-message .arrow:after {
-	content: "";
-	bottom: -8px;
-	left: 1px;
-	border-width: 8px;
-	border-right-color: #fff;
-	border-left-width: 0;
+	position: absolute;
+	display: inline-block;
+	width: 11px;
+	height: 11px;
+	border: 1px solid #ddd;
+	left: -7px;
+	top: 12px;
+	transform: rotate(-45deg);
+	background-color: #fff;
+	border-right: 0;
+	border-bottom: 0;
 }
 
 .mail-thread .mail-message-icons {

@@ -40,6 +40,15 @@ table.treetable tbody tr.selected {
 	background-color: #337ab7;
 }
 
+table.treetable tbody tr.selected a {
+	color: #fff;
+}
+
+table.treetable .tree-button i,
+table.treetable .tree-button img {
+	margin-right: 4px;
+}
+
 table.treetable tbody tr.accept {
   background-color: #a3bce4;
   color: #fff

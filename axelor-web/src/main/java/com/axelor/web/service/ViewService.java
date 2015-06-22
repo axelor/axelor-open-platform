@@ -32,14 +32,17 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import com.axelor.auth.AuthUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.inject.Beans;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.AbstractWidget;
+import com.axelor.meta.schema.views.Dashboard;
 import com.axelor.meta.schema.views.Field;
 import com.axelor.meta.schema.views.FormInclude;
 import com.axelor.meta.schema.views.FormView;
@@ -51,6 +54,7 @@ import com.axelor.meta.schema.views.SimpleContainer;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -295,6 +299,28 @@ public class ViewService extends AbstractService {
 		final Response response = new Response();
 		response.setData(findFields(request.getModel(), request.getFields()));
 		return response;
+	}
+
+	@POST
+	@Path("view/save")
+	public Response save(Request request) {
+		final Map<String, Object> data = request.getData();
+		final ObjectMapper om = Beans.get(ObjectMapper.class);
+		try {
+			final String type = (String) data.get("type");
+			final String json = om.writeValueAsString(data);
+			AbstractView view = null;
+			switch(type) {
+			case "dashboard":
+				view = om.readValue(json, Dashboard.class);
+				break;
+			}
+			if (view != null) {
+				return service.saveView(view, AuthUtils.getUser());
+			}
+		} catch (Exception e) {
+		}
+		return null;
 	}
 
 	private Property findField(final Mapper mapper, String name) {

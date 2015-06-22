@@ -52,8 +52,10 @@ import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaView;
+import com.axelor.meta.db.MetaViewCustom;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.meta.db.repo.MetaFileRepository;
+import com.axelor.meta.db.repo.MetaViewCustomRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.actions.Action;
@@ -82,6 +84,9 @@ public class MetaService {
 	@Inject
 	private MetaViewRepository views;
 	
+	@Inject
+	private MetaViewCustomRepository customViews;
+
 	@Inject
 	private MetaFileRepository files;
 	
@@ -365,6 +370,31 @@ public class MetaService {
 
 		AbstractView data = XMLViews.findView(model, name, type);
 		response.setData(data);
+		response.setStatus(Response.STATUS_SUCCESS);
+
+		return response;
+	}
+
+	@Transactional
+	public Response saveView(AbstractView view, User user) {
+		final Response response = new Response();
+		final String xml = XMLViews.toXml(view, true);
+
+		MetaViewCustom entity =  customViews.findByUser(view.getName(), user);
+		if (entity == null) {
+			entity = new MetaViewCustom();
+			entity.setName(view.getName());
+			entity.setType(view.getType());
+			entity.setModel(view.getModel());
+			entity.setUser(user);
+		}
+
+		entity.setTitle(view.getTitle());
+		entity.setXml(xml);
+
+		customViews.save(entity);
+
+		response.setData(view);
 		response.setStatus(Response.STATUS_SUCCESS);
 
 		return response;

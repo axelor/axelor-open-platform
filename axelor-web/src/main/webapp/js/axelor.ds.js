@@ -437,6 +437,28 @@
 			return promise;
 		};
 
+		ViewService.prototype.save = function(schema) {
+			var promise = $http.post("ws/meta/view/save", {
+				data: schema
+			});
+
+			promise.success = function(fn) {
+				promise.then(function(response) {
+					var res = response.data,
+						data = res.data;
+					fn(data);
+				});
+				return promise;
+			};
+
+			promise.error = function(fn) {
+				promise.then(null, fn);
+				return promise;
+			};
+
+			return promise;
+		};
+
 		return new ViewService();
 	}]);
 

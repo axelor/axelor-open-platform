@@ -47,7 +47,20 @@
     <finder-method name="findByModule" using="name,module" cacheable="true"/>
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
-  
+
+  <entity name="MetaViewCustom" table="META_VIEW_CUSTOM" cachable="true">
+    <string name="name" readonly="true" />
+    <string name="title" readonly="true" namecolumn="true" />
+    <string name="type" required="true" selection="view.type.selection"/>
+    <string name="model" />
+    <string name="xml" required="true" large="true"/>
+    <many-to-one name="user" ref="com.axelor.auth.db.User" column="user_id" required="true" />
+
+    <finder-method name="findByUser" using="name,user" cacheable="true"/>
+    <finder-method name="findByUser" using="name,model,user" cacheable="true"/>
+
+  </entity>
+
   <entity name="MetaMenu" table="META_MENU" cachable="true">
     <![CDATA[
     This object store the menus.

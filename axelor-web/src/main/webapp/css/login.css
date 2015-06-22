@@ -15,10 +15,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 body {
 	height: 100%;
+	display: block;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+	display: block;
 	background-color: #2f4050;
+	padding-top: 60px;
+}
+
+@media (max-width: 979px) {
+	body {
+  		padding-top: 20px;
+	}
 }
 
 header .navbar .brand-logo {
@@ -119,10 +130,6 @@ header .navbar .brand-logo img {
 	height: 20px;
 }
 
-#login-form input[type="checkbox"] {
-	margin-top: 3px;
-}
-
 #login-form .input-prepend {
 	width: 100%;
 	margin-bottom: 16px;
@@ -130,45 +137,6 @@ header .navbar .brand-logo img {
 
 #login-form .input-prepend input {
 	width: calc(100% - 60px);
-}
-
-button.btn {
-	border-radius: 0;
-	padding: 6px 14px;
-	background-image: none;
-	box-shadow: none;
-}
-
-button.btn-primary {
-	color: #fff;
-	background-color: #428bca;
-	border-color: #357ebd;
-}
-
-button.btn-primary:focus,
-button.btn-primary:active,
-button.btn-primary:hover {
-	color: #fff;
-	background-color: #3071a9;
-	border-color: #285e8e;
-}
-
-button.btn-default {
-	color: #333;
-	background-color: #fff;
-	border-color: #ccc;
-}
-
-button.btn-default:focus,
-button.btn-default:active,
-button.btn-default:hover {
-	color: #333;
-	background-color: #e6e6e6;
-	border-color: #adadad;
-}
-
-#login-form label.checkbox {
-	margin-bottom: 0;
 }
 
 body > footer {

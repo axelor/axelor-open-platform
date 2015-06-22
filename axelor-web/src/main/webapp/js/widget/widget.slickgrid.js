@@ -1244,11 +1244,21 @@ Grid.prototype.onMenuCommand = function(event, args) {
 	}
 	
 	if (args.command === 'group-by') {
-		return this.groupBy(args.column.field);
+		var groups = this._groups || [];
+		var index = groups.indexOf(args.column.field);
+		if (index === -1) {
+			groups.push(args.column.field);
+		}
+		return this.groupBy(groups);
 	}
 	
 	if (args.command === 'ungroup') {
-		return this.groupBy([]);
+		var groups = this._groups || [];
+		var index = groups.indexOf(args.column.field);
+		if (index > -1) {
+			groups.splice(index, 1);
+		}
+		return this.groupBy(groups);
 	}
 	
 	if (args.command === 'hide') {
@@ -2015,6 +2025,7 @@ Grid.prototype.groupBy = function(names) {
 		};
 	}, this);
 	
+	this._groups = all;
 	data.setGrouping(grouping);
 };
 

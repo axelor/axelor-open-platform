@@ -31,6 +31,6 @@ public class I18nExtractorTest {
 	@Test
 	public void test() {
 		I18nExtractor tools = new I18nExtractor();
-		tools.extract(Paths.get(BASE, MODULE), true);
+		tools.extract(Paths.get(BASE, MODULE), true, true);
 	}
 }

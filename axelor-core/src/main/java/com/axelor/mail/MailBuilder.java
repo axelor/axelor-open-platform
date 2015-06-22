@@ -71,6 +71,7 @@ public final class MailBuilder {
 	private boolean textOnly;
 
 	private class Content {
+		String cid;
 		String text;
 		String name;
 		String file;
@@ -155,10 +156,41 @@ public final class MailBuilder {
 	}
 
 	public MailBuilder attach(String name, String link) {
+		return attach(name, link, null);
+	}
+
+	/**
+	 * Attach a file referenced by the given link.
+	 *
+	 * <p>
+	 * If you want to reference the attachment as inline image, provide content
+	 * id wrapped by angle brackets and refer the image with content id without
+	 * angle brackets.
+	 * </p>
+	 *
+	 * For example:
+	 *
+	 * <pre>
+	 * builder
+	 * 	.html("<img src='cid:logo.png'>")
+	 * 	.attach("logo.png", "/path/to/logo.png", "<logo.png>"
+	 * 	.send();
+	 * <pre>
+	 *
+	 * @param name
+	 *            attachment file name
+	 * @param link
+	 *            attachment file link (url or file path)
+	 * @param cid
+	 *            content id
+	 * @return this
+	 */
+	public MailBuilder attach(String name, String link, String cid) {
 		Preconditions.checkNotNull(link, "link can't be null");
 		Content content = new Content();
 		content.name = name;
 		content.file = link;
+		content.cid = cid;
 		contents.add(content);
 		textOnly = false;
 		return this;
@@ -197,6 +229,9 @@ public final class MailBuilder {
 					part.setDataHandler(new DataHandler(new URLDataSource(link)));
 				} catch (MalformedURLException e) {
 					part.attachFile(content.file);
+				}
+				if (content.cid != null) {
+					part.setContentID(content.cid);
 				}
 			} else {
 				content.apply(part);

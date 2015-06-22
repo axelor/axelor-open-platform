@@ -17,12 +17,15 @@
  */
 
 .ibox {
-	position: relative;
 	display: inline-block;
 	margin: 0;
 	padding: 4px;
 	padding-left: 0;
-	overflow: hidden;
+}
+
+.form-inline .ibox {
+	vertical-align: middle;
+	margin-bottom: 0;
 }
 
 .ibox.readonly {
@@ -39,8 +42,7 @@
 }
 
 .ibox input {
-	position: absolute;
-	left: -20px;
+	display: none !important;
 }
 
 .ibox .title {

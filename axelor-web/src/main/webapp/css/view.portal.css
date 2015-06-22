@@ -148,8 +148,12 @@
 	padding: 14px;
 }
 
-.dashboard > .dashlet-container {
-	padding: 0;
+.dashboard .ui-sortable-placeholder {
+	visibility: visible !important;
+	background: #e7eaec !important;
+}
+.dashboard .ui-sortable-helper {
+	box-shadow: 0 5px 10px rgba(0,0,0,.2);
 }
 
 .dashboard .dashlet {
@@ -164,6 +168,7 @@
 	border-top: 4px solid #e7e7e7;
 	padding: 11px 15px 14px;
 	overflow: hidden;
+	cursor: move;
 }
 
 .dashboard .dashlet-title {
