@@ -16,6 +16,9 @@
           <button class="btn" ng-click="onDelete()" ng-if="hasButton('delete')" ng-disabled="!canDelete()" title="{{ 'Delete' | t}}">
             <i class="fa fa-trash-o"></i> <span ng-hide="tbTitleHide" x-translate>Delete</span>
           </button>
+          <button class="btn" ng-click="onRefresh()" ng-if="hasButton('refresh')" title="{{ 'Refresh' | t}}">
+            <i class="fa fa-refresh"></i> <span ng-hide="tbTitleHide" x-translate>Refresh</span>
+          </button>
         </div>
         <div class="btn-group" ng-if="toolbar">
           <button ng-repeat="btn in toolbar | filter:{custom: true}" class="btn" ui-tool-button="btn">{{btn.title}}</button>
