@@ -995,6 +995,11 @@
             <xsd:documentation>Specify whether to use editor as viewer</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+       	<xsd:attribute name="x-show-titles" type="xsd:boolean">
+          <xsd:annotation>
+          	<xsd:documentation>Specify whether to show item titles by default</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="x-show-on-new" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>Specify whether to show editor on new record (o2m/m2m fields)</xsd:documentation>
