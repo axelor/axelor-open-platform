@@ -447,12 +447,17 @@ ui.formInput('OneToMany', {
 				axelor.$adjustSize();
 			};
 		})();
-		
-		if (this.collapseIfEmpty) {
-			scope.$watch(attrs.ngModel, function(value){
+
+		var collapseIfEmpty = this.collapseIfEmpty;
+		scope.$watch(attrs.ngModel, function(value){
+			if (!value) {
+				// clear data view
+				scope.dataView.setItems([]);
+			}
+			if (collapseIfEmpty) {
 				adjustSize(value);
-			});
-		}
+			}
+		});
 
 		function deleteItemsById(id) {
 			var items = scope.dataView.getItems() || [];
