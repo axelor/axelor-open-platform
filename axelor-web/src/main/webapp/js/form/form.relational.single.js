@@ -108,7 +108,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 	};
 	
 	$scope.canEditTarget = function () {
-		return $scope.canEdit() && $scope.field.canEdit !== false;
+		return $scope.canEdit() && $scope.attr('canEdit') !== false;
 	};
 	
 	$scope.canEdit = function () {
@@ -126,9 +126,8 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 
 	var canNew = $scope.canNew;
 	$scope.canNew = function () {
-		var field = $scope.field || {};
 		// disable new icon
-		if (field.canNew === undefined) {
+		if ($scope.attr('canNew') === undefined) {
 			return false;
 		}
 		return canNew.call($scope);
@@ -160,7 +159,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		var names;
 		var field = $scope.field || {};
 		var prop = actions[which];
-		if (prop !== undefined && field[prop] === false) {
+		if (prop !== undefined && $scope.attr(prop) === false) {
 			return false;
 		}
 

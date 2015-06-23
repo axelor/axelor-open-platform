@@ -319,6 +319,11 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		handleFor(scope, field, "readonly", "readonlyIf");
 		handleFor(scope, field, "required", "requiredIf");
 		handleFor(scope, field, "collapse", "collapseIf");
+		handleFor(scope, field, "canNew", "canNew");
+		handleFor(scope, field, "canView", "canView");
+		handleFor(scope, field, "canEdit", "canEdit");
+		handleFor(scope, field, "canRemove", "canRemove");
+		handleFor(scope, field, "canSelect", "canSelect");
 		handleHilites(scope, field);
 		handleBind(scope, field);
 	}
