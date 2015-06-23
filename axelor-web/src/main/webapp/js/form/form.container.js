@@ -437,7 +437,9 @@ ui.formWidget('Panel', {
 
 ui.formWidget('PanelStack', {
 	transclude: true,
-	template: "<div class='panel-stack' ui-transclude></div>"
+	template: "<div class='panel-stack'>" +
+				"<span ui-transclude></span>" +
+			"</div>"
 });
 
 ui.formWidget('PanelTabs', {
