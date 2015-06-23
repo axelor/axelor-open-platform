@@ -170,7 +170,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	};
 
 	$scope.canEditTarget = function () {
-		return $scope.canEdit() && $scope.field.canEdit !== false;
+		return $scope.canEdit() && $scope.attr('canEdit') !== false;
 	};
 
 	$scope.canShowEdit = function () {
@@ -179,8 +179,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	}
 	
 	$scope.canEdit = function () {
-		var field = $scope.field || {};
-		return field.canEdit !== false && $scope.canView();
+		return $scope.attr('canEdit') !== false && $scope.canView();
 	};
 	
 	var _canRemove = $scope.canRemove;
@@ -764,7 +763,7 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 
 		var _removeItem = scope.removeItem;
 		scope.removeItem = function(e, ui) {
-			if (field.canRemove === false) return;
+			if (scope.attr('canRemove') === false) return;
 			_removeItem.apply(this, arguments);
 		};
 
@@ -1062,7 +1061,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 		
 		scope.$watch('schema.loaded', function(viewLoaded) {
 			var schema = scope.schema;
-			if (schema && field.canEdit === false) {
+			if (schema && scope.attr('canEdit') === false) {
 				schema.editIcon = false;
 			}
 		});
@@ -1073,11 +1072,11 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 		});
 
 		scope.canEdit = function () {
-			return scope.hasPermission('create') && !scope.isReadonly() && field.canEdit !== false;
+			return scope.hasPermission('create') && !scope.isReadonly() && scope.attr('canEdit') !== false;
 		};
-		
+
 		scope.canRemove = function() {
-			return scope.hasPermission('create') && !scope.isReadonly() && field.canEdit !== false;
+			return scope.hasPermission('create') && !scope.isReadonly() && scope.attr('canEdit') !== false;
 		};
 	},
 	
