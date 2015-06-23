@@ -340,6 +340,9 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 					item.placeholder = item.placeholder || item.title || item.autoTitle;
 				}
 				item.showTitle = item.showTitle === true;
+				if (editor.itemSpan && !item.colSpan) {
+					item.colSpan = editor.itemSpan;
+				}
 				var width = item.width || (item.widgetAttrs||{}).width;
 				return width ? width : (item.widget === 'toggle' ? 24 : '*');
 			});
