@@ -63,7 +63,11 @@ function FormViewCtrl($scope, $element) {
 			fields : _.pluck($scope.fields, 'name'),
 			related: $scope.fields_related
 		};
-		return ds.read(id, params);
+		var promise = ds.read(id, params);
+		promise.success(function (record) {
+			record.$fetched = true;
+		});
+		return promise;
 	};
 
 	function doEdit(id, dummy, fireOnLoad) {
