@@ -80,7 +80,11 @@ ui.formCompile = function(element, attrs, linkerFn) {
 					});
 				}
 			}
-			return state[name];
+			var res = state[name];
+			if (res === undefined) {
+				res = field[name];
+			}
+			return res;
 		};
 		
 		scope.$on("on:edit", function(e, rec) {

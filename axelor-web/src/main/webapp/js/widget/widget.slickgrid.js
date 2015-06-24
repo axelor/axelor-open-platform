@@ -426,7 +426,7 @@ _.extend(Factory.prototype, {
 		if (widget === "Progress" || widget === "progress" || widget === "SelectProgress") {
 			type = "progress";
 		}
-		if (_.isArray(field.selectionList)) {
+		if (_.isArray(field.selectionList) && widget !== "SelectProgress") {
 			type = "selection";
 		}
 

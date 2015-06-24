@@ -203,25 +203,27 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 		link: function(scope, element, attrs) {
 
 			var lazy = true;
-			var unwatch = scope.$watch(function () {
-				var dashlet = scope.dashlet;
-				if (!dashlet) {
-					return;
-				}
+			scope.waitForActions(function () {
+				var unwatch = scope.$watch(function () {
+					var dashlet = scope.dashlet;
+					if (!dashlet) {
+						return;
+					}
 
-				if (element.parent().is(":hidden")) {
-					return lazy = true;
-				}
+					if (element.parent().is(":hidden")) {
+						return lazy = true;
+					}
 
-				unwatch();
-				unwatch = null;
+					unwatch();
+					unwatch = null;
 
-				var ctx = undefined;
-				if (scope.getContext) {
-					ctx = scope.getContext();
-				}
-				scope.initDashlet(dashlet, {
-					context: ctx
+					var ctx = undefined;
+					if (scope.getContext) {
+						ctx = scope.getContext();
+					}
+					scope.initDashlet(dashlet, {
+						context: ctx
+					});
 				});
 			});
 
