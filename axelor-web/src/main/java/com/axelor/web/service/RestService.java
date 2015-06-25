@@ -494,8 +494,8 @@ public class RestService extends ResourceService {
 	}
 
 	@GET
-	@Path("messagesAll")
-	public Response messagesAll(
+	@Path("messages")
+	public Response messages(
 			@QueryParam("folder") String folder,
 			@QueryParam("parent") Long parentId,
 			@QueryParam("count") Boolean count,
