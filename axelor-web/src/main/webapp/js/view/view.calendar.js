@@ -569,10 +569,8 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 				RecordManager.add(result);
 			});
 			if (record == null || !record.id) {
-				popup.ajaxStop(function() {
-					scope.applyLater(function() {
-						popup.$broadcast("on:new");
-					});
+				popup.waitForActions(function() {
+					popup.$broadcast("on:new");
 				});
 			}
 		};
