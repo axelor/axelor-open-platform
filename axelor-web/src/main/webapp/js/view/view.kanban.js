@@ -59,7 +59,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $
 			return item;
 		});
 
-		columns = _.first(columns, 4);
+		columns = _.first(columns, 6);
 
 		var first = _.first(columns);
 		if (view.onNew) {
