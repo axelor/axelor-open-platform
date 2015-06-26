@@ -572,7 +572,7 @@ function FormViewCtrl($scope, $element) {
 				return;
 			}
 			ds.removeAll([record]).success(function(records, page){
-				$scope.switchTo("grid");
+				$scope.switchBack();
 			});
 		});
 	};
@@ -586,7 +586,7 @@ function FormViewCtrl($scope, $element) {
 			return;
 		}
 
-		$scope.switchTo("grid");
+		$scope.switchBack();
 	};
 
 	$scope.onRefresh = function() {
@@ -616,9 +616,24 @@ function FormViewCtrl($scope, $element) {
 			$scope.reload();
 		});
 	};
-	
+
 	var __switchTo = $scope.switchTo;
-	
+	var __switchBack = null;
+
+	$scope.switchBack = function () {
+		if (__switchBack === null) {
+			var views = ($scope._viewParams||{}).views || [];
+			for (var i = 0 ; i < views.length; i++) {
+				var view = views[i];
+				if (view.type !== "form") {
+					__switchBack = view.type;
+					break;
+				}
+			}
+		}
+		return $scope.switchTo(__switchBack || "grid");
+	};
+
 	$scope.switchTo = function(type, callback) {
 		$scope.confirmDirty(function() {
 			$scope.setEditable(false);
@@ -633,7 +648,7 @@ function FormViewCtrl($scope, $element) {
 			return;
 		}
 
-		$scope.switchTo("grid");
+		$scope.switchBack();
 	};
 	
 	$scope.pagerText = function() {
