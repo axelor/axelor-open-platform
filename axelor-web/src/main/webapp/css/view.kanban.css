@@ -33,7 +33,6 @@
 
 .kanban-column {
 	background-color: #fff;
-	padding: 15px 20px 0 20px;
 	margin-bottom: 18px;
 	border-color: #e7eaec;
 	border-style: solid solid none;
@@ -47,7 +46,7 @@
 }
 
 .kanban-column ul.kanban-card-list {
-	padding: 10px 0 20px 0;
+	padding: 10px 20px 35px 20px;
 }
 
 .kanban-column li.kanban-card {
@@ -58,10 +57,6 @@
 	border-radius: 2px;
 	box-sizing: content-box;
 	border-left: 3px solid #e7eaec;
-}
-
-.kanban-column li.kanban-card:last-child {
-	margin-bottom: 0;
 }
 
 .kanban-column li.kanban-card:hover {
@@ -101,14 +96,15 @@
 .kanban-column > h3 {
 	font-weight: 600;
 	font-size: 16px;
-	margin-top: 5px;
-	margin-bottom: 10px;
+	margin: 0;
+	padding: 15px 20px 5px 20px;
 	line-height: 18px;
 }
 
 .kanban-column .input-group {
 	display: table;
 	width: 100%;
+	padding: 10px 20px 0 20px;
 }
 
 .kanban-column .input-group .form-control,
@@ -142,7 +138,7 @@
 .kanban-more {
 	border-bottom: 1px dashed #ddd;
 	text-align: center;
-	margin-top: -16px;
+	margin: -35px 20px 25px 20px;
 }
 
 .kanban-more a {

@@ -136,7 +136,6 @@ ui.directive('uiKanban', function () {
 				connectWith: ".kanban-card-list",
 				items: ".kanban-card",
 				tolerance: "pointer",
-				dropOnEmpty: true,
 				stop: function (event, ui) {
 					var item = ui.item;
 					var column = item.parent().scope().column;
