@@ -17,6 +17,12 @@
  */
 
 .kanban-view {
+	position: absolute;
+	top: 41px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	overflow: auto;
 	padding: 18px;
 }
 
@@ -154,8 +160,8 @@
 }
 
 .kanban-card img {
-	width: 32px;
-	height: 32px;
+	width: 24px;
+	height: 24px;
 	position: absolute;
 	right: 2px;
 	bottom: 2px;

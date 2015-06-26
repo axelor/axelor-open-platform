@@ -135,6 +135,7 @@ ui.directive('uiKanban', function () {
 			element.find(".kanban-card-list").sortable({
 				connectWith: ".kanban-card-list",
 				items: ".kanban-card",
+				tolerance: "pointer",
 				dropOnEmpty: true,
 				stop: function (event, ui) {
 					var item = ui.item;
@@ -147,13 +148,18 @@ ui.directive('uiKanban', function () {
 
 					var source = $(this).scope();
 					var target = item.parent().scope();
+					var record = item.scope().record;
+
+					if (source === target && item.index() === source.records.indexOf(record)) {
+						return;
+					}
 
 					source.reorder();
 					if (target !== source) {
 						target.reorder();
 					}
 
-					scope.move(item.scope().record, column.value, next, prev);
+					scope.move(record, column.value, next, prev);
 					scope.applyLater();
 				}
 			});
@@ -297,8 +303,11 @@ ui.directive('uiKanbanCard', ["$parse", "$interpolate", function ($parse, $inter
 	return {
 		scope: true,
 		link: function (scope, element, attrs) {
-			scope.hilite = null;
-			scope.record.$image = function (fieldName, imageName) {
+
+			var evalScope = scope.$new(true);
+			_.extend(evalScope, scope.record);
+
+			evalScope.$image = function (fieldName, imageName) {
 				var rec = scope.record;
 				var field = scope.fields[fieldName];
 				if (field && field.target && rec[fieldName]) {
@@ -306,9 +315,10 @@ ui.directive('uiKanbanCard', ["$parse", "$interpolate", function ($parse, $inter
 					return "ws/rest/" + field.target + "/" + val.id + "/" + imageName + "/download?image=true";
 				}
 				return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-			}
+			};
 
-			scope.content = $interpolate(scope.schema.template)(scope.record);
+			scope.hilite = null;
+			scope.content = $interpolate(scope.schema.template)(evalScope);
 
 			var hilites = scope.schema.hilites || [];
 			for (var i = 0; i < hilites.length; i++) {
