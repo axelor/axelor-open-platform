@@ -135,6 +135,7 @@ ui.directive('uiKanban', function () {
 			element.find(".kanban-card-list").sortable({
 				connectWith: ".kanban-card-list",
 				items: ".kanban-card",
+				tolerance: "pointer",
 				dropOnEmpty: true,
 				stop: function (event, ui) {
 					var item = ui.item;
@@ -147,13 +148,18 @@ ui.directive('uiKanban', function () {
 
 					var source = $(this).scope();
 					var target = item.parent().scope();
+					var record = item.scope().record;
+
+					if (source === target && item.index() === source.records.indexOf(record)) {
+						return;
+					}
 
 					source.reorder();
 					if (target !== source) {
 						target.reorder();
 					}
 
-					scope.move(item.scope().record, column.value, next, prev);
+					scope.move(record, column.value, next, prev);
 					scope.applyLater();
 				}
 			});
