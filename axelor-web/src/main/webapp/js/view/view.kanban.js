@@ -303,8 +303,11 @@ ui.directive('uiKanbanCard', ["$parse", "$interpolate", function ($parse, $inter
 	return {
 		scope: true,
 		link: function (scope, element, attrs) {
-			scope.hilite = null;
-			scope.record.$image = function (fieldName, imageName) {
+
+			var evalScope = scope.$new(true);
+			_.extend(evalScope, scope.record);
+
+			evalScope.$image = function (fieldName, imageName) {
 				var rec = scope.record;
 				var field = scope.fields[fieldName];
 				if (field && field.target && rec[fieldName]) {
@@ -312,9 +315,10 @@ ui.directive('uiKanbanCard', ["$parse", "$interpolate", function ($parse, $inter
 					return "ws/rest/" + field.target + "/" + val.id + "/" + imageName + "/download?image=true";
 				}
 				return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-			}
+			};
 
-			scope.content = $interpolate(scope.schema.template)(scope.record);
+			scope.hilite = null;
+			scope.content = $interpolate(scope.schema.template)(evalScope);
 
 			var hilites = scope.schema.hilites || [];
 			for (var i = 0; i < hilites.length; i++) {
