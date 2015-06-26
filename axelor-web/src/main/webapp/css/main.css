@@ -33,6 +33,10 @@ body {
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
+strong {
+	font-weight: 600;
+}
+
 #container {
 	left: 0px; right: 0px; top: 41px; bottom: 0px;
 	position:	absolute;
@@ -721,10 +725,6 @@ img.prefix-icon {
 	position: absolute;
 	top: 0; left: 0; bottom: 0; right: 0;
 	overflow: auto;
-}
-
-.about-page strong {
-	font-weight: 600;
 }
 
 .about-page .page-header {

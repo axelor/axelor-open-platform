@@ -371,7 +371,7 @@
 			messages: function (options) {
 
 				var opts = _.extend({}, options);
-				var promise = this._request('messagesAll').send({
+				var promise = this._request('messages').send({
 					method: 'GET',
 					params: opts,
 					silent: opts.count ? true : undefined,

@@ -44,6 +44,7 @@ import com.axelor.meta.schema.views.ChartView;
 import com.axelor.meta.schema.views.Dashboard;
 import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.GridView;
+import com.axelor.meta.schema.views.KanbanView;
 import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.schema.views.Portal;
 import com.axelor.meta.schema.views.Search;
@@ -77,6 +78,7 @@ public class ObjectViews {
 		@XmlElement(name = "dashboard", type = Dashboard.class),
 		@XmlElement(name = "search", type = Search.class),
 		@XmlElement(name = "calendar", type = CalendarView.class),
+		@XmlElement(name = "kanban", type = KanbanView.class),
 		@XmlElement(name = "search-filters", type = SearchFilters.class),
 	})
 	private List<AbstractView> views;
