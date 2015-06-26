@@ -1,0 +1,192 @@
+/**
+ * Axelor Business Solutions
+ *
+ * Copyright (C) 2005-2015 Axelor (<http://axelor.com>).
+ *
+ * This program is free software: you can redistribute it and/or  modify
+ * it under the terms of the GNU Affero General Public License, version 3,
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.kanban-view {
+	padding: 18px;
+}
+
+.kanban-view,
+.kanban-view * {
+	box-sizing: border-box;
+}
+
+.kanban-column {
+	background-color: #fff;
+	padding: 15px 20px 20px 20px;
+	margin-bottom: 18px;
+	border-color: #e7eaec;
+	border-style: solid solid none;
+	border-width: 1px 0;
+}
+
+.kanban-column ul.kanban-card-list,
+.kanban-column li.kanban-card {
+	list-style: none;
+	margin: 0;
+}
+
+.kanban-column ul.kanban-card-list {
+	padding: 10px 0;
+}
+
+.kanban-column li.kanban-card {
+	background: #fafafb;
+	border: 1px solid #e7eaec;
+	margin: 0px 0 10px 0;
+	padding: 10px;
+	border-radius: 2px;
+	box-sizing: content-box;
+	border-left: 3px solid #e7eaec;
+}
+
+.kanban-column li.kanban-card:hover {
+	background-color: #fff;
+	cursor: pointer;
+}
+
+.kanban-column li.primary {
+	border-left: 3px solid #337ab7;
+}
+
+.kanban-column li.warning {
+	border-left: 3px solid #f0ad4e;
+}
+
+.kanban-column li.danger {
+	border-left: 3px solid #d9534f;
+}
+
+.kanban-column li.info {
+	border-left: 3px solid #23c6c8;
+}
+
+.kanban-column li.success {
+	border-left: 3px solid #16a765;
+}
+
+.kanban-column .ui-sortable-placeholder {
+	border: 1px dashed #cecece !important;
+	visibility: visible !important;
+	background: #e7eaec !important;
+}
+.kanban-column .ui-sortable-helper {
+	box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+.kanban-column > h3 {
+	font-weight: 600;
+	font-size: 16px;
+	margin-top: 5px;
+	margin-bottom: 10px;
+	line-height: 18px;
+}
+
+.kanban-column .input-group {
+	display: table;
+	width: 100%;
+}
+
+.kanban-column .input-group .form-control,
+.kanban-column .input-group .input-group-btn {
+	display: table-cell;
+}
+
+.kanban-column .input-group .form-control {
+	height: inherit;
+	width: 100%;
+	margin: 0;
+	position: relative;
+}
+
+.kanban-column .input-group .input-group-btn {
+	width: 1%;
+}
+
+.kanban-column .input-group .input-group-btn > .btn {
+	position: relative;
+	margin-left: -1px;
+}
+
+.kanban-column .input-group .form-control:focus,
+.kanban-column .input-group-btn > .btn:active,
+.kanban-column .input-group-btn > .btn:focus,
+.kanban-column .input-group-btn > .btn:hover {
+	z-index: 2;
+}
+
+.kanban-more {
+	border-bottom: 1px dashed #ddd;
+	text-align: center;
+	margin-top: -16px;
+}
+
+.kanban-more a {
+	position: relative;
+	top: 8px;
+	background: #fff;
+	padding: 0 4px;
+	outline: none;
+}
+
+.kanban-card {
+	position: relative;
+}
+
+.kanban-card h4 {
+	margin: 0 0 4px 0;
+	font-weight: 600;
+	font-size: 13px;
+}
+
+.kanban-card img {
+	width: 32px;
+	height: 32px;
+	position: absolute;
+	right: 2px;
+	bottom: 2px;
+	border-radius: 100%;
+}
+
+.kanban-card .card-body {
+
+}
+
+.kanban-card .card-footer {
+	margin-top: 4px;
+	color: #777;
+	font-size: 12px;
+}
+
+.kanban-card-menu {
+	display: none;
+	position: absolute;
+	top: 2px;
+	right: 2px;
+}
+
+.kanban-card-menu > a {
+	padding: 0 4px;
+	outline: none !important;
+	border: 0 !important;
+	box-shadow: none !important;
+}
+
+.kanban-card:hover .kanban-card-menu,
+.kanban-card .kanban-card-menu.open {
+	display: inline-block;
+}

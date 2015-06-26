@@ -241,6 +241,10 @@
 				items.push(view.eventStop);
 				items.push(view.colorBy);
 			}
+			if (view.type === "kanban") {
+				items.push(view.columnBy);
+				items.push(view.orderBy);
+			}
 
 			return result;
 		}

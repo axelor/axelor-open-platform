@@ -12,6 +12,7 @@
     <option value="portal">Portal</option>
     <option value="dashboard">Dashboard</option>
     <option value="calendar">Calendar</option>
+    <option value="kanban">Kanban</option>
     <option value="search-filters">Filters</option>
   </selection>
 

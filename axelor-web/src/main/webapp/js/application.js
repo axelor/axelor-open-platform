@@ -142,7 +142,8 @@ load([
 	'js/view/view.dashboard.js',
 	'js/view/view.popup.js',
 	'js/view/view.chart.js',
-	'js/view/view.calendar.js'
+	'js/view/view.calendar.js',
+	'js/view/view.kanban.js'
 	//-- js-end
 ]);
 
