@@ -23,6 +23,10 @@
     <!-- tags -->
     <many-to-many name="tags" ref="DMSFileTag" orderBy="name" />
 
+    <!-- content -->
+    <string name="content" large="true" />
+    <string name="contentType" />
+
   </entity>
 
   <entity name="DMSFileTag" table="DMS_FILE_TAG" repository="none">

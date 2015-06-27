@@ -225,6 +225,7 @@ function DMSFileListCtrl($scope, $element) {
 			if (elem.is('.fa-folder')) return $scope.onFolder(getSelected());
 			if (elem.is('.fa-download')) return $scope.onDownload(getSelected());
 			if (elem.is('.fa-info-circle')) return $scope.onDetails(getSelected());
+			if (elem.is('.fa-file-text-o')) return $scope.onEditFile(getSelected());
 		});
 	};
 
@@ -240,33 +241,37 @@ function DMSFileListCtrl($scope, $element) {
 		return $scope.dataView.getItem(index);
 	}
 
-	$scope.onNewFolder = function () {
+	function onNew(options, callback) {
 
 		if (!$scope.canCreateDocument(true)) {
 			return;
 		}
 
+		var opts = _.extend({
+			name: _t("New Folder"),
+			title: _t("Create folder")
+		}, options);
+
 		var count = 1;
 		var selected = $scope.getSelected() || {};
 		var existing = _.pluck((selected.nodes || []), "fileName");
 
-		var name = _t("New Folder");
-		var _name = name;
-		while(existing.indexOf(_name) > -1) {
-			_name = name + " (" + ++count + ")";
+		existing = existing.concat(_.pluck($scope.dataView.getItems(), "fileName"));
+
+		var name = opts.name;
+		while(existing.indexOf(name) > -1) {
+			name = opts.name + " (" + ++count + ")";
 		}
-		name = _name;
 
 		inputDialog({
 			value: name,
-			title: _t("Create folder"),
+			title: opts.title,
 			titleOK: _t("Create")
 		}, function (value, done) {
 			var parent = $scope.getCurrentParent();
-			var record = {
-				fileName: value,
-				isDirectory: true
-			};
+			var record = _.extend({}, opts.record, {
+				fileName: value
+			});
 			if (parent && parent.id > 0) {
 				record.parent = parent;
 			}
@@ -275,7 +280,32 @@ function DMSFileListCtrl($scope, $element) {
 			promise.then(done, done);
 			promise.success(function (record) {
 				$scope.reloadNoSync();
+				callback(record);
 			});
+		});
+	}
+
+	$scope.onNewFolder = function () {
+		onNew({
+			name: _t("New Folder"),
+			title: _t("Create folder"),
+			record: {
+				isDirectory: true
+			}
+		}, function (record) {
+		});
+	};
+
+	$scope.onNewDoc = function () {
+		onNew({
+			name: _t("New Document"),
+			title: _t("Create document"),
+			record: {
+				isDirectory: false,
+				contentType: "html"
+			}
+		}, function (record) {
+			$scope.onEditFile(record);
 		});
 	};
 
@@ -378,6 +408,55 @@ function DMSFileListCtrl($scope, $element) {
 		}
 		return true;
 	}
+
+	$scope.canEditFile = function () {
+		var record = getSelected();
+		return record && !!record.contentType;
+	};
+
+	$scope.onEditFile = function (record) {
+		record = record || getSelected();
+		var view = {
+			model: $scope._model,
+			title: _t("Document"),
+			viewType: "form",
+			views: [{
+				type: "form",
+				width: "large",
+				items: [{
+					type: "panel",
+					items: [{
+						type: "button",
+						width: "100px",
+						title: _t("Save")
+					}, {
+						type: "field",
+						name: "content",
+						showTitle: false,
+						widget: "html",
+						colSpan: 12
+					}]
+				}]
+			}],
+			recordId: record.id,
+			forceEdit: true,
+			params: {
+				'show-toolbar': false,
+			}
+		};
+
+		$scope.openTab(view);
+		$scope.waitForActions(function () {
+			var formScope = view.$viewScope;
+			if (formScope) {
+				formScope.$on("$destroy", function () {
+					if (formScope.record) {
+						record.version = formScope.record.version;
+					}
+				});
+			}
+		});
+	};
 }
 
 ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {

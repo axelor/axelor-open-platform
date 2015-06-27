@@ -12,12 +12,14 @@
           <ul class="dropdown-menu">
             <li><a href="javascript:" ng-click="onNewFolder()" x-translate>Folder</a></li>
             <li class="divider"></li>
+            <li><a href="javascript:" ng-click="onNewDoc()" x-translate>Document</a></li>
             <li><a href="javascript:" ng-click="onUpload()" x-translate>File upload</a></li>
           </ul>
         </div>
         <div class="btn-group pull-left">
           <button class="btn dropdown-toggle" data-toggle="dropdown" ng-disabled="!selection.length" tabIndex="-1" title="{{ 'More actions' | t }}"><i class="fa fa-ellipsis-v"></i></button>
           <ul class="dropdown-menu">
+            <li><a href="javascript:" ng-click="onEditFile()" ng-show="canEditFile()" x-translate>Edit...</a></li>
             <li><a href="javascript:" ng-click="onRename()" x-translate>Rename...</a></li>
             <li><a href="javascript:" ng-click="onPermissions()" ng-show="canShare()" x-translate>Permissions...</a></li>
             <li ng-show="canShowRelated()"><a href="javascript:" ng-click="onShowRelated()" x-translate>Attached to...</a></li>
