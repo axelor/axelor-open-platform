@@ -908,6 +908,16 @@
           </xsd:element>
           <xsd:group ref="tns:PanelItems" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
+        <xsd:attribute name="canCollapse" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether the panel is collapsible.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="collapseIf" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Specify a boolean expression to collapse/expend this panel.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
