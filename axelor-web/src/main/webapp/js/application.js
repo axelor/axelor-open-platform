@@ -71,6 +71,8 @@ load([
 	'lib/fullcalendar/fullcalendar.js',
 	'lib/fullcalendar/gcal.js',
 
+	'lib/handsontable/handsontable.full.js',
+
 	'lib/d3/d3.v3.js',
 	'lib/d3/nv/nv.d3.js',
 	'lib/d3/radar/radar-chart.js',
@@ -124,6 +126,7 @@ load([
 	'js/form/form.input.select.js',
 	'js/form/form.input.progress.js',
 	'js/form/form.input.binary.js',
+	'js/form/form.input.spreadsheet.js',
 
 	'js/form/form.relational.base.js',
 	'js/form/form.relational.single.js',

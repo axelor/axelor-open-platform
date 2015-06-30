@@ -37,6 +37,8 @@
 @import url('../lib/fullcalendar/fullcalendar.css');
 @import url('../lib/fullcalendar/fullcalendar.print.css') print;
 
+@import url('../lib/handsontable/handsontable.full.css');
+
 @import url('../lib/d3/nv/nv.d3.css');
 
 @import url('../lib/codemirror/codemirror.min.css');

@@ -276,9 +276,16 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 		}
 
 		if ("html".equals(file.getContentType())) {
+			json.put("fileType", "text/html");
 			json.put("contentType", "html");
 			json.put("typeIcon", "fa fa-file-text-o");
 		}
+		if ("spreadsheet".equals(file.getContentType())) {
+			json.put("fileType", "text/json");
+			json.put("contentType", "spreadsheet");
+			json.put("typeIcon", "fa fa-table");
+		}
+
 		if (file.getTags() != null) {
 			final List<Object> tags = new ArrayList<>();
 			for (DMSFileTag tag : file.getTags()) {

@@ -226,6 +226,7 @@ function DMSFileListCtrl($scope, $element) {
 			if (elem.is('.fa-download')) return $scope.onDownload(getSelected());
 			if (elem.is('.fa-info-circle')) return $scope.onDetails(getSelected());
 			if (elem.is('.fa-file-text-o')) return $scope.onEditFile(getSelected());
+			if (elem.is('.fa-table')) return $scope.onEditFile(getSelected());
 		});
 	};
 
@@ -303,6 +304,19 @@ function DMSFileListCtrl($scope, $element) {
 			record: {
 				isDirectory: false,
 				contentType: "html"
+			}
+		}, function (record) {
+			$scope.onEditFile(record);
+		});
+	};
+
+	$scope.onNewSheet = function () {
+		onNew({
+			name: _t("New Spreadsheet"),
+			title: _t("Create spreadsheet"),
+			record: {
+				isDirectory: false,
+				contentType: "spreadsheet"
 			}
 		}, function (record) {
 			$scope.onEditFile(record);
@@ -428,12 +442,13 @@ function DMSFileListCtrl($scope, $element) {
 					items: [{
 						type: "button",
 						width: "100px",
-						title: _t("Save")
+						title: _t("Save"),
+						onClick: "save"
 					}, {
 						type: "field",
 						name: "content",
 						showTitle: false,
-						widget: "html",
+						widget: record.contentType || "html",
 						colSpan: 12
 					}]
 				}]
