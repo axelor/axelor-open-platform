@@ -222,19 +222,27 @@ function DMSFileListCtrl($scope, $element) {
 	$scope.onItemClick = function(event, args) {
 		var elem = $(event.target);
 		$scope.$timeout(function () {
-			if (elem.is('.fa-folder')) return $scope.onFolder(getSelected());
-			if (elem.is('.fa-download')) return $scope.onDownload(getSelected());
-			if (elem.is('.fa-info-circle')) return $scope.onDetails(getSelected());
-			if (elem.is('.fa-file-text-o')) return $scope.onEditFile(getSelected());
-			if (elem.is('.fa-table')) return $scope.onEditFile(getSelected());
+			var record = getSelected();
+			if (elem.is('.fa-folder')) return $scope.onFolder(record);
+			if (elem.is('.fa-download')) return $scope.onDownload(record);
+			if (elem.is('.fa-info-circle')) return $scope.onDetails(record);
+			if (elem.is('.fa') && record && (record.contentType === "html" || record.contentType === "spreadsheet")) {
+				return $scope.onEditFile(record);
+			}
 		});
 	};
 
 	$scope.onItemDblClick = function(event, args) {
 		var elem = $(event.target);
 		if (elem.hasClass("fa")) return;
-		$scope.onEdit();
-		$scope.$apply();
+		setTimeout(function () {
+			var record = getSelected();
+			if (record && (record.contentType === "html" || record.contentType === "spreadsheet")) {
+				return $scope.onEditFile(record);
+			}
+			$scope.onEdit();
+			$scope.$apply();
+		});
 	};
 
 	function getSelected() {
