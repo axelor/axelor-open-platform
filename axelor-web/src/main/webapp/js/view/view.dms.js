@@ -431,8 +431,9 @@ function DMSFileListCtrl($scope, $element) {
 	$scope.onEditFile = function (record) {
 		record = record || getSelected();
 		var view = {
+			action: "$act:dms" + record.id,
 			model: $scope._model,
-			title: _t("Document"),
+			title: record.contentType === "spreadsheet" ? _t("Spreadsheet") : _t("Document"),
 			viewType: "form",
 			views: [{
 				type: "form",
