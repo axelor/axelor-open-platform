@@ -57,6 +57,15 @@ ui.formInput('Spreadsheet', {
 			model.$render();
 		});
 
+		element.resizable({
+			handles: 's',
+			resize: function () {
+				if (inst) {
+					inst.render();
+				}
+			}
+		});
+
 		function update() {
 			if (!inst) { return; }
 			var current = model.$viewValue;
