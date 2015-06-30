@@ -114,6 +114,14 @@
 	left: 250px !important;
 }
 
+.dms-file-list .slick-icon.fa-file-text {
+	color: #337ab7;
+}
+
+.dms-file-list .slick-icon.fa-table {
+	color: #16a765;
+}
+
 .dms-folder-dialog input {
 	box-sizing: border-box;
 	width: 100%;
