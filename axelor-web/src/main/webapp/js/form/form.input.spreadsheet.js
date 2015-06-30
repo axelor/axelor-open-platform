@@ -26,25 +26,96 @@ ui.formInput('Spreadsheet', {
 	link: function (scope, element, attrs, model) {
 
 		var field = scope.field;
-		var height = field.height || 400;
+		var height = field.height || 260;
 
-		element.height(height).css("overflow", "hidden");
+		var inst;
 
-		var inst = new Handsontable(element[0], {
-			rowHeaders: true,
-			colHeaders: true,
-			contextMenu: true,
-			afterChange: function (change, source) {
-				if (!inst || source === 'loadData') { return; }
-				var value = JSON.stringify(inst.getData());
-				var current = model.$viewValue;
-				if (value === current) {
-					return;
-				}
-				scope.setValue(value, true);
-				scope.applyLater();
-			}
+		scope.$timeout(function () {
+
+			element.height(height).css({
+				"position": "relative",
+				"overflow": "hidden"
+			});
+
+			inst = new Handsontable(element[0], {
+				colWidths: 60,
+				rowHeaders: true,
+				colHeaders: true,
+				contextMenu: true,
+				manualColumnResize: true,
+				manualRowResize: true,
+				afterChange: function (change, source) {
+					if (source !== 'loadData') {
+						update();
+					}
+				},
+				afterCreateCol: update,
+				afterCreateRow: update,
+				afterRemoveCol: update,
+				afterRemoveRow: update
+			});
+			model.$render();
 		});
+
+		function update() {
+			if (!inst) { return; }
+			var current = model.$viewValue;
+			var value = compact(inst.getData());
+
+			value = value ? JSON.stringify(value) : value;
+			if (value === current) {
+				return;
+			}
+			scope.setValue(value, true);
+			scope.applyLater();
+		}
+
+		function compact(items) {
+			var res = [];
+			for (var i = 0; i < items.length; i++) {
+				var item = items[i];
+				if (Array.isArray(item)) {
+					item = compact(item);
+				}
+				if (item === "" || item === null || item === undefined || item.length === 0) {
+					continue;
+				}
+				res[i] = item;
+			}
+
+			var n = res.length;
+			for (var i = n - 1; i >= 0; i--) {
+				if (res[i] !== null) {
+					n = i+1;
+					break;
+				}
+			}
+			res = res.slice(0, n);
+			return res.length ? res : null;
+		}
+
+		function fill(data) {
+			var cols = 0;
+			var rows = data.length;
+			for(var i = 0; i < data.length; i++) {
+				var row = data[i] || (data[i] = []);
+				cols = Math.max(row.length, cols);
+			}
+
+			cols = Math.max(50, cols)
+			rows = Math.max(100, rows);
+
+			for(var i = 0; i < rows; i++) {
+				var row = data[i] || (data[i] = []);
+				for (var j = 0; j < cols + 1; j++) {
+					if (row[j] === undefined) {
+						row[j] = null;
+					}
+				}
+			}
+
+			return data;
+		}
 
 		model.$render = function () {
 			var value = null;
@@ -52,7 +123,13 @@ ui.formInput('Spreadsheet', {
 				value = JSON.parse(model.$viewValue) || null;
 			} catch (e) {
 			}
-			inst.loadData(value || null);
+			if (inst) {
+				value = fill(value || []);
+				inst.loadData(value || null);
+				setTimeout(function () {
+					inst.render();
+				}, 300);
+			}
 		};
 
 		scope.$on("$destroy", function () {
@@ -60,16 +137,6 @@ ui.formInput('Spreadsheet', {
 				inst.destroy();
 				inst = null;
 			}
-		});
-
-		scope.$watch("isReadonly()", function (readonly) {
-			inst.updateSettings({
-				readOnly: !!readonly
-			});
-		});
-
-		scope.$timeout(function () {
-			inst.render();
 		});
 	},
 	template_editable: null,
