@@ -171,7 +171,12 @@ ui.formInput('Html', {
 		var editor = element.find('.html-editor');
 		var buttons = getButtons(editor, scope.field.lite);
 
-		editor.wysiwyg({
+		var height = +(scope.field.height) || null;
+		if (height) {
+			height = Math.max(100, height);
+		}
+
+		editor.height(height).wysiwyg({
 			toolbar: 'top',
 			buttons: buttons,
 			submit: {

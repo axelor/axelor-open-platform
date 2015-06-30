@@ -458,7 +458,8 @@ function DMSFileListCtrl($scope, $element) {
 						name: "content",
 						showTitle: false,
 						widget: record.contentType || "html",
-						colSpan: 12
+						colSpan: 12,
+						height: 520
 					}]
 				}]
 			}],
