@@ -26,7 +26,7 @@ ui.formInput('Spreadsheet', {
 	link: function (scope, element, attrs, model) {
 
 		var field = scope.field;
-		var height = field.height || 260;
+		var height = field.height || 580;
 
 		var inst;
 
