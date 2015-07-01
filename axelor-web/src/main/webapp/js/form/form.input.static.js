@@ -436,7 +436,7 @@ ui.formItem('Button', {
 			element.children('.btn-text').html(title);
 		});
 	},
-	template: '<a href="" class="btn">'+
+	template: '<a href="" class="btn btn-success">'+
 		'<span class="btn-text" ng-transclude></span>'+
 	'</a>'
 });
