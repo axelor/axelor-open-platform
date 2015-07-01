@@ -310,8 +310,9 @@ function FormViewCtrl($scope, $element) {
 		return $scope.hasButton('edit');
 	};
 	
-	$scope.canSave = function() {
-		return $scope.hasPermission('write') && $scope.$$dirty && $scope.isValid();
+	$scope.canSave = function(dirty) {
+		var isDirty = dirty || $scope.$$dirty;
+		return $scope.hasPermission('write') && dirty && $scope.isValid();
 	};
 
 	$scope.canDelete = function() {
@@ -531,7 +532,7 @@ function FormViewCtrl($scope, $element) {
 		}
 
 		$scope.waitForActions(function() {
-			if (!$scope.canSave()) {
+			if (!$scope.canSave(options.force)) {
 				$scope.showErrorNotice();
 				return defer.promise;
 			}

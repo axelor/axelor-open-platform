@@ -316,7 +316,7 @@ ActionHandler.prototype = {
 			deferred.reject();
 			return deferred.promise;
 		}
-		if (validateOnly || (scope.isDirty && !scope.isDirty())) {
+		if (validateOnly) {
 			deferred.resolve();
 			return deferred.promise;
 		}
@@ -344,7 +344,8 @@ ActionHandler.prototype = {
 		if (scope.onSave) {
 			scope.onSave({
 				values: values,
-				callOnSave: false
+				callOnSave: false,
+				force: true
 			}).then(deferred.resolve, deferred.reject);
 		} else {
 			doSave(values);
