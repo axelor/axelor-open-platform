@@ -418,7 +418,10 @@ function FormViewCtrl($scope, $element) {
 		event.preventDefault();
 		context = tab.context || {};
 		record = $scope.record || {};
-		checkVersion = "" + context.__check_version;
+		checkVersion = "" + __appSettings["view.form.check-version"];
+		if (context.__check_version !== undefined) {
+			checkVersion = "" + context.__check_version;
+		};
 
 		if (!record.id || checkVersion !== "true") {
 			return;
