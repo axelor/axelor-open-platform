@@ -353,10 +353,6 @@
 	min-width: 28px;
 	height: 28px;
 }
-.panel-layout .btn:active,
-.panel-layout .btn.active {
-  background-color: #e0e0e0;
-}
 .panel-layout .btn:focus {
   background-position: inherit;
 }
