@@ -399,15 +399,47 @@ ui.formWidget('Panel', {
 	showTitle: false,
 
 	link: function (scope, element, attrs) {
+
 		var field = scope.field || {};
+		var body = element.children(".panel-body");
+
 		element.addClass(field.serverType);
 		if (field.sidebar && !attrs.itemSpan) {
 			attrs.$set('itemSpan', 12);
 		}
+
 		scope.menus = null;
 		if (field.menu) {
 			scope.menus = [field.menu];
 		}
+
+		scope.collapsed = false;
+
+		scope.canCollapse = function() {
+			return field.canCollapse || field.collapseIf;
+		};
+
+		scope.setCollapsed = function(collapsed) {
+			scope.collapsed = collapsed;
+			scope.collapsedIcon = collapsed ? 'fa-chevron-down' : 'fa-chevron-up';
+
+			var action = collapsed ? "hide" : "show";
+
+			element.removeClass("collapsed");
+			body[action]("blind", 200, function () {
+				element.toggleClass("collapsed", !!collapsed);
+				axelor.$adjustSize();
+			});
+		};
+
+		scope.toggle = function() {
+			scope.collapsed = !scope.collapsed;
+			scope.setCollapsed(scope.collapsed);
+		};
+
+		scope.$watch("attr('collapse')", function(collapsed) {
+			scope.setCollapsed(collapsed);
+		});
 
 		var nested = element.parents('.panel:first').size() > 0;
 		if (nested) {
@@ -428,6 +460,9 @@ ui.formWidget('Panel', {
 	template:
 		"<div class='panel panel-default'>" +
 			"<div class='panel-header' ng-show='field.title' ng-if='!notitle'>" +
+				"<div ng-show='canCollapse()' class='panel-icons pull-right'>" +
+					"<a href='' ng-click='toggle()'><i class='fa' ng-class='collapsedIcon'></i></a>" +
+				"</div>" +
 				"<div ng-if='menus' ui-menu-bar menus='menus' handler='this' class='pull-right'></div>" +
 				"<div class='panel-title'>{{title}}</div>" +
 			"</div>" +
@@ -437,7 +472,9 @@ ui.formWidget('Panel', {
 
 ui.formWidget('PanelStack', {
 	transclude: true,
-	template: "<div class='panel-stack' ui-transclude></div>"
+	template: "<div class='panel-stack'>" +
+				"<span ui-transclude></span>" +
+			"</div>"
 });
 
 ui.formWidget('PanelTabs', {

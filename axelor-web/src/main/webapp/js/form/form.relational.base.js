@@ -477,13 +477,14 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	};
 
 	$scope.canSelect = function() {
-		if (field.canSelect !== undefined) return field.canSelect;
+		var canSelect = $scope.attr('canSelect');
+		if (canSelect !== undefined) return canSelect;
 		if ($scope.selectEnable !== undefined) return $scope.selectEnable;
 		return true;
 	};
 
 	$scope.canNew = function() {
-		return _.isUndefined(field.canNew) ? true : field.canNew;
+		return $scope.attr('canNew') !== false;
 	};
 	
 	$scope.canEdit = function() {
@@ -491,11 +492,11 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	};
 
 	$scope.canView = function() {
-		return _.isUndefined(field.canView) ? true : field.canView;
+		return $scope.attr('canView') !== false;
 	};
 
 	$scope.canRemove = function() {
-		return _.isUndefined(field.canRemove) ? true : field.canRemove;
+		return $scope.attr('canRemove') !== false;
 	};
 
 	$scope.select = function(value) {

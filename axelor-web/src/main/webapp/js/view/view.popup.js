@@ -591,10 +591,19 @@ angular.module('axelor.ui').directive('uiEditorPopup', function() {
 					return onNewHandler.apply(scope, arguments);
 				}
 			};
+
+			scope.isPopupOpen = true;
+			setTimeout(function () {
+				element.on('dialogopen dialogclose', function (e) {
+					scope.waitForActions(function () {
+						scope.isPopupOpen = e.type === 'dialogopen';
+					});
+				});
+			});
 		},
 		replace: true,
 		template:
-		'<div ui-dialog x-resizable="true" ui-dialog-size x-on-ok="onOK" x-on-before-close="onBeforeClose">'+
+		'<div ui-dialog x-resizable="true" ui-dialog-size x-on-ok="onOK" x-on-before-close="onBeforeClose" ui-watch-if="isPopupOpen">'+
 		    '<div ui-view-form x-handler="this"></div>'+
 		'</div>'
 	};

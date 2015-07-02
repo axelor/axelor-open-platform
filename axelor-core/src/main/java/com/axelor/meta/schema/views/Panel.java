@@ -19,6 +19,7 @@ package com.axelor.meta.schema.views;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
@@ -28,6 +29,12 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @XmlType
 @JsonTypeName("panel")
 public class Panel extends AbstractPanel {
+
+	@XmlAttribute
+	private Boolean canCollapse;
+
+	@XmlAttribute
+	private String collapseIf;
 
 	@XmlElement
 	private Menu menu;
@@ -44,6 +51,22 @@ public class Panel extends AbstractPanel {
 		@XmlElement(name = "panel-include", type = PanelInclude.class)
 	})
 	private List<AbstractWidget> items;
+
+	public Boolean getCanCollapse() {
+		return canCollapse;
+	}
+
+	public void setCanCollapse(Boolean canCollapse) {
+		this.canCollapse = canCollapse;
+	}
+
+	public String getCollapseIf() {
+		return collapseIf;
+	}
+
+	public void setCollapseIf(String collapseIf) {
+		this.collapseIf = collapseIf;
+	}
 
 	public Menu getMenu() {
 		return menu;

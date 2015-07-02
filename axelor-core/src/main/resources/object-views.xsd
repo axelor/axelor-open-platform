@@ -667,40 +667,38 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="canSelect" type="xsd:boolean">
+    <xsd:attribute name="canSelect" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-          If this is a relational field, specify whether to allow selecting
-          existing record(s).
-          Generally, used with NestedEditor widget.
+          Specify whether to allow selecting existing records (boolean expression).
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="canNew" type="xsd:boolean">
+    <xsd:attribute name="canNew" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-          If this is a relational field, specify whether to allow creating new record(s).
+          Specify whether to allow creating new item (boolean expression).
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="canView" type="xsd:boolean">
+    <xsd:attribute name="canView" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-          If this is a relational field, specify whether to allow view the record(s).
+          Specify whether to allow viewing the selected item (boolean expression).
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="canEdit" type="xsd:boolean">
+    <xsd:attribute name="canEdit" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-        If this is a  relational field, specify whether to allow editing existing record(s).
+        Specify whether to allow editing selected items (boolean expression).
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="canRemove" type="xsd:boolean">
+    <xsd:attribute name="canRemove" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-          If this is a relational field, specify whether to allow removing record(s).
+          Specify whether to allow removing selected items (boolean expression).
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -782,12 +780,12 @@
             <xsd:documentation>Comma separate list of actions to execute on new event.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="canNew" type="xsd:boolean">
+        <xsd:attribute name="canNew" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>Specify whether to show the 'New' button.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="canEdit" type="xsd:boolean">
+        <xsd:attribute name="canEdit" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>Specify whether to show the 'Edit' button.</xsd:documentation>
           </xsd:annotation>
@@ -910,6 +908,16 @@
           </xsd:element>
           <xsd:group ref="tns:PanelItems" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
+        <xsd:attribute name="canCollapse" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether the panel is collapsible.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="collapseIf" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Specify a boolean expression to collapse/expend this panel.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -993,6 +1001,11 @@
         <xsd:attribute name="x-viewer" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>Specify whether to use editor as viewer</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+       	<xsd:attribute name="x-show-titles" type="xsd:boolean">
+          <xsd:annotation>
+          	<xsd:documentation>Specify whether to show item titles by default</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="x-show-on-new" type="xsd:boolean">
@@ -1972,8 +1985,8 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-       <xsd:attributeGroup ref="tns:RelationalAttributes"/>
-        <xsd:attributeGroup ref="tns:ExtraAttributes"/>
+        <xsd:attributeGroup ref="tns:RelationalAttributes"/>
+       	<xsd:attributeGroup ref="tns:ExtraAttributes"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
