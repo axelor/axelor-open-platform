@@ -57,6 +57,10 @@
 	font-weight: 600;
 }
 
+.panel .panel-header .panel-icons a {
+	color: #c4c4c4;
+}
+
 .panel .panel-header .menu-bar {
 	position: relative;
 	top: -6px;
@@ -79,8 +83,13 @@
 	right: 0;
 }
 
+.panel.collapsed .panel-header {
+	border-bottom: 0;
+}
+
 .panel .panel-body {
-	padding: 14px;
+	padding: 14px;	
+	transition: height 0.3s ease-out;
 }
 
 .panel {
@@ -455,21 +464,5 @@
 		float: left;
 		text-align: right;
 		width: 48%;
-	}
-}
-
-/* fix-child-3 fixes width of span3 child */
-.panel.fix-child-3 > .panel-body > .panel-layout > .row-fluid > .span3 {
-	width: 140px;
-}
-
-.panel.fix-child-3 > .panel-body > .panel-layout > .row-fluid > .span9 {
-	width: calc(100% - 160px);
-}
-
-@media (max-width: 767px) {
-	.panel.fix-child-3 > .panel-body > .panel-layout > .row-fluid > .span9 {
-		margin-left: 0;
-		width: 100%;
 	}
 }

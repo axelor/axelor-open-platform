@@ -312,8 +312,9 @@ function FormViewCtrl($scope, $element) {
 		return $scope.hasButton('edit');
 	};
 	
-	$scope.canSave = function() {
-		return $scope.hasPermission('write') && $scope.$$dirty && $scope.isValid();
+	$scope.canSave = function(dirty) {
+		var isDirty = dirty || $scope.$$dirty;
+		return $scope.hasPermission('write') && isDirty && $scope.isValid();
 	};
 
 	$scope.canDelete = function() {
@@ -420,7 +421,10 @@ function FormViewCtrl($scope, $element) {
 		event.preventDefault();
 		context = tab.context || {};
 		record = $scope.record || {};
-		checkVersion = "" + context.__check_version;
+		checkVersion = "" + __appSettings["view.form.check-version"];
+		if (context.__check_version !== undefined) {
+			checkVersion = "" + context.__check_version;
+		};
 
 		if (!record.id || checkVersion !== "true") {
 			return;
@@ -484,6 +488,7 @@ function FormViewCtrl($scope, $element) {
 
 	$scope.onSave = function(options) {
 		
+		var opts = _.extend({}, options);
 		var defer = $scope._defer();
 		var saveAction = $scope.$events.onSave;
 		var fireOnLoad = true;
@@ -502,7 +507,7 @@ function FormViewCtrl($scope, $element) {
 			return true;
 		}
 
-		if (options && options.callOnSave === false) {
+		if (opts.callOnSave === false) {
 			saveAction = null;
 			fireOnLoad = false;
 		}
@@ -513,7 +518,7 @@ function FormViewCtrl($scope, $element) {
 
 		function doSave() {
 			var dummy = $scope.getDummyValues(),
-				values = _.extend({}, $scope.record, (options||{}).values),
+				values = _.extend({}, $scope.record, opts.values),
 				promise;
 			
 			values = ds.diff(values, $scope.$$original);
@@ -530,7 +535,7 @@ function FormViewCtrl($scope, $element) {
 		}
 
 		$scope.waitForActions(function() {
-			if (!$scope.canSave()) {
+			if (!$scope.canSave(opts.force)) {
 				$scope.showErrorNotice();
 				return defer.promise;
 			}
