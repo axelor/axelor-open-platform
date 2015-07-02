@@ -50,6 +50,28 @@
     <field name="description"/>
   </grid>
 
+  <cards name="mail-group-cards" title="Groups" model="com.axelor.mail.db.MailGroup">
+    <field name="name"/>
+    <field name="description"/>
+    <template><![CDATA[
+    <div>
+      <div class="span4 card-image">
+        <img ng-src="{{$image(null, 'image')}}">
+        <strong>{{name}}</strong>
+      </div>
+      <div class="span8">
+        <strong>{{name}}</strong>
+        <p class="muted">{{description}}</p>
+        <div class="buttons">
+          <a class="btn btn-small btn-success" href="" ng-show="!_following" ui-action-click="com.axelor.mail.web.MailController:follow" x-translate>Subscribe</a>
+          <a class="btn btn-small btn-danger" href="" ng-show="_following" ui-action-click="com.axelor.mail.web.MailController:unfollow" x-translate>Unsubscribe</a>
+        </div>
+      </div>
+    </div>
+    ]]>
+    </template>
+  </cards>
+
   <form name="mail-group-from" title="Group" model="com.axelor.mail.db.MailGroup"
     onSave="com.axelor.mail.web.MailController:autoSubscribe">
     <panel title="Overview" css="fix-child-3">
@@ -86,9 +108,8 @@
   </action-view>
 
   <action-view name="mail.groups" model="com.axelor.mail.db.MailGroup" title="Groups">
-    <view name="mail-group-grid" type="grid" />
+    <view name="mail-group-cards" type="cards" />
     <view name="mail-group-form" type="form" />
-    <view-param name="ui-template:grid" value="mail-group-grid"/>
   </action-view>
 
   <!-- menu -->

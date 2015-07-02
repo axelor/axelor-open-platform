@@ -37,6 +37,7 @@ import com.axelor.mail.db.repo.MailGroupRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
+import com.axelor.rpc.Context;
 import com.axelor.rpc.Response;
 
 public class MailController extends JpaSupport {
@@ -177,6 +178,30 @@ public class MailController extends JpaSupport {
 			followers.follow(entity, user);
 		}
 
+		response.setStatus(ActionResponse.STATUS_SUCCESS);
+	}
+
+	public void follow(ActionRequest request, ActionResponse response) {
+		final Context ctx = request.getContext();
+		final Long id = (Long) ctx.get("id");
+		final Model entity = (Model) getEntityManager().find(ctx.getContextClass(), id);
+		final MailFollowerRepository followers = Beans.get(MailFollowerRepository.class);
+
+		followers.follow(entity, AuthUtils.getUser());
+
+		response.setValue("_following", true);
+		response.setStatus(ActionResponse.STATUS_SUCCESS);
+	}
+
+	public void unfollow(ActionRequest request, ActionResponse response) {
+		final Context ctx = request.getContext();
+		final Long id = (Long) ctx.get("id");
+		final Model entity = (Model) getEntityManager().find(ctx.getContextClass(), id);
+		final MailFollowerRepository followers = Beans.get(MailFollowerRepository.class);
+
+		followers.unfollow(entity, AuthUtils.getUser());
+
+		response.setValue("_following", false);
 		response.setStatus(ActionResponse.STATUS_SUCCESS);
 	}
 
