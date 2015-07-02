@@ -271,6 +271,7 @@ final class AuditTracker {
 			follower.setRelatedId(entity.getId());
 			follower.setRelatedModel(entity.getClass().getName());
 			follower.setUser(user);
+			follower.setArchived(false);
 			add(follower);
 		}
 	}

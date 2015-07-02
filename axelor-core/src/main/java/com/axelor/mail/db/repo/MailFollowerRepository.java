@@ -72,7 +72,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 
 		final List<Map<String, Object>> all = new ArrayList<>();
 		for (MailFollower follower : users) {
-			if (follower.getArchived() == Boolean.TRUE) {
+			if (follower.getArchived() == Boolean.FALSE) {
 				all.add(Resource.toMapCompact(follower.getUser()));
 			}
 		}
@@ -138,7 +138,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 	public void follow(Model entity, User user) {
 
 		MailFollower follower = findOne(entity, user);
-		if (follower != null && follower.getArchived() == Boolean.TRUE) {
+		if (follower != null && follower.getArchived() == Boolean.FALSE) {
 			return;
 		}
 
@@ -146,7 +146,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 			follower = new MailFollower();
 		}
 
-		follower.setArchived(true);
+		follower.setArchived(false);
 		follower.setRelatedId(entity.getId());
 		follower.setRelatedModel(entity.getClass().getName());
 		follower.setUser(user);
@@ -168,7 +168,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 
 		MailFollower follower = findOne(entity, user);
 		if (follower != null) {
-			follower.setArchived(false);
+			follower.setArchived(true);
 			save(follower);
 		}
 
@@ -180,6 +180,6 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 
 	public boolean isFollowing(Model entity, User user) {
 		final MailFollower found = findOne(entity, user);
-		return found != null && found.getArchived() == Boolean.TRUE;
+		return found != null && found.getArchived() == Boolean.FALSE;
 	}
 }
