@@ -44,31 +44,31 @@ public class MailController extends JpaSupport {
 	
 	private static final String SQL_UNREAD = ""
 			+ "SELECT COUNT(DISTINCT m) FROM MailMessage m LEFT JOIN m.flags g "
-			+ "WHERE ((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
-			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
+			+ "WHERE (CONCAT(m.relatedId, m.relatedModel) IN "
+			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
 			+ "((g IS NULL) OR (g.user.id = :uid AND g.isRead = false AND g.isArchived = false))";
 
 	private static final String SQL_INBOX = ""
 			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
 			+ "WHERE (m.parent IS NULL) AND "
-			+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
-			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
+			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
+			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
 			+ "((g IS NULL) OR (g.user.id = :uid AND g.isArchived = false)) "
 			+ "ORDER BY m.createdOn DESC";
 
 	private static final String SQL_IMPORTANT = ""
 			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
 			+ "WHERE (m.parent IS NULL) AND "
-			+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
-			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
-			+ "((g.user.id = :uid AND g.isStarred = true)) "
+			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
+			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
+			+ "((g.user.id = :uid AND g.isStarred = true AND g.isArchived = false)) "
 			+ "ORDER BY m.createdOn DESC";
 
 	private static final String SQL_ARCHIVE = ""
 			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
 			+ "WHERE (m.parent IS NULL) AND "
-			+ "((m.createdBy.id = :uid) OR CONCAT(m.relatedId, m.relatedModel) IN "
-			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid)) AND "
+			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
+			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
 			+ "((g.user.id = :uid AND g.isArchived = true)) "
 			+ "ORDER BY m.createdOn DESC";
 
