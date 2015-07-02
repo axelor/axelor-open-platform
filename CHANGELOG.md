@@ -1,4 +1,24 @@
-# Current (3.0.11)
+# 3.0.11 (2015-07-02)
+
+## Bug fixes
+
+- fix onNew issue in calendar popup editor
+- fix SelectProgress widget in grid
+- fix duplicate read from popup
+- fix editors inside panel-stack
+- fix editor itemSpan
+- fix o2m caching issue
+- fix dropdown o2m/m2m in editable grid
+
+## Improvements
+
+- always force "save" action
+- add view.form.check-version config option
+- add collapse support for panels
+- allow expressions with `can` attributes
+- add x-show-titles attribute to editor tag
+- add refresh button on grid view
+- optimize popup editor window
 
 # 3.0.10 (2015-06-19)
 
