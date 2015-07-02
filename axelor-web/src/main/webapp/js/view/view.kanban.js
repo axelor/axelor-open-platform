@@ -38,6 +38,7 @@ function BaseCardsCtrl(type, $scope, $element) {
 		}
 	};
 
+	var ds = $scope._dataSource;
 	var initialized = false;
 
 	$scope.onShow = function (viewPromise) {
@@ -61,8 +62,11 @@ function BaseCardsCtrl(type, $scope, $element) {
 		$scope.filter({});
 	};
 
+	function update(records) {
+		$scope.records = records;
+	}
+
 	$scope.filter = function(options) {
-		var ds = $scope._dataSource;
 		var view = $scope.schema;
 		var opts = {
 			fields: _.pluck($scope.fields, 'name'),
@@ -78,9 +82,25 @@ function BaseCardsCtrl(type, $scope, $element) {
 			opts.sortBy = view.orderBy.split(',');
 		}
 
-		ds.search(opts).success(function (records) {
-			$scope.records = records;
-		});
+		return ds.search(opts).success(update);
+	};
+
+	$scope.pagerText = function() {
+		var page = ds._page;
+		if (page && page.from !== undefined) {
+			if (page.total == 0) return null;
+			return _t("{0} to {1} of {2}", page.from + 1, page.to, page.total);
+		}
+	};
+
+	$scope.onNext = function() {
+		var fields = _.pluck($scope.fields, 'name');
+		return ds.next(fields).success(update);
+	};
+
+	$scope.onPrev = function() {
+		var fields = _.pluck($scope.fields, 'name');
+		return ds.prev(fields).success(update);
 	};
 }
 
