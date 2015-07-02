@@ -185,9 +185,8 @@ public class RestService extends ResourceService {
 
 	@POST
 	@Path("{id}/fetch")
-	public Response fetch(
-			@PathParam("id") long id, Request request) {
-
+	public Response fetch(@PathParam("id") long id, Request request) {
+		request.setModel(getModel());
 		Response response = getResource().fetch(id, request);
 		long attachments = Query.of(MetaAttachment.class)
 				.filter("self.objectId = ?1 AND self.objectName = ?2", id, getModel())
@@ -198,7 +197,6 @@ public class RestService extends ResourceService {
 			Map<String, Object> item = (Map) response.getItem(0);
 			item.put("$attachments", attachments);
 		}
-
 
 		return response;
 	}
