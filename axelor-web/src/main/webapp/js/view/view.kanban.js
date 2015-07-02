@@ -58,6 +58,14 @@ function BaseCardsCtrl(type, $scope, $element) {
 
 	};
 
+	$scope.onNew = function () {
+		$scope.switchTo('form', function (formScope) {
+			formScope.edit(null);
+			formScope.setEditable();
+			formScope.$broadcast("on:new");
+		});
+	};
+
 	$scope.onRefresh = function () {
 		$scope.filter({});
 	};
@@ -161,14 +169,6 @@ ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $
 				_.extend(item, ds.get(item.id));
 			});
 			record.version = rec.version;
-		});
-	};
-
-	$scope.onNew = function () {
-		$scope.switchTo('form', function (formScope) {
-			formScope.edit(null);
-			formScope.setEditable();
-			formScope.$broadcast("on:new");
 		});
 	};
 
