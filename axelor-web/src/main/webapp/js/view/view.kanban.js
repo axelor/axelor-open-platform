@@ -44,7 +44,7 @@ function BaseCardsCtrl(type, $scope, $element) {
 	$scope.onShow = function (viewPromise) {
 
 		if (initialized) {
-			return $scope.onRefresh();
+			return;
 		}
 
 		initialized = true;
@@ -406,9 +406,15 @@ ui.directive('uiCard', ["$parse", "$compile", function ($parse, $compile) {
 		scope: true,
 		link: function (scope, element, attrs) {
 
+			var record = scope.record;
 			var evalScope = scope.$new(true);
 
+			if (!record.$processed) {
+				element.hide();
+			}
+
 			function process(record) {
+				record.$processed = true;
 				for (var name in record) {
 					if (!record.hasOwnProperty(name) || name.indexOf('.') === -1) {
 						continue;
@@ -461,6 +467,8 @@ ui.directive('uiCard', ["$parse", "$compile", function ($parse, $compile) {
 			if (scope.schema.cardWidth) {
 				element.parent().css("width", scope.schema.cardWidth);
 			}
+
+			element.fadeIn("slow");
 		}
 	};
 }]);
