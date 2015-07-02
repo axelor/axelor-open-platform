@@ -913,4 +913,22 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 	};
 }]);
 
+ui.directive('uiActionClick', ['ViewService', function(ViewService) {
+	return {
+		link: function(scope, element, attrs) {
+			var action = attrs.uiActionClick;
+			scope.$evalAsync(function() {
+				var handler = new ActionHandler(scope, ViewService, {
+					element: element,
+					action: action
+				});
+				element.on("click", function () {
+					handler.handle();
+					scope.applyLater();
+				});
+			});
+		}
+	};
+}]);
+
 }).call(this);

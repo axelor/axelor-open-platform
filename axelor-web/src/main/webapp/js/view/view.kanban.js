@@ -409,11 +409,21 @@ ui.directive('uiCard', ["$parse", "$compile", function ($parse, $compile) {
 			var record = scope.record;
 			var evalScope = scope.$new(true);
 
+			evalScope.record = record;
+			evalScope.getContext = scope.getContext = function () {
+				var ctx = _.extend({}, scope._context, scope.record);
+				ctx._model = scope._model;
+				return ctx;
+			};
+
 			if (!record.$processed) {
 				element.hide();
 			}
 
 			function process(record) {
+				if (record.$processed) {
+					return record;
+				}
 				record.$processed = true;
 				for (var name in record) {
 					if (!record.hasOwnProperty(name) || name.indexOf('.') === -1) {
@@ -431,11 +441,13 @@ ui.directive('uiCard', ["$parse", "$compile", function ($parse, $compile) {
 				return record;
 			}
 
-			_.extend(evalScope, process(scope.record));
+			evalScope.$watch("record", function (record) {
+				_.extend(evalScope, process(record));
+			}, true);
 
 			evalScope.$image = function (fieldName, imageName) {
 				var rec = scope.record;
-				var v = rec.version || rec.$version || (new Date()).getTime();
+				var v = rec.version || rec.$version || 0;
 				if (fieldName === null && imageName) {
 					return "ws/rest/" + scope._model + "/" + rec.id + "/" + imageName + "/download?image=true&v=" + v;
 				}
@@ -453,7 +465,7 @@ ui.directive('uiCard', ["$parse", "$compile", function ($parse, $compile) {
 			}
 
 			scope.hilite = null;
-			scope.content = $compile(template)(evalScope);
+				scope.content = $compile(template)(evalScope);
 
 			var hilites = scope.schema.hilites || [];
 			for (var i = 0; i < hilites.length; i++) {
