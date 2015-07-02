@@ -225,6 +225,10 @@
 	margin-bottom: 0;
 }
 
+.cards-view .kanban-card p {
+	margin: 9px 0;
+}
+
 .cards-view .card-image {
 	position: relative;
 	text-align: center;
