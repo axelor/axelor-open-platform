@@ -344,11 +344,13 @@ ui.directive('uiCards', function () {
 
 	return function (scope, element, attrs) {
 
-		scope.onEdit = function (record) {
+		scope.onEdit = function (record, readonly) {
 			scope.switchTo('form', function (formScope) {
 				if (formScope.canEdit()) {
 					formScope.edit(record);
-					formScope.setEditable();
+					if (!readonly) {
+						formScope.setEditable();
+					}
 				}
 			});
 		};
@@ -365,6 +367,16 @@ ui.directive('uiCards', function () {
 				});
 			});
 		};
+
+		element.on("click", ".kanban-card", function (e) {
+			if ($(e.target).parents(".kanban-card-menu").size()) {
+				return;
+			}
+			var elem = $(this);
+			var record = elem.scope().record;
+			scope.onEdit(record, true);
+			scope.applyLater();
+		});
 	};
 });
 
