@@ -170,7 +170,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	};
 
 	$scope.canEditTarget = function () {
-		return $scope.canEdit() && $scope.field.canEdit !== false;
+		return $scope.canEdit() && $scope.attr('canEdit') !== false;
 	};
 
 	$scope.canShowEdit = function () {
@@ -179,8 +179,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	}
 	
 	$scope.canEdit = function () {
-		var field = $scope.field || {};
-		return field.canEdit !== false && $scope.canView();
+		return $scope.attr('canEdit') !== false && $scope.canView();
 	};
 	
 	var _canRemove = $scope.canRemove;
@@ -447,12 +446,17 @@ ui.formInput('OneToMany', {
 				axelor.$adjustSize();
 			};
 		})();
-		
-		if (this.collapseIfEmpty) {
-			scope.$watch(attrs.ngModel, function(value){
+
+		var collapseIfEmpty = this.collapseIfEmpty;
+		scope.$watch(attrs.ngModel, function(value){
+			if (!value) {
+				// clear data view
+				scope.dataView.setItems([]);
+			}
+			if (collapseIfEmpty) {
 				adjustSize(value);
-			});
-		}
+			}
+		});
 
 		function deleteItemsById(id) {
 			var items = scope.dataView.getItems() || [];
@@ -759,7 +763,7 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 
 		var _removeItem = scope.removeItem;
 		scope.removeItem = function(e, ui) {
-			if (field.canRemove === false) return;
+			if (scope.attr('canRemove') === false) return;
 			_removeItem.apply(this, arguments);
 		};
 
@@ -1012,6 +1016,10 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 			return !axelor.device.small;
 		};
 
+		scope.canShowAdd = function () {
+			return dropdownVisible && scope.canEdit();
+		};
+
 		scope.canShowRemove = function () {
 			return dropdownVisible && scope.canRemove() && !_.isEmpty(scope.selection);
 		};
@@ -1037,6 +1045,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 			var elem = $(e.target);
 			if (all.is(elem) || all.has(elem).size() > 0) return;
 			if (elem.zIndex() > element.parents('.slickgrid:first').zIndex()) return;
+			if (elem.parents(".ui-dialog:first").zIndex() > element.parents('.slickgrid:first').zIndex()) return;
 
 			element.trigger('close:slick-editor');
 		}
@@ -1052,7 +1061,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 		
 		scope.$watch('schema.loaded', function(viewLoaded) {
 			var schema = scope.schema;
-			if (schema && field.canEdit === false) {
+			if (schema && scope.attr('canEdit') === false) {
 				schema.editIcon = false;
 			}
 		});
@@ -1063,11 +1072,11 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 		});
 
 		scope.canEdit = function () {
-			return scope.hasPermission('create') && !scope.isReadonly() && field.canEdit !== false;
+			return scope.hasPermission('create') && !scope.isReadonly() && scope.attr('canEdit') !== false;
 		};
-		
+
 		scope.canRemove = function() {
-			return scope.hasPermission('create') && !scope.isReadonly() && field.canEdit !== false;
+			return scope.hasPermission('create') && !scope.isReadonly() && scope.attr('canEdit') !== false;
 		};
 	},
 	
@@ -1079,7 +1088,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 	'<span class="picker-input picker-icons-2" style="position: absolute;">'+
 		'<input type="text" readonly>'+
 		'<span class="picker-icons">'+
-			'<i class="fa fa-plus" ng-click="onSelect()" ng-show="canEdit()" title="{{\'Select\' | t}}"></i>'+
+			'<i class="fa fa-plus" ng-click="onSelect()" ng-show="canShowAdd()" title="{{\'Select\' | t}}"></i>'+
 			'<i class="fa fa-minus" ng-click="onRemove()" ng-show="canShowRemove()" title="{{\'Select\' | t}}"></i>'+
 			'<i class="fa fa-caret-down" ng-show="canDropdown()" ng-click="onDropdown()" title="{{\'Show\' | t}}"></i>'+
 		'</span>'+

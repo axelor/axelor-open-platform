@@ -336,10 +336,13 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 
 			var items = editor.items || [];
 			var widths = _.map(items, function (item) {
+				item.showTitle = item.showTitle === true || (editor.widgetAttrs||{}).showTitles !== "false";
 				if (!item.showTitle) {
 					item.placeholder = item.placeholder || item.title || item.autoTitle;
 				}
-				item.showTitle = item.showTitle === true;
+				if (editor.itemSpan && !item.colSpan) {
+					item.colSpan = editor.itemSpan;
+				}
 				var width = item.width || (item.widgetAttrs||{}).width;
 				return width ? width : (item.widget === 'toggle' ? 24 : '*');
 			});

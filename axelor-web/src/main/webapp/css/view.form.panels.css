@@ -59,6 +59,10 @@
 	font-size: 16px;
 }
 
+.panel .panel-header .panel-icons a {
+	color: #c4c4c4;
+}
+
 .panel .panel-header .menu-bar {
 	position: relative;
 	top: -6px;
@@ -83,8 +87,13 @@
 	right: 0;
 }
 
+.panel.collapsed .panel-header {
+	border-bottom: 0;
+}
+
 .panel .panel-body {
-	padding: 14px;	
+	padding: 14px;
+	transition: height 0.3s ease-out;
 }
 
 .panel {
