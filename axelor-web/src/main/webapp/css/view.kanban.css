@@ -169,6 +169,10 @@
 	border-radius: 100%;
 }
 
+.rect-image .kanban-card img {
+	border-radius: 0;
+}
+
 .kanban-card .card-body {
 
 }

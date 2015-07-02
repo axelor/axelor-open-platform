@@ -15,7 +15,7 @@
       </div>
     </div>
   </div>
-  <div class="kanban-view row-fluid" ui-kanban>
+  <div class="kanban-view row-fluid" ng-clsss="schema.css" ui-kanban>
   <div class="kanban-column" ng-class="colSpan" ng-repeat="column in columns" ui-kanban-column>
     <h3>{{column.title}}</h3>
     <div class="input-group" ng-if="column.canCreate">

@@ -1525,6 +1525,11 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="css" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Specify custom css class names.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
