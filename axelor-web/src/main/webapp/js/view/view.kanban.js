@@ -435,13 +435,14 @@ ui.directive('uiCard', ["$parse", "$compile", function ($parse, $compile) {
 
 			evalScope.$image = function (fieldName, imageName) {
 				var rec = scope.record;
+				var v = rec.version || rec.$version || (new Date()).getTime();
 				if (fieldName === null && imageName) {
-					return "ws/rest/" + scope._model + "/" + rec.id + "/" + imageName + "/download?image=true";
+					return "ws/rest/" + scope._model + "/" + rec.id + "/" + imageName + "/download?image=true&v=" + v;
 				}
 				var field = scope.fields[fieldName];
 				if (field && field.target && rec[fieldName]) {
 					var val = rec[fieldName];
-					return "ws/rest/" + field.target + "/" + val.id + "/" + imageName + "/download?image=true";
+					return "ws/rest/" + field.target + "/" + val.id + "/" + imageName + "/download?image=true&v=" + v;
 				}
 				return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 			};
