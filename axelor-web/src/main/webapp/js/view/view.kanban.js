@@ -21,13 +21,13 @@
 
 var ui = angular.module('axelor.ui');
 
-ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $element) {
+function BaseCardsCtrl(type, $scope, $element) {
 
-	DSViewCtrl('kanban', $scope, $element);
+	DSViewCtrl(type, $scope, $element);
 
 	$scope.getRouteOptions = function() {
 		return {
-			mode: 'kanban',
+			mode: type,
 			args: []
 		};
 	};
@@ -54,6 +54,50 @@ ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $
 	};
 
 	$scope.parse = function (fields, view) {
+
+	};
+
+	$scope.onRefresh = function () {
+		$scope.filter({});
+	};
+
+	$scope.filter = function(options) {
+		var ds = $scope._dataSource;
+		var view = $scope.schema;
+		var opts = {
+			fields: _.pluck($scope.fields, 'name'),
+		};
+
+		if (options.criteria || options._domains) {
+			opts.filter = options;
+		}
+		if (options.archived !== undefined) {
+			opts.archived = options.archived;
+		}
+		if (view.orderBy) {
+			opts.sortBy = view.orderBy.split(',');
+		}
+
+		ds.search(opts).success(function (records) {
+			$scope.records = records;
+		});
+	};
+}
+
+ui.controller("CardsCtrl", ['$scope', '$element', function CardsCtrl($scope, $element) {
+
+	BaseCardsCtrl('cards', $scope, $element);
+
+	$scope.parse = function (fields, view) {
+		$scope.onRefresh();
+	}
+}]);
+
+ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $element) {
+
+	BaseCardsCtrl('kanban', $scope, $element);
+
+	$scope.parse = function (fields, view) {
 		var columnBy = fields[view.columnBy] || {};
 		var columns = _.map(columnBy.selectionList, function (item) {
 			return item;
@@ -66,9 +110,9 @@ ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $
 			first.canCreate = true;
 		}
 
-		var orderBy = fields[view.orderBy] || {};
-		if (["integer", "long"].indexOf(orderBy.type) === -1) {
-			throw new Error("Invalid orderBy field in view: " + view.name);
+		var sequenceBy = fields[view.sequenceBy] || {};
+		if (["integer", "long"].indexOf(sequenceBy.type) === -1) {
+			throw new Error("Invalid sequenceBy field in view: " + view.name);
 		}
 
 		$scope.columns = columns;
@@ -78,18 +122,18 @@ ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $
 	$scope.move = function (record, to, next, prev) {
 
 		var view = $scope.schema;
-		var rec = _.pick(record, "id", "version", view.orderBy);
+		var rec = _.pick(record, "id", "version", view.sequenceBy);
 		var ds = $scope._dataSource._new($scope._model);
 
 		// update columnBy
 		rec[view.columnBy] = to;
 
-		// update orderBy
+		// update sequenceBy
 		var all = _.compact([prev, rec, next]);
-		var offset = _.min(_.pluck(all, view.orderBy)) || 0;
+		var offset = _.min(_.pluck(all, view.sequenceBy)) || 0;
 
 		_.each(all, function (item, i) {
-			item[view.orderBy] = offset + i;
+			item[view.sequenceBy] = offset + i;
 		});
 
 		return ds.saveAll(all).success(function (records) {
@@ -124,7 +168,6 @@ ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $
 			$scope.$broadcast("on:filter", options);
 		}
 	};
-
 }]);
 
 ui.directive('uiKanban', function () {
@@ -195,7 +238,7 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 			function fetch(options) {
 				var opts = _.extend({
 					offset: 0,
-					sortBy: [view.orderBy]
+					sortBy: [view.sequenceBy]
 				}, options);
 				ds.search(opts).success(function (records) {
 					scope.records = scope.records.concat(records);
@@ -297,7 +340,35 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 	};
 }]);
 
-ui.directive('uiKanbanCard', ["$parse", "$interpolate", function ($parse, $interpolate) {
+ui.directive('uiCards', function () {
+
+	return function (scope, element, attrs) {
+
+		scope.onEdit = function (record) {
+			scope.switchTo('form', function (formScope) {
+				if (formScope.canEdit()) {
+					formScope.edit(record);
+					formScope.setEditable();
+				}
+			});
+		};
+
+		scope.onDelete = function (record) {
+			axelor.dialogs.confirm(_t("Do you really want to delete the selected record?"),
+			function(confirmed) {
+				if (!confirmed) {
+					return;
+				}
+				ds.removeAll([record]).success(function(records, page) {
+					var index = scope.records.indexOf(record);
+					scope.records.splice(index, 1);
+				});
+			});
+		};
+	};
+});
+
+ui.directive('uiCard', ["$parse", "$interpolate", function ($parse, $interpolate) {
 
 	return {
 		scope: true,
@@ -308,6 +379,9 @@ ui.directive('uiKanbanCard', ["$parse", "$interpolate", function ($parse, $inter
 
 			evalScope.$image = function (fieldName, imageName) {
 				var rec = scope.record;
+				if (fieldName === null && imageName) {
+					return "ws/rest/" + scope._model + "/" + rec.id + "/" + imageName + "/download?image=true";
+				}
 				var field = scope.fields[fieldName];
 				if (field && field.target && rec[fieldName]) {
 					var val = rec[fieldName];
@@ -327,6 +401,10 @@ ui.directive('uiKanbanCard', ["$parse", "$interpolate", function ($parse, $inter
 					scope.hilite = hilite;
 					break;
 				}
+			}
+
+			if (scope.schema.cardWidth) {
+				element.parent().css("width", scope.schema.cardWidth);
 			}
 		}
 	};

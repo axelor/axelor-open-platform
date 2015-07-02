@@ -50,6 +50,8 @@ import com.google.common.base.Strings;
 	@Type(TreeView.class),
 	@Type(ChartView.class),
 	@Type(CalendarView.class),
+	@Type(CardsView.class),
+	@Type(KanbanView.class),
 	@Type(Dashboard.class),
 	@Type(Portal.class),
 	@Type(Search.class),

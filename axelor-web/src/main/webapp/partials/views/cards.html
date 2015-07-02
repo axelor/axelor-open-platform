@@ -1,0 +1,36 @@
+<div class="cards-container" ng-controller="CardsCtrl" ui-tab-gate>
+  <div class="navbar record-toolbar">
+    <div class="navbar-inner">
+      <div class="container">
+        <div class="btn-group">
+          <button class="btn" ng-click="onNew()" ng-if="hasButton('new')" title="{{ 'New' | t}}">
+            <i class="fa fa-plus"></i> <span ng-hide="tbTitleHide" x-translate>New</span>
+          </button>
+          <button class="btn" ng-click="onRefresh()" ng-if="hasButton('refresh')" title="{{ 'Refresh' | t}}">
+            <i class="fa fa-refresh"></i> <span ng-hide="tbTitleHide" x-translate>Refresh</span>
+          </button>
+        </div>
+        <div ui-filter-box x-handler="this"></div>
+        <div ui-view-switcher class="pull-right"></div>
+      </div>
+    </div>
+  </div>
+  <div class="cards-view row-fluid" ui-cards>
+    <div class="kanban-card-list">
+      <div class="kanban-card-container" ng-repeat="record in records">
+        <div class="kanban-card" ng-class="hilite.color" ui-card>
+          <div class="kanban-card-menu btn-group pull-right">
+            <a tabindex="-1" href="javascript:" class="btn btn-link dropdown-toggle" data-toggle="dropdown">
+              <i class="fa fa-caret-down"></i>
+            </a>
+            <ul class="dropdown-menu pull-right">
+              <li><a href="javascript:" ng-click="onEdit(record)" x-translate>Edit</a></li>
+              <li><a href="javascript:" ng-click="onDelete(record)" x-translate>Delete</a></li>
+            </ul>
+          </div>
+          <div ng-bind-html-unsafe="content"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

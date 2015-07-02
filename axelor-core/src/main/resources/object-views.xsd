@@ -10,7 +10,8 @@
         <xsd:element name="grid" type="tns:GridView" />
         <xsd:element name="tree" type="tns:TreeView" />
         <xsd:element name="calendar" type="tns:CalendarView" />
-        <xsd:element name="kanban" type="tns:Kanban" />
+        <xsd:element name="cards" type="tns:CardsView" />
+        <xsd:element name="kanban" type="tns:KanbanView" />
         <xsd:element name="chart" type="tns:ChartView" />
         <xsd:element name="portal" type="tns:Portal" />
         <xsd:element name="dashboard" type="tns:Dashboard" />
@@ -1461,7 +1462,7 @@
     </xsd:complexContent>
   </xsd:complexType>
 
-  <xsd:complexType name="KanbanField">
+  <xsd:complexType name="CardField">
     <xsd:attribute name="name" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>Name of the field</xsd:documentation>
@@ -1469,7 +1470,7 @@
     </xsd:attribute>
   </xsd:complexType>
 
-  <xsd:complexType name="KanbanStyle">
+  <xsd:complexType name="CardStyle">
     <xsd:attribute name="color" type="tns:HiliteStyle" use="required">
       <xsd:annotation>
         <xsd:documentation>Highlight text color style</xsd:documentation>
@@ -1482,16 +1483,16 @@
     </xsd:attribute>
   </xsd:complexType>
 
-  <xsd:complexType name="Kanban">
+  <xsd:complexType name="CardsView">
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleView">
         <xsd:sequence>
-          <xsd:element name="field" type="tns:KanbanField" maxOccurs="unbounded">
+          <xsd:element name="field" type="tns:CardField" maxOccurs="unbounded">
             <xsd:annotation>
               <xsd:documentation>Specify a field to show as card content.</xsd:documentation>
             </xsd:annotation>
           </xsd:element>
-          <xsd:element name="hilite" type="tns:KanbanStyle" minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="hilite" type="tns:CardStyle" minOccurs="0" maxOccurs="unbounded">
             <xsd:annotation>
               <xsd:documentation>Define a highlight condition.</xsd:documentation>
             </xsd:annotation>
@@ -1507,12 +1508,38 @@
             <xsd:documentation>Specify the model object name.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="cardWidth" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Specify width of the cards.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="orderBy" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            List of comma separated field names optionally
+            prefix with `-` to order by DESC.
+
+            For example:
+
+            orderBy="name,-age"
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="KanbanView">
+    <xsd:complexContent>
+      <xsd:extension base="tns:CardsView">
         <xsd:attribute name="columnBy" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>Specify a selection field to create columns.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="orderBy" type="xsd:string" use="required">
+        <xsd:attribute name="cardWidth" use="prohibited"/>
+        <xsd:attribute name="orderBy" use="prohibited"/>
+        <xsd:attribute name="sequenceBy" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>Specify a numeric field to re-order cards.</xsd:documentation>
           </xsd:annotation>

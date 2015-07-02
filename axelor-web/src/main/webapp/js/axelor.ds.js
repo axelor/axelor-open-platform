@@ -243,7 +243,7 @@
 			}
 			if (view.type === "kanban") {
 				items.push(view.columnBy);
-				items.push(view.orderBy);
+				items.push(view.sequenceBy);
 			}
 
 			return result;

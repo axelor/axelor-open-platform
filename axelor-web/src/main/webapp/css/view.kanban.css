@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+.cards-view,
 .kanban-view {
 	position: absolute;
 	top: 41px;
@@ -26,6 +27,8 @@
 	padding: 18px;
 }
 
+.cards-view,
+.cards-view *,
 .kanban-view,
 .kanban-view * {
 	box-sizing: border-box;
@@ -42,46 +45,11 @@
 .kanban-column ul.kanban-card-list,
 .kanban-column li.kanban-card {
 	list-style: none;
-	margin: 0;
 }
 
 .kanban-column ul.kanban-card-list {
+	margin: 0;
 	padding: 10px 20px 35px 20px;
-}
-
-.kanban-column li.kanban-card {
-	background: #fafafb;
-	border: 1px solid #e7eaec;
-	margin: 0px 0 10px 0;
-	padding: 10px;
-	border-radius: 2px;
-	box-sizing: content-box;
-	border-left: 3px solid #e7eaec;
-}
-
-.kanban-column li.kanban-card:hover {
-	background-color: #fff;
-	cursor: pointer;
-}
-
-.kanban-column li.primary {
-	border-left: 3px solid #337ab7;
-}
-
-.kanban-column li.warning {
-	border-left: 3px solid #f0ad4e;
-}
-
-.kanban-column li.danger {
-	border-left: 3px solid #d9534f;
-}
-
-.kanban-column li.info {
-	border-left: 3px solid #23c6c8;
-}
-
-.kanban-column li.success {
-	border-left: 3px solid #16a765;
 }
 
 .kanban-column .ui-sortable-placeholder {
@@ -150,7 +118,40 @@
 }
 
 .kanban-card {
+	list-style: none;
 	position: relative;
+	background: #fafafb;
+	border: 1px solid #e7eaec;
+	margin: 0 0 10px 0;
+	padding: 10px;
+	border-radius: 2px;
+	box-sizing: content-box;
+	border-left: 3px solid #e7eaec;
+}
+
+.kanban-card:hover {
+	background-color: #fff;
+	cursor: pointer;
+}
+
+.kanban-card.primary {
+	border-left: 3px solid #337ab7;
+}
+
+.kanban-card.warning {
+	border-left: 3px solid #f0ad4e;
+}
+
+.kanban-card.danger {
+	border-left: 3px solid #d9534f;
+}
+
+.kanban-card.info {
+	border-left: 3px solid #23c6c8;
+}
+
+.kanban-card.success {
+	border-left: 3px solid #16a765;
 }
 
 .kanban-card h4 {
@@ -195,4 +196,57 @@
 .kanban-card:hover .kanban-card-menu,
 .kanban-card .kanban-card-menu.open {
 	display: inline-block;
+}
+
+.cards-view .kanban-card-list {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.cards-view .kanban-card-container {
+	float: left;
+	width: 33.33333333%;
+	padding-left: 10px;
+	padding-right: 10px;
+	margin-bottom: 20px;
+	display: flex;
+}
+
+.cards-view .kanban-card {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 16px;
+	background-color: #fff;
+	overflow: hidden;
+	width: 100%;
+}
+
+.cards-view .kanban-card address {
+	margin-bottom: 0;
+}
+
+.cards-view .card-image {
+	position: relative;
+	text-align: center;
+}
+
+.cards-view .card-image img {
+	position: relative;
+	width: 64px;
+	height: 64px;
+}
+
+.cards-view .card-image strong {
+	margin-top: 6px;
+	display: block;
+}
+
+@media (max-width: 767px) {
+	.cards-view {
+		padding: 12px 0;
+	}
+	.cards-view .kanban-card-container {
+		width: 100% !important;
+		margin-bottom: 12px;
+	}
 }

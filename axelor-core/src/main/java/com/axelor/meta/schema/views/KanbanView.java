@@ -17,41 +17,26 @@
  */
 package com.axelor.meta.schema.views;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("kanban")
-public class KanbanView extends AbstractView {
+public class KanbanView extends CardsView {
 
 	@XmlAttribute
 	private String columnBy;
 
 	@XmlAttribute
-	private String colorBy;
-
-	@XmlAttribute
-	private String orderBy;
+	private String sequenceBy;
 
 	@XmlAttribute
 	private String onNew;
 
 	@XmlAttribute
 	private Integer limit;
-
-	@XmlElement(name = "field", type = Field.class)
-	private List<AbstractWidget> items;
-
-	@XmlElement(name = "hilite", type = Hilite.class)
-	private List<Hilite> hilites;
-
-	@XmlElement
-	private String template;
 
 	public String getColumnBy() {
 		return columnBy;
@@ -61,20 +46,12 @@ public class KanbanView extends AbstractView {
 		this.columnBy = columnBy;
 	}
 
-	public String getColorBy() {
-		return colorBy;
+	public String getSequenceBy() {
+		return sequenceBy;
 	}
 
-	public void setColorBy(String colorBy) {
-		this.colorBy = colorBy;
-	}
-
-	public String getOrderBy() {
-		return orderBy;
-	}
-
-	public void setOrderBy(String orderBy) {
-		this.orderBy = orderBy;
+	public void setSequenceBy(String sequenceBy) {
+		this.sequenceBy = sequenceBy;
 	}
 
 	public String getOnNew() {
@@ -91,35 +68,5 @@ public class KanbanView extends AbstractView {
 
 	public void setLimit(Integer limit) {
 		this.limit = limit;
-	}
-
-	public List<AbstractWidget> getItems() {
-		if (items == null) {
-			return items;
-		}
-		for (AbstractWidget item : items) {
-			item.setModel(getModel());
-		}
-		return items;
-	}
-
-	public void setItems(List<AbstractWidget> items) {
-		this.items = items;
-	}
-
-	public List<Hilite> getHilites() {
-		return hilites;
-	}
-
-	public void setHilites(List<Hilite> hilites) {
-		this.hilites = hilites;
-	}
-
-	public String getTemplate() {
-		return template;
-	}
-
-	public void setTemplate(String template) {
-		this.template = template;
 	}
 }
