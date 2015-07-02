@@ -122,9 +122,11 @@ public interface Repository<T extends Model> {
 	 *
 	 * @param json
 	 *            the json map to validate
+	 * @param context
+	 *            the context
 	 * @return validated json map
 	 */
-	Map<String, Object> validate(Map<String, Object> json);
+	Map<String, Object> validate(Map<String, Object> json, Map<String, Object> context);
 
 	/**
 	 * Populate the given json map with additional data.
@@ -135,7 +137,9 @@ public interface Repository<T extends Model> {
 	 *
 	 * @param json
 	 *            the json map to populate
+	 * @param context
+	 *            the context
 	 * @return the json map itself
 	 */
-	Map<String, Object> populate(Map<String, Object> json);
+	Map<String, Object> populate(Map<String, Object> json, Map<String, Object> context);
 }

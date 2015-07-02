@@ -333,7 +333,7 @@ public class Resource<T extends Model> {
 				item = toMap(item);
 			}
 			if (item instanceof Map) {
-				item = repo.populate((Map) item);
+				item = repo.populate((Map) item, request.getContext());
 				Translator.applyTranslatables((Map) item, model);
 			}
 			jsonData.add(item);
@@ -557,7 +557,7 @@ public class Resource<T extends Model> {
 			}
 		}
 
-		data.add(repository.populate(values));
+		data.add(repository.populate(values, request.getContext()));
 		response.setData(data);
 		return response;
 	}
@@ -590,7 +590,7 @@ public class Resource<T extends Model> {
 
 		for(Object record : records) {
 
-			record = (Map) repository.validate((Map) record);
+			record = (Map) repository.validate((Map) record, request.getContext());
 
 			Long id = findId((Map) record);
 
@@ -621,7 +621,7 @@ public class Resource<T extends Model> {
 				I18nBundle.invalidate();
 			}
 
-			data.add(repository.populate(toMap(bean)));
+			data.add(repository.populate(toMap(bean), request.getContext()));
 		}
 
 		response.setData(data);

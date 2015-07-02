@@ -38,7 +38,7 @@ public class MailGroupRepository extends JpaRepository<MailGroup> {
 	}
 	
 	@Override
-	public Map<String, Object> populate(Map<String, Object> json) {
+	public Map<String, Object> populate(Map<String, Object> json, Map<String, Object> context) {
 		if (json == null || json.get("id") == null) {
 			return json;
 		}

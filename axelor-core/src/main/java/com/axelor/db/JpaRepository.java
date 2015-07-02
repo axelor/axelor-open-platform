@@ -125,12 +125,12 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 	}
 
 	@Override
-	public Map<String, Object> validate(Map<String, Object> json) {
+	public Map<String, Object> validate(Map<String, Object> json, Map<String, Object> context) {
 		return json;
 	}
 
 	@Override
-	public Map<String, Object> populate(Map<String, Object> json) {
+	public Map<String, Object> populate(Map<String, Object> json, Map<String, Object> context) {
 		return json;
 	}
 

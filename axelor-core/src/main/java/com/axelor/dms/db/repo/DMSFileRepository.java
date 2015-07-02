@@ -215,7 +215,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> validate(Map<String, Object> json) {
+	public Map<String, Object> validate(Map<String, Object> json, Map<String, Object> context) {
 		final DMSFile file = findFrom(json);
 		final DMSFile parent = findFrom((Map<String, Object>) json.get("parent"));
 		if (parent == null) {
@@ -237,7 +237,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 	}
 
 	@Override
-	public Map<String, Object> populate(Map<String, Object> json) {
+	public Map<String, Object> populate(Map<String, Object> json, Map<String, Object> context) {
 		final DMSFile file = findFrom(json);
 		if (file == null) {
 			return json;
