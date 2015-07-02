@@ -380,14 +380,32 @@ ui.directive('uiCards', function () {
 	};
 });
 
-ui.directive('uiCard', ["$parse", "$interpolate", function ($parse, $interpolate) {
+ui.directive('uiCard', ["$parse", "$compile", function ($parse, $compile) {
 
 	return {
 		scope: true,
 		link: function (scope, element, attrs) {
 
 			var evalScope = scope.$new(true);
-			_.extend(evalScope, scope.record);
+
+			function process(record) {
+				for (var name in record) {
+					if (!record.hasOwnProperty(name) || name.indexOf('.') === -1) {
+						continue;
+					}
+					var nested = record;
+					var names = name.split('.');
+					var head = _.first(names, names.length - 1);
+					var last = _.last(names);
+					head.forEach(function (n) {
+						nested = nested[n] || (nested[n] = {});
+					});
+					nested[last] = record[name];
+				}
+				return record;
+			}
+
+			_.extend(evalScope, process(scope.record));
 
 			evalScope.$image = function (fieldName, imageName) {
 				var rec = scope.record;
@@ -402,8 +420,13 @@ ui.directive('uiCard', ["$parse", "$interpolate", function ($parse, $interpolate
 				return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 			};
 
+			var template = (scope.schema.template || "<span></span>").trim();
+			if (template.indexOf('<') !== 0) {
+				template = "<span>" + template + "</span>";
+			}
+
 			scope.hilite = null;
-			scope.content = $interpolate(scope.schema.template)(evalScope);
+			scope.content = $compile(template)(evalScope);
 
 			var hilites = scope.schema.hilites || [];
 			for (var i = 0; i < hilites.length; i++) {
