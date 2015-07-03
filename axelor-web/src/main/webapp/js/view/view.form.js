@@ -181,7 +181,7 @@ function FormViewCtrl($scope, $element) {
 			state = +opts.state || null;
 
 		$scope._routeSearch = opts.search;
-		if (record.id == state) {
+		if (record.id == state || routeId === state) {
 			return $scope.updateRoute();
 		}
 		
