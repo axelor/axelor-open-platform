@@ -406,6 +406,7 @@ ui.directive('uiCard', ["$parse", "$compile", function ($parse, $compile) {
 		scope: true,
 		link: function (scope, element, attrs) {
 
+			var body = element.find(".kanban-card-body");
 			var record = scope.record;
 			var evalScope = scope.$new(true);
 
@@ -465,7 +466,8 @@ ui.directive('uiCard', ["$parse", "$compile", function ($parse, $compile) {
 			}
 
 			scope.hilite = null;
-				scope.content = $compile(template)(evalScope);
+
+			$compile(template)(evalScope).appendTo(body);
 
 			var hilites = scope.schema.hilites || [];
 			for (var i = 0; i < hilites.length; i++) {
