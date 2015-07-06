@@ -33,7 +33,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @XmlType
-public class ActionValidate extends ActionIndex {
+public class ActionValidate extends ActionIndex<ActionValidate> {
 
 	public static class Validator extends Element {
 
@@ -94,13 +94,23 @@ public class ActionValidate extends ActionIndex {
 	}
 
 	@Override
+	protected ActionValidate copy(int index) {
+		final ActionValidate action = new ActionValidate();
+		final List<Validator> items = validators.subList(index, validators.size());
+		action.setName(getName() + "@" + index);
+		action.setModel(getModel());
+		action.setValidators(items);
+		return action;
+	}
+
+	@Override
 	public Object evaluate(ActionHandler handler) {
 
 		final List<String> info = Lists.newArrayList();
 		final List<String> notify = Lists.newArrayList();
 		final Map<String, Object> result = Maps.newHashMap();
 
-		for (int i = getIndex(); i < validators.size(); i++) {
+		for (int i = 0; i < validators.size(); i++) {
 
 			final Validator validator = validators.get(i);
 			if (!validator.test(handler)) {
