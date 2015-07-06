@@ -233,7 +233,7 @@ function SelectorCtrl($scope, $element, DataSource, ViewService) {
 		
 		viewPromise.then(function(){
 			if (!initialized) {
-				$element.closest('.ui-dialog').css('visibility', 'hidden');
+				$element.closest('.ui-dialog').css('opacity', 0);
 			}
 			$element.dialog('open');
 			initialized = true;
@@ -512,12 +512,6 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			});
 		});
 
-		var ensureInCenter = _.once(function () {
-			element.on('adjustSize', _.throttle(function () {
-				element.dialog('option', 'position', 'center');
-			}));
-		});
-
 		function adjustSize() {
 
 			var form = element.children('[ui-view-form],[ui-view-pane]').find('form[ui-form]:first');
@@ -527,12 +521,7 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			height -= element.parent().children('.ui-dialog-titlebar').outerHeight(true) + 4;
 			height -= element.parent().children('.ui-dialog-buttonpane').outerHeight(true) + 4;
 
-			if (element.is('.nav-tabs-popup')) {
-				var toolbar = element.find('.form-view:first > .record-toolbar');
-				var form = element.find('.form-view:first > [ui-view-form]');
-				var h = toolbar.height() + form[0].scrollHeight;
-				height = Math.min(height, h);
-			} else if (element.is('[ui-selector-popup]')) {
+			if (element.is('.nav-tabs-popup,[ui-selector-popup]')) {
 				height = Math.min(height, 480);
 			} else if (height > element[0].scrollHeight) {
 				height = element[0].scrollHeight + 8;
@@ -548,8 +537,6 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			// set height to wrapper to fix overflow issue
 			var wrapper = element.dialog('widget');
 			wrapper.height(wrapper.height());
-
-			ensureInCenter();
 		}
 
 		function doShow() {
@@ -567,16 +554,17 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 
 			scope.ajaxStop(function() {
 				adjustSize();
-				element.closest('.ui-dialog').css('visibility', '');
+				element.closest('.ui-dialog').css('opacity', '');
+				axelor.$adjustSize();
 			}, 100);
 		}
 
 		// a flag used by evalScope to detect popup (see form.base.js)
 		scope._isPopup = true;
 		scope._doShow = function(viewPromise) {
-			element.closest('.ui-dialog').css('visibility', 'hidden');
+			element.dialog('open');
+			element.closest('.ui-dialog').css('opacity', 0);
 			viewPromise.then(function(s) {
-				element.dialog('open');
 				scope.waitForActions(doShow);
 			});
 		};

@@ -70,6 +70,9 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 						parent.addClass('ui-dialog-dragged');
 					}
 				},
+				resizeStop: function () {
+					axelor.$adjustSize();
+				},
 				dragStart: function(event, ui) {
 
 					// set size to prevent shrinking
