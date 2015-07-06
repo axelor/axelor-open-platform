@@ -491,17 +491,36 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 		var addMaximizeButton = _.once(function () {
 			var elemDialog = element.parent();
 			var elemTitle = elemDialog.find('.ui-dialog-title');
+			var resizable = elemDialog.hasClass('ui-resizable');
 			$('<a href="#" class="ui-dialog-titlebar-max"><i class="fa fa-expand"></i></a>').click(function (e) {
 				$(this).children('i').toggleClass('fa-expand fa-compress');
 				elemDialog.toggleClass('maximized');
+				element.dialog('option', 'position', 'center');
+				if (resizable) {
+					element.dialog('option', 'resizable', !elemDialog.hasClass('maximized'));
+				}
 				axelor.$adjustSize();
 				return false;
 			}).insertAfter(elemTitle);
+
+			// remove maximized state on close
+			element.on('dialogclose', function(e, ui) {
+				elemDialog.removeClass('maximized');
+				if (resizable) {
+					element.dialog('option', 'resizable', true);
+				}
+			});
 		});
-		
-		element.on('adjustSize', _.throttle(adjustSize));
-		
+
+		var ensureInCenter = _.once(function () {
+			element.on('adjustSize', _.throttle(function () {
+				element.dialog('option', 'position', 'center');
+			}));
+		});
+
 		function adjustSize() {
+
+			var form = element.children('[ui-view-form],[ui-view-pane]').find('form[ui-form]:first');
 			var maxHeight = $(document).height() - 16;
 			var height = maxHeight;
 
@@ -511,48 +530,57 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			if (element.is('.nav-tabs-popup')) {
 				var toolbar = element.find('.form-view:first > .record-toolbar');
 				var form = element.find('.form-view:first > [ui-view-form]');
-				var h = toolbar.height() + form[0].scrollHeight - 16;
+				var h = toolbar.height() + form[0].scrollHeight;
 				height = Math.min(height, h);
 			} else if (element.is('[ui-selector-popup]')) {
 				height = Math.min(height, 480);
-			} else if (height > element[0].scrollHeight - 16) {
-				height = 'auto';
+			} else if (height > element[0].scrollHeight) {
+				height = element[0].scrollHeight + 8;
 			}
+
+			if (form.size() && height > form[0].scrollHeight) {
+				height = form[0].scrollHeight + 8;
+			}
+
 			element.height(height);
+			element.dialog('option', 'position', 'center');
+
+			// set height to wrapper to fix overflow issue
+			var wrapper = element.dialog('widget');
+			wrapper.height(wrapper.height());
+
+			ensureInCenter();
 		}
 
 		function doShow() {
 
-			axelor.$adjustSize();
-
 			addMaximizeButton();
 
-			return scope.ajaxStop(function () {
+			// focus first element
+			if (!axelor.device.mobile) {
+				element.find(':input:first').focus();
+			}
+
+			//XXX: ui-dialog issue
+			element.find('.slick-headerrow-column,.slickgrid').zIndex(element.zIndex());
+			element.find('.record-toolbar .btn').zIndex(element.zIndex()+1);
+
+			scope.ajaxStop(function() {
 				adjustSize();
 				element.closest('.ui-dialog').css('visibility', '');
-
-				// focus first element
-				if (!axelor.device.mobile) {
-					element.find(':input:first').focus();
-				}
-
-				//XXX: ui-dialog issue
-				element.find('.slick-headerrow-column,.slickgrid').zIndex(element.zIndex());
-				element.find('.record-toolbar .btn').zIndex(element.zIndex()+1);
 			}, 100);
 		}
-		
+
 		// a flag used by evalScope to detect popup (see form.base.js)
 		scope._isPopup = true;
 		scope._doShow = function(viewPromise) {
-			
+			element.closest('.ui-dialog').css('visibility', 'hidden');
 			viewPromise.then(function(s) {
-				element.closest('.ui-dialog').css('visibility', 'hidden');
 				element.dialog('open');
-				scope.ajaxStop(doShow, 100);
+				scope.waitForActions(doShow);
 			});
 		};
-		
+
 		scope._setTitle = function (title) {
 			if (title) {
 				element.closest('.ui-dialog').find('.ui-dialog-title').text(title);
@@ -560,7 +588,6 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 		};
 
 		scope.adjustSize = function() {
-
 		};
 	};
 });
@@ -603,7 +630,7 @@ angular.module('axelor.ui').directive('uiEditorPopup', function() {
 		},
 		replace: true,
 		template:
-		'<div ui-dialog x-resizable="true" ui-dialog-size x-on-ok="onOK" x-on-before-close="onBeforeClose" ui-watch-if="isPopupOpen">'+
+		'<div ui-dialog ui-dialog-size x-resizable="true" x-on-ok="onOK" x-on-before-close="onBeforeClose" ui-watch-if="isPopupOpen">'+
 		    '<div ui-view-form x-handler="this"></div>'+
 		'</div>'
 	};
