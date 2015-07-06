@@ -678,7 +678,7 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 		},
 		replace: true,
 		template:
-		'<div ui-dialog ui-dialog-size x-on-ok="onOK">'+
+		'<div ui-dialog ui-dialog-size x-resizable="true" x-on-ok="onOK">'+
 		    '<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-editable="false" x-selector="{{selectMode}}"></div>'+
 		    '<div class="record-pager">'+
 		    	'<span class="record-pager-text">{{pagerText()}}</span>'+
