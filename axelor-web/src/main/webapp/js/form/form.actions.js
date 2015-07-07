@@ -261,7 +261,11 @@ ActionHandler.prototype = {
 
 	handle: function() {
 		var action = this.action.trim();
-		return this._handleAction(action);
+		var promise = this._handleAction(action);
+		if (this.scope.$actionPromises) {
+			this.scope.$actionPromises.push(promise);
+		}
+		return promise;
 	},
 	
 	_blockUI: function() {

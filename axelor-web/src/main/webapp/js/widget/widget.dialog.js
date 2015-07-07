@@ -63,7 +63,7 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 				zIndex: 1100,
 				buttons: buttons,
 				resizeStart: function () {
-					var parent = $(this).parent();
+					var parent = $(this).parent().removeClass('ui-dialog-responsive');
 					if (!parent.hasClass('ui-dialog-resized')) {
 						parent.addClass('ui-dialog-resized');
 					}
@@ -71,8 +71,23 @@ angular.module('axelor.ui').directive('uiDialog', function() {
 						parent.addClass('ui-dialog-dragged');
 					}
 				},
+				resizeStop: function () {
+					axelor.$adjustSize();
+				},
 				dragStart: function(event, ui) {
-					var parent = $(this).parent();
+
+					// set size to prevent shrinking
+					var wrapper = element.dialog('widget');
+					var width = wrapper.width();
+					var height = wrapper.height();
+
+					wrapper.width(width);
+					wrapper.height(height);
+
+					element.dialog('option', 'width', width);
+					element.dialog('option', 'height', height);
+
+					var parent = $(this).parent().removeClass('ui-dialog-responsive');
 					if (parent.hasClass('maximized') || axelor.device.small) {
 						event.preventDefault();
 						event.stopPropagation();

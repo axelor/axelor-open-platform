@@ -502,7 +502,7 @@ angular.module('axelor.ui').directive('uiViewPopup', function() {
 		},
 		replace: true,
 		template:
-			'<div ui-dialog ui-dialog-size x-on-close="onPopupClose" x-on-ok="onPopupOK" x-on-before-close="onBeforeClose">' +
+			'<div ui-dialog ui-dialog-size x-resizable="true" x-on-close="onPopupClose" x-on-ok="onPopupOK" x-on-before-close="onBeforeClose">' +
 				'<div ui-view-pane="tab"></div>' +
 			'</div>'
 	};
