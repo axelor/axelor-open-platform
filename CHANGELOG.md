@@ -1,3 +1,21 @@
+# 3.0.12 (2015-07-07)
+
+## Bug fixes
+
+- fix duplicate onload issue 
+- fix dirty state handling with onNew having save
+- fix unwanted collapse animation on panels
+- fix popup/dialog issue
+- fix save action issues in popup editor
+- fix collapseIf on panel issue
+- fix indexed action execution
+
+## Improvements
+
+- do not allow dragging maximized popup
+- allow selector popup not resizable
+
+
 # 3.0.11 (2015-07-02)
 
 ## Bug fixes

@@ -413,28 +413,33 @@ ui.formWidget('Panel', {
 			scope.menus = [field.menu];
 		}
 
-		scope.collapsed = false;
-
 		scope.canCollapse = function() {
 			return field.canCollapse || field.collapseIf;
 		};
 
 		scope.setCollapsed = function(collapsed) {
+			var old = scope.collapsed;
+			var action = collapsed ? "hide" : "show";
+
 			scope.collapsed = collapsed;
 			scope.collapsedIcon = collapsed ? 'fa-chevron-down' : 'fa-chevron-up';
 
-			var action = collapsed ? "hide" : "show";
+			if (collapsed === old) {
+				return;
+			}
 
 			element.removeClass("collapsed");
 			body[action]("blind", 200, function () {
 				element.toggleClass("collapsed", !!collapsed);
+				if (body.css('display') !== 'none' && action === 'hide') {
+					body.hide();
+				}
 				axelor.$adjustSize();
 			});
 		};
 
 		scope.toggle = function() {
-			scope.collapsed = !scope.collapsed;
-			scope.setCollapsed(scope.collapsed);
+			scope.setCollapsed(!scope.collapsed);
 		};
 
 		scope.$watch("attr('collapse')", function(collapsed) {

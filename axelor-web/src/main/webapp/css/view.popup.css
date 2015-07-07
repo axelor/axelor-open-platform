@@ -19,6 +19,7 @@
 /* jquery-ui fix */
 .ui-dialog {
 	padding: 0;
+	border: 0;
 }
 
 .ui-dialog .ui-dialog-titlebar {
@@ -37,6 +38,11 @@
 	margin: 0;
 }
 
+.ui-dialog,
+.ui-dialog .ui-dialog-title {
+	border-radius: 0;
+}
+
 .ui-dialog .ui-dialog-titlebar-close.ui-state-hover {
 	background: none;
 	border: 0;
@@ -53,8 +59,8 @@
 }
 
 .ui-dialog .ui-dialog-titlebar-close {
-	margin-top: -12px;
-	margin-right: 4px;
+	top: 20px;
+  	right: .5em;
 	height: auto;
 	width: auto;
 	opacity: 0.2;
@@ -86,6 +92,22 @@
 	font-weight: inherit;
 }
 
+.ui-dialog .ui-dialog-titlebar-max {
+	position: absolute;
+	right: 1.6em;
+	top: 7px;
+	opacity: 0.2;
+}
+.ui-dialog .ui-dialog-titlebar-max:hover {
+	font-weight: bold;
+	color: #212121;
+	opacity: 0.4;
+}
+
+.ui-dialog .ui-dialog-titlebar-close span::before {
+	font-size: 24px;
+}
+
 .ui-dialog-buttonpane {
 	border-top: 1px solid #DDD;
 }
@@ -100,11 +122,18 @@
 
 .ui-dialog .ui-dialog-content {
 	padding: 4px;
+	min-height: 250px;
+	max-height: calc(100% - 45px - 60px) !important;
 }
 
 .ui-widget-overlay {
 	background: none;
 	background-color: black;
+}
+
+.ui-dialog .ui-dialog-buttonpane {
+	margin-top: 0;
+	padding: .3em .5em .5em .5em
 }
 
 .ui-dialog-buttonpane .btn-group > .btn {
@@ -146,6 +175,14 @@
 	padding-bottom: 0px;
 }
 
+.ui-dialog-content > [ui-view-form],
+.ui-dialog-content > [ui-view-form] > form {
+	box-sizing: border-box;
+	width: 100%;
+	min-width: 100%;
+	max-width: 100%;
+}
+
 .ui-dialog-responsive {
 	position: absolute;
 
@@ -156,43 +193,6 @@
 	max-height: calc(100% - 16px) !important;
 
 	border: none;
-}
-
-.ui-dialog-responsive:not(.ui-dialog-dragged) {
-	top: 0 !important;
-	left: 0 !important;
-}
-
-.ui-dialog-responsive.ui-dialog-dragged {
-	margin: 0 !important;
-}
-
-.ui-dialog-responsive,
-.ui-dialog-responsive .ui-dialog-title {
-	border-radius: 0;
-}
-
-.ui-dialog-responsive .ui-dialog-content {
-	min-height: 250px;
-	max-height: calc(100% - 45px - 60px) !important;
-}
-.ui-dialog-responsive .ui-dialog-buttonpane {
-	margin-top: 0;
-	padding: .3em .5em .5em .5em
-}
-.ui-dialog-responsive .ui-dialog-titlebar-max {
-	position: absolute;
-	right: 1.6em;
-	top: 7px;
-	opacity: 0.2;
-}
-.ui-dialog-responsive .ui-dialog-titlebar-max:hover {
-	font-weight: bold;
-	color: #212121;
-	opacity: 0.4;
-}
-.ui-dialog-responsive .ui-dialog-titlebar-close span::before {
-	font-size: 24px;
 }
 
 .ui-dialog-small .ui-dialog-content {
@@ -211,13 +211,6 @@
 	.ui-dialog-small {
 		width: 480px !important;
 	}
-	.ui-dialog-responsive:not(.ui-dialog-dragged) {
-		left: calc(50% - 370px) !important;
-	}
-	.ui-dialog-small:not(.ui-dialog-dragged) {
-		width: 480px !important;
-		left: calc(50% - 240px) !important;
-	}
 }
 @media screen and (min-width: 1024px) {
 	.ui-dialog-responsive {
@@ -226,61 +219,30 @@
 	.ui-dialog-small {
 		width: 480px !important;
 	}
-	.ui-dialog-responsive:not(.ui-dialog-dragged) {
-		left: calc(50% - 450px) !important;
-	}
-	.ui-dialog-small:not(.ui-dialog-dragged) {
-		left: calc(50% - 240px) !important;
-	}
 }
-.ui-dialog-responsive.maximized .ui-dialog-titlebar,
-.ui-dialog-responsive.maximized .ui-dialog-buttonpane {
-	position: absolute;
-	left: 0;
-	right: 0;
-}
-.ui-dialog-responsive.maximized {
-	top: 0 !important;
-	left: 0 !important;
-	margin: 8px !important;
-	width: calc(100% - 16px) !important;
-	height: calc(100% - 16px) !important;
-}
-.ui-dialog-responsive.maximized .ui-dialog-title {
-	top: 0;
-}
-.ui-dialog-responsive.maximized .ui-dialog-buttonpane {
-	bottom: 0;
-}
-.ui-dialog-responsive.maximized .ui-dialog-content {
-	width: auto !important;
-	height: calc(100% - 45px - 60px) !important;
-	overflow: auto;
-	margin-top: 45px;
-}
+
 @media screen and (max-width: 768px) {
-	.ui-dialog-responsive .ui-dialog-titlebar,
-	.ui-dialog-responsive .ui-dialog-buttonpane {
+	.ui-dialog .ui-dialog-titlebar,
+	.ui-dialog .ui-dialog-buttonpane {
 		position: absolute;
 		left: 0;
 		right: 0;
 	}
-	.ui-dialog-responsive {
+	.ui-dialog {
+		position: absolute;
+		margin: 8px !important;
 		top: 0 !important;
 		left: 0 !important;
 		width: calc(100% - 16px) !important;
 		height: calc(100% - 16px) !important;
 	}
-	.ui-dialog-responsive.ui-dialog-dragged {
-		margin: 8px !important;
-	}
-	.ui-dialog-responsive .ui-dialog-title {
+	.ui-dialog .ui-dialog-title {
 		top: 0;
 	}
-	.ui-dialog-responsive .ui-dialog-buttonpane {
+	.ui-dialog .ui-dialog-buttonpane {
 		bottom: 0;
 	}
-	.ui-dialog-responsive .ui-dialog-content {
+	.ui-dialog .ui-dialog-content {
   		box-sizing: border-box;
 		width: 100% !important;
 		height: calc(100% - 45px - 60px) !important;
@@ -301,16 +263,30 @@
 	}
 }
 
-@media screen and (min-width: 768px) {
-	.ui-dialog-responsive.ui-dialog-resized > [ui-dialog] > [ui-view-form] > form {
-		min-width: 720px;
-	}
-	.ui-dialog-responsive.ui-dialog-resized.ui-dialog-small > [ui-dialog] > [ui-view-form] > form {
-		min-width: 444px;
-	}
-	.ui-dialog-responsive.ui-dialog-resized:not(.maximized) {
-		width: inherit !important;
-	}
+.ui-dialog.maximized .ui-dialog-titlebar,
+.ui-dialog.maximized .ui-dialog-buttonpane {
+	position: absolute;
+	left: 0;
+	right: 0;
+}
+.ui-dialog.maximized {
+	top: 0 !important;
+	left: 0 !important;
+	margin: 8px !important;
+	width: calc(100% - 16px) !important;
+	height: calc(100% - 16px) !important;
+}
+.ui-dialog.maximized .ui-dialog-title {
+	top: 0;
+}
+.ui-dialog.maximized .ui-dialog-buttonpane {
+	bottom: 0;
+}
+.ui-dialog.maximized .ui-dialog-content {
+	width: auto !important;
+	height: calc(100% - 45px - 60px) !important;
+	overflow: auto;
+	margin-top: 45px;
 }
 
 #loginWindow * {
