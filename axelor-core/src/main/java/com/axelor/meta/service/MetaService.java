@@ -93,18 +93,40 @@ public class MetaService {
 	@Inject
 	private MetaAttachmentRepository attachments;
 
+	private boolean canShow(MenuItem item, Map<String, MenuItem> map) {
+		if (item.getHidden() == Boolean.TRUE) {
+			return false;
+		}
+		if (item.getParent() == null) {
+			return true;
+		}
+		final MenuItem parent = map.get(item.getParent());
+		if (parent == null) {
+			return false;
+		}
+		return canShow(parent, map);
+	}
+
 	private List<MenuItem> filter(List<MenuItem> items) {
 
-		Set<String> visited = new HashSet<>();
-		List<MenuItem> all = new ArrayList<>();
+		final Map<String, MenuItem> map = new HashMap<>();
+		final Set<String> visited = new HashSet<>();
+		final List<MenuItem> all = new ArrayList<>();
 
 		for (MenuItem item : items) {
-			String name = item.getName();
+			final String name = item.getName();
 			if (visited.contains(name)) {
 				continue;
 			}
 			visited.add(name);
 			if (item.getHidden() != Boolean.TRUE) {
+				map.put(name, item);
+			}
+		}
+
+		for (final String name : map.keySet()) {
+			final MenuItem item = map.get(name);
+			if (canShow(item, map)) {
 				all.add(item);
 			}
 		}
