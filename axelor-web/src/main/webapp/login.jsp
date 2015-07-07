@@ -43,6 +43,7 @@ if (pageContext.getServletContext().getResource(loginHeader) == null) {
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="shortcut icon" href="ico/favicon.ico">
     <link href="lib/bootstrap/css/bootstrap.css" rel="stylesheet">
     <link href="lib/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
     <link href="lib/font-awesome/css/font-awesome.css" rel="stylesheet">
