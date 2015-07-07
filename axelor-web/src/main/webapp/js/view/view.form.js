@@ -181,7 +181,7 @@ function FormViewCtrl($scope, $element) {
 			state = +opts.state || null;
 
 		$scope._routeSearch = opts.search;
-		if (record.id == state) {
+		if (record.id == state || routeId === state) {
 			return $scope.updateRoute();
 		}
 		
@@ -367,10 +367,12 @@ function FormViewCtrl($scope, $element) {
 					promise = promise.then(function () {
 						if ($scope.isDirty()) {
 							var rec = _.extend({}, defaults, $scope.record);
+							var old = $scope.$$original;
 							var res = $scope.editRecord(rec);
-							if (rec && !rec.id) {
+							if (rec) {
 								rec._dirty = true;
 							}
+							$scope.$$original = old;
 							return res;
 						}
 					});
