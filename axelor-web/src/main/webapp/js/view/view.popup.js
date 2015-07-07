@@ -43,25 +43,19 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		}
 		closeCallback = callback;
 		isClosed = false;
-		recordVersion = -1;
+		recordVersion = record ? record.version : -1;
 		this.edit(record);
 	};
 
 	function doEdit(record, fireOnLoad) {
 		if (record && record.id > 0 && (!(record.version >= 0) || !record.$fetched)) {
 			$scope.doRead(record.id).success(function(rec) {
-				if (recordVersion === -1) {
-					recordVersion = rec.version;
-				}
 				if (record.$dirty) {
 					rec = _.extend({}, rec, record);
 				}
 				originalEdit(rec, fireOnLoad);
 			});
 		} else {
-			if (recordVersion === -1 && record) {
-				recordVersion = record.version;
-			}
 			originalEdit(record, fireOnLoad);
 		}
 		canClose = false;
@@ -105,12 +99,28 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		});
 	};
 
-	function canOK() {
-		if (isClosed) return false;
+	$scope.$actionPromises = [];
+
+	function afterActions(callback) {
+		$scope.$timeout(function () {
+			$scope.ajaxStop(function () {
+				var all = $scope.$actionPromises;
+				$scope.$actionPromises = [];
+				$q.all(all).then(callback);
+			}, 100);
+		}, 100);
+	}
+
+	function isChanged() {
 		if ($scope.isDirty()) return true;
 		var record = $scope.record || {};
 		var version = record.version;
 		return recordVersion !== version;
+	}
+
+	function canOK() {
+		if (isClosed) return false;
+		return isChanged();
 	};
 
 	function onOK() {
@@ -142,25 +152,26 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			return;
  		}
 
-		if ($scope.editorCanSave && $scope.isDirty()) {
-			if (record.id < 0)
-				record.id = null;
-			return $scope.onSave().then(function(record, page) {
-				$scope.applyLater(function(){
-					close(record, true);
+		afterActions(function() {
+			if ($scope.editorCanSave && isChanged()) {
+				if (record.id < 0)
+					record.id = null;
+				return $scope.onSave({force: true}).then(function(record, page) {
+					afterActions(function(){
+						close(record, true);
+					});
 				});
-			});
-		}
-
-		$scope.waitForActions(function() {
+			}
 			close(record);
 		});
 	};
 	
 	$scope.onOK = function() {
-		if (!$scope.isValid())
-			return;
-		$scope.waitForActions(onOK);
+		if ($scope.isValid()) {
+			setTimeout(function () {
+				afterActions(onOK);
+			});
+		}
 	};
 
 	$scope.onBeforeClose = function(event, ui) {
