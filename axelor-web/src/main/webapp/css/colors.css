@@ -221,8 +221,7 @@ input, button, textarea, select, fieldset, pre {
 }
 
 /* jquery fixes */
-.ui-widget-header a,
-.ui-widget-content a {
+.ui-widget-header a {
 	color: #0088cc;
 }
 .ui-dialog .ui-dialog-titlebar a {
