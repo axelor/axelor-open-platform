@@ -492,12 +492,16 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			var elemDialog = element.parent();
 			var elemTitle = elemDialog.find('.ui-dialog-title');
 			var resizable = elemDialog.hasClass('ui-resizable');
+			var draggable = elemDialog.hasClass('ui-draggable');
 			$('<a href="#" class="ui-dialog-titlebar-max"><i class="fa fa-expand"></i></a>').click(function (e) {
 				$(this).children('i').toggleClass('fa-expand fa-compress');
 				elemDialog.toggleClass('maximized');
 				element.dialog('option', 'position', 'center');
 				if (resizable) {
 					element.dialog('option', 'resizable', !elemDialog.hasClass('maximized'));
+				}
+				if (resizable) {
+					element.dialog('option', 'draggable', !elemDialog.hasClass('maximized'));
 				}
 				axelor.$adjustSize();
 				return false;
@@ -508,6 +512,9 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 				elemDialog.removeClass('maximized');
 				if (resizable) {
 					element.dialog('option', 'resizable', true);
+				}
+				if (draggable) {
+					element.dialog('option', 'draggable', true);
 				}
 			});
 		});
