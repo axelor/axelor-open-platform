@@ -75,6 +75,8 @@ load([
 
 	'lib/handsontable/handsontable.full.js',
 
+	'lib/bpmn-js/bpmn-modeler.js',
+
 	'lib/d3/d3.v3.js',
 	'lib/d3/nv/nv.d3.js',
 	'lib/d3/radar/radar-chart.js',
@@ -138,6 +140,7 @@ load([
 
 	'js/form/form.mail.js',
 	'js/form/form.code.js',
+	'js/form/form.bpmn.js',
 
 	'js/view/view.base.js',
 	'js/view/view.form.js',

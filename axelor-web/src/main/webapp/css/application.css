@@ -47,11 +47,15 @@
 @import url('../lib/wysiwyg/wysiwyg-editor.css');
 @import url('wysiwyg.css');
 
+@import url('../lib/bpmn-js/assets/bpmn-font/css/bpmn-embedded.css');
+@import url('../lib/bpmn-js/assets/diagram-js.css');
+
 @import url('main.css');
 
 @import url('tabs.css');
 @import url('navtree.css');
 @import url('slickgrid.css');
+@import url('bpmn.css');
 
 @import url('view.form.css');
 @import url('view.form.panels.css');

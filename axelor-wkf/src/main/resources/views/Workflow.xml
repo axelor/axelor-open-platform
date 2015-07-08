@@ -15,7 +15,7 @@
     
   <form name="workflow-form" title="Workflow" model="com.axelor.wkf.db.Workflow" width="large">
     <toolbar>
-      <button name="openEditor" title="Editor" onClick="save,wkf-method-open-editor"/>
+      <button name="openEditor" title="Editor" onClick="save,wkf.editor"/>
       <button name="openInstances" title="Instances" onClick="save,wkf-method-open-instances"/>
       <button name="importWorkflow" title="Import" onClick="save,wkf-method-import-workflow"/>
     </toolbar>
@@ -41,7 +41,13 @@
       </panel>
     </panel-tabs>
   </form>
-    
+
+  <form name="workflow-editor" title="Workflow editor" model="com.axelor.wkf.db.Workflow" width="large">
+    <panel>
+      <field name="bpmn" showTitle="false" colSpan="12" widget="BpmnEditor"/>
+    </panel>
+  </form>
+
   <!-- TRANSITION -->
   <grid name="transition-grid" title="Transitions" model="com.axelor.wkf.db.Transition">
     <field name="sequence"/>
@@ -135,12 +141,14 @@
     <call class="com.axelor.wkf.web.WorkflowController" method="openInstances" />
   </action-method>
     
-  <action-method name="wkf-method-open-editor">
-    <call class="com.axelor.wkf.web.WorkflowController" method="openEditor" />
-  </action-method>
-
   <action-method name="wkf-method-import-workflow">
     <call class="com.axelor.wkf.web.WorkflowController" method="importWorkflow" />
   </action-method>
-    
+  
+  <action-view name="wkf.editor" model="com.axelor.wkf.db.Workflow" title="Workflow editor">
+    <view name="workflow-editor" type="form"/>
+    <view-param name='ui-template:form' value='bpmn-editor'/>
+    <context name="_showRecord" expr="eval: id"/>
+  </action-view>
+
 </object-views>
