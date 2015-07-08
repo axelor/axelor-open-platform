@@ -1,0 +1,59 @@
+/**
+ * Axelor Business Solutions
+ *
+ * Copyright (C) 2012-2015 Axelor (<http://axelor.com>).
+ *
+ * This program is free software: you can redistribute it and/or  modify
+ * it under the terms of the GNU Affero General Public License, version 3,
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+.view-container .gantt-view > div:last-child {
+	position: absolute;
+	top: 46px;
+	bottom: 0; left: 4px; right: 0;
+}
+
+.gantt_grid_head_cell {
+	font-weight: bold;
+}
+
+.gantt-main {
+	position: absolute;
+	top: 0; left: 0; bottom: 0; right: 0;
+	overflow: auto;
+}
+
+.gantt_time_selects > select {
+	width: auto;
+}
+
+.child_preview {
+	box-sizing: border-box;
+	margin-top: 2px;
+	position: absolute;
+	z-index: 1;
+	color: white;
+	text-align: center;
+	font-size: 12px;
+}
+
+.gantt_task_line.task-collapsed {
+	height: 4px;
+	opacity: 0.25;
+}
+
+.gantt_task_line.gantt_project.task-collapsed .gantt_task_content {
+	display: none;
+}
+
+.gantt_row.task-parent {
+	font-weight: bold;
+}

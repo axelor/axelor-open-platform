@@ -71,6 +71,8 @@ load([
 	'lib/fullcalendar/fullcalendar.js',
 	'lib/fullcalendar/gcal.js',
 
+	'lib/dhtmlxGantt/dhtmlxgantt.js',
+
 	'lib/handsontable/handsontable.full.js',
 
 	'lib/d3/d3.v3.js',
@@ -147,6 +149,7 @@ load([
 	'js/view/view.popup.js',
 	'js/view/view.chart.js',
 	'js/view/view.calendar.js',
+	'js/view/view.gantt.js',
 	'js/view/view.kanban.js',
 	'js/view/view.dms.js'
 	//-- js-end

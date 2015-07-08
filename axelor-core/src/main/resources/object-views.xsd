@@ -10,6 +10,7 @@
         <xsd:element name="grid" type="tns:GridView" />
         <xsd:element name="tree" type="tns:TreeView" />
         <xsd:element name="calendar" type="tns:CalendarView" />
+        <xsd:element name="gantt" type="tns:GanttView" />
         <xsd:element name="cards" type="tns:CardsView" />
         <xsd:element name="kanban" type="tns:KanbanView" />
         <xsd:element name="chart" type="tns:ChartView" />
@@ -1469,6 +1470,89 @@
           </xsd:simpleType>
         </xsd:attribute>
       </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="GanttView">
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractView">
+        <xsd:sequence>
+          <xsd:element name="field" maxOccurs="3" minOccurs="1">
+            <xsd:complexType>
+              <xsd:complexContent>
+                <xsd:extension base="tns:AbstractWidget">
+                  <xsd:attribute name="name" type="xsd:string" use="required" />
+                  <xsd:attribute name="title" type="xsd:string" />
+                </xsd:extension>
+              </xsd:complexContent>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attributeGroup ref="tns:ObjectViewAttributes" />
+        <xsd:attribute name="taskStart" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              Name of the field of type date/datetime to be used as start time.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="taskDuration" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              Name of the duration field.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="taskParent" type="xsd:string" use="optional">
+          <xsd:annotation>
+            <xsd:documentation>
+              Name of the parent field.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="taskProgress" type="xsd:string" use="optional">
+          <xsd:annotation>
+            <xsd:documentation>
+              Name of the progress field.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="taskSequence" type="xsd:string" use="optional">
+          <xsd:annotation>
+            <xsd:documentation>
+              Name of a field to order tasks in sequence.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="x-finish-to-start" type="xsd:string" use="optional">
+          <xsd:annotation>
+            <xsd:documentation>
+              Name of the M2M field contains links finish to start current task.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="x-start-to-start" type="xsd:string" use="optional">
+          <xsd:annotation>
+            <xsd:documentation>
+              Name of the M2M field contains links start to start current task.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="x-finish-to-finish" type="xsd:string" use="optional">
+          <xsd:annotation>
+            <xsd:documentation>
+              Name of the M2M field contains links finish to finsh current task.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="x-start-to-finish" type="xsd:string" use="optional">
+          <xsd:annotation>
+            <xsd:documentation>
+              Name of the M2M field contains links start to finish current task.
+            </xsd:documentation>
+          </xsd:annotation>
+       </xsd:attribute>
+     </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
 
