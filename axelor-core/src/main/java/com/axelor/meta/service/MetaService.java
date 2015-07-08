@@ -93,7 +93,15 @@ public class MetaService {
 	@Inject
 	private MetaAttachmentRepository attachments;
 
-	private boolean canShow(MenuItem item, Map<String, MenuItem> map) {
+	private boolean canShow(MenuItem item, Map<String, MenuItem> map, Set<String> visited) {
+		if (visited == null) {
+			visited = new HashSet<>();
+		}
+		if (visited.contains(item.getName())) {
+			LOG.warn("Recursion detected at menu: " + item.getName());
+			return false;
+		}
+		visited.add(item.getName());
 		if (item.getHidden() == Boolean.TRUE) {
 			return false;
 		}
@@ -104,7 +112,7 @@ public class MetaService {
 		if (parent == null) {
 			return false;
 		}
-		return canShow(parent, map);
+		return canShow(parent, map, visited);
 	}
 
 	private List<MenuItem> filter(List<MenuItem> items) {
@@ -126,7 +134,7 @@ public class MetaService {
 
 		for (final String name : map.keySet()) {
 			final MenuItem item = map.get(name);
-			if (canShow(item, map)) {
+			if (canShow(item, map, null)) {
 				all.add(item);
 			}
 		}
