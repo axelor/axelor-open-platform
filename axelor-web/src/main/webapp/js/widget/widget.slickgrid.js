@@ -95,7 +95,7 @@ var Editor = function(args) {
 
 		var container = $(args.container);
 		if (external) {
-			container = container.parents('.view-container:first');
+			container = container.parents('.ui-dialog-content:first,.view-container:first').first();
 			$(document).on('mousedown.slick-external', function (e) {
 				if (element.is(e.target) || element.find(e.target).size() > 0) {
 					return;
@@ -177,10 +177,12 @@ var Editor = function(args) {
 			of: args.container
 		});
 		var container = $(args.container);
+		var parent = element.data('$parent') || element;
+		var zIndex = (parent.parents('.slickgrid:first').zIndex() || 0) + container.zIndex();
 		element.css({
 			border: 0,
 			width: container.width(),
-			zIndex: container.zIndex() + 1
+			zIndex: zIndex + 1
 		});
 	};
 	
