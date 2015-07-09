@@ -1,6 +1,7 @@
 .bpmn-canvas {
 	width: 100%;
 	height: 100%;
+	outline: none;
 }
 
 .bpmn-editor {
@@ -8,6 +9,7 @@
 	border: 1px solid #ddd;
 	position: relative;
 	border-bottom: 4px solid #ddd;
+	outline: none;
 }
 
 .bpmn-editor,
@@ -24,6 +26,10 @@
 .bpmn-editor .bjs-powered-by img {
 	width: 24px !important;
 	height: 24px !important;
+}
+
+.bpmn-editor .djs-label {
+	font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
 }
 
 .bpmn-props {

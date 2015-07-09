@@ -92,6 +92,7 @@ ui.formInput('BpmnEditor', {
 
 			props.$x = x;
 			props.$type = bo.$type;
+			props.$last = {};
 
 			names.forEach(function (name) {
 				x[name] = true;
@@ -100,6 +101,7 @@ ui.formInput('BpmnEditor', {
 					value = { name: value };
 				}
 				props[name] = value;
+				props.$last[name] = value;
 			});
 
 			scope.props = props;
@@ -157,68 +159,71 @@ ui.formInput('BpmnEditor', {
 			}, 100);
 		}
 
-		modeler.on('element.click', function (e) {
-			if (e.element.type === "bpmn:Process") {
-				scope.$timeout(function () {
-					onSelect(e.element);
-				});
-			}
-		});
-		modeler.on(['shape.removed', 'connection.removed'], function (e) {
-			scope.$timeout(doSave);
-		});
-		modeler.on(['shape.added', 'connection.added'], function (e) {
-			if (e.element.type === "bpmn:Task" ||
-				e.element.type === "bpmn:SubProcess" ||
-				e.element.type === "bpmn:SendTask" ||
-				e.element.type === "bpmn:ReceiveTask" ||
-				e.element.type === "bpmn:UserTask" ||
-				e.element.type === "bpmn:IntermediateCatchEvent") {
-				scope.$timeout(function () {
-					onSelect(e.element);
-					doSave();
-				});
-			}
-		});
-		modeler.on(['selection.changed'], function (e) {
-			var all = e.newSelection;
-			setTimeout(function () {
-				onSelect(all.length === 1 ? all[0] : null);
-			});
-		});
-
-		modeler.on('element.changed', _.debounce(function (e) {
-			setTimeout(function () {
-				onSelect(e.element);
-				doSave();
-			});
-		}, 100))
-
 		var propNames = _.unique(_.flatten(_.values(PROPS)));
 		propNames.forEach(function (name) {
 			scope.$watch("props." + name, function (value, old) {
-				if (value !== undefined && value !== old) {
+				if (!scope.props || value === undefined || value === old) {
+					return;
+				};
+				var last = scope.props.$last[name];
+				if (!angular.equals(last, value)) {
 					updateProperty(name, value);
 				}
 			});
 		});
 
-		// make container resizable
-		element.resizable({
-			handles: 's',
-			resize: function () {
-				// container resized, do something
+		modeler.on('element.click', function (e) {
+			if (e.element.type === "bpmn:Process") {
+				onSelect(e.element);
 			}
+		});
+		modeler.on('selection.changed', function (e) {
+			onSelect(e.newSelection[0]);
+		});
+		modeler.on(['shape.added', 'connection.added',
+		            'shape.removed', 'connection.removed',
+		            'shape.changed', 'connection.changed'], function (e) {
+			if (selectedElement) {
+				onSelect(selectedElement);
+			}
+			scope.$timeout(doSave);
+		});
+
+		var keyboard = null;
+		modeler.on('import.success', function () {
+			if (keyboard) {
+				keyboard.unbind();
+			}
+			keyboard = modeler.get('keyboard');
+			keyboard.bind(element[0]);
+		});
+
+		modeler.on('element.mousedown', function (e) {
+			var sp = element.scrollParent()[0] || {};
+			var x = sp.scrollTop;
+			element.focus();
+			sp.scrollTop = x;
 		});
 
 		element.on('$destroy', function () {
+			if (keyboard) {
+				keyboard.unbind();
+			}
 			modeler.destroy();
+		});
+
+		// make container resizable
+		element.resizable({
+			handles: 's',
+			stop: function () {
+				$('body').css('cursor', '');
+			}
 		});
 	},
 	template_readonly: null,
 	template_editable: null,
 	template:
-		"<div>" +
+		"<div tabindex='-1'>" +
 			"<div class='bpmn-canvas'></div>" +
 			"<div class='bpmn-props' ng-show='props' ui-bpmn-props></div>" +
 		"</div>"
