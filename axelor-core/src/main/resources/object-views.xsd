@@ -1788,6 +1788,7 @@
                     <xsd:enumeration value="radar" />
                     <xsd:enumeration value="gauge" />
                     <xsd:enumeration value="scatter" />
+                    <xsd:enumeration value="funnel" />
                   </xsd:restriction>
                 </xsd:simpleType>
               </xsd:attribute>

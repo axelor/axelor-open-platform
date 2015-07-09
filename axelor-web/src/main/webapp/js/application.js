@@ -79,6 +79,7 @@ load([
 	'lib/d3/nv/nv.d3.js',
 	'lib/d3/radar/radar-chart.js',
 	'lib/d3/gauge/gauge-chart.js',
+	'lib/d3/funnel/d3-funnel.js',
 
 	'lib/codemirror/codemirror.min.js',
 	'lib/wysiwyg/wysiwyg.js',

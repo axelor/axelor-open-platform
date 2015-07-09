@@ -364,9 +364,39 @@ function HBarChart(scope, element, data) {
 	return chart;
 }
 
+function FunnelChart(scope, element, data) {
+	
+	var chart = new D3Funnel(element[0]);
+	var w = element.width();
+	var h = element.height();
+	var config = _.extend({}, data.config);
+	var props = {
+			fillType: 'gradient',
+			hoverEffects: true,
+			dynamicArea: true,
+			animation: 200};
+	
+	if(config.width){
+		props.width = w*config.width/100
+	}
+	if(config.height){
+		props.height = h*config.height/100
+	}
+	
+	var series = _.first(data.series) || {};
+	var opts = [];
+	_.each(data.dataset, function(dat){
+		opts.push([dat[data.xAxis],($conv(dat[series.key])||0)])
+	})
+	chart.draw(opts, props);
+	
+	return chart
+}
+
 CHARTS.bar = BarChart;
 CHARTS.dbar = DBarChart;
 CHARTS.hbar = HBarChart;
+CHARTS.funnel = FunnelChart;
 
 function LineChart(scope, element, data) {
 
