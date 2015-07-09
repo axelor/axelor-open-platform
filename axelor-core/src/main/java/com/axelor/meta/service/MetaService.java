@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -117,7 +118,7 @@ public class MetaService {
 
 	private List<MenuItem> filter(List<MenuItem> items) {
 
-		final Map<String, MenuItem> map = new HashMap<>();
+		final Map<String, MenuItem> map = new LinkedHashMap<>();
 		final Set<String> visited = new HashSet<>();
 		final List<MenuItem> all = new ArrayList<>();
 
