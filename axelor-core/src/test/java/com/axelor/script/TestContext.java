@@ -20,6 +20,10 @@ package com.axelor.script;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.axelor.inject.Beans;
+import com.axelor.test.db.Contact;
+import com.axelor.test.db.repo.ContactRepository;
+
 public class TestContext extends ScriptTest {
 
 	public static final String STATIC_FIELD = "A static value...";
@@ -34,6 +38,11 @@ public class TestContext extends ScriptTest {
 		return message;
 	}
 
+	public Contact contact() {
+		ContactRepository repo = Beans.get(ContactRepository.class);
+		return repo.all().fetchOne();
+	}
+
 	@Test
 	public void testConfigContext() {
 
@@ -43,14 +52,17 @@ public class TestContext extends ScriptTest {
 		Object hello = helper.eval("__config__.hello");
 		Object world = helper.eval("__config__.world");
 		Object result = helper.eval("__config__.hello.hello()");
+		Object contact = helper.eval("__config__.hello.contact()");
 
 		Assert.assertNotNull(hello);
 		Assert.assertNotNull(world);
 		Assert.assertNotNull(result);
+		Assert.assertNotNull(contact);
 
 		Assert.assertTrue(hello instanceof TestContext);
 		Assert.assertEquals(message, world);
 		Assert.assertEquals(message, result);
+		Assert.assertTrue(contact instanceof Contact);
 
 		Object some = helper.eval("__config__.some");
 		Object thing = helper.eval("__config__.thing");

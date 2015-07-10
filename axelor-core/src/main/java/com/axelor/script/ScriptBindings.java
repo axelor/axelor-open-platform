@@ -65,7 +65,6 @@ public class ScriptBindings extends SimpleBindings {
 
 	public ScriptBindings(Map<String, Object> variables) {
 		this.variables = this.tryContext(variables);
-		this.configContext = this.configContext();
 	}
 	
 	private Map<String, Object> tryContext(Map<String, Object> variables) {
@@ -101,6 +100,9 @@ public class ScriptBindings extends SimpleBindings {
 		case "__datetime__":
 			return new DateTime();
 		case "__config__":
+			if (configContext == null) {
+				configContext = new ConfigContext();
+			}
 			return configContext;
 		case "__user__":
 			return AuthUtils.getUser();
@@ -182,26 +184,50 @@ public class ScriptBindings extends SimpleBindings {
 		variables.putAll(values);
 	}
 
-	private Map<String, Object> configContext() {
+	@SuppressWarnings("serial")
+	private static class ConfigContext extends HashMap<String, Object> {
 
-		final Properties properties = AppSettings.get().getProperties();
-		final Map<String, Object> vars = new HashMap<>();
+		private static Map<String, String> CONFIG;
+		private Map<String, Object> values = new HashMap<>();
 
-		for (final Object item : properties.keySet()) {
+		public ConfigContext() {
+			if (CONFIG == null) {
+				CONFIG = new HashMap<>();
+				final Properties properties = AppSettings.get().getProperties();
+				for (final Object item : properties.keySet()) {
+					final String name = item.toString();
+					final String expr = properties.getProperty(name);
+					if (!name.startsWith("context.") || isBlank(expr)) {
+						continue;
+					}
+					CONFIG.put(name.substring(8), expr);
+				}
+			}
+		}
 
-			final String name = item.toString();
-			final String expr = properties.getProperty(name);
+		@Override
+		public Set<String> keySet() {
+			return CONFIG.keySet();
+		}
 
-			if (!name.startsWith("context.") || isBlank(expr)) {
-				continue;
+		@Override
+		public boolean containsKey(Object key) {
+			return CONFIG.containsKey(key);
+		}
+
+		@Override
+		public Object get(Object key) {
+
+			if (values.containsKey(key) || !containsKey(key)) {
+				return values.get(key);
 			}
 
-			final String key = name.substring(8);
+			final String name = (String) key;
+			final String expr = CONFIG.get(key);
 			final String[] parts = expr.split("\\:", 2);
+			final Object invalid = new Object();
 
 			Class<?> klass = null;
-
-			Object invalid = new Object();
 			Object value = invalid;
 
 			try {
@@ -210,8 +236,9 @@ public class ScriptBindings extends SimpleBindings {
 			}
 
 			if (klass == null) {
-				vars.put(key, adapt(expr));
-				continue;
+				value = adapt(expr);
+				values.put(name, value);
+				return value;
 			}
 
 			try {
@@ -224,15 +251,16 @@ public class ScriptBindings extends SimpleBindings {
 			}
 
 			if (value != invalid) {
-				vars.put(key, value);
-				continue;
+				values.put(name, value);
+				return value;
 			}
 
 			final Object instance = Beans.get(klass);
 
 			if (parts.length == 1) {
-				vars.put(key, instance);
-				continue;
+				value = instance;
+				values.put(name, value);
+				return value;
 			}
 
 			try {
@@ -244,26 +272,25 @@ public class ScriptBindings extends SimpleBindings {
 				throw new RuntimeException("Invalid configuration: " + name + " = " + expr);
 			}
 
-			vars.put(key, value);
+			values.put(name, value);
+			return value;
 		}
 
-		return vars;
-	}
-
-	private Object adapt(String value) {
-		if (isBlank(value)) {
-			return null;
+		private Object adapt(String value) {
+			if (isBlank(value)) {
+				return null;
+			}
+			if ("true".equals(value.toLowerCase())) {
+				return true;
+			}
+			if ("false".equals(value.toLowerCase())) {
+				return false;
+			}
+			try {
+				return Integer.parseInt(value);
+			} catch (Exception e) {
+			}
+			return value;
 		}
-		if ("true".equals(value.toLowerCase())) {
-			return true;
-		}
-		if ("false".equals(value.toLowerCase())) {
-			return false;
-		}
-		try {
-			return Integer.parseInt(value);
-		} catch (Exception e) {
-		}
-		return value;
 	}
 }
