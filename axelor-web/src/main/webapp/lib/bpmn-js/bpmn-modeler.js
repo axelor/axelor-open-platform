@@ -43148,4 +43148,3 @@ module.exports = Refs;
  */
 },{"355":355}]},{},[1])(1)
 });
-//# sourceMappingURL=bpmn-modeler.js.map
