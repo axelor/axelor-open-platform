@@ -202,9 +202,9 @@
 	}]);
 
 	// only enable animation on element with ng-animate css class
-	module.config(function($animateProvider) {
+	module.config(['$animateProvider', function($animateProvider) {
         $animateProvider.classNameFilter(/x-animate/);
-    });
+    }]);
 
 	module.factory('httpIndicator', ['$rootScope', '$q', function($rootScope, $q){
 		
