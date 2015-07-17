@@ -365,12 +365,12 @@ ui.directive('uiCards', function () {
 	return function (scope, element, attrs) {
 
 		scope.onEdit = function (record, readonly) {
+			var ds = scope._dataSource;
+			var page = ds._page;
+			page.index = record ? ds._data.indexOf(record) : -1;
 			scope.switchTo('form', function (formScope) {
-				if (formScope.canEdit()) {
-					formScope.edit(record);
-					if (!readonly) {
-						formScope.setEditable();
-					}
+				if (!readonly && formScope.canEdit()) {
+					formScope.setEditable();
 				}
 			});
 		};

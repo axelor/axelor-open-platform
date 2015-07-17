@@ -41,17 +41,9 @@ function ChartCtrl($scope, $element, $http) {
 	var viewValues = null;
 
 	var loading = false;
+	var unwatch = null;
 
-	function refresh(force) {
-
-		if (loading || ($element.is(":hidden") && !force)) {
-			return;
-		}
-
-		// in case of onInit
-		if ($scope.searchInit && !viewValues && !force) {
-			return;
-		}
+	function refresh() {
 
 		var context = $scope._context || {};
 		if ($scope.getContext) {
@@ -95,14 +87,24 @@ function ChartCtrl($scope, $element, $http) {
 		});
 	}
 
-	$scope.$callWhen(function () {
-		return $element.is(":visible");
-	}, function() {
-		return refresh(true);
-	}, 100);
+	$scope.onRefresh = function() {
+		if (unwatch || loading) {
+			return;
+		}
 
-	$scope.onRefresh = function(force) {
-		refresh(force);
+		// in case of onInit
+		if ($scope.searchInit && !viewValues && !force) {
+			return;
+		}
+
+		unwatch = $scope.$watch(function () {
+			if ($element.is(":hidden")) {
+				return;
+			}
+			unwatch();
+			unwatch = null;
+			refresh();
+		});
 	};
 
 	$scope.setViewValues = function (values) {
@@ -112,6 +114,9 @@ function ChartCtrl($scope, $element, $http) {
 	$scope.render = function(data) {
 		
 	};
+
+	// refresh to load chart
+	$scope.onRefresh();
 };
 
 ChartFormCtrl.$inject = ['$scope', '$element', 'ViewService', 'DataSource'];

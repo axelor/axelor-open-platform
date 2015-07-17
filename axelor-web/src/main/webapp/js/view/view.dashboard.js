@@ -202,7 +202,7 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 		controller: DashletCtrl,
 		link: function(scope, element, attrs) {
 
-			var lazy = true;
+			var lazy = false;
 			scope.waitForActions(function () {
 				var unwatch = scope.$watch(function () {
 					var dashlet = scope.dashlet;
