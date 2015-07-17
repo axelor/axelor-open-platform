@@ -38,7 +38,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @XmlType
-public class ActionGroup extends ActionIndex<ActionGroup> {
+public class ActionGroup extends ActionResumable<ActionGroup> {
 
 	@XmlElement(name = "action")
 	private List<ActionItem> actions;
@@ -109,8 +109,8 @@ public class ActionGroup extends ActionIndex<ActionGroup> {
 				log.debug("continue action-validate: {}", actionName);
 				log.debug("continue at: {}", index);
 				Action action = MetaStore.getAction(actionName);
-				if (action instanceof ActionIndex) {
-					return ((ActionIndex<?>) action).copy(index);
+				if (action instanceof ActionResumable) {
+					return ((ActionResumable<?>) action).resumeAt(index);
 				}
 				return action;
 		}
@@ -119,10 +119,9 @@ public class ActionGroup extends ActionIndex<ActionGroup> {
 	}
 
 	@Override
-	protected ActionGroup copy(int index) {
+	protected ActionGroup resumeAt(int index) {
 		final ActionGroup action = new ActionGroup();
 		final List<ActionItem> items = actions.subList(index, actions.size());
-		action.setName(getName() + "@" + index);
 		action.setModel(getModel());
 		action.setActions(items);
 		return action;
