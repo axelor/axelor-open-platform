@@ -198,6 +198,7 @@
 		provider.interceptors.push('httpIndicator');
 		provider.defaults.transformRequest.push(onHttpStart);
 		provider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
+		provider.useApplyAsync(true);
 	}]);
 	
 	module.factory('httpIndicator', ['$rootScope', '$q', function($rootScope, $q){
