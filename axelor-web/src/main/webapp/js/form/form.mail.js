@@ -465,7 +465,7 @@ ui.directive('uiMailUploader', ["$compile", function ($compile) {
 
 		scope.onUpload = function () {
 			var popup = $compile('<div ui-dms-popup x-on-select="onSelect"></div>')(scope);
-			popup.scope().showPopup();
+			popup.isolateScope().showPopup();
 		};
 	};
 }]);
@@ -630,7 +630,7 @@ ui.formWidget('uiMailFollowers', {
 				userSelector = ViewService.compile('<div ui-selector-popup x-select-mode="multi"></div>')($scope);
 			}
 
-			var popup = userSelector.data('$scope');
+			var popup = userSelector.isolateScope();
 			popup.show();
 		};
 

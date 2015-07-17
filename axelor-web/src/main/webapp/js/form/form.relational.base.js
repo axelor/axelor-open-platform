@@ -124,7 +124,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			editor.data('$target', $element);
 		}
 		
-		var popup = editor.data('$scope');
+		var popup = editor.isolateScope();
 		popup.show(record);
 		if (record == null) {
 			popup.ajaxStop(function() {
@@ -195,7 +195,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 				selector = ViewService.compile(selector)($scope);
 				selector.data('$target', $element);
 			}
-			var popup = selector.data('$scope');
+			var popup = selector.isolateScope();
 			popup._domain = $scope._domain; // make sure that popup uses my domain (#1233)
 			popup.show();
 		}

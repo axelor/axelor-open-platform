@@ -568,7 +568,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 				editor.data('$target', element);
 			}
 
-			var popup = editor.data('$scope');
+			var popup = editor.isolateScope();
 			
 			popup.setEditable(scope.isEditable());
 			popup.show(record, function(result) {
