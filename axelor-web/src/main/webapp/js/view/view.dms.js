@@ -1244,6 +1244,7 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 
 				if (form === null) {
 					form = $("<div ui-dms-inline-form></div>")
+						.attr("x-record", "record")
 						.attr("x-form-name", "permissionFormName")
 						.attr("x-form-title", "permissionFormTitle");
 					form = $compile(form)(scope);
