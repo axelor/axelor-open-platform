@@ -408,7 +408,7 @@ ui.formWidget('uiMailMessages', {
 		});
 
 		$scope.$on("on:nav-click", function (e, tab) {
-			var action = $scope.tab.action;
+			var action = ($scope.tab||{}).action;
 			if (action !== tab.action) { return ; }
 			if (folder) {
 				$scope.onLoadMessages();
@@ -605,7 +605,7 @@ ui.formWidget('uiMailFollowers', {
 		$scope.updateStatus = function() {
 			var followers = $scope.followers || [];
 			var found = _.findWhere(followers, {
-				code: $scope.app.login
+				code: $scope.$root.app.login
 			});
 			$scope.following = !!found;
 		}
@@ -713,7 +713,7 @@ ui.formWidget('uiMailFollowers', {
 ui.formWidget('PanelMail', {
 
 	scope: true,
-	controller: ['$scope', '$timeout', 'ViewService', 'MessageService', function ($scope, $timeout, ViewService, MessageService) {
+	controller: ['$scope', '$timeout', 'NavService', 'ViewService', 'MessageService', function ($scope, $timeout, NavService, ViewService, MessageService) {
 
 		$scope.getDomain = function () {
 			return {};
@@ -723,17 +723,18 @@ ui.formWidget('PanelMail', {
 			if (!author) {
 				return;
 			}
-			$scope.openTabByName("form:user-form", {
+			NavService.openTabByName("form:user-form", {
 				mode: "edit",
 				state: author.id
 			});
 		}
 
 		var folder = undefined;
+		var tab = $scope.tab || {};
 
-		if ($scope.tab.action === "mail.inbox") folder = "inbox";
-		if ($scope.tab.action === "mail.important") folder = "important";
-		if ($scope.tab.action === "mail.archive") folder = "archive";
+		if (tab.action === "mail.inbox") folder = "inbox";
+		if (tab.action === "mail.important") folder = "important";
+		if (tab.action === "mail.archive") folder = "archive";
 
 		$scope.folder = folder;
 	}],

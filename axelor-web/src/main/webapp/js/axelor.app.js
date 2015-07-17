@@ -363,7 +363,14 @@
 		$scope.showMailBox = function() {
 			NavService.openTabByName('mail.inbox');
 		};
-	
+
+		Object.defineProperty($rootScope, 'app', {
+			enumerable: true,
+			get: function () {
+				return $scope.app;
+			}
+		});
+
 		var loginAttempts = 0;
 		var loginWindow = null;
 		var errorWindow = null;
