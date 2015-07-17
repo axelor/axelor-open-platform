@@ -91,6 +91,7 @@ load([
 	'lib/angular/angular-route.js',
 	'lib/angular/angular-resource.js',
 	'lib/angular/angular-sanitize.js',
+	'lib/angular/angular-animate.js',
 
 	'js/axelor.ng.js',
 	

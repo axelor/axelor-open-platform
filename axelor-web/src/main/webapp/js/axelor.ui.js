@@ -18,5 +18,6 @@
 angular.module('axelor.ui', [
 	'ngRoute',
 	'ngSanitize',
+	'ngAnimate',
 	'axelor.ds'
 ]);

@@ -200,7 +200,12 @@
 		provider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
 		provider.useApplyAsync(true);
 	}]);
-	
+
+	// only enable animation on element with ng-animate css class
+	module.config(function($animateProvider) {
+        $animateProvider.classNameFilter(/x-animate/);
+    });
+
 	module.factory('httpIndicator', ['$rootScope', '$q', function($rootScope, $q){
 		
 		var doc = $(document);
