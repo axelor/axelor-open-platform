@@ -243,7 +243,7 @@ ui.directive('uiMailMessage', function () {
 					"<div class='mail-message-body'>" +
 						"<ul class='track-fields' ng-if='body'>" +
 							"<li ng-repeat='item in body.tracks'>" +
-								"<strong>{{item.title}}</strong> : <span ng-bind-html-unsafe='item.value'></span>" +
+								"<strong>{{item.title}}</strong> : <span ng-bind-html='item.value'></span>" +
 							"</li>" +
 						"</ul>" +
 						"<div ng-if='!body' ui-bind-template x-text='message.body'></div>" +

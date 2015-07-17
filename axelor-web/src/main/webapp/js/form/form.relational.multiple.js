@@ -595,7 +595,7 @@ ui.formInput('OneToMany', {
 	'<div class="navbar">'+
 		'<div class="navbar-inner">'+
 			'<div class="container-fluid">'+
-				'<span class="brand" href="" ui-help-popover ng-bind-html-unsafe="title"></span>'+
+				'<span class="brand" href="" ui-help-popover ng-bind-html="title"></span>'+
 				'<span class="icons-bar pull-right" ng-show="!isReadonly()">'+
 					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowEdit()" title="{{\'Edit\' | t}}" class="fa fa-pencil"></i>'+
 					'<i ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled() && canNew()" title="{{\'New\' | t}}" class="fa fa-plus"></i>'+
@@ -634,7 +634,7 @@ var panelRelatedTemplate =
 			"<i ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()' class='fa fa-minus'></i>" +
 			"<i ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()' class='fa fa-search'></i>" +
 		"</div>" +
-		"<div class='panel-title'><span ui-help-popover ng-bind-html-unsafe='title'></span></div>" +
+		"<div class='panel-title'><span ui-help-popover ng-bind-html='title'></span></div>" +
 	"</div>" +
 	"<div class='panel-body panel-layout'>" +
 		"<div ui-view-grid " +

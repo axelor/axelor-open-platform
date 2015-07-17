@@ -83,7 +83,7 @@ ui.formWidget('Group', {
 		'<fieldset ng-class="{\'bordered-box\': title, \'has-title\': title}" x-layout-selector="&gt; div:first">'+
 			'<legend ng-show="title">'+
 				'<i ng-show="canCollapse()" ng-click="toggle()" ng-class="{\'fa fa-plus\': collapsed, \'fa fa-minus\': !collapsed}"></i>'+
-				'<span ng-bind-html-unsafe="title"></span></legend>'+
+				'<span ng-bind-html="title"></span></legend>'+
 			'<div ui-transclude></div>'+
 		'</fieldset>'
 });
@@ -307,7 +307,7 @@ ui.formWidget('Tabs', {
 						'<li tabindex="-1" ng-repeat="tab in tabs" ng-class="{active:tab.tabSelected}">'+
 							'<a tabindex="-1" href="" ng-click="select(tab)">'+
 								'<img class="prefix-icon" ng-show="tab.icon" ng-src="{{tab.icon}}">'+
-								'<span ng-bind-html-unsafe="tab.title"></span>'+
+								'<span ng-bind-html="tab.title"></span>'+
 							'</a>' +
 						'</li>' +
 					'</ul>' +
@@ -317,7 +317,7 @@ ui.formWidget('Tabs', {
 						'<a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="caret"></i></a>'+
 							'<ul class="dropdown-menu" role="menu">'+
 							    '<li ng-repeat="tab in tabs">'+
-							    	'<a tabindex="-1" href="javascript: void(0)" ng-click="select(tab)" ng-bind-html-unsafe="tab.title"></a>'+
+							    	'<a tabindex="-1" href="javascript: void(0)" ng-click="select(tab)" ng-bind-html="tab.title"></a>'+
 							    '</li>' +
 							'</ul>' +
 						'</a>'+
@@ -717,7 +717,7 @@ ui.formWidget('PanelTabs', {
 		"<div class='panel-tabs tabbable-tabs'>" +
 			"<ul class='nav nav-tabs nav-tabs-responsive'>" +
 				"<li ng-repeat='tab in tabs' ng-class='{active: tab.selected}'>" +
-					"<a tabindex='-1' href='' ng-click='selectTab(tab)' ng-bind-html-unsafe='tab.title'></a>" +
+					"<a tabindex='-1' href='' ng-click='selectTab(tab)' ng-bind-html='tab.title'></a>" +
 				"</li>" +
 				"<li class='dropdown' ng-class='{active: more.selected}' style='display: none'>" +
 					"<a tabindex='-1' href='' title='{{more.title}}' class='dropdown-toggle' ng-click='onMenuClick($event)'>" +
@@ -725,7 +725,7 @@ ui.formWidget('PanelTabs', {
 					"</a>" +
 					"<ul class='dropdown-menu pull-right' data-toggle='dropdown'>" +
 						"<li ng-repeat='tab in tabs' ng-class='{active: tab.selected}'>" +
-							"<a tabindex='-1' href='' ng-click='selectTab(tab)' ng-bind-html-unsafe='tab.title'></a>" +
+							"<a tabindex='-1' href='' ng-click='selectTab(tab)' ng-bind-html='tab.title'></a>" +
 						"</li>" +
 					"</ul>" +
 				"</li>" +

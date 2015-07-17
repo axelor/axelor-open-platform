@@ -343,7 +343,7 @@ var NestedEditor = {
 	template:
 	'<fieldset class="form-item-group bordered-box" ui-show="visible">'+
 		'<legend>'+
-			'<span ng-bind-html-unsafe="title"></span> '+
+			'<span ng-bind-html="title"></span> '+
 			'<span class="legend-toolbar" style="display: none;" ng-show="!isReadonly()">'+
 				'<a href="" tabindex="-1" ng-click="onClear()" title="{{\'Clear\' | t}}" ng-show="canShowIcon(\'clear\')"><i class="fa fa-ban"></i></a> '+
 				'<a href="" tabindex="-1" ng-click="onSelect()" title="{{\'Select\' | t}}" ng-show="canShowIcon(\'select\')"><i class="fa fa-search"></i></a> '+
