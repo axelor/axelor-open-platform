@@ -68,7 +68,7 @@ ui.directive('uiFilterItem', function() {
 		},
 		link: function(scope, element, attrs, form) {
 
-			scope.getOperators = function() {
+			function getOperators() {
 
 				if (element.is(':hidden')) {
 					return;
@@ -92,7 +92,7 @@ ui.directive('uiFilterItem', function() {
 						title: OPERATORS[name]
 					};
 				});
-			};
+			}
 
 			scope.remove = function(filter) {
 				form.removeFilter(filter);
@@ -139,6 +139,7 @@ ui.directive('uiFilterItem', function() {
 				} else {
 					filter.targetName = null;
 				}
+				scope.operators = getOperators();
 			};
 
 			var unwatch = scope.$watch('fields', function(fields, old) {
@@ -159,7 +160,7 @@ ui.directive('uiFilterItem', function() {
 						"<select ng-model='filter.field' ng-options='v.name as v.title for v in options' ng-change='onFieldChange()' class='input-medium'></select> " +
 					"</td>" +
 					"<td class='form-item filter-select'>" +
-						"<select ng-model='filter.operator' ng-options='o.name as o.title for o in getOperators()' class='input-medium'></select> "+
+						"<select ng-model='filter.operator' ng-options='o.name as o.title for o in operators' class='input-medium'></select> "+
 					"</td>" +
 					"<td class='form-item filter-select' ng-show='canShowSelect()'>" +
 						"<select ng-model='filter.value' class='input=medium' ng-options='o.value as o.title for o in getSelection()'></select>" +
@@ -974,7 +975,8 @@ ui.directive('uiFilterBox', function() {
 
 			scope.onSearch = function(e) {
 				if (menu && menu.is(':visible')) {
-					return hideMenu();
+					hideMenu();
+					return;
 				}
 				toggleButton = $(e.currentTarget);
 				menu.show();
@@ -1029,7 +1031,7 @@ ui.directive('uiFilterBox', function() {
 				scope.applyLater(function () {
 					scope.visible = false;
 				});
-				return menu.hide();
+				menu.hide();
 			}
 
 			function onMouseDown(e) {
