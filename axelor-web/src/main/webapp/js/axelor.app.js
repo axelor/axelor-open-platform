@@ -195,8 +195,9 @@
 	}]);
 	
 	module.config(['$httpProvider', function(provider) {
-		provider.responseInterceptors.push('httpIndicator');
+		provider.interceptors.push('httpIndicator');
 		provider.defaults.transformRequest.push(onHttpStart);
+		provider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
 	}]);
 	
 	module.factory('httpIndicator', ['$rootScope', '$q', function($rootScope, $q){
@@ -275,8 +276,8 @@
 			return unblock();
 		};
 
-		return function(promise) {
-			return promise.then(function(response){
+		return {
+			response: function(response) {
 				if (response.config && !response.config.silent) {
 					onHttpStop();
 				}
@@ -285,11 +286,12 @@
 					return $q.reject(response);
 				}
 				return response;
-			}, function(error) {
+			},
+			responseError: function(error) {
 				onHttpStop();
 				$rootScope.$broadcast('event:http-error', error);
 				return $q.reject(error);
-			});
+			}
 		};
 	}]);
 	
