@@ -24,28 +24,38 @@
 	outline: none;
 }
 
+.dms-file-list > .slickgrid,
+.dms-file-list .dms-folder-tree,
+.dms-file-list .dms-details {
+	transition: all 0.25s;
+}
+
 .dms-file-list .dms-folder-tree {
 	position: absolute;
 	overflow: auto;
-	width: 0;
+	width: 250px;
 	top: 41px;
 	bottom: 0;
+	left: -251px;
 	border-right: 1px solid #d3d3d3;
 	background-color: #fff;
 }
 
 .dms-file-list .dms-details {
 	position: absolute;
-	right: -260px;
+	right: -1px;
 	top: 41px;
 	bottom: 0;
 	width: 249px;
 	margin: 0;
 	border-bottom: 0;
 	background-color: white;
-	transition: all 0.25s;
-	z-index: 2;
 	box-shadow: 0 6px 12px rgba(0,0,0,.175);
+	z-index: 2;
+}
+
+.dms-file-list .dms-details.ng-hide {
+	right: -261px;
 }
 
 .dms-file-list .dms-details > .panel-body {
@@ -63,11 +73,6 @@
 	text-overflow: ellipsis;
 	max-width: calc(100% - 20px);
 	box-sizing: border-box;
-}
-
-.dms-file-list.has-details .dms-details {
-	right: -1px;
-	max-width: 100%;
 }
 
 .dms-file-list .dms-details input.not-readonly {
@@ -107,7 +112,7 @@
 }
 
 .dms-file-list.has-tree .dms-folder-tree {
-	width: 250px;
+	left: 0;
 }
 
 .dms-file-list.has-tree > .slickgrid {

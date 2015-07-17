@@ -1,4 +1,4 @@
-<div class="grid-view dms-file-list" ng-class="{'has-tree': showTree, 'has-details': showDetails }" ng-controller="DMSFileListCtrl"
+<div class="grid-view dms-file-list" ng-class="{'has-tree': showTree}" ng-controller="DMSFileListCtrl"
   ui-dms-uploader ui-tab-gate>
   <div class="navbar record-toolbar">
     <div class="navbar-inner">
@@ -49,7 +49,7 @@
   </div>
   <div class="dms-folder-tree" ui-dms-folders></div>
   <div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-no-filter="true" x-on-init="onGridInit"></div>
-  <div ui-dms-details class="dms-details panel">
+  <div ui-dms-details class="dms-details panel x-animate" ng-show="showDetails">
     <div class="panel-header">
       <div class="panel-title pull-left">{{details.name}}</div>
       <div class="panel-buttons pull-right">
