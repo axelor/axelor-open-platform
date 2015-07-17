@@ -15,11 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-[ng\:cloak], [ng-cloak], .ng-cloak {
-   display: none;
-}
-
 html, body {
 	overflow: hidden;
 	padding: 0 !important;

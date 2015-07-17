@@ -88,9 +88,9 @@ load([
 	'lib/wysiwyg/wysiwyg-editor.js',
 
 	'lib/angular/angular.js',
+	'lib/angular/angular-route.js',
 	'lib/angular/angular-resource.js',
 	'lib/angular/angular-sanitize.js',
-	'lib/angular/angular-if.js',
 
 	'js/axelor.ng.js',
 	

@@ -50,6 +50,8 @@
 @import url('../lib/bpmn-js/assets/bpmn-font/css/bpmn-embedded.css');
 @import url('../lib/bpmn-js/assets/diagram-js.css');
 
+@import url('../lib/angular/angular-csp.css');
+
 @import url('main.css');
 
 @import url('tabs.css');
