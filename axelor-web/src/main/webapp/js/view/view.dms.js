@@ -1130,12 +1130,11 @@ ui.directive("uiDmsTree", ['$compile', function ($compile) {
 	var template = "" +
 	"<li ng-repeat='node in nodes' ng-class='{empty: !node.nodes.length}' class='dms-tree-folder'>" +
 		"<a x-node='node' ui-dms-tree-node></a>" +
-		"<ul ng-show='parent.open' x-parent='node' x-handler='handler' x-nodes='node.nodes' ui-dms-tree></ul>" +
+		"<ul ng-show='node.open' x-handler='handler' x-nodes='node.nodes' ui-dms-tree></ul>" +
 	"</li>";
 
 	return {
 		scope: {
-			parent: "=",
 			nodes: "=",
 			handler: "="
 		},
@@ -1255,7 +1254,7 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 				var selected = _.first(scope.selection);
 				var record = scope.dataView.getItem(selected);
 
-				var formScope = form.scope();
+				var formScope = form.isolateScope();
 
 				formScope.doRead(record.id).success(function (rec) {
 					formScope.edit(rec);
@@ -1269,7 +1268,7 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 			scope.onSavePermissions = function () {
 
 				var ds = scope._dataSource._new("com.axelor.dms.db.DMSPermission");
-				var formScope = form.scope();
+				var formScope = form.isolateScope();
 
 				if (!formScope.isValid()) {
 					return axelor.notify.error(_t("Invalid permissions"));
@@ -1313,7 +1312,7 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 
 			scope.$on("$destroy", function () {
 				if (form) {
-					form.scope().$destroy();
+					form.isolateScope().$destroy();
 					form = null;
 				}
 			});
