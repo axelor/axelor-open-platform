@@ -103,7 +103,7 @@ String appCss = AppInfo.getAppCSS(getServletContext());
               </li>
               <li class="divider-vertical"></li>
               <li class="dropdown">
-                <a href="#" class="dropdown-toggle nav-link-user" data-toggle="dropdown">
+                <a href="javascript:" class="dropdown-toggle nav-link-user" data-toggle="dropdown">
                   <img ng-src="{{app.userImage}}" width="20px"> <b class="caret"></b>
                 </a>
                 <ul class="dropdown-menu">
@@ -133,10 +133,10 @@ String appCss = AppInfo.getAppCSS(getServletContext());
       <% } else { %>
       <div class="fill-parent" ng-show="routePath[0] == 'main'" ng-include src="'partials/main.html'"></div>
       <% } %>
-      <div ng-switch-when="about" ng-include src="'partials/about.html'"></div>
-      <div ng-switch-when="system" ng-include src="'partials/system.html'"></div>
-      <div ng-switch-when="welcome" ng-include src="'partials/welcome.html'"></div>
-      <div ng-switch-when="preferences" ng-include src="'partials/preferences.html'"></div>
+      <div ng-switch-when="about"><div ng-include src="'partials/about.html'"></div></div>
+      <div ng-switch-when="system"><div ng-include src="'partials/system.html'"></div></div>
+      <div ng-switch-when="welcome"><div ng-include src="'partials/welcome.html'"></div></div>
+      <div ng-switch-when="preferences"><div ng-include src="'partials/preferences.html'"></div></div>
     </section>
 
     <!-- JavaScript at the bottom for fast page loading -->

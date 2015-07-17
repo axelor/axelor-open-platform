@@ -361,7 +361,7 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 
 		if ($location.$$path !== path) {
 			$location.path(path);
-			$location.search(opts.query);
+			$location.search(opts.query || "");
 		}
 	}
 

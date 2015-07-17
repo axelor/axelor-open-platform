@@ -508,7 +508,7 @@
 		
 		$scope.$on('$routeChangeSuccess', function(event, current, prev) {
 	
-			var route = current.$route,
+			var route = current.$$route,
 				path = route && route.action ? route.action.split('.') : null;
 	
 			if (path == null)

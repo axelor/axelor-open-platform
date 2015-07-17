@@ -58,15 +58,10 @@ angular.module('axelor.ui').directive('navTabs', function() {
 			}
 			
 			function hideMenu(e) {
-				if (menu.is(e.target) || menu.has(e.target).size() > 0) {
-					scope.$evalAsync(function () {
+					scope.$timeout(function () {
 						scope.current = null;
 						menu.hide();
-					});
-				} else {
-					scope.current = null;
-					menu.hide();
-				}
+					}, 200);
 				$(document).off('mousedown.nav-tabs-menu');
 			}
 		},
