@@ -1,3 +1,9 @@
+# 3.0.13 (2015-07-17)
+
+## Bug fixes
+
+- fix save action issues in popup editor (regression)
+
 # 3.0.12 (2015-07-07)
 
 ## Bug fixes
