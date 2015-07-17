@@ -19,9 +19,9 @@
 	
 var ui = angular.module('axelor.ui');
 
-this.TreeViewCtrl = TreeViewCtrl;
-this.TreeViewCtrl.$inject = ['$scope', '$element', 'DataSource', 'ActionService'];
+ui.controller('TreeViewCtrl', TreeViewCtrl);
 
+TreeViewCtrl.$inject = ['$scope', '$element', 'DataSource', 'ActionService'];
 function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 
 	var view = $scope._views['tree'];

@@ -19,6 +19,8 @@
 
 var ui = angular.module('axelor.ui');
 
+ui.controller('FormViewCtrl', FormViewCtrl);
+
 this.FormViewCtrl = FormViewCtrl;
 
 FormViewCtrl.$inject = ['$scope', '$element'];

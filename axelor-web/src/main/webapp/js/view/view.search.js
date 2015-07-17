@@ -15,6 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+(function() {
+
+var ui = angular.module('axelor.ui');
+
+ui.controller('SearchViewCtrl', SearchViewCtrl);
+
 SearchViewCtrl.$inject = ['$scope', '$element', '$http', 'DataSource', 'ViewService', 'MenuService'];
 function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuService) {
 	
@@ -245,6 +251,8 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 	};
 }
 
+ui.controller('SearchFormCtrl', SearchFormCtrl);
+
 SearchFormCtrl.$inject = ['$scope', '$element', 'ViewService'];
 function SearchFormCtrl($scope, $element, ViewService) {
 	
@@ -327,6 +335,8 @@ function SearchFormCtrl($scope, $element, ViewService) {
 		});
 	};
 }
+
+ui.controller('SearchGridCtrl', SearchGridCtrl);
 
 SearchGridCtrl.$inject = ['$scope', '$element', 'ViewService', '$interpolate'];
 function SearchGridCtrl($scope, $element, ViewService, $interpolate) {
@@ -458,6 +468,8 @@ function SearchGridCtrl($scope, $element, ViewService, $interpolate) {
 		grid.render();
 	};
 }
+
+ui.controller('SearchToolbarCtrl', SearchToolbarCtrl);
 
 SearchToolbarCtrl.$inject = ['$scope', '$element', '$http'];
 function SearchToolbarCtrl($scope, $element, $http) {
@@ -827,3 +839,4 @@ angular.module('axelor.ui').directive('uiActionSelector', function(){
 	};
 });
 
+}).call(this)

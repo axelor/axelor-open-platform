@@ -15,6 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+(function() {
+
+var ui = angular.module('axelor.ui');
+
+ui.controller('CalendarViewCtrl', CalendarViewCtrl);
+
 CalendarViewCtrl.$inject = ['$scope', '$element'];
 function CalendarViewCtrl($scope, $element) {
 
@@ -672,3 +678,5 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 		'</div>'
 	};
 }]);
+
+}).call(this);
