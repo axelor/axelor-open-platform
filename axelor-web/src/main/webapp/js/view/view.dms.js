@@ -403,8 +403,8 @@ function DMSFileListCtrl($scope, $element) {
 		var record = getSelected() || {};
 		var id = record.relatedId
 		var model = record.relatedModel;
-		if (id && model && $scope.openTabByName) {
-			$scope.openTabByName("form::" + model, {
+		if (id && model) {
+			$scope.$root.openTabByName("form::" + model, {
 				"mode": "edit",
 				"state": id
 			});
@@ -470,7 +470,7 @@ function DMSFileListCtrl($scope, $element) {
 			}
 		};
 
-		$scope.openTab(view);
+		$scope.$root.openTab(view);
 		$scope.waitForActions(function () {
 			var formScope = view.$viewScope;
 			if (formScope) {
@@ -1365,7 +1365,7 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 		scope: {
 			onSelect: "&"
 		},
-		controller: ["$scope", 'DataSource', 'ViewService', function($scope, DataSource, ViewService) {
+		controller: ["$scope", 'DataSource', 'ViewService', 'NavService', function($scope, DataSource, ViewService, NavService) {
 
 			$scope._isPopup = true;
 			$scope._viewParams = {

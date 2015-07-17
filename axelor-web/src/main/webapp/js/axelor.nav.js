@@ -418,7 +418,11 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 		}
 		return false;
 	};
-	
+
+	// expose common methods to $rootScope
+	$scope.$root.openTab = $scope.openTab;
+	$scope.$root.openTabByName = $scope.openTabByName;
+
 	$scope.$watch('selectedTab.viewType', function(viewType){
 		if (viewType) {
 			axelor.$adjustSize();

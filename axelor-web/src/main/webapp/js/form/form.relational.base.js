@@ -151,7 +151,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 				}]
 			};
 				
-			return $scope.openTab(tab);
+			return $scope.$root.openTab(tab);
 		}
 
 		if ($scope.editorCanReload && record && record.id) {
