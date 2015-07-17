@@ -17,7 +17,7 @@
  */
 package com.axelor.meta.schema.actions;
 
-abstract class ActionIndex<T extends ActionIndex<?>> extends Action {
+abstract class ActionResumable<T extends ActionResumable<?>> extends Action {
 
-	protected abstract T copy(int index);
+	protected abstract T resumeAt(int index);
 }

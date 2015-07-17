@@ -162,16 +162,16 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 					});
 				});
 			}
-			close(record);
+			if ($scope.isValid()) {
+				close(record);
+			}
 		});
 	};
 	
 	$scope.onOK = function() {
-		if ($scope.isValid()) {
-			setTimeout(function () {
-				afterActions(onOK);
-			});
-		}
+		$scope.ajaxStop(function () {
+			afterActions(onOK);
+		}, 100);
 	};
 
 	$scope.onBeforeClose = function(event, ui) {
