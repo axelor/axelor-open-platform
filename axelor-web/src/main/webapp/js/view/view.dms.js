@@ -1454,13 +1454,9 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 
 				return promise.then(done, done);
 			};
-		}],
-		link: function (scope, element, attrs) {
 
-			var onSelect = scope.onSelect();
-
-			if (onSelect) {
-				scope.buttons = [{
+			if ($scope.onSelect()) {
+				$scope.buttons = [{
 					text: _t("Select"),
 					'class': 'btn btn-primary',
 					click: function (e) {
@@ -1468,18 +1464,24 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 						var items = _.map(viewScope.selection, function (i) {
 							return viewScope.dataView.getItem(i);
 						});
-						scope.applyLater(function () {
-							var promise = onSelect(items);
-							if (promise && promise.then) {
-								promise.then(function () {
-									element.dialog("close");
-								});
-							} else {
-								element.dialog("close");
-							}
-						});
+						$scope._onSelectFiles(items);
 					}
 				}];
+			}
+		}],
+		link: function (scope, element, attrs) {
+
+			scope._onSelectFiles = function (items) {
+				scope.applyLater(function () {
+					var promise = scope.onSelect()(items);
+					if (promise && promise.then) {
+						promise.then(function () {
+							element.dialog("close");
+						});
+					} else {
+						element.dialog("close");
+					}
+				});
 			}
 
 			setTimeout(function () {
