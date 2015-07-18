@@ -189,8 +189,9 @@
 	height: 28px;
 }
 
-.panel-layout .tag-select {
-	min-height: 28px;
+.panel-layout .tag-select,
+.panel-layout .tag-select > ul {
+	min-height: 26px;
 }
 .panel-layout .tag-select .tag-text,
 .panel-layout .tag-select .tag-link,

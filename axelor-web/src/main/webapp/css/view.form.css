@@ -892,7 +892,7 @@ table.field-details .help-text hr {
 
 .tag-select-placeholder {
 	position: absolute;
-	top: 2px;
+	top: 3px;
 	left: 6px;
 	right: 16px;
 	white-space: nowrap;
