@@ -36,7 +36,7 @@
 	width: 250px;
 	top: 41px;
 	bottom: 0;
-	left: -251px;
+	left: 0;
 	border-right: 1px solid #d3d3d3;
 	background-color: #fff;
 }
@@ -111,12 +111,16 @@
 	margin-right: 5px;
 }
 
-.dms-file-list.has-tree .dms-folder-tree {
-	left: 0;
+.dms-file-list > .slickgrid {
+	left: 250px;
 }
 
-.dms-file-list.has-tree > .slickgrid {
-	left: 250px !important;
+.dms-file-list.has-no-tree .dms-folder-tree {
+	left: -251px;
+}
+
+.dms-file-list.has-no-tree > .slickgrid {
+	left: 0 !important;
 }
 
 .dms-file-list .slick-icon.fa-file-text {
