@@ -19,5 +19,6 @@ angular.module('axelor.ui', [
 	'ngRoute',
 	'ngSanitize',
 	'ngAnimate',
+	'ui.sortable',
 	'axelor.ds'
 ]);

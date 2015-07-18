@@ -93,6 +93,8 @@ load([
 	'lib/angular/angular-sanitize.js',
 	'lib/angular/angular-animate.js',
 
+	'lib/angular-ui/sortable.js',
+
 	'js/axelor.ng.js',
 	
 	'js/lib/utils.js',
