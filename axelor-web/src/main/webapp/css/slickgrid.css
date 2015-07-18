@@ -88,8 +88,13 @@
   	background-color: #abb9d3;
 }
 
-.slick-row .slick-cell.selected.active {
-	background-color: #98aaca;
+.slick-row .slick-cell.selected.active::after {
+	content: " ";
+	display: block;
+	position: absolute;
+	top: 0; right: 0; bottom: 0; left: 0;
+	border: 1px dotted #76849c;
+	z-index: -1;
 }
 
 .slickgrid-editable .slick-row.active .slick-cell-editable:before {
