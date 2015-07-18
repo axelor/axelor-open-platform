@@ -188,54 +188,32 @@ ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $
 			$scope.$broadcast("on:filter", options);
 		}
 	};
-}]);
 
-ui.directive('uiKanban', function () {
+	$scope.sortableOptions = {
+		connectWith: ".kanban-card-list",
+		items: ".kanban-card",
+		tolerance: "pointer",
+		stop: function (event, ui) {
+			var item = ui.item;
+			var sortable = item.sortable;
+			var source = sortable.source.scope();
+			var target = (sortable.droptarget || $(this)).scope();
 
-	return function (scope, element, attrs) {
+			var next = item.next().scope();
+			var prev = item.prev().scope();
+			if (next) next = next.record;
+			if (prev) prev = prev.record;
 
-		function makeSortables() {
-			element.find(".kanban-card-list").sortable({
-				connectWith: ".kanban-card-list",
-				items: ".kanban-card",
-				tolerance: "pointer",
-				stop: function (event, ui) {
-					var item = ui.item;
-					var column = item.parent().scope().column;
-					var next = item.next().scope();
-					var prev = item.prev().scope();
-
-					if (next) next = next.record;
-					if (prev) prev = prev.record;
-
-					var source = $(this).scope();
-					var target = item.parent().scope();
-					var record = item.scope().record;
-
-					if (source === target && item.index() === source.records.indexOf(record)) {
-						return;
-					}
-
-					source.reorder();
-					if (target !== source) {
-						target.reorder();
-					}
-
-					scope.move(record, column.value, next, prev);
-					scope.applyLater();
-				}
-			});
-		}
-
-		var unwatch = scope.$watch("columns", function (cols) {
-			if (cols) {
-				unwatch();
-				unwatch = null;
-				setTimeout(makeSortables);
+			var index = sortable.dropindex;
+			if (source === target && sortable.index === index) {
+				return;
 			}
-		});
+
+			$scope.move(target.records[index], target.column.value, next, prev);
+			$scope.$applyAsync();
+		}
 	};
-});
+}]);
 
 ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 
@@ -245,6 +223,7 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 
 			var ds = scope._dataSource._new(scope._model);
 			var view = scope.schema;
+			var elemMore = element.children(".kanban-more");
 
 			ds._context = _.extend({}, scope._dataSource._context);
 			ds._context[view.columnBy] = scope.column.value;
@@ -260,8 +239,10 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 					offset: 0,
 					sortBy: [view.sequenceBy]
 				}, options);
-				ds.search(opts).success(function (records) {
+				elemMore.hide();
+				return ds.search(opts).success(function (records) {
 					scope.records = scope.records.concat(records);
+					elemMore.fadeIn('slow');
 				});
 			}
 
@@ -273,20 +254,12 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 
 			scope.onMore = function () {
 				var page = ds._page;
-				var next = page.from + page.limit;
+				var next = scope.records.length;
 				if (next < page.total) {
 					return fetch({
 						offset: next
 					});
 				}
-			};
-
-			scope.reorder = function () {
-				var items = [];
-				element.find("li.kanban-card").each(function () {
-					items.push($(this).scope().record);
-				});
-				scope.records = items;
 			};
 
 			var onNew = null;
