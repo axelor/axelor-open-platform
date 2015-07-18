@@ -229,13 +229,21 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 				}
 			});
 
+			scope.collapsed = false;
+			scope.collapsedIcon = "fa-chevron-up";
 			scope.onDashletToggle = function(event) {
-				var e = $(event.target);
-				e.toggleClass('fa-chevron-up fa-chevron-down');
-				element.toggleClass('dashlet-minimized');
-				if (e.hasClass('fa-chevron-up')) {
+				var body = element.children('.dashlet-body');
+				var action = scope.collapsed ? "show" : "hide";
+				scope.collapsed = !scope.collapsed;
+				scope.collapsedIcon = scope.collapsed ? "fa-chevron-down" : "fa-chevron-up";
+				element.removeClass("collapsed");
+				body[action]("blind", 200, function () {
+					element.toggleClass("collapsed", !!scope.collapsed);
+					if (body.css('display') !== 'none' && action === 'hide') {
+						body.hide();
+					}
 					axelor.$adjustSize();
-				}
+				});
 			};
 
 			scope.doNext = function() {
@@ -253,6 +261,7 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 					"<div class='dashlet-title pull-left'>{{title}}</div>" +
 					"<div class='dashlet-buttons pull-right'>" +
 						"<a href='' ng-click='onRefresh()'><i class='fa fa-refresh'></i></a>" +
+						"<a href='' ng-click='onDashletToggle()'><i class='fa' ng-class='collapsedIcon'></i></a>" +
 					"</div>" +
 					"<div class='dashlet-pager pull-right' ng-show='showPager'>" +
 						"<span class='dashlet-pager-text'>{{pagerText()}}</span>" +
