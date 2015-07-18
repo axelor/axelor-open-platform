@@ -197,14 +197,14 @@ ui.directive('uiMailMessage', function () {
 		},
 		template: "" +
 			"<div class='fade'>" +
-				"<a href='' class='pull-left avatar' title='{{message.createdBy.name}}' ng-click='showUser(message.author)'>" +
-					"<img ng-src='{{message.$avatar}}' width='32px'>" +
+				"<a href='' class='pull-left avatar' title='{{::message.createdBy.name}}' ng-click='showUser(message.author)'>" +
+					"<img ng-src='{{::message.$avatar}}' width='32px'>" +
 				"</a>" +
 				"<div class='mail-message'>" +
 					"<span class='arrow left'></span>" +
 					"<div class='mail-message-icons'>" +
-						"<span ng-if='message.$thread'>" +
-							"<i class='fa fa-reply' ng-show='message.$thread' ng-click='onReply(message)'></i> " +
+						"<span ng-if='::message.$thread'>" +
+							"<i class='fa fa-reply' ng-show='::message.$thread' ng-click='onReply(message)'></i> " +
 						"</span>" +
 						"<div class='btn-group'>" +
 							"<a href='javascript:' class='btn btn-link dropdown-toggle' data-toggle='dropdown'>" +
@@ -212,45 +212,45 @@ ui.directive('uiMailMessage', function () {
 							"</a>" +
 							"<ul class='dropdown-menu pull-right'>" +
 								"<li>" +
-									"<a href='javascript:' ng-show='!message.$flags.isRead' ng-click='onFlag(message, 1)' x-translate>Mark as read</a>" +
-									"<a href='javascript:' ng-show='message.$flags.isRead' ng-click='onFlag(message, -1)' x-translate>Mark as unread</a>" +
+									"<a href='javascript:' ng-show='::!message.$flags.isRead' ng-click='onFlag(message, 1)' x-translate>Mark as read</a>" +
+									"<a href='javascript:' ng-show='::message.$flags.isRead' ng-click='onFlag(message, -1)' x-translate>Mark as unread</a>" +
 								"</li>" +
 								"<li>" +
-									"<a href='javascript:' ng-show='!message.$flags.isStarred' ng-click='onFlag(message, 2)' x-translate>Mark as important</a>" +
-									"<a href='javascript:' ng-show='message.$flags.isStarred' ng-click='onFlag(message, -2)' x-translate>Mark as not important</a>" +
+									"<a href='javascript:' ng-show='::!message.$flags.isStarred' ng-click='onFlag(message, 2)' x-translate>Mark as important</a>" +
+									"<a href='javascript:' ng-show='::message.$flags.isStarred' ng-click='onFlag(message, -2)' x-translate>Mark as not important</a>" +
 								"</li>" +
-								"<li ng-if='message.$thread' ng-show='!message.parent'>" +
-									"<a href='javascript:' ng-show='!message.$flags.isArchived' ng-click='onFlag(message, 3)'>Move to archive</a>" +
-									"<a href='javascript:' ng-show='message.$flags.isArchived' ng-click='onFlag(message, -3)'>Move to inbox</a>" +
+								"<li ng-if='message.$thread' ng-show='::!message.parent'>" +
+									"<a href='javascript:' ng-show='::!message.$flags.isArchived' ng-click='onFlag(message, 3)'>Move to archive</a>" +
+									"<a href='javascript:' ng-show='::message.$flags.isArchived' ng-click='onFlag(message, -3)'>Move to inbox</a>" +
 								"</li>" +
 								"<li>" +
-									"<a href='javascript:' ng-show='message.$canDelete' ng-click='onRemove(message)'>Delete</a>" +
+									"<a href='javascript:' ng-show='::message.$canDelete' ng-click='onRemove(message)'>Delete</a>" +
 								"</li>" +
 				            "</ul>" +
 						"</div>" +
 					"</div>" +
-					"<div class='mail-message-header' ng-if='message.$name || body.title'>" +
-						"<span class='subject' ng-if='message.$name'>" +
-							"<a ng-if='message.relatedId' href='#ds/form::{{message.relatedModel}}/edit/{{message.relatedId}}'>{{message.$name}}</a>" +
-							"<span ng-if='!message.relatedId'>{{message.$name}}</span>" +
-							"<span ng-if='message.subject'> : {{message.subject}}</span>" +
+					"<div class='mail-message-header' ng-if='::message.$name || body.title'>" +
+						"<span class='subject' ng-if='::message.$name'>" +
+							"<a ng-if='message.relatedId' href='#ds/form::{{::message.relatedModel}}/edit/{{::message.relatedId}}'>{{::message.$name}}</a>" +
+							"<span ng-if='::!message.relatedId'>{{::message.$name}}</span>" +
+							"<span ng-if='::message.subject'> : {{::message.subject}}</span>" +
 						"</span>" +
-						"<span class='track-message'>{{body.title}}</span>" +
+						"<span class='track-message'>{{::body.title}}</span>" +
 						"<span class='track-tags'>" +
-							"<span class='label' ng-class='item.css' ng-repeat='item in body.tags'>{{item.title}}</span>" +
+							"<span class='label' ng-class='::item.css' ng-repeat='item in ::body.tags'>{{::item.title}}</span>" +
 						"</span>" +
 					"</div>" +
 					"<div class='mail-message-body'>" +
-						"<ul class='track-fields' ng-if='body'>" +
-							"<li ng-repeat='item in body.tracks'>" +
-								"<strong>{{item.title}}</strong> : <span ng-bind-html='item.value'></span>" +
+						"<ul class='track-fields' ng-if='::body'>" +
+							"<li ng-repeat='item in ::body.tracks'>" +
+								"<strong>{{::item.title}}</strong> : <span ng-bind-html='::item.value'></span>" +
 							"</li>" +
 						"</ul>" +
 						"<div ng-if='!body' ui-bind-template x-text='message.body'></div>" +
-						"<div class='mail-message-files' ng-show='message.$files.length'>" +
+						"<div class='mail-message-files' ng-show='::message.$files.length'>" +
 							"<ul class='inline'>" +
-								"<li ng-repeat='file in message.$files'>" +
-									"<i class='fa fa-paperclip'></i> <a href='' ng-click='onDownload(file)'>{{file.fileName}}</a>" +
+								"<li ng-repeat='file in ::message.$files'>" +
+									"<i class='fa fa-paperclip'></i> <a href='' ng-click='onDownload(file)'>{{::file.fileName}}</a>" +
 								"</li>" +
 							"</ul>" +
 						"</div>" +
@@ -259,13 +259,13 @@ ui.directive('uiMailMessage', function () {
 								"<a href='' ng-click='onReplies(message)'>{{formatNumReplies(message)}}</a>" +
 							"</span>" +
 							"<span>" +
-								"<a href='' ng-click='showUser(message.author)'>{{message.author.name}}</a> " +
+								"<a href='' ng-click='showUser(message.author)'>{{::message.author.name}}</a> " +
 								"<span>{{formatEvent(message)}}</span>" +
 							"</span>" +
 						"</div>" +
 					"</div>" +
 				"</div>" +
-				"<div ui-mail-composer ng-if='message.$thread'></div>" +
+				"<div ui-mail-composer ng-if='::message.$thread'></div>" +
 			"</div>"
 	};
 });
@@ -417,13 +417,13 @@ ui.formWidget('uiMailMessages', {
 	}],
 	link: function (scope, element, attrs) {
 
-		var frame = element.find('iframe:first').hide();
-
 		scope.onDownload = function (file) {
+			var frame = $("<iframe>").hide().appendTo(element);
 			var url = "ws/rest/com.axelor.meta.db.MetaFile/" + file.id + "/content/download";
 			frame.attr("src", url);
 			setTimeout(function(){
 				frame.attr("src", "");
+				frame.remove();
 			}, 100);
 		};
 	},
@@ -574,7 +574,6 @@ ui.formWidget('uiMailComposer', {
 	template: "" +
 		"<div class='mail-composer' ng-show='canShow()'>" +
 			"<textarea rows='1' ng-model='post' ui-textarea-auto-size class='span12' placeholder='Write your comment here'></textarea>" +
-			"<iframe class='hidden'></iframe>" +
 			"<div class='mail-composer-files' ng-show='files.length'>" +
 				"<ul>" +
 				"<li ng-repeat='file in files'>" +

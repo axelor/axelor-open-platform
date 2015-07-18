@@ -128,6 +128,9 @@
 .mail-thread .mail-message-icons .btn {
 	padding: 0;
 	margin-top: -4px;
+	outline: none !important;
+	border: 0 !important;
+	box-shadow: none !important;
 }
 
 .mail-thread .mail-message-icons .btn i {
