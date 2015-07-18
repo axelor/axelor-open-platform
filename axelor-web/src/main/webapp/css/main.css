@@ -706,21 +706,6 @@ img.prefix-icon {
 	background-image: inherit;
 }
 
-.nvtooltip {
-	font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-	font-size: inherit;
-	padding: 0;
-	opacity: 0.94 !important;
-	border-radius: 4px;
-	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-}
-
-.nvtooltip h3 {
-	font-size: 13px;
-	font-weight: 600;
-	background: none !important;
-}
-
 .about-page {
 	position: absolute;
 	top: 0; left: 0; bottom: 0; right: 0;

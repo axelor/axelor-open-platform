@@ -19,14 +19,6 @@
 
 "use strict";
 
-nv.dev = false;
-
-// i18n
-_.extend(nv.messages, {
-	'Grouped': _t('Grouped'),
-	'Stacked': _t('Stacked')
-});
-
 var ui = angular.module('axelor.ui');
 
 this.ChartCtrl = ChartCtrl;
@@ -591,6 +583,7 @@ function Chart(scope, element, data) {
 		}
 		if(chart.controlLabels) {
 			chart.controlLabels({
+				grouped: _t('Grouped'),
 				stacked: _t('Stacked'),
 				stream: _t('Stream'),
 				expanded: _t('Expanded'),

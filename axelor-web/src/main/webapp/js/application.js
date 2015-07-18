@@ -77,7 +77,7 @@ load([
 
 	'lib/bpmn-js/bpmn-modeler.js',
 
-	'lib/d3/d3.v3.js',
+	'lib/d3/d3.js',
 	'lib/d3/nv/nv.d3.js',
 	'lib/d3/radar/radar-chart.js',
 	'lib/d3/gauge/gauge-chart.js',
