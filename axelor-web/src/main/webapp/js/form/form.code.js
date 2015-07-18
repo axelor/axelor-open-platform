@@ -19,30 +19,6 @@
 
 var ui = angular.module('axelor.ui');
 
-var SpaceIndentKeys = {
-	Tab: function (cm) {
-		var sel = cm.doc.sel;
-		if (sel.from.line !== sel.to.line) {
-			return CodeMirror.Pass;
-		}
-		var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
-		cm.replaceSelection(spaces, "end", "+input");
-	},
-	Backspace: function (cm) {
-		var cur = cm.getCursor(),
-			num = cm.getOption("indentUnit"),
-			line = cm.getLine(cur.line),
-			space = line.substring(cur.ch - num, cur.ch);
-		
-		if (space.length > 0 && space.trim() === "") {
-			cm.setSelection({line: cur.line, ch: cur.ch - num}, cur);
-			cm.replaceSelection("");
-			return true;
-		}
-		return CodeMirror.Pass;
-	}
-};
-
 ui.formInput('CodeEditor', {
 
 	css: "code-editor",
@@ -71,8 +47,7 @@ ui.formInput('CodeEditor', {
 				autoCloseTags : true,
 				tabSize : 2,
 				indentUnit : 2,
-				indentWithTabs: false,
-				extraKeys : SpaceIndentKeys
+				indentWithTabs: false
 			});
 		}
 
