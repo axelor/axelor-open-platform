@@ -67,9 +67,10 @@ function DashboardCtrl($scope, $element) {
 		var items = angular.copy(schema.items || []);
 		var row = [];
 
-		items.forEach(function (item) {
+		items.forEach(function (item, i) {
 			var span = item.colSpan || 6;
 
+			item.$index = i;
 			item.spanCss = {};
 			item.spanCss['dashlet-cs' + span] = true;
 
@@ -81,62 +82,44 @@ function DashboardCtrl($scope, $element) {
 	};
 }
 
-ui.directive('uiViewDashboard', ['$compile', 'ViewService', function($compile, ViewService) {
+ui.directive('uiViewDashboard', ['ViewService', function(ViewService) {
 
 	return {
-		scope: true,
 		controller: DashboardCtrl,
 		link: function(scope, element, attrs) {
 
-			function save() {
-				var schema = scope.schema;
-				var items = [];
+			scope.sortableOptions = {
+				handle: ".dashlet-header",
+				cancel: ".dashlet-buttons",
+				items: ".dashlet",
+				tolerance: "pointer",
+				activate: function(e, ui) {
+					var height = ui.helper.height();
+					ui.placeholder.height(height);
+				},
+				deactivate: function(event, ui) {
+					axelor.$adjustSize();
+				},
+				stop: function (event, ui) {
+					var schema = scope.schema;
+					var items = _.map(scope.row, function (item) {
+						return schema.items[item.$index];
+					});
 
-				element.find('.dashlet').each(function (i) {
-					var j = $(this).data('index');
-					$(this).data("index", i);
-					items.push(schema.items[j]);
-				});
-
-				if (angular.equals(schema.items, items)) {
-					return;
-				}
-
-				schema.items = items;
-				return ViewService.save(schema);
-			}
-
-			function makeSortable() {
-				element.sortable({
-					handle: ".dashlet-header",
-					cancel: ".dashlet-buttons",
-					items: ".dashlet",
-					tolerance: "pointer",
-					activate: function(e, ui) {
-						var height = ui.helper.height();
-						ui.placeholder.height(height);
-					},
-					deactivate: function(event, ui) {
-						axelor.$adjustSize();
-					},
-					stop: function (event, ui) {
-						save();
+					if (angular.equals(schema.items, items)) {
+						return;
 					}
-				});
-			}
 
-			var unwatch = scope.$watch("row.length", function (length) {
-				if (!length) { return; }
-				unwatch();
-				unwatch = null;
-				scope.waitForActions(makeSortable);
-			});
+					schema.items = items;
+					return ViewService.save(schema);
+				}
+			};
 		},
 		replace: true,
 		transclude: true,
 		template:
-		"<div>" +
-			"<div class='dashlet' ng-class='dashlet.spanCss' ng-repeat='dashlet in row' data-index='{{$index}}' ui-view-dashlet></div>" +
+		"<div ui-sortable='sortableOptions' ng-model='row'>" +
+			"<div class='dashlet' ng-class='dashlet.spanCss' ng-repeat='dashlet in row' ui-view-dashlet></div>" +
 		"</div>"
 	};
 }]);
