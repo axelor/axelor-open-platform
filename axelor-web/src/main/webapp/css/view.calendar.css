@@ -57,19 +57,14 @@
 	padding: 10px 4px 0;
 }
 
-.calendar-view .fc-view-month .calendar-event-day {
-	background-color: transparent !important;
-	border-color: transparent !important;
-}
-
-.calendar-view .fc-view-month .calendar-event-day * {
+.calendar-view .fc-month-view .calendar-event-day * {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
-.calendar-view .fc-agenda .calendar-event-day {
-	color: #fff !important;
+.calendar-view .fc-event .fc-bg {
+	opacity: .1;
 }
 
 .calendar-bubble-content {
@@ -81,5 +76,5 @@
 }
 
 .calendar-view .fc-widget-header {
-	background-color: #f5f5f5;
+	font-weight: 600;
 }

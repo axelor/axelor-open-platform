@@ -239,9 +239,14 @@ header .navbar .nav-link-user-sub {
 	font-size: 13px;
 }
 
+.ui-datepicker th {
+	font-weight: 600;
+}
+
 .ui-datepicker-header {
 	background: none;
 	border: none;
+	font-weight: 600;
 }
 
 .ui-datepicker .ui-state-default {
@@ -518,9 +523,11 @@ header .navbar .nav-link-user-sub {
 	font-size: 13px;
 }
 
-.record-pager > button {
+.record-pager > button,
+.record-pager > .btn {
 	margin-left: 4px;
 	margin-right: 4px;
+	margin-top: 6px;
 }
 
 .record-pager.pull-right > span,
