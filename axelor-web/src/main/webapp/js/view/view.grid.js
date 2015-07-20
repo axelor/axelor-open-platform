@@ -494,11 +494,11 @@ function GridViewCtrl($scope, $element) {
 		}
 
 		var dataView = $scope.dataView,
-			selected = _.map($scope.selection, function(index) {
+			selected = _.map($scope.selection || [], function(index) {
 				return dataView.getItem(index);
 			});
 		return {
-			'_ids': _.pluck(selected, "id")
+			'_ids': _.pluck(selected || [], "id")
 		};
 	};
 	

@@ -117,9 +117,9 @@ function DMSFileListCtrl($scope, $element) {
 		return base;
 	};
 
-	$scope.addRelatedValues = function (record) {
+	$scope.addRelatedValues = function (record, baseFolder) {
 		// apply details about related object
-		var base = $scope.currentFolder;
+		var base = baseFolder || $scope.currentFolder;
 		if (!base || !base.relatedModel) {
 			base = $scope.getCurrentHome();
 		}
@@ -367,7 +367,7 @@ function DMSFileListCtrl($scope, $element) {
 			} else {
 				item.parent = null;
 			}
-			$scope.addRelatedValues(item);
+			$scope.addRelatedValues(item, toFolder);
 		});
 
 		$scope._dataSource.saveAll(files)

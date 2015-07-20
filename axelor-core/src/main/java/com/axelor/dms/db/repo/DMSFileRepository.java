@@ -91,6 +91,18 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 
 		// if new attachment, save attachment reference
 		if (isAttachment) {
+			// remove old attachment if file is moved
+			MetaAttachment attachmentOld = attachments.all()
+					.filter("self.metaFile.id = ? AND self.objectId != ? AND self.objectName != ?",
+							entity.getMetaFile().getId(),
+							related.getId(),
+							related.getClass().getName())
+					.fetchOne();
+			if (attachmentOld != null) {
+				System.err.println("OLD: " + attachmentOld);
+				attachments.remove(attachmentOld);
+			}
+
 			MetaAttachment attachment = attachments.all()
 					.filter("self.metaFile.id = ? AND self.objectId = ? AND self.objectName = ?",
 							entity.getMetaFile().getId(),
