@@ -189,7 +189,7 @@ function CalendarViewCtrl($scope, $element) {
 		info.start = value ? moment(value).toDate() : new Date();
 
 		value = record[view.stop];
-		info.end = value ? moment(value).toDate() : moment(info.start).add("hours", view.length || 1).toDate();
+		info.end = value ? moment(value).toDate() : moment(info.start).add(view.length || 1, "hours").toDate();
 
 		var diff = moment(info.end).diff(info.start, "minutes");
 		var title = this.fields[view.title];

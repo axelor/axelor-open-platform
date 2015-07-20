@@ -75,12 +75,20 @@ $.timepicker.setDefaults(regional);
 $.datepicker.setDefaults(regional);
 
 // configure moment.js
-moment.lang('en', {
+moment.locale('en', {
 	months: regional.monthNames,
 	monthsShort: regional.monthNamesShort,
 	weekdays: regional.dayNames,
 	weekdaysShort: regional.dayNamesShort,
 	weekdaysMin: regional.dayNamesMin,
+	calendar : {
+        sameDay : _t('[Today at] LT'),
+        nextDay : _t('[Tomorrow at] LT'),
+        nextWeek : _t('dddd [at] LT'),
+        lastDay : _t('[Yesterday at] LT'),
+        lastWeek : _t('[Last] dddd [at] LT'),
+        sameElse : _t('L')
+    },
 	relativeTime : {
         future : _t("in %s"),
         past : _t("%s ago"),
