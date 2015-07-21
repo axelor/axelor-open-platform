@@ -598,6 +598,13 @@ ui.formWidget('uiMailFollowers', {
 		var ds = $scope._dataSource;
 		var userSelector = null;
 
+		$scope.editorCanSave = false;
+		$scope._viewParams = {
+			model: 'com.axelor.auth.db.User',
+			viewType: 'form',
+			views: [{type: 'form', type: 'grid'}]
+		};
+
 		$scope.following = false;
 		$scope.followers = [];
 
