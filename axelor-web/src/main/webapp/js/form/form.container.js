@@ -764,10 +764,12 @@ ui.formWidget('PanelTab', {
 		});
 
 		scope.$watch("attr('hidden')", function(hidden, old) {
-			if (hidden) {
-				return scope.hideTab(index);
-			}
-			return scope.showTab(index);
+			scope.$evalAsync(function () {
+				if (hidden) {
+					return scope.hideTab(index);
+				}
+				return scope.showTab(index);
+			});
 		});
 	}
 });
