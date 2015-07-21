@@ -195,8 +195,35 @@
 	}]);
 	
 	module.config(['$httpProvider', function(provider) {
+
+		function isFile(obj) {
+			return toString.call(obj) === '[object File]';
+		}
+
+		function isFormData(obj) {
+			return toString.call(obj) === '[object FormData]';
+		}
+
+		function isBlob(obj) {
+			return toString.call(obj) === '[object Blob]';
+		}
+
+		// restore old behavior
+		// breaking change (https://github.com/angular/angular.js/commit/c054288c9722875e3595e6e6162193e0fb67a251)
+		function jsonReplacer(key, value) {
+			if (typeof key === 'string' && key.charAt(0) === '$') {
+				return undefined;
+			}
+			return value;
+		}
+
+		function transformRequest(d) {
+			return angular.isObject(d) && !isFile(d) && !isBlob(d) && !isFormData(d) ? JSON.stringify(d, jsonReplacer) : d;
+	    }
+
 		provider.interceptors.push('httpIndicator');
 		provider.defaults.transformRequest.push(onHttpStart);
+		provider.defaults.transformRequest.unshift(transformRequest);
 		provider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
 		provider.useApplyAsync(true);
 	}]);
