@@ -417,7 +417,7 @@
 				errorWindow = $('#errorWindow')
 				.attr('title', _t('Error'))
 				.dialog({
-					dialogClass: 'ui-dialog-responsive',
+					dialogClass: 'ui-dialog-error ui-dialog-responsive',
 					draggable: true,
 					resizable: false,
 					closeOnEscape: true,
@@ -432,9 +432,20 @@
 						text: _t("Show Details"),
 						'class': 'btn',
 						click: function(){
+							var elem = $(this);
 							$scope.onErrorWindowShow('stacktrace');
-							$scope.applyLater();
-							axelor.$adjustSize();
+							$scope.$apply(function () {
+								setTimeout(function () {
+									var maxHeight = $(document).height() - 132;
+									var height = maxHeight;
+									if (height > elem[0].scrollHeight) {
+										height = elem[0].scrollHeight + 8;
+									}
+									elem.height(height);
+									elem.dialog('option', 'position', 'center');
+									elem.dialog('widget').height(elem.dialog('widget').height());
+								}, 100);
+							});
 						}
 					}, {
 						text: _t("Close"),
@@ -446,7 +457,10 @@
 				});
 			}
 			
-			return errorWindow.dialog(hide ? 'close' : 'open').height('auto');
+			return errorWindow
+				.dialog(hide ? 'close' : 'open')
+				.dialog('widget').css('top', 6)
+				.height('auto');
 		}
 
 		function showNotification(options) {
