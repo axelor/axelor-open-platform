@@ -405,7 +405,7 @@ ui.formWidget('Panel', {
 
 		element.addClass(field.serverType);
 		if (field.sidebar && !attrs.itemSpan) {
-			attrs.$set('itemSpan', 12);
+			attrs.$set('itemSpan', 12, true, 'x-item-span');
 		}
 
 		scope.menus = null;

@@ -256,11 +256,14 @@ function PanelLayout(items, attrs, $scope, $compile) {
 
 ui.directive('uiPanelLayout', ['$compile', function($compile) {
 
-	return function(scope, element, attrs) {
-		var elem = element.children('[ui-transclude]:first');
-		var items = elem.children();
-		var layout = PanelLayout(items, attrs, scope, $compile);
-		elem.append(layout);
+	return {
+		priority: 1000,
+		link: function(scope, element, attrs) {
+			var elem = element.children('[ui-transclude]:first');
+			var items = elem.children();
+			var layout = PanelLayout(items, attrs, scope, $compile);
+			elem.append(layout);
+		}
 	};
 
 }]);
