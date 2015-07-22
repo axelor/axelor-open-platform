@@ -72,9 +72,12 @@ def libs = [
 						 "io.undertow:undertow-servlet:1.2.9.Final"],
 
 	// jackson
-	jackson_libs:		["com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.3.1",
-						 "com.fasterxml.jackson.datatype:jackson-datatype-joda:2.3.1",
-						 "com.fasterxml.jackson.datatype:jackson-datatype-guava:2.3.1"],
+	jackson_libs:		["com.fasterxml.jackson.core:jackson-core:2.5.4",
+						 "com.fasterxml.jackson.core:jackson-databind:2.5.4",
+						 "com.fasterxml.jackson.core:jackson-annotations:2.5.4",
+						 "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.5.4",
+						 "com.fasterxml.jackson.datatype:jackson-datatype-joda:2.5.4",
+						 "com.fasterxml.jackson.datatype:jackson-datatype-guava:2.5.4"],
 
 	// Apache Shiro
 	apache_shiro:		["org.apache.shiro:shiro-core:1.2.2",
