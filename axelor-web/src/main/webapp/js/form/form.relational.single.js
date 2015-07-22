@@ -83,7 +83,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 			}).success(function(rec){
 				var record = { 'id' : value.id };
 				record[nameField] = rec[nameField];
-				record = _.extend({}, related, record);
+				record = _.extend({}, related, rec);
 				$scope.setValue(record, true);
 			});
 		}
