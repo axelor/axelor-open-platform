@@ -19,6 +19,7 @@ package com.axelor.web;
 
 import java.util.Properties;
 
+import com.axelor.app.AppModule;
 import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
 import com.axelor.rpc.ObjectMapperProvider;
@@ -36,5 +37,6 @@ public class TestModule extends AbstractModule {
 
 		install(new JpaModule("testUnit", true, false).scan("com.axelor.web.db").properties(properties));
 		install(new AuthModule.Simple().properties(properties));
+		install(new AppModule());
 	}
 }

@@ -17,6 +17,16 @@
  */
 package com.axelor.web;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+
+import org.jboss.resteasy.core.Dispatcher;
+import org.jboss.resteasy.plugins.guice.ModuleProcessor;
+import org.jboss.resteasy.plugins.server.servlet.ListenerBootstrap;
+import org.jboss.resteasy.spi.Registry;
+import org.jboss.resteasy.spi.ResteasyDeployment;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
@@ -26,6 +36,46 @@ import com.google.inject.servlet.GuiceServletContextListener;
  *
  */
 public class AppContextListener extends GuiceServletContextListener {
+
+	private ResteasyDeployment deployment;
+
+	@Override
+	public void contextInitialized(ServletContextEvent servletContextEvent) {
+		super.contextInitialized(servletContextEvent);
+
+		final ServletContext context = servletContextEvent.getServletContext();
+		final ListenerBootstrap config = new ListenerBootstrap(context);
+
+		deployment = config.createDeployment();
+		deployment.start();
+
+		context.setAttribute(ResteasyProviderFactory.class.getName(),
+				deployment.getProviderFactory());
+		context.setAttribute(Dispatcher.class.getName(),
+				deployment.getDispatcher());
+		context.setAttribute(Registry.class.getName(),
+				deployment.getRegistry());
+
+		final Registry registry = (Registry) context.getAttribute(Registry.class.getName());
+		final ResteasyProviderFactory providerFactory = (ResteasyProviderFactory) context.getAttribute(ResteasyProviderFactory.class.getName());
+		final ModuleProcessor processor = new ModuleProcessor(registry, providerFactory);
+		final Injector injector = (Injector) context.getAttribute(Injector.class.getName());
+
+		processor.processInjector(injector);
+
+		// load parent injectors
+		Injector parent = injector.getParent();
+		while (parent != null) {
+			parent = injector.getParent();
+			processor.processInjector(parent);
+		}
+	}
+
+	@Override
+	public void contextDestroyed(ServletContextEvent servletContextEvent) {
+		deployment.stop();
+		super.contextDestroyed(servletContextEvent);
+	}
 
 	@Override
 	protected final Injector getInjector() {

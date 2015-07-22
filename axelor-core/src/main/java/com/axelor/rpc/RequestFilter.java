@@ -18,16 +18,14 @@
 package com.axelor.rpc;
 
 import java.io.IOException;
-import java.io.OutputStream;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.ext.Provider;
+import javax.ws.rs.ext.WriterInterceptor;
+import javax.ws.rs.ext.WriterInterceptorContext;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ContainerResponseWriter;
 
 /**
  * Keep track of current {@link Request} object.
@@ -37,8 +35,8 @@ import com.sun.jersey.spi.container.ContainerResponseWriter;
  * available and cleared when the web service finishes writing response.
  * </p>
  */
-public class RequestFilter implements MethodInterceptor,
-		ContainerRequestFilter, ContainerResponseFilter {
+@Provider
+public class RequestFilter implements MethodInterceptor, WriterInterceptor {
 
 	private Request getRequest(MethodInvocation invocation) {
 		final Object[] args = invocation.getArguments();
@@ -62,29 +60,12 @@ public class RequestFilter implements MethodInterceptor,
 	}
 
 	@Override
-	public ContainerRequest filter(ContainerRequest request) {
-		Request.CURRENT.remove();
-		return request;
-	}
-
-	@Override
-	public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-
-		final ContainerResponseWriter crw = response .getContainerResponseWriter();
-		response.setContainerResponseWriter(new ContainerResponseWriter() {
-
-			@Override
-			public OutputStream writeStatusAndHeaders(long contentLength,
-					ContainerResponse response) throws IOException {
-				return crw.writeStatusAndHeaders(contentLength, response);
-			}
-
-			@Override
-			public void finish() throws IOException {
-				Request.CURRENT.remove();
-			}
-		});
-
-		return response;
+	public void aroundWriteTo(WriterInterceptorContext context)
+			throws IOException, WebApplicationException {
+		try {
+			context.proceed();
+		} finally {
+			Request.CURRENT.remove();
+		}
 	}
 }

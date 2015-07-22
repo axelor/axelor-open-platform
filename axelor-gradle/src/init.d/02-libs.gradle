@@ -59,11 +59,17 @@ def libs = [
 	subetha_smtp:		"org.subethamail:subethasmtp:3.1.7",
 
 	// jax-rs
-	jersey_server:		["com.sun.jersey:jersey-server:1.12",
-						 "com.sun.jersey.contribs:jersey-multipart:1.12"],
-	jersey_guice:		"com.sun.jersey.contribs:jersey-guice:1.12",
-	jersey_client:		"com.sun.jersey:jersey-client:1.12",
-	jersey_test:		"com.sun.jersey.jersey-test-framework:jersey-test-framework-grizzly2:1.12",
+	resteasy:			["org.jboss.resteasy:resteasy-jaxrs:3.0.11.Final",
+						 "org.jboss.resteasy:resteasy-jackson2-provider:3.0.11.Final",
+						 "org.jboss.resteasy:resteasy-servlet-initializer:3.0.11.Final"],
+
+	resteasy_multipart: "org.jboss.resteasy:resteasy-multipart-provider:3.0.11.Final",
+
+	resteasy_guice:		"org.jboss.resteasy:resteasy-guice:3.0.11.Final",
+	resteasy_client:	"org.jboss.resteasy:resteasy-client:3.0.11.Final",
+	resteasy_server:	["org.jboss.resteasy:resteasy-undertow:3.0.11.Final",
+						 "io.undertow:undertow-core:1.2.9.Final",
+						 "io.undertow:undertow-servlet:1.2.9.Final"],
 
 	// jackson
 	jackson_libs:		["com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.3.1",

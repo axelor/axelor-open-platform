@@ -47,9 +47,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 import javax.xml.bind.DatatypeConverter;
+
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
@@ -89,9 +93,6 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.common.primitives.Longs;
 import com.google.inject.servlet.RequestScoped;
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.multipart.FormDataBodyPart;
-import com.sun.jersey.multipart.FormDataParam;
 
 @RequestScoped
 @Consumes(MediaType.APPLICATION_JSON)
@@ -277,25 +278,37 @@ public class RestService extends ResourceService {
 		out.close();
 	}
 
+	private String getFileName(MultivaluedMap<String, String> headers) {
+        final String[] parts = headers.getFirst("Content-Disposition").split(";");
+        for (String filename : parts) {
+            if ((filename.trim().startsWith("filename"))) {
+                String[] name = filename.split("=");
+                return name[1].trim();
+            }
+        }
+        return null;
+    }
+
 	@POST
 	@Path("upload")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	public Response upload(
-			@FormDataParam("request") FormDataBodyPart requestText,
-			@FormDataParam("field") String field,
-			@FormDataParam("file") InputStream fileStream,
-			@FormDataParam("file") FormDataContentDisposition fileDetails) throws IOException {
+	public Response upload(final MultipartFormDataInput input) throws IOException {
 
-		requestText.setMediaType(MediaType.APPLICATION_JSON_TYPE);
+		final Map<String, List<InputPart>> formData = input.getFormDataMap();
+		final InputPart filePart = formData.get("file").get(0);
+		final InputPart requestPart = formData.get("request").get(0);
+		final InputPart fieldPart = formData.get("field").get(0);
 
+		final boolean isAttachment = MetaFile.class.getName().equals(getModel());
+		final String field = fieldPart.getBodyAsString();
+		final String fileName = getFileName(filePart.getHeaders());
+		final InputStream fileStream = filePart.getBody(InputStream.class, null);
+		final Request request = requestPart.getBody(Request.class, null);
 
-		boolean isAttachment = MetaFile.class.getName().equals(getModel());
-
-		Request request = requestText.getEntityAs(Request.class);
 		request.setModel(getModel());
 
-		Map<String, Object> data = request.getData();
+		final Map<String, Object> data = request.getData();
 
 		if (!isAttachment) {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -303,7 +316,7 @@ public class RestService extends ResourceService {
 			data.put(field, out.toByteArray());
 		}
 
-		String filePath = fileDetails.getFileName();
+		String filePath = fileName;
 		if (isAttachment) {
 			int maxCounter = 1000;
 			long counter = 0;
@@ -311,7 +324,7 @@ public class RestService extends ResourceService {
 				if (counter++ > maxCounter) {
 					counter = System.currentTimeMillis();
 				}
-				filePath = fileDetails.getFileName();
+				filePath = fileName;
 				filePath = Files.getNameWithoutExtension(filePath) + " (" + counter + ")." + Files.getFileExtension(filePath);
 				if (counter > maxCounter) {
 					break;
@@ -340,7 +353,7 @@ public class RestService extends ResourceService {
 	public javax.ws.rs.core.Response download(
 			@PathParam("id") Long id,
 			@PathParam("field") String field,
-			@QueryParam("image") Boolean isImage) throws IOException {
+			@QueryParam("image") boolean isImage) throws IOException {
 
 		boolean isAttachment = MetaFile.class.getName().equals(getModel());
 
@@ -369,7 +382,7 @@ public class RestService extends ResourceService {
 		String fileName = getModel() + "_" + field;
 		Object data = mapper.get(bean, field);
 
-		if (isImage == Boolean.TRUE) {
+		if (isImage) {
 			String base64 = BLANK_IMAGE;
 			if (data instanceof byte[]) {
 				base64 = new String((byte[]) data);
@@ -496,7 +509,7 @@ public class RestService extends ResourceService {
 	public Response messages(
 			@QueryParam("folder") String folder,
 			@QueryParam("parent") Long parentId,
-			@QueryParam("count") Boolean count,
+			@QueryParam("count") boolean count,
 			@QueryParam("limit") @DefaultValue("10") Integer limit,
 			@QueryParam("offset") @DefaultValue("0") Integer offset,
 			@QueryParam("relatedId") Long relatedId,
@@ -534,7 +547,7 @@ public class RestService extends ResourceService {
 			return res;
 		}
 
-		if (count == Boolean.TRUE) {
+		if (count) {
 			ctrl.unread(req, res);
 			return res;
 		}

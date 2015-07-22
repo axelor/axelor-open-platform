@@ -17,45 +17,36 @@
  */
 package com.axelor.web;
 
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import com.axelor.test.GuiceModules;
-import com.axelor.test.GuiceWebTest;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.representation.Form;
+import com.axelor.test.WebServer;
 
-@GuiceModules(WebTestModule.class)
-public abstract class AbstractTest extends GuiceWebTest {
-	
+public abstract class AbstractTest {
+
+	private static WebServer server;
+
 	@BeforeClass
 	public static void setUp() {
-		startServer();
+		if (server == null) {
+			server = WebServer.create(new WebTestModule());
+		}
+		server.start();
 	}
-	
+
 	@AfterClass
 	public static void tearDown(){
-		stopServer();
+		if (server != null) {
+			server.stop();
+		}
 	}
 	
-	protected WebResource.Builder jsonPath(String path, String... params) {
-		
-		MultivaluedMap<String, String> form = new Form();
-		
-		for(int i=0; i < params.length; i += 2) {
-			String param = params[i], value = "";
-			try {
-				value = params[i+1];
-			} catch (IndexOutOfBoundsException e){}
-			form.add(param, value);
-		}
-
-		return resource().path(path).queryParams(form)
-				.accept(MediaType.APPLICATION_JSON)
-				.type(MediaType.APPLICATION_JSON);
+	protected Invocation.Builder jsonPath(String path) {
+		return server.target().path(path)
+				.request(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON);
 	}
-
 }

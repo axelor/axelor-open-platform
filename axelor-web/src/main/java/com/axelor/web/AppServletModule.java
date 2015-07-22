@@ -18,10 +18,9 @@
 package com.axelor.web;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.ext.Provider;
 
 import org.apache.shiro.guice.web.GuiceShiroFilter;
 import org.slf4j.Logger;
@@ -44,21 +43,12 @@ import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.persist.PersistFilter;
 import com.google.inject.servlet.ServletModule;
-import com.sun.jersey.api.container.filter.GZIPContentEncodingFilter;
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.guice.JerseyServletModule;
-import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
 /**
  * The main application module.
  *
- * It configures JPA and Jersy, registers a custom jackson context resolver,
- * binds essential web services and configures {@link GuiceContainer} to server
- * the web services on <i>/ws/*</i>.
- *
  */
-public class AppServletModule extends JerseyServletModule {
+public class AppServletModule extends ServletModule {
 
 	private static final String DEFAULT_PERSISTANCE_UNIT = "persistenceUnit";
 
@@ -139,26 +129,17 @@ public class AppServletModule extends JerseyServletModule {
 		for (Class<?> type : Reflections
 				.findTypes()
 				.within("com.axelor.web")
+				.within("com.axelor.rpc")
 				.having(Path.class)
-				.find()) {
+				.having(Provider.class)
+				.any().find()) {
 			bind(type);
 		}
 
 		// register the session listener
 		getServletContext().addListener(new AppSessionListener(settings));
 
-		Map<String, String> params = new HashMap<String, String>();
-
-		params.put(ResourceConfig.FEATURE_REDIRECT, "true");
-		params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.axelor;");
-
-		// enable some filters
-		String filters = RequestFilter.class.getName() + "," + GZIPContentEncodingFilter.class.getName();
-
-		params.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, filters);
-		params.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, filters);
-
+		// register initialization servlet
 		serve("_init").with(InitServlet.class);
-		serve("/ws/*").with(GuiceContainer.class, params);
 	}
 }

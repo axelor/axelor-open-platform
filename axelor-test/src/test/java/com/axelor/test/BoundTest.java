@@ -24,34 +24,30 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.RequestScoped;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 
-@GuiceModules(BoundTest.Module.class)
-public class BoundTest extends GuiceWebTest {
+public class BoundTest {
 
-	static class Module extends AbstractModule {
+	static class MyModule extends AbstractModule {
 
 		@Override
 		protected void configure() {
 			bind(BoundPerRequestResource.class);
 			bind(BoundNoScopeResource.class);
 			bind(BoundSingletonResource.class);
-			
-			bind(ClientConfig.class).to(DefaultClientConfig.class);
 		}
 	}
-	
-	@Path("bound/perrequest")
+
+	@Path("/bound/perrequest")
     @RequestScoped
     public static class BoundPerRequestResource {
 
@@ -62,14 +58,14 @@ public class BoundTest extends GuiceWebTest {
         @GET
         @Produces("text/plain")
         public String getIt() {
-            assertEquals("bound/perrequest", ui.getPath());
+            assertEquals("/bound/perrequest", ui.getPath());
             assertEquals("x", x);
             
             return "OK";
         }
     }
 	
-	@Path("bound/noscope")
+	@Path("/bound/noscope")
     public static class BoundNoScopeResource {
 
         @Context UriInfo ui;
@@ -79,14 +75,14 @@ public class BoundTest extends GuiceWebTest {
         @GET
         @Produces("text/plain")
         public String getIt() {
-            assertEquals("bound/noscope", ui.getPath());
+            assertEquals("/bound/noscope", ui.getPath());
             assertEquals("x", x);
 
             return "OK";
         }
     }
 
-    @Path("bound/singleton")
+    @Path("/bound/singleton")
     @Singleton
     public static class BoundSingletonResource {
 
@@ -95,7 +91,7 @@ public class BoundTest extends GuiceWebTest {
         @GET
         @Produces("text/plain")
         public String getIt() {
-            assertEquals("bound/singleton", ui.getPath());
+            assertEquals("/bound/singleton", ui.getPath());
             String x = ui.getQueryParameters().getFirst("x");
             assertEquals("x", x);
 
@@ -103,29 +99,36 @@ public class BoundTest extends GuiceWebTest {
         }
     }
     
+    private static WebServer server = WebServer.create(new MyModule());
+
     @BeforeClass
     public static void beforeClass() {
-    	GuiceWebTest.startServer();
+    	server.start();
+    }
+
+    @AfterClass
+    public static void afterClass() {
+    	server.stop();
     }
 
     @Test
 	public void testBoundPerRequestScope() {
-		WebResource r = resource().path("/bound/perrequest").queryParam("x", "x");
-        String s = r.get(String.class);
+		WebTarget r = server.target().path("/bound/perrequest").queryParam("x", "x");
+        String s = r.request().get(String.class);
         assertEquals(s, "OK");
 	}
 	
 	@Test
 	public void testBoundNoScopeResource() {
-        WebResource r = resource().path("/bound/noscope").queryParam("x", "x");
-        String s = r.get(String.class);
+		WebTarget r = server.target().path("/bound/noscope").queryParam("x", "x");
+        String s = r.request().get(String.class);
         assertEquals(s, "OK");
     }
 
 	@Test
     public void testBoundSingletonResourcee() {
-        WebResource r = resource().path("/bound/singleton").queryParam("x", "x");
-        String s = r.get(String.class);
+        WebTarget r =server.target().path("/bound/singleton").queryParam("x", "x");
+        String s = r.request().get(String.class);
         assertEquals(s, "OK");
     }
 }

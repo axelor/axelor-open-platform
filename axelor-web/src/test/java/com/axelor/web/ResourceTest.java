@@ -24,29 +24,31 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+
 import org.junit.Test;
 
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.google.common.collect.ImmutableMap;
-import com.sun.jersey.api.client.WebResource;
 
 public class ResourceTest extends AbstractTest {
 
 	protected String model = "com.axelor.web.db.Contact";
 
-	protected WebResource.Builder crud(String action, String... params) {
-		String path = "ws/rest/" + model;
+	protected Invocation.Builder crud(String action) {
+		String path = "/rest/" + model;
 		if (action != null) {
 			path = path + "/" + action;
 		}
-		return jsonPath(path, params);
+		return jsonPath(path);
 	}
 
 	@Test
 	public void testFields() {
 
-		Response response = jsonPath("ws/meta/fields/" + model).get(Response.class);
+		Response response = jsonPath("/meta/fields/" + model).get(Response.class);
 
 		assertNotNull(response);
 		assertNotNull(response.getData());
@@ -62,7 +64,7 @@ public class ResourceTest extends AbstractTest {
 		Request request = new Request();
 		request.setData(ImmutableMap.of("firstName", (Object) "John", "lastName", "Teen"));
 
-		Response response = crud("search").post(Response.class, request);
+		Response response = crud("search").post(Entity.json(request), Response.class);
 
 		assertNotNull(response);
 		assertNotNull(response.getData());

@@ -9,9 +9,13 @@ module {
 
 dependencies {
 	compile libs.javax_servlet
-	compile libs.jersey_server
-	compile libs.jersey_guice
+	compile libs.resteasy
+	compile libs.resteasy_guice
 	compile libs.jackson_libs
+
+	compile(libs.resteasy_multipart) {
+		exclude module: "resteasy-jaxb-provider"
+	}
 }
 
 jar {

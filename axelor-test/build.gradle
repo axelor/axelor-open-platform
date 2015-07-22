@@ -14,9 +14,10 @@ dependencies {
 	compile libs.hibernate
 
 	compile libs.javax_el
-	
-	compile libs.jersey_server
-	compile libs.jersey_client
-	compile libs.jersey_guice
-	compile libs.jersey_test
+	compile libs.javax_servlet
+
+	compile libs.resteasy
+	compile libs.resteasy_guice
+	compile libs.resteasy_client
+	compile libs.resteasy_server
 }
