@@ -500,11 +500,10 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 				record[schema.taskProgress] = item.progress; 
 			}
 			if(schema.taskSequence){ 
-				record[schema.taskProgress] = item.order; 
+				record[schema.taskSequence] = item.order; 
 			}
-			
+
 			if(schema.taskParent && item.parent && !record[schema.taskParent]){
-				record[schema.taskProgress] = item["progress"];
 				var parentTask = gantt.getTask(item.parent);
 				var parentRecord = parentTask.record;
 				if(parentRecord){
@@ -538,7 +537,7 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 				dict["sortorder"] = rec[schema.taskSequence];
 			}
 			
-			if(schema.progres){
+			if(schema.taskProgress){
 				dict["progress"] = rec[schema.taskProgress];
 			}
 
@@ -608,7 +607,8 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 			if(schema.taskSequence){
 				task["sortorder"] = res[schema.taskSequence];
 			}
-			if(schema.progres){
+
+			if(schema.taskProgress){
 				task["progress"] = res[schema.taskProgress];
 			}
 
@@ -656,7 +656,7 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 				editor.data('$target', element);
 			}
 
-			var popup = editor.data('$scope');
+			var popup = editor.isolateScope();
 			popup.setEditable(true);
 			popup.show(record, function(result) {
 				task.isNew = isNew;
