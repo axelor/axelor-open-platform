@@ -97,6 +97,9 @@ gantt.locale = {
 	}
 };
 
+var ui = angular.module('axelor.ui');
+ui.controller('GanttViewCtrl', GanttViewCtrl);
+
 GanttViewCtrl.$inject = ['$scope', '$element'];
 
 function GanttViewCtrl($scope, $element) {
