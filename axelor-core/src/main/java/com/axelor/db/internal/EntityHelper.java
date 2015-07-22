@@ -25,8 +25,8 @@ import com.axelor.db.annotations.HashKey;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
-import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.collect.Lists;
 
 /**
@@ -58,7 +58,7 @@ public final class EntityHelper {
 			return null;
 		}
 		final Mapper mapper = Mapper.of(entity.getClass());
-		final ToStringHelper helper = Objects.toStringHelper(entity);
+		final MoreObjects.ToStringHelper helper = MoreObjects.toStringHelper(entity);
 
 		helper.add("id", entity.getId());
 		for (Property field : mapper.getProperties()) {

@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 public class ParserResult {
@@ -70,7 +71,7 @@ public class ParserResult {
 	
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this)
+		return MoreObjects.toStringHelper(this)
 				.add("method", method)
 				.add("instance", instance)
 				.add("arguments", arguments != null ? Joiner.on(", ").join(arguments) : "[]")

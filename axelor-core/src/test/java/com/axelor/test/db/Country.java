@@ -26,8 +26,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.axelor.db.Model;
-import com.google.common.base.Objects;
-import com.google.common.base.Objects.ToStringHelper;
+import com.google.common.base.MoreObjects;
 
 @Entity
 @Table(name = "CONTACT_COUNTRY")
@@ -78,12 +77,10 @@ public class Country extends Model {
 	
 	@Override
 	public String toString() {
-		ToStringHelper tsh = Objects.toStringHelper(getClass());
-		
-		tsh.add("id", getId());
-		tsh.add("code", code);
-		tsh.add("name", name);
-		
-		return tsh.omitNullValues().toString();
+		return MoreObjects.toStringHelper(getClass())
+				.add("id", getId())
+				.add("code", code)
+				.add("name", name)
+				.omitNullValues().toString();
 	}
 }

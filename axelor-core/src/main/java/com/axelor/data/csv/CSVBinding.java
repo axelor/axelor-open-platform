@@ -28,8 +28,7 @@ import org.codehaus.groovy.runtime.InvokerHelper;
 import com.axelor.data.DataScriptHelper;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
-import com.google.common.base.Objects.ToStringHelper;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
@@ -238,14 +237,11 @@ public class CSVBinding {
 
 	@Override
 	public String toString() {
-
-		ToStringHelper ts = Objects.toStringHelper(this);
-
-		if (column != null) ts.add("column", column);
-		if (field != null) ts.add("field", field);
-		if (type != null) ts.add("type", type);
-		if (bindings != null) ts.add("bindings", bindings).toString();
-
-		return ts.toString();
+		return MoreObjects.toStringHelper(this)
+			.add("column", column)
+			.add("field", field)
+			.add("type", type)
+			.add("bindings", bindings)
+			.omitNullValues().toString();
 	}
 }

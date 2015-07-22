@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.meta.ActionHandler;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 
 @XmlType(name = "AbstractAction")
@@ -84,7 +84,7 @@ public abstract class Action {
 	
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(getClass()).add("name", getName()).toString();
+		return MoreObjects.toStringHelper(getClass()).add("name", getName()).toString();
 	}
 	
 	static boolean test(ActionHandler handler, String expression) {

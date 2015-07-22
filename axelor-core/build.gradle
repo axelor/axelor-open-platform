@@ -15,6 +15,7 @@ dependencies {
 	compile	libs.guice
 	compile libs.guice_servlet
 	compile libs.guice_persist
+	compile libs.guice_multibindings
 	
 	compile libs.jdbc_hsqldb
 	compile libs.jdbc_postgres

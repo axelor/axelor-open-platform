@@ -310,6 +310,7 @@ class Entity {
 		def code = ["if (obj == null) return false;"]
 
 		importType("com.google.common.base.Objects")
+		importType("com.google.common.base.MoreObjects")
 
 		if (groovy) {
 			code += "if (this.is(obj)) return true;"
@@ -348,11 +349,10 @@ class Entity {
 		if (hasExtends) {
 			return "return EntityHelper.toString(this);"
 		}
-		importType("com.google.common.base.Objects.ToStringHelper")
 
 		def code = []
 
-		code += "ToStringHelper tsh = Objects.toStringHelper(this);\n"
+		code += "MoreObjects.ToStringHelper tsh = MoreObjects.toStringHelper(this);\n"
 		code += "tsh.add(\"id\", this.getId());"
 		int count = 0
 		for(Property p : properties) {

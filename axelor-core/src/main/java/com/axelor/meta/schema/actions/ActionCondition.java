@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlType;
 import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
@@ -122,7 +122,7 @@ public class ActionCondition extends Action {
 
 		@Override
 		public String toString() {
-			return Objects.toStringHelper(getClass())
+			return MoreObjects.toStringHelper(getClass())
 					.add("field", field)
 					.add("error", getError())
 					.add("condition", getCondition())

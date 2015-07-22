@@ -43,7 +43,7 @@ import com.axelor.text.GroovyTemplates;
 import com.axelor.text.StringTemplates;
 import com.axelor.text.Templates;
 import com.google.common.base.Charsets;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.io.Files;
 
 @XmlType
@@ -190,7 +190,7 @@ public class ActionExport extends Action {
 
 		@Override
 		public String toString() {
-			return Objects.toStringHelper(getClass())
+			return MoreObjects.toStringHelper(getClass())
 					.add("name", getName())
 					.add("template", template)
 					.toString();

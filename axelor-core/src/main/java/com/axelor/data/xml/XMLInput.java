@@ -20,7 +20,7 @@ package com.axelor.data.xml;
 import java.util.List;
 
 import com.axelor.data.adapter.DataAdapter;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -67,7 +67,7 @@ public class XMLInput {
 	
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this)
+		return MoreObjects.toStringHelper(this)
 				.add("file", fileName)
 				.add("bindings", bindings).toString();
 	}

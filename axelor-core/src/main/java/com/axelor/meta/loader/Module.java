@@ -20,6 +20,7 @@ package com.axelor.meta.loader;
 import java.net.URL;
 import java.util.List;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -138,7 +139,7 @@ final class Module {
 	
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this)
+		return MoreObjects.toStringHelper(this)
 				.add("name", name)
 				.add("version", version)
 				.toString();
