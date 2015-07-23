@@ -50,7 +50,8 @@ def libs = [
 	eclipselink_moxy:	"org.eclipse.persistence:org.eclipse.persistence.moxy:2.5.2",
 
 	// groovy
-	groovy:				"org.codehaus.groovy:groovy-all:2.2.1:indy",
+	groovy:				"org.codehaus.groovy:groovy-all:2.4.4:indy",
+	groovy_wslite:		"com.github.groovy-wslite:groovy-wslite:1.1.2",
 
 	// javax
 	javax_servlet:		"javax.servlet:javax.servlet-api:3.0.1",
