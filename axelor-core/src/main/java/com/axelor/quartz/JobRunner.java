@@ -175,7 +175,7 @@ public class JobRunner {
 	public void stop() {
 		log.info("Stoping scheduler...");
 		try {
-			scheduler.shutdown();
+			scheduler.shutdown(true);
 		} catch (SchedulerException e) {
 			log.error("Unable to stop the scheduler...");
 			log.trace("Scheduler error: {}", e.getMessage(), e);
