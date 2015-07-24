@@ -33,7 +33,7 @@ String loginPassword = I18n.get("Password");
 int year = Calendar.getInstance().get(Calendar.YEAR);
 String copyright = String.format("&copy; 2005 - %s Axelor. All Rights Reserved.", year);
 
-String loginHeader = "login-header.jsp";
+String loginHeader = "/login-header.jsp";
 if (pageContext.getServletContext().getResource(loginHeader) == null) {
   loginHeader = null;
 }
