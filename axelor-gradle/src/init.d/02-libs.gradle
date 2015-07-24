@@ -31,17 +31,17 @@ def libs = [
 	axelor_el:		"com.axelor:axelor-el:8.0.24",
 
 	// jdbc
-	jdbc_hsqldb:		"org.hsqldb:hsqldb:2.3.2",
-	jdbc_postgres:		"org.postgresql:postgresql:9.3-1101-jdbc41",
+	jdbc_hsqldb:		"org.hsqldb:hsqldb:2.3.3",
+	jdbc_postgres:		"org.postgresql:postgresql:9.4-1201-jdbc41",
 
 	// hibernate/jpa
-	hibernate:			["org.hibernate:hibernate-core:4.2.8.Final",
-						 "org.hibernate:hibernate-entitymanager:4.2.8.Final",
-						 "org.hibernate:hibernate-c3p0:4.2.8.Final",
-						 "org.hibernate:hibernate-validator:5.0.2.Final"],
+	hibernate:			["org.hibernate:hibernate-core:4.2.19.Final",
+						 "org.hibernate:hibernate-entitymanager:4.2.19.Final",
+						 "org.hibernate:hibernate-c3p0:4.2.19.Final",
+						 "org.hibernate:hibernate-validator:5.2.0.Final"],
 	// ehcache
-	hibernate_ehcache: 	"org.hibernate:hibernate-ehcache:4.2.8.Final",
-	ehcache:		   	"net.sf.ehcache:ehcache:2.8.1",
+	hibernate_ehcache: 	"org.hibernate:hibernate-ehcache:4.2.19.Final",
+	ehcache_core:		"net.sf.ehcache:ehcache-core:2.6.11",
 
 	// flyway
 	flywaydb:			"org.flywaydb:flyway-core:3.2.1",

@@ -19,14 +19,13 @@ package com.axelor.web;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-
-import net.sf.ehcache.util.concurrent.ConcurrentHashMap;
 
 import com.axelor.app.AppSettings;
 

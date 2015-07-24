@@ -26,7 +26,7 @@ dependencies {
 	compile(libs.hibernate_ehcache) {
 		exclude group: "net.sf.ehcache"
 	}
-	compile libs.ehcache
+	compile libs.ehcache_core
 	compile libs.flywaydb
 
 	compile libs.resteasy
