@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlType;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
-@JsonTypeName("gant")
+@JsonTypeName("gantt")
 public class GanttView extends AbstractView {
 
 	@XmlAttribute
