@@ -21,8 +21,10 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -49,6 +51,8 @@ import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
@@ -62,7 +66,9 @@ public class XMLViews {
 
 	private static final String LOCAL_SCHEMA = "object-views.xsd";
 	private static final String REMOTE_SCHEMA = "object-views_" + ObjectViews.VERSION + ".xsd";
-	
+
+	private static final Set<String> VIEW_TYPES = new HashSet<>();
+
 	private static final String INDENT_STRING = "  ";
 	private static final String[] INDENT_PROPERTIES = {
 		"eclipselink.indent-string",
@@ -105,6 +111,15 @@ public class XMLViews {
 
 		unmarshaller.setSchema(schema);
 		marshaller.setSchema(schema);
+
+		// find supported views
+		JsonSubTypes types = AbstractView.class.getAnnotation(JsonSubTypes.class);
+		for (JsonSubTypes.Type type : types.value()) {
+			JsonTypeName name = type.value().getAnnotation(JsonTypeName.class);
+			if (name != null) {
+				VIEW_TYPES.add(name.value());
+			}
+		}
 	}
 
 	public static ObjectViews unmarshal(InputStream stream) throws JAXBException {
@@ -123,6 +138,10 @@ public class XMLViews {
 		synchronized (marshaller) {
 			marshaller.marshal(views, writer);
 		}
+	}
+
+	public static boolean isViewType(String type) {
+		return VIEW_TYPES.contains(type);
 	}
 	
 	private static String prepareXML(String xml) {

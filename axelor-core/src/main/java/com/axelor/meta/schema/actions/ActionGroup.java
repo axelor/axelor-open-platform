@@ -108,7 +108,7 @@ public class ActionGroup extends ActionResumable<ActionGroup> {
 
 		if (actionName.contains(":")) {
 			final String[] parts = name.split("\\:", 3);
-			if (parts[0].matches("grid|form|tree|portal|kanban|cards|calendar|gantt|chart|search|html")) {
+			if (XMLViews.isViewType(parts[0])) {
 				ActionView actionView = new ActionView();
 				ActionView.View view = new ActionView.View();
 				AbstractView xml = XMLViews.findView(null, parts[1], parts[0]);
