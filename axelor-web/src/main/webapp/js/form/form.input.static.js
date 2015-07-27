@@ -441,6 +441,31 @@ ui.formItem('Button', {
 	'</a>'
 });
 
+ui.formItem('InfoButton', 'Button', {
+	link: function (scope, element, attrs) {
+		this._super.apply(this, arguments);
+		var field = scope.field || {};
+		scope.title = field.title;
+		scope.$watch('attr("title")', function(title, old) {
+			if (!title || title === old) return;
+			scope.title = title;
+		});
+		Object.defineProperty(scope, 'value', {
+			get: function () {
+				return scope.record ? scope.record[field.name] : "";
+			}
+		});
+	},
+	replace: true,
+	template:
+		"<div class='btn info-button'>" +
+			"<div class='info-button-data'>" +
+				"<span class='info-button-value'>{{value}}</span>" +
+				"<small class='info-button-title'>{{title}}</small>" +
+			"</div>" +
+		"</div>"
+});
+
 ui.formItem('ToolButton', 'Button', {
 
 	getViewDef: function(element) {

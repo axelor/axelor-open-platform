@@ -44,7 +44,10 @@ public class Button extends SimpleWidget {
 
 	@XmlAttribute
 	private String onClick;
-	
+
+	@XmlAttribute
+	private String widget;
+
 	@JsonGetter("title")
 	public String getLocalizedTitle() {
 		String title = getTitle();
@@ -86,5 +89,13 @@ public class Button extends SimpleWidget {
 
 	public void setOnClick(String onClick) {
 		this.onClick = onClick;
+	}
+
+	public String getWidget() {
+		return widget;
+	}
+
+	public void setWidget(String widget) {
+		this.widget = widget;
 	}
 }
