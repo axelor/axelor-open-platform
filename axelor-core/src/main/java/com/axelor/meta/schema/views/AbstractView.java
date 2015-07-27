@@ -70,6 +70,9 @@ public abstract class AbstractView {
 	private String title;
 
 	@XmlAttribute
+	private String css;
+
+	@XmlAttribute
 	private String model;
 
 	@XmlAttribute
@@ -119,6 +122,14 @@ public abstract class AbstractView {
 	@JsonSetter
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public String getCss() {
+		return css;
+	}
+
+	public void setCss(String css) {
+		this.css = css;
 	}
 
 	public String getModel() {

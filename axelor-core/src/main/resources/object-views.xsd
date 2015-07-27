@@ -293,6 +293,11 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="css" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify additional css class names</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="width">
       <xsd:annotation>
         <xsd:documentation>
@@ -1203,7 +1208,6 @@
             </xsd:choice>
           <xsd:element name="panel-mail" type="tns:PanelMail" minOccurs="0" />
         </xsd:sequence>
-        <xsd:attribute name="css" type="xsd:string"/>
         <xsd:attribute name="cols" type="xsd:int">
           <xsd:annotation>
             <xsd:documentation>Number of initial column for the form.</xsd:documentation>
@@ -1617,11 +1621,6 @@
 
             orderBy="name,-age"
             </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="css" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>Specify custom css class names.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>

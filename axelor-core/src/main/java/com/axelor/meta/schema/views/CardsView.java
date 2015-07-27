@@ -37,9 +37,6 @@ public class CardsView extends AbstractView {
 	@XmlAttribute
 	private String orderBy;
 
-	@XmlAttribute
-	private String css;
-
 	@XmlElement(name = "field", type = Field.class)
 	private List<AbstractWidget> items;
 
@@ -64,14 +61,6 @@ public class CardsView extends AbstractView {
 
 	public void setOrderBy(String orderBy) {
 		this.orderBy = orderBy;
-	}
-
-	public String getCss() {
-		return css;
-	}
-
-	public void setCss(String css) {
-		this.css = css;
 	}
 
 	public List<AbstractWidget> getItems() {
