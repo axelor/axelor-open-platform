@@ -343,7 +343,7 @@ public class ViewService extends AbstractService {
 
 	@GET
 	@Path("chart/{name}")
-	public Response get(@PathParam("name") String name) {
+	public Response chart(@PathParam("name") String name) {
 		final MultivaluedMap<String, String> params = getUriInfo().getQueryParameters(true);
 		final Map<String, Object> context = Maps.newHashMap();
 		final Request request = new Request();
@@ -363,7 +363,13 @@ public class ViewService extends AbstractService {
 
 	@POST
 	@Path("chart/{name}")
-	public Response get(@PathParam("name") String name, Request request) {
+	public Response chart(@PathParam("name") String name, Request request) {
 		return service.getChart(name, request);
+	}
+
+	@POST
+	@Path("custom/{name}")
+	public Response dataset(@PathParam("name") String name, Request request) {
+		return service.getDataSet(name, request);
 	}
 }

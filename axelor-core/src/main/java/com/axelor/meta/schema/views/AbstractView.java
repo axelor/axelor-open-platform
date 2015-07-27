@@ -53,6 +53,7 @@ import com.google.common.base.Strings;
 	@Type(GanttView.class),
 	@Type(CardsView.class),
 	@Type(KanbanView.class),
+	@Type(CustomView.class),
 	@Type(Dashboard.class),
 	@Type(Search.class),
 	@Type(SearchFilters.class)

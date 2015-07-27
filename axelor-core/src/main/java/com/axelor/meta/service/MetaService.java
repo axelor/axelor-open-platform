@@ -65,6 +65,8 @@ import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.ChartView;
 import com.axelor.meta.schema.views.ChartView.ChartConfig;
 import com.axelor.meta.schema.views.ChartView.ChartSeries;
+import com.axelor.meta.schema.views.CustomView;
+import com.axelor.meta.schema.views.DataSet;
 import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.schema.views.Search;
 import com.axelor.rpc.ActionRequest;
@@ -593,7 +595,7 @@ public class MetaService {
 		
 		if (hasDataSet || !hasOnInit) {
 			
-			final String string = chart.getDataset().getText();
+			final String string = chart.getDataSet().getText();
 			final Map<String, Object> context = Maps.newHashMap();
 			if (request.getData() != null) {
 				context.putAll(request.getData());
@@ -604,7 +606,7 @@ public class MetaService {
 				context.put("__userCode__", AuthUtils.getSubject());
 			}
 
-			if ("rpc".equals(chart.getDataset().getType())) {
+			if ("rpc".equals(chart.getDataSet().getType())) {
 				ActionHandler handler = Beans.get(ActionHandler.class);
 				ActionRequest req = new ActionRequest();
 				ActionResponse res = new ActionResponse();
@@ -623,7 +625,7 @@ public class MetaService {
 				data.put("dataset", res.getData());
 
 			} else {
-				Query query = "sql".equals(chart.getDataset().getType()) ?
+				Query query = "sql".equals(chart.getDataSet().getType()) ?
 						JPA.em().createNativeQuery(string) :
 						JPA.em().createQuery(string);
 
@@ -673,6 +675,82 @@ public class MetaService {
 		data.put("config", config);
 		data.put("search", chart.getSearchFields());
 		data.put("onInit", chart.getOnInit());
+
+		return response;
+	}
+
+	public Response getDataSet(final String viewName, final Request request) {
+
+		final Response response = new Response();
+		final MetaView metaView = views.findByName(viewName);
+
+		if (metaView == null) {
+			return response;
+		}
+
+		CustomView report = (CustomView) XMLViews.findView(null, viewName, "report");
+		if (report == null) {
+			return response;
+		}
+
+		final DataSet dataSet = report.getDataSet();
+		final Map<String, Object> data = new HashMap<>();
+
+		response.setData(data);
+		response.setStatus(Response.STATUS_SUCCESS);
+
+		final Map<String, Object> context = new HashMap<>();
+		if (request.getData() != null) {
+			context.putAll(request.getData());
+		}
+		if (AuthUtils.getUser() != null) {
+			context.put("__user__", AuthUtils.getUser());
+			context.put("__userId__", AuthUtils.getUser().getId());
+			context.put("__userCode__", AuthUtils.getSubject());
+		}
+
+		if ("rpc".equals(dataSet.getType())) {
+			ActionHandler handler = Beans.get(ActionHandler.class);
+			ActionRequest req = new ActionRequest();
+			ActionResponse res = new ActionResponse();
+
+			req.setModel(request.getModel());
+			req.setData(request.getData());
+			req.setAction(dataSet.getText());
+
+			if (req.getModel() == null) {
+				req.setModel(ScriptBindings.class.getName());
+			}
+
+			handler = handler.forRequest(req);
+			res = handler.execute();
+
+			data.put("dataset", res.getData());
+		} else {
+			Query query = "sql".equals(report.getDataSet().getType()) ?
+					JPA.em().createNativeQuery(dataSet.getText()) :
+					JPA.em().createQuery(dataSet.getText());
+
+			if (request.getLimit() > 0) {
+				query.setMaxResults(request.getLimit());
+			}
+			if (request.getOffset() > 0) {
+				query.setFirstResult(request.getOffset());
+			}
+			if (dataSet.getLimit() != null && dataSet.getLimit() > 0) {
+				query.setMaxResults(dataSet.getLimit());
+			}
+
+			// return result as list of map
+			((org.hibernate.ejb.QueryImpl<?>) query).getHibernateQuery()
+				.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+
+			if (request.getData() != null) {
+				QueryBinder.of(query).bind(context);
+			}
+
+			data.put("dataset", query.getResultList());
+		}
 
 		return response;
 	}

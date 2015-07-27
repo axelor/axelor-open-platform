@@ -308,3 +308,10 @@
 .form-item-container.bg-danger textarea:first-of-type {
 	background-color: #f2dede !important;
 }
+
+.font-bold {
+  font-weight: 600;
+}
+.font-noraml {
+  font-weight: 400;
+}

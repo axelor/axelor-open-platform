@@ -42,6 +42,7 @@ import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.CalendarView;
 import com.axelor.meta.schema.views.CardsView;
 import com.axelor.meta.schema.views.ChartView;
+import com.axelor.meta.schema.views.CustomView;
 import com.axelor.meta.schema.views.Dashboard;
 import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.GanttView;
@@ -81,6 +82,7 @@ public class ObjectViews {
 		@XmlElement(name = "gantt", type = GanttView.class),
 		@XmlElement(name = "cards", type = CardsView.class),
 		@XmlElement(name = "kanban", type = KanbanView.class),
+		@XmlElement(name = "custom", type = CustomView.class),
 		@XmlElement(name = "search-filters", type = SearchFilters.class),
 	})
 	private List<AbstractView> views;

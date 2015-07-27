@@ -8,12 +8,13 @@
     <option value="form">Form</option>
     <option value="tree">Tree</option>
     <option value="chart">Chart</option>
-    <option value="search">Search</option>
     <option value="dashboard">Dashboard</option>
     <option value="calendar">Calendar</option>
     <option value="gantt">Gantt</option>
     <option value="cards">Cards</option>
     <option value="kanban">Kanban</option>
+    <option value="custom">Custom</option>
+    <option value="search">Search</option>
     <option value="search-filters">Filters</option>
   </selection>
 

@@ -15,6 +15,7 @@
         <xsd:element name="kanban" type="tns:KanbanView" />
         <xsd:element name="chart" type="tns:ChartView" />
         <xsd:element name="dashboard" type="tns:Dashboard" />
+        <xsd:element name="custom" type="tns:CustomView" />
         <xsd:element name="search" type="tns:Search" />
         <xsd:element name="search-filters" type="tns:SearchFilters" />
         <xsd:element name="menuitem" type="tns:MenuItem" />
@@ -1671,6 +1672,56 @@
     </xsd:complexContent>
   </xsd:complexType>
 
+  <xsd:complexType name="DataSet">
+    <xsd:annotation>
+      <xsd:documentation>Specify JPQL or SQL (with aliased select) or a
+        method call to return statistics data.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="type" use="required">
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:enumeration value="jpql" />
+              <xsd:enumeration value="sql" />
+              <xsd:enumeration value="rpc" />
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="limit" type="xsd:int">
+          <xsd:annotation>
+            <xsd:documentation>Specify query result limit</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="CustomView">
+    <xsd:complexContent>
+      <xsd:extension base="tns:SimpleView">
+        <xsd:sequence>
+          <xsd:element name="field" type="tns:Field" minOccurs="0" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>Define a dataset field</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="dataset" type="tns:DataSet">
+            <xsd:annotation>
+              <xsd:documentation>Define the dataset of the report</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="template" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Define the template to render the data</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
   <xsd:complexType name="ChartView">
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleView">
@@ -1682,30 +1733,7 @@
               </xsd:sequence>
             </xsd:complexType>
           </xsd:element>
-          <xsd:element name="dataset">
-            <xsd:annotation>
-              <xsd:documentation>
-                Specify the chart dataset using JPQL, SQL or a method call.
-                The query select names should be have aliases.
-                The controller method should provide list of records or maps.
-              </xsd:documentation>
-            </xsd:annotation>
-            <xsd:complexType>
-              <xsd:simpleContent>
-                <xsd:extension base="xsd:string">
-                  <xsd:attribute name="type" use="required">
-                    <xsd:simpleType>
-                      <xsd:restriction base="xsd:string">
-                        <xsd:enumeration value="jpql" />
-                        <xsd:enumeration value="sql" />
-                        <xsd:enumeration value="rpc" />
-                      </xsd:restriction>
-                    </xsd:simpleType>
-                  </xsd:attribute>
-                </xsd:extension>
-              </xsd:simpleContent>
-            </xsd:complexType>
-          </xsd:element>
+          <xsd:element name="dataset" type="tns:DataSet"/>
           <xsd:element name="category">
             <xsd:complexType>
               <xsd:attribute name="key" type="xsd:string" use="required" />

@@ -325,3 +325,34 @@
 .chart-controls .span6:last-child {
 	margin-right: 0 !important;
 }
+
+.report-box {
+	position: relative;
+}
+
+.report-box .dashlet-buttons {
+	display: none;
+}
+
+.report-box .dashlet-body {
+	height: 60px;
+	padding: 15px 20px 20px 20px;
+	overflow: hidden;
+}
+
+.report-box .dashlet-body h1 {
+	margin: 0;
+	font-size: 30px;
+	font-weight: 100;
+}
+
+.report-box .report-tags {
+	position: absolute;
+    top: 12px;
+    right: 10px;
+}
+
+.report-table tfoot td {
+	border-top: 1px solid #ccc;
+	font-weight: 600;
+}

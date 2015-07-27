@@ -158,6 +158,7 @@ load([
 	'js/view/view.calendar.js',
 	'js/view/view.gantt.js',
 	'js/view/view.kanban.js',
+	'js/view/view.custom.js',
 	'js/view/view.dms.js'
 	//-- js-end
 ]);

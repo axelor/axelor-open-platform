@@ -23,9 +23,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
-
-import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 
 import com.axelor.i18n.I18n;
 import com.axelor.meta.schema.views.Search.SearchField;
@@ -47,8 +44,9 @@ public class ChartView extends AbstractView {
 	@XmlElementWrapper(name = "search-fields")
 	private List<SearchField> searchFields;
 
+	@JsonIgnore
 	@XmlElement(name = "dataset")
-	private ChartDataset dataset;
+	private DataSet dataSet;
 
 	@XmlElement
 	private ChartCategory category;
@@ -71,8 +69,8 @@ public class ChartView extends AbstractView {
 		return searchFields;
 	}
 
-	public ChartDataset getDataset() {
-		return dataset;
+	public DataSet getDataSet() {
+		return dataSet;
 	}
 
 	public ChartCategory getCategory() {
@@ -85,25 +83,6 @@ public class ChartView extends AbstractView {
 
 	public List<ChartConfig> getConfig() {
 		return config;
-	}
-
-	@XmlType
-	public static class ChartDataset {
-
-		@XmlAttribute
-		private String type;
-
-		@XmlValue
-		@XmlCDATA
-		private String text;
-
-		public String getType() {
-			return type;
-		}
-
-		public String getText() {
-			return text;
-		}
 	}
 
 	@XmlType
