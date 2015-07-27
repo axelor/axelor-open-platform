@@ -45,8 +45,8 @@ class Index {
 			}
 			Property property = entity.getField(field)
 
-			fields += field
-			columns += Index.getColumn(property, column)
+			fields.add(field)
+			columns.add(Index.getColumn(property, column))
 		}
 	}
 

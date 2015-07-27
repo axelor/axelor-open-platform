@@ -48,10 +48,16 @@ public class Utils {
 	}
 
 	public static String firstUpper(String string) {
+		if (string.length() > 1 && Character.isUpperCase(string.charAt(1))) {
+			return string;
+		}
 		return string.substring(0, 1).toUpperCase() + string.substring(1);
 	}
 
 	public static String firstLower(String string) {
+		if (string.length() > 1 && Character.isUpperCase(string.charAt(1))) {
+			return string;
+		}
 		return string.substring(0, 1).toLowerCase() + string.substring(1);
 	}
 }

@@ -133,6 +133,10 @@
   
   <entity name="HelloWorld" extends="Hello" strategy="CLASS" hashAll="true">
     <string name="tags"/>
+    <string name="hrCode" />
+    <string name="hRCode" />
+    <string name="URL" />
+    <finder-method name="findBy" using="hrCode,hRCode,URL"/>
   </entity>
 
 </domain-models>
