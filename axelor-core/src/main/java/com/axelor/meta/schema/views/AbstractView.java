@@ -54,7 +54,6 @@ import com.google.common.base.Strings;
 	@Type(CardsView.class),
 	@Type(KanbanView.class),
 	@Type(Dashboard.class),
-	@Type(Portal.class),
 	@Type(Search.class),
 	@Type(SearchFilters.class)
 })

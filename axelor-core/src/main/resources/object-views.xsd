@@ -14,7 +14,6 @@
         <xsd:element name="cards" type="tns:CardsView" />
         <xsd:element name="kanban" type="tns:KanbanView" />
         <xsd:element name="chart" type="tns:ChartView" />
-        <xsd:element name="portal" type="tns:Portal" />
         <xsd:element name="dashboard" type="tns:Dashboard" />
         <xsd:element name="search" type="tns:Search" />
         <xsd:element name="search-filters" type="tns:SearchFilters" />
@@ -1657,26 +1656,6 @@
     </xsd:complexContent>
   </xsd:complexType>
 
-  <xsd:complexType name="AbstractPortal" abstract="true">
-    <xsd:complexContent>
-      <xsd:extension base="tns:AbstractView">
-        <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="portlet" type="tns:Portlet" />
-          <xsd:element name="tabs" type="tns:PortalTabs" />
-        </xsd:choice>
-        <xsd:attribute name="cols" type="xsd:integer" />
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-
-  <xsd:complexType name="Portal">
-    <xsd:complexContent>
-      <xsd:extension base="tns:AbstractPortal">
-        <xsd:attribute name="name" type="xsd:string" use="required" />
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-
   <xsd:complexType name="Portlet">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractContainer">
@@ -1688,24 +1667,6 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-  
-  <xsd:complexType name="PortalTabs">
-    <xsd:complexContent>
-      <xsd:extension base="tns:AbstractContainer">
-        <xsd:sequence>
-          <xsd:element name="tab" maxOccurs="4">
-            <xsd:complexType>
-              <xsd:complexContent>
-                <xsd:extension base="tns:AbstractPortal">
-                  <xsd:attribute name="width" use="prohibited"/>
-                </xsd:extension>
-              </xsd:complexContent>
-            </xsd:complexType>
-          </xsd:element>
-        </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

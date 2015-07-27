@@ -48,7 +48,6 @@ import com.axelor.meta.schema.views.GanttView;
 import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.KanbanView;
 import com.axelor.meta.schema.views.MenuItem;
-import com.axelor.meta.schema.views.Portal;
 import com.axelor.meta.schema.views.Search;
 import com.axelor.meta.schema.views.SearchFilters;
 import com.axelor.meta.schema.views.Selection;
@@ -76,7 +75,6 @@ public class ObjectViews {
 		@XmlElement(name = "grid", type = GridView.class),
 		@XmlElement(name = "tree", type = TreeView.class),
 		@XmlElement(name = "chart", type = ChartView.class),
-		@XmlElement(name = "portal", type = Portal.class),
 		@XmlElement(name = "dashboard", type = Dashboard.class),
 		@XmlElement(name = "search", type = Search.class),
 		@XmlElement(name = "calendar", type = CalendarView.class),
