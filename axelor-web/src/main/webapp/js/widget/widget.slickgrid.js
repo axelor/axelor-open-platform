@@ -440,15 +440,14 @@ _.extend(Factory.prototype, {
 			type = widget.toLowerCase();
 		}
 
-		if (value === null || value === undefined || (_.isObject(value) && _.isEmpty(value))) {
-			return "";
-		}
-
 		var fn = Formatters[type];
 		if (fn) {
 			value = fn(field, value, dataContext, this.grid);
 		}
-		return value === undefined ? '' : value;
+		if (value === null || value === undefined || (_.isObject(value) && _.isEmpty(value))) {
+			return "";
+		}
+		return value;
 	},
 	
 	formatProgress: function(field, value) {
