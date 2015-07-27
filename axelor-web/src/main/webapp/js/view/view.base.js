@@ -225,7 +225,7 @@ function DSViewCtrl(type, $scope, $element) {
 				$scope.toolbar = toolbar;
 				$scope.menubar = schema.menubar;
 
-				$scope.toolbarAsMenu = [{
+				$scope.toolbarAsMenu = _.isEmpty(toolbar) ? null : [{
 					icon: 'fa-wrench',
 					isButton: true,
 					items: _.map(toolbar, function (item) {
