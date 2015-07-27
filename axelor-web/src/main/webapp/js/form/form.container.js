@@ -145,14 +145,6 @@ ui.formWidget('Dashlet', {
 		if (field.height) {
 			element.height(field.height);
 		}
-
-		element.resizable({
-			handles: 's',
-			resize: _.debounce(function() {
-				axelor.$adjustSize();
-				element.width('auto');
-			}, 100)
-		});
 	},
 
 	template:

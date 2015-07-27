@@ -219,6 +219,13 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 				template = $compile(template)(scope);
 				body.append(template);
 
+				if (dashlet.height) {
+					body.height(dashlet.height);
+				}
+				if (dashlet.css) {
+					element.addClass(dashlet.css);
+				}
+
 				element.removeClass('hidden');
 
 				scope.show();

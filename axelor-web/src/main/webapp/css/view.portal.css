@@ -167,15 +167,21 @@
 	background-color: #fff;
 }
 
-.bar-layout .dashlet {
-	height: 100%;
-}
-
 .dashboard .dashlet-header {
 	border-top: 4px solid #e7e7e7;
 	padding: 11px 15px 14px;
 	overflow: hidden;
 	cursor: move;
+}
+
+.bar-layout .dashlet {
+	height: 100%;
+}
+.bar-layout .dashlet-header {
+	cursor: default;
+}
+.bar-layout .panel .dashboard {
+	margin-bottom: 0;
 }
 
 .dashboard .dashlet-title {
@@ -191,6 +197,7 @@
 	padding: 4px;
 	border-top: 1px solid #e7e7e7;
 	height: 250px;
+	overflow: auto;
 }
 
 .dashboard .dashlet-body > * {
@@ -234,7 +241,7 @@
 }
 
 .dashboard .dashlet {
-	margin: 12px !important;
+	margin: 10px !important;
 }
 
 .form-item .dashboard {
