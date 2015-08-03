@@ -81,9 +81,15 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 			return ds.read(value.id, {
 				fields: missing
 			}).success(function(rec){
-				var record = { 'id' : value.id };
+				var record = _.extend({}, related, {
+					id: value.id,
+					$version: value.version || value.$version
+				});
 				record[nameField] = rec[nameField];
-				record = _.extend({}, related, rec);
+				_.each(missing, function(name) {
+					var prefix = name.split('.')[0];
+					record[prefix] = rec[prefix];
+				});
 				$scope.setValue(record, true);
 			});
 		}
