@@ -63,7 +63,8 @@ ui.formInput('BpmnEditor', {
 		var canvas = element.find('.bpmn-canvas');
 
 		var overrideModule = {
-			paletteProvider: [ 'type', CustomPaletteProvider ]
+			paletteProvider: [ 'type', CustomPaletteProvider ],
+			contextPadProvider: [ 'type', CustomContextPadProvider ]
 		};
 
 		// initialize bpmn modeler
@@ -71,6 +72,101 @@ ui.formInput('BpmnEditor', {
 			container: canvas[0],
 			additionalModules: [overrideModule]
 		});
+
+		function CustomContextPadProvider(contextPad, modeling, elementFactory, connect, create, bpmnReplace, canvas) {
+
+			contextPad.registerProvider(this);
+			this._contextPad = contextPad;
+			this._modeling = modeling;
+			this._elementFactory = elementFactory;
+			this._connect = connect;
+			this._create = create;
+			this._bpmnReplace = bpmnReplace;
+			this._canvas  = canvas;
+
+			this.getContextPadEntries = function(element) {
+
+				var actions = {};
+				var bpmnElement = element.businessObject;
+
+				function removeElement(e) {
+					if (element.waypoints) {
+						modeling.removeConnection(element);
+					} else {
+						modeling.removeShape(element);
+					}
+				}
+
+				function startConnect(event, element, autoActivate) {
+					connect.start(event, element, autoActivate);
+				}
+
+				function appendAction(type, className, options) {
+
+					function appendListener(event, element) {
+						var shape = elementFactory.createShape(_.extend({ type: type }, options));
+						create.start(event, shape, element);
+					}
+
+					var shortType = type.replace(/^bpmn\:/, '');
+
+					return {
+						group: 'model',
+						className: className,
+						title: _t('Append {0}', shortType),
+						action: {
+							dragstart: appendListener,
+							click: appendListener
+						}
+					};
+				}
+
+				if ((bpmnElement.$instanceOf('bpmn:FlowNode') ||
+					 bpmnElement.$instanceOf('bpmn:InteractionNode')) &&
+					 !bpmnElement.$instanceOf('bpmn:EndEvent') ) {
+
+					_.extend(actions, {
+						'connect': {
+							group: 'connect',
+							className: 'icon-connection-multi',
+							title: _t("Connect using Sequence/MessageFlow"),
+							action: {
+								click: startConnect,
+								dragstart: startConnect
+							}
+						},
+					});
+				}
+
+				if (!bpmnElement.$instanceOf('bpmn:EndEvent') &&
+				    !bpmnElement.$instanceOf('bpmn:EventBasedGateway')) {
+
+					_.extend(actions, {
+				        'append.gateway': appendAction('bpmn:ExclusiveGateway', 'icon-gateway-xor'),
+				        'append.ParallelGateway' : appendAction('bpmn:ParallelGateway', 'icon-gateway-parallel'),
+				        'append.append-task': appendAction('bpmn:Task', 'icon-task'),
+				        'append.end-event': appendAction('bpmn:EndEvent', 'icon-end-event-none'),
+				        'append.InclusiveGateway' : appendAction('bpmn:InclusiveGateway', 'icon-gateway-or'),
+					});
+				}
+
+				_.extend(actions, {
+					'delete': {
+						group: 'edit',
+						className: 'icon-trash',
+						title: _t('Remove'),
+						action: {
+							click: removeElement,
+							dragstart: removeElement
+						}
+					}
+				});
+
+				return actions;
+			};
+		}
+
+		CustomContextPadProvider.$inject = ['contextPad', 'modeling', 'elementFactory', 'connect', 'create', 'bpmnReplace', 'canvas'];
 
 		function CustomPaletteProvider(palette, create, elementFactory, spaceTool, lassoTool) {
 
