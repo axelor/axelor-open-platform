@@ -1726,7 +1726,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 		var args = grid.getActiveCell();
 
 		formScope.editRecord(values);
-		formScope.$applyNow();
+		formScope.applyLater();
 
 		if (!formScope.$events.onNew) {
 			return;

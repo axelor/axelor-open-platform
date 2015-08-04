@@ -33,7 +33,8 @@
 				}
 			}
 
-			var $http = null,
+			var $q = null,
+				$http = null,
 				$timeout = null;
 			
 			__custom__.ajaxStop = function ajaxStop(callback, context) {
@@ -58,13 +59,29 @@
 				}
 			};
 
+			__custom__.$actionPromises = [];
 			__custom__.waitForActions = function waitForActions(callback) {
+				if ($q === null) {
+					$q = $injector.get('$q');
+				}
 				var that = this;
 				this.$timeout(function () {
+					// wait for any pending ajax requests
 					that.ajaxStop(function () {
-						that.$timeout(callback, 100);
-					}, 200);
-				}, 100);
+						var all = that.$actionPromises;
+						that.$actionPromises.length = 0;
+						// wait for actions
+						$q.all(all).then(function () {
+							// if new actions are executed, wait for them
+							if (that.$actionPromises.length) {
+								return _.delay(waitForActions.bind(that), 10, callback);
+							}
+							if (callback) {
+								callback();
+							}
+						});
+					});
+				});
 			};
 
 			__custom__.applyLater = function applyLater(func, wait) {
