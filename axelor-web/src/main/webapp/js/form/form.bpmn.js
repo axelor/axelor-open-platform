@@ -45,7 +45,7 @@ var DEFAULT = '<?xml version="1.0" encoding="UTF-8"?>' +
 
 var PROPS = {
 	'bpmn:StartEvent': ['id', 'name'],
-	'bpmn:Process': ['id', 'name', 'model'],
+	'bpmn:Process': ['id', 'name', 'model', 'sequence', 'maxnodecounter', 'active', 'archived', 'description'],
 	'bpmn:Task': ['id', 'name', 'action'],
 	'bpmn:SendTask': ['id', 'name'],
 	'bpmn:ReceiveTask' : ['id', 'name'],
@@ -196,11 +196,36 @@ ui.formInput('BpmnEditor', {
 			props.$last = {};
 
 			names.forEach(function (name) {
+
 				x[name] = true;
+
 				var value = bo.get(xname(name));
+
 				if (value && (name === 'action' || name == 'role')) {
 					value = { name: value };
 				}
+				if (name === 'model' && bo.$type === 'bpmn:Process' ) {
+					value = { name: scope.record.metaModel.name };
+				}
+				if (name === 'name' && bo.$type === 'bpmn:Process') {
+					value =  scope.record.name;
+				}
+				if (name === 'active' && bo.$type === 'bpmn:Process') {
+					value = scope.record.active;
+				}
+				if (name === 'archived' && bo.$type === 'bpmn:Process') {
+					value = scope.record.archived;
+				}
+				if (name === 'maxnodecounter' && bo.$type === 'bpmn:Process') {
+					value = scope.record.maxNodeCounter;
+				}
+				if (name === 'sequence' && bo.$type === 'bpmn:Process') {
+					value = scope.record.sequence;
+				}
+				if (name === 'sequence' && bo.$type === 'bpmn:SequenceFlow') {
+					value = scope.record.sequence;
+				}
+
 				props[name] = value;
 				props.$last[name] = value;
 			});
@@ -223,10 +248,33 @@ ui.formInput('BpmnEditor', {
 			if (name == 'name' && first.type !== "bpmn:Process") {
 				modeling.updateLabel(first, value);
 			}
+			if (name == 'name' && first.type === "bpmn:Process") {
+				scope.record[name] = value;
+			}
+			if (name == 'model' && first.type === "bpmn:Process") {
+				scope.record.metaModel = value;
+			}
+			if (name == 'active' && first.type === "bpmn:Process") {
+				scope.record.active = value;
+			}
+			if (name == 'archived' && first.type === "bpmn:Process") {
+				scope.record.archived = value;
+			}
 			if (value && (name === 'action' || name == 'role')) {
 				value = value.name;
 			}
+			if (value && name === 'model') {
+				value = value.name;
+			}
+			if (name === 'sequence' && first.type === "bpmn:Process") {
+				scope.record.sequence = value;
+			}
+			if (name === 'maxnodecounter' && first.type === "bpmn:Process") {
+				scope.record.maxNodeCounter = value;
+			}
+
 			var bo = first.businessObject;
+
 			bo.set("xmlns:x", "http://axelor.com");
 			bo.set(xname(name), value);
 
@@ -359,12 +407,50 @@ ui.directive('uiBpmnProps', function () {
 				title: _t('Name'),
 				name: 'name',
 				showIf: '$x.name',
+				required : true,
 				colSpan: 12,
 			}, {
 				title: _t('Model'),
 				name: 'model',
+				type: 'many-to-one',
+				target: 'com.axelor.meta.db.MetaModel',
+				targetName: 'name',
+				widget: 'BpmnManyToOne',
 				showIf: '$x.model',
+				required : true,
 				colSpan: 12
+			}, {
+				title: _t('Sequence'),
+				name: 'sequence',
+				type: 'integer',
+				showIf: '$x.sequence',
+				colSpan: 12,
+			}, {
+				title: _t('Max node counter'),
+				name: 'maxnodecounter',
+				type: 'integer',
+				showIf: '$x.maxnodecounter',
+				colSpan: 12,
+			}, {
+				title: _t('Description'),
+				name: 'description',
+				type: 'text',
+				showIf: '$x.model',
+				colSpan: 12,
+			}, {
+				title: _t('Active'),
+				name: 'active',
+				type: 'boolean',
+				target : 'com.axelor.wkf.db.Workflow',
+				targetName: 'active',
+				showIf: '$x.active',
+				colSpan: 6,
+			}, {
+				title: _t('Archived'),
+				name: 'archived',
+				type: 'boolean',
+				showIf: '$x.archived',
+				colSpan: 6,
 			}, {
 				title: _t('Action'),
 				name: 'action',
@@ -391,15 +477,9 @@ ui.directive('uiBpmnProps', function () {
 				colSpan: 12
 			}, {
 				title: _t('Duration'),
-				name: 'duration',
+				name: 'timeduration',
 				type: 'time',
-				showIf: '$x.duration',
-				colSpan: 12
-			}, {
-				title: _t('Sequence'),
-				name: 'sequence',
-				type: 'integer',
-				showIf: '$x.sequence',
+				showIf: '$x.timeduration',
 				colSpan: 12
 			}, {
 				title: _t('Signal'),
