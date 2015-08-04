@@ -62,10 +62,111 @@ ui.formInput('BpmnEditor', {
 
 		var canvas = element.find('.bpmn-canvas');
 
+		var overrideModule = {
+			paletteProvider: [ 'type', CustomPaletteProvider ]
+		};
+
 		// initialize bpmn modeler
 		var modeler = new BpmnJS({
-			container: canvas[0]
+			container: canvas[0],
+			additionalModules: [overrideModule]
 		});
+
+		function CustomPaletteProvider(palette, create, elementFactory, spaceTool, lassoTool) {
+
+			this._create = create;
+			this._elementFactory = elementFactory;
+			this._spaceTool = spaceTool;
+			this._lassoTool = lassoTool;
+			palette.registerProvider(this);
+		}
+
+		CustomPaletteProvider.prototype.getPaletteEntries = function(element) {
+
+			var actions  = {};
+			var create = this._create;
+			var elementFactory = this._elementFactory;
+			var spaceTool = this._spaceTool;
+			var lassoTool = this._lassoTool;
+
+			function createAction(type, group, className, title, options) {
+
+				function createListener(event) {
+					var shape = elementFactory.createShape(_.extend({ type: type }, options));
+
+					if (options) {
+						shape.businessObject.di.isExpanded = options.isExpanded;
+					}
+
+					create.start(event, shape);
+				}
+
+				var shortType = type.replace(/^bpmn\:/, '');
+
+				return {
+					group: group,
+					className: className,
+					title: title || 'Create ' + shortType,
+					action: {
+						dragstart: createListener,
+						click: createListener
+					}
+				};
+			}
+
+			function createParticipant(event, collapsed) {
+				create.start(event, elementFactory.createParticipantShape(collapsed));
+			}
+
+			_.extend(actions, {
+				'lasso-tool': {
+					group : 'tools',
+					className : 'icon-lasso-tool',
+					title : 'Activate the lasso tool',
+					action : {
+						click : function(event) {
+							lassoTool.activateSelection(event);
+						}
+					}
+				},
+				'space-tool': {
+					group: 'tools',
+					className: 'icon-space-tool',
+					title: 'Activate the create/remove space tool',
+					action: {
+						click: function(event) {
+							spaceTool.activateSelection(event);
+						}
+					}
+				},
+				'tool-separator': {
+					group: 'tools',
+					separator: true
+				},
+				'create.start-event': createAction(
+					'bpmn:StartEvent', 'event', 'icon-start-event-none'
+				),
+				'create.end-event': createAction(
+					'bpmn:EndEvent', 'event', 'icon-end-event-none'
+				),
+				'create.task': createAction(
+					'bpmn:Task', 'activity', 'icon-task'
+				),
+				'create.exclusive-gateway': createAction(
+					'bpmn:ExclusiveGateway', 'gateway', 'icon-gateway-xor'
+				),
+				'create.ParallelGateway': createAction(
+					'bpmn:ParallelGateway', 'replace-with-parallel-gateway', 'icon-gateway-parallel'
+				),
+				'create.InclusiveGateway': createAction(
+					'bpmn:InclusiveGateway', 'replace-with-inclusive-gateway', 'icon-gateway-or'
+				),
+			});
+
+			return actions;
+		};
+
+		CustomPaletteProvider.$inject = [ 'palette', 'create', 'elementFactory', 'spaceTool', 'lassoTool' ];
 
 		var selectedElement = null;
 
