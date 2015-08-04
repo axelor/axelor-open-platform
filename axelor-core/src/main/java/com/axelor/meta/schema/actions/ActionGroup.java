@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.schema.actions;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -38,7 +39,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @XmlType
-public class ActionGroup extends ActionResumable<ActionGroup> {
+public class ActionGroup extends ActionResumable {
 
 	@XmlElement(name = "action")
 	private List<ActionItem> actions;
@@ -106,11 +107,11 @@ public class ActionGroup extends ActionResumable<ActionGroup> {
 				String idx = actionName.substring(actionName.lastIndexOf('[') + 1, actionName.lastIndexOf(']'));
 				actionName = actionName.substring(0, actionName.lastIndexOf('['));
 				int index = Integer.parseInt(idx);
-				log.debug("continue action-validate: {}", actionName);
+				log.debug("continue action: {}", actionName);
 				log.debug("continue at: {}", index);
 				Action action = MetaStore.getAction(actionName);
 				if (action instanceof ActionResumable) {
-					return ((ActionResumable<?>) action).resumeAt(index);
+					return ((ActionResumable) action).resumeAt(index);
 				}
 				return action;
 		}
@@ -119,9 +120,10 @@ public class ActionGroup extends ActionResumable<ActionGroup> {
 	}
 
 	@Override
-	protected ActionGroup resumeAt(int index) {
+	protected ActionGroup copy() {
 		final ActionGroup action = new ActionGroup();
-		final List<ActionItem> items = actions.subList(index, actions.size());
+		final List<ActionItem> items = new ArrayList<>(actions);
+		action.setName(getName());
 		action.setModel(getModel());
 		action.setActions(items);
 		return action;
@@ -138,7 +140,7 @@ public class ActionGroup extends ActionResumable<ActionGroup> {
 			log.debug("action-group: {}", getName());
 		}
 		
-		for (int i = 0; i < actions.size(); i++) {
+		for (int i = getIndex(); i < actions.size(); i++) {
 
 			Element element = actions.get(i);
 			String name = element.getName().trim();

@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.schema.actions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +34,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @XmlType
-public class ActionValidate extends ActionResumable<ActionValidate> {
+public class ActionValidate extends ActionResumable {
 
 	public static class Validator extends Element {
 
@@ -94,9 +95,10 @@ public class ActionValidate extends ActionResumable<ActionValidate> {
 	}
 
 	@Override
-	protected ActionValidate resumeAt(int index) {
+	protected ActionValidate copy() {
 		final ActionValidate action = new ActionValidate();
-		final List<Validator> items = validators.subList(index, validators.size());
+		final List<Validator> items = new ArrayList<>(validators);
+		action.setName(getName());
 		action.setModel(getModel());
 		action.setValidators(items);
 		return action;
