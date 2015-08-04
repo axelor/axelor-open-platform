@@ -135,6 +135,7 @@ function ActionHandler($scope, ViewService, options) {
 		throw 'No action provided.';
 
 	this.canSave = options.canSave;
+	this.name = options.name;
 	this.prompt = options.prompt;
 	this.action = options.action;
 	this.element = options.element || $();
@@ -297,6 +298,15 @@ ActionHandler.prototype = {
 
 	_handleSave: function(validateOnly) {
 		var self = this;
+		var scope = this.scope;
+		var o2mPopup = scope._isPopup && (scope.$parent.field||{}).serverType === "one-to-many";
+		if (o2mPopup && this.name == 'onLoad' && !((scope.record||{}).id > 0)) {
+			var deferred = this.ws.defer();
+			var msg = _t("The {0}={1} event can't call 'save' action on unsaved record.", this.name, this.action);
+			deferred.reject(msg);
+			console.error(msg);
+			return deferred.promise;
+		}
 		return this._fireBeforeSave().then(function() {
 			return self.__doHandleSave(validateOnly);
 		});
@@ -857,6 +867,7 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 			}
 			
 			var handler = new ActionHandler(scope, ViewService, {
+				name: name,
 				element: element,
 				action: action,
 				canSave: props.canSave,
