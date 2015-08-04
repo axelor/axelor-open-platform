@@ -27,31 +27,32 @@ var DEFAULT = '<?xml version="1.0" encoding="UTF-8"?>' +
 					'xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" ' +
 					'targetNamespace="http://bpmn.io/schema/bpmn" ' +
 					'id="Definitions_1">' +
-	'<bpmn:process id="Process_1" name="" x:model="" isExecutable="false">' +
+	'<bpmn:process id="Process_1" name="" x:bpmnId="" x:model="" x:description="" isExecutable="false">' +
 	'<bpmn:startEvent id="StartEvent_1"/>' +
 	'<bpmn:endEvent id="EndEvent_1"/>' +
 	'</bpmn:process>' +
 	'<bpmndi:BPMNDiagram id="BPMNDiagram_1">' +
 	'<bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">' +
 		'<bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">' +
-		'<dc:Bounds x="469" y="295" width="36" height="36"/>'+
+		'<dc:Bounds x="269" y="195" width="36" height="36"/>'+
 		'</bpmndi:BPMNShape>' +
 		'<bpmndi:BPMNShape id="_BPMNShape_EndEvent_2" bpmnElement="EndEvent_1">' +
-		'<dc:Bounds x="734" y="295" width="36" height="36"/>'+
+		'<dc:Bounds x="534" y="195" width="36" height="36"/>'+
 		'</bpmndi:BPMNShape>' +
 	'</bpmndi:BPMNPlane>' +
 	'</bpmndi:BPMNDiagram>' +
 '</bpmn:definitions>';
 
 var PROPS = {
-	'bpmn:StartEvent': ['id', 'name'],
-	'bpmn:Process': ['id', 'name', 'model', 'sequence', 'maxnodecounter', 'active', 'archived', 'description'],
-	'bpmn:Task': ['id', 'name', 'action'],
-	'bpmn:SendTask': ['id', 'name'],
-	'bpmn:ReceiveTask' : ['id', 'name'],
-	'bpmn:UserTask' : ['id', 'name'],
-    'bpmn:SequenceFlow': ['id', 'name', 'sequence', 'signal', 'action', 'role'],
-    'bpmn:IntermediateCatchEvent' : ['id', 'name', 'datetime', 'timeduration']
+	'bpmn:StartEvent': ['bpmnId', 'name'],
+	'bpmn:EndEvent': ['bpmnId', 'name'],
+	'bpmn:Task': ['bpmnId', 'name', 'action'],
+	'bpmn:exclusive-gateway' : ['bpmnId', 'name'],
+	'bpmn:ParallelGateway' : ['bpmnId', 'name'],
+	'bpmn:InclusiveGateway' : ['bpmnId', 'name'],
+	'bpmn:Process': ['bpmnId', 'name', 'model', 'sequence', 'maxnodecounter', 'active', 'archived', 'description'],
+	'bpmn:SequenceFlow': ['bpmnId', 'name', 'sequence', 'signal', 'action', 'role'],
+	'bpmn:IntermediateCatchEvent' : ['bpmnId', 'name', 'datetime', 'timeduration'],
 };
 
 ui.formInput('BpmnEditor', {
@@ -202,7 +203,7 @@ ui.formInput('BpmnEditor', {
 				return {
 					group: group,
 					className: className,
-					title: title || 'Create ' + shortType,
+					title: title || _t('Create') + shortType,
 					action: {
 						dragstart: createListener,
 						click: createListener
@@ -218,7 +219,7 @@ ui.formInput('BpmnEditor', {
 				'lasso-tool': {
 					group : 'tools',
 					className : 'icon-lasso-tool',
-					title : 'Activate the lasso tool',
+					title : _t('Activate the lasso tool'),
 					action : {
 						click : function(event) {
 							lassoTool.activateSelection(event);
@@ -228,7 +229,7 @@ ui.formInput('BpmnEditor', {
 				'space-tool': {
 					group: 'tools',
 					className: 'icon-space-tool',
-					title: 'Activate the create/remove space tool',
+					title: _t('Activate the create/remove space tool'),
 					action: {
 						click: function(event) {
 							spaceTool.activateSelection(event);
@@ -318,8 +319,8 @@ ui.formInput('BpmnEditor', {
 				if (name === 'sequence' && bo.$type === 'bpmn:Process') {
 					value = scope.record.sequence;
 				}
-				if (name === 'sequence' && bo.$type === 'bpmn:SequenceFlow') {
-					value = scope.record.sequence;
+				if (name === 'maxnodecounter' && bo.$type === 'bpmn:Process') {
+					value = scope.record.maxNodeCounter;
 				}
 
 				props[name] = value;
@@ -405,6 +406,7 @@ ui.formInput('BpmnEditor', {
 		}
 
 		var propNames = _.unique(_.flatten(_.values(PROPS)));
+
 		propNames.forEach(function (name) {
 			scope.$watch("props." + name, function (value, old) {
 				if (!scope.props || value === undefined || value === old) {
@@ -422,12 +424,14 @@ ui.formInput('BpmnEditor', {
 				onSelect(e.element);
 			}
 		});
+
 		modeler.on('selection.changed', function (e) {
 			onSelect(e.newSelection[0]);
 		});
+
 		modeler.on(['shape.added', 'connection.added',
-		            'shape.removed', 'connection.removed',
-		            'shape.changed', 'connection.changed'], function (e) {
+					'shape.removed', 'connection.removed',
+					'shape.changed', 'connection.changed'], function (e) {
 			if (selectedElement) {
 				onSelect(selectedElement);
 			}
@@ -435,6 +439,7 @@ ui.formInput('BpmnEditor', {
 		});
 
 		var keyboard = null;
+
 		modeler.on('import.success', function () {
 			if (keyboard) {
 				keyboard.unbind();
@@ -496,8 +501,9 @@ ui.directive('uiBpmnProps', function () {
 			});
 
 			var items = [{
-				title: _t('ID'),
-				name: 'id',
+				title: _t('Item ID'),
+				name: 'bpmnId',
+				showIf: '$x.bpmnId',
 				colSpan: 12,
 			}, {
 				title: _t('Name'),
@@ -525,6 +531,8 @@ ui.directive('uiBpmnProps', function () {
 				title: _t('Max node counter'),
 				name: 'maxnodecounter',
 				type: 'integer',
+				target : 'com.axelor.wkf.db.Workflow.maxNodeCounter',
+				targetName: 'maxNodeCounter',
 				showIf: '$x.maxnodecounter',
 				colSpan: 12,
 			}, {
@@ -589,7 +597,7 @@ ui.directive('uiBpmnProps', function () {
 				type: 'form',
 				items: [{
 					type: 'panel',
-					title: 'Properties',
+					title: _t('Properties'),
 					items: items
 				}]
 			};
