@@ -109,31 +109,12 @@ function GanttViewCtrl($scope, $element) {
 	var view = $scope._views['gantt'];
 	var initialized = false;
 
-	if (view.items) {
-		$scope.$timeout(function () {
-			$scope.parse(view);
-		});
-	}
-	else {
-		$scope.loadView('gantt', view.name).success(function(fields, schema){
-			$scope.parse(schema);
-		});
-	}
-
-	$scope.applyLater(function(){
-		if (view.deferred)
-			view.deferred.resolve($scope);
-	}, 0);
-
-	$scope.parse = function(schema) {
-	};
-
 	$scope.onShow = function(viewPromise) {
-
+		
 		if (initialized) {
 			return $scope.refresh();
 		}
-
+		
 		viewPromise.then(function(){
 			var schema = $scope.schema;
 			initialized = true;
@@ -194,8 +175,13 @@ function GanttViewCtrl($scope, $element) {
 	};
 
 	$scope.setRouteOptions = function(options) {
-		if (!$scope.isNested) {
-			$scope.updateRoute();
+		var opts = options || {};
+		if (opts.mode === "gantt") {
+			return $scope.updateRoute();
+		}
+		var params = $scope._viewParams;
+		if (params.viewType !== "calendar") {
+			return $scope.show();
 		}
 	};
 
@@ -221,25 +207,11 @@ function GanttViewCtrl($scope, $element) {
 	$scope.refresh = function() {
 	};
 
-	$scope.readRecord =  function(recordIds, callback) {
-		searchFields.push($scope.childField.mappedBy);
-		var opts = {
-			fields: searchFields,
-			filter: false,
-			domain: "self.id in ("+recordIds+")",
-			store: false
-		};
-		childDs.search(opts).success(function(records) {
-			callback(records);
-		});
-	};
-
 }
 
 angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewService, ActionService) {
 
 	function link(scope, element, attrs, controller) {
-		
 		var main = element[0];
 		var schema = scope.schema;
 		var fields = scope.fields;
@@ -387,7 +359,6 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 	   }
 
 	   function ganttInit(){
-		   
 		   setScaleConfig("1");
 		   gantt.config.grid_width = 400;
 		   gantt.config.duration_unit = "hour";
@@ -395,11 +366,10 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 		   gantt.config.columns = getGanttColumns();
 		   gantt._onTaskIdChange = null;
 		   gantt._onLinkIdChange = null;
-		   gantt.init(main);
-		   setChildTaskDisplay();
 		   ganttAttachEvents();
-		   fetchRecords();
-		   
+		   setChildTaskDisplay();
+		   gantt.init(main);
+		   fetchRecords();	
 	   }
 
 	   function ganttAttachEvents(){
@@ -428,6 +398,7 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 	   function fetchRecords() {
 		   
 		   scope.fetchItems(function(records) {
+
 			   var data = [];
 			   var links = [];
 				_.each(records, function(rec) {
@@ -435,7 +406,6 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 					addLinks(links, rec);
 				});
 				gantt.parse({ "data":data, "links":links });
-				gantt.render();
 			});
 		   
 	   }
@@ -637,8 +607,6 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 		};
 
 		scope.onRefresh = function () {
-			scope.childMap = {};
-			scope.parentMap = {};
 			gantt.clearAll();
 			fetchRecords();
 		};
