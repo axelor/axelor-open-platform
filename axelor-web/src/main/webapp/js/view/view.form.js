@@ -534,7 +534,14 @@ function FormViewCtrl($scope, $element) {
 			});
 		}
 
-		$scope.waitForActions(function() {
+		function waitForActions(callback) {
+			if (opts.wait === false) {
+				return callback();
+			}
+			return $scope.waitForActions(callback);
+		}
+
+		function doOnSave() {
 			if (!$scope.canSave(opts.force)) {
 				$scope.showErrorNotice();
 				return defer.promise;
@@ -544,9 +551,12 @@ function FormViewCtrl($scope, $element) {
 			}
 			// repeat on:before-save to ensure if any o2m/m2m is updated gets applied
 			if (fireBeforeSave()) {
-				$scope.waitForActions(doSave);
+				waitForActions(doSave);
 			}
-		});
+		}
+
+		waitForActions(doOnSave);
+
 		return defer.promise;
 	};
 

@@ -211,9 +211,9 @@ ActionHandler.prototype = {
 
 		var self = this,
 			scope = this.scope;
-		scope.waitForActions(function() {
+		scope.ajaxStop(function() {
 			self.handle().then(deferred.resolve, deferred.reject);
-		});
+		}, 100);
 		return promise;
 	},
 	
@@ -260,23 +260,29 @@ ActionHandler.prototype = {
 	},
 
 	handle: function() {
+		var that = this;
 		var action = this.action.trim();
-		var promise = this._handleAction(action);
-		var all = this.scope.$actionPromises || [];
+		var deferred = this.ws.defer();
 
-		function done() {
-			setTimeout(function () {
-				var i = all.indexOf(promise);
-				if (i > -1) {
-					all.splice(i, 1);
-				}
-			}, 10);
-		}
+		this.scope.waitForActions(function () {
+			var promise = that._handleAction(action);
+			var all = that.scope.$actionPromises || [];
 
-		all.push(promise);
-		promise.then(done, done);
+			function done() {
+				setTimeout(function () {
+					var i = all.indexOf(promise);
+					if (i > -1) {
+						all.splice(i, 1);
+					}
+				}, 10);
+			}
 
-		return promise;
+			all.push(promise);
+			promise.then(done, done);
+			promise.then(deferred.resolve, deferred.reject);
+		});
+
+		return deferred.promise;
 	},
 	
 	_blockUI: function() {
@@ -370,7 +376,8 @@ ActionHandler.prototype = {
 			scope.onSave({
 				values: values,
 				callOnSave: false,
-				force: true
+				force: true,
+				wait: false
 			}).then(deferred.resolve, deferred.reject);
 		} else {
 			doSave(values);

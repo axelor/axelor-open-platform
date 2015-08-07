@@ -240,7 +240,7 @@
 				if (blockedCounter > 0) {
 					blockedCounter = blockedCounter - 10;
 				}
-				return blockedTimer = _.delay(unblock, 10, callback);
+				return blockedTimer = _.delay(unblock, 200, callback);
 			}
 			doc.off("keydown.blockui mousedown.blockui");
 			body.css("cursor", "");

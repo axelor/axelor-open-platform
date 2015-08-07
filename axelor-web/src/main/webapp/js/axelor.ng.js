@@ -69,7 +69,6 @@
 					// wait for any pending ajax requests
 					that.ajaxStop(function () {
 						var all = that.$actionPromises;
-						that.$actionPromises.length = 0;
 						// wait for actions
 						$q.all(all).then(function () {
 							// if new actions are executed, wait for them
