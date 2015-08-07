@@ -262,9 +262,20 @@ ActionHandler.prototype = {
 	handle: function() {
 		var action = this.action.trim();
 		var promise = this._handleAction(action);
-		if (this.scope.$actionPromises) {
-			this.scope.$actionPromises.push(promise);
+		var all = this.scope.$actionPromises || [];
+
+		function done() {
+			setTimeout(function () {
+				var i = all.indexOf(promise);
+				if (i > -1) {
+					all.splice(i, 1);
+				}
+			}, 10);
 		}
+
+		all.push(promise);
+		promise.then(done, done);
+
 		return promise;
 	},
 	
