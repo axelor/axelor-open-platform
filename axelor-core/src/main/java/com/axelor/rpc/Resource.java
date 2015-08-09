@@ -43,6 +43,7 @@ import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.auth.AuthUtils;
 import com.axelor.common.Inflector;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
@@ -56,6 +57,8 @@ import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
+import com.axelor.inject.Beans;
+import com.axelor.meta.MetaPermissions;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaTranslation;
@@ -408,6 +411,7 @@ public class Resource<T extends Model> {
 		Map<Integer, Map<String, String>> selection = Maps.newHashMap();
 
 		Mapper mapper = Mapper.of(model);
+		MetaPermissions perms = Beans.get(MetaPermissions.class);
 
 		for(String field : fields) {
 			Iterator<String> iter = Splitter.on(".").split(field).iterator();
@@ -421,6 +425,13 @@ public class Resource<T extends Model> {
 
 			String name = prop.getName();
 			String title = prop.getTitle();
+			String model = getModel().getName();
+			if (prop.isReference()) {
+				model = prop.getTarget().getName();
+			}
+			if (!perms.canExport(AuthUtils.getUser(), model, name)) {
+				continue;
+			}
 			if(iter != null) {
 				name = field;
 			}

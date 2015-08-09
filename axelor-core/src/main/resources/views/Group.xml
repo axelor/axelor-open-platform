@@ -35,6 +35,7 @@
         <field name="name"/>
         <field name="object"/>
       </panel-related>
+      <panel-related field="metaPermissions"/>
       <panel-related field="menus">
         <field name="name"/>
         <field name="title"/>
