@@ -124,6 +124,7 @@ public class I18nExtractor {
 			boolean isView = file.toString().indexOf("views") > -1;
 			if (isView) {
 				processHtml(file);
+				processJava(file);
 			}
 
 			if (!PATTERN_XML.matcher(file.toString()).find()) {
