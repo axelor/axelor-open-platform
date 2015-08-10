@@ -200,7 +200,7 @@ function FormViewCtrl($scope, $element) {
 			$scope.ajaxStop(function(){
 				var handler = $scope.$events.onLoad,
 					record = $scope.record;
-				if (handler && !_.isEmpty(record)) {
+				if (handler && !ds.equals({}, record)) {
 					setTimeout(handler);
 				}
 			});
