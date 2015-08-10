@@ -310,9 +310,11 @@ function FormViewCtrl($scope, $element) {
 		return $scope.hasButton('edit');
 	};
 	
-	$scope.canSave = function(dirty) {
-		var isDirty = dirty || $scope.$$dirty;
-		return $scope.hasPermission('write') && isDirty && $scope.isValid();
+	$scope.canSave = function(force) {
+		if (force) {
+			return $scope.isValid();
+		}
+		return $scope.hasPermission('write') && $scope.$$dirty && $scope.isValid();
 	};
 
 	$scope.canDelete = function() {
