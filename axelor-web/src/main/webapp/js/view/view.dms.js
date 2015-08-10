@@ -25,7 +25,7 @@ function inputDialog(options, callback) {
 		value: "",
 		title: "",
 		titleOK: _t("OK"),
-		titleCancel: _t("Cancel"),
+		titleCancel: _t("Cancel")
 	}, options);
 
 	var html = "" +
@@ -466,7 +466,7 @@ function DMSFileListCtrl($scope, $element) {
 			recordId: record.id,
 			forceEdit: true,
 			params: {
-				'show-toolbar': false,
+				'show-toolbar': false
 			}
 		};
 
@@ -938,7 +938,7 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 		return ds.search({
 			fields: ["fileName", "parent.id", "relatedId", "relatedModel"],
 			domain: getDomain(),
-			limit: -1,
+			limit: -1
 		}).success(syncFolders);
 	};
 

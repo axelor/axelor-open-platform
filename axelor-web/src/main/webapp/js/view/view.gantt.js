@@ -532,7 +532,7 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 					id:targetRecordId+"-"+sourceRec.id,
 					target:targetRecordId,
 					source:sourceRec.id,
-					type:linkType,
+					type:linkType
 				});
 			});
 			

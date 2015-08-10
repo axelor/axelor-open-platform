@@ -77,7 +77,7 @@ function BaseCardsCtrl(type, $scope, $element) {
 	$scope.filter = function(options) {
 		var view = $scope.schema;
 		var opts = {
-			fields: _.pluck($scope.fields, 'name'),
+			fields: _.pluck($scope.fields, 'name')
 		};
 
 		if (options.criteria || options._domains) {

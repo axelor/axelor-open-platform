@@ -52,7 +52,7 @@ var PROPS = {
 	'bpmn:InclusiveGateway' : ['bpmnId', 'name'],
 	'bpmn:Process': ['bpmnId', 'name', 'model', 'sequence', 'maxnodecounter', 'active', 'archived', 'description'],
 	'bpmn:SequenceFlow': ['bpmnId', 'name', 'sequence', 'signal', 'action', 'role'],
-	'bpmn:IntermediateCatchEvent' : ['bpmnId', 'name', 'datetime', 'timeduration'],
+	'bpmn:IntermediateCatchEvent' : ['bpmnId', 'name', 'datetime', 'timeduration']
 };
 
 ui.formInput('BpmnEditor', {
@@ -135,7 +135,7 @@ ui.formInput('BpmnEditor', {
 								click: startConnect,
 								dragstart: startConnect
 							}
-						},
+						}
 					});
 				}
 
@@ -147,7 +147,7 @@ ui.formInput('BpmnEditor', {
 				        'append.ParallelGateway' : appendAction('bpmn:ParallelGateway', 'icon-gateway-parallel'),
 				        'append.append-task': appendAction('bpmn:Task', 'icon-task'),
 				        'append.end-event': appendAction('bpmn:EndEvent', 'icon-end-event-none'),
-				        'append.InclusiveGateway' : appendAction('bpmn:InclusiveGateway', 'icon-gateway-or'),
+				        'append.InclusiveGateway' : appendAction('bpmn:InclusiveGateway', 'icon-gateway-or')
 					});
 				}
 
@@ -257,7 +257,7 @@ ui.formInput('BpmnEditor', {
 				),
 				'create.InclusiveGateway': createAction(
 					'bpmn:InclusiveGateway', 'replace-with-inclusive-gateway', 'icon-gateway-or'
-				),
+				)
 			});
 
 			return actions;
@@ -504,13 +504,13 @@ ui.directive('uiBpmnProps', function () {
 				title: _t('Item ID'),
 				name: 'bpmnId',
 				showIf: '$x.bpmnId',
-				colSpan: 12,
+				colSpan: 12
 			}, {
 				title: _t('Name'),
 				name: 'name',
 				showIf: '$x.name',
 				required : true,
-				colSpan: 12,
+				colSpan: 12
 			}, {
 				title: _t('Model'),
 				name: 'model',
@@ -526,7 +526,7 @@ ui.directive('uiBpmnProps', function () {
 				name: 'sequence',
 				type: 'integer',
 				showIf: '$x.sequence',
-				colSpan: 12,
+				colSpan: 12
 			}, {
 				title: _t('Max node counter'),
 				name: 'maxnodecounter',
@@ -534,13 +534,13 @@ ui.directive('uiBpmnProps', function () {
 				target : 'com.axelor.wkf.db.Workflow.maxNodeCounter',
 				targetName: 'maxNodeCounter',
 				showIf: '$x.maxnodecounter',
-				colSpan: 12,
+				colSpan: 12
 			}, {
 				title: _t('Description'),
 				name: 'description',
 				type: 'text',
 				showIf: '$x.model',
-				colSpan: 12,
+				colSpan: 12
 			}, {
 				title: _t('Active'),
 				name: 'active',
@@ -548,13 +548,13 @@ ui.directive('uiBpmnProps', function () {
 				target : 'com.axelor.wkf.db.Workflow',
 				targetName: 'active',
 				showIf: '$x.active',
-				colSpan: 6,
+				colSpan: 6
 			}, {
 				title: _t('Archived'),
 				name: 'archived',
 				type: 'boolean',
 				showIf: '$x.archived',
-				colSpan: 6,
+				colSpan: 6
 			}, {
 				title: _t('Action'),
 				name: 'action',
