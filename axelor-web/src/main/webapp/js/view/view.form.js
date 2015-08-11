@@ -429,7 +429,7 @@ function FormViewCtrl($scope, $element) {
 			return;
 		}
 
-		return $scope.checkVersion(function (verified) {
+		return $scope.checkVersion(true, function (verified) {
 			if (verified) {
 				return;
 			}
@@ -446,6 +446,12 @@ function FormViewCtrl($scope, $element) {
 
 	$scope.checkVersion = function (callback) {
 		var record = $scope.record || {};
+		var done = callback;
+		var graph = callback === true;
+		if (graph) {
+			done = arguments[1];
+		}
+		done = _.isFunction(done) ? done : angular.noop;
 
 		function compact(rec) {
 			var res = {
@@ -455,23 +461,25 @@ function FormViewCtrl($scope, $element) {
 			if (res.version === undefined) {
 				res.version = rec.$version;
 			}
-			_.each(rec, function(v, k) {
-				if (!v) return;
-				if (v.id) res[k] = compact(v);
-				if (_.isArray(v)) res[k] = _.map(v, compact);
-			});
+			if (graph) {
+				_.each(rec, function(v, k) {
+					if (!v) return;
+					if (v.id) res[k] = compact(v);
+					if (_.isArray(v)) res[k] = _.map(v, compact);
+				});
+			}
 			return res;
 		}
 
 		if (!record.id) {
-			return callback(true);
+			return done(true);
 		}
 
 		return ds.verify(compact(record))
 		.success(function(res) {
-			callback(res.status === 0);
+			done(res.status === 0);
 		}).error(function (err) {
-			callback(false);
+			done(false);
 		});
 	};
 	
