@@ -339,9 +339,13 @@ ActionHandler.prototype = {
 			return this.__handleSave(validateOnly);
 		}
 		var self = this;
-		return this._checkVersion().then(function () {
-			self.__handleSave();
-		});
+		var deferred = this.ws.defer();
+
+		this._checkVersion().then(function () {
+			self.__handleSave().then(deferred.resolve, deferred.reject);
+		}, deferred.reject);
+
+		return deferred.promise;
 	},
 
 	__handleSave: function(validateOnly) {
