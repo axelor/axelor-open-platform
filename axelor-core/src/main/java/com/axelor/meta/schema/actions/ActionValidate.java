@@ -111,7 +111,7 @@ public class ActionValidate extends ActionResumable {
 		final List<String> notify = Lists.newArrayList();
 		final Map<String, Object> result = Maps.newHashMap();
 
-		for (int i = 0; i < validators.size(); i++) {
+		for (int i = getIndex(); i < validators.size(); i++) {
 
 			final Validator validator = validators.get(i);
 			if (!validator.test(handler)) {
