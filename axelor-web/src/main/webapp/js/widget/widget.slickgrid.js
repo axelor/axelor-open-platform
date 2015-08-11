@@ -643,9 +643,12 @@ Grid.prototype.parse = function(view) {
 					return handler.dataView.deleteItem(0);
 				}
 				if (handler && handler.onEdit) {
-					handler.applyLater(function () {
-						handler.onEdit(true);
-					}, 10);
+					handler.waitForActions(function () {
+						args.grid.setActiveCell(args.row, args.cell);
+						handler.applyLater(function () {
+							handler.onEdit(true);
+						});
+					});
 				}
 			}
 		});
