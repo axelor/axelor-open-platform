@@ -310,10 +310,7 @@ function FormViewCtrl($scope, $element) {
 		return $scope.hasButton('edit');
 	};
 	
-	$scope.canSave = function(force) {
-		if (force) {
-			return $scope.isValid();
-		}
+	$scope.canSave = function() {
 		return $scope.hasPermission('write') && $scope.$$dirty && $scope.isValid();
 	};
 
@@ -432,6 +429,24 @@ function FormViewCtrl($scope, $element) {
 			return;
 		}
 
+		return $scope.checkVersion(function (verified) {
+			if (verified) {
+				return;
+			}
+			axelor.dialogs.confirm(
+					_t("The record has been updated or delete by another action.") + "<br>" +
+					_t("Would you like to reload the current record?"),
+			function(confirmed){
+				if (confirmed) {
+					$scope.reload();
+				}
+			});
+		});
+	});
+
+	$scope.checkVersion = function (callback) {
+		var record = $scope.record || {};
+
 		function compact(rec) {
 			var res = {
 				id: rec.id,
@@ -448,19 +463,17 @@ function FormViewCtrl($scope, $element) {
 			return res;
 		}
 
-		ds.verify(compact(record)).success(function(res){
-			if (res.status !== 0) {
-				axelor.dialogs.confirm(
-						_t("The record has been updated or delete by another action.") + "<br>" +
-						_t("Would you like to reload the current record?"),
-				function(confirmed){
-					if (confirmed) {
-						$scope.reload();
-					}
-				});
-			}
+		if (!record.id) {
+			return callback(true);
+		}
+
+		return ds.verify(compact(record))
+		.success(function(res) {
+			callback(res.status === 0);
+		}).error(function (err) {
+			callback(false);
 		});
-	});
+	};
 	
 	$scope.onEdit = function() {
 		$.event.trigger('cancel:hot-edit');
@@ -544,7 +557,7 @@ function FormViewCtrl($scope, $element) {
 		}
 
 		function doOnSave() {
-			if (!$scope.canSave(opts.force)) {
+			if (!$scope.canSave()) {
 				$scope.showErrorNotice();
 				return defer.promise;
 			}
