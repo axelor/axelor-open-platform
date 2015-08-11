@@ -980,7 +980,10 @@ Grid.prototype._doInit = function(view) {
 		if (!that.editorScope || that.editorScope.isValid()) {
 			return;
 		}
-		
+		if (that.editorForm && that.editorForm.is(":hidden")) {
+			return;
+		}
+
 		var args = that.grid.getActiveCell();
 		if (args) {
 			that.focusInvalidCell(args);
