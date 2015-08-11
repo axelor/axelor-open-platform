@@ -313,13 +313,44 @@ ActionHandler.prototype = {
 		return deferred.promise;
 	},
 
+	_checkVersion: function() {
+		var self = this;
+		var scope = this.scope;
+		var deferred = this.ws.defer();
+
+		if (scope.checkVersion) {
+			scope.checkVersion(function (verified) {
+				if (verified) {
+					return deferred.resolve();
+				}
+				axelor.dialogs.error(
+						_t("The record has been updated or delete by another action."));
+				deferred.reject();
+			});
+		} else {
+			deferred.resolve();
+		}
+
+		return deferred.promise;
+	},
+
 	_handleSave: function(validateOnly) {
+		if (validateOnly) {
+			return this.__handleSave(validateOnly);
+		}
+		var self = this;
+		return this._checkVersion().then(function () {
+			self.__handleSave();
+		});
+	},
+
+	__handleSave: function(validateOnly) {
 		var self = this;
 		var scope = this.scope;
 		var o2mPopup = scope._isPopup && (scope.$parent.field||{}).serverType === "one-to-many";
-		if (o2mPopup && this.name == 'onLoad' && !((scope.record||{}).id > 0)) {
+		if (o2mPopup && !validateOnly && this.name == 'onLoad' && !((scope.record||{}).id > 0)) {
 			var deferred = this.ws.defer();
-			var msg = _t("The {0}={1} event can't call 'save' action on unsaved record.", this.name, this.action);
+			var msg = _t("The {0}={1} event can't call 'save' action on unsaved o2m item.", this.name, this.action);
 			deferred.reject(msg);
 			console.error(msg);
 			return deferred.promise;
@@ -347,7 +378,7 @@ ActionHandler.prototype = {
 			deferred.reject();
 			return deferred.promise;
 		}
-		if (validateOnly) {
+		if (validateOnly || (scope.isDirty && !scope.isDirty())) {
 			deferred.resolve();
 			return deferred.promise;
 		}
@@ -376,7 +407,6 @@ ActionHandler.prototype = {
 			scope.onSave({
 				values: values,
 				callOnSave: false,
-				force: true,
 				wait: false
 			}).then(deferred.resolve, deferred.reject);
 		} else {
