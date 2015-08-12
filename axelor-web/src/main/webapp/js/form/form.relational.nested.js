@@ -206,49 +206,49 @@ var NestedEditor = {
 	scope: true,
 	controller: NestedEditorCtrl,
 	link: function(scope, element, attrs, model) {
-		
-		var configured = false;
-		
+
 		function setValidity(nested, valid) {
 			model.$setValidity('valid', nested.isValid());
 			if (scope.setValidity) {
 				scope.setValidity('valid', nested.isValid());
 			}
 		}
-		
-		function configure(nested) {
-			
-			//FIX: select on M2O doesn't apply to nested editor
-			var valueSet = false;
-			scope.$watch(attrs.ngModel + '.id', function(id, old){
-				if (id === old && valueSet) return;
-				valueSet = true;
-				scope.applyLater();
-			});
-			
-			//FIX: accept values updated with actions
-			scope.$watch(attrs.ngModel + '.$updatedValues', function(value) {
-				if (!nested || !value) return;
-				var record = nested.record || {};
-				if (record.id === value.id) {
-					_.extend(record, value);
-				}
-			});
 
-			var validitySet = false;
-			nested.$watch('form.$valid', function(valid, old){
-				if (valid === old && validitySet) {
+		var configure = _.once(function (nested) {
+
+			//FIX: select on M2O doesn't apply to nested editor
+			var unwatchId = scope.$watch(attrs.ngModel + '.id', function(id, old){
+				if (id === old) {
 					return;
 				}
-				validitySet = true;
+				unwatchId();
+				unwatchId = null;
+				scope.applyLater();
+			});
+
+			var unwatchValid = nested.$watch('form.$valid', function(valid, old){
+				if (valid === old) {
+					return;
+				}
+				unwatchValid();
+				unwatchValid = null;
 				setValidity(nested, valid);
+			});
+
+			scope.$on("on:check-nested-values", function (e, value) {
+				if (nested && value) {
+					var val = scope.getValue() || {};
+					if (val.$updatedValues === value) {
+						_.extend(nested.record, value);
+					}
+				}
 			});
 
 			var parentAttrs = scope.$parent.field || {};
 			if (parentAttrs.forceWatch) {
 				nested.$$forceWatch = true;
 			}
-		}
+		});
 
 		var unwatch = null;
 		var original = null;
@@ -264,7 +264,7 @@ var NestedEditor = {
 			original = angular.copy(record);
 
 			unwatch = nested.$watch('record', function(rec, old) {
-				
+
 				if (counter++ === 0 && !nested.$$forceCounter) {
 					return;
 				}
@@ -272,6 +272,11 @@ var NestedEditor = {
 				var ds = nested._dataSource;
 				var name = scope.field.name;
 				var orig = (scope.$$original||{})[name];
+
+				// don't process default values
+				if (ds.equals(rec, nested.defaultValues)) {
+					return;
+				}
 
 				if (_.isEmpty(rec)) rec = null;
 				if (_.isEmpty(old)) old = null;
@@ -307,23 +312,13 @@ var NestedEditor = {
 		attrs.$observe('title', function(title){
 			scope.title = title;
 		});
-		
+
 		model.$render = function() {
 			var nested = scope.nested,
 				promise = nested._viewPromise,
 				oldValue = model.$viewValue;
 
-			if (nested == null)
-				return;
-			
-			if (!configured) {
-				configured = true;
-				promise.then(function(){
-					configure(nested);
-				});
-			}
-			
-			promise.then(function() {
+			function doRender() {
 				var value = model.$viewValue;
 				if (oldValue !== value) { // prevent unnecessary onLoad
 					return;
@@ -337,6 +332,15 @@ var NestedEditor = {
 					value.$fetched = true;
 					return nestedEdit(record);
 				});
+			}
+
+			if (nested == null) {
+				return;
+			}
+
+			promise.then(function() {
+				configure(nested);
+				scope.waitForActions(doRender);
 			});
 		};
 	},
@@ -357,5 +361,5 @@ var NestedEditor = {
 ui.formDirective('uiNestedEditor', NestedEditor);
 ui.formDirective('uiEmbeddedEditor', EmbeddedEditor);
 ui.formDirective('uiNestedForm', NestedForm);
-	
+
 }).call(this);

@@ -166,12 +166,22 @@ ui.formWidget('Tabs', {
 		
 		var tabs = $scope.tabs = [],
 			selected = -1;
-		
-		var doSelect = _.debounce(function doSelect() {
+
+		var doOnSelectPending = false;
+		var doOnSelect = _.debounce(function () {
 			var select = tabs[selected];
-			if (select) {
-				select.handleSelect();
+			if (doOnSelectPending || !select) {
+				return;
 			}
+			doOnSelectPending = true;
+			$scope.waitForActions(function () {
+				if (select.handleSelect) {
+					select.handleSelect();
+				}
+				$scope.waitForActions(function () {
+					doOnSelectPending = false;
+				});
+			});
 		}, 100);
 		
 		$scope.select = function(tab) {
@@ -195,10 +205,16 @@ ui.formWidget('Tabs', {
 				}
 				axelor.$adjustSize();
 				if(current != selected){
-					doSelect();
+					doOnSelect();
 				}
 			});
 		};
+
+		$scope.$on('on:edit', function (e, record) {
+			if ($scope.record === record) {
+				doOnSelect();
+			}
+		});
 		
 		this.addTab = function(tab) {
 			if (tabs.length === 0) $scope.select(tab);
@@ -267,8 +283,6 @@ ui.formWidget('Tabs', {
 
 			pageScope.tab.title = value;
 		};
-		
-		$scope.$on('on:edit', doSelect);
 	}],
 	
 	link: function(scope, elem, attrs) {
@@ -504,14 +518,19 @@ ui.formWidget('PanelTabs', {
 			return found;
 		}
 		
-		var doSelect = _.debounce(function doSelect() {
-			if (!selected || !selected.elem) {
+		var doOnSelectPending = false;
+		var doOnSelect = _.debounce(function () {
+			if (doOnSelectPending || !selected || !selected.elem) {
 				return;
 			}
-			var scope = selected.elem.scope();
-			if (scope.handleSelect) {
-				scope.handleSelect();
-			}
+			doOnSelectPending = true;
+			scope.waitForActions(function () {
+				var elemScope = selected.elem.scope();
+				if (elemScope.handleSelect) {
+					elemScope.handleSelect();
+				}
+				doOnSelectPending = false;
+			});
 		}, 100);
 
 		scope.selectTab = function(tab) {
@@ -542,7 +561,7 @@ ui.formWidget('PanelTabs', {
 				elemMenu.removeClass('open');
 				axelor.$adjustSize();
 				if (current != selected) {
-					doSelect();
+					doOnSelect();
 				}
 			});
 		};
@@ -701,7 +720,11 @@ ui.formWidget('PanelTabs', {
 			scope.selectTab(_.first(scope.tabs));
 		});
 
-		scope.$on('on:edit', doSelect);
+		scope.$on('on:edit', function (e, record) {
+			if (scope.record === record && !doOnSelectPending) {
+				scope.ajaxStop(doOnSelect, 100);
+			}
+		});
 	},
 
 	transclude: true,

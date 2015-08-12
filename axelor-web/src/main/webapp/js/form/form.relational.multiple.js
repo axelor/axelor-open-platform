@@ -74,7 +74,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	$scope.select = function(value) {
 
 		// if items are same, no need to set values
-		if (angular.equals(value, $scope.getValue())) {
+		if ($scope._dataSource.equals(value, $scope.getValue())) {
 			return;
 		}
 

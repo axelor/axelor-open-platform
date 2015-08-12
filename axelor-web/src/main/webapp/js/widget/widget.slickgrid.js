@@ -659,9 +659,12 @@ Grid.prototype.parse = function(view) {
 					return handler.dataView.deleteItem(0);
 				}
 				if (handler && handler.onEdit) {
-					handler.applyLater(function () {
-						handler.onEdit(true);
-					}, 10);
+					handler.waitForActions(function () {
+						args.grid.setActiveCell(args.row, args.cell);
+						handler.applyLater(function () {
+							handler.onEdit(true);
+						});
+					});
 				}
 			}
 		});
@@ -997,7 +1000,10 @@ Grid.prototype._doInit = function(view) {
 		if (!that.editorScope || that.editorScope.isValid()) {
 			return;
 		}
-		
+		if (that.editorForm && that.editorForm.is(":hidden")) {
+			return;
+		}
+
 		var args = that.grid.getActiveCell();
 		if (args) {
 			that.focusInvalidCell(args);
@@ -1753,7 +1759,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 		var args = grid.getActiveCell();
 
 		formScope.editRecord(values);
-		formScope.$applyNow();
+		formScope.applyLater();
 
 		if (!formScope.$events.onNew) {
 			return;

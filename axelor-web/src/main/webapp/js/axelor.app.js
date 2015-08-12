@@ -254,7 +254,7 @@
 		var blocked = false;
 		var blockedCounter = 0;
 		var blockedTimer = null;
-		var spinnerTimer = 0;
+		var spinnerTime = 0;
 
 		function block(callback) {
 			if (blocked) return true;
@@ -278,19 +278,22 @@
 		function unblock(callback) {
 			if (blockedTimer) { clearTimeout(blockedTimer); blockedTimer = null; };
 			if (loadingCounter > 0 || blockedCounter > 0 || loadingTimer) {
-				spinnerTimer += 1;
-				if (spinnerTimer > 300) {
+				if (spinnerTime === 0) {
+					spinnerTime = moment();
+				}
+				// show spinner after 5 seconds
+				if (moment().diff(spinnerTime, "seconds") > 5) {
 					blocker.addClass('wait');
 				}
 				if (blockedCounter > 0) {
 					blockedCounter = blockedCounter - 10;
 				}
-				return blockedTimer = _.delay(unblock, 10, callback);
+				return blockedTimer = _.delay(unblock, 200, callback);
 			}
 			doc.off("keydown.blockui mousedown.blockui");
 			body.css("cursor", "");
 			blocker.removeClass('wait').hide();
-			spinnerTimer = 0;
+			spinnerTime = 0;
 			if (callback) {
 				callback(blocked);
 			}
