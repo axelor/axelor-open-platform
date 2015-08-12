@@ -229,7 +229,7 @@ public class MailController extends JpaSupport {
 		return all;
 	}
 
-	private long countUnread() {
+	private Long countUnread() {
 		final TypedQuery<Long> query = getEntityManager().createQuery(SQL_UNREAD, Long.class);
 		QueryBinder.of(query).setCacheable();
 
@@ -238,7 +238,7 @@ public class MailController extends JpaSupport {
 			return query.getSingleResult();
 		} catch (Exception e) {
 		}
-		return 0;
+		return 0L;
 	}
 
 	private Long count(String queryString) {
