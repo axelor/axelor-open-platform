@@ -340,7 +340,7 @@ var NestedEditor = {
 
 			promise.then(function() {
 				configure(nested);
-				scope.waitForActions(doRender);
+				scope.ajaxStop(doRender, 100);
 			});
 		};
 	},
