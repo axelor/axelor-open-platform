@@ -95,7 +95,7 @@ var Editor = function(args) {
 
 		var container = $(args.container);
 		if (external) {
-			container = container.parents('.view-container:first');
+			container = container.parents('.ui-dialog-content:first,.view-container:first').first();
 			$(document).on('mousedown.slick-external', function (e) {
 				if (element.is(e.target) || element.find(e.target).size() > 0) {
 					return;
@@ -177,10 +177,12 @@ var Editor = function(args) {
 			of: args.container
 		});
 		var container = $(args.container);
+		var parent = element.data('$parent') || element;
+		var zIndex = (parent.parents('.slickgrid:first').zIndex() || 0) + container.zIndex();
 		element.css({
 			border: 0,
 			width: container.width(),
-			zIndex: container.zIndex() + 1
+			zIndex: zIndex + 1
 		});
 	};
 	
@@ -641,9 +643,12 @@ Grid.prototype.parse = function(view) {
 					return handler.dataView.deleteItem(0);
 				}
 				if (handler && handler.onEdit) {
-					handler.applyLater(function () {
-						handler.onEdit(true);
-					}, 10);
+					handler.waitForActions(function () {
+						args.grid.setActiveCell(args.row, args.cell);
+						handler.applyLater(function () {
+							handler.onEdit(true);
+						});
+					});
 				}
 			}
 		});
@@ -978,7 +983,10 @@ Grid.prototype._doInit = function(view) {
 		if (!that.editorScope || that.editorScope.isValid()) {
 			return;
 		}
-		
+		if (that.editorForm && that.editorForm.is(":hidden")) {
+			return;
+		}
+
 		var args = that.grid.getActiveCell();
 		if (args) {
 			that.focusInvalidCell(args);
@@ -1724,7 +1732,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 		var args = grid.getActiveCell();
 
 		formScope.editRecord(values);
-		formScope.$applyNow();
+		formScope.applyLater();
 
 		if (!formScope.$events.onNew) {
 			return;

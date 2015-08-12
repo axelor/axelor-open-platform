@@ -64,22 +64,29 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 
 		// fetch '.' names
 		var path = $element.attr('x-path');
+		var related = {};
 		var relatives = $element.parents().find('[x-field][x-path^="'+path+'."]').map(
 				function(){
 					return $(this).attr('x-path').replace(path+'.','');
 				}).get();
-
 		relatives = _.unique(relatives);
-		relatives = _.filter(relatives, function (name) {
+		missing = _.filter(relatives, function (name) {
 			return !value || value[name] === undefined;
 		});
-		if (relatives.length > 0 && value && value.id) {
+		_.each(relatives, function(name) {
+			var prefix = name.split('.')[0];
+			related[prefix] = record[prefix];
+		});
+		if (missing.length > 0 && value && value.id) {
 			return ds.read(value.id, {
-				fields: relatives
+				fields: missing
 			}).success(function(rec){
-				var record = { 'id' : value.id };
+				var record = _.extend({}, related, {
+					id: value.id,
+					$version: value.version || value.$version
+				});
 				record[nameField] = rec[nameField];
-				_.each(relatives, function(name) {
+				_.each(missing, function(name) {
 					var prefix = name.split('.')[0];
 					record[prefix] = rec[prefix];
 				});
@@ -89,14 +96,14 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		// end fetch '.' names
 
 		if (value && value.id) {
-			record = {
+			record = _.extend({}, related, {
 				id: value.id,
 				$version: value.version || value.$version
-			};
+			});
 			record[nameField] = value[nameField];
 			if (nameField && _.isUndefined(value[nameField])) {
 				return ds.details(value.id, nameField).success(function(rec){
-					$scope.setValue(rec, true);
+					$scope.setValue(_.extend({}, related, rec), true);
 				});
 			}
 			if (value.code) {

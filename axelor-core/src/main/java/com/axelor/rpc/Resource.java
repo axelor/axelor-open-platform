@@ -510,33 +510,59 @@ public class Resource<T extends Model> {
 
 		final List<Object> data = Lists.newArrayList();
 		final String[] fields = request.getFields().toArray(new String[]{});
-		final Map<String, List<String>> related = request.getRelated();
-		final Map<String, Object> values = toMap(entity, fields);
-
-		if (related != null) {
-			final Mapper mapper = Mapper.of(model);
-			for (final String name : related.keySet()) {
-				final String[] names = related.get(name).toArray(new String[] {});
-				Object value = mapper.get(entity, name);
-				if (value instanceof Collection<?>) {
-					value = Collections2.transform(
-						(Collection<?>) value,
-						new Function<Object, Object>() {
-							@Override
-							public Object apply(Object input) {
-								return toMap(input, names);
-							}
-						});
-				} else if (value instanceof Model) {
-					value = toMap(value, names);
-				}
-				values.put(name, value);
-			}
-		}
+		final Map<String, Object> values = mergeRelated(request, entity, toMap(entity, fields));
 
 		data.add(values);
 		response.setData(data);
 		return response;
+	}
+
+	@SuppressWarnings("all")
+	private Map<String, Object> mergeRelated(Request request, Model entity, Map<String, Object> values) {
+		final Map<String, List<String>> related = request.getRelated();
+		if (related == null) {
+			return values;
+		}
+		final Mapper mapper = Mapper.of(model);
+		for (final String name : related.keySet()) {
+			final String[] names = related.get(name).toArray(new String[] {});
+			Object old = values.get(name);
+			Object value = mapper.get(entity, name);
+			if (value instanceof Collection<?>) {
+				value = Collections2.transform(
+					(Collection<?>) value,
+					new Function<Object, Object>() {
+						@Override
+						public Object apply(Object input) {
+							return toMap(input, names);
+						}
+					});
+			} else if (value instanceof Model) {
+				value = toMap(value, names);
+				if (old instanceof Map) {
+					value = mergeMaps((Map) value, (Map) old);
+				}
+			}
+			values.put(name, value);
+		}
+		return values;
+	}
+
+	@SuppressWarnings("all")
+	private Map<String, Object> mergeMaps(Map<String, Object> target, Map<String, Object> source) {
+		if (target == null || source == null || source.isEmpty()) {
+			return target;
+		}
+		for (String key : source.keySet()) {
+			Object old = source.get(key);
+			Object val = target.get(key);
+			if (val instanceof Map && old instanceof Map) {
+				mergeMaps((Map) val, (Map) old);
+			} else if (val == null) {
+				target.put(key, old);
+			}
+		}
+		return target;
 	}
 
 	public Response verify(Request request) {

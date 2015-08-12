@@ -206,7 +206,7 @@
 		var blocked = false;
 		var blockedCounter = 0;
 		var blockedTimer = null;
-		var spinnerTimer = 0;
+		var spinnerTime = 0;
 
 		function block(callback) {
 			if (blocked) return true;
@@ -230,19 +230,22 @@
 		function unblock(callback) {
 			if (blockedTimer) { clearTimeout(blockedTimer); blockedTimer = null; };
 			if (loadingCounter > 0 || blockedCounter > 0 || loadingTimer) {
-				spinnerTimer += 1;
-				if (spinnerTimer > 300) {
+				if (spinnerTime === 0) {
+					spinnerTime = moment();
+				}
+				// show spinner after 5 seconds
+				if (moment().diff(spinnerTime, "seconds") > 5) {
 					blocker.addClass('wait');
 				}
 				if (blockedCounter > 0) {
 					blockedCounter = blockedCounter - 10;
 				}
-				return blockedTimer = _.delay(unblock, 10, callback);
+				return blockedTimer = _.delay(unblock, 200, callback);
 			}
 			doc.off("keydown.blockui mousedown.blockui");
 			body.css("cursor", "");
 			blocker.removeClass('wait').hide();
-			spinnerTimer = 0;
+			spinnerTime = 0;
 			if (callback) {
 				callback(blocked);
 			}
@@ -377,7 +380,7 @@
 				errorWindow = $('#errorWindow')
 				.attr('title', _t('Error'))
 				.dialog({
-					dialogClass: 'ui-dialog-responsive',
+					dialogClass: 'ui-dialog-error ui-dialog-responsive',
 					draggable: true,
 					resizable: false,
 					closeOnEscape: true,
@@ -392,9 +395,20 @@
 						text: _t("Show Details"),
 						'class': 'btn',
 						click: function(){
+							var elem = $(this);
 							$scope.onErrorWindowShow('stacktrace');
-							$scope.applyLater();
-							axelor.$adjustSize();
+							$scope.$apply(function () {
+								setTimeout(function () {
+									var maxHeight = $(document).height() - 132;
+									var height = maxHeight;
+									if (height > elem[0].scrollHeight) {
+										height = elem[0].scrollHeight + 8;
+									}
+									elem.height(height);
+									elem.dialog('option', 'position', 'center');
+									elem.dialog('widget').height(elem.dialog('widget').height());
+								}, 100);
+							});
 						}
 					}, {
 						text: _t("Close"),
@@ -406,7 +420,10 @@
 				});
 			}
 			
-			return errorWindow.dialog(hide ? 'close' : 'open').height('auto');
+			return errorWindow
+				.dialog(hide ? 'close' : 'open')
+				.dialog('widget').css('top', 6)
+				.height('auto');
 		}
 	
 		$scope.doLogin = function() {

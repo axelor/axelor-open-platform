@@ -99,18 +99,6 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		});
 	};
 
-	$scope.$actionPromises = [];
-
-	function afterActions(callback) {
-		$scope.$timeout(function () {
-			$scope.ajaxStop(function () {
-				var all = $scope.$actionPromises;
-				$scope.$actionPromises = [];
-				$q.all(all).then(callback);
-			}, 100);
-		}, 100);
-	}
-
 	function isChanged() {
 		if ($scope.isDirty()) return true;
 		var record = $scope.record || {};
@@ -152,26 +140,26 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			return;
  		}
 
-		afterActions(function() {
+		// wait for onChange actions
+		$scope.waitForActions(function() {
 			if ($scope.editorCanSave && isChanged()) {
 				if (record.id < 0)
 					record.id = null;
 				return $scope.onSave({force: true}).then(function(record, page) {
-					afterActions(function(){
+					// wait for onSave actions
+					$scope.waitForActions(function(){
 						close(record, true);
 					});
 				});
 			}
-			close(record);
+			if ($scope.isValid()) {
+				close(record);
+			}
 		});
 	};
 	
 	$scope.onOK = function() {
-		if ($scope.isValid()) {
-			setTimeout(function () {
-				afterActions(onOK);
-			});
-		}
+		$scope.$timeout(onOK, 10);
 	};
 
 	$scope.onBeforeClose = function(event, ui) {
