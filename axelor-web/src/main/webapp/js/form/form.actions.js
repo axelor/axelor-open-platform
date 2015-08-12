@@ -135,6 +135,7 @@ function ActionHandler($scope, ViewService, options) {
 		throw 'No action provided.';
 
 	this.canSave = options.canSave;
+	this.name = options.name;
 	this.prompt = options.prompt;
 	this.action = options.action;
 	this.element = options.element || $();
@@ -210,9 +211,9 @@ ActionHandler.prototype = {
 
 		var self = this,
 			scope = this.scope;
-		scope.waitForActions(function() {
+		scope.ajaxStop(function() {
 			self.handle().then(deferred.resolve, deferred.reject);
-		});
+		}, 100);
 		return promise;
 	},
 	
@@ -259,12 +260,29 @@ ActionHandler.prototype = {
 	},
 
 	handle: function() {
+		var that = this;
 		var action = this.action.trim();
-		var promise = this._handleAction(action);
-		if (this.scope.$actionPromises) {
-			this.scope.$actionPromises.push(promise);
-		}
-		return promise;
+		var deferred = this.ws.defer();
+
+		this.scope.waitForActions(function () {
+			var promise = that._handleAction(action);
+			var all = that.scope.$actionPromises || [];
+
+			function done() {
+				setTimeout(function () {
+					var i = all.indexOf(promise);
+					if (i > -1) {
+						all.splice(i, 1);
+					}
+				}, 10);
+			}
+
+			all.push(promise);
+			promise.then(done, done);
+			promise.then(deferred.resolve, deferred.reject);
+		});
+
+		return deferred.promise;
 	},
 	
 	_blockUI: function() {
@@ -295,8 +313,52 @@ ActionHandler.prototype = {
 		return deferred.promise;
 	},
 
-	_handleSave: function(validateOnly) {
+	_checkVersion: function() {
 		var self = this;
+		var scope = this.scope;
+		var deferred = this.ws.defer();
+
+		if (scope.checkVersion) {
+			scope.checkVersion(function (verified) {
+				if (verified) {
+					return deferred.resolve();
+				}
+				axelor.dialogs.error(
+						_t("The record has been updated or delete by another action."));
+				deferred.reject();
+			});
+		} else {
+			deferred.resolve();
+		}
+
+		return deferred.promise;
+	},
+
+	_handleSave: function(validateOnly) {
+		if (validateOnly) {
+			return this.__handleSave(validateOnly);
+		}
+		var self = this;
+		var deferred = this.ws.defer();
+
+		this._checkVersion().then(function () {
+			self.__handleSave().then(deferred.resolve, deferred.reject);
+		}, deferred.reject);
+
+		return deferred.promise;
+	},
+
+	__handleSave: function(validateOnly) {
+		var self = this;
+		var scope = this.scope;
+		var o2mPopup = scope._isPopup && (scope.$parent.field||{}).serverType === "one-to-many";
+		if (o2mPopup && !validateOnly && this.name == 'onLoad' && !((scope.record||{}).id > 0)) {
+			var deferred = this.ws.defer();
+			var msg = _t("The {0}={1} event can't call 'save' action on unsaved o2m item.", this.name, this.action);
+			deferred.reject(msg);
+			console.error(msg);
+			return deferred.promise;
+		}
 		return this._fireBeforeSave().then(function() {
 			return self.__doHandleSave(validateOnly);
 		});
@@ -320,7 +382,7 @@ ActionHandler.prototype = {
 			deferred.reject();
 			return deferred.promise;
 		}
-		if (validateOnly) {
+		if (validateOnly || (scope.isDirty && !scope.isDirty())) {
 			deferred.resolve();
 			return deferred.promise;
 		}
@@ -349,7 +411,7 @@ ActionHandler.prototype = {
 			scope.onSave({
 				values: values,
 				callOnSave: false,
-				force: true
+				wait: false
 			}).then(deferred.resolve, deferred.reject);
 		} else {
 			doSave(values);
@@ -857,6 +919,7 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 			}
 			
 			var handler = new ActionHandler(scope, ViewService, {
+				name: name,
 				element: element,
 				action: action,
 				canSave: props.canSave,

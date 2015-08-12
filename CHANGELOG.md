@@ -1,3 +1,25 @@
+# 3.0.14 (2015-08-12)
+
+## Bug fixes
+
+- fix onChange issue on popup
+- fix external editor visibility in grid widget
+- fix dotted field update issue
+- fix error dialog issues
+- fix action-group & action-validate resume issue
+- fix duplicate onSelect issue on tabs
+- fix various nested editor issues
+- fix action execution issue on popup editor
+- fix pending action promises are not cleared
+- fix wrong validation error from editable grid
+
+## Improvements
+
+- do not allow 'save' with onLoad on unsaved o2m item
+- show wait spinner after 5 seconds
+- extract i18n strings from xml sources
+- always check record version before 'save' action
+
 # 3.0.13 (2015-07-17)
 
 ## Bug fixes
