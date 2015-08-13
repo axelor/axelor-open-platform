@@ -1,4 +1,10 @@
-# Current (3.0.15)
+# 3.0.15 (2015-08-13)
+
+## Bug fixes
+
+- fix pending actions callback issue
+- fix nest editor not refreshing record
+- fix nested in nested editor not refreshing record
 
 # 3.0.14 (2015-08-12)
 
