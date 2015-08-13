@@ -282,8 +282,11 @@ var NestedEditor = {
 				if (_.isEmpty(old)) old = null;
 
 				if (rec) {
-					rec.$dirty = !ds.equals(rec, original);
-					model.$setViewValue(rec.$dirty ? rec : orig);
+					var dirty = !ds.equals(rec, original);
+					if (original) {
+						rec.$dirty = dirty;
+					}
+					model.$setViewValue(dirty ? rec : orig);
 				}
 				setValidity(nested, nested.isValid());
 			}, true);
@@ -340,7 +343,7 @@ var NestedEditor = {
 
 			promise.then(function() {
 				configure(nested);
-				scope.waitForActions(doRender);
+				scope.ajaxStop(doRender, 100);
 			});
 		};
 	},
