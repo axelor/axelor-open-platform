@@ -1,4 +1,11 @@
-# Current (3.0.16)
+# 3.0.16 (2015-08-14)
+
+## Bug fixes
+
+- fix master-detail refresh issue
+- fix summary-view issues
+- fix onChange in popup editor
+- fix dirty checking issue on record save
 
 # 3.0.15 (2015-08-13)
 
