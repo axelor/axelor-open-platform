@@ -144,11 +144,21 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 	$scope.canUpdate = function () {
 		return $scope.record && $scope.record.id;
 	};
-	
-	$scope.$on('grid:changed', function(event) {
+
+	function loadSelected() {
 		var record = $scope.getSelectedRecord();
 		if ($scope.isDetailView) {
 			$scope.edit(record);
+		}
+	}
+
+	$scope.$on('grid:changed', function(event) {
+		loadSelected();
+	});
+
+	$scope.$on('on:edit', function(event, record) {
+		if ($scope.$parent.record === record) {
+			loadSelected();
 		}
 	});
 	
