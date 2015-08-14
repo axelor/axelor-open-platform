@@ -81,9 +81,12 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 			$scope.edit($scope.getSelectedRecord());
 			return;
 		}
-		$scope.visible = false;
-		$element.hide();
-		$element.data('$rel').show();
+		$scope.edit(null);
+		$scope.waitForActions(function () {
+			$scope.visible = false;
+			$element.hide();
+			$element.data('$rel').show();
+		});
 	};
 	
 	$scope.edit = function(record) {
@@ -102,8 +105,17 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 		}
 		var record = $scope.record;
 		if (record) record.$fetched = true;
-		$scope.select(record);
-		setTimeout(doClose);
+
+		var event = $scope.$broadcast('on:before-save', record);
+		if (event.defaultPrevented) {
+			if (event.error) {
+				return axelor.dialogs.error(event.error);
+			}
+		}
+		$scope.waitForActions(function () {
+			$scope.select($scope.record);
+			$scope.waitForActions(doClose);
+		});
 	};
 	
 	$scope.onAdd = function() {
@@ -175,6 +187,14 @@ var EmbeddedEditor = {
 	css: 'nested-editor',
 	scope: true,
 	controller: EmbeddedEditorCtrl,
+	link: function (scope, element, attrs) {
+		setTimeout(function () {
+			var prev = element.prev();
+			if (prev.is("[ui-slick-grid]")) {
+				element.zIndex(prev.zIndex() + 1);
+			}
+		});
+	},
 	template:
 		'<fieldset class="form-item-group bordered-box" ui-show="visible">'+
 			'<div ui-view-form x-handler="this"></div>'+
