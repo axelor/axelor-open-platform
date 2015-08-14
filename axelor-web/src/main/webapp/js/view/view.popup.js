@@ -555,7 +555,7 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			}
 
 			//XXX: ui-dialog issue
-			element.find('.slick-headerrow-column,.slickgrid').zIndex(element.zIndex());
+			element.find('.slick-headerrow-column,.slickgrid,[ui-embedded-editor]').zIndex(element.zIndex());
 			element.find('.record-toolbar .btn').zIndex(element.zIndex()+1);
 
 			scope.ajaxStop(function() {
