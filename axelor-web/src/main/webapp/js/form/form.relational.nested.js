@@ -170,7 +170,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 
 	$scope.$on('on:edit', function(event, record) {
 		if ($scope.$parent.record === record) {
-			loadSelected();
+			$scope.waitForActions(loadSelected);
 		}
 	});
 	
