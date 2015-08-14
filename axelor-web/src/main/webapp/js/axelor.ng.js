@@ -60,11 +60,12 @@
 			};
 
 			__custom__.$actionPromises = [];
-			__custom__.waitForActions = function waitForActions(callback) {
+			__custom__.waitForActions = function waitForActions(callback, wait) {
 				if ($q === null) {
 					$q = $injector.get('$q');
 				}
 				var that = this;
+				var waitFor = wait || 10;
 				this.$timeout(function () {
 					// wait for any pending ajax requests
 					that.ajaxStop(function () {
@@ -80,7 +81,7 @@
 							}
 						}, callback);
 					});
-				});
+				}, waitFor);
 			};
 
 			__custom__.applyLater = function applyLater(func, wait) {

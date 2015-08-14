@@ -54,7 +54,10 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		_showNestedEditor(show, record);
 		if (embedded) {
 			embedded.data('$rel').hide();
-			embedded.data('$scope').edit(record);
+			var formScope = embedded.scope();
+			formScope._viewPromise.then(function () {
+				formScope.edit(record);
+			});
 		}
 		return embedded;
 	};
@@ -539,7 +542,7 @@ ui.formInput('OneToMany', {
 				resizable: false,
 				width: 16,
 				formatter: function(row, cell, value, columnDef, dataContext) {
-					return '<i class="fa fa-caret-right" style="display: inline-block; cursor: pointer; padding: 2px 8px; font-size: 15.5px;"></i>';
+					return '<i class="fa fa-caret-right" style="display: inline-block; cursor: pointer; padding: 4px 10px;"></i>';
 				}
 			};
 			
@@ -549,8 +552,12 @@ ui.formInput('OneToMany', {
 			grid.setColumns(cols);
 			grid.onClick.subscribe(function(e, args) {
 				if ($(e.target).is('.fa-caret-right'))
-					setTimeout(function(){
-						scope.onSummary();
+					scope.$timeout(function(){
+						grid.setSelectedRows([args.row]);
+						grid.setActiveCell(args.row, args.cell);
+						scope.$timeout(function () {
+							scope.onSummary();
+						});
 					});
 			});
 		};

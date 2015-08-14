@@ -569,8 +569,9 @@ function FormViewCtrl($scope, $element) {
 		}
 
 		function doOnSave() {
-			if (!$scope.canSave()) {
+			if (!$scope.hasPermission('write') || !$scope.isValid()) {
 				$scope.showErrorNotice();
+				defer.reject();
 				return defer.promise;
 			}
 			if (saveAction) {
