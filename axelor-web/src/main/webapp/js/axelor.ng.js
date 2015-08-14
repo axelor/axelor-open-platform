@@ -78,7 +78,7 @@
 							if (callback) {
 								callback();
 							}
-						});
+						}, callback);
 					});
 				});
 			};
