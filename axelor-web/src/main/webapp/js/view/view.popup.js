@@ -155,7 +155,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			if ($scope.isValid()) {
 				close(record);
 			}
-		});
+		}, 100);
 	};
 	
 	$scope.onOK = function() {
