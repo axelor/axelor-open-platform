@@ -122,6 +122,14 @@
 	box-shadow: none !important;
 }
 
+
+.slick-headerrow i.combo-icon {
+	position: absolute;
+	font-size: 14px;
+	top: 5px;
+	right: 6px;
+}
+
 .slick-header-column.ui-state-default {
 	height: inherit;
 	line-height: inherit;

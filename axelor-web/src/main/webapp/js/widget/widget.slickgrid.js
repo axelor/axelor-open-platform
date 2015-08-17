@@ -65,7 +65,12 @@ function makeFilterCombo(input, selection, callback) {
 		case 46:	// delete
 			update(null);
 		}
-	}).focus(function(){
+	}).click(function(){
+		input.autocomplete("search", "");
+	});
+
+	$("<i class='fa fa-caret-down combo-icon'></i>").appendTo(input.parent()).click(function () {
+		input.focus();
 		input.autocomplete("search", "");
 	});
 }
