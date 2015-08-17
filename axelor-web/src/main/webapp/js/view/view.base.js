@@ -615,6 +615,12 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 				return;
 			}
 			
+			// disable backspace as back button
+			if (e.which === 8 && e.target === document.body) {
+				e.preventDefault();
+				return false;
+			}
+
 			var action = keys[e.which];
 			
 			if (action === "toggle-menu") {
