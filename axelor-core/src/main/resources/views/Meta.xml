@@ -169,6 +169,11 @@
     <field name="sequence"/>
     <field name="priority"/>
   </grid>
+  
+  <grid title="Menu Items" name="meta-menu-grid-simple" model="com.axelor.meta.db.MetaMenu">
+    <field name="name"/>
+    <field name="title"/>
+  </grid>
 
   <form name="meta-menu-form" title="Menu Item" model="com.axelor.meta.db.MetaMenu">
     <panel title="Overview">
@@ -358,5 +363,43 @@
       <field name="description"/>
     </panel>
   </form>
+  
+  <grid title="Group Menu Assistant" name="meta-group-menu-assistant-grid" model="com.axelor.meta.db.MetaGroupMenuAssistant">
+    <field name="metaFile" />
+    <field name="importDate" />
+    <field name="createdBy" />
+    <field name="updatedBy" />      
+  </grid>
+  
+  <form title="Group Menu Assistant" name="meta-group-menu-assistant-form" model="com.axelor.meta.db.MetaGroupMenuAssistant" width="large">
+    <panel>
+      <panel-related field="groupSet" colSpan="4" />
+      <panel-related field="menuSet" grid-view="meta-menu-grid-simple" colSpan="8"/>
+      <field name="metaFile" colSpan="6" x-can-delete="true" x-show-icons="select">
+        	<editor x-show-titles="false">
+        		<field name="fileName" colSpan="8"  />
+            <field name="content" widget="binary" colSpan="4" />
+            <field name="filePath" hidden="true"/>
+          </editor>
+      </field>
+      <field name="language" />
+      <button name="createFile" title="Create file" colSpan="3" onClick="save,action-meta-method-create-group-menu-file"/>
+      <button name="importFile" title="Import" readonlyIf="metaFile == null" colSpan="3" onClick="save,action-meta-method-import-group-menu,save"/>
+      <panel title="Details" colSpan="12">
+        <field name="importDate" colSpan="4"/>
+        <field name="createdBy" colSpan="4"/>
+        <field name="updatedBy" colSpan="4"/>
+      </panel>
+      <field name="log" colSpan="12"/>
+    </panel>
+  </form>
 
+  <action-method name="action-meta-method-create-group-menu-file">
+      <call class="com.axelor.meta.web.MetaController" method="createGroupMenuFile"/>
+  </action-method>
+  
+  <action-method name="action-meta-method-import-group-menu">
+      <call class="com.axelor.meta.web.MetaController" method="importGroupMenu"/>
+  </action-method>
+  
 </object-views>

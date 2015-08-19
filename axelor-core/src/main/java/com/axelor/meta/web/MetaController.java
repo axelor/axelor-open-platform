@@ -30,6 +30,8 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
+import org.joda.time.LocalDateTime;
+
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -40,6 +42,7 @@ import com.axelor.meta.MetaScanner;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaField;
+import com.axelor.meta.db.MetaGroupMenuAssistant;
 import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
@@ -49,6 +52,7 @@ import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.actions.ActionView;
+import com.axelor.meta.service.MetaGroupMenuAssistantService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.google.common.base.Throwables;
@@ -61,9 +65,12 @@ public class MetaController {
 
 	@Inject
 	private ModuleManager moduleManager;
-	
+
 	@Inject
 	private MetaTranslationRepository translations;
+
+	@Inject
+	private MetaGroupMenuAssistantService groupMenuAssistantService;
 
 	private ObjectViews validateXML(String xml) {
 		try {
@@ -147,17 +154,17 @@ public class MetaController {
 			response.setException(e);
 		}
 	}
-	
+
 	private static final String DEFAULT_EXPORT_DIR = "{java.io.tmpdir}/axelor/data-export";
 	private static final String EXPORT_DIR = AppSettings.get().getPath("data.export.dir", DEFAULT_EXPORT_DIR);
-	
+
 	private void exportI18n(String module, URL file) throws IOException {
 
 		String name = Paths.get(file.getFile()).getFileName().toString();
 		if (!name.startsWith("messages_")) {
 			return;
 		}
-		
+
 		Path path = Paths.get(EXPORT_DIR, "i18n");
 		String lang = name.substring(9, name.length() - 4);
 		Path target = path.resolve(Paths.get(module, "src/main/resources/i18n", name));
@@ -171,19 +178,19 @@ public class MetaController {
 				if (header.length != values.length) {
 					continue;
 				}
-				
+
 				final Map<String, String> map = new HashMap<>();
 				for (int i = 0; i < header.length; i++) {
 					map.put(header[i], values[i]);
 				}
-				
+
 				String key = map.get("key");
 				String value = map.get("value");
-				
+
 				if (StringUtils.isBlank(key)) {
 					continue;
 				}
-				
+
 				MetaTranslation tr = translations.findByKey(key, lang);
 				if (tr != null) {
 					value = tr.getMessage();
@@ -196,7 +203,7 @@ public class MetaController {
 		} finally {
 			reader.close();
 		}
-		
+
 		Files.createParentDirs(target.toFile());
 
 		CSVWriter writer = new CSVWriter(new FileWriter(target.toFile()));
@@ -219,5 +226,28 @@ public class MetaController {
 			}
 		}
 		response.setFlash(I18n.get("Export complete."));
+	}
+
+	public void createGroupMenuFile(ActionRequest request, ActionResponse response) {
+
+		MetaGroupMenuAssistant groupMenuAssistant = request.getContext().asType(MetaGroupMenuAssistant.class);
+		groupMenuAssistantService.createGroupMenuFile(groupMenuAssistant);
+		response.setReload(true);
+	}
+
+	public void importGroupMenu(ActionRequest request, ActionResponse response) {
+
+		MetaGroupMenuAssistant groupMenuAssistant = request.getContext().asType(MetaGroupMenuAssistant.class);
+		String errorLog = groupMenuAssistantService.importGroupMenu(groupMenuAssistant);
+
+		if(errorLog.equals("")){
+			response.setFlash("Imported completed succesfully");
+			response.setValue("importDate", LocalDateTime.now());
+		}
+		else{
+			response.setValue("log", errorLog);
+			response.setFlash("Error in import. Please check the log");
+		}
+
 	}
 }

@@ -189,9 +189,9 @@
   </entity>
   
   <entity name="MetaTranslation" table="META_TRANSLATION" logUpdates="false">
-    <string name="key" required="true" large="true" />
+    <string name="key" required="true" large="true" column="key"/>
     <string name="message" large="true" />
-    <string name="language" required="true" />
+    <string name="language" required="true" column="language"/>
     <unique-constraint columns="key,language"/>
     <finder-method name="findByKey" using="key,language" cacheable="true" />
   </entity>
@@ -221,6 +221,15 @@
   	<long name="objectId" required="true"/>
   	<many-to-one name="metaFile" ref="MetaFile" title="File" required="true" column="meta_file"/>
   	<unique-constraint columns="objectName,objectId,meta_file"/>
+  </entity>
+  
+  <entity name="MetaGroupMenuAssistant" table="META_GROUP_MENU_ASSISTANT">
+    <many-to-many name="groupSet" ref="com.axelor.auth.db.Group" title="Groups"/>
+    <many-to-many name="menuSet" ref="MetaMenu" title="Menus"/>
+    <many-to-one name="metaFile" ref="MetaFile" title="File" />
+    <datetime name="importDate" title="Import date"/>
+    <string name="language" title="Language" selection="select.language" default="en"/>
+    <string name="log" large="true" title="Log" />
   </entity>
 
 </domain-models>
