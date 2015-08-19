@@ -22,6 +22,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +60,6 @@ import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class PermissionAssistantService {
 
@@ -92,6 +94,8 @@ public class PermissionAssistantService {
 			add(I18n.get("Create"));
 			add(I18n.get("Delete"));
 			add(I18n.get("Export"));
+			add(I18n.get("Readonly If"));
+			add(I18n.get("Hide If"));
 	}};
 
 	private String getFileName(PermissionAssistant assistant){
@@ -143,12 +147,12 @@ public class PermissionAssistantService {
 			add("Title");
 		}};
 
-		String[] groupRow = new String[assistant.getGroupSet().size()*6+3];
+		String[] groupRow = new String[assistant.getGroupSet().size()*8+3];
 		Integer count = 3;
 		for(Group group : assistant.getGroupSet()){
 			groupRow[count+1] = group.getCode();
 			headerRow.addAll(groupHeader);
-			count += 6;
+			count += 8;
 		}
 
 		LOG.debug("Header row created: {}",headerRow);
@@ -158,6 +162,16 @@ public class PermissionAssistantService {
 
 		writeObject(csvWriter, assistant, groupRow.length);
 
+	}
+
+	public Comparator<Object> compareField() {
+
+		 return new Comparator<Object>() {
+	            @Override
+	            public int compare(Object field1, Object field2) {
+	                return ((MetaField)field1).getName().compareTo(((MetaField)field2).getName());
+	            }
+	        };
 	}
 
 	private void writeObject(CSVWriter csvWriter, PermissionAssistant assistant, Integer size) {
@@ -172,7 +186,10 @@ public class PermissionAssistantService {
 			row[0] = object.getFullName();
 			csvWriter.writeNext(row);
 
-			for(MetaField field : object.getMetaFields()){
+			List<MetaField> fieldList = object.getMetaFields();
+			Collections.sort(fieldList, compareField());
+
+			for(MetaField field : fieldList){
 
 				MetaTranslation translation = metaTranslationRepository.all().filter("self.language = ?1 and self.key = ?2",
 						language, field.getLabel()).fetchOne();
@@ -192,6 +209,7 @@ public class PermissionAssistantService {
 
 	}
 
+
 	private boolean checkHeaderRow(String[] headerRow){
 
 		@SuppressWarnings("serial")
@@ -204,7 +222,7 @@ public class PermissionAssistantService {
 		Integer count = 3;
 		while(count < headerRow.length){
 			headerList.addAll(groupHeader);
-			count += 6;
+			count += 8;
 		}
 		LOG.debug("Standard Headers: {}",headerList);
 
@@ -223,7 +241,7 @@ public class PermissionAssistantService {
 			CSVReader csvReader = new CSVReader(new FileReader(csvFile), ';');
 
 			String[] groupRow = csvReader.readNext();
-			if(groupRow == null || groupRow.length < 9){
+			if(groupRow == null || groupRow.length < 11){
 				errorLog = I18n.get("Bad import file");
 			}
 
@@ -244,6 +262,8 @@ public class PermissionAssistantService {
 			Map<String, MetaPermission> metaPermissionDict = new HashMap<String, MetaPermission>();
 			processCSV(csvReader, groupRow, null, metaPermissionDict, groupMap);
 
+			saveGroups(groupMap);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			errorLog += "\n"+String.format(I18n.get("Error in import: %s. Please check the server log"), e.getMessage());
@@ -252,12 +272,21 @@ public class PermissionAssistantService {
 		return errorLog;
 	}
 
+	@Transactional
+	public void saveGroups(Map<String, Group> groupMap) {
+
+		for(Group group: groupMap.values()){
+			groupRepository.save(group);
+		}
+
+	}
+
 	private Map<String,Group> checkBadGroups(String[] groupRow){
 
 		List<String> badGroups = new ArrayList<String>();
 		Map<String,Group> groupMap = new HashMap<String, Group>();
 
-		for(Integer glen = 4; glen<groupRow.length; glen+=6){
+		for(Integer glen = 4; glen<groupRow.length; glen+=8){
 
 			String groupName = groupRow[glen];
 			Group group = groupRepository.all().filter("self.code = ?1", groupName).fetchOne();
@@ -298,12 +327,12 @@ public class PermissionAssistantService {
 			return;
 		}
 
-		for(Integer groupIndex = 4; groupIndex<row.length; groupIndex+=6){
+		for(Integer groupIndex = 4; groupIndex < row.length; groupIndex += 8){
 
 			String groupName = groupRow[groupIndex];
 			if(!groupMap.containsKey(groupName)) {continue;}
 
-			String[] rowGroup = (String[]) Arrays.copyOfRange(row, groupIndex, groupIndex+6);
+			String[] rowGroup = (String[]) Arrays.copyOfRange(row, groupIndex, groupIndex + 8);
 
 			if(!Strings.isNullOrEmpty(groupName) && !Strings.isNullOrEmpty(row[0])){
 				objectName = checkObject(row[0]);
@@ -324,12 +353,11 @@ public class PermissionAssistantService {
 	}
 
 
-	@Transactional
 	public MetaPermission getMetaPermission(Group group, String objectName){
 
 		String[] objectNames = objectName.split("\\.");
 		String groupName = group.getCode();
-		String permName = groupName+"."+objectNames[objectNames.length-1];
+		String permName = groupName + "." + objectNames[objectNames.length - 1];
 		MetaPermission metaPermission = metaPermissionRepository.all().filter("self.name = ?1",  permName).fetchOne();
 
 		if(metaPermission == null){
@@ -338,21 +366,18 @@ public class PermissionAssistantService {
 			metaPermission = new MetaPermission();
 			metaPermission.setName(permName);
 			metaPermission.setObject(objectName);
-			metaPermission = metaPermissionRepository.save(metaPermission);
 
 			group.addMetaPermission(metaPermission);
-			groupRepository.save(group);
 
 		}
 
 		return metaPermission;
 	}
 
-	@Transactional
 	public MetaPermission updateFieldPermission(MetaPermission metaPermission, String field, String[] row) {
 
-		MetaPermissionRule permissionRule = ruleRepository.all().filter("self.field = ?1 and self.metaPermission = ?2",
-				field,metaPermission).fetchOne();
+		MetaPermissionRule permissionRule = ruleRepository.all().filter("self.field = ?1 and self.metaPermission.name = ?2",
+				field,metaPermission.getName()).fetchOne();
 
 		if(permissionRule == null){
 			permissionRule = new MetaPermissionRule();
@@ -363,17 +388,18 @@ public class PermissionAssistantService {
 		permissionRule.setCanRead(row[0].equalsIgnoreCase("x"));
 		permissionRule.setCanWrite(row[1].equalsIgnoreCase("x"));
 		permissionRule.setCanExport(row[4].equalsIgnoreCase("x"));
-		ruleRepository.save(permissionRule);
+		permissionRule.setReadonlyIf(row[5]);
+		permissionRule.setHideIf(row[6]);
+		metaPermission.addRule(permissionRule);
 
 		return metaPermission;
 	}
 
-	@Transactional
 	public void updatePermission(Group group, String objectName, String[] row) {
 
 		String[] objectNames = objectName.split("\\.");
 		String groupName = group.getCode();
-		String permName = groupName+"."+objectNames[objectNames.length-1];
+		String permName = groupName + "." + objectNames[objectNames.length-1];
 
 		Permission permission = permissionRepository.all().filter("self.name = ?1", permName).fetchOne();
 		boolean newPermission = false;
@@ -390,11 +416,9 @@ public class PermissionAssistantService {
 		permission.setCanCreate(row[2].equalsIgnoreCase("x"));
 		permission.setCanRemove(row[3].equalsIgnoreCase("x"));
 		permission.setCanExport(row[4].equalsIgnoreCase("x"));
-		permissionRepository.save(permission);
 
 		if(newPermission){
 			group.addPermission(permission);
-			groupRepository.save(group);
 		}
 	}
 }

@@ -48,6 +48,8 @@ public class MetaGroupMenuAssistantService {
 
 	private String errorLog = "";
 
+	private List<MetaMenu> updatedMenu = new ArrayList<MetaMenu>();
+
 	private String getFileName(MetaGroupMenuAssistant groupMenuAssistant){
 
 		String userCode = groupMenuAssistant.getCreatedBy().getCode();
@@ -160,6 +162,8 @@ public class MetaGroupMenuAssistantService {
 
 			csvReader.close();
 
+			saveMenus();
+
 		}catch(Exception e){
 			e.printStackTrace();
 			errorLog += "\n"+String.format(I18n.get("Error in import: %s. Please check server log"), e.getMessage());
@@ -169,6 +173,15 @@ public class MetaGroupMenuAssistantService {
 	}
 
 	@Transactional
+	public void saveMenus() {
+
+		for(MetaMenu menu : updatedMenu){
+			menuRepository.save(menu);
+		}
+
+	}
+
+
 	public void importMenus(CSVReader csvReader, String[] groupRow,
 			Map<String, Group> groupMap) throws IOException {
 
@@ -184,7 +197,6 @@ public class MetaGroupMenuAssistantService {
 			return;
 		}
 
-		boolean menuUpdated = false;
 		for(Integer mIndex = 2; mIndex < row.length; mIndex++ ){
 
 			String groupCode = groupRow[mIndex];
@@ -193,19 +205,19 @@ public class MetaGroupMenuAssistantService {
 				Group group = groupMap.get(groupCode);
 				if(row[mIndex].equalsIgnoreCase("x")){
 					menu.addGroup(group);
-					menuUpdated = true;
+					if(!updatedMenu.contains(menu)){
+						updatedMenu.add(menu);
+					}
 				}
 				else if(menu.getGroups().contains(group)){
 					menu.removeGroup(group);
-					menuUpdated = true;
+					if(!updatedMenu.contains(menu)){
+						updatedMenu.add(menu);
+					}
 				}
 
 			}
 
-		}
-
-		if(menuUpdated){
-			menuRepository.save(menu);
 		}
 
 		importMenus(csvReader, groupRow, groupMap);
