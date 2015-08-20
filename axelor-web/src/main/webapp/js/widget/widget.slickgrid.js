@@ -1321,6 +1321,11 @@ Grid.prototype.onKeyDown = function(e, args) {
 	function focusCell(row, cell) {
 		grid.setActiveCell(row, cell);
 		grid.editActiveCell();
+		// make sure cell has focus RM-3938
+		setTimeout(function () {
+			grid.setActiveCell(row, cell);
+			grid.editActiveCell();
+		});
 	}
 
 	// firefox & IE fails to trigger onChange
