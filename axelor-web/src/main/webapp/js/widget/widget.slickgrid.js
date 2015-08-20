@@ -1388,7 +1388,7 @@ Grid.prototype.isCellEditable = function(cell) {
 	var field = col.descriptor || {};
 	var form = this.editorForm;
 
-	if (field.type === 'button') {
+	if (field.type === 'button' || (field.name && field.name.indexOf('.') > -1)) {
 		return false;
 	}
 	if (!form) {
