@@ -638,7 +638,7 @@ angular.module('axelor.ui').directive('uiEditorPopup', function() {
 				element.on('dialogopen dialogclose', function (e) {
 					scope.waitForActions(function () {
 						scope.isPopupOpen = e.type === 'dialogopen';
-					});
+					}, 2000); // delay couple of seconds to that popup can cleanup
 				});
 			});
 		},
