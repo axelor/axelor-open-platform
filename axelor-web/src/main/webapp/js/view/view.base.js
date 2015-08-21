@@ -226,6 +226,7 @@ function DSViewCtrl(type, $scope, $element) {
 					isButton: true,
 					items: _.map(toolbar, function (item) {
 						return _.extend({}, item, {
+							name: item.name,
 							action: item.onClick,
 							title: item.title || item.autoTitle || item.name
 						});

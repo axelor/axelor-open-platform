@@ -117,6 +117,7 @@ module.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, 
 					action: item.action,
 					prompt: item.prompt
 				});
+				element.addClass("action-item").attr("x-name", item.name);
 			}
 
 			scope.isRequired = function(){};
