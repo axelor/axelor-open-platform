@@ -203,28 +203,39 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 		link: function(scope, element, attrs) {
 
 			var lazy = false;
-			var unwatch = scope.$watch(function () {
-				var action = attrs.action;
-				if (!action) {
-					return;
-				}
+			(function () {
+				var counter = 0;
+				return function checkLoading() {
+					scope.waitForActions(function () {
+						if (counter < 10 && element.parent().is(":hidden")) {
+							counter++;
+							return setTimeout(checkLoading, 100);
+						}
+						var unwatch = scope.$watch(function () {
+							var action = attrs.action;
+							if (!action) {
+								return;
+							}
 
-				if (element.parent().is(":hidden")) {
-					return lazy = true;
-				}
+							if (element.parent().is(":hidden")) {
+								return lazy = true;
+							}
 
-				unwatch();
-				unwatch = null;
+							unwatch();
+							unwatch = null;
 
-				var ctx = undefined;
-				if (scope.getContext) {
-					ctx = scope.getContext();
+							var ctx = undefined;
+							if (scope.getContext) {
+								ctx = scope.getContext();
+							}
+							scope.initPortlet(action, {
+								context: ctx
+							});
+						});
+					});
 				}
-				scope.initPortlet(action, {
-					context: ctx
-				});
-			});
-			
+			})()();
+
 			scope.parsePortlet = _.once(function(view) {
 
 				scope.noFilter = attrs.canSearch != "true";
