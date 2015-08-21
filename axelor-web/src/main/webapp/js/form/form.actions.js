@@ -233,8 +233,8 @@ ActionHandler.prototype = {
 		context = _.extend({}, viewParams.context, context);
 
 		// include button name as _signal (used by workflow engine)
-		if (this.element.is("button,a.button-item")) {
-			context['_signal'] = this.element.attr('name');
+		if (this.element.is("button,a.button-item,li.action-item")) {
+			context['_signal'] = this.element.attr('name') || this.element.attr('x-name');
 		}
 
 		return context;
