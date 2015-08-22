@@ -90,6 +90,10 @@ ui.formInput('BpmnEditor', {
 				var actions = {};
 				var bpmnElement = element.businessObject;
 
+				if (element.type === 'label') {
+				    return actions;
+				}
+
 				function removeElement(e) {
 					if (element.waypoints) {
 						modeling.removeConnection(element);
@@ -140,7 +144,8 @@ ui.formInput('BpmnEditor', {
 				}
 
 				if (!bpmnElement.$instanceOf('bpmn:EndEvent') &&
-				    !bpmnElement.$instanceOf('bpmn:EventBasedGateway')) {
+				    !bpmnElement.$instanceOf('bpmn:EventBasedGateway') &&
+				    !bpmnElement.$instanceOf('bpmn:SequenceFlow')) {
 
 					_.extend(actions, {
 				        'append.gateway': appendAction('bpmn:ExclusiveGateway', 'icon-gateway-xor'),
