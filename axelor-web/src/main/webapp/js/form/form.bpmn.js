@@ -44,15 +44,15 @@ var DEFAULT = '<?xml version="1.0" encoding="UTF-8"?>' +
 '</definitions>';
 
 var PROPS = {
-	'bpmn:StartEvent': ['bpmnId', 'name'],
-	'bpmn:EndEvent': ['bpmnId', 'name'],
-	'bpmn:Task': ['bpmnId', 'name', 'action'],
-	'bpmn:exclusive-gateway' : ['bpmnId', 'name'],
-	'bpmn:ParallelGateway' : ['bpmnId', 'name'],
-	'bpmn:InclusiveGateway' : ['bpmnId', 'name'],
+	'bpmn:StartEvent': ['bpmnId', 'name', 'description'],
+	'bpmn:EndEvent': ['bpmnId', 'name', 'description'],
+	'bpmn:Task': ['bpmnId', 'name', 'action','description'],
+	'bpmn:exclusive-gateway' : ['bpmnId', 'name', 'description'],
+	'bpmn:ParallelGateway' : ['bpmnId', 'name', 'description'],
+	'bpmn:InclusiveGateway' : ['bpmnId', 'name', 'description'],
 	'bpmn:Process': ['bpmnId', 'name', 'model', 'sequence', 'maxnodecounter', 'active', 'archived', 'description'],
-	'bpmn:SequenceFlow': ['bpmnId', 'name', 'sequence', 'signal', 'action', 'role'],
-	'bpmn:IntermediateCatchEvent' : ['bpmnId', 'name', 'datetime', 'timeduration']
+	'bpmn:SequenceFlow': ['bpmnId', 'name', 'sequence', 'signal', 'action', 'role', 'description'],
+	'bpmn:IntermediateCatchEvent' : ['bpmnId', 'name', 'datetime', 'timeduration', 'description']
 };
 
 ui.formInput('BpmnEditor', {
@@ -542,12 +542,6 @@ ui.directive('uiBpmnProps', function () {
 				showIf: '$x.maxnodecounter',
 				colSpan: 12
 			}, {
-				title: _t('Description'),
-				name: 'description',
-				type: 'text',
-				showIf: '$x.model',
-				colSpan: 12
-			}, {
 				title: _t('Active'),
 				name: 'active',
 				type: 'boolean',
@@ -596,6 +590,11 @@ ui.directive('uiBpmnProps', function () {
 				name: 'signal',
 				type: 'string',
 				showIf: '$x.signal',
+				colSpan: 12
+			}, {
+				title: _t('Description'),
+				name: 'description',
+				type: 'text',
 				colSpan: 12
 			}];
 
