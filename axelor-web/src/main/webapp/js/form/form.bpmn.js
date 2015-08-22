@@ -20,17 +20,17 @@
 var ui = angular.module('axelor.ui');
 
 var DEFAULT = '<?xml version="1.0" encoding="UTF-8"?>' +
-'<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
-					'xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" ' +
+'<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
+					'xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" ' +
 					'xmlns:x="http://axelor.com" ' +
 					'xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" ' +
 					'xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" ' +
 					'targetNamespace="http://bpmn.io/schema/bpmn" ' +
 					'id="Definitions_1">' +
-	'<bpmn:process id="Process_1" name="" x:bpmnId="" x:model="" x:description="" isExecutable="false">' +
-	'<bpmn:startEvent id="StartEvent_1"/>' +
-	'<bpmn:endEvent id="EndEvent_1"/>' +
-	'</bpmn:process>' +
+	'<process id="Process_1" name="" x:bpmnId="" x:model="" x:description="" isExecutable="false">' +
+	'<startEvent id="StartEvent_1"/>' +
+	'<endEvent id="EndEvent_1"/>' +
+	'</process>' +
 	'<bpmndi:BPMNDiagram id="BPMNDiagram_1">' +
 	'<bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">' +
 		'<bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">' +
@@ -41,7 +41,7 @@ var DEFAULT = '<?xml version="1.0" encoding="UTF-8"?>' +
 		'</bpmndi:BPMNShape>' +
 	'</bpmndi:BPMNPlane>' +
 	'</bpmndi:BPMNDiagram>' +
-'</bpmn:definitions>';
+'</definitions>';
 
 var PROPS = {
 	'bpmn:StartEvent': ['bpmnId', 'name'],
@@ -378,6 +378,7 @@ ui.formInput('BpmnEditor', {
 			var bo = first.businessObject;
 
 			bo.set("xmlns:x", "http://axelor.com");
+			bo.set("xmlns", "http://www.omg.org/spec/BPMN/20100524/MODEL");
 			bo.set(xname(name), value);
 
 			doSave();
