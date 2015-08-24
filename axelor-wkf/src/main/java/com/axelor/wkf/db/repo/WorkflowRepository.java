@@ -44,4 +44,18 @@ public class WorkflowRepository extends AbstractWorkflowRepository {
 		}
 		return true;
 	}
+
+	@Override
+	public Map<String, Object> populate(Map<String, Object> json, Map<String, Object> context) {
+		Long id = (Long) json.get("id");
+		if (id == null) {
+			return json;
+		}
+		Workflow entity = find(id);
+		if (entity == null || entity.getMetaModel() == null) {
+			return json;
+		}
+		json.put("metaModelName", entity.getMetaModel().getFullName());
+		return json;
+	}
 }

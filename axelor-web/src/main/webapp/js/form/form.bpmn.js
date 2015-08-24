@@ -506,6 +506,10 @@ ui.directive('uiBpmnProps', function () {
 				}
 			});
 
+			$scope.getContext = function () {
+				return $scope.$parent.getContext();
+			}
+
 			var items = [{
 				title: _t('Item ID'),
 				name: 'bpmnId',
@@ -561,6 +565,7 @@ ui.directive('uiBpmnProps', function () {
 				type: 'many-to-one',
 				target: 'com.axelor.meta.db.MetaAction',
 				targetName: 'name',
+				domain: "self.model = :metaModelName",
 				widget: 'BpmnManyToOne',
 				showIf: '$x.action',
 				colSpan: 12
