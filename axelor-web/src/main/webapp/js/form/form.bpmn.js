@@ -384,7 +384,11 @@ ui.formInput('BpmnEditor', {
 			doSave();
 		}
 
+		var last = null;
+
 		function doSave() {
+
+			last = scope.record;
 			modeler.saveXML({ format: true }, function(err, xml) {
 				scope.setValue(xml, true);
 			});
@@ -394,8 +398,6 @@ ui.formInput('BpmnEditor', {
 			modeler.importXML(xml, function(err) {
 			});
 		}
-
-		var last = null;
 
 		model.$render = function () {
 			if (last === scope.record) {
