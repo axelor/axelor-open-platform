@@ -22,6 +22,7 @@ dependencies {
 	
 	compile libs.jdbc_hsqldb
 	compile libs.jdbc_postgres
+	compile libs.jdbc_mysql
 	compile libs.hibernate
 	compile(libs.hibernate_ehcache) {
 		exclude group: "net.sf.ehcache"
