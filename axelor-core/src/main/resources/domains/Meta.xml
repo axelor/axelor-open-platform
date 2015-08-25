@@ -189,10 +189,10 @@
   </entity>
   
   <entity name="MetaTranslation" table="META_TRANSLATION" logUpdates="false">
-    <string name="key" required="true" large="true" column="key"/>
-    <string name="message" large="true" />
+    <string name="key" column="message_key" required="true" large="true" />
+    <string name="message" column="message_value" large="true" />
     <string name="language" required="true" column="language"/>
-    <unique-constraint columns="key,language"/>
+    <unique-constraint columns="message_key,language"/>
     <finder-method name="findByKey" using="key,language" cacheable="true" />
   </entity>
 
@@ -202,16 +202,16 @@
     ]]>
   	<string name="fileName" required="true" namecolumn="true"/>
     <string name="filePath" required="true"/>
-  	<long name="size" title="Size in bytes" readonly="true"/>
-  	<string name="mime" title="File type"/>
+  	<long name="fileSize" title="Size in bytes" readonly="true"/>
+  	<string name="fileType" title="File type"/>
   	<string name="description" multiline="true"/>
-  	<string name="sizeText" title="Size" readonly="true">
+  	<string name="sizeText" column="file_size_text" title="Size" readonly="true">
       <![CDATA[
-      if (size == null) return null;
-      if(size > 1000000000) return String.format("%.2f GB", size / 1000000000.00);
-      if(size > 1000000) return String.format("%.2f MB", size / 1000000.00);
-      if(size >= 1000) return String.format("%.2f KB", size / 1000.00);
-      return size + " B";
+      if (fileSize == null) return null;
+      if(fileSize > 1000000000) return String.format("%.2f GB", fileSize / 1000000000.00);
+      if(fileSize > 1000000) return String.format("%.2f MB", fileSize / 1000000.00);
+      if(fileSize >= 1000) return String.format("%.2f KB", fileSize / 1000.00);
+      return fileSize + " B";
       ]]>
   	</string>
   </entity>

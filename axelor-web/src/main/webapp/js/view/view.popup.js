@@ -398,8 +398,8 @@ function AttachmentCtrl($scope, $element, DataSource, ViewService) {
 	    
 	    var record = {
 			fileName: file.name,
-			mime: file.type,
-			size: file.size,
+			fileType: file.type,
+			fileSize: file.size,
 			id: null,
 			version: null
 	    };

@@ -45,7 +45,7 @@ public class TestFiles extends MetaTest {
 		MetaFile metaFile = files.upload(tmp.toFile());
 		Assert.assertNotNull(metaFile);
 		Assert.assertNotNull(metaFile.getId());
-		Assert.assertEquals("text/plain", metaFile.getMime());
+		Assert.assertEquals("text/plain", metaFile.getFileType());
 
 		// upload again
 		MetaFile metaFile2 = files.upload(tmp.toFile());

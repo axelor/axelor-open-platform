@@ -284,7 +284,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 		json.put("updatedOn", file.getUpdatedOn());
 
 		if (metaFile != null) {
-			json.put("fileType", metaFile.getMime());
+			json.put("fileType", metaFile.getFileType());
 		}
 
 		if ("html".equals(file.getContentType())) {

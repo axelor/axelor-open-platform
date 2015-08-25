@@ -130,7 +130,7 @@ public class FileService extends AbstractService {
 			if (Files.size(file.toPath()) == fileSize) {
 				final MetaFile meta = new MetaFile();
 				meta.setFileName(fileName);
-				meta.setMime(fileType);
+				meta.setFileType(fileType);
 				files.upload(file, meta);
 				return javax.ws.rs.core.Response.ok(meta).build();
 			}

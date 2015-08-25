@@ -9,7 +9,7 @@
     <string name="name" required="true" title="Name"/>
     <boolean name="active" default="true" title="Active"/>
     <many-to-one name="metaModel" ref="com.axelor.meta.db.MetaModel" required="true" title="Model"/>
-    <many-to-one name="condition" ref="com.axelor.meta.db.MetaAction" title="Condition"/>
+    <many-to-one name="condition" column="meta_action" ref="com.axelor.meta.db.MetaAction" title="Condition"/>
     <many-to-one name="node" ref="Node" title="Node"/>
     <integer name="maxNodeCounter" title="Max node counter"/>
     <integer name="sequence" title="Sequence"/>
@@ -42,14 +42,14 @@
 
   <entity name="Transition" repository="abstract">
     <string name="name" title="Name"/>
-    <string name="signal" title="Signal"/>
+    <string name="signal" title="Signal" column="signal_name"/>
     <string name="ref" title="Ref"/>
     <string name="description" large="true" title="Description"/>
     <integer name="sequence" title="Sequence"/>
 
     <many-to-one name="startNode" ref="Node" title="Start node"/>
     <many-to-one name="nextNode" ref="Node" required="true" title="Next node"/>
-    <many-to-one name="condition" ref="com.axelor.meta.db.MetaAction" title="Condition"/>
+    <many-to-one name="condition" column="meta_action" ref="com.axelor.meta.db.MetaAction" title="Condition"/>
     <many-to-one name="role" ref="com.axelor.auth.db.Role" title="Role"/>
   </entity>
 

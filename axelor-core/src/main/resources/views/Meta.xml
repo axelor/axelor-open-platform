@@ -349,7 +349,7 @@
   <grid title="Files" name="meta-files-grid" model="com.axelor.meta.db.MetaFile">
     <field name="fileName"/>
     <field name="sizeText" width="100"/>
-    <field name="mime" width="175"/>
+    <field name="fileType" width="175"/>
     <field name="createdBy" width="175"/>
     <field name="createdOn" width="150"/>
   </grid>
@@ -358,8 +358,8 @@
     <panel title="Overview">
       <field name="content" widget="binary" title="File"/>
       <field name="fileName"/>
-      <field name="size"/>
-      <field name="mime"/>
+      <field name="fileSize"/>
+      <field name="fileType"/>
       <field name="description"/>
     </panel>
   </form>
