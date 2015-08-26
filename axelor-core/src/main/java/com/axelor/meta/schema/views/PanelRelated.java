@@ -85,6 +85,9 @@ public class PanelRelated extends AbstractPanel {
 	@XmlAttribute
 	private String canRemove;
 
+	@XmlAttribute
+	private Boolean canMove;
+
 	@XmlElements({
 		@XmlElement(name = "field", type = PanelField.class),
 		@XmlElement(name = "button", type = Button.class),
@@ -232,6 +235,14 @@ public class PanelRelated extends AbstractPanel {
 
 	public void setCanSelect(String canSelect) {
 		this.canSelect = canSelect;
+	}
+
+	public Boolean getCanMove() {
+		return canMove;
+	}
+
+	public void setCanMove(Boolean canMove) {
+		this.canMove = canMove;
 	}
 
 	public List<AbstractWidget> getItems() {

@@ -905,6 +905,11 @@
             <xsd:documentation>Specify whether to show the 'Remove' button.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="canMove" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether the rows can be moved to re-orders by sequence.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1069,6 +1074,11 @@
         <xsd:attribute name="orderBy" type="xsd:string" />
         <xsd:attribute name="onNew" type="xsd:string" />
         <xsd:attribute name="onChange" type="xsd:string"/>
+        <xsd:attribute name="canMove" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether the rows can be moved to re-orders by sequence.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attributeGroup ref="tns:RelationalAttributes" />
       </xsd:extension>
     </xsd:complexContent>
