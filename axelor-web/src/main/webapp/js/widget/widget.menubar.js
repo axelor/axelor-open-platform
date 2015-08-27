@@ -208,10 +208,11 @@ module.directive('uiToolbarAdjust', function() {
 
 			elemMenubarMobile = element.children('.view-menubar-mobile').hide();
 			elemToolbarMobile = element.children('.view-toolbar-mobile').hide();
+			
+			element.on('adjustSize', adjust);
 		}
 
 		function adjust() {
-
 			if (elemMenubar === null || lastWidth === element.width()) {
 				return;
 			}
@@ -257,8 +258,7 @@ module.directive('uiToolbarAdjust', function() {
 			}
 		}
 
-		element.on('adjustSize', adjust);
-		setTimeout(setup, 100);
+		scope.waitForActions(setup, 100);
 	};
 });
 
