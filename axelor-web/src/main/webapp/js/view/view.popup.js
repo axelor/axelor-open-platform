@@ -518,6 +518,8 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			});
 		});
 
+		var initialized = false;
+
 		function adjustSize() {
 
 			var form = element.children('[ui-view-form],[ui-view-pane]').find('form[ui-form]:first');
@@ -538,11 +540,30 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 			}
 
 			element.height(height);
-			element.dialog('option', 'position', 'center');
 
-			// set height to wrapper to fix overflow issue
-			var wrapper = element.dialog('widget');
-			wrapper.height(wrapper.height());
+			function doAdjust() {
+				// set height to wrapper to fix overflow issue
+				var wrapper = element.dialog('widget');
+				wrapper.height(wrapper.height());
+
+				// show the dialog
+				element.dialog('option', 'position', 'center');
+				element.closest('.ui-dialog').css('opacity', '');
+
+				initialized = true;
+			}
+
+			if (!form.size() || initialized) {
+				return doAdjust();
+			}
+
+			var last = form[0].scrollHeight;
+			scope.ajaxStop(function () {
+				if (last < form[0].scrollHeight) {
+					return adjustSize();
+				}
+				doAdjust();
+			}, 100);
 		}
 
 		function doShow() {
@@ -560,7 +581,6 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 
 			scope.ajaxStop(function() {
 				adjustSize();
-				element.closest('.ui-dialog').css('opacity', '');
 				axelor.$adjustSize();
 			}, 100);
 		}
@@ -618,7 +638,7 @@ angular.module('axelor.ui').directive('uiEditorPopup', function() {
 				element.on('dialogopen dialogclose', function (e) {
 					scope.waitForActions(function () {
 						scope.isPopupOpen = e.type === 'dialogopen';
-					});
+					}, 2000); // delay couple of seconds to that popup can cleanup
 				});
 			});
 		},

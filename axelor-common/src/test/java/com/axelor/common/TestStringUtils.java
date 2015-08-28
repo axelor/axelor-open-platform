@@ -20,6 +20,8 @@ package com.axelor.common;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.google.common.base.Joiner;
+
 public class TestStringUtils {
 
 	@Test
@@ -35,5 +37,50 @@ public class TestStringUtils {
 		Assert.assertTrue(StringUtils.isBlank(""));
 		Assert.assertTrue(StringUtils.isBlank(" "));
 		Assert.assertFalse(StringUtils.isBlank("some value"));
+	}
+
+	final static String text1 = ""
+			+ "  this is some text\n"
+			+ "  this is some text\n"
+			+ "  this is some text\n";
+
+	final static String text2 = ""
+			+ "  this is some text\n"
+			+ "    \tthis is some text\n"
+			+ "   this is some text\n";
+
+	final static String text3 = ""
+			+ "  this is some text\n"
+			+ "  this is some text\n"
+			+ " this is some text\n";
+
+	@Test
+	public void testStripIndent() {
+		String[] lines = StringUtils.stripIndent(text1).split("\n");
+		Assert.assertFalse(Character.isWhitespace(lines[0].charAt(0)));
+		Assert.assertFalse(Character.isWhitespace(lines[1].charAt(0)));
+		Assert.assertFalse(Character.isWhitespace(lines[2].charAt(0)));
+		Assert.assertEquals(Joiner.on("\n").join(lines), ""
+				+ "this is some text\n"
+				+ "this is some text\n"
+				+ "this is some text");
+
+		lines = StringUtils.stripIndent(text2).split("\n");
+		Assert.assertFalse(Character.isWhitespace(lines[0].charAt(0)));
+		Assert.assertTrue(Character.isWhitespace(lines[1].charAt(0)));
+		Assert.assertTrue(Character.isWhitespace(lines[2].charAt(0)));
+		Assert.assertEquals(Joiner.on("\n").join(lines), ""
+				+ "this is some text\n"
+				+ "  \tthis is some text\n"
+				+ " this is some text");
+
+		lines = StringUtils.stripIndent(text3).split("\n");
+		Assert.assertTrue(Character.isWhitespace(lines[0].charAt(0)));
+		Assert.assertTrue(Character.isWhitespace(lines[1].charAt(0)));
+		Assert.assertFalse(Character.isWhitespace(lines[2].charAt(0)));
+		Assert.assertEquals(Joiner.on("\n").join(lines), ""
+				+ " this is some text\n"
+				+ " this is some text\n"
+				+ "this is some text");
 	}
 }
