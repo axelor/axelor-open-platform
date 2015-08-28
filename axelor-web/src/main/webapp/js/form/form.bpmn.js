@@ -152,7 +152,11 @@ ui.formInput('BpmnEditor', {
 				        'append.ParallelGateway' : appendAction('bpmn:ParallelGateway', 'icon-gateway-parallel'),
 				        'append.append-task': appendAction('bpmn:Task', 'icon-task'),
 				        'append.end-event': appendAction('bpmn:EndEvent', 'icon-end-event-none'),
-				        'append.InclusiveGateway' : appendAction('bpmn:InclusiveGateway', 'icon-gateway-or')
+				        'append.InclusiveGateway' : appendAction('bpmn:InclusiveGateway', 'icon-gateway-or'),
+				        'append.timer-intermediate-event': appendAction('bpmn:IntermediateCatchEvent', 'icon-intermediate-event-catch-timer',
+				        									{ _eventDefinitionType: 'bpmn:TimerEventDefinition'}),
+						'append.message-intermediate-event': appendAction('bpmn:IntermediateCatchEvent', 'icon-intermediate-event-catch-message',
+															{ _eventDefinitionType: 'bpmn:MessageEventDefinition'})
 					});
 				}
 
