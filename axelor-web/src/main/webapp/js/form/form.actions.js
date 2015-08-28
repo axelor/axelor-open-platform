@@ -48,7 +48,11 @@ function updateValues(source, target, itemScope, formScope) {
 					return v.id === item.id;
 				});
 				if (_.has(item, "version") && item.id) item.$fetched = true;
-				return found ? _.extend({}, found, item) : item;
+				if (found) {
+					updateValues(item, found);
+					return found;
+				}
+				return item;
 			});
 			return target[key] = value;
 		}
