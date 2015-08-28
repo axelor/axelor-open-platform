@@ -19,30 +19,6 @@
 
 var ui = angular.module('axelor.ui');
 
-var DEFAULT = '<?xml version="1.0" encoding="UTF-8"?>' +
-'<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
-					'xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" ' +
-					'xmlns:x="http://axelor.com" ' +
-					'xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" ' +
-					'xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" ' +
-					'targetNamespace="http://bpmn.io/schema/bpmn" ' +
-					'id="Definitions_1">' +
-	'<process id="Process_1" name="" x:bpmnId="" x:model="" x:description="" isExecutable="false">' +
-	'<startEvent id="StartEvent_1"/>' +
-	'<endEvent id="EndEvent_1"/>' +
-	'</process>' +
-	'<bpmndi:BPMNDiagram id="BPMNDiagram_1">' +
-	'<bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">' +
-		'<bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">' +
-		'<dc:Bounds x="269" y="195" width="36" height="36"/>'+
-		'</bpmndi:BPMNShape>' +
-		'<bpmndi:BPMNShape id="_BPMNShape_EndEvent_2" bpmnElement="EndEvent_1">' +
-		'<dc:Bounds x="534" y="195" width="36" height="36"/>'+
-		'</bpmndi:BPMNShape>' +
-	'</bpmndi:BPMNPlane>' +
-	'</bpmndi:BPMNDiagram>' +
-'</definitions>';
-
 var PROPS = {
 	'bpmn:StartEvent': ['bpmnId', 'name', 'description'],
 	'bpmn:EndEvent': ['bpmnId', 'name', 'description'],
@@ -410,6 +386,30 @@ ui.formInput('BpmnEditor', {
 			last = scope.record;
 			var xml = model.$viewValue;
 			if (xml === null) {
+				var DEFAULT = '<?xml version="1.0" encoding="UTF-8"?>' +
+					'<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
+										'xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" ' +
+										'xmlns:x="http://axelor.com" ' +
+										'xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" ' +
+										'xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" ' +
+										'targetNamespace="http://bpmn.io/schema/bpmn" ' +
+										'id="Definitions_1">' +
+						'<process id="Process_1" name="'+ scope.record.name +'" x:model="'+ scope.record.metaModel.name +'" x:bpmnId="" x:description="" isExecutable="false">' +
+						'<startEvent id="StartEvent_1"/>' +
+						'<endEvent id="EndEvent_1"/>' +
+						'</process>' +
+						'<bpmndi:BPMNDiagram id="BPMNDiagram_1">' +
+						'<bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">' +
+							'<bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">' +
+							'<dc:Bounds x="269" y="195" width="36" height="36"/>'+
+							'</bpmndi:BPMNShape>' +
+							'<bpmndi:BPMNShape id="_BPMNShape_EndEvent_2" bpmnElement="EndEvent_1">' +
+							'<dc:Bounds x="534" y="195" width="36" height="36"/>'+
+							'</bpmndi:BPMNShape>' +
+						'</bpmndi:BPMNPlane>' +
+						'</bpmndi:BPMNDiagram>' +
+					'</definitions>';
+
 				xml = DEFAULT;
 			}
 			scope.waitForActions(function () {
