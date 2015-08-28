@@ -20,15 +20,15 @@
 var ui = angular.module('axelor.ui');
 
 var PROPS = {
-	'bpmn:StartEvent': ['bpmnId', 'name', 'description'],
-	'bpmn:EndEvent': ['bpmnId', 'name', 'description'],
-	'bpmn:Task': ['bpmnId', 'name', 'action','description'],
-	'bpmn:exclusive-gateway' : ['bpmnId', 'name', 'description'],
-	'bpmn:ParallelGateway' : ['bpmnId', 'name', 'description'],
-	'bpmn:InclusiveGateway' : ['bpmnId', 'name', 'description'],
-	'bpmn:Process': ['bpmnId', 'name', 'model', 'sequence', 'maxnodecounter', 'active', 'archived', 'description'],
-	'bpmn:SequenceFlow': ['bpmnId', 'name', 'sequence', 'signal', 'action', 'role', 'description'],
-	'bpmn:IntermediateCatchEvent' : ['bpmnId', 'name', 'datetime', 'timeduration', 'description']
+	'bpmn:StartEvent': ['id', 'name', 'description'],
+	'bpmn:EndEvent': ['id', 'name', 'description'],
+	'bpmn:Task': ['id', 'name', 'action','description'],
+	'bpmn:exclusive-gateway' : ['id', 'name', 'description'],
+	'bpmn:ParallelGateway' : ['id', 'name', 'description'],
+	'bpmn:InclusiveGateway' : ['id', 'name', 'description'],
+	'bpmn:Process': ['id', 'name', 'model', 'sequence', 'maxnodecounter', 'active', 'archived', 'description'],
+	'bpmn:SequenceFlow': ['id', 'name', 'sequence', 'signal', 'action', 'role', 'description'],
+	'bpmn:IntermediateCatchEvent' : ['id', 'name', 'datetime', 'timeduration', 'description']
 };
 
 ui.formInput('BpmnEditor', {
@@ -130,7 +130,7 @@ ui.formInput('BpmnEditor', {
 				        'append.end-event': appendAction('bpmn:EndEvent', 'icon-end-event-none'),
 				        'append.InclusiveGateway' : appendAction('bpmn:InclusiveGateway', 'icon-gateway-or'),
 				        'append.timer-intermediate-event': appendAction('bpmn:IntermediateCatchEvent', 'icon-intermediate-event-catch-timer',
-				        									{ _eventDefinitionType: 'bpmn:TimerEventDefinition'}),
+															{ _eventDefinitionType: 'bpmn:TimerEventDefinition'}),
 						'append.message-intermediate-event': appendAction('bpmn:IntermediateCatchEvent', 'icon-intermediate-event-catch-message',
 															{ _eventDefinitionType: 'bpmn:MessageEventDefinition'})
 					});
@@ -394,7 +394,7 @@ ui.formInput('BpmnEditor', {
 										'xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" ' +
 										'targetNamespace="http://bpmn.io/schema/bpmn" ' +
 										'id="Definitions_1">' +
-						'<process id="Process_1" name="'+ scope.record.name +'" x:model="'+ scope.record.metaModel.name +'" x:bpmnId="" x:description="" isExecutable="false">' +
+						'<process id="Process_1" name="'+ scope.record.name +'" x:model="'+ scope.record.metaModel.name +'" x:description="" isExecutable="false">' +
 						'<startEvent id="StartEvent_1"/>' +
 						'<endEvent id="EndEvent_1"/>' +
 						'</process>' +
@@ -518,8 +518,9 @@ ui.directive('uiBpmnProps', function () {
 
 			var items = [{
 				title: _t('Item ID'),
-				name: 'bpmnId',
-				showIf: '$x.bpmnId',
+				name: 'id',
+				showIf: '$x.id',
+				readonly: true,
 				colSpan: 12
 			}, {
 				title: _t('Name'),
