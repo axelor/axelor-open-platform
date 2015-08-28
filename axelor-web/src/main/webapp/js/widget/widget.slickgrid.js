@@ -685,7 +685,8 @@ Grid.prototype.parse = function(view) {
 	}
 	
 	// add column for re-ordering rows
-	if (view.canMove) {
+	this._canMove = view.canMove && view.orderBy === "sequence" && !view.groupBy;
+	if (this._canMove) {
 		cols.push({
 			id: "#",
 		    name: "",
@@ -726,8 +727,7 @@ Grid.prototype.parse = function(view) {
 	
 	this._selectColumn = selectColumn;
 	this._editColumn = editColumn;
-	this._canMove = view.canMove;
-	
+
 	element.show();
 	element.data('grid', grid);
 	
@@ -1536,6 +1536,11 @@ Grid.prototype.__saveChanges = function(args, callback) {
 	var ds = this.handler._dataSource,
 		records = [];
 
+	// resequence
+	if (this._canMove) {
+		this._resequence(data.getItems());
+	}
+
 	records = _.map(data.getItems(), function(rec) {
 		var res = {};
 		for(var key in rec) {
@@ -1883,6 +1888,17 @@ Grid.prototype.onBeforeMoveRows = function (event, args) {
 	return true;
 };
 
+Grid.prototype._resequence = function (items) {
+	var min = _.min(_.map(items, function (item) {
+    	return item.sequence || 0;
+    }));
+    for (var i = 0; i < items.length; i++) {
+    	items[i].sequence = min++;
+    	items[i].$dirty = true;
+	}
+    return items;
+};
+
 Grid.prototype.onMoveRows = function (event, args) {
 	var grid = this.grid;
 	var dataView = this.scope.dataView;
@@ -1918,13 +1934,8 @@ Grid.prototype.onMoveRows = function (event, args) {
     	selectedRows.push(left.length + i);
 	}
 
-    var min = _.min(_.map(items, function (item) {
-    	return item.sequence || 0;
-    }));
-    for (var i = 0; i < items.length; i++) {
-    	items[i].sequence = min++;
-    	items[i].$dirty = true;
-	}
+    // resequence
+    this._resequence(items);
 
     function resetSelection() {
     	grid.setActiveCell(selectedRows[0], 0);
@@ -1939,7 +1950,11 @@ Grid.prototype.onMoveRows = function (event, args) {
 
     var that = this;
     setTimeout(function () {
-    	that.saveChanges(null, resetSelection, true);
+        dataView.$resequence = true;
+    	that.saveChanges(null, function() {
+    		dataView.$resequence = undefined;
+    		resetSelection();
+    	}, true);
     });
 };
 

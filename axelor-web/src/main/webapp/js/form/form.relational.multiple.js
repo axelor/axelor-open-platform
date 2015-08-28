@@ -115,8 +115,13 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 			if (rec.id <= 0) rec.id = null;
 		});
 		
+		var callOnChange = true;
+		if ($scope.dataView && $scope.dataView.$resequence) {
+			callOnChange = false;
+		}
+
 		$scope.itemsPending = records;
-		$scope.setValue(records, true);
+		$scope.setValue(records, callOnChange);
 		$scope.applyLater(function(){
 			$scope.$broadcast('grid:changed');
 		});
