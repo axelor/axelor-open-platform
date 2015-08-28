@@ -40,7 +40,7 @@ ${p.documentation}
 <% if (p.isCollection()) { %>\
 	
 	/**
-	 * Add the given {@link #${p.target}} item to the {@code ${p.name}}.
+	 * Add the given {@link ${p.target}} item to the {@code ${p.name}}.
 	 *
 <% if (p.serverType == "one-to-many" && p.mappedBy) {%>\
 	 * <p>
@@ -59,7 +59,7 @@ ${p.documentation}
 	}
 
 	/**
-	 * Remove the given {@link #${p.target}} item from the {@code ${p.name}}.
+	 * Remove the given {@link ${p.target}} item from the {@code ${p.name}}.
 	 *
 <% if (p.serverType == "one-to-many" && p.orphan) {%>\
 	 * <p>
@@ -80,14 +80,17 @@ ${p.documentation}
 	/**
 	 * Clear the {@code ${p.name}} collection.
 	 *
+<% if (p.serverType == "one-to-many") {%>\
 	 * <p>
-<% if (p.serverType == "one-to-many" && p.orphan) {%>\
+<% if (p.orphan) {%>\
 	 * It sets {@code item.${p.mappedBy} = null} to break the relationship.
 <% } else { %>\
-	 * It calls the {@code this.flush()} method to avoid unexpected errors
-	 * if any of the item in the collection is changed.
+	 * If you have to query {@link ${p.target}} records in same transaction, make
+	 * sure to call {@link javax.persistence.EntityManager#flush() } to avoid
+	 * unexpected errors.
 <% } %>\
 	 * </p>
+<% } %>\
 	 */	
 	public void clear${p.firstUpper(p.name)}() {
 		if (${p.name} != null) {

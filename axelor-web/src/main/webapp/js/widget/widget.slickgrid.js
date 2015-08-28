@@ -65,7 +65,12 @@ function makeFilterCombo(input, selection, callback) {
 		case 46:	// delete
 			update(null);
 		}
-	}).focus(function(){
+	}).click(function(){
+		input.autocomplete("search", "");
+	});
+
+	$("<i class='fa fa-caret-down combo-icon'></i>").appendTo(input.parent()).click(function () {
+		input.focus();
 		input.autocomplete("search", "");
 	});
 }
@@ -1316,6 +1321,11 @@ Grid.prototype.onKeyDown = function(e, args) {
 	function focusCell(row, cell) {
 		grid.setActiveCell(row, cell);
 		grid.editActiveCell();
+		// make sure cell has focus RM-3938
+		setTimeout(function () {
+			grid.setActiveCell(row, cell);
+			grid.editActiveCell();
+		});
 	}
 
 	// firefox & IE fails to trigger onChange
@@ -1383,7 +1393,7 @@ Grid.prototype.isCellEditable = function(cell) {
 	var field = col.descriptor || {};
 	var form = this.editorForm;
 
-	if (field.type === 'button') {
+	if (field.type === 'button' || (field.name && field.name.indexOf('.') > -1)) {
 		return false;
 	}
 	if (!form) {
