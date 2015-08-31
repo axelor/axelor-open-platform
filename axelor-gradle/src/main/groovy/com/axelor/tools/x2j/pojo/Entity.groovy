@@ -32,6 +32,10 @@ class Entity {
 
 	String namespace
 	
+	String repoNamespace
+
+	String tablePrefix
+
 	transient long lastModified
 
 	private String interfaces
@@ -83,9 +87,10 @@ class Entity {
 	Entity(NodeChild node) {
 		name = node.@name
 		table = node.@table
-		namespace = node.parent().module."@package"
 		module = node.parent().module.'@name'
-
+		namespace = node.parent().module."@package"
+		repoNamespace = node.parent().module."@repo-package"
+		tablePrefix = node.parent().module."@table-prefix"
 		mappedSuper = node.'@persistable' == 'false'
 		sequential = !(node.'@sequential' == "false")
 		groovy = node.'@lang' == "groovy"
@@ -99,15 +104,26 @@ class Entity {
 		if (!name) {
 			throw new IllegalArgumentException("Entity name not given.")
 		}
+		if (!module) {
+			throw new IllegalArgumentException("Namespace details not given.")
+		}
 		
 		if (!namespace) {
 			namespace = "com.axelor.${module}.db"
 		}
 
+		if (!repoNamespace) {
+			repoNamespace = "${namespace}.repo"
+		}
+		if (!tablePrefix) {
+			tablePrefix = module + "_"
+		}
+		if (!tablePrefix.endsWith("_")) {
+			tablePrefix += "_"
+		}
+
 		if (!table) {
-			table = namespace.replaceAll(/\.db$/, "")
-			table = table.substring(table.lastIndexOf('.') + 1)
-			table = Inflector.getInstance().underscore(table + '_' + name).toUpperCase()
+			table = Inflector.getInstance().underscore(tablePrefix + name).toUpperCase()
 		}
 
 		importManager = new ImportManager(namespace, groovy)

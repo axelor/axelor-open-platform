@@ -6,28 +6,12 @@
   <xsd:element name="domain-models">
     <xsd:complexType>
       <xsd:sequence>
-        <xsd:element name="module" maxOccurs="1" minOccurs="1">
+        <xsd:element name="module" type="dm:Namespace">
           <xsd:annotation>
             <xsd:documentation>
-              Module settings.
+              Specify module namespace information.
             </xsd:documentation>
           </xsd:annotation>
-          <xsd:complexType>
-            <xsd:attribute name="name" type="xsd:string" use="required">
-              <xsd:annotation>
-                <xsd:documentation>
-                  Provide name for the package. Package will be "com.axelor.${name}.db".
-                </xsd:documentation>
-              </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="package" type="xsd:string">
-              <xsd:annotation>
-                <xsd:documentation>
-                  Define a custom package name for the entity.
-                </xsd:documentation>
-              </xsd:annotation>
-            </xsd:attribute>
-          </xsd:complexType>
         </xsd:element>
         <xsd:element name="sequence" minOccurs="0" maxOccurs="unbounded" type="dm:Sequence">
           <xsd:annotation>
@@ -47,6 +31,33 @@
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
+
+  <xsd:complexType name="Namespace">
+    <xsd:attribute name="name" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify module name.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="package" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify package name for entities, default is "${name}.db".
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="repo-package" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify package name for repositories, default is "${package}.repo"</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="table-prefix" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify table name prefix to use, default is "${name}_"</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
 
   <xsd:complexType name="Sequence">
     <xsd:attribute name="name" type="xsd:string" use="required">

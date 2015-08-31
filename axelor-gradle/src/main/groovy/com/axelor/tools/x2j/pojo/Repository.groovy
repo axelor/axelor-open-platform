@@ -36,15 +36,15 @@ class Repository {
 
 		this.entity = entity
 
-		this.namespace = "${entity.namespace}.repo"
-		this.baseClass = "JpaRepository<${entity.name}>";
+		this.namespace = entity.repoNamespace
+		this.baseClass = "JpaRepository<${entity.name}>"
 		this.modelClass = entity.name
 		this.name = "${entity.name}Repository"
 
-		this.importManager = new ImportManager(this.namespace, false);
+		this.importManager = new ImportManager(this.namespace, false)
 
-		this.importManager.importType("com.axelor.db.JpaRepository");
-		this.importManager.importType("${entity.namespace}.${entity.name}");
+		this.importManager.importType("com.axelor.db.JpaRepository")
+		this.importManager.importType("${entity.namespace}.${entity.name}")
 	}
 
 	String getClassName() {

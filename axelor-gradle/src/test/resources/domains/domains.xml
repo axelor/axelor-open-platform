@@ -3,7 +3,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_4.0.xsd">
 
-  <module name="contact" package="com.axelor.contact.db" />
+  <module name="contact" package="com.axelor.contact.db" repo-package="com.axelor.contact.repo" table-prefix="MY" />
   
   <entity name="Title" cachable="true" implements="java.io.Serializable" repository="abstract">
     <![CDATA[
@@ -109,7 +109,7 @@
     <string name="area" required="true" />
     <string name="city" required="true" />
     <many-to-one name="country" ref="Country" required="true" />
-    <many-to-one name="user" ref="com.axelor.auth.db.User" />
+    <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" />
     <finder-method name="findByContact" using="long:contactId, String:name" filter="self.customer.id = :contactId OR self.customer.fullName = :name" all="true"/>
     <finder-method name="findByContact" using="String:email" filter="self.customer.email = :email" all="true"/>
 
