@@ -30,8 +30,8 @@ import com.axelor.app.AppModule;
 import com.axelor.app.AppSettings;
 import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthModule;
-import com.axelor.common.reflections.Reflections;
 import com.axelor.db.JpaModule;
+import com.axelor.meta.MetaScanner;
 import com.axelor.quartz.SchedulerModule;
 import com.axelor.rpc.ObjectMapperProvider;
 import com.axelor.rpc.Request;
@@ -112,7 +112,7 @@ public class AppServletModule extends ServletModule {
 				new ResponseInterceptor());
 
 		// intercept request accepting methods
-		bindInterceptor(Matchers.inSubpackage("com.axelor.web.service"),
+		bindInterceptor(Matchers.annotatedWith(Path.class),
 				new AbstractMatcher<Method>() {
 					@Override
 					public boolean matches(Method t) {
@@ -126,10 +126,8 @@ public class AppServletModule extends ServletModule {
 				}, new RequestFilter());
 
 		// bind all the web service resources
-		for (Class<?> type : Reflections
+		for (Class<?> type : MetaScanner
 				.findTypes()
-				.within("com.axelor.web")
-				.within("com.axelor.rpc")
 				.having(Path.class)
 				.having(Provider.class)
 				.any().find()) {

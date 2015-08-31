@@ -27,8 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.common.reflections.ClassFinder;
-import com.axelor.common.reflections.Reflections;
 import com.axelor.inject.Beans;
+import com.axelor.meta.MetaScanner;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.report.ReportEngineProvider;
 import com.google.common.base.Throwables;
@@ -45,9 +45,8 @@ public class AppModule extends AbstractModule {
 
 	private List<Class<? extends AxelorModule>> findAll() {
 		final List<Class<? extends AxelorModule>> all = new ArrayList<>();
-		for (Class<? extends AxelorModule> module : Reflections
+		for (Class<? extends AxelorModule> module : MetaScanner
 				.findSubTypesOf(AxelorModule.class)
-				.within("com.axelor")
 				.find()) {
 			all.add(module);
 		}
@@ -79,9 +78,8 @@ public class AppModule extends AbstractModule {
 			final URL url = modulePaths.get(name);
 			final String path = url.getPath().replaceFirst("module\\.properties$", "");
 			final String pattern = String.format("^(%s).*", path);
-			final ClassFinder<AxelorModule> finders = Reflections
+			final ClassFinder<AxelorModule> finders = MetaScanner
 					.findSubTypesOf(AxelorModule.class)
-					.within("com.axelor")
 					.byURL(pattern);
 			for (Class<? extends AxelorModule> klass : finders.find()) {
 				moduleClasses.add(klass);

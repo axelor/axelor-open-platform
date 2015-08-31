@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.common.reflections.ClassFinder;
-import com.axelor.common.reflections.Reflections;
+import com.axelor.meta.MetaScanner;
 import com.google.common.collect.MapMaker;
 
 /**
@@ -102,8 +102,7 @@ public class JpaScanner extends NativeScanner {
 			
 			register(Model.class);
 
-			ClassFinder<Model> finder = Reflections.findSubTypesOf(Model.class)
-					.within("com.axelor")
+			ClassFinder<Model> finder = MetaScanner.findSubTypesOf(Model.class)
 					.having(Entity.class)
 					.having(Embeddable.class)
 					.having(MappedSuperclass.class);
@@ -112,9 +111,7 @@ public class JpaScanner extends NativeScanner {
 				finder = finder.within(pkg);
 			}
 
-			final Set<Class<? extends Model>> models = finder.any().find();
-
-			for (Class<?> klass : models) {
+			for (Class<?> klass : finder.any().find()) {
 				if (modelCache.containsKey(klass.getName()) ||
 					excludes.contains(klass.getPackage().getName())) {
 					continue;
@@ -126,12 +123,13 @@ public class JpaScanner extends NativeScanner {
 
 		synchronized (repoCache) {
 			log.info("Searching for repository classes...");
-			ClassFinder<?> finder = Reflections.findSubTypesOf(JpaRepository.class)
-					.within("com.axelor");
+
+			ClassFinder<?> finder = MetaScanner.findSubTypesOf(JpaRepository.class);
 
 			for (String pkg : includes) {
 				finder = finder.within(pkg);
 			}
+
 			for (Class<?> klass : finder.any().find()) {
 				if (repoCache.containsKey(klass.getName()) ||
 					excludes.contains(klass.getPackage().getName())) {
