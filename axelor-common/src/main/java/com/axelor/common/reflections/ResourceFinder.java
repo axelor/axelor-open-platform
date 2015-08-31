@@ -43,20 +43,13 @@ public final class ResourceFinder {
 	private Set<Pattern> pathPatterns = Sets.newLinkedHashSet();
 	
 	ResourceFinder() {
+
 	}
 
-	/**
-	 * Find using the given {@link ClassLoader}
-	 * 
-	 * @param loader
-	 *            the class loader to use
-	 * @return the same finder
-	 */
-	public ResourceFinder using(ClassLoader loader) {
+	ResourceFinder(ClassLoader loader) {
 		this.loader = loader;
-		return this;
 	}
-	
+
 	/**
 	 * Find with the given name pattern.
 	 * 

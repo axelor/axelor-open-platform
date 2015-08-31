@@ -31,17 +31,23 @@ import com.google.common.collect.Sets;
 public final class ClassFinder<T> {
 
 	private Class<T> type;
+	private ClassLoader loader;
+
 	private Set<Class<? extends Annotation>> annotations = Sets.newLinkedHashSet();
 	private Set<String> packages = Sets.newLinkedHashSet();
 	private Set<String> pathPatterns = Sets.newLinkedHashSet();
-	private ClassLoader loader = Thread.currentThread().getContextClassLoader();
-	
+
 	private boolean matchAll = true;
-	
-	ClassFinder(Class<T> type) {
+
+	ClassFinder(Class<T> type, ClassLoader loader) {
 		this.type = type;
+		this.loader = loader;
 	}
-	
+
+	ClassFinder(Class<T> type) {
+		this(type, Thread.currentThread().getContextClassLoader());
+	}
+
 	/**
 	 * Find with the given URL pattern.
 	 *
