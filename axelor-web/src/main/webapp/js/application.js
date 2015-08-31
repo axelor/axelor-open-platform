@@ -65,6 +65,7 @@ load([
 	'lib/slickgrid/plugins/slick.headermenu.js',
 	'lib/slickgrid/plugins/slick.rowselectionmodel.js',
 	'lib/slickgrid/plugins/slick.checkboxselectcolumn.js',
+	'lib/slickgrid/plugins/slick.rowmovemanager.js',
 
 	'lib/jquery.treetable/js/jquery.treetable.js',
 

@@ -399,6 +399,16 @@
 	cursor: pointer;
 }
 
+.slick-cell.move-icon {
+	cursor: move;
+}
+.panel-related.readonly .slick-cell.move-icon {
+	cursor: default;
+}
+.panel-related.readonly .slick-cell.move-icon::before {
+	content: "";
+}
+
 .slickgrid-empty-text {
 	display: none;
 }

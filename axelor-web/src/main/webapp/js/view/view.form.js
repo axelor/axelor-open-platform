@@ -934,6 +934,7 @@ ui.formBuild = function (scope, schema, fields) {
 					attrs.views = [{
 						type: 'grid',
 						items: attrs.items,
+						canMove: attrs.canMove,
 						orderBy: attrs.orderBy,
 						editable: attrs.editable,
 						editIcon: attrs.editIcon === undefined ? true : attrs.editIcon

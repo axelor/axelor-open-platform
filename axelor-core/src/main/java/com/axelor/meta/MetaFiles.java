@@ -281,8 +281,8 @@ public class MetaFiles {
 				metaFile.setFileName(file.getName());
 			}
 
-			metaFile.setMime(Files.probeContentType(target));
-			metaFile.setSize(Files.size(target));
+			metaFile.setFileType(Files.probeContentType(target));
+			metaFile.setFileSize(Files.size(target));
 			metaFile.setFilePath(target.toFile().getName());
 
 			try {

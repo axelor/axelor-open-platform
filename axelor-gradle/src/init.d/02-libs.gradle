@@ -33,6 +33,7 @@ def libs = [
 	// jdbc
 	jdbc_hsqldb:		"org.hsqldb:hsqldb:2.3.3",
 	jdbc_postgres:		"org.postgresql:postgresql:9.4-1201-jdbc41",
+	jdbc_mysql:			"mysql:mysql-connector-java:5.1.36",
 
 	// hibernate/jpa
 	hibernate:			["org.hibernate:hibernate-core:4.2.19.Final",

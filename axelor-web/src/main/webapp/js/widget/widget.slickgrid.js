@@ -684,6 +684,26 @@ Grid.prototype.parse = function(view) {
 		}));
 	}
 	
+	// add column for re-ordering rows
+	this._canMove = view.canMove && view.orderBy === "sequence" && !view.groupBy;
+	if (this._canMove) {
+		cols.push({
+			id: "#",
+		    name: "",
+		    width: 32,
+		    behavior: "selectAndMove",
+		    selectable: false,
+		    resizable: false,
+		    cssClass: "fa fa-bars move-icon",
+		    canMove: function () {
+		    	if (handler.isReadonly && handler.isReadonly()) {
+		    		return false;
+		    	}
+		    	return true;
+		    }
+		});
+	}
+
 	var factory = new Factory(this);
 
 	var options = {
@@ -707,7 +727,7 @@ Grid.prototype.parse = function(view) {
 	
 	this._selectColumn = selectColumn;
 	this._editColumn = editColumn;
-	
+
 	element.show();
 	element.data('grid', grid);
 	
@@ -765,6 +785,10 @@ Grid.prototype._doInit = function(view) {
 		buttonImage: "lib/slickgrid/images/down.gif"
 	});
 
+	var rowMoveManager = new Slick.RowMoveManager({
+		cancelEditOnDrag: true
+	});
+
 	grid.setSelectionModel(new Slick.RowSelectionModel());
 	grid.registerPlugin(new Slick.Data.GroupItemMetadataProvider());
 	grid.registerPlugin(headerMenu);
@@ -773,6 +797,9 @@ Grid.prototype._doInit = function(view) {
 	}
 	if (this._editColumn) {
 		grid.registerPlugin(this._editColumn);
+	}
+	if (this._canMove) {
+		grid.registerPlugin(rowMoveManager);
 	}
 
 	// performance tweaks
@@ -823,6 +850,10 @@ Grid.prototype._doInit = function(view) {
 	// register header menu event handlers
 	this.subscribe(headerMenu.onBeforeMenuShow, this.onBeforeMenuShow);
 	this.subscribe(headerMenu.onCommand, this.onMenuCommand);
+
+	// register row move handlers
+	this.subscribe(rowMoveManager.onBeforeMoveRows, this.onBeforeMoveRows);
+	this.subscribe(rowMoveManager.onMoveRows, this.onMoveRows);
 
 	// hilite support
 	var getItemMetadata = dataView.getItemMetadata;
@@ -1478,7 +1509,7 @@ Grid.prototype.saveChanges = function(args, callback) {
 	}
 
 	this._saveChangesRunning = true;
-	var res = this.__saveChanges(args, callback);
+	var res = this.__saveChanges.apply(this, arguments);
 	this._saveChangesRunning = false;
 
 	return res;
@@ -1486,10 +1517,13 @@ Grid.prototype.saveChanges = function(args, callback) {
 
 Grid.prototype.__saveChanges = function(args, callback) {
 
-	var grid = this.grid,
-		lock = grid.getEditorLock();
+	var grid = this.grid;
+	var lock = grid.getEditorLock();
+	var force = arguments[2];
 
-	if ((lock.isActive() && !lock.commitCurrentEdit()) || (this.editorScope && !this.editorScope.isValid())) {
+	if (!force &&
+			((lock.isActive() && !lock.commitCurrentEdit()) ||
+			 (this.editorScope && !this.editorScope.isValid()))) {
 		return false;
 	}
 
@@ -1501,6 +1535,11 @@ Grid.prototype.__saveChanges = function(args, callback) {
 	var data = this.scope.dataView;
 	var ds = this.handler._dataSource,
 		records = [];
+
+	// resequence
+	if (this._canMove) {
+		this._resequence(data.getItems());
+	}
 
 	records = _.map(data.getItems(), function(rec) {
 		var res = {};
@@ -1835,6 +1874,88 @@ Grid.prototype.onSort = function(event, args) {
 		return;
 	if (this.handler.onSort)
 		this.handler.onSort(event, args);
+};
+
+Grid.prototype.onBeforeMoveRows = function (event, args) {
+	var data = this.scope.dataView;
+	for (var i = 0; i < args.rows.length; i++) {
+		// no point in moving before or after itself
+		if (args.rows[i] == args.insertBefore || args.rows[i] == args.insertBefore - 1) {
+			event.stopPropagation();
+			return false;
+		}
+	}
+	return true;
+};
+
+Grid.prototype._resequence = function (items) {
+	var min = _.min(_.map(items, function (item) {
+    	return item.sequence || 0;
+    }));
+    for (var i = 0; i < items.length; i++) {
+    	items[i].sequence = min++;
+    	items[i].$dirty = true;
+	}
+    return items;
+};
+
+Grid.prototype.onMoveRows = function (event, args) {
+	var grid = this.grid;
+	var dataView = this.scope.dataView;
+    var rows = args.rows;
+    var items = dataView.getItems();
+    var insertBefore = args.insertBefore;
+
+    var left = items.slice(0, insertBefore);
+    var right = items.slice(insertBefore, items.length);
+    var extractedRows = [];
+
+    rows.sort(function(a, b) { return a - b; });
+
+    for (var i = 0; i < rows.length; i++) {
+    	extractedRows.push(items[rows[i]]);
+    }
+
+    rows.reverse();
+
+    for (var i = 0; i < rows.length; i++) {
+    	var row = rows[i];
+    	if (row < insertBefore) {
+    		left.splice(row, 1);
+    	} else {
+    		right.splice(row - insertBefore, 1);
+    	}
+    }
+
+    items = left.concat(extractedRows.concat(right));
+
+    var selectedRows = [];
+    for (var i = 0; i < rows.length; i++) {
+    	selectedRows.push(left.length + i);
+	}
+
+    // resequence
+    this._resequence(items);
+
+    function resetSelection() {
+    	grid.setActiveCell(selectedRows[0], 0);
+    	grid.setSelectedRows(selectedRows);
+    }
+
+    dataView.beginUpdate();
+	dataView.setItems(items);
+	dataView.endUpdate();
+	resetSelection();
+    grid.render();
+
+    var that = this;
+    setTimeout(function () {
+        dataView.$resequence = true;
+    	that.saveChanges(null, function() {
+    		dataView.$resequence = undefined;
+    		resetSelection();
+    	}, true);
+    });
 };
 
 Grid.prototype.onButtonClick = function(event, args) {

@@ -13,7 +13,7 @@
   </entity>
 
   <entity name="ICalendarEvent" table="ICAL_EVENT" sequential="true">
-    <string name="uid" unique="true" hashKey="true"/>
+    <string name="uid" column="calendar_uid" unique="true" hashKey="true"/>
     <string name="url" />
     <string name="summary" required="true" />
     <string name="description" />

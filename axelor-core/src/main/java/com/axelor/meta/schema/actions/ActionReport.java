@@ -152,7 +152,7 @@ public class ActionReport extends Action {
 		final MetaFile metaFile = new MetaFile();
 		metaFile.setFileName(name);
 		metaFile.setFilePath(relative.toString());
-		metaFile.setSize(tempFile.length());
+		metaFile.setFileSize(tempFile.length());
 
 		String mime = java.nio.file.Files.probeContentType(tempFile.toPath());
 		if (mime == null) {
@@ -162,7 +162,7 @@ public class ActionReport extends Action {
 			if (format.equals("html")) mime = "text/html";
 		}
 
-		metaFile.setMime(mime);
+		metaFile.setFileType(mime);
 
 		final MetaAttachment metaAttachment = new MetaAttachment();
 		metaAttachment.setObjectName(model.getName());
