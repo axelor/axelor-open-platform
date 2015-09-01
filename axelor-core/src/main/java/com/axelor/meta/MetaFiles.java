@@ -176,7 +176,7 @@ public class MetaFiles {
 	 */
 	public File upload(InputStream chunk, long startOffset, long fileSize, String fileId) throws IOException {
 		final Path tmp = UPLOAD_PATH_TEMP.resolve(fileId);
-		if ((startOffset > fileSize)
+		if ((fileSize > -1 && startOffset > fileSize)
 				|| (Files.exists(tmp) && Files.size(tmp) != startOffset)
 				|| (!Files.exists(tmp) && startOffset > 0)) {
 			throw new IllegalArgumentException("Start offset is out of bound.");
@@ -199,7 +199,7 @@ public class MetaFiles {
 			byte[] bytes = new byte[4096];
 			while ((read = chunk.read(bytes)) != -1) {
 				total += read;
-				if (total > fileSize) {
+				if (fileSize > -1 && total > fileSize) {
 					throw new IllegalArgumentException("Invalid chunk, oversized upload.");
 				}
 				bos.write(bytes, 0, read);

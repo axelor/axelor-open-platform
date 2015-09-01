@@ -20,7 +20,6 @@ package com.axelor.web.service;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,6 +28,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +72,7 @@ import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.mail.web.MailController;
 import com.axelor.meta.ActionHandler;
+import com.axelor.meta.MetaFiles;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
@@ -91,7 +92,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.io.Files;
 import com.google.common.primitives.Longs;
 import com.google.inject.servlet.RequestScoped;
 
@@ -316,32 +316,23 @@ public class RestService extends ResourceService {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			uploadSave(fileStream, out);
 			data.put(field, out.toByteArray());
+			return getResource().save(request);
 		}
 
-		String filePath = fileName;
-		if (isAttachment) {
-			int maxCounter = 1000;
-			long counter = 0;
-			while (FileUtils.getFile(uploadPath, filePath).exists()) {
-				if (counter++ > maxCounter) {
-					counter = System.currentTimeMillis();
-				}
-				filePath = fileName;
-				filePath = Files.getNameWithoutExtension(filePath) + " (" + counter + ")." + Files.getFileExtension(filePath);
-				if (counter > maxCounter) {
-					break;
-				}
-			}
-			data.put("filePath", filePath);
+		final MetaFiles files = Beans.get(MetaFiles.class);
+		final MetaFileRepository repo = Beans.get(MetaFileRepository.class);
+		final MetaFile metaFile = Mapper.toBean(MetaFile.class, data);
+		final MetaFile entity = metaFile.getId() == null ? metaFile : repo.find(metaFile.getId());
+		if (entity == null) {
+			throw new IOException("Unable to upload file: " + fileName);
 		}
 
-		Response response = getResource().save(request);
-		if (isAttachment && response.getStatus() == Response.STATUS_SUCCESS) {
-			File file = FileUtils.getFile(uploadPath, filePath);
-			Files.createParentDirs(file);
-			FileOutputStream out = new FileOutputStream(file);
-			uploadSave(fileStream, out);
-		}
+		final File tmp = files.upload(fileStream, 0, -1, fileName);
+		files.upload(tmp, entity);
+
+		final Response response = new Response();
+		response.setData(Arrays.asList(entity));
+		response.setStatus(Response.STATUS_SUCCESS);
 
 		return response;
 	}
