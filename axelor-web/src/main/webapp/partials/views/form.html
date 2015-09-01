@@ -19,7 +19,7 @@
             <i class="fa fa-reply"></i> <span ng-if="::!tbTitleHide" x-translate>Back</span>
           </button>
           <button class="btn" ng-disabled="!canShowAttachments()" ng-click="onShowAttachments()" ng-class="{'has-attachments': record.$attachments}">
-          	<i class="fa fa-thumb-tack"></i><sub ng-if="record.$attachments"> {{record.$attachments}}</sub>
+          	<i class="fa fa-paperclip"></i><sub ng-if="record.$attachments"> {{record.$attachments}}</sub>
           </button>
           <button class="btn" ng-if="hasHelp()" ng-click="onShowHelp()"><i class="fa fa-info-circle"></i></button>
         </div>
