@@ -254,8 +254,9 @@ public class MetaFiles {
 		Preconditions.checkNotNull(file);
 
 		final boolean update = !isBlank(metaFile.getFilePath());
-		final String targetName = update ? metaFile.getFilePath() :
-			(isBlank(metaFile.getFileName()) ? file.getName() : metaFile.getFileName());
+
+		final String fileName = isBlank(metaFile.getFileName()) ? file.getName() : metaFile.getFileName();
+		final String targetName = update ? metaFile.getFilePath() : fileName;
 		final Path path = UPLOAD_PATH.resolve(targetName);
 		final Path tmp = update ? Files.createTempFile(UPLOAD_PATH_TEMP, null, null) : null;
 
@@ -265,7 +266,7 @@ public class MetaFiles {
 
 		try {
 			final Path source = file.toPath();
-			final Path target = getNextPath(targetName);
+			final Path target = getNextPath(fileName);
 
 			// make sure the upload path exists
 			Files.createDirectories(UPLOAD_PATH);
@@ -281,8 +282,9 @@ public class MetaFiles {
 			if (isBlank(metaFile.getFileName())) {
 				metaFile.setFileName(file.getName());
 			}
-
-			metaFile.setFileType(Files.probeContentType(target));
+			if (isBlank(metaFile.getFileType())) {
+				metaFile.setFileType(Files.probeContentType(target));
+			}
 			metaFile.setFileSize(Files.size(target));
 			metaFile.setFilePath(target.toFile().getName());
 

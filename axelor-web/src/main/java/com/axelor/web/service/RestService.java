@@ -322,13 +322,17 @@ public class RestService extends ResourceService {
 		final MetaFiles files = Beans.get(MetaFiles.class);
 		final MetaFileRepository repo = Beans.get(MetaFileRepository.class);
 		final MetaFile metaFile = Mapper.toBean(MetaFile.class, data);
-		final MetaFile entity = metaFile.getId() == null ? metaFile : repo.find(metaFile.getId());
-		if (entity == null) {
-			throw new IOException("Unable to upload file: " + fileName);
+
+		MetaFile entity = metaFile;
+		if (metaFile.getId() != null) {
+			entity = repo.find(metaFile.getId());
 		}
 
-		final File tmp = files.upload(fileStream, 0, -1, fileName);
-		files.upload(tmp, entity);
+		entity.setFileName(metaFile.getFileName());
+		entity.setFileType(metaFile.getFileType());
+
+		File tmp = files.upload(fileStream, 0, -1, fileName);
+		entity = files.upload(tmp, entity);
 
 		final Response response = new Response();
 		response.setData(Arrays.asList(entity));

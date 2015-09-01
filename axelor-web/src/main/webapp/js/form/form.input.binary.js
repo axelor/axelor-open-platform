@@ -305,7 +305,7 @@ ui.formInput('Binary', {
 					field: field.name,
 					file: file
 				};
-				if(scope._model === META_FILE && !record.fileName) {
+				if(scope._model === META_FILE) {
 					record.fileName = file.name;
 				}
 				record.fileType = file.type;
