@@ -642,7 +642,7 @@ var panelRelatedTemplate =
 		"<div class='icons-bar pull-right' ng-show='!isReadonly()'>" +
 			"<i ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()' class='fa fa-pencil'></i>" +
 			"<i ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()' class='fa fa-plus'></i>" +
-			"<i ng-click='onCopy()' ng-show='hasPermission(\"create\") && !isDisabled() && canCopy()' class='fa fa-plus-circle'></i>" +
+			"<i ng-click='onCopy()' ng-show='hasPermission(\"create\") && !isDisabled() && canCopy()' class='fa fa-files-o'></i>" +
 			"<i ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()' class='fa fa-minus'></i>" +
 			"<i ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()' class='fa fa-search'></i>" +
 		"</div>" +
