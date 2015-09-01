@@ -324,4 +324,84 @@ ui.formInput('Binary', {
 	'</div>'
 });
 
+ui.formInput('BinaryLink', {
+
+	css: 'file-item',
+	cellCss: 'form-item file-item',
+
+	link: function(scope, element, attrs, model) {
+
+		var field = scope.field;
+		var input = element.children('input:first').hide();
+
+		if (field.target !== META_FILE) {
+			throw new Error("BinaryLink widget can be used with MetaFile field only.");
+		}
+
+		scope.doSelect = function() {
+			input.click();
+		};
+
+		scope.doRemove = function() {
+			input.val(null);
+			scope.setValue(null, true);
+		};
+
+		scope.canDownload = function() {
+			var value = model.$viewValue;
+			return value && value.id > 0;
+		};
+
+		scope.format = function (value) {
+			if (value) {
+				return value.fileName;
+			}
+			return value;
+		};
+
+		scope.doSave = function() {
+			var value = model.$viewValue;
+			var url = "ws/rest/" + META_FILE + "/" + value.id + "/content/download";
+			ui.download(url, scope.text);
+		};
+
+		input.change(function(e) {
+			var file = input.get(0).files[0];
+
+			// reset file selection
+			input.get(0).value = null;
+
+			if (!file) {
+				return;
+			}
+
+			var ds = scope._dataSource._new(META_FILE);
+			var record = {
+				fileName: file.name,
+				fileType: file.type,
+				fileSize: file.size
+			};
+
+			record.$upload = {
+				file: file
+			};
+
+			ds.save(record).success(function (rec) {
+				scope.setValue(rec, true);
+			});
+		});
+	},
+	template_readonly: null,
+	template_editable: null,
+	template:
+	'<div>' +
+		'<input type="file">' +
+		'<div class="btn-group">' +
+			'<button ng-click="doSelect()" ng-show="!isReadonly()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
+			'<button ng-click="doRemove()" ng-show="canDownload() && !isReadonly()" class="btn" type="button"><i class="fa fa-times"></i></button>' +
+		'</div> ' +
+		'<a ng-show="text" href="javascript:" ng-click="doSave()">{{text}}</a>' +
+	'</div>'
+});
+
 })(this);
