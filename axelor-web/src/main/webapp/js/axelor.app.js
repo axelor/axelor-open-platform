@@ -314,7 +314,7 @@
 
 		return {
 			response: function(response) {
-				if (response.config && !response.config.silent) {
+				if (!response.config || !response.config.silent) {
 					onHttpStop();
 				}
 				if (response.data && response.data.status === -1) {

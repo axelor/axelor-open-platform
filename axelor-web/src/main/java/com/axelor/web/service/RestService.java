@@ -83,6 +83,7 @@ import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Charsets;
 import com.google.common.cache.Cache;
@@ -282,8 +283,9 @@ public class RestService extends ResourceService {
         final String[] parts = headers.getFirst("Content-Disposition").split(";");
         for (String filename : parts) {
             if ((filename.trim().startsWith("filename"))) {
-                String[] name = filename.split("=");
-                return name[1].trim();
+                String name = filename.split("=")[1].trim();
+                // remove quotes
+                return name.replaceAll("^\"|\"$", "");
             }
         }
         return null;
@@ -304,7 +306,7 @@ public class RestService extends ResourceService {
 		final String field = fieldPart.getBodyAsString();
 		final String fileName = getFileName(filePart.getHeaders());
 		final InputStream fileStream = filePart.getBody(InputStream.class, null);
-		final Request request = requestPart.getBody(Request.class, null);
+		final Request request = Beans.get(ObjectMapper.class).readValue(requestPart.getBodyAsString(), Request.class);
 
 		request.setModel(getModel());
 

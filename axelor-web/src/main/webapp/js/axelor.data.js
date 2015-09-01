@@ -510,7 +510,7 @@
 					promise = deferred.promise;
 				
 				var indicator = $injector.get('httpIndicator');
-				promise = indicator(promise);
+				promise = promise.then(indicator.response, indicator.responseError);
 
 				var xhr = new XMLHttpRequest();
 				var data = new FormData();

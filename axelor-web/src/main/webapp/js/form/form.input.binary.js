@@ -190,8 +190,8 @@ ui.formInput('Image', 'ImageLink', {
 			var ds = scope._dataSource._new(META_FILE);
 			var record = {
 				fileName: file.name,
-				mime: file.type,
-				size: file.size,
+				fileType: file.type,
+				fileSize: file.size,
 				id: null,
 				version: null
 		    };
@@ -279,9 +279,9 @@ ui.formInput('Binary', {
 			record.$upload = null;
 			if(scope._model === META_FILE) {
 				record.fileName = null;
-				record.mime = null;
+				record.fileType = null;
 			}
-			record.size = null;
+			record.fileSize = null;
 		};
 
 		scope.canDownload = function() {
@@ -308,8 +308,8 @@ ui.formInput('Binary', {
 				if(scope._model === META_FILE && !record.fileName) {
 					record.fileName = file.name;
 				}
-				record.mime = file.type;
-				record.size = file.size;
+				record.fileType = file.type;
+				record.fileSize = file.size;
 				scope.applyLater(function() {
 					model.$setViewValue(0); // mark form for save
 				});
