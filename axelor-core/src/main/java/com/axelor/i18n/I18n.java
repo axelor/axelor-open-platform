@@ -35,16 +35,26 @@ public final class I18n {
 	}
 
 	/**
-	 * Get the instance of {@link I18nBundle} for the current {@link Locale}.
+	 * Get a resource bundle for the given locale.
 	 * 
+	 * @param locale
+	 *            the locale for which a resource bundle is desired
 	 * @return an instance of {@link I18nBundle}
 	 */
-	public static ResourceBundle getBundle() {
-		Locale locale = AppFilter.getLocale();
+	public static ResourceBundle getBundle(Locale locale) {
 		if (locale == null) {
 			locale = Locale.getDefault();
 		}
 		return ResourceBundle.getBundle("axelor", locale, new I18nControl());
+	}
+
+	/**
+	 * Get the resource bundle for the current {@link Locale}.
+	 * 
+	 * @return an instance of {@link I18nBundle}
+	 */
+	public static ResourceBundle getBundle() {
+		return getBundle(AppFilter.getLocale());
 	}
 
 	/**
