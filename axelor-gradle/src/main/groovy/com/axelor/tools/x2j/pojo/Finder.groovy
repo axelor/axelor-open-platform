@@ -102,7 +102,8 @@ class Finder {
 					t = entity.importType(TYPES[t])
 					t = entity.repository.importType(TYPES[t])
 				} else {
-					return ""
+					t = entity.importType(parts[0])
+					t = entity.repository.importType(parts[0])
 				}
 			} else {
 				p = entity.getField(n)

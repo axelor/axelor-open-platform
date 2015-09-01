@@ -1,3 +1,26 @@
+# Current (3.0.18)
+
+# 3.0.17 (2015-08-28)
+
+## Bug fixes
+
+- fix selection filter in grid
+- fix backspace button as back key
+- fix dotted field in editable grid
+- fix editable grid cell focus issue
+- fix strip indent utility method causing meta loader issue
+- fix dashboard/portal initialization issue 
+- fix toolbar buttons as menu doesn't send _signal
+- fix field editor update issue
+- fix toolbar buttons adjustment issue
+- fix form values update issue
+
+## Improvements
+
+- update javadoc on generated domain classes
+- allow all types/classes with finder method params
+- improve popup window autosize
+
 # 3.0.16 (2015-08-14)
 
 ## Bug fixes

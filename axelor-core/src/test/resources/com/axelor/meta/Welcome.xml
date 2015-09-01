@@ -3,11 +3,11 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_4.0.xsd">
   
-  <portal name="welcome" title="Welcome!">
-    <portlet title="All Contact" action="contact.all"/>
-    <portlet title="Business Contacts" action="contacts.business"/>
-    <portlet title="Sale Orders" action="sale.orders"/>
-    <portlet title="Axelor!" action="axelor.web.url"/>
-  </portal>
+  <dashboard name="welcome" title="Welcome!">
+    <dashlet title="All Contact" action="contact.all"/>
+    <dashlet title="Business Contacts" action="contacts.business"/>
+    <dashlet title="Sale Orders" action="sale.orders"/>
+    <dashlet title="Axelor!" action="axelor.web.url"/>
+  </dashboard>
 
 </object-views>

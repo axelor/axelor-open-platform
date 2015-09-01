@@ -419,6 +419,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 				scope.$watch('record', function (value, old) {
 					if (value && value !== old) {
 						value.$changed = true;
+						value.version = value.version || value.$version;
 					}
 					scope.$broadcast("on:record-change", value);
 				}, true);

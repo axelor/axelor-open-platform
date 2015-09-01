@@ -186,29 +186,39 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 		link: function(scope, element, attrs) {
 
 			var lazy = false;
-			scope.waitForActions(function () {
-				var unwatch = scope.$watch(function () {
-					var dashlet = scope.dashlet;
-					if (!dashlet) {
-						return;
-					}
 
-					if (element.parent().is(":hidden")) {
-						return lazy = true;
+			(function () {
+				var counter = 0;
+				return function checkLoading() {
+					if (counter < 10 && element.parent().is(":hidden")) {
+						counter++;
+						return setTimeout(checkLoading, 100);
 					}
+					scope.waitForActions(function () {
+						var unwatch = scope.$watch(function () {
+							var dashlet = scope.dashlet;
+							if (!dashlet) {
+								return;
+							}
 
-					unwatch();
-					unwatch = null;
+							if (element.parent().is(":hidden")) {
+								return lazy = true;
+							}
 
-					var ctx = undefined;
-					if (scope.getContext) {
-						ctx = scope.getContext();
-					}
-					scope.initDashlet(dashlet, {
-						context: ctx
+							unwatch();
+							unwatch = null;
+
+							var ctx = undefined;
+							if (scope.getContext) {
+								ctx = scope.getContext();
+							}
+							scope.initDashlet(dashlet, {
+								context: ctx
+							});
+						});
 					});
-				});
-			});
+				};
+			})()();
 
 			scope.parseDashlet = _.once(function(dashlet, view) {
 				var body = element.find('.dashlet-body:first');

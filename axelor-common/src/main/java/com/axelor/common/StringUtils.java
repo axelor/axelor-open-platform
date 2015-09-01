@@ -63,22 +63,34 @@ public final class StringUtils {
 	 * @return stripped text
 	 */
 	public static String stripIndent(String text) {
-		String string = text.replaceAll("\\t", "    ");
-		StringBuilder builder = new StringBuilder();
-		int leading = 0;
-		for(String line : string.split("\\n")) {
-			if (line.trim().length() == 0) continue;
-			int n = 0;
-			while(n++ < line.length()) {
-				if (!Character.isWhitespace(line.charAt(n))) break;
+		if (isBlank(text)) {
+			return text;
+		}
+
+		final String[] lines = text.split("\\n");
+		final StringBuilder builder = new StringBuilder();
+
+		int leading = -1;
+		for (String line : lines) {
+			if (isBlank(line)) { continue; }
+			int index = 0;
+			int length = line.length();
+			if (leading == -1) {
+				leading = length;
 			}
-			if (leading == 0 || n < leading) {
-				leading = n;
-			}
-			if (n >= leading) {
-				builder.append(line.substring(leading)).append("\n");
+			while(index < length && index < leading && Character.isWhitespace(line.charAt(index))) { index++; }
+			if (leading > index) {
+				leading = index;
 			}
 		}
+
+		for(String line : lines) {
+			if (!isBlank(line)) {
+				builder.append(leading <= line.length() ? line.substring(leading) : "");
+			}
+			builder.append("\n");
+		}
+
 		return builder.toString();
 	}
 }
