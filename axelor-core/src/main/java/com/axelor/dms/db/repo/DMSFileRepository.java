@@ -37,6 +37,7 @@ import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Model;
+import com.axelor.db.internal.EntityHelper;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.dms.db.DMSFile;
 import com.axelor.dms.db.DMSFileTag;
@@ -79,7 +80,8 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 		} catch (Exception e) {
 			return null;
 		}
-		return JpaRepository.of(klass).find(file.getRelatedId());
+		final Model entity = JpaRepository.of(klass).find(file.getRelatedId());
+		return EntityHelper.getEntity(entity);
 	}
 
 	@Override
