@@ -40,9 +40,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.StaleObjectStateException;
 import org.hibernate.collection.spi.PersistentCollection;
-import org.hibernate.proxy.HibernateProxy;
-import org.hibernate.proxy.LazyInitializer;
 
+import com.axelor.db.internal.EntityHelper;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -219,16 +218,12 @@ public final class JPA {
 		em().clear();
 	}
 
-	@SuppressWarnings("all")
 	private static <T extends Model> void checkVersion(T bean, Object version) {
 		if (bean == null || version == null) {
 			return;
 		}
-		Class klass = bean.getClass();
-		if (bean instanceof HibernateProxy) {
-			klass = ((HibernateProxy) bean).getHibernateLazyInitializer().getPersistentClass();
-		}
-		Model entity = JPA.find(klass, bean.getId());
+		final Class<T> klass = EntityHelper.getEntityClass(bean);
+		final Model entity = JPA.em().find(klass, bean.getId());
 		if (entity == null || !Objects.equal(version, entity.getVersion())) {
 			Exception cause = new StaleObjectStateException(klass.getName(), bean.getId());
 			throw new OptimisticLockException(cause.getMessage(), cause, bean);
@@ -470,7 +465,7 @@ public final class JPA {
 		Set<Model> visited = Sets.newHashSet();
 		try {
 			T managed = _manage(bean, visited);
-			if (isUninitialized(managed)) {
+			if (EntityHelper.isUninitialized(managed)) {
 				return managed;
 			}
 			return persist(managed);
@@ -478,16 +473,10 @@ public final class JPA {
 			visited.clear();
 		}
 	}
-	
-	private static <T extends Model> boolean isUninitialized(T bean) {
-		return bean instanceof HibernateProxy
-				&& ((HibernateProxy) bean).getHibernateLazyInitializer()
-						.isUninitialized();
-	}
 
 	private static <T extends Model> T _manage(T bean, Set<Model> visited) {
 		
-		if (visited.contains(bean) || isUninitialized(bean)) {
+		if (visited.contains(bean) || EntityHelper.isUninitialized(bean)) {
 			return bean;
 		}
 		visited.add(bean);
@@ -595,17 +584,10 @@ public final class JPA {
 			return bean;
 		}
 		
-		Class<?> beanClass = bean.getClass();
-		
-		if (bean instanceof HibernateProxy) {
-			LazyInitializer proxy = ((HibernateProxy) bean).getHibernateLazyInitializer();
-			if (proxy.isUninitialized()) {
-				bean = (T) proxy.getImplementation();
-			}
-			beanClass = proxy.getPersistentClass();
-		}
+		bean = EntityHelper.getEntity(bean);
 
-		String key = beanClass.getName() + "#" + bean.getId();
+		final Class<?> beanClass = bean.getClass();
+		final String key = beanClass.getName() + "#" + bean.getId();
 		if (visited.contains(key)) {
 			return null;
 		}

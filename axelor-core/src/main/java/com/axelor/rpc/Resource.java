@@ -39,7 +39,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.OptimisticLockException;
 
 import org.hibernate.StaleObjectStateException;
-import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +51,7 @@ import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.Repository;
+import com.axelor.db.internal.EntityHelper;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -878,9 +878,7 @@ public class Resource<T extends Model> {
 			return null;
 		}
 
-		if (bean instanceof HibernateProxy) {
-			bean = ((HibernateProxy) bean).getHibernateLazyInitializer().getImplementation();
-		}
+		bean = EntityHelper.getEntity(bean);
 
 		if (fields == null) {
 			fields = Maps.newHashMap();

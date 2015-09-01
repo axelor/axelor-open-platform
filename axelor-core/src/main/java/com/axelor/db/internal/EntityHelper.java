@@ -20,6 +20,8 @@ package com.axelor.db.internal;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hibernate.proxy.HibernateProxy;
+
 import com.axelor.db.Model;
 import com.axelor.db.annotations.HashKey;
 import com.axelor.db.mapper.Mapper;
@@ -27,6 +29,7 @@ import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 /**
@@ -137,5 +140,62 @@ public final class EntityHelper {
 		}
 
 		return !hasHashKeys;
+	}
+
+	/**
+	 * Get the real persistence class of the given entity.
+	 * 
+	 * <p>
+	 * This method can be used to find real class name of a proxy object
+	 * returned by hibernate entity manager.
+	 * </p>
+	 * 
+	 * @param entity
+	 *            an entity instance
+	 * @return real class of the entity
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> Class<T> getEntityClass(T entity) {
+		Preconditions.checkNotNull(entity);
+		if (entity instanceof HibernateProxy) {
+			return ((HibernateProxy) entity).getHibernateLazyInitializer().getPersistentClass();
+		}
+		return (Class<T>) entity.getClass();
+	}
+
+	/**
+	 * Get unproxied instance of the given entity.
+	 * 
+	 * <p>
+	 * This method can be used to convert hibernate proxy object to real
+	 * implementation instance.
+	 * </p>
+	 * 
+	 * @param entity
+	 *            proxied entity
+	 * @return unproxied instance of the entity
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getEntity(T entity) {
+		if (entity == null) {
+			return null;
+		}
+		if (entity instanceof HibernateProxy) {
+			return (T) ((HibernateProxy) entity).getHibernateLazyInitializer().getImplementation();
+		}
+		return entity;
+	}
+
+	/**
+	 * Check whether the given lazy loading proxy instance is uninitialized.
+	 * 
+	 * @param entity
+	 *            the lazy loading entity instance
+	 * @return true if uninitialized false otherwise
+	 */
+	public static <T> boolean isUninitialized(T entity) {
+		return entity instanceof HibernateProxy
+				&& ((HibernateProxy) entity).getHibernateLazyInitializer()
+						.isUninitialized();
 	}
 }
