@@ -20,15 +20,15 @@
 var ui = angular.module('axelor.ui');
 
 var PROPS = {
-	'bpmn:StartEvent': ['id', 'name', 'description'],
-	'bpmn:EndEvent': ['id', 'name', 'description'],
-	'bpmn:Task': ['id', 'name', 'action','description'],
+	'bpmn:StartEvent' : ['id', 'name', 'description'],
+	'bpmn:EndEvent' : ['id', 'name', 'description'],
+	'bpmn:Task' : ['id', 'name', 'action','description'],
 	'bpmn:exclusive-gateway' : ['id', 'name', 'description'],
 	'bpmn:ParallelGateway' : ['id', 'name', 'description'],
 	'bpmn:InclusiveGateway' : ['id', 'name', 'description'],
-	'bpmn:Process': ['id', 'name', 'model', 'sequence', 'maxnodecounter', 'active', 'archived', 'description'],
-	'bpmn:SequenceFlow': ['id', 'name', 'sequence', 'signal', 'action', 'role', 'description'],
-	'bpmn:IntermediateCatchEvent' : ['id', 'name', 'datetime', 'timeduration', 'description']
+	'bpmn:Process' : ['id', 'name', 'model', 'sequence', 'maxnodecounter', 'active', 'archived', 'description'],
+	'bpmn:SequenceFlow' : ['id', 'name', 'sequence', 'signal', 'action', 'role', 'description'],
+	'bpmn:IntermediateCatchEvent' : ['id', 'name', 'datetime', 'timeduration', 'timecycle', 'description']
 };
 
 ui.formInput('BpmnEditor', {
@@ -253,6 +253,7 @@ ui.formInput('BpmnEditor', {
 		var selectedElement = null;
 
 		function xname(name) {
+
 			if (name === 'id' || name === 'name') {
 				return name;
 			}
@@ -260,8 +261,10 @@ ui.formInput('BpmnEditor', {
 		}
 
 		function onSelect(element) {
+
 			selectedElement = element;
 			scope.props = null;
+
 			if (!element) {
 				scope.applyLater();
 				return;
@@ -287,7 +290,11 @@ ui.formInput('BpmnEditor', {
 					value = { name: value };
 				}
 				if (name === 'model' && bo.$type === 'bpmn:Process' ) {
-					value = { name: scope.record.metaModel.name };
+					if (scope.record.metaModel && scope.record.metaModel.fullName) {
+						value = { fullName: scope.record.metaModel.fullName };
+					} else {
+						value = { fullName: scope.record.metaModelName };
+					}
 				}
 				if (name === 'name' && bo.$type === 'bpmn:Process') {
 					value =  scope.record.name;
@@ -346,7 +353,7 @@ ui.formInput('BpmnEditor', {
 				value = value.name;
 			}
 			if (value && name === 'model') {
-				value = value.name;
+				value = value.fullName;
 			}
 			if (name === 'sequence' && first.type === "bpmn:Process") {
 				scope.record.sequence = value;
@@ -394,7 +401,7 @@ ui.formInput('BpmnEditor', {
 										'xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" ' +
 										'targetNamespace="http://bpmn.io/schema/bpmn" ' +
 										'id="Definitions_1">' +
-						'<process id="Process_1" name="'+ scope.record.name +'" x:model="'+ scope.record.metaModel.name +'" x:description="" isExecutable="false">' +
+						'<process id="Process_1" name="'+ scope.record.name +'" x:model="'+ scope.record.metaModelName +'" x:description="" isExecutable="false">' +
 						'<startEvent id="StartEvent_1"/>' +
 						'<endEvent id="EndEvent_1"/>' +
 						'</process>' +
@@ -533,7 +540,7 @@ ui.directive('uiBpmnProps', function () {
 				name: 'model',
 				type: 'many-to-one',
 				target: 'com.axelor.meta.db.MetaModel',
-				targetName: 'name',
+				targetName: 'fullName',
 				widget: 'BpmnManyToOne',
 				showIf: '$x.model',
 				required : true,
@@ -598,6 +605,12 @@ ui.directive('uiBpmnProps', function () {
 				showIf: '$x.timeduration',
 				colSpan: 12
 			}, {
+				title: _t('Time Cycle'),
+				name: 'timecycle',
+				type: 'time',
+				showIf: '$x.timecycle',
+				colSpan: 12
+			}, {
 				title: _t('Signal'),
 				name: 'signal',
 				type: 'string',
@@ -643,6 +656,16 @@ ui.formInput('BpmnManyToOne', 'ManyToOne', {
 					fields: ['name'],
 					domain: 'self.name = :name',
 					context: {name: value.name},
+					limit: 1
+				}).success(function (records, page) {
+					var record = _.first(records);
+					scope.showEditor(record);
+				});
+			} else if (value && value.fullName) {
+				ds.search({
+					fields: ['name'],
+					domain: 'self.fullName = :fullName',
+					context: {fullName: value.fullName},
 					limit: 1
 				}).success(function (records, page) {
 					var record = _.first(records);
