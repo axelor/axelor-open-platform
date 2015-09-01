@@ -31,14 +31,10 @@ ui.formInput('Boolean', {
 	link: function (scope, element, attrs, model) {
 		
 		var field = scope.field;
-		var onChange = scope.$events.onChange || angular.noop;
 		var input = element.find('input');
 
 		input.click(function () {
-			scope.setValue(input[0].checked);
-			scope.applyLater(function() {
-				setTimeout(onChange);
-			});
+			scope.setValue(input[0].checked, true);
 		});
 	},
 	template_readonly: null,
