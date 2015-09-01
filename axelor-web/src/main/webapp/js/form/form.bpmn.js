@@ -19,40 +19,16 @@
 
 var ui = angular.module('axelor.ui');
 
-var DEFAULT = '<?xml version="1.0" encoding="UTF-8"?>' +
-'<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
-					'xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" ' +
-					'xmlns:x="http://axelor.com" ' +
-					'xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" ' +
-					'xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" ' +
-					'targetNamespace="http://bpmn.io/schema/bpmn" ' +
-					'id="Definitions_1">' +
-	'<process id="Process_1" name="" x:bpmnId="" x:model="" x:description="" isExecutable="false">' +
-	'<startEvent id="StartEvent_1"/>' +
-	'<endEvent id="EndEvent_1"/>' +
-	'</process>' +
-	'<bpmndi:BPMNDiagram id="BPMNDiagram_1">' +
-	'<bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">' +
-		'<bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">' +
-		'<dc:Bounds x="269" y="195" width="36" height="36"/>'+
-		'</bpmndi:BPMNShape>' +
-		'<bpmndi:BPMNShape id="_BPMNShape_EndEvent_2" bpmnElement="EndEvent_1">' +
-		'<dc:Bounds x="534" y="195" width="36" height="36"/>'+
-		'</bpmndi:BPMNShape>' +
-	'</bpmndi:BPMNPlane>' +
-	'</bpmndi:BPMNDiagram>' +
-'</definitions>';
-
 var PROPS = {
-	'bpmn:StartEvent': ['bpmnId', 'name', 'description'],
-	'bpmn:EndEvent': ['bpmnId', 'name', 'description'],
-	'bpmn:Task': ['bpmnId', 'name', 'action','description'],
-	'bpmn:exclusive-gateway' : ['bpmnId', 'name', 'description'],
-	'bpmn:ParallelGateway' : ['bpmnId', 'name', 'description'],
-	'bpmn:InclusiveGateway' : ['bpmnId', 'name', 'description'],
-	'bpmn:Process': ['bpmnId', 'name', 'model', 'sequence', 'maxnodecounter', 'active', 'archived', 'description'],
-	'bpmn:SequenceFlow': ['bpmnId', 'name', 'sequence', 'signal', 'action', 'role', 'description'],
-	'bpmn:IntermediateCatchEvent' : ['bpmnId', 'name', 'datetime', 'timeduration', 'description']
+	'bpmn:StartEvent' : ['id', 'name', 'description'],
+	'bpmn:EndEvent' : ['id', 'name', 'description'],
+	'bpmn:Task' : ['id', 'name', 'action','description'],
+	'bpmn:exclusive-gateway' : ['id', 'name', 'description'],
+	'bpmn:ParallelGateway' : ['id', 'name', 'description'],
+	'bpmn:InclusiveGateway' : ['id', 'name', 'description'],
+	'bpmn:Process' : ['id', 'name', 'model', 'sequence', 'maxnodecounter', 'active', 'archived', 'description'],
+	'bpmn:SequenceFlow' : ['id', 'name', 'sequence', 'signal', 'action', 'role', 'description'],
+	'bpmn:IntermediateCatchEvent' : ['id', 'name', 'datetime', 'timeduration', 'timecycle', 'description']
 };
 
 ui.formInput('BpmnEditor', {
@@ -152,7 +128,11 @@ ui.formInput('BpmnEditor', {
 				        'append.ParallelGateway' : appendAction('bpmn:ParallelGateway', 'icon-gateway-parallel'),
 				        'append.append-task': appendAction('bpmn:Task', 'icon-task'),
 				        'append.end-event': appendAction('bpmn:EndEvent', 'icon-end-event-none'),
-				        'append.InclusiveGateway' : appendAction('bpmn:InclusiveGateway', 'icon-gateway-or')
+				        'append.InclusiveGateway' : appendAction('bpmn:InclusiveGateway', 'icon-gateway-or'),
+				        'append.timer-intermediate-event': appendAction('bpmn:IntermediateCatchEvent', 'icon-intermediate-event-catch-timer',
+															{ _eventDefinitionType: 'bpmn:TimerEventDefinition'}),
+						'append.message-intermediate-event': appendAction('bpmn:IntermediateCatchEvent', 'icon-intermediate-event-catch-message',
+															{ _eventDefinitionType: 'bpmn:MessageEventDefinition'})
 					});
 				}
 
@@ -273,6 +253,7 @@ ui.formInput('BpmnEditor', {
 		var selectedElement = null;
 
 		function xname(name) {
+
 			if (name === 'id' || name === 'name') {
 				return name;
 			}
@@ -280,8 +261,10 @@ ui.formInput('BpmnEditor', {
 		}
 
 		function onSelect(element) {
+
 			selectedElement = element;
 			scope.props = null;
+
 			if (!element) {
 				scope.applyLater();
 				return;
@@ -307,7 +290,11 @@ ui.formInput('BpmnEditor', {
 					value = { name: value };
 				}
 				if (name === 'model' && bo.$type === 'bpmn:Process' ) {
-					value = { name: scope.record.metaModel.name };
+					if (scope.record.metaModel && scope.record.metaModel.fullName) {
+						value = { fullName: scope.record.metaModel.fullName };
+					} else {
+						value = { fullName: scope.record.metaModelName };
+					}
 				}
 				if (name === 'name' && bo.$type === 'bpmn:Process') {
 					value =  scope.record.name;
@@ -366,7 +353,7 @@ ui.formInput('BpmnEditor', {
 				value = value.name;
 			}
 			if (value && name === 'model') {
-				value = value.name;
+				value = value.fullName;
 			}
 			if (name === 'sequence' && first.type === "bpmn:Process") {
 				scope.record.sequence = value;
@@ -406,6 +393,30 @@ ui.formInput('BpmnEditor', {
 			last = scope.record;
 			var xml = model.$viewValue;
 			if (xml === null) {
+				var DEFAULT = '<?xml version="1.0" encoding="UTF-8"?>' +
+					'<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
+										'xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" ' +
+										'xmlns:x="http://axelor.com" ' +
+										'xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" ' +
+										'xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" ' +
+										'targetNamespace="http://bpmn.io/schema/bpmn" ' +
+										'id="Definitions_1">' +
+						'<process id="Process_1" name="'+ scope.record.name +'" x:model="'+ scope.record.metaModelName +'" x:description="" isExecutable="false">' +
+						'<startEvent id="StartEvent_1"/>' +
+						'<endEvent id="EndEvent_1"/>' +
+						'</process>' +
+						'<bpmndi:BPMNDiagram id="BPMNDiagram_1">' +
+						'<bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">' +
+							'<bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">' +
+							'<dc:Bounds x="269" y="195" width="36" height="36"/>'+
+							'</bpmndi:BPMNShape>' +
+							'<bpmndi:BPMNShape id="_BPMNShape_EndEvent_2" bpmnElement="EndEvent_1">' +
+							'<dc:Bounds x="534" y="195" width="36" height="36"/>'+
+							'</bpmndi:BPMNShape>' +
+						'</bpmndi:BPMNPlane>' +
+						'</bpmndi:BPMNDiagram>' +
+					'</definitions>';
+
 				xml = DEFAULT;
 			}
 			scope.waitForActions(function () {
@@ -514,8 +525,9 @@ ui.directive('uiBpmnProps', function () {
 
 			var items = [{
 				title: _t('Item ID'),
-				name: 'bpmnId',
-				showIf: '$x.bpmnId',
+				name: 'id',
+				showIf: '$x.id',
+				readonly: true,
 				colSpan: 12
 			}, {
 				title: _t('Name'),
@@ -528,7 +540,7 @@ ui.directive('uiBpmnProps', function () {
 				name: 'model',
 				type: 'many-to-one',
 				target: 'com.axelor.meta.db.MetaModel',
-				targetName: 'name',
+				targetName: 'fullName',
 				widget: 'BpmnManyToOne',
 				showIf: '$x.model',
 				required : true,
@@ -593,6 +605,12 @@ ui.directive('uiBpmnProps', function () {
 				showIf: '$x.timeduration',
 				colSpan: 12
 			}, {
+				title: _t('Time Cycle'),
+				name: 'timecycle',
+				type: 'time',
+				showIf: '$x.timecycle',
+				colSpan: 12
+			}, {
 				title: _t('Signal'),
 				name: 'signal',
 				type: 'string',
@@ -638,6 +656,16 @@ ui.formInput('BpmnManyToOne', 'ManyToOne', {
 					fields: ['name'],
 					domain: 'self.name = :name',
 					context: {name: value.name},
+					limit: 1
+				}).success(function (records, page) {
+					var record = _.first(records);
+					scope.showEditor(record);
+				});
+			} else if (value && value.fullName) {
+				ds.search({
+					fields: ['name'],
+					domain: 'self.fullName = :fullName',
+					context: {fullName: value.fullName},
 					limit: 1
 				}).success(function (records, page) {
 					var record = _.first(records);
