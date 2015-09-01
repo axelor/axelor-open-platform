@@ -255,21 +255,16 @@ ui.formInput('Binary', {
 
 		var field = scope.field;
 		var input = element.children('input:first').hide();
-		var frame = element.children("iframe").hide();
 
 		scope.doSelect = function() {
 			input.click();
 		};
 
 		scope.doSave = function() {
-			var record = scope.record,
-				model = scope._model;
-
+			var record = scope.record;
+			var model = scope._model;
 			var url = "ws/rest/" + model + "/" + record.id + "/" + field.name + "/download";
-			frame.attr("src", url);
-			setTimeout(function(){
-				frame.attr("src", "");
-			}, 300);
+			ui.download(url, record.fileName || field.name);
 		};
 
 		scope.doRemove = function() {
@@ -320,7 +315,6 @@ ui.formInput('Binary', {
 	template_editable: null,
 	template:
 	'<div>' +
-		'<iframe></iframe>' +
 		'<input type="file">' +
 		'<div class="btn-group">' +
 			'<button ng-click="doSelect()" ng-show="!isReadonly()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +

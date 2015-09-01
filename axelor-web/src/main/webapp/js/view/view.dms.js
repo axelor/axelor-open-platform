@@ -394,7 +394,7 @@ function DMSFileListCtrl($scope, $element) {
 			var batchId = data.batchId;
 			var batchName = data.batchName;
 			if (batchId) {
-				$scope.doDownload("ws/dms/download/" + batchId, batchName);
+				ui.download("ws/dms/download/" + batchId, batchName);
 			}
 		});
 	};
@@ -815,29 +815,6 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 
 		scope.onUpload = function () {
 			input.click();
-		};
-
-		scope.doDownload = function (url, fileName) {
-			var link = document.createElement('a');
-
-			link.onclick = function(e) {
-				setTimeout(function () {
-					document.body.removeChild(e.target);
-				}, 100);
-			};
-
-			link.href = url;
-			link.download = fileName;
-			link.innerHTML = fileName;
-			link.style.display = "none";
-
-			document.body.appendChild(link);
-
-			setTimeout(function () {
-				link.click();
-			}, 300);
-
-			axelor.notify.info(_t("Downloading {0}...", fileName));
 		};
 	};
 }]);
@@ -1548,6 +1525,35 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 		template: "<div ui-dialog x-buttons='buttons' x-on-ok='false' x-on-close='onClose' class='dms-popup' title='Attachments'></div>"
 	};
 }]);
+
+ui.download =	function download(url, fileName) {
+
+	var link = document.createElement('a');
+
+	link.innerHTML = fileName;
+	link.download = fileName;
+	link.href = url;
+
+	_.extend(link.style, {
+		position: "absolute",
+		visibility: "hidden",
+		zIndex: 1000000000
+	});
+
+	document.body.appendChild(link);
+
+	link.onclick = function(e) {
+		setTimeout(function () {
+			document.body.removeChild(e.target);
+		}, 300);
+	};
+
+	setTimeout(function () {
+		link.click();
+	}, 100);
+
+	axelor.notify.info(_t("Downloading {0}...", fileName));
+};
 
 // prevent download on droping files
 $(function () {
