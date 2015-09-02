@@ -182,25 +182,22 @@ ui.formInput('Image', 'ImageLink', {
 			reader.readAsDataURL(file);
 		});
 		
-		function doProgress(n) {
-
-		}
-		
 		function doUpload(file) {
 			var ds = scope._dataSource._new(META_FILE);
+			var value = field.target === META_FILE ? scope.getValue() : {};
 			var record = {
 				fileName: file.name,
 				fileType: file.type,
 				fileSize: file.size,
-				id: null,
-				version: null
+				id: value.id,
+				version: value.version || value.$version
 		    };
 
 			record.$upload = {
 			    file: file
 		    };
 
-			ds.save(record).progress(doProgress).success(function (saved) {
+			ds.save(record).success(function (saved) {
 				update(saved);
 			});
 		}
@@ -376,11 +373,15 @@ ui.formInput('BinaryLink', {
 			}
 
 			var ds = scope._dataSource._new(META_FILE);
-			var record = {
+			var value = scope.getValue() || {};
+			var record = _.extend({
 				fileName: file.name,
 				fileType: file.type,
 				fileSize: file.size
-			};
+			}, {
+				id: value.id,
+				version: value.version || value.$version
+			});
 
 			record.$upload = {
 				file: file
