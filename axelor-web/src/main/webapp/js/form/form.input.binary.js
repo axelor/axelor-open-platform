@@ -184,7 +184,7 @@ ui.formInput('Image', 'ImageLink', {
 		
 		function doUpload(file) {
 			var ds = scope._dataSource._new(META_FILE);
-			var value = field.target === META_FILE ? scope.getValue() : {};
+			var value = field.target === META_FILE ? (scope.getValue()||{}) : {};
 			var record = {
 				fileName: file.name,
 				fileType: file.type,
