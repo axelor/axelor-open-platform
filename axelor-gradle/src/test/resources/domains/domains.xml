@@ -3,7 +3,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_4.0.xsd">
 
-  <module name="contact" package="com.axelor.contact.db" repo-package="com.axelor.contact.repo" table-prefix="MY" />
+  <module name="contact" package="com.axelor.contact.db"/>
   
   <entity name="Title" cachable="true" implements="java.io.Serializable" repository="abstract">
     <![CDATA[

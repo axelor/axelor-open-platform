@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_4.0.xsd">
+
+  <module name="my" package="my.models" repo-package="my.repos" table-prefix="my" />
+
+  <entity name="Party">
+    <string name="code" required="true" unique="true" min="2" />
+    <string name="name" required="true" unique="true" min="2" />
+  </entity>
+
+</domain-models>

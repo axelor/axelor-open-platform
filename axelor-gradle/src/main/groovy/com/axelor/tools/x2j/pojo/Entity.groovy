@@ -104,21 +104,23 @@ class Entity {
 		if (!name) {
 			throw new IllegalArgumentException("Entity name not given.")
 		}
-		if (!module) {
-			throw new IllegalArgumentException("Namespace details not given.")
-		}
-		
-		if (!namespace) {
-			namespace = "com.axelor.${module}.db"
+
+		if (!module || !namespace) {
+			throw new IllegalArgumentException("Namespace details not given or incomplete.")
 		}
 
 		if (!repoNamespace) {
 			repoNamespace = "${namespace}.repo"
 		}
+
 		if (!tablePrefix) {
-			tablePrefix = module + "_"
-		}
-		if (!tablePrefix.endsWith("_")) {
+			if (namespace.endsWith(".db")) {
+				tablePrefix = namespace.replaceAll(/\.db$/, "")
+				tablePrefix = tablePrefix.substring(tablePrefix.lastIndexOf('.') + 1) + "_"
+			} else {
+				tablePrefix = module + "_"
+			}
+		} else if (!tablePrefix.endsWith("_")) {
 			tablePrefix += "_"
 		}
 
