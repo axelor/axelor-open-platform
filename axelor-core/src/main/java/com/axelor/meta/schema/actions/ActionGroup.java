@@ -187,7 +187,7 @@ public class ActionGroup extends ActionResumable {
 
 			log.debug("action: {}", name);
 
-			if ("save".equals(name) || "validate".equals(name)) {
+			if ("save".equals(name) || "validate".equals(name) || "close".equals(name)) {
 				if (!element.test(handler)) {
 					log.debug("action '{}' doesn't meet the condition: {}", name, element.getCondition());
 					continue;
@@ -274,7 +274,8 @@ public class ActionGroup extends ActionResumable {
                 	last.containsKey("alert") ||
                 	last.containsKey("error") ||
                 	last.containsKey("save") ||
-                	last.containsKey("validate")) {
+                	last.containsKey("validate") ||
+                	last.containsKey("close")) {
             		String previous = (String) last.get("pending");
             		String pending = this.getPending(i, previous);
             		last.put("pending", pending);

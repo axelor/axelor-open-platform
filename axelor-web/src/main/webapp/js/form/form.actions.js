@@ -426,6 +426,17 @@ ActionHandler.prototype = {
 		return deferred.promise;
 	},
 
+	_closeView: function (scope) {
+		if (scope.onOK) {
+			return scope.onOK();
+		}
+		if (scope.closeTab) {
+			scope.closeTab(tab);
+		} else if (scope.$parent) {
+			this._closeView(scope.$parent);
+		}
+	},
+
 	_handleAction: function(action) {
 
 		this._blockUI();
@@ -485,6 +496,19 @@ ActionHandler.prototype = {
 			});
 		}
 
+		var pattern = /(,)?\s*(close)\s*,/;
+		if (pattern.test(action)) {
+			var which = pattern.exec(action)[2];
+			axelor.dialogs.error(_t('Invalid use of "{0}" action, must be the last action.', which));
+			deferred.reject();
+			return deferred.promise;
+		}
+
+		if (action === 'close') {
+			this._closeView(scope);
+			deferred.resolve();
+			return deferred.promise;
+		}
 		if (action === 'validate') {
 			return this._handleSave(true);
 		}
@@ -925,10 +949,8 @@ ActionHandler.prototype = {
 			doOpenView(data.view);
 		}
 
-		if (data.canClose) {
-			if (scope.onOK) {
-				scope.onOK();
-			}
+		if (data.close || data.canClose) {
+			this._closeView(scope);
 		}
 
 		deferred.resolve();
