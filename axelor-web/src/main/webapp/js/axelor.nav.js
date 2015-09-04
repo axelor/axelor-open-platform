@@ -18,6 +18,7 @@
 (function() {
 
 var app = angular.module("axelor.app");
+var singleTabOnly = axelor.device.mobile || !!__appSettings['view.single.tab'];
 
 app.factory('NavService', ['$location', 'MenuService', function($location, MenuService) {
 
@@ -96,8 +97,6 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		if (tab && tab.$popupParent) {
 			return openTabAsPopup(tab, options);
 		}
-		
-		var found = findTab(tab.action);
 
 		options = options || tab.options;
 
@@ -108,6 +107,50 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		tab.options = options;
 		tab.title = tab.title || findTabTitle(tab);
 
+		function __doSelect(found) {
+
+			found.selected = true;
+			selected = found;
+
+			if (options && tab.$viewScope) {
+				var view = tab.$viewScope._views[tab.viewType],
+					promise = view ? view.deferred.promise : null;
+				if (promise) {
+					promise.then(function(viewScope) {
+						viewScope.setRouteOptions(options);
+					});
+				}
+			}
+
+			setTimeout(function(){
+				$.event.trigger('adjust');
+				axelor.$adjustSize();
+			});
+		}
+
+		function __singleShow(found) {
+			tabs.length = 0;
+			tabs.push(found);
+			return __doSelect(found);
+		}
+
+		var found = findTab(tab.action);
+
+		if (singleTabOnly) {
+
+			if (found) {
+				return __singleShow(found);
+			}
+
+			var last = _.last(tabs);
+			if (last) {
+				return closeTab(last, function () {
+					__singleShow(tab);
+				});
+			}
+			return __singleShow(tab);
+		}
+
 		if (!found) {
 			found = tab;
 			if (options && options.__tab_prepend) {
@@ -117,25 +160,11 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 			}
 		}
 
-		_.each(tabs, function(tab) { tab.selected = false; });
-
-		found.selected = true;
-		selected = found;
-
-		if (options && tab.$viewScope) {
-			var view = tab.$viewScope._views[tab.viewType],
-				promise = view ? view.deferred.promise : null;
-			if (promise) {
-				promise.then(function(viewScope) {
-					viewScope.setRouteOptions(options);
-				});
-			}
-		}
-
-		setTimeout(function(){
-			$.event.trigger('adjust');
-			axelor.$adjustSize();
+		_.each(tabs, function(tab) {
+			tab.selected = false;
 		});
+
+		return __doSelect(found);
 	}
 
 	function __closeTab(tab, callback) {
@@ -290,6 +319,8 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 
 NavCtrl.$inject = ['$scope', '$rootScope', '$location', 'NavService'];
 function NavCtrl($scope, $rootScope, $location, NavService) {
+
+	$scope.singleTabOnly = singleTabOnly;
 
 	$scope.navTabs = Object.defineProperty($scope, 'navTabs', {
 		get: function() {

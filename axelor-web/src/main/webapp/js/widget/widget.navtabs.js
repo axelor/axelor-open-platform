@@ -20,19 +20,28 @@ angular.module('axelor.ui').directive('navTabs', function() {
 		restrict: 'EA',
 		replace: true,
 		link: function(scope, elem, attrs) {
+
+			if (scope.singleTabOnly) {
+				return elem.parent().addClass("view-tabs-single");
+			}
+
 			scope.$watch('tabs.length', function(value, oldValue){
 				if (value != oldValue) $.event.trigger('adjust');
 			});
+
 			elem.bsTabs();
 			elem.on('contextmenu', '.nav-tabs-main > li > a', showMenu);
 
-			var menu = elem.find('#nav-tabs-menu');
-			
-			menu.css({
-				position: 'absolute',
-				zIndex: 1000
-			}).hide();
-			
+			var menu = $();
+
+			setTimeout(function () {
+				menu = elem.find('#nav-tabs-menu');
+				menu.css({
+					position: 'absolute',
+					zIndex: 1000
+				}).hide();
+			});
+
 			function showMenu(e) {
 				var tabElem = $(e.target).parents('li:first');
 				var tabScope = tabElem.data('$scope');

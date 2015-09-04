@@ -760,3 +760,44 @@ img.prefix-icon {
 .system-page dt {
 	text-align: left;
 }
+
+
+/* single tab view mode */
+.view-tabs-single,
+.view-tabs-single .nav-tabs {
+	margin: 0;
+}
+
+.view-tabs-single .view-content {
+	top: 23px;
+}
+
+.view-tabs-single .nav-tabs {
+	position: relative;
+	top: -9px;
+}
+
+.view-tabs-single .nav-tabs > li {
+	width: 100%;
+	color: #555;
+}
+
+.view-tabs-single .nav-tabs > li > a {
+	font-size: 14px;
+    font-weight: 600;
+	padding: 6px 8px;
+	border-left: 0;
+	border-right: 0;
+}
+
+.view-tabs-single .nav-tabs > li > i {
+    float: right;
+    font-size: 14px;
+    line-height: 32px;
+    margin-right: 16px;
+    cursor: pointer;
+}
+
+.view-tabs-single .nav-tabs-strip .nav-tabs {
+	padding: 0;
+}
