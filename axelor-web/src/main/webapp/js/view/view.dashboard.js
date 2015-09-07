@@ -172,7 +172,6 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 		link: function(scope, element, attrs) {
 
 			var lazy = true;
-
 			(function () {
 				var counter = 0;
 				return function checkLoading() {
@@ -180,6 +179,9 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 						counter++;
 						return setTimeout(checkLoading, 100);
 					}
+
+					lazy = !element.parent().is(".dashlet-row,.dashboard");
+
 					scope.waitForActions(function () {
 						var unwatch = scope.$watch(function () {
 							var dashlet = scope.dashlet;
