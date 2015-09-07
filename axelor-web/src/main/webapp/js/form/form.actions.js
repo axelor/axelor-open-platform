@@ -430,6 +430,7 @@ ActionHandler.prototype = {
 		if (scope.onOK) {
 			return scope.onOK();
 		}
+		var tab = scope._viewParams || scope.selectedTab;
 		if (scope.closeTab) {
 			scope.closeTab(tab);
 		} else if (scope.$parent) {
