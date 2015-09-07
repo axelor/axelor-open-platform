@@ -32,6 +32,7 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileAttribute;
 
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
@@ -91,6 +92,26 @@ public class MetaFiles {
 	public static Path getPath(MetaFile file) {
 		Preconditions.checkNotNull(file, "file instance can't be null");
 		return UPLOAD_PATH.resolve(file.getFilePath());
+	}
+	
+	/**
+	 * Create a temporary file under upload directory.
+	 * 
+	 * @see Files#createTempFile(String, String, FileAttribute...)
+	 */
+	public static Path createTempFile(String prefix, String suffix, FileAttribute<?>... attrs) throws IOException {
+		return Files.createTempFile(UPLOAD_PATH_TEMP, prefix, suffix, attrs);
+	}
+
+	/**
+	 * Find a temporary file by the given name created previously.
+	 * 
+	 * @param name
+	 *            name of the temp file
+	 * @return file path
+	 */
+	public static Path findTempFile(String name) {
+		return UPLOAD_PATH_TEMP.resolve(name);
 	}
 
 	private Path getNextPath(String fileName) {
@@ -258,7 +279,7 @@ public class MetaFiles {
 		final String fileName = isBlank(metaFile.getFileName()) ? file.getName() : metaFile.getFileName();
 		final String targetName = update ? metaFile.getFilePath() : fileName;
 		final Path path = UPLOAD_PATH.resolve(targetName);
-		final Path tmp = update ? Files.createTempFile(UPLOAD_PATH_TEMP, null, null) : null;
+		final Path tmp = update ? createTempFile(null, null) : null;
 
 		if (update && Files.exists(path)) {
 			Files.move(path, tmp, MOVE_OPTIONS);

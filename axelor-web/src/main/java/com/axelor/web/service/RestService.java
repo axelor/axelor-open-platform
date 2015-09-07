@@ -20,19 +20,19 @@ package com.axelor.web.service;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.security.SecureRandom;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -87,11 +87,8 @@ import com.axelor.rpc.Response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Charsets;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.primitives.Longs;
 import com.google.inject.servlet.RequestScoped;
 
@@ -444,11 +441,6 @@ public class RestService extends ResourceService {
 		return getResource().perms();
 	}
 
-	private static final Cache<String, Request> EXPORT_REQUESTS = CacheBuilder
-			.newBuilder()
-			.expireAfterAccess(1, TimeUnit.MINUTES)
-			.build();
-
 	private static Charset csvCharset = Charsets.ISO_8859_1;
 	static {
 		try {
@@ -463,8 +455,8 @@ public class RestService extends ResourceService {
 	@Produces("text/csv")
 	public StreamingOutput export(@PathParam("name") final String name) {
 
-		final Request request = EXPORT_REQUESTS.getIfPresent(name);
-		if (request == null) {
+		final java.nio.file.Path temp = MetaFiles.findTempFile(name);
+		if (Files.notExists(temp)) {
 			throw new IllegalArgumentException(name);
 		}
 
@@ -472,12 +464,10 @@ public class RestService extends ResourceService {
 
 			@Override
 			public void write(OutputStream output) throws IOException, WebApplicationException {
-				Writer writer = new OutputStreamWriter(output, csvCharset);
-				try {
-					getResource().export(request, writer);
+				try (final InputStream is = new FileInputStream(temp.toFile())) {
+					uploadSave(is, output);
 				} finally {
-					writer.close();
-					EXPORT_REQUESTS.invalidate(name);
+					Files.deleteIfExists(temp);
 				}
 			}
 		};
@@ -486,17 +476,20 @@ public class RestService extends ResourceService {
 	@POST
 	@Path("export")
 	public Response export(Request request) {
-
-		Response response = new Response();
-		Map<String, Object> data = Maps.newHashMap();
-		String fileName = Math.abs(new SecureRandom().nextLong()) + ".csv";
-
-		EXPORT_REQUESTS.put(fileName, request);
-
-		request.setModel(getModel());
-		response.setData(data);
-
-		data.put("fileName", fileName);
+		final Response response = new Response();
+		final Map<String, Object> data = new HashMap<>();
+		try {
+			final java.nio.file.Path tempFile = MetaFiles.createTempFile(null, ".csv");
+			try(final OutputStream os = new FileOutputStream(tempFile.toFile())) {
+				try (final Writer writer = new OutputStreamWriter(os, csvCharset)) {
+					getResource().export(request, writer);
+				}
+			};
+			data.put("fileName", tempFile.toFile().getName());
+			response.setData(data);
+		} catch (IOException e) {
+			response.setException(e);
+		}
 
 		return response;
 	}
