@@ -69,8 +69,11 @@ function ChartCtrl($scope, $element, $http) {
 				data = _.extend({}, viewChart, data);
 			}
 
-			if ($scope.searchFields === undefined && data.search) {
+			if ($scope.searchFields === undefined) {
 				$scope.searchFields = data.search;
+			}
+
+			if (data.onInit && data.search) {
 				$scope.searchInit = data.onInit;
 			} else {
 				$scope.render(data);
@@ -79,7 +82,7 @@ function ChartCtrl($scope, $element, $http) {
 		});
 	}
 
-	$scope.onRefresh = function() {
+	$scope.onRefresh = function(force) {
 		if (unwatch || loading) {
 			return;
 		}
@@ -672,10 +675,12 @@ var directiveFn = function(){
 				if (svg.is(":hidden")) {
 					return initialized = false;
 				}
-				svg.height(element.height() - form.height()).width('100%');
-				scope.title = data.title;
-				Chart(scope, svg, data);
-				return initialized = true;
+				setTimeout(function () {
+					svg.height(element.height() - form.height()).width('100%');
+					scope.title = data.title;
+					Chart(scope, svg, data);
+					return initialized = true;
+				});
 			};
 
 			element.on("adjustSize", function(e){

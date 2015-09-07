@@ -235,6 +235,7 @@
 .dashlet .chart-controls .panel {
 	border: 0;
 	box-shadow: none;
+	margin: 0;
 }
 .dashlet .chart-controls .panel-body {
 	padding: 4px;
