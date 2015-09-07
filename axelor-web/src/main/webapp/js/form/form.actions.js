@@ -881,7 +881,7 @@ ActionHandler.prototype = {
 					scope.applyLater(function() {
 						if (confirmed) {
 							var url = "ws/rest/com.axelor.meta.db.MetaFile/" + data.attached.id + "/content/download";
-							axelor.download(url);
+							ui.download(url);
 							return deferred.resolve();
 						}
 						deferred.reject();
@@ -903,7 +903,7 @@ ActionHandler.prototype = {
 			if (['pdf', 'html'].indexOf(data.reportFormat) > -1) {
 				doOpenView(tab);
 			} else {
-				axelor.download(url);
+				ui.download(url);
 			}
 
 			scope.$timeout(deferred.resolve);
