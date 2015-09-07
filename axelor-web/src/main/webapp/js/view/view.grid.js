@@ -202,6 +202,10 @@ function GridViewCtrl($scope, $element) {
 		return $scope.hasPermission('massUpdate', false);
 	};
 
+	$scope.canExport = function() {
+		return $scope.hasPermission('export');
+	};
+
 	$scope.filter = function(searchFilter) {
 
 		var fields = _.pluck($scope.fields, 'name'),
@@ -518,6 +522,15 @@ function GridViewCtrl($scope, $element) {
 		});
 	};
 	
+	$scope.onExport = function (full) {
+		var fields = full ? [] : _.pluck($scope.view.items, 'name');
+		return ds.export_(fields).success(function(res) {
+			var fileName = res.fileName;
+			var filePath = 'ws/rest/' + $scope._model + '/export/' + fileName;
+			ui.download(filePath, fileName);
+		});
+	}
+
 	function focusFirst() {
 		var index = _.first($scope.selection) || 0;
 		var first = $scope.dataView.getItem(index);
@@ -572,57 +585,6 @@ angular.module('axelor.ui').directive('uiViewGrid', function(){
 	return {
 		replace: true,
 		template: '<div ui-slick-grid ui-widget-states></div>'
-	};
-});
-
-angular.module('axelor.ui').directive('uiGridExport', function(){
-
-	return {
-		require: '^uiFilterBox',
-		link: function(scope, element, attrs, ctrl) {
-			var handler = ctrl.$scope.handler;
-			if (!handler) {
-				return;
-			}
-	
-			function action(name) {
-				var res = 'ws/rest/' + handler._model + '/export';
-				return name ? res + '/' + name : res;
-			}
-	
-			function fields() {
-				return _.pluck(handler.view.items, 'name');
-			}
-	
-			var ds = handler._dataSource;
-			
-			function onExport() {
-				return ds.export_(fields()).success(function(res) {
-	
-					var filePath = action(res.fileName),
-						fileName = res.fileName;
-	
-					var link = document.createElement('a');
-	
-					link.onclick = function(e) {
-						document.body.removeChild(e.target);
-					};
-	
-					link.href = filePath;
-					link.download = fileName;
-					link.innerHTML = fileName;
-					link.style.display = "none";
-	
-					document.body.appendChild(link);
-	
-					link.click();
-					
-					axelor.notify.info(_t("Export in progress ..."));
-				});
-			};
-			
-			element.on('click', onExport);
-		}
 	};
 });
 

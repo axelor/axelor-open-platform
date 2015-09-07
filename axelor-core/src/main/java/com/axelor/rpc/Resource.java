@@ -64,7 +64,6 @@ import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.schema.views.Selection;
 import com.axelor.rpc.filter.Filter;
-import com.google.common.base.CaseFormat;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
@@ -406,12 +405,38 @@ public class Resource<T extends Model> {
 		LOG.debug("Exporting '{}' with {}", model.getName(), request.getData());
 
 		List<String> fields = request.getFields();
-		List<String> header = Lists.newArrayList();
-		List<String> names = Lists.newArrayList();
-		Map<Integer, Map<String, String>> selection = Maps.newHashMap();
+		List<String> header = new ArrayList<>();
+		List<String> names = new ArrayList<>();
+		Map<Integer, Map<String, String>> selection = new HashMap<>();
 
 		Mapper mapper = Mapper.of(model);
 		MetaPermissions perms = Beans.get(MetaPermissions.class);
+
+		if (fields == null) {
+			fields = new ArrayList<>();
+		}
+		if (fields.isEmpty()) {
+			fields.add("id");
+			try {
+				fields.add(mapper.getNameField().getName());
+			} catch (Exception e) {}
+
+			for (Property property : mapper.getProperties()) {
+				if (property.isPrimary() ||
+					property.isTransient() ||
+					property.isVersion() ||
+					property.isCollection() ||
+					property.isPassword() ||
+					property.getType() == PropertyType.BINARY) {
+					continue;
+				}
+				String name = property.getName();
+				if (fields.contains(name) || name.matches("^(created|updated)(On|By)$")) {
+					continue;
+				}
+				fields.add(name);
+			}
+		}
 
 		for(String field : fields) {
 			Iterator<String> iter = Splitter.on(".").split(field).iterator();
@@ -419,7 +444,10 @@ public class Resource<T extends Model> {
 			while(iter.hasNext() && prop != null) {
 				prop = Mapper.of(prop.getTarget()).getProperty(iter.next());
 			}
-			if (prop == null || prop.isCollection()) {
+			if (prop == null ||
+				prop.isCollection() ||
+				prop.isTransient() ||
+				prop.getType() == PropertyType.BINARY) {
 				continue;
 			}
 
@@ -437,8 +465,7 @@ public class Resource<T extends Model> {
 			}
 
 			if (isBlank(title)) {
-				title = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, prop.getName());
-				title = Inflector.getInstance().humanize(title);
+				title = Inflector.getInstance().humanize(prop.getName());
 			}
 
 			if (prop.isReference()) {
@@ -453,7 +480,7 @@ public class Resource<T extends Model> {
 					continue;
 				}
 
-				Map<String, String> map = Maps.newHashMap();
+				Map<String, String> map = new HashMap<>();
 				for (Selection.Option option : options) {
 					map.put(option.getValue(), option.getLocalizedTitle());
 				}

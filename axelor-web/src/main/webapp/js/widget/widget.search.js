@@ -511,6 +511,13 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		}
 		return true;
 	};
+
+	$scope.onExport = function(full) {
+		var handler = $scope.$parent.handler;
+		if (handler && handler.onExport) {
+			handler.onExport(full);
+		}
+	};
 }
 
 ui.directive('uiFilterForm', function() {
@@ -551,7 +558,9 @@ ui.directive('uiFilterForm', function() {
 				"<span class='divider'>|</span>"+
 				"<a href='' ng-click='clearFilter(true)' x-translate>Clear</a></li>"+
 				"<span class='divider' ng-if='canExport()'>|</span>"+
-				"<a href='' ng-if='canExport()' ui-grid-export x-translate>Export</a></li>"+
+				"<a href='' ng-if='canExport()' ng-click='onExport()' x-translate>Export</a></li>"+
+				"<span class='divider' ng-if='canExport()'>|</span>"+
+				"<a href='' ng-if='canExport()' ng-click='onExport(true)' x-translate>Export full</a></li>"+
 				"<span class='divider'>|</span>"+
 				"<a href='' ng-click='applyFilter(true)' x-translate>Apply</a></li>"+
 			"<div>"+
