@@ -676,12 +676,16 @@ ui.formWidget('PanelTabs', {
 			elemMenuTitle.empty();
 			elemMenuItems.hide().data('visible', null);
 
-			var count = 0;
 			var width = 0;
 			var last = null;
 
-			while (count < scope.tabs.length) {
-				var tab = scope.tabs[count++];
+			for (var count = 0; count < scope.tabs.length; count++) {
+				var tab = scope.tabs[count];
+				tab.$visible = false;
+			}
+
+			for (var count = 0; count < scope.tabs.length; count++) {
+				var tab = scope.tabs[count];
 				var elem = tab.tabItem;
 
 				if (tab.hidden) {
@@ -692,21 +696,25 @@ ui.formWidget('PanelTabs', {
 				if (width > parentWidth && last) {
 					// requires menu...
 					elem.hide();
-					count--;
 					if (width + menuWidth - elem.width() > parentWidth) {
-						last.hide();
-						count--;
+						last.tabItem.hide();
+						last.$visible = false;
 					}
 					break;
 				}
-				last = elem.css('visibility', '');
+				tab.$visible = true;
+				elem.css('visibility', '');
+				last = tab;
 			}
-			while(count < elemTabs.size()) {
-				var tab = scope.tabs[count++];
-				if (tab.hidden) continue;
-				$(elemMenuItems[count-1]).show().data('visible', true);
+
+			var menuVisible = false;
+			for (var count = 0; count < scope.tabs.length; count++) {
+				var tab = scope.tabs[count];
+				if (tab.hidden || tab.$visible) continue;
+				tab.menuItem.show().data('visible', true);
+				menuVisible = true;
 			}
-			if (count === elemTabs.size()) {
+			if (!menuVisible) {
 				elemMenu.hide();
 			}
 			setMenuTitle();
