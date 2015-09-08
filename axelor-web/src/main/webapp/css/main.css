@@ -697,6 +697,9 @@ img.prefix-icon {
 .record-toolbar .button-menu a.btn {
 	border-right-width: 0;
 }
+.record-toolbar .button-menu a.btn img {
+	margin-top: -2px;
+}
 
 .record-toolbar .button-menu:last-child a.btn {
 	border-right-width: 1px;
