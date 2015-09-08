@@ -1202,6 +1202,12 @@ ui.directive("uiDmsDetails", function () {
 // members popup
 ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 	return {
+		controller: ["$scope", function($scope) {
+
+			$scope.onSavePermissions = function () {
+				$scope._onSavePermissions();
+			}
+		}],
 		link: function (scope, element, attrs) {
 
 			var form = null;
@@ -1242,7 +1248,7 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 				});
 			};
 
-			scope.onSavePermissions = function () {
+			scope._onSavePermissions = function () {
 
 				var ds = scope._dataSource._new("com.axelor.dms.db.DMSPermission");
 				var formScope = form.isolateScope();
@@ -1289,7 +1295,10 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 
 			scope.$on("$destroy", function () {
 				if (form) {
-					form.isolateScope().$destroy();
+					var formScope = form.isolateScope();
+					if (formScope) {
+						formScope.$destroy();
+					}
 					form = null;
 				}
 			});
@@ -1432,6 +1441,10 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 				return promise.then(done, done);
 			};
 
+			$scope.onClose = function () {
+				$scope._onClose();
+			}
+
 			if ($scope.onSelect()) {
 				$scope.buttons = [{
 					text: _t("Select"),
@@ -1486,7 +1499,7 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 
 			var formScope = null;
 
-			scope.onClose = function () {
+			scope._onClose = function () {
 				if (formScope) {
 					scope.countAttachments(formScope, function () {
 						scope.$destroy();
