@@ -427,7 +427,7 @@ angular.module('axelor.ui').directive('uiViewPane', function() {
 angular.module('axelor.ui').directive('uiViewPopup', function() {
 	
 	return {
-		controller: ['$scope', '$attrs', function ($scope, $attrs) {
+		controller: ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
 			var params = $scope.$eval($attrs.uiViewPopup);
 
 			$scope.tab = params;
@@ -436,56 +436,55 @@ angular.module('axelor.ui').directive('uiViewPopup', function() {
 			$scope.onHotKey = function (e, action) {
 				return false;
 			};
-		}],
-		link: function (scope, element, attrs) {
-			
+
 			var canClose = false;
 
-			scope.onOK = function () {
-				scope.closeTab(scope.tab, function() {
+			$scope.onOK = function () {
+				$scope.closeTab($scope.tab, function() {
 					canClose = true;
-					element.dialog('close');
+					$element.dialog('close');
 				});
 			};
 			
-			scope.onBeforeClose = function(e) {
+			$scope.onBeforeClose = function(e) {
 				if (canClose) {
 					return;
 				}
 				e.preventDefault();
 				e.stopPropagation();
-
-				scope.onOK();
+				$scope.onOK();
 			};
 
-			scope.onPopupClose = function () {
-				var tab = scope.tab,
+			$scope.onPopupClose = function () {
+				var tab = $scope.tab,
 					params = tab.params || {},
 					parent = tab.$popupParent;
 				if (parent && parent.reload && params.popup === "reload") {
 					parent.reload();
 				}
-				scope.applyLater();
+				$scope.applyLater();
 			};
 
-			scope.onPopupOK = function () {
-				var viewScope = scope._viewParams.$viewScope;
+			$scope.onPopupOK = function () {
+				var viewScope = $scope._viewParams.$viewScope;
 				if (!viewScope.onSave || (!viewScope.isDirty() && viewScope.id)) {
-					return scope.onOK();
+					return $scope.onOK();
 				}
 				return viewScope.onSave().then(function(record, page) {
 					viewScope.edit(record);
 					viewScope.applyLater(function() {
-						scope.onOK();
+						$scope.onOK();
 					});
 				});
 			};
 
-			var params = scope.tab.params || {};
+			var params = $scope.tab.params || {};
 			if (!params['popup-save']) {
-				scope.onPopupOK = false;
+				$scope.onPopupOK = false;
 			}
-			
+		}],
+		link: function (scope, element, attrs) {
+
 			scope.$watch('viewTitle', function (title) {
 				scope._setTitle(title);
 			});
