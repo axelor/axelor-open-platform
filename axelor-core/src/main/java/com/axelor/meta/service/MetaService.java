@@ -585,7 +585,7 @@ public class MetaService {
 			return response;
 		}
 
-		final Map<String, Object> data = Maps.newHashMap();
+		final Map<String, Object> data = new HashMap<>();
 		
 		response.setData(data);
 		response.setStatus(Response.STATUS_SUCCESS);
@@ -603,16 +603,19 @@ public class MetaService {
 			if (AuthUtils.getUser() != null) {
 				context.put("__user__", AuthUtils.getUser());
 				context.put("__userId__", AuthUtils.getUser().getId());
-				context.put("__userCode__", AuthUtils.getSubject());
+				context.put("__userCode__", AuthUtils.getUser().getCode());
 			}
 
 			if ("rpc".equals(chart.getDataSet().getType())) {
 				ActionHandler handler = Beans.get(ActionHandler.class);
 				ActionRequest req = new ActionRequest();
 				ActionResponse res = new ActionResponse();
+				Map<String, Object> reqData = new HashMap<>();
+
+				reqData.put("context", context);
 
 				req.setModel(request.getModel());
-				req.setData(request.getData());
+				req.setData(reqData);
 				req.setAction(string);
 
 				if (req.getModel() == null) {
