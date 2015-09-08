@@ -1518,15 +1518,7 @@ Grid.prototype.saveChanges = function(args, callback) {
 		return;
 	}
 
-	this._saveChangesRunning = true;
-	var res = this.__saveChanges.apply(this, arguments);
-	this._saveChangesRunning = false;
-
-	return res;
-}
-
-Grid.prototype.__saveChanges = function(args, callback) {
-
+	var that = this;
 	var grid = this.grid;
 	var lock = grid.getEditorLock();
 	var force = arguments[2];
@@ -1537,14 +1529,31 @@ Grid.prototype.__saveChanges = function(args, callback) {
 		return false;
 	}
 
+	this._saveChangesRunning = true;
+	if (this.editorScope) {
+		this.editorScope.$emit("on:before-save", this.editorScope.record);
+	}
+	this.scope.waitForActions(function () {
+		that.__saveChanges.apply(that, arguments);
+		that._saveChangesRunning = false;
+	}, 100);
+
+	return true;
+}
+
+Grid.prototype.__saveChanges = function(args, callback) {
+
+	var that = this;
+	var grid = this.grid;
+
 	if (args == null) {
-		args = _.extend({ row: 0, cell: 0 }, this.grid.getActiveCell());
-		args.item = this.grid.getDataItem(args.row);
+		args = _.extend({ row: 0, cell: 0 }, grid.getActiveCell());
+		args.item = grid.getDataItem(args.row);
 	}
 	
+	var ds = this.handler._dataSource;
 	var data = this.scope.dataView;
-	var ds = this.handler._dataSource,
-		records = [];
+	var records = [];
 
 	// resequence
 	if (this._canMove) {
@@ -1568,7 +1577,6 @@ Grid.prototype.__saveChanges = function(args, callback) {
 		return res;
 	});
 	
-	var that = this;
 	function focus() {
 		grid.setActiveCell(args.row, args.cell);
 		grid.focus();
