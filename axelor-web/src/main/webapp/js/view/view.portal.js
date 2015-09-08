@@ -202,7 +202,7 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 		controller: PortletCtrl,
 		link: function(scope, element, attrs) {
 
-			var lazy = false;
+			var lazy = true;
 			(function () {
 				var counter = 0;
 				return function checkLoading() {
@@ -211,6 +211,9 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 							counter++;
 							return setTimeout(checkLoading, 100);
 						}
+
+						lazy = !element.parent().is(".portal");
+
 						var unwatch = scope.$watch(function () {
 							var action = attrs.action;
 							if (!action) {

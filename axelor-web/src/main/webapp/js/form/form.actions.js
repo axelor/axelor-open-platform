@@ -46,7 +46,7 @@ function updateValues(source, target, itemScope, formScope) {
 			var dest = target[key] || [];
 			value = _.map(value, function(item){
 				var found = _.find(dest, function(v){
-					return v.id === item.id;
+					return item.id && v.id === item.id;
 				});
 				if (_.has(item, "version") && item.id) item.$fetched = true;
 				if (found) {
