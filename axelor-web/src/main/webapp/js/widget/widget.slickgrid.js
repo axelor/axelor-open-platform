@@ -1533,8 +1533,9 @@ Grid.prototype.saveChanges = function(args, callback) {
 	if (this.editorScope) {
 		this.editorScope.$emit("on:before-save", this.editorScope.record);
 	}
+	var params = arguments;
 	this.scope.waitForActions(function () {
-		that.__saveChanges.apply(that, arguments);
+		that.__saveChanges.apply(that, params);
 		that._saveChangesRunning = false;
 	}, 100);
 
