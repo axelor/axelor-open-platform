@@ -142,19 +142,22 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 
 		// wait for onChange actions
 		$scope.waitForActions(function() {
-			if ($scope.editorCanSave && isChanged()) {
-				if (record.id < 0)
-					record.id = null;
-				return $scope.onSave({force: true}).then(function(record, page) {
-					// wait for onSave actions
-					$scope.waitForActions(function(){
-						close(record, true);
+			var waitFor = $scope.isDirty() ? 1000 : 100;
+			$scope.waitForActions(function() {
+				if ($scope.editorCanSave && isChanged()) {
+					if (record.id < 0)
+						record.id = null;
+					return $scope.onSave({force: true}).then(function(record, page) {
+						// wait for onSave actions
+						$scope.waitForActions(function(){
+							close(record, true);
+						});
 					});
-				});
-			}
-			if ($scope.isValid()) {
-				close(record);
-			}
+				}
+				if ($scope.isValid()) {
+					close(record);
+				}
+			}, waitFor);
 		}, 100);
 	};
 	
