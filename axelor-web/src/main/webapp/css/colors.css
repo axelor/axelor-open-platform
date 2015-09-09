@@ -146,7 +146,6 @@ header .navbar .nav .dropdown-submenu:hover > a:after {
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
-	font-weight: 600;
 	border: 1px solid #e7e7e7;
 	border-bottom: 1px solid transparent;
 	background-color: #fff;
@@ -172,9 +171,9 @@ header .navbar .nav .dropdown-submenu:hover > a:after {
 .nav-tabs-scroll-r {
 	bottom: 6px;
 	margin-top: 0;
-	padding-top: 6px;
-	border-top: 1px solid #DDD;
-	border-bottom: 1px solid #DDD;
+	padding-top: 8px;
+	background-color: #f3f3f4;
+	border-bottom: 1px solid #e7e7e7;
 }
 
 .nav-tabs-scroll-l a,

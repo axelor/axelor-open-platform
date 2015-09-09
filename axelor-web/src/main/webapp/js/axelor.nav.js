@@ -498,7 +498,7 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 			     $("#offcanvas").toggleClass("active", !active && axelor.device.small);
 			     $("#offcanvas").toggleClass("inactive", active && !axelor.device.small);
 			     if (!axelor.device.mobile) {
-			    	 axelor.$adjustSize();
+			    	 setTimeout(axelor.$adjustSize, 100);
 				 }
 			 });
 		 }
