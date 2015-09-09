@@ -146,6 +146,8 @@
 		
 			var widthStrip = this.$elemStrip.width();
 			var widthTabs = this._getTabsWidth();
+
+			this.element.toggleClass("nav-tabs-overflow", widthStrip < widthTabs);
 			
 			if (widthStrip >= widthTabs) {
 				this.$elemLeftScroller.hide();

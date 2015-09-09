@@ -164,6 +164,25 @@ header .navbar .nav .dropdown-submenu:hover > a:after {
 	border-bottom-color: #e7e7e7;
 }
 
+.nav-tabs-overflow .nav-tabs {
+	padding: 0;
+}
+
+.nav-tabs-scroll-l,
+.nav-tabs-scroll-r {
+	bottom: 6px;
+	margin-top: 0;
+	padding-top: 6px;
+	border-top: 1px solid #DDD;
+	border-bottom: 1px solid #DDD;
+}
+
+.nav-tabs-scroll-l a,
+.nav-tabs-scroll-r a {
+	width: 100%;
+	padding-left: 3px;
+}
+
 table.form-layout .tabbable-tabs .tab-content {
 	border-color: #e7e7e7;
 }

@@ -29,12 +29,13 @@ angular.module('axelor.ui').directive('navTabs', function() {
 				if (value != oldValue) $.event.trigger('adjust');
 			});
 
-			elem.bsTabs();
-			elem.on('contextmenu', '.nav-tabs-main > li > a', showMenu);
-
 			var menu = $();
 
 			setTimeout(function () {
+
+				elem.bsTabs();
+				elem.on('contextmenu', '.nav-tabs-main > li > a', showMenu);
+
 				menu = elem.find('#nav-tabs-menu');
 				menu.css({
 					position: 'absolute',
