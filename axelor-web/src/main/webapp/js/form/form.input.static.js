@@ -382,6 +382,10 @@ ui.formItem('Button', {
 			container: 'body'
 		});
 
+		element.on("$destroy", function () {
+			element.tooltip("destroy");
+		});
+
 		element.on("click", function(e) {
 
 			if (scope.isReadonlyExclusive() || element.hasClass('disabled')) {
