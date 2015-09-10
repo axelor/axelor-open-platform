@@ -27,6 +27,7 @@ import com.axelor.db.annotations.HashKey;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
+import com.axelor.internal.cglib.proxy.Enhancer;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -160,7 +161,11 @@ public final class EntityHelper {
 		if (entity instanceof HibernateProxy) {
 			return ((HibernateProxy) entity).getHibernateLazyInitializer().getPersistentClass();
 		}
-		return (Class<T>) entity.getClass();
+		Class<?> klass = entity.getClass();
+		while (Enhancer.isEnhanced(klass)) {
+			klass = klass.getSuperclass();
+		}
+		return (Class<T>) klass;
 	}
 
 	/**
