@@ -22,6 +22,15 @@ var ui = angular.module('axelor.ui');
 var BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 var META_FILE = "com.axelor.meta.db.MetaFile";
 
+function makeURL(model, field, recordOrId) {
+	var value = recordOrId;
+	if (!value) return null;
+	var id = value.id ? value.id : value;
+	var version = value.version || value.$version || (new Date()).getTime();
+	if (!id || id <= 0) return null;
+	return "ws/rest/" + model + "/" + id + "/" + field + "/download?v=" + version;
+}
+
 ui.formInput('ImageLink', {
 	css: 'image-item',
 	cssClass: 'from-item image-item',
@@ -107,9 +116,9 @@ ui.formInput('Image', 'ImageLink', {
 			if (!record.id || value === null) return value || BLANK;
 			if (isBinary) {
 				if (value) return value;
-				return "ws/rest/" + model + "/" + record.id + "/" + field.name + "/download?image=true&v=" + record.version;
+				return makeURL(model, field.name, record) + "&image=true";
 			}
-			return "ws/rest/" + META_FILE + "/" + (value.id || value) + "/content/download";
+			return makeURL(META_FILE, "content", (value.id || value));
 		};
 	},
 
@@ -260,7 +269,7 @@ ui.formInput('Binary', {
 		scope.doSave = function() {
 			var record = scope.record;
 			var model = scope._model;
-			var url = "ws/rest/" + model + "/" + record.id + "/" + field.name + "/download";
+			var url = makeURL(model, field.name, record);
 			ui.download(url, record.fileName || field.name);
 		};
 
@@ -358,7 +367,7 @@ ui.formInput('BinaryLink', {
 
 		scope.doSave = function() {
 			var value = model.$viewValue;
-			var url = "ws/rest/" + META_FILE + "/" + value.id + "/content/download";
+			var url = makeURL(META_FILE, "content", value);
 			ui.download(url, scope.text);
 		};
 
