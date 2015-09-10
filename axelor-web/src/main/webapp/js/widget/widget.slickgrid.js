@@ -837,7 +837,11 @@ Grid.prototype._doInit = function(view) {
         	grid.focus();
         }
 	};
-	
+
+	if (this._canMove) {
+		dataView.$resequence = _.bind(this._resequence, this);
+	}
+
 	// register grid event handlers
 	this.subscribe(grid.onSort, this.onSort);
 	this.subscribe(grid.onSelectedRowsChanged, this.onSelectionChanged);
@@ -1556,11 +1560,6 @@ Grid.prototype.__saveChanges = function(args, callback) {
 	var data = this.scope.dataView;
 	var records = [];
 
-	// resequence
-	if (this._canMove) {
-		this._resequence(data.getItems());
-	}
-
 	records = _.map(data.getItems(), function(rec) {
 		var res = {};
 		for(var key in rec) {
@@ -1912,8 +1911,12 @@ Grid.prototype._resequence = function (items) {
     	return item.sequence || 0;
     }));
     for (var i = 0; i < items.length; i++) {
-    	items[i].sequence = min++;
-    	items[i].$dirty = true;
+    	var last = items[i].sequence;
+    	var next = min++;
+    	if (items[i].sequence !== next) {
+        	items[i].sequence = next;
+    		items[i].$dirty = true;
+    	}
 	}
     return items;
 };
@@ -1968,12 +1971,15 @@ Grid.prototype.onMoveRows = function (event, args) {
     grid.render();
 
     var that = this;
-    setTimeout(function () {
-        dataView.$resequence = true;
-    	that.saveChanges(null, function() {
-    		dataView.$resequence = undefined;
+    this.scope.$timeout(function () {
+    	dataView.$isResequencing = true;
+    	var saved = that.saveChanges(null, function() {
+    		delete dataView.$isResequencing;
     		resetSelection();
     	}, true);
+    	if (saved === false) {
+    		delete dataView.$isResequencing;
+    	}
     });
 };
 

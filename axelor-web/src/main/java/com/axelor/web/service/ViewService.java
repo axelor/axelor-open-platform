@@ -239,7 +239,11 @@ public class ViewService extends AbstractService {
 			items = ((FormView) view).getItems();
 		}
 		if (view instanceof GridView) {
-			items = ((GridView) view).getItems();
+			GridView grid = (GridView) view;
+			items = grid.getItems();
+			if ("sequence".equals(grid.getOrderBy())) {
+				names.add("sequence");
+			}
 		}
 		if (view instanceof SearchFilters) {
 			items = ((SearchFilters) view).getItems();

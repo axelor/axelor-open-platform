@@ -115,10 +115,11 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 			if (rec.id <= 0) rec.id = null;
 		});
 		
-		var callOnChange = true;
-		if ($scope.dataView && $scope.dataView.$resequence) {
-			callOnChange = false;
+		if ($scope.dataView.$resequence) {
+			$scope.dataView.$resequence(records);
 		}
+
+		var callOnChange = $scope.dataView.$isResequencing !== true;
 
 		$scope.itemsPending = records;
 		$scope.setValue(records, callOnChange);
