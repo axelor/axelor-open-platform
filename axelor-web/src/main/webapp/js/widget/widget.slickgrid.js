@@ -1421,7 +1421,7 @@ Grid.prototype.findNextEditable = function(posY, posX) {
 		args.row += 1;
 	}
 	args.cell = 0;
-	while (args.cell < posX) {
+	while (args.cell <= posX) {
 		if (this.isCellEditable(args.cell)) {
 			return args;
 		}
@@ -1444,7 +1444,7 @@ Grid.prototype.findPrevEditable = function(posY, posX) {
 		args.row -= 1;
 	}
 	args.cell = cols.length - 1;
-	while (args.cell > posX) {
+	while (args.cell >= posX) {
 		if (this.isCellEditable(args.cell)) {
 			return args;
 		}
