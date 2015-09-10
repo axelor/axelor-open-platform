@@ -1320,10 +1320,8 @@ Grid.prototype.onKeyDown = function(e, args) {
 
 	function focusCell(row, cell) {
 		grid.setActiveCell(row, cell);
-		grid.editActiveCell();
 		// make sure cell has focus RM-3938
 		setTimeout(function () {
-			grid.setActiveCell(row, cell);
 			grid.editActiveCell();
 		});
 	}
@@ -1440,7 +1438,7 @@ Grid.prototype.findPrevEditable = function(posY, posX) {
 		}
 		args.cell -= 1;
 	}
-	if (args.row >= 0) {
+	if (args.row > 0) {
 		args.row -= 1;
 	}
 	args.cell = cols.length - 1;
@@ -1656,7 +1654,7 @@ Grid.prototype.addNewRow = function (args) {
 			self.scope.waitForActions(function () {
 				addRow(self.editorScope.record);
 			});
-		});
+		}, 100);
 	}
 
 	if (args.item || grid.getDataLength() === 0) {
