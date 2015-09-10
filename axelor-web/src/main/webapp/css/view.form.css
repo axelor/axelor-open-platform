@@ -1161,6 +1161,20 @@ table.field-details .help-text hr {
 	cursor: pointer;
 }
 
+.filter-menu .filter-list > dl dd a[disabled] {
+	pointer-events: none;
+	cursor: default;
+	text-decoration: none;
+	color: #333333;
+	opacity: 0.5;
+}
+
+.filter-form .filter-operator .show-archived > span[disabled] {
+	color: #333333;
+	opacity: 0.5;
+	cursor: default;
+}
+
 .filter-menu .filter-form .links {
 	line-height: 20px;
 }
