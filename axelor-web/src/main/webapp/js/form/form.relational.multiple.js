@@ -937,14 +937,14 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		var field = scope.field;
 		var tmpl = field.viewer;
 		if (!tmpl && field.editor && (field.editor.viewer || !field.targetName)) {
-			tmpl = '<div ui-panel-editor>';
+			tmpl = '<div ui-panel-editor></div>';
 		}
 		if (!tmpl && field.targetName) {
 			tmpl = '{{record.' + field.targetName + '}}';
 		}
 		tmpl = tmpl || '{{record.id}}';
 		return "<div class='o2m-list'>" +
-		"<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items' ng-bind-html='tmpl'>" + tmpl + "</div>" +
+		"<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items'>" + tmpl + "</div>" +
 		"</div>"
 	},
 
