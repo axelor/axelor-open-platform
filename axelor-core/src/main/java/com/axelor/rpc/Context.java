@@ -31,6 +31,7 @@ import java.util.Set;
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.db.internal.EntityHelper;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -81,11 +82,13 @@ public class Context extends HashMap<String, Object> {
 	private static final String KEY_PARENT_CONTEXT = "parentContext";
 	private static final String KEY_FORM = "_form";
 
+	private Class<?> beanClass;
 	private Object beanInstance;
 
-	private Context(Map<String, Object> data, Object bean) {
+	private Context(Map<String, Object> data, Object bean, Class<?> beanClass) {
 		super(data);
 		this.beanInstance = bean;
+		this.beanClass = beanClass;
 	}
 
 	/**
@@ -100,12 +103,14 @@ public class Context extends HashMap<String, Object> {
 		}
 
 		final Model bean = (Model) instance;
-		if (bean.getId() == null || JPA.em().contains(bean)) {
+		if (bean.getId() == null || Enhancer.isEnhanced(bean.getClass()) || JPA.em().contains(bean)) {
 			return bean;
 		}
 
+		final Class<?> beanClass = EntityHelper.getEntityClass(bean);
 		final Enhancer enhancer = new Enhancer();
-		enhancer.setSuperclass(bean.getClass());
+
+		enhancer.setSuperclass(beanClass);
 		enhancer.setCallback(new InvocationHandler() {
 
 			private Object managed;
@@ -122,7 +127,7 @@ public class Context extends HashMap<String, Object> {
 				getters = new HashMap<>();
 				computed = new HashSet<>();
 
-				Mapper mapper = Mapper.of(bean.getClass());
+				Mapper mapper = Mapper.of(beanClass);
 				for (Property property : mapper.getProperties()) {
 					String name = property.getName();
 					if (mapper.getGetter(name) != null) {
@@ -136,7 +141,7 @@ public class Context extends HashMap<String, Object> {
 
 			private Object managed() {
 				if (managed == null) {
-					managed = JPA.em().find(bean.getClass(), bean.getId());
+					managed = JPA.em().find(beanClass, bean.getId());
 				}
 				return managed;
 			}
@@ -202,7 +207,7 @@ public class Context extends HashMap<String, Object> {
 			data = new HashMap<>();
 		}
 		if (ScriptBindings.class.isAssignableFrom(beanClass)) {
-			return new Context(data, new ScriptBindings(data));
+			return new Context(data, new ScriptBindings(data), ScriptBindings.class);
 		}
 		return create(data, beanClass, data.containsKey(KEY_FORM));
 	}
@@ -290,19 +295,19 @@ public class Context extends HashMap<String, Object> {
 		// create proxy to read missing values from managed instance
 		bean = createProxy(bean, validated);
 
-		return new Context(validated, bean);
+		return new Context(validated, bean, beanClass);
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T> T asType(Class<T> type) {
 		Preconditions.checkArgument(type.isInstance(beanInstance),
 				"Invalid type {}, should be {}",
-				type.getName(), beanInstance.getClass().getName());
+				type.getName(), beanClass.getName());
 		return (T) beanInstance;
 	}
 
 	public Class<?> getContextClass() {
-		return beanInstance.getClass();
+		return beanClass;
 	}
 
 	public Context getParentContext() {
@@ -353,7 +358,7 @@ public class Context extends HashMap<String, Object> {
 		if (beanInstance == null || values == null || values.isEmpty()) {
 			return;
 		}
-		Mapper mapper = Mapper.of(beanInstance.getClass());
+		Mapper mapper = Mapper.of(beanClass);
 		for(String key : values.keySet()) {
 			Property property = mapper.getProperty(key);
 			if (property == null) {
