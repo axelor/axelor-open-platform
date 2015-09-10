@@ -693,7 +693,7 @@ Grid.prototype.parse = function(view) {
 	this._canMove = view.canMove && view.orderBy === "sequence" && !view.groupBy;
 	if (this._canMove) {
 		cols.push({
-			id: "#",
+			id: "_move_column",
 		    name: "",
 		    width: 32,
 		    behavior: "selectAndMove",
@@ -1449,7 +1449,7 @@ Grid.prototype.onKeyDown = function(e, args) {
 Grid.prototype.isCellEditable = function(cell) {
 	var cols = this.grid.getColumns(),
 		col = cols[cell];
-	if (!col || col.id === "_edit_column") {
+	if (!col || col.id === "_edit_column" || col.id === "_move_column") {
 		return false;
 	}
 	var field = col.descriptor || {};
@@ -1483,7 +1483,7 @@ Grid.prototype.findNextEditable = function(posY, posX) {
 		args.row += 1;
 	}
 	args.cell = 0;
-	while (args.cell < posX) {
+	while (args.cell <= posX) {
 		if (this.isCellEditable(args.cell)) {
 			return args;
 		}
@@ -1506,7 +1506,7 @@ Grid.prototype.findPrevEditable = function(posY, posX) {
 		args.row -= 1;
 	}
 	args.cell = cols.length - 1;
-	while (args.cell > posX) {
+	while (args.cell >= posX) {
 		if (this.isCellEditable(args.cell)) {
 			return args;
 		}
