@@ -65,15 +65,16 @@
 					$q = $injector.get('$q');
 				}
 				var that = this;
+				var args = arguments;
 				var waitFor = wait || 10;
 				this.$timeout(function () {
 					// wait for any pending ajax requests
 					that.ajaxStop(function () {
-						var all = that.$actionPromises;
+						var all = args.length === 3 ? args[2] : that.$actionPromises;
 						// wait for actions
 						$q.all(all).then(function () {
 							// if new actions are executed, wait for them
-							if (that.$actionPromises.length) {
+							if (args.length !== 3 && that.$actionPromises.length) {
 								return _.delay(waitForActions.bind(that), 10, callback);
 							}
 							if (callback) {
