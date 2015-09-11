@@ -139,8 +139,11 @@ ui.directive('uiFilterItem', function() {
 				} else {
 					filter.targetName = null;
 				}
-				scope.operators = getOperators();
 			};
+
+			scope.$watch('filter.field', function (value, old) {
+				scope.operators = getOperators();
+			});
 
 			var unwatch = scope.$watch('fields', function(fields, old) {
 				if (_.isEmpty(fields)) return;
