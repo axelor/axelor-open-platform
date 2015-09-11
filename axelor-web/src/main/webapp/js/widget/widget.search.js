@@ -643,6 +643,8 @@ ui.directive('uiFilterBox', function() {
 				} else {
 					$scope.custFilters.push(custom);
 				}
+
+				return found ? found : custom;
 			}
 
 			$scope.selectFilter = function(filter, isCustom, live) {
@@ -666,7 +668,9 @@ ui.directive('uiFilterBox', function() {
 				}
 
 				if (isCustom && (live || applyAll)) {
+					$scope.hasCustSelected = filter.$selected && !applyAll;
 					$scope.custName = filter.$selected ? filter.name : null;
+					$scope.oldCustTitle = filter.$selected ? filter.title : '';
 					$scope.custTitle = filter.$selected ? filter.title : '';
 					$scope.custShared = filter.$selected ? filter.shared : false;
 					return $scope.$broadcast('on:select-custom', filter, selection);
@@ -700,8 +704,8 @@ ui.directive('uiFilterBox', function() {
 			};
 
 			$scope.canSaveNew = function() {
-				if ($scope.custName && $scope.custTitle) {
-					return !angular.equals($scope.custName, _.underscored($scope.custTitle));
+				if ($scope.hasCustSelected && $scope.oldCustTitle && $scope.custTitle) {
+					return !angular.equals(_.underscored($scope.oldCustTitle), _.underscored($scope.custTitle));
 				}
 				return false;
 			};
@@ -744,14 +748,16 @@ ui.directive('uiFilterBox', function() {
 					model: 'com.axelor.meta.db.MetaFilter',
 					context: value
 				}).success(function(res) {
-					acceptCustom(res.data);
+					var custom = acceptCustom(res.data);
+					custom.$selected  = false;
+					$scope.selectFilter(custom, true, true);
 				});
 			};
 
 			$scope.onDelete = function() {
 
 				var name = $scope.custName;
-				if (!name) {
+				if (!$scope.hasCustSelected || !name) {
 					return;
 				}
 
@@ -766,6 +772,7 @@ ui.directive('uiFilterBox', function() {
 						var found = _.findWhere($scope.custFilters, {name: name});
 						if (found) {
 							$scope.custFilters.splice($scope.custFilters.indexOf(found), 1);
+							$scope.hasCustSelected = false;
 							$scope.custName = null;
 							$scope.custTitle = null;
 							$scope.custShared = false;
@@ -789,7 +796,9 @@ ui.directive('uiFilterBox', function() {
 				current.domains.length = 0;
 				current.customs.length = 0;
 
+				$scope.hasCustSelected = false;
 				$scope.custName = null;
+				$scope.oldCustTitle = null;
 				$scope.custTitle = null;
 				$scope.custShared = false;
 				$scope.custTerm = null;
@@ -826,6 +835,7 @@ ui.directive('uiFilterBox', function() {
 				});
 
 				_.each(current.customs, function(custom) {
+					if($scope.hasCustSelected) { return; }
 					if (custom.criteria && custom.criteria.criteria) {
 						customs.push({
 							operator: custom.criteria.operator || 'and',
@@ -1103,8 +1113,8 @@ ui.directive('uiFilterBox', function() {
 						"<dd ng-repeat='filter in viewFilters' class='checkbox'>" +
 							"<input type='checkbox' " +
 								"ng-model='filter.$selected' " +
-								"ng-click='selectFilter(filter, false, false)'> " +
-							"<a href='' ng-click='selectFilter(filter, false, true)'>{{filter.title}}</a>" +
+								"ng-click='selectFilter(filter, false, false)' ng-disabled='hasCustSelected'> " +
+							"<a href='' ng-click='selectFilter(filter, false, true)' ng-disabled='hasCustSelected'>{{filter.title}}</a>" +
 						"</dd>" +
 					"</dl>" +
 					"<dl ng-show='hasFilters(2)'>" +
@@ -1112,8 +1122,8 @@ ui.directive('uiFilterBox', function() {
 						"<dd ng-repeat='filter in custFilters' class='checkbox'>" +
 							"<input type='checkbox' " +
 								"ng-model='filter.$selected' " +
-								"ng-click='selectFilter(filter, true, false)'> " +
-							"<a href='' ng-click='selectFilter(filter, true, true)'>{{filter.title}}</a>" +
+								"ng-click='selectFilter(filter, true, false)' ng-disabled='hasCustSelected'> " +
+							"<a href='' ng-click='selectFilter(filter, true, true)' ng-disabled='!filter.$selected && hasCustSelected'>{{filter.title}}</a>" +
 						"</dd>" +
 					"</dl>" +
 				"</div>" +
@@ -1128,9 +1138,10 @@ ui.directive('uiFilterBox', function() {
 								"<input type='checkbox' ng-model='custShared'><span x-translate>Share</span>" +
 							"</label>" +
 						"</div>" +
-						"<button class='btn btn-small' ng-click='onSave()' ng-disabled='!custTitle'><span x-translate>Save</span></button> " +
+						"<button class='btn btn-small' ng-click='onSave()' ng-show='custTitle && !hasCustSelected'><span x-translate>Save</span></button> " +
+						"<button class='btn btn-small' ng-click='onSave()' ng-show='custTitle && hasCustSelected'><span x-translate>Update</span></button> " +
 						"<button class='btn btn-small' ng-click='onSave(true)' ng-show='canSaveNew()'><span x-translate>Save as</span></button> " +
-						"<button class='btn btn-small' ng-click='onDelete()' ng-show='custName'><span x-translate>Delete</span></button>" +
+						"<button class='btn btn-small' ng-click='onDelete()' ng-show='hasCustSelected'><span x-translate>Delete</span></button>" +
 					"</div>" +
 				"</div>" +
 			"</div>" +
