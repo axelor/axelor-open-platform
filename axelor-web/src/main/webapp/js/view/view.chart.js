@@ -69,11 +69,8 @@ function ChartCtrl($scope, $element, $http) {
 				data = _.extend({}, viewChart, data);
 			}
 
-			if ($scope.searchFields === undefined) {
+			if ($scope.searchFields === undefined && data.search) {
 				$scope.searchFields = data.search;
-			}
-
-			if (data.onInit && data.search) {
 				$scope.searchInit = data.onInit;
 			} else {
 				$scope.render(data);
@@ -172,6 +169,7 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 		function reload() {
 			$scope.$parent.setViewValues($scope.record);
 			$scope.$parent.onRefresh();
+			$scope.applyLater();
 		}
 		
 		function delayedReload() {
