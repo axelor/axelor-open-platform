@@ -210,15 +210,7 @@ ActionHandler.prototype = {
 	},
 
 	onChange: function(event) {
-		var deferred = this.ws.defer(),
-			promise = deferred.promise;
-
-		var self = this,
-			scope = this.scope;
-		scope.ajaxStop(function() {
-			self.handle().then(deferred.resolve, deferred.reject);
-		}, 100);
-		return promise;
+		return this.handle();
 	},
 	
 	_getPrompt: function () {
@@ -268,23 +260,24 @@ ActionHandler.prototype = {
 		var action = this.action.trim();
 		var deferred = this.ws.defer();
 
+		var all = this.scope.$actionPromises || [];
+		var pending = all.slice();
+
+		all.push(deferred.promise);
+
 		this.scope.waitForActions(function () {
 			var promise = that._handleAction(action);
-			var all = that.scope.$actionPromises || [];
-
 			function done() {
 				setTimeout(function () {
-					var i = all.indexOf(promise);
+					var i = all.indexOf(deferred.promise);
 					if (i > -1) {
 						all.splice(i, 1);
 					}
 				}, 10);
 			}
-
-			all.push(promise);
 			promise.then(done, done);
 			promise.then(deferred.resolve, deferred.reject);
-		});
+		}, 10, pending);
 
 		return deferred.promise;
 	},
