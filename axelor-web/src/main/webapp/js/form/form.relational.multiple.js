@@ -454,6 +454,8 @@ ui.formInput('OneToMany', {
 			if (elem.is('.panel-related')) {
 				elem = element.children('.panel-body');
 				minSize = 28;
+			} else if (scope.$hasPanels) {
+				minSize += 28;
 			}
 			if (elem.is('.picker-input')) {
 				elem = null;
@@ -538,7 +540,7 @@ ui.formInput('OneToMany', {
 				adjustSize(items, rows - items.length + 1);
 			});
 
-			if (!(scope._viewParams || {}).summaryView) {
+			if (!(scope._viewParams || {}).summaryView || scope.field.widget === "MasterDetail") {
 				return;
 			}
 			var col = {

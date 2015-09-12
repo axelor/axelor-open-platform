@@ -40,6 +40,14 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		embedded = ViewService.compile(embedded)($scope);
 		embedded.hide();
 
+		// if panel form
+		if ($element.parent().is("div.form-item")) {
+			var cell = $("<div></div>").addClass("span12 form-item").append(embedded);
+			var row = $("<div></div>").addClass("row-fluid").append(cell);
+			row.insertAfter($element.parents(".row-fluid:first"));
+			return embedded;
+		}
+
 		var colspan = $element.parents("form.dynamic-form:first").attr('x-cols') || 4,
 			cell = $('<td class="form-item"></td>').attr('colspan', colspan).append(embedded),
 			row = $('<tr></tr>').append(cell);
