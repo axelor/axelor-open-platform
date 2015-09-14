@@ -601,11 +601,11 @@ function Chart(scope, element, data) {
 				var v = "" + d;
 				var f = config.xFormat;
 				if (v.indexOf(".") > -1) return "";
-				if (_.isString(d) && /\d+/.test(d)) {
+				if (_.isString(d) && /^(\d+)$/.test(d)) {
 					d = parseInt(d);
 				}
 				if (_.isNumber(d)) {
-					return moment([2000, d - 1, 1]).format(f || "MMM");
+					return moment([moment().year(), d - 1, 1]).format(f || "MMM");
 				}
 				if (_.isString(d) && d.indexOf('-') > 0) {
 					return moment(d).format(f || 'MMM, YYYY');
@@ -613,7 +613,7 @@ function Chart(scope, element, data) {
 				return d;
 			},
 			"year" : function(d) {
-				return moment([2000, d - 1, 1]).format("YYYY");
+				return moment([moment().year(), d - 1, 1]).format("YYYY");
 			},
 			"number": d3.format(',f'),
 			"decimal": d3.format(',.1f'),
