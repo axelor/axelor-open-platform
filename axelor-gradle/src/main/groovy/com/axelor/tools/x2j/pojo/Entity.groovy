@@ -159,7 +159,7 @@ class Entity {
 				table = null
 			}
 			hasExtends = true
-			importType("com.axelor.db.internal.EntityHelper")
+			importType("com.axelor.db.EntityHelper")
 		}
 
 		node."*".each {

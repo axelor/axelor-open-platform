@@ -29,9 +29,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.axelor.auth.db.AuditableModel;
+import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
-import com.axelor.db.internal.EntityHelper;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -111,6 +111,7 @@ public class Context extends HashMap<String, Object> {
 		final Enhancer enhancer = new Enhancer();
 
 		enhancer.setSuperclass(beanClass);
+		enhancer.setInterfaces(new Class[]{ ContextEntity.class });
 		enhancer.setCallback(new InvocationHandler() {
 
 			private Object managed;
@@ -148,6 +149,14 @@ public class Context extends HashMap<String, Object> {
 
 			@Override
 			public Object invoke(Object obj, Method method, Object[] args) throws Throwable {
+
+				try {
+					// if call to ContextEntity#getEntit
+					if (ContextEntity.class.getDeclaredMethod(method.getName()) != null) {
+						return bean;
+					}
+				} catch (NoSuchMethodException e) {
+				}
 
 				// initialize on-demand
 				this.init();

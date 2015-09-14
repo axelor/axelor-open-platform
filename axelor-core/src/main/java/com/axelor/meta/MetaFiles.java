@@ -38,8 +38,8 @@ import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 
 import com.axelor.app.AppSettings;
+import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
-import com.axelor.db.internal.EntityHelper;
 import com.axelor.dms.db.repo.DMSFileRepository;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaAttachment;

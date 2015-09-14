@@ -15,19 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.db.internal;
+package com.axelor.db;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.proxy.HibernateProxy;
 
-import com.axelor.db.Model;
 import com.axelor.db.annotations.HashKey;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.axelor.internal.cglib.proxy.Enhancer;
+import com.axelor.rpc.Context;
+import com.axelor.rpc.ContextEntity;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -148,7 +149,8 @@ public final class EntityHelper {
 	 * 
 	 * <p>
 	 * This method can be used to find real class name of a proxy object
-	 * returned by hibernate entity manager.
+	 * returned by hibernate entity manager or {@link Context#asType(Class) }
+	 * instance.
 	 * </p>
 	 * 
 	 * @param entity
@@ -176,6 +178,11 @@ public final class EntityHelper {
 	 * implementation instance.
 	 * </p>
 	 * 
+	 * <p>
+	 * If called for instances returned with {@link Context#asType(Class) }, it
+	 * returns partial context instance.
+	 * </p>
+	 * 
 	 * @param entity
 	 *            proxied entity
 	 * @return unproxied instance of the entity
@@ -187,6 +194,9 @@ public final class EntityHelper {
 		}
 		if (entity instanceof HibernateProxy) {
 			return (T) ((HibernateProxy) entity).getHibernateLazyInitializer().getImplementation();
+		}
+		if (entity instanceof ContextEntity) {
+			return (T) ((ContextEntity) entity).getContextEntity();
 		}
 		return entity;
 	}

@@ -36,6 +36,7 @@ import org.stringtemplate.v4.misc.ObjectModelAdaptor;
 import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
 import com.axelor.common.StringUtils;
+import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -74,7 +75,7 @@ public class StringTemplates implements Templates {
 				return super.getProperty(interp, self, o, property, propertyName);
 			}
 			
-			final Mapper mapper = Mapper.of(o.getClass());
+			final Mapper mapper = Mapper.of(EntityHelper.getEntityClass(o));
 			final Property field = mapper.getProperty(propertyName);
 
 			if (field == null) {
@@ -141,7 +142,7 @@ public class StringTemplates implements Templates {
 		public <T extends Model> Renderer make(T context) {
 			final Map<String, Object> ctx = Maps.newHashMap();
 			if (context != null) {
-				Mapper mapper = Mapper.of(context.getClass());
+				Mapper mapper = Mapper.of(EntityHelper.getEntityClass(context));
 				for (String name : names) {
 					Property property = mapper.getProperty(name);
 					if (property != null) {

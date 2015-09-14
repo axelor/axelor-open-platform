@@ -25,8 +25,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
-import com.axelor.db.internal.EntityHelper;
 
 @Entity
 @Table(name = "CONTACT_CIRCLE")

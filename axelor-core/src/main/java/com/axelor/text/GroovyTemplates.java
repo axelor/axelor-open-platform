@@ -42,6 +42,7 @@ import com.axelor.app.AppSettings;
 import com.axelor.common.ClassUtils;
 import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -154,7 +155,7 @@ public class GroovyTemplates implements Templates {
 		@Override
 		@SuppressWarnings("serial")
 		public <T extends Model> Renderer make(final T context) {
-			final Mapper mapper = context == null ? null : Mapper.of(context.getClass());
+			final Mapper mapper = context == null ? null : Mapper.of(EntityHelper.getEntityClass(context));
 			final Map<String, Object> ctx = new HashMap<String, Object>() {
 				
 				@Override
@@ -187,7 +188,7 @@ public class GroovyTemplates implements Templates {
 				return "";
 			}
 			expr = expr.replaceAll("\\?", "");
-			return getTitle(bean.getClass(), expr, getValue(bean, expr));
+			return getTitle(EntityHelper.getEntityClass(bean), expr, getValue(bean, expr));
 		}
 
 		private String getTitle(Class<?> klass, String expr, Object value) {
@@ -222,7 +223,7 @@ public class GroovyTemplates implements Templates {
 			if (bean instanceof Map) {
 				obj = ((Map) bean).get(iter.next());
 			} else {
-				obj = Mapper.of(bean.getClass()).get(bean, iter.next());
+				obj = Mapper.of(EntityHelper.getEntityClass(bean)).get(bean, iter.next());
 			}
 			if(iter.hasNext() && obj != null) {
 				return getValue(obj, Joiner.on(".").join(iter));

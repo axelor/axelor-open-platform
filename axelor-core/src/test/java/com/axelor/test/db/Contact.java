@@ -37,11 +37,11 @@ import javax.validation.constraints.NotNull;
 
 import org.joda.time.LocalDate;
 
+import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaModel;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.VirtualColumn;
 import com.axelor.db.annotations.Widget;
-import com.axelor.db.internal.EntityHelper;
 import com.google.common.collect.Lists;
 
 @Entity

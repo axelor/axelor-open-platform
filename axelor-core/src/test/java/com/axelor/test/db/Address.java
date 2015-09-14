@@ -24,8 +24,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaModel;
-import com.axelor.db.internal.EntityHelper;
 
 @Entity
 @Table(name = "CONTACT_ADDRESS")
