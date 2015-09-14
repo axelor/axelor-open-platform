@@ -28,6 +28,7 @@
     <option value="action-method">action-method</option>
     <option value="action-import">action-import</option>
     <option value="action-export">action-export</option>
+    <option value="action-report">action-report</option>
     <option value="action-ws">action-ws</option>
     <option value="action-workflow">action-workflow</option>
   </selection>
