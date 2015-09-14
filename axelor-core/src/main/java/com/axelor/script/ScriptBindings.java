@@ -34,6 +34,7 @@ import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.db.internal.EntityHelper;
 import com.axelor.inject.Beans;
 import com.axelor.rpc.Context;
 import com.google.common.base.Preconditions;
@@ -109,7 +110,7 @@ public class ScriptBindings extends SimpleBindings {
 		case "__self__":
 			Model bean = ((Context) variables).asType(Model.class);
 			if (bean == null || bean.getId() == null) return null;
-			return JPA.em().getReference(bean.getClass(), bean.getId());
+			return JPA.em().getReference(EntityHelper.getEntityClass(bean), bean.getId());
 		case "__ref__":
 			Map values = (Map) variables.get("_ref");
 			Class<?> klass = Class.forName((String) values.get("_model"));
