@@ -259,6 +259,7 @@ function Loader(scope, node, DataSource) {
 	
 	if (node.parent) {
 		domain = "self." + node.parent + ".id = :parentId";
+		ds._page.limit = -1;
 	}
 
 	if (node.domain) {
