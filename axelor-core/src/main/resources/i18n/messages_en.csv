@@ -1,383 +1,356 @@
 "key","message","comment","context"
-"Action",,,"resources/domains/Meta.xml:68
-resources/domains/Meta.xml:91
-resources/views/Group.xml:28
-resources/views/Meta.xml:112
-resources/views/User.xml:29
-resources/views/User.xml:56"
-"Action Menu",,,"resources/views/Meta.xml:172"
-"Action Menus",,,"resources/views/Menu.xml:103
-resources/views/Menu.xml:105
-resources/views/Meta.xml:160"
-"Action name can't be changed.",,,"java/com/axelor/meta/web/MetaController.java:100"
-"Actions",,,"resources/views/Menu.xml:88"
-"Activate on",,,"resources/domains/User.xml:22"
-"Activate the user from the specified date.",,,"resources/domains/User.xml:22"
-"Active",,,"resources/domains/MetaSchedule.xml:19"
-"Administration",,,"resources/views/Menu.xml:6"
-"All Actions",,,"resources/views/Menu.xml:86
-resources/views/Meta.xml:103"
-"All Charts",,,"resources/views/Menu.xml:121
-resources/views/Menu.xml:123
-resources/views/Meta.xml:76"
-"All Menus",,,"resources/views/Menu.xml:77"
-"All Models",,,"resources/views/Menu.xml:59"
-"All Modules",,,"resources/views/Menu.xml:50
-resources/views/Meta.xml:33"
-"All Schedules",,,"resources/views/Menu.xml:131
-resources/views/Menu.xml:133"
-"All Selects",,,"resources/views/Menu.xml:94
-resources/views/Meta.xml:186"
-"All Translations",,,"resources/views/Menu.xml:112
-resources/views/Menu.xml:114
-resources/views/Meta.xml:286"
-"All Views",,,"resources/views/Menu.xml:68
-resources/views/Meta.xml:64"
-"All day",,,"resources/domains/Calendar.xml:23"
-"All the customizations will be lost. Are you sure ?",,,"resources/views/Meta.xml:66"
-"All views have been restored.",,,"java/com/axelor/meta/web/MetaController.java:145"
-"Allow",,,"resources/views/Permission.xml:21"
-"An unique permission name.",,,"resources/domains/Permission.xml:13"
-"Attendees",,,"resources/domains/Calendar.xml:28
-resources/views/Calendar.xml:31"
-"Authorization",,,"resources/views/User.xml:32"
-"Blocked",,,"resources/domains/User.xml:21"
-"Calendar",,,"resources/domains/Calendar.xml:26
-resources/views/Calendar.xml:40
-resources/views/Calendar.xml:9
-resources/views/Meta.xml:14"
-"Calendar User",,,"resources/views/Calendar.xml:48"
-"Calendar Users",,,"resources/views/Calendar.xml:44"
-"Calendars",,,"resources/views/Calendar.xml:6"
-"Category",,,"resources/domains/Meta.xml:87"
-"Category name to group action menus.",,,"resources/domains/Meta.xml:87"
-"Change password?",,,"resources/views/User.xml:36
-resources/views/User.xml:58"
-"Chart",,,"resources/views/Meta.xml:10"
-"Cid",,,"resources/domains/Calendar.xml:10"
-"Code",,,"resources/domains/Group.xml:13"
-"Code length should be greater than 2.",,,"resources/views/Group.xml:56
-resources/views/User.xml:67"
-"Collapse",,,"resources/views/Group.xml:9"
-"Comma separated list of params for the condition.",,,"resources/domains/Permission.xml:21"
-"Concurrent updates error",,,"java/com/axelor/rpc/ResponseInterceptor.java:120"
-"Condition",,,"resources/domains/Permission.xml:20
-resources/views/Permission.xml:28
-resources/views/Permission.xml:29"
-"Condition params",,,"resources/domains/Permission.xml:21"
-"Confirm",,,"resources/views/User.xml:39
-resources/views/User.xml:61"
-"Create",,,"resources/domains/Permission.xml:17"
-"Created by",,,"java/com/axelor/auth/db/AuditableModel.java:49"
-"Created on",,,"java/com/axelor/auth/db/AuditableModel.java:43"
-"Cron",,,"resources/domains/MetaSchedule.xml:23"
-"Dashboard",,,"resources/views/Meta.xml:13"
-"Data",,,"resources/domains/Meta.xml:140"
-"Default home action.",,,"resources/domains/Group.xml:16"
-"Depends",,,"resources/domains/Meta.xml:16"
-"Description",,,"resources/domains/Calendar.xml:19
-resources/domains/Meta.xml:15
-resources/domains/Meta.xml:170
-resources/domains/Meta.xml:189
-resources/domains/MetaSchedule.xml:21
-resources/domains/Role.xml:14
-resources/views/Calendar.xml:34
-resources/views/Meta.xml:277
-resources/views/Meta.xml:59"
-"Disable the user from the specified date.",,,"resources/domains/User.xml:23"
-"Display Name",,,"resources/domains/Calendar.xml:9"
-"Domain filter as condition.",,,"resources/domains/Permission.xml:20"
-"Email",,,"resources/domains/Calendar.xml:34
-resources/domains/User.xml:17"
-"End date",,,"resources/domains/Calendar.xml:22"
-"English",,,"resources/views/User.xml:7"
-"Event",,,"resources/views/Calendar.xml:21"
-"Events",,,"resources/domains/Calendar.xml:12
-resources/views/Calendar.xml:15"
-"Expires on",,,"resources/domains/User.xml:23"
-"Export",,,"resources/domains/Permission.xml:19
-resources/views/Meta.xml:288"
-"Export complete.",,,"java/com/axelor/meta/schema/actions/ActionExport.java:148
-java/com/axelor/meta/schema/actions/ActionExport.java:151
-java/com/axelor/meta/web/MetaController.java:221"
-"Field",,,"resources/views/Meta.xml:267"
-"Field is required.",,,"java/com/axelor/meta/schema/actions/ActionCondition.java:116"
-"Fields",,,"resources/domains/Meta.xml:154
-resources/views/Meta.xml:259"
-"File",,,"resources/domains/Meta.xml:206
-resources/views/Meta.xml:313"
-"File name",,,"resources/domains/Meta.xml:185"
-"File path",,,"resources/domains/Meta.xml:186"
-"File type",,,"resources/domains/Meta.xml:188"
-"Files",,,"resources/views/Meta.xml:303
-resources/views/Meta.xml:311"
-"Filter custom",,,"resources/domains/MetaFilter.xml:17"
-"Filter view",,,"resources/domains/MetaFilter.xml:18"
-"Filters",,,"resources/domains/MetaFilter.xml:16
-resources/views/Meta.xml:15"
-"Following modules will be installed : <br/> %s <br/> Are you sure ?",,,"java/com/axelor/meta/web/ModuleController.java:42"
-"Following modules will be uninstalled : <br/> %s <br/> Are you sure ?",,,"java/com/axelor/meta/web/ModuleController.java:43"
-"Foreign key violation",,,"java/com/axelor/rpc/ResponseInterceptor.java:173"
-"Form",,,"resources/views/Meta.xml:8"
-"French",,,"resources/views/User.xml:8"
-"Fullname",,,"resources/domains/Meta.xml:155"
-"Fully qualified object name or wild card package name.",,,"resources/domains/Permission.xml:14"
-"Geo",,,"resources/domains/Calendar.xml:25"
-"Geographic latitude and longitude",,,"resources/domains/Calendar.xml:25"
-"Grid",,,"resources/views/Meta.xml:7"
-"Group",,,"resources/domains/User.xml:25
-resources/views/Group.xml:18"
-"Groups",,,"resources/domains/Meta.xml:36
-resources/domains/Meta.xml:69
-resources/views/Group.xml:12
-resources/views/Menu.xml:22
-resources/views/Menu.xml:25"
-"Hidden",,,"resources/domains/Meta.xml:142
-resources/domains/Meta.xml:66
-resources/domains/Meta.xml:89
-resources/views/Group.xml:8"
-"Home action",,,"resources/domains/Group.xml:16
-resources/domains/User.xml:19"
-"Icon",,,"resources/domains/Meta.xml:139
-resources/domains/Meta.xml:61"
-"Increment",,,"resources/domains/MetaSequence.xml:16"
-"Initial",,,"resources/domains/MetaSequence.xml:17"
-"Install",,,"resources/views/Meta.xml:55"
-"Install module",,,"resources/views/Meta.xml:41"
-"Installed",,,"resources/domains/Meta.xml:19"
-"Invalid XML.",,,"java/com/axelor/meta/web/MetaController.java:72"
-"Invalid cron:",,,"java/com/axelor/quartz/JobRunner.java:147"
-"Invalid field value.",,,"java/com/axelor/meta/schema/actions/ActionCondition.java:118"
-"Items",,,"resources/domains/Meta.xml:125"
-"Job",,,"resources/domains/MetaSchedule.xml:22"
-"Job Management",,,"resources/views/Menu.xml:11"
-"Keep remote",,,"resources/domains/Calendar.xml:11"
-"Keep remote values when syncing.",,,"resources/domains/Calendar.xml:11"
-"Key",,,"resources/domains/Meta.xml:174"
-"Label",,,"resources/domains/Meta.xml:167"
-"Language",,,"resources/domains/Meta.xml:176
-resources/domains/User.xml:18"
-"Left",,,"resources/domains/Meta.xml:64"
-"Location",,,"resources/domains/Calendar.xml:24"
-"Login",,,"resources/domains/User.xml:13"
-"ManyToMany",,,"resources/views/Meta.xml:256"
-"ManyToOne",,,"resources/views/Meta.xml:254"
-"Mapped by",,,"resources/domains/Meta.xml:169"
-"Menu Item",,,"resources/views/Meta.xml:140"
-"Menu Items",,,"resources/views/Meta.xml:126"
-"Menus",,,"resources/domains/Group.xml:23
-resources/views/Menu.xml:79"
-"Message",,,"resources/domains/Meta.xml:175"
-"Meta model",,,"resources/domains/Meta.xml:163"
-"MetaScheduleParam",,,"resources/views/Schedules.xml:31"
-"Mobile",,,"resources/domains/Meta.xml:65"
-"Model",,,"resources/domains/Meta.xml:108
-resources/domains/Meta.xml:32
-resources/views/Meta.xml:243"
-"Model Management",,,"resources/views/Menu.xml:8"
-"Models",,,"resources/views/Menu.xml:61
-resources/views/Meta.xml:236"
-"Module",,,"resources/domains/Meta.xml:109
-resources/domains/Meta.xml:124
-resources/domains/Meta.xml:33
-resources/domains/Meta.xml:62
-resources/domains/Meta.xml:88
-resources/views/Meta.xml:45
-resources/views/Meta.xml:46"
-"Module Management",,,"resources/views/Menu.xml:10"
-"Modules",,,"resources/views/Menu.xml:52"
-"Name",,,"resources/domains/Calendar.xml:33
-resources/domains/Group.xml:14
-resources/domains/Meta.xml:105
-resources/domains/Meta.xml:122
-resources/domains/Meta.xml:13
-resources/domains/Meta.xml:151
-resources/domains/Meta.xml:164
-resources/domains/Meta.xml:28
-resources/domains/Meta.xml:59
-resources/domains/Meta.xml:85
-resources/domains/MetaFilter.xml:14
-resources/domains/MetaSchedule.xml:10
-resources/domains/MetaSchedule.xml:20
-resources/domains/MetaSequence.xml:12
-resources/domains/Permission.xml:13
-resources/domains/Role.xml:13
-resources/domains/User.xml:14"
-"Name length should be greater than 2.",,,"resources/views/Group.xml:52
-resources/views/User.xml:71"
-"Navigation",,,"resources/domains/Group.xml:15"
-"Next",,,"resources/domains/MetaSequence.xml:18"
-"Object",,,"resources/domains/Meta.xml:205
-resources/domains/Permission.xml:14"
-"Object name",,,"resources/domains/Meta.xml:204"
-"OneToMany",,,"resources/views/Meta.xml:255"
-"OneToOne",,,"resources/views/Meta.xml:253"
-"Order",,,"resources/domains/Meta.xml:141
-resources/domains/Meta.xml:57
-resources/domains/Meta.xml:83"
-"Organizer",,,"resources/domains/Calendar.xml:27"
-"Overview",,,"resources/views/Group.xml:22
-resources/views/Meta.xml:113
-resources/views/Meta.xml:141
-resources/views/Meta.xml:173
-resources/views/Meta.xml:193
-resources/views/Meta.xml:209
-resources/views/Meta.xml:244
-resources/views/Meta.xml:268
-resources/views/Meta.xml:312
-resources/views/Meta.xml:85
-resources/views/Permission.xml:17
-resources/views/Role.xml:11
-resources/views/Schedules.xml:14
-resources/views/Schedules.xml:32
-resources/views/User.xml:21"
-"Package",,,"resources/domains/Meta.xml:152
-resources/domains/Meta.xml:165"
-"Padding",,,"resources/domains/MetaSequence.xml:15"
-"Params",,,"resources/domains/MetaSchedule.xml:24
-resources/views/Permission.xml:30"
-"Parent",,,"resources/domains/Meta.xml:67
-resources/domains/Meta.xml:90"
-"Password",,,"resources/domains/User.xml:15
-resources/views/User.xml:38
-resources/views/User.xml:60"
-"Password doesn't match",,,"java/com/axelor/auth/AuthService.java:226"
-"Pending",,,"resources/domains/Meta.xml:20"
-"Permission",,,"resources/views/Permission.xml:16"
-"Permissions",,,"resources/domains/Group.xml:21
-resources/domains/Role.xml:15
-resources/domains/User.xml:27
-resources/views/Group.xml:59
-resources/views/Menu.xml:40
-resources/views/Menu.xml:43
-resources/views/Permission.xml:6"
-"Portal",,,"resources/views/Meta.xml:12"
-"Preferences",,,"resources/views/User.xml:50"
-"Prefix",,,"resources/domains/MetaSequence.xml:13"
-"Priority",,,"resources/domains/Meta.xml:103
-resources/domains/Meta.xml:123
-resources/domains/Meta.xml:31
-resources/domains/Meta.xml:56
-resources/domains/Meta.xml:82"
-"Read",,,"resources/domains/Permission.xml:15"
-"Record was updated or deleted by another transaction",,,"java/com/axelor/rpc/ResponseInterceptor.java:121"
-"Relationship",,,"resources/domains/Meta.xml:168"
-"Removable",,,"resources/domains/Meta.xml:18"
-"Remove",,,"resources/domains/Permission.xml:18"
-"Restart jobs...",,,"resources/views/Schedules.xml:22"
-"Restart the server for updates to take effect.",,,"java/com/axelor/meta/web/ModuleController.java:41"
-"Restore all...",,,"resources/views/Meta.xml:66"
-"Role",,,"resources/views/Role.xml:10"
-"Roles",,,"resources/domains/Group.xml:20
-resources/domains/User.xml:26
-resources/views/Menu.xml:31
-resources/views/Menu.xml:34
-resources/views/Role.xml:6"
-"SQL error",,,"java/com/axelor/rpc/ResponseInterceptor.java:179"
-"Schedule",,,"resources/domains/MetaSchedule.xml:12
-resources/views/Schedules.xml:13"
-"Schedules",,,"resources/views/Schedules.xml:6"
-"Schema",,,"resources/views/Meta.xml:121
-resources/views/Meta.xml:98"
-"Search",,,"resources/views/Meta.xml:11"
-"Select",,,"resources/domains/Meta.xml:143
-resources/views/Meta.xml:192"
-"Select Item",,,"resources/views/Meta.xml:208"
-"Selects",,,"resources/views/Menu.xml:96"
-"Sequence order",,,"resources/views/Meta.xml:215"
-"Shared",,,"resources/domains/MetaFilter.xml:20"
-"Show Model",,,"resources/views/Meta.xml:275"
-"Show permissions",,,"resources/views/Group.xml:20"
-"Size",,,"resources/domains/Meta.xml:190"
-"Size in bytes",,,"resources/domains/Meta.xml:187"
-"Specify whether the members of this group are technical staff.",,,"resources/domains/Group.xml:18"
-"Specify whether this action can be used as home action.",,,"resources/domains/Meta.xml:107"
-"Specify whether to block the user for an indeterminate times.",,,"resources/domains/User.xml:21"
-"Start date",,,"resources/domains/Calendar.xml:21"
-"Status",,,"resources/domains/Calendar.xml:20"
-"Suffix",,,"resources/domains/MetaSequence.xml:14"
-"Summary",,,"resources/domains/Calendar.xml:18"
-"Table",,,"resources/domains/Meta.xml:153"
-"Technical staff",,,"resources/domains/Group.xml:18"
-"The addition data for UI widgets.",,,"resources/domains/Meta.xml:140"
-"The image icon to show in UI widgets.",,,"resources/domains/Meta.xml:139"
-"The module can't be uninstalled because other modules are pending. Please restart the server before.",,,"java/com/axelor/meta/web/ModuleController.java:45"
-"The module can't be uninstalled because other non-removable modules depend on it.",,,"java/com/axelor/meta/web/ModuleController.java:44"
-"The scheduler service is disabled.",,,"java/com/axelor/quartz/JobRunner.java:157"
-"The select item title.",,,"resources/domains/Meta.xml:137"
-"The select item value.",,,"resources/domains/Meta.xml:138"
-"This may terminate any running jobs. Are sure to continue?",,,"resources/views/Schedules.xml:22"
-"Title",,,"resources/domains/Meta.xml:137
-resources/domains/Meta.xml:14
-resources/domains/Meta.xml:29
-resources/domains/Meta.xml:60
-resources/domains/Meta.xml:86
-resources/domains/MetaFilter.xml:15"
-"Top",,,"resources/domains/Meta.xml:63"
-"Translation",,,"resources/views/Meta.xml:295
-resources/views/Meta.xml:296"
-"Tree",,,"resources/views/Meta.xml:9"
-"Type",,,"resources/domains/Meta.xml:106
-resources/domains/Meta.xml:166
-resources/domains/Meta.xml:30"
-"Uid",,,"resources/domains/Calendar.xml:16"
-"Uninstall",,,"resources/views/Meta.xml:56"
-"Unique constraint violation",,,"java/com/axelor/rpc/ResponseInterceptor.java:176"
-"Updated by",,,"java/com/axelor/auth/db/AuditableModel.java:53"
-"Updated on",,,"java/com/axelor/auth/db/AuditableModel.java:46"
-"Url",,,"resources/domains/Calendar.xml:17"
-"Used as home action",,,"resources/domains/Meta.xml:107"
-"User",,,"resources/domains/MetaFilter.xml:21
-resources/views/User.xml:20"
-"User Management",,,"resources/views/Menu.xml:7"
-"User preferences",,,"resources/views/User.xml:51"
-"Users",,,"resources/views/Menu.xml:14
-resources/views/Menu.xml:16
-resources/views/User.xml:11"
-"Validate",,,"resources/views/Schedules.xml:21"
-"Validation error",,,"java/com/axelor/rpc/ResponseInterceptor.java:144"
-"Value",,,"resources/domains/Meta.xml:138
-resources/domains/MetaSchedule.xml:11"
-"Version",,,"resources/domains/Meta.xml:17"
-"View",,,"resources/views/Meta.xml:84"
-"View Management",,,"resources/views/Menu.xml:9"
-"Views",,,"resources/domains/Group.xml:24
-resources/views/Menu.xml:70"
-"Visible",,,"resources/views/Group.xml:7"
-"Whether to grant create access.",,,"resources/domains/Permission.xml:17"
-"Whether to grant export access.",,,"resources/domains/Permission.xml:19"
-"Whether to grant read access.",,,"resources/domains/Permission.xml:15"
-"Whether to grant remove access.",,,"resources/domains/Permission.xml:18"
-"Whether to grant write access.",,,"resources/domains/Permission.xml:16"
-"Write",,,"resources/domains/Permission.xml:16"
-"Xml",,,"resources/domains/Meta.xml:104
-resources/domains/Meta.xml:110
-resources/domains/Meta.xml:121
-resources/domains/Meta.xml:34
-resources/domains/Meta.xml:35
-resources/domains/Meta.xml:58
-resources/domains/Meta.xml:84"
-"You are not allowed to remove this filter",,,"java/com/axelor/meta/service/MetaFilterService.java:71"
-"You are not authorized to create this resource.",,,"java/com/axelor/db/JpaSecurity.java:31"
-"You are not authorized to export the data.",,,"java/com/axelor/db/JpaSecurity.java:33"
-"You are not authorized to read this resource.",,,"java/com/axelor/db/JpaSecurity.java:29"
-"You are not authorized to remove this resource.",,,"java/com/axelor/db/JpaSecurity.java:32"
-"You are not authorized to update this resource.",,,"java/com/axelor/db/JpaSecurity.java:30"
-"action-attrs",,,"resources/views/Meta.xml:19"
-"action-condition",,,"resources/views/Meta.xml:23"
-"action-export",,,"resources/views/Meta.xml:27"
-"action-group",,,"resources/views/Meta.xml:21"
-"action-import",,,"resources/views/Meta.xml:26"
-"action-method",,,"resources/views/Meta.xml:25"
-"action-record",,,"resources/views/Meta.xml:24"
-"action-validate",,,"resources/views/Meta.xml:22"
-"action-view",,,"resources/views/Meta.xml:20"
-"action-workflow",,,"resources/views/Meta.xml:29"
-"action-ws",,,"resources/views/Meta.xml:28"
-"confirm password",,,"resources/views/User.xml:39
-resources/views/User.xml:61"
-"login name",,,"resources/views/User.xml:23"
-"new password",,,"resources/views/User.xml:38
-resources/views/User.xml:60"
-"user group",,,"resources/views/User.xml:24"
-"user name",,,"resources/views/User.xml:22"
+"Access error",,,
+"Action",,,
+"Action Menu",,,
+"Action Menus",,,
+"Action name can't be changed.",,,
+"Actions",,,
+"Activate on",,,
+"Activate the user from the specified date.",,,
+"Active",,,
+"Administration",,,
+"All Actions",,,
+"All Charts",,,
+"All Documents",,,
+"All Groups",,,
+"All Menus",,,
+"All Models",,,
+"All Modules",,,
+"All Schedules",,,
+"All Selects",,,
+"All Translations",,,
+"All Views",,,
+"All day",,,
+"All the customizations will be lost. Are you sure ?",,,
+"All views have been restored.",,,
+"Allow",,,
+"An unique permission name.",,,
+"Archived",,,
+"Attached to",,,
+"Attachments",,,
+"Attendees",,,
+"Author",,,
+"Authorization",,,
+"Authorized groups",,,
+"Authorized users",,,
+"Bad header row:",,,
+"Bad import file",,,
+"Blocked",,,
+"Body",,,
+"Calendar",,,
+"Calendar User",,,
+"Calendar Users",,,
+"Calendars",,,
+"Call",,,
+"Can read",,,
+"Can share",,,
+"Can write",,,
+"Cards",,,
+"Category",,,
+"Category name to group action menus.",,,
+"Change password?",,,
+"Chart",,,
+"Cid",,,
+"Client side js expression",,,
+"Code",,,
+"Code length should be greater than 2.",,,
+"Collapse",,,
+"Come back later. There are no messages in this folder...",,,
+"Comma separated list of params for the condition.",,,
+"Comment",,,
+"Concurrent updates error",,,
+"Condition",,,
+"Condition params",,,
+"Conditions",,,
+"Configuration",,,
+"Confirm",,,
+"Content",,,
+"Content type",,,
+"Count",,,
+"Create",,,
+"Create file",,,
+"Created by",,,
+"Created on",,,
+"Cron",,,
+"Custom",,,
+"Dashboard",,,
+"Data",,,
+"Default",,,
+"Default home action.",,,
+"Delete",,,
+"Depends",,,
+"Description",,,
+"Details",,,
+"Directories",,,
+"Directory",,,
+"Disable the user from the specified date.",,,
+"Display Name",,,
+"Document",,,
+"Documents",,,
+"Domain filter as condition.",,,
+"Email",,,
+"End date",,,
+"English",,,
+"Error in import: %s. Please check server log",,,
+"Error in import: %s. Please check the server log",,,
+"Event",,,
+"Events",,,
+"Expires on",,,
+"Export",,,
+"Export complete.",,,
+"False",,,
+"Field",,,
+"Field is required.",,,
+"Fields",,,
+"File",,,
+"File name",,,
+"File path",,,
+"File type",,,
+"Files",,,
+"Filter custom",,,
+"Filter files",,,
+"Filter view",,,
+"Filters",,,
+"Flags",,,
+"Following modules will be installed : <br/> %s <br/> Are you sure ?",,,
+"Following modules will be uninstalled : <br/> %s <br/> Are you sure ?",,,
+"Foreign key violation",,,
+"Form",,,
+"French",,,
+"Fullname",,,
+"Fully qualified object name or wild card package name.",,,
+"Gantt",,,
+"General",,,
+"Geo",,,
+"Geographic latitude and longitude",,,
+"Grid",,,
+"Group",,,
+"Group Menu Assistant",,,
+"Groups",,,
+"Groups not found: %s",,,
+"Hidden",,,
+"Hide If",,,
+"Hide if",,,
+"Home action",,,
+"Icon",,,
+"Import",,,
+"Import date",,,
+"Import permissions",,,
+"Important",,,
+"Inbox",,,
+"Inbox is empty!",,,
+"Increment",,,
+"Information",,,
+"Initial",,,
+"Install",,,
+"Install module",,,
+"Installed",,,
+"Invalid XML.",,,
+"Invalid cron:",,,
+"Invalid field value.",,,
+"Invalid permission",,,
+"Invalid use of action-record: %s, must be the last action.",,,
+"Inverse",,,
+"Is archived",,,
+"Is directory",,,
+"Is read",,,
+"Is starred",,,
+"Items",,,
+"Job",,,
+"Job Management",,,
+"Kanban",,,
+"Keep remote",,,
+"Keep remote values when syncing.",,,
+"Key",,,
+"Label",,,
+"Language",,,
+"Last modified",,,
+"Left",,,
+"Location",,,
+"Log",,,
+"Login",,,
+"ManyToMany",,,
+"ManyToOne",,,
+"Mapped by",,,
+"Max size 4MB.",,,
+"Menu Item",,,
+"Menu Items",,,
+"Menu not found: %s",,,
+"Menus",,,
+"Message",,,
+"Messaging",,,
+"Meta file",,,
+"Meta model",,,
+"Meta permission",,,
+"MetaScheduleParam",,,
+"Mobile",,,
+"Model",,,
+"Model Management",,,
+"Models",,,
+"Module",,,
+"Module Management",,,
+"Modules",,,
+"My Documents",,,
+"My Views",,,
+"Name",,,
+"Name length should be greater than 2.",,,
+"Navigation",,,
+"Next",,,
+"No archived messages!",,,
+"No headerRow found",,,
+"No important messages!",,,
+"Object",,,
+"Object name",,,
+"Object not found: %s",,,
+"Objects",,,
+"OneToMany",,,
+"OneToOne",,,
+"Order",,,
+"Organizer",,,
+"Overview",,,
+"Package",,,
+"Padding",,,
+"Params",,,
+"Parent",,,
+"Password",,,
+"Password doesn't match",,,
+"Pending",,,
+"Permission",,,
+"Permission Assistant",,,
+"Permissions",,,
+"Permissions (fields)",,,
+"Personalized View",,,
+"Personalized Views",,,
+"Photo",,,
+"Preferences",,,
+"Prefix",,,
+"Priority",,,
+"Read",,,
+"Readonly If",,,
+"Readonly if",,,
+"Recipients",,,
+"Record created",,,
+"Record updated",,,
+"Record was updated or deleted by another transaction",,,
+"Related",,,
+"Related document id",,,
+"Related document model",,,
+"Related document name",,,
+"Related model",,,
+"Related object",,,
+"Relationship",,,
+"Removable",,,
+"Remove",,,
+"Replies",,,
+"Restart jobs...",,,
+"Restart the server for updates to take effect.",,,
+"Restore all...",,,
+"Role",,,
+"Roles",,,
+"Root",,,
+"Rule",,,
+"Rules",,,
+"SQL error",,,
+"Schedule",,,
+"Schedules",,,
+"Schema",,,
+"Search",,,
+"Select",,,
+"Select Item",,,
+"Selects",,,
+"Sequence order",,,
+"Shared",,,
+"Shared with me",,,
+"Show Model",,,
+"Show permissions",,,
+"Size",,,
+"Size in bytes",,,
+"Specify whether the members of this group are technical staff.",,,
+"Specify whether this action can be used as home action.",,,
+"Specify whether to block the user for an indeterminate times.",,,
+"Start date",,,
+"Status",,,
+"Style",,,
+"Subject",,,
+"Subscribe",,,
+"Success",,,
+"Suffix",,,
+"Summary",,,
+"System notification",,,
+"Table",,,
+"Tag",,,
+"Tag count",,,
+"Tag get",,,
+"Tag style",,,
+"Tags",,,
+"Technical staff",,,
+"The addition data for UI widgets.",,,
+"The image icon to show in UI widgets.",,,
+"The module can't be uninstalled because other modules are pending. Please restart the server before.",,,
+"The module can't be uninstalled because other non-removable modules depend on it.",,,
+"The scheduler service is disabled.",,,
+"The select item title.",,,
+"The select item value.",,,
+"This may terminate any running jobs. Are sure to continue?",,,
+"Title",,,
+"Top",,,
+"Translation",,,
+"Tree",,,
+"True",,,
+"Type",,,
+"Uid",,,
+"Uninstall",,,
+"Unique constraint violation",,,
+"Unsubscribe",,,
+"Updated by",,,
+"Updated on",,,
+"Url",,,
+"Used as home action",,,
+"User",,,
+"User Management",,,
+"User preferences",,,
+"Users",,,
+"Validate",,,
+"Validation error",,,
+"Value",,,
+"Version",,,
+"View",,,
+"View Management",,,
+"Views",,,
+"Visibility",,,
+"Visible",,,
+"Warning",,,
+"Whether to grant create access.",,,
+"Whether to grant export access.",,,
+"Whether to grant read access.",,,
+"Whether to grant remove access.",,,
+"Whether to grant write access.",,,
+"Write",,,
+"Xml",,,
+"You are not allowed to remove this filter",,,
+"You are not authorized to create this resource.",,,
+"You are not authorized to export the data.",,,
+"You are not authorized to read this resource.",,,
+"You are not authorized to remove this resource.",,,
+"You are not authorized to update this resource.",,,
+"You can't create document here.",,,
+"You can't move document here.",,,
+"action-attrs",,,
+"action-condition",,,
+"action-export",,,
+"action-group",,,
+"action-import",,,
+"action-method",,,
+"action-record",,,
+"action-report",,,
+"action-validate",,,
+"action-view",,,
+"action-workflow",,,
+"action-ws",,,
+"added comment",,,
+"confirm password",,,
+"login name",,,
+"new password",,,
+"updated document",,,
+"user group",,,
+"user name",,,

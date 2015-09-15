@@ -1,136 +1,77 @@
 "key","message","comment","context"
-"AND",,,"resources/views/Node.xml:18"
-"Account",,,"resources/domains/Workflow.xml:71"
-"Action",,,"resources/domains/Workflow.xml:61"
-"Active",,,"resources/domains/Workflow.xml:10"
-"Activities",,,"resources/views/Menu.xml:45
-resources/views/Menu.xml:47
-resources/views/Node.xml:88"
-"Activity",,,"resources/views/Node.xml:93"
-"BPMN",,,"resources/domains/Workflow.xml:17
-resources/views/Workflow.xml:36"
-"Condition",,,"resources/domains/Workflow.xml:12
-resources/domains/Workflow.xml:52"
-"Configurations",,,"resources/views/Menu.xml:26"
-"Counter",,,"resources/domains/Workflow.xml:34
-resources/views/Instance.xml:33
-resources/views/Instance.xml:58"
-"Counters",,,"resources/domains/Workflow.xml:28
-resources/views/Instance.xml:53"
-"Description",,,"resources/domains/Workflow.xml:16
-resources/domains/Workflow.xml:47
-resources/domains/Workflow.xml:60
-resources/views/Workflow.xml:112
-resources/views/Workflow.xml:33
-resources/views/Workflow.xml:66
-resources/views/Workflow.xml:89"
-"Details",,,"resources/views/Instance.xml:24"
-"Diagram",,,"resources/views/Instance.xml:21"
-"Editor",,,"resources/views/Workflow.xml:18"
-"End event",,,"resources/views/Node.xml:10
-resources/views/Node.xml:78"
-"End events",,,"resources/views/Menu.xml:53
-resources/views/Menu.xml:55
-resources/views/Node.xml:74"
-"End transitions",,,"resources/domains/Workflow.xml:63"
-"Exclusive gateway",,,"resources/views/Node.xml:124"
-"Exclusive gateways",,,"resources/views/Menu.xml:101
-resources/views/Menu.xml:99
-resources/views/Node.xml:120"
-"Executed transitions",,,"resources/domains/Workflow.xml:26"
-"Gateway",,,"resources/views/Node.xml:11"
-"Gateways",,,"resources/views/Menu.xml:80"
-"Histories",,,"resources/domains/Workflow.xml:27
-resources/views/Instance.xml:39"
-"History",,,"resources/views/Instance.xml:28
-resources/views/Instance.xml:45"
-"Import",,,"resources/views/Workflow.xml:20"
-"Inclusive gateway",,,"resources/views/Node.xml:109"
-"Inclusive gateways",,,"resources/views/Menu.xml:83
-resources/views/Menu.xml:85
-resources/views/Node.xml:105"
-"Instance",,,"resources/domains/Workflow.xml:32
-resources/domains/Workflow.xml:39
-resources/views/Instance.xml:14"
-"Instances",,,"resources/views/Instance.xml:5
-resources/views/Menu.xml:18
-resources/views/Menu.xml:20
-resources/views/Workflow.xml:19"
-"Max node counter",,,"resources/domains/Workflow.xml:14"
-"Message",,,"resources/views/Node.xml:12"
-"Message event",,,"resources/views/Node.xml:179"
-"Message events",,,"resources/views/Menu.xml:72
-resources/views/Menu.xml:74
-resources/views/Node.xml:171"
-"Meta model",,,"resources/views/Instance.xml:7"
-"Model",,,"resources/domains/Workflow.xml:11
-resources/views/Instance.xml:17"
-"Model Id",,,"resources/domains/Workflow.xml:23"
-"Name",,,"resources/domains/Workflow.xml:44
-resources/domains/Workflow.xml:57
-resources/domains/Workflow.xml:9"
-"Next node",,,"resources/domains/Workflow.xml:51"
-"Node",,,"resources/domains/Workflow.xml:13
-resources/domains/Workflow.xml:33
-resources/views/Node.xml:31"
-"Node Task",,,"resources/views/Node.xml:9"
-"Nodes",,,"resources/domains/Workflow.xml:25
-resources/views/Node.xml:25"
-"OR",,,"resources/views/Node.xml:19"
-"Operator",,,"resources/domains/Workflow.xml:84"
-"Other events",,,"resources/views/Menu.xml:61"
-"Overview",,,"resources/views/Instance.xml:15
-resources/views/Workflow.xml:104
-resources/views/Workflow.xml:22
-resources/views/Workflow.xml:57
-resources/views/Workflow.xml:81"
-"Parallel gateway",,,"resources/views/Node.xml:139"
-"Parallel gateways",,,"resources/views/Menu.xml:91
-resources/views/Menu.xml:93
-resources/views/Node.xml:135"
-"Persist",,,"resources/domains/Workflow.xml:74"
-"Process",,,"resources/views/Instance.xml:71"
-"Ref",,,"resources/domains/Workflow.xml:19
-resources/domains/Workflow.xml:46
-resources/domains/Workflow.xml:59"
-"Role",,,"resources/domains/Workflow.xml:53"
-"Sequence",,,"resources/domains/Workflow.xml:15
-resources/domains/Workflow.xml:48"
-"Signal",,,"resources/domains/Workflow.xml:45"
-"Start event",,,"resources/views/Node.xml:64
-resources/views/Node.xml:8"
-"Start events",,,"resources/views/Menu.xml:29
-resources/views/Menu.xml:31
-resources/views/Node.xml:60"
-"Start node",,,"resources/domains/Workflow.xml:50"
-"Start transitions",,,"resources/domains/Workflow.xml:62"
-"Template",,,"resources/domains/Workflow.xml:72"
-"Template Model",,,"resources/domains/Workflow.xml:73"
-"Time cycle",,,"resources/domains/Workflow.xml:80"
-"Time date",,,"resources/domains/Workflow.xml:78"
-"Time duration",,,"resources/domains/Workflow.xml:79"
-"Timer",,,"resources/views/Node.xml:13"
-"Timer event",,,"resources/views/Node.xml:157"
-"Timer events",,,"resources/views/Menu.xml:64
-resources/views/Menu.xml:66
-resources/views/Node.xml:150"
-"Transition",,,"resources/domains/Workflow.xml:40
-resources/views/Workflow.xml:103
-resources/views/Workflow.xml:56
-resources/views/Workflow.xml:80"
-"Transitions",,,"resources/views/Menu.xml:37
-resources/views/Menu.xml:39
-resources/views/Workflow.xml:46
-resources/views/Workflow.xml:71
-resources/views/Workflow.xml:94"
-"Type",,,"resources/domains/Workflow.xml:58"
-"Wkf Management",,,"resources/views/Menu.xml:6"
-"Workflow",,,"resources/domains/Workflow.xml:24
-resources/views/Workflow.xml:16"
-"Workflows",,,"resources/views/Menu.xml:11
-resources/views/Menu.xml:9
-resources/views/Workflow.xml:8"
-"XML",,,"resources/domains/Workflow.xml:18
-resources/views/Workflow.xml:39"
-"XOR",,,"resources/views/Node.xml:20"
-"You have no sufficient rights.",,,"java/com/axelor/wkf/db/repo/TransitionRepository.java:58"
+"AND",,,
+"Account",,,
+"Action",,,
+"Active",,,
+"Activities",,,
+"Activity",,,
+"BPMN",,,
+"Condition",,,
+"Configurations",,,
+"Counter",,,
+"Counters",,,
+"Description",,,
+"Details",,,
+"Diagram",,,
+"Editor",,,
+"End event",,,
+"End events",,,
+"End transitions",,,
+"Exclusive gateway",,,
+"Exclusive gateways",,,
+"Executed transitions",,,
+"Gateway",,,
+"Gateways",,,
+"Histories",,,
+"History",,,
+"Import",,,
+"Inclusive gateway",,,
+"Inclusive gateways",,,
+"Instance",,,
+"Instances",,,
+"Max node counter",,,
+"Message",,,
+"Message event",,,
+"Message events",,,
+"Meta model",,,
+"Model",,,
+"Model Id",,,
+"Name",,,
+"Next node",,,
+"Node",,,
+"Node Task",,,
+"Nodes",,,
+"OR",,,
+"Operator",,,
+"Other events",,,
+"Overview",,,
+"Parallel gateway",,,
+"Parallel gateways",,,
+"Persist",,,
+"Process",,,
+"Ref",,,
+"Role",,,
+"Sequence",,,
+"Signal",,,
+"Start event",,,
+"Start events",,,
+"Start node",,,
+"Start transitions",,,
+"Template",,,
+"Template Model",,,
+"Time cycle",,,
+"Time date",,,
+"Time duration",,,
+"Timer",,,
+"Timer event",,,
+"Timer events",,,
+"Transition",,,
+"Transitions",,,
+"Type",,,
+"Workflow",,,
+"Workflow Management",,,
+"Workflow editor",,,
+"Workflows",,,
+"XML",,,
+"XOR",,,
+"You have no sufficient rights.",,,

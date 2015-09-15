@@ -1,290 +1,341 @@
 "key","message","comment","context"
-"({0} items)","({0} éléments)",,"webapp/js/widget/widget.slickgrid.js:1977"
-"About","A propos",,"webapp/index.jsp:121"
-"Action","Action",,"webapp/js/form/form.input.static.js:161
-webapp/js/view/view.search.js:563
-webapp/js/view/view.search.js:772"
-"Action Category","Catégorie",,"webapp/js/view/view.search.js:547
-webapp/js/view/view.search.js:756"
-"Action Sub-Category","Sous catégorie",,"webapp/js/view/view.search.js:555
-webapp/js/view/view.search.js:764"
-"Active Users","Utilisateurs actifs",,"webapp/partials/system.html:36"
-"Add","Ajouter",,"webapp/js/form/form.relational.nested.js:174"
-"Add Field","Ajouter un champ",,"webapp/js/widget/widget.update.js:393"
-"Add filter","Ajouter filtre",,"webapp/js/widget/widget.search.js:526"
-"Advanced Search","Recherche avancée",,"webapp/js/widget/widget.search.js:1044"
-"Alert","Alerte",,"webapp/js/lib/dialogs.js:206"
-"All Day","Toute la journée",,"webapp/js/view/view.calendar.js:446"
-"Apply","Appliquer",,"webapp/js/widget/widget.search.js:532"
-"Apr","Avril",,"webapp/js/form/form.input.datetime.js:41"
-"April","Avril",,"webapp/js/form/form.input.datetime.js:27"
-"Aug","Août",,"webapp/js/form/form.input.datetime.js:45"
-"August","Août",,"webapp/js/form/form.input.datetime.js:31"
-"Back","Retour",,"webapp/js/form/form.relational.nested.js:172
-webapp/partials/views/form.html:18
-webapp/partials/views/form.html:19"
-"Cancel","Annuler",,"webapp/js/form/form.relational.nested.js:175
-webapp/js/lib/dialogs.js:63
-webapp/js/widget/widget.update.js:432
-webapp/partials/views/form.html:15
-webapp/partials/views/form.html:16
-webapp/partials/views/trail.html:7"
-"Clear","Effacer",,"webapp/js/form/form.relational.nested.js:348
-webapp/js/view/view.search.js:582
-webapp/js/widget/widget.search.js:528
-webapp/js/widget/widget.update.js:395"
-"Close","Fermer",,"webapp/js/axelor.app.js:400
-webapp/js/form/form.relational.nested.js:350
-webapp/js/widget/widget.dialog.js:32
-webapp/partials/about.html:51
-webapp/partials/nav-tabs.html:23
-webapp/partials/preferences.html:16
-webapp/partials/system.html:64"
-"Close All","Fermer tout",,"webapp/partials/nav-tabs.html:25"
-"Close Others","Fermer les autres",,"webapp/partials/nav-tabs.html:24"
-"Concurrent updates error","Modification concurrente détectée",,"webapp/js/axelor.app.js:459"
-"Create","Créer",,"webapp/js/view/view.popup.js:667"
-"Create ""{0}"" and add...","Créer ""{0}"" et ajouter...",,"webapp/js/form/form.relational.multiple.js:698"
-"Create ""{0}"" and select...","Créer ""{0}"" et sélectionner...",,"webapp/js/form/form.relational.single.js:321"
-"Create ""{0}""...","Créer ""{0}""...",,"webapp/js/form/form.relational.multiple.js:702
-webapp/js/form/form.relational.single.js:325"
-"Create new","Créer nouveau",,"webapp/partials/views/trail.html:6"
-"Create...","Créer...",,"webapp/js/form/form.relational.multiple.js:714
-webapp/js/form/form.relational.single.js:332"
-"Created By:","Crée par:",,"webapp/js/view/view.form.js:705"
-"Created On:","Crée le:",,"webapp/js/view/view.form.js:701"
-"Current changes will be lost.","Les modifications en cours vont être perdues.",,"webapp/js/axelor.nav.js:439"
-"Current changes will be lost. Do you really want to proceed?","Les modifications en cours vont être perdues, voulez-vous continuer ?",,"webapp/js/view/view.form.js:547"
-"Custom ({0})","Perso. ({0})",,"webapp/js/widget/widget.search.js:852"
-"Day","Journée",,"webapp/partials/views/calendar.html:8"
-"Dec","Déc",,"webapp/js/form/form.input.datetime.js:49"
-"December","Décembre",,"webapp/js/form/form.input.datetime.js:35"
-"Delete","Supprimer",,"webapp/js/view/view.calendar.js:489
-webapp/js/view/view.form.js:730
-webapp/js/widget/widget.search.js:1082
-webapp/partials/views/grid.html:16
-webapp/partials/views/grid.html:17"
-"Do you really want to delete the selected record(s)?","Etes-vous sûr de vouloir supprimer ce(s) enregistrement(s) ?",,"webapp/js/form/form.relational.multiple.js:200
-webapp/js/view/view.grid.js:403
-webapp/js/view/view.popup.js:358"
-"Do you really want to delete the selected record?","Etes-vous sûr de vouloir supprimer l'enregistrement sélectionné ?",,"webapp/js/view/view.form.js:563"
-"Do you really want to update all {0} record(s)?","Etes-vous sûr de vouloir mettre à jour ces {0} enregistrement(s) ?",,"webapp/js/widget/widget.update.js:317"
-"Domain","Domain",,"webapp/js/form/form.input.static.js:167"
-"Done","Choisir",,"webapp/js/form/form.input.datetime.js:67"
-"Download","Télécharger",,"webapp/js/view/view.popup.js:728"
-"Duplicate","Copier",,"webapp/js/view/view.form.js:738"
-"Edit","Modifier",,"webapp/js/form/form.relational.multiple.js:573
-webapp/js/form/form.relational.single.js:210
-webapp/partials/views/form.html:10
-webapp/partials/views/form.html:9
-webapp/partials/views/grid.html:10
-webapp/partials/views/grid.html:9"
-"Edit event","Modifier évènement",,"webapp/js/view/view.calendar.js:502"
-"Error","Erreur",,"webapp/js/axelor.app.js:378
-webapp/js/axelor.app.js:414
-webapp/js/lib/dialogs.js:221
-webapp/js/lib/dialogs.js:41"
-"Expanded","Etendu",,"webapp/js/view/view.chart.js:561"
-"Export","Exporter",,"webapp/js/widget/widget.search.js:530"
-"Export in progress ...","Export en cours ...",,"webapp/js/view/view.grid.js:610"
-"Failed!","Echec",,"webapp/partials/login-window.html:11"
-"Feb","Févr",,"webapp/js/form/form.input.datetime.js:39"
-"February","Février",,"webapp/js/form/form.input.datetime.js:25"
-"Field Name","Nom du champ",,"webapp/js/form/form.input.static.js:206"
-"Field Type","Type de champ",,"webapp/js/form/form.input.static.js:207"
-"Filter","Filtre",,"webapp/js/form/form.input.static.js:214"
-"Filters","Filtres",,"webapp/js/widget/widget.search.js:1051"
-"Filters ({0})","Filtres ({0})",,"webapp/js/widget/widget.search.js:847"
-"Fr","V",,"webapp/js/form/form.input.datetime.js:61"
-"Free Memory","Mémoire libre",,"webapp/partials/system.html:30"
-"Fri","Ven",,"webapp/js/form/form.input.datetime.js:60"
-"Friday","Vendredi",,"webapp/js/form/form.input.datetime.js:57"
-"Go","Lancer",,"webapp/js/view/view.search.js:599
-webapp/js/view/view.search.js:795"
-"Group by","Grouper par",,"webapp/js/widget/widget.slickgrid.js:588"
-"Grouped","Groupé",,"webapp/js/view/view.chart.js:26"
-"Hide","Cacher",,"webapp/js/widget/widget.slickgrid.js:596"
-"Hour","Heure",,"webapp/js/form/form.input.datetime.js:63"
-"Information","Information",,"webapp/js/lib/dialogs.js:198
-webapp/js/lib/dialogs.js:28
-webapp/js/lib/dialogs.js:96"
-"Internal Server Error","Erreur interne du serveur",,"webapp/js/axelor.app.js:451"
-"Invalid use of ""{0}"" action, must be the first action.",,,"webapp/js/form/form.actions.js:398"
-"Jan","Janv",,"webapp/js/form/form.input.datetime.js:38"
-"January","Janvier",,"webapp/js/form/form.input.datetime.js:24"
-"Java Runtime","Runtime Java",,"webapp/partials/system.html:11"
-"Java Version","Version Java",,"webapp/partials/system.html:13"
-"Jul","Juil",,"webapp/js/form/form.input.datetime.js:44"
-"July","Juillet",,"webapp/js/form/form.input.datetime.js:30"
-"Jun","Juin",,"webapp/js/form/form.input.datetime.js:43"
-"June","Juin",,"webapp/js/form/form.input.datetime.js:29"
-"Last access time","Heure du dernier accès",,"webapp/partials/system.html:46"
-"Loading","Chargement",,"webapp/js/axelor.app.js:58"
-"Log in","Se connecter",,"webapp/js/axelor.app.js:348
-webapp/js/axelor.app.js:359
-webapp/login.jsp:26"
-"Log in attempt failed.","Tentative de connexion échoué.",,"webapp/partials/login-window.html:11"
-"Log in time","Heure de connexion",,"webapp/partials/system.html:45"
-"Log out","Déconnexion",,"webapp/index.jsp:123"
-"Log...","Log...",,"webapp/js/view/view.form.js:747"
-"Mar","Mars",,"webapp/js/form/form.input.datetime.js:40"
-"March","Mars",,"webapp/js/form/form.input.datetime.js:26"
-"Mass Update","Mise à jour en masse",,"webapp/js/widget/widget.update.js:376
-webapp/partials/views/grid.html:12"
-"Max Memory","Mémoire max",,"webapp/partials/system.html:26"
-"May","Mai",,"webapp/js/form/form.input.datetime.js:28
-webapp/js/form/form.input.datetime.js:42"
-"Memory Information","Information mémoire",,"webapp/partials/system.html:19"
-"Minute","Minute",,"webapp/js/form/form.input.datetime.js:64"
-"Mo","L",,"webapp/js/form/form.input.datetime.js:61"
-"Mon","Lun",,"webapp/js/form/form.input.datetime.js:60"
-"Monday","Lundi",,"webapp/js/form/form.input.datetime.js:53"
-"Month","Mois",,"webapp/partials/views/calendar.html:6"
-"More","Plus",,"webapp/js/widget/widget.navmenu.js:209"
-"My Filters","Mes filtres",,"webapp/js/widget/widget.search.js:1060"
-"New","Nouveau",,"webapp/js/form/form.relational.multiple.js:574
-webapp/js/form/form.relational.single.js:211
-webapp/partials/views/form.html:6
-webapp/partials/views/form.html:7
-webapp/partials/views/grid.html:6
-webapp/partials/views/grid.html:7"
-"Next","Suivant",,"webapp/js/form/form.input.datetime.js:69"
-"No","Non",,"webapp/js/lib/dialogs.js:63"
-"No filters available","Aucun filtre disponible",,"webapp/js/widget/widget.search.js:1048"
-"No records found.","Aucune donnée trouvée.",,"webapp/js/view/view.chart.js:555
-webapp/js/view/view.search.js:194
-webapp/js/widget/widget.slickgrid.js:717"
-"Nov","Nov",,"webapp/js/form/form.input.datetime.js:48"
-"November","Novembre",,"webapp/js/form/form.input.datetime.js:34"
-"Now","Aujourd'hui",,"webapp/js/form/form.input.datetime.js:66"
-"OK","OK",,"webapp/js/form/form.relational.nested.js:173
-webapp/js/lib/dialogs.js:103
-webapp/js/lib/dialogs.js:62
-webapp/js/widget/widget.dialog.js:42"
-"Object","Objet",,"webapp/js/form/form.input.static.js:164
-webapp/js/form/form.input.static.js:205
-webapp/js/view/view.search.js:353"
-"Oct","Oct",,"webapp/js/form/form.input.datetime.js:47"
-"October","Octobre",,"webapp/js/form/form.input.datetime.js:33"
-"Offline!","Hors ligne",,"webapp/partials/login-window.html:14"
-"Operating System","Système d'exploitation",,"webapp/partials/system.html:9"
-"Orig. Value","Valeur orig.",,"webapp/js/form/form.input.static.js:249"
-"Password","Mot de passe",,"webapp/login.jsp:29
-webapp/partials/login-window.html:6"
-"Please correct the invalid form values.","Merci de corriger les champs du formulaire non valides.",,"webapp/js/form/form.actions.js:307"
-"Please sign in","Identification",,"webapp/login.jsp:24"
-"Please wait...","Merci de patienter...",,"webapp/js/axelor.app.js:203"
-"Preferences","Préférences",,"webapp/index.jsp:120"
-"Prev","Précédent",,"webapp/js/form/form.input.datetime.js:68"
-"Question","Question",,"webapp/js/lib/dialogs.js:59"
-"Reference","Référence",,"webapp/js/form/form.input.static.js:218"
-"Refresh","Actualiser",,"webapp/js/view/view.form.js:725
-webapp/js/view/view.portal.js:267
-webapp/partials/nav-tabs.html:21
-webapp/partials/system.html:63
-webapp/partials/views/calendar.html:11
-webapp/partials/views/trail.html:10"
-"Remember me","Se souvenir",,"webapp/login.jsp:25"
-"Remove","Supprimer",,"webapp/js/form/form.relational.multiple.js:575
-webapp/js/view/view.popup.js:729"
-"Sa","S",,"webapp/js/form/form.input.datetime.js:61"
-"Sat","Sam",,"webapp/js/form/form.input.datetime.js:60"
-"Saturday","Samedi",,"webapp/js/form/form.input.datetime.js:58"
-"Save","Enregistrer",,"webapp/js/widget/widget.search.js:1080
-webapp/partials/preferences.html:15
-webapp/partials/views/form.html:12
-webapp/partials/views/form.html:13
-webapp/partials/views/grid.html:13
-webapp/partials/views/grid.html:14"
-"Save as","Sauvegarder sous",,"webapp/js/widget/widget.search.js:1081"
-"Save filter as","Sauver filter sous",,"webapp/js/widget/widget.search.js:1075"
-"Search","Rechercher",,"webapp/js/view/view.search.js:576"
-"Search Objects","Sélectionner objet",,"webapp/js/view/view.search.js:533"
-"Search...","Rechercher...",,"webapp/js/form/form.relational.multiple.js:708
-webapp/js/form/form.relational.single.js:314"
-"Second","Seconde",,"webapp/js/form/form.input.datetime.js:65"
-"Select","Selectionner",,"webapp/js/form/form.relational.multiple.js:1078
-webapp/js/form/form.relational.multiple.js:1079
-webapp/js/form/form.relational.multiple.js:576
-webapp/js/form/form.relational.nested.js:349
-webapp/js/form/form.relational.single.js:212
-webapp/js/view/view.popup.js:652"
-"Sep","Sept",,"webapp/js/form/form.input.datetime.js:46"
-"September","Septembre",,"webapp/js/form/form.input.datetime.js:32"
-"Server is not responding.","Le serveur ne répond pas",,"webapp/partials/login-window.html:14"
-"Share","Partager",,"webapp/js/widget/widget.search.js:1077"
-"Show","Voir",,"webapp/js/form/form.relational.multiple.js:1080
-webapp/js/widget/widget.slickgrid.js:1192"
-"Show Details","Afficher les détails",,"webapp/js/axelor.app.js:392"
-"Show archived","Afficher archives",,"webapp/js/widget/widget.search.js:521"
-"Sort Ascending","Tri croissant",,"webapp/js/widget/widget.slickgrid.js:579"
-"Sort Descending","Tri décroissant",,"webapp/js/widget/widget.slickgrid.js:583"
-"Stack %","Empilé %",,"webapp/js/view/view.chart.js:562"
-"Stacked","Empilé",,"webapp/js/view/view.chart.js:27
-webapp/js/view/view.chart.js:559"
-"Stream","Flux",,"webapp/js/view/view.chart.js:560"
-"Su","D",,"webapp/js/form/form.input.datetime.js:61"
-"Success","Succès",,"webapp/js/lib/dialogs.js:213"
-"Sun","Dim",,"webapp/js/form/form.input.datetime.js:60"
-"Sunday","Dimanche",,"webapp/js/form/form.input.datetime.js:52"
-"System Information","Information système",,"webapp/partials/about.html:45
-webapp/partials/system.html:4"
-"Th","J",,"webapp/js/form/form.input.datetime.js:61"
-"The following fields are invalid:","Les champs suivants sont invalides:",,"webapp/js/view/view.form.js:1067
-webapp/js/widget/widget.slickgrid.js:951"
-"The record has been updated or delete by another action.","L'enregistrement a été modifié ou supprimé par une autre action.",,"webapp/js/view/view.form.js:442"
-"There are some invalid rows.","Il y a des lignes invalides.",,"webapp/js/widget/widget.slickgrid.js:981"
-"Thu","Jeu",,"webapp/js/form/form.input.datetime.js:60"
-"Thursday","Jeudi",,"webapp/js/form/form.input.datetime.js:56"
-"Today","Aujourd'hui",,"webapp/partials/views/calendar.html:16"
-"Toggle","Réduire",,"webapp/js/view/view.portal.js:268"
-"Total Memory","Mémoire totale",,"webapp/partials/system.html:24"
-"Tu","M",,"webapp/js/form/form.input.datetime.js:61"
-"Tue","Mar",,"webapp/js/form/form.input.datetime.js:60"
-"Tuesday","Mardi",,"webapp/js/form/form.input.datetime.js:54"
-"Ungroup","Dégrouper",,"webapp/js/widget/widget.slickgrid.js:591"
-"Unknown","Inconnue",,"webapp/js/view/view.calendar.js:144
-webapp/js/view/view.calendar.js:204"
-"Update","Mettre à jour",,"webapp/js/widget/widget.update.js:431"
-"Update all","Tout mettre à jour",,"webapp/js/widget/widget.update.js:434"
-"Updated By:","Mise à jour par:",,"webapp/js/view/view.form.js:713"
-"Updated On:","Mise à jour le:",,"webapp/js/view/view.form.js:709"
-"Upload",,,"webapp/js/view/view.popup.js:727"
-"Used Memory","Mémoire utilisé",,"webapp/partials/system.html:28"
-"User","Utilisateur",,"webapp/partials/login-window.html:4
-webapp/partials/system.html:44"
-"User name","Utilisateur",,"webapp/login.jsp:28"
-"Validation error","Erreur de validation",,"webapp/js/form/form.actions.js:308"
-"View","Vue",,"webapp/js/form/form.input.static.js:170"
-"Warning","Avertissement",,"webapp/js/form/form.actions.js:544
-webapp/js/lib/dialogs.js:34"
-"We","M",,"webapp/js/form/form.input.datetime.js:61"
-"Wed","Mer",,"webapp/js/form/form.input.datetime.js:60"
-"Wednesday","Mercredi",,"webapp/js/form/form.input.datetime.js:55"
-"Week","Semaine",,"webapp/partials/views/calendar.html:7"
-"Wk","Sem.",,"webapp/js/form/form.input.datetime.js:62"
-"Would you like to reload the current record?","Voulez-vous actualiser l'enregistrement actuel ?",,"webapp/js/view/view.form.js:443"
-"Would you like to remove the filter?","Voulez-vous supprimer le filtre ?",,"webapp/js/widget/widget.search.js:738"
-"Yes","Oui",,"webapp/js/lib/dialogs.js:62"
-"You are not allow to upload a file bigger than","Vous n'êtes pas autoriser à uploader un fichier plus grand que",,"webapp/js/form/form.input.binary.js:171
-webapp/js/view/view.popup.js:397"
-"and","et",,"webapp/js/widget/widget.search.js:515"
-"and {0} more","et {0} plus",,"webapp/js/form/form.input.select.js:466"
-"contains","contient",,"webapp/js/widget/widget.search.js:32"
-"doesn't contain","ne contient pas",,"webapp/js/widget/widget.search.js:33"
-"equals","égal",,"webapp/js/widget/widget.search.js:25"
-"greater or equal","supérieur ou égal",,"webapp/js/widget/widget.search.js:27"
-"greater than","supérieure à",,"webapp/js/widget/widget.search.js:29"
-"in range","compris entre",,"webapp/js/widget/widget.search.js:35"
-"is false","est faux",,"webapp/js/widget/widget.search.js:42"
-"is not null","n'est pas null",,"webapp/js/widget/widget.search.js:39"
-"is null","est null",,"webapp/js/widget/widget.search.js:38"
-"is true","est vrai",,"webapp/js/widget/widget.search.js:41"
-"less or equal","inférieure ou égale",,"webapp/js/widget/widget.search.js:28"
-"less than","inférieure à",,"webapp/js/widget/widget.search.js:30"
-"not equal","pas égal",,"webapp/js/widget/widget.search.js:26"
-"not in range","non compris entre",,"webapp/js/widget/widget.search.js:36"
-"or","ou",,"webapp/js/widget/widget.search.js:518"
-"{0} of {1}","{0} sur {1}",,"webapp/js/view/view.form.js:639"
-"{0} to {1} of {2}","{0} à {1} sur {2}",,"webapp/js/view/view.grid.js:353
-webapp/js/view/view.tree.js:417"
+"%d days",,,
+"%d hours",,,
+"%d minutes",,,
+"%d months",,,
+"%d years",,,
+"%s ago",,,
+"(end)",,,
+"(start)",,,
+"({0} items)","({0} éléments)",,
+":: 'New'",,,
+":: 'Refresh'",,,
+"About","A propos",,
+"Action","Action",,
+"Action Category","Catégorie",,
+"Action Sub-Category","Sous catégorie",,
+"Activate the create/remove space tool",,,
+"Activate the lasso tool",,,
+"Active",,,
+"Active Users","Utilisateurs actifs",,
+"Add","Ajouter",,
+"Add Field","Ajouter un champ",,
+"Add filter","Ajouter filtre",,
+"Add some tags",,,
+"Advanced Search","Recherche avancée",,
+"Alert","Alerte",,
+"All Day","Toute la journée",,
+"Append {0}",,,
+"Apply","Appliquer",,
+"Apr","Avril",,
+"April","Avril",,
+"Archived",,,
+"Are you sure to unfollow this document?",,,
+"Are you sure to unfollow this group?",,,
+"Are you sure you want to delete selected documents?",,,
+"Attached to...",,,
+"Aug","Août",,
+"August","Août",,
+"Back","Retour",,
+"Background color",,,
+"Blockquote",,,
+"Bold (Ctrl+B)",,,
+"Cancel","Annuler",,
+"Cancelled",,,
+"Center",,,
+"Clear","Effacer",,
+"Click or drop image",,,
+"Close","Fermer",,
+"Close All","Fermer tout",,
+"Close Others","Fermer les autres",,
+"Concurrent updates error","Modification concurrente détectée",,
+"Connect using Sequence/MessageFlow",,,
+"Create","Créer",,
+"Create ""{0}"" and add...","Créer ""{0}"" et ajouter...",,
+"Create ""{0}"" and select...","Créer ""{0}"" et sélectionner...",,
+"Create ""{0}""...","Créer ""{0}""...",,
+"Create document",,,
+"Create folder",,,
+"Create spreadsheet",,,
+"Create...","Créer...",,
+"Created",,,
+"Created By:","Crée par:",,
+"Created On:","Crée le:",,
+"Current changes will be lost.","Les modifications en cours vont être perdues.",,
+"Current changes will be lost. Do you really want to proceed?","Les modifications en cours vont être perdues, voulez-vous continuer ?",,
+"Custom ({0})","Perso. ({0})",,
+"Date",,,
+"Day","Journée",,
+"Days",,,
+"Dec","Déc",,
+"December","Décembre",,
+"Delete","Supprimer",,
+"Delete...",,,
+"Description",,,
+"Details",,,
+"Do you really want to delete the selected record(s)?","Etes-vous sûr de vouloir supprimer ce(s) enregistrement(s) ?",,
+"Do you really want to delete the selected record?","Etes-vous sûr de vouloir supprimer l'enregistrement sélectionné ?",,
+"Do you really want to update all {0} record(s)?","Etes-vous sûr de vouloir mettre à jour ces {0} enregistrement(s) ?",,
+"Document",,,
+"Domain","Domain",,
+"Done","Choisir",,
+"Download","Télécharger",,
+"Downloading {0}...",,,
+"Drop your files to start upload.",,,
+"Duplicate","Copier",,
+"Duration",,,
+"Edit","Modifier",,
+"Edit event","Modifier évènement",,
+"Edit...",,,
+"Error","Erreur",,
+"Expanded","Etendu",,
+"Export","Exporter",,
+"Export full",,,
+"Failed",,,
+"Failed!","Echec",,
+"Feb","Févr",,
+"February","Février",,
+"Field Name","Nom du champ",,
+"Field Type","Type de champ",,
+"File upload",,,
+"Filter","Filtre",,
+"Filters","Filtres",,
+"Filters ({0})","Filtres ({0})",,
+"Folder",,,
+"Followers",,,
+"Formated",,,
+"Fr","V",,
+"Free Memory","Mémoire libre",,
+"Fri","Ven",,
+"Friday","Vendredi",,
+"Go","Lancer",,
+"Group by","Grouper par",,
+"Grouped","Groupé",,
+"Header",,,
+"Header 1",,,
+"Header 2",,,
+"Header 3",,,
+"Header 4",,,
+"Header 5",,,
+"Header 6",,,
+"Hide","Cacher",,
+"Home",,,
+"Hour","Heure",,
+"Hours",,,
+"Indent",,,
+"Information","Information",,
+"Insert image",,,
+"Insert link",,,
+"Internal Server Error","Erreur interne du serveur",,
+"Invalid permissions",,,
+"Invalid use of ""{0}"" action, must be the first action.",,,
+"Invalid use of ""{0}"" action, must be the last action.",,,
+"Italic (Ctrl+I)",,,
+"Item ID",,,
+"Jan","Janv",,
+"January","Janvier",,
+"Java Runtime","Runtime Java",,
+"Java Version","Version Java",,
+"Jul","Juil",,
+"July","Juillet",,
+"Jun","Juin",,
+"June","Juin",,
+"Justify",,,
+"L",,,
+"Last access time","Heure du dernier accès",,
+"Left",,,
+"Link",,,
+"Loading","Chargement",,
+"Log in","Se connecter",,
+"Log in attempt failed.","Tentative de connexion échoué.",,
+"Log in time","Heure de connexion",,
+"Log out","Déconnexion",,
+"Log...","Log...",,
+"Mar","Mars",,
+"March","Mars",,
+"Mark as important",,,
+"Mark as not important",,,
+"Mark as read",,,
+"Mark as unread",,,
+"Mass Update","Mise à jour en masse",,
+"Max Memory","Mémoire max",,
+"Max node counter",,,
+"May","Mai",,
+"Memory Information","Information mémoire",,
+"Milestone",,,
+"Minute","Minute",,
+"Minutes",,,
+"Mo","L",,
+"Model",,,
+"Modified",,,
+"Mon","Lun",,
+"Monday","Lundi",,
+"Month","Mois",,
+"Months",,,
+"More","Plus",,
+"More actions",,,
+"My Filters","Mes filtres",,
+"Name",,,
+"New","Nouveau",,
+"New Document",,,
+"New Folder",,,
+"New Spreadsheet",,,
+"New task",,,
+"Next","Suivant",,
+"No","Non",,
+"No documents found.",,,
+"No filters available","Aucun filtre disponible",,
+"No records found.","Aucune donnée trouvée.",,
+"Normal",,,
+"Nov","Nov",,
+"November","Novembre",,
+"Now","Aujourd'hui",,
+"OK","OK",,
+"Object","Objet",,
+"Oct","Oct",,
+"October","Octobre",,
+"Offline!","Hors ligne",,
+"Operating System","Système d'exploitation",,
+"Ordered list",,,
+"Orig. Value","Valeur orig.",,
+"Outdent",,,
+"Owner",,,
+"Password","Mot de passe",,
+"Pending",,,
+"Permissions",,,
+"Permissions...",,,
+"Please correct the invalid form values.","Merci de corriger les champs du formulaire non valides.",,
+"Please sign in","Identification",,
+"Please wait...","Merci de patienter...",,
+"Post",,,
+"Preferences","Préférences",,
+"Prev","Précédent",,
+"Project",,,
+"Properties",,,
+"Question","Question",,
+"Reference","Référence",,
+"Refresh","Actualiser",,
+"Remember me","Se souvenir",,
+"Remove","Supprimer",,
+"Remove format",,,
+"Rename...",,,
+"Report attached to current object. Would you like to download?",,,
+"Retry",,,
+"Right",,,
+"Role",,,
+"Sa","S",,
+"Sat","Sam",,
+"Saturday","Samedi",,
+"Save","Enregistrer",,
+"Save as","Sauvegarder sous",,
+"Save filter as","Sauver filter sous",,
+"Search","Rechercher",,
+"Search Objects","Sélectionner objet",,
+"Search...","Rechercher...",,
+"Second","Seconde",,
+"Select","Selectionner",,
+"Sep","Sept",,
+"September","Septembre",,
+"Sequence",,,
+"Server is not responding.","Le serveur ne répond pas",,
+"Share","Partager",,
+"Show","Voir",,
+"Show Details","Afficher les détails",,
+"Show archived","Afficher archives",,
+"Signal",,,
+"Sort Ascending","Tri croissant",,
+"Sort Descending","Tri décroissant",,
+"Spreadsheet",,,
+"Stack %","Empilé %",,
+"Stacked","Empilé",,
+"Start time",,,
+"Stream","Flux",,
+"Strikethrough (Ctrl+S)",,,
+"Style",,,
+"Su","D",,
+"Submit",,,
+"Success","Succès",,
+"Sun","Dim",,
+"Sunday","Dimanche",,
+"System Information","Information système",,
+"Task",,,
+"Task name",,,
+"Task will be deleted permanently, are you sure?",,,
+"Text color",,,
+"Th","J",,
+"The following fields are invalid:","Les champs suivants sont invalides:",,
+"The record has been updated or delete by another action.","L'enregistrement a été modifié ou supprimé par une autre action.",,
+"The {0}={1} event can't call 'save' action on unsaved o2m item.",,,
+"There are some invalid rows.","Il y a des lignes invalides.",,
+"Thu","Jeu",,
+"Thursday","Jeudi",,
+"Time Cycle",,,
+"Time period",,,
+"Today","Aujourd'hui",,
+"Toggle","Réduire",,
+"Total Memory","Mémoire totale",,
+"Tu","M",,
+"Tue","Mar",,
+"Tuesday","Mardi",,
+"Type",,,
+"Underline (Ctrl+U)",,,
+"Ungroup","Dégrouper",,
+"Unknown","Inconnue",,
+"Unordered list",,,
+"Update","Mettre à jour",,
+"Update all","Tout mettre à jour",,
+"Updated By:","Mise à jour par:",,
+"Updated On:","Mise à jour le:",,
+"Upload complete",,,
+"Uploading files...",,,
+"Used Memory","Mémoire utilisé",,
+"User","Utilisateur",,
+"Username",,,
+"Validation error","Erreur de validation",,
+"View","Vue",,
+"Warning","Avertissement",,
+"We","M",,
+"Wed","Mer",,
+"Wednesday","Mercredi",,
+"Week","Semaine",,
+"Wk","Sem.",,
+"Would you like to reload the current record?","Voulez-vous actualiser l'enregistrement actuel ?",,
+"Would you like to remove the filter?","Voulez-vous supprimer le filtre ?",,
+"Years",,,
+"Yes","Oui",,
+"You are not allow to upload a file bigger than","Vous n'êtes pas autoriser à uploader un fichier plus grand que",,
+"You can't create document here.",,,
+"[Last] dddd [at] LT",,,
+"[Today at] LT",,,
+"[Tomorrow at] LT",,,
+"[Yesterday at] LT",,,
+"a day",,,
+"a few seconds",,,
+"a minute",,,
+"a month",,,
+"a year",,,
+"an hour",,,
+"and","et",,
+"and {0} more","et {0} plus",,
+"contains","contient",,
+"dddd [at] LT",,,
+"doesn't contain","ne contient pas",,
+"equals","égal",,
+"greater or equal","supérieur ou égal",,
+"greater than","supérieure à",,
+"in %s",,,
+"in range","compris entre",,
+"is false","est faux",,
+"is not null","n'est pas null",,
+"is null","est null",,
+"is true","est vrai",,
+"less or equal","inférieure ou égale",,
+"less than","inférieure à",,
+"load more",,,
+"not equal","pas égal",,
+"not in range","non compris entre",,
+"or","ou",,
+"replies ({0})",,,
+"will be deleted",,,
+"{0} of {1}","{0} sur {1}",,
+"{0} to {1} of {2}","{0} à {1} sur {2}",,
