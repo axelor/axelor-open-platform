@@ -106,6 +106,9 @@ public class AppServletModule extends ServletModule {
 		// no-cache filter
 		filter("/js/*", NoCacheFilter.STATIC_URL_PATTERNS).through(NoCacheFilter.class);
 
+		// CORS filter
+		filter("*").through(CorsFilter.class);
+
 		// intercept all response methods
 		bindInterceptor(Matchers.any(),
 				Matchers.returns(Matchers.subclassesOf(Response.class)),
