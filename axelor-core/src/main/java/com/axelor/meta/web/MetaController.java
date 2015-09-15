@@ -30,8 +30,6 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
-import org.joda.time.LocalDateTime;
-
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -42,7 +40,6 @@ import com.axelor.meta.MetaScanner;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaField;
-import com.axelor.meta.db.MetaGroupMenuAssistant;
 import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
@@ -52,7 +49,6 @@ import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.actions.ActionView;
-import com.axelor.meta.service.MetaGroupMenuAssistantService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.google.common.base.Throwables;
@@ -68,9 +64,6 @@ public class MetaController {
 
 	@Inject
 	private MetaTranslationRepository translations;
-
-	@Inject
-	private MetaGroupMenuAssistantService groupMenuAssistantService;
 
 	private ObjectViews validateXML(String xml) {
 		try {
@@ -226,28 +219,5 @@ public class MetaController {
 			}
 		}
 		response.setFlash(I18n.get("Export complete."));
-	}
-
-	public void createGroupMenuFile(ActionRequest request, ActionResponse response) {
-
-		MetaGroupMenuAssistant groupMenuAssistant = request.getContext().asType(MetaGroupMenuAssistant.class);
-		groupMenuAssistantService.createGroupMenuFile(groupMenuAssistant);
-		response.setReload(true);
-	}
-
-	public void importGroupMenu(ActionRequest request, ActionResponse response) {
-
-		MetaGroupMenuAssistant groupMenuAssistant = request.getContext().asType(MetaGroupMenuAssistant.class);
-		String errorLog = groupMenuAssistantService.importGroupMenu(groupMenuAssistant);
-
-		if(errorLog.equals("")){
-			response.setFlash("Imported completed succesfully");
-			response.setValue("importDate", LocalDateTime.now());
-		}
-		else{
-			response.setValue("log", errorLog);
-			response.setFlash("Error in import. Please check the log");
-		}
-
 	}
 }

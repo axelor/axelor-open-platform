@@ -45,24 +45,6 @@
     <view type="form" name="permission-form" />
   </action-view>
   
-  <menuitem name="menu-auth-permission-assistant" parent="menu-auth" title="Permission Assistant"
-    action="action-auth-permission-assistant"/>
-
-  <action-view name="action-auth-permission-assistant" title="Permission Assistant"
-    model="com.axelor.auth.db.PermissionAssistant">
-    <view type="grid" name="permission-assistant-grid" />
-    <view type="form" name="permission-assistant-form" />
-  </action-view>
-  
-  <menuitem name="menu-meta-group-menu-assistant" parent="menu-auth" title="Group Menu Assistant"
-    action="action-group-menu-assistant" />
-
-  <action-view name="action-group-menu-assistant" title="Group Menu Assistant"
-    model="com.axelor.meta.db.MetaGroupMenuAssistant">
-    <view type="grid" name="meta-group-menu-assistant-grid" />
-    <view type="form" name="meta-group-menu-assistant-form" />
-  </action-view>
-  
   <menuitem name="menu-meta-module" parent="menu-module-management"
     title="All Modules"
     action="meta.modules"/>
