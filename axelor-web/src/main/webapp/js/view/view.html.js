@@ -21,11 +21,19 @@ var ui = angular.module('axelor.ui');
 
 this.HtmlViewCtrl = HtmlViewCtrl;
 
-HtmlViewCtrl.$inject = ['$scope', '$element'];
-function HtmlViewCtrl($scope, $element) {
+HtmlViewCtrl.$inject = ['$scope', '$element', '$sce'];
+function HtmlViewCtrl($scope, $element, $sce) {
 
 	var views = $scope._views;
 	$scope.view = views['html'];
+
+	$scope.getURL = function () {
+		var view = $scope.view;
+		if (view) {
+			return $sce.trustAsResourceUrl(view.name || view.resource);
+		}
+		return null;
+	};
 };
 
 var directiveFn = function(){
@@ -34,7 +42,7 @@ var directiveFn = function(){
 		replace: true,
 		template:
 		'<div class="iframe-container">'+
-			'<iframe ng-src="{{view.name || view.resource}}" frameborder="0" scrolling="auto"></iframe>'+
+			'<iframe ng-src="{{getURL()}}" frameborder="0" scrolling="auto"></iframe>'+
 		'</div>'
 	};
 };
