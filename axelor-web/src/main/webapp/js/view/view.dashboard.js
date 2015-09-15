@@ -224,6 +224,7 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 
 			scope.parseDashlet = _.once(function(dashlet, view) {
 				var body = element.find('.dashlet-body:first');
+				var header = element.find('.dashlet-header:first');
 				var template = $('<div ui-portlet-' + view.viewType + '></div>');
 
 				scope.noFilter = !dashlet.canSearch;
@@ -232,7 +233,9 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 				body.append(template);
 
 				if (dashlet.height) {
-					body.height(dashlet.height);
+					setTimeout(function() {
+						body.css("height", "calc(100% - " + header.outerHeight() + "px)");
+					})
 				}
 				if (dashlet.css) {
 					element.addClass(dashlet.css);
