@@ -197,7 +197,7 @@ ui.directive('uiMailMessage', function () {
 		},
 		template: "" +
 			"<div class='fade'>" +
-				"<a href='' class='pull-left avatar' title='{{::message.createdBy.name}}' ng-click='showUser(message.author)'>" +
+				"<a href='' class='pull-left avatar' title='{{::$userName(message.createdBy)}}' ng-click='showUser(message.author)'>" +
 					"<img ng-src='{{::message.$avatar}}' width='32px'>" +
 				"</a>" +
 				"<div class='mail-message'>" +
@@ -259,7 +259,7 @@ ui.directive('uiMailMessage', function () {
 								"<a href='' ng-click='onReplies(message)'>{{formatNumReplies(message)}}</a>" +
 							"</span>" +
 							"<span>" +
-								"<a href='' ng-click='showUser(message.author)'>{{::message.author.name}}</a> " +
+								"<a href='' ng-click='showUser(message.author)'>{{::$userName(message.author)}}</a> " +
 								"<span>{{formatEvent(message)}}</span>" +
 							"</span>" +
 						"</div>" +
@@ -708,7 +708,7 @@ ui.formWidget('uiMailFollowers', {
 			"<div class='panel-body'>" +
 			"<ul class='links'>" +
 				"<li ng-repeat='follower in followers'>" +
-				"<a href='' ng-click='showUser(follower)'>{{follower.name}}</a> " +
+				"<a href='' ng-click='showUser(follower)'>{{$userName(follower)}}</a> " +
 				"<i class='fa fa-remove' ng-click='onUnfollow(follower)'></i>" +
 				"</li>" +
 			"</ul>" +
@@ -734,6 +734,12 @@ ui.formWidget('PanelMail', {
 				state: author.id
 			});
 		}
+
+		$scope.$userName = function (user) {
+			if (!user) return null;
+			var key = __appSettings["user.nameField"] || "name";
+			return user[key] || user.name;
+		};
 
 		var folder = undefined;
 		var tab = $scope.tab || {};
