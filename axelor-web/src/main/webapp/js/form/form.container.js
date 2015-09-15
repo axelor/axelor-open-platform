@@ -725,7 +725,12 @@ ui.formWidget('PanelTabs', {
 
 		scope.$timeout(function() {
 			setup();
-			scope.selectTab(_.first(scope.tabs));
+			var first = _.find(scope.tabs, function (tab) {
+				return !tab.hidden;
+			});
+			if (first) {
+				scope.selectTab(first);
+			}
 		});
 
 		scope.$on('on:edit', function (e, record) {
