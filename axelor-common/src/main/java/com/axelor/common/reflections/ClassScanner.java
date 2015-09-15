@@ -142,7 +142,6 @@ final class ClassScanner {
 	
 	private Set<String> getSubTypesOf(String type) throws IOException {
 
-		Set<String> all = Sets.newHashSet();
 		Set<String> types = Sets.newHashSet();
 
 		if (collectors.isEmpty()) {
@@ -156,16 +155,11 @@ final class ClassScanner {
 			}
 			if (my.contains(type)) {
 				types.add(klass);
+				types.addAll(getSubTypesOf(klass));
 			}
 		}
-
-		all.addAll(types);
 		
-		for (String klass : types) {
-			all.addAll(getSubTypesOf(klass));
-		}
-		
-		return all;
+		return types;
 	}
 	
 	private void scan() throws IOException {
@@ -204,8 +198,8 @@ final class ClassScanner {
 	}
 
 	private void scan(final String type) throws ClassNotFoundException {
-		Collector collector = collectors.get(type);
-		if (collector != null) {
+
+		if (collectors.containsKey(type) ||  Object.class.getName().equals(type)) {
 			return;
 		}
 
@@ -225,9 +219,12 @@ final class ClassScanner {
 			try {
 				BufferedInputStream in = new BufferedInputStream(stream);
 				ClassReader reader = new ClassReader(in);
-				collector = new Collector();
+				Collector collector = new Collector();
 				reader.accept(collector, ASM_FLAGS);
 				collectors.put(type, collector);
+				if (collector.superNames != null) {
+					for (String base : collector.superNames) { scan(base); }
+				}
 			} finally {
 				stream.close();
 			}
