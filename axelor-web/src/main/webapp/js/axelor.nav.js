@@ -471,29 +471,6 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 		});
 	});
 
-	$scope.$on("$locationChangeStart", function (event, newUrl, oldUrl) {
-
-		// don't allow browser back action if dialog is open
-		var dialog = $("body").children(".ui-dialog:visible").first();
-		if (dialog.size()) {
-			event.preventDefault();
-		    return false;
-		}
-
-		var viewScope = ($scope.selectedTab||{}).$viewScope;
-		var baseLength = $location.absUrl().length - $location.url().length;
-		if (viewScope && viewScope.confirmDirty && viewScope.$$dirty) {
-			viewScope.confirmDirty(function () {
-				viewScope.setEditable(false);
-				viewScope.editRecord(null);
-				$location.url(newUrl.substring(baseLength));
-				$scope.applyLater();
-			});
-			event.preventDefault();
-		    return false;
-		}
-	});
-
 	var confirm = _t('Current changes will be lost.');
 	
 	function onbeforeunload(e) {
