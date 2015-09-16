@@ -141,10 +141,6 @@ ui.formWidget('Dashlet', {
 		if (field.name) {
 			scope.formPath = field.name;
 		}
-
-		if (field.height) {
-			element.height(field.height);
-		}
 	},
 
 	template:

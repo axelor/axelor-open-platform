@@ -234,8 +234,8 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 
 				if (dashlet.height) {
 					setTimeout(function() {
-						body.css("height", "calc(100% - " + header.outerHeight() + "px)");
-					})
+						body.css("height", Math.max(0, dashlet.height - header.outerHeight()));
+					});
 				}
 				if (dashlet.css) {
 					element.addClass(dashlet.css);
