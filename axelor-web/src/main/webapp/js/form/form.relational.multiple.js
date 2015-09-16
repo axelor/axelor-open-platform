@@ -297,7 +297,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 
 		function fetchData() {
 			var items = scope.getValue();
-			scope.fetchData(items, function(records){
+			return scope.fetchData(items, function(records){
 				records =  ensureIds(records);
 				scope.setItems(records);
 			});
