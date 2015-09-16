@@ -770,7 +770,7 @@ ui.formInput('NavSelect', {
 		}
 
 		function adjust() {
-			if (elemNavs === null) {
+			if (elemNavs === null || element.is(":hidden")) {
 				return;
 			}
 			var currentValue = scope.getValue();
