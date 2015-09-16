@@ -497,9 +497,20 @@ function buttonScope(scope) {
 	btnScope._dataSource = handler._dataSource;
 	btnScope.editRecord = function (record) {};
 	btnScope.reload = function () {
+		if ((handler.field||{}).target) {
+			handler.$parent.reload();
+		}
 		return handler.onRefresh();
 	};
-	
+	if ((handler.field||{}).target) {
+		btnScope.onSave = function () {
+			return handler.$parent.onSave.call(handler.$parent, {
+				callOnSave: false,
+				wait: false
+			});
+		};
+	}
+
 	return btnScope;
 }
 
