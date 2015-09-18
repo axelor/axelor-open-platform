@@ -20,10 +20,10 @@
             <i class="fa fa-refresh"></i> <span ng-if="::!tbTitleHide" x-translate>Refresh</span>
           </button>
         </div>
-        <div class="btn-group" ng-if="::toolbar.length">
+        <div class="btn-group" ng-if="toolbar">
           <button ng-repeat="btn in toolbar | filter:{custom: true}" class="btn" ui-tool-button="btn">{{btn.title}}</button>
         </div>
-        <div ui-menu-bar menus="menubar" handler="this" ng-if="::menubar.length"></div>
+        <div ui-menu-bar menus="menubar" handler="this" ng-show="menubar"></div>
         <div ui-filter-box x-handler="this"></div>
         <div ui-view-switcher class="pull-right"></div>
         <div ui-record-pager class="pull-right"></div>

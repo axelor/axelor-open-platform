@@ -700,6 +700,8 @@ img.prefix-icon {
 }
 .record-toolbar .button-menu a.btn img {
 	margin-top: -2px;
+    max-width: 16px;
+    max-height: 16px
 }
 
 .record-toolbar .button-menu:last-child a.btn {
