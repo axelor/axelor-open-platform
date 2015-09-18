@@ -229,6 +229,13 @@ input, button, textarea, select, fieldset, pre {
 	color: #333;
 }
 
+.picker-icons i.fa {
+	color: #ccc;
+}
+.picker-icons i.fa:hover {
+	color: #333;
+}
+
 .progress,
 .progress .bar {
 	border-radius: 0 !important;

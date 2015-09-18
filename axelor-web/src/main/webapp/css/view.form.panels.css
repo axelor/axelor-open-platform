@@ -182,6 +182,33 @@
 	min-height: 28px;
 }
 
+.panel-layout .form-item-container.editable input[type="text"],
+.panel-layout .form-item-container.editable input[type="password"],
+.panel-layout .form-item-container.editable input[type="number"],
+.panel-layout .form-item-container.editable input[type="email"],
+.panel-layout .form-item-container.editable input[type="url"],
+.panel-layout .form-item-container.editable .tag-select {
+	border-top-width: 0;
+	border-left-width: 0;
+	border-right-width: 0;
+	padding-left: 0;
+}
+
+.panel-layout .slick-cell .form-item-container.editable input[type="text"],
+.panel-layout .slick-cell .form-item-container.editable input[type="password"],
+.panel-layout .slick-cell .form-item-container.editable input[type="number"],
+.panel-layout .slick-cell .form-item-container.editable input[type="email"],
+.panel-layout .slick-cell .form-item-container.editable input[type="url"],
+.panel-layout .slick-cell .form-item-container.editable .tag-select {
+	border-top-width: 1px;
+	border-left-width: 1px;
+	border-right-width: 1px;
+	padding-left: 6px;
+}
+.panel-layout .slick-cell .form-item-container.editable .tag-select {
+	padding-left: 0;
+}
+
 .panel-layout .image-item .btn,
 .panel-layout .file-item .btn {
 	width: 32px;
@@ -344,7 +371,37 @@
 
 .panel-layout .editable > .o2m-list .o2m-list-row .toggle-item button {
 	border-left: 0;
+	border-top: 0;
+	border-right: 0;
 	outline: none;
+	height: 28px;
+	color: #ccc;
+	padding: 4px 6px;
+}
+
+.panel-layout .editable > .o2m-list .o2m-list-row .toggle-item button:focus {
+	color: #ccc;
+	background: none;
+	box-shadow: none;
+	border-color: #ccc;
+}
+.panel-layout .editable > .o2m-list .o2m-list-row .toggle-item button:hover,
+.panel-layout .editable > .o2m-list .o2m-list-row .toggle-item button:active,
+.panel-layout .editable > .o2m-list .o2m-list-row .toggle-item button.active {
+	color: #333;
+	background: none;
+	box-shadow: none;
+	border-color: #ccc;
+}
+
+.panel-layout .editable > .o2m-list .o2m-list-remove i,
+.panel-layout .editable > .o2m-list .o2m-list-add i {
+	color: #ccc;
+	font-size: 12px;
+}
+.panel-layout .editable > .o2m-list .o2m-list-remove i:hover,
+.panel-layout .editable > .o2m-list .o2m-list-add i:hover {
+	color: #333;
 }
 
 .panel-layout .row-fluid [class*="span"] {
@@ -373,8 +430,8 @@
 	width: auto;
 }
 
-.panel-layout .row-fluid.has-labels .form-item > a.btn,
-.panel-layout .row-fluid.has-labels .form-item > [x-show-title="false"][ng-model] {
+.panel-layout .row-fluid.has-labels > .form-item > a.btn,
+.panel-layout .row-fluid.has-labels > .form-item > [x-show-title="false"][ng-model] {
 	margin-top: 18px;
 }
 
