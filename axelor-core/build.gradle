@@ -55,9 +55,6 @@ dependencies {
 	// CAS
 	compile libs.apache_shiro_cas
 
-	// iCal
-	compile libs.ical4j
-
 	// BIRT
 	compile(libs.birt_runtime) {
 		exclude module: "derby"
