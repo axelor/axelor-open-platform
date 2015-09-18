@@ -57,7 +57,6 @@
   <entity name="Group" repository="none">
     <string name="code" required="true" unique="true" min="2" />
     <string name="name" required="true" unique="true" min="2" />
-    <one-to-one name="test1" ref="Title" mappedBy="testG"/>
     <many-to-many name="contacts" ref="Contact"/>
   </entity>
 
@@ -87,9 +86,15 @@
     <string name="phone" max="20"  hashKey="false" massUpdate="true"/>
     <string name="notes" multiline="true" title="About Me" />
     <many-to-many name="groups" ref="Group" mappedBy="contacts"/>
+
+    <!-- test o2m fields with mappedBy & orphanRemoval -->
     <one-to-many name="addresses" ref="Address" mappedBy="contact" orderBy="area"/>
-    <one-to-many name="addresses2" ref="Address" mappedBy="contact" orderBy="area" orphan="false"/>
-    <one-to-many name="addresses3" ref="Address" mappedBy="contact" orderBy="area" orphan="true"/>
+    <one-to-many name="addresses2" ref="Address" mappedBy="contact" orderBy="area" orphanRemoval="true"/>
+    <one-to-many name="addresses3" ref="Address" mappedBy="contact" orderBy="area" orphanRemoval="false"/>
+    <one-to-many name="addresses4" ref="Address" orderBy="area" />
+    <one-to-many name="addresses5" ref="Address" orderBy="area" orphanRemoval="true" />
+    <one-to-many name="addresses6" ref="Address" orderBy="area" orphanRemoval="false" />
+
     <index name="IDX_NAMES" columns="firstName,lastName,fullName"/>
     <index columns="id,fullName,email"/>
     <track>
@@ -116,6 +121,17 @@
     <finder-method name="findByContact" using="contact" all="false"/>
     <finder-method name="findByUser" using="user" all="false"/>
     
+  </entity>
+
+  <entity name="Account">
+    <string name="name" required="true" />
+    <one-to-one name="config" ref="AccountConfig" />
+  </entity>
+  <entity name="AccountConfig">
+    <string name="name" required="true" />
+    <one-to-one name="account" ref="AccountConfig" mappedBy="config" />
+    <one-to-one name="account2" ref="AccountConfig" mappedBy="config" orphanRemoval="true" />
+    <one-to-one name="account3" ref="AccountConfig" mappedBy="config" orphanRemoval="false" />
   </entity>
 
   <entity name="ConstraintTester" persistable="false">

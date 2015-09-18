@@ -216,8 +216,8 @@ class Property {
 
 	String getDelinkCode() {
 		def mapped = attrs["mappedBy"]
-		def orphan = this.isOrphan()
-		if (!orphan || !mapped || type != "one-to-many") {
+		def orphanRemoval = this.isOrphanRemoval()
+		if (orphanRemoval || !mapped || type != "one-to-many") {
 			return null
 		}
 		return "item.set" + firstUpper(mapped) + "(null);"
@@ -225,8 +225,8 @@ class Property {
 
 	String getDelinkAllCode() {
 		def mapped = attrs["mappedBy"]
-		def orphan = this.isOrphan()
-		if (!orphan || !mapped || type != "one-to-many") {
+		def orphanRemoval = this.isOrphanRemoval()
+		if (orphanRemoval || !mapped || type != "one-to-many") {
 			return null
 		}
 		return """for(${target} item : ${name}) {
@@ -273,8 +273,15 @@ class Property {
 		return attrs["nullable"] == "true" && attrs["required"] != "true"
 	}
 
-	boolean isOrphan() {
-		return attrs["orphan"] == "true"
+	boolean isOrphanRemoval() {
+		if (attrs.containsKey("orphanRemoval")) {
+			return attrs["orphanRemoval"] == "true"
+		}
+		// if still using old "orphan" attribute
+		if (attrs.containsKey("orphan")) {
+			return attrs["orphan"] == "false"
+		}
+		return type == "one-to-many" && attrs["mappedBy"] != null
 	}
 
 	boolean isPassword() {
@@ -628,17 +635,17 @@ class Property {
 		if (type != "one-to-one") return null
 
 		def mapped = attrs.get('mappedBy')
-		def orphan = this.isOrphan()
+		def orphanRemoval = this.isOrphanRemoval()
 
 		def a = annon("javax.persistence.OneToOne")
 			.add("fetch", "javax.persistence.FetchType.LAZY", false)
 			.add("mappedBy", mapped)
 
-		if (orphan) {
-			a.add("cascade", ["javax.persistence.CascadeType.PERSIST","javax.persistence.CascadeType.MERGE"], false)
-		} else {
+		if (orphanRemoval) {
 			a.add("cascade", "javax.persistence.CascadeType.ALL", false)
 			a.add("orphanRemoval", "true", false)
+		} else {
+			a.add("cascade", ["javax.persistence.CascadeType.PERSIST","javax.persistence.CascadeType.MERGE"], false)
 		}
 		return a
 	}
@@ -656,17 +663,17 @@ class Property {
 		if (type != "one-to-many") return null
 
 		def mapped = attrs.get('mappedBy')
-		def orphan = this.isOrphan()
+		def orphanRemoval = this.isOrphanRemoval()
 
 		def a = annon("javax.persistence.OneToMany")
 			.add("fetch", "javax.persistence.FetchType.LAZY", false)
 			.add("mappedBy", mapped)
 
-		if (orphan) {
-			a.add("cascade", ["javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"], false)
-		} else {
+		if (orphanRemoval) {
 			a.add("cascade", "javax.persistence.CascadeType.ALL", false)
 			a.add("orphanRemoval", "true", false)
+		} else {
+			a.add("cascade", ["javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"], false)
 		}
 		return a
 	}

@@ -61,7 +61,7 @@ ${p.documentation}
 	/**
 	 * Remove the given {@link ${p.target}} item from the {@code ${p.name}}.
 	 *
-<% if (p.serverType == "one-to-many" && p.orphan) {%>\
+<% if (p.serverType == "one-to-many" && !p.orphanRemoval) {%>\
 	 * <p>
 	 * It sets {@code item.${p.mappedBy} = null} to break the relationship.
 	 * </p>
@@ -82,7 +82,7 @@ ${p.documentation}
 	 *
 <% if (p.serverType == "one-to-many") {%>\
 	 * <p>
-<% if (p.orphan) {%>\
+<% if (!p.orphanRemoval) {%>\
 	 * It sets {@code item.${p.mappedBy} = null} to break the relationship.
 <% } else { %>\
 	 * If you have to query {@link ${p.target}} records in same transaction, make

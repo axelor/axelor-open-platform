@@ -300,10 +300,10 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="orphan" type="xsd:boolean">
+        <xsd:attribute name="orphanRemoval" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>
-              Whether to allow orphaned records if parent record is deleted.
+            Specify whether to remove orphaned records if they have been removed from the relationship.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -325,7 +325,6 @@
     <xsd:complexContent mixed="true">
       <xsd:restriction base="dm:RelationalColumn">
         <xsd:attribute name="orderBy" type="xsd:string" use="prohibited"/>
-        <xsd:attribute name="orphan" type="xsd:string" use="prohibited"/>
       </xsd:restriction>
     </xsd:complexContent>
   </xsd:complexType>
@@ -338,7 +337,7 @@
       <xsd:restriction base="dm:RelationalColumn">
         <xsd:attribute name="mappedBy" type="xsd:string" use="prohibited"/>
         <xsd:attribute name="orderBy" type="xsd:string" use="prohibited"/>
-        <xsd:attribute name="orphan" type="xsd:string" use="prohibited"/>
+        <xsd:attribute name="orphanRemoval" type="xsd:boolean" use="prohibited"/>
       </xsd:restriction>
     </xsd:complexContent>
   </xsd:complexType>
@@ -362,7 +361,7 @@
     </xsd:annotation>
     <xsd:complexContent>
       <xsd:restriction base="dm:RelationalColumn">
-        <xsd:attribute name="orphan" type="xsd:boolean" use="prohibited"/>
+        <xsd:attribute name="orphanRemoval" type="xsd:boolean" use="prohibited"/>
         <xsd:attribute name="unique" type="xsd:boolean" use="prohibited"/>
         <xsd:attribute name="index" type="xsd:boolean" use="prohibited"/>
         <xsd:attribute name="massUpdate" type="xsd:boolean" use="prohibited"/>
@@ -863,11 +862,10 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="lang">
+    <xsd:attribute name="lang" default="java">
       <xsd:annotation>
         <xsd:documentation>
-          Generate code in the given language (default is Java but if
-          there are any function fields then defaults to Groovy).
+          Generate code in the given target language.
         </xsd:documentation>
       </xsd:annotation>
       <xsd:simpleType>
