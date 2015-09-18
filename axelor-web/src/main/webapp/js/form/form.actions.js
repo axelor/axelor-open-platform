@@ -549,11 +549,13 @@ ActionHandler.prototype = {
 
 		function doReload(pending) {
 			self._invalidateContext = true;
-			var promise = scope.reload(true);
+			var promise = scope.reload();
 			if (promise) {
 				promise.then(function(){
 					deferred.resolve(pending);
 				}, deferred.reject);
+			} else {
+				deferred.resolve(pending);
 			}
 			return deferred.promise;
 		}
