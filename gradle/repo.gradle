@@ -1,0 +1,22 @@
+def adkRepo = new File(buildscript.sourceFile.parentFile.parentFile, "ivy")
+
+ext.adkPlugins = {
+	fileTree(dir: "${buildscript.sourceFile.parentFile}/libs", include: '*.jar')
+}
+
+ext.adkRepos = {
+	ivy {
+		name "adk"
+		url "file://${adkRepo}"
+	}
+	maven {
+		name "axelor-nexus"
+		url	"http://repository.axelor.com/nexus/content/groups/public/"
+	}
+	jcenter()
+	mavenCentral()
+	mavenLocal()
+}
+
+project.repositories adkRepos
+project.buildscript.repositories adkRepos

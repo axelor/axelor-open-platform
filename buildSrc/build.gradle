@@ -1,0 +1,24 @@
+apply plugin: "java"
+
+allprojects {
+	apply from: "../gradle/repo.gradle"
+	apply from: "../gradle/libs.gradle"
+	apply from: "../version.gradle"
+}
+
+subprojects {
+
+	// build in separate directory to speed up build
+	project.buildDir = "${rootDir}/build/${project.name}"
+
+	// disable tests to speed up build
+	afterEvaluate {
+		project.test.enabled = false
+	}
+}
+
+dependencies {
+	runtime project(':axelor-gradle')
+}
+
+tasks.compileGroovy.enabled = false

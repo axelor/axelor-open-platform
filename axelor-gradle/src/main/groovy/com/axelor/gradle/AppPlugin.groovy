@@ -183,6 +183,11 @@ class AppPlugin extends AbstractPlugin {
 				all += [m.group(1)]
 			}
 		}
+		project.configurations.testRuntime.each { File lib ->
+			if (lib.name.startsWith("axelor-test")) {
+				all += ["axelor-test"]
+			}
+		}
 		return all
 	}
 

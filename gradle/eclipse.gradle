@@ -1,14 +1,41 @@
 import org.gradle.plugins.ide.eclipse.model.Facet
 import org.gradle.plugins.ide.eclipse.model.Facet.FacetType
+import org.gradle.plugins.ide.eclipse.model.SourceFolder
 import org.gradle.plugins.ide.eclipse.model.WbResource
 
-def IGNORE = ['axelor-shell', 'axelor-gradle']
+allprojects {
+
+	// eclipse
+	apply plugin: "eclipse"
+
+	plugins.withType(JavaPlugin) {
+		eclipse {
+			classpath {
+				defaultOutputDir = file("bin/main")
+				file.whenMerged { cp ->
+					// seperate output for main & test sources
+					cp.entries.findAll { it instanceof SourceFolder && it.path == "build/src-gen" }*.output = "bin/main"
+					cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/main/") }*.output = "bin/main"
+					cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/test/") }*.output = "bin/test"
+
+					// remove self-dependency
+					cp.entries.removeAll { it.path.contains("$project.name") && it.kind == 'src' }
+					cp.entries.removeAll { it.path.contains("$project.name/build") && it.kind == 'lib' }
+				}
+			}
+		}
+	}
+}
+
+def WTP_IGNORE = ['axelor-shell', 'axelor-gradle', 'axelor-test']
 
 subprojects {
 
-	if (IGNORE.contains(project.name)) {
+	if (WTP_IGNORE.contains(project.name)) {
 		return
 	}
+
+	apply plugin: "eclipse-wtp"
 
 	task forceWtpComponent(type: GenerateEclipseWtpComponent) {
 		inputFile = project.file('.settings/org.eclipse.wst.common.component')

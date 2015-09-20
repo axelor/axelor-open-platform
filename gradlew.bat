@@ -16,20 +16,6 @@ if "%DIRNAME%" == "" set DIRNAME=.
 set APP_BASE_NAME=%~n0
 set APP_HOME=%DIRNAME%
 
-@rem Add some init scripts.
-set INIT_SCRIPT_ARGS=
-
-cd "%DIRNAME%\axelor-gradle\src\init.d"
-for /f %%f in ('dir /b /on "*.gradle"') do call :initScriptAdd %%~dpnxf
-cd "%DIRNAME%"
-
-goto :initScriptDone
-
-:initScriptAdd
-set "INIT_SCRIPT_ARGS=%INIT_SCRIPT_ARGS% -I %1"
-goto :EOF
-:initScriptDone
-
 @rem Find java.exe
 if defined JAVA_HOME goto findJavaFromJavaHome
 
@@ -85,18 +71,8 @@ set CMD_LINE_ARGS=%$
 
 set CLASSPATH=%APP_HOME%\gradle\wrapper\gradle-wrapper.jar
 
-@rem Clean ivy directory
-if "%1%"=="clean" (
-if exist "%APP_HOME%\ivy" @rd /q /s "%APP_HOME%\ivy"
-)
-
-@rem Deploy axelor-gradle
-if not exist "%APP_HOME%\ivy" (
-"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -classpath "%CLASSPATH%" org.gradle.wrapper.GradleWrapperMain %INIT_SCRIPT_ARGS% -q -p axelor-gradle -x test uploadArchives 2> nul
-)
-
 @rem Execute Gradle
-"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -classpath "%CLASSPATH%" org.gradle.wrapper.GradleWrapperMain %INIT_SCRIPT_ARGS% %CMD_LINE_ARGS%
+"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -classpath "%CLASSPATH%" org.gradle.wrapper.GradleWrapperMain %CMD_LINE_ARGS%
 
 :end
 @rem End local scope for the variables with windows NT shell

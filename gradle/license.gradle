@@ -1,0 +1,69 @@
+buildscript {
+	repositories adkRepos
+	dependencies {
+		classpath libs.plugin_license
+	}
+}
+
+def findHeaderFile(p) {
+	for (dir in [".", "..", "${p.rootDir}", "${p.rootDir}/src/license"]) {
+		if (p.file("${dir}/header.txt").exists()) {
+			return p.file("${dir}/header.txt")
+		}
+	}
+	return p.file("src/license/header.txt")
+}
+
+apply plugin: nl.javadude.gradle.plugins.license.LicensePlugin
+
+license {
+
+	header findHeaderFile(project)
+
+	ignoreFailures true
+
+	mapping {
+		java = 'JAVADOC_STYLE'
+		groovy = 'JAVADOC_STYLE'
+		scala = 'JAVADOC_STYLE'
+		javascript = 'JAVADOC_STYLE'
+	}
+
+	ext.product = "Axelor Business Solutions"
+	ext.inception = "2005"
+	ext.year = Calendar.getInstance().get(Calendar.YEAR)
+	ext.owner = "Axelor"
+	ext.website = "http://axelor.com"
+
+	include "**/*.java"
+	include "**/*.groovy"
+	include "**/*.scala"
+	include "**/*.js"
+
+	excludes(["**/LICENSE", "**/LICENSE.md"])
+	excludes(["**/README", "**/README.md"])
+	excludes(["**/*.properties", "**/*.txt", "**/*.json"])
+}
+
+afterEvaluate {
+	tasks.findAll { it.class.simpleName.startsWith 'License' }.each {
+
+		it.onlyIf { license.header && license.header.exists() }
+
+		def src = fileTree(dir: 'src', excludes: [
+			"**/data/**",
+			"**/data-init/**",
+			"**/data-demo/**",
+			"**/resources/**",
+			"**/webapp/lib/**",
+			"**/webapp/WEB-INF/web.xml"
+		])
+
+		def gen = fileTree('build/src-gen') {
+			include '**/*.java'
+			include '**/*.groovy'
+		}
+
+		it.source = files([src, gen])
+	}
+}

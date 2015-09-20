@@ -28,34 +28,13 @@ sourceSets {
 	}
 }
 
-allprojects {
-
-	apply from: '../version.gradle'
-
-	repositories {
-		ivy {
-			name "localRepo"
-			url "file://${projectDir}/../ivy"
-		}
-	}
-
-	uploadArchives {
-		repositories {
-			add project.repositories.localRepo
-		}
-	}
-}
-
 // sometime installApp fails to process resources
 processResources.outputs.upToDateWhen { false }
 
 task dist(type: Copy) {
 	destinationDir = file("${rootProject.buildDir}/dist")
-	into('init.d') { from 'src/init.d' }
-    into('init.d/libs') {
+    into('gradle/libs') {
 		from jar
         from configurations.runtime - configurations.gradleApi
     }
 }
-
-uploadArchives.dependsOn project(":axelor-common").uploadArchives

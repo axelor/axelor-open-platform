@@ -12,41 +12,6 @@ DEFAULT_JVM_OPTS=""
 APP_NAME="Gradle"
 APP_BASE_NAME=`basename "$0"`
 
-# resolve links - $0 may be a softlink
-PRG="$0"
-
-while [ -h "$PRG" ]; do
-  ls=`ls -ld "$PRG"`
-  link=`expr "$ls" : '.*-> \(.*\)$'`
-  if expr "$link" : '/.*' > /dev/null; then
-    PRG="$link"
-  else
-    PRG=`dirname "$PRG"`/"$link"
-  fi
-done
-
-APP_DIR=`dirname "$PRG"`
-APP_DIR=`cd "$APP_DIR" >/dev/null; pwd`
-
-# Add some init scripts.
-INIT_SCRIPT_ARGS=""
-
-for f in `ls $APP_DIR/axelor-gradle/src/init.d/*.gradle` ; do
-	INIT_SCRIPT_ARGS="$INIT_SCRIPT_ARGS -I $f"
-done
-
-# Remove ivy directory
-if [ "$1" = "clean" ] ; then
-	rm -rf "$APP_DIR/ivy"
-fi
-
-# Make sure the axelor-gradle is deployed in local ivy repo
-if [ ! -d "$APP_DIR/ivy" ] ; then
-	mkdir -p "$APP_DIR/ivy"
-	echo "Configuring axelor-gradle, please wait..."
-	$0 -q -p axelor-gradle -x test uploadArchives &>/dev/null
-fi
-
 # Use the maximum available, or set MAX_FD != -1 to use that value.
 MAX_FD="maximum"
 
@@ -76,11 +41,6 @@ case "`uname`" in
     msys=true
     ;;
 esac
-
-# For Cygwin, ensure paths are in UNIX format before anything is touched.
-if $cygwin ; then
-    [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
-fi
 
 # Attempt to set APP_HOME
 # Resolve links: $0 may be a link
@@ -149,6 +109,7 @@ fi
 if $cygwin ; then
     APP_HOME=`cygpath --path --mixed "$APP_HOME"`
     CLASSPATH=`cygpath --path --mixed "$CLASSPATH"`
+    JAVACMD=`cygpath --unix "$JAVACMD"`
 
     # We build the pattern for arguments to be converted via cygpath
     ROOTDIRSRAW=`find -L / -maxdepth 1 -mindepth 1 -type d 2>/dev/null`
@@ -196,4 +157,4 @@ function splitJvmOpts() {
 eval splitJvmOpts $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS
 JVM_OPTS[${#JVM_OPTS[*]}]="-Dorg.gradle.appname=$APP_BASE_NAME"
 
-exec "$JAVACMD" "${JVM_OPTS[@]}" -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain $INIT_SCRIPT_ARGS "$@"
+exec "$JAVACMD" "${JVM_OPTS[@]}" -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"

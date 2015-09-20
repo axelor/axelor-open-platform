@@ -1,0 +1,132 @@
+def libs = ext.libs = [:]
+def versions = [:]
+
+// versions
+versions.guice = "4.0"
+versions.hibernate = "4.2.19.Final"
+versions.hibernate_validator = "5.2.0.Final"
+
+// unit testing
+libs.junit = "junit:junit:4.11"
+
+// logging
+libs.slf4j			= ["org.slf4j:slf4j-api:1.7.7", "org.slf4j:slf4j-log4j12:1.7.7", "org.slf4j:jcl-over-slf4j:1.7.7"]
+libs.slf4j_simple	= ["org.slf4j:slf4j-api:1.7.7", "org.slf4j:slf4j-simple:1.7.7"]
+libs.slf4j_logback	= ["org.slf4j:slf4j-api:1.7.7", "ch.qos.logback:logback-classic:1.1.2"]
+
+// Guava
+libs.guava = "com.google.guava:guava:18.0"
+libs.jsr305 = "com.google.code.findbugs:jsr305:3.0.0"
+
+// joda
+libs.joda_time = ["joda-time:joda-time:2.3", "org.jadira.usertype:usertype.core:3.0.0.GA"]
+
+// yaml
+libs.snakeyaml = "org.yaml:snakeyaml:1.13"
+
+// Guice
+libs.guice = "com.google.inject:guice:${versions.guice}"
+libs.guice_servlet = "com.google.inject.extensions:guice-servlet:${versions.guice}"
+libs.guice_persist = "com.google.inject.extensions:guice-persist:${versions.guice}"
+libs.guice_multibindings = "com.google.inject.extensions:guice-multibindings:${versions.guice}"
+
+// CGLIB & ASM (repackaged to avoid version conflicts)
+libs.axelor_cglib = "com.axelor:axelor-cglib:3.1"
+
+// Tomcat EL (repackaged to avoid version conflicts)
+libs.axelor_el = "com.axelor:axelor-el:8.0.24"
+
+// javax libs
+libs.javax_servlet = "javax.servlet:javax.servlet-api:3.0.1"
+libs.javax_validation = "javax.validation:validation-api:1.1.0.Final"
+libs.javax_el = ["javax.el:javax.el-api:3.0.0", "org.glassfish:javax.el:3.0.0"]
+libs.javax_mail = ["javax.mail:mail:1.4.7", "javax.mail:javax.mail-api:1.5.1"]
+libs.subetha_smtp =	"org.subethamail:subethasmtp:3.1.7"
+
+// jdbc
+libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.3.3"
+libs.jdbc_postgres = "org.postgresql:postgresql:9.4-1201-jdbc41"
+libs.jdbc_mysql = "mysql:mysql-connector-java:5.1.36"
+
+// Hibernate
+libs.hibernate = [
+    "org.hibernate:hibernate-core:${versions.hibernate}",
+    "org.hibernate:hibernate-entitymanager:${versions.hibernate}",
+    "org.hibernate:hibernate-c3p0:${versions.hibernate}",
+    "org.hibernate:hibernate-validator:${versions.hibernate_validator}"
+]
+libs.hibernate_ehcache = "org.hibernate:hibernate-ehcache:${versions.hibernate}"
+libs.ehcache_core = "net.sf.ehcache:ehcache-core:2.6.11"
+
+// flyway
+libs.flywaydb = "org.flywaydb:flyway-core:3.2.1"
+
+// eclipselink
+libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.5.2"
+
+// groovy
+libs.groovy = "org.codehaus.groovy:groovy-all:2.4.4:indy"
+libs.groovy_wslite = "com.github.groovy-wslite:groovy-wslite:1.1.2"
+
+// jax-rs
+libs.resteasy = [
+	"org.jboss.resteasy:resteasy-jaxrs:3.0.11.Final",
+	"org.jboss.resteasy:resteasy-jackson2-provider:3.0.11.Final",
+	"org.jboss.resteasy:resteasy-servlet-initializer:3.0.11.Final"]
+
+libs.resteasy_multipart = "org.jboss.resteasy:resteasy-multipart-provider:3.0.11.Final"
+
+libs.resteasy_guice = "org.jboss.resteasy:resteasy-guice:3.0.11.Final"
+libs.resteasy_client = "org.jboss.resteasy:resteasy-client:3.0.11.Final"
+libs.resteasy_server = [
+	"org.jboss.resteasy:resteasy-undertow:3.0.11.Final",
+	"io.undertow:undertow-core:1.2.9.Final",
+	"io.undertow:undertow-servlet:1.2.9.Final"]
+
+// jackson
+libs.jackson_libs = [
+	"com.fasterxml.jackson.core:jackson-core:2.5.4",
+	"com.fasterxml.jackson.core:jackson-databind:2.5.4",
+	"com.fasterxml.jackson.core:jackson-annotations:2.5.4",
+	"com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.5.4",
+	"com.fasterxml.jackson.datatype:jackson-datatype-joda:2.5.4",
+	"com.fasterxml.jackson.datatype:jackson-datatype-guava:2.5.4"]
+
+// Apache Shiro
+libs.apache_shiro = [
+	"org.apache.shiro:shiro-core:1.2.3",
+	"org.apache.shiro:shiro-web:1.2.3",
+	"org.apache.shiro:shiro-guice:1.2.3"]
+
+// Apache Shiro CAS
+libs.apache_shiro_cas = [
+	"org.apache.shiro:shiro-cas:1.2.3",
+	"commons-codec:commons-codec:1.10",
+	"org.opensaml:opensaml:1.1",
+	"org.apache.santuario:xmlsec:1.4.3"]
+
+// commons
+libs.commons_logging = "commons-logging:commons-logging:1.1.3"
+libs.commons_cli = "commons-cli:commons-cli:1.2"
+
+// BIRT Runtime
+libs.birt_runtime = "org.eclipse.birt.runtime:org.eclipse.birt.runtime:4.4.1"
+
+// jline
+libs.jline = "jline:jline:2.12"
+
+// Quartz Scheduler
+libs.quartz = "org.quartz-scheduler:quartz:2.2.1"
+
+// xstream
+libs.xstream = "com.thoughtworks.xstream:xstream:1.4.7"
+
+// opencsv
+libs.opencsv = "net.sf.opencsv:opencsv:2.3"
+
+// StringTemplate
+libs.ST4 = "org.antlr:ST4:4.0.7"
+
+// gradle plugins
+libs.plugin_license = "nl.javadude.gradle.plugins:license-gradle-plugin:0.10.0"
+libs.plugin_tomcat = "org.gradle.api.plugins:gradle-tomcat-plugin:1.2.4"
