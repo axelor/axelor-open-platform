@@ -74,12 +74,13 @@ public class ProjectCommands implements CommandProvider {
 		TEMPLATES.put("templates/app/log4j.properties.tmpl", "src/main/resources/log4j.properties");
 		TEMPLATES.put("templates/app/header.txt.tmpl", "src/license/header.txt");
 		//TEMPLATES.put("templates/app/ehcache.xml.tmpl", "src/main/resources/ehcache.xml");
-		
+		TEMPLATES.put("templates/app/adk.gradle.tmpl", "gradle/adk.gradle");
+
 		// gradle wrapper
-		TEMPLATES.put("templates/app/wrapper/gradlew","gradlew");
-		TEMPLATES.put("templates/app/wrapper/gradlew.bat","gradlew.bat");
-		TEMPLATES.put("templates/app/wrapper/gradle/wrapper/gradle-wrapper.jar","gradle/wrapper/gradle-wrapper.jar");
-		TEMPLATES.put("templates/app/wrapper/gradle/wrapper/gradle-wrapper.properties","gradle/wrapper/gradle-wrapper.properties");
+		TEMPLATES.put("templates/app/wrapper/gradlew", "gradlew");
+		TEMPLATES.put("templates/app/wrapper/gradlew.bat", "gradlew.bat");
+		TEMPLATES.put("templates/app/wrapper/gradle/wrapper/gradle-wrapper.jar", "gradle/wrapper/gradle-wrapper.jar");
+		TEMPLATES.put("templates/app/wrapper/gradle/wrapper/gradle-wrapper.properties", "gradle/wrapper/gradle-wrapper.properties");
 		
 		TEMPLATES.put("templates/module/build.gradle.tmpl", "build.gradle");
 		TEMPLATES.put("templates/module/Entity.xml.tmpl", "src/main/resources/domains/<%= model %>.xml");
@@ -173,7 +174,13 @@ public class ProjectCommands implements CommandProvider {
 		vars.put("title", title);
 		vars.put("author", author);
 		vars.put("sdkVersion", BuiltinCommands.getVersion());
-		
+
+		final String pgsqlName = Inflector.getInstance().dasherize(name);
+		final String mysqlName = Inflector.getInstance().underscore(name);
+
+		vars.put("pgsqlName", pgsqlName);
+		vars.put("mysqlName", mysqlName);
+
 		try {
 			for (String template : TEMPLATES.keySet()) {
 				if (template.startsWith("templates/app/")) {

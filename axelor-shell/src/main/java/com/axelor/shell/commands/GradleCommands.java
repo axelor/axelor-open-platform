@@ -19,9 +19,7 @@ package com.axelor.shell.commands;
 
 import static com.axelor.common.StringUtils.isBlank;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.gradle.jarjar.com.google.common.collect.Lists;
@@ -47,49 +45,9 @@ public class GradleCommands implements CommandProvider {
 		this.shell = shell;
 	}
 	
-	private File getHome() {
-		int count = 5;
-		File home = new File(getClass().getProtectionDomain().getCodeSource()
-				.getLocation().getFile());
-		
-		while (count-- > 0 && home != null) {
-			File found = new File(home, "init.d/01-plugins.gradle");
-			if (found.exists()) {
-				return home;
-			}
-			home = home.getParentFile();
-		}
-		return null;
-	}
-	
-	private List<File> getInitScripts() {
-		File home = getHome();
-		if (home == null || !home.exists()) {
-			return null;
-		}
-		final List<File> files = new ArrayList<>();
-		for (File file : new File(home, "init.d").listFiles()) {
-			if (file.getName().endsWith(".gradle")) {
-				files.add(file);
-			}
-		}
-		Collections.sort(files);
-		return files;
-	}
-	
 	private CommandResult execute(String... args) {
 		
 		List<String> arguments = new ArrayList<>();
-		List<File> initScripts = getInitScripts();
-		
-		if (initScripts == null) {
-			throw new IllegalStateException("Unable to locate init scripts.");
-		}
-		
-		for (File file : getInitScripts()) {
-			arguments.add("-I");
-			arguments.add(file.getAbsolutePath());
-		}
 		for (String arg : args) {
 			arguments.add(arg);
 		}

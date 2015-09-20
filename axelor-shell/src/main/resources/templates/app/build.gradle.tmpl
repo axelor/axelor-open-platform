@@ -1,4 +1,11 @@
-apply plugin: 'axelor-app'
+buildscript {
+	apply from: "gradle/adk.gradle"
+	dependencies {
+		classpath adkPlugins()
+	}
+}
+
+apply plugin: "axelor-app"
 
 application {
 
@@ -15,6 +22,10 @@ application {
 }
 
 allprojects {
+
+	sourceCompatibility = 1.7
+	targetCompatibility = 1.7
+
 	license {
 		ext.product = "<%= name %>"
 		ext.owner = "My Company"
