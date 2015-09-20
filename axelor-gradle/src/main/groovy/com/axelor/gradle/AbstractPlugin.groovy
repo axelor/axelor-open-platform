@@ -20,11 +20,9 @@ package com.axelor.gradle
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.plugins.ide.eclipse.model.SourceFolder
 
 import com.axelor.common.VersionUtils
 import com.axelor.gradle.tasks.I18nTask
-
 
 abstract class AbstractPlugin implements Plugin<Project> {
 
@@ -51,8 +49,6 @@ abstract class AbstractPlugin implements Plugin<Project> {
 		project.configure(project) {
 
 			apply plugin: 'groovy'
-			apply plugin: 'eclipse'
-			apply plugin: 'eclipse-wtp'
 		
 			dependencies {
 				compile libs.slf4j
@@ -70,25 +66,6 @@ abstract class AbstractPlugin implements Plugin<Project> {
 				description "Update i18 messages from message catalog."
 				group "Axelor i18n"
 				update = true
-			}
-
-			tasks.eclipse.dependsOn "cleanEclipse"
-
-			eclipse {
-
-				// create src-gen directory so that it's picked up as source folder
-				file("${buildDir}/src-gen").mkdirs()
-
-				// seperate output for main & test sources
-				classpath {
-					defaultOutputDir = file("bin/main")	
-					file {
-						whenMerged {  cp -> 
-							cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/main/") }*.output = "bin/main" 
-							cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/test/") }*.output = "bin/test" 
-						}
-					}
-				}
 			}
 
 			afterEvaluate {

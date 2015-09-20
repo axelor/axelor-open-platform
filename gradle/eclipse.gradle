@@ -1,77 +1,147 @@
+import java.util.List;
+import java.util.regex.Pattern;
+
+import org.gradle.api.Project;
 import org.gradle.plugins.ide.eclipse.model.Facet
 import org.gradle.plugins.ide.eclipse.model.Facet.FacetType
 import org.gradle.plugins.ide.eclipse.model.SourceFolder
 import org.gradle.plugins.ide.eclipse.model.WbResource
 
-allprojects {
+// eclipse
+apply plugin: "eclipse"
 
-	// eclipse
-	apply plugin: "eclipse"
+if (!plugins.hasPlugin("application")) {
+	apply plugin: "eclipse-wtp"
+}
 
-	plugins.withType(JavaPlugin) {
-		eclipse {
-			classpath {
-				defaultOutputDir = file("bin/main")
-				file.whenMerged { cp ->
-					// seperate output for main & test sources
-					cp.entries.findAll { it instanceof SourceFolder && it.path == "build/src-gen" }*.output = "bin/main"
-					cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/main/") }*.output = "bin/main"
-					cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/test/") }*.output = "bin/test"
+plugins.withType(JavaPlugin) {
 
-					// remove self-dependency
-					cp.entries.removeAll { it.path.contains("$project.name") && it.kind == 'src' }
-					cp.entries.removeAll { it.path.contains("$project.name/build") && it.kind == 'lib' }
-				}
+	eclipse {
+
+		// create src-gen directory so that it's picked up as source folder
+		file("${buildDir}/src-gen").mkdirs()
+
+		// seperate output for main & test sources
+		classpath {
+			defaultOutputDir = file("bin/main")
+			file.whenMerged { cp ->
+				// seperate output for main & test sources
+				cp.entries.findAll { it instanceof SourceFolder && it.path == "build/src-gen" }*.output = "bin/main"
+				cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/main/") }*.output = "bin/main"
+				cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/test/") }*.output = "bin/test"
+
+				// remove self-dependency
+				cp.entries.removeAll { it.path.contains("$project.name") && it.kind == 'src' }
+				cp.entries.removeAll { it.path.contains("$project.name/build") && it.kind == 'lib' }
 			}
 		}
 	}
 }
 
-def WTP_IGNORE = ['axelor-shell', 'axelor-gradle', 'axelor-test']
+def namePattern = ~/^(axelor-(?:common|core|web|wkf))-/
 
-subprojects {
+def findCoreModules = { Project project ->
+	def all = []
+	project.configurations.runtime.each { File lib ->
+		def m = namePattern.matcher(lib.name)
+		if (m.find()) {
+			all += [m.group(1)]
+		}
+	}
+	project.configurations.testRuntime.each { File lib ->
+		if (lib.name.startsWith("axelor-test")) {
+			all += ["axelor-test"]
+		}
+	}
+	return all
+}
 
-	if (WTP_IGNORE.contains(project.name)) {
+def linkCoreProjects = { Project project ->
+
+	def linked = findCoreModules(project)
+	def wtpLinked = linked - ['axelor-test']
+
+	project.eclipse.classpath {
+		minusConfigurations += [project.configurations.axelorCore]
+	}
+	project.eclipse.classpath.file {
+		withXml {
+			def node = it.asNode()
+			def ref = node.find { it.@path == "org.eclipse.jst.j2ee.internal.web.container" }
+			if (ref) {
+				ref.plus {
+					linked.collect { name -> classpathentry(kind: 'src', path: "/${name}", exported: 'true')}
+				}
+			} else {
+				linked.each { name -> node.appendNode('classpathentry', [kind: 'src', path: "/${name}", exported: 'true']) }
+			}
+		}
+	}
+
+	if (!project.plugins.hasPlugin("war")) {
 		return
 	}
 
-	apply plugin: "eclipse-wtp"
-
-	task forceWtpComponent(type: GenerateEclipseWtpComponent) {
-		inputFile = project.file('.settings/org.eclipse.wst.common.component')
-		outputFile = project.file('.settings/org.eclipse.wst.common.component')
-		project.afterEvaluate {
-			component.deployName = project.name
-			component.resources = project.sourceSets.main.allSource.srcDirs.collect {
-				new WbResource("/", project.relativePath(it))
+	project.eclipse.wtp.component {
+		minusConfigurations += [project.configurations.axelorCore]
+	}
+	project.eclipse.wtp.component.file {
+		withXml {
+			def node = it.asNode()['wb-module'][0]
+			def refs = node.findAll { it.name() == 'wb-resource' }
+			def extra = {
+				['wb-resource'('deploy-path': "/", 'source-path': "axelor-webapp"),
+				 'wb-resource'('deploy-path': "/", 'source-path': "src/main/webapp")] +
+				wtpLinked.collect { name ->
+					'dependent-module'('deploy-path': "/WEB-INF/lib", handle: "module:/resource/${name}/${name}") {
+						'dependency-type'('uses')
+					}
+				}
+			}
+			def ref = refs.find { it.'@source-path' == "src/main/webapp" };
+			if (ref) {
+				ref.replaceNode extra
+			} else {
+				refs.last()?.plus extra
 			}
 		}
 	}
-
-	task forceWtpFacet(type: GenerateEclipseWtpFacet) {
-		inputFile = project.file('.settings/org.eclipse.wst.common.project.facet.core.xml')
-		outputFile = project.file('.settings/org.eclipse.wst.common.project.facet.core.xml')
-		facet.facets = [
-			new Facet(FacetType.fixed, "jst.java", null),
-			new Facet(FacetType.fixed, "jst.web", null),
-			new Facet(FacetType.installed, "jst.utility", "1.0"),
-			new Facet(FacetType.installed, "jst.java", project.sourceCompatibility.toString())
-		]
-	}
-
-	tasks.eclipse.doLast {
-		forceWtpComponent.execute()
-		forceWtpFacet.execute()
-	}
-
-	eclipse {
-		project {
-			buildCommand 'org.eclipse.wst.common.project.facet.core.builder'
-			buildCommand 'org.eclipse.wst.validation.validationbuilder'
-			natures 'org.eclipse.wst.common.project.facet.core.nature'
-			natures 'org.eclipse.wst.common.modulecore.ModuleCoreNature'
-			natures 'org.eclipse.jem.workbench.JavaEMFNature'
-		}
+	project.eclipse.project {
+		linkedResource name: 'axelor-webapp', type: '2', location: '${WORKSPACE_LOC}/axelor-development-kit/axelor-web/src/main/webapp'
 	}
 }
 
+def eclipseLaunchers = { Project project ->
+	project.tasks.eclipse.doLast {
+		def home = System.getenv("AXELOR_HOME")
+		def launcher = project.file(".settings/Generate Code (${project.name}).launch")
+		launcher.text = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.ui.externaltools.ProgramLaunchConfigurationType">
+<stringAttribute key="org.eclipse.debug.core.ATTR_REFRESH_SCOPE" value="\${workspace}"/>
+<mapAttribute key="org.eclipse.debug.core.environmentVariables">
+<mapEntry key="AXELOR_HOME" value="${home}"/>
+</mapAttribute>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_LAUNCH_CONFIGURATION_BUILD_SCOPE" value="\${none}"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${project.projectDir}/gradlew"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_RUN_BUILD_KINDS" value="full,"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="generateCode"/>
+<booleanAttribute key="org.eclipse.ui.externaltools.ATTR_TRIGGERS_CONFIGURED" value="true"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_WORKING_DIRECTORY" value="${project.projectDir}"/>
+</launchConfiguration>
+"""
+	}
+}
+
+if (plugins.hasPlugin("axelor-app")) {
+	// link core projects
+	if (project.hasProperty('linkCoreInEclipse')) {
+		linkCoreProjects(project)
+		project.subprojects { sub ->
+			if (sub.plugins.hasPlugin('axelor-module')) {
+				linkCoreProjects(sub)
+			}
+		}
+	}
+	// add eclipse launcher
+	eclipseLaunchers(project)
+}

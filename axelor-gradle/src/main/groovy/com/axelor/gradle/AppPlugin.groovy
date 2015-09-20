@@ -17,16 +17,12 @@
  */
 package com.axelor.gradle
 
-import java.util.regex.Pattern
-
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.JavaExec
 import org.gradle.internal.os.OperatingSystem
 
-import com.axelor.common.VersionUtils
 import com.axelor.gradle.tasks.GenerateCode
 import com.axelor.gradle.tasks.VersionTask
 
@@ -85,15 +81,6 @@ class AppPlugin extends AbstractPlugin {
 					try {
 						project.tasks.generateCode.dependsOn p.generateCode
 					} catch (Exception e) {}
-				}
-
-				if (project.hasProperty('linkCoreInEclipse')) {
-					linkCoreProjects(project)
-					project.subprojects { sub ->
-						if (sub.plugins.hasPlugin('axelor-module')) {
-							linkCoreProjects(sub)
-						}
-					}
 				}
             }
 
@@ -167,103 +154,6 @@ class AppPlugin extends AbstractPlugin {
 
 			tomcatRun.dependsOn "copyWebapp"
 			tomcatRun.webAppSourceDirectory = file("${buildDir}/webapp")
-
-			// add eclipse launcher
-			eclipseLaunchers(project)
         }
     }
-
-	private Pattern namePattern = ~/^(axelor-(?:common|core|web|wkf))-/
-
-	private List<String> findCoreModules(Project project) {
-		def all = []
-		project.configurations.runtime.each { File lib ->
-			def m = namePattern.matcher(lib.name)
-			if (m.find()) {
-				all += [m.group(1)]
-			}
-		}
-		project.configurations.testRuntime.each { File lib ->
-			if (lib.name.startsWith("axelor-test")) {
-				all += ["axelor-test"]
-			}
-		}
-		return all
-	}
-
-	private void linkCoreProjects(Project project) {
-
-		def linked = findCoreModules(project)
-		def wtpLinked = linked - ['axelor-test']
-
-		project.eclipse.classpath {
-			minusConfigurations += [project.configurations.axelorCore]
-		}
-		project.eclipse.classpath.file {
-			withXml {
-				def node = it.asNode()
-				def ref = node.find { it.@path == "org.eclipse.jst.j2ee.internal.web.container" }
-				if (ref) {
-					ref.plus {
-						linked.collect { name -> classpathentry(kind: 'src', path: "/${name}", exported: 'true')}
-					}
-				} else {
-					linked.each { name -> node.appendNode('classpathentry', [kind: 'src', path: "/${name}", exported: 'true']) }
-				}
-			}
-		}
-
-		if (!project.plugins.hasPlugin("war")) {
-			return
-		}
-
-		project.eclipse.wtp.component {
-			minusConfigurations += [project.configurations.axelorCore]
-		}
-		project.eclipse.wtp.component.file {
-			withXml {
-				def node = it.asNode()['wb-module'][0]
-				def refs = node.findAll { it.name() == 'wb-resource' }
-				def extra = {
-					['wb-resource'('deploy-path': "/", 'source-path': "axelor-webapp"),
-					 'wb-resource'('deploy-path': "/", 'source-path': "src/main/webapp")] +
-					wtpLinked.collect { name ->
-						'dependent-module'('deploy-path': "/WEB-INF/lib", handle: "module:/resource/${name}/${name}") {
-							'dependency-type'('uses')
-						}
-					}
-				}
-				def ref = refs.find { it.'@source-path' == "src/main/webapp" };
-				if (ref) {
-					ref.replaceNode extra
-				} else {
-					refs.last()?.plus extra
-				}
-			}
-		}
-		project.eclipse.project {
-			linkedResource name: 'axelor-webapp', type: '2', location: '${WORKSPACE_LOC}/axelor-development-kit/axelor-web/src/main/webapp'
-		}
-	}
-
-	private void eclipseLaunchers(Project project) {
-		project.tasks.eclipse.doLast {
-			def home = System.getenv("AXELOR_HOME")
-			def launcher = project.file(".settings/Generate Code (${project.name}).launch")
-			launcher.text = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<launchConfiguration type="org.eclipse.ui.externaltools.ProgramLaunchConfigurationType">
-<stringAttribute key="org.eclipse.debug.core.ATTR_REFRESH_SCOPE" value="\${workspace}"/>
-<mapAttribute key="org.eclipse.debug.core.environmentVariables">
-<mapEntry key="AXELOR_HOME" value="${home}"/>
-</mapAttribute>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_LAUNCH_CONFIGURATION_BUILD_SCOPE" value="\${none}"/>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${project.projectDir}/gradlew"/>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_RUN_BUILD_KINDS" value="full,"/>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="generateCode"/>
-<booleanAttribute key="org.eclipse.ui.externaltools.ATTR_TRIGGERS_CONFIGURED" value="true"/>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_WORKING_DIRECTORY" value="${project.projectDir}"/>
-</launchConfiguration>
-"""
-		}
-	}
 }
