@@ -38,27 +38,9 @@ plugins.withType(JavaPlugin) {
 	}
 }
 
-def namePattern = ~/^(axelor-(?:common|core|web|wkf))-/
-
-def findCoreModules = { Project project ->
-	def all = []
-	project.configurations.runtime.each { File lib ->
-		def m = namePattern.matcher(lib.name)
-		if (m.find()) {
-			all += [m.group(1)]
-		}
-	}
-	project.configurations.testRuntime.each { File lib ->
-		if (lib.name.startsWith("axelor-test")) {
-			all += ["axelor-test"]
-		}
-	}
-	return all
-}
-
 def linkCoreProjects = { Project project ->
 
-	def linked = findCoreModules(project)
+	def linked = ["axelor-common", "axelor-test", "axelor-core", "axelor-web", "axelor-wkf"]
 	def wtpLinked = linked - ['axelor-test']
 
 	project.eclipse.classpath {
@@ -132,9 +114,9 @@ def eclipseLaunchers = { Project project ->
 	}
 }
 
-if (plugins.hasPlugin("axelor-app")) {
-	// link core projects
-	if (project.hasProperty('linkCoreInEclipse')) {
+ext.adkEclipseLinks = {
+	if (plugins.hasPlugin("axelor-app")) {
+		// link core projects
 		linkCoreProjects(project)
 		project.subprojects { sub ->
 			if (sub.plugins.hasPlugin('axelor-module')) {
@@ -142,6 +124,9 @@ if (plugins.hasPlugin("axelor-app")) {
 			}
 		}
 	}
+}
+
+afterEvaluate {
 	// add eclipse launcher
 	eclipseLaunchers(project)
 }
