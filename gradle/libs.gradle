@@ -129,4 +129,4 @@ libs.ST4 = "org.antlr:ST4:4.0.7"
 
 // gradle plugins
 libs.plugin_license = "nl.javadude.gradle.plugins:license-gradle-plugin:0.10.0"
-libs.plugin_tomcat = "org.gradle.api.plugins:gradle-tomcat-plugin:1.2.4"
+libs.plugin_tomcat = "com.bmuschko:gradle-tomcat-plugin:2.2.2"

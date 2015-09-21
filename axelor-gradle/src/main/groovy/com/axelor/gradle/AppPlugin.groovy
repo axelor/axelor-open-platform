@@ -33,7 +33,7 @@ class AppPlugin extends AbstractPlugin {
 		project.configure(project) {
 
 			apply plugin: 'war'
-			apply plugin: 'tomcat'
+			apply plugin: 'com.bmuschko.tomcat'
 
             def definition = extensions.create("application", AppDefinition)
 
@@ -52,12 +52,10 @@ class AppPlugin extends AbstractPlugin {
 				
 				providedCompile	libs.javax_servlet
 
-				def tomcatVersion = '7.0.54'
+				def tomcatVersion = '7.0.64'
 				tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
-					   "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}"
-				tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}") {
-					exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
-				}
+					   "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
+					   "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
 			}
 
 			allprojects {
