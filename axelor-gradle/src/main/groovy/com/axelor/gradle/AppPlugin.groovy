@@ -62,6 +62,7 @@ class AppPlugin extends AbstractPlugin {
 				configurations {
 					axelorCore
 					axelorCore.transitive = false
+					compile.exclude group: 'c3p0', module: 'c3p0'
 				}
 				dependencies {
 					axelorCore "com.axelor:axelor-common:${sdkVersion}"
