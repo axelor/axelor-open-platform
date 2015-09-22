@@ -114,14 +114,12 @@ def eclipseLaunchers = { Project project ->
 	}
 }
 
-ext.adkEclipseLinks = {
-	if (plugins.hasPlugin("axelor-app")) {
-		// link core projects
-		linkCoreProjects(project)
-		project.subprojects { sub ->
-			if (sub.plugins.hasPlugin('axelor-module')) {
-				linkCoreProjects(sub)
-			}
+ext.adkLinks = {
+	afterEvaluate {
+		if (project.plugins.hasPlugin("axelor-app") ||
+			project.plugins.hasPlugin("axelor-module")) {
+			// link core projects
+			linkCoreProjects(project)
 		}
 	}
 }
