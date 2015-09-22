@@ -20,7 +20,7 @@
 var bundle = {};
 
 function gettext(key) {
-	var message = bundle[key] || key;
+	var message = bundle[key] || bundle[(key||'').trim()] || key;
 	if (message && arguments.length > 1) {
 		for(var i = 1 ; i < arguments.length ; i++) {
 			var placeholder = new RegExp('\\{' + (i-1) + '\\}', 'g');

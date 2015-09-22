@@ -3,10 +3,10 @@
     <div class="navbar-inner">
       <div class="container">
         <div class="btn-group">
-          <button class="btn" ng-click="onNew()" ng-if="hasButton('new')" title="{{:: 'New' | t}}">
+          <button class="btn" ng-click="onNew()" ng-if="hasButton('new')" title="{{:: _t('New') }}">
             <i class="fa fa-plus"></i> <span ng-if="::!tbTitleHide" x-translate>New</span>
           </button>
-          <button class="btn" ng-click="onRefresh()" ng-if="hasButton('refresh')" title="{{:: 'Refresh' | t}}">
+          <button class="btn" ng-click="onRefresh()" ng-if="hasButton('refresh')" title="{{:: _t('Refresh') }}">
             <i class="fa fa-refresh"></i> <span ng-if="::!tbTitleHide" x-translate>Refresh</span>
           </button>
         </div>

@@ -235,15 +235,15 @@ ui.directive('uiMailMessage', function () {
 							"<span ng-if='::!message.relatedId'>{{::message.$name}}</span>" +
 							"<span ng-if='::message.subject'> : {{::message.subject}}</span>" +
 						"</span>" +
-						"<span class='track-message'>{{::body.title}}</span>" +
+						"<span class='track-message'>{{:: _t(body.title) }}</span>" +
 						"<span class='track-tags'>" +
-							"<span class='label' ng-class='::item.css' ng-repeat='item in ::body.tags'>{{::item.title}}</span>" +
+							"<span class='label' ng-class='::item.css' ng-repeat='item in ::body.tags'>{{:: _t(item.title) }}</span>" +
 						"</span>" +
 					"</div>" +
 					"<div class='mail-message-body'>" +
 						"<ul class='track-fields' ng-if='::body'>" +
 							"<li ng-repeat='item in ::body.tracks'>" +
-								"<strong>{{::item.title}}</strong> : <span ng-bind-html='::item.value'></span>" +
+								"<strong>{{:: _t(item.title) }}</strong> : <span ng-bind-html='::item.value'></span>" +
 							"</li>" +
 						"</ul>" +
 						"<div ng-if='!body' ui-bind-template x-text='message.body'></div>" +

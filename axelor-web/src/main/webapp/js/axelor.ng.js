@@ -59,6 +59,9 @@
 				}
 			};
 
+			// expose _t() to use in template
+			__custom__._t = _t;
+
 			__custom__.$actionPromises = [];
 			__custom__.waitForActions = function waitForActions(callback, wait) {
 				if ($q === null) {
