@@ -19,7 +19,10 @@ package com.axelor.shell.commands;
 
 import static com.axelor.common.StringUtils.isBlank;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.List;
 
 import org.gradle.jarjar.com.google.common.collect.Lists;
@@ -27,7 +30,6 @@ import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
 
-import com.axelor.common.StringUtils;
 import com.axelor.shell.core.CommandProvider;
 import com.axelor.shell.core.CommandResult;
 import com.axelor.shell.core.Shell;
@@ -44,14 +46,13 @@ public class GradleCommands implements CommandProvider {
 	public GradleCommands(Shell shell) {
 		this.shell = shell;
 	}
-	
+
 	private CommandResult execute(String... args) {
-		
-		List<String> arguments = new ArrayList<>();
-		for (String arg : args) {
-			arguments.add(arg);
-		}
-		
+		return execute(Arrays.asList(args));
+	}
+
+	private CommandResult execute(Iterable<String> arguments) {
+
 		if (connector == null) {
 			connector = GradleConnector.newConnector();
 		}
@@ -59,33 +60,52 @@ public class GradleCommands implements CommandProvider {
 		connector.forProjectDirectory(shell.getWorkingDir());
 		ProjectConnection connection = connector.connect();
 		
+		final OutputStream nullStream = new OutputStream() {
+
+			@Override
+			public void write(int b) throws IOException {
+			}
+		};
+
+		final PrintStream outStream = System.out;
+		final PrintStream errStream = System.err;
+
+		System.setOut(new PrintStream(nullStream));
+		System.setErr(new PrintStream(nullStream));
+
 		try {
-			BuildLauncher launcher = connection.newBuild();
-			launcher.withArguments(arguments.toArray(new String[] {}));
-			// Run the build
+			final BuildLauncher launcher = connection.newBuild();
+			launcher.setStandardOutput(outStream);
+			launcher.setStandardError(errStream);
+			launcher.withArguments(arguments);
 			launcher.run();
 		} catch (Exception e) {
-			System.err.println("Command failed: " + e);
+			errStream.println("Command failed: " + e);
 		} finally {
 			connection.close();
+			System.setOut(outStream);
+			System.setErr(errStream);
 		}
-		
+
 		return new CommandResult(true);
 	}
 
 	@CliCommand(name = "clean", help = "clean the project build")
 	public void clean() {
-		execute("-q", "clean");
+		execute("clean");
 	}
-	
+
 	@CliCommand(name = "build", usage = "[OPTIONS]", help = "build the project")
 	public CommandResult build(
-			@CliOption(name = "verbose", shortName = 'v', help = "show verbose output")
-			boolean verbose) {
-		if (verbose) {
-			return execute("-x", "test", "--stacktrace", "build");
-		}
-		return execute("-q", "-x", "test", "build");
+			@CliOption(name = "quiet", shortName = 'q', help = "show errors only")
+			boolean quiet,
+			@CliOption(name = "stacktrace", shortName = 's', help = "show stacktrace for all exceptions")
+			boolean stacktrace) {
+		final List<String> args = Lists.newArrayList("-x", "test");
+		if (quiet) { args.add("-q"); }
+		if (stacktrace) { args.add("--stacktrace"); }
+		args.add("build");
+		return execute(args);
 	}
 	
 	@CliCommand(name = "run", usage = "[OPTIONS]", help = "run the embedded tomcat server")
@@ -94,24 +114,21 @@ public class GradleCommands implements CommandProvider {
 			String port,
 			@CliOption(name = "config", shortName = 'c', argName = "FILE", help = "application configuration file")
 			String config,
-			@CliOption(name = "debug", shortName = 'd', help = "run in debug mode.", defaultValue = "true")
-			boolean debug,
-			@CliOption(name = "war", shortName = 'w', help = "run the war package")
-			boolean war) {
+			@CliOption(name = "quiet", shortName = 'v', help = "show errors only")
+			boolean quiet) {
 		
-		final List<String> args = Lists.newArrayList("-q", "-x", "test");
+		final List<String> args = Lists.newArrayList("-x", "test");
+		if (quiet) {
+			args.add("-q");
+		}
 		if (!isBlank(config)) {
 			args.add("-Daxelor.config=" + config);
 		}
 		if (!isBlank(port)) {
 			args.add("-Phttp.port=" + port);
 		}
-		if (war) {
-			args.add("tomcatRunWar");
-		} else {
-			args.add("tomcatRun");
-		}
-		return execute(args.toArray(new String[] {}));
+		args.add("tomcatRun");
+		return execute(args);
 	}
 
 	@CliCommand(name = "i18n", usage = "[OPTIONS]", help = "extract/update translatable messages")
@@ -125,16 +142,16 @@ public class GradleCommands implements CommandProvider {
 			@CliOption(name = "with-context", shortName = 'c', help = "extract context details.")
 			boolean withContext) {
 		final String task = update ? "i18n-update" : "i18n-extract";
-		final List<String> args = Lists.newArrayList("-q", "-x", "test");
+		final List<String> args = Lists.newArrayList("-x", "test");
 		if (withContext) {
 			args.add("-Pwith.context=true");
 		}
-		if (!StringUtils.isBlank(module)) {
+		if (!isBlank(module)) {
 			args.add("-p");
 			args.add(module);
 		}
 		args.add(task);
-		return execute(args.toArray(new String[] {}));
+		return execute(args);
 	}
 
 	@CliCommand(name = "init", usage = "[OPTIONS] [MODULES...]", help = "initialize or update the database")
@@ -152,7 +169,7 @@ public class GradleCommands implements CommandProvider {
 		if (modules != null && modules.length > 0) {
 			args.add("-Pmodules=" + Joiner.on(",").join(modules));
 		}
-		return execute(args.toArray(new String[] {}));
+		return execute(args);
 	}
 
 	@CliCommand(name = "migrate", usage = "[OPTIONS]", help = "run database migration scripts")
@@ -165,6 +182,6 @@ public class GradleCommands implements CommandProvider {
 		if (verbose) {
 			args.add("-Pverbose=true");
 		}
-		return execute(args.toArray(new String[] {}));
+		return execute(args);
 	}
 }
