@@ -204,7 +204,7 @@ final class AuditTracker {
 
 			String title = property.getTitle();
 			if (isBlank(title)) {
-				title = Inflector.getInstance().titleize(name);
+				title = Inflector.getInstance().humanize(name);
 			}
 
 			final Object value = values.get(name);
