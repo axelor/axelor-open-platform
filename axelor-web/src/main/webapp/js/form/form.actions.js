@@ -933,7 +933,15 @@ ActionHandler.prototype = {
 				if (!views.grid) tab.views.push({type: 'grid'});
 				if (!views.form) tab.views.push({type: 'form'});
 			}
-			
+			if (tab.viewType === "html" && (tab.params||{}).download) {
+				var view = _.findWhere(tab.views, { type: "html" });
+				if (view) {
+					var url = view.name || view.resource;
+					var fileName = tab.params.fileName || "true";
+					ui.download(url, fileName);
+					return scope.applyLater();
+				}
+			}
 			if (tab.params && tab.params.popup) {
 				tab.$popupParent = formScope;
 			}
