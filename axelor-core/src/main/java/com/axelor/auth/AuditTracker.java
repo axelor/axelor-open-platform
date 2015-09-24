@@ -183,7 +183,7 @@ final class AuditTracker {
 				hasEvent(tm, previousState == null ? TrackEvent.CREATE : TrackEvent.UPDATE)) {
 				boolean matched = tm.fields().length == 0;
 				for (String field : tm.fields()) {
-					matched = !Objects.equal(values.get(field), oldValues.get(field));
+					matched = previousState != null && !Objects.equal(values.get(field), oldValues.get(field));
 					if (matched) {
 						break;
 					}
