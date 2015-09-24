@@ -572,6 +572,12 @@ function Chart(scope, element, data) {
 
 	nv.addGraph(function generate() {
 		
+		var noData = _t('No records found.');
+		if (data.dataset && data.dataset.stacktrace) {
+			noData = data.dataset.message;
+			data.dataset = [];
+		}
+
 		var maker = CHARTS[type] || CHARTS.bar || function () {};
 		var chart = maker(scope, element, data);
 
@@ -580,7 +586,7 @@ function Chart(scope, element, data) {
 		}
 
 		if (chart.noData) {
-			chart.noData(_t('No records found.'));
+			chart.noData(noData);
 		}
 		if(chart.controlLabels) {
 			chart.controlLabels({
