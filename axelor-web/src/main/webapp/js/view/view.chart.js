@@ -630,7 +630,19 @@ function Chart(scope, element, data) {
 		if (chart.yAxis && data.yTitle) {
 			chart.yAxis.axisLabel(data.yTitle);
 		}
-		
+
+		var margin = null;
+		['top', 'left', 'bottom', 'right'].forEach(function (side) {
+			var key = 'margin-' + side;
+			var val = parseInt(config[key]);
+			if (val) {
+				(margin||(margin={}))[side] = val;
+			}
+		});
+		if (chart.margin && margin) {
+			chart.margin(margin);
+		}
+
 		var lastWidth = 0;
 		var lastHeight = 0;
 		
