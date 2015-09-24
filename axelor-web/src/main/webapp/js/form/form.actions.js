@@ -534,6 +534,19 @@ ActionHandler.prototype = {
 			return deferred.promise;
 		}
 		
+		if (data.exportFile) {
+			(function () {
+				var link = "ws/files/data-export/" + data.exportFile;
+				var frame = $('<iframe>').appendTo('body').hide();
+				frame.attr("src", link);
+				setTimeout(function(){
+					frame.attr("src", "");
+					frame.remove();
+					frame = null;
+				}, 5000);
+			})();
+		}
+		
 		if (data.signal === 'refresh-app') {
 			if(data.flash || data.info) {
 				axelor.dialogs.box(data.flash || data.info, {
@@ -643,19 +656,6 @@ ActionHandler.prototype = {
 		
 		if (data.signal) {
 			formScope.$broadcast(data.signal, data['signal-data']);
-		}
-		
-		if (data.exportFile) {
-			(function () {
-				var link = "ws/files/data-export/" + data.exportFile;
-				var frame = $('<iframe>').appendTo('body').hide();
-				frame.attr("src", link);
-				setTimeout(function(){
-					frame.attr("src", "");
-					frame.remove();
-					frame = null;
-				}, 5000);
-			})();
 		}
 
 		function findItems(name) {
