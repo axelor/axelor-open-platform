@@ -423,13 +423,15 @@ angular.module('axelor.ui').directive('uiEditorPopup', function() {
 
 			scope.isPopupOpen = true;
 			setTimeout(function () {
+				var isOpen = false;
 				element.on('dialogclose', function (e) {
+					isOpen = false;
 					scope.waitForActions(function () {
-						scope.isPopupOpen = false;
+						scope.isPopupOpen = isOpen;
 					}, 2000); // delay couple of seconds to that popup can cleanup
 				});
 				element.on('dialogopen', function (e) {
-					scope.isPopupOpen = true;
+					scope.isPopupOpen = isOpen = true;
 					scope.$applyAsync();
 				});
 			});
