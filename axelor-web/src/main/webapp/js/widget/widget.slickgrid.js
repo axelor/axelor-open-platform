@@ -1354,7 +1354,7 @@ Grid.prototype.onKeyDown = function(e, args) {
 		var cell = e.shiftKey ? this.findPrevEditable(args.row, args.cell) :
 								this.findNextEditable(args.row, args.cell);
 
-		if (commitChanges() && cell && cell.row > args.row && this.isDirty()) {
+		if (commitChanges() && cell && cell.row > args.row && this.isDirty() && this.canAdd()) {
 			args.item = null;
 			this.scope.waitForActions(function () {
 				that.scope.waitForActions(function () {
@@ -1644,12 +1644,14 @@ Grid.prototype.addNewRow = function (args) {
 		grid.invalidateRow(dataView.length);
 		dataView.addItem(item);
 
-		cell = self.findNextEditable(args.row, args.cell);
-		if (cell) {
-			grid.focus();
-			grid.setActiveCell(cell.row, cell.cell);
-			grid.editActiveCell();
-		}
+		self.scope.waitForActions(function () {
+			cell = self.findNextEditable(args.row, args.cell);
+			if (cell) {
+				grid.focus();
+				grid.setActiveCell(cell.row, cell.cell);
+				grid.editActiveCell();
+			}
+		}, 100);
 	}
 
 	function focus() {
@@ -1690,7 +1692,9 @@ Grid.prototype.canEdit = function () {
 
 Grid.prototype.canAdd = function () {
 	var handler = this.handler || {};
-	return this.canEdit() && handler.canNew && handler.canNew();
+	if (!this.editable) return false;
+	if (handler.isReadonly && handler.isReadonly()) return false;
+	return handler.canNew && handler.canNew();
 }
 
 Grid.prototype.setEditors = function(form, formScope, forEdit) {
