@@ -36,6 +36,9 @@ public class GanttView extends AbstractView {
 	private String taskDuration;
 
 	@XmlAttribute
+	private String taskEnd;
+
+	@XmlAttribute
 	private String taskParent;
 
 	@XmlAttribute
@@ -73,6 +76,14 @@ public class GanttView extends AbstractView {
 
 	public void setTaskDuration(String taskDuration) {
 		this.taskDuration = taskDuration;
+	}
+
+	public String getTaskEnd() {
+		return taskEnd;
+	}
+
+	public void setTaskEnd(String taskEnd) {
+		this.taskEnd = taskEnd;
 	}
 
 	public String getTaskParent() {

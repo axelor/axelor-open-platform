@@ -1510,10 +1510,17 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="taskDuration" type="xsd:string" use="required">
+        <xsd:attribute name="taskDuration" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
               Name of the duration field.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="taskEnd" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              Name of the field of type date/datetime to be used as end time.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>

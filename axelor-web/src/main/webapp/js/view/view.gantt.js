@@ -133,9 +133,11 @@ function GanttViewCtrl($scope, $element) {
 
 		var searchFields = _.pluck(this.fields, "name");
 		searchFields.push(schema.taskStart);
-		searchFields.push(schema.taskDuration);
 
-		var optionalFields = [schema.taskParent,
+		var optionalFields = [schema.taskProgress,
+		                      schema.taskEnd,
+		                      schema.taskDuration,
+		                      schema.taskParent,
 		                      schema.taskSequence,
 		                      schema.taskProgress,
 		                      schema.finishToStart,
@@ -204,6 +206,7 @@ function GanttViewCtrl($scope, $element) {
    	}
 
 	$scope.refresh = function() {
+		
 	};
 
 }
@@ -211,57 +214,46 @@ function GanttViewCtrl($scope, $element) {
 angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewService, ActionService) {
 
 	function link(scope, element, attrs, controller) {
-		var main = element[0];
+		var main = element.children(".gantt-main");
 		var schema = scope.schema;
 		var fields = scope.fields;
 		var fieldNames = _.pluck(schema.items, "name");
 		var firstField = fields[fieldNames[0]];
+		var mode = schema.mode || "day";
 		var editor = null;
 		ganttInit();
 
 		function setScaleConfig(value){
 			
 			switch (value) {
-				case "1":
+				case "day":
 					gantt.config.scale_unit = "day";
-					gantt.config.step = 1;
-					gantt.config.date_scale = "%d %M";
-					gantt.config.subscales = [{unit:"hour", step:3, date:"%H:%i"}];
-					gantt.config.scale_height = 27;
+					gantt.config.date_scale = "%d/%m/%Y";
+					gantt.config.subscales = [{unit:"hour", step:1, date:"%H:%i"}];
 					gantt.templates.date_scale = null;
 					break;
-				case "2":
+				case "week":
 					var weekScaleTemplate = function(date){
-						var dateToStr = gantt.date.date_to_str("%d %M");
+						var dateToStr = gantt.date.date_to_str("%d/%m/%Y");
 						var endDate = gantt.date.add(gantt.date.add(date, 1, "week"), -1, "day");
 						return dateToStr(date) + " - " + dateToStr(endDate);
 					};
 					gantt.config.scale_unit = "week";
-					gantt.config.step = 1;
 					gantt.templates.date_scale = weekScaleTemplate;
-					gantt.config.min_column_width = 50;
 					gantt.config.subscales = [
-						{unit:"day", step:1, date:"%D" }
-					];
-					gantt.config.scale_height = 50;
+						{unit:"day", step:1, date:"%D %d" }];
 					break;
-				case "3":
+				case "month":
 					gantt.config.scale_unit = "month";
 					gantt.config.date_scale = "%F, %Y";
 					gantt.config.subscales = [
-						{unit:"day", step:1, date:"%j, %D" }
+						{unit:"day", step:1, date:"%D %d" }
 					];
-					gantt.config.scale_height = 50;
 					gantt.templates.date_scale = null;
-					gantt.config.min_column_width = 50;
 					break;
-				case "4":
+				case "year":
 					gantt.config.scale_unit = "year";
-					gantt.config.step = 1;
 					gantt.config.date_scale = "%Y";
-					gantt.config.min_column_width = 50;
-
-					gantt.config.scale_height = 90;
 					gantt.templates.date_scale = null;
 
 					gantt.config.subscales = [
@@ -358,16 +350,23 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 	   }
 
 	   function ganttInit(){
-		   setScaleConfig("1");
-		   gantt.config.grid_width = 400;
+		   setScaleConfig("day");
+		   gantt.templates.progress_text = function(start, end, task){
+				return "<span style='text-align:left;'>"+Math.round(task.progress*100)+ "% </span>";
+			};
+		   gantt.config.step = 1;
+		   gantt.config.min_column_width = 50;
 		   gantt.config.duration_unit = "hour";
+		   gantt.config.duration_step = 1;
+		   gantt.config.scale_height = 75;
+		   gantt.config.grid_width = 400;
 		   gantt.config.fit_tasks = true;
 		   gantt.config.columns = getGanttColumns();
 		   gantt._onTaskIdChange = null;
 		   gantt._onLinkIdChange = null;
 		   ganttAttachEvents();
 		   setChildTaskDisplay();
-		   gantt.init(main);
+		   main.dhx_gantt();
 		   fetchRecords();	
 	   }
 
@@ -397,7 +396,6 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 	   function fetchRecords() {
 		   
 		   scope.fetchItems(function(records) {
-
 			   var data = [];
 			   var links = [];
 				_.each(records, function(rec) {
@@ -435,27 +433,27 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 				  }
 				  record[linkField] = recordList;
 				  task.record = record;
-				  scope.doSave(task, updateTask);
+				  scope.doSave(task, updateTaskRecord);
 			  }
 		   }
 
 	   }
 
-	   function updateLink (id,link){
-		   
+	   function updateLink(id,link){
 		   updateRecordItem(id, link,  false)
-		   
+	   }
+	   
+	   function updateTaskRecord(task, rec){
+		   task.record = rec;
 	   }
 
 	   function deleteLink(id, link){
-		   
 		   updateRecordItem(id, link, true)
-		   
 	   }
 
 	   function updateRecord(id, item){
 
-		    var record = item.record;
+		   	var record = item.record;
 		    if(!record){ record = {}; }
 		    
 			var duration = item.duration;
@@ -463,13 +461,18 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 			
 			record[schema.taskStart] = item.start_date.toJSON();
 			record[firstField.name] = item.text;
-			record[schema.taskDuration] = duration;
 			
 			if(schema.taskProgress){ 
 				record[schema.taskProgress] = item.progress; 
 			}
 			if(schema.taskSequence){ 
 				record[schema.taskSequence] = item.order; 
+			}
+			if(schema.taskDuration){
+				record[schema.taskDuration] = duration;
+			}
+			if(schema.taskEnd){
+				record[schema.taskEnd] = item.end_date.toJSON();
 			}
 
 			if(schema.taskParent && item.parent && !record[schema.taskParent]){
@@ -480,48 +483,25 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 				}
 			}
 			
-			item.record = record;
-
-			return scope.doSave(item, updateTask);
+			return scope.doSave(item, updateTaskRecord);
 		}
 
 		function addData(data, rec){
 			
-			if(!rec[schema.taskStart]){
-				return false;
-			};
-
-			var startDate = moment(rec[schema.taskStart]).format("DD-MM-YYYY HH:mm:SS");
-			var name = firstField.targetName ? rec[firstField.targetName] : rec[firstField.name];
-			var dict = {
+			if(rec[schema.taskStart]){
+				var dict = {
 					id:rec.id,
-					start_date:startDate,
-					duration:rec[schema.taskDuration] ? rec[schema.taskDuration] : 0,
-					text:name || "",
 					open:true,
-					record:rec
-			}
-			
-			if(schema.taskSequence){
-				dict["sortorder"] = rec[schema.taskSequence];
-			}
-			
-			if(schema.taskProgress){
-				dict["progress"] = rec[schema.taskProgress];
-			}
-
-			if(schema.taskParent && rec[schema.taskParent]){
-				dict["parent"] = rec[schema.taskParent].id;
-			}
-			_.each(fields,function(field){
-				var val = rec[field.name];
-				if(_.isObject(val) && field.targetName){
-					val = val[field.targetName];
+					isNew:true
 				}
-				dict[field.name] = val || "";
-			});
-
-			data.push(dict);
+				dict = updateData(dict, rec);
+				dict.isNew = false;
+				
+				if(dict.start_date){
+					data.push(dict);
+				}
+			}
+			
 		}
 
 		function addLinkDict(links, targetRecordId, sourceRecords, linkType){
@@ -554,36 +534,10 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 
 		}
 
-		function updateTask(task, res){
+		function updateTask(task, rec){
 			
-			task.record = res;
+			task = updateData(task, rec);
 			
-			_.each(fields, function(field){
-				var val = res[field.name];
-				if(_.isObject(val) && field.targetName){
-					val = val[field.targetName];
-				}
-				task[field.name] = val || "";
-			});
-			
-			if(res[firstField.name] != null){
-				task["text"] = res[firstField.name];
-			}
-			task["duration"] = res[schema.taskDuration];
-			if(res[schema.taskStart]){
-				task["start_date"] = moment(res[schema.taskStart]).toDate();
-			}
-			if(schema.taskSequence){
-				task["sortorder"] = res[schema.taskSequence];
-			}
-
-			if(schema.taskProgress){
-				task["progress"] = res[schema.taskProgress];
-			}
-
-			if(schema.taskParent && res[schema.taskParent]){
-				task["parent"] = res[schema.taskParent].id;
-			}
 			if(!task.isNew){
 				gantt.refreshTask(task.id);
 			}
@@ -591,18 +545,76 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 			
 			return task;
 		}
+		
+		function updateData(task, rec){
+			
+			task.record = rec;
+			
+			var name = firstField.targetName ? rec[firstField.targetName] : rec[firstField.name];
+			task["text"] = "";
+			if(name){
+				task["text"] = name;
+			}
+			_.each(fields,function(field){
+				var val = rec[field.name];
+				if(_.isObject(val) && field.targetName){
+					val = val[field.targetName];
+				}
+				task[field.name] = val || "";
+			});
+			
+			var endDate = null;
+			if(schema.taskEnd && rec[schema.taskEnd]){
+				endDate = moment(rec[schema.taskEnd]);
+				task["end_date"]  = endDate;
+				if(task.isNew){
+					task["end_date"]  = endDate.format("DD-MM-YYYY HH:mm:SS");
+				}
+			}
+
+			var startDate = moment(rec[schema.taskStart]);
+			if(task.isNew){
+				task["start_date"] = startDate.format("DD-MM-YYYY HH:mm:SS");
+			}
+			else{
+				task["start_date"] = startDate.toDate();
+			}
+			
+			
+			if(schema.taskDuration && rec[schema.taskDuration]){
+				task.duration = rec[schema.taskDuration];
+			}
+			else if(endDate){
+				task.duration = gantt.calculateDuration(startDate.toDate(), endDate);
+			}
+			else{
+				task.duration = "1";
+			}
+			
+			if(schema.taskProgress){
+				task["progress"] = rec[schema.taskProgress];
+			}
+			
+			if(schema.taskParent && rec[schema.taskParent]){
+				task["parent"] = rec[schema.taskParent].id;
+			}
+			
+			if(schema.taskSequence){
+				task["sortorder"] = rec[schema.taskSequence];
+			}
+			
+			return task;
+			
+		}
 
 		scope.onMode = function(name) {
+			setScaleConfig(name);
 			mode = name;
-			var scale = '4';
-			if (name === "week") {
-				scale = '2';
-			}
-			if (name === "day") {
-				scale = '1';
-			}
-			setScaleConfig(scale);
 			gantt.render();
+		};
+		
+		scope.isMode = function(name) {
+			return mode === name;
 		};
 
 		scope.onRefresh = function () {
@@ -642,8 +654,19 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 	 			});
 			}
 		};
+		
+		function adjustSize() {
+			if (main.is(':hidden')) {
+				return;
+			}
+			gantt.render();
+		}
+		
+		main.on("adjustSize", _.debounce(adjustSize, 100));
+		
 	}
-
+	
+	
 	return {
 	    link:function(scope, element, attrs, controller) {
 	    	scope._viewPromise.then(function(){
@@ -653,7 +676,7 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 	    },
 	    replace:true,
 	    template:
-		'<div class="webkit-scrollbar-all">'+
+		'<div>'+
 			'<div class="gantt-main"></div>'+
 		'</div>'
 	  };

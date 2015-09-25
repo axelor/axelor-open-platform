@@ -3,6 +3,7 @@
     <div class="navbar-inner">
       <div class="container">
         <div class="btn-group">
+          <button class="btn" ng-click="onMode('year')" ng-class="{ active: isMode('year') }"><span x-translate>Year</span></button>
           <button class="btn" ng-click="onMode('month')" ng-class="{ active: isMode('month') }"><span x-translate>Month</span></button>
           <button class="btn" ng-click="onMode('week')" ng-class="{ active: isMode('week') }"><span x-translate>Week</span></button>
           <button class="btn" ng-click="onMode('day')" ng-class="{ active: isMode('day') }"><span x-translate>Day</span></button>

@@ -57,3 +57,11 @@
 .gantt_row.task-parent {
 	font-weight: bold;
 }
+
+.gantt_task_progress{
+	text-align:left;
+	padding-left:10px;
+    box-sizing: border-box;
+	color:white;
+	font-weight: bold;
+}
