@@ -3,11 +3,12 @@
 ## Bug fixes
 
 - fix form values update issue
-- fix dashlet/portlet initialization issue.
+- fix dashlet/portlet initialization issue
 - fix record update issue
 - fix editable grid tab navigation
 - fix grid column overflow issue
-- fix o2m reload issue 
+- fix o2m reload issue
+- fix new record issue on editable grid
 
 ## Improvements
 
