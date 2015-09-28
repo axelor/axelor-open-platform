@@ -231,6 +231,7 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 					gantt.config.date_scale = "%d/%m/%Y";
 					gantt.config.subscales = [{unit:"hour", step:1, date:"%H:%i"}];
 					gantt.templates.date_scale = null;
+					gantt.config.min_column_width = 50;
 					break;
 				case "week":
 					var weekScaleTemplate = function(date){
@@ -240,6 +241,7 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 					};
 					gantt.config.scale_unit = "week";
 					gantt.templates.date_scale = weekScaleTemplate;
+					gantt.config.min_column_width = 50;
 					gantt.config.subscales = [
 						{unit:"day", step:1, date:"%D %d" }];
 					break;
@@ -250,12 +252,13 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 						{unit:"day", step:1, date:"%D %d" }
 					];
 					gantt.templates.date_scale = null;
+					gantt.config.min_column_width = 50;
 					break;
 				case "year":
 					gantt.config.scale_unit = "year";
 					gantt.config.date_scale = "%Y";
 					gantt.templates.date_scale = null;
-
+					gantt.config.min_column_width = 100;
 					gantt.config.subscales = [
 						{unit:"month", step:1, date:"%M" }
 					];
@@ -351,11 +354,10 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 
 	   function ganttInit(){
 		   setScaleConfig("day");
-		   gantt.templates.progress_text = function(start, end, task){
+		   gantt.templates.leftside_text = function(start, end, task){
 				return "<span style='text-align:left;'>"+Math.round(task.progress*100)+ "% </span>";
 			};
 		   gantt.config.step = 1;
-		   gantt.config.min_column_width = 50;
 		   gantt.config.duration_unit = "hour";
 		   gantt.config.duration_step = 1;
 		   gantt.config.scale_height = 75;
@@ -364,6 +366,7 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 		   gantt.config.columns = getGanttColumns();
 		   gantt._onTaskIdChange = null;
 		   gantt._onLinkIdChange = null;
+		   gantt.config.autosize = "x";
 		   ganttAttachEvents();
 		   setChildTaskDisplay();
 		   main.dhx_gantt();
@@ -632,7 +635,6 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 		});
 
 		scope.showEditor = function(task, isNew) {
-			
 			var record = _.extend({}, task.record);
 			if (editor == null) {
 				editor = ViewService.compile('<div ui-editor-popup></div>')(scope.$new());
@@ -657,16 +659,8 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 						popup.$broadcast("on:new");
 	 			});
 			}
+			
 		};
-		
-		function adjustSize() {
-			if (main.is(':hidden')) {
-				return;
-			}
-			gantt.render();
-		}
-		
-		main.on("adjustSize", _.debounce(adjustSize, 100));
 		
 	}
 	
