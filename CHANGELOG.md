@@ -1,4 +1,10 @@
-# Current (3.0.18)
+# Current (3.0.19)
+
+## Bug fixes
+
+## Improvements
+
+# 3.0.18 (2015-09-28)
 
 ## Bug fixes
 
