@@ -45,7 +45,7 @@ function updateValues(source, target, itemScope, formScope) {
 			var dest = target[key] || [];
 			value = _.map(value, function(item){
 				var found = _.find(dest, function(v){
-					return v.id === item.id;
+					return item.id && v.id === item.id;
 				});
 				if (_.has(item, "version") && item.id) item.$fetched = true;
 				if (found) {
@@ -210,15 +210,7 @@ ActionHandler.prototype = {
 	},
 
 	onChange: function(event) {
-		var deferred = this.ws.defer(),
-			promise = deferred.promise;
-
-		var self = this,
-			scope = this.scope;
-		scope.ajaxStop(function() {
-			self.handle().then(deferred.resolve, deferred.reject);
-		}, 100);
-		return promise;
+		return this.handle();
 	},
 	
 	_getPrompt: function () {
@@ -268,23 +260,24 @@ ActionHandler.prototype = {
 		var action = this.action.trim();
 		var deferred = this.ws.defer();
 
+		var all = this.scope.$actionPromises || [];
+		var pending = all.slice();
+
+		all.push(deferred.promise);
+
 		this.scope.waitForActions(function () {
 			var promise = that._handleAction(action);
-			var all = that.scope.$actionPromises || [];
-
 			function done() {
 				setTimeout(function () {
-					var i = all.indexOf(promise);
+					var i = all.indexOf(deferred.promise);
 					if (i > -1) {
 						all.splice(i, 1);
 					}
 				}, 10);
 			}
-
-			all.push(promise);
 			promise.then(done, done);
 			promise.then(deferred.resolve, deferred.reject);
-		});
+		}, 10, pending);
 
 		return deferred.promise;
 	},
@@ -530,13 +523,28 @@ ActionHandler.prototype = {
 
 		function doReload(pending) {
 			self._invalidateContext = true;
-			var promise = scope.reload(true);
+			var promise = scope.reload();
 			if (promise) {
 				promise.then(function(){
 					deferred.resolve(pending);
 				}, deferred.reject);
+			} else {
+				deferred.resolve(pending);
 			}
 			return deferred.promise;
+		}
+		
+		if (data.exportFile) {
+			(function () {
+				var link = "ws/files/data-export/" + data.exportFile;
+				var frame = $('<iframe>').appendTo('body').hide();
+				frame.attr("src", link);
+				setTimeout(function(){
+					frame.attr("src", "");
+					frame.remove();
+					frame = null;
+				}, 5000);
+			})();
 		}
 		
 		if (data.signal === 'refresh-app') {
@@ -648,19 +656,6 @@ ActionHandler.prototype = {
 		
 		if (data.signal) {
 			formScope.$broadcast(data.signal, data['signal-data']);
-		}
-		
-		if (data.exportFile) {
-			(function () {
-				var link = "ws/files/data-export/" + data.exportFile;
-				var frame = $('<iframe>').appendTo('body').hide();
-				frame.attr("src", link);
-				setTimeout(function(){
-					frame.attr("src", "");
-					frame.remove();
-					frame = null;
-				}, 5000);
-			})();
 		}
 
 		function findItems(name) {
