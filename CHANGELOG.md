@@ -9,6 +9,8 @@
 - fix grid column overflow issue
 - fix o2m reload issue
 - fix new record issue on editable grid
+- fix delayed record loading in popup
+- fix popup editor update issue
 
 ## Improvements
 
