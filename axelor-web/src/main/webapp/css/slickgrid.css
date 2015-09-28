@@ -22,10 +22,6 @@
 	border-top: 0 !important;
 }
 
-.slick-viewport {
-	overflow-x: hidden !important;
-}
-
 .slickgrid .slick-header,
 .slickgrid .slick-header-column {
 	
