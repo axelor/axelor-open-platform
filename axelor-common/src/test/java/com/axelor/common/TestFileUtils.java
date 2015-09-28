@@ -52,7 +52,7 @@ public class TestFileUtils {
 		Assert.assertTrue(target.listFiles().length > 0);
 
 		try {
-			FileUtils.deleteDerectory(target);
+			FileUtils.deleteDirectory(target);
 		} catch (IOException e) {
 			Assert.fail();
 		}

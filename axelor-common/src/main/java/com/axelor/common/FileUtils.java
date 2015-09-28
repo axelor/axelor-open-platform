@@ -132,8 +132,8 @@ public final class FileUtils {
 	 * @throws IOException
 	 *             in case deletion is unsuccessful
 	 */
-	public static void deleteDerectory(File directory) throws IOException {
-		deleteDerectory(directory.toPath());
+	public static void deleteDirectory(File directory) throws IOException {
+		deleteDirectory(directory.toPath());
 	}
 	
 	/**
@@ -144,7 +144,7 @@ public final class FileUtils {
 	 * @throws IOException
 	 *             in case deletion is unsuccessful
 	 */
-	public static void deleteDerectory(Path directory) throws IOException {
+	public static void deleteDirectory(Path directory) throws IOException {
 		if (!Files.isDirectory(directory)) {
 			throw new IOException("Invalid directory: " + directory);
 		}
