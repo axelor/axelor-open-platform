@@ -551,9 +551,9 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 			task.record = rec;
 			
 			var name = firstField.targetName ? rec[firstField.targetName] : rec[firstField.name];
-			task["text"] = "";
+			task.text = "";
 			if(name){
-				task["text"] = name;
+				task.text = name;
 			}
 			_.each(fields,function(field){
 				var val = rec[field.name];
@@ -566,18 +566,18 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 			var endDate = null;
 			if(schema.taskEnd && rec[schema.taskEnd]){
 				endDate = moment(rec[schema.taskEnd]);
-				task["end_date"]  = endDate;
+				task.end_date  = endDate;
 				if(task.isNew){
-					task["end_date"]  = endDate.format("DD-MM-YYYY HH:mm:SS");
+					task.end_date  = endDate.format("DD-MM-YYYY HH:mm:SS");
 				}
 			}
 
 			var startDate = moment(rec[schema.taskStart]);
 			if(task.isNew){
-				task["start_date"] = startDate.format("DD-MM-YYYY HH:mm:SS");
+				task.start_date = startDate.format("DD-MM-YYYY HH:mm:SS");
 			}
 			else{
-				task["start_date"] = startDate.toDate();
+				task.start_date = startDate.toDate();
 			}
 			
 			
@@ -591,16 +591,20 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 				task.duration = "1";
 			}
 			
+			if(!endDate){
+				task.end_date = gantt.calculateEndDate(startDate.toDate(), task.duration);
+			}
+			
 			if(schema.taskProgress){
-				task["progress"] = rec[schema.taskProgress];
+				task.progress = rec[schema.taskProgress];
 			}
 			
 			if(schema.taskParent && rec[schema.taskParent]){
-				task["parent"] = rec[schema.taskParent].id;
+				task.parent = rec[schema.taskParent].id;
 			}
 			
 			if(schema.taskSequence){
-				task["sortorder"] = rec[schema.taskSequence];
+				task.sortorder = rec[schema.taskSequence];
 			}
 			
 			return task;
