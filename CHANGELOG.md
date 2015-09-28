@@ -1,4 +1,29 @@
-# Current (3.0.18)
+# Current (3.0.19)
+
+## Bug fixes
+
+## Improvements
+
+# 3.0.18 (2015-09-28)
+
+## Bug fixes
+
+- fix form values update issue
+- fix dashlet/portlet initialization issue
+- fix record update issue
+- fix editable grid tab navigation
+- fix grid column overflow issue
+- fix o2m reload issue
+- fix new record issue on editable grid
+- fix delayed record loading in popup
+- fix popup editor update issue
+
+## Improvements
+
+- improve custom filter management
+- improve pending action tracking
+- improve action sequence management
+- improve loader messages
 
 # 3.0.17 (2015-08-28)
 
@@ -9,7 +34,7 @@
 - fix dotted field in editable grid
 - fix editable grid cell focus issue
 - fix strip indent utility method causing meta loader issue
-- fix dashboard/portal initialization issue 
+- fix dashboard/portal initialization issue
 - fix toolbar buttons as menu doesn't send _signal
 - fix field editor update issue
 - fix toolbar buttons adjustment issue
@@ -70,7 +95,7 @@
 
 ## Bug fixes
 
-- fix duplicate onload issue 
+- fix duplicate onload issue
 - fix dirty state handling with onNew having save
 - fix unwanted collapse animation on panels
 - fix popup/dialog issue
@@ -157,7 +182,7 @@
 
 ## Bug Fixes
 
-- fix wrong email sent date issue 
+- fix wrong email sent date issue
 - fix file download issue
 - fix binary widget download issue
 - fix onChange issues on o2m fields
@@ -172,7 +197,7 @@
 - fixed a regression (wrong change detection)
 - fixed progress bar widget (IE)
 - fixed advance search on o2m/m2m fields
-- fixed decimal field issue 
+- fixed decimal field issue
 - fixed unwrapped viewer template issue
 - fixed selection-in on integer selection
 - fixed textarea height issue
@@ -209,7 +234,7 @@
 - fixed meta scanner (search xml files only)
 - fixed module loader clean up issues
 - fixed duplicate views were not imported properly
-- fixed advance search issue on datetime field 
+- fixed advance search issue on datetime field
 - fixed context issue in tree view
 - fixed context issue on portlet
 - fixed selection issue in tree
@@ -295,7 +320,7 @@
 - fixed editable grid cell value update and persistent row issues
 - fixed cursor x-bind issue
 - fixed missing import statements issue
-- fixed generic Model.equals test 
+- fixed generic Model.equals test
 - fixed automatic bi-direction association setup
 - fixed print media css
 - fixed child count in tree view
@@ -336,7 +361,7 @@
 - fixed image widget upload issue
 - fixed binary widget download/update issue
 - fixed tree view column title overflow
-- fixed route issue on form view 
+- fixed route issue on form view
 - fixed code editor empty issue
 - fixed unnecessary dirty state from popup
 - fixed missing attributes on panel-related
@@ -351,8 +376,8 @@
 - add active user list
 - allow i18n shell command per module
 - provide default 'from' address for smtp server
-- add replayTo to mail build 
-- allow title on editor fields 
+- add replayTo to mail build
+- allow title on editor fields
 - show truncated button text as tooltip
 - remove trailing comma in array and object literals
 - allow editor as viewer
@@ -497,4 +522,3 @@ First stable release
 # 0.9.x (2012-2013)
 
 Initial prototype releases
-

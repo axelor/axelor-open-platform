@@ -90,7 +90,7 @@ public class I18nLoader extends AbstractLoader {
 		
 		for(final URL resource : sorted) {
 			try(InputStream is = resource.openStream()) {
-				log.debug("Load translation: {}", resource);
+				log.debug("Load translation: {}", resource.getFile());
 				process(is, resource.getFile(), module.getName());
 			} catch (IOException e) {
 				log.error("Unable to import file: {}", resource.getFile());

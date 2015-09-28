@@ -64,6 +64,7 @@ public class ModelLoader extends AbstractLoader {
 		}
 
 		for (URL file : MetaScanner.findAll(module.getName(), "(domains|objects)", "(.*?)\\.xml$")) {
+			log.debug("importing: {}", file.getFile());
 			try (InputStream is = file.openStream()) {
 				final Document doc = db.parse(is);
 				importModels(doc, file, update);
@@ -107,14 +108,12 @@ public class ModelLoader extends AbstractLoader {
 			return;
 		}
 
-		log.info("importing model data: {}", file);
-		
 		for (int i = 0; i < elements.getLength(); i++) {
 			
 			Element element = (Element) elements.item(i);
 			String name = element.getAttribute("name");
 			
-			log.info("importing model: {}", name);
+			log.debug("Loading model: {}", name);
 			
 			service.process(JPA.model(name));
 		}
@@ -125,8 +124,6 @@ public class ModelLoader extends AbstractLoader {
 		if (elements.getLength() == 0) {
 			return;
 		}
-		
-		log.info("importing sequence data: {}", file);
 		
 		for (int i = 0; i < elements.getLength(); i++) {
 			
@@ -140,7 +137,7 @@ public class ModelLoader extends AbstractLoader {
 				continue;
 			}
 			
-			log.info("importing sequence: {}", name);
+			log.debug("Loading sequence: {}", name);
 			
 			MetaSequence entity = new MetaSequence(name);
 			

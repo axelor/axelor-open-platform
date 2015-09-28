@@ -432,7 +432,7 @@ angular.module('axelor.ui').directive('uiEditorPopup', function() {
 				});
 				element.on('dialogopen', function (e) {
 					scope.isPopupOpen = isOpen = true;
-					scope.$applyAsync();
+					scope.applyLater();
 				});
 			});
 		},

@@ -683,7 +683,7 @@ ActionHandler.prototype = {
 		if (data.signal) {
 			formScope.$broadcast(data.signal, data['signal-data']);
 		}
-		
+
 		function findItems(name) {
 
 			var items;

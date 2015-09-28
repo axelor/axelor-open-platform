@@ -95,7 +95,7 @@ public class MetaModelService {
 	 */
 	private MetaModel createEntity(Class<?> klass){
 		
-		log.debug("Create entities : {}", klass.getName());
+		log.trace("Create entities : {}", klass.getName());
 		
 		MetaModel metaModel = new MetaModel();
 		metaModel.setName(klass.getSimpleName());
@@ -149,7 +149,7 @@ public class MetaModelService {
 		
 		if (!field.isSynthetic() && !field.isAnnotationPresent(Formula.class)){
 			
-			log.debug("Create field : {}", field.getName());
+			log.trace("Create field : {}", field.getName());
 			
 			metaField = new MetaField();
 			
