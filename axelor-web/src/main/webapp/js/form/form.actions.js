@@ -216,7 +216,8 @@ ActionHandler.prototype = {
 	
 	_getPrompt: function () {
 		var prompt = this.prompt;
-		if (_.isFunction(this.scope.attr)) {
+		var itemScope = this.element.scope();
+		if (_.isFunction(itemScope.attr)) {
 			prompt = this.scope.attr('prompt') || prompt;
 		}
 		return prompt;
