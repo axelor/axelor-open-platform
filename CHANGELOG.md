@@ -2,7 +2,9 @@
 
 ## Bug fixes
 
-## Improvements
+- fix onChange issue on grid widget
+- fix nested editor value lost issue 
+- fix lazy loading dashlet doesn't load data
 
 # 3.0.18 (2015-09-28)
 
