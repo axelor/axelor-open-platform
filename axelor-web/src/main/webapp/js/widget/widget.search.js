@@ -599,8 +599,9 @@ ui.directive('uiFilterBox', function() {
 					$scope.viewItems = angular.copy(view.items) || [];
 					$scope.viewFilters = angular.copy(view.filters);
 					_.each($scope.viewItems, function (item) {
-						item.type = fields[item.name].type;
-						item.title = item.title || fields[item.name].title;
+						var field = fields[item.name] || {};
+						item.type = field.type;
+						item.title = item.title || field.title;
 					});
 				});
 			} else {
@@ -888,7 +889,7 @@ ui.directive('uiFilterBox', function() {
 				var all = _.chain([$scope.viewFilters, $scope.custFilters])
 				   .flatten()
 				   .filter(function (item) {
-					  return item.$selected;
+					  return item && item.$selected;
 				   })
 				   .pluck('title')
 				   .value();
