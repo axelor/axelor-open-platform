@@ -373,7 +373,7 @@ var NestedEditor = {
 
 			promise.then(function() {
 				configure(nested);
-				scope.ajaxStop(doRender, 100);
+				scope.waitForActions(doRender, 100);
 			});
 		};
 	},

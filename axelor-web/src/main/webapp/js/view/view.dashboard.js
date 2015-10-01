@@ -194,7 +194,7 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 						return setTimeout(checkLoading, 100);
 					}
 
-					lazy = !element.parent().is(".dashlet-row,.dashboard");
+					lazy = !element.parent().is(".dashlet-row");
 
 					scope.waitForActions(function () {
 						var unwatch = scope.$watch(function () {

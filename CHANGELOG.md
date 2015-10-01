@@ -1,8 +1,12 @@
-# Current (3.0.19)
+# Current (3.0.20)
+
+# 3.0.19 (2015-10-01)
 
 ## Bug fixes
 
-## Improvements
+- fix onChange issue on grid widget
+- fix nested editor value lost issue 
+- fix lazy loading dashlet doesn't load data
 
 # 3.0.18 (2015-09-28)
 
