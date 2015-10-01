@@ -1354,7 +1354,7 @@ Grid.prototype.onKeyDown = function(e, args) {
 		var cell = e.shiftKey ? this.findPrevEditable(args.row, args.cell) :
 								this.findNextEditable(args.row, args.cell);
 
-		if (commitChanges() && cell && cell.row > args.row && this.isDirty() && this.canAdd()) {
+		if (commitChanges() && cell && cell.row > args.row && this.isDirty()) {
 			args.item = null;
 			this.scope.waitForActions(function () {
 				that.scope.waitForActions(function () {
@@ -1660,6 +1660,9 @@ Grid.prototype.addNewRow = function (args) {
 
 		if (grid.getDataLength() > cell.row) {
 			return grid.editActiveCell();
+		}
+		if (!self.canAdd()) {
+			return;
 		}
 
 		self.editorScope.doOnNew();
