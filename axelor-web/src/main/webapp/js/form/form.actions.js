@@ -793,7 +793,9 @@ ActionHandler.prototype = {
 						itemScope.setDomain(value);
 					break;
 				case 'refresh':
-					itemScope.$broadcast('on:attrs-change:refresh');
+					itemScope.waitForActions(function () {
+						itemScope.$broadcast('on:attrs-change:refresh');
+					}, 100);
 					break;
 				case 'url':
 				case 'url:set':
