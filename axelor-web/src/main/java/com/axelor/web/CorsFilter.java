@@ -20,8 +20,8 @@ package com.axelor.web;
 import static com.axelor.common.StringUtils.isBlank;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.inject.Singleton;
 import javax.servlet.Filter;
@@ -32,6 +32,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppSettings;
 
@@ -60,6 +63,8 @@ public class CorsFilter implements Filter {
 	private static String corsAllowMethods;
 	private static String corsAllowHeaders;
 
+	private Logger log = LoggerFactory.getLogger(CorsFilter.class);
+
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
 
@@ -70,8 +75,21 @@ public class CorsFilter implements Filter {
 		corsAllowMethods = settings.get("cors.allow.methods", DEFAULT_CORS_ALLOW_METHODS);
 		corsAllowHeaders = settings.get("cors.allow.headers", DEFAULT_CORS_ALLOW_HEADERS);
 
-		if (!isBlank(corsAllowOrigin)) {
+		if (isBlank(corsAllowOrigin)) {
+			return;
+		}
+
+		log.debug("CORS origin: {}", corsAllowOrigin);
+
+		if (DEFAULT_CORS_ALLOW_ORIGIN.equals(corsAllowOrigin)) {
+			corsOriginPattern = Pattern.compile(".*");
+			return;
+		}
+		try {
 			corsOriginPattern = Pattern.compile(corsAllowOrigin);
+		} catch (PatternSyntaxException e) {
+			log.error("CORS origin pattern is invalid", e);
+			corsAllowOrigin = null;
 		}
 	}
 
@@ -88,9 +106,7 @@ public class CorsFilter implements Filter {
 			return;
 		}
 
-		final Matcher matcher = corsOriginPattern.matcher(origin);
-
-		if (matcher.matches() || DEFAULT_CORS_ALLOW_ORIGIN.equals(corsAllowOrigin)) {
+		if (DEFAULT_CORS_ALLOW_ORIGIN.equals(corsAllowOrigin) || corsOriginPattern.matcher(origin).matches()) {
 			res.addHeader("Access-Control-Allow-Origin", origin);
 			res.addHeader("Access-Control-Allow-Credentials", corsAllowCredentials);
 			res.addHeader("Access-Control-Allow-Methods", corsAllowMethods);
