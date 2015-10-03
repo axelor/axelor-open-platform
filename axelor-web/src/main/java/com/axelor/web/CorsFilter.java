@@ -100,8 +100,9 @@ public class CorsFilter implements Filter {
 		final HttpServletRequest req = (HttpServletRequest) request;
 		final HttpServletResponse res = (HttpServletResponse) response;
 		final String origin = req.getHeader("Origin");
+		final String host = req.getHeader("Host");
 
-		if (corsOriginPattern == null || isBlank(origin)) {
+		if (corsOriginPattern == null || isBlank(origin) || origin.endsWith("//" + host)) {
 			chain.doFilter(request, response);
 			return;
 		}
