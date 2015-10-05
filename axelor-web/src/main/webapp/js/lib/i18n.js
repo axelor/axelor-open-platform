@@ -17,6 +17,8 @@
  */
 (function() {
 
+"use strict";
+
 var bundle = {};
 
 function gettext(key) {
@@ -32,7 +34,7 @@ function gettext(key) {
 }
 
 gettext.put = function(messages) {
-	message = messages || {};
+	messages = messages || {};
 	for(var key in messages) {
 		bundle[key] = messages[key];
 	}

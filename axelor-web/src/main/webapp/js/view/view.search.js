@@ -17,6 +17,8 @@
  */
 (function() {
 
+"use strict";
+
 var ui = angular.module('axelor.ui');
 
 ui.controller('SearchViewCtrl', SearchViewCtrl);
@@ -256,7 +258,7 @@ ui.controller('SearchFormCtrl', SearchFormCtrl);
 SearchFormCtrl.$inject = ['$scope', '$element', 'ViewService'];
 function SearchFormCtrl($scope, $element, ViewService) {
 	
-	FormViewCtrl.call(this, $scope, $element);
+	ui.FormViewCtrl.call(this, $scope, $element);
 	$scope._register('form', $scope);
 	$scope.setEditable();
 	
@@ -341,7 +343,7 @@ ui.controller('SearchGridCtrl', SearchGridCtrl);
 SearchGridCtrl.$inject = ['$scope', '$element', 'ViewService', '$interpolate'];
 function SearchGridCtrl($scope, $element, ViewService, $interpolate) {
 	
-	GridViewCtrl.call(this, $scope, $element);
+	ui.GridViewCtrl.call(this, $scope, $element);
 	$scope._register('grid', $scope);
 	
 	var viewTitles = {};
@@ -474,7 +476,7 @@ ui.controller('SearchToolbarCtrl', SearchToolbarCtrl);
 SearchToolbarCtrl.$inject = ['$scope', '$element', '$http'];
 function SearchToolbarCtrl($scope, $element, $http) {
 
-	FormViewCtrl.call(this, $scope, $element);
+	ui.FormViewCtrl.call(this, $scope, $element);
 	$scope._register('toolbar', $scope);
 	$scope.setEditable();
 	
@@ -682,7 +684,7 @@ angular.module('axelor.ui').directive('uiViewSearch', function(){
 ActionSelectorCtrl.$inject = ['$scope', '$element', '$attrs', '$http', 'MenuService'];
 function ActionSelectorCtrl($scope, $element, $attrs, $http, MenuService) {
 
-	FormViewCtrl.call(this, $scope, $element);
+	ui.FormViewCtrl.call(this, $scope, $element);
 	var menus = {},
 		category = $attrs.category;
 	
@@ -839,4 +841,4 @@ angular.module('axelor.ui').directive('uiActionSelector', function(){
 	};
 });
 
-}).call(this)
+})();

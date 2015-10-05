@@ -17,6 +17,8 @@
  */
 (function() {
 
+"use strict";
+
 var ui = angular.module('axelor.ui');
 
 ui.controller('CalendarViewCtrl', CalendarViewCtrl);
@@ -24,7 +26,7 @@ ui.controller('CalendarViewCtrl', CalendarViewCtrl);
 CalendarViewCtrl.$inject = ['$scope', '$element'];
 function CalendarViewCtrl($scope, $element) {
 
-	DSViewCtrl('calendar', $scope, $element);
+	ui.DSViewCtrl('calendar', $scope, $element);
 
 	var ds = $scope._dataSource;
 
@@ -673,4 +675,4 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 	};
 }]);
 
-}).call(this);
+})();

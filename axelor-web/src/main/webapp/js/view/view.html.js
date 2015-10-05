@@ -15,13 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-(function(){
+(function() {
+
+"use strict";
 
 var ui = angular.module('axelor.ui');
 
-this.HtmlViewCtrl = HtmlViewCtrl;
+ui.HtmlViewCtrl = HtmlViewCtrl;
+ui.HtmlViewCtrl.$inject = ['$scope', '$element', '$sce'];
 
-HtmlViewCtrl.$inject = ['$scope', '$element', '$sce'];
 function HtmlViewCtrl($scope, $element, $sce) {
 
 	var views = $scope._views;
@@ -50,4 +52,4 @@ var directiveFn = function(){
 ui.directive('uiViewHtml', directiveFn);
 ui.directive('uiPortletHtml', directiveFn);
 
-}).call(this);
+})();

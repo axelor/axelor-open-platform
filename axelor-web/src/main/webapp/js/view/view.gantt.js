@@ -17,6 +17,10 @@
  */
 // localization
 
+(function () {
+
+"use strict";
+
 var regional = {
 	month_full: [
 		_t('January'),
@@ -103,7 +107,7 @@ GanttViewCtrl.$inject = ['$scope', '$element'];
 
 function GanttViewCtrl($scope, $element) {
 
-	DSViewCtrl('gantt', $scope, $element);
+	ui.DSViewCtrl('gantt', $scope, $element);
 	var ds = $scope._dataSource;
 	var view = $scope._views['gantt'];
 	var initialized = false;
@@ -211,7 +215,7 @@ function GanttViewCtrl($scope, $element) {
 
 }
 
-angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewService, ActionService) {
+ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewService, ActionService) {
 
 	function link(scope, element, attrs, controller) {
 		var main = element.children(".gantt-main");
@@ -659,18 +663,14 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 						popup.$broadcast("on:new");
 	 			});
 			}
-			
 		};
-		
 	}
-	
 	
 	return {
 	    link:function(scope, element, attrs, controller) {
 	    	scope._viewPromise.then(function(){
 	    		link(scope, element, attrs, controller);
 	    	});
-
 	    },
 	    replace:true,
 	    template:
@@ -679,3 +679,5 @@ angular.module('axelor.ui').directive('uiViewGantt', ['ViewService', 'ActionServ
 		'</div>'
 	  };
 }]);
+
+})();

@@ -19,10 +19,12 @@
 
 "use strict";
 
+var ui = angular.module("axelor.ui");
+
 CustomViewCtrl.$inject = ['$scope', '$http', 'DataSource', 'ViewService'];
 function CustomViewCtrl($scope, $http, DataSource, ViewService) {
 
-	ViewCtrl.call(this, $scope, DataSource, ViewService);
+	ui.ViewCtrl.call(this, $scope, DataSource, ViewService);
 
 	var view = $scope._views['custom'] || {};
 	var viewPromise = null;

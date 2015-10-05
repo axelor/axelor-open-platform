@@ -15,7 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-(function(){
+(function() {
+
+"use strict";
 
 var ui = angular.module('axelor.ui');
 var widgets = {};
@@ -633,4 +635,4 @@ ui.getWidget = function(type) {
 	return null;
 };
 
-})(this);
+})();

@@ -17,7 +17,9 @@
  */
 (function() {
 
-var app = angular.module("axelor.app");
+"use strict";
+
+var ui = angular.module("axelor.ui");
 
 function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 	
@@ -26,8 +28,8 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 		views: [{name: 'user-preferences-form', type: 'form'}]
 	};
 	
-	ViewCtrl($scope, DataSource, ViewService);
-	FormViewCtrl($scope, $element);
+	ui.ViewCtrl($scope, DataSource, ViewService);
+	ui.FormViewCtrl($scope, $element);
 	
 	$scope.onClose = function() {
 		$scope.confirmDirty(doClose);
@@ -103,7 +105,7 @@ function SystemCtrl($scope, $element, $location, $http) {
 	$scope.onRefresh();
 }
 
-app.controller("UserCtrl", ['$scope', '$element', '$location', 'DataSource', 'ViewService', UserCtrl]);
-app.controller("SystemCtrl", ['$scope', '$element', '$location', '$http', SystemCtrl]);
+ui.controller("UserCtrl", ['$scope', '$element', '$location', 'DataSource', 'ViewService', UserCtrl]);
+ui.controller("SystemCtrl", ['$scope', '$element', '$location', '$http', SystemCtrl]);
 
-}).call(this);
+})();

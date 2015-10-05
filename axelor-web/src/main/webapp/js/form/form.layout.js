@@ -17,6 +17,8 @@
  */
 (function() {
 
+"use strict";
+
 var ui = angular.module('axelor.ui');
 
 function TableLayout(items, attrs, $scope, $compile) {
@@ -136,7 +138,7 @@ function TableLayout(items, attrs, $scope, $compile) {
 			widths = colWidths || computeWidths(row);
 
 		_.each(row, function(cell, i) {
-				el = $('<td></td>')
+				var el = $('<td></td>')
 					.addClass(cell.css)
 					.attr('colspan', cell.colspan)
 					.attr('rowspan', cell.rowspan)
@@ -485,4 +487,4 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 	};
 }]);
 
-})(this);
+})();

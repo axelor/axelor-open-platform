@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-(function($, undefined){
-	
+(function() {
+
+	"use strict";
+
 	var dialogs = {
 
 		config: {
@@ -236,4 +238,4 @@
 	this.axelor.dialogs = dialogs;
 	this.axelor.notify = notify;
 
-})(window.jQuery);
+}).call(this);

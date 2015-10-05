@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 (function() {
+
+"use strict";
 	
 var ui = angular.module('axelor.ui');
 
@@ -754,4 +756,4 @@ ui.directive('uiPortletTree', function(){
 	};
 });
 
-}).call(this);
+})();

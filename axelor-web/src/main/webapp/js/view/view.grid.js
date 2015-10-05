@@ -17,16 +17,18 @@
  */
 (function() {
 
-var ui = angular.module('axelor.ui');
+"use strict";
 
-this.GridViewCtrl = GridViewCtrl;
+var ui = angular.module('axelor.ui');
 
 ui.controller('GridViewCtrl', GridViewCtrl);
 
-GridViewCtrl.$inject = ['$scope', '$element'];
+ui.GridViewCtrl = GridViewCtrl;
+ui.GridViewCtrl.$inject = ['$scope', '$element'];
+
 function GridViewCtrl($scope, $element) {
 
-	DSViewCtrl('grid', $scope, $element);
+	ui.DSViewCtrl('grid', $scope, $element);
 
 	var ds = $scope._dataSource;
 	var page = {};
@@ -581,14 +583,14 @@ function GridViewCtrl($scope, $element) {
 	};
 }
 
-angular.module('axelor.ui').directive('uiViewGrid', function(){
+ui.directive('uiViewGrid', function(){
 	return {
 		replace: true,
 		template: '<div ui-slick-grid ui-widget-states></div>'
 	};
 });
 
-angular.module('axelor.ui').directive('uiPortletGrid', function(){
+ui.directive('uiPortletGrid', function(){
 	return {
 		controller: ['$scope', '$element', 'ViewService', 'NavService', 'MenuService',
 		             function($scope, $element, ViewService, NavService, MenuService) {
@@ -724,4 +726,4 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 	};
 });
 
-}).call(this);
+})();

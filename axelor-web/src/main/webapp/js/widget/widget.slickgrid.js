@@ -15,7 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-(function(undefined){
+(function() {
+
+"use strict";
 
 var ui = angular.module('axelor.ui');
 
@@ -2256,8 +2258,8 @@ ui.directive('uiSlickEditors', function() {
 		restrict: 'EA',
 		replace: true,
 		controller: ['$scope', '$element', 'DataSource', 'ViewService', function($scope, $element, DataSource, ViewService) {
-			ViewCtrl($scope, DataSource, ViewService);
-			FormViewCtrl.call(this, $scope, $element);
+			ui.ViewCtrl($scope, DataSource, ViewService);
+			ui.FormViewCtrl.call(this, $scope, $element);
 			$scope.setEditable();
 			$scope.onShow = function(viewPromise) {
 				

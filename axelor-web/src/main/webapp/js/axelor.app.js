@@ -19,7 +19,9 @@
  * Application Module
  * 
  */
-(function($, undefined){
+(function() {
+
+	"use strict";
 	
 	var loadingElem = null,
 		loadingTimer = null,
@@ -564,4 +566,4 @@
 		$route.reload();
 	}
 
-})(jQuery);
+})();

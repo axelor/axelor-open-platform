@@ -15,7 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-(function(){
+(function() {
+
+"use strict";
 
 var ui = angular.module('axelor.ui');
 
@@ -77,7 +79,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		$scope._viewParams = params;
 	}
 	
-	ViewCtrl($scope, DataSource, ViewService);
+	ui.ViewCtrl($scope, DataSource, ViewService);
 	
 	$scope.ngModel = null;
 	$scope.editorCanSave = true;
@@ -541,4 +543,4 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	};
 }
 
-}).call(this);
+})();

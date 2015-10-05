@@ -17,6 +17,8 @@
  */
 (function() {
 
+	"use strict";
+
 	var ds = angular.module('axelor.ds', ['ngResource']);
 
 	var forEach = angular.forEach,
@@ -71,7 +73,7 @@
 		};
 
 		ViewService.prototype.accept = function(params) {
-			views = {};
+			var views = {};
 			forEach(params.views, function(view){
 				var type = view.type || view.viewType;
 				if (params.viewType == null) {
@@ -466,5 +468,4 @@
 		return new ViewService();
 	}]);
 
-
-})(this);
+})();

@@ -126,8 +126,8 @@ ui.directive('uiUpdateDummy', function () {
 				views: []
 			};
 
-			ViewCtrl($scope, DataSource, ViewService);
-			FormViewCtrl.call(this, $scope, $element);
+			ui.ViewCtrl($scope, DataSource, ViewService);
+			ui.FormViewCtrl.call(this, $scope, $element);
 
 			function prepare(fields) {
 				
@@ -438,4 +438,4 @@ ui.directive('uiUpdateMenu', function () {
 	};
 });
 
-}());
+})();

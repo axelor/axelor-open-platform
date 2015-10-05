@@ -17,6 +17,8 @@
  */
 (function() {
 
+"use strict";
+
 var ui = angular.module('axelor.ui');
 
 DashboardCtrl.$inject = ['$scope', '$element'];
@@ -131,7 +133,7 @@ function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 
 	function init() {
 
-		ViewCtrl.call(self, $scope, DataSource, ViewService);
+		ui.ViewCtrl.call(self, $scope, DataSource, ViewService);
 
 		$scope.show = function() {
 

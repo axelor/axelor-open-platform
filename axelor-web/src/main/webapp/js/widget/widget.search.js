@@ -1153,4 +1153,4 @@ ui.directive('uiFilterBox', function() {
 	};
 });
 
-}).call(this);
+})();

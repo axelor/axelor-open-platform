@@ -17,6 +17,8 @@
  */
 (function() {
 
+"use strict";
+
 var ui = angular.module('axelor.ui');
 
 ui.formInput('Spreadsheet', {
@@ -154,4 +156,4 @@ ui.formInput('Spreadsheet', {
 		"<div></div>"
 });
 
-})(this);
+})();

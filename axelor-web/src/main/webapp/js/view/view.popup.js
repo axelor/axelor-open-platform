@@ -15,7 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+(function () {
+
+"use strict";
+
+var ui = angular.module("axelor.ui");
+
 EditorCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewService', '$q'];
+
 function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	
 	var parent = $scope.$parent;
@@ -24,8 +31,8 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	$scope.editorCanSave = parent.editorCanSave;
 	$scope.editorCanReload = parent.editorCanReload;
 
-	ViewCtrl.call(this, $scope, DataSource, ViewService);
-	FormViewCtrl.call(this, $scope, $element);
+	ui.ViewCtrl.call(this, $scope, DataSource, ViewService);
+	ui.FormViewCtrl.call(this, $scope, $element);
 	
 	var closeCallback = null;
 	var originalEdit = $scope.edit;
@@ -198,8 +205,8 @@ function SelectorCtrl($scope, $element, DataSource, ViewService) {
 	$scope._viewParams = parent._viewParams;
 	$scope.getDomain = parent.getDomain;
 
-	ViewCtrl.call(this, $scope, DataSource, ViewService);
-	GridViewCtrl.call(this, $scope, $element);
+	ui.ViewCtrl.call(this, $scope, DataSource, ViewService);
+	ui.GridViewCtrl.call(this, $scope, $element);
 
 	function doFilter() {
 		$scope.filter($scope.getDomain());
@@ -266,7 +273,7 @@ function SelectorCtrl($scope, $element, DataSource, ViewService) {
 	};
 }
 
-angular.module('axelor.ui').directive('uiDialogSize', function() {
+ui.directive('uiDialogSize', function() {
 
 	return function (scope, element, attrs) {
 		
@@ -394,7 +401,7 @@ angular.module('axelor.ui').directive('uiDialogSize', function() {
 	};
 });
 
-angular.module('axelor.ui').directive('uiEditorPopup', function() {
+ui.directive('uiEditorPopup', function() {
 	
 	return {
 		restrict: 'EA',
@@ -444,7 +451,7 @@ angular.module('axelor.ui').directive('uiEditorPopup', function() {
 	};
 });
 
-angular.module('axelor.ui').directive('uiSelectorPopup', function(){
+ui.directive('uiSelectorPopup', function(){
 	
 	return {
 		restrict: 'EA',
@@ -513,3 +520,5 @@ angular.module('axelor.ui').directive('uiSelectorPopup', function(){
 		'</div>'
 	};
 });
+
+})();

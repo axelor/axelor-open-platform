@@ -15,7 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-ViewCtrl.$inject = ['$scope', 'DataSource', 'ViewService'];
+(function () {
+
+"use strict";
+
+var ui = angular.module("axelor.ui");
+
+ui.ViewCtrl = ViewCtrl;
+ui.ViewCtrl.$inject = ['$scope', 'DataSource', 'ViewService'];
+
 function ViewCtrl($scope, DataSource, ViewService) {
 
 	if ($scope._viewParams == null) {
@@ -168,7 +176,7 @@ function ViewCtrl($scope, DataSource, ViewService) {
  * directly but actual controller should inherit from it.
  * 
  */
-function DSViewCtrl(type, $scope, $element) {
+ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
 
 	if (type == null) {
 		throw "No view type provided.";
@@ -369,7 +377,7 @@ function DSViewCtrl(type, $scope, $element) {
 	});
 }
 
-angular.module('axelor.ui').directive('uiViewPane', function() {
+ui.directive('uiViewPane', function() {
 
 	return {
 		replace: true,
@@ -424,7 +432,7 @@ angular.module('axelor.ui').directive('uiViewPane', function() {
 	};
 });
 
-angular.module('axelor.ui').directive('uiViewPopup', function() {
+ui.directive('uiViewPopup', function() {
 	
 	return {
 		controller: ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
@@ -508,7 +516,7 @@ angular.module('axelor.ui').directive('uiViewPopup', function() {
 	};
 });
 
-angular.module('axelor.ui').directive('uiRecordPager', function(){
+ui.directive('uiRecordPager', function(){
 
 	return {
 		replace: true,
@@ -548,7 +556,7 @@ angular.module('axelor.ui').directive('uiRecordPager', function(){
 	};
 });
 
-angular.module('axelor.ui').directive('uiViewSwitcher', function(){
+ui.directive('uiViewSwitcher', function(){
 	return {
 		scope: true,
 		link: function(scope, element, attrs) {
@@ -600,7 +608,7 @@ angular.module('axelor.ui').directive('uiViewSwitcher', function(){
 	};
 });
 
-angular.module('axelor.ui').directive('uiHotKeys', function() {
+ui.directive('uiHotKeys', function() {
 
 	var keys = {
 		45: 'new',		// insert
@@ -749,3 +757,5 @@ angular.module('axelor.ui').directive('uiHotKeys', function() {
 		});
 	};
 });
+
+})();

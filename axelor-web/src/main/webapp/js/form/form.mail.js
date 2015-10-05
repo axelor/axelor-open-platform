@@ -15,7 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-(function(){
+(function() {
+
+"use strict";
 
 var ui = angular.module('axelor.ui');
 
@@ -768,7 +770,7 @@ ui.formWidget('PanelMail', {
 ui.controller("MailGroupListCtrl", MailGroupListCtrl);
 MailGroupListCtrl.$inject = ['$scope', '$element'];
 function MailGroupListCtrl($scope, $element) {
-	GridViewCtrl.call(this, $scope, $element);
+	ui.GridViewCtrl.call(this, $scope, $element);
 
 	$scope.getUrl = function (record) {
 		if (!record || !record.id) return null;
@@ -814,4 +816,4 @@ function MailGroupListCtrl($scope, $element) {
 	};
 }
 
-})(this);
+})();

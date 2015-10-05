@@ -17,6 +17,8 @@
  */
 (function() {
 
+"use strict";
+
 var app = angular.module("axelor.app");
 var singleTabOnly = axelor.device.mobile || !!__appSettings['view.single.tab'];
 
@@ -65,10 +67,9 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 			closable = view.params.closable;
 		}
 
-		tab = view;
-		tab.closable = closable;
+		view.closable = closable;
 
-		openTab(tab, options);
+		openTab(view, options);
 	}
 
 	function openTabByName(name, options) {
@@ -322,19 +323,19 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 
 	$scope.singleTabOnly = singleTabOnly;
 
-	$scope.navTabs = Object.defineProperty($scope, 'navTabs', {
+	Object.defineProperty($scope, 'navTabs', {
 		get: function() {
 			return NavService.getTabs();
 		}
 	});
 	
-	$scope.navPopups = Object.defineProperty($scope, 'navPopups', {
+	Object.defineProperty($scope, 'navPopups', {
 		get: function() {
 			return NavService.getPopups();
 		}
 	});
 
-	$scope.selectedTab = Object.defineProperty($scope, 'selectedTab', {
+	Object.defineProperty($scope, 'selectedTab', {
 		get: function() {
 			return NavService.getSelected();
 		}
@@ -548,4 +549,4 @@ function TabCtrl($scope, $location, $routeParams) {
 app.controller("NavCtrl", NavCtrl);
 app.controller("TabCtrl", TabCtrl);
 
-}).call(this);
+})();

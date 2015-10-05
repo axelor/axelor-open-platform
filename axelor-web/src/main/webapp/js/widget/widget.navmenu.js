@@ -17,7 +17,9 @@
  */
 (function() {
 
-var module = angular.module('axelor.ui');
+"use strict";
+
+var ui = angular.module('axelor.ui');
 
 NavMenuCtrl.$inject = ['$scope', '$element', 'MenuService', 'NavService'];
 function NavMenuCtrl($scope, $element, MenuService, NavService) {
@@ -90,7 +92,7 @@ function NavMenuCtrl($scope, $element, MenuService, NavService) {
 	}
 }
 
-module.directive('navMenuBar', function() {
+ui.directive('navMenuBar', function() {
 
 	return {
 
@@ -209,7 +211,7 @@ module.directive('navMenuBar', function() {
 	};
 });
 
-module.directive('navMenu', function() {
+ui.directive('navMenu', function() {
 
 	return {
 		replace: true,
@@ -227,7 +229,7 @@ module.directive('navMenu', function() {
 	};
 });
 
-module.directive('navMenuItem', ['$compile', function($compile) {
+ui.directive('navMenuItem', ['$compile', function($compile) {
 
 	return {
 		replace: true,
@@ -260,4 +262,4 @@ module.directive('navMenuItem', ['$compile', function($compile) {
 	};
 }]);
 
-}).call(this);
+})();

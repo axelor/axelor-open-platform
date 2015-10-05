@@ -17,16 +17,18 @@
  */
 (function() {
 
+"use strict";
+
 var ui = angular.module('axelor.ui');
 
 ui.controller('FormViewCtrl', FormViewCtrl);
 
-this.FormViewCtrl = FormViewCtrl;
+ui.FormViewCtrl = FormViewCtrl;
+ui.FormViewCtrl.$inject = ['$scope', '$element'];
 
-FormViewCtrl.$inject = ['$scope', '$element'];
 function FormViewCtrl($scope, $element) {
 
-	DSViewCtrl('form', $scope, $element);
+	ui.DSViewCtrl('form', $scope, $element);
 
 	var ds = $scope._dataSource;
 
@@ -46,7 +48,8 @@ function FormViewCtrl($scope, $element) {
 	 * @param field field name or field element
 	 */
 	$scope.getViewDef = function(field) {
-		var name = id = field,
+		var id = field,
+			name = field,
 			elem = $(field),
 			attrs = {};
 
@@ -1179,4 +1182,4 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 	};
 }]);
 
-}).call(this);
+})();

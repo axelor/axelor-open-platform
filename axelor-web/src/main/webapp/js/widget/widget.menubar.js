@@ -17,7 +17,9 @@
  */
 (function() {
 
-var module = angular.module('axelor.ui');
+"use strict";
+
+var ui = angular.module('axelor.ui');
 
 MenuBarCtrl.$inject = ['$scope', '$element'];
 function MenuBarCtrl($scope, $element) {
@@ -43,7 +45,7 @@ function MenuBarCtrl($scope, $element) {
 	};
 }
 
-module.directive('uiMenuBar', function() {
+ui.directive('uiMenuBar', function() {
 
 	return {
 		replace: true,
@@ -77,7 +79,7 @@ module.directive('uiMenuBar', function() {
 	};
 });
 
-module.directive('uiMenu', function() {
+ui.directive('uiMenu', function() {
 
 	return {
 		replace: true,
@@ -95,7 +97,7 @@ module.directive('uiMenu', function() {
 	};
 });
 
-module.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, ActionService) {
+ui.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, ActionService) {
 
 	return {
 		replace: true,
@@ -188,7 +190,7 @@ module.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, 
 	};
 }]);
 
-module.directive('uiToolbarAdjust', function() {
+ui.directive('uiToolbarAdjust', function() {
 
 	return function (scope, element, attrs) {
 
@@ -262,4 +264,4 @@ module.directive('uiToolbarAdjust', function() {
 	};
 });
 
-}).call(this);
+})();

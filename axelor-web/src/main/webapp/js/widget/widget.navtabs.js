@@ -15,7 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-angular.module('axelor.ui').directive('navTabs', function() {
+(function() {
+
+"use strict";
+
+var ui = angular.module('axelor.ui');
+
+ui.directive('navTabs', function() {
 	return {
 		restrict: 'EA',
 		replace: true,
@@ -78,3 +84,5 @@ angular.module('axelor.ui').directive('navTabs', function() {
 		templateUrl: 'partials/nav-tabs.html'
 	};
 });
+
+})();

@@ -17,6 +17,8 @@
  */
 (function() {
 
+"use strict";
+
 var ui = angular.module('axelor.ui');
 
 PortalCtrl.$inject = ['$scope', '$element'];
@@ -140,7 +142,7 @@ function PortletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 	
 	function init() {
 		
-		ViewCtrl.call(self, $scope, DataSource, ViewService);
+		ui.ViewCtrl.call(self, $scope, DataSource, ViewService);
 		
 		$scope.show = function() {
 
@@ -379,7 +381,7 @@ ui.directive('uiPortalTab', function() {
 			$scope.isNested = true;
 			$scope._model = null;
 
-			ViewCtrl.apply(this, arguments);
+			ui.ViewCtrl.apply(this, arguments);
 		}],
 		template: "<div ui-view-portal></div>"
 	};

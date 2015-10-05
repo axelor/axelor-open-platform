@@ -15,7 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-(function(){
+(function() {
+
+"use strict";
 
 var ui = angular.module('axelor.ui');
 
@@ -45,7 +47,7 @@ ui.ProgressMixin = {
 		var max = +(field.max) || 100,
 			min = +(field.min) || 0;
 
-		colors = [
+		var colors = [
 			["r", 24],	// 00 - 24 (red)
 			["y", 49],	// 25 - 49 (yellow)
 			["b", 74],  // 50 - 74 (blue)
@@ -109,4 +111,4 @@ ui.formInput('Progress', 'Integer', _.extend({}, ui.ProgressMixin));
  */
 ui.formInput('SelectProgress', 'Select', _.extend({}, ui.ProgressMixin));
 
-})(this);
+})();

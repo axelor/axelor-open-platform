@@ -21,9 +21,9 @@
 
 var ui = angular.module('axelor.ui');
 
-this.ChartCtrl = ChartCtrl;
+ui.ChartCtrl = ChartCtrl;
+ui.ChartCtrl.$inject = ['$scope', '$element', '$http'];
 
-ChartCtrl.$inject = ['$scope', '$element', '$http'];
 function ChartCtrl($scope, $element, $http) {
 
 	var views = $scope._views;
@@ -116,7 +116,7 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 
 	$scope._dataSource = DataSource.create('com.axelor.meta.db.MetaView');
 	
-	FormViewCtrl.call(this, $scope, $element);
+	ui.FormViewCtrl.call(this, $scope, $element);
 	$scope.setEditable();
 	
 	function fixFields(fields) {
@@ -742,4 +742,4 @@ ui.directive('uiChartForm', function () {
 ui.directive('uiViewChart', directiveFn);
 ui.directive('uiPortletChart', directiveFn);
 
-}).call(this);
+})();

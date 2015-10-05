@@ -15,7 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-(function(){
+(function() {
+
+"use strict";
 
 var ui = angular.module("axelor.ui");
 
@@ -25,7 +27,7 @@ ui.OneToManyCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewService'];
 function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) {
 
 	ui.RefFieldCtrl.call(this, $scope, $element, DataSource, ViewService, function(){
-		GridViewCtrl.call(this, $scope, $element);
+		ui.GridViewCtrl.call(this, $scope, $element);
 		$scope.editorCanSave = false;
 		$scope.selectEnable = false;
 		if (initCallback) {
@@ -1150,4 +1152,4 @@ ui.formInput('ManyToManyInline', 'OneToManyInline', {
 	}
 });
 
-}).call(this);
+})();

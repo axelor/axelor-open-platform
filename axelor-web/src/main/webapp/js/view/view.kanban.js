@@ -23,7 +23,7 @@ var ui = angular.module('axelor.ui');
 
 function BaseCardsCtrl(type, $scope, $element) {
 
-	DSViewCtrl(type, $scope, $element);
+	ui.DSViewCtrl(type, $scope, $element);
 
 	$scope.getRouteOptions = function() {
 		return {

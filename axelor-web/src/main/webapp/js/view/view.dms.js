@@ -15,7 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-(function(){
+(function() {
+
+"use strict";
 
 var ui = angular.module('axelor.ui');
 
@@ -75,7 +77,7 @@ function inputDialog(options, callback) {
 ui.controller("DMSFileListCtrl", DMSFileListCtrl);
 DMSFileListCtrl.$inject = ['$scope', '$element'];
 function DMSFileListCtrl($scope, $element) {
-	GridViewCtrl.call(this, $scope, $element);
+	ui.GridViewCtrl.call(this, $scope, $element);
 
 	var _params = $scope._viewParams;
 	var _domain = $scope._domain || "";
@@ -1346,8 +1348,8 @@ ui.directive("uiDmsInlineForm", function () {
 					name: $scope.formName
 				}]
 			};
-			ViewCtrl.call(this, $scope, DataSource, ViewService);
-			FormViewCtrl.call(this, $scope, $element);
+			ui.ViewCtrl.call(this, $scope, DataSource, ViewService);
+			ui.FormViewCtrl.call(this, $scope, $element);
 
 			$scope.setEditable();
 			$scope.onHotKey = function (e) {
@@ -1382,7 +1384,7 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 				}]
 			};
 
-			ViewCtrl.apply(this, arguments);
+			ui.ViewCtrl.apply(this, arguments);
 
 			var ds = DataSource.create("com.axelor.dms.db.DMSFile");
 
@@ -1598,4 +1600,4 @@ $(function () {
 	}, false);
 });
 
-}).call(this);
+})();
