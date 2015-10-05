@@ -218,9 +218,9 @@ ActionHandler.prototype = {
 		var prompt = this.prompt;
 		var itemScope = this.element.scope();
 		if (_.isFunction(itemScope.attr)) {
-			prompt = this.scope.attr('prompt') || prompt;
+			prompt = itemScope.attr('prompt') || prompt;
 		}
-		return prompt;
+		return _.isString(prompt) ? prompt : null;
 	},
 
 	_getContext: function() {
