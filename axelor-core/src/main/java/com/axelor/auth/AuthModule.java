@@ -34,127 +34,123 @@ import com.axelor.auth.cas.AuthCasRealm;
 import com.axelor.auth.cas.AuthCasUserFilter;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JpaSecurity;
+import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Key;
+import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
-public class AuthModule extends ShiroWebModule {
+public class AuthModule extends AbstractModule {
 
 	private Properties properties = new Properties();
+
+	private ServletContext context;
+
+	public AuthModule() {
+	}
+
+	public AuthModule(ServletContext context) {
+		this.context = context;
+	}
 
 	public AuthModule properties(Properties properties) {
 		this.properties = properties;
 		return this;
 	}
 
-	public AuthModule(ServletContext servletContext) {
-		super(servletContext);
-	}
-
 	@Override
-	@SuppressWarnings("unchecked")
-	protected void configureShiroWeb() {
+	protected final void configure() {
 
-		this.bind(JpaSecurity.class).toProvider(AuthSecurity.class);
-		this.expose(JpaSecurity.class);
-
+		this.bindConstant().annotatedWith(Names.named("app.loginUrl")).to("/login.jsp");
 		this.bindConstant().annotatedWith(Names.named("auth.hash.algorithm")).to("SHA-512");
 		this.bindConstant().annotatedWith(Names.named("auth.hash.iterations")).to(500000);
 		this.bind(Properties.class).annotatedWith(Names.named("auth.ldap.config")).toInstance(properties);
 
+		this.bind(JpaSecurity.class).toProvider(AuthSecurity.class);
 		this.bind(AuthService.class).asEagerSingleton();
 		this.bind(AuthLdap.class).asEagerSingleton();
 
-		this.expose(AuthService.class);
-		this.expose(AuthLdap.class);
+		this.configureAuth();
 
-		this.addFilterChain("/public/**", ANON);
-		this.addFilterChain("/lib/**", ANON);
-		this.addFilterChain("/img/**", ANON);
-		this.addFilterChain("/ico/**", ANON);
-		this.addFilterChain("/css/**", ANON);
-		this.addFilterChain("/error.jsp", ANON);
-
-		// CAS support
-		if (bindCas()) {
-			this.addFilterChain("/cas", Key.get(AuthCasFilter.class));
-			this.addFilterChain("/logout", Key.get(AuthCasLogoutFilter.class));
-			this.addFilterChain("/**", Key.get(AuthCasUserFilter.class));
-			return;
-		}
-
-		this.bindConstant().annotatedWith(Names.named("app.loginUrl")).to("/login.jsp");
-		this.bindRealm().to(AuthRealm.class);
-
-		this.addFilterChain("/logout", LOGOUT);
-		this.addFilterChain("/**", Key.get(AuthFilter.class));
+		// initialize SecurityManager
+		this.bind(Initializer.class).asEagerSingleton();
 	}
 
-	private boolean bindCas() {
-
-		final AppSettings settings = AppSettings.get();
-		final String casServerUrlPrefix = settings.get(AuthCasRealm.CONFIG_CAS_SERVER_PREFIX_URL);
-		final String casService = settings.get(AuthCasRealm.CONFIG_CAS_SERVICE);
-
-		if (StringUtils.isBlank(casServerUrlPrefix) ||
-			StringUtils.isBlank(casService)) {
-			return false;
-		}
-
-		String casLoginUrl = settings.get(AuthCasRealm.CONFIG_CAS_LOGIN_URL);
-		String casLogoutUrl = settings.get(AuthCasRealm.CONFIG_CAS_LOGOUT_URL);
-		String casProtocol = settings.get(AuthCasRealm.CONFIG_CAS_PROTOCOL);
-
-		if (StringUtils.isBlank(casLoginUrl)) {
-			casLoginUrl = String.format("%s/login?service=%s", casServerUrlPrefix, casService);
-		}
-		if (StringUtils.isBlank(casLogoutUrl)) {
-			casLogoutUrl = String.format("%s/logout?service=%s", casServerUrlPrefix, casService);
-		}
-		if (StringUtils.isBlank(casProtocol)) {
-			casProtocol = "SAML";
-		}
-
-		this.bindConstant().annotatedWith(Names.named("shiro.cas.failure.url")).to("/error.jsp");
-		this.bindConstant().annotatedWith(Names.named("shiro.cas.server.url.prefix")).to(casServerUrlPrefix);
-		this.bindConstant().annotatedWith(Names.named("shiro.cas.service")).to(casService);
-		this.bindConstant().annotatedWith(Names.named("shiro.cas.login.url")).to(casLoginUrl);
-		this.bindConstant().annotatedWith(Names.named("shiro.cas.logout.url")).to(casLogoutUrl);
-		this.bindConstant().annotatedWith(Names.named("shiro.cas.protocol")).to(casProtocol);
-
-		this.bindRealm().to(AuthCasRealm.class);
-
-		return true;
+	protected void configureAuth() {
+		final Module module = context == null ? new MyShiroModule() : new MyShiroWebModule(context);
+		this.install(module);
 	}
 
-	public static class Simple extends ShiroModule {
-
-		private Properties properties = new Properties();
-
-		public Simple properties(Properties properties) {
-			this.properties = properties;
-			return this;
-		}
+	static final class MyShiroModule extends ShiroModule {
 
 		@Override
 		protected void configureShiro() {
-
-			this.bind(JpaSecurity.class).toProvider(AuthSecurity.class);
-			this.expose(JpaSecurity.class);
-
-			this.bindConstant().annotatedWith(Names.named("auth.hash.algorithm")).to("SHA-512");
-			this.bindConstant().annotatedWith(Names.named("auth.hash.iterations")).to(500000);
-			this.bind(Properties.class).annotatedWith(Names.named("auth.ldap.config")).toInstance(properties);
-
-			this.bind(AuthService.class).asEagerSingleton();
-			this.bind(AuthLdap.class).asEagerSingleton();
-
-			this.expose(AuthService.class);
-			this.expose(AuthLdap.class);
-
 			this.bindRealm().to(AuthRealm.class);
-			this.bind(Initializer.class).asEagerSingleton();
+		}
+	}
+
+	static final class MyShiroWebModule extends ShiroWebModule {
+
+		public MyShiroWebModule(ServletContext context) {
+			super(context);
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		protected void configureShiroWeb() {
+			this.addFilterChain("/public/**", ANON);
+			this.addFilterChain("/lib/**", ANON);
+			this.addFilterChain("/img/**", ANON);
+			this.addFilterChain("/ico/**", ANON);
+			this.addFilterChain("/css/**", ANON);
+			this.addFilterChain("/error.jsp", ANON);
+
+			if (bindCas()) {
+				this.bindRealm().to(AuthCasRealm.class);
+				this.addFilterChain("/cas", Key.get(AuthCasFilter.class));
+				this.addFilterChain("/logout", Key.get(AuthCasLogoutFilter.class));
+				this.addFilterChain("/**", Key.get(AuthCasUserFilter.class));
+			} else {
+				this.bindRealm().to(AuthRealm.class);
+				this.addFilterChain("/logout", LOGOUT);
+				this.addFilterChain("/**", Key.get(AuthFilter.class));
+			}
+		}
+
+		private boolean bindCas() {
+
+			final AppSettings settings = AppSettings.get();
+			final String casServerUrlPrefix = settings.get(AuthCasRealm.CONFIG_CAS_SERVER_PREFIX_URL);
+			final String casService = settings.get(AuthCasRealm.CONFIG_CAS_SERVICE);
+
+			if (StringUtils.isBlank(casServerUrlPrefix) ||
+				StringUtils.isBlank(casService)) {
+				return false;
+			}
+
+			String casLoginUrl = settings.get(AuthCasRealm.CONFIG_CAS_LOGIN_URL);
+			String casLogoutUrl = settings.get(AuthCasRealm.CONFIG_CAS_LOGOUT_URL);
+			String casProtocol = settings.get(AuthCasRealm.CONFIG_CAS_PROTOCOL);
+
+			if (StringUtils.isBlank(casLoginUrl)) {
+				casLoginUrl = String.format("%s/login?service=%s", casServerUrlPrefix, casService);
+			}
+			if (StringUtils.isBlank(casLogoutUrl)) {
+				casLogoutUrl = String.format("%s/logout?service=%s", casServerUrlPrefix, casService);
+			}
+			if (StringUtils.isBlank(casProtocol)) {
+				casProtocol = "SAML";
+			}
+
+			this.bindConstant().annotatedWith(Names.named("shiro.cas.failure.url")).to("/error.jsp");
+			this.bindConstant().annotatedWith(Names.named("shiro.cas.server.url.prefix")).to(casServerUrlPrefix);
+			this.bindConstant().annotatedWith(Names.named("shiro.cas.service")).to(casService);
+			this.bindConstant().annotatedWith(Names.named("shiro.cas.login.url")).to(casLoginUrl);
+			this.bindConstant().annotatedWith(Names.named("shiro.cas.logout.url")).to(casLogoutUrl);
+			this.bindConstant().annotatedWith(Names.named("shiro.cas.protocol")).to(casProtocol);
+
+			return true;
 		}
 	}
 

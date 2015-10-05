@@ -18,6 +18,8 @@
 package com.axelor.web;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
@@ -39,6 +41,7 @@ import com.axelor.rpc.RequestFilter;
 import com.axelor.rpc.Response;
 import com.axelor.rpc.ResponseInterceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Module;
 import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.persist.PersistFilter;
@@ -62,6 +65,19 @@ public class AppServletModule extends ServletModule {
 
 	public AppServletModule(String jpaUnit) {
 		this.jpaUnit = jpaUnit;
+	}
+
+	protected List<? extends Module> getModules() {
+		final AppSettings settings = AppSettings.get();
+		final AuthModule authModule = new AuthModule(getServletContext()).properties(settings.getProperties());
+		final AppModule appModule = new AppModule();
+		final SchedulerModule schedulerModule = new SchedulerModule();
+		return Arrays.asList(authModule, appModule, schedulerModule);
+	}
+
+	protected void afterConfigureServlets() {
+		// register initialization servlet
+		serve("_init").with(InitServlet.class);
 	}
 
 	@Override
@@ -94,14 +110,10 @@ public class AppServletModule extends ServletModule {
 			}
 		});
 
-		// install the auth module
-		install(new AuthModule(getServletContext()).properties(settings.getProperties()));
-
-		// install the app modules
-		install(new AppModule());
-		
-		// install the scheduler module
-		install(new SchedulerModule());
+		// install additional modules
+		for (Module module : getModules()) {
+			install(module);
+		}
 
 		// no-cache filter
 		filter("/js/*", NoCacheFilter.STATIC_URL_PATTERNS).through(NoCacheFilter.class);
@@ -140,7 +152,7 @@ public class AppServletModule extends ServletModule {
 		// register the session listener
 		getServletContext().addListener(new AppSessionListener(settings));
 
-		// register initialization servlet
-		serve("_init").with(InitServlet.class);
+		// run additional configuration tasks
+		this.afterConfigureServlets();
 	}
 }

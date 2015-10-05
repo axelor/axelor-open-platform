@@ -78,7 +78,7 @@ public class AppContextListener extends GuiceServletContextListener {
 	}
 
 	@Override
-	protected final Injector getInjector() {
+	protected Injector getInjector() {
 		return Guice.createInjector(new AppServletModule());
 	}
 }

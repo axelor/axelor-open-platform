@@ -76,7 +76,7 @@ public class AppInitCli {
 			bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
 
 			install(new JpaModule(jpaUnit).properties(properties));
-			install(new AuthModule.Simple().properties(properties));
+			install(new AuthModule().properties(properties));
 			install(new AppModule());
 		}
 	}

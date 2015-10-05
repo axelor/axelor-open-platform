@@ -36,7 +36,7 @@ public class TestModule extends AbstractModule {
 		bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
 
 		install(new JpaModule("testUnit", true, false).scan("com.axelor.web.db").properties(properties));
-		install(new AuthModule.Simple().properties(properties));
+		install(new AuthModule().properties(properties));
 		install(new AppModule());
 	}
 }
