@@ -1212,7 +1212,8 @@ ui.directive("uiDmsDetails", function () {
 			});
 		}],
 		link: function (scope, element, attrs) {
-
+			//XXX: ui-dialog issue
+			element.zIndex(element.siblings(".slickgrid").zIndex() + 1);
 		}
 	}
 });
