@@ -31,7 +31,6 @@
         <xsd:element name="action-import" type="tns:ActionImport" />
         <xsd:element name="action-export" type="tns:ActionExport" />
         <xsd:element name="action-group" type="tns:ActionGroup" />
-        <xsd:element name="action-workflow" type="tns:ActionWorkflow" />
         <xsd:element name="action-report" type="tns:ActionReport" />
       </xsd:choice>
     </xsd:complexType>
@@ -2957,12 +2956,6 @@
           <xsd:element name="action" type="tns:ActAction" maxOccurs="unbounded" />
         </xsd:sequence>
       </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-
-  <xsd:complexType name="ActionWorkflow">
-    <xsd:complexContent>
-      <xsd:extension base="tns:AbstractModelAction"></xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
 

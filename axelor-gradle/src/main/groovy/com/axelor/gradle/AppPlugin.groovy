@@ -68,7 +68,6 @@ class AppPlugin extends AbstractPlugin {
 					axelorCore "com.axelor:axelor-common:${sdkVersion}"
 					axelorCore "com.axelor:axelor-core:${sdkVersion}"
 					axelorCore "com.axelor:axelor-web:${sdkVersion}"
-					axelorCore "com.axelor:axelor-wkf:${sdkVersion}"
 					axelorCore "com.axelor:axelor-test:${sdkVersion}"
 				}
 			}

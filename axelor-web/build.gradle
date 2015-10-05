@@ -3,8 +3,6 @@ apply plugin: "axelor-module"
 module {
 	name "axelor-web"
 	title "Axelor :: Web"
-	
-	module "axelor-wkf"
 }
 
 dependencies {

@@ -32,7 +32,6 @@ public class TestResolver {
 	public void test() {
 		
 		resolver.add("axelor-auth", 	"axelor-core");
-		resolver.add("axelor-wkf", 		"axelor-auth", "axelor-core");
 		resolver.add("axelor-meta", 	"axelor-data");
 		
 		resolver.add("axelor-x");

@@ -40,7 +40,7 @@ plugins.withType(JavaPlugin) {
 
 def linkCoreProjects = { Project project ->
 
-	def linked = ["axelor-common", "axelor-test", "axelor-core", "axelor-web", "axelor-wkf"]
+	def linked = ["axelor-common", "axelor-test", "axelor-core", "axelor-web"]
 	def wtpLinked = linked - ['axelor-test']
 
 	project.eclipse.classpath {
