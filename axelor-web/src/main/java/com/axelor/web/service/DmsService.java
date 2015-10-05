@@ -17,11 +17,12 @@
  */
 package com.axelor.web.service;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,10 +33,13 @@ import java.util.zip.ZipOutputStream;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -43,16 +47,22 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 
+import com.axelor.auth.AuthUtils;
 import com.axelor.dms.db.DMSFile;
 import com.axelor.dms.db.repo.DMSFileRepository;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.rpc.Request;
+import com.axelor.rpc.Resource;
+import com.axelor.rpc.Response;
 import com.google.inject.servlet.RequestScoped;
 
-@RequestScoped
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 @Path("/dms")
+@RequestScoped
 public class DmsService {
 
 	@Context
@@ -60,6 +70,99 @@ public class DmsService {
 
 	@Inject
 	private DMSFileRepository repository;
+
+	@GET
+	@Path("offline")
+	public Response getOfflineFiles(@QueryParam("limit") int limit, @QueryParam("offset") int offset) {
+
+		final Response response = new Response();
+		final List<DMSFile> files = repository.findOffline(limit, offset);
+		final long count = repository.all()
+				.filter("self.permissions[].value = 'OFFLINE' AND self.permissions[].user = :user")
+				.bind("user", AuthUtils.getUser())
+				.count();
+
+		final List<Object> data = new ArrayList<>();
+		for (DMSFile file : files) {
+			final Map<String, Object> json = Resource.toMap(file, "fileName");
+			final MetaFile metaFile = file.getMetaFile();
+			LocalDateTime lastModified = file.getUpdatedOn();
+			if (metaFile != null) {
+				lastModified = metaFile.getCreatedOn();
+				json.put("fileSize", metaFile.getFileSize());
+				json.put("fileType", metaFile.getFileType());
+			}
+
+			json.put("id", file.getId());
+			json.put("updatedOn", lastModified);
+
+			data.add(json);
+		}
+
+		response.setData(data);
+		response.setOffset(offset);
+		response.setTotal(count);
+		response.setStatus(Response.STATUS_SUCCESS);
+
+		return response;
+	}
+
+	@POST
+	@Path("offline")
+	public Response offline(Request request) {
+		final Response response = new Response();
+		final List<?> ids = request.getRecords();
+
+		if (ids == null ||  ids.isEmpty()) {
+			response.setStatus(Response.STATUS_SUCCESS);
+			return response;
+		}
+
+		final List<DMSFile> records = repository.all()
+				.filter("self.id in :ids")
+				.bind("ids", ids)
+				.fetch();
+
+		boolean unset;
+		try {
+			unset = "true".equals(request.getData().get("unset").toString());
+		} catch (Exception e) {
+			unset = false;
+		}
+
+		for (DMSFile item : records) {
+			repository.setOffline(item, unset);
+		}
+
+		response.setStatus(Response.STATUS_SUCCESS);
+		return response;
+	}
+
+	@GET
+	@Path("offline/{id}")
+	public javax.ws.rs.core.Response doDownload(@PathParam("id") long id) {
+
+		final DMSFile file = repository.find(id);
+		if (file == null || file.getMetaFile() == null) {
+			return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+		}
+
+		final File path = MetaFiles.getPath(file.getMetaFile()).toFile();
+		if (!path.exists()) {
+			return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+		}
+
+		final StreamingOutput so = new StreamingOutput() {
+			@Override
+			public void write(OutputStream output) throws IOException, WebApplicationException {
+				try (InputStream input = new FileInputStream(path)) {
+					writeTo(output, input);
+				}
+			}
+		};
+
+		return stream(so, file.getFileName());
+	}
 
 	@POST
 	@Path("download/batch")
@@ -98,6 +201,7 @@ public class DmsService {
 
 	@GET
 	@Path("download/{batchId}")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	public javax.ws.rs.core.Response doDownload(@PathParam("batchId") String batchId) {
 
 		@SuppressWarnings("all")
@@ -168,17 +272,20 @@ public class DmsService {
 				continue;
 			}
 			final FileInputStream fis = new FileInputStream(file);
-			final BufferedInputStream bis = new BufferedInputStream(fis);
 			try {
-				int read = 0;
-				byte[] bytes = new byte[2048];
-				while ((read = bis.read(bytes)) != -1) {
-					zos.write(bytes, 0, read);
-				}
+				writeTo(zos, fis);
 			} finally {
-				bis.close();
+				fis.close();
 				zos.closeEntry();
 			}
+		}
+	}
+
+	private void writeTo(OutputStream os, InputStream is) throws IOException {
+		int read = 0;
+		byte[] bytes = new byte[2048];
+		while ((read = is.read(bytes)) != -1) {
+			os.write(bytes, 0, read);
 		}
 	}
 

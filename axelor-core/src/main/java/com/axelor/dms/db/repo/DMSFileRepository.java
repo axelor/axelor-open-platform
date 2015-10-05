@@ -41,14 +41,17 @@ import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.dms.db.DMSFile;
 import com.axelor.dms.db.DMSFileTag;
+import com.axelor.dms.db.DMSPermission;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.rpc.Resource;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.primitives.Longs;
+import com.google.inject.persist.Transactional;
 
 public class DMSFileRepository extends JpaRepository<DMSFile> {
 
@@ -227,6 +230,52 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 			.count() > 0;
 	}
 
+	private boolean canOffline(DMSFile file, User user) {
+		return file.getIsDirectory() != Boolean.TRUE && file.getMetaFile() != null && dmsPermissions.all()
+				.filter("self.file = ? AND self.value = 'OFFLINE' AND self.user = ?", file, user).count() > 0;
+	}
+
+	@Transactional
+	public DMSFile setOffline(DMSFile file, boolean offline) {
+		Preconditions.checkNotNull(file, "file can't be null");
+
+		// directory can't be marked as offline
+		if (file.getIsDirectory() == Boolean.TRUE) {
+			return file;
+		}
+
+		final User user = AuthUtils.getUser();
+		boolean canOffline = canOffline(file, user);
+
+		if (offline == canOffline) {
+			return file;
+		}
+
+		DMSPermission permission;
+
+		if (offline) {
+			permission = new DMSPermission();
+			permission.setValue("OFFLINE");
+			permission.setFile(file);
+			permission.setUser(user);
+			file.addPermission(permission);
+		} else {
+			permission = dmsPermissions.all()
+					.filter("self.file = ? AND self.value = 'OFFLINE' AND self.user = ?", file, user).fetchOne();
+			file.removePermission(permission);
+			dmsPermissions.remove(permission);
+		}
+
+		return this.save(file);
+	}
+
+	public List<DMSFile> findOffline(int limit, int offset) {
+		return all()
+		.filter("self.permissions[].value = 'OFFLINE' AND self.permissions[].user = :user")
+		.bind("user", AuthUtils.getUser())
+		.fetch(limit, offset);
+	}
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> validate(Map<String, Object> json, Map<String, Object> context) {
@@ -278,6 +327,10 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 
 		json.put("canShare", canShare);
 		json.put("canWrite", canCreate(file));
+
+		if (canOffline(file, user)) {
+			json.put("offline", true);
+		}
 
 		json.put("lastModified", dt);
 		json.put("createdOn", file.getCreatedOn());

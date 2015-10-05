@@ -262,7 +262,7 @@ function DMSFileListCtrl($scope, $element) {
 		}, options);
 
 		var count = 1;
-		var selected = $scope.getSelected() || {};
+		var selected = $scope.getActiveFolder() || {};
 		var existing = _.pluck((selected.nodes || []), "fileName");
 
 		existing = existing.concat(_.pluck($scope.dataView.getItems(), "fileName"));
@@ -397,6 +397,22 @@ function DMSFileListCtrl($scope, $element) {
 				ui.download("ws/dms/download/" + batchId, batchName);
 			}
 		});
+	};
+
+	$scope.onOffline = function () {
+		var http = $scope._dataSource._http;
+		var record = getSelected() || {};
+		if (record.id > 0) {
+			http.post("ws/dms/offline", {
+				model: $scope._model,
+				records: [record.id],
+				data: {
+					unset: !record.offline
+				}
+			}).then(function (res) {
+				record.offline = !record.offline;
+			});
+		}
 	};
 
 	$scope.onShowRelated = function () {
@@ -878,7 +894,7 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 		$scope.rootFolders = rootFolders;
 	}
 
-	$scope.getSelected = function () {
+	$scope.getActiveFolder = function () {
 		for (var id in $scope.folders) {
 			var folder = $scope.folders[id];
 			if (folder && folder.active) {
@@ -1150,6 +1166,8 @@ ui.directive("uiDmsDetails", function () {
 					info.owner = (record.createdBy||{}).name;
 					info.created = moment(record.createdOn).format('DD/MM/YYYY HH:mm');
 					info.updated = moment(record.lastModifiedOn).format('DD/MM/YYYY HH:mm');
+					info.canOffline = !record.isDirectory && (record.metaFile || record['metaFile.id']);
+					info.offline = record.offline;
 				}
 			}
 

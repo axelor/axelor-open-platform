@@ -94,6 +94,10 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
 			break;
 		}
 
+		if (permission == null) {
+			return super.save(entity);
+		}
+
 		final Permission __self__ = findOrCreate("perm.dms.file.__self__", "self.createdBy = ?", "__user__", DMSFile.class.getName());
 		final Permission __create__ = findOrCreate("perm.dms.__create__", null, null, "com.axelor.dms.db.*");
 		final Permission __meta__ = findOrCreate("perm.meta.file.__create__", null, null, "com.axelor.meta.db.MetaFile");

@@ -59,13 +59,18 @@
     <div class="panel-body">
       <form class="form-horizontal">
         <label x-translate>Type</label>
-        <input type="text" readonly="true" class="not-readonly" ng-model="details.type">
+        <input type="text" readonly="readonly" class="not-readonly" ng-model="details.type">
         <label x-translate>Owner</label>
-        <input type="text" readonly="true" class="not-readonly" ng-model="details.owner">
+        <input type="text" readonly="readonly" class="not-readonly" ng-model="details.owner">
         <label x-translate>Created</label>
-        <input type="text" readonly="true" class="not-readonly" ng-model="details.created">
+        <input type="text" readonly="readonly" class="not-readonly" ng-model="details.created">
         <label x-translate>Modified</label>
-        <input type="text" readonly="true" class="not-readonly" ng-model="details.updated">
+        <input type="text" readonly="readonly" class="not-readonly" ng-model="details.updated">
+       	<label class="ibox" ng-show="details.canOffline">
+       	  <input type="checkbox" ng-model="details.offline" ng-click="onOffline()"/>
+          <span class="box"></span>
+          <span class="title">Use offline...</span>
+        </label>
       </form>
       <hr>
       <div class="tags" ng-show="!showTagEditor">
