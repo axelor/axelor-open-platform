@@ -103,7 +103,9 @@ public class AppServletModule extends ServletModule {
 
 			@Override
 			protected void configureServlets() {
-				// order is important, PersistFilter must be the first filter
+				// check for CORS requests earlier
+				filter("*").through(CorsFilter.class);
+				// order is important, PersistFilter must come first
 				filter("*").through(PersistFilter.class);
 				filter("*").through(AppFilter.class);
 				filter("*").through(GuiceShiroFilter.class);
@@ -117,9 +119,6 @@ public class AppServletModule extends ServletModule {
 
 		// no-cache filter
 		filter("/js/*", NoCacheFilter.STATIC_URL_PATTERNS).through(NoCacheFilter.class);
-
-		// CORS filter
-		filter("*").through(CorsFilter.class);
 
 		// intercept all response methods
 		bindInterceptor(Matchers.any(),

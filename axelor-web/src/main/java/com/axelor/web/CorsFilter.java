@@ -93,6 +93,14 @@ public class CorsFilter implements Filter {
 		}
 	}
 
+	private boolean isCrossOrigin(String origin, String host) {
+		return !isBlank(origin) && !origin.endsWith("//" + host);
+	}
+
+	private boolean isOriginAllowed(String origin) {
+		return DEFAULT_CORS_ALLOW_ORIGIN.equals(corsAllowOrigin) || corsOriginPattern.matcher(origin).matches();
+	}
+
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
@@ -102,17 +110,19 @@ public class CorsFilter implements Filter {
 		final String origin = req.getHeader("Origin");
 		final String host = req.getHeader("Host");
 
-		if (corsOriginPattern == null || isBlank(origin) || origin.endsWith("//" + host)) {
+		if (corsOriginPattern == null || !isCrossOrigin(origin, host)) {
 			chain.doFilter(request, response);
 			return;
 		}
-
-		if (DEFAULT_CORS_ALLOW_ORIGIN.equals(corsAllowOrigin) || corsOriginPattern.matcher(origin).matches()) {
-			res.addHeader("Access-Control-Allow-Origin", origin);
-			res.addHeader("Access-Control-Allow-Credentials", corsAllowCredentials);
-			res.addHeader("Access-Control-Allow-Methods", corsAllowMethods);
-			res.addHeader("Access-Control-Allow-Headers", corsAllowHeaders);
+		if (!isOriginAllowed(origin)) {
+			res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return;
 		}
+
+		res.addHeader("Access-Control-Allow-Origin", origin);
+		res.addHeader("Access-Control-Allow-Credentials", corsAllowCredentials);
+		res.addHeader("Access-Control-Allow-Methods", corsAllowMethods);
+		res.addHeader("Access-Control-Allow-Headers", corsAllowHeaders);
 
 		chain.doFilter(request, response);
 	}
