@@ -137,9 +137,12 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 	@SuppressWarnings("unchecked")
 	public static  <U extends Model>  JpaRepository<U> of(Class<U> type) {
 		final Class<?> klass = JpaScanner.findRepository(type.getSimpleName() + "Repository");
-		if (klass == null) {
-			return null;
+		if (klass != null) {
+			final JpaRepository<U> repo = (JpaRepository<U>) Beans.get(klass);
+			if (repo.modelClass.isAssignableFrom(type)) {
+				return repo;
+			}
 		}
-		return (JpaRepository<U>) Beans.get(klass);
+		return Beans.inject(new JpaRepository<>(type));
 	}
 }
