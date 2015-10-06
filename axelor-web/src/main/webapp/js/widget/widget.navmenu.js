@@ -89,7 +89,7 @@ function NavMenuCtrl($scope, $element, MenuService, NavService) {
 
 	$scope.hasText = function (menu) {
 		return !menu.icon || menu.icon.indexOf('empty') === -1;
-	}
+	};
 }
 
 ui.directive('navMenuBar', function() {
@@ -181,7 +181,7 @@ ui.directive('navMenuBar', function() {
 			});
 			
 			var unwatch = scope.$watch('menus', function(menus, old) {
-				if (!menus || menus.length == 0  || menus === old) {
+				if (!menus || menus.length === 0  || menus === old) {
 					return;
 				}
 				unwatch();
@@ -242,11 +242,11 @@ ui.directive('navMenuItem', ['$compile', function($compile) {
 			var item = scope.item;
 
 			scope.isSubMenu = ctrl.isSubMenu(item);
-			scope.isActionMenu = item.action != null;
+			scope.isActionMenu = !!item.action;
 			
 			scope.onClick = function (e, item) {
 				ctrl.onItemClick(item);
-			}
+			};
 
 			if (ctrl.isSubMenu(item)) {
 				element.addClass("dropdown-submenu");

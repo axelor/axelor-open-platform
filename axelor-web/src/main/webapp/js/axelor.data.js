@@ -63,7 +63,7 @@
 			};
 			
 			this._listeners = {};
-		};
+		}
 		
 		DataSource.DEFAULT_LIMIT = 40;
 
@@ -230,11 +230,11 @@
 					store: true
 				}, options);
 				
-				var limit = opts.limit == undefined ? this._page.limit : opts.limit;
-				var offset = opts.offset == undefined ? this._page.from : opts.offset;
+				var limit = opts.limit === undefined ? this._page.limit : opts.limit;
+				var offset = opts.offset === undefined ? this._page.from : opts.offset;
 				var domain = opts.domain === undefined ? (this._lastDomain || this._domain) : opts.domain;
-				var context = opts.context == undefined ? (this._lastContext || this._context) : opts.context;
-				var archived = opts.archived == undefined ? this._showArchived : opts.archived;
+				var context = opts.context === undefined ? (this._lastContext || this._context) : opts.context;
+				var archived = opts.archived === undefined ? this._showArchived : opts.archived;
 				
 				var fields = _.isEmpty(opts.fields) ? null : opts.fields;
 				var filter = opts.filter || this._filter;
@@ -738,7 +738,7 @@
 							index = i;
 							break;
 						}
-					};
+					}
 					if (index > -1) {
 						records.splice(index, 1);
 						page.total -= 1;
@@ -962,7 +962,7 @@
 						if (records[i].id === data.id) {
 							index = i;
 							break;
-						};
+						}
 					}
 					
 					if (index > -1) {
@@ -988,9 +988,7 @@
 			},
 			
 			attachment: function(id, options) {
-				if (options == null)
-					options = {};
-
+				options = options || {};
 				var params = {
 					fields: options.fields
 				};
@@ -1097,7 +1095,7 @@
 
 		function create(model, options) {
 			return new DataSource(model, options);
-		};
+		}
 
 	}]);
 

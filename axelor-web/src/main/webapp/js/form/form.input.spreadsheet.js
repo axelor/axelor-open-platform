@@ -17,6 +17,8 @@
  */
 (function() {
 
+/* global Handsontable: true */
+
 "use strict";
 
 var ui = angular.module('axelor.ui');
@@ -83,7 +85,9 @@ ui.formInput('Spreadsheet', {
 
 		function compact(items) {
 			var res = [];
-			for (var i = 0; i < items.length; i++) {
+			var i;
+
+			for (i = 0; i < items.length; i++) {
 				var item = items[i];
 				if (Array.isArray(item)) {
 					item = compact(item);
@@ -95,7 +99,7 @@ ui.formInput('Spreadsheet', {
 			}
 
 			var n = res.length;
-			for (var i = n - 1; i >= 0; i--) {
+			for (i = n - 1; i >= 0; i--) {
 				if (res[i] !== null) {
 					n = i+1;
 					break;
@@ -108,16 +112,18 @@ ui.formInput('Spreadsheet', {
 		function fill(data) {
 			var cols = 0;
 			var rows = data.length;
-			for(var i = 0; i < data.length; i++) {
-				var row = data[i] || (data[i] = []);
+			var i, row;
+
+			for(i = 0; i < data.length; i++) {
+				row = data[i] || (data[i] = []);
 				cols = Math.max(row.length, cols);
 			}
 
-			cols = Math.max(50, cols)
+			cols = Math.max(50, cols);
 			rows = Math.max(100, rows);
 
-			for(var i = 0; i < rows; i++) {
-				var row = data[i] || (data[i] = []);
+			for(i = 0; i < rows; i++) {
+				row = data[i] || (data[i] = []);
 				for (var j = 0; j < cols + 1; j++) {
 					if (row[j] === undefined) {
 						row[j] = null;

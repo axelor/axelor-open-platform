@@ -39,13 +39,16 @@ function updateValues(source, target, itemScope, formScope) {
 		var res = _.extend(value);
 		res.version = undefined;
 		return res;
-	};
+	}
 
 	forEach(source, function(value, key) {
-		if (isDate(value))
-			return target[key] = value;
+		if (isDate(value)) {
+			target[key] = value;
+			return;
+		}
+		var dest;
 		if (isArray(value)) {
-			var dest = target[key] || [];
+			dest = target[key] || [];
 			value = _.map(value, function(item){
 				var found = _.find(dest, function(v){
 					return item.id && v.id === item.id;
@@ -57,10 +60,11 @@ function updateValues(source, target, itemScope, formScope) {
 				}
 				return item;
 			});
-			return target[key] = value;
+			target[key] = value;
+			return;
 		}
 		if (isObject(value)) {
-			var dest = target[key] || {};
+			dest = target[key] || {};
 			if (dest.id === value.id) {
 				if (_.isNumber(dest.version)) {
 					dest = _.extend({}, dest);
@@ -74,9 +78,10 @@ function updateValues(source, target, itemScope, formScope) {
 			} else {
 				dest = compact(value);
 			}
-			return target[key] = dest;
+			target[key] = dest;
+		} else {
+			target[key] = value;
 		}
-		return target[key] = value;
 	});
 
 	if (target) {
@@ -86,12 +91,12 @@ function updateValues(source, target, itemScope, formScope) {
 
 function handleError(scope, item, message) {
 	
-	if (item == null) {
+	if (!item) {
 		return;
 	}
 
 	var ctrl = item.data('$ngModelController');
-	if (ctrl == null || ctrl.$doReset) {
+	if (!ctrl || ctrl.$doReset) {
 		return;
 	}
 
@@ -138,7 +143,7 @@ function handleError(scope, item, message) {
 
 function ActionHandler($scope, ViewService, options) {
 
-	if (options == null || !options.action)
+	if (!options || !options.action)
 		throw 'No action provided.';
 
 	this.canSave = options.canSave;
@@ -234,7 +239,7 @@ ActionHandler.prototype = {
 
 		// include button name as _signal (used by workflow engine)
 		if (this.element.is("button,a.button-item,li.action-item")) {
-			context['_signal'] = this.element.attr('name') || this.element.attr('x-name');
+			context._signal = this.element.attr('name') || this.element.attr('x-name');
 		}
 
 		return context;
@@ -253,7 +258,7 @@ ActionHandler.prototype = {
 		if (!formElement || !formElement.get(0)) { // toolbar button
 			formElement = this.element.parents('.form-view:first').find('form:first');
 		}
-		if (formElement.length == 0) {
+		if (formElement.length === 0) {
 			formElement = this.element;
 		}
 		return formElement;
@@ -352,8 +357,9 @@ ActionHandler.prototype = {
 	__handleSave: function(validateOnly) {
 		var self = this;
 		var scope = this.scope;
+		var id = (scope.record||{}).id;
 		var o2mPopup = scope._isPopup && (scope.$parent.field||{}).serverType === "one-to-many";
-		if (o2mPopup && !validateOnly && this.name == 'onLoad' && !((scope.record||{}).id > 0)) {
+		if (o2mPopup && !validateOnly && this.name == 'onLoad' && (!id || id < 0)) {
 			var deferred = this.ws.defer();
 			var msg = _t("The {0}={1} event can't call 'save' action on unsaved o2m item.", this.name, this.action);
 			deferred.reject(msg);
@@ -493,10 +499,9 @@ ActionHandler.prototype = {
 			});
 		}
 
-		var pattern = /(,)?\s*(close)\s*,/;
+		pattern = /(,)?\s*(close)\s*,/;
 		if (pattern.test(action)) {
-			var which = pattern.exec(action)[2];
-			axelor.dialogs.error(_t('Invalid use of "{0}" action, must be the last action.', which));
+			axelor.dialogs.error(_t('Invalid use of "{0}" action, must be the last action.', pattern.exec(action)[2]));
 			deferred.reject();
 			return deferred.promise;
 		}
@@ -540,7 +545,7 @@ ActionHandler.prototype = {
 
 		var deferred = this.ws.defer();
 
-		if (data == null || data.length == 0) {
+		if (!data || data.length === 0) {
 			deferred.resolve();
 			return deferred.promise;
 		}
@@ -858,7 +863,7 @@ ActionHandler.prototype = {
 		
 		forEach(data.attrs, function(itemAttrs, itemName) {
 			var items = findItems(itemName);
-			if (items == null || items.length == 0) {
+			if (!items || items.length === 0) {
 				return;
 			}
 			items.each(function(i) {
@@ -896,7 +901,7 @@ ActionHandler.prototype = {
 				title: data.reportFile,
 				resource: url,
 				viewType: 'html'
-			}
+			};
 
 			if (['pdf', 'html'].indexOf(data.reportFormat) > -1) {
 				doOpenView(tab);
@@ -985,12 +990,13 @@ ui.directive('uiActions', ['ViewService', function(ViewService) {
 	function link(scope, element, attrs) {
 
 		var props = _.isEmpty(scope.field) ? scope.schema : scope.field;
-		if (props == null)
+		if (!props) {
 			return;
+		}
 
 		_.each(EVENTS, function(name){
 			var action = props[name];
-			if (action == null) {
+			if (!action) {
 				return;
 			}
 			

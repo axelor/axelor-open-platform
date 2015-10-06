@@ -37,7 +37,7 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		return _.find(tabs, function(tab){
 			return tab.action == key;
 		});
-	};
+	}
 
 	function findTabTitle(tab) {
 		var first;
@@ -63,7 +63,7 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		}
 
 		var closable = options && options.__tab_closable;
-		if (closable == undefined && view.params) {
+		if (!closable && view.params) {
 			closable = view.params.closable;
 		}
 
@@ -238,17 +238,21 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 			}
 		}
 
+		function doConfirm(tab, viewScope) {
+			return viewScope.confirmDirty(function(){
+				return close(tab);
+			}, function() {
+				close(null, tab);
+				viewScope.applyLater();
+			});
+		}
+
 		for (var i = 0; i < all.length; i++) {
 			var tab = all[i];
 			var viewScope = tab.$viewScope;
 			if (viewScope && viewScope.confirmDirty) {
 				select(tab);
-				return viewScope.confirmDirty(function(){
-					return close(tab);
-				}, function() {
-					close(null, tab);
-					viewScope.applyLater();
-				});
+				return doConfirm(tab, viewScope);
 			}
 			return close(tab);
 		}
@@ -512,7 +516,7 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 			 setTimeout(function () {
 				 $("#offcanvas,#offcanvas-toggle").removeClass("hidden");
 			 }, 100);
-		 }, 100)
+		 }, 100);
 
 		 $(window).on('resize', _.debounce(function () {
 			 $("#offcanvas").removeClass(axelor.device.small ? 'inactive' : 'active');

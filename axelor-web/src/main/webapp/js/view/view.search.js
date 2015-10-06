@@ -26,7 +26,7 @@ ui.controller('SearchViewCtrl', SearchViewCtrl);
 SearchViewCtrl.$inject = ['$scope', '$element', '$http', 'DataSource', 'ViewService', 'MenuService'];
 function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuService) {
 	
-	var view = $scope._views['search'] || {};
+	var view = $scope._views.search || {};
 	
 	$scope._dataSource = DataSource.create('multi-search');
 	
@@ -52,7 +52,7 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 	}
 	
 	$scope.show = function(viewPromise) {
-		if (viewPromise == null) {
+		if (!viewPromise) {
 			viewPromise = $scope.loadView('search', view.name);
 			viewPromise.success(function(fields, schema){
 				$scope.initView(schema);
@@ -218,8 +218,9 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 	$scope.doAction = function() {
 		
 		var action = scopes.toolbar.getMenuAction();
-		if (action == null)
+		if (!action) {
 			return;
+		}
 	
 		var grid = scopes.grid,
 			index = _.first(grid.selection),
@@ -239,8 +240,8 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 			}
 			
 			var view = result.data[0].view;
-			
-			tab = view;
+			var tab = view;
+
 			tab.action = _.uniqueId('$act');
 			tab.viewType = 'form';
 			
@@ -266,7 +267,7 @@ function SearchFormCtrl($scope, $element, ViewService) {
 	$scope.defaultValues = {};
 	
 	$scope.$watch('_searchView', function(schema) {
-		if (schema == null) return;
+		if (!schema) return;
 		var form = {
 			title: 'Search',
 			type: 'form',
@@ -349,7 +350,7 @@ function SearchGridCtrl($scope, $element, ViewService, $interpolate) {
 	var viewTitles = {};
 
 	$scope.$watch('_searchView', function(schema) {
-		if (schema == null) return;
+		if (!schema) return;
 		var view = {
 			title: 'Search',
 			type: 'grid',
@@ -453,13 +454,14 @@ function SearchGridCtrl($scope, $element, ViewService, $interpolate) {
 				case "long":
 					value1 = value1 || 0;
 					value2 = value2 || 0;
+					break;
 				default:
 					value1 = value1 || "";
 					value2 = value2 || "";
 				}
 
 				var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
-				if (result != 0) {
+				if (result) {
 					return result;
 				}
 			}
@@ -484,7 +486,7 @@ function SearchToolbarCtrl($scope, $element, $http) {
 	
 	function fetch(key, parent, request, response) {
 		
-		if (menus[key] != null) {
+		if (menus[key]) {
 			return response(menus[key]);
 		}
 
@@ -536,9 +538,10 @@ function SearchToolbarCtrl($scope, $element, $http) {
 
 	$scope.$watch('_searchView', function(schema) {
 		
-		if (schema == null)
+		if (!schema) {
 			return;
-		
+		}
+
 		var selected = [];
 
 		$scope.fields = {
@@ -559,7 +562,7 @@ function SearchToolbarCtrl($scope, $element, $http) {
 			'menuRoot' : {
 				type : 'string',
 				placeholder: _t('Action Category'),
-				type: 'select-query',
+				widget: 'select-query',
 				attrs: {
 					query: 'fetchRootMenus',
 					'ng-change': 'resetSelector("menuSub", "menuItem")'
@@ -567,7 +570,7 @@ function SearchToolbarCtrl($scope, $element, $http) {
 			},
 			'menuSub' : {
 				placeholder: _t('Action Sub-Category'),
-				type: 'select-query',
+				widget: 'select-query',
 				attrs: {
 					query: 'fetchSubMenus',
 					'ng-change': 'resetSelector($event, "menuItem")'
@@ -575,7 +578,7 @@ function SearchToolbarCtrl($scope, $element, $http) {
 			},
 			'menuItem' : {
 				placeholder: _t('Action'),
-				type: 'select-query',
+				widget: 'select-query',
 				attrs: {
 					query: 'fetchItemMenus'
 				}
@@ -635,7 +638,7 @@ function SearchToolbarCtrl($scope, $element, $http) {
 			items: items2
 		};
 
-		var schema = {
+		schema = {
 			type : 'form',
 			items: [{
 				type: 'panel',
@@ -690,7 +693,7 @@ function ActionSelectorCtrl($scope, $element, $attrs, $http, MenuService) {
 	
 	function fetch(key, request, response, params) {
 		
-		if (menus[key] != null) {
+		if (menus[key]) {
 			return response(menus[key]);
 		}
 
@@ -750,8 +753,9 @@ function ActionSelectorCtrl($scope, $element, $attrs, $http, MenuService) {
 	$scope.doAction = function() {
 		
 		var action = $scope.getMenuAction();
-		if (action == null)
+		if (!action) {
 			return;
+		}
 	
 		var context = $scope.$parent.getContext(),
 			record;
@@ -770,8 +774,8 @@ function ActionSelectorCtrl($scope, $element, $attrs, $http, MenuService) {
 			}
 			
 			var view = result.data[0].view;
-			
-			tab = view;
+			var tab = view;
+
 			tab.action = _.uniqueId('$act');
 			tab.viewType = 'form';
 			
@@ -787,7 +791,7 @@ function ActionSelectorCtrl($scope, $element, $attrs, $http, MenuService) {
 		'$menuRoot' : {
 			type : 'string',
 			placeholder: _t('Action Category'),
-			type: 'select-query',
+			widget: 'select-query',
 			attrs: {
 				query: 'fetchRootMenus',
 				'ng-change': 'resetSelector("$menuSub", "$menuItem")'
@@ -803,7 +807,7 @@ function ActionSelectorCtrl($scope, $element, $attrs, $http, MenuService) {
 		},
 		'$menuItem' : {
 			placeholder: _t('Action'),
-			type: 'select-query',
+			widget: 'select-query',
 			attrs: {
 				query: 'fetchItemMenus'
 			}

@@ -37,7 +37,8 @@
 			loadingTimer = null;
 		}
 		if (loadingCounter > 0) {
-			return loadingTimer = _.delay(hideLoading, 500);
+			loadingTimer = _.delay(hideLoading, 500);
+			return;
 		}
 		loadingTimer = _.delay(function () {
 			loadingTimer = null;
@@ -56,7 +57,7 @@
 			loadingTimer = null;
 		}
 		
-		if (loadingElem == null) {
+		if (loadingElem === null) {
 			loadingElem = $('<div><span class="label label-important loading-counter">' + _t('Loading') + '...</span></div>')
 				.css({
 					position: 'fixed',
@@ -184,6 +185,8 @@
 	
 	module.config(['$httpProvider', function(provider) {
 
+		/* global toString: true */
+
 		function isFile(obj) {
 			return toString.call(obj) === '[object File]';
 		}
@@ -246,7 +249,7 @@
 
 		function block(callback) {
 			if (blocked) return true;
-			if (blockedTimer) { clearTimeout(blockedTimer); blockedTimer = null; };
+			if (blockedTimer) { clearTimeout(blockedTimer); blockedTimer = null; }
 			if (loadingCounter > 0 || blockedCounter > 0) {
 				blocked = true;
 				doc.on("keydown.blockui mousedown.blockui", function(e) {
@@ -264,7 +267,7 @@
 		}
 
 		function unblock(callback) {
-			if (blockedTimer) { clearTimeout(blockedTimer); blockedTimer = null; };
+			if (blockedTimer) { clearTimeout(blockedTimer); blockedTimer = null; }
 			if (loadingCounter > 0 || blockedCounter > 0 || loadingTimer) {
 				if (spinnerTime === 0) {
 					spinnerTime = moment();
@@ -276,7 +279,8 @@
 				if (blockedCounter > 0) {
 					blockedCounter = blockedCounter - 10;
 				}
-				return blockedTimer = _.delay(unblock, 200, callback);
+				blockedTimer = _.delay(unblock, 200, callback);
+				return;
 			}
 			doc.off("keydown.blockui mousedown.blockui");
 			body.css("cursor", "");
@@ -401,7 +405,7 @@
 		
 		function showLogin(hide) {
 			
-			if (loginWindow == null) {
+			if (loginWindow === null) {
 				loginWindow = $('#loginWindow')
 				.attr('title', _t('Log in'))
 				.dialog({
@@ -431,7 +435,7 @@
 		}
 	
 		function showError(hide) {
-			if (errorWindow == null) {
+			if (errorWindow === null) {
 				errorWindow = $('#errorWindow')
 				.attr('title', _t('Error'))
 				.dialog({
@@ -556,10 +560,9 @@
 			var route = current.$$route,
 				path = route && route.action ? route.action.split('.') : null;
 	
-			if (path == null)
-				return;
-	
-			$scope.routePath = path;
+			if (path) {
+				$scope.routePath = path;
+			}
 		});
 		
 		$scope.routePath = ["main"];

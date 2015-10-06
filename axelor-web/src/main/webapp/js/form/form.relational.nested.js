@@ -76,7 +76,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 		} else {
 			originalEdit(record);
 		}
-	};
+	}
 	
 	function doClose() {
 		if ($scope.isDetailView) {
@@ -89,7 +89,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 			$element.hide();
 			$element.data('$rel').show();
 		});
-	};
+	}
 	
 	$scope.edit = function(record) {
 		doEdit(record);

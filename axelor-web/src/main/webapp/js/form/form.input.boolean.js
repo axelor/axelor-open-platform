@@ -112,7 +112,7 @@ ui.formInput('BooleanSelect', 'Boolean', {
 		scope.$selection = [trueText, falseText];
 		scope.format = function (value) {
 			return value ? scope.$selection[0] : scope.$selection[1];
-		}
+		};
 	},
 	link_editable: function (scope, element, attrs, model) {
 		var input = element.find('input');

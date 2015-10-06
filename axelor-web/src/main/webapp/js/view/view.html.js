@@ -27,7 +27,7 @@ ui.HtmlViewCtrl.$inject = ['$scope', '$element', '$sce'];
 function HtmlViewCtrl($scope, $element, $sce) {
 
 	var views = $scope._views;
-	$scope.view = views['html'];
+	$scope.view = views.html;
 
 	$scope.getURL = function () {
 		var view = $scope.view;
@@ -36,7 +36,7 @@ function HtmlViewCtrl($scope, $element, $sce) {
 		}
 		return null;
 	};
-};
+}
 
 var directiveFn = function(){
 	return {

@@ -55,7 +55,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	};
 
 	function doEdit(record, fireOnLoad) {
-		if (record && record.id > 0 && (!(record.version >= 0) || !record.$fetched)) {
+		if (record && record.id > 0 && (!_.isNumber(record.version) || !record.$fetched)) {
 			$scope.doRead(record.id).success(function(rec) {
 				if (record.$dirty) {
 					rec = _.extend({}, rec, record);
@@ -66,7 +66,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			originalEdit(record, fireOnLoad);
 		}
 		canClose = false;
-	};
+	}
 
 	var parentCanEditTarget = null;
 	
@@ -85,7 +85,8 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 
 	var isEditable = $scope.isEditable;
 	$scope.isEditable = function () {
-		if (!($scope.record || {}).id > 0) {
+		var id = ($scope.record || {}).id;
+		if (!id || id < 0) {
 			return $scope.hasPermission('create');
 		}
 		return $scope.hasPermission('write') &&
@@ -116,7 +117,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	function canOK() {
 		if (isClosed) return false;
 		return isChanged();
-	};
+	}
 
 	function onOK() {
 
@@ -137,7 +138,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			}
 			closeCallback = null;
 			isClosed = true;
-		};
+		}
 
 		var event = $scope.$broadcast('on:before-save', record);
 		if (event.defaultPrevented) {
@@ -163,7 +164,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 				close(record);
 			}
 		}, 100);
-	};
+	}
 	
 	$scope.onOK = function() {
 		$scope.$timeout(onOK, 10);

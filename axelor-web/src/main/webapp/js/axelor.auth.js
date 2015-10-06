@@ -41,7 +41,7 @@ angular.module('axelor.auth', []).provider('authService', function() {
       config: config,
       deferred: deferred
     });
-  }
+  };
 
   this.$get = ['$rootScope','$injector', function($rootScope, $injector) {
     var $http; //initialized later because of circular dependency problem
@@ -62,8 +62,8 @@ angular.module('axelor.auth', []).provider('authService', function() {
         $rootScope.$broadcast('event:auth-loginConfirmed');
         retryAll();
       }
-    }
-  }]
+    };
+  }];
 })
 
 /**

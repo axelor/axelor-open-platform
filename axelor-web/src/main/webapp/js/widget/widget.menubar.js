@@ -125,7 +125,7 @@ ui.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, Acti
 			scope.isRequired = function(){};
 			scope.isValid = function(){};
 
-			var attrs = {
+			attrs = {
 				hidden: false,
 				readonly: false
 			};

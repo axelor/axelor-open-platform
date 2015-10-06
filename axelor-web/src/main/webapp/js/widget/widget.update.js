@@ -55,8 +55,8 @@ ui.directive('uiUpdateButton', ['$compile', function ($compile) {
 			};
 			
 			scope.canMassUpdate = function () {
-				true;
-			}
+				return true;
+			};
 			
 			if (scope.handler && scope.handler.canMassUpdate) {
 				scope.canMassUpdate = scope.handler.canMassUpdate;
@@ -309,7 +309,7 @@ ui.directive('uiUpdateForm',  function () {
 				if ($scope.updateAll) {
 					count = ds._page.total;
 				} else if(handler.selection && handler.selection.length > 0) {
-					count = handler.selection.length
+					count = handler.selection.length;
 				} else {
 					return;
 				}

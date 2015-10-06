@@ -17,6 +17,8 @@
  */
 (function() {
 
+/* global Slick: true */
+
 "use strict";
 
 var ui = angular.module('axelor.ui');
@@ -115,7 +117,7 @@ var Editor = function(args) {
 			.addClass('slick-external-editor')
 			.appendTo(container);
 
-		if (element.data('keydown.nav') == null) {
+		if (!element.data('keydown.nav')) {
 			element.data('keydown.nav', true);
 			element.bind("keydown.nav", function (e) {
 				switch (e.keyCode) {
@@ -153,7 +155,7 @@ var Editor = function(args) {
 			return true;
 		}
 		return false;
-	}
+	};
 	
 	this.destroy = function() {
 		scope.$lastEditor = this;
@@ -174,7 +176,7 @@ var Editor = function(args) {
 		if (external) {
 			setTimeout(adjustExternal);
 		}
-	}
+	};
 
 	function adjustExternal() {
 
@@ -197,7 +199,7 @@ var Editor = function(args) {
 		if (element.is('.html-item')) {
 			element.find('[contenteditable]').focus();
 		}
-	};
+	}
 	
 	function focus() {
 		// Firefox throws exception if element is hidden
@@ -337,7 +339,7 @@ var Formatters = {
 		
 		if (field.readonlyIf && axelor.$eval(grid.scope, field.readonlyIf, context)) {
 			css += " readonly disabled";
-		};
+		}
 		
 		if(isIcon) {
 			elem = '<a href="javascript: void(0)" tabindex="-1"';
@@ -379,14 +381,14 @@ var Formatters = {
 		if (value && value.indexOf("fa-") > -1) {
 			return '<i class="slick-icon ' + value + '"></i>';
 		}
-		return Formatters["button"](field, value);
+		return Formatters.button(field, value);
 	}
 };
 
 function totalsFormatter(totals, columnDef) {
 	
 	var field = columnDef.descriptor;
-	if (field.aggregate == null) {
+	if (!field.aggregate) {
 		return "";
 	}
 
@@ -415,10 +417,10 @@ _.extend(Factory.prototype, {
 		if (field.type == 'binary') {
 			return null;
 		}
-		if (col.editor) {
-			return col.editor;
+		if (!col.editor) {
+			col.editor = Editor;
 		}
-		return col.editor = Editor;
+		return col.editor;
 	},
 	
 	getFormatter: function(col) {
@@ -568,7 +570,7 @@ Grid.prototype.parse = function(view) {
 			sortable = false;
 			break;
 		default:
-			sortable: true;
+			sortable = true;
 		}
 
 		if (field.type == "button") {
@@ -602,7 +604,7 @@ Grid.prototype.parse = function(view) {
 		if (!field.readonly && item.forEdit !== false) {
 			css.push('slick-cell-editable');
 			if (field.required) {
-				css.push('slick-cell-required')
+				css.push('slick-cell-required');
 			}
 		}
 		column.cssClass = css.join(' ');
@@ -907,6 +909,7 @@ Grid.prototype._doInit = function(view) {
 		var filtersRow = $(grid.getHeaderRow());
 
 		function updateFilters(event) {
+			/* jshint validthis: true */
 			var elem = $(this);
 			if (elem.is('.ui-autocomplete-input')) {
 				return;
@@ -941,7 +944,7 @@ Grid.prototype._doInit = function(view) {
 					});
 				}
 			});
-		};
+		}
 
 		var _setColumns = grid.setColumns;
 		grid.setColumns = function(columns) {
@@ -1139,10 +1142,8 @@ Grid.prototype.showColumn = function(name, show) {
 		grid = this.grid,
 		cols = this.cols;
 	
-	if (this.visibleCols == null) {
-		this.visibleCols = _.pluck(cols, 'id');
-	}
-	
+	this.visibleCols = this.visibleCols || _.pluck(cols, 'id');
+
 	show = _.isUndefined(show) ? true : show;
 	
 	var visible = [],
@@ -1238,8 +1239,8 @@ Grid.prototype.hilite = function (row, field) {
 	}
 	
 	for (var i = 0; i < hilites.length; i++) {
-		var params = hilites[i],
-			condition = params.condition,
+		params = hilites[i];
+		var condition = params.condition,
 			styles = null,
 			pass = false;
 		
@@ -1303,9 +1304,11 @@ Grid.prototype.onMenuCommand = function(event, args) {
 		return grid.onSort.notify(opts, event, grid);
 	}
 	
+	var groups, index;
+
 	if (args.command === 'group-by') {
-		var groups = this._groups || [];
-		var index = groups.indexOf(args.column.field);
+		groups = this._groups || [];
+		index = groups.indexOf(args.column.field);
 		if (index === -1) {
 			groups.push(args.column.field);
 		}
@@ -1313,8 +1316,8 @@ Grid.prototype.onMenuCommand = function(event, args) {
 	}
 	
 	if (args.command === 'ungroup') {
-		var groups = this._groups || [];
-		var index = groups.indexOf(args.column.field);
+		groups = this._groups || [];
+		index = groups.indexOf(args.column.field);
 		if (index > -1) {
 			groups.splice(index, 1);
 		}
@@ -1555,14 +1558,14 @@ Grid.prototype.saveChanges = function(args, callback) {
 	}, 100);
 
 	return true;
-}
+};
 
 Grid.prototype.__saveChanges = function(args, callback) {
 
 	var that = this;
 	var grid = this.grid;
 
-	if (args == null) {
+	if (!args) {
 		args = _.extend({ row: 0, cell: 0 }, grid.getActiveCell());
 		args.item = grid.getDataItem(args.row);
 	}
@@ -1630,18 +1633,19 @@ Grid.prototype.canSave = function() {
 
 Grid.prototype.isDirty = function(row) {
 	var grid = this.grid;
-	
+	var item;
+
 	if (row === null || row === undefined) {
 		var n = 0;
 		while (n < grid.getDataLength()) {
-			var item = grid.getDataItem(n);
+			item = grid.getDataItem(n);
 			if (item && item.$dirty) {
 				return true;
 			}
 			n ++;
 		}
 	} else {
-		var item = grid.getDataItem(row);
+		item = grid.getDataItem(row);
 		if (item && item.$dirty) {
 			return true;
 		}
@@ -1686,8 +1690,8 @@ Grid.prototype.focusInvalidCell = function(args) {
 	for(var name in error) {
 		var errors = error[name] || [];
 		if (errors.length) {
-			var name = errors[0].$name,
-				cell = grid.getColumnIndex(name);
+			name = errors[0].$name;
+			var cell = grid.getColumnIndex(name);
 			if (cell > -1) {
 				grid.setActiveCell(args.row, cell);
 				grid.editActiveCell();
@@ -1759,7 +1763,7 @@ Grid.prototype.addNewRow = function (args) {
 	if (!saved) {
 		self.focusInvalidCell(args);
 	}
-}
+};
 
 Grid.prototype.canEdit = function () {
 	var handler = this.handler || {};
@@ -1767,14 +1771,14 @@ Grid.prototype.canEdit = function () {
 	if (handler.canEdit && !handler.canEdit()) return false;
 	if (handler.isReadonly && handler.isReadonly()) return false;
 	return true;
-}
+};
 
 Grid.prototype.canAdd = function () {
 	var handler = this.handler || {};
 	if (!this.editable) return false;
 	if (handler.isReadonly && handler.isReadonly()) return false;
 	return handler.canNew && handler.canNew();
-}
+};
 
 Grid.prototype.setEditors = function(form, formScope, forEdit) {
 	var grid = this.grid,
@@ -1792,7 +1796,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 	form.prependTo(element).hide();
 	formScope.onChangeNotify = function(scope, values) {
 		var item, editor, cell = grid.getActiveCell();
-		if (cell == null || formScope.record !== scope.record) {
+		if (!cell || formScope.record !== scope.record) {
 			return;
 		}
 		item = grid.getDataItem(cell.row);
@@ -1876,7 +1880,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 					return that.addNewRow(cell);
 				});
 			}
-			return onNew.apply(self.handler, arguments);
+			return onNew.apply(that.handler, arguments);
 		};
 	}
 
@@ -1952,13 +1956,15 @@ Grid.prototype.onMoveRows = function (event, args) {
 
     rows.sort(function(a, b) { return a - b; });
 
-    for (var i = 0; i < rows.length; i++) {
+    var i;
+
+    for (i = 0; i < rows.length; i++) {
     	extractedRows.push(items[rows[i]]);
     }
 
     rows.reverse();
 
-    for (var i = 0; i < rows.length; i++) {
+    for (i = 0; i < rows.length; i++) {
     	var row = rows[i];
     	if (row < insertBefore) {
     		left.splice(row, 1);
@@ -1970,7 +1976,7 @@ Grid.prototype.onMoveRows = function (event, args) {
     items = left.concat(extractedRows.concat(right));
 
     var selectedRows = [];
-    for (var i = 0; i < rows.length; i++) {
+    for (i = 0; i < rows.length; i++) {
     	selectedRows.push(left.length + i);
 	}
 
@@ -2074,7 +2080,7 @@ Grid.prototype.onItemClick = function(event, args) {
 	}
 
 	// checkbox column
-	if (this.scope.selector && args.cell == 0) {
+	if (this.scope.selector && args.cell === 0) {
 		return false;
 	}
 
@@ -2213,7 +2219,7 @@ function EditIconColumn(options) {
     function init(grid) {
     	_grid = grid;
     	_handler.subscribe(grid.onClick, handleClick);
-    };
+    }
     
     function handleClick(e, args) {
     	if (_grid.getColumns()[args.cell].id !==  '_edit_column' || !$(e.target).is("i")) {
@@ -2310,9 +2316,10 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 			}
 
 			if (!type && !forEdit) {
-				return item.forEdit = false;
+				item.forEdit = false;
+				return;
 			}
-			
+
 			var params = _.extend({}, item, { showTitle: false });
 			if (type) {
 				params.widget = type;
@@ -2336,7 +2343,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 		};
 
 		return ViewService.compile('<div ui-slick-editors></div>')(scope);
-	};
+	}
 	
 	return {
 		restrict: 'EA',
@@ -2403,7 +2410,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 					formScope.grid = grid;
 					grid.setEditors(form, formScope, forEdit);
 				}
-			};
+			}
 
 			element.addClass('slickgrid').hide();
 			var unwatch = scope.$watch("view.loaded", function(viewLoaded) {

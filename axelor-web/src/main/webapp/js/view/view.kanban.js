@@ -96,7 +96,7 @@ function BaseCardsCtrl(type, $scope, $element) {
 	$scope.pagerText = function() {
 		var page = ds._page;
 		if (page && page.from !== undefined) {
-			if (page.total == 0) return null;
+			if (page.total === 0) return null;
 			return _t("{0} to {1} of {2}", page.from + 1, page.to, page.total);
 		}
 	};
@@ -114,16 +114,16 @@ function BaseCardsCtrl(type, $scope, $element) {
 
 ui.controller("CardsCtrl", ['$scope', '$element', function CardsCtrl($scope, $element) {
 
-	BaseCardsCtrl('cards', $scope, $element);
+	BaseCardsCtrl.call(this, 'cards', $scope, $element);
 
 	$scope.parse = function (fields, view) {
 		$scope.onRefresh();
-	}
+	};
 }]);
 
 ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $element) {
 
-	BaseCardsCtrl('kanban', $scope, $element);
+	BaseCardsCtrl.call(this, 'kanban', $scope, $element);
 
 	$scope.parse = function (fields, view) {
 		var columnBy = fields[view.columnBy] || {};
@@ -354,6 +354,7 @@ ui.directive('uiCards', function () {
 				if (!confirmed) {
 					return;
 				}
+				var ds = scope._dataSource;
 				ds.removeAll([record]).success(function(records, page) {
 					var index = scope.records.indexOf(record);
 					scope.records.splice(index, 1);
@@ -407,9 +408,11 @@ ui.directive('uiCard', ["$parse", "$compile", function ($parse, $compile) {
 					var names = name.split('.');
 					var head = _.first(names, names.length - 1);
 					var last = _.last(names);
-					head.forEach(function (n) {
+					var i, n;
+					for (i = 0; i < head.length; i++) {
+						n = head[i];
 						nested = nested[n] || (nested[n] = {});
-					});
+					}
 					nested[last] = record[name];
 				}
 				return record;

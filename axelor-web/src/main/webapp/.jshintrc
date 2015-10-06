@@ -1,0 +1,29 @@
+{
+  "browser": true,
+  "jquery": true,
+  "devel": true,
+  "globals": {
+    "axelor": true,
+    "angular": true,
+    "moment": true,
+    "util": true,
+    "__appSettings": true,
+    "_": true,
+    "_t": true
+  },
+  "bitwise": true,
+  "immed": true,
+  "newcap": false,
+  "noarg": true,
+  "noempty": true,
+  "nonew": true,
+  "maxlen": 200,
+  "boss": true,
+  "eqnull": true,
+  "expr": true,
+  "globalstrict": true,
+  "laxbreak": true,
+  "loopfunc": true,
+  "sub": true,
+  "undef": true
+}

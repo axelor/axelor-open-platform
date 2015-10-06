@@ -19,6 +19,8 @@
 
 (function () {
 
+/* global gantt: true */
+
 "use strict";
 
 var regional = {
@@ -109,7 +111,7 @@ function GanttViewCtrl($scope, $element) {
 
 	ui.DSViewCtrl('gantt', $scope, $element);
 	var ds = $scope._dataSource;
-	var view = $scope._views['gantt'];
+	var view = $scope._views.gantt;
 	var initialized = false;
 
 	$scope.onShow = function(viewPromise) {
@@ -195,19 +197,14 @@ function GanttViewCtrl($scope, $element) {
 		return ds.save(record).success(function(res){
 			callback(task, res);
 		});
-   	}
+	};
 
 	$scope.doRemove = function(id, task){
    		var record = _.clone(task.record);
-		if(task.childtask || task.parent){
-			return childDs.remove(record).success(function(res){
-				return $scope.refresh();
-			});
-		}
 		return ds.remove(record).success(function(res){
 			return $scope.refresh();
 		});
-   	}
+	};
 
 	$scope.refresh = function() {
 		
@@ -272,24 +269,24 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 
 	   function getGanttColumns() {
 		   
-		   var colHeader = '<div class="gantt_grid_head_cell gantt_grid_head_add" onclick="gantt.createTask()"></div>'
+		   var colHeader = '<div class="gantt_grid_head_cell gantt_grid_head_add" onclick="gantt.createTask()"></div>';
 
 		   var  colContent = function(task){
-				return '<i class="fa gantt_button_grid gantt_grid_add fa-plus" onclick="gantt.createTask(null, '+task.id+')"></i> \
-				<i class="fa gantt_button_grid gantt_grid_delete fa-times" onclick="dhtmlx.confirm({ \
-				title: gantt.locale.labels.confirm_deleting_title, \
-				text: gantt.locale.labels.confirm_deleting,\
-				callback: function(res){ \
-					if(res) \
-						gantt.deleteTask('+task.id+');\
-				}})"></i>';
+				return '<i class="fa gantt_button_grid gantt_grid_add fa-plus" onclick="gantt.createTask(null, '+task.id+')"></i>'+
+				'<i class="fa gantt_button_grid gantt_grid_delete fa-times" onclick="dhtmlx.confirm({ ' +
+				'title: gantt.locale.labels.confirm_deleting_title,'+
+				'text: gantt.locale.labels.confirm_deleting,'+
+				'callback: function(res){ '+
+				'	if(res)'+
+				'		gantt.deleteTask('+task.id+');'+
+				'}})"></i>';
 			};
 			
 		   var columns = [];
 		   var isTree = true;
 		   _.each(fieldNames, function(fname){
 			   var field = fields[fname];
-			   columns.push({ name:field["name"], label:field["title"], tree:isTree })
+			   columns.push({ name:field.name, label:field.title, tree:isTree });
 			   isTree = false;
 		   });
 		   columns.push({ name:"buttons", label:colHeader, width:75, template:colContent });
@@ -447,7 +444,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 	   }
 
 	   function updateLink(id,link){
-		   updateRecordItem(id, link,  false)
+		   updateRecordItem(id, link,  false);
 	   }
 	   
 	   function updateTaskRecord(task, rec){
@@ -455,7 +452,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 	   }
 
 	   function deleteLink(id, link){
-		   updateRecordItem(id, link, true)
+		   updateRecordItem(id, link, true);
 	   }
 
 	   function updateRecord(id, item){
@@ -463,9 +460,8 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 		   	var record = item.record;
 		    if(!record){ record = {}; }
 		    
-			var duration = item.duration;
-			if(duration == 0){ duration = 1;}
-			
+			var duration = item.duration || 1;
+
 			record[schema.taskStart] = item.start_date.toJSON();
 			record[firstField.name] = item.text;
 			
@@ -500,7 +496,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 					id:rec.id,
 					open:true,
 					isNew:true
-				}
+				};
 				dict = updateData(dict, rec);
 				dict.isNew = false;
 				
@@ -640,7 +636,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 
 		scope.showEditor = function(task, isNew) {
 			var record = _.extend({}, task.record);
-			if (editor == null) {
+			if (!editor) {
 				editor = ViewService.compile('<div ui-editor-popup></div>')(scope.$new());
 				editor.data('$target', element);
 			}
@@ -658,7 +654,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 				}
 			});
 
-			if (record == null || !record.id) {
+			if (!record || !record.id) {
 				popup.waitForActions(function() {
 						popup.$broadcast("on:new");
 	 			});

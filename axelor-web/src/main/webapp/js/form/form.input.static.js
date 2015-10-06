@@ -72,7 +72,7 @@ function makePopover(scope, element, callback, placement) {
 		placement: function() {
 			if (placement) return placement;
 			var coord = $(element.get(0)).offset(),
-				viewport = {height: innerHeight, width: window.innerWidth};
+				viewport = { height: window.innerHeight, width: window.innerWidth };
 			if(viewport.height < (coord.top + 100))
 				return 'top';
 			if(coord.left > (viewport.width / 2))
@@ -225,6 +225,8 @@ ui.directive('uiHelpPopover', function() {
 		}
 
 		var value = scope.$eval('$$original.' + field.name);
+		var length;
+
 		if (value && /-one$/.test(field.serverType)) {
 			value = _.compact([value.id, value[field.targetName]]).join(',');
 			value = '(' + value + ')';
@@ -233,7 +235,7 @@ ui.directive('uiHelpPopover', function() {
 			value = _.str.repeat('*', value.length);
 		}
 		if (value && /^(string|image|binary)$/.test(field.type)) {
-			var length = value.length;
+			length = value.length;
 			value = _.first(value, 50);
 			if (length > 50) {
 				value.push('...');
@@ -241,7 +243,7 @@ ui.directive('uiHelpPopover', function() {
 			value = value.join('');
 		}
 		if (value && /(panel-related|one-to-many|many-to-many)/.test(field.serverType)) {
-			var length = value.length;
+			length = value.length;
 			value = _.first(value, 5);
 			value = _.map(value, function(v){
 				return v.id;
@@ -263,7 +265,7 @@ ui.directive('uiHelpPopover', function() {
 		if(canDisplayPopover(scope, false)) {
 			makePopover(scope, element, getHelp);
 		}
-	};
+	}
 
 	return function(scope, element, attrs) {
 		var field = scope.field;

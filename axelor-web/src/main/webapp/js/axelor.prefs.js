@@ -48,7 +48,7 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 	
 	$scope.$watch('record.version', function (value) {
 		if (value === null || value === undefined) return;
-		if (__version !== null) return 
+		if (__version !== null) return;
 		__version = value;
 	});
 	
@@ -68,7 +68,7 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 		setTimeout(function() {
 			window.location.reload();
 		}, 100);
-	};
+	}
 
 	$scope.setEditable();
 	$scope.show();

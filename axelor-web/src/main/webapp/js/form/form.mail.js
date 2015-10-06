@@ -48,7 +48,7 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 			pollResult = count;
 			pollPromise = $timeout(checkUnreadMessages, POLL_INTERVAL);
 		});
-	};
+	}
 
 	/**
 	 * Get the followers of the given record.
@@ -74,7 +74,7 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 	function getMessages(options) {
 		var opts = _.extend({}, options);
 		return dsMessage.messages(opts);
-	};
+	}
 
 	/**
 	 * Get replies of the given message.
@@ -155,7 +155,7 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 			checkUnreadMessages(); // force unread check
 		});
 		return promise;
-	};
+	}
 
 	// start polling
 	checkUnreadMessages();
@@ -330,11 +330,11 @@ ui.formWidget('uiMailMessages', {
 			var line = message.$eventText + " - " + moment(message.$eventTime).fromNow();
 			message.$eventLine = line;
 			return line;
-		}
+		};
 
 		$scope.formatNumReplies = function (message) {
 			return _t('replies ({0})', message.$numReplies);
-		}
+		};
 
 		var folder = $scope.folder;
 
@@ -604,7 +604,7 @@ ui.formWidget('uiMailFollowers', {
 		$scope._viewParams = {
 			model: 'com.axelor.auth.db.User',
 			viewType: 'form',
-			views: [{type: 'form', type: 'grid'}]
+			views: [{type: 'form'}, {type: 'grid'}]
 		};
 
 		$scope.following = false;
@@ -616,7 +616,7 @@ ui.formWidget('uiMailFollowers', {
 				code: $scope.$root.app.login
 			});
 			$scope.following = !!found;
-		}
+		};
 
 		$scope.select = function (records) {
 
@@ -661,7 +661,7 @@ ui.formWidget('uiMailFollowers', {
 					doUnfollow(user);
 				}
 			});
-		}
+		};
 
 		function doUnfollow(user) {
 
@@ -674,7 +674,7 @@ ui.formWidget('uiMailFollowers', {
 				$scope.followers = res.data || [];
 				$scope.updateStatus();
 			});
-		};
+		}
 
 		function doLoadFollowers(record) {
 			MessageService.getFollowers($scope._model, record.id)
@@ -735,7 +735,7 @@ ui.formWidget('PanelMail', {
 				mode: "edit",
 				state: author.id
 			});
-		}
+		};
 
 		$scope.$userName = function (user) {
 			if (!user) return null;
@@ -743,7 +743,7 @@ ui.formWidget('PanelMail', {
 			return user[key] || user.name;
 		};
 
-		var folder = undefined;
+		var folder;
 		var tab = $scope.tab || {};
 
 		if (tab.action === "mail.inbox") folder = "inbox";
@@ -775,7 +775,7 @@ function MailGroupListCtrl($scope, $element) {
 	$scope.getUrl = function (record) {
 		if (!record || !record.id) return null;
 		return "ws/rest/com.axelor.mail.db.MailGroup/" + record.id + "/image/download?image=true&v=" + record.version;
-	}
+	};
 
 	$scope.onEdit = function(record) {
 		$scope.switchTo('form', function (formScope) {
@@ -803,7 +803,7 @@ function MailGroupListCtrl($scope, $element) {
 				doUnfollow(record);
 			}
 		});
-	}
+	};
 
 	function doUnfollow(record) {
 
@@ -813,7 +813,7 @@ function MailGroupListCtrl($scope, $element) {
 		promise.success(function (res) {
 			record.$following = false;
 		});
-	};
+	}
 }
 
 })();

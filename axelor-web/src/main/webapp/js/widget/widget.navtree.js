@@ -47,7 +47,7 @@ ui.directive('navTree', ['MenuService', function(MenuService) {
 				MenuService.tags().success(function (res) {
 					this.update(res.data);
 				}.bind(this));
-			}
+			};
 
 			this.load = function (data) {
 				if (!data || !data.length) return;
@@ -196,7 +196,7 @@ ui.directive('navSubTree', ['$compile', function ($compile) {
 				}
 				if ($list.size() === 0) return;
 				if (element.hasClass('open')) {
-					hide($list)
+					hide($list);
 				} else {
 					show($list);
 				}
@@ -212,7 +212,7 @@ ui.directive('navSubTree', ['$compile', function ($compile) {
 					"<span ng-show='menu.tag' ng-class='menu.tagCss' class='nav-tag label'>{{menu.tag}}</span>" +
 				"</a>" +
 			"</li>"
-	}
+	};
 }]);
 
 })();

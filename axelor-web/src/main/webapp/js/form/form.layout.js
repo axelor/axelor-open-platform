@@ -17,6 +17,8 @@
  */
 (function() {
 
+/* jshint newcap: false */
+
 "use strict";
 
 var ui = angular.module('axelor.ui');
@@ -288,7 +290,7 @@ function BarLayout(items, attrs, $scope, $compile) {
 		}
 	});
 
-	if (side.children().size() == 0) {
+	if (side.children().size() === 0) {
 		main.removeClass("span8").addClass("span12");
 		side = null;
 	}

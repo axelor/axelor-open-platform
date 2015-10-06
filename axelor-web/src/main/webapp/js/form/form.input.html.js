@@ -41,7 +41,7 @@ function getStylePopup(element, styles) {
 	    });
 
 		$popup.append($list);
-	}
+	};
 }
 
 function getButtons(element, lite) {
@@ -217,7 +217,7 @@ ui.formInput('Html', {
 			}
 
 			shell.setHTML(value);
-		}
+		};
 
 		editor.on('input', _.debounce(onChange, 100));
 		editor.on('keypress', function(e) {

@@ -36,7 +36,7 @@ ui.ProgressMixin = {
 			scope.cssClasses = 'progress ' + props.css;
 			scope.styles = {
 				width: props.width + '%'
-			}
+			};
 			scope.css = props.css;
 			scope.width = props.width;
 		});

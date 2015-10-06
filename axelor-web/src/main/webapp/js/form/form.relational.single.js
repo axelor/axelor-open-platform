@@ -42,18 +42,20 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		embedded = ViewService.compile(embedded)($scope);
 		embedded.hide();
 
+		var cell, row;
+
 		// if panel form
 		if ($element.parent().is("div.form-item")) {
-			var cell = $("<div></div>").addClass("span12 form-item").append(embedded);
-			var row = $("<div></div>").addClass("row-fluid").append(cell);
+			cell = $("<div></div>").addClass("span12 form-item").append(embedded);
+			row = $("<div></div>").addClass("row-fluid").append(cell);
 			row.insertAfter($element.parents(".row-fluid:first"));
 			return embedded;
 		}
 
-		var colspan = $element.parents("form.dynamic-form:first").attr('x-cols') || 4,
-			cell = $('<td class="form-item"></td>').attr('colspan', colspan).append(embedded),
-			row = $('<tr></tr>').append(cell);
+		var colspan = $element.parents("form.dynamic-form:first").attr('x-cols') || 4;
 
+		cell = $('<td class="form-item"></td>').attr('colspan', colspan).append(embedded);
+		row = $('<tr></tr>').append(cell);
 		row.insertAfter($element.parents("tr:first"));
 
 		return embedded;
@@ -80,7 +82,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 					return $(this).attr('x-path').replace(path+'.','');
 				}).get();
 		relatives = _.unique(relatives);
-		missing = _.filter(relatives, function (name) {
+		var missing = _.filter(relatives, function (name) {
 			return !value || value[name] === undefined;
 		});
 		_.each(relatives, function(name) {
@@ -211,7 +213,7 @@ ui.directive('uiCanSuggest', function () {
 	};
 });
 
-var m2oTemplateReadonly = '<a href="" ng-show="text" ng-click="onEdit()">{{text}}</a>'
+var m2oTemplateReadonly = '<a href="" ng-show="text" ng-click="onEdit()">{{text}}</a>';
 var m2oTemplateReadonlyPlain = '<span class="display-text" ng-show="text">{{text}}</span>';
 
 var m2oTemplateEditable = '' +
@@ -574,7 +576,7 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 		}
 		scope.canShowEditor = function () {
 			return (scope.record || {}).id > 0 || !!scope.getValue();
-		}
+		};
 		template =
 			"<div class='m2o-editor-switcher'>" +
 			"<div ng-show='!canShowEditor()' class='form-item-container'>"+ m2oTemplateEditable +"</div>" +

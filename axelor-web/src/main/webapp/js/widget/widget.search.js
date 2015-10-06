@@ -255,11 +255,9 @@ ui.directive('uiFilterInput', function() {
 			element.focus(function(e) {
 				var type = scope.filter.type;
 				if (!(type == 'date' || type == 'datetime')) {
-					return
+					return;
 				}
-				if (picker == null) {
-					picker = element.datepicker(options);
-				}
+				picker = picker || element.datepicker(options);
 				picker.datepicker('show');
 			});
 
@@ -304,7 +302,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
 			$scope.fields = items;
 			$scope.$parent.fields = $scope.fields;
-			$scope.$parent.nameField = nameField || ($scope.fields['name'] ? 'name' : null);
+			$scope.$parent.nameField = nameField || ($scope.fields.name ? 'name' : null);
 		});
 	};
 
@@ -726,7 +724,7 @@ ui.directive('uiFilterBox', function() {
 					name = _.underscored(title);
 				}
 
-				var selected = new Array();
+				var selected = [];
 
 				_.each($scope.viewFilters, function(item, i) {
 					if (item.$selected) selected.push(i);
@@ -824,7 +822,7 @@ ui.directive('uiFilterBox', function() {
 				}
 
 				var search = _.extend({}, criteria);
-				if (search.criteria == undefined) {
+				if (!search.criteria) {
 					search.operator = 'and';
 					search.criteria = [];
 				} else {

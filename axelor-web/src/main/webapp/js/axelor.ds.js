@@ -76,9 +76,7 @@
 			var views = {};
 			forEach(params.views, function(view){
 				var type = view.type || view.viewType;
-				if (params.viewType == null) {
-					params.viewType = type;
-				}
+				params.viewType = params.viewType || type;
 				views[type] = extend({}, view, {
 					deferred: $q.defer()
 				});
@@ -167,7 +165,7 @@
 				if (my !== menubar && menubar) {
 					my = my.concat(menubar);
 				}
-				return view.menubar = my;
+				view.menubar = my;
 			}
 			function useToolbar(toolbar) {
 				if (!toolbar) return;
@@ -175,10 +173,10 @@
 				if (my !== toolbar) {
 					my = my.concat(toolbar);
 				}
-				return view.toolbar = my;
+				view.toolbar = my;
 			}
 			function useItems(view) {
-				return useIncluded(view)
+				return useIncluded(view);
 			}
 
 			var items = [];
@@ -188,7 +186,7 @@
 					if (item.view) {
 						items = items.concat(useItems(item.view));
 						useMenubar(item.view.menubar);
-						useToolbar(item.view.toolbar)
+						useToolbar(item.view.toolbar);
 					}
 				} else {
 					items.push(item);
@@ -352,7 +350,7 @@
 
 			if (hasItems) {
 				return loadFields({view: view});
-			};
+			}
 
 			$http.post('ws/meta/view', {
 				model: model,

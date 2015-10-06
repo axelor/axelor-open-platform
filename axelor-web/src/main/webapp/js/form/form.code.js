@@ -17,6 +17,9 @@
  */
 (function() {
 
+/* jshint newcap: false */
+/* global CodeMirror: true */
+
 "use strict";
 
 var ui = angular.module('axelor.ui');

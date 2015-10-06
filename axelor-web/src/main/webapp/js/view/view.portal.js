@@ -24,7 +24,7 @@ var ui = angular.module('axelor.ui');
 PortalCtrl.$inject = ['$scope', '$element'];
 function PortalCtrl($scope, $element) {
 
-	var view = $scope._views['portal'];
+	var view = $scope._views.portal;
 	if (view.items) {
 		$scope.$timeout(function () {
 			$scope.parse(view);
@@ -223,13 +223,14 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 							}
 
 							if (element.parent().is(":hidden")) {
-								return lazy = true;
+								lazy = true;
+								return;
 							}
 
 							unwatch();
 							unwatch = null;
 
-							var ctx = undefined;
+							var ctx;
 							if (scope.getContext) {
 								ctx = scope.getContext();
 							}
@@ -238,7 +239,7 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 							});
 						});
 					});
-				}
+				};
 			})()();
 
 			scope.parsePortlet = _.once(function(view) {

@@ -26,11 +26,8 @@ ui.ViewCtrl.$inject = ['$scope', 'DataSource', 'ViewService'];
 
 function ViewCtrl($scope, DataSource, ViewService) {
 
-	if ($scope._viewParams == null) {
-		$scope._viewParams = $scope.selectedTab;
-	}
-
-	if ($scope._viewParams == null) {
+	$scope._viewParams = $scope._viewParams || $scope.selectedTab;
+	if (!$scope._viewParams) {
 		throw "View parameters are not provided.";
 	}
 
@@ -59,13 +56,10 @@ function ViewCtrl($scope, DataSource, ViewService) {
 	};
 
 	$scope.loadView = function(viewType, viewName) {
-		var view = $scope._views[viewType];
-		if (view == null) {
-			view = {
-				type: viewType,
-				name: viewName
-			};
-		}
+		var view = $scope._views[viewType] || {
+			type: viewType,
+			name: viewName
+		};
 		var ctx = $scope._context;
 		if ($scope.getContext) {
 			ctx = $scope.getContext();
@@ -94,7 +88,7 @@ function ViewCtrl($scope, DataSource, ViewService) {
 	$scope.switchTo = function(viewType, /* optional */ callback) {
 
 		var view = $scope._views[viewType];
-		if (view == null) {
+		if (!view) {
 			return;
 		}
 		
@@ -104,7 +98,7 @@ function ViewCtrl($scope, DataSource, ViewService) {
 		var promise = view.deferred.promise;
 		promise.then(function(viewScope){
 
-			if (viewScope == null || switchedTo === viewType) {
+			if (!viewScope || switchedTo === viewType) {
 				return;
 			}
 			
@@ -139,6 +133,7 @@ function ViewCtrl($scope, DataSource, ViewService) {
 		var ds = $scope._dataSource;
 		var forceEdit = (params.params||{}).forceEdit === true;
 
+		/* jshint -W082 */
 		function doEdit(id, readonly) {
 			$scope.switchTo('form', function(scope){
 				scope._viewPromise.then(function(){
@@ -178,10 +173,10 @@ function ViewCtrl($scope, DataSource, ViewService) {
  */
 ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
 
-	if (type == null) {
+	if (!type) {
 		throw "No view type provided.";
 	}
-	if ($scope._dataSource == null) {
+	if (!$scope._dataSource) {
 		throw "DataSource is not provided.";
 	}
 	
@@ -206,7 +201,7 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
 	$scope.schema = null;
 
 	$scope.show = function() {
-		if (viewPromise == null) {
+		if (!viewPromise) {
 			viewPromise = $scope.loadView(type, view.name);
 			viewPromise.then(function(meta){
 				var schema = meta.view;
@@ -375,7 +370,7 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
 			$scope.onRefresh();
 		}
 	});
-}
+};
 
 ui.directive('uiViewPane', function() {
 
@@ -486,7 +481,7 @@ ui.directive('uiViewPopup', function() {
 				});
 			};
 
-			var params = $scope.tab.params || {};
+			params = $scope.tab.params || {};
 			if (!params['popup-save']) {
 				$scope.onPopupOK = false;
 			}

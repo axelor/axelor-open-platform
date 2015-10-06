@@ -17,28 +17,28 @@
  */
 (function() {
 
-	"use strict";
+/* jshint evil: true */
 
-	function load(paths) {
-		for(var i = 0 ; i < paths.length ; i++) {
-			var path = paths[i],
-			elem = document.createElement('script');
-			elem.src = path;
-			document.write(outerHTML(elem));
-		}
-	}
+"use strict";
 
-	function outerHTML(node){
-		// if IE, Chrome take the internal method otherwise build one
-		return node.outerHTML || (
-		    function(n){
-		        var div = document.createElement('div'), h;
-		        div.appendChild(n);
-		        h = div.innerHTML;
-		        div = null;
-		        return h;
-		    })(node);
+function load(paths) {
+	for (var i = 0; i < paths.length; i++) {
+		var path = paths[i], elem = document.createElement('script');
+		elem.src = path;
+		document.write(outerHTML(elem));
 	}
+}
+
+function outerHTML(node) {
+	// if IE, Chrome take the internal method otherwise build one
+	return node.outerHTML || (function(n) {
+		var div = document.createElement('div'), h;
+		div.appendChild(n);
+		h = div.innerHTML;
+		div = null;
+		return h;
+	})(node);
+}
 
 // make sure i18n is loaded
 if (this._t === undefined) {

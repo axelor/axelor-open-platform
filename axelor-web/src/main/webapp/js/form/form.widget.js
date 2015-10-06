@@ -235,7 +235,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		}
 
 		function handle(rec) {
-			var value = undefined;
+			var value;
 			try {
 				value = axelor.$eval(scope, expr, withContext(scope, rec));
 			} catch (e) {}
@@ -286,10 +286,10 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		var last = null;
 
 		function handle(rec) {
-			var value = undefined;
+			var value;
 			try {
 				value = expr(withContext(scope, rec)).trim();
-				if (value.length == 0) {
+				if (value.length === 0) {
 					value = null;
 				}
 			} catch (e) {}

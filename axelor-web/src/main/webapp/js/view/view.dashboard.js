@@ -24,7 +24,7 @@ var ui = angular.module('axelor.ui');
 DashboardCtrl.$inject = ['$scope', '$element'];
 function DashboardCtrl($scope, $element) {
 
-	var view = $scope._views['dashboard'];
+	var view = $scope._views.dashboard;
 	if (view.items) {
 		$scope.$timeout(function () {
 			$scope.parse(view);
@@ -206,13 +206,14 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 							}
 
 							if (element.parent().is(":hidden")) {
-								return lazy = true;
+								lazy = true;
+								return;
 							}
 
 							unwatch();
 							unwatch = null;
 
-							var ctx = undefined;
+							var ctx;
 							if (scope.getContext) {
 								ctx = scope.getContext();
 							}
@@ -221,7 +222,7 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 							});
 						});
 					});
-				}
+				};
 			})()();
 
 			scope.parseDashlet = _.once(function(dashlet, view) {
