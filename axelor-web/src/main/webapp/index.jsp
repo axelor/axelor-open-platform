@@ -17,12 +17,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page language="java" session="true" %>
 <%@ page import="com.axelor.app.AppSettings" %>
-<%@ page import="com.axelor.web.internal.AppInfo" %>
-<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page import="java.util.Map" %>
 <%@ page import="java.util.Locale"%>
-
 <%
 AppSettings settings = AppSettings.get();
 
@@ -30,6 +29,7 @@ String appName = settings.get("application.name", "My App");
 String appDesc = settings.get("application.description", null);
 String appHome = settings.get("application.home", "");
 String appLogo = settings.get("application.logo", "img/axelor-logo.png");
+String appAuthor = settings.get("application.author", "");
 String appTheme = settings.get("application.theme", null);
 String appMenu = settings.get("application.menu", "both");
 
@@ -38,9 +38,6 @@ String appTitle =  appName;
 if (appDesc != null) {
   appTitle = appName + " :: " + appDesc;
 }
-
-String appJS = AppInfo.getAppJS(getServletContext());
-String appCss = AppInfo.getAppCSS(getServletContext());
 %>
 <!DOCTYPE html>
 <html lang="en" ng-app="axelor.app" ng-controller="AppCtrl" ng-cloak>
@@ -49,10 +46,10 @@ String appCss = AppInfo.getAppCSS(getServletContext());
     <title><%= appTitle %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="<%= appDesc %>">
-    <meta name="author" content="{{app.author}}">
+    <meta name="author" content="<%= appAuthor %>">
 
     <!-- Le styles -->
-    <link href="<%= appCss %>" rel="stylesheet">
+    <link href="css/application.css" rel="stylesheet">
     <% if (appTheme != null) { %>
     <link href="css/<%= appTheme %>/theme.css" rel="stylesheet">
     <% } %>
@@ -63,10 +60,6 @@ String appCss = AppInfo.getAppCSS(getServletContext());
 
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="ico/favicon.ico">
-
-    <script type="text/javascript">
-      var __appSettings = <%= AppInfo.asJson() %>
-    </script>
   </head>
   <body>
 
@@ -88,7 +81,7 @@ String appCss = AppInfo.getAppCSS(getServletContext());
             </a>
             <% } %>
             <% if (!"left".equals(appMenu)) { %>
-            <ul class="nav hidden-phone" nav-menu-bar></ul>
+            <ul class="nav hidden-phone" data-nav-menu-bar></ul>
             <% } %>
             <ul class="nav nav-shortcuts pull-right">
               <li class="divider-vertical"></li>
@@ -104,17 +97,17 @@ String appCss = AppInfo.getAppCSS(getServletContext());
               <li class="divider-vertical"></li>
               <li class="dropdown">
                 <a href="javascript:" class="dropdown-toggle nav-link-user" data-toggle="dropdown">
-                  <img ng-src="{{app.userImage}}" width="20px"> <b class="caret"></b>
+                  <img ng-src="{{ $user.image }}" width="20px"> <b class="caret"></b>
                 </a>
                 <ul class="dropdown-menu">
                   <li>
                     <a href="#/preferences">
-                      <span class="nav-link-user-name">{{app.user}}</span>
+                      <span class="nav-link-user-name">{{ $user.name }}</span>
                       <span class="nav-link-user-sub" x-translate>Preferences</span>
                     </a>
                   </li>
                   <li class="divider"></li>
-                  <li><a href="#/about"></i><span x-translate>About</span></a></li>
+                  <li><a href="#/about"><span x-translate>About</span></a></li>
                   <li><a href="logout"><span x-translate>Log out</span></a></li>
                 </ul>
               </li>
@@ -124,33 +117,24 @@ String appCss = AppInfo.getAppCSS(getServletContext());
       </div>
     </header>
 
-    <div ng-include src="'partials/login-window.html'"></div>
-    <div ng-include src="'partials/error-window.html'"></div>
+    <div ng-include x-src="'partials/login-window.html'"></div>
+    <div ng-include x-src="'partials/error-window.html'"></div>
 
-    <section role="main" id="container" ng-switch on="routePath[0]">
+    <section role="main" id="container" ng-switch x-on="routePath[0]">
       <% if ("top".equals(appMenu)) { %>
-      <div class="fill-parent" ng-show="routePath[0] == 'main'" ng-include src="'partials/main-nomenu.html'"></div>
+      <div class="fill-parent" ng-show="routePath[0] == 'main'" ng-include x-src="'partials/main-nomenu.html'"></div>
       <% } else { %>
-      <div class="fill-parent" ng-show="routePath[0] == 'main'" ng-include src="'partials/main.html'"></div>
+      <div class="fill-parent" ng-show="routePath[0] == 'main'" ng-include x-src="'partials/main.html'"></div>
       <% } %>
-      <div ng-switch-when="about"><div ng-include src="'partials/about.html'"></div></div>
-      <div ng-switch-when="system"><div ng-include src="'partials/system.html'"></div></div>
-      <div ng-switch-when="welcome"><div ng-include src="'partials/welcome.html'"></div></div>
-      <div ng-switch-when="preferences"><div ng-include src="'partials/preferences.html'"></div></div>
+      <div ng-switch-when="about"><div ng-include x-src="'partials/about.html'"></div></div>
+      <div ng-switch-when="system"><div ng-include x-src="'partials/system.html'"></div></div>
+      <div ng-switch-when="welcome"><div ng-include x-src="'partials/welcome.html'"></div></div>
+      <div ng-switch-when="preferences"><div ng-include x-src="'partials/preferences.html'"></div></div>
     </section>
 
     <!-- JavaScript at the bottom for fast page loading -->
     <script src="js/lib/i18n.js"></script>
     <script src="ws/i18n/messages.js"></script>
-    <script src="<%= appJS %>"></script>
-    <!-- trigger adjustSize event on window resize -->
-    <script type="text/javascript">
-      $(function(){
-        $(window).resize(function(event){
-          if (!event.isTrigger)
-            $.event.trigger('adjustSize');
-        });
-      });
-    </script>
+    <script src="js/application.js"></script>
   </body>
 </html>

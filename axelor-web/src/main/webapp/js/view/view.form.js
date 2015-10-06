@@ -430,7 +430,7 @@ function FormViewCtrl($scope, $element) {
 		event.preventDefault();
 		context = tab.context || {};
 		record = $scope.record || {};
-		checkVersion = "" + __appSettings["view.form.check-version"];
+		checkVersion = "" + axelor.config["view.form.check-version"];
 		if (context.__check_version !== undefined) {
 			checkVersion = "" + context.__check_version;
 		}
@@ -750,7 +750,7 @@ function FormViewCtrl($scope, $element) {
 			if (!user) {
 				return "";
 			}
-			var name = __appSettings['user.nameField'] || 'name';
+			var name = axelor.config['user.nameField'] || 'name';
 			return user[name] || "";
 		}
 		

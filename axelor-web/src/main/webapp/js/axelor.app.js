@@ -171,7 +171,6 @@
 		$routeProvider
 		
 		.when('/preferences', { action: 'preferences' })
-		.when('/welcome', { action: 'welcome' })
 		.when('/about', { action: 'about' })
 		.when('/system', { action: 'system' })
 		.when('/', { action: 'main' })
@@ -343,46 +342,21 @@
 	
 	AppCtrl.$inject = ['$rootScope', '$exceptionHandler', '$scope', '$http', '$route', 'authService', 'MessageService', 'NavService'];
 	function AppCtrl($rootScope, $exceptionHandler, $scope, $http, $route, authService, MessageService, NavService) {
-		
-		function getAppInfo(settings) {
-			
-			var info = {
-				name: settings['application.name'],
-				description: settings['application.description'],
-				version: settings['application.version'],
-				author: settings['application.author'],
-				copyright: settings['application.copyright'],
-				home: settings['application.home'],
-				help: settings['application.help'],
-				mode: settings['application.mode'],
-				sdk: settings['application.sdk'],
-				user: settings['user.name'],
-				userId: settings['user.id'],
-				userImage: settings['user.image'],
-				login: settings['user.login'],
-				homeAction: settings['user.action'],
-				navigator: settings['user.navigator'],
-				fileUploadSize: settings['file.upload.size']
-			};
 
-			if (settings['view.confirm.yes-no'] === true) {
-				_.extend(axelor.dialogs.config, {
-					yesNo: true
-				});
-			}
-			
-			return info;
-		}
-	
-		function appInfo() {
-			$http.get('ws/app/info').then(function(response){
-				var settings = response.data;
-				angular.extend($scope.app, getAppInfo(settings));
+		function fetchConfig() {
+			return $http.get('ws/app/info').then(function(response) {
+				_.extend(axelor.config, response.data);
 			});
 		}
-	
-		// See index.jsp
-		$scope.app = getAppInfo(__appSettings);
+
+		// load app config
+		fetchConfig().then(function () {
+			$scope.$user.id = axelor.config["user.id"];
+			$scope.$user.name = axelor.config["user.name"];
+			$scope.$user.image = axelor.config["user.image"];
+		});
+
+		$scope.$user = {};
 		$scope.$year = moment().year();
 		$scope.$unreadMailCount = function () {
 			return MessageService.unreadCount();
@@ -391,13 +365,6 @@
 		$scope.showMailBox = function() {
 			NavService.openTabByName('mail.inbox');
 		};
-
-		Object.defineProperty($rootScope, 'app', {
-			enumerable: true,
-			get: function () {
-				return $scope.app;
-			}
-		});
 
 		var loginAttempts = 0;
 		var loginWindow = null;
@@ -497,11 +464,16 @@
 				username: $('#loginWindow form input:first').val(),
 				password: $('#loginWindow form input:last').val()
 			};
-			
+
+			var last = axelor.config["user.code"];
+
 			$http.post('login.jsp', data).then(function(response){
 				authService.loginConfirmed();
 				$('#loginWindow form input').val('');
 				$('#loginWindow .alert').hide();
+				if (last !== data.username) {
+					window.location.reload();
+				}
 			});
 		};
 		
@@ -519,7 +491,7 @@
 		$scope.$on('event:auth-loginConfirmed', function() {
 			showLogin(true);
 			loginAttempts = 0;
-			appInfo();
+			fetchConfig();
 		});
 		
 		$scope.httpError = {};
@@ -568,5 +540,13 @@
 		$scope.routePath = ["main"];
 		$route.reload();
 	}
+
+    //trigger adjustSize event on window resize -->
+	$(function(){
+		$(window).resize(function(event){
+			if (!event.isTrigger)
+				$.event.trigger('adjustSize');
+		});
+	});
 
 })();

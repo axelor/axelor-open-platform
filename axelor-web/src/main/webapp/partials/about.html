@@ -1,21 +1,21 @@
-<div class="about-page">
+<div class="about-page" ng-controller="AboutCtrl">
 	<div class="container content">
 		<img src="img/axelor.png" width="200px">
 		<div class="page-header">
-			<h3>{{app.name}} - {{app.description}}</h3>
+			<h3>{{appName}} - {{appDescription}}</h3>
 		</div>
 		<div class="row-fluid">
 			<div class="span12">
 				<p>
-					<strong>Version: {{app.version}}</strong>
+					<strong>Version: {{appVersion}}</strong>
 				</p>
-				<p>{{app.copyright}}</p>
-				<p>Website: <a ng-href="{{app.home}}">{{app.home}}</a>.
+				<p>{{appCopyright}}</p>
+				<p>Website: <a ng-href="{{appHome}}">{{appHome}}</a>.
 				<p>
 					<strong>Links</strong>
 				</p>
 				<ul class="unstyled">
-					<li ng-if="app.help"><a ng-href="{{app.help}}">Documentation</a></li>
+					<li ng-if="appHelp"><a ng-href="{{appHelp}}">Documentation</a></li>
 					<li><a href="http://www.gnu.org/licenses/agpl.html">License</a></li>
 				</ul>
 			</div>
@@ -26,9 +26,9 @@
 		<div class="row-fluid">
 			<div class="span12">
 				<p>
-					<strong>Version: {{app.sdk}}</strong>
+					<strong>Version: {{appSdk}}</strong>
 				</p>
-				<p>Copyright (c) 2005-{{$year}} Axelor. All Rights Reserved.</p>
+				<p>Copyright (c) 2005-{{appYear}} Axelor. All Rights Reserved.</p>
 				<p>Website: <a ng-href="http://www.axelor.com">http://www.axelor.com</a>.
 				<p>
 					<strong>Links</strong>
@@ -53,6 +53,6 @@
 		</div>
 	</div>
 	<footer class="footer">
-		<p class="credit">Copyright (c) 2005-{{$year}} <a href="http://www.axelor.com">Axelor</a>. All Rights Reserved.</p>
+		<p class="credit">Copyright (c) 2005-{{appYear}} <a href="http://www.axelor.com">Axelor</a>. All Rights Reserved.</p>
 	</footer>
 </div>

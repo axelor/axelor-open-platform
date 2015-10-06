@@ -168,7 +168,7 @@ ui.formInput('Image', 'ImageLink', {
 
 		input.change(function(e, ui) {
 			var file = input.get(0).files[0];
-			var uploadSize = scope.$eval('app.fileUploadSize');
+			var uploadSize = axelor.config["file.upload.size"];
 
 			// reset file selection
 			input.get(0).value = null;

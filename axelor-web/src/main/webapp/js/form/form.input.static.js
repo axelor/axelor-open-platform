@@ -24,8 +24,8 @@ var popoverElem = null;
 var popoverTimer = null;
 
 function canDisplayPopover(scope, details) {
-	var mode = __appSettings['application.mode'];
-	var tech = __appSettings['user.technical'];
+	var mode = axelor.config['application.mode'];
+	var tech = axelor.config['user.technical'];
 	
 	if (axelor.device.mobile) {
 		return false;
@@ -40,8 +40,8 @@ function canDisplayPopover(scope, details) {
 
 function makePopover(scope, element, callback, placement) {
 	
-	var mode = __appSettings['application.mode'];
-	var tech = __appSettings['user.technical'];
+	var mode = axelor.config['application.mode'];
+	var tech = axelor.config['user.technical'];
 	var doc = $(document);
 	
 	var table = null;

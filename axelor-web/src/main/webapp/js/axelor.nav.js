@@ -20,7 +20,7 @@
 "use strict";
 
 var app = angular.module("axelor.app");
-var singleTabOnly = axelor.device.mobile || !!__appSettings['view.single.tab'];
+var singleTabOnly = axelor.device.mobile || !!axelor.config['view.single.tab'];
 
 app.factory('NavService', ['$location', 'MenuService', function($location, MenuService) {
 
@@ -466,11 +466,11 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 	});
 
 	$scope.$watch('routePath', function(path) {
-		var app = $scope.app || {};
-		if (!app.homeAction || _.last(path) !== "main") {
+		var homeAction = axelor.config["user.action"];
+		if (!homeAction || _.last(path) !== "main") {
 			return;
 		}
-		NavService.openTabByName(app.homeAction, {
+		NavService.openTabByName(homeAction, {
 			__tab_prepend: true,
 			__tab_closable: false
 		});
@@ -492,7 +492,7 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 
 		 // menu toggle logic
 		 var menuToggled = false;
-		 var navigator = $scope.app.navigator;
+		 var navigator = axelor.config["user.navigator"];
 
 		 if (navigator !== 'hidden') {
 			 $('#offcanvas-toggle').find('a').click(function (e) {
@@ -530,12 +530,12 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 TabCtrl.$inject = ['$scope', '$location', '$routeParams'];
 function TabCtrl($scope, $location, $routeParams) {
 
-	var app = $scope.app || {},
+	var homeAction = axelor.config["user.action"],
 		params = _.clone($routeParams),
 		search = _.clone($location.$$search);
 	
-	if (app.homeAction && app.homeAction !== params.resource) {
-		$scope.openTabByName(app.homeAction, {
+	if (homeAction && homeAction !== params.resource) {
+		$scope.openTabByName(homeAction, {
 			__tab_prepend: true,
 			__tab_closable: false
 		});

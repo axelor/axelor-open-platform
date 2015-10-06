@@ -32,6 +32,10 @@ strong {
 	font-weight: 600;
 }
 
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}
+
 #container {
 	left: 0px; right: 0px; top: 41px; bottom: 0px;
 	position:	absolute;

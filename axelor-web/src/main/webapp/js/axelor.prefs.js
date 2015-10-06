@@ -41,7 +41,7 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 	$scope.getContext = function() {
 		var context = __getContext.apply($scope, arguments) || {};
 		if (!context.code) {
-			context.code = __appSettings['user.login'];
+			context.code = axelor.config['user.login'];
 		}
 		return context;
 	};
@@ -54,9 +54,8 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 	
 	function doClose() {
 		if (!$scope.isDirty()) {
-			var app = $scope.app || {};
 			var rec = $scope.record || {};
-			app.homeAction = rec.homeAction;
+			axelor.config["user.action"] = rec.homeAction;
 		}
 		
 		window.history.back();
@@ -76,6 +75,17 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 	$scope.ajaxStop(function () {
 		$scope.applyLater();
 	});
+}
+
+function AboutCtrl($scope) {
+	$scope.appName = axelor.config["application.name"];
+	$scope.appDescription = axelor.config["application.description"];
+	$scope.appVersion = axelor.config["application.version"];
+	$scope.appCopyright = axelor.config["application.copyright"];
+	$scope.appSdk = axelor.config["application.sdk"];
+	$scope.appHome = axelor.config["application.home"];
+	$scope.appHelp = axelor.config["application.help"];
+	$scope.appYear = moment().year();
 }
 
 function SystemCtrl($scope, $element, $location, $http) {
@@ -107,5 +117,6 @@ function SystemCtrl($scope, $element, $location, $http) {
 
 ui.controller("UserCtrl", ['$scope', '$element', '$location', 'DataSource', 'ViewService', UserCtrl]);
 ui.controller("SystemCtrl", ['$scope', '$element', '$location', '$http', SystemCtrl]);
+ui.controller("AboutCtrl", ['$scope', AboutCtrl]);
 
 })();

@@ -124,7 +124,7 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 
 			flags.message = _.pick(message, 'id');
 			flags.user = {
-				id: __appSettings['user.id']
+				id: axelor.config['user.id']
 			};
 
 			ref[""+message.id] = message;
@@ -613,7 +613,7 @@ ui.formWidget('uiMailFollowers', {
 		$scope.updateStatus = function() {
 			var followers = $scope.followers || [];
 			var found = _.findWhere(followers, {
-				code: $scope.$root.app.login
+				code: axelor.config["user.code"]
 			});
 			$scope.following = !!found;
 		};
@@ -739,7 +739,7 @@ ui.formWidget('PanelMail', {
 
 		$scope.$userName = function (user) {
 			if (!user) return null;
-			var key = __appSettings["user.nameField"] || "name";
+			var key = axelor.config["user.nameField"] || "name";
 			return user[key] || user.name;
 		};
 

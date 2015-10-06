@@ -199,8 +199,8 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 			values = _.extend({}, scope._context, values);
 		}
 		return _.extend(values, {
-			$user: __appSettings['user.login'],
-			$group: __appSettings['user.group']
+			$user: axelor.config['user.login'],
+			$group: axelor.config['user.group']
 		});
 	}
 	

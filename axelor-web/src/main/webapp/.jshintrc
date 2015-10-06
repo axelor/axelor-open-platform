@@ -7,7 +7,6 @@
     "angular": true,
     "moment": true,
     "util": true,
-    "__appSettings": true,
     "_": true,
     "_t": true
   },
