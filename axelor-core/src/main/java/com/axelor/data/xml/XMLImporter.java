@@ -20,7 +20,6 @@ package com.axelor.data.xml;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
@@ -48,8 +47,6 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.inject.Injector;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
@@ -58,12 +55,12 @@ import com.thoughtworks.xstream.mapper.MapperWrapper;
  * XML data importer.
  * <br>
  * <br>
- * This class also provides {@link #runTask(ImportTask)} method to import data programatically.
+ * This class also provides {@link #runTask(ImportTask)} method to import data programmatically.
  * <br>
  * <br>
  * For example:
  * <pre> 
- * XMLImporter importer = new XMLImporter(injector, &quot;path/to/xml-config.xml&quot;);
+ * XMLImporter importer = new XMLImporter(&quot;path/to/xml-config.xml&quot;);
  * 
  * importer.runTask(new ImportTask(){
  * 	
@@ -84,8 +81,6 @@ public class XMLImporter implements Importer {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
-	private Injector injector;
-	
 	private File dataDir;
 	
 	private XMLConfig config;
@@ -97,16 +92,15 @@ public class XMLImporter implements Importer {
 	private boolean canClear = true;
 
 	@Inject
-	public XMLImporter(Injector injector,
+	public XMLImporter(
 			@Named("axelor.data.config") String configFile,
 			@Named("axelor.data.dir") String dataDir) {
 
-		Preconditions.checkNotNull(injector);
 		Preconditions.checkNotNull(configFile);
 
-		File _file = new File(configFile);
+		File file = new File(configFile);
 
-		Preconditions.checkArgument(_file.isFile(), "No such file: " + configFile);
+		Preconditions.checkArgument(file.isFile(), "No such file: " + configFile);
 		
 		if (dataDir != null) {
 			File _data = new File(dataDir);
@@ -114,12 +108,11 @@ public class XMLImporter implements Importer {
 			this.dataDir = _data;
 		}
 
-		this.injector = injector;
-		this.config = XMLConfig.parse(_file);
+		this.config = XMLConfig.parse(file);
 	}
 
-	public XMLImporter(Injector injector, String configFile) {
-		this(injector, configFile, null);
+	public XMLImporter(String configFile) {
+		this(configFile, null);
 	}
 	
 	public void setContext(Map<String, Object> context) {
@@ -206,29 +199,6 @@ public class XMLImporter implements Importer {
 	}
 
 	/**
-	 * Process the given key -> reader multi-mapping to import data from some streams.
-	 * 
-	 * @param readers multi-value mapping of filename -> reader
-	 * @throws ImportException
-	 * 
-	 * @see {@link #input(String, File)}
-	 * @see {@link #input(String, InputStream)}
-	 * @see {@link #input(String, Reader)}
-	 * @see {@link #consume()}
-	 */
-	@Deprecated
-	public void process(Multimap<String, Reader> readers) throws ImportException {
-		
-		Preconditions.checkNotNull(config);
-		Preconditions.checkNotNull(readers);
-
-		for (XMLInput input : config.getInputs()) {
-			for(Reader reader : readers.get(input.getFileName()))
-				this.process(input, reader);
-		}
-	}
-	
-	/**
 	 * Process the data file with the given input binding.
 	 * 
 	 * @param input input binding configuration
@@ -281,7 +251,7 @@ public class XMLImporter implements Importer {
 					return;
 				}
 				try {
-					bean = binding.call(bean, ctx, injector);
+					bean = binding.call(bean, ctx);
 					if (bean != null) {
 						bean = JPA.manage((Model) bean);
 						count++;

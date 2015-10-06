@@ -22,11 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.axelor.data.ImportException;
 import com.axelor.data.DataScriptHelper;
+import com.axelor.data.ImportException;
+import com.axelor.inject.Beans;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import com.google.inject.Injector;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -158,7 +158,7 @@ public class XMLBind {
 	private Method callMethod;
 
 	@SuppressWarnings("unchecked")
-	public <T> T call(T object, Map<String, Object> context, Injector injector) throws Exception {
+	public <T> T call(T object, Map<String, Object> context) throws Exception {
 
 		if (Strings.isNullOrEmpty(callable))
 			return object;
@@ -171,7 +171,7 @@ public class XMLBind {
 			Class<?> klass = Class.forName(className);
 
 			callMethod = klass.getMethod(method, Object.class, Map.class);
-			callObject = injector.getInstance(klass);
+			callObject = Beans.get(klass);
 		}
 
 		try {

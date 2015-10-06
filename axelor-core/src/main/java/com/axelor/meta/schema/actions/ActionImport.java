@@ -126,7 +126,7 @@ public class ActionImport extends Action {
 		}
 
 		log.info("action-import (config): " + configName.toString());
-		XMLImporter importer = new XMLImporter(handler.getInjector(), configName.toString());
+		XMLImporter importer = new XMLImporter(configName.toString());
 		importer.setContext(handler.getContext());
 
 		int count = 0;

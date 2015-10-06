@@ -50,15 +50,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.inject.Injector;
 
 public class CSVImporter implements Importer {
 
 	private Logger LOG = LoggerFactory.getLogger(getClass());
 
 	private File dataDir;
-
-	private Injector injector;
 
 	private CSVConfig config;
 
@@ -82,16 +79,16 @@ public class CSVImporter implements Importer {
 		this.context = context;
 	}
 
-	public CSVImporter(Injector injector, String configFile) {
-		this(injector, configFile, null, null);
+	public CSVImporter(String configFile) {
+		this(configFile, null, null);
 	}
 
-	public CSVImporter(Injector injector, String config, String dataDir){
-		this(injector, config, dataDir, null);
+	public CSVImporter(String config, String dataDir){
+		this(config, dataDir, null);
 	}
 
 	@Inject
-	public CSVImporter(Injector injector,
+	public CSVImporter(
 			@Named("axelor.data.config") String config,
 			@Named("axelor.data.dir") String dataDir,
 			@Nullable @Named("axelor.error.dir") String errorDir) {
@@ -109,21 +106,20 @@ public class CSVImporter implements Importer {
 		}
 
 		this.config = CSVConfig.parse(_file);
-		this.injector = injector;
 		if(!Strings.isNullOrEmpty(errorDir)) {
 			this.loggerManager = new CSVLogger(this.config, errorDir);
 		}
 	}
 
-	public CSVImporter(Injector injector, CSVConfig config){
-		this(injector, config, null);
+	public CSVImporter(CSVConfig config){
+		this(config, null);
 	}
 
-	public CSVImporter(Injector injector, CSVConfig config, String dataDir){
-		this(injector, config, dataDir, null);
+	public CSVImporter(CSVConfig config, String dataDir){
+		this(config, dataDir, null);
 	}
 
-	public CSVImporter(Injector injector, CSVConfig config, String dataDir, String errorDir){
+	public CSVImporter(CSVConfig config, String dataDir, String errorDir){
 
 		if (dataDir != null) {
 			File _data = new File(dataDir);
@@ -133,7 +129,6 @@ public class CSVImporter implements Importer {
 		}
 
 		this.config = config;
-		this.injector = injector;
 		if(!Strings.isNullOrEmpty(errorDir)) {
 			this.loggerManager = new CSVLogger(this.config, errorDir);
 		}
@@ -295,7 +290,7 @@ public class CSVImporter implements Importer {
 
 		LOG.debug("Header {}", Arrays.asList(fields));
 
-		CSVBinder binder = new CSVBinder(beanClass, fields, csvInput, injector);
+		CSVBinder binder = new CSVBinder(beanClass, fields, csvInput);
 		String[] values = null;
 
 		int count = 0;
@@ -312,7 +307,7 @@ public class CSVImporter implements Importer {
 				context.putAll(this.context);
 			}
 
-			csvInput.callPrepareContext(context, injector);
+			csvInput.callPrepareContext(context);
 
 			// register type adapters
 			for(DataAdapter adapter : defaultAdapters) {
@@ -414,7 +409,7 @@ public class CSVImporter implements Importer {
 
 		bean = binder.bind(values, ctx);
 
-		bean = csvInput.call(bean, ctx, injector);
+		bean = csvInput.call(bean, ctx);
 		LOG.trace("bean created: {}", bean);
 
 		if (bean != null) {

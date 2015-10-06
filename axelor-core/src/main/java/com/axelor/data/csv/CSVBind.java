@@ -26,19 +26,19 @@ import java.util.regex.Pattern;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 import com.axelor.data.DataScriptHelper;
+import com.axelor.inject.Beans;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
-import com.google.inject.Injector;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 @XStreamAlias("bind")
-public class CSVBinding {
+public class CSVBind {
 
 	public static Pattern pattern = Pattern.compile("^(call|eval):\\s*(.*)");
 
@@ -71,7 +71,7 @@ public class CSVBinding {
 	private Boolean conditionEmpty;
 
 	@XStreamImplicit(itemFieldName = "bind")
-	private List<CSVBinding> bindings;
+	private List<CSVBind> bindings;
 
 	@XStreamAsAttribute
 	private String adapter;
@@ -128,7 +128,7 @@ public class CSVBinding {
 		this.conditionEmpty = conditionEmpty;
 	}
 
-	public List<CSVBinding> getBindings() {
+	public List<CSVBind> getBindings() {
 		return bindings;
 	}
 
@@ -136,8 +136,8 @@ public class CSVBinding {
 		return adapter;
 	}
 
-	public static CSVBinding getBinding(final String column, final String field, Set<String> cols) {
-		CSVBinding cb = new CSVBinding();
+	public static CSVBind getBinding(final String column, final String field, Set<String> cols) {
+		CSVBind cb = new CSVBind();
 		cb.field = field;
 		cb.column = column;
 
@@ -150,7 +150,7 @@ public class CSVBinding {
 		for(String col : cols) {
 			if (cb.bindings == null)
 				cb.bindings = Lists.newArrayList();
-			cb.bindings.add(CSVBinding.getBinding(field + "." + col, col, null));
+			cb.bindings.add(CSVBind.getBinding(field + "." + col, col, null));
 		}
 
 		cb.update = true;
@@ -167,7 +167,7 @@ public class CSVBinding {
 
 	private static DataScriptHelper helper = new DataScriptHelper(100, 10, false);
 
-	public Object evaluate(Map<String, Object> context, Injector injector) {
+	public Object evaluate(Map<String, Object> context) {
 		if (Strings.isNullOrEmpty(expression)) {
 			return handleGroovy(context);
 		}
@@ -184,7 +184,7 @@ public class CSVBinding {
 		}
 
 		if ("call".equals(kind)) {
-			return handleCall(context, expr, injector);
+			return handleCall(context, expr);
 		}
 
 		return handleGroovy(context);
@@ -205,7 +205,7 @@ public class CSVBinding {
 		return (Boolean) helper.eval(expr, context);
 	}
 
-	private Object handleCall(Map<String, Object> context, String expr, Injector injector) {
+	private Object handleCall(Map<String, Object> context, String expr) {
 		if(Strings.isNullOrEmpty(expr)) {
 			return null;
 		}
@@ -216,7 +216,7 @@ public class CSVBinding {
 			String method = expr.split("\\:")[1];
 
 			Class<?> klass = Class.forName(className);
-			Object object = injector.getInstance(klass);
+			Object object = Beans.get(klass);
 
 			Pattern p = Pattern.compile("(\\w+)\\((.*?)\\)");
 			Matcher m = p.matcher(method);

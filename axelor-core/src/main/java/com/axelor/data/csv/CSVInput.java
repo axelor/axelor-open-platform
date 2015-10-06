@@ -23,11 +23,10 @@ import java.util.Map;
 
 import com.axelor.data.ImportException;
 import com.axelor.data.adapter.DataAdapter;
+import com.axelor.inject.Beans;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -36,9 +35,6 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 public class CSVInput {
 
 	private static transient final char DEFAULT_SEPARATOR = ',';
-
-	@Inject
-	Injector injector;
 
 	@XStreamAlias("file")
 	@XStreamAsAttribute
@@ -69,7 +65,7 @@ public class CSVInput {
 	private String prepareContext;
 
 	@XStreamImplicit(itemFieldName = "bind")
-	private List<CSVBinding> bindings = Lists.newArrayList();
+	private List<CSVBind> bindings = Lists.newArrayList();
 
 	@XStreamImplicit(itemFieldName = "adapter")
 	private List<DataAdapter> adapters = Lists.newArrayList();
@@ -133,11 +129,11 @@ public class CSVInput {
 		return prepareContext;
 	}
 
-	public List<CSVBinding> getBindings() {
+	public List<CSVBind> getBindings() {
 		return bindings;
 	}
 
-	public void setBindings(List<CSVBinding> bindings) {
+	public void setBindings(List<CSVBind> bindings) {
 		this.bindings = bindings;
 	}
 
@@ -155,7 +151,7 @@ public class CSVInput {
 	private Method contextMethod;
 
 	@SuppressWarnings("unchecked")
-	public <T> T call(T object, Map<String, Object> context, Injector injector) throws Exception {
+	public <T> T call(T object, Map<String, Object> context) throws Exception {
 
 		if (Strings.isNullOrEmpty(callable))
 			return object;
@@ -168,7 +164,7 @@ public class CSVInput {
 			Class<?> klass = Class.forName(className);
 
 			callMethod = klass.getMethod(method, Object.class, Map.class);
-			callObject = injector.getInstance(klass);
+			callObject = Beans.get(klass);
 		}
 
 		try {
@@ -179,7 +175,7 @@ public class CSVInput {
 		}
 	}
 
-	public Map<String, Object> callPrepareContext(Map<String, Object> context, Injector injector) throws Exception {
+	public Map<String, Object> callPrepareContext(Map<String, Object> context) throws Exception {
 
 		if (Strings.isNullOrEmpty(prepareContext))
 			return context;
@@ -192,7 +188,7 @@ public class CSVInput {
 			Class<?> klass = Class.forName(className);
 
 			contextMethod = klass.getMethod(method, Map.class);
-			contextObject = injector.getInstance(klass);
+			contextObject = Beans.get(klass);
 		}
 
 		try {

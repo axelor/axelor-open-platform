@@ -28,7 +28,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.axelor.common.FileUtils;
@@ -39,7 +38,6 @@ import com.google.common.base.Throwables;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.io.LineReader;
-import com.google.inject.Injector;
 
 @Singleton
 class DataLoader extends AbstractLoader {
@@ -52,9 +50,6 @@ class DataLoader extends AbstractLoader {
 	private static Pattern patCsv = Pattern.compile("^\\<\\s*csv-inputs");
 	private static Pattern patXml = Pattern.compile("^\\<\\s*xml-inputs");
 
-	@Inject
-	private Injector injector;
-	
 	@Override
 	protected void doLoad(Module module, boolean update) {
 
@@ -77,7 +72,7 @@ class DataLoader extends AbstractLoader {
 	
 	private void importCsv(File config) {
 		File data = FileUtils.getFile(config.getParentFile(), INPUT_DIR_NAME);
-		CSVImporter importer = new CSVImporter(injector, config.getAbsolutePath(), data.getAbsolutePath(), null);
+		CSVImporter importer = new CSVImporter(config.getAbsolutePath(), data.getAbsolutePath(), null);
 		try {
 			importer.run(null);
 		} catch (IOException e) {
@@ -87,7 +82,7 @@ class DataLoader extends AbstractLoader {
 
 	private void importXml(File config) {
 		File data = FileUtils.getFile(config.getParentFile(), INPUT_DIR_NAME);
-		XMLImporter importer = new XMLImporter(injector, config.getAbsolutePath(), data.getAbsolutePath());
+		XMLImporter importer = new XMLImporter(config.getAbsolutePath(), data.getAbsolutePath());
 		importer.run(null);
 	}
 

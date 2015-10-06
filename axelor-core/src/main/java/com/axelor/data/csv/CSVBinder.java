@@ -39,7 +39,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.inject.Injector;
 
 public class CSVBinder {
 
@@ -47,7 +46,7 @@ public class CSVBinder {
 
 	private Class<?> beanClass;
 
-	private List<CSVBinding> bindings;
+	private List<CSVBind> bindings;
 
 	private String[] fields;
 
@@ -59,8 +58,6 @@ public class CSVBinder {
 
 	private Map<String, DataAdapter> adapters = Maps.newHashMap();
 
-	private Injector injector;
-
 	public void registerAdapter(DataAdapter adapter) {
 		adapters.put(adapter.getName(), adapter);
 	}
@@ -69,21 +66,20 @@ public class CSVBinder {
 		return fields;
 	}
 
-	public CSVBinder(Class<?> beanClass, String[] fields, CSVInput csvInput, Injector injector) {
-		this(beanClass, fields, csvInput.getBindings(), true, csvInput.getSearch(), csvInput.isUpdate(), injector);
+	public CSVBinder(Class<?> beanClass, String[] fields, CSVInput csvInput) {
+		this(beanClass, fields, csvInput.getBindings(), true, csvInput.getSearch(), csvInput.isUpdate());
 	}
 
-	public CSVBinder(Class<?> beanClass, String[] fields, CSVBinding csvBind, Injector injector) {
-		this(beanClass, fields, csvBind.getBindings(), false, csvBind.getSearch(), csvBind.isUpdate(), injector);
+	public CSVBinder(Class<?> beanClass, String[] fields, CSVBind csvBind) {
+		this(beanClass, fields, csvBind.getBindings(), false, csvBind.getSearch(), csvBind.isUpdate());
 	}
 
-	private CSVBinder(Class<?> beanClass, String[] fields, List<CSVBinding> csvBinds, boolean autoBind, String query, boolean update, Injector injector) {
+	private CSVBinder(Class<?> beanClass, String[] fields, List<CSVBind> csvBinds, boolean autoBind, String query, boolean update) {
 		this.beanClass = beanClass;
 		this.fields = fields;
 		this.bindings = Lists.newArrayList();
 		this.query = query;
 		this.update = update;
-		this.injector = injector;
 
 		if (csvBinds != null)
 			this.bindings.addAll(csvBinds);
@@ -121,15 +117,15 @@ public class CSVBinder {
 		}
 
 		for (String field : beanFields) {
-			bindings.add(CSVBinding.getBinding(null, field, refFields.get(field)));
+			bindings.add(CSVBind.getBinding(null, field, refFields.get(field)));
 		}
 	}
 
-	private List<String> getBoundCols(List<CSVBinding> bindings, List<String> bounds) {
+	private List<String> getBoundCols(List<CSVBind> bindings, List<String> bounds) {
 		if (bounds == null)
 			bounds = Lists.newArrayList();
 		if (bindings != null) {
-			for (CSVBinding cb : bindings) {
+			for (CSVBind cb : bindings) {
 				if (cb.getColumn() != null)
 					bounds.add(cb.getColumn());
 				if (cb.getBindings() != null)
@@ -165,11 +161,11 @@ public class CSVBinder {
 		return JPA.all((Class<Model>) beanClass).filter(query).bind(params).cacheable().autoFlush(false).fetch();
 	}
 
-	private boolean isBound(CSVBinding cb, Map<String, Object> values) {
+	private boolean isBound(CSVBind cb, Map<String, Object> values) {
 		if (cb.getColumn() != null)
 			return values.get(cb.getColumn()) != null;
 		if (cb.getBindings() != null)
-			for (CSVBinding b : cb.getBindings())
+			for (CSVBind b : cb.getBindings())
 				if (isBound(b, values))
 					return true;
 		if(cb.getSearch() != null)
@@ -177,7 +173,7 @@ public class CSVBinder {
 		return cb.getExpression() != null;
 	}
 
-	private void handleDummyBind(CSVBinding cb, Map<String, Object> values) {
+	private void handleDummyBind(CSVBind cb, Map<String, Object> values) {
 
 		Class<?> type = null;
 		try {
@@ -194,10 +190,10 @@ public class CSVBinder {
 			if (cb.getColumn() == null &&
 				cb.getSearch() == null &&
 				cb.getExpression() != null) {
-				value = cb.evaluate(values, injector);
+				value = cb.evaluate(values);
 			}
 		} else {
-			CSVBinder binder = new CSVBinder(type, fields, cb, injector);
+			CSVBinder binder = new CSVBinder(type, fields, cb);
 			value = binder.bind(values);
 		}
 		values.put(field, value);
@@ -214,7 +210,7 @@ public class CSVBinder {
 
 		LOG.trace("populate: " + beanClass);
 
-		for (CSVBinding cb : this.bindings) {
+		for (CSVBind cb : this.bindings) {
 
 			LOG.trace("binding: " + cb);
 
@@ -259,7 +255,7 @@ public class CSVBinder {
 			// get default value
 			if (cb.getColumn() == null && cb.getSearch() == null && cb.getExpression() != null) {
 				LOG.trace("expression: " + cb.getExpression());
-				value = cb.evaluate(values, injector);
+				value = cb.evaluate(values);
 				LOG.trace("value: " + value);
 			}
 
@@ -271,7 +267,7 @@ public class CSVBinder {
 
 			// handle relational fields (including other case of m2m)
 			else if (p.getTarget() != null) {
-				CSVBinder b = new CSVBinder(p.getTarget(), fields, cb, injector);
+				CSVBinder b = new CSVBinder(p.getTarget(), fields, cb);
 				value = b.bind(values);
 			}
 
@@ -295,11 +291,11 @@ public class CSVBinder {
 		return bean;
 	}
 	
-	private boolean isValueGiven(CSVBinding bind, Map<String, Object> values) {
+	private boolean isValueGiven(CSVBind bind, Map<String, Object> values) {
 		if (bind.getColumn() != null) return false;
 		if (bind.getBindings() == null) return true;
 		boolean given = false;
-		for (CSVBinding binding : bind.getBindings()) {
+		for (CSVBind binding : bind.getBindings()) {
 			Object raw = values.get(binding.getColumn());
 			if (raw != null && !"".equals(raw)) {
 				given = true;
@@ -338,11 +334,11 @@ public class CSVBinder {
 		}
 
 		localContext.putAll(map);
-		for (CSVBinding cb : flatten(this.bindings)) {
+		for (CSVBind cb : flatten(this.bindings)) {
 			String field = cb.getColumn();
 			if (Strings.isNullOrEmpty(field) || !map.containsKey(field))
 				continue;
-			localContext.put(field, cb.evaluate(map, injector));
+			localContext.put(field, cb.evaluate(map));
 			if (field.contains("."))
 				localContext.put(field.replace(".", "_") + "_", localContext.get(field));
 		}
@@ -350,9 +346,9 @@ public class CSVBinder {
 		return bind(localContext);
 	}
 
-	private List<CSVBinding> flatten(List<CSVBinding> bindings) {
-		List<CSVBinding> all = Lists.newArrayList();
-		for (CSVBinding cb : bindings) {
+	private List<CSVBind> flatten(List<CSVBind> bindings) {
+		List<CSVBind> all = Lists.newArrayList();
+		for (CSVBind cb : bindings) {
 			all.add(cb);
 			if (cb.getBindings() != null) {
 				all.addAll(flatten(cb.getBindings()));
@@ -361,7 +357,7 @@ public class CSVBinder {
 		return all;
 	}
 
-	private Object adapt(CSVBinding bind, Object value, Map<String, Object> ctx) {
+	private Object adapt(CSVBind bind, Object value, Map<String, Object> ctx) {
 		String name = bind.getAdapter();
 		if ("".equals(value)) {
 			value = null;
