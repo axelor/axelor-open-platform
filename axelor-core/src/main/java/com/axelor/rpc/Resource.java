@@ -74,7 +74,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import com.google.inject.persist.Transactional;
 
@@ -815,9 +814,6 @@ public class Resource<T extends Model> {
 		return response;
 	}
 
-	@Inject
-	private Injector injector;
-
 	public ActionResponse action(ActionRequest request) {
 
 		ActionResponse response = new ActionResponse();
@@ -834,7 +830,7 @@ public class Resource<T extends Model> {
 		try {
 			Class<?> klass = Class.forName(controller);
 			Method m = klass.getDeclaredMethod(method, ActionRequest.class, ActionResponse.class);
-			Object obj = injector.getInstance(klass);
+			Object obj = Beans.get(klass);
 
 			m.setAccessible(true);
 			m.invoke(obj, new Object[] { request, response });

@@ -17,7 +17,6 @@
  */
 package com.axelor.quartz;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.quartz.Job;
@@ -26,25 +25,18 @@ import org.quartz.SchedulerException;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 
-import com.google.inject.Injector;
+import com.axelor.inject.Beans;
 
 /**
- * The custom {@link JobFactory} to create job instance using guice injector.
+ * The custom {@link JobFactory} to create job injectable job instances.
  * 
  */
 @Singleton
 class GuiceJobFactory implements JobFactory {
 
-	private Injector injector;
-
-	@Inject
-	public GuiceJobFactory(Injector injector) {
-		this.injector = injector;
-	}
-
 	@Override
 	public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException {
 		Class<? extends Job> jobClass = bundle.getJobDetail().getJobClass();
-		return this.injector.getInstance(jobClass);
+		return Beans.get(jobClass);
 	}
 }
