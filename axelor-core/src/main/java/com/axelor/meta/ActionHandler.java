@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.persistence.Query;
 
 import org.slf4j.Logger;
@@ -38,6 +37,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
+import com.axelor.inject.Beans;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.actions.ActionGroup;
 import com.axelor.meta.schema.actions.ActionMethod;
@@ -56,15 +56,12 @@ import com.google.common.collect.Collections2;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import com.google.common.io.CharStreams;
-import com.google.inject.Injector;
 import com.google.inject.servlet.RequestScoped;
 
 @RequestScoped
 public class ActionHandler {
 
 	private final Logger log = LoggerFactory.getLogger(ActionHandler.class);
-
-	private Injector injector;
 
 	private ActionRequest request;
 
@@ -76,11 +73,10 @@ public class ActionHandler {
 	
 	private Pattern pattern = Pattern.compile("^(select\\[\\]|select|action|call|eval):\\s*(.*)");
 	
-	private ActionHandler(Injector injector, ActionRequest request) {
+	public ActionHandler(ActionRequest request) {
 
 		final Context context = request.getContext();
 
-		this.injector = injector;
 		this.request = request;
 
 		this.context = context;
@@ -88,19 +84,6 @@ public class ActionHandler {
 		this.scriptHelper = new CompositeScriptHelper(this.context);
 		this.bindings = this.scriptHelper.getBindings();
 		this.bindings.put("__me__", this);
-	}
-
-	@Inject
-	ActionHandler(Injector injector) {
-		this.injector = injector;
-	}
-	
-	public ActionHandler forRequest(ActionRequest request) {
-		return new ActionHandler(injector, request);
-	}
-	
-	public Injector getInjector() {
-		return injector;
 	}
 
 	public Context getContext() {
@@ -168,14 +151,12 @@ public class ActionHandler {
 	public Object call(String className, String method) {
 		ActionResponse response = new ActionResponse();
 		try {
-			Class<?> klass = Class.forName(className);
-			Method m = klass.getMethod(method,
-					ActionRequest.class,
-					ActionResponse.class);
-			Object obj = injector.getInstance(klass);
+			final Class<?> klass = Class.forName(className);
+			final Method m = klass.getMethod(method, ActionRequest.class, ActionResponse.class);
+			final Object obj = Beans.get(klass);
 			m.invoke(obj, new Object[] { request, response });
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 			response.setException(e);
 		}
 		return response;
@@ -191,8 +172,8 @@ public class ActionHandler {
 		}
 
 		try {
-			Class<?> klass = Class.forName(className);
-			Object object = injector.getInstance(klass);
+			final Class<?> klass = Class.forName(className);
+			final Object object = Beans.get(klass);
 			return scriptHelper.call(object, methodCall);
 		} catch (Exception e) {
 			throw new IllegalArgumentException(e);

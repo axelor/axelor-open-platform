@@ -102,9 +102,6 @@ public class RestService extends ResourceService {
 	private MetaService service;
 	
 	@Inject
-	private ActionHandler handler;
-
-	@Inject
 	private MailMessageRepository messages;
 
 	@Inject
@@ -147,7 +144,7 @@ public class RestService extends ResourceService {
 		actRequest.setAction(action);
 		actRequest.setData(data);
 
-		final ActionHandler actHandler = handler.forRequest(actRequest);
+		final ActionHandler actHandler = new ActionHandler(actRequest);
 		final Object res = act.evaluate(actHandler);
 
 		if (res instanceof Map) {

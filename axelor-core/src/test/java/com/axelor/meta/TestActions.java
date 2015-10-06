@@ -40,15 +40,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.persist.Transactional;
 
 public class TestActions extends MetaTest {
 	
 	private ObjectViews views;
-	
-	@Inject
-	private Injector injector;
 	
 	@Inject
 	private ContactRepository contacts;
@@ -90,7 +86,7 @@ public class TestActions extends MetaTest {
 
 		data.put("context", context);
 		
-		return new ActionHandler(injector).forRequest(request);
+		return new ActionHandler(request);
 	}
 	
 	private ActionHandler createHandler(Action action, Map<String, Object> context) {

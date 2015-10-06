@@ -212,7 +212,7 @@ public class MetaService {
 		if (tag != null) { return tag; }
 		if (call != null) {
 			final ActionRequest request = new ActionRequest();
-			final ActionHandler handler = Beans.get(ActionHandler.class).forRequest(request);
+			final ActionHandler handler = new ActionHandler(request);
 			request.setAction(call);
 			try {
 				return (String) handler.execute().getItem(0);
@@ -236,7 +236,7 @@ public class MetaService {
 			request.setAction(action.getName());
 			request.setModel(action.getModel());
 			request.setData(new HashMap<String, Object>());
-			final ActionHandler handler = Beans.get(ActionHandler.class).forRequest(request);
+			final ActionHandler handler = new ActionHandler(request);
 			try {
 				final Map<String, Object> data = (Map) ((Map) handler.execute().getItem(0)).get("view");
 				final Map<String, Object> context = (Map) data.get("context");
@@ -622,7 +622,7 @@ public class MetaService {
 					req.setModel(ScriptBindings.class.getName());
 				}
 
-				handler = handler.forRequest(req);
+				handler = new ActionHandler(req);
 				res = handler.execute();
 
 				data.put("dataset", res.getData());
@@ -725,7 +725,7 @@ public class MetaService {
 				req.setModel(ScriptBindings.class.getName());
 			}
 
-			handler = handler.forRequest(req);
+			handler = new ActionHandler(req);
 			res = handler.execute();
 
 			data.put("dataset", res.getData());

@@ -42,14 +42,9 @@ import com.axelor.text.Templates;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.persist.Transactional;
 
 public class TestWS extends MetaTest {
-	
-	@Inject
-	private Injector injector;
 	
 	private ActionHandler createHandler(String actions, Map<String, Object> context) {
 		
@@ -62,7 +57,7 @@ public class TestWS extends MetaTest {
 		data.put("action", actions);
 		data.put("context", context);
 		
-		return new ActionHandler(injector).forRequest(request);
+		return new ActionHandler(request);
 	}
 	
 	@Test
