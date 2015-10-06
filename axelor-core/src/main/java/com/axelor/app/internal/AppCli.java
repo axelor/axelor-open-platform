@@ -34,7 +34,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-public class AppInitCli {
+public class AppCli {
 
 	private static final String PROGRAM_NAME = "axelor";
 	private static final String PERSISTENCE_UNIT = "persistenceUnit";

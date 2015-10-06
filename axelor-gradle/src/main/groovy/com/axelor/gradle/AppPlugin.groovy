@@ -126,7 +126,7 @@ class AppPlugin extends AbstractPlugin {
 			task("init", dependsOn: "classes", type: JavaExec) {
 				description "Initialize application database."
 				group "Axelor web"
-				main = "com.axelor.app.internal.AppInitCli"
+				main = "com.axelor.app.internal.AppCli"
 				classpath = sourceSets.main.runtimeClasspath
 				if (project.properties.update) args "-u" else args "-i"
 				if (project.properties.modules) args "-m " + project.properties.modules
@@ -136,7 +136,7 @@ class AppPlugin extends AbstractPlugin {
 			task("migrate", dependsOn: "classes", type: JavaExec) {
 				description "Run database migration scripts."
 				group "Axelor"
-				main = "com.axelor.app.internal.AppInitCli"
+				main = "com.axelor.app.internal.AppCli"
 				classpath = sourceSets.main.runtimeClasspath
 				args "-M"
 				if (project.properties.verbose) args "--verbose"
