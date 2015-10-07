@@ -172,7 +172,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 
 	$scope.showEditor = function(record) {
 		var perm = record ? "read" : "create";
-		var id = record.id;
+		var id = (record||{}).id;
 
 		if (perm === 'read' && (!id || id < 0)) {
 			return _showEditor(record);
