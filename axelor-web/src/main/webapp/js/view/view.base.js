@@ -127,23 +127,22 @@ function ViewCtrl($scope, DataSource, ViewService) {
 	// hide toolbar button titles
 	$scope.tbTitleHide = !__appSettings['view.toolbar.titles'];
 
+	function switchAndEdit(id, readonly) {
+		$scope.switchTo('form', function(scope) {
+			scope._viewPromise.then(function() {
+				scope.doRead(id).success(function(record) {
+					scope.edit(record);
+					scope.setEditable(!readonly);
+				});
+			});
+		});
+	}
+
 	// show single or default record if specified
 	var context = params.context || {};
 	if (context._showSingle || context._showRecord) {
 		var ds = $scope._dataSource;
 		var forceEdit = (params.params||{}).forceEdit === true;
-
-		/* jshint -W082 */
-		function doEdit(id, readonly) {
-			$scope.switchTo('form', function(scope){
-				scope._viewPromise.then(function(){
-					scope.doRead(id).success(function(record){
-						scope.edit(record);
-						scope.setEditable(!readonly);
-					});
-				});
-			});
-		}
 
 		if (context._showRecord > 0) {
 			params.viewType = "form";
@@ -156,7 +155,7 @@ function ViewCtrl($scope, DataSource, ViewService) {
 			fields: ["id"]
 		}).success(function(records, page){
 			if (page.total === 1 && records.length === 1) {
-				return doEdit(records[0].id, !forceEdit);
+				return switchAndEdit(records[0].id, !forceEdit);
 			}
 			return $scope.switchTo($scope._viewType || 'grid');
 		});
