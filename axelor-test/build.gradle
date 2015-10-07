@@ -20,4 +20,5 @@ dependencies {
 	compile libs.resteasy_guice
 	compile libs.resteasy_client
 	compile libs.resteasy_server
+	compile libs.jackson_libs
 }
