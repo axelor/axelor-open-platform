@@ -1,44 +1,54 @@
-import java.util.List;
-import java.util.regex.Pattern;
-
-import org.gradle.api.Project;
-import org.gradle.plugins.ide.eclipse.model.Facet
-import org.gradle.plugins.ide.eclipse.model.Facet.FacetType
-import org.gradle.plugins.ide.eclipse.model.SourceFolder
-import org.gradle.plugins.ide.eclipse.model.WbResource
-
-// eclipse
+apply plugin: "java"
 apply plugin: "eclipse"
 
-if (!plugins.hasPlugin("application")) {
-	apply plugin: "eclipse-wtp"
-}
+eclipse {
+	classpath {
 
-plugins.withType(JavaPlugin) {
-
-	eclipse {
-
-		// create src-gen directory so that it's picked up as source folder
-		file("${buildDir}/src-gen").mkdirs()
+		// default output directory
+		defaultOutputDir = file("bin/main")
 
 		// seperate output for main & test sources
-		classpath {
-			defaultOutputDir = file("bin/main")
-			file.whenMerged { cp ->
-				// seperate output for main & test sources
-				cp.entries.findAll { it instanceof SourceFolder && it.path == "build/src-gen" }*.output = "bin/main"
-				cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/main/") }*.output = "bin/main"
-				cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/test/") }*.output = "bin/test"
+		file.whenMerged { cp ->
+			// seperate output for main & test sources
+			cp.entries.findAll { it.kind == "src" && it.path == "build/src-gen" }*.output = "bin/main"
+			cp.entries.findAll { it.kind == "src" && it.path.startsWith("src/main/") }*.output = "bin/main"
+			cp.entries.findAll { it.kind == "src" && it.path.startsWith("src/test/") }*.output = "bin/test"
 
-				// remove self-dependency
-				cp.entries.removeAll { it.path.contains("$project.name") && it.kind == 'src' }
-				cp.entries.removeAll { it.path.contains("$project.name/build") && it.kind == 'lib' }
-			}
+			// remove self-dependency
+			cp.entries.removeAll { it.path.contains("$project.name") && it.kind == 'src' }
+			cp.entries.removeAll { it.path.contains("$project.name/build") && it.kind == 'lib' }
 		}
 	}
 }
 
-def linkCoreProjects = { Project project ->
+if (["axelor-development-kit", "axelor-shell", "axelor-test", "axelor-gradle"].contains(project.name)) {
+	return;
+}
+
+apply plugin: "eclipse-wtp"
+
+def appendAttributes = { node ->
+	node.appendNode('attributes')
+		.appendNode('attribute', [name: 'org.eclipse.jst.component.dependency', value: plugins.hasPlugin("war") ? '/WEB-INF/lib' : '../']);
+}
+
+// fix exported class path warnings
+eclipse.classpath.file {
+	whenMerged { cp ->
+		cp.entries.findAll { it instanceof org.gradle.plugins.ide.eclipse.model.ProjectDependency }.each {
+			if (it.hasProperty("exported") && !it.path.endsWith("axelor-test")) {
+				it.exported = true
+			}
+		}
+	}
+	withXml {
+		def node = it.asNode()
+		node.classpathentry.findAll { it.'**'.attribute.find { it.@name == "org.eclipse.jst.component.dependency" } }*.@exported = true
+		node.classpathentry.findAll { it.@kind == "src" && it.@exported && !it.@path.endsWith("axelor-test") }.each appendAttributes
+	}
+}
+
+def linkCoreProjects = { project ->
 
 	def linked = ["axelor-common", "axelor-test", "axelor-core", "axelor-web"]
 	def wtpLinked = linked - ['axelor-test']
@@ -46,27 +56,43 @@ def linkCoreProjects = { Project project ->
 	project.eclipse.classpath {
 		minusConfigurations += [project.configurations.axelorCore]
 	}
+
 	project.eclipse.classpath.file {
 		withXml {
 			def node = it.asNode()
+			def added = []
 			def ref = node.find { it.@path == "org.eclipse.jst.j2ee.internal.web.container" }
 			if (ref) {
 				ref.plus {
-					linked.collect { name -> classpathentry(kind: 'src', path: "/${name}", exported: 'true')}
+					linked.collect { name ->
+						def me = classpathentry(kind: 'src', path: "/${name}", exported: true)
+						if (name == "axelor-test") {
+							me.@exported = false
+						} else {
+							added += [me]
+						}
+						return me
+					}
 				}
 			} else {
-				linked.each { name -> node.appendNode('classpathentry', [kind: 'src', path: "/${name}", exported: 'true']) }
+				linked.each { name ->
+					def me = node.appendNode('classpathentry', [kind: 'src', path: "/${name}", exported: true])
+					if (name == "axelor-test") {
+						me.attributes().remove("exported")
+					} else {
+						added += [me]
+					}
+				}
 			}
+			// append dependency attribute
+			added.each appendAttributes
 		}
-	}
-
-	if (!project.plugins.hasPlugin("war")) {
-		return
 	}
 
 	project.eclipse.wtp.component {
 		minusConfigurations += [project.configurations.axelorCore]
 	}
+
 	project.eclipse.wtp.component.file {
 		withXml {
 			def node = it.asNode()['wb-module'][0]
@@ -93,27 +119,6 @@ def linkCoreProjects = { Project project ->
 	}
 }
 
-def eclipseLaunchers = { Project project ->
-	project.tasks.eclipse.doLast {
-		def home = System.getenv("AXELOR_HOME")
-		def launcher = project.file(".settings/Generate Code (${project.name}).launch")
-		launcher.text = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<launchConfiguration type="org.eclipse.ui.externaltools.ProgramLaunchConfigurationType">
-<stringAttribute key="org.eclipse.debug.core.ATTR_REFRESH_SCOPE" value="\${workspace}"/>
-<mapAttribute key="org.eclipse.debug.core.environmentVariables">
-<mapEntry key="AXELOR_HOME" value="${home}"/>
-</mapAttribute>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_LAUNCH_CONFIGURATION_BUILD_SCOPE" value="\${none}"/>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${project.projectDir}/gradlew"/>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_RUN_BUILD_KINDS" value="full,"/>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="generateCode"/>
-<booleanAttribute key="org.eclipse.ui.externaltools.ATTR_TRIGGERS_CONFIGURED" value="true"/>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_WORKING_DIRECTORY" value="${project.projectDir}"/>
-</launchConfiguration>
-"""
-	}
-}
-
 ext.adkLinks = {
 	afterEvaluate {
 		if (project.plugins.hasPlugin("axelor-app") ||
@@ -122,9 +127,4 @@ ext.adkLinks = {
 			linkCoreProjects(project)
 		}
 	}
-}
-
-afterEvaluate {
-	// add eclipse launcher
-	eclipseLaunchers(project)
 }
