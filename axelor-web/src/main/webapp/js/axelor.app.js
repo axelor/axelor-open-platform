@@ -465,7 +465,7 @@
 				password: $('#loginWindow form input:last').val()
 			};
 
-			var last = axelor.config["user.code"];
+			var last = axelor.config["user.login"];
 
 			$http.post('login.jsp', data).then(function(response){
 				authService.loginConfirmed();
