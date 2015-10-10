@@ -118,9 +118,6 @@ public class AppServletModule extends ServletModule {
 			install(module);
 		}
 
-		// minify filter
-		filter("/js/application.js", "/css/application.css").through(MinifyFilter.class);
-
 		// no-cache filter
 		filter("/js/*", NoCacheFilter.STATIC_URL_PATTERNS).through(NoCacheFilter.class);
 

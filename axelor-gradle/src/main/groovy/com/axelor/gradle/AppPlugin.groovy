@@ -51,6 +51,7 @@ class AppPlugin extends AbstractPlugin {
 				compile		"com.axelor:axelor-web:${sdkVersion}"
 				
 				providedCompile	libs.javax_servlet
+				providedCompile	libs.javax_servlet_jsp
 
 				def tomcatVersion = '7.0.64'
 				tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",

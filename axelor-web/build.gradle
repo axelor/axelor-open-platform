@@ -6,7 +6,10 @@ module {
 }
 
 dependencies {
+
 	compile libs.javax_servlet
+	compile libs.javax_servlet_jsp
+
 	compile libs.resteasy
 	compile libs.resteasy_guice
 	compile libs.jackson_libs

@@ -38,6 +38,7 @@ libs.axelor_el = "com.axelor:axelor-el:8.0.24"
 
 // javax libs
 libs.javax_servlet = "javax.servlet:javax.servlet-api:3.0.1"
+libs.javax_servlet_jsp = "javax.servlet.jsp:javax.servlet.jsp-api:2.2.1"
 libs.javax_validation = "javax.validation:validation-api:1.1.0.Final"
 libs.javax_el = ["javax.el:javax.el-api:3.0.0", "org.glassfish:javax.el:3.0.0"]
 libs.javax_mail = ["javax.mail:mail:1.4.7", "javax.mail:javax.mail-api:1.5.1"]

@@ -21,51 +21,51 @@
  */
 
 @import url("../lib/open-sans/css/open-sans.css");
-@import url('../lib/jquery.ui/css/smoothness/jquery-ui.css');
-@import url('../lib/jquery.timepicker/jquery-ui-timepicker-addon.css');
+@import url("../lib/jquery.ui/css/smoothness/jquery-ui.css");
+@import url("../lib/jquery.timepicker/jquery-ui-timepicker-addon.css");
 
-@import url('../lib/bootstrap/css/bootstrap.css');
-@import url('../lib/bootstrap/css/bootstrap-responsive.css');
-@import url('../lib/font-awesome/css/font-awesome.css');
+@import url("../lib/bootstrap/css/bootstrap.css");
+@import url("../lib/bootstrap/css/bootstrap-responsive.css");
+@import url("../lib/font-awesome/css/font-awesome.css");
 
-@import url('../lib/slickgrid/slick.grid.css');
-@import url('../lib/slickgrid/plugins/slick.headermenu.css');
+@import url("../lib/slickgrid/slick.grid.css");
+@import url("../lib/slickgrid/plugins/slick.headermenu.css");
 
-@import url('../lib/jquery.treetable/css/jquery.treetable.css');
-@import url('../lib/jquery.treetable/css/jquery.treetable.theme.default.css');
+@import url("../lib/jquery.treetable/css/jquery.treetable.css");
+@import url("../lib/jquery.treetable/css/jquery.treetable.theme.default.css");
 
-@import url('../lib/fullcalendar/fullcalendar.css');
-@import url('../lib/fullcalendar/fullcalendar.print.css') print;
+@import url("../lib/fullcalendar/fullcalendar.css");
+@import url("../lib/fullcalendar/fullcalendar.print.css") print;
 
-@import url('../lib/dhtmlxGantt/dhtmlxgantt.css');
+@import url("../lib/dhtmlxGantt/dhtmlxgantt.css");
 
-@import url('../lib/handsontable/handsontable.full.css');
+@import url("../lib/handsontable/handsontable.full.css");
 
-@import url('../lib/d3/nv/nv.d3.css');
+@import url("../lib/d3/nv/nv.d3.css");
 
-@import url('../lib/codemirror/codemirror.min.css');
-@import url('../lib/wysiwyg/wysiwyg-editor.css');
-@import url('wysiwyg.css');
+@import url("../lib/codemirror/codemirror.min.css");
+@import url("../lib/wysiwyg/wysiwyg-editor.css");
+@import url("wysiwyg.css");
 
-@import url('main.css');
+@import url("main.css");
 
-@import url('tabs.css');
-@import url('navtree.css');
-@import url('slickgrid.css');
+@import url("tabs.css");
+@import url("navtree.css");
+@import url("slickgrid.css");
 
-@import url('view.form.css');
-@import url('view.form.panels.css');
-@import url('view.form.hilite.css');
-@import url('view.form.checkbox.css');
-@import url('view.popup.css');
-@import url('view.tree.css');
-@import url('view.portal.css');
-@import url('view.calendar.css');
-@import url('view.gantt.css');
-@import url('view.kanban.css');
-@import url('view.mail.css');
-@import url('view.dms.css');
+@import url("view.form.css");
+@import url("view.form.panels.css");
+@import url("view.form.hilite.css");
+@import url("view.form.checkbox.css");
+@import url("view.popup.css");
+@import url("view.tree.css");
+@import url("view.portal.css");
+@import url("view.calendar.css");
+@import url("view.gantt.css");
+@import url("view.kanban.css");
+@import url("view.mail.css");
+@import url("view.dms.css");
 
-@import url('colors.css');
+@import url("colors.css");
 
-@import url('print.css') print;
+@import url("print.css") print;

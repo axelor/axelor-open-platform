@@ -19,6 +19,7 @@
 --%>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page language="java" session="true" %>
+<%@ taglib prefix="x" uri="WEB-INF/axelor.tld" %>
 <%@ page import="com.axelor.app.AppSettings" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Locale"%>
@@ -49,7 +50,7 @@ if (appDesc != null) {
     <meta name="author" content="<%= appAuthor %>">
 
     <!-- Le styles -->
-    <link href="css/application.css" rel="stylesheet">
+    <x:style src="css/application.css" />
     <% if (appTheme != null) { %>
     <link href="css/<%= appTheme %>/theme.css" rel="stylesheet">
     <% } %>
@@ -133,7 +134,8 @@ if (appDesc != null) {
     </section>
 
     <!-- JavaScript at the bottom for fast page loading -->
-    <script src="js/application.js"></script>
     <script src="js/messages.js"></script>
+    <x:script src="js/application.js"/>
+
   </body>
 </html>
