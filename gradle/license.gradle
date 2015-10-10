@@ -39,6 +39,7 @@ license {
 	include "**/*.groovy"
 	include "**/*.scala"
 	include "**/*.js"
+	include "**/*.css"
 
 	excludes(["**/LICENSE", "**/LICENSE.md"])
 	excludes(["**/README", "**/README.md"])
