@@ -133,8 +133,7 @@ if (appDesc != null) {
     </section>
 
     <!-- JavaScript at the bottom for fast page loading -->
-    <script src="js/lib/i18n.js"></script>
-    <script src="ws/i18n/messages.js"></script>
     <script src="js/application.js"></script>
+    <script src="js/messages.js"></script>
   </body>
 </html>

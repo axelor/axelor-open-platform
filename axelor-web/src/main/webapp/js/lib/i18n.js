@@ -19,7 +19,7 @@
 
 "use strict";
 
-var bundle = {};
+var bundle = (window._t || {}).bundle || {};
 
 function gettext(key) {
 	var message = bundle[key] || bundle[(key||'').trim()] || key;
@@ -32,13 +32,6 @@ function gettext(key) {
 	}
 	return message;
 }
-
-gettext.put = function(messages) {
-	messages = messages || {};
-	for(var key in messages) {
-		bundle[key] = messages[key];
-	}
-};
 
 this._t = gettext;
 

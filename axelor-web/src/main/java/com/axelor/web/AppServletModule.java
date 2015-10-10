@@ -40,6 +40,7 @@ import com.axelor.rpc.Request;
 import com.axelor.rpc.RequestFilter;
 import com.axelor.rpc.Response;
 import com.axelor.rpc.ResponseInterceptor;
+import com.axelor.web.servlet.I18nServlet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Module;
 import com.google.inject.matcher.AbstractMatcher;
@@ -122,6 +123,9 @@ public class AppServletModule extends ServletModule {
 
 		// no-cache filter
 		filter("/js/*", NoCacheFilter.STATIC_URL_PATTERNS).through(NoCacheFilter.class);
+
+		// i18n bundle
+		serve("/js/messages.js").with(I18nServlet.class);
 
 		// intercept all response methods
 		bindInterceptor(Matchers.any(),
