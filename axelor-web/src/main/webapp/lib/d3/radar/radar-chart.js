@@ -136,6 +136,4 @@ var RadarChart = {
     //Tooltip
     tooltip = g.append('text').style('opacity', 0).style('font-family', 'sans-serif').style('font-size', 13);
   }
-}
-
-
+};
