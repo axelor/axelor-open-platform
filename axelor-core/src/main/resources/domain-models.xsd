@@ -106,7 +106,7 @@
       </xsd:annotation>
       <xsd:simpleType>
         <xsd:restriction base="xsd:string">
-          <xsd:pattern value="[a-z][a-zA-Z0-9_]+" />
+          <xsd:pattern value="([a-z][a-zA-Z0-9_]+)|([A-Z][A-Z0-9_]+)" />
         </xsd:restriction>
       </xsd:simpleType>
     </xsd:attribute>
@@ -282,7 +282,7 @@
         <xsd:attribute name="ref" use="required">
           <xsd:annotation>
             <xsd:documentation>
-              Fully quolified name of the reference entity class.
+              Fully qualified name of the reference entity class.
             </xsd:documentation>
           </xsd:annotation>
           <xsd:simpleType>
@@ -399,7 +399,7 @@
         <xsd:attribute name="search">
           <xsd:annotation>
             <xsd:documentation>
-              Comma seperated list of field names used by autocompletion UI component to search.
+              Comma separated list of field names used by auto-completion UI component to search.
             </xsd:documentation>
           </xsd:annotation>
           <xsd:simpleType>
