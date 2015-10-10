@@ -195,11 +195,9 @@ class Property {
 		def empty = this.getEmptyValue()
 
 		if (empty != null) {
-			result += "if ($name == null) return $empty;"
+			return "return $name == null ? $empty : $name;"
 		}
-		result += "return $name;"
-		result = result.collect { "        " + it }
-		return result.join("\n").trim()
+		return "return $name;"
 	}
 
 	String getSetterBody() {
@@ -229,7 +227,7 @@ class Property {
 		if (orphanRemoval || !mapped || type != "one-to-many") {
 			return null
 		}
-		return """for(${target} item : ${name}) {
+		return """for (${target} item : ${name}) {
 				item.set${firstUpper(mapped)}(null);
 			}"""
 	}

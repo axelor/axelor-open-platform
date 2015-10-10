@@ -327,8 +327,7 @@ class Entity {
 		def hashables = getHashables()
 		def code = ["if (obj == null) return false;"]
 
-		importType("com.google.common.base.Objects")
-		importType("com.google.common.base.MoreObjects")
+		importType("java.util.Objects")
 
 		if (groovy) {
 			code += "if (this.is(obj)) return true;"
@@ -337,13 +336,13 @@ class Entity {
 		}
 		code += "if (!(obj instanceof ${name})) return false;"
 		code += ""
-		code += "${name} other = (${name}) obj;"
+		code += "final ${name} other = (${name}) obj;"
 		code += "if (this.getId() != null || other.getId() != null) {"
-		code += "\treturn Objects.equal(this.getId(), other.getId());"
+		code += "\treturn Objects.equals(this.getId(), other.getId());"
 		code += "}"
 		if (!hashables.empty) {
 			code += ""
-			code += getHashables().collect { p -> "if (!Objects.equal(${p.getter}(), other.${p.getter}())) return false;"}
+			code += getHashables().collect { p -> "if (!Objects.equals(${p.getter}(), other.${p.getter}())) return false;"}
 		}
 		code += ""
 		code += hashables.empty ? "return false;" : "return true;"
@@ -354,11 +353,11 @@ class Entity {
 		if (hasExtends) {
 			return "return EntityHelper.hashCode(this);"
 		}
-		importType("com.google.common.base.Objects")
+		importType("java.util.Objects")
 		def data = getHashables()collect { "this.${it.getter}()" }.join(", ")
 		if (data.size()) {
 			def hash = name.hashCode()
-			return "return Objects.hashCode(${hash}, ${data});"
+			return "return Objects.hash(${hash}, ${data});"
 		}
 		return "return super.hashCode();"
 	}
@@ -368,9 +367,11 @@ class Entity {
 			return "return EntityHelper.toString(this);"
 		}
 
+		importType("com.google.common.base.MoreObjects")
+
 		def code = []
 
-		code += "MoreObjects.ToStringHelper tsh = MoreObjects.toStringHelper(this);\n"
+		code += "final MoreObjects.ToStringHelper tsh = MoreObjects.toStringHelper(this);\n"
 		code += "tsh.add(\"id\", this.getId());"
 		int count = 0
 		for(Property p : properties) {

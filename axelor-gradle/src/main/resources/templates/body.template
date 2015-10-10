@@ -18,9 +18,9 @@ ${p.documentation}
 	public $p.type ${p.getter}() {
 		try {
 			$p.name = compute${p.firstUpper(p.name)}();
-		} catch (NullPointerException e){
+		} catch (NullPointerException e) {
 			${p.importName('org.slf4j.Logger')} logger = ${p.importName('org.slf4j.LoggerFactory')}.getLogger(getClass());
-			logger.error("NPE in function field: {}", "${p.getter}()");
+			logger.error("NPE in function field: ${p.getter}()", e);
 		}
 		return $p.name;
 	}
@@ -29,11 +29,17 @@ ${p.documentation}
 		$p.code
 	}
 <% } else { %>\
+<% if (p.name == "id") { %>\
+	@Override
+<% } %>\
 	public $p.type ${p.getter}() {
 		$p.getterBody
 	}
 <% } %>\
 
+<% if (p.name == "id") { %>\
+	@Override
+<% } %>\
 	public void ${p.setter}($p.type $p.name) {
 		$p.setterBody
 	}

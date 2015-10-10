@@ -124,6 +124,7 @@
   </entity>
 
   <entity name="Account">
+    <boolean name="active" />
     <string name="name" required="true" />
     <one-to-one name="config" ref="AccountConfig" />
   </entity>
