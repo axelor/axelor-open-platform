@@ -17,8 +17,10 @@
  */
 package com.axelor.db;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.hibernate.proxy.HibernateProxy;
 
@@ -30,9 +32,7 @@ import com.axelor.internal.cglib.proxy.Enhancer;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.ContextEntity;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 
 /**
  * This class provides helper methods for model objects.
@@ -89,7 +89,7 @@ public final class EntityHelper {
 			return 0;
 		}
 		final Mapper mapper = Mapper.of(entity.getClass());
-		final List<Object> values = Lists.newArrayList();
+		final List<Object> values = new ArrayList<>();
 
 		for (Property p : mapper.getProperties()) {
 			if (isSimple(p) && p.isHashKey()) {
@@ -97,10 +97,7 @@ public final class EntityHelper {
 			}
 		}
 
-		if (values.isEmpty()) {
-			return 0;
-		}
-		return Arrays.hashCode(values.toArray());
+		return values.isEmpty() ? 0 : Arrays.hashCode(values.toArray());
 	}
 
 	/**
@@ -117,16 +114,18 @@ public final class EntityHelper {
 	 * @return true if both the objects are equals by their hashing keys
 	 */
 	public static <T extends Model> boolean equals(T entity, Object other) {
-		if (entity == other)
+		if (entity == other) {
 			return true;
-		if (entity == null || other == null)
+		}
+		if (entity == null || other == null) {
 			return false;
-		if (!entity.getClass().isInstance(other))
+		}
+		if (!entity.getClass().isInstance(other)) {
 			return false;
-
+		}
 		final Model that = (Model) other;
 		if (entity.getId() != null || that.getId() != null) {
-			return Objects.equal(entity.getId(), that.getId());
+			return Objects.equals(entity.getId(), that.getId());
 		}
 
 		final Mapper mapper = Mapper.of(entity.getClass());
@@ -135,7 +134,7 @@ public final class EntityHelper {
 		for (Property field : mapper.getProperties()) {
 			if (field.isHashKey()) {
 				hasHashKeys = true;
-				if (!Objects.equal(field.get(entity), field.get(other))) {
+				if (!Objects.equals(field.get(entity), field.get(other))) {
 					return false;
 				}
 			}
