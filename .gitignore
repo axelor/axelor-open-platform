@@ -7,6 +7,7 @@ build
 .settings
 node_modules
 application.min.*
+application.gzip.*
 *.sw[nop]
 *~
 .#*

@@ -22,6 +22,7 @@ import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
@@ -57,10 +58,22 @@ public abstract class AbstractTag extends SimpleTagSupport {
 
 	protected abstract void doTag(String src) throws IOException;
 
+	private boolean gzipSupported() {
+		final PageContext context = (PageContext) getJspContext();
+		final HttpServletRequest req = (HttpServletRequest) context.getRequest();
+		final String encodings = req.getHeader("Accept-Encoding");
+		return encodings != null && encodings.toLowerCase().contains("gzip");
+	}
+
 	@Override
 	public void doTag() throws JspException, IOException {
 
 		if (production) {
+			final String gzipped = src.replaceFirst("\\.(js|css)$", ".gzip.$1");
+			if (exists(gzipped) && gzipSupported()) {
+				doTag(gzipped);
+				return;
+			}
 			final String minified = src.replaceFirst("\\.(js|css)$", ".min.$1");
 			if (exists(minified)) {
 				doTag(minified);

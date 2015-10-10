@@ -72,6 +72,11 @@ public class NoCacheFilter implements Filter {
 		final String uri = req.getRequestURI();
 		final boolean busted = req.getParameterMap().containsKey(CACHE_BUSTER_PARAM);
 
+		// if gzip bundle, set content-encoding header
+		if (uri.contains(".gzip.")) {
+			res.setHeader("Content-Encoding", "gzip");
+		}
+
 		if (production && !busted) {
 			res.sendRedirect(uri + "?" + CACHE_BUSTER_PARAM);
 			return;
