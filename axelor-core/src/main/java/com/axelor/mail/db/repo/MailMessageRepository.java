@@ -110,8 +110,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		entity.setRoot(root);
 
 		// mark root as unread
-		final List<MailFlags> flags = root.getFlags();
-		if (flags != null) {
+		if (root != null && root.getFlags() != null) {
 			for (MailFlags flag : root.getFlags()) {
 				flag.setIsRead(false);
 			}
