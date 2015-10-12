@@ -21,7 +21,7 @@
 
 var ui = angular.module('axelor.ui');
 
-ui.directive('navTabs', function() {
+ui.directive('uiNavTabs', function() {
 	return {
 		restrict: 'EA',
 		replace: true,

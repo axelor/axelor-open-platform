@@ -21,7 +21,7 @@
 
 var ui = angular.module('axelor.ui');
 
-ui.directive('navTree', ['MenuService', function(MenuService) {
+ui.directive('uiNavTree', ['MenuService', function(MenuService) {
 
 	return {
 		scope: {
@@ -99,18 +99,18 @@ ui.directive('navTree', ['MenuService', function(MenuService) {
 		replace: true,
 		template:
 			"<ul class='nav nav-tree'>" +
-				"<li ng-repeat='menu in menus' nav-sub-tree x-menu='menu'></li>" +
+				"<li ng-repeat='menu in menus' ui-nav-sub-tree x-menu='menu'></li>" +
 			"</ul>"
 	};
 }]);
 
-ui.directive('navSubTree', ['$compile', function ($compile) {
+ui.directive('uiNavSubTree', ['$compile', function ($compile) {
 
 	return {
 		scope: {
 			menu: "="
 		},
-		require: "^navTree",
+		require: "^uiNavTree",
 		link: function (scope, element, attrs, ctrl) {
 			var menu = scope.menu;
 			if (menu.icon && menu.icon.indexOf('fa') === 0) {
@@ -122,8 +122,8 @@ ui.directive('navSubTree', ['$compile', function ($compile) {
 			}
 			if (menu.children) {
 				var sub = $(
-					"<ul class='nav nav-sub-tree'>" +
-						"<li ng-repeat='child in menu.children' nav-sub-tree x-menu='child'></li>" +
+					"<ul class='nav ui-nav-sub-tree'>" +
+						"<li ng-repeat='child in menu.children' ui-nav-sub-tree x-menu='child'></li>" +
 					"</ul>");
 				sub = $compile(sub)(scope);
 				sub.appendTo(element);
