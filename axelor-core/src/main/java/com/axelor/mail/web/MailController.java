@@ -281,8 +281,8 @@ public class MailController extends JpaSupport {
 			final List<Object> unread = new ArrayList<>();
 
 			for (MailMessage reply : replies) {
-				MailFlags flags = flagsRepo.findBy(reply, AuthUtils.getUser());
-				if (flags != null && flags.getIsRead() == Boolean.FALSE) {
+				final MailFlags flags = flagsRepo.findBy(reply, AuthUtils.getUser());
+				if (flags == null || flags.getIsRead() == Boolean.FALSE) {
 					unread.add(messages.details(reply));
 				}
 			}
