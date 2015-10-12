@@ -364,6 +364,9 @@
 
 		$scope.showMailBox = function() {
 			NavService.openTabByName('mail.inbox');
+			$scope.$timeout(function () {
+				$scope.$broadcast("on:nav-click", NavService.getSelected());
+			});
 		};
 
 		var loginAttempts = 0;

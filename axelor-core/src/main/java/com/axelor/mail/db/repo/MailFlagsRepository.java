@@ -50,7 +50,6 @@ public class MailFlagsRepository extends JpaRepository<MailFlags> {
 					child.setIsStarred(flags.getIsStarred());
 				}
 			}
-			return flags;
 		}
 
 		MailFlags rootFlags = findBy(root, flags.getUser());
@@ -58,10 +57,17 @@ public class MailFlagsRepository extends JpaRepository<MailFlags> {
 			rootFlags = new MailFlags();
 			rootFlags.setMessage(root);
 			rootFlags.setUser(flags.getUser());
+			super.save(rootFlags);
 		}
 
 		rootFlags.setIsStarred(flags.getIsStarred());
-		super.save(rootFlags);
+
+		// mark root as unread
+		if (flags.getIsRead() == Boolean.FALSE && root.getFlags() != null) {
+			for (MailFlags item : root.getFlags()) {
+				item.setIsRead(false);
+			}
+		}
 
 		return flags;
 	}

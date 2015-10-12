@@ -277,8 +277,16 @@ ui.formWidget('uiMailMessages', {
 	controller: ['$scope', 'MessageService', function ($scope, MessageService) {
 
 		function updateReadCount(messages) {
-			var unread = _.filter(messages, function (msg) {
-				return !(msg.$flags||{}).isRead;
+			var unread = [];
+			_.each(messages, function (message) {
+				if (!(message.$flags||{}).isRead) {
+					unread.push(message);
+				}
+				_.each(message.$children, function (item) {
+					if (!(item.$flags||{}).isRead) {
+						unread.push(item);
+					}
+				});
 			});
 			if (unread.length) {
 				MessageService.flagMessage(unread, 1);
@@ -333,7 +341,9 @@ ui.formWidget('uiMailMessages', {
 		};
 
 		$scope.formatNumReplies = function (message) {
-			return _t('replies ({0})', message.$numReplies);
+			var children = (message.$children||[]).length || 0;
+			var total = message.$numReplies || 0;
+			return _t('replies ({0} of {1})', children, total);
 		};
 
 		var folder = $scope.folder;
@@ -380,8 +390,8 @@ ui.formWidget('uiMailMessages', {
 				$scope.waitForActions(function () {
 					if (folder) {
 						$scope.record.__empty = count === 0;
+						updateReadCount(found);
 					}
-					updateReadCount(found);
 				});
 
 				$scope.animation = {
@@ -613,7 +623,7 @@ ui.formWidget('uiMailFollowers', {
 		$scope.updateStatus = function() {
 			var followers = $scope.followers || [];
 			var found = _.findWhere(followers, {
-				code: axelor.config["user.code"]
+				code: axelor.config["user.login"]
 			});
 			$scope.following = !!found;
 		};

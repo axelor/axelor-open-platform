@@ -30,8 +30,10 @@ import com.axelor.db.JpaSupport;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.inject.Beans;
+import com.axelor.mail.db.MailFlags;
 import com.axelor.mail.db.MailGroup;
 import com.axelor.mail.db.MailMessage;
+import com.axelor.mail.db.repo.MailFlagsRepository;
 import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailGroupRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
@@ -46,14 +48,20 @@ public class MailController extends JpaSupport {
 			+ "SELECT COUNT(DISTINCT m) FROM MailMessage m LEFT JOIN m.flags g "
 			+ "WHERE (CONCAT(m.relatedId, m.relatedModel) IN "
 			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "((g IS NULL) OR (g.user.id = :uid AND g.isRead = false AND g.isArchived = false))";
+			+ "((g IS NULL) OR (g.user.id != :uid) OR (g.user.id = :uid AND g.isRead = false))";
+
+	private static final String SQL_SUBSCRIBERS = ""
+			+ "SELECT DISTINCT(u) FROM User u LEFT JOIN u.group g WHERE "
+			+ "(u.id NOT IN (SELECT fu.id FROM MailFollower f LEFT JOIN f.user fu WHERE f.relatedId = :id AND f.relatedModel = :model)) AND "
+			+ "((u.id IN (SELECT mu.id FROM MailGroup m LEFT JOIN m.users mu WHERE m.id = :id)) OR "
+			+ "	(g.id IN (SELECT mg.id FROM MailGroup m LEFT JOIN m.groups mg WHERE m.id = :id)))";
 
 	private static final String SQL_INBOX = ""
 			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
 			+ "WHERE (m.parent IS NULL) AND "
 			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
 			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "((g IS NULL) OR (g.user.id = :uid AND g.isArchived = false)) "
+			+ "((g IS NULL) OR (g.user.id != :uid) OR (g.user.id = :uid AND (g.isRead = false OR g.isArchived = false))) "
 			+ "ORDER BY m.createdOn DESC";
 
 	private static final String SQL_IMPORTANT = ""
@@ -72,18 +80,12 @@ public class MailController extends JpaSupport {
 			+ "((g.user.id = :uid AND g.isArchived = true)) "
 			+ "ORDER BY m.createdOn DESC";
 
-	private static final String SQL_SUBSCRIBERS = ""
-			+ "SELECT DISTINCT(u) FROM User u LEFT JOIN u.group g WHERE "
-			+ "(u.id NOT IN (SELECT fu.id FROM MailFollower f LEFT JOIN f.user fu WHERE f.relatedId = :id AND f.relatedModel = :model)) AND "
-			+ "((u.id IN (SELECT mu.id FROM MailGroup m LEFT JOIN m.users mu WHERE m.id = :id)) OR "
-			+ "	(g.id IN (SELECT mg.id FROM MailGroup m LEFT JOIN m.groups mg WHERE m.id = :id)))";
-
 	@Inject
 	private MailMessageRepository messages;
 
 	public void unread(ActionRequest request, ActionResponse response) {
-		 response.setValue("unread", countUnread());
-		 response.setStatus(Response.STATUS_SUCCESS);
+		response.setValue("unread", countUnread());
+		response.setStatus(Response.STATUS_SUCCESS);
 	}
 
 	public void inbox(ActionRequest request, ActionResponse response) {
@@ -261,6 +263,7 @@ public class MailController extends JpaSupport {
 	private List<Object> find(String queryString, int offset, int limit) {
 
 		final TypedQuery<MailMessage> query = getEntityManager().createQuery(queryString, MailMessage.class);
+		final MailFlagsRepository flagsRepo = Beans.get(MailFlagsRepository.class);
 
 		query.setParameter("uid", AuthUtils.getUser().getId());
 
@@ -271,12 +274,24 @@ public class MailController extends JpaSupport {
 		final List<Object> all = new ArrayList<>();
 
 		for (MailMessage message : found) {
-			Map<String, Object> details = messages.details(message);
-			long replies = messages.all().filter("self.root.id = ?", message.getId()).count();
+			final Map<String, Object> details = messages.details(message);
+			final List<MailMessage> replies = messages.all()
+					.filter("self.root.id = ?", message.getId())
+					.order("-createdOn").fetch();
+			final List<Object> unread = new ArrayList<>();
+
+			for (MailMessage reply : replies) {
+				MailFlags flags = flagsRepo.findBy(reply, AuthUtils.getUser());
+				if (flags != null && flags.getIsRead() == Boolean.FALSE) {
+					unread.add(messages.details(reply));
+				}
+			}
 
 			details.put("$name", details.get("relatedName"));
 			details.put("$thread", true);
-			details.put("$numReplies", replies);
+			details.put("$numReplies", replies.size());
+			details.put("$children", unread);
+			details.put("$hasMore", replies.size() > unread.size());
 			all.add(details);
 		}
 
