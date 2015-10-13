@@ -63,13 +63,8 @@ public class MailFlagsRepository extends JpaRepository<MailFlags> {
 		rootFlags.setIsStarred(flags.getIsStarred());
 
 		// mark root as unread
-		if (flags.getIsRead() == Boolean.FALSE) {
+		if (root != null && flags.getIsRead() != Boolean.TRUE) {
 			rootFlags.setIsRead(false);
-			if (root.getFlags() != null) {
-				for (MailFlags item : root.getFlags()) {
-					item.setIsRead(false);
-				}
-			}
 		}
 
 		return flags;
