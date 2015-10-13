@@ -19,6 +19,7 @@ package com.axelor.web.tags;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,15 +45,19 @@ public abstract class AbstractTag extends SimpleTagSupport {
 	}
 
 	private boolean exists(String path) {
-		final PageContext ctx = (PageContext) getJspContext();
 		try {
-			return ctx.getServletContext().getResource(path) != null;
+			return getResource(path) != null;
 		} catch (MalformedURLException e) {
 			return false;
 		}
 	}
 
-	protected List<String> getScripts() {
+	protected URL getResource(String path) throws MalformedURLException {
+		final PageContext ctx = (PageContext) getJspContext();
+		return ctx.getServletContext().getResource(path);
+	}
+
+	protected List<String> getScripts() throws IOException {
 		return Arrays.asList(src);
 	}
 

@@ -26,16 +26,15 @@ import java.util.List;
 
 import javax.servlet.jsp.JspWriter;
 
-import com.axelor.common.ClassUtils;
 import com.google.common.io.CharStreams;
 import com.google.common.io.LineProcessor;
 
 public class ScriptTag extends AbstractTag {
 	
-	private List<String> files(final String manifest) {
+	private List<String> files(final String manifest) throws IOException {
 
 		final List<String> files = new ArrayList<>();
-		final URL resource = ClassUtils.getResource(manifest);
+		final URL resource = this.getResource(manifest);
 		if (resource == null) {
 			return files;
 		}
@@ -55,13 +54,11 @@ public class ScriptTag extends AbstractTag {
 					return files;
 				}
 			});
-		} catch (IOException e) {
-			return files;
 		}
 	}
 
 	@Override
-	protected List<String> getScripts() {
+	protected List<String> getScripts() throws IOException {
 		return files(getSrc());
 	}
 
