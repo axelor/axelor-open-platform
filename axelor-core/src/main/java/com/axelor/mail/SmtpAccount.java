@@ -32,9 +32,9 @@ import com.google.common.base.Preconditions;
  */
 public class SmtpAccount implements MailAccount {
 
-	public static final String ENCRYPTION_TLS = "tls";
+	public static final String CHANNEL_STARTTLS = "starttls";
 
-	public static final String ENCRYPTION_SSL = "ssl";
+	public static final String CHANNEL_SSL = "ssl";
 
 	public static final String DEFAULT_PORT = "25";
 
@@ -42,7 +42,7 @@ public class SmtpAccount implements MailAccount {
 	private String port;
 	private String user;
 	private String password;
-	private String encryption;
+	private String channel;
 
 	private int connectionTimeout = DEFAULT_TIMEOUT;
 	private int timeout = DEFAULT_TIMEOUT;
@@ -53,7 +53,7 @@ public class SmtpAccount implements MailAccount {
 
 	/**
 	 * Create a non-authenticating SMTP account.
-	 * 
+	 *
 	 * @param host
 	 *            the smtp server host
 	 * @param port
@@ -67,7 +67,7 @@ public class SmtpAccount implements MailAccount {
 
 	/**
 	 * Create an authenticating SMTP account.
-	 * 
+	 *
 	 * @param host
 	 *            the smtp server host
 	 * @param port
@@ -76,14 +76,30 @@ public class SmtpAccount implements MailAccount {
 	 *            the smtp server login user name
 	 * @param password
 	 *            the smtp server login passowrd
-	 * @param encryption
-	 *            the smtp encryption scheme (tls or ssl)
 	 */
-	public SmtpAccount(String host, String port, String user, String password, String encryption) {
+	public SmtpAccount(String host, String port, String user, String password) {
 		this(host, port);
 		this.user = user;
 		this.password = password;
-		this.encryption = encryption;
+	}
+
+	/**
+	 * Create an authenticating SMTP account.
+	 *
+	 * @param host
+	 *            the smtp server host
+	 * @param port
+	 *            the smtp server port
+	 * @param user
+	 *            the smtp server login user name
+	 * @param password
+	 *            the smtp server login passowrd
+	 * @param channel
+	 *            the smtp encryption channel (starttls or ssl)
+	 */
+	public SmtpAccount(String host, String port, String user, String password, String channel) {
+		this(host, port, user, password);
+		this.channel = channel;
 	}
 
 	private Session init() {
@@ -118,17 +134,17 @@ public class SmtpAccount implements MailAccount {
 		if (!authenticating) {
 			return Session.getInstance(props);
 		}
-		
-		if (ENCRYPTION_TLS.equals(encryption)) {
+
+		if (CHANNEL_STARTTLS.equals(channel)) {
 			props.setProperty("mail.smtp.starttls.enable", "true");
 		}
-		if (ENCRYPTION_SSL.equals(encryption)) {
+		if (CHANNEL_SSL.equals(channel)) {
 			props.setProperty("mail.smtp.socketFactory.port", port);
 			props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 		}
-		
+
 		final Authenticator authenticator = new Authenticator() {
-			
+
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(user, password);

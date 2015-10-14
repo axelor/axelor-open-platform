@@ -24,14 +24,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.activation.DataHandler;
 import javax.activation.URLDataSource;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -48,24 +51,24 @@ import com.google.common.collect.Maps;
 /**
  * The {@link MailBuilder} defines fluent API to build {@link MimeMessage} and
  * if required can send the built message directly.
- * 
+ *
  */
 public final class MailBuilder {
 
 	private Session session;
-	
+
 	private String subject;
-	
+
 	private String from = "";
 	private String sender = "";
 
-	private List<String> toRecipients = Lists.newArrayList();
-	private List<String> ccRecipients = Lists.newArrayList();
-	private List<String> bccRecipients = Lists.newArrayList();
-	private List<String> replyRecipients = Lists.newArrayList();
+	private Set<String> toRecipients = new LinkedHashSet<>();
+	private Set<String> ccRecipients = new LinkedHashSet<>();
+	private Set<String> bccRecipients = new LinkedHashSet<>();
+	private Set<String> replyRecipients = new LinkedHashSet<>();
 
 	private List<Content> contents = Lists.newArrayList();
-	
+
 	private Map<String, String> headers = Maps.newHashMap();
 
 	private boolean textOnly;
@@ -75,6 +78,7 @@ public final class MailBuilder {
 		String text;
 		String name;
 		String file;
+		boolean inline;
 		boolean html;
 
 		public MimePart apply(MimePart message) throws MessagingException {
@@ -130,7 +134,7 @@ public final class MailBuilder {
 		this.sender = sender;
 		return this;
 	}
-	
+
 	public MailBuilder header(String name, String value) {
 		Preconditions.checkNotNull(name, "header name can't be null");
 		headers.put(name, value);
@@ -196,6 +200,36 @@ public final class MailBuilder {
 		return this;
 	}
 
+	/**
+	 * Attach a file as inline content.
+	 *
+	 * @param name
+	 *            attachment file name
+	 * @param link
+	 *            attachment file link (url or file path)
+	 * @param inline
+	 *            whether to inline this attachment
+	 * @return this
+	 */
+	public MailBuilder inline(String name, String link) {
+		Preconditions.checkNotNull(link, "link can't be null");
+		Content content = new Content();
+		content.name = name;
+		content.file = link;
+		content.cid = "<" + name + ">";
+		content.inline = true;
+		contents.add(content);
+		textOnly = false;
+		return this;
+	}
+
+	/**
+	 * Build a new {@link MimeMessage} instance from the provided details.
+	 *
+	 * @return an instance of {@link MimeMessage}
+	 * @throws MessagingException
+	 * @throws IOException
+	 */
 	public MimeMessage build() throws MessagingException, IOException {
 
 		MimeMessage message = new MimeMessage(session);
@@ -206,10 +240,10 @@ public final class MailBuilder {
 		message.setRecipients(RecipientType.BCC, InternetAddress.parse(Joiner.on(",").join(bccRecipients)));
 
 		message.setReplyTo(InternetAddress.parse(Joiner.on(",").join(replyRecipients)));
-		
+
 		if (!isBlank(from)) message.setFrom(new InternetAddress(from));
 		if (!isBlank(sender)) message.setSender(new InternetAddress(sender));
-		
+
 		for (String name : headers.keySet()) {
 			message.setHeader(name, headers.get(name));
 		}
@@ -223,27 +257,40 @@ public final class MailBuilder {
 		for (Content content : contents) {
 			MimeBodyPart part = new MimeBodyPart();
 			if (content.text == null) {
-				part.setFileName(content.name);
 				try {
 					URL link = new URL(content.file);
 					part.setDataHandler(new DataHandler(new URLDataSource(link)));
 				} catch (MalformedURLException e) {
 					part.attachFile(content.file);
 				}
+				part.setFileName(content.name);
 				if (content.cid != null) {
 					part.setContentID(content.cid);
+				}
+				if (content.inline) {
+					part.setDisposition(Part.INLINE);
+				} else {
+					part.setDisposition(Part.ATTACHMENT);
 				}
 			} else {
 				content.apply(part);
 			}
 			mp.addBodyPart(part);
 		}
-		
+
 		message.setContent(mp);
 
 		return message;
 	}
 
+	/**
+	 * Send the message with given send date.
+	 *
+	 * @param date
+	 *            send date, can be null
+	 * @throws MessagingException
+	 * @throws IOException
+	 */
 	public void send(Date date) throws MessagingException, IOException {
 		final MimeMessage message = build();
 		try {
@@ -253,6 +300,12 @@ public final class MailBuilder {
 		Transport.send(message);
 	}
 
+	/**
+	 * Send the message.
+	 *
+	 * @throws MessagingException
+	 * @throws IOException
+	 */
 	public void send() throws MessagingException, IOException {
 		send(new Date());
 	}
