@@ -5,7 +5,6 @@ dependencies {
 	testCompile libs.junit
 
 	compile libs.guava
-	compile libs.jsr305
 	compile libs.axelor_cglib
 }
 

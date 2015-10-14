@@ -15,8 +15,7 @@ libs.slf4j_simple	= ["org.slf4j:slf4j-api:1.7.7", "org.slf4j:slf4j-simple:1.7.7"
 libs.slf4j_logback	= ["org.slf4j:slf4j-api:1.7.7", "ch.qos.logback:logback-classic:1.1.2"]
 
 // Guava
-libs.guava = "com.google.guava:guava:18.0"
-libs.jsr305 = "com.google.code.findbugs:jsr305:3.0.0"
+libs.guava = ["com.google.guava:guava:18.0", "com.google.code.findbugs:jsr305:3.0.1"]
 
 // joda
 libs.joda_time = ["joda-time:joda-time:2.3", "org.jadira.usertype:usertype.core:3.0.0.GA"]
