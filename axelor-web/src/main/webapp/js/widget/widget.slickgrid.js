@@ -1517,9 +1517,13 @@ Grid.prototype.__saveChanges = function(args, callback) {
 	});
 	
 	var that = this;
+	var activeCell = grid.getActiveCell();
+
 	function focus() {
-		grid.setActiveCell(args.row, args.cell);
 		grid.focus();
+		if (activeCell) {
+			grid.setActiveCell(activeCell.row, activeCell.cell);
+		}
 		if (callback) {
 			that.handler.waitForActions(callback);
 		}

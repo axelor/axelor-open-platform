@@ -561,7 +561,7 @@ function FormViewCtrl($scope, $element) {
 			if (opts.wait === false) {
 				return callback();
 			}
-			return $scope.waitForActions(callback);
+			return $scope.waitForActions(callback, 100);
 		}
 
 		function doOnSave() {
