@@ -200,9 +200,13 @@ class Entity {
 	void merge(Entity other) {
 		
 		for (Property prop : other.properties) {
-			if (!propertyMap.containsKey(prop.name)) {
+			Property existing = propertyMap.get(prop.name)
+			if (existing == null || (existing.virtual && existing.type == prop.type && existing.target == prop.target)) {
 				prop.ownEntity = prop.entity
 				prop.entity = this
+				if (existing != null) {
+					properties.remove(existing)
+				}
 				properties.add(prop)
 				propertyMap[prop.name] = prop
 				if (prop.isNameField()) {

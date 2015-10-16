@@ -82,6 +82,11 @@
       return title ? title.getName() + " " + firstName + " " + lastName : firstName + " " + lastName
       ]]>
     </string>
+    <string name="name" namecolumn="true" search="firstName,lastName">
+      <![CDATA[
+      return getFullName();
+      ]]>
+    </string>
     <string name="email" required="true" unique="true" initParam="true" massUpdate="true"/>
     <string name="phone" max="20"  hashKey="false" massUpdate="true"/>
     <string name="notes" multiline="true" title="About Me" />
@@ -106,6 +111,10 @@
       <message if="some == 'thing'" tag="success" fields="email,phone">Success</message>
       <message if="!some" tag="important" fields="email">Failed</message>
     </track>
+  </entity>
+
+  <entity name="Contact">
+    <string name="name" />
   </entity>
 
   <entity name="Address" hashAll="true">
