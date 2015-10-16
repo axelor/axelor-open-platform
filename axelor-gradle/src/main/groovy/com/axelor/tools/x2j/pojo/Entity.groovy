@@ -155,9 +155,6 @@ class Entity {
 			propertyMap.put("id", Property.idProperty(this));
 			properties.add(propertyMap.get("id"));
 		} else {
-			if (!strategy || strategy == 'SINGLE') {
-				table = null
-			}
 			hasExtends = true
 			importType("com.axelor.db.EntityHelper")
 		}
@@ -482,7 +479,8 @@ class Entity {
 	}
 
 	Annotation $strategy() {
-		if (!strategy) return null
+		// Inheritance strategy can be specified on root entity only
+		if (!strategy || hasExtends) return null
 		String type = "SINGLE_TABLE"
 		if (strategy == "JOINED") type = "JOINED"
 		if (strategy == "CLASS") type = "TABLE_PER_CLASS"
