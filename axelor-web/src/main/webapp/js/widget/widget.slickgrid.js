@@ -307,11 +307,13 @@ var Formatters = {
 	},
 	
 	"one-to-one": function(field, value) {
-		return value ? value[field.targetName] : "";
+		var text = (value||{})[field.targetName];
+		return text ? _.escapeHTML(text) : "";
 	},
 
 	"many-to-one": function(field, value) {
-		return value ? value[field.targetName] : "";
+		var text = (value||{})[field.targetName];
+		return text ? _.escapeHTML(text) : "";
 	},
 	
 	"one-to-many": function(field, value) {
@@ -334,13 +336,13 @@ var Formatters = {
 		if(isIcon) {
 			elem = '<a href="javascript: void(0)" tabindex="-1"';
 			if (field.help) {
-				elem += ' title="' + field.help + '"';
+				elem += ' title="' + _.escapeHTML(field.help) + '"';
 			}
 			elem += '><i class="' + css + '"></i></a>';
 		} else {
 			elem = '<img class="' + css + '" src="' + field.icon + '"';
 			if (field.help) {
-				elem += ' title="' + field.help + '"';
+				elem += ' title="' + _.escapeHTML(field.help) + '"';
 			}
 			elem += '>';
 		}
@@ -360,11 +362,11 @@ var Formatters = {
 		var res = _.find(field.selectionList, function(item){
 			return cmp(item.value, value);
 		}) || {};
-		return res.title;
+		return _.isString(res.title) ? _.escapeHTML(res.title) : res.title;
 	},
 
 	"url": function(field, value) {
-		return '<a target="_blank" ng-show="text" href="' + value + '">' + value + '</a>';
+		return '<a target="_blank" ng-show="text" href="' + _.escapeHTML(value) + '">' + _.escapeHTML(value) + '</a>';
 	}
 };
 
@@ -436,10 +438,13 @@ _.extend(Factory.prototype, {
 			return "";
 		}
 
-		var fn = Formatters[type];
-		if (fn) {
-			value = fn(field, value, dataContext, this.grid);
+		var formatter = Formatters[type];
+		if (formatter) {
+			value = formatter(field, value, dataContext, this.grid);
+		} else if (_.isString(value)) {
+			value = _.escapeHTML(value);
 		}
+
 		return value === undefined ? '' : value;
 	},
 	
@@ -1512,9 +1517,13 @@ Grid.prototype.__saveChanges = function(args, callback) {
 	});
 	
 	var that = this;
+	var activeCell = grid.getActiveCell();
+
 	function focus() {
-		grid.setActiveCell(args.row, args.cell);
 		grid.focus();
+		if (activeCell) {
+			grid.setActiveCell(activeCell.row, activeCell.cell);
+		}
 		if (callback) {
 			that.handler.waitForActions(callback);
 		}

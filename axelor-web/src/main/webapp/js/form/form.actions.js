@@ -210,7 +210,7 @@ ActionHandler.prototype = {
 	},
 
 	onChange: function(event) {
-		return this.handle();
+		return this.handle({ wait: 100 });
 	},
 	
 	_getPrompt: function () {
@@ -255,13 +255,14 @@ ActionHandler.prototype = {
 		return formElement;
 	},
 
-	handle: function() {
+	handle: function(options) {
 		var that = this;
 		var action = this.action.trim();
 		var deferred = this.ws.defer();
 
 		var all = this.scope.$actionPromises || [];
 		var pending = all.slice();
+		var opts = _.extend({}, options);
 
 		all.push(deferred.promise);
 
@@ -277,7 +278,7 @@ ActionHandler.prototype = {
 			}
 			promise.then(done, done);
 			promise.then(deferred.resolve, deferred.reject);
-		}, 10, pending);
+		}, opts.wait || 10, pending);
 
 		return deferred.promise;
 	},
@@ -793,7 +794,9 @@ ActionHandler.prototype = {
 						itemScope.setDomain(value);
 					break;
 				case 'refresh':
-					itemScope.$broadcast('on:attrs-change:refresh');
+					itemScope.waitForActions(function () {
+						itemScope.$broadcast('on:attrs-change:refresh');
+					}, 100);
 					break;
 				case 'url':
 				case 'url:set':
