@@ -516,7 +516,7 @@ ui.formInput('MultiSelect', 'Select', {
 
 			input.css('position', 'absolute');
 			input.css('top', top + 5);
-			input.css('left', left + 2);
+			input.css('left', left);
 			input.css('width', width - 24);
 		}
 
@@ -591,6 +591,12 @@ ui.formInput('MultiSelect', 'Select', {
 			}
 			return input.val('');
 		};
+
+		input.on("input blur", function () {
+			if (placeholder) {
+				placeholder.toggleClass('hidden', !!(input.val() || scope.getValue()));
+			}
+		});
 
 		scope.$watch('items.length', function (value, old) {
 			setTimeout(function () {

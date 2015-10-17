@@ -893,7 +893,7 @@ table.field-details .help-text hr {
 .tag-select-placeholder {
 	position: absolute;
 	top: 3px;
-	left: 6px;
+	left: 0;
 	right: 16px;
 	white-space: nowrap;
 	overflow: hidden;
@@ -917,9 +917,9 @@ table.field-details .help-text hr {
 .tag-select li {
 	float: left;
 	display: inline-block;
-	margin: 2px;
-	margin-right: 0;
-	margin-bottom: 0;
+	margin: 0;
+	margin-top: 2px;
+	margin-right: 2px;
 }
 
 .tag-select span.label {
@@ -971,7 +971,7 @@ table.field-details .help-text hr {
 	min-width: 50px !important;
 	margin: 0;
 	padding: 0 !important;
-	margin-left: 2px;
+	margin-left: 0;
 	margin-top: -1px;
 	line-height: 16px;
 	height: auto !important;
@@ -1289,6 +1289,12 @@ table.field-details .help-text hr {
 
 .notify-stack {
 	width: 340px;
+}
+
+.tag-select-placeholder {
+    color: #777;
+    font-size: 12px;
+	font-style: italic;
 }
 
 ::-webkit-input-placeholder {
