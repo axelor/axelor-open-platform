@@ -235,6 +235,8 @@ public class MailServiceImpl implements MailService, MailConstants {
 		final List<String> where = new ArrayList<>();
 		final Map<String, Object> params = new HashMap<>();
 
+		where.add("self.email is not null");
+
 		if (!isBlank(matching)) {
 			where.add("(LOWER(self.email) like LOWER(:email) OR LOWER(self.name) like LOWER(:email))");
 			params.put("email", "%" + matching + "%");
