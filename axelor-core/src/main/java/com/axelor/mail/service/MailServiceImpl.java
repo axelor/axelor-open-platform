@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppSettings;
 import com.axelor.auth.db.User;
-import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
@@ -77,6 +76,9 @@ import com.google.common.util.concurrent.Futures;
 @Singleton
 public class MailServiceImpl implements MailService, MailConstants {
 
+	/**
+	 * The default mail sender is configured from application configuration settings
+	 */
 	private MailSender sender;
 
 	private ExecutorService executor = Executors.newCachedThreadPool();
@@ -98,7 +100,7 @@ public class MailServiceImpl implements MailService, MailConstants {
 		final int smtpTimeout = settings.getInt(CONFIG_SMTP_TIMEOUT, DEFAULT_TIMEOUT);
 		final int smtpConnectionTimeout = settings.getInt(CONFIG_SMTP_CONNECTION_TIMEOUT, DEFAULT_TIMEOUT);
 
-		if (StringUtils.isBlank(smtpHost)) {
+		if (isBlank(smtpHost)) {
 			return;
 		}
 
@@ -108,6 +110,23 @@ public class MailServiceImpl implements MailService, MailConstants {
 		smtpAccount.setConnectionTimeout(smtpConnectionTimeout);
 
 		this.sender = new MailSender(smtpAccount);
+	}
+
+	/**
+	 * Get {@link MailSender} to use sending the given message.
+	 * <p>
+	 * Can be overridden to provide different {@link MailSender} for different
+	 * messages and object depending on the business requirements.
+	 * </p>
+	 * 
+	 * @param message
+	 *            the message to send with the sender
+	 * @param entity
+	 *            the related entity, can be null if there is no related record
+	 * @return a {@link MailSender}, null if not configured
+	 */
+	protected MailSender getMailSender(MailMessage message, Model entity) {
+		return sender;
 	}
 
 	protected String getSubject(MailMessage message, Model entity) {
@@ -190,13 +209,13 @@ public class MailServiceImpl implements MailService, MailConstants {
 	@Override
 	public Future<Boolean> send(final MailMessage message) throws MailException {
 
+		final Model related = findEntity(message);
+		final MailSender sender = getMailSender(message, related);
 		if (sender == null) {
 			return Futures.immediateCancelledFuture();
 		}
 
-		final Model related = findEntity(message);
 		final Set<String> recipients = recipients(message, related);
-
 		if (recipients.isEmpty()) {
 			return Futures.immediateCancelledFuture();
 		}
