@@ -63,9 +63,15 @@
 	list-style: none;
 }
 
-.mail-composer-files ul .fa-close {
+.mail-editor .mail-files {
+  min-height: 18px;
+}
+
+.mail-files i {
+	margin-right: 4px;
+}
+.mail-files i.fa-close {
 	cursor: pointer;
-	margin-right: 6px;
 }
 
 .mail-thread .avatar {
@@ -200,10 +206,6 @@
 	font-weight: 600;
 	padding: 10px 16px;
 	border-bottom: 1px solid #ddd;
-}
-
-.mail-message .mail-message-header .track-tags {
-	margin-left: 8px;
 }
 
 .mail-message .mail-message-header .subject:after {

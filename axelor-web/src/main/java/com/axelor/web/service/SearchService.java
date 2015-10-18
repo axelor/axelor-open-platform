@@ -17,7 +17,13 @@
  */
 package com.axelor.web.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.inject.Inject;
+import javax.mail.internet.InternetAddress;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -27,6 +33,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import com.axelor.mail.service.MailService;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
@@ -39,20 +46,46 @@ import com.google.inject.servlet.RequestScoped;
 public class SearchService {
 	
 	@Inject
-	private MetaService service;
-	
+	private MetaService metaService;
+
+	@Inject
+	private MailService mailService;
+
 	@POST
 	public Response run(Request request) {
-		return service.runSearch(request);
+		return metaService.runSearch(request);
 	}
-	
+
+	@POST
+	@Path("emails")
+	@SuppressWarnings("all")
+	public Response emails(Request request) {
+		final Response response = new Response();
+		final String matching = (String) request.getData().get("search");
+		final List selected = (List) request.getData().get("selected");
+		final List<InternetAddress> addresses = mailService.findEmails(matching, selected, request.getLimit());
+		final List<Object> data = new ArrayList<>();
+
+		for (InternetAddress address : addresses) {
+			final Map<String, String> item = new HashMap<>();
+			item.put("address", address.getAddress());
+			item.put("personal", address.getPersonal());
+			data.add(item);
+		}
+
+		response.setData(data);
+		response.setStatus(Response.STATUS_SUCCESS);
+
+		return response;
+	}
+
 	@GET
 	@Path("menu")
 	public Response menu(@QueryParam("parent") @DefaultValue("") String parent,
 			@QueryParam("category") @DefaultValue("") String category) {
 		Response response = new Response();
 		try {
-			response.setData(service.getActionMenus(parent, category));
+			response.setData(metaService.getActionMenus(parent, category));
 			response.setStatus(Response.STATUS_SUCCESS);
 		} catch (Exception e) {
 			e.printStackTrace();

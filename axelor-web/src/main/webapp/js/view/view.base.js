@@ -204,7 +204,7 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
 			viewPromise = $scope.loadView(type, view.name);
 			viewPromise.then(function(meta){
 				var schema = meta.view;
-				var fields = meta.fields;
+				var fields = meta.fields || params.fields;
 				var toolbar = [];
 				_.each(schema.toolbar, function(button){
 					button.custom = true;
