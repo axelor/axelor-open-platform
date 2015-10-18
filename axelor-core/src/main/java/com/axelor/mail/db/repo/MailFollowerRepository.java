@@ -23,11 +23,13 @@ import java.util.Map;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
 import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailFollower;
 import com.axelor.mail.db.MailGroup;
+import com.axelor.mail.db.MailMessage;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.repo.MetaActionRepository;
@@ -46,14 +48,26 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 	}
 
 	public List<MailFollower> findAll(Model entity, int limit) {
+
+		Long relatedId;
+		String relatedModel;
+
+		if (entity instanceof MailMessage) {
+			relatedId = ((MailMessage) entity).getRelatedId();
+			relatedModel = ((MailMessage) entity).getRelatedModel();
+		} else {
+			relatedId = entity.getId();
+			relatedModel = EntityHelper.getEntityClass(entity).getName();
+		}
+
 		return all().filter("self.relatedModel = ? AND self.relatedId = ?",
-				entity.getClass().getName(), entity.getId()).fetch(limit);
+				relatedModel, relatedId).fetch(limit);
 	}
 
 	public MailFollower findOne(Model entity, User user) {
 		MailFollower follower = all()
 				.filter("self.relatedId = ? AND self.relatedModel = ? AND self.user.id = ?",
-						entity.getId(), entity.getClass().getName(),
+						entity.getId(), EntityHelper.getEntityClass(entity).getName(),
 						user.getId()).fetchOne();
 		return follower;
 	}

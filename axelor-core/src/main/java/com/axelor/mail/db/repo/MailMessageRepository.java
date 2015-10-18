@@ -25,15 +25,21 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
+import com.axelor.mail.MailException;
 import com.axelor.mail.db.MailFlags;
 import com.axelor.mail.db.MailMessage;
+import com.axelor.mail.service.MailService;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
@@ -47,7 +53,12 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 	private MetaFiles files;
 
 	@Inject
+	private MailService mailService;
+
+	@Inject
 	private MetaAttachmentRepository attachmentRepo;
+
+	private Logger log = LoggerFactory.getLogger(MailMessageRepository.class);
 
 	public MailMessageRepository() {
 		super(MailMessage.class);
@@ -55,7 +66,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 
 	public List<MailMessage> findRelated(Model entity, int limit, int offset) {
 		return all().filter("self.relatedModel = ? AND self.relatedId = ?",
-				entity.getClass().getName(),
+				EntityHelper.getEntityClass(entity).getName(),
 				entity.getId())
 				.order("-createdOn")
 				.fetch(limit, offset);
@@ -63,7 +74,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 
 	public long countRelated(Model entity) {
 		return all().filter("self.relatedModel = ? AND self.relatedId = ?",
-				entity.getClass().getName(),
+				EntityHelper.getEntityClass(entity).getName(),
 				entity.getId()).count();
 	}
 
@@ -116,17 +127,35 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 			}
 		}
 
-		return super.save(entity);
+		boolean isNew = entity.getId() == null;
+		boolean isNotification = "notification".equals(entity.getType());
+
+		final MailMessage saved = super.save(entity);
+
+		// notify all followers by email
+		if (isNotification && isNew) {
+			email(saved);
+		}
+
+		return saved;
+	}
+
+	public void email(MailMessage message) {
+		try {
+			mailService.send(message);
+		} catch (MailException e) {
+			log.error("Error sending mail: " + e.getMessage(), e);
+		}
 	}
 
 	@Transactional
 	public MailMessage post(Model entity, MailMessage message, List<MetaFile> files) {
 
-		final Mapper mapper = Mapper.of(entity.getClass());
+		final Mapper mapper = Mapper.of(EntityHelper.getEntityClass(entity));
 		final MailFlags  flags = new MailFlags();
 
 		message.setRelatedId(entity.getId());
-		message.setRelatedModel(entity.getClass().getName());
+		message.setRelatedModel(EntityHelper.getEntityClass(entity).getName());
 		message.setAuthor(AuthUtils.getUser());
 
 		// mark message as read
@@ -143,6 +172,8 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		message = save(message);
 
 		if (files == null || files.isEmpty()) {
+			// notify all followers by email
+			email(message);
 			return message;
 		}
 
@@ -159,7 +190,18 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 			repo.save(attachment);
 		}
 
+		// notify all followers by email
+		email(message);
+
 		return message;
+	}
+
+	public List<MetaAttachment> findAttachments(MailMessage message) {
+		final MetaAttachmentRepository repoAttachments = Beans.get(MetaAttachmentRepository.class);
+		return repoAttachments.all().filter(
+				"self.objectId = ? AND self.objectName = ?",
+				message.getId(),
+				EntityHelper.getEntityClass(message).getName()).fetch();
 	}
 
 	public Map<String, Object> details(MailMessage message) {
@@ -169,14 +211,10 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		final Map<String, Object> details = Resource.toMap(message, fields);
 		final List<Object> files = new ArrayList<>();
 
-		final MetaAttachmentRepository repoAttachments = Beans.get(MetaAttachmentRepository.class);
 		final MailFlagsRepository repoFlags = Beans.get(MailFlagsRepository.class);
 
 		final MailFlags flags = repoFlags.findBy(message, AuthUtils.getUser());
-		final List<MetaAttachment> attachments = repoAttachments.all().filter(
-				"self.objectId = ? AND self.objectName = ?",
-				message.getId(),
-				message.getClass().getName()).fetch();
+		final List<MetaAttachment> attachments = findAttachments(message);
 
 		for (MetaAttachment attachment : attachments) {
 			files.add(Resource.toMapCompact(attachment.getMetaFile()));
