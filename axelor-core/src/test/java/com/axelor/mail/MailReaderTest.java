@@ -17,37 +17,59 @@
  */
 package com.axelor.mail;
 
-import static org.junit.Assert.assertNotNull;
-
 import javax.mail.Folder;
 import javax.mail.Store;
+import javax.mail.internet.MimeMessage;
 
+import org.junit.Assert;
 import org.junit.Test;
 
-import com.axelor.AbstractTest;
+public class MailReaderTest extends AbstractMailTest {
 
-public class MailReaderTest extends AbstractTest {
-
-	private static final String IMAP_HOST = "imap.gmail.com";
-	private static final String IMAP_PORT = "993";
-	
-	private static final String IMAP_USER = "my.name@gmail.com";
-	private static final String IMAP_PASS = "secret";
+	final MailSender sender = new MailSender(SMTP_ACCOUNT);
+	final MailReader reader = new MailReader(IMAPS_ACCOUNT);
 
 	@Test
-	public void testRead() throws Exception {
-		
-		if ("secret".equals(IMAP_PASS)) {
-			return;
-		}
-		
-		MailAccount account = new ImapsAccount(IMAP_HOST, IMAP_PORT, IMAP_USER, IMAP_PASS);
-		MailReader reader = new MailReader(account);
-		
+	public void test() throws Exception {
+
+		final MimeMessage msg = sender.compose()
+				.from("me@localhost")
+				.to("you@localhost")
+				.subject("Hello...")
+				.text("Hello!!!")
+				.build();
+
+		user.deliver(msg);
+		server.waitForIncomingEmail(1);
+
 		Store store = reader.getStore();
-		assertNotNull(store);
-		
+		Assert.assertNotNull(store);
+
 		Folder folder =	store.getFolder("INBOX");
-		assertNotNull(folder);
+		Assert.assertNotNull(folder);
+
+		folder.open(Folder.READ_ONLY);
+
+		Assert.assertEquals(1, folder.getMessageCount());
+
+		MimeMessage incoming = (MimeMessage) folder.getMessage(1);
+		Assert.assertNotNull(incoming);
+		Assert.assertEquals("Hello...", incoming.getSubject());
+
+		MimeMessage reply = (MimeMessage) incoming.reply(false);
+		reply.setText("This is a reply...");
+
+		user.deliver(reply);
+		server.waitForIncomingEmail(1);
+
+		folder = store.getFolder("INBOX");
+		folder.open(Folder.READ_ONLY);
+
+		Assert.assertEquals(2, folder.getMessageCount());
+
+		incoming = (MimeMessage) folder.getMessage(2);
+
+		Assert.assertEquals("Re: Hello...", incoming.getSubject());
+		Assert.assertEquals(msg.getMessageID(), incoming.getHeader("In-Reply-To", ""));
 	}
 }

@@ -23,51 +23,33 @@ import javax.mail.Message.RecipientType;
 import javax.mail.Multipart;
 import javax.mail.internet.MimeMessage;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.subethamail.wiser.Wiser;
-import org.subethamail.wiser.WiserMessage;
 
-import com.axelor.AbstractTest;
 import com.axelor.common.ClassUtils;
 
-public class MailBuilderTest extends AbstractTest {
+public class MailBuilderTest extends AbstractMailTest {
 
-	private Wiser wiser;
-	
-	private static MailSender sender;
-	
-	@BeforeClass
-	public static void createSender() {
-		sender = new MailSender(new SmtpAccount("localhost", "8587"));
-	}
-	
+	private MailSender sender;
+
+	@Override
 	@Before
 	public void startServer() {
-		if (wiser == null) {
-			wiser = new Wiser();
-			wiser.setPort(8587);
+		if (sender == null) {
+			sender = new MailSender(SMTP_ACCOUNT);
 		}
-		wiser.start();
-	}
-
-	@After
-	public void stopServer() {
-		wiser.stop();
 	}
 
 	private MimeMessage sendAndRecieve(Message message) throws Exception {
 		sender.send(message);
-		WiserMessage wm = wiser.getMessages().get(0);
-		return wm.getMimeMessage();
+		server.waitForIncomingEmail(1);
+		return server.getReceivedMessages()[0];
 	}
 
 	@Test
 	public void testPlain() throws Exception {
-		
+
 		Message message = sender.compose()
 				.to("me@localhost")
 				.to("you@localhost", "else@localhost")
@@ -84,14 +66,14 @@ public class MailBuilderTest extends AbstractTest {
 		Assert.assertTrue(msg.getContent() instanceof String);
 
 		String content = (String) msg.getContent();
-		
+
 		Assert.assertEquals("Hello...", msg.getSubject());
 		Assert.assertEquals("Hello!!!", content.trim());
 	}
-	
+
 	@Test
 	public void testMultipart() throws Exception {
-		
+
 		Message message = sender.compose()
 				.to("me@localhost")
 				.bcc("you@localhost")
@@ -101,20 +83,20 @@ public class MailBuilderTest extends AbstractTest {
 				.build();
 
 		MimeMessage msg = sendAndRecieve(message);
-		
+
 		Assert.assertEquals("Hello...", msg.getSubject());
 		Assert.assertTrue(msg.getContent() instanceof Multipart);
-		
+
 		Multipart content = (Multipart) msg.getContent();
-		
+
 		Assert.assertEquals(2, content.getCount());
-		
+
 		for (int i = 0; i < content.getCount(); i++) {
 			BodyPart part = content.getBodyPart(i);
 			Assert.assertTrue(part.getContent() instanceof String);
 		}
 	}
-	
+
 	@Test
 	public void testAttachment() throws Exception {
 
@@ -137,7 +119,7 @@ public class MailBuilderTest extends AbstractTest {
 		Multipart content = (Multipart) msg.getContent();
 
 		Assert.assertEquals(3, content.getCount());
-		
+
 		for (int i = 1; i < content.getCount(); i++) {
 			BodyPart part = content.getBodyPart(i);
 			Assert.assertNotNull(part.getFileName());
