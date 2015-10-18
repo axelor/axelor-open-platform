@@ -261,6 +261,7 @@ final class AuditTracker {
 		json.put("tags", tags);
 		json.put("tracks", tracks);
 
+		message.setSubject(msg);
 		message.setBody(toJSON(json));
 		message.setAuthor(user);
 		message.setRelatedId(entity.getId());
