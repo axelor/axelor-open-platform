@@ -54,6 +54,7 @@ import com.axelor.mail.MailException;
 import com.axelor.mail.MailSender;
 import com.axelor.mail.SmtpAccount;
 import com.axelor.mail.db.MailFollower;
+import com.axelor.mail.db.MailGroup;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
@@ -122,6 +123,10 @@ public class MailServiceImpl implements MailService, MailConstants {
 		}
 		if (subject == null) {
 			subject = getSubject(message.getParent() == null ? message.getRoot() : message.getParent(), entity);
+		}
+		// in case of message groups
+		if (subject == null && entity instanceof MailGroup) {
+			subject = ((MailGroup) entity).getName();
 		}
 		if (message.getParent() != null && subject != null) {
 			subject = "Re: " + subject;
