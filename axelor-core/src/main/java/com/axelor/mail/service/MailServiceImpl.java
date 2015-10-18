@@ -129,6 +129,20 @@ public class MailServiceImpl implements MailService, MailConstants {
 		return sender;
 	}
 
+	/**
+	 * Get the subject line for the message.
+	 * 
+	 * <p>
+	 * Custom implementation can overrider this method to prepare good subject
+	 * line.
+	 * </p>
+	 * 
+	 * @param message
+	 *            the message for which subject line is required
+	 * @param entity
+	 *            the related entity, can be null if there is no related record
+	 * @return subject line
+	 */
 	protected String getSubject(MailMessage message, Model entity) {
 		if (message == null) {
 			return null;
@@ -153,6 +167,21 @@ public class MailServiceImpl implements MailService, MailConstants {
 		return subject;
 	}
 
+	/**
+	 * Get the list of recipient email addresses.
+	 * 
+	 * <p>
+	 * The default implementation returns email addresses of all followers.
+	 * Custom implementation may include more per business requirement. For
+	 * example, including customer email on sale order is confirmed.
+	 * </p>
+	 * 
+	 * @param message
+	 *            the message to send
+	 * @param entity
+	 *            the related entity, can be null if there is no related record
+	 * @return set of email addresses
+	 */
 	protected Set<String> recipients(MailMessage message, Model entity) {
 		final Set<String> recipients = new LinkedHashSet<>();
 		final MailFollowerRepository followers = Beans.get(MailFollowerRepository.class);
@@ -171,6 +200,23 @@ public class MailServiceImpl implements MailService, MailConstants {
 		return Sets.filter(recipients, Predicates.notNull());
 	}
 
+	/**
+	 * Apply a template to prepare message content.
+	 * 
+	 * <p>
+	 * The default implementation uses very basic template. Custom
+	 * implementations can apply different templates depending on message type
+	 * and related entity or even current customer.
+	 * </p>
+	 * 
+	 * @param message
+	 *            the message to send
+	 * @param entity
+	 *            the related entity, can be null if there is no related record
+	 * @return final message body text
+	 * @throws IOException
+	 *             if there is any error applying template
+	 */
 	protected String template(MailMessage message, Model entity) throws IOException {
 
 		final String text = message.getBody().trim();
@@ -198,6 +244,13 @@ public class MailServiceImpl implements MailService, MailConstants {
 		return tmpl.make(data).render();
 	}
 
+	/**
+	 * Find related entity.
+	 * 
+	 * @param message
+	 *            the message
+	 * @return related entity or null if there is no related record
+	 */
 	protected final Model findEntity(final MailMessage message) {
 		try {
 			return (Model) JPA.em().find(Class.forName(message.getRelatedModel()), message.getRelatedId());
