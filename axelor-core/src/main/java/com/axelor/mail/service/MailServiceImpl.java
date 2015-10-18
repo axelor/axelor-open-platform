@@ -65,6 +65,8 @@ import com.axelor.text.Templates;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
 
 /**
@@ -142,7 +144,7 @@ public class MailServiceImpl implements MailService, MailConstants {
 			}
 		}
 
-		return recipients;
+		return Sets.filter(recipients, Predicates.notNull());
 	}
 
 	protected String template(MailMessage message, Model entity) throws IOException {

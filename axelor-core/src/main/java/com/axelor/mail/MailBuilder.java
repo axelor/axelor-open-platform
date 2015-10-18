@@ -22,7 +22,8 @@ import static com.axelor.common.StringUtils.isBlank;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -101,28 +102,30 @@ public final class MailBuilder {
 		return this;
 	}
 
-	public MailBuilder to(String... recipients) {
+	private MailBuilder addAll(Collection<String> to, String... recipients) {
 		Preconditions.checkNotNull(recipients, "recipients can't be null");
-		this.toRecipients.addAll(Arrays.asList(recipients));
+		for (String email : recipients) {
+			Preconditions.checkNotNull(email, "email can't be null");
+		}
+		Collections.addAll(to, recipients);
 		return this;
+	}
+
+	public MailBuilder to(String... recipients) {
+		return addAll(toRecipients, recipients);
 	}
 
 	public MailBuilder cc(String... recipients) {
 		Preconditions.checkNotNull(recipients, "recipients can't be null");
-		this.ccRecipients.addAll(Arrays.asList(recipients));
-		return this;
+		return addAll(ccRecipients, recipients);
 	}
 
 	public MailBuilder bcc(String... recipients) {
-		Preconditions.checkNotNull(recipients, "recipients can't be null");
-		this.bccRecipients.addAll(Arrays.asList(recipients));
-		return this;
+		return addAll(bccRecipients, recipients);
 	}
 
 	public MailBuilder replyTo(String... recipients) {
-		Preconditions.checkNotNull(recipients, "recipients can't be null");
-		this.replyRecipients.addAll(Arrays.asList(recipients));
-		return this;
+		return addAll(replyRecipients, recipients);
 	}
 
 	public MailBuilder from(String from) {
