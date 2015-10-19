@@ -17,7 +17,6 @@
  */
 package com.axelor.gradle
 
-
 class AppDefinition extends AbstractDefinition {
 
 	String version

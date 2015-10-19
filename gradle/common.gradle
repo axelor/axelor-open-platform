@@ -1,4 +1,10 @@
-// compiler
+apply plugin: "java"
+
+dependencies {
+	compile libs.slf4j
+	testCompile	libs.junit
+}
+
 tasks.withType(JavaCompile) {
 	options.encoding = 'utf-8'
 	options.compilerArgs = ['-Xlint:-options']
@@ -7,4 +13,20 @@ tasks.withType(GroovyCompile) {
 	options.encoding = 'utf-8'
 	options.compilerArgs = ['-Xlint:-options']
 	groovyOptions.encoding = 'utf-8'
+}
+
+project.afterEvaluate {
+
+	// add src-gen
+	if (tasks.findByName("generateCode")) {
+		sourceSets.main.java.srcDir "${buildDir}/src-gen"
+	}
+
+	// force groovy compiler
+	if (plugins.hasPlugin("groovy")) {
+		sourceSets.main.groovy.srcDirs += project.sourceSets.main.java.srcDirs
+		sourceSets.main.java.srcDirs = []
+		sourceSets.test.groovy.srcDirs += project.sourceSets.test.java.srcDirs
+		sourceSets.test.java.srcDirs = []
+	}
 }

@@ -46,68 +46,26 @@ abstract class AbstractPlugin implements Plugin<Project> {
 
 	protected void applyCommon(Project project, AbstractDefinition definition) {
 
-		project.configure(project) {
+		project.task('i18n-extract', type: I18nTask) {
+			description "Extract i18n messages from source files."
+			group "Axelor"
+			update = false
+			withContext = project.hasProperty('with.context')
+		}
 
-			apply plugin: 'java'
+		project.task('i18n-update', type: I18nTask) {
+			description "Update i18 messages from message catalog."
+			group "Axelor"
+			update = true
+		}
 
-			dependencies {
-				compile libs.slf4j
-				compile libs.groovy
-				testCompile	libs.junit
-			}
-
-			task('i18n-extract', type: I18nTask) {
-				description "Extract i18n messages from source files."
-				group "Axelor"
-				update = false
-				withContext = project.properties['with.context'] ? true : false
-			}
-			task('i18n-update', type: I18nTask) {
-				description "Update i18 messages from message catalog."
-				group "Axelor"
-				update = true
-			}
-
-			afterEvaluate {
-
-				// add module dependency
-				definition.modules.each { module ->
-					dependencies {
-						compile project.project(":${module}")
-					}
-                }
-				
-				// add src-gen as source directory
-				sourceSets {
-					main {
-						java {
-							srcDir "${buildDir}/src-gen"
-						}
-					}
+		project.afterEvaluate {
+			// add module dependency
+			definition.modules.each { module ->
+				project.dependencies {
+					compile project.project(":${module}")
 				}
-
-				// force groovy compiler
-				if (plugins.hasPlugin("groovy")) {
-					sourceSets {
-						main {
-							java {
-								srcDirs = []
-							}
-							groovy {
-								srcDirs = ["src/main/java", "src/main/groovy", "${buildDir}/src-gen"]
-							}
-						}
-						test {
-							java {
-								srcDirs = []
-							}
-							groovy {
-								srcDirs = ["src/test/java", "src/test/groovy"]
-							}
-						}
-					}
-				}
-            }
+			}
 		}
 	}
 }

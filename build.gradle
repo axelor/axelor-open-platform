@@ -9,7 +9,7 @@ dependencies {
 }
 
 def localDist = "${rootProject.buildDir}/dist"
-def localRepo = "${localDist}/ivy"
+def localRepo = "${localDist}/maven"
 
 allprojects {
 
@@ -23,16 +23,21 @@ allprojects {
 	sourceCompatibility = 1.7
 	targetCompatibility = 1.7
 
-	repositories {
-		ivy {
-			name "localRepo"
-			url "file://${localRepo}"
-		}
-	}
+	apply plugin: "maven-publish"
 
-	uploadArchives {
+	group "com.axelor"
+
+	publishing {
+		publications {
+			mavenJava(MavenPublication) {
+				from components.java
+			}
+		}
 		repositories {
-			add project.repositories.localRepo
+			maven {
+				name "adk"
+				url "file://${localRepo}"
+			}
 		}
 	}
 
@@ -49,11 +54,11 @@ task repo(dependsOn: [':axelor-gradle:dist']) {
 	outputs.dir localDist
 }
 
-tasks.repo.dependsOn subprojects*.uploadArchives
+tasks.repo.dependsOn subprojects*.publish
 
 jar.enabled = false
 install.enabled = false
-uploadArchives.enabled = false
+publish.enabled = false
 
 applicationName = "axelor"
 mainClassName = "com.axelor.shell.Main"

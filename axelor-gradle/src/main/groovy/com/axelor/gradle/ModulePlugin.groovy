@@ -25,26 +25,22 @@ class ModulePlugin extends BasePlugin {
 
 		super.apply(project)
 
-		project.configure(project) {
-			// add some common dependencies
-			afterEvaluate {
-				
-				Object core = null
-				Object test = null
-				
-				try {
-					core = project.project(":axelor-core")
-					test = project.project(":axelor-test")
-				} catch (Exception e) {
-					core = "com.axelor:axelor-core:${sdkVersion}"
-					test = "com.axelor:axelor-test:${sdkVersion}"
-				}
-				
-				dependencies {
-					compile core
-					testCompile test
-				}
-			}
-        }
+		// add common dependencies
+
+		Object core = null
+		Object test = null
+
+		try {
+			core = project.project(":axelor-core")
+			test = project.project(":axelor-test")
+		} catch (Exception e) {
+			core = "com.axelor:axelor-core:${sdkVersion}"
+			test = "com.axelor:axelor-test:${sdkVersion}"
+		}
+
+		project.dependencies {
+			compile core
+			testCompile test
+		}
     }
 }
