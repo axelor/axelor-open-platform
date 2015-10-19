@@ -81,7 +81,7 @@ public class MailSenderTest extends AbstractMailTest {
 		if ("secret".equals(SMTP_PASS)) {
 			return;
 		}
-		final MailAccount account = new SmtpAccount(SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SmtpAccount.CHANNEL_STARTTLS);
+		final MailAccount account = new SmtpAccount(SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, MailConstants.CHANNEL_STARTTLS);
 		send(account, null);
 	}
 

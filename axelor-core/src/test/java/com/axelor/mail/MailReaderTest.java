@@ -27,7 +27,7 @@ import org.junit.Test;
 public class MailReaderTest extends AbstractMailTest {
 
 	final MailSender sender = new MailSender(SMTP_ACCOUNT);
-	final MailReader reader = new MailReader(IMAPS_ACCOUNT);
+	final MailReader reader = new MailReader(IMAP_ACCOUNT);
 
 	@Test
 	public void test() throws Exception {

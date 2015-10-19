@@ -26,26 +26,23 @@ import org.junit.Rule;
 import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.DummySSLSocketFactory;
-import com.icegreen.greenmail.util.ServerSetup;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
 public abstract class AbstractMailTest {
 
-	protected static final ServerSetup[] SMTP_IMAPS = { ServerSetupTest.SMTP, ServerSetupTest.IMAPS };
-
 	protected static final String SERVER_HOST = "127.0.0.1";
 
 	protected static final String SMTP_PORT = "" + ServerSetupTest.SMTP.getPort();
-	protected static final String IMAPS_PORT = "" + ServerSetupTest.IMAPS.getPort();
+	protected static final String IMAP_PORT = "" + ServerSetupTest.IMAP.getPort();
 
 	protected static final String USER_NAME = "test";
 	protected static final String USER_PASS = "test";
 
 	@Rule
-	public final GreenMailRule server = new GreenMailRule(SMTP_IMAPS);
+	public final GreenMailRule server = new GreenMailRule(ServerSetupTest.SMTP_IMAP);
 
 	protected final SmtpAccount SMTP_ACCOUNT = new SmtpAccount(SERVER_HOST, SMTP_PORT, USER_NAME, USER_PASS);
-	protected final ImapsAccount IMAPS_ACCOUNT = new ImapsAccount(SERVER_HOST, IMAPS_PORT, USER_NAME, USER_PASS);
+	protected final ImapAccount IMAP_ACCOUNT = new ImapAccount(SERVER_HOST, IMAP_PORT, USER_NAME, USER_PASS);
 
 	protected GreenMailUser user;
 

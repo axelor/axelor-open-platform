@@ -17,22 +17,17 @@
  */
 package com.axelor.mail;
 
-import static com.axelor.common.StringUtils.isBlank;
-
 import java.util.Properties;
 
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 
-import com.axelor.common.StringUtils;
-import com.google.common.base.Preconditions;
-
 /**
- * The default implementation of {@link MailAccount} for SMPT accounts.
+ * The default implementation of {@link MailAccount} for IMAP/IMAPS accounts.
  *
  */
-public class SmtpAccount implements MailAccount {
+public class ImapAccount implements MailAccount {
 
 	private String host;
 	private String port;
@@ -48,88 +43,72 @@ public class SmtpAccount implements MailAccount {
 	private Session session;
 
 	/**
-	 * Create a non-authenticating SMTP account.
+	 * Create a new IMAP account.
 	 *
 	 * @param host
-	 *            the smtp server host
+	 *            server hostname
 	 * @param port
-	 *            the smtp server port
+	 *            server port
+	 * @param user
+	 *            login name
+	 * @param password
+	 *            login password
 	 */
-	public SmtpAccount(String host, String port) {
-		Preconditions.checkNotNull(host, "host can't be null");
+	public ImapAccount(String host, String port, String user, String password) {
+		this(host, port, user, password, null);
+	}
+
+	/**
+	 * Create a new IMAP/IMAPS account.
+	 *
+	 * <p>
+	 * If the given channel is {@link MailConstants#CHANNEL_SSL} then it will
+	 * use <code>imaps</code> protocol over <code>ssl</code>.
+	 * </p>
+	 *
+	 * @param host
+	 *            server hostname
+	 * @param port
+	 *            server port
+	 * @param user
+	 *            login name
+	 * @param password
+	 *            login password
+	 * @param channel
+	 *            encryption channel (ssl, startssl or null)
+	 */
+	public ImapAccount(String host, String port, String user, String password, String channel) {
 		this.host = host;
 		this.port = port;
-	}
-
-	/**
-	 * Create an authenticating SMTP account.
-	 *
-	 * @param host
-	 *            the smtp server host
-	 * @param port
-	 *            the smtp server port
-	 * @param user
-	 *            the smtp server login user name
-	 * @param password
-	 *            the smtp server login password
-	 */
-	public SmtpAccount(String host, String port, String user, String password) {
-		this(host, port);
 		this.user = user;
 		this.password = password;
-	}
-
-	/**
-	 * Create an authenticating SMTP account.
-	 *
-	 * @param host
-	 *            the smtp server host
-	 * @param port
-	 *            the smtp server port
-	 * @param user
-	 *            the smtp server login user name
-	 * @param password
-	 *            the smtp server login password
-	 * @param channel
-	 *            the smtp encryption channel (starttls or ssl)
-	 */
-	public SmtpAccount(String host, String port, String user, String password, String channel) {
-		this(host, port, user, password);
 		this.channel = channel;
 	}
 
 	private Session init() {
 
-		final boolean authenticating = !StringUtils.isBlank(user);
 		final Properties props = new Properties();
+		final String protocol = MailConstants.CHANNEL_SSL.equals(channel) ? "imaps" : "imap";
 
 		// set timeout
-		props.setProperty("mail.smtp.connectiontimeout", "" + connectionTimeout);
-		props.setProperty("mail.smtp.timeout", "" + timeout);
+		props.setProperty("mail." + protocol + ".connectiontimeout", "" + connectionTimeout);
+		props.setProperty("mail." + protocol + ".timeout", "" + timeout);
 
 		if (properties != null) {
 			props.putAll(properties);
 		}
 
-		props.setProperty("mail.smtp.host", host);
-		props.setProperty("mail.smtp.port", port);
-		props.setProperty("mail.smtp.auth", "" + authenticating);
-
-		if (!isBlank(user)) {
-			props.setProperty("mail.smtp.from", user);
-		}
-
-		if (!authenticating) {
-			return Session.getInstance(props);
-		}
+		props.setProperty("mail.store.protocol", protocol);
+		props.setProperty("mail." + protocol + ".host", host);
+		props.setProperty("mail." + protocol + ".port", port);
 
 		if (MailConstants.CHANNEL_STARTTLS.equalsIgnoreCase(channel)) {
-			props.setProperty("mail.smtp.starttls.enable", "true");
+			props.setProperty("mail." + protocol + ".starttls.enable", "true");
 		}
 		if (MailConstants.CHANNEL_SSL.equalsIgnoreCase(channel)) {
-			props.setProperty("mail.smtp.ssl.enable", "true");
-			props.setProperty("mail.smtp.socketFactory.port", port);
-			props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+			props.setProperty("mail." + protocol + ".ssl.enable", "true");
+			props.setProperty("mail." + protocol + ".socketFactory.port", port);
+			props.setProperty("mail." + protocol + ".socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 		}
 
 		final Authenticator authenticator = new Authenticator() {

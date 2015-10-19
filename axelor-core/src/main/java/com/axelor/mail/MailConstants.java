@@ -31,12 +31,16 @@ public interface MailConstants {
 	public static final String CONFIG_SMTP_TIMEOUT = "mail.smtp.timeout";
 	public static final String CONFIG_SMTP_CONNECTION_TIMEOUT = "mail.smtp.connectionTimeout";
 
-	public static final String CONFIG_IMAPS_HOST = "mail.imaps.host";
-	public static final String CONFIG_IMAPS_PORT = "mail.imaps.port";
-	public static final String CONFIG_IMAPS_USER = "mail.imaps.user";
-	public static final String CONFIG_IMAPS_PASS = "mail.imaps.pass";
-	public static final String CONFIG_IMAPS_TIMEOUT = "mail.imaps.timeout";
-	public static final String CONFIG_IMAPS_CONNECTION_TIMEOUT = "mail.imaps.connectionTimeout";
+	public static final String CONFIG_IMAP_HOST = "mail.imap.host";
+	public static final String CONFIG_IMAP_PORT = "mail.imap.port";
+	public static final String CONFIG_IMAP_USER = "mail.imap.user";
+	public static final String CONFIG_IMAP_PASS = "mail.imap.pass";
+	public static final String CONFIG_IMAP_CHANNEL = "mail.imap.channel";
+	public static final String CONFIG_IMAP_TIMEOUT = "mail.imap.timeout";
+	public static final String CONFIG_IMAP_CONNECTION_TIMEOUT = "mail.imap.connectionTimeout";
 
-	public static final int DEFAULT_TIMEOUT = MailAccount.DEFAULT_TIMEOUT;
+	public static final int DEFAULT_TIMEOUT = 60000;
+
+	public static final String CHANNEL_STARTTLS = "starttls";
+	public static final String CHANNEL_SSL = "ssl";
 }

@@ -29,12 +29,6 @@ import javax.mail.Session;
 public interface MailAccount {
 
 	/**
-	 * Default connection timeout.
-	 *
-	 */
-	static final int DEFAULT_TIMEOUT = 60000;
-
-	/**
 	 * Socket connection timeout value in milliseconds.
 	 *
 	 * @param connectionTimeout
