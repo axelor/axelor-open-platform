@@ -234,8 +234,30 @@ public final class MailBuilder {
 	 * @throws IOException
 	 */
 	public MimeMessage build() throws MessagingException, IOException {
+		return build(null);
+	}
 
-		MimeMessage message = new MimeMessage(session);
+	/**
+	 * Build a new {@link MimeMessage} instance from the provided details.
+	 *
+	 * @param messageId
+	 *            custom "Message-ID" to use, null to use auto-generated
+	 * @return an instance of {@link MimeMessage}
+	 * @throws MessagingException
+	 * @throws IOException
+	 */
+	public MimeMessage build(final String messageId) throws MessagingException, IOException {
+
+		MimeMessage message = new MimeMessage(session) {
+			@Override
+			protected void updateMessageID() throws MessagingException {
+				if (isBlank(messageId)) {
+					super.updateMessageID();
+				} else {
+					this.setHeader("Message-ID", messageId);
+				}
+			}
+		};
 
 		message.setSubject(subject);
 		message.setRecipients(RecipientType.TO, InternetAddress.parse(Joiner.on(",").join(toRecipients)));
@@ -291,25 +313,30 @@ public final class MailBuilder {
 	 *
 	 * @param date
 	 *            send date, can be null
+	 *
+	 * @return sent {@link MimeMessage}
 	 * @throws MessagingException
 	 * @throws IOException
 	 */
-	public void send(Date date) throws MessagingException, IOException {
+	public MimeMessage send(Date date) throws MessagingException, IOException {
 		final MimeMessage message = build();
 		try {
 			message.setSentDate(date);
 		} catch (Exception e) {
 		}
 		Transport.send(message);
+		return message;
 	}
 
 	/**
 	 * Send the message.
 	 *
+	 * @return sent {@link MimeMessage}
 	 * @throws MessagingException
 	 * @throws IOException
 	 */
-	public void send() throws MessagingException, IOException {
-		send(new Date());
+	public MimeMessage send() throws MessagingException, IOException {
+		return send(new Date());
 	}
+
 }
