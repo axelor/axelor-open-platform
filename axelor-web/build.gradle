@@ -16,6 +16,7 @@ dependencies {
 
 	compile(libs.resteasy_multipart) {
 		exclude module: "resteasy-jaxb-provider"
+		exclude module: "mail", group: "javax.mail"
 	}
 }
 
