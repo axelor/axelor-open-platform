@@ -327,6 +327,52 @@ public class MetaFiles {
 		}
 	}
 
+	/**
+	 * Upload the given stream to the upload directory and link it to the to
+	 * given {@link MetaFile}.
+	 *
+	 * <p>
+	 * The given {@link MetaFile} instance must have fileName set to save the
+	 * stream as file.
+	 * </p>
+	 *
+	 * Upload the stream
+	 *
+	 * @param stream
+	 *            the stream to upload
+	 * @param metaFile
+	 *            the {@link MetaFile} to link the uploaded file
+	 * @return the given {@link MetaFile} instance
+	 * @throws IOException
+	 */
+	@Transactional
+	public MetaFile upload(InputStream stream, MetaFile metaFile) throws IOException {
+		Preconditions.checkNotNull(stream, "stream can't be null");
+		Preconditions.checkNotNull(metaFile, "meta file can't be null");
+		Preconditions.checkNotNull(metaFile.getFileName(), "meta file should have filename");
+
+		final Path tmp = createTempFile(null, null);
+		final File tmpFile = upload(stream, 0, -1, tmp.toFile().getName());
+
+		return upload(tmpFile, metaFile);
+	}
+
+	/**
+	 * Upload the given stream to the upload directory.
+	 *
+	 * @param stream
+	 *            the stream to upload
+	 * @param fileName
+	 *            the file name to use
+	 * @return a new {@link MetaFile} instance
+	 * @throws IOException
+	 */
+	@Transactional
+	public MetaFile upload(InputStream stream, String fileName) throws IOException {
+		final MetaFile file = new MetaFile();
+		file.setFileName(fileName);
+		return upload(stream, file);
+	}
 
 	/**
 	 * Attach the given {@link MetaFile} to the given {@link Model} object and
