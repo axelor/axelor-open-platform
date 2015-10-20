@@ -1,3 +1,9 @@
+# 3.0.21 (2015-10-20)
+
+## Bug fixes
+
+- fix nested editor rendering issue
+
 # 3.0.20 (2015-10-17)
 
 ## Bug fixes
