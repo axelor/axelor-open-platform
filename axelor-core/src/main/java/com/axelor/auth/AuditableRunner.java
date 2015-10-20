@@ -17,11 +17,14 @@
  */
 package com.axelor.auth;
 
+import java.util.concurrent.Callable;
+
 import javax.inject.Inject;
 
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.UserRepository;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 
 /**
  * This class can be used to run batch jobs that requires to keep track of audit
@@ -47,8 +50,30 @@ public class AuditableRunner {
 	 * @param job
 	 *            the job to run
 	 */
-	public void run(Runnable job) {
+	public void run(final Runnable job) {
+		try {
+			run(new Callable<Boolean>() {
+				@Override
+				public Boolean call() throws Exception {
+					job.run();
+					return true;
+				}
+			});
+		} catch (Exception e) {
+			// propagate the exception
+			throw Throwables.propagate(e);
+		}
+	}
 
+	/**
+	 * Run a batch job.
+	 * 
+	 * @param job
+	 *            the job to run
+	 * @return job result
+	 * @throws Exception
+	 */
+	public <T> T run(Callable<T> job) throws Exception {
 		Preconditions.checkNotNull(job);
 		Preconditions.checkNotNull(users);
 
@@ -59,7 +84,7 @@ public class AuditableRunner {
 
 		batchUser.set(user);
 		try {
-			job.run();
+			return job.call();
 		} finally {
 			batchUser.remove();
 		}
