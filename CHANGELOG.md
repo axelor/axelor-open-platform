@@ -1,4 +1,21 @@
-# Current (3.0.20)
+# Current (3.0.22)
+
+## Bug fixes
+
+# 3.0.21 (2015-10-20)
+
+## Bug fixes
+
+- fix nested editor rendering issue
+
+# 3.0.20 (2015-10-17)
+
+## Bug fixes
+
+- fix dashlet refresh issue
+- fix nested editor rendering issue
+- fix grid widget rendering issue
+- fix onchange issue in editable grid
 
 # 3.0.19 (2015-10-01)
 
