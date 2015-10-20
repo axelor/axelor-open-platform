@@ -496,7 +496,7 @@ ui.directive('uiMailFiles', [function () {
 				"<li ng-repeat='file in files'>" +
 					"<i class='fa fa-close' ng-if='removable != \"false\"' ng-click='onRemoveFile(file)'></i>" +
 					"<i class='fa fa-paperclip' ng-if='removable == \"false\"'></i>" +
-					"<a href='' ng-click='onDowload(file)'>{{file.fileName}}</a>" +
+					"<a href='' ng-click='onDownload(file)'>{{file.fileName}}</a>" +
 				"</li>" +
 			"</ul>"
 	};
