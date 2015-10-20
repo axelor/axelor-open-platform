@@ -38,4 +38,18 @@
 
   </input>
 
+  <input file="jobs.xml" root="scheduled-jobs">
+    <bind node="scheduled-job" type="com.axelor.meta.db.MetaSchedule" search="self.name = :name">
+      <bind node="@active" to="active" />
+      <bind node="@name" to="name" />
+      <bind node="@description" to="description" />
+      <bind node="@job" to="job" />
+      <bind node="@cron" to="cron" />
+      <bind node="param" to="params">
+        <bind node="@name" to="name"/>
+        <bind node="text()" to="value"/>
+      </bind>
+    </bind>
+  </input>
+
 </xml-inputs>

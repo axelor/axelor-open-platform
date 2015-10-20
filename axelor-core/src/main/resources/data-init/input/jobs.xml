@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scheduled-jobs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <scheduled-job name="mail.fetcher" active="true"
+    description="fetch new emails on every 5 minutes."
+    job="com.axelor.mail.service.MailFetchJob"
+    cron="* */5 * * * ?"/>
+
+</scheduled-jobs>

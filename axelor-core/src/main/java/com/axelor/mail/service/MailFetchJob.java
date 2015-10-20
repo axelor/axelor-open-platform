@@ -1,0 +1,46 @@
+/**
+ * Axelor Business Solutions
+ *
+ * Copyright (C) 2005-2015 Axelor (<http://axelor.com>).
+ *
+ * This program is free software: you can redistribute it and/or  modify
+ * it under the terms of the GNU Affero General Public License, version 3,
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.axelor.mail.service;
+
+import java.util.concurrent.Future;
+
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+
+import com.axelor.inject.Beans;
+
+/**
+ * Job to fetch emails.
+ *
+ */
+public class MailFetchJob implements Job {
+
+	@Override
+	public void execute(JobExecutionContext context) throws JobExecutionException {
+		final MailService service = Beans.get(MailService.class);
+		try {
+			final Future<Boolean> fetching = service.fetch();
+			if (!fetching.isCancelled()) {
+				fetching.get();
+			}
+		} catch (Exception e) {
+			throw new JobExecutionException(e);
+		}
+	}
+}

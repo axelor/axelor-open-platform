@@ -46,10 +46,24 @@ public interface MailService {
 	 * @param message
 	 *            the message to send
 	 * @return a {@link Future} object
-	 *
 	 * @throws MailException
 	 */
 	Future<Boolean> send(MailMessage message) throws MailException;
+
+	/**
+	 * Fetch mails from remote mail server.
+	 *
+	 * <p>
+	 * This method is meant to be called by a background job runner, running
+	 * under database transaction with super user. The implementation should
+	 * process all incoming email messages and may save them as
+	 * {@link MailMessage}.
+	 * </p>
+	 *
+	 * @return a {@link Future} object
+	 * @throws MailException
+	 */
+	Future<Boolean> fetch() throws MailException;
 
 	/**
 	 * Search for email addresses matching the given text.
