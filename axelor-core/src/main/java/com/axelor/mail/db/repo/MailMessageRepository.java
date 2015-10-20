@@ -21,8 +21,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
+import javax.mail.internet.InternetAddress;
 import javax.persistence.PersistenceException;
 
 import org.slf4j.Logger;
@@ -95,6 +97,27 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		super.remove(message);
 	}
 
+	private static String mailHost;
+	private static AtomicInteger mailId = new AtomicInteger();
+
+	protected String generateMessageId(MailMessage entity) {
+		if (mailHost == null) {
+			final InternetAddress addr = InternetAddress.getLocalAddress(null);
+			mailHost = addr == null ? "javamailuser@localhost" : addr.getAddress();
+			if (mailHost.indexOf("@") > 0) {
+				mailHost = mailHost.substring(mailHost.lastIndexOf("@"));
+			}
+		}
+		final StringBuilder builder = new StringBuilder();
+		builder.append("<");
+		builder.append(builder.hashCode()).append(".");
+		builder.append(mailId.getAndIncrement()).append(".");
+		builder.append(System.currentTimeMillis());
+		builder.append(mailHost);
+		builder.append(">");
+		return builder.toString();
+	}
+
 	@Override
 	public MailMessage save(MailMessage entity) {
 		if (entity.getParent() == null && entity.getRelatedId() != null) {
@@ -129,6 +152,11 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 
 		boolean isNew = entity.getId() == null;
 		boolean isNotification = "notification".equals(entity.getType());
+
+		// make sure to set unique message-id
+		if (entity.getMessageId() == null) {
+			entity.setMessageId(generateMessageId(entity));
+		}
 
 		final MailMessage saved = super.save(entity);
 

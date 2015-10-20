@@ -17,6 +17,8 @@
     <string name="subject" namecolumn="true" />
     <string name="body" multiline="true" large="true" />
 
+    <string name="messageId" unique="true" readonly="true" help="Unique message identifier" />
+
     <long name="relatedId" title="Related document id" />
     <string name="relatedModel" title="Related document model" />
     <string name="relatedName" title="Related document name" />
