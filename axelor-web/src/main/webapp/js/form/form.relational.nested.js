@@ -373,7 +373,7 @@ var NestedEditor = {
 
 			promise.then(function() {
 				configure(nested);
-				nestedEdit(null, false);
+				nestedEdit(model.$viewValue, false);
 				scope.waitForActions(doRender, 100);
 			});
 		};
