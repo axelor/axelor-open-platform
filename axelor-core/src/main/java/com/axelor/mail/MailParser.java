@@ -35,6 +35,14 @@ import javax.mail.internet.MimePart;
 import javax.mail.internet.MimePartDataSource;
 import javax.mail.internet.ParseException;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.nodes.TextNode;
+import org.jsoup.safety.Whitelist;
+import org.jsoup.select.NodeTraversor;
+import org.jsoup.select.NodeVisitor;
+
 /**
  * Parses a {@link MimeMessage} and stores the individual parts such as context
  * text, attachments etc.
@@ -47,6 +55,8 @@ public final class MailParser {
 	private String text;
 
 	private String html;
+
+	private String summary;
 
 	private boolean isMultiPart;
 
@@ -158,6 +168,9 @@ public final class MailParser {
 	 *
 	 */
 	public String getText() {
+		if (text == null && html != null) {
+			text = toPlainText(html);
+		}
 		return text;
 	}
 
@@ -167,6 +180,25 @@ public final class MailParser {
 	 */
 	public String getHtml() {
 		return html;
+	}
+
+	/**
+	 * Get the first line of the email as summary.
+	 * @return
+	 */
+	public String getSummary() {
+		if (summary == null && getText() != null) {
+			final String text = getText();
+			summary = text.substring(0, text.indexOf("\n"));
+		}
+		return summary;
+	}
+
+	public String getSafeHtml() {
+		if (html == null) {
+			return null;
+		}
+		return sanitize(html);
 	}
 
 	/**
@@ -242,6 +274,86 @@ public final class MailParser {
 		} else {
 			final DataSource dataSource = new MimePartDataSource(part);
 			attachments.add(dataSource);
+		}
+	}
+
+	private String toPlainText(String html) {
+		final Element doc = Jsoup.parse(html);
+		final FormattingVisitor formatter = new FormattingVisitor();
+		final NodeTraversor traversor = new NodeTraversor(formatter);
+		traversor.traverse(doc);
+		return formatter.toString();
+	}
+
+	private String sanitize(String html) {
+		return Jsoup.clean(html, Whitelist.basicWithImages());
+	}
+
+	private static final class FormattingVisitor implements NodeVisitor {
+
+		private final StringBuilder builder = new StringBuilder();
+
+		private void newLine() {
+			int n = builder.length();
+			if (n < 2 || builder.charAt(n - 1) != '\n' || builder.charAt(n - 2) != '\n') {
+				builder.append("\n");
+			}
+		}
+
+		@Override
+		public void head(Node node, int depth) {
+			if (node instanceof TextNode) {
+				builder.append(((TextNode) node).text());
+				return;
+			}
+			final String name = node.nodeName();
+			switch (name) {
+			case "li":
+				builder.append("\n * ");
+				break;
+			case "dt":
+				builder.append("  ");
+				break;
+			case "p":
+			case "div":
+			case "blockquote":
+			case "h1":
+			case "h2":
+			case "h3":
+			case "h4":
+			case "h5":
+			case "tr":
+				newLine();
+				break;
+			}
+		}
+
+		@Override
+		public void tail(Node node, int depth) {
+			final String name = node.nodeName();
+			switch (name) {
+			case "a":
+				builder.append(String.format(" <%s>", node.attr("href")));
+				break;
+			case "p":
+			case "div":
+			case "blockquote":
+			case "br":
+			case "dd":
+			case "dt":
+			case "h1":
+			case "h2":
+			case "h3":
+			case "h4":
+			case "h5":
+				newLine();
+				break;
+			}
+		}
+
+		@Override
+		public String toString() {
+			return builder.toString().trim();
 		}
 	}
 }

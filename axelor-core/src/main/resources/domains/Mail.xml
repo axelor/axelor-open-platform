@@ -16,6 +16,7 @@
 
     <string name="subject" namecolumn="true" />
     <string name="body" multiline="true" large="true" />
+    <string name="summary" />
 
     <string name="messageId" unique="true" readonly="true" help="Unique message identifier" />
 

@@ -124,6 +124,9 @@ libs.xstream = "com.thoughtworks.xstream:xstream:1.4.7"
 // opencsv
 libs.opencsv = "net.sf.opencsv:opencsv:2.3"
 
+// jsoup for html parsing & sanitize
+libs.jsoup = "org.jsoup:jsoup:1.8.3"
+
 // StringTemplate
 libs.ST4 = "org.antlr:ST4:4.0.7"
 

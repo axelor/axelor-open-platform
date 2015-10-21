@@ -562,9 +562,11 @@ public class MailServiceImpl implements MailService, MailConstants {
 
 		final MailMessage message = new MailMessage();
 		final String content = parser.getHtml() == null ? parser.getText() : parser.getHtml();
+		final String summary = parser.getSummary();
 
 		message.setSubject(parser.getSubject());
 		message.setBody(content);
+		message.setSummary(summary);
 		message.setRelatedModel(parent.getRelatedModel());
 		message.setRelatedId(parent.getRelatedId());
 		message.setRelatedName(parent.getRelatedName());

@@ -235,7 +235,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 	public Map<String, Object> details(MailMessage message) {
 		final String[] fields = {
 				"id", "version", "type", "author", "recipients",
-				"subject", "body", "relatedId", "relatedModel", "relatedName"};
+				"subject", "body", "summary", "relatedId", "relatedModel", "relatedName"};
 		final Map<String, Object> details = Resource.toMap(message, fields);
 		final List<Object> files = new ArrayList<>();
 
