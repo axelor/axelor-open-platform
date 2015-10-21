@@ -44,7 +44,6 @@ import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
-import com.axelor.inject.Beans;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
@@ -607,7 +606,6 @@ public class MetaService {
 			}
 
 			if ("rpc".equals(chart.getDataSet().getType())) {
-				ActionHandler handler = Beans.get(ActionHandler.class);
 				ActionRequest req = new ActionRequest();
 				ActionResponse res = new ActionResponse();
 				Map<String, Object> reqData = new HashMap<>();
@@ -622,8 +620,7 @@ public class MetaService {
 					req.setModel(ScriptBindings.class.getName());
 				}
 
-				handler = new ActionHandler(req);
-				res = handler.execute();
+				res = new ActionHandler(req).execute();
 
 				data.put("dataset", res.getData());
 
@@ -713,7 +710,6 @@ public class MetaService {
 		}
 
 		if ("rpc".equals(dataSet.getType())) {
-			ActionHandler handler = Beans.get(ActionHandler.class);
 			ActionRequest req = new ActionRequest();
 			ActionResponse res = new ActionResponse();
 
@@ -725,8 +721,7 @@ public class MetaService {
 				req.setModel(ScriptBindings.class.getName());
 			}
 
-			handler = new ActionHandler(req);
-			res = handler.execute();
+			res = new ActionHandler(req).execute();
 
 			data.put("dataset", res.getData());
 		} else {
