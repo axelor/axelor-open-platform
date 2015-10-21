@@ -227,6 +227,23 @@
 	margin-right: 2px;
 }
 
+.mail-message-body a.show-full {
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    line-height: 8px;
+    outline: none;
+    padding: 1px 6px 0px;
+    display: inline-block;
+}
+.mail-message-body a.show-full:hover {
+  background-color: #d8d8d8;
+  border-color: #cdcdcd;
+}
+
+.mail-message-body a.show-full i {
+  line-height: 6px;
+}
+
 .form-mail .fade {
 	opacity: 0.1;
 }

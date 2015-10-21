@@ -196,6 +196,11 @@ ui.directive('uiMailMessage', function () {
 
 			message.$title = (body||{}).title || message.subject;
 
+			scope.showFull = !message.summary;
+			scope.onShowFull = function () {
+				scope.showFull = true;
+			};
+
 			setTimeout(function () {
 				element.addClass('fadeIn');
 			});
@@ -251,7 +256,11 @@ ui.directive('uiMailMessage', function () {
 								"<strong>{{:: _t(item.title) }}</strong> : <span ng-bind-html='::item.value'></span>" +
 							"</li>" +
 						"</ul>" +
-						"<div ng-if='!body' ui-bind-template x-text='message.body'></div>" +
+						"<div ng-if='!body'>" +
+							"<div ng-if='message.summary && !showFull' ui-bind-template x-text='message.summary'></div>" +
+							"<div ng-if='!message.summary || showFull' ui-bind-template x-text='message.body'></div>" +
+							"<div ng-if='!showFull'><a href='' ng-click='onShowFull()' class='show-full'><i class='fa fa-ellipsis-h'></i></a></div>" +
+						"</div>" +
 						"<div class='mail-message-files' ng-show='::message.$files.length'>" +
 							"<div ui-mail-files x-removable='false' x-files='message.$files' class='inline'></div>" +
 						"</div>" +
