@@ -228,12 +228,13 @@
 }
 
 .mail-message-body a.show-full {
+    display: inline-block;
     background-color: #f1f1f1;
     border: 1px solid #ddd;
     line-height: 8px;
     outline: none;
     padding: 1px 6px 0px;
-    display: inline-block;
+    margin-top: 6px;
 }
 .mail-message-body a.show-full:hover {
   background-color: #d8d8d8;

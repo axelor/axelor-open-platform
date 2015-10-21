@@ -259,7 +259,7 @@ ui.directive('uiMailMessage', function () {
 						"<div ng-if='!body'>" +
 							"<div ng-if='message.summary && !showFull' ui-bind-template x-text='message.summary'></div>" +
 							"<div ng-if='!message.summary || showFull' ui-bind-template x-text='message.body'></div>" +
-							"<div ng-if='!showFull'><a href='' ng-click='onShowFull()' class='show-full'><i class='fa fa-ellipsis-h'></i></a></div>" +
+							"<a ng-if='!showFull' href='' ng-click='onShowFull()' class='show-full'><i class='fa fa-ellipsis-h'></i></a>" +
 						"</div>" +
 						"<div class='mail-message-files' ng-show='::message.$files.length'>" +
 							"<div ui-mail-files x-removable='false' x-files='message.$files' class='inline'></div>" +
