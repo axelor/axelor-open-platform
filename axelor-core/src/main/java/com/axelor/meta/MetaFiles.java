@@ -100,6 +100,8 @@ public class MetaFiles {
 	 * @see Files#createTempFile(String, String, FileAttribute...)
 	 */
 	public static Path createTempFile(String prefix, String suffix, FileAttribute<?>... attrs) throws IOException {
+		// make sure the upload directories exist
+		Files.createDirectories(UPLOAD_PATH_TEMP);
 		return Files.createTempFile(UPLOAD_PATH_TEMP, prefix, suffix, attrs);
 	}
 
