@@ -41,6 +41,7 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
+import com.axelor.mail.MailConstants;
 import com.axelor.mail.db.MailFollower;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.db.repo.MailMessageRepository;
@@ -266,7 +267,7 @@ final class AuditTracker {
 		message.setAuthor(user);
 		message.setRelatedId(entity.getId());
 		message.setRelatedModel(entity.getClass().getName());
-		message.setType("notification");
+		message.setType(MailConstants.MESSAGE_TYPE_NOTIFICATION);
 		add(message);
 
 		try {

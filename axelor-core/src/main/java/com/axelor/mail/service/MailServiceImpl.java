@@ -115,8 +115,6 @@ public class MailServiceImpl implements MailService, MailConstants {
 
 	private Logger log = LoggerFactory.getLogger(MailService.class);
 
-	private static final String NOTIFICATION = "notification";
-
 	static final class FalseFuture implements Future<Boolean> {
 
 		@Override
@@ -338,7 +336,7 @@ public class MailServiceImpl implements MailService, MailConstants {
 	protected String template(final MailMessage message, Model entity) throws IOException {
 
 		final String text = message.getBody().trim();
-		if (text == null || !NOTIFICATION.equals(message.getType()) || !(text.startsWith("{") || text.startsWith("}"))) {
+		if (text == null || !MESSAGE_TYPE_NOTIFICATION.equals(message.getType()) || !(text.startsWith("{") || text.startsWith("}"))) {
 			return text;
 		}
 
@@ -567,6 +565,7 @@ public class MailServiceImpl implements MailService, MailConstants {
 		message.setSubject(parser.getSubject());
 		message.setBody(content);
 		message.setSummary(summary);
+		message.setType(MESSAGE_TYPE_EMAIL);
 		message.setRelatedModel(parent.getRelatedModel());
 		message.setRelatedId(parent.getRelatedId());
 		message.setRelatedName(parent.getRelatedName());
@@ -658,6 +657,7 @@ public class MailServiceImpl implements MailService, MailConstants {
 						try {
 							fetch(reader);
 						} catch (Exception e) {
+							log.error("Unable to fetch messages", e);
 							result[0] = false;
 						}
 					}

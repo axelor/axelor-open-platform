@@ -38,6 +38,7 @@ import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
+import com.axelor.mail.MailConstants;
 import com.axelor.mail.MailException;
 import com.axelor.mail.db.MailFlags;
 import com.axelor.mail.db.MailMessage;
@@ -123,10 +124,11 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		if (entity.getParent() == null && entity.getRelatedId() != null) {
 			MailMessage parent = all()
 				.filter("self.parent is null AND "
-						+ "self.type = 'notification' AND "
+						+ "self.type = :type AND "
 						+ "self.relatedId = :id AND self.relatedModel = :model")
 				.bind("id", entity.getRelatedId())
 				.bind("model", entity.getRelatedModel())
+				.bind("type", MailConstants.MESSAGE_TYPE_NOTIFICATION)
 				.order("id")
 				.cacheable()
 				.autoFlush(false)
@@ -151,7 +153,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		}
 
 		boolean isNew = entity.getId() == null;
-		boolean isNotification = "notification".equals(entity.getType());
+		boolean isNotification = MailConstants.MESSAGE_TYPE_NOTIFICATION.equals(entity.getType());
 
 		// make sure to set unique message-id
 		if (entity.getMessageId() == null) {
@@ -254,7 +256,8 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 
 		String eventType = message.getType();
 		String eventText = I18n.get("updated document");
-		if ("comment".equals(eventType)) {
+		if (MailConstants.MESSAGE_TYPE_COMMENT.equals(eventType) ||
+			MailConstants.MESSAGE_TYPE_EMAIL.equals(eventType)) {
 			eventText = I18n.get("added comment");
 			details.put("$canDelete", message.getCreatedBy() == AuthUtils.getUser());
 		}
