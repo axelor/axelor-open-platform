@@ -69,7 +69,6 @@ import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailAddress;
 import com.axelor.mail.db.MailFollower;
 import com.axelor.mail.db.MailMessage;
-import com.axelor.mail.db.repo.MailAddressRepository;
 import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.mail.web.MailController;
@@ -604,9 +603,7 @@ public class RestService extends ResourceService {
 			return messageFollowers(id);
 		}
 
-		final MailAddressRepository addresses = Beans.get(MailAddressRepository.class);
-		for (MailAddress item : message.getRecipients()) {
-			MailAddress address = addresses.findOrCreate(item.getAddress(), item.getPersonal());
+		for (MailAddress address : message.getRecipients()) {
 			followers.follow(entity, address);
 		}
 
