@@ -17,8 +17,6 @@
  */
 package com.axelor.mail.service;
 
-import java.util.concurrent.Future;
-
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -35,10 +33,7 @@ public class MailFetchJob implements Job {
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		final MailService service = Beans.get(MailService.class);
 		try {
-			final Future<Boolean> fetching = service.fetch();
-			if (!fetching.isCancelled()) {
-				fetching.get();
-			}
+			service.fetch();
 		} catch (Exception e) {
 			throw new JobExecutionException(e);
 		}

@@ -18,8 +18,6 @@
 package com.axelor.mail.service;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 import javax.mail.internet.InternetAddress;
 
@@ -37,33 +35,18 @@ public interface MailService {
 	/**
 	 * Send a mail for the given {@link MailMessage}.
 	 *
-	 * <p>
-	 * It sends email asynchronously using {@link ExecutorService} to prevent
-	 * process blocking. However, clients can wait for action to complete by
-	 * calling {@link Future#get()}.
-	 * </p>
-	 *
 	 * @param message
 	 *            the message to send
-	 * @return a {@link Future} object
 	 * @throws MailException
 	 */
-	Future<Boolean> send(MailMessage message) throws MailException;
+	void send(MailMessage message) throws MailException;
 
 	/**
 	 * Fetch mails from remote mail server.
 	 *
-	 * <p>
-	 * This method is meant to be called by a background job runner, running
-	 * under database transaction with super user. The implementation should
-	 * process all incoming email messages and may save them as
-	 * {@link MailMessage}.
-	 * </p>
-	 *
-	 * @return a {@link Future} object
 	 * @throws MailException
 	 */
-	Future<Boolean> fetch() throws MailException;
+	void fetch() throws MailException;
 
 	/**
 	 * Search for email addresses matching the given text.

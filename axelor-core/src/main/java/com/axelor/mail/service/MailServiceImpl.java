@@ -31,12 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import javax.activation.DataSource;
 import javax.inject.Singleton;
@@ -114,35 +110,6 @@ public class MailServiceImpl implements MailService, MailConstants {
 	private ExecutorService executor = Executors.newCachedThreadPool();
 
 	private Logger log = LoggerFactory.getLogger(MailService.class);
-
-	static final class FalseFuture implements Future<Boolean> {
-
-		@Override
-		public boolean cancel(boolean mayInterruptIfRunning) {
-			return false;
-		}
-
-		@Override
-		public boolean isCancelled() {
-			return false;
-		}
-
-		@Override
-		public boolean isDone() {
-			return true;
-		}
-
-		@Override
-		public Boolean get() throws InterruptedException, ExecutionException {
-			return false;
-		}
-
-		@Override
-		public Boolean get(long timeout, TimeUnit unit)
-				throws InterruptedException, ExecutionException, TimeoutException {
-			return false;
-		}
-	}
 
 	public MailServiceImpl() {
 	}
@@ -376,43 +343,14 @@ public class MailServiceImpl implements MailService, MailConstants {
 	}
 
 	@Override
-	public Future<Boolean> send(final MailMessage message) throws MailException {
-
+	public void send(final MailMessage message) throws MailException {
+		Preconditions.checkNotNull(message, "mail message can't be null");
 		final Model related = findEntity(message);
 		final MailSender sender = getMailSender(message, related);
 		if (sender == null) {
-			return new FalseFuture();
+			return;
 		}
 
-		return executor.submit(new Callable<Boolean>() {
-			@Override
-			public Boolean call() throws Exception {
-				send(sender, message);
-				return true;
-			}
-		});
-	}
-
-	/**
-	 * Send an email for the given message using the given mail sender.
-	 *
-	 * <p>
-	 * This method runs under a transaction with super user access. It calls
-	 * {@link #messageSent(MimeMessage, MailMessage)} after email is
-	 * successfully sent. If that method returns updated {@link MailMessage}, it
-	 * will persist the updated {@link MailMessage} record.
-	 * </p>
-	 *
-	 * @param store
-	 *            the mail store to fetch message from
-	 * @throws MailException
-	 */
-	@Transactional(rollbackOn = Exception.class)
-	protected void send(final MailSender sender, final MailMessage message) throws MessagingException, IOException {
-		Preconditions.checkNotNull(sender, "mail sender can't be null");
-		Preconditions.checkNotNull(message, "mail message can't be null");
-
-		final Model related = findEntity(message);
 		final Set<String> recipients = recipients(message, related);
 		if (recipients.isEmpty()) {
 			return;
@@ -425,74 +363,76 @@ public class MailServiceImpl implements MailService, MailConstants {
 			builder.to(recipient);
 		}
 
-		builder.html(template(message, related));
-
 		for (MetaAttachment attachment : messages.findAttachments(message)) {
 			final Path filePath = MetaFiles.getPath(attachment.getMetaFile());
 			final File file = filePath.toFile();
 			builder.attach(file.getName(), file.toString());
 		}
 
-		final AuditableRunner runner = Beans.get(AuditableRunner.class);
+		final MimeMessage email;
 		try {
-			runner.run(new Callable<Boolean>() {
-				@Override
-				public Boolean call() throws Exception {
-					final MimeMessage email = builder.build(message.getMessageId());
-					final List<String> references = new ArrayList<>();
-					if (message.getParent() != null) {
-						references.add(message.getParent().getMessageId());
-					}
-					if (message.getRoot() != null) {
-						references.add(message.getRoot().getMessageId());
-					}
-					if (!references.isEmpty()) {
-						email.setHeader("X-References", Joiner.on(" ").skipNulls().join(references));
-					}
-
-					sender.send(email);
-					final MailMessage updated = messageSent(email, message);
-					if (updated != null && updated.getId() != null) {
-						messages.save(updated);
-					}
-					return true;
-				}
-			});
-		} catch (Exception e) {
-			throw new MessagingException("Unable to send email", e);
+			builder.html(template(message, related));
+			email = builder.build(message.getMessageId());
+			final Set<String> references = new LinkedHashSet<>();
+			if (message.getParent() != null) {
+				references.add(message.getParent().getMessageId());
+			}
+			if (message.getRoot() != null) {
+				references.add(message.getRoot().getMessageId());
+			}
+			if (!references.isEmpty()) {
+				email.setHeader("X-References", Joiner.on(" ").skipNulls().join(references));
+			}
+		} catch (MessagingException | IOException e) {
+			throw new MailException(e);
 		}
+
+		// send email using a separate process to void thread blocking
+		executor.submit(new Callable<Boolean>() {
+			@Override
+			public Boolean call() throws Exception {
+				send(sender, email);
+				return true;
+			}
+		});
+	}
+
+	@Transactional(rollbackOn = Exception.class)
+	protected void send(final MailSender sender, final MimeMessage email) throws Exception {
+		final AuditableRunner runner = Beans.get(AuditableRunner.class);
+		final Callable<Boolean> job = new Callable<Boolean>() {
+			@Override
+			public Boolean call() throws Exception {
+				sender.send(email);
+				messageSent(email);
+				return true;
+			}
+		};
+		runner.run(job);
 	}
 
 	/**
-	 * This method is called when an email message is sent for the given
-	 * message.
+	 * This method is called when email is sent successfully.
 	 *
 	 * <p>
-	 * This method called by {@link #send(MailSender, MailMessage)} which is
-	 * running under data transaction. If {@link MailMessage} is not updated,
-	 * this method should return null.
+	 * This method is called by {@link #send(MailSender, MimeMessage)} which is
+	 * running under a transaction with super user access.
 	 * </p>
 	 *
 	 * @param email
 	 *            the email message sent
-	 * @param message
-	 *            the {@link MailMessage} for which the email is sent
-	 * @return the update {@link MailMessage} instance or null if not updated
-	 * @throws MessagingException
-	 * @throws {@link IOException}
 	 */
-	protected MailMessage messageSent(MimeMessage email, MailMessage message) throws MessagingException, IOException {
-		return null;
+	protected void messageSent(final MimeMessage email) {
 	}
 
 	/**
 	 * This method is called when a new email message received.
 	 *
 	 * <p>
-	 * The method is called by {@link #fetch(Store)} which is running under
-	 * database transaction. If this method returns an instance of
-	 * {@link MailMessage}, the {@link #fetch(Store)} will persist the record.
-	 * Return null ignore the message.
+	 * This method is called by {@link #fetch(MailReader)} which is running
+	 * under a database transaction. If this method returns an instance of
+	 * {@link MailMessage}, the {@link #fetch(MailReader)} will persist the
+	 * record.
 	 * </p>
 	 *
 	 * <p>
@@ -640,29 +580,20 @@ public class MailServiceImpl implements MailService, MailConstants {
 	}
 
 	@Override
-	public Future<Boolean> fetch() throws MailException {
+	public void fetch() throws MailException {
 		final MailReader reader = getMailReader();
 		if (reader == null) {
-			return new FalseFuture();
+			return;
 		}
-		return executor.submit(new Callable<Boolean>() {
-
+		final AuditableRunner runner = Beans.get(AuditableRunner.class);
+		runner.run(new Runnable() {
 			@Override
-			public Boolean call() throws Exception {
-				final boolean[] result = { true };
-				final AuditableRunner runner = Beans.get(AuditableRunner.class);
-				runner.run(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							fetch(reader);
-						} catch (Exception e) {
-							log.error("Unable to fetch messages", e);
-							result[0] = false;
-						}
-					}
-				});
-				return result[0];
+			public void run() {
+				try {
+					fetch(reader);
+				} catch (Exception e) {
+					log.error("Unable to fetch messages", e);
+				}
 			}
 		});
 	}
