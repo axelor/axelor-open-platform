@@ -21,6 +21,8 @@ import java.util.List;
 
 import javax.mail.internet.InternetAddress;
 
+import com.axelor.auth.db.User;
+import com.axelor.db.Model;
 import com.axelor.mail.MailException;
 import com.axelor.mail.db.MailMessage;
 import com.google.inject.ImplementedBy;
@@ -47,6 +49,24 @@ public interface MailService {
 	 * @throws MailException
 	 */
 	void fetch() throws MailException;
+
+	/**
+	 * Resolve the given email address to an associated entity.
+	 *
+	 * <p>
+	 * Generally, it should resolve to the {@link User}, <code>Contact</code>,
+	 * <code>Partner</code> or <code>Customer</code> that represents a contact.
+	 * </p>
+	 *
+	 * <p>
+	 * The default implementation resolves to the {@link User} records.
+	 * </p>
+	 *
+	 * @param email
+	 *            the email address to resolve
+	 * @return associated entity or null if can't be resolved
+	 */
+	Model resolve(String email);
 
 	/**
 	 * Search for email addresses matching the given text.

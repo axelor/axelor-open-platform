@@ -66,9 +66,11 @@ import com.axelor.mail.MailParser;
 import com.axelor.mail.MailReader;
 import com.axelor.mail.MailSender;
 import com.axelor.mail.SmtpAccount;
+import com.axelor.mail.db.MailAddress;
 import com.axelor.mail.db.MailFollower;
 import com.axelor.mail.db.MailGroup;
 import com.axelor.mail.db.MailMessage;
+import com.axelor.mail.db.repo.MailAddressRepository;
 import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.meta.MetaFiles;
@@ -270,13 +272,13 @@ public class MailServiceImpl implements MailService, MailConstants {
 		final MailFollowerRepository followers = Beans.get(MailFollowerRepository.class);
 
 		if (message.getRecipients() != null) {
-			for (User user : message.getRecipients()) {
-				recipients.add(user.getEmail());
+			for (MailAddress address : message.getRecipients()) {
+				recipients.add(address.getAddress());
 			}
 		}
 		for (MailFollower follower : followers.findAll(message)) {
-			if (follower.getUser() != null) {
-				recipients.add(follower.getUser().getEmail());
+			if (follower.getEmail() != null && follower.getArchived() != Boolean.TRUE) {
+				recipients.add(follower.getEmail().getAddress());
 			}
 		}
 
@@ -480,6 +482,7 @@ public class MailServiceImpl implements MailService, MailConstants {
 		}
 
 		final UserRepository users = Beans.get(UserRepository.class);
+		final MailAddressRepository emails = Beans.get(MailAddressRepository.class);
 		final MailMessageRepository messages = Beans.get(MailMessageRepository.class);
 
 		final MailMessage parent = messages.all().filter("self.messageId in (:ids)").bind("ids", parentIds).fetchOne();
@@ -510,15 +513,17 @@ public class MailServiceImpl implements MailService, MailConstants {
 		message.setRelatedId(parent.getRelatedId());
 		message.setRelatedName(parent.getRelatedName());
 
-		final String from = parser.getFrom().getAddress();
-		final User author = users.all().filter("self.email = ?", from).fetchOne();
+		final InternetAddress from = parser.getFrom();
+		final MailAddress address = emails.findOrCreate(from.getAddress(), from.getPersonal());
+		final User author = users.findByEmail(from.getAddress());
 
 		message.setAuthor(author);
+		message.setFrom(address);
 
 		// need to save before attaching files
 		messages.save(message);
 
-		log.info("message created with author: {}", author == null ? from : author);
+		log.info("message from: {}", from.getAddress());
 
 		// handle attachments
 		final MetaAttachmentRepository attachments = Beans.get(MetaAttachmentRepository.class);
@@ -596,6 +601,12 @@ public class MailServiceImpl implements MailService, MailConstants {
 				}
 			}
 		});
+	}
+
+	@Override
+	public Model resolve(String email) {
+		final UserRepository users = Beans.get(UserRepository.class);
+		return users.all().filter("self.email is not null and self.email = ?", email).fetchOne();
 	}
 
 	@Override

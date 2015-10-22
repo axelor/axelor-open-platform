@@ -19,8 +19,10 @@ package com.axelor.mail.db.repo;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
@@ -40,12 +42,15 @@ import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.mail.MailConstants;
 import com.axelor.mail.MailException;
+import com.axelor.mail.db.MailAddress;
 import com.axelor.mail.db.MailFlags;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.service.MailService;
 import com.axelor.meta.MetaFiles;
+import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
+import com.axelor.meta.db.repo.MetaActionRepository;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.rpc.Resource;
 import com.google.inject.persist.Transactional;
@@ -60,6 +65,9 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 
 	@Inject
 	private MetaAttachmentRepository attachmentRepo;
+
+	@Inject
+	private MetaActionRepository actionRepo;
 
 	private Logger log = LoggerFactory.getLogger(MailMessageRepository.class);
 
@@ -199,6 +207,16 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		} catch (Exception e) {
 		}
 
+		if (message.getRecipients() != null) {
+			final Set<MailAddress> recipients = new HashSet<>();
+			final MailAddressRepository addresses = Beans.get(MailAddressRepository.class);
+			for (MailAddress address : message.getRecipients()) {
+				recipients.add(addresses.findOrCreate(address.getAddress(), address.getPersonal()));
+			}
+			message.clearRecipients();
+			message.setRecipients(recipients);
+		}
+
 		message = save(message);
 
 		if (files == null || files.isEmpty()) {
@@ -235,12 +253,11 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 	}
 
 	public Map<String, Object> details(MailMessage message) {
-		final String[] fields = {
-				"id", "version", "type", "author", "recipients",
-				"subject", "body", "summary", "relatedId", "relatedModel", "relatedName"};
+		final String[] fields = { "id", "type", "subject", "body", "summary", "relatedId", "relatedModel", "relatedName" };
 		final Map<String, Object> details = Resource.toMap(message, fields);
 		final List<Object> files = new ArrayList<>();
 
+		final MailService mailService = Beans.get(MailService.class);
 		final MailFlagsRepository repoFlags = Beans.get(MailFlagsRepository.class);
 
 		final MailFlags flags = repoFlags.findBy(message, AuthUtils.getUser());
@@ -262,13 +279,32 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 			details.put("$canDelete", message.getCreatedBy() == AuthUtils.getUser());
 		}
 
+		final MailAddress email = message.getFrom();
+		final User user = message.getAuthor();
+
+		Model author = user;
+		if (author == null && email != null) {
+			author = mailService.resolve(email.getAddress());
+		}
+
+		if (author != null) {
+			final String authorModel = EntityHelper.getEntityClass(author).getName();
+			final MetaAction authorAction = actionRepo.all()
+					.filter("self.type = 'action-view' and self.model = ?", authorModel).fetchOne();
+			if (authorAction != null) {
+				details.put("$authorAction", authorAction.getName());
+			}
+			details.put("$authorModel", authorModel);
+		}
+
 		String avatar = "img/user.png";
-		User author = message.getAuthor();
-		if (author != null && author.getImage() != null) {
-			avatar = "ws/rest/" + User.class.getName() + "/" + author.getId() + "/image/download?image=true&v=" + author.getVersion();
+		if (user != null && user.getImage() != null) {
+			avatar = "ws/rest/" + User.class.getName() + "/" + user.getId() + "/image/download?image=true&v=" + user.getVersion();
 		}
 
 		details.put("$avatar", avatar);
+		details.put("$from", Resource.toMap(email, "address", "personal"));
+		details.put("$author", author);
 		details.put("$files", files);
 		details.put("$eventType", eventType);
 		details.put("$eventText", eventText);

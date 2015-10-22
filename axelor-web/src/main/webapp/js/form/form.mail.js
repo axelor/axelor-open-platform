@@ -207,7 +207,7 @@ ui.directive('uiMailMessage', function () {
 		},
 		template: "" +
 			"<div class='fade'>" +
-				"<a href='' class='pull-left avatar' title='{{::$userName(message.createdBy)}}' ng-click='showUser(message.author)'>" +
+				"<a href='' class='pull-left avatar' title='{{::$userName(message)}}' ng-click='showAuthor(message)'>" +
 					"<img ng-src='{{::message.$avatar}}' width='32px'>" +
 				"</a>" +
 				"<div class='mail-message'>" +
@@ -269,7 +269,7 @@ ui.directive('uiMailMessage', function () {
 								"<a href='' ng-click='onReplies(message)'>{{formatNumReplies(message)}}</a>" +
 							"</span>" +
 							"<span>" +
-								"<a href='' ng-click='showUser(message.author)'>{{::$userName(message.author)}}</a> " +
+								"<a href='' ng-click='showAuthor(message)'>{{::$userName(message)}}</a> " +
 								"<span>{{formatEvent(message)}}</span>" +
 							"</span>" +
 						"</div>" +
@@ -514,6 +514,10 @@ ui.directive('uiMailFiles', [function () {
 ui.directive('uiMailEditor', ["$compile", function ($compile) {
 
 	return function (scope, element, attrs) {
+
+		var title = scope.$eval(attrs.emailTitle) || _t("Email");
+		var sendTitle = scope.$eval(attrs.sendTitle) || _t("Send");
+
 		scope._viewParams = {
 			model: "com.axelor.mail.db.MailMessage",
 			type: "form",
@@ -521,7 +525,7 @@ ui.directive('uiMailEditor', ["$compile", function ($compile) {
 			},
 			views: [{
 				type: "form",
-				title: _t("Email"),
+				title: title,
 				css: "mail-editor",
 				items: [{
 					type: "panel",
@@ -572,7 +576,7 @@ ui.directive('uiMailEditor', ["$compile", function ($compile) {
 				var editor = $compile('<div ui-editor-popup x-buttons="buttons"></div>')(popup);
 				var buttons = editor.parent().find(".ui-dialog-buttonpane");
 
-				buttons.find(".button-ok").text(_t("Send"));
+				buttons.find(".button-ok").text(sendTitle);
 
 				var attach = $('<button type="button" class="btn"><i class="fa fa-paperclip"></i></button>')
 				.click(function() {
@@ -621,6 +625,7 @@ ui.formInput('uiMailSelect', 'MultiSelect', {
 	link_editable: function (scope, element, attrs, model) {
 		this._super.apply(this, arguments);
 
+		var field = scope.field;
 		var selectionMap = {};
 
 		scope.formatItem = function(value) {
@@ -636,6 +641,10 @@ ui.formInput('uiMailSelect', 'MultiSelect', {
 		scope.handleSelect = function(e, ui) {
 			var item = ui.item;
 			selectionMap[item.value] = item;
+			// store selection map in record to find display names
+			if (scope.record) {
+				scope.record["$" + field.name + "Map"] = selectionMap;
+			}
 			return handleSelect.apply(scope, arguments);
 		};
 
@@ -724,11 +733,13 @@ ui.formWidget('uiMailComposer', {
 
 			var text = email.body || email.post;
 			var files = _.pluck(email.files, "id");
+			var recipients = email.recipients;
 
 			return ds.messagePost(record.id, text, {
 				type: 'comment',
 				parent: parent.id && parent,
-				files: files
+				files: files,
+				recipients: recipients
 			}).success(function (res) {
 				var message = _.first(res.data);
 				var messages = $scope.$parent.messages || [];
@@ -784,6 +795,17 @@ ui.formWidget('uiMailComposer', {
 				files: scope.files
 			};
 			scope.onEditEmail(record, function (record) {
+				var map = record.$recipientsMap || {};
+				var recipients = record.recipients || "";
+
+				record.recipients = _.map(recipients.split(","), function (item) {
+					var email = item.trim();
+					return _.extend({
+						address: email,
+						personal: (map[email]||{}).label || email
+					});
+				});
+
 				scope.sendEmail(record);
 			});
 		};
@@ -812,32 +834,27 @@ ui.formWidget('uiMailFollowers', {
 	controller: ['$scope', 'ViewService', 'MessageService', function ($scope, ViewService, MessageService) {
 
 		var ds = $scope._dataSource;
-		var userSelector = null;
 
-		$scope.editorCanSave = false;
-		$scope._viewParams = {
-			model: 'com.axelor.auth.db.User',
-			viewType: 'form',
-			views: [{type: 'form'}, {type: 'grid'}]
-		};
+		$scope.emailTitle = _t("Add followers");
+		$scope.sendTitle = _t("Add");
 
 		$scope.following = false;
 		$scope.followers = [];
 
 		$scope.updateStatus = function() {
 			var followers = $scope.followers || [];
-			var found = _.findWhere(followers, {
-				code: axelor.config["user.login"]
+			var found = _.find(followers, function (item) {
+				return item.$author && item.$author.code === axelor.config["user.login"]
 			});
 			$scope.following = !!found;
 		};
 
-		$scope.select = function (records) {
+		function sendEmail(email) {
 
 			var ds = $scope._dataSource;
 			var record = $scope.record || {};
 			var promise = ds.messageFollow(record.id, {
-				records: records
+				email: email
 			});
 
 			promise.success(function (res) {
@@ -846,14 +863,31 @@ ui.formWidget('uiMailFollowers', {
 			});
 		};
 
+		function findName() {
+			var record = $scope.record || {};
+			var fields = $scope.fields || {};
+			var name = _.findWhere(fields, {nameColumn: true});
+			return record[name] || record.name || record.code || "";
+		}
+
 		$scope.onAddFollowers = function () {
+			var record = {
+				subject: _t("Follow: {0}", findName())
+			};
+			$scope.onEditEmail(record, function (record) {
 
-			if (userSelector == null) {
-				userSelector = ViewService.compile('<div ui-selector-popup x-select-mode="multi"></div>')($scope);
-			}
+				var map = record.$recipientsMap || {};
+				var recipients = record.recipients || "";
 
-			var popup = userSelector.isolateScope();
-			popup.show();
+				record.recipients = _.map(recipients.split(","), function (item) {
+					var email = item.trim();
+					return _.extend({
+						address: email,
+						personal: (map[email]||{}).label || email
+					});
+				});
+				sendEmail(record);
+			});
 		};
 
 		$scope.onFollow = function () {
@@ -867,21 +901,20 @@ ui.formWidget('uiMailFollowers', {
 			});
 		};
 
-		$scope.onUnfollow = function (user) {
-
+		$scope.onUnfollow = function (follower) {
 			axelor.dialogs.confirm(_t('Are you sure to unfollow this document?'),
 			function (confirmed) {
 				if (confirmed) {
-					doUnfollow(user);
+					doUnfollow(follower);
 				}
 			});
 		};
 
-		function doUnfollow(user) {
-
+		function doUnfollow(follower) {
+			var followerId = (follower||{}).id;
 			var record = $scope.record || {};
 			var promise = ds.messageUnfollow(record.id, {
-				records: _.compact([user])
+				records: _.compact([followerId])
 			});
 
 			promise.success(function (res) {
@@ -917,14 +950,14 @@ ui.formWidget('uiMailFollowers', {
 				"<div class='icons pull-right'>" +
 					"<i class='fa fa-star-o' ng-click='onFollow()' ng-show='!following'></i>" +
 					"<i class='fa fa-star' ng-click='onUnfollow()' ng-show='following'></i>" +
-					"<i class='fa fa-plus' ng-click='onAddFollowers()'></i>" +
+					"<i class='fa fa-plus' ui-mail-editor x-email-title='emailTitle' x-send-title='sendTitle' ng-click='onAddFollowers()'></i>" +
 				"</div>" +
 			"</div>" +
 			"</div>" +
 			"<div class='panel-body'>" +
 			"<ul class='links'>" +
 				"<li ng-repeat='follower in followers'>" +
-				"<a href='' ng-click='showUser(follower)'>{{$userName(follower)}}</a> " +
+				"<a href='' ng-click='showAuthor(follower)'>{{$userName(follower)}}</a> " +
 				"<i class='fa fa-remove' ng-click='onUnfollow(follower)'></i>" +
 				"</li>" +
 			"</ul>" +
@@ -941,20 +974,33 @@ ui.formWidget('PanelMail', {
 			return {};
 		};
 
-		$scope.showUser = function (author) {
-			if (!author) {
+		$scope.showAuthor = function (message) {
+			var msg = message || {};
+			var act = msg.$authorAction;
+			var author = msg.$author;
+			var model = msg.$authorModel;
+			if (!author || !author.id) {
 				return;
 			}
-			NavService.openTabByName("form:user-form", {
+			NavService.openTab({
+				action: act || _.uniqueId('$act'),
+				model: model,
+				viewType: "form",
+				views: [{ type: "form" }]
+			}, {
 				mode: "edit",
 				state: author.id
 			});
 		};
 
-		$scope.$userName = function (user) {
-			if (!user) return null;
+		$scope.$userName = function (message) {
+			var msg = message || {};
+			var author = msg.$author || msg.$from;
+			if (!author) {
+				return null;
+			}
 			var key = axelor.config["user.nameField"] || "name";
-			return user[key] || user.name;
+			return author.personal || author[key] || author.name || author.fullName || author.displayName;
 		};
 
 		var folder;

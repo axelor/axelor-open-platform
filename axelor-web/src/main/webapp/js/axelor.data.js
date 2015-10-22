@@ -412,7 +412,8 @@
 					body : text,
 					type: opts.type,
 					parent: opts.parent,
-					files: opts.files
+					files: opts.files,
+					recipients: opts.recipients
 				});
 
 				var promise = this._request('message', id).post({
@@ -435,7 +436,7 @@
 			messageFollow: function (id, options) {
 				var opts = _.extend({}, options);
 				var promise = this._request('follow', id).post({
-					records: opts.records
+					data: opts.email
 				});
 
 				promise.success = function(fn) {

@@ -5,14 +5,29 @@
 
   <module name="mail" package="com.axelor.mail.db"/>
 
+  <entity name="MailAddress" table="MAIL_ADDRESS" cachable="true" repository="none">
+    <![CDATA[
+    The model to store email addresses.
+    ]]>
+    <string name="address" column="email_address" required="true" />
+    <string name="personal" column="personal_name" />
+  </entity>
+
   <entity name="MailMessage" table="MAIL_MESSAGE" cachable="true" repository="none">
     <![CDATA[
     The model to store different kind of messages like system notifications,
     comments, email messages etc.
     ]]>
     <string name="type" selection="message.type.selection" />
+
+    <!-- user as author (from), used for audit tracking -->
     <many-to-one name="author" ref="com.axelor.auth.db.User" />
-    <many-to-many name="recipients" ref="com.axelor.auth.db.User" />
+
+    <!-- sender address -->
+    <many-to-one name="from" column="email_from" ref="MailAddress" />
+
+    <!-- recipient addresses -->
+    <many-to-many name="recipients" ref="MailAddress" />
 
     <string name="subject" namecolumn="true" />
     <string name="body" multiline="true" large="true" />
@@ -49,7 +64,12 @@
     ]]>
     <long name="relatedId" />
     <string name="relatedModel" />
+
+    <!-- follow by user id -->
     <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" />
+
+    <!-- follow by email id -->
+    <many-to-one name="email" ref="MailAddress" />
   </entity>
 
   <entity name="MailGroup" table="MAIL_GROUP" cachable="true" repository="none">
