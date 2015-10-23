@@ -99,7 +99,7 @@ data.export.encoding = UTF-8
 # ~~~~~
 data.export.dir = {user.home}/.axelor/data-export
 
-# Specify whether to import demo data for the application
+# Specify whether to import demo data
 # ~~~~~
 data.import.demo-data = true
 
@@ -154,9 +154,9 @@ ldap.user.filter = (uid={0})
 # the attribute to map to user email
 #cas.attrs.user.email = mail
 
-##
 # Quartz Scheduler
-##
+# ~~~~~
+# quartz job scheduler
 
 # Specify whether to enable quartz scheduler
 quartz.enable = false
@@ -165,9 +165,36 @@ quartz.enable = false
 # the number of jobs that can run simultaneously
 quartz.threadCount = 3
 
-##
+# SMPT configuration
+# ~~~~~
+# SMTP server configuration
+#mail.smtp.host = smtp.gmail.com
+#mail.smtp.port = 587
+#mail.smtp.channel = starttls
+#mail.smtp.user = user.name@gmail.com
+#mail.smtp.pass =
+
+# timeout settings
+#mail.smtp.timeout = 60000
+#mail.smtp.connectionTimeout = 60000
+
+# IMAP configuration
+# ~~~~~
+# IMAP server configuration
+# (quartz scheduler should be enabled for fetching stream replies)
+#mail.imap.host = imap.gmail.com
+#mail.imap.port = 993
+#mail.imap.channel = ssl
+#mail.imap.user = user.name@axelor.com
+#mail.imap.pass =
+
+# timeout settings
+#mail.imap.timeout = 60000
+#mail.imap.connectionTimeout = 60000
+
 # CORS configuration
-##
+# ~~~~~
+# CORS settings to allow cross origin requests
 
 # regular expression to test allowed origin or * to allow all (not recommended)
 #cors.allow.origin = *
@@ -175,21 +202,11 @@ quartz.threadCount = 3
 #cors.allow.methods = GET,PUT,POST,DELETE,HEAD,OPTIONS
 #cors.allow.headers = Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers
 
-##
 # View configuration
-##
+# ~~~~~
 
 # Set to true to enable single view mode
 view.single.tab = false
 
 # Set menu style (left, top, both)
 view.menubar.location = both
-
-# Show button titles in toolbar
-view.toolbar.titles = false
-
-# Show confirm dialog with yes/no buttons (default is Cancel/OK)
-view.confirm.yes-no = false
-
-# Whether to enable hot-edit feature
-view.form.hot-edit = true
