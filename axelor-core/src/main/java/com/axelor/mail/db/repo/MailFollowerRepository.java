@@ -51,9 +51,12 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 	}
 
 	public List<MailFollower> findAll(Model entity, int limit) {
+		if (entity == null) {
+			return new ArrayList<>();
+		}
 
-		Long relatedId;
-		String relatedModel;
+		final Long relatedId;
+		final String relatedModel;
 
 		if (entity instanceof MailMessage) {
 			relatedId = ((MailMessage) entity).getRelatedId();
@@ -63,24 +66,60 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 			relatedModel = EntityHelper.getEntityClass(entity).getName();
 		}
 
+		if (relatedId == null || relatedModel == null) {
+			return new ArrayList<>();
+		}
+
 		return all().filter("self.relatedModel = ? AND self.relatedId = ?",
 				relatedModel, relatedId).fetch(limit);
 	}
 
 	public MailFollower findOne(Model entity, User user) {
-		MailFollower follower = all()
-				.filter("self.relatedId = ? AND self.relatedModel = ? AND self.user.id = ?",
-						entity.getId(), EntityHelper.getEntityClass(entity).getName(),
-						user.getId()).fetchOne();
-		return follower;
+		if (entity == null || user == null) {
+			return null;
+		}
+
+		final Long relatedId;
+		final String relatedModel;
+
+		if (entity instanceof MailMessage) {
+			relatedId = ((MailMessage) entity).getRelatedId();
+			relatedModel = ((MailMessage) entity).getRelatedModel();
+		} else {
+			relatedId = entity.getId();
+			relatedModel = EntityHelper.getEntityClass(entity).getName();
+		}
+
+		if (relatedId == null || relatedModel == null) {
+			return null;
+		}
+
+		return all().filter("self.relatedId = ? AND self.relatedModel = ? AND self.user.id = ?", entity.getId(),
+				EntityHelper.getEntityClass(entity).getName(), user.getId()).fetchOne();
 	}
 
 	public MailFollower findOne(Model entity, MailAddress address) {
-		MailFollower follower = all()
-				.filter("self.relatedId = ? AND self.relatedModel = ? AND self.email.address = ?",
-						entity.getId(), EntityHelper.getEntityClass(entity).getName(),
-						address.getAddress()).fetchOne();
-		return follower;
+		if (entity == null || address == null) {
+			return null;
+		}
+
+		final Long relatedId;
+		final String relatedModel;
+
+		if (entity instanceof MailMessage) {
+			relatedId = ((MailMessage) entity).getRelatedId();
+			relatedModel = ((MailMessage) entity).getRelatedModel();
+		} else {
+			relatedId = entity.getId();
+			relatedModel = EntityHelper.getEntityClass(entity).getName();
+		}
+
+		if (relatedId == null || relatedModel == null) {
+			return null;
+		}
+
+		return all().filter("self.relatedId = ? AND self.relatedModel = ? AND self.user.id = ?", entity.getId(),
+				EntityHelper.getEntityClass(entity).getName(), address.getId()).fetchOne();
 	}
 
 	public List<Map<String, Object>> findFollowers(Model entity) {

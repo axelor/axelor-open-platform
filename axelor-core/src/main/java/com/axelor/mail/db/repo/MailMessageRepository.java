@@ -245,6 +245,9 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 	}
 
 	public List<MetaAttachment> findAttachments(MailMessage message) {
+		if (message == null || message.getId() == null) {
+			return new ArrayList<>();
+		}
 		final MetaAttachmentRepository repoAttachments = Beans.get(MetaAttachmentRepository.class);
 		return repoAttachments.all().filter(
 				"self.objectId = ? AND self.objectName = ?",
