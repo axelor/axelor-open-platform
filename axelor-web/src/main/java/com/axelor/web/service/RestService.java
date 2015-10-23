@@ -59,6 +59,7 @@ import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.common.ClassUtils;
 import com.axelor.common.FileUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
@@ -71,6 +72,7 @@ import com.axelor.mail.db.MailFollower;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
+import com.axelor.mail.service.MailService;
 import com.axelor.mail.web.MailController;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaFiles;
@@ -605,6 +607,15 @@ public class RestService extends ResourceService {
 
 		for (MailAddress address : message.getRecipients()) {
 			followers.follow(entity, address);
+		}
+
+		if (!StringUtils.isBlank(message.getBody())) {
+			final MailService mailService = Beans.get(MailService.class);
+			try {
+				mailService.send(message);
+			} catch (Exception e) {
+				LOG.error("Unable to send email message to new followers", e);
+			}
 		}
 
 		return messageFollowers(id);
