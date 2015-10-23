@@ -22,16 +22,6 @@ import com.axelor.tools.x2j.pojo.Entity
 class XmlHelper {
 
 	/**
-	 * Read return the list of modules from the given pom.xml
-	 *
-	 * @param input the input file
-	 * @return list of all the modules found in the xml
-	 */
-	public static List<String> modules(File input) {
-		return new XmlSlurper().parse(input).'**'.findAll { it.name() == "module" }.collect { it.text() }
-	}
-
-	/**
 	 * Parse the given input xml and return {@link Entity} mapping
 	 * to each entity elements.
 	 *
@@ -42,13 +32,5 @@ class XmlHelper {
 		return new XmlSlurper().parse(input).'entity'.collect {
 			return new Entity(it)
 		}
-	}
-
-	public static String version(File input) {
-		def version = new XmlSlurper().parse(input).'**'.find { it.name() == 'version' }
-		if (version) {
-			return version.text()
-		}
-		return "1.0.0-SNAPSHOT"
 	}
 }

@@ -20,7 +20,7 @@ package com.axelor.tools.x2j;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.codehaus.groovy.runtime.StringGroovyMethods;
+import com.axelor.common.StringUtils;
 
 public class Utils {
 
@@ -34,7 +34,7 @@ public class Utils {
 		if (code == null || code.trim().length() == 0) {
 			return "";
 		}
-		String text = StringGroovyMethods.stripIndent(code.replaceAll("    ", "\t"));
+		String text = StringUtils.stripIndent(code.replaceAll("    ", "\t"));
 		text = text.trim().replaceAll("\n", joinWith).trim();
 		return text;
 	}
