@@ -17,6 +17,7 @@
  */
 package com.axelor.data.xml;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +36,6 @@ import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
-import com.beust.jcommander.internal.Maps;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
@@ -49,7 +49,7 @@ public abstract class XMLBinder {
 
 	private boolean newBean;
 
-	private Map<String, DataAdapter> adapters = Maps.newHashMap();
+	private Map<String, DataAdapter> adapters = new HashMap<>();
 
 	public XMLBinder(XMLInput input, Map<String, Object> context) {
 		this.input = input;
@@ -214,7 +214,7 @@ public abstract class XMLBinder {
 	}
 
 	private Map<String, Object> toContext(Map<String, Object> map) {
-		Map<String, Object> ctx = Maps.newHashMap();
+		Map<String, Object> ctx = new HashMap<>();
 		if (context != null) {
 			ctx.putAll(context);
 		}
@@ -241,7 +241,7 @@ public abstract class XMLBinder {
 	@SuppressWarnings("all")
 	private Map<String, Object> toMap(Node node, XMLBind binding) {
 
-		Map<String, Object> map = Maps.newHashMap();
+		Map<String, Object> map = new HashMap<>();
 
 		// first prepare complete map
 		for(XMLBind bind : binding.getBindings()) {

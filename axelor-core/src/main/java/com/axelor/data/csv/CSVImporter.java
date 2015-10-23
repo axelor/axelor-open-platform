@@ -23,11 +23,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -35,8 +32,6 @@ import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import au.com.bytecode.opencsv.CSVReader;
 
 import com.axelor.common.StringUtils;
 import com.axelor.data.ImportException;
@@ -50,6 +45,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 public class CSVImporter implements Importer {
 
@@ -158,7 +155,7 @@ public class CSVImporter implements Importer {
 	 * Run the task from the configured readers
 	 * @param task
 	 */
-	public void runTask(ImportTask task) {
+	public void run(ImportTask task) {
 		try {
 			if (task.readers.isEmpty()) {
 				task.configure();
@@ -197,22 +194,12 @@ public class CSVImporter implements Importer {
 	}
 
 	@Override
-	public void run(Map<String, String[]> mappings) throws IOException {
-
-		if (mappings == null) {
-			mappings = new HashMap<String, String[]>();
-		}
+	public void run() {
 
 		for (CSVInput input : config.getInputs()) {
 
 			String fileName = input.getFileName();
-
-			Pattern pattern = Pattern.compile("\\[([\\w.]+)\\]");
-			Matcher matcher = pattern.matcher(fileName);
-
-			List<File> files = matcher.matches() ?
-					this.getFiles(mappings.get(matcher.group(1))) :
-					this.getFiles(fileName);
+			List<File> files = this.getFiles(fileName);
 
 			for(File file : files) {
 				try {

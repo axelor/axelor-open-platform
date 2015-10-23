@@ -96,7 +96,7 @@ public class ActionImport extends Action {
 		});
 
 		importer.setCanClear(false);
-		importer.runTask(new ImportTask() {
+		importer.run(new ImportTask() {
 
 			@Override
 			public void configure() throws IOException {

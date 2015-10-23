@@ -21,11 +21,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -55,7 +52,7 @@ import com.thoughtworks.xstream.mapper.MapperWrapper;
  * XML data importer.
  * <br>
  * <br>
- * This class also provides {@link #runTask(ImportTask)} method to import data programmatically.
+ * This class also provides {@link #run(ImportTask)} method to import data programmatically.
  * <br>
  * <br>
  * For example:
@@ -148,23 +145,13 @@ public class XMLImporter implements Importer {
 	}
 
 	@Override
-	public void run(Map<String, String[]> mappings) {
-		
-		if (mappings == null) {
-			mappings = new HashMap<String, String[]>();
-		}
-		
+	public void run() {
+
 		for (XMLInput input : config.getInputs()) {
-			
+
 			String fileName = input.getFileName();
-			
-			Pattern pattern = Pattern.compile("\\[([\\w.]+)\\]");
-			Matcher matcher = pattern.matcher(fileName);
-			
-			List<File> files = matcher.matches() ?
-					this.getFiles(mappings.get(matcher.group(1))) :
-					this.getFiles(fileName);
-			
+			List<File> files = this.getFiles(fileName);
+
 			for(File file : files) {
 				try {
 					this.process(input, file);
@@ -175,7 +162,7 @@ public class XMLImporter implements Importer {
 		}
 	}
 	
-	public void runTask(ImportTask task) {
+	public void run(ImportTask task) {
 		try {
 			if (task.readers.isEmpty()) {
 				task.configure();

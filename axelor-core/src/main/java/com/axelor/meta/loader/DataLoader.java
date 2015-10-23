@@ -65,6 +65,9 @@ class DataLoader extends AbstractLoader {
 			} else if (isConfig(config, patXml)) {
 				importXml(config);
 			}
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+			throw Throwables.propagate(e);
 		} finally {
 			clean(tmp);
 		}
@@ -73,17 +76,13 @@ class DataLoader extends AbstractLoader {
 	private void importCsv(File config) {
 		File data = FileUtils.getFile(config.getParentFile(), INPUT_DIR_NAME);
 		CSVImporter importer = new CSVImporter(config.getAbsolutePath(), data.getAbsolutePath(), null);
-		try {
-			importer.run(null);
-		} catch (IOException e) {
-			throw Throwables.propagate(e);
-		}
+		importer.run();
 	}
 
-	private void importXml(File config) {
+	private void importXml(File config) throws IOException {
 		File data = FileUtils.getFile(config.getParentFile(), INPUT_DIR_NAME);
 		XMLImporter importer = new XMLImporter(config.getAbsolutePath(), data.getAbsolutePath());
-		importer.run(null);
+		importer.run();
 	}
 
 	private boolean isConfig(File file, Pattern pattern) {
@@ -98,6 +97,7 @@ class DataLoader extends AbstractLoader {
 			}
 			reader.close();
 		} catch (IOException e) {
+			log.error(e.getMessage(), e);
 		}
 		return false;
 	}
@@ -123,6 +123,7 @@ class DataLoader extends AbstractLoader {
 			try {
 				copy(file.openStream(), tmp, name);
 			} catch (IOException e) {
+				log.error(e.getMessage(), e);
 				throw Throwables.propagate(e);
 			}
 		}
