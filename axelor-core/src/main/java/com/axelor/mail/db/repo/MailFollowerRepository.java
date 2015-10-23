@@ -94,8 +94,8 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 			return null;
 		}
 
-		return all().filter("self.relatedId = ? AND self.relatedModel = ? AND self.user.id = ?", entity.getId(),
-				EntityHelper.getEntityClass(entity).getName(), user.getId()).fetchOne();
+		return all().filter("self.relatedId = ? AND self.relatedModel = ? AND self.user.id = ?", relatedId,
+				relatedModel, user.getId()).fetchOne();
 	}
 
 	public MailFollower findOne(Model entity, MailAddress address) {
@@ -118,8 +118,8 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 			return null;
 		}
 
-		return all().filter("self.relatedId = ? AND self.relatedModel = ? AND self.user.id = ?", entity.getId(),
-				EntityHelper.getEntityClass(entity).getName(), address.getId()).fetchOne();
+		return all().filter("self.relatedId = ? AND self.relatedModel = ? AND self.email.address = ?", relatedId,
+				relatedModel, address.getAddress()).fetchOne();
 	}
 
 	public List<Map<String, Object>> findFollowers(Model entity) {
