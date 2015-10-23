@@ -29,6 +29,18 @@ class GenerateCode extends DefaultTask {
 
 	private static final Set<String> IGNORE = ["axelor-common", "axelor-test"]
 
+	public GenerateCode() {
+
+		// set inputs so that gradle can check for up-to-date
+		project.afterEvaluate {
+			outputs.dir "${project.buildDir}/src-gen"
+			inputs.files "${project.projectDir}/src/main/resources/domains"
+			findAllModules(project).each { Project p ->
+				inputs.files "${p.projectDir}/src/main/resources/domains"
+			}
+		}
+	}
+
 	def _findDeps(Project project) {
 		return project.configurations.compile.allDependencies.withType(ProjectDependency).collect { it.dependencyProject }
 	}
