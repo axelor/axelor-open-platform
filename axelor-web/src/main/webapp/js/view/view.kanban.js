@@ -144,7 +144,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $
 		}
 
 		$scope.columns = columns;
-		$scope.colSpan = "span" + (12 / columns.length);
+		$scope.colSpan = "kanban-cs-" + columns.length;
 	};
 
 	$scope.move = function (record, to, next, prev) {
