@@ -328,7 +328,7 @@ function FormViewCtrl($scope, $element) {
 	};
 	
 	$scope.canCopy = function() {
-		return !$scope.isEditable() && $scope.hasButton('copy') && !$scope.$$dirty && ($scope.record || {}).id;
+		return $scope.canNew() && $scope.hasButton('copy') && !$scope.$$dirty && ($scope.record || {}).id;
 	};
 	
 	$scope.canAttach = function() {
