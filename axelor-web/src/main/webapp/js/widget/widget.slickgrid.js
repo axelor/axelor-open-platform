@@ -370,6 +370,14 @@ var Formatters = {
 		var res = _.find(field.selectionList, function(item){
 			return cmp(item.value, value);
 		}) || {};
+
+		if (field.widget === 'ImageSelect' && res.icon) {
+			var image = "<img style='max-height: 24px;' src='" + (res.icon || res.value) + "'>";
+			if (field.labels === false) {
+				return image;
+			}
+			return image + " " + res.title;
+		}
 		return res.title;
 	},
 
