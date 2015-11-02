@@ -481,7 +481,7 @@ ui.directive('uiViewPopup', function() {
 			};
 
 			params = $scope.tab.params || {};
-			if (!params['popup-save']) {
+			if (params['popup-save'] === false) {
 				$scope.onPopupOK = false;
 			}
 		}],
