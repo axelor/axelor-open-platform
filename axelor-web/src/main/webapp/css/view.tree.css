@@ -64,6 +64,10 @@ table.treetable tbody tr.accept {
 	width: 100%;
 	white-space: nowrap;
 	border-bottom: 1px solid #e7e7e7;
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	    -ms-user-select: none;
+	        user-select: none;
 }
 
 .tree-view-container .tree-header th {

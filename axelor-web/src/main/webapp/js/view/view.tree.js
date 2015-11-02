@@ -60,13 +60,13 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 	$scope.onRefresh = function() {
 		
 	};
-	
-	$scope.sortAs = "";
-	$scope.sortBy = "";
 
 	$scope.onSort = function(column) {
-		$scope.sortAs = $scope.sortAs === "-" ? "" : "-";
-		$scope.sortBy = column.name;
+		if (column) {
+			column.sort = true;
+			column.desc = column.desc !== undefined && !column.desc;
+			column.sortCss = column.desc ? "slick-sort-indicator-desc" : "slick-sort-indicator-asc";
+		}
 		$scope.onRefresh();
 	};
 	
@@ -304,15 +304,15 @@ function Loader(scope, node, DataSource) {
 		var context = _.extend({}, scope._context),
 			current = item && item.$record;
 		
-		var sortBy = _.find(node.items, function(field) {
-			return field.as === scope.sortBy;
+		var sortOn = _.filter(scope.columns, function (col) { return col.sort; });
+		var sortBy = _.map(sortOn, function (col) {
+			var field = _.findWhere(node.items, { as: col.name });
+			if (field) {
+				return col.desc ? '-' + field.name : field.name;
+			}
 		});
 
-		if (sortBy) {
-			sortBy = scope.sortAs + sortBy.name;
-		}
-		
-		sortBy = sortBy || node.orderBy;
+		sortBy = _.compact(sortBy).join(',') || node.orderBy;
 
 		if (scope.getContext) {
 			context = _.extend(context, scope.getContext());
@@ -338,7 +338,7 @@ function Loader(scope, node, DataSource) {
 		});
 
 		if (sortBy) {
-			opts.sortBy = [sortBy];
+			opts.sortBy = sortBy.split(',');
 		}
 
 		var promise = ds.search(opts);
@@ -671,6 +671,19 @@ ui.directive('uiViewTree', function(){
 				acceptNodes(nodes);
 			};
 			
+			scope.onHeaderClick = function (event, column) {
+				if (!event.shiftKey) {
+					_.each(scope.columns, function (col) {
+						if (col !== column) {
+							col.sort = false;
+							col.desc = undefined;
+							col.sortCss = null;
+						}
+					});
+				}
+				scope.onSort(column);
+			};
+
 			var watcher = scope.$watch('loaders', function(loaders) {
 				
 				if (loaders === undefined) {
@@ -720,7 +733,10 @@ ui.directive('uiViewTree', function(){
 			'<table class="tree-header">'+
 				'<thead>'+
 					'<tr>'+
-						'<th ng-repeat="column in columns" ng-class="column.css" ng-click="onSort(column)">{{column.title}}</th>'+
+						'<th ng-repeat="column in columns" ng-class="column.css" ng-click="onHeaderClick($event, column)">' +
+							'<span>{{column.title}}</span>'+
+							'<span ng-if="column.sort" class="slick-sort-indicator" ng-class="column.sortCss"></span>'+
+						'</th>'+
 					'</tr>'+
 				'</thead>'+
 			'</table>'+
