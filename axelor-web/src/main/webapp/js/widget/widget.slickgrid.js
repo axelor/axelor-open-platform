@@ -2427,6 +2427,16 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 				}
 				unwatch();
 				schema = scope.view;
+
+				var field = handler.field || {};
+				if (field.canMove !== undefined) {
+					schema.canMove = field.canMove;
+				}
+				if (field.editable !== undefined) {
+					schema.editable = field.editable;
+				}
+				schema.orderBy = field.orderBy || schema.orderBy;
+
 				element.show();
 				doInit();
 			});
