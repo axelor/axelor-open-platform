@@ -56,6 +56,10 @@ public abstract class AbstractPanel extends AbstractContainer {
 		return sidebar;
 	}
 
+	public void setSidebar(Boolean sidebar){
+		this.sidebar = sidebar;
+	}
+
 	public Boolean getStacked() {
 		return stacked;
 	}
