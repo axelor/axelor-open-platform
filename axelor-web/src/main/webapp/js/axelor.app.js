@@ -184,7 +184,7 @@
 	
 	module.config(['$httpProvider', function(provider) {
 
-		/* global toString: true */
+		var toString = Object.prototype.toString;
 
 		function isFile(obj) {
 			return toString.call(obj) === '[object File]';
