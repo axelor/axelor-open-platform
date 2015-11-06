@@ -806,7 +806,10 @@ table.field-details .help-text hr {
 	content: '';
 	width: 32px;
 	height: 32px;
-	transform: scale(0.667) rotate(45deg);
+	-webkit-transform: scale(0.667) rotate(45deg);
+	   -moz-transform: scale(0.667) rotate(45deg);
+	    -ms-transform: scale(0.667) rotate(45deg);
+	        transform: scale(0.667) rotate(45deg);
 
 	position: absolute;
 	right: -16px;
@@ -844,9 +847,12 @@ table.field-details .help-text hr {
 .nav-select li.dropdown a.nav-label:after {
 	font-family: FontAwesome;
 	content: '\f0d7';
-	transform: scale(1) rotate(0);
 	width: 16px;
 	box-shadow: none;
+	-webkit-transform: scale(1) rotate(0);
+	   -moz-transform: scale(1) rotate(0);
+	    -ms-transform: scale(1) rotate(0);
+	        transform: scale(1) rotate(0);
 }
 
 .nav-select a.nav-label:hover,

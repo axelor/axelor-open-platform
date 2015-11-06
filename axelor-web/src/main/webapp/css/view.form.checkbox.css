@@ -95,7 +95,10 @@
 	border: 2px solid #fff;
 	border-top: 0;
 	border-right: 0;
-	transform: rotate(-45deg);	
+	-webkit-transform: rotate(-45deg);
+	   -moz-transform: rotate(-45deg);
+	    -ms-transform: rotate(-45deg);
+	        transform: rotate(-45deg);
 }
 
 .ibox:hover input:disabled + .box:before {

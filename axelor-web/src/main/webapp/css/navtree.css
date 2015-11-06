@@ -96,17 +96,26 @@
 }
 
 .nav-tree li.folder.animate > a::after {
-	transform: rotate(-90deg);
+	-webkit-transform: rotate(-90deg);
+	   -moz-transform: rotate(-90deg);
+	    -ms-transform: rotate(-90deg);
+	        transform: rotate(-90deg);
 	transition: all .35s ease;
 }
 
 .nav-tree li.folder.open.animate > a::after {
-	transform: rotate(0deg);
+	-webkit-transform: rotate(0deg);
+	   -moz-transform: rotate(0deg);
+	    -ms-transform: rotate(0deg);
+	        transform: rotate(0deg);
 	transition: all .35s ease;
 }
 
 .nav-tree li.folder.open > a::after {
-	transform: rotate(-90deg);
+	-webkit-transform: rotate(-90deg);
+	   -moz-transform: rotate(-90deg);
+	    -ms-transform: rotate(-90deg);
+	        transform: rotate(-90deg);
 }
 
 .nav-tree li.tagged > a::after {

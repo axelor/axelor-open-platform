@@ -113,10 +113,13 @@
 	border: 1px solid #ddd;
 	left: -7px;
 	top: 12px;
-	transform: rotate(-45deg);
 	background-color: #fff;
 	border-right: 0;
 	border-bottom: 0;
+	-webkit-transform: rotate(-45deg);
+	   -moz-transform: rotate(-45deg);
+	    -ms-transform: rotate(-45deg);
+	        transform: rotate(-45deg);
 }
 
 .mail-thread .mail-message-icons {
