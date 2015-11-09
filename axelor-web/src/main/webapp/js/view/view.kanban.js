@@ -44,7 +44,7 @@ function BaseCardsCtrl(type, $scope, $element) {
 	$scope.onShow = function (viewPromise) {
 
 		if (initialized) {
-			return;
+			return $scope.onRefresh();
 		}
 
 		initialized = true;
@@ -336,6 +336,12 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 ui.directive('uiCards', function () {
 
 	return function (scope, element, attrs) {
+
+		var onRefresh = scope.onRefresh;
+		scope.onRefresh = function () {
+			scope.records = null;
+			return onRefresh.apply(scope, arguments);
+		};
 
 		scope.onEdit = function (record, readonly) {
 			var ds = scope._dataSource;
