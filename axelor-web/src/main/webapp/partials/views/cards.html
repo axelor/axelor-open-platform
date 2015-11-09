@@ -18,7 +18,7 @@
   </div>
   <div class="cards-view row-fluid" ng-class="::schema.css" ui-cards>
     <div class="kanban-card-list">
-      <div class="kanban-card-container" ng-repeat="record in records track by record.id">
+      <div class="kanban-card-container" ng-repeat="record in records">
         <div class="kanban-card" ng-class="hilite.color" ui-card>
           <div class="kanban-card-menu btn-group pull-right">
             <a tabindex="-1" href="javascript:" class="btn btn-link dropdown-toggle" data-toggle="dropdown">
