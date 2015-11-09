@@ -226,6 +226,15 @@ function Column(scope, col) {
 			var res = _.find(selection, function(item){
 				return cmp(item.value, value);
 			}) || {};
+
+			if (col.widget === 'ImageSelect' && res.icon) {
+				var image = "<img style='max-height: 24px;' src='" + (res.icon || res.value) + "'>";
+				if (col.labels === false) {
+					return image;
+				}
+				return image + " " + res.title;
+			}
+
 			return res.title;
 		}
 		switch(col.type) {
