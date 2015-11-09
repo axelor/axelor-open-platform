@@ -263,6 +263,7 @@ public class AuthService {
 			values.put("email", user.getEmail());
 			values.put("language", user.getLanguage());
 			values.put("homeAction", user.getHomeAction());
+			values.put("singleTab", user.getSingleTab());
 		}
 
 		if (action != null) {

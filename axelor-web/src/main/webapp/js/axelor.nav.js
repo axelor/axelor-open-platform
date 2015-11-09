@@ -20,7 +20,10 @@
 "use strict";
 
 var app = angular.module("axelor.app");
-var singleTabOnly = axelor.device.mobile || !!axelor.config['view.single.tab'];
+
+function useSingleTabOnly() {
+	return axelor.device.mobile || !!axelor.config['view.single.tab'] || axelor.config['user.singleTab'];
+}
 
 app.factory('NavService', ['$location', 'MenuService', function($location, MenuService) {
 
@@ -137,7 +140,7 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 
 		var found = findTab(tab.action);
 
-		if (singleTabOnly) {
+		if (useSingleTabOnly()) {
 
 			if (found) {
 				return __singleShow(found);
@@ -325,7 +328,7 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 NavCtrl.$inject = ['$scope', '$rootScope', '$location', 'NavService'];
 function NavCtrl($scope, $rootScope, $location, NavService) {
 
-	$scope.singleTabOnly = singleTabOnly;
+	$scope.singleTabOnly = useSingleTabOnly();
 
 	Object.defineProperty($scope, 'navTabs', {
 		get: function() {

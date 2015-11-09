@@ -84,6 +84,7 @@ public class AboutService extends AbstractService {
 		map.put("user.nameField", nameField.getName());
 		map.put("user.lang", user.getLanguage());
 		map.put("user.action", user.getHomeAction());
+		map.put("user.singleTab", user.getSingleTab());
 
 		if (user.getImage() != null) {
 			map.put("user.image", "ws/rest/" + User.class.getName() + "/" + user.getId() + "/image/download?image=true&v=" + user.getVersion());
