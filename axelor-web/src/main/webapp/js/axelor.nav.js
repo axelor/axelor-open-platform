@@ -66,7 +66,7 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		}
 
 		var closable = options && options.__tab_closable;
-		if (!closable && view.params) {
+		if (!closable && view.params && view.params.closable !== undefined) {
 			closable = view.params.closable;
 		}
 
@@ -537,19 +537,21 @@ function TabCtrl($scope, $location, $routeParams) {
 		params = _.clone($routeParams),
 		search = _.clone($location.$$search);
 	
-	if (homeAction && homeAction !== params.resource) {
-		$scope.openTabByName(homeAction, {
+	var opts = {
+		mode: params.mode,
+    	state: params.state,
+    	search: search
+	};
+
+	if (homeAction === params.resource) {
+		_.extend(opts, {
 			__tab_prepend: true,
 			__tab_closable: false
 		});
 	}
 
 	if (params.resource) {
-        $scope.openTabByName(params.resource, {
-    		mode: params.mode,
-        	state: params.state,
-        	search: search
-    	});
+		$scope.openTabByName(params.resource, opts);
     }
 }
 
