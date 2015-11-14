@@ -400,7 +400,7 @@ ui.formWidget('uiMailMessages', {
 						$scope.record.__empty = count === 0;
 						updateReadCount(found);
 					}
-				});
+				}, 100);
 
 				$scope.animation = {
 					'fade': true,
