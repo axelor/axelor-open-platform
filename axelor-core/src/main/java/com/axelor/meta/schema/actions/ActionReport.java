@@ -76,7 +76,7 @@ public class ActionReport extends Action {
 	@XmlAttribute
 	private Boolean attachment;
 
-	@XmlElement(name = "parameter")
+	@XmlElement(name = "param")
 	private List<Parameter> parameters;
 
 	@JsonGetter("title")
