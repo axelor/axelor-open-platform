@@ -575,7 +575,7 @@
 
 .info-button {
 	height: 60px;
-	width: 210px;
+	width: 100%;
 	padding: 4px 8px;
 	border-style: dotted;
 }
@@ -625,15 +625,20 @@
 }
 
 .info-button > i,
-.info-button-value {
-	color: #3c763d;
+.info-button .info-button-value,
+.info-button .info-button-title {
 	text-shadow: 1px 1px 0 rgba(0,0,0,.15);
 }
 
-.info-button:hover,
-.info-button:focus,
-.info-button:active,
-.info-button.active {
+.info-button:not([class*=btn-]) > i,
+.info-button:not([class*=btn-]) .info-button-value {
+	color: #3c763d;
+}
+
+.info-button:not([class*=btn-]):hover,
+.info-button:not([class*=btn-]):focus,
+.info-button:not([class*=btn-]):active,
+.info-button:not([class*=btn-]).active {
 	box-shadow: none;
 	background-color: #fff;
 }

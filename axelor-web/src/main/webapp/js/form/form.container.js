@@ -379,9 +379,9 @@ ui.formWidget('ButtonGroup', {
 
 	link: function (scope, element, attrs) {
 		function adjust() {
-			var visible = element.children('a.btn:visible').size();
+			var visible = element.children('.btn:visible').size();
 			if (visible) {
-				element.children('a.btn:visible')
+				element.children('.btn:visible')
 					.css('max-width', (100.00/visible) + '%')
 					.css('width', (100.00/visible) + '%');
 			}
