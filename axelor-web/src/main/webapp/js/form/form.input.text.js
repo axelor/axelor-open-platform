@@ -54,7 +54,7 @@ ui.formInput('String', {
 		};
 	},
 
-	template_readonly: '<input type="text" ng-show="text" tabindex="-1" readonly="readonly" class="display-text" value="{{text}}">'
+	template_readonly: '<input type="text" ng-show="text.length" tabindex="-1" readonly="readonly" class="display-text" value="{{text}}">'
 });
 
 /**
