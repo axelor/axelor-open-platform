@@ -35,6 +35,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -43,7 +44,6 @@ import com.axelor.common.FileUtils;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.schema.actions.ActionExport;
-import com.axelor.meta.schema.actions.ActionReport;
 import com.google.inject.persist.Transactional;
 import com.google.inject.servlet.RequestScoped;
 
@@ -68,10 +68,13 @@ public class FileService extends AbstractService {
 	}
 
 	@GET
-	@Path("report/{name:.*}")
-	public javax.ws.rs.core.Response reportFile(@PathParam("name") final String name) {
-		final File file = FileUtils.getFile(ActionReport.getOutputPath(), name);
-		if (!file.isFile()) {
+	@Path("report/{link:.*}")
+	public javax.ws.rs.core.Response reportFile(
+			@PathParam("link") final String link,
+			@QueryParam("name") final String name) {
+
+		final java.nio.file.Path file = MetaFiles.findTempFile(link);
+		if (file == null || !file.toFile().isFile()) {
 			throw new IllegalArgumentException(new FileNotFoundException(name));
 		}
 
@@ -79,13 +82,17 @@ public class FileService extends AbstractService {
 		if (name.endsWith("pdf")) type = new MediaType("application", "pdf");
 		if (name.endsWith("html")) type = new MediaType("text", "html");
 
-		ResponseBuilder builder = javax.ws.rs.core.Response.ok(file, type);
+		final String fileName = name == null ? file.toFile().getName() : name;
+		final ResponseBuilder builder = javax.ws.rs.core.Response.ok(file.toFile(), type);
+
 		if (type != MediaType.APPLICATION_OCTET_STREAM_TYPE) {
-			return builder.build();
+			return builder
+					.header("Content-Disposition", "inline; filename=\"" + fileName + "\"")
+					.build();
 		}
 
 		return builder
-				.header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"")
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
 				.header("Content-Transfer-Encoding", "binary")
 				.build();
 	}

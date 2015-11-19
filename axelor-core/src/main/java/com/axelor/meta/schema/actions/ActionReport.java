@@ -18,10 +18,11 @@
 package com.axelor.meta.schema.actions;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,33 +34,31 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.joda.time.DateTime;
 
-import com.axelor.app.AppSettings;
+import com.axelor.common.VersionUtils;
 import com.axelor.db.JPA;
+import com.axelor.dms.db.DMSFile;
+import com.axelor.dms.db.repo.DMSFileRepository;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.meta.ActionHandler;
-import com.axelor.meta.db.MetaAttachment;
+import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
-import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.report.ReportGenerator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Throwables;
-import com.google.common.io.Files;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfStamper;
 
 public class ActionReport extends Action {
+
+	private static final String DEFAULT_FORMAT = "pdf";
 
 	@XmlType
 	public static class Parameter extends ActionRecord.RecordField {
 
 	}
-
-	private static final String DEFAULT_UPLOAD_DIR = "{java.io.tmpdir}/axelor/attachments";
-	private static final String DEFAULT_TEMP_DIR = "{java.io.tmpdir}/axelor/reports-gen";
-	private static final String DEFAULT_FORMAT = "pdf";
-
-	private static final Path UPLOAD_DIR = Paths.get(AppSettings.get().getPath("file.upload.dir", DEFAULT_UPLOAD_DIR));
-	private static final Path TEMP_DIR = Paths.get(AppSettings.get().getPath("reports.output.dir", DEFAULT_TEMP_DIR));
 
 	@XmlAttribute
 	private String title;
@@ -109,10 +108,6 @@ public class ActionReport extends Action {
 		return parameters;
 	}
 
-	public static File getOutputPath() {
-		return TEMP_DIR.toFile();
-	}
-
 	private File render(ActionHandler handler, String fileName) throws IOException {
 
 		Map<String, Object> params = new HashMap<>();
@@ -126,33 +121,47 @@ public class ActionReport extends Action {
 
 		log.debug("with params: {}", params);
 
-		final File output = TEMP_DIR.resolve(fileName).toFile();
+		final Path tmp1 = MetaFiles.createTempFile(null, "");
 		final ReportGenerator generator = Beans.get(ReportGenerator.class);
 
-		Files.createParentDirs(output);
-
-		try(FileOutputStream stream = new FileOutputStream(output)) {
+		try(FileOutputStream stream = new FileOutputStream(tmp1.toFile())) {
 			generator.generate(stream, designName, format, params);
 		} catch (Exception e) {
 			throw Throwables.propagate(e);
 		}
 
-		return output;
+		if (!"pdf".equalsIgnoreCase(format)) {
+			return tmp1.toFile();
+		}
+
+		final Path tmp2 = MetaFiles.createTempFile(null, "");
+		try(FileInputStream is = new FileInputStream(tmp1.toFile());
+			FileOutputStream os = new FileOutputStream(tmp2.toFile())) {
+
+			PdfReader reader = new PdfReader(is);
+			PdfStamper stamper = new PdfStamper(reader, os);
+
+			HashMap<String, String> info = new HashMap<>();
+
+			info.put("Creator", "ADK " + VersionUtils.getVersion());
+
+			stamper.setMoreInfo(info);
+			stamper.close();
+
+			Files.delete(tmp1);
+		} catch (DocumentException e) {
+			throw Throwables.propagate(e);
+		}
+
+		return tmp2.toFile();
 	}
 
 	private Object attach(File tempFile, String name, Class<?> model, Long id) throws IOException {
 
-		Path relative = Paths.get("reports", tempFile.getName());
-		Path target = UPLOAD_DIR.resolve(relative);
-
-
-		Files.createParentDirs(target.toFile());
-		Files.move(tempFile, target.toFile());
-
+		final MetaFiles files = Beans.get(MetaFiles.class);
 		final MetaFile metaFile = new MetaFile();
+
 		metaFile.setFileName(name);
-		metaFile.setFilePath(relative.toString());
-		metaFile.setFileSize(tempFile.length());
 
 		String mime = java.nio.file.Files.probeContentType(tempFile.toPath());
 		if (mime == null) {
@@ -164,21 +173,24 @@ public class ActionReport extends Action {
 
 		metaFile.setFileType(mime);
 
-		final MetaAttachment metaAttachment = new MetaAttachment();
-		metaAttachment.setObjectName(model.getName());
-		metaAttachment.setObjectId(id);
-		metaAttachment.setMetaFile(metaFile);
+		files.upload(tempFile, metaFile);
 
-		final MetaAttachmentRepository repository = Beans.get(MetaAttachmentRepository.class);
+		final DMSFile dmsFile = new DMSFile();
+		dmsFile.setFileName(name);
+		dmsFile.setMetaFile(metaFile);
+		dmsFile.setRelatedId(id);
+		dmsFile.setRelatedModel(model.getName());
+
+		final DMSFileRepository repository = Beans.get(DMSFileRepository.class);
 		JPA.runInTransaction(new Runnable() {
 
 			@Override
 			public void run() {
-				repository.save(metaAttachment);
+				repository.save(dmsFile);
 			}
 		});
 
-		return metaAttachment;
+		return dmsFile;
 	}
 
 	private Object _evaluate(ActionHandler handler) throws IOException {

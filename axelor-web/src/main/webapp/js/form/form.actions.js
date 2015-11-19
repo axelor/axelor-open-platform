@@ -899,7 +899,7 @@ ActionHandler.prototype = {
 				return deferred.promise;
 			}
 
-			var url = "ws/files/report/" + data.reportLink;
+			var url = "ws/files/report/" + data.reportLink + "?name=" + data.reportFile;
 			var tab = {
 				title: data.reportFile,
 				resource: url,
