@@ -59,7 +59,6 @@ public class ReportResourceLocator implements IResourceLocator {
 	@Override
 	public URL findResource(ModuleHandle moduleHandle, String fileName, int type) {
 
-		Path path = searchPath;
 		String sub = ".";
 
 		switch (type) {
@@ -74,13 +73,12 @@ public class ReportResourceLocator implements IResourceLocator {
 			break;
 		}
 
-		path = path.resolve(sub).normalize();
+		// first search in the top directory
+		File found = searchPath.resolve(fileName).toFile();
 
-		// first search in the external repository
-		File found = path.resolve(fileName).toFile();
-
+		// else search in sub directory
 		if (!found.exists()) {
-			found = searchPath.resolve(fileName).toFile();
+			found = searchPath.resolve(sub).normalize().resolve(fileName).toFile();
 		}
 
 		if (found.exists()) {
@@ -91,9 +89,12 @@ public class ReportResourceLocator implements IResourceLocator {
 		}
 
 		// otherwise locate from the modules
-		path = Paths.get("reports", sub, fileName).normalize();
+		URL url = ClassUtils.getResource(Paths.get("reports", fileName).normalize().toString());
+		if (url == null) {
+			url = ClassUtils.getResource(Paths.get("reports", sub, fileName).normalize().toString());
+		}
 
-		return ClassUtils.getResource(path.toString());
+		return url;
 	}
 
 }
