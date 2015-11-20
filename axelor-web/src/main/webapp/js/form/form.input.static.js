@@ -488,13 +488,17 @@ ui.formItem('ToolButton', 'Button', {
 		}
 
 		scope.title = field.title;
+		scope.showTitle = field.showTitle !== false;
 
 		scope.btn.isHidden = function() {
 			return scope.isHidden();
 		};
 	},
 
-	template: '<button class="btn" ui-show="!isHidden()" name="{{btn.name}}" ui-actions ui-widget-states>{{title}}</button>'
+	template:
+		'<button class="btn" ui-show="!isHidden()" name="{{btn.name}}" ui-actions ui-widget-states>' +
+			'<span ng-show="showTitle">{{title}}</span>' +
+		'</button>'
 });
 
 })();
