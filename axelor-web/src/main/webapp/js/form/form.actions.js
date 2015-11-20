@@ -500,7 +500,7 @@ ActionHandler.prototype = {
 			});
 		}
 
-		pattern = /(,)?\s*(close)\s*,/;
+		pattern = /(^|,)\s*(close)\s*,/;
 		if (pattern.test(action)) {
 			axelor.dialogs.error(_t('Invalid use of "{0}" action, must be the last action.', pattern.exec(action)[2]));
 			deferred.reject();
