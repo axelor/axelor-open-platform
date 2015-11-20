@@ -115,20 +115,20 @@
 
 .panel .row-fluid:last-child > .form-item-hidden,
 .panel .row-fluid:last-child > .form-item {
-	margin-bottom: 0;
+	margin-bottom: 1px;
 }
 .panel[x-stacked] .row-fluid:last-child > .form-item {
 	margin-bottom: 6px;
 }
 .panel[x-stacked] .row-fluid:last-child > .form-item-hidden,
 .panel[x-stacked] .row-fluid:last-child > .form-item:last-child {
-	margin-bottom: 0;
+	margin-bottom: 1px;
 }
 
 .panel[x-stacked] .row-fluid:last-child > .form-item-hidden,
 .panel[x-stacked] .row-fluid:last-child > .form-item:last-child,
 .panel[x-stacked] .row-fluid:last-child > .form-item:last-child > .panel {
-	margin-bottom: 0;
+	margin-bottom: 1px;
 }
 
 @media (max-width: 767px) {
@@ -136,7 +136,7 @@
 		margin-bottom: 6px;
 	}
 	.panel .row-fluid:last-child > .form-item:last-child {
-		margin-bottom: 0;
+		margin-bottom: 1px;
 	}
 }
 
