@@ -24,15 +24,15 @@
           <button class="btn" ng-if="hasHelp()" ng-click="onShowHelp()"><i class="fa fa-info-circle"></i></button>
         </div>
         <div ui-menu-bar x-menus="toolmenu" x-handler="this"></div>
-        <div class="btn-group view-toolbar" ng-show="toolbar">
+        <div class="btn-group view-toolbar" ng-show="toolbar" style="display: none;">
           <button ng-repeat="btn in toolbar | filter:{custom: true}" ui-tool-button></button>
         </div>
-        <div class="btn-group" ng-if="toolbar" style="display: none;">
+        <div class="btn-group" ng-show="toolbar" style="display: none;">
           <button ng-repeat="btn in toolbar | filter:{custom: false}" ui-tool-button></button>
         </div>
-        <div ui-menu-bar x-menus="menubar" x-handler="this" class="view-menubar"></div>
-        <div ui-menu-bar x-menus="toolbarAsMenu" x-handler="this" class='view-toolbar-mobile'></div>
-        <div ui-menu-bar x-menus="menubarAsMenu" x-handler="this" class='view-menubar-mobile'></div>
+        <div ui-menu-bar x-menus="menubar" x-handler="this" class="view-menubar" style="visibility: hidden;"></div>
+        <div ui-menu-bar x-menus="toolbarAsMenu" x-handler="this" class="view-toolbar-mobile" style="visibility: hidden;"></div>
+        <div ui-menu-bar x-menus="menubarAsMenu" x-handler="this" class="view-menubar-mobile" style="visibility: hidden;"></div>
         <div ui-view-switcher class="pull-right"></div>
         <div ui-record-pager class="pull-right"></div>
       </div>

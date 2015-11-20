@@ -680,7 +680,11 @@ img.prefix-icon {
 	float: inherit;
 	vertical-align: middle;
 	white-space: nowrap;
-	margin-left: 5px;
+}
+
+.record-toolbar .menu-bar,
+.record-toolbar .view-toolbar {
+	margin-left: 0;
   	margin-right: 0;
 }
 

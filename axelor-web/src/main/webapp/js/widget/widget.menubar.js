@@ -227,15 +227,15 @@ ui.directive('uiToolbarAdjust', function() {
 				elemMenubar.hide();
 				elemMenubarMobile.hide();
 				elemToolbarMobile.hide();
-				if (hasMenubar) elemMenubarMobile.show();
-				if (hasToolbar) elemToolbarMobile.show();
+				if (hasMenubar) elemMenubarMobile.show().css('visibility', '');
+				if (hasToolbar) elemToolbarMobile.show().css('visibility', '');
 				return;
 			}
 
 			elemMenubarMobile.hide();
 			elemToolbarMobile.hide();
-			elemToolbar.show();
-			elemMenubar.show();
+			elemToolbar.show().css('visibility', '');
+			elemMenubar.show().css('visibility', '');
 
 			var total = elemToolbar.width() + elemMenubar.width();
 			if (total === 0) {
@@ -252,11 +252,11 @@ ui.directive('uiToolbarAdjust', function() {
 			if (width <= total && hasMenubar) {
 				total -= elemMenubar.width();
 				elemMenubar.hide();
-				elemMenubarMobile.show();
+				elemMenubarMobile.show().css('visibility', '');
 			}
 			if (width <= total && hasToolbar) {
 				elemToolbar.hide();
-				elemToolbarMobile.show();
+				elemToolbarMobile.show().css('visibility', '');
 			}
 		}
 

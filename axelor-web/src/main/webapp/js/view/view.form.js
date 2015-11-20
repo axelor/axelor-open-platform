@@ -789,7 +789,6 @@ function FormViewCtrl($scope, $element) {
 	}
 	
 	$scope.toolmenu = [{
-		icon: 'fa-gear',
 		isButton: true,
 		items: [{
 			title: _t('Refresh'),
