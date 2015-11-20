@@ -906,7 +906,9 @@ ActionHandler.prototype = {
 				viewType: 'html'
 			};
 
-			if (['pdf', 'html'].indexOf(data.reportFormat) > -1) {
+			if (axelor.device.mobile && data.reportFormat !== "html") {
+				ui.download(url, data.reportFile);
+			} else if (['pdf', 'html'].indexOf(data.reportFormat) > -1) {
 				doOpenView(tab);
 			} else {
 				ui.download(url);
