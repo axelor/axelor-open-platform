@@ -680,7 +680,8 @@ input[readonly], select[readonly], textarea[readonly] {
 
 .search-view .search-view-grid {
 	position: relative;
-	overflow: hidden;	
+	overflow: hidden;
+	min-height: 300px;
 }
 
 .search-view .search-view-grid .slickgrid {
