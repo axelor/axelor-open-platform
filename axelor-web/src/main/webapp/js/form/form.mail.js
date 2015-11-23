@@ -194,6 +194,28 @@ ui.directive('uiMailMessage', function () {
 				scope.body = null;
 			}
 
+			function format(value) {
+				if (!value) {
+					return value;
+				}
+				if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$/.test(value)) {
+					return moment(value).format("DD/MM/YYYY HH:mm");
+				}
+				if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+					return moment(value).format("DD/MM/YYYY");
+				}
+				return value;
+			}
+
+			if (body && body.tracks) {
+				_.each(body.tracks, function (item) {
+					item.displayValue = format(item.value);
+					if (item.oldValue !== undefined) {
+						item.displayValue += " &raquo; " + format(item.oldValue);
+					}
+				});
+			}
+
 			message.$title = (body||{}).title || message.subject;
 
 			scope.showFull = !message.summary;
@@ -253,7 +275,7 @@ ui.directive('uiMailMessage', function () {
 					"<div class='mail-message-body'>" +
 						"<ul class='track-fields' ng-if='::body'>" +
 							"<li ng-repeat='item in ::body.tracks'>" +
-								"<strong>{{:: _t(item.title) }}</strong> : <span ng-bind-html='::item.value'></span>" +
+								"<strong>{{:: _t(item.title) }}</strong> : <span ng-bind-html='::item.displayValue'></span>" +
 							"</li>" +
 						"</ul>" +
 						"<div ng-if='!body'>" +

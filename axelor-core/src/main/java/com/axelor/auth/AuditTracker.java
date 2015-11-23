@@ -218,21 +218,19 @@ final class AuditTracker {
 			final Object value = values.get(name);
 			final Object oldValue = oldValues.get(name);
 
-			String dispayValue = format(property, value);
-			if (previousState != null) {
-				if (Objects.equal(value, oldValue)) {
-					continue;
-				}
-				if (oldValue != null) {
-					dispayValue = format(property, oldValue) + " &raquo; " + dispayValue;
-				}
+			if (previousState != null && Objects.equal(value, oldValue)) {
+				continue;
 			}
 
 			tagFields.add(name);
 
 			final Map<String, String> item = new HashMap<>();
 			item.put("title", title);
-			item.put("value", dispayValue);
+			item.put("value", format(property, value));
+
+			if (oldValue != null) {
+				item.put("oldValue", format(property, oldValue));
+			}
 
 			tracks.add(item);
 		}
