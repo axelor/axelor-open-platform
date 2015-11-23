@@ -178,14 +178,14 @@ public class I18nExtractor {
 					accept(new I18nItem(attributes.getValue("prompt"), file, locator.getLineNumber()));
 					accept(new I18nItem(attributes.getValue("placeholder"), file, locator.getLineNumber()));
 					
-					if ("option".equals(qName)) {
+					if ("option".equals(qName) || "message".equals(qName)) {
 						readText = true;
 					}
 				}
 				
 				@Override
 				public void endElement(String uri, String localName, String qName) throws SAXException {
-					if ("option".equals(qName)) {
+					if ("option".equals(qName) || "message".equals(qName)) {
 						readText = false;
 					}
 					if ("entity".equals(qName)) {

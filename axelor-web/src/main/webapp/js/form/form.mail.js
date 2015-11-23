@@ -266,7 +266,7 @@ ui.directive('uiMailMessage', function () {
 							"<a ng-if='message.relatedId && message.$name' href='#ds/form::{{::message.relatedModel}}/edit/{{::message.relatedId}}'>{{::message.$name}}</a>" +
 							"<span ng-if='::!message.relatedId && message.$name'>{{::message.$name}}</span>" +
 							"<span ng-if='::message.$name'> - </span>" +
-							"<span ng-if='::message.$title'>{{::message.$title}}</span>" +
+							"<span ng-if='::message.$title'>{{:: _t(message.$title) }}</span>" +
 						"</span>" +
 						"<span class='track-tags'>" +
 							"<span class='label' ng-class='::item.css' ng-repeat='item in ::body.tags'>{{:: _t(item.title) }}</span>" +
