@@ -64,6 +64,9 @@ public class AuthFilter extends FormAuthenticationFilter {
 	@Override
 	protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
 		
+		// set encoding to UTF-8 (see RM-4304)
+		request.setCharacterEncoding("UTF-8");
+
 		if (isXHR(request)) {
 			
 			int status = 401;
