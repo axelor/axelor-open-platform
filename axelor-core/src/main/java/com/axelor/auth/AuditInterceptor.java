@@ -29,14 +29,19 @@ import org.joda.time.LocalDateTime;
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
+import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
+import com.axelor.db.JpaSequence;
 import com.axelor.db.Model;
+import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
+import com.axelor.meta.db.MetaSequence;
 
 @SuppressWarnings("serial")
 public class AuditInterceptor extends EmptyInterceptor {
 
-	private ThreadLocal<User> currentUser = new ThreadLocal<User>();
-	private ThreadLocal<AuditTracker> tracker = new ThreadLocal<>();
+	private final ThreadLocal<User> currentUser = new ThreadLocal<User>();
+	private final ThreadLocal<AuditTracker> tracker = new ThreadLocal<>();
 
 	private static final String UPDATED_BY = "updatedBy";
 	private static final String UPDATED_ON = "updatedOn";
@@ -92,14 +97,10 @@ public class AuditInterceptor extends EmptyInterceptor {
 			if (!ADMIN_CHECK_FIELD.equals(field)) {
 				return true;
 			}
-			if (entity instanceof User &&
-					ADMIN_USER.equals(prevValue) &&
-					!ADMIN_USER.equals(newValue)) {
+			if (entity instanceof User && ADMIN_USER.equals(prevValue) && !ADMIN_USER.equals(newValue)) {
 				return false;
 			}
-			if (entity instanceof Group &&
-					ADMIN_GROUP.equals(prevValue) &&
-					!ADMIN_GROUP.equals(newValue)) {
+			if (entity instanceof Group && ADMIN_GROUP.equals(prevValue) && !ADMIN_GROUP.equals(newValue)) {
 				return false;
 			}
 		}
@@ -116,20 +117,41 @@ public class AuditInterceptor extends EmptyInterceptor {
 		return true;
 	}
 
+	private boolean updateSequence(Object entity, String[] names, Object[] state) {
+		if ((entity instanceof MetaSequence) || !(entity instanceof Model)) {
+			return false;
+		}
+
+		final Mapper mapper = Mapper.of(EntityHelper.getEntityClass(entity));
+		boolean updated = false;
+
+		for (int i = 0; i < names.length; i++) {
+			if (state[i] != null) {
+				continue;
+			}
+			final Property property = mapper.getProperty(names[i]);
+			if (property != null && property.isSequence()) {
+				state[i] = JpaSequence.nextValue(property.getSequenceName());
+				updated = true;
+			}
+		}
+
+		return updated;
+	}
+
 	@Override
-	public boolean onFlushDirty(Object entity, Serializable id,
-			Object[] currentState, Object[] previousState,
+	public boolean onFlushDirty(Object entity, Serializable id, Object[] currentState, Object[] previousState,
 			String[] propertyNames, Type[] types) {
+
 		if (!(entity instanceof AuditableModel)) {
 			return false;
 		}
-		User user = this.getUser();
+
+		final User user = this.getUser();
 		for (int i = 0; i < propertyNames.length; i++) {
 			if (!canUpdate(entity, propertyNames[i], previousState[i], currentState[i])) {
-				throw new PersistenceException(
-						String.format("You can't update: %s#%s, values (%s=%s)",
-								entity.getClass().getName(), id,
-								propertyNames[i], currentState[i]));
+				throw new PersistenceException(String.format("You can't update: %s#%s, values (%s=%s)",
+						entity.getClass().getName(), id, propertyNames[i], currentState[i]));
 			}
 			if (UPDATED_ON.equals(propertyNames[i])) {
 				currentState[i] = new LocalDateTime();
@@ -148,12 +170,14 @@ public class AuditInterceptor extends EmptyInterceptor {
 	}
 
 	@Override
-	public boolean onSave(Object entity, Serializable id, Object[] state,
-			String[] propertyNames, Type[] types) {
+	public boolean onSave(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
+
+		boolean changed = updateSequence(entity, propertyNames, state);
 		if (!(entity instanceof AuditableModel)) {
-			return false;
+			return changed;
 		}
-		User user = this.getUser();
+
+		final User user = this.getUser();
 		for (int i = 0; i < propertyNames.length; i++) {
 			if (state[i] != null) {
 				continue;
@@ -173,14 +197,11 @@ public class AuditInterceptor extends EmptyInterceptor {
 
 		return true;
 	}
-	
+
 	@Override
-	public void onDelete(Object entity, Serializable id, Object[] state,
-			String[] propertyNames, Type[] types) {
+	public void onDelete(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
 		if (!canDelete(entity)) {
-			throw new PersistenceException(
-				String.format("You can't delete: %s#%s",
-					entity.getClass().getName(), id));
+			throw new PersistenceException(String.format("You can't delete: %s#%s", entity.getClass().getName(), id));
 		}
 	}
 }
