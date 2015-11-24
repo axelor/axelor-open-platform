@@ -244,6 +244,7 @@ public class Property {
 			}
 			
 			if (annotation instanceof Sequence) {
+				readonly = true;
 				sequence = true;
 				sequenceName = ((Sequence) annotation).value();
 			}

@@ -31,13 +31,10 @@ public final class JpaSequence {
 
 	private JpaSequence() {
 	}
-	
-	private static MetaSequenceRepository repo() {
-		return Beans.get(MetaSequenceRepository.class);
-	}
 
 	private static MetaSequence find(String name) {
-		MetaSequence sequence =  repo().findByName(name);
+		final MetaSequenceRepository repo = Beans.get(MetaSequenceRepository.class);
+		final MetaSequence sequence =  repo.findByName(name);
 		if (sequence == null) {
 			throw new IllegalArgumentException("No such sequence: " + name);
 		}
@@ -74,7 +71,7 @@ public final class JpaSequence {
 		
 		sequence.setNext(next + sequence.getIncrement());
 
-		repo().save(sequence);
+		JPA.em().persist(sequence);
 
 		return value;
 	}
@@ -97,6 +94,6 @@ public final class JpaSequence {
 	public static void nextValue(final String name, final long next) {
 		final MetaSequence sequence = find(name);
 		sequence.setNext(next);
-		repo().save(sequence);
+		JPA.em().persist(sequence);
 	}
 }

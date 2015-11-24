@@ -358,15 +358,6 @@ public final class JPA {
 		if (id != null) {
 			edited.put(klass.getName(), id);
 		}
-		
-		// set sequence values
-		if (id == null) {
-			for (Property p : mapper.getSequenceFields()) {
-				if (values.get(p.getName()) == null) {
-					values.put(p.getName(), JpaSequence.nextValue(p.getSequenceName()));
-				}
-			}
-		}
 
 		for (String name : values.keySet()) {
 

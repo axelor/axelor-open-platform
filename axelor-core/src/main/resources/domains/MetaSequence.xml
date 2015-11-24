@@ -16,6 +16,7 @@
     <integer name="increment" column="increment_by" required="true" default="1"/>
     <long name="initial" column="initial_value" required="true" default="0"/>
     <long name="next" column="next_value" required="true" default="1"/>
+    <finder-method name="findByName" using="name" flush="false"/>
   </entity>
 
 </domain-models>
