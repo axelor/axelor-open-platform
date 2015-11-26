@@ -17,11 +17,14 @@
  */
 package com.axelor.report;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Locale;
@@ -46,21 +49,57 @@ import org.hibernate.internal.SessionFactoryImpl;
 
 import com.axelor.app.internal.AppFilter;
 import com.axelor.db.JPA;
+import com.axelor.meta.MetaFiles;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 
+/**
+ * The report generator service.
+ *
+ */
 public class ReportGenerator {
 
 	@Inject
 	private IReportEngine engine;
 
-	public void generate(OutputStream output, String designName, String format,
-			Map<String, Object> params) throws IOException, BirtException {
+	/**
+	 * Generate a report for the given report design.
+	 *
+	 * @param output
+	 *            the report output stream
+	 * @param designName
+	 *            report design
+	 * @param format
+	 *            output format (e.g. pdf, html etc)
+	 * @param params
+	 *            report parameters
+	 * @throws IOException
+	 * @throws BirtException
+	 */
+	public void generate(OutputStream output, String designName, String format, Map<String, Object> params)
+			throws IOException, BirtException {
 		generate(output, designName, format, params, AppFilter.getLocale());
 	}
 
+	/**
+	 * Generate a report for the given report design.
+	 *
+	 * @param output
+	 *            the report output stream
+	 * @param designName
+	 *            report design
+	 * @param format
+	 *            output format (e.g. pdf, html etc)
+	 * @param params
+	 *            report parameters
+	 * @param locale
+	 *            report output locale
+	 * @throws IOException
+	 * @throws BirtException
+	 */
 	@SuppressWarnings("unchecked")
-	public void generate(OutputStream output, String designName, String format,
-			Map<String, Object> params, Locale locale) throws IOException, BirtException {
+	public void generate(OutputStream output, String designName, String format, Map<String, Object> params,
+			Locale locale) throws IOException, BirtException {
 
 		final IResourceLocator locator = engine.getConfig().getResourceLocator();
 		final URL found = locator.findResource(null, designName, IResourceLocator.OTHERS);
@@ -69,8 +108,7 @@ public class ReportGenerator {
 			throw new BirtException("No such report found: " + designName);
 		}
 
-		final InputStream stream = found.openStream();
-		try {
+		try (InputStream stream = found.openStream()) {
 
 			final IReportRunnable report = engine.openReportDesign(designName, stream);
 			final IRunAndRenderTask task = engine.createRunAndRenderTask(report);
@@ -101,9 +139,34 @@ public class ReportGenerator {
 			} finally {
 				task.close();
 			}
-		} finally {
-			stream.close();
 		}
+	}
+
+	/**
+	 * Generate a report to a temporary file and return path to the generated
+	 * file.
+	 *
+	 * @param designName
+	 *            report design name
+	 * @param format
+	 *            output format
+	 * @param params
+	 *            report parameters
+	 * @param locale
+	 *            report output language
+	 * @return {@link Path} to the generated file
+	 * @throws IOException
+	 * @throws BirtException
+	 */
+	public File generate(String designName, String format, Map<String, Object> params, Locale locale)
+			throws IOException, BirtException {
+		Preconditions.checkNotNull(designName, "no report design name given");
+		final Path tmpFile = MetaFiles.createTempFile(null, "");
+		final FileOutputStream stream = new FileOutputStream(tmpFile.toFile());
+
+		generate(stream, designName, format, params);
+
+		return tmpFile.toFile();
 	}
 
 	static {
