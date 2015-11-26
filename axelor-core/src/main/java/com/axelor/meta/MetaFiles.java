@@ -40,6 +40,7 @@ import javax.persistence.PersistenceException;
 import com.axelor.app.AppSettings;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
+import com.axelor.dms.db.DMSFile;
 import com.axelor.dms.db.repo.DMSFileRepository;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaAttachment;
@@ -374,6 +375,60 @@ public class MetaFiles {
 		final MetaFile file = new MetaFile();
 		file.setFileName(fileName);
 		return upload(stream, file);
+	}
+
+	/**
+	 * Upload the given file stream and attach it to the given record.
+	 *
+	 * <p>
+	 * The attachment will be saved as {@link DMSFile} and will be visible in
+	 * DMS user interface. Use {@link #upload(InputStream, String)} along with
+	 * {@link #attach(MetaFile, Model)} if you don't want to show the attachment
+	 * in DMS interface.
+	 * </p>
+	 *
+	 * @param stream
+	 *            the stream to upload
+	 * @param fileName
+	 *            the file name to use
+	 * @param entity
+	 *            the record to attach to
+	 * @return a {@link DMSFile} record created for the attachment
+	 * @throws IOException
+	 */
+	@Transactional
+	public DMSFile attach(InputStream stream, String fileName, Model entity) throws IOException {
+		final MetaFile metaFile = upload(stream, fileName);
+		final DMSFile dmsFile = new DMSFile();
+		final DMSFileRepository repository = Beans.get(DMSFileRepository.class);
+
+		dmsFile.setFileName(fileName);
+		dmsFile.setMetaFile(metaFile);
+		dmsFile.setRelatedId(entity.getId());
+		dmsFile.setRelatedModel(EntityHelper.getEntityClass(entity).getName());
+
+		repository.save(dmsFile);
+
+		return dmsFile;
+	}
+
+	/**
+	 * Delete the given {@link DMSFile} and also delete linked file if not
+	 * referenced by any other record.
+	 *
+	 * <p>
+	 * It will attempt to clean up associated {@link MetaFile} and
+	 * {@link MetaAttachment} records and also try to delete linked file from
+	 * upload directory.
+	 * </p>
+	 *
+	 * @param file
+	 *            the {@link DMSFile} to delete
+	 */
+	@Transactional
+	public void delete(DMSFile file) {
+		final DMSFileRepository repository = Beans.get(DMSFileRepository.class);
+		repository.remove(file);
 	}
 
 	/**
