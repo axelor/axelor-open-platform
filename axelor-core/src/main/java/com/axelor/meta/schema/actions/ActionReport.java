@@ -18,10 +18,8 @@
 package com.axelor.meta.schema.actions;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +32,6 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.joda.time.DateTime;
 
-import com.axelor.common.VersionUtils;
 import com.axelor.db.JPA;
 import com.axelor.dms.db.DMSFile;
 import com.axelor.dms.db.repo.DMSFileRepository;
@@ -47,9 +44,6 @@ import com.axelor.report.ReportGenerator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Throwables;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfStamper;
 
 public class ActionReport extends Action {
 
@@ -130,30 +124,7 @@ public class ActionReport extends Action {
 			throw Throwables.propagate(e);
 		}
 
-		if (!"pdf".equalsIgnoreCase(format)) {
-			return tmp1.toFile();
-		}
-
-		final Path tmp2 = MetaFiles.createTempFile(null, "");
-		try(FileInputStream is = new FileInputStream(tmp1.toFile());
-			FileOutputStream os = new FileOutputStream(tmp2.toFile())) {
-
-			PdfReader reader = new PdfReader(is);
-			PdfStamper stamper = new PdfStamper(reader, os);
-
-			HashMap<String, String> info = new HashMap<>();
-
-			info.put("Creator", "ADK " + VersionUtils.getVersion());
-
-			stamper.setMoreInfo(info);
-			stamper.close();
-
-			Files.delete(tmp1);
-		} catch (DocumentException e) {
-			throw Throwables.propagate(e);
-		}
-
-		return tmp2.toFile();
+		return tmp1.toFile();
 	}
 
 	private Object attach(File tempFile, String name, Class<?> model, Long id) throws IOException {

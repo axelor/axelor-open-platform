@@ -20,11 +20,14 @@ package com.axelor.report;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -36,6 +39,7 @@ import org.eclipse.birt.report.engine.api.IReportEngine;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
 import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.eclipse.birt.report.engine.api.RenderOption;
+import org.eclipse.birt.report.engine.emitter.pdf.PDFPageDevice;
 import org.eclipse.birt.report.model.api.IResourceLocator;
 import org.hibernate.Session;
 import org.hibernate.internal.SessionFactoryImpl;
@@ -99,6 +103,25 @@ public class ReportGenerator {
 			}
 		} finally {
 			stream.close();
+		}
+	}
+
+	static {
+		// BIRT when used as embedded library, shows full file path as version,
+		// this is security risk as this information is exposed in pdf metadata
+		try {
+			final Field field = PDFPageDevice.class.getDeclaredField("versionInfo");
+			field.setAccessible(true);
+			final String[] info = (String[]) field.get(PDFPageDevice.class);
+			final String version = info[0];
+			if (version.endsWith(".jar")) {
+				final Pattern p = Pattern.compile(".*?\\-([^-]+)\\.jar");
+				final Matcher m = p.matcher(version);
+				if (m.matches()) {
+					info[0] = m.group(1);
+				}
+			}
+		} catch (Exception e) {
 		}
 	}
 }
