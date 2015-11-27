@@ -19,22 +19,27 @@ package com.axelor.mail;
 
 import static com.axelor.common.StringUtils.isBlank;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
+import javax.activation.FileTypeMap;
 import javax.activation.URLDataSource;
+import javax.mail.BodyPart;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
-import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -46,8 +51,6 @@ import javax.mail.internet.MimePart;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * The {@link MailBuilder} defines fluent API to build {@link MimeMessage} and
@@ -68,11 +71,16 @@ public final class MailBuilder {
 	private Set<String> bccRecipients = new LinkedHashSet<>();
 	private Set<String> replyRecipients = new LinkedHashSet<>();
 
-	private List<Content> contents = Lists.newArrayList();
+	private final List<Content> contents = new ArrayList<>();
 
-	private Map<String, String> headers = Maps.newHashMap();
+	private final Map<String, String> headers = new HashMap<>();
 
-	private boolean textOnly;
+	private final FileTypeMap fileTypeMap = new MailFileTypeMap();
+
+	private boolean hasText;
+	private boolean hasHtml;
+	private boolean hasInline;
+	private boolean hasAttach;
 
 	private class Content {
 		String cid;
@@ -145,10 +153,12 @@ public final class MailBuilder {
 	}
 
 	public MailBuilder text(String text) {
+		hasText = true;
 		return text(text, false);
 	}
 
 	public MailBuilder html(String text) {
+		hasHtml = true;
 		return text(text, true);
 	}
 
@@ -158,7 +168,6 @@ public final class MailBuilder {
 		content.text = text;
 		content.html = html;
 		contents.add(content);
-		textOnly = contents.size() == 1;
 		return this;
 	}
 
@@ -199,7 +208,13 @@ public final class MailBuilder {
 		content.file = link;
 		content.cid = cid;
 		contents.add(content);
-		textOnly = false;
+
+		if (cid != null && cid.indexOf('<') == 0) {
+			hasInline = true;
+		} else {
+			hasAttach = true;
+		}
+
 		return this;
 	}
 
@@ -222,7 +237,7 @@ public final class MailBuilder {
 		content.cid = "<" + name + ">";
 		content.inline = true;
 		contents.add(content);
-		textOnly = false;
+		hasInline = true;
 		return this;
 	}
 
@@ -273,20 +288,55 @@ public final class MailBuilder {
 			message.setHeader(name, headers.get(name));
 		}
 
-		if (textOnly) {
+		// simple text or html email
+		if (contents.size() == 1 && (hasText || hasHtml)) {
 			contents.get(0).apply(message);
 			return message;
 		}
 
-		Multipart mp = new MimeMultipart();
+		final MimeMultipart rootContainer = new MimeMultipart();
+		MimeMultipart inlineContainer = rootContainer;
+		MimeMultipart bodyContainer = rootContainer;
+
+		rootContainer.setSubType("mixed");
+
+		// prepare multipart layout
+		if (hasHtml && hasInline) {
+			// if html & inline images are used, created related container
+			inlineContainer = new MimeMultipart("related");
+			bodyContainer = inlineContainer;
+			addPart(rootContainer, inlineContainer, 0);
+
+			// if text body is provided, create alternative container
+			if (hasText) {
+				bodyContainer = new MimeMultipart("alternative");
+				addPart(inlineContainer, bodyContainer, 0);
+			}
+		} else if (hasHtml && hasText) {
+			// create alternative container if html & text is provided and has attachments
+			if (hasInline || hasAttach) {
+				bodyContainer = new MimeMultipart("alternative");
+				addPart(rootContainer, bodyContainer, 0);
+			} else {
+				// if no attachments, mark main container as alternative
+				rootContainer.setSubType("alternative");
+			}
+		}
+
+		final StringBuilder text = new StringBuilder();
+		final StringBuilder html = new StringBuilder();
+
 		for (Content content : contents) {
-			MimeBodyPart part = new MimeBodyPart();
 			if (content.text == null) {
+				final MimeBodyPart part = new MimeBodyPart();
 				try {
-					URL link = new URL(content.file);
+					final URL link = new URL(content.file);
 					part.setDataHandler(new DataHandler(new URLDataSource(link)));
 				} catch (MalformedURLException e) {
-					part.attachFile(content.file);
+					// default implementation fails to detect mime type
+					final FileDataSource fds = new FileDataSource(new File(content.file));
+					fds.setFileTypeMap(fileTypeMap);
+					part.setDataHandler(new DataHandler(fds));
 				}
 				part.setFileName(content.name);
 				if (content.cid != null) {
@@ -294,18 +344,39 @@ public final class MailBuilder {
 				}
 				if (content.inline) {
 					part.setDisposition(Part.INLINE);
+					inlineContainer.addBodyPart(part);
 				} else {
 					part.setDisposition(Part.ATTACHMENT);
+					rootContainer.addBodyPart(part);
 				}
+			} else if (content.html) {
+				html.append(content.text);
 			} else {
-				content.apply(part);
+				text.append(content.text);
 			}
-			mp.addBodyPart(part);
 		}
 
-		message.setContent(mp);
+		final MimeBodyPart htmlPart = new MimeBodyPart();
+		final MimeBodyPart textPart = new MimeBodyPart();
+
+		if (html.length() > 0) {
+			htmlPart.setText(html.toString(), "UTF-8", "html");
+			bodyContainer.addBodyPart(htmlPart, 0);
+		}
+		if (text.length() > 0) {
+			textPart.setText(text.toString(), "UTF-8");
+			bodyContainer.addBodyPart(textPart, 0);
+		}
+
+		message.setContent(rootContainer);
 
 		return message;
+	}
+
+	private void addPart(MimeMultipart root, MimeMultipart content, int index) throws MessagingException {
+		final BodyPart part = new MimeBodyPart();
+		part.setContent(content);
+		root.addBodyPart(part, index);
 	}
 
 	/**
