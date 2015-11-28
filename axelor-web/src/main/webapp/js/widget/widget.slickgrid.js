@@ -2017,7 +2017,7 @@ Grid.prototype.onMoveRows = function (event, args) {
 
 Grid.prototype.onButtonClick = function(event, args) {
 	
-	if ($(event.srcElement).is('.readonly')) {
+	if ($(event.srcElement).is('.readonly') || this._buttonClickRunning) {
 		event.stopImmediatePropagation();
 		return false;
 	}
@@ -2032,10 +2032,12 @@ Grid.prototype.onButtonClick = function(event, args) {
 	grid.setActiveCell(args.row, args.cell);
 
 	if (field.handler) {
-		
+		this._buttonClickRunning = true;
+
 		var handlerScope = this.scope.handler;
 		var model = handlerScope._model;
 		var record = data.getItem(args.row) || {};
+		var that = this;
 
 		// defer record access so that any pending changes are applied
 		Object.defineProperty(field.handler.scope, 'record', {
@@ -2059,9 +2061,12 @@ Grid.prototype.onButtonClick = function(event, args) {
 			return context;
 		};
 		field.handler.onClick().then(function(res){
+			delete that._buttonClickRunning;
 			delete field.handler.scope.record;
 			grid.invalidateRows([args.row]);
 			grid.render();
+		}, function () {
+			delete that._buttonClickRunning;
 		});
 	}
 };
