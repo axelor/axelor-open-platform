@@ -56,6 +56,11 @@ public class AuthFilter extends FormAuthenticationFilter {
 	public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
 		if (isLoginRequest(request, response) && SecurityUtils.getSubject().isAuthenticated()) {
+			// in case of login submission with ajax
+			if (isXHR(request) && isLoginSubmission(request, response)) {
+				WebUtils.toHttp(response).setStatus(200);
+				return;
+			}
 			WebUtils.issueRedirect(request, response, "/");
 		}
 		super.doFilterInternal(request, response, chain);
@@ -108,6 +113,8 @@ public class AuthFilter extends FormAuthenticationFilter {
 	}
 
 	private boolean isXHR(ServletRequest request) {
-		return "XMLHttpRequest".equals(((HttpServletRequest) request).getHeader("X-Requested-With"));
+		final HttpServletRequest req = (HttpServletRequest) request;
+		return "XMLHttpRequest".equals(req.getHeader("X-Requested-With"))
+				|| "application/json".equals(req.getHeader("Content-Type"));
 	}
 }
