@@ -201,7 +201,7 @@
 }
 
 .dashboard .dashlet-body > * {
-	height: calc(100% - 2px);
+	height: calc(100% - 1px);
 }
 
 .dashboard .dashlet-body .slickgrid {
@@ -250,6 +250,10 @@
 }
 .form-item .dashboard .dashlet {
 	margin: 0 !important;
+	border: 1px solid #e7e7e7;
+}
+.form-item .dashboard .dashlet .dashlet-body > * {
+	height: 100%;
 }
 
 /** responsive dashlet classes */
