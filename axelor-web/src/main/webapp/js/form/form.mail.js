@@ -834,7 +834,7 @@ ui.formWidget('uiMailComposer', {
 	},
 	template: "" +
 		"<div class='mail-composer' ng-show='canShow()'>" +
-			"<textarea rows='1' ng-model='post' ui-textarea-auto-size class='span12' placeholder='Write your comment here'></textarea>" +
+			"<textarea rows='1' ng-model='post' ui-textarea-auto-size class='span12' placeholder='{{\"Write your comment here\" | t}}'></textarea>" +
 			"<div class='mail-composer-files' ng-show='files.length'>" +
 				"<div ui-mail-files x-files='files'></div>" +
 			"</div>" +
