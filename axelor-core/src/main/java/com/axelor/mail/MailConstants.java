@@ -41,6 +41,10 @@ public interface MailConstants {
 	public static final String CONFIG_IMAP_TIMEOUT = "mail.imap.timeout";
 	public static final String CONFIG_IMAP_CONNECTION_TIMEOUT = "mail.imap.connectionTimeout";
 
+	public static final String PROTOCOL_IMAP = "imap";
+	public static final String PROTOCOL_IMAPS = "imaps";
+	public static final String PROTOCOL_POP3 = "pop3";
+
 	public static final int DEFAULT_TIMEOUT = 60000;
 
 	public static final String CHANNEL_STARTTLS = "starttls";

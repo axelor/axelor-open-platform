@@ -34,15 +34,17 @@ public abstract class AbstractMailTest {
 
 	protected static final String SMTP_PORT = "" + ServerSetupTest.SMTP.getPort();
 	protected static final String IMAP_PORT = "" + ServerSetupTest.IMAP.getPort();
+	protected static final String POP3_PORT = "" + ServerSetupTest.POP3.getPort();
 
 	protected static final String USER_NAME = "test";
 	protected static final String USER_PASS = "test";
 
 	@Rule
-	public final GreenMailRule server = new GreenMailRule(ServerSetupTest.SMTP_IMAP);
+	public final GreenMailRule server = new GreenMailRule(ServerSetupTest.SMTP_POP3_IMAP);
 
 	protected final SmtpAccount SMTP_ACCOUNT = new SmtpAccount(SERVER_HOST, SMTP_PORT, USER_NAME, USER_PASS);
 	protected final ImapAccount IMAP_ACCOUNT = new ImapAccount(SERVER_HOST, IMAP_PORT, USER_NAME, USER_PASS);
+	protected final Pop3Account POP3_ACCOUNT = new Pop3Account(SERVER_HOST, POP3_PORT, USER_NAME, USER_PASS);
 
 	protected GreenMailUser user;
 

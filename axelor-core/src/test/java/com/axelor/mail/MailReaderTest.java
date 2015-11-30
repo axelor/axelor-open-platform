@@ -27,10 +27,10 @@ import org.junit.Test;
 public class MailReaderTest extends AbstractMailTest {
 
 	final MailSender sender = new MailSender(SMTP_ACCOUNT);
-	final MailReader reader = new MailReader(IMAP_ACCOUNT);
+	final MailReader imapReader = new MailReader(IMAP_ACCOUNT);
+	final MailReader pop3Reader = new MailReader(POP3_ACCOUNT);
 
-	@Test
-	public void test() throws Exception {
+	private void test(MailSender sender, MailReader reader) throws Exception {
 
 		final MimeMessage msg = sender.compose()
 				.from("me@localhost")
@@ -71,5 +71,15 @@ public class MailReaderTest extends AbstractMailTest {
 
 		Assert.assertEquals("Re: Hello...", incoming.getSubject());
 		Assert.assertEquals(msg.getMessageID(), incoming.getHeader("In-Reply-To", ""));
+	}
+
+	@Test
+	public void testIMAP() throws Exception {
+		test(sender, imapReader);
+	}
+
+	@Test
+	public void testPOP3() throws Exception {
+		test(sender, pop3Reader);
 	}
 }

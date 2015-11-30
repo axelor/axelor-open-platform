@@ -18,13 +18,13 @@
 package com.axelor.mail;
 
 /**
- * The default implementation of {@link MailAccount} for IMAP/IMAPS accounts.
+ * The default implementation of {@link MailAccount} for POP3 accounts.
  *
  */
-public class ImapAccount extends AbstractMailAccount {
+public class Pop3Account extends AbstractMailAccount {
 
 	/**
-	 * Create a new IMAP account.
+	 * Create a new POP3 account.
 	 *
 	 * @param host
 	 *            server hostname
@@ -35,17 +35,12 @@ public class ImapAccount extends AbstractMailAccount {
 	 * @param password
 	 *            login password
 	 */
-	public ImapAccount(String host, String port, String user, String password) {
-		this(host, port, user, password, null);
+	public Pop3Account(String host, String port, String user, String password) {
+		super(MailConstants.PROTOCOL_POP3, host, port, user, password, null);
 	}
 
 	/**
-	 * Create a new IMAP/IMAPS account.
-	 *
-	 * <p>
-	 * If the given channel is {@link MailConstants#CHANNEL_SSL} then it will
-	 * use <code>imaps</code> protocol over <code>ssl</code>.
-	 * </p>
+	 * Create a new POP3 account.
 	 *
 	 * @param host
 	 *            server hostname
@@ -58,8 +53,7 @@ public class ImapAccount extends AbstractMailAccount {
 	 * @param channel
 	 *            encryption channel (ssl, starttls or null)
 	 */
-	public ImapAccount(String host, String port, String user, String password, String channel) {
-		super(MailConstants.CHANNEL_SSL.equals(channel) ? MailConstants.PROTOCOL_IMAPS : MailConstants.PROTOCOL_IMAP,
-				host, port, user, password, channel);
+	public Pop3Account(String host, String port, String user, String password, String channel) {
+		super(MailConstants.PROTOCOL_POP3, host, port, user, password, channel);
 	}
 }
