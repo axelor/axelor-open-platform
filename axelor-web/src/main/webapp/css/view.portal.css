@@ -255,6 +255,15 @@
 .form-item .dashboard .dashlet .dashlet-body > * {
 	height: 100%;
 }
+.form-item .dashboard .dashlet .dashlet-body {
+	padding: 0;
+}
+.form-item .dashboard .dashlet .dashlet-body .portlet-grid .slickgrid {
+	border: 0;
+}
+.form-item .dashboard .dashlet .dashlet-body .portlet-grid .slick-header {
+	border-top: 0;
+}
 
 /** responsive dashlet classes */
 
