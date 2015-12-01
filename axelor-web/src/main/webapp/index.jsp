@@ -21,15 +21,17 @@
 <%@ page language="java" session="true" %>
 <%@ taglib prefix="x" uri="WEB-INF/axelor.tld" %>
 <%@ page import="com.axelor.app.AppSettings" %>
+<%@ page import="com.axelor.web.internal.AppInfo" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Locale"%>
 <%
 AppSettings settings = AppSettings.get();
+AppInfo info = new AppInfo();
 
 String appName = settings.get("application.name", "My App");
 String appDesc = settings.get("application.description", null);
 String appHome = settings.get("application.home", "");
-String appLogo = settings.get("application.logo", "img/axelor-logo.png");
+String appLogo = info.getLogo();
 String appAuthor = settings.get("application.author", "");
 String appTheme = settings.get("application.theme", null);
 String appMenu = settings.get("application.menu", "both");

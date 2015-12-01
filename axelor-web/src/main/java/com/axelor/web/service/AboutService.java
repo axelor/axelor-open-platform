@@ -38,14 +38,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
-import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
-import com.axelor.common.VersionUtils;
-import com.axelor.db.mapper.Mapper;
-import com.axelor.db.mapper.Property;
 import com.axelor.web.AppSessionListener;
+import com.axelor.web.internal.AppInfo;
 import com.google.inject.servlet.RequestScoped;
 
 @RequestScoped
@@ -63,67 +59,8 @@ public class AboutService extends AbstractService {
 	@GET
 	@Path("info")
 	public Map<String, Object> info() {
-
-		final AppSettings settings = AppSettings.get();
-		final Map<String, Object> map = new HashMap<>();
-		final User user = AuthUtils.getUser();
-
-		if (user == null) {
-			return map;
-		}
-
-		final Group group = user.getGroup();
-
-		// if name field is overridden
-		final Property nameField = Mapper.of(User.class).getNameField();
-		final Object nameValue = nameField.get(user);
-
-		map.put("user.id", user.getId());
-		map.put("user.name", nameValue);
-		map.put("user.login", user.getCode());
-		map.put("user.nameField", nameField.getName());
-		map.put("user.lang", user.getLanguage());
-		map.put("user.action", user.getHomeAction());
-		map.put("user.singleTab", user.getSingleTab());
-
-		if (user.getImage() != null) {
-			map.put("user.image", "ws/rest/" + User.class.getName() + "/" + user.getId() + "/image/download?image=true&v=" + user.getVersion());
-		} else {
-			map.put("user.image", "img/user.png");
-		}
-
-		if (group != null) {
-			map.put("user.navigator", group.getNavigation());
-			map.put("user.technical", group.getTechnicalStaff());
-			map.put("user.group", group.getCode());
-		}
-		if (user.getHomeAction() == null && group != null) {
-			map.put("user.action", group.getHomeAction());
-		}
-
-		map.put("application.name", settings.get("application.name"));
-		map.put("application.description", settings.get("application.description"));
-		map.put("application.version", settings.get("application.version"));
-		map.put("application.author", settings.get("application.author"));
-		map.put("application.copyright", settings.get("application.copyright"));
-		map.put("application.home", settings.get("application.home"));
-		map.put("application.help", settings.get("application.help"));
-		map.put("application.mode", settings.get("application.mode", "dev"));
-
-		map.put("file.upload.size", settings.get("file.upload.size", "5"));
-		map.put("application.sdk", VersionUtils.getVersion().version);
-
-		for (String key : settings.getProperties().stringPropertyNames()) {
-			if (key.startsWith("view.")) {
-				Object value = settings.get(key);
-				if ("true".equals(value) || "false".equals(value)) {
-					value = Boolean.parseBoolean(value.toString());
-				}
-				map.put(key, value);
-			}
-		}
-
-		return map;
+		final AppInfo info = new AppInfo();
+		return info.info();
 	}
 
 	@GET
