@@ -645,11 +645,11 @@ var panelRelatedTemplate =
 "<div class='panel panel-related'>" +
 	"<div class='panel-header'>" +
 		"<div class='icons-bar pull-right' ng-show='!isReadonly()'>" +
-			"<i ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()' class='fa fa-pencil'></i>" +
-			"<i ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()' class='fa fa-plus'></i>" +
-			"<i ng-click='onCopy()' ng-show='hasPermission(\"create\") && !isDisabled() && canCopy()' class='fa fa-files-o'></i>" +
-			"<i ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()' class='fa fa-minus'></i>" +
-			"<i ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()' class='fa fa-search'></i>" +
+			"<i ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()' title='{{\"Edit\" | t}}' class='fa fa-pencil'></i>" +
+			"<i ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()' title='{{\"New\" | t}}' class='fa fa-plus'></i>" +
+			"<i ng-click='onCopy()' ng-show='hasPermission(\"create\") && !isDisabled() && canCopy()' title='{{\"Duplicate\" | t}}' class='fa fa-files-o'></i>" +
+			"<i ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()' title='{{\"Remove\" | t}}' class='fa fa-minus'></i>" +
+			"<i ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()' title='{{\"Select\" | t}}' class='fa fa-search'></i>" +
 		"</div>" +
 		"<div class='panel-title'><span ui-help-popover ng-bind-html='title'></span></div>" +
 	"</div>" +
@@ -957,11 +957,11 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			"<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items'>" +
 				"<div ui-panel-editor></div>" +
 				"<span class='o2m-list-remove'>" +
-					"<a tabindex='-1' href='' ng-click='removeItem($index)'><i class='fa fa-times'></i></a>" +
+					"<a tabindex='-1' href='' ng-click='removeItem($index)' title='{{\"Remove\" | t}}'><i class='fa fa-times'></i></a>" +
 				"</span>" +
 			"</div>" +
 			"<div class='o2m-list-row o2m-list-add'>" +
-				"<a tabindex='-1' href='' ng-click='addItem()'><i class='fa fa-plus'></i></a>" +
+				"<a tabindex='-1' href='' ng-click='addItem()'  title='{{\"Add\" | t}}'><i class='fa fa-plus'></i></a>" +
 			"</div>" +
 		"</div>";
 	},

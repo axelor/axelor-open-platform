@@ -565,9 +565,9 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 		var template = "" +
 		"<div class='m2o-editor'>" +
 			"<div class='m2o-editor-controls'>" +
-				"<a href='' ng-show='canEdit() && canShowIcon(\"edit\")' ng-click='onEdit()'><i class='fa fa-pencil'></i></a>" +
-				"<a href='' ng-show='canSelect() && canShowIcon(\"select\")' ng-click='onSelect()'><i class='fa fa-search'></i></a>" +
-				"<a href='' ng-show='canShowIcon(\"clear\")' ng-click='onClear()'><i class='fa fa-times-circle'></i></a>" +
+				"<a href='' ng-show='canEdit() && canShowIcon(\"edit\")' ng-click='onEdit()' title='{{\"Edit\" | t}}'><i class='fa fa-pencil'></i></a>" +
+				"<a href='' ng-show='canSelect() && canShowIcon(\"select\")' ng-click='onSelect()' title='{{\"Select\" | t}}'><i class='fa fa-search'></i></a>" +
+				"<a href='' ng-show='canShowIcon(\"clear\")' ng-click='onClear()' title='{{\"Clear\" | t}}'><i class='fa fa-times-circle'></i></a>" +
 			"</div>" +
 			"<div class='m2o-editor-form' ui-panel-editor></div>" +
 		"</div>";
