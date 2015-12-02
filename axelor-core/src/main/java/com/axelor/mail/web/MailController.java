@@ -46,7 +46,8 @@ public class MailController extends JpaSupport {
 	
 	private static final String SQL_UNREAD = ""
 			+ "SELECT COUNT(DISTINCT m) FROM MailMessage m LEFT JOIN m.flags g "
-			+ "WHERE (CONCAT(m.relatedId, m.relatedModel) IN "
+			+ "WHERE (m.parent IS NULL) AND "
+			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
 			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
 			+ "((g IS NULL) OR (g.user.id != :uid) OR (g.user.id = :uid AND g.isRead = false))";
 
