@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
@@ -570,6 +571,10 @@ public class Resource<T extends Model> {
 			if (act != null) {
 				values.put("__actionSelect", toMapCompact(act));
 			}
+		}
+		// don't include password if not requested
+		if (entity instanceof User && !request.getFields().contains("password")) {
+			values.remove("password");
 		}
 
 		data.add(repository.populate(values, request.getContext()));
