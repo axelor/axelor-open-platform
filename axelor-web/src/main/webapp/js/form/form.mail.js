@@ -212,7 +212,7 @@ ui.directive('uiMailMessage', function () {
 				"</a>" +
 				"<div class='mail-message'>" +
 					"<span class='arrow left'></span>" +
-					"<span class='star left' ng-show='!message.$flags.isRead'><i class='fa fa-asterisk'></i></span>" +
+					"<span class='star left' ng-show='message.$isNew || !message.$flags.isRead'><i class='fa fa-asterisk'></i></span>" +
 					"<div class='mail-message-icons'>" +
 						"<span ng-if='::message.$thread'>" +
 							"<i class='fa fa-reply' ng-show='::message.$thread' ng-click='onReply(message)'></i> " +
@@ -290,6 +290,7 @@ ui.formWidget('uiMailMessages', {
 			_.each(messages, function (message) {
 				if (!(message.$flags||{}).isRead) {
 					unread.push(message);
+					message.$isNew = true;
 				}
 				_.each(message.$children, function (item) {
 					if (!(item.$flags||{}).isRead) {
