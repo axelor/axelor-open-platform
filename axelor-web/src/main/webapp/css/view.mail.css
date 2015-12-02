@@ -105,7 +105,7 @@
 	box-shadow: 0 1px 1px rgba(0,0,0,0.05);
 }
 
-.mail-thread .mail-message .arrow {
+.mail-thread .mail-message > .arrow {
 	position: absolute;
 	display: inline-block;
 	width: 11px;
@@ -120,6 +120,16 @@
 	   -moz-transform: rotate(-45deg);
 	    -ms-transform: rotate(-45deg);
 	        transform: rotate(-45deg);
+}
+
+.mail-thread .mail-message > .star {
+	position: absolute;
+	color: #d9534f;
+	left: 8px;
+}
+
+.mail-thread .mail-message > .star i {
+	font-size: 8px;
 }
 
 .mail-thread .mail-message-icons {

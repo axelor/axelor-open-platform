@@ -212,6 +212,7 @@ ui.directive('uiMailMessage', function () {
 				"</a>" +
 				"<div class='mail-message'>" +
 					"<span class='arrow left'></span>" +
+					"<span class='star left' ng-show='!message.$flags.isRead'><i class='fa fa-asterisk'></i></span>" +
 					"<div class='mail-message-icons'>" +
 						"<span ng-if='::message.$thread'>" +
 							"<i class='fa fa-reply' ng-show='::message.$thread' ng-click='onReply(message)'></i> " +
