@@ -158,13 +158,33 @@ public class ReportGenerator {
 	 * @throws IOException
 	 * @throws BirtException
 	 */
+	public File generate(String designName, String format, Map<String, Object> params) throws IOException, BirtException {
+		return generate(designName, format, params, AppFilter.getLocale());
+	}
+
+	/**
+	 * Generate a report to a temporary file and return path to the generated
+	 * file.
+	 *
+	 * @param designName
+	 *            report design name
+	 * @param format
+	 *            output format
+	 * @param params
+	 *            report parameters
+	 * @param locale
+	 *            report output language
+	 * @return {@link Path} to the generated file
+	 * @throws IOException
+	 * @throws BirtException
+	 */
 	public File generate(String designName, String format, Map<String, Object> params, Locale locale)
 			throws IOException, BirtException {
 		Preconditions.checkNotNull(designName, "no report design name given");
 		final Path tmpFile = MetaFiles.createTempFile(null, "");
 		final FileOutputStream stream = new FileOutputStream(tmpFile.toFile());
 
-		generate(stream, designName, format, params);
+		generate(stream, designName, format, params, locale);
 
 		return tmpFile.toFile();
 	}
