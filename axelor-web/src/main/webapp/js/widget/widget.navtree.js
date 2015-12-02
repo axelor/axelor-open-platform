@@ -21,7 +21,7 @@
 
 var ui = angular.module('axelor.ui');
 
-ui.directive('uiNavTree', ['MenuService', function(MenuService) {
+ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, TagService) {
 
 	return {
 		scope: {
@@ -44,9 +44,6 @@ ui.directive('uiNavTree', ['MenuService', function(MenuService) {
 					return;
 				}
 				handler(e, menu);
-				MenuService.tags().success(function (res) {
-					this.update(res.data);
-				}.bind(this));
 			};
 
 			this.load = function (data) {
@@ -89,6 +86,11 @@ ui.directive('uiNavTree', ['MenuService', function(MenuService) {
 					}
 				});
 			};
+
+			var that =  this;
+			TagService.listen(function (data) {
+				that.update(data.tags);
+			});
 		}],
 		link: function (scope, element, attrs, ctrl) {
 			

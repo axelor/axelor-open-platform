@@ -33,10 +33,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import com.axelor.mail.web.MailController;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
+import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
 import com.google.inject.servlet.RequestScoped;
 
@@ -48,6 +50,9 @@ public class ActionService extends AbstractService {
 
 	@Inject
 	private MetaService service;
+
+	@Inject
+	private MailController mailController;
 	
 	@GET
 	@Path("menu")
@@ -82,18 +87,19 @@ public class ActionService extends AbstractService {
 	@GET
 	@Path("menu/tags")
 	public Response tags() {
-		Response response = new Response();
-		List<Object> data = new ArrayList<>();
+		final ActionResponse response = new ActionResponse();
+		final List<Object> tags = new ArrayList<>();
 		try {
 			for (MenuItem item : service.getMenusWithTag()) {
 				Map<String, Object> tag = new HashMap<>();
 				tag.put("name", item.getName());
 				tag.put("tag", item.getTag());
 				tag.put("tagStyle", item.getTagStyle());
-				data.add(tag);
+				tags.add(tag);
 			}
-			response.setData(data);
+			response.setValue("tags", tags);
 			response.setStatus(Response.STATUS_SUCCESS);
+			mailController.countMail(null, response);
 		} catch (Exception e) {
 			if (LOG.isErrorEnabled())
 				LOG.error(e.getMessage(), e);

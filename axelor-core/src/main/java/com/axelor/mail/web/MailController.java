@@ -18,6 +18,7 @@
 package com.axelor.mail.web;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -83,6 +84,14 @@ public class MailController extends JpaSupport {
 
 	@Inject
 	private MailMessageRepository messages;
+
+	public void countMail(ActionRequest request, ActionResponse response) {
+		final Map<String, Object> value = new HashMap<>();
+		value.put("total", count(SQL_INBOX));
+		value.put("unread", countUnread());
+		response.setValue("mail", value);
+		response.setStatus(Response.STATUS_SUCCESS);
+	}
 
 	public void unread(ActionRequest request, ActionResponse response) {
 		response.setValue("unread", countUnread());

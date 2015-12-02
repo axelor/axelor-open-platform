@@ -21,34 +21,16 @@
 
 var ui = angular.module('axelor.ui');
 
-ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $timeout, DataSource) {
-
-	var POLL_INTERVAL = 10000;
+ui.factory('MessageService', ['$q', '$timeout', 'DataSource', 'TagService', function($q, $timeout, DataSource, TagService) {
 
 	var dsFlags = DataSource.create('com.axelor.mail.db.MailFlags');
 	var dsMessage = DataSource.create('com.axelor.mail.db.MailMessage');
 
 	var pollResult = {};
-	var pollPromise = null;
 
-	function checkUnreadMessages() {
-
-		if (pollPromise) {
-			$timeout.cancel(pollPromise);
-		}
-
-		var params = {
-			folder: 'inbox',
-			count: true
-		};
-
-		dsMessage.messages(params).success(function (res) {
-			var item = _.first(res.data) || {};
-			var count = item.values || {};
-			pollResult = count;
-			pollPromise = $timeout(checkUnreadMessages, POLL_INTERVAL);
-		});
-	}
+	TagService.listen(function (data) {
+		pollResult = data.mail || {};
+	});
 
 	/**
 	 * Get the followers of the given record.
@@ -142,7 +124,7 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 			});
 			// force unread check
 			if (flagState === 1 || flagState == -1) {
-				checkUnreadMessages();
+				TagService.find();
 			}
 		});
 
@@ -152,13 +134,10 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 	function removeMessage(message) {
 		var promise = dsMessage.remove(message);
 		promise.then(function () {
-			checkUnreadMessages(); // force unread check
+			TagService.find(); // force unread check
 		});
 		return promise;
 	}
-
-	// start polling
-	checkUnreadMessages();
 
 	return {
 		getFollowers: getFollowers,
@@ -166,7 +145,6 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', function($q, $time
 		getReplies: getReplies,
 		flagMessage: flagMessage,
 		removeMessage: removeMessage,
-		checkUnreadMessages: checkUnreadMessages,
 		unreadCount: function () {
 			return pollResult.unread;
 		}
@@ -244,12 +222,12 @@ ui.directive('uiMailMessage', function () {
 							"</a>" +
 							"<ul class='dropdown-menu pull-right'>" +
 								"<li>" +
-									"<a href='javascript:' ng-show='::!message.$flags.isRead' ng-click='onFlag(message, 1)' x-translate>Mark as read</a>" +
-									"<a href='javascript:' ng-show='::message.$flags.isRead' ng-click='onFlag(message, -1)' x-translate>Mark as unread</a>" +
+									"<a href='javascript:' ng-show='!message.$flags.isRead' ng-click='onFlag(message, 1)' x-translate>Mark as read</a>" +
+									"<a href='javascript:' ng-show='message.$flags.isRead' ng-click='onFlag(message, -1)' x-translate>Mark as unread</a>" +
 								"</li>" +
 								"<li>" +
-									"<a href='javascript:' ng-show='::!message.$flags.isStarred' ng-click='onFlag(message, 2)' x-translate>Mark as important</a>" +
-									"<a href='javascript:' ng-show='::message.$flags.isStarred' ng-click='onFlag(message, -2)' x-translate>Mark as not important</a>" +
+									"<a href='javascript:' ng-show='!message.$flags.isStarred' ng-click='onFlag(message, 2)' x-translate>Mark as important</a>" +
+									"<a href='javascript:' ng-show='message.$flags.isStarred' ng-click='onFlag(message, -2)' x-translate>Mark as not important</a>" +
 								"</li>" +
 								"<li ng-if='message.$thread' ng-show='::!message.parent'>" +
 									"<a href='javascript:' ng-show='::!message.$flags.isArchived' ng-click='onFlag(message, 3)'>Move to archive</a>" +

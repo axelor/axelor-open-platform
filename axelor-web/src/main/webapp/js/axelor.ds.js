@@ -66,6 +66,46 @@
 		};
 	}]);
 
+	ds.factory('TagService', ['$q', '$timeout', '$rootScope', 'MenuService', function($q, $timeout, $rootScope, MenuService) {
+
+		var POLL_INTERVAL = 10000;
+
+		var pollResult = {};
+		var pollPromise = null;
+		var listeners = [];
+
+		function findTags() {
+			if (pollPromise) {
+				$timeout.cancel(pollPromise);
+			}
+			MenuService.tags().success(function (res) {
+				var data = _.first(res.data);
+				var values = data.values;
+				for (var i = 0; i < listeners.length; i++) {
+					listeners[i](values);
+				}
+				pollPromise = $timeout(findTags, POLL_INTERVAL);
+			});
+		}
+
+		// start polling
+		findTags();
+
+		return {
+			find: findTags,
+			listen: function(listener) {
+				listeners.push(listener);
+				return function () {
+					var i = listeners.indexOf(listener);
+					if (i >= 0) {
+						listeners.splice(i, 1);
+					}
+					return listener;
+				}
+			}
+		}
+	}]);
+
 	ds.factory('ViewService', ['$http', '$q', '$cacheFactory', '$compile', function($http, $q, $cacheFactory, $compile) {
 
 		var ViewService = function() {
