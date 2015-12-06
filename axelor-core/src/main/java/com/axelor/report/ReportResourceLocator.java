@@ -23,6 +23,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.birt.report.model.api.IResourceLocator;
 import org.eclipse.birt.report.model.api.ModuleHandle;
@@ -30,6 +31,7 @@ import org.eclipse.datatools.connectivity.oda.flatfile.ResourceLocator;
 
 import com.axelor.app.AppSettings;
 import com.axelor.common.ClassUtils;
+import com.axelor.common.FileUtils;
 
 /**
  * This is a {@link ResourceLocator} that first searches external reports
@@ -40,6 +42,8 @@ public class ReportResourceLocator implements IResourceLocator {
 
 	public static final String CONFIG_REPORT_DIR = "axelor.report.dir";
 	public static final String DEFAULT_REPORT_DIR = "{user.home}/axelor/reports";
+
+	private static final Pattern URL_PATTERN = Pattern.compile("^(file|jar|http|https|ftp):/.*");
 
 	private Path searchPath;
 
@@ -73,8 +77,21 @@ public class ReportResourceLocator implements IResourceLocator {
 			break;
 		}
 
-		// first search in the top directory
-		File found = searchPath.resolve(fileName).toFile();
+		// if already an url
+		if (URL_PATTERN.matcher(fileName).matches()) {
+			try {
+				return new URL(fileName);
+			} catch (MalformedURLException e) {
+			}
+		}
+
+		// first resolve absolute path
+		File found = new File(fileName);
+
+		// next search in the top directory
+		if (!found.exists()) {
+			found = searchPath.resolve(fileName).toFile();
+		}
 
 		// else search in sub directory
 		if (!found.exists()) {
@@ -89,9 +106,9 @@ public class ReportResourceLocator implements IResourceLocator {
 		}
 
 		// otherwise locate from the modules
-		URL url = ClassUtils.getResource(Paths.get("reports", fileName).normalize().toString());
+		URL url = ClassUtils.getResource(FileUtils.getFile("reports", fileName).getPath().replace("\\", "/"));
 		if (url == null) {
-			url = ClassUtils.getResource(Paths.get("reports", sub, fileName).normalize().toString());
+			url = ClassUtils.getResource(FileUtils.getFile("reports", sub, fileName).getPath().replace("\\", "/"));
 		}
 
 		return url;
