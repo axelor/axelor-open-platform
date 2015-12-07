@@ -212,6 +212,7 @@ ui.directive('uiToolbarAdjust', function() {
 			elemToolbarMobile = element.children('.view-toolbar-mobile').hide();
 			
 			element.on('adjustSize', adjust);
+			adjust();
 		}
 
 		function adjust() {
