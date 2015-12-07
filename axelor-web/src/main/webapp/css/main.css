@@ -400,7 +400,8 @@ header .navbar .nav-link-user-sub {
 	top: 8px; left: 0; right: 0; bottom: 0;
 }
 
-.navigation-tabs > .nav-tabs-wrap li.dirty a:before {
+.navigation-tabs > .nav-tabs-wrap li.dirty a:before,
+.navigation-tabs > .nav-tabs li.dirty a:before {
 	content: '*';
 	margin-right: 2px;
 }
