@@ -27,6 +27,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.google.inject.Singleton;
@@ -37,9 +38,14 @@ public class AppFilter implements Filter {
 	private static final ThreadLocal<String> BASE_URL = new ThreadLocal<>();
 	private static final ThreadLocal<Locale> LANGUAGE = new ThreadLocal<>();
 
+	private static Locale APP_LOCALE;
+
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-	
+		try {
+			APP_LOCALE = new Locale(AppSettings.get().get("application.locale"));
+		} catch (Exception e) {
+		}
 	}
 
 	public static String getBaseURL() {
@@ -50,6 +56,9 @@ public class AppFilter implements Filter {
 		User user = AuthUtils.getUser();
 		if (user != null && user.getLanguage() != null) {
 			return new Locale(user.getLanguage());
+		}
+		if (user != null && APP_LOCALE != null) {
+			return APP_LOCALE;
 		}
 		if (LANGUAGE.get() == null) {
 			return Locale.getDefault();
