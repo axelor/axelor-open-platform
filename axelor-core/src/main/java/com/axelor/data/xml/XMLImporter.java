@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -226,7 +227,19 @@ public class XMLImporter implements Importer {
 				};
 			}
 		};
-		
+
+		final Map<String, Object> context = new HashMap<>();
+
+		// Put global context
+		if (this.context != null) {
+			context.putAll(this.context);
+		}
+
+		// Put data path in context
+		if (dataDir != null) {
+			context.put("__path__", dataDir.toPath());
+		}
+
 		final XMLBinder binder = new XMLBinder(input, context) {
 			
 			int count = 0;

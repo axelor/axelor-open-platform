@@ -23,6 +23,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -287,14 +288,19 @@ public class CSVImporter implements Importer {
 		JPA.em().getTransaction().begin();
 		try {
 
-			Map<String, Object> context = Maps.newHashMap();
+			final Map<String, Object> context = new HashMap<>();
 
-			//Put global context
+			// Put global context
 			if (this.context != null) {
 				context.putAll(this.context);
 			}
 
 			csvInput.callPrepareContext(context);
+
+			// Put data path in context
+			if (dataDir != null) {
+				context.put("__path__", dataDir.toPath());
+			}
 
 			// register type adapters
 			for(DataAdapter adapter : defaultAdapters) {
