@@ -18,6 +18,7 @@
 package com.axelor.db;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,7 @@ import javax.persistence.EntityManager;
 
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.db.mapper.PropertyType;
 import com.axelor.inject.Beans;
 
 public class JpaRepository<T extends Model> implements Repository<T> {
@@ -100,7 +102,34 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 
 	@Override
 	public void remove(T entity) {
+		// detach orphan o2m records
+		detachChildren(entity);
 		JPA.remove(entity);
+	}
+
+	@SuppressWarnings("all")
+	private void detachChildren(T entity) {
+		if (!JPA.em().contains(entity)) {
+			return;
+		}
+		final Mapper mapper = Mapper.of(EntityHelper.getEntityClass(entity));
+		for (Property property : mapper.getProperties()) {
+			if (property.getType() != PropertyType.ONE_TO_MANY || !property.isOrphan()) {
+				continue;
+			}
+			final Property mappedBy = mapper.of(property.getTarget()).getProperty(property.getMappedBy());
+			if (mappedBy != null && mappedBy.isRequired()) {
+				continue;
+			}
+			final Collection<? extends Model> items = (Collection) property.get(entity);
+			if (items == null || items.size() == 0) {
+				continue;
+			}
+			for (Model item : items) {
+				property.setAssociation(item, null);
+			}
+			items.clear();
+		}
 	}
 
 	/**
