@@ -109,7 +109,7 @@ class DataLoader extends AbstractLoader {
 	private File extract(Module module) {
 
 		final String dirName = this.getDirName();
-		final List<URL> files = MetaScanner.findAll(module.getName(), dirName, "(.*?)\\.(xml|csv)");
+		final List<URL> files = MetaScanner.findAll(module.getName(), dirName, "(.+?)");
 
 		if (files.isEmpty()) {
 			return null;
