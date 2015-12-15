@@ -144,7 +144,8 @@ public class MetaController {
 			MetaStore.clear();
 			I18nBundle.invalidate();
 			moduleManager.restoreMeta();
-			response.setNotify(I18n.get("All views have been restored."));
+			response.setNotify(I18n.get("All views have been restored.") + "<br>" +
+					I18n.get("Please refresh your browser to see updated views."));
 		} catch (Exception e){
 			response.setException(e);
 		}
