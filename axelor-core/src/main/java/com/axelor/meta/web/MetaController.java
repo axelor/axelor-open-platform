@@ -30,12 +30,10 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
-
 import com.axelor.app.AppSettings;
 import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
+import com.axelor.i18n.I18nBundle;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
@@ -56,6 +54,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
+
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
 
 public class MetaController {
 
@@ -141,6 +142,7 @@ public class MetaController {
 	public void restoreAll(ActionRequest request, ActionResponse response) {
 		try {
 			MetaStore.clear();
+			I18nBundle.invalidate();
 			moduleManager.restoreMeta();
 			response.setNotify(I18n.get("All views have been restored."));
 		} catch (Exception e){
