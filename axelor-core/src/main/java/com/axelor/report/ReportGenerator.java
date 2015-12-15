@@ -37,6 +37,7 @@ import javax.inject.Inject;
 import org.eclipse.birt.core.exception.BirtException;
 import org.eclipse.birt.report.data.oda.jdbc.IConnectionFactory;
 import org.eclipse.birt.report.engine.api.EngineConstants;
+import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.birt.report.engine.api.IRenderOption;
 import org.eclipse.birt.report.engine.api.IReportEngine;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
@@ -44,8 +45,6 @@ import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.eclipse.birt.report.engine.api.RenderOption;
 import org.eclipse.birt.report.engine.emitter.pdf.PDFPageDevice;
 import org.eclipse.birt.report.model.api.IResourceLocator;
-import org.hibernate.Session;
-import org.hibernate.internal.SessionFactoryImpl;
 
 import com.axelor.app.internal.AppFilter;
 import com.axelor.db.JPA;
@@ -121,24 +120,23 @@ public class ReportGenerator {
 			task.setRenderOption(opts);
 			task.setParameterValues(params);
 
-			Session session = JPA.em().unwrap(Session.class);
-			SessionFactoryImpl sessionFactory = (SessionFactoryImpl) session.getSessionFactory();
-			Connection connection = null;
-			try {
-				connection = sessionFactory.getConnectionProvider().getConnection();
-			} catch (SQLException e) {
-				throw Throwables.propagate(e);
-			}
-
 			task.getAppContext().put(EngineConstants.APPCONTEXT_CLASSLOADER_KEY, getClass().getClassLoader());
-			task.getAppContext().put(IConnectionFactory.PASS_IN_CONNECTION, connection);
 			task.getAppContext().put(IConnectionFactory.CLOSE_PASS_IN_CONNECTION, Boolean.FALSE);
 
-			try {
-				task.run();
-			} finally {
-				task.close();
-			}
+			JPA.jdbcWork(new JPA.JDBCWork() {
+
+				@Override
+				public void execute(Connection connection) throws SQLException {
+					task.getAppContext().put(IConnectionFactory.PASS_IN_CONNECTION, connection);
+					try {
+						task.run();
+					} catch (EngineException e) {
+						Throwables.propagate(e);
+					} finally {
+						task.close();
+					}
+				}
+			});
 		}
 	}
 
