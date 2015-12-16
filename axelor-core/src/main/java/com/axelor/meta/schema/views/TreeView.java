@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.schema.views;
 
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -30,6 +31,7 @@ import com.axelor.meta.schema.views.Search.SearchField;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.google.common.base.Splitter;
 
 @XmlType
 @JsonTypeName("tree")
@@ -137,21 +139,27 @@ public class TreeView extends AbstractView {
 
 		@Override
 		public String getSelection() {
-			String selection = super.getSelection();
-			Class<?> klass = null;
+			final String selection = super.getSelection();
 			if (selection != null) {
 				return selection;
 			}
+			final Class<?> klass;
 			try {
 				klass = Class.forName(getModel());
 			} catch (ClassNotFoundException e) {
 				return null;
 			}
-			Property property = Mapper.of(klass).getProperty(getName());
-			if (property == null) {
-				return null;
+			final Iterator<String> iter = Splitter.on(".").split(getName()).iterator();
+			Mapper current = Mapper.of(klass);
+			Property property = current.getProperty(iter.next());
+			while(iter.hasNext()) {
+				if (property == null || property.getTarget() == null) {
+					return null;
+				}
+				current = Mapper.of(property.getTarget());
+				property = current.getProperty(iter.next());
 			}
-			return property.getSelection();
+			return property == null ? null : property.getSelection();
 		}
 	}
 }
