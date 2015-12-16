@@ -57,6 +57,7 @@ abstract class AbstractPlugin implements Plugin<Project> {
 			description "Update i18 messages from message catalog."
 			group "Axelor"
 			update = true
+			withContext = project.hasProperty('with.context')
 		}
 
 		project.afterEvaluate {
