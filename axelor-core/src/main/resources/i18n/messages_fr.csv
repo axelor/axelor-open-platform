@@ -214,6 +214,7 @@ resources/views/Group.xml:55
 resources/views/Menu.xml:40
 resources/views/Menu.xml:43
 resources/views/Permission.xml:6"
+"Please refresh your browser to see updated views.","Merci de rafraîchir votre navigateur afin d'afficher les mises à jour.",,"java/com/axelor/meta/web/MetaController.java:148"
 "Portal","Portail",,"resources/views/Meta.xml:12"
 "Preferences","Préférences",,"resources/views/User.xml:50"
 "Prefix","Prefix",,"resources/domains/MetaSequence.xml:13"
