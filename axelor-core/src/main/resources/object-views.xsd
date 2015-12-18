@@ -1446,19 +1446,6 @@
             </xsd:restriction>
           </xsd:simpleType>
         </xsd:attribute>
-        <xsd:attribute name="dayLength" default="8">
-          <xsd:annotation>
-            <xsd:documentation>
-              The day working hours (default is 8).
-            </xsd:documentation>
-          </xsd:annotation>
-          <xsd:simpleType>
-            <xsd:restriction base="xsd:integer">
-              <xsd:minInclusive value="1" />
-              <xsd:maxInclusive value="24" />
-            </xsd:restriction>
-          </xsd:simpleType>
-        </xsd:attribute>
         <xsd:attribute name="onChange" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>

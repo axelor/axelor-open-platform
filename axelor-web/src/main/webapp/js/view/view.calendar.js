@@ -54,8 +54,7 @@ function CalendarViewCtrl($scope, $element) {
 				stop: schema.eventStop,
 				length: parseInt(schema.eventLength) || 0,
 				color: schema.colorBy,
-				title: schema.items[0].name,
-				dayLength: schema.dayLength || 8
+				title: schema.items[0].name
 			};
 
 			$scope._viewResolver.resolve(schema, $element);
@@ -195,7 +194,6 @@ function CalendarViewCtrl($scope, $element) {
 		value = record[view.stop];
 		info.end = value ? moment(value) : moment(info.start).add(view.length || 1, "hours");
 
-		var diff = moment(info.end).diff(info.start, "minutes");
 		var title = this.fields[view.title];
 		var titleText = null;
 		
@@ -215,23 +213,34 @@ function CalendarViewCtrl($scope, $element) {
 		}
 		
 		info.title = ("" + titleText);
-		info.allDay = diff <= 0 || diff >= (view.dayLength * 60);
+		info.allDay = isAllDay(info);
 		info.className = info.allDay ? "calendar-event-allDay" : "calendar-event-day";
 		
 		return info;
 	};
-	
+
+	function isAllDay(event) {
+		var start = moment(event.start);
+		var end = moment(event.end);
+		if (!start.hasTime()) {
+			return true;
+		}
+		if (start.format("HH:mm") !== "00:00") {
+			return false;
+		}
+		return !event.end || end.format("HH:mm") === "00:00";
+	}
+
 	$scope.onEventChange = function(event, delta) {
 		
 		var record = _.clone(event.record);
-		var allDay = event.allDay;
 
 		var start = event.start;
 		var end = event.end;
-		var diff = end ? moment(end).diff(start, "minutes") : 0;
 
-		if (allDay && diff < (view.dayLength * 60)) {
-			end = start.startOf("day").add((view.dayLength * 60), "minutes");
+		if (isAllDay(event)) {
+			start = start.clone().startOf("day").local();
+			end = (end || start).clone().startOf("day").local();
 		}
 
 		record[view.start] = start;
@@ -418,11 +427,10 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 			
 			selectHelper: editable,
 			
-			select: function(start, end, allDay) {
+			select: function(start, end) {
 				var event = {
 					start: start,
-					end: end,
-					allDay: allDay
+					end: end
 				};
 				scope.applyLater(function(){
 					scope.showEditor(event);
