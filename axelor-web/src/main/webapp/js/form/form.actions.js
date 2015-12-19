@@ -955,7 +955,7 @@ ActionHandler.prototype = {
 					return scope.applyLater();
 				}
 			}
-			if (tab.params && tab.params.popup) {
+			if ((tab.params && tab.params.popup) || axelor.device.mobile) {
 				tab.$popupParent = formScope;
 			}
 			openTab(scope, tab);

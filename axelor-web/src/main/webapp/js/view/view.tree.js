@@ -558,7 +558,7 @@ ui.directive('uiViewTree', function(){
 					makeDraggable(tr);
 				}
 
-				tr.on('click dblclick', function(e) {
+				tr.on('click dblclick taphold', function(e) {
 					record.$click(e);
 				});
 				
