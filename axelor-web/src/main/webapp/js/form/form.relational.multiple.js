@@ -505,7 +505,7 @@ ui.formInput('OneToMany', {
 
 		scope.onGridInit = function(grid, inst) {
 			var editIcon = scope.canView() || (!scope.isReadonly() && scope.canEdit());
-			var editable = grid.getOptions().editable;
+			var editable = grid.getOptions().editable && !axelor.device.mobile;
 
 			adjustHeight = true;
 

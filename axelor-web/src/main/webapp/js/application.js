@@ -23,6 +23,7 @@
 //= lib/jquery.ui/js/jquery.js
 //= lib/jquery.ui/js/jquery-ui.js
 //= lib/jquery.ui/js/jquery.ui.mask.js
+//= lib/jquery.ui/js/jquery.mobile-events.js
 //= lib/bootstrap/js/bootstrap.js
 //= lib/jquery.timepicker/jquery-ui-timepicker-addon.js
 
@@ -61,6 +62,7 @@
 //= lib/angular/angular-resource.js
 //= lib/angular/angular-sanitize.js
 //= lib/angular/angular-animate.js
+//= lib/angular/angular-touch.js
 
 //= lib/angular-ui/sortable.js
 

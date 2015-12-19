@@ -311,7 +311,7 @@ if (typeof Slick === "undefined") {
             .bind("keydown", handleKeyDown);
         $canvas
             .bind("keydown", handleKeyDown)
-            .bind("click", handleClick)
+            .bind("taphold click", handleClick)
             .bind("dblclick", handleDblClick)
             .bind("contextmenu", handleContextMenu)
             .bind("draginit", handleDragInit)
@@ -2235,11 +2235,15 @@ if (typeof Slick === "undefined") {
       if (!cell || (currentEditor !== null && activeRow == cell.row && activeCell == cell.cell)) {
 	    return;
       }
-      // XXX: hack to deffer click event
-      var wait = trigger(self.onClick, {row: cell.row, cell: cell.cell}, e);
-      if (wait > 0) {
-	    return defer(handleClick, wait, e, cell);
-      };
+      if (e.type === "taphold") {
+    	trigger(self.onTapHold, {row: cell.row, cell: cell.cell}, e);
+      } else {
+    	// XXX: hack to deffer click event
+	    var wait = trigger(self.onClick, {row: cell.row, cell: cell.cell}, e);
+	    if (wait > 0) {
+		  return defer(handleClick, wait, e, cell);
+	    };
+      }
 
       if (e.isImmediatePropagationStopped()) {
         return;
@@ -3216,6 +3220,7 @@ if (typeof Slick === "undefined") {
       "onMouseLeave": new Slick.Event(),
       "onClick": new Slick.Event(),
       "onDblClick": new Slick.Event(),
+      "onTapHold": new Slick.Event(),
       "onContextMenu": new Slick.Event(),
       "onKeyDown": new Slick.Event(),
       "onAddNewRow": new Slick.Event(),
