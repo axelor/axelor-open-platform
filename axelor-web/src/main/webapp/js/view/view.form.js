@@ -100,6 +100,10 @@ function FormViewCtrl($scope, $element) {
 			context._showRecord = undefined;
 		}
 
+		viewPromise.then(function () {
+			$scope.waitForActions($scope.$locationChangeCheck.bind($scope));
+		});
+
 		$scope.$broadcast("on:form-show");
 
 		if (recordId) {
@@ -162,6 +166,26 @@ function FormViewCtrl($scope, $element) {
 		editable = arguments.length === 1 ? _.first(arguments) : true;
 	};
 	
+	$scope.$locationChangeOff = null;
+	$scope.$on("$destroy", function () {
+		if ($scope.$locationChangeOff) {
+			$scope.$locationChangeOff();
+		}
+	});
+
+	$scope.$locationChangeCheck = function () {
+		if ($scope.$locationChangeOff) {
+			$scope.$locationChangeOff();
+		}
+		$scope.$locationChangeOff = $scope.$on("$locationChangeStart", function (event, newUrl, oldUrl) {
+			var tab = $scope.selectedTab || {};
+			if (tab.$viewScope == $scope) {
+				$scope.switchBack($scope.$locationChangeOff.bind($scope));
+				event.preventDefault();
+			}
+		});
+	};
+
 	$scope.getRouteOptions = function() {
 		var rec = $scope.record,
 			args = [];
@@ -184,6 +208,8 @@ function FormViewCtrl($scope, $element) {
 		var opts = options || {},
 			record = $scope.record || {},
 			state = +opts.state || null;
+
+		$scope.waitForActions($scope.$locationChangeCheck.bind($scope));
 
 		$scope._routeSearch = opts.search;
 		if (record.id == state || routeId === state) {
@@ -669,7 +695,7 @@ function FormViewCtrl($scope, $element) {
 	var __switchTo = $scope.switchTo;
 	var __switchBack = null;
 
-	$scope.switchBack = function () {
+	$scope.switchBack = function (callback) {
 		if (__switchBack === null) {
 			var views = ($scope._viewParams||{}).views || [];
 			for (var i = 0 ; i < views.length; i++) {
@@ -680,7 +706,7 @@ function FormViewCtrl($scope, $element) {
 				}
 			}
 		}
-		return $scope.switchTo(__switchBack || "grid");
+		return $scope.switchTo(__switchBack || "grid", callback);
 	};
 
 	$scope.switchTo = function(type, callback) {
