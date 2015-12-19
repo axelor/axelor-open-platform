@@ -113,8 +113,9 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 
 		function __doSelect(found) {
 
-			if (selected && selected.$viewScope.$locationChangeOff) {
-				selected.$viewScope.$locationChangeOff();
+			var lastScope = (selected||{}).$viewScope || {};
+			if (lastScope.$locationChangeOff) {
+				lastScope.$locationChangeOff();
 			}
 
 			found.selected = true;
