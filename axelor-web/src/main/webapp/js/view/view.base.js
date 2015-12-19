@@ -490,16 +490,18 @@ ui.directive('uiViewPopup', function() {
 			scope.$watch('viewTitle', function (title) {
 				scope._setTitle(title);
 			});
-			
-			var unwatch = scope.$watch("_viewParams.$viewScope.schema.loaded", function(loaded) {
-				if (!loaded) {
-					return;
-				}
-				unwatch();
-				var viewScope = scope._viewParams.$viewScope;
-				var viewPromise = viewScope._viewPromise;
-				scope.viewTitle = viewScope.schema.title;
-				scope._doShow(viewPromise);
+
+			scope.waitForActions(function () {
+				var unwatch = scope.$watch("_viewParams.$viewScope.schema.loaded", function(loaded) {
+					if (!loaded) {
+						return;
+					}
+					unwatch();
+					var viewScope = scope._viewParams.$viewScope;
+					var viewPromise = viewScope._viewPromise;
+					scope.viewTitle = viewScope.schema.title;
+					scope._doShow(viewPromise);
+				});
 			});
 		},
 		replace: true,
