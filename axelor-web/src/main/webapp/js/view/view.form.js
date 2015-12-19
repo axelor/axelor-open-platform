@@ -171,6 +171,11 @@ function FormViewCtrl($scope, $element) {
 		}
 		locationChangeOff = $scope.$on("$locationChangeStart", function (event, newUrl, oldUrl) {
 			event.preventDefault();
+			// block navigation if popup is open
+			var hasDialogs = $('body .ui-dialog:visible').size() > 0;
+			if (hasDialogs) {
+				return;
+			}
 			var tab = $scope.selectedTab || {};
 			if (tab.$viewScope === $scope) {
 				$scope.switchBack();
