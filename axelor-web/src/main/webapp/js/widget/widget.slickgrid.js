@@ -736,7 +736,7 @@ Grid.prototype.parse = function(view) {
 
 	var options = {
 		rowHeight: 26,
-		editable: view.editable,
+		editable: view.editable && !axelor.device.mobile,
 		editorFactory:  factory,
 		formatterFactory: factory,
 		enableCellNavigation: true,
@@ -1796,7 +1796,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 	this.editable = forEdit = forEdit === undefined ? true : forEdit;
 
 	grid.setOptions({
-		editable: true,
+		editable: !axelor.device.mobile,
 		asyncEditorLoading: false,
 		editorLock: new Slick.EditorLock()
 	});
