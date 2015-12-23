@@ -335,6 +335,12 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 
 	$scope.singleTabOnly = useSingleTabOnly();
 
+	Object.defineProperty($scope, '$location', {
+		get: function() {
+			return $location;
+		}
+	});
+
 	Object.defineProperty($scope, 'navTabs', {
 		get: function() {
 			return NavService.getTabs();

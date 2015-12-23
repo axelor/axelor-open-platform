@@ -170,16 +170,37 @@ function FormViewCtrl($scope, $element) {
 			return;
 		}
 		locationChangeOff = $scope.$on("$locationChangeStart", function (event, newUrl, oldUrl) {
-			event.preventDefault();
 			// block navigation if popup is open
 			var hasDialogs = $('body .ui-dialog:visible').size() > 0;
 			if (hasDialogs) {
+				event.preventDefault();
 				return;
 			}
+
 			var tab = $scope.selectedTab || {};
-			if (tab.$viewScope === $scope) {
-				$scope.switchBack();
+			var params = $scope._viewParams;
+			var $location = $scope.$location;
+
+			if (!$location || tab !== params || tab.$viewScope != $scope || !$scope.isDirty()) {
+				return;
 			}
+
+			var path = $location.path();
+			var search = $location.search();
+
+			// only handle /ds path changes
+			if (path.indexOf("/ds/") !== 0 || oldUrl.indexOf("#/ds/") === -1) {
+				return;
+			}
+
+			event.preventDefault();
+			$scope.$locationChangeOff();
+			$scope.confirmDirty(function() {
+				routeId = null;
+				$scope.setEditable(false);
+				$scope.editRecord(null);
+				$location.path(path).search(search);
+			}, locationChangeCheck);
 		});
 	}
 
@@ -225,10 +246,13 @@ function FormViewCtrl($scope, $element) {
 
 		$scope.$locationChangeCheck();
 		$scope._routeSearch = opts.search;
-		if (record.id == state || routeId === state) {
+		if (record.id == state) {
 			return $scope.updateRoute();
 		}
-		
+		if (routeId === state && state) {
+			return doEdit(state);
+		}
+
 		var params = $scope._viewParams;
 		if (params.viewType !== "form") {
 			return $scope.show();
