@@ -31,6 +31,7 @@ import javax.persistence.TypedQuery;
 
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.db.mapper.PropertyType;
 import com.axelor.rpc.Resource;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -503,7 +504,7 @@ public class Query<T extends Model> {
 			selects.add("self.version");
 			for(String name : names) {
 				Property property = getProperty(name);
-				if (property != null) {
+				if (property != null && property.getType() != PropertyType.BINARY) {
 					String alias = joinHelper.joinName(name);
 					if (alias != null) {
 						selects.add(alias);
