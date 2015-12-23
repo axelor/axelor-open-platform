@@ -24,14 +24,14 @@ var ui = angular.module('axelor.ui');
 var BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 var META_FILE = "com.axelor.meta.db.MetaFile";
 
-function makeURL(model, field, recordOrId) {
+ui.makeImageURL = function makeURL(model, field, recordOrId) {
 	var value = recordOrId;
 	if (!value) return null;
 	var id = value.id ? value.id : value;
 	var version = value.version || value.$version || (new Date()).getTime();
 	if (!id || id <= 0) return null;
 	return "ws/rest/" + model + "/" + id + "/" + field + "/download?v=" + version;
-}
+};
 
 ui.formInput('ImageLink', {
 	css: 'image-item',
