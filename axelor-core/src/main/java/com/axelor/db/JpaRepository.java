@@ -128,7 +128,6 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 			for (Model item : items) {
 				property.setAssociation(item, null);
 			}
-			items.clear();
 		}
 	}
 
