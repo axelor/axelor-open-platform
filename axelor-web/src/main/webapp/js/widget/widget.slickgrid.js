@@ -686,7 +686,7 @@ Grid.prototype.parse = function(view) {
 
 	// create edit column
 	var editColumn = null;
-	if (!scope.selector && view.editIcon && (!handler.hasPermission || handler.hasPermission('write'))) {
+	if (view.editIcon && (!scope.selector || scope.selector === "checkbox") && (!handler.hasPermission || handler.hasPermission('write'))) {
 		editColumn = new EditIconColumn({
 			onClick: function (e, args) {
 				if (e.isDefaultPrevented()) {
@@ -2399,6 +2399,10 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 				}
 				scope.selector = attrs.selector;
 				scope.noFilter = attrs.noFilter;
+
+				if (axelor.config["view.grid.selection"] === "checkbox" && !scope.selector) {
+					scope.selector = "checkbox";
+				}
 
 				var forEdit = schema.editable || false,
 					canEdit = schema.editable || false,
