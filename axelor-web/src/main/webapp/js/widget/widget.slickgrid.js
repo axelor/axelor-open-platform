@@ -439,7 +439,7 @@ _.extend(Factory.prototype, {
 		
 		var field = columnDef.descriptor || {},
 			attrs = _.extend({}, field, field.widgetAttrs),
-			widget = attrs.widget,
+			widget = attrs.widget || "",
 			type = attrs.type;
 
 		if (widget === "Progress" || widget === "progress" || widget === "SelectProgress") {
@@ -455,6 +455,17 @@ _.extend(Factory.prototype, {
 
 		if(["Url", "url", "duration"].indexOf(widget) > 0) {
 			type = widget.toLowerCase();
+		}
+
+		if (widget.toLowerCase() === "image" || (type === "binary" && field.name === "image")) {
+			if (field.target === "com.axelor.meta.db.MetaFile") {
+				if (value) {
+					return ui.makeImageURL("com.axelor.meta.db.MetaFile", "content", (value.id || value));
+				}
+				return "";
+			}
+			var url = ui.makeImageURL(this.grid.handler._model, field.name, dataContext);
+			return '<img src="' + url + '&image=true" style="height: 21px;margin-top: -2px;">';
 		}
 
 		var fn = Formatters[type];
