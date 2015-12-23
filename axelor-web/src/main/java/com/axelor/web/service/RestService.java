@@ -668,7 +668,7 @@ public class RestService extends ResourceService {
 			files = repoFiles.all().filter("self.id IN :ids").bind("ids", ids).fetch();
 		}
 
-		MailMessage saved = messages.post(entity, msg, files);
+		MailMessage saved = messages.post(entity == null ? msg : entity, msg, files);
 		Object item = messages.details(saved);
 
 		response.setData(Lists.newArrayList(item));
