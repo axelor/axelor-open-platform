@@ -43,9 +43,11 @@ import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaAction;
+import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.MetaViewCustom;
 import com.axelor.meta.db.repo.MetaActionRepository;
+import com.axelor.meta.db.repo.MetaModelRepository;
 import com.axelor.meta.db.repo.MetaViewCustomRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.schema.ObjectViews;
@@ -253,27 +255,57 @@ public class XMLViews {
 			view = view == null ? views.findByType(type, model) : view;
 		}
 
+		final AbstractView xmlView;
+		final MetaModel metaModel;
 		try {
 			final String xml = custom == null ? view.getXml() : custom.getXml();
-			return ((ObjectViews) XMLViews.unmarshal(xml)).getViews().get(0);
+			xmlView = ((ObjectViews) XMLViews.unmarshal(xml)).getViews().get(0);
+			xmlView.setViewId(view.getId());
 		} catch (Exception e) {
+			return null;
 		}
-		return null;
+		if (view.getModel() != null) {
+			metaModel = Beans.get(MetaModelRepository.class).all()
+					.filter("self.fullName = :name")
+					.bind("name", view.getModel())
+					.cacheable().autoFlush(false)
+					.fetchOne();
+			if (metaModel != null) {
+				xmlView.setModelId(metaModel.getId());
+			}
+		}
+		return xmlView;
 	}
 
 	public static AbstractView findView(String name, String module) {
-		MetaView view = Beans.get(MetaViewRepository.class).all()
+
+		final MetaView view = Beans.get(MetaViewRepository.class).all()
 				.filter("self.name = :name AND self.module = :module")
 				.bind("name", name)
 				.bind("module", module)
 				.order("-priority")
 				.cacheable().autoFlush(false)
 				.fetchOne();
+
+		final AbstractView xmlView;
+		final MetaModel metaModel;
 		try {
-			return ((ObjectViews) XMLViews.unmarshal(view.getXml())).getViews().get(0);
+			xmlView = ((ObjectViews) XMLViews.unmarshal(view.getXml())).getViews().get(0);
+			xmlView.setViewId(view.getId());
 		} catch (Exception e) {
+			return null;
 		}
-		return null;
+		if (view.getModel() != null) {
+			metaModel = Beans.get(MetaModelRepository.class).all()
+					.filter("self.fullName = :name")
+					.bind("name", view.getModel())
+					.cacheable().autoFlush(false)
+					.fetchOne();
+			if (metaModel != null) {
+				xmlView.setModelId(metaModel.getId());
+			}
+		}
+		return xmlView;
 	}
 
 	public static Action findAction(String name) {

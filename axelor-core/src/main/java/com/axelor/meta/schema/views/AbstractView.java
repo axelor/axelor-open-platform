@@ -32,6 +32,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
@@ -62,6 +63,14 @@ public abstract class AbstractView {
 
 	@XmlAttribute(name = "id")
 	private String xmlId;
+
+	@XmlTransient
+	@JsonProperty
+	private Long viewId;
+
+	@XmlTransient
+	@JsonProperty
+	private Long modelId;
 
 	@XmlAttribute
 	private String name;
@@ -99,6 +108,22 @@ public abstract class AbstractView {
 
 	public void setXmlId(String xmlId) {
 		this.xmlId = xmlId;
+	}
+
+	public Long getViewId() {
+		return viewId;
+	}
+
+	public void setViewId(Long viewId) {
+		this.viewId = viewId;
+	}
+
+	public Long getModelId() {
+		return modelId;
+	}
+
+	public void setModelId(Long modelId) {
+		this.modelId = modelId;
 	}
 
 	public String getName() {

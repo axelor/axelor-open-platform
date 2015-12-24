@@ -470,8 +470,9 @@ header .navbar .nav-link-user-sub {
 	top: -1px;
 }
 
+.record-toolbar .view-customize,
 .record-toolbar .view-switcher {
-	margin-left: 4px;
+	margin-left: 4px !important;
 }
 
 .record-toolbar .view-title {
