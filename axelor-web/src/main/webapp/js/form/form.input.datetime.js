@@ -319,6 +319,10 @@ ui.formInput('DateTime', {
 				value = input.datetimepicker('getDate') || null,
 				oldValue = scope.getValue() || null;
 
+			if (!input.mask("valid")) {
+				return;
+			}
+
 			if (_.isEmpty(masked)) {
 				value = null;
 			}
