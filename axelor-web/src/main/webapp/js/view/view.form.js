@@ -335,12 +335,15 @@ function FormViewCtrl($scope, $element) {
 	};
 
 	$scope.onNew = function() {
+		var defer = $scope._defer();
 		$scope.confirmDirty(function(){
 			routeId = null;
 			$scope.edit(null);
 			$scope.setEditable();
 			$scope.$broadcast("on:new");
-		});
+			defer.resolve();
+		}, defer.reject);
+		return defer.promise;
 	};
 	
 	$scope.onNewPromise = null;

@@ -332,6 +332,25 @@ ActionHandler.prototype = {
 		return deferred.promise;
 	},
 
+	_handleNew: function() {
+		var self = this;
+		var scope = this.scope;
+		var deferred = this.ws.defer();
+
+		if (scope.onNew) {
+			console.log("aaaa")
+			return scope.onNew();
+		}
+		if (scope.editRecord) {
+			scope.editRecord(null);
+			deferred.resolve();
+		} else {
+			deferred.reject();
+		}
+
+		return deferred.promise;
+	},
+
 	_handleSave: function(validateOnly) {
 		if (validateOnly) {
 			return this.__handleSave(validateOnly);
@@ -470,12 +489,24 @@ ActionHandler.prototype = {
 			return deferred.promise;
 		}
 
+		pattern = /new\s*,/;
+		if (pattern.test(action)) {
+			var which = pattern.exec(action)[1];
+			axelor.dialogs.error(_t('Invalid use of "{0}" action, must be the last action.', which));
+			deferred.reject();
+			return deferred.promise;
+		}
+
 		pattern = /(^sync\s*,\s*)|(^sync$)/;
 		if (pattern.test(action)) {
 			action = action.replace(pattern, '');
 			return this._fireBeforeSave().then(function() {
 				return self._handleAction(action);
 			});
+		}
+
+		if (action === 'new') {
+			return this._handleNew();
 		}
 
 		if (action === 'validate') {
@@ -654,7 +685,17 @@ ActionHandler.prototype = {
 			});
 			return deferred.promise;
 		}
-		
+		if (data['new']) {
+			scope.$timeout(function () {
+				self._handleNew().then(function(){
+					scope.ajaxStop(function () {
+						deferred.resolve(data.pending);
+					}, 100);
+				}, deferred.reject);
+			});
+			return deferred.promise;
+		}
+
 		if (data.signal) {
 			formScope.$broadcast(data.signal, data['signal-data']);
 		}
