@@ -271,6 +271,7 @@ public class ViewLoader extends AbstractLoader {
 
 		if (entity == null) {
 			entity = new MetaSelect(selection.getName());
+			entity.setXmlId(xmlId);
 		}
 		
 		if (other == entity) {
