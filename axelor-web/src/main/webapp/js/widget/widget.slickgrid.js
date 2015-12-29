@@ -416,7 +416,7 @@ _.extend(Factory.prototype, {
 		
 		var field = columnDef.descriptor || {},
 			attrs = _.extend({}, field, field.widgetAttrs),
-			widget = attrs.widget,
+			widget = attrs.widget || "",
 			type = attrs.type;
 
 		if (widget === "Progress" || widget === "progress" || widget === "SelectProgress") {
@@ -436,6 +436,10 @@ _.extend(Factory.prototype, {
 
 		if (value === null || value === undefined || (_.isObject(value) && _.isEmpty(value))) {
 			return "";
+		}
+
+		if (widget.toLowerCase() === "html") {
+			return '<span>' + value + '</span>';
 		}
 
 		var formatter = Formatters[type];
