@@ -553,7 +553,7 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 			return field.viewer;
 		}
 		if (field.editor && (field.editor.viewer || !field.targetName)) {
-			return '<div ui-panel-editor>';
+			return null;
 		}
 		return scope.canView() ?
 				m2oTemplateReadonly:
@@ -564,7 +564,7 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 		var editor = scope.field.editor || {};
 		var template = "" +
 		"<div class='m2o-editor'>" +
-			"<div class='m2o-editor-controls'>" +
+			"<div class='m2o-editor-controls' ng-show='!isReadonly()'>" +
 				"<a href='' ng-show='canEdit() && canShowIcon(\"edit\")' ng-click='onEdit()' title='{{\"Edit\" | t}}'><i class='fa fa-pencil'></i></a>" +
 				"<a href='' ng-show='canSelect() && canShowIcon(\"select\")' ng-click='onSelect()' title='{{\"Select\" | t}}'><i class='fa fa-search'></i></a>" +
 				"<a href='' ng-show='canShowIcon(\"clear\")' ng-click='onClear()' title='{{\"Clear\" | t}}'><i class='fa fa-times-circle'></i></a>" +
