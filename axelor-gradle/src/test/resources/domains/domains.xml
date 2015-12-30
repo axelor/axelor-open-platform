@@ -115,6 +115,9 @@
 
   <entity name="Contact">
     <string name="name" />
+    <track>
+      <field name="name" on="CREATE" />
+    </track>
   </entity>
 
   <entity name="Address" hashAll="true">
