@@ -338,7 +338,6 @@ ActionHandler.prototype = {
 		var deferred = this.ws.defer();
 
 		if (scope.onNew) {
-			console.log("aaaa")
 			return scope.onNew();
 		}
 		if (scope.editRecord) {
