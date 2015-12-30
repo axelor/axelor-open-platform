@@ -53,7 +53,7 @@ _.each(["long", "decimal", "date", "time", "datetime"], function(type) {
 	OPERATORS_BY_TYPE[type] = OPERATORS_BY_TYPE.integer;
 });
 
-_.each(["text", "many-to-one", "one-to-many", "many-to-many"], function(type) {
+_.each(["text", "one-to-one", "many-to-one", "one-to-many", "many-to-many"], function(type) {
 	OPERATORS_BY_TYPE[type] = OPERATORS_BY_TYPE.string;
 });
 
@@ -134,7 +134,7 @@ ui.directive('uiFilterItem', function() {
 					filter.type = 'selection';
 				}
 
-				if (field.type === 'many-to-one') {
+				if (field.type === 'many-to-one' || field.type === 'one-to-one') {
 					filter.targetName = field.targetName;
 				} else {
 					filter.targetName = null;
@@ -401,7 +401,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 				}
 			}
 			
-			if (filter.type == 'many-to-one') {
+			if (filter.type == 'many-to-one' || field.type === 'one-to-one') {
 				filter.targetName = field.targetName;
 			}
 
@@ -958,6 +958,7 @@ ui.directive('uiFilterBox', function() {
 					case 'string':
 						fieldName = name;
 						break;
+					case 'one-to-one':
 					case 'many-to-one':
 						if (field.targetName) {
 							fieldName = name + '.' + field.targetName;
