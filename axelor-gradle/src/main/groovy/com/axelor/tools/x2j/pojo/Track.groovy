@@ -96,7 +96,7 @@ class Track {
 
 	def $track() {
 		def annon = new Annotation(this.entity, "com.axelor.db.annotations.Track")
-		imports.forEach { name -> this.entity.importType(name) }
+		imports.each { name -> this.entity.importType(name) }
 		if (!fields.empty) annon.add("fields", fields, false, false)
 		if (!messages.empty) annon.add("messages", messages, false, false)
 		return annon
