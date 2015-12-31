@@ -28,6 +28,8 @@ class Track {
 
 	private Entity entity
 
+	private boolean replace;
+
 	private Track(Entity entity) {
 		this.entity = entity;
 	}
@@ -41,6 +43,7 @@ class Track {
 
 		fields = fields.grep { it != null }
 		messages = messages.grep { it != null }
+		replace = node.'@replace' == "true"
 	}
 
 	private Annotation $field(NodeChild node) {
@@ -94,8 +97,8 @@ class Track {
 	def $track() {
 		def annon = new Annotation(this.entity, "com.axelor.db.annotations.Track")
 		imports.forEach { name -> this.entity.importType(name) }
-		annon.add("fields", fields, false, false)
-		annon.add("messages", messages, false, false)
+		if (!fields.empty) annon.add("fields", fields, false, false)
+		if (!messages.empty) annon.add("messages", messages, false, false)
 		return annon
 	}
 

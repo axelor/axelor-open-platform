@@ -686,6 +686,11 @@
         </xsd:complexType>
       </xsd:element>
     </xsd:sequence>
+    <xsd:attribute name="replace" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether to replace original change track config.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 
   <xsd:complexType name="Entity" mixed="true">

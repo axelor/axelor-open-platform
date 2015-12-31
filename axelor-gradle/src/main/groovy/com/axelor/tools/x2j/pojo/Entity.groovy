@@ -220,7 +220,7 @@ class Entity {
 		finders.addAll(other.finders)
 
 		if (other.track) {
-			if (track == null) {
+			if (track == null || other.track.replace) {
 				track = other.track.copyFor(this);
 			} else {
 				track.merge(other.track);
