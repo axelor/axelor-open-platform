@@ -57,7 +57,7 @@ class Track {
 		if (condition) annon.add("condition", condition)
 		if (on) {
 			imports += ['com.axelor.db.annotations.TrackEvent']
-			annon.add("on", "TrackEvent.${on}", false)
+			annon.add("on", "com.axelor.db.annotations.TrackEvent.${on}", false)
 		}
 
 		return annon
@@ -80,7 +80,7 @@ class Track {
 		if (tag) annon.add("tag", tag)
 		if (on) {
 			imports += ['com.axelor.db.annotations.TrackEvent']
-			annon.add("on", "TrackEvent.${on}", false)
+			annon.add("on", "com.axelor.db.annotations.TrackEvent.${on}", false)
 		}
 
 		if (fields) {
