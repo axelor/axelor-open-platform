@@ -189,7 +189,7 @@ ui.directive('uiMailMessage', function () {
 				_.each(body.tracks, function (item) {
 					item.displayValue = format(item.value);
 					if (item.oldValue !== undefined) {
-						item.displayValue += " &raquo; " + format(item.oldValue);
+						item.displayValue = format(item.oldValue) + " &raquo; " + item.displayValue;
 					}
 				});
 			}
