@@ -52,6 +52,10 @@ public class MailFlagsRepository extends JpaRepository<MailFlags> {
 			}
 		}
 
+		if (root == null) {
+			return flags;
+		}
+
 		MailFlags rootFlags = findBy(root, flags.getUser());
 		if (rootFlags == null) {
 			rootFlags = new MailFlags();
@@ -63,7 +67,7 @@ public class MailFlagsRepository extends JpaRepository<MailFlags> {
 		rootFlags.setIsStarred(flags.getIsStarred());
 
 		// mark root as unread
-		if (root != null && flags.getIsRead() != Boolean.TRUE) {
+		if (flags.getIsRead() != Boolean.TRUE) {
 			rootFlags.setIsRead(false);
 		}
 
