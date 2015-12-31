@@ -212,7 +212,7 @@ ui.directive('uiMailMessage', function () {
 				"</a>" +
 				"<div class='mail-message'>" +
 					"<span class='arrow left'></span>" +
-					"<span class='star left' ng-show='message.$isNew || !message.$flags.isRead'><i class='fa fa-asterisk'></i></span>" +
+					"<span class='star left' ng-show='message.$thread && (message.$isNew || !message.$flags.isRead)'><i class='fa fa-asterisk'></i></span>" +
 					"<div class='mail-message-icons'>" +
 						"<span ng-if='::message.$thread'>" +
 							"<i class='fa fa-reply' ng-show='::message.$thread' ng-click='onReply(message)'></i> " +
@@ -241,8 +241,17 @@ ui.directive('uiMailMessage', function () {
 						"</div>" +
 					"</div>" +
 					"<div class='mail-message-header' ng-if='::message.$name || message.$title'>" +
-						"<span class='subject'>" +
+						"<span class='subject' ng-if='::message.$thread'>" +
 							"<a ng-if='message.relatedId && message.$name' href='#ds/form::{{::message.relatedModel}}/edit/{{::message.relatedId}}'>{{::message.$name}}</a>" +
+							"<span ng-if='::!message.relatedId && message.$name'>{{::message.$name}}</span>" +
+							"<span ng-if='::message.$name'> - </span>" +
+							"<span ng-if='::message.$title'>" +
+								"<a ng-if='::message.relatedId' href='#ds/form::{{::message.relatedModel}}/edit/{{::message.relatedId}}'>{{:: _t(message.$title) }}</a>" +
+								"<span ng-if='::!message.relatedId'>{{:: _t(message.$title) }}</span>" +
+							"</span>" +
+						"</span>" +
+						"<span class='subject' ng-if='::!message.$thread'>" +
+							"<span ng-if='message.relatedId && message.$name'>{{::message.$name}}</span>" +
 							"<span ng-if='::!message.relatedId && message.$name'>{{::message.$name}}</span>" +
 							"<span ng-if='::message.$name'> - </span>" +
 							"<span ng-if='::message.$title'>{{:: _t(message.$title) }}</span>" +
