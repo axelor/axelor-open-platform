@@ -187,7 +187,7 @@ public class ActionGroup extends ActionResumable {
 
 			log.debug("action: {}", name);
 
-			if ("save".equals(name) || "validate".equals(name) || "close".equals(name)  || "name".equals(name)) {
+			if ("save".equals(name) || "validate".equals(name) || "close".equals(name)  || "new".equals(name)) {
 				if (!element.test(handler)) {
 					log.debug("action '{}' doesn't meet the condition: {}", name, element.getCondition());
 					continue;

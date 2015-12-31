@@ -518,9 +518,9 @@ ActionHandler.prototype = {
 			});
 		}
 
-		pattern = /new\s*,/;
+		pattern = /(^|,)\s*(new)\s*,/;
 		if (pattern.test(action)) {
-			var which = pattern.exec(action)[1];
+			var which = pattern.exec(action)[2];
 			axelor.dialogs.error(_t('Invalid use of "{0}" action, must be the last action.', which));
 			deferred.reject();
 			return deferred.promise;
