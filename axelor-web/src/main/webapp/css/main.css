@@ -542,6 +542,11 @@ input[readonly], select[readonly], textarea[readonly] {
 .record-toolbar .view-menubar-mobile {
 	margin: 0;
 }
+.record-toolbar-right {
+	top: 0;
+	right: 0;
+	position: absolute;
+}
 
 @media (max-width: 767px) {
 	.menu-bar.visible-phone {

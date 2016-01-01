@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2015 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,7 +17,9 @@
  */
 (function() {
 
-var module = angular.module('axelor.ui');
+"use strict";
+
+var ui = angular.module('axelor.ui');
 
 MenuBarCtrl.$inject = ['$scope', '$element'];
 function MenuBarCtrl($scope, $element) {
@@ -43,7 +45,7 @@ function MenuBarCtrl($scope, $element) {
 	};
 }
 
-module.directive('uiMenuBar', function() {
+ui.directive('uiMenuBar', function() {
 
 	return {
 		replace: true,
@@ -77,7 +79,7 @@ module.directive('uiMenuBar', function() {
 	};
 });
 
-module.directive('uiMenu', function() {
+ui.directive('uiMenu', function() {
 
 	return {
 		replace: true,
@@ -95,7 +97,7 @@ module.directive('uiMenu', function() {
 	};
 });
 
-module.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, ActionService) {
+ui.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, ActionService) {
 
 	return {
 		replace: true,
@@ -123,7 +125,7 @@ module.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, 
 			scope.isRequired = function(){};
 			scope.isValid = function(){};
 
-			var attrs = {
+			attrs = {
 				hidden: false,
 				readonly: false
 			};
@@ -188,7 +190,7 @@ module.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, 
 	};
 }]);
 
-module.directive('uiToolbarAdjust', function() {
+ui.directive('uiToolbarAdjust', function() {
 
 	return function (scope, element, attrs) {
 
@@ -199,67 +201,71 @@ module.directive('uiToolbarAdjust', function() {
 		var elemMenubarMobile = null;
 		var elemToolbarMobile = null;
 		
-		var lastWidth = 0;
-
 		function setup() {
 			elemMenubar = element.children('.view-menubar');
 			elemToolbar = element.children('.view-toolbar');
-			elemSiblings = element.children(':not(.view-menubar,.view-toolbar)');
+			elemSiblings = element.children(':not(.view-menubar,.view-toolbar,.view-menubar-mobile,.view-toolbar-mobile)');
 
 			elemMenubarMobile = element.children('.view-menubar-mobile').hide();
 			elemToolbarMobile = element.children('.view-toolbar-mobile').hide();
 			
-			element.on('adjustSize', adjust);
+			var running = false;
+			element.on('adjustSize', function () {
+				if (running) {
+					return;
+				}
+				running = true;
+				try {
+					adjust();
+				} finally {
+					running = false;
+				}
+			});
+
+			adjust();
+		}
+
+		function hideAndShow(first, second, visibility) {
+			[elemMenubar, elemToolbar, elemMenubarMobile, elemToolbarMobile].forEach(function (elem) {
+				elem.hide().css('visibility', 'hidden');
+			});
+			[first, second].forEach(function (elem) {
+				if (elem) elem.show().css('visibility', visibility || '');
+			});
 		}
 
 		function adjust() {
-			if (elemMenubar === null || lastWidth === element.width()) {
+
+			if (elemMenubar === null) {
 				return;
 			}
-			
-			var hasMenubar = !_.isEmpty(scope.menubar);
-			var hasToolbar = !_.isEmpty(scope.toolbar);
 
 			if (axelor.device.small) {
-				elemToolbar.hide();
-				elemMenubar.hide();
-				elemMenubarMobile.hide();
-				elemToolbarMobile.hide();
-				if (hasMenubar) elemMenubarMobile.show();
-				if (hasToolbar) elemToolbarMobile.show();
-				return;
+				return hideAndShow(elemToolbarMobile, elemMenubarMobile);
 			}
 
-			elemMenubarMobile.hide();
-			elemToolbarMobile.hide();
-			elemToolbar.show();
-			elemMenubar.show();
-
-			var total = elemToolbar.width() + elemMenubar.width();
-			if (total === 0) {
-				return;
-			}
-
-			lastWidth = element.width();
-			var restWidth = 0;
-			elemSiblings.each(function () {
-				restWidth += $(this).width();
+			var width = element.width();
+			elemSiblings.each(function (i) {
+				width -= $(this).width();
 			});
 
-			var width = lastWidth - restWidth;
-			if (width <= total && hasMenubar) {
-				total -= elemMenubar.width();
-				elemMenubar.hide();
-				elemMenubarMobile.show();
+			function canShow(first, second) {
+				hideAndShow(first, second, 'hidden');
+				if (width > first.width() + second.width()) {
+					first.css('visibility', '');
+					second.css('visibility', '');
+					return true;
+				}
+				return false;
 			}
-			if (width <= total && hasToolbar) {
-				elemToolbar.hide();
-				elemToolbarMobile.show();
-			}
+
+			canShow(elemToolbar, elemMenubar) ||
+			canShow(elemToolbar, elemMenubarMobile) ||
+			canShow(elemToolbarMobile, elemMenubarMobile);
 		}
 
 		scope.waitForActions(setup, 100);
 	};
 });
 
-}).call(this);
+})();
