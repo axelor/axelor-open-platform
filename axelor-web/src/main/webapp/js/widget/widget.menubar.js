@@ -201,64 +201,67 @@ ui.directive('uiToolbarAdjust', function() {
 		var elemMenubarMobile = null;
 		var elemToolbarMobile = null;
 		
-		var lastWidth = 0;
-
 		function setup() {
 			elemMenubar = element.children('.view-menubar');
 			elemToolbar = element.children('.view-toolbar');
-			elemSiblings = element.children(':not(.view-menubar,.view-toolbar)');
+			elemSiblings = element.children(':not(.view-menubar,.view-toolbar,.view-menubar-mobile,.view-toolbar-mobile)');
 
 			elemMenubarMobile = element.children('.view-menubar-mobile').hide();
 			elemToolbarMobile = element.children('.view-toolbar-mobile').hide();
 			
-			element.on('adjustSize', adjust);
+			var running = false;
+			element.on('adjustSize', function () {
+				if (running) {
+					return;
+				}
+				running = true;
+				try {
+					adjust();
+				} finally {
+					running = false;
+				}
+			});
+
 			adjust();
 		}
 
+		function hideAndShow(first, second, visibility) {
+			[elemMenubar, elemToolbar, elemMenubarMobile, elemToolbarMobile].forEach(function (elem) {
+				elem.hide().css('visibility', 'hidden');
+			});
+			[first, second].forEach(function (elem) {
+				if (elem) elem.show().css('visibility', visibility || '');
+			});
+		}
+
 		function adjust() {
-			if (elemMenubar === null || lastWidth === element.width()) {
+
+			if (elemMenubar === null) {
 				return;
 			}
-			
-			var hasMenubar = !_.isEmpty(scope.menubar);
-			var hasToolbar = !_.isEmpty(scope.toolbar);
 
 			if (axelor.device.small) {
-				elemToolbar.hide();
-				elemMenubar.hide();
-				elemMenubarMobile.hide();
-				elemToolbarMobile.hide();
-				if (hasMenubar) elemMenubarMobile.show().css('visibility', '');
-				if (hasToolbar) elemToolbarMobile.show().css('visibility', '');
-				return;
+				return hideAndShow(elemToolbarMobile, elemMenubarMobile);
 			}
 
-			elemMenubarMobile.hide();
-			elemToolbarMobile.hide();
-			elemToolbar.show().css('visibility', '');
-			elemMenubar.show().css('visibility', '');
-
-			var total = elemToolbar.width() + elemMenubar.width();
-			if (total === 0) {
-				return;
-			}
-
-			lastWidth = element.width();
-			var restWidth = 0;
-			elemSiblings.each(function () {
-				restWidth += $(this).width();
+			var width = element.width();
+			elemSiblings.each(function (i) {
+				width -= $(this).width();
 			});
 
-			var width = lastWidth - restWidth;
-			if (width <= total && hasMenubar) {
-				total -= elemMenubar.width();
-				elemMenubar.hide();
-				elemMenubarMobile.show().css('visibility', '');
+			function canShow(first, second) {
+				hideAndShow(first, second, 'hidden');
+				if (width > first.width() + second.width()) {
+					first.css('visibility', '');
+					second.css('visibility', '');
+					return true;
+				}
+				return false;
 			}
-			if (width <= total && hasToolbar) {
-				elemToolbar.hide();
-				elemToolbarMobile.show().css('visibility', '');
-			}
+
+			canShow(elemToolbar, elemMenubar) ||
+			canShow(elemToolbar, elemMenubarMobile) ||
+			canShow(elemToolbarMobile, elemMenubarMobile);
 		}
 
 		scope.waitForActions(setup, 100);
