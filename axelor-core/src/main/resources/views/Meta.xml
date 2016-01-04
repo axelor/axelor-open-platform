@@ -88,6 +88,7 @@
         <field name="title" colSpan="12"/>
         <field name="type"/>
         <field name="priority"/>
+        <field name="helpLink" colSpan="12"/>
       </panel>
       <panel itemSpan="12">
         <field name="model"/>

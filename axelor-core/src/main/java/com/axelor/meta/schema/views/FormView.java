@@ -49,9 +49,6 @@ public class FormView extends AbstractView {
 	private String onNew;
 
 	@XmlAttribute
-	private String helpLink;
-
-	@XmlAttribute
 	private String readonlyIf;
 	
 	@XmlAttribute
@@ -138,14 +135,6 @@ public class FormView extends AbstractView {
 
 	public void setOnNew(String onNew) {
 		this.onNew = onNew;
-	}
-
-	public String getHelpLink() {
-		return helpLink;
-	}
-
-	public void setHelpLink(String helpLink) {
-		this.helpLink = helpLink;
 	}
 
 	public String getReadonlyIf() {

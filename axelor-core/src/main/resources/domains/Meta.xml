@@ -33,6 +33,7 @@
     <string name="module"/>
   	<string name="xml" required="true" large="true"/>
     <string name="xmlId" unique="true" />
+    <string name="helpLink" />
   	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
     
     <finder-method name="findByName" using="name"                     orderBy="-priority" cacheable="true"/>

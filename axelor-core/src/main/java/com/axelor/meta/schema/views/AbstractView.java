@@ -73,6 +73,9 @@ public abstract class AbstractView {
 	@XmlAttribute
 	private String groups;
 
+	@XmlAttribute
+	private String helpLink;
+
 	@JsonIgnore
 	@XmlAttribute( name = "width")
 	private String widthSpec;
@@ -145,6 +148,14 @@ public abstract class AbstractView {
 
 	public void setGroups(String groups) {
 		this.groups = groups;
+	}
+
+	public String getHelpLink() {
+		return helpLink;
+	}
+
+	public void setHelpLink(String helpLink) {
+		this.helpLink = helpLink;
 	}
 
 	private String widthPart(int which) {

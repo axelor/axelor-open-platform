@@ -226,7 +226,11 @@ public class XMLViews {
 		}
 
 		try {
-			return ((ObjectViews) XMLViews.unmarshal(view.getXml())).getViews().get(0);
+			final AbstractView xmlView = ((ObjectViews) XMLViews.unmarshal(view.getXml())).getViews().get(0);
+			if (view.getHelpLink() != null) {
+				xmlView.setHelpLink(view.getHelpLink());
+			}
+			return xmlView;
 		} catch (Exception e) {
 		}
 		return null;
@@ -241,7 +245,11 @@ public class XMLViews {
 				.cacheable().autoFlush(false)
 				.fetchOne();
 		try {
-			return ((ObjectViews) XMLViews.unmarshal(view.getXml())).getViews().get(0);
+			final AbstractView xmlView = ((ObjectViews) XMLViews.unmarshal(view.getXml())).getViews().get(0);
+			if (view.getHelpLink() != null) {
+				xmlView.setHelpLink(view.getHelpLink());
+			}
+			return xmlView;
 		} catch (Exception e) {
 		}
 		return null;

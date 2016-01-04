@@ -234,6 +234,10 @@ public class ViewLoader extends AbstractLoader {
 		entity.setXml(xml);
 		entity.setGroups(this.findGroups(view.getGroups(), entity.getGroups()));
 
+		if (entity.getHelpLink() == null) {
+			entity.setHelpLink(view.getHelpLink());
+		}
+
 		entity = views.save(entity);
 	}
 
