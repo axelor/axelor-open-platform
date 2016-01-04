@@ -67,7 +67,7 @@ function BaseCardsCtrl(type, $scope, $element) {
 	};
 
 	$scope.onRefresh = function () {
-		$scope.filter({});
+		return $scope._dataSource.search().success(update);
 	};
 
 	function update(records) {
