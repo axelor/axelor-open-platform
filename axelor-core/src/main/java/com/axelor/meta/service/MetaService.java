@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.FileUtils;
-import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
@@ -588,11 +587,10 @@ public class MetaService {
 		
 		response.setData(data);
 		response.setStatus(Response.STATUS_SUCCESS);
-		
-		boolean hasOnInit = !StringUtils.isBlank(chart.getOnInit());
+
 		boolean hasDataSet = request.getFields() != null && request.getFields().contains("dataset");
 		
-		if (hasDataSet || !hasOnInit) {
+		if (hasDataSet) {
 			
 			final String string = chart.getDataSet().getText();
 			final Map<String, Object> context = Maps.newHashMap();

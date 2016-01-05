@@ -32,12 +32,16 @@ function ChartCtrl($scope, $element, $http) {
 	var view = $scope.view = views.chart;
 	
 	var viewChart = null;
-	var viewValues = null;
+	var searchScope = null;
 
 	var loading = false;
 	var unwatch = null;
 
 	function refresh() {
+
+		if (viewChart && searchScope && !searchScope.isValid()) {
+			return;
+		}
 
 		var context = $scope._context || {};
 		if ($scope.getContext) {
@@ -50,7 +54,7 @@ function ChartCtrl($scope, $element, $http) {
 			}
 		}
 
-		context = _.extend({}, context, viewValues);
+		context = _.extend({}, context, (searchScope||{}).record);
 		loading = true;
 		
 		var params = {
@@ -81,13 +85,17 @@ function ChartCtrl($scope, $element, $http) {
 		});
 	}
 
+	$scope.setSearchScope = function (formScope) {
+		searchScope = formScope;
+	};
+
 	$scope.onRefresh = function(force) {
 		if (unwatch || loading) {
 			return;
 		}
 
 		// in case of onInit
-		if ($scope.searchInit && !viewValues && !force) {
+		if ($scope.searchInit && !(searchScope||{}).record && !force) {
 			return;
 		}
 
@@ -99,10 +107,6 @@ function ChartCtrl($scope, $element, $http) {
 			unwatch = null;
 			refresh();
 		});
-	};
-
-	$scope.setViewValues = function (values) {
-		viewValues = values;
 	};
 
 	$scope.render = function(data) {
@@ -119,8 +123,10 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 	$scope._dataSource = DataSource.create('com.axelor.meta.db.MetaView');
 	
 	ui.FormViewCtrl.call(this, $scope, $element);
+
 	$scope.setEditable();
-	
+	$scope.setSearchScope($scope);
+
 	function fixFields(fields) {
 		_.each(fields, function(field){
 			if (field.type == 'reference') {
@@ -169,7 +175,6 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 		var interval;
 
 		function reload() {
-			$scope.$parent.setViewValues($scope.record);
 			$scope.$parent.onRefresh();
 			$scope.applyLater();
 		}
@@ -704,9 +709,12 @@ var directiveFn = function(){
 				});
 			};
 
-			element.on("adjustSize", function(e){
-				if (!initialized) scope.onRefresh();
-			});
+			element.on("adjustSize", _.debounce(function(e){
+				if (!initialized) {
+					scope.onRefresh();
+					scope.applyLater();
+				}
+			}));
 
 			function onNewOrEdit() {
 				if (scope.searchInit && scope.searchFields) {
