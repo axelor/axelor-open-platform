@@ -794,7 +794,7 @@ table.field-details .help-text hr {
 	position: relative;
 	line-height: 32px;
 	padding: 0 14px 0 24px;
-
+	white-space: nowrap;
 	background: #e2e2e2;
 }
 
@@ -824,7 +824,6 @@ table.field-details .help-text hr {
 }
 .nav-select li.dropdown a.nav-label {
 	padding-right: 6px;
-	display: inline-block;
 	padding: 0;
 	height: 32px;
 }
