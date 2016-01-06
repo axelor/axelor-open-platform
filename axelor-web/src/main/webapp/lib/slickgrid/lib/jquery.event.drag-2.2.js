@@ -16,8 +16,8 @@ $.fn.drag = function( str, arg, opts ){
 	// figure out the event handler...
 	fn = $.isFunction( str ) ? str : $.isFunction( arg ) ? arg : null;
 	// fix the event type
-	if ( type.indexOf("drag") !== 0 ) 
-		type = "drag"+ type;
+	if ( type.indexOf("xdrag") !== 0 ) 
+		type = "xdrag"+ type;
 	// were options passed
 	opts = ( str == fn ? arg : opts ) || {};
 	// trigger or bind event handler
@@ -42,7 +42,7 @@ drag = $special.drag = {
 	},
 	
 	// the key name for stored drag data
-	datakey: "dragdata",
+	datakey: "xdragdata",
 	
 	// prevent bubbling for better performance
 	noBubble: true,
@@ -127,7 +127,7 @@ drag = $special.drag = {
 		dd.pageY = event.pageY;
 		dd.dragging = null;
 		// handle draginit event... 
-		results = drag.hijack( event, "draginit", dd );
+		results = drag.hijack( event, "xdraginit", dd );
 		// early cancel
 		if ( !dd.propagates )
 			return;
@@ -182,7 +182,7 @@ drag = $special.drag = {
 				if ( Math.pow(  event.pageX-dd.pageX, 2 ) + Math.pow(  event.pageY-dd.pageY, 2 ) < Math.pow( dd.distance, 2 ) ) 
 					break; // distance tolerance not reached
 				event.target = dd.target; // force target from "mousedown" event (fix distance issue)
-				drag.hijack( event, "dragstart", dd ); // trigger "dragstart"
+				drag.hijack( event, "xdragstart", dd ); // trigger "dragstart"
 				if ( dd.propagates ) // "dragstart" not rejected
 					dd.dragging = true; // activate interaction
 			// mousemove, dragging
@@ -191,7 +191,7 @@ drag = $special.drag = {
 			case 'mousemove':
 				if ( dd.dragging ){
 					// trigger "drag"		
-					drag.hijack( event, "drag", dd );
+					drag.hijack( event, "xdrag", dd );
 					if ( dd.propagates ){
 						// manage drop events
 						if ( dd.drop !== false && $special.drop )
@@ -211,7 +211,7 @@ drag = $special.drag = {
 				if ( dd.dragging ){
 					if ( dd.drop !== false && $special.drop )
 						$special.drop.handler( event, dd ); // "drop"
-					drag.hijack( event, "dragend", dd ); // trigger "dragend"	
+					drag.hijack( event, "xdragend", dd ); // trigger "dragend"	
 				}
 				drag.textselect( true ); // enable text selection
 				// if suppressing click events...
@@ -230,7 +230,7 @@ drag = $special.drag = {
 		// remember the original event and type
 		var orig = { event:event.originalEvent, type:event.type },
 		// is the event drag related or drog related?
-		mode = type.indexOf("drop") ? "drag" : "drop",
+		mode = type.indexOf("xdrop") ? "drag" : "drop",
 		// iteration vars
 		result, i = x || 0, ia, $elems, callback,
 		len = !isNaN( x ) ? x : dd.interactions.length;
@@ -243,7 +243,7 @@ drag = $special.drag = {
 		// handle each interacted element
 		do if ( ia = dd.interactions[ i ] ){
 			// validate the interaction
-			if ( type !== "dragend" && ia.cancelled )
+			if ( type !== "xdragend" && ia.cancelled )
 				continue;
 			// set the dragdrop properties on the event object
 			callback = drag.properties( event, dd, ia );
@@ -263,31 +263,31 @@ drag = $special.drag = {
 						ia.cancelled = true;
 						dd.propagates -= 1;
 					}
-					if ( type == "drop" ){
+					if ( type == "xdrop" ){
 						ia[ mode ][p] = null;
 					}
 				}
 				// assign any dropinit elements
-				else if ( type == "dropinit" )
+				else if ( type == "xdropinit" )
 					ia.droppable.push( drag.element( result ) || subject );
 				// accept a returned proxy element 
-				if ( type == "dragstart" )
+				if ( type == "xdragstart" )
 					ia.proxy = $( drag.element( result ) || ia.drag )[0];
 				// remember this result	
 				ia.results.push( result );
 				// forget the event result, for recycling
 				delete event.result;
 				// break on cancelled handler
-				if ( type !== "dropinit" )
+				if ( type !== "xdropinit" )
 					return result;
 			});	
 			// flatten the results	
 			dd.results[ i ] = drag.flatten( ia.results );	
 			// accept a set of valid drop targets
-			if ( type == "dropinit" )
+			if ( type == "xdropinit" )
 				ia.droppable = drag.flatten( ia.droppable );
 			// locate drop targets
-			if ( type == "dragstart" && !ia.cancelled )
+			if ( type == "xdragstart" && !ia.cancelled )
 				callback.update(); 
 		}
 		while ( ++i < len )
@@ -397,6 +397,6 @@ $event.fixHooks.touchcancel = {
 };
 
 // share the same special event configuration with related events...
-$special.draginit = $special.dragstart = $special.dragend = drag;
+$special.xdraginit = $special.xdragstart = $special.xdragend = drag;
 
 })( jQuery );

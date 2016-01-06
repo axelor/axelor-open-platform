@@ -314,10 +314,10 @@ if (typeof Slick === "undefined") {
             .bind("click", handleClick)
             .bind("dblclick", handleDblClick)
             .bind("contextmenu", handleContextMenu)
-            .bind("draginit", handleDragInit)
-            .bind("dragstart", {distance: 3}, handleDragStart)
-            .bind("drag", handleDrag)
-            .bind("dragend", handleDragEnd)
+            .bind("xdraginit", handleDragInit)
+            .bind("xdragstart", {distance: 3}, handleDragStart)
+            .bind("xdrag", handleDrag)
+            .bind("xdragend", handleDragEnd)
             .delegate(".slick-cell", "mouseenter", handleMouseEnter)
             .delegate(".slick-cell", "mouseleave", handleMouseLeave);
       }
@@ -715,7 +715,7 @@ if (typeof Slick === "undefined") {
         $col = $(e);
         $("<div class='slick-resizable-handle' />")
             .appendTo(e)
-            .bind("dragstart", function (e, dd) {
+            .bind("xdragstart", function (e, dd) {
               if (!getEditorLock().commitCurrentEdit()) {
                 return false;
               }
@@ -774,7 +774,7 @@ if (typeof Slick === "undefined") {
               maxPageX = pageX + Math.min(shrinkLeewayOnRight, stretchLeewayOnLeft);
               minPageX = pageX - Math.min(shrinkLeewayOnLeft, stretchLeewayOnRight);
             })
-            .bind("drag", function (e, dd) {
+            .bind("xdrag", function (e, dd) {
               var actualMinWidth, d = Math.min(maxPageX, Math.max(minPageX, e.pageX)) - pageX, x;
               if (d < 0) { // shrink column
                 x = d;
@@ -844,7 +844,7 @@ if (typeof Slick === "undefined") {
                 applyColumnWidths();
               }
             })
-            .bind("dragend", function (e, dd) {
+            .bind("xdragend", function (e, dd) {
               var newWidth;
               $(this).parent().removeClass("slick-header-column-active");
               for (j = 0; j < columnElements.length; j++) {
@@ -983,7 +983,7 @@ if (typeof Slick === "undefined") {
       $container.unbind(".slickgrid");
       removeCssRules();
 
-      $canvas.unbind("draginit dragstart dragend drag");
+      $canvas.unbind("xdraginit xdragstart xdragend xdrag");
       $container.empty().removeClass(uid);
     }
 
