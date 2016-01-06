@@ -534,6 +534,7 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 
 		 $(window).on('resize', _.debounce(function () {
 			 $("#offcanvas").removeClass(axelor.device.small ? 'inactive' : 'active');
+			 setTimeout(axelor.$adjustSize, 100);
 		 }, 100));
 
 		 // confirm dirty

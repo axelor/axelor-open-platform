@@ -240,14 +240,21 @@ ui.directive('uiToolbarAdjust', function() {
 				return;
 			}
 
-			if (axelor.device.small) {
-				return hideAndShow(elemToolbarMobile, elemMenubarMobile);
-			}
-
-			var width = element.width();
+			var width = element.width() - 8;
 			elemSiblings.each(function (i) {
 				width -= $(this).width();
 			});
+
+			if (axelor.device.small) {
+				if (width > elemToolbarMobile.width() + elemMenubarMobile.width()) {
+					hideAndShow(elemToolbarMobile, elemMenubarMobile);
+				} else if (width > elemToolbarMobile.width()) {
+					hideAndShow(elemToolbarMobile);
+				} else if (width > elemMenubarMobile.width()) {
+					hideAndShow(elemMenubarMobile);
+				}
+				return;
+			}
 
 			function canShow(first, second) {
 				hideAndShow(first, second, 'hidden');

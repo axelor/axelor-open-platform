@@ -39,6 +39,7 @@ strong {
 #container {
 	left: 0px; right: 0px; top: 41px; bottom: 0px;
 	position:	absolute;
+	min-width: 320px;
 }
 
 @media (max-width: 979px) {
@@ -72,6 +73,7 @@ header .container-fluid {
 	header .navbar-fixed-top {
 		margin-left: 0;
 		margin-right: 0;
+		min-width: 320px;
 	}
 }
 
