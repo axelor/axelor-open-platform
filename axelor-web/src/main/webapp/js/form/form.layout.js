@@ -336,7 +336,9 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 
 			var items = editor.items || [];
 			var widths = _.map(items, function (item) {
-				item.showTitle = item.showTitle === true || (editor.widgetAttrs||{}).showTitles !== "false";
+				if (item.showTitle === undefined) {
+					item.showTitle = (editor.widgetAttrs||{}).showTitles !== "false";
+				}
 				if (!item.showTitle) {
 					item.placeholder = item.placeholder || item.title || item.autoTitle;
 				}
