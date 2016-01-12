@@ -382,6 +382,9 @@
 .panel-layout .row-fluid.has-labels .form-item > a.btn {
 	margin-top: 17px;
 }
+.panel-layout .row-fluid.has-labels .row-fluid:not(.has-labels) > .form-item > a.btn {
+	margin-top: 0;
+}
 
 .panel-tabs .nav-tabs-responsive {
 	margin-bottom: 0;

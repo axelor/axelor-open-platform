@@ -985,6 +985,7 @@
       <xsd:extension base="tns:AbstractPanel">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
           <xsd:element name="field" type="tns:BaseField"/>
+          <xsd:element name="button" type="tns:Button"/>
           <xsd:element name="spacer" type="tns:Spacer" />
           <xsd:element name="label" type="tns:Label" />
         </xsd:choice>
