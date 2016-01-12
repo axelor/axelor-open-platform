@@ -500,7 +500,7 @@ header .navbar .nav-link-user-sub {
 }
 .record-toolbar-right {
 	top: 0;
-	right: 0;
+	right: 6px;
 	position: absolute;
 }
 

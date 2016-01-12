@@ -14,9 +14,11 @@
           <button ng-repeat="btn in toolbar | filter:{custom: true}" class="btn" ui-tool-button="btn">{{btn.title}}</button>
         </div>
         <div ui-filter-box x-handler="this"></div>
-        <div ui-view-customize class="pull-right"></div>
-        <div ui-view-switcher class="pull-right"></div>
-        <div ui-record-pager class="pull-right"></div>
+        <div class="record-toolbar-right">
+          <div ui-view-customize class="pull-right"></div>
+          <div ui-view-switcher class="pull-right"></div>
+          <div ui-record-pager class="pull-right"></div>
+        </div>
       </div>
     </div>
   </div>
