@@ -36,8 +36,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
 import com.axelor.common.FileUtils;
+import com.axelor.common.ObjectUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
@@ -157,22 +159,55 @@ public class MetaService {
 		return all;
 	}
 
-	@SuppressWarnings("unchecked")
-	private List<MenuItem> findMenus(Query query) {
+	private List<MenuItem> findMenus(Query query, boolean withTagsOnly) {
 
 		QueryBinder.of(query).setCacheable();
 
-		List<MenuItem> menus = new ArrayList<>();
-		List<Object[]> all = query.getResultList();
+		final List<MenuItem> menus = new ArrayList<>();
+		final Set<Role> roles = new HashSet<>();
+		final User user = AuthUtils.getUser();
 
-		for(Object[] items : all) {
+		if (user != null && user.getRoles() != null) {
+			roles.addAll(user.getRoles());
+		}
+		if (user != null && user.getGroup() != null && user.getGroup().getRoles() != null) {
+			roles.addAll(user.getGroup().getRoles());
+		}
 
-			MetaMenu menu = (MetaMenu) items[0];
-			MenuItem item = new MenuItem();
+		final List<MetaMenu> all = new ArrayList<>();
+
+		for (Object tuple : query.getResultList()) {
+			MetaMenu menu = (MetaMenu) ((Object[]) tuple)[0];
+			all.add(menu);
+
+			while (withTagsOnly && menu.getParent() != null) {
+				// need to get parents to check visibility
+				menu = menu.getParent();
+				all.add(menu);
+			}
+		}
+
+		for(final MetaMenu menu : all) {
+
+			final MenuItem item = new MenuItem();
 
 			// check user
-			if (menu.getUser() != null && menu.getUser() != AuthUtils.getUser()) {
+			if (menu.getUser() != null && menu.getUser() != user) {
 				continue;
+			}
+
+			// check roles
+			if (!AuthUtils.isAdmin(user) && !ObjectUtils.isEmpty(menu.getRoles())) {
+				boolean hasRole = false;
+				for (final Role role : roles) {
+					if (menu.getRoles().contains(role)) {
+						hasRole = true;
+						break;
+					}
+				}
+				if (!hasRole) {
+					continue;
+				}
 			}
 
 			item.setName(menu.getName());
@@ -252,78 +287,35 @@ public class MetaService {
 		return null;
 	}
 
-	public List<MenuItem> getMenusWithTag() {
-		final List<MenuItem> all = getMenus();
-		final List<MenuItem> res = new ArrayList<>();
-		for (MenuItem item : all) {
-			if (item.getTag() != null) {
-				res.add(item);
-			}
-		}
-		return res;
-	}
+	public List<MenuItem> getMenus(boolean withTagsOnly) {
 
-	public List<MenuItem> getMenus() {
+		final User user = AuthUtils.getUser();
 
-		User user = AuthUtils.getUser();
-
-		String q1 = "SELECT self, COALESCE(self.priority, 0) AS priority FROM MetaMenu self LEFT JOIN self.groups g WHERE ";
-		Object p1 = null;
+		String qs = "SELECT self, COALESCE(self.priority, 0) AS priority FROM MetaMenu self LEFT JOIN self.groups g WHERE ";
+		Object groupCode = null;
 
 		if (user != null && user.getGroup() != null) {
-			p1 = user.getGroup().getCode();
+			groupCode = user.getGroup().getCode();
 		}
 
-		if (p1 != null) {
-			q1 += "(g.code = ?1 OR self.groups IS EMPTY)";
+		if (groupCode != null) {
+			qs += "(g.code = ?1 OR self.groups IS EMPTY) ";
 		} else {
-			q1 += "self.groups IS EMPTY";
+			qs += "self.groups IS EMPTY ";
 		}
 
-		q1 += " ORDER BY priority DESC, self.id";
-
-		Query query = JPA.em().createQuery(q1);
-		if (p1 != null)
-			query.setParameter(1, p1);
-
-		return findMenus(query);
-	}
-
-	public List<MenuItem> getMenus(String parent) {
-
-		User user = AuthUtils.getUser();
-
-		String q1 = "SELECT self, COALESCE(self.priority, 0) AS priority FROM MetaMenu self LEFT JOIN self.groups g WHERE ";
-		String q2 = "self.parent IS NULL";
-		Object p1 = null;
-		Object p2 = null;
-
-		if (user != null && user.getGroup() != null) {
-			p2 = user.getGroup().getCode();
+		if (withTagsOnly) {
+			qs += "AND (self.tag IS NOT NULL OR self.tagGet IS NOT NULL) ";
 		}
 
-		if (Strings.isNullOrEmpty(parent) || "null".endsWith(parent)) {
-			q1 += q2;
-		} else {
-			q1 += "self.parent.name = ?1";
-			p1 = parent;
+		qs += "ORDER BY priority DESC, self.id";
+
+		Query query = JPA.em().createQuery(qs);
+		if (groupCode != null) {
+			query.setParameter(1, groupCode);
 		}
 
-		if (p2 != null) {
-			q1 += " AND (g.code = ?2 OR self.groups IS EMPTY)";
-		} else {
-			q1 += " AND self.groups IS EMPTY";
-		}
-
-		q1 += " ORDER BY priority DESC, self.id";
-
-		Query query = JPA.em().createQuery(q1);
-		if (p1 != null)
-			query.setParameter(1, p1);
-		if (p2 != null)
-			query.setParameter(2, p2);
-
-		return findMenus(query);
+		return findMenus(query, withTagsOnly);
 	}
 
 	@SuppressWarnings("unchecked")

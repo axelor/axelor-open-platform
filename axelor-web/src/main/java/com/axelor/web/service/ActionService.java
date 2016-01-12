@@ -24,13 +24,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import com.axelor.mail.web.MailController;
@@ -55,26 +53,11 @@ public class ActionService extends AbstractService {
 	private MailController mailController;
 	
 	@GET
-	@Path("menu")
-	public Response menu(@QueryParam("parent") @DefaultValue("") String parent) {
-		Response response = new Response();
-		try {
-			response.setData(service.getMenus(parent));
-			response.setStatus(Response.STATUS_SUCCESS);
-		} catch (Exception e) {
-			if (LOG.isErrorEnabled())
-				LOG.error(e.getMessage(), e);
-			response.setException(e);
-		}
-		return response;
-	}
-
-	@GET
 	@Path("menu/all")
 	public Response all() {
 		Response response = new Response();
 		try {
-			response.setData(service.getMenus());
+			response.setData(service.getMenus(false));
 			response.setStatus(Response.STATUS_SUCCESS);
 		} catch (Exception e) {
 			if (LOG.isErrorEnabled())
@@ -90,7 +73,7 @@ public class ActionService extends AbstractService {
 		final ActionResponse response = new ActionResponse();
 		final List<Object> tags = new ArrayList<>();
 		try {
-			for (MenuItem item : service.getMenusWithTag()) {
+			for (MenuItem item : service.getMenus(true)) {
 				Map<String, Object> tag = new HashMap<>();
 				tag.put("name", item.getName());
 				tag.put("tag", item.getTag());

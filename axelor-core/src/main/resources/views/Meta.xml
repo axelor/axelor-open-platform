@@ -196,6 +196,7 @@
       </panel>
     </panel>
     <panel-related field="groups"/>
+    <panel-related field="roles"/>
   </form>
 
   <grid title="Action Menus" name="meta-action-menu-grid" model="com.axelor.meta.db.MetaActionMenu">

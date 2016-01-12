@@ -84,8 +84,10 @@
   	<many-to-one name="parent" ref="MetaMenu"/>
   	<many-to-one name="action" ref="MetaAction"/>
     <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" />
+
   	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
-    
+    <many-to-many name="roles" ref="com.axelor.auth.db.Role"/>
+
     <finder-method name="findByID" using="xmlId" cacheable="true" />
     <finder-method name="findByName" using="name" orderBy="-order" cacheable="true"/>
     <finder-method name="findByParent" using="Long:id" filter="self.parent.id = :id" all="true" cacheable="true"/>
