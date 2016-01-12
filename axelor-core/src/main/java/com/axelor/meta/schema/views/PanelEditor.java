@@ -52,6 +52,7 @@ public class PanelEditor extends AbstractPanel {
 
 	@XmlElements({
 		@XmlElement(name = "field", type = PanelField.class),
+		@XmlElement(name = "button", type = Button.class),
 		@XmlElement(name = "spacer", type = Spacer.class),
 		@XmlElement(name = "label", type = Label.class),
 	})
