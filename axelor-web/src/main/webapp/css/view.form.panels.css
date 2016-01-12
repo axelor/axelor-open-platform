@@ -379,10 +379,12 @@
 	width: auto;
 }
 
-.panel-layout .row-fluid.has-labels .form-item > a.btn {
+.panel-layout .row-fluid.has-labels > .form-item > a.btn,
+.panel-layout .row-fluid.has-labels > .form-item > [x-show-title="false"][ng-model] {
 	margin-top: 17px;
 }
-.panel-layout .row-fluid.has-labels .row-fluid:not(.has-labels) > .form-item > a.btn {
+.panel-layout .row-fluid:not(.has-labels) > .form-item > a.btn,
+.panel-layout .row-fluid:not(.has-labels) > .form-item > [x-show-title="false"][ng-model] {
 	margin-top: 0;
 }
 
