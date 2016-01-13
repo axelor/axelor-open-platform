@@ -2069,6 +2069,9 @@ Grid.prototype.onButtonClick = function(event, args) {
 			if (handlerScope.field && handlerScope.field.target) {
 				context._parent = handlerScope.getContext();
 			}
+			if (context.id === 0) {
+				context.id = null;
+			}
 			return context;
 		};
 		field.handler.onClick().then(function(res){
@@ -2301,6 +2304,9 @@ ui.directive('uiSlickEditors', function() {
 				var handler = $scope.handler || {};
 				if (context && handler.field && handler.field.target) {
 					context._parent = handler.getContext();
+				}
+				if (context.id === 0) {
+					context.id = null;
 				}
 				return context;
 			};
