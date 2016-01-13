@@ -593,14 +593,13 @@ ui.directive('uiFilterBox', function() {
 			if (filterView) {
 				ViewService.getMetaDef($scope.model, {name: filterView, type: 'search-filters'})
 				.success(function(fields, view) {
-					$scope.view = view;
-					$scope.viewItems = angular.copy(view.items) || [];
-					$scope.viewFilters = angular.copy(view.filters);
-					_.each($scope.viewItems, function (item) {
+					var viewItems = _.map(view.items, function (item) {
 						var field = fields[item.name] || {};
-						item.type = field.type;
-						item.title = item.title || field.title;
+						return _.extend({}, field, item, { type: field.type });
 					});
+					$scope.view = view;
+					$scope.viewItems = viewItems;
+					$scope.viewFilters = angular.copy(view.filters);
 				});
 			} else {
 				$scope.viewItems = [];
