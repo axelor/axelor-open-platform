@@ -228,9 +228,11 @@ input, button, textarea, select, fieldset, pre {
 	color: #333;
 }
 
+.m2o-editor-controls i.fa,
 .picker-icons i.fa {
 	color: #ccc;
 }
+.m2o-editor-controls i.fa:hover,
 .picker-icons i.fa:hover {
 	color: #333;
 }
