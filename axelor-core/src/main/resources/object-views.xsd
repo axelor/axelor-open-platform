@@ -1570,6 +1570,7 @@
         <xsd:documentation>Name of the field</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:anyAttribute processContents="skip" />
   </xsd:complexType>
 
   <xsd:complexType name="CardStyle">

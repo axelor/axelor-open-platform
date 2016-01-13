@@ -116,7 +116,16 @@ ui.controller("CardsCtrl", ['$scope', '$element', function CardsCtrl($scope, $el
 
 	BaseCardsCtrl.call(this, 'cards', $scope, $element);
 
+	$scope.viewItems = {};
+
 	$scope.parse = function (fields, view) {
+		var viewItems = {};
+		_.each(view.items, function (item) {
+			if (item.name) {
+				viewItems[item.name] = _.extend({}, item, fields[item.name], item.widgetAttrs);
+			}
+		});
+		$scope.viewItems = viewItems;
 		$scope.onRefresh();
 	};
 }]);
@@ -440,6 +449,23 @@ ui.directive('uiCard', ["$parse", "$compile", function ($parse, $compile) {
 					return "ws/rest/" + field.target + "/" + val.id + "/" + imageName + "/download?image=true&v=" + v;
 				}
 				return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+			};
+
+			evalScope.$fmt = function (fieldName) {
+				var value = evalScope[fieldName];
+				if (value === undefined || value === null) {
+					return "";
+				}
+				var field = scope.viewItems[fieldName] || scope.fields[fieldName];
+				if (!field) {
+					return value;
+				}
+				var type = field.selection ? "selection" : field.type;
+				var formatter = ui.formatters[type];
+				if (formatter) {
+					return formatter(field, value);
+				}
+				return value;
 			};
 
 			var template = (scope.schema.template || "<span></span>").trim();
