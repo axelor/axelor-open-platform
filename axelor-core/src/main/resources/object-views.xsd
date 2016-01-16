@@ -72,6 +72,11 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="icon-background" type="tns:ColorStyle">
+      <xsd:annotation>
+        <xsd:documentation>Specify icon background color (predefined or html hex color)</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="action" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
@@ -483,6 +488,34 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
+
+  <xsd:simpleType name="ColorStyle">
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="green" />
+          <xsd:enumeration value="blue" />
+          <xsd:enumeration value="red" />
+          <xsd:enumeration value="yellow" />
+          <xsd:enumeration value="pink" />
+          <xsd:enumeration value="orange" />
+          <xsd:enumeration value="olive" />
+          <xsd:enumeration value="purple" />
+          <xsd:enumeration value="violet" />
+          <xsd:enumeration value="teal" />
+          <xsd:enumeration value="brown" />
+          <xsd:enumeration value="grey" />
+          <xsd:enumeration value="white" />
+          <xsd:enumeration value="black" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="#[\dA-Fa-f]{6}([\dA-Fa-f][\dA-Fa-f])?"></xsd:pattern>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
 
   <xsd:simpleType name="HiliteStyle">
     <xsd:restriction base="xsd:string">

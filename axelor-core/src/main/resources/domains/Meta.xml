@@ -72,6 +72,7 @@
 	<string name="name" required="true"/>
   	<string name="title" required="true" namecolumn="true"/>
   	<string name="icon"/>
+    <string name="iconBackground" />
     <string name="module"/>
     <string name="tag" />
     <string name="tagGet" />

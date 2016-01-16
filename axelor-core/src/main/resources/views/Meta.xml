@@ -171,29 +171,28 @@
   </grid>
 
   <form name="meta-menu-form" title="Menu Item" model="com.axelor.meta.db.MetaMenu">
-    <panel title="Overview">
-      <panel title="General" colSpan="12">
-        <field name="name"/>
-        <field name="parent" domain="self.name != :name"/>
-        <field name="title"/>
-        <field name="icon"/>
-        <field name="action"/>
-        <field name="module"/>
-      </panel>
-      <panel title="Visibility" colSpan="6">
-        <field name="order"/>
-        <field name="priority"/>
-        <field name="top" widget="inline-checkbox"/>
-        <field name="left" widget="inline-checkbox"/>
-        <field name="mobile" widget="inline-checkbox"/>
-        <field name="hidden" widget="inline-checkbox"/>
-      </panel>
-      <panel title="Tag" colSpan="6">
-        <field name="tag"/>
-        <field name="tagStyle"/>
-        <field name="tagGet" title="Call" hideIf="tag"/>
-        <field name="tagCount" title="Count" hideIf="tag"/>
-      </panel>
+    <panel title="General" colSpan="12">
+      <field name="name"/>
+      <field name="parent" domain="self.name != :name"/>
+      <field name="title"/>
+      <field name="action"/>
+      <field name="icon"/>
+      <field name="iconBackground" />
+      <field name="module"/>
+    </panel>
+    <panel title="Visibility" sidebar="true" itemSpan="6">
+      <field name="order"/>
+      <field name="priority"/>
+      <field name="top" widget="inline-checkbox"/>
+      <field name="left" widget="inline-checkbox"/>
+      <field name="mobile" widget="inline-checkbox"/>
+      <field name="hidden" widget="inline-checkbox"/>
+    </panel>
+    <panel title="Tag" sidebar="true" itemSpan="6">
+      <field name="tag"/>
+      <field name="tagStyle"/>
+      <field name="tagGet" title="Call" hideIf="tag"/>
+      <field name="tagCount" title="Count" hideIf="tag"/>
     </panel>
     <panel-related field="groups"/>
     <panel-related field="roles"/>

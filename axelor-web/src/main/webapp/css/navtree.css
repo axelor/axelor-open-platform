@@ -55,10 +55,20 @@
 	background: transparent;
 }
 
-.nav-tree li > a > img,
-.nav-tree li > a > i {
-	padding-right: 6px;
-	width: 24px;
+.nav-tree li > a > .nav-image,
+.nav-tree li > a > .nav-icon {
+	margin-right: 6px;
+	width: 28px;
+	height: 28px;
+	float: left;
+	display: inline-block;
+	margin-top: -4px;
+	border-radius: 4px;
+}
+
+.nav-tree li > a > .nav-icon {
+	padding: 4px 7px;
+	text-shadow: -1px 1px 5px rgba(0, 0, 0, 0.15);
 }
 
 .nav-tree li > a * {
@@ -142,12 +152,12 @@
 
 /* 1st level */
 .nav-tree > li > a {
-	padding: 13px 16px;
+	padding: 11px 8px;
 }
 
 /* 2nd level */
 .nav-tree > li > ul > li > a {
-	padding-left: 42px;
+	padding-left: 46px;
 }
 
 /* 3rd level */

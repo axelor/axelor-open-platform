@@ -154,7 +154,7 @@
 
   <!-- menu -->
   <menuitem name="menu-dms" order="-109"
-    title="Documents" icon="fa-archive"/>
+    title="Documents" icon="fa-archive" icon-background="brown"/>
   <menuitem name="menu-dms-all" title="All Documents" parent="menu-dms"
     action="dms.all" order="-90"/>
   <menuitem name="menu-dms-my" title="My Documents" parent="menu-dms"

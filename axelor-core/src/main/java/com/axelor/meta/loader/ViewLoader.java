@@ -467,6 +467,7 @@ public class ViewLoader extends AbstractLoader {
 
 		entity.setTitle(menuItem.getTitle());
 		entity.setIcon(menuItem.getIcon());
+		entity.setIconBackground(menuItem.getIconBackground());
 		entity.setModule(module.getName());
 		entity.setTag(menuItem.getTag());
 		entity.setTagGet(menuItem.getTagGet());

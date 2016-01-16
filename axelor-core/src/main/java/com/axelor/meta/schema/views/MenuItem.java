@@ -44,6 +44,9 @@ public class MenuItem extends AbstractWidget {
 	@XmlAttribute
 	private String icon;
 
+	@XmlAttribute(name = "icon-background")
+	private String iconBackground;
+
 	@XmlAttribute
 	private String action;
 
@@ -184,6 +187,14 @@ public class MenuItem extends AbstractWidget {
 
 	public void setIcon(String icon) {
 		this.icon = icon;
+	}
+
+	public String getIconBackground() {
+		return iconBackground;
+	}
+
+	public void setIconBackground(String iconBackground) {
+		this.iconBackground = iconBackground;
 	}
 
 	public String getAction() {

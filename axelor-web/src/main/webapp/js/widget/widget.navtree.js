@@ -131,6 +131,18 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
 				sub.appendTo(element);
 			}
 
+			setTimeout(function () {
+				var icon = element.find("span.nav-icon");
+				if (menu.iconBackground) {
+					icon.addClass("fg-white");
+					if (menu.iconBackground.indexOf("#") === 0) {
+						icon.css("background-color", menu.iconBackground);
+					} else {
+						icon.addClass("bg-" + menu.iconBackground);
+					}
+				}
+			});
+
 			var animation = false;
 
 			function show(el) {
@@ -209,7 +221,7 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
 			"<li ng-class='{folder: menu.children, tagged: menu.tag }'>" +
 				"<a href='#'>" +
 					"<img class='nav-image' ng-if='menu.icon' ng-src='{{menu.icon}}'></img>" +
-					"<i ng-if='menu.fa' class='nav-icon fa' ng-class='menu.fa'></i>" +
+					"<span class='nav-icon' ng-if='menu.fa'><i class='nav-icon fa' ng-class='menu.fa'></i></span>" +
 					"<span class='nav-title'>{{menu.title}}</span>" +
 					"<span ng-show='menu.tag' ng-class='menu.tagCss' class='nav-tag label'>{{menu.tag}}</span>" +
 				"</a>" +

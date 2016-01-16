@@ -114,7 +114,7 @@
 
   <!-- menu -->
   <menuitem name="menu-mail" order="-110"
-    title="Messaging" icon="fa-envelope"/>
+    title="Messaging" icon="fa-envelope" icon-background="teal"/>
 
   <menuitem name="menu-mail-inbox" title="Inbox" parent="menu-mail"
     action="mail.inbox" order="-90" tag-get="com.axelor.mail.web.MailController:inboxMenuTag()" tag-style="warning"/>
