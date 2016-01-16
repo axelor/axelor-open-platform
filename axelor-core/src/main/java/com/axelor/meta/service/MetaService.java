@@ -196,8 +196,10 @@ public class MetaService {
 				continue;
 			}
 
-			// check roles
-			if (!AuthUtils.isAdmin(user) && !ObjectUtils.isEmpty(menu.getRoles())) {
+			boolean hasGroup =  !ObjectUtils.isEmpty(menu.getGroups()) && menu.getGroups().contains(user.getGroup());
+
+			// if no group access, check for roles
+			if (!hasGroup && !AuthUtils.isAdmin(user) && !ObjectUtils.isEmpty(menu.getRoles())) {
 				boolean hasRole = false;
 				for (final Role role : roles) {
 					if (menu.getRoles().contains(role)) {
