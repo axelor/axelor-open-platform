@@ -437,6 +437,7 @@
 
 .panel-tabs .nav-tabs-responsive {
 	margin-bottom: 0;
+	display: inline-flex;
 }
 
 .panel-tabs .nav-tabs-responsive > li.dropdown {
