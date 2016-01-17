@@ -33,7 +33,7 @@ String appDesc = settings.get("application.description", null);
 String appHome = settings.get("application.home", "");
 String appLogo = info.getLogo();
 String appAuthor = settings.get("application.author", "");
-String appTheme = settings.get("application.theme", null);
+String appTheme = info.getTheme();
 String appMenu = settings.get("application.menu", "both");
 
 String appTitle =  appName;

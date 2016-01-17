@@ -60,7 +60,7 @@ public class AboutService extends AbstractService {
 	@Path("info")
 	public Map<String, Object> info() {
 		final AppInfo info = new AppInfo();
-		return info.info();
+		return info.info(request.getServletContext());
 	}
 
 	@GET

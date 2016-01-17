@@ -838,4 +838,14 @@ ui.formInput('NavSelect', {
 		"</div>"
 });
 
+ui.formInput('ThemeSelect', 'Select', {
+
+	init: function (scope) {
+		scope.field.selectionList = _.map(axelor.config['application.themes'], function (name) {
+			return { value: name, title: _.titleize(name) };
+		});
+		this._super(scope);
+	}
+});
+
 })();

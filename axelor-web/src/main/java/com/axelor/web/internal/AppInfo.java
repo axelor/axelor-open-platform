@@ -18,9 +18,14 @@
 package com.axelor.web.internal;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.jsp.JspException;
 
 import com.axelor.app.AppSettings;
@@ -37,9 +42,10 @@ import com.axelor.script.ScriptHelper;
 
 public class AppInfo {
 
-	final AppSettings settings = AppSettings.get();
+	private static final AppSettings SETTINGS = AppSettings.get();
+	private static final String APP_THEME = SETTINGS.get("application.theme", null);
 
-	public Map<String, Object> info() {
+	public Map<String, Object> info(final ServletContext context) {
 
 		final Map<String, Object> map = new HashMap<>();
 		final User user = AuthUtils.getUser();
@@ -77,21 +83,21 @@ public class AppInfo {
 			map.put("user.action", group.getHomeAction());
 		}
 
-		map.put("application.name", settings.get("application.name"));
-		map.put("application.description", settings.get("application.description"));
-		map.put("application.version", settings.get("application.version"));
-		map.put("application.author", settings.get("application.author"));
-		map.put("application.copyright", settings.get("application.copyright"));
-		map.put("application.home", settings.get("application.home"));
-		map.put("application.help", settings.get("application.help"));
-		map.put("application.mode", settings.get("application.mode", "dev"));
+		map.put("application.name", SETTINGS.get("application.name"));
+		map.put("application.description", SETTINGS.get("application.description"));
+		map.put("application.version", SETTINGS.get("application.version"));
+		map.put("application.author", SETTINGS.get("application.author"));
+		map.put("application.copyright", SETTINGS.get("application.copyright"));
+		map.put("application.home", SETTINGS.get("application.home"));
+		map.put("application.help", SETTINGS.get("application.help"));
+		map.put("application.mode", SETTINGS.get("application.mode", "dev"));
 
-		map.put("file.upload.size", settings.get("file.upload.size", "5"));
+		map.put("file.upload.size", SETTINGS.get("file.upload.size", "5"));
 		map.put("application.sdk", VersionUtils.getVersion().version);
 
-		for (String key : settings.getProperties().stringPropertyNames()) {
+		for (String key : SETTINGS.getProperties().stringPropertyNames()) {
 			if (key.startsWith("view.")) {
-				Object value = settings.get(key);
+				Object value = SETTINGS.get(key);
 				if ("true".equals(value) || "false".equals(value)) {
 					value = Boolean.parseBoolean(value.toString());
 				}
@@ -99,12 +105,27 @@ public class AppInfo {
 			}
 		}
 
+		final List<String> themes = new ArrayList<>();
+		for (String path : context.getResourcePaths("/css")) {
+			try {
+				if (path.endsWith("/") && context.getResource(path + "theme.css") != null) {
+					path = path.replace("/css/", "").replace("/", "");
+					themes.add(path);
+				}
+			} catch (MalformedURLException e) {
+			}
+		}
+
+		Collections.sort(themes);
+
+		map.put("application.themes", themes);
+
 		return map;
 	}
 
 	public String getLogo() throws JspException, IOException {
-		final String logo = settings.get("application.logo", "img/axelor-logo.png");
-		if (settings.get("context.appLogo") != null) {
+		final String logo = SETTINGS.get("application.logo", "img/axelor-logo.png");
+		if (SETTINGS.get("context.appLogo") != null) {
 			final ScriptBindings bindings = new ScriptBindings(new HashMap<String, Object>());
 			final ScriptHelper helper = new GroovyScriptHelper(bindings);
 			try {
@@ -113,6 +134,14 @@ public class AppInfo {
 			}
 		}
 		return logo;
+	}
+
+	public String getTheme() {
+		final User user = AuthUtils.getUser();
+		if (user == null || user.getTheme() == null) {
+			return APP_THEME;
+		}
+		return user.getTheme();
 	}
 
 	private String getLink(Object value, String defaultValue) {
