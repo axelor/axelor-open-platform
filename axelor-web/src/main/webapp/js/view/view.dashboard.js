@@ -116,6 +116,16 @@ ui.directive('uiViewDashboard', ['ViewService', function(ViewService) {
 					return ViewService.save(schema);
 				}
 			};
+
+			var unwatch = scope.$watch("schema", function (schema) {
+				if (!schema) {
+					return;
+				}
+				unwatch();
+				if (schema.css) {
+					element.addClass(schema.css);
+				}
+			});
 		},
 		replace: true,
 		transclude: true,

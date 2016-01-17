@@ -248,20 +248,20 @@
 .form-item .dashboard {
 	padding: 0 !important;
 }
-.form-item .dashboard .dashlet {
+.form-item .dashlet {
 	margin: 0 !important;
 	border: 1px solid #e7e7e7;
 }
-.form-item .dashboard .dashlet .dashlet-body > * {
+.form-item .dashlet .dashlet-body > * {
 	height: 100%;
 }
-.form-item .dashboard .dashlet .dashlet-body {
+.form-item .dashlet .dashlet-body {
 	padding: 0;
 }
-.form-item .dashboard .dashlet .dashlet-body .portlet-grid .slickgrid {
+.form-item .dashlet .dashlet-body .portlet-grid .slickgrid {
 	border: 0;
 }
-.form-item .dashboard .dashlet .dashlet-body .portlet-grid .slick-header {
+.form-item .dashlet .dashlet-body .portlet-grid .slick-header {
 	border-top: 0;
 }
 

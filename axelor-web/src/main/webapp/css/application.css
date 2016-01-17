@@ -54,7 +54,6 @@
 
 @import url("view.form.css");
 @import url("view.form.panels.css");
-@import url("view.form.hilite.css");
 @import url("view.form.checkbox.css");
 @import url("view.popup.css");
 @import url("view.tree.css");
@@ -64,6 +63,8 @@
 @import url("view.kanban.css");
 @import url("view.mail.css");
 @import url("view.dms.css");
+
+@import url("view.form.hilite.css");
 
 @import url("colors.css");
 
