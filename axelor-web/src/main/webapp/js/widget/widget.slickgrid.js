@@ -630,7 +630,7 @@ Grid.prototype.parse = function(view) {
 
 		cols.push(column);
 		
-		if (field.aggregate || ["integer", "long", "decimal"].indexOf(field.type) > -1) {
+		if (field.aggregate) {
 			column.groupTotalsFormatter = totalsFormatter;
 		}
 		
@@ -2183,7 +2183,7 @@ Grid.prototype.groupBy = function(names) {
 	var aggregators = _.map(cols, function(col) {
 		var field = col.descriptor;
 		if (!field) return null;
-		if (field.aggregate === "sum" || ["integer", "long", "decimal"].indexOf(field.type) > -1) {
+		if (field.aggregate === "sum") {
 			return new Slick.Data.Aggregators.Sum(field.name);
 		}
 		if (field.aggregate === "avg") {
