@@ -345,3 +345,185 @@
 .fg-black 		{ color: #1B1C1D; }
 .fg-white		{ color: #F9FAFB; }
 
+.panel-red .panel {
+  border-color: #DB2828;
+}
+.panel-red .panel-header {
+  border-top-color: #DB2828;
+  border-bottom-color: #DB2828;
+}
+.panel.panel-red {
+  border-color: #DB2828 !important;
+}
+.panel.panel-red .panel-header {
+  border-top-color: #DB2828 !important;
+  border-bottom-color: #DB2828 !important;
+}
+.panel-orange .panel {
+  border-color: #F2711C;
+}
+.panel-orange .panel-header {
+  border-top-color: #F2711C;
+  border-bottom-color: #F2711C;
+}
+.panel.panel-orange {
+  border-color: #F2711C !important;
+}
+.panel.panel-orange .panel-header {
+  border-top-color: #F2711C !important;
+  border-bottom-color: #F2711C !important;
+}
+.panel-yellow .panel {
+  border-color: #FBBD08;
+}
+.panel-yellow .panel-header {
+  border-top-color: #FBBD08;
+  border-bottom-color: #FBBD08;
+}
+.panel.panel-yellow {
+  border-color: #FBBD08 !important;
+}
+.panel.panel-yellow .panel-header {
+  border-top-color: #FBBD08 !important;
+  border-bottom-color: #FBBD08 !important;
+}
+.panel-olive .panel {
+  border-color: #B5CC18;
+}
+.panel-olive .panel-header {
+  border-top-color: #B5CC18;
+  border-bottom-color: #B5CC18;
+}
+.panel.panel-olive {
+  border-color: #B5CC18 !important;
+}
+.panel.panel-olive .panel-header {
+  border-top-color: #B5CC18 !important;
+  border-bottom-color: #B5CC18 !important;
+}
+.panel-green .panel {
+  border-color: #21BA45;
+}
+.panel-green .panel-header {
+  border-top-color: #21BA45;
+  border-bottom-color: #21BA45;
+}
+.panel.panel-green {
+  border-color: #21BA45 !important;
+}
+.panel.panel-green .panel-header {
+  border-top-color: #21BA45 !important;
+  border-bottom-color: #21BA45 !important;
+}
+.panel-teal .panel {
+  border-color: #00B5AD;
+}
+.panel-teal .panel-header {
+  border-top-color: #00B5AD;
+  border-bottom-color: #00B5AD;
+}
+.panel.panel-teal {
+  border-color: #00B5AD !important;
+}
+.panel.panel-teal .panel-header {
+  border-top-color: #00B5AD !important;
+  border-bottom-color: #00B5AD !important;
+}
+.panel-blue .panel {
+  border-color: #2185D0;
+}
+.panel-blue .panel-header {
+  border-top-color: #2185D0;
+  border-bottom-color: #2185D0;
+}
+.panel.panel-blue {
+  border-color: #2185D0 !important;
+}
+.panel.panel-blue .panel-header {
+  border-top-color: #2185D0 !important;
+  border-bottom-color: #2185D0 !important;
+}
+.panel-violet .panel {
+  border-color: #6435C9;
+}
+.panel-violet .panel-header {
+  border-top-color: #6435C9;
+  border-bottom-color: #6435C9;
+}
+.panel.panel-violet {
+  border-color: #6435C9 !important;
+}
+.panel.panel-violet .panel-header {
+  border-top-color: #6435C9 !important;
+  border-bottom-color: #6435C9 !important;
+}
+.panel-purple .panel {
+  border-color: #A333C8;
+}
+.panel-purple .panel-header {
+  border-top-color: #A333C8;
+  border-bottom-color: #A333C8;
+}
+.panel.panel-purple {
+  border-color: #A333C8 !important;
+}
+.panel.panel-purple .panel-header {
+  border-top-color: #A333C8 !important;
+  border-bottom-color: #A333C8 !important;
+}
+.panel-pink .panel {
+  border-color: #E03997;
+}
+.panel-pink .panel-header {
+  border-top-color: #E03997;
+  border-bottom-color: #E03997;
+}
+.panel.panel-pink {
+  border-color: #E03997 !important;
+}
+.panel.panel-pink .panel-header {
+  border-top-color: #E03997 !important;
+  border-bottom-color: #E03997 !important;
+}
+.panel-brown .panel {
+  border-color: #A5673F;
+}
+.panel-brown .panel-header {
+  border-top-color: #A5673F;
+  border-bottom-color: #A5673F;
+}
+.panel.panel-brown {
+  border-color: #A5673F !important;
+}
+.panel.panel-brown .panel-header {
+  border-top-color: #A5673F !important;
+  border-bottom-color: #A5673F !important;
+}
+.panel-grey .panel {
+  border-color: #767676;
+}
+.panel-grey .panel-header {
+  border-top-color: #767676;
+  border-bottom-color: #767676;
+}
+.panel.panel-grey {
+  border-color: #767676 !important;
+}
+.panel.panel-grey .panel-header {
+  border-top-color: #767676 !important;
+  border-bottom-color: #767676 !important;
+}
+.panel-black .panel {
+  border-color: #1B1C1D;
+}
+.panel-black .panel-header {
+  border-top-color: #1B1C1D;
+  border-bottom-color: #1B1C1D;
+}
+.panel.panel-black {
+  border-color: #1B1C1D !important;
+}
+.panel.panel-black .panel-header {
+  border-top-color: #1B1C1D !important;
+  border-bottom-color: #1B1C1D !important;
+}
