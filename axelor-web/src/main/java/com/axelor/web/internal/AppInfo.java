@@ -32,6 +32,7 @@ import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
+import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -138,7 +139,7 @@ public class AppInfo {
 
 	public String getTheme() {
 		final User user = AuthUtils.getUser();
-		if (user == null || user.getTheme() == null) {
+		if (user == null || StringUtils.isBlank(user.getTheme()) || "default".equals(user.getTheme())) {
 			return APP_THEME;
 		}
 		return user.getTheme();

@@ -844,6 +844,10 @@ ui.formInput('ThemeSelect', 'Select', {
 		scope.field.selectionList = _.map(axelor.config['application.themes'], function (name) {
 			return { value: name, title: _.titleize(name) };
 		});
+		scope.field.selectionList.unshift({
+			value: "default",
+			title: "Default"
+		});
 		this._super(scope);
 	}
 });
