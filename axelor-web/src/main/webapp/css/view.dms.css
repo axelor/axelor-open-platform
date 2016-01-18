@@ -379,6 +379,7 @@
 
 .dms-popup {
 	margin-top: -1px;
+	padding: 1px 0 0 !important;
 }
 
 .dms-popup > div,
@@ -388,7 +389,7 @@
 }
 
 .dms-popup > div > .grid-view {
-	border: 1px solid #e7e7e7;
+	border: 0;
 }
 
 .dms-permission-popup {
