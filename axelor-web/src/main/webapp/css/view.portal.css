@@ -170,6 +170,7 @@
 .dashboard .dashlet-header {
 	border-top: 4px solid #e7e7e7;
 	padding: 11px 15px 14px;
+	margin-top: -1px;
 	overflow: hidden;
 	cursor: move;
 }
