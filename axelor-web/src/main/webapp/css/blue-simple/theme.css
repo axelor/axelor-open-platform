@@ -104,3 +104,9 @@ input[type="color"]:focus,
 .iswitch {
     background-color: #2185D0;
 }
+
+/* panels */
+.panel .panel-header,
+.dashlet .dashlet-header {
+    border-top-width: 2px;
+}
