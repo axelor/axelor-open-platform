@@ -230,7 +230,8 @@
 
 .ui-dialog [ui-dialog] > .slickgrid {
 	position: absolute;
-	top: 4px; right: 4px; bottom: 4px; left: 4px;
+	top: -1px; right: 0; bottom: 0; left: 0;
+	border: 0;
 }
 
 .ui-dialog .slick-editor-dropdown .slickgrid {
