@@ -39,7 +39,7 @@ function ChartCtrl($scope, $element, $http) {
 
 	function refresh() {
 
-		if (viewChart && searchScope && !searchScope.isValid()) {
+		if (viewChart && searchScope && $scope.searchFields && !searchScope.isValid()) {
 			return;
 		}
 
@@ -68,6 +68,7 @@ function ChartCtrl($scope, $element, $http) {
 		return $http.post('ws/meta/chart/' + view.name, params).then(function(response) {
 			var res = response.data;
 			var data = res.data;
+			var isInitial = viewChart === null;
 
 			if (viewChart === null) {
 				viewChart = data;
@@ -80,6 +81,9 @@ function ChartCtrl($scope, $element, $http) {
 				$scope.searchInit = data.onInit;
 			} else {
 				$scope.render(data);
+				if (isInitial) {
+					refresh(); // force loading data
+				}
 			}
 			loading = false;
 		});
