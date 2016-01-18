@@ -444,6 +444,9 @@ header .navbar .nav-link-user-sub {
 .view-pane > .view-container.has-toolbar {
 	top: -6px;
 }
+.view-tabs-single .view-pane > .view-container.has-toolbar {
+	top: 0;
+}
 
 .grid-view > .slickgrid {
 	position: absolute !important;
@@ -815,9 +818,10 @@ img.prefix-icon {
 }
 
 .view-tabs-single .navigation-tabs > .nav-tabs > li > i {
+    width: 28px;
     float: right;
     font-size: 14px;
     line-height: 32px;
-    margin-right: 16px;
+    text-align: center;
     cursor: pointer;
 }
