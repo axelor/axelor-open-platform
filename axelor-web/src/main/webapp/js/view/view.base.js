@@ -85,7 +85,15 @@ function ViewCtrl($scope, DataSource, ViewService) {
 		if (view == null) {
 			return;
 		}
-		
+
+		// if switching from form to other view, make sure to clear current record
+		if ($scope._views.form && $scope._viewType === 'form' && viewType != 'form') {
+			$scope._views.form.deferred.promise.then(function (viewScope) {
+				viewScope.setEditable(false);
+				viewScope.editRecord(null);
+			});
+		}
+
 		// cancel hot edit
 		$.event.trigger('cancel:hot-edit');
 		
