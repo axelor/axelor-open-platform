@@ -616,6 +616,8 @@ ui.directive('uiViewSwitcher', function(){
 		scope: true,
 		link: function(scope, element, attrs) {
 
+			element.parents('.view-container:first').addClass('has-toolbar');
+
 			element.find("button").click(function(e){
 				var type = $(this).attr("x-view-type"),
 					ds = scope._dataSource,
