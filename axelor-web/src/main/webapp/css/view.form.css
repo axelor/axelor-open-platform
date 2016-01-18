@@ -1094,6 +1094,7 @@ table.field-details .help-text hr {
 
 .filter-box .tag-select ul {
 	padding-bottom: 0;
+    margin-left: 2px;
 }
 
 .filter-box .tag-select li {
