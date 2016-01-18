@@ -140,6 +140,22 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
 					} else {
 						icon.addClass("bg-" + menu.iconBackground);
 					}
+
+					// get computed color value
+					var color = icon.css('background-color');
+					var bright = d3.rgb(color).brighter(.3).toString();
+
+					// use same color for vertical line
+					element.css("border-left-color", color);
+
+					// add hover effect
+					element.hover(function () {
+						icon.css('background-color', bright);
+						element.css("border-left-color", bright);
+					}, function () {
+						icon.css('background-color', color)
+						element.css("border-left-color", color);
+					});
 				}
 			});
 
