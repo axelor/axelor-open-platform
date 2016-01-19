@@ -570,7 +570,9 @@ function FormViewCtrl($scope, $element) {
 			routeId = null;
 			$scope.edit(record);
 			$scope.setEditable();
-			record._dirty = true;
+			$scope.$timeout(function () {
+				record._dirty = true;
+			});
 		});
 	};
 	
