@@ -18,6 +18,10 @@
 
 @import url('../blue-simple/theme.css');
 
+[data-name="menu-admin"] .nav-icon {
+	background-color: #E03997;
+}
+
 .panel, .dashlet {
 	border: 1px solid #2185D0;
 }
