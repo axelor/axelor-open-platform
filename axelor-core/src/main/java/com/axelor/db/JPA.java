@@ -328,6 +328,7 @@ public final class JPA {
 		}
 		
 		if (id == null || id <= 0) {
+			id = null;
 			try {
 				bean = klass.newInstance();
 			} catch (Exception ex) {
