@@ -478,6 +478,7 @@ public class RestService extends ResourceService {
 	public Response export(Request request) {
 		final Response response = new Response();
 		final Map<String, Object> data = new HashMap<>();
+		request.setModel(getModel());
 		try {
 			final java.nio.file.Path tempFile = MetaFiles.createTempFile(null, ".csv");
 			try(final OutputStream os = new FileOutputStream(tempFile.toFile())) {
