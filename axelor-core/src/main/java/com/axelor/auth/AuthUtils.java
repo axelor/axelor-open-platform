@@ -83,6 +83,10 @@ public class AuthUtils {
 				|| (user.getGroup() != null && "admins".equals(user.getGroup().getCode()));
 	}
 
+	public static boolean isTechnicalStaff(final User user) {
+		return user.getGroup() != null && user.getGroup().getTechnicalStaff() == Boolean.TRUE;
+	}
+
 	private static final String QS_HAS_ROLE = "SELECT self.id FROM Role self WHERE "
 			+ "(self.name = :name) AND "
 			+ "("

@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.AuthSecurityException;
+import com.axelor.auth.AuthUtils;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.JpaSupport;
 import com.axelor.db.Model;
@@ -174,22 +175,27 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 		PSQLException pe = (PSQLException) e;
 
 		String title = null;
-		String message = null;
+		String message = pe.getServerErrorMessage().getMessage();
 
 		// http://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
 		switch (state) {
 		case "23503":   // foreign key violation
 			title = I18n.get("Foreign key violation");
+			message = I18n.get("The record(s) can't be updated or deleted as it violates foreign key constraint.");
 			break;
 		case "23505":	// unique constraint violation
 			title = I18n.get("Unique constraint violation");
+			message = I18n.get("The record(s) can't be updated as it violates unique constraint.");
 			break;
 		default:
 			title = I18n.get("SQL error");
+			message = I18n.get("Unexpected database error occurred on the server.");
 			break;
 		}
 
-		message = pe.getServerErrorMessage().getDetail();
+		if (AuthUtils.isAdmin(AuthUtils.getUser()) || AuthUtils.isTechnicalStaff(AuthUtils.getUser())) {
+			message += "<p>" + pe.getMessage() + "</p>";
+		}
 
 		Map<String, Object> report = new HashMap<>();
 		report.put("title", title);
