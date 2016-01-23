@@ -227,13 +227,11 @@
   <grid title="All Selects" name="meta-select-grid" model="com.axelor.meta.db.MetaSelect">
     <field name="name"/>
     <field name="module"/>
-    <field name="priority" width="75"/>
   </grid>
 
   <form name="meta-select-form" title="Select" model="com.axelor.meta.db.MetaSelect">
     <panel title="Overview">
       <field name="name"/>
-      <field name="priority"/>
       <field name="module"/>
     </panel>
     <panel-related field="items" editable="true" orderBy="order">
