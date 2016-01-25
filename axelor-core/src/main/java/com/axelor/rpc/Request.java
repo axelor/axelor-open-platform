@@ -191,9 +191,19 @@ public class Request {
 	 */
 	@JsonIgnore
 	public Context getContext() {
-		if (context != null || getBeanClass() == null) {
+		if (context != null) {
 			return context;
 		}
-		return context = Context.create(findContext(), getBeanClass());
+		final Map<String, Object> vars = findContext();
+		Class<?> klass;
+		try {
+			klass = Class.forName(vars.get("_model").toString());
+		} catch (Exception e) {
+			klass = getBeanClass();
+		}
+		if (klass == null) {
+			return null;
+		}
+		return context = Context.create(vars, klass);
 	}
 }
