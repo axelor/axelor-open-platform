@@ -231,11 +231,11 @@ ui.directive('uiMailMessage', function () {
 									"<a href='javascript:' ng-show='message.$flags.isStarred' ng-click='onFlag(message, -2)' x-translate>Mark as not important</a>" +
 								"</li>" +
 								"<li ng-if='message.$thread' ng-show='::!message.parent'>" +
-									"<a href='javascript:' ng-show='::!message.$flags.isArchived' ng-click='onFlag(message, 3)'>Move to archive</a>" +
-									"<a href='javascript:' ng-show='::message.$flags.isArchived' ng-click='onFlag(message, -3)'>Move to inbox</a>" +
+									"<a href='javascript:' ng-show='::!message.$flags.isArchived' ng-click='onFlag(message, 3)' x-translate>Move to archive</a>" +
+									"<a href='javascript:' ng-show='::message.$flags.isArchived' ng-click='onFlag(message, -3)' x-translate>Move to inbox</a>" +
 								"</li>" +
 								"<li>" +
-									"<a href='javascript:' ng-show='::message.$canDelete' ng-click='onRemove(message)'>Delete</a>" +
+									"<a href='javascript:' ng-show='::message.$canDelete' ng-click='onRemove(message)' x-translate>Delete</a>" +
 								"</li>" +
 				            "</ul>" +
 						"</div>" +
