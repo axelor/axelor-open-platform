@@ -1,3 +1,7 @@
+# Current (3.0.24)
+
+## Bug fixes
+
 # 3.0.23 (2016-01-27)
 
 ## Improvements
