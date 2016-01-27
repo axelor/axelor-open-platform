@@ -1,6 +1,29 @@
-# Current (3.0.23)
+# 3.0.23 (2016-01-27)
+
+## Improvements
+
+- allow buttons in field editor
+- addded helpLink field to MetaView
+- support for one-to-one field in advance search
+- support for special action "close"
+- support for special action "new"
+- show html content in grid cell
+- notify to refresh browser after meta data reload
+- automatically detach orphaned one-to-many records
 
 ## Bug fixes
+
+- fix wrong record in form view
+- fix showTitle attribute issue on editor fields
+- fix field alignment issue
+- fix field editor as viewer is not reused
+- fix id value not persisted for selections
+- fix date input widget issue
+- fix i18n bundle cache update issue
+- fix nested selection field issue in tree view
+- fix mail builder issue for multi-part messages
+- fix pagination issue on tree view
+- fix wrong conversion of string value as boolean
 
 # 3.0.22 (2015-10-22)
 
