@@ -82,6 +82,12 @@ public @interface Widget {
 	boolean massUpdate() default false;
 
 	/**
+	 * Whether to copy this field when creating duplicate record.
+	 *
+	 */
+	boolean copyable() default true;
+
+	/**
 	 * Whether the field value is translatable.
 	 *
 	 */

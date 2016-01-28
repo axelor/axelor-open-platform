@@ -203,6 +203,13 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="copy" type="xsd:boolean" default="true">
+      <xsd:annotation>
+        <xsd:documentation>
+        Whether to use this field when creating duplicate record?
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 
   <xsd:complexType name="SimpleColumn">
