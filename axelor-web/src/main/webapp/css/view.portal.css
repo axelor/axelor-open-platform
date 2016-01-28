@@ -148,6 +148,9 @@
 	padding: 14px;
 }
 
+.dashboard.attached {
+	margin-top: -9px;
+}
 
 .dashboard,
 .dashboard .dashlet {
