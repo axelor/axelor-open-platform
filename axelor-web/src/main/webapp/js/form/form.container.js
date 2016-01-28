@@ -443,7 +443,8 @@ ui.formWidget('Panel', {
 			}
 
 			element.removeClass("collapsed");
-			body[action]("blind", 200, function () {
+			body[action]();
+			setTimeout(function () {
 				element.toggleClass("collapsed", !!collapsed);
 				if (body.css('display') !== 'none' && action === 'hide') {
 					body.hide();
