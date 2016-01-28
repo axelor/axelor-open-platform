@@ -616,7 +616,7 @@ public final class JPA {
 		final int random = new Random().nextInt();
 		for(final Property p : mapper.getProperties()) {
 			
-			if (p.isVirtual() || p.isPrimary() || p.isVersion() || p.isSequence()) {
+			if (p.isVirtual() || p.isPrimary() || p.isVersion() || p.isSequence() || !p.isCopyable()) {
 				continue;
 			}
 

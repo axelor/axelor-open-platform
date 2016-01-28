@@ -57,7 +57,7 @@
   <entity name="Group" repository="none">
     <string name="code" required="true" unique="true" min="2" />
     <string name="name" required="true" unique="true" min="2" />
-    <one-to-one name="test1" ref="Title" mappedBy="testG"/>
+    <one-to-one name="test1" ref="Title" mappedBy="testG" copy="false" />
     <many-to-many name="contacts" ref="Contact"/>
   </entity>
 

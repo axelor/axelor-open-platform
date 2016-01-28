@@ -90,6 +90,8 @@ public class Property {
 
 	private transient boolean hashKey;
 
+	private transient boolean copyable;
+
 	private Object maxSize;
 
 	private Object minSize;
@@ -135,6 +137,7 @@ public class Property {
 		this.name = name;
 		this.javaType = javaType;
 		this.genericType = genericType;
+		this.copyable = true;
 
 		try {
 			this.type = PropertyType
@@ -257,6 +260,7 @@ public class Property {
 				selection = w.selection();
 				password = w.password();
 				massUpdate = w.massUpdate();
+				copyable = w.canCopy();
 
 				if (w.multiline() && type == PropertyType.STRING) {
 					type = PropertyType.TEXT;
@@ -367,6 +371,10 @@ public class Property {
 
 	public boolean isHashKey() {
 		return hashKey;
+	}
+
+	public boolean isCopyable() {
+		return copyable;
 	}
 
 	public boolean isVirtual() {

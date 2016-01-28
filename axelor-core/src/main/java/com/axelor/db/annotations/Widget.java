@@ -82,6 +82,12 @@ public @interface Widget {
 	boolean massUpdate() default false;
 
 	/**
+	 * Whether to copy this field when creating duplicate record.
+	 *
+	 */
+	boolean canCopy() default true;
+
+	/**
 	 * List of the columns to be used to search this record.
 	 *
 	 * Used by auto-complete widget. By default the same column will be
