@@ -1,0 +1,96 @@
+/**
+ * Axelor Business Solutions
+ *
+ * Copyright (C) 2005-2016 Axelor (<http://axelor.com>).
+ *
+ * This program is free software: you can redistribute it and/or  modify
+ * it under the terms of the GNU Affero General Public License, version 3,
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+.wysiwyg-container {
+	border-radius: 0;
+}
+
+.wysiwyg-editor {
+	min-height: inherit;
+}
+
+.wysiwyg-popup {
+	border-radius: 0;
+	background: #fff;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	background-clip: padding-box;
+}
+
+.wysiwyg-toolbar-icon {
+	padding: 6px 8px;
+	font-size: 14px;
+}
+
+.wysiwyg-toolbar a,
+.wysiwyg-toolbar a:hover,
+.wysiwyg-toolbar a:link,
+.wysiwyg-toolbar a:visited {
+	text-decoration: none;
+}
+
+.wysiwyg-plugin-list {
+    max-height: 16em;
+    overflow: hidden;
+}
+
+.wysiwyg-plugin-list a,
+.wysiwyg-plugin-list a:link,
+.wysiwyg-plugin-list a:visited {
+    display: block;
+    color: black;
+    padding: 5px 10px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.wysiwyg-toolbar-icon:hover,
+.wysiwyg-plugin-list a:hover {
+    color: #fff;
+    background-color: #5377b1;
+}
+
+.wysiwyg-popup.wysiwyg-popuphover {
+	width: auto;
+}
+
+.wysiwyg-popup * {
+	box-sizing: content-box !important;
+}
+
+input.wysiwyg-input {
+	margin: 0;
+}
+
+.wysiwyg-toolbar-divider {
+	background-color: #ddd;
+	display: inline-block;
+	height: 26px;
+	margin-left: 0px;
+	margin-right: 0px;
+	vertical-align: middle;
+	width: 1px;
+}
+
+.slick-external-editor.html-item {
+	background-color: white;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	min-width: 380px;
+}
+
+.slick-external-editor.html-item input.wysiwyg-input {
+	box-sizing: border-box;
+}

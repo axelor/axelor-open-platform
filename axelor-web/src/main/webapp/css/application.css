@@ -36,6 +36,8 @@
 @import url('../lib/d3/nv/nv.d3.css');
 
 @import url('../lib/codemirror/codemirror.min.css');
+@import url("../lib/wysiwyg/wysiwyg-editor.css");
+@import url("wysiwyg.css");
 
 @import url('scrollbar.css');
 @import url('main.css');
