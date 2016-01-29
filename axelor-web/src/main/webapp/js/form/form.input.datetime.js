@@ -353,7 +353,7 @@ ui.formInput('DateTime', {
 				value = input.datetimepicker('getDate') || null,
 				oldValue = scope.getValue() || null;
 
-			if (!input.mask("valid")) {
+			if (value && !input.mask("valid")) {
 				return;
 			}
 			if (_.isEmpty(masked)) {
