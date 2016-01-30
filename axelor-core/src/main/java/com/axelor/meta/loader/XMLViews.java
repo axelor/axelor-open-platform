@@ -261,6 +261,9 @@ public class XMLViews {
 			final String xml = custom == null ? view.getXml() : custom.getXml();
 			xmlView = ((ObjectViews) XMLViews.unmarshal(xml)).getViews().get(0);
 			xmlView.setViewId(view.getId());
+			if (view.getHelpLink() != null) {
+				xmlView.setHelpLink(view.getHelpLink());
+			}
 		} catch (Exception e) {
 			return null;
 		}
@@ -292,6 +295,9 @@ public class XMLViews {
 		try {
 			xmlView = ((ObjectViews) XMLViews.unmarshal(view.getXml())).getViews().get(0);
 			xmlView.setViewId(view.getId());
+			if (view.getHelpLink() != null) {
+				xmlView.setHelpLink(view.getHelpLink());
+			}
 		} catch (Exception e) {
 			return null;
 		}
