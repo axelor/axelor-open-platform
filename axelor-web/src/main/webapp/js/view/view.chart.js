@@ -666,12 +666,13 @@ function Chart(scope, element, data) {
 		
 		function adjust() {
 			
-			if (element.is(":hidden")) {
+			if (!element[0] || element.parent().is(":hidden")) {
 				return;
 			}
 
-			var w = element.width(),
-				h = element.height();
+			var rect = element[0].getBoundingClientRect();
+			var w = rect.width,
+				h = rect.height;
 			
 			if (w === lastWidth && h === lastHeight) {
 				return;
@@ -700,7 +701,7 @@ var directiveFn = function(){
 			var form = element.children('.chart-controls');
 			
 			scope.render = function(data) {
-				if (svg.is(":hidden")) {
+				if (element.is(":hidden")) {
 					initialized = false;
 					return;
 				}
