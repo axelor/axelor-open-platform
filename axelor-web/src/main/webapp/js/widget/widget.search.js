@@ -141,6 +141,12 @@ ui.directive('uiFilterItem', function() {
 				}
 			};
 
+			scope.onOperatorChange = function() {
+				setTimeout(function() {
+					scope.$parent.$parent.$parent.doAdjust();
+				});
+			};
+
 			scope.$watch('filter.field', function (value, old) {
 				scope.operators = getOperators();
 			});
@@ -163,7 +169,7 @@ ui.directive('uiFilterItem', function() {
 						"<select ng-model='filter.field' ng-options='v.name as v.title for v in options' ng-change='onFieldChange()' class='input-medium'></select> " +
 					"</td>" +
 					"<td class='form-item filter-select'>" +
-						"<select ng-model='filter.operator' ng-options='o.name as o.title for o in operators' class='input-medium'></select> "+
+						"<select ng-model='filter.operator' ng-options='o.name as o.title for o in operators' ng-change='onOperatorChange()' class='input-medium'></select> "+
 					"</td>" +
 					"<td class='form-item filter-select' ng-show='canShowSelect()'>" +
 						"<select ng-model='filter.value' class='input=medium' ng-options='o.value as o.title for o in getSelection()'></select>" +
@@ -1001,18 +1007,24 @@ ui.directive('uiFilterBox', function() {
 				}
 				toggleButton = $(e.currentTarget);
 				menu.show();
-				menu.position({
-					my: "left top",
-					at: "left bottom",
-					of: element
-				});
+				scope.doAdjust();
+
 				$(document).on('mousedown.search-menu', onMouseDown);
 				
 				scope.applyLater(function () {
 					scope.visible = true;
 				});
 			};
-			
+
+			scope.doAdjust = function () {
+				menu.position({
+					my: "left top",
+					at: "left bottom",
+					of: element,
+					collision: "fit"
+				});
+			};
+
 			scope.onClearFilter = function () {
 				hideMenu();
 				scope.visible = true;

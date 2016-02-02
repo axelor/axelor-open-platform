@@ -1085,6 +1085,7 @@ table.field-details .help-text hr {
 	box-sizing: border-box;
 	width: 200px;
 	vertical-align: middle;
+	z-index: 1;
 }
 
 .filter-box .search-query {
