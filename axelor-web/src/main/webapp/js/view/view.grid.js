@@ -63,11 +63,6 @@ function GridViewCtrl($scope, $element) {
 					$scope._routeSearch = params.options.search;
 				}
 
-				// set limit for non-relational views
-				if (params.params && params.params['search-limit'] && !($scope.field||{}).target) {
-					ds._page.limit = +(params.params['search-limit']);
-				}
-
 				reloadDotted = params.params && params.params['reload-dotted'];
 
 				$scope.view = view;
