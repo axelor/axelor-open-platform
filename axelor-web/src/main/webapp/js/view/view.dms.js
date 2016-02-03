@@ -1078,7 +1078,7 @@ ui.directive("uiDmsTreeNode", function () {
 		scope: true,
 		link: function (scope, element, attrs) {
 
-			element.children('.highlight').on("dropstart", function (e, dd) {
+			element.children('.highlight').on("xdropstart", function (e, dd) {
 				var records = dd.records;
 				if (!records || records.length === 0) {
 					return;
@@ -1098,11 +1098,11 @@ ui.directive("uiDmsTreeNode", function () {
 				element.addClass("dropping");
 			});
 
-			element.children('.highlight').on("dropend", function (e, dd) {
+			element.children('.highlight').on("xdropend", function (e, dd) {
 				element.removeClass("dropping");
 			});
 
-			element.children('.highlight').on("drop", function (e, dd) {
+			element.children('.highlight').on("xdrop", function (e, dd) {
 				var records = dd.records;
 				if (!records || records.length === 0 || !scope.node) {
 					return;

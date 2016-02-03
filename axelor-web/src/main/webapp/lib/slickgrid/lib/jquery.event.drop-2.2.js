@@ -18,8 +18,8 @@ $.fn.drop = function( str, arg, opts ){
 	// figure out the event handler...
 	fn = $.isFunction( str ) ? str : $.isFunction( arg ) ? arg : null;
 	// fix the event type
-	if ( type.indexOf("drop") !== 0 )
-		type = "drop"+ type;
+	if ( type.indexOf("xdrop") !== 0 )
+		type = "xdrop"+ type;
 	// were options passed
 	opts = ( str == fn ? arg : opts ) || {};
 	// trigger or bind event handler
@@ -133,7 +133,7 @@ drop = $.event.special.drop = {
 				// set available target elements
 				dd.droppable = $targets;
 				// activate drop targets for the initial element being dragged
-				$special.drag.hijack( event, "dropinit", dd );
+				$special.drag.hijack( event, "xdropinit", dd );
 				break;
 			// drag, from $.event.special.drag
 			case 'mousemove': // TOLERATE >>
@@ -148,8 +148,8 @@ drop = $.event.special.drop = {
 			case 'touchend': // DROP >> DROPEND >>
 				drop.timer = clearTimeout( drop.timer ); // delete timer
 				if ( dd.propagates ){
-					$special.drag.hijack( event, "drop", dd );
-					$special.drag.hijack( event, "dropend", dd );
+					$special.drag.hijack( event, "xdrop", dd );
+					$special.drag.hijack( event, "xdropend", dd );
 				}
 				break;
 
@@ -262,7 +262,7 @@ drop = $.event.special.drop = {
 					// new winner... dropstart
 					if ( !data.active[x] && !data.anyactive ){
 						// check to make sure that this is not prevented
-						if ( $special.drag.hijack( drop.event, "dropstart", dd, x, data.elem )[0] !== false ){
+						if ( $special.drag.hijack( drop.event, "xdropstart", dd, x, data.elem )[0] !== false ){
 							data.active[x] = 1;
 							data.anyactive += 1;
 						}
@@ -277,7 +277,7 @@ drop = $.event.special.drop = {
 				// losers...
 				else if ( data.active[x] && data.anyactive == 1 ){
 					// former winner... dropend
-					$special.drag.hijack( drop.event, "dropend", dd, x, data.elem );
+					$special.drag.hijack( drop.event, "xdropend", dd, x, data.elem );
 					data.active[x] = 0;
 					data.anyactive -= 1;
 				}
@@ -297,6 +297,6 @@ drop = $.event.special.drop = {
 };
 
 // share the same special event configuration with related events...
-$special.dropinit = $special.dropstart = $special.dropend = drop;
+$special.xdropinit = $special.xdropstart = $special.xdropend = drop;
 
 })(jQuery); // confine scope
