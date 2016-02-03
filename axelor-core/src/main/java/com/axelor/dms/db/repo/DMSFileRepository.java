@@ -338,21 +338,54 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 		json.put("updatedBy", file.getUpdatedBy());
 		json.put("updatedOn", file.getUpdatedOn());
 
-		if (metaFile != null) {
-			json.put("fileType", metaFile.getFileType());
-		}
-
 		if ("html".equals(file.getContentType())) {
 			json.put("fileType", "text/html");
 			json.put("contentType", "html");
-			json.put("typeIcon", "fa fa-file-text");
+			json.put("typeIcon", "fa fa-file-text-o");
 			json.remove("downloadIcon");
 		}
 		if ("spreadsheet".equals(file.getContentType())) {
 			json.put("fileType", "text/json");
 			json.put("contentType", "spreadsheet");
-			json.put("typeIcon", "fa fa-table");
+			json.put("typeIcon", "fa fa-file-excel-o");
 			json.remove("downloadIcon");
+		}
+
+		if (metaFile != null) {
+
+			String fileType = metaFile.getFileType();
+			String fileIcon = "fa-file-o";
+
+			switch (fileType) {
+			case "application/msword":
+			case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+			case "application/vnd.oasis.opendocument.text":
+				fileIcon = "fa-file-word-o";
+				break;
+			case "application/vnd.ms-excel":
+			case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+			case "application/vnd.oasis.opendocument.spreadsheet":
+				fileIcon = "fa-file-excel-o";
+				break;
+			case "application/pdf":
+				fileIcon = "fa-file-pdf-o";
+				break;
+			case "application/zip":
+			case "application/gzip":
+				fileIcon = "fa-file-archive-o";
+				break;
+			default:
+				String type = metaFile.getFileType();
+				if (type != null) {
+					if (type.startsWith("text")) fileIcon = "fa-file-text-o";
+					if (type.startsWith("image")) fileIcon = "fa-file-image-o";
+					if (type.startsWith("video")) fileIcon = "fa-file-video-o";
+				}
+				break;
+			}
+
+			json.put("fileType", fileType);
+			json.put("typeIcon", "fa " + fileIcon);
 		}
 
 		if (file.getTags() != null) {

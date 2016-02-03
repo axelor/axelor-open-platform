@@ -419,3 +419,46 @@
 	background-color: #e7e7e7;
 	border-color: #e7e7e7;
 }
+
+.dms-folder-tree i.fa-folder {
+	font-size: 18px;
+	vertical-align: middle;
+    margin-right: 4px;
+    margin-top: -1px;
+}
+
+.dms-file-list i.fa-folder {
+	color: #FFA726;
+}
+
+.dms-file-list i.fa-file-o {
+	color: #767676;
+}
+
+.dms-file-list i.fa-file-text-o {
+	color: #2185D0;
+}
+
+.dms-file-list i.fa-file-word-o {
+	color: #2185D0;
+}
+
+.dms-file-list i.fa-file-excel-o {
+	color: #21BA45;
+}
+
+.dms-file-list i.fa-file-pdf-o {
+	color: #DB2828;
+}
+
+.dms-file-list i.fa-file-image-o {
+	color: #6435C9;
+}
+
+.dms-file-list i.fa-file-video-o {
+	color: #DB2828;
+}
+
+.dms-file-list i.fa-file-archive-o {
+	color: #A5673F;
+}
