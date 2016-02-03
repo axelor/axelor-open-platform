@@ -1016,14 +1016,21 @@ ui.directive('uiFilterBox', function() {
 				});
 			};
 
-			scope.doAdjust = function () {
-				menu.position({
+			scope.doAdjust = (function() {
+				var opts = {
 					my: "left top",
 					at: "left bottom",
 					of: element,
 					collision: "fit"
-				});
-			};
+				};
+				if (element.hasClass('pull-right')) {
+					opts.my = "right top";
+					opts.at = "right bottom"
+				}
+				return function() {
+					menu.position(opts);
+				}
+			}());
 
 			scope.onClearFilter = function () {
 				hideMenu();
