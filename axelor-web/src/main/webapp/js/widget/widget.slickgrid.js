@@ -347,12 +347,14 @@ var Formatters = {
 				elem += ' title="' + field.help + '"';
 			}
 			elem += '><i class="' + css + '"></i></a>';
-		} else {
+		} else if (field.icon) {
 			elem = '<img class="' + css + '" src="' + field.icon + '"';
 			if (field.help) {
 				elem += ' title="' + field.help + '"';
 			}
 			elem += '>';
+		} else {
+			return "";
 		}
 		
 		return elem;
