@@ -98,6 +98,20 @@ function makePopover(scope, element, callback, placement) {
 	element.on('mouseenter.popover', enter);
 	element.on('mouseleave.popover', leave);
 
+	function selectText(elem) {
+		var el = $(elem).get(0);
+        if (document.selection) {
+            var range = document.body.createTextRange();
+            range.moveToElementText(el);
+            range.select();
+        } else if (window.getSelection) {
+            var range = document.createRange();
+            range.selectNodeContents(el);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+        }
+    }
+
 	function enter(e) {
 		if (popoverTimer) {
 			clearTimeout(popoverTimer);
@@ -106,13 +120,16 @@ function makePopover(scope, element, callback, placement) {
 			if (popoverElem === null) {
 				popoverElem = element;
 				popoverElem.popover('show');
+				if (e.ctrlKey) {
+					selectText(table.find('.field-name,.model-name').get(0));
+				}
 			}
 			var tip = element.data('popover').$tip;
 			if (tip) {
 				tip.attr('tabIndex', 0);
 				tip.css('outline', 'none');
 			}
-		}, 1000);
+		}, e.ctrlKey ? 0 : 1000);
 	}
 	
 	function leave(e) {
@@ -167,7 +184,7 @@ ui.directive('uiTabPopover', function() {
 			addRow(_t('Action'), tab.action);
 		}
 		if (tab.model) {
-			addRow(_t('Object'), tab.model);
+			addRow(_t('Object'), '<code>' + tab.model + '</code>', 'model-name');
 		}
 		if (tab.domain) {
 			addRow(_t('Domain'), tab.domain);
@@ -209,7 +226,7 @@ ui.directive('uiHelpPopover', function() {
 		}
 
 		addRow(_t('Object'), model);
-		addRow(_t('Field Name'), field.name);
+		addRow(_t('Field Name'), '<code>' + field.name + '</code>', 'field-name');
 		addRow(_t('Field Type'), field.serverType);
 
 		if (field.type === 'text') {
