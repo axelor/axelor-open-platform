@@ -236,18 +236,16 @@ public class XMLViews {
 
 		if (name != null) {
 
-			// first find personalized view
+			// find personalized view
 			if (user != null) {
 				custom = customViews.findByUser(name, model, user);
 				custom = custom == null ? customViews.findByUser(name, user) : custom;
 			}
 
-			// else find default view
-			if (custom == null) {
-				view = views.findByName(name, model, group);
-				view = view == null ? views.findByName(name, model) : view;
-				view = view == null ? views.findByName(name) : view;
-			}
+			// find default view
+			view = views.findByName(name, model, group);
+			view = view == null ? views.findByName(name, model) : view;
+			view = view == null ? views.findByName(name) : view;
 		}
 
 		if (view == null) {
