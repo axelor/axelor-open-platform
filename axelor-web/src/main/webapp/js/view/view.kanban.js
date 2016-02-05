@@ -128,6 +128,15 @@ ui.controller("CardsCtrl", ['$scope', '$element', function CardsCtrl($scope, $el
 		$scope.viewItems = viewItems;
 		$scope.onRefresh();
 	};
+
+	$scope.onExport = function (full) {
+		var fields = full ? [] : _.pluck($scope.viewItems, 'name');
+		return $scope._dataSource.export_(fields).success(function(res) {
+			var fileName = res.fileName;
+			var filePath = 'ws/rest/' + $scope._model + '/export/' + fileName;
+			ui.download(filePath, fileName);
+		});
+	};
 }]);
 
 ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $element) {
