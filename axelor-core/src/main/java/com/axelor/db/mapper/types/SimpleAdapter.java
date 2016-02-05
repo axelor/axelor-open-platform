@@ -67,8 +67,12 @@ public class SimpleAdapter implements TypeAdapter<Object> {
 		if (type == Short.TYPE || type == Short.class)
 			return Short.valueOf(value.toString());
 
-		if (type == Integer.TYPE || type == Integer.class)
+		if (type == Integer.TYPE || type == Integer.class) {
+			if (value instanceof Number) {
+				return ((Number) value).intValue();
+			}
 			return Integer.valueOf(value.toString());
+		}
 
 		if (type == Long.TYPE || type == Long.class)
 			return Long.valueOf(value.toString());
