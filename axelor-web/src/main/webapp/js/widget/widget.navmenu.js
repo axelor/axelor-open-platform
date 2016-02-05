@@ -262,4 +262,105 @@ ui.directive('navMenuItem', ['$compile', function($compile) {
 	};
 }]);
 
+ui.directive('navMenuFav', function() {
+
+	return {
+		replace: true,
+		controller: ['$scope', '$location', 'DataSource', 'NavService', function ($scope, $location, DataSource, NavService) {
+
+			var ds = DataSource.create("com.axelor.meta.db.MetaMenu", {
+				domain: "self.user = :__user__ and self.link is not null"
+			});
+
+			$scope.items = [];
+
+			function update() {
+				ds.search({
+					fields: ["id", "name", "title", "link"]
+				}).success(function (records, page) {
+					$scope.items =  records;
+				});
+			}
+
+			function add(values, callback) {
+				var item = _.findWhere($scope.items, { link: values.link });
+				if (item && item.title === values.title) {
+					return callback();
+				}
+				if (item) {
+					item.title = values.title;
+				} else {
+					item = values;
+					item.name = values.link;
+					item.user = {
+						id: axelor.config['user.id']
+					};
+					item.hidden = true;
+				}
+
+				ds.save(item).success(update).then(callback, callback);
+			}
+
+			$scope.addFav = function () {
+
+				var link = $location.path();
+				if (link === "/") {
+					return;
+				}
+
+				var tab = NavService.getSelected() || {};
+				var vs = tab.$viewScope || {};
+				var title = tab.title || (vs.schema || {}).title || "";
+
+				if (vs.record && vs.record.id > 0) {
+					title = title + " (" + vs.record.id + ")";
+				}
+
+				var item = _.findWhere($scope.items, { link: link });
+				if (item) {
+					title = item.title;
+				}
+
+				var dialog = axelor.dialogs.box("<input type='text' style='width: 100%;box-sizing: border-box;height: 28px;margin: 0;'>", {
+					title: _t('Add to favorites...'),
+					buttons: [{
+						text: _t('Cancel'),
+						'class': 'btn btn-default',
+						click: function (e) {
+							$(this).dialog('close');
+						}
+					}, {
+						text: _t('OK'),
+						'class': 'btn btn-primary',
+						click: function (e) {
+							title = dialog.find("input").val();
+							add({ title: title, link: link }, function () {
+								dialog.dialog('close');
+							});
+						}
+					}]
+				});
+
+				setTimeout(function () {
+					dialog.find("input").val(title).focus().select();
+				});
+			};
+
+			$scope.manageFav = function () {
+				NavService.openTabByName('menus.fav');
+			};
+
+			update();
+		}],
+		template:
+			"<ul class='dropdown-menu'>" +
+				"<li><a href='' ng-click='addFav()' x-translate>Add to favorites...</a></li>" +
+				"<li class='divider'></li>" +
+				"<li ng-repeat='item in items'><a ng-href='#{{item.link}}'>{{item.title}}</a></li>" +
+				"<li class='divider'></li>" +
+				"<li><a href='' ng-click='manageFav()' x-translate>Organize favorites...</a></li>" +
+			"</ul>"
+	};
+});
+
 })();

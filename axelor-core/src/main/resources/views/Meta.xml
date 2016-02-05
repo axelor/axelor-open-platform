@@ -171,6 +171,15 @@
     <field name="priority"/>
   </grid>
 
+  <grid title="Favorites" name="meta-menu-fav-grid" model="com.axelor.meta.db.MetaMenu" editable="true">
+    <field name="title"/>
+    <field name="link"/>
+  </grid>
+  <action-view name="menus.fav" model="com.axelor.meta.db.MetaMenu" title="Favorites">
+    <view name="meta-menu-fav-grid" type="grid"/>
+    <domain>self.user = :__user__ and self.link is not null</domain>
+  </action-view>
+
   <form name="meta-menu-form" title="Menu Item" model="com.axelor.meta.db.MetaMenu">
     <panel title="General" colSpan="12">
       <field name="name"/>
@@ -179,6 +188,7 @@
       <field name="action"/>
       <field name="icon"/>
       <field name="iconBackground" />
+      <field name="link" />
       <field name="module"/>
     </panel>
     <panel title="Visibility" sidebar="true" itemSpan="6">

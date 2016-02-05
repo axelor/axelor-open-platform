@@ -99,6 +99,13 @@ if (appDesc != null) {
               </li>
               <li class="divider-vertical"></li>
               <li class="dropdown">
+                <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown">
+                  <i class="fa fa-star"></i>
+                </a>
+                <ul class="dropdown-menu" nav-menu-fav></ul>
+              </li>
+              <li class="divider-vertical"></li>
+              <li class="dropdown">
                 <a href="javascript:" class="dropdown-toggle nav-link-user" data-toggle="dropdown">
                   <img ng-src="{{ $user.image }}" width="20px"> <b class="caret"></b>
                 </a>

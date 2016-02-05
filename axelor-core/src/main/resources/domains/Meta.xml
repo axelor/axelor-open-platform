@@ -83,6 +83,9 @@
     <boolean name="left" column="left_menu" default="true"/>
     <boolean name="mobile" column="mobile_menu"/>
     <boolean name="hidden" />
+
+    <string name="link" />
+
   	<many-to-one name="parent" ref="MetaMenu"/>
   	<many-to-one name="action" ref="MetaAction"/>
     <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" />
