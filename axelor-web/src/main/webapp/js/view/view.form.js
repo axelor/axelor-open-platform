@@ -221,6 +221,8 @@ function FormViewCtrl($scope, $element) {
 		var context = _.extend({}, $scope._routeSearch, $scope.record);
 		if ($scope.$parent && $scope.$parent.getContext) {
 			context._parent = $scope.$parent.getContext();
+		} else {
+			context = _.extend({}, $scope._viewParams.context, context);
 		}
 
 		function compact(item) {
@@ -251,6 +253,10 @@ function FormViewCtrl($scope, $element) {
 
 		context = _.extend(context, dummy);
 		context._model = ds._model;
+
+		if (context.id <= 0) {
+			context.id = null;
+		}
 
 		if (!$scope.$hasPanels) {
 			context._form = true;
