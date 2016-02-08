@@ -127,6 +127,7 @@ ui.controller("CardsCtrl", ['$scope', '$element', function CardsCtrl($scope, $el
 		});
 		$scope.viewItems = viewItems;
 		$scope.onRefresh();
+		$scope.waitForActions(axelor.$adjustSize);
 	};
 
 	$scope.onExport = function (full) {

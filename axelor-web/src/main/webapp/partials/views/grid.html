@@ -1,7 +1,7 @@
 <div class="grid-view" ng-controller="GridViewCtrl" ui-tab-gate>
   <div class="navbar record-toolbar">
     <div class="navbar-inner">
-      <div class="container">
+      <div class="container" ui-toolbar-adjust>
         <div class="btn-group">
           <button class="btn" ng-click="onNew()" ng-if="hasButton('new')" ng-disabled="canSave()" title="{{ 'New' | t}}">
             <i class="fa fa-plus"></i> <span ng-if="::!tbTitleHide" x-translate>New</span>
@@ -20,11 +20,13 @@
             <i class="fa fa-refresh"></i> <span ng-if="::!tbTitleHide" x-translate>Refresh</span>
           </button>
         </div>
-        <div class="btn-group" ng-if="toolbar">
+        <div class="btn-group view-toolbar" ng-if="toolbar" style="display: none;">
           <button ng-repeat="btn in toolbar | filter:{custom: true}" class="btn" ui-tool-button="btn">{{btn.title}}</button>
         </div>
         <div ui-menu-bar x-menus="menubar" x-handler="this" ng-show="menubar"></div>
         <div ui-filter-box x-handler="this"></div>
+        <div ui-menu-bar x-menus="toolbarAsMenu" x-handler="this" class="view-toolbar-mobile" style="visibility: hidden;"></div>
+        <div ui-menu-bar x-menus="menubarAsMenu" x-handler="this" class="view-menubar-mobile" style="visibility: hidden;"></div>
         <div class="record-toolbar-right">
           <div ui-view-customize class="pull-right"></div>
           <div ui-view-switcher class="pull-right"></div>
