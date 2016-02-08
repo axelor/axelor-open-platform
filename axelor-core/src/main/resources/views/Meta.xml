@@ -296,7 +296,7 @@
       <field name="tableName"/>
       <field name="packageName"/>
     </panel>
-    <panel-related field="metaFields" />
+    <panel-related field="metaFields" orderBy="id" />
   </form>
 
   <selection name="relationship.field.selection">
