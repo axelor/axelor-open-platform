@@ -74,6 +74,9 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 			try {
 				response = new Response();
 				response = onException(e, response);
+				if (log.isTraceEnabled()) {
+					log.trace("Exception: {}", e.getMessage(), e);
+				}
 			} finally {
 				if (txn.isActive()) {
 					txn.rollback();
@@ -86,7 +89,6 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 	}
 
 	private Response onException(Throwable ex, Response response) {
-
 		if (ex instanceof AuthorizationException) {
 			return onAuthorizationException((AuthorizationException) ex, response);
 		}
@@ -106,6 +108,7 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 			return onException(ex.getCause(), response);
 		}
 		response.setException(ex);
+		log.error("Error: {}", ex.getMessage());
 		return response;
 	}
 
@@ -116,9 +119,11 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 
 		report.put("title", title);
 		report.put("message", message);
-		response.setData(report);
 
+		response.setData(report);
 		response.setStatus(Response.STATUS_FAILURE);
+
+		log.error("Authorization Error: {}", e.getMessage());
 		return response;
 	}
 
@@ -146,6 +151,8 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 
 		response.setData(report);
 		response.setStatus(Response.STATUS_FAILURE);
+
+		log.error("Concurrency Error: {}", e.getMessage());
 		return response;
 	}
 
@@ -163,6 +170,7 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 		response.setData(report);
 		response.setStatus(Response.STATUS_FAILURE);
 
+		log.error("Constraint Error: {}", e.getMessage());
 		return response;
 	}
 
@@ -210,6 +218,7 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 		response.setData(report);
 		response.setStatus(Response.STATUS_FAILURE);
 
+		log.error("SQL Error: {}", e.getMessage());
 		return response;
 	}
 }
