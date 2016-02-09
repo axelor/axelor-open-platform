@@ -62,7 +62,7 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 		try {
 			response = (Response) invocation.proceed();
 		} catch (Exception e) {
-			EntityTransaction txn = getEntityManager().getTransaction();
+			final EntityTransaction txn = getEntityManager().getTransaction();
 			if (txn.isActive()) {
 				txn.rollback();
 			} else if (e instanceof PersistenceException) {
@@ -71,8 +71,14 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 					txn.begin();
 				} catch(Exception ex){}
 			}
-			response = new Response();
-			response = onException(e, response);
+			try {
+				response = new Response();
+				response = onException(e, response);
+			} finally {
+				if (txn.isActive()) {
+					txn.rollback();
+				}
+			}
 		} finally {
 			running.remove();
 		}
