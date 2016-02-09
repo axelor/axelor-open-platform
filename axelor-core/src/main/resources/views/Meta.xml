@@ -171,12 +171,21 @@
     <field name="priority"/>
   </grid>
 
-  <grid title="Favorites" name="meta-menu-fav-grid" model="com.axelor.meta.db.MetaMenu" editable="true">
+  <grid name="meta-menu-fav-grid" title="Favorites" model="com.axelor.meta.db.MetaMenu" orderBy="-priority" canNew="false" editable="true">
     <field name="title"/>
     <field name="link"/>
+    <field name="priority" width="100"/>
   </grid>
+  <form name="meta-menu-fav-form" title="Favorite" model="com.axelor.meta.db.MetaMenu" canNew="false">
+    <panel title="Overview">
+      <field name="title"/>
+      <field name="priority"/>
+      <field name="link" colSpan="12" />
+    </panel>
+  </form>
   <action-view name="menus.fav" model="com.axelor.meta.db.MetaMenu" title="Favorites">
     <view name="meta-menu-fav-grid" type="grid"/>
+    <view name="meta-menu-fav-form" type="form"/>
     <domain>self.user = :__user__ and self.link is not null</domain>
   </action-view>
 

@@ -606,6 +606,7 @@
 					res.data = res.data[0];
 					record = that._accept(res);
 					that.trigger('on:save', [values]);
+					$rootScope.$broadcast('ds:saved', that);
 				});
 
 				promise.success = function(fn) {
@@ -659,6 +660,7 @@
 
 					that.trigger('change', records, page);
 					that.trigger('on:save', items);
+					$rootScope.$broadcast('ds:saved', that);
 				});
 				
 				promise.success = function(fn) {
@@ -748,6 +750,7 @@
 					
 					that.trigger('change', records, page);
 					that.trigger('on:remove', [record]);
+					$rootScope.$broadcast('ds:removed', that);
 				});
 
 				promise.success = function(fn) {
@@ -797,6 +800,7 @@
 					});
 					that.trigger('change', records, page);
 					that.trigger('on:remove', selection);
+					$rootScope.$broadcast('ds:removed', that);
 				});
 
 				promise.success = function(fn) {

@@ -276,7 +276,8 @@ ui.directive('navMenuFav', function() {
 
 			function update() {
 				ds.search({
-					fields: ["id", "name", "title", "link"]
+					fields: ["id", "name", "title", "link"],
+					sortBy: ["-priority"]
 				}).success(function (records, page) {
 					$scope.items =  records;
 				});
@@ -349,6 +350,15 @@ ui.directive('navMenuFav', function() {
 			$scope.manageFav = function () {
 				NavService.openTabByName('menus.fav');
 			};
+
+			function onUpdate(e, _ds) {
+				if (ds !== _ds && ds._model === _ds._model) {
+					update();
+				}
+			}
+
+			$scope.$on("ds:saved", onUpdate);
+			$scope.$on("ds:removed", onUpdate);
 
 			update();
 		}],
