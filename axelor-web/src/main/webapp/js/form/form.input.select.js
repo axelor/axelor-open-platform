@@ -708,6 +708,61 @@ ui.formInput('RadioSelect', {
 	'</ul>'
 });
 
+ui.formInput('CheckboxSelect', {
+
+	css: "checkbox-select",
+
+	link: function(scope, element, attrs, model) {
+
+		var field = scope.field;
+		var selection = field.selectionList || [];
+
+		scope.getSelection = function () {
+			return filterSelection(scope, field, selection, scope.getValue());
+		};
+
+		scope.isSelected = function (select) {
+			var value = scope.getValue();
+			var current = ("" + value).split(",").map(function (val) {
+				return parseNumber(scope.field, val);
+			});
+			return current.indexOf(select.value) > -1;
+		};
+
+		element.on("change", ":input", function(e) {
+			var all = element.find("input:checked");
+			var selected = [];
+			all.each(function () {
+				var val = parseNumber(scope.field, $(this).val());
+				selected.push(val);
+			});
+			var value =  selected.length === 0 ? null : selected.join(",");
+			scope.setValue(value, true);
+			scope.$apply();
+		});
+
+		if (field.direction === "vertical" || field.dir === "vert") {
+			setTimeout(function(){
+				element.addClass("checkbox-select-vertical");
+			});
+		}
+	},
+	template_editable: null,
+	template_readonly: null,
+	template:
+	'<ul ng-class="{ readonly: isReadonly() }">'+
+		'<li ng-repeat="select in getSelection()">'+
+		'<label class="ibox">'+
+			'<input type="checkbox" value="{{select.value}}"'+
+			' ng-disabled="isReadonly()"'+
+			' ng-checked="isSelected(select)">'+
+			'<span class="box"></span>'+
+			'<span class="title">{{select.title}}</span>'+
+		'</label>'+
+		'</li>'+
+	'</ul>'
+});
+
 ui.formInput('NavSelect', {
 	
 	css: "nav-select",

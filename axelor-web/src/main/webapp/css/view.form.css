@@ -608,27 +608,32 @@ td.form-item > * {
 	margin: 0;
 }
 
-.form-item ul.radio-select {
+.form-item ul.radio-select,
+.form-item ul.checkbox-select  {
 	list-style-type: none;
 	overflow: hidden;
 	padding-top: 3px;
+	margin: 0;
 }
 
-.form-item ul.radio-select > li {
+.form-item ul.radio-select > li,
+.form-item ul.checkbox-select > li {
 	float: left;
 	margin: 0 4px;
 }
 
-.form-item ul.radio-select-vertical > li {
+.form-item ul.radio-select-vertical > li,
+.form-item ul.checkbox-select-vertical > li {
 	float: none;
 }
 
 .form-item ul.radio-select > li input[type="radio"],
-.form-item ul.radio-select > li input[type="checkbox"] {
+.form-item ul.checkbox-select > li input[type="checkbox"] {
 	margin-top: -2px;
 }
 
-.form-item ul.radio-select.readonly > li label {
+.form-item ul.radio-select.readonly > li label,
+.form-item ul.checkbox-select.readonly > li label {
 	cursor: default;
 }
 
