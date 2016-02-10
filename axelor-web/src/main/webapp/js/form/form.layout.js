@@ -464,7 +464,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 					return;
 				}
 				var valid = scope.isValid();
-				if (!valid && !scope.isRequired() && isEmpty(scope.record)) {
+				if (!valid && !scope.$parent.isRequired() && isEmpty(scope.record)) {
 					valid = true;
 				}
 				if (scope.setValidity) {
