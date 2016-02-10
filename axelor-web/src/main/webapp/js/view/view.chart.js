@@ -86,6 +86,8 @@ function ChartCtrl($scope, $element, $http) {
 				}
 			}
 			loading = false;
+		}, function () {
+			loading = false;
 		});
 	}
 
@@ -710,30 +712,20 @@ var directiveFn = function(){
 		controller: ChartCtrl,
 		link: function(scope, element, attrs) {
 			
-			var initialized = false;
 			var svg = element.children('svg');
 			var form = element.children('.chart-controls');
 			
 			scope.render = function(data) {
 				if (element.is(":hidden")) {
-					initialized = false;
 					return;
 				}
 				setTimeout(function () {
 					svg.height(element.height() - form.height()).width('100%');
 					scope.title = data.title;
 					Chart(scope, svg, data);
-					initialized = true;
 					return;
 				});
 			};
-
-			element.on("adjustSize", _.debounce(function(e){
-				if (!initialized) {
-					scope.onRefresh();
-					scope.applyLater();
-				}
-			}));
 
 			function onNewOrEdit() {
 				if (scope.searchInit && scope.searchFields) {
