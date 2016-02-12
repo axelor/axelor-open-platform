@@ -1,6 +1,19 @@
-# Current (3.0.24)
+# 3.1.0 (2016-02-12)
+
+There are many bug fixings and minor improvements in 3.0.x release.
+It's time to move forward with a new minor release.
+
+## Improvements
+
+- added support for excluding fields to copy
+- add css rule to attach dashlet panels
+- backported new html widget from v4
 
 ## Bug fixes
+
+- fixed panel toggle issue caused by collapse animation
+- fixed date widget clear value problem
+- fixed context issues
 
 # 3.0.23 (2016-01-27)
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://axelor.com/xml/ns/data-import"
   xmlns:db="http://axelor.com/xml/ns/data-import"
-  elementFormDefault="qualified" version="3.0">
+  elementFormDefault="qualified" version="3.1">
 
   <element name="csv-inputs">
     <annotation>
