@@ -179,6 +179,13 @@
 						item[key] = value;
 					}
 				});
+
+				["canNew", "canView", "canEdit", "canRemove", "canSelect"].forEach(function (name) {
+					if (item[name] === "false" || item[name] === "true") {
+						item[name] = item[name] === "true";
+					}
+				});
+
 				if (item.items || item.pages) {
 					ViewService.prototype.process(meta, item);
 				}
