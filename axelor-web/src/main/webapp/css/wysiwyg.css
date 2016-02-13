@@ -20,7 +20,7 @@
 }
 
 .wysiwyg-editor {
-	min-height: inherit;
+	min-height: 3em;
 }
 
 .wysiwyg-popup {
