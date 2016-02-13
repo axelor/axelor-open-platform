@@ -110,7 +110,7 @@ public class GroovyTemplates implements Templates {
 			text = text.replaceAll("\\$\\{\\s*([^}]*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text(it, '$1')}");
 			text = text.replaceAll("\\$\\{\\s*([^}]*?)\\s*\\|\\s*e\\s*\\}", "\\${($1) ?: ''}");
 			if (text.trim().startsWith("<?xml ")) {
-				text = text.replaceAll("\\$\\{(.*?)\\}", "\\${__fmt__.escape($1)}");
+				text = text.replaceAll("\\$\\{(.*?)\\}", "\\${__fmt__.escape $1}");
 			}
 
 			StringBuilder builder = new StringBuilder();
