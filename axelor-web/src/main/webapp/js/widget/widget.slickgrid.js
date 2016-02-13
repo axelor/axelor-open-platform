@@ -2166,6 +2166,14 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 				params.canEdit = forEdit;
 			}
 
+			if ((params.widget === "one-to-many-inline" || params.widget === "many-to-many-inline") && params.target === model) {
+				if (!params.gridView || scope.view.name === params.gridView) {
+					var viewName = (scope.view||{}).name || "current";
+					throw new Error("field '" + params.name + "' in '" + viewName + "' view may cause recursion.\n"
+							+ "Use different view for this field (e.g. <field name='" + params.name + "' grid-view='some-grid-view'/>)");
+				}
+			}
+
 			_items.push(params);
 		});
 
