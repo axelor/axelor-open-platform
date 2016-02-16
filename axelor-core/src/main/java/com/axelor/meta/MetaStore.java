@@ -66,31 +66,11 @@ public class MetaStore {
 	}
 	
 	public static AbstractView getView(String name) {
-		if (CACHE.containsKey(name)) {
-			return (AbstractView) CACHE.get(name);
-		}
-		AbstractView view = XMLViews.findView(null, name, null);
-
-		if (view != null) {
-			register(name, view);
-		}
-		return view;
+		return getView(name, null);
 	}
 	
 	public static AbstractView getView(String name, String module) {
-		if (module == null || "".equals(module.trim())) {
-			return getView(name);
-		}
-		String key = module + ":" + name;
-		if (CACHE.containsKey(key)) {
-			return (AbstractView) CACHE.get(key);
-		}
-		AbstractView view = XMLViews.findView(name, module);
-
-		if (view != null) {
-			register(key, view);
-		}
-		return view;
+		return StringUtils.isBlank(module) ? XMLViews.findView(null, name, null) : XMLViews.findView(name, module);
 	}
 
 	public static Action getAction(String name) {
