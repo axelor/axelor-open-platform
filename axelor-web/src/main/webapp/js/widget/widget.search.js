@@ -287,6 +287,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
 			var items = {};
 			var nameField = null;
+			var nameFields = [];
 
 			_.each(fields, function(field, name) {
 				if (field.name === 'id' || field.name === 'version' ||
@@ -294,9 +295,13 @@ function FilterFormCtrl($scope, $element, ViewService) {
 				if (field.type === 'binary' || field.large) return;
 				if (field.nameColumn) {
 					nameField = name;
+				} else if (name === "name" || name === "code") {
+					nameFields.push(name);
 				}
 				items[name] = field;
 			});
+
+			nameField = nameField || _.first(nameFields);
 
 			_.each(viewItems, function (item) {
 				if (item.hidden) {

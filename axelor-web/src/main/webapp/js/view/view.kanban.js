@@ -51,6 +51,7 @@ function BaseCardsCtrl(type, $scope, $element) {
 
 		viewPromise.then(function (meta) {
 			$scope.parse(meta.fields, meta.view);
+			$scope.$broadcast("on:clear-filter-silent");
 		});
 	};
 

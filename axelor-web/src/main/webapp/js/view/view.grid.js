@@ -548,6 +548,7 @@ function GridViewCtrl($scope, $element) {
 		if (filterBox.size()) {
 			filterBox.focus().select();
 		}
+		$scope.$broadcast("on:clear-filter-silent");
 	}
 
 	$scope.onHotKey = function (e, action) {
