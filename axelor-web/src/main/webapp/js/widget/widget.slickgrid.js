@@ -1036,10 +1036,19 @@ Grid.prototype._doInit = function(view) {
 	
 	scope.$on("on:before-save", function(e) {
 
+		// only for editable grid
+		if (!that.editable) {
+			return;
+		}
+
 		var lock = grid.getEditorLock();
 		if (lock.isActive()) {
 			lock.commitCurrentEdit();
 		}
+
+		var beforeSavePending = that.__beforeSavePending;
+
+		that.__beforeSavePending = false;
 
 		function showErrorNotice() {
 
@@ -1071,7 +1080,7 @@ Grid.prototype._doInit = function(view) {
 			return false;
 		}
 
-		if (!that.isDirty() || that.saveChanges()) {
+		if (!that.isDirty() || !beforeSavePending || that.saveChanges()) {
 			return;
 		}
 		if (!that.editorScope || that.editorScope.isValid()) {
@@ -1686,6 +1695,8 @@ Grid.prototype.markDirty = function(row, field) {
 	grid.setCellCssStyles("highlight", hash);
 	grid.invalidateAllRows();
 	grid.render();
+
+	this.__beforeSavePending = true;
 };
 
 Grid.prototype.clearDirty = function(row) {
@@ -1701,6 +1712,8 @@ Grid.prototype.clearDirty = function(row) {
 	grid.setCellCssStyles("highlight", hash);
 	grid.invalidateAllRows();
 	grid.render();
+
+	this.__beforeSavePending = false;
 };
 
 Grid.prototype.focusInvalidCell = function(args) {

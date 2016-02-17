@@ -282,6 +282,9 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			if (sortBy) {
 				sortBy = sortBy.split(",");
 			}
+			if (view.canMove && fields.indexOf('sequence') === -1) {
+				fields.push('sequence');
+			}
 			return fetchDS().search({
 				filter: filter,
 				fields: fields,
