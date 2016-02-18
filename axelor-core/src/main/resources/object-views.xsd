@@ -1039,6 +1039,7 @@
     <xsd:choice>
       <xsd:element name="field" type="tns:PanelField" />
       <xsd:element name="label" type="tns:Label" />
+      <xsd:element name="help" type="tns:Help" />
       <xsd:element name="spacer" type="tns:Spacer" />
       <xsd:element name="button" type="tns:Button" />
       <xsd:element name="button-group">
@@ -1251,6 +1252,7 @@
           <xsd:element name="menubar" type="tns:Menubar" minOccurs="0" />
             <xsd:choice minOccurs="0" maxOccurs="1">
               <xsd:choice maxOccurs="unbounded">
+                <xsd:element name="help" type="tns:Help" />
                 <xsd:element name="panel" type="tns:Panel" />
                 <xsd:element name="panel-include" type="tns:FormInclude" />
                 <xsd:element name="panel-dashlet" type="tns:Dashlet" />
@@ -2194,6 +2196,19 @@
         <xsd:attribute name="showTitle" use="prohibited" />
         <xsd:attribute name="readonly" use="prohibited" />
         <xsd:attribute name="readonlyIf" use="prohibited" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="Help">
+    <xsd:complexContent mixed="true">
+      <xsd:extension base="tns:SimpleWidget">
+        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="title" use="prohibited" />
+        <xsd:attribute name="showTitle" use="prohibited" />
+        <xsd:attribute name="readonly" use="prohibited" />
+        <xsd:attribute name="readonlyIf" use="prohibited" />
+        <xsd:attribute name="help" use="prohibited" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

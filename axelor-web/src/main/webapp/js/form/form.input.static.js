@@ -353,6 +353,23 @@ ui.formItem('Static', {
 });
 
 /**
+ * The Help Text widget.
+ *
+ */
+ui.formItem('Help', {
+	css: 'help-item',
+	link: function (scope, element, attrs, ctrl) {
+		var field = scope.field;
+		var css = "alert alert-info";
+		if (field.css && field.css.indexOf('alert-') > -1) {
+			css = "alert";
+		}
+		element.addClass(css).html(field.text);
+	},
+	template: '<div></div>'
+});
+
+/**
  * The button widget.
  */
 ui.formItem('Button', {

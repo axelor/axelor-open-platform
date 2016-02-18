@@ -1053,7 +1053,7 @@ ui.formBuild = function (scope, schema, fields) {
 			var _attrs = _.extend({}, attrs.attrs, this.attrs, widgetAttrs, {
 					'name'			: attrs.name || this.name,
 					'x-cols'		: this.cols,
-					'x-colspan'		: this.colSpan,
+					'x-colspan'		: this.colSpan || (type === 'help' ? 12 : undefined),
 					'x-coloffset'	: this.colOffset,
 					'x-rowspan'		: this.rowSpan,
 					'x-sidebar'		: this.sidebar,

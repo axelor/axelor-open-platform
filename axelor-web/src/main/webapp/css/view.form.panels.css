@@ -575,6 +575,23 @@
 	}
 }
 
+.help-item {
+	border-radius: 0;
+}
+
+.panel .help-item {
+	margin: 0;
+}
+
+.help-item:after {
+	font: normal normal normal 14px/1 FontAwesome;
+	content: "\f10e";
+}
+.help-item:before {
+	font: normal normal normal 14px/1 FontAwesome;
+	content: "\f10d";
+}
+
 .info-button {
 	height: 60px;
 	width: 100%;
