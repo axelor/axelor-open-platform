@@ -718,6 +718,15 @@ table.field-details .help-text hr {
 	background-color: white;	
 }
 
+label.has-help > span:after {
+	font: normal normal normal 14px/1 FontAwesome;
+	content: "\f06a";
+	font-size: 10px;
+	color: #107a4a;
+	margin-left: 2px;
+    position: absolute;
+}
+
 .ws-nowrap {
 	white-space: nowrap;
 }
