@@ -1001,6 +1001,16 @@ ActionHandler.prototype = {
 					return scope.applyLater();
 				}
 			}
+			if (tab.viewType === "html" && (tab.params||{}).target === "_blank") {
+				var view = _.findWhere(tab.views, { type: "html" });
+				if (view) {
+					var url = view.name || view.resource;
+					setTimeout(function () {
+						window.open(url);
+					});
+					return scope.applyLater();
+				}
+			}
 			if ((tab.params && tab.params.popup) || axelor.device.mobile) {
 				tab.$popupParent = formScope;
 			}
