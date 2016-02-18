@@ -29,6 +29,7 @@
         <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" target="com.axelor.meta.db.MetaAction" target-name="name" domain="self.type = 'action-view' and self.home = true"/>
       </panel>
       <field name="singleTab" widget="inline-checkbox" />
+      <field name="noHelp" widget="inline-checkbox" />
     </panel>
     <panel title="Authorization">
       <field name="activateOn" validIf="!activateOn || (activateOn &amp;&amp; !expiresOn) || (activateOn &amp;&amp; expiresOn &amp;&amp; $moment(expiresOn) >= $moment(activateOn))"/>
@@ -55,6 +56,7 @@
       <field name="language"/>
       <field name="theme" widget="theme-select"/>
       <field name="singleTab" widget="inline-checkbox"/>
+      <field name="noHelp" widget="inline-checkbox" />
       <field name="change" title="Change password?" widget="inline-checkbox"/>
       <panel showIf="change">
         <field name="newPassword" title="Password" placeholder="new password" widget="password" requiredIf="change" validIf="(!change) || (newPassword.length >= 4 &amp;&amp; confirm == newPassword)"/>

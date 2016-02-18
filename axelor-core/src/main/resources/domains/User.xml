@@ -20,6 +20,7 @@
     <string name="homeAction"/>
     <string name="theme" />
     <boolean name="singleTab" help="Whether to use tabbed ui."/>
+    <boolean name="noHelp" help="Whether to show help messages." />
 
     <boolean name="blocked" default="false" help="Specify whether to block the user for an indeterminate times."/>
     <date name="activateOn" help="Activate the user from the specified date."/>

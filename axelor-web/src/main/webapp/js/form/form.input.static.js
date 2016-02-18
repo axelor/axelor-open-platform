@@ -315,7 +315,7 @@ ui.formItem('Label', {
 		if (field && field.required) {
 			element.addClass('required');
 		}
-		if (field &&  field.help) {
+		if (field && field.help && axelor.config['user.noHelp'] !== true) {
 			element.addClass('has-help');
 		}
 	},

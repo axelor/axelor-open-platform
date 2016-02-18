@@ -40,6 +40,7 @@ import com.axelor.inject.Beans;
 import com.axelor.meta.MetaPermissions;
 import com.axelor.meta.db.MetaPermissionRule;
 import com.axelor.meta.schema.views.AbstractWidget;
+import com.axelor.meta.schema.views.Help;
 import com.axelor.meta.schema.views.SimpleWidget;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -168,11 +169,14 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 			final SimpleWidget item = (SimpleWidget) widget;
 			final String object = item.getModel();
 			final String field = item.getName();
-			if (isBlank(object) || isBlank(field)) {
+			final User user = AuthUtils.getUser();
+			if (user == null) {
 				return true;
 			}
-			final User user = AuthUtils.getUser();
-			if (user == null || AuthUtils.isAdmin(user)) {
+			if (widget instanceof Help && user.getNoHelp() == Boolean.TRUE) {
+				return false;
+			}
+			if (AuthUtils.isAdmin(user) || isBlank(object) || isBlank(field)) {
 				return true;
 			}
 			final MetaPermissions perms = Beans.get(MetaPermissions.class);

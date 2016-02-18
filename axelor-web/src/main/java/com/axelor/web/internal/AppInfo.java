@@ -68,6 +68,7 @@ public class AppInfo {
 		map.put("user.lang", user.getLanguage());
 		map.put("user.action", user.getHomeAction());
 		map.put("user.singleTab", user.getSingleTab());
+		map.put("user.noHelp", user.getNoHelp() == Boolean.TRUE);
 
 		if (user.getImage() != null) {
 			map.put("user.image", getLink(user, null));
