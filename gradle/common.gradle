@@ -29,4 +29,13 @@ project.afterEvaluate {
 		sourceSets.test.groovy.srcDirs += project.sourceSets.test.java.srcDirs
 		sourceSets.test.java.srcDirs = []
 	}
+
+	// make sure to include non-java resources from src/main/java
+	sourceSets.main.java.srcDirs.each { dir ->
+		sourceSets.main.resources {
+			srcDir dir
+			exclude '**/*.java'
+			exclude '**/*.groovy'
+		}
+	}
 }
