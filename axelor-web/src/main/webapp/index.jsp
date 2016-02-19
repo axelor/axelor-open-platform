@@ -41,6 +41,21 @@ String appTitle =  appName;
 if (appDesc != null) {
   appTitle = appName + " :: " + appDesc;
 }
+
+String extraHead = "/index-head.jsp";
+String extraFoot = "/index-foot.jsp";
+String extraButtons = "/index-nav-buttons.jsp";
+
+if (pageContext.getServletContext().getResource(extraHead) == null) {
+	extraHead = null;
+}
+if (pageContext.getServletContext().getResource(extraFoot) == null) {
+	extraFoot = null;
+}
+if (pageContext.getServletContext().getResource(extraButtons) == null) {
+	extraButtons = null;
+}
+
 %>
 <!DOCTYPE html>
 <html lang="en" ng-app="axelor.app" ng-controller="AppCtrl" ng-cloak>
@@ -63,6 +78,7 @@ if (appDesc != null) {
 
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="ico/favicon.ico">
+    <% if (extraHead != null) { %> <jsp:include page="<%= extraHead %>" /> <% } %>
   </head>
   <body>
 
@@ -122,6 +138,7 @@ if (appDesc != null) {
                 </ul>
               </li>
             </ul>
+            <% if (extraButtons != null) { %> <jsp:include page="<%= extraButtons %>" /> <% } %>
           </div>
         </div>
       </div>
@@ -145,6 +162,6 @@ if (appDesc != null) {
     <!-- JavaScript at the bottom for fast page loading -->
     <script src="js/messages.js"></script>
     <x:script src="js/application.js"/>
-
+    <% if (extraFoot != null) { %> <jsp:include page="<%= extraFoot %>" /> <% } %>
   </body>
 </html>
