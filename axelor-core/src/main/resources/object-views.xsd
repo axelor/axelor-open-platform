@@ -1040,6 +1040,7 @@
       <xsd:element name="field" type="tns:PanelField" />
       <xsd:element name="label" type="tns:Label" />
       <xsd:element name="help" type="tns:Help" />
+      <xsd:element name="static" type="tns:Static" />
       <xsd:element name="spacer" type="tns:Spacer" />
       <xsd:element name="button" type="tns:Button" />
       <xsd:element name="button-group">
@@ -2200,7 +2201,7 @@
     </xsd:complexContent>
   </xsd:complexType>
 
-  <xsd:complexType name="Help">
+  <xsd:complexType name="Static">
     <xsd:complexContent mixed="true">
       <xsd:extension base="tns:SimpleWidget">
         <xsd:attribute name="name" type="xsd:string" />
@@ -2210,6 +2211,12 @@
         <xsd:attribute name="readonlyIf" use="prohibited" />
         <xsd:attribute name="help" use="prohibited" />
       </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="Help">
+    <xsd:complexContent>
+      <xsd:extension base="tns:Static"></xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
 

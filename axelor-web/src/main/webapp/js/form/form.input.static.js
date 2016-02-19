@@ -348,8 +348,11 @@ ui.formItem('Separator', {
  */
 ui.formItem('Static', {
 	css: 'static-item',
-	transclude: true,
-	template: '<label ng-transclude></label>'
+	link: function (scope, element, attrs, ctrl) {
+		var field = scope.field;
+		element.html(field.text);
+	},
+	template: '<div></div>'
 });
 
 /**

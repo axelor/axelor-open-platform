@@ -48,6 +48,7 @@ import com.google.common.collect.Maps;
 	@Type(Spacer.class),
 	@Type(Separator.class),
 	@Type(Label.class),
+	@Type(Static.class),
 	@Type(Help.class),
 	@Type(Group.class),
 	@Type(Notebook.class),
