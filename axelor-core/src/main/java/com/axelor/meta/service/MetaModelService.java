@@ -131,6 +131,13 @@ public class MetaModelService {
 				metaModel.getMetaFields().add(createField(metaModel, field));
 			}
 		}
+		if (AuditableModel.class.isAssignableFrom(klass)) {
+			for (Field field : AuditableModel.class.getDeclaredFields()) {
+				if (fields.all().filter("metaModel = ?1 AND name = ?2", metaModel, field.getName()).count() == 0){
+					metaModel.getMetaFields().add(createField(metaModel, field));
+				}
+			}
+		}
 		return metaModel;
 	}
 	
