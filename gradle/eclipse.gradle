@@ -98,8 +98,9 @@ def linkCoreProjects = { project ->
 			def node = it.asNode()['wb-module'][0]
 			def refs = node.findAll { it.name() == 'wb-resource' }
 			def extra = {
-				['wb-resource'('deploy-path': "/", 'source-path': "axelor-webapp"),
-				 'wb-resource'('deploy-path': "/", 'source-path': "src/main/webapp")] +
+				['wb-resource'('deploy-path': "/", 'source-path': "src/main/webapp"),
+				 'wb-resource'('deploy-path': "/", 'source-path': "axelor-webapp"),
+				 'wb-resource'('deploy-path': "/", 'source-path': "build/webapp")] +
 				wtpLinked.collect { name ->
 					'dependent-module'('deploy-path': "/WEB-INF/lib", handle: "module:/resource/${name}/${name}") {
 						'dependency-type'('uses')
