@@ -399,10 +399,33 @@ public class MetaFiles {
 	@Transactional
 	public DMSFile attach(InputStream stream, String fileName, Model entity) throws IOException {
 		final MetaFile metaFile = upload(stream, fileName);
+		return attach(metaFile, fileName, entity);
+	}
+
+	/**
+	 * Attach the given file to the given record.
+	 *
+	 * @param metaFile
+	 *            the file to attach
+	 * @param fileName
+	 *            alternative file name to use (optional, can be null)
+	 * @param entity
+	 *            the record to attach to
+	 * @return a {@link DMSFile} record created for the attachment
+	 * @throws IOException
+	 */
+	@Transactional
+	public DMSFile attach(MetaFile metaFile, String fileName, Model entity) throws IOException {
+		Preconditions.checkNotNull(metaFile);
+		Preconditions.checkNotNull(metaFile.getId());
+		Preconditions.checkNotNull(entity);
+		Preconditions.checkNotNull(entity.getId());
+
+		final String name = isBlank(fileName) ? metaFile.getFileName() : fileName;
 		final DMSFile dmsFile = new DMSFile();
 		final DMSFileRepository repository = Beans.get(DMSFileRepository.class);
 
-		dmsFile.setFileName(fileName);
+		dmsFile.setFileName(name);
 		dmsFile.setMetaFile(metaFile);
 		dmsFile.setRelatedId(entity.getId());
 		dmsFile.setRelatedModel(EntityHelper.getEntityClass(entity).getName());
