@@ -1008,8 +1008,8 @@ ui.formBuild = function (scope, schema, fields) {
 			if (attrs.image) {
 				type = "image";
 			}
-			if (type == 'label') { //TODO: allow <static> tag in xml view
-				type = 'static';
+			if (type == 'label') {
+				type = 'static-label';
 			}
 
 			if (attrs.type == 'panel-related') {
@@ -1083,11 +1083,11 @@ ui.formBuild = function (scope, schema, fields) {
 			item.attr('ui-actions', '');
 			item.attr('ui-widget-states', '');
 
-			if (type == 'button' || type == 'static') {
+			if (type == 'button' || type == 'static-label') {
 				item.html(this.title);
 			}
 
-			if (/button|group|tabs|tab|separator|spacer|static/.test(type)) {
+			if (/button|group|tabs|tab|separator|spacer|static|static-label/.test(type)) {
 				item.attr('x-show-title', false);
 			}
 		

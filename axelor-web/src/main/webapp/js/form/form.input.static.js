@@ -356,6 +356,16 @@ ui.formItem('Static', {
 });
 
 /**
+ * The Static Label widget.
+ *
+ */
+ui.formItem('StaticLabel', {
+	css: 'static-item',
+	transclude: true,
+	template: '<label ng-transclude></label>'
+});
+
+/**
  * The Help Text widget.
  *
  */
