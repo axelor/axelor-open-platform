@@ -46,4 +46,9 @@ public @interface Track {
 	 *
 	 */
 	TrackMessage[] messages() default {};
+
+	/**
+	 * Subscribe for change notifications.
+	 */
+	boolean subscribe() default false;
 }

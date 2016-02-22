@@ -277,7 +277,7 @@ final class AuditTracker {
 		} catch (Exception e) {
 		}
 
-		if (previousState == null) {
+		if (previousState == null && track.subscribe()) {
 			final MailFollower follower = new MailFollower();
 			follower.setRelatedId(entity.getId());
 			follower.setRelatedModel(entity.getClass().getName());

@@ -102,7 +102,7 @@
 
     <index name="IDX_NAMES" columns="firstName,lastName,fullName"/>
     <index columns="id,fullName,email"/>
-    <track>
+    <track subscribe="true">
       <field name="fullName" />
       <field name="email" />
       <field name="phone" if="!email" on="UPDATE" />
@@ -158,6 +158,9 @@
   <entity name="Hello" strategy="SINGLE">
     <string name="title" required="true" translatable="true"/>
     <string name="message" required="true"/>
+    <track>
+      <field name="message" on="CREATE" />
+    </track>
   </entity>
   
   <entity name="HelloWorld" extends="Hello" strategy="CLASS" hashAll="true">

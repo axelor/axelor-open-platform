@@ -693,6 +693,11 @@
         </xsd:complexType>
       </xsd:element>
     </xsd:sequence>
+    <xsd:attribute name="subscribe" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether to auto subscribe for change notifications.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="replace" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>Specify whether to replace original change track config.</xsd:documentation>

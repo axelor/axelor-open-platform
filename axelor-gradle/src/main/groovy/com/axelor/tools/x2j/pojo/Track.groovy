@@ -28,6 +28,8 @@ class Track {
 
 	private Entity entity
 
+	private boolean subscribe;
+
 	private boolean replace;
 
 	private Track(Entity entity) {
@@ -43,6 +45,7 @@ class Track {
 
 		fields = fields.grep { it != null }
 		messages = messages.grep { it != null }
+		subscribe = node.'@subscribe' == "true"
 		replace = node.'@replace' == "true"
 	}
 
@@ -99,6 +102,7 @@ class Track {
 		imports.each { name -> this.entity.importType(name) }
 		if (!fields.empty) annon.add("fields", fields, false, false)
 		if (!messages.empty) annon.add("messages", messages, false, false)
+		if (subscribe) annon.add("subscribe", "true", false, false)
 		return annon
 	}
 
@@ -106,6 +110,9 @@ class Track {
 		fields.addAll(other.fields);
 		messages.addAll(other.messages);
 		imports.addAll(other.imports);
+		if (other.replace) {
+			subscribe = other.subscribe;
+		}
 		return this;
 	}
 
