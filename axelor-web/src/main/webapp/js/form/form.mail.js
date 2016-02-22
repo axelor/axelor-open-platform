@@ -176,6 +176,8 @@ ui.directive('uiMailMessage', function () {
 				if (!value) {
 					return value;
 				}
+				if (value === 'True') return _t('True');
+				if (value === 'False') return _t('False');
 				if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$/.test(value)) {
 					return moment(value).format("DD/MM/YYYY HH:mm");
 				}
@@ -187,9 +189,10 @@ ui.directive('uiMailMessage', function () {
 
 			if (body && body.tracks) {
 				_.each(body.tracks, function (item) {
-					item.displayValue = format(item.value);
-					if (item.oldValue !== undefined) {
-						item.displayValue = format(item.oldValue) + " &raquo; " + item.displayValue;
+					item.displayValue = item.displayValue || format(item.value);
+					item.oldDisplayValue = item.oldDisplayValue || format(item.oldValue);
+					if (item.oldDisplayValue !== undefined) {
+						item.displayValue = item.oldDisplayValue + " &raquo; " + item.displayValue;
 					}
 				});
 			}

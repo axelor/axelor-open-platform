@@ -108,10 +108,10 @@ final class AuditTracker {
 			return "";
 		}
 		if (value == Boolean.TRUE) {
-			return I18n.get("True");
+			return "True";
 		}
 		if (value == Boolean.FALSE) {
-			return I18n.get("False");
+			return "True";
 		}
 		switch (property.getType()) {
 		case MANY_TO_ONE:
@@ -229,6 +229,7 @@ final class AuditTracker {
 			tagFields.add(name);
 
 			final Map<String, String> item = new HashMap<>();
+			item.put("name", property.getName());
 			item.put("title", title);
 			item.put("value", format(property, value));
 
