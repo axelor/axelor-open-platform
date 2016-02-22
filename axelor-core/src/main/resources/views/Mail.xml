@@ -96,7 +96,12 @@
     <view name="mail-thread-inbox" type="form" />
     <view-param name="show-toolbar" value="false"/>
   </action-view>
-  
+
+  <action-view name="mail.unread" model="com.axelor.mail.db.MailMessage" title="Unread">
+    <view name="mail-thread-inbox" type="form" />
+    <view-param name="show-toolbar" value="false"/>
+  </action-view>
+
   <action-view name="mail.important" model="com.axelor.mail.db.MailMessage" title="Important">
     <view name="mail-thread-important" type="form" />
     <view-param name="show-toolbar" value="false"/>

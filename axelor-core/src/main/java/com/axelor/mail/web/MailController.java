@@ -29,7 +29,6 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.db.JpaSupport;
 import com.axelor.db.Model;
-import com.axelor.db.QueryBinder;
 import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailFlags;
 import com.axelor.mail.db.MailGroup;
@@ -46,11 +45,12 @@ import com.axelor.rpc.Response;
 public class MailController extends JpaSupport {
 	
 	private static final String SQL_UNREAD = ""
-			+ "SELECT COUNT(DISTINCT m) FROM MailMessage m LEFT JOIN m.flags g "
+			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
 			+ "WHERE (m.parent IS NULL) AND "
 			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
 			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "((g IS NULL) OR (g.user.id != :uid) OR (g.user.id = :uid AND g.isRead = false))";
+			+ "((g IS NULL) OR (g.user.id != :uid) OR (g.user.id = :uid AND g.isRead = false)) "
+			+ "ORDER BY m.createdOn DESC";
 
 	private static final String SQL_SUBSCRIBERS = ""
 			+ "SELECT DISTINCT(u) FROM User u LEFT JOIN u.group g WHERE "
@@ -88,14 +88,24 @@ public class MailController extends JpaSupport {
 	public void countMail(ActionRequest request, ActionResponse response) {
 		final Map<String, Object> value = new HashMap<>();
 		value.put("total", count(SQL_INBOX));
-		value.put("unread", countUnread());
+		value.put("unread", count(SQL_UNREAD));
 		response.setValue("mail", value);
 		response.setStatus(Response.STATUS_SUCCESS);
 	}
 
-	public void unread(ActionRequest request, ActionResponse response) {
-		response.setValue("unread", countUnread());
+	public void countUnread(ActionRequest request, ActionResponse response) {
+		response.setValue("unread", count(SQL_UNREAD));
 		response.setStatus(Response.STATUS_SUCCESS);
+	}
+
+	public void unread(ActionRequest request, ActionResponse response) {
+
+		final List<Object> all = find(SQL_UNREAD, request.getOffset(), request.getLimit());
+		final Long total = count(SQL_UNREAD);
+
+		response.setData(all);
+		response.setOffset(request.getOffset());
+		response.setTotal(total);
 	}
 
 	public void inbox(ActionRequest request, ActionResponse response) {
@@ -219,7 +229,7 @@ public class MailController extends JpaSupport {
 
 	public String inboxMenuTag() {
 		Long total = count(SQL_INBOX);
-		Long unread = countUnread();
+		Long unread = count(SQL_UNREAD);
 		if (total == null) {
 			return null;
 		}
@@ -239,18 +249,6 @@ public class MailController extends JpaSupport {
 			all.addAll(findChildren(msg));
 		}
 		return all;
-	}
-
-	private Long countUnread() {
-		final TypedQuery<Long> query = getEntityManager().createQuery(SQL_UNREAD, Long.class);
-		QueryBinder.of(query).setCacheable();
-
-		query.setParameter("uid", AuthUtils.getUser().getId());
-		try {
-			return query.getSingleResult();
-		} catch (Exception e) {
-		}
-		return 0L;
 	}
 
 	private Long count(String queryString) {

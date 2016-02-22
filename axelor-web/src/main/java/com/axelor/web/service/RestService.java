@@ -539,7 +539,7 @@ public class RestService extends ResourceService {
 		}
 
 		if (count) {
-			ctrl.unread(req, res);
+			ctrl.countUnread(req, res);
 			return res;
 		}
 		
@@ -561,6 +561,9 @@ public class RestService extends ResourceService {
 			return res;
 		case "important":
 			ctrl.important(req, res);
+			return res;
+		case "unread":
+			ctrl.unread(req, res);
 			return res;
 		default:
 			ctrl.inbox(req, res);

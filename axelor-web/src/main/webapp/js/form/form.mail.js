@@ -1021,6 +1021,7 @@ ui.formWidget('PanelMail', {
 		var tab = $scope.tab || {};
 
 		if (tab.action === "mail.inbox") folder = "inbox";
+		if (tab.action === "mail.unread") folder = "unread";
 		if (tab.action === "mail.important") folder = "important";
 		if (tab.action === "mail.archive") folder = "archive";
 
