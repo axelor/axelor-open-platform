@@ -537,4 +537,28 @@ public class MetaFiles {
 
 		Files.deleteIfExists(target);
 	}
+
+	public String fileTypeIcon(MetaFile file) {
+		String fileType = file.getFileType();
+		switch (fileType) {
+		case "application/msword":
+		case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+		case "application/vnd.oasis.opendocument.text":
+			return "fa-file-word-o";
+		case "application/vnd.ms-excel":
+		case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+		case "application/vnd.oasis.opendocument.spreadsheet":
+			return "fa-file-excel-o";
+		case "application/pdf":
+			return "fa-file-pdf-o";
+		case "application/zip":
+		case "application/gzip":
+			return "fa-file-archive-o";
+		default:
+			if (fileType.startsWith("text")) return "fa-file-text-o";
+			if (fileType.startsWith("image")) return "fa-file-image-o";
+			if (fileType.startsWith("video")) return "fa-file-video-o";
+		}
+		return "fa-file-o";
+	}
 }

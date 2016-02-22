@@ -427,38 +427,38 @@
     margin-top: -1px;
 }
 
-.dms-file-list i.fa-folder {
+i.fa-colored.fa-folder {
 	color: #FFA726;
 }
 
-.dms-file-list i.fa-file-o {
+i.fa-colored.fa-file-o {
 	color: #767676;
 }
 
-.dms-file-list i.fa-file-text-o {
+i.fa-colored.fa-file-text-o {
 	color: #2185D0;
 }
 
-.dms-file-list i.fa-file-word-o {
+i.fa-colored.fa-file-word-o {
 	color: #2185D0;
 }
 
-.dms-file-list i.fa-file-excel-o {
+i.fa-colored.fa-file-excel-o {
 	color: #21BA45;
 }
 
-.dms-file-list i.fa-file-pdf-o {
+i.fa-colored.fa-file-pdf-o {
 	color: #DB2828;
 }
 
-.dms-file-list i.fa-file-image-o {
+i.fa-colored.fa-file-image-o {
 	color: #6435C9;
 }
 
-.dms-file-list i.fa-file-video-o {
+i.fa-colored.fa-file-video-o {
 	color: #DB2828;
 }
 
-.dms-file-list i.fa-file-archive-o {
+i.fa-colored.fa-file-archive-o {
 	color: #A5673F;
 }

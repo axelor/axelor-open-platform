@@ -352,40 +352,10 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 		}
 
 		if (metaFile != null) {
-
 			String fileType = metaFile.getFileType();
-			String fileIcon = "fa-file-o";
-
-			switch (fileType) {
-			case "application/msword":
-			case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-			case "application/vnd.oasis.opendocument.text":
-				fileIcon = "fa-file-word-o";
-				break;
-			case "application/vnd.ms-excel":
-			case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-			case "application/vnd.oasis.opendocument.spreadsheet":
-				fileIcon = "fa-file-excel-o";
-				break;
-			case "application/pdf":
-				fileIcon = "fa-file-pdf-o";
-				break;
-			case "application/zip":
-			case "application/gzip":
-				fileIcon = "fa-file-archive-o";
-				break;
-			default:
-				String type = metaFile.getFileType();
-				if (type != null) {
-					if (type.startsWith("text")) fileIcon = "fa-file-text-o";
-					if (type.startsWith("image")) fileIcon = "fa-file-image-o";
-					if (type.startsWith("video")) fileIcon = "fa-file-video-o";
-				}
-				break;
-			}
-
+			String fileIcon = metaFiles.fileTypeIcon(metaFile);
 			json.put("fileType", fileType);
-			json.put("typeIcon", "fa " + fileIcon);
+			json.put("typeIcon", "fa fa-colored " + fileIcon);
 		}
 
 		if (file.getTags() != null) {

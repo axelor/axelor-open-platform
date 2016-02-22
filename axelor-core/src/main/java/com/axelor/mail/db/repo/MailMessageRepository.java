@@ -298,7 +298,9 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		final List<MetaAttachment> attachments = findAttachments(message);
 
 		for (MetaAttachment attachment : attachments) {
-			files.add(Resource.toMapCompact(attachment.getMetaFile()));
+			final Map<String, Object> fileInfo = Resource.toMapCompact(attachment.getMetaFile());
+			fileInfo.put("fileIcon", Beans.get(MetaFiles.class).fileTypeIcon(attachment.getMetaFile()));
+			files.add(fileInfo);
 		}
 
 		if (flags != null) {

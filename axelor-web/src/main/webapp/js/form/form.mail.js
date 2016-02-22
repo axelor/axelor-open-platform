@@ -512,13 +512,17 @@ ui.directive('uiMailFiles', [function () {
 				var url = "ws/rest/com.axelor.meta.db.MetaFile/" + file.id + "/content/download";
 				ui.download(url, file.fileName);
 			};
+
+			scope.fileIcon = function (file) {
+				return file.fileIcon || 'fa-paperclip';
+			}
 		},
 		replace: true,
 		template:
 			"<ul class='mail-files'>" +
 				"<li ng-repeat='file in files'>" +
 					"<i class='fa fa-close' ng-if='removable != \"false\"' ng-click='onRemoveFile(file)'></i>" +
-					"<i class='fa fa-paperclip' ng-if='removable == \"false\"'></i>" +
+					"<i class='fa fa-colored' ng-class='fileIcon(file)' ng-if='removable == \"false\"'></i>" +
 					"<a href='' ng-click='onDownload(file)'>{{file.fileName}}</a>" +
 				"</li>" +
 			"</ul>"
