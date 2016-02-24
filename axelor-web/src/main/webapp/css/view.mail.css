@@ -221,7 +221,7 @@
 	border-bottom: 1px solid #ddd;
 }
 
-.mail-message .mail-message-header .subject:after {
+.mail-message .mail-message-header .track-tags:before {
 	content: ' : ';
 }
 

@@ -259,7 +259,7 @@ ui.directive('uiMailMessage', function () {
 							"<span ng-if='::message.$name'> - </span>" +
 							"<span ng-if='::message.$title'>{{:: _t(message.$title) }}</span>" +
 						"</span>" +
-						"<span class='track-tags'>" +
+						"<span class='track-tags' ng-if='::body.tags.length'>" +
 							"<span class='label' ng-class='::item.css' ng-repeat='item in ::body.tags'>{{:: _t(item.title) }}</span>" +
 						"</span>" +
 					"</div>" +
