@@ -750,14 +750,14 @@ ActionHandler.prototype = {
 			} else if (formElement.parent().is('[ui-slick-editors],.slick-cell')) {
 				containers = formElement.parent().parent().add(formElement);
 			} else if (formElement.parent().is('[ui-panel-editor]')) {
-				containers = formElement.parents('[ui-form]:first').add(formElement);
+				containers = formElement.is('.m2o-editor-form,.o2m-editor-form') ? formElement : formElement.parents('[ui-form]:first').add(formElement);
 			} else {
 				containers = formElement.parents('.form-view:first')
 										.find('.record-toolbar:first')
 										.add(formElement);
 			}
 
-			return containers.find('[x-path="' + (scope.formPath ?  scope.formPath + '.' + name : name) + '"]');
+			return containers.find('[x-path="' + (formScope.formPath ?  formScope.formPath + '.' + name : name) + '"]');
 		}
 		
 		function setAttrs(item, itemAttrs, itemIndex) {
