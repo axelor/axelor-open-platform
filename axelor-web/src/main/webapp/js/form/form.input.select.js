@@ -50,7 +50,7 @@ function parseNumber(field, value) {
 
 ui.formWidget('BaseSelect', {
 	
-	showSelectionOn: "click",
+	showSelectionOn: "focus",
 
 	findInput: function(element) {
 		return element.find('input:first');
@@ -79,14 +79,16 @@ ui.formWidget('BaseSelect', {
 
 		var input = this.findInput(element);
 
-		scope.showSelection = function(e) {
+		scope.showSelection = function() {
 			if (scope.isReadonly()) {
 				return;
 			}
-			if (!axelor.device.mobile) {
-				input.focus();
-			}
-			input.autocomplete("search" , '');
+			doSetup(input);
+			setTimeout(function () {
+				if (input.is(':focus')) {
+					input.autocomplete("search" , '');
+				}
+			}, 100);
 		};
 
 		scope.handleClear = function(e) {
@@ -543,12 +545,14 @@ ui.formInput('MultiSelect', 'Select', {
 			update(items);
 		};
 		
-		var __showSelection = scope.showSelection;
-		scope.showSelection = function(e) {
+		scope.onShowSelection = function(e) {
 			if (e && $(e.target || e.srcElement).is('li,i,span.tag-text')) {
 				return;
 			}
-			return __showSelection(e);
+			if (!input.is(':focus')) {
+				input.focus();
+			}
+			scope.showSelection();
 		};
 
 		scope.handleDelete = function(e) {
@@ -606,7 +610,7 @@ ui.formInput('MultiSelect', 'Select', {
 	},
 	template_editable:
 	'<div class="tag-select picker-input">'+
-	  '<ul ng-click="showSelection($event)">'+
+	  '<ul ng-click="onShowSelection($event)">'+
 		'<li class="tag-item label label-info" ng-repeat="item in items">'+
 			'<span ng-class="{\'tag-link\': handleClick}" class="tag-text" ng-click="handleClick($event, item.value)">{{item.title}}</span> '+
 			'<i class="fa fa-times fa-small" ng-click="removeItem(item)"></i>'+
@@ -616,7 +620,7 @@ ui.formInput('MultiSelect', 'Select', {
 		'</li>'+
 	  '</ul>'+
 	  '<span class="picker-icons">'+
-	  	'<i class="fa fa-caret-down" ng-click="showSelection()"></i>'+
+	  	'<i class="fa fa-caret-down" ng-click="onShowSelection()"></i>'+
 	  '</span>'+
 	'</div>',
 	template_readonly:

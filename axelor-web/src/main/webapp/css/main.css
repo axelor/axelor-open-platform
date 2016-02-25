@@ -297,7 +297,7 @@ header .navbar .nav-link-user-sub {
 }
 
 .ui-autocomplete {
-	max-height: 200px;
+	max-height: 340px;
 	overflow-y: auto;
 	overflow-x: hidden;
 }

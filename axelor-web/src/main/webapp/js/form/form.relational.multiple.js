@@ -736,21 +736,22 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 				return response([]);
 			}
 
-			this.fetchSelection(request, function(items) {
+			this.fetchSelection(request, function(items, page) {
 				var term = request.term;
+				var canSelect = scope.canSelect() && (items.length < page.total || (request.term && items.length === 0));
 				if (field.create && term && scope.canNew()) {
 					items.push({
-						label : _t('Create "{0}" and add...', term),
+						label : _t('Create "{0}" and select...', '<strong><em>' + term + '</em></strong>'),
 						click : function() { create(term); }
 					});
 					items.push({
-						label : _t('Create "{0}"...', term),
+						label : _t('Create "{0}"...', '<strong><em>' + term + '</em></strong>'),
 						click : function() { create(term, true); }
 					});
 				}
-				if (scope.canSelect()) {
+				if (canSelect) {
 					items.push({
-						label : _t("Search..."),
+						label : _t("Search more..."),
 						click : function() { scope.showSelector(); }
 					});
 				}
