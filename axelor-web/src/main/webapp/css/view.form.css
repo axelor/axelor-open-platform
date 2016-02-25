@@ -1058,6 +1058,10 @@ label.has-help > span:after {
 	padding-right: 4px !important;
 }
 
+.select-item .picker-input > .picker-icons > .fa.fa-pencil {
+	font-size: 12px;
+}
+
 .form-item-container textarea {
 	box-sizing: border-box;
 }

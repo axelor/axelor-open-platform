@@ -621,8 +621,8 @@ ui.formInput('SuggestBox', 'ManyToOne', {
 	template_editable:
 	'<span class="picker-input">'+
 		'<input type="text" autocomplete="off" ui-can-suggest>'+
-		'<span class="picker-icons">'+
-			'<i class="fa fa-times" ng-show="text" ng-click="handleClear()"></i>'+
+		'<span class="picker-icons picker-icons-2">'+
+			'<i class="fa fa-pencil" ng-click="onEdit()" ng-show="hasPermission(\'read\') && canView() && canEdit()" title="{{\'Edit\' | t}}"></i>'+
 			'<i class="fa fa-caret-down" ng-click="showSelection()"></i>'+
 		'</span>'+
    '</span>'
