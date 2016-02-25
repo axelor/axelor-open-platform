@@ -187,15 +187,16 @@ ui.formWidget('BaseSelect', {
 				}
 			});
 		});
-		
-		input.focus(function() {
-			doSetup(input);
+
+		input.focus(function(e) {
 			element.addClass('focus');
-			if (showOn === "focus") {
-				scope.showSelection(300);
-			}
 		}).blur(function() {
 			element.removeClass('focus');
+		}).keyup(function(e) {
+			// if TAB key
+			if (e.which === 9 && showOn === "focus") {
+				scope.showSelection(300);
+			}
 		}).keydown(function(e) {
 			var KEY = $.ui.keyCode;
 			switch(e.keyCode) {
@@ -204,8 +205,7 @@ ui.formWidget('BaseSelect', {
 				scope.handleDelete(e);
 			}
 		}).click(function() {
-			doSetup(input);
-			if (showOn === "click") {
+			if (showOn === "click" || showOn === "focus") {
 				scope.showSelection();
 			}
 		});
@@ -555,8 +555,9 @@ ui.formInput('MultiSelect', 'Select', {
 			if (e && $(e.target || e.srcElement).is('li,i,span.tag-text')) {
 				return;
 			}
+			input.focus();
 			setTimeout(function() {
-				input.focus();
+				scope.showSelection();
 			});
 		};
 
