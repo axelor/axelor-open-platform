@@ -302,7 +302,7 @@ public class ActionGroup extends ActionResumable {
     		map = Mapper.toMap(value);
     	}
     	if (values instanceof Map) {
-    		map = (Map) values;
+    		map = Maps.newHashMap((Map) values);
     	}
     	
     	values = value.get("attrs");
