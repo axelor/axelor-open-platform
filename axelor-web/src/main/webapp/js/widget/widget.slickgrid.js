@@ -204,9 +204,14 @@ var Editor = function(args) {
 	function focus() {
 		// Firefox throws exception if element is hidden
 		if (element.is(':hidden')) return;
-		if (element.is(':input'))
-			return element.focus().select();
-		element.find(':input:first').focus().select();
+		if (element.is(':input')) {
+			element.focus().select();
+		} else {
+			element.find(':input:first').focus().select();
+		}
+		if (element.is('[x-cell-css*=select-item]') && element.scope().showSelection) {
+			element.scope().showSelection(300);
+		}
 	}
 
 	this.focus = function() {
