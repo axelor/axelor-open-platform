@@ -1041,12 +1041,14 @@ Grid.prototype._doInit = function(view) {
 			return;
 		}
 
+		var row = null;
 		var lock = grid.getEditorLock();
 		if (lock.isActive()) {
 			lock.commitCurrentEdit();
+			row = grid.getDataItem(grid.getDataLength() - 1); // to check if adding new row
 		}
 
-		var beforeSavePending = that.__beforeSavePending;
+		var beforeSavePending = that.__beforeSavePending || (row && row.id === 0);
 
 		that.__beforeSavePending = false;
 
