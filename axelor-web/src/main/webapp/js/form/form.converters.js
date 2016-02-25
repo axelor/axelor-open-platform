@@ -77,4 +77,37 @@
 		}
 	};
 
+	ui.formatters.$image = function (scope, fieldName, imageName) {
+		var record = scope.record || {};
+		var fields = scope.fields || {}
+		var v = record.version || record.$version || 0;
+
+		if (fieldName === null && imageName) {
+			return "ws/rest/" + scope._model + "/" + record.id + "/" + imageName + "/download?image=true&v=" + v;
+		}
+		var field = fields[fieldName];
+		if (field && field.target && record[fieldName]) {
+			var val = record[fieldName];
+			return "ws/rest/" + field.target + "/" + val.id + "/" + imageName + "/download?image=true&v=" + v;
+		}
+		return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+	};
+
+	ui.formatters.$fmt = function (scope, fieldName, fieldValue) {
+		var value = arguments.length === 2 ? (scope.record || {})[fieldName] : fieldValue;
+		if (value === undefined || value === null) {
+			return "";
+		}
+		var field = (scope.viewItems || scope.fields || {})[fieldName];
+		if (!field) {
+			return value;
+		}
+		var type = field.selection ? "selection" : field.type;
+		var formatter = ui.formatters[type];
+		if (formatter) {
+			return formatter(field, value);
+		}
+		return value;
+	};
+
 })();

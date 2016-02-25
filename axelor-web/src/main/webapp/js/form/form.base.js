@@ -348,6 +348,14 @@ ui.formDirective = function(name, object) {
 				var template_readonly = self.template_readonly;
 				if (field.viewer) {
 					template_readonly = field.viewer;
+					scope.$image = function (fieldName, imageName) { return ui.formatters.$image(scope, fieldName, imageName); };
+					scope.$fmt = function (fieldName, fieldValue) {
+						var args = [scope, fieldName];
+						if (arguments.length > 1) {
+							args.push(fieldValue);
+						}
+						return ui.formatters.$fmt.apply(null, args);
+					};
 				} else if (field.editor && field.editor.viewer) {
 					template_readonly = $('<div ui-panel-editor>');
 				}

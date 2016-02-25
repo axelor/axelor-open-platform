@@ -449,34 +449,11 @@ ui.directive('uiCard', ["$parse", "$compile", function ($parse, $compile) {
 			}, true);
 
 			evalScope.$image = function (fieldName, imageName) {
-				var rec = scope.record;
-				var v = rec.version || rec.$version || 0;
-				if (fieldName === null && imageName) {
-					return "ws/rest/" + scope._model + "/" + rec.id + "/" + imageName + "/download?image=true&v=" + v;
-				}
-				var field = scope.fields[fieldName];
-				if (field && field.target && rec[fieldName]) {
-					var val = rec[fieldName];
-					return "ws/rest/" + field.target + "/" + val.id + "/" + imageName + "/download?image=true&v=" + v;
-				}
-				return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+				return ui.formatters.$image(scope, fieldName, imageName);
 			};
 
 			evalScope.$fmt = function (fieldName) {
-				var value = evalScope[fieldName];
-				if (value === undefined || value === null) {
-					return "";
-				}
-				var field = scope.viewItems[fieldName] || scope.fields[fieldName];
-				if (!field) {
-					return value;
-				}
-				var type = field.selection ? "selection" : field.type;
-				var formatter = ui.formatters[type];
-				if (formatter) {
-					return formatter(field, value);
-				}
-				return value;
+				return ui.formatters.$fmt(scope, fieldName, evalScope[fieldName]);
 			};
 
 			var template = (scope.schema.template || "<span></span>").trim();
