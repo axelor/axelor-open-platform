@@ -79,7 +79,7 @@ ui.formWidget('BaseSelect', {
 
 		var input = this.findInput(element);
 
-		scope.showSelection = function() {
+		scope.showSelection = function(delay) {
 			if (scope.isReadonly()) {
 				return;
 			}
@@ -94,7 +94,7 @@ ui.formWidget('BaseSelect', {
 					input.autocomplete("search" , '');
 					input.removeClass('.x-focus');
 				}
-			}, 100);
+			}, delay || 100);
 		};
 
 		scope.handleClear = function(e) {
@@ -192,7 +192,7 @@ ui.formWidget('BaseSelect', {
 			doSetup(input);
 			element.addClass('focus');
 			if (showOn === "focus") {
-				scope.showSelection();
+				scope.showSelection(300);
 			}
 		}).blur(function() {
 			element.removeClass('focus');
