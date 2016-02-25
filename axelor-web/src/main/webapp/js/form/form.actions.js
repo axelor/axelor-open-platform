@@ -34,6 +34,7 @@ function updateValues(source, target, itemScope, formScope) {
 		if (value.version === undefined) return value;
 		if (!value.id) return value;
 		var res = _.extend(value);
+		res.$version = res.version;
 		res.version = undefined;
 		return res;
 	};
