@@ -83,10 +83,16 @@ ui.formWidget('BaseSelect', {
 			if (scope.isReadonly()) {
 				return;
 			}
+			if (input.is('.x-focus')) {
+				input.removeClass('.x-focus');
+				return;
+			}
+			input.addClass('.x-focus');
 			doSetup(input);
 			setTimeout(function () {
 				if (input.is(':focus')) {
 					input.autocomplete("search" , '');
+					input.removeClass('.x-focus');
 				}
 			}, 100);
 		};
@@ -549,10 +555,9 @@ ui.formInput('MultiSelect', 'Select', {
 			if (e && $(e.target || e.srcElement).is('li,i,span.tag-text')) {
 				return;
 			}
-			if (!input.is(':focus')) {
+			setTimeout(function() {
 				input.focus();
-			}
-			scope.showSelection();
+			});
 		};
 
 		scope.handleDelete = function(e) {

@@ -123,7 +123,11 @@ ui.directive('uiDialog', function() {
 				if (target) {
 					return setTimeout(function(){
 						if (!axelor.device.mobile) {
-							target.find(':input:first').focus().select();
+							var input = target.find(':input:first');
+							input.addClass('x-focus').focus().select();
+							setTimeout(function () {
+								input.removeClass('x-focus');
+							});
 						}
 					});
 				}
