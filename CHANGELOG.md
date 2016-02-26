@@ -1,3 +1,17 @@
+# 3.1.1 (2016-02-26)
+
+## Improvements
+
+- allow to open url actions in new tab
+
+## Bug fixes
+
+- fix wrong form items matching
+- fix action handler polluting response data
+- fix value update with actions issue
+- fix recursion issue when using o2m in of same type in grid view
+- fix wrong escape in groovy template when using closure
+
 # 3.1.0 (2016-02-12)
 
 There are many bug fixings and minor improvements in 3.0.x release.
