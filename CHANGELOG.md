@@ -1,6 +1,141 @@
-# Current (3.0.22)
+# Current (4.0.0)
+
+Tones of new features, new refreshed look and feel and more.
+
+## Improvements
+
+- support for MySQL 5.x (including MariaDB, WebScaleSQL)
+- centralized document management
+- improved file upload & attachment management
+- more consistent web services
+- implemented field value translation
+- implemented accent neutral search
+- improved mail api (smtp, imap, pop3 support)
+- java expression language support for action expressions
+- better request context handling
+- implemented role based menu permissions
+- implemented new views (kanban, cards, custom html, gantt)
+- support for change tracking and messaging
+- support for re-sequence grid items with drag & drop
+- support for selection list enhancement from modules
+- support for view field permissions
+- support for CAS authentication
+- support for CORS
+- upgraded to angular 1.4 (better performance and url handling)
+- new default theme
+- implemented per user theme support
+- implemented new improved navigation menu (icons, colors, tags)
+- support for single tab ui
+- support for extending index.jsp with include templates
+- replaced tinymce widget with new lightweight HTML widget
+- implemented new widgets (BinaryLink, BooleanSelect, BooleanRadio, BooleanSwitch)
+- implemented new funnel chart
+- support for excluding fields when duplicating a record
+- support for custom chart colors
+- support for favourite menu (bookmarks)
+- implemented new checkbox-select widget
+- implemented new static text widget
+- implemented new static help widget
+
+and lot more...
+
+## Database (column name changes)
+
+- meta_translation (key -> message_key, message -> message_value)
+- meta_file (size -> file_size, type -> file_type, size_text -> file_size_text)
+- permission (condition -> condition_value)
 
 ## Bug fixes
+
+Almost all fixes in v3.x branch are merged in v4.x branch. See git log for more comprehensive
+list of changes.
+
+# 3.1.1 (2016-02-26)
+
+## Improvements
+
+- allow to open url actions in new tab
+
+## Bug fixes
+
+- fix wrong form items matching
+- fix action handler polluting response data
+- fix value update with actions issue
+- fix recursion issue when using o2m in of same type in grid view
+- fix wrong escape in groovy template when using closure
+
+# 3.0.25 (2016-02-26)
+
+## Bug fixes
+
+- fixed date widget clear value problem
+- fix wrong form items matching
+- fix action handler polluting response data
+- fix value update with actions issue
+
+# 3.1.0 (2016-02-12)
+
+There are many bug fixings and minor improvements in 3.0.x release.
+It's time to move forward with a new minor release.
+
+## Improvements
+
+- added support for excluding fields to copy
+- add css rule to attach dashlet panels
+- backported new html widget from v4
+
+## Bug fixes
+
+- fixed panel toggle issue caused by collapse animation
+- fixed date widget clear value problem
+- fixed context issues
+
+# 3.0.24 (2016-02-12)
+
+## Improvements
+
+- added support for excluding fields to copy
+- add css rule to attach dashlet panels
+- backported new html widget from v4
+
+## Bug fixes
+
+- fixed panel toggle issue caused by collapse animation
+- fixed date widget clear value problem
+- fixed context issues
+
+# 3.0.23 (2016-01-27)
+
+## Improvements
+
+- allow buttons in field editor
+- addded helpLink field to MetaView
+- support for one-to-one field in advance search
+- support for special action "close"
+- support for special action "new"
+- show html content in grid cell
+- notify to refresh browser after meta data reload
+- automatically detach orphaned one-to-many records
+
+## Bug fixes
+
+- fix wrong record in form view
+- fix showTitle attribute issue on editor fields
+- fix field alignment issue
+- fix field editor as viewer is not reused
+- fix id value not persisted for selections
+- fix date input widget issue
+- fix i18n bundle cache update issue
+- fix nested selection field issue in tree view
+- fix mail builder issue for multi-part messages
+- fix pagination issue on tree view
+- fix wrong conversion of string value as boolean
+
+# 3.0.22 (2015-10-22)
+
+## Bug fixes
+
+- fix nested editor rendering issue
 
 # 3.0.21 (2015-10-20)
 
