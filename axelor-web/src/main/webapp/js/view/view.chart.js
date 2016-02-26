@@ -388,6 +388,10 @@ function HBarChart(scope, element, data) {
 
 function FunnelChart(scope, element, data) {
 	
+	if(!data.dataset){
+		return;
+	}
+	
 	var chart = new D3Funnel(element[0]);
 	var w = element.width();
 	var h = element.height();
@@ -411,6 +415,8 @@ function FunnelChart(scope, element, data) {
 		opts.push([dat[data.xAxis],($conv(dat[series.key])||0)]);
 	});
 	chart.draw(opts, props);
+	
+	chart.update = function(){};
 	
 	return chart;
 }
