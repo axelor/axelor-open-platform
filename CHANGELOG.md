@@ -1,3 +1,12 @@
+# 3.0.25 (2016-02-26)
+
+## Bug fixes
+
+- fixed date widget clear value problem
+- fix wrong form items matching
+- fix action handler polluting response data
+- fix value update with actions issue
+
 # 3.0.24 (2016-02-12)
 
 ## Improvements
