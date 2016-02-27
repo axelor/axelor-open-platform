@@ -20,6 +20,7 @@
 	margin: 0;
 	padding: 4px;
 	padding-left: 0;
+	overflow: hidden;
 }
 
 .form-inline .ibox {
@@ -41,7 +42,9 @@
 }
 
 .ibox input {
-	display: none !important;
+	opacity: 0 !important;
+	margin-left: -14px !important;
+	position: absolute;
 }
 
 .ibox .title {
@@ -158,6 +161,10 @@
     border: 1px solid #ddd;
     border-radius: 30px;
     transition: all .2s
+}
+
+.iswitch input:focus + .box:before {
+	border: 1px solid #16a765;
 }
 
 .iswitch .box:after {
