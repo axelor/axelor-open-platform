@@ -1513,7 +1513,7 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 
 				elemTitle.html(_t('Attachments'));
 
-				var height = $(window).height();
+				var height = $(window).height() - 16;
 				height = Math.min(480, height);
 				element.dialog('option', 'height', height);
 			});

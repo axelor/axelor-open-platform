@@ -382,6 +382,13 @@
 	padding: 1px 0 0 !important;
 }
 
+.ui-dialog .ui-dialog-content.dms-popup {
+	max-height: calc(100% - 45px - 52px) !important;
+}
+.ui-dialog.maximized .ui-dialog-content.dms-popup {
+	height: 100% !important;
+}
+
 .dms-popup > div,
 .dms-popup > div > .grid-view {
 	height: 100%;
