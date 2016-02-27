@@ -993,6 +993,7 @@ ui.formBuild = function (scope, schema, fields) {
 				type = widget;
 
 			attrs = angular.extend(attrs, field, this);
+			widget = widget || attrs.widget;
 			type = ui.getWidget(widget) ||
 				   ui.getWidget(attrs.type) ||
 				   ui.getWidget(attrs.serverType) ||
