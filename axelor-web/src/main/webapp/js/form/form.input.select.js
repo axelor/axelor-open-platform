@@ -615,8 +615,8 @@ ui.formInput('MultiSelect', 'Select', {
 		});
 	},
 	template_editable:
-	'<div class="tag-select picker-input">'+
-	  '<ul ng-click="onShowSelection($event)">'+
+	'<div class="tag-select picker-input" ng-click="onShowSelection($event)">'+
+	  '<ul>'+
 		'<li class="tag-item label label-info" ng-repeat="item in items">'+
 			'<span ng-class="{\'tag-link\': handleClick}" class="tag-text" ng-click="handleClick($event, item.value)">{{item.title}}</span> '+
 			'<i class="fa fa-times fa-small" ng-click="removeItem(item)"></i>'+
