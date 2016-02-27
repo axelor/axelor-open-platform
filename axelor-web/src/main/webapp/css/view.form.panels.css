@@ -229,13 +229,19 @@
 	font-size: 11px;
 }
 
-.panel-layout .label-item {
+.panel-layout .label-item,
+.panel-layout .label-item span {
 	font-weight: 600;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	font-size: 12px;
 	margin-bottom: 0;
+	height: 18px;
+}
+.panel-layout .label-item span {
+	display: inline-block;
+	max-width: 100%;
 }
 
 .panel-related .panel-header {
