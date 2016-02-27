@@ -109,21 +109,27 @@ ui.formInput('BooleanSelect', 'Boolean', {
 		var trueText = (field.widgetAttrs||{}).trueText || _t('Yes');
 		var falseText = (field.widgetAttrs||{}).falseText || _t('No');
 
-		scope.$selection = [trueText, falseText];
+		scope.$items = [trueText, falseText];
+		scope.$selection = [{ value: trueText, val: true}, { value: falseText, val: false }];
+		if (field.nullable) {
+			scope.$selection.unshift({ value: '', val: null });
+		}
 		scope.format = function (value) {
-			return value ? scope.$selection[0] : scope.$selection[1];
+			if (field.nullable && (value === null || value === undefined)) {
+				return "";
+			}
+			return value ? scope.$items[0] : scope.$items[1];
 		};
 	},
 	link_editable: function (scope, element, attrs, model) {
 		var input = element.find('input');
-		var items = scope.$selection;
+		var items = scope.$items;
 
 		input.autocomplete({
 			minLength: 0,
-			source: items,
+			source: scope.$selection,
 			select: function (e, u) {
-				var value = items.indexOf(u.item.value) === 0;
-				scope.setValue(value, true);
+				scope.setValue(u.item.val, true);
 				scope.applyLater();
 			}
 		}).click(function (e) {
@@ -132,8 +138,8 @@ ui.formInput('BooleanSelect', 'Boolean', {
 
 		scope.$render_editable = function () {
 			var value = model.$viewValue || false;
-			var current = items.indexOf(input.val()) === 0;
-			value ? input.val(items[0]) : input.val(items[1]);
+			var text = scope.format(value);
+			input.val(text);
 		};
 
 		scope.$watch('isReadonly()', function (readonly) {

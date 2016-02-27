@@ -232,6 +232,10 @@ header .navbar .nav-link-user-sub {
 	background-image: none;
 }
 
+.ui-menu .ui-menu-item a:empty {
+	height: 18px;
+}
+
 .ui-datepicker,
 .ui-datepicker * {
 	line-height: 1.1em;
