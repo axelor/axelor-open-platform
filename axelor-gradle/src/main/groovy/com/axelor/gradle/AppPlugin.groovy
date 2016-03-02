@@ -116,12 +116,8 @@ class AppPlugin extends AbstractPlugin {
 			task("gulp", type: Exec, dependsOn: 'npm') {
 				description "Run gulp command to build web resource bundles."
 				group "Axelor web"
-				def command = "gulp"
-				if (OperatingSystem.current().isWindows()) {
-					command = "gulp.cmd"
-				}
 				workingDir "${buildDir}/webapp"
-				commandLine = [command]
+				commandLine = ["npm", "run", "gulp"]
 			}
 
 			task("init", dependsOn: "classes", type: JavaExec) {

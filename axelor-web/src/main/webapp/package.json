@@ -1,6 +1,9 @@
 {
   "name": "axelor-web",
   "private": true,
+  "scripts": {
+    "gulp": "gulp"
+  },
   "devDependencies": {
     "del": "^2.0.2",
     "gulp": "^3.9.0",
