@@ -70,6 +70,10 @@ public class MetaStore {
 	}
 	
 	public static AbstractView getView(String name, String module) {
+		// for unit tests
+		if (StringUtils.isBlank(module) && CACHE.containsKey(name)) {
+			return (AbstractView) CACHE.get(name);
+		}
 		return StringUtils.isBlank(module) ? XMLViews.findView(null, name, null) : XMLViews.findView(name, module);
 	}
 
