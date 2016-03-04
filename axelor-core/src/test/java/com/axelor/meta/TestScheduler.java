@@ -86,15 +86,18 @@ public class TestScheduler extends AbstractTest {
 	
 	@Test
 	public void test() throws SchedulerException, InterruptedException {
+		int current = 0;
 		jobCounter = 0;
 		runner.start();
 		Thread.sleep(3000);
-		Assert.assertEquals(4, jobCounter);
+		current = jobCounter;
+		Assert.assertEquals(4, current);
 		
 		jobCounter = 0;
 		runner.restart();
 		Thread.sleep(5000);
-		Assert.assertEquals(6, jobCounter);
+		current = jobCounter;
+		Assert.assertEquals(6, current);
 		
 		runner.stop();
 	}

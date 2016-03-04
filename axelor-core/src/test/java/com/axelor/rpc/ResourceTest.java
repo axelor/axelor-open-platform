@@ -26,6 +26,7 @@ import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.axelor.db.JPA;
 import com.axelor.test.db.Address;
 import com.axelor.test.db.Circle;
 import com.axelor.test.db.Contact;
@@ -74,9 +75,10 @@ public class ResourceTest extends RpcTest {
 		Assert.assertNotNull(res);
 		Assert.assertNotNull(res.getData());
 		Assert.assertNotNull(res.getItem(0));
-		Assert.assertTrue(res.getItem(0) instanceof Contact);
+		Assert.assertTrue(res.getItem(0) instanceof Map);
+		Assert.assertNotNull(((Map) res.getItem(0)).get("id"));
 
-		Contact p = (Contact) res.getItem(0);
+		Contact p =  JPA.em().find(Contact.class, ((Map) res.getItem(0)).get("id"));
 
 		Assert.assertEquals(Title.class, p.getTitle().getClass());
 		Assert.assertEquals(Address.class, p.getAddresses().get(0).getClass());
@@ -109,9 +111,10 @@ public class ResourceTest extends RpcTest {
 		Assert.assertNotNull(res);
 		Assert.assertNotNull(res.getData());
 		Assert.assertNotNull(res.getItem(0));
-		Assert.assertTrue(res.getItem(0) instanceof Contact);
+		Assert.assertTrue(res.getItem(0) instanceof Map);
+		Assert.assertNotNull(((Map) res.getItem(0)).get("id"));
 
-		Contact contact = (Contact) res.getItem(0);
+		Contact contact =  JPA.em().find(Contact.class, ((Map) res.getItem(0)).get("id"));
 		
 		Assert.assertEquals("jack", contact.getFirstName());
 		Assert.assertEquals("sparrow", contact.getLastName());

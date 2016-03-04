@@ -102,21 +102,6 @@ public class RelationTest extends JpaTest {
 		// entity manager will throws an exception
 		move.getMoveLines().clear();
 	}
-	
-	@Transactional
-	protected void testRemoveCollectionImproper() {
-		Move move = all(Move.class).fetchOne();
-		Invoice invoice = all(Invoice.class).fetchOne();
-		
-		// before trying to clear moveLines, we remove invoice itself that
-		// refers one of the move line but the invoice again is referenced
-		// in a move
-		invoices.remove(invoice);
-		
-		// invoice is removed but still referenced in move so on transaction
-		//completion entity manager will throw an exception
-		move.getMoveLines().clear();
-	}
 
 	@Transactional
 	protected void testRemoveCollectionProper() {
@@ -131,8 +116,7 @@ public class RelationTest extends JpaTest {
 		
 		// or
 		
-		// invoice.remove();
-		// move.setInvoice(null);
+		// invoices.remove(invoice); // this will auto detach invoice from all it's children
 		// move.getMoveLines().clear();
 	}
 	
@@ -143,11 +127,6 @@ public class RelationTest extends JpaTest {
 		
 		try {
 			testRemoveCollection();
-			Assert.fail();
-		} catch (PersistenceException e) {}
-		
-		try {
-			testRemoveCollectionImproper();
 			Assert.fail();
 		} catch (PersistenceException e) {}
 		

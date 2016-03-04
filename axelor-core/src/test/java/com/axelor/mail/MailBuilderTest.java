@@ -89,7 +89,7 @@ public class MailBuilderTest extends AbstractMailTest {
 
 		Multipart content = (Multipart) msg.getContent();
 
-		Assert.assertEquals(2, content.getCount());
+		Assert.assertEquals(1, content.getCount());
 
 		for (int i = 0; i < content.getCount(); i++) {
 			BodyPart part = content.getBodyPart(i);

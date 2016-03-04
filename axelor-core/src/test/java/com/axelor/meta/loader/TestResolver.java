@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.loader;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
@@ -49,7 +50,12 @@ public class TestResolver {
 				"axelor-contact",
 				"axelor-sale");
 
-		Assert.assertEquals(expected, resolver.resolve("axelor-sale"));
+		List<String> actual = new ArrayList<>();
+		for (Module module : resolver.resolve("axelor-sale")) {
+			actual.add(module.getName());
+		}
+
+		Assert.assertEquals(expected, actual);
 
 		List<String> all = resolver.names();
 		
