@@ -38,4 +38,11 @@ project.afterEvaluate {
 			exclude '**/*.groovy'
 		}
 	}
+	sourceSets.test.java.srcDirs.each { dir ->
+		sourceSets.test.resources {
+			srcDir dir
+			exclude '**/*.java'
+			exclude '**/*.groovy'
+		}
+	}
 }

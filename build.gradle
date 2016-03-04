@@ -42,10 +42,17 @@ allprojects {
 	}
 
 	afterEvaluate {
-		// only run test suites
 		test {
-			scanForTestClasses = false
-			include "**/*Suite.class"
+			forkEvery 1
+			maxParallelForks 4
+
+			beforeTest { descriptor ->
+				logger.lifecycle("Running: " + descriptor)
+			}
+
+			onlyIf {
+				return project.hasProperty('run-test')
+			}
 		}
 	}
 }
