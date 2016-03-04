@@ -17,6 +17,8 @@
  */
 package com.axelor.web.service;
 
+import static com.axelor.common.ObjectUtils.isEmpty;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -110,6 +112,19 @@ public class RestService extends ResourceService {
 	@Inject
 	private MailFollowerRepository followers;
 
+	private Response fail() {
+
+		final Map<String, Object> report = new HashMap<>();
+		final Response response = new Response();
+
+		report.put("message", "invalid request");
+
+		response.setData(report);
+		response.setStatus(Response.STATUS_FAILURE);
+
+		return response;
+	}
+
 	@GET
 	public Response find(
 			@QueryParam("limit")
@@ -119,6 +134,7 @@ public class RestService extends ResourceService {
 			@QueryParam("q") String query) {
 
 		Request request = new Request();
+		request.setModel(getModel());
 		request.setOffset(offset);
 		request.setLimit(limit);
 		return getResource().search(request);
@@ -128,7 +144,13 @@ public class RestService extends ResourceService {
 	@Path("search")
 	@SuppressWarnings("all")
 	public Response find(Request request) {
-		
+
+		if (request == null) {
+			request = new Request();
+			request.setOffset(0);
+			request.setLimit(40);
+		}
+
 		request.setModel(getModel());
 
 		final Map<String, Object> data = request.getData();
@@ -165,14 +187,16 @@ public class RestService extends ResourceService {
 
 	@POST
 	public Response save(Request request) {
+		if (request == null || (isEmpty(request.getRecords()) && isEmpty(request.getData()))) {
+			return fail();
+		}
 		request.setModel(getModel());
 		return getResource().save(request);
 	}
 
 	@PUT
 	public Response create(Request request) {
-		request.setModel(getModel());
-		return getResource().save(request);
+		return save(request);
 	}
 
 	@GET
@@ -185,6 +209,9 @@ public class RestService extends ResourceService {
 	@POST
 	@Path("{id}/fetch")
 	public Response fetch(@PathParam("id") long id, Request request) {
+		if (request == null) {
+			return fail();
+		}
 		request.setModel(getModel());
 		Response response = getResource().fetch(id, request);
 		long attachments = Query.of(MetaAttachment.class)
@@ -203,8 +230,12 @@ public class RestService extends ResourceService {
 	@POST
 	@Path("{id}")
 	public Response update(@PathParam("id") long id, Request request) {
+		if (request == null || isEmpty(request.getData())) {
+			return fail();
+		}
 		final List<Object> records = new ArrayList<>();
 		final Map<String, Object> data = request.getData();
+
 		data.put("id", id);
 		records.add(data);
 
@@ -217,6 +248,9 @@ public class RestService extends ResourceService {
 	@POST
 	@Path("updateMass")
 	public Response updateMass(Request request) {
+		if (request == null || isEmpty(request.getData())) {
+			return fail();
+		}
 		request.setModel(getModel());
 		return getResource().updateMass(request);
 	}
@@ -233,6 +267,9 @@ public class RestService extends ResourceService {
 	@POST
 	@Path("{id}/remove")
 	public Response remove(@PathParam("id") long id, Request request) {
+		if (request == null || isEmpty(request.getData())) {
+			return fail();
+		}
 		request.setModel(getModel());
 		return getResource().remove(id, request);
 	}
@@ -240,6 +277,9 @@ public class RestService extends ResourceService {
 	@POST
 	@Path("removeAll")
 	public Response remove(Request request) {
+		if (request == null || isEmpty(request.getRecords())) {
+			return fail();
+		}
 		request.setModel(getModel());
 		return getResource().remove(request);
 	}
@@ -404,13 +444,20 @@ public class RestService extends ResourceService {
 
 	@POST
 	@Path("{id}/attachment")
-	public Response attachment(@PathParam("id") long id, Request request){
+	public Response attachment(@PathParam("id") long id, Request request) {
+		if (request == null || isEmpty(request.getFields())) {
+			return fail();
+		}
+		request.setModel(getModel());
 		return service.getAttachment(id, getModel(), request);
 	}
 
 	@POST
 	@Path("removeAttachment")
 	public Response removeAttachment(Request request) {
+		if (request == null || isEmpty(request.getRecords())) {
+			return fail();
+		}
 		request.setModel(getModel());
 		return service.removeAttachment(request, uploadPath);
 	}
@@ -418,6 +465,9 @@ public class RestService extends ResourceService {
 	@POST
 	@Path("{id}/addAttachment")
 	public Response addAttachment(@PathParam("id") long id, Request request) {
+		if (request == null || isEmpty(request.getData())) {
+			return fail();
+		}
 		request.setModel(getModel());
 		return service.addAttachment(id, request);
 	}
@@ -425,6 +475,9 @@ public class RestService extends ResourceService {
 	@POST
 	@Path("verify")
 	public Response verify(Request request) {
+		if (request == null || isEmpty(request.getData())) {
+			return fail();
+		}
 		request.setModel(getModel());
 		return getResource().verify(request);
 	}
@@ -476,6 +529,9 @@ public class RestService extends ResourceService {
 	@POST
 	@Path("export")
 	public Response export(Request request) {
+		if (request == null || isEmpty(request.getFields())) {
+			return fail();
+		}
 		final Response response = new Response();
 		final Map<String, Object> data = new HashMap<>();
 		request.setModel(getModel());
@@ -592,14 +648,13 @@ public class RestService extends ResourceService {
 	@Path("{id}/follow")
 	@SuppressWarnings("all")
 	public Response messageFollow(@PathParam("id") long id, Request request) {
-
 		final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
 		final Model entity = repo.find(id);
 
 		if (entity == null) {
 			return messageFollowers(id);
 		}
-		if (request.getData() == null) {
+		if (request == null || request.getData() == null) {
 			followers.follow(entity, AuthUtils.getUser());
 			return messageFollowers(id);
 		}
@@ -629,21 +684,18 @@ public class RestService extends ResourceService {
 	@Path("{id}/unfollow")
 	@SuppressWarnings("all")
 	public Response messageUnfollow(@PathParam("id") long id, Request request) {
-		@SuppressWarnings("all")
-
 		final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
 		final Model entity = repo.find(id);
 		if (entity == null) {
 			return messageFollowers(id);
 		}
 
-		final List<Object> records = request.getRecords();
-		if (records == null || records.isEmpty()) {
+		if (request == null || request.getRecords() == null || request.getRecords().isEmpty()) {
 			followers.unfollow(entity, AuthUtils.getUser());
 			return messageFollowers(id);
 		}
 
-		for (Object item  : records) {
+		for (Object item  : request.getRecords()) {
 			final MailFollower follower = followers.find(Longs.tryParse(item.toString()));
 			if (follower != null) {
 				followers.unfollow(follower);
@@ -656,7 +708,9 @@ public class RestService extends ResourceService {
 	@POST
 	@Path("{id}/message")
 	public Response messagePost(@PathParam("id") long id, Request request) {
-
+		if (request == null || isEmpty(request.getData())) {
+			return fail();
+		}
 		final Response response = new Response();
 		@SuppressWarnings("all")
 		final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());

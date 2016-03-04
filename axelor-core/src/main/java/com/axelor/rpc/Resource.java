@@ -578,7 +578,7 @@ public class Resource<T extends Model> {
 		}
 
 		final List<Object> data = Lists.newArrayList();
-		final String[] fields = request.getFields().toArray(new String[]{});
+		final String[] fields = request.getFields() == null ? null : request.getFields().toArray(new String[]{});
 		final Map<String, Object> values = mergeRelated(request, entity, toMap(entity, fields));
 
 		// special case for User/Group objects
@@ -669,12 +669,21 @@ public class Resource<T extends Model> {
 		List<Object> records = request.getRecords();
 		List<Object> data = Lists.newArrayList();
 
+		if ((records == null || records.isEmpty()) && request.getData() == null) {
+			response.setStatus(Response.STATUS_FAILURE);
+			return response;
+		}
+
 		if (records == null) {
 			records = Lists.newArrayList();
 			records.add(request.getData());
 		}
 
 		for(Object record : records) {
+
+			if (record == null) {
+				continue;
+			}
 
 			record = (Map) repository.validate((Map) record, request.getContext());
 
@@ -1024,6 +1033,7 @@ public class Resource<T extends Model> {
 	@SuppressWarnings("all")
 	private static Map<String, Object> unflatten(Map<String, Object> map, String... names) {
 		if (map == null) map = Maps.newHashMap();
+		if (names == null) return map;
 		for(String name : names) {
 			if (map.containsKey(name))
 				continue;

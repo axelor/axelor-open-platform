@@ -72,6 +72,10 @@ public class Criteria {
 
 	public static Criteria parse(Request request) {
 
+		if (request.getData() == null) {
+			return null;
+		}
+
 		final Map<String, Object> data = request.getData();
 		final Map<String, Object> raw = new HashMap<>();
 
