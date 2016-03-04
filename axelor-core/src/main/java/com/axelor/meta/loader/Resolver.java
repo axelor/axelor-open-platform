@@ -34,7 +34,7 @@ import com.google.common.collect.Sets;
  */
 final class Resolver {
 
-	private HashMap<String, Module> modules = Maps.newHashMap();
+	private HashMap<String, Module> modules = Maps.newLinkedHashMap();
 
 	private Module module(String name) {
 		Module module = modules.get(name);
