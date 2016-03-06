@@ -233,11 +233,11 @@ ui.formInput('Html', {
 
 	template_readonly:
 	'<div class="form-item-container">'+
-		'<div class="html-viewer" ui-bind-template x-text="text" x-locals="record" x-live="field.live"></div>'+
+		'<div class="html-viewer html-content" ui-bind-template x-text="text" x-locals="record" x-live="field.live"></div>'+
 	'</div>',
 	template_editable:
 	'<div class="form-item-container">'+
-		'<div class="html-editor"></div>'+
+		'<div class="html-editor html-content"></div>'+
 	'</div>'
 
 });
