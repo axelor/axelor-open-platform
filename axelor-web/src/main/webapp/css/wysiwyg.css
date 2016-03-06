@@ -94,3 +94,32 @@ input.wysiwyg-input {
 .slick-external-editor.html-item input.wysiwyg-input {
 	box-sizing: border-box;
 }
+
+/** normalize bootstrap css for content */
+.html-item .html-content blockquote {
+	margin: 0 0 9px 40px;
+	border: none;
+	padding: 0px;
+}
+
+.html-item .html-content blockquote p {
+	font-size: 13.25px;
+	font-weight: inherit;
+	line-height: 18px;
+}
+
+.html-item .html-content h1, h2, h3, h4, h5, h6 {
+	font-weight: 600;
+}
+
+.html-item .html-content h1 {
+	font-size: 24.75px;
+}
+
+.html-item .html-content h2 {
+	font-size: 22.25px;
+}
+
+.html-item .html-content h3 {
+	font-size: 18.75px;
+}
