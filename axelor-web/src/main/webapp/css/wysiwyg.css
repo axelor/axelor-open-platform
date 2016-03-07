@@ -98,6 +98,11 @@ input.wysiwyg-input {
 	padding: 0px;
 }
 
+/** force same style on chrome */
+.html-item .html-content blockquote[style*='margin: 0 0 0 40px'] {
+	margin: 0 0 9px 40px !important;
+}
+
 .html-item .html-content blockquote p {
 	font-size: 13.25px;
 	font-weight: inherit;

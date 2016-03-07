@@ -178,6 +178,24 @@ ui.formInput('Html', {
 			height = Math.max(100, height);
 		}
 
+		function isParagraph(node) {
+			return node && /^DIV|^P|^LI|^H[1-7]/.test(node.nodeName.toUpperCase());
+		}
+
+		function findParagraph(node) {
+			if (!node) return null;
+			if (node.classList && node.classList.contains('wysiwyg-editor')) return null;
+			if (isParagraph(node)) return node;
+			return findParagraph(node.parentNode);
+		}
+
+	    // Chrome and Edge supports this
+		document.execCommand('defaultParagraphSeparator', false, 'p');
+
+		// firefox uses attributes for some commands
+		document.execCommand('styleWithCSS');
+		document.execCommand('insertBrOnReturn', false, false);
+
 		editor.height(height).wysiwyg({
 			toolbar: 'top',
 			buttons: buttons,
@@ -188,7 +206,16 @@ ui.formInput('Html', {
             selectImage: _t('Click or drop image'),
             placeholderUrl: 'www.example.com',
             maxImageSize: [600, 200],
-			hijackContextmenu: false
+			hijackContextmenu: false,
+			onKeyPress: function(key, character, shiftKey, altKey, ctrlKey, metaKey) {
+				if (key !== 13 || shiftKey) {
+					return;
+				}
+		    	var parent = findParagraph(document.getSelection().anchorNode);
+			    if (!parent) {
+			    	document.execCommand('formatBlock', false, '<p>');
+			    }
+			}
 		});
 
 		var shell = editor.wysiwyg('shell');
@@ -220,15 +247,6 @@ ui.formInput('Html', {
 		};
 
 		editor.on('input', _.debounce(onChange, 100));
-		editor.on('keypress', function(e) {
-			// always start new paragraph on ENTER
-		    if(e.keyCode == '13' && !e.shiftKey) {
-		    	var current = document.queryCommandValue('formatBlock');
-		    	if (!current) {
-		    		document.execCommand('formatBlock', false, 'p');
-		    	}
-			}
-		});
 	},
 
 	template_readonly:
