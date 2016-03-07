@@ -44,7 +44,9 @@ function getStylePopup(element, styles) {
 	};
 }
 
-function getButtons(element, lite) {
+function getButtons(scope, element) {
+
+	var lite = scope.field.lite;
 
 	return {
 		style: lite ? false : {
@@ -153,6 +155,16 @@ function getButtons(element, lite) {
 		insertlink: lite ? false : {
             title: _t('Insert link'),
             image: '\uf08e'
+		},
+		d8: lite ? false : {
+			html: $('<span class="wysiwyg-toolbar-divider"></span>')
+		},
+		showCode: lite ? false : {
+			title: _t('Code'),
+			image: '\uf121',
+			click: function () {
+				scope.toggleCode();
+			}
 		}
 	};
 }
@@ -170,8 +182,8 @@ ui.formInput('Html', {
 
 	link_editable: function(scope, element, attrs, model) {
 		this._super(scope, element, attrs, model);
-		var editor = element.find('.html-editor');
-		var buttons = getButtons(editor, scope.field.lite);
+		var textElement = element.find('textarea');
+		var buttons = getButtons(scope, textElement);
 
 		var height = +(scope.field.height) || null;
 		if (height) {
@@ -196,7 +208,7 @@ ui.formInput('Html', {
 		document.execCommand('styleWithCSS');
 		document.execCommand('insertBrOnReturn', false, false);
 
-		editor.height(height).wysiwyg({
+		textElement.height(height).wysiwyg({
 			toolbar: 'top',
 			buttons: buttons,
 			submit: {
@@ -218,35 +230,62 @@ ui.formInput('Html', {
 			}
 		});
 
-		var shell = editor.wysiwyg('shell');
+		var shell = textElement.wysiwyg('shell');
+		var shellElement = $(shell.getElement());
+		var shellActive = true;
+
+		shellElement.addClass('html-content');
 
 		function onChange(e) {
-			var val = shell.getHTML();
+
+			var value = shellActive ? shell.getHTML() : textElement.val();
+
 			var old = scope.getValue();
-			var txt = scope.parse(val);
+			var txt = scope.parse(value);
 
 			if (old === txt) {
 				return;
 			}
 
-			scope.setValue(val, true);
+			scope.setValue(value, true);
 			scope.applyLater();
 		}
 
 		scope.$render_editable = function () {
-			var value = scope.getValue() || "",
-				html = shell.getHTML();
-
+			var value = scope.getValue() || "";
 			scope.text = scope.format(value);
 
-			if (value === html) {
-				return;
-			}
+			var current = shellActive ? shell : textElement;
+			var getter = shellActive ? 'getHTML' : 'val';
+			var setter = shellActive ? 'setHTML' : 'val';
 
-			shell.setHTML(value);
+			var html = current[getter]();
+			if (value !== html) {
+				current[setter](value);
+			}
 		};
 
-		editor.on('input', _.debounce(onChange, 100));
+		textElement.on('input paste change blur', _.debounce(onChange, 100));
+
+		scope.toggleCode = function () {
+
+			shellActive = !shellActive;
+
+			element.parent().find('.wysiwyg-toolbar-icon')
+				.toggleClass('disabled', !shellActive)
+				.last().removeClass('disabled');
+
+			if (shellActive) {
+				textElement.hide();
+				shellElement.show();
+				shell.setHTML(textElement.val());
+			} else {
+				var height = Math.max(100, shellElement.outerHeight());
+				shellElement.hide();
+				textElement.show().height(height);
+			}
+		}
+
 	},
 
 	template_readonly:
@@ -255,7 +294,7 @@ ui.formInput('Html', {
 	'</div>',
 	template_editable:
 	'<div class="form-item-container">'+
-		'<div class="html-editor html-content"></div>'+
+		'<textarea class="html-editor html-content"></textarea>'+
 	'</div>'
 
 });

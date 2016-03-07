@@ -20,7 +20,7 @@
 }
 
 .wysiwyg-editor {
-	min-height: 3em;
+	min-height: 100px;
 }
 
 .wysiwyg-popup {
@@ -61,6 +61,13 @@
 .wysiwyg-plugin-list a:hover {
     color: #fff;
     background-color: #5377b1;
+}
+
+.wysiwyg-toolbar-icon.disabled {
+	opacity: 0.3;
+	color: inherit;
+	background-color: inherit;
+	cursor: default;
 }
 
 .wysiwyg-popup.wysiwyg-popuphover {
@@ -123,4 +130,10 @@ input.wysiwyg-input {
 
 .html-item .html-content h3 {
 	font-size: 18.75px;
+}
+
+.html-item textarea.html-content {
+	border: none;
+	width: 100%;
+	margin: 0;
 }
