@@ -461,6 +461,7 @@
                 var $button;
                 if( toolbar_handler )
                     $button = toolbar_button( value ).click( function(event) {
+                    	if ( $( this ).hasClass('disabled') ) return false;
                         toolbar_handler( event.currentTarget );
                         // Give the focus back to the editor. Technically not necessary
                         if( get_toolbar_handler(key) ) // only if not a popup-handler

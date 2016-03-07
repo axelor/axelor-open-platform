@@ -20,7 +20,7 @@
 }
 
 .wysiwyg-editor {
-	min-height: inherit;
+	min-height: 100px;
 }
 
 .wysiwyg-popup {
@@ -63,12 +63,15 @@
     background-color: #5377b1;
 }
 
-.wysiwyg-popup.wysiwyg-popuphover {
-	width: auto;
+.wysiwyg-toolbar-icon.disabled {
+	opacity: 0.3;
+	color: inherit;
+	background-color: inherit;
+	cursor: default;
 }
 
-.wysiwyg-popup * {
-	box-sizing: content-box !important;
+.wysiwyg-popup.wysiwyg-popuphover {
+	width: auto;
 }
 
 input.wysiwyg-input {
@@ -127,4 +130,10 @@ input.wysiwyg-input {
 
 .html-item .html-content h3 {
 	font-size: 18.75px;
+}
+
+.html-item textarea.html-content {
+	border: none;
+	width: 100%;
+	margin: 0;
 }
