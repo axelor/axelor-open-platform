@@ -159,6 +159,13 @@ function getButtons(scope, element) {
 		d8: lite ? false : {
 			html: $('<span class="wysiwyg-toolbar-divider"></span>')
 		},
+		normalize: lite ? false : {
+	    	title: _t('Normalize'),
+	    	image: '\uf0d0',
+	    	click: function () {
+	    		scope.normalize();
+	    	}
+	    },
 		showCode: lite ? false : {
 			title: _t('Code'),
 			image: '\uf121',
@@ -284,7 +291,39 @@ ui.formInput('Html', {
 				shellElement.hide();
 				textElement.show().height(height);
 			}
-		}
+		};
+
+		scope.normalize = function () {
+
+    		var html = shell.getHTML();
+    		var div = $('<div>').html(html);
+
+    		div.find('p').css({
+    			'margin-top': 0,
+    			'margin-bottom': '1em'});
+
+    		div.find('ol,ul').each(function() {
+    			var el = $(this);
+    			if (el.parents('ol,ul').size()) return;
+    			el.css({
+	    			'margin-top': 0,
+	    			'margin-bottom': '1em'});
+    		});
+
+    		div.find('blockquote').each(function() {
+    			var el = $(this);
+    			el.css({
+	    			'margin': el.parents('blockquote').size() ? '0 0 0 2em' : '0 0 1em 2em',
+	    			'border': 'none',
+	    			'padding': 0
+	    		});
+    		});
+
+    		shellElement.focus();
+    		shell.setHTML(div[0].innerHTML);
+
+    		div.remove();
+		};
 
 	},
 
