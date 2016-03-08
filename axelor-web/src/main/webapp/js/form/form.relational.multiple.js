@@ -738,14 +738,15 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 
 			this.fetchSelection(request, function(items, page) {
 				var term = request.term;
+				var text = '<strong><em>' + term + '</em></strong>';
 				var canSelect = scope.canSelect() && (items.length < page.total || (request.term && items.length === 0));
 				if (field.create && term && scope.canNew()) {
 					items.push({
-						label : _t('Create "{0}" and select...', '<strong><em>' + term + '</em></strong>'),
+						label : _t('Create "{0}" and select...', text),
 						click : function() { create(term); }
 					});
 					items.push({
-						label : _t('Create "{0}"...', '<strong><em>' + term + '</em></strong>'),
+						label : _t('Create "{0}"...', text),
 						click : function() { create(term, true); }
 					});
 				}
