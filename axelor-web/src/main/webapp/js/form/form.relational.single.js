@@ -318,18 +318,15 @@ ui.formInput('ManyToOne', 'Select', {
 			});
 		}
 
-		if (!field.placeholder) {
-			input.on("change", function () {
-				input.attr('placeholder', input.is(':focus') ? _t('Search...') : null);
-			});
-			input.on("focus", function () {
-				input.attr('placeholder', _t('Search...'));
-			});
-			input.on("blur", function () {
-				input.attr('placeholder', '');
-			});
-		}
-
+		input.on("change", function () {
+			input.attr('placeholder', input.is(':focus') ? _t('Search...') : null);
+		});
+		input.on("focus", function () {
+			input.attr('placeholder', _t('Search...'));
+		});
+		input.on("blur", function () {
+			input.attr('placeholder', field.placeholder || '');
+		});
 		input.on("click", function () {
 			scope.showSelection();
 		});
