@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,7 @@ import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
@@ -214,7 +216,7 @@ public class XMLViews {
 		}
 		for(String type : views.keySet()) {
 			final String name = views.get(type);
-			final AbstractView view = findView(model, name, type);
+			final AbstractView view = findView(name, type, model);
 			try {
 				result.put(type, view);
 			} catch (Exception e) {
@@ -223,34 +225,86 @@ public class XMLViews {
 		return result;
 	}
 
-	public static AbstractView findView(String model, String name, String type) {
+	private static MetaView findMetaView(MetaViewRepository views, String name, String type, String model, String module, Long group) {
+		final List<String> select = new ArrayList<>();
+		if (name != null) {
+			select.add("self.name = :name");
+		}
+		if (type != null) {
+			select.add("self.type = :type");
+		}
+		if (model != null) {
+			select.add("self.model = :model");
+		}
+		if (module != null) {
+			select.add("self.module = :module");
+		}
+		if (group == null) {
+			select.add("self.groups is empty");
+		} else {
+			select.add("self.groups[].id = :group");
+		}
+		return views.all().filter(Joiner.on(" AND ").join(select))
+				.bind("name", name)
+				.bind("type", type)
+				.bind("model", model)
+				.bind("module", module)
+				.bind("group", group)
+				.cacheable()
+				.order("-priority")
+				.fetchOne();
+	}
+
+	public static AbstractView findView(String name, String type) {
+		return findView(name, type, null, null);
+	}
+
+	public static AbstractView findView(String name, String type, String model) {
+		return findView(name, type, model, null);
+	}
+
+	/**
+	 * Find view by the given parameters.
+	 *
+	 * <p>
+	 * This method will find view in following order:
+	 * </p>
+	 *
+	 * <ol>
+	 * <li> find custom view by name & current user
+	 * <li> find view matching given params with user's group
+	 * <li> find view matching given params but have no groups
+	 * </ol>
+	 *
+	 * @param name find by name
+	 * @param type find by type (name or model should be provided)
+	 * @param model find by model (name or type should be provided)
+	 * @param module (any of the other param should be provided)
+	 * @return
+	 */
+	public static AbstractView findView(String name, String type, String model, String module) {
 
 		final MetaViewRepository views = Beans.get(MetaViewRepository.class);
 		final MetaViewCustomRepository customViews = Beans.get(MetaViewCustomRepository.class);
 
+		final User user = AuthUtils.getUser();
+		final Long group = user != null && user.getGroup() != null ? user.getGroup().getId() : null;
+
 		MetaView view = null;
 		MetaViewCustom custom = null;
 
-		User user = AuthUtils.getUser();
-		Long group = user != null && user.getGroup() != null ? user.getGroup().getId() : null;
-
-		if (name != null) {
-
-			// find personalized view
-			if (user != null) {
-				custom = customViews.findByUser(name, model, user);
-				custom = custom == null ? customViews.findByUser(name, user) : custom;
-			}
-
-			// find default view
-			view = views.findByName(name, model, group);
-			view = view == null ? views.findByName(name, model) : view;
-			view = view == null ? views.findByName(name) : view;
+		// find personalized view
+		if (module == null && name != null && user != null) {
+			custom = customViews.findByUser(name, model, user);
+			custom = custom == null ? customViews.findByUser(name, user) : custom;
 		}
 
+		// first find by group
+		view = findMetaView(views, name, type, model, null, group);
+
+		// next find by no groups
 		if (view == null) {
-			view = views.findByType(type, model, group);
-			view = view == null ? views.findByType(type, model) : view;
+			view = findMetaView(views, name, type, model, null, null);
 		}
 
 		final AbstractView xmlView;
@@ -258,55 +312,21 @@ public class XMLViews {
 		try {
 			final String xml = custom == null ? view.getXml() : custom.getXml();
 			xmlView = ((ObjectViews) XMLViews.unmarshal(xml)).getViews().get(0);
-			xmlView.setViewId(view.getId());
-			if (view.getHelpLink() != null) {
-				xmlView.setHelpLink(view.getHelpLink());
-			}
 		} catch (Exception e) {
 			return null;
 		}
-		if (view.getModel() != null) {
-			metaModel = Beans.get(MetaModelRepository.class).all()
-					.filter("self.fullName = :name")
-					.bind("name", view.getModel())
-					.cacheable().autoFlush(false)
-					.fetchOne();
-			if (metaModel != null) {
-				xmlView.setModelId(metaModel.getId());
-			}
-		}
-		return xmlView;
-	}
-
-	public static AbstractView findView(String name, String module) {
-
-		final MetaView view = Beans.get(MetaViewRepository.class).all()
-				.filter("self.name = :name AND self.module = :module")
-				.bind("name", name)
-				.bind("module", module)
-				.order("-priority")
-				.cacheable().autoFlush(false)
-				.fetchOne();
-
-		final AbstractView xmlView;
-		final MetaModel metaModel;
-		try {
-			xmlView = ((ObjectViews) XMLViews.unmarshal(view.getXml())).getViews().get(0);
+		if (view != null) {
 			xmlView.setViewId(view.getId());
-			if (view.getHelpLink() != null) {
-				xmlView.setHelpLink(view.getHelpLink());
-			}
-		} catch (Exception e) {
-			return null;
-		}
-		if (view.getModel() != null) {
-			metaModel = Beans.get(MetaModelRepository.class).all()
-					.filter("self.fullName = :name")
-					.bind("name", view.getModel())
-					.cacheable().autoFlush(false)
-					.fetchOne();
-			if (metaModel != null) {
-				xmlView.setModelId(metaModel.getId());
+			xmlView.setHelpLink(view.getHelpLink());
+			if (view.getModel() != null) {
+				metaModel = Beans.get(MetaModelRepository.class).all()
+						.filter("self.fullName = :name")
+						.bind("name", view.getModel())
+						.cacheable().autoFlush(false)
+						.fetchOne();
+				if (metaModel != null) {
+					xmlView.setModelId(metaModel.getId());
+				}
 			}
 		}
 		return xmlView;

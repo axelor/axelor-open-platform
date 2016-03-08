@@ -273,7 +273,7 @@ public class TestActions extends MetaTest {
 	@Test
 	public void testEvents() throws Exception {
 		
-		FormView view = (FormView) MetaStore.getView("contact-form");
+		FormView view = (FormView) views.getViews().get(1);
 		assertNotNull(view);
 		
 		Map<String, Object> context = Maps.newHashMap();

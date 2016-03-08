@@ -35,17 +35,9 @@
     <string name="xmlId" unique="true" />
     <string name="helpLink" />
   	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
-    
-    <finder-method name="findByName" using="name"                     orderBy="-priority" cacheable="true"/>
-    <finder-method name="findByName" using="name,Long:groupId"        orderBy="-priority" filter="self.name = :name AND self.groups[].id = :groupId" cacheable="true"/>
-    <finder-method name="findByName" using="name,model"               orderBy="-priority" cacheable="true"/>
-    <finder-method name="findByName" using="name,model,Long:groupId"  orderBy="-priority" filter="self.name = :name AND self.model = :model AND self.groups[].id = :groupId" cacheable="true"/>
-    
-    <finder-method name="findByType" using="type,model"               orderBy="-priority" filter="self.model = :model AND self.type = :type" cacheable="true"/>
-    <finder-method name="findByType" using="type,model,Long:groupId"  orderBy="-priority" filter="self.model = :model AND self.type = :type AND self.groups[].id = :groupId" cacheable="true"/>
 
     <finder-method name="findByID" using="xmlId" />
-    <finder-method name="findByModule" using="name,module" cacheable="true"/>
+    <finder-method name="findByName" using="name" orderBy="-priority" cacheable="true"/>
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
 

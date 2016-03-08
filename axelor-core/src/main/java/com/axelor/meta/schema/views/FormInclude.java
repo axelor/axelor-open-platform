@@ -20,7 +20,7 @@ package com.axelor.meta.schema.views;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.meta.MetaStore;
+import com.axelor.meta.loader.XMLViews;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
@@ -58,7 +58,7 @@ public class FormInclude extends AbstractWidget {
 	
 	@JsonInclude
 	public AbstractView getView() {
-		AbstractView view = MetaStore.getView(name, module);
+		AbstractView view = XMLViews.findView(name, null, null, module);
 		if (view == owner) {
 			return null;
 		}

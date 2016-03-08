@@ -36,7 +36,6 @@ import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
-import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.Selection;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
@@ -56,25 +55,9 @@ public class MetaStore {
 	 */
 	static void resister(ObjectViews views) {
 		try {
-			for(AbstractView item : views.getViews())
-				register(item.getName(), item);
-		} catch (NullPointerException e){}
-		try {
 			for(Action item : views.getActions())
 				register(item.getName(), item);
 		} catch (NullPointerException e){}
-	}
-	
-	public static AbstractView getView(String name) {
-		return getView(name, null);
-	}
-	
-	public static AbstractView getView(String name, String module) {
-		// for unit tests
-		if (StringUtils.isBlank(module) && CACHE.containsKey(name)) {
-			return (AbstractView) CACHE.get(name);
-		}
-		return StringUtils.isBlank(module) ? XMLViews.findView(null, name, null) : XMLViews.findView(name, module);
 	}
 
 	public static Action getAction(String name) {

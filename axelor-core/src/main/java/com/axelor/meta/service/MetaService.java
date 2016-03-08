@@ -394,7 +394,7 @@ public class MetaService {
 	public Response findView(String model, String name, String type) {
 		Response response = new Response();
 
-		AbstractView data = XMLViews.findView(model, name, type);
+		AbstractView data = XMLViews.findView(name, type, model);
 		response.setData(data);
 		response.setStatus(Response.STATUS_SUCCESS);
 
@@ -436,7 +436,7 @@ public class MetaService {
 
 		LOG.debug("Search : {}", name);
 
-		Search search = (Search) XMLViews.findView(null, name, "search");
+		Search search = (Search) XMLViews.findView(name, "search");
 		ScriptHelper helper = search.scriptHandler(context);
 
 		List<Object> data = Lists.newArrayList();
@@ -573,7 +573,7 @@ public class MetaService {
 			return response;
 		}
 
-		ChartView chart = (ChartView) XMLViews.findView(null, name, "chart");
+		ChartView chart = (ChartView) XMLViews.findView(name, "chart");
 		if (chart == null) {
 			return response;
 		}
@@ -681,7 +681,7 @@ public class MetaService {
 			return response;
 		}
 
-		CustomView report = (CustomView) XMLViews.findView(null, viewName, "report");
+		CustomView report = (CustomView) XMLViews.findView(viewName, "report");
 		if (report == null) {
 			return response;
 		}

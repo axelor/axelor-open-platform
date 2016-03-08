@@ -112,7 +112,7 @@ public class ActionGroup extends ActionResumable {
 			if (XMLViews.isViewType(parts[0])) {
 				ActionView actionView = new ActionView();
 				ActionView.View view = new ActionView.View();
-				AbstractView xml = XMLViews.findView(null, parts[1], parts[0]);
+				AbstractView xml = XMLViews.findView(parts[1], parts[0]);
 
 				view.setType(parts[0]);
 				view.setName(parts[1]);
@@ -122,7 +122,7 @@ public class ActionGroup extends ActionResumable {
 				if (parts.length == 3) {
 					Class<?> model = ClassUtils.findClass(parts[2]);
 					actionView.setModel(model.getName());
-					xml = XMLViews.findView(model.getName(), parts[1], parts[0]);
+					xml = XMLViews.findView(parts[1], parts[0], model.getName());
 				}
 				if (xml != null) {
 					actionView.setTitle(xml.getTitle());
