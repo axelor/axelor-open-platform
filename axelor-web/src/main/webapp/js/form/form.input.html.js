@@ -101,36 +101,36 @@ function getButtons(scope, element) {
 			image: '\uf1dd',
 			popup: getStylePopup(element, {
 				'<p>' 			: _t('Normal'),
-		        '<pre>' 		: _t('<pre>Formated</pre>'),
-	        	'<blockquote>'	: _t('<blockquote>Blockquote</blockquote>'),
-		        '<h1>': _t('<h1>Header 1</h1>'),
-        		'<h2>': _t('<h2>Header 2</h2>'),
-				'<h3>': _t('<h3>Header 3</h3>'),
-				'<h4>': _t('<h4>Header 4</h4>'),
-				'<h5>': _t('<h5>Header 5</h5>'),
-				'<h6>': _t('<h6>Header 6</h6>')
+				'<pre>' 		: '<pre>' + _t('Formatted') + '</pre>',
+				'<blockquote>'	: '<blockquote>' + _t('Blockquote') + '</blockquote>',
+				'<h1>': '<h1>' + _t('Header 1') + '</h1>',
+				'<h2>': '<h2>' + _t('Header 2') + '</h2>',
+				'<h3>': '<h3>' + _t('Header 3') + '</h3>',
+				'<h4>': '<h4>' + _t('Header 4') + '</h4>',
+				'<h5>': '<h5>' + _t('Header 5') + '</h5>',
+				'<h6>': '<h6>' + _t('Header 6') + '</h6>'
 		    })
 		},
 		fontName: (lite || !$.browser.chrome) ? false : {
 			title: _t('Font'),
 			image: '\uf031',
 			popup: getFontNamePopup(element, {
-				'"Times New Roman", Times, serif': _t('<span style="font-family: \"Times New Roman\", Times, serif">Times New Roman</span>'),
-				'Arial, Helvetica, sans-serif': _t('<span style="font-family: Arial, Helvetica, sans-serif">Arial</span>'),
-				'"Courier New", Courier, monospace': _t('<span style="font-family: \"Courier New\", Courier, monospace">Courier New</span>'),
-				'Comic Sans, Comic Sans MS, cursive': _t('<span style="font-family: Comic Sans, Comic Sans MS, cursive">Comic Sans</span>'),
-				'Impact, fantasy': _t('<span style="font-family: Impact, fantasy">Impact</span>'),
+				'"Times New Roman", Times, serif': '<span style="font-family: \"Times New Roman\", Times, serif">Times New Roman</span>',
+				'Arial, Helvetica, sans-serif': '<span style="font-family: Arial, Helvetica, sans-serif">Arial</span>',
+				'"Courier New", Courier, monospace': '<span style="font-family: \"Courier New\", Courier, monospace">Courier New</span>',
+				'Comic Sans, Comic Sans MS, cursive': '<span style="font-family: Comic Sans, Comic Sans MS, cursive">Comic Sans</span>',
+				'Impact, fantasy': '<span style="font-family: Impact, fantasy">Impact</span>',
 		    })
 		},
 		fontSize: (lite || !$.browser.chrome) ? false : {
 			title: _t('Font size'),
 			image: '\uf035',
 			popup: getFontSizePopup(element, {
-				'1': '<span style="font-size: x-small">Smaller</span>',
-				'2': '<span style="font-size: small">Small</span>',
-				'3': '<span style="font-size: medium">Medium</span>',
-				'4': '<span style="font-size: large">Large</span>',
-				'5': '<span style="font-size: x-large">Larger</span>'
+				'1': '<span style="font-size: x-small">' + _t('Smaller') + '</span>',
+				'2': '<span style="font-size: small">' + _t('Small') + '</span>',
+				'3': '<span style="font-size: medium">' + _t('Medium') + '</span>',
+				'4': '<span style="font-size: large">' + _t('Large') + '</span>',
+				'5': '<span style="font-size: x-large">' + _t('Larger') + '</span>'
 		    })
 		},
 		d1: lite ? false : {
@@ -453,3 +453,4 @@ ui.directive('uiBindTemplate', ['$interpolate', function($interpolate){
 }]);
 
 })();
+
