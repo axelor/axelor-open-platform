@@ -1319,25 +1319,20 @@ label.has-help > span:after {
 .tag-select-placeholder {
     color: #777;
     font-size: 12px;
-	font-style: italic;
 }
 
 ::-webkit-input-placeholder {
 	font-size: 12px;
-	font-style: italic;
 }
 
 :-moz-placeholder { /* older Firefox*/
 	font-size: 12px;
-	font-style: italic;
 }
 
 ::-moz-placeholder { /* Firefox 19+ */
 	font-size: 12px; 
-	font-style: italic;
 } 
 
 :-ms-input-placeholder {
 	font-size: 12px;
-	font-style: italic;
 }
