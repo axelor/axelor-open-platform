@@ -210,7 +210,7 @@ public class XMLViews {
 
 		if (name != null) {
 			view = views.findByName(name, model, group);
-			if (view == null) {
+			if (view == null && group == null) {
 				view = views.findByName(name, model);
 				if (view == null) {
 					view = views.findByName(name);
@@ -220,7 +220,7 @@ public class XMLViews {
 
 		if (view == null) {
 			view = views.findByType(type, model, group);
-			if (view == null) {
+			if (view == null && group == null) {
 				view = views.findByType(type, model);
 			}
 		}
