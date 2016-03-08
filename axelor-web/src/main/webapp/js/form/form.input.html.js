@@ -111,7 +111,7 @@ function getButtons(scope, element) {
 				'<h6>': _t('<h6>Header 6</h6>')
 		    })
 		},
-		fontName: lite ? false : {
+		fontName: (lite || !$.browser.chrome) ? false : {
 			title: _t('Font'),
 			image: '\uf031',
 			popup: getFontNamePopup(element, {
@@ -122,7 +122,7 @@ function getButtons(scope, element) {
 				'Impact, fantasy': _t('<span style="font-family: Impact, fantasy">Impact</span>'),
 		    })
 		},
-		fontSize: lite ? false : {
+		fontSize: (lite || !$.browser.chrome) ? false : {
 			title: _t('Font size'),
 			image: '\uf035',
 			popup: getFontSizePopup(element, {
