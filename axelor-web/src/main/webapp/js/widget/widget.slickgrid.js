@@ -964,6 +964,15 @@ Grid.prototype._doInit = function(view) {
 				var header = grid.getHeaderRowColumn(col.id),
 					input = $('<input type="text">').data("columnId", col.id).appendTo(header),
 					field = col.descriptor || {};
+				input.on("change", function () {
+					input.attr('placeholder', input.is(':focus') ? _t('Search...') : null);
+				});
+				input.on("focus", function () {
+					input.attr('placeholder', _t('Search...'));
+				});
+				input.on("blur", function () {
+					input.attr('placeholder', '');
+				});
 				if (_.isArray(field.selectionList)) {
 					makeFilterCombo(input, field.selectionList, function(filter){
 						_.extend(filters, filter);
