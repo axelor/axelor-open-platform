@@ -44,6 +44,53 @@ function getStylePopup(element, styles) {
 	};
 }
 
+function getFontNamePopup(element, fonts) {
+
+	return function ($popup, $button) {
+
+		var $list = $('<div/>').addClass('wysiwyg-plugin-list')
+	                           .attr('unselectable', 'on');
+
+		$.each(fonts, function(font, name) {
+	        var $link = $('<a/>').attr('href','#')
+	                             .html(name)
+	                             .click(function(event) {
+	                                $(element).wysiwyg('shell').fontName(font).closePopup();
+	                                event.stopPropagation();
+	                                event.preventDefault();
+	                                return false;
+	                            });
+	        $list.append($link);
+	    });
+
+		$popup.append($list);
+	};
+}
+
+function getFontSizePopup(element, sizes) {
+
+	return function ($popup, $button) {
+
+		var $list = $('<div/>').addClass('wysiwyg-plugin-list')
+	                           .attr('unselectable', 'on');
+
+		$.each(sizes, function(size, name) {
+	        var $link = $('<a/>').attr('href','#')
+	                             .html(name)
+	                             .click(function(event) {
+	                            	$(element).focus();
+	                            	$(element).wysiwyg('shell').fontSize(size).closePopup();
+	                                event.stopPropagation();
+	                                event.preventDefault();
+	                                return false;
+	                            });
+	        $list.append($link);
+	    });
+
+		$popup.append($list);
+	};
+}
+
 function getButtons(scope, element) {
 
 	var lite = scope.field.lite;
@@ -53,21 +100,37 @@ function getButtons(scope, element) {
 			title: _t('Style'),
 			image: '\uf1dd',
 			popup: getStylePopup(element, {
-		        '<p>' 			: _t('Normal'),
-		        '<pre>' 		: _t('Formated'),
-	        	'<blockquote>'	: _t('Blockquote')
+				'<p>' 			: _t('Normal'),
+		        '<pre>' 		: _t('<pre>Formated</pre>'),
+	        	'<blockquote>'	: _t('<blockquote>Blockquote</blockquote>'),
+		        '<h1>': _t('<h1>Header 1</h1>'),
+        		'<h2>': _t('<h2>Header 2</h2>'),
+				'<h3>': _t('<h3>Header 3</h3>'),
+				'<h4>': _t('<h4>Header 4</h4>'),
+				'<h5>': _t('<h5>Header 5</h5>'),
+				'<h6>': _t('<h6>Header 6</h6>')
 		    })
 		},
-		header: lite ? false : {
-			title: _t('Header'),
-			image: '\uf1dc',
-			popup: getStylePopup(element, {
-		        '<h1>': _t('Header 1'),
-        		'<h2>': _t('Header 2'),
-				'<h3>': _t('Header 3'),
-				'<h4>': _t('Header 4'),
-				'<h5>': _t('Header 5'),
-				'<h6>': _t('Header 6')
+		fontName: lite ? false : {
+			title: _t('Font'),
+			image: '\uf031',
+			popup: getFontNamePopup(element, {
+				'"Times New Roman", Times, serif': _t('<span style="font-family: \"Times New Roman\", Times, serif">Times New Roman</span>'),
+				'Arial, Helvetica, sans-serif': _t('<span style="font-family: Arial, Helvetica, sans-serif">Arial</span>'),
+				'"Courier New", Courier, monospace': _t('<span style="font-family: \"Courier New\", Courier, monospace">Courier New</span>'),
+				'Comic Sans, Comic Sans MS, cursive': _t('<span style="font-family: Comic Sans, Comic Sans MS, cursive">Comic Sans</span>'),
+				'Impact, fantasy': _t('<span style="font-family: Impact, fantasy">Impact</span>'),
+		    })
+		},
+		fontSize: lite ? false : {
+			title: _t('Font size'),
+			image: '\uf035',
+			popup: getFontSizePopup(element, {
+				'1': '<span style="font-size: x-small">Smaller</span>',
+				'2': '<span style="font-size: small">Small</span>',
+				'3': '<span style="font-size: medium">Medium</span>',
+				'4': '<span style="font-size: large">Large</span>',
+				'5': '<span style="font-size: x-large">Larger</span>'
 		    })
 		},
 		d1: lite ? false : {

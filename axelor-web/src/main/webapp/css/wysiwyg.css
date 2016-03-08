@@ -43,7 +43,6 @@
 }
 
 .wysiwyg-plugin-list {
-    max-height: 16em;
     overflow: hidden;
 }
 
@@ -116,20 +115,46 @@ input.wysiwyg-input {
 	line-height: 18px;
 }
 
+.wysiwyg-plugin-list h1, h2, h3, h4, h5, h6,
 .html-item .html-content h1, h2, h3, h4, h5, h6 {
 	font-weight: 600;
 }
 
+.wysiwyg-plugin-list h1,
 .html-item .html-content h1 {
 	font-size: 24.75px;
 }
 
+.wysiwyg-plugin-list h2,
 .html-item .html-content h2 {
 	font-size: 22.25px;
 }
 
+.wysiwyg-plugin-list h3,
 .html-item .html-content h3 {
 	font-size: 18.75px;
+}
+
+.html-item textarea.html-content {
+	border: none;
+	width: 100%;
+	margin: 0;
+}
+
+.wysiwyg-plugin-list h1,
+.wysiwyg-plugin-list h2,
+.wysiwyg-plugin-list h3,
+.wysiwyg-plugin-list h4,
+.wysiwyg-plugin-list h5,
+.wysiwyg-plugin-list h6,
+.wysiwyg-plugin-list p,
+.wysiwyg-plugin-list pre,
+.wysiwyg-plugin-list blockquote {
+	margin: 0;
+}
+
+.wysiwyg-plugin-list pre {
+	padding: 2px 4px 0;
 }
 
 .html-item textarea.html-content {
