@@ -208,13 +208,6 @@ ui.formInput('Html', {
 			return findParagraph(node.parentNode);
 		}
 
-	    // Chrome and Edge supports this
-		document.execCommand('defaultParagraphSeparator', false, 'p');
-
-		// firefox uses attributes for some commands
-		document.execCommand('styleWithCSS');
-		document.execCommand('insertBrOnReturn', false, false);
-
 		textElement.height(height).wysiwyg({
 			toolbar: 'top',
 			buttons: buttons,
@@ -273,6 +266,16 @@ ui.formInput('Html', {
 		};
 
 		textElement.on('input paste change blur', _.debounce(onChange, 100));
+
+		textElement.on("focus", function (e) {
+
+		    // Chrome and Edge supports this
+			document.execCommand('defaultParagraphSeparator', false, 'p');
+
+			// firefox uses attributes for some commands
+			document.execCommand('styleWithCSS', false, true);
+			document.execCommand('insertBrOnReturn', false, false);
+		});
 
 		scope.toggleCode = function () {
 
