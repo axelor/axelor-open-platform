@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +48,7 @@ import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
@@ -183,7 +185,64 @@ public class XMLViews {
 		StringReader reader = new StringReader(xml);
 		return (ObjectViews) unmarshaller.unmarshal(reader);
 	}
-	
+
+	private static MetaView findMetaView(MetaViewRepository views,
+			String name, String type, String model, String module, Long group) {
+		final List<String> select = new ArrayList<>();
+		if (name != null) {
+			select.add("self.name = :name");
+		}
+		if (type != null) {
+			select.add("self.type = :type");
+		}
+		if (model != null) {
+			select.add("self.model = :model");
+		}
+		if (module != null) {
+			select.add("self.module = :module");
+		}
+		if (group == null) {
+			select.add("self.groups is empty");
+		} else {
+			select.add("self.groups[].id = :group");
+		}
+		return views.all().filter(Joiner.on(" AND ").join(select))
+				.bind("name", name)
+				.bind("type", type)
+				.bind("model", model)
+				.bind("module", module)
+				.bind("group", group)
+				.cacheable()
+				.order("-priority")
+				.fetchOne();
+	}
+
+	public static AbstractView findView(String name, String type, String model, String module) {
+
+		final MetaViewRepository views = Beans.get(MetaViewRepository.class);
+
+		User user = AuthUtils.getUser();
+		Long group = user != null && user.getGroup() != null ? user.getGroup().getId() : null;
+
+		// first find by group
+		MetaView view = findMetaView(views, name, type, model, module, group);
+
+		// next find with no group
+		if (view == null) {
+			view = findMetaView(views, name, type, model, module, null);
+		}
+
+		try {
+			final AbstractView xmlView = ((ObjectViews) XMLViews.unmarshal(view.getXml())).getViews().get(0);
+			if (view.getHelpLink() != null) {
+				xmlView.setHelpLink(view.getHelpLink());
+			}
+			return xmlView;
+		} catch (Exception e) {
+		}
+		return null;
+	}
+
 	public static Map<String, Object> findViews(String model, Map<String, String> views) {
 		final Map<String, Object> result = Maps.newHashMap();
 		if (views == null || views.isEmpty()) {
@@ -201,58 +260,11 @@ public class XMLViews {
 	}
 
 	public static AbstractView findView(String model, String name, String type) {
-
-		final MetaViewRepository views = Beans.get(MetaViewRepository.class);
-
-		MetaView view = null;
-		User user = AuthUtils.getUser();
-		Long group = user != null && user.getGroup() != null ? user.getGroup().getId() : null;
-
-		if (name != null) {
-			view = views.findByName(name, model, group);
-			if (view == null && group == null) {
-				view = views.findByName(name, model);
-				if (view == null) {
-					view = views.findByName(name);
-				}
-			}
-		}
-
-		if (view == null) {
-			view = views.findByType(type, model, group);
-			if (view == null && group == null) {
-				view = views.findByType(type, model);
-			}
-		}
-
-		try {
-			final AbstractView xmlView = ((ObjectViews) XMLViews.unmarshal(view.getXml())).getViews().get(0);
-			if (view.getHelpLink() != null) {
-				xmlView.setHelpLink(view.getHelpLink());
-			}
-			return xmlView;
-		} catch (Exception e) {
-		}
-		return null;
+		return findView(name, type, model, null);
 	}
 
 	public static AbstractView findView(String name, String module) {
-		MetaView view = Beans.get(MetaViewRepository.class).all()
-				.filter("self.name = :name AND self.module = :module")
-				.bind("name", name)
-				.bind("module", module)
-				.order("-priority")
-				.cacheable().autoFlush(false)
-				.fetchOne();
-		try {
-			final AbstractView xmlView = ((ObjectViews) XMLViews.unmarshal(view.getXml())).getViews().get(0);
-			if (view.getHelpLink() != null) {
-				xmlView.setHelpLink(view.getHelpLink());
-			}
-			return xmlView;
-		} catch (Exception e) {
-		}
-		return null;
+		return findView(name, null, null, module);
 	}
 
 	public static Action findAction(String name) {
