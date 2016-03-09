@@ -17,38 +17,76 @@
  */
 package com.axelor.meta;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
+import com.axelor.app.AppSettings;
+import com.axelor.dms.db.DMSFile;
 import com.axelor.meta.db.MetaFile;
+import com.axelor.test.db.Contact;
+import com.axelor.test.db.repo.ContactRepository;
+import com.google.inject.persist.Transactional;
 
 public class TestFiles extends MetaTest {
+
+	private static final String TEST_DIR_CONFIG = "{java.io.tmpdir}/.axelor/test-attachments";
+	private static final String TEST_DIR_PATH = AppSettings.get().getPath("" + UUID.randomUUID(), TEST_DIR_CONFIG);
+	private static final String TEST_DIR = AppSettings.get().getPath("file.upload.dir", "");
 
 	@Inject
 	private MetaFiles files;
 
+	@Inject
+	private ContactRepository contacts;
+
+	@After
+	@Before
+	public void cleanUp() throws IOException {
+
+		if (!TEST_DIR_PATH.equals(TEST_DIR)) {
+			Assert.fail();
+		}
+
+		Files.walkFileTree(Paths.get(TEST_DIR_PATH), new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult visitFile(Path file,
+					BasicFileAttributes attrs) throws IOException {
+				Files.deleteIfExists(file);
+				return FileVisitResult.CONTINUE;
+			}
+		});
+	}
+
 	@Test
 	public void testUpload() throws IOException {
 
-		Path tmp = Files.createTempFile("test", null);
+		Path tmp1 = Files.createTempFile("test", null);
 		Path tmp2 = Files.createTempFile("test2", null);
 
-		Files.write(tmp, "Hello...".getBytes());
+		Files.write(tmp1, "Hello...".getBytes());
 		Files.write(tmp2, "World...".getBytes());
 
-		MetaFile metaFile = files.upload(tmp.toFile());
+		MetaFile metaFile = files.upload(tmp1.toFile());
 		Assert.assertNotNull(metaFile);
 		Assert.assertNotNull(metaFile.getId());
 		Assert.assertEquals("text/plain", metaFile.getFileType());
 
 		// upload again
-		MetaFile metaFile2 = files.upload(tmp.toFile());
+		MetaFile metaFile2 = files.upload(tmp1.toFile());
 
 		// make sure upload path are not same
 		Assert.assertNotEquals(metaFile.getFilePath(), metaFile2.getFilePath());
@@ -66,9 +104,56 @@ public class TestFiles extends MetaTest {
 		Assert.assertEquals("World...", text2);
 		Assert.assertEquals(path1, path2);
 
-		Files.deleteIfExists(tmp);
+		Files.deleteIfExists(tmp1);
 		Files.deleteIfExists(tmp2);
 		Files.deleteIfExists(MetaFiles.getPath(metaFile));
 		Files.deleteIfExists(MetaFiles.getPath(metaFile2));
+	}
+
+	@Test
+	@Transactional
+	public void testAttach() throws IOException {
+
+		Contact contact = new Contact();
+		contact.setFirstName("Test");
+		contact.setLastName("DMS");
+		contact = contacts.save(contact);
+
+		Path tmp1 = MetaFiles.createTempFile(null, null);
+		Path tmp2 = MetaFiles.createTempFile(null, null);
+
+		// test tmp file helpers
+		Assert.assertNotNull(tmp1);
+		Assert.assertNotNull(tmp2);
+		Assert.assertNotEquals(tmp1, tmp2);
+		Assert.assertEquals(tmp1, MetaFiles.findTempFile(tmp1.getFileName().toString()));
+		Assert.assertEquals(tmp2, MetaFiles.findTempFile(tmp2.getFileName().toString()));
+
+		Files.write(tmp1, "Hello...".getBytes());
+		Files.write(tmp2, "World...".getBytes());
+
+		// attach 1st file, it should create a parent dms directory
+		DMSFile dms1 = files.attach(new FileInputStream(tmp1.toFile()), "dms-test1", contact);
+
+		Assert.assertNotNull(dms1);
+		Assert.assertNotNull(dms1.getParent());
+
+		// attach 2nd file, it should re-user existing parent dms directory
+		DMSFile dms2 =  files.attach(new FileInputStream(tmp2.toFile()), "dms-test2", contact);
+
+		Assert.assertNotNull(dms2);
+		Assert.assertNotNull(dms2.getParent());
+		Assert.assertEquals(dms1.getParent(), dms2.getParent());
+
+		// attach 2nd file again, it should create new file with name "dms-test2 (1)"
+		DMSFile dms3 =  files.attach(new FileInputStream(tmp2.toFile()), "dms-test2", contact);
+
+		Assert.assertNotNull(dms3);
+		Assert.assertEquals(dms3.getMetaFile().getFilePath(), "dms-test2 (1)");
+
+		// clean up uploaded files
+		files.delete(dms1);
+		files.delete(dms2);
+		files.delete(dms3);
 	}
 }
