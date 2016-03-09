@@ -151,13 +151,23 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 			dmsRoot = super.save(dmsRoot); // should get id before it's child
 		}
 
-		DMSFile dmsHome = new DMSFile();
-		dmsHome.setFileName(homeName);
-		dmsHome.setRelatedId(entity.getRelatedId());
-		dmsHome.setRelatedModel(entity.getRelatedModel());
-		dmsHome.setParent(dmsRoot);
-		dmsHome.setIsDirectory(true);
-		dmsHome = super.save(dmsHome); // should get id before it's child
+		DMSFile dmsHome = all().filter(""
+						+ "self.relatedId = :id AND self.relatedModel = :model AND self.isDirectory = true AND "
+						+ "self.parent.relatedModel = :model AND "
+						+ "(self.parent.relatedId is null OR self.parent.relatedId = 0)")
+				.bind("id", entity.getRelatedId())
+				.bind("model", entity.getRelatedModel())
+				.fetchOne();
+
+		if (dmsHome == null) {
+			dmsHome = new DMSFile();
+			dmsHome.setFileName(homeName);
+			dmsHome.setRelatedId(entity.getRelatedId());
+			dmsHome.setRelatedModel(entity.getRelatedModel());
+			dmsHome.setParent(dmsRoot);
+			dmsHome.setIsDirectory(true);
+			dmsHome = super.save(dmsHome); // should get id before it's child
+		}
 
 		entity.setParent(dmsHome);
 
