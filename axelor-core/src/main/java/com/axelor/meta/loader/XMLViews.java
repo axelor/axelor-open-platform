@@ -300,17 +300,17 @@ public class XMLViews {
 		}
 
 		// first find by group
-		view = findMetaView(views, name, null, model, null, group);
-		view = view == null ? findMetaView(views, name, null, null, null, group) : view;
+		view = findMetaView(views, name, null, model, module, group);
+		view = view == null ? findMetaView(views, name, null, null, module, group) : view;
 
 		// next find without group
-		view = view == null ? findMetaView(views, name, null, model, null, null) : view;
-		view = view == null ? findMetaView(views, name, null, null, null, null) : view;
+		view = view == null ? findMetaView(views, name, null, model, module, null) : view;
+		view = view == null ? findMetaView(views, name, null, null, module, null) : view;
 
 		// next find by type
 		if (type != null && model != null) {
-			view = view == null ? findMetaView(views, null, type, model, null, group) : view;
-			view = view == null ? findMetaView(views, null, type, model, null, null) : view;
+			view = view == null ? findMetaView(views, null, type, model, module, group) : view;
+			view = view == null ? findMetaView(views, null, type, model, module, null) : view;
 		}
 
 		final AbstractView xmlView;
