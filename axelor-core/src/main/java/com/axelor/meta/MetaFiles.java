@@ -133,10 +133,11 @@ public class MetaFiles {
 		synchronized (lock) {
 			int dotIndex = fileName.lastIndexOf('.');
 			int counter = 1;
-			String fileNameBase = fileName.substring(0, dotIndex);
+			String fileNameBase = fileName;
 			String fileNameExt = "";
 			if (dotIndex > -1) {
 				fileNameExt = fileName.substring(dotIndex);
+				fileNameBase = fileName.substring(0, dotIndex);
 			}
 			String targetName = fileName;
 			Path target = UPLOAD_PATH.resolve(targetName);
