@@ -94,7 +94,19 @@ public class MetaFiles {
 		Preconditions.checkNotNull(file, "file instance can't be null");
 		return UPLOAD_PATH.resolve(file.getFilePath());
 	}
-	
+
+	/**
+	 * Get the actual storage path of the given relative file path.
+	 *
+	 * @param filePath
+	 *            relative file path
+	 * @return actual file path
+	 */
+	public static Path getPath(String filePath) {
+		Preconditions.checkNotNull(filePath, "file path can't be null");
+		return UPLOAD_PATH.resolve(filePath);
+	}
+
 	/**
 	 * Create a temporary file under upload directory.
 	 * 
