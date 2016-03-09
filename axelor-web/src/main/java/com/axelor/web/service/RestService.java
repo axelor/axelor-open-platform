@@ -60,7 +60,6 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.common.ClassUtils;
-import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
@@ -83,7 +82,6 @@ import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaFileRepository;
 import com.axelor.meta.schema.actions.Action;
-import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
@@ -103,9 +101,6 @@ import com.google.inject.servlet.RequestScoped;
 @Path("/rest/{model}")
 public class RestService extends ResourceService {
 
-	@Inject
-	private MetaService service;
-	
 	@Inject
 	private MailMessageRepository messages;
 
@@ -303,9 +298,6 @@ public class RestService extends ResourceService {
 
 		return getResource().getRecordName(request);
 	}
-	
-	private static final String DEFAULT_UPLOAD_PATH = "{java.io.tmpdir}/axelor/attachments";
-	private static String uploadPath = AppSettings.get().getPath("file.upload.dir", DEFAULT_UPLOAD_PATH);
 
 	private void uploadSave(InputStream in, OutputStream out) throws IOException {
 		int read = 0;
@@ -389,16 +381,16 @@ public class RestService extends ResourceService {
 			@PathParam("field") String field,
 			@QueryParam("image") boolean isImage) throws IOException {
 
-		boolean isAttachment = MetaFile.class.getName().equals(getModel());
+		final boolean isAttachment = MetaFile.class.getName().equals(getModel());
 
-		Class klass = getResource().getModel();
-		Mapper mapper = Mapper.of(klass);
-		Model bean = JPA.find(klass, id);
+		final Class klass = getResource().getModel();
+		final Mapper mapper = Mapper.of(klass);
+		final Model bean = JPA.find(klass, id);
 
 		if (isAttachment) {
 			final String fileName = (String) mapper.get(bean, "fileName");
 			final String filePath = (String) mapper.get(bean, "filePath");
-			final File inputFile = FileUtils.getFile(uploadPath, filePath);
+			final File inputFile = Beans.get(MetaFiles.class).getPath(filePath).toFile();
 			if (!inputFile.exists()) {
 				return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
 			}
@@ -440,36 +432,6 @@ public class RestService extends ResourceService {
 				.ok(data)
 				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
 				.build();
-	}
-
-	@POST
-	@Path("{id}/attachment")
-	public Response attachment(@PathParam("id") long id, Request request) {
-		if (request == null || isEmpty(request.getFields())) {
-			return fail();
-		}
-		request.setModel(getModel());
-		return service.getAttachment(id, getModel(), request);
-	}
-
-	@POST
-	@Path("removeAttachment")
-	public Response removeAttachment(Request request) {
-		if (request == null || isEmpty(request.getRecords())) {
-			return fail();
-		}
-		request.setModel(getModel());
-		return service.removeAttachment(request, uploadPath);
-	}
-
-	@POST
-	@Path("{id}/addAttachment")
-	public Response addAttachment(@PathParam("id") long id, Request request) {
-		if (request == null || isEmpty(request.getData())) {
-			return fail();
-		}
-		request.setModel(getModel());
-		return service.addAttachment(id, request);
 	}
 
 	@POST
