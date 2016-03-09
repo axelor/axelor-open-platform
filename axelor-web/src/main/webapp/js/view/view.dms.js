@@ -1412,9 +1412,7 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 					return record.name || _.lpad(record.id, 5, '0');
 				}
 
-				var domain = "self.isDirectory = true AND self.relatedId = :rid AND self.relatedModel = :rmodel";
-
-				domain = "" +
+				var domain = "" +
 						"self.isDirectory = true AND " +
 						"self.relatedId = :rid AND " +
 						"self.relatedModel = :rmodel AND " +
