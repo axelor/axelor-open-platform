@@ -93,12 +93,25 @@ public class LdapTest extends AbstractLdapTestUnit {
 			groups.save(testGroup);
 			groups.save(myGroup);
 
+			// make sure there are no users
 			ensureUsers(0);
+
+			// attempt login with wrong password
 			loginFailed();
+
+			// it should not create user
 			ensureUsers(0);
+
+			// attempt login with good password
 			loginSuccess();
+
+			// it should create an user
 			ensureUsers(1);
+
+			// attempt login again with good password
 			loginSuccess();
+
+			// it should not create new user, as it's already created
 			ensureUsers(1);
 
 			// make sure groups are create on ldap server
