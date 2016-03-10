@@ -291,7 +291,6 @@
 	overflow: inherit;
 	background-color: #fff;
 	border: 1px solid #e7e7e7;
-	border-top: none;
 }
 
 .panel-tabs .tab-content > .panel {
@@ -443,7 +442,7 @@
 }
 
 .panel-tabs .nav-tabs-responsive {
-	margin-bottom: 0;
+	margin-bottom: -1px;
 	display: inline-flex;
 }
 
