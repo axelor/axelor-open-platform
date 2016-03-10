@@ -84,6 +84,24 @@ public final class L10n {
 	}
 
 	/**
+	 * Format the number value.
+	 *
+	 * @param value
+	 *            the value to format
+	 * @param grouping
+	 *            whether to use grouping in format
+	 * @return value as formated string
+	 */
+	public String format(Number value, boolean grouping) {
+		if (value == null) {
+			return null;
+		}
+		final NumberFormat fmt = NumberFormat.getInstance(locale);
+		fmt.setGroupingUsed(grouping);
+		return fmt.format(value);
+	}
+
+	/**
 	 * Format the date value.
 	 *
 	 * @param value

@@ -522,7 +522,7 @@ public class Resource<T extends Model> {
 						objValue = selection.get(index-3).get(objValue.toString());
 					}
 					if (objValue instanceof Number) {
-						objValue = formatter.format((Number) objValue);
+						objValue = formatter.format((Number) objValue, false);
 					}
 					if (objValue instanceof LocalDate) {
 						objValue = formatter.format((LocalDate) objValue);
