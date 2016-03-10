@@ -299,13 +299,16 @@ public class XMLViews {
 			custom = custom == null ? customViews.findByUser(name, user) : custom;
 		}
 
-		// first find by group
-		view = findMetaView(views, name, null, model, module, group);
-		view = view == null ? findMetaView(views, name, null, null, module, group) : view;
+		// first find by name
+		if (name != null) {
+			// with group
+			view = findMetaView(views, name, null, model, module, group);
+			view = view == null ? findMetaView(views, name, null, null, module, group) : view;
 
-		// next find without group
-		view = view == null ? findMetaView(views, name, null, model, module, null) : view;
-		view = view == null ? findMetaView(views, name, null, null, module, null) : view;
+			// without group
+			view = view == null ? findMetaView(views, name, null, model, module, null) : view;
+			view = view == null ? findMetaView(views, name, null, null, module, null) : view;
+		}
 
 		// next find by type
 		if (type != null && model != null) {
