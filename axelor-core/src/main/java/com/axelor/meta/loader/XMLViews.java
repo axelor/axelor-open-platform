@@ -224,12 +224,23 @@ public class XMLViews {
 		User user = AuthUtils.getUser();
 		Long group = user != null && user.getGroup() != null ? user.getGroup().getId() : null;
 
-		// first find by group
-		MetaView view = findMetaView(views, name, type, model, module, group);
+		MetaView view = null;
 
-		// next find with no group
-		if (view == null) {
-			view = findMetaView(views, name, type, model, module, null);
+		// first find by name
+		if (name != null) {
+			// with group
+			view = findMetaView(views, name, null, model, module, group);
+			view = view == null ? findMetaView(views, name, null, null, module, group) : view;
+
+			// without group
+			view = view == null ? findMetaView(views, name, null, model, module, null) : view;
+			view = view == null ? findMetaView(views, name, null, null, module, null) : view;
+		}
+
+		// next find by type
+		if (type != null && model != null) {
+			view = view == null ? findMetaView(views, null, type, model, module, group) : view;
+			view = view == null ? findMetaView(views, null, type, model, module, null) : view;
 		}
 
 		try {
