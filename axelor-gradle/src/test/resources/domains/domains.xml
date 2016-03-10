@@ -138,6 +138,7 @@
   <entity name="Account">
     <boolean name="active" />
     <string name="name" required="true" />
+    <string name="notes" />
     <one-to-one name="config" ref="AccountConfig" />
   </entity>
   <entity name="AccountConfig">
@@ -145,6 +146,12 @@
     <one-to-one name="account" ref="AccountConfig" mappedBy="config" />
     <one-to-one name="account2" ref="AccountConfig" mappedBy="config" orphanRemoval="true" />
     <one-to-one name="account3" ref="AccountConfig" mappedBy="config" orphanRemoval="false" />
+  </entity>
+
+  <!-- field replace test -->
+  <entity name="Account">
+     <string name="notes" large="true"/> <!-- should replace original one -->
+     <one-to-one name="config" ref="Contact" /> <!-- should not replace, target is different -->
   </entity>
 
   <entity name="ConstraintTester" persistable="false">

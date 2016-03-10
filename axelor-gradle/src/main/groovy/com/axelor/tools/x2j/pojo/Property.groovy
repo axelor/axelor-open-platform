@@ -108,7 +108,7 @@ class Property {
 	boolean isSimple() {
 		switch(type) {
 			case "string":
-				if (attrs["large"] == "true" || attrs["multiline"] == "true") return false
+				if (isLarge()) return false
 				return true
 			case "integer":
 			case "long":
@@ -354,6 +354,10 @@ class Property {
 		entity.importType(qname)
 	}
 
+	boolean isLarge() {
+		return attrs['large'] == 'true'
+	}
+
 	boolean isReference() {
 		type == "many-to-one" || type == "one-to-one"
 	}
@@ -551,7 +555,7 @@ class Property {
 		def translatable = attrs['translatable']
 		def copyable = attrs['copy']
 
-		if (massUpdate && (isUnique() || isCollection() || attrs['large'])) {
+		if (massUpdate && (isUnique() || isCollection() || isLarge())) {
 			massUpdate = false;
 		}
 
@@ -578,9 +582,7 @@ class Property {
 
 	private List<Annotation> $binary() {
 
-		def large = attrs['large'] != null
-
-		if (large && type == 'string') {
+		if (isLarge() && type == 'string') {
 			return [
 				annon("javax.persistence.Lob", true),
 				annon("javax.persistence.Basic").add("fetch", "javax.persistence.FetchType.LAZY", false),
@@ -588,7 +590,7 @@ class Property {
 			]
 		}
 
-		if (large || type == 'binary') {
+		if (isLarge() || type == 'binary') {
 			return [
 				annon("javax.persistence.Lob", true),
 				annon("javax.persistence.Basic").add("fetch", "javax.persistence.FetchType.LAZY", false)

@@ -197,11 +197,20 @@ class Entity {
 		return this.repository
 	}
 
+	private boolean isCompatible(Property existing, Property property) {
+		if (existing == null) return true
+		if (existing.isCollection() || existing.isTransient()) return false;
+		if (existing.type != property.type) return false
+		if (existing.target != property.target) return false
+		if (existing.large && !property.large) return false
+		return true
+	}
+
 	void merge(Entity other) {
 		
 		for (Property prop : other.properties) {
 			Property existing = propertyMap.get(prop.name)
-			if (existing == null || (existing.virtual && existing.type == prop.type && existing.target == prop.target)) {
+			if (isCompatible(existing, prop)) {
 				prop.ownEntity = prop.entity
 				prop.entity = this
 				if (existing != null) {
