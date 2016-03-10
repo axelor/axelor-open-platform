@@ -1,6 +1,15 @@
-# Current (3.1.2)
+# 3.1.2 (2016-03-10)
+
+## Improvements
+
+- support for order/limit of suggest box list
+- implement code view support for html widget
+- add button to normalize html value
 
 ## Bug fixes
+
+- normalize html widget content display
+- fix view by groups issue
 
 # 3.1.1 (2016-02-26)
 
