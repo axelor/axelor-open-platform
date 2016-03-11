@@ -729,6 +729,7 @@ ActionHandler.prototype = {
 		function findItems(name) {
 
 			var items;
+			var toolbar;
 			var containers;
 
 			if (formElement.is('[ui-slick-editors]')) {
@@ -738,12 +739,15 @@ ActionHandler.prototype = {
 			} else if (formElement.parent().is('[ui-panel-editor]')) {
 				containers = formElement.is('.m2o-editor-form,.o2m-editor-form') ? formElement : formElement.parents('[ui-form]:first').add(formElement);
 			} else {
-				containers = formElement.parents('.form-view:first')
-										.find('.record-toolbar:first')
-										.add(formElement);
+				containers = formElement;
+				toolbar = formElement.parents('.form-view:first').find('.record-toolbar:first');
 			}
 
-			return containers.find('[x-path="' + (formScope.formPath ? formScope.formPath + '.' + name : name) + '"]');
+			items = containers.find('[x-path="' + (formScope.formPath ? formScope.formPath + '.' + name : name) + '"]');
+			if (toolbar) {
+				return toolbar.find('[name="' + name + '"]').add(items);
+			}
+			return items;
 		}
 		
 		function setAttrs(item, itemAttrs, itemIndex) {
