@@ -275,7 +275,7 @@ ui.formInput('Html', {
 			return findParagraph(node.parentNode);
 		}
 
-		textElement.height(height).wysiwyg({
+		textElement.wysiwyg({
 			toolbar: 'top',
 			buttons: buttons,
 			submit: {
@@ -302,6 +302,15 @@ ui.formInput('Html', {
 		var shellActive = true;
 
 		shellElement.addClass('html-content');
+
+		if (scope.field.height) {
+			shellElement.parent().height(height).resizable({
+				handles: 's',
+				resize: function () {
+					shellElement.parent().width('');
+				}
+			});
+		}
 
 		function onChange(e) {
 
@@ -359,7 +368,11 @@ ui.formInput('Html', {
 			} else {
 				var height = Math.max(100, shellElement.outerHeight());
 				shellElement.hide();
-				textElement.show().height(height);
+				textElement.show();
+
+				if (!scope.field.height) {
+					textElement.height(height);
+				}
 			}
 		};
 
