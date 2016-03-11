@@ -330,7 +330,7 @@ ui.formInput('Html', {
 
 		textElement.on('input paste change blur', _.debounce(onChange, 100));
 
-		textElement.on("focus", function (e) {
+		textElement.on("focus", _.once(function (e) {
 
 		    // Chrome and Edge supports this
 			document.execCommand('defaultParagraphSeparator', false, 'p');
@@ -338,7 +338,7 @@ ui.formInput('Html', {
 			// firefox uses attributes for some commands
 			document.execCommand('styleWithCSS', false, true);
 			document.execCommand('insertBrOnReturn', false, false);
-		});
+		}));
 
 		scope.toggleCode = function () {
 
