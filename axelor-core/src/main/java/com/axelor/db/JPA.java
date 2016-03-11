@@ -593,6 +593,10 @@ public final class JPA {
 				continue;
 			}
 
+			if (p.getType() == PropertyType.ONE_TO_ONE) {
+				continue;
+			}
+
 			Object value = p.get(bean);
 			
 			if (value instanceof List && deep) {
