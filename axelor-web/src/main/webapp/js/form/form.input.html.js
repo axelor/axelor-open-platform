@@ -23,22 +23,20 @@ var ui = angular.module('axelor.ui');
 
 function getStylePopup(element, styles) {
 
-	return function ($popup, $button) {
+	return function($popup, $button) {
 
-		var $list = $('<div/>').addClass('wysiwyg-plugin-list')
-	                           .attr('unselectable', 'on');
+		var $list = $('<div/>').addClass('wysiwyg-plugin-list').attr('unselectable', 'on');
 
 		$.each(styles, function(format, name) {
-	        var $link = $('<a/>').attr('href','#')
-	                             .html(name)
-	                             .click(function(event) {
-	                                $(element).wysiwyg('shell').format(format).closePopup();
-	                                event.stopPropagation();
-	                                event.preventDefault();
-	                                return false;
-	                            });
-	        $list.append($link);
-	    });
+			var $link = $('<a/>').attr('href', '#').html(name).click(
+					function(event) {
+						$(element).wysiwyg('shell').format(format).closePopup();
+						event.stopPropagation();
+						event.preventDefault();
+						return false;
+					});
+			$list.append($link);
+		});
 
 		$popup.append($list);
 	};
@@ -46,22 +44,25 @@ function getStylePopup(element, styles) {
 
 function getFontNamePopup(element, fonts) {
 
-	return function ($popup, $button) {
+	return function($popup, $button) {
 
-		var $list = $('<div/>').addClass('wysiwyg-plugin-list')
-	                           .attr('unselectable', 'on');
+		var $list = $('<div/>').addClass('wysiwyg-plugin-list').attr('unselectable', 'on');
 
 		$.each(fonts, function(font, name) {
-	        var $link = $('<a/>').attr('href','#')
-	                             .html(name)
-	                             .click(function(event) {
-	                                $(element).wysiwyg('shell').fontName(font).closePopup();
-	                                event.stopPropagation();
-	                                event.preventDefault();
-	                                return false;
-	                            });
-	        $list.append($link);
-	    });
+			var $link = $('<a/>').attr('href', '#').html(name).click(
+					function(event) {
+						try {
+							document.execCommand('styleWithCSS', false, false);
+							$(element).wysiwyg('shell').fontName(font).closePopup();
+						} finally {
+							document.execCommand('styleWithCSS', false, true);
+						}
+						event.stopPropagation();
+						event.preventDefault();
+						return false;
+					});
+			$list.append($link);
+		});
 
 		$popup.append($list);
 	};
@@ -69,23 +70,26 @@ function getFontNamePopup(element, fonts) {
 
 function getFontSizePopup(element, sizes) {
 
-	return function ($popup, $button) {
+	return function($popup, $button) {
 
-		var $list = $('<div/>').addClass('wysiwyg-plugin-list')
-	                           .attr('unselectable', 'on');
+		var $list = $('<div/>').addClass('wysiwyg-plugin-list').attr('unselectable', 'on');
 
 		$.each(sizes, function(size, name) {
-	        var $link = $('<a/>').attr('href','#')
-	                             .html(name)
-	                             .click(function(event) {
-	                            	$(element).focus();
-	                            	$(element).wysiwyg('shell').fontSize(size).closePopup();
-	                                event.stopPropagation();
-	                                event.preventDefault();
-	                                return false;
-	                            });
-	        $list.append($link);
-	    });
+			var $link = $('<a/>').attr('href', '#').html(name).click(
+					function(event) {
+						$(element).focus();
+						try {
+							document.execCommand('styleWithCSS', false, false);
+							$(element).wysiwyg('shell').fontSize(size).closePopup();
+						} finally {
+							document.execCommand('styleWithCSS', false, true);
+						}
+						event.stopPropagation();
+						event.preventDefault();
+						return false;
+					});
+			$list.append($link);
+		});
 
 		$popup.append($list);
 	};
@@ -111,7 +115,7 @@ function getButtons(scope, element) {
 				'<h6>': '<h6>' + _t('Header 6') + '</h6>'
 		    })
 		},
-		fontName: (lite || !$.browser.chrome) ? false : {
+		fontName: lite ? false : {
 			title: _t('Font'),
 			image: '\uf031',
 			popup: getFontNamePopup(element, {
@@ -122,7 +126,7 @@ function getButtons(scope, element) {
 				'Impact, fantasy': '<span style="font-family: Impact, fantasy">Impact</span>',
 		    })
 		},
-		fontSize: (lite || !$.browser.chrome) ? false : {
+		fontSize: lite ? false : {
 			title: _t('Font size'),
 			image: '\uf035',
 			popup: getFontSizePopup(element, {
