@@ -110,7 +110,7 @@ task wrapper(type: Wrapper) {
 	gradleVersion = "2.8"
 }
 
-task("updateVersion", type: com.axelor.gradle.tasks.VersionTask) {
+task updateVersion(type: com.axelor.gradle.tasks.VersionTask) {
 	description "Update version text in source files."
 	group "Axelor"
 	processFiles = fileTree(projectDir) {
@@ -123,3 +123,5 @@ task("updateVersion", type: com.axelor.gradle.tasks.VersionTask) {
 		include '**/webapp/package.json'
 	}
 }
+
+apply from: "gradle/javadoc.gradle"

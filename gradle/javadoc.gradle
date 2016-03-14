@@ -1,0 +1,61 @@
+
+task generateDocs(type: Javadoc) {
+
+	description "Generate API docs."
+	group "Axelor"
+
+	destinationDir = file("${buildDir}/docs")
+	failOnError = false
+
+	exclude '**/internal/**'
+	exclude '**/*Impl.java'
+
+	include '**/com/axelor/common/**'
+	include '**/com/axelor/app/**'
+
+	include '**/com/axelor/auth/AuditableRunner.java'
+	include '**/com/axelor/auth/AuthModule.java'
+	include '**/com/axelor/auth/AuthService.java'
+	include '**/com/axelor/auth/AuthUtils.java'
+	include '**/com/axelor/auth/db/**'
+
+	include '**/com/axelor/data/**'
+	include '**/com/axelor/data/adapter/Adapter.java'
+	exclude '**/com/axelor/data/AuditHelper.java'
+	exclude '**/com/axelor/data/DataScriptHelper.java'
+	exclude '**/com/axelor/data/**/ElementConverter.java'
+
+	include '**/com/axelor/db/**'
+	exclude '**/com/axelor/db/JPA.java'
+	exclude '**/com/axelor/db/JpaClassLoader.java'
+
+	include '**/com/axelor/dms/**'
+	include '**/com/axelor/i18n/**'
+	exclude '**/com/axelor/i18n/I18nInterpolator.java'
+	include '**/com/axelor/inject/**'
+
+	include '**/com/axelor/mail/**'
+	exclude '**/com/axelor/mail/web/**'
+
+	include '**/com/axelor/meta/MetaFile.java'
+	include '**/com/axelor/meta/db/**'
+
+	include '**/com/axelor/quartz/**'
+	include '**/com/axelor/report/**'
+
+	include '**/com/axelor/rpc/**'
+	exclude '**/com/axelor/rpc/Resource.java'
+	exclude '**/com/axelor/rpc/RequestFilter.java'
+	exclude '**/com/axelor/rpc/ObjectMapperProvider.java'
+	exclude '**/com/axelor/rpc/ResponseInterceptor.java'
+
+	include '**/com/axelor/script/**'
+	include '**/com/axelor/text/**'
+}
+
+subprojects {
+	rootProject.tasks.generateDocs {
+		source sourceSets.main.allJava
+		classpath = files(sourceSets.main.compileClasspath)
+	}
+}
