@@ -51,6 +51,22 @@ task generateDocs(type: Javadoc) {
 
 	include '**/com/axelor/script/**'
 	include '**/com/axelor/text/**'
+
+	options.links = [
+		'https://docs.oracle.com/javaee/7/api',
+		'https://docs.oracle.com/javase/7/docs/api',
+		'http://google.github.io/guice/api-docs/4.0/javadoc',
+		'http://google.github.io/guava/releases/18.0/api/docs/',
+		'http://docs.jboss.org/hibernate/orm/4.2/javadocs',
+		'http://www.joda.org/joda-time/apidocs',
+		'https://www.quartz-scheduler.org/api/2.2.1',
+		'http://help.eclipse.org/mars/topic/org.eclipse.birt.doc.isv/model/api',
+		'http://help.eclipse.org/mars/topic/org.eclipse.birt.doc.isv/engine/api'
+	]
+
+	doFirst {
+		title = "Axelor Development Kit $version API"
+	}
 }
 
 subprojects {
