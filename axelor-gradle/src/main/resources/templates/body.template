@@ -47,12 +47,15 @@ ${p.documentation}
 
 	/**
 	 * Add the given {@link ${p.target}} item to the {@code ${p.name}}.
-	 *
 <% if (p.serverType == "one-to-many" && p.mappedBy) {%>\
+	 *
 	 * <p>
 	 * It sets {@code item.${p.mappedBy} = this} to ensure the proper relationship.
 	 * </p>
 <% } %>\
+	 *
+	 * @param item
+	 *            the item to add
 	 */
 	public void add${p.firstUpper(p.singularName)}($p.target item) {
 		if (${p.name} == null) {
@@ -66,12 +69,15 @@ ${p.documentation}
 
 	/**
 	 * Remove the given {@link ${p.target}} item from the {@code ${p.name}}.
-	 *
 <% if (p.serverType == "one-to-many" && !p.orphanRemoval) {%>\
+	 *
 	 * <p>
 	 * It sets {@code item.${p.mappedBy} = null} to break the relationship.
 	 * </p>
 <% } %>\
+	 *
+ 	 * @param item
+	 *            the item to remove
 	 */
 	public void remove${p.firstUpper(p.singularName)}($p.target item) {
 		if (${p.name} == null) {

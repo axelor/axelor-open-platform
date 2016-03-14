@@ -347,6 +347,8 @@ class Property {
 		return """
 \t/**
 \t * """ + text + """
+\t *
+\t * @return the property value
 \t */"""
 	}
 
