@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
@@ -77,8 +78,10 @@ public final class MailParser {
 	 * Parse the message.
 	 *
 	 * @return the {@link MailParser} instance itself
-	 * @throws MessagingException
 	 * @throws IOException
+	 *             generally thrown by {@link DataHandler}
+	 * @throws MessagingException
+	 *             for failures
 	 */
 	public MailParser parse() throws MessagingException, IOException {
 		this.parse(message);
@@ -110,6 +113,7 @@ public final class MailParser {
 	 *
 	 * @return list of {@link InternetAddress}
 	 * @throws MessagingException
+	 *             if unable to get addresses
 	 */
 	public List<InternetAddress> getCc() throws MessagingException {
 		return getRecipients(RecipientType.CC);
@@ -120,6 +124,7 @@ public final class MailParser {
 	 *
 	 * @return list of {@link InternetAddress}
 	 * @throws MessagingException
+	 *             if unable to get addresses
 	 */
 	public List<InternetAddress> getBcc() throws MessagingException {
 		return getRecipients(RecipientType.BCC);
@@ -130,6 +135,7 @@ public final class MailParser {
 	 *
 	 * @return {@link InternetAddress} or null if unable to read "from" field
 	 * @throws MessagingException
+	 *             if unable to get address
 	 */
 	public InternetAddress getFrom() throws MessagingException {
 		final InternetAddress[] all = (InternetAddress[]) message.getFrom();
@@ -144,6 +150,7 @@ public final class MailParser {
 	 *
 	 * @return {@link InternetAddress} or null unable to read "replyTo" field.
 	 * @throws MessagingException
+	 *             if unable to get address
 	 */
 	public InternetAddress getReplyTo() throws MessagingException {
 		final InternetAddress[] all = (InternetAddress[]) message.getReplyTo();
@@ -158,6 +165,7 @@ public final class MailParser {
 	 *
 	 * @return message subject line
 	 * @throws MessagingException
+	 *             for failure
 	 */
 	public String getSubject() throws MessagingException {
 		return message.getSubject();
@@ -166,6 +174,7 @@ public final class MailParser {
 	/**
 	 * Get plain text content if available.
 	 *
+	 * @return the content as plain text
 	 */
 	public String getText() {
 		if (text == null && html != null) {
@@ -176,6 +185,8 @@ public final class MailParser {
 
 	/**
 	 * Get the html content if available.
+	 * 
+	 * @return the html content
 	 *
 	 */
 	public String getHtml() {
@@ -184,7 +195,8 @@ public final class MailParser {
 
 	/**
 	 * Get the first line of the email as summary.
-	 * @return
+	 * 
+	 * @return return short text as summary
 	 */
 	public String getSummary() {
 		if (summary == null && getText() != null) {
@@ -194,6 +206,11 @@ public final class MailParser {
 		return summary;
 	}
 
+	/**
+	 * Get sanitized safe html.
+	 * 
+	 * @return sanitized html
+	 */
 	public String getSafeHtml() {
 		if (html == null) {
 			return null;
@@ -204,6 +221,7 @@ public final class MailParser {
 	/**
 	 * Whether the message is multipart message.
 	 *
+	 * @return true if multipart false otherwise
 	 */
 	public boolean isMultiPart() {
 		return isMultiPart;
@@ -211,7 +229,8 @@ public final class MailParser {
 
 	/**
 	 * Whether the message has attachments.
-	 *
+	 * 
+	 * @return true if has attachments false otherwise
 	 */
 	public boolean hasAttachments() {
 		return !attachments.isEmpty();
@@ -233,6 +252,7 @@ public final class MailParser {
 	 *            header name
 	 * @return first header value if found else null
 	 * @throws MessagingException
+	 *             for failures
 	 */
 	public String getHeader(String name) throws MessagingException {
 		final String[] all = message.getHeader(name);

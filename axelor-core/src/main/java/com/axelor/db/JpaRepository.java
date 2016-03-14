@@ -29,6 +29,12 @@ import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.axelor.inject.Beans;
 
+/**
+ * The JPA implementation of the {@link Repository}.
+ * 
+ * @param <T>
+ *            the type of bean class
+ */
 public class JpaRepository<T extends Model> implements Repository<T> {
 
 	protected Class<T> modelClass;
@@ -54,6 +60,8 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 	/**
 	 * Get the {@link Query} instance of the given type.
 	 *
+	 * @param <U>
+	 *            type of the model class
 	 * @param type
 	 *            the subtype of the managed model class.
 	 * @return instance of {@link Query}
@@ -85,6 +93,9 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 	/**
 	 * Make an entity managed and persistent.
 	 * 
+	 * @param entity
+	 *            the entity instance
+	 * 
 	 * @see EntityManager#persist(Object)
 	 */
 	public void persist(T entity) {
@@ -94,6 +105,9 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 	/**
 	 * Merge the state of the given entity into the current persistence context.
 	 * 
+	 * @param entity
+	 *            the entity instance
+	 * @return the managed instance
 	 * @see EntityManager#merge(Object)
 	 */
 	public T merge(T entity) {
@@ -134,6 +148,9 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 	/**
 	 * Refresh the state of the instance from the database, overwriting changes
 	 * made to the entity, if any.
+	 * 
+	 * @param entity
+	 *            the entity instance
 	 *
 	 * @see EntityManager#refresh(Object)
 	 */

@@ -34,19 +34,22 @@ public @interface TrackField {
 
 	/**
 	 * The field name to track.
-	 *
+	 * 
+	 * @return the field name
 	 */
 	String name();
 
 	/**
 	 * The condition to check.
 	 *
+	 * @return the condition
 	 */
 	String condition() default "";
 
 	/**
 	 * Specify the events on which to track.
-	 *
+	 * 
+	 * @return the list of events
 	 */
 	TrackEvent[] on() default TrackEvent.ALWAYS;
 }

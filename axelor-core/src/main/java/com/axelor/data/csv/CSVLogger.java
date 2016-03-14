@@ -40,8 +40,6 @@ import com.thoughtworks.xstream.XStream;
 /**
  * This {@link CSVLogger} class logs all errors during the import into a specific file.
  *
- * @author axelor
- *
  */
 public class CSVLogger {
 
@@ -69,7 +67,9 @@ public class CSVLogger {
 
 	/**
 	 * Main constructor
-	 * @param directory that will contain the files
+	 * 
+	 * @param csvConfig the config
+	 * @param dir that will contain the files
 	 */
 	public CSVLogger(CSVConfig csvConfig, String dir) {
 		this.errorDir = this.computeDir(dir);
@@ -84,7 +84,9 @@ public class CSVLogger {
 
 	/**
 	 * Delete all files and directories of the directory
+	 * 
 	 * @param file
+	 *            the directory
 	 */
 	private void cleanDir(File file) {
 		if (file.isDirectory()) {
@@ -110,8 +112,11 @@ public class CSVLogger {
 	}
 
 	/**
-	 * Get the directory where errors will be logs. Takes care to delete the directory.
-	 * @param directory that will contain the files
+	 * Get the directory where errors will be logs. Takes care to delete the
+	 * directory.
+	 * 
+	 * @param errorDir
+	 *            that will contain the files
 	 * @return the directory
 	 */
 	private File computeDir(String errorDir) {
@@ -120,9 +125,9 @@ public class CSVLogger {
 
 	/**
 	 * Log the row into a specific file.
+	 * 
 	 * @param values
-	 * @param csvBinder
-	 * @param csvInput
+	 *            the row values
 	 */
 	public void log(String[] values) {
 		if(this.errorDir == null || this.currentFile == null || this.csvInput == null) {
@@ -144,8 +149,10 @@ public class CSVLogger {
 
 	/**
 	 * Quote all text in tab
-	 * @param line
-	 * @return
+	 * 
+	 * @param values
+	 *            the row values
+	 * @return list of the quoted row values
 	 */
 	private Collection<String> transformLine(String[] values) {
 		return Collections2.transform(Arrays.asList(values), new Function<String, String>(){
@@ -159,8 +166,11 @@ public class CSVLogger {
 
 	/**
 	 * Configures the file that will receive the rows in error
+	 * 
 	 * @param csvInput
+	 *            the input
 	 * @param fields
+	 *            the header fields
 	 */
 	public void prepareInput(CSVInput csvInput, String[] fields) {
 		this.header = fields;
@@ -171,7 +181,10 @@ public class CSVLogger {
 
 	/**
 	 * Return an unique file (not already created)
-	 * @return file
+	 * 
+	 * @param fileName
+	 *            file name
+	 * @return file the file
 	 */
 	private File getCurrentFile(String fileName) {
 		if(!this.filesName.contains(this.csvInput.getFileName())) {
@@ -182,9 +195,13 @@ public class CSVLogger {
 
 	/**
 	 * Recursive method that determinate an unique file name
+	 * 
 	 * @param fileName
+	 *            file name
 	 * @param level
-	 * @return
+	 *            last level
+	 * 
+	 * @return unique file name
 	 */
 	private String getCurrentFile(String fileName, int level) {
 		String name = this.csvInput.getFileName().replace(".csv", "").concat("_" + level).concat(".csv");
@@ -214,7 +231,9 @@ public class CSVLogger {
 
 	/**
 	 * Append the current binding to the config file.
+	 * 
 	 * @throws IOException
+	 *             if unable to read config file
 	 */
 	private void computeBindings() throws IOException {
 		List<String> lines = Lists.newArrayList();
@@ -255,7 +274,9 @@ public class CSVLogger {
 
 	/**
 	 * Create the config file using {@link DEFAULT_CONFIG_NAME} as file name
+	 * 
 	 * @throws IOException
+	 *             if unable to create file
 	 */
 	private void createConfigFile() throws IOException {
 		this.configFile = new File(this.errorDir, DEFAULT_CONFIG_NAME);
@@ -264,8 +285,10 @@ public class CSVLogger {
 
 	/**
 	 * Build the xml file with appropriate declaration and name space.
+	 * 
 	 * @param xml
-	 * @return string
+	 *            the source xml to wrap
+	 * @return string proper xml wrapped with root element
 	 */
 	private String prepareXML(String xml) {
 		StringBuilder sb = new StringBuilder("<?xml version='1.0' encoding='UTF-8'?>\n");

@@ -23,8 +23,6 @@ import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Store;
 
-import com.google.common.base.Throwables;
-
 /**
  * The {@link MailReader} provides features to read mails.
  * 
@@ -58,15 +56,11 @@ public class MailReader {
 	 * @throws AuthenticationFailedException if authentication fails
 	 * @throws MessagingException if other failure
 	 */
-	public Store getStore() {
+	public Store getStore() throws AuthenticationFailedException, MessagingException {
 		if (store.isConnected()) {
 			return store;
 		}
-		try {
-			store.connect();
-		} catch (MessagingException e) {
-			throw Throwables.propagate(e);
-		}
+		store.connect();
 		return store;
 	}
 }

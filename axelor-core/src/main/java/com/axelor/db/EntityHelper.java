@@ -54,6 +54,8 @@ public final class EntityHelper {
 	/**
 	 * The toString helper method.
 	 *
+	 * @param <T>
+	 *            type of the entity
 	 * @param entity
 	 *            generate toString for the given entity
 	 * @return string
@@ -80,6 +82,8 @@ public final class EntityHelper {
 	 * This method searches for all the fields marked with {@link HashKey} and
 	 * uses them to generate the hash code.
 	 *
+	 * @param <T>
+	 *            type of the entity
 	 * @param entity
 	 *            generate the hashCode for the given entity
 	 * @return hashCode
@@ -106,6 +110,8 @@ public final class EntityHelper {
 	 * This method searches for all the fields marked with {@link HashKey} and
 	 * uses them to check for the equality.
 	 *
+	 * @param <T>
+	 *            type of the entity
 	 * @param entity
 	 *            the current entity
 	 * @param other
@@ -152,6 +158,8 @@ public final class EntityHelper {
 	 * instance.
 	 * </p>
 	 * 
+	 * @param <T>
+	 *            type of the entity
 	 * @param entity
 	 *            an entity instance
 	 * @return real class of the entity
@@ -182,6 +190,8 @@ public final class EntityHelper {
 	 * returns partial context instance.
 	 * </p>
 	 * 
+	 * @param <T>
+	 *            type of the entity
 	 * @param entity
 	 *            proxied entity
 	 * @return unproxied instance of the entity
@@ -203,6 +213,8 @@ public final class EntityHelper {
 	/**
 	 * Check whether the given lazy loading proxy instance is uninitialized.
 	 * 
+	 * @param <T>
+	 *            type of the entity
 	 * @param entity
 	 *            the lazy loading entity instance
 	 * @return true if uninitialized false otherwise

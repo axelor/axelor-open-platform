@@ -36,7 +36,7 @@ import java.lang.annotation.Target;
  * 	private String lastName;
  * 	...
  * 	...
- * 	@VirtualColumn
+ * 	{@literal @}VirtualColumn
  * 	public String getFullName() {
  * 		return firstName + " " + lastName;
  * 	}

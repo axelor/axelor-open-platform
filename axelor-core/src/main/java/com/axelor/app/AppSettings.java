@@ -132,6 +132,8 @@ public final class AppSettings {
 
 	/**
 	 * For internal use only.
+	 * 
+	 * @return the internal properties store
 	 */
 	public Properties getProperties() {
 		return properties;

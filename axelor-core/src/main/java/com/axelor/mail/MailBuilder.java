@@ -187,11 +187,8 @@ public final class MailBuilder {
 	 * For example:
 	 *
 	 * <pre>
-	 * builder
-	 * 	.html("<img src='cid:logo.png'>")
-	 * 	.attach("logo.png", "/path/to/logo.png", "<logo.png>"
-	 * 	.send();
-	 * <pre>
+	 * builder.html("&lt;img src='cid:logo.png'&gt;").attach("logo.png", "/path/to/logo.png", "&lt;logo.png&gt;").send();
+	 * </pre>
 	 *
 	 * @param name
 	 *            attachment file name
@@ -225,8 +222,6 @@ public final class MailBuilder {
 	 *            attachment file name
 	 * @param link
 	 *            attachment file link (url or file path)
-	 * @param inline
-	 *            whether to inline this attachment
 	 * @return this
 	 */
 	public MailBuilder inline(String name, String link) {
@@ -245,8 +240,10 @@ public final class MailBuilder {
 	 * Build a new {@link MimeMessage} instance from the provided details.
 	 *
 	 * @return an instance of {@link MimeMessage}
-	 * @throws MessagingException
 	 * @throws IOException
+	 *             generally thrown by {@link DataHandler}
+	 * @throws MessagingException
+	 *             for failure
 	 */
 	public MimeMessage build() throws MessagingException, IOException {
 		return build(null);
@@ -258,8 +255,10 @@ public final class MailBuilder {
 	 * @param messageId
 	 *            custom "Message-ID" to use, null to use auto-generated
 	 * @return an instance of {@link MimeMessage}
-	 * @throws MessagingException
 	 * @throws IOException
+	 *             generally thrown by {@link DataHandler}
+	 * @throws MessagingException
+	 *             for failure
 	 */
 	public MimeMessage build(final String messageId) throws MessagingException, IOException {
 
@@ -386,8 +385,10 @@ public final class MailBuilder {
 	 *            send date, can be null
 	 *
 	 * @return sent {@link MimeMessage}
-	 * @throws MessagingException
 	 * @throws IOException
+	 *             generally thrown by {@link DataHandler}
+	 * @throws MessagingException
+	 *             for failure
 	 */
 	public MimeMessage send(Date date) throws MessagingException, IOException {
 		final MimeMessage message = build();
@@ -403,8 +404,10 @@ public final class MailBuilder {
 	 * Send the message.
 	 *
 	 * @return sent {@link MimeMessage}
-	 * @throws MessagingException
 	 * @throws IOException
+	 *             generally thrown by {@link DataHandler}
+	 * @throws MessagingException
+	 *             for failure
 	 */
 	public MimeMessage send() throws MessagingException, IOException {
 		return send(new Date());

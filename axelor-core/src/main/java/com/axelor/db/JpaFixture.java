@@ -66,7 +66,7 @@ import com.google.inject.persist.Transactional;
  *     private String email;
  *     
  *     &#64;ManyToMany
- *     private Set<Circle> circles;
+ *     private Set&lt;Circle&gt; circles;
  *     ...
  *     ...
  *     ...
@@ -75,15 +75,15 @@ import com.google.inject.persist.Transactional;
  * The fixtures should be defined like this:
  * 
  * <pre>
- *  - !Circle: &family
+ *  - !Circle: &amp;family
  *   code: family
  *   name: Family
  * 
- * - !Circle: &friends
+ * - !Circle: &amp;friends
  *   code: friends
  *   name: Friends
  *   
- * - !Circle: &business
+ * - !Circle: &amp;business
  *   code: business
  *   name: Business
  * 

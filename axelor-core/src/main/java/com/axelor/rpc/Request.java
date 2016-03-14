@@ -171,7 +171,8 @@ public class Request {
 
 	/**
 	 * Get a {@link ScriptHelper} to evaluate expressions with current context.
-	 *
+	 * 
+	 * @return an instance of {@link ScriptHelper} for current context
 	 */
 	@JsonIgnore
 	public ScriptHelper getScriptHelper() {
@@ -188,6 +189,7 @@ public class Request {
 	/**
 	 * Get the domain object context.
 	 *
+	 * @return an instance of {@link Context}
 	 */
 	@JsonIgnore
 	public Context getContext() {

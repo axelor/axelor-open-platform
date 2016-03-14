@@ -103,6 +103,7 @@ public class JpaModule extends AbstractModule {
 	 * @param properties
 	 *            A set of name value pairs that configure a JPA persistence
 	 *            provider as per the specification.
+	 * @return this instance itself
 	 */
 	public JpaModule properties(final Properties properties) {
 		this.properties = properties;

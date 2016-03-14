@@ -75,9 +75,12 @@ public final class VersionUtils {
 		 * The version spec can be exact version number, or version number
 		 * prefixed with <code>~</code> it matches all subsequent patch
 		 * versions.
+		 * </p>
+		 * 
 		 * <p>
-		 * Giver a version <code>3.0.4<code> following holds:
-		 *
+		 * Giver a version <code>3.0.4</code> following holds:
+		 * </p>
+		 * 
 		 * <ul>
 		 * <li> 3.0.4 (matches)</li>
 		 * <li> 3.0.0 (doesn't match)</li>

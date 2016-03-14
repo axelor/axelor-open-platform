@@ -342,7 +342,7 @@ public class Context extends HashMap<String, Object> {
 	/**
 	 * Update the context with the specified key and value.<br>
 	 *
-	 * Use this method instead of {@link #put(String, Object)} to propagate the
+	 * Use this method instead of {@link #put} to propagate the
 	 * value to the underlying context object.
 	 *
 	 * @param key
@@ -361,7 +361,9 @@ public class Context extends HashMap<String, Object> {
 	 *
 	 * Use this method instead of {@link #putAll(Map)} to propagate the values
 	 * to the underlying context object.
-	 *
+	 * 
+	 * @param values
+	 *            mappings to be updated
 	 */
 	public void update(Map<String, Object> values) {
 		if (beanInstance == null || values == null || values.isEmpty()) {

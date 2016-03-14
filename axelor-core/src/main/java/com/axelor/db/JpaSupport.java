@@ -42,6 +42,7 @@ public abstract class JpaSupport {
 	/**
 	 * Get the instance of current {@link EntityManager}.
 	 * 
+	 * @return the {@link EntityManager} instance
 	 */
 	protected EntityManager getEntityManager() {
 		return JPA.em();
@@ -50,6 +51,8 @@ public abstract class JpaSupport {
 	/**
 	 * Get the {@link Query} instance for the given model class.
 	 * 
+	 * @param <T>
+	 *            the type of the model
 	 * @param modelClass
 	 *            the model class
 	 * @return an instance of {@link Query}

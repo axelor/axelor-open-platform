@@ -34,18 +34,21 @@ public @interface TrackMessage {
 	/**
 	 * The track message to generate if the given condition is true.
 	 *
+	 * @return the message
 	 */
 	String message();
 
 	/**
 	 * The condition to check.
 	 *
+	 * @return the condition
 	 */
 	String condition();
 
 	/**
 	 * Specify the events on which to use this message.
-	 *
+	 * 
+	 * @return the events
 	 */
 	TrackEvent[] on() default TrackEvent.ALWAYS;
 
@@ -59,12 +62,14 @@ public @interface TrackMessage {
 	 *   <li>info</li>
 	 * </ul>
 	 *
+	 * @return the tag style name
 	 */
 	String tag() default "";
 
 	/**
 	 * Only use the message if these fields are changed.
-	 *
+	 * 
+	 * @return the field names
 	 */
 	String[] fields() default "";
 }

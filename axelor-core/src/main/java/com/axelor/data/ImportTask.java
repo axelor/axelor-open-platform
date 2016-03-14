@@ -41,17 +41,20 @@ public abstract class ImportTask {
 	 * Configure the input sources using the various {@code input} methods.
 	 * 
 	 * @throws IOException
-	 * @see {@link #input(String, File)},
-	 *      {@link #input(String, File, Charset)}
-	 *      {@link #input(String, InputStream)},
-	 *      {@link #input(String, InputStream, Charset)},
-	 *      {@link #input(String, Reader)}
+	 *             if unable to read configuration
+	 * @see #input(String, File)
+	 * @see #input(String, File, Charset)
+	 * @see #input(String, InputStream)
+	 * @see #input(String, InputStream, Charset)
+	 * @see #input(String, Reader)
 	 */
 	public abstract void configure() throws IOException;
 	
 	/**
 	 * Provide import error handler.
 	 * 
+	 * @param e
+	 *            the error cause
 	 * @return return {@code true} to continue else terminate the task
 	 *         immediately.
 	 */
@@ -60,8 +63,10 @@ public abstract class ImportTask {
 	}
 	
 	/**
-	 * Provide io exception handler.
+	 * Provide {@link IOException} handler.
 	 * 
+	 * @param e
+	 *            the error cause
 	 * @return return {@code true} to continue else terminate the task
 	 *         immediately.
 	 */
@@ -70,8 +75,10 @@ public abstract class ImportTask {
 	}
 	
 	/**
-	 * Provide class exception handler.
+	 * Provide {@link ClassNotFoundException} handler.
 	 * 
+	 * @param e
+	 *            the error cause
 	 * @return return {@code true} to continue else terminate the task
 	 *         immediately.
 	 */
@@ -86,7 +93,7 @@ public abstract class ImportTask {
 	 *            the input name
 	 * @param source
 	 *            the input source
-	 * @throws FileNotFoundException
+	 * @throws FileNotFoundException if source file doesn't exist
 	 */
 	public void input(String inputName, File source) throws FileNotFoundException {
 		input(inputName, source, Charset.defaultCharset());
@@ -101,7 +108,7 @@ public abstract class ImportTask {
 	 *            the input source
 	 * @param charset
 	 *            the source encoding
-	 * @throws FileNotFoundException
+	 * @throws FileNotFoundException if source file doesn't exist
 	 */
 	public void input(String inputName, File source, Charset charset) throws FileNotFoundException {
 		input(inputName, new FileInputStream(source), charset);

@@ -198,7 +198,7 @@ public final class Inflector {
 	 * inflection.tableize(&quot;contacts&quot;); // &quot;Contact&quot;
 	 * </pre>
 	 * 
-	 * @param test
+	 * @param text
 	 *            the string to convert
 	 * @return converted string
 	 */
@@ -282,7 +282,7 @@ public final class Inflector {
 	 * <p>
 	 * It uses
 	 * {@link Normalizer#normalize(CharSequence, java.text.Normalizer.Form)}
-	 * with {@link Form.NFD} normalization and then replaces accented characters
+	 * with {@link Form#NFD} normalization and then replaces accented characters
 	 * with their equivalent unaccented characters.
 	 * 
 	 * @param text

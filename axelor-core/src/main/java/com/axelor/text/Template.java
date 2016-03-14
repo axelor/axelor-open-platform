@@ -38,7 +38,12 @@ public interface Template {
 
 	/**
 	 * Make a template renderer using the given context.
-	 * @param context the template context
+	 * 
+	 * @param <T>
+	 *            type of the context bean
+	 * @param context
+	 *            the template context
+	 * 
 	 * @return a {@link Renderer} instance
 	 */
 	<T extends Model> Renderer make(T context);

@@ -34,6 +34,8 @@ public @interface Sequence {
 
 	/**
 	 * The custom sequence name.
+	 * 
+	 * @return the sequence name
 	 */
 	String value();
 }

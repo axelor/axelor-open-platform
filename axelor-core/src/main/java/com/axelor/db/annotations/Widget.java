@@ -34,62 +34,72 @@ public @interface Widget {
 
 	/**
 	 * Title for the UI widget.
-	 *
+	 * 
+	 * @return the title
 	 */
 	String title() default "";
 
 	/**
 	 * Help text.
-	 *
+	 * 
+	 * @return help text
 	 */
 	String help() default "";
 
 	/**
 	 * Whether the widget should be set readonly.
-	 *
+	 * 
+	 * @return true if marked as readonly, default is false
 	 */
 	boolean readonly() default false;
 
 	/**
 	 * Whether to hide widget by default.
-	 *
+	 * 
+	 * @return true if marked as hidden, default is false
 	 */
 	boolean hidden() default false;
 
 	/**
 	 * Should be used with String fields to mark whether to use multiline text
 	 * widget.
-	 *
+	 * 
+	 * @return true if marked as multiline, default is false
 	 */
 	boolean multiline() default false;
 
 	/**
 	 * Use image widget for this binary field.
-	 *
+	 * 
+	 * @return true if marked as image, default is false
 	 */
 	boolean image() default false;
 
 	/**
 	 * Use password widget for this string field.
-	 *
+	 * 
+	 * @return true if marked as password, default is false
 	 */
 	boolean password() default false;
 
 	/**
 	 * Whether to allow mass update on this field.
 	 *
+	 * @return true if marked for mass update, default is false
 	 */
 	boolean massUpdate() default false;
 
 	/**
 	 * Whether to copy this field when creating duplicate record.
-	 *
+	 * 
+	 * @return true if marked as copyable, default is true
 	 */
 	boolean copyable() default true;
 
 	/**
 	 * Whether the field value is translatable.
-	 *
+	 * 
+	 * @return true if marked as translatable, default is false
 	 */
 	boolean translatable() default false;
 
@@ -99,19 +109,15 @@ public @interface Widget {
 	 * Used by auto-complete widget. By default the same column will be
 	 * searched. Also, in case of virtual column (computed values) specify the
 	 * actual searchable columns.
-	 *
+	 * 
+	 * @return array if fields on which to search, default is empty
 	 */
 	String[] search() default {};
 
 	/**
-	 * List of selection options.
-	 *
-	 * The list of value->label options for the selection widget. For example:
-	 *
-	 * <pre>
-	 * 	@Widget( select = "['mr', 'Mr.'], ['mrs', 'Mrs.'], ['miss', 'Miss']" )
-	 * </pre>
-	 *
+	 * The name of the selection.
+	 * 
+	 * @return name of the selection, default is empty
 	 */
 	String selection() default "";
 }

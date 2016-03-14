@@ -53,6 +53,8 @@ public final class Beans {
 	/**
 	 * Returns the appropriate instance for the given injection type.
 	 *
+	 * @param <T>
+	 *            type of the requested bean
 	 * @param type
 	 *            the requested type
 	 * @return an appropriate instance of the given type
@@ -64,7 +66,9 @@ public final class Beans {
 	/**
 	 * Returns the appropriate instance for the given injection type qualified
 	 * by the given annotation.
-	 *
+	 * 
+	 * @param <T>
+	 *            type of the requested bean
 	 * @param type
 	 *            the requested type
 	 * @param qualifier
@@ -78,6 +82,8 @@ public final class Beans {
 	/**
 	 * Injects dependencies into the fields and methods of {@code bean}.
 	 *
+	 * @param <T>
+	 *            type of the bean
 	 * @param bean
 	 *            to inject members on
 	 * @return the bean itself

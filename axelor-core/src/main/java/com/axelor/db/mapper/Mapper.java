@@ -165,8 +165,9 @@ public class Mapper {
 	 * If the {@link Mapper} class has been previously created for the given
 	 * class, then the {@link Mapper} class is retrieved from the cache.
 	 *
-	 * @param klassJava
-	 *            bean class
+	 * @param klass
+	 *            the bean class
+	 * @return an instance of {@link Mapper} for the given class.
 	 */
 	public static Mapper of(Class<?> klass) {
 		try {
@@ -326,6 +327,8 @@ public class Mapper {
 	 * Create an object of the given class mapping the given value map to it's
 	 * properties.
 	 *
+	 * @param <T>
+	 *            type of the bean
 	 * @param klass
 	 *            class of the bean
 	 * @param values

@@ -37,18 +37,22 @@ public @interface Track {
 
 	/**
 	 * The fields to track.
-	 *
+	 * 
+	 * @return the fields to track
 	 */
 	TrackField[] fields() default {};
 
 	/**
 	 * The track messages to generate.
 	 *
+	 * @return the messages to generate
 	 */
 	TrackMessage[] messages() default {};
 
 	/**
 	 * Subscribe for change notifications.
+	 * 
+	 * @return true if marked for auto-subscribe
 	 */
 	boolean subscribe() default false;
 }

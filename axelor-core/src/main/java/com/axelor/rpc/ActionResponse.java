@@ -188,6 +188,8 @@ public class ActionResponse extends Response {
 	/**
 	 * Inform the client to open the given view.
 	 * 
+	 * @param view
+	 *            the view to show
 	 */
 	public void setView(Map<String, Object> view) {
 		set("view", view);

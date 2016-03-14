@@ -46,7 +46,9 @@ public interface MailAccount {
 
 	/**
 	 * Set additional properties.
-	 *
+	 * 
+	 * @param properties
+	 *            the properties to set
 	 */
 	void setProperties(Properties properties);
 

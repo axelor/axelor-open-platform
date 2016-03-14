@@ -73,7 +73,9 @@ public class ReportGenerator {
 	 * @param params
 	 *            report parameters
 	 * @throws IOException
+	 *             if an I/O exception occurs
 	 * @throws BirtException
+	 *             if rendering fails
 	 */
 	public void generate(OutputStream output, String designName, String format, Map<String, Object> params)
 			throws IOException, BirtException {
@@ -94,7 +96,9 @@ public class ReportGenerator {
 	 * @param locale
 	 *            report output locale
 	 * @throws IOException
+	 *             if an I/O exception occurs
 	 * @throws BirtException
+	 *             if rendering fails
 	 */
 	@SuppressWarnings("unchecked")
 	public void generate(OutputStream output, String designName, String format, Map<String, Object> params,
@@ -150,11 +154,11 @@ public class ReportGenerator {
 	 *            output format
 	 * @param params
 	 *            report parameters
-	 * @param locale
-	 *            report output language
 	 * @return {@link Path} to the generated file
 	 * @throws IOException
+	 *             if an I/O exception occurs
 	 * @throws BirtException
+	 *             if rendering fails
 	 */
 	public File generate(String designName, String format, Map<String, Object> params) throws IOException, BirtException {
 		return generate(designName, format, params, AppFilter.getLocale());
@@ -174,7 +178,9 @@ public class ReportGenerator {
 	 *            report output language
 	 * @return {@link Path} to the generated file
 	 * @throws IOException
+	 *             if an I/O exception occurs
 	 * @throws BirtException
+	 *             if rendering fails
 	 */
 	public File generate(String designName, String format, Map<String, Object> params, Locale locale)
 			throws IOException, BirtException {

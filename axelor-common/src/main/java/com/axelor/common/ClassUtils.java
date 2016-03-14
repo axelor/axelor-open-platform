@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 /**
- * The class provides static helper methods to deal with classes & resource.
+ * The class provides static helper methods to deal with classes and resource.
  * 
  */
 public final class ClassUtils {

@@ -68,10 +68,13 @@ public class AuditableRunner {
 	/**
 	 * Run a batch job.
 	 * 
+	 * @param <T>
+	 *            type of the result
 	 * @param job
 	 *            the job to run
 	 * @return job result
 	 * @throws Exception
+	 *             if unable to compute a result
 	 */
 	public <T> T run(Callable<T> job) throws Exception {
 		Preconditions.checkNotNull(job);

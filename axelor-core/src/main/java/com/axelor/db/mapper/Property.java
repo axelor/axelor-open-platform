@@ -529,8 +529,6 @@ public class Property {
 	 *            the bean instance
 	 * @param item
 	 *            collection item
-	 * @param rest
-	 *            additional items
 	 * @return the same bean instance
 	 */
 	public Object add(Object bean, Object item) {
@@ -590,6 +588,10 @@ public class Property {
 	 * relationship if association is bidirectional (marked with mappedBy
 	 * attribute).
 	 *
+	 * @param <T>
+	 *            the type of the parent
+	 * @param <U>
+	 *            the type of the child
 	 * @param child
 	 *            the child item
 	 * @param bean
@@ -661,7 +663,13 @@ public class Property {
 
 	/**
 	 * Check whether the property value in the given bean is changed.
-	 *
+	 * 
+	 * @param bean
+	 *            the bean instance to check
+	 * @param oldValue
+	 *            the old value to check against
+	 * 
+	 * @return true if changed false otherwise
 	 */
 	public boolean valueChanged(Object bean, Object oldValue) {
 		Object current = get(bean);

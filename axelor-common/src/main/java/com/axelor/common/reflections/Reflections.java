@@ -31,6 +31,8 @@ public final class Reflections {
 	 * Return a {@link ClassFinder} to search for the sub types of the given
 	 * type.
 	 * 
+	 * @param <T>
+	 *            the type to search
 	 * @param type
 	 *            the super type
 	 * @param loader
@@ -46,6 +48,8 @@ public final class Reflections {
 	 * Return a {@link ClassFinder} to search for the sub types of the given
 	 * type.
 	 * 
+	 * @param <T>
+	 *            the type to search
 	 * @param type
 	 *            the super type
 	 * 

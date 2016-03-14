@@ -42,7 +42,8 @@ public class CSVConfig {
 
 	/**
 	 * Get all {@link #inputs} nodes
-	 * @return List<CSVInput>
+	 * 
+	 * @return the inputs
 	 */
 	public List<CSVInput> getInputs() {
 		return inputs;
@@ -50,7 +51,8 @@ public class CSVConfig {
 
 	/**
 	 * Set {@link #inputs} nodes
-	 * @param inputs
+	 * 
+	 * @param inputs the inputs
 	 */
 	public void setInputs(List<CSVInput> inputs) {
 		this.inputs = inputs;
@@ -58,8 +60,8 @@ public class CSVConfig {
 
 	/**
 	 * Get all {@link #adapters} nodes.
-	 * If {@link #adapters} is null, return a new list of {@see DataAdapter}.
-	 * @return
+	 * 
+	 * @return list of all adapters
 	 */
 	public List<DataAdapter> getAdapters() {
 		if (adapters == null) {
@@ -70,8 +72,10 @@ public class CSVConfig {
 
 	/**
 	 * Parse the <code>input</code> File
-	 * @param input File
-	 * @return
+	 * 
+	 * @param input
+	 *            the input file
+	 * @return an instance of {@link CSVConfig} for the given file
 	 */
 	public static CSVConfig parse(File input) {
 		XStream stream = new XStream();

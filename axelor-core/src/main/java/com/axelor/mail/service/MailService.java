@@ -40,6 +40,7 @@ public interface MailService {
 	 * @param message
 	 *            the message to send
 	 * @throws MailException
+	 *             on failure
 	 */
 	void send(MailMessage message) throws MailException;
 
@@ -47,6 +48,7 @@ public interface MailService {
 	 * Fetch mails from remote mail server.
 	 *
 	 * @throws MailException
+	 *             on failure
 	 */
 	void fetch() throws MailException;
 
@@ -71,7 +73,7 @@ public interface MailService {
 	/**
 	 * Search for email addresses matching the given text.
 	 *
-	 * @param match
+	 * @param matching
 	 *            the match text
 	 * @param selected
 	 *            already selected email addresses

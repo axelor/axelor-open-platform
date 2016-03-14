@@ -37,7 +37,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.inject.Provider;
 
 /**
  * The {@code Query} class allows filtering and fetching records quickly.
@@ -72,11 +71,6 @@ public class Query<T extends Model> {
 
 	/**
 	 * Create a new instance of {@code Query} with given bean class.
-	 *
-	 * <p>
-	 * Before using the instance, an {@code EntityManager} provider should be
-	 * either injected by the {@code Guice} container or should be provided
-	 * manually using {@link #setEntityManagerProvider(Provider)} method.
 	 *
 	 * @param beanClass
 	 *            model bean class
@@ -117,7 +111,7 @@ public class Query<T extends Model> {
 	 * This is equivalent to:
 	 *
 	 * <pre>
-	 * SELECT self from Person self WHERE (self.name = ?1) AND (self.age >= ?2)
+	 * SELECT self from Person self WHERE (self.name = ?1) AND (self.age &gt;= ?2)
 	 * </pre>
 	 *
 	 * <p>
@@ -168,7 +162,7 @@ public class Query<T extends Model> {
 	 * This is equivalent to:
 	 *
 	 * <pre>
-	 * SELECT p from Person p WHERE (p.name = ?1) AND (p.age >= ?2) AND (lang IN (?3, ?4)) ORDER BY p.name, p.age DESC
+	 * SELECT p from Person p WHERE (p.name = ?1) AND (p.age &gt;= ?2) AND (lang IN (?3, ?4)) ORDER BY p.name, p.age DESC
 	 * </pre>
 	 *
 	 * @param spec
@@ -301,8 +295,6 @@ public class Query<T extends Model> {
 
 	/**
 	 * Perform mass update on the matched records with the given values.
-	 * To avoid unexpected results, clear the session with {@link JPA.clear}
-	 * before running the update.
 	 *
 	 * @param values
 	 *            the key value map
@@ -331,7 +323,7 @@ public class Query<T extends Model> {
 	/**
 	 * This is similar to {@link #update(Map)} but updates only single field.
 	 *
-	 * @param field
+	 * @param name
 	 *            the field name whose value needs to be changed
 	 * @param value
 	 *            the new value
@@ -439,6 +431,7 @@ public class Query<T extends Model> {
 	 *
 	 * @param params
 	 *            mapping for named params.
+	 * @return the same instance
 	 */
 	public Query<T> bind(Map<String, Object> params) {
 		if (this.filter == null) {
@@ -460,7 +453,7 @@ public class Query<T extends Model> {
 	 *            the named parameter to bind
 	 * @param value
 	 *            the parameter value
-	 *
+	 * @return the same instance
 	 */
 	public Query<T> bind(String name, Object value) {
 		Map<String, Object> params = Maps.newHashMap();
@@ -485,7 +478,7 @@ public class Query<T extends Model> {
 	 * This results in following query:
 	 *
 	 * <pre>
-	 * SELECT _title.name, self.fullName JOIN LEFT self.title AS _title WHERE self.age > ? LIMIT 80
+	 * SELECT _title.name, self.fullName JOIN LEFT self.title AS _title WHERE self.age &gt; ? LIMIT 80
 	 * </pre>
 	 *
 	 * The {@link Selector#fetch(int, int)} method returns a List of Map instead
