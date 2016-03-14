@@ -10,77 +10,57 @@ environment for working with the sources.
 Prerequisite
 ------------
 
-* JDK 1.7
-* PostgreSQL 9.x
+* [JDK 1.7][uri_jdk]
+* [PostgreSQL 9.x][uri_postgresql]
 
-We recommend Oracle JDK only. The OpenJDK distributed with most of the Linux
-distributions may work but we have tested only with the Oracle JDK 1.7.
+We recommend to use [Oracle JDK][uri_jdk]. The OpenJDK distributed with most of
+the Linux distributions may work but we have not tested it extensively.
 
-```bash
-$ export JAVA_HOME=/path/to/jdk
-$ export PATH=$JAVA_HOME/bin:$PATH
-```
+	$ export JAVA_HOME=/path/to/jdk
+	$ export PATH=$JAVA_HOME/bin:$PATH
 
-Install PostgreSQL from your linux distribution’s package repositories.
+Install [PostgreSQL][uri_postgresql] from your Linux distribution’s package repositories.
 
 For ubuntu, you can do this:
 
-```bash
-$ sudo apt-get install postgresql
-````
+	$ sudo apt-get install postgresql
 
 Installation
 ------------
 
-[Download](https://github.com/axelor/axelor-development-kit/releases) the latest
-distribution package and extract the package somewhere and set following
-environment variables.
+Download the latest [distribution package](../../releases) or get the source from the repository.
 
-```bash
-$ export AXELOR_HOME=/path/to/axelor-development-kit
-$ export PATH=$AXELOR_HOME/bin:$PATH
-```
+	$ git clone https://github.com/axelor/axelor-development-kit.git
 
-or you can build from the latest source like this:
+	$ cd /path/to/axelor-development-kit
+	$ ./gradlew installDist
 
-```bash
-$ git clone https://github.com/axelor/axelor-development-kit.git
-$ cd axelor-development-kit
-$ ./gradlew installApp
-```
+	$ export AXELOR_HOME=/path/to/axelor-development-kit/build/install/axelor-development-kit
+	$ export PATH=$AXELOR_HOME/bin:$PATH
 
-```bash
-$ export AXELOR_HOME=/path/to/axelor-development-kit/build/install/axelor-development-kit
-$ export PATH=$AXELOR_HOME/bin:$PATH
-```
-
-You should have a special command `axelor' in your path now. Just try issuing
+You should have a special command `axelor` in your path now. Just try issuing
 following command on the terminal:
 
-```bash
-$ axelor --help
-```
+	$ axelor --help
 
 You should see output something like this:
 
-```
-Usage: axelor [--help] [--new <NAME>]
-Run the interactive shell or create a new axelor project.
-
-  -h, --help          show this help and exit
-  -v, --version       display version information
-      --new <NAME>    create a new application project
-
-You can also execute shell commands directly like:
-
-  axelor help
-  axelor help run
-  axelor clean
-  axelor build
-  axelor run -p 8000
-
-See detailed documentation at http://axelor.com/docs/adk.
-```
+	Usage: axelor [--help] [--new <NAME>]
+	Run the interactive shell or create a new axelor project.
+	
+	  -h, --help          show this help and exit
+	  -v, --version       display version information
+	      --new <NAME>    create a new application project
+	
+	You can also execute shell commands directly like:
+	
+	  axelor help
+	  axelor help run
+	  axelor clean
+	  axelor build
+	  axelor run -p 8000
+	
+	See detailed documentation at http://docs.axelor.com/adk.
 
 The command line utility can also be used in interactive mode where the utility
 runs in a special shell from where you can issue various commands.
@@ -88,12 +68,19 @@ runs in a special shell from where you can issue various commands.
 What’s Next?
 ------------
 
-Follow the [Quickstart Guide](http://axelor.com/docs/adk/quickstart/) for more
-detailed introduction.
+Please check the [documentation][uri_docs] for more detailed introduction.
 
 Links
 -----
 
-* [Axelor](http://axelor.com)
-* [Documentation](http://axelor.com/docs/adk)
-* [License](http://www.gnu.org/licenses/agpl.html)
+* [Axelor][uri_axelor]
+* [Documentation][uri_docs]
+* [Community][uri_code]
+* [License][uri_license]
+
+[uri_axelor]: http://www.axelor.com
+[uri_docs]: http://www.axelor.com/docs/adk
+[uri_code]: http://www.axelor.com/en/communauty
+[uri_license]: http://www.gnu.org/licenses/agpl.html
+[uri_jdk]: http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
+[uri_postgresql]: http://www.postgresql.org/download/
