@@ -75,12 +75,10 @@ Links
 
 * [Axelor][uri_axelor]
 * [Documentation][uri_docs]
-* [Community][uri_code]
 * [License][uri_license]
 
 [uri_axelor]: http://www.axelor.com
-[uri_docs]: http://www.axelor.com/docs/adk
-[uri_code]: http://www.axelor.com/en/communauty
+[uri_docs]: http://docs.axelor.com/adk
 [uri_license]: http://www.gnu.org/licenses/agpl.html
 [uri_jdk]: http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
 [uri_postgresql]: http://www.postgresql.org/download/

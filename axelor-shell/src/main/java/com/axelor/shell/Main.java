@@ -62,7 +62,7 @@ public class Main {
 		System.out.println("  axelor build");
 		System.out.println("  axelor run -p 8000");
 		System.out.println();
-		System.out.println("See detailed documentation at http://axelor.com/docs/adk.");
+		System.out.println("See detailed documentation at http://docs.axelor.com/adk.");
 	}
 	
 	public static void main(String[] args) throws Exception {
