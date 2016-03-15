@@ -8,8 +8,8 @@
     <field name="typeIcon" x-type="icon"/>
     <field name="fileName"/>
     <field name="downloadIcon" x-type="icon"/>
-    <field name="detailsIcon" x-type="icon" />
-    <field name="lastModified" title="Last modified" width="120" x-type="datetime"/>
+    <field name="detailsIcon" x-type="icon"/>
+    <field name="updatedOn" title="Last modified" width="120"/>
     <field name="metaFile.sizeText" title="Size" width="80"/>
   </grid>
 

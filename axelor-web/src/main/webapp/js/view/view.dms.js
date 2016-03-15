@@ -1173,7 +1173,7 @@ ui.directive("uiDmsDetails", function () {
 					info.tags = record.tags;
 					info.owner = (record.createdBy||{}).name;
 					info.created = moment(record.createdOn).format('DD/MM/YYYY HH:mm');
-					info.updated = moment(record.lastModifiedOn).format('DD/MM/YYYY HH:mm');
+					info.updated = moment(record.updatedOn || record.createdOn).format('DD/MM/YYYY HH:mm');
 					info.canOffline = !record.isDirectory && (record.metaFile || record['metaFile.id']);
 					info.offline = record.offline;
 				}

@@ -342,11 +342,10 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 			json.put("offline", true);
 		}
 
-		json.put("lastModified", dt);
 		json.put("createdOn", file.getCreatedOn());
 		json.put("createdBy", file.getCreatedBy());
 		json.put("updatedBy", file.getUpdatedBy());
-		json.put("updatedOn", file.getUpdatedOn());
+		json.put("updatedOn", dt);
 
 		if ("html".equals(file.getContentType())) {
 			json.put("fileType", "text/html");
@@ -366,6 +365,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 			String fileIcon = metaFiles.fileTypeIcon(metaFile);
 			json.put("fileType", fileType);
 			json.put("typeIcon", "fa fa-colored " + fileIcon);
+			json.put("metaFile.sizeText", metaFile.getSizeText());
 		}
 
 		if (file.getTags() != null) {
