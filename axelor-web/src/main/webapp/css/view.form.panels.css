@@ -114,6 +114,10 @@
 	margin-bottom: 6px;
 }
 
+.panel .row-fluid > .form-item-hidden {
+	margin-bottom: 0;
+}
+
 .panel .row-fluid:last-child > .form-item-hidden,
 .panel .row-fluid:last-child > .form-item {
 	margin-bottom: 1px;
