@@ -411,7 +411,9 @@ angular.module('axelor.ui').directive('uiViewPane', function() {
 				return 'partials/views/' + type + '.html';
 			};
 
-			$scope.switchTo((params.viewType || params.type));
+			if (!params.action) {
+				$scope.switchTo((params.viewType || params.type));
+			}
 		}],
 		link: function(scope, element, attrs) {
 		
