@@ -100,11 +100,7 @@ function FormViewCtrl($scope, $element) {
 		if (recordId) {
 			routeId = recordId;
 			return viewPromise.then(function(){
-				var forceEdit = params.forceEdit || (params.params && params.params.forceEdit);
 				doEdit(recordId);
-				if (forceEdit) {
-					$scope.setEditable();
-				}
 			});
 		}
 		
@@ -149,8 +145,13 @@ function FormViewCtrl($scope, $element) {
 
 	var editable = false;
 
+	$scope.isForceEdit = function () {
+		var params = this._viewParams || {};
+		return params.forceEdit || (params.params && params.params.forceEdit);
+	}
+
 	$scope.isEditable = function() {
-		return editable;
+		return $scope.isForceEdit() || editable;
 	};
 
 	$scope.setEditable = function() {
@@ -628,12 +629,10 @@ function FormViewCtrl($scope, $element) {
 	$scope.onBack = function() {
 		var record = $scope.record || {};
 		var editable = $scope.isEditable();
-
-		if (record.id && editable && $scope.canEdit()) {
+		if (!$scope.isForceEdit() && record.id && editable && $scope.canEdit()) {
 			$scope.setEditable(false);
 			return;
 		}
-
 		$scope.switchTo("grid");
 	};
 
