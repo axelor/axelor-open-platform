@@ -82,6 +82,7 @@ import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaFileRepository;
 import com.axelor.meta.schema.actions.Action;
+import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
@@ -101,6 +102,9 @@ import com.google.inject.servlet.RequestScoped;
 @Path("/rest/{model}")
 public class RestService extends ResourceService {
 
+	@Inject
+	private MetaService service;
+	
 	@Inject
 	private MailMessageRepository messages;
 
@@ -298,6 +302,9 @@ public class RestService extends ResourceService {
 
 		return getResource().getRecordName(request);
 	}
+	
+	private static final String DEFAULT_UPLOAD_PATH = "{java.io.tmpdir}/axelor/attachments";
+	private static String uploadPath = AppSettings.get().getPath("file.upload.dir", DEFAULT_UPLOAD_PATH);
 
 	private void uploadSave(InputStream in, OutputStream out) throws IOException {
 		int read = 0;
@@ -432,6 +439,36 @@ public class RestService extends ResourceService {
 				.ok(data)
 				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
 				.build();
+	}
+
+	@POST
+	@Path("{id}/attachment")
+	public Response attachment(@PathParam("id") long id, Request request) {
+		if (request == null || isEmpty(request.getFields())) {
+			return fail();
+		}
+		request.setModel(getModel());
+		return service.getAttachment(id, getModel(), request);
+	}
+
+	@POST
+	@Path("removeAttachment")
+	public Response removeAttachment(Request request) {
+		if (request == null || isEmpty(request.getRecords())) {
+			return fail();
+		}
+		request.setModel(getModel());
+		return service.removeAttachment(request, uploadPath);
+	}
+
+	@POST
+	@Path("{id}/addAttachment")
+	public Response addAttachment(@PathParam("id") long id, Request request) {
+		if (request == null || isEmpty(request.getData())) {
+			return fail();
+		}
+		request.setModel(getModel());
+		return service.addAttachment(id, request);
 	}
 
 	@POST
