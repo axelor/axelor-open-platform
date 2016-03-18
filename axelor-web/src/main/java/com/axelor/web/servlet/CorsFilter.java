@@ -124,8 +124,8 @@ public class CorsFilter implements Filter {
 		res.addHeader("Access-Control-Allow-Methods", corsAllowMethods);
 		res.addHeader("Access-Control-Allow-Headers", corsAllowHeaders);
 
-		 // Just ACCEPT and REPLY OK if OPTIONS
-        if (req.getMethod().equals("OPTIONS") ) {
+		// Just ACCEPT and REPLY OK if OPTIONS (preflight request)
+        if (req.getMethod().equals("OPTIONS") && !isBlank(req.getHeader("Access-Control-Request-Method"))) {
             res.setStatus(HttpServletResponse.SC_OK);
             return;
         }
