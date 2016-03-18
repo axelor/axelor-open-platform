@@ -276,7 +276,7 @@ function FormViewCtrl($scope, $element) {
 	};
 	
 	$scope.editRecord = function(record) {
-		$scope.$$original = record || {};
+		$scope.$$original = angular.copy(record) || {};
 		$scope.$$dirty = false;
 		$scope.record = angular.copy($scope.$$original);
 		$scope._viewPromise.then(function(){
