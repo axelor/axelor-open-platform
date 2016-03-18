@@ -51,6 +51,9 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		closeCallback = callback;
 		isClosed = false;
 		recordVersion = record ? record.version : -1;
+		if (recordVersion === undefined && record) {
+			recordVersion = record.$version;
+		}
 		this.edit(record);
 	};
 
