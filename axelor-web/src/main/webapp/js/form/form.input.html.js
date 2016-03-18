@@ -247,8 +247,8 @@ ui.formInput('Html', {
 
 			var value = shellActive ? shell.getHTML() : textElement.val();
 
-			var old = scope.getValue();
-			var txt = scope.parse(value);
+			var old = scope.getValue() || null;
+			var txt = scope.parse(value) || null;
 
 			if (old === txt) {
 				return;
