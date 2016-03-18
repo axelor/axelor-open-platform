@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -46,17 +48,26 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.eclipse.persistence.annotations.Transformation;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.common.ObjectUtils;
+import com.axelor.common.StringUtils;
+import com.axelor.db.JPA;
+import com.axelor.db.Model;
+import com.axelor.db.Query;
 import com.axelor.dms.db.DMSFile;
 import com.axelor.dms.db.repo.DMSFileRepository;
+import com.axelor.inject.Beans;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
+import com.axelor.meta.db.repo.MetaFileRepository;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Resource;
 import com.axelor.rpc.Response;
+import com.google.common.primitives.Longs;
 import com.google.inject.servlet.RequestScoped;
 
 @Consumes(MediaType.APPLICATION_JSON)
@@ -70,6 +81,101 @@ public class DmsService {
 
 	@Inject
 	private DMSFileRepository repository;
+
+	@GET
+	@Path("files")
+	public Response listFiles(@QueryParam("parent") Long parentId, @QueryParam("pattern") String pattern) {
+		final Response response = new Response();
+		final StringBuilder filter = new StringBuilder("self.parent");
+
+		if (parentId == null || parentId <= 0) {
+			filter.append(" is null");
+		} else {
+			filter.append(" = :parent");
+		}
+		if (!StringUtils.isBlank(pattern)) {
+			pattern = "%" + pattern + "%";
+			filter.append(" AND UPPER(self.fileName) like UPPER(:pattern)");
+		}
+
+		final Query<?> query = repository.all()
+				.filter(filter.toString())
+				.bind("parent", parentId)
+				.bind("pattern", pattern);
+
+		final Long count = query.count();
+		final List<?> records = query.select("fileName", "isDirectory").fetch(-1, -1);
+
+		response.setStatus(Response.STATUS_SUCCESS);
+		response.setData(records);
+		response.setTotal(count);
+		return response;
+	}
+
+	@GET
+	@Path("attachments/{model}/{id}")
+	public Response attachments(@PathParam("model") String model, @PathParam("id") Long id) {
+		final Response response = new Response();
+		final List<?> records = repository.all()
+				.filter("self.relatedId = :id AND self.relatedModel = :model AND self.metaFile is not null AND self.isDirectory = false")
+				.bind("id", id)
+				.bind("model", model)
+				.select("fileName")
+				.fetch(-1, -1);
+		response.setStatus(Response.STATUS_SUCCESS);
+		response.setData(records);
+		response.setTotal(records.size());
+		return response;
+	}
+
+	@PUT
+	@Path("attachments/{model}/{id}")
+	@Transformation
+	public Response addAttachments(@PathParam("model") String model, @PathParam("id") Long id, Request request) {
+		if (request == null || ObjectUtils.isEmpty(request.getRecords())) {
+			throw new IllegalArgumentException("No attachment records provided.");
+		}
+		final Class<?> modelClass;
+		try {
+			modelClass = Class.forName(model);
+		} catch (ClassNotFoundException e) {
+			throw new IllegalArgumentException("No such model found.");
+		}
+		final Object entity = JPA.em().find(modelClass, id);
+		if (!(entity instanceof Model)) {
+			throw new IllegalArgumentException("No such record found.");
+		}
+
+		final MetaFileRepository filesRepo = Beans.get(MetaFileRepository.class);
+		final List<MetaFile> items = new ArrayList<>();
+
+		for (Object item : request.getRecords()) {
+			@SuppressWarnings("rawtypes")
+			Object fileRecord = filesRepo.find(Longs.tryParse(((Map) item).get("id").toString()));
+			if (fileRecord instanceof MetaFile) {
+				items.add((MetaFile) fileRecord);
+			} else {
+				throw new IllegalArgumentException("Invalid list of attachment records.");
+			}
+		}
+
+		final MetaFiles files = Beans.get(MetaFiles.class);
+		final Response response = new Response();
+		final List<Object> records = new ArrayList<>();
+
+		for (MetaFile file : items) {
+			DMSFile dmsFile;
+			try {
+				dmsFile = files.attach(file, file.getFileName(), (Model) entity);
+				records.add(Resource.toMapCompact(dmsFile));
+			} catch (IOException e) {
+			}
+		}
+
+		response.setStatus(Response.STATUS_SUCCESS);
+		response.setData(records);
+		return response;
+	}
 
 	@GET
 	@Path("offline")
@@ -200,13 +306,17 @@ public class DmsService {
 	}
 
 	@GET
-	@Path("download/{batchId}")
+	@Path("download/{id}")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public javax.ws.rs.core.Response doDownload(@PathParam("batchId") String batchId) {
+	public javax.ws.rs.core.Response doDownload(@PathParam("id") String batchOrId) {
 
-		@SuppressWarnings("all")
-		final List<Object> ids = (List) httpRequest.getSession().getAttribute(batchId);
+		List<?> ids = (List<?>) httpRequest.getSession().getAttribute(batchOrId);
 		if (ids == null) {
+			Long id = Longs.tryParse(batchOrId);
+			ids = id == null ? null : Arrays.asList(id);
+		}
+
+		if (ids == null || ids.isEmpty()) {
 			return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
 		}
 
