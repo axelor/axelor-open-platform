@@ -124,6 +124,12 @@ public class CorsFilter implements Filter {
 		res.addHeader("Access-Control-Allow-Methods", corsAllowMethods);
 		res.addHeader("Access-Control-Allow-Headers", corsAllowHeaders);
 
+		 // Just ACCEPT and REPLY OK if OPTIONS
+        if (req.getMethod().equals("OPTIONS") ) {
+            res.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
 		chain.doFilter(request, response);
 	}
 
