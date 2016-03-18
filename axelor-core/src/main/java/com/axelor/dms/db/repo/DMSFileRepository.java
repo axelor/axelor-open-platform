@@ -342,9 +342,9 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 			json.put("offline", true);
 		}
 
+		json.put("createdBy", Resource.toMapCompact(file.getCreatedBy()));
 		json.put("createdOn", file.getCreatedOn());
-		json.put("createdBy", file.getCreatedBy());
-		json.put("updatedBy", file.getUpdatedBy());
+		json.put("updatedBy", Resource.toMapCompact(file.getUpdatedBy()));
 		json.put("updatedOn", dt);
 
 		if ("html".equals(file.getContentType())) {
