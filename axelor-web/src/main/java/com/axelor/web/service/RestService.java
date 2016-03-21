@@ -394,6 +394,10 @@ public class RestService extends ResourceService {
 		final Mapper mapper = Mapper.of(klass);
 		final Model bean = JPA.find(klass, id);
 
+		if (bean == null) {
+			return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+		}
+
 		if (isAttachment) {
 			final String fileName = (String) mapper.get(bean, "fileName");
 			final String filePath = (String) mapper.get(bean, "filePath");
