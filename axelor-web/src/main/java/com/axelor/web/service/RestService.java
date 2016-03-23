@@ -532,7 +532,7 @@ public class RestService extends ResourceService {
 	@POST
 	@Path("export")
 	public Response export(Request request) {
-		if (request == null || isEmpty(request.getFields())) {
+		if (request == null || request.getFields() == null) {
 			return fail();
 		}
 		final Response response = new Response();
