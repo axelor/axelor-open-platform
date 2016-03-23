@@ -38,12 +38,21 @@ ui.formInput('Boolean', {
 		input.click(function () {
 			scope.setValue(input[0].checked, true);
 		});
+
+		Object.defineProperty(scope, '$value', {
+			get: function () {
+				return model.$viewValue;
+			},
+			set: function(value) {
+				model.$setViewValue(value);
+			}
+		});
 	},
 	template_readonly: null,
 	template_editable: null,
 	template:
 		"<label class='ibox'>" +
-			"<input type='checkbox' ng-model='record[field.name]' ng-disabled='isReadonly()'>" +
+			"<input type='checkbox' ng-model='$value' ng-disabled='isReadonly()'>" +
 			"<span class='box'></span>" +
 		"</label>"
 });
@@ -64,7 +73,7 @@ ui.formInput('InlineCheckbox', 'Boolean', {
 	template_editable: null,
 	template:
 		"<label class='ibox'>" +
-			"<input type='checkbox' ng-model='record[field.name]' ng-disabled='isReadonly()'>" +
+			"<input type='checkbox' ng-model='$value' ng-disabled='isReadonly()'>" +
 			"<div class='box'></div>" +
 			"<span class='title'>{{label}}</span>" +
 		"</label>"
@@ -97,7 +106,7 @@ ui.formInput('Toggle', 'Boolean', {
 	template_editable: null,
 	template_readonly: null,
 	template:
-		"<button tabindex='-1' class='btn btn-default' ng-class='{active: record[field.name]}' ng-click='toggle()'>" +
+		"<button tabindex='-1' class='btn btn-default' ng-class='{active: $value}' ng-click='toggle()'>" +
 			"<i class='fa {{icon()}}'></i>" +
 		"</button>"
 });
@@ -199,7 +208,7 @@ ui.formInput('BooleanSwitch', 'Boolean', {
 	template_editable: null,
 	template:
 		"<label class='iswitch'>" +
-			"<input type='checkbox' ng-model='record[field.name]' ng-disabled='isReadonly()'>" +
+			"<input type='checkbox' ng-model='$value' ng-disabled='isReadonly()'>" +
 			"<span class='box'></span>" +
 		"</label>"
 });
