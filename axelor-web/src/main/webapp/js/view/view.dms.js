@@ -1547,6 +1547,10 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 					content.appendTo(element);
 					setTimeout(function () {
 						element.dialog("open");
+						setTimeout(function () {
+							//XXX: ui-dialog issue
+							element.find('.filter-box').zIndex(element.zIndex() + 1);
+						});
 					});
 				}
 
