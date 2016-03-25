@@ -1,6 +1,13 @@
-# Current (3.1.3)
+# 3.1.3 (2016-03-25)
 
 ## Bug fixes
+
+- fix jquery-ui css conflict
+- fix html widget update issue
+- fix view switching issue in popup
+- fix empty space left by hidden widgets
+- fix view switching issue in popup
+- fix action-attrs issue on toolbar
 
 # 3.1.2 (2016-03-10)
 
