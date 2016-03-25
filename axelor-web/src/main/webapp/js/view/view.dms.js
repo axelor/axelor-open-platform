@@ -96,6 +96,9 @@ function DMSFileListCtrl($scope, $element) {
 
 	Object.defineProperty($scope, "_domain", {
 		get: function () {
+			if ($scope.currentFilter && $scope.getCurrentHome()) {
+				return _domain + "self.isDirectory = false AND self.parent.id = " + $scope.getCurrentHome().id;
+			}
 			if ($scope.currentFilter) {
 				return _domain + "self.isDirectory = false";
 			}
