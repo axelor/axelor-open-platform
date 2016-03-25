@@ -270,12 +270,20 @@ table.form-layout fieldset {
 
 .form-item-container > input.display-text {
 	min-width: 100px;
-	text-overflow: ellipsis;
-	overflow: hidden;
 	border: none;
 	border-radius: 0;
 	box-shadow: none;
 	background: transparent;
+}
+
+.form-item-container > a.display-text {
+	display: inline-block;
+	white-space: nowrap;
+}
+
+.form-item-container > .display-text {
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 .form-item-container.many2one-item.readonly {

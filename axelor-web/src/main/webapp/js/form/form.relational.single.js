@@ -213,7 +213,7 @@ ui.directive('uiCanSuggest', function () {
 	};
 });
 
-var m2oTemplateReadonly = '<a href="" ng-show="text" ng-click="onEdit()">{{text}}</a>';
+var m2oTemplateReadonly = '<a href="" class="display-text" ng-show="text" ng-click="onEdit()">{{text}}</a>';
 var m2oTemplateReadonlyPlain = '<span class="display-text" ng-show="text">{{text}}</span>';
 
 var m2oTemplateEditable = '' +
