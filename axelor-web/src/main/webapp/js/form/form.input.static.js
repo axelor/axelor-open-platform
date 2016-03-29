@@ -418,7 +418,7 @@ ui.formItem('Button', {
 		}
 		
 		if (_.isString(field.link)) {
-			element.removeClass('btn');
+			element.removeClass('btn btn-success').addClass('btn-link');
 			element.attr("href", field.link);
 		}
 		
