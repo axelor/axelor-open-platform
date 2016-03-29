@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_4.0.xsd">
+
+  <grid title="Permissions" name="meta-permission-grid" model="com.axelor.meta.db.MetaPermission">
+    <field name="name" />
+    <field name="object" />
+  </grid>
+
+  <form title="Permissions" name="meta-permission-form" model="com.axelor.meta.db.MetaPermission">
+    <panel title="Overview">
+      <field name="name"/>
+      <field name="active" widget="inline-checkbox"/>
+      <field name="object" colSpan="12"/>
+    </panel>
+    <panel-related field="rules" editable="true">
+      <field name="field" />
+      <field name="canRead" />
+      <field name="canWrite" />
+      <field name="canExport" />
+    </panel-related>
+  </form>
+
+  <form title="Rule" name="meta-permission-rule-form" model="com.axelor.meta.db.MetaPermissionRule">
+    <panel title="Overview">
+      <field name="field" colSpan="12" />
+      <field name="canRead" colSpan="4" widget="inline-checkbox"/>
+      <field name="canWrite" colSpan="4" widget="inline-checkbox"/>
+      <field name="canExport" colSpan="4" widget="inline-checkbox"/>
+    </panel>
+    <panel title="Conditions" itemSpan="12">
+      <field name="readonlyIf" help="Client side js expression"/>
+      <field name="hideIf"  help="Client side js expression"/>
+    </panel>
+  </form>
+
+</object-views>
