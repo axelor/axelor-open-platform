@@ -110,6 +110,15 @@ public class MetaFiles {
 	/**
 	 * Create a temporary file under upload directory.
 	 * 
+	 * @param prefix
+	 *            the file prefix to use
+	 * @param suffix
+	 *            the file suffix to use
+	 * @param attrs
+	 *            an optional list of file attributes
+	 * @return the path to the newly created file
+	 * @throws IOException
+	 *             if an I/O error occurs
 	 * @see Files#createTempFile(String, String, FileAttribute...)
 	 */
 	public static Path createTempFile(String prefix, String suffix, FileAttribute<?>... attrs) throws IOException {
@@ -152,6 +161,8 @@ public class MetaFiles {
 	/**
 	 * Clean up obsolete temporary files from upload directory.
 	 *
+	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
 	public void clean() throws IOException {
 		if (!Files.isDirectory(UPLOAD_PATH_TEMP)) {
@@ -176,6 +187,8 @@ public class MetaFiles {
 	 *
 	 * @param fileId
 	 *            the upload file id
+	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
 	public void clean(String fileId) throws IOException {
 		Files.deleteIfExists(UPLOAD_PATH_TEMP.resolve(fileId));
@@ -360,6 +373,7 @@ public class MetaFiles {
 	 *            the {@link MetaFile} to link the uploaded file
 	 * @return the given {@link MetaFile} instance
 	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
 	@Transactional
 	public MetaFile upload(InputStream stream, MetaFile metaFile) throws IOException {
@@ -382,6 +396,7 @@ public class MetaFiles {
 	 *            the file name to use
 	 * @return a new {@link MetaFile} instance
 	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
 	@Transactional
 	public MetaFile upload(InputStream stream, String fileName) throws IOException {
@@ -408,6 +423,7 @@ public class MetaFiles {
 	 *            the record to attach to
 	 * @return a {@link DMSFile} record created for the attachment
 	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
 	@Transactional
 	public DMSFile attach(InputStream stream, String fileName, Model entity) throws IOException {
@@ -426,6 +442,7 @@ public class MetaFiles {
 	 *            the record to attach to
 	 * @return a {@link DMSFile} record created for the attachment
 	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
 	@Transactional
 	public DMSFile attach(MetaFile metaFile, String fileName, Model entity) throws IOException {
@@ -495,12 +512,13 @@ public class MetaFiles {
 	}
 
 	/**
-	 * Delete the given attachment & related {@link MetaFile} instance along
+	 * Delete the given attachment and related {@link MetaFile} instance along
 	 * with the file content.
 	 *
 	 * @param attachment
 	 *            the attachment to delete
-	 * @throws IOException if unable to delete file
+	 * @throws IOException
+	 *             if unable to delete file
 	 */
 	@Transactional
 	public void delete(MetaAttachment attachment) throws IOException {
@@ -535,7 +553,7 @@ public class MetaFiles {
 	/**
 	 * Delete the given {@link MetaFile} instance along with the file content.
 	 *
-	 * @param file
+	 * @param metaFile
 	 *            the file to delete
 	 * @throws IOException
 	 *             if unable to delete file
