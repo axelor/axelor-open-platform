@@ -181,7 +181,18 @@ function FormViewCtrl($scope, $element) {
 			var params = $scope._viewParams;
 			var $location = $scope.$location;
 
+			function resetForm() {
+				routeId = null;
+				$scope.setEditable(false);
+				$scope.editRecord(null);
+			}
+
 			if (!$location || tab !== params || tab.$viewScope != $scope || !$scope.isDirty()) {
+				$scope.$timeout(function () {
+					if (params && params.viewType !== 'form') {
+						resetForm();
+					}
+				});
 				return;
 			}
 
@@ -196,9 +207,7 @@ function FormViewCtrl($scope, $element) {
 			event.preventDefault();
 			$scope.$locationChangeOff();
 			$scope.confirmDirty(function() {
-				routeId = null;
-				$scope.setEditable(false);
-				$scope.editRecord(null);
+				resetForm();
 				$location.path(path).search(search);
 			}, locationChangeCheck);
 		});
