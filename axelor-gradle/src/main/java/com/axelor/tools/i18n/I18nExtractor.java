@@ -67,6 +67,9 @@ public class I18nExtractor {
 	private static final Pattern PATTERN_HTML = Pattern.compile("((\\{\\{(.*?)\\|\\s*t\\s*\\}\\})|(x-translate.*?\\>(.*?)\\<))");
 	private static final Pattern PATTERN_EXCLUDE = Pattern.compile("(\\.min\\.)|(main.webapp.lib)|(js.i18n)");
 
+	private static final Set<String> VIEW_TYPES = Sets.newHashSet(
+			"form", "grid", "tree", "calendar", "kanban", "cards", "gantt", "chart", "custom");
+
 	private static final Set<String> FIELD_NODES = Sets.newHashSet(
 			"string", "boolean", "integer", "long", "decimal", "date", "time", "datetime", "binary",
 			"one-to-one", "many-to-one", "one-to-many", "many-to-many");
@@ -91,6 +94,9 @@ public class I18nExtractor {
 		private Path base;
 		
 		private String entityName;
+
+		private String viewType;
+
 		public I18nTextVisitor(Path base) {
 			this.base = base;
 		}
@@ -161,8 +167,12 @@ public class I18nExtractor {
 					if ("entity".equals(qName)) {
 						entityName = name;
 					}
-					
-					if (StringUtils.isBlank(title) && FIELD_NODES.contains(qName) && name != null) {
+					if (VIEW_TYPES.contains(qName)) {
+						viewType = qName;
+					}
+
+					if (StringUtils.isBlank(title) && name != null
+							&& (FIELD_NODES.contains(qName) || ("tree".equals(viewType) && "column".equals(qName)))) {
 						title = Inflector.getInstance().humanize(name);
 					}
 
@@ -190,6 +200,9 @@ public class I18nExtractor {
 					}
 					if ("entity".equals(qName)) {
 						entityName = null;
+					}
+					if (VIEW_TYPES.contains(qName)) {
+						viewType = null;
 					}
 				}
 				

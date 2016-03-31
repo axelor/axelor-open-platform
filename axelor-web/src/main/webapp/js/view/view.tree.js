@@ -180,7 +180,7 @@ function Column(scope, col) {
 
 	this.css = col.type || 'string';
 	this.name = col.name;
-	this.title = col.title;
+	this.title = col.title || col.autoTitle;
 
 	if (this.title === null || this.title === undefined) {
 		this.title = _.humanize(col.name);
