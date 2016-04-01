@@ -236,6 +236,10 @@ header .navbar-inverse .dropdown-submenu:focus > a {
 	border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
+.ui-menu .ui-menu-item a {
+	color: #333;
+}
+
 .ui-menu .ui-menu-item a.ui-state-focus {
 	color: white;
 	text-decoration: none;
