@@ -239,6 +239,7 @@
 	top: 0; right: 0; border: 0; left: 0;
 }
 
+.slickgrid-editable .slick-row.active .slick-cell-editable.dirty:before,
 .slick-cell.dirty {
 	background-image: url('../img/dirty.gif');
 	background-position: 0 0;
