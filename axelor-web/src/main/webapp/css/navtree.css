@@ -69,6 +69,7 @@
 .nav-tree li > a > .nav-icon {
 	padding: 4px 7px;
 	text-shadow: -1px 1px 5px rgba(0, 0, 0, 0.15);
+	text-align: center;
 }
 
 .nav-tree li > a * {
