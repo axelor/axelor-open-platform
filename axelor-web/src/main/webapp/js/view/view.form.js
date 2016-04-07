@@ -435,7 +435,7 @@ function FormViewCtrl($scope, $element) {
 			checkVersion = "" + context.__check_version;
 		};
 
-		if (!record.id || checkVersion !== "true") {
+		if (!record.id || !(checkVersion === "true" || checkVersion === "silent")) {
 			return;
 		}
 
@@ -443,6 +443,11 @@ function FormViewCtrl($scope, $element) {
 			if (verified) {
 				return;
 			}
+
+			if (checkVersion === "silent") {
+				return $scope.reload();
+			}
+
 			axelor.dialogs.confirm(
 					_t("The record has been updated or delete by another action.") + "<br>" +
 					_t("Would you like to reload the current record?"),
