@@ -114,8 +114,7 @@ DashletCtrl.$inject = ['$scope', '$element', 'MenuService', 'DataSource', 'ViewS
 function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 
 	var self = this;
-
-	function init() {
+	var init = _.once(function init() {
 
 		ViewCtrl.call(self, $scope, DataSource, ViewService);
 
@@ -126,7 +125,20 @@ function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 		$scope.onShow = function() {
 
 		};
-	}
+
+		$scope.$on('on:attrs-change:refresh', function(e) {
+			e.preventDefault();
+			if ($scope.onRefresh) {
+				$scope.onRefresh();
+			}
+		});
+
+		$scope.$on('on:tab-reload', function(e) {
+			if ($scope.onRefresh) {
+				$scope.onRefresh();
+			}
+		});
+	});
 
 	$scope.initDashlet = function(dashlet, options) {
 
@@ -150,19 +162,6 @@ function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 			$scope.parseDashlet(dashlet, view);
 		});
 	};
-
-	$scope.$on('on:attrs-change:refresh', function(e) {
-		e.preventDefault();
-		if ($scope.onRefresh) {
-			$scope.onRefresh();
-		}
-	});
-
-	$scope.$on('on:tab-reload', function(e) {
-		if ($scope.onRefresh) {
-			$scope.onRefresh();
-		}
-	});
 }
 
 ui.directive('uiViewDashlet', ['$compile', function($compile){
