@@ -400,6 +400,11 @@ ui.formItem('Button', {
 			element.prepend(' ');
 		}
 
+		var css = field.css || '';
+		if (css.indexOf('btn-') > -1 && css.indexOf('btn-success') === -1) {
+			element.removeClass('btn-success');
+		}
+
 		if (isIcon) {
 			var e = $('<i>').addClass('fa').addClass(icon).prependTo(element);
 			if (iconHover) {
