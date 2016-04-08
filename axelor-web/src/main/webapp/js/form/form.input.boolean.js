@@ -115,8 +115,8 @@ ui.formInput('BooleanSelect', 'Boolean', {
 	css: 'form-item boolean-select-item',
 	init: function (scope) {
 		var field = scope.field;
-		var trueText = (field.widgetAttrs||{}).trueText || _t('Yes');
-		var falseText = (field.widgetAttrs||{}).falseText || _t('No');
+		var trueText = _t((field.widgetAttrs||{}).trueText) || _t('Yes');
+		var falseText = _t((field.widgetAttrs||{}).falseText) || _t('No');
 
 		scope.$items = [trueText, falseText];
 		scope.$selection = [{ value: trueText, val: true}, { value: falseText, val: false }];
@@ -145,6 +145,10 @@ ui.formInput('BooleanSelect', 'Boolean', {
 			input.autocomplete("search" , '');
 		});
 
+		scope.doShowSelect = function () {
+			input.autocomplete("search" , '');
+		};
+
 		scope.$render_editable = function () {
 			var value = model.$viewValue || false;
 			var text = scope.format(value);
@@ -161,7 +165,7 @@ ui.formInput('BooleanSelect', 'Boolean', {
 	template_editable: "<span class='picker-input'>" +
 				"<input type='text' readonly='readonly'>" +
 				"<span class='picker-icons picker-icons-1'>" +
-					"<i class='fa fa-caret-down'></i>" +
+					"<i class='fa fa-caret-down' ng-click='doShowSelect()'></i>" +
 				"</span>" +
 			"</span>"
 });
@@ -174,7 +178,7 @@ ui.formInput('BooleanRadio', 'BooleanSelect', {
 		var trueInput = $('<input type="radio" data-value="true" name="' + inputName + '">');
 		var falseInput = $('<input type="radio" data-value="false" name="' + inputName + '">');
 
-		var items = scope.$selection;
+		var items = scope.$items;
 
 		$('<label class="ibox round">')
 			.append(trueInput)
