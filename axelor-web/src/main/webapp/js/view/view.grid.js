@@ -675,9 +675,11 @@ angular.module('axelor.ui').directive('uiPortletGrid', function(){
 			};
 
 			$scope.$on("on:new", function(e) {
+				ds._page.from = 0;
 				$scope.onRefresh();
 			});
 			$scope.$on("on:edit", function(e) {
+				ds._page.from = 0;
 				$scope.onRefresh();
 			});
 
