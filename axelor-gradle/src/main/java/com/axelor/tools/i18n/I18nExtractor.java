@@ -45,10 +45,6 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import au.com.bytecode.opencsv.CSVParser;
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
-
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
 import com.google.common.base.Joiner;
@@ -57,6 +53,10 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
+
+import au.com.bytecode.opencsv.CSVParser;
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
 
 public class I18nExtractor {
 	
@@ -73,7 +73,10 @@ public class I18nExtractor {
 	private static final Set<String> FIELD_NODES = Sets.newHashSet(
 			"string", "boolean", "integer", "long", "decimal", "date", "time", "datetime", "binary",
 			"one-to-one", "many-to-one", "one-to-many", "many-to-many");
-	
+
+	private static final Set<String> TEXT_ATTRS = Sets.newHashSet("tag", "prompt", "placeholder", "x-true-text",
+			"x-false-text");
+
 	private static final String[] CSV_HEADER = {"key", "message", "comment", "context" };
 
 	private static class I18nItem {
@@ -184,10 +187,11 @@ public class I18nExtractor {
 					accept(new I18nItem(help, file, locator.getLineNumber()));
 					accept(new I18nItem(message, file, locator.getLineNumber()));
 					accept(new I18nItem(error, file, locator.getLineNumber()));
-					accept(new I18nItem(attributes.getValue("tag"), file, locator.getLineNumber()));
-					accept(new I18nItem(attributes.getValue("prompt"), file, locator.getLineNumber()));
-					accept(new I18nItem(attributes.getValue("placeholder"), file, locator.getLineNumber()));
-					
+
+					for (String attr : TEXT_ATTRS) {
+						accept(new I18nItem(attributes.getValue(attr), file, locator.getLineNumber()));
+					}
+
 					if ("option".equals(qName) || "message".equals(qName)) {
 						readText = true;
 					}
