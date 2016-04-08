@@ -312,11 +312,9 @@ ui.formDirective = function(name, object) {
 						self.link_editable.call(self, scope, scope.$elem_editable, attrs, model);
 					}
 					if (scope.validate) {
-						model.$parsers.unshift(function(viewValue) {
-							var valid = scope.validate(viewValue);
-							model.$setValidity('valid', valid);
-							return valid ? viewValue : undefined;
-						});
+						model.$validators.valid = function(modelValue, viewValue) {
+							return !!scope.validate(viewValue);
+						};
 					}
 					// focus the first input field
 					if (scope.$elem_editable.is('.input-append,.picker-input')) {
