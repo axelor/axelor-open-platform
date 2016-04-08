@@ -1954,6 +1954,9 @@ Grid.prototype.onCellChange = function(event, args) {
 		name = cols[args.cell].field;
 
 	var es = this.editorScope;
+	if (es.record && es.record.version === undefined) {
+		es.record.version = es.record.$version;
+	}
 	if (es.isDirty()) {
 		this.markDirty(args.row, name);
 	}
