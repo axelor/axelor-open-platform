@@ -199,6 +199,13 @@
 	margin: 0 0 20px 0;
 }
 
+.mail-followers .panel-title > span {
+	width: calc(100% - 40px);
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .mail-followers .panel-title .icons i {
 	margin-left: 8px;
 	cursor: pointer;
