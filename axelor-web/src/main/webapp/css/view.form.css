@@ -168,7 +168,7 @@ table.form-layout td.form-item.v-align-top {
 }
 
 .form-item-container > span.display-text {
-	padding-top: 4px;
+	padding-top: 5px;
 	padding-bottom: 2px;
 }
 
@@ -256,7 +256,7 @@ table.form-layout fieldset {
 }
 
 .form-item-container.readonly > a {
-	line-height: 24px;
+	line-height: 22px;
 	color: #0088cc;
 }
 
@@ -279,15 +279,14 @@ table.form-layout fieldset {
 .form-item-container > a.display-text {
 	display: inline-block;
 	white-space: nowrap;
+	height: 24px;
+	padding-top: 3px;
 }
 
 .form-item-container > .display-text {
 	text-overflow: ellipsis;
 	overflow: hidden;
-}
-
-.form-item-container.many2one-item.readonly {
-	padding-top: 1px;
+	color: #555555;
 }
 
 .picker-input,
