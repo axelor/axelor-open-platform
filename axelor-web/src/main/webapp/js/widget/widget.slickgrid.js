@@ -2479,7 +2479,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 					grid.setEditors(form, formScope, forEdit);
 				}
 
-				if (schema.inlineHelp) {
+				if (schema.inlineHelp && !axelor.config["user.noHelp"]) {
 					addHelp(schema.inlineHelp);
 				}
 			}
