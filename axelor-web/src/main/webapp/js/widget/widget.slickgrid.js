@@ -2478,6 +2478,32 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 					formScope.grid = grid;
 					grid.setEditors(form, formScope, forEdit);
 				}
+
+				if (schema.inlineHelp) {
+					addHelp(schema.inlineHelp);
+				}
+			}
+
+			function addHelp(helpItem) {
+
+				var helpElem = $('<div>')
+					.css('visibility', 'hidden')
+					.addClass('help-item alert')
+					.html(helpItem.text);
+
+				var css = helpItem.css || '';
+				if (css.indexOf('alert-') === -1) {
+					css = (css + ' alert-info').trim();
+				}
+
+				helpElem.addClass(css);
+				helpElem.appendTo('body');
+
+				element.css('top', helpElem.height() + 36 + 40);
+
+				setTimeout(function () {
+					element.before(helpElem.css('visibility', ''));
+				});
 			}
 
 			element.addClass('slickgrid').hide();

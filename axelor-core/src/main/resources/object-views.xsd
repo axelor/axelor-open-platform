@@ -880,6 +880,7 @@
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractView">
         <xsd:sequence>
+          <xsd:element name="help" type="tns:Help" minOccurs="0" />
           <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0" />
           <xsd:element name="menubar" type="tns:Menubar" minOccurs="0" />
           <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" maxOccurs="unbounded" />

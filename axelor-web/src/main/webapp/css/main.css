@@ -458,6 +458,10 @@ header .navbar .nav-link-user-sub {
 	border: none;
 }
 
+.grid-view > .help-item {
+	margin: 8px;
+}
+
 .record-toolbar {
 	margin: 0;
 }
