@@ -211,10 +211,21 @@
 	cursor: pointer;
 }
 
+.mail-followers .links {
+	list-style: none;
+	margin: 0;
+}
+
+.mail-followers .links li {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 .mail-followers .links i.fa-remove {
 	cursor: pointer;
-	float: right;
 	margin-top: 3px;
+	margin-right: 4px;
 }
 
 .mail-message i.fa:hover,

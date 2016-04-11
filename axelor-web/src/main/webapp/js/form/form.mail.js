@@ -975,8 +975,8 @@ ui.formWidget('uiMailFollowers', {
 			"<div class='panel-body'>" +
 			"<ul class='links'>" +
 				"<li ng-repeat='follower in followers'>" +
-				"<a href='' ng-click='showAuthor(follower)'>{{$userName(follower)}}</a> " +
 				"<i class='fa fa-remove' ng-click='onUnfollow(follower)'></i>" +
+				"<a href='' ng-click='showAuthor(follower)'>{{$userName(follower)}}</a> " +
 				"</li>" +
 			"</ul>" +
 			"</div>" +
