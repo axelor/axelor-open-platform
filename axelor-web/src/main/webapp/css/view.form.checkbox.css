@@ -30,6 +30,7 @@
 
 .ibox.readonly {
 	cursor: default;
+	opacity: 0.6;
 }
 
 .ibox .box {
@@ -129,6 +130,7 @@
 
 .iswitch.readonly {
 	cursor: default;
+	opacity: 0.6;
 }
 
 .iswitch input {
