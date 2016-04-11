@@ -307,6 +307,12 @@
 .dms-folder-tree ul,
 .dms-folder-tree li {
 	list-style: none;
+	white-space: nowrap;
+}
+
+.dms-folder-tree li {
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .dms-folder-tree > ul {
@@ -344,11 +350,11 @@
 }
 
 .dms-folder-tree li > a:hover span.highlight {
-	background-color: #eeeeee;
+	background-color: rgba(0, 0, 0, .05);
 }
 
 .dms-folder-tree li > a.active span.highlight {
-	background-color: #e6e6e6;
+	background-color: rgba(0, 0, 0, .1);
 }
 
 .dms-folder-tree li > a.dropping span.highlight {
