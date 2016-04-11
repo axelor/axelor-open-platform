@@ -1275,6 +1275,14 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 				scope.$broadcast("adjust:dialog");
 			}
 		});
+		
+		element.on('dblclick', '[x-field].readonly', function (e) {
+			if (!scope.isEditable()) {
+				element.prev('.record-toolbar')
+					.find('button[ng-click="onEdit()"] i')
+					.effect('pulsate', { times: 3 }, 600);
+			}
+		});
 	};
 }]);
 
