@@ -13,7 +13,6 @@
       <field name="description" />
     </panel>
     <panel-related field="permissions" />
-    <panel-related field="metaPermissions" />
   </form>
 
 </object-views>

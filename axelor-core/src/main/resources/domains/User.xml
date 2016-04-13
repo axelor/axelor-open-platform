@@ -25,7 +25,6 @@
     <many-to-one name="group" ref="Group" column="group_id"/>
     <many-to-many name="roles" ref="Role"/>
     <many-to-many name="permissions" ref="Permission"/>
-    <many-to-many name="metaPermissions" ref="com.axelor.meta.db.MetaPermission" title="Permissions (fields)"/>
     
     <finder-method name="findByGroup" using="Long:groupId" filter="self.group[].id = :groupId" cacheable="true" all="false"/>
     <finder-method name="findByGroup" using="String:groupCode" filter="self.group[].code = :groupCode" cacheable="true" all="false"/>

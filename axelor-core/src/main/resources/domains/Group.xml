@@ -18,7 +18,6 @@
 
     <many-to-many name="roles" ref="Role" />
     <many-to-many name="permissions" ref="Permission" />
-    <many-to-many name="metaPermissions" ref="com.axelor.meta.db.MetaPermission" title="Permissions (fields)"/>
 
     <many-to-many name="menus" ref="com.axelor.meta.db.MetaMenu" mappedBy="groups" />
     <many-to-many name="views" ref="com.axelor.meta.db.MetaView" mappedBy="groups" />

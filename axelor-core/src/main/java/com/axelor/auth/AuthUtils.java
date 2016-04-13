@@ -77,12 +77,7 @@ public class AuthUtils {
 		
 		return true;
 	}
-
-	public static boolean isAdmin(final User user) {
-		return "admin".equals(user.getCode())
-				|| (user.getGroup() != null && "admins".equals(user.getGroup().getCode()));
-	}
-
+	
 	private static final String QS_HAS_ROLE = "SELECT self.id FROM Role self WHERE "
 			+ "(self.name = :name) AND "
 			+ "("

@@ -17,8 +17,6 @@
  */
 package com.axelor.meta.schema.views;
 
-import static com.axelor.common.StringUtils.isBlank;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -48,7 +46,6 @@ public class PanelField extends Field {
 	public PanelEditor getEditor() {
 		if (editor != null) {
 			editor.forField = this;
-			editor.setModel(isBlank(getTarget()) ? getModel() : getTarget());
 		}
 		return editor;
 	}
