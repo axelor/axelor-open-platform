@@ -1,6 +1,13 @@
-# Current (3.1.4)
+# 3.1.4 (2016-04-13)
 
 ## Bug fixes
+
+- fix open view as popup
+- fix "close" action validation
+- fix pagination issue on dashlet grid
+- fix dashlet refresh issue
+- fix dashlet context issue
+- fix jquery-ui css conflict
 
 # 3.1.3 (2016-03-25)
 
