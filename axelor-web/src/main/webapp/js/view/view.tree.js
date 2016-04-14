@@ -147,28 +147,23 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 			return;
 		}
 
-		if (record.$handler === undefined) {
-			record.$handler = ActionService.handler($scope.$new(), $(e.currentTarget), {
-				action: action
-			});
-		}
-		
-		if (record.$handler) {
+		var $handler = ActionService.handler($scope.$new(), $(e.currentTarget), {
+			action: action
+		});
 			
-			var model = loader.model;
-			var context = record.$record;
-			
-			record.$handler.scope.record = context;
-			record.$handler.scope.getContext = function() {
-				return _.extend({
-					_model: model
-				}, context);
-			};
+		var model = loader.model;
+		var context = record.$record;
 
-			record.$handler.onClick().then(function(res){
+		$handler.scope.record = context;
+		$handler.scope.getContext = function() {
+			return _.extend({
+				_model: model
+			}, context);
+		};
 
-			});
-		}
+		$handler.onClick().then(function(res){
+
+		});
 	};
 }
 
@@ -202,7 +197,7 @@ function Column(scope, col) {
 				template = "<a href='javascript:' class='tree-button' x-action='"+ item.onClick +"'>";
 				if (item.icon) {
 					if (item.icon.indexOf('fa') === 0) {
-						template += "<i class='" + item.icon + "'></i>";
+						template += "<i class='fa " + item.icon + "'></i>";
 					} else {
 						template += "<img width='16px' src='"+ item.icon +"'>";
 					}
@@ -707,12 +702,18 @@ ui.directive('uiViewTree', function(){
 				}
 			});
 			
+			var adjustCounter = 0;
+			
 			function adjustCols() {
 				
 				if (element.is(':hidden')) {
+					if (adjustCounter++ < 10) {
+						_.delay(adjustCols, 100);
+					}
 					return;
 				}
-				
+				adjustCounter = 0;
+
 				var tds = table.find('tr:first').find('td');
 				var ths = element.find('.tree-header').find('th');
 				var widths = [];
