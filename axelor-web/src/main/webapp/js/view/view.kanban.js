@@ -250,7 +250,7 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 			ds._page.limit = view.limit || 20;
 
 			var domain = "self." + view.columnBy + " = :" + view.columnBy;
-			ds._domain = ds._domain ? ds._domain + " AND " + domain : domain;
+			ds._domain = scope._dataSource._domain ? scope._dataSource._domain + " AND " + domain : domain;
 
 			scope.records = [];
 
