@@ -150,7 +150,7 @@ public class Request {
 	}
 
 	@SuppressWarnings("all")
-	private Map<String, Object> findContext() {
+	public Map<String, Object> getRawContext() {
 
 		final Map<String, Object> data = getData();
 		final Map<String, Object> ctx = new HashMap<>();
@@ -181,7 +181,7 @@ public class Request {
 		}
 		Map<String, Object> ctx = getContext();
 		if (ctx == null) {
-			ctx = findContext();
+			ctx = getRawContext();
 		}
 		return scriptHelper = new GroovyScriptHelper(new ScriptBindings(ctx));
 	}
@@ -196,7 +196,7 @@ public class Request {
 		if (context != null) {
 			return context;
 		}
-		final Map<String, Object> vars = findContext();
+		final Map<String, Object> vars = getRawContext();
 		Class<?> klass;
 		try {
 			klass = Class.forName(vars.get("_model").toString());
