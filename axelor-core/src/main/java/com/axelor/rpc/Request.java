@@ -149,6 +149,16 @@ public class Request {
 		return criteria;
 	}
 
+	/**
+	 * Get the raw context.
+	 * 
+	 * <p>
+	 * The returned map is mutable so updating this map may cause some
+	 * unexpected results. So use this method with care.
+	 * </p>
+	 * 
+	 * @return map of context values
+	 */
 	@SuppressWarnings("all")
 	public Map<String, Object> getRawContext() {
 
