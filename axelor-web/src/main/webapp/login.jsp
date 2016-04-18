@@ -69,7 +69,7 @@ if (pageContext.getServletContext().getResource(loginHeader) == null) {
             <div class="form-fields">
               <div class="input-prepend">
                 <span class="add-on"><i class="fa fa-envelope"></i></span>
-                <input type="text" id="usernameId" name="username"  placeholder="<%= loginUserName %>">
+                <input type="text" id="usernameId" name="username" placeholder="<%= loginUserName %>" autofocus="autofocus">
               </div>
               <div class="input-prepend">
                 <span class="add-on"><i class="fa fa-lock"></i></span>
