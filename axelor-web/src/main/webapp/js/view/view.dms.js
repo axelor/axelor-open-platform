@@ -1501,6 +1501,12 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 					}
 				});
 			};
+			
+			function adjustSize() {
+				var height = $(window).height() - 16;
+				height = Math.min(480, height);
+				element.dialog('option', 'height', height);
+			}
 
 			setTimeout(function () {
 				var elemDialog = element.parent();
@@ -1513,11 +1519,10 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 				}).insertAfter(elemTitle);
 
 				elemTitle.html(_t('Attachments'));
-
-				var height = $(window).height() - 16;
-				height = Math.min(480, height);
-				element.dialog('option', 'height', height);
+				adjustSize();
 			});
+			
+			element.on("adjustSize", _.debounce(adjustSize));
 
 			scope.onHotKey = function (e, action) {
 				var elem = element.find(".grid-view:first");
