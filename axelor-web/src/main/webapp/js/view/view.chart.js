@@ -306,6 +306,8 @@ function PieChart(scope, element, data) {
 
 	var chart = nv.models.pieChart()
 		.showLabels(false)
+		.height(null)
+		.width(null)
 		.x(function(d) { return d.x; })
 		.y(function(d) { return d.y; })
 	    .color(colors(config.colors));
@@ -324,6 +326,8 @@ function PieChart(scope, element, data) {
 	d3.select(element[0])
 	  .datum(datum)
 	  .transition().duration(1200).call(chart);
+
+	return chart;
 }
 
 CHARTS.pie = PieChart;
