@@ -74,7 +74,7 @@ angular.module('axelor.auth', []).provider('authService', function() {
   $httpProvider.interceptors.push(['$rootScope', '$q', function($rootScope, $q) {
     return {
       responseError: function error(response) {
-        if (response.status === 401 || response.status === 502 || (response.status === 0 && response.data === "")) {
+        if (response.status === 401 || response.status === 502 || (response.status === 0 && !response.data)) {
           var deferred = $q.defer();
           authServiceProvider.pushToBuffer(response.config, deferred);
           if (!response.config.silent) {
