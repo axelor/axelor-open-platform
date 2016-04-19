@@ -259,7 +259,7 @@ function FormViewCtrl($scope, $element) {
 			return $scope.updateRoute();
 		}
 		if (routeId === state && state) {
-			return doEdit(state);
+			return record.id && record.id !== state ? doEdit(state) : $scope.updateRoute();
 		}
 
 		var params = $scope._viewParams;
