@@ -45,6 +45,7 @@ angular.module('axelor.auth', []).provider('authService', function() {
   this.$get = ['$rootScope','$injector', function($rootScope, $injector) {
     var $http; //initialized later because of circular dependency problem
     function retry(config, deferred) {
+      setTimeout(axelor.blockUI);
       $http = $http || $injector.get('$http');
       $http(config).then(function(response) {
         deferred.resolve(response);
