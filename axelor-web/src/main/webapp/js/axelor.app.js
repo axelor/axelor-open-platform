@@ -29,6 +29,7 @@
 	
 	function updateLoadingCounter(val) {
 		loadingCounter += val;
+		loadingCounter = Math.max(0, loadingCounter);
 	}
 	
 	function hideLoading() {
