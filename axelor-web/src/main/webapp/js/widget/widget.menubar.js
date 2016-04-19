@@ -222,7 +222,9 @@ ui.directive('uiToolbarAdjust', function() {
 				}
 			});
 
-			adjust();
+			scope.$callWhen(adjust, function () {
+				return element.is(':visible');
+			});
 		}
 
 		function hideAndShow(first, second, visibility) {
