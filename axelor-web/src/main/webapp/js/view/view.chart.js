@@ -241,7 +241,7 @@ function colors(color, shades, type) {
 			return _.first(_.range(0, n + 1).map(d3.scale.linear().domain([0, n + 1]).range([c, 'white'])), n);
 		}).concat(rest));
 	}
-	return type == 'pie' ? d3.scale.category10().range() : d3.scale.category20b().range();
+	return type == 'pie' ? d3.scale.category10().range() : d3.scale.category20().range();
 }
 
 var CHARTS = {};
