@@ -180,12 +180,6 @@ var Editor = function(args) {
 
 	function adjustExternal() {
 
-		element.css('position', 'absolute');
-		element.position({
-			my: 'left top',
-			at: 'left top',
-			of: args.container
-		});
 		var container = $(args.container);
 		var parent = element.data('$parent') || element;
 		var zIndex = (parent.parents('.slickgrid:first').zIndex() || 0) + container.zIndex();
@@ -193,6 +187,12 @@ var Editor = function(args) {
 			border: 0,
 			width: container.width(),
 			zIndex: zIndex + 1
+		});
+		element.css('position', 'absolute');
+		element.position({
+			my: 'left top',
+			at: 'left top',
+			of: args.container
 		});
 
 		// focus html editor
