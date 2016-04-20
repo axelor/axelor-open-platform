@@ -244,7 +244,8 @@ public class MailController extends JpaSupport {
 		if (message.getReplies() == null) {
 			return all;
 		}
-		for (MailMessage msg : message.getReplies()) {
+		for (MailMessage msg : messages.all().filter("self.parent.id = ?", message.getId())
+				.order("-createdOn").fetch()) {
 			all.add(msg);
 			all.addAll(findChildren(msg));
 		}
