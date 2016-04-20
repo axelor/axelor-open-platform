@@ -233,14 +233,15 @@ function applyXY(chart, data) {
 	return chart.x(function (d) { return d.x; });
 }
 
-function colors(color) {
-	var all = d3.scale.category20b().range();
+function colors(color, shades, type) {
 	if (color) {
-		all = _.flatten(color.split(',').map(function (c) {
-			return _.range(0, 5).map(d3.scale.linear().domain([0, 5]).range([c, 'white']))
-		}).concat(all));
+		var n = +(shades) || 4;
+		var rest = n > 1 ? d3.scale.category20b().range() : d3.scale.category20().range();
+		return _.flatten(color.split(',').map(function (c) {
+			return _.first(_.range(0, n + 1).map(d3.scale.linear().domain([0, n + 1]).range([c, 'white'])), n);
+		}).concat(rest));
 	}
-	return all;
+	return type == 'pie' ? d3.scale.category10().range() : d3.scale.category20b().range();
 }
 
 var CHARTS = {};
@@ -309,8 +310,7 @@ function PieChart(scope, element, data) {
 		.height(null)
 		.width(null)
 		.x(function(d) { return d.x; })
-		.y(function(d) { return d.y; })
-	    .color(colors(config.colors));
+		.y(function(d) { return d.y; });
 
 	if (series.type === "donut") {
 		chart.donut(true)
@@ -620,7 +620,7 @@ function Chart(scope, element, data) {
 		}
 
 		if (chart.color) {
-			chart.color(colors(config.colors));
+			chart.color(colors(config.colors, config.shades, type));
 		}
 
 		if (chart.noData) {
