@@ -909,7 +909,7 @@ Grid.prototype._doInit = function(view) {
 	var getItemMetadata = dataView.getItemMetadata;
 	dataView.getItemMetadata = function (row) {
 		var item = grid.getDataItem(row);
-		if (item && item.$style === undefined) {
+		if (item && !item.$style) {
 			that.hilite(row);
 		}
 		var meta = getItemMetadata.apply(dataView, arguments);
