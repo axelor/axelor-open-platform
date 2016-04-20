@@ -57,6 +57,12 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 				title: first.title,
 				type: 'html'
 			}];
+			if ((view.params||{}).target === "_blank") {
+				var url = first.name || first.resource;
+				return setTimeout(function () {
+					window.open(url);
+				});
+			}
 		}
 
 		var closable = options && options.__tab_closable;
