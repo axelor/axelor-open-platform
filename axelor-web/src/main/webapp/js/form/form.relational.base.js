@@ -332,7 +332,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		var nameField = field.targetName || 'id',
 			fields = field.targetSearch || [],
 			filter = {},
-			limit = field.limit || (axelor.device.small ? 6 : 15),
+			limit = field.limit || (axelor.device.small ? 6 : 10),
 			sortBy = field.orderBy;
 
 		fields = ["id", nameField].concat(fields);
