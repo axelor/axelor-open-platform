@@ -233,10 +233,16 @@ function applyXY(chart, data) {
 	return chart.x(function (d) { return d.x; });
 }
 
+var color_shades = [
+	d3.scale.category10().range(), // no shades
+	d3.scale.category20().range(), // 2 shades
+	d3.scale.category20b().range() // 4 shades
+];
+
 function colors(color, shades, type) {
 	if (color) {
 		var n = +(shades) || 4;
-		var rest = n > 1 ? d3.scale.category20b().range() : d3.scale.category20().range();
+		var rest = color_shades[n-1];
 		return _.flatten(color.split(',').map(function (c) {
 			return _.first(_.range(0, n + 1).map(d3.scale.linear().domain([0, n + 1]).range([c, 'white'])), n);
 		}).concat(rest));
