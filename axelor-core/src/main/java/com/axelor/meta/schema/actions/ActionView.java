@@ -260,6 +260,7 @@ public class ActionView extends Action {
 			view.title = title;
 			view.views = Lists.newArrayList();
 			view.params = Lists.newArrayList();
+			view.contexts = Lists.newArrayList();
 		}
 		
 		public ActionViewBuilder name(String name) {
@@ -296,6 +297,12 @@ public class ActionView extends Action {
 		
 		public ActionViewBuilder context(String key, Object value) {
 			this.context.put(key, value);
+			if (value instanceof String) {
+				Context context = new Context();
+				context.setName(key);
+				context.setExpression((String) value);
+				view.contexts.add(context);
+			}
 			return this;
 		}
 		
