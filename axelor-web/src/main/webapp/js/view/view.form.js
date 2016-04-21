@@ -295,6 +295,10 @@ function FormViewCtrl($scope, $element) {
 			$scope.ajaxStop(function(){
 				$scope.$broadcast("on:edit", $scope.record);
 				$scope.$broadcast("on:record-change", $scope.record);
+				if ($scope.__canForceEdit && $scope.canEdit()) {
+					$scope.__canForceEdit = undefined;
+					$scope.onEdit();
+				}
 			});
 		});
 	};
