@@ -205,11 +205,14 @@ function FormViewCtrl($scope, $element) {
 			}
 
 			event.preventDefault();
-			$scope.$locationChangeOff();
 			$scope.confirmDirty(function() {
 				resetForm();
+				$scope.$locationChangeOff();
 				$location.path(path).search(search);
-			}, locationChangeCheck);
+			}, function () {
+				$scope.$locationChangeOff();
+				locationChangeCheck();
+			});
 		});
 	}
 
