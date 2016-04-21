@@ -322,11 +322,13 @@ var Formatters = {
 	},
 	
 	"one-to-one": function(field, value) {
-		return value ? value[field.targetName] : "";
+		var text = (value||{})[field.targetName];
+		return text ? _.escapeHTML(text) : "";
 	},
 
 	"many-to-one": function(field, value) {
-		return value ? value[field.targetName] : "";
+		var text = (value||{})[field.targetName];
+		return text ? _.escapeHTML(text) : "";
 	},
 	
 	"one-to-many": function(field, value) {
@@ -349,13 +351,13 @@ var Formatters = {
 		if(isIcon) {
 			elem = '<a href="javascript: void(0)" tabindex="-1"';
 			if (field.help) {
-				elem += ' title="' + field.help + '"';
+				elem += ' title="' + _.escapeHTML(field.help) + '"';
 			}
 			elem += '><i class="' + css + '"></i></a>';
 		} else if (field.icon) {
 			elem = '<img class="' + css + '" src="' + field.icon + '"';
 			if (field.help) {
-				elem += ' title="' + field.help + '"';
+				elem += ' title="' + _.escapeHTML(field.help) + '"';
 			}
 			elem += '>';
 		} else {
@@ -378,18 +380,16 @@ var Formatters = {
 			return cmp(item.value, value);
 		}) || {};
 
+		var text = _.isString(res.title) ? _.escapeHTML(res.title) : res.title;
 		if (field.widget === 'ImageSelect' && res.icon) {
 			var image = "<img style='max-height: 24px;' src='" + (res.icon || res.value) + "'>";
-			if (field.labels === false) {
-				return image;
-			}
-			return image + " " + res.title;
+			return field.labels === false ? image : image + " " + text;
 		}
-		return res.title;
+		return text;
 	},
 
 	"url": function(field, value) {
-		return '<a target="_blank" ng-show="text" href="' + value + '">' + value + '</a>';
+		return '<a target="_blank" ng-show="text" href="' + _.escapeHTML(value) + '">' + _.escapeHTML(value) + '</a>';
 	},
 	
 	"icon": function(field, value) {
@@ -478,7 +478,9 @@ _.extend(Factory.prototype, {
 		var fn = Formatters[type];
 		if (fn) {
 			value = fn(field, value, dataContext, this.grid);
-		}
+		} else if (_.isString(value)) {
+			value = _.escapeHTML(value);
+ 		}
 		if (value === null || value === undefined || (_.isObject(value) && _.isEmpty(value))) {
 			return "";
 		}
