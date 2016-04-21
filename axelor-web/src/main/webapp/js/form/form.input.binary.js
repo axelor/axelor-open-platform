@@ -117,7 +117,7 @@ ui.formInput('Image', 'ImageLink', {
 		scope.getLink = function (value) {
 			var record = scope.record || {};
 			var model = scope._model;
-			if (!value) return BLANK;
+			if (value === null) return BLANK;
 			if (isBinary) {
 				if (value) {
 					return value;
@@ -127,7 +127,7 @@ ui.formInput('Image', 'ImageLink', {
 				}
 				return BLANK;
 			}
-			return makeURL(META_FILE, "content", (value.id || value));
+			return value ? makeURL(META_FILE, "content", (value.id || value)) : BLANK;
 		};
 	},
 
