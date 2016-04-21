@@ -117,7 +117,7 @@ ui.formInput('Image', 'ImageLink', {
 		scope.getLink = function (value) {
 			var record = scope.record || {};
 			var model = scope._model;
-			if (value === null) return BLANK;
+			if (!value) return BLANK;
 			if (isBinary) {
 				if (value) {
 					return value;
