@@ -209,9 +209,6 @@ var Editor = function(args) {
 		} else {
 			element.find(':input:first').focus().select();
 		}
-		if (element.is('[x-cell-css*=select-item]') && element.scope().showSelection) {
-			element.scope().showSelection(300);
-		}
 	}
 
 	this.focus = function() {
