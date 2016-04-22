@@ -80,16 +80,14 @@ ui.formInput('ImageLink', {
 	link_readonly: function(scope, element, attrs, model) {
 
 		var image = element.children('img:first');
-
-		scope.$render_readonly = function() {
-			image.get(0).src = scope.parseText(model.$viewValue) || BLANK;
-		};
-
-		scope.$watch("record.id", function(id, old) {
+		var update = scope.$render_readonly = function () {
 			if (scope.isReadonly()) {
-				scope.$render_readonly();
+				image.get(0).src = scope.parseText(model.$viewValue) || BLANK;
 			}
-		});
+		}
+
+		scope.$watch("record.id", update);
+		scope.$watch("isReadonly()", update);
 	},
 	template_editable: '<input type="text">',
 	template_readonly:
