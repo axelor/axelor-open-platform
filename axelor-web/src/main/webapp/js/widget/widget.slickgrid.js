@@ -629,8 +629,10 @@ Grid.prototype.parse = function(view) {
 		};
 		
 		var css = [type];
-		if (!field.readonly && item.forEdit !== false) {
-			css.push('slick-cell-editable');
+		if (item.forEdit !== false) {
+			if (!field.readonly) {
+				css.push('slick-cell-editable');
+			}
 			if (field.required) {
 				css.push('slick-cell-required');
 			}
