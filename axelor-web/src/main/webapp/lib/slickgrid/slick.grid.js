@@ -2238,8 +2238,25 @@ if (typeof Slick === "undefined") {
       // XXX: hack to deffer click event
       var wait = trigger(self.onClick, {row: cell.row, cell: cell.cell}, e);
       if (wait > 0) {
-	    return defer(handleClick, wait, e, cell);
+	    return defer(doHandleClick, wait, e, cell);
       };
+
+      return doHandleClick(e, lastCell);
+    }
+
+    function doHandleClick(e, lastCell) {
+      if (!currentEditor) {
+        // if this click resulted in some cell child node getting focus,
+        // don't steal it back - keyboard events will still bubble up
+        if (e.target != document.activeElement) {
+          setFocus();
+        }
+      }
+
+      var cell = getCellFromEvent(e) || lastCell;
+      if (!cell || (currentEditor !== null && activeRow == cell.row && activeCell == cell.cell)) {
+	    return;
+      }
 
       if (e.isImmediatePropagationStopped()) {
         return;
