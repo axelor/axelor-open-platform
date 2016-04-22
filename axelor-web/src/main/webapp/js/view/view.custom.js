@@ -42,6 +42,10 @@ function CustomViewCtrl($scope, $http, DataSource, ViewService) {
 	};
 
 	$scope.onShow = function(viewPromise) {
+		// it will be refreshed by dashlet
+		if ($scope.dashlet) {
+			return;
+		}
 		viewPromise.then(function () {
 			$scope.onRefresh();
 		});
