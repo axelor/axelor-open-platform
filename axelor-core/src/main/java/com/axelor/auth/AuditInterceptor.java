@@ -66,7 +66,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 
 	@Override
 	public void beforeTransactionCompletion(Transaction tx) {
-		tracker.get().onComplete(tx);
+		tracker.get().onComplete(tx, getUser());
 	}
 
 	private User getUser() {
@@ -163,7 +163,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 
 		// change tracking
 		if (tracker.get() != null) {
-			tracker.get().track(getUser(), (AuditableModel) entity, propertyNames, currentState, previousState);
+			tracker.get().track((AuditableModel) entity, propertyNames, currentState, previousState);
 		}
 
 		return true;
@@ -192,7 +192,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 
 		// change tracking
 		if (tracker.get() != null) {
-			tracker.get().track(user, (AuditableModel) entity, propertyNames, state, null);
+			tracker.get().track((AuditableModel) entity, propertyNames, state, null);
 		}
 
 		return true;

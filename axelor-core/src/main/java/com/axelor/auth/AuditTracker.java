@@ -32,7 +32,6 @@ import com.axelor.auth.db.AuditableModel;
 import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
 import com.axelor.db.JPA;
-import com.axelor.db.Model;
 import com.axelor.db.annotations.Track;
 import com.axelor.db.annotations.TrackEvent;
 import com.axelor.db.annotations.TrackField;
@@ -44,6 +43,7 @@ import com.axelor.inject.Beans;
 import com.axelor.mail.MailConstants;
 import com.axelor.mail.db.MailFollower;
 import com.axelor.mail.db.MailMessage;
+import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
@@ -57,16 +57,34 @@ import com.google.common.base.Objects;
  */
 final class AuditTracker {
 
-	private static final ThreadLocal<List<Model>> PENDING = new ThreadLocal<>();
+	private static final ThreadLocal<Map<String, EntityState>> STORE = new ThreadLocal<>();
+
+	private static class EntityState {
+
+		private AuditableModel entity;
+
+		private Map<String, Object> values;
+		private Map<String, Object> oldValues;
+
+		public static void create(AuditableModel entity, Map<String, Object> values, Map<String, Object> oldValues) {
+			if (STORE.get() == null) {
+				STORE.set(new HashMap<String, EntityState>());
+			}
+			String key = entity.getClass().getName() + ":" + entity.getId();
+			EntityState state = STORE.get().get(key);
+			if (state == null) {
+				state = new EntityState();
+				state.entity = entity;
+				state.values = values;
+				state.oldValues = oldValues;
+				STORE.get().put(key, state);
+			} else {
+				state.values.putAll(values);
+			}
+		}
+	}
 
 	private ObjectMapper objectMapper;
-
-	private void add(Model entity) {
-		if (PENDING.get() == null) {
-			PENDING.set(new ArrayList<Model>());
-		}
-		PENDING.get().add(entity);
-	}
 
 	private String toJSON(Object value) {
 		if (objectMapper == null) {
@@ -133,8 +151,6 @@ final class AuditTracker {
 	/**
 	 * Record the changes as a notification message.
 	 *
-	 * @param user
-	 *            the user who initiated the change
 	 * @param entity
 	 *            the object being tracked
 	 * @param names
@@ -144,15 +160,12 @@ final class AuditTracker {
 	 * @param previousState
 	 *            old values
 	 */
-	public void track(User user, AuditableModel entity, String[] names, Object[] state, Object[] previousState) {
+	public void track(AuditableModel entity, String[] names, Object[] state, Object[] previousState) {
 
 		final Track track = getTrack(entity);
 		if (track == null) {
 			return;
 		}
-
-		final Mapper mapper = Mapper.of(entity.getClass());
-		final MailMessage message = new MailMessage();
 
 		final Map<String, Object> values = new HashMap<>();
 		final Map<String, Object> oldValues = new HashMap<>();
@@ -167,7 +180,22 @@ final class AuditTracker {
 			}
 		}
 
-		final ScriptBindings bindings = new ScriptBindings(values);
+		EntityState.create(entity, values, oldValues);
+	}
+
+	private void process(EntityState state, User user) {
+
+		final AuditableModel entity = state.entity;
+		final Mapper mapper = Mapper.of(entity.getClass());
+		final MailMessage message = new MailMessage();
+
+		final Track track = getTrack(entity);
+
+		final Map<String, Object> values = state.values;
+		final Map<String, Object> oldValues = state.oldValues;
+		final Map<String, Object> previousState = oldValues.isEmpty() ? null : oldValues;
+
+		final ScriptBindings bindings = new ScriptBindings(state.values);
 		final ScriptHelper scriptHelper = new CompositeScriptHelper(bindings);
 
 		final List<Map<String, String>> tags = new ArrayList<>();
@@ -271,7 +299,8 @@ final class AuditTracker {
 		message.setRelatedId(entity.getId());
 		message.setRelatedModel(entity.getClass().getName());
 		message.setType(MailConstants.MESSAGE_TYPE_NOTIFICATION);
-		add(message);
+
+		Beans.get(MailMessageRepository.class).save(message);
 
 		try {
 			message.setRelatedName(mapper.getNameField().get(entity).toString());
@@ -284,7 +313,7 @@ final class AuditTracker {
 			follower.setRelatedModel(entity.getClass().getName());
 			follower.setUser(user);
 			follower.setArchived(false);
-			add(follower);
+			Beans.get(MailFollowerRepository.class).save(follower);
 		}
 	}
 
@@ -295,25 +324,23 @@ final class AuditTracker {
 	 *
 	 * @param tx
 	 *            the transaction in which the change tracking is being done
+	 * @param user
+	 *            the session user
 	 */
-	public void onComplete(Transaction tx) {
-		final List<Model> pending = PENDING.get();
-		if (pending == null) {
+	public void onComplete(Transaction tx, User user) {
+
+		final Map<String, EntityState> store = STORE.get();
+		if (store == null) {
 			return;
 		}
 		// prevent concurrent update
-		PENDING.remove();
+		STORE.remove();
 		try {
-			for (Model entity : pending) {
-				if (entity instanceof MailMessage) {
-					Beans.get(MailMessageRepository.class).save((MailMessage) entity);
-				} else {
-					JPA.em().persist(entity);
-				}
+			for (EntityState state : store.values()) {
+				process(state, user);
 			}
 		} finally {
 			JPA.em().flush();
-			PENDING.remove();
 		}
 	}
 }
