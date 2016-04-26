@@ -54,6 +54,7 @@ import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaActionRepository;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
+import com.axelor.meta.schema.views.Selection;
 import com.axelor.rpc.Resource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.persist.Transactional;
@@ -278,8 +279,10 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 			if (property == null || property.getSelection() == null) {
 				continue;
 			}
-			item.put("displayValue", MetaStore.getSelectionItem(property.getSelection(), item.get("value")).getLocalizedTitle());
-			item.put("oldDisplayValue", MetaStore.getSelectionItem(property.getSelection(), item.get("oldValue")).getLocalizedTitle());
+			final Selection.Option d1 = MetaStore.getSelectionItem(property.getSelection(), item.get("value"));
+			final Selection.Option d2 = MetaStore.getSelectionItem(property.getSelection(), item.get("oldValue"));
+			item.put("displayValue", d1 == null ? null : d1.getLocalizedTitle());
+			item.put("oldDisplayValue", d2 == null ? null : d2.getLocalizedTitle());
 		}
 
 		bodyData.put("tracks", values);
