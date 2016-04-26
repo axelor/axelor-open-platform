@@ -60,8 +60,10 @@ function updateValues(source, target, itemScope, formScope) {
 				});
 				if (_.has(item, "version") && item.id) item.$fetched = true;
 				if (found) {
-					updateValues(item, found);
-					return found;
+					var found_ = _.extend({}, found);
+					var changed_ = updateValues(item, found_);
+					changed = changed || changed_;
+					return changed_ ? found_ : found;
 				}
 				return item;
 			});
@@ -70,7 +72,7 @@ function updateValues(source, target, itemScope, formScope) {
 			if (dest.id === value.id) {
 				if (_.isNumber(dest.version)) {
 					dest = _.extend({}, dest);
-					updateValues(value, dest, itemScope. formScope);
+					changed = updateValues(value, dest, itemScope. formScope) || changed;
 				} else {
 					dest.$updatedValues = value;
 					if (formScope) {
@@ -92,6 +94,8 @@ function updateValues(source, target, itemScope, formScope) {
 	if (target && changed) {
 		target.$dirty = true;
 	}
+
+	return changed;
 }
 
 function handleError(scope, item, message) {
