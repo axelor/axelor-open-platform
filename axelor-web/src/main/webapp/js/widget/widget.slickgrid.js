@@ -1092,7 +1092,7 @@ Grid.prototype._doInit = function(view) {
 		}
 		
 		var empty = that.element.find('.slick-cell-required:empty').get(0);
-		if (empty) {
+		if (empty && !($(empty).parent().is('.slick-group-totals'))) {
 			that.grid.setActiveNode(empty);
 			that.grid.editActiveCell();
 			e.preventDefault();
