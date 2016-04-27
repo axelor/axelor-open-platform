@@ -378,6 +378,26 @@ public class RestService extends ResourceService {
 	}
 
 	private static final String BLANK_IMAGE = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+	
+	@SuppressWarnings("all")
+	private javax.ws.rs.core.Response download(MetaFile metaFile) {
+		final Mapper mapper = Mapper.of(MetaFile.class);
+		final String fileName = (String) mapper.get(metaFile, "fileName");
+		final String filePath = (String) mapper.get(metaFile, "filePath");
+		final File inputFile = Beans.get(MetaFiles.class).getPath(filePath).toFile();
+		if (!inputFile.exists()) {
+			return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+		}
+		return javax.ws.rs.core.Response.ok(new StreamingOutput() {
+
+			@Override
+			public void write(OutputStream output) throws IOException, WebApplicationException {
+				uploadSave(new FileInputStream(inputFile), output);
+			}
+		})
+		.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+		.build();
+	}
 
 	@GET
 	@Path("{id}/{field}/download")
@@ -388,8 +408,6 @@ public class RestService extends ResourceService {
 			@PathParam("field") String field,
 			@QueryParam("image") boolean isImage) throws IOException {
 
-		final boolean isAttachment = MetaFile.class.getName().equals(getModel());
-
 		final Class klass = getResource().getModel();
 		final Mapper mapper = Mapper.of(klass);
 		final Model bean = JPA.find(klass, id);
@@ -398,26 +416,16 @@ public class RestService extends ResourceService {
 			return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
 		}
 
-		if (isAttachment) {
-			final String fileName = (String) mapper.get(bean, "fileName");
-			final String filePath = (String) mapper.get(bean, "filePath");
-			final File inputFile = Beans.get(MetaFiles.class).getPath(filePath).toFile();
-			if (!inputFile.exists()) {
-				return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
-			}
-			return javax.ws.rs.core.Response.ok(new StreamingOutput() {
-
-				@Override
-				public void write(OutputStream output) throws IOException, WebApplicationException {
-					uploadSave(new FileInputStream(inputFile), output);
-				}
-			})
-			.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
-			.build();
+		if (bean instanceof MetaFile) {
+			return download((MetaFile) bean);
 		}
 
 		String fileName = getModel() + "_" + field;
 		Object data = mapper.get(bean, field);
+
+		if (data instanceof MetaFile) {
+			return download((MetaFile) data);
+		}
 
 		if (isImage) {
 			String base64 = BLANK_IMAGE;
