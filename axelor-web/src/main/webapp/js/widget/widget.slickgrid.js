@@ -1065,6 +1065,11 @@ Grid.prototype._doInit = function(view) {
 			lock.commitCurrentEdit();
 			row = grid.getDataItem(grid.getDataLength() - 1); // to check if adding new row
 		}
+		if (grid.getActiveCell() && that.focusInvalidCell(grid.getActiveCell())) {
+			e.preventDefault();
+			showErrorNotice();
+			return false;
+		}
 
 		var beforeSavePending = that.__beforeSavePending || (row && row.id === 0);
 
@@ -1091,9 +1096,12 @@ Grid.prototype._doInit = function(view) {
 			});
 		}
 		
-		var empty = that.element.find('.slick-cell-required:empty').get(0);
-		if (empty && !($(empty).parent().is('.slick-group-totals'))) {
-			that.grid.setActiveNode(empty);
+		var node = that.element.find('.slick-cell-required:empty,.slick-cell > .ng-invalid').first();
+		if (node.parent().is('.slick-cell')) {
+			node = node.parent();
+		}
+		if (node.size()) {
+			that.grid.setActiveNode(node[0]);
 			that.grid.editActiveCell();
 			e.preventDefault();
 			showErrorNotice();
@@ -1749,10 +1757,12 @@ Grid.prototype.focusInvalidCell = function(args) {
 			if (cell > -1) {
 				grid.setActiveCell(args.row, cell);
 				grid.editActiveCell();
-				break;
+				return true;
 			}
 		}
 	}
+
+	return false;
 };
 
 Grid.prototype.addNewRow = function (args) {
@@ -2125,18 +2135,39 @@ Grid.prototype.onButtonClick = function(event, args) {
 
 Grid.prototype.onItemClick = function(event, args) {
 
+	var that = this;
+	var waitCallback = function (done) {
+		setTimeout(function () {
+			that.__onItemClick(event, args);
+			if (done) {
+				done();
+			}
+		}, 100);
+	};
+
 	var lock = this.grid.getEditorLock();
 	if (lock.isActive()) {
 		lock.commitCurrentEdit();
 		if (this.editorScope &&
 			this.editorScope.$lastEditor &&
 			this.editorScope.$lastEditor.shouldWait()) {
-			return 300;
+			return waitCallback;
 		}
 	}
+
 	// prevent edit if some action is still in progress
 	if (this.isDirty() && axelor.blockUI()) {
-		return 200;
+		return waitCallback;
+	}
+
+	return this.__onItemClick(event, args);
+}
+
+Grid.prototype.__onItemClick = function(event, args) {
+
+	// prevent edit if some action is still in progress
+	if (this.isDirty() && axelor.blockUI()) {
+		return;
 	}
 
 	var source = $(event.target);

@@ -2215,10 +2215,11 @@ if (typeof Slick === "undefined") {
       }
     }
 
-    function defer(func, wait) {
-      var args = Array.prototype.slice.call(arguments, 2);
+    function defer(func, wait, e, cell) {
       setTimeout(function () {
-        func.apply(null, args);
+        func(function () {
+          doHandleClick(e, cell);
+        });
       }, wait);
     }
 
@@ -2236,15 +2237,15 @@ if (typeof Slick === "undefined") {
 	    return;
       }
       // XXX: hack to deffer click event
-      var wait = trigger(self.onClick, {row: cell.row, cell: cell.cell}, e);
-      if (wait > 0) {
-	    return defer(doHandleClick, wait, e, cell);
+      var waitCallback = trigger(self.onClick, {row: cell.row, cell: cell.cell}, e);
+      if ($.isFunction(waitCallback)) {
+	    return defer(waitCallback, 200, e, cell);
       };
 
-      return doHandleClick(e, lastCell);
+      return doHandleClick(e, cell);
     }
 
-    function doHandleClick(e, lastCell) {
+    function doHandleClick(e, cell) {
       if (!currentEditor) {
         // if this click resulted in some cell child node getting focus,
         // don't steal it back - keyboard events will still bubble up
@@ -2252,9 +2253,7 @@ if (typeof Slick === "undefined") {
           setFocus();
         }
       }
-
-      var cell = getCellFromEvent(e) || lastCell;
-      if (!cell || (currentEditor !== null && activeRow == cell.row && activeCell == cell.cell)) {
+      if (!cell) {
 	    return;
       }
 
