@@ -659,19 +659,21 @@ Grid.prototype.parse = function(view) {
 			command: "sort-desc"
 		}, {
 			separator: true
-		}, {
+		}, view.editable ? null : {
 			title: _t("Group by") + " <i>" + column.name + "</i>",
 			command: "group-by"
-		}, {
+		}, view.editable ? null : {
 			title: _t("Ungroup"),
 			command: "ungroup"
-		}, {
+		}, view.editable ? null : {
 			separator: true
 		}, {
 			title: _t("Hide") + " <i>" + column.name + "</i>",
 			command: "hide"
 		}];
-		
+
+		menus = _.compact(menus);
+
 		column.header = {
 			menu: {
 				items: menus,
@@ -2557,6 +2559,8 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 					schema.editable = field.editable;
 				}
 				schema.orderBy = field.orderBy || schema.orderBy;
+				schema.groupBy = field.groupBy || schema.groupBy;
+				schema.groupBy = (schema.editable || schema.groupBy === "false") ? false : schema.groupBy;
 
 				element.show();
 				doInit();
