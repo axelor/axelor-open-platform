@@ -53,6 +53,9 @@ public class PanelRelated extends AbstractPanel {
 	private String orderBy;
 
 	@XmlAttribute
+	private String groupBy;
+
+	@XmlAttribute
 	private String domain;
 	
 	@XmlAttribute
@@ -139,6 +142,14 @@ public class PanelRelated extends AbstractPanel {
 
 	public void setOrderBy(String orderBy) {
 		this.orderBy = orderBy;
+	}
+
+	public String getGroupBy() {
+		return groupBy;
+	}
+
+	public void setGroupBy(String groupBy) {
+		this.groupBy = groupBy;
 	}
 
 	public Boolean getEditable() {
