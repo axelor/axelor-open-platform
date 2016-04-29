@@ -313,21 +313,28 @@ public class MailServiceImpl implements MailService, MailConstants {
 		if (text == null || !MESSAGE_TYPE_NOTIFICATION.equals(message.getType()) || !(text.startsWith("{") || text.startsWith("}"))) {
 			return text;
 		}
+		
+		final MailMessageRepository messages = Beans.get(MailMessageRepository.class);
+		final Map<String, Object> details = messages.details(message);
+		final String jsonBody = details.containsKey("body") ? (String) details.get("body") : text;
 
 		// audit tracking notification is stored as json data
 		final ObjectMapper mapper = Beans.get(ObjectMapper.class);
-		final Map<String, Object> map = mapper.readValue(text, new TypeReference<Map<String, Object>>() {});
+		final Map<String, Object> data = mapper.readValue(jsonBody, new TypeReference<Map<String, Object>>() {});
 
-		final Map<String, Object> data = new HashMap<>();
-
-		data.put("audit", map);
 		data.put("entity", entity);
+
+		//TODO: improve template to include messages and tags
 
 		Templates templates = Beans.get(GroovyTemplates.class);
 		Template tmpl = templates.fromText(""
 				+ "<ul>"
-				+ "<% for (def item : audit.tracks) { %>"
-				+ "<li><strong>${item.title}</strong>: <span>${item.value}</span></li>"
+				+ "<% for (def item : tracks) { %>"
+				+ "<% if (item.containsKey('displayValue')) { %>"
+				+ "<li><strong>${item.title}</strong>: <span>${item.oldDisplayValue}</span> &raquo; <span>${item.displayValue}</span></li>"
+				+ "<% } else { %>"
+				+ "<li><strong>${item.title}</strong>: <span>${item.oldValue}</span> &raquo; <span>${item.value}</span></li>"
+				+ "<% } %>"
 				+ "<% } %>"
 				+ "</ul>");
 
