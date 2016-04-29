@@ -277,8 +277,13 @@ public class MailServiceImpl implements MailService, MailConstants {
 			}
 		}
 		for (MailFollower follower : followers.findAll(message)) {
-			if (follower.getEmail() != null && follower.getArchived() != Boolean.TRUE) {
+			if (follower.getArchived() == Boolean.TRUE) {
+				continue;
+			}
+			if (follower.getEmail() != null) {
 				recipients.add(follower.getEmail().getAddress());
+			} else if (follower.getUser() != null && follower.getUser().getEmail() != null) {
+				recipients.add(follower.getUser().getEmail());
 			}
 		}
 
