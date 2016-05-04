@@ -167,7 +167,7 @@
     <field name="left"/>
     <field name="mobile"/>
     <field name="hidden"/>
-    <field name="sequence"/>
+    <field name="order"/>
     <field name="priority"/>
   </grid>
 
