@@ -50,6 +50,28 @@ and lot more...
 Almost all fixes in v3.x branch are merged in v4.x branch. See git log for more comprehensive
 list of changes.
 
+# 3.1.4 (2016-04-13)
+
+## Bug fixes
+
+- fix open view as popup
+- fix "close" action validation
+- fix pagination issue on dashlet grid
+- fix dashlet refresh issue
+- fix dashlet context issue
+- fix jquery-ui css conflict
+
+# 3.1.3 (2016-03-25)
+
+## Bug fixes
+
+- fix jquery-ui css conflict
+- fix html widget update issue
+- fix view switching issue in popup
+- fix empty space left by hidden widgets
+- fix view switching issue in popup
+- fix action-attrs issue on toolbar
+
 # 3.1.2 (2016-03-10)
 
 ## Improvements
