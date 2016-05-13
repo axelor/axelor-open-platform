@@ -102,7 +102,7 @@ public class MetaScanner {
 				if (res == null) {
 					res = cl.findResource("application.properties");
 				}
-				if (res != null || Paths.get(item.getPath()).endsWith("build/classes/test/")) {
+				if (res != null || item.getPath().endsWith("build/classes/test/")) {
 					path.add(item);
 				}
 			} catch (IOException e) {
