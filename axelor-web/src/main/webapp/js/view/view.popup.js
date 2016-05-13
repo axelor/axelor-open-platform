@@ -759,7 +759,7 @@ angular.module('axelor.ui').directive('uiAttachmentPopup', function(){
 				frame.attr("src", url);
 				setTimeout(function(){
 					frame.attr("src", "");
-				}, 100);
+				}, 500);
 			};
 			
 			scope.$watch('schema.title', function(title){
