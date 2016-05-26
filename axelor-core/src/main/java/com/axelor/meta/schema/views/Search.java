@@ -393,11 +393,18 @@ public class Search extends AbstractView {
 		@XmlAttribute
 		private String match;
 
+		@XmlAttribute
+		private Boolean showArchived;
+
 		@XmlElement(name = "input")
 		private List<SearchSelectInput> inputs;
 
 		public String getMatch() {
 			return match;
+		}
+
+		public Boolean getShowArchived() {
+			return showArchived;
 		}
 
 		public List<SearchSelectInput> getInputs() {
@@ -429,6 +436,7 @@ public class Search extends AbstractView {
 			List<String> where = Lists.newArrayList();
 			Map<String, Object> binding = Maps.newHashMap();
 			Multimap<String, String> groups = HashMultimap.create();
+			boolean filterArchived = showArchived != Boolean.TRUE;
 
 			String join = "any".equals(match) ? " OR " : " AND ";
 
@@ -482,6 +490,13 @@ public class Search extends AbstractView {
 						left = name;
 					}
 
+					if ("archived".equals(input.getField())) {
+						filterArchived = value != Boolean.TRUE;
+						if (filterArchived) {
+							continue;
+						}
+					}
+
 					String first = as.split("\\.")[0];
 					as = as.replace('.', '_');
 
@@ -502,9 +517,20 @@ public class Search extends AbstractView {
 				builder.append(" ").append(joinHelper.toString());
 			}
 
+			builder.append(" WHERE ");
+
+			if (filterArchived) {
+				builder.append("(self.archived is null OR self.archived = false)");
+			}
+
 			if (where.size() > 0) {
-				builder.append(" WHERE ");
+				if (filterArchived) {
+					builder.append(" AND (");
+				}
 				Joiner.on(join).appendTo(builder, where);
+				if (filterArchived) {
+					builder.append(")");
+				}
 				return binding;
 			}
 
