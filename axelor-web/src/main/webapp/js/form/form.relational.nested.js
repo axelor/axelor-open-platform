@@ -305,7 +305,6 @@ var NestedEditor = {
 
 				var ds = nested._dataSource;
 				var name = scope.field.name;
-				var orig = (scope.$$original||{})[name];
 
 				// don't process default values
 				if (ds.equals(rec, nested.defaultValues)) {
@@ -314,14 +313,14 @@ var NestedEditor = {
 
 				if (_.isEmpty(rec)) rec = null;
 				if (_.isEmpty(old)) old = null;
-
-				if (rec) {
-					var dirty = !ds.equals(rec, original);
-					if (original) {
-						rec.$dirty = dirty;
-					}
-					model.$setViewValue(dirty ? rec : orig);
+				if (rec == old) {
+					return;
 				}
+				if (rec) {
+					rec.$dirty = !(rec.id > 0 && ds.equals(rec, original));
+				}
+
+				model.$setViewValue(rec);
 				setValidity(nested, nested.isValid());
 			}, true);
 
