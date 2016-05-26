@@ -261,7 +261,6 @@
 	overflow: inherit;
 
 	border: 1px solid #d4d4d4;
-	border-top: none;
 }
 
 .panel-tabs .tab-content > .panel {
@@ -391,7 +390,8 @@
 }
 
 .panel-tabs .nav-tabs-responsive {
-	margin-bottom: 0;
+	margin-bottom: -1px;
+	display: inline-flex;
 }
 
 .panel-tabs .nav-tabs-responsive > li.dropdown {
@@ -408,7 +408,7 @@
 .panel-tabs .nav-tabs-responsive > li.dropdown > a > span {
 	display: inline-block;
 	max-width: 74px;
-	margin-bottom: -4px;
+	margin-bottom: -5px;
 }
 
 /** some special classes */
@@ -479,4 +479,4 @@
 		text-align: right;
 		width: 48%;
 	}
-}
+}}}}
