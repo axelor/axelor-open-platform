@@ -201,8 +201,11 @@ ui.directive('uiCanSuggest', function () {
 	};
 });
 
-var m2oTemplateReadonly = '<a href="" ng-show="text" ng-click="onEdit()">{{text}}</a>'
-var m2oTemplateReadonlyPlain = '<span class="display-text" ng-show="text">{{text}}</span>';
+var m2oTemplateReadonly = "" +
+		"<span class='display-text' ng-show='text'>" +
+			"<a href='' ng-show='canView()' ng-click='onEdit()'>{{text}}</a>" +
+			"<span ng-show='!canView()'>{{text}}</span>" +
+		"</span>";
 
 var m2oTemplateEditable = '' +
 '<div class="picker-input picker-icons-3 tag-select-single">'+
@@ -454,11 +457,7 @@ ui.formInput('ManyToOne', 'Select', {
 		}
 	},
 	template_editable: m2oTemplateEditable,
-	template_readonly: function (scope) {
-		return scope.canView() ?
-			m2oTemplateReadonly :
-			m2oTemplateReadonlyPlain;
-	}
+	template_readonly: m2oTemplateReadonly
 });
 
 ui.InlineManyToOneCtrl = InlineManyToOneCtrl;
@@ -543,9 +542,7 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 		if (field.editor && (field.editor.viewer || !field.targetName)) {
 			return null;
 		}
-		return scope.canView() ?
-				m2oTemplateReadonly:
-				m2oTemplateReadonlyPlain;
+		return m2oTemplateReadonly;
 	},
 
 	template_editable: function (scope) {
