@@ -513,11 +513,12 @@ ui.formWidget('PanelTabs', {
 				elem: elem,
 				tabItem: $(),
 				menuItem: $()
-			}
+			};
 			scope.tabs.push(tab);
 		});
 		
 		var selected = null;
+		var adjustPending = false;
 
 		function findTab(tab) {
 			var found = scope.tabs[tab] || tab;
@@ -563,8 +564,6 @@ ui.formWidget('PanelTabs', {
 				.add(found.menuItem)
 				.addClass('active');
 
-			setMenuTitle();
-
 			setTimeout(function () {
 				elemTabs.removeClass('open');
 				elemMenu.removeClass('open');
@@ -580,6 +579,8 @@ ui.formWidget('PanelTabs', {
 			if (!found) {
 				return;
 			}
+
+			adjustPending = true;
 
 			found.hidden = false;
 			found.tabItem.show();
@@ -599,6 +600,8 @@ ui.formWidget('PanelTabs', {
 				return;
 			}
 
+			adjustPending = true;
+
 			var wasHidden = found.hidden;
 
 			found.hidden = true;
@@ -613,7 +616,7 @@ ui.formWidget('PanelTabs', {
 
 			var tabs = scope.tabs;
 			for(var i = 0 ; i < tabs.length ; i++) {
-				var tab = tabs[i];
+				tab = tabs[i];
 				if (!tab.hidden) {
 					return scope.selectTab(tabs[i]);
 				}
@@ -629,7 +632,9 @@ ui.formWidget('PanelTabs', {
 			});
 		});
 
-		var menuWidth = 120; // max-width
+		var lastWidth = 0;
+		var lastTab = null;
+
 		var elemTabs = $();
 		var elemMenu = $();
 		var elemMenuTitle = $();
@@ -647,86 +652,92 @@ ui.formWidget('PanelTabs', {
 			});
 		}
 
-		function setMenuTitle() {
-			var more = null;
-			var show = false;
-			elemMenuItems.each(function (i) {
-				var elem = $(this);
-				var tab = scope.tabs[i] || {};
-				if (elem.data('visible')) show = true;
-				if (tab.selected && show) {
-					more = tab;
+		var setMenuTitle = (function() {
+			var setActive = _.debounce(function(selected) {
+				elemMenu.toggleClass('active', !!selected);
+			});
+			return function setMenuTitle(selected) {
+				elemMenu.show();
+				elemMenuTitle.html(selected && selected.title);
+				setActive(selected);
+			}
+		}());
+
+		function adjust() {
+			if (elemTabs === null || !scope.tabs || element.is(":hidden")) {
+				return;
+			}
+
+			var parentWidth = element.width() - 2;
+			if (parentWidth === lastWidth && lastTab === selected && !adjustPending) {
+				return;
+			}
+			lastWidth = parentWidth;
+			lastTab = selected;
+
+			elemTabs.parent().css('visibility', 'hidden');
+			elemMenu.hide();
+
+			// show visible tabs
+			scope.tabs.forEach(function (tab, i) {
+				if (tab.hidden) {
+					$(elemTabs[i]).hide();
+				} else {
+					$(elemTabs[i]).show();
 				}
 			});
-			scope.more = more;
-			if (show) {
-				elemMenu.show();
-				elemMenuTitle.html((more||{}).title);
+
+			if (elemTabs.parent().width() <= parentWidth) {
+				elemTabs.parent().css('visibility', '');
+				return;
 			}
+
+			setMenuTitle(null);
+
+			var elem = null;
+			var index = elemTabs.size();
+			var selectedIndex = scope.tabs.indexOf(selected);
+
+			while (elemTabs.parent().width() > parentWidth && index > 0) {
+				elem = $(elemTabs[--index]);
+				elem.hide();
+				if (index === selectedIndex) {
+					setMenuTitle(selected);
+				}
+			}
+
+			elemMenuItems.hide();
+			var tab = null;
+			while(index < scope.tabs.length) {
+				tab = scope.tabs[index++];
+				if (!tab.hidden) {
+					tab.menuItem.show();
+				}
+			}
+
+			elemTabs.parent().css('visibility', '');
 		}
 
 		var adjusting = false;
-
-		function adjust() {
-
-			if (elemTabs === null || adjusting) {
-				return;
+		element.on('adjustSize', _.debounce(function() {
+			if (adjusting) { return; }
+			try {
+				adjusting = true;
+				adjust();
+			} finally {
+				adjusting = false;
+				adjustPending = false;
 			}
-
-			var parentWidth = element.width() - 32;
-			if (parentWidth <= 0) {
-				return;
-			}
-
-			adjusting = true;
-
-			elemTabs.hide().css('visibility', 'hidden');
-			elemMenu.hide();
-			elemMenuTitle.empty();
-			elemMenuItems.hide().data('visible', null);
-
-			var count = 0;
-			var width = 0;
-			var last = null;
-
-			while (count < scope.tabs.length) {
-				var tab = scope.tabs[count++];
-				var elem = tab.tabItem;
-
-				if (tab.hidden) {
-					continue;
-				}
-
-				width += elem.show().width() + 3;
-				if (width > parentWidth && last) {
-					// requires menu...
-					elem.hide();
-					count--;
-					if (width + menuWidth - elem.width() > parentWidth) {
-						last.hide();
-						count--;
-					}
-					break;
-				}
-				last = elem.css('visibility', '');
-			}
-			while(count < elemTabs.size()) {
-				var tab = scope.tabs[count++];
-				if (tab.hidden) continue;
-				$(elemMenuItems[count-1]).show().data('visible', true);
-			}
-			if (count === elemTabs.size()) {
-				elemMenu.hide();
-			}
-			setMenuTitle();
-			adjusting = false;
-		}
-
-		element.on('adjustSize', _.debounce(adjust, 10));
+		}, 10));
 
 		scope.$timeout(function() {
 			setup();
-			scope.selectTab(_.first(scope.tabs));
+			var first = _.find(scope.tabs, function (tab) {
+				return !tab.hidden;
+			});
+			if (first) {
+				scope.selectTab(first);
+			}
 		});
 
 		scope.$on('on:edit', function (e, record) {
@@ -743,11 +754,9 @@ ui.formWidget('PanelTabs', {
 				"<li ng-repeat='tab in tabs' ng-class='{active: tab.selected}'>" +
 					"<a tabindex='-1' href='' ng-click='selectTab(tab)' ng-bind-html-unsafe='tab.title'></a>" +
 				"</li>" +
-				"<li class='dropdown' ng-class='{active: more.selected}' style='display: none'>" +
-					"<a tabindex='-1' href='' title='{{more.title}}' class='dropdown-toggle' ng-click='onMenuClick($event)'>" +
-						"<span></span><b class='caret'></b>" +
-					"</a>" +
-					"<ul class='dropdown-menu pull-right' data-toggle='dropdown'>" +
+				"<li class='dropdown' style='display: none'>" +
+					"<a tabindex='-1' href='' class='dropdown-toggle' data-toggle='dropdown' ng-click='onMenuClick($event)'><span></span><b class='caret'></b></a>" +
+					"<ul class='dropdown-menu pull-right'>" +
 						"<li ng-repeat='tab in tabs' ng-class='{active: tab.selected}'>" +
 							"<a tabindex='-1' href='' ng-click='selectTab(tab)' ng-bind-html-unsafe='tab.title'></a>" +
 						"</li>" +
@@ -788,10 +797,12 @@ ui.formWidget('PanelTab', {
 		});
 
 		scope.$watch("attr('hidden')", function(hidden, old) {
-			if (hidden) {
-				return scope.hideTab(index);
-			}
-			return scope.showTab(index);
+			scope.$evalAsync(function () {
+				if (hidden) {
+					return scope.hideTab(index);
+				}
+				return scope.showTab(index);
+			});
 		});
 	}
 });
