@@ -127,6 +127,12 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 	$scope.pagerText = function() {
 		return first ? first.pagerText() : "";
 	};
+	
+	$scope.resetPager = function() {
+		if (first) {
+			first.resetPager();
+		}
+	};
 
 	$scope.onClick = function(e, options) {
 		
@@ -290,6 +296,10 @@ function Loader(scope, node, DataSource) {
 			domain: _domain,
 			context: _context
 		};
+	};
+	
+	this.resetPager = function () {
+		ds._page.from = 0;
 	};
 
 	this.load = function(item, callback) {
@@ -735,14 +745,16 @@ ui.directive('uiViewTree', function(){
 TreePortletCtrl.$inject = ['$scope', '$element', 'DataSource', 'ActionService'];
 function TreePortletCtrl($scope, $element, DataSource, ActionService) {
 	
-	TreeViewCtrl($scope, $element, DataSource, ActionService);
+	TreeViewCtrl.call(this, $scope, $element, DataSource, ActionService);
 	
 	$scope.showPager = true;
 
 	$scope.$on("on:new", function(e) {
+		$scope.resetPager();
 		$scope.onRefresh();
 	});
 	$scope.$on("on:edit", function(e) {
+		$scope.resetPager();
 		$scope.onRefresh();
 	});
 }
