@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaSecurity;
@@ -55,6 +56,7 @@ import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaPermissions;
+import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.rpc.filter.Filter;
 import com.google.common.base.CaseFormat;
@@ -522,6 +524,20 @@ public class Resource<T extends Model> {
 		final List<Object> data = Lists.newArrayList();
 		final String[] fields = request.getFields().toArray(new String[]{});
 		final Map<String, Object> values = mergeRelated(request, entity, toMap(entity, fields));
+
+		// special case for User/Group objects
+		if (values.get("homeAction") != null) {
+			MetaAction act = JpaRepository.of(MetaAction.class).all()
+					.filter("self.name = ?", values.get("homeAction"))
+					.fetchOne();
+			if (act != null) {
+				values.put("__actionSelect", toMapCompact(act));
+			}
+		}
+		// don't include password if not requested
+		if (entity instanceof User && !request.getFields().contains("password")) {
+			values.remove("password");
+		}
 
 		data.add(values);
 		response.setData(data);
