@@ -30,19 +30,13 @@ import org.apache.shiro.crypto.hash.format.ParsableHashFormat;
 import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 
 import com.axelor.auth.db.User;
-import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.i18n.I18n;
-import com.axelor.inject.Beans;
-import com.axelor.meta.db.MetaAction;
-import com.axelor.meta.db.repo.MetaActionRepository;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
-import com.axelor.rpc.Resource;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
 /**
@@ -225,51 +219,5 @@ public class AuthService {
 		} else {
 			response.setData(ImmutableList.of(ImmutableMap.of("error", I18n.get("Password doesn't match"))));
 		}
-	}
-	
-	/**
-	 * Load the user preferences.
-	 * 
-	 * @param request
-	 *            the request with user object as context
-	 * @param response
-	 *            the response, which is updated according to the validation
-	 */
-	@Transactional
-	public void preferences(ActionRequest request, ActionResponse response) {
-
-		final UserRepository users = Beans.get(UserRepository.class);
-		final MetaActionRepository actions = Beans.get(MetaActionRepository.class);
-
-		User user = null;
-		User context = request.getContext().asType(User.class);
-		if (context.getId() != null) {
-			user = users.find(context.getId());
-		} else {
-			user = users.findByCode(context.getCode());
-		}
-		
-		if (user == null) {
-			response.setStatus(ActionResponse.STATUS_FAILURE);
-			return;
-		}
-
-		final Map<String, Object> values = Maps.newHashMap();
-		final MetaAction action = actions.findByName(user.getHomeAction());
-
-		if (context.getId() == null) {
-			values.put("id", user.getId());
-			values.put("version", user.getVersion());
-			values.put("email", user.getEmail());
-			values.put("language", user.getLanguage());
-			values.put("homeAction", user.getHomeAction());
-		}
-
-		if (action != null) {
-			values.put("__actionSelect", Resource.toMapCompact(action));
-		}
-
-		response.setValues(values);
-		response.setStatus(ActionResponse.STATUS_SUCCESS);
 	}
 }

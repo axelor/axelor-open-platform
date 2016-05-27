@@ -16,8 +16,7 @@
     <field name="group"/>
   </grid>
 
-  <form name="user-form" title="User" model="com.axelor.auth.db.User" onSave="com.axelor.auth.AuthService:validate"
-    onLoad="com.axelor.auth.AuthService:preferences">
+  <form name="user-form" title="User" model="com.axelor.auth.db.User" onSave="com.axelor.auth.AuthService:validate">
     <panel title="Overview">
       <field name="name" placeholder="user name" onChange="action-condition-user-validName" validIf="name.length >= 2"/>
       <field name="code" placeholder="login name" onChange="action-condition-user-validCode" validIf="code.length >= 2" readonlyIf="id &amp;&amp; code == 'admin'"/>
@@ -47,7 +46,6 @@
   </form>
 
   <form name="user-preferences-form" title="Preferences" model="com.axelor.auth.db.User"
-    onNew="com.axelor.auth.AuthService:preferences"
     onSave="com.axelor.auth.AuthService:validate">
     <panel title="User preferences" itemSpan="12">
       <field name="email" widget="Email"/>
