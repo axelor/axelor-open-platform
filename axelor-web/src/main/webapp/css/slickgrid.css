@@ -292,6 +292,13 @@
 	text-align: center;
 }
 
+.slick-cell.boolean .fa {
+	border: 1px solid #ccc;
+	padding: 2px;
+	width: 14px;
+    height: 14px;
+}
+
 .slick-headerrow input::-webkit-input-placeholder {
 	font-size: 11px;
 }

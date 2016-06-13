@@ -302,7 +302,7 @@ var Formatters = {
 	},
 	
 	"boolean": function(field, value) {
-		return value ? '<i class="fa fa-check"></i>' : "";
+		return value ? '<i class="fa fa-check"></i>' : "<i class='fa'></i>";
 	},
 	
 	"duration": function(field, value) {
