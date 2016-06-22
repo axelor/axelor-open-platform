@@ -1053,18 +1053,9 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			return record.createdOn || record.updatedOn || record.createBy || record.updatedBy;
 		};
 
-		scope.hasHelp = function() {
-			var view = scope.schema;
-			return view ? view.helpLink : false;
-		};
-		
 		scope.hasWidth = function() {
 			var view = scope.schema;
 			return view && view.width;
-		};
-
-		scope.onShowHelp = function() {
-			window.open(scope.schema.helpLink);
 		};
 		
 		var translatted = null;
