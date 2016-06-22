@@ -278,6 +278,11 @@
         </xsd:restriction>
       </xsd:simpleType>
     </xsd:attribute>
+    <xsd:attribute name="helpLink" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Link to a web page.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 
   <xsd:complexType name="SimpleView" abstract="true">
@@ -1086,11 +1091,6 @@
         <xsd:attribute name="onNew" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>Comma separate list of actions to execute on new event.</xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="helpLink" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>Link to a web page.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="readonlyIf" type="xsd:string">
