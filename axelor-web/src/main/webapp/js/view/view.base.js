@@ -359,7 +359,18 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
 		}
 		return true;
 	};
-	
+
+	$scope.hasHelp = function() {
+		var view = $scope.schema;
+		return view ? view.helpLink : false;
+	};
+
+	$scope.onShowHelp = function() {
+		if ($scope.hasHelp()) {
+			window.open($scope.schema.helpLink);			
+		}
+	};
+
 	if (view.deferred) {
 		view.deferred.resolve($scope);
 	}

@@ -9,6 +9,7 @@
   	    </div>
         <div class="btn-group">
           <button class="btn" ng-click="onRefresh()"><span x-translate>Refresh</span></button>
+          <button class="btn" ng-if="hasHelp()" ng-click="onShowHelp()"><i class="fa fa-info-circle"></i></button>
         </div>
         <div ui-view-customize class="pull-right"></div>
   	    <div ui-view-switcher class="pull-right"></div>
