@@ -881,7 +881,7 @@
 			prev: function(fields) {
 				var page = this._page;
 				return this.search({
-					offset: page.from - page.limit,
+					offset: Math.max(0, page.from - page.limit),
 					fields: fields
 				});
 			},
