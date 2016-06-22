@@ -48,6 +48,7 @@ public class ActionRequest extends Request {
 		
 		Map<String, Object> data = getData();
 		Map<String, Object> ctx = Maps.newHashMap();
+		Class<?> klass = getBeanClass();
 
 		if (data.get("context") != null) {
 			ctx.putAll((Map) data.get("context"));
@@ -55,7 +56,13 @@ public class ActionRequest extends Request {
 		if (data.get("_domainContext") != null) {
 			ctx.putAll((Map) data.get("_domainContext"));
 		}
+		if (ctx.get("_model") != null) {
+			try {
+				klass = Class.forName((String) ctx.get("_model"));
+			} catch (Exception e) {
+			}
+		}
 
-		return context = Context.create(ctx, getBeanClass());
+		return context = Context.create(ctx, klass);
 	}
 }
