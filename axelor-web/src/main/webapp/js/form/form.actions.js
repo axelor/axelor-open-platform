@@ -758,7 +758,8 @@ ActionHandler.prototype = {
 				containers = formElement.is('.m2o-editor-form,.o2m-editor-form') ? formElement : formElement.parents('[ui-form]:first').add(formElement);
 			} else {
 				containers = formElement;
-				toolbar = formElement.parents('.form-view:first').find('.record-toolbar:first');
+				toolbar = formElement.parents('.form-view:first,.search-view:first')
+					.find('.record-toolbar:first,.search-view-toolbar:first');
 			}
 
 			items = containers.find('[x-path="' + (formScope.formPath ?  formScope.formPath + '.' + name : name) + '"]');
