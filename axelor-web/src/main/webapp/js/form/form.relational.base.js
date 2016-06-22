@@ -138,12 +138,12 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	
 	function _showEditor(record) {
 		
-		if (field.editWindow === "blank") {
+		if (field.editWindow === "blank" && record && record.id > 0) {
 			var tab = {
 				action: _.uniqueId('$act'),
 				title: field.title,
 				model: field.target,
-				recordId: record ? record.id : null,
+				recordId: record.id,
 				views: [{
 					type: 'form',
 					name: field.formView

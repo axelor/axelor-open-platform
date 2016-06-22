@@ -91,6 +91,9 @@ public class PanelRelated extends AbstractPanel {
 	@XmlAttribute
 	private Boolean canMove;
 
+	@XmlAttribute(name = "edit-window")
+	private String editWindow;
+
 	@XmlElements({
 		@XmlElement(name = "field", type = PanelField.class),
 		@XmlElement(name = "button", type = Button.class),
@@ -254,6 +257,14 @@ public class PanelRelated extends AbstractPanel {
 
 	public void setCanMove(Boolean canMove) {
 		this.canMove = canMove;
+	}
+
+	public String getEditWindow() {
+		return editWindow;
+	}
+
+	public void setEditWindow(String editWindow) {
+		this.editWindow = editWindow;
 	}
 
 	public List<AbstractWidget> getItems() {
