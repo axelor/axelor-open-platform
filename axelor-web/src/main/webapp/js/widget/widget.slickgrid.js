@@ -343,8 +343,9 @@ var Formatters = {
 		var elem;
 		var isIcon = field.icon && field.icon.indexOf('fa-') === 0;
 		var css = isIcon ? "slick-icon-button fa " + field.icon : "slick-img-button";
-		
-		if (field.readonlyIf && axelor.$eval(grid.scope, field.readonlyIf, context)) {
+		var handler = grid.scope.handler;
+
+		if (field.readonlyIf && axelor.$eval(grid.scope, field.readonlyIf, _.extend({}, handler._context, context))) {
 			css += " readonly disabled";
 		}
 		
