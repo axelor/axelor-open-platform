@@ -72,7 +72,7 @@ function updateValues(source, target, itemScope, formScope) {
 			if (dest.id === value.id) {
 				if (_.isNumber(dest.version)) {
 					dest = _.extend({}, dest);
-					changed = updateValues(value, dest, itemScope. formScope) || changed;
+					changed = updateValues(value, dest, itemScope, formScope) || changed;
 				} else {
 					dest.$updatedValues = value;
 					if (formScope) {
