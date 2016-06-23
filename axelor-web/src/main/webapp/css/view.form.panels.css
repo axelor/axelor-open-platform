@@ -118,6 +118,10 @@
 	margin-bottom: 0;
 }
 
+.panel .row-fluid > .form-item-hidden:first-child + .form-item {
+	margin-left: 0;
+}
+
 .panel .row-fluid:last-child > .form-item-hidden,
 .panel .row-fluid:last-child > .form-item {
 	margin-bottom: 1px;
