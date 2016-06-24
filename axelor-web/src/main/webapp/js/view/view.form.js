@@ -499,6 +499,15 @@ function FormViewCtrl($scope, $element) {
 					}
 				});
 			}
+
+			// ensure correct date/datetime
+			_.each($scope.fields, function (field, name) {
+				if (field.defaultNow && $scope.defaultValues[name] !== undefined) {
+					$scope.defaultValues[name] = field.type === 'date'
+							? moment().startOf('day').format('YYYY-MM-DD')
+							: moment().toISOString();
+				}
+			});
 			return handleOnNew();
 		}
 		

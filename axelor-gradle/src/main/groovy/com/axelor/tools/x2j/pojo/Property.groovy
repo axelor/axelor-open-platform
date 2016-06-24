@@ -556,6 +556,7 @@ class Property {
 		def massUpdate = attrs['massUpdate']
 		def translatable = attrs['translatable']
 		def copyable = attrs['copy']
+		def defaultNow = attrs['default'] == 'now';
 
 		if (massUpdate && (isUnique() || isCollection() || isLarge())) {
 			massUpdate = false;
@@ -566,7 +567,7 @@ class Property {
 		}
 
 		if (title || help || readonly || hidden || multiline || selection ||
-			image || isPassword() || massUpdate || search || translatable || copyable)
+			image || isPassword() || massUpdate || search || translatable || copyable || defaultNow)
 			annon("com.axelor.db.annotations.Widget")
 				.add("image", image, false)
 				.add("title", title)
@@ -580,6 +581,7 @@ class Property {
 				.add("massUpdate", massUpdate, false)
 				.add("translatable", translatable, false)
 				.add("copyable", copyable, false)
+				.add("defaultNow", defaultNow ? "true" : null, false)
 	}
 
 	private List<Annotation> $binary() {

@@ -126,6 +126,8 @@ public class Property {
 
 	private boolean translatable;
 
+	private boolean defaultNow;
+
 	private transient String sequenceName;
 
 	private String[] nameSearch;
@@ -264,6 +266,7 @@ public class Property {
 				massUpdate = w.massUpdate();
 				copyable = w.copyable();
 				translatable = w.translatable();
+				defaultNow = w.defaultNow();
 
 				if (w.multiline() && type == PropertyType.STRING) {
 					type = PropertyType.TEXT;
@@ -455,6 +458,10 @@ public class Property {
 
 	public boolean isTranslatable() {
 		return translatable;
+	}
+
+	public boolean isDefaultNow() {
+		return defaultNow;
 	}
 
 	public String getSequenceName() {

@@ -90,6 +90,7 @@
     <string name="email" required="true" unique="true" initParam="true" massUpdate="true"/>
     <string name="phone" max="20"  hashKey="false" massUpdate="true"/>
     <string name="notes" multiline="true" title="About Me" />
+    <date name="dateOfBirth" default="now" />
     <many-to-many name="groups" ref="Group" mappedBy="contacts"/>
 
     <!-- test o2m fields with mappedBy & orphanRemoval -->

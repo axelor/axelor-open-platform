@@ -104,6 +104,13 @@ public @interface Widget {
 	boolean translatable() default false;
 
 	/**
+	 * Whether the field should use current date/datetime as default value.
+	 * 
+	 * @return true if "now" is given as defaultValue
+	 */
+	boolean defaultNow() default false;
+
+	/**
 	 * List of the columns to be used to search this record.
 	 *
 	 * Used by auto-complete widget. By default the same column will be
@@ -112,7 +119,7 @@ public @interface Widget {
 	 * 
 	 * @return array if fields on which to search, default is empty
 	 */
-	String[] search() default {};
+	String[]search() default {};
 
 	/**
 	 * The name of the selection.
