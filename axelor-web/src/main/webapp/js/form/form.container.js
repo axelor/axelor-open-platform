@@ -143,6 +143,17 @@ ui.formWidget('Dashlet', {
 		if (field.name) {
 			scope.formPath = field.name;
 		}
+		
+		
+		scope.$watch('attr("title")', function (title, old) {
+			if (title === old) {
+				return;
+			}
+			var dashletScope = element.children('[ui-view-dashlet]').scope();
+			if (dashletScope) {
+				dashletScope.title = title;
+			}
+		});
 	},
 
 	template:
