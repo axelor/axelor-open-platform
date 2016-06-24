@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("portlet")
-public class Portlet extends AbstractContainer {
+public class Portlet extends AbstractPanel {
 
 	@XmlAttribute
 	private String action;
