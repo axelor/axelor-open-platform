@@ -54,7 +54,7 @@ function ChartCtrl($scope, $element, $http) {
 			}
 		}
 
-		context = _.extend({}, context, (searchScope||{}).record);
+		context = _.extend({}, context, (searchScope||{}).record, { _domainAction: $scope._viewAction });
 		loading = true;
 		
 		var params = {

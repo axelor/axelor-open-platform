@@ -18,6 +18,7 @@
 package com.axelor.web.service;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,9 @@ import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
+import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
+import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.AbstractWidget;
 import com.axelor.meta.schema.views.Dashboard;
@@ -52,6 +55,7 @@ import com.axelor.meta.schema.views.Search;
 import com.axelor.meta.schema.views.SearchFilters;
 import com.axelor.meta.schema.views.SimpleContainer;
 import com.axelor.meta.service.MetaService;
+import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -368,6 +372,11 @@ public class ViewService extends AbstractService {
 	@POST
 	@Path("chart/{name}")
 	public Response chart(@PathParam("name") String name, Request request) {
+		final Map<String, Object> data = request.getData();
+		if (data == null || data.get("_domainAction") == null) {
+			return service.getChart(name, request);
+		}
+		ViewService.updateContext((String) data.get("_domainAction"), data);
 		return service.getChart(name, request);
 	}
 
@@ -375,5 +384,50 @@ public class ViewService extends AbstractService {
 	@Path("custom/{name}")
 	public Response dataset(@PathParam("name") String name, Request request) {
 		return service.getDataSet(name, request);
+	}
+
+	/**
+	 * Helper method to update context with re-evaluated domain context for the
+	 * given action.
+	 * 
+	 * @param action
+	 *            the action to re-evaluate
+	 * @param domainContext
+	 *            the context to update
+	 * @return updated domainContext
+	 */
+	@SuppressWarnings("all")
+	static Map<String, Object> updateContext(String action, Map<String, Object> domainContext) {
+		if (action == null || domainContext == null) {
+			return domainContext;
+		}
+		final Action act = MetaStore.getAction(action);
+		final String model = (String) domainContext.get("_model");
+		if (act == null || model == null) {
+			return domainContext;
+		}
+
+		final ActionRequest actRequest = new ActionRequest();
+		final Map<String, Object> actData = new HashMap<>();
+
+		actData.put("_model", model);
+		actData.put("_domainAction", action);
+		actData.put("_domainContext", domainContext);
+		
+		actRequest.setModel(model);
+		actRequest.setAction(action);
+		actRequest.setData(actData);
+
+		final ActionHandler actHandler = new ActionHandler(actRequest);
+		final Object res = act.evaluate(actHandler);
+
+		if (res instanceof Map) {
+			Map<String, Object> ctx = (Map) ((Map) res).get("context");
+			if (ctx != null) {
+				domainContext.putAll(ctx);
+			}
+		}
+
+		return domainContext;
 	}
 }

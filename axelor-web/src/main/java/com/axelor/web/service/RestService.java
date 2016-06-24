@@ -75,13 +75,10 @@ import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.mail.service.MailService;
 import com.axelor.mail.web.MailController;
-import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaFiles;
-import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaFileRepository;
-import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
@@ -159,28 +156,11 @@ public class RestService extends ResourceService {
 
 		// domain actions are used by portlets to evaluate view context
 		// in the context of the current form
-
 		final String action = (String) data.get("_domainAction");
-		final Action act = MetaStore.getAction(action);
-		final ActionRequest actRequest = new ActionRequest();
-		
-		actRequest.setModel(getModel());
-		actRequest.setAction(action);
-		actRequest.setData(data);
+		final Map<String, Object> old = (Map) data.get("_domainContext");
 
-		final ActionHandler actHandler = new ActionHandler(actRequest);
-		final Object res = act.evaluate(actHandler);
+		ViewService.updateContext(action, old);
 
-		if (res instanceof Map) {
-			Map<String, Object> old = (Map) data.get("_domainContext");
-			Map<String, Object> ctx = (Map) ((Map) res).get("context");
-			if (old == null) {
-				old = ctx;
-			} else {
-				old.putAll(ctx);
-			}
-		}
-		
 		return getResource().search(request);
 	}
 
