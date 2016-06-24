@@ -737,7 +737,9 @@ var directiveFn = function(){
 				}
 				setTimeout(function () {
 					svg.height(element.height() - form.height()).width('100%');
-					scope.title = data.title;
+					if (!scope.dashlet || !scope.dashlet.title) {
+						scope.title = data.title;
+					}
 					Chart(scope, svg, data);
 					return;
 				});
