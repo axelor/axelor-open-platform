@@ -25,8 +25,25 @@ var equals = angular.equals,
 	isObject = angular.isObject,
 	isDate = angular.isDate;
 
+function dummyEquals(a, b) {
+	if (a === b) return true;
+	if (a === null || b === null) return false;
+	if (a !== a && b !== b) return true; // NaN === NaN
+	var keys = _.keys(a).filter(function (k) { return k.indexOf('$') === 0; });
+	if (keys.length === 0) {
+		return true;
+	}
+	for (var i = 0; i < keys.length; i++) {
+		var k = keys[i];
+		if (!equals(a[k], b[k])) {
+			return false;
+		}
+	}
+	return true;
+}
+
 function updateValues(source, target, itemScope, formScope) {
-	if (equals(source, target))
+	if (equals(source, target) && dummyEquals(source, target))
 		return;
 
 	function compact(value) {
@@ -50,7 +67,7 @@ function updateValues(source, target, itemScope, formScope) {
 				});
 				if (_.has(item, "version") && item.id) item.$fetched = true;
 				if (found) {
-					updateValues(item, found);
+					updateValues(item, found, itemScope, formScope);
 					return found;
 				}
 				return item;
@@ -62,7 +79,7 @@ function updateValues(source, target, itemScope, formScope) {
 			if (dest.id === value.id) {
 				if (_.isNumber(dest.version)) {
 					dest = _.extend({}, dest);
-					updateValues(value, dest, itemScope. formScope);
+					updateValues(value, dest, itemScope, formScope);
 				} else {
 					dest.$updatedValues = value;
 					if (formScope) {
