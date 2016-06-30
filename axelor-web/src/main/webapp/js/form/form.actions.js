@@ -27,9 +27,26 @@ var equals = angular.equals,
 	isObject = angular.isObject,
 	isDate = angular.isDate;
 
+function dummyEquals(a, b) {
+	if (a === b) return true;
+	if (a === null || b === null) return false;
+	if (a !== a && b !== b) return true; // NaN === NaN
+	var keys = _.keys(a).filter(function (k) { return k.indexOf('$') === 0; });
+	if (keys.length === 0) {
+		return true;
+	}
+	for (var i = 0; i < keys.length; i++) {
+		var k = keys[i];
+		if (!equals(a[k], b[k])) {
+			return false;
+		}
+	}
+	return true;
+}
+
 function updateValues(source, target, itemScope, formScope) {
 
-	if (equals(source, target) && (!source || !source.$force)) {
+	if (equals(source, target) && dummyEquals(source, target) && (!source || !source.$force)) {
 		return;
 	}
 
