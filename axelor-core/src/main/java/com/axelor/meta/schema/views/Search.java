@@ -509,7 +509,7 @@ public class Search extends AbstractView {
 					}
 
 					binding.put(as, value);
-					groups.put(first, String.format("%s %s :%s", left, operator, as));
+					groups.put(first, filter);
 				}
 			}
 
