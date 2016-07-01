@@ -1,6 +1,14 @@
-# Current (3.2.0)
+# 3.2.0 (2016-07-01)
 
-## Bug fixes
+## Improvements
+
+- fix pagination issue on search
+- allow to select search view objects with actions
+- backport user preferences related changes from v4
+- allow to open url actions in new tab
+- add support for archived records in search view
+- add support for silent reload
+- implement view field permissions
 
 # 3.1.5 (2016-07-01)
 
