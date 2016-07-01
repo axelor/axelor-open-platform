@@ -1,6 +1,21 @@
-# Current (3.1.5)
+# 3.1.5 (2016-07-01)
 
 ## Bug fixes
+
+- fix core module dependency issue
+- fix view loader for unresolved imports
+- fix dummy field update issue
+- fix wrong alignment of fields
+- fix pagination issue
+- fix edit-window attribute on panel-related
+- allow helpLink all views
+- fix wrong context class issue
+- fix nested editor empty value issue
+- backport panel-tabs fixes from 4.x
+- fix m2o with canView=false not working
+- fix tree view dashlet reload issue
+- fix download attachment timeout
+- fixed tree view issues
 
 # 3.1.4 (2016-04-13)
 
