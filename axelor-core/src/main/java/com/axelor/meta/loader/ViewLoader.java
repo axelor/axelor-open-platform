@@ -118,12 +118,6 @@ public class ViewLoader extends AbstractLoader {
 				throw Throwables.propagate(e);
 			}
 		}
-
-		Set<?> unresolved = this.unresolvedKeys();
-		if (unresolved.size() > 0) {
-			log.error("unresolved items: {}", unresolved);
-			throw new PersistenceException("There are some unresolve items, check the log.");
-		}
 	}
 
 	@Override
@@ -131,6 +125,12 @@ public class ViewLoader extends AbstractLoader {
 	void doLast(Module module, boolean update) {
 		// generate default views
 		importDefault(module);
+		
+		Set<?> unresolved = this.unresolvedKeys();
+		if (unresolved.size() > 0) {
+			log.error("unresolved items: {}", unresolved);
+			throw new PersistenceException("There are some unresolve items, check the log.");
+		}
 	}
 
 	private static <T> List<T> getList(List<T> list) {
