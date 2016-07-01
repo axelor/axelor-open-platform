@@ -344,7 +344,16 @@ function GridViewCtrl($scope, $element) {
 			options.offset = (pageNum - 1 ) * ds._page.limit;
 		}
 
-		return ds.search(options);
+		return ds.search(options).then(function() {
+			// if search count is less than current page boundary, adjust the page and do search again
+			if (page.from > page.total) {
+				page.from = page.total - (page.total % page.limit);
+				page.to = Math.min(page.from + page.limit, page.total);
+				// need to update route
+				$scope.updateRoute();
+				return $scope.filter(searchFilter);
+			}
+		});
 	};
 
 	$scope.pagerText = function() {
