@@ -345,13 +345,10 @@ function GridViewCtrl($scope, $element) {
 		}
 
 		return ds.search(options).then(function() {
-			// if search count is less than current page boundary, adjust the page and do search again
-			if (page.from > page.total) {
-				page.from = page.total - (page.total % page.limit);
-				page.to = Math.min(page.from + page.limit, page.total);
-				// need to update route
+			var promise = ds.fixPage();
+			if (promise) {
 				$scope.updateRoute();
-				return $scope.filter(searchFilter);
+			  return promise;
 			}
 		});
 	};
