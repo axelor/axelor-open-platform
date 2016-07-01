@@ -224,7 +224,19 @@
 				
 				return promise;
 			},
-			
+
+			// if search count is less than current page boundary, adjust the page and do search again
+			fixPage: function () {
+				var page = this._page;
+				if (page.from >= page.total) {
+					page.from = page.total - (page.total % page.limit);
+					page.from = page.from === page.total ? page.from - page.limit : page.from;
+					page.from = Math.max(0, page.from);
+					page.to = Math.min(page.from + page.limit, page.total);
+					return this.search();
+				}
+			},
+
 			search: function(options) {
 				
 				var opts = _.extend({

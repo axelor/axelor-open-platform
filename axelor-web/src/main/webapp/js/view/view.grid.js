@@ -360,7 +360,11 @@ function GridViewCtrl($scope, $element) {
 			options.offset = (pageNum - 1 ) * ds._page.limit;
 		}
 
-		return ds.search(options);
+		return ds.search(options).then(function() {
+			if (ds.fixPage()) {
+				$scope.updateRoute();
+			}
+		});
 	};
 
 	$scope.pagerText = function() {

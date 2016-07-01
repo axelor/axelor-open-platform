@@ -91,7 +91,9 @@ function BaseCardsCtrl(type, $scope, $element) {
 			opts.sortBy = view.orderBy.split(',');
 		}
 
-		return ds.search(opts).success(update);
+		return ds.search(opts).success(update).then(function () {
+			return ds.fixPage();
+		});
 	};
 
 	$scope.pagerText = function() {
