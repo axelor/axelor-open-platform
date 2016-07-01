@@ -28,6 +28,7 @@ import com.axelor.tools.x2j.Generator
 class GenerateCode extends DefaultTask {
 
 	private static final Set<String> IGNORE = ["axelor-common", "axelor-test"]
+	private static final List<String> INCLUDE = ["axelor-core", "axelor-wkf"]
 
 	def _findDeps(Project project) {
 		return project.configurations.compile.allDependencies.withType(ProjectDependency).collect { it.dependencyProject }
@@ -154,6 +155,11 @@ class GenerateCode extends DefaultTask {
 			def depends = findAllModules(project).collect { it.name }
 			def installs = null
 			def removable = false
+			
+			if (!INCLUDE.contains(project.name)) {
+				depends = INCLUDE + depends
+				depends = depends.unique()
+			}
 
 			try {
 				removable = definition.removable
