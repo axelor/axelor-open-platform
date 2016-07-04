@@ -159,6 +159,10 @@ public abstract class AbstractView {
 	public void setCss(String css) {
 		this.css = css;
 	}
+	
+	public void setWidthSpec(String widthSpec) {
+		this.widthSpec = widthSpec;
+	}
 
 	public String getModel() {
 		if(model != null)
