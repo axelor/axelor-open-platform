@@ -220,7 +220,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 		var fields = scope.fields;
 		var fieldNames = _.pluck(schema.items, "name");
 		var firstField = fields[fieldNames[0]];
-		var mode = schema.mode || "day";
+		var mode = schema.mode || "week";
 		var editor = null;
 		ganttInit();
 
@@ -354,7 +354,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 	   }
 
 	   function ganttInit(){
-		   setScaleConfig("day");
+		   setScaleConfig("week");
 		   gantt.templates.leftside_text = function(start, end, task){
 				return "<span style='text-align:left;'>"+Math.round(task.progress*100)+ "% </span>";
 			};
