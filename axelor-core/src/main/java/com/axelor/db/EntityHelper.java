@@ -146,7 +146,7 @@ public final class EntityHelper {
 			}
 		}
 
-		return !hasHashKeys;
+		return hasHashKeys;
 	}
 
 	/**

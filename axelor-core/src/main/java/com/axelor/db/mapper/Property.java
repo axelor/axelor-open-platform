@@ -52,6 +52,7 @@ import javax.validation.constraints.Size;
 
 import com.axelor.common.Inflector;
 import com.axelor.db.Model;
+import com.axelor.db.annotations.HashKey;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.Sequence;
 import com.axelor.db.annotations.VirtualColumn;
@@ -246,6 +247,10 @@ public class Property {
 			
 			if (annotation instanceof Transient) {
 				transient_ = true;
+			}
+			
+			if (annotation instanceof HashKey) {
+				hashKey = true;
 			}
 			
 			if (annotation instanceof Sequence) {
