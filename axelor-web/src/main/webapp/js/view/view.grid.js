@@ -361,8 +361,10 @@ function GridViewCtrl($scope, $element) {
 		}
 
 		return ds.search(options).then(function() {
+			var promise = ds.fixPage();
 			if (ds.fixPage()) {
 				$scope.updateRoute();
+				return promise;
 			}
 		});
 	};
