@@ -58,6 +58,7 @@ public class CorsFilter implements Filter {
 	private static final String DEFAULT_CORS_ALLOW_CREDENTIALS = "true";
 	private static final String DEFAULT_CORS_ALLOW_METHODS = "GET,PUT,POST,DELETE,HEAD,OPTIONS";
 	private static final String DEFAULT_CORS_ALLOW_HEADERS = "Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers";
+	private static final String DEFAULT_EXPOSE_HEADERS = "";
 	private static final String DEFAULT_CORS_MAX_AGE = "1728000";
 
 	private static Pattern corsOriginPattern;
@@ -66,6 +67,7 @@ public class CorsFilter implements Filter {
 	private static String corsAllowCredentials;
 	private static String corsAllowMethods;
 	private static String corsAllowHeaders;
+	private static String corsExposeHeaders;
 	private static String corsMaxAge;
 
 	private Logger log = LoggerFactory.getLogger(CorsFilter.class);
@@ -79,6 +81,7 @@ public class CorsFilter implements Filter {
 		corsAllowCredentials = settings.get("cors.allow.credentials", DEFAULT_CORS_ALLOW_CREDENTIALS);
 		corsAllowMethods = settings.get("cors.allow.methods", DEFAULT_CORS_ALLOW_METHODS);
 		corsAllowHeaders = settings.get("cors.allow.headers", DEFAULT_CORS_ALLOW_HEADERS);
+		corsExposeHeaders = settings.get("cors.expose.headers", DEFAULT_EXPOSE_HEADERS);
 		corsMaxAge = settings.get("cors.max.age", DEFAULT_CORS_MAX_AGE);
 
 		if (isBlank(corsAllowOrigin)) {
@@ -148,6 +151,10 @@ public class CorsFilter implements Filter {
             res.setStatus(HttpServletResponse.SC_OK);
             return;
         }
+
+		if (!isBlank(corsExposeHeaders)) {
+			res.addHeader("Access-Control-Expose-Headers", corsExposeHeaders);
+		}
 
 		// Force "application/json" if content-type is "text/plain;json"
 		final ServletRequest wrapper = isTextPlain(req) ? new JsonRequest(req) : req;
