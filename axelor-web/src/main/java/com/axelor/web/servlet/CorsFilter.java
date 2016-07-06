@@ -139,12 +139,12 @@ public class CorsFilter implements Filter {
 
 		res.addHeader("Access-Control-Allow-Origin", origin);
 		res.addHeader("Access-Control-Allow-Credentials", corsAllowCredentials);
-		res.addHeader("Access-Control-Allow-Methods", corsAllowMethods);
-		res.addHeader("Access-Control-Allow-Headers", corsAllowHeaders);
-		res.addHeader("Access-Control-Max-Age", corsMaxAge);
 
-		// Just ACCEPT and REPLY OK if OPTIONS (preflight request)
+		// Handle preflight request
 		if (isPreflight(req)) {
+			res.addHeader("Access-Control-Allow-Methods", corsAllowMethods);
+			res.addHeader("Access-Control-Allow-Headers", corsAllowHeaders);
+			res.addHeader("Access-Control-Max-Age", corsMaxAge);
             res.setStatus(HttpServletResponse.SC_OK);
             return;
         }
