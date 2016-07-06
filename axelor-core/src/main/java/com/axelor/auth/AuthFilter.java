@@ -130,6 +130,7 @@ public class AuthFilter extends FormAuthenticationFilter {
 	private boolean isXHR(ServletRequest request) {
 		final HttpServletRequest req = (HttpServletRequest) request;
 		return "XMLHttpRequest".equals(req.getHeader("X-Requested-With"))
+				|| "application/json".equals(req.getHeader("Accept"))
 				|| "application/json".equals(req.getHeader("Content-Type"));
 	}
 }
