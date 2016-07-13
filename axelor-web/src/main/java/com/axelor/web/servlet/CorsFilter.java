@@ -119,7 +119,8 @@ public class CorsFilter implements Filter {
 	}
 
 	private boolean isTextPlain(HttpServletRequest req) {
-		return "text/plain;json".equals(req.getContentType());
+		final String contentType = req.getContentType();
+		return contentType != null && "text/plain".equals(contentType.split(";")[0]);
 	}
 
 	@Override
@@ -156,7 +157,7 @@ public class CorsFilter implements Filter {
 			res.addHeader("Access-Control-Expose-Headers", corsExposeHeaders);
 		}
 
-		// Force "application/json" if content-type is "text/plain;json"
+		// Force "application/json" if content-type is "text/plain"
 		final ServletRequest wrapper = isTextPlain(req) ? new JsonRequest(req) : req;
 
 		chain.doFilter(wrapper, response);
