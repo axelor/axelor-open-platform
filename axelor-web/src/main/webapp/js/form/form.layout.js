@@ -419,6 +419,8 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 					if (value && value !== old) {
 						value.$changed = true;
 						value.version = _.isNumber(value.version) ? value.version : value.$version;
+					}
+					if (value) {
 						// parent form's getContext will check this to prepare context for editor
 						// to have proper selection flags in nest o2m/m2m
 						value.$editorModel = scope._model;

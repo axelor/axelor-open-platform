@@ -77,9 +77,7 @@ ui.prepareContext = function(model, values, dummyValues, parentContext) {
 		// make sure to have proper selected flags in nested o2m/m2m values, see uiPanelEditor
 		if (value && value.$editorModel) {
 			context[name] = ui.prepareContext(value.$editorModel, value);
-			// remove unnecessary props
-			delete context[name]._model;
-			delete context[name].$editorModel;
+			delete context[name]._model; // no need to include _model
 		}
 	});
 
