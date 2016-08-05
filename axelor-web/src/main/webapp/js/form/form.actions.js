@@ -253,7 +253,15 @@ ActionHandler.prototype = {
 
 		return context;
 	},
-	
+
+	_getRootFormElement: function () {
+		var formElement = $(this.element).parents('form[ui-form]:last');
+		if (formElement.length === 0) {
+			formElement = this._getFormElement();
+		}
+		return formElement;
+	},
+
 	_getFormElement: function () {
 
 		var elem = $(this.element);
@@ -307,8 +315,7 @@ ActionHandler.prototype = {
 	},
 
 	_fireBeforeSave: function() {
-		var form = this._getFormElement();
-		var scope = form.scope();
+		var scope = this._getRootFormElement().scope();
 		var event = scope.$broadcast('on:before-save', scope.record);
 		var deferred = this.ws.defer();
 
@@ -402,8 +409,9 @@ ActionHandler.prototype = {
 
 		this._blockUI();
 
-		var scope = this.scope,
-			deferred = this.ws.defer();
+		// save should be done on root form scope only
+		var scope = this._getRootFormElement().scope();
+		var deferred = this.ws.defer();
 
 		if (scope.isValid && !scope.isValid()) {
 			if (scope.showErrorNotice) {
