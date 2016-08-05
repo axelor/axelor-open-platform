@@ -412,13 +412,16 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 					var context = _.extend({}, scope.record);
 					context._model = scope._model;
 					context._parent = scope.$parent.getContext();
-					return context;
+					return ui.prepareContext(scope._model, context);
 				};
 				// make sure to trigger record-change with proper record data
 				scope.$watch('record', function (value, old) {
 					if (value && value !== old) {
 						value.$changed = true;
 						value.version = _.isNumber(value.version) ? value.version : value.$version;
+						// parent form's getContext will check this to prepare context for editor
+						// to have proper selection flags in nest o2m/m2m
+						value.$editorModel = scope._model;
 					}
 					scope.$broadcast("on:record-change", value);
 				}, true);

@@ -19,6 +19,73 @@
 
 var ui = angular.module('axelor.ui');
 
+ui.prepareContext = function(model, values, dummyValues, parentContext) {
+
+	var context = _.extend({}, values);
+
+	function compact(item) {
+		if (!item || _.isNumber(item)) return item;
+		if (item.id > 0 && item.version === undefined) {
+			return {
+				id: item.id,
+				selected: item.selected,
+				$version: item.$version
+			};
+		}
+		item = _.extend({}, item);
+		if (item.id <= 0) {
+			item.id = null;
+		}
+		return item;
+	}
+
+	var dummy = _.extend({}, dummyValues);
+	_.each(dummy, function (value, name) {
+		if (value && value.$updatedValues) {
+			dummy[name] = value.$updatedValues;
+		}
+		if (name.indexOf('$') === 0) {
+			dummy[name.substring(1)] = dummy[name];
+		}
+	});
+
+	context = _.extend(context, dummy);
+	context._model = model || context._model;
+	context._parent = parentContext || context._parent;
+
+	if (context.id <= 0) {
+		context.id = null;
+	}
+
+	// use selected flag for o2m/m2m fields
+	// see onSelectionChanged in o2m controller
+	_.each(context.$many, function (getItems, name) {
+		if (!getItems) return;
+		if (name.indexOf('$') === 0) name = name.substring(1);
+		var items = getItems();
+		var value = context[name] || [];
+		if (items && items.length === value.length) {
+			context[name] = _.map(items, compact);
+		}
+	});
+
+	// compact o2m/m2m records
+	_.each(context, function (value, name) {
+		if (_.isArray(value)) {
+			context[name] = _.map(value, compact);
+		}
+		// make sure to have proper selected flags in nested o2m/m2m values, see uiPanelEditor
+		if (value && value.$editorModel) {
+			context[name] = ui.prepareContext(value.$editorModel, value);
+			// remove unnecessary props
+			delete context[name]._model;
+			delete context[name].$editorModel;
+		}
+	});
+
+	return context;
+};
+
 this.FormViewCtrl = FormViewCtrl;
 
 FormViewCtrl.$inject = ['$scope', '$element'];
@@ -219,70 +286,17 @@ function FormViewCtrl($scope, $element) {
 	};
 	
 	$scope.getContext = function() {
+		var dummy = $scope.getDummyValues();
 		var context = _.extend({}, $scope._routeSearch, $scope.record);
 		if ($scope.$parent && $scope.$parent.getContext) {
 			context._parent = $scope.$parent.getContext();
 		} else {
 			context = _.extend({}, $scope._viewParams.context, context);
 		}
-
-		function compact(item) {
-			if (!item || _.isNumber(item)) return item;
-			if (item.id > 0 && item.version === undefined) {
-				return {
-					id: item.id,
-					selected: item.selected,
-					$version: item.$version
-				};
-			}
-			item = _.extend({}, item);
-			if (item.id <= 0) {
-				item.id = null;
-			}
-			return item;
-		}
-
-		var dummy = $scope.getDummyValues();
-		_.each(dummy, function (value, name) {
-			if (value && value.$updatedValues) {
-				dummy[name] = value.$updatedValues;
-			}
-			if (name.indexOf('$') === 0) {
-				dummy[name.substring(1)] = dummy[name];
-			}
-		});
-
-		context = _.extend(context, dummy);
-		context._model = ds._model;
-
-		if (context.id <= 0) {
-			context.id = null;
-		}
-
 		if (!$scope.$hasPanels) {
 			context._form = true;
 		}
-
-		// use selected flag for o2m/m2m fields
-		// see onSelectionChanged in o2m controller
-		_.each(context.$many, function (getItems, name) {
-			if (!getItems) return;
-			if (name.indexOf('$') === 0) name = name.substring(1);
-			var items = getItems();
-			var value = context[name] || [];
-			if (items && items.length === value.length) {
-				context[name] = items;
-			}
-		});
-
-		// compact o2m/m2m records
-		_.each(context, function (value, name) {
-			if (_.isArray(value)) {
-				context[name] = _.map(value, compact);
-			}
-		});
-
-		return context;
+		return ui.prepareContext(ds._model, context, dummy);
 	};
 
 	$scope.isDirty = function() {
