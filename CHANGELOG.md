@@ -1,3 +1,11 @@
+# 3.2.1 (2016-08-08)
+
+## Bug fixes
+
+- fix 'save' action issue (should always save main record)
+- fix selection flag issue in nested o2m
+- fix pagination issue if search count is less
+
 # 3.2.0 (2016-07-01)
 
 ## Improvements
