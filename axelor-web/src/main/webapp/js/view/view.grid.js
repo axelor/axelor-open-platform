@@ -199,6 +199,14 @@ function GridViewCtrl($scope, $element) {
 		var fields = _.pluck($scope.fields, 'name'),
 			options = {};
 
+		function fixPage() {
+			var promise = ds.fixPage();
+			if (promise) {
+				$scope.updateRoute();
+				return promise;
+			}			
+		}
+
 		// if criteria is given search using it
 		if (searchFilter.criteria || searchFilter._domains) {
 			options = {
@@ -208,7 +216,7 @@ function GridViewCtrl($scope, $element) {
 			if (searchFilter.archived !== undefined) {
 				options.archived = searchFilter.archived;
 			}
-			return ds.search(options);
+			return ds.search(options).then(fixPage);
 		}
 
 		var filter =  {},
@@ -344,13 +352,7 @@ function GridViewCtrl($scope, $element) {
 			options.offset = (pageNum - 1 ) * ds._page.limit;
 		}
 
-		return ds.search(options).then(function() {
-			var promise = ds.fixPage();
-			if (promise) {
-				$scope.updateRoute();
-			  return promise;
-			}
-		});
+		return ds.search(options).then(fixPage);
 	};
 
 	$scope.pagerText = function() {
