@@ -135,7 +135,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		if (parent.canEditTarget && !parent.canEditTarget()) {
 			return false;
 		}
-		return $scope.canView() && $scope.getValue();
+		return $scope.attr('canEdit') !== false && $scope.canView() && $scope.getValue();
 	};
 
 	$scope.onEdit = function() {
@@ -229,6 +229,7 @@ var m2oTemplateEditable = '' +
 '<span class="picker-icons">'+
 	'<i class="fa fa-eye" ng-click="onSummary()" ng-show="hasPermission(\'read\') && _viewParams.summaryView && canToggle()"></i>'+
 	'<i class="fa fa-pencil" ng-click="onEdit()" ng-show="hasPermission(\'read\') && canView() && canEdit()" title="{{\'Edit\' | t}}"></i>'+
+	'<i class="fa fa-file-text-o" ng-click="onEdit()" ng-show="hasPermission(\'read\') && canView() && !canEdit()" title="{{\'View\' | t}}"></i>'+
 	'<i class="fa fa-plus" ng-click="onNew()" ng-show="canNew() && hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}"></i>'+
 	'<i class="fa fa-search" ng-click="onSelect()" ng-show="canSelect() && hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}"></i>'+
 '</span>'+
@@ -576,6 +577,7 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 		"<div class='m2o-editor'>" +
 			"<div class='m2o-editor-controls' ng-show='!isReadonly()'>" +
 				"<a href='' ng-show='canEdit() && canShowIcon(\"edit\")' ng-click='onEdit()' title='{{\"Edit\" | t}}'><i class='fa fa-pencil'></i></a>" +
+				"<a href='' ng-show='!canEdit() && canView() && canShowIcon(\"view\")' ng-click='onEdit()' title='{{\"View\" | t}}'><i class='fa fa-file-text-o'></i></a>" +
 				"<a href='' ng-show='canSelect() && canShowIcon(\"select\")' ng-click='onSelect()' title='{{\"Select\" | t}}'><i class='fa fa-search'></i></a>" +
 				"<a href='' ng-show='canShowIcon(\"clear\")' ng-click='onClear()' title='{{\"Clear\" | t}}'><i class='fa fa-times-circle'></i></a>" +
 			"</div>" +
