@@ -238,7 +238,8 @@
 }
 
 .panel-layout .label-item,
-.panel-layout .label-item span {
+.panel-layout .label-item span,
+.panel-layout label span.title {
 	font-weight: 600;
 	overflow: hidden;
 	text-overflow: ellipsis;
