@@ -387,7 +387,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	
 		function createItem(fields, term, popup) {
 			var ds = $scope._dataSource,
-				data = {}, missing = false;
+				data = { $forceDirty: true }, missing = false;
 	
 			_.each(fields, function(field) {
 				if (field.name === "name") return data["name"] = term;

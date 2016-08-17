@@ -114,7 +114,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		if ($scope.isDirty()) return true;
 		var record = $scope.record || {};
 		var version = record.version;
-		return recordVersion !== version;
+		return recordVersion !== version || record.$forceDirty;
 	}
 
 	function canOK() {
