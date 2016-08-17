@@ -130,6 +130,10 @@
 		evalScope.$popup = function() { return scope._isPopup; };	// popup detect
 		evalScope.$iif = function(c, t, f) { return c ? t : f; };
 
+		// current user and group
+		evalScope.$user = axelor.config['user.login'];
+		evalScope.$group = axelor.config['user.group'];
+
 		evalScope.$contains = function(iter, item) {
 			if (iter && iter.indexOf)
 				return iter.indexOf(item) > -1;
