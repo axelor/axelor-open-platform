@@ -138,6 +138,10 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		return $scope.attr('canEdit') !== false && $scope.canView() && $scope.getValue();
 	};
 
+	$scope.canView = function () {
+		return $scope.attr('canView') !== false && $scope.getValue();
+	};
+
 	$scope.onEdit = function() {
 		var record = $scope.getValue();
 		$scope.showEditor(record);
