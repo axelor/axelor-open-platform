@@ -402,7 +402,7 @@ ui.directive('uiCards', function () {
 	};
 });
 
-ui.directive('uiCard', ["$parse", "$compile", function ($parse, $compile) {
+ui.directive('uiCard', ["$compile", function ($compile) {
 
 	return {
 		scope: true,
@@ -470,8 +470,7 @@ ui.directive('uiCard', ["$parse", "$compile", function ($parse, $compile) {
 			var hilites = scope.schema.hilites || [];
 			for (var i = 0; i < hilites.length; i++) {
 				var hilite = hilites[i];
-				var expr = $parse(hilite.condition);
-				if (expr(scope.record)) {
+				if (axelor.$eval(evalScope, hilite.condition, scope.record)) {
 					scope.hilite = hilite;
 					break;
 				}
