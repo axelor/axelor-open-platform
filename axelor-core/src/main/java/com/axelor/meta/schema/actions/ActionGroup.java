@@ -176,7 +176,7 @@ public class ActionGroup extends ActionResumable {
 		List<Object> result = Lists.newArrayList();
 		Iterator<ActionItem> iter = actions.iterator();
 
-		if (getName() != null && getName().indexOf("inboxMenuTag") == -1) {
+		if (getName() != null && !getName().endsWith("MenuTag()")) {
 			log.debug("action-group: {}", getName());
 		}
 		
@@ -185,7 +185,7 @@ public class ActionGroup extends ActionResumable {
 			Element element = actions.get(i);
 			String name = element.getName().trim();
 
-			if (name.indexOf("inboxMenuTag") == -1) {
+			if (!name.endsWith("MenuTag()")) {
 				log.debug("action: {}", name);
 			}
 
