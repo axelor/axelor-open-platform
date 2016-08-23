@@ -77,6 +77,8 @@ public class I18nExtractor {
 	private static final Set<String> TEXT_ATTRS = Sets.newHashSet("tag", "prompt", "placeholder", "x-true-text",
 			"x-false-text");
 
+	private static final Set<String> TEXT_NODES = Sets.newHashSet("option", "message", "static", "help");
+
 	private static final String[] CSV_HEADER = {"key", "message", "comment", "context" };
 
 	private static class I18nItem {
@@ -192,14 +194,14 @@ public class I18nExtractor {
 						accept(new I18nItem(attributes.getValue(attr), file, locator.getLineNumber()));
 					}
 
-					if ("option".equals(qName) || "message".equals(qName)) {
+					if (TEXT_NODES.contains(qName)) {
 						readText = true;
 					}
 				}
 				
 				@Override
 				public void endElement(String uri, String localName, String qName) throws SAXException {
-					if ("option".equals(qName) || "message".equals(qName)) {
+					if (TEXT_NODES.contains(qName)) {
 						readText = false;
 					}
 					if ("entity".equals(qName)) {
