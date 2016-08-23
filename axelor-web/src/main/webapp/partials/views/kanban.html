@@ -39,6 +39,9 @@
           <div class="kanban-card-body"></div>
         </li>
       </ul>
+      <div class="kanban-empty ng-hide" ng-show="isEmpty()">
+      	<span class="help-block text-center" x-translate>No records found.</span>
+      </div>
       <div class="kanban-more ng-hide" ng-show="hasMore()">
         <a tabindex="-1" href="" ng-click="onMore()">load more</a>
       </div>

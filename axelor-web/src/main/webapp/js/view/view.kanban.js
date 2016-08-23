@@ -170,7 +170,9 @@ ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $
 	};
 
 	$scope.move = function (record, to, next, prev) {
-
+		if(!record) {
+		    return;
+		}
 		var view = $scope.schema;
 		var rec = _.pick(record, "id", "version", view.sequenceBy);
 		var ds = $scope._dataSource._new($scope._model);
@@ -272,6 +274,10 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 				var page = ds._page;
 				var next = page.from + page.limit;
 				return next < page.total;
+			};
+			
+			scope.isEmpty = function () {
+				return scope.records.length == 0;
 			};
 
 			scope.onMore = function () {
