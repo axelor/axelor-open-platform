@@ -93,7 +93,7 @@ var customDirective = ["$compile", function ($compile) {
 		controller: CustomViewCtrl,
 		link: function (scope, element, attrs, ctrl) {
 
-			var evalScope = scope.$new(true);
+			var evalScope = axelor.$evalScope(scope);
 
 			function render(template) {
 				var elem = $('<span>' + template.trim() + '</span>');

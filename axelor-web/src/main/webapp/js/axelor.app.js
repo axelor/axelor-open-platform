@@ -92,11 +92,8 @@
 			return device;
 		}
 	});
-
-	axelor.$eval = function (scope, expr, context) {
-		if (!scope || !expr) {
-			return null;
-		}
+	
+	axelor.$evalScope = function (scope) {
 
 		var evalScope = scope.$new(true);
 		
@@ -119,7 +116,7 @@
 		}
 
 		evalScope.$get = function(n) {
-			var context = this.$context || {};
+			var context = this.$context || this.record || {};
 			if (context.hasOwnProperty(n)) {
 				return context[n];
 			}
@@ -150,7 +147,16 @@
 		evalScope.$invalid = function(name) {
 			return !isValid(scope, name);
 		};
-		
+
+		return evalScope;
+	};
+
+	axelor.$eval = function (scope, expr, context) {
+		if (!scope || !expr) {
+			return null;
+		}
+
+		var evalScope = axelor.$evalScope(scope);
 		try {
 			evalScope.$context = context;
 			return evalScope.$eval(expr, context);
