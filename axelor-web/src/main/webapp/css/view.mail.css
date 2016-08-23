@@ -175,24 +175,29 @@
 .mail-thread-more {
 	border-bottom: 1px dashed #ddd;
 	text-align: center;
-	margin-top: -4px;
+	margin-top: -15px;
 	margin-left: -2px;
 	border-left: 2px solid #fff;
 }
 
-.mail-thread-more a {
+.mail-thread-more .btn-load-more:hover {
+	background-color: #eaf2f8 !important;
+	color: #537c9f;
+}
+
+.mail-thread-more .btn-load-more {
 	position: relative;
-	top: 8px;
-	background: #fff;
+	top: 10px;
 	padding: 0 4px;
+	outline: none;
+    border-color: #8aafce;
+	border-radius: 4px !important;
+	border-bottom-width: 2px;
+	color: #537c9f;
 }
 
 .mail-thread-view .mail-thread-more {
 	border-left: 2px solid #f3f3f4;
-}
-
-.mail-thread-view .mail-thread-more a {
-	background: #f3f3f4;
 }
 
 .mail-messages > div > .mail-composer:first-child {

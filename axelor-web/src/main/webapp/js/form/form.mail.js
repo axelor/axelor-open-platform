@@ -461,7 +461,10 @@ ui.formWidget('uiMailMessages', {
 						"<div ng-repeat='message in message.$children' class='mail-message-indent' ui-mail-message></div>" +
 					"</span>" +
 					"<div ng-show='hasMore' class='mail-thread-more'>" +
-						"<a href='' ng-click='onLoadMore()' class='muted' x-translate>load more</a>" +
+						"<a class='btn btn-load-more' href='' role='button' ng-click='onLoadMore()'>" +
+				      	  "<span x-translate>load more</span>" +
+				      	  "<i class='fa fa-arrow-right fa-fw'></i>" +
+				      	"</a>" +
 					"</div>" +
 				"</div>" +
 			"</div>" +

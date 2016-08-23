@@ -105,15 +105,23 @@
 .kanban-more {
 	border-bottom: 1px dashed #ddd;
 	text-align: center;
-	margin: -35px 20px 25px 20px;
+	margin: -40px 20px 25px 20px;
 }
 
-.kanban-more a {
+.kanban-more .btn-load-more:hover {
+	background-color: #eaf2f8 !important;
+	color: #537c9f;
+}
+
+.kanban-more .btn-load-more {
 	position: relative;
-	top: 8px;
-	background: #fff;
+	top: 11px;
 	padding: 0 4px;
 	outline: none;
+    border-color: #8aafce;
+	border-radius: 4px !important;
+	border-bottom-width: 2px;
+	color: #537c9f;
 }
 
 .kanban-empty {
