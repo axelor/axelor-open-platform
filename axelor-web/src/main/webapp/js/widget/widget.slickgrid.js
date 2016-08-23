@@ -1756,6 +1756,10 @@ Grid.prototype.focusInvalidCell = function(args) {
 		formCtrl = this.editorForm.children('form').data('$formController'),
 		error = formCtrl.$error || {};
 	
+	if (this.editorForm.is(':hidden') && _.isEmpty(this.editorScope.record)) {
+		return false;
+	}
+
 	for(var name in error) {
 		var errors = error[name] || [];
 		if (errors.length) {
