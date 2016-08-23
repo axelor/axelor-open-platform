@@ -634,17 +634,6 @@ ui.formInput('RefSelect', {
 
 	controller: ['$scope', 'ViewService', function($scope, ViewService) {
 
-		$scope.createSelector = function(select, ref, watch) {
-			var value = select.value;
-			var elem = $('<input ui-ref-item ng-show="canShow(\'' + value + '\')"/>')
-				.attr('ng-model', '$_' + ref)
-				.attr('x-target', value)
-				.attr('x-watch-name', watch)
-				.attr('x-ref', ref);
-
-			return ViewService.compile(elem)($scope);
-		};
-
 		$scope.createElement = function(id, name, selectionList, related) {
 
 			var elemGroup = $('<div ui-group ui-table-layout cols="2" x-widths="150,*"></div>');
@@ -653,16 +642,18 @@ ui.formInput('RefSelect', {
 				.attr("x-for-widget", id)
 				.attr("ng-model", "record." + name);
 
-			var elemSelects = $('<div ui-group></div>');
+			var elemSelects = $('<div></div>').attr('ng-switch', "record." + name);
 			var elemItems = _.map(selectionList, function(s) {
-				return $('<input ui-ref-item ng-show="canShow(this)" style="display: none;"/>')
+				return $('<input ui-ref-item ng-switch-when="' + s.value +'">')
 					.attr('ng-model', 'record.$_' + related)
 					.attr('x-target', s.value)
 					.attr('x-watch-name', name)
 					.attr('x-ref', related);
 			});
 
-			elemGroup.append(elemSelect).append(elemSelects.append(elemItems));
+			elemGroup
+				.append($('<div></div>').append(elemSelect))
+				.append(elemSelects.append(elemItems));
 
 			return ViewService.compile(elemGroup)($scope);
 		};
@@ -674,14 +665,8 @@ ui.formInput('RefSelect', {
 		var name = scope.field.name,
 			selectionList = scope.field.selectionList,
 			related = scope.field.related || scope.field.name + "Id";
-
-		scope.canShow = function(itemScope) {
-			return itemScope.targetValue === scope.getValue();
-		};
-
-		scope.isReadonly = function() {
-			return false;
-		};
+		
+		scope.fieldsCache = {};
 
 		scope.refFireEvent = function (name) {
 			var handler = scope.$events[name];
@@ -693,6 +678,13 @@ ui.formInput('RefSelect', {
 		var elem = scope.createElement(element.attr('id'), name, selectionList, related);
 		setTimeout(function() {
 			element.append(elem);
+		});
+		
+		scope.$watch("record." + name, function (value, old) {
+			if (value === old || old === undefined) return;
+			if (scope.record) {
+				scope.record[related] = null;
+			}
 		});
 	},
 	template_editable: null,
@@ -713,8 +705,8 @@ ui.formInput('RefItem', 'ManyToOne', {
 		var self = this;
 		var target = element.attr('x-target');
 		var data = (_.findWhere(scope.$parent.field.selectionList, {value: target})||{}).data || {};
-
-		scope.loadFields().success(function(fields) {
+		
+		function doLink(fields) {
 			var name = false,
 				search = [];
 
@@ -736,7 +728,16 @@ ui.formInput('RefItem', 'ManyToOne', {
 			});
 
 			self._link(scope, element, attrs, model);
-		});
+		}
+
+		if (scope.fieldsCache[scope._model]) {
+			doLink(scope.fieldsCache[scope._model]);
+		} else {
+			scope.loadFields().success(function (fields) {
+				scope.fieldsCache[scope._model] = fields;
+				doLink(fields);
+			});
+		}
 	},
 
 	_link: function(scope, element, attrs, model) {
@@ -745,15 +746,6 @@ ui.formInput('RefItem', 'ManyToOne', {
 		var watch = element.attr('x-watch-name');
 		var target = element.attr('x-target');
 		
-		function doRender() {
-			if (scope.$render_editable) scope.$render_editable();
-			if (scope.$render_readonly) scope.$render_readonly();
-		}
-
-		function getRef() {
-			return (scope.record||{})[ref];
-		}
-
 		function setRef(value) {
 			if (!scope.record) {
 				return;
@@ -775,30 +767,13 @@ ui.formInput('RefItem', 'ManyToOne', {
 			setRef(value ? value.id : 0);
 		};
 
-		var selected = false;
-
 		scope.$watch("record." + ref, function(value, old) {
 			scope.$timeout(function() {
 				var v = scope.getValue();
-				if ((v && v.id === value) || !selected) return;
-				scope.select(value ? {id: value } : null);
+				if (v && v.id === value) return;
+				scope.select(value ? { id: value } : null);
 			});
 		});
-		
-		var lastId = null;
-
-		scope.$watch("record." + watch, function(value, old) {
-			selected = value === scope._model;
-			if (value === old || old === undefined) return;
-			if (lastId == scope.record.id) {
-				scope.setValue(null);
-			}
-			lastId = scope.record.id;
-		});
-
-		model.$render = function() {
-			if (selected) doRender();
-		};
 	}
 });
 
