@@ -606,6 +606,10 @@ Grid.prototype.parse = function(view) {
 			sortable = true;
 		}
 
+		if(field.transient) {
+			sortable = false;
+		}
+
 		if (field.type == "button") {
 			if (scope.selector) return;
 			field.image = field.title;
@@ -654,17 +658,17 @@ Grid.prototype.parse = function(view) {
 			return;
 		}
 
-		var menus = [{
+		var menus = [sortable ? {
 			iconImage: "lib/slickgrid/images/sort-asc.gif",
 			title: _t("Sort Ascending"),
 			command: "sort-asc"
-		}, {
+		} : null, sortable ? {
 			iconImage: "lib/slickgrid/images/sort-desc.gif",
 			title: _t("Sort Descending"),
 			command: "sort-desc"
-		}, {
+		} : null, sortable ? {
 			separator: true
-		}, view.editable ? null : {
+		} : null, view.editable ? null : {
 			title: _t("Group by") + " <i>" + column.name + "</i>",
 			command: "group-by"
 		}, view.editable ? null : {
