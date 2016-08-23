@@ -349,6 +349,16 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 				scope.records.length = 0;
 				return fetch(options);
 			});
+			
+			element.on("click", ".kanban-card", function (e) {
+				if ($(e.target).parents(".kanban-card-menu").size()) {
+					return;
+				}
+				var elem = $(this);
+				var record = elem.scope().record;
+				scope.onEdit(record);
+				scope.applyLater();
+			});
 
 			fetch();
 		}
