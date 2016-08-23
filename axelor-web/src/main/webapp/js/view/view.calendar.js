@@ -134,7 +134,7 @@ function CalendarViewCtrl($scope, $element) {
 
 		_.each(records, function(record) {
 			var item = record[colorBy];
-			if (!item) {
+			if (item === null || item === undefined) {
 				return;
 			}
 			var key = $scope.getColorKey(record, item);
