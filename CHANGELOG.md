@@ -1,6 +1,13 @@
-# Current (3.2.2)
+# 3.2.2 (2016-08-23)
 
 ## Bug fixes
+
+- fix regression caused by selection flag fix
+- fix pagination reset issue with advance search
+
+## Improvements
+
+- show different icon for view only popup on m2o
 
 # 3.2.1 (2016-08-08)
 
