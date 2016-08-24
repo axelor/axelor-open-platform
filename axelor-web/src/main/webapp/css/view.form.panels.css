@@ -278,6 +278,7 @@
 	bottom: 0px;
 	border: none;
 }
+.panel-related.noEdit .edit-icon i:before,
 .panel-related.readonly .edit-icon i:before {
 	content: "\f0f6";
 }

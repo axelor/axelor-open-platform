@@ -186,6 +186,11 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 
 	$scope.canShowEdit = function () {
 		var selected = $scope.selection.length ? $scope.selection[0] : null;
+		return selected !== null && $scope.canEdit();
+	};
+
+	$scope.canShowView = function () {
+		var selected = $scope.selection.length ? $scope.selection[0] : null;
 		return selected !== null && $scope.canView();
 	};
 	
@@ -608,13 +613,14 @@ ui.formInput('OneToMany', {
 	template_readonly: null,
 	
 	template:
-	'<div class="stackbar">'+
+	'<div class="stackbar" ng-class="{noEdit: !canShowEdit()}">'+
 	'<div class="navbar">'+
 		'<div class="navbar-inner">'+
 			'<div class="container-fluid">'+
 				'<span class="brand" href="" ui-help-popover ng-bind-html="title"></span>'+
 				'<span class="icons-bar pull-right" ng-show="!isReadonly()">'+
 					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowEdit()" title="{{\'Edit\' | t}}" class="fa fa-pencil"></i>'+
+					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowView()" title="{{\'View\' | t}}" class="fa fa-file-text-o"></i>'+
 					'<i ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled() && canNew()" title="{{\'New\' | t}}" class="fa fa-plus"></i>'+
 					'<i ng-click="onRemove()" ng-show="hasPermission(\'remove\') && !isDisabled() && canRemove()" title="{{\'Remove\' | t}}" class="fa fa-minus"></i>'+
 					'<i ng-click="onSelect()" ng-show="hasPermission(\'read\') && !isDisabled() && canSelect()" title="{{\'Select\' | t}}" class="fa fa-search"></i>'+
@@ -642,10 +648,11 @@ ui.formInput('ManyToMany', 'OneToMany', {
 });
 
 var panelRelatedTemplate = 
-"<div class='panel panel-related'>" +
+"<div class='panel panel-related' ng-class='{noEdit: !canShowEdit()}'>" +
 	"<div class='panel-header'>" +
 		"<div class='icons-bar pull-right' ng-show='!isReadonly()'>" +
 			"<i ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()' title='{{\"Edit\" | t}}' class='fa fa-pencil'></i>" +
+			'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowView()" title="{{\'View\' | t}}" class="fa fa-file-text-o"></i>'+
 			"<i ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()' title='{{\"New\" | t}}' class='fa fa-plus'></i>" +
 			"<i ng-click='onCopy()' ng-show='hasPermission(\"create\") && !isDisabled() && canCopy()' title='{{\"Duplicate\" | t}}' class='fa fa-files-o'></i>" +
 			"<i ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()' title='{{\"Remove\" | t}}' class='fa fa-minus'></i>" +
