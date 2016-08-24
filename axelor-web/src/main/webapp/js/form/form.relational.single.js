@@ -766,14 +766,19 @@ ui.formInput('RefItem', 'ManyToOne', {
 			__setValue.call(scope, value);
 			setRef(value ? value.id : 0);
 		};
-
-		scope.$watch("record." + ref, function(value, old) {
+		
+		var doSelect = _.debounce(function () {
 			scope.$timeout(function() {
+				var value = (scope.record || {})[ref];
 				var v = scope.getValue();
 				if (v && v.id === value) return;
 				scope.select(value ? { id: value } : null);
 			});
-		});
+		}, 100);
+
+		var watchExpr = "record.id + record." + watch + " + record." + ref;
+		scope.$watch(watchExpr, doSelect);
+		scope.$watch("record", doSelect);
 	}
 });
 
