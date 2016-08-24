@@ -333,6 +333,7 @@ table.form-layout .tabbable-tabs .tab-content {
 	min-height: 200px;
 }
 
+.form-item .stackbar.noEdit .edit-icon i:before,
 .form-item .stackbar.readonly .edit-icon i:before {
 	content: "\f0f6";
 }
