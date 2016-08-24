@@ -254,7 +254,7 @@ function FormViewCtrl($scope, $element) {
 		if (params.viewType !== "form") {
 			return $scope.show();
 		}
-		return state ? doEdit(state) : $scope.edit(null);
+		return state ? doEdit(state) : $scope.edit(null, false);
 	};
 
 	$scope.edit = function(record, fireOnLoad) {
@@ -356,7 +356,7 @@ function FormViewCtrl($scope, $element) {
 		var defer = $scope._defer();
 		$scope.confirmDirty(function(){
 			routeId = null;
-			$scope.edit(null);
+			$scope.edit(null, false);
 			$scope.setEditable();
 			$scope.$broadcast("on:new");
 			defer.resolve();
@@ -666,7 +666,7 @@ function FormViewCtrl($scope, $element) {
 				}
 			});
 		}
-		$scope.edit(null);
+		$scope.edit(null, false);
 		$scope.$broadcast("on:new");
 	};
 
