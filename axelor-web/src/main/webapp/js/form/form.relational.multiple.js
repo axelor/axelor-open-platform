@@ -182,6 +182,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	}
 
   $scope.canShowView = function () {
+    if ($scope.canShowEdit()) return false;
 		var selected = $scope.selection.length ? $scope.selection[0] : null;
 		return selected !== null && $scope.canView();
 	}
