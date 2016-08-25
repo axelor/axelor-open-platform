@@ -303,7 +303,7 @@ public class Resource<T extends Model> {
 				txn.rollback();
 			}
 			data = Lists.newArrayList();
-			LOG.error("Error: {}", e, e);
+			LOG.error("Error: ", e);
 		}
 
 		LOG.debug("Records found: {}", data.size());
