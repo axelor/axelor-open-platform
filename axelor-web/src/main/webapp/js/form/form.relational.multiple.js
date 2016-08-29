@@ -181,8 +181,8 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		return selected !== null && $scope.canEdit();
 	}
 
-  $scope.canShowView = function () {
-    if ($scope.canShowEdit()) return false;
+	$scope.canShowView = function () {
+		if ($scope.canShowEdit()) return false;
 		var selected = $scope.selection.length ? $scope.selection[0] : null;
 		return selected !== null && $scope.canView();
 	}
@@ -585,7 +585,7 @@ ui.formInput('OneToMany', {
 	template_readonly: null,
 	
 	template:
-	'<div class="stackbar" ng-class="{noEdit: !canShowEdit()}">'+
+	'<div class="stackbar" ng-class="{noEdit: canView() && !canEdit()}">'+
 	'<div class="navbar">'+
 		'<div class="navbar-inner">'+
 			'<div class="container-fluid">'+
@@ -620,7 +620,7 @@ ui.formInput('ManyToMany', 'OneToMany', {
 });
 
 var panelRelatedTemplate = 
-"<div class='panel panel-related' ng-class='{noEdit: !canShowEdit()}'>" +
+"<div class='panel panel-related' ng-class='{noEdit: canView() && !canEdit()}'>" +
 	"<div class='panel-header'>" +
 		"<div class='icons-bar pull-right' ng-show='!isReadonly()'>" +
 			"<i ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()' class='fa fa-pencil'></i>" +
