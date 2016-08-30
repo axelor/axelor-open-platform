@@ -1028,6 +1028,16 @@ Grid.prototype._doInit = function(view) {
 				that.showColumn(col.field, false);
 			}
 		});
+		scope.$on("on:attrs-reset", function() {
+			if (that.visibleCols.length === that.cols.length) {
+				return;
+			}
+			_.each(that.cols, function (col) {
+				if (col.descriptor) {
+					that.showColumn(col.field, !col.descriptor.hidden);
+				}
+			});
+		});
 	});
 
 	if (scope.$parent._viewResolver) {

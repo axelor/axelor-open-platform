@@ -52,9 +52,18 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		var getViewDef = this.getViewDef || scope.getViewDef || function() { return {}; };
 
 		var field = getViewDef.call(scope, element);
-		var props = _.pick(field, ['readonly', 'required', 'hidden', 'title']);
+		var props = _.pick(field, 'readonly,required,hidden,collapse,precision,scale,prompt,title,domain'.split(','));
 		var state = _.clone(props);
 		
+		function resetAttrs() {
+			var label = element.data('label');
+			state = _.clone(props);
+			state["force-edit"] = false;
+			if (label && state.title) {
+				label.html(state.title);
+			}
+		}
+
 		if (field.css) {
 			element.addClass(field.css);
 		}
@@ -92,13 +101,11 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		};
 		
 		scope.$on("on:edit", function(e, rec) {
-			if (_.isEmpty(rec)) {
-				state = _.clone(props);
-			}
-			state["force-edit"] = false;
 			scope.$$readonly = scope.$$isReadonly();
 		});
 		
+		scope.$on("on:attrs-reset", resetAttrs);
+
 		scope.$on("on:attrs-changed", function(event, attr) {
 			if (attr.name === "readonly" || attr.name === "force-edit") {
 				scope.$$readonly = scope.$$isReadonly();

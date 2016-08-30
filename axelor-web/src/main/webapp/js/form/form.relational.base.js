@@ -221,6 +221,13 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		if (context !== undefined) $scope._context = context;
 	});
 	
+	$scope.$on("on:attrs-reset", function(record){
+		var domain = ($scope.field||field).domain;
+		var context = ($scope.field||field).context;
+		if (domain !== undefined) $scope._domain = domain;
+		if (context !== undefined) $scope._context = context;
+	});
+
 	$scope.setDomain = function(domain, context) {
 		if (domain !== undefined) $scope._domain = domain;
 		if (context !== undefined) $scope._context = context;

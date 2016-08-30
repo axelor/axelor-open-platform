@@ -75,7 +75,7 @@ ui.formWidget('Group', {
 		}
 
 		if (props.showTitle !== false) {
-			attrs.$observe('title', function(value){
+			scope.$watch('attr("title")', function(value){
 				scope.title = value;
 			});
 		}
@@ -361,7 +361,7 @@ ui.formWidget('Tab', {
 
 		tabs.addTab(scope);
 		
-		attrs.$observe('title', function(value){
+		scope.$watch('attr("title")', function(value){
 			scope.title = value;
 		});
 		
@@ -783,7 +783,7 @@ ui.formWidget('PanelTab', {
 			return !tab.selected || isHidden.call(scope);
 		};
 
-		attrs.$observe('title', function(value) {
+		scope.$watch("attr('title')", function(value) {
 			var tab = findTab();
 			tab.title = value;
 		});

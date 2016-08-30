@@ -604,7 +604,7 @@ ui.formInput('OneToMany', {
 			});
 		}
 
-		attrs.$observe('title', function(title){
+		scope.$watch("attr('title')", function(title){
 			scope.title = title;
 		});
 	},

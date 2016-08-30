@@ -404,6 +404,11 @@ function FormViewCtrl($scope, $element) {
 		$scope.$$dirty = $scope.isDirty();
 	}, true);
 
+	// reference watch for attrs reset
+	$scope.$watch("record", function(rec, old) {
+		$scope.$broadcast("on:attrs-reset", rec);
+	});
+
 	$scope.isValid = function() {
 		return $scope.form && $scope.form.$valid;
 	};
