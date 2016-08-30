@@ -636,6 +636,8 @@ Grid.prototype.parse = function(view) {
 			headerCssClass: type,
 			xpath: path
 		};
+
+		column._title = column.name;
 		
 		var css = [type];
 		if (item.forEdit !== false) {
@@ -1029,13 +1031,22 @@ Grid.prototype._doInit = function(view) {
 			}
 		});
 		scope.$on("on:attrs-reset", function() {
-			if (that.visibleCols.length === that.cols.length) {
-				return;
-			}
-			_.each(that.cols, function (col) {
+			var resetHidden = that.visibleCols.length === that.cols.length ? angular.noop : function (col) {
 				if (col.descriptor) {
 					that.showColumn(col.field, !col.descriptor.hidden);
 				}
+			};
+			var resetTitle = function (col) {
+				if (col._title) {
+					var found = _.findWhere(that.grid.getColumns(), { id: col.id });
+					if (found && found.name !== col._title) {
+						that.setColumnTitle(col.id, col._title);
+					}
+				}
+			};
+			_.each(that.cols, function (col) {
+				resetHidden(col);
+				resetTitle(col);
 			});
 		});
 	});
