@@ -122,7 +122,16 @@ function handleError(scope, item, message) {
 	}
 
 	var ctrl = item.data('$ngModelController');
-	if (!ctrl || ctrl.$doReset) {
+	if (!ctrl) {
+		return;
+	}
+
+	if (ctrl.$doReset) {
+		ctrl.$doReset();
+	}
+	
+	if (!message) {
+		ctrl.$doReset = null;
 		return;
 	}
 
