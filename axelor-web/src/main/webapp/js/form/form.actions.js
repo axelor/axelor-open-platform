@@ -428,7 +428,8 @@ ActionHandler.prototype = {
 		this._blockUI();
 
 		// save should be done on root form scope only
-		var scope = this._getRootFormElement().scope();
+		var rootForm = this._getRootFormElement();
+		var scope = rootForm.is('[ui-view-grid]') ? this.scope : rootForm.scope();
 		var deferred = this.ws.defer();
 
 		if (scope.isValid && !scope.isValid()) {
