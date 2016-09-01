@@ -101,7 +101,9 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		_.each(items, function(item){
 			item = _.clone(item);
 			var find = _.find(records, function(rec){
-				return rec.id && rec.id == item.id;
+				var id1 = rec.id || rec.$id;
+				var id2 = item.id || item.$id;
+				return id1 && id1 === id2;
 			});
 			
 			if (find) {
@@ -111,6 +113,8 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 			}
 		});
 		
+		records = $scope.$$ensureIds(records);
+
 		_.each(records, function(rec){
 			if (rec.id <= 0) rec.id = null;
 		});
@@ -265,12 +269,13 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 
 		var dummyId = 0;
 
-		function ensureIds(records) {
+		function ensureIds(records, clone) {
 			var items = [];
 			angular.forEach(records, function(record){
-				var item = angular.copy(record, {});
-				if (item.id == null)
-					item.id = --dummyId;
+				var item = clone ? angular.copy(record, {}) : (record || {});
+				if (item.id == null) {
+					item.id = item.$id || (item.$id = --dummyId);
+				}
 				items.push(item);
 			});
 			return items;
@@ -279,11 +284,11 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		function fetchData() {
 			var items = scope.getValue();
 			return scope.fetchData(items, function(records){
-				records =  ensureIds(records);
-				scope.setItems(records);
+				scope.setItems(ensureIds(records, true));
 			});
 		}
 
+		scope.$$ensureIds = ensureIds;
 		scope.$$fetchData = fetchData;
 
 	})($scope);
