@@ -164,6 +164,7 @@
 						if (k === 'selected') return; // selected is transient field
 						res[k] = compact(v);
 					});
+					res.id = res.id || res.$id; // make sure to use dummy id
 					return res;
 				}
 				return angular.equals(compact(a), compact(b));
