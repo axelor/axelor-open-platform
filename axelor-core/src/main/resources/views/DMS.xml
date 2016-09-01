@@ -142,11 +142,6 @@
     <domain>self.createdBy = :__user__</domain>
   </action-view>
 
-  <action-view name="dms.attach" model="com.axelor.dms.db.DMSFile" title="Attachments">
-    <view name="dms-file-grid" type="grid" />
-    <view-param name="ui-template:grid" value="dms-file-list"/>
-    <view-param name="search-filters" value="dms-file-filters"/>
-  </action-view>
   <action-view name="dms.tags" model="com.axelor.dms.db.DMSFileTag" title="Tags">
     <view name="dms-tag-grid" type="grid" />
     <view name="dms-tag-form" type="form" />
