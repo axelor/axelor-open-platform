@@ -72,7 +72,7 @@
     </template>
   </cards>
 
-  <form name="mail-group-from" title="Group" model="com.axelor.mail.db.MailGroup"
+  <form name="mail-group-form" title="Group" model="com.axelor.mail.db.MailGroup"
     onSave="com.axelor.mail.web.MailController:autoSubscribe">
     <panel title="Overview" css="fix-child-3">
       <panel colSpan="3">
