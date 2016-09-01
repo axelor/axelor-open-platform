@@ -249,7 +249,7 @@
     <field name="module"/>
   </grid>
 
-  <form name="meta-select-form" title="Select" model="com.axelor.meta.db.MetaSelect">
+  <form name="meta-select-form" title="form::Select" model="com.axelor.meta.db.MetaSelect">
     <panel title="Overview">
       <field name="name"/>
       <field name="module"/>
