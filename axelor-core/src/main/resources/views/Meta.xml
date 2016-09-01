@@ -239,7 +239,7 @@
       <field name="action"/>
       <field name="module"/>
       <field name="hidden"/>
-      <field name="sequence"/>
+      <field name="order"/>
       <field name="priority"/>
     </panel>
   </form>
