@@ -43,7 +43,8 @@ public class AppFilter implements Filter {
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
 		try {
-			APP_LOCALE = new Locale(AppSettings.get().get("application.locale"));
+			final String appLocale = AppSettings.get().get("application.locale", null);
+			APP_LOCALE =  appLocale == null ? null : new Locale(appLocale);
 		} catch (Exception e) {
 		}
 	}
