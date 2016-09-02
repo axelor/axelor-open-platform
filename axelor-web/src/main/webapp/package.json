@@ -1,6 +1,6 @@
 {
   "name": "axelor-web",
-  "version": "3.2.3",
+  "version": "3.2.4",
   "private": true,
   "devDependencies": {
     "grunt": "~0.4.5",
