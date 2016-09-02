@@ -550,11 +550,10 @@ function GridViewCtrl($scope, $element) {
 	}
 	
 	function focusFilter() {
-		var filterBox = $('.filter-box .search-query:visible');
+		var filterBox = $('.filter-box .search-query:visible input');
 		if (filterBox.size()) {
 			filterBox.focus().select();
 		}
-		$scope.$broadcast("on:clear-filter-silent");
 	}
 
 	$scope.onHotKey = function (e, action) {
