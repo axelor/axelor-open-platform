@@ -335,9 +335,6 @@ ui.formInput('ManyToOne', 'Select', {
 		input.on("blur", function () {
 			input.attr('placeholder', field.placeholder || '');
 		});
-		input.on("click", function () {
-			scope.showSelection();
-		});
 
 		scope.loadSelection = function(request, response) {
 
