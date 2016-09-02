@@ -1,6 +1,16 @@
-# Current (3.2.3)
+# Current (3.2.4)
+
+# 3.2.3 (2016-09-02)
 
 ## Bug fixes
+
+- fix unnecessary call to onLoad action
+- fix duplicate onChange action on o2m issue 
+- fix regression caused by save action fix 
+
+## Improvements
+
+- show different icon for view on relational fields
 
 # 3.2.2 (2016-08-23)
 
