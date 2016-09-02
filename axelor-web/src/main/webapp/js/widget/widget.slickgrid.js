@@ -1031,11 +1031,13 @@ Grid.prototype._doInit = function(view) {
 			}
 		});
 		scope.$on("on:attrs-reset", function() {
-			var resetHidden = that.visibleCols.length === that.cols.length ? angular.noop : function (col) {
-				if (col.descriptor) {
-					that.showColumn(col.field, !col.descriptor.hidden);
-				}
-			};
+			var resetHidden = that.visibleCols && that.visibleCols.length === that.cols.length
+				? angular.noop
+				: function (col) {
+					if (col.descriptor) {
+						that.showColumn(col.field, !col.descriptor.hidden);
+					}
+				};
 			var resetTitle = function (col) {
 				if (col._title) {
 					var found = _.findWhere(that.grid.getColumns(), { id: col.id });
