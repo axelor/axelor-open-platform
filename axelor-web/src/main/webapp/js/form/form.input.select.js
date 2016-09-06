@@ -552,7 +552,7 @@ ui.formInput('MultiSelect', 'Select', {
 		};
 		
 		scope.onShowSelection = function(e) {
-			if (e && $(e.target || e.srcElement).is('li,i,span.tag-text')) {
+			if (e && $(e.target || e.srcElement).is('input,li,i,span.tag-text')) {
 				return;
 			}
 			input.focus();
