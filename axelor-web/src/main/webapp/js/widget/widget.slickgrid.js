@@ -1024,13 +1024,7 @@ Grid.prototype._doInit = function(view) {
 	}
 
 	setTimeout(function () {
-		// hide columns
-		_.each(that.cols, function (col) {
-			if (col.descriptor && col.descriptor.hidden) {
-				that.showColumn(col.field, false);
-			}
-		});
-		scope.$on("on:attrs-reset", function() {
+		var onResetAttrs = function () {
 			var resetHidden = that.visibleCols && that.visibleCols.length === that.cols.length
 				? angular.noop
 				: function (col) {
@@ -1050,6 +1044,16 @@ Grid.prototype._doInit = function(view) {
 				resetHidden(col);
 				resetTitle(col);
 			});
+		};
+		// hide columns
+		_.each(that.cols, function (col) {
+			if (col.descriptor && col.descriptor.hidden) {
+				that.showColumn(col.field, false);
+			}
+		});
+		// reset column attrs
+		scope.$on("on:attrs-reset", function() {
+			scope.$timeout(onResetAttrs);
 		});
 	});
 
