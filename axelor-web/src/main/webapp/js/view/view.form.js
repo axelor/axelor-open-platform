@@ -625,6 +625,7 @@ function FormViewCtrl($scope, $element) {
 			$scope.setEditable();
 			$scope.$timeout(function () {
 				record._dirty = true;
+				$scope.$$original = {};
 			});
 		});
 	};
