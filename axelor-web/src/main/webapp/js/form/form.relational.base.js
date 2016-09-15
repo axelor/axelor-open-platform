@@ -136,7 +136,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	
 	function _showEditor(record) {
 		
-		if (field.editWindow === "blank" && record && record.id > 0) {
+		if (!$scope._isPopup && field.editWindow === "blank" && record && record.id > 0) {
 			var tab = {
 				action: _.uniqueId('$act'),
 				title: field.title,
