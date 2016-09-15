@@ -238,12 +238,13 @@ public class ActionView extends Action {
 	public static final class ActionViewBuilder {
 
 		private ActionView view = new ActionView();
+		private Map<String, Object> context = Maps.newHashMap();
 
 		private ActionViewBuilder(String title) {
 			view.title = title;
 			view.views = Lists.newArrayList();
-			view.contexts = Lists.newArrayList();
 			view.params = Lists.newArrayList();
+			view.contexts = Lists.newArrayList();
 		}
 		
 		public ActionViewBuilder name(String name) {
@@ -278,11 +279,14 @@ public class ActionView extends Action {
 			return this;
 		}
 		
-		public ActionViewBuilder context(String key, String value) {
-			Context item = new Context();
-			item.setName(key);
-			item.setExpression(value);
-			view.contexts.add(item);
+		public ActionViewBuilder context(String key, Object value) {
+			this.context.put(key, value);
+			if (value instanceof String) {
+				Context context = new Context();
+				context.setName(key);
+				context.setExpression((String) value);
+				view.contexts.add(context);
+			}
 			return this;
 		}
 		
@@ -310,7 +314,6 @@ public class ActionView extends Action {
 		 */
 		public Map<String, Object> map() {
 			Map<String, Object> result = Maps.newHashMap();
-			Map<String, Object> context = Maps.newHashMap();
 			Map<String, Object> params = Maps.newHashMap();
 			List<Object> items = Lists.newArrayList();
 			String type = null;
@@ -329,10 +332,6 @@ public class ActionView extends Action {
 				type = "grid";
 				items.add(ImmutableMap.of("type", "grid"));
 				items.add(ImmutableMap.of("type", "form"));
-			}
-
-			for(Context ctx : view.contexts) {
-				context.put(ctx.getName(), ctx.getExpression());
 			}
 
 			for(Param param : view.params) {
