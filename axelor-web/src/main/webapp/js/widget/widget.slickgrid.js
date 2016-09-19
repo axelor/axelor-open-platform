@@ -393,11 +393,11 @@ var Formatters = {
 		return '<a target="_blank" ng-show="text" href="' + _.escapeHTML(value) + '">' + _.escapeHTML(value) + '</a>';
 	},
 	
-	"icon": function(field, value) {
+	"icon": function(field, value, dataContext, grid) {
 		if (value && value.indexOf("fa-") > -1) {
 			return '<i class="slick-icon ' + value + '"></i>';
 		}
-		return Formatters.button(field, value);
+		return Formatters.button(field, value, dataContext, grid);
 	}
 };
 
@@ -2294,13 +2294,14 @@ Grid.prototype.groupBy = function(names) {
 	var grouping = _.map(all, function(name) {
 		
 		var col = this.getColumn(name),
+			grid = this.grid,
 			field = col.descriptor,
 			formatter = Formatters[field.selection ? 'selection' : field.type];
 		
 		return {
 			getter: function(item) {
 				if (formatter) {
-					return formatter(field, item[name]);
+					return formatter(field, item[name], item, grid);
 				}
 				return item[name];
 			},
