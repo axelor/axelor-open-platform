@@ -351,6 +351,11 @@ ui.formInput('Select', 'BaseSelect', {
 		scope.$render_editable = function() {
 			input.val(this.getText());
 		};
+		
+		scope.$on('on:edit', function () {
+			// force update input text, fixes #5965
+			scope.$render_editable();
+		});
 	}
 });
 
