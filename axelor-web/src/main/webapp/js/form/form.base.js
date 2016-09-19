@@ -101,10 +101,11 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		};
 		
 		scope.$on("on:edit", function(e, rec) {
+			if (_.isEmpty(rec)) {
+				resetAttrs();
+			}
 			scope.$$readonly = scope.$$isReadonly();
 		});
-		
-		scope.$on("on:attrs-reset", resetAttrs);
 
 		scope.$on("on:attrs-changed", function(event, attr) {
 			if (attr.name === "readonly" || attr.name === "force-edit") {

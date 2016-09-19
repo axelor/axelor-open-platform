@@ -1024,36 +1024,11 @@ Grid.prototype._doInit = function(view) {
 	}
 
 	setTimeout(function () {
-		var onResetAttrs = function () {
-			var resetHidden = that.visibleCols && that.visibleCols.length === that.cols.length
-				? angular.noop
-				: function (col) {
-					if (col.descriptor) {
-						that.showColumn(col.field, !col.descriptor.hidden);
-					}
-				};
-			var resetTitle = function (col) {
-				if (col._title) {
-					var found = _.findWhere(that.grid.getColumns(), { id: col.id });
-					if (found && found.name !== col._title) {
-						that.setColumnTitle(col.id, col._title);
-					}
-				}
-			};
-			_.each(that.cols, function (col) {
-				resetHidden(col);
-				resetTitle(col);
-			});
-		};
 		// hide columns
 		_.each(that.cols, function (col) {
 			if (col.descriptor && col.descriptor.hidden) {
 				that.showColumn(col.field, false);
 			}
-		});
-		// reset column attrs
-		scope.$on("on:attrs-reset", function() {
-			scope.$timeout(onResetAttrs);
 		});
 	});
 
