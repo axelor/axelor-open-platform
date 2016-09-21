@@ -52,7 +52,6 @@ afterEvaluate {
 		it.onlyIf { license.header && license.header.exists() }
 
 		def src = fileTree(dir: 'src', excludes: [
-			"**/data/**",
 			"**/data-init/**",
 			"**/data-demo/**",
 			"**/resources/**",
