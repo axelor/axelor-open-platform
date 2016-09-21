@@ -1147,19 +1147,23 @@ Grid.prototype._doInit = function(view) {
 		e.preventDefault();
 		return false;
 	});
-	
-	//XXX: ui-dialog issue (filter row)
-	var zIndex = element.parents('.ui-dialog:first').zIndex();
-	if (zIndex) {
-		element.find('.slick-headerrow-column').zIndex(zIndex);
-	}
-	
+
+	this.zIndexFix();
+
 	scope.$timeout(grid.invalidate);
 	scope.applyLater();
 };
 
 Grid.prototype.subscribe = function(event, handler) {
 	event.subscribe(_.bind(handler, this));
+};
+
+Grid.prototype.zIndexFix = function() {
+	//XXX: ui-dialog issue (filter row)
+	var zIndex = this.element.parents('.ui-dialog:first').zIndex();
+	if (zIndex) {
+		this.element.find('.slick-headerrow-column').zIndex(zIndex);
+	}
 };
 
 Grid.prototype.adjustSize = function() {
@@ -1241,6 +1245,8 @@ Grid.prototype.showColumn = function(name, show) {
 	grid.getViewport().rightPx = 0;
 	grid.resizeCanvas();
 	grid.autosizeColumns();
+
+	this.zIndexFix();
 };
 
 Grid.prototype.getVisibleColumns = function() {
