@@ -152,6 +152,7 @@ public class I18nExtractor {
 				
 				private Locator locator;
 				private boolean readText = false;
+				private StringBuilder readTextLines = new StringBuilder();
 				
 				@Override
 				public void setDocumentLocator(Locator locator) {
@@ -202,7 +203,10 @@ public class I18nExtractor {
 				@Override
 				public void endElement(String uri, String localName, String qName) throws SAXException {
 					if (TEXT_NODES.contains(qName)) {
+						String text = StringUtils.stripIndent(readTextLines.toString()).trim();
+						accept(new I18nItem(text, file, locator.getLineNumber()));
 						readText = false;
+						readTextLines.setLength(0);
 					}
 					if ("entity".equals(qName)) {
 						entityName = null;
@@ -215,9 +219,7 @@ public class I18nExtractor {
 				@Override
 				public void characters(char[] ch, int start, int length) throws SAXException {
 					if (readText) {
-						String text = new String(ch, start, length);
-						I18nItem item = new I18nItem(text, file, locator.getLineNumber());
-						accept(item);
+						readTextLines.append(new String(ch, start, length));
 					}
 				}
 			};

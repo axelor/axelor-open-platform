@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlValue;
 
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 
+import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -37,7 +38,7 @@ public class Static extends SimpleWidget {
 
 	@JsonGetter("text")
 	public String getLocaleText() {
-		return I18n.get(text);
+		return text == null ? text : I18n.get(StringUtils.stripIndent(text).trim());
 	}
 
 	@JsonIgnore
