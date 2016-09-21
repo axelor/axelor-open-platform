@@ -46,8 +46,18 @@ license {
 	excludes(["**/*.properties", "**/*.txt", "**/*.json"])
 }
 
+task licenseFormatGenerated (type: nl.javadude.gradle.plugins.license.License) {
+	def gen = fileTree('build/src-gen') {
+		include '**/*.java'
+		include '**/*.groovy'
+	}
+	logging.level = LogLevel.QUIET // suppress logging
+	it.source = gen
+	it.onlyIf { license.header && license.header.exists() }
+}
+
 afterEvaluate {
-	tasks.findAll { it.class.simpleName.startsWith 'License' }.each {
+	tasks.findAll { it.class.simpleName.startsWith('License') && it.name != 'licenseFormatGenerated' }.each {
 
 		it.onlyIf { license.header && license.header.exists() }
 
@@ -65,5 +75,9 @@ afterEvaluate {
 		}
 
 		it.source = files([src, gen])
+	}
+	
+	if (tasks.findByName('generateCode')) {
+		tasks.generateCode.finalizedBy licenseFormatGenerated
 	}
 }
