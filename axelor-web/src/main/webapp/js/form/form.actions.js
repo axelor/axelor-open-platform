@@ -603,11 +603,12 @@ ActionHandler.prototype = {
 		var self = this,
 			scope = this.scope,
 			formElement = this._getFormElement(),
-			formScope = formElement.data('$scope') || scope;
+			formScope = formElement.data('$scope') || scope,
+			rootScope = self._getRootFormElement().scope();
 
 		function doReload(pending) {
 			self._invalidateContext = true;
-			var promise = scope.reload();
+			var promise = rootScope.reload();
 			if (promise) {
 				promise.then(function(){
 					deferred.resolve(pending);
