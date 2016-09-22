@@ -190,6 +190,11 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 			
 			scopes.grid.setItems(records);
 			
+			if (scopes.form.$events.onLoad) {
+				scopes.form.record._count = records.length;
+				scopes.form.$events.onLoad();
+			}
+
 			if (_.isEmpty(records)) {
 				axelor.notify.info(_t("No records found."));
 			}
