@@ -482,6 +482,8 @@ function FormViewCtrl($scope, $element) {
 							}
 							$scope.$$original = old;
 							return res;
+						} else if (defaults) {
+							$scope.editRecord(defaults);
 						}
 					});
 				}
