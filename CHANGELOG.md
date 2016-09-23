@@ -1,4 +1,8 @@
-# Current (3.2.4)
+# 3.2.4 (2016-09-23)
+
+## Bug fixes
+
+- fix reload root record with actions 
 
 # 3.2.3 (2016-09-02)
 
