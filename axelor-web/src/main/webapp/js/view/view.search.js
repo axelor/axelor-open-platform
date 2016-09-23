@@ -192,6 +192,9 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 			
 			if (scopes.form.$events.onLoad) {
 				scopes.form.record._count = records.length;
+				scopes.form.record._countByModels = _.countBy(records, function(rec) {
+					return rec._model;
+				});
 				scopes.form.$events.onLoad();
 			}
 
