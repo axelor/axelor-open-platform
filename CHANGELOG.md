@@ -1,8 +1,13 @@
-# Current (3.3.0)
+# 3.3.0 (2016-09-23)
 
 ## Bug fixes
 
+- fix open relational field in new tab if currently in popup
+
 ## Improvements
+
+- allow any context value from action-view builder
+- add support for onLoad actions on multi-object search
 
 # 3.2.4 (2016-09-23)
 
