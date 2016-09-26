@@ -1,6 +1,8 @@
-# Current (3.3.1)
+# 3.3.1 (2016-09-26)
 
-## Bug fixes
+## Improvements
+
+- add field reset error feature
 
 # 3.3.0 (2016-09-23)
 
