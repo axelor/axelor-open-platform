@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
@@ -45,7 +46,6 @@ public class ActionCondition extends Action {
 	@Override
 	public Object evaluate(ActionHandler handler) {
 		Map<String, String> errors = Maps.newHashMap();
-		boolean allCheck = true;
 		for(Check check : conditions) {
 			String names = check.getField();
 			String error = check.getLocalizedError();
@@ -66,12 +66,14 @@ public class ActionCondition extends Action {
 				field = field.trim();
 				if (Action.test(handler, check.getCondition(field))) {
 					errors.put(field, error);
-					allCheck = false;
-				}
+				} else {
+					errors.put(field, "");
+                }
 			}
 
 		}
-		return allCheck ? true : errors;
+		
+		return ObjectUtils.isEmpty(errors) ? true : errors;
 	}
 
 	@Override

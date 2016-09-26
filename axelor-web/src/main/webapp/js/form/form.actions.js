@@ -106,7 +106,16 @@ function handleError(scope, item, message) {
 	}
 
 	var ctrl = item.data('$ngModelController');
-	if (ctrl == null || ctrl.$doReset) {
+	if (ctrl == null) {
+		return;
+	}
+	
+	if (ctrl.$doReset) {
+		ctrl.$doReset();
+	}
+	
+	if (!message) {
+		ctrl.$doReset = null;
 		return;
 	}
 
@@ -699,12 +708,18 @@ ActionHandler.prototype = {
 		}
 		
 		if (!_.isEmpty(data.errors)) {
+			var hasError = false;
 			_.each(data.errors, function(v, k){
 				var item = (findItems(k) || $()).first();
 				handleError(scope, item, v);
+				if(v && v.length > 0) {
+					hasError = true;
+				}
 			});
-			deferred.reject();
-			return deferred.promise;
+			if(hasError) {
+				deferred.reject();
+				return deferred.promise;
+			}
 		}
 		
 		if (data.values) {
