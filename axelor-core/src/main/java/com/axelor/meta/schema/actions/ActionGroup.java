@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.common.ClassUtils;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
@@ -219,11 +220,28 @@ public class ActionGroup extends ActionResumable {
 			Object value = action.wrap(handler);
             if (value instanceof Response) {
             	Response res = (Response) value;
-            	// if error or this is the only action then return the response
+            	// if this is the only action then return the response
             	if (res.getStatus() != Response.STATUS_SUCCESS || actions.size() == 1) {
             		return res;
             	}
+            	
             	value = res.getItem(0);
+            	
+            	// if error then concat the response result with result of previous actions and quit
+            	if(!ObjectUtils.isEmpty(res.getErrors())) {
+            		Map<String, Object> resValues = Maps.newHashMap();
+            		resValues.put("data", res.getItem(0));
+            		resValues.put("errors", res.getErrors());
+            		
+                	// skip next actions if contains errors
+                	if(hasErrors(resValues)) {
+                		result.add(resValues);
+                    	break;
+                	} else {
+                		value = resValues;
+                	}
+            	}
+            	
             }
             if (value == null) {
             	continue;
@@ -258,8 +276,9 @@ public class ActionGroup extends ActionResumable {
             }
 
             if (action instanceof ActionCondition) {
-            	if (value instanceof Map || Objects.equal(value, Boolean.FALSE)) {
-                	break;
+            	if(Objects.equal(value, Boolean.FALSE) || 
+        			(value instanceof Map && hasErrors((Map) value))) {
+            		break;
             	}
             }
 
@@ -289,6 +308,23 @@ public class ActionGroup extends ActionResumable {
             }
 		}
 		return result;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private Boolean hasErrors(Map<String, Object> value) {
+		if (ObjectUtils.isEmpty(value)) return Boolean.FALSE;
+		
+		Object errors = value.get("errors");
+		if(errors instanceof Map) {
+			for (Object key : ((Map) errors).keySet()) {
+				String error = (String) ((Map) errors).get(key);
+				if(!StringUtils.isEmpty(error)) {
+					return Boolean.TRUE;
+				}
+			}
+		}
+		
+		return Boolean.FALSE;
 	}
 	
 	@SuppressWarnings("all")

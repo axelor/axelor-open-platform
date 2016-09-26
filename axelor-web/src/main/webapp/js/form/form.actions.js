@@ -725,12 +725,18 @@ ActionHandler.prototype = {
 		}
 		
 		if (!_.isEmpty(data.errors)) {
+			var hasError = false;
 			_.each(data.errors, function(v, k){
 				var item = (findItems(k) || $()).first();
 				handleError(scope, item, v);
+				if(v && v.length > 0) {
+					hasError = true;
+				}
 			});
-			deferred.reject();
-			return deferred.promise;
+			if(hasError) {
+				deferred.reject();
+				return deferred.promise;
+			}
 		}
 		
 		if (data.values) {
