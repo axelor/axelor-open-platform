@@ -40,6 +40,8 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.annotations.Widget;
+import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaField;
 import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.repo.MetaFieldRepository;
@@ -126,18 +128,14 @@ public class MetaModelService {
 	 */
 	private MetaModel updateEntity(Class<?> klass){
 		MetaModel metaModel = getMetaModel(klass);
-		for (Field field : klass.getDeclaredFields()){
-			if (fields.all().filter("metaModel = ?1 AND name = ?2", metaModel, field.getName()).count() == 0){
-				metaModel.getMetaFields().add(createField(metaModel, field));
+		Mapper mapper = Mapper.of(klass);
+		
+		for (Property property :mapper.getProperties()) {
+			if (fields.all().filter("self.metaModel = ?1 AND self.name = ?2", metaModel, property.getName()).count() == 0){
+				metaModel.getMetaFields().add(createField(metaModel, getField(klass, property.getName())));
 			}
 		}
-		if (AuditableModel.class.isAssignableFrom(klass)) {
-			for (Field field : AuditableModel.class.getDeclaredFields()) {
-				if (fields.all().filter("metaModel = ?1 AND name = ?2", metaModel, field.getName()).count() == 0){
-					metaModel.getMetaFields().add(createField(metaModel, field));
-				}
-			}
-		}
+		
 		return metaModel;
 	}
 	
@@ -218,40 +216,12 @@ public class MetaModelService {
 	private List<MetaField> createFields(MetaModel metaModel, Class<?> klass){
 		
 		List<MetaField> modelFields = new ArrayList<MetaField>();
-		MetaField metaField = new MetaField();
-
-		// first add id field
-		Field idField = null;
-		try {
-			idField = klass.getDeclaredField("id");
-			idField = Model.class.getDeclaredField("id");
-		} catch (Exception e) {
-		}
-		if (idField != null) {
-			metaField = this.createField(metaModel, idField);
+		Mapper mapper = Mapper.of(klass);
+		
+		for (Property property :mapper.getProperties()) {
+			MetaField metaField = this.createField(metaModel, getField(klass, property.getName()));
 			if (metaField != null) {
 				modelFields.add(metaField);
-			}
-		}
-
-		// then own fields
-		for (Field field : klass.getDeclaredFields()) {
-			if ("id".equals(field.getName()) && idField != null) {
-				continue;
-			}
-			metaField = this.createField(metaModel, field);
-			if (metaField != null) {
-				modelFields.add(metaField);
-			}
-		}
-
-		// finally audit fields
-		if (AuditableModel.class.isAssignableFrom(klass)) {
-			for (Field field : AuditableModel.class.getDeclaredFields()) {
-				metaField = this.createField(metaModel, field);
-				if (metaField != null) {
-					modelFields.add(metaField);
-				}
 			}
 		}
 
@@ -324,6 +294,14 @@ public class MetaModelService {
 		}
 		
 		return typeName;
+	}
+	
+	private Field getField(Class<?> klass, String name) {
+		try {
+			return klass.getDeclaredField(name);
+		} catch (NoSuchFieldException e) {
+			return getField(klass.getSuperclass(), name);
+		}
 	}
 	
 	/**
