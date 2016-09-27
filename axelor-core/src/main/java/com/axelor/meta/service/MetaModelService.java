@@ -35,9 +35,7 @@ import org.hibernate.annotations.Formula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axelor.auth.db.AuditableModel;
 import com.axelor.db.JPA;
-import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.annotations.Widget;
 import com.axelor.db.mapper.Mapper;
@@ -51,9 +49,6 @@ import com.google.inject.persist.Transactional;
 /**
  * API for MetaModel and MetaField entity.
  * 
- * @author guerrier
- * @version 1.0
- *
  */
 public class MetaModelService {
 	
@@ -81,7 +76,7 @@ public class MetaModelService {
 	@Transactional
 	public void process(Class<?> klass){
 		final MetaModel entity;
-		if (models.all().filter("fullName = ?1", klass.getName()).count() == 0){
+		if (models.all().filter("self.fullName = ?1", klass.getName()).count() == 0){
 			entity = this.createEntity(klass);
 		} else {
 			entity = this.updateEntity(klass);
@@ -109,7 +104,7 @@ public class MetaModelService {
 
 		if (klass.getAnnotation(Table.class) != null) {
 			metaModel.setTableName(klass.getAnnotation(Table.class).name());
-		}		
+		}
 		
 		metaModel.setMetaFields(new ArrayList<MetaField>());
 		metaModel.getMetaFields().addAll(this.createFields(metaModel, klass));
@@ -242,12 +237,12 @@ public class MetaModelService {
 		Type type = field.getGenericType();
 		String typeName = null;
 		
-		if (type instanceof ParameterizedType) {  
-            ParameterizedType pt = (ParameterizedType) type;  
-            for (Type t : pt.getActualTypeArguments()) {
-            	typeName = t.toString();  
-            }  
-        }
+		if (type instanceof ParameterizedType) {
+			ParameterizedType pt = (ParameterizedType) type;
+			for (Type t : pt.getActualTypeArguments()) {
+				typeName = t.toString();
+			}
+		}
 		
 		return typeName;
 	}
