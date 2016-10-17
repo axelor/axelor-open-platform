@@ -377,7 +377,7 @@ class Entity {
 			def hash = name.hashCode()
 			return "return Objects.hash(${hash}, ${data});"
 		}
-		return "return super.hashCode();"
+		return "return 0;"
 	}
 
 	String getToStringCode() {
