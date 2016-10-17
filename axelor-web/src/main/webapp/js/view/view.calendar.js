@@ -83,23 +83,39 @@ function CalendarViewCtrl($scope, $element) {
 	}
 	
 	$scope.fetchItems = function(start, end, callback) {
-
 		var fields = _.pluck(this.fields, 'name');
-		var fieldName = view.start;
-
 		var criteria = {
 			operator: "and",
 			criteria: [{
-				fieldName: fieldName,
+				fieldName: view.start,
 				operator: ">=",
 				value: start
 			}, {
-				fieldName: fieldName,
+				fieldName: view.start,
 				operator: "<=",
 				value: end
 			}]
 		};
-		
+
+		// make sure to include items whose end date falls in current range
+		if (view.stop) {
+			criteria = {
+				operator: "or",
+				criteria: [criteria, {
+					operator: "and",
+					criteria: [{
+						fieldName: view.stop,
+						operator: ">=",
+						value: start
+					}, {
+						fieldName: view.stop,
+						operator: "<=",
+						value: end
+					}]
+				}]
+			};
+		}
+
 		// consider stored filter
 		if (ds._filter) {
 			_.each(ds._filter.criteria, function(criterion) {
