@@ -14,7 +14,7 @@
     </panel>
     <panel-related field="permissions" />
     <panel-related field="metaPermissions" />
-    <panel-related field="menus" />
+    <panel-related field="menus" grid-view="simple-meta-menu-grid" form-view="meta-menu-form"/>
   </form>
 
 </object-views>

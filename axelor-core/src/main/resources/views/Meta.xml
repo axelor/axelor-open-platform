@@ -73,6 +73,13 @@
     </panel>
   </form>
   
+  <grid title="Views" name="simple-meta-view-grid" model="com.axelor.meta.db.MetaView" orderBy="priority,name">
+    <field name="name"/>
+    <field name="title"/>
+    <field name="type"/>
+    <field name="priority" width="75"/>
+  </grid>
+  
   <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView" orderBy="priority,name">
     <toolbar>
       <button name="restoreAll" icon="fa-undo" help="Restore all..." prompt="All the customizations will be lost. Are you sure ?" onClick="action-meta-restore-all"/>
@@ -156,6 +163,12 @@
       <field name="xml" showTitle="false" widget="CodeEditor" height="500" x-code-syntax="xml" colSpan="12"/>
     </panel>
   </form>
+  
+  <grid title="Menu Items" name="simple-meta-menu-grid" model="com.axelor.meta.db.MetaMenu">
+  	<field name="name"/>
+    <field name="title"/>
+    <field name="priority" width="75"/>
+  </grid>
 
   <grid title="Menu Items" name="meta-menu-grid" model="com.axelor.meta.db.MetaMenu">
     <field name="name"/>
@@ -176,6 +189,7 @@
     <field name="link"/>
     <field name="priority" width="100"/>
   </grid>
+  
   <form name="meta-menu-fav-form" title="Favorite" model="com.axelor.meta.db.MetaMenu" canNew="false">
     <panel title="Overview">
       <field name="title"/>
@@ -183,6 +197,7 @@
       <field name="link" colSpan="12" />
     </panel>
   </form>
+  
   <action-view name="menus.fav" model="com.axelor.meta.db.MetaMenu" title="Favorites">
     <view name="meta-menu-fav-grid" type="grid"/>
     <view name="meta-menu-fav-form" type="form"/>

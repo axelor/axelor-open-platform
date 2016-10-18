@@ -31,21 +31,10 @@
     </panel>
     <panel-tabs>
       <panel-related field="roles" form-view="role-form" grid-view="role-grid"/>
-      <panel-related field="permissions">
-        <field name="name"/>
-        <field name="object"/>
-      </panel-related>
+      <panel-related field="permissions" grid-view="simple-permission-grid" form-view="permission-form"/>
       <panel-related field="metaPermissions"/>
-      <panel-related field="menus">
-        <field name="name"/>
-        <field name="title"/>
-      </panel-related>
-      <panel-related field="views">
-        <field name="name"/>
-        <field name="title"/>
-        <field name="type"/>
-        <field name="priority" width="75"/>
-      </panel-related>
+      <panel-related field="menus" grid-view="simple-meta-menu-grid" form-view="meta-menu-form"/>
+      <panel-related field="views" grid-view="simple-meta-view-grid" form-view="meta-view-form"/>
     </panel-tabs>
   </form>
 

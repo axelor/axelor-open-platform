@@ -43,7 +43,7 @@
     </panel>
     <panel-tabs>
       <panel-related field="roles" form-view="role-form" grid-view="role-grid"/>
-      <panel-related field="permissions"/>
+      <panel-related field="permissions" grid-view="simple-permission-grid" form-view="permission-form"/>
       <panel-related field="metaPermissions"/>
     </panel-tabs>
   </form>
