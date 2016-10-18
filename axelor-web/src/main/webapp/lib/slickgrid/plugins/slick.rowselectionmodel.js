@@ -133,6 +133,9 @@
       if (!cell || !_grid.canCellBeActive(cell.row, cell.cell)) {
         return false;
       }
+      if (_grid.getEditorLock().isActive() && _grid.getEditController().isCurrentValueChanged()) {
+	    return false;
+      }
 
       var selection = rangesToRows(_ranges);
       var idx = $.inArray(cell.row, selection);

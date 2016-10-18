@@ -214,7 +214,8 @@ if (typeof Slick === "undefined") {
 
       editController = {
         "commitCurrentEdit": commitCurrentEdit,
-        "cancelCurrentEdit": cancelCurrentEdit
+        "cancelCurrentEdit": cancelCurrentEdit,
+        "isCurrentValueChanged": isCurrentValueChanged,
       };
 
       $container
@@ -3085,6 +3086,10 @@ if (typeof Slick === "undefined") {
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     // IEditor implementation for the editor lock
+    
+    function isCurrentValueChanged() {
+      return currentEditor && currentEditor.isValueChanged();
+    }
 
     function commitCurrentEdit() {
       var item = getDataItem(activeRow);
