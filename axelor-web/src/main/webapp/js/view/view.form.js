@@ -1063,6 +1063,7 @@ ui.formBuild = function (scope, schema, fields) {
 				if (attrs.items && attrs.items.length) {
 					attrs.views = [{
 						type: 'grid',
+						title: attrs.title || field.title || field.autoTitle,
 						items: attrs.items,
 						canMove: attrs.canMove,
 						orderBy: attrs.orderBy,
