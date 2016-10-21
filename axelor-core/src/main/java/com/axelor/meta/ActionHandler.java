@@ -332,7 +332,7 @@ public class ActionHandler {
 			return items;
 		}
 		if (data instanceof Map) {
-			final Map<String, Object> item = new HashMap<>((Map) data);
+			final Map<String, Object> item = new HashMap<>((Map<String, Object>) data);
 			if (item.containsKey(KEY_VALUES) && item.get(KEY_VALUES) instanceof Map) {
 				final Map<String, Object> values = (Map) item.get(KEY_VALUES);
 				for (String key : values.keySet()) {
