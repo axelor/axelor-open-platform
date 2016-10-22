@@ -13,6 +13,10 @@ ext.adkRepos = {
 		name "axelor-nexus"
 		url	"http://repository.axelor.com/nexus/content/groups/public/"
 	}
+	maven {
+		name "gradle-plugins"
+		url "https://plugins.gradle.org/m2/"
+	}
 	jcenter()
 	mavenCentral()
 	mavenLocal()

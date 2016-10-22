@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
+import org.eclipse.persistence.oxm.annotations.XmlValueExtension;
 
 import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
@@ -34,6 +35,7 @@ public class Static extends SimpleWidget {
 
 	@XmlCDATA
 	@XmlValue
+	@XmlValueExtension
 	private String text;
 
 	@JsonGetter("text")

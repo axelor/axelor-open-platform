@@ -4,7 +4,6 @@ dependencies {
 
 	testCompile	libs.junit
 
-
 	compile libs.slf4j_simple
 	compile	libs.guava
 	compile libs.jline
@@ -12,6 +11,6 @@ dependencies {
 	
 	compile project(':axelor-common')
 	
-	compile "org.gradle:gradle-tooling-api:${gradle.gradleVersion}"
+	compile libs.gradle_tooling
 	compile libs.groovy
 }

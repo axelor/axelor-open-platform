@@ -12,12 +12,8 @@ dependencies {
 
 	compile libs.resteasy
 	compile libs.resteasy_guice
+	compile libs.resteasy_multipart
 	compile libs.jackson_libs
-
-	compile(libs.resteasy_multipart) {
-		exclude module: "resteasy-jaxb-provider"
-		exclude module: "mail", group: "javax.mail"
-	}
 }
 
 jar {

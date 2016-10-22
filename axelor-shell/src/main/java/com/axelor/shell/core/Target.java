@@ -26,9 +26,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -134,7 +134,7 @@ public class Target {
 		final List<Object> arguments = new ArrayList<>(method.getParameterTypes().length);
 		final Options options = getOptions();
 
-		final CommandLineParser lineParser = new BasicParser();
+		final CommandLineParser lineParser = new DefaultParser();
 		final CommandLine cmdLine;
 		try {
 			cmdLine = lineParser.parse(options, args);

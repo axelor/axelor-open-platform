@@ -1,6 +1,13 @@
 apply plugin: "java"
 apply plugin: "eclipse"
 
+tasks.eclipse.dependsOn tasks.cleanEclipse
+afterEvaluate {
+	if (tasks.findByName('generateCode')) {
+		tasks.eclipseClasspath.dependsOn tasks.generateCode
+	}
+}
+
 eclipse {
 	classpath {
 
