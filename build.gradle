@@ -101,13 +101,9 @@ task dist(dependsOn: [distZip, distTar])
 installDist {
 	destinationDir = file("${buildDir}/install/${distName}")
 }
-// deprecated
-installApp {
-	destinationDir = file("${buildDir}/install/${distName}")
-}
 
 task wrapper(type: Wrapper) {
-	gradleVersion = "2.8"
+	gradleVersion = "3.1"
 }
 
 task updateVersion(type: com.axelor.gradle.tasks.VersionTask) {

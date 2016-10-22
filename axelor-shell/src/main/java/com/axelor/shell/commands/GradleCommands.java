@@ -25,7 +25,6 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
-import org.gradle.jarjar.com.google.common.collect.Lists;
 import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
@@ -36,6 +35,7 @@ import com.axelor.shell.core.Shell;
 import com.axelor.shell.core.annotations.CliCommand;
 import com.axelor.shell.core.annotations.CliOption;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 public class GradleCommands implements CommandProvider {
 	
