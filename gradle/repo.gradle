@@ -1,9 +1,5 @@
 def adkRepo = new File(buildscript.sourceFile.parentFile.parentFile, "maven")
 
-ext.adkPlugins = {
-	fileTree(dir: "${buildscript.sourceFile.parentFile}/libs", include: '*.jar')
-}
-
 ext.adkRepos = {
 	maven {
 		name "adk"
