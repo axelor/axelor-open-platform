@@ -31,6 +31,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.persistence.Query;
 
+import org.hibernate.query.internal.QueryImpl;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -623,8 +624,7 @@ public class MetaService {
 						JPA.em().createQuery(string);
 
 				// return result as list of map
-				((org.hibernate.ejb.QueryImpl<?>) query).getHibernateQuery()
-					.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+				this.transformQueryResult(query);
 
 				if (request.getData() != null) {
 					QueryBinder.of(query).bind(context);
@@ -733,8 +733,7 @@ public class MetaService {
 			}
 
 			// return result as list of map
-			((org.hibernate.ejb.QueryImpl<?>) query).getHibernateQuery()
-				.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+			this.transformQueryResult(query);
 
 			if (request.getData() != null) {
 				QueryBinder.of(query).bind(context);
@@ -744,5 +743,11 @@ public class MetaService {
 		}
 
 		return response;
+	}
+
+	private void transformQueryResult(Query query) {
+		//TODO: fix deprecation when new transformer api is implemented in hibernate
+		query.unwrap(QueryImpl.class)
+			.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 	}
 }

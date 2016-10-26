@@ -4,8 +4,8 @@ def versions = [:]
 // versions
 versions.guice = "4.1.0"
 versions.guava = "19.0"
-versions.hibernate = "4.2.19.Final"
-versions.hibernate_validator = "5.2.0.Final"
+versions.hibernate = "5.2.4.Final"
+versions.hibernate_validator = "5.3.2.Final"
 
 versions.groovy = "2.4.7"
 versions.resteasy = "3.1.0.CR2"
@@ -27,7 +27,7 @@ libs.slf4j_logback	= ["org.slf4j:slf4j-api:${versions.slf4j}", "ch.qos.logback:l
 libs.guava = ["com.google.guava:guava:${versions.guava}", "com.google.code.findbugs:jsr305:3.0.1"]
 
 // joda
-libs.joda_time = ["joda-time:joda-time:2.3", "org.jadira.usertype:usertype.core:3.0.0.GA"]
+libs.joda_time = ["joda-time:joda-time:2.9.4", "org.jadira.usertype:usertype.core:6.0.1.GA"]
 
 // yaml
 libs.snakeyaml = "org.yaml:snakeyaml:1.17"
@@ -64,10 +64,7 @@ libs.hibernate = [
     "org.hibernate:hibernate-c3p0:${versions.hibernate}",
     "org.hibernate:hibernate-validator:${versions.hibernate_validator}"
 ]
-libs.hibernate_ehcache = [
-	"net.sf.ehcache:ehcache-core:2.6.11",
-	"org.hibernate:hibernate-ehcache:${versions.hibernate}"
-]
+libs.hibernate_ehcache = "org.hibernate:hibernate-ehcache:${versions.hibernate}"
 
 // flyway
 libs.flywaydb = "org.flywaydb:flyway-core:4.0.3"

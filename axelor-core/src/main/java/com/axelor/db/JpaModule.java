@@ -24,13 +24,17 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
+import org.hibernate.cfg.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppSettings;
+import com.axelor.auth.AuditInterceptor;
 import com.axelor.common.ClassUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.internal.DBHelper;
+import com.axelor.db.internal.naming.ImplicitNamingStrategyImpl;
+import com.axelor.db.internal.naming.PhysicalNamingStrategyImpl;
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.PersistService;
 import com.google.inject.persist.jpa.JpaPersistModule;
@@ -118,24 +122,24 @@ public class JpaModule extends AbstractModule {
 			properties.putAll(this.properties);
 		}
 		if (this.autoscan) {
-			properties.put("hibernate.ejb.resource_scanner", "com.axelor.db.JpaScanner");
+			properties.put(Environment.SCANNER, JpaScanner.class.getName());
 		}
-		
-		properties.put("hibernate.ejb.interceptor", "com.axelor.auth.AuditInterceptor");
 
-		properties.put("hibernate.connection.autocommit", "false");
-		properties.put("hibernate.id.new_generator_mappings", "true");
-		properties.put("hibernate.ejb.naming_strategy", "org.hibernate.cfg.ImprovedNamingStrategy");
-		properties.put("hibernate.connection.charSet", "UTF-8");
-		properties.put("hibernate.max_fetch_depth", "3");
+		properties.put(Environment.INTERCEPTOR, AuditInterceptor.class.getName());
+		properties.put(Environment.USE_NEW_ID_GENERATOR_MAPPINGS, "true");
+		properties.put(Environment.IMPLICIT_NAMING_STRATEGY, ImplicitNamingStrategyImpl.class.getName());
+		properties.put(Environment.PHYSICAL_NAMING_STRATEGY, PhysicalNamingStrategyImpl.class.getName());
+		
 
 		properties.put("jadira.usertype.autoRegisterUserTypes", "true");
 		properties.put("jadira.usertype.databaseZone", "jvm");
+		properties.put(Environment.AUTOCOMMIT, "false");
+		properties.put(Environment.MAX_FETCH_DEPTH, "3");
 
 		if (DBHelper.isCacheEnabled()) {
-			properties.put("hibernate.cache.use_second_level_cache", "true");
-			properties.put("hibernate.cache.use_query_cache", "true");
-			properties.put("hibernate.cache.region.factory_class", "org.hibernate.cache.ehcache.EhCacheRegionFactory");
+			properties.put(Environment.USE_SECOND_LEVEL_CACHE, "true");
+			properties.put(Environment.USE_QUERY_CACHE, "true");
+			properties.put(Environment.CACHE_REGION_FACTORY, "org.hibernate.cache.ehcache.EhCacheRegionFactory");
 			try {
 				updateCacheProperties(properties);
 			} catch (Exception e) {

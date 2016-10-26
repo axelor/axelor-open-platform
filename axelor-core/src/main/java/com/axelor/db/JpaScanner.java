@@ -17,8 +17,6 @@
  */
 package com.axelor.db;
 
-import java.lang.annotation.Annotation;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
@@ -27,7 +25,16 @@ import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 
-import org.hibernate.ejb.packaging.NativeScanner;
+import org.hibernate.boot.archive.internal.StandardArchiveDescriptorFactory;
+import org.hibernate.boot.archive.scan.internal.ClassDescriptorImpl;
+import org.hibernate.boot.archive.scan.internal.ScanResultImpl;
+import org.hibernate.boot.archive.scan.spi.AbstractScannerImpl;
+import org.hibernate.boot.archive.scan.spi.ClassDescriptor;
+import org.hibernate.boot.archive.scan.spi.ClassDescriptor.Categorization;
+import org.hibernate.boot.archive.scan.spi.ScanEnvironment;
+import org.hibernate.boot.archive.scan.spi.ScanOptions;
+import org.hibernate.boot.archive.scan.spi.ScanParameters;
+import org.hibernate.boot.archive.scan.spi.ScanResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +47,7 @@ import com.google.common.collect.MapMaker;
  * {@link Model} classes annotated with {@link Entity}.
  *
  */
-public class JpaScanner extends NativeScanner {
+public class JpaScanner extends AbstractScannerImpl {
 
 	private static Logger log = LoggerFactory.getLogger(JpaScanner.class);
 	
@@ -54,6 +61,10 @@ public class JpaScanner extends NativeScanner {
 	private static Set<String> includes = new HashSet<>();
 
 	public static ClassLoader loader = new JpaClassLoader();
+
+	public JpaScanner() {
+		super(StandardArchiveDescriptorFactory.INSTANCE);
+	}
 
 	/**
 	 * Exclude classes from the given package.
@@ -76,15 +87,21 @@ public class JpaScanner extends NativeScanner {
 	}
 
 	@Override
-	public Set<Class<?>> getClassesInJar(URL jarToScan, Set<Class<? extends Annotation>> annotationsToLookFor) {
-		Set<Class<?>> mine = super.getClassesInJar(jarToScan, annotationsToLookFor);
-		for (Class<?> klass : mine) {
-			if (!Model.class.isAssignableFrom(klass)) {
-				log.warn("Not a Model: " + klass.getName());
-				return mine;
-			}
+	public ScanResult scan(ScanEnvironment environment, ScanOptions options, ScanParameters params) {
+		final ScanResult found = super.scan(environment, options, params);
+		final Set<Class<?>> models = findModels();
+		final Set<ClassDescriptor> descriptors = new HashSet<>();
+
+		if (found.getLocatedClasses() != null) {
+			descriptors.addAll(found.getLocatedClasses());
 		}
-		return findModels();
+
+		for (Class<?> model : models) {
+			ClassDescriptor descriptor = new ClassDescriptorImpl(model.getName(), Categorization.MODEL, null);
+			descriptors.add(descriptor);
+		}
+
+		return new ScanResultImpl(found.getLocatedPackages(), descriptors, found.getLocatedMappingFiles());
 	}
 
 	public static Set<Class<?>> findModels() {

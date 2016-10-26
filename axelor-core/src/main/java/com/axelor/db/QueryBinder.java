@@ -76,7 +76,7 @@ public class QueryBinder {
 	 * @return the same query binder instance
 	 */
 	public QueryBinder setCacheable(boolean cacheable) {
-		query.unwrap(org.hibernate.Query.class).setCacheable(cacheable);
+		query.setHint("org.hibernate.cacheable", "" + cacheable);
 		return this;
 	}
 
