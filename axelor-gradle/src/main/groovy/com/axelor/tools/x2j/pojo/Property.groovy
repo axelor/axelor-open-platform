@@ -409,7 +409,6 @@ class Property {
 			$required(),
 			$size(),
 			$digits(),
-			$index(),
 			$transient(),
 			$column(),
 			$one2one(),
@@ -602,12 +601,12 @@ class Property {
 		}
 	}
 
-	private Annotation $index() {
+	private Index getIndex() {
 		if (!this.isIndexable()) return null
 		String index = attrs['index'] as String
 		if (!index || index == 'true' || index.trim().empty)
 			index = "${entity.table}_${columnAuto}_IDX".toUpperCase()
-		return annon("org.hibernate.annotations.Index").add("name", index)
+		return new Index(this.entity, index, [this.name])
 	}
 
 	private List<Annotation> $id() {

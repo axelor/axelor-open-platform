@@ -46,8 +46,15 @@ class Index {
 			Property property = entity.getField(field)
 
 			fields.add(field)
-			columns.add(Index.getColumn(property, column))
+			columns.add(getColumn(property, column))
 		}
+	}
+
+	Index(Entity entity, String name, List<String> fields) {
+		this.entity = entity
+		this.name = name
+		this.fields = fields
+		this.columns = fields.collect { String n -> getColumn(entity.getField(n), n) }
 	}
 
 	private static String getColumn(Property property, String column) {

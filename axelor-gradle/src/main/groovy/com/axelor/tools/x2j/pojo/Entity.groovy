@@ -189,6 +189,9 @@ class Entity {
 				if (field.isNameField()) {
 					nameField = field
 				}
+				if (field.indexable) {
+					indexes += field.index
+				}
 			}
 		}
 	}
@@ -450,9 +453,9 @@ class Entity {
 		return all
 	}
 
-	List<Annotation> $table() {
+	Annotation $table() {
 
-		if (!table || mappedSuper) return []
+		if (!table || mappedSuper) return null
 
 		def constraints = this.constraints.collect {
 			def idx = new Annotation(this, "javax.persistence.UniqueConstraint", false)
@@ -463,24 +466,20 @@ class Entity {
 		}
 
 		def indexes = this.indexes.collect {
-			def idx = new Annotation(this, "org.hibernate.annotations.Index", false)
+			def idx = new Annotation(this, "javax.persistence.Index", false)
 			if (it.name) {
 				idx.add("name", it.name)
 			}
-			return idx.add("columnNames", it.columns, true)
+			return idx.add("columnList", it.columns.join(','), true)
 		}
 
 		def a1 = new Annotation(this, "javax.persistence.Table", false).add("name", this.table)
 		if (!constraints.empty)
 			a1.add("uniqueConstraints", constraints, false)
+		if (!indexes.empty)
+			a1.add("indexes", indexes, false)
 
-		if (indexes.empty)
-			return [a1]
-
-		def a2 = new Annotation(this, "org.hibernate.annotations.Table", false).add("appliesTo", this.table.toLowerCase())
-		a2.add("indexes", indexes, false)
-
-		return [a1, a2]
+		return a1
 	}
 
 	Annotation $cachable() {
