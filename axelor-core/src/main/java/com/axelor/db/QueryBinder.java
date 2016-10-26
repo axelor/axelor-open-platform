@@ -144,28 +144,40 @@ public class QueryBinder {
 				}
 			}
 		}
+		
+		if (params == null) {
+			return this;
+		}
 
-		if (params != null) {
-			for (int i = 0; i < params.length; i++) {
-				Object param = params[i];
-				if (param instanceof String
-						&& !StringUtils.isBlank((String) param)
-						&& bindings.containsKey(param)) {
-					param = bindings.get(param);
-				}
-				try {
-					query.getParameter(i + 1);
-				} catch (Exception e) {
-					continue;
-				}
-				try {
-					query.setParameter(i + 1, param);
-				} catch (IllegalArgumentException e) {
-					Parameter<?> p = query.getParameter(i + 1);
-					query.setParameter(i + 1, adapt(param, p));
-				}
+		// check if we have 1 based positional params
+		int offset = 0;
+		try {
+			query.getParameter(0);
+			// TODO: enforce JPA style positional params
+		} catch (Exception e) {
+			offset = 1;
+		}
+
+		for (int i = 0; i < params.length; i++) {
+			Object param = params[i];
+			if (param instanceof String
+					&& !StringUtils.isBlank((String) param)
+					&& bindings.containsKey(param)) {
+				param = bindings.get(param);
+			}
+			try {
+				query.getParameter(i + offset);
+			} catch (Exception e) {
+				continue;
+			}
+			try {
+				query.setParameter(i + offset, param);
+			} catch (IllegalArgumentException e) {
+				Parameter<?> p = query.getParameter(i + 1);
+				query.setParameter(i + offset, adapt(param, p));
 			}
 		}
+
 		return this;
 	}
 
