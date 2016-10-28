@@ -110,7 +110,7 @@ ui.formInput('Text', {
 		var field = scope.field,
 			textarea = element.get(0);
 
-		textarea.rows = field.height || 8;
+		textarea.rows = parseInt(field.height) || 8;
 
 		//Firefox add one more line
 		if ($.browser.mozilla){
