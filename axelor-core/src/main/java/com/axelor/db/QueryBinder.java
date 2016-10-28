@@ -24,6 +24,7 @@ import javax.persistence.Parameter;
 
 import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Adapter;
+import com.axelor.db.mapper.types.SimpleAdapter;
 import com.axelor.script.ScriptBindings;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
@@ -159,22 +160,22 @@ public class QueryBinder {
 		}
 
 		for (int i = 0; i < params.length; i++) {
-			Object param = params[i];
-			if (param instanceof String
-					&& !StringUtils.isBlank((String) param)
-					&& bindings.containsKey(param)) {
-				param = bindings.get(param);
+			Object value = params[i];
+			if (value instanceof String
+					&& !StringUtils.isBlank((String) value)
+					&& bindings.containsKey(value)) {
+				value = bindings.get(value);
 			}
+			final Parameter<?> param;
 			try {
-				query.getParameter(i + offset);
+				param = query.getParameter(i + offset);
 			} catch (Exception e) {
 				continue;
 			}
 			try {
-				query.setParameter(i + offset, param);
+				query.setParameter(i + offset, trySimpleAdapt(value, param));
 			} catch (IllegalArgumentException e) {
-				Parameter<?> p = query.getParameter(i + 1);
-				query.setParameter(i + offset, adapt(param, p));
+				query.setParameter(i + offset, adapt(value, param));
 			}
 		}
 
@@ -191,23 +192,21 @@ public class QueryBinder {
 	 * @return the same query binder instance
 	 */
 	public QueryBinder bind(String name, Object value) {
-		Parameter<?> parameter = null;
+		final Parameter<?> param;
 		try {
-			parameter = query.getParameter(name);
-		} catch (Exception e) {}
-
-		if (parameter == null) {
+			param = query.getParameter(name);
+		} catch (Exception e) {
 			return this;
 		}
 
 		if (value == null || value instanceof String && "".equals(((String) value).trim())) {
-			value = adapt(value, parameter);
+			value = adapt(value, param);
 		}
 
 		try {
-			query.setParameter(name, value);
+			query.setParameter(name, trySimpleAdapt(value, param));
 		} catch (IllegalArgumentException e) {
-			query.setParameter(name, adapt(value, parameter));
+			query.setParameter(name, adapt(value, param));
 		}
 
 		return this;
@@ -221,18 +220,30 @@ public class QueryBinder {
 	public javax.persistence.Query getQuery() {
 		return query;
 	}
+	
+	private static final SimpleAdapter SIMPLE_ADAPTER = new SimpleAdapter();
+
+	private Object trySimpleAdapt(Object value, Parameter<?> param) {
+		final Class<?> type = param.getParameterType();
+		if (type == null) {
+			return value;
+		}
+		//XXX: Hibernate 5.2 seems not throwing IllegalArgumentException on type mismatch
+		return SIMPLE_ADAPTER.adapt(value, type, type, null);
+	}
 
 	private Object adapt(Object value, Parameter<?> param) {
 		final Class<?> type = param.getParameterType();
 		if (type == null) {
 			return value;
 		}
-		value = Adapter.adapt(value, type, type, null);
-		if (value instanceof Model && type.isInstance(value)) {
-			Model bean = (Model) value;
-			if (bean.getId() != null)
-				value = JPA.find(bean.getClass(), bean.getId());
+		final Object val = Adapter.adapt(value, type, type, null);
+		if (val instanceof Model && type.isInstance(val)) {
+			final Model bean = (Model) val;
+			if (bean.getId() != null) {
+				return JPA.find(bean.getClass(), bean.getId());
+			}
 		}
-		return value;
+		return val;
 	}
 }
