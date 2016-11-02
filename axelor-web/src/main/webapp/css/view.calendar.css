@@ -41,11 +41,18 @@
 .calendar-side .ui-datepicker {
 	box-shadow: none;
 	border-radius: 0;
+	height: 190px;
 }
 
 .calendar-legend {
 	padding-left: 4px;
-	margin-top: 8px;
+	margin: 0;
+	position: absolute;
+	top: 198px;
+	left: 0;
+	right: 4px;
+	bottom: 0;	
+	overflow: auto;
 }
 
 .calendar-legend label {
