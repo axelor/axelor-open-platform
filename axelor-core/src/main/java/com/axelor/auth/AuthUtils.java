@@ -17,6 +17,7 @@
  */
 package com.axelor.auth;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.FlushModeType;
@@ -26,7 +27,6 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.subject.Subject;
-import org.joda.time.LocalDate;
 
 import com.axelor.auth.db.User;
 import com.axelor.db.JPA;

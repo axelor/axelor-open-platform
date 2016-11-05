@@ -76,10 +76,10 @@ class Finder {
 		"Double"	: "Double",
 		"Boolean"	: "Boolean",
 		"String"	: "String",
-		"LocalDate"		: "org.joda.time.LocalDate",
-		"LocalTime"		: "org.joda.time.LocalTime",
-		"LocalDateTime"	: "org.joda.time.LocalDateTime",
-		"DateTime"		: "org.joda.time.DateTime",
+		"LocalDate"		: "java.time.LocalDate",
+		"LocalTime"		: "java.time.LocalTime",
+		"LocalDateTime"	: "java.time.LocalDateTime",
+		"ZonedDateTime"	: "java.time.ZonedDateTime",
 		"BigDecimal"	: "java.math.BigDecimal"
 	]
 

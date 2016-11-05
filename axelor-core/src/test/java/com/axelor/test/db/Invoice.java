@@ -17,13 +17,13 @@
  */
 package com.axelor.test.db;
 
+import java.time.LocalDate;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.joda.time.LocalDate;
 
 import com.axelor.db.JpaModel;
 

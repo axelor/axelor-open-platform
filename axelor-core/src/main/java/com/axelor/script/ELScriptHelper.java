@@ -172,7 +172,7 @@ public class ELScriptHelper extends AbstractScriptHelper {
 
 		final String[] packages = {
 			"java.util",
-			"org.joda.time",
+			"java.time",
 			"com.axelor.common",
 			"com.axelor.script.util",
 			"com.axelor.apps.tool"

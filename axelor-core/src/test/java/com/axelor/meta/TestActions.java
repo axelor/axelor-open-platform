@@ -21,10 +21,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -217,8 +217,8 @@ public class TestActions extends MetaTest {
 		Action action = MetaStore.getAction("check.dates");
 		Map<String, Object> context = Maps.newHashMap();
 		
-		context.put("orderDate", new LocalDate("2012-12-10"));
-		context.put("createDate", new LocalDate("2012-12-11"));
+		context.put("orderDate", LocalDate.parse("2012-12-10"));
+		context.put("createDate", LocalDate.parse("2012-12-11"));
 		
 		ActionHandler handler = createHandler(action, context);
 		Object value = action.evaluate(handler);

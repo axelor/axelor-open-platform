@@ -46,6 +46,7 @@ public enum PropertyType {
 			if (value.equals("LOCALTIME")) return PropertyType.TIME;
 			if (value.equals("LOCALDATETIME")) return PropertyType.DATETIME;
 			if (value.equals("CALENDAR")) return PropertyType.DATETIME;
+			if (value.equals("ZONEDDATETIME")) return PropertyType.DATETIME;
 			if (value.equals("BYTE[]")) return PropertyType.BINARY;
 		}
 		return null;

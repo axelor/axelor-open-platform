@@ -18,6 +18,8 @@
 package com.axelor.mail;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 import javax.mail.MessagingException;
@@ -25,7 +27,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.joda.time.LocalDateTime;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -87,7 +88,7 @@ public class MailSenderTest extends AbstractMailTest {
 	@Test
 	public void testLocal() throws Exception {
 
-		final Date sentOn = new LocalDateTime().withMillisOfSecond(0).minusDays(15).toDate();
+		final Date sentOn = Date.from(LocalDateTime.now().minusDays(15).toInstant(ZoneOffset.UTC));
 
 		send(SMTP_ACCOUNT, sentOn);
 

@@ -18,6 +18,8 @@
 package com.axelor.meta.schema.views;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +30,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
-
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 
 import com.axelor.db.JPA;
 import com.axelor.db.Model;

@@ -26,9 +26,6 @@ libs.slf4j_logback	= ["org.slf4j:slf4j-api:${versions.slf4j}", "ch.qos.logback:l
 // Guava
 libs.guava = ["com.google.guava:guava:${versions.guava}", "com.google.code.findbugs:jsr305:3.0.1"]
 
-// joda
-libs.joda_time = ["joda-time:joda-time:2.9.4", "org.jadira.usertype:usertype.core:6.0.1.GA"]
-
 // yaml
 libs.snakeyaml = "org.yaml:snakeyaml:1.17"
 
@@ -101,8 +98,10 @@ libs.jackson_libs = [
 	"com.fasterxml.jackson.core:jackson-databind:${versions.jackson}",
 	"com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}",
 	"com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:${versions.jackson}",
-	"com.fasterxml.jackson.datatype:jackson-datatype-joda:${versions.jackson}",
-	"com.fasterxml.jackson.datatype:jackson-datatype-guava:${versions.jackson}"]
+	"com.fasterxml.jackson.datatype:jackson-datatype-guava:${versions.jackson}",
+	"com.fasterxml.jackson.module:jackson-module-parameter-names:${versions.jackson}",
+	"com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${versions.jackson}",
+	"com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${versions.jackson}"]
 
 // Apache Shiro
 libs.apache_shiro = [

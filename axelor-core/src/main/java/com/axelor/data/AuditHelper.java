@@ -18,12 +18,11 @@
 package com.axelor.data;
 
 import java.lang.reflect.Method;
-
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.auth.db.User;
-import com.axelor.db.mapper.types.JodaAdapter;
+import com.axelor.db.mapper.types.JavaTimeAdapter;
 
 public class AuditHelper {
 
@@ -42,13 +41,13 @@ public class AuditHelper {
 	private static Method updatedOn;
 	private static Method updatedBy;
 
-	private static JodaAdapter adapter;
+	private static JavaTimeAdapter adapter;
 
 	private AuditHelper() {
 	}
 
 	private static void init() {
-		adapter = new JodaAdapter();
+		adapter = new JavaTimeAdapter();
 		try {
 			createdOn = AuditableModel.class.getDeclaredMethod(SET_CREATED_ON, LocalDateTime.class);
 			createdBy = AuditableModel.class.getDeclaredMethod(SET_CREATED_BY, User.class);

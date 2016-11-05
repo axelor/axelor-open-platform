@@ -18,13 +18,12 @@
 package com.axelor.db;
 
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Map;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Construct;
@@ -159,12 +158,12 @@ public class JpaFixture {
 					if (nnode.getTag().equals(Tag.TIMESTAMP)) {
 						Date date = (Date) dateConstructor.construct(nnode);
 						if (nnode.getType() == LocalDate.class) {
-							return new LocalDate(date, DateTimeZone.UTC);
+							return date.toInstant().atZone(ZoneOffset.UTC).toLocalDate();
 						}
 						if (nnode.getType() == LocalDateTime.class) {
-							return new LocalDateTime(date, DateTimeZone.UTC);
+							return date.toInstant().atZone(ZoneOffset.UTC).toLocalDateTime();
 						}
-						return new DateTime(date, DateTimeZone.UTC);
+						return date.toInstant().atZone(ZoneOffset.UTC);
 					} else {
 						return super.construct(nnode);
 					}

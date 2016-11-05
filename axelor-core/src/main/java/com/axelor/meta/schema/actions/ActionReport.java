@@ -21,6 +21,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +33,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 import org.eclipse.birt.core.exception.BirtException;
-import org.joda.time.DateTime;
 
 import com.axelor.app.internal.AppFilter;
 import com.axelor.db.JPA;
@@ -122,8 +124,8 @@ public class ActionReport extends Action {
 		final Long id = (Long) handler.getContext().get("id");
 
 		final String outputName = this.outputName
-				.replace("${date}", new DateTime().toString("yyyyMMdd"))
-				.replace("${time}", new DateTime().toString("HHmmss"))
+				.replace("${date}", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
+				.replace("${time}", LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss")))
 				.replace("${name}", getName());
 
 		final String fileName = String.format("%s.%s", outputName, format);

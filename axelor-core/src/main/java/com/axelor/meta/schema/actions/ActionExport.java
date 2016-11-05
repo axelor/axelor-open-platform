@@ -24,6 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +34,6 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-
-import org.joda.time.DateTime;
 
 import com.axelor.app.AppSettings;
 import com.axelor.common.ClassUtils;
@@ -132,8 +133,8 @@ public class ActionExport extends Action {
 		String dir = output == null ? DEFAULT_DIR : output;
 
 		dir = dir.replace("${name}", getName())
-				 .replace("${date}", new DateTime().toString("yyyyMMdd"))
-				 .replace("${time}", new DateTime().toString("HHmmss"));
+				 .replace("${date}", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
+				 .replace("${time}", LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss")));
 		dir = handler.evaluate(dir).toString();
 
 		for(Export export : exports) {

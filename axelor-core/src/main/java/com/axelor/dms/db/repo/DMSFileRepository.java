@@ -18,6 +18,7 @@
 package com.axelor.dms.db.repo;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,6 @@ import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 
 import org.apache.shiro.authz.UnauthorizedException;
-import org.joda.time.LocalDateTime;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;

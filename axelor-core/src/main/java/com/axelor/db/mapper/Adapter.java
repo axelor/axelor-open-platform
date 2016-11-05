@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.axelor.db.mapper.types.DecimalAdapter;
-import com.axelor.db.mapper.types.JodaAdapter;
+import com.axelor.db.mapper.types.JavaTimeAdapter;
 import com.axelor.db.mapper.types.ListAdapter;
 import com.axelor.db.mapper.types.MapAdapter;
 import com.axelor.db.mapper.types.SetAdapter;
@@ -40,7 +40,8 @@ public class Adapter {
 	private static ListAdapter listAdapter = new ListAdapter();
 	private static SetAdapter setAdapter = new SetAdapter();
 	private static MapAdapter mapAdapter = new MapAdapter();
-	private static JodaAdapter jodaAdapter = new JodaAdapter();
+	private static JavaTimeAdapter javaTimeAdapter = new JavaTimeAdapter();
+	
 	private static DecimalAdapter decimalAdapter = new DecimalAdapter();
 
 	public static Object adapt(Object value, Class<?> type, Type genericType, Annotation[] annotations) {
@@ -76,9 +77,9 @@ public class Adapter {
 			}
 			return all;
 		}
-
-		if (jodaAdapter.isJodaObject(type)) {
-			return jodaAdapter.adapt(value, type, genericType, annotations);
+		
+		if (javaTimeAdapter.isJavaTimeObject(type)) {
+			return javaTimeAdapter.adapt(value, type, genericType, annotations);
 		}
 
 		if (BigDecimal.class.isAssignableFrom(type)) {

@@ -24,6 +24,9 @@ import java.io.Writer;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,9 +42,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.OptimisticLockException;
 
 import org.hibernate.StaleObjectStateException;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -530,8 +530,8 @@ public class Resource<T extends Model> {
 					if (objValue instanceof LocalDateTime) {
 						objValue = formatter.format((LocalDateTime) objValue);
 					}
-					if (objValue instanceof DateTime) {
-						objValue = formatter.format((DateTime) objValue);
+					if (objValue instanceof ZonedDateTime) {
+						objValue = formatter.format((ZonedDateTime) objValue);
 					}
 					String strValue = objValue == null ? "" : escapeCsv(objValue.toString());
 					line.add(strValue);

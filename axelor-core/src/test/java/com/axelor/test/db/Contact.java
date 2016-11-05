@@ -18,6 +18,7 @@
 package com.axelor.test.db;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -34,8 +35,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
-
-import org.joda.time.LocalDate;
 
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaModel;

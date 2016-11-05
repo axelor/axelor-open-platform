@@ -21,7 +21,7 @@ import java.util.Map;
 
 import com.axelor.data.adapter.BooleanAdapter;
 import com.axelor.data.adapter.DataAdapter;
-import com.axelor.data.adapter.JodaAdapter;
+import com.axelor.data.adapter.JavaTimeAdapter;
 import com.axelor.data.adapter.NumberAdapter;
 import com.axelor.data.csv.CSVImporter;
 import com.google.inject.ImplementedBy;
@@ -36,10 +36,10 @@ public interface Importer {
 	static final int DEFAULT_BATCH_SIZE = 20;
 
 	public static DataAdapter[] defaultAdapters = {
-		new DataAdapter("LocalDate", JodaAdapter.class, "type", "LocalDate", "format", "dd/MM/yyyy"),
-		new DataAdapter("LocalTime", JodaAdapter.class, "type", "LocalTime", "format", "HH:mm"),
-		new DataAdapter("LocalDateTime", JodaAdapter.class, "type", "LocalDateTime", "format", "dd/MM/yyyy HH:mm"),
-		new DataAdapter("DateTime", JodaAdapter.class, "type", "DateTime", "format", "dd/MM/yyyy HH:mm"),
+		new DataAdapter("LocalDate", JavaTimeAdapter.class, "type", "LocalDate", "format", "dd/MM/yyyy"),
+		new DataAdapter("LocalTime", JavaTimeAdapter.class, "type", "LocalTime", "format", "HH:mm"),
+		new DataAdapter("LocalDateTime", JavaTimeAdapter.class, "type", "LocalDateTime", "format", "dd/MM/yyyy HH:mm"),
+		new DataAdapter("ZonedDateTime", JavaTimeAdapter.class, "type", "ZonedDateTime", "format", "dd/MM/yyyy HH:mm"),
 		new DataAdapter("Boolean", BooleanAdapter.class, "falsePattern", "(0|f|n|false|no)"),
 		new DataAdapter("Number", NumberAdapter.class, "decimalSeparator", ".", "thousandSeparator", ",")
 	};

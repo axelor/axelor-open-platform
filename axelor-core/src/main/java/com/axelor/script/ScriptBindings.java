@@ -19,16 +19,15 @@ package com.axelor.script;
 
 import static com.axelor.common.StringUtils.isBlank;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
 import javax.script.SimpleBindings;
-
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
@@ -95,11 +94,11 @@ public class ScriptBindings extends SimpleBindings {
 		case "__parent__":
 			return ((Context) variables).getParentContext();
 		case "__date__":
-			return new LocalDate();
+			return LocalDate.now();
 		case "__time__":
-			return new LocalDateTime();
+			return LocalDateTime.now();
 		case "__datetime__":
-			return new DateTime();
+			return ZonedDateTime.now();
 		case "__config__":
 			if (configContext == null) {
 				configContext = new ConfigContext();

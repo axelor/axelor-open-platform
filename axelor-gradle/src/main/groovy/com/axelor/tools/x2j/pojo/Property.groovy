@@ -80,12 +80,12 @@ class Property {
 			case "decimal":
 				return entity.importType("java.math.BigDecimal")
 			case "date":
-				return entity.importType("org.joda.time.LocalDate")
+				return entity.importType("java.time.LocalDate")
 			case "time":
-				return entity.importType("org.joda.time.LocalTime")
+				return entity.importType("java.time.LocalTime")
 			case "datetime":
-				def t = attrs['tz'] == 'true' ? 'DateTime' : 'LocalDateTime'
-				return entity.importType('org.joda.time.' + t)
+				def t = attrs['tz'] == 'true' ? 'ZonedDateTime' : 'LocalDateTime'
+				return entity.importType('java.time.' + t)
 			case "binary":
 				return "byte[]"
 			case "one-to-one":

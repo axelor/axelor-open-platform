@@ -18,12 +18,11 @@
 package com.axelor.i18n;
 
 import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormat;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.internal.AppFilter;
@@ -112,7 +111,7 @@ public final class L10n {
 		if (value == null) {
 			return null;
 		}
-		return DateTimeFormat.forPattern(DATE_FORMAT).print(value);
+		return DateTimeFormatter.ofPattern(DATE_FORMAT).format(value);
 	}
 
 	/**
@@ -126,7 +125,7 @@ public final class L10n {
 		if (value == null) {
 			return null;
 		}
-		return DateTimeFormat.forPattern(DATE_TIME_FORMAT).print(value);
+		return DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).format(value);
 	}
 
 	/**
@@ -136,10 +135,10 @@ public final class L10n {
 	 *            the value to format
 	 * @return value as formated string
 	 */
-	public String format(DateTime value) {
+	public String format(ZonedDateTime value) {
 		if (value == null) {
 			return null;
 		}
-		return DateTimeFormat.forPattern(DATE_TIME_FORMAT).print(value);
+		return DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).format(value);
 	}
 }

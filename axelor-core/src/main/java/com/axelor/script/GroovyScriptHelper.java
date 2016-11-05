@@ -57,10 +57,10 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 
 		importCustomizer.addImport("__repo__", "com.axelor.db.JpaRepository");
 
-		importCustomizer.addImports("org.joda.time.DateTime");
-		importCustomizer.addImports("org.joda.time.LocalDateTime");
-		importCustomizer.addImports("org.joda.time.LocalDate");
-		importCustomizer.addImports("org.joda.time.LocalTime");
+		importCustomizer.addImports("java.time.ZonedDateTime");
+		importCustomizer.addImports("java.time.LocalDateTime");
+		importCustomizer.addImports("java.time.LocalDate");
+		importCustomizer.addImports("java.time.LocalTime");
 
 		config.addCompilationCustomizers(importCustomizer);
 

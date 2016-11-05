@@ -17,14 +17,14 @@
  */
 package com.axelor.auth.db;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
-
-import org.joda.time.LocalDateTime;
 
 import com.axelor.db.Model;
 import com.axelor.db.annotations.Widget;

@@ -22,6 +22,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -49,8 +51,6 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.eclipse.persistence.annotations.Transformation;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.common.ObjectUtils;
@@ -292,7 +292,7 @@ public class DmsService {
 		final String batchId = UUID.randomUUID().toString();
 		final Map<String, Object> data = new HashMap<>();
 
-		String batchName = "documents-" + new LocalDate().toString("yyyy-MM-dd") + ".zip";
+		String batchName = "documents-" + LocalDate.now() + ".zip";
 		if (records.size() == 1) {
 			batchName = records.get(0).getFileName();
 		}
@@ -349,7 +349,7 @@ public class DmsService {
 			}
 		};
 
-		final String batchName = "documents-" + new LocalDate().toString("yyyy-MM-dd") + ".zip";
+		final String batchName = "documents-" + LocalDate.now() + ".zip";
 		return stream(so, batchName);
 	}
 

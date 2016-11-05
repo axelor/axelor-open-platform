@@ -32,7 +32,6 @@ dependencies {
 
 	compile libs.ST4
 	compile libs.apache_shiro
-	compile libs.joda_time
 	compile libs.snakeyaml
 	compile libs.xstream
 	compile libs.opencsv

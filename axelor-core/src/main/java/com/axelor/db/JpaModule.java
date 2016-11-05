@@ -130,9 +130,6 @@ public class JpaModule extends AbstractModule {
 		properties.put(Environment.IMPLICIT_NAMING_STRATEGY, ImplicitNamingStrategyImpl.class.getName());
 		properties.put(Environment.PHYSICAL_NAMING_STRATEGY, PhysicalNamingStrategyImpl.class.getName());
 		
-
-		properties.put("jadira.usertype.autoRegisterUserTypes", "true");
-		properties.put("jadira.usertype.databaseZone", "jvm");
 		properties.put(Environment.AUTOCOMMIT, "false");
 		properties.put(Environment.MAX_FETCH_DEPTH, "3");
 

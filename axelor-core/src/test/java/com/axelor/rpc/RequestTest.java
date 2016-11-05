@@ -17,12 +17,12 @@
  */
 package com.axelor.rpc;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
 

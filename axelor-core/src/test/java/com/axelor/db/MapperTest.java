@@ -17,12 +17,12 @@
  */
 package com.axelor.db;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -77,7 +77,7 @@ public class MapperTest extends JpaTest {
 		
 		LocalDate date = contact.getDateOfBirth();
 		Assert.assertEquals(1975, date.getYear());
-		Assert.assertEquals(3, date.getMonthOfYear());
+		Assert.assertEquals(3, date.getMonthValue());
 		Assert.assertEquals(23, date.getDayOfMonth());
 		
 		Assert.assertNotNull(contact.getTitle());
