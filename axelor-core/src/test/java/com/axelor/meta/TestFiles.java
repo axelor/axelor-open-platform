@@ -19,22 +19,14 @@ package com.axelor.meta;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.UUID;
 
 import javax.inject.Inject;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import com.axelor.app.AppSettings;
 import com.axelor.dms.db.DMSFile;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.test.db.Contact;
@@ -43,33 +35,11 @@ import com.google.inject.persist.Transactional;
 
 public class TestFiles extends MetaTest {
 
-	private static final String TEST_DIR_CONFIG = "{java.io.tmpdir}/.axelor/test-attachments";
-	private static final String TEST_DIR_PATH = AppSettings.get().getPath("" + UUID.randomUUID(), TEST_DIR_CONFIG);
-	private static final String TEST_DIR = AppSettings.get().getPath("file.upload.dir", "");
-
 	@Inject
 	private MetaFiles files;
 
 	@Inject
 	private ContactRepository contacts;
-
-	@After
-	@Before
-	public void cleanUp() throws IOException {
-
-		if (!TEST_DIR_PATH.equals(TEST_DIR)) {
-			Assert.fail();
-		}
-
-		Files.walkFileTree(Paths.get(TEST_DIR_PATH), new SimpleFileVisitor<Path>() {
-			@Override
-			public FileVisitResult visitFile(Path file,
-					BasicFileAttributes attrs) throws IOException {
-				Files.deleteIfExists(file);
-				return FileVisitResult.CONTINUE;
-			}
-		});
-	}
 
 	@Test
 	public void testUpload() throws IOException {
