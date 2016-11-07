@@ -34,7 +34,6 @@ import org.joda.time.LocalTime;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
-import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaPermissions;
@@ -169,6 +168,9 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 			}
 			if (rule.getCanWrite() != Boolean.TRUE) {
 				item.setReadonly(true);
+				if (isBlank(rule.getReadonlyIf())) {
+					item.setReadonlyIf(null);
+				}
 			}
 
 			return rule.getCanRead() == Boolean.TRUE;
@@ -187,7 +189,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 			
 			for (AbstractWidget widget : value) {
 				String module = widget.getModuleToCheck();
-				if ((StringUtils.isBlank(module) || ModuleManager.isInstalled(module)) && hasAccess(widget)) {
+				if ((isBlank(module) || ModuleManager.isInstalled(module)) && hasAccess(widget)) {
 					jgen.writeObject(widget);
 				}
 			}
