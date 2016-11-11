@@ -58,7 +58,7 @@ libs.jdbc_mysql = "mysql:mysql-connector-java:5.1.40"
 libs.hibernate = [
     "org.hibernate:hibernate-core:${versions.hibernate}",
     "org.hibernate:hibernate-entitymanager:${versions.hibernate}",
-    "org.hibernate:hibernate-c3p0:${versions.hibernate}",
+	"org.hibernate:hibernate-hikaricp:${versions.hibernate}",
     "org.hibernate:hibernate-validator:${versions.hibernate_validator}"
 ]
 libs.hibernate_ehcache = "org.hibernate:hibernate-ehcache:${versions.hibernate}"

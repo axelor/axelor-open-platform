@@ -26,14 +26,11 @@
 
       <!-- connection pooling -->
       <property name="hibernate.connection.provider_class"
-        value="org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider" />
+        value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider" />
 
-      <property name="hibernate.c3p0.max_size" value="200" />
-      <property name="hibernate.c3p0.min_size" value="10" />
-      <property name="hibernate.c3p0.acquire_increment" value="5" />
-      <property name="hibernate.c3p0.idle_test_period" value="300" />
-      <property name="hibernate.c3p0.max_statements" value="100" />
-      <property name="hibernate.c3p0.timeout" value="600" />
+      <property name="hibernate.hikari.minimumIdle" value="10" />
+      <property name="hibernate.hikari.maximumPoolSize" value="200" />
+      <property name="hibernate.hikari.idleTimeout" value="30000" />
 
     </properties>
   </persistence-unit>
