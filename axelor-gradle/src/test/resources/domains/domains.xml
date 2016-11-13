@@ -91,7 +91,7 @@
     <string name="phone" max="20"  hashKey="false" massUpdate="true"/>
     <string name="notes" multiline="true" title="About Me" />
     <date name="dateOfBirth" default="now" />
-    <many-to-many name="groups" ref="Group" mappedBy="contacts"/>
+    <many-to-many name="groups" ref="Group" mappedBy="contacts" table="contact_groups" column="contact_id" column2="group_id" />
 
     <!-- test o2m fields with mappedBy & orphanRemoval -->
     <one-to-many name="addresses" ref="Address" mappedBy="contact" orderBy="area"/>

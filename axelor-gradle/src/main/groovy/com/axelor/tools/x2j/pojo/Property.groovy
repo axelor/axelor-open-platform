@@ -415,6 +415,7 @@ class Property {
 			$many2one(),
 			$one2many(),
 			$many2many(),
+			$joinTable(),
 			$orderBy(),
 			$sequence()
 		]
@@ -457,6 +458,23 @@ class Property {
 		annon(reference ? "javax.persistence.JoinColumn" : "javax.persistence.Column")
 				.add("name", column)
 				.add("unique", unique, false)
+	}
+	
+	private Annotation $joinTable() {
+		
+		def joinTable = attrs.table
+		def fk1 = attrs.column
+		def fk2 = attrs.column2
+
+		if (joinTable == null)
+			return null
+
+		def res = annon("javax.persistence.JoinTable").add("name", joinTable)
+
+		if (fk1) res.add("joinColumns", annon("javax.persistence.JoinColumn").add("name", fk1, true).toString(), false)
+		if (fk2) res.add("inverseJoinColumns", annon("javax.persistence.JoinColumn").add("name", fk2, true).toString(), false)
+
+		return res
 	}
 
 	private Annotation $transient() {
@@ -605,7 +623,7 @@ class Property {
 		if (!this.isIndexable()) return null
 		String index = attrs['index'] as String
 		if (!index || index == 'true' || index.trim().empty)
-			index = "${entity.table}_${columnAuto}_IDX".toUpperCase()
+			index = null
 		return new Index(this.entity, index, [this.name])
 	}
 
