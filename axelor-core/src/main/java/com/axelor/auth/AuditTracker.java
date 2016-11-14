@@ -38,7 +38,6 @@ import com.axelor.db.annotations.TrackField;
 import com.axelor.db.annotations.TrackMessage;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
-import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.mail.MailConstants;
 import com.axelor.mail.db.MailFollower;
@@ -202,9 +201,7 @@ final class AuditTracker {
 		final List<Map<String, String>> tracks = new ArrayList<>();
 		final Set<String> tagFields = new HashSet<>();
 
-		String msg = previousState == null ?
-				I18n.get("Record created") :
-				I18n.get("Record updated");
+		String msg = previousState == null ? /*$$(*/ "Record created" /*)*/ : /*$$(*/ "Record updated" /*)*/;
 
 		// find first matched message
 		for (TrackMessage tm : track.messages()) {
