@@ -165,7 +165,6 @@ public class JpaModule extends AbstractModule {
 		final Map<String, String> keys = new HashMap<>();
 		final String unit = jpaUnit.replaceAll("(PU|Unit)$", "").replaceAll("^persistence$", "default");
 
-		keys.put("db.%s.dialect", "hibernate.dialect");
 		keys.put("db.%s.driver", "javax.persistence.jdbc.driver");
 		keys.put("db.%s.ddl", "hibernate.hbm2ddl.auto");
 		keys.put("db.%s.url", "javax.persistence.jdbc.url");
