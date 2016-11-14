@@ -196,6 +196,14 @@ public class DBHelper {
 		if (cacheMode.equals("ENABLE_SELECTIVE")) return true;
 		return false;
 	}
+	
+	/**
+	 * Whether using oracle database.
+	 * 
+	 */
+	public static boolean isOracle() {
+		return jdbcDriver != null && jdbcDriver.contains("Oracle");
+	}
 
 	/**
 	 * Check whether the database has unaccent support.

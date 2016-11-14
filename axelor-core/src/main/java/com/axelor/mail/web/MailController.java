@@ -45,12 +45,12 @@ import com.axelor.rpc.Response;
 public class MailController extends JpaSupport {
 	
 	private static final String SQL_UNREAD = ""
-			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
+			+ "SELECT mm FROM MailMessage mm WHERE mm.id IN(SELECT DISTINCT(m.id) FROM MailMessage m LEFT JOIN m.flags g "
 			+ "WHERE (m.parent IS NULL) AND "
 			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
 			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "((g IS NULL) OR (g.user.id != :uid) OR (g.user.id = :uid AND g.isRead = false)) "
-			+ "ORDER BY m.createdOn DESC";
+			+ "((g IS NULL) OR (g.user.id != :uid) OR (g.user.id = :uid AND g.isRead = false))) "
+			+ "ORDER BY mm.createdOn DESC";
 
 	private static final String SQL_SUBSCRIBERS = ""
 			+ "SELECT DISTINCT(u) FROM User u LEFT JOIN u.group g WHERE "
@@ -59,28 +59,28 @@ public class MailController extends JpaSupport {
 			+ "	(g.id IN (SELECT mg.id FROM MailGroup m LEFT JOIN m.groups mg WHERE m.id = :id)))";
 
 	private static final String SQL_INBOX = ""
-			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
+			+ "SELECT mm FROM MailMessage mm WHERE mm.id IN (SELECT DISTINCT(m.id) FROM MailMessage m LEFT JOIN m.flags g "
 			+ "WHERE (m.parent IS NULL) AND "
 			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
 			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "((g IS NULL) OR (g.user.id != :uid) OR (g.user.id = :uid AND (g.isRead = false OR g.isArchived = false))) "
-			+ "ORDER BY m.createdOn DESC";
+			+ "((g IS NULL) OR (g.user.id != :uid) OR (g.user.id = :uid AND (g.isRead = false OR g.isArchived = false)))) "
+			+ "ORDER BY mm.createdOn DESC";
 
 	private static final String SQL_IMPORTANT = ""
-			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
+			+ "SELECT mm FROM MailMessage mm WHERE mm.id IN (SELECT DISTINCT(m.id) FROM MailMessage m LEFT JOIN m.flags g "
 			+ "WHERE (m.parent IS NULL) AND "
 			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
 			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "((g.user.id = :uid AND g.isStarred = true AND g.isArchived = false)) "
-			+ "ORDER BY m.createdOn DESC";
+			+ "((g.user.id = :uid AND g.isStarred = true AND g.isArchived = false))) "
+			+ "ORDER BY mm.createdOn DESC";
 
 	private static final String SQL_ARCHIVE = ""
-			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
+			+ "SELECT mm FROM MailMessage mm WHERE mm.id IN (SELECT DISTINCT(m.id) FROM MailMessage m LEFT JOIN m.flags g "
 			+ "WHERE (m.parent IS NULL) AND "
 			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
 			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "((g.user.id = :uid AND g.isArchived = true)) "
-			+ "ORDER BY m.createdOn DESC";
+			+ "((g.user.id = :uid AND g.isArchived = true))) "
+			+ "ORDER BY mm.createdOn DESC";
 
 	@Inject
 	private MailMessageRepository messages;
@@ -255,8 +255,8 @@ public class MailController extends JpaSupport {
 	private Long count(String queryString) {
 
 		final String countString = queryString
-				.replace("DISTINCT(m)", "COUNT(DISTINCT m)")
-				.replace(" ORDER BY m.createdOn DESC", "");
+				.replace("SELECT mm FROM MailMessage mm", "SELECT COUNT(mm.id) FROM MailMessage mm")
+				.replace(" ORDER BY mm.createdOn DESC", "");
 
 		final TypedQuery<Long> query = getEntityManager().createQuery(countString, Long.class);
 

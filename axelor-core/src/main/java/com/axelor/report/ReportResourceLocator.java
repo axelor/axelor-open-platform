@@ -32,6 +32,7 @@ import org.eclipse.datatools.connectivity.oda.flatfile.ResourceLocator;
 import com.axelor.app.AppSettings;
 import com.axelor.common.ClassUtils;
 import com.axelor.common.FileUtils;
+import com.axelor.db.internal.DBHelper;
 
 /**
  * This is a {@link ResourceLocator} that first searches external reports
@@ -48,8 +49,7 @@ public class ReportResourceLocator implements IResourceLocator {
 	private Path searchPath;
 
 	public ReportResourceLocator() {
-		final String dir = AppSettings.get().getPath(CONFIG_REPORT_DIR,
-				DEFAULT_REPORT_DIR);
+		final String dir = AppSettings.get().getPath(CONFIG_REPORT_DIR, DEFAULT_REPORT_DIR);
 		this.searchPath = Paths.get(dir);
 	}
 
@@ -62,18 +62,31 @@ public class ReportResourceLocator implements IResourceLocator {
 
 	@Override
 	public URL findResource(ModuleHandle moduleHandle, String fileName, int type) {
+		if (DBHelper.isOracle() && fileName.endsWith(".rptlibrary")) {
+			final URL found = find(moduleHandle, fileName.replace(".rptlibrary", ".oracle.rptlibrary"), type);
+			if (found != null) {
+				return found;
+			}
+		}
+		return find(moduleHandle, fileName, type);
+	}
 
-		String sub = ".";
+	private URL find(ModuleHandle moduleHandle, String fileName, int type) {
+
+		final String subDir;
 
 		switch (type) {
 		case IResourceLocator.LIBRARY:
-			sub = "lib";
+			subDir = "lib";
 			break;
 		case IResourceLocator.IMAGE:
-			sub = "img";
+			subDir = "img";
 			break;
 		case IResourceLocator.CASCADING_STYLE_SHEET:
-			sub = "css";
+			subDir = "css";
+			break;
+		default:
+			subDir = ".";
 			break;
 		}
 
@@ -95,7 +108,7 @@ public class ReportResourceLocator implements IResourceLocator {
 
 		// else search in sub directory
 		if (!found.exists()) {
-			found = searchPath.resolve(sub).normalize().resolve(fileName).toFile();
+			found = searchPath.resolve(subDir).normalize().resolve(fileName).toFile();
 		}
 
 		if (found.exists()) {
@@ -108,7 +121,7 @@ public class ReportResourceLocator implements IResourceLocator {
 		// otherwise locate from the modules
 		URL url = ClassUtils.getResource(FileUtils.getFile("reports", fileName).getPath().replace("\\", "/"));
 		if (url == null) {
-			url = ClassUtils.getResource(FileUtils.getFile("reports", sub, fileName).getPath().replace("\\", "/"));
+			url = ClassUtils.getResource(FileUtils.getFile("reports", subDir, fileName).getPath().replace("\\", "/"));
 		}
 
 		return url;

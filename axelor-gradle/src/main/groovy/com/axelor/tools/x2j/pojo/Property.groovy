@@ -607,7 +607,7 @@ class Property {
 			return [
 				annon("javax.persistence.Lob", true),
 				annon("javax.persistence.Basic").add("fetch", "javax.persistence.FetchType.LAZY", false),
-				annon("org.hibernate.annotations.Type").add("type", "org.hibernate.type.TextType")
+				annon("org.hibernate.annotations.Type").add("type", "text")
 			]
 		}
 
