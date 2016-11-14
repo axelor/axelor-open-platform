@@ -129,7 +129,7 @@ final class AuditTracker {
 			return "True";
 		}
 		if (value == Boolean.FALSE) {
-			return "True";
+			return "False";
 		}
 		switch (property.getType()) {
 		case MANY_TO_ONE:
