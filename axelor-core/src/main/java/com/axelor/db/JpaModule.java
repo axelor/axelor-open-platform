@@ -157,23 +157,30 @@ public class JpaModule extends AbstractModule {
 
 	private Properties updatePersistenceProperties(Properties properties) {
 
+		final AppSettings settings = AppSettings.get();
+
+		for (String name : settings.getProperties().stringPropertyNames()) {
+			if (name.startsWith("hibernate.")) {
+				properties.put(name, settings.get(name));
+			}
+		}
+
 		if (DBHelper.isDataSourceUsed()) {
+			properties.put("hibernate.connection.datasource", DBHelper.getDataSourceName());
 			return properties;
 		}
 
-		final AppSettings settings = AppSettings.get();
 		final Map<String, String> keys = new HashMap<>();
-		final String unit = jpaUnit.replaceAll("(PU|Unit)$", "").replaceAll("^persistence$", "default");
 
-		keys.put("db.%s.driver", "javax.persistence.jdbc.driver");
-		keys.put("db.%s.ddl", "hibernate.hbm2ddl.auto");
-		keys.put("db.%s.url", "javax.persistence.jdbc.url");
-		keys.put("db.%s.user", "javax.persistence.jdbc.user");
-		keys.put("db.%s.password", "javax.persistence.jdbc.password");
+		keys.put("db.default.driver", "javax.persistence.jdbc.driver");
+		keys.put("db.default.ddl", "hibernate.hbm2ddl.auto");
+		keys.put("db.default.url", "javax.persistence.jdbc.url");
+		keys.put("db.default.user", "javax.persistence.jdbc.user");
+		keys.put("db.default.password", "javax.persistence.jdbc.password");
 
 		for (String key : keys.keySet()) {
 			String name = keys.get(key);
-			String value = settings.get(String.format(key, unit));
+			String value = settings.get(key);
 			if (!StringUtils.isBlank(value)) {
 				properties.put(name, value.trim());
 			}

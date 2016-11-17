@@ -63,6 +63,7 @@ public class DBHelper {
 	private static final String XPATH_PERSISTENCE_USER 		= "properties/property[@name='javax.persistence.jdbc.user']/@value";
 	private static final String XPATH_PERSISTENCE_PASSWORD 	= "properties/property[@name='javax.persistence.jdbc.password']/@value";
 
+	private static final String CONFIG_DATASOURCE	= "db.default.datasource";
 	private static final String CONFIG_DRIVER 		= "db.default.driver";
 	private static final String CONFIG_URL 			= "db.default.url";
 	private static final String CONFIG_USER 		= "db.default.user";
@@ -99,6 +100,7 @@ public class DBHelper {
 		final XPathFactory xpf = XPathFactory.newInstance();
 		final XPath xpath = xpf.newXPath();
 
+		jndiName		= settings.get(CONFIG_DATASOURCE);
 		jdbcDriver 		= settings.get(CONFIG_DRIVER);
 		jdbcUrl 		= settings.get(CONFIG_URL);
 		jdbcUser 		= settings.get(CONFIG_USER);
@@ -109,8 +111,11 @@ public class DBHelper {
 			final DocumentBuilder db = dbf.newDocumentBuilder();
 			final Document document = db.parse(res);
 
-			jndiName = evaluate(xpath, XPATH_ROOT, XPATH_NON_JTA_DATA_SOURCE, document);
 			cacheMode = evaluate(xpath, XPATH_ROOT, XPATH_SHARED_CACHE_MODE, document);
+
+			if (isBlank(jndiName)) {
+				jndiName = evaluate(xpath, XPATH_ROOT, XPATH_NON_JTA_DATA_SOURCE, document);
+			}
 
 			if (isBlank(jndiName) && isBlank(jdbcDriver)) {
 				jdbcDriver		= evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_DRIVER, document);
@@ -176,6 +181,10 @@ public class DBHelper {
 			flyway.setDataSource(jdbcUrl, jdbcUser, jdbcPassword);
 		}
 		flyway.migrate();
+	}
+	
+	public static String getDataSourceName() {
+		return jndiName;
 	}
 
 	/**
