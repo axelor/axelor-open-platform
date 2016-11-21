@@ -24,6 +24,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
+import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.cfg.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,10 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.internal.DBHelper;
 import com.axelor.db.internal.naming.ImplicitNamingStrategyImpl;
 import com.axelor.db.internal.naming.PhysicalNamingStrategyImpl;
+import com.axelor.db.tenants.TenantConnectionProvider;
+import com.axelor.db.tenants.AbstractTenantFilter;
+import com.axelor.db.tenants.TenantModule;
+import com.axelor.db.tenants.TenantResolver;
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.PersistService;
 import com.google.inject.persist.jpa.JpaPersistModule;
@@ -147,7 +152,8 @@ public class JpaModule extends AbstractModule {
 			updatePersistenceProperties(properties);
 		} catch (Exception e) {
 		}
-		
+
+		install(new TenantModule());
 		install(new JpaPersistModule(jpaUnit).properties(properties));
 		if (this.autostart) {
 			bind(Initializer.class).asEagerSingleton();
@@ -163,6 +169,12 @@ public class JpaModule extends AbstractModule {
 			if (name.startsWith("hibernate.")) {
 				properties.put(name, settings.get(name));
 			}
+		}
+
+		if (settings.get(AbstractTenantFilter.CONFIG_MULTI_TENANT) != null) {
+			properties.put(Environment.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name());
+			properties.put(Environment.MULTI_TENANT_CONNECTION_PROVIDER, TenantConnectionProvider.class.getName());
+			properties.put(Environment.MULTI_TENANT_IDENTIFIER_RESOLVER, TenantResolver.class.getName());
 		}
 
 		if (DBHelper.isDataSourceUsed()) {

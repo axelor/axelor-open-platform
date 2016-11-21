@@ -33,6 +33,8 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
+import com.axelor.db.tenants.PostSessionTenantFilter;
+import com.axelor.db.tenants.PreSessionTenantFilter;
 import com.axelor.meta.MetaScanner;
 import com.axelor.quartz.SchedulerModule;
 import com.axelor.rpc.ObjectMapperProvider;
@@ -109,10 +111,14 @@ public class AppServletModule extends ServletModule {
 			protected void configureServlets() {
 				// check for CORS requests earlier
 				filter("*").through(CorsFilter.class);
+				// pre-session tenant filter should be come before PersistFilter
+				filter("*").through(PreSessionTenantFilter.class);
 				// order is important, PersistFilter must come first
 				filter("*").through(PersistFilter.class);
 				filter("*").through(AppFilter.class);
 				filter("*").through(GuiceShiroFilter.class);
+				// pre-session tenant filter should be come after shiro filter
+				filter("*").through(PostSessionTenantFilter.class);
 			}
 		});
 

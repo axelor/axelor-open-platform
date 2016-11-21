@@ -2,7 +2,7 @@
 
     Axelor Business Solutions
 
-    Copyright (C) 2012-2014 Axelor (<http://axelor.com>).
+    Copyright (C) 2012-2016 Axelor (<http://axelor.com>).
 
     This program is free software: you can redistribute it and/or  modify
     it under the terms of the GNU Affero General Public License, version 3,
@@ -17,11 +17,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@page import="java.util.Calendar"%>
-<%@page import="java.util.Date"%>
-<%@ page language="java" session="true" %>
-<%@ page import="com.axelor.i18n.I18n" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page language="java" session="true" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="com.axelor.i18n.I18n" %>
 <%
 String loginTitle = I18n.get("Please sign in");
 String loginRemember = I18n.get("Remember me");
@@ -37,6 +38,11 @@ String loginHeader = "/login-header.jsp";
 if (pageContext.getServletContext().getResource(loginHeader) == null) {
   loginHeader = null;
 }
+
+@SuppressWarnings("all")
+Map<String, String> tenants = (Map) session.getAttribute("tenantMap");
+String tenantId = (String) session.getAttribute("tenantId");
+
 %>
 <!DOCTYPE html>
 <html>
@@ -75,6 +81,16 @@ if (pageContext.getServletContext().getResource(loginHeader) == null) {
                 <span class="add-on"><i class="fa fa-lock"></i></span>
                 <input type="password" id="passwordId" name="password" placeholder="<%= loginPassword %>">
               </div>
+              <% if (tenants != null && tenants.size() > 1) { %>
+              <div class="input-prepend">
+                <span class="add-on"><i class="fa fa-database"></i></span>
+                <select name="tenantId">
+                <% for (String key : tenants.keySet()) { %>
+                	<option value="<%= key %>" <%= (key.equals(tenantId) ? "selected" : "") %>><%= tenants.get(key) %></option>
+                <% } %>
+                </select>
+              </div>
+              <% } %>
               <label class="ibox">
                 <input type="checkbox" value="rememberMe" name="rememberMe">
                 <span class="box"></span>
