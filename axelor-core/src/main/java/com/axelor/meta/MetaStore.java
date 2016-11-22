@@ -18,6 +18,8 @@
 package com.axelor.meta;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -108,7 +110,21 @@ public class MetaStore {
 			return null;
 		}
 
-		return new ArrayList<>(all.values());
+		final List<Selection.Option> values = new ArrayList<>(all.values());
+		Collections.sort(values, new Comparator<Selection.Option>() {
+			@Override
+			public int compare(Selection.Option o1, Selection.Option o2) {
+				Integer n = o1.getOrder();
+				Integer m = o2.getOrder();
+
+				if (n == null) n = 0;
+				if (m == null) m = 0;
+
+				return Integer.compare(n, m);
+			}
+		});
+
+		return values;
 	}
 
 	public static Selection.Option getSelectionItem(String selection, String value) {
@@ -127,8 +143,8 @@ public class MetaStore {
 	private static Map<String, Selection.Option> buildSelectionMap(String selection) {
 		final List<MetaSelectItem> items = Query.of(MetaSelectItem.class)
 				.filter("self.select.name = ?", selection)
+				.order("select.priority")
 				.order("order")
-				.order("createdOn")
 				.fetch();
 
 		if (items.isEmpty()) {
