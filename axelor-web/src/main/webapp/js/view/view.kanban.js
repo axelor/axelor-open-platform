@@ -165,6 +165,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $
 			throw new Error("Invalid sequenceBy field in view: " + view.name);
 		}
 
+		$scope.sortableOptions.disabled = !view.draggable;
 		$scope.columns = columns;
 		$scope.colSpan = "kanban-cs-" + columns.length;
 	};

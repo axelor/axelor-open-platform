@@ -33,6 +33,9 @@ public class KanbanView extends CardsView {
 	private String sequenceBy;
 
 	@XmlAttribute
+	private Boolean draggable = Boolean.TRUE;
+
+	@XmlAttribute
 	private String onNew;
 
 	@XmlAttribute
@@ -52,6 +55,14 @@ public class KanbanView extends CardsView {
 
 	public void setSequenceBy(String sequenceBy) {
 		this.sequenceBy = sequenceBy;
+	}
+
+	public Boolean getDraggable() {
+		return draggable;
+	}
+
+	public void setDraggable(Boolean draggable) {
+		this.draggable = draggable;
 	}
 
 	public String getOnNew() {

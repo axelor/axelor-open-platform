@@ -1694,6 +1694,11 @@
         </xsd:attribute>
         <xsd:attribute name="cardWidth" use="prohibited"/>
         <xsd:attribute name="orderBy" use="prohibited"/>
+        <xsd:attribute name="draggable" type="xsd:boolean" default="true">
+          <xsd:annotation>
+            <xsd:documentation>Whether to enable drag &amp;&amp; drop feature.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="sequenceBy" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>Specify a numeric field to re-order cards.</xsd:documentation>
