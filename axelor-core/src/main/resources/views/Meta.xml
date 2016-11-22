@@ -262,19 +262,21 @@
   <grid title="All Selects" name="meta-select-grid" model="com.axelor.meta.db.MetaSelect">
     <field name="name"/>
     <field name="module"/>
+    <field name="priority"/>
   </grid>
 
   <form name="meta-select-form" title="form::Select" model="com.axelor.meta.db.MetaSelect">
     <panel title="Overview">
       <field name="name"/>
       <field name="module"/>
+      <field name="priority"/>
     </panel>
     <panel-related field="items" editable="true" orderBy="order">
       <field name="title"/>
       <field name="value"/>
       <field name="icon"/>
       <field name="data"/>
-      <field name="hidden" />
+      <field name="hidden"/>
       <field name="order" width="100"/>
     </panel-related>
   </form>
