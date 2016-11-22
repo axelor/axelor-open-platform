@@ -118,7 +118,33 @@ ui.formInput('Text', {
 		if ($.browser.mozilla){
 			textarea.rows -= 1;
 		}
-    },
+
+		var field = scope.field,
+			regex = field.pattern ? new RegExp(field.pattern, 'i') : null,
+			minSize = +(field.minSize),
+			maxSize = +(field.maxSize);
+
+		scope.validate = function(value) {
+			if (_.isEmpty(value)) {
+				return true;
+			}
+			var length = value.length,
+				valid = true;
+
+			if (minSize) {
+				valid = length >= minSize;
+			}
+			if(valid && maxSize) {
+				valid = length <= maxSize;
+			}
+			if (valid && regex) {
+				valid = regex.test(value);
+			}
+
+			return valid;
+		};
+
+	},
 	template_editable: '<textarea></textarea >',
 	template_readonly: '<pre ng-show="text">{{text}}</pre>'
 });

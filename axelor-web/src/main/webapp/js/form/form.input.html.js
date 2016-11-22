@@ -259,7 +259,11 @@ ui.formInput('Html', {
 		var textElement = element.find('textarea');
 		var buttons = getButtons(scope, textElement);
 
-		var height = +(scope.field.height) || null;
+		var props = scope.field,
+			minSize = +props.minSize,
+			maxSize = +props.maxSize,
+			height = +(scope.field.height) || null;
+
 		if (height) {
 			height = Math.max(100, height);
 		}
@@ -406,6 +410,23 @@ ui.formInput('Html', {
     		shell.setHTML(div[0].innerHTML);
 
     		div.remove();
+		};
+
+		scope.validate = function(value) {
+			if (_.isEmpty(value)) {
+				return true;
+			}
+			var length = value.length,
+				valid = true;
+
+			if (minSize) {
+				valid = length >= minSize;
+			}
+			if(valid && maxSize) {
+				valid = length <= maxSize;
+			}
+
+			return valid;
 		};
 
 	},
