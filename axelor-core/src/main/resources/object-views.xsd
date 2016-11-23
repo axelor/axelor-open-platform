@@ -1699,7 +1699,7 @@
             <xsd:documentation>Whether to enable drag &amp;&amp; drop feature.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="sequenceBy" type="xsd:string" use="required">
+        <xsd:attribute name="sequenceBy" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>Specify a numeric field to re-order cards.</xsd:documentation>
           </xsd:annotation>

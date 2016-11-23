@@ -160,40 +160,25 @@ ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $
 			first.canCreate = true;
 		}
 
-		var sequenceBy = fields[view.sequenceBy] || {};
-		if (["integer", "long"].indexOf(sequenceBy.type) === -1) {
-			throw new Error("Invalid sequenceBy field in view: " + view.name);
-		}
-
 		$scope.sortableOptions.disabled = !view.draggable;
 		$scope.columns = columns;
 		$scope.colSpan = "kanban-cs-" + columns.length;
 	};
 
-	$scope.move = function (record, to, next, prev) {
-		if(!record) {
-		    return;
-		}
+	$scope.move = function (record, to) {
 		var view = $scope.schema;
-		var rec = _.pick(record, "id", "version", view.sequenceBy);
+		if(!record || record[view.columnBy] == to) {
+			return;
+		}
+
+		var rec = _.pick(record, "id", "version");
 		var ds = $scope._dataSource._new($scope._model);
 
 		// update columnBy
 		rec[view.columnBy] = to;
 
-		// update sequenceBy
-		var all = _.compact([prev, rec, next]);
-		var offset = _.min(_.pluck(all, view.sequenceBy)) || 0;
-
-		_.each(all, function (item, i) {
-			item[view.sequenceBy] = offset + i;
-		});
-
-		return ds.saveAll(all).success(function (records) {
-			_.each(all, function (item) {
-				_.extend(item, ds.get(item.id));
-			});
-			record.version = rec.version;
+		return ds.save(rec).success(function (item) {
+			_.extend(record, item)
 		});
 	};
 
@@ -224,17 +209,12 @@ ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $
 			var source = sortable.source.scope();
 			var target = (sortable.droptarget || $(this)).scope();
 
-			var next = item.next().scope();
-			var prev = item.prev().scope();
-			if (next) next = next.record;
-			if (prev) prev = prev.record;
-
 			var index = sortable.dropindex;
 			if (source === target && sortable.index === index) {
 				return;
 			}
 
-			$scope.move(target.records[index], target.column.value, next, prev);
+			$scope.move(target.records[index], target.column.value);
 			$scope.$applyAsync();
 		}
 	};
@@ -262,7 +242,7 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 			function fetch(options) {
 				var opts = _.extend({
 					offset: 0,
-					sortBy: [view.sequenceBy]
+					sortBy: view.sequenceBy ? [view.sequenceBy] : null
 				}, options);
 				elemMore.hide();
 				return ds.search(opts).success(function (records) {
