@@ -189,6 +189,13 @@
             </documentation>
           </annotation>
         </attribute>
+        <attribute name="search-call" type="string">
+          <annotation>
+            <documentation>
+              Call a method to return a bean.
+            </documentation>
+          </annotation>
+        </attribute>
       </extension>
     </complexContent>
   </complexType>
