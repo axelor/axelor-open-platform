@@ -61,6 +61,10 @@ public class CSVBinder {
 	public void registerAdapter(DataAdapter adapter) {
 		adapters.put(adapter.getName(), adapter);
 	}
+	
+	public void registerAdapters(Map<String, DataAdapter> map) {
+		adapters.putAll(map);
+	}
 
 	public String[] getFields() {
 		return fields;
@@ -194,6 +198,7 @@ public class CSVBinder {
 			}
 		} else {
 			CSVBinder binder = new CSVBinder(type, fields, cb);
+			binder.registerAdapters(adapters);
 			value = binder.bind(values);
 		}
 		values.put(field, value);
@@ -268,6 +273,7 @@ public class CSVBinder {
 			// handle relational fields (including other case of m2m)
 			else if (p.getTarget() != null) {
 				CSVBinder b = new CSVBinder(p.getTarget(), fields, cb);
+				b.registerAdapters(adapters);
 				value = b.bind(values);
 			}
 
