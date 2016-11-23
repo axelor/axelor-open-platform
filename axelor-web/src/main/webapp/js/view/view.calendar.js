@@ -506,14 +506,16 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 				container: 'body',
 				content: function() {
 					var html = $("<div></div>").addClass("calendar-bubble-content");
-					var singleDay = (event.allDay || !scope.isAgenda()) && (!event.end || moment(event.start).isSame(event.end, 'day'));
-					var dateFormat = !scope.isAgenda() || singleDay ? "LL" : "LLL";
+					var start = event.start;
+					var end = event.end && event.allDay ? moment(event.end).add(-1, 'second') : event.end;
+					var singleDay = (event.allDay || !scope.isAgenda()) && (!end || moment(start).isSame(end, 'day'));
+					var dateFormat = !scope.isAgenda() || event.allDay ? "ddd D MMM" : "ddd D MMM HH:mm";
 
-					$("<span>").text(moment(event.start).format(dateFormat)).appendTo(html);
+					$("<span>").text(moment(start).format(dateFormat)).appendTo(html);
 					
-					if (event.end && !singleDay) {
+					if (schema.eventStop && end && !singleDay) {
 						$("<span> - </span>").appendTo(html);
-						$("<span>").text(moment(event.end).format(dateFormat)).appendTo(html);
+						$("<span>").text(moment(end).format(dateFormat)).appendTo(html);
 					}
 					
 					$("<hr>").appendTo(html);
