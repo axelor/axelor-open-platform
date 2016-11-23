@@ -429,13 +429,19 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 			}
 		});
 		
+		var lang = axelor.config["user.lang"] || 'en';
+		
 		var options = {
 
 			header: false,
 			
-			timeFormat: 'h(:mm)t',
+			timeFormat: lang === 'fr' ? 'H:mm' : 'h(:mm)t',
+
+			axisFormat: lang === 'fr' ? 'H:mm' : 'h(:mm)t',
 
 			timezone: 'local',
+			
+			lang: lang,
 			
 			editable: editable,
 			
