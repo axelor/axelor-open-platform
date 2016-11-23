@@ -29,6 +29,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.jsp.JspException;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
@@ -65,7 +66,7 @@ public class AppInfo {
 		map.put("user.name", nameValue);
 		map.put("user.login", user.getCode());
 		map.put("user.nameField", nameField.getName());
-		map.put("user.lang", user.getLanguage());
+		map.put("user.lang", AppFilter.getLocale().getLanguage());
 		map.put("user.action", user.getHomeAction());
 		map.put("user.singleTab", user.getSingleTab());
 		map.put("user.noHelp", user.getNoHelp() == Boolean.TRUE);
