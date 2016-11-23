@@ -1,6 +1,8 @@
 Axelor Development Kit
 ======================
 
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](http://www.gnu.org/licenses/agpl-3.0)
+
 Axelor Development Kit (ADK) is an open source Java framework for business
 application development.
 
