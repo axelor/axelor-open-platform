@@ -19,6 +19,8 @@ package com.axelor.db.tenants;
 
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 
+import com.axelor.app.AppSettings;
+
 /**
  * The tenant identifier resolver.
  *
@@ -27,17 +29,27 @@ public class TenantResolver implements CurrentTenantIdentifierResolver {
 
 	static final ThreadLocal<String> CURRENT_HOST = new ThreadLocal<>();
 	static final ThreadLocal<String> CURRENT_TENANT = new ThreadLocal<>();
+	
+	private static boolean enabled;
 
 	public TenantResolver() {
+		enabled = AppSettings.get().getBoolean(AbstractTenantFilter.CONFIG_MULTI_TENANT, false);
 	}
-
-	@Override
-	public String resolveCurrentTenantIdentifier() {
+	
+	public static String currentTenantIdentifier() {
+		if (!enabled) {
+			return null;
+		}
 		final String tenant = CURRENT_TENANT.get();
 		if (tenant == null) {
 			return TenantConfig.DEFAULT_TENANT_ID;
 		}
 		return tenant;
+	}
+
+	@Override
+	public String resolveCurrentTenantIdentifier() {
+		return currentTenantIdentifier();
 	}
 
 	@Override

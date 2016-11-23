@@ -283,9 +283,6 @@ public class RestService extends ResourceService {
 		return getResource().getRecordName(request);
 	}
 	
-	private static final String DEFAULT_UPLOAD_PATH = "{java.io.tmpdir}/axelor/attachments";
-	private static String uploadPath = AppSettings.get().getPath("file.upload.dir", DEFAULT_UPLOAD_PATH);
-
 	private void uploadSave(InputStream in, OutputStream out) throws IOException {
 		int read = 0;
 		byte[] bytes = new byte[1024];
@@ -450,7 +447,7 @@ public class RestService extends ResourceService {
 			return fail();
 		}
 		request.setModel(getModel());
-		return service.removeAttachment(request, uploadPath);
+		return service.removeAttachment(request);
 	}
 
 	@POST

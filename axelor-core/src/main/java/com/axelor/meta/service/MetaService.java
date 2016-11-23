@@ -17,7 +17,6 @@
  */
 package com.axelor.meta.service;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
-import com.axelor.common.FileUtils;
 import com.axelor.common.ObjectUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
@@ -47,6 +45,7 @@ import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.meta.ActionHandler;
+import com.axelor.meta.MetaFiles;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaActionMenu;
@@ -55,7 +54,6 @@ import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.MetaViewCustom;
-import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.meta.db.repo.MetaFileRepository;
 import com.axelor.meta.db.repo.MetaViewCustomRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
@@ -77,6 +75,7 @@ import com.axelor.rpc.Response;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
@@ -95,7 +94,7 @@ public class MetaService {
 	private MetaFileRepository files;
 	
 	@Inject
-	private MetaAttachmentRepository attachments;
+	private MetaFiles metaFiles;
 
 	private boolean canShow(MenuItem item, Map<String, MenuItem> map, Set<String> visited) {
 		if (visited == null) {
@@ -508,7 +507,7 @@ public class MetaService {
 	}
 
 	@Transactional
-	public Response removeAttachment(Request request, String uploadPath) {
+	public Response removeAttachment(Request request) {
 		Response response = new Response();
 		List<Object> result = Lists.newArrayList();
 		List<Object> records = request.getRecords();
@@ -524,17 +523,12 @@ public class MetaService {
 
 			if (fileId != null) {
 				MetaFile obj = files.find(fileId);
-				if (uploadPath != null) {
-					File file = FileUtils.getFile(uploadPath, obj.getFilePath());
-					if (file.exists() && !file.delete()) {
-						continue;
-					}
+				try {
+					metaFiles.delete(obj);
+					result.add(record);
+				} catch (Exception e) {
+					throw Throwables.propagate(e);
 				}
-
-				attachments.all().filter("self.metaFile.id = ?1", fileId).delete();
-				files.remove(obj);
-
-				result.add(record);
 			}
 		}
 
