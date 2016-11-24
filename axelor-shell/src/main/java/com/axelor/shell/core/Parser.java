@@ -96,10 +96,6 @@ public class Parser {
 		final Target target = targets.get(command);
 		
 		if (target == null) {
-			// no such command
-			System.err.println();
-			System.err.println(command + ": command not found");
-			System.err.println();
 			return null;
 		}
 		

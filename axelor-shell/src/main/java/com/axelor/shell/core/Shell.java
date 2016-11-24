@@ -75,6 +75,7 @@ public class Shell implements Runnable {
 	public CommandResult execute(String... args) {
 		ParserResult result = parser.parse(args);
 		if (result == null) {
+			parser.printUsage(args[0]);
 			return new CommandResult(false);
 		}
 		if (result.getMethod() == null && result.getInstance() == null) {
