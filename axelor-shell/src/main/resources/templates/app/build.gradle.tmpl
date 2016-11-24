@@ -33,6 +33,10 @@ allprojects {
 	}
 }
 
+task wrapper(type: Wrapper) {
+	gradleVersion = "3.2.1"
+}
+
 tomcat {
 	httpPort = project.properties.get("http.port", 8080) as Integer
 	stopPort = 9451

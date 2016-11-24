@@ -77,10 +77,10 @@ public class ProjectCommands implements CommandProvider {
 		TEMPLATES.put("templates/app/adk.gradle.tmpl", "gradle/adk.gradle");
 
 		// gradle wrapper
-		TEMPLATES.put("templates/app/wrapper/gradlew", "gradlew");
-		TEMPLATES.put("templates/app/wrapper/gradlew.bat", "gradlew.bat");
-		TEMPLATES.put("templates/app/wrapper/gradle/wrapper/gradle-wrapper.jar", "gradle/wrapper/gradle-wrapper.jar");
-		TEMPLATES.put("templates/app/wrapper/gradle/wrapper/gradle-wrapper.properties", "gradle/wrapper/gradle-wrapper.properties");
+		TEMPLATES.put("templates/app/gradlew", "gradlew");
+		TEMPLATES.put("templates/app/gradlew.bat", "gradlew.bat");
+		TEMPLATES.put("templates/app/gradle/wrapper/gradle-wrapper.jar", "gradle/wrapper/gradle-wrapper.jar");
+		TEMPLATES.put("templates/app/gradle/wrapper/gradle-wrapper.properties", "gradle/wrapper/gradle-wrapper.properties");
 		
 		TEMPLATES.put("templates/module/build.gradle.tmpl", "build.gradle");
 		TEMPLATES.put("templates/module/Entity.xml.tmpl", "src/main/resources/domains/<%= model %>.xml");
