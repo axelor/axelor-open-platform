@@ -8,8 +8,8 @@ versions.hibernate = "5.2.5.Final"
 versions.hibernate_validator = "5.3.3.Final"
 
 versions.groovy = "2.4.7"
-versions.resteasy = "3.1.0.CR2"
-versions.jackson = "2.8.4"
+versions.resteasy = "3.1.0.CR3"
+versions.jackson = "2.8.5"
 versions.shiro = "1.2.6"
 
 versions.junit = "4.12"
@@ -89,8 +89,8 @@ libs.resteasy_guice = "org.jboss.resteasy:resteasy-guice:${versions.resteasy}"
 libs.resteasy_client = "org.jboss.resteasy:resteasy-client:${versions.resteasy}"
 libs.resteasy_server = [
 	"org.jboss.resteasy:resteasy-undertow:${versions.resteasy}",
-	"io.undertow:undertow-core:1.4.3.Final",
-	"io.undertow:undertow-servlet:1.4.3.Final"]
+	"io.undertow:undertow-core:1.4.4.Final",
+	"io.undertow:undertow-servlet:1.4.4.Final"]
 
 // jackson
 libs.jackson_libs = [
