@@ -343,6 +343,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 
 		var main = element.children('.calendar-main');
 		var mini = element.find('.calendar-mini');
+		var legend = element.find('.calendar-legend');
 		
 		var schema = scope.schema;
 		var mode = schema.mode || "month";
@@ -678,6 +679,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 			main.css('right', mini.parent().outerWidth(true));
 			main.fullCalendar('render');
 			main.fullCalendar('option', 'height', element.height());
+			legend.css("max-height", (legend.parent().height() - mini.height()));
 		}
 
 		main.on("adjustSize", _.debounce(adjustSize, 100));
