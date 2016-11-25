@@ -4,8 +4,8 @@ def versions = [:]
 // versions
 versions.guice = "4.1.0"
 versions.guava = "19.0"
-versions.hibernate = "5.2.4.Final"
-versions.hibernate_validator = "5.3.2.Final"
+versions.hibernate = "5.2.5.Final"
+versions.hibernate_validator = "5.3.3.Final"
 
 versions.groovy = "2.4.7"
 versions.resteasy = "3.1.0.CR2"
@@ -51,7 +51,7 @@ libs.greenmail = "com.icegreen:greenmail:1.4.1"
 
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.3.4"
-libs.jdbc_postgres = "org.postgresql:postgresql:9.4.1211"
+libs.jdbc_postgres = "org.postgresql:postgresql:9.4.1212"
 libs.jdbc_mysql = "mysql:mysql-connector-java:5.1.40"
 
 // Hibernate
