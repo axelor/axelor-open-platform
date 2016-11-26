@@ -3,7 +3,6 @@ apply plugin: "java"
 dependencies {
 
 	compile libs.junit
-	compile libs.slf4j
 	
 	compile	libs.guice
 	compile libs.guice_servlet

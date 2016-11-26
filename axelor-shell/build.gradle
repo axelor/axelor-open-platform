@@ -4,7 +4,6 @@ dependencies {
 
 	testCompile	libs.junit
 
-	compile libs.slf4j_simple
 	compile	libs.guava
 	compile libs.jline
 	compile libs.commons_cli

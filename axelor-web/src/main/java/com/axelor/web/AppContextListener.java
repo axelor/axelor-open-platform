@@ -17,6 +17,9 @@
  */
 package com.axelor.web;
 
+import java.util.Properties;
+import java.util.function.Predicate;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
@@ -27,6 +30,8 @@ import org.jboss.resteasy.spi.Registry;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
+import com.axelor.app.AppSettings;
+import com.axelor.common.logging.LoggerConfiguration;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
@@ -39,8 +44,29 @@ public class AppContextListener extends GuiceServletContextListener {
 
 	private ResteasyDeployment deployment;
 
+	private LoggerConfiguration loggerConfig;
+	
+	private LoggerConfiguration createLoggerConfig() {
+		final AppSettings settings = AppSettings.get();
+		final Properties loggingConfig = new Properties();
+		final Predicate<String> isLogging = (n) -> n.startsWith("logging.");
+		settings.getProperties().stringPropertyNames().stream().filter(isLogging).forEach(n -> {
+			loggingConfig.setProperty(n, settings.get(n));
+		});
+		if (loggingConfig.containsKey("logging.path")) {
+			loggingConfig.setProperty("logging.path", settings.getPath("logging.path", null));
+		}
+		return new LoggerConfiguration(loggingConfig);
+	}
+
 	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
+		
+		servletContextEvent.getServletContext();
+		
+		loggerConfig = createLoggerConfig();
+		loggerConfig.install();
+
 		super.contextInitialized(servletContextEvent);
 
 		final ServletContext context = servletContextEvent.getServletContext();
@@ -74,6 +100,7 @@ public class AppContextListener extends GuiceServletContextListener {
 	@Override
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
 		deployment.stop();
+		loggerConfig.uninstall();
 		super.contextDestroyed(servletContextEvent);
 	}
 

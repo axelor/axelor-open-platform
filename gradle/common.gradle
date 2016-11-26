@@ -1,8 +1,12 @@
 apply plugin: "java"
 
 dependencies {
-	compile libs.slf4j
 	testCompile	libs.junit
+	compile libs.slf4j_logback
+}
+
+configurations.all {
+	exclude group: 'org.slf4j', module: 'slf4j-log4j12'
 }
 
 tasks.withType(JavaCompile) {

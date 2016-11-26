@@ -19,9 +19,30 @@ versions.slf4j = "1.7.21"
 libs.junit = "junit:junit:${versions.junit}"
 
 // logging
-libs.slf4j			= ["org.slf4j:slf4j-api:${versions.slf4j}", "org.slf4j:slf4j-log4j12:${versions.slf4j}", "org.slf4j:jcl-over-slf4j:${versions.slf4j}"]
-libs.slf4j_simple	= ["org.slf4j:slf4j-api:${versions.slf4j}", "org.slf4j:slf4j-simple:${versions.slf4j}"]
-libs.slf4j_logback	= ["org.slf4j:slf4j-api:${versions.slf4j}", "ch.qos.logback:logback-classic:1.1.2"]
+libs.slf4j_base = [
+    "org.slf4j:slf4j-api:${versions.slf4j}",
+    "org.slf4j:jul-to-slf4j:${versions.slf4j}",
+    "org.slf4j:jcl-over-slf4j:${versions.slf4j}",
+    "org.slf4j:log4j-over-slf4j:${versions.slf4j}"
+]
+
+libs.slf4j_log4j = libs.slf4j_base + [
+	"org.apache.logging.log4j:log4j-slf4j-impl:2.7",
+	"org.apache.logging.log4j:log4j-api:2.7",
+	"org.apache.logging.log4j:log4j-core:2.7"
+]
+
+libs.slf4j_log4j_web = "org.apache.logging.log4j:log4j-web:2.7"
+
+libs.slf4j_simple = libs.slf4j_base + [
+	"org.slf4j:slf4j-simple:${versions.slf4j}"
+]
+
+libs.slf4j_logback = libs.slf4j_base + [
+	"ch.qos.logback:logback-core:1.1.7",
+	"ch.qos.logback:logback-classic:1.1.7",
+	"org.fusesource.jansi:jansi:1.14"	
+]
 
 // Guava
 libs.guava = ["com.google.guava:guava:${versions.guava}", "com.google.code.findbugs:jsr305:3.0.1"]
