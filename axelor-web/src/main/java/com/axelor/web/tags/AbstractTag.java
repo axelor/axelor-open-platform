@@ -53,8 +53,9 @@ public abstract class AbstractTag extends SimpleTagSupport {
 	}
 
 	protected URL getResource(String path) throws MalformedURLException {
+		final String resource = path.startsWith("/") ? path : "/" + path;
 		final PageContext ctx = (PageContext) getJspContext();
-		return ctx.getServletContext().getResource(path);
+		return ctx.getServletContext().getResource(resource);
 	}
 
 	protected List<String> getScripts() throws IOException {
