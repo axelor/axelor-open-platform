@@ -3,7 +3,7 @@ def versions = [:]
 
 // versions
 versions.guice = "4.0"
-versions.hibernate = "4.2.19.Final"
+versions.hibernate = "4.2.21.Final"
 versions.hibernate_validator = "5.2.0.Final"
 
 // unit testing
@@ -45,7 +45,7 @@ libs.greenmail = "com.icegreen:greenmail:1.4.1"
 
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.3.3"
-libs.jdbc_postgres = "org.postgresql:postgresql:9.4-1201-jdbc41"
+libs.jdbc_postgres = "org.postgresql:postgresql:9.4.1212"
 libs.jdbc_mysql = "mysql:mysql-connector-java:5.1.36"
 
 // Hibernate
