@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,8 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Query;
+import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.loader.ModuleManager;
@@ -40,6 +43,7 @@ import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.Selection;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 
 public class MetaStore {
@@ -98,6 +102,80 @@ public class MetaStore {
 		map.put("export", security.isPermitted(AccessType.EXPORT, (Class) model));
 
 		return map;
+	}
+
+	private static Property findField(final Mapper mapper, String name) {
+		final Iterator<String> iter = Splitter.on(".").split(name).iterator();
+		Mapper current = mapper;
+		Property property = current.getProperty(iter.next());
+		while(iter.hasNext()) {
+			current = Mapper.of(property.getTarget());
+			property = current.getProperty(iter.next());
+		}
+		return property;
+	}
+	
+	public static Map<String, Object> findFields(final Class<?> modelClass, final List<String> names) {
+		final Map<String, Object> data = new HashMap<>();
+		final Mapper mapper = Mapper.of(modelClass);
+		final List<Object> fields = new ArrayList<>();
+
+		boolean massUpdate = false;
+		Object bean = null;
+		try {
+			bean = modelClass.newInstance();
+		} catch (Exception e) {}
+
+		for(final String name : names) {
+			final Property property = findField(mapper, name);
+			if (property == null) continue;
+			final Map<String, Object> map = property.toMap();
+			map.put("name", name);
+			if (property.getSelection() != null && !"".equals(property.getSelection().trim())) {
+				map.put("selection", property.getSelection());
+				map.put("selectionList", getSelectionList(property.getSelection()));
+			}
+			if (property.getTarget() != null) {
+				map.put("perms", getPermissions(property.getTarget()));
+			}
+			if (property.isMassUpdate()) {
+				massUpdate = true;
+			}
+			// find the default value
+			if (!property.isTransient() && !property.isVirtual()) {
+				Object obj = null;
+				if (name.contains(".")) {
+					try {
+						obj = property.getEntity().newInstance();
+					} catch (Exception e) {}
+				} else {
+					obj = bean;
+				}
+				if (obj != null) {
+					Object defaultValue = property.get(obj);
+					if (defaultValue != null) {
+						map.put("defaultValue", defaultValue);
+					}
+				}
+			}
+			if (name.contains(".")) {
+				map.put("readonly", true);
+			}
+			fields.add(map);
+		}
+
+		Map<String, Object> perms = getPermissions(modelClass);
+		if (massUpdate) {
+			if (perms == null) {
+				perms = new HashMap<>();
+			}
+			perms.put("massUpdate", massUpdate);
+		}
+
+		data.put("perms", perms);
+		data.put("fields", fields);
+
+		return data;
 	}
 
 	public static List<Selection.Option> getSelectionList(String selection) {
