@@ -107,16 +107,14 @@ public class ModuleManager {
 
 			@Override
 			public void run() {
-
-				log.info("modules found:");
-				for (String name : resolver.names()) {
-					log.info("  " + name);
-				}
-
 				// install modules
 				for (Module module : resolver.all()) {
-					if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
-						install(module.getName(), update, withDemo, false);
+					if (!module.isRemovable() || module.isInstalled()) {
+						if (module.isPending()) {
+							install(module.getName(), update, withDemo, false);
+						} else {
+							log.info("Loading package " + module.getName() + "...");
+						}
 					}
 				}
 				// second iteration ensures proper view sequence
@@ -226,7 +224,7 @@ public class ModuleManager {
 	@Transactional
 	public void uninstall(String module) {
 
-		log.info("Uninstall module: {}", module);
+		log.info("Removing package " + module + "...");
 		
 		MetaModule entity = modules.findByName(module);
 
@@ -243,8 +241,6 @@ public class ModuleManager {
 
 		resolver.get(module).setInstalled(false);
 		resolver.get(module).setPending(false);
-
-		log.info("Module uninstalled: {}", module);
 	}
 
 	public void doCleanUp() {
@@ -280,12 +276,12 @@ public class ModuleManager {
 			return;
 		}
 
-		String message = "installing: {}";
+		String message = "Installing package ";
 		if (module.isInstalled()) {
-			message = "updating: {}";
+			message = "Updating package ";
 		}
 
-		log.info(message, module);
+		log.info(message + module + "...");
 
 		// load meta
 		installMeta(module, update);

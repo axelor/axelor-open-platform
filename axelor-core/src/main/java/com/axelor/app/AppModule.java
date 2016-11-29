@@ -94,12 +94,11 @@ public class AppModule extends AbstractModule {
 
 		for (Class<? extends AxelorModule> module : moduleClasses) {
 			try {
-				log.info("Configure: {}", module.getName());
+				log.debug("Configure module: {}", module.getName());
 				install(module.newInstance());
 			} catch (InstantiationException | IllegalAccessException e) {
 				throw Throwables.propagate(e);
 			}
 		}
-		log.info("App modules configured.");
 	}
 }

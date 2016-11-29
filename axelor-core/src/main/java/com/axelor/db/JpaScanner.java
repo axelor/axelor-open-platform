@@ -115,7 +115,7 @@ public class JpaScanner extends AbstractScannerImpl {
 
 		synchronized (modelCache) {
 			
-			log.info("Searching for model classes...");
+			log.debug("Searching for entity classes...");
 			
 			register(Model.class);
 
@@ -133,13 +133,14 @@ public class JpaScanner extends AbstractScannerImpl {
 					excludes.contains(klass.getPackage().getName())) {
 					continue;
 				}
+				log.trace("Found entity: {}", klass.getName());
 				register(klass);
 			}
-			log.info("Total found: {}", modelCache.size());
+			log.debug("Entitity classes found: {}", modelCache.size());
 		}
 
 		synchronized (repoCache) {
-			log.info("Searching for repository classes...");
+			log.debug("Searching for repository classes...");
 
 			ClassFinder<?> finder = MetaScanner.findSubTypesOf(JpaRepository.class);
 
@@ -152,10 +153,11 @@ public class JpaScanner extends AbstractScannerImpl {
 					excludes.contains(klass.getPackage().getName())) {
 					continue;
 				}
+				log.trace("Found repository: {}", klass.getName());
 				repoCache.put(klass.getName(), klass);
 				repoNames.put(klass.getSimpleName(), klass.getName());
 			}
-			log.info("Total found: {}", repoCache.size());
+			log.debug("Repository classes found: {}", repoCache.size());
 		}
 		return new HashSet<Class<?>>(modelCache.values());
 	}

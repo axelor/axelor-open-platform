@@ -25,8 +25,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.shiro.guice.web.GuiceShiroFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppModule;
 import com.axelor.app.AppSettings;
@@ -61,8 +59,6 @@ public class AppServletModule extends ServletModule {
 
 	private static final String DEFAULT_PERSISTANCE_UNIT = "persistenceUnit";
 
-	private Logger log = LoggerFactory.getLogger(getClass());
-
 	private String jpaUnit;
 
 	public AppServletModule() {
@@ -92,12 +88,6 @@ public class AppServletModule extends ServletModule {
 		// load application settings
 		AppSettings settings = AppSettings.get();
 
-		StringBuilder builder = new StringBuilder("Starting application:");
-		builder.append("\n  ").append("Name: ").append(settings.get("application.name"));
-		builder.append("\n  ").append("Version: ").append(settings.get("application.version"));
-
-		log.info(builder.toString());
-		
 		// some common bindings
 		bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
 

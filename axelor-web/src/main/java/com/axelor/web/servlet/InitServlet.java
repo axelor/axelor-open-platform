@@ -61,6 +61,8 @@ public class InitServlet extends HttpServlet {
 		}
 		
 		super.init();
+
+		LOG.info("Ready to serve...");
 	}
 	
 	@Override
