@@ -35,8 +35,6 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.persist.Transactional;
 
 /**
@@ -213,11 +211,9 @@ public class AuthService {
 
 		if (Objects.equal(password, confirm)) {
 			response.setValue("password", encrypt(password));
-			response.setValue("newPassword", null);
-			response.setValue("confirm", null);
 			response.setValue("change", false);
 		} else {
-			response.setData(ImmutableList.of(ImmutableMap.of("error", I18n.get("Password doesn't match"))));
+			response.setError(I18n.get("Password doesn't match"));
 		}
 	}
 }
