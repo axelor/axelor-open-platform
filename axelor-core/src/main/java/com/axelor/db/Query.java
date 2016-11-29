@@ -61,6 +61,8 @@ public class Query<T extends Model> {
 	private JoinHelper joinHelper;
 
 	private boolean cacheable;
+	
+	private boolean readOnly;
 
 	private FlushModeType flushMode = FlushModeType.AUTO;
 
@@ -194,6 +196,16 @@ public class Query<T extends Model> {
 	 */
 	public Query<T> cacheable() {
 		this.cacheable = true;
+		return this;
+	}
+	
+	/**
+	 * Set the query readonly.
+	 * 
+	 * @return the same query instance.
+	 */
+	public Query<T> readOnly() {
+		this.readOnly = true;
 		return this;
 	}
 

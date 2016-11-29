@@ -79,6 +79,30 @@ public class QueryBinder {
 		query.unwrap(org.hibernate.Query.class).setCacheable(cacheable);
 		return this;
 	}
+	
+	/**
+	 * Set the query readOnly.
+	 *
+	 * @return the same query binder instance
+	 */
+	public QueryBinder setReadOnly() {
+		return setReadOnly(true);
+	}
+
+	/**
+	 * Set the query readOnly.
+	 * 
+	 * <p>
+	 * This will give better performance if the result is not meant for updates.
+	 * For example, REST api data fetching can benefit from this.
+	 * </p>
+	 * 
+	 * @return the same query binder instance
+	 */
+	public QueryBinder setReadOnly(boolean readOnly) {
+		query.unwrap(org.hibernate.Query.class).setReadOnly(readOnly);
+		return this;
+	}
 
 	/**
 	 * Set query flush mode.
