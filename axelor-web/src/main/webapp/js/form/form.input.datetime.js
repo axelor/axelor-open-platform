@@ -253,6 +253,7 @@ ui.formInput('DateTime', {
 		var props = scope.field;
 		var isDate = this.isDate;
 		var isShowing = false;
+		var lastValue = null;
 		
 		var options = {
 			dateFormat: 'dd/mm/yy',
@@ -260,9 +261,11 @@ ui.formInput('DateTime', {
 			showTime: false,
 			showOn: null,
 			beforeShow: function (e, ui) {
+				lastValue = input.mask("value") || '';
 				isShowing = true;
 			},
 			onClose: function (e, ui) {
+				lastValue = null;
 				isShowing = false;
 			},
 			onSelect: function(dateText, inst) {
@@ -293,7 +296,12 @@ ui.formInput('DateTime', {
 		var rendering = false;
 
 		input.on('change', function(e, ui){
-			changed = !rendering;
+			if (changed) return;
+			if (isShowing) {
+				changed = lastValue !== (input.mask("value") || '');
+			} else {
+				changed = !rendering;
+			}
 		});
 		input.on('blur', function() {
 			if (changed) {
