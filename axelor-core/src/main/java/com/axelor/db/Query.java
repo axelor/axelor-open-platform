@@ -252,7 +252,10 @@ public class Query<T extends Model> {
 			query.setFirstResult(offset);
 		}
 
-		this.bind(query).opts(cacheable, flushMode);
+		final QueryBinder binder = this.bind(query).opts(cacheable, flushMode);
+		if (readOnly) {
+			binder.setReadOnly();
+		}
 		return query.getResultList();
 	}
 
@@ -291,7 +294,7 @@ public class Query<T extends Model> {
 	 */
 	public long count() {
 		final TypedQuery<Long> query = em().createQuery(countQuery(), Long.class);
-		this.bind(query).opts(cacheable, flushMode);
+		this.bind(query).setCacheable(cacheable).setFlushMode(flushMode).setReadOnly();
 		return query.getSingleResult();
 	}
 
@@ -395,7 +398,7 @@ public class Query<T extends Model> {
 	}
 
 	protected String countQuery() {
-		StringBuilder sb = new StringBuilder("SELECT COUNT(self) FROM ")
+		StringBuilder sb = new StringBuilder("SELECT COUNT(self.id) FROM ")
 				.append(beanClass.getSimpleName())
 				.append(" self")
 				.append(joinHelper.toString());
@@ -570,7 +573,10 @@ public class Query<T extends Model> {
 				q.setFirstResult(offset);
 			}
 
-			bind(q).opts(cacheable, flushMode);
+			final QueryBinder binder = bind(q).opts(cacheable, flushMode);
+			if (readOnly) {
+				binder.setReadOnly();
+			}
 
 			return q.getResultList();
 		}
