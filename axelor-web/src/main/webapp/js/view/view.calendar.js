@@ -603,15 +603,16 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 
 			var popup = editor.isolateScope();
 			
-			popup.setEditable(scope.isEditable());
 			popup.show(record, function(result) {
 				RecordManager.add(result);
 			});
-			if (!record || !record.id) {
-				popup.waitForActions(function() {
+			popup.waitForActions(function() {
+				if (!record || !record.id) {
 					popup.$broadcast("on:new");
-				});
-			}
+				} else {
+					popup.setEditable(scope.isEditable());
+				}
+			});
 		};
 		
 		scope.isEditable = function() {
