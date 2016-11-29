@@ -193,6 +193,9 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 			}
 			if (rule.getCanWrite() != Boolean.TRUE) {
 				item.setReadonly(true);
+				if (isBlank(rule.getReadonlyIf())) {
+					item.setReadonlyIf(null);
+				}
 			}
 
 			return rule.getCanRead() == Boolean.TRUE;
