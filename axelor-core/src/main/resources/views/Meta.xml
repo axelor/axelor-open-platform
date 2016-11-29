@@ -226,8 +226,8 @@
     <panel title="Tag" sidebar="true" itemSpan="6">
       <field name="tag"/>
       <field name="tagStyle"/>
-      <field name="tagGet" title="Call" hideIf="tag"/>
-      <field name="tagCount" title="Count" hideIf="tag"/>
+      <field name="tagGet"/>
+      <field name="tagCount"/>
     </panel>
     <panel-related field="groups"/>
     <panel-related field="roles"/>
