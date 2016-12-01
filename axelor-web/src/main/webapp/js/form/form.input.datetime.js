@@ -413,7 +413,7 @@ ui.formInput('DateTime', {
 					input.mask('value', value);
 					try {
 						$.datepicker._noUpdate = true;
-						$.datepicker._setDateDatepicker(input[0], value);
+						$.datepicker._setDateDatepicker(input[0], moment(scope.getValue()).toDate());
 					} finally {
 						$.datepicker._noUpdate = false;
 					}
