@@ -311,6 +311,9 @@ public class Resource<T extends Model> {
 		Query<?> query = getQuery(request).cacheable().readOnly();
 		List<?> data = null;
 		try {
+			if (limit > 0) {
+				response.setTotal(query.count());
+			}
 			if (request.getFields() != null) {
 				Query<?>.Selector selector = query.select(request.getFields().toArray(new String[] {}));
 				LOG.debug("JPQL: {}", selector);
@@ -319,9 +322,7 @@ public class Resource<T extends Model> {
 				LOG.debug("JPQL: {}", query);
 				data = query.fetch(limit, offset);
 			}
-			if (limit > 0) {
-				response.setTotal(query.count());
-			} else {
+			if (limit <= 0) {
 				response.setTotal(data.size());
 			}
 		} catch (Exception e) {
