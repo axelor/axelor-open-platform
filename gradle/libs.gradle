@@ -15,6 +15,9 @@ versions.shiro = "1.2.6"
 versions.junit = "4.12"
 versions.slf4j = "1.7.21"
 
+versions.tomcat_embed = "8.5.8"
+versions.tomcat_embed_logging = "8.5.2"
+
 // unit testing
 libs.junit = "junit:junit:${versions.junit}"
 
@@ -179,3 +182,10 @@ libs.gradle_tooling = "org.gradle:gradle-tooling-api:${gradle.gradleVersion}"
 // gradle plugins
 libs.plugin_license = "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.1"
 libs.plugin_tomcat = "com.bmuschko:gradle-tomcat-plugin:2.2.5"
+
+// embeded tomcat
+libs.tomcat_embed = [
+	"org.apache.tomcat.embed:tomcat-embed-core:${versions.tomcat_embed}",
+	"org.apache.tomcat.embed:tomcat-embed-logging-log4j:${versions.tomcat_embed_logging}",
+	"org.apache.tomcat.embed:tomcat-embed-jasper:${versions.tomcat_embed}",
+]

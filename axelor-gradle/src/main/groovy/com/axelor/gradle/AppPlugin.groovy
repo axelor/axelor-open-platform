@@ -21,7 +21,6 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.JavaExec
-import org.gradle.internal.os.OperatingSystem
 
 import com.axelor.gradle.tasks.GenerateCode
 import com.axelor.gradle.tasks.VersionTask
@@ -53,10 +52,9 @@ class AppPlugin extends AbstractPlugin {
 				providedCompile	libs.javax_servlet
 				providedCompile	libs.javax_servlet_jsp
 
-				def tomcatVersion = '7.0.64'
-				tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
-					   "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
-					   "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
+				tomcat libs.tomcat_embed
+				tomcat libs.slf4j_logback
+				tomcat "com.axelor:axelor-common:${sdkVersion}"
 			}
 
 			allprojects {
@@ -92,7 +90,7 @@ class AppPlugin extends AbstractPlugin {
 				}
 			}
 
-			task("generateCode", type: GenerateCode) << {
+			task("generateCode", type: GenerateCode) {
 				description "Generate code for domain models from xml definitions."
 				group "Axelor"
 			}
@@ -146,6 +144,10 @@ class AppPlugin extends AbstractPlugin {
 			war.from "${buildDir}/webapp"
 			war.exclude "node_modules", "gulpfile.js", "package.json"
 			war.duplicatesStrategy = "EXCLUDE"
+
+			[tomcatRun, tomcatRunWar]*.httpProtocol = "org.apache.coyote.http11.Http11NioProtocol"
+			[tomcatRun, tomcatRunWar]*.httpsProtocol = "org.apache.coyote.http11.Http11NioProtocol"
+			[tomcatRun, tomcatRunWar]*.ajpProtocol = "org.apache.coyote.ajp.AjpNioProtocol"
 
 			tomcatRun.dependsOn "copyWebapp"
 			tomcatRun.webAppSourceDirectory = file("${buildDir}/webapp")
