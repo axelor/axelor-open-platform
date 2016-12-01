@@ -42,16 +42,21 @@ application.locale =
 # ~~~~~
 # See hibernate documentation for connection parameters
 
-# PostgreSQL
-db.default.dialect = org.hibernate.dialect.PostgreSQLDialect
-db.default.driver = org.postgresql.Driver
-db.default.ddl = update
-db.default.url = jdbc:postgresql://localhost:5432/<%= pgsqlName %>-dev
-db.default.user = axelor
+# For testing only
+db.default.driver = org.hsqldb.jdbcDriver
+db.default.ddl = create
+db.default.url = jdbc:hsqldb:mem:test
+db.default.user = sa
 db.default.password =
 
+# PostgreSQL
+#db.default.driver = org.postgresql.Driver
+#db.default.ddl = update
+#db.default.url = jdbc:postgresql://localhost:5432/<%= pgsqlName %>-dev
+#db.default.user = axelor
+#db.default.password =
+
 # MySQL
-#db.default.dialect = org.hibernate.dialect.MySQL5InnoDBDialect
 #db.default.driver = com.mysql.jdbc.Driver
 #db.default.ddl = update
 #db.default.url = jdbc:mysql://localhost:3306/<%= mysqlName %>_dev
@@ -210,3 +215,18 @@ view.single.tab = false
 
 # Set menu style (left, top, both)
 view.menubar.location = both
+
+# Logging
+# ~~~~~
+# Custom logback configuration can be provided with `logging.config` property pointing
+# to a custom `logback.xml`. In this case, all the logging configuration provided here
+# will be ignored.
+#
+# Following settings can be used to configure logging system automatically.
+#
+#logging.path = {user.home}/.axelor/logs
+#logging.pattern.file = %d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- [%t] %-40.40logger{39} : %m%n
+#logging.pattern.console = %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n
+#logging.level.root = error
+#logging.level.com.axelor = info
+#logging.level.org.hibernate = warn

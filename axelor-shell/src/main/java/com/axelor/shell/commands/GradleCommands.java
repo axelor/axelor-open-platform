@@ -20,14 +20,9 @@ package com.axelor.shell.commands;
 import static com.axelor.common.StringUtils.isBlank;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.gradle.tooling.BuildLauncher;
-import org.gradle.tooling.GradleConnector;
-import org.gradle.tooling.ProjectConnection;
 
 import com.axelor.shell.core.CommandProvider;
 import com.axelor.shell.core.CommandResult;
@@ -38,11 +33,9 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 public class GradleCommands implements CommandProvider {
-	
-	private GradleConnector connector;
-	
+
 	private Shell shell;
-	
+
 	public GradleCommands(Shell shell) {
 		this.shell = shell;
 	}
@@ -51,43 +44,27 @@ public class GradleCommands implements CommandProvider {
 		return execute(Arrays.asList(args));
 	}
 
-	private CommandResult execute(Iterable<String> arguments) {
+	private CommandResult execute(List<String> args) {
+		final List<String> params = new ArrayList<>();
+		final boolean isWindow = System.getProperty("os.name").toLowerCase().indexOf("windows") > -1;
 
-		if (connector == null) {
-			connector = GradleConnector.newConnector();
-		}
+		params.add(isWindow ? "gradlew.bat" : "./gradlew");
+		params.addAll(args);
 		
-		connector.forProjectDirectory(shell.getWorkingDir());
-		ProjectConnection connection = connector.connect();
-		
-		final OutputStream nullStream = new OutputStream() {
-
-			@Override
-			public void write(int b) throws IOException {
-			}
-		};
-
-		final PrintStream outStream = System.out;
-		final PrintStream errStream = System.err;
-
-		System.setOut(new PrintStream(nullStream));
-		System.setErr(new PrintStream(nullStream));
-
+		final ProcessBuilder pb = new ProcessBuilder(params);
+		pb.directory(shell.getWorkingDir());
+		pb.inheritIO();
 		try {
-			final BuildLauncher launcher = connection.newBuild();
-			launcher.setStandardOutput(outStream);
-			launcher.setStandardError(errStream);
-			launcher.withArguments(arguments);
-			launcher.run();
-		} catch (Exception e) {
-			errStream.println("Command failed: " + e);
-		} finally {
-			connection.close();
-			System.setOut(outStream);
-			System.setErr(errStream);
+			final Process proc = pb.start();
+			try {
+				proc.waitFor();
+			} catch (InterruptedException e) {
+				// ignore interruption error
+			}
+			return new CommandResult(true);
+		} catch (IOException e) {
+			return new CommandResult(false);
 		}
-
-		return new CommandResult(true);
 	}
 
 	@CliCommand(name = "clean", help = "clean the project build")
@@ -114,12 +91,13 @@ public class GradleCommands implements CommandProvider {
 			String port,
 			@CliOption(name = "config", shortName = 'c', argName = "FILE", help = "application configuration file")
 			String config,
-			@CliOption(name = "quiet", shortName = 'v', help = "show errors only")
-			boolean quiet) {
+			@CliOption(name = "verbose", shortName = 'v', help = "verbose output")
+			boolean verbose) {
 		
 		final List<String> args = Lists.newArrayList("-x", "test");
-		if (quiet) {
+		if (!verbose) {
 			args.add("-q");
+			shell.info("Starting Tomcat Server...");
 		}
 		if (!isBlank(config)) {
 			args.add("-Daxelor.config=" + config);
@@ -128,6 +106,7 @@ public class GradleCommands implements CommandProvider {
 			args.add("-Phttp.port=" + port);
 		}
 		args.add("tomcatRun");
+		args.add("--no-daemon");
 		return execute(args);
 	}
 

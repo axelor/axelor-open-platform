@@ -17,24 +17,17 @@
  */
 package com.axelor.shell.commands;
 
-import groovy.text.GStringTemplateEngine;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.codehaus.groovy.control.CompilationFailedException;
 
 import com.axelor.common.ClassUtils;
 import com.axelor.common.Inflector;
@@ -47,7 +40,6 @@ import com.axelor.shell.core.annotations.CliOption;
 
 public class ProjectCommands implements CommandProvider {
 
-	private static final GStringTemplateEngine ENGINE = new GStringTemplateEngine();
 	private static final Map<String, String> TEMPLATES = new HashMap<>();
 	
 	private static String[] DIRS = {
@@ -71,7 +63,6 @@ public class ProjectCommands implements CommandProvider {
 		TEMPLATES.put("templates/app/settings.gradle.tmpl", "settings.gradle");
 		TEMPLATES.put("templates/app/application.properties.tmpl", "src/main/resources/application.properties");
 		TEMPLATES.put("templates/app/persistence.xml.tmpl", "src/main/resources/META-INF/persistence.xml");
-		TEMPLATES.put("templates/app/log4j.properties.tmpl", "src/main/resources/log4j.properties");
 		TEMPLATES.put("templates/app/header.txt.tmpl", "src/license/header.txt");
 		//TEMPLATES.put("templates/app/ehcache.xml.tmpl", "src/main/resources/ehcache.xml");
 		TEMPLATES.put("templates/app/adk.gradle.tmpl", "gradle/adk.gradle");
@@ -94,6 +85,21 @@ public class ProjectCommands implements CommandProvider {
 		}
 	}
 	
+	private String expand(String line,  Map<String, Object> vars) {
+		Pattern pattern = Pattern.compile("<%=\\s*(.*?)\\s*%>");
+		Matcher matcher = pattern.matcher(line);
+		StringBuilder sb = new StringBuilder();
+		String text = line;
+		while (matcher.find()) {
+			sb.append(text.substring(0, matcher.start()));
+			sb.append(vars.getOrDefault(matcher.group(1).trim(), ""));
+			text = text.substring(matcher.end());
+			matcher = pattern.matcher(text);
+		}
+		sb.append(text);
+		return sb.toString();
+	}
+
 	private void expand(File base, String templateName, Map<String, Object> vars) throws Exception {
 		
 		final InputStream is = ClassUtils.getResourceStream(templateName);
@@ -101,10 +107,8 @@ public class ProjectCommands implements CommandProvider {
 			return;
 		}
 		
-		StringWriter nameWriter = new StringWriter();
-		ENGINE.createTemplate(TEMPLATES.get(templateName)).make(vars).writeTo(nameWriter);
-		
-		File target = new File(base, nameWriter.toString());
+		String name = expand(TEMPLATES.get(templateName), vars);
+		File target = new File(base, name);
 		if (!target.getParentFile().exists()) {
 			target.getParentFile().mkdirs();
 		}
@@ -120,11 +124,13 @@ public class ProjectCommands implements CommandProvider {
 		}
 
 		try (
-			Reader reader = new BufferedReader(new InputStreamReader(is));
-			Writer writer = new BufferedWriter(new FileWriter(target))) {
-			ENGINE.createTemplate(reader).make(vars).writeTo(writer);
-		} catch (CompilationFailedException | ClassNotFoundException e) {
-			throw new IOException(e);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+			BufferedWriter writer = new BufferedWriter(new FileWriter(target))) {
+			String line = reader.readLine();
+			while (line != null) {
+				writer.write(expand(line, vars) + "\n");
+				line = reader.readLine();
+			}
 		}
 	}
 	

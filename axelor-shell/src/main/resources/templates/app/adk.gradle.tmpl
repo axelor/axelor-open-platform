@@ -5,17 +5,17 @@ if (adkHome == null) {
 }
 
 ext.adkPlugins = {
-	def libs = file("\${adkHome}/gradle/libs")
+	def libs = file("${adkHome}/gradle/libs")
 	return libs.exists() ? fileTree(dir: libs.path, include: '*.jar') : "com.axelor:axelor-gradle:*"
 }
 
 allprojects {
 
-	apply from: "\${adkHome}/gradle/repo.gradle"
-	apply from: "\${adkHome}/gradle/libs.gradle"
-	apply from: "\${adkHome}/gradle/common.gradle"
-	apply from: "\${adkHome}/gradle/eclipse.gradle"
-	apply from: "\${adkHome}/gradle/license.gradle"
+	apply from: "${adkHome}/gradle/repo.gradle"
+	apply from: "${adkHome}/gradle/libs.gradle"
+	apply from: "${adkHome}/gradle/common.gradle"
+	apply from: "${adkHome}/gradle/eclipse.gradle"
+	apply from: "${adkHome}/gradle/license.gradle"
 
 	repositories adkRepos
 }
