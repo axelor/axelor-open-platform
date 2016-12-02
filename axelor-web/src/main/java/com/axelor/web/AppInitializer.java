@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.web.servlet;
+package com.axelor.web;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,26 +30,26 @@ import com.axelor.meta.loader.ModuleManager;
 import com.axelor.quartz.JobRunner;
 
 @Singleton
-public class InitServlet extends HttpServlet {
+public class AppInitializer extends HttpServlet {
 
 	private static final long serialVersionUID = -2493577642638670615L;
 
-	private static final Logger LOG = LoggerFactory.getLogger(InitServlet.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AppInitializer.class);
 
 	@Inject
 	private ModuleManager moduleManager;
-	
+
 	@Inject
 	private JobRunner jobRunner;
-	
+
 	@Override
 	public void init() throws ServletException {
-		LOG.info("Initializing...");
+		LOGGER.info("Initializing...");
 
 		try {
 			moduleManager.initialize(false, AppSettings.get().getBoolean("data.import.demo-data", true));
 		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
+			LOGGER.error(e.getMessage(), e);
 		}
 
 		try {
@@ -57,21 +57,18 @@ public class InitServlet extends HttpServlet {
 				jobRunner.start();
 			}
 		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
+			LOGGER.error(e.getMessage(), e);
 		}
-		
-		super.init();
 
-		LOG.info("Ready to serve...");
+		LOGGER.info("Ready to serve...");
 	}
-	
+
 	@Override
 	public void destroy() {
 		try {
 			jobRunner.stop();
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage(), e);
 		}
-		super.destroy();
 	}
 }

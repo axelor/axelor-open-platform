@@ -42,7 +42,6 @@ import com.axelor.rpc.Response;
 import com.axelor.rpc.ResponseInterceptor;
 import com.axelor.web.servlet.CorsFilter;
 import com.axelor.web.servlet.I18nServlet;
-import com.axelor.web.servlet.InitServlet;
 import com.axelor.web.servlet.NoCacheFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Module;
@@ -79,7 +78,7 @@ public class AppServletModule extends ServletModule {
 
 	protected void afterConfigureServlets() {
 		// register initialization servlet
-		serve("_init").with(InitServlet.class);
+		serve("__init__").with(AppInitializer.class);
 	}
 
 	@Override
