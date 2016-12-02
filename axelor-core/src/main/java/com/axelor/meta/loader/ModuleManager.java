@@ -110,11 +110,10 @@ public class ModuleManager {
 				// install modules
 				for (Module module : resolver.all()) {
 					if (!module.isRemovable() || module.isInstalled()) {
-						if (module.isPending()) {
-							install(module.getName(), update, withDemo, false);
-						} else {
-							log.info("Loading package " + module.getName() + "...");
-						}
+						log.info("Loading package " + module.getName() + "...");
+					}
+					if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
+						install(module.getName(), update, withDemo, false);
 					}
 				}
 				// second iteration ensures proper view sequence
