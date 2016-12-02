@@ -129,7 +129,7 @@ public final class VersionUtils {
 	}
 
 	private static Version getVersion(String file) {
-		try (InputStream is = ClassUtils.getResourceStream(file)) {
+		try (InputStream is = ResourceUtils.getResourceStream(file)) {
 			String version = CharStreams.toString(new InputStreamReader(is));
 			return new Version(version);
 		} catch (Exception e) {

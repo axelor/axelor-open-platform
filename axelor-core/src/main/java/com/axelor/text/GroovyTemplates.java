@@ -17,11 +17,6 @@
  */
 package com.axelor.text;
 
-import groovy.text.GStringTemplateEngine;
-import groovy.text.StreamingTemplateEngine;
-import groovy.text.TemplateEngine;
-import groovy.xml.XmlUtil;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -39,8 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppSettings;
-import com.axelor.common.ClassUtils;
 import com.axelor.common.FileUtils;
+import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
@@ -52,6 +47,11 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
+
+import groovy.text.GStringTemplateEngine;
+import groovy.text.StreamingTemplateEngine;
+import groovy.text.TemplateEngine;
+import groovy.xml.XmlUtil;
 
 /**
  * The implementation of {@link Templates} for groovy string template support.
@@ -86,7 +86,7 @@ public class GroovyTemplates implements Templates {
 			if (file.isFile()) {
 				reader = new FileReader(file);
 			} else {
-				InputStream stream = ClassUtils.getResourceStream(included);
+				InputStream stream = ResourceUtils.getResourceStream(included);
 				if (stream != null) {
 					reader = new InputStreamReader(stream);
 				}

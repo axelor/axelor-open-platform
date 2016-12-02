@@ -32,7 +32,7 @@ import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.Tag;
 
-import com.axelor.common.ClassUtils;
+import com.axelor.common.ResourceUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
@@ -131,7 +131,7 @@ import com.google.inject.persist.Transactional;
 public class JpaFixture {
 
 	private InputStream read(String resource) {
-		return ClassUtils.getResourceStream("fixtures/" + resource);
+		return ResourceUtils.getResourceStream("fixtures/" + resource);
 	}
 
 	@Transactional

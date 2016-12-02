@@ -17,7 +17,6 @@
  */
 package com.axelor.script;
 
-import com.axelor.common.ClassUtils;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
 import com.axelor.db.Model;
@@ -96,7 +95,12 @@ public class ELScriptHelper extends AbstractScriptHelper {
 
 		private static Class<?> typeClass(Object type) {
 			if (type instanceof Class<?>) return (Class<?>) type;
-			if (type instanceof String) return ClassUtils.findClass(type.toString());
+			if (type instanceof String)
+				try {
+					return Class.forName(type.toString());
+				} catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(e);
+				}
 			if (type instanceof ELClass) return ((ELClass) type).getKlass();
 			throw new IllegalArgumentException("Invalid type: " + type);
 		}
@@ -118,7 +122,11 @@ public class ELScriptHelper extends AbstractScriptHelper {
 		}
 
 		public static Class<?> importClass(String name) {
-			return ClassUtils.findClass(name);
+			try {
+				return Class.forName(name);
+			} catch (ClassNotFoundException e) {
+				throw new IllegalArgumentException(e);
+			}
 		}
 
 		public static <T extends Model> JpaRepository<T> repo(Class<T> model) {

@@ -26,7 +26,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import com.axelor.JpaTest;
-import com.axelor.common.ClassUtils;
+import com.axelor.common.ResourceUtils;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,7 +37,7 @@ public abstract class MetaTest extends JpaTest {
 	private ObjectMapper mapper;
 
 	protected InputStream read(String resource) {
-		return ClassUtils.getResourceStream(resource);
+		return ResourceUtils.getResourceStream(resource);
 	}
 
 	protected ObjectMapper getObjectMapper() {

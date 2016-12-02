@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.axelor.common.ClassUtils;
 import com.axelor.common.Inflector;
+import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.shell.core.CommandProvider;
 import com.axelor.shell.core.CommandResult;
@@ -102,7 +102,7 @@ public class ProjectCommands implements CommandProvider {
 
 	private void expand(File base, String templateName, Map<String, Object> vars) throws Exception {
 		
-		final InputStream is = ClassUtils.getResourceStream(templateName);
+		final InputStream is = ResourceUtils.getResourceStream(templateName);
 		if (is == null) {
 			return;
 		}

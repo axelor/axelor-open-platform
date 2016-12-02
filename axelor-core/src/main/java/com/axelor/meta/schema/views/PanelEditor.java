@@ -25,7 +25,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.common.ClassUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -115,8 +114,10 @@ public class PanelEditor extends AbstractPanel {
 		if (items == null || forField == null || forField.getTarget() == null) {
 			return null;
 		}
-		final Class<?> target = ClassUtils.findClass(forField.getTarget());
-		if (target == null) {
+		final Class<?> target;
+		try {
+			target = Class.forName(forField.getTarget());
+		} catch (ClassNotFoundException e) {
 			return null;
 		}
 		this.targetFields = new ArrayList<>();

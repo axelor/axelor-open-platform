@@ -23,7 +23,7 @@ import java.util.Calendar;
 import java.util.Properties;
 
 import com.axelor.app.internal.AppFilter;
-import com.axelor.common.ClassUtils;
+import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
 
 public final class AppSettings {
@@ -40,7 +40,7 @@ public final class AppSettings {
 		InputStream stream = null;
 		try {
 			if (StringUtils.isBlank(config)) {
-				stream = ClassUtils.getResourceStream(config = DEFAULT_CONFIG_LOCATION);
+				stream = ResourceUtils.getResourceStream(config = DEFAULT_CONFIG_LOCATION);
 			} else {
 				stream = new FileInputStream(config);
 			}

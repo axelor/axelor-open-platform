@@ -30,7 +30,7 @@ import javax.mail.internet.MimeMultipart;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.axelor.common.ClassUtils;
+import com.axelor.common.ResourceUtils;
 
 public class MailSenderTest extends AbstractMailTest {
 
@@ -63,8 +63,8 @@ public class MailSenderTest extends AbstractMailTest {
 
 		final MailSender sender = new MailSender(account);
 
-		final String file = ClassUtils.getResource("com/axelor/mail/test-file.txt").getFile();
-		final String image = ClassUtils.getResource("com/axelor/mail/test-image.png").getFile();
+		final String file = ResourceUtils.getResource("com/axelor/mail/test-file.txt").getFile();
+		final String image = ResourceUtils.getResource("com/axelor/mail/test-image.png").getFile();
 
 		sender.compose()
 			.to(SEND_TO)

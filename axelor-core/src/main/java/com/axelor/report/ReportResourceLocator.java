@@ -30,8 +30,8 @@ import org.eclipse.birt.report.model.api.ModuleHandle;
 import org.eclipse.datatools.connectivity.oda.flatfile.ResourceLocator;
 
 import com.axelor.app.AppSettings;
-import com.axelor.common.ClassUtils;
 import com.axelor.common.FileUtils;
+import com.axelor.common.ResourceUtils;
 import com.axelor.db.internal.DBHelper;
 
 /**
@@ -119,9 +119,9 @@ public class ReportResourceLocator implements IResourceLocator {
 		}
 
 		// otherwise locate from the modules
-		URL url = ClassUtils.getResource(FileUtils.getFile("reports", fileName).getPath().replace("\\", "/"));
+		URL url = ResourceUtils.getResource(FileUtils.getFile("reports", fileName).getPath().replace("\\", "/"));
 		if (url == null) {
-			url = ClassUtils.getResource(FileUtils.getFile("reports", subDir, fileName).getPath().replace("\\", "/"));
+			url = ResourceUtils.getResource(FileUtils.getFile("reports", subDir, fileName).getPath().replace("\\", "/"));
 		}
 
 		return url;

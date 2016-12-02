@@ -27,7 +27,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.axelor.common.ClassUtils;
+import com.axelor.common.ResourceUtils;
 
 public class MailBuilderTest extends AbstractMailTest {
 
@@ -100,7 +100,7 @@ public class MailBuilderTest extends AbstractMailTest {
 	@Test
 	public void testAttachment() throws Exception {
 
-		String file = ClassUtils.getResource("log4j.properties").getFile();
+		String file = ResourceUtils.getResource("log4j.properties").getFile();
 		String url = "file://" + file;
 
 		Message message = sender.compose()

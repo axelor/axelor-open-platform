@@ -26,7 +26,6 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.common.ClassUtils;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
@@ -121,7 +120,12 @@ public class ActionGroup extends ActionResumable {
 				actionView.setViews(ImmutableList.of(view));
 
 				if (parts.length == 3) {
-					Class<?> model = ClassUtils.findClass(parts[2]);
+					Class<?> model;
+					try {
+						model = Class.forName(parts[2]);
+					} catch (ClassNotFoundException e) {
+						throw new IllegalArgumentException(e);
+					}
 					actionView.setModel(model.getName());
 					xml = XMLViews.findView(parts[1], parts[0], model.getName());
 				}

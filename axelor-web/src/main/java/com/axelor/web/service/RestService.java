@@ -59,7 +59,6 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
-import com.axelor.common.ClassUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
@@ -563,7 +562,7 @@ public class RestService extends ResourceService {
 		Model related = null;
 
 		try {
-			relatedClass = ClassUtils.findClass(relatedModel);
+			relatedClass = Class.forName(relatedModel);
 		} catch (Exception e) {}
 
 		if (relatedClass != null && relatedId != null) {

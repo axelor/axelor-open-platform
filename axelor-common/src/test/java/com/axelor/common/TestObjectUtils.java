@@ -42,13 +42,13 @@ public class TestObjectUtils {
 	
 	@Test
 	public void testGetResource() {
-		URL url = ClassUtils.getResource("log4j.properties");
+		URL url = ResourceUtils.getResource("log4j.properties");
 		Assert.assertNotNull(url);
 	}
 	
 	@Test
 	public void testGetResourceStream() {
-		InputStream stream = ClassUtils.getResourceStream("log4j.properties");
+		InputStream stream = ResourceUtils.getResourceStream("log4j.properties");
 		Assert.assertNotNull(stream);
 	}
 }

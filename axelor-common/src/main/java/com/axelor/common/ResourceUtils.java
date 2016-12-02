@@ -21,26 +21,11 @@ import java.io.InputStream;
 import java.net.URL;
 
 /**
- * The class provides static helper methods to deal with classes and resource.
+ * The class provides static helper methods to work with resources. It uses
+ * current thread's context {@link ClassLoader} to locate resources.
  * 
  */
-public final class ClassUtils {
-
-	/**
-	 * This is same as {@link Class#forName(String)} but throws
-	 * {@link IllegalArgumentException} if class is not found.
-	 * 
-	 * @param name
-	 *            name of the class to look for
-	 * @return the class found
-	 */
-	public static Class<?> findClass(String name) {
-		try {
-			return Class.forName(name);
-		} catch (ClassNotFoundException e) {
-			throw new IllegalArgumentException(name, e);
-		}
-	}
+public final class ResourceUtils {
 
 	/**
 	 * Finds the resource with the given name.

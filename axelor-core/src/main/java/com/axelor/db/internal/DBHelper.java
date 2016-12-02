@@ -38,7 +38,7 @@ import org.flywaydb.core.api.FlywayException;
 import org.w3c.dom.Document;
 
 import com.axelor.app.AppSettings;
-import com.axelor.common.ClassUtils;
+import com.axelor.common.ResourceUtils;
 import com.google.common.base.Throwables;
 
 /**
@@ -107,7 +107,7 @@ public class DBHelper {
 		jdbcPassword 	= settings.get(CONFIG_PASSWORD);
 
 		try (
-			final InputStream res = ClassUtils.getResourceStream("META-INF/persistence.xml")) {
+			final InputStream res = ResourceUtils.getResourceStream("META-INF/persistence.xml")) {
 			final DocumentBuilder db = dbf.newDocumentBuilder();
 			final Document document = db.parse(res);
 

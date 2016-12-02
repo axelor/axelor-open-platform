@@ -31,13 +31,13 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuditInterceptor;
-import com.axelor.common.ClassUtils;
+import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.internal.DBHelper;
 import com.axelor.db.internal.naming.ImplicitNamingStrategyImpl;
 import com.axelor.db.internal.naming.PhysicalNamingStrategyImpl;
-import com.axelor.db.tenants.TenantConnectionProvider;
 import com.axelor.db.tenants.AbstractTenantFilter;
+import com.axelor.db.tenants.TenantConnectionProvider;
 import com.axelor.db.tenants.TenantModule;
 import com.axelor.db.tenants.TenantResolver;
 import com.google.inject.AbstractModule;
@@ -203,7 +203,7 @@ public class JpaModule extends AbstractModule {
 	
 	private Properties updateCacheProperties(Properties properties) throws IOException {
 		final Properties config = new Properties();
-		config.load(ClassUtils.getResourceStream("ehcache-objects.properties"));
+		config.load(ResourceUtils.getResourceStream("ehcache-objects.properties"));
 
 		for (Object key : config.keySet()) {
 			String name = (String) key;

@@ -25,7 +25,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.common.ClassUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.meta.MetaStore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -277,7 +276,7 @@ public class PanelRelated extends AbstractPanel {
 
 	public Map<String, Object> getPerms() {
 		try {
-			return MetaStore.getPermissions(ClassUtils.findClass(getTarget()));
+			return MetaStore.getPermissions(Class.forName(getTarget()));
 		} catch (Exception e) {}
 		return null;
 	}

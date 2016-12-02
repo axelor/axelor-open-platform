@@ -22,7 +22,7 @@ import java.io.InputStreamReader;
 import javax.inject.Inject;
 
 import com.axelor.JpaTest;
-import com.axelor.common.ClassUtils;
+import com.axelor.common.ResourceUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 abstract class RpcTest extends JpaTest {
@@ -31,7 +31,7 @@ abstract class RpcTest extends JpaTest {
 	protected ObjectMapper mapper;
 
 	protected InputStreamReader read(String json) {
-		return new InputStreamReader(ClassUtils.getResourceStream("json/" + json));
+		return new InputStreamReader(ResourceUtils.getResourceStream("json/" + json));
 	}
 
 	protected String toJson(Object value) {

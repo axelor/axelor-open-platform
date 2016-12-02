@@ -36,8 +36,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.app.AppSettings;
-import com.axelor.common.ClassUtils;
 import com.axelor.common.FileUtils;
+import com.axelor.common.ResourceUtils;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.axelor.text.GroovyTemplates;
@@ -89,7 +89,7 @@ public class ActionExport extends Action {
 		}
 
 		if (reader == null) {
-			InputStream is = ClassUtils.getResourceStream(templatePath);
+			InputStream is = ResourceUtils.getResourceStream(templatePath);
 			if (is == null) {
 				throw new FileNotFoundException("No such template: " + templatePath);
 			}

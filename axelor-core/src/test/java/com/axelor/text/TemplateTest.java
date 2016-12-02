@@ -30,7 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.axelor.AbstractTest;
-import com.axelor.common.ClassUtils;
+import com.axelor.common.ResourceUtils;
 import com.google.common.collect.Maps;
 
 public class TemplateTest extends AbstractTest {
@@ -59,7 +59,7 @@ public class TemplateTest extends AbstractTest {
 	@Test
 	public void testGroovyInclude() throws Exception {
 	
-		InputStream stream = ClassUtils.getResourceStream("com/axelor/text/include-test.tmpl");
+		InputStream stream = ResourceUtils.getResourceStream("com/axelor/text/include-test.tmpl");
 		Reader reader = new InputStreamReader(stream);
 		
 		Templates templates = new GroovyTemplates();

@@ -30,8 +30,8 @@ import java.util.regex.Pattern;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import com.axelor.common.ClassUtils;
 import com.axelor.common.FileUtils;
+import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
 
 import ch.qos.logback.classic.Level;
@@ -171,7 +171,7 @@ public class LoggerConfiguration {
 		}
 
 		// don't do anything if default config found in classpath
-		if (ClassUtils.getResource(DEFAULT_CONFIG) != null) {
+		if (ResourceUtils.getResource(DEFAULT_CONFIG) != null) {
 			return;
 		}
 

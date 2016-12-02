@@ -31,7 +31,6 @@ import org.apache.shiro.authz.UnauthorizedException;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
-import com.axelor.common.ClassUtils;
 import com.axelor.common.Inflector;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaRepository;
@@ -79,7 +78,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 		}
 		Class<? extends Model> klass = null;
 		try {
-			klass = (Class) ClassUtils.findClass(file.getRelatedModel());
+			klass = (Class) Class.forName(file.getRelatedModel());
 		} catch (Exception e) {
 			return null;
 		}

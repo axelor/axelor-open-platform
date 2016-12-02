@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppSettings;
-import com.axelor.common.ClassUtils;
 import com.axelor.db.Query;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaSchedule;
@@ -90,7 +89,13 @@ public class JobRunner {
 		final String jobClass = meta.getJob();
 
 		log.info("Configuring job: {}, {}", name, cron);
-		final Class<?> klass = ClassUtils.findClass(jobClass);
+		Class<?> klass;
+		try {
+			klass = Class.forName(jobClass);
+		} catch (ClassNotFoundException e1) {
+			log.error("No such job class found: {}", jobClass);
+			return;
+		}
 		if (klass == null || !Job.class.isAssignableFrom(klass)) {
 			log.error("Invalid job class: {}", jobClass);
 			return;
