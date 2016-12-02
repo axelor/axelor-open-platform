@@ -1851,7 +1851,7 @@ Grid.prototype.onSort = function(event, args) {
 
 Grid.prototype.onButtonClick = function(event, args) {
 	
-	if ($(event.srcElement).is('.readonly')) {
+	if ($(event.srcElement || event.target).is('.readonly')) {
 		event.stopImmediatePropagation();
 		return false;
 	}
@@ -1950,7 +1950,7 @@ Grid.prototype.onItemClick = function(event, args) {
 
 Grid.prototype.onItemDblClick = function(event, args) {
 	
-	if ($(event.srcElement).is('img.slick-img-button,i.slick-icon-button')) {
+	if ($(event.srcElement || event.target).is('img.slick-img-button,i.slick-icon-button')) {
 		return this.onButtonClick(event, args);
 	}
 	
