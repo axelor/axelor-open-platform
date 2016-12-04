@@ -24,7 +24,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.axelor.common.reflections.ClassFinder;
 import com.axelor.common.reflections.Reflections;
@@ -50,7 +53,7 @@ public class MetaScanner {
 	 * @return list of resources matched
 	 */
 	public static ImmutableList<URL> findAll(String pattern) {
-		return Reflections.findResources(loader()).byName(pattern).find();
+		return Reflections.findResources(wrappedContextLoader()).byName(pattern).find();
 	}
 
 	/**
@@ -94,24 +97,29 @@ public class MetaScanner {
 	 */
 	public static URL[] findURLs() {
 		final List<URL> path = new ArrayList<>();
-		final URLClassLoader loader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
-		for (URL item : loader.getURLs()) {
-			final URL[] urls = { item };
-			try (final URLClassLoader cl = new URLClassLoader(urls)) {
+		for (URL item : findClassPath(Thread.currentThread().getContextClassLoader())) {
+			// for unit tests
+			if (item.getPath().endsWith("build/classes/test/")) {
+				path.add(item);
+				continue;
+			}
+			try (final URLClassLoader cl = new URLClassLoader(new URL[] { item }, null)) {
 				URL res = cl.findResource("module.properties");
 				if (res == null) {
 					res = cl.findResource("application.properties");
 				}
-				if (res != null || item.getPath().endsWith("build/classes/test/")) {
+				if (res != null) {
 					path.add(item);
 				}
 			} catch (IOException e) {
 			}
 		}
-		return path.toArray(new URL[]{});
+		return path.toArray(new URL[] {});
 	}
 
-	private static ClassLoader loader() {
+	private static ClassLoader wrappedContextLoader() {
+		// trick to speed-up search types in axelor modules only
+		// the wrapper class loader loads classes with original class loader only
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		return new URLClassLoader(findURLs(), null) {
 			@Override
@@ -119,6 +127,19 @@ public class MetaScanner {
 				return loader.loadClass(name);
 			}
 		};
+	}
+
+	private static Set<URL> findClassPath(ClassLoader classloader) {
+		final Set<URL> entries = new LinkedHashSet<>();
+		// search parent first as ClassLoader#loadClass() does.
+		final ClassLoader parent = classloader.getParent();
+		if (parent != null) {
+			entries.addAll(findClassPath(parent));
+		}
+		if (classloader instanceof URLClassLoader) {
+			entries.addAll(Arrays.asList(((URLClassLoader) classloader).getURLs()));
+		}
+		return entries;
 	}
 
 	/**
@@ -130,18 +151,18 @@ public class MetaScanner {
 	 * @see Reflections#findSubTypesOf(Class)
 	 */
 	public static <T> ClassFinder<T> findSubTypesOf(Class<T> type) {
-		return Reflections.findSubTypesOf(type, loader());
+		return Reflections.findSubTypesOf(type, wrappedContextLoader());
 	}
 
 	/**
-	 * Delegates to {@link Reflections#findTypes(ClassLoader)}
-	 * method and uses custom {@link ClassLoader} to speedup searching.
+	 * Delegates to {@link Reflections#findTypes(ClassLoader)} method and uses
+	 * custom {@link ClassLoader} to speedup searching.
 	 * 
 	 * This method search within module jar/directories only.
 	 * 
 	 * @see Reflections#findTypes()
 	 */
 	public static ClassFinder<?> findTypes() {
-		return Reflections.findTypes(loader());
+		return Reflections.findTypes(wrappedContextLoader());
 	}
 }
