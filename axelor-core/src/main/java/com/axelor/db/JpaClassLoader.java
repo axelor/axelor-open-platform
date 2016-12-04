@@ -17,20 +17,18 @@
  */
 package com.axelor.db;
 
-import java.net.URL;
-import java.net.URLClassLoader;
-
 /**
  * The class loader for domain objects.
- *
- * @todo implement code enhancer
- * @todo implement dynamic fields
- * @todo implement class reload
+ * 
  */
-public class JpaClassLoader extends URLClassLoader {
+public class JpaClassLoader extends ClassLoader {
 
 	public JpaClassLoader() {
-		super(new URL[0], Thread.currentThread().getContextClassLoader());
+		this(Thread.currentThread().getContextClassLoader());
+	}
+
+	public JpaClassLoader(ClassLoader parent) {
+		super(parent);
 	}
 
 	@Override
@@ -38,9 +36,10 @@ public class JpaClassLoader extends URLClassLoader {
 		try {
 			return super.findClass(name);
 		} catch (ClassNotFoundException e) {
-			Class<?> model = findModelClass(name);
-			if (model != null)
+			final Class<?> model = findModelClass(name);
+			if (model != null) {
 				return model;
+			}
 			throw e;
 		}
 	}
@@ -50,10 +49,11 @@ public class JpaClassLoader extends URLClassLoader {
 	 *
 	 */
 	private Class<?> findModelClass(String className) {
-		if (!className.startsWith("java.lang.") || className.contains("$"))
+		if (!className.startsWith("java.lang.") || className.contains("$")) {
 			return null;
-		String name = className.substring(className.lastIndexOf('.') + 1);
-		Class<?> klass = JpaScanner.findRepository(name);
+		}
+		final String name = className.substring(className.lastIndexOf('.') + 1);
+		final Class<?> klass = JpaScanner.findRepository(name);
 		if (klass == null) {
 			return JpaScanner.findModel(name);
 		}
