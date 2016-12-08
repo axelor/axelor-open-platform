@@ -17,13 +17,15 @@
  */
 package com.axelor.db.tenants;
 
-import com.axelor.app.AxelorModule;
+import com.google.inject.AbstractModule;
 
 /**
- * A Guice module to provide multi-tenant support.
+ * A Guice module to provide multi-tenancy support.
  *
  */
-public class TenantModule extends AxelorModule {
+public class TenantModule extends AbstractModule {
+
+	public static final String CONFIG_MULTI_TENANCY = "application.multi_tenancy";
 
 	@Override
 	protected void configure() {

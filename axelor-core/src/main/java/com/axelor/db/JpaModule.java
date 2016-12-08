@@ -36,7 +36,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.internal.DBHelper;
 import com.axelor.db.internal.naming.ImplicitNamingStrategyImpl;
 import com.axelor.db.internal.naming.PhysicalNamingStrategyImpl;
-import com.axelor.db.tenants.AbstractTenantFilter;
+import com.axelor.db.search.SearchModule;
 import com.axelor.db.tenants.TenantConnectionProvider;
 import com.axelor.db.tenants.TenantModule;
 import com.axelor.db.tenants.TenantResolver;
@@ -171,7 +171,8 @@ public class JpaModule extends AbstractModule {
 			}
 		}
 
-		if (settings.get(AbstractTenantFilter.CONFIG_MULTI_TENANT) != null) {
+		// multi-tenancy support
+		if (settings.getBoolean(TenantModule.CONFIG_MULTI_TENANCY, false)) {
 			properties.put(Environment.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name());
 			properties.put(Environment.MULTI_TENANT_CONNECTION_PROVIDER, TenantConnectionProvider.class.getName());
 			properties.put(Environment.MULTI_TENANT_IDENTIFIER_RESOLVER, TenantResolver.class.getName());

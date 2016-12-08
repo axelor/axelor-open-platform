@@ -41,8 +41,6 @@ import com.axelor.auth.db.User;
  */
 public abstract class AbstractTenantFilter implements Filter {
 
-	public static final String CONFIG_MULTI_TENANT = "application.multi_tenancy";
-
 	protected static final String TENANT_COOKIE_NAME = "TENANTID";
 	protected static final String TENANT_LOGIN_PARAM = "tenantId";
 
@@ -55,7 +53,7 @@ public abstract class AbstractTenantFilter implements Filter {
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		enabled = AppSettings.get().getBoolean(CONFIG_MULTI_TENANT, false);
+		enabled = AppSettings.get().getBoolean(TenantModule.CONFIG_MULTI_TENANCY, false);
 	}
 
 	@Override

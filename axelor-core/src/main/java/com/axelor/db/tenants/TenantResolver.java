@@ -33,7 +33,7 @@ public class TenantResolver implements CurrentTenantIdentifierResolver {
 	private static boolean enabled;
 
 	public TenantResolver() {
-		enabled = AppSettings.get().getBoolean(AbstractTenantFilter.CONFIG_MULTI_TENANT, false);
+		enabled = AppSettings.get().getBoolean(TenantModule.CONFIG_MULTI_TENANCY, false);
 	}
 	
 	public static String currentTenantIdentifier() {
