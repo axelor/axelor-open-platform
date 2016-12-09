@@ -247,8 +247,6 @@ ui.formInput('ManyToOne', 'Select', {
 
 	controller: ManyToOneCtrl,
 
-	showSelectionOn: "focus",
-
 	init: function(scope) {
 		this._super(scope);
 
@@ -602,8 +600,6 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 });
 
 ui.formInput('SuggestBox', 'ManyToOne', {
-
-	showSelectionOn: "focus",
 
 	link_editable: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);

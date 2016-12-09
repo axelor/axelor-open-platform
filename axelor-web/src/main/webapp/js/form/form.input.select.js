@@ -50,8 +50,6 @@ function parseNumber(field, value) {
 
 ui.formWidget('BaseSelect', {
 	
-	showSelectionOn: "focus",
-
 	findInput: function(element) {
 		return element.find('input:first');
 	},
@@ -78,15 +76,18 @@ ui.formWidget('BaseSelect', {
 	link_editable: function (scope, element, attrs, model) {
 
 		var input = this.findInput(element);
-
+		var showing = false;
+		var willShow = false;
+		
 		scope.showSelection = function(delay) {
-			if (scope.isReadonly()) {
+			if (scope.isReadonly() || showing || willShow) {
 				return;
 			}
 			if (input.is('.x-focus')) {
 				input.removeClass('.x-focus');
 				return;
 			}
+			willShow = true;
 			input.addClass('.x-focus');
 			doSetup(input);
 			setTimeout(function () {
@@ -94,6 +95,7 @@ ui.formWidget('BaseSelect', {
 					input.autocomplete("search" , '');
 					input.removeClass('.x-focus');
 				}
+				willShow = false;
 			}, delay || 100);
 		};
 
@@ -126,12 +128,10 @@ ui.formWidget('BaseSelect', {
 			return el;
 		}
 
-		var showOn = this.showSelectionOn;
 		var doSetup = _.once(function (input) {
 		
 			var loading = false;
 			var pending = null;
-			var showing = false;
 
 			function doLoad(request, response) {
 				if (loading) {
@@ -190,12 +190,11 @@ ui.formWidget('BaseSelect', {
 
 		input.focus(function(e) {
 			element.addClass('focus');
+			scope.showSelection(300);
 		}).blur(function() {
 			element.removeClass('focus');
-		}).keyup(function(e) {
-			// if TAB key
-			if (e.which === 9 && showOn === "focus") {
-				scope.showSelection(300);
+			if (showing) {
+				input.autocomplete('close');
 			}
 		}).keydown(function(e) {
 			var KEY = $.ui.keyCode;
@@ -205,9 +204,7 @@ ui.formWidget('BaseSelect', {
 				scope.handleDelete(e);
 			}
 		}).click(function() {
-			if (showOn === "click" || showOn === "focus") {
-				scope.showSelection();
-			}
+			scope.showSelection();
 		});
 	},
 
