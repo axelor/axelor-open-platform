@@ -359,7 +359,7 @@ ui.formInput('DateTime', {
 				oldValue = scope.getValue() || null;
 
 			if (value && !input.mask("valid")) {
-				return;
+				return model.$setViewValue(value); // force validation
 			}
 			if (_.isEmpty(masked)) {
 				value = null;
@@ -378,8 +378,12 @@ ui.formInput('DateTime', {
 		scope.validate = function(value) {
 			var minSize = props.minSize === 'now' ? moment() : props.minSize,
 				maxSize = props.maxSize,
-				input = moment(value),
+				val = moment(value),
 				valid = true;
+
+			if (value && !input.mask("valid")) {
+				return false;
+			}
 
 			if(isDate) {
 				if(minSize) minSize = moment(minSize).startOf('day');
@@ -391,12 +395,12 @@ ui.formInput('DateTime', {
 			}
 
 			if(minSize) {
-				if(!input) return false;
-				valid = !input.isBefore(minSize) ;
+				if(!val) return false;
+				valid = !val.isBefore(minSize) ;
 			}
 			if(valid && maxSize) {
-				if(!input) return true;
-				valid = !input.isAfter(maxSize) ;
+				if(!val) return true;
+				valid = !val.isAfter(maxSize) ;
 			}
 
 			return valid;
