@@ -207,11 +207,16 @@
 				if (editor.fields) {
 					editor.fields = processFields(editor.fields);
 				}
-				_.each(editor.items, function (child) {
-					if (child.name && collect.indexOf(child.name) === -1 && child.type === 'field') {
-						collect.push(child.name);
-					}
-				});
+				var acceptItems = function (items) {
+					_.each(items, function (child) {
+						if (child.name && collect.indexOf(child.name) === -1 && child.type === 'field') {
+							collect.push(child.name);
+						} else if (child.type === 'panel') {
+							acceptItems(child.items);
+						}
+					});
+				};
+				acceptItems(editor.items);
 			}
 
 			_.each(fields, function(item) {
