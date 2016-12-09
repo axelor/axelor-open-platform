@@ -291,6 +291,9 @@ ui.formDirective = function(name, object) {
 			function showEditable() {
 				var template_editable = self.template_editable;
 				if (scope.field && scope.field.editor) {
+					if (scope.field.editor.viewer && scope.$elem_readonly) {
+						return true;
+					}
 					template_editable = $('<div ui-panel-editor>');
 				}
 				if (_.isFunction(self.template_editable)) {
@@ -342,6 +345,9 @@ ui.formDirective = function(name, object) {
 				if (field.viewer) {
 					template_readonly = field.viewer;
 				} else if (field.editor && field.editor.viewer) {
+					if (scope.$elem_editable) {
+						return true;
+					}
 					template_readonly = $('<div ui-panel-editor>');
 				}
 				if (_.isFunction(self.template_readonly)) {
