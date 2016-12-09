@@ -306,9 +306,6 @@ ui.formDirective = function(name, object) {
 			function showEditable() {
 				var template_editable = self.template_editable;
 				if (scope.field && scope.field.editor) {
-					if (scope.field.editor.viewer && scope.$elem_readonly) {
-						return true;
-					}
 					template_editable = $('<div ui-panel-editor>');
 				}
 				if (_.isFunction(self.template_editable)) {
@@ -366,10 +363,7 @@ ui.formDirective = function(name, object) {
 						return ui.formatters.$fmt.apply(null, args);
 					};
 				} else if (field.editor && field.editor.viewer) {
-					if (scope.$elem_editable) {
-						return true;
-					}
-					template_readonly = $('<div ui-panel-editor>');
+					return showEditable();
 				}
 				if (_.isFunction(self.template_readonly)) {
 					template_readonly = self.template_readonly(scope);
