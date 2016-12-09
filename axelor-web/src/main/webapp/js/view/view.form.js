@@ -799,7 +799,9 @@ function FormViewCtrl($scope, $element) {
 				}
 			}
 		}
-		return $scope.switchTo(__switchBack || "grid");
+		if (__switchBack) {
+			return $scope.switchTo(__switchBack);
+		}
 	};
 
 	$scope.switchTo = function(type, callback) {
