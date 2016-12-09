@@ -907,7 +907,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			var values = _.filter(items, function (item) {
 				return !isEmpty(item);
 			});
-			if (items.length === 0) {
+			if (items.length === 0 && showOnNew) {
 				scope.addItem();
 			}
 			model.$setViewValue(values);
