@@ -417,7 +417,19 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 						return;
 					}
 					var missing = _.filter(_.keys(editor.fields), function (name) {
-						return !record.hasOwnProperty(name);
+						if (!record) return false;
+						if (name.indexOf('.') === -1) {
+							return !record.hasOwnProperty(name);
+						}
+						var path = name.split('.');
+						var nested = record;
+						for (var i = 0; i < path.length - 1; i++) {
+							nested = nested[path[i]];
+							if (!nested) {
+								return false;
+							}
+						}
+						return !nested.hasOwnProperty(path[path.length - 1]);
 					});
 					if (missing.length === 0) {
 						return;
