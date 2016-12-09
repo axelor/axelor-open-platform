@@ -190,11 +190,15 @@ ui.formWidget('BaseSelect', {
 
 		input.focus(function(e) {
 			element.addClass('focus');
-			scope.showSelection(300);
 		}).blur(function() {
 			element.removeClass('focus');
 			if (showing) {
 				input.autocomplete('close');
+			}
+		}).keyup(function(e) {
+			// if TAB key
+			if (e.which === 9) {
+				scope.showSelection(300);
 			}
 		}).keydown(function(e) {
 			var KEY = $.ui.keyCode;
