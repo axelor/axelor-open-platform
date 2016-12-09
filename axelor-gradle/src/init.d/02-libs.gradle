@@ -28,7 +28,7 @@ def libs = [
 
 	// jdbc
 	jdbc_hsqldb:		"org.hsqldb:hsqldb:2.3.2",
-	jdbc_postgres:		"org.postgresql:postgresql:9.4.1212",
+	jdbc_postgres:		"org.postgresql:postgresql:9.3-1101-jdbc41",
 
 	// hibernate/jpa
 	hibernate:			["org.hibernate:hibernate-core:4.2.8.Final",
