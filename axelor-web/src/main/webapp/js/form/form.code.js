@@ -37,7 +37,10 @@ ui.formInput('CodeEditor', {
 		var props = {
 			autofocus: true,
 			lineNumbers: true,
-			theme: field.codeTheme || "default"
+			theme: field.codeTheme || "default",
+			extraKeys: {
+				'Ctrl-F': function () {}
+			}
 		};
 
 		if (field.mode || field.codeSyntax) {
