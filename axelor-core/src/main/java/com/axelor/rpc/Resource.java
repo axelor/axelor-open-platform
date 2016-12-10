@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
+import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
@@ -59,6 +60,7 @@ import com.axelor.db.Repository;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
+import com.axelor.db.search.SearchService;
 import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.i18n.L10n;
@@ -277,6 +279,30 @@ public class Resource<T extends Model> {
 		}
 		return request.getCriteria();
 	}
+	
+	private Query<?> getSearchQuery(Request request) {
+		final SearchService searchService = Beans.get(SearchService.class);
+		if (request.getData() == null || !searchService.isEnabled()) {
+			return getQuery(request);
+		}
+
+		final Map<String, Object> data = request.getData();
+		final String searchText = (String) data.get("_searchText");
+
+		// try full-text search
+		if (!StringUtils.isEmpty(searchText)) {
+			try {
+				final List<Long> ids = searchService.fullTextSearch(model, searchText, request.getLimit());
+				if (ids.size() > 0) {
+					return JPA.all(model).filter("self.id in :ids").bind("ids", ids);
+				}
+			} catch (Exception e) {
+				// just log and fallback to default search
+				LOG.error("Unable to do full-text search: " + e.getMessage(), e);
+			}
+		}
+		return getQuery(request);
+	}
 
 	private Query<?> getQuery(Request request) {
 		Criteria criteria = getCriteria(request);
@@ -308,7 +334,7 @@ public class Resource<T extends Model> {
 		int offset = request.getOffset();
 		int limit = request.getLimit();
 
-		Query<?> query = getQuery(request);
+		Query<?> query = getSearchQuery(request);
 		List<?> data = null;
 		try {
 			if (request.getFields() != null) {

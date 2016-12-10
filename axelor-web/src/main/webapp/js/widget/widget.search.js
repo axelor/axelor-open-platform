@@ -838,6 +838,10 @@ ui.directive('uiFilterBox', function() {
 				} else {
 					search.criteria = _.clone(search.criteria);
 				}
+				
+				if (arguments.length > 1 && _.isString(arguments[1])) {
+					search._searchText = arguments[1];
+				}
 
 				var domains = [],
 					customs = [];
@@ -928,6 +932,7 @@ ui.directive('uiFilterBox', function() {
 
 				var filters = [],
 					fields = {},
+					nameField = this.nameField,
 					text = this.custTerm,
 					number = +(text);
 
@@ -936,10 +941,14 @@ ui.directive('uiFilterBox', function() {
 				if ((handler.schema || {}).freeSearch === 'all') {
 					fields = _.extend({}, this.$parent.fields, this.fields);
 				}
+				
+				if (!nameField) {
+					nameField = (_.extend({}, this.$parent.fields, this.fields).name || {}).name;
+				}
 
-				if (this.nameField && text) {
+				if (nameField && text) {
 					filters.push({
-						fieldName: this.nameField,
+						fieldName: nameField,
 						operator: 'like',
 						value: text
 					});
@@ -947,7 +956,7 @@ ui.directive('uiFilterBox', function() {
 
 				for(var name in fields) {
 
-					if (name === this.nameField || !text) continue;
+					if (name === nameField || !text) continue;
 
 					var fieldName = null,
 						operator = "like",
@@ -997,7 +1006,7 @@ ui.directive('uiFilterBox', function() {
 					criteria: filters
 				};
 
-				this.onFilter(criteria);
+				this.onFilter(criteria, text);
 			};
 		}],
 		link: function(scope, element, attrs) {

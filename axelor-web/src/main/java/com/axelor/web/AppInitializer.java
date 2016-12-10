@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppSettings;
+import com.axelor.db.search.SearchService;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.quartz.JobRunner;
 
@@ -42,6 +43,9 @@ public class AppInitializer extends HttpServlet {
 	@Inject
 	private JobRunner jobRunner;
 
+	@Inject
+	private SearchService searchService;
+	
 	@Override
 	public void init() throws ServletException {
 		LOGGER.info("Initializing...");
@@ -50,6 +54,15 @@ public class AppInitializer extends HttpServlet {
 			moduleManager.initialize(false, AppSettings.get().getBoolean("data.import.demo-data", true));
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
+		}
+
+		// initialize search index
+		if (searchService.isEnabled()) {
+			try {
+				searchService.createIndex(false);
+			} catch (InterruptedException e) {
+				LOGGER.error(e.getMessage(), e);
+			}
 		}
 
 		try {

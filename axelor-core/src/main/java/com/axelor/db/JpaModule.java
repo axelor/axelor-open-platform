@@ -36,6 +36,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.internal.DBHelper;
 import com.axelor.db.internal.naming.ImplicitNamingStrategyImpl;
 import com.axelor.db.internal.naming.PhysicalNamingStrategyImpl;
+import com.axelor.db.search.SearchMappingFactory;
 import com.axelor.db.search.SearchModule;
 import com.axelor.db.tenants.TenantConnectionProvider;
 import com.axelor.db.tenants.TenantModule;
@@ -153,6 +154,7 @@ public class JpaModule extends AbstractModule {
 		} catch (Exception e) {
 		}
 
+		install(new SearchModule());
 		install(new TenantModule());
 		install(new JpaPersistModule(jpaUnit).properties(properties));
 		if (this.autostart) {
@@ -176,6 +178,21 @@ public class JpaModule extends AbstractModule {
 			properties.put(Environment.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name());
 			properties.put(Environment.MULTI_TENANT_CONNECTION_PROVIDER, TenantConnectionProvider.class.getName());
 			properties.put(Environment.MULTI_TENANT_IDENTIFIER_RESOLVER, TenantResolver.class.getName());
+		}
+
+		// hibernate-search support
+		if ("none".equalsIgnoreCase(settings.get(SearchModule.CONFIG_DIRECTORY_PROVIDER))) {
+			properties.put(org.hibernate.search.cfg.Environment.AUTOREGISTER_LISTENERS, "false");
+			properties.remove(SearchModule.CONFIG_DIRECTORY_PROVIDER);
+		} else {
+			if (properties.getProperty(SearchModule.CONFIG_DIRECTORY_PROVIDER) == null) {
+				properties.setProperty(SearchModule.CONFIG_DIRECTORY_PROVIDER, SearchModule.DEFAULT_DIRECTORY_PROVIDER);
+			}
+			if (properties.getProperty(SearchModule.CONFIG_INDEX_BASE) == null) {
+				properties.setProperty(SearchModule.CONFIG_INDEX_BASE,
+						settings.getPath(SearchModule.CONFIG_INDEX_BASE, SearchModule.DEFAULT_INDEX_BASE));
+			}
+			properties.put(org.hibernate.search.cfg.Environment.MODEL_MAPPING, SearchMappingFactory.class.getName());
 		}
 
 		if (DBHelper.isDataSourceUsed()) {
