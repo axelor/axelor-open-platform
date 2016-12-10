@@ -208,9 +208,10 @@ public class ViewService extends AbstractService {
 			Response searchResponse = service.findView(null, searchForm, "form");
 			data.put("searchForm", searchResponse.getData());
 		}
-
-		if (view instanceof AbstractView) {
-			data.putAll(MetaStore.findFields(findClass(model), findNames((AbstractView) view)));
+		
+		final Class<?> modelClass = findClass(model);
+		if (view instanceof AbstractView && modelClass != null) {
+			data.putAll(MetaStore.findFields(modelClass, findNames((AbstractView) view)));
 		}
 
 		response.setData(data);
