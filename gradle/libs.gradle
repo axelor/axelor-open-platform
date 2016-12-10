@@ -45,7 +45,7 @@ libs.greenmail = "com.icegreen:greenmail:1.4.1"
 
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.3.3"
-libs.jdbc_postgres = "org.postgresql:postgresql:9.4.1212"
+libs.jdbc_postgres = "org.postgresql:postgresql:9.4.1212.jre7"
 libs.jdbc_mysql = "mysql:mysql-connector-java:5.1.36"
 
 // Hibernate
