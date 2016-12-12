@@ -1,7 +1,109 @@
 # Current (4.0.1)
 
 ## Bug fixes
- 
+
+- fix html field issue in grid widget
+- fix tree view dashlet reload issue
+- fix various nested editor issues
+- fix edit-window attribute on panel-related
+- fix pagination issue
+- fix m2o with canView=false not working
+- fix forceEdit view-param to open record in edit mode
+- fix wrong alignment of fields wWhen we show/hide first field in a row dynamically
+- fix grid view context issue for readonlyIf condition
+- fix dashlet dynamic title change issue
+- fix domain context update issue on chart dashlets
+- fix date/datetime default value (default="now")
+- fix Entity.equals and HashKey annotation issues
+- fix view loader for unresolved imports : check only once all modules are installed
+- fix dummy field update issue
+- fix selection flag issue in nested o2m
+- fix 'save' action that should always save main record
+- fix missing variable $user & $group in expression evaluator
+- fix hilite in kanban view
+- fix tag-select widget issue
+- fix label style of inline boolean widget
+- fix ref-select widget issues
+- fix colorBy issue in calendar view
+- fix editable dummy field issue
+- fix i18n extract text from static and help fields
+- fix unnecessary call to onLoad action
+- fix grid column title reset issue
+- fix advance search state lost issue
+- fix duplicate onChange action and select request on o2m
+- fix app locale issue
+- fix dirty record on copy
+- fix dms view issue with document/spreadsheet
+- fix selection field issue with wrong search text
+- fix zIndex issue on grid's filter inputs
+- fix multiline cdata text of static/help extraction issue
+- fix license headers issue if path has "data" folder
+- fix default values issue on form view
+- fix reload root record with actions
+- fix calendar view not considering end date when feching items
+- fix grid widget onChange issue
+- fix missing title on selector popup
+- fix calendar view legends clipped issue
+- fix height attribute issue on text field
+- fix boolean tracking value
+- fix Html and Text widget validation issues
+- fix selection ordering issue
+- fix 'user.lang' app info
+- fix missing adapters for CSV sub binding
+- fix scaffolding templates
+- fix 'tag-get' preference over 'tag-count'
+- fix menu tag display issue
+- fix field permission readonlyIf condition conflict
+- fix onChange issue on date widget
+- fix dotted fields support in field editor
+- fix issue when creating new user with custom button
+- fix readonly calendar view issue
+- fix chart rendering on missing value
+- fix readonly button issue in grid widget
+- fix js expression not trigger on editor field
+- fix editor with panel not loading nested values
+- fix action-attrs issues on editor used as viewer
+- fix code widget keyboard shortcut conflict
+- fix selection widget issue in firefox
+
+## Improvements
+
+- improve visibility of boolean values in grid
+- add support for archived records in search view
+- allow to select search view objects with actions
+- allow helpLink all views
+- add sidebar attribute support on dashlet
+- change default gantt view mode to "week"
+- improve CORS support
+- show different icon for view only popup on m2o
+- allow to open record on kanban item click
+- add 'no records found' message to kanban view
+- use same js expression helpers for custom views
+- improve load more records button design
+- style disabled btn-link in form view
+- improve calendar bubble content
+- do not allow sorting of transient fields
+- don't log actions ending with MenuTag()
+- implement field reset error feature
+- don't open relational field in new tab if currently in popup
+- apply license header on generate code
+- add support for onLoad actions on multi-object search
+- generate entity base class MetaField instances
+- return 0 as hashCode if no hashKey defined
+- improve default views
+- don't save translated title of default tracking subject
+- add priority field in MetaSelect views
+- add support to disable kanban drag&drop feature
+- improve calendar locale based on user lang
+- implement CSV search call feature
+- upgrade postgresql-jdbc 9.4.1212
+- add support for setting query readOnly
+- add some optimization on search and count queries
+- do not add empty editor on o2m if x-show-on-new is false
+- improve datetime field validation
+- do not try to switch back is no other views found
+- allow enter key to update page size
+
 # 4.0.0 (2016-05-09)
 
 Tones of new features, new refreshed look and feel and more.
