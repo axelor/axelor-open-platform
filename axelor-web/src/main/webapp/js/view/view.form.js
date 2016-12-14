@@ -505,12 +505,13 @@ function FormViewCtrl($scope, $element) {
 		
 		function afterVewLoaded() {
 			if ($scope.defaultValues === null) {
-				$scope.defaultValues = {};
+				var defaultValues = {};
 				_.each($scope.fields, function (field, name) {
 					if (field.defaultValue !== undefined) {
 						$scope.defaultValues[name] = field.defaultValue;
 					}
 				});
+				$scope.defaultValues = _.isEmpty(defaultValues) ? undefined : defaultValues;
 			}
 
 			// ensure correct date/datetime
