@@ -123,7 +123,7 @@ function getButtons(scope, element) {
 				'Arial, Helvetica, sans-serif': '<span style="font-family: Arial, Helvetica, sans-serif">Arial</span>',
 				'"Courier New", Courier, monospace': '<span style="font-family: \"Courier New\", Courier, monospace">Courier New</span>',
 				'Comic Sans, Comic Sans MS, cursive': '<span style="font-family: Comic Sans, Comic Sans MS, cursive">Comic Sans</span>',
-				'Impact, fantasy': '<span style="font-family: Impact, fantasy">Impact</span>',
+				'Impact, fantasy': '<span style="font-family: Impact, fantasy">Impact</span>'
 		    })
 		},
 		fontSize: lite ? false : {
