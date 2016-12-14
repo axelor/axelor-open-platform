@@ -508,7 +508,7 @@ function FormViewCtrl($scope, $element) {
 				var defaultValues = {};
 				_.each($scope.fields, function (field, name) {
 					if (field.defaultValue !== undefined) {
-						$scope.defaultValues[name] = field.defaultValue;
+						defaultValues[name] = field.defaultValue;
 					}
 				});
 				$scope.defaultValues = _.isEmpty(defaultValues) ? undefined : defaultValues;
