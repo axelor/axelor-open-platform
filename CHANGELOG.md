@@ -65,6 +65,9 @@
 - fix action-attrs issues on editor used as viewer
 - fix code widget keyboard shortcut conflict
 - fix selection widget issue in firefox
+- fix save DMS permission NPE issue
+- fix x-lite attribute on html field
+- dix default values handler causing widget state reset
 
 ## Improvements
 
