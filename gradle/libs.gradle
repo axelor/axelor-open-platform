@@ -4,8 +4,8 @@ def versions = [:]
 // versions
 versions.guice = "4.1.0"
 versions.guava = "19.0"
-versions.hibernate = "5.2.5.Final"
-versions.hibernate_validator = "5.3.3.Final"
+versions.hibernate = "5.2.6.Final"
+versions.hibernate_validator = "5.3.4.Final"
 versions.hibernate_search = "5.7.0.Beta1"
 
 versions.groovy = "2.4.7"
