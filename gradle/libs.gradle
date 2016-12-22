@@ -6,7 +6,7 @@ versions.guice = "4.1.0"
 versions.guava = "19.0"
 versions.hibernate = "5.2.6.Final"
 versions.hibernate_validator = "5.3.4.Final"
-versions.hibernate_search = "5.7.0.Beta1"
+versions.hibernate_search = "5.7.0.Beta2"
 
 versions.groovy = "2.4.7"
 versions.resteasy = "3.1.0.Final"
