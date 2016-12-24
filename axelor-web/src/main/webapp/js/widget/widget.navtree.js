@@ -32,6 +32,7 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 			var items = [];
 			var menus = [];
 			var nodes = {};
+			var searchItems = [];
 
 			var handler = $scope.itemClick();
 
@@ -68,9 +69,27 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 				items.forEach(function (item) {
 					if (item.children.length === 0) {
 						delete item.children;
+						var label = item.title;
+						var parent = nodes[item.parent];
+						var lastParent;
+						while (parent) {
+							lastParent = parent;
+							parent = nodes[parent.parent];
+							if (parent) {
+								label = lastParent.title + "/" + label;
+							}
+						}
+						searchItems.push(_.extend({
+							title: item.title,
+							label: label,
+							action: item.action,
+							category: lastParent ? lastParent.name : '',
+							categoryTitle: lastParent ? lastParent.title : ''
+						}));
 					}
 				});
 				$scope.menus = menus;
+				$scope.searchItems = searchItems;
 			};
 
 			this.update = function (data) {
@@ -93,16 +112,104 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 			});
 		}],
 		link: function (scope, element, attrs, ctrl) {
-			
+			var input = element.find('input');
+			scope.showSearch = !!axelor.device.mobile;
+			scope.toggleSearch = function (show) {
+				input.val('');
+				if (!axelor.device.mobile) {
+					scope.showSearch = show === undefined ? !scope.showSearch : show;
+				}
+			}
+			scope.onShowSearch = function () {
+				scope.showSearch = true;
+				setTimeout(function () {
+					input.val('').focus();
+				});
+			}
+
+			input.attr('placeholder', _t('Search...'));
+			input.blur(function (e) {
+				scope.$timeout(function () {
+					scope.toggleSearch(false);
+				});
+			});
+			input.keydown(function (e) {
+				if (e.keyCode ===  27) { // escape
+					scope.$timeout(function () {
+						scope.toggleSearch(false);
+					});
+				}
+			});
+
+			function search(request, response) {
+				var term = request.term;
+				var items = _.filter(scope.searchItems, function (item) {
+					var text = item.categoryTitle + '/' + item.label;
+					var search = term;
+					if (search[0] === '/') {
+						search = search.substring(1);
+						text = item.title;
+					}
+					text = text.replace('/', '').toLowerCase();
+					if (search[0] === '"' || search[0] === '=') {
+						search = search.substring(1);
+						if (search.indexOf('"') === search.length - 1) {
+							search = search.substring(0, search.length - 1);
+						}
+						return text.indexOf(search) > -1;
+					}
+					var parts = search.toLowerCase().split(/\s+/);
+					for (var i = 0; i < parts.length; i++) {
+						if (text.indexOf(parts[i]) === -1) {
+							return false;
+						}
+					}
+					return parts.length > 0;
+				});
+				response(items);
+			}
+
 			MenuService.all().success(function (res) {
 				ctrl.load(res.data);
+				input.autocomplete({
+					source: search,
+					select: function (e, ui) {
+						ctrl.onClick(e, ui.item);
+						scope.$timeout(function () {
+							scope.toggleSearch(false);
+						});
+					},
+					appendTo: element.parent()
+				});
+				
+				input.data('autocomplete')._renderMenu = function (ul, items) {
+					var all = _.groupBy(items, 'category');
+					var that = this;
+					scope.menus.forEach(function (menu) {
+						var found = all[menu.name];
+						if (found) {
+							ul.append("<li class='ui-menu-category'>"+ menu.title +"</li>");
+				            found.forEach(function (item) {
+				            	that._renderItemData(ul, item);
+				            });
+						}
+					});
+				};
 			});
 		},
 		replace: true,
 		template:
-			"<ul class='nav nav-tree'>" +
-				"<li ng-repeat='menu in menus' ui-nav-sub-tree x-menu='menu'></li>" +
-			"</ul>"
+			"<div>" +
+				"<div class='nav-search-toggle' ng-show='!showSearch'>" +
+					"<i ng-click='onShowSearch()' class='fa fa-angle-down'></i>" +
+				"</div>" +
+				"<div class='nav-search' ng-show='showSearch'>" +
+					"<input type='text'>" +
+				"</div>" +
+				"<ul class='nav nav-tree'>" +
+					"<li ng-repeat='menu in menus' ui-nav-sub-tree x-menu='menu'></li>" +
+				"</ul>" +
+			"</div>"
 	};
 }]);
 
