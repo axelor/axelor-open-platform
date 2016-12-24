@@ -137,7 +137,7 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
 			group.addPermission(__self__);
 			group.addPermission(__create__);
 			group.addPermission(__parent__);
-			user.addPermission(__meta__);
+			group.addPermission(__meta__);
 		}
 
 		entity.setPermission(permission);

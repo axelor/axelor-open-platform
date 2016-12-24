@@ -124,17 +124,32 @@
     </xsd:attribute>
     <xsd:attribute name="tag" type="xsd:string">
       <xsd:annotation>
-        <xsd:documentation>Specify a tag to show on menu item.</xsd:documentation>
+        <xsd:documentation>
+          Specify a tag to show on menu item as a fixed label.
+          This attribute gets preference over 'tag-count' and 'tag-get' attributes.
+        </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="tag-count" type="xsd:boolean">
       <xsd:annotation>
-        <xsd:documentation>Specify whether to use count of menu action records as tag.</xsd:documentation>
+        <xsd:documentation>
+          Specify whether to use count of menu action records as tag.
+        </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="tag-get" type="xsd:string">
       <xsd:annotation>
-        <xsd:documentation>Specify a method call to get tag value.</xsd:documentation>
+        <xsd:documentation>
+          <![CDATA[
+          Specify a method call to get tag value.
+          This attribute gets preference over 'tag-count' attribute.
+          The signature of the controller method should be:<br><br>
+
+          <code>
+          	void someMethod(ActionRequest request, ActionResponse response)
+          </code>
+          ]]>
+        </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="tag-style" type="tns:LabelStyle">
@@ -1694,6 +1709,11 @@
         </xsd:attribute>
         <xsd:attribute name="cardWidth" use="prohibited"/>
         <xsd:attribute name="orderBy" use="prohibited"/>
+        <xsd:attribute name="draggable" type="xsd:boolean" default="true">
+          <xsd:annotation>
+            <xsd:documentation>Whether to enable drag &amp;&amp; drop feature.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="sequenceBy" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>Specify a numeric field to re-order cards.</xsd:documentation>

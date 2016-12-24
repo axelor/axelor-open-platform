@@ -161,10 +161,11 @@ ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $
 		}
 
 		var sequenceBy = fields[view.sequenceBy] || {};
-		if (["integer", "long"].indexOf(sequenceBy.type) === -1) {
+		if (["integer", "long"].indexOf(sequenceBy.type) === -1 || ["id", "version"].indexOf(sequenceBy.name) > -1) {
 			throw new Error("Invalid sequenceBy field in view: " + view.name);
 		}
 
+		$scope.sortableOptions.disabled = !view.draggable;
 		$scope.columns = columns;
 		$scope.colSpan = "kanban-cs-" + columns.length;
 	};

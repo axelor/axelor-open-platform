@@ -512,7 +512,8 @@ td.form-item > * {
 .ng-invalid > textarea,
 .ng-invalid > .picker-input input,
 .ng-invalid > .ui-spinner input,
-.ng-invalid > .tag-select {
+.ng-invalid > .tag-select,
+.ng-invalid > .form-item-container > .wysiwyg-container {
 	border-color: #B94A48;
 }
 
@@ -528,7 +529,8 @@ td.form-item > * {
 .nested-not-required .form-item .ng-invalid > textarea,
 .nested-not-required .form-item .ng-invalid > .picker-input input,
 .nested-not-required .form-item .ng-invalid > .ui-spinner input,
-.nested-not-required .form-item .ng-invalid > .tag-select {
+.nested-not-required .form-item .ng-invalid > .tag-select
+.nested-not-required .form-item .ng-invalid > .form-item-container > .wysiwyg-container {
 	border-color: #ccc;
 }
 

@@ -15,18 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.meta;
+package com.axelor.meta.loader;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import java.io.InputStream;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.persistence.Query;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.axelor.common.ResourceUtils;
+import com.axelor.meta.MetaTest;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.FormInclude;
@@ -38,6 +43,9 @@ import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
 public class TestViews extends MetaTest {
+	
+	@Inject
+	private ViewLoader loader;
 
 	@Test
 	public void test1() throws Exception {
@@ -109,29 +117,22 @@ public class TestViews extends MetaTest {
 	}
 
 	@Test
+	@Transactional
 	public void testInclude() throws Exception {
-		ObjectViews views = this.unmarshal("com/axelor/meta/Include.xml", ObjectViews.class);
+		
+		try (InputStream is = ResourceUtils.getResourceStream("com/axelor/meta/Include.xml")) {
+			loader.process(is, new Module("test"), false);
 
-		MetaStore.resister(views);
+			final AbstractView form1 = XMLViews.findView("contact-form1", null, null, "test");
+			final AbstractView form2 = XMLViews.findView("contact-form2", null, null, "test");
 
-		assertNotNull(views);
-		assertNotNull(views.getViews());
-		assertEquals(2, views.getViews().size());
+			assertTrue(form1 instanceof FormView);
+			assertTrue(form2 instanceof FormView);
 
-		FormView view = (FormView) views.getViews().get(1);
+			final FormInclude include = (FormInclude) ((FormView) form2).getItems().get(0);
+			final AbstractView included = include.getView();
 
-		assertNotNull(view.getItems());
-		assertEquals(2, view.getItems().size());
-
-		FormInclude include = (FormInclude) view.getItems().get(0);
-
-		AbstractView included = include.getView();
-
-		assertNotNull(included);
-		Assert.assertTrue(included instanceof FormView);
-
-		String json = toJson(include);
-
-		assertNotNull(json);
+			assertEquals(form1.getName(), included.getName());
+		}
 	}
 }

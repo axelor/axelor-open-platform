@@ -162,7 +162,7 @@ public class Field extends SimpleWidget {
 	private String codeTheme;
 
 	@XmlAttribute(name = "x-lite")
-	private String lite;
+	private Boolean lite;
 
 	@XmlAttribute(name = "x-labels")
 	private Boolean labels;
@@ -444,11 +444,11 @@ public class Field extends SimpleWidget {
 		this.codeTheme = codeTheme;
 	}
 
-	public String getLite() {
+	public Boolean getLite() {
 		return lite;
 	}
 
-	public void setLite(String lite) {
+	public void setLite(Boolean lite) {
 		this.lite = lite;
 	}
 

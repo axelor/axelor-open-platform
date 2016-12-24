@@ -343,6 +343,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 
 		var main = element.children('.calendar-main');
 		var mini = element.find('.calendar-mini');
+		var legend = element.find('.calendar-legend');
 		
 		var schema = scope.schema;
 		var mode = schema.mode || "month";
@@ -429,13 +430,19 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 			}
 		});
 		
+		var lang = axelor.config["user.lang"] || 'en';
+		
 		var options = {
 
 			header: false,
 			
-			timeFormat: 'h(:mm)t',
+			timeFormat: lang === 'fr' ? 'H:mm' : 'h(:mm)t',
+
+			axisFormat: lang === 'fr' ? 'H:mm' : 'h(:mm)t',
 
 			timezone: 'local',
+			
+			lang: lang,
 			
 			editable: editable,
 			
@@ -506,14 +513,16 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 				container: 'body',
 				content: function() {
 					var html = $("<div></div>").addClass("calendar-bubble-content");
-					var singleDay = (event.allDay || !scope.isAgenda()) && (!event.end || moment(event.start).isSame(event.end, 'day'));
-					var dateFormat = !scope.isAgenda() || singleDay ? "LL" : "LLL";
+					var start = event.start;
+					var end = event.end && event.allDay ? moment(event.end).add(-1, 'second') : event.end;
+					var singleDay = (event.allDay || !scope.isAgenda()) && (!end || moment(start).isSame(end, 'day'));
+					var dateFormat = !scope.isAgenda() || event.allDay ? "ddd D MMM" : "ddd D MMM HH:mm";
 
-					$("<span>").text(moment(event.start).format(dateFormat)).appendTo(html);
+					$("<span>").text(moment(start).format(dateFormat)).appendTo(html);
 					
-					if (event.end && !singleDay) {
+					if (schema.eventStop && end && !singleDay) {
 						$("<span> - </span>").appendTo(html);
-						$("<span>").text(moment(event.end).format(dateFormat)).appendTo(html);
+						$("<span>").text(moment(end).format(dateFormat)).appendTo(html);
 					}
 					
 					$("<hr>").appendTo(html);
@@ -594,15 +603,16 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 
 			var popup = editor.isolateScope();
 			
-			popup.setEditable(scope.isEditable());
 			popup.show(record, function(result) {
 				RecordManager.add(result);
 			});
-			if (!record || !record.id) {
-				popup.waitForActions(function() {
+			popup.waitForActions(function() {
+				if (!record || !record.id) {
 					popup.$broadcast("on:new");
-				});
-			}
+				} else {
+					popup.setEditable(scope.isEditable());
+				}
+			});
 		};
 		
 		scope.isEditable = function() {
@@ -670,6 +680,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 			main.css('right', mini.parent().outerWidth(true));
 			main.fullCalendar('render');
 			main.fullCalendar('option', 'height', element.height());
+			legend.css("max-height", (legend.parent().height() - mini.height()));
 		}
 
 		main.on("adjustSize", _.debounce(adjustSize, 100));

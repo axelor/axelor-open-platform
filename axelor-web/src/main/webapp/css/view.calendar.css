@@ -46,6 +46,8 @@
 .calendar-legend {
 	padding-left: 4px;
 	margin-top: 8px;
+	padding-top: 10px;
+	overflow: auto;
 }
 
 .calendar-legend label {

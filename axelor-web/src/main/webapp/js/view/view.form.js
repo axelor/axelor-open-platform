@@ -505,12 +505,13 @@ function FormViewCtrl($scope, $element) {
 		
 		function afterVewLoaded() {
 			if ($scope.defaultValues === null) {
-				$scope.defaultValues = {};
+				var defaultValues = {};
 				_.each($scope.fields, function (field, name) {
 					if (field.defaultValue !== undefined) {
-						$scope.defaultValues[name] = field.defaultValue;
+						defaultValues[name] = field.defaultValue;
 					}
 				});
+				$scope.defaultValues = _.isEmpty(defaultValues) ? undefined : defaultValues;
 			}
 
 			// ensure correct date/datetime
@@ -799,7 +800,9 @@ function FormViewCtrl($scope, $element) {
 				}
 			}
 		}
-		return $scope.switchTo(__switchBack || "grid");
+		if (__switchBack) {
+			return $scope.switchTo(__switchBack);
+		}
 	};
 
 	$scope.switchTo = function(type, callback) {

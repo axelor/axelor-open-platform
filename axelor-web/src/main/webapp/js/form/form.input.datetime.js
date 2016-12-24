@@ -253,6 +253,7 @@ ui.formInput('DateTime', {
 		var props = scope.field;
 		var isDate = this.isDate;
 		var isShowing = false;
+		var lastValue = null;
 		
 		var options = {
 			dateFormat: 'dd/mm/yy',
@@ -260,17 +261,16 @@ ui.formInput('DateTime', {
 			showTime: false,
 			showOn: null,
 			beforeShow: function (e, ui) {
+				lastValue = input.mask("value") || '';
 				isShowing = true;
 			},
 			onClose: function (e, ui) {
+				lastValue = null;
 				isShowing = false;
 			},
 			onSelect: function(dateText, inst) {
 				input.mask('value', dateText);
 				updateModel();
-				if (changed && onChange) {
-					setTimeout(onChange);
-				}
 				if (!inst.timeDefined) {
 					input.datetimepicker('hide');
 					setTimeout(function(){
@@ -293,7 +293,12 @@ ui.formInput('DateTime', {
 		var rendering = false;
 
 		input.on('change', function(e, ui){
-			changed = !rendering;
+			if (changed) return;
+			if (isShowing) {
+				changed = lastValue !== (input.mask("value") || '');
+			} else {
+				changed = !rendering;
+			}
 		});
 		input.on('blur', function() {
 			if (changed) {
@@ -354,7 +359,7 @@ ui.formInput('DateTime', {
 				oldValue = scope.getValue() || null;
 
 			if (value && !input.mask("valid")) {
-				return;
+				return model.$setViewValue(value); // force validation
 			}
 			if (_.isEmpty(masked)) {
 				value = null;
@@ -373,8 +378,12 @@ ui.formInput('DateTime', {
 		scope.validate = function(value) {
 			var minSize = props.minSize === 'now' ? moment() : props.minSize,
 				maxSize = props.maxSize,
-				input = moment(value),
+				val = moment(value),
 				valid = true;
+
+			if (value && !input.mask("valid")) {
+				return false;
+			}
 
 			if(isDate) {
 				if(minSize) minSize = moment(minSize).startOf('day');
@@ -386,12 +395,12 @@ ui.formInput('DateTime', {
 			}
 
 			if(minSize) {
-				if(!input) return false;
-				valid = !input.isBefore(minSize) ;
+				if(!val) return false;
+				valid = !val.isBefore(minSize) ;
 			}
 			if(valid && maxSize) {
-				if(!input) return true;
-				valid = !input.isAfter(maxSize) ;
+				if(!val) return true;
+				valid = !val.isAfter(maxSize) ;
 			}
 
 			return valid;
@@ -405,7 +414,7 @@ ui.formInput('DateTime', {
 					input.mask('value', value);
 					try {
 						$.datepicker._noUpdate = true;
-						$.datepicker._setDateDatepicker(input[0], value);
+						$.datepicker._setDateDatepicker(input[0], moment(scope.getValue()).toDate());
 					} finally {
 						$.datepicker._noUpdate = false;
 					}

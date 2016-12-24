@@ -123,7 +123,7 @@ function getButtons(scope, element) {
 				'Arial, Helvetica, sans-serif': '<span style="font-family: Arial, Helvetica, sans-serif">Arial</span>',
 				'"Courier New", Courier, monospace': '<span style="font-family: \"Courier New\", Courier, monospace">Courier New</span>',
 				'Comic Sans, Comic Sans MS, cursive': '<span style="font-family: Comic Sans, Comic Sans MS, cursive">Comic Sans</span>',
-				'Impact, fantasy': '<span style="font-family: Impact, fantasy">Impact</span>',
+				'Impact, fantasy': '<span style="font-family: Impact, fantasy">Impact</span>'
 		    })
 		},
 		fontSize: lite ? false : {
@@ -259,7 +259,11 @@ ui.formInput('Html', {
 		var textElement = element.find('textarea');
 		var buttons = getButtons(scope, textElement);
 
-		var height = +(scope.field.height) || null;
+		var props = scope.field,
+			minSize = +props.minSize,
+			maxSize = +props.maxSize,
+			height = +(scope.field.height) || null;
+
 		if (height) {
 			height = Math.max(100, height);
 		}
@@ -406,6 +410,23 @@ ui.formInput('Html', {
     		shell.setHTML(div[0].innerHTML);
 
     		div.remove();
+		};
+
+		scope.validate = function(value) {
+			if (_.isEmpty(value)) {
+				return true;
+			}
+			var length = value.length,
+				valid = true;
+
+			if (minSize) {
+				valid = length >= minSize;
+			}
+			if(valid && maxSize) {
+				valid = length <= maxSize;
+			}
+
+			return valid;
 		};
 
 	},

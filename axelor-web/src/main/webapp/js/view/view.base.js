@@ -535,16 +535,30 @@ ui.directive('uiRecordPager', function(){
 			
 			scope.showText = attrs.uiRecordPager !== "no-text";
 			
-			elText.click(function(e) {
-				elText.add(elChanger).toggle();
-			});
-
-			elChanger.on('click', 'button',  function() {
+			function updatePageSize() {
 				elText.add(elChanger).toggle();
 				if (scope.setPageSize) {
 					scope.setPageSize(elInput.val());
 				}
+			}
+
+			elText.click(function(e) {
+				if(scope.selectedTab.viewType !== "form") {
+					elText.add(elChanger).toggle();
+					elInput.focus().select();
+				}
 			});
+
+			elChanger.on('click', 'button',  function() {
+				updatePageSize();
+			});
+
+			elChanger.keyup(function(e) {
+				if(e.keyCode == 13) { // ENTER
+					updatePageSize();
+			    }
+			});
+
 		},
 		template:
 		'<div class="record-pager hidden-phone">'+

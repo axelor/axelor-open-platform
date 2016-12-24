@@ -2099,7 +2099,7 @@ Grid.prototype.onMoveRows = function (event, args) {
 
 Grid.prototype.onButtonClick = function(event, args) {
 	
-	if ($(event.srcElement).is('.readonly') || this._buttonClickRunning) {
+	if ($(event.srcElement || event.target).is('.readonly') || this._buttonClickRunning) {
 		event.stopImmediatePropagation();
 		return false;
 	}
@@ -2227,7 +2227,7 @@ Grid.prototype.__onItemClick = function(event, args) {
 
 Grid.prototype.onItemDblClick = function(event, args) {
 	
-	if ($(event.srcElement).is('img.slick-img-button,i.slick-icon-button')) {
+	if ($(event.srcElement || event.target).is('img.slick-img-button,i.slick-icon-button')) {
 		return this.onButtonClick(event, args);
 	}
 	

@@ -363,7 +363,7 @@ ui.formDirective = function(name, object) {
 						return ui.formatters.$fmt.apply(null, args);
 					};
 				} else if (field.editor && field.editor.viewer) {
-					template_readonly = $('<div ui-panel-editor>');
+					return showEditable();
 				}
 				if (_.isFunction(self.template_readonly)) {
 					template_readonly = self.template_readonly(scope);

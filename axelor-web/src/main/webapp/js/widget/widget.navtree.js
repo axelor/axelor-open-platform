@@ -345,8 +345,8 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
 				"<a href='#'>" +
 					"<img class='nav-image' ng-if='menu.icon' ng-src='{{menu.icon}}'></img>" +
 					"<span class='nav-icon' ng-if='menu.fa'><i class='fa' ng-class='menu.fa'></i></span>" +
-					"<span class='nav-title'>{{menu.title}}</span>" +
 					"<span ng-show='menu.tag' ng-class='menu.tagCss' class='nav-tag label'>{{menu.tag}}</span>" +
+					"<span class='nav-title'>{{menu.title}}</span>" +
 				"</a>" +
 			"</li>"
 	};

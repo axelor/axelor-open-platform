@@ -247,8 +247,6 @@ ui.formInput('ManyToOne', 'Select', {
 
 	controller: ManyToOneCtrl,
 
-	showSelectionOn: "focus",
-
 	init: function(scope) {
 		this._super(scope);
 
@@ -330,7 +328,10 @@ ui.formInput('ManyToOne', 'Select', {
 			input.attr('placeholder', input.is(':focus') ? _t('Search...') : null);
 		});
 		input.on("focus", function () {
-			input.attr('placeholder', _t('Search...'));
+			// XXX: firefox prevents click event, bug in FF?
+			if (!$.browser.mozilla) {
+				input.attr('placeholder', _t('Search...'));
+			}
 		});
 		input.on("blur", function () {
 			input.attr('placeholder', field.placeholder || '');
@@ -602,8 +603,6 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 });
 
 ui.formInput('SuggestBox', 'ManyToOne', {
-
-	showSelectionOn: "focus",
 
 	link_editable: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);

@@ -255,6 +255,7 @@ public class MetaService {
 			} catch (Exception e) {
 				LOG.error("Unable to read tag for menu: {}", item.getName());
 				LOG.trace("Error", e);
+				return null;
 			}
 		}
 

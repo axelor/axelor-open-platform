@@ -215,7 +215,8 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 	});
 }
 
-function $conv(value) {
+function $conv(value, type) {
+	if (!value && type === 'text') return 'N/A';
 	if (!value) return 0;
 	if (_.isNumber(value)) return value;
 	if (/^(-)?\d+(\.\d+)?$/.test(value)) {
@@ -261,7 +262,7 @@ function PlusData(series, data) {
 			value += $conv(item[series.key]);
 		});
 		return {
-			x: name,
+			x: name === 'null' ? 'N/A' : name,
 			y: value
 		};
 	 }).value();
@@ -270,7 +271,7 @@ function PlusData(series, data) {
 }
 
 function PlotData(series, data) {
-	var ticks = _.chain(data.dataset).pluck(data.xAxis).unique().value();
+	var ticks = _.chain(data.dataset).pluck(data.xAxis).unique().map(function (v) { return $conv(v, data.xType); }).value();
 	var groupBy = series.groupBy;
 	var datum = [];
 
@@ -278,7 +279,7 @@ function PlotData(series, data) {
 	.map(function (group, groupName) {
 		var name = groupBy ? groupName : null;
 		var values = _.map(group, function (item) {
-			var x = $conv(item[data.xAxis]) || 0;
+			var x = $conv(item[data.xAxis], data.xType) || 0;
 			var y = $conv(item[series.key] || name || 0);
 			return { x: x, y: y };
 		});

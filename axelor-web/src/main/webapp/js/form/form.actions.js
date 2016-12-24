@@ -630,7 +630,8 @@ ActionHandler.prototype = {
 			scope = this.scope,
 			formElement = this._getFormElement(),
 			formScope = formElement.data('$scope') || scope,
-			rootScope = self._getRootFormElement().scope();
+			rootForm = this._getRootFormElement(),
+			rootScope = rootForm.is('[ui-view-grid]') ? scope : rootForm.scope();
 
 		function doReload(pending) {
 			self._invalidateContext = true;

@@ -64,6 +64,10 @@ public class CSVInput {
 	@XStreamAsAttribute
 	private String prepareContext;
 
+	@XStreamAlias("search-call")
+	@XStreamAsAttribute
+	private String searchCall;
+
 	@XStreamImplicit(itemFieldName = "bind")
 	private List<CSVBind> bindings = Lists.newArrayList();
 
@@ -127,6 +131,14 @@ public class CSVInput {
 
 	public String getPrepareContext() {
 		return prepareContext;
+	}
+
+	public void setSearchCall(String searchCall) {
+		this.searchCall = searchCall;
+	}
+
+	public String getSearchCall() {
+		return searchCall;
 	}
 
 	public List<CSVBind> getBindings() {

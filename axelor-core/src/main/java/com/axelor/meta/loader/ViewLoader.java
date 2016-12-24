@@ -140,7 +140,7 @@ public class ViewLoader extends AbstractLoader {
 		return list;
 	}
 
-	private void process(InputStream stream, Module module, boolean update) throws JAXBException {
+	void process(InputStream stream, Module module, boolean update) throws JAXBException {
 		final ObjectViews all = XMLViews.unmarshal(stream);
 
 		for (AbstractView view : getList(all.getViews())) {

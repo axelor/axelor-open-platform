@@ -2,13 +2,13 @@
 <object-views xmlns="http://axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
 
-	<menuitem name="menu-hello" priority="100" title="Hello" icon="img/tree-folder.png" />
+	<menuitem name="menu-hello" order="-1000" title="Hello" icon="fa-folder" />
 
 	<menuitem name="menu-hello-all" parent="menu-hello"
-    	title="All Messages"
+    	title="All <%= model %>"
     	action="hello.all"/>
 
-	<action-view name="hello.all" title="Messages" model="com.axelor.<%= namespace %>.db.<%= model %>">
+	<action-view name="hello.all" title="All <%= model %>" model="com.axelor.<%= namespace %>.db.<%= model %>">
     	<view type="grid" name="hello-<%= namespace %>-grid"/>
 	    <view type="form" name="hello-<%= namespace %>-form"/>
 	</action-view>

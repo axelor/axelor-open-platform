@@ -334,18 +334,23 @@ public class Resource<T extends Model> {
 		int offset = request.getOffset();
 		int limit = request.getLimit();
 
-		Query<?> query = getSearchQuery(request);
+		Query<?> query = getSearchQuery(request).cacheable().readOnly();
 		List<?> data = null;
 		try {
+			if (limit > 0) {
+				response.setTotal(query.count());
+			}
 			if (request.getFields() != null) {
-				Query<?>.Selector selector = query.cacheable().select(request.getFields().toArray(new String[]{}));
+				Query<?>.Selector selector = query.select(request.getFields().toArray(new String[] {}));
 				LOG.debug("JPQL: {}", selector);
 				data = selector.fetch(limit, offset);
 			} else {
 				LOG.debug("JPQL: {}", query);
-				data = query.cacheable().fetch(limit, offset);
+				data = query.fetch(limit, offset);
 			}
-			response.setTotal(query.count());
+			if (limit <= 0) {
+				response.setTotal(data.size());
+			}
 		} catch (Exception e) {
 			EntityTransaction txn = JPA.em().getTransaction();
 			if (txn.isActive()) {
@@ -419,6 +424,8 @@ public class Resource<T extends Model> {
 
 		javax.persistence.Query q = JPA.em().createQuery(builder.toString());
 		q.setParameter("ids", ids);
+
+		QueryBinder.of(q).setCacheable().setReadOnly();
 
 		Map counts = Maps.newHashMap();
 		for (Object item : q.getResultList()) {
@@ -932,7 +939,7 @@ public class Resource<T extends Model> {
 					property.getName(), model.getSimpleName());
 
 			javax.persistence.Query query = JPA.em().createQuery(qs);
-			QueryBinder.of(query).bind(data);
+			QueryBinder.of(query).setCacheable().setReadOnly().bind(data);
 
 			Object name = query.getSingleResult();
 			data.put(property.getName(), name);

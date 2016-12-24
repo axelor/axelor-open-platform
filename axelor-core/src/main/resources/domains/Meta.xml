@@ -67,14 +67,14 @@
   	<string name="icon"/>
     <string name="iconBackground" />
     <string name="module"/>
-    <string name="tag" />
-    <string name="tagGet" />
-    <boolean name="tagCount" />
-    <string name="tagStyle" selection="label.style.selection" />
-    <boolean name="top" column="top_menu"/>
-    <boolean name="left" column="left_menu" default="true"/>
-    <boolean name="mobile" column="mobile_menu"/>
-    <boolean name="hidden" />
+    <string name="tag" title="Tag label"/>
+    <string name="tagGet" title="Tag method"/>
+    <boolean name="tagCount" title="Tag count"/>
+    <string name="tagStyle" selection="label.style.selection" title="Tag style"/>
+    <boolean name="top" column="top_menu" title="Top menu"/>
+    <boolean name="left" column="left_menu" default="true" title="Left menu"/>
+    <boolean name="mobile" column="mobile_menu" title="Mobile menu"/>
+    <boolean name="hidden" title="Hidden menu"/>
 
     <string name="link" />
 

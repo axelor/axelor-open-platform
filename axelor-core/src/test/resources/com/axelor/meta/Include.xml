@@ -8,7 +8,7 @@
     <field name="lastName"/>
   </form>
   
-  <form name="contact-form2" title="Contact" model="com.axelor.contact.db.Contact">
+  <form name="contact-form2" title="Contact" model="com.axelor.test.db.Contact">
     <include view="contact-form1"/>
     <field name="email"/>
   </form>

@@ -17,6 +17,7 @@
  */
 package com.axelor.data.csv;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -34,6 +35,7 @@ import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
+import com.axelor.inject.Beans;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -56,10 +58,16 @@ public class CSVBinder {
 
 	private boolean newBean;
 
+	private String searchCall;
+
 	private Map<String, DataAdapter> adapters = Maps.newHashMap();
 
 	public void registerAdapter(DataAdapter adapter) {
 		adapters.put(adapter.getName(), adapter);
+	}
+	
+	public void registerAdapters(Map<String, DataAdapter> map) {
+		adapters.putAll(map);
 	}
 
 	public String[] getFields() {
@@ -67,19 +75,20 @@ public class CSVBinder {
 	}
 
 	public CSVBinder(Class<?> beanClass, String[] fields, CSVInput csvInput) {
-		this(beanClass, fields, csvInput.getBindings(), true, csvInput.getSearch(), csvInput.isUpdate());
+		this(beanClass, fields, csvInput.getBindings(), true, csvInput.getSearch(), csvInput.isUpdate(), csvInput.getSearchCall());
 	}
 
 	public CSVBinder(Class<?> beanClass, String[] fields, CSVBind csvBind) {
-		this(beanClass, fields, csvBind.getBindings(), false, csvBind.getSearch(), csvBind.isUpdate());
+		this(beanClass, fields, csvBind.getBindings(), false, csvBind.getSearch(), csvBind.isUpdate(), null);
 	}
 
-	private CSVBinder(Class<?> beanClass, String[] fields, List<CSVBind> csvBinds, boolean autoBind, String query, boolean update) {
+	private CSVBinder(Class<?> beanClass, String[] fields, List<CSVBind> csvBinds, boolean autoBind, String query, boolean update, String searchCall) {
 		this.beanClass = beanClass;
 		this.fields = fields;
 		this.bindings = Lists.newArrayList();
 		this.query = query;
 		this.update = update;
+		this.searchCall = searchCall;
 
 		if (csvBinds != null)
 			this.bindings.addAll(csvBinds);
@@ -138,7 +147,15 @@ public class CSVBinder {
 	@SuppressWarnings("unchecked")
 	private Object find(Map<String, Object> params) {
 
-		if (this.query != null) {
+		if(this.searchCall != null) {
+			LOG.trace("call bean search: " + this.searchCall);
+			Object bean = callSearch(params);
+			LOG.trace("search found: " + bean);
+			if (update || bean != null) {
+				newBean = false;
+				return bean;
+			}
+		} else if (this.query != null) {
 			LOG.trace("search: " + this.query);
 			Object bean = JPA.all((Class<Model>) beanClass).filter(query).bind(params).cacheable().autoFlush(false).fetchOne();
 			LOG.trace("search found: " + bean);
@@ -155,6 +172,34 @@ public class CSVBinder {
 			throw new RuntimeException(e);
 		}
 	}
+
+	private Object callSearchObject;
+	private Method callSearchMethod;
+
+	@SuppressWarnings("unchecked")
+    public <T> T callSearch(Map<String, Object> context) {
+
+        if (Strings.isNullOrEmpty(searchCall)) {
+            return null;
+        }
+
+        try {
+            if (callSearchObject == null) {
+
+                String className = searchCall.split("\\:")[0];
+                String method = searchCall.split("\\:")[1];
+
+                Class<?> klass = Class.forName(className);
+                callSearchMethod = klass.getMethod(method, Map.class);
+                callSearchObject = Beans.get(klass);
+            }
+
+            return (T) callSearchMethod.invoke(callSearchObject, new Object[]{ context });
+        } catch (Exception e) {
+            System.err.println("EEE: " + e);
+            return null;
+        }
+    }
 
 	@SuppressWarnings("unchecked")
 	private Object findAll(Class<?> beanClass, String query, Map<String, Object> params) {
@@ -194,6 +239,7 @@ public class CSVBinder {
 			}
 		} else {
 			CSVBinder binder = new CSVBinder(type, fields, cb);
+			binder.registerAdapters(adapters);
 			value = binder.bind(values);
 		}
 		values.put(field, value);
@@ -268,6 +314,7 @@ public class CSVBinder {
 			// handle relational fields (including other case of m2m)
 			else if (p.getTarget() != null) {
 				CSVBinder b = new CSVBinder(p.getTarget(), fields, cb);
+				b.registerAdapters(adapters);
 				value = b.bind(values);
 			}
 
