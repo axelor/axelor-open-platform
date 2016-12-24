@@ -174,7 +174,6 @@
 	border-top: 4px solid #e7e7e7;
 	padding: 11px 15px 14px;
 	margin-top: -1px;
-	overflow: hidden;
 	cursor: move;
 }
 
@@ -214,6 +213,21 @@
 
 .dashboard .dashlet-pager {
 	margin-right: 8px;
+}
+
+.dashboard ul.dashlet-buttons {
+	list-style: none;
+	margin: 0;
+}
+
+.dashboard ul.dashlet-buttons > li {
+	list-style: none;
+	float: left;
+	margin: 0 4px;
+}
+
+.dashboard ul.dashlet-buttons > li > a {
+	color: #333;
 }
 
 .dashboard .dashlet-buttons > a,

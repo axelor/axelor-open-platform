@@ -732,6 +732,31 @@ var directiveFn = function(){
 			var svg = element.children('svg');
 			var form = element.children('.chart-controls');
 			
+			function doExport(data) {
+				var dataset = data.dataset || [];
+				var header = [];
+				_.each(dataset, function (item) {
+					header = _.unique(_.flatten([header, _.keys(item)]));
+				
+				});
+
+				var content = "data:text/csv;charset=utf-8," + header.join(';') + '\n';
+
+				dataset.forEach(function (item) {
+					var row = header.map(function (key) {
+						var val = item[key];
+						if (val === undefined || val === null) {
+							val = '';
+						}
+						return '"' + (''+val).replace(/"/g, '""') + '"';
+					});
+					content += row.join(';') + '\n';
+				});
+
+				var name = (data.title || 'export').toLowerCase();
+				ui.download(encodeURI(content), _.underscored(name) + '.csv');
+			}
+
 			scope.render = function(data) {
 				if (element.is(":hidden")) {
 					return;
@@ -742,6 +767,13 @@ var directiveFn = function(){
 						scope.title = data.title;
 					}
 					Chart(scope, svg, data);
+					var canExport = data && _.isArray(data.dataset);
+					scope.canExport = function () {
+						return canExport;
+					};
+					scope.onExport = function () {
+						doExport(data);
+					}
 					return;
 				});
 			};

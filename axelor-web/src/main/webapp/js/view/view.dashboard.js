@@ -292,16 +292,26 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 		template:
 			"<div class='dashlet hidden'>" +
 				"<div class='dashlet-header'>" +
-					"<div class='dashlet-title pull-left'>{{title}}</div>" +
-					"<div class='dashlet-buttons pull-right'>" +
-						"<a href='' ng-click='onRefresh()'><i class='fa fa-refresh'></i></a>" +
-						"<a href='' ng-click='onDashletToggle()'><i class='fa' ng-class='collapsedIcon'></i></a>" +
-					"</div>" +
+					"<ul class='dashlet-buttons pull-right'>" +
+						"<li class='dropdown'>" +
+							"<a href='' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-gear'></i></a>" +
+							"<ul class='dropdown-menu pull-right'>" +
+								"<li>" +
+									"<a href='' ng-click='onRefresh()' x-translate>Refresh</a>" +
+								"</li>" +
+								"<li ng-if='canExport()'>" +
+									"<a href='' ng-click='onExport()' x-translate>Export</a>" +
+								"</li>" +
+							"</ul>" +
+						"</li>" +
+						"<li><a href='' ng-click='onDashletToggle()'><i class='fa' ng-class='collapsedIcon'></i></a></li>" +
+					"</ul>" +
 					"<div class='dashlet-pager pull-right' ng-show='showPager'>" +
 						"<span class='dashlet-pager-text'>{{pagerText()}}</span>" +
 						"<a href='' ng-click='doPrev()' ng-class='{disabled: !canPrev()}'><i class='fa fa-step-backward'></i></a>" +
 						"<a href='' ng-click='doNext()' ng-class='{disabled: !canNext()}'><i class='fa fa-step-forward'></i></a>" +
 					"</div>" +
+					"<div class='dashlet-title'>{{title}}</div>" +
 				"</div>" +
 				"<div class='dashlet-body'></div>" +
 			"</div>"
