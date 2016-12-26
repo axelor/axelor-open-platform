@@ -26,9 +26,9 @@
     <ul class="dropdown-menu" style="display:block;position:static;margin-bottom:5px;">
       <li><a href="" tabindex="-1" ng-click="reloadTab(current)" x-translate>Refresh</a>
       <li class="divider"></li>
-      <li><a href="" tabindex="-1" ng-click="closeTab(current)" x-translate>Close</a></li>
+      <li ng-show="canCloseTab(current)"><a href="" tabindex="-1" ng-click="closeTab(current)" x-translate>Close</a></li>
       <li><a href="" tabindex="-1" ng-click="closeTabOthers(current)" x-translate>Close Others</a></li>
-      <li><a href="" tabindex="-1" ng-click="closeTabAll()" x-translate>Close All</a></li>
+      <li ng-show="canCloseTab(current)"><a href="" tabindex="-1" ng-click="closeTabAll()" x-translate>Close All</a></li>
     </ul>
   </div>
   <div class="nav-tabs-popup" ng-repeat="tab in navPopups" ui-view-popup="tab"></div>
