@@ -683,6 +683,11 @@
         <xsd:documentation>Specify whether to allow copy of o2m/m2m field items.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-can-export" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether to allow export to csv from o2m/m2m.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="x-direction" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>Specify the layout direction (horizontal, vertical) of some widgets(e.g. RadioSelect)</xsd:documentation>

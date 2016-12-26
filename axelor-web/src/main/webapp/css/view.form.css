@@ -375,6 +375,10 @@ table.form-layout .tabbable-tabs .tab-content {
 	padding-top: 4px;
 }
 
+.icons-bar a {
+	color: #333;
+}
+
 .icons-bar i {
 	margin: 2px;
 	padding: 2px;

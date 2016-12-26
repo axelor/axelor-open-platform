@@ -253,6 +253,15 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		}
 	};
 	
+	$scope.viewCanCopy = function () {
+		return this.hasPermission("create") && !this.isDisabled() && !this.isReadonly() && this.canCopy();
+	};
+
+	$scope.viewCanExport = function () {
+		if (!$scope.field || !($scope.field.widgetAttrs||{}).canExport) return false;
+		return this.hasPermission("export") && this.canExport();
+	};
+
 	$scope.getSelectedRecord = function() {
 		var selected = _.first($scope.selection || []);
 		if (_.isUndefined(selected))
@@ -656,11 +665,17 @@ ui.formInput('ManyToMany', 'OneToMany', {
 var panelRelatedTemplate = 
 "<div class='panel panel-related' ng-class='{noEdit: canView() && !canEdit()}'>" +
 	"<div class='panel-header'>" +
+		"<div class='icons-bar pull-right dropdown' ng-show='viewCanCopy() || viewCanExport()'>" +
+			"<a href='' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-caret-down'></i></a>" +
+			"<ul class='dropdown-menu'>" +
+				"<li ng-show='viewCanCopy()'><a href='' ng-click='onCopy()' x-translate>Duplicate</a></li>" +
+				"<li ng-show='viewCanExport()'><a href='' ng-click='onExport()' x-translate>Export</a></li>" +
+			"</ul>" +
+		"</div>" +
 		"<div class='icons-bar pull-right' ng-show='!isReadonly()'>" +
 			"<i ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()' title='{{\"Edit\" | t}}' class='fa fa-pencil'></i>" +
 			'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowView()" title="{{\'View\' | t}}" class="fa fa-file-text-o"></i>'+
 			"<i ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()' title='{{\"New\" | t}}' class='fa fa-plus'></i>" +
-			"<i ng-click='onCopy()' ng-show='hasPermission(\"create\") && !isDisabled() && canCopy()' title='{{\"Duplicate\" | t}}' class='fa fa-files-o'></i>" +
 			"<i ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()' title='{{\"Remove\" | t}}' class='fa fa-minus'></i>" +
 			"<i ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()' title='{{\"Select\" | t}}' class='fa fa-search'></i>" +
 		"</div>" +

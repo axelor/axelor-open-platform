@@ -533,7 +533,9 @@ function GridViewCtrl($scope, $element) {
 	};
 	
 	$scope.onExport = function (full) {
-		var fields = full ? [] : _.pluck($scope.view.items, 'name');
+		var view = $scope.view || $scope.schema || {};
+		if (!view.items) return;
+		var fields = full ? [] : _.pluck(view.items, 'name');
 		return ds.export_(fields).success(function(res) {
 			var fileName = res.fileName;
 			var filePath = 'ws/rest/' + $scope._model + '/export/' + fileName;
