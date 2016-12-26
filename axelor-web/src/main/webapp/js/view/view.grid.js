@@ -627,7 +627,7 @@ ui.directive('uiPortletGrid', function(){
 				tab.recordId = record.id;
 				tab.action = _.uniqueId('$act');
 
-				if ($scope._isPopup) {
+				if ($scope._isPopup || (($scope._viewParams || {}).params || {}).popup) {
 					tab.$popupParent = $scope;
 					tab.params = tab.params || {};
 					_.defaults(tab.params, {
