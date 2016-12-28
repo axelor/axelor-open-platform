@@ -210,7 +210,7 @@ public class Resource<T extends Model> {
 		final List<String> sortOn = Lists.newArrayList();
 		final Mapper mapper = Mapper.of(model);
 
-		boolean unique = true;
+		boolean unique = false;
 		boolean desc = true;
 
 		if (request.getSortBy() != null) {
@@ -250,8 +250,8 @@ public class Resource<T extends Model> {
 					spec = spec + "." + p.getName();
 				}
 			}
-			if (!property.isUnique()) {
-				unique = false;
+			if (property.isUnique()) {
+				unique = true;
 			}
 			sortBy.add(spec);
 		}
