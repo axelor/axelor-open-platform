@@ -97,7 +97,7 @@ public class ActionExport extends Action {
 
 		String name = export.getName();
 		if (name.indexOf("$") > -1) {
-			name = handler.evaluate("eval: \"\"\"" + name + "\"\"\"").toString();
+			name = handler.evaluate(toExpression(name)).toString();
 		}
 
 		log.info("export {} as {}", templatePath, name);

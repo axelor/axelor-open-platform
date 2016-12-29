@@ -194,7 +194,7 @@ public class ActionView extends Action {
 		}
 
 		if (!context.containsKey("_id") && handler.getContext().containsKey("id")) {
-			context.put("_id", handler.evaluate("eval: id"));
+			context.put("_id", handler.evaluate("#{id}"));
 		}
 
 		if (params != null) {
@@ -208,12 +208,12 @@ public class ActionView extends Action {
 
 		String domain = this.getDomain();
 		if (domain != null && domain.contains("$")) {
-			domain = handler.evaluate("eval: \"" + domain + "\"").toString();
+			domain = handler.evaluate(toExpression(domain)).toString();
 		}
 
 		String title = this.getLocalizedTitle();
 		if (title != null && title.contains("$")) {
-			title = handler.evaluate("eval: \"" + title + "\"").toString();
+			title = handler.evaluate(toExpression(title)).toString();
 		}
 
 		result.put("title", title);

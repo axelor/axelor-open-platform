@@ -122,7 +122,7 @@ public class ActionValidate extends ActionResumable {
 			String value = I18n.get(validator.getMessage());
 
 			if (!StringUtils.isBlank(value)) {
-				value = handler.evaluate("eval: " + "\"\"\"" + value + "\"\"\"").toString();
+				value = handler.evaluate(toExpression(value)).toString();
 			}
 
 			if (validator instanceof Info) {
