@@ -250,7 +250,7 @@ public class Resource<T extends Model> {
 					spec = spec + "." + p.getName();
 				}
 			}
-			if (property.isUnique()) {
+			if (property.isUnique() && property.isRequired()) {
 				unique = true;
 			}
 			sortBy.add(spec);
