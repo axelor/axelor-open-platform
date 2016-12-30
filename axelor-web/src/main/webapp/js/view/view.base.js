@@ -510,7 +510,7 @@ ui.directive('uiViewPopup', function() {
 					unwatch();
 					var viewScope = scope._viewParams.$viewScope;
 					var viewPromise = viewScope._viewPromise;
-					scope.viewTitle = viewScope.schema.title;
+					scope.viewTitle = scope.tabTitle(scope._viewParams);
 					scope._doShow(viewPromise);
 				});
 			});
