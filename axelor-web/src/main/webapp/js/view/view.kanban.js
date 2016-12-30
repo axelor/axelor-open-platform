@@ -408,7 +408,8 @@ ui.directive('uiCards', function () {
 		};
 
 		element.on("click", ".kanban-card", function (e) {
-			if ($(e.target).parents(".kanban-card-menu").size()) {
+			if ($(e.target).parents(".kanban-card-menu").size() ||
+				$(e.target).is('[ng-click],[ui-action-click],button,a,.iswitch,.ibox')) {
 				return;
 			}
 			var elem = $(this);
