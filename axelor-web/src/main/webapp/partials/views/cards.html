@@ -25,6 +25,7 @@
   </div>
   <div class="cards-view row-fluid" ng-class="::schema.css" ui-cards>
     <div class="kanban-card-list">
+      <div class="cards-no-records" ng-if="!records || records.length === 0" x-translate>No records found.</div>
       <div class="kanban-card-container" ng-repeat="record in records">
         <div class="kanban-card" ng-class="hilite.color" ui-card>
           <div class="kanban-card-menu btn-group pull-right" ng-show="hasPermission('write') || hasPermission('remove')">

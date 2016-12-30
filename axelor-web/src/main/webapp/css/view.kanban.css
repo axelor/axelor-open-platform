@@ -260,6 +260,15 @@
 	display: block;
 }
 
+.cards-view .cards-no-records {
+	display: block !important;
+    position: absolute;
+    top: 48%;
+    width: 100%;
+    font-weight: 400;
+    text-align: center;
+}
+
 .kanban-column h3,
 .kanban-column h4,
 .kanban-column .card-body,
