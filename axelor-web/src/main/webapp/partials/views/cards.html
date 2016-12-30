@@ -27,13 +27,13 @@
     <div class="kanban-card-list">
       <div class="kanban-card-container" ng-repeat="record in records">
         <div class="kanban-card" ng-class="hilite.color" ui-card>
-          <div class="kanban-card-menu btn-group pull-right">
+          <div class="kanban-card-menu btn-group pull-right" ng-show="hasPermission('write') || hasPermission('remove')">
             <a tabindex="-1" href="javascript:" class="btn btn-link dropdown-toggle" data-toggle="dropdown">
               <i class="fa fa-caret-down"></i>
             </a>
             <ul class="dropdown-menu pull-right">
-              <li><a href="javascript:" ng-click="onEdit(record)" x-translate>Edit</a></li>
-              <li><a href="javascript:" ng-click="onDelete(record)" x-translate>Delete</a></li>
+              <li><a href="javascript:" ng-show="hasPermission('write')" ng-click="onEdit(record)" x-translate>Edit</a></li>
+              <li><a href="javascript:" ng-show="hasPermission('remove')" ng-click="onDelete(record)" x-translate>Delete</a></li>
             </ul>
           </div>
           <div class="kanban-card-body"></div>
