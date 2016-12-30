@@ -51,7 +51,7 @@ function parseNumber(field, value) {
 ui.formWidget('BaseSelect', {
 	
 	findInput: function(element) {
-		return element.find('input:first');
+		return element.find('input:first:not([ui-panel-editor] input)');
 	},
 
 	init: function(scope) {
