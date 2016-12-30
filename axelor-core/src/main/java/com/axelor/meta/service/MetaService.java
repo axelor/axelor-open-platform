@@ -17,6 +17,9 @@
  */
 package com.axelor.meta.service;
 
+import static com.axelor.common.StringUtils.isBlank;
+import static com.axelor.meta.loader.ModuleManager.isInstalled;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,6 +76,7 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
+import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.google.common.base.Strings;
@@ -96,7 +100,7 @@ public class MetaService {
 	@Inject
 	private MetaAttachmentRepository attachments;
 
-	private boolean canShow(MenuItem item, Map<String, MenuItem> map, Set<String> visited) {
+	private boolean canShow(MenuItem item, Map<String, MenuItem> map, Set<String> visited, ScriptHelper helper) {
 		if (visited == null) {
 			visited = new HashSet<>();
 		}
@@ -105,7 +109,7 @@ public class MetaService {
 			return false;
 		}
 		visited.add(item.getName());
-		if (item.getHidden() == Boolean.TRUE) {
+		if (item.getHidden() == Boolean.TRUE || !test(item, helper)) {
 			return false;
 		}
 		if (item.getParent() == null) {
@@ -115,7 +119,19 @@ public class MetaService {
 		if (parent == null) {
 			return false;
 		}
-		return canShow(parent, map, visited);
+		return canShow(parent, map, visited, helper);
+	}
+
+	private boolean test(MenuItem item, ScriptHelper helper) {
+		final String module = item.getModuleToCheck();
+		final String condition =  item.getConditionToCheck();
+		if (!isBlank(module) && !isInstalled(module)) {
+			return false;
+		}
+		if (isBlank(condition)) {
+			return true;
+		}
+		return helper.test(condition);
 	}
 
 	private List<MenuItem> filter(List<MenuItem> items) {
@@ -123,6 +139,9 @@ public class MetaService {
 		final Map<String, MenuItem> map = new LinkedHashMap<>();
 		final Set<String> visited = new HashSet<>();
 		final List<MenuItem> all = new ArrayList<>();
+
+		final Map<String, Object> vars = new HashMap<>();
+		final ScriptHelper scriptHelper = new CompositeScriptHelper(new ScriptBindings(vars));
 
 		for (MenuItem item : items) {
 			final String name = item.getName();
@@ -137,7 +156,7 @@ public class MetaService {
 
 		for (final String name : map.keySet()) {
 			final MenuItem item = map.get(name);
-			if (canShow(item, map, null)) {
+			if (canShow(item, map, null, scriptHelper)) {
 				all.add(item);
 			}
 		}
@@ -223,6 +242,8 @@ public class MetaService {
 			item.setLeft(menu.getLeft());
 			item.setMobile(menu.getMobile());
 			item.setHidden(menu.getHidden());
+			item.setModuleToCheck(menu.getModuleToCheck());
+			item.setConditionToCheck(menu.getConditionToCheck());
 
 			if (menu.getParent() != null) {
 				item.setParent(menu.getParent().getName());

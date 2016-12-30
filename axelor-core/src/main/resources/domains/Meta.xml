@@ -85,6 +85,9 @@
   	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
     <many-to-many name="roles" ref="com.axelor.auth.db.Role"/>
 
+    <string name="conditionToCheck" max="1024" title="If" help="Only use this menu-item if the given expression is true."/>
+    <string name="moduleToCheck" title="If-module" help="Only use this menu-item if the given module is installed."/>
+
     <finder-method name="findByID" using="xmlId" cacheable="true" />
     <finder-method name="findByName" using="name" orderBy="-order" cacheable="true"/>
     <finder-method name="findByParent" using="Long:id" filter="self.parent.id = :id" all="true" cacheable="true"/>
