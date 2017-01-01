@@ -196,17 +196,17 @@ public class JpaModule extends AbstractModule {
 		}
 
 		if (DBHelper.isDataSourceUsed()) {
-			properties.put("hibernate.connection.datasource", DBHelper.getDataSourceName());
+			properties.put(Environment.DATASOURCE, DBHelper.getDataSourceName());
 			return properties;
 		}
 
 		final Map<String, String> keys = new HashMap<>();
 
-		keys.put("db.default.driver", "javax.persistence.jdbc.driver");
-		keys.put("db.default.ddl", "hibernate.hbm2ddl.auto");
-		keys.put("db.default.url", "javax.persistence.jdbc.url");
-		keys.put("db.default.user", "javax.persistence.jdbc.user");
-		keys.put("db.default.password", "javax.persistence.jdbc.password");
+		keys.put("db.default.ddl", Environment.HBM2DDL_AUTO);
+		keys.put("db.default.driver", Environment.JPA_JDBC_DRIVER);
+		keys.put("db.default.url", Environment.JPA_JDBC_URL);
+		keys.put("db.default.user", Environment.JPA_JDBC_USER);
+		keys.put("db.default.password", Environment.JPA_JDBC_PASSWORD);
 
 		for (String key : keys.keySet()) {
 			String name = keys.get(key);
