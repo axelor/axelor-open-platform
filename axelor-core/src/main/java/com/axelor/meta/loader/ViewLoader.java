@@ -30,6 +30,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.PersistenceException;
+import javax.persistence.TypedQuery;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
@@ -598,19 +599,30 @@ public class ViewLoader extends AbstractLoader {
 	private static final File outputDir = FileUtils.getFile(System.getProperty("java.io.tmpdir"), "axelor", "generated");
 
 	private void importDefault(Module module) {
+		final List<String> names = new ArrayList<>();
 		for (String name : ModelLoader.findEntities(module)) {
-			Class<?> klass = JPA.model(name);
-			if (klass == null) continue;
-			if (views.all().filter("self.model = ?1", klass.getName()).count() == 0) {
-				File out = FileUtils.getFile(outputDir, "views", klass.getSimpleName() + ".xml");
-				String xml = createDefaults(module, klass);
-				try {
-					log.debug("Creating default views: {}", out);
-					Files.createParentDirs(out);
-					Files.write(xml, out, Charsets.UTF_8);
-				} catch (IOException e) {
-					log.error("Unable to create: {}", out);
-				}
+			final Class<?> klass = JPA.model(name);
+			if (klass != null) {
+				names.add(klass.getName());
+			}
+		}
+		if (names.isEmpty()) {
+			return;
+		}
+
+		final TypedQuery<String> query = JPA.em().createQuery("SELECT s.model FROM MetaView s", String.class);
+		final List<String> found = query.getResultList();
+		for (String name : names) {
+			if (found.contains(name)) continue;
+			final Class<?> klass = JPA.model(name);
+			final File out = FileUtils.getFile(outputDir, "views", klass.getSimpleName() + ".xml");
+			final String xml = createDefaults(module, klass);
+			try {
+				log.debug("Creating default views: {}", out);
+				Files.createParentDirs(out);
+				Files.write(xml, out, Charsets.UTF_8);
+			} catch (IOException e) {
+				log.error("Unable to create: {}", out);
 			}
 		}
 	}
