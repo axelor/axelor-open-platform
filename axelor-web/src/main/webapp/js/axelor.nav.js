@@ -371,8 +371,9 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 
 	$scope.menuClick = function(event, record) {
 
-		if (record.isFolder)
+		if (!record.action) {
 			return;
+		}
 
 		if (axelor.device.small) {
 			$("#offcanvas").removeClass("active");

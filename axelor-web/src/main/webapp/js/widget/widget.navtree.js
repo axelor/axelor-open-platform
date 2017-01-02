@@ -40,10 +40,9 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 			}
 
 			this.onClick = function (e, menu) {
-				if (menu.isFolder) {
-					return;
+				if (menu.action && (menu.children||[]).length === 0) {
+					handler(e, menu);
 				}
-				handler(e, menu);
 			};
 
 			this.load = function (data) {
@@ -219,7 +218,7 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
 				element.parents('.nav-tree').find('li.active').not(element).removeClass('active');
 				element.addClass('active');
 
-				if (!menu.isFolder) {
+				if (menu.action && (menu.children||[]).length === 0) {
 					scope.applyLater(function () {
 						ctrl.onClick(e, menu);
 					});
