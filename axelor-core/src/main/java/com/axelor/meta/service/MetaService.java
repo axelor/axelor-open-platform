@@ -288,13 +288,11 @@ public class MetaService {
 				continue;
 			}
 			// if no group access, check for roles
-			if (!AuthUtils.isAdmin(user)) {
-				final Set<String> myGroups = menuGroups.get(menu.getId());
-				final Set<String> myRoles = menuRoles.get(menu.getId());
-				if (myGroups != null && !myGroups.contains(userGroup)
-						&& (myRoles == null || Collections.disjoint(userRoles, myRoles))) {
-					continue;
-				}
+			final Set<String> myGroups = menuGroups.get(menu.getId());
+			final Set<String> myRoles = menuRoles.get(menu.getId());
+			if (myGroups != null && !myGroups.contains(userGroup)
+					&& (myRoles == null || Collections.disjoint(userRoles, myRoles))) {
+				continue;
 			}
 
 			final MenuItem item = new MenuItem();
