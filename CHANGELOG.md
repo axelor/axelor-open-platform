@@ -2,7 +2,16 @@
 
 ## Bug fixes
 
+- fix height attribute issue on text field
+- fix field permission readonlyIf condition conflict
+- fix readonly button issue in grid widget
+- fix grid reload issue
+- fix onChange on m2o issue
+
 ## Improvements
+
+- allow to only update object in xml import
+- re-throw exception during search request
 
 # 3.3.1 (2016-09-26)
 
