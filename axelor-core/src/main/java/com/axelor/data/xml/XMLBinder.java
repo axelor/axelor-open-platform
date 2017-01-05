@@ -103,6 +103,9 @@ public abstract class XMLBinder {
 			if (bean != null && !binding.isUpdate()) {
 				LOG.trace("search no update");
 				return bean;
+			} else if(bean == null && !binding.isCreate()) {
+				LOG.trace("search no create");
+				return null;
 			}
 		}
 
