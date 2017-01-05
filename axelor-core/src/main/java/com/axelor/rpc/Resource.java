@@ -64,6 +64,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -302,8 +303,7 @@ public class Resource<T extends Model> {
 			if (txn.isActive()) {
 				txn.rollback();
 			}
-			data = Lists.newArrayList();
-			LOG.error("Error: ", e);
+			Throwables.propagate(e);
 		}
 
 		LOG.debug("Records found: {}", data.size());
