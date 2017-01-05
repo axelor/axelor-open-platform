@@ -53,6 +53,9 @@ public class XMLBind {
 
 	@XStreamAsAttribute
 	private boolean update;
+	
+	@XStreamAsAttribute
+	private boolean create;
 
 	@XStreamAlias("eval")
 	@XStreamAsAttribute
@@ -112,6 +115,10 @@ public class XMLBind {
 
 	public boolean isUpdate() {
 		return update;
+	}
+	
+	public boolean isCreate() {
+		return create;
 	}
 
 	public String getExpression() {
