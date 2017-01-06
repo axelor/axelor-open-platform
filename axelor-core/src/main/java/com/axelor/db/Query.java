@@ -512,7 +512,7 @@ public class Query<T extends Model> {
 			selects.add("self.version");
 			for(String name : names) {
 				Property property = getProperty(name);
-				if (property != null && property.getType() != PropertyType.BINARY) {
+				if (property != null && property.getType() != PropertyType.BINARY && !property.isTransient()) {
 					String alias = joinHelper.joinName(name);
 					if (alias != null) {
 						selects.add(alias);
