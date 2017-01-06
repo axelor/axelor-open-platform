@@ -56,6 +56,7 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 		final ImportCustomizer importCustomizer = new ImportCustomizer();
 
 		importCustomizer.addImport("__repo__", "com.axelor.db.JpaRepository");
+		importCustomizer.addStaticImport("__json__", "com.axelor.script.AbstractScriptHelper", "toJson");
 
 		importCustomizer.addImports("java.time.ZonedDateTime");
 		importCustomizer.addImports("java.time.LocalDateTime");

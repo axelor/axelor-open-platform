@@ -431,6 +431,13 @@
             </xsd:restriction>
           </xsd:simpleType>
         </xsd:attribute>
+        <xsd:attribute name="json" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+            Whether the field is used to store json data.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="password" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>

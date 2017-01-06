@@ -398,6 +398,31 @@ var Formatters = {
 			return '<i class="slick-icon ' + value + '"></i>';
 		}
 		return Formatters.button(field, value, dataContext, grid);
+	},
+	
+	"json": function(field, value) {
+		if (!value || !field.jsonFields || field.jsonFields.length === 0) return "";
+		var that = this;
+		var items = [];
+		var json = angular.fromJson(value);
+		field.jsonFields.forEach(function (item) {
+			if (json[item.name] === undefined) return;
+			var value = json[item.name];
+			switch(item.type) {
+			case 'integer':
+				value = +(value);
+				break;
+			case 'date':
+				value = that.date(field, value);
+				break;
+			case 'datetime':
+				value = that.datetime(field, value);
+				break;
+			}
+			items.push('<strong>' + item.title + '</strong>: ' + value);
+		});
+
+		return items.join(' &bull; ');
 	}
 };
 
@@ -449,6 +474,10 @@ _.extend(Factory.prototype, {
 			attrs = _.extend({}, field, field.widgetAttrs),
 			widget = attrs.widget || "",
 			type = attrs.type;
+		
+		if (widget === 'json-field' || attrs.json) {
+			return Formatters.json(field, value);
+		}
 
 		if (widget === "Progress" || widget === "progress" || widget === "SelectProgress") {
 			type = "progress";

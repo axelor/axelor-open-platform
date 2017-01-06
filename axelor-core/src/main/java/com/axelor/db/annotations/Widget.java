@@ -74,6 +74,13 @@ public @interface Widget {
 	 * @return true if marked as image, default is false
 	 */
 	boolean image() default false;
+	
+	/**
+	 * Whether to use json editor for this string field.
+	 *
+	 * @return true if marked as json, default is false
+	 */
+	boolean json() default false;
 
 	/**
 	 * Use password widget for this string field.
@@ -119,7 +126,7 @@ public @interface Widget {
 	 * 
 	 * @return array if fields on which to search, default is empty
 	 */
-	String[]search() default {};
+	String[] search() default {};
 
 	/**
 	 * The name of the selection.

@@ -116,6 +116,8 @@ public class Property {
 	private boolean virtual;
 	
 	private boolean transient_;
+	
+	private boolean json;
 
 	private boolean password;
 
@@ -267,6 +269,7 @@ public class Property {
 				hidden = w.hidden();
 				nameSearch = w.search();
 				selection = w.selection();
+				json = w.json();
 				password = w.password();
 				massUpdate = w.massUpdate();
 				copyable = w.copyable();
@@ -394,6 +397,10 @@ public class Property {
 	
 	public boolean isTransient() {
 		return transient_;
+	}
+
+	public boolean isJson() {
+		return json;
 	}
 
 	public boolean isPassword() {

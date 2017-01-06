@@ -17,10 +17,13 @@
  */
 package com.axelor.script;
 
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.axelor.common.StringUtils;
+import com.axelor.inject.Beans;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 
 public abstract class AbstractScriptHelper implements ScriptHelper {
@@ -64,6 +67,15 @@ public abstract class AbstractScriptHelper implements ScriptHelper {
 		}
 
 		return doCall(obj, methodCall);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static Map<String, Object> toJson(String value) {
+		try {
+			return Beans.get(ObjectMapper.class).readValue(value, Map.class);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	protected abstract Object doCall(Object obj, String methodCall);

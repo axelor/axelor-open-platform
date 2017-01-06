@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
+
+  <selection name="select.custom.field.type">
+    <option value="string">String</option>
+    <option value="integer">Integer</option>
+    <option value="boolean">Boolean</option>
+    <option value="date">Date</option>
+    <option value="time">Time</option>
+    <option value="datetime">DateTime</option>
+  </selection>
+
+  <grid name="meta-custom-field-grid" title="Custom fields" model="com.axelor.meta.db.MetaFieldCustom">
+    <field name="name" />
+    <field name="type" />
+    <field name="model" />
+    <field name="modelField" />
+  </grid>
+
+  <form name="meta-custom-field-form" title="Custom field" model="com.axelor.meta.db.MetaFieldCustom">
+    <panel title="Overview">
+      <field name="name" />
+      <field name="type" />
+      <field name="title" />
+      <field name="help" />
+      <field name="defaultValue" />
+      <field name="selection" />
+      <field name="model" />
+      <field name="modelField" />
+    </panel>
+    <panel title="Options">
+      <field name="required" />
+      <field name="hidden" />
+      <field name="minSize" title="Min" />
+      <field name="maxSize" title="Max" />
+      <field name="regex" colSpan="12" />
+    </panel>
+    <panel title="Advance Options" itemSpan="12">
+      <field name="showIf" />
+      <field name="hideIf" />
+      <field name="requiredIf" />
+    </panel>
+  </form>
+
+  <menuitem name="menu-custom-fields" parent="menu-model" title="Custom Fields" />
+  <menuitem name="menu-all-custom-field" parent="menu-custom-fields"
+    title="All Fields" action="custom.fields.all" />
+
+  <action-view name="custom.fields.all" title="Custom Fields"
+    model="com.axelor.meta.db.MetaFieldCustom">
+    <view type="grid" name="meta-custom-field-grid" />
+    <view type="form" name="meta-custom-field-form" />
+  </action-view>
+
+</object-views>

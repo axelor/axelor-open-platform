@@ -17,18 +17,24 @@
  */
 package com.axelor.meta.schema.views;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.db.mapper.Mapper;
 import com.axelor.i18n.I18n;
+import com.axelor.inject.Beans;
 import com.axelor.meta.MetaStore;
+import com.axelor.meta.db.MetaFieldCustom;
+import com.axelor.meta.db.repo.MetaFieldCustomRepository;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
@@ -579,5 +585,24 @@ public class Field extends SimpleWidget {
 		} catch (NullPointerException e) {
 		}
 		return null;
+	}
+
+	@XmlTransient
+	@JsonProperty
+	public List<JsonField> getJsonFields() {
+		try {
+			if (!Mapper.of(Class.forName(this.getModel())).getProperty(getName()).isJson()) {
+				return null;
+			}
+		} catch (Exception e) {
+			return null;
+		}
+		final List<JsonField> fields = new ArrayList<>();
+		final MetaFieldCustomRepository repo = Beans.get(MetaFieldCustomRepository.class);
+		for (MetaFieldCustom field : repo.all()
+				.filter("self.model = ?1 AND self.modelField = ?2", getModel(), getName()).order("id").fetch()) {
+			fields.add(new JsonField(field));
+		}
+		return fields;
 	}
 }
