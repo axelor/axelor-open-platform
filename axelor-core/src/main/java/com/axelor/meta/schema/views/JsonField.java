@@ -17,8 +17,11 @@
  */
 package com.axelor.meta.schema.views;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaFieldCustom;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -89,6 +92,10 @@ public class JsonField {
 
 	public String getSelection() {
 		return selection;
+	}
+	
+	public List<?> getSelectionList() {
+		return MetaStore.getSelectionList(getSelection());
 	}
 
 	public String getHelp() {
