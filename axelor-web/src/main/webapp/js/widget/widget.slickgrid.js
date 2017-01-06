@@ -406,18 +406,12 @@ var Formatters = {
 		var items = [];
 		var json = angular.fromJson(value);
 		field.jsonFields.forEach(function (item) {
-			if (json[item.name] === undefined) return;
+			if (json[item.name] === undefined || json[item.name] === null) return;
 			var value = json[item.name];
-			switch(item.type) {
-			case 'integer':
-				value = +(value);
-				break;
-			case 'date':
-				value = that.date(field, value);
-				break;
-			case 'datetime':
-				value = that.datetime(field, value);
-				break;
+			var type = item.selection ? 'selection' : item.type;
+			var func = that[type];
+			if (func) {
+				value = func(item, value);
 			}
 			items.push('<strong>' + item.title + '</strong>: ' + value);
 		});

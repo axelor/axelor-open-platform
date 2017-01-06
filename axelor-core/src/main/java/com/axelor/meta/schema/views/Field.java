@@ -18,7 +18,9 @@
 package com.axelor.meta.schema.views;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -26,12 +28,13 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.common.StringUtils;
+import com.axelor.db.Query;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
-import com.axelor.inject.Beans;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaFieldCustom;
-import com.axelor.meta.db.repo.MetaFieldCustomRepository;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -589,7 +592,7 @@ public class Field extends SimpleWidget {
 
 	@XmlTransient
 	@JsonProperty
-	public List<JsonField> getJsonFields() {
+	public List<Map<String, Object>> getJsonFields() {
 		try {
 			if (!Mapper.of(Class.forName(this.getModel())).getProperty(getName()).isJson()) {
 				return null;
@@ -597,11 +600,40 @@ public class Field extends SimpleWidget {
 		} catch (Exception e) {
 			return null;
 		}
-		final List<JsonField> fields = new ArrayList<>();
-		final MetaFieldCustomRepository repo = Beans.get(MetaFieldCustomRepository.class);
-		for (MetaFieldCustom field : repo.all()
-				.filter("self.model = ?1 AND self.modelField = ?2", getModel(), getName()).order("id").fetch()) {
-			fields.add(new JsonField(field));
+
+		final java.lang.reflect.Field[] declaredFields = MetaFieldCustom.class.getDeclaredFields();
+		final Mapper mapper = Mapper.of(MetaFieldCustom.class);
+		final List<Map<String, Object>> fields = new ArrayList<>();
+
+		for (MetaFieldCustom record : Query.of(MetaFieldCustom.class)
+				.filter("self.model = :model AND self.modelField = :field")
+				.bind("model", getModel())
+				.bind("field", getName())
+				.order("id").fetch()) {
+			final Map<String, Object> attrs = new HashMap<>();
+			for (java.lang.reflect.Field field : declaredFields) {
+				final Property prop = mapper.getProperty(field.getName());
+				if (prop == null || prop.isPrimary()) continue;
+				final Object value = prop.get(record);
+				if (value == null || value == Boolean.FALSE) continue;
+				attrs.put(prop.getName(), value);
+			}
+			
+			String type = record.getType() == null ? "" : record.getType();
+			int min = record.getMinSize() == null ? 0 : record.getMinSize();
+			int max = record.getMaxSize() == null ? 0 : record.getMaxSize();
+			if (max <= min) {
+				attrs.remove("maxSize");
+			}
+			if ((min == 0 && max == 0) || type.matches("date|time|datetime|boolean")) {
+				attrs.remove("maxSize");
+				attrs.remove("minSize");
+			}
+
+			if (!StringUtils.isBlank(record.getSelection())) {
+				attrs.put("selectionList", MetaStore.getSelectionList(record.getSelection()));
+			}
+			fields.add(attrs);
 		}
 		return fields;
 	}

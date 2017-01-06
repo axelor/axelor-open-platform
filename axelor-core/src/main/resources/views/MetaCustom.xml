@@ -6,10 +6,11 @@
   <selection name="select.custom.field.type">
     <option value="string">String</option>
     <option value="integer">Integer</option>
+    <option value="decimal">Decimal</option>
     <option value="boolean">Boolean</option>
+    <option value="datetime">DateTime</option>
     <option value="date">Date</option>
     <option value="time">Time</option>
-    <option value="datetime">DateTime</option>
   </selection>
 
   <grid name="meta-custom-field-grid" title="Custom fields" model="com.axelor.meta.db.MetaFieldCustom">
@@ -24,18 +25,21 @@
       <field name="name" />
       <field name="type" />
       <field name="title" />
-      <field name="help" />
       <field name="defaultValue" />
-      <field name="selection" />
+      <field name="help" colSpan="12" />
       <field name="model" />
       <field name="modelField" />
     </panel>
     <panel title="Options">
       <field name="required" />
       <field name="hidden" />
-      <field name="minSize" title="Min" />
-      <field name="maxSize" title="Max" />
-      <field name="regex" colSpan="12" />
+      <field name="selection" />
+      <field name="widget" />
+      <field name="minSize" title="Min" showIf="type === 'string' || type === 'integer' || type === 'decimal'"/>
+      <field name="maxSize" title="Max" showIf="type === 'string' || type === 'integer' || type === 'decimal'"/>
+      <field name="precision" showIf="type === 'decimal'" />
+      <field name="scale" showIf="type === 'decimal'" />
+      <field name="regex" colSpan="12" showIf="type === 'string'" />
     </panel>
     <panel title="Advance Options" itemSpan="12">
       <field name="showIf" />

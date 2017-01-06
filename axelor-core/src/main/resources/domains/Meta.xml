@@ -195,6 +195,7 @@
     <string name="model" required="true" column="model_name" />
     <string name="modelField" required="true" column="model_field" />
     <string name="selection" />
+    <string name="widget" />
     <string name="help" />
     <string name="showIf" />
     <string name="hideIf" />
@@ -203,6 +204,8 @@
     <boolean name="required" column="is_required" />
     <integer name="minSize" column="min_size" />
     <integer name="maxSize" column="max_size" />
+    <integer name="precision" default="6" column="decimal_precision" />
+    <integer name="scale" default="2" column="decimal_scale" />
     <string name="regex" />
   </entity>
 
