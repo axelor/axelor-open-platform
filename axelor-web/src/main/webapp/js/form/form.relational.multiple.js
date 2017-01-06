@@ -474,8 +474,9 @@ ui.formInput('OneToMany', {
 				elem = null;
 			}
 
-			var inc = 0;
-			var maxSize = (rowSize * 10) + minSize;
+			var inc = 0,
+				height = +(scope.field.height) || 10;
+			var maxSize = (rowSize * height) + minSize;
 
 			return function(value) {
 				inc = arguments[1] || inc;
