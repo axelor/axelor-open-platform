@@ -630,6 +630,10 @@ public class Field extends SimpleWidget {
 				attrs.remove("minSize");
 			}
 
+			if ("ref-select".equalsIgnoreCase(record.getWidget()) || "RefSelect".equalsIgnoreCase(record.getWidget())) {
+				attrs.put("widget", "json-ref-select");
+			}
+
 			if (!StringUtils.isBlank(record.getSelection())) {
 				attrs.put("selectionList", MetaStore.getSelectionList(record.getSelection()));
 			}

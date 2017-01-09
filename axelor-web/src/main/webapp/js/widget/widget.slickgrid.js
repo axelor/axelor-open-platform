@@ -400,6 +400,17 @@ var Formatters = {
 		return Formatters.button(field, value, dataContext, grid);
 	},
 	
+	"jsonRef": function (field, value) {
+		var val = _.extend({}, value);
+		var id = val.id;
+		if (!id || id < 0) return '';
+		delete val.model;
+		delete val.version;
+		delete val.id;
+		var vals = _.flatten([id, _.values(val)]);
+		return '[' + vals.join(', ') + ']';
+	},
+
 	"json": function(field, value) {
 		if (!value || !field.jsonFields || field.jsonFields.length === 0) return "";
 		var that = this;
@@ -409,6 +420,7 @@ var Formatters = {
 			if (json[item.name] === undefined || json[item.name] === null) return;
 			var value = json[item.name];
 			var type = item.selection ? 'selection' : item.type;
+			if (item.widget === 'json-ref-select') type = 'jsonRef';
 			var func = that[type];
 			if (func) {
 				value = func(item, value);

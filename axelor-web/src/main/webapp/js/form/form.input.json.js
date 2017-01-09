@@ -114,4 +114,141 @@ ui.formInput('JsonField', 'String', {
 	}
 });
 
+ui.formInput('JsonRefSelect', {
+
+	css: 'multi-object-select',
+
+	controller: ['$scope', 'ViewService', function($scope, ViewService) {
+
+		$scope.createElement = function(id, name, selectionList) {
+
+			var elemGroup = $('<div ui-group ui-table-layout cols="2" x-widths="150,*"></div>');
+			var elemSelect = $('<input ui-select showTitle="false">')
+				.attr("name", name + "$model")
+				.attr("x-for-widget", id)
+				.attr("ng-model", "record." + name + ".model");
+
+			var elemSelects = $('<div></div>').attr('ng-switch', "record." + name + ".model");
+			var elemItems = _.map(selectionList, function(s) {
+				return $('<input ui-json-ref-item ng-switch-when="' + s.value +'">')
+					.attr('ng-model', 'record.' + name)
+					.attr('name', name)
+					.attr('x-target', s.value);
+			});
+
+			elemGroup
+				.append($('<div></div>').append(elemSelect))
+				.append(elemSelects.append(elemItems));
+
+			return ViewService.compile(elemGroup)($scope);
+		};
+	}],
+
+	link: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+
+		var name = scope.field.name;
+		var selectionList = scope.field.selectionList;
+
+		scope.fieldsCache = {};
+
+		scope.refFireEvent = function (name) {
+			var handler = scope.$events[name];
+			if (handler) {
+				return handler();
+			}
+		};
+
+		var elem = scope.createElement(element.attr('id'), name, selectionList);
+		setTimeout(function() {
+			element.append(elem);
+		});
+
+		scope.$watch("record." + name + ".model", function (value, old) {
+			if (value === old || old === undefined) return;
+			if (scope.record && scope.record[name]) {
+				scope.record[name] = _.pick(scope.record[name], 'model');
+				if (!scope.record[name].model) {
+					delete scope.record[name];
+				}
+			}
+		});
+	},
+	template_editable: null,
+	template_readonly: null
+});
+
+ui.formInput('JsonRefItem', 'ManyToOne', {
+
+	showTitle: false,
+
+	link: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+
+		if (scope.field.targetName) {
+			return this._link.apply(this, arguments);
+		}
+
+		var self = this;
+		var target = element.attr('x-target');
+		var data = (_.findWhere(scope.$parent.field.selectionList, {value: target})||{}).data || {};
+		
+		function doLink(fields) {
+			var name = false,
+				search = [];
+
+			_.each(fields, function(f) {
+				if (f.nameColumn) name = f.name;
+				if (f.name === "name") search.push("name");
+				if (f.name === "code") search.push("code");
+			});
+
+			if (!name && _.contains(search, "name")) {
+				name = "name";
+			}
+
+			_.extend(scope.field, {
+				target: scope._model,
+				targetName: name,
+				targetSearch: search,
+				domain: data.domain
+			});
+
+			self._link(scope, element, attrs, model);
+		}
+
+		if (scope.fieldsCache[scope._model]) {
+			doLink(scope.fieldsCache[scope._model]);
+		} else {
+			scope.loadFields().success(function (fields) {
+				scope.fieldsCache[scope._model] = fields;
+				doLink(fields);
+			});
+		}
+	},
+
+	_link: function(scope, element, attrs, model) {
+		var name = element.attr('name');
+		
+		scope.getValue = function () {
+			return scope.record[name];
+		}
+		
+		var __setValue = scope.setValue;
+		
+		scope.setValue = function (value) {
+			var val = _.pick(scope.record[name], 'model');
+			val = _.extend(val, value);
+			__setValue.call(scope, val);
+		}
+
+		function doSelect() {
+			var value = (scope.record || {})[name];
+			scope.select(value);
+		}
+
+		scope.$watch("record", doSelect);
+	}
+});
+
 })();
