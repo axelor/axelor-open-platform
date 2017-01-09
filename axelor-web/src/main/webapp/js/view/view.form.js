@@ -1002,7 +1002,6 @@ function FormViewCtrl($scope, $element) {
 ui.formBuild = function (scope, schema, fields) {
 
 	var path = scope.formPath || "";
-	var modelPrefix = scope.modelPrefix || "";
 	var hasPanels = false;
 
 	function update(e, attrs) {
@@ -1126,9 +1125,6 @@ ui.formBuild = function (scope, schema, fields) {
 
 			if (_attrs.name) {
 				_attrs['x-path'] = path ? path + "." + _attrs.name : _attrs.name;
-			}
-			if (modelPrefix) {
-				_attrs['x-model-prefix'] = modelPrefix;
 			}
 
 			update(item, _attrs);

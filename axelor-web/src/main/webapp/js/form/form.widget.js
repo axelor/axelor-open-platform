@@ -43,8 +43,7 @@ ui.formWidget('Form', {
 
 			if (name && elem.attr('ui-button') === undefined) {
 				if (!elem.attr('ng-model')) {
-					var prefix = elem.attr('x-model-prefix') || 'record';
-					elem.attr('ng-model', prefix + '.' + name);
+					elem.attr('ng-model', 'record.' + name);
 				}
 				if (!elem.attr('ng-required')) {
 					// always attache a required validator to make

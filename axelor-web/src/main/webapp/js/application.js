@@ -110,6 +110,8 @@
 //= js/form/form.relational.multiple.js
 //= js/form/form.relational.nested.js
 
+//= js/form/form.input.json.js
+
 //= js/form/form.mail.js
 //= js/form/form.code.js
 
