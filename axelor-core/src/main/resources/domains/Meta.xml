@@ -207,6 +207,9 @@
     <integer name="precision" default="6" column="decimal_precision" />
     <integer name="scale" default="2" column="decimal_scale" />
     <string name="regex" />
+    <string name="targetModel" />
+    <string name="targetName" />
+    <string name="domain" />
   </entity>
 
   <entity name="MetaTranslation" table="META_TRANSLATION" logUpdates="false">

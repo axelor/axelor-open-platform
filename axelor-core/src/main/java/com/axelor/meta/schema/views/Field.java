@@ -630,8 +630,15 @@ public class Field extends SimpleWidget {
 				attrs.remove("minSize");
 			}
 
-			if ("ref-select".equalsIgnoreCase(record.getWidget()) || "RefSelect".equalsIgnoreCase(record.getWidget())) {
+			if ("ref-select".equalsIgnoreCase(record.getType()) ||
+				"ref-select".equalsIgnoreCase(record.getWidget()) ||
+				"RefSelect".equalsIgnoreCase(record.getWidget())) {
 				attrs.put("widget", "json-ref-select");
+			}
+			
+			if (!StringUtils.isBlank(record.getTargetModel())) {
+				attrs.put("target", record.getTargetModel());
+				attrs.remove("targetModel");
 			}
 
 			if (!StringUtils.isBlank(record.getSelection())) {

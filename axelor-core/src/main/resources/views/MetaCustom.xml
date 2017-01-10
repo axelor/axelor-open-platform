@@ -11,6 +11,8 @@
     <option value="datetime">DateTime</option>
     <option value="date">Date</option>
     <option value="time">Time</option>
+    <option value="many-to-one">ManyToOne</option>
+    <option value="ref-select">RefSelect</option>
   </selection>
 
   <grid name="meta-custom-field-grid" title="Custom fields" model="com.axelor.meta.db.MetaFieldCustom">
@@ -40,6 +42,9 @@
       <field name="precision" showIf="type === 'decimal'" />
       <field name="scale" showIf="type === 'decimal'" />
       <field name="regex" colSpan="12" showIf="type === 'string'" />
+      <field name="targetModel" showIf="type === 'many-to-one'"/>
+      <field name="targetName" showIf="type === 'many-to-one'"/>
+      <field name="domain" colSpan="12" showIf="type === 'many-to-one'"/>
     </panel>
     <panel title="Advance Options" itemSpan="12">
       <field name="showIf" />
