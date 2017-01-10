@@ -46,6 +46,9 @@
       <field name="targetName" showIf="type === 'many-to-one'"/>
       <field name="domain" colSpan="12" showIf="type === 'many-to-one'"/>
     </panel>
+    <panel title="Widget Attributes" sidebar="true">
+      <field name="widgetAttrs" widget="json-raw" />
+    </panel>
     <panel title="Advance Options" itemSpan="12">
       <field name="showIf" />
       <field name="hideIf" />

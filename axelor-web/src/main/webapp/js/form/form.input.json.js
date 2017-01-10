@@ -114,6 +114,83 @@ ui.formInput('JsonField', 'String', {
 	}
 });
 
+ui.formInput('JsonRaw', 'String', {
+	showTitle: false,
+	link: function (scope, element, attrs, model) {
+		
+		scope.placeHolderKey = _t('name');
+		scope.placeHolderVal = _t('value');
+
+		scope.items = [];
+
+		scope.onAdd = function () {
+			var last = _.last(scope.items);
+			if (last && !(_.trim(last.name) && _.trim(last.value))) return;
+			scope.items.push({});
+		};
+
+		scope.onRemove = function (index) {
+			scope.items.splice(index, 1);
+			if (scope.items.length === 0) {
+				scope.onAdd();
+			}
+		};
+
+		model.$render = function () {
+			var value = model.$viewValue;
+			if (value) {
+				value = angular.fromJson(value);
+			} else {
+				value = {};
+			}
+			scope.items = _.map(_.keys(value), function (name) {
+				return { name: name, value: value[name] || '' };
+			});
+		};
+
+		scope.$watch('items', function (items, old) {
+			if (items === old) return;
+			var record = null;
+			_.each(items, function (item) {
+				if (!_.trim(item.name) || !_.trim(item.value)) return;
+				if (record === null) {
+					record = {};
+				}
+				record[item.name] = item.value;
+			});
+			model.$setViewValue(record ? angular.toJson(record) : null);
+		}, true);
+	},
+	template_readonly:
+		"<div class='json-editor'>" +
+			"<table class='form-layout'>" +
+				"<tr ng-repeat='(i, item) in items'>" +
+					"<td class='form-label'>" +
+						"<strong class='display-text'>{{item.name}}</strong>:" +
+					"</td>" +
+					"<td class='form-item'>" +
+						"<span class='display-text'>{{item.value}}</span>" +
+					"</td>" +
+				"</tr>" +
+			"</table>" +
+		"</div>",
+	template_editable:
+		"<div class='json-editor'>" +
+			"<table class='form-layout'>" +
+				"<tr ng-repeat='(i, item) in items'>" +
+					"<td class='form-item'><span class='form-item-container'>" +
+						"<input type='text' placeholder='{{placeHolderKey}}' ng-model='item.name'></span>" +
+					"</td>" +
+					"<td class='form-item'><span class='form-item-container'>" +
+						"<input type='text' placeholder='{{placeHolderVal}}' ng-model='item.value'></span>" +
+					"</td>" +
+					"<td><a href='' ng-click='onRemove(i)'><i class='fa fa-minus'></i></a></td>" +
+				"</tr>" +
+			"</table>" +
+			"<a href='' ng-click='onAdd()'><i class='fa fa-plus'></i></a>" +
+		"</div>"
+});
+
 ui.formInput('JsonRefSelect', {
 
 	css: 'multi-object-select',

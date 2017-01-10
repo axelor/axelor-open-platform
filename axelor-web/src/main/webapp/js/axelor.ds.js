@@ -192,7 +192,7 @@
 				if (item.password) {
 					item.widget = "password";
 				}
-				if (item.jsonFields) {
+				if (item.jsonFields && item.widget !== 'json-raw') {
 					item.widget = 'json-field';
 					item.editor = item.editor || {
 						items: item.jsonFields
@@ -200,6 +200,12 @@
 					if (!item.viewer) {
 						item.editor.viewer = true;
 					}
+					item.jsonFields.forEach(function (field) {
+						if (field.widgetAttrs) {
+							field.widgetAttrs = angular.fromJson(field.widgetAttrs);
+							processWidget(field);
+						}
+					});
 				}
 			});
 		};
