@@ -208,12 +208,12 @@ public class ActionView extends Action {
 
 		String domain = this.getDomain();
 		if (domain != null && domain.contains("$")) {
-			domain = handler.evaluate(toExpression(domain)).toString();
+			domain = handler.evaluate(toExpression(domain, true)).toString();
 		}
 
 		String title = this.getLocalizedTitle();
 		if (title != null && title.contains("$")) {
-			title = handler.evaluate(toExpression(title)).toString();
+			title = handler.evaluate(toExpression(title, true)).toString();
 		}
 
 		result.put("title", title);

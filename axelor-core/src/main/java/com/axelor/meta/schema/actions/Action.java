@@ -87,10 +87,10 @@ public abstract class Action {
 		return MoreObjects.toStringHelper(getClass()).add("name", getName()).toString();
 	}
 
-	static String toExpression(String expression) {
+	static String toExpression(String expression, boolean quote) {
 		Pattern pattern = Pattern.compile("^(#\\{|(eval|select|action):)");
 		if (expression != null && !pattern.matcher(expression).find()) {
-			expression = "eval: " + "\"\"\"" + expression + "\"\"\"";
+			expression = "eval: " + (quote ? "\"\"\"" + expression + "\"\"\"" : expression);
 		}
 		return expression;
 	}
@@ -102,7 +102,7 @@ public abstract class Action {
 			return true;
 		if ("false".equals(expression))
 			return false;
-		Object result = handler.evaluate(toExpression(expression));
+		Object result = handler.evaluate(toExpression(expression, false));
 		if (result == null)
 			return false;
 		if (result instanceof Number && result.equals(0))
