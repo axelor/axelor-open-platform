@@ -122,6 +122,15 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			scope.$$readonly = scope.$$isReadonly();
 		});
 
+		// js expressions should be evaluated on dummy value changes
+		if (field.name && field.name[0] === '$') {
+			scope.$watch('record.' + field.name, function (a, b) {
+				if (a !== b) {
+					scope.$parent.$broadcast('on:record-change', scope.record);
+				}
+			});
+		}
+
 		scope.isRequired = function() {
 			return this.attr("required") || false;
 		};
