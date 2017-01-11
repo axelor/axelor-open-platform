@@ -430,6 +430,12 @@ ui.formInput('OneToMany', {
 		var doRenderUnwatch = null;
 		var doViewPromised = false;
 
+		var validate = model.$validators.valid || function () { return true; }
+		model.$validators.valid = function(modelValue, viewValue) {
+			if (scope.isRequired() && _.isEmpty(viewValue)) return false;
+			return validate.call(model.$validators, viewValue);
+		};
+
 		function doRender() {
 			if (doRenderUnwatch) {
 				return;
