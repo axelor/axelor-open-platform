@@ -143,12 +143,12 @@ class Property {
 			case "decimal":
 				return "new BigDecimal(\"${value}\")"
 			case "date":
-				return value == "now" ? "new LocalDate()" : "new LocalDate(\"${value}\")"
+				return value == "now" ? "LocalDate.now()" : "LocalDate.parse(\"${value}\")"
 			case "time":
-				return value == "now" ? "new LocalTime()" : "new LocalTime(\"${value}\")"
+				return value == "now" ? "LocalTime.now()" : "LocalTime.parse(\"${value}\")"
 			case "datetime":
-				def t = attrs['tz'] == 'true' ? 'DateTime' : 'LocalDateTime'
-				return value == "now" ? "new ${t}()" : "new ${t}(\"${value}\")"
+				def t = attrs['tz'] == 'true' ? 'ZonedDateTime' : 'LocalDateTime'
+				return value == "now" ? "${t}.now()" : "${t}.parse(\"${value}\")"
 		}
 	}
 
