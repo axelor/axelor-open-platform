@@ -57,6 +57,7 @@
   	<many-to-one name="parent" ref="MetaMenu"/>
   	<many-to-one name="action" ref="MetaAction"/>
   	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
+    <many-to-many name="roles" ref="com.axelor.auth.db.Role"/>
     
     <finder-method name="findByName" using="name" orderBy="-priority" cacheable="true"/>
     <finder-method name="findByParent" using="Long:id" filter="self.parent.id = :id" all="true" cacheable="true"/>

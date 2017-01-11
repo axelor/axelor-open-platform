@@ -121,6 +121,12 @@
     </panel>
   </form>
 
+  <grid title="Menu Items" name="simple-meta-menu-grid" model="com.axelor.meta.db.MetaMenu">
+    <field name="name"/>
+    <field name="title"/>
+    <field name="priority" width="75"/>
+  </grid>
+
   <grid title="Menu Items" name="meta-menu-grid" model="com.axelor.meta.db.MetaMenu">
     <field name="name"/>
     <field name="title"/>
@@ -149,6 +155,7 @@
       </panel>
     </panel>
     <panel-related field="groups" />
+    <panel-related field="roles" />
   </form>
 
   <grid title="Action Menus" name="meta-action-menu-grid" model="com.axelor.meta.db.MetaActionMenu">

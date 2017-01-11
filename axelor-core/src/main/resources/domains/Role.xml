@@ -12,6 +12,7 @@
     
     <string name="name" required="true" unique="true" />
     <string name="description" />
+    <many-to-many name="menus" ref="com.axelor.meta.db.MetaMenu" mappedBy="roles" />    
     <many-to-many name="permissions" ref="Permission" />
     <many-to-many name="metaPermissions" ref="com.axelor.meta.db.MetaPermission" title="Permissions (fields)"/>
   </entity>

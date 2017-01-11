@@ -18,8 +18,10 @@
 package com.axelor.meta.service;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.persistence.Query;
@@ -30,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
 import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
@@ -86,11 +89,37 @@ public class MetaService {
 
 		List<MenuItem> menus = Lists.newArrayList();
 		List<Object[]> all = query.getResultList();
+		
+		final Set<Role> roles = new HashSet<>();
+		final User user = AuthUtils.getUser();
+
+		if (user != null && user.getRoles() != null) {
+			roles.addAll(user.getRoles());
+		}
+		if (user != null && user.getGroup() != null && user.getGroup().getRoles() != null) {
+			roles.addAll(user.getGroup().getRoles());
+		}
 
 		for(Object[] items : all) {
+			
+			final MetaMenu menu = (MetaMenu) items[0];
+			boolean hasGroup =  menu.getGroups() != null && menu.getGroups().contains(user.getGroup());
 
-			MetaMenu menu = (MetaMenu) items[0];
-			MenuItem item = new MenuItem();
+			// if no group access, check for roles
+			if (!hasGroup && !AuthUtils.isAdmin(user) && menu.getRoles() != null && menu.getRoles().size() > 0) {
+				boolean hasRole = false;
+				for (final Role role : roles) {
+					if (menu.getRoles().contains(role)) {
+						hasRole = true;
+						break;
+					}
+				}
+				if (!hasRole) {
+					continue;
+				}
+			}
+
+			final MenuItem item = new MenuItem();
 			item.setName(menu.getName());
 			item.setPriority(menu.getPriority());
 			item.setTitle(menu.getTitle());
