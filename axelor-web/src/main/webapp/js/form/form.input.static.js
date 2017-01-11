@@ -498,6 +498,17 @@ ui.formItem('Button', {
 			}
 			element.children('.btn-text').html(title);
 		});
+
+		scope.$watch('attr("css")', function (css, old) {
+			if (css !== old) {
+				element.removeClass(old || '').addClass(css || field.css || '');
+			}
+		});
+
+		scope.$watch('attr("icon")', function (icon, old) {
+			if (icon === old || (icon && icon.indexOf('fa-') !== 0)) return;
+			element.find('i.fa:first').removeClass(old || '').addClass(icon || field.icon || '');
+		});
 	},
 	template: '<a href="" class="btn btn-success">'+
 		'<span class="btn-text" ng-transclude></span>'+

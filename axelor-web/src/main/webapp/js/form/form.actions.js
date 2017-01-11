@@ -888,6 +888,8 @@ ActionHandler.prototype = {
 				case 'precision':
 				case 'scale':
 				case 'prompt':
+				case 'css':
+				case 'icon':
 					itemScope.attr(attr, value);
 					break;
 				case 'title':

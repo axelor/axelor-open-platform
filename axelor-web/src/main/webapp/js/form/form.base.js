@@ -52,7 +52,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		var getViewDef = this.getViewDef || scope.getViewDef || function() { return {}; };
 
 		var field = getViewDef.call(scope, element);
-		var props = _.pick(field, 'readonly,required,hidden,collapse,precision,scale,prompt,title,domain'.split(','));
+		var props = _.pick(field, 'readonly,required,hidden,collapse,precision,scale,prompt,title,domain,css,icon'.split(','));
 		var state = _.clone(props);
 		
 		function resetAttrs() {
