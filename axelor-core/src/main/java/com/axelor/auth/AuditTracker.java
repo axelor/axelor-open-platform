@@ -201,7 +201,7 @@ final class AuditTracker {
 		final List<Map<String, String>> tracks = new ArrayList<>();
 		final Set<String> tagFields = new HashSet<>();
 
-		String msg = previousState == null ? /*$$(*/ "Record created" /*)*/ : /*$$(*/ "Record updated" /*)*/;
+		String msg = null;
 
 		// find first matched message
 		for (TrackMessage tm : track.messages()) {
@@ -283,6 +283,15 @@ final class AuditTracker {
 					tags.add(item);
 				}
 			}
+		}
+
+		// don't generate empty tracking info
+		if (msg == null && tracks.isEmpty()) {
+			return;
+		}
+
+		if (msg == null) {
+			msg = previousState == null ? /*$$(*/ "Record created" /*)*/ : /*$$(*/ "Record updated" /*)*/;
 		}
 
 		final Map<String, Object> json = new HashMap<>();

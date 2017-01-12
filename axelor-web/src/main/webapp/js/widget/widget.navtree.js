@@ -41,10 +41,9 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 			}
 
 			this.onClick = function (e, menu) {
-				if (menu.isFolder) {
-					return;
+				if (menu.action && (menu.children||[]).length === 0) {
+					handler(e, menu);
 				}
-				handler(e, menu);
 			};
 
 			this.load = function (data) {
@@ -60,7 +59,6 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 					var node = nodes[item.parent];
 					if (node) {
 						node.children.push(item);
-						item.icon = null;
 					} else if (canAccept(item)){
 						menus.push(item);
 					}
@@ -239,30 +237,41 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
 			}
 
 			setTimeout(function () {
-				var icon = element.find("span.nav-icon");
-				if (menu.iconBackground) {
-					icon.addClass("fg-white");
+				var icon = element.find("span.nav-icon:first");
+				if (menu.iconBackground && icon.size() > 0) {
+					var cssName = menu.parent ? 'color' : 'background-color';
+					var clsName = menu.parent ? 'fg-' : 'bg-';
+
+					if (!menu.parent) {
+						icon.addClass("fg-white");
+					}
+
 					if (menu.iconBackground.indexOf("#") === 0) {
-						icon.css("background-color", menu.iconBackground);
+						icon.css(cssName, menu.iconBackground);
 					} else {
-						icon.addClass("bg-" + menu.iconBackground);
+						icon.addClass(clsName + menu.iconBackground);
 					}
 
 					// get computed color value
-					var color = icon.css('background-color');
+					var color = icon.css(cssName);
 					var bright = d3.rgb(color).brighter(.3).toString();
-
-					// use same color for vertical line
-					element.css("border-left-color", color);
 
 					// add hover effect
 					element.hover(function () {
-						icon.css('background-color', bright);
-						element.css("border-left-color", bright);
+						icon.css(cssName, bright);
 					}, function () {
-						icon.css('background-color', color)
-						element.css("border-left-color", color);
+						icon.css(cssName, color)
 					});
+
+					// use same color for vertical line
+					if (!menu.parent) {
+						element.css("border-left-color", color);
+						element.hover(function () {
+							element.css("border-left-color", color);
+						}, function () {
+							element.css("border-left-color", bright);
+						});
+					}
 				}
 			});
 
@@ -326,7 +335,7 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
 				element.parents('.nav-tree').find('li.active').not(element).removeClass('active');
 				element.addClass('active');
 
-				if (!menu.isFolder) {
+				if (menu.action && (menu.children||[]).length === 0) {
 					scope.applyLater(function () {
 						ctrl.onClick(e, menu);
 					});

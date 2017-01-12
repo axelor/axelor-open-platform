@@ -59,7 +59,7 @@ public class ActionCondition extends Action {
 			}
 
 			if (!StringUtils.isBlank(error)) {
-				error = handler.evaluate("eval: " + "\"\"\"" + error + "\"\"\"").toString();
+				error = handler.evaluate(toExpression(error, true)).toString();
 			}
 
 			for (String field : names.split(",")) {

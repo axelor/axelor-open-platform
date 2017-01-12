@@ -73,10 +73,9 @@ function NavMenuCtrl($scope, $element, MenuService, NavService) {
 	};
 
 	this.onItemClick = function(item) {
-		if (this.isSubMenu(item) || item.isFolder) {
-			return;
+		if (item.action && !this.isSubMenu(item)) {
+			NavService.openTabByName(item.action);
 		}
-		NavService.openTabByName(item.action);
 	};
 
 	$scope.hasImage = function (menu) {

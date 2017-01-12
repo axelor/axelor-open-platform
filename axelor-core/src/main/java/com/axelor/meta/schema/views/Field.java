@@ -182,6 +182,9 @@ public class Field extends SimpleWidget {
 	@XmlAttribute(name = "x-limit")
 	private Integer limit;
 
+	@XmlAttribute(name = "x-search-limit")
+	private Integer searchLimit;
+
 	@XmlElement(name = "hilite")
 	private List<Hilite> hilites;
 
@@ -483,6 +486,14 @@ public class Field extends SimpleWidget {
 
 	public void setLimit(Integer limit) {
 		this.limit = limit;
+	}
+
+	public Integer getSearchLimit() {
+		return searchLimit;
+	}
+
+	public void setSearchLimit(Integer searchLimit) {
+		this.searchLimit = searchLimit;
 	}
 
 	public List<Hilite> getHilites() {

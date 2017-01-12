@@ -165,7 +165,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $
 			throw new Error("Invalid sequenceBy field in view: " + view.name);
 		}
 
-		$scope.sortableOptions.disabled = !view.draggable;
+		$scope.sortableOptions.disabled = !view.draggable || !$scope.hasPermission('write');
 		$scope.columns = columns;
 		$scope.colSpan = "kanban-cs-" + columns.length;
 	};
@@ -323,12 +323,10 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 				});
 			};
 
-			scope.onEdit = function (record) {
+			scope.onEdit = function (record, readonly) {
 				scope.switchTo('form', function (formScope) {
-					if (formScope.canEdit()) {
-						formScope.edit(record);
-						formScope.setEditable();
-					}
+					formScope.edit(record);
+					formScope.setEditable(!readonly && scope.hasPermission('write') && formScope.canEdit());
 				});
 			};
 
@@ -363,7 +361,7 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 				}
 				var elem = $(this);
 				var record = elem.scope().record;
-				scope.onEdit(record);
+				scope.onEdit(record, true);
 				scope.applyLater();
 			});
 
@@ -387,9 +385,7 @@ ui.directive('uiCards', function () {
 			var page = ds._page;
 			page.index = record ? ds._data.indexOf(record) : -1;
 			scope.switchTo('form', function (formScope) {
-				if (!readonly && formScope.canEdit()) {
-					formScope.setEditable();
-				}
+				formScope.setEditable(!readonly && scope.hasPermission('write') && formScope.canEdit());
 			});
 		};
 
@@ -408,7 +404,8 @@ ui.directive('uiCards', function () {
 		};
 
 		element.on("click", ".kanban-card", function (e) {
-			if ($(e.target).parents(".kanban-card-menu").size()) {
+			if ($(e.target).parents(".kanban-card-menu").size() ||
+				$(e.target).is('[ng-click],[ui-action-click],button,a,.iswitch,.ibox')) {
 				return;
 			}
 			var elem = $(this);

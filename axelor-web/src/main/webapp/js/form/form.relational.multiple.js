@@ -439,6 +439,12 @@ ui.formInput('OneToMany', {
 		var doRenderUnwatch = null;
 		var doViewPromised = false;
 
+		var validate = model.$validators.valid || function () { return true; }
+		model.$validators.valid = function(modelValue, viewValue) {
+			if (scope.isRequired() && _.isEmpty(viewValue)) return false;
+			return validate.call(model.$validators, viewValue);
+		};
+
 		function doRender() {
 			if (doRenderUnwatch) {
 				return;
@@ -483,8 +489,9 @@ ui.formInput('OneToMany', {
 				elem = null;
 			}
 
-			var inc = 0;
-			var maxSize = (rowSize * 10) + minSize;
+			var inc = 0,
+				height = +(scope.field.height) || 10;
+			var maxSize = (rowSize * height) + minSize;
 
 			return function(value) {
 				inc = arguments[1] || inc;

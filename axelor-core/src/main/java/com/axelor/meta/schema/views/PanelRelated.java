@@ -44,7 +44,10 @@ public class PanelRelated extends AbstractPanel {
 	
 	@XmlAttribute(name = "grid-view")
 	private String gridView;
-	
+
+	@XmlAttribute(name = "x-search-limit")
+	private Integer searchLimit;
+
 	@XmlAttribute
 	private Boolean editable;
 
@@ -136,6 +139,14 @@ public class PanelRelated extends AbstractPanel {
 	
 	public void setGridView(String gridView) {
 		this.gridView = gridView;
+	}
+
+	public Integer getSearchLimit() {
+		return searchLimit;
+	}
+
+	public void setSearchLimit(Integer searchLimit) {
+		this.searchLimit = searchLimit;
 	}
 
 	public String getOrderBy() {

@@ -90,6 +90,25 @@ public final class I18n {
 	 */
 	public static String get(String singular, String plural, int number) {
 		String message = (number > 1) ? get(plural) : get(singular);
+		// MessageFormat requires doubled single quotes
+		char singleQuote = '\'';
+		if (message != null && message.indexOf(singleQuote) > -1) {
+			final StringBuilder builder = new StringBuilder();
+			final int length = message.length();
+			boolean seen = false;
+			for (int i = 0; i < length; i++) {
+				char last = message.charAt(i);
+				if (seen && last != singleQuote) {
+					builder.append(singleQuote);
+				}
+				builder.append(last);
+				seen = !seen && last == singleQuote;
+			}
+			if (seen) {
+				builder.append(singleQuote);
+			}
+			message = builder.toString();
+		}
 		return MessageFormat.format(message, number);
 	}
 }

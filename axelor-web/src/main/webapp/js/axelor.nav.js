@@ -371,8 +371,9 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 
 	$scope.menuClick = function(event, record) {
 
-		if (record.isFolder)
+		if (!record.action) {
 			return;
+		}
 
 		if (axelor.device.small) {
 			$("#offcanvas").removeClass("active");
@@ -486,14 +487,7 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 	});
 
 	$scope.$watch('routePath', function(path) {
-		var homeAction = axelor.config["user.action"];
-		if (!homeAction || _.last(path) !== "main") {
-			return;
-		}
-		NavService.openTabByName(homeAction, {
-			__tab_prepend: true,
-			__tab_closable: false
-		});
+		$scope.openHomeTab();
 	});
 
 	var confirm = _t('Current changes will be lost.');

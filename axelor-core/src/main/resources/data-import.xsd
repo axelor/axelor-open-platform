@@ -295,6 +295,13 @@
             </documentation>
           </annotation>
         </attribute>
+        <attribute name="create" type="boolean">
+      	  <annotation>
+            <documentation>
+              Whether to create the object or not.
+            </documentation>
+          </annotation>
+    	</attribute>
       </extension>
     </complexContent>
   </complexType>

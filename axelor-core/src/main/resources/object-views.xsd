@@ -37,126 +37,130 @@
   </xsd:element>
 
   <xsd:complexType name="MenuItem">
-    <xsd:attribute name="id" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>
-        If overriding some existing one, provide an unique id to identify this one.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="name" type="xsd:string" use="required">
-      <xsd:annotation>
-        <xsd:documentation>
-          The name of the menu item. It serves as an identifier.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="title" type="xsd:string" use="required">
-      <xsd:annotation>
-        <xsd:documentation>
-          The display text of this menu item.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="parent" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>
-          The name of the parent menu item.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="icon" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>
-          The image for this menu item.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="icon-background" type="tns:ColorStyle">
-      <xsd:annotation>
-        <xsd:documentation>Specify icon background color (predefined or html hex color)</xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="action" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>
-          The name of the action to perform when this menu is clicked.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="order" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>Specify menu sequence order.</xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="groups" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>
-          Comma separated list of authorized groups.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="top" type="xsd:boolean">
-      <xsd:annotation>
-        <xsd:documentation>
-          Whether to show the menu item in top navigation menu.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="left" type="xsd:boolean">
-      <xsd:annotation>
-        <xsd:documentation>
-          Whether to show the menu item in the left navigation menu.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="mobile" type="xsd:boolean">
-      <xsd:annotation>
-        <xsd:documentation>
-          Whether to show the menu item in the mobile menu.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="hidden" type="xsd:boolean">
-      <xsd:annotation>
-        <xsd:documentation>Specify whether to hide the menu with given name.</xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="tag" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>
-          Specify a tag to show on menu item as a fixed label.
-          This attribute gets preference over 'tag-count' and 'tag-get' attributes.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="tag-count" type="xsd:boolean">
-      <xsd:annotation>
-        <xsd:documentation>
-          Specify whether to use count of menu action records as tag.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="tag-get" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>
-          <![CDATA[
-          Specify a method call to get tag value.
-          This attribute gets preference over 'tag-count' attribute.
-          The signature of the controller method should be:<br><br>
-
-          <code>
-          	void someMethod(ActionRequest request, ActionResponse response)
-          </code>
-          ]]>
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="tag-style" type="tns:LabelStyle">
-      <xsd:annotation>
-        <xsd:documentation>Specify the tag display style.</xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractWidget">
+        <xsd:attribute name="id" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            If overriding some existing one, provide an unique id to identify this one.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="name" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              The name of the menu item. It serves as an identifier.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="title" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              The display text of this menu item.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="parent" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              The name of the parent menu item.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="icon" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              The image for this menu item.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="icon-background" type="tns:ColorStyle">
+          <xsd:annotation>
+            <xsd:documentation>Specify icon background color (predefined or html hex color)</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="action" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              The name of the action to perform when this menu is clicked.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="order" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Specify menu sequence order.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="groups" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              Comma separated list of authorized groups.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="top" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Whether to show the menu item in top navigation menu.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="left" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Whether to show the menu item in the left navigation menu.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="mobile" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Whether to show the menu item in the mobile menu.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="hidden" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to hide the menu with given name.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="tag" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              Specify a tag to show on menu item as a fixed label.
+              This attribute gets preference over 'tag-count' and 'tag-get' attributes.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="tag-count" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Specify whether to use count of menu action records as tag.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="tag-get" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              <![CDATA[
+              Specify a method call to get tag value.
+              This attribute gets preference over 'tag-count' attribute.
+              The signature of the controller method should be:<br><br>
+    
+              <code>
+              	void someMethod(ActionRequest request, ActionResponse response)
+              </code>
+              ]]>
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="tag-style" type="tns:LabelStyle">
+          <xsd:annotation>
+            <xsd:documentation>Specify the tag display style.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
   </xsd:complexType>
 
   <xsd:complexType name="ActionMenuItem">
@@ -875,6 +879,11 @@
         <xsd:documentation>
         Specify whether to call onSave event when saving parent record if x-can-reload is true.
         </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-search-limit" type="xsd:int">
+      <xsd:annotation>
+        <xsd:documentation>Specify the default page limit of search popup.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
   </xsd:attributeGroup>
@@ -1914,6 +1923,7 @@
               <xsd:attribute name="title" type="xsd:string"/>
               <xsd:attribute name="hidden" type="xsd:boolean"/>
               <xsd:attribute name="if" type="xsd:string" />
+              <xsd:attribute name="selection" type="xsd:string" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="filter" type="tns:SearchFilter" minOccurs="0" maxOccurs="unbounded">

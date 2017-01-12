@@ -52,7 +52,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		var getViewDef = this.getViewDef || scope.getViewDef || function() { return {}; };
 
 		var field = getViewDef.call(scope, element);
-		var props = _.pick(field, 'readonly,required,hidden,collapse,precision,scale,prompt,title,domain'.split(','));
+		var props = _.pick(field, 'readonly,required,hidden,collapse,precision,scale,prompt,title,domain,css,icon'.split(','));
 		var state = _.clone(props);
 		
 		function resetAttrs() {
@@ -121,6 +121,15 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			if (editable === old) return;
 			scope.$$readonly = scope.$$isReadonly();
 		});
+
+		// js expressions should be evaluated on dummy value changes
+		if (field.name && field.name[0] === '$') {
+			scope.$watch('record.' + field.name, function (a, b) {
+				if (a !== b) {
+					scope.$parent.$broadcast('on:record-change', scope.record);
+				}
+			});
+		}
 
 		scope.isRequired = function() {
 			return this.attr("required") || false;

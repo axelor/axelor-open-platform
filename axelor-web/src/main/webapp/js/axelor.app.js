@@ -360,15 +360,29 @@
 			});
 		}
 
+		function openHomeTab() {
+			var path = $scope.routePath;
+			var homeAction = axelor.config["user.action"];
+			if (!homeAction || _.last(path) !== "main") {
+				return;
+			}
+			NavService.openTabByName(homeAction, {
+				__tab_prepend: true,
+				__tab_closable: false
+			});
+		}
+
 		// load app config
 		fetchConfig().then(function () {
 			$scope.$user.id = axelor.config["user.id"];
 			$scope.$user.name = axelor.config["user.name"];
 			$scope.$user.image = axelor.config["user.image"];
+			openHomeTab();
 		});
 
 		$scope.$user = {};
 		$scope.$year = moment().year();
+		$scope.openHomeTab = openHomeTab;
 		$scope.$unreadMailCount = function () {
 			return MessageService.unreadCount();
 		};

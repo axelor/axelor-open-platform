@@ -17,6 +17,9 @@
  */
 package com.axelor.meta.service;
 
+import static com.axelor.common.StringUtils.isBlank;
+import static com.axelor.meta.loader.ModuleManager.isInstalled;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,6 +32,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.hibernate.query.internal.QueryImpl;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
@@ -38,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
-import com.axelor.common.ObjectUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
@@ -72,6 +75,7 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
+import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.google.common.base.Strings;
@@ -96,7 +100,7 @@ public class MetaService {
 	@Inject
 	private MetaFiles metaFiles;
 
-	private boolean canShow(MenuItem item, Map<String, MenuItem> map, Set<String> visited) {
+	private boolean canShow(MenuItem item, Map<String, MenuItem> map, Set<String> visited, ScriptHelper helper) {
 		if (visited == null) {
 			visited = new HashSet<>();
 		}
@@ -105,7 +109,7 @@ public class MetaService {
 			return false;
 		}
 		visited.add(item.getName());
-		if (item.getHidden() == Boolean.TRUE) {
+		if (item.getHidden() == Boolean.TRUE || !test(item, helper)) {
 			return false;
 		}
 		if (item.getParent() == null) {
@@ -115,7 +119,19 @@ public class MetaService {
 		if (parent == null) {
 			return false;
 		}
-		return canShow(parent, map, visited);
+		return canShow(parent, map, visited, helper);
+	}
+
+	private boolean test(MenuItem item, ScriptHelper helper) {
+		final String module = item.getModuleToCheck();
+		final String condition =  item.getConditionToCheck();
+		if (!isBlank(module) && !isInstalled(module)) {
+			return false;
+		}
+		if (isBlank(condition)) {
+			return true;
+		}
+		return helper.test(condition);
 	}
 
 	private List<MenuItem> filter(List<MenuItem> items) {
@@ -123,6 +139,9 @@ public class MetaService {
 		final Map<String, MenuItem> map = new LinkedHashMap<>();
 		final Set<String> visited = new HashSet<>();
 		final List<MenuItem> all = new ArrayList<>();
+
+		final Map<String, Object> vars = new HashMap<>();
+		final ScriptHelper scriptHelper = new CompositeScriptHelper(new ScriptBindings(vars));
 
 		for (MenuItem item : items) {
 			final String name = item.getName();
@@ -137,7 +156,7 @@ public class MetaService {
 
 		for (final String name : map.keySet()) {
 			final MenuItem item = map.get(name);
-			if (canShow(item, map, null)) {
+			if (canShow(item, map, null, scriptHelper)) {
 				all.add(item);
 			}
 		}
@@ -157,85 +176,6 @@ public class MetaService {
 		});
 
 		return all;
-	}
-
-	private List<MenuItem> findMenus(Query query, boolean withTagsOnly) {
-
-		QueryBinder.of(query).setCacheable();
-
-		final List<MenuItem> menus = new ArrayList<>();
-		final Set<Role> roles = new HashSet<>();
-		final User user = AuthUtils.getUser();
-
-		if (user != null && user.getRoles() != null) {
-			roles.addAll(user.getRoles());
-		}
-		if (user != null && user.getGroup() != null && user.getGroup().getRoles() != null) {
-			roles.addAll(user.getGroup().getRoles());
-		}
-
-		final List<MetaMenu> all = new ArrayList<>();
-
-		for (Object tuple : query.getResultList()) {
-			MetaMenu menu = (MetaMenu) ((Object[]) tuple)[0];
-			all.add(menu);
-
-			while (withTagsOnly && menu.getParent() != null) {
-				// need to get parents to check visibility
-				menu = menu.getParent();
-				all.add(menu);
-			}
-		}
-
-		for(final MetaMenu menu : all) {
-
-			final MenuItem item = new MenuItem();
-
-			// check user
-			if (menu.getUser() != null && menu.getUser() != user) {
-				continue;
-			}
-
-			boolean hasGroup =  !ObjectUtils.isEmpty(menu.getGroups()) && menu.getGroups().contains(user.getGroup());
-
-			// if no group access, check for roles
-			if (!hasGroup && !AuthUtils.isAdmin(user) && !ObjectUtils.isEmpty(menu.getRoles())) {
-				boolean hasRole = false;
-				for (final Role role : roles) {
-					if (menu.getRoles().contains(role)) {
-						hasRole = true;
-						break;
-					}
-				}
-				if (!hasRole) {
-					continue;
-				}
-			}
-
-			item.setName(menu.getName());
-			item.setOrder(menu.getOrder());
-			item.setTitle(menu.getTitle());
-			item.setIcon(menu.getIcon());
-			item.setIconBackground(menu.getIconBackground());
-			item.setTag(getTag(menu));
-			item.setTagStyle(menu.getTagStyle());
-			item.setTop(menu.getTop());
-			item.setLeft(menu.getLeft());
-			item.setMobile(menu.getMobile());
-			item.setHidden(menu.getHidden());
-
-			if (menu.getParent() != null) {
-				item.setParent(menu.getParent().getName());
-			}
-
-			if (menu.getAction() != null) {
-				item.setAction(menu.getAction().getName());
-			}
-
-			menus.add(item);
-		}
-
-		return filter(menus);
 	}
 
 	@SuppressWarnings("all")
@@ -294,32 +234,113 @@ public class MetaService {
 	public List<MenuItem> getMenus(boolean withTagsOnly) {
 
 		final User user = AuthUtils.getUser();
+		final Map<Long, Set<String>> menuGroups = new HashMap<>();
+		final Map<Long, Set<String>> menuRoles = new HashMap<>();
 
-		String qs = "SELECT self, COALESCE(self.priority, 0) AS priority FROM MetaMenu self LEFT JOIN self.groups g WHERE ";
-		Object groupCode = null;
+		final Query permsQuery = JPA.em().createQuery(
+				"SELECT new List(m.id, g.code, r.name) "
+				+ "FROM MetaMenu m "
+				+ "LEFT JOIN m.groups g "
+				+ "LEFT JOIN m.roles r");
+		QueryBinder.of(permsQuery).setCacheable();
 
-		if (user != null && user.getGroup() != null) {
-			groupCode = user.getGroup().getCode();
+		// prepare group, roles info to avoid additional queries
+		for (Object item : permsQuery.getResultList()) {
+			final List<?> vals = (List<?>) item;
+			final Long id = (Long) vals.get(0);
+			if (vals.get(1) != null) {
+				Set<String> groups = menuGroups.get(id);
+				if (groups == null) {
+					groups = new HashSet<>();
+					menuGroups.put(id, groups);
+				}
+				groups.add(vals.get(1).toString());
+			}
+			if (vals.get(2) != null) {
+				Set<String> roles = menuRoles.get(id);
+				if (roles == null) {
+					roles = new HashSet<>();
+					menuRoles.put(id, roles);
+				}
+				roles.add(vals.get(2).toString());
+			}
+		}
+		
+		final StringBuilder queryString = new StringBuilder()
+				.append("SELECT self FROM MetaMenu self ")
+				.append("LEFT JOIN FETCH self.action ")
+				.append("LEFT JOIN FETCH self.parent ")
+				.append(withTagsOnly ? "WHERE (self.tag IS NOT NULL OR self.tagGet IS NOT NULL) " : "")
+				.append(" ORDER BY COALESCE(self.priority, 0) DESC, self.id");
+
+		final TypedQuery<MetaMenu> query = JPA.em().createQuery(queryString.toString(), MetaMenu.class);
+		QueryBinder.of(query).setCacheable();
+
+		final List<MenuItem> menus = new ArrayList<>();
+		final List<MetaMenu> records = new ArrayList<>();
+
+		for (MetaMenu menu : query.getResultList()) {
+			records.add(menu);
+			while (withTagsOnly && menu.getParent() != null) {
+				// need to get parents to check visibility
+				menu = menu.getParent();
+				records.add(menu);
+			}
 		}
 
-		if (groupCode != null) {
-			qs += "(g.code = ?1 OR self.groups IS EMPTY) ";
-		} else {
-			qs += "self.groups IS EMPTY ";
+		final String userGroup = user.getGroup() == null ? null : user.getGroup().getCode();
+		final List<String> userRoles = new ArrayList<>();
+		if (user.getRoles() != null) {
+			for (Role role : user.getRoles()) {
+				userRoles.add(role.getName());
+			}
+		}
+		if (user.getGroup() != null && user.getGroup().getRoles() != null) {
+			for (Role role : user.getGroup().getRoles()) {
+				userRoles.add(role.getName());
+			}
 		}
 
-		if (withTagsOnly) {
-			qs += "AND (self.tag IS NOT NULL OR self.tagGet IS NOT NULL) ";
+		for(final MetaMenu menu : records) {
+			// check for user menus
+			if (menu.getUser() != null && menu.getUser() != user) {
+				continue;
+			}
+			// if no group access, check for roles
+			final Set<String> myGroups = menuGroups.get(menu.getId());
+			final Set<String> myRoles = menuRoles.get(menu.getId());
+			if (myGroups != null && !myGroups.contains(userGroup)
+					&& (myRoles == null || Collections.disjoint(userRoles, myRoles))) {
+				continue;
+			}
+
+			final MenuItem item = new MenuItem();
+			item.setName(menu.getName());
+			item.setOrder(menu.getOrder());
+			item.setTitle(menu.getTitle());
+			item.setIcon(menu.getIcon());
+			item.setIconBackground(menu.getIconBackground());
+			item.setTag(getTag(menu));
+			item.setTagStyle(menu.getTagStyle());
+			item.setTop(menu.getTop());
+			item.setLeft(menu.getLeft());
+			item.setMobile(menu.getMobile());
+			item.setHidden(menu.getHidden());
+			item.setModuleToCheck(menu.getModuleToCheck());
+			item.setConditionToCheck(menu.getConditionToCheck());
+
+			if (menu.getParent() != null) {
+				item.setParent(menu.getParent().getName());
+			}
+
+			if (menu.getAction() != null) {
+				item.setAction(menu.getAction().getName());
+			}
+
+			menus.add(item);
 		}
 
-		qs += "ORDER BY priority DESC, self.id";
-
-		Query query = JPA.em().createQuery(qs);
-		if (groupCode != null) {
-			query.setParameter(1, groupCode);
-		}
-
-		return findMenus(query, withTagsOnly);
+		return filter(menus);
 	}
 
 	@SuppressWarnings("unchecked")

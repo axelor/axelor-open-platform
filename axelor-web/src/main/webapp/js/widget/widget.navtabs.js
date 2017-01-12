@@ -58,27 +58,24 @@ ui.directive('uiNavTabs', function() {
 
 				e.preventDefault();
 				e.stopPropagation();
-				
-				if (!tabScope.canCloseTab(tabScope.tab)) {
-					return;
-				}
-
-				var offset = elem.offset();
-				menu.show().css({
-					left: e.pageX - offset.left,
-					top: e.pageY - offset.top
-				});
 
 				scope.current = tabScope.tab;
-				$(document).on('mousedown.nav-tabs-menu', hideMenu);
+				scope.$timeout(function () {
+					var offset = elem.offset();
+					menu.show().css({
+						left: e.pageX - offset.left,
+						top: e.pageY - offset.top
+					});
+					$(document).on('click.nav-tabs-menu', hideMenu);
+				});
 			}
 			
 			function hideMenu(e) {
-					scope.$timeout(function () {
-						scope.current = null;
-						menu.hide();
-					}, 200);
-				$(document).off('mousedown.nav-tabs-menu');
+				scope.$timeout(function () {
+					scope.current = null;
+					menu.hide();
+				});
+				$(document).off('click.nav-tabs-menu');
 			}
 		},
 		templateUrl: 'partials/nav-tabs.html'

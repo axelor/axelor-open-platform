@@ -57,9 +57,11 @@ import com.google.common.collect.Maps;
 })
 public abstract class AbstractWidget {
 	
+	@JsonIgnore
 	@XmlAttribute(name = "if")
 	private String conditionToCheck;
 
+	@JsonIgnore
 	@XmlAttribute(name = "if-module")
 	private String moduleToCheck;
 	

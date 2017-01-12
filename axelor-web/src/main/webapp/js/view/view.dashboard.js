@@ -185,6 +185,9 @@ function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 			init();
 
 			$scope.title = dashlet.title || view.title;
+			if ($scope.attr) {
+				$scope.title = $scope.attr('title') || $scope.title;
+			}
 			$scope.parseDashlet(dashlet, view);
 		});
 	};

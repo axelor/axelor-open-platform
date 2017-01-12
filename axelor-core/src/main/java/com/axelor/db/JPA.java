@@ -41,6 +41,7 @@ import org.hibernate.Session;
 import org.hibernate.StaleObjectStateException;
 import org.hibernate.collection.spi.PersistentCollection;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -594,6 +595,11 @@ public final class JPA {
 			}
 
 			if (p.getType() == PropertyType.ONE_TO_ONE) {
+				continue;
+			}
+
+			// don't copy non-owning m2m
+			if (p.getType() == PropertyType.MANY_TO_MANY && !StringUtils.isBlank(p.getMappedBy())) {
 				continue;
 			}
 

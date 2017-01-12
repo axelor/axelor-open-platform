@@ -1093,11 +1093,13 @@ Grid.prototype._doInit = function(view) {
 	scope.$on("on:new", function(e) {
 		that.$oldValues = null;
 		that.clearDirty();
+		that.resetColumns();
 	});
 	
 	scope.$on("on:edit", function(e) {
 		that.$oldValues = null;
 		that.clearDirty();
+		that.resetColumns();
 	});
 	
 	scope.$on("on:before-save", function(e) {
@@ -1293,8 +1295,10 @@ Grid.prototype.getVisibleColumns = function() {
 
 Grid.prototype.resetColumns = function() {
 	var grid = this.grid,
-		cols = this.cols;
-	
+		cols = this.cols.filter(function (col) {
+			return !(col.descriptor||{}).hidden;
+		});
+
 	this.visibleCols = _.pluck(cols, 'id');
 	
 	grid.setColumns(cols);

@@ -510,7 +510,7 @@ ui.directive('uiViewPopup', function() {
 					unwatch();
 					var viewScope = scope._viewParams.$viewScope;
 					var viewPromise = viewScope._viewPromise;
-					scope.viewTitle = viewScope.schema.title;
+					scope.viewTitle = scope.tabTitle(scope._viewParams);
 					scope._doShow(viewPromise);
 				});
 			});
@@ -536,17 +536,20 @@ ui.directive('uiRecordPager', function(){
 			scope.showText = attrs.uiRecordPager !== "no-text";
 			
 			function updatePageSize() {
-				elText.add(elChanger).toggle();
-				if (scope.setPageSize) {
-					scope.setPageSize(elInput.val());
+				var size = +(elInput.val()) || 0;
+				if (scope.setPageSize && size > 0) {
+					scope.setPageSize(size);
 				}
+				elText.add(elChanger).toggle();
 			}
 
 			elText.click(function(e) {
-				if(scope.selectedTab.viewType !== "form") {
-					elText.add(elChanger).toggle();
-					elInput.focus().select();
-				}
+				elText.add(elChanger).toggle();
+				elInput.zIndex(elInput.parent().zIndex() + 1).focus().select();
+			});
+
+			elInput.on('click', function () {
+				elInput.zIndex(elInput.parent().zIndex() + 1).focus().select();
 			});
 
 			elChanger.on('click', 'button',  function() {
