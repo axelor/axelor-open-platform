@@ -1734,6 +1734,12 @@
             that returns required values to create a new record.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="onMove" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Specify an action (action-record or action-method)
+            that returns values to update kanban record being moved.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="limit" type="xsd:integer">
           <xsd:annotation>
             <xsd:documentation>Specify pagination limit per column.</xsd:documentation>

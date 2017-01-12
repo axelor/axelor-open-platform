@@ -39,6 +39,9 @@ public class KanbanView extends CardsView {
 	private String onNew;
 
 	@XmlAttribute
+	private String onMove;
+
+	@XmlAttribute
 	private Integer limit;
 
 	public String getColumnBy() {
@@ -71,6 +74,14 @@ public class KanbanView extends CardsView {
 
 	public void setOnNew(String onNew) {
 		this.onNew = onNew;
+	}
+
+	public String getOnMove() {
+		return onMove;
+	}
+
+	public void setOnMove(String onMove) {
+		this.onMove = onMove;
 	}
 
 	public Integer getLimit() {
