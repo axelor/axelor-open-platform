@@ -17,15 +17,20 @@
  */
 package com.axelor.script;
 
+import java.lang.reflect.Method;
+
 import com.axelor.common.ClassUtils;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
 import com.axelor.db.Model;
+import com.axelor.internal.javax.el.BeanELResolver;
 import com.axelor.internal.javax.el.ELClass;
 import com.axelor.internal.javax.el.ELContext;
+import com.axelor.internal.javax.el.ELException;
 import com.axelor.internal.javax.el.ELProcessor;
 import com.axelor.internal.javax.el.ImportHandler;
 import com.axelor.internal.javax.el.MapELResolver;
+import com.axelor.internal.javax.el.MethodNotFoundException;
 import com.axelor.rpc.Context;
 import com.google.common.primitives.Ints;
 
@@ -89,6 +94,28 @@ public class ELScriptHelper extends AbstractScriptHelper {
 			}
 			context.setPropertyResolved(true);
 			return value;
+		}
+	}
+	
+	class BeanResolver extends BeanELResolver {
+		
+		@Override
+		public Object invoke(ELContext context, final Object base, Object method, Class<?>[] paramTypes, Object[] params) {
+			if (base instanceof Class) {
+				final Class<?> klass = (Class<?>) base;
+				try {
+					final Method staticMethod = klass.getMethod(method.toString(), paramTypes);
+					context.setPropertyResolved(true);
+					return staticMethod.invoke(klass, params);
+				} catch (NoSuchMethodException | SecurityException e) {
+					throw new MethodNotFoundException(klass.getName() + "." + method.toString());
+				} catch (IllegalArgumentException e) {
+					throw e;
+				} catch (Exception e) {
+					throw new ELException(e);
+				}
+			}
+			return super.invoke(context, base, method, paramTypes, params);
 		}
 	}
 
@@ -156,6 +183,7 @@ public class ELScriptHelper extends AbstractScriptHelper {
 		this.processor = new ELProcessor();
 		this.processor.getELManager().addELResolver(new ClassResolver());
 		this.processor.getELManager().addELResolver(new ContextResolver());
+		this.processor.getELManager().addELResolver(new BeanResolver());
 
 		final String className = Helpers.class.getName();
 
@@ -165,6 +193,7 @@ public class ELScriptHelper extends AbstractScriptHelper {
 			this.processor.defineFunction("", "int", className, "toInt");
 			this.processor.defineFunction("", "str", className, "text");
 			this.processor.defineFunction("", "imp", className, "importClass");
+			this.processor.defineFunction("", "T", className, "importClass");
 			this.processor.defineFunction("", "__repo__", className, "repo");
 			this.processor.defineFunction("fmt", "text", className, "formatText");
 		} catch (Exception e) {
