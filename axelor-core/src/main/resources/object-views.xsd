@@ -876,6 +876,11 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-search-limit" type="xsd:int">
+      <xsd:annotation>
+        <xsd:documentation>Specify the default page limit of search popup.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:attributeGroup name="ObjectViewAttributes">

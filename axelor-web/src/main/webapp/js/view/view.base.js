@@ -536,17 +536,20 @@ ui.directive('uiRecordPager', function(){
 			scope.showText = attrs.uiRecordPager !== "no-text";
 			
 			function updatePageSize() {
-				elText.add(elChanger).toggle();
-				if (scope.setPageSize) {
-					scope.setPageSize(elInput.val());
+				var size = +(elInput.val()) || 0;
+				if (scope.setPageSize && size > 0) {
+					scope.setPageSize(size);
 				}
+				elText.add(elChanger).toggle();
 			}
 
 			elText.click(function(e) {
-				if(scope.selectedTab.viewType !== "form") {
-					elText.add(elChanger).toggle();
-					elInput.focus().select();
-				}
+				elText.add(elChanger).toggle();
+				elInput.zIndex(elInput.parent().zIndex() + 1).focus().select();
+			});
+
+			elInput.on('click', function () {
+				elInput.zIndex(elInput.parent().zIndex() + 1).focus().select();
 			});
 
 			elChanger.on('click', 'button',  function() {

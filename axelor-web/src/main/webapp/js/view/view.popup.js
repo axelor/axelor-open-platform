@@ -211,6 +211,11 @@ function SelectorCtrl($scope, $element, DataSource, ViewService) {
 
 	ui.ViewCtrl.call(this, $scope, DataSource, ViewService);
 	ui.GridViewCtrl.call(this, $scope, $element);
+	
+	var searchLimit = (parent.field||{}).searchLimit || 0;
+	if (searchLimit > 0) {
+		$scope._dataSource._page.limit = searchLimit;
+	}
 
 	function doFilter() {
 		$scope.filter($scope.getDomain());
@@ -511,13 +516,7 @@ ui.directive('uiSelectorPopup', function(){
 		template:
 		'<div ui-dialog ui-dialog-size x-resizable="true" x-on-ok="onOK">'+
 		    '<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-editable="false" x-selector="{{selectMode}}"></div>'+
-		    '<div class="record-pager">'+
-		    	'<span class="record-pager-text">{{pagerText()}}</span>'+
-			    '<div class="btn-group">'+
-			      '<button class="btn" ng-disabled="!canPrev()" ng-click="onPrev()"><i class="fa fa-chevron-left"></i></button>'+
-			      '<button class="btn" ng-disabled="!canNext()" ng-click="onNext()"><i class="fa fa-chevron-right"></i></button>'+
-			    '</div>'+
-		    '</div>'+
+		    '<div ui-record-pager></div>'+
 		    '<div class="ui-dialog-buttonset-left pull-left" ng-show="canNew()">'+
 		    	'<button class="btn" ng-click="onCreate()" x-translate>Create</button>'+
 		    '</div>'+
