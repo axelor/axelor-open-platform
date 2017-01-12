@@ -1918,6 +1918,7 @@
               <xsd:attribute name="title" type="xsd:string"/>
               <xsd:attribute name="hidden" type="xsd:boolean"/>
               <xsd:attribute name="if" type="xsd:string" />
+              <xsd:attribute name="selection" type="xsd:string" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="filter" type="tns:SearchFilter" minOccurs="0" maxOccurs="unbounded">
