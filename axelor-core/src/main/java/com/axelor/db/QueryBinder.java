@@ -17,6 +17,7 @@
  */
 package com.axelor.db;
 
+import java.util.Collection;
 import java.util.Map;
 
 import javax.persistence.FlushModeType;
@@ -183,22 +184,23 @@ public class QueryBinder {
 		}
 
 		for (int i = 0; i < params.length; i++) {
-			Object param = params[i];
-			if (param instanceof String
-					&& !StringUtils.isBlank((String) param)
-					&& bindings.containsKey(param)) {
-				param = bindings.get(param);
+			Parameter<?> param;
+			Object value = params[i];
+			if (value instanceof String
+					&& !StringUtils.isBlank((String) value)
+					&& bindings.containsKey(value)) {
+				value = bindings.get(value);
 			}
 			try {
-				query.getParameter(i + offset);
+				param = query.getParameter(i + offset);
 			} catch (Exception e) {
 				continue;
 			}
 			try {
-				query.setParameter(i + offset, param);
+				validate(param.getParameterType(), value);
+				query.setParameter(i + offset, value);
 			} catch (IllegalArgumentException e) {
-				Parameter<?> p = query.getParameter(i + 1);
-				query.setParameter(i + offset, adapt(param, p));
+				query.setParameter(i + offset, adapt(value, param));
 			}
 		}
 
@@ -229,6 +231,7 @@ public class QueryBinder {
 		}
 
 		try {
+			validate(parameter.getParameterType(), value);
 			query.setParameter(name, value);
 		} catch (IllegalArgumentException e) {
 			query.setParameter(name, adapt(value, parameter));
@@ -244,6 +247,38 @@ public class QueryBinder {
 	 */
 	public javax.persistence.Query getQuery() {
 		return query;
+	}
+	
+	// XXX: HHH-11397
+	// based on hibernate 4.x parameter binding validation
+	private void validate(Class<?> type, Object value) {
+		if (value == null || type == null) {
+			return;
+		}
+		if (value instanceof Collection && !Collection.class.isAssignableFrom(type)) {
+			for (Object item : (Collection<?>) value) {
+				if (!type.isInstance(item)) {
+					throw new IllegalArgumentException();
+				}
+			}
+		} else if (value.getClass().isArray()) {
+			if (!type.isArray()) {
+				throw new IllegalArgumentException();
+			}
+			if (value.getClass().getComponentType().isPrimitive()) {
+				if (!type.getComponentType().isAssignableFrom(value.getClass().getComponentType())) {
+					throw new IllegalArgumentException();
+				}
+			} else {
+				for (Object element : (Object[]) value) {
+					if (!type.getComponentType().isInstance(element)) {
+						throw new IllegalArgumentException();
+					}
+				}
+			}
+		} else if (!type.isInstance(value)) {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	private Object adapt(Object value, Parameter<?> param) {
