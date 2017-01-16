@@ -8,6 +8,8 @@ build
 node_modules
 application.min.*
 application.gzip.*
+application.login.min.*
+application.login.gzip.*
 *.sw[nop]
 *~
 .#*

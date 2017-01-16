@@ -17,11 +17,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@page import="java.util.Calendar"%>
-<%@page import="java.util.Date"%>
+<%@ taglib prefix="x" uri="WEB-INF/axelor.tld" %>
 <%@ page language="java" session="true" %>
-<%@ page import="com.axelor.i18n.I18n" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page import="java.util.Calendar"%>
+<%@ page import="java.util.Date"%>
+<%@ page import="com.axelor.i18n.I18n" %>
 <%
 String loginTitle = I18n.get("Please sign in");
 String loginRemember = I18n.get("Remember me");
@@ -45,14 +46,8 @@ if (pageContext.getServletContext().getResource(loginHeader) == null) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="google" content="notranslate">
     <link rel="shortcut icon" href="ico/favicon.ico">
-    <link href="lib/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="lib/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="lib/font-awesome/css/font-awesome.css" rel="stylesheet">
-    <link href="css/view.form.checkbox.css" rel="stylesheet">
-    <link href="css/colors.css" rel="stylesheet">
-    <link href="css/login.css" rel="stylesheet">
-    <script type="text/javascript" src="lib/jquery.ui/js/jquery.js"></script>
-    <script type="text/javascript" src="lib/bootstrap/js/bootstrap.js"></script>
+    <x:style src="css/application.login.css" />
+    <x:script src="js/application.login.js" />
   </head>
   <body>
 
