@@ -58,11 +58,12 @@ if (pageContext.getServletContext().getResource(extraButtons) == null) {
 
 %>
 <!DOCTYPE html>
-<html lang="en" ng-app="axelor.app" ng-controller="AppCtrl" ng-cloak>
+<html lang="<%= info.getPageLang() %>" ng-app="axelor.app" ng-controller="AppCtrl" ng-cloak>
   <head>
     <meta charset="utf-8">
     <title><%= appTitle %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="google" content="notranslate">
     <meta name="description" content="<%= appDesc %>">
     <meta name="author" content="<%= appAuthor %>">
 
