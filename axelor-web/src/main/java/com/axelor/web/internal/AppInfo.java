@@ -139,6 +139,11 @@ public class AppInfo {
 		return logo;
 	}
 
+	public String getPageLang() {
+		String lang = AppFilter.getLocale().getLanguage();
+		return lang == null ? "en" : lang.substring(0, 2).toLowerCase();
+	}
+
 	public String getTheme() {
 		final User user = AuthUtils.getUser();
 		if (user == null || StringUtils.isBlank(user.getTheme()) || "default".equals(user.getTheme())) {
