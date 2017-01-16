@@ -52,10 +52,10 @@ public class XMLBind {
 	private String search;
 
 	@XStreamAsAttribute
-	private boolean update;
+	private Boolean update;
 	
 	@XStreamAsAttribute
-	private boolean create;
+	private Boolean create;
 
 	@XStreamAlias("eval")
 	@XStreamAsAttribute
@@ -113,11 +113,11 @@ public class XMLBind {
 		return search;
 	}
 
-	public boolean isUpdate() {
+	public Boolean getUpdate() {
 		return update;
 	}
 	
-	public boolean isCreate() {
+	public Boolean getCreate() {
 		return create;
 	}
 
