@@ -103,3 +103,7 @@ table.treetable tbody tr.accept {
 	height: 100%;
 	border: 1px solid #d4d4d4;
 }
+
+.form-item .dashlet .tree-view-container {
+	border: 0;
+}
