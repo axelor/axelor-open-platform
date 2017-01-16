@@ -221,7 +221,7 @@
     <string name="message" column="message_value" large="true" />
     <string name="language" required="true" />
     <unique-constraint columns="message_key,language"/>
-    <finder-method name="findByKey" using="key,language" cacheable="true" filter="self.language = :language AND self.key LIKE :key"/>
+    <finder-method name="findByKey" using="key,language" cacheable="true" />
   </entity>
 
   <entity name="MetaFile" table="META_FILE">
