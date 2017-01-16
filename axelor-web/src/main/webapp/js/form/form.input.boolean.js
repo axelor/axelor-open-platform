@@ -49,8 +49,7 @@ ui.formInput('Boolean', {
 		});
 	},
 	template_readonly: null,
-	template_editable: null,
-	template:
+	template_editable:
 		"<label class='ibox'>" +
 			"<input type='checkbox' ng-model='$value' ng-disabled='isReadonly()'>" +
 			"<span class='box'></span>" +
@@ -70,8 +69,7 @@ ui.formInput('InlineCheckbox', 'Boolean', {
 		});
 	},
 	template_readonly: null,
-	template_editable: null,
-	template:
+	template_editable:
 		"<label class='ibox'>" +
 			"<input type='checkbox' ng-model='$value' ng-disabled='isReadonly()'>" +
 			"<div class='box'></div>" +
@@ -103,9 +101,8 @@ ui.formInput('Toggle', 'Boolean', {
 			element.attr('title', field.help || field.title);
 		}
 	},
-	template_editable: null,
 	template_readonly: null,
-	template:
+	template_editable:
 		"<button tabindex='-1' class='btn btn-default' ng-class='{active: $value}' ng-click='toggle()'>" +
 			"<i class='fa {{icon()}}'></i>" +
 		"</button>"
@@ -209,8 +206,7 @@ ui.formInput('BooleanRadio', 'BooleanSelect', {
 ui.formInput('BooleanSwitch', 'Boolean', {
 	css: 'form-item',
 	template_readonly: null,
-	template_editable: null,
-	template:
+	template_editable:
 		"<label class='iswitch'>" +
 			"<input type='checkbox' ng-model='$value' ng-disabled='isReadonly()'>" +
 			"<span class='box'></span>" +
