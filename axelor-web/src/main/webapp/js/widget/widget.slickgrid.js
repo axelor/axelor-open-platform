@@ -886,7 +886,15 @@ Grid.prototype._doInit = function(view) {
 	// end performance tweaks
 	
 	dataView.$syncSelection = function(old, oldIds, focus) {
-		var selection = dataView.mapIdsToRows(oldIds);
+		var selection = dataView.mapIdsToRows(oldIds || []);
+		if (!focus) {
+			_.each(dataView.getItems(), function (item, i) {
+				if (item.selected) {
+					selection.push(i);
+				}
+			});
+		}
+		selection = _.unique(selection);
 		grid.setSelectedRows(selection);
 		if (selection.length === 0 && !grid.getEditorLock().isActive()) {
 			grid.setActiveCell(null);
