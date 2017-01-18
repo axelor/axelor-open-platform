@@ -31,12 +31,9 @@ ui.formInput('Boolean', {
 	cellCss: 'form-item boolean-item',
 	
 	link: function (scope, element, attrs, model) {
-		
-		var field = scope.field;
-		var input = element.find('input');
 
-		input.click(function () {
-			scope.setValue(input[0].checked, true);
+		element.on('click', 'input', function (e) {
+			scope.setValue(e.target.checked, true);
 		});
 
 		Object.defineProperty(scope, '$value', {
