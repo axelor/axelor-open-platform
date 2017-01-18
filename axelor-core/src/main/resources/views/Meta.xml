@@ -207,7 +207,7 @@
   <form name="meta-menu-form" title="Menu Item" model="com.axelor.meta.db.MetaMenu">
     <panel title="General" colSpan="12">
       <field name="name"/>
-      <field name="parent" domain="self.name != :name"/>
+      <field name="parent" domain="self.name != :name" grid-view="meta-menu-grid" form-view="meta-menu-form"/>
       <field name="title"/>
       <field name="action"/>
       <field name="icon"/>
