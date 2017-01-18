@@ -1161,7 +1161,6 @@ Grid.prototype._doInit = function(view) {
 	this.zIndexFix();
 
 	scope.$timeout(grid.invalidate);
-	scope.applyLater();
 };
 
 Grid.prototype.subscribe = function(event, handler) {
@@ -1183,6 +1182,7 @@ Grid.prototype.adjustSize = function() {
 	this.doInit();
 	this.adjustToScreen();
 	this.grid.resizeCanvas();
+	this.grid.autosizeColumns();
 };
 
 Grid.prototype.adjustToScreen = function() {
@@ -2553,6 +2553,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 				if (!handler._isPopup && schema.inlineHelp && !axelor.config["user.noHelp"]) {
 					addHelp(schema.inlineHelp);
 				}
+				grid.adjustSize();
 			}
 
 			function addHelp(helpItem) {
