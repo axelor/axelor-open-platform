@@ -244,6 +244,7 @@ public class XMLViews {
 		} else {
 			select.add("self.groups[].id = :group");
 		}
+		select.add("(self.extension is null OR self.extension = false)");
 		return views.all().filter(Joiner.on(" AND ").join(select))
 				.bind("name", name)
 				.bind("type", type)
@@ -339,6 +340,53 @@ public class XMLViews {
 			}
 		}
 		return xmlView;
+	}
+
+	/**
+	 * Find view extensions.
+	 * 
+	 * @param name
+	 *            name of the form extension
+	 * @param model
+	 *            the form extension model
+	 * @param type
+	 *            extension view type
+	 * @param module
+	 *            the module
+	 * @return list of the form extensions
+	 */
+	public static List<AbstractView> findExtensions(String name, String model, String type, String module) {
+		final MetaViewRepository repo = Beans.get(MetaViewRepository.class);
+		final User user = AuthUtils.getUser();
+		final Long group = user != null && user.getGroup() != null ? user.getGroup().getId() : null;
+		final List<String> select = new ArrayList<>();
+		select.add("self.extension = true");
+		select.add("self.name = :name");
+		select.add("self.model = :model");
+		select.add("self.type = :type");
+		if (group == null) {
+			select.add("self.groups is empty");
+		} else {
+			select.add("(self.groups is empty OR self.groups[].id = :group)");
+		}
+		final List<MetaView> metaViews = repo.all().filter(Joiner.on(" AND ").join(select))
+				.bind("name", name)
+				.bind("model", model)
+				.bind("type", type)
+				.bind("module", module)
+				.bind("group", group)
+				.cacheable()
+				.order("-priority")
+				.fetch();
+		final List<AbstractView> all = new ArrayList<>();
+		for (MetaView view : metaViews) {
+			try {
+				final AbstractView xmlView = ((ObjectViews) XMLViews.unmarshal(view.getXml())).getViews().get(0);
+				all.add(xmlView);
+			} catch (Exception e) {
+			}
+		}
+		return all;
 	}
 
 	public static Action findAction(String name) {

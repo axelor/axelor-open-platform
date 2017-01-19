@@ -1362,6 +1362,7 @@
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractFormView">
         <xsd:attributeGroup ref="tns:ObjectViewAttributes" />
+        <xsd:attribute name="extension" type="xsd:boolean" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

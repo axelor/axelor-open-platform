@@ -113,6 +113,7 @@
         <field name="model"/>
         <field name="module"/>
         <field name="groups" widget="TagSelect" x-create="code,name"/>
+        <field name="extension" showIf="type === 'form'"/>
       </panel>
     </panel>
     <panel title="Schema">

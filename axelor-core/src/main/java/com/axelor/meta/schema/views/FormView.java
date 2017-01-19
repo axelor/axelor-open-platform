@@ -17,13 +17,18 @@
  */
 package com.axelor.meta.schema.views;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.meta.loader.XMLViews;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
@@ -184,6 +189,7 @@ public class FormView extends AbstractView {
 		this.canAttach = canAttach;
 	}
 
+	@JsonIgnore
 	public List<AbstractWidget> getItems() {
 		if(items == null) {
 			return items;
@@ -199,5 +205,22 @@ public class FormView extends AbstractView {
 
 	public void setItems(List<AbstractWidget> items) {
 		this.items = items;
+	}
+	
+	@XmlTransient
+	@JsonProperty("items")
+	public List<AbstractWidget> getItemsWithExtensions() {
+		final List<AbstractWidget> items = getItems();
+		final List<AbstractWidget> all = new ArrayList<>();
+		if (items != null) {
+			all.addAll(items);
+		}
+		final List<AbstractView> extensions = XMLViews.findExtensions(getName(), getModel(), "form", null);
+		for (AbstractView extension : extensions) {
+			if (extension instanceof FormView) {
+				all.addAll(((FormView) extension).getItems());
+			}
+		}
+		return all.isEmpty() ? null : all;
 	}
 }

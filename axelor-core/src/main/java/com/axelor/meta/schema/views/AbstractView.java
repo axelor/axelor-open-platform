@@ -93,6 +93,9 @@ public abstract class AbstractView {
 	@XmlAttribute
 	private String helpLink;
 
+	@XmlAttribute
+	private Boolean extension;
+
 	@JsonIgnore
 	@XmlAttribute( name = "width")
 	private String widthSpec;
@@ -202,6 +205,14 @@ public abstract class AbstractView {
 
 	public void setHelpLink(String helpLink) {
 		this.helpLink = helpLink;
+	}
+
+	public Boolean getExtension() {
+		return extension;
+	}
+
+	public void setExtension(Boolean extension) {
+		this.extension = extension;
 	}
 
 	private String widthPart(int which) {

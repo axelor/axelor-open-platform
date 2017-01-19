@@ -220,7 +220,8 @@ public class ViewLoader extends AbstractLoader {
 		}
 
 		// set priority higher to existing view
-		if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+		if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())
+				&& view.getExtension() != Boolean.TRUE) {
 			entity.setPriority(other.getPriority() + 1);
 		}
 
@@ -244,6 +245,11 @@ public class ViewLoader extends AbstractLoader {
 		entity.setModule(module.getName());
 		entity.setXml(xml);
 		entity.setGroups(this.findGroups(view.getGroups(), entity.getGroups()));
+		entity.setExtension(view.getExtension());
+		
+		if (entity.getTitle() == null) {
+			entity.setTitle(name);
+		}
 
 		if (entity.getHelpLink() == null) {
 			entity.setHelpLink(view.getHelpLink());
