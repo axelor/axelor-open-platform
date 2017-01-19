@@ -18,7 +18,6 @@
 package com.axelor.web.service;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -50,8 +49,6 @@ import com.axelor.meta.schema.views.SimpleContainer;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -120,7 +117,7 @@ public class ViewService extends AbstractService {
 		}
 
 		meta.put("model", model);
-		meta.putAll(findFields(model, names));
+		meta.putAll(MetaStore.findFields(modelClass, names));
 
 		response.setData(meta);
 		response.setStatus(Response.STATUS_SUCCESS);
@@ -137,74 +134,6 @@ public class ViewService extends AbstractService {
 			views.put(mode, params.getFirst(mode));
 		}
 		return service.findViews(findClass(model), views);
-	}
-
-	private Map<String, Object> findFields(final String model, final List<String> names) {
-		final Map<String, Object> data = Maps.newHashMap();
-
-		if (Strings.isNullOrEmpty(model)) {
-			return data;
-		}
-
-		final Class<?> modelClass = findClass(model);
-		final Mapper mapper = Mapper.of(modelClass);
-		final List<Object> fields = Lists.newArrayList();
-
-		boolean massUpdate = false;
-		Object bean = null;
-		try {
-			bean = modelClass.newInstance();
-		} catch (Exception e) {}
-
-		for(String name : names) {
-			Property p = findField(mapper, name);
-			if (p != null) {
-				Map<String, Object> map = p.toMap();
-				map.put("name", name);
-				if (p.getSelection() != null && !"".equals(p.getSelection().trim())) {
-					map.put("selection", p.getSelection());
-					map.put("selectionList", findSelection(p));
-				}
-				if (p.getTarget() != null) {
-					map.put("perms", MetaStore.getPermissions(p.getTarget()));
-				}
-				if (p.isMassUpdate()) {
-					massUpdate = true;
-				}
-				// find the default value
-				if (!p.isTransient() && !p.isVirtual()) {
-					Object obj = null;
-					if (name.contains(".")) {
-						try {
-							obj = p.getEntity().newInstance();
-						} catch (Exception e) {}
-					} else {
-						obj = bean;
-					}
-					if (obj != null) {
-						Object defaultValue = p.get(obj);
-						if (defaultValue != null) {
-							map.put("defaultValue", defaultValue);
-						}
-					}
-				}
-				fields.add(map);
-			}
-		}
-
-		Map<String, Object> perms = MetaStore.getPermissions(modelClass);
-
-		if (massUpdate) {
-			if (perms == null) {
-				perms = Maps.newHashMap();
-			}
-			perms.put("massUpdate", massUpdate);
-		}
-
-		data.put("perms", perms);
-		data.put("fields", fields);
-
-		return data;
 	}
 
 	private List<String> findNames(final List<String> names, final AbstractWidget widget) {
@@ -265,7 +194,7 @@ public class ViewService extends AbstractService {
 		}
 
 		if (view instanceof AbstractView) {
-			data.putAll(findFields(model, findNames((AbstractView) view)));
+			data.putAll(MetaStore.findFields(findClass(model), findNames((AbstractView) view)));
 		}
 
 		response.setData(data);
@@ -278,26 +207,8 @@ public class ViewService extends AbstractService {
 	@Path("view/fields")
 	public Response viewFields(Request request) {
 		final Response response = new Response();
-		response.setData(findFields(request.getModel(), request.getFields()));
+		response.setData(MetaStore.findFields(request.getBeanClass(), request.getFields()));
 		return response;
-	}
-
-	private Property findField(final Mapper mapper, String name) {
-		final Iterator<String> iter = Splitter.on(".").split(name).iterator();
-		Mapper current = mapper;
-		Property property = current.getProperty(iter.next());
-		while(iter.hasNext()) {
-			current = Mapper.of(property.getTarget());
-			property = current.getProperty(iter.next());
-		}
-		return property;
-	}
-
-	private List<?> findSelection(Property property) {
-		if (property.getSelection() == null) {
-			return null;
-		}
-		return MetaStore.getSelectionList(property.getSelection());
 	}
 
 	@GET
