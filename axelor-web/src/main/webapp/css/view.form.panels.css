@@ -159,7 +159,7 @@
 	padding: 0;
 }
 
-.panel-layout .o2m-list .panel .row-fluid > .form-item {
+.panel-layout .o2m-list .panel .row-fluid > .form-item:not(.form-item-hidden) {
 	margin-bottom: 6px;
 }
 
