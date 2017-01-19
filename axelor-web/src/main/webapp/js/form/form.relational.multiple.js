@@ -597,7 +597,7 @@ ui.formInput('OneToMany', {
 				'<span class="brand" href="" ui-help-popover ng-bind-html-unsafe="title"></span>'+
 				'<span class="icons-bar pull-right" ng-show="!isReadonly()">'+
 					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowEdit()" title="{{\'Edit\' | t}}" class="fa fa-pencil"></i>'+
-          '<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowView()" title="{{\'View\' | t}}" class="fa fa-file-text-o"></i>'+
+					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowView()" title="{{\'View\' | t}}" class="fa fa-file-text-o"></i>'+
 					'<i ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled() && canNew()" title="{{\'New\' | t}}" class="fa fa-plus"></i>'+
 					'<i ng-click="onRemove()" ng-show="hasPermission(\'remove\') && !isDisabled() && canRemove()" title="{{\'Remove\' | t}}" class="fa fa-minus"></i>'+
 					'<i ng-click="onSelect()" ng-show="hasPermission(\'read\') && !isDisabled() && canSelect()" title="{{\'Select\' | t}}" class="fa fa-search"></i>'+
@@ -836,6 +836,10 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		var showOnNew = (scope.field.editor||{}).showOnNew !== false;
 		var unwatch = null;
 
+		function canAdd() {
+			return scope.hasPermission("write") && !scope.isDisabled() && scope.canNew();
+		}
+
 		model.$render = function () {
 			if (unwatch) {
 				unwatch();
@@ -845,7 +849,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			if ((scope.items && scope.items.length > 0) || scope.$$readonly) {
 				return;
 			}
-			scope.items = showOnNew ? [{}] : [];
+			scope.items = showOnNew && canAdd() ? [{}] : [];
 			unwatch = scope.$watch('items[0]', function (item, old) {
 				if (!item) return;
 				if (item.$changed) {
@@ -882,7 +886,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			if (readonly === undefined) return;
 			var items = model.$viewValue;
 			if (_.isEmpty(items)) {
-				scope.items = (showOnNew && !readonly) ? [{}] : items;
+				scope.items = (showOnNew && canAdd() && !readonly) ? [{}] : items;
 			}
 		});
 
@@ -892,7 +896,9 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			if (items && items.length && isEmpty(item)) {
 				return;
 			}
-			items.push({});
+			if (canAdd()) {
+				items.push({});
+			}
 		};
 
 		scope.removeItem = function (index) {
@@ -906,6 +912,10 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			}
 			model.$setViewValue(values);
 		};
+
+		scope.canRemove = function () {
+			return scope.attr('canRemove') !== false;
+		}
 
 		scope.setValidity = function (key, value) {
 			model.$setValidity(key, value);
@@ -939,11 +949,11 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		return "<div class='o2m-list'>" +
 			"<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items'>" +
 				"<div class='o2m-editor-form' ui-panel-editor></div>" +
-				"<span class='o2m-list-remove'>" +
+				"<span class='o2m-list-remove' ng-show='hasPermission(\"remove\") && !isDisabled() && canRemove()'>" +
 					"<a tabindex='-1' href='' ng-click='removeItem($index)'><i class='fa fa-times'></i></a>" +
 				"</span>" +
 			"</div>" +
-			"<div class='o2m-list-row o2m-list-add'>" +
+			"<div class='o2m-list-row o2m-list-add' ng-show='hasPermission(\"write\") && !isDisabled() && canNew()'>" +
 				"<a tabindex='-1' href='' ng-click='addItem()'><i class='fa fa-plus'></i></a>" +
 			"</div>" +
 		"</div>"
