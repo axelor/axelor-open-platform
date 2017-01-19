@@ -17,6 +17,7 @@
  */
 .ibox {
 	display: inline-block;
+    width: inherit;
 	margin: 0;
 	padding: 4px;
 	padding-left: 0;

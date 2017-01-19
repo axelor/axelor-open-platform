@@ -143,7 +143,7 @@ ui.controller("CardsCtrl", ['$scope', '$element', function CardsCtrl($scope, $el
 	};
 }]);
 
-ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $element) {
+ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function KanbanCtrl($scope, $element, ActionService) {
 
 	BaseCardsCtrl.call(this, 'kanban', $scope, $element);
 
@@ -189,12 +189,30 @@ ui.controller("KanbanCtrl", ['$scope', '$element', function KanbanCtrl($scope, $
 			item[view.sequenceBy] = offset + i;
 		});
 
-		return ds.saveAll(all).success(function (records) {
-			_.each(all, function (item) {
-				_.extend(item, ds.get(item.id));
+		function doSave() {
+			return ds.saveAll(all).success(function (records) {
+				_.each(all, function (item) {
+					_.extend(item, ds.get(item.id));
+				});
+				record.version = rec.version;
 			});
-			record.version = rec.version;
-		});
+		}
+
+		if (view.onMove) {
+			var actScope = $scope.$new();
+			actScope.record = rec;
+			actScope.getContext = function () {
+				return _.extend({}, $scope._context, rec);
+			};
+			return ActionService.handler(actScope, $(), { action: view.onMove}).handle().then(function () {
+				return doSave();
+			}, function (err) {
+				axelor.notify.error(_t('Unable to move the record.'));
+				$scope.onRefresh();
+			});
+		}
+
+		return doSave();
 	};
 
 	$scope.onRefresh = function () {

@@ -350,33 +350,43 @@
 			return result;
 		}
 
-		var viewCache = $cacheFactory("viewFields", { capacity: 1000 });
-
-		function viewGet(key) {
-			var result = viewCache.get(key);
-			return angular.copy(result);
-		}
+		var viewCache = $cacheFactory("viewCache", { capacity: 1000 });
 		
-		function viewSet(key, result) {
-			if (result.then) {
-				return viewCache.put(key, result);
+		function createStore(prefix) {
+			var toKey = function (name) {
+				return prefix + ':' + axelor.config['user.id'] + ':' + name;
 			}
-			var view = result.view;
-			if (view && _.isArray(view.items)) {
-				return;
+			return {
+				get: function (name) {
+					return new Promise(function (resolve) {
+						resolve(viewCache.get(toKey(name)));
+					});
+				},
+				set: function (name, value) {
+					if (value) {
+						return new Promise(function (resolve) {
+							var val = viewCache.put(toKey(name), angular.copy(value));
+							resolve(val);
+						});
+					}
+					return Promise.resolve(value);
+				}
 			}
-			viewCache.put(key, angular.copy(result));
 		}
+
+		var PENDING_REQUESTS = {};
+
+		var FIELDS = createStore('f');
+		var VIEWS = createStore('v');
+		var PERMS = createStore('p');
 
 		ViewService.prototype.getMetaDef = function(model, view, context) {
-
-			var self = this,
-				hasItems = _.isArray(view.items),
-				deferred = $q.defer(),
-				promise = deferred.promise;
+			var self = this;
+			var deferred = $q.defer();
+			var promise = deferred.promise;
 
 			promise.success = function(fn) {
-				promise.then(function(res){
+				promise.then(function(res) {
 					fn(res.fields, res.view);
 				});
 				return promise;
@@ -392,96 +402,157 @@
 
 				return data;
 			}
+			
+			function updateFields(fetched) {
+				return FIELDS.get(model).then(function (current) {
+					current = current || {};
+					if (current !== fetched.fields) {
+						_.extend(current, _.object(_.pluck(fetched.fields, 'name'), fetched.fields));
+					}
+					return Promise.all([FIELDS.set(model, current), PERMS.set(model, fetched.perms)]);
+				});
+			}
 
-			function loadFields(data) {
-
+			function fetchFields(data) {
 				var fields_data = findFields(data.view);
 				var fields = _.unique(_.compact(fields_data.fields.sort()));
-				var key = _.flatten([model, data.view.type, data.view.name, fields]).join();
 
 				data.related = fields_data.related;
 
-				if (!_.isEmpty(data.fields)) {
-					viewSet(key, data);
-					deferred.resolve(process(data));
+				if (_.isArray(data.fields) && data.fields.length > 0) {
+					updateFields(data).then(function () {
+						deferred.resolve(process(data));
+					});
 					return promise;
 				}
-
-				if (!model || !fields || fields.length === 0) {
+				if (!model || _.isEmpty(fields)) {
 					deferred.resolve(data);
 					return promise;
 				}
 
-				var result = viewGet(key);
-				if (result && result.fields) {
-					deferred.resolve(result);
-					return promise;
-				}
-				if (result && result.then) {
-					result.then(resolver);
-					return promise;
-				}
+				function resolve(fetched) {
+					return updateFields(fetched).then(function (res) {
+						var current = res[0];
+						var perms = res[1];
+						var result = _.extend({}, fetched, {
+							fields: _.map(fields, function(n) { return current[n]; }),
+							perms: perms
+						});
 
-				function resolver(response) {
-					var res = response.data,
-						result = res.data;
+						result.view = data.view || view;
+						result.fields = _.compact(result.fields);
+						result.related = data.related;
+						result = process(result);
 
-					result.view = data.view || view;
-					result = process(result);
-					result.related = fields_data.related;
-
-					viewSet(key, result);
-
-					deferred.resolve(result);
-
-					return promise;
+						deferred.resolve(result);
+						return promise;
+					});
 				}
 
-				var _promise = $http.post('ws/meta/view/fields', {
-					model: model,
-					fields: fields
+				Promise.all([FIELDS.get(model), PERMS.get(model)]).then(function (res) {
+					var fetchedFields = res[0] || {};
+					var pendingFields = _.filter(fields, function (n) { return !fetchedFields.hasOwnProperty(n); });
+					if (pendingFields.length == 0) {
+						resolve({
+							fields: _.values(fetchedFields),
+							perms: res[1]
+						});
+						return promise;
+					}
+
+					var key = _.flatten([model, pendingFields]).join();
+					var pending = PENDING_REQUESTS[key];
+
+					function clear() {
+						delete PENDING_REQUESTS[key];
+					}
+
+					if (pending) {
+						pending.then(clear, clear);
+						pending.then(function (response) {
+							resolve((response.data || {}).data);
+						});
+						return promise;
+					}
+
+					pending = $http.post('ws/meta/view/fields', { model: model, fields: pendingFields }).then(function (response) {
+						resolve((response.data || {}).data);
+					});
+
+					pending.then(clear, clear);
+					PENDING_REQUESTS[key] = pending;
 				});
-
-				_promise.then(resolver);
-
-				if (!hasItems) viewSet(key, _promise);
-
 				return promise;
 			}
 
-			if (hasItems) {
-				return loadFields({view: view});
-			}
+			function fetchView() {
+				var key = [model, view.type, view.name].join(':');
 
-			$http.post('ws/meta/view', {
-				model: model,
-				data: {
-					type: view.type,
-					name: view.name,
-					context: context
-				}
-			}).then(function(response) {
-				var res = response.data,
-					result = res.data;
+				function resolve(response) {
+					var result = (response.data || {}).data;
+					if (!result || !result.view) {
+						return deferred.reject('view not found', view);
+					}
+					if (result.searchForm) {
+						result.view.searchForm = result.searchForm;
+					}
 
-				if (!result || !result.view) {
-					return deferred.reject('view not found', view);
+					if (_.isArray(result.view.items)) {
+						var fieldsPromise = fetchFields(result, key);
+						if (!_.isArray(view.items)) {
+							// only cache fetched views
+							return fieldsPromise.then(function (res) {
+								return VIEWS.set(key, _.extend({}, res, { view: result.view }));
+							});
+						}
+						return fieldsPromise;
+					}
+
+					result = {
+						fields: result.view.items,
+						view: result.view
+					};
+
+					VIEWS.set(key, result).then(function () {
+						deferred.resolve(result);
+					});
 				}
 
-				if (_.isArray(result.view.items)) {
-					return loadFields(result);
-				}
-				
-				if (result.searchForm) {
-					result.view.searchForm = result.searchForm;
-				}
+				VIEWS.get(key).then(function (loaded) {
+					if (loaded) {
+						return deferred.resolve(loaded);
+					}
+	
+					function clear() {
+						delete PENDING_REQUESTS[key];
+					}
+	
+					var pending = PENDING_REQUESTS[key];
+					if (pending) {
+						pending.then(clear, clear);
+						return pending.then(resolve);
+					}
+	
+					pending = $http.post('ws/meta/view', {
+						model: model,
+						data: {
+							type: view.type,
+							name: view.name,
+							context: context
+						}
+					}).then(resolve);
 
-				deferred.resolve({
-					fields: result.view.items,
-					view: result.view
+					pending.then(clear, clear);
+					PENDING_REQUESTS[key] = pending;
 				});
-			});
-			return promise;
+
+				return promise;
+			}
+			
+			if (_.isArray(view.items)) {
+				return fetchFields({ view: view });
+			}
+			return fetchView();
 		};
 
 		ViewService.prototype.defer = function() {

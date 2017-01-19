@@ -148,9 +148,7 @@ function GridViewCtrl($scope, $element) {
 
 	$scope.setItems = function(items, pageInfo) {
 
-		var dataView = $scope.dataView,
-			selection = $scope.selection || [],
-			selectionIds = dataView.mapRowsToIds(selection);
+		var dataView = $scope.dataView;
 		
 		//XXX: clear existing items (bug?)
 		if (dataView.getLength()) {
@@ -169,7 +167,7 @@ function GridViewCtrl($scope, $element) {
 		
 		if (dataView.$syncSelection) {
 			setTimeout(function(){
-				dataView.$syncSelection(selection, selectionIds);
+				dataView.$syncSelection();
 			});
 		}
 	};

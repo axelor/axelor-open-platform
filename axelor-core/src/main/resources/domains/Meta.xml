@@ -34,6 +34,7 @@
   	<string name="xml" required="true" large="true"/>
     <string name="xmlId" unique="true" />
     <string name="helpLink" />
+    <boolean name="extension" />
   	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
 
     <finder-method name="findByID" using="xmlId" />

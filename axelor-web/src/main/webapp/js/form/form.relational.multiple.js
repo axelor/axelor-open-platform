@@ -86,6 +86,10 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		var items = _.chain([value]).flatten(true).compact().value();
 		var records = _.map($scope.getItems(), _.clone);
 
+		_.each(records, function(item) {
+			item.selected = false;
+		});
+
 		_.each($scope.itemsPending, function (item) {
 			var find = _.find(records, function(rec) {
 				if (rec.id && rec.id == item.id) {

@@ -24,15 +24,16 @@
 var ui = angular.module('axelor.ui');
 
 ui.ChartCtrl = ChartCtrl;
-ui.ChartCtrl.$inject = ['$scope', '$element', '$http'];
+ui.ChartCtrl.$inject = ['$scope', '$element', '$http', 'ActionService'];
 
-function ChartCtrl($scope, $element, $http) {
+function ChartCtrl($scope, $element, $http, ActionService) {
 
 	var views = $scope._views;
 	var view = $scope.view = views.chart;
 	
 	var viewChart = null;
 	var searchScope = null;
+	var actionHandler = null;
 
 	var loading = false;
 	var unwatch = null;
@@ -72,6 +73,11 @@ function ChartCtrl($scope, $element, $http) {
 
 			if (viewChart === null) {
 				viewChart = data;
+				if (data.config && data.config.onClick) {
+					actionHandler = ActionService.handler($scope, $element, {
+						action: data.config.onClick
+					});
+				}
 			} else {
 				data = _.extend({}, viewChart, data);
 			}
@@ -93,6 +99,15 @@ function ChartCtrl($scope, $element, $http) {
 
 	$scope.setSearchScope = function (formScope) {
 		searchScope = formScope;
+	};
+
+	$scope.handleClick = function (e) {
+		if (actionHandler) {
+			actionHandler._getContext = function () {
+				return _.extend({}, e.data.raw, { _model: $scope._model || 'com.axelor.meta.db.MetaView' });
+			};
+			actionHandler.handle();
+		}
 	};
 
 	$scope.onRefresh = function(force) {
@@ -261,9 +276,16 @@ function PlusData(series, data) {
 		_.each(group, function (item) {
 			value += $conv(item[series.key]);
 		});
+		var raw = {};
+		if (group[0]) {
+			raw[data.xAxis] = name;
+			raw[series.key] = value;
+			raw[data.xAxis + 'Id'] = group[0][data.xAxis + 'Id'];
+		}
 		return {
 			x: name === 'null' ? 'N/A' : name,
-			y: value
+			y: value,
+			raw: raw
 		};
 	 }).value();
 
@@ -281,7 +303,7 @@ function PlotData(series, data) {
 		var values = _.map(group, function (item) {
 			var x = $conv(item[data.xAxis], data.xType) || 0;
 			var y = $conv(item[series.key] || name || 0);
-			return { x: x, y: y };
+			return { x: x, y: y, raw: item };
 		});
 
 		var my = _.pluck(values, 'x');
@@ -334,6 +356,10 @@ function PieChart(scope, element, data) {
 	  .datum(datum)
 	  .transition().duration(1200).call(chart);
 
+	chart.pie.dispatch.on('elementClick', function (e) {
+		scope.handleClick(e);
+	});
+
 	return chart;
 }
 
@@ -378,6 +404,10 @@ function BarChart(scope, element, data) {
 	  .datum(datum)
 	  .transition().duration(500).call(chart);
 	
+	chart.multibar.dispatch.on('elementClick', function (e) {
+		scope.handleClick(e);
+	});
+
 	return chart;
 }
 

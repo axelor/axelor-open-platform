@@ -921,7 +921,15 @@ Grid.prototype._doInit = function(view) {
 	// end performance tweaks
 	
 	dataView.$syncSelection = function(old, oldIds, focus) {
-		var selection = dataView.mapIdsToRows(oldIds);
+		var selection = dataView.mapIdsToRows(oldIds || []);
+		if (!focus) {
+			_.each(dataView.getItems(), function (item, i) {
+				if (item.selected) {
+					selection.push(i);
+				}
+			});
+		}
+		selection = _.unique(selection);
 		grid.setSelectedRows(selection);
 		if (selection.length === 0 && !grid.getEditorLock().isActive()) {
 			grid.setActiveCell(null);
@@ -1188,7 +1196,6 @@ Grid.prototype._doInit = function(view) {
 	this.zIndexFix();
 
 	scope.$timeout(grid.invalidate);
-	scope.applyLater();
 };
 
 Grid.prototype.subscribe = function(event, handler) {
@@ -1210,6 +1217,7 @@ Grid.prototype.adjustSize = function() {
 	this.doInit();
 	this.adjustToScreen();
 	this.grid.resizeCanvas();
+	this.grid.autosizeColumns();
 };
 
 Grid.prototype.adjustToScreen = function() {
@@ -2580,6 +2588,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 				if (!handler._isPopup && schema.inlineHelp && !axelor.config["user.noHelp"]) {
 					addHelp(schema.inlineHelp);
 				}
+				grid.adjustSize();
 			}
 
 			function addHelp(helpItem) {

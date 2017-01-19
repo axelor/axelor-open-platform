@@ -129,6 +129,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 		function close(value, forceSelect) {
 			if (value && (forceSelect || canOK())) {
 				value.$fetched = true;
+				value.selected = true;
 				$scope.$parent.select(value);
 			}
 			canClose = true;

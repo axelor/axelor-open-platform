@@ -104,6 +104,7 @@ public class AuthModule extends AbstractModule {
 			this.addFilterChain("/img/**", ANON);
 			this.addFilterChain("/ico/**", ANON);
 			this.addFilterChain("/css/**", ANON);
+			this.addFilterChain("/js/**", ANON);
 			this.addFilterChain("/error.jsp", ANON);
 
 			if (bindCas()) {

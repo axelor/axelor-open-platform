@@ -17,13 +17,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ taglib prefix="x" uri="WEB-INF/axelor.tld" %>
-<%@ page language="java" session="true" %>
+<<<<<<< HEAD
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page language="java" session="true" %>
 <%@ page import="java.util.Calendar" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.Map" %>
+=======
+<%@ taglib prefix="x" uri="WEB-INF/axelor.tld" %>
+<%@ page language="java" session="true" %>
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page import="java.util.Calendar"%>
+<%@ page import="java.util.Date"%>
+>>>>>>> dev
 <%@ page import="com.axelor.i18n.I18n" %>
 <%
 String loginTitle = I18n.get("Please sign in");

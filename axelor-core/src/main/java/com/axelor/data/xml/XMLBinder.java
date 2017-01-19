@@ -100,10 +100,10 @@ public abstract class XMLBinder {
 			LOG.trace("search: " + binding.getSearch());
 			bean = JPA.all((Class<Model>) type).filter(binding.getSearch()).bind(ctx).fetchOne();
 			LOG.trace("search found: " + bean);
-			if (bean != null && !binding.isUpdate()) {
+			if (bean != null && binding.getUpdate() != Boolean.TRUE) {
 				LOG.trace("search no update");
 				return bean;
-			} else if(bean == null && !binding.isCreate()) {
+			} else if(bean == null && binding.getCreate() == Boolean.FALSE) {
 				LOG.trace("search no create");
 				return null;
 			}

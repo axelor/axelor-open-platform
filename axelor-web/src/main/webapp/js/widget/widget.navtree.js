@@ -61,6 +61,8 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 						node.children.push(item);
 					} else if (canAccept(item)){
 						menus.push(item);
+						item.icon = item.icon || 'fa-bars';
+						item.iconBackground = item.iconBackground || 'green';
 					}
 				});
 

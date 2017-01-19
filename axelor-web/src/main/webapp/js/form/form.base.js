@@ -60,7 +60,11 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			state = _.clone(props);
 			state["force-edit"] = false;
 			if (label && state.title) {
-				label.html(state.title);
+				var span = label.children('span[ui-help-popover]:first');
+				if (span.size() === 0) {
+					span = label;
+				}
+				span.html(state.title);
 			}
 		}
 
