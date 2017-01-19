@@ -55,6 +55,7 @@ public class PanelEditor extends AbstractPanel {
 		@XmlElement(name = "button", type = Button.class),
 		@XmlElement(name = "spacer", type = Spacer.class),
 		@XmlElement(name = "label", type = Label.class),
+		@XmlElement(name = "panel", type = Panel.class)
 	})
 	private List<AbstractWidget> items;
 
@@ -84,6 +85,28 @@ public class PanelEditor extends AbstractPanel {
 		this.items = items;
 	}
 
+	private List<Field> findFields(AbstractWidget widget) {
+
+		final List<Field> all = new ArrayList<>();
+
+		if (widget instanceof Field) {
+			all.add((Field) widget);
+			return all;
+		}
+
+		if (widget instanceof PanelEditor) {
+			for (AbstractWidget item : ((PanelEditor) widget).getItems()) {
+				all.addAll(findFields(item));
+			}
+		} else if (widget instanceof Panel) {
+			for (AbstractWidget item : ((Panel) widget).getItems()) {
+				all.addAll(findFields(item));
+			}
+		}
+
+		return all;
+	}
+
 	@JsonGetter("fields")
 	public List<Object> getTargetFields() {
 		if (targetFields != null) {
@@ -98,10 +121,9 @@ public class PanelEditor extends AbstractPanel {
 		}
 		this.targetFields = new ArrayList<>();
 		final Mapper mapper = Mapper.of(target);
-		for (AbstractWidget item : items) {
+		for (final Field field : findFields(this)) {
 			try {
-				Field field = (Field) item;
-				Property prop = mapper.getProperty(field.getName());
+				final Property prop = mapper.getProperty(field.getName());
 				if (field.getSelection() == null) {
 					field.setSelection(prop.getSelection());
 				}
