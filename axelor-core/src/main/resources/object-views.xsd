@@ -993,6 +993,19 @@
           <xsd:element name="button" type="tns:Button"/>
           <xsd:element name="spacer" type="tns:Spacer" />
           <xsd:element name="label" type="tns:Label" />
+          <xsd:element name="panel">
+            <xsd:complexType>
+              <xsd:complexContent>
+                <xsd:extension base="tns:PanelEditor">
+                  <xsd:attribute name="layout" use="prohibited" />
+                  <xsd:attribute name="onNew" use="prohibited" />
+                  <xsd:attribute name="x-viewer" use="prohibited" />
+                  <xsd:attribute name="x-show-titles" use="prohibited" />
+                  <xsd:attribute name="x-show-on-new" use="prohibited" />
+                </xsd:extension>
+              </xsd:complexContent>
+            </xsd:complexType>
+          </xsd:element>
         </xsd:choice>
         <xsd:attribute name="layout" type="xsd:string">
           <xsd:annotation>
