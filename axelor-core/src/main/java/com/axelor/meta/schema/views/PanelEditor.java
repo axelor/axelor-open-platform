@@ -18,16 +18,16 @@
 package com.axelor.meta.schema.views;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.common.ClassUtils;
-import com.axelor.db.mapper.Mapper;
-import com.axelor.db.mapper.Property;
+import com.axelor.meta.MetaStore;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
@@ -85,12 +85,12 @@ public class PanelEditor extends AbstractPanel {
 		this.items = items;
 	}
 
-	private List<Field> findFields(AbstractWidget widget) {
+	private List<String> findFields(AbstractWidget widget) {
 
-		final List<Field> all = new ArrayList<>();
+		final List<String> all = new ArrayList<>();
 
 		if (widget instanceof Field) {
-			all.add((Field) widget);
+			all.add(((Field) widget).getName());
 			return all;
 		}
 
@@ -109,27 +109,19 @@ public class PanelEditor extends AbstractPanel {
 
 	@JsonGetter("fields")
 	public List<Object> getTargetFields() {
-		if (targetFields != null) {
+		if (targetFields != null || items == null || forField == null || forField.getTarget() == null) {
 			return targetFields;
 		}
-		if (items == null || forField == null || forField.getTarget() == null) {
-			return null;
-		}
-		final Class<?> target = ClassUtils.findClass(forField.getTarget());
-		if (target == null) {
-			return null;
-		}
 		this.targetFields = new ArrayList<>();
-		final Mapper mapper = Mapper.of(target);
-		for (final Field field : findFields(this)) {
-			try {
-				final Property prop = mapper.getProperty(field.getName());
-				if (field.getSelection() == null) {
-					field.setSelection(prop.getSelection());
-				}
-				targetFields.add(prop.toMap());
-			} catch (Exception e) {}
+		final Class<?> target;
+		try {
+			target = Class.forName(forField.getTarget());
+		} catch (ClassNotFoundException e) {
+			return null;
 		}
+		final Map<String, Object> fields = MetaStore.findFields(target, findFields(this));
+		this.targetFields.addAll((Collection<?>)fields.get("fields"));
+
 		return targetFields;
 	}
 }
