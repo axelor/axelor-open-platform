@@ -903,6 +903,16 @@ Grid.prototype._doInit = function(view) {
         	grid.focus();
         }
 	};
+	dataView.$setSelection = function(selection, focus) {
+		var rows = selection || [];
+		grid.setSelectedRows(rows);
+		if (selection.length === 0 && !grid.getEditorLock().isActive()) {
+			grid.setActiveCell(null);
+        } else if (focus) {
+        	grid.setActiveCell(_.first(selection), 1);
+        	grid.focus();
+        }
+	};
 
 	if (this._canMove) {
 		dataView.$resequence = _.bind(this._resequence, this);

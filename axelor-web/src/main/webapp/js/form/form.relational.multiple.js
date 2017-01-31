@@ -228,6 +228,9 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		if (item && item.id > 0) {
 			ds.copy(item.id).success(function(record) {
 				$scope.select([record]);
+				$scope.$timeout(function () {
+					$scope.dataView.$setSelection([$scope.dataView.getLength() - 1], true);
+				}, 100);
 			});
 		}
 	};
@@ -639,6 +642,7 @@ ui.formInput('OneToMany', {
 					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowEdit()" title="{{\'Edit\' | t}}" class="fa fa-pencil"></i>'+
 					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowView()" title="{{\'View\' | t}}" class="fa fa-file-text-o"></i>'+
 					'<i ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled() && canNew()" title="{{\'New\' | t}}" class="fa fa-plus"></i>'+
+					'<i ng-click="onCopy()" ng-show="hasPermission(\'create\') && !isDisabled() && canCopy()" title="{{\'Duplicate\' | t}}" class="fa fa-files-o"></i>' +
 					'<i ng-click="onRemove()" ng-show="hasPermission(\'remove\') && !isDisabled() && canRemove()" title="{{\'Remove\' | t}}" class="fa fa-minus"></i>'+
 					'<i ng-click="onSelect()" ng-show="hasPermission(\'read\') && !isDisabled() && canSelect()" title="{{\'Select\' | t}}" class="fa fa-search"></i>'+
 				'</span>'+
