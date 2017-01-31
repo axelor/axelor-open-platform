@@ -487,6 +487,7 @@ public class ViewLoader extends AbstractLoader {
 		entity.setTop(menuItem.getTop());
 		entity.setLeft(menuItem.getLeft() == null ? true : menuItem.getLeft());
 		entity.setMobile(menuItem.getMobile());
+		entity.setHidden(menuItem.getHidden());
 		entity.setGroups(this.findGroups(menuItem.getGroups(), entity.getGroups()));
 		
 		entity.setConditionToCheck(menuItem.getConditionToCheck());
