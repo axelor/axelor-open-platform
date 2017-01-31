@@ -497,13 +497,17 @@ public class ViewLoader extends AbstractLoader {
 			entity.setOrder(menuItem.getOrder());
 		}
 
-		if (!Strings.isNullOrEmpty(menuItem.getParent())) {
-			MetaMenu parent = menus.findByName(menuItem.getParent());
-			if (parent == null) {
-				log.debug("Unresolved parent : {}", menuItem.getParent());
-				this.setUnresolved(MetaMenu.class, menuItem.getParent(), entity);
+		if (menuItem.getParent() != null) {
+			if (StringUtils.isBlank(menuItem.getParent()) || "none".equalsIgnoreCase(menuItem.getParent())) {
+				entity.setParent(null);
 			} else {
-				entity.setParent(parent);
+				MetaMenu parent = menus.findByName(menuItem.getParent());
+				if (parent == null) {
+					log.debug("Unresolved parent : {}", menuItem.getParent());
+					this.setUnresolved(MetaMenu.class, menuItem.getParent(), entity);
+				} else {
+					entity.setParent(parent);
+				}
 			}
 		}
 
