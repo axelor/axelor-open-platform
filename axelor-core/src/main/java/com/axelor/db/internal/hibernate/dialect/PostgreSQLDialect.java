@@ -30,5 +30,13 @@ public class PostgreSQLDialect extends PostgreSQL94Dialect {
 		registerColumnType(Types.OTHER, "jsonb");
 		registerFunction("json_extract",
 				new VarArgsSQLFunction(StandardBasicTypes.STRING, "jsonb_extract_path_text(", ",", ")"));
+		registerFunction("json_extract_text",
+				new VarArgsSQLFunction(StandardBasicTypes.STRING, "jsonb_extract_path_text(", ",", ")"));
+		registerFunction("json_extract_boolean",
+				new VarArgsSQLFunction(StandardBasicTypes.BOOLEAN, "jsonb_extract_path_text(", ",", ")::boolean"));
+		registerFunction("json_extract_integer",
+				new VarArgsSQLFunction(StandardBasicTypes.INTEGER, "jsonb_extract_path_text(", ",", ")::integer"));
+		registerFunction("json_extract_decimal",
+				new VarArgsSQLFunction(StandardBasicTypes.BIG_DECIMAL, "jsonb_extract_path_text(", ",", ")::numeric"));
 	}
 }
