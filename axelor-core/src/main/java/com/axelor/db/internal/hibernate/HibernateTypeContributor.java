@@ -21,6 +21,7 @@ import org.hibernate.boot.model.TypeContributions;
 import org.hibernate.boot.model.TypeContributor;
 import org.hibernate.service.ServiceRegistry;
 
+import com.axelor.db.internal.hibernate.type.JsonType;
 import com.axelor.db.internal.hibernate.type.TextType;
 
 public class HibernateTypeContributor implements TypeContributor {
@@ -28,5 +29,6 @@ public class HibernateTypeContributor implements TypeContributor {
 	@Override
 	public void contribute(TypeContributions typeContributions, ServiceRegistry serviceRegistry) {
 		typeContributions.contributeType(TextType.INSTANCE);
+		typeContributions.contributeType(JsonType.INSTANCE);
 	}
 }

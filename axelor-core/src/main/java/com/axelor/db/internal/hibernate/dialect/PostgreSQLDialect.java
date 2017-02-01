@@ -1,7 +1,7 @@
 /**
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2016 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -15,18 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.db.internal.hibernate;
+package com.axelor.db.internal.hibernate.dialect;
 
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.engine.jdbc.dialect.spi.DialectResolver;
-import org.hibernate.service.spi.ServiceContributor;
+import java.sql.Types;
 
-import com.axelor.db.internal.hibernate.dialect.CustomDialectResolver;
+import org.hibernate.dialect.PostgreSQL94Dialect;
+import org.hibernate.dialect.function.VarArgsSQLFunction;
+import org.hibernate.type.StandardBasicTypes;
 
-public class HibernateServiceContributor implements ServiceContributor {
+public class PostgreSQLDialect extends PostgreSQL94Dialect {
 
-	@Override
-	public void contribute(StandardServiceRegistryBuilder serviceRegistryBuilder) {
-		serviceRegistryBuilder.addService(DialectResolver.class, CustomDialectResolver.INSTANCE);
+	public PostgreSQLDialect() {
+		super();
+		registerColumnType(Types.OTHER, "jsonb");
+		registerFunction("json_extract",
+				new VarArgsSQLFunction(StandardBasicTypes.STRING, "jsonb_extract_path_text(", ",", ")"));
 	}
 }
