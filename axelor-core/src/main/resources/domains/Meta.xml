@@ -214,7 +214,7 @@
     <string name="targetModel" />
     <string name="targetName" />
     <string name="domain" />
-    <string name="widgetAttrs" max="1024" json="true" />
+    <string name="widgetAttrs" json="true" />
   </entity>
 
   <entity name="MetaTranslation" table="META_TRANSLATION" logUpdates="false">

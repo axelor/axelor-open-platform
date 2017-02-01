@@ -584,7 +584,6 @@ class Property {
 		def multiline = attrs['multiline']
 		def selection = attrs['selection']
 		def image = attrs['image']
-		def json = attrs['json']
 		def password = attrs['password']
 		def massUpdate = attrs['massUpdate']
 		def translatable = attrs['translatable']
@@ -600,7 +599,7 @@ class Property {
 		}
 
 		if (title || help || readonly || hidden || multiline || selection ||
-			image || isJson() || isPassword() || massUpdate || search || translatable || copyable || defaultNow)
+			image || isPassword() || massUpdate || search || translatable || copyable || defaultNow)
 			annon("com.axelor.db.annotations.Widget")
 				.add("image", image, false)
 				.add("title", title)
@@ -610,7 +609,6 @@ class Property {
 				.add("multiline", multiline, false)
 				.add("search", search, true, true)
 				.add("selection", selection)
-				.add("json", json, false)
 				.add("password", password, false)
 				.add("massUpdate", massUpdate, false)
 				.add("translatable", translatable, false)
@@ -619,6 +617,12 @@ class Property {
 	}
 
 	private List<Annotation> $binary() {
+		
+		if (isJson() && type == 'string') {
+			return [
+				annon("org.hibernate.annotations.Type").add("type", "json")
+			]
+		}
 
 		if (isLarge() && type == 'string') {
 			return [

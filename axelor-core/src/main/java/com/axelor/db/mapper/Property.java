@@ -260,6 +260,10 @@ public class Property {
 				sequenceName = ((Sequence) annotation).value();
 			}
 
+			if (annotation instanceof org.hibernate.annotations.Type) {
+				json = "json".equalsIgnoreCase(((org.hibernate.annotations.Type) annotation).type());
+			}
+
 			// Widget attributes
 			if (annotation instanceof Widget) {
 				Widget w = (Widget) annotation;
@@ -269,7 +273,6 @@ public class Property {
 				hidden = w.hidden();
 				nameSearch = w.search();
 				selection = w.selection();
-				json = w.json();
 				password = w.password();
 				massUpdate = w.massUpdate();
 				copyable = w.copyable();
