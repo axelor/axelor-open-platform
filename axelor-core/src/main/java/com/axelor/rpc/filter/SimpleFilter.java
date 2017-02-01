@@ -51,9 +51,21 @@ class SimpleFilter extends Filter {
 		this.operator = operator;
 	}
 
+	protected String getOperand() {
+		final String name = getFieldName();
+		if (name.indexOf("::") > -1) {
+			final String cast = name.substring(name.indexOf("::") + 2);
+			final String rest = name.substring(0, name.indexOf("::"));
+			final String first = rest.substring(0, rest.indexOf('.'));
+			final String path = rest.substring(rest.indexOf('.') + 1);
+			return String.format("json_extract_%s(self.%s, '%s')", cast, first, path);
+		}
+		return "self." + name;
+	}
+
 	@Override
 	public String getQuery() {
-		return String.format("(self.%s %s ?)", fieldName, operator);
+		return String.format("(%s %s ?)", getOperand(), operator);
 	}
 
 	@Override

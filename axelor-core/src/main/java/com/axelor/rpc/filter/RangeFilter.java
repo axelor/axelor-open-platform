@@ -42,11 +42,11 @@ class RangeFilter extends SimpleFilter {
 
 		if (getOperator() == Operator.BETWEEN
 				|| getOperator() == Operator.NOT_BETWEEN) {
-			return String.format("(self.%s %s ? AND ?)", getFieldName(),
+			return String.format("(%s %s ? AND ?)", getOperand(),
 					getOperator());
 		}
 
-		StringBuilder sb = new StringBuilder("self.").append(getFieldName());
+		StringBuilder sb = new StringBuilder(getOperand());
 		sb.append(" ").append(getOperator()).append(" (");
 
 		Iterator<?> iter = values.iterator();
