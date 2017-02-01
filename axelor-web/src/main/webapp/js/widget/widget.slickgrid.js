@@ -484,6 +484,14 @@ _.extend(Factory.prototype, {
 		if (widget === 'json-field' || attrs.json) {
 			return Formatters.json(field, value);
 		}
+		
+		if (attrs.jsonPath && attrs.jsonField) {
+			var jsonValue = dataContext[attrs.jsonField];
+			if (jsonValue) {
+				jsonValue = angular.fromJson(jsonValue);
+				value = jsonValue[attrs.jsonPath];
+			}
+		}
 
 		if (widget === "Progress" || widget === "progress" || widget === "SelectProgress") {
 			type = "progress";
@@ -641,7 +649,7 @@ Grid.prototype.parse = function(view) {
 			sortable = true;
 		}
 
-		if(field.transient) {
+		if(field.transient || field.json || field.jsonField) {
 			sortable = false;
 		}
 
@@ -1020,7 +1028,7 @@ Grid.prototype._doInit = function(view) {
 
 		function _setInputs(cols) {
 			_.each(cols, function(col){
-				if (!col.xpath || col.descriptor.type === 'button') return;
+				if (!col.xpath || col.descriptor.type === 'button' || col.descriptor.json) return;
 				var header = grid.getHeaderRowColumn(col.id),
 					input = $('<input type="text">').data("columnId", col.id).appendTo(header),
 					field = col.descriptor || {};
@@ -2353,10 +2361,15 @@ Grid.prototype.groupBy = function(names) {
 		
 		return {
 			getter: function(item) {
-				if (formatter) {
-					return formatter(field, item[name], item, grid);
+				var value = item[name];
+				if (field.jsonPath && field.jsonField) {
+					var jsonValue = item[field.jsonField];
+					if (jsonValue) {
+						jsonValue = angular.fromJson(jsonValue);
+						value = jsonValue[field.jsonPath];
+					}
 				}
-				return item[name];
+				return (formatter ? formatter(field, value, item, grid) : value) || _t('N/A');
 			},
 			formatter: function(g) {
 				var title = col.name + ": " + g.value;

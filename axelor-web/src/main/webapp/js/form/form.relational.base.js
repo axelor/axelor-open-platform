@@ -271,7 +271,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			'value': ids
 		};
 
-		var fields = _.pluck($scope.fields, 'name');
+		var fields = $scope.selectFields();
 		var filter = {
 			operator: 'and',
 			criteria: [criterion]

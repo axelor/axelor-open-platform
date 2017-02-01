@@ -208,9 +208,19 @@ function GridViewCtrl($scope, $element) {
 		return $scope.hasPermission('export');
 	};
 
+	$scope.selectFields = function() {
+		var fields = _.pluck($scope.fields, 'name');
+		_.each($scope.fields, function (field, name) {
+			if (field.jsonField && fields.indexOf(field.jsonField) == -1) {
+				fields.push(field.jsonField);
+			}
+		});
+		return fields;
+	};
+
 	$scope.filter = function(searchFilter) {
 
-		var fields = _.pluck($scope.fields, 'name'),
+		var fields = $scope.selectFields(),
 			options = {};
 
 		function fixPage() {
@@ -264,11 +274,12 @@ function GridViewCtrl($scope, $element) {
 			var field = $scope.fields[key] || {};
 			var type = field.type || 'string';
 			var operator = 'like';
+			var origValue = value;
 			var value2;
 
 			//TODO: implement expression parser
 			
-			if (type === 'many-to-one') {
+			if (type === 'many-to-one' && !field.jsonField) {
 				if (field.targetName) {
 					key = key + '.' + field.targetName;
 				} else {
@@ -340,6 +351,11 @@ function GridViewCtrl($scope, $element) {
 					break;
 			}
 
+			// tag json fields
+			if (field.jsonField) {
+				key += '::' +('integer,decimal,boolean'.indexOf(type) > -1 ? type : 'text');
+			}
+
 			return {
 				fieldName: key,
 				operator: operator,
@@ -387,14 +403,14 @@ function GridViewCtrl($scope, $element) {
 	};
 
 	$scope.onNext = function() {
-		var fields = _.pluck($scope.fields, 'name');
+		var fields = $scope.selectFields();
 		ds.next(fields).then(function(){
 			$scope.updateRoute();
 		});
 	};
 	
 	$scope.onPrev = function() {
-		var fields = _.pluck($scope.fields, 'name');
+		var fields = $scope.selectFields();
 		ds.prev(fields).then(function(){
 			$scope.updateRoute();
 		});
@@ -444,14 +460,14 @@ function GridViewCtrl($scope, $element) {
 	};
 	
 	$scope.reload = function() {
-		var fields = _.pluck($scope.fields, 'name');
+		var fields = $scope.selectFields();
 		return ds.search({
 			fields: fields
 		});
 	};
 
 	$scope.onSort = function(event, args) {
-		var fields = _.pluck($scope.fields, 'name');
+		var fields = $scope.selectFields();
 		var sortBy = _.map(args.sortCols, function(column) {
 			var name = column.sortCol.field;
 			var spec = column.sortAsc ? name : '-' + name;
@@ -522,7 +538,7 @@ function GridViewCtrl($scope, $element) {
 		var button = $(e.currentTarget);
 		setTimeout(function(){
 			var active = button.is('.active');
-			var fields = _.pluck($scope.fields, 'name');
+			var fields = $scope.selectFields();
 			ds.search({
 				fields: fields,
 				archived: active
