@@ -283,7 +283,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	this.doInit = function(model, viewItems) {
 		return ViewService
 		.getFields(model)
-		.success(function(fields) {
+		.success(function(fields, jsonFields) {
 
 			var items = {};
 			var nameField = null;
@@ -299,6 +299,21 @@ function FilterFormCtrl($scope, $element, ViewService) {
 					nameFields.push(name);
 				}
 				items[name] = field;
+			});
+
+			// include json fields
+			_.each(jsonFields, function (fields, prefix) {
+				_.each(fields, function (field, name) {
+					var key = prefix + '.' + name;
+					var cast = 'integer,decimal,boolean'.indexOf(field.type) > -1 ? field.type : 'text';
+					key += '::' + cast;
+					items[key] = _.extend({}, field, {
+						name: key,
+						title: items[prefix].title + ' > ' + field.title
+					});
+				});
+				// don't search parent
+				delete items[prefix];
 			});
 
 			nameField = nameField || _.first(nameFields);
@@ -460,7 +475,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 				value: filter.value
 			};
 
-			if (filter.targetName && (
+			if (filter.targetName && criterion.fieldName.indexOf(':') == -1 && (
 					filter.operator !== 'isNull' ||
 					filter.operator !== 'notNull')) {
 				criterion.fieldName += '.' + filter.targetName;
@@ -979,7 +994,9 @@ ui.directive('uiFilterBox', function() {
 						break;
 					case 'one-to-one':
 					case 'many-to-one':
-						if (field.targetName) {
+						if (field.jsonField) {
+							fieldName = name;
+						} else if (field.targetName) {
 							fieldName = name + '.' + field.targetName;
 						}
 						break;

@@ -600,7 +600,7 @@
 					var res = response.data,
 						data = res.data;
 					that.process(data);
-					fn(data.fields);
+					fn(data.fields, data.jsonFields);
 				});
 				return promise;
 			};

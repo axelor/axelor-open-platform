@@ -113,6 +113,7 @@ public class ViewService extends AbstractService {
 		final Map<String, Object> meta = Maps.newHashMap();
 		final Class<?> modelClass = findClass(model);
 		final List<String> names = Lists.newArrayList();
+		final Map<String, Object> jsonFields = Maps.newHashMap();
 		
 		if (!security.isPermitted(AccessType.READ, (Class) modelClass)) {
 			response.setStatus(Response.STATUS_FAILURE);
@@ -123,9 +124,13 @@ public class ViewService extends AbstractService {
 			if (!p.isTransient()) {
 				names.add(p.getName());
 			}
+			if (p.isJson()) {
+				jsonFields.put(p.getName(), MetaStore.findJsonFields(model, p.getName()));
+			}
 		}
 
 		meta.put("model", model);
+		meta.put("jsonFields", jsonFields);
 		meta.putAll(MetaStore.findFields(modelClass, names));
 
 		response.setData(meta);
