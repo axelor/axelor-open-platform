@@ -36,6 +36,7 @@ import com.axelor.db.Query;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
+import com.axelor.meta.db.MetaFieldCustom;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
@@ -108,16 +109,23 @@ public class MetaStore {
 		final Iterator<String> iter = Splitter.on(".").split(name).iterator();
 		Mapper current = mapper;
 		Property property = current.getProperty(iter.next());
-		while(iter.hasNext()) {
+
+		if (property == null || (property.isJson() && iter.hasNext())) {
+			return null;
+		}
+
+		while(property != null && property.getTarget() != null && iter.hasNext()) {
 			current = Mapper.of(property.getTarget());
 			property = current.getProperty(iter.next());
 		}
+
 		return property;
 	}
 	
 	public static Map<String, Object> findFields(final Class<?> modelClass, final List<String> names) {
 		final Map<String, Object> data = new HashMap<>();
 		final Mapper mapper = Mapper.of(modelClass);
+		final Map<String, Property> fieldsMap = new LinkedHashMap<>();
 		final List<Object> fields = new ArrayList<>();
 
 		boolean massUpdate = false;
@@ -161,6 +169,7 @@ public class MetaStore {
 			if (name.contains(".")) {
 				map.put("readonly", true);
 			}
+			fieldsMap.put(name, property);
 			fields.add(map);
 		}
 
@@ -172,10 +181,92 @@ public class MetaStore {
 			perms.put("massUpdate", massUpdate);
 		}
 
+		// find dotted json fields
+		final Map<String, Map<String, Object>> jsonFields = new HashMap<>();
+		for (String name : names) {
+			if (fieldsMap.containsKey(name) || name.indexOf('.') == -1) { continue; }
+			final String first = name.substring(0, name.indexOf('.'));
+			final String field = name.substring(name.indexOf('.') + 1);
+			final Property property = findField(mapper, first);
+			if (property == null || !property.isJson()) { continue; }
+			if (!jsonFields.containsKey(first)) {
+				jsonFields.put(first, findJsonFields(modelClass.getName(), first));
+			}
+			final Map<String, Object> jsonField = jsonFields.get(first);
+			if (jsonField != null && jsonField.containsKey(field)) {
+				@SuppressWarnings("all")
+				final Map<String, Object> attrs = new HashMap<>((Map) jsonField.get(field));
+				if (attrs != null) {
+					attrs.put("name", name);
+					fields.add(attrs);
+				}
+			}
+		}
+
 		data.put("perms", perms);
 		data.put("fields", fields);
 
 		return data;
+	}
+
+	public static Map<String, Object> findJsonFields(String modelName, String fieldName) {
+		try {
+			if (!Mapper.of(Class.forName(modelName)).getProperty(fieldName).isJson()) {
+				return null;
+			}
+		} catch (Exception e) {
+			return null;
+		}
+
+		final java.lang.reflect.Field[] declaredFields = MetaFieldCustom.class.getDeclaredFields();
+		final Mapper mapper = Mapper.of(MetaFieldCustom.class);
+		final Map<String, Object> fields = new LinkedHashMap<>();
+
+		for (MetaFieldCustom record : Query.of(MetaFieldCustom.class)
+				.filter("self.model = :model AND self.modelField = :field")
+				.bind("model", modelName)
+				.bind("field", fieldName)
+				.order("id").fetch()) {
+			final Map<String, Object> attrs = new HashMap<>();
+			for (java.lang.reflect.Field field : declaredFields) {
+				final Property prop = mapper.getProperty(field.getName());
+				if (prop == null || prop.isPrimary()) continue;
+				final Object value = prop.get(record);
+				if (value == null || value == Boolean.FALSE) continue;
+				attrs.put(prop.getName(), value);
+			}
+			
+			String type = record.getType() == null ? "" : record.getType();
+			int min = record.getMinSize() == null ? 0 : record.getMinSize();
+			int max = record.getMaxSize() == null ? 0 : record.getMaxSize();
+			if (max <= min) {
+				attrs.remove("maxSize");
+			}
+			if ((min == 0 && max == 0) || type.matches("date|time|datetime|boolean")) {
+				attrs.remove("maxSize");
+				attrs.remove("minSize");
+			}
+
+			if ("ref-select".equalsIgnoreCase(record.getType()) ||
+				"ref-select".equalsIgnoreCase(record.getWidget()) ||
+				"RefSelect".equalsIgnoreCase(record.getWidget())) {
+				attrs.put("widget", "json-ref-select");
+			}
+			
+			if (!StringUtils.isBlank(record.getTargetModel())) {
+				attrs.put("target", record.getTargetModel());
+				attrs.remove("targetModel");
+			}
+
+			if (!StringUtils.isBlank(record.getSelection())) {
+				attrs.put("selectionList", getSelectionList(record.getSelection()));
+			}
+
+			attrs.put("jsonField", fieldName);
+			attrs.put("jsonPath", record.getName());
+			fields.put(record.getName(), attrs);
+		}
+		return fields;
 	}
 
 	public static List<Selection.Option> getSelectionList(String selection) {
