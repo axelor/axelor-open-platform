@@ -12,6 +12,7 @@
     <option value="date">Date</option>
     <option value="time">Time</option>
     <option value="many-to-one">ManyToOne</option>
+    <option value="many-to-many">ManyToMany</option>
     <option value="ref-select">RefSelect</option>
   </selection>
 

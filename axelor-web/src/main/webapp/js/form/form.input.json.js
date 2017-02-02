@@ -86,6 +86,12 @@ ui.formInput('JsonField', 'String', {
 			var rec = null;
 			_.each(scope.record, function (v, k) {
 				if (k.indexOf('$') === 0 || v === null || v === undefined) return;
+				if (_.isArray(v)) {
+					if (v.length == 0) return;
+					v = v.map(function (x) {
+						return x.id ? { id: x.id } : x;
+					});
+				}
 				if (rec === null) {
 					rec = {};
 				}
