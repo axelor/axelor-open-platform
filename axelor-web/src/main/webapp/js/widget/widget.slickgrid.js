@@ -649,7 +649,7 @@ Grid.prototype.parse = function(view) {
 			sortable = true;
 		}
 
-		if(field.transient || field.json || field.jsonField) {
+		if(field.transient || field.json) {
 			sortable = false;
 		}
 

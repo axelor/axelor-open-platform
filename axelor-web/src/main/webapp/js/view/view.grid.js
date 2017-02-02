@@ -469,7 +469,11 @@ function GridViewCtrl($scope, $element) {
 	$scope.onSort = function(event, args) {
 		var fields = $scope.selectFields();
 		var sortBy = _.map(args.sortCols, function(column) {
+			var field = column.sortCol.descriptor;
 			var name = column.sortCol.field;
+			if (field.jsonField) {
+				name += '::' + ('integer,boolean,decimal'.indexOf(field.type) > -1 ? field.type : 'text');
+			}
 			var spec = column.sortAsc ? name : '-' + name;
 			return spec;
 		});

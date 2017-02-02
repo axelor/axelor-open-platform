@@ -68,9 +68,6 @@ public class Query<T extends Model> {
 
 	private static final String NAME_PATTERN = "((?:[a-zA-Z_]\\w+)(?:(?:\\[\\])?\\.\\w+)*)";
 
-	private static final Pattern orderPattern = Pattern.compile(
-			"(\\-)?(?:self\\.)?" + NAME_PATTERN, Pattern.CASE_INSENSITIVE);
-
 	/**
 	 * Create a new instance of {@code Query} with given bean class.
 	 *
@@ -172,19 +169,19 @@ public class Query<T extends Model> {
 	 * @return the same query instance
 	 */
 	public Query<T> order(String spec) {
-		Matcher m = orderPattern.matcher(spec.trim());
-		if (!m.matches()) {
-			throw new IllegalArgumentException("Invalid order spec: " + spec);
-		}
-
 		if (orderBy.length() > 0) {
 			orderBy += ", ";
 		} else {
 			orderBy = " ORDER BY ";
 		}
-
-		String name = this.joinHelper.joinName(m.group(2));
-		orderBy += name + ("-".equals(m.group(1)) ? " DESC" : "");
+		
+		String name = spec.trim();
+		if (name.charAt(0) == '-') {
+			name = name.substring(1);
+			orderBy += this.joinHelper.joinName(name) + " DESC";
+		} else {
+			orderBy += this.joinHelper.joinName(name);
+		}
 
 		return this;
 	}
@@ -737,6 +734,16 @@ public class Query<T extends Model> {
 					Property property = currentMapper.getProperty(item);
 					if (property == null) {
 						break;
+					}
+
+					if (property.isJson()) {
+						String rest = name.substring(name.indexOf('.') + 1);
+						String cast = "text";
+						if (rest.indexOf("::") > -1) {
+							cast = rest.substring(rest.indexOf("::") + 2);
+							rest = rest.substring(0, rest.indexOf("::"));
+						}
+						return String.format("json_extract_%s(self.%s, '%s')", cast, item, rest);
 					}
 
 					if (prefix == null) {

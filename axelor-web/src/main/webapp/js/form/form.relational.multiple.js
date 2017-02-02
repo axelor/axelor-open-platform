@@ -362,7 +362,11 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		var sortBy = [];
 		
 		angular.forEach(args.sortCols, function(column){
+			var field = column.sortCol.descriptor;
 			var name = column.sortCol.field;
+			if (field.jsonField) {
+				name += '::' + ('integer,boolean,decimal'.indexOf(field.type) > -1 ? field.type : 'text');
+			}
 			var spec = column.sortAsc ? name : '-' + name;
 			sortBy.push(spec);
 		});
