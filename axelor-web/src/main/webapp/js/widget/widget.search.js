@@ -304,6 +304,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 			// include json fields
 			_.each(jsonFields, function (fields, prefix) {
 				_.each(fields, function (field, name) {
+					if (field.type === 'many-to-many') return;
 					var key = prefix + '.' + name;
 					var cast = 'integer,decimal,boolean'.indexOf(field.type) > -1 ? field.type : 'text';
 					key += '::' + cast;
