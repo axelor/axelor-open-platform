@@ -205,6 +205,10 @@
 							field.widgetAttrs = angular.fromJson(field.widgetAttrs);
 							processWidget(field);
 						}
+						if (field.type == 'one-to-many') {
+							field.type = 'many-to-many';
+							field.canSelect = false;
+						}
 						if (field.type == 'many-to-many') {
 							field.showTitle = false;
 							field.colSpan = (field.widgetAttrs||{}).colSpan || field.colSpan || 12;
