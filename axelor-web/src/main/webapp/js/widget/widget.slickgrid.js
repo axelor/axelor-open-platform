@@ -2259,7 +2259,7 @@ Grid.prototype.onItemDblClick = function(event, args) {
 	if (item.__group || item.__groupTotals) {
 		return;
 	}
-	if (this.canSave())
+	if (!this.handler.field && this.canSave())
 		return;
 
 	var selected = this.grid.getSelectedRows() || [];
