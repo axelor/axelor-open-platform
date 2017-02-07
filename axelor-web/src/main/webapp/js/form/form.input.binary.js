@@ -319,10 +319,9 @@ ui.formInput('Binary', {
 				if(scope._model === META_FILE) {
 					record.fileName = file.name;
 				}
-				record.fileType = file.type;
-				record.fileSize = file.size;
 				scope.applyLater(function() {
-					model.$setViewValue(0); // mark form for save
+					record.fileType = file.type;
+					record.fileSize = file.size;
 				});
 			}
 		});
