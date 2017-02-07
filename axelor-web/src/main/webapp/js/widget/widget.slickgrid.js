@@ -486,10 +486,15 @@ _.extend(Factory.prototype, {
 		}
 		
 		if (attrs.jsonPath && attrs.jsonField) {
-			var jsonValue = dataContext[attrs.jsonField];
-			if (jsonValue) {
-				jsonValue = angular.fromJson(jsonValue);
-				value = jsonValue[attrs.jsonPath];
+			var jsonValue = dataContext[attrs.name];
+			if (jsonValue === undefined) {
+				jsonValue = dataContext[attrs.jsonField];
+				if (jsonValue) {
+					jsonValue = angular.fromJson(jsonValue);
+					value = jsonValue[attrs.jsonPath];
+				}
+			} else if (jsonValue && attrs.target) { // relational field value
+				value = angular.fromJson(jsonValue);
 			}
 		}
 

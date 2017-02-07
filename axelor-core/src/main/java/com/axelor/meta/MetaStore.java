@@ -264,6 +264,10 @@ public class MetaStore {
 
 			attrs.put("jsonField", fieldName);
 			attrs.put("jsonPath", record.getName());
+			if (type.matches("integer|decimal|boolean")) {
+				attrs.put("jsonType", type);
+			}
+
 			fields.put(record.getName(), attrs);
 		}
 		return fields;

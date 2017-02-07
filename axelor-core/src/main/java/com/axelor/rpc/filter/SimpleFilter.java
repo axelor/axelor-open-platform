@@ -20,6 +20,8 @@ package com.axelor.rpc.filter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.axelor.db.internal.hibernate.type.JsonFunction;
+
 
 class SimpleFilter extends Filter {
 
@@ -54,11 +56,7 @@ class SimpleFilter extends Filter {
 	protected String getOperand() {
 		final String name = getFieldName();
 		if (name.indexOf("::") > -1) {
-			final String cast = name.substring(name.indexOf("::") + 2);
-			final String rest = name.substring(0, name.indexOf("::"));
-			final String first = rest.substring(0, rest.indexOf('.'));
-			final String path = rest.substring(rest.indexOf('.') + 1);
-			return String.format("json_extract_%s(self.%s, '%s')", cast, first, path);
+			return JsonFunction.fromPath(name).toString();
 		}
 		return "self." + name;
 	}

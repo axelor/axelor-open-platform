@@ -306,8 +306,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 				_.each(fields, function (field, name) {
 					if (field.type === 'many-to-many') return;
 					var key = prefix + '.' + name;
-					var cast = 'integer,decimal,boolean'.indexOf(field.type) > -1 ? field.type : 'text';
-					key += '::' + cast;
+					key += '::' + (field.jsonType || 'text');
 					items[key] = _.extend({}, field, {
 						name: key,
 						title: items[prefix].title + ' > ' + field.title

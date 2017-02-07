@@ -210,10 +210,11 @@ function GridViewCtrl($scope, $element) {
 
 	$scope.selectFields = function() {
 		var fields = _.pluck($scope.fields, 'name');
-		_.each($scope.fields, function (field, name) {
-			if (field.jsonField && fields.indexOf(field.jsonField) == -1) {
-				fields.push(field.jsonField);
+		return _.map($scope.fields, function (field) {
+			if (field.jsonField) {
+				return field.name + '::' + (field.jsonType || 'text');
 			}
+			return field.name;
 		});
 		return fields;
 	};
@@ -353,7 +354,7 @@ function GridViewCtrl($scope, $element) {
 
 			// tag json fields
 			if (field.jsonField) {
-				key += '::' +('integer,decimal,boolean'.indexOf(type) > -1 ? type : 'text');
+				key += '::' + (field.jsonType || 'text');
 			}
 
 			return {

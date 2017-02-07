@@ -29,6 +29,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.TypedQuery;
 
+import com.axelor.db.internal.hibernate.type.JsonFunction;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -525,6 +526,13 @@ public class Query<T extends Model> {
 						selects.add(joinHelper.joinName(name + ".id"));
 						selects.add(joinHelper.joinName(name + ".version"));
 						selects.add(joinHelper.joinName(name + "." + property.getTargetName()));
+					}
+				} else if (name.indexOf('.') > -1) {
+					final JsonFunction func = JsonFunction.fromPath(name);
+					final Property json = mapper.getProperty(func.getField());
+					if (json != null && json.isJson()) {
+						this.names.add(func.getField() + "." + func.getAttribute());
+						selects.add(func.toString());
 					}
 				}
 			}
