@@ -7,7 +7,7 @@
 
   <entity name="MetaJsonField" table="META_JSON_FIELD">
     <string name="name" required="true" />
-    <string name="title" required="true" />
+    <string name="title" />
     <string name="type" column="type_name" required="true"
       selection="json.field.type" />
     <string name="defaultValue" />

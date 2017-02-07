@@ -201,6 +201,7 @@
 						item.editor.viewer = true;
 					}
 					item.jsonFields.forEach(function (field) {
+						field.title = field.title || field.autoTitle;
 						if (field.widgetAttrs) {
 							field.widgetAttrs = angular.fromJson(field.widgetAttrs);
 							processWidget(field);

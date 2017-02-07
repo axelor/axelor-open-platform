@@ -29,12 +29,14 @@ import java.util.concurrent.ConcurrentMap;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Query;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaSelectItem;
@@ -235,7 +237,20 @@ public class MetaStore {
 				if (value == null || value == Boolean.FALSE) continue;
 				attrs.put(prop.getName(), value);
 			}
-			
+
+			String name = record.getName();
+			String title = record.getTitle();
+
+			// localized title
+			attrs.put("title", I18n.get(title));
+
+			// auto title
+			if (StringUtils.isBlank(title)) {
+				String last = name.substring(name.lastIndexOf('.') + 1);
+				title = I18n.get(Inflector.getInstance().humanize(last));
+				attrs.put("autoTitle", title);
+			}
+
 			String type = record.getType() == null ? "" : record.getType();
 			int min = record.getMinSize() == null ? 0 : record.getMinSize();
 			int max = record.getMaxSize() == null ? 0 : record.getMaxSize();
