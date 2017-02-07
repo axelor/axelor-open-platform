@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
+
+  <selection name="json.field.type">
+    <option value="string">String</option>
+    <option value="integer">Integer</option>
+    <option value="decimal">Decimal</option>
+    <option value="boolean">Boolean</option>
+    <option value="datetime">DateTime</option>
+    <option value="date">Date</option>
+    <option value="time">Time</option>
+    <option value="many-to-one">ManyToOne</option>
+    <option value="many-to-many">ManyToMany</option>
+    <option value="one-to-many">OneToMany</option>
+    <option value="ref-select">RefSelect</option>
+  </selection>
+
+  <grid name="json-field-grid" title="Custom fields" model="com.axelor.meta.db.MetaJsonField">
+    <field name="name" />
+    <field name="type" />
+    <field name="model" />
+    <field name="modelField" />
+  </grid>
+
+  <form name="json-field-form" title="Custom field" model="com.axelor.meta.db.MetaJsonField">
+    <panel title="Overview">
+      <field name="name" />
+      <field name="type" />
+      <field name="title" />
+      <field name="defaultValue" />
+      <field name="help" />
+      <field name="sequence" />
+      <field name="model" />
+      <field name="modelField" />
+    </panel>
+    <panel-tabs>
+      <panel title="Options">
+        <field name="required" />
+        <field name="hidden" />
+        <field name="selection" />
+        <field name="widget" />
+        <field name="minSize" title="Min" showIf="type.match('string|integer|decimal')" />
+        <field name="maxSize" title="Max" showIf="type.match('string|integer|decimal')" />
+        <field name="precision" showIf="type === 'decimal'" />
+        <field name="scale" showIf="type === 'decimal'" />
+        <field name="regex" showIf="type === 'string'" colSpan="12" />
+        <field name="targetModel" showIf="type.match('-to-')" />
+        <field name="targetName" showIf="type.match('-to-')" />
+        <field name="gridView" showIf="type.match('-to-')" />
+        <field name="formView" showIf="type.match('-to-')" />
+        <field name="domain" colSpan="12" showIf="type.match('-to-')" />
+      </panel>
+      <panel title="Conditions" itemSpan="12">
+        <field name="showIf" />
+        <field name="hideIf" />
+        <field name="requiredIf" />
+      </panel>
+    </panel-tabs>
+    <panel title="Widget Attributes" sidebar="true">
+      <field name="widgetAttrs" widget="json-raw" />
+    </panel>
+  </form>
+
+  <menuitem name="menu-custom-fields" parent="menu-model"
+    title="Custom Fields" />
+  <menuitem name="menu-all-custom-field" parent="menu-custom-fields"
+    title="All Fields"
+    action="custom.fields.all" />
+
+  <action-view name="custom.fields.all"
+    title="Custom Fields"
+    model="com.axelor.meta.db.MetaJsonField">
+    <view type="grid" name="json-field-grid" />
+    <view type="form" name="json-field-form" />
+    <domain>self.jsonModel is null</domain>
+  </action-view>
+
+</object-views>

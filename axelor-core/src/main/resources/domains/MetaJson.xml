@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_5.0.xsd">
+
+  <module name="meta" package="com.axelor.meta.db" />
+
+  <entity name="MetaJsonField" table="META_JSON_FIELD">
+    <string name="name" required="true" />
+    <string name="title" required="true" />
+    <string name="type" column="type_name" required="true"
+      selection="json.field.type" />
+    <string name="defaultValue" />
+    <string name="model" required="true" column="model_name" />
+    <string name="modelField" required="true" column="model_field" />
+    <string name="selection" />
+    <string name="widget" />
+    <string name="help" />
+    <string name="showIf" />
+    <string name="hideIf" />
+    <string name="requiredIf" />
+    <boolean name="hidden" column="is_hidden" />
+    <boolean name="required" column="is_required" />
+    <integer name="minSize" column="min_size" />
+    <integer name="maxSize" column="max_size" />
+    <integer name="precision" default="6" column="decimal_precision" />
+    <integer name="scale" default="2" column="decimal_scale" />
+    <string name="regex" />
+    <string name="targetModel" />
+    <string name="targetName" />
+    <string name="formView" />
+    <string name="gridView" />
+    <string name="domain" />
+    <integer name="sequence" />
+    <string name="widgetAttrs" json="true" />
+  </entity>
+
+</domain-models>

@@ -190,32 +190,6 @@
     <string name="mappedBy" title="Mapped by" />
     <string name="description" title="Description" large="true" />
   </entity>
-  
-  <entity name="MetaFieldCustom" table="META_FIELD_CUSTOM" cachable="true">
-    <string name="name" required="true" />
-    <string name="title" required="true" />
-    <string name="type" column="type_name" required="true" selection="select.custom.field.type" />
-    <string name="defaultValue" />
-    <string name="model" required="true" column="model_name" />
-    <string name="modelField" required="true" column="model_field" />
-    <string name="selection" />
-    <string name="widget" />
-    <string name="help" />
-    <string name="showIf" />
-    <string name="hideIf" />
-    <string name="requiredIf" />
-    <boolean name="hidden" column="is_hidden" />
-    <boolean name="required" column="is_required" />
-    <integer name="minSize" column="min_size" />
-    <integer name="maxSize" column="max_size" />
-    <integer name="precision" default="6" column="decimal_precision" />
-    <integer name="scale" default="2" column="decimal_scale" />
-    <string name="regex" />
-    <string name="targetModel" />
-    <string name="targetName" />
-    <string name="domain" />
-    <string name="widgetAttrs" json="true" />
-  </entity>
 
   <entity name="MetaTranslation" table="META_TRANSLATION" logUpdates="false">
     <string name="key" column="message_key" required="true" large="true" />

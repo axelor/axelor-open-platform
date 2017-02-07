@@ -36,7 +36,7 @@ import com.axelor.db.Query;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
-import com.axelor.meta.db.MetaFieldCustom;
+import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
@@ -218,11 +218,11 @@ public class MetaStore {
 			return null;
 		}
 
-		final java.lang.reflect.Field[] declaredFields = MetaFieldCustom.class.getDeclaredFields();
-		final Mapper mapper = Mapper.of(MetaFieldCustom.class);
+		final java.lang.reflect.Field[] declaredFields = MetaJsonField.class.getDeclaredFields();
+		final Mapper mapper = Mapper.of(MetaJsonField.class);
 		final Map<String, Object> fields = new LinkedHashMap<>();
 
-		for (MetaFieldCustom record : Query.of(MetaFieldCustom.class)
+		for (MetaJsonField record : Query.of(MetaJsonField.class)
 				.filter("self.model = :model AND self.modelField = :field")
 				.bind("model", modelName)
 				.bind("field", fieldName)
