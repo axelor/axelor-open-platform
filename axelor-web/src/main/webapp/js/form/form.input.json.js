@@ -26,6 +26,7 @@ ui.formInput('JsonField', 'String', {
 	link: function (scope, element, attrs, model) {
 		var field = scope.field;
 		var jsonFields = field.jsonFields || [];
+		var jsonFix = {};
 
 		var defaultValues = {};
 		var parentUnwatch = null;
@@ -33,6 +34,18 @@ ui.formInput('JsonField', 'String', {
 
 		scope.formPath = scope.formPath ? scope.formPath + "." + field.name : field.name;
 		scope.record = {};
+		
+		jsonFields.forEach(function (item) {
+			if (item.target === 'com.axelor.meta.db.MetaJsonRecord' &&
+				item.targetName && item.targetName.indexOf('attrs.') === 0) {
+				jsonFix[item.name] = function (v) {
+					if (v) {
+						v[item.targetName.substring(6)] = v[item.targetName];
+					}
+					return v;
+				}
+			}
+		});
 
 		function getDefaultValues() {
 			jsonFields.forEach(function (item) {
@@ -81,6 +94,11 @@ ui.formInput('JsonField', 'String', {
 				onUpdate();
 			}, true);
 		}
+		
+		function format(name, value) {
+			var func = jsonFix[name];
+			return func ? func(value) : value;
+		}
 
 		function onUpdate() {
 			var rec = null;
@@ -95,7 +113,7 @@ ui.formInput('JsonField', 'String', {
 				if (rec === null) {
 					rec = {};
 				}
-				rec[k] = v;
+				rec[k] = format(k, v);
 			});
 			unwatchParent();
 			if (scope.$parent.record[field.name] || rec) {
