@@ -225,8 +225,7 @@
 					if (item.jsonFields) {
 						_.each(item.jsonFields, function (field) {
 							var type = field.type || 'text';
-							var show = (field.widgetAttrs||{}).noGrid !== false;
-							if (type.indexOf('-to-many') === -1 && show) {
+							if (type.indexOf('-to-many') === -1 && !field.hiddenInGrid) {
 								items.push(_.extend({}, field, { name: item.name + '.' + field.name }));
 							}
 						});

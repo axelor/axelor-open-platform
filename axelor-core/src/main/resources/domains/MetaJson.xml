@@ -22,6 +22,8 @@
     <string name="requiredIf" />
     <boolean name="hidden" column="is_hidden" />
     <boolean name="required" column="is_required" />
+    <boolean name="nameField" />
+    <boolean name="hiddenInGrid" />
     <integer name="minSize" column="min_size" />
     <integer name="maxSize" column="max_size" />
     <integer name="precision" default="6" column="decimal_precision" />
@@ -32,6 +34,7 @@
     <string name="formView" />
     <string name="gridView" />
     <string name="domain" />
+    <many-to-one name="targetJsonModel" ref="MetaJsonModel" />
     <integer name="sequence" />
     <string name="widgetAttrs" json="true" />
   </entity>

@@ -40,6 +40,7 @@ import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonModel;
+import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.db.repo.MetaJsonModelRepository;
 import com.axelor.meta.loader.ModuleManager;
@@ -290,6 +291,39 @@ public class MetaStore {
 			if (!StringUtils.isBlank(record.getTargetModel())) {
 				attrs.put("target", record.getTargetModel());
 				attrs.remove("targetModel");
+			}
+
+			if (type.startsWith("json-")) {
+				type = type.substring(5);
+				attrs.put("type", type);
+				attrs.put("target", MetaJsonRecord.class.getName());
+				if (record.getTargetJsonModel() != null) {
+					final MetaJsonModel targetModel = record.getTargetJsonModel();
+					String domain = String.format("self.jsonModel = '%s'", targetModel.getName());
+					if (!StringUtils.isBlank(record.getDomain())) {
+						domain = String.format("(%s) AND (%s)", domain, record.getDomain()); 
+					}
+					attrs.put("domain", domain);
+					attrs.put("gridView", targetModel.getGridView().getName());
+					attrs.put("formView", targetModel.getFormView().getName());
+					
+					if (targetModel.getFields() != null) {
+						MetaJsonField nameField = null;
+						for (MetaJsonField field : targetModel.getFields()) {
+							if (!"string".equals(field.getType())) continue;
+							if (field.getNameField() == Boolean.TRUE) {
+								nameField = field;
+								break;
+							}
+							if (nameField != null) {
+								nameField = field;
+							}
+						}
+						if (nameField != null) {
+							attrs.put("targetName", "attrs." + nameField.getName());
+						}
+					}
+				}
 			}
 
 			if (!StringUtils.isBlank(record.getSelection())) {

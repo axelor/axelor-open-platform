@@ -11,10 +11,13 @@
     <option value="datetime">DateTime</option>
     <option value="date">Date</option>
     <option value="time">Time</option>
+    <option value="ref-select">RefSelect</option>
     <option value="many-to-one">ManyToOne</option>
     <option value="many-to-many">ManyToMany</option>
     <option value="one-to-many">OneToMany</option>
-    <option value="ref-select">RefSelect</option>
+    <option value="json-many-to-one">Json-ManyToOne</option>
+    <option value="json-many-to-many">Json-ManyToMany</option>
+    <option value="json-one-to-many">Json-OneToMany</option>
   </selection>
 
   <grid name="json-field-grid" title="Custom fields" model="com.axelor.meta.db.MetaJsonField">
@@ -27,8 +30,6 @@
   <form name="json-field-form-base" title="Custom field" model="com.axelor.meta.db.MetaJsonField">
     <panel-tabs>
       <panel title="Options">
-        <field name="required" />
-        <field name="hidden" />
         <field name="selection" />
         <field name="widget" />
         <field name="minSize" title="Min" showIf="type.match('string|integer|decimal')" />
@@ -36,11 +37,12 @@
         <field name="precision" showIf="type === 'decimal'" />
         <field name="scale" showIf="type === 'decimal'" />
         <field name="regex" showIf="type === 'string'" colSpan="12" />
-        <field name="targetModel" showIf="type.match('-to-')" />
-        <field name="targetName" showIf="type.match('-to-')" />
-        <field name="gridView" showIf="type.match('-to-')" />
-        <field name="formView" showIf="type.match('-to-')" />
-        <field name="domain" colSpan="12" showIf="type.match('-to-')" />
+        <field name="targetModel" showIf="type.match('^(one|many)-to-')" />
+        <field name="targetName" showIf="type.match('^(one|many)-to-')" />
+        <field name="gridView" showIf="type.match('^(one|many)-to-')" />
+        <field name="formView" showIf="type.match('^(one|many)-to-')" />
+        <field name="targetJsonModel" showIf="type.match('^json-')" colSpan="12" />
+        <field name="domain" showIf="type.match('-to-')" colSpan="12" />
       </panel>
       <panel title="Conditions" itemSpan="12">
         <field name="showIf" />
@@ -48,6 +50,12 @@
         <field name="requiredIf" />
       </panel>
     </panel-tabs>
+    <panel title="Options" sidebar="true" itemSpan="6">
+      <field name="required" widget="inline-checkbox" />
+      <field name="nameField" widget="inline-checkbox" showIf="type === 'string'" />
+      <field name="hidden" widget="inline-checkbox" />
+      <field name="hiddenInGrid" widget="inline-checkbox" />
+    </panel>
     <panel title="Widget Attributes" sidebar="true">
       <field name="widgetAttrs" widget="json-raw" />
     </panel>
