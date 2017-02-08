@@ -217,6 +217,25 @@
 					});
 				}
 			});
+
+			// include json fields in grid
+			if (view.type === 'grid') {
+				var items = [];
+				_.each(view.items, function (item) {
+					if (item.jsonFields) {
+						_.each(item.jsonFields, function (field) {
+							var type = field.type || 'text';
+							var show = (field.widgetAttrs||{}).noGrid !== false;
+							if (type.indexOf('-to-many') === -1 && show) {
+								items.push(_.extend({}, field, { name: item.name + '.' + field.name }));
+							}
+						});
+					} else {
+						items.push(item);
+					}
+				});
+				view.items = items;
+			}
 		};
 		
 		function processFields(fields) {
