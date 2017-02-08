@@ -13,6 +13,7 @@
     <string name="defaultValue" />
     <string name="model" required="true" column="model_name" />
     <string name="modelField" required="true" column="model_field" />
+    <many-to-one name="jsonModel" ref="MetaJsonModel" />
     <string name="selection" />
     <string name="widget" />
     <string name="help" />
@@ -33,6 +34,21 @@
     <string name="domain" />
     <integer name="sequence" />
     <string name="widgetAttrs" json="true" />
+  </entity>
+
+  <entity name="MetaJsonModel" table="META_JSON_MODEL" repository="abstract">
+    <string name="name" required="true" unique="true" />
+    <string name="title" namecolumn="true" required="true" />
+    <many-to-one name="menu" ref="MetaMenu" copy="false" />
+    <many-to-one name="action" ref="MetaAction" copy="false" />
+    <many-to-one name="gridView" ref="MetaView" copy="false" />
+    <many-to-one name="formView" ref="MetaView" copy="false" />
+    <one-to-many name="fields" ref="MetaJsonField" mappedBy="jsonModel" />
+  </entity>
+
+  <entity name="MetaJsonRecord" table="META_JSON_RECORD">
+    <string name="jsonModel" required="true" />
+    <string name="attrs" json="true" />
   </entity>
 
 </domain-models>

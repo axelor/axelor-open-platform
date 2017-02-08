@@ -33,6 +33,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
@@ -41,6 +42,7 @@ import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
+import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.AbstractWidget;
@@ -108,30 +110,37 @@ public class ViewService extends AbstractService {
 	@GET
 	@Path("fields/{model}")
 	@SuppressWarnings("all")
-	public Response fields(@PathParam("model") String model) {
+	public Response fields(@PathParam("model") String model, @QueryParam("jsonModel") String jsonModel) {
 		final Response response = new Response();
 		final Map<String, Object> meta = Maps.newHashMap();
 		final Class<?> modelClass = findClass(model);
-		final List<String> names = Lists.newArrayList();
-		final Map<String, Object> jsonFields = Maps.newHashMap();
 		
 		if (!security.isPermitted(AccessType.READ, (Class) modelClass)) {
 			response.setStatus(Response.STATUS_FAILURE);
 			return response;
 		}
 		
-		for (Property p : Mapper.of(modelClass).getProperties()) {
-			if (!p.isTransient()) {
-				names.add(p.getName());
-			}
-			if (p.isJson()) {
-				jsonFields.put(p.getName(), MetaStore.findJsonFields(model, p.getName()));
-			}
-		}
+		final Map<String, Object> jsonFields = Maps.newHashMap();
+		final List<String> names = Lists.newArrayList();
 
 		meta.put("model", model);
 		meta.put("jsonFields", jsonFields);
-		meta.putAll(MetaStore.findFields(modelClass, names));
+
+		if (StringUtils.isBlank(jsonModel)) {
+			for (Property p : Mapper.of(modelClass).getProperties()) {
+				if (!p.isTransient()) {
+					names.add(p.getName());
+				}
+				if (p.isJson()) {
+					jsonFields.put(p.getName(), MetaStore.findJsonFields(model, p.getName()));
+				}
+			}
+			meta.putAll(MetaStore.findFields(modelClass, names));
+		} else if (MetaJsonRecord.class.getName().equals(model)){
+			names.add("attrs");
+			meta.putAll(MetaStore.findFields(modelClass, names));
+			jsonFields.put("attrs", MetaStore.findJsonFields(jsonModel));
+		}
 
 		response.setData(meta);
 		response.setStatus(Response.STATUS_SUCCESS);

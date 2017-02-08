@@ -281,8 +281,9 @@ FilterFormCtrl.$inject = ['$scope', '$element', 'ViewService'];
 function FilterFormCtrl($scope, $element, ViewService) {
 
 	this.doInit = function(model, viewItems) {
+		var context = $scope.$parent.$parent._context || {};
 		return ViewService
-		.getFields(model)
+		.getFields(model, context.jsonModel)
 		.success(function(fields, jsonFields) {
 
 			var items = {};

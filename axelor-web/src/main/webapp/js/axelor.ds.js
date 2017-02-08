@@ -616,11 +616,14 @@
 			return promise;
 		};
 
-		ViewService.prototype.getFields = function(model) {
+		ViewService.prototype.getFields = function(model, jsonModel) {
 
 			var that = this,
 				promise = $http.get('ws/meta/fields/' + model, {
-					cache: true
+					cache: true,
+					params: jsonModel ? {
+						jsonModel: jsonModel
+					} : undefined
 				});
 
 			promise.success = function(fn) {

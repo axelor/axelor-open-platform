@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.schema.actions;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +31,10 @@ import com.axelor.db.Model;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.axelor.rpc.ActionResponse;
+import com.axelor.rpc.Resource;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -182,6 +185,14 @@ public class ActionView extends Action {
 					Object value = handler.evaluate(ctx.getExpression());
 					if (ctx.getCanCopy() == Boolean.TRUE && value instanceof Model) {
 						value = JPA.copy((Model)value, true);
+					}
+					if (value instanceof Model) {
+						value = Resource.toMapCompact(value);
+					}
+					if (value instanceof Collection) {
+						value = Collections2.transform((Collection<?>) value, item -> {
+							return item instanceof Model ? Resource.toMapCompact(item) : item;
+						});
 					}
 					context.put(ctx.getName(), value);
 

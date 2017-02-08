@@ -57,6 +57,7 @@ import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.Repository;
+import com.axelor.db.internal.hibernate.type.JsonFunction;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -922,27 +923,43 @@ public class Resource<T extends Model> {
 
 		Mapper mapper = Mapper.of(model);
 		Map<String, Object> data = request.getData();
+		
+		String name = request.getFields().get(0);
 
 		Property property = null;
 		try {
-			property = mapper.getProperty(request.getFields().get(0));
+			property = mapper.getProperty(name);
 		} catch (Exception e) {
 		}
 
-		if (property == null) {
-			property = mapper.getNameField();
+		String selectName = null;
+
+		if (property == null && name.indexOf('.') > -1) {
+			JsonFunction func = JsonFunction.fromPath(name);
+			Property p = mapper.getProperty(func.getField());
+			if (p != null && p.isJson()) {
+				selectName = func.toString();
+			}
 		}
 
-		if (property != null) {
+		if (property == null && selectName == null) {
+			property = mapper.getNameField();
+			if (property != null) {
+				selectName = "self." + property.getName();
+				name = property.getName();
+			}
+		}
+
+		if (selectName != null) {
 			String qs = String.format(
-					"SELECT self.%s FROM %s self WHERE self.id = :id",
-					property.getName(), model.getSimpleName());
+					"SELECT %s FROM %s self WHERE self.id = :id",
+					selectName, model.getSimpleName());
 
 			javax.persistence.Query query = JPA.em().createQuery(qs);
 			QueryBinder.of(query).setCacheable().setReadOnly().bind(data);
 
-			Object name = query.getSingleResult();
-			data.put(property.getName(), name);
+			Object value = query.getSingleResult();
+			data.put(name, value);
 		}
 
 		response.setData(ImmutableList.of(data));

@@ -24,17 +24,7 @@
     <field name="modelField" />
   </grid>
 
-  <form name="json-field-form" title="Custom field" model="com.axelor.meta.db.MetaJsonField">
-    <panel title="Overview">
-      <field name="name" />
-      <field name="type" />
-      <field name="title" />
-      <field name="defaultValue" />
-      <field name="help" />
-      <field name="sequence" />
-      <field name="model" />
-      <field name="modelField" />
-    </panel>
+  <form name="json-field-form-base" title="Custom field" model="com.axelor.meta.db.MetaJsonField">
     <panel-tabs>
       <panel title="Options">
         <field name="required" />
@@ -62,12 +52,83 @@
       <field name="widgetAttrs" widget="json-raw" />
     </panel>
   </form>
+  <form name="json-field-form" title="Custom field" model="com.axelor.meta.db.MetaJsonField">
+    <panel title="Overview">
+      <field name="name" x-pattern="[a-z][a-zA-Z0-9_\\$]+"/>
+      <field name="type" />
+      <field name="title" />
+      <field name="defaultValue" />
+      <field name="help" />
+      <field name="sequence" />
+      <field name="model" />
+      <field name="modelField" />
+    </panel>
+    <panel-include view="json-field-form-base" />
+  </form>
+  <form name="json-field-form-2" title="Custom field" model="com.axelor.meta.db.MetaJsonField"
+    onNew="action-json-field-defaults">
+    <panel title="Overview">
+      <field name="name" x-pattern="[a-z][a-zA-Z0-9_\\$]+"/>
+      <field name="type" />
+      <field name="title" />
+      <field name="defaultValue" />
+      <field name="help" />
+      <field name="sequence" />
+    </panel>
+    <panel-include view="json-field-form-base" />
+  </form>
 
+  <grid name="json-model-grid" title="Custom models" model="com.axelor.meta.db.MetaJsonModel">
+    <field name="name" />
+    <field name="title" />
+  </grid>
+
+  <form name="json-model-form" title="Custom model" model="com.axelor.meta.db.MetaJsonModel">
+    <panel title="Overview">
+      <field name="name" readonlyIf="id" x-pattern="[a-z][a-zA-Z0-9_\\$]+"/>
+      <field name="title" />
+    </panel>
+    <panel-related field="fields" form-view="json-field-form-2" orderBy="sequence" canMove="true">
+      <field name="name" />
+      <field name="type" />
+    </panel-related>
+  </form>
+
+  <grid name="json-record-grid" title="Form records" model="com.axelor.meta.db.MetaJsonRecord">
+    <field name="attrs" />
+  </grid>
+
+  <form name="json-record-form" title="Form record" model="com.axelor.meta.db.MetaJsonRecord"
+    onNew="action-json-record-defaults">
+    <panel title="Overview">
+      <field name="attrs" colSpan="12" />
+    </panel>
+  </form>
+
+  <menuitem name="menu-custom-models" parent="menu-model"
+    title="Custom Models"
+    action="custom.models.all" />
   <menuitem name="menu-custom-fields" parent="menu-model"
     title="Custom Fields" />
   <menuitem name="menu-all-custom-field" parent="menu-custom-fields"
     title="All Fields"
     action="custom.fields.all" />
+
+  <action-record name="action-json-field-defaults" model="com.axelor.meta.db.MetaJsonField">
+    <field name="model" expr="com.axelor.meta.db.MetaJsonRecord" />
+    <field name="modelField" expr="attrs" />
+  </action-record>
+
+  <action-record name="action-json-record-defaults" model="com.axelor.meta.db.MetaJsonRecord">
+    <field name="jsonModel" expr="#{jsonModel}" />
+  </action-record>
+
+  <action-view name="custom.models.all"
+    title="Custom Models"
+    model="com.axelor.meta.db.MetaJsonModel">
+    <view type="grid" name="json-model-grid" />
+    <view type="form" name="json-model-form" />
+  </action-view>
 
   <action-view name="custom.fields.all"
     title="Custom Fields"

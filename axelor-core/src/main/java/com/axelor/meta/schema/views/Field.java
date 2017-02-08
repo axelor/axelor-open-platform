@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.MetaStore;
@@ -179,6 +180,9 @@ public class Field extends SimpleWidget {
 
 	@XmlAttribute(name = "x-search-limit")
 	private Integer searchLimit;
+	
+	@XmlAttribute(name = "x-json-model")
+	private String jsonModel;
 
 	@XmlElement(name = "hilite")
 	private List<Hilite> hilites;
@@ -599,7 +603,9 @@ public class Field extends SimpleWidget {
 	@XmlTransient
 	@JsonProperty
 	public Collection<?> getJsonFields() {
-		final Map<String, Object> fields = MetaStore.findJsonFields(getModel(), getName());
+		final Map<String, Object> fields = StringUtils.isBlank(jsonModel) ?
+				MetaStore.findJsonFields(getModel(), getName()) :
+				MetaStore.findJsonFields(jsonModel);
 		return fields == null ? null : fields.values();
 	}
 }

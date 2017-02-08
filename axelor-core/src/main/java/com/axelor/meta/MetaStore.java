@@ -39,7 +39,9 @@ import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaJsonField;
+import com.axelor.meta.db.MetaJsonModel;
 import com.axelor.meta.db.MetaSelectItem;
+import com.axelor.meta.db.repo.MetaJsonModelRepository;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
@@ -219,16 +221,33 @@ public class MetaStore {
 		} catch (Exception e) {
 			return null;
 		}
-
-		final java.lang.reflect.Field[] declaredFields = MetaJsonField.class.getDeclaredFields();
-		final Mapper mapper = Mapper.of(MetaJsonField.class);
-		final Map<String, Object> fields = new LinkedHashMap<>();
-
-		for (MetaJsonField record : Query.of(MetaJsonField.class)
+		final List<MetaJsonField> fields = Query.of(MetaJsonField.class)
 				.filter("self.model = :model AND self.modelField = :field")
 				.bind("model", modelName)
 				.bind("field", fieldName)
-				.order("id").fetch()) {
+				.order("id").fetch(); 
+		return updateJsonFields(fields, fieldName);
+	}
+
+	public static Map<String, Object> findJsonFields(String jsonModel) {
+		final MetaJsonModelRepository forms = Beans.get(MetaJsonModelRepository.class);
+		final MetaJsonModel found = forms.findByName(jsonModel);
+		return found == null ? null : updateJsonFields(found.getFields(), "attrs");
+	}
+
+	private static Map<String, Object> updateJsonFields(List<MetaJsonField> records, String fieldName) {
+		final java.lang.reflect.Field[] declaredFields = MetaJsonField.class.getDeclaredFields();
+		final Mapper mapper = Mapper.of(MetaJsonField.class);
+		final Map<String, Object> fields = new LinkedHashMap<>();
+		final List<MetaJsonField> jsonFields = new ArrayList<>(records);
+
+		jsonFields.sort((a, b) -> {
+			int x = a.getSequence() == null ? 0 : a.getSequence();
+			int y = b.getSequence() == null ? 0 : b.getSequence();
+			return Integer.compare(x, y);
+		});
+
+		for (MetaJsonField record : jsonFields) {
 			final Map<String, Object> attrs = new HashMap<>();
 			for (java.lang.reflect.Field field : declaredFields) {
 				final Property prop = mapper.getProperty(field.getName());
