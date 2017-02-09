@@ -40,7 +40,7 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 			gridView.setType("grid");
 			gridView.setModel(action.getModel());
 		}
-		gridView.setName("json-model-" + jsonModel.getName() + "-grid");
+		gridView.setName("custom-model-" + jsonModel.getName() + "-grid");
 		gridView.setTitle(jsonModel.getTitle());
 		gridView.setXml(new StringBuilder()
 				.append("<grid")
@@ -58,7 +58,7 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 			formView.setType("form");
 			formView.setModel(action.getModel());
 		}
-		formView.setName("json-model-" + jsonModel.getName() + "-form");
+		formView.setName("custom-model-" + jsonModel.getName() + "-form");
 		formView.setTitle(jsonModel.getTitle());
 		formView.setXml(new StringBuilder()
 				.append("<form")

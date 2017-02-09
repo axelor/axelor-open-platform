@@ -14,9 +14,9 @@
     <option value="many-to-one">ManyToOne</option>
     <option value="many-to-many">ManyToMany</option>
     <option value="one-to-many">OneToMany</option>
-    <option value="json-many-to-one">Json-ManyToOne</option>
-    <option value="json-many-to-many">Json-ManyToMany</option>
-    <option value="json-one-to-many">Json-OneToMany</option>
+    <option value="json-many-to-one">Custom-ManyToOne</option>
+    <option value="json-many-to-many">Custom-ManyToMany</option>
+    <option value="json-one-to-many">Custom-OneToMany</option>
   </selection>
 
   <grid name="json-field-grid" title="Custom fields" model="com.axelor.meta.db.MetaJsonField">
