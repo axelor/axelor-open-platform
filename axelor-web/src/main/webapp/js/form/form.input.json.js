@@ -162,11 +162,30 @@ ui.formInput('JsonRaw', 'String', {
 		};
 
 		scope.onRemove = function (index) {
-			scope.items.splice(index, 1);
-			if (scope.items.length === 0) {
-				scope.onAdd();
+			if (scope.items.length > 0) {
+				scope.items.splice(index, 1);
 			}
 		};
+
+		var unwatch = null;
+
+		function doWatch () {
+			if (unwatch) {
+				unwatch();
+			}
+			unwatch = scope.$watch('items', function (items, old) {
+				if (items === old) return;
+				var record = null;
+				_.each(items, function (item) {
+					if (!_.trim(item.name) || !_.trim(item.value)) return;
+					if (record === null) {
+						record = {};
+					}
+					record[item.name] = item.value;
+				});
+				model.$setViewValue(record ? angular.toJson(record) : null);
+			}, true);
+		}
 
 		model.$render = function () {
 			var value = model.$viewValue;
@@ -178,20 +197,8 @@ ui.formInput('JsonRaw', 'String', {
 			scope.items = _.map(_.keys(value), function (name) {
 				return { name: name, value: value[name] || '' };
 			});
+			doWatch();
 		};
-
-		scope.$watch('items', function (items, old) {
-			if (items === old) return;
-			var record = null;
-			_.each(items, function (item) {
-				if (!_.trim(item.name) || !_.trim(item.value)) return;
-				if (record === null) {
-					record = {};
-				}
-				record[item.name] = item.value;
-			});
-			model.$setViewValue(record ? angular.toJson(record) : null);
-		}, true);
 	},
 	template_readonly:
 		"<div class='json-editor'>" +
