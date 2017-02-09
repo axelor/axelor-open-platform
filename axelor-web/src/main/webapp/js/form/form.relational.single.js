@@ -778,4 +778,31 @@ ui.formInput('RefItem', 'ManyToOne', {
 	}
 });
 
+ui.formInput('RefText', 'ManyToOne', {
+
+	link: function (scope, element, attrs, model) {
+		scope.canNew = function () { return false; };
+		scope.canView = function () { return false; };
+		scope.canEdit = function () { return false; };
+		
+		var field = scope.field;
+		var targetName = field.targetName || "name";
+		
+		scope._viewParams.views = [{
+			type: "grid",
+			items: [{ name: targetName, type: "field" }]
+		}];
+		
+		scope.formatItem = function (record) {
+			return record || "";
+		};
+
+		scope.select = function (value) {
+			var record = _.isArray(value) ? _.first(value) : value;
+			var val = (record || {})[targetName] || null;
+			scope.setValue(val, true);
+		};
+	}
+});
+
 })();
