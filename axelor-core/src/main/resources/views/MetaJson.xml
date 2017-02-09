@@ -30,7 +30,9 @@
   <form name="json-field-form-base" title="Custom field" model="com.axelor.meta.db.MetaJsonField">
     <panel-tabs>
       <panel title="Options">
-        <field name="selection" />
+        <field name="selection" widget="ref-text"
+          x-target="com.axelor.meta.db.MetaSelect"
+          x-target-name="name" />
         <field name="widget" />
         <field name="onChange" colSpan="12" hideIf="type === 'button'"/>
         <field name="onClick" colSpan="12" showIf="type === 'button'" requiredIf="type === 'button'"/>
@@ -40,14 +42,22 @@
         <field name="scale" showIf="type === 'decimal'" />
         <field name="regex" showIf="type === 'string'" colSpan="12" />
         <panel itemSpan="12">
-          <field name="targetModel" showIf="type.match('^(one|many)-to-')" />
+          <field name="targetModel" showIf="type.match('^(one|many)-to-')" widget="ref-text"
+            x-target="com.axelor.meta.db.MetaModel"
+            x-target-name="fullName" />
           <field name="targetJsonModel" showIf="type.match('^json-')"
             title="Target custom model"
             canEdit="false" canView="false" />
         </panel>
         <field name="domain" showIf="type.match('-to-')" />
-        <field name="gridView" showIf="type.match('^(one|many)-to-')" />
-        <field name="formView" showIf="type.match('^(one|many)-to-')" />
+        <field name="gridView" showIf="type.match('^(one|many)-to-')" widget="ref-text"
+           x-target="com.axelor.meta.db.MetaView"
+           x-target-name="name"
+           x-domain="self.model = :targetModel AND self.type = 'grid'"/>
+        <field name="formView" showIf="type.match('^(one|many)-to-')" widget="ref-text"
+           x-target="com.axelor.meta.db.MetaView"
+           x-target-name="name"
+           x-domain="self.model = :targetModel AND self.type = 'form'"/>
       </panel>
       <panel title="Conditions" itemSpan="12">
         <field name="showIf" />
@@ -73,8 +83,14 @@
       <field name="defaultValue" />
       <field name="help" />
       <field name="sequence" />
-      <field name="model" />
-      <field name="modelField" />
+      <field name="model" widget="ref-text"
+        x-target-name="fullName"
+        x-target="com.axelor.meta.db.MetaModel"
+        x-domain="self.metaFields.json = true AND self.fullName NOT LIKE 'com.axelor.meta.db%'" />
+      <field name="modelField" widget="ref-text"
+        x-target-name="name"
+        x-target="com.axelor.meta.db.MetaField"
+        x-domain="self.json = true AND self.metaModel.fullName = :model"/>
     </panel>
     <panel-include view="json-field-form-base" />
   </form>

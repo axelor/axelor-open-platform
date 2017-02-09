@@ -127,7 +127,7 @@ public class MetaModelService {
 		
 		for (Property property :mapper.getProperties()) {
 			if (fields.all().filter("self.metaModel = ?1 AND self.name = ?2", metaModel, property.getName()).count() == 0){
-				metaModel.getMetaFields().add(createField(metaModel, getField(klass, property.getName())));
+				metaModel.getMetaFields().add(createField(metaModel, getField(klass, property.getName()), property));
 			}
 		}
 		
@@ -140,13 +140,15 @@ public class MetaModelService {
 	 * @param metaModel
 	 * 		MetaModel attachment. 
 	 * @param field
-	 * 		Field to load. 
-	 * 
+	 * 		Field to load.
+	 * @param property
+	 * 		The property
+	 *
 	 * @return
 	 * @see MetaModel
 	 * @see MetaField
 	 */
-	private MetaField createField(MetaModel metaModel, Field field){
+	private MetaField createField(MetaModel metaModel, Field field, Property property){
 		
 		MetaField metaField = null;
 		
@@ -159,6 +161,7 @@ public class MetaModelService {
 			metaField.setMetaModel(metaModel);
 			metaField.setName(field.getName());
 			metaField.setTypeName(field.getType().getSimpleName());
+			metaField.setJson(property.isJson());
 			
 			if (field.getType().getPackage() != null){
 				metaField.setPackageName(field.getType().getPackage().getName());
@@ -214,7 +217,7 @@ public class MetaModelService {
 		Mapper mapper = Mapper.of(klass);
 		
 		for (Property property :mapper.getProperties()) {
-			MetaField metaField = this.createField(metaModel, getField(klass, property.getName()));
+			MetaField metaField = this.createField(metaModel, getField(klass, property.getName()), property);
 			if (metaField != null) {
 				modelFields.add(metaField);
 			}
