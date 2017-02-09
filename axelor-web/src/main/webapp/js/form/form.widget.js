@@ -211,7 +211,9 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		}
 
 		scope.$on("on:record-change", function(e, rec, force) {
-			if (rec === scope.record || force) {
+			if (field && field.jsonField) {
+				handle(scope.record);
+			} else if (rec === scope.record || force) {
 				handle(rec);
 			}
 		});
@@ -300,7 +302,9 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		}
 		
 		scope.$on("on:record-change", function(e, rec) {
-			if (rec && rec === scope.record) {
+			if (field && field.jsonField) {
+				handle(scope.record);
+			} else if (rec && rec === scope.record) {
 				handle(rec);
 			}
 		});
