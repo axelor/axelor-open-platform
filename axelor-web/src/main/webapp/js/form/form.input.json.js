@@ -135,6 +135,14 @@ ui.formInput('JsonField', 'String', {
 		});
 
 		watchParent();
+
+		// hide parent panel if no jsonFields defined
+		scope.$evalAsync(function () {
+			var parent = scope.$parent.field || {};
+			if (parent.type === 'panel' && _.size(parent.items) === 1 && _.isEmpty(field.jsonFields)) {
+				scope.$parent.attr('hidden', true);
+			}
+		});
 	}
 });
 
