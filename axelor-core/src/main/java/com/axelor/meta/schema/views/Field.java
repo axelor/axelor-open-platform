@@ -495,6 +495,14 @@ public class Field extends SimpleWidget {
 		this.searchLimit = searchLimit;
 	}
 
+	public String getJsonModel() {
+		return jsonModel;
+	}
+
+	public void setJsonModel(String jsonModel) {
+		this.jsonModel = jsonModel;
+	}
+
 	public List<Hilite> getHilites() {
 		return hilites;
 	}
