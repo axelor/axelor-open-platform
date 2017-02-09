@@ -2,6 +2,7 @@ package com.axelor.meta.db.repo;
 
 import javax.persistence.EntityManager;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.meta.db.MetaAction;
@@ -52,6 +53,13 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 				.append("</grid>\n")
 				.toString());
 
+		String onNew = jsonModel.getOnNew();
+		String onSave = jsonModel.getOnSave();
+
+		onNew = StringUtils.isBlank(onNew) ?
+				"action-json-record-defaults" :
+				"action-json-record-defaults," + onNew;
+
 		MetaView formView = jsonModel.getFormView();
 		if (formView == null) {
 			formView = new MetaView();
@@ -60,18 +68,24 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 		}
 		formView.setName("custom-model-" + jsonModel.getName() + "-form");
 		formView.setTitle(jsonModel.getTitle());
-		formView.setXml(new StringBuilder()
+		StringBuilder xml = new StringBuilder()
 				.append("<form")
 				.append(" name=").append('"').append(gridView.getName()).append('"')
 				.append(" title=").append('"').append(gridView.getTitle()).append('"')
 				.append(" model=").append('"').append(gridView.getModel()).append('"')
-				.append(" onNew=").append('"').append("action-json-record-defaults").append('"')
-				.append(">\n")
+				.append(" onNew=").append('"').append(onNew).append('"');
+		
+		if (!StringUtils.isBlank(onSave)) {
+			xml.append(" onSave=").append('"').append(onSave).append('"');
+		}
+
+		xml.append(">\n")
 				.append("  <panel title=\"Overview\" itemSpan=\"12\">\n")
 				.append("    <field name=\"attrs\" x-json-model=\"" + jsonModel.getName() + "\"/>\n")
 				.append("  </panel>\n")
-				.append("</form>\n")
-				.toString());
+				.append("</form>\n");
+
+		formView.setXml(xml.toString());
 
 		action.setXml(new StringBuilder()
 				.append("<action-view")

@@ -35,12 +35,16 @@
     <string name="domain" />
     <many-to-one name="targetJsonModel" ref="MetaJsonModel" />
     <integer name="sequence" />
+    <string name="onChange" />
+    <string name="onClick" />
     <string name="widgetAttrs" json="true" />
   </entity>
 
   <entity name="MetaJsonModel" table="META_JSON_MODEL" repository="abstract">
     <string name="name" required="true" unique="true" />
     <string name="title" namecolumn="true" required="true" />
+    <string name="onNew" />
+    <string name="onSave" />
     <many-to-one name="menu" ref="MetaMenu" copy="false" />
     <many-to-one name="action" ref="MetaAction" copy="false" />
     <many-to-one name="gridView" ref="MetaView" copy="false" />

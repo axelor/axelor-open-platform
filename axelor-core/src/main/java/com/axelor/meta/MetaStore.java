@@ -252,7 +252,9 @@ public class MetaStore {
 			final Map<String, Object> attrs = new HashMap<>();
 			for (java.lang.reflect.Field field : declaredFields) {
 				final Property prop = mapper.getProperty(field.getName());
-				if (prop == null || prop.isPrimary()) continue;
+				if (prop == null || prop.isPrimary() || prop.isReference() || prop.isCollection()) {
+					continue;
+				}
 				final Object value = prop.get(record);
 				if (value == null || value == Boolean.FALSE) continue;
 				attrs.put(prop.getName(), value);
