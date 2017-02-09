@@ -291,6 +291,10 @@ public class MetaStore {
 			if (!StringUtils.isBlank(record.getTargetModel())) {
 				attrs.put("target", record.getTargetModel());
 				attrs.remove("targetModel");
+				try {
+					attrs.put("targetName", Mapper.of(Class.forName(record.getTargetModel())).getNameField().getName());
+				} catch (ClassNotFoundException e) {
+				}
 			}
 
 			if (type.startsWith("json-")) {

@@ -30,7 +30,6 @@
     <integer name="scale" default="2" column="decimal_scale" />
     <string name="regex" />
     <string name="targetModel" />
-    <string name="targetName" />
     <string name="formView" />
     <string name="gridView" />
     <string name="domain" />

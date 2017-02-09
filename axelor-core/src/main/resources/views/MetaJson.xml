@@ -36,12 +36,15 @@
         <field name="precision" showIf="type === 'decimal'" />
         <field name="scale" showIf="type === 'decimal'" />
         <field name="regex" showIf="type === 'string'" colSpan="12" />
-        <field name="targetModel" showIf="type.match('^(one|many)-to-')" />
-        <field name="targetName" showIf="type.match('^(one|many)-to-')" />
+        <panel itemSpan="12">
+          <field name="targetModel" showIf="type.match('^(one|many)-to-')" />
+          <field name="targetJsonModel" showIf="type.match('^json-')"
+            title="Target custom model"
+            canEdit="false" canView="false" />
+        </panel>
+        <field name="domain" showIf="type.match('-to-')" />
         <field name="gridView" showIf="type.match('^(one|many)-to-')" />
         <field name="formView" showIf="type.match('^(one|many)-to-')" />
-        <field name="targetJsonModel" showIf="type.match('^json-')" colSpan="12" />
-        <field name="domain" showIf="type.match('-to-')" colSpan="12" />
       </panel>
       <panel title="Conditions" itemSpan="12">
         <field name="showIf" />
@@ -86,8 +89,8 @@
   </form>
 
   <grid name="json-model-grid" title="Custom models" model="com.axelor.meta.db.MetaJsonModel">
-    <field name="name" />
     <field name="title" />
+    <field name="name" />
   </grid>
 
   <form name="json-model-form" title="Custom model" model="com.axelor.meta.db.MetaJsonModel">
