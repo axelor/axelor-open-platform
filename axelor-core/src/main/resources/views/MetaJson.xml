@@ -11,7 +11,9 @@
     <option value="datetime">DateTime</option>
     <option value="date">Date</option>
     <option value="time">Time</option>
+    <option value="panel">Panel</option>
     <option value="button">Button</option>
+    <option value="separator">Separator</option>
     <option value="many-to-one">ManyToOne</option>
     <option value="many-to-many">ManyToMany</option>
     <option value="one-to-many">OneToMany</option>

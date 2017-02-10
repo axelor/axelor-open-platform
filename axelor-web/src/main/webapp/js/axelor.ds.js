@@ -193,28 +193,44 @@
 					item.widget = "password";
 				}
 				if (item.jsonFields && item.widget !== 'json-raw') {
-					item.widget = 'json-field';
-					item.editor = item.editor || {
-						items: item.jsonFields
+					var editor = {
+						items: []
 					};
-					if (!item.viewer) {
-						item.editor.viewer = true;
-					}
+					var panel = null;
 					item.jsonFields.forEach(function (field) {
-						field.title = field.title || field.autoTitle;
 						if (field.widgetAttrs) {
 							field.widgetAttrs = angular.fromJson(field.widgetAttrs);
 							processWidget(field);
 						}
+						if (field.type === 'panel' || field.type === 'separator') {
+							field.hiddenInGrid = true;
+						}
+						if (field.type === 'panel') {
+							panel = _.extend({}, field, { items: [] });
+							editor.items.push(panel);
+							return;
+						}
+						field.title = field.title || field.autoTitle;
+						var colSpan = (field.widgetAttrs||{}).colSpan || field.colSpan;
 						if (field.type == 'one-to-many') {
 							field.type = 'many-to-many';
 							field.canSelect = false;
 						}
-						if (field.type == 'many-to-many') {
+						if (field.type == 'separator' || field.type == 'many-to-many') {
 							field.showTitle = false;
-							field.colSpan = (field.widgetAttrs||{}).colSpan || field.colSpan || 12;
+							field.colSpan = colSpan || 12;
+						}
+						if (panel) {
+							panel.items.push(field);
+						} else {
+							editor.items.push(field);
 						}
 					});
+					item.widget = 'json-field';
+					item.editor = editor;
+					if (!item.viewer) {
+						item.editor.viewer = true;
+					}
 				}
 			});
 
