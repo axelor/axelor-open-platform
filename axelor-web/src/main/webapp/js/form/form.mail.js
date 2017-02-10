@@ -637,6 +637,7 @@ ui.formWidget('uiMailFileList', {
 });
 
 ui.formInput('uiMailSelect', 'MultiSelect', {
+	metaWidget: false,
 
 	init: function (scope) {
 		this._super.apply(this, arguments);

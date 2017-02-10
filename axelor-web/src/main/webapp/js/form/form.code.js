@@ -28,6 +28,8 @@ ui.formInput('CodeEditor', {
 
 	css: "code-editor",
 
+	metaWidget: true,
+
 	link: function(scope, element, attrs, model) {
 		
 		var editor = null;

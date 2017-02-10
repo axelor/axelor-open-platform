@@ -603,7 +603,7 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 });
 
 ui.formInput('SuggestBox', 'ManyToOne', {
-
+	metaWidget: true,
 	link_editable: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);
 		var field = scope.field;
@@ -627,6 +627,8 @@ ui.formInput('SuggestBox', 'ManyToOne', {
 ui.formInput('RefSelect', {
 
 	css: 'multi-object-select',
+
+	metaWidget: true,
 
 	controller: ['$scope', 'ViewService', function($scope, ViewService) {
 
@@ -779,7 +781,7 @@ ui.formInput('RefItem', 'ManyToOne', {
 });
 
 ui.formInput('RefText', 'ManyToOne', {
-
+	metaWidget: true,
 	link: function (scope, element, attrs, model) {
 		scope.canNew = function () { return false; };
 		scope.canView = function () { return false; };

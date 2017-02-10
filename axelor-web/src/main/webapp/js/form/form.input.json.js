@@ -27,6 +27,16 @@ ui.formInput('JsonField', 'String', {
 		var field = scope.field;
 		var jsonFields = field.jsonFields || [];
 		var jsonFix = {};
+		
+
+		jsonFields.forEach(function (item) {
+			if (item.widget && item.showTitle === undefined) {
+				var widget = ui.getWidgetDef(item.widget);
+				if (widget) {
+					item.showTitle = widget.showTitle;
+				}
+			}
+		});
 
 		var defaultValues = {};
 		var parentUnwatch = null;

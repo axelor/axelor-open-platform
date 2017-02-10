@@ -24,6 +24,7 @@
 var ui = angular.module('axelor.ui');
 var widgets = {};
 var registry = {};
+var metaWidgets = [];
 
 /**
  * Perform common compile operations.
@@ -631,6 +632,10 @@ ui.formWidget = function(name, object) {
 	var widget = _.str.capitalize(name.replace(/^ui/, ''));
 	var directive = "ui" + widget;
 
+	if (obj.metaWidget) {
+		metaWidgets.push(widget);
+	}
+
 	registry[directive] = directive;
 	_.each(obj.widgets, function(alias){
 		registry[alias] = directive;
@@ -664,6 +669,14 @@ ui.getWidget = function(type) {
 		return _.chain(widget).underscored().dasherize().value();
 	}
 	return null;
+};
+
+ui.getWidgetDef = function (name) {
+	return widgets[name];
+};
+
+ui.getMetaWidgets = function () {
+	return metaWidgets;
 };
 
 })();

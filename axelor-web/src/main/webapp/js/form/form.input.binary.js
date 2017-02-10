@@ -41,7 +41,7 @@ ui.makeImageURL = makeURL;
 ui.formInput('ImageLink', {
 	css: 'image-item',
 	cssClass: 'from-item image-item',
-
+	metaWidget: true,
 	controller: ['$scope', '$element', '$interpolate', function($scope, $element, $interpolate) {
 
 		$scope.parseText = function(text) {
@@ -344,6 +344,7 @@ ui.formInput('BinaryLink', {
 
 	css: 'file-item',
 	cellCss: 'form-item file-item',
+	metaWidget: true,
 
 	link: function(scope, element, attrs, model) {
 

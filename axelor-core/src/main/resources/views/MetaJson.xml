@@ -33,7 +33,7 @@
         <field name="selection" widget="ref-text"
           x-target="com.axelor.meta.db.MetaSelect"
           x-target-name="name" />
-        <field name="widget" />
+        <field name="widget" widget="widget-select" />
         <field name="onChange" colSpan="12" hideIf="type === 'button'"/>
         <field name="onClick" colSpan="12" showIf="type === 'button'" requiredIf="type === 'button'"/>
         <field name="minSize" title="Min" showIf="type.match('string|integer|decimal')" />

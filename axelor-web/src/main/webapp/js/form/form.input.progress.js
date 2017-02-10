@@ -25,7 +25,8 @@ ui.ProgressMixin = {
 
 	css: 'progress-item',
 	cellCss: 'form-item progress-item',
-	
+	metaWidget: true,
+
 	link_readonly: function(scope, element, attrs, model) {
 		
 		var field = scope.field || {},

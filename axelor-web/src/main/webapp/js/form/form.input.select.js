@@ -361,7 +361,9 @@ ui.formInput('Select', 'BaseSelect', {
 });
 
 ui.formInput('ImageSelect', 'Select', {
-	
+
+	metaWidget: true,
+
 	BLANK: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
 	
 	link: function(scope, element, attrs) {
@@ -434,7 +436,8 @@ ui.formInput('MultiSelect', 'Select', {
 
 	css: 'multi-select-item',
 	cellCss: 'form-item multi-select-item',
-	
+	metaWidget: true,
+
 	init: function(scope) {
 		this._super(scope);
 
@@ -686,7 +689,8 @@ ui.formInput('SelectQuery', 'Select', {
 ui.formInput('RadioSelect', {
 	
 	css: "radio-select",
-	
+	metaWidget: true,
+
 	link: function(scope, element, attrs, model) {
 		
 		var field = scope.field;
@@ -727,6 +731,7 @@ ui.formInput('RadioSelect', {
 ui.formInput('CheckboxSelect', {
 
 	css: "checkbox-select",
+	metaWidget: true,
 
 	link: function(scope, element, attrs, model) {
 
@@ -782,7 +787,8 @@ ui.formInput('CheckboxSelect', {
 ui.formInput('NavSelect', {
 	
 	css: "nav-select",
-	
+	metaWidget: true,
+
 	link: function(scope, element, attrs, model) {
 		
 		var field = scope.field;
@@ -918,6 +924,16 @@ ui.formInput('ThemeSelect', 'Select', {
 		scope.field.selectionList.unshift({
 			value: "default",
 			title: "Default"
+		});
+		this._super(scope);
+	}
+});
+
+ui.formInput('WidgetSelect', 'Select', {
+
+	init: function (scope) {
+		scope.field.selectionList = _.map(ui.getMetaWidgets(), function (name) {
+			return { value: name, title: name };
 		});
 		this._super(scope);
 	}

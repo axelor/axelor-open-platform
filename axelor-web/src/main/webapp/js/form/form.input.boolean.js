@@ -58,6 +58,7 @@ ui.formInput('Boolean', {
  */
 ui.formInput('InlineCheckbox', 'Boolean', {
 	css: 'checkbox-inline',
+	metaWidget: true,
 	showTitle: false,
 	link: function (scope, element, attrs, model) {
 		this._super.apply(this, arguments);
@@ -76,6 +77,7 @@ ui.formInput('InlineCheckbox', 'Boolean', {
 
 ui.formInput('Toggle', 'Boolean', {
 	cellCss: 'form-item toggle-item',
+	metaWidget: true,
 	link: function (scope, element, attrs, model) {
 		this._super.apply(this, arguments);
 
@@ -107,6 +109,7 @@ ui.formInput('Toggle', 'Boolean', {
 
 ui.formInput('BooleanSelect', 'Boolean', {
 	css: 'form-item boolean-select-item',
+	metaWidget: true,
 	init: function (scope) {
 		var field = scope.field;
 		var trueText = _t((field.widgetAttrs||{}).trueText) || _t('Yes');
@@ -166,6 +169,7 @@ ui.formInput('BooleanSelect', 'Boolean', {
 
 ui.formInput('BooleanRadio', 'BooleanSelect', {
 	css: 'form-item boolean-radio-item',
+	metaWidget: true,
 	link_editable: function (scope, element, attrs, model) {
 
 		var inputName = _.uniqueId('boolean-radio');
@@ -202,6 +206,7 @@ ui.formInput('BooleanRadio', 'BooleanSelect', {
 
 ui.formInput('BooleanSwitch', 'Boolean', {
 	css: 'form-item',
+	metaWidget: true,
 	template_readonly: null,
 	template_editable:
 		"<label class='iswitch'>" +

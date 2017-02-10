@@ -246,6 +246,7 @@ function getButtons(scope, element) {
 ui.formInput('Html', {
 
 	css: "html-item",
+	metaWidget: true,
 
 	init: function(scope) {
 

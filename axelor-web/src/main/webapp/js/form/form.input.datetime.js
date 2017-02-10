@@ -508,7 +508,7 @@ ui.formInput('Time', 'DateTime', {
 });
 
 ui.formInput('RelativeTime', 'DateTime', {
-	
+	metaWidget: true,
 	init: function(scope) {
 		this._super(scope);
 		
@@ -550,7 +550,7 @@ function formatDuration(field, value) {
 ui.formatDuration = formatDuration;
 	
 ui.formInput('Duration', 'Time', {
-	
+	metaWidget: true,
 	mask: '99:mm',
 	
 	init: function(scope) {

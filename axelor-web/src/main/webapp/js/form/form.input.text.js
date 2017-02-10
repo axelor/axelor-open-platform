@@ -66,6 +66,8 @@ ui.formInput('Email', {
 
 	css: 'email-item',
 
+	metaWidget: true,
+
 	pattern: /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
 
 	link: function(scope, element, attrs, model) {
@@ -89,6 +91,7 @@ ui.formInput('Email', {
  */
 ui.formInput('Url', {
 	css: 'url-item',
+	metaWidget: true,
 	template_editable: '<input type="url">',
 	template_readonly: '<a target="_blank" ng-show="text" href="{{text}}">{{text}}</a>'
 });
@@ -152,6 +155,8 @@ ui.formInput('Text', {
 ui.formInput('Password', 'String', {
 
 	css: 'password-item',
+
+	metaWidget: true,
 
 	init: function(scope) {
 
