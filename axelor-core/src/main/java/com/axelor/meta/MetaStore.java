@@ -321,7 +321,7 @@ public class MetaStore {
 								nameField = field;
 								break;
 							}
-							if (nameField != null) {
+							if (nameField == null || "name".equals(field.getName())) {
 								nameField = field;
 							}
 						}

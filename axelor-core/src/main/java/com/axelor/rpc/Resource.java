@@ -926,6 +926,10 @@ public class Resource<T extends Model> {
 		
 		String name = request.getFields().get(0);
 
+		if (name == null) {
+			name = "id";
+		}
+
 		Property property = null;
 		try {
 			property = mapper.getProperty(name);
