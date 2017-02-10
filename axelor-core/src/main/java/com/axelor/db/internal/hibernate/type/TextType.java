@@ -19,10 +19,7 @@ package com.axelor.db.internal.hibernate.type;
 
 import org.hibernate.type.AbstractSingleColumnStandardBasicType;
 import org.hibernate.type.descriptor.java.StringTypeDescriptor;
-import org.hibernate.type.descriptor.sql.ClobTypeDescriptor;
 import org.hibernate.type.descriptor.sql.LongVarcharTypeDescriptor;
-
-import com.axelor.db.internal.DBHelper;
 
 public class TextType extends AbstractSingleColumnStandardBasicType<String> {
 
@@ -31,8 +28,7 @@ public class TextType extends AbstractSingleColumnStandardBasicType<String> {
 	public static final TextType INSTANCE = new TextType();
 
 	public TextType() {
-		super(DBHelper.isOracle() ? ClobTypeDescriptor.DEFAULT : LongVarcharTypeDescriptor.INSTANCE,
-				StringTypeDescriptor.INSTANCE);
+		super(LongVarcharTypeDescriptor.INSTANCE, StringTypeDescriptor.INSTANCE);
 	}
 
 	@Override

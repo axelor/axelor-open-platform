@@ -31,6 +31,8 @@ import org.hibernate.type.descriptor.sql.BasicBinder;
 import org.hibernate.type.descriptor.sql.BasicExtractor;
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 
+import com.axelor.db.internal.DBHelper;
+
 public class JsonSqlTypeDescriptor implements SqlTypeDescriptor {
 
 	private static final long serialVersionUID = 4349881178523129021L;
@@ -39,7 +41,7 @@ public class JsonSqlTypeDescriptor implements SqlTypeDescriptor {
 
 	@Override
 	public int getSqlType() {
-		return Types.OTHER;
+		return DBHelper.isOracle() ? Types.LONGVARCHAR : Types.OTHER;
 	}
 
 	@Override

@@ -193,8 +193,8 @@
   </entity>
 
   <entity name="MetaTranslation" table="META_TRANSLATION" logUpdates="false">
-    <string name="key" column="message_key" required="true" large="true" />
-    <string name="message" column="message_value" large="true" />
+    <string name="key" column="message_key" required="true" max="1024" multiline="true" />
+    <string name="message" column="message_value" max="1024" multiline="true" />
     <string name="language" required="true" />
     <unique-constraint columns="message_key,language"/>
     <finder-method name="findByKey" using="key,language" cacheable="true" />

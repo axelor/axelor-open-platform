@@ -38,6 +38,13 @@ public class CustomDialectResolver extends StandardDialectResolver {
 			}
 			throw new RuntimeException("PostgreSQL 9.4 or later is required.");
 		}
+		if ("Oracle".equals(databaseName)) {
+			final int majorVersion = info.getDatabaseMajorVersion();
+			if (majorVersion > 11) {
+				return new OracleDialect();
+			}
+			throw new RuntimeException("Oracle 12c or later is required.");
+		}
 		return super.resolveDialect(info);
 	}
 }
