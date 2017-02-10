@@ -438,6 +438,7 @@ public class Resource<T extends Model> {
 		}
 	}
 
+	@SuppressWarnings("all")
 	public void export(Request request, Writer writer) throws IOException {
 		security.get().check(JpaSecurity.CAN_READ, model);
 		LOG.debug("Exporting '{}' with {}", model.getName(), request.getData());
@@ -446,6 +447,7 @@ public class Resource<T extends Model> {
 		List<String> header = new ArrayList<>();
 		List<String> names = new ArrayList<>();
 		Map<Integer, Map<String, String>> selection = new HashMap<>();
+		Map<String, Map<String, Object>> jsonFieldsMap = new HashMap<>();
 
 		Mapper mapper = Mapper.of(model);
 		MetaPermissions perms = Beans.get(MetaPermissions.class);
@@ -479,7 +481,8 @@ public class Resource<T extends Model> {
 		for(String field : fields) {
 			Iterator<String> iter = Splitter.on(".").split(field).iterator();
 			Property prop = mapper.getProperty(iter.next());
-			while(iter.hasNext() && prop != null) {
+
+			while(iter.hasNext() && prop != null && !prop.isJson()) {
 				prop = Mapper.of(prop.getTarget()).getProperty(iter.next());
 			}
 			if (prop == null ||
@@ -498,10 +501,35 @@ public class Resource<T extends Model> {
 			if (!perms.canExport(AuthUtils.getUser(), model, name)) {
 				continue;
 			}
-			if(iter != null) {
+			if (iter != null) {
 				name = field;
 			}
 
+			List<Selection.Option> options = MetaStore.getSelectionList(prop.getSelection());
+
+			if (prop.isJson()) {
+				if (!jsonFieldsMap.containsKey(prop.getName())) {
+					jsonFieldsMap.put(prop.getName(), MetaStore.findJsonFields(model, prop.getName()));
+				}
+				Map<String, Object> jsonFields = jsonFieldsMap.get(prop.getName());
+				Map<String, Object> jsonField = (Map) jsonFields.get(iter.next());
+				name = field;
+				if (jsonField != null) {
+					title = (String) jsonField.get("title");
+					if (title == null) {
+						title = (String) jsonField.get("autoTitle");
+					}
+					options = (List) jsonField.get("selectionList");
+					if ("many-to-one".equals(jsonField.get("type"))) {
+						try {
+							String targetName = jsonField.get("targetName").toString();
+							targetName = targetName.substring(targetName.indexOf(".") + 1);
+							name = name + "." + targetName;
+						} catch (Exception e) {
+						}
+					}
+				}
+			}
 			if (isBlank(title)) {
 				title = Inflector.getInstance().humanize(prop.getName());
 			}
@@ -512,12 +540,7 @@ public class Resource<T extends Model> {
 					continue;
 				}
 				name = name + '.' + prop.getName();
-			} else if(!isBlank(prop.getSelection())) {
-				List<Selection.Option> options = MetaStore.getSelectionList(prop.getSelection());
-				if (options == null || options.isEmpty()) {
-					continue;
-				}
-
+			} else if(options != null && !options.isEmpty()) {
 				Map<String, String> map = new HashMap<>();
 				for (Selection.Option option : options) {
 					map.put(option.getValue(), option.getLocalizedTitle());
