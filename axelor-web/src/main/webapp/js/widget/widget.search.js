@@ -311,7 +311,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 					key += '::' + (field.jsonType || 'text');
 					items[key] = _.extend({}, field, {
 						name: key,
-						title: items[prefix].title + ' > ' + field.title
+						title: items[prefix].title + ' > ' + (field.title || field.autoTitle)
 					});
 				});
 				// don't search parent
