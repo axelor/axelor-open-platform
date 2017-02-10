@@ -68,6 +68,12 @@ public final class JsonFunction {
 
 	@Override
 	public String toString() {
-		return String.format("json_extract_%s(self.%s, '%s')", type, field, attribute);
+		final StringBuilder builder = new StringBuilder()
+				.append("json_extract_").append(type).append("(")
+				.append("self.").append(field);
+		for (String item : attribute.split("\\.")) {
+			builder.append(", ").append("'").append(item).append("'");
+		}
+		return builder.append(")").toString();
 	}
 }
