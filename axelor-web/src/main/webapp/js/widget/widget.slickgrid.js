@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2016 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -944,6 +944,16 @@ Grid.prototype._doInit = function(view) {
 		}
 		selection = _.unique(selection);
 		grid.setSelectedRows(selection);
+		if (selection.length === 0 && !grid.getEditorLock().isActive()) {
+			grid.setActiveCell(null);
+        } else if (focus) {
+        	grid.setActiveCell(_.first(selection), 1);
+        	grid.focus();
+        }
+	};
+	dataView.$setSelection = function(selection, focus) {
+		var rows = selection || [];
+		grid.setSelectedRows(rows);
 		if (selection.length === 0 && !grid.getEditorLock().isActive()) {
 			grid.setActiveCell(null);
         } else if (focus) {
@@ -2297,7 +2307,7 @@ Grid.prototype.onItemDblClick = function(event, args) {
 	if (item.__group || item.__groupTotals) {
 		return;
 	}
-	if (this.canSave())
+	if (!this.handler.field && this.canSave())
 		return;
 
 	var selected = this.grid.getSelectedRows() || [];

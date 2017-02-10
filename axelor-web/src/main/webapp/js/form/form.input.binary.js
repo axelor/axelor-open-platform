@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2016 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -319,10 +319,9 @@ ui.formInput('Binary', {
 				if(scope._model === META_FILE) {
 					record.fileName = file.name;
 				}
-				record.fileType = file.type;
-				record.fileSize = file.size;
 				scope.applyLater(function() {
-					model.$setViewValue(0); // mark form for save
+					record.fileType = file.type;
+					record.fileSize = file.size;
 				});
 			}
 		});

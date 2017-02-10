@@ -1,7 +1,7 @@
 /**
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2016 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -487,6 +487,7 @@ public class ViewLoader extends AbstractLoader {
 		entity.setTop(menuItem.getTop());
 		entity.setLeft(menuItem.getLeft() == null ? true : menuItem.getLeft());
 		entity.setMobile(menuItem.getMobile());
+		entity.setHidden(menuItem.getHidden());
 		entity.setGroups(this.findGroups(menuItem.getGroups(), entity.getGroups()));
 		
 		entity.setConditionToCheck(menuItem.getConditionToCheck());
