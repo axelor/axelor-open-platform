@@ -368,6 +368,9 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 			var field = column.sortCol.descriptor;
 			var name = column.sortCol.field;
 			if (field.jsonField) {
+				if (field.type === 'many-to-one' && field.targetName) {
+					name = name + "." + field.targetName;
+				}
 				name += '::' + ('integer,boolean,decimal'.indexOf(field.type) > -1 ? field.type : 'text');
 			}
 			var spec = column.sortAsc ? name : '-' + name;
