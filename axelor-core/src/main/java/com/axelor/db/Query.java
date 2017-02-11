@@ -745,13 +745,7 @@ public class Query<T extends Model> {
 					}
 
 					if (property.isJson()) {
-						String rest = name.substring(name.indexOf('.') + 1);
-						String cast = "text";
-						if (rest.indexOf("::") > -1) {
-							cast = rest.substring(rest.indexOf("::") + 2);
-							rest = rest.substring(0, rest.indexOf("::"));
-						}
-						return String.format("json_extract_%s(self.%s, '%s')", cast, item, rest);
+						return JsonFunction.fromPath(name).toString();
 					}
 
 					if (prefix == null) {
