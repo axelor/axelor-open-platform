@@ -30,6 +30,9 @@ public class CustomDialectResolver extends StandardDialectResolver {
 	@Override
 	public Dialect resolveDialect(DialectResolutionInfo info) {
 		final String databaseName = info.getDatabaseName();
+		if ("HSQL Database Engine".equals(databaseName)) {
+			return new HSQLDialect();
+		}
 		if ("PostgreSQL".equals(databaseName)) {
 			final int majorVersion = info.getDatabaseMajorVersion();
 			final int minorVersion = info.getDatabaseMinorVersion();
