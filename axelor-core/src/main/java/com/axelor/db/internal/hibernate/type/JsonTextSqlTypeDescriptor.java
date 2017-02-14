@@ -17,18 +17,16 @@
  */
 package com.axelor.db.internal.hibernate.type;
 
-import org.hibernate.type.AbstractSingleColumnStandardBasicType;
-import org.hibernate.type.descriptor.java.StringTypeDescriptor;
+import java.sql.Types;
 
-public class JsonType extends AbstractSingleColumnStandardBasicType<String> {
+public class JsonTextSqlTypeDescriptor extends JsonSqlTypeDescriptor {
 
-	private static final long serialVersionUID = -2510546264526737635L;
-	
-	public JsonType(JsonSqlTypeDescriptor descriptor) {
-		super(descriptor, StringTypeDescriptor.INSTANCE);
-	}
+	private static final long serialVersionUID = 4607469096983456015L;
 
-	public String getName() {
-		return "json";
+	public static final JsonTextSqlTypeDescriptor INSTANCE = new JsonTextSqlTypeDescriptor();
+
+	@Override
+	public int getSqlType() {
+		return Types.LONGVARCHAR;
 	}
 }

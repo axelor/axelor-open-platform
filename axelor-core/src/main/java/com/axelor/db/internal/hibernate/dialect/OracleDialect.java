@@ -19,44 +19,30 @@ package com.axelor.db.internal.hibernate.dialect;
 
 import java.sql.Types;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.hibernate.boot.model.TypeContributions;
 import org.hibernate.dialect.Oracle12cDialect;
-import org.hibernate.dialect.function.StandardSQLFunction;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
+import com.axelor.db.internal.hibernate.type.JsonTextSqlTypeDescriptor;
+import com.axelor.db.internal.hibernate.type.JsonType;
+
 public class OracleDialect extends Oracle12cDialect {
 
-	static class JsonValueFunction extends StandardSQLFunction {
+	static class JsonValueFunction extends AbstractJsonExtractFunction {
 
-		private String returning;
-
-		public JsonValueFunction(Type registeredType, String returning) {
-			super("json_value", registeredType);
-			this.returning = returning;
+		public JsonValueFunction(Type type, String cast) {
+			super("json_value", type, cast);
 		}
 
 		@Override
-		@SuppressWarnings("rawtypes")
-		public String render(Type firstArgumentType, List arguments, SessionFactoryImplementor factory) {
-			final StringBuilder buf = new StringBuilder();
-			buf.append(getName()).append('(');
-			buf.append(arguments.get(0));
-			buf.append(", '$.");
-			for (int i = 1; i < arguments.size(); i++) {
-				final String argument = (String) arguments.get(i);
-				buf.append(argument.substring(1, argument.length() - 1));
-				if (i < arguments.size() - 1) {
-					buf.append(".");
-				}
-			}
-			buf.append("'");
-			if (returning != null) {
-				buf.append(" returning ").append(returning);
-			}
-			buf.append(')');
-			return buf.toString();
+		protected String transformPath(List<String> path) {
+			return path.stream()
+					.map(item -> item.substring(1, item.length() - 1))
+					.collect(Collectors.joining(".", "'$.", "'"));
 		}
 	}
 
@@ -68,5 +54,11 @@ public class OracleDialect extends Oracle12cDialect {
 		registerFunction("json_extract_boolean", new JsonValueFunction(StandardBasicTypes.BOOLEAN, "number"));
 		registerFunction("json_extract_integer", new JsonValueFunction(StandardBasicTypes.INTEGER, "number"));
 		registerFunction("json_extract_decimal", new JsonValueFunction(StandardBasicTypes.BIG_DECIMAL, "number"));
+	}
+
+	@Override
+	public void contributeTypes(TypeContributions typeContributions, ServiceRegistry serviceRegistry) {
+		super.contributeTypes(typeContributions, serviceRegistry);
+		typeContributions.contributeType(new JsonType(JsonTextSqlTypeDescriptor.INSTANCE));
 	}
 }
