@@ -45,6 +45,14 @@ public class CustomDialectResolver extends StandardDialectResolver {
 			}
 			throw new RuntimeException("Oracle 12c or later is required.");
 		}
+		if ("MySQL".equals(databaseName)) {
+			final int majorVersion = info.getDatabaseMajorVersion();
+			final int minorVersion = info.getDatabaseMinorVersion();
+			if (majorVersion >= 5 && minorVersion >= 7) {
+				return new MySQLDialect();
+			}
+			throw new RuntimeException("MySQL 5.7 or later is required.");
+		}
 		return super.resolveDialect(info);
 	}
 }
