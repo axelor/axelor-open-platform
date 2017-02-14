@@ -1,8 +1,8 @@
-# Current (3.3.3)
+# 3.3.3 (2017-02-14)
 
 ## Bug fixes
 
-## Improvements
+- fix regression caused by xml data import api change
 
 # 3.3.2 (2017-01-05)
 
