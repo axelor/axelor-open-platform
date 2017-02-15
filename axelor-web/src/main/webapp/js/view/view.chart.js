@@ -54,8 +54,12 @@ function ChartCtrl($scope, $element, $http, ActionService) {
 				return;
 			}
 		}
+		
+		if (searchScope) {
+			context = _.extend({}, context, searchScope.getContext());
+		}
 
-		context = _.extend({}, context, (searchScope||{}).record, { _domainAction: $scope._viewAction });
+		context = _.extend({}, context, { _domainAction: $scope._viewAction });
 		loading = true;
 		
 		var params = {
@@ -177,10 +181,14 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 				type: 'panel',
 				noframe: true,
 				items: _.map(meta.fields, function (item) {
-					return _.extend({}, item, {
+					var props = _.extend({}, item, {
 						showTitle: false,
 						placeholder: item.title || item.autoTitle
 					});
+					if (item.multiple && (item.target || item.selection)) {
+						item.widget = item.target ? "TagSelect" : "MultiSelect";
+					}
+					return props;
 				})
 			}]
 		};
@@ -210,6 +218,20 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 				$scope.$events.onLoad().then(delayedReload);
 			}
 		}
+		
+		var __getContext = $scope.getContext;
+		$scope.getContext = function () {
+			var ctx = __getContext.call(this);
+			_.each(meta.fields, function (item) {
+				if (item.multiple && (item.target || item.selection)) {
+					var value = ctx[item.name];
+					if (_.isArray(value)) value = _.pluck(value, "id");
+					if (_.isString(value)) value = value.split(/\s*,\s*/g);
+					ctx[item.name] = value;
+				}
+			});
+			return ctx;
+		};
 
 		$scope.$on('on:new', onNewOrEdit);
 		$scope.$on('on:edit', onNewOrEdit);
