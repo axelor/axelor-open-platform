@@ -221,6 +221,7 @@
 .slick-cell .ibox {
 	width: auto;
 	margin-top: 2px !important;
+	padding: 0;
 }
 
 .slick-editor-dropdown {
@@ -293,6 +294,7 @@
 }
 
 .slick-cell.boolean .fa {
+	box-sizing: content-box;
 	border: 1px solid #ccc;
 	padding: 2px;
 	width: 14px;
