@@ -680,7 +680,9 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 			main.css('right', mini.parent().outerWidth(true));
 			main.fullCalendar('render');
 			main.fullCalendar('option', 'height', element.height());
-			legend.css("max-height", (legend.parent().height() - mini.height()));
+			legend.css("max-height", legend.parent().height() - mini.height()
+					  - (parseInt(legend.css('marginTop')) || 0)
+					  - (parseInt(legend.css('marginBottom')) || 0));
 		}
 
 		main.on("adjustSize", _.debounce(adjustSize, 100));
