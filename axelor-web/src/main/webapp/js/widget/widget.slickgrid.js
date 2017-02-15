@@ -1562,7 +1562,7 @@ Grid.prototype.onKeyDown = function(e, args) {
 Grid.prototype.isCellEditable = function(cell) {
 	var cols = this.grid.getColumns(),
 		col = cols[cell];
-	if (!col || col.id === "_edit_column" || col.id === "_move_column") {
+	if (!col || col.id === "_edit_column" || col.id === "_move_column" || col.id === "_checkbox_selector") {
 		return false;
 	}
 	var field = col.descriptor || {};
@@ -2230,7 +2230,7 @@ Grid.prototype.__onItemClick = function(event, args) {
 		var col = this.grid.getColumns()[args.cell] || {},
 			field = col.descriptor || {};
 		if (col.forEdit !== false &&
-				(field.type === 'one-to-many' || field.type === 'many-to-many')) {
+				(field.type === 'one-to-many' || field.type === 'many-to-many' || this.scope.selector === 'checkbox')) {
 			this.grid.setActiveCell(args.row, args.cell);
 			this.grid.editActiveCell();
 			event.preventDefault();
