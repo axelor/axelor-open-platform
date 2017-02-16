@@ -201,16 +201,17 @@ public class JpaModule extends AbstractModule {
 		}
 
 		final Map<String, String> keys = new HashMap<>();
+		final String unit = jpaUnit.replaceAll("(PU|Unit)$", "").replaceAll("^persistence$", "default");
 
-		keys.put("db.default.ddl", Environment.HBM2DDL_AUTO);
-		keys.put("db.default.driver", Environment.JPA_JDBC_DRIVER);
-		keys.put("db.default.url", Environment.JPA_JDBC_URL);
-		keys.put("db.default.user", Environment.JPA_JDBC_USER);
-		keys.put("db.default.password", Environment.JPA_JDBC_PASSWORD);
+		keys.put("db.%s.ddl", Environment.HBM2DDL_AUTO);
+		keys.put("db.%s.driver", Environment.JPA_JDBC_DRIVER);
+		keys.put("db.%s.url", Environment.JPA_JDBC_URL);
+		keys.put("db.%s.user", Environment.JPA_JDBC_USER);
+		keys.put("db.%s.password", Environment.JPA_JDBC_PASSWORD);
 
 		for (String key : keys.keySet()) {
 			String name = keys.get(key);
-			String value = settings.get(key);
+			String value = settings.get(String.format(key, unit));
 			if (!StringUtils.isBlank(value)) {
 				properties.put(name, value.trim());
 			}
