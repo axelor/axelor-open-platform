@@ -142,9 +142,7 @@
     title="Custom Models"
     action="custom.models.all" />
   <menuitem name="menu-custom-fields" parent="menu-model"
-    title="Custom Fields" />
-  <menuitem name="menu-all-custom-field" parent="menu-custom-fields"
-    title="All Fields"
+    title="Custom Fields"
     action="custom.fields.all" />
 
   <action-record name="action-json-field-defaults" model="com.axelor.meta.db.MetaJsonField">
