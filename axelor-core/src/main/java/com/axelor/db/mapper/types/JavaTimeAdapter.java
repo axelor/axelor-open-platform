@@ -121,7 +121,7 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
 				return value instanceof LocalTime ? value : toZonedDateTime(value).toLocalTime();
 			} catch (Exception e) {
 				final ZonedDateTime dt = ZonedDateTime.now();
-				final String val = String.format("%d-%d-%dT%s", dt.getYear(), dt.getMonthValue(), dt.getDayOfMonth(), value);
+				final String val = String.format("%d-%02d-%02dT%s", dt.getYear(), dt.getMonthValue(), dt.getDayOfMonth(), value);
 				return toZonedDateTime(val).toLocalTime();
 			}
 		}
