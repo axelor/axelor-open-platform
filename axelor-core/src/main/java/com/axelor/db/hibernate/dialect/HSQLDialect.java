@@ -29,7 +29,7 @@ public class HSQLDialect extends org.hibernate.dialect.HSQLDialect {
 
 	public HSQLDialect() {
 		super();
-		registerColumnType(Types.OTHER, "text");
+		registerColumnType(Types.OTHER, "clob");
 	}
 
 	@Override
