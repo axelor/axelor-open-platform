@@ -1,1 +1,1 @@
-com.axelor.db.internal.hibernate.HibernateTypeContributor
+com.axelor.db.hibernate.HibernateTypeContributor

@@ -1,7 +1,7 @@
 /**
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2016 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -15,20 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.db.internal.hibernate.type;
+package com.axelor.db.hibernate;
 
-import java.sql.Types;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.engine.jdbc.dialect.spi.DialectResolver;
+import org.hibernate.service.spi.ServiceContributor;
 
-import org.hibernate.type.descriptor.sql.LongVarcharTypeDescriptor;
+import com.axelor.db.hibernate.dialect.CustomDialectResolver;
 
-public class JsonSqlTypeDescriptor extends LongVarcharTypeDescriptor {
-
-	private static final long serialVersionUID = -8979157616088702827L;
-
-	public static final JsonSqlTypeDescriptor INSTANCE = new JsonSqlTypeDescriptor();
+public class HibernateServiceContributor implements ServiceContributor {
 
 	@Override
-	public int getSqlType() {
-		return Types.OTHER;
+	public void contribute(StandardServiceRegistryBuilder serviceRegistryBuilder) {
+		serviceRegistryBuilder.addService(DialectResolver.class, CustomDialectResolver.INSTANCE);
 	}
 }

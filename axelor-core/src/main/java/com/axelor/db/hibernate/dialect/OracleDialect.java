@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.db.internal.hibernate.dialect;
+package com.axelor.db.hibernate.dialect;
 
 import java.sql.Types;
 import java.util.List;
@@ -27,8 +27,8 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
-import com.axelor.db.internal.hibernate.type.JsonTextSqlTypeDescriptor;
-import com.axelor.db.internal.hibernate.type.JsonType;
+import com.axelor.db.hibernate.type.JsonTextSqlTypeDescriptor;
+import com.axelor.db.hibernate.type.JsonType;
 
 public class OracleDialect extends Oracle12cDialect {
 

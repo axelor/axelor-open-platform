@@ -57,7 +57,7 @@ import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.Repository;
-import com.axelor.db.internal.hibernate.type.JsonFunction;
+import com.axelor.db.hibernate.type.JsonFunction;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;

@@ -1,7 +1,7 @@
 /**
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2016 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -15,18 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.db.internal.hibernate;
+package com.axelor.db.hibernate.type;
 
-import org.hibernate.boot.model.TypeContributions;
-import org.hibernate.boot.model.TypeContributor;
-import org.hibernate.service.ServiceRegistry;
+import java.sql.Types;
 
-import com.axelor.db.internal.hibernate.type.TextType;
+public class JsonTextSqlTypeDescriptor extends JsonSqlTypeDescriptor {
 
-public class HibernateTypeContributor implements TypeContributor {
+	private static final long serialVersionUID = 4607469096983456015L;
+
+	public static final JsonTextSqlTypeDescriptor INSTANCE = new JsonTextSqlTypeDescriptor();
 
 	@Override
-	public void contribute(TypeContributions typeContributions, ServiceRegistry serviceRegistry) {
-		typeContributions.contributeType(TextType.INSTANCE);
+	public int getSqlType() {
+		return Types.LONGVARCHAR;
 	}
 }

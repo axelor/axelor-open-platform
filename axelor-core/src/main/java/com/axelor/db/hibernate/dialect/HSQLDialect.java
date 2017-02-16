@@ -15,18 +15,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.db.internal.hibernate.type;
+package com.axelor.db.hibernate.dialect;
 
 import java.sql.Types;
 
-public class JsonTextSqlTypeDescriptor extends JsonSqlTypeDescriptor {
+import org.hibernate.boot.model.TypeContributions;
+import org.hibernate.service.ServiceRegistry;
 
-	private static final long serialVersionUID = 4607469096983456015L;
+import com.axelor.db.hibernate.type.JsonSqlTypeDescriptor;
+import com.axelor.db.hibernate.type.JsonType;
 
-	public static final JsonTextSqlTypeDescriptor INSTANCE = new JsonTextSqlTypeDescriptor();
+public class HSQLDialect extends org.hibernate.dialect.HSQLDialect {
+
+	public HSQLDialect() {
+		super();
+		registerColumnType(Types.OTHER, "text");
+	}
 
 	@Override
-	public int getSqlType() {
-		return Types.LONGVARCHAR;
+	public void contributeTypes(TypeContributions typeContributions, ServiceRegistry serviceRegistry) {
+		super.contributeTypes(typeContributions, serviceRegistry);
+		typeContributions.contributeType(new JsonType(JsonSqlTypeDescriptor.INSTANCE));
 	}
 }

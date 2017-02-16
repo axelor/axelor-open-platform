@@ -20,7 +20,7 @@ package com.axelor.rpc.filter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.axelor.db.internal.hibernate.type.JsonFunction;
+import com.axelor.db.hibernate.type.JsonFunction;
 
 
 class SimpleFilter extends Filter {
