@@ -266,7 +266,7 @@ public class LoggerConfiguration {
 		appender.setEncoder(encoder);
 
 		final FixedWindowRollingPolicy rollingPolicy = new FixedWindowRollingPolicy();
-		final SizeBasedTriggeringPolicy<ILoggingEvent> triggeringPolicy = new SizeBasedTriggeringPolicy<>("10MB");
+		final SizeBasedTriggeringPolicy<ILoggingEvent> triggeringPolicy = new SizeBasedTriggeringPolicy<>();
 
 		rollingPolicy.setFileNamePattern(logFile + ".%i");
 		rollingPolicy.setParent(appender);

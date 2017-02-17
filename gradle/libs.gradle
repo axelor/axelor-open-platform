@@ -14,7 +14,7 @@ versions.jackson = "2.8.5"
 versions.shiro = "1.2.6"
 
 versions.junit = "4.12"
-versions.slf4j = "1.7.21"
+versions.slf4j = "1.7.23"
 
 versions.tomcat_embed = "8.5.8"
 versions.tomcat_embed_logging = "8.5.2"
@@ -43,9 +43,9 @@ libs.slf4j_simple = libs.slf4j_base + [
 ]
 
 libs.slf4j_logback = libs.slf4j_base + [
-	"ch.qos.logback:logback-core:1.1.7",
-	"ch.qos.logback:logback-classic:1.1.7",
-	"org.fusesource.jansi:jansi:1.14"	
+	"ch.qos.logback:logback-core:1.2.1",
+	"ch.qos.logback:logback-classic:1.2.1",
+	"org.fusesource.jansi:jansi:1.14"
 ]
 
 // Guava
