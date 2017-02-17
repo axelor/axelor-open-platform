@@ -202,7 +202,7 @@ class Entity {
 
 	private boolean isCompatible(Property existing, Property property) {
 		if (existing == null) return true
-		if (existing.isCollection() || existing.isTransient()) return false;
+		if (existing.isCollection() || existing.isTransient() || existing.name == "id") return false;
 		if (existing.type != property.type) return false
 		if (existing.target != property.target) return false
 		if (existing.large && !property.large) return false
