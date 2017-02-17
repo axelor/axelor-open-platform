@@ -37,7 +37,6 @@ import com.axelor.db.Query;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaSchedule;
 import com.axelor.meta.db.MetaScheduleParam;
-import com.google.common.base.Throwables;
 
 /**
  * The {@link JobRunner} controls the scheduler.<br>
@@ -168,7 +167,7 @@ public class JobRunner {
 		} catch (SchedulerException e) {
 			log.error("Unable to start the scheduler...");
 			log.trace("Scheduler error: {}", e.getMessage(), e);
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 		log.info("Job scheduler is running...");
 	}
@@ -198,7 +197,7 @@ public class JobRunner {
 		} catch (SchedulerException e) {
 			log.error("Unable to clear existing jobs...");
 			log.trace("Scheduler error: {}", e.getMessage(), e);
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 		total = 0;
 		this.start();

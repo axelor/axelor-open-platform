@@ -29,7 +29,6 @@ import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
 import com.axelor.app.AppSettings;
-import com.google.common.base.Throwables;
 
 /**
  * The {@link Provider} for {@link Scheduler} that uses {@link GuiceJobFactory}
@@ -60,7 +59,7 @@ class SchedulerProvider implements Provider<Scheduler> {
 			scheduler = schedulerFactory.getScheduler();
 			scheduler.setJobFactory(jobFactory);
 		} catch (SchedulerException e) {
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 
 		return scheduler;

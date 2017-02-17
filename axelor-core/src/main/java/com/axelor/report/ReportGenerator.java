@@ -50,7 +50,6 @@ import com.axelor.app.internal.AppFilter;
 import com.axelor.db.JPA;
 import com.axelor.meta.MetaFiles;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 
 /**
  * The report generator service.
@@ -135,7 +134,7 @@ public class ReportGenerator {
 					try {
 						task.run();
 					} catch (EngineException e) {
-						Throwables.propagate(e);
+						new RuntimeException(e);
 					} finally {
 						task.close();
 					}

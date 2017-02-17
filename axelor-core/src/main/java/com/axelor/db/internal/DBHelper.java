@@ -39,7 +39,6 @@ import org.w3c.dom.Document;
 
 import com.axelor.app.AppSettings;
 import com.axelor.common.ResourceUtils;
-import com.google.common.base.Throwables;
 
 /**
  * This class provides some database helper methods (for internal use only).
@@ -159,7 +158,7 @@ public class DBHelper {
 		try {
 			Class.forName(jdbcDriver);
 		} catch (Exception e) {
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 
 		return DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPassword);

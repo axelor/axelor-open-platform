@@ -79,7 +79,6 @@ import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
@@ -549,7 +548,7 @@ public class MetaService {
 					metaFiles.delete(obj);
 					result.add(record);
 				} catch (Exception e) {
-					throw Throwables.propagate(e);
+					throw new RuntimeException(e);
 				}
 			}
 		}

@@ -37,7 +37,6 @@ import com.axelor.rpc.ActionResponse;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.repo.ContactRepository;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
@@ -54,7 +53,7 @@ public class TestActions extends MetaTest {
 		try {
 			views = this.unmarshal("com/axelor/meta/Contact.xml", ObjectViews.class);
 		} catch (Exception e) {
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 		
 		assertNotNull(views);

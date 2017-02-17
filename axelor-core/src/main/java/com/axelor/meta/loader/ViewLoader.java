@@ -74,7 +74,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -116,7 +115,7 @@ public class ViewLoader extends AbstractLoader {
 			try {
 				process(file.openStream(), module, update);
 			} catch (IOException | JAXBException e) {
-				throw Throwables.propagate(e);
+				throw new RuntimeException(e);
 			}
 		}
 	}

@@ -45,7 +45,6 @@ import com.axelor.meta.MetaStore;
 import com.axelor.script.ScriptBindings;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
 
 import groovy.text.GStringTemplateEngine;
@@ -148,7 +147,7 @@ public class GroovyTemplates implements Templates {
 					}
 				};
 			} catch (Exception e) {
-				throw Throwables.propagate(e);
+				throw new RuntimeException(e);
 			}
 		}
 

@@ -24,7 +24,6 @@ import javax.inject.Inject;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.UserRepository;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 
 /**
  * This class can be used to run batch jobs that requires to keep track of audit
@@ -61,7 +60,7 @@ public class AuditableRunner {
 			});
 		} catch (Exception e) {
 			// propagate the exception
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 	}
 

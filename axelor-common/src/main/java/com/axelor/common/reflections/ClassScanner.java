@@ -35,7 +35,6 @@ import com.axelor.internal.asm.ClassReader;
 import com.axelor.internal.asm.ClassVisitor;
 import com.axelor.internal.asm.Opcodes;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -101,7 +100,7 @@ final class ClassScanner {
 		try {
 			types = getSubTypesOf(type.getName());
 		} catch (IOException e) {
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 		
 		for (String sub : types) {
@@ -121,7 +120,7 @@ final class ClassScanner {
 			try {
 				scan();
 			} catch (IOException e) {
-				throw Throwables.propagate(e);
+				throw new RuntimeException(e);
 			}
 		}
 

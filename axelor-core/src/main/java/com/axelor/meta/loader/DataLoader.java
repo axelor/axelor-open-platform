@@ -34,7 +34,6 @@ import com.axelor.common.FileUtils;
 import com.axelor.data.csv.CSVImporter;
 import com.axelor.data.xml.XMLImporter;
 import com.axelor.meta.MetaScanner;
-import com.google.common.base.Throwables;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.io.LineReader;
@@ -67,7 +66,7 @@ class DataLoader extends AbstractLoader {
 			}
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		} finally {
 			clean(tmp);
 		}
@@ -124,7 +123,7 @@ class DataLoader extends AbstractLoader {
 				copy(file.openStream(), tmp, name);
 			} catch (IOException e) {
 				log.error(e.getMessage(), e);
-				throw Throwables.propagate(e);
+				throw new RuntimeException(e);
 			}
 		}
 		

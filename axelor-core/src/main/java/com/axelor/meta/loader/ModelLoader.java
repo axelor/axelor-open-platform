@@ -38,7 +38,6 @@ import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaSequence;
 import com.axelor.meta.db.repo.MetaSequenceRepository;
 import com.axelor.meta.service.MetaModelService;
-import com.google.common.base.Throwables;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
@@ -70,7 +69,7 @@ public class ModelLoader extends AbstractLoader {
 				importModels(doc, file, update);
 				importSequences(doc, file, update);
 			} catch (Exception e) {
-				throw Throwables.propagate(e);
+				throw new RuntimeException(e);
 			}
 		}
 	}

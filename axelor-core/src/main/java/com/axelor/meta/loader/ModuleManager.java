@@ -55,7 +55,6 @@ import com.axelor.meta.db.repo.MetaModuleRepository;
 import com.axelor.meta.db.repo.MetaSelectRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.google.common.base.Joiner;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.persist.Transactional;
@@ -357,7 +356,7 @@ public class ModuleManager {
 			try {
 				properties.load(file.openStream());
 			} catch (IOException e) {
-				throw Throwables.propagate(e);
+				throw new RuntimeException(e);
 			}
 
 			String name = properties.getProperty("name");
@@ -413,7 +412,7 @@ public class ModuleManager {
 			try {
 				properties.load(file.openStream());
 			} catch (IOException e) {
-				throw Throwables.propagate(e);
+				throw new RuntimeException(e);
 			}
 
 			String name = properties.getProperty("name");

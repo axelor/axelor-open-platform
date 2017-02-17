@@ -31,7 +31,6 @@ import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.report.ReportEngineProvider;
-import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 
 /**
@@ -97,7 +96,7 @@ public class AppModule extends AbstractModule {
 				log.debug("Configure module: {}", module.getName());
 				install(module.newInstance());
 			} catch (InstantiationException | IllegalAccessException e) {
-				throw Throwables.propagate(e);
+				throw new RuntimeException(e);
 			}
 		}
 	}

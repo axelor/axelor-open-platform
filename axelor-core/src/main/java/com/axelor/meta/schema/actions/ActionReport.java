@@ -44,7 +44,6 @@ import com.axelor.meta.MetaFiles;
 import com.axelor.report.ReportGenerator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Throwables;
 
 public class ActionReport extends Action {
 
@@ -151,7 +150,7 @@ public class ActionReport extends Action {
 		try {
 			return _evaluate(handler);
 		} catch (Exception e) {
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 	}
 

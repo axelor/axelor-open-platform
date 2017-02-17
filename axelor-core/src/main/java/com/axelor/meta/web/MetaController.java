@@ -49,7 +49,6 @@ import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -217,7 +216,7 @@ public class MetaController {
 				try {
 					exportI18n(module, file);
 				} catch (IOException e) {
-					throw Throwables.propagate(e);
+					throw new RuntimeException(e);
 				}
 			}
 		}
