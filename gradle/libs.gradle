@@ -8,9 +8,9 @@ versions.hibernate_validator = "5.3.4.Final"
 versions.hibernate_search = "5.7.0.Beta2"
 versions.guava = "21.0"
 
-versions.groovy = "2.4.7"
+versions.groovy = "2.4.8"
 versions.resteasy = "3.1.0.Final"
-versions.jackson = "2.8.5"
+versions.jackson = "2.8.6"
 versions.shiro = "1.2.6"
 
 versions.junit = "4.12"
@@ -70,9 +70,9 @@ libs.axelor_el = "com.axelor:axelor-el:8.5.9"
 libs.javax_servlet = "javax.servlet:javax.servlet-api:3.1.0"
 libs.javax_servlet_jsp = "javax.servlet.jsp:javax.servlet.jsp-api:2.3.1"
 libs.javax_validation = "javax.validation:validation-api:1.1.0.Final"
-libs.javax_mail = ["com.sun.mail:javax.mail:1.5.4"]
-libs.greenmail = "com.icegreen:greenmail:1.4.1"
 libs.javax_el = ["org.apache.tomcat:tomcat-jasper:8.5.9", "org.apache.tomcat:tomcat-el-api:8.5.9"]
+libs.javax_mail = ["com.sun.mail:javax.mail:1.5.6"]
+libs.greenmail = "com.icegreen:greenmail:1.5.3"
 
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.3.4"
@@ -110,7 +110,7 @@ libs.apache_tika = dependencies.module("org.apache.tika:tika-parsers:1.14") {
 }
 
 // flyway
-libs.flywaydb = "org.flywaydb:flyway-core:4.0.3"
+libs.flywaydb = "org.flywaydb:flyway-core:4.1.0"
 
 // eclipselink
 libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.6.4"
@@ -181,8 +181,8 @@ libs.birt_runtime = dependencies.create("org.eclipse.birt.runtime:org.eclipse.bi
 }
 
 // jline & jcommander
-libs.jline = "jline:jline:2.14.2"
-libs.jcommander = "com.beust:jcommander:1.58"
+libs.jline = "jline:jline:2.14.3"
+libs.jcommander = "com.beust:jcommander:1.60"
 
 // Quartz Scheduler
 libs.quartz = dependencies.create("org.quartz-scheduler:quartz:2.2.3") { exclude module: "c3p0" }
@@ -194,7 +194,7 @@ libs.xstream = "com.thoughtworks.xstream:xstream:1.4.9"
 libs.opencsv = "net.sf.opencsv:opencsv:2.3"
 
 // jsoup for html parsing & sanitize
-libs.jsoup = "org.jsoup:jsoup:1.10.1"
+libs.jsoup = "org.jsoup:jsoup:1.10.2"
 
 // StringTemplate
 libs.ST4 = "org.antlr:ST4:4.0.8"
