@@ -99,7 +99,7 @@ public class MailSenderTest extends AbstractMailTest {
 
 		Assert.assertNotNull(m1);
 		Assert.assertEquals("Hello...", m1.getSubject());
-		Assert.assertEquals(sentOn, m1.getSentDate());
+		Assert.assertTrue(sentOn.compareTo(m1.getSentDate()) >= 0);
 		Assert.assertTrue(m1.getContent() instanceof MimeMultipart);
 
 		final MimeMultipart parts = (MimeMultipart) m1.getContent();

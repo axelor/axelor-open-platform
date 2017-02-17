@@ -100,7 +100,7 @@ public class MailBuilderTest extends AbstractMailTest {
 	@Test
 	public void testAttachment() throws Exception {
 
-		String file = ResourceUtils.getResource("log4j.properties").getFile();
+		String file = ResourceUtils.getResource("logback.xml").getFile();
 		String url = "file://" + file;
 
 		Message message = sender.compose()
@@ -108,8 +108,8 @@ public class MailBuilderTest extends AbstractMailTest {
 				.bcc("you@localhost")
 				.subject("Hello...")
 				.text("Hello!!!")
-				.attach("log4j.properties", file)
-				.attach("log4j.properties", url)
+				.attach("logback.xml", file)
+				.attach("logback.xml", url)
 				.build();
 
 		MimeMessage msg = sendAndRecieve(message);
