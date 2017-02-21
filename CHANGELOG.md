@@ -1,4 +1,22 @@
-# 4.1.0  (2016-12-15)
+# 4.1.1 (2017-02-21)
+
+## Bug fixes
+
+- fix NPE issue on xml data import when text node is empty
+- fix x-precision and x-scale attributes issue
+- fix legend display issue on calendar view
+- fix editable grid issue with selection checkbox
+- fix technical help info lost issue
+- fix binary field issue if form has onSave
+- fix attachment file name encoding issue
+
+## Improvements
+
+- add support for changing page limit on search dialog
+- allow to define number of rows display in relational field
+- allow to copy record line on master detail widget
+
+# 4.1.0 (2016-12-15)
 
 ## Bug fixes
 
