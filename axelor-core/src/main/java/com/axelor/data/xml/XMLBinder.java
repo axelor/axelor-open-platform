@@ -283,6 +283,9 @@ public abstract class XMLBinder {
 				}
 				if (input.getNodeType() == Node.ELEMENT_NODE) {
 					Node child = input.getFirstChild();
+					if (child == null) {
+						return null;
+					}
 					if (child.getNodeType() == Node.TEXT_NODE) {
 						return child.getNodeValue();
 					}
