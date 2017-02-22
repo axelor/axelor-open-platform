@@ -34,7 +34,7 @@ import javax.inject.Inject;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import org.hibernate.query.internal.QueryImpl;
+import org.hibernate.query.internal.AbstractProducedQuery;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -762,7 +762,6 @@ public class MetaService {
 
 	private void transformQueryResult(Query query) {
 		//TODO: fix deprecation when new transformer api is implemented in hibernate
-		query.unwrap(QueryImpl.class)
-			.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+		((AbstractProducedQuery<?>) query).setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 	}
 }
