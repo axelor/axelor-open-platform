@@ -139,6 +139,11 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 	function _showEditor(record) {
 		
 		if (!$scope._isPopup && field.editWindow === "blank" && record && record.id > 0) {
+			var checkVersion = "" + axelor.config["view.form.check-version"];
+			var context = ($scope.selectedTab || {}).context || {};
+			if (context.__check_version !== undefined) {
+				checkVersion = "" + context.__check_version;
+			}
 			var tab = {
 				action: _.uniqueId('$act'),
 				title: field.title,
@@ -152,7 +157,10 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 					name: field.gridView
 				}]
 			};
-				
+			if (checkVersion) {
+				tab.context = { __check_version: checkVersion };
+			}
+
 			return $scope.$root.openTab(tab);
 		}
 
