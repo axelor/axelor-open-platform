@@ -281,6 +281,10 @@
 	padding-top: 2px;
 }
 
+.slick-group > .slick-cell-checkboxsel {
+	 text-align: inherit;
+}
+
 .slick-header-column.integer,
 .slick-header-column.decimal,
 .slick-cell.integer,
