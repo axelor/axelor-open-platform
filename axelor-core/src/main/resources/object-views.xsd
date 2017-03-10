@@ -942,6 +942,11 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="x-row-height" type="xsd:int">
+          <xsd:annotation>
+            <xsd:documentation>Specify custom row height.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="edit-icon" type="xsd:boolean" default="true">
           <xsd:annotation>
             <xsd:documentation>Whether to show edit icon.</xsd:documentation>

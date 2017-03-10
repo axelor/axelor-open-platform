@@ -818,7 +818,7 @@ Grid.prototype.parse = function(view) {
 	var factory = new Factory(this);
 
 	var options = {
-		rowHeight: 26,
+		rowHeight: Math.max(view.rowHeight || 26, 26),
 		editable: view.editable && !axelor.device.mobile,
 		editorFactory:  factory,
 		formatterFactory: factory,

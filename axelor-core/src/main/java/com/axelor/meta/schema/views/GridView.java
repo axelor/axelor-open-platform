@@ -66,6 +66,9 @@ public class GridView extends AbstractView {
 	@XmlAttribute(name = "edit-icon")
 	private Boolean editIcon = Boolean.TRUE;
 
+	@XmlAttribute(name = "x-row-height")
+	private Integer rowHeight;
+
 	@XmlElement(name = "help")
 	private Help inlineHelp;
 
@@ -172,6 +175,14 @@ public class GridView extends AbstractView {
 
 	public void setEditIcon(Boolean editIcon) {
 		this.editIcon = editIcon;
+	}
+
+	public Integer getRowHeight() {
+		return rowHeight;
+	}
+
+	public void setRowHeight(Integer rowHeight) {
+		this.rowHeight = rowHeight;
 	}
 
 	public Help getInlineHelp() {
