@@ -462,6 +462,17 @@ header .navbar .nav-link-user-sub {
 	margin: 8px;
 }
 
+.grid-view.has-details-view > .slickgrid {
+	right: 50%;
+	border-right: 1px solid #ddd;
+}
+
+.grid-view > .details-view {
+	position: absolute !important;
+	top: 40px; left: 50%; right: 0px; bottom: 0px;
+	overflow: auto;
+}
+
 .record-toolbar {
 	margin: 0;
 }

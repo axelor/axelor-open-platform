@@ -170,6 +170,10 @@ function GridViewCtrl($scope, $element) {
 				dataView.$syncSelection();
 			});
 		}
+
+		if ($scope.$details) {
+			$scope.$details.editRecord(null);
+		}
 	};
 
 	$scope.attr = function (name) {
@@ -187,7 +191,17 @@ function GridViewCtrl($scope, $element) {
 		return $scope.hasButton('edit') && $scope.selection.length > 0;
 	};
 	
+	$scope.canShowSave = function () {
+		if ($scope.$details) {
+			return true;
+		}
+		return $scope.hasButton('save') && $scope.canEditInline();
+	}
+
 	$scope.canSave = function() {
+		if ($scope.$details && $scope.$details.canSave()) {
+			return true;
+		}
 		return $scope.hasButton('save') && this.dataView.canSave && this.dataView.canSave();
 	};
 	
@@ -419,6 +433,10 @@ function GridViewCtrl($scope, $element) {
 	
 	$scope.onNew = function() {
 		page.index = -1;
+		if ($scope.$details) {
+			$scope.$details.onNew();
+			return;
+		}
 		$scope.switchTo('form', function(viewScope){
 			$scope.ajaxStop(function(){
 				$scope.applyLater(function(){
@@ -457,7 +475,13 @@ function GridViewCtrl($scope, $element) {
 	};
 	
 	$scope.onRefresh = function() {
-		return $scope.reload();
+		if ($scope.$details) {
+			$scope.$details.onNew().then(function () {
+				$scope.reload();
+			});
+		} else {
+			$scope.reload();
+		}
 	};
 	
 	$scope.reload = function() {
@@ -506,6 +530,10 @@ function GridViewCtrl($scope, $element) {
 		$scope.applyLater(function () {
 			$scope.$broadcast('on:grid-selection-change', $scope.getContext());
 		});
+		
+		if ($scope.$details) {
+			$scope.$details.selectionChanged(selection);
+		}
 	};
 	
 	$scope.onItemClick = function(event, args) {
@@ -539,7 +567,12 @@ function GridViewCtrl($scope, $element) {
 	};
 	
 	$scope.onSave = function() {
-		this.dataView.saveChanges();
+		if ($scope.$details) {
+			$scope.$details.onSave();
+		}
+		if ($scope.dataView.saveChanges) {
+			$scope.dataView.saveChanges();
+		}
 	};
 	
 	$scope.onArchived = function(e) {
@@ -621,6 +654,77 @@ ui.directive('uiViewGrid', function(){
 		template: '<div ui-slick-grid ui-widget-states></div>'
 	};
 });
+
+ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource, ViewService) {
+	return {
+		scope: {},
+		controller: ['$scope', '$element', function ($scope, $element) {
+			var parent = $scope.$parent;
+			var params =  _.pick(parent._viewParams, ['views', 'model', 'domain', 'context', 'params']);
+
+			var view = _.findWhere(params.views, { type: 'form' }) || { type: 'form' };
+			if (params.params && _.isString(params.params['details-view'])) {
+				view = { type: 'form', name: params.params['details-view']};
+			}
+
+			params.views = [view];
+			$scope._viewParams = params;
+
+			ui.ViewCtrl.call(this, $scope, DataSource, ViewService);
+
+			// use same ds as grid
+			$scope._dataSource = parent._dataSource;
+
+			ui.FormViewCtrl.call(this, $scope, $element);
+
+			parent.$parent.$details = $scope;
+
+			var ds = $scope._dataSource;
+			var noop = angular.noop;
+
+			$scope.getRouteOptions = noop;
+			$scope.setRouteOptions = noop;
+			$scope.updateRoute = noop;
+			$scope.$locationChangeCheck = noop;
+			$scope.switchBack = noop;
+			$scope.switchTo = noop;
+			$scope.onHotKey = noop;
+
+			$scope._dataSource = parent._dataSource;
+
+			$scope.setEditable(true);
+			$scope.show();
+			
+			function doEdit(index) {
+				var found = ds.at(index);
+				$scope.edit(found);
+			}
+
+			$scope.selectionChanged = _.debounce(function (selection) {
+				var first = _.first(selection);
+				if (first !== undefined) {
+					doEdit(first);
+				}
+			}, 300);
+		}],
+		link: function (scope, element, attrs) {
+			var overlay = $("<div class='slickgrid-overlay'>");
+			element.parent().addClass('has-details-view');
+			scope.waitForActions(function () {
+				element.parent().children('.slickgrid').append(overlay);
+			});
+			
+			scope.$watch('$$dirty', function (dirty) {
+				overlay.toggle(dirty);
+			});
+		},
+		replace: true,
+		template:
+			"<div class='details-view'>" +
+				"<div ui-view-form x-handler='this'></div>" +
+			"</div>"
+	}
+}]);
 
 ui.directive('uiPortletGrid', function(){
 	return {
