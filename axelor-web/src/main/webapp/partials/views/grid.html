@@ -1,4 +1,4 @@
-<div class="grid-view" ng-controller="GridViewCtrl" ui-tab-gate>
+<div class="grid-view" ng-controller="GridViewCtrl" ui-tab-gate ng-class="{'has-details-view': canShowDetailsView() }">
   <div class="navbar record-toolbar">
     <div class="navbar-inner">
       <div class="container" ui-toolbar-adjust>
@@ -40,5 +40,5 @@
     <h3>{{schema.title}}</h3>
   </div>
   <div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this"></div>
-  <div ui-view-details ui-tab-gate ng-if="_viewParams.params['details-view']"></div>
+  <div ui-view-details ui-tab-gate ng-if="canShowDetailsView()"></div>
 </div>

@@ -191,6 +191,11 @@ function GridViewCtrl($scope, $element) {
 		return $scope.hasButton('edit') && $scope.selection.length > 0;
 	};
 	
+	$scope.canShowDetailsView = function () {
+		var params = ($scope._viewParams || {}).params || {};
+		return params['details-view'] && !axelor.device.mobile;
+	};
+	
 	$scope.canShowSave = function () {
 		if ($scope.$details) {
 			return true;
@@ -711,7 +716,6 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
 		}],
 		link: function (scope, element, attrs) {
 			var overlay = $("<div class='slickgrid-overlay'>");
-			element.parent().addClass('has-details-view');
 			scope.waitForActions(function () {
 				element.parent().children('.slickgrid').append(overlay);
 			});
