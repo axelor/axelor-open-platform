@@ -179,7 +179,13 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 							scope.toggleSearch(false);
 						});
 					},
-					appendTo: element.parent()
+					appendTo: element.parent(),
+					open: function () {
+						element.children('.nav-tree').hide();
+					},
+					close: function (e) {
+						element.children('.nav-tree').show();
+					}
 				});
 				
 				input.data('autocomplete')._renderMenu = function (ul, items) {
