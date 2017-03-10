@@ -10,7 +10,7 @@
             <i class="fa fa-pencil"></i> <span ng-if="::!tbTitleHide" x-translate>Edit</span>
           </button>
           <button class="hidden-phone" ui-update-button x-handler="this" ng-if="hasButton('edit') && canMassUpdate()" title="{{ 'Mass Update' | t}}"></button>
-          <button class="btn hidden-phone" ng-click="onSave()" ng-if="hasButton('save') && canEditInline()" ng-disabled="!canSave()" title="{{ 'Save' | t}}">
+          <button class="btn hidden-phone" ng-click="onSave()" ng-if="canShowSave()" ng-disabled="!canSave()" title="{{ 'Save' | t}}">
             <i class="fa fa-floppy-o"></i> <span ng-if="::!tbTitleHide" x-translate>Save</span>
           </button>
           <button class="btn" ng-click="onDelete()" ng-if="hasButton('delete')" ng-disabled="!canDelete()" title="{{ 'Delete' | t}}">
