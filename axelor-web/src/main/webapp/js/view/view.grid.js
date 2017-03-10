@@ -725,10 +725,7 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
 			});
 		},
 		replace: true,
-		template:
-			"<div class='details-view'>" +
-				"<div ui-view-form x-handler='this'></div>" +
-			"</div>"
+		templateUrl: "partials/views/details-form.html"
 	}
 }]);
 

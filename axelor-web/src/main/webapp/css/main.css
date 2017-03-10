@@ -470,7 +470,12 @@ header .navbar .nav-link-user-sub {
 .grid-view > .details-view {
 	position: absolute !important;
 	top: 40px; left: 50%; right: 0px; bottom: 0px;
+}
+
+.grid-view > .details-view > [ui-view-form] {
 	overflow: auto;
+	position: absolute;
+	top: 42px; left: 0; right: 0; bottom: 0;
 }
 
 .record-toolbar {
@@ -528,6 +533,13 @@ header .navbar .nav-link-user-sub {
 	top: 0;
 	right: 6px;
 	position: absolute;
+}
+
+.grid-view > .details-view .record-toolbar {
+}
+
+.grid-view > .details-view .record-toolbar .navbar-inner {
+	border-top: 1px solid #e7e7e7;
 }
 
 @media (max-width: 767px) {
