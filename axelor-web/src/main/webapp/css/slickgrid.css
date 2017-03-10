@@ -84,6 +84,12 @@
   	background-color: #abb9d3;
 }
 
+.slick-row .slick-cell.text,
+.slick-row .slick-cell.html {
+	white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
 .slick-row .slick-cell.selected.active::after {
 	content: " ";
 	display: block;
