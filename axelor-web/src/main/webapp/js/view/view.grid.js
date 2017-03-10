@@ -697,7 +697,9 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
 			
 			function doEdit(index) {
 				var found = ds.at(index);
-				$scope.edit(found);
+				$scope.doRead(found.id).success(function(record) {
+					$scope.edit(record);
+				});
 			}
 
 			$scope.selectionChanged = _.debounce(function (selection) {
