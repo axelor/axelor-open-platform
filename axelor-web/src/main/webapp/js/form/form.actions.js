@@ -259,7 +259,7 @@ ActionHandler.prototype = {
 	_getPrompt: function () {
 		var prompt = this.prompt;
 		var itemScope = this.element.scope();
-		if (_.isFunction(itemScope.attr)) {
+		if (_.isFunction(itemScope.attr) && !this.element.is('[ui-slick-grid]')) {
 			prompt = itemScope.attr('prompt') || prompt;
 		}
 		return _.isString(prompt) ? prompt : null;
