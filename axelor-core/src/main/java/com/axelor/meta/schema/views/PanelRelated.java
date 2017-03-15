@@ -48,6 +48,9 @@ public class PanelRelated extends AbstractPanel {
 	@XmlAttribute(name = "x-search-limit")
 	private Integer searchLimit;
 
+	@XmlAttribute(name = "x-row-height")
+	private Integer rowHeight;
+
 	@XmlAttribute
 	private Boolean editable;
 
@@ -147,6 +150,14 @@ public class PanelRelated extends AbstractPanel {
 
 	public void setSearchLimit(Integer searchLimit) {
 		this.searchLimit = searchLimit;
+	}
+
+	public Integer getRowHeight() {
+		return rowHeight;
+	}
+	
+	public void setRowHeight(Integer rowHeight) {
+		this.rowHeight = rowHeight;
 	}
 
 	public String getOrderBy() {

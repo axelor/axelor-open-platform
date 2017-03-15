@@ -490,7 +490,7 @@ ui.formInput('OneToMany', {
 
 		var adjustHeight = false;
 		var adjustSize = (function() {
-			var rowSize = 26;
+			var rowSize = +(scope.field.rowHeight) || 26;
 			var	minSize = 56;
 			var elem = element;
 			if (elem.is('.panel-related')) {

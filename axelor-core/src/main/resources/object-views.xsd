@@ -1174,6 +1174,7 @@
         <xsd:attribute name="title" use="prohibited"/>
         <xsd:attribute name="help" use="prohibited"/>
         <xsd:attribute name="onTabSelect" use="prohibited"/>
+        <xsd:attribute name="x-row-height" type="xsd:int"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

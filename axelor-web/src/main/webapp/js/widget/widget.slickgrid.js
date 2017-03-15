@@ -2656,6 +2656,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 				if (field.editable !== undefined) {
 					schema.editable = field.editable;
 				}
+				schema.rowHeight = field.rowHeight || schema.rowHeight;
 				schema.orderBy = field.orderBy || schema.orderBy;
 				schema.groupBy = field.groupBy || schema.groupBy;
 				schema.groupBy = (schema.editable || schema.groupBy === "false") ? false : schema.groupBy;
