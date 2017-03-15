@@ -70,9 +70,9 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 		formView.setTitle(jsonModel.getTitle());
 		StringBuilder xml = new StringBuilder()
 				.append("<form")
-				.append(" name=").append('"').append(gridView.getName()).append('"')
-				.append(" title=").append('"').append(gridView.getTitle()).append('"')
-				.append(" model=").append('"').append(gridView.getModel()).append('"')
+				.append(" name=").append('"').append(formView.getName()).append('"')
+				.append(" title=").append('"').append(formView.getTitle()).append('"')
+				.append(" model=").append('"').append(formView.getModel()).append('"')
 				.append(" onNew=").append('"').append(onNew).append('"');
 		
 		if (!StringUtils.isBlank(onSave)) {
