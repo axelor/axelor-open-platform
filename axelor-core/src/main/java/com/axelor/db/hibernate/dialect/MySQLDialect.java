@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hibernate.boot.model.TypeContributions;
-import org.hibernate.dialect.MySQL57InnoDBDialect;
+import org.hibernate.dialect.MySQL57Dialect;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
@@ -30,7 +30,7 @@ import org.hibernate.type.Type;
 import com.axelor.db.hibernate.type.JsonSqlTypeDescriptor;
 import com.axelor.db.hibernate.type.JsonType;
 
-public class MySQLDialect extends MySQL57InnoDBDialect {
+public class MySQLDialect extends MySQL57Dialect {
 
 	static class JsonExtractFunction extends AbstractJsonExtractFunction {
 
