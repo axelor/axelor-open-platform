@@ -17,7 +17,6 @@
  */
 package com.axelor.db;
 
-import java.util.Collection;
 import java.util.Map;
 
 import javax.persistence.FlushModeType;
@@ -197,7 +196,6 @@ public class QueryBinder {
 				continue;
 			}
 			try {
-				validate(param.getParameterType(), value);
 				query.setParameter(i + offset, value);
 			} catch (IllegalArgumentException e) {
 				query.setParameter(i + offset, adapt(value, param));
@@ -231,7 +229,6 @@ public class QueryBinder {
 		}
 
 		try {
-			validate(parameter.getParameterType(), value);
 			query.setParameter(name, value);
 		} catch (IllegalArgumentException e) {
 			query.setParameter(name, adapt(value, parameter));
@@ -249,38 +246,6 @@ public class QueryBinder {
 		return query;
 	}
 	
-	// XXX: HHH-11397
-	// based on hibernate 4.x parameter binding validation
-	private void validate(Class<?> type, Object value) {
-		if (value == null || type == null) {
-			return;
-		}
-		if (value instanceof Collection && !Collection.class.isAssignableFrom(type)) {
-			for (Object item : (Collection<?>) value) {
-				if (!type.isInstance(item)) {
-					throw new IllegalArgumentException();
-				}
-			}
-		} else if (value.getClass().isArray()) {
-			if (!type.isArray()) {
-				throw new IllegalArgumentException();
-			}
-			if (value.getClass().getComponentType().isPrimitive()) {
-				if (!type.getComponentType().isAssignableFrom(value.getClass().getComponentType())) {
-					throw new IllegalArgumentException();
-				}
-			} else {
-				for (Object element : (Object[]) value) {
-					if (!type.getComponentType().isInstance(element)) {
-						throw new IllegalArgumentException();
-					}
-				}
-			}
-		} else if (!type.isInstance(value)) {
-			throw new IllegalArgumentException();
-		}
-	}
-
 	private Object adapt(Object value, Parameter<?> param) {
 		final Class<?> type = param.getParameterType();
 		if (type == null) {
