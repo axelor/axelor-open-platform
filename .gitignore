@@ -14,3 +14,6 @@ application.login.gzip.*
 *~
 .#*
 [#]*#
+.idea/
+*.iml
+*.iws
