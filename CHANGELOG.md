@@ -1,3 +1,15 @@
+# 4.1.2 (2017-03-20)
+
+## Bug fixes
+
+- fix button prompt issue in grid view
+- fix wrong record selected with grouped selection popup
+- fix BIRT report pdf word wrap issue
+- fix decimal formatting issue in grid view
+- fix alignment issue on grouped grid
+- fix __check_version use on tabs opened with edit-window="blank"
+- fix __check_version reload ignores dirty checking
+
 # 4.1.1 (2017-02-21)
 
 ## Bug fixes
