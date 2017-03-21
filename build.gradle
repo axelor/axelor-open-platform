@@ -10,22 +10,24 @@ buildscript {
 allprojects {
 	apply from: "${rootDir}/gradle/repo.gradle"
 	apply from: "${rootDir}/gradle/libs.gradle"
+}
+
+subprojects {
 	apply from: "${rootDir}/gradle/common.gradle"
+
+	if (project.name != 'axelor-shell') {
+		apply from: "${rootDir}/gradle/publish.gradle"
+	}
 
 	apply plugin: com.axelor.gradle.support.JavaSupport
 	apply plugin: com.axelor.gradle.support.EclipseSupport
 	apply plugin: com.axelor.gradle.support.LicenseSupport
 
-	group "com.axelor"
-	version rootProject.version
+	group = "com.axelor"
+	version = rootProject.version
 
 	sourceCompatibility = 1.8
 	targetCompatibility = 1.8
-}
-
-subprojects {
-
-	if (project.name != 'axelor-shell') { apply from: "${rootDir}/gradle/publish.gradle" }
 
 	afterEvaluate {
 		test {
