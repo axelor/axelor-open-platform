@@ -1,11 +1,14 @@
-apply plugin: "maven"
+ext.rcNumber = project.hasProperty("rcNumber") ? project.rcNumber.toInteger() : null
+ext.finalRelease = project.hasProperty("finalRelease")
+ext.versionFile = rootProject.name == "buildSrc" ? "../version.txt" : "version.txt"
+ext.baseVersion = rootProject.file(versionFile).text.trim()
 
-group "com.axelor"
-version "5.0.0"
+version baseVersion
 
-def rcNumber = project.hasProperty("rcNumber") ?
-			   project.getProperty("rcNumber").toInteger() : null;
-
-if (rcNumber != null) {
-	version += "-rc$rcNumber"
+if (finalRelease) {
+	// use base version
+} else if (rcNumber != null) {
+	version += "-rc${rcNumber}"
+} else {
+	version += "-SNAPSHOT"
 }

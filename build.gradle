@@ -1,35 +1,31 @@
+apply from: "${rootDir}/version.gradle"
+
 buildscript {
-	apply from: "version.gradle"
+	apply from: "${rootDir}/gradle/repo.gradle"
+	dependencies {
+		classpath "org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1"
+	}
 }
 
 allprojects {
 	apply from: "${rootDir}/gradle/repo.gradle"
 	apply from: "${rootDir}/gradle/libs.gradle"
 	apply from: "${rootDir}/gradle/common.gradle"
-	apply from: "${rootDir}/version.gradle"
 
 	apply plugin: com.axelor.gradle.support.JavaSupport
 	apply plugin: com.axelor.gradle.support.EclipseSupport
 	apply plugin: com.axelor.gradle.support.LicenseSupport
 
-	apply plugin: "maven-publish"
-	
+	group "com.axelor"
+	version rootProject.version
+
 	sourceCompatibility = 1.8
 	targetCompatibility = 1.8
+}
 
-	publishing {
-		publications {
-			mavenJava(MavenPublication) {
-				from components.java
-			}
-		}
-		repositories {
-			maven {
-				name "axelor-repo"
-				url "file://${rootDir}/build/repo"
-			}
-		}
-	}
+subprojects {
+
+	if (project.name != 'axelor-shell') { apply from: "${rootDir}/gradle/publish.gradle" }
 
 	afterEvaluate {
 		test {

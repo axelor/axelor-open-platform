@@ -1,10 +1,14 @@
 apply plugin: "java"
 
+apply from: "../version.gradle"
+
 allprojects {
 	apply from: "../gradle/repo.gradle"
 	apply from: "../gradle/libs.gradle"
 	apply from: "../gradle/common.gradle"
-	apply from: "../version.gradle"
+
+	group "com.axelor"
+	version rootProject.version
 
 	// build in separate directory to speed up build
 	project.buildDir = "${rootDir}/build/${project.name}"
