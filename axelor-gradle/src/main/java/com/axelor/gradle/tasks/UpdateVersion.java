@@ -29,13 +29,14 @@ import org.gradle.api.tasks.SkipWhenEmpty;
 import org.gradle.api.tasks.TaskAction;
 
 import com.axelor.common.VersionUtils;
+import com.axelor.gradle.AxelorPlugin;
 import com.google.common.io.Files;
 
 public class UpdateVersion extends DefaultTask {
-	
+
 	public static final String TASK_NAME = "updateVersion";
 	public static final String TASK_DESCRIPTION = "Update version text in source files.";
-	public static final String TASK_GROUP = "Axelor";
+	public static final String TASK_GROUP = AxelorPlugin.AXELOR_BUILD_GROUP;
 
 	private static final Pattern XML_PATTERN = Pattern.compile("(domain-models|object-views|data-import)_\\d+\\.\\d+\\.xsd");
 	private static final Pattern JSON_PATTERN = Pattern.compile("version\".*,");

@@ -21,7 +21,9 @@ import java.io.File;
 
 import org.gradle.api.Project;
 
+import com.axelor.gradle.AxelorPlugin;
 import com.bmuschko.gradle.tomcat.tasks.AbstractTomcatRun;
+import com.bmuschko.gradle.tomcat.tasks.Tomcat;
 import com.bmuschko.gradle.tomcat.tasks.TomcatRun;
 
 public class TomcatSupport extends AbstractSupport {
@@ -41,6 +43,10 @@ public class TomcatSupport extends AbstractSupport {
 		project.getTasks().withType(TomcatRun.class).all(task -> {
 			task.dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
 			task.setWebAppSourceDirectory(new File(project.getBuildDir(), "webapp"));
+		});
+
+		project.getTasks().withType(Tomcat.class).all(task -> {
+			task.setGroup(AxelorPlugin.AXELOR_APP_GROUP);
 		});
 	}
 }

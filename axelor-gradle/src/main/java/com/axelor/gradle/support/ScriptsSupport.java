@@ -23,6 +23,8 @@ import org.gradle.api.tasks.Exec;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.SourceSet;
 
+import com.axelor.gradle.AxelorPlugin;
+
 public class ScriptsSupport extends AbstractSupport {
 
 	@Override
@@ -30,21 +32,21 @@ public class ScriptsSupport extends AbstractSupport {
 
 		project.getTasks().create("npm", Exec.class, task -> {
  			task.setDescription("Run 'npm install' command to install npm packages.");
- 			task.setGroup("Axelor");
+ 			task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
  			task.setWorkingDir(project.getBuildDir() + "/webapp");
  			task.setCommandLine("npm", "install");
  		});
 
 		project.getTasks().create("gulp", Exec.class, task -> {
 			task.setDescription("Run gulp command to build web resource bundles.");
-			task.setGroup("Axelor");
+			task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
 			task.setWorkingDir(project.getBuildDir() + "/webapp");
 			task.setCommandLine("npm", "run", "gulp");
 		});
-		
+
 		project.getTasks().create("init", JavaExec.class, task -> {
 			task.setDescription("Initialize application database.");
-			task.setGroup("Axelor");
+			task.setGroup(AxelorPlugin.AXELOR_APP_GROUP);
 			task.setClasspath(project.getConvention()
 					.getPlugin(JavaPluginConvention.class)
 					.getSourceSets()
@@ -65,7 +67,7 @@ public class ScriptsSupport extends AbstractSupport {
 		
 		project.getTasks().create("migrate", JavaExec.class, task -> {
 			task.setDescription("Run database migration scripts.");
-			task.setGroup("Axelor");
+			task.setGroup(AxelorPlugin.AXELOR_APP_GROUP);
 			task.setClasspath(project.getConvention()
 					.getPlugin(JavaPluginConvention.class)
 					.getSourceSets()

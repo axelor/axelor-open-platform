@@ -36,6 +36,9 @@ import com.axelor.gradle.tasks.I18nExtract;
 import com.axelor.gradle.tasks.UpdateVersion;
 
 public class AxelorPlugin implements Plugin<Project> {
+	
+	public static final String AXELOR_APP_GROUP = "axelor application";
+	public static final String AXELOR_BUILD_GROUP = "axelor build";
 
 	@Override
 	public void apply(Project project) {

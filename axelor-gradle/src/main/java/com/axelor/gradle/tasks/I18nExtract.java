@@ -22,13 +22,14 @@ import java.nio.file.Paths;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
+import com.axelor.gradle.AxelorPlugin;
 import com.axelor.tools.i18n.I18nExtractor;
 
 public class I18nExtract extends DefaultTask {
 
-	public static final String TASK_NAME = "i18n-extract";
+	public static final String TASK_NAME = "i18nExtract";
 	public static final String TASK_DESCRIPTION = "Extract i18n messages from source files.";
-	public static final String TASK_GROUP = "Axelor";
+	public static final String TASK_GROUP = AxelorPlugin.AXELOR_BUILD_GROUP;
 
 	@TaskAction
 	public void extract() {

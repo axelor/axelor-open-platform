@@ -48,7 +48,7 @@ public class GenerateCode extends DefaultTask {
 
 	public static final String TASK_NAME = "generateCode";
 	public static final String TASK_DESCRIPTION = "Generate code for domain models from xml definitions.";
-	public static final String TASK_GROUP = "Axelor";
+	public static final String TASK_GROUP = AxelorPlugin.AXELOR_BUILD_GROUP;
 
 	private static final String DIR_OUTPUT = "src-gen";
 	private static final String DIR_SOURCE = "src/main/resources/domains";
