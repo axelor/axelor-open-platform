@@ -17,12 +17,8 @@
  */
 package com.axelor.common;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.google.common.io.CharStreams;
 
 /**
  * Provides helper methods to find version information of axelor projects.
@@ -32,7 +28,6 @@ public final class VersionUtils {
 
 	private static Version version;
 
-	private static final String VERSION_FILE = "axelor-version.txt";
 	private static final Pattern VERSION_PATTERN = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+)(?:\\-rc(\\d+))?(-SNAPSHOT)?$");
 	private static final Pattern VERSION_SPEC_PATTERN = Pattern.compile("(~)?((\\d+)\\.(\\d+)\\.(\\d+)(?:\\-rc(\\d+))?(-SNAPSHOT)?)");
 
@@ -123,17 +118,12 @@ public final class VersionUtils {
 	 */
 	public static Version getVersion() {
 		if (version == null) {
-			version = getVersion(VERSION_FILE);
+			final Package pkg = VersionUtils.class.getPackage();
+			if (pkg == null || pkg.getImplementationVersion() == null) {
+				throw new IllegalStateException("Unable to read version details.");
+			}
+			version = new Version(pkg.getImplementationVersion());
 		}
 		return version;
-	}
-
-	private static Version getVersion(String file) {
-		try (InputStream is = ResourceUtils.getResourceStream(file)) {
-			String version = CharStreams.toString(new InputStreamReader(is));
-			return new Version(version);
-		} catch (Exception e) {
-			throw new IllegalStateException("Unable to read version details.", e);
-		}
 	}
 }
