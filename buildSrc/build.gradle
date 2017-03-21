@@ -5,21 +5,18 @@ allprojects {
 	apply from: "../gradle/libs.gradle"
 	apply from: "../gradle/common.gradle"
 	apply from: "../version.gradle"
-}
-
-subprojects {
 
 	// build in separate directory to speed up build
 	project.buildDir = "${rootDir}/build/${project.name}"
 
-	// disable tests to speed up build
-	afterEvaluate {
-		project.test.enabled = false
-	}
+	// disable test
+	test.enabled = false
+	sourceSets.test.java.srcDirs = []
+	sourceSets.test.resources.srcDirs = []
 }
 
 dependencies {
 	runtime project(':axelor-gradle')
 }
 
-tasks.compileGroovy.enabled = false
+jar.enabled = false

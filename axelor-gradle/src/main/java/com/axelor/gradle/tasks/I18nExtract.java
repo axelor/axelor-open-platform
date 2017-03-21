@@ -15,37 +15,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.gradle
+package com.axelor.gradle.tasks;
 
-import org.gradle.api.Project
+import java.nio.file.Paths;
 
-abstract class AbstractDefinition {
-    
-	String name
-	String title
-	String description
-    String adkVersion
+import org.gradle.api.DefaultTask;
+import org.gradle.api.tasks.TaskAction;
 
-	List<String> modules = []
+import com.axelor.tools.i18n.I18nExtractor;
 
-	def name(String name) {
-        this.name = name
-    }
+public class I18nExtract extends DefaultTask {
 
-    def title(String title) {
-        this.title = title
-    }
+	public static final String TASK_NAME = "i18n-extract";
+	public static final String TASK_DESCRIPTION = "Extract i18n messages from source files.";
+	public static final String TASK_GROUP = "Axelor";
 
-	def description(String description) {
-        this.description = description
-    }
-
-	def adkVersion(String adkVersion) {
-		this.adkVersion = adkVersion
+	@TaskAction
+	public void extract() {
+		final I18nExtractor extractor = new I18nExtractor();
+		final boolean withContext = getProject().hasProperty("with.context");
+		extractor.extract(Paths.get(getProject().getProjectDir().getPath()), true, withContext);
 	}
-
-	def module(String module) {
-		modules << module
-    }
 }
-

@@ -33,4 +33,17 @@ class XmlHelper {
 			return new Entity(it)
 		}
 	}
+
+	/**
+	 * Parse the given input xml and return {@link Entity} mapping
+	 * to each entity elements.
+	 *
+	 * @param input the input data
+	 * @return list of entity mapping
+	 */
+	public static  List<Entity> entities(InputStream input) {
+		return new XmlSlurper().parse(input).'entity'.collect {
+			return new Entity(it)
+		}
+	}
 }

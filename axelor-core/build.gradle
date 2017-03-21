@@ -1,8 +1,7 @@
-apply plugin: "axelor-base"
+apply plugin: com.axelor.gradle.AxelorPlugin
 
-module {
-	name "axelor-core"
-	title "Axelor :: Core"
+axelor {
+	title = "Axelor Core"
 }
 
 dependencies {

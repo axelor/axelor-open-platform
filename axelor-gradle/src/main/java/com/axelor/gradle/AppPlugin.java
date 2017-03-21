@@ -15,19 +15,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.gradle
+package com.axelor.gradle;
 
-class AppDefinition extends AbstractDefinition {
+import org.gradle.api.Plugin;
+import org.gradle.api.Project;
 
-	String version
+import com.axelor.gradle.support.ScriptsSupport;
+import com.axelor.gradle.support.TomcatSupport;
+import com.axelor.gradle.support.WarSupport;
 
-	List<String> installs = []
+public class AppPlugin implements Plugin<Project> {
 
-	def version(String version) {
-        this.version = version
-    }
-
-	def install(String module) {
-		installs << module
+	@Override
+	public void apply(Project project) {
+		project.getPlugins().apply(ModulePlugin.class);
+		project.getPlugins().apply(WarSupport.class);
+		project.getPlugins().apply(ScriptsSupport.class);
+		project.getPlugins().apply(TomcatSupport.class);
 	}
 }

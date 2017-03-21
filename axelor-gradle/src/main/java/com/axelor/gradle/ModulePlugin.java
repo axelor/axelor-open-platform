@@ -15,15 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.gradle
+package com.axelor.gradle;
 
-import org.gradle.api.Project
+import org.gradle.api.Plugin;
+import org.gradle.api.Project;
 
-class ModuleDefinition extends AbstractDefinition {
+import com.axelor.common.VersionUtils;
 
-	Boolean removable
+public class ModulePlugin implements Plugin<Project> {
 
-	Boolean removable(Boolean removable) {
-		this.removable = removable
+	private final String version = VersionUtils.getVersion().version;
+
+	@Override
+	public void apply(Project project) {
+		project.getPlugins().apply(AxelorPlugin.class);
+
+		// add core dependencies
+		project.getDependencies().add("compile", "com.axelor:axelor-core:" + version);
+		project.getDependencies().add("testCompile", "com.axelor:axelor-test:" + version);
 	}
 }

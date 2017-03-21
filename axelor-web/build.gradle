@@ -1,11 +1,13 @@
-apply plugin: "axelor-module"
+apply plugin: com.axelor.gradle.AxelorPlugin
 
-module {
-	name "axelor-web"
-	title "Axelor :: Web"
+axelor {
+	title = "Axelor Web"
 }
 
 dependencies {
+
+	testCompile project(":axelor-test")
+	compile project(":axelor-core")
 
 	compile libs.javax_servlet
 	compile libs.javax_servlet_jsp

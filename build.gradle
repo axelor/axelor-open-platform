@@ -1,31 +1,21 @@
-apply plugin: 'application'
-
 buildscript {
 	apply from: "version.gradle"
 }
 
-dependencies {
-	compile project(":axelor-shell")
-}
-
-def localDist = "${rootProject.buildDir}/dist"
-def localRepo = "${localDist}/maven"
-
 allprojects {
-
 	apply from: "${rootDir}/gradle/repo.gradle"
 	apply from: "${rootDir}/gradle/libs.gradle"
 	apply from: "${rootDir}/gradle/common.gradle"
-	apply from: "${rootDir}/gradle/eclipse.gradle"
-	apply from: "${rootDir}/gradle/license.gradle"
 	apply from: "${rootDir}/version.gradle"
 
-	sourceCompatibility = 1.8
-	targetCompatibility = 1.8
+	apply plugin: com.axelor.gradle.support.JavaSupport
+	apply plugin: com.axelor.gradle.support.EclipseSupport
+	apply plugin: com.axelor.gradle.support.LicenseSupport
 
 	apply plugin: "maven-publish"
-
-	group "com.axelor"
+	
+	sourceCompatibility = 1.8
+	targetCompatibility = 1.8
 
 	publishing {
 		publications {
@@ -35,8 +25,8 @@ allprojects {
 		}
 		repositories {
 			maven {
-				name "adk"
-				url "file://${localRepo}"
+				name "axelor-repo"
+				url "file://${rootDir}/build/repo"
 			}
 		}
 	}
@@ -49,64 +39,11 @@ allprojects {
 			beforeTest { descriptor ->
 				logger.lifecycle("Running: " + descriptor)
 			}
-
-			onlyIf {
-				return project.hasProperty('run-test')
-			}
 		}
 	}
 }
 
-task repo(dependsOn: [':axelor-gradle:dist']) {
-	outputs.dir localDist
-}
-
-tasks.repo.dependsOn subprojects*.publish
-
-jar.enabled = false
-install.enabled = false
-publish.enabled = false
-
-applicationName = "axelor"
-mainClassName = "com.axelor.shell.Main"
-
-run {
-	standardInput = System.in
-	standardOutput = System.out
-}
-
-applicationDistribution.from (repo) {
-}
-applicationDistribution.from("${rootDir}/gradle") {
-	into "gradle"
-	include "*.gradle"
-}
-
-def distName = "axelor-development-kit"
-def distConfig = {
-	baseName distName
-	eachFile {
-		if (it.name.endsWith('.bat')) {
-			it.mode = 0644
-		}
-	}
-}
-
-distZip distConfig
-distTar distConfig
-distTar.compression Compression.GZIP
-
-task dist(dependsOn: [distZip, distTar])
-
-installDist {
-	destinationDir = file("${buildDir}/install/${distName}")
-}
-
-task wrapper(type: Wrapper) {
-	gradleVersion = "3.4.1"
-}
-
-task updateVersion(type: com.axelor.gradle.tasks.VersionTask) {
+task updateVersion(type: com.axelor.gradle.tasks.UpdateVersion) {
 	description "Update version text in source files."
 	group "Axelor"
 	processFiles = fileTree(projectDir) {
@@ -118,6 +55,10 @@ task updateVersion(type: com.axelor.gradle.tasks.VersionTask) {
 		include '**/data/**/*config.xml'
 		include '**/webapp/package.json'
 	}
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = "3.4.1"
 }
 
 apply from: "gradle/javadoc.gradle"

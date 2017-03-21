@@ -19,9 +19,14 @@ package com.axelor.tools.x2j;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,6 +151,20 @@ public class Generator {
 			entities.put(entity.getName(), entity);
 		}
 	}
+	
+	private void process(URL input, boolean verbose) throws IOException {
+		
+		if (verbose) {
+			log.info("Processing: " + input);
+		}
+
+		try (final InputStream stream = input.openStream()) {
+			final List<Entity> all = XmlHelper.entities(stream);
+			for (Entity entity : all) {
+				entities.put(entity.getName(), entity);
+			}
+		}
+	}
 
 	private void delete(File file) {
 		if (file.isDirectory()) {
@@ -249,5 +268,38 @@ public class Generator {
 			}
 		}
 		return gen;
+	}
+
+	public static Generator forJar(File jarFile) throws IOException {
+		try (final JarFile jar = new JarFile(jarFile)) {
+
+			if (jar.getEntry("module.properties") == null) {
+				return null;
+			}
+			
+			final List<URI> files = jar.stream()
+					.filter(it -> it.getName().matches("^domains\\/.*\\.xml"))
+					.map(it -> String.format("jar:file:%s!/%s", jar.getName(), it.getName()))
+					.map(URI::create)
+					.collect(Collectors.toList());
+			if (files.isEmpty()) {
+				return null;
+			}
+			final Generator gen = new Generator(null, null) {
+
+				@Override
+				public void start() throws IOException {}
+
+				@Override
+				public void clean() {}
+
+				@Override
+				public void addLookupSource(Generator generator) throws IOException {}
+			};
+			for (URI file : files) {
+				gen.process(file.toURL(), false);
+			}
+			return gen;
+		}
 	}
 }
