@@ -10,10 +10,7 @@ subprojects {
 	apply from: "${rootDir}/version.gradle"
 	apply from: "${rootDir}/gradle/libs.gradle"
 	apply from: "${rootDir}/gradle/common.gradle"
-
-	if (project.name != 'axelor-shell') {
-		apply from: "${rootDir}/gradle/publish.gradle"
-	}
+	apply from: "${rootDir}/gradle/publish.gradle"
 
 	apply plugin: com.axelor.gradle.support.JavaSupport
 	apply plugin: com.axelor.gradle.support.EclipseSupport
