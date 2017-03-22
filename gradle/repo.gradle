@@ -1,9 +1,0 @@
-ext.repos = {
-	maven { url	"http://repository.axelor.com/nexus/content/groups/public/" }
-	maven { url "https://plugins.gradle.org/m2/" }
-	mavenCentral()
-	jcenter()
-}
-
-project.repositories repos
-project.buildscript.repositories repos

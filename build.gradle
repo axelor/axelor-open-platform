@@ -1,18 +1,14 @@
-apply from: "${rootDir}/version.gradle"
 
 buildscript {
-	apply from: "${rootDir}/gradle/repo.gradle"
+	apply from: "${rootDir}/gradle/repos.gradle"
 	dependencies {
 		classpath "org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1"
 	}
 }
 
-allprojects {
-	apply from: "${rootDir}/gradle/repo.gradle"
-	apply from: "${rootDir}/gradle/libs.gradle"
-}
-
 subprojects {
+	apply from: "${rootDir}/version.gradle"
+	apply from: "${rootDir}/gradle/libs.gradle"
 	apply from: "${rootDir}/gradle/common.gradle"
 
 	if (project.name != 'axelor-shell') {

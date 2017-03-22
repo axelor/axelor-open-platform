@@ -1,10 +1,9 @@
 apply plugin: "maven-publish"
 apply plugin: "maven-publish-auth"
 
-def repoTarget = rootProject.version.endsWith('-SNAPSHOT') ? "snapshots" : "releases"
-
-def repoLocal = "file://${rootProject.buildDir}/repo/${repoTarget}"
-def repoRemote = "http://repository.axelor.com/nexus/repository/${repoTarget}"
+def repoName = rootProject.version.endsWith('-SNAPSHOT') ? "snapshots" : "releases"
+def repoLocal = "file://${rootProject.buildDir}/repo/${repoName}"
+def repoRemote = "https://repository.axelor.com/nexus/${repoName}"
 
 task sourcesJar(type: Jar, dependsOn: compileJava) {
 	from sourceSets.main.allSource
@@ -27,7 +26,7 @@ publishing {
 	repositories {
 		maven {
 			if (project.hasProperty("remotePublish")) {
-				name "axelor-${repoTarget}"
+				name "axelor-${repoName}"
 				url repoRemote
 			} else {
 				url repoLocal

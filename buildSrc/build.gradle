@@ -1,9 +1,9 @@
 apply plugin: "java"
 
 apply from: "../version.gradle"
+apply from: "../gradle/repos.gradle"
 
 allprojects {
-	apply from: "../gradle/repo.gradle"
 	apply from: "../gradle/libs.gradle"
 	apply from: "../gradle/common.gradle"
 
