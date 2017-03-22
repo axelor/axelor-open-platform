@@ -1,13 +1,13 @@
-
 buildscript {
-	apply from: "${rootDir}/gradle/repos.gradle"
+	apply from: "gradle/repos.gradle"
 	dependencies {
 		classpath "org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1"
 	}
 }
 
+apply from: "version.gradle"
+
 subprojects {
-	apply from: "${rootDir}/version.gradle"
 	apply from: "${rootDir}/gradle/libs.gradle"
 	apply from: "${rootDir}/gradle/common.gradle"
 	apply from: "${rootDir}/gradle/publish.gradle"
