@@ -17,8 +17,6 @@
  */
 package com.axelor.gradle;
 
-import java.io.File;
-
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileTree;
@@ -57,9 +55,6 @@ public class AxelorPlugin implements Plugin<Project> {
 	}
 
 	private void configureCodeGeneration(Project project) {
-		final File domainPath = GenerateCode.getInputDirectory(project);
-		final File targetPath = GenerateCode.getOutputDirectory(project);
-
 		project.getTasks().create(I18nExtract.TASK_NAME, I18nExtract.class, task -> {
 			task.setDescription(I18nExtract.TASK_DESCRIPTION);
 			task.setGroup(I18nExtract.TASK_GROUP);
@@ -81,11 +76,8 @@ public class AxelorPlugin implements Plugin<Project> {
 		project.getTasks().withType(JavaCompile.class).all(task -> task.dependsOn(GenerateCode.TASK_NAME));
 
 		// add src-gen
-		if (domainPath.exists()) {
-			targetPath.mkdirs();
-			project.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets()
-					.getByName(SourceSet.MAIN_SOURCE_SET_NAME).getJava()
-					.srcDir(GenerateCode.getOutputDirectory(project));
-		}
+		project.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets()
+				.getByName(SourceSet.MAIN_SOURCE_SET_NAME).getJava()
+				.srcDir(GenerateCode.getOutputDirectory(project));
 	}
 }
