@@ -372,4 +372,76 @@ ui.directive('navMenuFav', function() {
 	};
 });
 
+ui.directive('navMenuTasks', function() {
+	return {
+		replace: true,
+		controller: ['$scope', '$location', 'TagService', 'NavService', function ($scope, $location, TagService, NavService) {
+
+			var TEAM_TASK = "com.axelor.team.db.TeamTask";
+
+			function taskText(count) {
+				var n = count || 0;
+				if (n <= 0) return _t('no tasks');
+				return n > 1 ? _t('{0} tasks', n) : _t('{0} task', n);
+			}
+
+			function update(data) {
+				var counts = data || {};
+				if (counts.current) {
+					counts.css = 'badge-success';
+				}
+				if (counts.pending) {
+					counts.css = 'badge-important';
+				}
+				counts.currentText = taskText(counts.current);
+				counts.pendingText = taskText(counts.pending);
+				counts.total = Math.min(99, counts.current);
+
+				$scope.counts = counts;
+			}
+			
+			TagService.listen(function (data) {
+				update(data.tasks || {});
+			});
+
+			$scope.showTasks = function (type) {
+				NavService.openTabByName('team.tasks.' + type);
+			};
+
+			function onDataChange(e, ds) {
+				if (ds._model === TEAM_TASK) {
+					TagService.find();
+				}
+			}
+
+			$scope.$on('ds:saved', onDataChange);
+			$scope.$on('ds:removed', onDataChange);
+
+			update({});
+		}],
+		template:
+			"<li class='dropdown'>" +
+				"<a href='' class='nav-link-tasks dropdown-toggle' data-toggle='dropdown'>" +
+					"<i class='fa fa-bell'></i>" +
+					"<span class='badge' ng-show='counts.css' ng-class='counts.css'>{{counts.total}}</span>" +
+				"</a>" +
+				"<ul class='dropdown-menu'>" +
+					"<li>" +
+						"<a href='' ng-click='showTasks(\"due\")'>" +
+							"<span class='nav-link-user-name' x-translate>Tasks due</span>" +
+							"<span class='nav-link-user-sub' ng-class='{\"fg-red\": counts.pending > 0}'>{{counts.pendingText}}</span>" +
+						"</a>" +
+					"</li>" +
+					"<li class='divider'></li>" +
+					"<li>" +
+						"<a href='' ng-click='showTasks((\"todo\"))'>" +
+							"<span class='nav-link-user-name' x-translate>Tasks todo</span>" +
+							"<span class='nav-link-user-sub'>{{counts.currentText}}</span>" +
+						"</a>" +
+					"</li>" +
+				"</ul>" +
+			"</li>"
+	};
+});
+
 })();

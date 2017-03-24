@@ -83,6 +83,7 @@ public class ActionService extends AbstractService {
 			response.setValue("tags", tags);
 			response.setStatus(Response.STATUS_SUCCESS);
 			mailController.countMail(null, response);
+			mailController.countTasks(null, response);
 		} catch (Exception e) {
 			if (LOG.isErrorEnabled())
 				LOG.error(e.getMessage(), e);

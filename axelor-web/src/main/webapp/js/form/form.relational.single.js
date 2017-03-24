@@ -650,7 +650,7 @@ ui.formInput('RefSelect', {
 			});
 
 			elemGroup
-				.append($('<div></div>').append(elemSelect))
+				.append($('<div class="multi-object-select-first" ng-show="!isLink || (isLink && !isReadonly())"></div>').append(elemSelect))
 				.append(elemSelects.append(elemItems));
 
 			return ViewService.compile(elemGroup)($scope);
@@ -663,7 +663,8 @@ ui.formInput('RefSelect', {
 		var name = scope.field.name,
 			selectionList = scope.field.selectionList,
 			related = scope.field.related || scope.field.name + "Id";
-		
+
+		scope.isLink = this.isLink;
 		scope.fieldsCache = {};
 
 		scope.refFireEvent = function (name) {
@@ -677,16 +678,26 @@ ui.formInput('RefSelect', {
 		setTimeout(function() {
 			element.append(elem);
 		});
-		
-		scope.$watch("record." + name, function (value, old) {
-			if (value === old || old === undefined) return;
-			if (scope.record) {
-				scope.record[related] = null;
-			}
+
+		setTimeout(function () {
+			var selectScope = element.find('[name="'+name+'"]').scope();
+			var setValue = selectScope.setValue;
+			selectScope.setValue = function (value) {
+				var old = scope.getValue();
+				if (old !== value) {
+					scope.record[related] = null;
+				}
+				setValue.apply(selectScope, arguments);
+			};
 		});
 	},
 	template_editable: null,
 	template_readonly: null
+});
+
+ui.formInput('RefLink', 'RefSelect', {
+	css: 'multi-object-select multi-object-link',
+	isLink: true
 });
 
 ui.formInput('RefItem', 'ManyToOne', {
@@ -726,6 +737,21 @@ ui.formInput('RefItem', 'ManyToOne', {
 			});
 
 			self._link(scope, element, attrs, model);
+			
+			if (scope.$parent.isLink) {
+				scope.onEdit = function () {
+					var value = scope.getValue() || {};
+					scope.openTab({
+						action: _.uniqueId('$act'),
+						model: scope._model,
+						viewType: "form",
+						views: [{ type: "form" }]
+					}, {
+						mode: "edit",
+						state: value.id
+					});
+				};
+			}
 		}
 
 		if (scope.fieldsCache[scope._model]) {

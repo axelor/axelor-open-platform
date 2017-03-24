@@ -110,6 +110,16 @@ header .navbar .nav-shortcuts .nav-link-mail sup {
 	top: 8px;
 }
 
+header .navbar .nav-shortcuts .nav-link-tasks .badge {
+    display: inline-block;
+    position: absolute;
+    padding: 5px 4px;
+    width: 11px;
+    height: 9px;
+    top: 1px;
+    right: -3px;
+}
+
 header .navbar .nav-link-user > img {
 	width: 20px;
 	height: 20px;
@@ -120,6 +130,8 @@ header .navbar .nav-link-user > img {
 header .navbar .nav-link-user-name,
 header .navbar .nav-link-user-sub {
 	display: block;
+	font-weight: 600;
+	opacity: .8;
 }
 header .navbar .nav-link-user-sub {
 	font-size: 10px;

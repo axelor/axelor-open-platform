@@ -116,18 +116,20 @@ String tenantId = (String) session.getAttribute("tenantId");
                 <a href="#/" class="nav-link-home"><i class="fa fa-home"></i></a>
               </li>
               <li class="divider-vertical"></li>
-              <li>
-                <a href="" class="nav-link-mail"
-                  ng-click="showMailBox()"><i class="fa fa-envelope"></i><sup
-                    ng-show="unreadCount=$unreadMailCount()">{{unreadCount}}</sup></a>
-              </li>
-              <li class="divider-vertical"></li>
               <li class="dropdown">
                 <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown">
                   <i class="fa fa-star"></i>
                 </a>
                 <ul class="dropdown-menu" nav-menu-fav></ul>
               </li>
+              <li class="divider-vertical"></li>
+              <li>
+                <a href="" class="nav-link-mail"
+                  ng-click="showMailBox()"><i class="fa fa-envelope"></i><sup
+                    ng-show="unreadCount=$unreadMailCount()">{{unreadCount}}</sup></a>
+              </li>
+              <li class="divider-vertical"></li>
+              <li nav-menu-tasks></li>
               <li class="divider-vertical"></li>
               <li class="dropdown">
                 <a href="javascript:" class="dropdown-toggle nav-link-user" data-toggle="dropdown">

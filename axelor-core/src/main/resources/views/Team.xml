@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
+
+  <selection name="team.task.status">
+    <option value="new">New</option>
+    <option value="in-progress">In Progress</option>
+    <option value="closed">Closed</option>
+    <option value="canceled">Canceled</option>
+  </selection>
+
+  <selection name="team.task.priority">
+    <option value="low">Low</option>
+    <option value="normal">Normal</option>
+    <option value="high">High</option>
+    <option value="urgent">Urgent</option>
+  </selection>
+
+  <selection name="team.task.links">
+    <option value="com.axelor.team.db.Team">Team</option>
+  </selection>
+
+  <grid name="team-grid" title="Teams" model="com.axelor.team.db.Team">
+    <field name="name" />
+  </grid>
+
+  <form name="team-form" title="Team" model="com.axelor.team.db.Team">
+    <panel title="Overview">
+      <field name="name" colSpan="12"/>
+      <field name="description" colSpan="12" />
+    </panel>
+    <panel-related field="members" form-view="user-form">
+      <field name="name" />
+    </panel-related>
+  </form>
+
+  <grid name="team-task-grid" title="Tasks" model="com.axelor.team.db.TeamTask">
+    <field name="name" />
+    <field name="team" />
+    <field name="taskDate" />
+    <field name="status" />
+    <field name="priority" />
+  </grid>
+
+  <form name="team-task-form" title="Task" model="com.axelor.team.db.TeamTask" onNew="team.task.on-new">
+    <panel title="Overview">
+      <field name="name"/>
+      <field name="team"/>
+      <field name="description" colSpan="12"/>
+      <field name="priority"/>
+      <field name="status"/>
+      <field name="taskDate"/>
+      <field name="taskDeadline"/>
+      <field name="taskDuration"/>
+      <field name="assignedTo" />
+      <field name="relatedModel"
+        title="Link"
+        colSpan="12"
+        widget="RefLink"
+        selection="team.task.links"
+        x-related="relatedId" />
+    </panel>
+    <panel-mail>
+      <mail-messages limit="4"/>
+      <mail-followers/>
+    </panel-mail>
+  </form>
+
+  <action-attrs name="team.task.on-new">
+    <attribute name="value" for="priority" expr="normal" />
+    <attribute name="value" for="status" expr="new" />
+    <attribute name="value" for="taskDate" expr="#{__date__}" />
+  </action-attrs>
+  
+  <action-view name="teams.all" model="com.axelor.team.db.Team" title="All Teams">
+    <view name="team-grid" type="grid" />
+    <view name="team-form" type="form" />
+  </action-view>
+
+  <action-view name="team.tasks.due" model="com.axelor.team.db.TeamTask" title="Tasks due">
+    <view name="team-task-grid" type="grid" />
+    <view name="team-task-form" type="form" />
+    <domain><![CDATA[
+      self.assignedTo = :__user__  AND self.status NOT IN :closed_status AND self.taskDeadline < current_date
+    ]]></domain>
+    <context name="closed_status" expr="#{['closed', 'canceled']}"/>
+  </action-view>
+
+  <action-view name="team.tasks.todo" model="com.axelor.team.db.TeamTask" title="Tasks todo">
+    <view name="team-task-grid" type="grid" />
+    <view name="team-task-form" type="form" />
+    <domain><![CDATA[
+      (self.assignedTo = :__user__ AND self.status NOT IN :closed_status) AND
+      ((year(self.taskDate) = year(current_date) AND
+        month(self.taskDate) = month(current_date) AND
+        day(self.taskDate) = day(current_date)) OR
+      (self.taskDate < current_date AND self.taskDeadline >= current_date))
+    ]]></domain>
+    <context name="closed_status" expr="#{['closed', 'canceled']}"/>
+  </action-view>
+  
+  <action-view name="team.tasks.open" model="com.axelor.team.db.TeamTask" title="My open tasks">
+    <view name="team-task-grid" type="grid" />
+    <view name="team-task-form" type="form" />
+    <domain>self.assignedTo = :__user__ AND self.status NOT IN :closed_status</domain>
+    <context name="closed_status" expr="#{['closed', 'canceled']}"/>
+  </action-view>
+  
+  <action-view name="team.tasks.assigned" model="com.axelor.team.db.TeamTask" title="Tasks assigned to me">
+    <view name="team-task-grid" type="grid" />
+    <view name="team-task-form" type="form" />
+    <domain>self.assignedTo = :__user__</domain>
+  </action-view>
+
+  <action-view name="team.tasks.created" model="com.axelor.team.db.TeamTask" title="Tasks created by me">
+    <view name="team-task-grid" type="grid" />
+    <view name="team-task-form" type="form" />
+    <domain>self.createdBy = :__user__ AND self.status NOT IN :closed_status</domain>
+    <context name="closed_status" expr="#{['closed', 'canceled']}"/>
+  </action-view>
+
+  <menuitem name="menu-team" order="-108" title="Teamwork" icon="fa-users" icon-background="blue"/>
+  <menuitem name="menu-team-tasks" title="Tasks" parent="menu-team" order="-80" />
+  <menuitem name="menu-team-teams" title="Teams" parent="menu-team" order="-70" />
+
+  <menuitem name="menu-team-tasks-due" title="Tasks due" parent="menu-team-tasks" action="team.tasks.due" order="-80" />
+  <menuitem name="menu-team-tasks-todo" title="Tasks todo" parent="menu-team-tasks" action="team.tasks.todo" order="-70" />
+  <menuitem name="menu-team-tasks-open" title="My open tasks" parent="menu-team-tasks" action="team.tasks.open" order="-60" />
+  <menuitem name="menu-team-tasks-assigned" title="Tasks assigned to me" parent="menu-team-tasks" action="team.tasks.assigned" order="-55" />
+  <menuitem name="menu-team-tasks-created" title="Tasks created by me" parent="menu-team-tasks" action="team.tasks.created" order="-50" />
+
+  <menuitem name="menu-team-teams-all" title="All Teams" parent="menu-team-teams" action="teams.all" />
+
+</object-views>

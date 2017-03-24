@@ -18,6 +18,7 @@
 package com.axelor.mail.web;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,26 +83,53 @@ public class MailController extends JpaSupport {
 			+ "((g.user.id = :uid AND g.isArchived = true))) "
 			+ "ORDER BY mm.createdOn DESC";
 
+	private static final String SQL_TASKS_DUE = ""
+			+ "SELECT tt FROM TeamTask tt "
+			+ "LEFT JOIN tt.assignedTo u "
+			+ "WHERE tt.status NOT IN :closed_status AND u.id = :uid AND tt.taskDeadline < current_date";
+
+	private static final String SQL_TASKS_TODO = ""
+			+ "SELECT tt FROM TeamTask tt "
+			+ "LEFT JOIN tt.assignedTo u "
+			+ "WHERE tt.status NOT IN :closed_status AND u.id = :uid AND "
+			+ "(("
+			+ "	year(tt.taskDate) = year(current_date) AND "
+			+ " month(tt.taskDate) = month(current_date) AND "
+			+ " day(tt.taskDate) = day(current_date)"
+			+ ") OR ("
+			+ " tt.taskDate < current_date AND tt.taskDeadline >= current_date"
+			+ ") OR ("
+			+ "	tt.taskDeadline < current_date"
+			+ "))";
+
 	@Inject
 	private MailMessageRepository messages;
 
+	public void countTasks(ActionRequest request, ActionResponse response) {
+		final Map<String, Object> value = new HashMap<>();
+		value.put("pending", countTasks(SQL_TASKS_DUE));
+		value.put("current", countTasks(SQL_TASKS_TODO));
+		response.setValue("tasks", value);
+		response.setStatus(Response.STATUS_SUCCESS);
+	}
+
 	public void countMail(ActionRequest request, ActionResponse response) {
 		final Map<String, Object> value = new HashMap<>();
-		value.put("total", count(SQL_INBOX));
-		value.put("unread", count(SQL_UNREAD));
+		value.put("total", countMessages(SQL_INBOX));
+		value.put("unread", countMessages(SQL_UNREAD));
 		response.setValue("mail", value);
 		response.setStatus(Response.STATUS_SUCCESS);
 	}
 
 	public void countUnread(ActionRequest request, ActionResponse response) {
-		response.setValue("unread", count(SQL_UNREAD));
+		response.setValue("unread", countMessages(SQL_UNREAD));
 		response.setStatus(Response.STATUS_SUCCESS);
 	}
 
 	public void unread(ActionRequest request, ActionResponse response) {
 
 		final List<Object> all = find(SQL_UNREAD, request.getOffset(), request.getLimit());
-		final Long total = count(SQL_UNREAD);
+		final Long total = countMessages(SQL_UNREAD);
 
 		response.setData(all);
 		response.setOffset(request.getOffset());
@@ -111,7 +139,7 @@ public class MailController extends JpaSupport {
 	public void inbox(ActionRequest request, ActionResponse response) {
 
 		final List<Object> all = find(SQL_INBOX, request.getOffset(), request.getLimit());
-		final Long total = count(SQL_INBOX);
+		final Long total = countMessages(SQL_INBOX);
 
 		response.setData(all);
 		response.setOffset(request.getOffset());
@@ -121,7 +149,7 @@ public class MailController extends JpaSupport {
 	public void important(ActionRequest request, ActionResponse response) {
 
 		final List<Object> all = find(SQL_IMPORTANT, request.getOffset(), request.getLimit());
-		final Long total = count(SQL_IMPORTANT);
+		final Long total = countMessages(SQL_IMPORTANT);
 
 		response.setData(all);
 		response.setOffset(request.getOffset());
@@ -131,7 +159,7 @@ public class MailController extends JpaSupport {
 	public void archived(ActionRequest request, ActionResponse response) {
 
 		final List<Object> all = find(SQL_ARCHIVE, request.getOffset(), request.getLimit());
-		final Long total = count(SQL_ARCHIVE);
+		final Long total = countMessages(SQL_ARCHIVE);
 
 		response.setData(all);
 		response.setOffset(request.getOffset());
@@ -228,8 +256,8 @@ public class MailController extends JpaSupport {
 	}
 
 	public String inboxMenuTag() {
-		Long total = count(SQL_INBOX);
-		Long unread = count(SQL_UNREAD);
+		Long total = countMessages(SQL_INBOX);
+		Long unread = countMessages(SQL_UNREAD);
 		if (total == null) {
 			return null;
 		}
@@ -252,7 +280,23 @@ public class MailController extends JpaSupport {
 		return all;
 	}
 
-	private Long count(String queryString) {
+	private Long countTasks(String queryString) {
+
+		final String countString = queryString
+				.replace("SELECT tt FROM TeamTask tt", "SELECT COUNT(tt.id) FROM TeamTask tt");
+
+		final TypedQuery<Long> query = getEntityManager().createQuery(countString, Long.class);
+
+		query.setParameter("uid", AuthUtils.getUser().getId());
+		query.setParameter("closed_status", Arrays.asList("closed", "canceled"));
+		try {
+			return query.getSingleResult();
+		} catch (Exception e) {
+		}
+		return 0L;
+	}
+
+	private Long countMessages(String queryString) {
 
 		final String countString = queryString
 				.replace("SELECT mm FROM MailMessage mm", "SELECT COUNT(mm.id) FROM MailMessage mm")

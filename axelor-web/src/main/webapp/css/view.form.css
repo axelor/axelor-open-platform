@@ -1059,10 +1059,6 @@ label.has-help > span:after {
 	margin-right: 8px;
 }
 
-.multi-object-select {
-	
-}
-
 .multi-object-select fieldset,
 .multi-object-select td {
 	padding: 0 !important;
@@ -1070,6 +1066,10 @@ label.has-help > span:after {
 
 .multi-object-select td.select-item {
 	padding-right: 4px !important;
+}
+
+.multi-object-link.readonly .form-layout td[style*='150'] {
+    display: none;
 }
 
 .select-item .picker-input > .picker-icons > .fa.fa-pencil {
