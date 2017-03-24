@@ -12,6 +12,16 @@ configurations {
 	runtime.exclude module: 'jsr305'
 }
 
+task updateVersion() {
+	def versionFile = file("${projectDir}/src/main/resources/axelor-version.txt")
+	onlyIf { versionFile.text.trim() != project.version }
+	doLast { versionFile.text = project.version + "\n" }
+}
+
+afterEvaluate {
+	tasks.withType(JavaCompile)*.dependsOn updateVersion
+}
+
 jar {
 	manifest {
 		attributes('Implementation-Title': project.name,
