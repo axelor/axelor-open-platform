@@ -19,14 +19,12 @@ package com.axelor.tools.x2j;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.jar.JarFile;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +45,9 @@ public class Generator {
 
 	private File outputPath;
 
-	private final Multimap<String, Entity> lookup = LinkedHashMultimap.create();
+	private final Set<String> defines = new HashSet<>();
+	private final List<Generator> lookup = new ArrayList<>();
+
 	private final Multimap<String, Entity> entities = LinkedHashMultimap.create();
 
 	public Generator(File domainPath, File outputPath) {
@@ -76,8 +76,15 @@ public class Generator {
 		final String name = first.getName();
 
 		// prepend all lookup entities
-		if (doLookup && lookup.get(name) != null) {
-			all.addAll(0, lookup.get(name));
+		if (doLookup) {
+			for (Generator gen : lookup) {
+				if (gen.defines.contains(name)) {
+					if (gen.entities.isEmpty()) {
+						gen.processAll(false);
+					}
+					all.addAll(0, gen.entities.get(name));
+				}
+			}
 		}
 		
 		// check that all entities have same namespace
@@ -95,18 +102,6 @@ public class Generator {
 		final File entityFile = this.file(outputPath, entity.getFile());
 		final File repoFile = repository == null ? null : this.file(outputPath, repository.getFile());
 
-		long lastModified = entity.getLastModified();
-		
-		for (Entity it : all) {
-			if (lastModified < it.getLastModified()) {
-				lastModified = it.getLastModified();
-			}
-		}
-		
-		if (lastModified < entityFile.lastModified()) {
-			return;
-		}
-		
 		for (Entity it : all) {
 			entity.merge(it);
 		}
@@ -139,7 +134,20 @@ public class Generator {
 		Files.write(Utils.stringTrailing(repo), repoFile, Charsets.UTF_8);
 	}
 
-	private void process(File input, boolean verbose) throws IOException {
+	protected void findFrom(File input) throws IOException {
+		defines.addAll(XmlHelper.findEntityNames(input));
+	}
+
+	protected void findAll() throws IOException {
+		if (!domainPath.exists()) return;
+		for (File file : domainPath.listFiles()) {
+			if (file.getName().endsWith(".xml")) {
+				findFrom(file);
+			}
+		}
+	}
+
+	protected void process(File input, boolean verbose) throws IOException {
 		
 		if (verbose) {
 			log.info("Processing: " + input);
@@ -151,17 +159,12 @@ public class Generator {
 			entities.put(entity.getName(), entity);
 		}
 	}
-	
-	private void process(URL input, boolean verbose) throws IOException {
-		
-		if (verbose) {
-			log.info("Processing: " + input);
-		}
 
-		try (final InputStream stream = input.openStream()) {
-			final List<Entity> all = XmlHelper.entities(stream);
-			for (Entity entity : all) {
-				entities.put(entity.getName(), entity);
+	protected void processAll(boolean verbose) throws IOException {
+		if (!domainPath.exists()) return;
+		for (File file : domainPath.listFiles()) {
+			if (file.getName().endsWith(".xml")) {
+				process(file, verbose);
 			}
 		}
 	}
@@ -174,22 +177,13 @@ public class Generator {
 		}
 		file.delete();
 	}
-
-	private void processAll(boolean verbose) throws IOException {
-		if (!domainPath.exists()) return;
-		for (File file : domainPath.listFiles()) {
-			if (file.getName().endsWith(".xml")) {
-				process(file, verbose);
-			}
-		}
-	}
 	
 	public void addLookupSource(Generator generator) throws IOException {
 		if (generator == null) return;
-		if (generator.entities.isEmpty()) {
-			generator.processAll(false);
+		if (generator.defines.isEmpty()) {
+			generator.findAll();
 		}
-		lookup.putAll(generator.entities);
+		lookup.add(0, generator);
 	}
 	
 	public void clean() {
@@ -225,14 +219,24 @@ public class Generator {
 		}
 
 		// make sure to generate extended entities from parent modules
-		for (String name : lookup.keySet()) {
-			if (entities.containsKey(name)) {
-				continue;
+		final Multimap<String, Entity> extended = LinkedHashMultimap.create();
+		for (Generator generator : lookup) {
+			for (String name : generator.defines) {
+				if (entities.containsKey(name)) {
+					continue;
+				}
+				if (generator.entities.isEmpty()) {
+					generator.processAll(false);
+				}
+				extended.putAll(name, generator.entities.get(name));
 			}
-			final Collection<Entity> all = lookup.get(name);
+		}
+		for (String name : extended.keySet()) {
+			final List<Entity> all = new ArrayList<>(extended.get(name));
 			if (all == null || all.size() < 2) {
 				continue;
 			}
+			Collections.reverse(all);
 			expand(all, false);
 		}
 	}
@@ -246,7 +250,7 @@ public class Generator {
 	 *            input files
 	 * @return a {@link Generator} instance
 	 */
-	public static Generator forFiles(Collection<File> files) {
+	public static Generator forFiles(final Collection<File> files) {
 		if (files == null || files.isEmpty()) {
 			return null;
 		}
@@ -260,46 +264,20 @@ public class Generator {
 
 			@Override
 			public void addLookupSource(Generator generator) throws IOException {}
+			
+			@Override
+			protected void processAll(boolean verbose) throws IOException {
+				for (File file : files) {
+					process(file, verbose);
+				}
+			}
 		};
 		for (File file : files) {
 			try {
-				gen.process(file, false);
+				gen.findFrom(file);
 			} catch (IOException e) {
 			}
 		}
 		return gen;
-	}
-
-	public static Generator forJar(File jarFile) throws IOException {
-		try (final JarFile jar = new JarFile(jarFile)) {
-
-			if (jar.getEntry("module.properties") == null) {
-				return null;
-			}
-			
-			final List<URI> files = jar.stream()
-					.filter(it -> it.getName().matches("^domains\\/.*\\.xml"))
-					.map(it -> String.format("jar:file:%s!/%s", jar.getName(), it.getName()))
-					.map(URI::create)
-					.collect(Collectors.toList());
-			if (files.isEmpty()) {
-				return null;
-			}
-			final Generator gen = new Generator(null, null) {
-
-				@Override
-				public void start() throws IOException {}
-
-				@Override
-				public void clean() {}
-
-				@Override
-				public void addLookupSource(Generator generator) throws IOException {}
-			};
-			for (URI file : files) {
-				gen.process(file.toURL(), false);
-			}
-			return gen;
-		}
 	}
 }

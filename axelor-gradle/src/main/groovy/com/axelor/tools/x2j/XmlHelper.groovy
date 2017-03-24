@@ -28,22 +28,21 @@ class XmlHelper {
 	 * @param input the input file
 	 * @return list of entity mapping
 	 */
-	public static  List<Entity> entities(File input) {
+	public static List<Entity> entities(File input) {
 		return new XmlSlurper().parse(input).'entity'.collect {
 			return new Entity(it)
 		}
 	}
 
 	/**
-	 * Parse the given input xml and return {@link Entity} mapping
-	 * to each entity elements.
+	 * Parse the given input xml and return entity names defined in the file.
 	 *
-	 * @param input the input data
-	 * @return list of entity mapping
+	 * @param input the input file
+	 * @return list of entity names
 	 */
-	public static  List<Entity> entities(InputStream input) {
+	public static Set<String> findEntityNames(File input) {
 		return new XmlSlurper().parse(input).'entity'.collect {
-			return new Entity(it)
+			return (String) it.@name
 		}
 	}
 }

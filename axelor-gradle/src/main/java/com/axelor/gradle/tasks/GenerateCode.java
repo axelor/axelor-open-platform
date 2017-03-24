@@ -23,8 +23,10 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
@@ -33,9 +35,10 @@ import org.gradle.api.artifacts.ResolvedArtifact;
 import org.gradle.api.artifacts.ResolvedDependency;
 import org.gradle.api.artifacts.component.ComponentIdentifier;
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier;
-import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.util.PatternSet;
 
 import com.axelor.gradle.AxelorExtension;
 import com.axelor.gradle.AxelorPlugin;
@@ -52,8 +55,14 @@ public class GenerateCode extends DefaultTask {
 
 	private static final String DIR_OUTPUT = "src-gen";
 	private static final String DIR_SOURCE = "src/main/resources/domains";
+	
+	private List<ResolvedArtifact> artifacts;
 
-	public GenerateCode() {
+	private List<ResolvedArtifact> artifacts() {
+		if (artifacts == null) {
+			artifacts = findArtifacts(getProject().getConfigurations().getByName("compile"));
+		}
+		return artifacts;
 	}
 
 	public static File getInputDirectory(Project project) {
@@ -64,7 +73,16 @@ public class GenerateCode extends DefaultTask {
 		return new File(project.getBuildDir(), DIR_OUTPUT);
 	}
 
-	@Input
+	@InputFiles
+	public List<File> getLookupFiles() {
+		return artifacts().stream()
+			.map(artifact -> findProject(artifact))
+			.filter(Objects::nonNull)
+			.map(sub -> getOutputDirectory(sub))
+			.collect(Collectors.toList());
+	}
+
+	@InputFiles
 	public File getInputDirectory() {
 		return getInputDirectory(getProject());
 	}
@@ -191,11 +209,8 @@ public class GenerateCode extends DefaultTask {
 			return;
 		}
 
-		final Configuration config = project.getConfigurations().getByName("compile");
-		final List<ResolvedArtifact> result = findArtifacts(config);
-
 		// generate module info
-		generateInfo(extension, result);
+		generateInfo(extension, artifacts());
 
 		// copy module.properties
 		project.copy(copy -> {
@@ -207,12 +222,14 @@ public class GenerateCode extends DefaultTask {
 		final Generator generator = buildGenerator(project);
 
 		// add lookup generators
-		for (ResolvedArtifact artifact : result) {
+		for (ResolvedArtifact artifact : artifacts()) {
 			final Project sub = findProject(artifact);
-			final Generator lookup = sub == null
-					? Generator.forJar(artifact.getFile())
-					: buildGenerator(sub);
-			generator.addLookupSource(lookup);
+			if (sub == null) {
+				generator.addLookupSource(Generator.forFiles(project.zipTree(artifact.getFile())
+						.matching(new PatternSet().include("**/domains/**")).getFiles()));
+			} else {
+				generator.addLookupSource(buildGenerator(sub));
+			}
 		}
 
 		generator.start();
