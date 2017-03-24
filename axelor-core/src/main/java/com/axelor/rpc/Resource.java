@@ -971,10 +971,11 @@ public class Resource<T extends Model> {
 
 		if (property == null && selectName == null) {
 			property = mapper.getNameField();
-			if (property != null) {
-				selectName = "self." + property.getName();
-				name = property.getName();
-			}
+		}
+
+		if (property != null && selectName == null) {
+			selectName = "self." + property.getName();
+			name = property.getName();
 		}
 
 		if (selectName != null) {
