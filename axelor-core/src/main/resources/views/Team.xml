@@ -126,7 +126,8 @@
       ((year(self.taskDate) = year(current_date) AND
         month(self.taskDate) = month(current_date) AND
         day(self.taskDate) = day(current_date)) OR
-      (self.taskDate < current_date AND self.taskDeadline >= current_date))
+      (self.taskDate < current_date AND self.taskDeadline >= current_date) OR
+      (self.taskDeadline < current_date))
     ]]></domain>
     <context name="closed_status" expr="#{['closed', 'canceled']}"/>
   </action-view>
