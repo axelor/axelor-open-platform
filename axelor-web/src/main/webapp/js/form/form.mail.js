@@ -1050,14 +1050,14 @@ ui.formWidget('PanelMail', {
 	template: "<div class='form-mail row-fluid' ng-show='record.id > 0 || folder' ui-transclude></div>"
 });
 
-ui.controller("MailGroupListCtrl", MailGroupListCtrl);
-MailGroupListCtrl.$inject = ['$scope', '$element'];
-function MailGroupListCtrl($scope, $element) {
+ui.controller("TeamListCtrl", TeamListCtrl);
+TeamListCtrl.$inject = ['$scope', '$element'];
+function TeamListCtrl($scope, $element) {
 	ui.GridViewCtrl.call(this, $scope, $element);
 
 	$scope.getUrl = function (record) {
 		if (!record || !record.id) return null;
-		return "ws/rest/com.axelor.mail.db.MailGroup/" + record.id + "/image/download?image=true&v=" + record.version;
+		return "ws/rest/com.axelor.team.db.Team/" + record.id + "/image/download?image=true&v=" + record.version;
 	};
 
 	$scope.onEdit = function(record) {

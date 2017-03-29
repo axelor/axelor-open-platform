@@ -38,6 +38,7 @@ import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
+import com.axelor.team.web.TaskController;
 import com.google.inject.servlet.RequestScoped;
 
 @RequestScoped
@@ -48,6 +49,9 @@ public class ActionService extends AbstractService {
 
 	@Inject
 	private MetaService service;
+
+	@Inject
+	private TaskController teamController;
 
 	@Inject
 	private MailController mailController;
@@ -83,7 +87,7 @@ public class ActionService extends AbstractService {
 			response.setValue("tags", tags);
 			response.setStatus(Response.STATUS_SUCCESS);
 			mailController.countMail(null, response);
-			mailController.countTasks(null, response);
+			teamController.countTasks(null, response);
 		} catch (Exception e) {
 			if (LOG.isErrorEnabled())
 				LOG.error(e.getMessage(), e);

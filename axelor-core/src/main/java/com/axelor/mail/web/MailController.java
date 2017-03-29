@@ -18,7 +18,6 @@
 package com.axelor.mail.web;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,16 +31,16 @@ import com.axelor.db.JpaSupport;
 import com.axelor.db.Model;
 import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailFlags;
-import com.axelor.mail.db.MailGroup;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.db.repo.MailFlagsRepository;
 import com.axelor.mail.db.repo.MailFollowerRepository;
-import com.axelor.mail.db.repo.MailGroupRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.Response;
+import com.axelor.team.db.Team;
+import com.axelor.team.db.repo.TeamRepository;
 
 public class MailController extends JpaSupport {
 	
@@ -56,8 +55,8 @@ public class MailController extends JpaSupport {
 	private static final String SQL_SUBSCRIBERS = ""
 			+ "SELECT DISTINCT(u) FROM User u LEFT JOIN u.group g WHERE "
 			+ "(u.id NOT IN (SELECT fu.id FROM MailFollower f LEFT JOIN f.user fu WHERE f.relatedId = :id AND f.relatedModel = :model)) AND "
-			+ "((u.id IN (SELECT mu.id FROM MailGroup m LEFT JOIN m.users mu WHERE m.id = :id)) OR "
-			+ "	(g.id IN (SELECT mg.id FROM MailGroup m LEFT JOIN m.groups mg WHERE m.id = :id)))";
+			+ "((u.id IN (SELECT mu.id FROM Team m LEFT JOIN m.users mu WHERE m.id = :id)) OR "
+			+ "	(g.id IN (SELECT mg.id FROM Team m LEFT JOIN m.groups mg WHERE m.id = :id)))";
 
 	private static final String SQL_INBOX = ""
 			+ "SELECT mm FROM MailMessage mm WHERE mm.id IN (SELECT DISTINCT(m.id) FROM MailMessage m LEFT JOIN m.flags g "
@@ -83,35 +82,8 @@ public class MailController extends JpaSupport {
 			+ "((g.user.id = :uid AND g.isArchived = true))) "
 			+ "ORDER BY mm.createdOn DESC";
 
-	private static final String SQL_TASKS_DUE = ""
-			+ "SELECT tt FROM TeamTask tt "
-			+ "LEFT JOIN tt.assignedTo u "
-			+ "WHERE tt.status NOT IN :closed_status AND u.id = :uid AND tt.taskDeadline < current_date";
-
-	private static final String SQL_TASKS_TODO = ""
-			+ "SELECT tt FROM TeamTask tt "
-			+ "LEFT JOIN tt.assignedTo u "
-			+ "WHERE tt.status NOT IN :closed_status AND u.id = :uid AND "
-			+ "(("
-			+ "	year(tt.taskDate) = year(current_date) AND "
-			+ " month(tt.taskDate) = month(current_date) AND "
-			+ " day(tt.taskDate) = day(current_date)"
-			+ ") OR ("
-			+ " tt.taskDate < current_date AND tt.taskDeadline >= current_date"
-			+ ") OR ("
-			+ "	tt.taskDeadline < current_date"
-			+ "))";
-
 	@Inject
 	private MailMessageRepository messages;
-
-	public void countTasks(ActionRequest request, ActionResponse response) {
-		final Map<String, Object> value = new HashMap<>();
-		value.put("pending", countTasks(SQL_TASKS_DUE));
-		value.put("current", countTasks(SQL_TASKS_TODO));
-		response.setValue("tasks", value);
-		response.setStatus(Response.STATUS_SUCCESS);
-	}
 
 	public void countMail(ActionRequest request, ActionResponse response) {
 		final Map<String, Object> value = new HashMap<>();
@@ -211,19 +183,19 @@ public class MailController extends JpaSupport {
 	public void autoSubscribe(ActionRequest request, ActionResponse response) {
 
 		final MailFollowerRepository followers = Beans.get(MailFollowerRepository.class);
-		final MailGroupRepository groups = Beans.get(MailGroupRepository.class);
-		final MailGroup group = request.getContext().asType(MailGroup.class);
+		final TeamRepository teams = Beans.get(TeamRepository.class);
+		final Team team = request.getContext().asType(Team.class);
 
-		if (group == null || group.getId() == null) {
+		if (team == null || team.getId() == null) {
 			return;
 		}
 
 		final TypedQuery<User> query = getEntityManager().createQuery(SQL_SUBSCRIBERS, User.class);
-		query.setParameter("id", group.getId());
-		query.setParameter("model", MailGroup.class.getName());
+		query.setParameter("id", team.getId());
+		query.setParameter("model", Team.class.getName());
 
 		final List<User> users = query.getResultList();
-		final MailGroup entity = groups.find(group.getId());
+		final Team entity = teams.find(team.getId());
 		for (User user : users) {
 			followers.follow(entity, user);
 		}
@@ -278,22 +250,6 @@ public class MailController extends JpaSupport {
 			all.addAll(findChildren(msg));
 		}
 		return all;
-	}
-
-	private Long countTasks(String queryString) {
-
-		final String countString = queryString
-				.replace("SELECT tt FROM TeamTask tt", "SELECT COUNT(tt.id) FROM TeamTask tt");
-
-		final TypedQuery<Long> query = getEntityManager().createQuery(countString, Long.class);
-
-		query.setParameter("uid", AuthUtils.getUser().getId());
-		query.setParameter("closed_status", Arrays.asList("closed", "canceled"));
-		try {
-			return query.getSingleResult();
-		} catch (Exception e) {
-		}
-		return 0L;
 	}
 
 	private Long countMessages(String queryString) {

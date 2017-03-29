@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.mail.db.repo;
+package com.axelor.team.db.repo;
 
 import java.util.Map;
 
@@ -23,15 +23,16 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.db.JpaRepository;
 import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailFollower;
-import com.axelor.mail.db.MailGroup;
+import com.axelor.mail.db.repo.MailFollowerRepository;
+import com.axelor.team.db.Team;
 
-public class MailGroupRepository extends JpaRepository<MailGroup> {
+public class TeamRepository extends JpaRepository<Team> {
 
-	public MailGroupRepository() {
-		super(MailGroup.class);
+	public TeamRepository() {
+		super(Team.class);
 	}
 
-	public MailGroup findByName(String name) {
+	public Team findByName(String name) {
 		return all().filter("self.name = :name")
 				.bind("name", name)
 				.fetchOne();
@@ -43,7 +44,7 @@ public class MailGroupRepository extends JpaRepository<MailGroup> {
 			return json;
 		}
 
-		final MailGroup entity = find((Long) json.get("id"));
+		final Team entity = find((Long) json.get("id"));
 		if (entity == null) {
 			return json;
 		}

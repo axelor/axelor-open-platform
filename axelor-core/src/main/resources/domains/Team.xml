@@ -5,11 +5,12 @@
 
   <module name="team" package="com.axelor.team.db" />
 
-  <entity name="Team" table="TEAM_TEAM">
+  <entity name="Team" table="TEAM_TEAM" repository="none">
     <string name="name" required="true" unique="true" />
-    <string name="description" multiline="true" />
-    <many-to-many name="members" ref="com.axelor.auth.db.User" />
-    <one-to-many name="tasks" ref="TeamTask" mappedBy="team" />
+    <string name="description" large="true" />
+    <binary name="image" title="Photo" />
+    <many-to-many name="groups" ref="com.axelor.auth.db.Group" title="Authorized groups" />
+    <many-to-many name="users" ref="com.axelor.auth.db.User" title="Authorized users" />
   </entity>
 
   <entity name="TeamTask" table="TEAM_TASK">
@@ -27,7 +28,7 @@
     <long name="relatedId" />
     <many-to-one name="assignedTo" ref="com.axelor.auth.db.User" />
 
-    <track subscribe="true">
+    <track subscribe="false">
       <field name="name" />
       <field name="status" />
       <field name="priority" />

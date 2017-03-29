@@ -72,17 +72,4 @@
     <many-to-one name="email" ref="MailAddress" />
   </entity>
 
-  <entity name="MailGroup" table="MAIL_GROUP" cachable="true" repository="none">
-    <![CDATA[
-    The model to define mail groups to share message in discussion groups.
-    ]]>
-    <string name="name" unique="true" namecolumn="true" />
-    <string name="description" multiline="true" />
-    <binary name="image" title="Photo" />
-    <many-to-many name="groups" ref="com.axelor.auth.db.Group"
-      title="Authorized groups" />
-    <many-to-many name="users" ref="com.axelor.auth.db.User"
-      title="Authorized users" />
-  </entity>
-
 </domain-models>

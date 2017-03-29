@@ -30,7 +30,6 @@ import com.axelor.db.Model;
 import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailAddress;
 import com.axelor.mail.db.MailFollower;
-import com.axelor.mail.db.MailGroup;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.service.MailService;
 import com.axelor.meta.db.MetaAction;
@@ -38,6 +37,7 @@ import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.repo.MetaActionRepository;
 import com.axelor.meta.db.repo.MetaMenuRepository;
 import com.axelor.rpc.Resource;
+import com.axelor.team.db.Team;
 import com.google.inject.persist.Transactional;
 
 public class MailFollowerRepository extends JpaRepository<MailFollower> {
@@ -163,17 +163,17 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 		return all;
 	}
 
-	private void createOrDeleteMenu(MailGroup entity,  boolean delete) {
+	private void createOrDeleteMenu(Team entity,  boolean delete) {
 		final MetaActionRepository actionRepo = Beans.get(MetaActionRepository.class);
 		final MetaMenuRepository menuRepo = Beans.get(MetaMenuRepository.class);
-		final MetaMenu parent = menuRepo.findByName("menu-mail-groups");
+		final MetaMenu parent = menuRepo.findByName("menu-team-teams");
 
 		if (parent == null) {
 			return;
 		}
 
-		final String name = "menu-mail-groups-" + entity.getId();
-		final String actionName = "mail.groups." + entity.getId();
+		final String name = "menu-team-teams-" + entity.getId();
+		final String actionName = "team." + entity.getId();
 
 		MetaMenu menu = menuRepo.all().filter("self.name = ? AND self.user = ?", name, AuthUtils.getUser()).fetchOne();
 		MetaAction action = actionRepo.findByName(actionName);
@@ -194,11 +194,11 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 		if (action == null) {
 			action = new MetaAction(actionName);
 			action.setType("action-view");
-			action.setModel(MailGroup.class.getName());
+			action.setModel(Team.class.getName());
 			action.setXml(""
-					+ "<action-view title='"+ entity.getName() + "' name='" + actionName + "' model='"+ MailGroup.class.getName() +"'>\n"
+					+ "<action-view title='"+ entity.getName() + "' name='" + actionName + "' model='"+ Team.class.getName() +"'>\n"
 					+ "  <view type='form'/>\n"
-					+ "  <view-param name='ui-template:form' value='mail-group-form'/>\n"
+					+ "  <view-param name='ui-template:form' value='team-form'/>\n"
 					+ "  <context name='_showRecord' expr='eval: "+ entity.getId() +"'/>\n"
 					+ "</action-view>");
 		}
@@ -207,8 +207,6 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 			menu = new MetaMenu();
 			menu.setName(name);
 			menu.setTitle(entity.getName());
-			menu.setIcon("fa-group");
-			menu.setOrder(-50);
 			menu.setParent(parent);
 			menu.setAction(action);
 			menu.setUser(AuthUtils.getUser());
@@ -235,8 +233,8 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 		follower.setUser(user);
 
 		// create menu
-		if (entity instanceof MailGroup) {
-			createOrDeleteMenu((MailGroup) entity, false);
+		if (entity instanceof Team) {
+			createOrDeleteMenu((Team) entity, false);
 		}
 
 		save(follower);
@@ -278,8 +276,8 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 		}
 
 		// remove menu
-		if (entity instanceof MailGroup) {
-			createOrDeleteMenu((MailGroup) entity, true);
+		if (entity instanceof Team) {
+			createOrDeleteMenu((Team) entity, true);
 		}
 	}
 
