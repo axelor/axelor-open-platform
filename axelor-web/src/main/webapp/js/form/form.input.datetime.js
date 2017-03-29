@@ -381,7 +381,7 @@ ui.formInput('DateTime', {
 				val = moment(value),
 				valid = true;
 
-			if (value && !input.mask("valid")) {
+			if (value && input.val() && !input.mask("valid")) {
 				return false;
 			}
 
