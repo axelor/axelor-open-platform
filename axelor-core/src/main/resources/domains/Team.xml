@@ -9,8 +9,8 @@
     <string name="name" required="true" unique="true" />
     <string name="description" large="true" />
     <binary name="image" title="Photo" />
-    <many-to-many name="groups" ref="com.axelor.auth.db.Group" title="Authorized groups" />
-    <many-to-many name="users" ref="com.axelor.auth.db.User" title="Authorized users" />
+    <many-to-many name="roles" ref="com.axelor.auth.db.Role" title="Authorized roles" />
+    <many-to-many name="members" ref="com.axelor.auth.db.User" />
   </entity>
 
   <entity name="TeamTask" table="TEAM_TASK">

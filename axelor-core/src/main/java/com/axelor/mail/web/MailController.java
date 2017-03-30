@@ -53,10 +53,15 @@ public class MailController extends JpaSupport {
 			+ "ORDER BY mm.createdOn DESC";
 
 	private static final String SQL_SUBSCRIBERS = ""
-			+ "SELECT DISTINCT(u) FROM User u LEFT JOIN u.group g WHERE "
+			+ "SELECT DISTINCT(u) FROM User u "
+			+ "LEFT JOIN u.group g "
+			+ "LEFT JOIN u.roles r "
+			+ "LEFT JOIN g.roles gr "
+			+ "WHERE "
 			+ "(u.id NOT IN (SELECT fu.id FROM MailFollower f LEFT JOIN f.user fu WHERE f.relatedId = :id AND f.relatedModel = :model)) AND "
-			+ "((u.id IN (SELECT mu.id FROM Team m LEFT JOIN m.users mu WHERE m.id = :id)) OR "
-			+ "	(g.id IN (SELECT mg.id FROM Team m LEFT JOIN m.groups mg WHERE m.id = :id)))";
+			+ "((u.id IN (SELECT mu.id FROM Team m LEFT JOIN m.members mu WHERE m.id = :id)) OR "
+			+ "	(r.id IN (SELECT mr.id FROM Team m LEFT JOIN m.roles mr WHERE m.id = :id)) OR "
+			+ " (gr.id IN (SELECT mr.id FROM Team m LEFT JOIN m.roles mr WHERE m.id = :id)))";
 
 	private static final String SQL_INBOX = ""
 			+ "SELECT mm FROM MailMessage mm WHERE mm.id IN (SELECT DISTINCT(m.id) FROM MailMessage m LEFT JOIN m.flags g "

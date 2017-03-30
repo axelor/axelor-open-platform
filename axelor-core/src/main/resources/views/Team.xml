@@ -56,8 +56,8 @@
       <panel colSpan="9" itemSpan="12">
         <field name="name"/>
         <field name="description" showTitle="false" height="4"/>
-        <field name="groups" widget="TagSelect"/>
-        <field name="users" widget="TagSelect"/>
+        <field name="roles" widget="TagSelect" colSpan="12"/>
+        <field name="members" widget="TagSelect" colSpan="12"/>
       </panel>
     </panel>
     <panel-mail>
