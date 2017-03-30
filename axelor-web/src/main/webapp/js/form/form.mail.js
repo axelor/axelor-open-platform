@@ -411,7 +411,7 @@ ui.formWidget('uiMailMessages', {
 
 				$scope.waitForActions(function () {
 					if (folder) {
-						$scope.record.__empty = count === 0;
+						$scope.record.__empty = !count;
 						updateReadCount(found);
 					}
 				}, 100);
