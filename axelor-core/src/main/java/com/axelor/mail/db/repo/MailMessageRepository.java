@@ -135,12 +135,9 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 	public MailMessage save(MailMessage entity) {
 		if (entity.getParent() == null && entity.getRelatedId() != null) {
 			MailMessage parent = all()
-				.filter("self.parent is null AND "
-						+ "self.type = :type AND "
-						+ "self.relatedId = :id AND self.relatedModel = :model")
+				.filter("self.parent is null AND self.relatedId = :id AND self.relatedModel = :model")
 				.bind("id", entity.getRelatedId())
 				.bind("model", entity.getRelatedModel())
-				.bind("type", MailConstants.MESSAGE_TYPE_NOTIFICATION)
 				.order("id")
 				.cacheable()
 				.autoFlush(false)
