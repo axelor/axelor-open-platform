@@ -34,21 +34,16 @@ public class TaskController extends JpaSupport {
 	private static final String SQL_TASKS_DUE = ""
 			+ "SELECT tt FROM TeamTask tt "
 			+ "LEFT JOIN tt.assignedTo u "
-			+ "WHERE tt.status NOT IN :closed_status AND u.id = :uid AND tt.taskDeadline < current_date";
+			+ "WHERE "
+			+ "	(tt.status NOT IN :closed_status AND u.id = :uid) AND "
+			+ " (tt.taskDeadline <= current_date)";
 
 	private static final String SQL_TASKS_TODO = ""
 			+ "SELECT tt FROM TeamTask tt "
 			+ "LEFT JOIN tt.assignedTo u "
-			+ "WHERE tt.status NOT IN :closed_status AND u.id = :uid AND "
-			+ "(("
-			+ "	year(tt.taskDate) = year(current_date) AND "
-			+ " month(tt.taskDate) = month(current_date) AND "
-			+ " day(tt.taskDate) = day(current_date)"
-			+ ") OR ("
-			+ " tt.taskDate < current_date AND tt.taskDeadline >= current_date"
-			+ ") OR ("
-			+ "	tt.taskDeadline < current_date"
-			+ "))";
+			+ "WHERE "
+			+ "	(tt.status NOT IN :closed_status AND u.id = :uid) AND "
+			+ "	(tt.taskDeadline <= current_date OR tt.taskDate <= current_date)";
 
 	public void countTasks(ActionRequest request, ActionResponse response) {
 		final Map<String, Object> value = new HashMap<>();
