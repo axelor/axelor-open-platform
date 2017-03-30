@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.db.EntityHelper;
+import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
@@ -79,18 +80,28 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		super(MailMessage.class);
 	}
 
-	public List<MailMessage> findRelated(Model entity, int limit, int offset) {
+	public List<MailMessage> findAll(Model related, int limit, int offset) {
 		return all().filter("self.relatedModel = ? AND self.relatedId = ?",
-				EntityHelper.getEntityClass(entity).getName(),
-				entity.getId())
+				EntityHelper.getEntityClass(related).getName(),
+				related.getId())
 				.order("-createdOn")
 				.fetch(limit, offset);
 	}
 
-	public long countRelated(Model entity) {
+	public long count(Model related) {
 		return all().filter("self.relatedModel = ? AND self.relatedId = ?",
-				EntityHelper.getEntityClass(entity).getName(),
-				entity.getId()).count();
+				EntityHelper.getEntityClass(related).getName(),
+				related.getId()).count();
+	}
+	
+	public Model findRelated(MailMessage message) {
+		if (message.getRelatedId() == null) return null;
+		try {
+			Class<?> klass = Class.forName(message.getRelatedModel());
+			return (Model) JPA.em().find(klass, message.getRelatedId());
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	@Override

@@ -151,8 +151,8 @@ public class MailController extends JpaSupport {
 		}
 
 		final Model related = (Model) request.getRecords().get(0);
-		final List<MailMessage> all = messages.findRelated(related, request.getLimit(), request.getOffset());
-		final Long count = messages.countRelated(related);
+		final List<MailMessage> all = messages.findAll(related, request.getLimit(), request.getOffset());
+		final Long count = messages.count(related);
 
 		final List<Object> data = new ArrayList<>();
 		for (MailMessage message : all) {
