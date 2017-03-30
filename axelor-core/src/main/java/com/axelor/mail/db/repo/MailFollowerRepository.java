@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaRepository;
@@ -38,6 +37,7 @@ import com.axelor.meta.db.repo.MetaActionRepository;
 import com.axelor.meta.db.repo.MetaMenuRepository;
 import com.axelor.rpc.Resource;
 import com.axelor.team.db.Team;
+import com.axelor.team.db.TeamTopic;
 import com.google.inject.persist.Transactional;
 
 public class MailFollowerRepository extends JpaRepository<MailFollower> {
@@ -163,7 +163,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 		return all;
 	}
 
-	private void createOrDeleteMenu(Team entity,  boolean delete) {
+	private void createOrDeleteMenu(Team team, User user, boolean delete) {
 		final MetaActionRepository actionRepo = Beans.get(MetaActionRepository.class);
 		final MetaMenuRepository menuRepo = Beans.get(MetaMenuRepository.class);
 		final MetaMenu parent = menuRepo.findByName("menu-team-teams");
@@ -172,10 +172,10 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 			return;
 		}
 
-		final String name = "menu-team-teams-" + entity.getId();
-		final String actionName = "team." + entity.getId();
+		final String name = "menu-team-" + team.getId();
+		final String actionName = "team." + team.getId();
 
-		MetaMenu menu = menuRepo.all().filter("self.name = ? AND self.user = ?", name, AuthUtils.getUser()).fetchOne();
+		MetaMenu menu = menuRepo.all().filter("self.name = ? AND self.user = ?", name, user).fetchOne();
 		MetaAction action = actionRepo.findByName(actionName);
 
 		if (delete) {
@@ -194,22 +194,25 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 		if (action == null) {
 			action = new MetaAction(actionName);
 			action.setType("action-view");
-			action.setModel(Team.class.getName());
+			action.setModel(TeamTopic.class.getName());
 			action.setXml(""
-					+ "<action-view title='"+ entity.getName() + "' name='" + actionName + "' model='"+ Team.class.getName() +"'>\n"
-					+ "  <view type='form'/>\n"
-					+ "  <view-param name='ui-template:form' value='team-form'/>\n"
-					+ "  <context name='_showRecord' expr='eval: "+ entity.getId() +"'/>\n"
+					+ "<action-view title='"+ team.getName() + "' name='" + actionName + "' model='"+ TeamTopic.class.getName() +"'>\n"
+					+ "  <view name='team-topic-grid' type='grid'/>\n"
+					+ "  <view name='team-topic-form' type='form'/>\n"
+					+ "  <view-param name='details-view' value='true'/>\n"
+					+ "  <view-param name='forceTitle' value='true'/>\n"
+					+ "  <domain>self.team.id = :teamId</domain>\n"
+					+ "  <context name='teamId' expr='#{"+ team.getId() +"}'/>\n"
 					+ "</action-view>");
 		}
 
 		if (menu == null) {
 			menu = new MetaMenu();
 			menu.setName(name);
-			menu.setTitle(entity.getName());
+			menu.setTitle(team.getName());
 			menu.setParent(parent);
 			menu.setAction(action);
-			menu.setUser(AuthUtils.getUser());
+			menu.setUser(user);
 		}
 
 		menuRepo.save(menu);
@@ -234,7 +237,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 
 		// create menu
 		if (entity instanceof Team) {
-			createOrDeleteMenu((Team) entity, false);
+			createOrDeleteMenu((Team) entity, user, false);
 		}
 
 		save(follower);
@@ -277,7 +280,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 
 		// remove menu
 		if (entity instanceof Team) {
-			createOrDeleteMenu((Team) entity, true);
+			createOrDeleteMenu((Team) entity, user, true);
 		}
 	}
 

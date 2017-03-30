@@ -11,6 +11,7 @@
     <binary name="image" title="Photo" />
     <many-to-many name="roles" ref="com.axelor.auth.db.Role" title="Authorized roles" />
     <many-to-many name="members" ref="com.axelor.auth.db.User" />
+    <one-to-many name="topics" ref="TeamTopic" mappedBy="team" />
   </entity>
 
   <entity name="TeamTask" table="TEAM_TASK">
@@ -39,6 +40,21 @@
       <message if="true" on="CREATE">Task created</message>
       <message if="status == 'closed'" on="UPDATE" tag="success" fields="status">Task closed</message>
       <message if="priority == 'urgent'" on="UPDATE" tag="important" fields="priority">Urgent</message>
+    </track>
+  </entity>
+  
+  <entity name="TeamTopic" table="TEAM_TOPIC">
+    <string name="name" required="true" />
+    <string name="description" large="true" />
+    <boolean name="active" default="true" />
+    <many-to-one name="team" ref="Team" required="true" />
+
+    <track subscribe="true">
+      <field name="name" />
+      <field name="description" />
+      <message if="true" on="CREATE">Topic created</message>
+      <message if="!active" on="UPDATE" fields="active">Topic closed</message>
+      <message if="active" on="UPDATE" fields="active">Topic re-opened</message>
     </track>
   </entity>
 

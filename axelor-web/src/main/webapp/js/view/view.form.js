@@ -463,7 +463,8 @@ function FormViewCtrl($scope, $element) {
 			
 			var handler = $scope.$events.onNew;
 			var last = $scope.$parent.onNewPromise || $scope.onNewPromise;
-			
+			var params = ($scope._viewParams || {}).params || {};
+
 			function reset() {
 				$scope.onNewPromise = null;
 			}
@@ -480,7 +481,9 @@ function FormViewCtrl($scope, $element) {
 							if (rec) {
 								rec._dirty = true;
 							}
-							$scope.$$original = old;
+							if (!params['details-view']) {
+								$scope.$$original = old;
+							}
 							return res;
 						} else if (defaults) {
 							$scope.editRecord(defaults);

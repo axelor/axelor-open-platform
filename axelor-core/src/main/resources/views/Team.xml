@@ -60,10 +60,6 @@
         <field name="members" widget="TagSelect" colSpan="12"/>
       </panel>
     </panel>
-    <panel-mail>
-      <mail-messages limit="5"/>
-      <mail-followers/>
-    </panel-mail>
   </form>
 
   <grid name="team-task-grid" title="Tasks" model="com.axelor.team.db.TeamTask">
@@ -97,6 +93,24 @@
       <mail-followers/>
     </panel-mail>
   </form>
+  
+  <grid name="team-topic-grid" title="Topics" model="com.axelor.team.db.TeamTopic">
+    <field name="name" />
+  </grid>
+  
+  <form name="team-topic-form" title="Topic" model="com.axelor.team.db.TeamTopic"
+    onNew="team.topic.on-new">
+    <panel title="Overview">
+      <field name="name" colSpan="12"/>
+      <field name="description" colSpan="12"/>
+      <field name="team"/>
+      <field name="active"/>
+    </panel>
+    <panel-mail>
+      <mail-messages limit="4"/>
+      <mail-followers/>
+    </panel-mail>
+  </form>
 
   <action-attrs name="team.task.on-new">
     <attribute name="value" for="priority" expr="normal" />
@@ -104,6 +118,10 @@
     <attribute name="value" for="taskDate" expr="#{__date__}" />
   </action-attrs>
   
+  <action-attrs name="team.topic.on-new">
+    <attribute name="value" for="team" if="teamId" expr="#{__repo__(Team).find(teamId)}" />
+  </action-attrs>
+
   <action-view name="teams.all" model="com.axelor.team.db.Team" title="All Teams">
     <view name="team-cards" type="cards" />
     <view name="team-form" type="form" />
@@ -147,6 +165,11 @@
     <view name="team-task-form" type="form" />
     <domain>self.createdBy = :__user__ AND self.status NOT IN :closed_status</domain>
     <context name="closed_status" expr="#{['closed', 'canceled']}"/>
+  </action-view>
+  
+  <action-view name="topics.all" model="com.axelor.team.db.TeamTopic" title="Topics">
+    <view name="team-topic-grid" type="grid" />
+    <view name="team-topic-form" type="form" />
   </action-view>
 
   <menuitem name="menu-team" order="-110" title="Teamwork" icon="fa-users" icon-background="blue"/>

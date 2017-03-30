@@ -37,6 +37,18 @@ public class TeamRepository extends JpaRepository<Team> {
 				.bind("name", name)
 				.fetchOne();
 	}
+
+	@Override
+	public Team save(Team entity) {
+		final Team team = super.save(entity);
+		final MailFollowerRepository followers = Beans.get(MailFollowerRepository.class);
+		
+		if (team.getMembers() != null) {
+			team.getMembers().forEach(user -> followers.follow(team, user));
+		}
+
+		return team;
+	}
 	
 	@Override
 	public Map<String, Object> populate(Map<String, Object> json, Map<String, Object> context) {
