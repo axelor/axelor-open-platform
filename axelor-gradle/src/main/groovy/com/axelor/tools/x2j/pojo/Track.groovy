@@ -33,6 +33,8 @@ class Track {
 
 	private boolean replace;
 
+	private boolean files;
+
 	private Track(Entity entity) {
 		this.entity = entity;
 	}
@@ -50,6 +52,7 @@ class Track {
 		contents = contents.grep { it != null }
 		subscribe = node.'@subscribe' == "true"
 		replace = node.'@replace' == "true"
+		files = node.'@files' == "true"
 	}
 
 	private Annotation $field(NodeChild node) {
@@ -107,6 +110,7 @@ class Track {
 		if (!messages.empty) annon.add("messages", messages, false, false)
 		if (!contents.empty) annon.add("contents", contents, false, false)
 		if (subscribe) annon.add("subscribe", "true", false, false)
+		if (files) annon.add("files", "true", false, false)
 		return annon
 	}
 

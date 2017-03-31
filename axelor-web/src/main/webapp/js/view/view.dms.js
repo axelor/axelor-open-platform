@@ -1464,6 +1464,7 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 
 				promise.success(function (records) {
 					record.$attachments = _.size(records);
+					forScope.$broadcast('on:load-messages', record);
 				});
 
 				return promise.then(done, done);

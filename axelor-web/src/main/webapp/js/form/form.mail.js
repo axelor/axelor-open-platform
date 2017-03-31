@@ -277,6 +277,9 @@ ui.directive('uiMailMessage', function () {
 							"<div ng-if='!message.summary || showFull' ui-bind-template x-text='message.body'></div>" +
 							"<a ng-if='!showFull' href='' ng-click='onShowFull()' class='show-full'><i class='fa fa-ellipsis-h'></i></a>" +
 						"</div>" +
+						"<div class='mail-message-files' ng-if='::body.files'>" +
+							"<div ui-mail-files x-removable='false' x-files='body.files' class='inline'></div>" +
+						"</div>" +
 						"<div class='mail-message-files' ng-show='::message.$files.length'>" +
 							"<div ui-mail-files x-removable='false' x-files='message.$files' class='inline'></div>" +
 						"</div>" +
@@ -440,6 +443,12 @@ ui.formWidget('uiMailMessages', {
 		$scope.$watch("record", function (record, old) {
 			if (record === old) { return; }
 			if (record && record.id) {
+				$scope.onLoadMessages();
+			}
+		});
+		
+		$scope.$on("on:load-messages", function (e, record) {
+			if ($scope.record === record) {
 				$scope.onLoadMessages();
 			}
 		});

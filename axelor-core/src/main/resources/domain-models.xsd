@@ -738,6 +738,11 @@
         <xsd:documentation>Specify whether to replace original change track config.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="files" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether to track attached files.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 
   <xsd:complexType name="Entity" mixed="true">

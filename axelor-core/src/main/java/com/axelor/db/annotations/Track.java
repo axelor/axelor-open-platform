@@ -62,4 +62,11 @@ public @interface Track {
 	 * @return true if marked for auto-subscribe
 	 */
 	boolean subscribe() default false;
+
+	/**
+	 * Whether to track attached files.
+	 * 
+	 * @return true if marked for tracking attachments
+	 */
+	boolean files() default false;
 }
