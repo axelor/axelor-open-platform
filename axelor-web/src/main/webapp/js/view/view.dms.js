@@ -1579,33 +1579,46 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 	};
 }]);
 
-ui.download =	function download(url, fileName) {
+ui.download = function download(url, fileName) {
 
-	var link = document.createElement('a');
+	function doDownload() {
+		var link = document.createElement('a');
 
-	link.innerHTML = fileName;
-	link.download = fileName;
-	link.href = url;
+		link.innerHTML = fileName;
+		link.download = fileName;
+		link.href = url;
 
-	_.extend(link.style, {
-		position: "absolute",
-		visibility: "hidden",
-		zIndex: 1000000000
-	});
+		_.extend(link.style, {
+			position: "absolute",
+			visibility: "hidden",
+			zIndex: 1000000000
+		});
 
-	document.body.appendChild(link);
+		document.body.appendChild(link);
 
-	link.onclick = function(e) {
+		link.onclick = function(e) {
+			setTimeout(function () {
+				document.body.removeChild(e.target);
+			}, 300);
+		};
+
 		setTimeout(function () {
-			document.body.removeChild(e.target);
-		}, 300);
-	};
+			link.click();
+		}, 100);
 
-	setTimeout(function () {
-		link.click();
-	}, 100);
+		axelor.notify.info(_t("Downloading {0}...", fileName));
+	}
 
-	axelor.notify.info(_t("Downloading {0}...", fileName));
+	$.ajax({
+		url : url,
+		type : 'HEAD',
+		success : doDownload,
+		error : function (e) {
+			if (e.status == 404) {
+				axelor.notify.error("<p>" + _t("File {0} does not exist." + "</p>", "<strong>" + fileName + "</strong>"));
+			}
+		}
+	});
 };
 
 // prevent download on droping files
