@@ -113,6 +113,7 @@
   </form>
 
   <action-attrs name="team.task.on-new">
+    <attribute name="value" for="team" if="teamId" expr="#{__repo__(Team).find(teamId)}" />
     <attribute name="value" for="priority" expr="normal" />
     <attribute name="value" for="status" expr="new" />
     <attribute name="value" for="taskDate" expr="#{__date__}" />

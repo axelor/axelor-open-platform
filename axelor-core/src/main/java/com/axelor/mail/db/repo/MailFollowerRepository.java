@@ -37,7 +37,7 @@ import com.axelor.meta.db.repo.MetaActionRepository;
 import com.axelor.meta.db.repo.MetaMenuRepository;
 import com.axelor.rpc.Resource;
 import com.axelor.team.db.Team;
-import com.axelor.team.db.TeamTopic;
+import com.axelor.team.db.TeamTask;
 import com.google.inject.persist.Transactional;
 
 public class MailFollowerRepository extends JpaRepository<MailFollower> {
@@ -166,7 +166,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 	private void createOrDeleteMenu(Team team, User user, boolean delete) {
 		final MetaActionRepository actionRepo = Beans.get(MetaActionRepository.class);
 		final MetaMenuRepository menuRepo = Beans.get(MetaMenuRepository.class);
-		final MetaMenu parent = menuRepo.findByName("menu-team-teams");
+		final MetaMenu parent = menuRepo.findByName("menu-team");
 
 		if (parent == null) {
 			return;
@@ -174,6 +174,8 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 
 		final String name = "menu-team-" + team.getId();
 		final String actionName = "team." + team.getId();
+		final String actionModel = TeamTask.class.getName();
+		final String actionTitle = team.getName();
 
 		MetaMenu menu = menuRepo.all().filter("self.name = ? AND self.user = ?", name, user).fetchOne();
 		MetaAction action = actionRepo.findByName(actionName);
@@ -194,14 +196,15 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 		if (action == null) {
 			action = new MetaAction(actionName);
 			action.setType("action-view");
-			action.setModel(TeamTopic.class.getName());
+			action.setModel(actionModel);
 			action.setXml(""
-					+ "<action-view title='"+ team.getName() + "' name='" + actionName + "' model='"+ TeamTopic.class.getName() +"'>\n"
-					+ "  <view name='team-topic-grid' type='grid'/>\n"
-					+ "  <view name='team-topic-form' type='form'/>\n"
+					+ "<action-view title='"+ actionTitle + "' name='" + actionName + "' model='"+ actionModel +"'>\n"
+					+ "  <view name='team-task-grid' type='grid'/>\n"
+					+ "  <view name='team-task-form' type='form'/>\n"
 					+ "  <view-param name='details-view' value='true'/>\n"
 					+ "  <view-param name='forceTitle' value='true'/>\n"
-					+ "  <domain>self.team.id = :teamId</domain>\n"
+					+ "  <domain>self.team.id = :teamId AND self.status NOT IN :closed_status</domain>\n"
+					+ "  <context name='closed_status' expr='#{[\"closed\", \"canceled\"]}'/>\n"
 					+ "  <context name='teamId' expr='#{"+ team.getId() +"}'/>\n"
 					+ "</action-view>");
 		}
