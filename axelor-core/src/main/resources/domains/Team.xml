@@ -29,7 +29,7 @@
     <long name="relatedId" />
     <many-to-one name="assignedTo" ref="com.axelor.auth.db.User" />
 
-    <track subscribe="false">
+    <track files="true">
       <field name="name" />
       <field name="status" />
       <field name="priority" />
