@@ -19,7 +19,10 @@ package com.axelor.team.db.repo;
 
 import java.util.Map;
 
+import javax.persistence.TypedQuery;
+
 import com.axelor.auth.AuthUtils;
+import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailFollower;
@@ -45,9 +48,30 @@ public class TeamRepository extends JpaRepository<Team> {
 		
 		if (team.getMembers() != null) {
 			team.getMembers().forEach(user -> followers.follow(team, user));
+		} else {
+			followers.findAll(entity).forEach(followers::unfollow);
 		}
+		
+		final TypedQuery<MailFollower> query = JPA.em().createQuery(""
+				+ "SELECT f FROM MailFollower f "
+				+ "LEFT JOIN f.user u "
+				+ "WHERE f.relatedModel = :model "
+				+ "	AND f.relatedId = :id "
+				+ "	AND u.id NOT IN "
+				+ "		(SELECT x.id FROM Team t LEFT JOIN t.members x WHERE t.id = :id)", MailFollower.class);
+
+		query.setParameter("model", Team.class.getName());
+		query.setParameter("id", team.getId());
+		query.getResultList().forEach(f -> followers.unfollow(team, f.getUser()));
 
 		return team;
+	}
+
+	@Override
+	public void remove(Team entity) {
+		final MailFollowerRepository followers = Beans.get(MailFollowerRepository.class);
+		followers.findAll(entity).forEach(followers::unfollow);
+		super.remove(entity);
 	}
 	
 	@Override
