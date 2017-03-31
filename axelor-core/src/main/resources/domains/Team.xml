@@ -40,6 +40,7 @@
       <message if="true" on="CREATE">Task created</message>
       <message if="status == 'closed'" on="UPDATE" tag="success" fields="status">Task closed</message>
       <message if="priority == 'urgent'" on="UPDATE" tag="important" fields="priority">Urgent</message>
+      <content if="true" fields="description">#{description}</content>
     </track>
   </entity>
   
@@ -51,10 +52,10 @@
 
     <track subscribe="true">
       <field name="name" />
-      <field name="description" />
       <message if="true" on="CREATE">Topic created</message>
       <message if="!active" on="UPDATE" fields="active">Topic closed</message>
       <message if="active" on="UPDATE" fields="active">Topic re-opened</message>
+      <content if="true" fields="description">#{description}</content>
     </track>
   </entity>
 
