@@ -708,7 +708,19 @@
           <xsd:documentation>Specify a change message</xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
-          <xsd:simpleContent >
+          <xsd:simpleContent>
+            <xsd:restriction base="dm:TrackMessage">
+              <xsd:minLength value="1"/>
+            </xsd:restriction>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="content" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>Specify a body message</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:simpleContent>
             <xsd:restriction base="dm:TrackMessage">
               <xsd:minLength value="1"/>
             </xsd:restriction>

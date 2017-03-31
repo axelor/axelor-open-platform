@@ -23,6 +23,7 @@ class Track {
 
 	private List<Annotation> fields = []
 	private List<Annotation> messages = []
+	private List<Annotation> contents = []
 
 	private List<String> imports = []
 
@@ -41,10 +42,12 @@ class Track {
 		node."*".each {
 			if (it.name() == "field") fields += $field(it)
 			if (it.name() == "message") messages += $message(it)
+			if (it.name() == "content") contents += $message(it)
 		}
 
 		fields = fields.grep { it != null }
 		messages = messages.grep { it != null }
+		contents = contents.grep { it != null }
 		subscribe = node.'@subscribe' == "true"
 		replace = node.'@replace' == "true"
 	}
@@ -102,6 +105,7 @@ class Track {
 		imports.each { name -> this.entity.importType(name) }
 		if (!fields.empty) annon.add("fields", fields, false, false)
 		if (!messages.empty) annon.add("messages", messages, false, false)
+		if (!contents.empty) annon.add("contents", contents, false, false)
 		if (subscribe) annon.add("subscribe", "true", false, false)
 		return annon
 	}
@@ -109,6 +113,7 @@ class Track {
 	def merge(Track other) {
 		fields.addAll(other.fields);
 		messages.addAll(other.messages);
+		contents.addAll(other.contents);
 		imports.addAll(other.imports);
 		if (other.replace) {
 			subscribe = other.subscribe;

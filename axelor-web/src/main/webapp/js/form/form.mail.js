@@ -269,6 +269,9 @@ ui.directive('uiMailMessage', function () {
 								"<strong>{{:: _t(item.title) }}</strong> : <span ng-bind-html='::item.displayValue'></span>" +
 							"</li>" +
 						"</ul>" +
+						"<div class='track-content' ng-if='::body.content'>" +
+							"<div ui-bind-template x-text='body.content'></div>" +
+						"</div>" +
 						"<div ng-if='!body'>" +
 							"<div ng-if='message.summary && !showFull' ui-bind-template x-text='message.summary'></div>" +
 							"<div ng-if='!message.summary || showFull' ui-bind-template x-text='message.body'></div>" +

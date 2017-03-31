@@ -31,6 +31,7 @@ import org.hibernate.Transaction;
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.annotations.Track;
 import com.axelor.db.annotations.TrackEvent;
@@ -181,6 +182,34 @@ final class AuditTracker {
 
 		EntityState.create(entity, values, oldValues);
 	}
+	
+	private String findMessage(TrackMessage[] messages, Map<String, Object> values, Map<String, Object> oldValues, ScriptHelper scriptHelper) {
+		for (TrackMessage tm : messages) {
+			if (hasEvent(tm, TrackEvent.ALWAYS) ||
+				hasEvent(tm, oldValues.isEmpty() ? TrackEvent.CREATE : TrackEvent.UPDATE)) {
+				boolean matched = tm.fields().length == 0;
+				for (String field : tm.fields()) {
+					if (isBlank(field)) {
+						matched = true;
+						break;
+					}
+					matched = oldValues.isEmpty() ? values.containsKey(field) : !Objects.equal(values.get(field), oldValues.get(field));
+					if (matched) {
+						break;
+					}
+				}
+				if (matched && isBlank(tm.tag()) && scriptHelper.test(tm.condition())) {
+					String msg = tm.message();
+					// evaluate message expression
+					if (msg != null && msg.indexOf("#{") == 0) {
+						msg = (String) scriptHelper.eval(msg);
+					}
+					return msg;
+				}
+			}
+		}
+		return null;
+	}
 
 	private void process(EntityState state, User user) {
 
@@ -201,29 +230,11 @@ final class AuditTracker {
 		final List<Map<String, String>> tracks = new ArrayList<>();
 		final Set<String> tagFields = new HashSet<>();
 
-		String msg = null;
-
-		// find first matched message
-		for (TrackMessage tm : track.messages()) {
-			if (hasEvent(tm, TrackEvent.ALWAYS) ||
-				hasEvent(tm, previousState == null ? TrackEvent.CREATE : TrackEvent.UPDATE)) {
-				boolean matched = tm.fields().length == 0;
-				for (String field : tm.fields()) {
-					if (isBlank(field)) {
-						matched = true;
-						break;
-					}
-					matched = previousState != null && !Objects.equal(values.get(field), oldValues.get(field));
-					if (matched) {
-						break;
-					}
-				}
-				if (matched && isBlank(tm.tag()) && scriptHelper.test(tm.condition())) {
-					msg = tm.message();
-					break;
-				}
-			}
-		}
+		// find matched message
+		String msg = findMessage(track.messages(), values, oldValues, scriptHelper);
+		
+		// find matched content message
+		String content = findMessage(track.contents(), values, oldValues, scriptHelper);
 
 		for (TrackField field : track.fields()) {
 
@@ -286,7 +297,7 @@ final class AuditTracker {
 		}
 
 		// don't generate empty tracking info
-		if (msg == null && tracks.isEmpty()) {
+		if (msg == null && content == null && tracks.isEmpty()) {
 			return;
 		}
 
@@ -298,6 +309,10 @@ final class AuditTracker {
 		json.put("title", msg);
 		json.put("tags", tags);
 		json.put("tracks", tracks);
+
+		if (!StringUtils.isBlank(content)) {
+			json.put("content", content);
+		}
 
 		message.setSubject(msg);
 		message.setBody(toJSON(json));

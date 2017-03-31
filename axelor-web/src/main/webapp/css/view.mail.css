@@ -252,6 +252,10 @@
 	font-weight: 600;
 }
 
+.mail-message .track-content {
+	margin-bottom: 8px;
+}
+
 .mail-message .track-fields {
 	margin: 0 0 4px 26px;
 }

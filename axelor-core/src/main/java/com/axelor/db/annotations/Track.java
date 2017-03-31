@@ -45,9 +45,16 @@ public @interface Track {
 	/**
 	 * The track messages to generate.
 	 *
-	 * @return the messages to generate
+	 * @return the messages
 	 */
 	TrackMessage[] messages() default {};
+	
+	/**
+	 * The body content to generate.
+	 *
+	 * @return the body messages
+	 */
+	TrackMessage[] contents() default {};
 
 	/**
 	 * Subscribe for change notifications.
