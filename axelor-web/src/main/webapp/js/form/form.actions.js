@@ -798,7 +798,7 @@ ActionHandler.prototype = {
 			} else if (formElement.parent().is('[ui-slick-editors],.slick-cell')) {
 				containers = formElement.parent().parent().add(formElement);
 			} else if (formElement.parent().is('[ui-panel-editor]')) {
-				containers = formElement.is('.m2o-editor-form,.o2m-editor-form') ? formElement : formElement.parents('[ui-form]:first').add(formElement);
+				containers = formElement.parent().add(formElement).is('.m2o-editor-form,.o2m-editor-form') ? formElement : formElement.parents('[ui-form]:first').add(formElement);
 			} else {
 				containers = formElement;
 				toolbar = formElement.parents('.form-view:first,.search-view:first')
