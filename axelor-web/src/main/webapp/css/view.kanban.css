@@ -218,6 +218,10 @@
 	flex-wrap: wrap;
 }
 
+.cards-view.cards-center .kanban-card-list {
+	justify-content: center;
+}
+
 .cards-view .kanban-card-container {
 	float: left;
 	width: 33.33333333%;
