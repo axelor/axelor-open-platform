@@ -38,6 +38,7 @@ import org.eclipse.birt.core.exception.BirtException;
 import org.eclipse.birt.report.data.oda.jdbc.IConnectionFactory;
 import org.eclipse.birt.report.engine.api.EngineConstants;
 import org.eclipse.birt.report.engine.api.EngineException;
+import org.eclipse.birt.report.engine.api.IPDFRenderOption;
 import org.eclipse.birt.report.engine.api.IRenderOption;
 import org.eclipse.birt.report.engine.api.IReportEngine;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
@@ -118,6 +119,10 @@ public class ReportGenerator {
 
 			opts.setOutputFormat(format);
 			opts.setOutputStream(output);
+
+			if(IRenderOption.OUTPUT_FORMAT_PDF.equals(format)) {
+				opts.setOption(IPDFRenderOption.PDF_HYPHENATION, true);
+			}
 
 			task.setLocale(locale);
 			task.setRenderOption(opts);

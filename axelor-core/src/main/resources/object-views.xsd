@@ -2064,6 +2064,7 @@
     <xsd:attribute name="domain" type="xsd:string" />
     <xsd:attribute name="selection" type="xsd:string" />
     <xsd:attribute name="widget" type="xsd:string" />
+    <xsd:attribute name="multiple" type="xsd:boolean" />
     <xsd:anyAttribute processContents="skip" />
   </xsd:complexType>
 

@@ -260,7 +260,7 @@ function SelectorCtrl($scope, $element, DataSource, ViewService) {
 	$scope.onOK = function() {
 		
 		var selection = _.map($scope.selection, function(index){
-			return $scope._dataSource.at(index);
+			return $scope.dataView.getItem(index);
 		});
 		
 		if (!_.isEmpty(selection)) {

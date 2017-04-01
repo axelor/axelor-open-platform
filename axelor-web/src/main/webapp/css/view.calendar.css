@@ -34,8 +34,7 @@
 	top: 0; right: 0; bottom: 0;
 	width: auto;
 	overflow: hidden;
-	padding: 4px;
-	padding-top: 0;
+	padding: 0 4px;
 }
 
 .calendar-side .ui-datepicker {
@@ -46,7 +45,7 @@
 .calendar-legend {
 	padding-left: 4px;
 	margin-top: 8px;
-	padding-top: 10px;
+	margin-bottom: 0;
 	overflow: auto;
 }
 

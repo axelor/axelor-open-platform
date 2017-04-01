@@ -555,12 +555,13 @@ function FormViewCtrl($scope, $element) {
 		}
 
 		return $scope.checkVersion(true, function (verified) {
+			var params = $scope._viewParams;
 			if (verified) {
 				return;
 			}
-
-			if (checkVersion === "silent") {
-				return $scope.reload();
+			if (checkVersion === "silent"
+				&& (!$scope.isDirty() || (params.params && params.params['show-confirm'] === false))) {
+				return $scope.onRefresh();
 			}
 
 			axelor.dialogs.confirm(
@@ -568,7 +569,7 @@ function FormViewCtrl($scope, $element) {
 					_t("Would you like to reload the current record?"),
 			function(confirmed){
 				if (confirmed) {
-					$scope.reload();
+					$scope.onRefresh();
 				}
 			});
 		});

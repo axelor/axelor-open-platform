@@ -1271,6 +1271,7 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 
 				formScope.doRead(record.id).success(function (rec) {
 					formScope.edit(rec);
+					formScope.setEditable(true);
 					setTimeout(function () {
 						element.dialog("option", "height", 320);
 						element.dialog("open");

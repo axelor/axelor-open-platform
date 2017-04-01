@@ -259,7 +259,7 @@ ActionHandler.prototype = {
 	_getPrompt: function () {
 		var prompt = this.prompt;
 		var itemScope = this.element.scope();
-		if (_.isFunction(itemScope.attr)) {
+		if (_.isFunction(itemScope.attr) && !this.element.is('[ui-slick-grid]')) {
 			prompt = itemScope.attr('prompt') || prompt;
 		}
 		return _.isString(prompt) ? prompt : null;
@@ -798,7 +798,7 @@ ActionHandler.prototype = {
 			} else if (formElement.parent().is('[ui-slick-editors],.slick-cell')) {
 				containers = formElement.parent().parent().add(formElement);
 			} else if (formElement.parent().is('[ui-panel-editor]')) {
-				containers = formElement.is('.m2o-editor-form,.o2m-editor-form') ? formElement : formElement.parents('[ui-form]:first').add(formElement);
+				containers = formElement.parent().add(formElement).is('.m2o-editor-form,.o2m-editor-form') ? formElement : formElement.parents('[ui-form]:first').add(formElement);
 			} else {
 				containers = formElement;
 				toolbar = formElement.parents('.form-view:first,.search-view:first')

@@ -127,6 +127,13 @@ public class Search extends AbstractView {
 	@JsonInclude(Include.NON_NULL)
 	public static class SearchField extends Field {
 
+		@XmlAttribute
+		private Boolean multiple;
+
+		public Boolean getMultiple() {
+			return multiple;
+		}
+
 		@JsonGetter("type")
 		@Override
 		public String getServerType() {

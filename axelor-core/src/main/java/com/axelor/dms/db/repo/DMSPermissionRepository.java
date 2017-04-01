@@ -105,6 +105,15 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
 				"(self.parent.permissions.user = ? OR self.parent.permissions.group = ?) AND self.parent.permissions.permission.canRead = true",
 				"__user__, __user__.group");
 
+		final Permission __perm_full__ = findOrCreate("perm.dms.perm.__full__",
+				"self.createdBy = ? OR ((self.user = ? OR self.group = ?) AND self.value = 'FULL')",
+				"__user__, __user__, __user__.group", DMSPermission.class.getName());
+
+		__perm_full__.setCanCreate(true);
+		__perm_full__.setCanRead(true);
+		__perm_full__.setCanWrite(true);
+		__perm_full__.setCanRemove(true);
+
 		__parent__.setCanCreate(false);
 		__parent__.setCanRead(true);
 		__parent__.setCanWrite(false);
@@ -131,6 +140,7 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
 			user.addPermission(__create__);
 			user.addPermission(__parent__);
 			user.addPermission(__meta__);
+			user.addPermission(__perm_full__);
 		}
 		if (group != null) {
 			group.addPermission(permission);
@@ -138,6 +148,7 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
 			group.addPermission(__create__);
 			group.addPermission(__parent__);
 			group.addPermission(__meta__);
+			group.addPermission(__perm_full__);
 		}
 
 		entity.setPermission(permission);
