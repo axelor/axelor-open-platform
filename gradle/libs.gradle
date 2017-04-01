@@ -92,21 +92,17 @@ libs.hibernate_ehcache = "org.hibernate:hibernate-ehcache:${versions.hibernate}"
 libs.hibernate_search = "org.hibernate:hibernate-search-orm:${versions.hibernate_search}"
 
 // minimal set of tika-parsers
-libs.apache_tika = dependencies.module("org.apache.tika:tika-parsers:1.14") {
-	dependency 'org.apache.tika:tika-core:1.14'
-	dependency 'org.apache.james:apache-mime4j-core:0.7.2'
-	dependency 'org.apache.james:apache-mime4j-dom:0.7.2'
-	dependency 'org.apache.commons:commons-compress:1.12'
-	dependency 'org.tukaani:xz:1.5'
-	dependency 'org.apache.pdfbox:pdfbox:2.0.3'
-	dependency 'org.apache.pdfbox:pdfbox-tools:2.0.3'
-	dependency 'org.apache.pdfbox:jempbox:1.8.12'
-	dependency 'org.apache.poi:poi:3.15'
-	dependency 'org.apache.poi:poi-ooxml:3.15'
-	dependency 'org.apache.poi:poi-scratchpad:3.15'
+libs.apache_tika = dependencies.module("org.apache.tika:tika-parsers:1.4") {
+	dependency 'org.apache.tika:tika-core:1.4'
+	dependency 'org.apache.commons:commons-compress:1.5'
+	dependency 'org.apache.pdfbox:pdfbox:1.8.1'
+	dependency 'org.apache.poi:poi:3.9'
+	dependency 'org.apache.poi:poi-ooxml:3.9'
+	dependency 'org.apache.poi:poi-scratchpad:3.9'
 	dependency 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
 	dependency 'de.l3s.boilerpipe:boilerpipe:1.1.0'
-	dependency 'commons-io:commons-io:2.5'
+	dependency 'commons-codec:commons-codec:1.5'
+	dependency 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
 }
 
 // flyway
