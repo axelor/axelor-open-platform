@@ -240,6 +240,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 
 		// create menu
 		if (entity instanceof Team) {
+			((Team) entity).addMember(user);
 			createOrDeleteMenu((Team) entity, user, false);
 		}
 
@@ -283,6 +284,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 
 		// remove menu
 		if (entity instanceof Team) {
+			((Team) entity).removeMember(user);
 			createOrDeleteMenu((Team) entity, user, true);
 		}
 	}
