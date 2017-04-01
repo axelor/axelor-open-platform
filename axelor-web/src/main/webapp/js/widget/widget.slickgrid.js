@@ -514,14 +514,15 @@ _.extend(Factory.prototype, {
 		}
 
 		if (widget.toLowerCase() === "image" || (type === "binary" && field.name === "image")) {
+			var url = null;
 			if (field.target === "com.axelor.meta.db.MetaFile") {
 				if (value) {
-					return ui.makeImageURL("com.axelor.meta.db.MetaFile", "content", (value.id || value));
+					url = ui.makeImageURL("com.axelor.meta.db.MetaFile", "content", (value.id || value));
 				}
-				return "";
+			} else {
+				url = ui.makeImageURL(this.grid.handler._model, field.name, dataContext) + "&image=true";
 			}
-			var url = ui.makeImageURL(this.grid.handler._model, field.name, dataContext);
-			return '<img src="' + url + '&image=true" style="height: 21px;margin-top: -2px;">';
+			return url ? '<img src="' + url + '" style="height: 21px;margin-top: -2px;">' : '';
 		}
 		
 		if (widget.toLowerCase() === "html") {
