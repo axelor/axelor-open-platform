@@ -508,8 +508,14 @@ ui.directive('uiCard', ["$compile", function ($compile) {
 				}
 			}
 
-			if (scope.schema.cardWidth) {
-				element.parent().css("width", scope.schema.cardWidth);
+			if (scope.schema.width) {
+				element.parent().css("width", scope.schema.width);
+			}
+			if (scope.schema.minWidth) {
+				element.parent().css("min-width", scope.schema.minWidth);
+			}
+			if (scope.schema.maxWidth) {
+				element.parent().css("max-width", scope.schema.maxWidth);
 			}
 
 			element.fadeIn("slow");

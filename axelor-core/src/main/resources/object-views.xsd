@@ -1699,11 +1699,6 @@
             <xsd:documentation>Specify the model object name.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="cardWidth" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>Specify width of the cards.</xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="orderBy" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
