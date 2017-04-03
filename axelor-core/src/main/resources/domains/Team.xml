@@ -28,6 +28,7 @@
     <string name="relatedName" />
     <long name="relatedId" />
     <many-to-one name="assignedTo" ref="com.axelor.auth.db.User" />
+    <string name="attrs" json="true" />
 
     <track files="true">
       <field name="name" />

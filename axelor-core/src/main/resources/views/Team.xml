@@ -88,6 +88,9 @@
         selection="team.task.links"
         x-related="relatedId" />
     </panel>
+    <panel title="Attributes">
+      <field name="attrs" showTitle="false" colSpan="12"/>
+    </panel>
     <panel-mail>
       <mail-messages limit="4"/>
       <mail-followers/>
