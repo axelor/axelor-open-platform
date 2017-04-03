@@ -2393,7 +2393,6 @@ Grid.prototype.groupBy = function(names) {
 					   '<span class="slick-group-count">' + _t("({0} items)", g.count) + '</span>';
 			},
 			aggregators: aggregators,
-			collapsed: true,
 			aggregateCollapsed: false
 		};
 	}, this);
