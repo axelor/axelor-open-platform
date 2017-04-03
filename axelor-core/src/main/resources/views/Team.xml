@@ -70,6 +70,13 @@
     <field name="priority" />
   </grid>
 
+  <calendar name="team-task-calendar" title="Tasks" model="com.axelor.team.db.TeamTask"
+    eventStart="taskDate"
+    eventStop="taskDeadline"
+    colorBy="assignedTo">
+    <field name="name" />
+  </calendar>
+
   <form name="team-task-form" title="Task" model="com.axelor.team.db.TeamTask" onNew="team.task.on-new">
     <panel title="Overview">
       <field name="name"/>
@@ -133,6 +140,7 @@
 
   <action-view name="team.tasks.due" model="com.axelor.team.db.TeamTask" title="Tasks due">
     <view name="team-task-grid" type="grid" />
+    <view name="team-task-calendar" type="calendar" />
     <view name="team-task-form" type="form" />
     <domain><![CDATA[
       (self.assignedTo = :__user__  AND self.status NOT IN :closed_status) AND
@@ -143,6 +151,7 @@
 
   <action-view name="team.tasks.todo" model="com.axelor.team.db.TeamTask" title="Tasks todo">
     <view name="team-task-grid" type="grid" />
+    <view name="team-task-calendar" type="calendar" />
     <view name="team-task-form" type="form" />
     <domain><![CDATA[
       (self.assignedTo = :__user__ AND self.status NOT IN :closed_status) AND
@@ -153,6 +162,7 @@
   
   <action-view name="team.tasks.open" model="com.axelor.team.db.TeamTask" title="My open tasks">
     <view name="team-task-grid" type="grid" />
+    <view name="team-task-calendar" type="calendar" />
     <view name="team-task-form" type="form" />
     <domain>self.assignedTo = :__user__ AND self.status NOT IN :closed_status</domain>
     <context name="closed_status" expr="#{['closed', 'canceled']}"/>
@@ -160,12 +170,14 @@
   
   <action-view name="team.tasks.assigned" model="com.axelor.team.db.TeamTask" title="Tasks assigned to me">
     <view name="team-task-grid" type="grid" />
+    <view name="team-task-calendar" type="calendar" />
     <view name="team-task-form" type="form" />
     <domain>self.assignedTo = :__user__</domain>
   </action-view>
 
   <action-view name="team.tasks.created" model="com.axelor.team.db.TeamTask" title="Tasks created by me">
     <view name="team-task-grid" type="grid" />
+    <view name="team-task-calendar" type="calendar" />
     <view name="team-task-form" type="form" />
     <domain>self.createdBy = :__user__ AND self.status NOT IN :closed_status</domain>
     <context name="closed_status" expr="#{['closed', 'canceled']}"/>

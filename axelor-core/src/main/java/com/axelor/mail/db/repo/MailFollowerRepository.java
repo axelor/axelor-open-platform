@@ -200,6 +200,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 			action.setXml(""
 					+ "<action-view title='"+ actionTitle + "' name='" + actionName + "' model='"+ actionModel +"'>\n"
 					+ "  <view name='team-task-grid' type='grid'/>\n"
+					+ "  <view name='team-task-calendar' type='calendar'/>\n"
 					+ "  <view name='team-task-form' type='form'/>\n"
 					+ "  <view-param name='details-view' value='true'/>\n"
 					+ "  <view-param name='forceTitle' value='true'/>\n"
