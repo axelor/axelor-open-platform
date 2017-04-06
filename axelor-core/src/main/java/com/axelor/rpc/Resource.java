@@ -265,7 +265,7 @@ public class Resource<T extends Model> {
 		
 		List<String> sortBy = getSortBy(request);
 
-		if (!sortBy.contains("id") || !sortBy.contains("-id")) {
+		if (!(sortBy.contains("id") || sortBy.contains("-id"))) {
 			sortBy.add("id");
 		}
 		for(String spec : sortBy) {
