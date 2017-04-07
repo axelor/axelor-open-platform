@@ -45,6 +45,8 @@
 	border-top: 4px solid #e7e7e7;
 	border-bottom: 1px solid #e7e7e7;
 	margin-top: -1px;
+	display: flex;
+    align-items: center;
 }
 
 .panel-nested > .panel-header {
@@ -56,6 +58,27 @@
 .panel .panel-title {
 	font-size: 14px;
 	font-weight: 600;
+	flex: 1;
+}
+
+.panel .panel-header .panel-icon {
+    margin-right: 8px;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.panel .panel-header .panel-icon.has-bg {
+    text-shadow: -1px 1px 5px rgba(0, 0, 0, 0.15);
+}
+
+.panel .panel-header .panel-image {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+}
+
+.panel .panel-header .panel-icons {
+    margin-left: 4px;  
 }
 
 .panel .panel-header .panel-icons a {
@@ -63,20 +86,17 @@
 }
 
 .panel .panel-header .menu-bar {
-	position: relative;
-	top: -6px;
-	right: -10px;
 	margin: 0;
 }
 
 .panel .panel-header .menu-bar > .menu > a {
-	padding: 6px 10px;
+    padding: 0 4px;
 	background-image: none;
 	border: 0;
 }
 
 .panel .panel-header .menu-bar .caret {
-	margin-top: 7px;
+	margin-top: 8px;
 }
 
 .panel .panel-header .dropdown-menu {

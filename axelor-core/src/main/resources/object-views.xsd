@@ -1131,6 +1131,16 @@
             <xsd:documentation>Specify a boolean expression to collapse/expend this panel.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="icon" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Specify an icon to show in panel title.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="icon-background" type="tns:ColorStyle">
+          <xsd:annotation>
+            <xsd:documentation>Specify icon background color (predefined or html hex color)</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

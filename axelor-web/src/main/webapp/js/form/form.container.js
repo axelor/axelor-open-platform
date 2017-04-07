@@ -474,17 +474,41 @@ ui.formWidget('Panel', {
 			if (title === undefined || title === old) return;
 			scope.title = title;
 		});
+
+		var icon = field.icon;
+		var iconBg = field.iconBackground;
+		
+		if (icon && icon.indexOf('fa-') === 0) {
+			scope.icon = icon;
+		} else if (icon) {
+			scope.image = icon;
+		}
+
+		if (scope.icon && iconBg) {
+			setTimeout(function() {
+				var iconElem = element.children('.panel-header').children('.panel-icon');
+				if (iconBg.indexOf("#") === 0) {
+					iconElem.css('background-color', iconBg);
+				} else {
+					iconElem.addClass('bg-' + iconBg);
+				}
+				iconElem.addClass('has-bg');
+				iconElem.find('i').addClass('fg-white');
+			});
+		}
 	},
 
 	transclude: true,
 	template:
 		"<div class='panel panel-default'>" +
 			"<div class='panel-header' ng-show='field.title' ng-if='!notitle'>" +
-				"<div ng-show='canCollapse()' class='panel-icons pull-right'>" +
+				"<div class='panel-icon' ng-if='icon'><i class='fa' ng-class='icon'></i></div>" +
+				"<img class='panel-image' ng-if='image' ng-src='{{image}}'>" +
+				"<div class='panel-title'>{{title}}</div>" +
+				"<div ng-if='menus' ui-menu-bar menus='menus' handler='this'></div>" +
+				"<div ng-show='canCollapse()' class='panel-icons'>" +
 					"<a href='' ng-click='toggle()'><i class='fa' ng-class='collapsedIcon'></i></a>" +
 				"</div>" +
-				"<div ng-if='menus' ui-menu-bar menus='menus' handler='this' class='pull-right'></div>" +
-				"<div class='panel-title'>{{title}}</div>" +
 			"</div>" +
 			"<div class='panel-body' ui-transclude></div>" +
 		"</div>"

@@ -36,6 +36,12 @@ public class Panel extends AbstractPanel {
 	@XmlAttribute
 	private String collapseIf;
 
+	@XmlAttribute
+	private String icon;
+
+	@XmlAttribute(name = "icon-background")
+	private String iconBackground;
+
 	@XmlElement
 	private Menu menu;
 
@@ -68,6 +74,22 @@ public class Panel extends AbstractPanel {
 
 	public void setCollapseIf(String collapseIf) {
 		this.collapseIf = collapseIf;
+	}
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+
+	public String getIconBackground() {
+		return iconBackground;
+	}
+
+	public void setIconBackground(String iconBackground) {
+		this.iconBackground = iconBackground;
 	}
 
 	public Menu getMenu() {
