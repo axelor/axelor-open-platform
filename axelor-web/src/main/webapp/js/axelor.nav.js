@@ -116,6 +116,10 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 
 		tab.options = options;
 		tab.title = tab.title || findTabTitle(tab);
+		
+		if (tab.action) {
+			MenuService.updateTabStyle(tab);
+		}
 
 		function __doSelect(found) {
 

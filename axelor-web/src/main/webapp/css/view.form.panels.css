@@ -290,7 +290,7 @@
 }
 
 .panel-tabs .nav-tabs > li > a {
-	border-color: #e7e7e7 !important;
+	border-color: #e7e7e7;
 }
 .panel-tabs .nav-tabs > li.active > a {
 	color: #333;

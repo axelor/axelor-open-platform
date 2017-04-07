@@ -717,6 +717,10 @@ img.prefix-icon {
 	margin-top: -1px;
 }
 
+.nav-tabs > li > a > i.prefix-icon {
+	margin-right: 2px;
+}
+
 .fa, [class^=fa-] {
 	font-size: 14px;
 }

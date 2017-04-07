@@ -110,6 +110,38 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 			TagService.listen(function (data) {
 				that.update(data.tags);
 			});
+			
+			function findProp(node, name) {
+				if (node[name]) {
+					return node[name];
+				}
+				var parent = nodes[node.parent];
+				if (parent) {
+					return findProp(parent, name);
+				}
+				return null;
+			}
+
+			function updateTabStyle(tab) {
+				if (tab.icon || tab.fa) {
+					return;
+				}
+				var node = _.findWhere(nodes, { action: tab.action });
+				if (node) {
+					tab.icon = tab.icon || findProp(node, 'icon');
+					tab.color = tab.color || findProp(node, 'iconBackground');
+					tab.fa = tab.fa || findProp(node, 'fa');
+					if (tab.icon) {
+						tab.fa = null;
+					}
+				}
+			};
+			
+			MenuService.updateTabStyle = function (tab) {
+				$scope.waitForActions(function () {
+					updateTabStyle(tab);
+				});
+			};
 		}],
 		link: function (scope, element, attrs, ctrl) {
 			var input = element.find('input');

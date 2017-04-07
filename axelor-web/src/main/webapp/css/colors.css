@@ -146,10 +146,18 @@ header .navbar .nav .dropdown-submenu:hover > a:after {
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
 	border: 1px solid #e7e7e7;
+	border-top: 2px solid #16a765;
 	border-bottom: 1px solid transparent;
 	background-color: #fff;
-	border-top: 2px solid #16a765 !important;
 	padding-top: 5px;
+}
+
+.nav-tabs-main > li:not(.active) > a {
+  border-top-color: #e7e7e7 !important;
+}
+
+.nav-tabs-main > li:not(.active) > a > i.fa {
+  opacity: 0.55;
 }
 
 .nav-tabs-strip {
