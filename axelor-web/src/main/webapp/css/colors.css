@@ -54,7 +54,7 @@ header .navbar .nav .dropdown-submenu > a:after {
 header .navbar .nav > li > a:focus,
 header .navbar .nav > li > a:hover,
 header .navbar .nav > li.dropdown.open > a.dropdown-toggle {
-	color: #16a765;
+	color: #534cb6;
 }
 
 header .navbar .nav .dropdown-menu > li > a:hover,
@@ -62,7 +62,7 @@ header .navbar .nav .dropdown-menu > li > a:focus,
 header .navbar .nav .dropdown-submenu:hover > a,
 header .navbar .nav .dropdown-submenu:focus > a {
 	color: #fff;
-	background-color: #16a765;
+	background-color: #534cb6;
 }
 
 header .navbar .nav .dropdown-submenu:hover > a:after {
@@ -77,13 +77,13 @@ header .navbar .nav .dropdown-submenu:hover > a:after {
 .ui-datepicker .ui-state-active,
 .ui-datepicker .ui-slider-handle.ui-state-hover {
 	color: #fff !important;
-	background-color: #16a765 !important;
+	background-color: #534cb6 !important;
 	background-image: none !important;
 }
 .ui-datepicker .ui-slider-handle.ui-state-focus,
 .ui-datepicker .ui-slider-handle.ui-state-hover,
 .ui-datepicker .ui-state-highlight {
-	border: 1px solid #16a765 !important
+	border: 1px solid #534cb6 !important
 }
 .ui-menu .ui-menu-item a.ui-state-focus {
 	color: #262626;
@@ -146,7 +146,7 @@ header .navbar .nav .dropdown-submenu:hover > a:after {
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
 	border: 1px solid #e7e7e7;
-	border-top: 2px solid #16a765;
+	border-top: 2px solid #534cb6;
 	border-bottom: 1px solid transparent;
 	background-color: #fff;
 	padding-top: 5px;

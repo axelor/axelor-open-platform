@@ -1153,7 +1153,7 @@ input[type="search"]:focus,
 input[type="tel"]:focus,
 input[type="color"]:focus,
 .uneditable-input:focus {
-  border-color: #16a765;
+  border-color: #534cb6;
   outline: 0;
 }
 
@@ -2816,8 +2816,8 @@ fieldset[disabled] .btn-danger.active {
 
 .btn-success {
   color: #ffffff;
-  background-color: #16a765;
-  border-color: #139057;
+  background-color: #534cb6;
+  border-color: #4a43a5;
 }
 
 .btn-success:hover,
@@ -2827,8 +2827,8 @@ fieldset[disabled] .btn-danger.active {
 .btn-success.disabled,
 .btn-success[disabled] {
   color: #ffffff;
-  background-color: #107a4a;
-  border-color: #0c5a37;
+  background-color: #423c93;
+  border-color: #36327a;
 }
 
 .btn-success.disabled,
@@ -2849,8 +2849,8 @@ fieldset[disabled] .btn-success:active,
 .btn-success.disabled.active,
 .btn-success[disabled].active,
 fieldset[disabled] .btn-success.active {
-  background-color: #16a765;
-  border-color: #139057;
+  background-color: #534cb6;
+  border-color: #4a43a5;
 }
 
 .btn-info {
@@ -3155,7 +3155,7 @@ input[type="submit"].btn.btn-mini {
 }
 
 .btn-group.open .btn-success.dropdown-toggle {
-  background-color: #139057;
+  background-color: #4a43a5;
 }
 
 .btn-group.open .btn-info.dropdown-toggle {
@@ -4960,12 +4960,12 @@ a.badge:focus {
 
 .label-success,
 .badge-success {
-  background-color: #16a765;
+  background-color: #534cb6;
 }
 
 .label-success[href],
 .badge-success[href] {
-  background-color: #107a4a;
+  background-color: #423c93;
 }
 
 .label-info,
@@ -5121,12 +5121,12 @@ a.badge:focus {
 
 .progress-success .bar,
 .progress .bar-success {
-  background-color: #16a765;
+  background-color: #534cb6;
 }
 
 .progress-success.progress-striped .bar,
 .progress-striped .bar-success {
-  background-color: #16a765;
+  background-color: #534cb6;
   background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, rgba(255, 255, 255, 0.15)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.15)), color-stop(0.75, rgba(255, 255, 255, 0.15)), color-stop(0.75, transparent), to(transparent));
   background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
   background-image: -moz-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
