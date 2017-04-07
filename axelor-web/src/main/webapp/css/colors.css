@@ -263,3 +263,35 @@ input, button, textarea, select, fieldset, pre {
 .ui-dialog .ui-dialog-titlebar a {
 	color: #222;
 }
+
+/* == v5 == */
+
+.record-toolbar button,
+.record-toolbar .btn {
+  border: 0;
+}
+
+.record-toolbar button.active,
+.record-toolbar button:active,
+.record-toolbar .btn.active,
+.record-toolbar .btn:active {
+  background-color: #ddd;
+  box-shadow: none;
+}
+
+.record-toolbar .button-menu a.btn:hover,
+.record-toolbar .button-menu a.btn:focus {
+  background-color: #eee;  
+}
+
+.tag-select {
+    border-top-width: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    padding-left: 0;
+}
+.tag-select > .picker-icons {
+  right: 0;
+}
+
+/* == v5 == */
