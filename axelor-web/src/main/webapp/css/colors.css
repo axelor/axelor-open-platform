@@ -287,4 +287,27 @@ input, button, textarea, select, fieldset, pre {
 .nav-tabs-main > li.active > a.bg-black { border-top-color: #1B1C1D !important; }
 .nav-tabs-main > li.active > a.bg-white { border-top-color: #F9FAFB !important; }
 
+.panel .panel-related .panel-header,
+.panel-tabs .panel-related .panel-header,
+.panel .dashboard .dashlet-header,
+.panel-tabs .dashboard .dashlet-header {
+  border: 0;
+  padding: 8px 2px;
+}
+
+.panel .panel-related,
+.panel-tabs .panel-related,
+.panel .form-item .dashlet,
+.panel-tabs .form-item .dashlet {
+  border: 0;
+}
+
+.panel .panel-related .panel-body .slickgrid,
+.panel-tabs .panel-related .panel-body .slickgrid,
+.panel .form-item .dashlet .dashlet-body .portlet-grid .slickgrid,
+.panel-tabs .form-item .dashlet .dashlet-body .portlet-grid .slickgrid {
+  border: 1px solid #ddd;
+  height: calc(100% - 2px);
+}
+
 /* == v5 == */
