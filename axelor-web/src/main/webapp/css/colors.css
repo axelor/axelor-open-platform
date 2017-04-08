@@ -212,6 +212,9 @@ input, button, textarea, select, fieldset, pre {
 .tag-select .picker-icons > i.fa {
 	padding-top: 3px;
 }
+.tag-select .label {
+    background-color: #534cb6;
+}
 
 .select-item .picker-icons i.fa-times {
 	font-size: 12px;
