@@ -165,7 +165,7 @@
 }
 
 .nav-tree > li.open {
-	border-left: 4px solid #534cb6;
+	border-left: 4px solid #0275d8;
 	transition: all .35s ease;
 }
 

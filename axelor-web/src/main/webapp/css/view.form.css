@@ -887,7 +887,7 @@ label.has-help > span:after {
 
 .nav-select li.active a.nav-label,
 .nav-select li.active a.nav-label:after {
-	background: #534cb6;
+	background: #0275d8;
 	transition: background-color 0.3s;
 	color: #f0f0f0;
 }
@@ -916,7 +916,7 @@ label.has-help > span:after {
 
 .tag-select:focus,
 .tag-select.focus {
-	border-color: #534cb6;
+	border-color: #0275d8;
 	outline: 0;
 }
 

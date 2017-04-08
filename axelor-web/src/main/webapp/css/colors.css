@@ -63,13 +63,13 @@ header .navbar .nav .dropdown-submenu:hover > a:after {
 .ui-datepicker .ui-state-active,
 .ui-datepicker .ui-slider-handle.ui-state-hover {
 	color: #fff !important;
-	background-color: #534cb6 !important;
+	background-color: #0275d8 !important;
 	background-image: none !important;
 }
 .ui-datepicker .ui-slider-handle.ui-state-focus,
 .ui-datepicker .ui-slider-handle.ui-state-hover,
 .ui-datepicker .ui-state-highlight {
-	border: 1px solid #534cb6 !important
+	border: 1px solid #0275d8 !important
 }
 .ui-menu .ui-menu-item a.ui-state-focus {
 	color: #262626;
@@ -132,7 +132,7 @@ header .navbar .nav .dropdown-submenu:hover > a:after {
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
 	border: 1px solid #e7e7e7;
-	border-top: 3px solid #534cb6;
+	border-top: 3px solid #0275d8;
 	border-bottom: 1px solid transparent;
 	background-color: #fff;
 	padding-top: 4px;
@@ -215,7 +215,7 @@ input, button, textarea, select, fieldset, pre {
 	padding-top: 3px;
 }
 .tag-select .label {
-    background-color: #534cb6;
+    background-color: #0275d8;
 }
 
 .select-item .picker-icons i.fa-times {
