@@ -821,7 +821,7 @@ label.has-help > span:after {
 	display: block;
 	position: relative;
 	line-height: 32px;
-	padding: 0 14px 0 24px;
+	padding: 0 16px 0 32px;
 	white-space: nowrap;
 	background: #e2e2e2;
 }
@@ -834,17 +834,14 @@ label.has-help > span:after {
 	content: '';
 	width: 32px;
 	height: 32px;
-	-webkit-transform: scale(0.667) rotate(45deg);
-	   -moz-transform: scale(0.667) rotate(45deg);
-	    -ms-transform: scale(0.667) rotate(45deg);
-	        transform: scale(0.667) rotate(45deg);
+    transform: scale(0.72) rotate(45deg);
 
 	position: absolute;
 	right: -16px;
 	z-index: 1;
 
 	background: #e2e2e2;
-	box-shadow: 2px -2px 0 1px rgba(83, 119, 177, 0.2)
+	box-shadow: 2px -2px 0 1px rgba(255, 255, 255, 1);
 }
 
 .nav-select li.dropdown {
