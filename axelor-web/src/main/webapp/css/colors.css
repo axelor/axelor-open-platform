@@ -257,14 +257,6 @@ input, button, textarea, select, fieldset, pre {
   border: 0;
 }
 
-.record-toolbar button.active,
-.record-toolbar button:active,
-.record-toolbar .btn.active,
-.record-toolbar .btn:active {
-  background-color: #ddd;
-  box-shadow: none;
-}
-
 .record-toolbar .button-menu a.btn:hover,
 .record-toolbar .button-menu a.btn:focus {
   background-color: #eee;  
