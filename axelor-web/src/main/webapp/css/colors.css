@@ -280,4 +280,19 @@ input, button, textarea, select, fieldset, pre {
   right: 0;
 }
 
+.nav-tabs-main > li.active > a.bg-red { border-top-color: #DB2828 !important; }
+.nav-tabs-main > li.active > a.bg-orange { border-top-color: #F2711C !important; }
+.nav-tabs-main > li.active > a.bg-yellow { border-top-color: #FBBD08 !important; }
+.nav-tabs-main > li.active > a.bg-olive { border-top-color: #B5CC18 !important; }
+.nav-tabs-main > li.active > a.bg-green { border-top-color: #21BA45 !important; }
+.nav-tabs-main > li.active > a.bg-teal { border-top-color: #00B5AD !important; }
+.nav-tabs-main > li.active > a.bg-blue { border-top-color: #2185D0 !important; }
+.nav-tabs-main > li.active > a.bg-violet { border-top-color: #6435C9 !important; }
+.nav-tabs-main > li.active > a.bg-purple { border-top-color: #A333C8 !important; }
+.nav-tabs-main > li.active > a.bg-pink { border-top-color: #E03997 !important; }
+.nav-tabs-main > li.active > a.bg-brown { border-top-color: #A5673F !important; }
+.nav-tabs-main > li.active > a.bg-grey { border-top-color: #767676 !important; }
+.nav-tabs-main > li.active > a.bg-black { border-top-color: #1B1C1D !important; }
+.nav-tabs-main > li.active > a.bg-white { border-top-color: #F9FAFB !important; }
+
 /* == v5 == */

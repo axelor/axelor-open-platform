@@ -134,6 +134,11 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 					if (tab.icon) {
 						tab.fa = null;
 					}
+					if (tab.color && tab.color.indexOf('#') != 0) {
+						tab.topCss = 'bg-' + tab.color;
+						tab.fa = tab.fa ? tab.fa + ' fg-' + tab.color : null;
+						tab.color = null;
+					}
 				}
 			};
 			
