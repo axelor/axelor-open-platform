@@ -95,7 +95,7 @@ String tenantId = (String) session.getAttribute("tenantId");
               </label>
             </div>
             <div class="form-footer">
-              <button class="btn btn-success" type="submit"><%= loginSubmit %></button>
+              <button class="btn btn-primary" type="submit"><%= loginSubmit %></button>
             </div>
           </form>
         </div>
