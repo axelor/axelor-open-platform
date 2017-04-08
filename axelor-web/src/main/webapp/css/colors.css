@@ -132,10 +132,12 @@ header .navbar .nav .dropdown-submenu:hover > a:after {
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
 	border: 1px solid #e7e7e7;
-	border-top: 2px solid #534cb6;
+	border-top: 3px solid #534cb6;
 	border-bottom: 1px solid transparent;
 	background-color: #fff;
-	padding-top: 5px;
+	padding-top: 4px;
+    border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
 }
 
 .nav-tabs-main > li:not(.active) > a {
