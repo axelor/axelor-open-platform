@@ -690,10 +690,10 @@ var panelRelatedTemplate =
 		"<div class='panel-title'><span ui-help-popover ng-bind-html='title'></span></div>" +
 		"<div class='icons-bar' ng-show='!isReadonly()'>" +
 			"<a href='' ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()'>" +
-				"<i class='fa fa-search'></i><span x-translate>Search</span>" +
+				"<i class='fa fa-search'></i><span x-translate>Select</span>" +
 			"</a>" +
 			"<a href='' ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()'>" +
-				"<i class='fa fa-plus'></i><span x-translate>Add</span>" +
+				"<i class='fa fa-plus'></i><span x-translate>New</span>" +
 			"</a>" +
 			"<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()'>" +
 				"<i class='fa fa-pencil'></i><span x-translate>Edit</span>" +
