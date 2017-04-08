@@ -211,7 +211,7 @@
     text-overflow: ellipsis;
 }
 
-.mail-followers .panel-title .icons i {
+.mail-followers .panel-icons i {
 	margin-left: 8px;
 	cursor: pointer;
 }

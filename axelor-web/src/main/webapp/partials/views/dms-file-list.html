@@ -51,8 +51,8 @@
   <div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-no-filter="true" x-on-init="onGridInit"></div>
   <div ui-dms-details class="dms-details panel x-animate ng-hide" ng-show="showDetails">
     <div class="panel-header">
-      <div class="panel-title pull-left">{{details.name}}</div>
-      <div class="panel-buttons pull-right">
+      <div class="panel-title">{{details.name}}</div>
+      <div class="panel-icons">
         <a href='' ng-click="onCloseDetails()"><i class="fa fa-times"></i></a>
       </div>
     </div>

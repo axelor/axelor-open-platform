@@ -687,21 +687,21 @@ ui.formInput('ManyToMany', 'OneToMany', {
 var panelRelatedTemplate = 
 "<div class='panel panel-related' ng-class='{noEdit: canView() && !canEdit()}'>" +
 	"<div class='panel-header'>" +
-		"<div class='icons-bar pull-right dropdown' ng-show='viewCanCopy() || viewCanExport()'>" +
-			"<a href='' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-caret-down'></i></a>" +
-			"<ul class='dropdown-menu'>" +
-				"<li ng-show='viewCanCopy()'><a href='' ng-click='onCopy()' x-translate>Duplicate</a></li>" +
-				"<li ng-show='viewCanExport()'><a href='' ng-click='onExport()' x-translate>Export</a></li>" +
-			"</ul>" +
-		"</div>" +
-		"<div class='icons-bar pull-right' ng-show='!isReadonly()'>" +
+		"<div class='panel-title'><span ui-help-popover ng-bind-html='title'></span></div>" +
+		"<div class='icons-bar' ng-show='!isReadonly()'>" +
 			"<i ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()' title='{{\"Edit\" | t}}' class='fa fa-pencil'></i>" +
 			'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowView()" title="{{\'View\' | t}}" class="fa fa-file-text-o"></i>'+
 			"<i ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()' title='{{\"New\" | t}}' class='fa fa-plus'></i>" +
 			"<i ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()' title='{{\"Remove\" | t}}' class='fa fa-minus'></i>" +
 			"<i ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()' title='{{\"Select\" | t}}' class='fa fa-search'></i>" +
 		"</div>" +
-		"<div class='panel-title'><span ui-help-popover ng-bind-html='title'></span></div>" +
+		"<div class='icons-bar dropdown' ng-show='viewCanCopy() || viewCanExport()'>" +
+			"<a href='' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-caret-down'></i></a>" +
+			"<ul class='dropdown-menu'>" +
+				"<li ng-show='viewCanCopy()'><a href='' ng-click='onCopy()' x-translate>Duplicate</a></li>" +
+				"<li ng-show='viewCanExport()'><a href='' ng-click='onExport()' x-translate>Export</a></li>" +
+			"</ul>" +
+		"</div>" +
 	"</div>" +
 	"<div class='panel-body panel-layout'>" +
 		"<div ui-view-grid " +

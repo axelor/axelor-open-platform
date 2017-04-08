@@ -979,22 +979,20 @@ ui.formWidget('uiMailFollowers', {
 	template:
 		"<div class='mail-followers panel panel-default span3'>" +
 			"<div class='panel-header'>" +
-			"<div class='panel-title'>" +
-				"<span x-translate>Followers</span>" +
-				"<div class='icons pull-right'>" +
+				"<div class='panel-title' x-translate>Followers</div>" +
+				"<div class='panel-icons'>" +
 					"<i class='fa fa-star-o' ng-click='onFollow()' ng-show='!following'></i>" +
 					"<i class='fa fa-star' ng-click='onUnfollow()' ng-show='following'></i>" +
 					"<i class='fa fa-plus' ui-mail-editor x-email-title='emailTitle' x-send-title='sendTitle' ng-click='onAddFollowers()'></i>" +
 				"</div>" +
 			"</div>" +
-			"</div>" +
 			"<div class='panel-body'>" +
-			"<ul class='links'>" +
-				"<li ng-repeat='follower in followers'>" +
-				"<i class='fa fa-remove' ng-click='onUnfollow(follower)'></i>" +
-				"<a href='' ng-click='showAuthor(follower)'>{{$userName(follower)}}</a> " +
-				"</li>" +
-			"</ul>" +
+				"<ul class='links'>" +
+					"<li ng-repeat='follower in followers'>" +
+					"<i class='fa fa-remove' ng-click='onUnfollow(follower)'></i>" +
+					"<a href='' ng-click='showAuthor(follower)'>{{$userName(follower)}}</a> " +
+					"</li>" +
+				"</ul>" +
 			"</div>" +
 		"</div>"
 });
