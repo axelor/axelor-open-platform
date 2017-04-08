@@ -64,7 +64,7 @@ ui.ProgressMixin = {
 		var styles = {
 			"r": "progress-danger",
 			"y": "progress-warning",
-			"b": "",
+			"b": "progress-primary",
 			"g": "progress-success"
 		};
 

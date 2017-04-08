@@ -626,7 +626,7 @@ ui.formInput('MultiSelect', 'Select', {
 	template_editable:
 	'<div class="tag-select picker-input" ng-click="onShowSelection($event)">'+
 	  '<ul>'+
-		'<li class="tag-item label label-success" ng-repeat="item in items">'+
+		'<li class="tag-item label label-primary" ng-repeat="item in items">'+
 			'<span ng-class="{\'tag-link\': handleClick}" class="tag-text" ng-click="handleClick($event, item.value)">{{item.title}}</span> '+
 			'<i class="fa fa-times fa-small" ng-click="removeItem(item)"></i>'+
 		'</li>'+
@@ -640,7 +640,7 @@ ui.formInput('MultiSelect', 'Select', {
 	'</div>',
 	template_readonly:
 	'<div class="tag-select">'+
-		'<span class="label label-success" ng-repeat="item in limited(items)">'+
+		'<span class="label label-primary" ng-repeat="item in limited(items)">'+
 			'<span ng-class="{\'tag-link\': handleClick}" class="tag-text" ng-click="handleClick($event, item.value)">{{item.title}}</span>'+
 		'</span>'+
 		'<span ng-show="more"> {{more}}</span>'+

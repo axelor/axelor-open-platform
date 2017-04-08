@@ -388,7 +388,7 @@ ui.directive('navMenuTasks', function() {
 			function update(data) {
 				var counts = data || {};
 				if (counts.current) {
-					counts.css = 'badge-success';
+					counts.css = 'badge-primary';
 				}
 				if (counts.pending) {
 					counts.css = 'badge-important';

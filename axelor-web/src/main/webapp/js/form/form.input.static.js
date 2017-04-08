@@ -401,8 +401,8 @@ ui.formItem('Button', {
 		}
 
 		var css = field.css || '';
-		if (css.indexOf('btn-') > -1 && css.indexOf('btn-success') === -1) {
-			element.removeClass('btn-success');
+		if (css.indexOf('btn-') > -1 && css.indexOf('btn-primary') === -1) {
+			element.removeClass('btn-primary');
 		}
 
 		if (isIcon) {
@@ -423,7 +423,7 @@ ui.formItem('Button', {
 		}
 		
 		if (_.isString(field.link)) {
-			element.removeClass('btn btn-success').addClass('btn-link');
+			element.removeClass('btn btn-primary').addClass('btn-link');
 			element.attr("href", field.link);
 		}
 		
@@ -510,7 +510,7 @@ ui.formItem('Button', {
 			element.find('i.fa:first').removeClass(old || '').addClass(icon || field.icon || '');
 		});
 	},
-	template: '<a href="" class="btn btn-success">'+
+	template: '<a href="" class="btn btn-primary">'+
 		'<span class="btn-text" ng-transclude></span>'+
 	'</a>'
 });

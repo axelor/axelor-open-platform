@@ -215,7 +215,7 @@
 		success: function(message, options) {
 			var opts = _.extend({
 				title: _t('Success'),
-				css: 'alert-success'
+				css: 'alert-primary'
 			}, options);
 			return doNotify(message, opts);
 		},

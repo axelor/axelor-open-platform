@@ -1143,7 +1143,7 @@ ui.directive('uiFilterBox', function() {
 		"<div class='filter-box'>" +
 			"<div class='tag-select picker-input search-query'>" +
 			  "<ul>" +
-				"<li class='tag-item label label-success' ng-repeat='item in tagItems'>" +
+				"<li class='tag-item label label-primary' ng-repeat='item in tagItems'>" +
 					"<span class='tag-text' title='{{item.help}}'>{{item.title}}</span> " +
 					"<i class='fa fa-times fa-small' ng-click='onClearFilter()'></i>" +
 				"</li>" +
