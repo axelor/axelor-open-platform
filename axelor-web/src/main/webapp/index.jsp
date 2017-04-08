@@ -118,7 +118,7 @@ String tenantId = (String) session.getAttribute("tenantId");
               <li class="divider-vertical"></li>
               <li class="dropdown">
                 <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown">
-                  <i class="fa fa-star"></i>
+                  <i class="fa fa-star fg-green"></i>
                 </a>
                 <ul class="dropdown-menu" nav-menu-fav></ul>
               </li>
