@@ -310,4 +310,8 @@ input, button, textarea, select, fieldset, pre {
   height: calc(100% - 2px);
 }
 
+.panel-related .panel-header .icons-bar > a {
+  margin-left: 16px;
+}
+
 /* == v5 == */

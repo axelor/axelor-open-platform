@@ -689,11 +689,21 @@ var panelRelatedTemplate =
 	"<div class='panel-header'>" +
 		"<div class='panel-title'><span ui-help-popover ng-bind-html='title'></span></div>" +
 		"<div class='icons-bar' ng-show='!isReadonly()'>" +
-			"<i ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()' title='{{\"Edit\" | t}}' class='fa fa-pencil'></i>" +
-			'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowView()" title="{{\'View\' | t}}" class="fa fa-file-text-o"></i>'+
-			"<i ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()' title='{{\"New\" | t}}' class='fa fa-plus'></i>" +
-			"<i ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()' title='{{\"Remove\" | t}}' class='fa fa-minus'></i>" +
-			"<i ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()' title='{{\"Select\" | t}}' class='fa fa-search'></i>" +
+			"<a href='' ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()'>" +
+				"<i class='fa fa-search'></i><span x-translate>Search</span>" +
+			"</a>" +
+			"<a href='' ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()'>" +
+				"<i class='fa fa-plus'></i><span x-translate>Add</span>" +
+			"</a>" +
+			"<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()'>" +
+				"<i class='fa fa-pencil'></i><span x-translate>Edit</span>" +
+			"</a>" +
+			"<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowView()'>" +
+				"<i class='fa fa-file-text-o'></i><span x-translate>Show</span>" +
+			"</a>" +
+			"<a href='' ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()'>" +
+				"<i class='fa fa-remove'></i><span x-translate>Remove</span>" +
+			"</a>" +
 		"</div>" +
 		"<div class='icons-bar dropdown' ng-show='viewCanCopy() || viewCanExport()'>" +
 			"<a href='' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-caret-down'></i></a>" +
