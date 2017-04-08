@@ -198,6 +198,10 @@ ui.directive('uiMailMessage', function () {
 			}
 
 			message.$title = (body||{}).title || message.subject;
+			if (!message.$avatar) {
+				var a = scope.$userName(message) || "";
+				message.$a = a[0] || "?";
+			}
 
 			scope.showFull = !message.summary;
 			scope.onShowFull = function () {
@@ -206,12 +210,22 @@ ui.directive('uiMailMessage', function () {
 
 			setTimeout(function () {
 				element.addClass('fadeIn');
+				// dim avatar background color
+				var avatar = element.find('.avatar[class*=bg-]');
+				if (avatar.size()) {
+					var color = avatar.css('background-color');
+					var bg = d3.hsl(color);
+					bg.l += 0.1;
+					bg.s -= 0.1;
+					avatar.css('background-color', bg.toString());
+				}
 			});
 		},
 		template: "" +
 			"<div class='fade'>" +
-				"<a href='' class='pull-left avatar' title='{{::$userName(message)}}' ng-click='showAuthor(message)'>" +
-					"<img ng-src='{{::message.$avatar}}' width='32px'>" +
+				"<a href='' class='pull-left avatar' ng-class='userColor(message)' title='{{::$userName(message)}}' ng-click='showAuthor(message)'>" +
+					"<img ng-if='message.$avatar' ng-src='{{::message.$avatar}}' width='32px'>" +
+					"<span ng-if='message.$a'>{{::message.$a}}</span>" +
 				"</a>" +
 				"<div class='mail-message'>" +
 					"<span class='arrow left'></span>" +
@@ -302,6 +316,38 @@ ui.directive('uiMailMessage', function () {
 ui.formWidget('uiMailMessages', {
 	scope: true,
 	controller: ['$scope', 'MessageService', function ($scope, MessageService) {
+		
+		var userColors = {};
+		var usedColors = [];
+		var colorNames = [
+			'blue', 
+			'green', 
+			'red', 
+			'orange', 
+			'yellow', 
+			'olive', 
+			'teal', 
+			'violet', 
+			'purple', 
+			'pink', 
+			'brown'
+		];
+
+		$scope.userColor = function (message) {
+			var user = message.$author;
+			if (!user) return null;
+			if (userColors[user.code]) {
+				return userColors[user.code];
+			}
+			if (usedColors.length === colorNames.length) {
+				usedColors = [];
+			}
+			var color = _.find(colorNames, function (n) {
+				return usedColors.indexOf(n) === -1;
+			});
+			usedColors.push(color);
+			return userColors[user.code] = 'bg-' + color;
+		};
 
 		function updateReadCount(messages) {
 			var unread = [];

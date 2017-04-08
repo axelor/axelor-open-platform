@@ -344,9 +344,8 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 			details.put("$authorModel", authorModel);
 		}
 
-		String avatar = "img/user.png";
 		if (user != null && user.getImage() != null) {
-			avatar = "ws/rest/" + User.class.getName() + "/" + user.getId() + "/image/download?image=true&v=" + user.getVersion();
+			details.put("$avatar", "ws/rest/" + User.class.getName() + "/" + user.getId() + "/image/download?image=true&v=" + user.getVersion());
 		}
 
 		try {
@@ -354,7 +353,6 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		} catch (Exception e) {
 		}
 
-		details.put("$avatar", avatar);
 		details.put("$from", Resource.toMap(email, "address", "personal"));
 		details.put("$author", author);
 		details.put("$files", files);

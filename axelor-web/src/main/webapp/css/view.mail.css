@@ -79,9 +79,25 @@
 	display: inline-block;
 	width:  40px;
 	height: 40px;
-	margin-left: -22px;
+	margin-left: -21px;
 	border-radius: 500px;
-	background-color: #e7e7e7;
+	line-height: 40px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    color: #ffffff;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 0 rgba(0,0,0,.15);
+}
+
+.mail-thread .avatar:not([class*=bg-]) {
+    background-color: #534cb6;
+}
+
+.mail-thread .avatar:hover,
+.mail-thread .avatar:active,
+.mail-thread .avatar:focus {
+  text-decoration: none;
 }
 
 .mail-thread .avatar img {
