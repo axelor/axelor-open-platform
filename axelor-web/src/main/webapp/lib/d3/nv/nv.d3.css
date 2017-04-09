@@ -409,7 +409,7 @@ svg.nvd3-svg {
 }
 
 .nvd3.nv-pie .hover path {
-    fill-opacity: .7;
+    fill-opacity: 1;
 }
 .nvd3.nv-pie .nv-label {
     pointer-events: none;

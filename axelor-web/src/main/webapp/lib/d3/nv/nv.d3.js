@@ -10347,6 +10347,9 @@ nv.models.pie = function() {
                     color: d3.select(this).style("fill")
                 });
             });
+            
+            slices.style('stroke-opacity', 1)
+            slices.style('fill-opacity', .75);
 
             slices.attr('fill', function(d,i) { return color(d.data, i); });
             slices.attr('stroke', function(d,i) { return color(d.data, i); });
