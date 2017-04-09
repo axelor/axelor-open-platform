@@ -271,21 +271,68 @@ function applyXY(chart, data) {
 	return chart.x(function (d) { return d.x; });
 }
 
-var color_shades = [
-	d3.scale.category10().range(), // no shades
-	d3.scale.category20().range(), // 2 shades
-	d3.scale.category20b().range() // 4 shades
-];
+var themes = {
 
-function colors(color, shades, type) {
-	if (color) {
-		var n = +(shades) || 4;
-		var rest = color_shades[n-1];
-		return _.flatten(color.split(',').map(function (c) {
+	// default
+	d3: d3.scale.category10().range(),
+	
+	// material
+	material: [
+		'#f44336', // Red
+		'#E91E63', // Pink
+		'#9c27b0', // Purple
+		'#673ab7', // Deep Purple
+		'#3f51b5', // Indigo
+		'#2196F3', // Blue
+		'#03a9f4', // Light Blue
+		'#00bcd4', // Cyan
+		'#009688', // Teal
+		'#4caf50', // Green
+		'#8bc34a', // Light Green
+		'#cddc39', // Lime
+		'#ffeb3b', // Yellow
+		'#ffc107', // Amber
+		'#ff9800', // Orange
+		'#ff5722', // Deep Orange
+		'#795548', // Brown
+		'#9e9e9e', // Grey
+		'#607d8b', // Blue Grey
+	],
+
+	// chart.js
+	chartjs: [
+		'#ff6384', '#ff9f40', '#ffcd56', '#4bc0c0',
+		'#36a2eb', '#9966ff', '#c9cbcf',
+	],
+
+	// echart - roma
+	roma: [
+		'#E01F54','#001852','#f5e8c8','#b8d2c7','#c6b38e',
+	    '#a4d8c2','#f3d999','#d3758f','#dcc392','#2e4783',
+	    '#82b6e9','#ff6347','#a092f1','#0a915d','#eaf889',
+	    '#6699FF','#ff6666','#3cb371','#d5b158','#38b6b6',
+	],
+
+	// echart - macarons
+	macarons: [
+	    '#2ec7c9','#b6a2de','#5ab1ef','#ffb980','#d87a80',
+	    '#8d98b3','#e5cf0d','#97b552','#95706d','#dc69aa',
+	    '#07a2a4','#9a7fd1','#588dd5','#f5994e','#c05050',
+	    '#59678c','#c9ab00','#7eb00a','#6f5553','#c14089',
+	]
+};
+
+function colors(names, shades, type) {
+	var given = themes[names] ? themes[names] : names;
+	given = given || themes.material;
+	given = _.isArray(given) ? given : given.split(',');
+	if (given && shades > 1) {
+		var n = Math.max(0, Math.min(+(shades) || 4, 4));
+		return _.flatten(given.map(function (c) {
 			return _.first(_.range(0, n + 1).map(d3.scale.linear().domain([0, n + 1]).range([c, 'white'])), n);
-		}).concat(rest));
+		}));
 	}
-	return type == 'pie' ? d3.scale.category10().range() : d3.scale.category20().range();
+	return given;
 }
 
 var CHARTS = {};
