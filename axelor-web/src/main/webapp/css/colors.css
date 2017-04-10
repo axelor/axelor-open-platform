@@ -24,15 +24,6 @@ header .navbar-inner {
 	box-shadow: none !important;
 }
 
-header .navbar .nav > li > a {
-	color: #676a6c;
-	font-weight: 600;
-}
-
-header .navbar .nav li.dropdown.open > .dropdown-toggle {
-	background-color: #fff;
-}
-
 header .navbar .nav .dropdown-menu {
 	box-shadow: none;
 	border: 1px solid #e7e7e7;
