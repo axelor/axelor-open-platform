@@ -63,12 +63,12 @@ header .navbar .brand-logo img {
 }
 
 header .container-fluid {
-	padding: 0 10px;
+	padding: 0 4px;
 }
 
 @media (max-width: 767px) {
 	header .container-fluid {
-		padding: 0 10px;
+		padding: 0 4px;
 	}
 	header .navbar-fixed-top {
 		margin-left: 0;
@@ -330,6 +330,11 @@ header .navbar .nav-link-user-sub {
 
 #offcanvas {
 	height: 100%;
+}
+
+#offcanvas-toggle {
+    margin: 0;
+    margin-left: 4px;
 }
 
 #offcanvas-toggle a {
