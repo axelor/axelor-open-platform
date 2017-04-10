@@ -30,6 +30,8 @@ import org.apache.shiro.crypto.hash.format.ParsableHashFormat;
 import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 
 import com.axelor.auth.db.User;
+import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
@@ -188,6 +190,37 @@ public class AuthService {
 			return true;
 		}
 		return passwordService.passwordsMatch(plain, saved);
+	}
+
+	/**
+	 * Helper action to check user password.
+	 * 
+	 * @param request
+	 *            the request with username & password as context or data
+	 * @param response
+	 *            the response, with user details if password matched
+	 */
+	public void checkPassword(ActionRequest request, ActionResponse response) {
+		final Context context = request.getContext();
+		final Map<String, Object> data = context == null ? request.getData() : context;
+
+		final String username = (String) data.getOrDefault("username", data.get("code"));
+		final String password = (String) data.getOrDefault("password", data.get("newPassword"));
+
+		final User user = AuthUtils.getUser(username);
+		if (user == null || !match(password, user.getPassword())) {
+			response.setStatus(ActionResponse.STATUS_FAILURE);
+			response.setError("No such user or password doesn't match.");
+			return;
+		}
+
+		final Mapper mapper = Mapper.of(User.class);
+		final Property name = mapper.getNameField();
+		response.setValue("id", user.getId());
+		response.setValue("name", name.get(user));
+		response.setValue("nameField", name.getName());
+		response.setValue("login", user.getCode());
+		response.setValue("lang", user.getLanguage());
 	}
 
 	/**
