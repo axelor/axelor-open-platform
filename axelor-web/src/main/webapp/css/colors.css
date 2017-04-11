@@ -25,12 +25,13 @@ header .navbar-inner {
 }
 
 header .navbar .nav .dropdown-menu {
-	box-shadow: none;
-	border: 1px solid #e7e7e7;
+	border: 1px solid #d3d3d3;
+	border-top: 1px solid #e7e7e7;
 }
 
 header .navbar .nav .dropdown-submenu > .dropdown-menu {
 	margin-left: 0;
+	border-top: 1px solid #d3d3d3;
 }
 
 header .navbar .nav .dropdown-menu > li > a {
@@ -44,6 +45,35 @@ header .navbar .nav .dropdown-submenu > a:after {
 
 header .navbar .nav .dropdown-submenu:hover > a:after {
 	border-left-color: #fff;
+}
+
+header .navbar .nav .fa-bars,
+header .navbar .dropdown-toggle .caret {
+    color: #16a765;
+}
+
+.navbar .nav li.dropdown.open > .dropdown-toggle,
+.navbar .nav li.dropdown.active > .dropdown-toggle,
+.navbar .nav li.dropdown.open.active > .dropdown-toggle {
+    color: #107a4a;
+}
+
+header .navbar .nav > li > a:focus,
+header .navbar .nav > li > a:hover {
+    color: #16a765;
+}
+
+header .navbar .nav .fa-bars:hover,
+header .navbar .nav .fa-bars:focus {
+    color: #107a4a;
+}
+
+header .dropdown-menu > li > a:hover,
+header .dropdown-menu > li > a:focus,
+header .dropdown-submenu:hover > a,
+header .dropdown-submenu:focus > a {
+    color: #fff;
+    background-color: #16a765;
 }
 
 .slick-header-menuitem:hover {

@@ -131,11 +131,11 @@ header .navbar .nav-link-user-name,
 header .navbar .nav-link-user-sub {
 	display: block;
 	font-weight: 600;
-	opacity: .8;
+	opacity: .9;
 }
 header .navbar .nav-link-user-sub {
 	font-size: 10px;
-	opacity: .5;
+	opacity: .7;
 }
 
 .fill-parent {
