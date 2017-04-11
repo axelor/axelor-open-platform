@@ -67,6 +67,10 @@ public class TestEL extends ScriptTest {
 		Assert.assertTrue(actual instanceof String);
 
 		actual = helper.eval("__ref__.fullName += ' (" + counter + ")'");
+		
+		Assert.assertNotNull(helper.eval("__config__.string"));
+		Assert.assertNotNull(helper.eval("__config__.world"));
+		Assert.assertNotNull(helper.eval("__config__.hello.contact()"));
 	}
 
 	@Test

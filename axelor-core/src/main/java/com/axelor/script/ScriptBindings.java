@@ -185,7 +185,7 @@ public class ScriptBindings extends SimpleBindings {
 	}
 
 	@SuppressWarnings("serial")
-	private static class ConfigContext extends HashMap<String, Object> {
+	static class ConfigContext extends HashMap<String, Object> {
 
 		private static Map<String, String> CONFIG;
 		private Map<String, Object> values = new HashMap<>();

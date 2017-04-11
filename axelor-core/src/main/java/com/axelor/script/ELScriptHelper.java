@@ -32,6 +32,7 @@ import com.axelor.internal.javax.el.ImportHandler;
 import com.axelor.internal.javax.el.MapELResolver;
 import com.axelor.internal.javax.el.MethodNotFoundException;
 import com.axelor.rpc.Context;
+import com.axelor.script.ScriptBindings.ConfigContext;
 import com.google.common.primitives.Ints;
 
 public class ELScriptHelper extends AbstractScriptHelper {
@@ -98,6 +99,15 @@ public class ELScriptHelper extends AbstractScriptHelper {
 	}
 	
 	class BeanResolver extends BeanELResolver {
+		
+		@Override
+		public Object getValue(ELContext context, Object base, Object property) {
+			if (base instanceof ConfigContext && ((ConfigContext) base).containsKey(property)) {
+				context.setPropertyResolved(true);
+				return ((ConfigContext) base).get(property);
+			}
+			return super.getValue(context, base, property);
+		}
 		
 		@Override
 		public Object invoke(ELContext context, final Object base, Object method, Class<?>[] paramTypes, Object[] params) {
