@@ -46,7 +46,7 @@ public class QueryTest extends JpaTest {
 	public void testSimpleFilter() {
 
 		String filter = "self.firstName < ? AND self.lastName LIKE ?";
-		String expected = "SELECT self FROM Contact self WHERE self.firstName < ? AND self.lastName LIKE ?";
+		String expected = "SELECT self FROM Contact self WHERE self.firstName < ?1 AND self.lastName LIKE ?2";
 
 		Query<Contact> q = all(Contact.class).filter(filter, "some", "thing");
 

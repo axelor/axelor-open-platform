@@ -29,6 +29,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.TypedQuery;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.hibernate.type.JsonFunction;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -68,6 +69,9 @@ public class Query<T extends Model> {
 	private FlushModeType flushMode = FlushModeType.AUTO;
 
 	private static final String NAME_PATTERN = "((?:[a-zA-Z_]\\w+)(?:(?:\\[\\])?\\.\\w+)*)";
+	
+	private static final Pattern PLACEHOLDER_PLAIN = Pattern.compile("(?<!\\?)\\?(?!(\\d+|\\?))");
+	private static final Pattern PLACEHOLDER_INDEXED = Pattern.compile("\\?\\d+");
 
 	/**
 	 * Create a new instance of {@code Query} with given bean class.
@@ -128,8 +132,27 @@ public class Query<T extends Model> {
 		if (this.filter != null) {
 			throw new IllegalStateException("Query is already filtered.");
 		}
+		if (StringUtils.isBlank(filter)) {
+			throw new IllegalArgumentException("filter string is required.");
+		}
 
-		this.filter = joinHelper.parse(filter);
+		// check for mixed style positional parameters
+		if (PLACEHOLDER_PLAIN.matcher(filter).find() &&
+			PLACEHOLDER_INDEXED.matcher(filter).find()) {
+			throw new IllegalArgumentException(
+					"JDBC and JPA-style positional parameters can't be mixed: " + filter);
+		}
+
+		// fix JDBC style parameters
+		int i = 1;
+		final Matcher matcher = PLACEHOLDER_PLAIN.matcher(filter);
+		final StringBuffer sb = new StringBuffer();
+		while (matcher.find()) {
+			matcher.appendReplacement(sb, "?" + (i++));
+		}
+		matcher.appendTail(sb);
+
+		this.filter = joinHelper.parse(sb.toString());
 		this.params = params;
 		return this;
 	}
