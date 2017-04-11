@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.xml.namespace.QName;
-
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
@@ -46,6 +44,7 @@ import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.Selection;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 
@@ -261,16 +260,14 @@ public class MetaStore {
 		return getSelectionItem(item);
 	}
 
+	@SuppressWarnings("unchecked")
 	private static Selection.Option getSelectionItem(MetaSelectItem item) {
 		Selection.Option option = new Selection.Option();
 		option.setValue(item.getValue());
 		option.setTitle(item.getTitle());
-		String data = item.getData();
-		if (data != null) {
-			Map<QName, String> attrs = new HashMap<>();
-			QName qn = new QName("x-data");
-			attrs.put(qn, data);
-			option.setData(attrs);
+		try {
+			option.setData(Beans.get(ObjectMapper.class).readValue(item.getData(), Map.class));
+		} catch (Exception e) {
 		}
 		return option;
 	}
