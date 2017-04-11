@@ -143,7 +143,7 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 			};
 			
 			MenuService.updateTabStyle = function (tab) {
-				$scope.waitForActions(function () {
+				$scope.ajaxStop(function () {
 					updateTabStyle(tab);
 				});
 			};
