@@ -674,6 +674,7 @@ ui.formInput('RefSelect', {
 			related = scope.field.related || scope.field.name + "Id";
 		
 		scope.fieldsCache = {};
+		scope.selectionList = selectionList;
 
 		scope.refFireEvent = function (name) {
 			var handler = scope.$events[name];
@@ -711,7 +712,7 @@ ui.formInput('RefItem', 'ManyToOne', {
 
 		var self = this;
 		var target = element.attr('x-target');
-		var data = (_.findWhere(scope.$parent.field.selectionList, {value: target})||{}).data || {};
+		var data = (_.findWhere(scope.$parent.selectionList, {value: target})||{}).data || {};
 		
 		function doLink(fields) {
 			var name = false,
@@ -735,6 +736,7 @@ ui.formInput('RefItem', 'ManyToOne', {
 			});
 
 			self._link(scope, element, attrs, model);
+			scope.setDomain(data.domain, data.context);
 		}
 
 		if (scope.fieldsCache[scope._model]) {
