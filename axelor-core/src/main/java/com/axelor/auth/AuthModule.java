@@ -100,6 +100,7 @@ public class AuthModule extends AbstractModule {
 		@SuppressWarnings("unchecked")
 		protected void configureShiroWeb() {
 			this.addFilterChain("/public/**", ANON);
+			this.addFilterChain("/dist/**", ANON);
 			this.addFilterChain("/lib/**", ANON);
 			this.addFilterChain("/img/**", ANON);
 			this.addFilterChain("/ico/**", ANON);

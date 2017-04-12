@@ -75,12 +75,12 @@ public abstract class AbstractTag extends SimpleTagSupport {
 	public void doTag() throws JspException, IOException {
 
 		if (production) {
-			final String gzipped = src.replaceFirst("\\.(js|css)$", ".gzip.$1");
+			final String gzipped = src.replaceAll("^(js|css)\\/(.*)\\.(js|css)$", "dist/$2.gzip.$3");
 			if (exists(gzipped) && gzipSupported()) {
 				doTag(gzipped);
 				return;
 			}
-			final String minified = src.replaceFirst("\\.(js|css)$", ".min.$1");
+			final String minified = src.replaceAll("^(js|css)\\/(.*)\\.(js|css)$", "dist/$2.min.$3");
 			if (exists(minified)) {
 				doTag(minified);
 				return;

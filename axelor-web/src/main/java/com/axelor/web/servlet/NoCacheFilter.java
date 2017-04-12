@@ -42,6 +42,7 @@ public class NoCacheFilter implements Filter {
 		"/partials/*",
 		"/images/*",
 		"/javascript/*",
+		"/dist/*",
 		"/lib/*",
 		"/img/*",
 		"/ico/*",
