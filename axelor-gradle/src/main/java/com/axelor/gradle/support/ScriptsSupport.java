@@ -35,6 +35,7 @@ public class ScriptsSupport extends AbstractSupport {
  			task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
  			task.setWorkingDir(project.getBuildDir() + "/webapp");
  			task.setCommandLine("npm", "install");
+ 			task.dependsOn("copyWebapp");
  		});
 
 		project.getTasks().create("npm-build", Exec.class, task -> {
@@ -42,6 +43,7 @@ public class ScriptsSupport extends AbstractSupport {
 			task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
 			task.setWorkingDir(project.getBuildDir() + "/webapp");
 			task.setCommandLine("npm", "run", "build");
+			task.dependsOn("npm-install");
 		});
 
 		project.getTasks().create("init", JavaExec.class, task -> {
