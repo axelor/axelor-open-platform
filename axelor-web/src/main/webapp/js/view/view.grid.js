@@ -612,6 +612,10 @@ function GridViewCtrl($scope, $element) {
 	}
 	
 	function focusFilter() {
+		// don't focus on mobile, as it will bring keypad up
+		if (axelor.device.mobile) {
+			return;
+		}
 		var filterBox = $('.filter-box .search-query:visible input');
 		if (filterBox.size()) {
 			filterBox.focus().select();
