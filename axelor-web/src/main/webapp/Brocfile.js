@@ -52,7 +52,7 @@ function minifyCss(name) {
     ],
   });
   return new Funnel(tree, {
-    getDestinationPath: function (path) {
+    getDestinationPath: function () {
       return name + '.min.css';
     },
   });
@@ -72,19 +72,18 @@ function minifyJs(name) {
   });
 }
 
-let tree = merge([
+function gzip(tree) {
+  return new Funnel(new Gzip(tree, { keepUncompressed: true }), {
+    getDestinationPath: function (destPath) {
+      return destPath.replace(/\.min\.(js|css)\.gz$/, '.gzip.$1');
+    },
+  });
+}
+
+module.exports = gzip(merge([
   minifyCss('application'),
   minifyCss('application.login'),
   minifyJs('application'),
   minifyJs('application.login'),
-]);
+]));
 
-// gzip
-tree = new Gzip(tree, { keepUncompressed: true });
-tree = new Funnel(tree, {
-  getDestinationPath: function (name) {
-    return name.replace(/\.min\.(js|css)\.gz$/, '.gzip.$1');
-  },
-});
-
-module.exports = tree;

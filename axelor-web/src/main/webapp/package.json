@@ -1,6 +1,9 @@
 {
   "name": "axelor-web",
   "private": true,
+  "engines": {
+  	"node": ">= 4.0.0"
+  },
   "scripts": {
     "clean": "rimraf dist",
     "prebuild": "rimraf dist",
