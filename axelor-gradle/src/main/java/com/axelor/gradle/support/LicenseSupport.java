@@ -66,12 +66,8 @@ public class LicenseSupport extends AbstractSupport {
 		});
 		
 		// format generated code with license header
-		project.getTasks().withType(GenerateCode.class).all(task -> {
-			task.doLast(action -> {
-				
-			});
-		});
-		
+		project.getTasks().withType(GenerateCode.class).all(task -> task.finalizedBy("licenseFormatGenerated"));
+
 		final LicenseExtension license = project.getExtensions().getByType(LicenseExtension.class);
 
 		license.setHeader(header);
