@@ -30,18 +30,18 @@ public class ScriptsSupport extends AbstractSupport {
 	@Override
 	public void apply(Project project) {
 
-		project.getTasks().create("npm", Exec.class, task -> {
+		project.getTasks().create("npm-install", Exec.class, task -> {
  			task.setDescription("Run 'npm install' command to install npm packages.");
  			task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
  			task.setWorkingDir(project.getBuildDir() + "/webapp");
  			task.setCommandLine("npm", "install");
  		});
 
-		project.getTasks().create("gulp", Exec.class, task -> {
-			task.setDescription("Run gulp command to build web resource bundles.");
+		project.getTasks().create("npm-build", Exec.class, task -> {
+			task.setDescription("Run 'npm run build' command to build web resource bundles.");
 			task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
 			task.setWorkingDir(project.getBuildDir() + "/webapp");
-			task.setCommandLine("npm", "run", "gulp");
+			task.setCommandLine("npm", "run", "build");
 		});
 
 		project.getTasks().create("init", JavaExec.class, task -> {
