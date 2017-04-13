@@ -59,14 +59,18 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 					var node = nodes[item.parent];
 					if (node) {
 						node.children.push(item);
-						item.sidebar = node.sidebar;
 					} else if (canAccept(item)){
 						menus.push(item);
-						item.sidebar = true;
 						item.icon = item.icon || 'fa-bars';
 						item.iconBackground = item.iconBackground || 'green';
 					}
 				});
+
+				var markForSidebar = function (item) {
+					item.sidebar = true;
+					item.children.forEach(markForSidebar);
+				};
+				menus.forEach(markForSidebar);
 
 				items.forEach(function (item) {
 					if (item.children.length === 0) {
