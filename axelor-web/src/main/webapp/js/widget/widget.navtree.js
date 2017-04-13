@@ -59,8 +59,10 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 					var node = nodes[item.parent];
 					if (node) {
 						node.children.push(item);
+						item.sidebar = node.sidebar;
 					} else if (canAccept(item)){
 						menus.push(item);
+						item.sidebar = true;
 						item.icon = item.icon || 'fa-bars';
 						item.iconBackground = item.iconBackground || 'green';
 					}
@@ -126,7 +128,7 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 				if (tab.icon || tab.fa) {
 					return;
 				}
-				var node = _.findWhere(nodes, { action: tab.action });
+				var node = _.findWhere(nodes, { action: tab.action, sidebar: true });
 				if (node) {
 					tab.icon = tab.icon || findProp(node, 'icon');
 					tab.color = tab.color || findProp(node, 'iconBackground');
