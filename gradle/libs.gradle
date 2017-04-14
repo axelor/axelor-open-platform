@@ -4,19 +4,20 @@ def versions = [:]
 // versions
 versions.guice = "4.1.0"
 versions.guava = "21.0"
-versions.hibernate_validator = "5.4.0.Final"
 versions.hibernate = "5.2.10.Final"
+versions.hibernate_validator = "5.4.1.Final"
 versions.hibernate_search = "5.7.0.Final"
 
-versions.groovy = "2.4.8"
-versions.resteasy = "3.1.0.Final"
-versions.jackson = "2.8.6"
+versions.groovy = "2.4.10"
+versions.resteasy = "3.1.2.Final"
+versions.jackson = "2.8.8"
 versions.shiro = "1.2.6"
 
 versions.junit = "4.12"
-versions.slf4j = "1.7.23"
+versions.slf4j = "1.7.25"
 
-versions.tomcat_embed = "8.5.9"
+versions.tomcat = "8.5.13"
+versions.tomcat_embed = "${versions.tomcat}"
 versions.tomcat_embed_logging = "8.5.2"
 
 // unit testing
@@ -43,9 +44,9 @@ libs.slf4j_simple = libs.slf4j_base + [
 ]
 
 libs.slf4j_logback = libs.slf4j_base + [
-	"ch.qos.logback:logback-core:1.2.1",
-	"ch.qos.logback:logback-classic:1.2.1",
-	"org.fusesource.jansi:jansi:1.14"
+	"ch.qos.logback:logback-core:1.2.3",
+	"ch.qos.logback:logback-classic:1.2.3",
+	"org.fusesource.jansi:jansi:1.15"
 ]
 
 // Guava
@@ -64,20 +65,20 @@ libs.guice_multibindings = "com.google.inject.extensions:guice-multibindings:${v
 libs.axelor_cglib = "com.axelor:axelor-cglib:3.1"
 
 // Tomcat EL (repackaged to avoid version conflicts)
-libs.axelor_el = "com.axelor:axelor-el:8.5.9"
+libs.axelor_el = "com.axelor:axelor-el:${versions.tomcat}"
 
 // javax libs
 libs.javax_servlet = "javax.servlet:javax.servlet-api:3.1.0"
 libs.javax_servlet_jsp = "javax.servlet.jsp:javax.servlet.jsp-api:2.3.1"
 libs.javax_validation = "javax.validation:validation-api:1.1.0.Final"
-libs.javax_el = ["org.apache.tomcat:tomcat-jasper:8.5.9", "org.apache.tomcat:tomcat-el-api:8.5.9"]
+libs.javax_el = ["org.apache.tomcat:tomcat-jasper:${versions.tomcat}", "org.apache.tomcat:tomcat-el-api:${versions.tomcat}"]
 libs.javax_mail = ["com.sun.mail:javax.mail:1.5.6"]
 libs.greenmail = "com.icegreen:greenmail:1.5.3"
 
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.3.4"
-libs.jdbc_postgres = "org.postgresql:postgresql:9.4.1212"
-libs.jdbc_mysql = "mysql:mysql-connector-java:5.1.40"
+libs.jdbc_postgres = "org.postgresql:postgresql:42.0.0"
+libs.jdbc_mysql = "mysql:mysql-connector-java:5.1.41"
 
 // Hibernate
 libs.hibernate = [
@@ -108,7 +109,7 @@ libs.apache_tika = dependencies.create("org.apache.tika:tika-parsers:1.4") {
 }
 
 // flyway
-libs.flywaydb = "org.flywaydb:flyway-core:4.1.0"
+libs.flywaydb = "org.flywaydb:flyway-core:4.1.2"
 
 // eclipselink
 libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.6.4"
@@ -180,7 +181,7 @@ libs.birt_runtime = dependencies.create("org.eclipse.birt.runtime:org.eclipse.bi
 
 // jline & jcommander
 libs.jline = "jline:jline:2.14.3"
-libs.jcommander = "com.beust:jcommander:1.60"
+libs.jcommander = "com.beust:jcommander:1.64"
 
 // Quartz Scheduler
 libs.quartz = dependencies.create("org.quartz-scheduler:quartz:2.2.3") { exclude module: "c3p0" }
