@@ -92,17 +92,19 @@ libs.hibernate_ehcache = "org.hibernate:hibernate-ehcache:${versions.hibernate}"
 libs.hibernate_search = "org.hibernate:hibernate-search-orm:${versions.hibernate_search}"
 
 // minimal set of tika-parsers
-libs.apache_tika = dependencies.module("org.apache.tika:tika-parsers:1.4") {
-	dependency 'org.apache.tika:tika-core:1.4'
-	dependency 'org.apache.commons:commons-compress:1.5'
-	dependency 'org.apache.pdfbox:pdfbox:1.8.1'
-	dependency 'org.apache.poi:poi:3.9'
-	dependency 'org.apache.poi:poi-ooxml:3.9'
-	dependency 'org.apache.poi:poi-scratchpad:3.9'
-	dependency 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
-	dependency 'de.l3s.boilerpipe:boilerpipe:1.1.0'
-	dependency 'commons-codec:commons-codec:1.5'
-	dependency 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
+libs.apache_tika = dependencies.create("org.apache.tika:tika-parsers:1.4") {
+	exclude group: 'org.gagravarr', module: 'vorbis-java-tika'
+	exclude group: 'edu.ucar', module: 'netcdf'
+	exclude group: 'org.apache.james', module: 'apache-mime4j-core'
+	exclude group: 'org.apache.james', module: 'apache-mime4j-dom'
+	exclude group: 'org.bouncycastle', module: 'bcmail-jdk15'
+	exclude group: 'org.bouncycastle', module: 'bcprov-jdk15'
+	exclude group: 'org.ow2.asm', module: 'asm-debug-all'
+	exclude group: 'com.googlecode.mp4parser', module: 'isoparser'
+	exclude group: 'xerces', module: 'xercesImpl'
+	exclude group: 'rome', module: 'rome'
+	exclude group: 'org.gagravarr', module: 'vorbis-java-core'
+	exclude group: 'org.apache.geronimo.specs', module: 'geronimo-stax-api_1.0_spec'
 }
 
 // flyway
