@@ -190,7 +190,7 @@ libs.quartz = dependencies.create("org.quartz-scheduler:quartz:2.2.3") { exclude
 libs.xstream = "com.thoughtworks.xstream:xstream:1.4.9"
 
 // opencsv
-libs.opencsv = "net.sf.opencsv:opencsv:2.3"
+libs.opencsv = "com.opencsv:opencsv:3.9"
 
 // jsoup for html parsing & sanitize
 libs.jsoup = "org.jsoup:jsoup:1.10.2"

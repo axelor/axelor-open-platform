@@ -37,9 +37,6 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import au.com.bytecode.opencsv.CSVParser;
-import au.com.bytecode.opencsv.CSVReader;
-
 import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
@@ -50,6 +47,8 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVReader;
 
 @Singleton
 public class I18nLoader extends AbstractLoader {
