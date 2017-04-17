@@ -22,9 +22,10 @@ dependencies {
 	compile libs.jdbc_postgres
 	compile libs.jdbc_mysql
 	compile libs.hibernate
-	compile libs.hibernate_ehcache
 	compile libs.hibernate_search
+
 	runtime libs.apache_tika
+
 	compile libs.flywaydb
 
 	compile libs.resteasy

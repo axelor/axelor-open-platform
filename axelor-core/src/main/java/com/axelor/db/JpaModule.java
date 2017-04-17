@@ -17,7 +17,6 @@
  */
 package com.axelor.db;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -25,6 +24,8 @@ import java.util.Properties;
 import javax.inject.Inject;
 
 import org.hibernate.MultiTenancyStrategy;
+import org.hibernate.cache.infinispan.InfinispanRegionFactory;
+import org.hibernate.cache.jcache.JCacheRegionFactory;
 import org.hibernate.cfg.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +56,12 @@ import com.google.inject.persist.jpa.JpaPersistModule;
  */
 public class JpaModule extends AbstractModule {
 
+	private static final String CACHE_REGION_FACTORY_JCACHE = "org.hibernate.cache.jcache.JCacheRegionFactory";
+	private static final String CACHE_REGION_FACTORY_INFINISPAN = "org.hibernate.cache.infinispan.InfinispanRegionFactory";
+
+	private static final String INFINISPAN_CONFIG = "infinispan.xml";
+	private static final String INFINISPAN_CONFIG_FALLBACK = "org/hibernate/cache/infinispan/builder/infinispan-configs-local.xml";
+
 	private static Logger log = LoggerFactory.getLogger(JpaModule.class);
 
 	private String jpaUnit;
@@ -72,11 +79,11 @@ public class JpaModule extends AbstractModule {
 	 * Create new instance of the {@link JpaModule} with the given persistence
 	 * unit name.
 	 *
-	 * If <i>autoscan</i> is true then a custom Hibernate scanner will be used to scan
-	 * all the classpath entries for Entity classes.
+	 * If <i>autoscan</i> is true then a custom Hibernate scanner will be used
+	 * to scan all the classpath entries for Entity classes.
 	 *
-	 * If <i>autostart</i> is true then the {@link PersistService} will be started
-	 * automatically.
+	 * If <i>autostart</i> is true then the {@link PersistService} will be
+	 * started automatically.
 	 *
 	 * @param jpaUnit
 	 *            the persistence unit name
@@ -135,20 +142,10 @@ public class JpaModule extends AbstractModule {
 		properties.put(Environment.USE_NEW_ID_GENERATOR_MAPPINGS, "true");
 		properties.put(Environment.IMPLICIT_NAMING_STRATEGY, ImplicitNamingStrategyImpl.class.getName());
 		properties.put(Environment.PHYSICAL_NAMING_STRATEGY, PhysicalNamingStrategyImpl.class.getName());
-		
+
 		properties.put(Environment.AUTOCOMMIT, "false");
 		properties.put(Environment.MAX_FETCH_DEPTH, "3");
 
-		if (DBHelper.isCacheEnabled()) {
-			properties.put(Environment.USE_SECOND_LEVEL_CACHE, "true");
-			properties.put(Environment.USE_QUERY_CACHE, "true");
-			properties.put(Environment.CACHE_REGION_FACTORY, "org.hibernate.cache.ehcache.EhCacheRegionFactory");
-			try {
-				updateCacheProperties(properties);
-			} catch (Exception e) {
-			}
-		}
-		
 		try {
 			updatePersistenceProperties(properties);
 		} catch (Exception e) {
@@ -170,6 +167,32 @@ public class JpaModule extends AbstractModule {
 		for (String name : settings.getProperties().stringPropertyNames()) {
 			if (name.startsWith("hibernate.")) {
 				properties.put(name, settings.get(name));
+			}
+		}
+
+		// L2-cache support
+		if (DBHelper.isCacheEnabled()) {
+			properties.put(Environment.USE_SECOND_LEVEL_CACHE, "true");
+			properties.put(Environment.USE_QUERY_CACHE, "true");
+
+			final String jcacheProvider = settings.get(JCacheRegionFactory.PROVIDER);
+			final String jcacheConfig = settings.get(JCacheRegionFactory.CONFIG_URI);
+
+			if (jcacheProvider != null) {
+				// use jcache
+				properties.put(Environment.CACHE_REGION_FACTORY, CACHE_REGION_FACTORY_JCACHE);
+				properties.put(JCacheRegionFactory.PROVIDER, jcacheProvider);
+				properties.put(JCacheRegionFactory.CONFIG_URI, jcacheConfig);
+			} else {
+				// use infinispan
+				properties.put(Environment.CACHE_REGION_FACTORY, CACHE_REGION_FACTORY_INFINISPAN);
+				String infinispanConfig = settings.get(InfinispanRegionFactory.INFINISPAN_CONFIG_RESOURCE_PROP);
+				if (infinispanConfig == null) {
+					infinispanConfig = ResourceUtils.getResource(INFINISPAN_CONFIG) != null
+							? INFINISPAN_CONFIG
+							: INFINISPAN_CONFIG_FALLBACK;
+				}
+				properties.put(InfinispanRegionFactory.INFINISPAN_CONFIG_RESOURCE_PROP, infinispanConfig);
 			}
 		}
 
@@ -215,23 +238,6 @@ public class JpaModule extends AbstractModule {
 			if (!StringUtils.isBlank(value)) {
 				properties.put(name, value.trim());
 			}
-		}
-		
-		return properties;
-	}
-	
-	private Properties updateCacheProperties(Properties properties) throws IOException {
-		final Properties config = new Properties();
-		config.load(ResourceUtils.getResourceStream("ehcache-objects.properties"));
-
-		for (Object key : config.keySet()) {
-			String name = (String) key;
-			String value = config.getProperty((String) name).trim();
-			String prefix = "hibernate.ejb.classcache";
-			if (!Character.isUpperCase(name.charAt(name.lastIndexOf(".") + 1))) {
-				prefix = "hibernate.ejb.collectioncache";
-			}
-			properties.put(prefix + "." + name, value);
 		}
 
 		return properties;

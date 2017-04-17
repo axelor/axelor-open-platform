@@ -85,9 +85,10 @@ libs.hibernate = [
     "org.hibernate:hibernate-core:${versions.hibernate}",
     "org.hibernate:hibernate-entitymanager:${versions.hibernate}",
 	"org.hibernate:hibernate-hikaricp:${versions.hibernate}",
-    "org.hibernate:hibernate-validator:${versions.hibernate_validator}"
+    "org.hibernate:hibernate-validator:${versions.hibernate_validator}",
+	"org.hibernate:hibernate-infinispan:${versions.hibernate}",
+	"org.hibernate:hibernate-jcache:${versions.hibernate}",
 ]
-libs.hibernate_ehcache = "org.hibernate:hibernate-ehcache:${versions.hibernate}"
 
 // Hibernate search
 libs.hibernate_search = "org.hibernate:hibernate-search-orm:${versions.hibernate_search}"
