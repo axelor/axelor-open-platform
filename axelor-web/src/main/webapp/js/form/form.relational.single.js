@@ -63,31 +63,24 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 
 	$scope.selectMode = "single";
 
-	$scope.select = function(value) {
-
-		if (_.isArray(value)) {
-			value = _.first(value);
-		}
-
-		var field = $scope.field,
-			nameField = field.targetName || 'id';
-
-		var record = value;
-
-		// fetch '.' names
+	$scope.findRelativeFields = function () {
 		var path = $element.attr('x-path');
+		var relatives = $element.parents().find('[x-field][x-path^="'+path+'."]').map(function() {
+			return $(this).attr('x-path').replace(path+'.','');
+		}).get();
+		return _.unique(relatives);
+	};
+
+	$scope.fetchMissingValues = function (value, fields) {
+		var nameField = $scope.field.targetName || 'id';
 		var related = {};
-		var relatives = $element.parents().find('[x-field][x-path^="'+path+'."]').map(
-				function(){
-					return $(this).attr('x-path').replace(path+'.','');
-				}).get();
-		relatives = _.unique(relatives);
+		var relatives = fields || $scope.findRelativeFields();
 		var missing = _.filter(relatives, function (name) {
 			return !value || value[name] === undefined;
 		});
 		_.each(relatives, function(name) {
 			var prefix = name.split('.')[0];
-			related[prefix] = record[prefix];
+			related[prefix] = value[prefix];
 		});
 		if (missing.length > 0 && value && value.id) {
 			return ds.read(value.id, {
@@ -102,20 +95,29 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 					var prefix = name.split('.')[0];
 					record[prefix] = rec[prefix];
 				});
-				$scope.setValue(record, true);
+				$scope.setValue(record, false);
 			});
 		}
-		// end fetch '.' names
+	};
+
+	$scope.select = function(value) {
+
+		if (_.isArray(value)) {
+			value = _.first(value);
+		}
+
+		var nameField = $scope.field.targetName || 'id';
+		var record = value;
 
 		if (value && value.id) {
-			record = _.extend({}, related, {
+			record = _.extend({}, {
 				id: value.id,
 				$version: value.version || value.$version
 			});
 			record[nameField] = value[nameField];
 			if (nameField && _.isUndefined(value[nameField])) {
 				return ds.details(value.id, nameField).success(function(rec){
-					$scope.setValue(_.extend({}, related, rec), true);
+					$scope.setValue(_.extend({}, rec), true);
 				});
 			}
 			if (value.code) {
@@ -271,6 +273,15 @@ ui.formInput('ManyToOne', 'Select', {
 		scope.canToggle = function() {
 			return (field.widgetAttrs || {}).toggle;
 		};
+
+		var relatives = scope.findRelativeFields();
+		if (relatives.length > 0) {
+			scope.$watch(attrs.ngModel, function (value, old) {
+				if (value && value.id > 0) {
+					scope.fetchMissingValues(scope.getValue(), relatives);
+				}
+			}, true);
+		}
 
 		if (field.widget === 'NestedEditor') {
 
@@ -666,6 +677,7 @@ ui.formInput('RefSelect', {
 
 		scope.isLink = this.isLink;
 		scope.fieldsCache = {};
+		scope.selectionList = selectionList;
 
 		scope.refFireEvent = function (name) {
 			var handler = scope.$events[name];
@@ -713,7 +725,7 @@ ui.formInput('RefItem', 'ManyToOne', {
 
 		var self = this;
 		var target = element.attr('x-target');
-		var data = (_.findWhere(scope.$parent.field.selectionList, {value: target})||{}).data || {};
+		var data = (_.findWhere(scope.$parent.selectionList, {value: target})||{}).data || {};
 		
 		function doLink(fields) {
 			var name = false,
@@ -737,7 +749,8 @@ ui.formInput('RefItem', 'ManyToOne', {
 			});
 
 			self._link(scope, element, attrs, model);
-			
+			scope.setDomain(data.domain, data.context);
+
 			if (scope.$parent.isLink) {
 				scope.onEdit = function () {
 					var value = scope.getValue() || {};

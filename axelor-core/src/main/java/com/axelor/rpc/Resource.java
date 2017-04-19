@@ -259,7 +259,7 @@ public class Resource<T extends Model> {
 			sortBy.add(spec);
 		}
 
-		if (!unique && (!sortBy.contains("id") || !sortBy.contains("-id"))) {
+		if (!unique && !(sortBy.contains("id") || sortBy.contains("-id"))) {
 			sortBy.add(desc ? "-id" : "id");
 		}
 
