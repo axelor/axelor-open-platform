@@ -401,18 +401,18 @@
 			}
 			return {
 				get: function (name) {
-					return new Promise(function (resolve) {
+					return new $q(function (resolve) {
 						resolve(viewCache.get(toKey(name)));
 					});
 				},
 				set: function (name, value) {
 					if (value) {
-						return new Promise(function (resolve) {
+						return new $q(function (resolve) {
 							var val = viewCache.put(toKey(name), angular.copy(value));
 							resolve(val);
 						});
 					}
-					return Promise.resolve(value);
+					return $q.resolve(value);
 				}
 			}
 		}
@@ -452,7 +452,7 @@
 					if (current !== fetched.fields) {
 						_.extend(current, _.object(_.pluck(fetched.fields, 'name'), fetched.fields));
 					}
-					return Promise.all([FIELDS.set(model, current), PERMS.set(model, fetched.perms)]);
+					return $q.all([FIELDS.set(model, current), PERMS.set(model, fetched.perms)]);
 				});
 			}
 
@@ -492,7 +492,7 @@
 					});
 				}
 
-				Promise.all([FIELDS.get(model), PERMS.get(model)]).then(function (res) {
+				$q.all([FIELDS.get(model), PERMS.get(model)]).then(function (res) {
 					var fetchedFields = res[0] || {};
 					var pendingFields = _.filter(fields, function (n) { return !fetchedFields.hasOwnProperty(n); });
 					if (pendingFields.length == 0) {
@@ -583,7 +583,9 @@
 							name: view.name,
 							context: context
 						}
-					}).then(resolve);
+					});
+
+					pending.then(resolve);
 
 					pending.then(clear, clear);
 					PENDING_REQUESTS[key] = pending;
