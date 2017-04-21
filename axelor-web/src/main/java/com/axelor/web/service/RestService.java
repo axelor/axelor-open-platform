@@ -41,6 +41,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -488,6 +489,14 @@ public class RestService extends ResourceService {
 					AppSettings.get().get("data.export.encoding"));
 		} catch (Exception e) {
 		}
+	}
+
+	@HEAD
+	@Path("export/{name}")
+	public javax.ws.rs.core.Response exportCheck(@PathParam("name") final String name) {
+		return Files.exists(MetaFiles.findTempFile(name))
+			? javax.ws.rs.core.Response.ok().build()
+			: javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
 	}
 
 	@GET

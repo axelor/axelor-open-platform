@@ -38,6 +38,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -243,18 +244,31 @@ public class DmsService {
 		response.setStatus(Response.STATUS_SUCCESS);
 		return response;
 	}
+	
+	private File findFile(DMSFile file) {
+		if (file == null || file.getMetaFile() == null) {
+			return null;
+		}
+		final File path = MetaFiles.getPath(file.getMetaFile()).toFile();
+		return path.exists() ? path : null;
+	}
+
+	@HEAD
+	@Path("offline/{id}")
+	public javax.ws.rs.core.Response doDownloadCheck(@PathParam("id") long id) {
+		final DMSFile file = repository.find(id);
+		return findFile(file) == null
+			? javax.ws.rs.core.Response.status(Status.NOT_FOUND).build()
+			: javax.ws.rs.core.Response.ok().build();
+	}
 
 	@GET
 	@Path("offline/{id}")
 	public javax.ws.rs.core.Response doDownload(@PathParam("id") long id) {
 
 		final DMSFile file = repository.find(id);
-		if (file == null || file.getMetaFile() == null) {
-			return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
-		}
-
-		final File path = MetaFiles.getPath(file.getMetaFile()).toFile();
-		if (!path.exists()) {
+		final File path = findFile(file);
+		if (path == null) {
 			return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
 		}
 
@@ -305,11 +319,7 @@ public class DmsService {
 		return javax.ws.rs.core.Response.ok(data).build();
 	}
 
-	@GET
-	@Path("download/{id}")
-	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public javax.ws.rs.core.Response doDownload(@PathParam("id") String batchOrId) {
-
+	private List<?> findBatchIds(String batchOrId) {
 		List<?> ids = (List<?>) httpRequest.getSession().getAttribute(batchOrId);
 		if (ids == null) {
 			Long id = Longs.tryParse(batchOrId);
@@ -317,6 +327,26 @@ public class DmsService {
 		}
 
 		if (ids == null || ids.isEmpty()) {
+			return null;
+		}
+		return ids;
+	}
+	
+	@HEAD
+	@Path("download/{id}")
+	public javax.ws.rs.core.Response doDownloadCheck(@PathParam("id") String batchOrId) {
+		return findBatchIds(batchOrId) == null
+				? javax.ws.rs.core.Response.status(Status.NOT_FOUND).build()
+				: javax.ws.rs.core.Response.ok().build();
+	}
+
+	@GET
+	@Path("download/{id}")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public javax.ws.rs.core.Response doDownload(@PathParam("id") String batchOrId) {
+
+		final List<?> ids = findBatchIds(batchOrId);
+		if (ids == null) {
 			return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
 		}
 
