@@ -197,6 +197,7 @@
 						items: []
 					};
 					var panel = null;
+					var panelTab = null;
 					item.jsonFields.forEach(function (field) {
 						if (field.widgetAttrs) {
 							field.widgetAttrs = angular.fromJson(field.widgetAttrs);
@@ -207,7 +208,16 @@
 						}
 						if (field.type === 'panel') {
 							panel = _.extend({}, field, { items: [] });
-							editor.items.push(panel);
+							if ((field.widgetAttrs || {}).tab) {
+								panelTab = panelTab || {
+									type: 'panel-tabs',
+									colSpan: 12,
+									items: []
+								};
+								panelTab.items.push(panel);
+							} else {
+								editor.items.push(panel);
+							}
 							return;
 						}
 						field.title = field.title || field.autoTitle;
@@ -226,6 +236,11 @@
 							editor.items.push(field);
 						}
 					});
+
+					if (panelTab) {
+						editor.items.push(panelTab);
+					}
+
 					item.widget = 'json-field';
 					item.editor = editor;
 					if (!item.viewer) {
