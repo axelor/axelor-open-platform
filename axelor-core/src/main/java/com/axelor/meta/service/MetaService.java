@@ -308,8 +308,9 @@ public class MetaService {
 			// if no group access, check for roles
 			final Set<String> myGroups = menuGroups.get(menu.getId());
 			final Set<String> myRoles = menuRoles.get(menu.getId());
-			if (myGroups != null && !myGroups.contains(userGroup)
-					&& (myRoles == null || Collections.disjoint(userRoles, myRoles))) {
+			
+			if ((myGroups != null && !myGroups.contains(userGroup)) || (!AuthUtils.isAdmin(user) && myGroups == null
+					&& myRoles != null && Collections.disjoint(userRoles, myRoles))) {
 				continue;
 			}
 
