@@ -1025,7 +1025,7 @@ ui.formBuild = function (scope, schema, fields) {
 			if (this.type == 'field') {
 				delete this.type;
 			}
-			if (['panel', 'panel-related'].indexOf(this.type) > -1) {
+			if (['panel', 'panel-json', 'panel-related'].indexOf(this.type) > -1) {
 				scope.$hasPanels = hasPanels = true;
 			}
 

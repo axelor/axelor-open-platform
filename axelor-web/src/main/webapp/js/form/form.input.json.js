@@ -21,6 +21,12 @@
 
 var ui = angular.module('axelor.ui');
 
+ui.formWidget('PanelJson', {
+	showTitle: false,
+	transclude: true,
+	template: "<div class='panel-json' ui-transclude></div>"
+});
+
 ui.formInput('JsonField', 'String', {
 	showTitle: false,
 	link: function (scope, element, attrs, model) {

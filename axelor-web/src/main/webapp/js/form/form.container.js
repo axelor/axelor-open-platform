@@ -496,6 +496,13 @@ ui.formWidget('Panel', {
 				iconElem.find('i').addClass('fg-white');
 			});
 		}
+		
+		setTimeout(function () {
+			var nestedJson = element.parents('.panel-json:first').size() > 0;
+			if (nestedJson) {
+				element.removeClass("panel-nested");
+			}
+		});
 	},
 
 	transclude: true,

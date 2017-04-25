@@ -549,6 +549,10 @@
    padding-top: 30px;
 }
 
+.panel-json .bar-layout {
+  padding: 0;
+}
+
 /** some special classes */
 .border-left-none,
 .border-left-none.form-item-container,

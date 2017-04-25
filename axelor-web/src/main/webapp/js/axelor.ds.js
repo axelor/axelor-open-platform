@@ -169,6 +169,7 @@
 			meta = meta || {};
 			view = view || {};
 
+			view = processJsonForm(view);
 			meta.fields = processFields(meta.fields);
 
 			forEach(view.items || view.pages, function(item) {
@@ -194,6 +195,7 @@
 				}
 				if (item.jsonFields && item.widget !== 'json-raw') {
 					var editor = {
+						layout: view.type === 'panel-json' ? 'table' : undefined,
 						items: []
 					};
 					var panel = null;
@@ -271,6 +273,22 @@
 			}
 		};
 		
+		function processJsonForm(view) {
+			if (view.type !== 'form') return view;
+			if (view.model !== 'com.axelor.meta.db.MetaJsonRecord') return view;
+
+			var panel = _.first(view.items) || {};
+			var jsonField = _.first(panel.items) || {};
+			var jsonFields = jsonField.jsonFields || [];
+
+			var first = _.first(jsonFields) || {};
+			if (first.type === 'panel') {
+				panel.type = 'panel-json';
+			}
+
+			return view;
+		}
+
 		function processFields(fields) {
 			var result = {};
 			if (isArray(fields)) {
