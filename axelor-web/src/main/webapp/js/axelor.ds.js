@@ -284,6 +284,10 @@
 			var first = _.first(jsonFields) || {};
 			if (first.type === 'panel') {
 				panel.type = 'panel-json';
+				if (first.widgetAttrs) {
+					var attrs = angular.fromJson(first.widgetAttrs);
+					view.width = view.width || attrs.width;
+				}
 			}
 
 			return view;
