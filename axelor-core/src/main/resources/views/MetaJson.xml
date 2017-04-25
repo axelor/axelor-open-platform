@@ -66,6 +66,9 @@
         <field name="hideIf" />
         <field name="requiredIf" />
       </panel>
+      <panel-related field="roles">
+        <field name="name" />
+      </panel-related>
     </panel-tabs>
     <panel title="Options" sidebar="true" itemSpan="6">
       <field name="required" widget="inline-checkbox" />
@@ -121,10 +124,15 @@
       <field name="onNew" />
       <field name="onSave" />
     </panel>
-    <panel-related field="fields" form-view="json-field-form-2" orderBy="sequence" canMove="true">
-      <field name="name" />
-      <field name="type" />
-    </panel-related>
+    <panel-tabs>
+  	  <panel-related field="fields" form-view="json-field-form-2" orderBy="sequence" canMove="true">
+        <field name="name"/>
+        <field name="type"/>
+      </panel-related>
+      <panel-related field="roles">
+        <field name="name" />
+      </panel-related>
+    </panel-tabs>
   </form>
 
   <grid name="json-record-grid" title="Form records" model="com.axelor.meta.db.MetaJsonRecord">

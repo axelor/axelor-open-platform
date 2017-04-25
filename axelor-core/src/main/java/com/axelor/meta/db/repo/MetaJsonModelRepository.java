@@ -44,6 +44,10 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 		menu.setName("menu-json-model-" + jsonModel.getName());
 		menu.setTitle(jsonModel.getTitle());
 
+		if (jsonModel.getRoles() != null) {
+			jsonModel.getRoles().forEach(menu::addRole);
+		}
+
 		MetaAction action = jsonModel.getAction();
 		if (action == null) {
 			action = new MetaAction();

@@ -38,6 +38,7 @@
     <string name="onChange" />
     <string name="onClick" />
     <string name="widgetAttrs" json="true" />
+    <many-to-many name="roles" ref="com.axelor.auth.db.Role" />
   </entity>
 
   <entity name="MetaJsonModel" table="META_JSON_MODEL" repository="abstract">
@@ -50,6 +51,7 @@
     <many-to-one name="gridView" ref="MetaView" copy="false" />
     <many-to-one name="formView" ref="MetaView" copy="false" />
     <one-to-many name="fields" ref="MetaJsonField" mappedBy="jsonModel" />
+    <many-to-many name="roles" ref="com.axelor.auth.db.Role" />
   </entity>
 
   <entity name="MetaJsonRecord" table="META_JSON_RECORD">

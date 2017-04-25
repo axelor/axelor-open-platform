@@ -21,13 +21,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
@@ -241,6 +244,7 @@ public class MetaStore {
 		final Mapper mapper = Mapper.of(MetaJsonField.class);
 		final Map<String, Object> fields = new LinkedHashMap<>();
 		final List<MetaJsonField> jsonFields = new ArrayList<>(records);
+		final User user = AuthUtils.getUser();
 
 		jsonFields.sort((a, b) -> {
 			int x = a.getSequence() == null ? 0 : a.getSequence();
@@ -250,6 +254,22 @@ public class MetaStore {
 
 		for (MetaJsonField record : jsonFields) {
 			final Map<String, Object> attrs = new HashMap<>();
+			final String name = record.getName();
+			
+			// check permissions
+			if (record.getRoles() != null && !record.getRoles().isEmpty()) {
+				final Set<Role> roles = new HashSet<>();
+				if (user.getRoles() != null) {
+					roles.addAll(user.getRoles());
+				}
+				if (user.getGroup() != null && user.getGroup().getRoles() != null) {
+					roles.addAll(user.getGroup().getRoles());
+				}
+				if (Collections.disjoint(roles, record.getRoles())) {
+					continue;
+				}
+			}
+
 			for (java.lang.reflect.Field field : declaredFields) {
 				final Property prop = mapper.getProperty(field.getName());
 				if (prop == null || prop.isPrimary() || prop.isReference() || prop.isCollection()) {
@@ -260,7 +280,6 @@ public class MetaStore {
 				attrs.put(prop.getName(), value);
 			}
 
-			String name = record.getName();
 			String title = record.getTitle();
 
 			// localized title
