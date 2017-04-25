@@ -202,6 +202,9 @@
 						if (field.widgetAttrs) {
 							field.widgetAttrs = angular.fromJson(field.widgetAttrs);
 							processWidget(field);
+							if (field.widgetAttrs.showTitle !== undefined) {
+								field.showTitle = field.widgetAttrs.showTitle;
+							}
 						}
 						if (field.type === 'panel' || field.type === 'separator') {
 							field.hiddenInGrid = true;

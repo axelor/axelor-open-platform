@@ -481,6 +481,10 @@
 	display: inline-flex;
 }
 
+.panel-tabs .nav-tabs-responsive > li {
+    margin-top: -12px;
+}
+
 .panel-tabs .nav-tabs-responsive > li.dropdown {
 	max-width: 120px;
 }
