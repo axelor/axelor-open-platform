@@ -59,7 +59,7 @@ public class Criteria {
 					//throw new RuntimeException(e);
 				}
 			}
-			Context context = Context.create(domainContext, domainClass);
+			Context context = new Context(domainContext, domainClass);
 			q.bind(context);
 		}
 		return q;

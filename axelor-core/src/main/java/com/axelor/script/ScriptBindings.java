@@ -77,7 +77,7 @@ public class ScriptBindings extends SimpleBindings {
 		} catch (NullPointerException | ClassNotFoundException e) {
 			return variables;
 		}
-		return Context.create(variables, klass);
+		return new Context(variables, klass);
 	}
 
 	@SuppressWarnings("all")

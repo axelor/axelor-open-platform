@@ -28,7 +28,6 @@ import com.axelor.db.annotations.HashKey;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
-import com.axelor.internal.cglib.proxy.Enhancer;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.ContextEntity;
 import com.google.common.base.MoreObjects;
@@ -171,7 +170,7 @@ public final class EntityHelper {
 			return ((HibernateProxy) entity).getHibernateLazyInitializer().getPersistentClass();
 		}
 		Class<?> klass = entity.getClass();
-		while (Enhancer.isEnhanced(klass)) {
+		while (ContextEntity.class.isAssignableFrom(klass)) {
 			klass = klass.getSuperclass();
 		}
 		return (Class<T>) klass;

@@ -710,7 +710,7 @@ public class RestService extends ResourceService {
 		final Response response = new Response();
 		@SuppressWarnings("all")
 		final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
-		final Context ctx = Context.create(request.getData(), MailMessage.class);
+		final Context ctx = new Context(request.getData(), MailMessage.class);
 		final MailMessage msg = ctx.asType(MailMessage.class);
 
 		final Model entity = repo.find(id);

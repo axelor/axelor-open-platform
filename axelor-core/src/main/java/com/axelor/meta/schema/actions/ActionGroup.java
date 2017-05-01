@@ -362,12 +362,12 @@ public class ActionGroup extends ActionResumable {
     	}
     	
 		try {
-			handler.getContext().update(map);
+			handler.getContext().putAll(map);
 		} catch (IllegalArgumentException e) {
 			// SEE: RM-5373
 			// for some reasons, if we have incompatible value types in response map,
 			// try convert them with type adapters and try again.
-			handler.getContext().update(Mapper.toMap(Mapper.toBean(handler.getContext().getContextClass(), map)));
+			handler.getContext().putAll(Mapper.toMap(Mapper.toBean(handler.getContext().getContextClass(), map)));
 		}
 	}
 

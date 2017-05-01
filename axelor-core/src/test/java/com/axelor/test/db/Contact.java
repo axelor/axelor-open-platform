@@ -128,10 +128,10 @@ public class Contact extends JpaModel {
 	}
 	
 	public String getFullName() {
-		return fullName = calculateFullName();
+		return fullName = computeFullName();
 	}
 
-	protected String calculateFullName() {
+	protected String computeFullName() {
 		fullName = firstName + " " + lastName;
 		if (this.title != null) {
 			return this.title.getName() + " " + fullName;

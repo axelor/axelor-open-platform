@@ -106,8 +106,6 @@ public class TestActions extends MetaTest {
 
 		assertNotNull(c.getTitle());
 		assertEquals("Mr. John Smith", c.getFullName());
-		
-		//System.err.println("XXX: " + c);
 	}
 	
 	@Test
@@ -285,11 +283,11 @@ public class TestActions extends MetaTest {
 		
 		ActionHandler handler = createHandler(onLoad, context);
 		ActionResponse response = handler.execute();
-		System.err.println(response.getData());
+		assertNotNull(response.getData());
 		
 		handler = createHandler(onSave, context);
 		response = handler.execute();
-		System.err.println(response.getData());
+		assertNotNull(response.getData());
 	}
 	
  	@Test
@@ -326,8 +324,8 @@ public class TestActions extends MetaTest {
 		Assert.assertNotNull(((List<?>)value).get(0));
 		Assert.assertFalse(value.toString().contains("pending"));
 		
-		handler.getContext().update("firstName", "J");
-		handler.getContext().update("email", "j.smith@gmail.com");
+		handler.getContext().put("firstName", "J");
+		handler.getContext().put("email", "j.smith@gmail.com");
 		
 		value = action.evaluate(handler);
 		

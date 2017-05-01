@@ -216,6 +216,6 @@ public class Request {
 		if (klass == null) {
 			return null;
 		}
-		return context = Context.create(vars, klass);
+		return context = new Context(vars, klass);
 	}
 }

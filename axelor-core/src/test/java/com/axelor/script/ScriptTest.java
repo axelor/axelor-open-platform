@@ -62,6 +62,6 @@ public abstract class ScriptTest extends JpaTest {
         data.put("_ref", ref);
         data.put("_parent", ref);
 
-        return Context.create(data, Contact.class);
+        return new Context(data, Contact.class);
     }
 }
