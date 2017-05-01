@@ -61,8 +61,8 @@ libs.guice_servlet = "com.google.inject.extensions:guice-servlet:${versions.guic
 libs.guice_persist = "com.google.inject.extensions:guice-persist:${versions.guice}"
 libs.guice_multibindings = "com.google.inject.extensions:guice-multibindings:${versions.guice}"
 
-// CGLIB & ASM (repackaged to avoid version conflicts)
-libs.axelor_cglib = "com.axelor:axelor-cglib:3.1"
+// ASM (repackaged to avoid version conflicts)
+libs.axelor_asm = "com.axelor:axelor-asm:5.2"
 
 // Tomcat EL (repackaged to avoid version conflicts)
 libs.axelor_el = "com.axelor:axelor-el:${versions.tomcat}"

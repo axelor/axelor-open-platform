@@ -5,7 +5,7 @@ dependencies {
 	testCompile libs.junit
 
 	compile libs.guava
-	compile libs.axelor_cglib
+	compile libs.axelor_asm
 }
 
 configurations {
