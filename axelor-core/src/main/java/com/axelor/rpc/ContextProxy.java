@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import com.axelor.auth.db.AuditableModel;
 import com.axelor.common.ResourceUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
@@ -67,6 +68,7 @@ import net.bytebuddy.matcher.ElementMatchers;
 public class ContextProxy<T> {
 
 	private static final String FIELD_ID = "id";
+	private static final String FIELD_VERSION = "version";
 	private static final String COMPUTE_PREFIX = "compute";
 
 	private Map<String, Property> fieldsByMethod;
@@ -77,8 +79,8 @@ public class ContextProxy<T> {
 
 	private final Class<T> beanClass;
 
-	private Model managed;
-	private Model unmanaged;
+	private Object managed;
+	private Object unmanaged;
 
 	private boolean searched;
 
@@ -111,7 +113,7 @@ public class ContextProxy<T> {
 		}
 	}
 
-	private Model managed() {
+	private Object managed() {
 		if (searched) {
 			return managed;
 		}
@@ -123,11 +125,36 @@ public class ContextProxy<T> {
 		return managed;
 	}
 
-	private Model unmanaged() {
+	private Object unmanaged() {
 		if (unmanaged == null) {
-			unmanaged = (Model) Mapper.toBean(beanClass, null);
+			unmanaged = Mapper.toBean(beanClass, null);
 		}
 		return unmanaged;
+	}
+
+	private Object populated() {
+		final Mapper mapper = Mapper.of(beanClass);
+		final Object bean = unmanaged();
+
+		// populate the bean
+		for (Property property : mapper.getProperties()) {
+			this.validate(property);
+			if (property.isVirtual()) {
+				final Set<String> depends = getComputeDependencies(property.getName());
+				if (depends != null && !depends.isEmpty()) {
+					depends.stream().forEach(n -> mapper.set(bean, n, mapper.get(managed(), n)));
+				}
+			}
+		}
+
+		// make sure to have version value
+		if (bean instanceof Model && !values.containsKey(FIELD_VERSION)) {
+			final Model managed = (Model) managed();
+			if (managed != null) {
+				((Model) bean).setVersion(managed.getVersion());
+			}
+		}
+		return bean;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -157,15 +184,16 @@ public class ContextProxy<T> {
 			value = createOrFind(property, value);
 		}
 
-		final Mapper mapper = Mapper.of(beanClass);
 		final Object bean = unmanaged();
-		if (property.getTarget() != null) {
-			// prevent automatic association handling
-			// causing detached entity exception
-			mapper.set(bean, property.getName(), value);
-		} else {
-			property.set(bean, value);
+
+		Mapper mapper = Mapper.of(beanClass);
+		if (mapper.getSetter(property.getName()) == null && bean instanceof AuditableModel) {
+			mapper = Mapper.of(AuditableModel.class);
 		}
+
+		// prevent automatic association handling
+		// causing detached entity exception
+		mapper.set(bean, property.getName(), value);
 
 		validated.add(property.getName());
 	}
@@ -311,7 +339,7 @@ public class ContextProxy<T> {
 			.intercept(MethodDelegation.to(proxy))
 			.implement(ContextEntity.class)
 			.method(ElementMatchers.isDeclaredBy(ContextEntity.class))
-			.intercept(MethodCall.call(proxy::unmanaged))
+			.intercept(MethodCall.call(proxy::populated))
 			.make()
 			.load(beanClass.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
 			.getLoaded();
