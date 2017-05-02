@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import com.axelor.common.ResourceUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
@@ -182,8 +183,8 @@ public class ContextProxy<T> {
 	 * 
 	 */
 	private void findComputeDependencies() throws IOException {
-		final ClassReader reader = new ClassReader(beanClass.getName());
-		final String className = reader.getClassName();
+		final String className = beanClass.getName().replace('.', '/');
+		final ClassReader reader = new ClassReader(ResourceUtils.getResourceStream(className + ".class"));
 		final ClassVisitor visitor = new ClassVisitor(Opcodes.ASM5) {
 
 			@Override
