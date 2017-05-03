@@ -149,7 +149,8 @@ public class Context extends SimpleBindings {
 			throw new IllegalArgumentException(
 					String.format("Invalid type {}, should be {}", type.getName(), beanClass.getName()));
 		}
-		return bean;
+		// get fully initialized instance
+		return (T) ((ContextEntity) bean).getContextEntity();
 	}
 
 	private String checkKey(Object key) {
