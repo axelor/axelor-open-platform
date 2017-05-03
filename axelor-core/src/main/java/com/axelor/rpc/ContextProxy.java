@@ -135,23 +135,23 @@ public class ContextProxy<T> {
 	private Object populated() {
 		final Mapper mapper = Mapper.of(beanClass);
 		final Object bean = unmanaged();
+		final Object managed = managed();
 
 		// populate the bean
 		for (Property property : mapper.getProperties()) {
 			this.validate(property);
-			if (property.isVirtual()) {
+			if (property.isVirtual() && managed != null) {
 				final Set<String> depends = getComputeDependencies(property.getName());
 				if (depends != null && !depends.isEmpty()) {
-					depends.stream().forEach(n -> mapper.set(bean, n, mapper.get(managed(), n)));
+					depends.stream().forEach(n -> mapper.set(bean, n, mapper.get(managed, n)));
 				}
 			}
 		}
 
 		// make sure to have version value
 		if (bean instanceof Model && !values.containsKey(FIELD_VERSION)) {
-			final Model managed = (Model) managed();
 			if (managed != null) {
-				((Model) bean).setVersion(managed.getVersion());
+				((Model) bean).setVersion(((Model) managed).getVersion());
 			}
 		}
 		return bean;
