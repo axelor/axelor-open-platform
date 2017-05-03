@@ -69,6 +69,8 @@ public class ContextProxy<T> {
 
 	private static final String FIELD_ID = "id";
 	private static final String FIELD_VERSION = "version";
+	private static final String FIELD_SELECTED = "selected";
+	
 	private static final String COMPUTE_PREFIX = "compute";
 
 	private Map<String, Property> fieldsByMethod;
@@ -105,7 +107,7 @@ public class ContextProxy<T> {
 		return fieldsByMethod.get(methodName);
 	}
 
-	private Long findId() {
+	private Long findId(Map<String, Object> values) {
 		try {
 			return Long.parseLong(values.get(FIELD_ID).toString());
 		} catch (Exception e) {
@@ -117,7 +119,7 @@ public class ContextProxy<T> {
 		if (searched) {
 			return managed;
 		}
-		final Long id = findId();
+		final Long id = findId(values);
 		if (id != null) {
 			managed = (Model) JPA.em().find(beanClass, id);
 		}
@@ -163,7 +165,18 @@ public class ContextProxy<T> {
 			return item;
 		}
 		if (item instanceof Map) {
-			return create((Map<String, Object>) item, property.getTarget());
+			final Map<String, Object> map = (Map<String, Object>) item;
+			final Long id = findId(map);
+			// if new or updated, create proxy
+			if (id == null || id <= 0 || map.containsKey(FIELD_VERSION)) {
+				return create(map, property.getTarget());
+			}
+			// use managed instance
+			final Object bean = JPA.em().find(property.getTarget(), id);
+			if (map.containsKey(FIELD_SELECTED)) {
+				Mapper.of(property.getTarget()).set(bean, FIELD_SELECTED, map.get(FIELD_SELECTED));
+			}
+			return bean;
 		}
 		if (item instanceof Number) {
 			return JPA.em().find(property.getTarget(), item);
