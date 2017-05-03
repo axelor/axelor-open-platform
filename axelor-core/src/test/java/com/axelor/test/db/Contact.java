@@ -36,6 +36,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Type;
+
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaModel;
 import com.axelor.db.annotations.NameColumn;
@@ -90,6 +92,10 @@ public class Contact extends JpaModel {
 	@Transient
 	@Widget(multiline = true)
 	private String notes;
+	
+	@Widget(title = "Attributes")
+	@Type(type = "json")
+	private String attrs;
 
 	public Contact() {
 	}
@@ -235,7 +241,15 @@ public class Contact extends JpaModel {
 	public void setNotes(String notes) {
 		this.notes = notes;
 	}
-	
+
+	public String getAttrs() {
+		return attrs;
+	}
+
+	public void setAttrs(String attrs) {
+		this.attrs = attrs;
+	}
+
 	@Override
 	public String toString() {
 		return EntityHelper.toString(this);

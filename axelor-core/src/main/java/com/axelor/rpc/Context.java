@@ -24,6 +24,9 @@ import javax.script.SimpleBindings;
 
 import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
+import com.axelor.meta.MetaStore;
+import com.axelor.meta.db.MetaJsonModel;
 
 /**
  * The Context class represents an {@link ActionRequest} context.
@@ -60,7 +63,13 @@ public class Context extends SimpleBindings {
 	private static final String KEY_MODEL = "_model";
 	private static final String KEY_PARENT = "_parent";
 	private static final String KEY_PARENT_CONTEXT = "parentContext";
+	
+	private static final String KEY_JSON_ATTRS = "attrs";
+	private static final String KEY_JSON_MODEL = "jsonModel";
+	private static final String KEY_JSON_PREFIX = "$";
 
+
+	private final Map<String, Object> jsonFields;
 	private final Map<String, Object> values;
 
 	private final Mapper mapper;
@@ -85,6 +94,9 @@ public class Context extends SimpleBindings {
 		this.values = Objects.requireNonNull(values);
 		this.beanClass = Objects.requireNonNull(beanClass);
 		this.mapper = Mapper.of(beanClass);
+		this.jsonFields = MetaJsonModel.class.isAssignableFrom(beanClass)
+			? MetaStore.findJsonFields((String) values.get(KEY_JSON_MODEL))
+			: MetaStore.findJsonFields(beanClass.getName(), KEY_JSON_ATTRS);
 	}
 
 	private Object getProxy() {
@@ -140,7 +152,7 @@ public class Context extends SimpleBindings {
 		return bean;
 	}
 
-	private void checkKey(Object key) {
+	private String checkKey(Object key) {
 		if (key == null) {
 			throw new NullPointerException("key can not be null");
 		}
@@ -150,15 +162,52 @@ public class Context extends SimpleBindings {
 		if (StringUtils.isEmpty((String) key)) {
 			throw new IllegalArgumentException("key can not be empty");
 		}
+		return (String) key;
+	}
+
+	private boolean hasJsonField(String name) {
+		return jsonFields != null && jsonFields.containsKey(name);
+	}
+
+	private boolean isJsonField(String name) {
+		return name.startsWith(KEY_JSON_PREFIX)
+				&& mapper.getProperty(name.substring(KEY_JSON_PREFIX.length())) != null
+				&& mapper.getProperty(name.substring(KEY_JSON_PREFIX.length())).isJson();
+	}
+	
+	private JsonContext getJsonContext(Property property, Object value) {
+		final String name = property.getName();
+		return (JsonContext) values.computeIfAbsent(KEY_JSON_PREFIX + name,
+				k -> new JsonContext(this, property, (String) value));
+	}
+
+	private JsonContext getJsonContext() {
+		final Property property = mapper.getProperty(KEY_JSON_ATTRS);
+		return getJsonContext(property, property.get(getProxy()));
+	}
+
+	private Object tryJsonGet(String name) {
+		if (hasJsonField(name)) {
+			return getJsonContext().get(name);
+		}
+		return super.get(name);
+	}
+
+	private Object tryJsonPut(String name, Object value) {
+		if (hasJsonField(name)) {
+			return getJsonContext().put(name, value);
+		}
+		return super.put(name, value);
 	}
 
 	@Override
 	public boolean containsKey(Object key) {
-		checkKey(key);
-		if (super.containsKey(key) || KEY_PARENT_CONTEXT.equals(key)) {
-			return true;
-		}
-		return mapper.getProperty((String) key) != null;
+		final String name = checkKey(key);
+		return super.containsKey(name)
+				|| KEY_PARENT_CONTEXT.equals(name)
+				|| isJsonField(name)
+				|| hasJsonField(name)
+				|| mapper.getProperty((String) key) != null;
 	}
 
 	@Override
@@ -167,17 +216,36 @@ public class Context extends SimpleBindings {
 		if (KEY_PARENT_CONTEXT.equals(key)) {
 			return getParent();
 		}
-		if (mapper.getProperty((String) key) != null) {
-			return mapper.get(getProxy(), (String) key);
+		final String name = (String) key;
+		final Object value = super.get(name);
+
+		// if cached json context
+		if (value instanceof JsonContext) {
+			return value;
 		}
-		return super.get(key);
+
+		final Property property = mapper.getProperty(name);
+
+		// if real field access
+		if (property != null) {
+			return property.get(getProxy());
+		}
+
+		// try json context
+		if (isJsonField(name)) {
+			final Property jsonProperty = mapper.getProperty(name.substring(KEY_JSON_PREFIX.length()));
+			return getJsonContext(jsonProperty, jsonProperty.get(getProxy()));
+		}
+
+		// else try json fields
+		return tryJsonGet((String) key);
 	}
-	
+
 	@Override
 	public Object put(String name, Object value) {
-		if (mapper.getProperty(name) != null) {
-			return mapper.set(getProxy(), name, value);
+		if (mapper.getProperty(name) == null) {
+			return tryJsonPut(name, value);
 		}
-		return super.put(name, value);
+		return mapper.set(getProxy(), name, value);
 	}
 }

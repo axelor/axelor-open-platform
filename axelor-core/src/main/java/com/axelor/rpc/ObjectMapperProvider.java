@@ -62,7 +62,7 @@ import groovy.lang.GString;
 @Singleton
 public class ObjectMapperProvider implements Provider<ObjectMapper> {
 
-	private ObjectMapper mapper;
+	private final ObjectMapper mapper;
 
 	static class ModelSerializer extends JsonSerializer<Model> {
 
@@ -229,8 +229,9 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 		}
 	}
 
-	public ObjectMapperProvider() {
-		mapper = new ObjectMapper();
+	static ObjectMapper createObjectMapper() {
+
+		final ObjectMapper mapper = new ObjectMapper();
 
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
@@ -253,6 +254,12 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 		mapper.registerModule(new Jdk8Module());
 		mapper.registerModule(new ParameterNamesModule());
 		mapper.registerModule(new GuavaModule());
+
+		return mapper;
+	}
+
+	public ObjectMapperProvider() {
+		this.mapper = createObjectMapper();
 	}
 
 	@Override
