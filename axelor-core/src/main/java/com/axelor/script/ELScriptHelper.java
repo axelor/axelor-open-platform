@@ -18,7 +18,6 @@
 package com.axelor.script;
 
 import java.lang.reflect.Method;
-import java.util.Map;
 
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
@@ -171,10 +170,6 @@ public class ELScriptHelper extends AbstractScriptHelper {
 			return JpaRepository.of(model);
 		}
 
-		public static Map<String, Object> toJson(String value) {
-			return AbstractScriptHelper.toJson(value);
-		}
-
 		public static Integer toInt(Object value) {
 			if (value == null) {
 				return null;
@@ -218,7 +213,6 @@ public class ELScriptHelper extends AbstractScriptHelper {
 			this.processor.defineFunction("", "imp", className, "importClass");
 			this.processor.defineFunction("", "T", className, "importClass");
 			this.processor.defineFunction("", "__repo__", className, "repo");
-			this.processor.defineFunction("", "__json__", className, "toJson");
 			this.processor.defineFunction("fmt", "text", className, "formatText");
 		} catch (Exception e) {
 		}

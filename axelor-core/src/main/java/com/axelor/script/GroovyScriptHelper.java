@@ -17,11 +17,6 @@
  */
 package com.axelor.script;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyClassLoader;
-import groovy.lang.MissingPropertyException;
-import groovy.lang.Script;
-
 import java.util.concurrent.TimeUnit;
 
 import org.codehaus.groovy.control.CompilerConfiguration;
@@ -33,6 +28,11 @@ import com.axelor.db.JpaScanner;
 import com.axelor.rpc.Context;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+
+import groovy.lang.Binding;
+import groovy.lang.GroovyClassLoader;
+import groovy.lang.MissingPropertyException;
+import groovy.lang.Script;
 
 public class GroovyScriptHelper extends AbstractScriptHelper {
 
@@ -56,7 +56,6 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 		final ImportCustomizer importCustomizer = new ImportCustomizer();
 
 		importCustomizer.addImport("__repo__", "com.axelor.db.JpaRepository");
-		importCustomizer.addStaticImport("__json__", "com.axelor.script.AbstractScriptHelper", "toJson");
 
 		importCustomizer.addImports("java.time.ZonedDateTime");
 		importCustomizer.addImports("java.time.LocalDateTime");
