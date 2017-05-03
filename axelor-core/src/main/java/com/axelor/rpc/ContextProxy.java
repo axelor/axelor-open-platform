@@ -145,7 +145,9 @@ public class ContextProxy<T> {
 			if (property.isVirtual() && managed != null) {
 				final Set<String> depends = getComputeDependencies(property.getName());
 				if (depends != null && !depends.isEmpty()) {
-					depends.stream().forEach(n -> mapper.set(bean, n, mapper.get(managed, n)));
+					depends.stream()
+						.filter(n -> !validated.contains(n))
+						.forEach(n -> mapper.set(bean, n, mapper.get(managed, n)));
 				}
 			}
 		}
@@ -185,10 +187,12 @@ public class ContextProxy<T> {
 	}
 
 	private void validate(Property property) {
-		Object value = values.get(property.getName());
-		if (value == null || validated.contains(property.getName())) {
+		if (property == null
+				|| validated.contains(property.getName())
+				|| !values.containsKey(property.getName())) {
 			return;
 		}
+		Object value = values.get(property.getName());
 		if (property.isCollection() && value instanceof Collection) {
 			value = ((Collection<?>) value).stream()
 					.map(item -> createOrFind(property, item))
