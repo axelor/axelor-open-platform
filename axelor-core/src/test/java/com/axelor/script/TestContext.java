@@ -109,7 +109,7 @@ public class TestContext extends ScriptTest {
 	public void testContext() throws Exception {
 
 		final Context ctx = new Context(contextMap(), Contact.class);
-		final Contact cnt = ctx.asType(Contact.class);
+		final Contact cnt = ctx.asLazyType(Contact.class);
 
 		Assert.assertNotNull(cnt.getTitle());
 		Assert.assertEquals("Mrs. John NAME", cnt.getFullName());

@@ -142,15 +142,34 @@ public class Context extends SimpleBindings {
 		return beanClass;
 	}
 
+	/**
+	 * Convert the context as fully initialized entity of the given type.
+	 * 
+	 * @param type
+	 *            the expected type
+	 * @return fully initialized entity
+	 */
 	@SuppressWarnings("unchecked")
 	public <T> T asType(Class<T> type) {
+		// get fully initialized instance
+		return (T) ((ContextEntity) asLazyType(type)).getContextEntity();
+	}
+
+	/**
+	 * Convert the context as lazy entity of the given type.
+	 * 
+	 * @param type
+	 *            the expected type
+	 * @return lazy initialized entity
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T asLazyType(Class<T> type) {
 		final T bean = (T) getProxy();
 		if (!type.isInstance(bean)) {
 			throw new IllegalArgumentException(
 					String.format("Invalid type {}, should be {}", type.getName(), beanClass.getName()));
 		}
-		// get fully initialized instance
-		return (T) ((ContextEntity) bean).getContextEntity();
+		return bean;
 	}
 
 	private String checkKey(Object key) {
