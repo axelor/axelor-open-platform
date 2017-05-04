@@ -671,8 +671,13 @@ header .navbar .nav-link-user-sub {
 	top: 0; bottom: 0; left: 0; right: 0;
 }
 
+.html-view > .dashlet-body {
+  overflow: inherit !important;
+  height: auto !important;
+  min-height: 50px;
+}
+
 .iframe-container > iframe {
-	position: absolute;
 	width: 100%;
 	height: 100%;
 }
