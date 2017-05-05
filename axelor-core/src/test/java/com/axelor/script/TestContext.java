@@ -17,44 +17,26 @@
  */
 package com.axelor.script;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import com.axelor.inject.Beans;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.ContextEntity;
 import com.axelor.test.db.Contact;
-import com.axelor.test.db.Invoice;
-import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
 import com.google.common.collect.ImmutableMap;
 
+@FixMethodOrder(MethodSorters.JVM)
 public class TestContext extends ScriptTest {
 
 	public static final String STATIC_FIELD = "A static value...";
 	public static final String HELLO_MESSAGE = "Hello world...";
 
 	private String message = HELLO_MESSAGE;
-	
-	private Contact contact;
-	private Title title;
 
-	@Before
-	public void init() {
-		if (contact == null) {
-			contact = all(Contact.class).filter("self.email = ?", "jsmith@gmail.com").fetchOne();
-			title = all(Title.class).filter("self.code = ?", "mrs").fetchOne();
-		}
-	}
-	
 	public static String staticMethod() {
 		return STATIC_FIELD;
 	}
@@ -64,89 +46,57 @@ public class TestContext extends ScriptTest {
 	}
 
 	public Contact contact() {
-		ContactRepository repo = Beans.get(ContactRepository.class);
-		return repo.all().fetchOne();
+		return Beans.get(ContactRepository.class).all().fetchOne();
 	}
 
-	private Map<String, Object> contextMap() {
-
-		final Map<String, Object> values = new HashMap<>();
-		values.put("lastName", "NAME");
-		values.put("id", contact.getId());
-		
-		final Map<String, Object> t = new HashMap<>();
-		t.put("id", title.getId());
-		values.put("title", t);
-
-		final List<Map<String, Object>> addresses = new ArrayList<>();
-		final Map<String, Object> a1 = new HashMap<>();
-		a1.put("street", "My");
-		a1.put("area", "Home");
-		a1.put("city", "Paris");
-		a1.put("zip", "1212");
-		final Map<String, Object> a2 = new HashMap<>();
-		a2.put("street", "My");
-		a2.put("area", "Office");
-		a2.put("city", "London");
-		a2.put("zip", "1111");
-		a2.put("selected", true);
-		
-		addresses.add(a1);
-		addresses.add(a2);
-
-		values.put("addresses", addresses);
-		
-		final Map<String, Object> parent = new HashMap<>();
-		parent.put("_model", Invoice.class.getName());
-		parent.put("date", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-
-		values.put("_parent", parent);
-
-		return values;
-	}
-	
 	@Test
 	public void testContext() throws Exception {
 
-		final Context ctx = new Context(contextMap(), Contact.class);
-		final Contact cnt = ctx.asLazyType(Contact.class);
+		final Context context = new Context(contextMap(), Contact.class);
+		final Contact proxy = context.asLazyType(Contact.class);
+		final Contact managed = getEntityManager().find(Contact.class, proxy.getId());
 
-		Assert.assertNotNull(cnt.getTitle());
-		Assert.assertEquals("Mrs. John NAME", cnt.getFullName());
+		Assert.assertNotNull(proxy.getTitle());
+		Assert.assertEquals("Mrs. John NAME", proxy.getFullName());
 
-		cnt.setFirstName("Some");
-		Assert.assertEquals("Mrs. Some NAME", cnt.getFullName());
+		proxy.setFirstName("Some");
+		Assert.assertEquals("Mrs. Some NAME", proxy.getFullName());
 
-		ctx.putAll(ImmutableMap.of("firstName", "Some1"));
-		Assert.assertEquals("Mrs. Some1 NAME", cnt.getFullName());
+		context.putAll(ImmutableMap.of("firstName", "Some1"));
+		Assert.assertEquals("Mrs. Some1 NAME", proxy.getFullName());
 
-		Assert.assertEquals("Mr. John Smith", contact.getFullName());
+		Assert.assertEquals("Mr. John Smith", managed.getFullName());
 		
-		Assert.assertNotNull(cnt.getAddresses());
-		Assert.assertEquals(2, cnt.getAddresses().size());
+		Assert.assertNotNull(proxy.getAddresses());
+		Assert.assertEquals(2, proxy.getAddresses().size());
 		
-		Assert.assertTrue(cnt.getAddresses().get(1) instanceof ContextEntity);
-		Assert.assertTrue(cnt.getAddresses().get(1).isSelected());
+		Assert.assertTrue(proxy.getAddresses().get(1) instanceof ContextEntity);
+		Assert.assertTrue(proxy.getAddresses().get(1).isSelected());
 
-		Assert.assertTrue(ctx.get("parentContext") instanceof Context);
+		Assert.assertTrue(context.get("parentContext") instanceof Context);
 		
-		Assert.assertEquals(contact.getEmail(), cnt.getEmail());
-		Assert.assertEquals(contact.getEmail(), ctx.get("email"));
+		Assert.assertEquals(managed.getEmail(), proxy.getEmail());
+		Assert.assertEquals(managed.getEmail(), context.get("email"));
 
-		Assert.assertNotNull(cnt.getCircles());
-		Assert.assertTrue(cnt.getCircles().size() > 0);
-		Assert.assertFalse(cnt.getCircle(0) instanceof ContextEntity);
+		Assert.assertNotNull(proxy.getCircles());
+		Assert.assertTrue(proxy.getCircles().size() > 0);
+		Assert.assertFalse(proxy.getCircle(0) instanceof ContextEntity);
 		
-		Assert.assertTrue(cnt instanceof ContextEntity);
-		Assert.assertNotNull(((ContextEntity) cnt).getContextEntity());
+		Assert.assertTrue(proxy instanceof ContextEntity);
+		Assert.assertNotNull(((ContextEntity) proxy).getContextEntity());
 	}
 
 	@Test
-	public void testConfigContext() {
+	public void testEL() {
+		testConfig(new ELScriptHelper(new ScriptBindings(context())));
+	}
 
-		final ScriptBindings bindings = new ScriptBindings(this.context());
-		final ScriptHelper helper = new GroovyScriptHelper(bindings);
+	@Test
+	public void testGroovy() {
+		testConfig(new GroovyScriptHelper(new ScriptBindings(context())));
+	}
 
+	private void testConfig(ScriptHelper helper) {
 		final Object hello = helper.eval("__config__.hello");
 		final Object world = helper.eval("__config__.world");
 		final Object result = helper.eval("__config__.hello.hello()");
