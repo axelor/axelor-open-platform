@@ -109,6 +109,10 @@ public class CSVInput {
 		return separator.charAt(0);
 	}
 
+	public void setSeparator(char separator) {
+		this.separator = Character.toString(separator);
+	}
+
 	public String getSearch() {
 		return search;
 	}
