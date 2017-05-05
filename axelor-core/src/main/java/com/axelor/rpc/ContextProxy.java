@@ -80,6 +80,7 @@ public class ContextProxy<T> {
 	private final Set<String> validated;
 
 	private final Class<T> beanClass;
+	private final Mapper beanMapper;
 
 	private Object managed;
 	private Object unmanaged;
@@ -88,18 +89,18 @@ public class ContextProxy<T> {
 
 	private ContextProxy(Map<String, Object> values, Class<T> beanClass) {
 		this.values = Objects.requireNonNull(values);
-		this.beanClass = Objects.requireNonNull(beanClass);
 		this.validated = new HashSet<>();
+		this.beanClass = Objects.requireNonNull(beanClass);
+		this.beanMapper = Mapper.of(beanClass);
 	}
 	
 	private Property findProperty(String methodName) {
 		if (fieldsByMethod == null) {
 			fieldsByMethod = new HashMap<>();
-			final Mapper mapper = Mapper.of(beanClass);
-			for (Property property : mapper.getProperties()) {
+			for (Property property : beanMapper.getProperties()) {
 				final String name = property.getName();
-				final Method getter = mapper.getGetter(name);
-				final Method setter = mapper.getSetter(name);
+				final Method getter = beanMapper.getGetter(name);
+				final Method setter = beanMapper.getSetter(name);
 				if (getter != null) fieldsByMethod.put(getter.getName(), property);
 				if (setter != null) fieldsByMethod.put(setter.getName(), property);
 			}
@@ -135,19 +136,18 @@ public class ContextProxy<T> {
 	}
 
 	private Object populated() {
-		final Mapper mapper = Mapper.of(beanClass);
 		final Object bean = unmanaged();
 		final Object managed = managed();
 
 		// populate the bean
-		for (Property property : mapper.getProperties()) {
+		for (Property property : beanMapper.getProperties()) {
 			this.validate(property);
 			if (property.isVirtual() && managed != null) {
 				final Set<String> depends = getComputeDependencies(property.getName());
 				if (depends != null && !depends.isEmpty()) {
 					depends.stream()
 						.filter(n -> !validated.contains(n))
-						.forEach(n -> mapper.set(bean, n, mapper.get(managed, n)));
+						.forEach(n -> beanMapper.set(bean, n, beanMapper.get(managed, n)));
 				}
 			}
 		}
@@ -203,7 +203,7 @@ public class ContextProxy<T> {
 
 		final Object bean = unmanaged();
 
-		Mapper mapper = Mapper.of(beanClass);
+		Mapper mapper = beanMapper;
 		if (mapper.getSetter(property.getName()) == null && bean instanceof AuditableModel) {
 			mapper = Mapper.of(AuditableModel.class);
 		}
@@ -271,39 +271,25 @@ public class ContextProxy<T> {
 	
 	private Object interceptCompute(Callable<?> superCall, Method method, Object[] args) throws Exception {
 		final String computed = getComputedField(method.getName());
-		if (computed == null) {
+		final Set<String> depends;
+		if (computed == null || (depends = getComputeDependencies(computed)) == null || depends.isEmpty()) {
 			return superCall.call();
 		}
-		final Set<String> depends = getComputeDependencies(computed);
-		if (depends == null || depends.isEmpty()) {
-			return superCall.call();
+
+		for (String name : depends) {
+			final Property property;
+			if (validated.contains(name) || (property = beanMapper.getProperty(name)) == null) {
+				continue;
+			}
+			if (values.containsKey(name)) {
+				validate(property);
+			} else {
+				beanMapper.set(unmanaged(), name, property.get(managed()));
+			}
 		}
-		final Mapper mapper = Mapper.of(beanClass);
+
 		method.setAccessible(true);
-
-		if (values.keySet().containsAll(depends)) {
-			depends.stream().map(mapper::getProperty).filter(Objects::nonNull).forEach(this::validate);
-			return method.invoke(unmanaged(), args);
-		}
-
-		// in case of missing fields in context, use intermediate bean
-		// but forward all calls to getter to parent proxy
-		final Object bean = new ByteBuddy()
-				.subclass(beanClass)
-				.method(ElementMatchers.isPublic().and(ElementMatchers.isGetter()))
-				.intercept(MethodDelegation.to(this))
-				.make()
-				.load(beanClass.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
-				.getLoaded()
-				.newInstance();
-
-		depends.stream().map(mapper::getProperty).filter(Objects::nonNull)
-			.forEach(p -> {
-				validate(p);
-				Object source = validated.contains(p.getName()) ? unmanaged() : managed();
-				mapper.set(bean, p.getName(), p.get(source));
-			});
-		return method.invoke(bean, args);
+		return method.invoke(unmanaged(), args);
 	}
 
 	@RuntimeType
