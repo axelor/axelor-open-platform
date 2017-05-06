@@ -25,12 +25,14 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.Sequence;
@@ -39,8 +41,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * This class can be used to map params to Java bean using reflection. It also
@@ -53,23 +53,23 @@ public class Mapper {
 			.newBuilder()
 			.maximumSize(1000)
 			.weakKeys()
-			.build(new CacheLoader<Class<?>, Mapper>() {
+			.build(CacheLoader.from(Mapper::new));
 
-				@Override
-				public Mapper load(Class<?> key) throws Exception {
-					return new Mapper(key);
-				}
-			});
+	private static final Cache<Method, Annotation[]> ANNOTATION_CACHE = CacheBuilder
+			.newBuilder()
+			.maximumSize(1000)
+			.weakKeys()
+			.build();
 
 	private static final Object[] NULL_ARGUMENTS = {};
 
-	private Map<String, Method> getters = new HashMap<String, Method>();
-	private Map<String, Method> setters = new HashMap<String, Method>();
+	private Map<String, Method> getters = new HashMap<>();
+	private Map<String, Method> setters = new HashMap<>();
 
-	private Map<String, Class<?>> types = new HashMap<String, Class<?>>();
-	private Map<String, Property> fields = new HashMap<String, Property>();
+	private Map<String, Class<?>> types = new HashMap<>();
+	private Map<String, Property> fields = new HashMap<>();
 
-	private Set<Property> sequenceFields = new HashSet<Property>();
+	private Set<Property> sequenceFields = new HashSet<>();
 
 	private Property nameField;
 
@@ -81,7 +81,6 @@ public class Mapper {
 		try {
 			BeanInfo info = Introspector.getBeanInfo(beanClass, Object.class);
 			for (PropertyDescriptor descriptor : info.getPropertyDescriptors()) {
-
 				String name = descriptor.getName();
 				Method getter = descriptor.getReadMethod();
 				Method setter = descriptor.getWriteMethod();
@@ -119,19 +118,13 @@ public class Mapper {
 		}
 	}
 
-	private static final Cache<Method, Annotation[]> ANNOTATION_CACHE = CacheBuilder
-			.newBuilder()
-			.maximumSize(1000)
-			.weakKeys()
-			.build();
-
 	private Annotation[] getAnnotations(String name, Method method) {
 		Annotation[] found = ANNOTATION_CACHE.getIfPresent(method);
 		if (found != null) {
 			return found;
 		}
 
-		final List<Annotation> all = Lists.newArrayList();
+		final List<Annotation> all = new ArrayList<>();
 		try {
 			final Field field = getField(beanClass, name);
 			for (Annotation a : field.getAnnotations()) {
@@ -268,19 +261,15 @@ public class Mapper {
 	 * @return property value
 	 */
 	public Object get(Object bean, String name) {
-
 		Preconditions.checkNotNull(bean);
 		Preconditions.checkNotNull(name);
-
 		Preconditions.checkArgument(beanClass.isInstance(bean));
 		Preconditions.checkArgument(!name.trim().equals(""));
-
-		Method method = getters.get((String) name);
 		try {
-			return method.invoke(bean, NULL_ARGUMENTS);
+			return getters.get((String) name).invoke(bean, NULL_ARGUMENTS);
 		} catch (Exception e) {
+			return null;
 		}
-		return null;
 	}
 
 	/**
@@ -295,28 +284,23 @@ public class Mapper {
 	 * @return old value of the property
 	 */
 	public Object set(Object bean, String name, Object value) {
-
 		Preconditions.checkNotNull(bean);
 		Preconditions.checkNotNull(name);
-
 		Preconditions.checkArgument(beanClass.isInstance(bean));
 		Preconditions.checkArgument(!name.trim().equals(""));
 
-		Object oldValue = get(bean, name);
-		Method method = setters.get(name);
+		final Method method = setters.get(name);
 		if (method == null) {
 			throw new IllegalArgumentException("The bean of type: "
 					+ beanClass.getName() + " has no property called: " + name);
 		}
 
-		Class<?> actualType = method.getParameterTypes()[0];
-		Type genericType = method.getGenericParameterTypes()[0];
-		Annotation[] annotations = getAnnotations(name, method);
-
-		value = Adapter.adapt(value, actualType, genericType, annotations);
-
+		final Object oldValue = get(bean, name);
+		final Class<?> actualType = method.getParameterTypes()[0];
+		final Type genericType = method.getGenericParameterTypes()[0];
+		final Annotation[] annotations = getAnnotations(name, method);
 		try {
-			method.invoke(bean, new Object[] { value });
+			method.invoke(bean, Adapter.adapt(value, actualType, genericType, annotations));
 		} catch (Exception e) {
 			throw new IllegalArgumentException(e);
 		}
@@ -336,21 +320,19 @@ public class Mapper {
 	 * @return an instance of the given class
 	 */
 	public static <T> T toBean(Class<T> klass, Map<String, Object> values) {
-		T bean = null;
+		final T bean;
 		try {
 			bean = klass.newInstance();
-		} catch (Exception ex) {
-			throw new IllegalArgumentException(ex);
+		} catch (Exception e) {
+			throw new IllegalArgumentException(e);
 		}
 		if (values == null || values.isEmpty()) {
 			return bean;
 		}
-		Mapper mapper = Mapper.of(klass);
-		for (String name : values.keySet()) {
-			if (mapper.setters.containsKey(name))
-				mapper.set(bean, name, values.get(name));
-		}
-
+		final Mapper mapper = Mapper.of(klass);
+		values.entrySet().stream()
+			.filter(e -> mapper.setters.containsKey(e.getKey()))
+			.forEach(e -> mapper.set(bean, e.getKey(), e.getValue()));
 		return bean;
 	}
 
@@ -363,15 +345,11 @@ public class Mapper {
 	 * @return a map
 	 */
 	public static Map<String, Object> toMap(Object bean) {
-		if (bean == null) return null;
-
-		Map<String, Object> map = Maps.newHashMap();
-		Mapper mapper = Mapper.of(bean.getClass());
-
-		for(Property p : mapper.getProperties()) {
-			map.put(p.getName(), p.get(bean));
+		if (bean == null) {
+			return null;
 		}
-
-		return map;
+		return Mapper.of(bean.getClass()).fields.values()
+				.stream()
+				.collect(Collectors.toMap(Property::getName, p -> p.get(bean)));
 	}
 }
