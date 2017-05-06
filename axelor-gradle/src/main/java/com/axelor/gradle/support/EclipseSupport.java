@@ -24,7 +24,9 @@ import java.util.Map;
 import org.gradle.api.Project;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin;
+import org.gradle.plugins.ide.eclipse.model.AccessRule;
 import org.gradle.plugins.ide.eclipse.model.Classpath;
+import org.gradle.plugins.ide.eclipse.model.Container;
 import org.gradle.plugins.ide.eclipse.model.EclipseClasspath;
 import org.gradle.plugins.ide.eclipse.model.EclipseModel;
 import org.gradle.plugins.ide.eclipse.model.Library;
@@ -66,6 +68,13 @@ public class EclipseSupport extends AbstractSupport {
 			// remove self-dependency
 			cp.getEntries().removeIf(it -> it instanceof SourceFolder && ((SourceFolder) it).getPath().contains(project.getName()));
 			cp.getEntries().removeIf(it -> it instanceof Library && ((Library) it).getPath().contains(project.getName() + "/build"));
+			
+			// add access rule for nashorn api
+			cp.getEntries()
+				.stream()
+				.filter(it -> it instanceof Container).map(it -> (Container) it)
+				.filter(it -> it.getPath().contains("org.eclipse.jdt.launching.JRE_CONTAINER"))
+				.forEach(it -> it.getAccessRules().add(new AccessRule("0", "jdk/nashorn/api/**")));
 		});
 
 		// finally configure wtp resources
