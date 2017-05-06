@@ -17,13 +17,10 @@
  */
 package com.axelor.rpc;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -31,15 +28,10 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import com.axelor.auth.db.AuditableModel;
-import com.axelor.common.ResourceUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
-import com.axelor.internal.asm.ClassReader;
-import com.axelor.internal.asm.ClassVisitor;
-import com.axelor.internal.asm.MethodVisitor;
-import com.axelor.internal.asm.Opcodes;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
@@ -73,9 +65,6 @@ public class ContextProxy<T> {
 	
 	private static final String COMPUTE_PREFIX = "compute";
 
-	private Map<String, Property> fieldsByMethod;
-	private Map<String, Set<String>> computeDependencies;
-
 	private final Map<String, Object> values;
 	private final Set<String> validated;
 
@@ -92,20 +81,6 @@ public class ContextProxy<T> {
 		this.validated = new HashSet<>();
 		this.beanClass = Objects.requireNonNull(beanClass);
 		this.beanMapper = Mapper.of(beanClass);
-	}
-	
-	private Property findProperty(String methodName) {
-		if (fieldsByMethod == null) {
-			fieldsByMethod = new HashMap<>();
-			for (Property property : beanMapper.getProperties()) {
-				final String name = property.getName();
-				final Method getter = beanMapper.getGetter(name);
-				final Method setter = beanMapper.getSetter(name);
-				if (getter != null) fieldsByMethod.put(getter.getName(), property);
-				if (setter != null) fieldsByMethod.put(setter.getName(), property);
-			}
-		}
-		return fieldsByMethod.get(methodName);
 	}
 
 	private Long findId(Map<String, Object> values) {
@@ -143,7 +118,7 @@ public class ContextProxy<T> {
 		for (Property property : beanMapper.getProperties()) {
 			this.validate(property);
 			if (property.isVirtual() && managed != null) {
-				final Set<String> depends = getComputeDependencies(property.getName());
+				final Set<String> depends = beanMapper.getComputeDependencies(property);
 				if (depends != null && !depends.isEmpty()) {
 					depends.stream()
 						.filter(n -> !validated.contains(n))
@@ -215,64 +190,10 @@ public class ContextProxy<T> {
 		validated.add(property.getName());
 	}
 	
-	private String getComputedField(String methodName) {
-		if (methodName.startsWith(COMPUTE_PREFIX) && methodName.length() > COMPUTE_PREFIX.length()) {
-			final String field = methodName.substring(COMPUTE_PREFIX.length());
-			return Character.toLowerCase(field.charAt(0)) + field.substring(1);
-		}
-		return null;
-	}
-
-	/**
-	 * Find direct access to fields in compute methods of function fields.
-	 * 
-	 */
-	private void findComputeDependencies() throws IOException {
-		final String className = beanClass.getName().replace('.', '/');
-		final ClassReader reader = new ClassReader(ResourceUtils.getResourceStream(className + ".class"));
-		final ClassVisitor visitor = new ClassVisitor(Opcodes.ASM5) {
-
-			@Override
-			public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-				final String field = access == Modifier.PROTECTED ?  getComputedField(name) : null;
-				return field == null ? null : new MethodVisitor(Opcodes.ASM5) {
-
-					private Set<String> depends = new LinkedHashSet<>();
-
-					@Override
-					public void visitFieldInsn(int opcode, String owner, String name, String desc) {
-						if (owner.equals(className) && !name.equals(field)) {
-							depends.add(name);
-						}
-					}
-
-					@Override
-					public void visitEnd() {
-						computeDependencies.put(field, depends);
-					}
-				};
-			}
-		};
-
-		reader.accept(visitor, ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
-	}
-
-	private Set<String> getComputeDependencies(String property) {
-		if (computeDependencies == null) {
-			computeDependencies = new HashMap<>();
-			try {
-				findComputeDependencies();
-			} catch (IOException e) {
-				return null;
-			}
-		}
-		return computeDependencies.get(property);
-	}
-	
 	private Object interceptCompute(Callable<?> superCall, Method method, Object[] args) throws Exception {
-		final String computed = getComputedField(method.getName());
+		final Property computed = beanMapper.getProperty(method);
 		final Set<String> depends;
-		if (computed == null || (depends = getComputeDependencies(computed)) == null || depends.isEmpty()) {
+		if (computed == null || (depends = beanMapper.getComputeDependencies(computed)) == null || depends.isEmpty()) {
 			return superCall.call();
 		}
 
@@ -300,7 +221,7 @@ public class ContextProxy<T> {
 			return interceptCompute(superCall, method, args);
 		}
 
-		final Property property = findProperty(method.getName());
+		final Property property = beanMapper.getProperty(method);
 		// no fields defined or is computed field
 		if (property == null || property.isVirtual()) {
 			return superCall.call();
