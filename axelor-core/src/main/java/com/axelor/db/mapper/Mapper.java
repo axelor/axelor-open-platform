@@ -62,9 +62,13 @@ public class Mapper {
 			.build();
 
 	private static final Object[] NULL_ARGUMENTS = {};
+	
+	private static final String PREFIX_COMPUTE = "compute";
+	private static final String PREFIX_SET = "set";
 
-	private Map<String, Method> getters = new HashMap<>();
-	private Map<String, Method> setters = new HashMap<>();
+	private Map<String, Method> getters = new HashMap<>(); // field -> getter
+	private Map<String, Method> setters = new HashMap<>(); // field -> setter
+	private Map<String, String> methods = new HashMap<>(); // getter/setter/compute -> field
 
 	private Map<String, Class<?>> types = new HashMap<>();
 	private Map<String, Property> fields = new HashMap<>();
@@ -88,6 +92,7 @@ public class Mapper {
 
 				if (getter != null) {
 					getters.put(name, getter);
+					methods.put(getter.getName(), name);
 					try {
 						Property property = new Property(beanClass, name, type,
 								getter.getGenericReturnType(),
@@ -96,21 +101,31 @@ public class Mapper {
 						if (property.isSequence()) {
 							sequenceFields.add(property);
 						}
+						if (property.isVirtual()) {
+							try {
+								final Method compute = beanClass.getDeclaredMethod(PREFIX_COMPUTE
+										+ name.substring(0, 1).toUpperCase()
+										+ name.substring(1));
+								methods.put(compute.getName(), name);
+							} catch (NoSuchMethodException | SecurityException e) {
+							}
+						}
 					} catch(Exception e) {
 						continue;
 					}
 				}
 				if (setter == null) {
 					try {
-						setter = beanClass.getDeclaredMethod(
-								"set" + name.substring(0, 1).toUpperCase()
-									  + name.substring(1), type);
+						setter = beanClass.getDeclaredMethod(PREFIX_SET
+								+ name.substring(0, 1).toUpperCase()
+								+ name.substring(1), type);
 						setter.setAccessible(true);
 					} catch (NoSuchMethodException | SecurityException e) {
 					}
 				}
 				if (setter != null) {
 					setters.put(name, setter);
+					methods.put(setter.getName(), name);
 				}
 				types.put(name, type);
 			}
@@ -188,6 +203,18 @@ public class Mapper {
 	 */
 	public Property getProperty(String name) {
 		return fields.get(name);
+	}
+
+	/**
+	 * Get {@link Property} by it's getter, setter or compute method.
+	 * 
+	 * @param method
+	 *            the getter, setter or compute method
+	 * @return the property associated with the method
+	 */
+	public Property getProperty(Method method) {
+		Preconditions.checkNotNull(method);
+		return getProperty(methods.get(method.getName()));
 	}
 
 	/**
