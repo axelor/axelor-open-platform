@@ -21,11 +21,14 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,8 +37,14 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import com.axelor.common.ResourceUtils;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.Sequence;
+import com.axelor.internal.asm.ClassReader;
+import com.axelor.internal.asm.Opcodes;
+import com.axelor.internal.asm.tree.ClassNode;
+import com.axelor.internal.asm.tree.FieldInsnNode;
+import com.axelor.internal.asm.tree.MethodNode;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -72,6 +81,8 @@ public class Mapper {
 
 	private Map<String, Class<?>> types = new HashMap<>();
 	private Map<String, Property> fields = new HashMap<>();
+
+	private Map<String, Set<String>> computeDependencies;
 
 	private Set<Property> sequenceFields = new HashSet<>();
 
@@ -244,6 +255,50 @@ public class Mapper {
 	 */
 	public Property[] getSequenceFields() {
 		return sequenceFields.toArray(new Property[]{});
+	}
+	
+	/**
+	 * Find the fields directly accessed by the compute method of the given
+	 * computed property.
+	 * 
+	 * @param property
+	 *            the computed property
+	 * @return set of fields accessed by computed property
+	 */
+	public Set<String> getComputeDependencies(Property property) {
+		Preconditions.checkNotNull(property);
+		if (computeDependencies == null) {
+			computeDependencies = findComputeDependencies();
+		}
+		return computeDependencies.get(property.getName());
+	}
+
+	private Map<String, Set<String>> findComputeDependencies() {
+		final String className = beanClass.getName().replace('.', '/');
+		final ClassReader reader;
+		try {
+			reader = new ClassReader(ResourceUtils.getResourceStream(className + ".class"));
+		} catch (IOException e) {
+			return new HashMap<>();
+		}
+
+		final ClassNode node = new ClassNode();
+		reader.accept(node, 0);
+
+		return ((List<?>) node.methods).stream()
+			.map(m -> (MethodNode) m)
+			.filter(m -> Modifier.isProtected(m.access))
+			.filter(m -> m.name.startsWith(PREFIX_COMPUTE))
+			.filter(m -> methods.containsKey(m.name))
+			.collect(Collectors.toMap(m -> methods.get(m.name), m -> {
+				return Arrays.stream(m.instructions.toArray())
+					.filter(n -> n.getOpcode() == Opcodes.GETFIELD)
+					.filter(n -> n instanceof FieldInsnNode)
+					.map(n -> (FieldInsnNode) n)
+					.filter(n -> !n.name.equals(methods.get(m.name)))
+					.map(n -> n.name)
+					.collect(Collectors.toSet());
+			}));
 	}
 
 	/**

@@ -17,6 +17,8 @@
  */
 package com.axelor.db;
 
+import java.util.Arrays;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -53,6 +55,10 @@ public class PropertyTest extends AbstractTest {
 		Assert.assertEquals("fullName", p.getName());
 		Assert.assertEquals(PropertyType.STRING, p.getType());
 		
+		// virtual column dependencies
+		Assert.assertNotNull(mapper.getComputeDependencies(p));
+		Assert.assertTrue(mapper.getComputeDependencies(p).containsAll(Arrays.asList("firstName", "lastName", "title")));
+
 		// binary column
 		p = mapper.getProperty("image");
 		Assert.assertEquals(Contact.class, p.getEntity());
