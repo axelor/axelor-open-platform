@@ -46,8 +46,7 @@ public class NashornScriptHelper extends AbstractScriptHelper {
 	@Override
 	public Object eval(String expr) {
 		try {
-			engine.setBindings(getBindings(), ScriptContext.ENGINE_SCOPE);
-			return engine.eval(expr);
+			return engine.eval(expr, getBindings());
 		} catch (ScriptException e) {
 			log.error("Script error: {}", expr, e);
 		}

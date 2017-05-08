@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.function.Function;
 
 import javax.management.Query;
@@ -78,6 +77,7 @@ class NashornGlobals extends SimpleBindings {
 
 	public NashornGlobals(ScriptEngine engine) {
 		this.engine = engine;
+
 		this.put("__repo__", (Function<Class<? extends Model>, Object>) t -> JpaRepository.of(t));
 
 		this.put("doInJPA", (Function<ScriptObjectMirror, Object>) task -> {
@@ -91,11 +91,9 @@ class NashornGlobals extends SimpleBindings {
 		this.put("setOf", (VarArgs) args -> new HashSet<>(Arrays.asList(args)));
 		this.put("mapOf", (Function<ScriptObjectMirror, Object>) obj -> {
 			if (obj.isArray()) {
-				throw new IllegalArgumentException("mapOf expected object literals as arguments");
+				throw new IllegalArgumentException("mapOf expectes object literal as argument");
 			}
-			final Map<String, Object> map = new HashMap<>();
-			obj.forEach(map::put);
-			return map;
+			return new HashMap<>(obj);
 		});
 	}
 
