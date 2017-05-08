@@ -74,10 +74,8 @@ public class CompositeScriptHelper extends AbstractScriptHelper {
 	}
 
 	@Override
-	public Object eval(String expr) {
-		if (isEL(expr)) {
-			return getESH().eval(strip(expr));
-		}
-		return getGSH().eval(expr);
+	public Object eval(String expr, Bindings bindings) throws Exception {
+		final ScriptHelper helper = isEL(expr) ? getESH() : getGSH();
+		return helper.eval(strip(expr), bindings);
 	}
 }

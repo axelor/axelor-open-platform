@@ -246,7 +246,13 @@ public class ELScriptHelper extends AbstractScriptHelper {
 	}
 
 	@Override
-	public Object eval(String expr) {
-		return processor.eval(expr);
+	public Object eval(String expr, Bindings bindings) {
+		final Bindings current = getBindings();
+		try {
+			setBindings(bindings);
+			return processor.eval(expr);
+		} finally {
+			setBindings(current);
+		}
 	}
 }

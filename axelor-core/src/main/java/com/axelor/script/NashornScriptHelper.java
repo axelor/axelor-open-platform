@@ -23,14 +23,9 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axelor.rpc.Context;
 
 public class NashornScriptHelper extends AbstractScriptHelper {
-
-	private static Logger log = LoggerFactory.getLogger(GroovyScriptHelper.class);
 
 	private final ScriptEngine engine;
 	
@@ -45,12 +40,7 @@ public class NashornScriptHelper extends AbstractScriptHelper {
 	}
 
 	@Override
-	public Object eval(String expr) {
-		try {
-			return engine.eval(expr, getBindings());
-		} catch (ScriptException e) {
-			log.error("Script error: {}", expr, e);
-		}
-		return null;
+	public Object eval(String expr, Bindings bindings) throws ScriptException {
+		return engine.eval(expr, bindings);
 	}
 }

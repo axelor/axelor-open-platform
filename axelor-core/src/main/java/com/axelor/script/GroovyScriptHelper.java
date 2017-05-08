@@ -25,8 +25,6 @@ import javax.script.Bindings;
 
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.axelor.db.JPA;
 import com.axelor.db.JpaScanner;
@@ -52,8 +50,6 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 	private static final GroovyClassLoader GCL;
 	private static final Cache<String, Class<?>> SCRIPT_CACHE;
 
-	private static Logger log = LoggerFactory.getLogger(GroovyScriptHelper.class);
-	
 	public static class Helpers {
 
 		@SuppressWarnings("unchecked")
@@ -132,25 +128,20 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 	}
 
 	@Override
-	public Object eval(String expr) {
-		try {
-			Class<?> klass = parseClass(expr);
-			Script script = (Script) klass.newInstance();
-			script.setBinding(new Binding(getBindings()) {
+	public Object eval(String expr, Bindings bindings) throws Exception {
+		Class<?> klass = parseClass(expr);
+		Script script = (Script) klass.newInstance();
+		script.setBinding(new Binding(bindings) {
 
-				@Override
-				public Object getVariable(String name) {
-					try {
-						return super.getVariable(name);
-					} catch (MissingPropertyException e) {
-					}
-					return null;
+			@Override
+			public Object getVariable(String name) {
+				try {
+					return super.getVariable(name);
+				} catch (MissingPropertyException e) {
 				}
-			});
-			return script.run();
-		} catch (Exception e) {
-			log.error("Script error: {}", expr, e);
-		}
-		return null;
+				return null;
+			}
+		});
+		return script.run();
 	}
 }

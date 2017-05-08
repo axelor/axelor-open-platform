@@ -23,11 +23,16 @@ import java.util.regex.Pattern;
 
 import javax.script.Bindings;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.axelor.common.StringUtils;
 import com.google.common.base.Preconditions;
 
 public abstract class AbstractScriptHelper implements ScriptHelper {
 
+	protected final Logger log = LoggerFactory.getLogger(getClass());
+	
 	private Bindings bindings;
 
 	@Override
@@ -77,6 +82,16 @@ public abstract class AbstractScriptHelper implements ScriptHelper {
 			return eval(key + "." + methodCall);
 		} finally {
 			bindings.remove(key);
+		}
+	}
+	
+	@Override
+	public Object eval(String expr) {
+		try {
+			return eval(expr, getBindings());
+		} catch (Exception e) {
+			log.error("Script error: {}", expr, e);
+			return null;
 		}
 	}
 }

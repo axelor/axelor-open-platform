@@ -50,6 +50,17 @@ public interface ScriptHelper {
 	Object eval(String expr);
 
 	/**
+	 * Evaluate the given expression with the given bindings.
+	 * 
+	 * @param expr
+	 *            the expression to evaluate
+	 * @param bindings
+	 *            the context bindings
+	 * @return expression result
+	 */
+	Object eval(String expr, Bindings bindings) throws Exception;
+
+	/**
 	 * Evaluate a boolean expression.
 	 *
 	 * @param expr
