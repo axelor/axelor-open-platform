@@ -21,6 +21,7 @@
   <selection name="action.type.selection">
     <option value="action-attrs">action-attrs</option>
     <option value="action-view">action-view</option>
+    <option value="action-script">action-script</option>
     <option value="action-group">action-group</option>
     <option value="action-validate">action-validate</option>
     <option value="action-condition">action-condition</option>
