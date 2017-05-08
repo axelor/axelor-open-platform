@@ -18,12 +18,16 @@
 package com.axelor.script;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+
+import javax.persistence.EntityManager;
 
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.db.JPA;
 import com.axelor.db.JpaScanner;
 import com.axelor.rpc.Context;
 import com.google.common.cache.Cache;
@@ -48,6 +52,16 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 	private static final Cache<String, Class<?>> SCRIPT_CACHE;
 
 	private static Logger log = LoggerFactory.getLogger(GroovyScriptHelper.class);
+	
+	public static class Helpers {
+
+		@SuppressWarnings("unchecked")
+		public static <T> T doInJPA(Function<EntityManager, T> task) {
+			final Object[] result = { null };
+			JPA.runInTransaction(() -> result[0] = task.apply(JPA.em()));
+			return (T) result[0];
+		}
+	}
 
 	static {
 		config.getOptimizationOptions().put("indy", Boolean.TRUE);
@@ -56,6 +70,8 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 		final ImportCustomizer importCustomizer = new ImportCustomizer();
 
 		importCustomizer.addImport("__repo__", "com.axelor.db.JpaRepository");
+
+		importCustomizer.addStaticImport(Helpers.class.getName(), "doInJPA");
 
 		importCustomizer.addImports("java.time.ZonedDateTime");
 		importCustomizer.addImports("java.time.LocalDateTime");

@@ -67,6 +67,14 @@ public class TestGroovy extends ScriptTest {
 		actual = helper.eval("(__ref__ as Contact).fullName + ' (" + counter
 				+ ")'");
 	}
+	
+	@Test
+	public void doJpaTest() {
+		final ScriptHelper helper = new GroovyScriptHelper(context());
+		final Object bean = helper.eval("doInJPA({ em -> em.find(Contact, id) })");
+		Assert.assertNotNull(bean);
+		Assert.assertTrue(bean instanceof Contact);
+	}
 
 	@Test
 	public void test01_casts() {
