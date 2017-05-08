@@ -52,12 +52,4 @@ public class NashornScriptHelper extends AbstractScriptHelper {
 		}
 		return null;
 	}
-
-	@Override
-	protected Object doCall(Object obj, String methodCall) {
-		final ScriptBindings bindings = new ScriptBindings(getBindings());
-		final ScriptHelper sh = new NashornScriptHelper(bindings);
-		bindings.put("__obj__", obj);
-		return sh.eval("__obj__." + methodCall);
-	}
 }

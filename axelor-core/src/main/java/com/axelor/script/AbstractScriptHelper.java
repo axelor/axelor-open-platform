@@ -17,6 +17,7 @@
  */
 package com.axelor.script;
 
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -66,5 +67,14 @@ public abstract class AbstractScriptHelper implements ScriptHelper {
 		return doCall(obj, methodCall);
 	}
 
-	protected abstract Object doCall(Object obj, String methodCall);
+	protected Object doCall(Object obj, String methodCall) {
+		final String key = "__obj__" + Math.abs(UUID.randomUUID().getMostSignificantBits());
+		final ScriptBindings bindings = getBindings();
+		try {
+			bindings.put(key, obj);
+			return eval(key + "." + methodCall);
+		} finally {
+			bindings.remove(key);
+		}
+	}
 }

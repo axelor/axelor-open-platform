@@ -136,12 +136,4 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 		}
 		return null;
 	}
-
-	@Override
-	protected Object doCall(Object obj, String methodCall) {
-		ScriptBindings bindings = new ScriptBindings(getBindings());
-		GroovyScriptHelper sh = new GroovyScriptHelper(bindings);
-		bindings.put("__obj__", obj);
-		return sh.eval("__obj__." + methodCall);
-	}
 }

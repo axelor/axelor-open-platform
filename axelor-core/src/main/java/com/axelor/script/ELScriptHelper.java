@@ -247,12 +247,4 @@ public class ELScriptHelper extends AbstractScriptHelper {
 	public Object eval(String expr) {
 		return processor.eval(expr);
 	}
-
-	@Override
-	protected Object doCall(Object obj, String methodCall) {
-		ScriptBindings bindings = new ScriptBindings(getBindings());
-		ELScriptHelper sh = new ELScriptHelper(bindings);
-		bindings.put("__obj__", obj);
-		return sh.eval("__obj__." + methodCall);
-	}
 }
