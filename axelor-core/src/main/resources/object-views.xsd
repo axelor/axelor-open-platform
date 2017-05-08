@@ -27,6 +27,7 @@
         <xsd:element name="action-attrs" type="tns:ActionAttrs" />
         <xsd:element name="action-method" type="tns:ActionMethod" />
         <xsd:element name="action-view" type="tns:ActionView" />
+        <xsd:element name="action-script" type="tns:ActionScript" />
         <xsd:element name="action-ws" type="tns:ActionWS" />
         <xsd:element name="action-import" type="tns:ActionImport" />
         <xsd:element name="action-export" type="tns:ActionExport" />
@@ -2854,6 +2855,31 @@
             <xsd:documentation>Path of the image.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  
+  <xsd:complexType name="ActionScript">
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractBaseAction">
+        <xsd:sequence>
+          <xsd:element name="script">
+            <xsd:complexType>
+              <xsd:simpleContent>
+                <xsd:extension base="xsd:string">
+                  <xsd:attribute name="language" use="required">
+                    <xsd:simpleType>
+                      <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="js"/>
+                        <xsd:enumeration value="groovy"/>
+                      </xsd:restriction>
+                    </xsd:simpleType>
+                  </xsd:attribute>
+                </xsd:extension>
+              </xsd:simpleContent>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

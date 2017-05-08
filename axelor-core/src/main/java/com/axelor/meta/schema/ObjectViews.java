@@ -34,6 +34,7 @@ import com.axelor.meta.schema.actions.ActionImport;
 import com.axelor.meta.schema.actions.ActionMethod;
 import com.axelor.meta.schema.actions.ActionRecord;
 import com.axelor.meta.schema.actions.ActionReport;
+import com.axelor.meta.schema.actions.ActionScript;
 import com.axelor.meta.schema.actions.ActionValidate;
 import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.meta.schema.actions.ActionWS;
@@ -92,6 +93,7 @@ public class ObjectViews {
 		@XmlElement(name = "action-record", type=ActionRecord.class),
 		@XmlElement(name = "action-method", type=ActionMethod.class),
 		@XmlElement(name = "action-attrs", type=ActionAttrs.class),
+		@XmlElement(name = "action-script", type=ActionScript.class),
 		@XmlElement(name = "action-view", type=ActionView.class),
 		@XmlElement(name = "action-ws", type=ActionWS.class),
 		@XmlElement(name = "action-import", type=ActionImport.class),
