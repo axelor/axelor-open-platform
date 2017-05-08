@@ -29,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.persistence.Query;
+import javax.script.Bindings;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,6 @@ import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.Resource;
 import com.axelor.script.CompositeScriptHelper;
-import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.axelor.text.Templates;
 import com.google.common.base.Function;
@@ -67,7 +67,7 @@ public class ActionHandler {
 
 	private Context context;
 
-	private ScriptBindings bindings;
+	private Bindings bindings;
 
 	private ScriptHelper scriptHelper;
 	

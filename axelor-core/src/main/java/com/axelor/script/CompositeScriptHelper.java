@@ -17,6 +17,8 @@
  */
 package com.axelor.script;
 
+import javax.script.Bindings;
+
 import com.axelor.common.StringUtils;
 import com.axelor.rpc.Context;
 
@@ -25,7 +27,7 @@ public class CompositeScriptHelper extends AbstractScriptHelper {
 	private GroovyScriptHelper gsh;
 	private ELScriptHelper esh;
 
-	public CompositeScriptHelper(ScriptBindings bindings) {
+	public CompositeScriptHelper(Bindings bindings) {
 		this.setBindings(bindings);
 	}
 

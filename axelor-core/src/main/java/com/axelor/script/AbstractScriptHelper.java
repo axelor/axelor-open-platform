@@ -21,20 +21,22 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.script.Bindings;
+
 import com.axelor.common.StringUtils;
 import com.google.common.base.Preconditions;
 
 public abstract class AbstractScriptHelper implements ScriptHelper {
 
-	private ScriptBindings bindings;
+	private Bindings bindings;
 
 	@Override
-	public ScriptBindings getBindings() {
+	public Bindings getBindings() {
 		return bindings;
 	}
 
 	@Override
-	public void setBindings(ScriptBindings bindings) {
+	public void setBindings(Bindings bindings) {
 		this.bindings = bindings;
 	}
 
@@ -69,7 +71,7 @@ public abstract class AbstractScriptHelper implements ScriptHelper {
 
 	protected Object doCall(Object obj, String methodCall) {
 		final String key = "__obj__" + Math.abs(UUID.randomUUID().getMostSignificantBits());
-		final ScriptBindings bindings = getBindings();
+		final Bindings bindings = getBindings();
 		try {
 			bindings.put(key, obj);
 			return eval(key + "." + methodCall);

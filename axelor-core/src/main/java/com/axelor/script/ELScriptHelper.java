@@ -19,6 +19,8 @@ package com.axelor.script;
 
 import java.lang.reflect.Method;
 
+import javax.script.Bindings;
+
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
 import com.axelor.db.Model;
@@ -76,7 +78,7 @@ public class ELScriptHelper extends AbstractScriptHelper {
 
 		@Override
 		public Object getValue(ELContext context, Object base, Object property) {
-			final ScriptBindings bindings = getBindings();
+			final Bindings bindings = getBindings();
 			if (bindings == null || base != null) {
 				return null;
 			}
@@ -196,7 +198,7 @@ public class ELScriptHelper extends AbstractScriptHelper {
 		}
 	}
 
-	public ELScriptHelper(ScriptBindings bindings) {
+	public ELScriptHelper(Bindings bindings) {
 
 		this.processor = new ELProcessor();
 		this.processor.getELManager().addELResolver(new ClassResolver());

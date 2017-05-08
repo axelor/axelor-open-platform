@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import javax.persistence.EntityManager;
+import javax.script.Bindings;
 
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
@@ -104,7 +105,7 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 		GCL = new GroovyClassLoader(JpaScanner.getClassLoader(), config);
 	}
 
-	public GroovyScriptHelper(ScriptBindings bindings) {
+	public GroovyScriptHelper(Bindings bindings) {
 		this.setBindings(bindings);
 	}
 

@@ -17,6 +17,8 @@
  */
 package com.axelor.script;
 
+import javax.script.Bindings;
+
 /**
  * The DataScriptHelper interface to implement dynamic script evaluation support.
  *
@@ -28,7 +30,7 @@ public interface ScriptHelper {
 	 *
 	 * @return bindings
 	 */
-	ScriptBindings getBindings();
+	Bindings getBindings();
 
 	/**
 	 * Set script bindings.
@@ -36,7 +38,7 @@ public interface ScriptHelper {
 	 * @param bindings
 	 *            new script bindings.
 	 */
-	void setBindings(ScriptBindings bindings);
+	void setBindings(Bindings bindings);
 
 	/**
 	 * Evaluate the given expression.
