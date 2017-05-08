@@ -18,6 +18,7 @@
 package com.axelor.meta.schema.actions;
 
 import javax.script.Bindings;
+import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -53,22 +54,29 @@ public class ActionScript extends Action {
 		this.script = script;
 	}
 
-	private ScriptHelper getScriptHelper(Bindings context) {
+	private ScriptHelper getScriptHelper(Bindings bindings) {
 		return LANGUAGE_JS.equalsIgnoreCase(script.language)
-				? new NashornScriptHelper(context)
-				: new GroovyScriptHelper(context);
+				? new NashornScriptHelper(bindings)
+				: new GroovyScriptHelper(bindings);
 	}
 
 	@Override
 	public Object evaluate(ActionHandler handler) {
-		final Bindings context = new SimpleBindings();
+		final Bindings bindings = new SimpleBindings();
 		final ActionRequest request = handler.getRequest();
 		final ActionResponse response = new ActionResponse();
-		context.put(KEY_REQUEST, request);
-		context.put(KEY_RESPONSE, response);
+		bindings.put(KEY_REQUEST, request);
+		bindings.put(KEY_RESPONSE, response);
 		try {
-			getScriptHelper(context).eval(script.code.trim());
-		} finally {
+			getScriptHelper(bindings).eval(script.code.trim(), bindings);
+		} catch (ScriptException e) {
+			if ("<eval>".equals(e.getFileName())) {
+				e = new ScriptException(e.getMessage().replace("<eval>",
+						"<strong>&lt;action-script name=" + getName() + "&gt;</strong>"));
+			}
+			response.setException(e);
+		} catch (Exception e) {
+			response.setException(e);
 		}
 		return response;
 	}
