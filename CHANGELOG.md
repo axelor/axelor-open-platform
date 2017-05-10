@@ -1,8 +1,13 @@
-# Current (3.3.4)
+# 3.3.4 (2017-05-10)
 
 ## Bug fixes
 
+- fix domain support issue on ref-select widget
+- fix dotted fields support in field editor
+
 ## Improvements
+
+- allow panel inside field editor
 
 # 3.3.3 (2017-02-14)
 
