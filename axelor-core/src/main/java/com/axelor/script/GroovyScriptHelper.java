@@ -27,6 +27,7 @@ import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
 
 import com.axelor.db.JPA;
+import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
 import com.axelor.rpc.Context;
 import com.google.common.cache.Cache;
@@ -66,8 +67,7 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 
 		final ImportCustomizer importCustomizer = new ImportCustomizer();
 
-		importCustomizer.addImport("__repo__", "com.axelor.db.JpaRepository");
-
+		importCustomizer.addStaticImport("__repo__", JpaRepository.class.getName(), "of");
 		importCustomizer.addStaticImport(Helpers.class.getName(), "doInJPA");
 
 		importCustomizer.addImports("java.time.ZonedDateTime");
