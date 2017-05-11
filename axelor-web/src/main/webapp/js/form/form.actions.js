@@ -807,7 +807,7 @@ ActionHandler.prototype = {
 
 			items = containers.find('[x-path="' + (formScope.formPath ?  formScope.formPath + '.' + name : name) + '"]');
 			if (toolbar) {
-				return toolbar.find('[name="' + name + '"]').add(items);
+				return toolbar.find('[name="' + name + '"],[x-name="' + name + '"]').add(items);
 			}
 			return items;
 		}
