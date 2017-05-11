@@ -372,6 +372,10 @@
 	color: #0088cc;
 }
 
+.slick-cell.edit-icon {
+	text-overflow: inherit;
+}
+
 .slick-cell.edit-icon i {
 	padding: 4px 7px;
 	cursor: pointer;
