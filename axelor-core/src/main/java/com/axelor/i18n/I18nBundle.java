@@ -82,7 +82,7 @@ public class I18nBundle extends ResourceBundle {
 		Query<MetaTranslation> query = Query.of(MetaTranslation.class).filter("self.language = ?1", lang).order("id").autoFlush(false);
 		
 		if (query.count() == 0 && lang.length() > 2) {
-			query = Query.of(MetaTranslation.class).filter("self.language = ?1", lang.substring(0, 2));
+			query = Query.of(MetaTranslation.class).filter("self.language = ?1", lang.substring(0, 2)).order("id");
 		}
 
 		long total = query.count();
