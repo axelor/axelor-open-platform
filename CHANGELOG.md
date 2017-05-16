@@ -1,6 +1,10 @@
-# Current (4.1.3)
+# 4.1.3 (2017-05-16)
 
 ## Bug fixes
+
+- fix dotted field update issue
+- fix domain support issue on ref-select widget
+- fixed translation loading issue
 
 # 4.1.2 (2017-03-20)
 
