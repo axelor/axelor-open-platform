@@ -122,5 +122,17 @@ public class TestJsonContext extends JpaTest {
 		Assert.assertFalse(context.asType(Contact.class).getAttrs().contains("date"));
 		Assert.assertNotNull(engine.eval("$attrs.date = __time__"));
 		Assert.assertTrue(context.asType(Contact.class).getAttrs().contains("date"));
+		
+		context.put("customer", null);
+		Assert.assertFalse(context.asType(Contact.class).getAttrs().contains("customer"));
+
+		context.put("customer", all(Contact.class).fetchOne());
+		Assert.assertTrue(context.asType(Contact.class).getAttrs().contains("customer"));
+
+		try {
+			context.put("customer", new Contact());
+			Assert.fail();
+		} catch (IllegalArgumentException e) {
+		}
 	}
 }

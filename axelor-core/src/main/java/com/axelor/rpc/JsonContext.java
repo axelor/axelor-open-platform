@@ -17,6 +17,7 @@
  */
 package com.axelor.rpc;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,14 +29,38 @@ import java.util.stream.Collectors;
 import javax.script.SimpleBindings;
 
 import com.axelor.common.ObjectUtils;
+import com.axelor.db.Model;
 import com.axelor.db.mapper.Adapter;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaStore;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
 public class JsonContext extends SimpleBindings {
+	
+	static class ModelSerializer extends JsonSerializer<Model> {
 
-	private static final ObjectMapper jsonMapper = ObjectMapperProvider.createObjectMapper();
+		@Override
+		public void serialize(Model value, JsonGenerator jgen, SerializerProvider provider)
+				throws IOException, JsonProcessingException {
+			if (value != null) {
+				final JsonSerializer<Object> serializer = provider.findValueSerializer(Map.class, null);
+				final Map<String, Object> map = Resource.toMapCompact(value);
+				map.remove("$version");
+				serializer.serialize(map, jgen, provider);
+			}
+		}
+	}
+
+	private static final ObjectMapper jsonMapper = ObjectMapperProvider.createObjectMapper(new ModelSerializer());
+
+	static {
+		jsonMapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
+	}
 
 	private final String jsonField;
 	private final Map<String, Object> fields;
@@ -64,7 +89,19 @@ public class JsonContext extends SimpleBindings {
 			return null;
 		}
 	}
-	
+
+	private void ensureManaged(Object value) {
+		if (value instanceof Model) {
+			final Model bean = (Model) value;
+			if (bean.getId() == null || bean.getId() <= 0) {
+				throw new IllegalArgumentException();
+			}
+		}
+		if (value instanceof Collection) {
+			((Collection<?>) value).forEach(this::ensureManaged);
+		}
+	}
+
 	private void propagate() {
 		context.put(jsonField, toJson(this));
 	}
@@ -137,6 +174,11 @@ public class JsonContext extends SimpleBindings {
 
 	@Override
 	public Object put(String name, Object value) {
+		try {
+			ensureManaged(value);
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("cannot set unsaved values to field: " + name);
+		}
 		try {
 			return super.put(name, value);
 		} finally {

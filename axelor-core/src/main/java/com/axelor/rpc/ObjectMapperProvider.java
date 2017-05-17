@@ -230,6 +230,10 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 	}
 
 	static ObjectMapper createObjectMapper() {
+		return createObjectMapper(new ModelSerializer());
+	}
+
+	static ObjectMapper createObjectMapper(JsonSerializer<Model> modelSerializer) {
 
 		final ObjectMapper mapper = new ObjectMapper();
 
@@ -237,7 +241,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
 		SimpleModule module = new SimpleModule("MyModule");
-		module.addSerializer(Model.class, new ModelSerializer());
+		module.addSerializer(Model.class, modelSerializer);
 		module.addSerializer(GString.class, new GStringSerializer());
 		module.addSerializer(BigDecimal.class, new DecimalSerializer());
 
