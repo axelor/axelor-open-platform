@@ -2868,12 +2868,25 @@
               <xsd:simpleContent>
                 <xsd:extension base="xsd:string">
                   <xsd:attribute name="language" use="required">
+                    <xsd:annotation>
+                      <xsd:documentation>
+                      Specify the scripting language.
+                      </xsd:documentation>
+                    </xsd:annotation>
                     <xsd:simpleType>
                       <xsd:restriction base="xsd:string">
                         <xsd:enumeration value="js"/>
                         <xsd:enumeration value="groovy"/>
                       </xsd:restriction>
                     </xsd:simpleType>
+                  </xsd:attribute>
+                  <xsd:attribute name="transactional" type="xsd:boolean">
+                    <xsd:annotation>
+                      <xsd:documentation>
+                      Specify whether the action is transactional.
+                      In that case, EntityManager will be available as $em variable.
+                      </xsd:documentation>
+                    </xsd:annotation>
                   </xsd:attribute>
                 </xsd:extension>
               </xsd:simpleContent>

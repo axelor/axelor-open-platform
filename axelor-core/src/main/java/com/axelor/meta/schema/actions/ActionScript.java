@@ -27,6 +27,8 @@ import javax.xml.bind.annotation.XmlValue;
 
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 
+import com.axelor.db.JPA;
+import com.axelor.inject.Beans;
 import com.axelor.meta.ActionHandler;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
@@ -34,6 +36,7 @@ import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.NashornScriptHelper;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.inject.persist.Transactional;
 
 public class ActionScript extends Action {
 
@@ -41,6 +44,7 @@ public class ActionScript extends Action {
 
 	private static final String KEY_REQUEST = "$request";
 	private static final String KEY_RESPONSE = "$response";
+	private static final String KEY_EM = "$em";
 
 	@JsonIgnore
 	@XmlElement(name = "script")
@@ -60,13 +64,15 @@ public class ActionScript extends Action {
 				: new GroovyScriptHelper(bindings);
 	}
 
-	@Override
-	public Object evaluate(ActionHandler handler) {
+	private Object run(ActionHandler handler) {
 		final Bindings bindings = new SimpleBindings();
 		final ActionRequest request = handler.getRequest();
 		final ActionResponse response = new ActionResponse();
 		bindings.put(KEY_REQUEST, request);
 		bindings.put(KEY_RESPONSE, response);
+		if (script.transactional == Boolean.TRUE) {
+			bindings.put(KEY_EM, JPA.em());
+		}
 		try {
 			getScriptHelper(bindings).eval(script.code.trim(), bindings);
 		} catch (ScriptException e) {
@@ -82,8 +88,23 @@ public class ActionScript extends Action {
 	}
 
 	@Override
+	public Object evaluate(ActionHandler handler) {
+		return script.transactional == Boolean.TRUE
+				? Beans.get(ActRunner.class).run(this, handler)
+				: run(handler);
+	}
+
+	@Override
 	public Object wrap(ActionHandler handler) {
 		return evaluate(handler);
+	}
+
+	public static class ActRunner {
+
+		@Transactional
+		public Object run(ActionScript action, ActionHandler handler) {
+			return action.run(handler);
+		}
 	}
 
 	@XmlType
@@ -91,6 +112,9 @@ public class ActionScript extends Action {
 
 		@XmlAttribute
 		private String language;
+		
+		@XmlAttribute
+		private Boolean transactional;
 
 		@XmlCDATA
 		@XmlValue
@@ -102,6 +126,14 @@ public class ActionScript extends Action {
 
 		public void setLanguage(String language) {
 			this.language = language;
+		}
+		
+		public Boolean getTransactional() {
+			return transactional;
+		}
+		
+		public void setTransactional(Boolean transactional) {
+			this.transactional = transactional;
 		}
 	}
 }
