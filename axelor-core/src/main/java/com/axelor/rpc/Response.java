@@ -25,7 +25,6 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
 
 @JsonInclude(Include.NON_EMPTY)
 public class Response {
@@ -94,7 +93,7 @@ public class Response {
 
 	public void addError(String fieldName, String errorMessage) {
 		if (this.errors == null) {
-			this.errors = new HashMap<String, String>();
+			this.errors = new HashMap<>();
 		}
 		this.errors.put(fieldName, errorMessage);
 	}
@@ -106,7 +105,7 @@ public class Response {
 			cause = ((BatchUpdateException) cause).getNextException();
 		}
 		
-		Map<String, Object> report = Maps.newHashMap();
+		final Map<String, Object> report = new HashMap<>();
 		
 		report.put("class", throwable.getClass());
 		report.put("message", cause.getMessage());

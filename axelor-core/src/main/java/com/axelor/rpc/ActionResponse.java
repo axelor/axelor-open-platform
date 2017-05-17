@@ -17,15 +17,13 @@
  */
 package com.axelor.rpc;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * An implementation of {@link Response} to be used with controllers.
@@ -35,16 +33,21 @@ import com.google.common.collect.Maps;
 @XmlRootElement(name = "response")
 public class ActionResponse extends Response {
 
-	final Map<String, Object> _data = Maps.newHashMap();
+	private Map<String, Object> dataMap;
+
+	private Map<String, Object> dataMap() {
+		if (dataMap == null) {
+			dataMap = new HashMap<>();
+			List<Object> data = new ArrayList<>();
+			data.add(dataMap);
+			setData(data);
+		}
+		return dataMap;
+	}
 
 	@SuppressWarnings("all")
 	private void set(String name, Object value) {
-		if (getData() == null) {
-			List<Object> data = Lists.newArrayList();
-			data.add(_data);
-			setData(data);
-		}
-		_data.put(name, value);
+		dataMap().put(name, value);
 	}
 
 	/**
@@ -193,12 +196,12 @@ public class ActionResponse extends Response {
 	 */
 	@SuppressWarnings("all")
 	public void setValue(String fieldName, Object value) {
-		Map<String, Object> values = (Map) _data.get("values");
+		Map<String, Object> values = (Map) dataMap().get("values");
 		if (values == null) {
-			values = Maps.newHashMap();
+			values = new HashMap<>();
+			setValues(values);
 		}
 		values.put(fieldName, value);
-		setValues(values);
 	}
 
 	/**
@@ -224,7 +227,7 @@ public class ActionResponse extends Response {
 	 *            the filter
 	 */
 	public void setView(String title, String model, String mode, String domain) {
-		Map<String, Object> view = Maps.newHashMap();
+		final Map<String, Object> view = new HashMap<>();
 		view.put("title", title);
 		view.put("model", model);
 		view.put("type", mode);
@@ -272,19 +275,18 @@ public class ActionResponse extends Response {
 	public void setAttr(String fieldName, String attr, Object value) {
 
 		Map<String, Map<String, Object>> attrs = null;
-
 		try {
 			attrs = (Map) ((Map) getItem(0)).get("attrs");
 		} catch (Exception e) {
 		}
 
 		if (attrs == null) {
-			attrs = new HashMap<String, Map<String, Object>>();
+			attrs = new HashMap<>();
 		}
-
+		
 		Map<String, Object> my = attrs.get(fieldName);
 		if (my == null) {
-			my = new HashMap<String, Object>();
+			my = new HashMap<>();
 		}
 
 		my.put(attr, value);
