@@ -161,9 +161,25 @@ public class ActionResponse extends Response {
 	 * @param context
 	 *            a map or a model instance
 	 * @see #setValue(String, Object)
+	 * @see #setValues(Map)
 	 */
+	@Deprecated
 	public void setValues(Object context) {
 		set("values", context);
+	}
+
+	/**
+	 * Set record values.
+	 * <p>
+	 * The client updates current view with these values.
+	 * </p>
+	 * 
+	 * @param context
+	 *            a map or a model instance
+	 * @see #setValue(String, Object)
+	 */
+	public void setValues(Map<String, Object> values) {
+		set("values", values);
 	}
 
 	/**
