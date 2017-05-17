@@ -27,6 +27,7 @@ import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.cache.infinispan.InfinispanRegionFactory;
 import org.hibernate.cache.jcache.JCacheRegionFactory;
 import org.hibernate.cfg.Environment;
+import org.hibernate.hikaricp.internal.HikariCPConnectionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,7 +145,14 @@ public class JpaModule extends AbstractModule {
 		properties.put(Environment.PHYSICAL_NAMING_STRATEGY, PhysicalNamingStrategyImpl.class.getName());
 
 		properties.put(Environment.AUTOCOMMIT, "false");
+		properties.put(Environment.CONNECTION_PROVIDER_DISABLES_AUTOCOMMIT, "true");
 		properties.put(Environment.MAX_FETCH_DEPTH, "3");
+
+		// Use HikariCP as default pool provider
+		properties.put(Environment.CONNECTION_PROVIDER, HikariCPConnectionProvider.class.getName());
+		properties.put("hibernate.hikari.minimumIdle", "10");
+		properties.put("hibernate.hikari.maximumPoolSize", "200");
+		properties.put("hibernate.hikari.idleTimeout", "30000");
 
 		try {
 			updatePersistenceProperties(properties);
