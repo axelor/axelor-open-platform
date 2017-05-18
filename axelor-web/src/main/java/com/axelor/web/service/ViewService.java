@@ -31,6 +31,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
@@ -193,7 +194,7 @@ public class ViewService extends AbstractService {
 			data.put("searchForm", searchResponse.getData());
 		}
 
-		if (view instanceof AbstractView) {
+		if (view instanceof AbstractView && !StringUtils.isBlank(model)) {
 			data.putAll(MetaStore.findFields(findClass(model), findNames((AbstractView) view)));
 		}
 
