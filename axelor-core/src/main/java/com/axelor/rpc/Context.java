@@ -17,9 +17,11 @@
  */
 package com.axelor.rpc;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.script.SimpleBindings;
 
@@ -29,6 +31,11 @@ import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonModel;
 import com.axelor.meta.db.MetaJsonRecord;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * The Context class represents an {@link ActionRequest} context.
@@ -60,7 +67,24 @@ import com.axelor.meta.db.MetaJsonRecord;
  * context values using the bean methods.
  *
  */
+@JsonSerialize(using = Context.Serializer.class)
 public class Context extends SimpleBindings {
+
+	static class Serializer extends JsonSerializer<Context> {
+
+		@Override
+		public void serialize(Context value, JsonGenerator jgen, SerializerProvider provider)
+				throws IOException, JsonProcessingException {
+			if (value != null) {
+				final JsonSerializer<Object> serializer = provider.findValueSerializer(Map.class, null);
+				final Map<String, Object> map = value.entrySet().stream()
+						.filter(e -> !(e.getValue() instanceof JsonContext))
+						.filter(e -> !KEY_PARENT_CONTEXT.equals(e.getKey()))
+						.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+				serializer.serialize(map, jgen, provider);
+			}
+		}
+	}
 
 	private static final String KEY_MODEL = "_model";
 	private static final String KEY_PARENT = "_parent";
