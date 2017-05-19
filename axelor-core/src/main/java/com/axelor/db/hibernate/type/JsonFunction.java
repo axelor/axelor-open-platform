@@ -51,7 +51,9 @@ public final class JsonFunction {
 		final String field = rest.substring(0, dot);
 		final String attribute = rest.substring(dot + 1);
 
-		return new JsonFunction(field, attribute, type);
+		return "long".equals(type)
+			? new JsonFunction(field, attribute, "integer")
+			: new JsonFunction(field, attribute, type);
 	}
 
 	public String getField() {
