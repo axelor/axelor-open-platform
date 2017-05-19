@@ -30,6 +30,7 @@ import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 import com.axelor.db.JPA;
 import com.axelor.inject.Beans;
 import com.axelor.meta.ActionHandler;
+import com.axelor.meta.db.repo.MetaJsonRecordRepository;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.script.GroovyScriptHelper;
@@ -44,6 +45,7 @@ public class ActionScript extends Action {
 
 	private static final String KEY_REQUEST = "$request";
 	private static final String KEY_RESPONSE = "$response";
+	private static final String KEY_JSON = "$json";
 	private static final String KEY_EM = "$em";
 
 	@JsonIgnore
@@ -70,6 +72,7 @@ public class ActionScript extends Action {
 		final ActionResponse response = new ActionResponse();
 		bindings.put(KEY_REQUEST, request);
 		bindings.put(KEY_RESPONSE, response);
+		bindings.put(KEY_JSON, Beans.get(MetaJsonRecordRepository.class));
 		if (script.transactional == Boolean.TRUE) {
 			bindings.put(KEY_EM, JPA.em());
 		}
