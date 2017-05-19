@@ -50,6 +50,25 @@ function updateValues(source, target, itemScope, formScope) {
 		return;
 	}
 
+	// handle json records
+	if (source && formScope._model === 'com.axelor.meta.db.MetaJsonRecord') {
+		source = source.attrs ? _.extend({}, JSON.parse(source.attrs), source) : source;
+		delete source.attrs;
+		var fix = function (rec) {
+			if (!rec) return rec;
+			if (_.isArray(rec)) return _.map(rec, fix);
+			if (rec.id > 0 && (rec.version || rec.attrs)) {
+				rec = _.pick(rec, 'id', 'name', 'selected');
+				if (!rec.selected) delete rec.selected;
+			}
+			return rec;
+		}
+
+		_.each(source, function (v, k) {
+			source[k] = fix(v);
+		});
+	}
+
 	function compact(value) {
 		if (!value) return value;
 		if (value.version === undefined) return value;
