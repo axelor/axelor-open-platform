@@ -46,6 +46,7 @@
     <string name="title" namecolumn="true" required="true" />
     <string name="onNew" />
     <string name="onSave" />
+    <string name="nameField" />
     <many-to-one name="menu" ref="MetaMenu" copy="false" />
     <many-to-one name="action" ref="MetaAction" copy="false" />
     <many-to-one name="gridView" ref="MetaView" copy="false" />
@@ -54,8 +55,9 @@
     <many-to-many name="roles" ref="com.axelor.auth.db.Role" />
   </entity>
 
-  <entity name="MetaJsonRecord" table="META_JSON_RECORD">
+  <entity name="MetaJsonRecord" table="META_JSON_RECORD" repository="none">
     <string name="jsonModel" required="true" />
+    <string name="name" namecolumn="true" />
     <string name="attrs" json="true" />
   </entity>
 

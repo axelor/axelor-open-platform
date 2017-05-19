@@ -331,23 +331,7 @@ public class MetaStore {
 					attrs.put("domain", domain);
 					attrs.put("gridView", targetModel.getGridView().getName());
 					attrs.put("formView", targetModel.getFormView().getName());
-					
-					if (targetModel.getFields() != null) {
-						MetaJsonField nameField = null;
-						for (MetaJsonField field : targetModel.getFields()) {
-							if (!"string".equals(field.getType())) continue;
-							if (field.getNameField() == Boolean.TRUE) {
-								nameField = field;
-								break;
-							}
-							if (nameField == null || "name".equals(field.getName())) {
-								nameField = field;
-							}
-						}
-						if (nameField != null) {
-							attrs.put("targetName", "attrs." + nameField.getName());
-						}
-					}
+					attrs.put("targetName", "name");
 				}
 			}
 

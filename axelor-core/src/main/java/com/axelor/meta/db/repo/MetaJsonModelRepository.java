@@ -23,6 +23,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.meta.db.MetaAction;
+import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonModel;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.MetaMenu;
@@ -31,9 +32,30 @@ import com.google.inject.persist.Transactional;
 
 public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 
+	public MetaJsonField findNameField(MetaJsonModel jsonModel) {
+		return jsonModel.getFields()
+			.stream()
+			.filter(f -> f.getNameField() == Boolean.TRUE)
+			.findFirst()
+			.orElseGet(() -> {
+				return jsonModel.getFields()
+					.stream()
+					.filter(f -> "name".equalsIgnoreCase(f.getName()))
+					.filter(f -> "fullName".equalsIgnoreCase(f.getName()))
+					.findFirst().orElse(null);
+			});
+	}
+	
 	private void onSave(MetaJsonModel jsonModel) {
 		if (jsonModel.getFields() == null) {
 			return;
+		}
+
+		final MetaJsonField nameField = findNameField(jsonModel);
+		if (nameField == null) {
+			jsonModel.setNameField(null);
+		} else {
+			jsonModel.setNameField(nameField.getName());
 		}
 
 		MetaMenu menu = jsonModel.getMenu();

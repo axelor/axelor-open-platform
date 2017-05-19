@@ -298,7 +298,8 @@ public class Context extends SimpleBindings {
 
 	@Override
 	public Object put(String name, Object value) {
-		if (mapper.getProperty(name) == null) {
+		if (mapper.getProperty(name) == null
+				|| (MetaJsonRecord.class.isAssignableFrom(getContextClass()) && hasJsonField(name))) {
 			return tryJsonPut(name, value);
 		}
 		return mapper.set(getProxy(), name, value);
