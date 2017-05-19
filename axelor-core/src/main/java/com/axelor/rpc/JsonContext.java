@@ -24,15 +24,19 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.script.SimpleBindings;
 
 import com.axelor.common.ObjectUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Adapter;
+import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaStore;
+import com.axelor.meta.db.MetaJsonRecord;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -68,9 +72,30 @@ public class JsonContext extends SimpleBindings {
 
 	public JsonContext(Context context, Property property, String jsonValue) {
 		super(fromJson(jsonValue));
-		this.jsonField = property.getName();
-		this.fields = MetaStore.findJsonFields(property.getEntity().getName(), property.getName());
 		this.context = context;
+		this.jsonField = property.getName();
+		this.fields = findFields();
+	}
+
+	public JsonContext(MetaJsonRecord record) {
+		this(Objects.requireNonNull(record).getJsonModel(), record.getAttrs());
+	}
+
+	public JsonContext(String jsonModel, String jsonValue) {
+		this(new Context(MetaJsonRecord.class),
+				Mapper.of(MetaJsonRecord.class).getProperty(Context.KEY_JSON_ATTRS),
+				jsonValue);
+	}
+
+	private Map<String, Object> findFields() {
+		String jsonModel = (String) context.get(Context.KEY_JSON_MODEL);
+		if (jsonModel == null) {
+			jsonModel = (String) super.get(Context.KEY_JSON_MODEL);
+		}
+		if (!StringUtils.isBlank(jsonModel) && MetaJsonRecord.class.isAssignableFrom(context.getContextClass())) {
+			return MetaStore.findJsonFields(jsonModel);
+		}
+		return MetaStore.findJsonFields(context.getContextClass().getName(), jsonField);
 	}
 
 	@SuppressWarnings("unchecked")

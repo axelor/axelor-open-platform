@@ -17,6 +17,7 @@
  */
 package com.axelor.rpc;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,6 +28,7 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonModel;
+import com.axelor.meta.db.MetaJsonRecord;
 
 /**
  * The Context class represents an {@link ActionRequest} context.
@@ -64,10 +66,9 @@ public class Context extends SimpleBindings {
 	private static final String KEY_PARENT = "_parent";
 	private static final String KEY_PARENT_CONTEXT = "parentContext";
 	
-	private static final String KEY_JSON_ATTRS = "attrs";
-	private static final String KEY_JSON_MODEL = "jsonModel";
-	private static final String KEY_JSON_PREFIX = "$";
-
+	static final String KEY_JSON_ATTRS = "attrs";
+	static final String KEY_JSON_MODEL = "jsonModel";
+	static final String KEY_JSON_PREFIX = "$";
 
 	private final Map<String, Object> jsonFields;
 	private final Map<String, Object> values;
@@ -97,6 +98,16 @@ public class Context extends SimpleBindings {
 		this.jsonFields = MetaJsonModel.class.isAssignableFrom(beanClass)
 			? MetaStore.findJsonFields((String) values.get(KEY_JSON_MODEL))
 			: MetaStore.findJsonFields(beanClass.getName(), KEY_JSON_ATTRS);
+	}
+
+	/**
+	 * Create a new {@link Context} for the given bean class.
+	 * 
+	 * @param beanClass
+	 *            the context bean class
+	 */
+	public Context(Class<?> beanClass) {
+		this(new HashMap<>(), beanClass);
 	}
 
 	private Object getProxy() {
