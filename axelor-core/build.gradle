@@ -18,6 +18,8 @@ dependencies {
 	compile libs.guice_persist
 	compile libs.guice_multibindings
 	
+	compile libs.byte_buddy
+
 	compile libs.jdbc_hsqldb
 	compile libs.jdbc_postgres
 	compile libs.jdbc_mysql

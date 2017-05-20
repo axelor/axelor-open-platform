@@ -64,6 +64,9 @@ libs.guice_multibindings = "com.google.inject.extensions:guice-multibindings:${v
 // ASM (repackaged to avoid version conflicts)
 libs.axelor_asm = "com.axelor:axelor-asm:5.2"
 
+// Byte Buddy
+libs.byte_buddy = "net.bytebuddy:byte-buddy:1.6.14"
+
 // Tomcat EL (repackaged to avoid version conflicts)
 libs.axelor_el = "com.axelor:axelor-el:${versions.tomcat}"
 
@@ -83,7 +86,6 @@ libs.jdbc_mysql = "mysql:mysql-connector-java:5.1.41"
 // Hibernate
 libs.hibernate = [
     "org.hibernate:hibernate-core:${versions.hibernate}",
-    "org.hibernate:hibernate-entitymanager:${versions.hibernate}",
 	"org.hibernate:hibernate-hikaricp:${versions.hibernate}",
     "org.hibernate:hibernate-validator:${versions.hibernate_validator}",
 	"org.hibernate:hibernate-infinispan:${versions.hibernate}",
