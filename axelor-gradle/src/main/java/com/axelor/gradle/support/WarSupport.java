@@ -62,8 +62,8 @@ public class WarSupport extends AbstractSupport {
 		project.getTasks().withType(War.class).all(task -> task.dependsOn(COPY_WEBAPP_TASK_NAME));
 		
 		final War war = (War) project.getTasks().getByName(WarPlugin.WAR_TASK_NAME);
- 		war.from(project.getBuildDir() + "/webapp");
- 		war.exclude("node_modules", "gulpfile.js", "package.json");
+		war.from(project.getBuildDir() + "/webapp");
+		war.exclude("node_modules", "gulpfile.js", "package.json", "Brocfile.js", ".jshintignore", ".jshintrc");
  		war.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
 	}
 }
