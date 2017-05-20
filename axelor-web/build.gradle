@@ -9,8 +9,8 @@ dependencies {
 	testCompile project(":axelor-test")
 	compile project(":axelor-core")
 
-	compile libs.javax_servlet
-	compile libs.javax_servlet_jsp
+	compileOnly libs.javax_servlet
+	compileOnly libs.javax_servlet_jsp
 
 	compile libs.resteasy
 	compile libs.resteasy_guice

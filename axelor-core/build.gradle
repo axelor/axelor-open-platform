@@ -20,7 +20,7 @@ dependencies {
 	
 	compile libs.byte_buddy
 
-	compile libs.jdbc_hsqldb
+	testCompile libs.jdbc_hsqldb
 	compile libs.jdbc_postgres
 	compile libs.jdbc_mysql
 	compile libs.hibernate
@@ -40,8 +40,9 @@ dependencies {
 	compile libs.xstream
 	compile libs.opencsv
 
-	compile libs.javax_servlet
-	compile libs.javax_mail
+	compileOnly libs.javax_servlet
+	compileOnly libs.javax_mail
+
 	compile libs.axelor_el
 	compile libs.jsoup
 

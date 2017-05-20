@@ -40,7 +40,7 @@ public class WarSupport extends AbstractSupport {
 		project.getConfigurations().create("axelorWeb").setTransitive(false);
 
 		// apply providedCompile dependencies
-		applyConfigurationLibs(project, "provided", "providedCompile");
+		applyConfigurationLibs(project, "provided", "compileOnly");
 
 		// add dependency to axelor-web
 		project.getDependencies().add("compile", "com.axelor:axelor-web:" + version);

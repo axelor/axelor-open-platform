@@ -12,8 +12,8 @@ dependencies {
 	compile libs.jdbc_postgres
 	compile libs.hibernate
 
-	compile libs.javax_el
-	compile libs.javax_servlet
+	compileOnly libs.javax_el
+	compileOnly libs.javax_servlet
 
 	compile libs.resteasy
 	compile libs.resteasy_guice
