@@ -1,8 +1,8 @@
-# Current (3.3.5)
+# 3.3.5 (2017-05-22)
 
 ## Bug fixes
 
-## Improvements
+- Fix NPE
 
 # 3.3.4 (2017-05-10)
 
