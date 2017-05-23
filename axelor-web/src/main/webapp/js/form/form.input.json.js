@@ -33,7 +33,6 @@ ui.formInput('JsonField', 'String', {
 		var field = scope.field;
 		var jsonFields = field.jsonFields || [];
 		var jsonFix = {};
-		
 
 		jsonFields.forEach(function (item) {
 			if (item.widget && item.showTitle === undefined) {
@@ -148,7 +147,7 @@ ui.formInput('JsonField', 'String', {
 
 		scope.$on('on:new', onRender);
 		scope.$on('on:edit', function () {
-			if (scope.viewType === 'form') onRender();
+			if (scope.viewType === 'form' || (!scope.viewType && scope._isPopup)) onRender();
 		});
 
 		watchParent();

@@ -34,6 +34,10 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		},
 		views = {};
 	
+	if (field.jsonTarget) {
+		params.context = _.extend({}, params.context, { jsonModel: field.jsonTarget });
+	}
+	
 	if (!$element.is('fieldset')) {
 		
 		_.each(field.views, function(view){

@@ -332,6 +332,7 @@ public class MetaStore {
 					attrs.put("gridView", targetModel.getGridView().getName());
 					attrs.put("formView", targetModel.getFormView().getName());
 					attrs.put("targetName", "name");
+					attrs.put("jsonTarget", targetModel.getName());
 				}
 			}
 
