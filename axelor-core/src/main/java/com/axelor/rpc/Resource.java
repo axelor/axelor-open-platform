@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -69,6 +70,7 @@ import com.axelor.inject.Beans;
 import com.axelor.meta.MetaPermissions;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
+import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.schema.views.Selection;
 import com.axelor.rpc.filter.Filter;
@@ -452,9 +454,29 @@ public class Resource<T extends Model> {
 		Mapper mapper = Mapper.of(model);
 		MetaPermissions perms = Beans.get(MetaPermissions.class);
 
+		final Function<String, Map<String, Object>> findJsonFields = name -> jsonFieldsMap.computeIfAbsent(name,
+				(n) -> {
+					return MetaJsonRecord.class.isAssignableFrom(model)
+							? MetaStore.findJsonFields((String) request.getContext().get("jsonModel"))
+							: MetaStore.findJsonFields(model.getName(), n);
+				});
+
+		final Function<String, List<String>> findJsonPaths = name -> {
+			final Map<String, Object> map = findJsonFields.apply(name);
+			return map == null
+					? Collections.EMPTY_LIST
+					: map.keySet().stream().map(n -> name + "." + n).collect(Collectors.toList());
+		};
+
 		if (fields == null) {
 			fields = new ArrayList<>();
 		}
+
+		if (fields.isEmpty() && MetaJsonRecord.class.isAssignableFrom(model)) {
+			fields.add("id");
+			fields.addAll(findJsonPaths.apply("attrs"));
+		}
+
 		if (fields.isEmpty()) {
 			fields.add("id");
 			try {
@@ -474,7 +496,11 @@ public class Resource<T extends Model> {
 				if (fields.contains(name) || name.matches("^(created|updated)(On|By)$")) {
 					continue;
 				}
-				fields.add(name);
+				if (property.isJson()) {
+					fields.addAll(findJsonPaths.apply(property.getName()));
+				} else {
+					fields.add(name);
+				}
 			}
 		}
 
@@ -489,6 +515,9 @@ public class Resource<T extends Model> {
 				prop.isCollection() ||
 				prop.isTransient() ||
 				prop.getType() == PropertyType.BINARY) {
+				continue;
+			}
+			if (prop.isJson() && !iter.hasNext()) {
 				continue;
 			}
 
@@ -508,10 +537,7 @@ public class Resource<T extends Model> {
 			List<Selection.Option> options = MetaStore.getSelectionList(prop.getSelection());
 
 			if (prop.isJson()) {
-				if (!jsonFieldsMap.containsKey(prop.getName())) {
-					jsonFieldsMap.put(prop.getName(), MetaStore.findJsonFields(model, prop.getName()));
-				}
-				Map<String, Object> jsonFields = jsonFieldsMap.get(prop.getName());
+				Map<String, Object> jsonFields = findJsonFields.apply(prop.getName());
 				Map<String, Object> jsonField = (Map) jsonFields.get(iter.next());
 				name = field;
 				if (jsonField != null) {
