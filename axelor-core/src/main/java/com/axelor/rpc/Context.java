@@ -219,6 +219,10 @@ public class Context extends SimpleBindings {
 		}
 		return (String) key;
 	}
+	
+	private boolean isJsonRecord() {
+		return MetaJsonRecord.class.isAssignableFrom(getContextClass());
+	}
 
 	private boolean hasJsonField(String name) {
 		return jsonFields != null && jsonFields.containsKey(name);
@@ -282,7 +286,7 @@ public class Context extends SimpleBindings {
 		final Property property = mapper.getProperty(name);
 
 		// if real field access
-		if (property != null) {
+		if (property != null && (!isJsonRecord() || !"name".equals(property.getName()))) {
 			return property.get(getProxy());
 		}
 
@@ -298,8 +302,7 @@ public class Context extends SimpleBindings {
 
 	@Override
 	public Object put(String name, Object value) {
-		if (mapper.getProperty(name) == null
-				|| (MetaJsonRecord.class.isAssignableFrom(getContextClass()) && hasJsonField(name))) {
+		if (mapper.getProperty(name) == null || (isJsonRecord() && hasJsonField(name))) {
 			return tryJsonPut(name, value);
 		}
 		return mapper.set(getProxy(), name, value);
