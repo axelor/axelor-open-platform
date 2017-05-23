@@ -41,7 +41,7 @@ dependencies {
 	compile libs.opencsv
 
 	compileOnly libs.javax_servlet
-	compileOnly libs.javax_mail
+	compile libs.javax_mail
 
 	compile libs.axelor_el
 	compile libs.jsoup
