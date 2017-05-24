@@ -92,7 +92,7 @@ public class ScriptBindings extends SimpleBindings {
 		case "__this__":
 			return ((Context) variables).asType(Model.class);
 		case "__parent__":
-			return ((Context) variables).getParentContext();
+			return ((Context) variables).getParent();
 		case "__date__":
 			return LocalDate.now();
 		case "__time__":
