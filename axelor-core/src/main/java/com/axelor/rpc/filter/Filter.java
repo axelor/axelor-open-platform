@@ -60,11 +60,11 @@ public abstract class Filter {
 		return new SimpleFilter(Operator.NOT_EQUAL, fieldName, value);
 	}
 
-	public static Filter lessThen(String fieldName, Object value) {
+	public static Filter lessThan(String fieldName, Object value) {
 		return new SimpleFilter(Operator.LESS_THAN, fieldName, value);
 	}
 
-	public static Filter greaterThen(String fieldName, Object value) {
+	public static Filter greaterThan(String fieldName, Object value) {
 		return new SimpleFilter(Operator.GREATER_THAN, fieldName, value);
 	}
 

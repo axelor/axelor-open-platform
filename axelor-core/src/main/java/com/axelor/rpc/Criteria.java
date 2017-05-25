@@ -218,9 +218,9 @@ public class Criteria {
 		case NOT_EQUAL:
 			return Filter.notEquals(fieldName, value);
 		case LESS_THAN:
-			return Filter.lessThen(fieldName, value);
+			return Filter.lessThan(fieldName, value);
 		case GREATER_THAN:
-			return Filter.greaterThen(fieldName, value);
+			return Filter.greaterThan(fieldName, value);
 		case LESS_OR_EQUAL:
 			return Filter.lessOrEqual(fieldName, value);
 		case GREATER_OR_EQUAL:
