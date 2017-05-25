@@ -166,5 +166,9 @@ public class MetaJsonRecordRepository extends JpaRepository<MetaJsonRecord> {
 					.append(" ").append(":param");
 			return filter(builder.toString()).bind("param", value);
 		}
+
+		public Query<MetaJsonRecord> by(String field, Object value) {
+			return by(field, "=", value);
+		}
 	}
 }
