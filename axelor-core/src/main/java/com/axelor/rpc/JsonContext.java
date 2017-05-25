@@ -183,14 +183,14 @@ public class JsonContext extends SimpleBindings {
 		}
 		
 		if (value instanceof Map) {
-			return ContextProxy.create((Map) value, targetClass);
+			return ContextProxy.of(targetClass, (Map) value).get();
 		}
 
 		if (value instanceof Collection) {
 			return ((Collection<?>) value)
 				.stream()
 				.map(item -> (Map<String, Object>) item)
-				.map(item -> ContextProxy.create(item, targetClass))
+				.map(item -> ContextProxy.of(targetClass, item).get())
 				.collect(Collectors.toList());
 		}
 

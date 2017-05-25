@@ -141,7 +141,7 @@ public class Context extends SimpleBindings {
 
 	private ContextProxy<?> getContextProxy() {
 		if (proxy == null) {
-			proxy = ContextProxy.create(values, beanClass);
+			proxy = ContextProxy.of(beanClass, values);
 		}
 		return proxy;
 	}

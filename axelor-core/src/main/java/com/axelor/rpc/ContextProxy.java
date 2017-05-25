@@ -17,14 +17,12 @@
  */
 package com.axelor.rpc;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -69,7 +67,7 @@ public class ContextProxy<T> {
 	
 	private static final String COMPUTE_PREFIX = "compute";
 	
-	private final List<PropertyChangeListener> changeListeners;
+	private final PropertyChangeSupport changeListeners;
 
 	private final Map<String, Object> values;
 	private final Set<String> validated;
@@ -84,21 +82,16 @@ public class ContextProxy<T> {
 
 	private boolean searched;
 
-	private ContextProxy(Map<String, Object> values, Class<T> beanClass) {
+	private ContextProxy(Class<T> beanClass, Map<String, Object> values) {
 		this.values = Objects.requireNonNull(values);
 		this.validated = new HashSet<>();
 		this.beanClass = Objects.requireNonNull(beanClass);
 		this.beanMapper = Mapper.of(beanClass);
-		this.changeListeners = new ArrayList<>();
+		this.changeListeners = new PropertyChangeSupport(this);
 	}
 	
 	public void addChangeListener(PropertyChangeListener listener) {
-		changeListeners.add(listener);
-	}
-
-	private void triggerChange(String propertyName, Object oldValue, Object newValue) {
-		final PropertyChangeEvent event = new PropertyChangeEvent(this, propertyName, oldValue, newValue);
-		changeListeners.forEach(listener -> listener.propertyChange(event));
+		changeListeners.addPropertyChangeListener(listener);
 	}
 
 	private Long findId(Map<String, Object> values) {
@@ -164,7 +157,7 @@ public class ContextProxy<T> {
 			final Long id = findId(map);
 			// if new or updated, create proxy
 			if (id == null || id <= 0 || map.containsKey(FIELD_VERSION)) {
-				return create(map, property.getTarget());
+				return of(property.getTarget(), map).get();
 			}
 			// use managed instance
 			final Object bean = JPA.em().find(property.getTarget(), id);
@@ -248,23 +241,19 @@ public class ContextProxy<T> {
 		final String fieldName = property.getName();
 
 		// in case of setter, update context map
-		if (args.length == 1) {
-			values.put(fieldName, args[0]);
-		}
+		final Object oldValue = args.length == 1
+				? values.put(fieldName, args[0])
+				: null;
 	
 		// if setter or value found in context map for the getter
 		if (args.length == 1 || values.containsKey(fieldName) || property.isTransient()) {
 			validate(property);
-			if (changeListeners.isEmpty()) {
-				return method.invoke(this.unmanaged(), args);
-			}
-			final Object oldValue = beanMapper.get(this.unmanaged(), fieldName);
-			final Object newValue = values.get(fieldName);
-			method.invoke(this.unmanaged(), args);
 			try {
-				triggerChange(fieldName, oldValue, newValue);
-			} catch (Exception e) {
-				// ignore change listener exceptions
+				return method.invoke(this.unmanaged(), args);
+			} finally {
+				if (args.length == 1 && changeListeners.hasListeners(fieldName)) {
+					changeListeners.firePropertyChange(fieldName, oldValue, values.get(fieldName));
+				}
 			}
 		}
 		// else get value from managed instance
@@ -281,9 +270,9 @@ public class ContextProxy<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> ContextProxy<T> create(final Map<String, Object> values, final Class<T> beanClass) {
+	public static <T> ContextProxy<T> of(final Class<T> beanClass, final Map<String, Object> values) {
 		Objects.requireNonNull(values, "values map cannot be null");
-		final ContextProxy<T> proxy = new ContextProxy<>(values, beanClass);
+		final ContextProxy<T> proxy = new ContextProxy<>(beanClass, values);
 		final Class<?> proxyClass = new ByteBuddy()
 			.subclass(beanClass)
 			.method(ElementMatchers.isPublic().and(ElementMatchers.isGetter().or(ElementMatchers.isSetter())))
