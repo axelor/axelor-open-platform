@@ -17,6 +17,7 @@
  */
 package com.axelor.rpc;
 
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -101,7 +102,7 @@ public class Context extends SimpleBindings {
 
 	private final Class<?> beanClass;
 
-	private Object proxy;
+	private ContextProxy<?> proxy;
 	
 	private Context parent;
 
@@ -133,12 +134,20 @@ public class Context extends SimpleBindings {
 	public Context(Class<?> beanClass) {
 		this(new HashMap<>(), beanClass);
 	}
+	
+	public void addChangeListener(PropertyChangeListener listener) {
+		getContextProxy().addChangeListener(listener);
+	}
 
-	private Object getProxy() {
+	private ContextProxy<?> getContextProxy() {
 		if (proxy == null) {
 			proxy = ContextProxy.create(values, beanClass);
 		}
 		return proxy;
+	}
+
+	private Object getProxy() {
+		return getContextProxy().get();
 	}
 
 	/**

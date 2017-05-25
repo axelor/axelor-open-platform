@@ -17,10 +17,14 @@
  */
 package com.axelor.rpc;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -64,6 +68,8 @@ public class ContextProxy<T> {
 	private static final String FIELD_SELECTED = "selected";
 	
 	private static final String COMPUTE_PREFIX = "compute";
+	
+	private final List<PropertyChangeListener> changeListeners;
 
 	private final Map<String, Object> values;
 	private final Set<String> validated;
@@ -73,6 +79,8 @@ public class ContextProxy<T> {
 
 	private Object managed;
 	private Object unmanaged;
+	
+	private T proxied;
 
 	private boolean searched;
 
@@ -81,6 +89,16 @@ public class ContextProxy<T> {
 		this.validated = new HashSet<>();
 		this.beanClass = Objects.requireNonNull(beanClass);
 		this.beanMapper = Mapper.of(beanClass);
+		this.changeListeners = new ArrayList<>();
+	}
+	
+	public void addChangeListener(PropertyChangeListener listener) {
+		changeListeners.add(listener);
+	}
+
+	private void triggerChange(String propertyName, Object oldValue, Object newValue) {
+		final PropertyChangeEvent event = new PropertyChangeEvent(this, propertyName, oldValue, newValue);
+		changeListeners.forEach(listener -> listener.propertyChange(event));
 	}
 
 	private Long findId(Map<String, Object> values) {
@@ -237,7 +255,17 @@ public class ContextProxy<T> {
 		// if setter or value found in context map for the getter
 		if (args.length == 1 || values.containsKey(fieldName) || property.isTransient()) {
 			validate(property);
-			return method.invoke(this.unmanaged(), args);
+			if (changeListeners.isEmpty()) {
+				return method.invoke(this.unmanaged(), args);
+			}
+			final Object oldValue = beanMapper.get(this.unmanaged(), fieldName);
+			final Object newValue = values.get(fieldName);
+			method.invoke(this.unmanaged(), args);
+			try {
+				triggerChange(fieldName, oldValue, newValue);
+			} catch (Exception e) {
+				// ignore change listener exceptions
+			}
 		}
 		// else get value from managed instance
 		final Object managed = this.managed();
@@ -247,13 +275,14 @@ public class ContextProxy<T> {
 
 		return method.invoke(managed, args);
 	}
-	
-	@SuppressWarnings("unchecked")
-	public static <T> T create(final Map<String, Object> values, final Class<T> beanClass) {
-		if (values == null) {
-			return null;
-		}
 
+	public T get() {
+		return proxied;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> ContextProxy<T> create(final Map<String, Object> values, final Class<T> beanClass) {
+		Objects.requireNonNull(values, "values map cannot be null");
 		final ContextProxy<T> proxy = new ContextProxy<>(values, beanClass);
 		final Class<?> proxyClass = new ByteBuddy()
 			.subclass(beanClass)
@@ -269,9 +298,11 @@ public class ContextProxy<T> {
 			.getLoaded();
 
 		try {
-			return (T) proxyClass.newInstance();
+			proxy.proxied = (T) proxyClass.newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
+
+		return proxy;
 	}
 }
