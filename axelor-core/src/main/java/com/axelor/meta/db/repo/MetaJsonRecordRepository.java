@@ -17,8 +17,8 @@
  */
 package com.axelor.meta.db.repo;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Query;
@@ -63,9 +63,17 @@ public class MetaJsonRecordRepository extends JpaRepository<MetaJsonRecord> {
 	 * @return a {@link Context}
 	 */
 	public Context create(String jsonModel) {
-		final Map<String, Object> values = new HashMap<>();
-		final Context context = new Context(values, MetaJsonRecord.class);
+		final Context context = new MetaJsonContext();
 		context.put("jsonModel", jsonModel);
+		return context;
+	}
+
+	public Context create(MetaJsonRecord record) {
+		Objects.requireNonNull(record, "record cannot be null");
+		Objects.requireNonNull(record.getJsonModel(), "jsonModel cannot be null");
+		MetaJsonContext context = (MetaJsonContext) create(record.getJsonModel());
+		context.addChangeListener(evt -> record.setAttrs((String) context.get("attrs")));
+		context.record = record;
 		return context;
 	}
 
@@ -95,6 +103,9 @@ public class MetaJsonRecordRepository extends JpaRepository<MetaJsonRecord> {
 	 * @return saved instance {@link MetaJsonRecord}
 	 */
 	public MetaJsonRecord save(Context context) {
+		if (context instanceof MetaJsonContext) {
+			return save(((MetaJsonContext) context).record);
+		}
 		return save(context.asType(MetaJsonRecord.class));
 	}
 	
@@ -120,6 +131,15 @@ public class MetaJsonRecordRepository extends JpaRepository<MetaJsonRecord> {
 		return new MetaJsonRecordQuery(jsonModel);
 	}
 	
+	private static class MetaJsonContext extends Context {
+		
+		private MetaJsonRecord record;
+
+		public MetaJsonContext() {
+			super(MetaJsonRecord.class);
+		}
+	}
+
 	public static class MetaJsonRecordQuery extends Query<MetaJsonRecord> {
 		
 		private final String jsonModel;
