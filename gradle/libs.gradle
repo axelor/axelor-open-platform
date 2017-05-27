@@ -173,18 +173,18 @@ libs.apache_ds = [
 ]
 
 // commons
-libs.commons_cli = "commons-cli:commons-cli:1.3.1"
+libs.commons_cli = "commons-cli:commons-cli:1.4"
 libs.commons_jxpath = "commons-jxpath:commons-jxpath:1.3"
 
 // BIRT Runtime
 libs.birt_runtime = dependencies.create("org.eclipse.birt.runtime:org.eclipse.birt.runtime:4.4.2") {
 	exclude module: "derby"
 	exclude module: "org.apache.batik.pdf" // causing issue with commons-io
+	exclude module: "commons-cli"
 }
 
-// jline & jcommander
-libs.jline = "jline:jline:2.14.3"
-libs.jcommander = "com.beust:jcommander:1.64"
+// jcommander
+libs.jcommander = "com.beust:jcommander:1.71"
 
 // Quartz Scheduler
 libs.quartz = dependencies.create("org.quartz-scheduler:quartz:2.2.3") { exclude module: "c3p0" }
