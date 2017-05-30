@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -46,7 +47,6 @@ import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -507,14 +507,9 @@ public final class JPA {
 	 * @return Set of model classes
 	 */
 	public static Set<Class<?>> models() {
-
-		return Sets.filter(JpaScanner.findModels(), new Predicate<Class<?>>() {
-
-			@Override
-			public boolean apply(Class<?> input) {
-				return !Modifier.isAbstract(input.getModifiers());
-			}
-		});
+		return JpaScanner.findModels().stream()
+				.filter(c -> !Modifier.isAbstract(c.getModifiers()))
+				.collect(Collectors.toSet());
 	}
 	
 	/**

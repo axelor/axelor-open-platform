@@ -17,9 +17,13 @@
  */
 package com.axelor.db;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
@@ -40,7 +44,6 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.common.reflections.ClassFinder;
 import com.axelor.meta.MetaScanner;
-import com.google.common.collect.MapMaker;
 
 /**
  * A custom Hibernate scanner that scans all the classpath entries for all the
@@ -50,12 +53,14 @@ import com.google.common.collect.MapMaker;
 public class JpaScanner extends AbstractScannerImpl {
 
 	private static Logger log = LoggerFactory.getLogger(JpaScanner.class);
-	
-	private static ConcurrentMap<String, Class<?>> modelCache = null;
-	private static ConcurrentMap<String, Class<?>> repoCache = null;
 
-	private static ConcurrentMap<String, String> modelNames = new MapMaker().makeMap();
-	private static ConcurrentMap<String, String> repoNames = new MapMaker().makeMap();
+	private static final Object lock = new Object();
+
+	private static Map<String, Class<?>> modelCache = new HashMap<>();
+	private static Map<String, Class<?>> repoCache = new HashMap<>();
+
+	private static Map<String, String> modelNames = new HashMap<>();
+	private static Map<String, String> repoNames = new HashMap<>();
 
 	private static Set<String> excludes = new HashSet<>();
 	private static Set<String> includes = new HashSet<>();
@@ -89,7 +94,7 @@ public class JpaScanner extends AbstractScannerImpl {
 	@Override
 	public ScanResult scan(ScanEnvironment environment, ScanOptions options, ScanParameters params) {
 		final ScanResult found = super.scan(environment, options, params);
-		final Set<Class<?>> models = findModels();
+		final Set<Class<?>> models = findClasses();
 		final Set<ClassDescriptor> descriptors = new HashSet<>();
 
 		if (found.getLocatedClasses() != null) {
@@ -104,60 +109,65 @@ public class JpaScanner extends AbstractScannerImpl {
 		return new ScanResultImpl(found.getLocatedPackages(), descriptors, found.getLocatedMappingFiles());
 	}
 
-	public static Set<Class<?>> findModels() {
-
-		if (modelCache != null) {
-			return new HashSet<Class<?>>(modelCache.values());
-		}
-
-		modelCache = new MapMaker().makeMap();
-		repoCache = new MapMaker().makeMap();
-
-		synchronized (modelCache) {
-			
-			log.debug("Searching for entity classes...");
-			
-			register(Model.class);
-
-			ClassFinder<Model> finder = MetaScanner.findSubTypesOf(Model.class)
-					.having(Entity.class)
-					.having(Embeddable.class)
-					.having(MappedSuperclass.class);
-
-			for (String pkg : includes) {
-				finder = finder.within(pkg);
-			}
-
-			for (Class<?> klass : finder.any().find()) {
-				if (modelCache.containsKey(klass.getName()) ||
-					excludes.contains(klass.getPackage().getName())) {
-					continue;
+	private static Set<Class<?>> findClasses() {
+		synchronized (lock) {
+			final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+			final Future<?> models = executor.submit(() -> {
+				log.debug("Searching for entity classes...");
+				modelCache.clear();
+				modelNames.clear();
+				
+				register(Model.class);
+	
+				ClassFinder<Model> finder = MetaScanner.findSubTypesOf(Model.class)
+						.having(Entity.class)
+						.having(Embeddable.class)
+						.having(MappedSuperclass.class);
+	
+				for (String pkg : includes) {
+					finder = finder.within(pkg);
 				}
-				log.trace("Found entity: {}", klass.getName());
-				register(klass);
-			}
-			log.debug("Entitity classes found: {}", modelCache.size());
-		}
-
-		synchronized (repoCache) {
-			log.debug("Searching for repository classes...");
-
-			ClassFinder<?> finder = MetaScanner.findSubTypesOf(JpaRepository.class);
-
-			for (String pkg : includes) {
-				finder = finder.within(pkg);
-			}
-
-			for (Class<?> klass : finder.any().find()) {
-				if (repoCache.containsKey(klass.getName()) ||
-					excludes.contains(klass.getPackage().getName())) {
-					continue;
+	
+				for (Class<?> klass : finder.any().find()) {
+					if (modelCache.containsKey(klass.getName()) ||
+						excludes.contains(klass.getPackage().getName())) {
+						continue;
+					}
+					log.trace("Found entity: {}", klass.getName());
+					register(klass);
 				}
-				log.trace("Found repository: {}", klass.getName());
-				repoCache.put(klass.getName(), klass);
-				repoNames.put(klass.getSimpleName(), klass.getName());
+				log.debug("Entitity classes found: {}", modelCache.size());
+			});
+			final Future<?> repos = executor.submit(() -> {
+				log.debug("Searching for repository classes...");
+				repoCache.clear();
+				repoNames.clear();
+	
+				ClassFinder<?> finder = MetaScanner.findSubTypesOf(JpaRepository.class);
+	
+				for (String pkg : includes) {
+					finder = finder.within(pkg);
+				}
+	
+				for (Class<?> klass : finder.any().find()) {
+					if (repoCache.containsKey(klass.getName()) ||
+						excludes.contains(klass.getPackage().getName())) {
+						continue;
+					}
+					log.trace("Found repository: {}", klass.getName());
+					repoCache.put(klass.getName(), klass);
+					repoNames.put(klass.getSimpleName(), klass.getName());
+				}
+				log.debug("Repository classes found: {}", repoCache.size());
+			});
+			try {
+				models.get();
+				repos.get();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			} finally {
+				executor.shutdown();
 			}
-			log.debug("Repository classes found: {}", repoCache.size());
 		}
 		return new HashSet<Class<?>>(modelCache.values());
 	}
@@ -167,23 +177,34 @@ public class JpaScanner extends AbstractScannerImpl {
 		modelNames.put(model.getSimpleName(), model.getName());
 	}
 
+	public static Set<Class<?>> findModels() {
+		synchronized (lock) {
+			if (modelCache.isEmpty()) {
+				return findClasses();
+			}
+		}
+		return new HashSet<>(modelCache.values());
+	}
+
 	public static ClassLoader getClassLoader() {
 		return loader;
 	}
 
 	public static Class<?> findModel(String name) {
-		if (modelCache == null) {
-			findModels();
+		synchronized (lock) {
+			if (modelCache.isEmpty()) {
+				findClasses();
+			}
 		}
-		String className = modelNames.containsKey(name) ? modelNames.get(name) : name;
-		return modelCache.get(className);
+		return modelCache.get(modelNames.getOrDefault(name, name));
 	}
 
 	public static Class<?> findRepository(String name) {
-		if (modelCache == null) {
-			findModels();
+		synchronized (lock) {
+			if (modelCache.isEmpty()) {
+				findClasses();
+			}
 		}
-		String className = repoNames.containsKey(name) ? repoNames.get(name) : name;
-		return repoCache.get(className);
+		return repoCache.get(repoNames.getOrDefault(name, name));
 	}
 }
