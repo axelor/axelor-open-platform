@@ -19,6 +19,7 @@ package com.axelor.tools.x2j;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -59,14 +60,10 @@ public class Generator {
 		return new File(base.getPath() + "/" + Joiner.on("/").join(parts));
 	}
 
-	private void expand(Collection<Entity> items, boolean doLookup) throws IOException {
-		expand(outputPath, items, doLookup);
-	}
-	
-	private void expand(File outputPath, Collection<Entity> items, boolean doLookup) throws IOException {
+	private List<File> render(Collection<Entity> items, boolean doLookup) throws IOException {
 
 		if (items == null || items.isEmpty()) {
-			return;
+			return null;
 		}
 
 		final List<Entity> all = new ArrayList<>(items);
@@ -123,15 +120,21 @@ public class Generator {
 			}
 		}
 
+		final List<File> rendered = new ArrayList<>();
+
 		log.info("Generating: " + entityFile.getPath());
 		String code = Expander.expand(entity, false);
 		Files.write(Utils.stringTrailing(code), entityFile, Charsets.UTF_8);
-		
-		if (repoFile == null) return;
+		rendered.add(entityFile);
 
-		log.info("Generating: " + repoFile.getPath());
-		String repo = Expander.expand(entity, true);
-		Files.write(Utils.stringTrailing(repo), repoFile, Charsets.UTF_8);
+		if (repoFile != null) {
+			log.info("Generating: " + repoFile.getPath());
+			String repo = Expander.expand(entity, true);
+			Files.write(Utils.stringTrailing(repo), repoFile, Charsets.UTF_8);
+			rendered.add(repoFile);
+		}
+
+		return rendered;
 	}
 
 	protected void findFrom(File input) throws IOException {
@@ -206,6 +209,8 @@ public class Generator {
 
 		outputPath.mkdirs();
 
+		final Set<File> generated = new HashSet<>();
+
 		if (this.domainPath.exists()) {
 			for (File file : domainPath.listFiles()) {
 				if (file.getName().endsWith(".xml")) {
@@ -215,7 +220,10 @@ public class Generator {
 		}
 		
 		for (String name : entities.keySet()) {
-			expand(entities.get(name), true);
+			final List<File> rendered = render(entities.get(name), true);
+			if (rendered != null) {
+				generated.addAll(rendered);
+			}
 		}
 
 		// make sure to generate extended entities from parent modules
@@ -237,8 +245,22 @@ public class Generator {
 				continue;
 			}
 			Collections.reverse(all);
-			expand(all, false);
+			final List<File> rendered = render(all, false);
+			if (rendered != null) {
+				generated.addAll(rendered);
+			}
 		}
+
+		// clean up obsolete files
+		java.nio.file.Files.walk(outputPath.toPath())
+			.map(Path::toFile)
+			.filter(f -> f.getName().endsWith(".java"))
+			.filter(f -> f.getName().endsWith(".groovy"))
+			.filter(f -> !generated.contains(f))
+			.forEach(f -> {
+				log.info("Deleting obsolete file: {}", f);
+				f.delete();
+			});
 	}
 	
 	/**
