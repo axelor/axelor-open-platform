@@ -3,7 +3,9 @@ apply plugin: "eclipse"
 
 dependencies {
 	testCompile	libs.junit
-	compile libs.slf4j_logback
+	if (project.name != "axelor-tomcat") {
+		compile libs.slf4j_logback
+	}
 }
 
 configurations.all {

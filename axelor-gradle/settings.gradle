@@ -1,2 +1,0 @@
-include 'axelor-common'
-project(':axelor-common').projectDir = new File(rootDir, "../axelor-common")

@@ -206,7 +206,6 @@ libs.gradle_tooling = "org.gradle:gradle-tooling-api:${gradle.gradleVersion}"
 
 // gradle plugins
 libs.plugin_license = "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.1"
-libs.plugin_tomcat = "com.bmuschko:gradle-tomcat-plugin:2.2.5"
 
 // embeded tomcat
 libs.tomcat_embed = [
@@ -214,3 +213,6 @@ libs.tomcat_embed = [
 	"org.apache.tomcat.embed:tomcat-embed-logging-log4j:${versions.tomcat_embed_logging}",
 	"org.apache.tomcat.embed:tomcat-embed-jasper:${versions.tomcat_embed}",
 ]
+
+// currently deployed on axelor repo
+libs.hotswap_agent = "org.hotswap.agent:hotswap-agent:1.1.0-SNAPSHOT"

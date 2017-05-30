@@ -11,18 +11,15 @@ configurations {
 dependencies {
 	testCompile	libs.junit
 	
-	compile	libs.guava
-	compile libs.opencsv
-
 	compile project(':axelor-common')
 
+	compile	libs.guava
+	compile libs.opencsv
 	compile libs.plugin_license
-	compile libs.plugin_tomcat
 
-	tomcat libs.tomcat_embed
-	tomcat libs.slf4j_logback
-	tomcat project(":axelor-common")
-	
+	tomcat libs.hotswap_agent
+	tomcat project(":axelor-tomcat")
+
 	provided libs.javax_servlet
 	provided libs.javax_servlet_jsp
 }

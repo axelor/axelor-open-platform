@@ -15,14 +15,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.bmuschko.gradle.tomcat.embedded.factory
+package com.axelor.tomcat;
 
-import com.bmuschko.gradle.tomcat.embedded.Tomcat85Server
+public class TomcatRunner {
 
-@Singleton
-class TomcatServerFactory {
+	public static void main(String[] args) {
+		final TomcatOptions options = new TomcatOptions();
+		try {
+			options.parse(args);
+		} catch (Exception e) {
+			options.usage();
+			System.exit(1);
+		}
+		if (options.hasHelp()) {
+			options.usage();
+			System.exit(1);
+		}
 
-    def getTomcatServer() {
-		return new Tomcat85Server()
-    }
+		final TomcatServer server = new TomcatServer(options);
+		server.start();
+	}
 }
