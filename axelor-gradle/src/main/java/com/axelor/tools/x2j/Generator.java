@@ -254,8 +254,7 @@ public class Generator {
 		// clean up obsolete files
 		java.nio.file.Files.walk(outputPath.toPath())
 			.map(Path::toFile)
-			.filter(f -> f.getName().endsWith(".java"))
-			.filter(f -> f.getName().endsWith(".groovy"))
+			.filter(f -> f.getName().endsWith(".java") || f.getName().endsWith(".groovy"))
 			.filter(f -> !generated.contains(f))
 			.forEach(f -> {
 				log.info("Deleting obsolete file: {}", f);
