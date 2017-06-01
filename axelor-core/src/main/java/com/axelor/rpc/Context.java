@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.script.SimpleBindings;
 
@@ -78,10 +77,11 @@ public class Context extends SimpleBindings {
 				throws IOException, JsonProcessingException {
 			if (value != null) {
 				final JsonSerializer<Object> serializer = provider.findValueSerializer(Map.class, null);
-				final Map<String, Object> map = value.entrySet().stream()
+				final Map<String, Object> map = new HashMap<>();
+				value.entrySet().stream()
 						.filter(e -> !(e.getValue() instanceof JsonContext))
 						.filter(e -> !KEY_PARENT_CONTEXT.equals(e.getKey()))
-						.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+						.forEach(e -> map.put(e.getKey(), e.getValue()));
 				serializer.serialize(map, jgen, provider);
 			}
 		}
@@ -228,7 +228,11 @@ public class Context extends SimpleBindings {
 		}
 		return (String) key;
 	}
-	
+
+	private boolean isJsonName(String name) {
+		return isJsonRecord() && "name".equals(name);
+	}
+
 	private boolean isJsonRecord() {
 		return MetaJsonRecord.class.isAssignableFrom(getContextClass());
 	}
@@ -295,7 +299,7 @@ public class Context extends SimpleBindings {
 		final Property property = mapper.getProperty(name);
 
 		// if real field access
-		if (property != null && (!isJsonRecord() || !"name".equals(property.getName()))) {
+		if (property != null && !isJsonName(name)) {
 			return property.get(getProxy());
 		}
 
@@ -312,6 +316,9 @@ public class Context extends SimpleBindings {
 	@Override
 	public Object put(String name, Object value) {
 		if (mapper.getProperty(name) == null || (isJsonRecord() && hasJsonField(name))) {
+			if (isJsonName(name)) {
+				mapper.set(getProxy(), name, value);
+			}
 			return tryJsonPut(name, value);
 		}
 		return mapper.set(getProxy(), name, value);
