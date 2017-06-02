@@ -57,11 +57,8 @@ import com.google.inject.persist.jpa.JpaPersistModule;
  */
 public class JpaModule extends AbstractModule {
 
-	private static final String CACHE_REGION_FACTORY_JCACHE = "org.hibernate.cache.jcache.JCacheRegionFactory";
-	private static final String CACHE_REGION_FACTORY_INFINISPAN = "org.hibernate.cache.infinispan.InfinispanRegionFactory";
-
 	private static final String INFINISPAN_CONFIG = "infinispan.xml";
-	private static final String INFINISPAN_CONFIG_FALLBACK = "org/hibernate/cache/infinispan/builder/infinispan-configs-local.xml";
+	private static final String INFINISPAN_CONFIG_FALLBACK = "infinispan-fallback.xml";
 
 	private static Logger log = LoggerFactory.getLogger(JpaModule.class);
 
@@ -188,17 +185,20 @@ public class JpaModule extends AbstractModule {
 
 			if (jcacheProvider != null) {
 				// use jcache
-				properties.put(Environment.CACHE_REGION_FACTORY, CACHE_REGION_FACTORY_JCACHE);
+				properties.put(Environment.CACHE_REGION_FACTORY, JCacheRegionFactory.class.getName());
 				properties.put(JCacheRegionFactory.PROVIDER, jcacheProvider);
 				properties.put(JCacheRegionFactory.CONFIG_URI, jcacheConfig);
 			} else {
 				// use infinispan
-				properties.put(Environment.CACHE_REGION_FACTORY, CACHE_REGION_FACTORY_INFINISPAN);
+				properties.put(Environment.CACHE_REGION_FACTORY, InfinispanRegionFactory.class.getName());
 				String infinispanConfig = settings.get(InfinispanRegionFactory.INFINISPAN_CONFIG_RESOURCE_PROP);
 				if (infinispanConfig == null) {
 					infinispanConfig = ResourceUtils.getResource(INFINISPAN_CONFIG) != null
 							? INFINISPAN_CONFIG
 							: INFINISPAN_CONFIG_FALLBACK;
+				}
+				if (INFINISPAN_CONFIG_FALLBACK.equals(infinispanConfig)) {
+					properties.put(Environment.DEFAULT_CACHE_CONCURRENCY_STRATEGY, "read-write");
 				}
 				properties.put(InfinispanRegionFactory.INFINISPAN_CONFIG_RESOURCE_PROP, infinispanConfig);
 			}

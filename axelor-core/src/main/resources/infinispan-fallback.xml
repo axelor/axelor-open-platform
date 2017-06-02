@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infinispan xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:infinispan:config:8.2"
+  xsi:schemaLocation="urn:infinispan:config:8.2 http://www.infinispan.org/schemas/infinispan-config-8.2.xsd">
+
+  <cache-container name="LocalCacheManager" statistics="false" default-cache="local-cache"
+    shutdown-hook="DEFAULT">
+    <jmx duplicate-domains="true" />
+
+    <local-cache-configuration name="local-cache" simple-cache="true" statistics="false"
+      statistics-available="false">
+      <transaction mode="NONE" />
+    </local-cache-configuration>
+
+    <local-cache-configuration name="entity" configuration="local-cache">
+      <eviction size="10000" strategy="LRU" />
+      <expiration max-idle="100000" interval="5000" />
+    </local-cache-configuration>
+
+    <local-cache-configuration name="local-query" configuration="local-cache">
+      <eviction size="10000" strategy="LRU" />
+      <expiration max-idle="100000" interval="5000" />
+    </local-cache-configuration>
+
+    <local-cache-configuration name="timestamps" configuration="local-cache">
+      <locking concurrency-level="1000" acquire-timeout="15000" />
+      <eviction strategy="NONE" />
+      <expiration interval="0" />
+    </local-cache-configuration>
+
+    <local-cache-configuration name="pending-puts" configuration="local-cache">
+      <expiration max-idle="60000" />
+    </local-cache-configuration>
+
+  </cache-container>
+
+</infinispan>
