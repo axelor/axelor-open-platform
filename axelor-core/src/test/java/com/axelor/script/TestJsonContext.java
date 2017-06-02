@@ -17,6 +17,7 @@
  */
 package com.axelor.script;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -117,7 +118,7 @@ public class TestJsonContext extends JpaTest {
 			
 			hello.addField(new MetaJsonField() {{
 				setName("world");
-				setType("custom-many-to-one");
+				setType("json-many-to-one");
 				setTargetJsonModel(world);
 			}});
 
@@ -156,6 +157,8 @@ public class TestJsonContext extends JpaTest {
 		Assert.assertTrue(engine.eval("$attrs") instanceof JsonContext);
 
 		Assert.assertTrue(engine.eval("$attrs.customer") instanceof Contact);
+		System.err.println(engine.eval("$attrs.customer"));
+		
 		Assert.assertTrue(engine.eval("$attrs.customer.fullName") instanceof String);
 
 		Assert.assertEquals("Some NAME", engine.eval("$attrs.name = 'Some NAME'"));
@@ -212,5 +215,11 @@ public class TestJsonContext extends JpaTest {
 		final Context ctx = $json.create(hello);
 		Assert.assertEquals("Hello!!!", ctx.get("name"));
 		Assert.assertTrue(ctx.get("world") instanceof Map);
+		
+		final ScriptHelper sh = new NashornScriptHelper(ctx);
+		final Object name = sh.eval("name");
+		Assert.assertEquals("Hello!!!", name);
+		Assert.assertTrue(sh.eval("world") instanceof MetaJsonRecord);
+		Assert.assertTrue(sh.eval("world.price") instanceof BigDecimal);
 	}
 }

@@ -321,7 +321,17 @@ public class ContextProxy<T> {
 						switch (method.getName()) {
 						case "get":
 						case "put":
-							return method.invoke(context.call(), args);
+							final String name = (String) args[0];
+							final Method found = args.length == 2
+									? proxy.beanMapper.getSetter(name)
+									: proxy.beanMapper.getGetter(name);
+							if (found == null) {
+								return method.invoke(context.call(), args);
+							}
+							final Object[] params = args.length == 2
+									? new Object[]{ args[1] }
+									: new Object[]{};
+							return found.invoke(proxy.proxied, params);
 						}
 						throw new UnsupportedOperationException("cannot call '" + method + "' on proxy object");
 					}));
