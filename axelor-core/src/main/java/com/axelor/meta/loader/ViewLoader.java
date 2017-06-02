@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 import javax.xml.bind.JAXBException;
@@ -80,7 +79,6 @@ import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.inject.persist.Transactional;
 
-@Singleton
 public class ViewLoader extends AbstractLoader {
 	
 	@Inject

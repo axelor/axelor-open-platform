@@ -32,7 +32,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +49,6 @@ import com.google.inject.persist.Transactional;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 
-@Singleton
 public class I18nLoader extends AbstractLoader {
 
 	private Logger log = LoggerFactory.getLogger(I18nLoader.class);
