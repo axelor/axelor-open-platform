@@ -17,6 +17,7 @@
  */
 package com.axelor.script;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -30,7 +31,11 @@ import org.junit.Test;
 import com.axelor.JpaTest;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaJsonField;
+import com.axelor.meta.db.MetaJsonModel;
+import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.repo.MetaJsonFieldRepository;
+import com.axelor.meta.db.repo.MetaJsonModelRepository;
+import com.axelor.meta.db.repo.MetaJsonRecordRepository;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.JsonContext;
 import com.axelor.test.db.Contact;
@@ -46,14 +51,17 @@ public class TestJsonContext extends JpaTest {
 	@Before
 	@Transactional
 	public void setup() {
-		final MetaJsonFieldRepository repo = Beans.get(MetaJsonFieldRepository.class);
-		if (repo.all().filter("self.model = :model AND self.modelField = :field")
+		
+		final MetaJsonModelRepository jsonModels = Beans.get(MetaJsonModelRepository.class);
+		final MetaJsonFieldRepository jsonFields = Beans.get(MetaJsonFieldRepository.class);
+
+		if (jsonFields.all().filter("self.model = :model AND self.modelField = :field")
 				.bind("model", Contact.class.getName()).bind("field", "attrs").count() == 0) {
 			
 			final Consumer<MetaJsonField> fields = f -> {
 				f.setModel(Contact.class.getName());
 				f.setModelField("attrs");
-				repo.save(f);
+				jsonFields.save(f);
 			};
 
 			MetaJsonField field;
@@ -79,9 +87,45 @@ public class TestJsonContext extends JpaTest {
 			field.setTargetModel(Contact.class.getName());
 			fields.accept(field);
 		}
+		
+		if (jsonModels.findByName("hello") == null) {
+			final MetaJsonModel hello = new MetaJsonModel();
+			hello.setName("hello");
+			hello.setTitle("Hello");
+			hello.addField(new MetaJsonField() {{
+				setName("name");
+				setNameField(true);
+			}});
+			hello.addField(new MetaJsonField() {{
+				setName("date");
+				setType("datetime");
+			}});
+			
+			jsonModels.save(hello);
+
+			final MetaJsonModel world = new MetaJsonModel();
+			world.setName("world");
+			world.setTitle("World");
+			world.addField(new MetaJsonField() {{
+				setName("name");
+				setNameField(true);
+			}});
+			world.addField(new MetaJsonField() {{
+				setName("price");
+				setType("decimal");
+			}});
+			
+			hello.addField(new MetaJsonField() {{
+				setName("world");
+				setType("custom-many-to-one");
+				setTargetJsonModel(world);
+			}});
+
+			jsonModels.save(world);
+		}
 	}
 
-	private String getJson() {
+	private String getCustomerAttrsJson() {
 		final Map<String, Object> map = new HashMap<>();
 
 		map.put("name", "Some Name");
@@ -100,9 +144,9 @@ public class TestJsonContext extends JpaTest {
 	}
 
 	@Test
-	public void test() throws Exception {
+	public void testCustomFields() throws Exception {
 		final Map<String, Object> values = new HashMap<>();
-		final String json = getJson();
+		final String json = getCustomerAttrsJson();
 		values.put("attrs", json);
 
 		final Context context = new Context(values, Contact.class);
@@ -134,5 +178,39 @@ public class TestJsonContext extends JpaTest {
 			Assert.fail();
 		} catch (IllegalArgumentException e) {
 		}
+	}
+
+	@Test
+	@Transactional
+	public void testCustomModels() throws Exception {
+		final MetaJsonRecordRepository $json = Beans.get(MetaJsonRecordRepository.class);
+
+		final Context helloCtx = $json.create("hello");
+		helloCtx.put("name", "Hello!!!");
+		helloCtx.put("date", LocalDateTime.now());
+		
+		final Context worldCtx = $json.create("world");
+		worldCtx.put("name", "World!!!");
+		worldCtx.put("price", 1000.25);
+
+		final MetaJsonRecord world = $json.save(worldCtx);
+		
+		helloCtx.put("world", world);
+
+		final MetaJsonRecord hello = $json.save(helloCtx);
+		
+		Assert.assertNotNull(hello.getAttrs());
+		Assert.assertNotNull(world.getAttrs());
+		Assert.assertEquals("Hello!!!", hello.getName());
+		Assert.assertEquals("World!!!", world.getName());
+
+		Assert.assertTrue(hello.getAttrs().contains("date"));
+		Assert.assertTrue(hello.getAttrs().contains("world"));
+		Assert.assertTrue(hello.getAttrs().contains("World!!!"));
+		Assert.assertTrue(world.getAttrs().contains("1000.25"));
+
+		final Context ctx = $json.create(hello);
+		Assert.assertEquals("Hello!!!", ctx.get("name"));
+		Assert.assertTrue(ctx.get("world") instanceof Map);
 	}
 }

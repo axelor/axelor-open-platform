@@ -33,7 +33,6 @@ import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Adapter;
-import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonRecord;
@@ -82,9 +81,11 @@ public class JsonContext extends SimpleBindings {
 	}
 
 	public JsonContext(String jsonModel, String jsonValue) {
-		this(new Context(MetaJsonRecord.class),
-				Mapper.of(MetaJsonRecord.class).getProperty(Context.KEY_JSON_ATTRS),
-				jsonValue);
+		super(fromJson(jsonValue));
+		this.context = new Context(MetaJsonRecord.class);
+		this.context.put(Context.KEY_JSON_MODEL, jsonModel);
+		this.jsonField = Context.KEY_JSON_ATTRS;
+		this.fields = findFields();
 	}
 
 	private Map<String, Object> findFields() {

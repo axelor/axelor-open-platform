@@ -29,7 +29,6 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaStore;
-import com.axelor.meta.db.MetaJsonModel;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -95,7 +94,6 @@ public class Context extends SimpleBindings {
 	static final String KEY_JSON_MODEL = "jsonModel";
 	static final String KEY_JSON_PREFIX = "$";
 
-	private final Map<String, Object> jsonFields;
 	private final Map<String, Object> values;
 
 	private final Mapper mapper;
@@ -105,6 +103,8 @@ public class Context extends SimpleBindings {
 	private ContextProxy<?> proxy;
 	
 	private Context parent;
+	
+	private Map<String, Object> jsonFields;
 
 	/**
 	 * Create a new {@link Context} for the given bean class using the given
@@ -120,9 +120,6 @@ public class Context extends SimpleBindings {
 		this.values = Objects.requireNonNull(values);
 		this.beanClass = Objects.requireNonNull(beanClass);
 		this.mapper = Mapper.of(beanClass);
-		this.jsonFields = MetaJsonModel.class.isAssignableFrom(beanClass)
-			? MetaStore.findJsonFields((String) values.get(KEY_JSON_MODEL))
-			: MetaStore.findJsonFields(beanClass.getName(), KEY_JSON_ATTRS);
 	}
 
 	/**
@@ -137,6 +134,15 @@ public class Context extends SimpleBindings {
 	
 	public void addChangeListener(PropertyChangeListener listener) {
 		getContextProxy().addChangeListener(listener);
+	}
+	
+	private Map<String, Object> jsonFields() {
+		if (jsonFields == null) {
+			jsonFields = MetaJsonRecord.class.isAssignableFrom(beanClass)
+				? MetaStore.findJsonFields((String) values.get(KEY_JSON_MODEL))
+				: MetaStore.findJsonFields(beanClass.getName(), KEY_JSON_ATTRS);
+		}
+		return jsonFields;
 	}
 
 	private ContextProxy<?> getContextProxy() {
@@ -238,7 +244,10 @@ public class Context extends SimpleBindings {
 	}
 
 	private boolean hasJsonField(String name) {
-		return jsonFields != null && jsonFields.containsKey(name);
+		return !KEY_JSON_MODEL.equals(name)
+				&& !KEY_JSON_ATTRS.equals(name)
+				&& jsonFields() != null
+				&& jsonFields().containsKey(name);
 	}
 
 	private boolean isJsonField(String name) {
