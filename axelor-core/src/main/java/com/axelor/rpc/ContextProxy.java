@@ -34,9 +34,12 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.meta.db.MetaJsonRecord;
 
 import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.dynamic.DynamicType.Builder;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+import net.bytebuddy.implementation.InvocationHandlerAdapter;
 import net.bytebuddy.implementation.MethodCall;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
@@ -269,20 +272,62 @@ public class ContextProxy<T> {
 		return proxied;
 	}
 
+	private boolean hasJsonFields() {
+		final Property attrs = beanMapper.getProperty(Context.KEY_JSON_ATTRS);
+		return attrs != null && attrs.isJson();
+	}
+
+	private JsonContext createJsonContext() {
+		if (MetaJsonRecord.class.isAssignableFrom(beanClass)) {
+			final MetaJsonRecord rec = (MetaJsonRecord) proxied;
+			return new JsonContext(rec);
+		}
+		final Property p = beanMapper.getProperty(Context.KEY_JSON_ATTRS);
+		final Context c = new Context(beanClass);
+		return new JsonContext(c, p, (String) p.get(proxied));
+	}
+
 	@SuppressWarnings("unchecked")
 	public static <T> ContextProxy<T> of(final Class<T> beanClass, final Map<String, Object> values) {
 		Objects.requireNonNull(values, "values map cannot be null");
 		final ContextProxy<T> proxy = new ContextProxy<>(beanClass, values);
-		final Class<?> proxyClass = new ByteBuddy()
-			.subclass(beanClass)
-			.method(ElementMatchers.isPublic().and(ElementMatchers.isGetter().or(ElementMatchers.isSetter())))
-			.intercept(MethodDelegation.to(proxy))
-			.method(ElementMatchers.isProtected().and(ElementMatchers.nameStartsWith(COMPUTE_PREFIX)))
-			.intercept(MethodDelegation.to(proxy))
-			.implement(ContextEntity.class)
-			.method(ElementMatchers.isDeclaredBy(ContextEntity.class))
-			.intercept(MethodCall.call(proxy::populated))
-			.make()
+		
+		Builder<T> builder = new ByteBuddy()
+				.subclass(beanClass)
+				.method(ElementMatchers.isPublic().and(ElementMatchers.isGetter().or(ElementMatchers.isSetter())))
+				.intercept(MethodDelegation.to(proxy))
+				.method(ElementMatchers.isProtected().and(ElementMatchers.nameStartsWith(COMPUTE_PREFIX)))
+				.intercept(MethodDelegation.to(proxy))
+				.implement(ContextEntity.class)
+				.method(ElementMatchers.isDeclaredBy(ContextEntity.class))
+				.intercept(MethodCall.call(proxy::populated));
+
+		// allow to seamlessly handle json field values from scripts
+		if (proxy.hasJsonFields()) {
+			final Callable<JsonContext> context = new Callable<JsonContext>() {
+				JsonContext ctx;
+				@Override
+				public JsonContext call() throws Exception {
+					if (ctx == null) {
+						ctx = proxy.createJsonContext();
+					}
+					return ctx;
+				}
+			};
+			builder = builder
+					.implement(Map.class)
+					.method(ElementMatchers.isDeclaredBy(Map.class))
+					.intercept(InvocationHandlerAdapter.of((p, method, args) -> {
+						switch (method.getName()) {
+						case "get":
+						case "put":
+							return method.invoke(context.call(), args);
+						}
+						throw new UnsupportedOperationException("cannot call '" + method + "' on proxy object");
+					}));
+		}
+
+		final Class<?> proxyClass = builder.make()
 			.load(beanClass.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
 			.getLoaded();
 
