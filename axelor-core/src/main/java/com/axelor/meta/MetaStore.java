@@ -27,7 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Role;
@@ -36,6 +35,7 @@ import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
+import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -51,64 +51,69 @@ import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.Selection;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Maps;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
-public class MetaStore {
+public final class MetaStore {
 
-	private static final ConcurrentMap<String, Object> CACHE = Maps.newConcurrentMap();
-	
-	private static Object register(String key, Object value) {
-		CACHE.put(key, value);
-		return value;
+	private static final Cache<String, Action> ACTIONS = CacheBuilder.newBuilder()
+			.maximumSize(1000)
+			.weakValues()
+			.build();
+
+	private MetaStore() {
 	}
-	
+
 	/**
 	 * Used for unit testing.
 	 * 
 	 */
 	static void resister(ObjectViews views) {
 		try {
-			for(Action item : views.getActions())
-				register(item.getName(), item);
-		} catch (NullPointerException e){}
+			for (Action item : views.getActions()) {
+				ACTIONS.put(item.getName(), item);
+			}
+		} catch (NullPointerException e) {
+		}
 	}
 
 	public static Action getAction(String name) {
-		Action action = (Action) CACHE.get(name);
+		Action action = ACTIONS.getIfPresent(name);
 		if (action == null) {
 			action = XMLViews.findAction(name);
 			if (action != null) {
-				register(name, action);
+				ACTIONS.put(name, action);
 			}
 		}
-
-		if (action == null) return null;
-
+		if (action == null) {
+			return null;
+		}
 		final String module = action.getModuleToCheck();
 		if (StringUtils.isBlank(module) || ModuleManager.isInstalled(module)) {
 			return action;
 		}
-
 		return null;
 	}
-	
-	@SuppressWarnings("all")
+
 	public static Map<String, Object> getPermissions(Class<?> model) {
 		final User user = AuthUtils.getUser();
+		if (user == null || AuthUtils.isAdmin(user) || !Model.class.isAssignableFrom(model)) {
+			return null;
+		}
 
-		if (user == null || "admin".equals(user.getCode())) return null;
-		if (user.getGroup() != null && "admins".equals(user.getGroup().getCode())) return null;
-
+		@SuppressWarnings("unchecked")
+		final Class<? extends Model> klass = (Class<? extends Model>) model;
 		final Map<String, Object> map = new HashMap<>();
 		final JpaSecurity security = Beans.get(JpaSecurity.class);
 
-		map.put("read", security.isPermitted(AccessType.READ, (Class) model));
-		map.put("write", security.isPermitted(AccessType.WRITE, (Class) model));
-		map.put("create", security.isPermitted(AccessType.CREATE, (Class) model));
-		map.put("remove", security.isPermitted(AccessType.REMOVE, (Class) model));
-		map.put("export", security.isPermitted(AccessType.EXPORT, (Class) model));
+		map.put("read", security.isPermitted(AccessType.READ, klass));
+		map.put("write", security.isPermitted(AccessType.WRITE, klass));
+		map.put("create", security.isPermitted(AccessType.CREATE, klass));
+		map.put("remove", security.isPermitted(AccessType.REMOVE, klass));
+		map.put("export", security.isPermitted(AccessType.EXPORT, klass));
 
 		return map;
 	}
@@ -415,23 +420,27 @@ public class MetaStore {
 		return all;
 	}
 
-	@SuppressWarnings("unchecked")
 	private static Selection.Option getSelectionItem(MetaSelectItem item) {
-		Selection.Option option = new Selection.Option();
+		final ObjectMapper objectMapper = Beans.get(ObjectMapper.class);
+		final Selection.Option option = new Selection.Option();
 		option.setValue(item.getValue());
 		option.setTitle(item.getTitle());
 		option.setIcon(item.getIcon());
 		option.setOrder(item.getOrder());
 		option.setHidden(item.getHidden());
-		ObjectMapper objectMapper = Beans.get(ObjectMapper.class);
 		try {
-			option.setData(objectMapper.readValue(item.getData(), Map.class));
+			option.setData(objectMapper.readValue(item.getData(), new TypeReference<Map<String,Object>>() {}));
 		} catch (Exception e) {
+			// this should never happen, ignore
 		}
 		return option;
 	}
 
 	public static void clear() {
-		CACHE.clear();
+		ACTIONS.invalidateAll();
+	}
+
+	public static void invalidate(String name) {
+		ACTIONS.invalidate(name);
 	}
 }
