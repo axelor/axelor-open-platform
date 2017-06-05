@@ -45,6 +45,7 @@ import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaScanner;
+import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaMenu;
@@ -163,6 +164,7 @@ public class ViewLoader extends AbstractLoader {
 
 		for (Action action : getList(all.getActions())) {
 			importAction(action, module, update);
+			MetaStore.invalidate(action.getName());
 		}
 
 		for (MenuItem item : getList(all.getMenus())) {

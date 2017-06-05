@@ -74,7 +74,7 @@ public final class ViewWatcher {
 		return instance;
 	}
 
-	public synchronized static void process() {
+	synchronized static void process() {
 		final ViewWatcher watcher = getInstance();
 		if (watcher.pending.isEmpty()) {
 			return;

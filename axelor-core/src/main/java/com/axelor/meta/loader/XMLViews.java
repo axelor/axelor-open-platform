@@ -207,7 +207,15 @@ public class XMLViews {
 		StringReader reader = new StringReader(xml);
 		return (ObjectViews) unmarshaller.unmarshal(reader);
 	}
-	
+
+	/**
+	 * Apply pending updates if auto-update watch is running.
+	 * 
+	 */
+	public static void applyHotUpdates() {
+		ViewWatcher.process();
+	}
+
 	public static Map<String, Object> findViews(String model, Map<String, String> views) {
 		final Map<String, Object> result = Maps.newHashMap();
 		if (views == null || views.isEmpty()) {
@@ -225,10 +233,6 @@ public class XMLViews {
 	}
 
 	private static MetaView findMetaView(MetaViewRepository views, String name, String type, String model, String module, Long group) {
-
-		// if watch is enabled, process any pending changes
-		ViewWatcher.process();
-
 		final List<String> select = new ArrayList<>();
 		if (name != null) {
 			select.add("self.name = :name");
@@ -302,6 +306,9 @@ public class XMLViews {
 			custom = customViews.findByUser(name, model, user);
 			custom = custom == null ? customViews.findByUser(name, user) : custom;
 		}
+
+		// make sure hot updates are applied
+		applyHotUpdates();
 
 		// first find by name
 		if (name != null) {
@@ -393,11 +400,12 @@ public class XMLViews {
 	}
 
 	public static Action findAction(String name) {
-		MetaAction action = Beans.get(MetaActionRepository.class).findByName(name);
+		applyHotUpdates();
+		final MetaAction action = Beans.get(MetaActionRepository.class).findByName(name);
 		try {
 			return ((ObjectViews) XMLViews.unmarshal(action.getXml())).getActions().get(0);
 		} catch (Exception e) {
+			return null;
 		}
-		return null;
 	}
 }

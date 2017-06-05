@@ -232,6 +232,11 @@ public class MetaService {
 
 	public List<MenuItem> getMenus(boolean withTagsOnly) {
 
+		// make sure to apply hot updates
+		if (!withTagsOnly) {
+			XMLViews.applyHotUpdates();
+		}
+		
 		final User user = AuthUtils.getUser();
 		final Map<Long, Set<String>> menuGroups = new HashMap<>();
 		final Map<Long, Set<String>> menuRoles = new HashMap<>();
