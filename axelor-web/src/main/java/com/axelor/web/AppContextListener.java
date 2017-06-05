@@ -32,6 +32,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 import com.axelor.app.AppSettings;
 import com.axelor.common.logging.LoggerConfiguration;
+import com.axelor.meta.loader.ViewWatcher;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
@@ -99,6 +100,7 @@ public class AppContextListener extends GuiceServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
+		ViewWatcher.getInstance().stop();
 		deployment.stop();
 		loggerConfig.uninstall();
 		super.contextDestroyed(servletContextEvent);

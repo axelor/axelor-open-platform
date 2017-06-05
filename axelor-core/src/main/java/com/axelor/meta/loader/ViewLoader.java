@@ -18,9 +18,11 @@
 package com.axelor.meta.loader;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -136,6 +138,16 @@ public class ViewLoader extends AbstractLoader {
 			return Lists.newArrayList();
 		}
 		return list;
+	}
+
+	@Transactional
+	void updateFrom(Path file, String moduleName) throws IOException, JAXBException {
+		final Module module = ModuleManager.getModule(moduleName);
+		try (FileInputStream stream = new FileInputStream(file.toFile())) {
+			process(stream, module, true);
+		} finally {
+			doCleanUp();
+		}
 	}
 
 	void process(InputStream stream, Module module, boolean update) throws JAXBException {

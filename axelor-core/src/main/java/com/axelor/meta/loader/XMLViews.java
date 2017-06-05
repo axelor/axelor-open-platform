@@ -225,6 +225,10 @@ public class XMLViews {
 	}
 
 	private static MetaView findMetaView(MetaViewRepository views, String name, String type, String model, String module, Long group) {
+
+		// if watch is enabled, process any pending changes
+		ViewWatcher.process();
+
 		final List<String> select = new ArrayList<>();
 		if (name != null) {
 			select.add("self.name = :name");
