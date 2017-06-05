@@ -198,6 +198,10 @@ public class ModuleManager {
 		return resolver.all();
 	}
 
+	static Module getModule(String name) {
+		return resolver.get(name);
+	}
+
 	public static URL getModulePath(String module) {
 		try {
 			return resolver.get(module).getPath();
