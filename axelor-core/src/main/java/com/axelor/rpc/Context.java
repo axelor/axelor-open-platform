@@ -324,7 +324,7 @@ public class Context extends SimpleBindings {
 
 	@Override
 	public Object put(String name, Object value) {
-		if (mapper.getProperty(name) == null || (isJsonRecord() && hasJsonField(name))) {
+		if (mapper.getSetter(name) == null || (isJsonRecord() && hasJsonField(name))) {
 			if (isJsonName(name)) {
 				mapper.set(getProxy(), name, value);
 			}
