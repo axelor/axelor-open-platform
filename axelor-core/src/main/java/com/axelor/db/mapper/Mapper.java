@@ -430,8 +430,11 @@ public class Mapper {
 		if (bean == null) {
 			return null;
 		}
-		return Mapper.of(bean.getClass()).fields.values()
-				.stream()
-				.collect(Collectors.toMap(Property::getName, p -> p.get(bean)));
+		final Map<String, Object> map = new HashMap<>();
+		final Mapper mapper = Mapper.of(bean.getClass());
+		for (Property p : mapper.getProperties()) {
+			map.put(p.getName(), p.get(bean));
+		}
+		return map;
 	}
 }
