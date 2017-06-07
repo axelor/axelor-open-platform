@@ -18,47 +18,26 @@
 package com.axelor.gradle.tasks;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.internal.tasks.options.Option;
-import org.gradle.api.invocation.Gradle;
-import org.gradle.api.tasks.InputDirectory;
+import org.gradle.api.plugins.WarPlugin;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.composite.internal.IncludedBuildInternal;
+import org.gradle.api.tasks.bundling.War;
 
-import com.axelor.common.FileUtils;
+import com.axelor.gradle.support.HotswapSupport;
+import com.axelor.gradle.support.TomcatSupport;
+import com.google.common.base.Joiner;
 
 public class TomcatRun extends JavaExec {
-
-	public static final String TOMCAT_CONFIGURATION = "tomcat";
-
-	private Configuration tomcatConfiguration;
 
 	private boolean hot;
 
 	private int port = 8080;
-	
-	private File baseDir;
-	
-	private File webappDir;
-
-	public TomcatRun() {
-		this.tomcatConfiguration = getProject().getConfigurations().getByName(TOMCAT_CONFIGURATION);
-	}
 
 	@Option(option = "hot", description = "Specify whether to enable hot-swaping.")
 	public void setHot(boolean hot) {
@@ -66,149 +45,82 @@ public class TomcatRun extends JavaExec {
 	}
 
 	@Option(option = "port", description = "Specify the tomcat server port.")
-	public void setHttpPort(String port) {
+	public void setPort(String port) {
 		this.port = Integer.parseInt(port);
 	}
 
-	@InputDirectory
-	public File getBaseDir() {
-		return baseDir;
+	public int getPort() {
+		return port;
 	}
 
-	public void setBaseDir(File baseDir) {
-		this.baseDir = baseDir;
+	public void configure(boolean hot, boolean debug) {
+		final Project project = getProject();
+		final Configuration tomcat = project.getConfigurations().getByName(TomcatSupport.TOMCAT_CONFIGURATION);
+		final War war = (War) project.getTasks().getByName(WarPlugin.WAR_TASK_NAME);
+		final File baseDir = new File(project.getBuildDir(), "tomcat");
+
+		final List<String> webapps = new ArrayList<>();
+		final List<String> classes = new ArrayList<>();
+		final List<String> libs = new ArrayList<>();
+		
+		for (File file : war.getClasspath()) {
+			if (file.isDirectory()) {
+				classes.add(file.getAbsolutePath());
+			}
+			if (file.getName().endsWith(".jar")) {
+				libs.add(file.getAbsolutePath());
+			}
+		}
+		
+		final File webapp = new File(project.getProjectDir(), "src/main/webapp");
+		if (webapp.exists()) {
+			webapps.add(webapp.getAbsolutePath());
+		}
+
+		// try to use linked axelor-web's webapp dir
+		project.getGradle().getIncludedBuilds().stream()
+			.map(it -> new File(it.getProjectDir(), "axelor-web/src/main/webapp"))
+			.filter(it -> it.exists())
+			.findFirst().ifPresent(dir -> webapps.add(dir.getAbsolutePath()));
+		
+		final File merged = new File(project.getBuildDir(), "webapp");
+		if (merged.exists()) {
+			webapps.add(merged.getAbsolutePath());
+		}
+
+		final List<String> args = new ArrayList<>();
+		final List<String> jvmArgs = new ArrayList<>();
+
+		args.add("--port");
+		args.add("" + getPort());
+		args.add("--base-dir");
+		args.add(baseDir.getAbsolutePath());
+		args.add("--context-path");
+		args.add(war.getBaseName());
+		args.add("--extra-classes");
+		args.add(Joiner.on(",").join(classes));
+		args.add("--extra-libs");
+		args.add(Joiner.on(",").join(libs));
+		args.addAll(webapps);
+
+		if (hot || debug) {
+			if (HotswapSupport.hasDCEVM()) {
+				HotswapSupport.getAgentArgs(project, !debug).forEach(jvmArgs::add);
+			} else {
+				getLogger().info("Cannot enable hot-swaping as DCEVM is not installed.");
+			}
+		}
+
+		setClasspath(tomcat.getAsFileTree().matching(f -> f.exclude("*hotswap-agent*")));
+		setMain("com.axelor.tomcat.TomcatRunner");
+		setArgs(args);
+		setJvmArgs(jvmArgs);
 	}
 
-	@InputDirectory
-	public File getWebappDir() {
-		return webappDir;
-	}
-
-	public void setWebappDir(File webappDir) {
-		this.webappDir = webappDir;
-	}
-	
 	@TaskAction
 	@Override
 	public void exec() {
-		configureMain();
-		configureHotswap();
+		configure(hot, getDebug());
 		super.exec();
-	}
-
-	private void configureMain() {
-		setMain("com.axelor.tomcat.TomcatRunner");
-		setClasspath(tomcatConfiguration.getAsFileTree().matching(f -> f.exclude("*hotswap-agent*")));
-		args("--port", port);
-		args("--base-dir", baseDir.getAbsolutePath());
-		args("--context-path", webappDir.getName());
-		args(webappDir.getAbsolutePath());
-	}
-
-	private void configureHotswap() {
-		if (!hasDCEVM()) {
-			getLogger().info("Cannot enable hot-swaping as DCEVM is not installed.");
-			return;
-		}
-		tomcatConfiguration.getFiles().stream()
-			.filter(f -> f.getName().endsWith(".jar"))
-			.filter(f -> f.getName().startsWith("hotswap-agent"))
-			.findFirst()
-			.ifPresent(agentJar -> {
-				final String jdwpArgs = getAllJvmArgs().stream()
-					.filter(s -> s.startsWith("-agentlib:jdwp="))
-					.map(s -> s.replace("-agentlib:jdwp=", ""))
-					.findFirst()
-					.orElse("");
-				
-				if (hot || jdwpArgs.length() > 0) {
-					final File hotswapConfig = createHotswapConfig(jdwpArgs);
-					final StringBuilder agentArgs = new StringBuilder("-javaagent:")
-							.append(agentJar.getAbsolutePath())
-							.append("=propertiesFilePath=")
-							.append(hotswapConfig.getAbsolutePath());
-					if (jdwpArgs.length() == 0) {
-						agentArgs.append(",autoHotswap=true");
-					}
-					jvmArgs("-XXaltjvm=dcevm");
-					jvmArgs(agentArgs.toString());
-				}
-			});
-	}
-
-	protected static boolean hasDCEVM() {
-		final Path home = Paths.get(System.getProperty("java.home"));
-		final List<String> paths = Arrays.asList("lib/amd64/dcevm", "lib/i386/dcevm", "lib/dcevm", "bin/dcevm");
-		final List<String> libs = Arrays.asList("libjvm.so", "libjvm.dylib", "jvm.dll");
-		for (String path : paths) {
-			for (String name : libs) {
-				if (Files.exists(home.resolve(Paths.get(path, name)))) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	protected File createHotswapConfig(String jdwpArgs) {
-		final Function<Project, List<File>> findClasses = p -> Arrays.asList(
-				FileUtils.getFile(p.getProjectDir(), "bin", "main"),
-				FileUtils.getFile(p.getBuildDir(), "classes", "main"));
-		final Function<Project, File> findResources = p ->
-				FileUtils.getFile(p.getProjectDir(), "src", "main", "resources");
-
-		final List<File> extraClasspath = new ArrayList<>();
-		final List<File> watchResources = new ArrayList<>();
-
-		getProject().getAllprojects().stream()
-			.filter(p -> FileUtils.getFile(p.getProjectDir(), "build.gradle").exists())
-			.forEach(p -> {
-				extraClasspath.addAll(findClasses.apply(p));
-				watchResources.add(findResources.apply(p));
-			});
-		getProject().getGradle().getIncludedBuilds().forEach(b -> {
-			Gradle included = ((IncludedBuildInternal) b).getConfiguredBuild();
-			included.getRootProject().getAllprojects().stream()
-				.filter(p -> !p.getName().equals("axelor-gradle"))
-				.filter(p -> !p.getName().equals("axelor-tomcat"))
-				.filter(p -> !p.getName().equals("axelor-test"))
-				.forEach(p -> {
-					extraClasspath.addAll(findClasses.apply(p));
-					watchResources.add(findResources.apply(p));
-				});
-		});
-
-		final Properties hotswapProps = new Properties();
-		hotswapProps.setProperty("LOGGER", "reload");
-		hotswapProps.setProperty("autoHotswap", "true");
-
-		for (String arg : jdwpArgs.split(",")) {
-			String[] val = arg.split("=");
-			if (val.length > 1 && val[0].equals("address")) {
-				String address = val[1];
-				if (address.contains(":")) {
-					address = address.substring(address.lastIndexOf(":"));
-				}
-				hotswapProps.setProperty("autoHotswap.port", address);
-			}
-		}
-
-		hotswapProps.setProperty("extraClasspath", extraClasspath.stream()
-				.filter(File::exists)
-				.map(File::getPath)
-				.collect(Collectors.joining(",")));
-
-		hotswapProps.setProperty("watchResources", watchResources.stream()
-				.filter(File::exists)
-				.map(File::getPath)
-				.collect(Collectors.joining(",")));
-
-		final File hotswapConfig = FileUtils.getFile(getBaseDir(), "hotswap-agent.properties");
-		try (OutputStream os = new FileOutputStream(hotswapConfig)) {
-			hotswapProps.store(os, null);
-		} catch (IOException e) {
-			getProject().getLogger().error(e.getMessage(), e);
-		}
-		return hotswapConfig;
 	}
 }

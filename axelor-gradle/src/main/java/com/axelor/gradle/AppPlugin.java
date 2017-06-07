@@ -20,6 +20,7 @@ package com.axelor.gradle;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
+import com.axelor.gradle.support.HotswapSupport;
 import com.axelor.gradle.support.ScriptsSupport;
 import com.axelor.gradle.support.TomcatSupport;
 import com.axelor.gradle.support.WarSupport;
@@ -32,5 +33,6 @@ public class AppPlugin implements Plugin<Project> {
 		project.getPlugins().apply(WarSupport.class);
 		project.getPlugins().apply(ScriptsSupport.class);
 		project.getPlugins().apply(TomcatSupport.class);
+		project.getPlugins().apply(HotswapSupport.class);
 	}
 }
