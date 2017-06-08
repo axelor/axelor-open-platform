@@ -501,7 +501,7 @@ function TabCtrl($scope, $location, $routeParams) {
 		search = _.clone($location.$$search),
 		promise;
 	
-	if (app.homeAction && app.homeAction !== params.resource) {
+	if (app.homeAction && app.homeAction === params.resource) {
 		promise = $scope.openTabByName(app.homeAction, {
 			__tab_prepend: true,
 			__tab_closable: false
