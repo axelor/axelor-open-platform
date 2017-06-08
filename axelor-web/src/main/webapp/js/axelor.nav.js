@@ -498,22 +498,31 @@ function TabCtrl($scope, $location, $routeParams) {
 
 	var app = $scope.app || {},
 		params = _.clone($routeParams),
-		search = _.clone($location.$$search);
+		search = _.clone($location.$$search),
+		promise;
 	
 	if (app.homeAction && app.homeAction !== params.resource) {
-		$scope.openTabByName(app.homeAction, {
+		promise = $scope.openTabByName(app.homeAction, {
 			__tab_prepend: true,
 			__tab_closable: false
 		});
 	}
 
-	if (params.resource) {
-        $scope.openTabByName(params.resource, {
-    		mode: params.mode,
-        	state: params.state,
-        	search: search
-    	});
-    }
+	var openSelf = function () {
+		if (params.resource) {
+			$scope.openTabByName(params.resource, {
+				mode: params.mode,
+				state: params.state,
+				search: search
+			});
+		}
+	}
+
+	if (promise && promise.then) {
+		promise.then(openSelf, openSelf);
+	} else {
+		openSelf();
+	}
 }
 
 app.controller("NavCtrl", NavCtrl);
