@@ -2,7 +2,26 @@
 
 ## Bug fixes
 
+- fix home tab issue
+- fix toolbar issue when home action is set
+- fix NPE
+- fix edit icon display issue in grid
+- fix toolbar auto-adjust issue
+- fix domain support issue on ref-select widget
+- fix canSave=false issue with keyboard shortcut
+- fix duplicated sortBy on id field
+- fix empty space left by hidden widgets
+- fix empty editor issue on o2m if x-show-on-new is false
+- fix action-attrs issues on editor used as viewer
+- fix editor with panel not loading nested values
+- fix dotted fields support in field editor
+- fix o2m repeat widget doesn't follow permissions
+
 ## Improvements
+
+- add accent insensitive search support
+- allow panel inside field editor
+- support for menus per role
 
 # 3.3.5 (2017-05-22)
 
