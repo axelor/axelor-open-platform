@@ -17,13 +17,20 @@
  */
 package com.axelor.tomcat;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import javax.servlet.ServletException;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.realm.MemoryRealm;
+import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.webresources.DirResourceSet;
 import org.apache.catalina.webresources.FileResourceSet;
@@ -39,13 +46,60 @@ public class TomcatServer {
 		this.options = options;
 	}
 
-	public Tomcat create() throws ServletException {
-		final Tomcat tomcat = new Tomcat();
-		tomcat.setBaseDir(options.getBaseDir().toFile().getAbsolutePath());
+	private void copyConf(String name, Path confDir) throws IOException {
+		final Path dest = confDir.resolve(name);
+		if (Files.notExists(dest)) {
+			try (InputStream is = getClass().getResourceAsStream("/conf/" + name)) {
+				Files.copy(is, dest);
+			}
+		}
+	}
+
+	private Tomcat create() throws IOException, ServletException {
+		final Path baseDir = options.getBaseDir();
+		final Path confDir = baseDir.resolve("conf");
+		final Path logsDir = baseDir.resolve("logs");
+
+		Files.createDirectories(confDir);
+		Files.createDirectories(logsDir);
+
+		copyConf("web.xml", confDir);
+		copyConf("tomcat-users.xml", confDir);
+		copyConf("logging.properties", confDir);
 
 		final int port = options.getPort();
 		final String contextPath = options.getContextPath();
 		final String docBase = options.getDocBase().toFile().getAbsolutePath();
+		
+		System.setProperty("java.util.logging.manager", "org.apache.juli.ClassLoaderLogManager");
+		System.setProperty("java.util.logging.config.file", confDir.resolve("logging.properties").toString());
+
+		final Tomcat tomcat = new Tomcat() {
+
+			@Override
+			public Context addWebapp(Host host, String contextPath, String docBase) {
+				final ContextConfig config = new ContextConfig();
+				final Context context = new StandardContext();
+				
+				context.setPath(contextPath);
+				context.setDocBase(docBase);
+				context.addLifecycleListener(config);
+				config.setDefaultWebXml(confDir.resolve("web.xml").toFile().getAbsolutePath());
+
+				if (host == null) {
+					getHost().addChild(context);
+				} else {
+					host.addChild(context);
+				}
+
+				return context;
+			}
+		};
+
+		tomcat.setBaseDir(baseDir.toFile().getAbsolutePath());
+		
+		final MemoryRealm memoryRealm = new MemoryRealm();
+		tomcat.getEngine().setRealm(memoryRealm);
 
 		final Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
 		connector.setPort(port);
@@ -100,13 +154,19 @@ public class TomcatServer {
 	}
 
 	public void start() {
+		final String catalinaBase = System.getProperty("catalina.base");
 		try {
+			System.setProperty("catalina.base", options.getBaseDir().toFile().getAbsolutePath());
 			if (tomcat == null) {
 				tomcat = create();
 			}
 			tomcat.start();
 		} catch (Exception e) {
 			throw new RuntimeException("Cannot start Tomcat " + e.getMessage(), e);
+		} finally {
+			if (catalinaBase != null) {
+				System.setProperty("catalina.base", catalinaBase);
+			}
 		}
 		tomcat.getServer().await();
 	}
