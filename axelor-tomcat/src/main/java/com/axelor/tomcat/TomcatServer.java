@@ -133,6 +133,9 @@ public class TomcatServer {
 			.map(Path::toFile)
 			.map(file -> new FileResourceSet(resources, "/WEB-INF/lib/" + file.getName(), file.getAbsolutePath(), "/"))
 			.forEach(resources::addPostResources);
+		
+		// Skip scanning
+		TldSkipPatterns.apply(context.getJarScanner());
 
 		tomcat.getServer().addLifecycleListener(event -> {
 			final Lifecycle lifecycle = event.getLifecycle();
