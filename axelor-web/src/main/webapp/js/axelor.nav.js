@@ -328,7 +328,15 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 			$("#offcanvas").removeClass("active");
 		}
 
-		$scope.openTabByName(record.action);
+		var options = {};
+		if ($scope.app && $scope.app.homeAction === record.action) {
+			options = {
+				__tab_prepend: true,
+				__tab_closable: false
+			};
+		}
+
+		$scope.openTabByName(record.action, options);
 		$scope.$apply();
 	};
 
