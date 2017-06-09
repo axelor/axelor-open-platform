@@ -37,6 +37,9 @@ public class MenuItem extends AbstractWidget {
 	private String title;
 
 	@XmlAttribute
+	private String help;
+
+	@XmlAttribute
 	private String parent;
 
 	@XmlAttribute
@@ -177,6 +180,14 @@ public class MenuItem extends AbstractWidget {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public String getHelp() {
+		return help;
+	}
+
+	public void setHelp(String help) {
+		this.help = help;
 	}
 
 	public String getIcon() {

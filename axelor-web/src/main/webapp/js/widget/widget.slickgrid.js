@@ -676,6 +676,7 @@ Grid.prototype.parse = function(view) {
 			name: item.title || field.title || item.autoTitle || _.chain(item.name).humanize().titleize().value(),
 			id: item.name,
 			field: item.name,
+			toolTip: item.help,
 			forEdit: item.forEdit,
 			descriptor: field,
 			sortable: sortable,

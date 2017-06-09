@@ -398,6 +398,20 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
 					show($list);
 				}
 			});
+			
+			if (menu.help) {
+				setTimeout(function () {
+					element.children('a')
+					.addClass('has-help')
+					.children('.nav-title').tooltip({
+						html: true,
+						title: menu.help,
+						placement: 'right',
+						delay: { show: 500, hide: 100 },
+						container: 'body'
+					});
+				});
+			}
 		},
 		replace: true,
 		template:

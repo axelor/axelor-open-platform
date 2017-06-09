@@ -201,12 +201,13 @@
   </entity>
 
   <entity name="MetaHelp" table="META_HELP" logUpdates="false">
-    <string name="model" required="true" />
+    <string name="model" />
+    <string name="menu" />
     <string name="field" />
-    <string name="language" max="5" required="true" />
-    <string name="help" column="help_value" max="1024" multiline="true" required="true" />
-    <string name="type" column="help_type" required="true" selection="help.type.selection" />
+    <string name="language" required="true" />
     <string name="style" />
+    <string name="type" column="help_type" selection="help.type.selection" />
+    <string name="help" column="help_value" max="1024" multiline="true" required="true" />
   </entity>
 
   <entity name="MetaFile" table="META_FILE">

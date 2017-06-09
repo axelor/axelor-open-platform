@@ -232,6 +232,13 @@ header .navbar .nav-link-user-sub {
 	z-index: 9999999999 !important;
 }
 
+.tooltip {
+    font-size: 12px;
+}
+.tooltip.fade.in {
+    opacity: 1;
+}
+
 .ui-menu {
 	border: 1px solid rgba(0, 0, 0, 0.2);
 }

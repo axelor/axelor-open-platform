@@ -39,6 +39,7 @@ import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
@@ -47,6 +48,7 @@ import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.inject.Beans;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.MetaStore;
@@ -58,6 +60,7 @@ import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.MetaViewCustom;
 import com.axelor.meta.db.repo.MetaFileRepository;
+import com.axelor.meta.db.repo.MetaHelpRepository;
 import com.axelor.meta.db.repo.MetaViewCustomRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.loader.XMLViews;
@@ -304,6 +307,21 @@ public class MetaService {
 				userRoles.add(role.getName());
 			}
 		}
+		
+		final Map<String, String> help = new HashMap<>();
+		if (!withTagsOnly) {
+			final MetaHelpRepository helpRepo = Beans.get(MetaHelpRepository.class);
+			final String lang = AppFilter.getLocale() == null ? "en" : AppFilter.getLocale().getLanguage();
+			helpRepo.all()
+				.filter("self.menu is not null and self.language = :lang")
+				.bind("lang", lang)
+				.cacheable()
+				.select("menu", "help")
+				.fetch(-1, 0)
+				.forEach(item -> {
+					help.put((String) item.get("menu"), (String) item.get("help"));
+				});
+		}
 
 		for(final MetaMenu menu : records) {
 			// check for user menus
@@ -333,6 +351,10 @@ public class MetaService {
 			item.setHidden(menu.getHidden());
 			item.setModuleToCheck(menu.getModuleToCheck());
 			item.setConditionToCheck(menu.getConditionToCheck());
+			
+			if (help.containsKey(menu.getName())) {
+				item.setHelp(help.get(menu.getName()));
+			}
 
 			if (menu.getParent() != null) {
 				item.setParent(menu.getParent().getName());

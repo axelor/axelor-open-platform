@@ -380,25 +380,42 @@
     </panel>
   </form>
 
-  <grid title="All Help" name="meta-help-grid" model="com.axelor.meta.db.MetaHelp">
+  <grid title="All View Help" name="meta-help-view-grid" model="com.axelor.meta.db.MetaHelp">
     <field name="model" />
     <field name="field" />
     <field name="type" selection="help.type.selection" />
     <field name="language" />
   </grid>
 
-  <form title="Help" name="meta-help-form" model="com.axelor.meta.db.MetaHelp">
+  <form title="View Help" name="meta-help-view-form" model="com.axelor.meta.db.MetaHelp">
     <panel title="Overview">
-      <field name="model" widget="ref-text"
+      <field name="model" required="true" widget="ref-text"
         x-target-name="fullName"
         x-target="com.axelor.meta.db.MetaModel" />
-      <field name="field" widget="ref-text"
+      <field name="field" required="true" widget="ref-text"
         x-target-name="name"
         x-target="com.axelor.meta.db.MetaField"
         x-create="name"
         x-domain="self.metaModel.fullName = :model AND self.name NOT IN ('id', 'version', 'archived', 'createdBy', 'updatedBy', 'createdOn', 'updatedOn')" />
       <field name="type" selection="help.type.selection" />
       <field name="style" />
+      <field name="language" />
+    </panel>
+    <panel title="Help">
+      <field name="help" showTitle="false" colSpan="12" />
+    </panel>
+  </form>
+  
+  <grid title="All Menu Help" name="meta-help-menu-grid" model="com.axelor.meta.db.MetaHelp">
+    <field name="menu" />
+    <field name="language" />
+  </grid>
+
+  <form title="Menu Help" name="meta-help-menu-form" model="com.axelor.meta.db.MetaHelp">
+    <panel title="Overview">
+      <field name="menu" required="true" widget="ref-text"
+        x-target-name="name"
+        x-target="com.axelor.meta.db.MetaMenu" />
       <field name="language" />
     </panel>
     <panel title="Help">

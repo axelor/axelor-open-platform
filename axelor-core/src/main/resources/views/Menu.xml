@@ -7,6 +7,7 @@
   <menuitem name="menu-auth" parent="menu-admin" title="User Management" />
   <menuitem name="menu-model" title="Model Management" parent="menu-admin"/>
   <menuitem name="menu-view-management" title="View Management" parent="menu-admin"/>
+  <menuitem name="menu-help-management" title="Help Management" parent="menu-admin"/>
   <menuitem name="menu-module-management" title="Module Management" parent="menu-admin" />
   <menuitem name="menu-job-management" title="Job Management" parent="menu-admin" />
 
@@ -126,13 +127,23 @@
     <view type="form" name="meta-translations-form"/>
   </action-view>
 
-  <menuitem name="menu-view-help" parent="menu-view-management"
-    title="All Help"
-    action="action-meta-help"/>
+  <menuitem name="menu-view-help-views" parent="menu-help-management"
+    title="View Help"
+    action="action-meta-help-views" />
+  <menuitem name="menu-view-help-menus" parent="menu-help-management"
+    title="Menu Help"
+    action="action-meta-help-menus" />
 
-  <action-view name="action-meta-help" title="All Help" model="com.axelor.meta.db.MetaHelp">
-    <view type="grid" name="meta-help-grid"/>
-    <view type="form" name="meta-help-form"/>
+  <action-view name="action-meta-help-views" title="View Help" model="com.axelor.meta.db.MetaHelp">
+    <view type="grid" name="meta-help-view-grid"/>
+    <view type="form" name="meta-help-view-form"/>
+    <domain>self.menu is null</domain>
+  </action-view>
+
+  <action-view name="action-meta-help-menus" title="Menu Help" model="com.axelor.meta.db.MetaHelp">
+    <view type="grid" name="meta-help-menu-grid"/>
+    <view type="form" name="meta-help-menu-form"/>
+    <domain>self.menu is not null</domain>
   </action-view>
 
   <menuitem name="menu-view-charts" parent="menu-view-management"
