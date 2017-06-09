@@ -1083,6 +1083,7 @@
       <xsd:element name="help" type="tns:Help" />
       <xsd:element name="static" type="tns:Static" />
       <xsd:element name="spacer" type="tns:Spacer" />
+      <xsd:element name="separator" type="tns:Separator" />
       <xsd:element name="button" type="tns:Button" />
       <xsd:element name="button-group">
         <xsd:complexType>
