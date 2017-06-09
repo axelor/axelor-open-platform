@@ -589,13 +589,35 @@ td.form-item > * {
 	        user-select: none;
 }
 
-.form-item .separator-item span {
-	font-weight: 600;
+.form-item .separator-item {
+    font-weight: 700;
+	border-bottom: 1px solid #c9c9c9;
+    margin: 1rem 0;
+    width: 100%;
 }
 
-.form-item .separator-item hr {
-	margin: 4px 0;
-	border-top-color: #c1c1c1;
+.form-item .separator-item.divider {
+    display: table;
+    border: none;
+}
+
+.form-item .separator-item.divider::after,
+.form-item .separator-item.divider::before {
+    content: '';
+    display: table-cell;
+    position: relative;
+    top: 50%;
+    width: 50%;
+    background-repeat: no-repeat;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAE4gAAAABCAQAAACYGIwDAAAAJElEQVR42u3BAQ0AAAgDIN8/mak0xzcgewMAAAAAAAAAAAD1HuWuAcq7kIiIAAAAAElFTkSuQmCC);
+}
+
+.form-item .separator-item.divider::before {
+  background-position: right 1em top 50%;
+}
+
+.form-item .separator-item.divider::after {
+  background-position: left 1em top 50%;
 }
 
 .form-item .ui-spinner {

@@ -339,7 +339,7 @@ ui.formItem('Spacer', {
 ui.formItem('Separator', {
 	css: 'separator-item',
 	showTitle: false,
-	template: '<div><span>{{field.title}}</span><hr></div>'
+	template: '<div>{{field.title}}</div>'
 });
 
 /**
