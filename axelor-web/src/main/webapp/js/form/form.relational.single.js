@@ -821,6 +821,34 @@ ui.formInput('RefItem', 'ManyToOne', {
 
 ui.formInput('RefText', 'ManyToOne', {
 	metaWidget: true,
+	link_editable: function (scope, element, attrs) {
+		this._super.apply(this, arguments);
+		
+		if (!scope.field.create) {
+			return;
+		}
+
+		function freeSelect(text) {
+			return function () { 
+				scope.$timeout(function () {
+					scope.select(text);
+				});
+			};
+		}
+
+		scope.loadSelection = function(request, response) {
+			this.fetchSelection(request, function(items, page) {
+				var term = request.term;
+				if (term) {
+					items.push({
+						label : _t('Select "{0}"...', term),
+						click : freeSelect(term)
+					});
+				}
+				response(items);
+			});
+		};
+	},
 	link: function (scope, element, attrs, model) {
 		scope.canNew = function () { return false; };
 		scope.canView = function () { return false; };
@@ -840,7 +868,10 @@ ui.formInput('RefText', 'ManyToOne', {
 
 		scope.select = function (value) {
 			var record = _.isArray(value) ? _.first(value) : value;
-			var val = (record || {})[targetName] || null;
+			var val = _.isString(record) ? record : (record || {})[targetName];
+			if (val === undefined) {
+				val = null;
+			}
 			scope.setValue(val, true);
 		};
 	}
