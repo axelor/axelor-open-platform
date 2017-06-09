@@ -274,14 +274,16 @@ ui.formInput('ManyToOne', 'Select', {
 			return (field.widgetAttrs || {}).toggle;
 		};
 
-		var relatives = scope.findRelativeFields();
-		if (relatives.length > 0) {
-			scope.$watch(attrs.ngModel, function (value, old) {
-				if (value && value.id > 0) {
-					scope.fetchMissingValues(scope.getValue(), relatives);
-				}
-			}, true);
-		}
+		scope.$evalAsync(function() {
+			var relatives = scope.findRelativeFields();
+			if (relatives.length > 0) {
+				scope.$watch(attrs.ngModel, function (value, old) {
+					if (value && value.id > 0) {
+						scope.fetchMissingValues(scope.getValue(), relatives);
+					}
+				}, true);
+			}
+		});
 
 		if (field.widget === 'NestedEditor') {
 
