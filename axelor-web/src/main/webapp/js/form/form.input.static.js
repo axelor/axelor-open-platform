@@ -405,6 +405,10 @@ ui.formItem('Button', {
 			element.removeClass('btn-primary');
 		}
 
+		if (field && field.help && axelor.config['user.noHelp'] !== true) {
+			element.addClass('has-help');
+		}
+
 		if (isIcon) {
 			var e = $('<i>').addClass('fa').addClass(icon).prependTo(element);
 			if (iconHover) {

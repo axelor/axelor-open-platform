@@ -732,13 +732,17 @@ table.field-details .help-text hr {
 	background-color: white;	
 }
 
+.button-item.has-help > span:after,
 label.has-help > span:after {
 	font: normal normal normal 14px/1 FontAwesome;
 	content: "\f06a";
 	font-size: 10px;
-	color: #107a4a;
 	margin-left: 2px;
     position: absolute;
+}
+
+label.has-help > span:after {
+  color: #107a4a;
 }
 
 .ws-nowrap {
