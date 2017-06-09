@@ -200,6 +200,15 @@
     <finder-method name="findByKey" using="key,language" cacheable="true" />
   </entity>
 
+  <entity name="MetaHelp" table="META_HELP" logUpdates="false">
+    <string name="model" required="true" />
+    <string name="field" />
+    <string name="language" max="5" required="true" />
+    <string name="help" column="help_value" max="1024" multiline="true" required="true" />
+    <string name="type" column="help_type" required="true" selection="help.type.selection" />
+    <string name="style" />
+  </entity>
+
   <entity name="MetaFile" table="META_FILE">
     <![CDATA[
     This object store the files.

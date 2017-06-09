@@ -171,6 +171,54 @@
 
 			view = processJsonForm(view);
 			meta.fields = processFields(meta.fields);
+			
+			(function () {
+				var helps = meta.helps = meta.helps || {};
+				var items = [];
+
+				if (view.helpOverride && view.helpOverride.length) {
+					helps = _.groupBy(view.helpOverride || [], 'type');
+					helps = meta.helps = _.object(_.map(helps, function(items, key) {
+						return [key, _.reduce(items, function(memo, item) {
+							memo[item.field] = item;
+							return memo;
+						}, {})];
+					}));
+				}
+
+				var help = helps.tooltip || {};
+				var placeholder = helps.placeholder || {};
+				var inline = helps.inline || {};
+
+				forEach(view.items, function (item) {
+					if (help[item.name]) {
+						item.help = help[item.name].help;
+					}
+					if (placeholder[item.name]) {
+						item.placeholder = placeholder[item.name].help;
+					}
+					if (inline[item.name] && !inline[item.name].used) {
+						inline[item.name].used = true;
+						items.push({
+							type: 'help',
+							text: inline[item.name].help,
+							css: inline[item.name].style,
+							colSpan: 12
+						});
+					}
+					items.push(item);
+				});
+	
+				forEach(view.toolbar, function (item) {
+					if (help[item.name]) {
+						item.help = help[item.name].help;
+					}
+				});
+	
+				if (items.length) {
+					view.items = items;
+				}
+			})();
 
 			forEach(view.items || view.pages, function(item) {
 				processWidget(item);

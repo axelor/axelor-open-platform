@@ -25,9 +25,12 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.app.internal.AppFilter;
 import com.axelor.db.Query;
 import com.axelor.i18n.I18n;
+import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaView;
+import com.axelor.meta.db.repo.MetaHelpRepository;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -274,5 +277,18 @@ public abstract class AbstractView {
 			return getClass().getAnnotation(JsonTypeName.class).value();
 		} catch(Exception e){}
 		return "unknown";
+	}
+	
+	@XmlTransient
+	@JsonProperty("helpOverride")
+	public List<?> getHelpOverride() {
+		final MetaHelpRepository repo = Beans.get(MetaHelpRepository.class);
+		final String lang = AppFilter.getLocale() == null ? "en" : AppFilter.getLocale().getLanguage();
+		return repo.all()
+			.filter("self.model = :model AND self.language = :lang")
+			.bind("model", getModel())
+			.bind("lang", lang)
+			.select("field", "type", "help", "style")
+			.fetch(-1, 0);
 	}
 }

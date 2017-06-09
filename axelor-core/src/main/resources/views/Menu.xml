@@ -126,6 +126,15 @@
     <view type="form" name="meta-translations-form"/>
   </action-view>
 
+  <menuitem name="menu-view-help" parent="menu-view-management"
+    title="All Help"
+    action="action-meta-help"/>
+
+  <action-view name="action-meta-help" title="All Help" model="com.axelor.meta.db.MetaHelp">
+    <view type="grid" name="meta-help-grid"/>
+    <view type="form" name="meta-help-form"/>
+  </action-view>
+
   <menuitem name="menu-view-charts" parent="menu-view-management"
     title="All Charts"
     action="meta.charts"/>
