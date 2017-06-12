@@ -892,7 +892,7 @@ ui.directive('uiGridHelp', function () {
 		},
 		replace: true,
 		template:
-			"<button>" +
+			"<button ng-show='schema.help'>" +
 				"<i class='fa fa-info'></i>" +
 			"</button>"
 	};
