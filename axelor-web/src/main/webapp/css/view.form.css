@@ -754,12 +754,13 @@ table.field-details .help-text hr {
 	background-color: white;	
 }
 
+label.has-help > span:after,
 .button-item.has-help > span:after,
-label.has-help > span:after {
+.nav-tree a.has-help:after {
 	font: normal normal normal 14px/1 FontAwesome;
 	content: "\f06a";
 	font-size: 10px;
-	margin-left: 2px;
+	margin-left: 4px;
     position: absolute;
 }
 

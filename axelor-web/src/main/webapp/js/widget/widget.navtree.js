@@ -401,9 +401,9 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
 			
 			if (menu.help) {
 				setTimeout(function () {
-					element.children('a')
+					var tooltip = element.children('a')
 					.addClass('has-help')
-					.children('.nav-title').tooltip({
+					.tooltip({
 						html: true,
 						title: menu.help,
 						placement: 'right',
