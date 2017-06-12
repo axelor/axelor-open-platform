@@ -502,6 +502,11 @@ header .navbar .nav-link-user-sub {
 	top: 42px; left: 0; right: 0; bottom: 0;
 }
 
+.grid-view button[ui-grid-help] {
+  background: none;
+  outline: none;
+}
+
 .record-toolbar {
 	margin: 0;
 }

@@ -184,6 +184,10 @@
 							return memo;
 						}, {})];
 					}));
+					
+					if (helps.tooltip && helps.tooltip.__top__) {
+						view.help = helps.tooltip.__top__.help;
+					}
 				}
 
 				var help = helps.tooltip || {};

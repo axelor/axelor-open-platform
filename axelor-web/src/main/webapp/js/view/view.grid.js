@@ -870,4 +870,32 @@ ui.directive('uiPortletGrid', function(){
 	};
 });
 
+ui.directive('uiGridHelp', function () {
+	return {
+		link: function (scope, element) {
+			var unwatch = scope.$watch('schema', function (view) {
+				if (view) {
+					unwatch();
+				}
+				if (view && view.help) {
+					element.popover({
+						html: true,
+						title: view.title,
+						content: view.help,
+						placement: 'bottom',
+						trigger: 'hover',
+						delay: { show: 500, hide: 100 },
+						container: 'body'
+					});
+				}
+			});
+		},
+		replace: true,
+		template:
+			"<button>" +
+				"<i class='fa fa-info'></i>" +
+			"</button>"
+	};
+});
+
 })();

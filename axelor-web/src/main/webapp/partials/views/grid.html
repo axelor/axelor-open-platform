@@ -20,6 +20,7 @@
           <button class="btn" ng-click="onRefresh()" ng-if="hasButton('refresh')" title="{{ 'Refresh' | t}}">
             <i class="fa fa-refresh"></i> <span ng-if="::!tbTitleHide" x-translate>Refresh</span>
           </button>
+          <span ui-grid-help></span>
         </div>
         <div class="btn-group view-toolbar" ng-if="toolbar.length" style="display: none;">
           <button ng-repeat="btn in toolbar | filter:{custom: true}" class="btn" ui-tool-button="btn">{{btn.title}}</button>
