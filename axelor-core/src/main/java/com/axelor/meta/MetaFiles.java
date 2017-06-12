@@ -441,11 +441,9 @@ public class MetaFiles {
 	 * @param entity
 	 *            the record to attach to
 	 * @return a {@link DMSFile} record created for the attachment
-	 * @throws IOException
-	 *             if an I/O error occurs
 	 */
 	@Transactional
-	public DMSFile attach(MetaFile metaFile, String fileName, Model entity) throws IOException {
+	public DMSFile attach(MetaFile metaFile, String fileName, Model entity) {
 		Preconditions.checkNotNull(metaFile);
 		Preconditions.checkNotNull(metaFile.getId());
 		Preconditions.checkNotNull(entity);
