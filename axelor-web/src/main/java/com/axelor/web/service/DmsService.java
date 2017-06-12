@@ -164,12 +164,8 @@ public class DmsService {
 		final List<Object> records = new ArrayList<>();
 
 		for (MetaFile file : items) {
-			DMSFile dmsFile;
-			try {
-				dmsFile = files.attach(file, file.getFileName(), (Model) entity);
-				records.add(Resource.toMapCompact(dmsFile));
-			} catch (IOException e) {
-			}
+			DMSFile dmsFile = files.attach(file, file.getFileName(), (Model) entity);
+			records.add(Resource.toMapCompact(dmsFile));
 		}
 
 		response.setStatus(Response.STATUS_SUCCESS);
