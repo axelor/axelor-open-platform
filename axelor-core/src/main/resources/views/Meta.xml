@@ -384,6 +384,7 @@
     <field name="model" />
     <field name="field" />
     <field name="type" selection="help.type.selection" />
+    <field name="view" />
     <field name="language" />
   </grid>
 
@@ -399,6 +400,10 @@
         x-domain="self.metaModel.fullName = :model AND self.name NOT IN ('id', 'version', 'archived', 'createdBy', 'updatedBy', 'createdOn', 'updatedOn')" />
       <field name="type" selection="help.type.selection" />
       <field name="style" />
+      <field name="view" widget="ref-text"
+        x-target-name="name"
+        x-target="com.axelor.meta.db.MetaView"
+        x-domain="self.model = :model AND self.type IN ('form', 'grid')" />
       <field name="language" />
     </panel>
     <panel title="Help">

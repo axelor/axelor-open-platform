@@ -201,9 +201,10 @@
   </entity>
 
   <entity name="MetaHelp" table="META_HELP" logUpdates="false">
-    <string name="model" />
-    <string name="menu" />
-    <string name="field" />
+    <string name="menu" column="menu_name" />
+    <string name="model" column="model_name" />
+    <string name="field" column="field_name" />
+    <string name="view" column="view_name" />
     <string name="language" required="true" selection="select.language" />
     <string name="style" />
     <string name="type" column="help_type" selection="help.type.selection" />

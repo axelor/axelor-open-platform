@@ -284,11 +284,14 @@ public abstract class AbstractView {
 	public List<?> getHelpOverride() {
 		final MetaHelpRepository repo = Beans.get(MetaHelpRepository.class);
 		final String lang = AppFilter.getLocale() == null ? "en" : AppFilter.getLocale().getLanguage();
-		return repo.all()
-			.filter("self.model = :model AND self.language = :lang")
+		List<?> found = repo.all()
+			.filter("self.model = :model AND self.language = :lang and (self.view = :view OR self.view IS NULL)")
 			.bind("model", getModel())
 			.bind("lang", lang)
+			.bind("view", getName())
+			.order("-view")
 			.select("field", "type", "help", "style")
 			.fetch(-1, 0);
+		return found.isEmpty() ? null : found;
 	}
 }
