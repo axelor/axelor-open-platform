@@ -42,19 +42,16 @@ angular.module('axelor.ui').directive('navTabs', function() {
 
 				e.preventDefault();
 				e.stopPropagation();
-				
-				if (!tabScope.canCloseTab(tabScope.tab)) {
-					return;
-				}
-
-				var offset = elem.offset();
-				menu.show().css({
-					left: e.pageX - offset.left,
-					top: e.pageY - offset.top
-				});
 
 				scope.current = tabScope.tab;
-				$(document).on('mousedown.nav-tabs-menu', hideMenu);
+				scope.$timeout(function () {
+					var offset = elem.offset();
+					menu.show().css({
+						left: e.pageX - offset.left,
+						top: e.pageY - offset.top
+					});
+					$(document).on('mousedown.nav-tabs-menu', hideMenu);
+				});
 			}
 			
 			function hideMenu(e) {

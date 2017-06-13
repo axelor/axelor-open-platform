@@ -440,14 +440,7 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 	});
 
 	$scope.$watch('routePath', function(path) {
-		var app = $scope.app || {};
-		if (!app.homeAction || _.last(path) !== "main") {
-			return;
-		}
-		NavService.openTabByName(app.homeAction, {
-			__tab_prepend: true,
-			__tab_closable: false
-		});
+		$scope.openHomeTab();
 	});
 	
 	var confirm = _t('Current changes will be lost.');
@@ -510,10 +503,7 @@ function TabCtrl($scope, $location, $routeParams) {
 		promise;
 	
 	if (app.homeAction && app.homeAction === params.resource) {
-		promise = $scope.openTabByName(app.homeAction, {
-			__tab_prepend: true,
-			__tab_closable: false
-		});
+		promise = $scope.openHomeTab();
 	}
 
 	var openSelf = function () {

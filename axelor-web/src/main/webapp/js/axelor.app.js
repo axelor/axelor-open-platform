@@ -298,8 +298,8 @@
 	
 	module.controller('AppCtrl', AppCtrl);
 	
-	AppCtrl.$inject = ['$rootScope', '$exceptionHandler', '$scope', '$http', '$route', 'authService'];
-	function AppCtrl($rootScope, $exceptionHandler, $scope, $http, $route, authService) {
+	AppCtrl.$inject = ['$rootScope', '$exceptionHandler', '$scope', '$http', '$route', 'authService', 'NavService'];
+	function AppCtrl($rootScope, $exceptionHandler, $scope, $http, $route, authService, NavService) {
 		
 		function getAppInfo(settings) {
 			
@@ -335,10 +335,25 @@
 				angular.extend($scope.app, getAppInfo(settings));
 			});
 		}
+
+		function openHomeTab() {
+			var path = $scope.routePath || ["main"];
+			var homeAction = $scope.app.homeAction;
+			if (!homeAction || _.last(path) !== "main") {
+				return;
+			}
+			return NavService.openTabByName(homeAction, {
+				__tab_prepend: true,
+				__tab_closable: false
+			});
+		}
 	
 		// See index.jsp
 		$scope.app = getAppInfo(__appSettings);
+		$scope.openHomeTab = openHomeTab;
 		$scope.$year = moment().year();
+
+		openHomeTab();
 	
 		var loginAttempts = 0;
 		var loginWindow = null;
