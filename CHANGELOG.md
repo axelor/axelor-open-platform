@@ -2,7 +2,7 @@
 
 ## Bug fixes
 
-## Improvements
+- fix home tab issues
 
 # 3.4.0 (2017-06-08)
 
