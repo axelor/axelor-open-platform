@@ -870,7 +870,7 @@ ui.directive('uiPortletGrid', function(){
 	};
 });
 
-ui.directive('uiGridHelp', function () {
+ui.directive('uiTopHelp', function () {
 	return {
 		link: function (scope, element) {
 			var unwatch = scope.$watch('schema', function (view) {

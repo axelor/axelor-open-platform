@@ -21,6 +21,7 @@
           <button class="btn" ng-disabled="!canShowAttachments()" ng-click="onShowAttachments()" ng-class="{'has-attachments': record.$attachments}">
           	<i class="fa fa-paperclip"></i><sub ng-if="record.$attachments"> {{record.$attachments}}</sub>
           </button>
+          <span ui-top-help></span>
           <button class="btn" ng-if="hasHelp()" ng-click="onShowHelp()"><i class="fa fa-info-circle"></i></button>
         </div>
         <div ui-menu-bar x-menus="toolmenu" x-handler="this"></div>
