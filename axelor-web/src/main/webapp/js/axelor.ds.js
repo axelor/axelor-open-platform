@@ -198,17 +198,19 @@
 					if (help[item.name]) {
 						item.help = help[item.name].help;
 					}
-					if (placeholder[item.name]) {
-						item.placeholder = placeholder[item.name].help;
-					}
-					if (inline[item.name] && !inline[item.name].used) {
-						inline[item.name].used = true;
-						items.push({
-							type: 'help',
-							text: inline[item.name].help,
-							css: inline[item.name].style,
-							colSpan: 12
-						});
+					if (meta.view && meta.view.type === 'form') {
+						if (placeholder[item.name]) {
+							item.placeholder = placeholder[item.name].help;
+						}
+						if (inline[item.name] && !inline[item.name].used) {
+							inline[item.name].used = true;
+							items.push({
+								type: 'help',
+								text: inline[item.name].help,
+								css: inline[item.name].style,
+								colSpan: 12
+							});
+						}
 					}
 					items.push(item);
 				});
