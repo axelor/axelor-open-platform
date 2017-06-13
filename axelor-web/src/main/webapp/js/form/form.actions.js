@@ -822,7 +822,7 @@ ActionHandler.prototype = {
 			// handle o2m/m2m columns
 			if (item.is('.slick-dummy-column')) {
 				column = item.data('column');
-				itemScope = item.parents('[x-path]:first').data('$scope');
+				itemScope = item.parents('[x-path]:first,.portlet-grid').data('$scope');
 				forEach(itemAttrs, function(value, attr){
 					if (attr == 'hidden')
 						itemScope.showColumn(column.id, !value);
