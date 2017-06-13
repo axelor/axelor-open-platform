@@ -1,3 +1,9 @@
+# Current (3.4.2)
+
+## Bug fixes
+
+## Improvements
+
 # 3.4.1 (2017-06-13)
 
 ## Bug fixes

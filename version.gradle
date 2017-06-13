@@ -1,7 +1,7 @@
 apply plugin: "maven"
 
 group "com.axelor"
-version "3.4.1"
+version "3.4.2"
 
 def rcNumber = project.hasProperty("rcNumber") ?
 			   project.getProperty("rcNumber").toInteger() : null;
