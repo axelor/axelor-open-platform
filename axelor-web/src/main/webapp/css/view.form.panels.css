@@ -634,10 +634,12 @@
 .help-item:after {
 	font: normal normal normal 14px/1 FontAwesome;
 	content: "\f10e";
+	margin-left: 6px;
 }
 .help-item:before {
 	font: normal normal normal 14px/1 FontAwesome;
 	content: "\f10d";
+	margin-right: 6px;
 }
 
 .info-button {
