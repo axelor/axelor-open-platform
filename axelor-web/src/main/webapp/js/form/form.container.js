@@ -139,12 +139,8 @@ ui.formWidget('Dashlet', {
 		var dashlet = _.extend({}, scope.field);
 
 		scope.dashlet = dashlet;
+		scope.formPath = field.name || field.action;
 
-		if (field.name) {
-			scope.formPath = field.name;
-		}
-		
-		
 		scope.$watch('attr("title")', function (title, old) {
 			if (title === old) {
 				return;
