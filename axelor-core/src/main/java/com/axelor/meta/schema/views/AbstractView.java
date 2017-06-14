@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.app.internal.AppFilter;
+import com.axelor.auth.AuthUtils;
 import com.axelor.db.Query;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
@@ -282,6 +283,9 @@ public abstract class AbstractView {
 	@XmlTransient
 	@JsonProperty("helpOverride")
 	public List<?> getHelpOverride() {
+		if (AuthUtils.getUser().getNoHelp() == Boolean.TRUE) {
+			return null;
+		}
 		final MetaHelpRepository repo = Beans.get(MetaHelpRepository.class);
 		final String lang = AppFilter.getLocale() == null ? "en" : AppFilter.getLocale().getLanguage();
 		List<?> found = repo.all()
