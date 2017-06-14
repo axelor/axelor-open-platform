@@ -309,7 +309,7 @@ public class MetaService {
 		}
 		
 		final Map<String, String> help = new HashMap<>();
-		if (!withTagsOnly) {
+		if (!withTagsOnly && user.getNoHelp() != Boolean.TRUE) {
 			final MetaHelpRepository helpRepo = Beans.get(MetaHelpRepository.class);
 			final String lang = AppFilter.getLocale() == null ? "en" : AppFilter.getLocale().getLanguage();
 			helpRepo.all()
