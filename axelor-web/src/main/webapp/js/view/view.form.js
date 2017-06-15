@@ -351,13 +351,23 @@ function FormViewCtrl($scope, $element) {
 			});
 		});
 	};
-	
+
+	$scope.$$fixUndefined = function (orig, current) {
+		_.keys(current).forEach(function (name) {
+			var value = current[name];
+			if (value == undefined && orig[name] === null) {
+				current[name] = null;
+			}
+		});
+	};
+
 	$scope.editRecord = function(record) {
 		$scope.$$original = angular.copy(record) || {};
 		$scope.$$dirty = false;
 		$scope.record = angular.copy($scope.$$original);
 		$scope._viewPromise.then(function(){
 			$scope.ajaxStop(function(){
+				$scope.$$fixUndefined($scope.$$original, $scope.record);
 				$scope.$broadcast("on:edit", $scope.record);
 				$scope.$broadcast("on:record-change", $scope.record);
 				if ($scope.__canForceEdit && $scope.canEdit()) {
