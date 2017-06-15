@@ -54,11 +54,15 @@ public class PhysicalNamingStrategyImpl implements PhysicalNamingStrategy {
 		return addUnderscores(name);
 	}
 
-	protected static Identifier addUnderscores(Identifier name) {
+	static Identifier addUnderscores(Identifier name) {
 		if (name == null || StringUtils.isBlank(name.getText())) {
 			return null;
 		}
-		final StringBuilder buf = new StringBuilder( name.getText().replace('.', '_') );
+		return Identifier.toIdentifier(addUnderscores(name.getText()));
+	}
+
+	static String addUnderscores(String text) {
+		final StringBuilder buf = new StringBuilder( text.replace('.', '_') );
 		for (int i=1; i<buf.length()-1; i++) {
 			if (
 				Character.isLowerCase(buf.charAt(i-1)) &&
@@ -68,6 +72,6 @@ public class PhysicalNamingStrategyImpl implements PhysicalNamingStrategy {
 				buf.insert(i++, '_');
 			}
 		}
-		return Identifier.toIdentifier(buf.toString().toLowerCase(Locale.ROOT));
+		return buf.toString().toLowerCase(Locale.ROOT);
 	}
 }
