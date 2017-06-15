@@ -454,9 +454,11 @@ function FormViewCtrl($scope, $element) {
 		var defer = $scope._defer();
 		$scope.confirmDirty(function(){
 			routeId = null;
+			$scope.$locationChangeOff();
 			$scope.edit(null, false);
 			$scope.setEditable();
 			$scope.$broadcast("on:new");
+			$scope.$locationChangeCheck();
 			defer.resolve();
 		}, defer.reject);
 		return defer.promise;
