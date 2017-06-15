@@ -51,7 +51,7 @@ function updateValues(source, target, itemScope, formScope) {
 	}
 
 	// handle json records
-	if (source && formScope._model === 'com.axelor.meta.db.MetaJsonRecord') {
+	if (source && formScope && formScope._model === 'com.axelor.meta.db.MetaJsonRecord') {
 		source = source.attrs ? _.extend({}, JSON.parse(source.attrs), source) : source;
 		delete source.attrs;
 		var fix = function (rec) {
