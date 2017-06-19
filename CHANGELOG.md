@@ -2,6 +2,12 @@
 
 ## Bug fixes
 
+- fix dotted fields update issue
+- do not throw unused IOException
+- isolate dashlet grid columns to avoid name conflict 
+- fix unnecessary dirty flag caused by validators
+- fix unnecessary dirty check when create new record
+
 # 4.1.3 (2017-05-16)
 
 ## Bug fixes
