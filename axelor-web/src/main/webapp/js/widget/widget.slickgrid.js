@@ -1288,6 +1288,10 @@ Grid.prototype.showColumn = function(name, show) {
 		cols = this.cols;
 	
 	this.visibleCols = this.visibleCols || _.pluck(cols, 'id');
+	
+	if (this.visibleCols.indexOf(name) > -1) {
+		return;
+	}
 
 	show = _.isUndefined(show) ? true : show;
 	
@@ -1331,8 +1335,14 @@ Grid.prototype.resetColumns = function() {
 		cols = this.cols.filter(function (col) {
 			return !(col.descriptor||{}).hidden;
 		});
+	
+	var currentCols = this.visibleCols || [];
+	var visibleCols = _.pluck(cols, 'id');
+	if (_.difference(currentCols, visibleCols).length == 0) {
+		return;
+	}
 
-	this.visibleCols = _.pluck(cols, 'id');
+	this.visibleCols = visibleCols;
 	
 	grid.setColumns(cols);
 	grid.getViewport().rightPx = 0;
