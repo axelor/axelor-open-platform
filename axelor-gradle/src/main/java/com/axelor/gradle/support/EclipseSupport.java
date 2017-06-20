@@ -219,10 +219,6 @@ public class EclipseSupport extends AbstractSupport {
 			.append(" key=\"org.eclipse.debug.core.source_locator_memento\"")
 			.append(" value=").append('"').append(generateSourceLookup(project, cp)).append('"')
 			.append("/>\n");
-		
-		builder.append("<listAttribute key=\"org.eclipse.debug.ui.favoriteGroups\">\n")
-			.append("<listEntry value=\"org.eclipse.debug.ui.launchGroup.debug\"/>\n")
-			.append("</listAttribute>\n");
 
 		builder.append("<booleanAttribute key=\"org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD\" value=\"true\"/>\n");
 
