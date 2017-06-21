@@ -52,6 +52,9 @@ import com.axelor.meta.schema.views.FormInclude;
 import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.Notebook;
+import com.axelor.meta.schema.views.Panel;
+import com.axelor.meta.schema.views.PanelRelated;
+import com.axelor.meta.schema.views.PanelTabs;
 import com.axelor.meta.schema.views.Search;
 import com.axelor.meta.schema.views.SearchFilters;
 import com.axelor.meta.schema.views.SimpleContainer;
@@ -165,10 +168,16 @@ public class ViewService extends AbstractService {
 			all = ((Notebook) widget).getPages();
 		} else if (widget instanceof SimpleContainer) {
 			all = ((SimpleContainer) widget).getItems();
+		} else if (widget instanceof Panel) {
+			all = ((Panel) widget).getItems();
+		} else if (widget instanceof PanelTabs) {
+			all = ((PanelTabs) widget).getItems();
 		} else if (widget instanceof FormInclude) {
 			names.addAll(findNames(((FormInclude) widget).getView()));
 		} else if (widget instanceof Field) {
 			names.add(((Field) widget).getName());
+		} else if (widget instanceof PanelRelated) {
+			names.add(((PanelRelated) widget).getName());
 		}
 		if (all == null) {
 			return names;
