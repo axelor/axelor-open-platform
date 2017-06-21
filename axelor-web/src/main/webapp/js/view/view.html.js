@@ -27,14 +27,28 @@ ui.HtmlViewCtrl.$inject = ['$scope', '$element', '$sce'];
 function HtmlViewCtrl($scope, $element, $sce) {
 
 	var views = $scope._views;
+	var stamp = -1;
+
 	$scope.view = views.html;
 
-	$scope.getURL = function () {
+	$scope.getURL = function getURL() {
 		var view = $scope.view;
 		if (view) {
-			return $sce.trustAsResourceUrl(view.name || view.resource);
+			var url = new URL(view.name || view.resource);
+			if (stamp > 0) {
+				url.searchParams.append('t', stamp);
+			}
+			return $sce.trustAsResourceUrl(url.href);
 		}
 		return null;
+	};
+
+	$scope.onRefresh = function () {
+		if (stamp > -1) {
+			stamp = new Date().getTime();
+		} else {
+			stamp = 0;
+		}
 	};
 }
 
