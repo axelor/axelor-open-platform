@@ -34,11 +34,16 @@ function HtmlViewCtrl($scope, $element, $sce) {
 	$scope.getURL = function getURL() {
 		var view = $scope.view;
 		if (view) {
-			var url = new URL(view.name || view.resource);
+			var url = view.name || view.resource;
 			if (stamp > 0) {
-				url.searchParams.append('t', stamp);
+				var q = url.lastIndexOf('?');
+				if (q > -1) {
+					url += "&t" + stamp;
+				} else {
+					url += "?t" + stamp;
+				}
 			}
-			return $sce.trustAsResourceUrl(url.href);
+			return $sce.trustAsResourceUrl(url);
 		}
 		return null;
 	};
