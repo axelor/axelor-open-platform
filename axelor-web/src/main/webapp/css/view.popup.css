@@ -19,6 +19,11 @@
 .ui-dialog {
 	padding: 0;
 	border: 0;
+	top: 30px !important;
+	left: 0 !important;
+	right: 0 !important;
+	display: flex;
+	flex-flow: column nowrap;
 }
 
 .ui-dialog .ui-dialog-titlebar {
@@ -31,6 +36,7 @@
 	font-size: 20.5px;
 	font-weight: 600;
 	line-height: 26px;
+	flex: 0 0 auto;
 }
 
 .ui-dialog .ui-dialog-title {
@@ -123,6 +129,12 @@
 	padding: 4px;
 	min-height: 250px;
 	max-height: calc(100% - 45px - 60px) !important;
+	height: inherit !important;
+}
+
+.ui-dialog .ui-dialog-content[ui-selector-popup] {
+	overflow: hidden;
+	height: 450px !important;
 }
 
 .ui-widget-overlay {
@@ -132,7 +144,8 @@
 
 .ui-dialog .ui-dialog-buttonpane {
 	margin-top: 0;
-	padding: .3em .5em .5em .5em
+	padding: .3em .5em .5em .5em;
+	flex: 0 0 auto;
 }
 
 .ui-dialog-buttonpane .btn-group > .btn {
@@ -184,13 +197,10 @@
 
 .ui-dialog-responsive {
 	position: absolute;
-
 	width: 100% !important;
-	margin: 8px !important;
-
+	margin: 0 auto !important;
 	max-width: calc(100% - 16px) !important;
-	max-height: calc(100% - 16px) !important;
-
+	max-height: calc(100% - 64px) !important;
 	border: none;
 }
 
@@ -234,6 +244,7 @@
 		left: 0 !important;
 		width: calc(100% - 16px) !important;
 		height: calc(100% - 16px) !important;
+		max-height: calc(100% - 16px) !important;
 	}
 	.ui-dialog .ui-dialog-title {
 		top: 0;
@@ -274,6 +285,7 @@
 	margin: 8px !important;
 	width: calc(100% - 16px) !important;
 	height: calc(100% - 16px) !important;
+	max-height: calc(100% - 16px) !important;
 }
 .ui-dialog.maximized .ui-dialog-title {
 	top: 0;

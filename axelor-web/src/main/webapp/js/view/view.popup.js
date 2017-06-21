@@ -248,9 +248,6 @@ function SelectorCtrl($scope, $element, DataSource, ViewService) {
 	$scope.onShow = function(viewPromise) {
 		
 		viewPromise.then(function(){
-			if (!initialized) {
-				$element.closest('.ui-dialog').css('opacity', 0);
-			}
 			$element.dialog('open');
 			initialized = true;
 			origOnShow(viewPromise);
@@ -295,18 +292,9 @@ ui.directive('uiDialogSize', function() {
 		var addMaximizeButton = _.once(function () {
 			var elemDialog = element.parent();
 			var elemTitle = elemDialog.find('.ui-dialog-title');
-			var resizable = elemDialog.hasClass('ui-resizable');
-			var draggable = elemDialog.hasClass('ui-draggable');
 			$('<a href="#" class="ui-dialog-titlebar-max"><i class="fa fa-expand"></i></a>').click(function (e) {
 				$(this).children('i').toggleClass('fa-expand fa-compress');
 				elemDialog.toggleClass('maximized');
-				element.dialog('option', 'position', 'center');
-				if (resizable) {
-					element.dialog('option', 'resizable', !elemDialog.hasClass('maximized'));
-				}
-				if (resizable) {
-					element.dialog('option', 'draggable', !elemDialog.hasClass('maximized'));
-				}
 				axelor.$adjustSize();
 				return false;
 			}).insertAfter(elemTitle);
@@ -314,62 +302,8 @@ ui.directive('uiDialogSize', function() {
 			// remove maximized state on close
 			element.on('dialogclose', function(e, ui) {
 				elemDialog.removeClass('maximized');
-				if (resizable) {
-					element.dialog('option', 'resizable', true);
-				}
-				if (draggable) {
-					element.dialog('option', 'draggable', true);
-				}
 			});
 		});
-
-		var initialized = false;
-
-		function adjustSize() {
-
-			var form = element.children('[ui-view-form],[ui-view-pane]').find('form[ui-form]:first');
-			var maxHeight = $(document).height() - 16;
-			var height = maxHeight;
-
-			height -= element.parent().children('.ui-dialog-titlebar').outerHeight(true) + 4;
-			height -= element.parent().children('.ui-dialog-buttonpane').outerHeight(true) + 4;
-
-			if (element.is('.nav-tabs-popup,[ui-selector-popup]')) {
-				height = Math.min(height, 480);
-			} else if (height > element[0].scrollHeight) {
-				height = element[0].scrollHeight + 8;
-			}
-
-			if (form.size() && height > form[0].scrollHeight) {
-				height = form[0].scrollHeight + 8;
-			}
-
-			element.height(height);
-
-			function doAdjust() {
-				// set height to wrapper to fix overflow issue
-				var wrapper = element.dialog('widget');
-				wrapper.height(wrapper.height());
-
-				// show the dialog
-				element.dialog('option', 'position', 'center');
-				element.closest('.ui-dialog').css('opacity', '');
-
-				initialized = true;
-			}
-
-			if (!form.size() || initialized) {
-				return doAdjust();
-			}
-
-			var last = form[0].scrollHeight;
-			scope.ajaxStop(function () {
-				if (last < form[0].scrollHeight) {
-					return adjustSize();
-				}
-				doAdjust();
-			}, 100);
-		}
 
 		function doShow() {
 
@@ -383,21 +317,13 @@ ui.directive('uiDialogSize', function() {
 			//XXX: ui-dialog issue
 			element.find('.slick-headerrow-column,.slickgrid,[ui-embedded-editor]').zIndex(element.zIndex());
 			element.find('.record-toolbar .btn').zIndex(element.zIndex()+1);
-
-			scope.ajaxStop(function() {
-				adjustSize();
-				axelor.$adjustSize();
-			}, 100);
 		}
 
 		// a flag used by evalScope to detect popup (see form.base.js)
 		scope._isPopup = true;
 		scope._doShow = function(viewPromise) {
 			element.dialog('open');
-			element.closest('.ui-dialog').css('opacity', 0);
-			viewPromise.then(function(s) {
-				scope.waitForActions(doShow);
-			});
+			viewPromise.then(doShow);
 		};
 
 		scope._setTitle = function (title) {
@@ -455,7 +381,7 @@ ui.directive('uiEditorPopup', function() {
 		},
 		replace: true,
 		template:
-		'<div ui-dialog ui-dialog-size x-resizable="true" x-on-ok="onOK" x-on-before-close="onBeforeClose" ui-watch-if="isPopupOpen">'+
+		'<div ui-dialog ui-dialog-size x-on-ok="onOK" x-on-before-close="onBeforeClose" ui-watch-if="isPopupOpen">'+
 		    '<div ui-view-form x-handler="this"></div>'+
 		'</div>'
 	};
@@ -470,13 +396,6 @@ ui.directive('uiSelectorPopup', function(){
 			selectMode: "@"
 		},
 		link: function(scope, element, attrs) {
-
-			var height = $(window).height();
-			height = (70 * height / 100);
-			
-			scope._calcHeight = function (h) {
-				return height;
-			};
 
 			var onShow = scope.onShow;
 			scope.onShow = function (viewPromise) {
@@ -515,7 +434,7 @@ ui.directive('uiSelectorPopup', function(){
 		},
 		replace: true,
 		template:
-		'<div ui-dialog ui-dialog-size x-resizable="true" x-on-ok="onOK">'+
+		'<div ui-dialog ui-dialog-size x-on-ok="onOK">'+
 		    '<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-editable="false" x-selector="{{selectMode}}"></div>'+
 		    '<div ui-record-pager></div>'+
 		    '<div class="ui-dialog-buttonset-left pull-left" ng-show="canNew()">'+

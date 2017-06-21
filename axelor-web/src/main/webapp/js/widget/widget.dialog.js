@@ -26,7 +26,6 @@ ui.directive('uiDialog', function() {
 		restrict: 'EA',
 		link: function(scope, element, attrs) {
 
-			var resizable = !!attrs.resizable && !axelor.device.small;
 			var onBeforeClose = scope.$eval(attrs.onBeforeClose);
 			
 			var onOpen = scope.$eval(attrs.onOpen);
@@ -61,48 +60,13 @@ ui.directive('uiDialog', function() {
 			
 			var dialog = element.dialog({
 				dialogClass: 'ui-dialog-responsive ' + (cssClass || ''),
-				resizable: resizable,
-				draggable: true,
+				resizable: false,
+				draggable: false,
 				autoOpen: false,
 				closeOnEscape: true,
 				modal: true,
 				zIndex: 1100,
-				buttons: buttons,
-				resizeStart: function () {
-					var parent = $(this).parent().removeClass('ui-dialog-responsive');
-					if (!parent.hasClass('ui-dialog-resized')) {
-						parent.addClass('ui-dialog-resized');
-					}
-					if (!parent.hasClass('ui-dialog-dragged')) {
-						parent.addClass('ui-dialog-dragged');
-					}
-				},
-				resizeStop: function () {
-					axelor.$adjustSize();
-				},
-				dragStart: function(event, ui) {
-
-					// set size to prevent shrinking
-					var wrapper = element.dialog('widget');
-					var width = wrapper.width();
-					var height = wrapper.height();
-
-					wrapper.width(width);
-					wrapper.height(height);
-
-					element.dialog('option', 'width', width);
-					element.dialog('option', 'height', height);
-
-					var parent = $(this).parent().removeClass('ui-dialog-responsive');
-					if (parent.hasClass('maximized') || axelor.device.small) {
-						event.preventDefault();
-						event.stopPropagation();
-						return false;
-					}
-					if (!parent.hasClass('ui-dialog-dragged')) {
-						parent.addClass('ui-dialog-dragged');
-					}
-				}
+				buttons: buttons
 			});
 			
 			// maintain overlay opacity
