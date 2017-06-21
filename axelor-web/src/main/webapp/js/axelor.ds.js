@@ -689,7 +689,7 @@
 			}
 			
 			if (_.isArray(view.items)) {
-				return fetchFields({ view: view });
+				return fetchFields({ view: view, fields: view.fields });
 			}
 			return fetchView();
 		};

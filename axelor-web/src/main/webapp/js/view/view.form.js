@@ -1072,6 +1072,7 @@ ui.formBuild = function (scope, schema, fields) {
 						type: 'grid',
 						title: attrs.title || field.title || field.autoTitle,
 						items: attrs.items,
+						fields: attrs.fields,
 						canMove: attrs.canMove,
 						orderBy: attrs.orderBy,
 						editable: attrs.editable,
