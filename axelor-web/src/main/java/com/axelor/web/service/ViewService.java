@@ -17,10 +17,13 @@
  */
 package com.axelor.web.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -53,6 +56,7 @@ import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.Notebook;
 import com.axelor.meta.schema.views.Panel;
+import com.axelor.meta.schema.views.PanelField;
 import com.axelor.meta.schema.views.PanelRelated;
 import com.axelor.meta.schema.views.PanelTabs;
 import com.axelor.meta.schema.views.Search;
@@ -162,7 +166,7 @@ public class ViewService extends AbstractService {
 		return service.findViews(findClass(model), views);
 	}
 
-	private List<String> findNames(final List<String> names, final AbstractWidget widget) {
+	private Set<String> findNames(final Set<String> names, final AbstractWidget widget) {
 		List<? extends AbstractWidget> all = null;
 		if (widget instanceof Notebook) {
 			all = ((Notebook) widget).getPages();
@@ -176,6 +180,12 @@ public class ViewService extends AbstractService {
 			names.addAll(findNames(((FormInclude) widget).getView()));
 		} else if (widget instanceof Field) {
 			names.add(((Field) widget).getName());
+			if (widget instanceof PanelField) {
+				PanelField field = (PanelField) widget;
+				if (field.getEditor() != null && field.getTarget() == null) {
+					all = field.getEditor().getItems();
+				}
+			}
 		} else if (widget instanceof PanelRelated) {
 			names.add(((PanelRelated) widget).getName());
 		}
@@ -189,7 +199,7 @@ public class ViewService extends AbstractService {
 	}
 
 	public List<String> findNames(final AbstractView view) {
-		List<String> names = Lists.newArrayList();
+		Set<String> names = new HashSet<>();
 		List<AbstractWidget> items = null;
 		if (view instanceof FormView) {
 			items = ((FormView) view).getItems();
@@ -205,12 +215,12 @@ public class ViewService extends AbstractService {
 			items = ((SearchFilters) view).getItems();
 		}
 		if (items == null || items.isEmpty()) {
-			return names;
+			return new ArrayList<>(names);
 		}
 		for (AbstractWidget widget : items) {
 			findNames(names, widget);
 		}
-		return names;
+		return new ArrayList<>(names);
 	}
 
 	@GET
