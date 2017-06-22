@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* jquery-ui fix */
+
 .ui-dialog {
 	padding: 0;
 	border: 0;
@@ -127,9 +127,13 @@
 
 .ui-dialog .ui-dialog-content {
 	padding: 4px;
-	min-height: 250px !important;
+	min-height: 50px;
 	max-height: calc(100% - 45px - 60px) !important;
 	height: inherit !important;
+}
+
+.ui-dialog .ui-dialog-content[ui-editor-popup] {
+	min-height: 200px !important;
 }
 
 .ui-dialog .ui-dialog-content[ui-selector-popup] {
