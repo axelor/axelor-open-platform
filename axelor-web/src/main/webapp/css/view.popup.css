@@ -127,7 +127,7 @@
 
 .ui-dialog .ui-dialog-content {
 	padding: 4px;
-	min-height: 250px;
+	min-height: 250px !important;
 	max-height: calc(100% - 45px - 60px) !important;
 	height: inherit !important;
 }

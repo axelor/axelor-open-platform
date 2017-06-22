@@ -89,12 +89,10 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	var isEditable = $scope.isEditable;
 	$scope.isEditable = function () {
 		var id = ($scope.record || {}).id;
-		if (!id || id < 0) {
-			return $scope.hasPermission('create');
-		}
-		return $scope.hasPermission('write') &&
-			$scope.canEditTarget() &&
-			isEditable.call($scope);
+		var perm = id > 0 ? 'write' : 'create';
+		return $scope.hasPermission(perm)
+			&& $scope.canEditTarget()
+			&& isEditable.call($scope);
 	};
 	
 	var canEdit = $scope.canEdit;
@@ -177,7 +175,9 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 	$scope.onBeforeClose = function(event, ui) {
 
 		if (canClose || !$scope.isDirty()) {
-			$scope.record = null;
+			$scope.$evalAsync(function () {
+				$scope.edit(null, false);
+			});
 			return true;
 		}
 		
@@ -301,6 +301,7 @@ ui.directive('uiDialogSize', function() {
 
 			// remove maximized state on close
 			element.on('dialogclose', function(e, ui) {
+				elemTitle.parent().find('i.fa-compress').toggleClass('fa-expand fa-compress');
 				elemDialog.removeClass('maximized');
 			});
 		});
@@ -317,12 +318,15 @@ ui.directive('uiDialogSize', function() {
 			//XXX: ui-dialog issue
 			element.find('.slick-headerrow-column,.slickgrid,[ui-embedded-editor]').zIndex(element.zIndex());
 			element.find('.record-toolbar .btn').zIndex(element.zIndex()+1);
+
+			setTimeout(function () {
+				element.dialog('open');
+			});
 		}
 
 		// a flag used by evalScope to detect popup (see form.base.js)
 		scope._isPopup = true;
 		scope._doShow = function(viewPromise) {
-			element.dialog('open');
 			viewPromise.then(doShow);
 		};
 
