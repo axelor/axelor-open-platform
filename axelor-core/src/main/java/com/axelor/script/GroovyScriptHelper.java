@@ -30,8 +30,9 @@ import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
 import com.axelor.rpc.Context;
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyClassLoader;
@@ -49,7 +50,7 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 	private static int cacheExpireTime;
 
 	private static final GroovyClassLoader GCL;
-	private static final Cache<String, Class<?>> SCRIPT_CACHE;
+	private static final LoadingCache<String, Class<?>> SCRIPT_CACHE;
 
 	public static class Helpers {
 
@@ -93,12 +94,22 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 			cacheExpireTime = DEFAULT_CACHE_EXPIRE_TIME;
 		}
 
+		GCL = new GroovyClassLoader(JpaScanner.getClassLoader(), config);
+
 		SCRIPT_CACHE = CacheBuilder.newBuilder()
 				.maximumSize(cacheSize)
 				.expireAfterAccess(cacheExpireTime, TimeUnit.MINUTES)
-				.build();
+				.build(new CacheLoader<String, Class<?>>() {
 
-		GCL = new GroovyClassLoader(JpaScanner.getClassLoader(), config);
+					@Override
+					public Class<?> load(String code) throws Exception {
+						try {
+							return GCL.parseClass(code);
+						} finally {
+							GCL.clearCache();
+						}
+					}
+				});
 	}
 
 	public GroovyScriptHelper(Bindings bindings) {
@@ -109,27 +120,9 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 		this(new ScriptBindings(context));
 	}
 
-	private Class<?> parseClass(String code) {
-
-		Class<?> klass = SCRIPT_CACHE.getIfPresent(code);
-		if (klass != null) {
-			return klass;
-		}
-
-		try {
-			klass = GCL.parseClass(code);
-		} finally {
-			GCL.clearCache();
-		}
-
-		SCRIPT_CACHE.put(code, klass);
-
-		return klass;
-	}
-
 	@Override
 	public Object eval(String expr, Bindings bindings) throws Exception {
-		Class<?> klass = parseClass(expr);
+		Class<?> klass = SCRIPT_CACHE.get(expr);
 		Script script = (Script) klass.newInstance();
 		script.setBinding(new Binding(bindings) {
 
