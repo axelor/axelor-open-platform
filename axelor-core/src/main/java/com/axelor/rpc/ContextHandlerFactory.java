@@ -54,7 +54,6 @@ public final class ContextHandlerFactory {
 
 	private static final LoadingCache<Class<?>, Class<?>> PROXY_CACHE = CacheBuilder.newBuilder()
 			.weakKeys()
-			.weakValues()
 			.maximumSize(500)
 			.build(new CacheLoader<Class<?>, Class<?>>() {
 				public Class<?> load(Class<?> key) throws Exception {
