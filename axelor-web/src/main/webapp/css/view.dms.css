@@ -389,7 +389,7 @@
 }
 
 .ui-dialog .ui-dialog-content.dms-popup {
-	max-height: calc(100% - 45px - 52px) !important;
+	height: 450px !important;
 }
 .ui-dialog.maximized .ui-dialog-content.dms-popup {
 	height: 100% !important;

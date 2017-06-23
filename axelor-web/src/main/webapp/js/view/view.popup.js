@@ -327,7 +327,11 @@ ui.directive('uiDialogSize', function() {
 		// a flag used by evalScope to detect popup (see form.base.js)
 		scope._isPopup = true;
 		scope._doShow = function(viewPromise) {
-			viewPromise.then(doShow);
+			if (viewPromise && viewPromise.then) {
+				viewPromise.then(doShow);
+			} else {
+				doShow();
+			}
 		};
 
 		scope._setTitle = function (title) {

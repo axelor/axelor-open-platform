@@ -1504,27 +1504,9 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 				});
 			};
 			
-			function adjustSize() {
-				var height = $(window).height() - 16;
-				height = Math.min(480, height);
-				element.dialog('option', 'height', height);
-			}
-
-			setTimeout(function () {
-				var elemDialog = element.parent();
-				var elemTitle = elemDialog.find('.ui-dialog-title');
-				$('<a href="#" class="ui-dialog-titlebar-max"><i class="fa fa-expand"></i></a>').click(function (e) {
-					$(this).children('i').toggleClass('fa-expand fa-compress');
-					elemDialog.toggleClass('maximized');
-					axelor.$adjustSize();
-					return false;
-				}).insertAfter(elemTitle);
-
-				elemTitle.html(_t('Attachments'));
-				adjustSize();
+			scope.$evalAsync(function () {
+				scope._setTitle(_t('Attachments'));
 			});
-			
-			element.on("adjustSize", _.debounce(adjustSize));
 
 			scope.onHotKey = function (e, action) {
 				var elem = element.find(".grid-view:first");
@@ -1555,12 +1537,10 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 					var content = "<div ng-include='\"partials/views/dms-file-list.html\"'></div>";
 					content = $compile(content)(scope);
 					content.appendTo(element);
+					scope._doShow();
 					setTimeout(function () {
-						element.dialog("open");
-						setTimeout(function () {
-							//XXX: ui-dialog issue
-							element.find('.filter-box').zIndex(element.zIndex() + 1);
-						});
+						//XXX: ui-dialog issue
+						element.find('.filter-box').zIndex(element.zIndex() + 1);
 					});
 				}
 
@@ -1576,7 +1556,7 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 
 		},
 		replace: true,
-		template: "<div ui-dialog x-buttons='buttons' x-on-ok='false' x-on-close='onClose' class='dms-popup' title='Attachments'></div>"
+		template: "<div ui-dialog ui-dialog-size x-buttons='buttons' x-on-ok='false' x-on-close='onClose' class='dms-popup' title='Attachments'></div>"
 	};
 }]);
 
