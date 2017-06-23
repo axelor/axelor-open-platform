@@ -444,6 +444,11 @@
 	text-align: center;
 }
 
+.slickgrid-empty-message .grid-canvas {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
 .slickgrid-overlay {
 	position: absolute;
 	top: 0;
