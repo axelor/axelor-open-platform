@@ -100,7 +100,7 @@ public class Context extends SimpleBindings {
 
 	private final Class<?> beanClass;
 
-	private ContextProxy<?> proxy;
+	private ContextHandler<?> handler;
 	
 	private Context parent;
 	
@@ -133,7 +133,7 @@ public class Context extends SimpleBindings {
 	}
 	
 	public void addChangeListener(PropertyChangeListener listener) {
-		getContextProxy().addChangeListener(listener);
+		getContextHandler().addChangeListener(listener);
 	}
 	
 	private Map<String, Object> jsonFields() {
@@ -145,15 +145,15 @@ public class Context extends SimpleBindings {
 		return jsonFields;
 	}
 
-	private ContextProxy<?> getContextProxy() {
-		if (proxy == null) {
-			proxy = ContextProxy.of(beanClass, values);
+	private ContextHandler<?> getContextHandler() {
+		if (handler == null) {
+			handler = ContextHandlerFactory.newHandler(beanClass, values);
 		}
-		return proxy;
+		return handler;
 	}
 
 	private Object getProxy() {
-		return getContextProxy().get();
+		return getContextHandler().getProxy();
 	}
 
 	/**

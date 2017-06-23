@@ -157,8 +157,6 @@ public class TestJsonContext extends JpaTest {
 		Assert.assertTrue(engine.eval("$attrs") instanceof JsonContext);
 
 		Assert.assertTrue(engine.eval("$attrs.customer") instanceof Contact);
-		System.err.println(engine.eval("$attrs.customer"));
-		
 		Assert.assertTrue(engine.eval("$attrs.customer.fullName") instanceof String);
 
 		Assert.assertEquals("Some NAME", engine.eval("$attrs.name = 'Some NAME'"));

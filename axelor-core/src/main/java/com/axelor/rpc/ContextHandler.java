@@ -36,20 +36,13 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaJsonRecord;
 
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.dynamic.DynamicType.Builder;
-import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
-import net.bytebuddy.implementation.InvocationHandlerAdapter;
-import net.bytebuddy.implementation.MethodCall;
-import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
-import net.bytebuddy.matcher.ElementMatchers;
 
 /**
- * This {@link ContextProxy} provides seamless way to access context values
+ * The {@link ContextHandler} provides seamless way to access context values
  * using proxy.
  * 
  * <p>
@@ -62,14 +55,12 @@ import net.bytebuddy.matcher.ElementMatchers;
  * 
  * @see Context
  */
-public class ContextProxy<T> {
+public class ContextHandler<T> {
 
 	private static final String FIELD_ID = "id";
 	private static final String FIELD_VERSION = "version";
 	private static final String FIELD_SELECTED = "selected";
-	
-	private static final String COMPUTE_PREFIX = "compute";
-	
+
 	private final PropertyChangeSupport changeListeners;
 
 	private final Map<String, Object> values;
@@ -78,21 +69,22 @@ public class ContextProxy<T> {
 	private final Class<T> beanClass;
 	private final Mapper beanMapper;
 
-	private Object managed;
-	private Object unmanaged;
-	
-	private T proxied;
+	private T managedEntity;
+	private T unmanagedEntity;
+	private T proxy;
+
+	private JsonContext jsonContext;
 
 	private boolean searched;
-
-	private ContextProxy(Class<T> beanClass, Map<String, Object> values) {
+	
+	ContextHandler(Class<T> beanClass, Map<String, Object> values) {
 		this.values = Objects.requireNonNull(values);
 		this.validated = new HashSet<>();
 		this.beanClass = Objects.requireNonNull(beanClass);
 		this.beanMapper = Mapper.of(beanClass);
 		this.changeListeners = new PropertyChangeSupport(this);
 	}
-	
+
 	public void addChangeListener(PropertyChangeListener listener) {
 		changeListeners.addPropertyChangeListener(listener);
 	}
@@ -105,49 +97,48 @@ public class ContextProxy<T> {
 		}
 	}
 
-	private Object managed() {
+	private T getManagedEntity() {
 		if (searched) {
-			return managed;
+			return managedEntity;
 		}
 		final Long id = findId(values);
 		if (id != null) {
-			managed = (Model) JPA.em().find(beanClass, id);
+			managedEntity = JPA.em().find(beanClass, id);
 		}
 		searched = true;
-		return managed;
+		return managedEntity;
 	}
 
-	private Object unmanaged() {
-		if (unmanaged == null) {
-			unmanaged = Mapper.toBean(beanClass, null);
+	private T getUnmanagedEntity() {
+		if (unmanagedEntity == null) {
+			unmanagedEntity = Mapper.toBean(beanClass, null);
 		}
-		return unmanaged;
+		return unmanagedEntity;
 	}
 
-	private Object populated() {
-		final Object bean = unmanaged();
-		final Object managed = managed();
+	public T getProxy() {
+		return proxy;
+	}
 
-		// populate the bean
-		for (Property property : beanMapper.getProperties()) {
-			this.validate(property);
-			if (property.isVirtual() && managed != null) {
-				final Set<String> depends = beanMapper.getComputeDependencies(property);
-				if (depends != null && !depends.isEmpty()) {
-					depends.stream()
-						.filter(n -> !validated.contains(n))
-						.forEach(n -> beanMapper.set(bean, n, beanMapper.get(managed, n)));
-				}
-			}
-		}
+	void setProxy(T proxy) {
+		this.proxy = proxy;
+	}
 
-		// make sure to have version value
-		if (bean instanceof Model && !values.containsKey(FIELD_VERSION)) {
-			if (managed != null) {
-				((Model) bean).setVersion(((Model) managed).getVersion());
-			}
+	private JsonContext getJsonContext() {
+		if (jsonContext == null) {
+			jsonContext = createJsonContext();
 		}
-		return bean;
+		return jsonContext;
+	}
+
+	private JsonContext createJsonContext() {
+		if (MetaJsonRecord.class.isAssignableFrom(beanClass)) {
+			final MetaJsonRecord rec = (MetaJsonRecord) proxy;
+			return new JsonContext(rec);
+		}
+		final Property p = beanMapper.getProperty(Context.KEY_JSON_ATTRS);
+		final Context c = new Context(beanClass);
+		return new JsonContext(c, p, (String) p.get(proxy));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -160,7 +151,7 @@ public class ContextProxy<T> {
 			final Long id = findId(map);
 			// if new or updated, create proxy
 			if (id == null || id <= 0 || map.containsKey(FIELD_VERSION)) {
-				return of(property.getTarget(), map).get();
+				return ContextHandlerFactory.newHandler(property.getTarget(), map).getProxy();
 			}
 			// use managed instance
 			final Object bean = JPA.em().find(property.getTarget(), id);
@@ -174,7 +165,7 @@ public class ContextProxy<T> {
 		}
 		throw new IllegalArgumentException("Invalid collection item for field: " + property.getName());
 	}
-
+	
 	private void validate(Property property) {
 		if (property == null
 				|| validated.contains(property.getName())
@@ -190,7 +181,7 @@ public class ContextProxy<T> {
 			value = createOrFind(property, value);
 		}
 
-		final Object bean = unmanaged();
+		final Object bean = getUnmanagedEntity();
 
 		Mapper mapper = beanMapper;
 		if (mapper.getSetter(property.getName()) == null && bean instanceof AuditableModel) {
@@ -203,8 +194,8 @@ public class ContextProxy<T> {
 
 		validated.add(property.getName());
 	}
-	
-	private Object interceptCompute(Callable<?> superCall, Method method, Object[] args) throws Exception {
+
+	private Object interceptComputeAccess(Callable<?> superCall, Method method, Object[] args) throws Exception {
 		final Property computed = beanMapper.getProperty(method);
 		final Set<String> depends;
 		if (computed == null || (depends = beanMapper.getComputeDependencies(computed)) == null || depends.isEmpty()) {
@@ -219,20 +210,44 @@ public class ContextProxy<T> {
 			if (values.containsKey(name)) {
 				validate(property);
 			} else {
-				beanMapper.set(unmanaged(), name, property.get(managed()));
+				beanMapper.set(getUnmanagedEntity(), name, property.get(getManagedEntity()));
 			}
 		}
 
 		method.setAccessible(true);
-		return method.invoke(unmanaged(), args);
+		return method.invoke(getUnmanagedEntity(), args);
 	}
 
+	public Object interceptJsonAccess(Method method, Object[] args) throws Exception {
+		switch (method.getName()) {
+		case "get":
+		case "put":
+			final String name = (String) args[0];
+			final Method found = args.length == 2
+					? beanMapper.getSetter(name)
+					: beanMapper.getGetter(name);
+			if (found == null) {
+				return method.invoke(getJsonContext(), args);
+			}
+			final Object[] params = args.length == 2
+					? new Object[]{ args[1] }
+					: new Object[]{};
+			return found.invoke(proxy, params);
+		}
+		throw new UnsupportedOperationException("cannot call '" + method + "' on proxy object");
+	}
+	
 	@RuntimeType
 	public Object intercept(@SuperCall Callable<?> superCall, @Origin Method method, @AllArguments Object[] args) throws Throwable {
 
+		// if map access (for json values)
+		if (superCall == null && method.getDeclaringClass() == Map.class) {
+			return interceptJsonAccess(method, args);
+		}
+
 		// handle compute method calls
 		if (Modifier.isProtected(method.getModifiers())) {
-			return interceptCompute(superCall, method, args);
+			return interceptComputeAccess(superCall, method, args);
 		}
 
 		final Property property = beanMapper.getProperty(method);
@@ -252,7 +267,7 @@ public class ContextProxy<T> {
 		if (args.length == 1 || values.containsKey(fieldName) || property.isTransient()) {
 			validate(property);
 			try {
-				return method.invoke(this.unmanaged(), args);
+				return method.invoke(getUnmanagedEntity(), args);
 			} finally {
 				if (args.length == 1 && changeListeners.hasListeners(fieldName)) {
 					changeListeners.firePropertyChange(fieldName, oldValue, values.get(fieldName));
@@ -260,7 +275,7 @@ public class ContextProxy<T> {
 			}
 		}
 		// else get value from managed instance
-		final Object managed = this.managed();
+		final Object managed = getManagedEntity();
 		if (managed == null) {
 			return null;
 		}
@@ -268,85 +283,29 @@ public class ContextProxy<T> {
 		return method.invoke(managed, args);
 	}
 
-	public T get() {
-		return proxied;
-	}
+	@RuntimeType
+	public Object getContextEntity() {
+		final Object bean = getUnmanagedEntity();
+		final Object managed = getManagedEntity();
 
-	private boolean hasJsonFields() {
-		final Property attrs = beanMapper.getProperty(Context.KEY_JSON_ATTRS);
-		return attrs != null && attrs.isJson();
-	}
-
-	private JsonContext createJsonContext() {
-		if (MetaJsonRecord.class.isAssignableFrom(beanClass)) {
-			final MetaJsonRecord rec = (MetaJsonRecord) proxied;
-			return new JsonContext(rec);
-		}
-		final Property p = beanMapper.getProperty(Context.KEY_JSON_ATTRS);
-		final Context c = new Context(beanClass);
-		return new JsonContext(c, p, (String) p.get(proxied));
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <T> ContextProxy<T> of(final Class<T> beanClass, final Map<String, Object> values) {
-		Objects.requireNonNull(values, "values map cannot be null");
-		final ContextProxy<T> proxy = new ContextProxy<>(beanClass, values);
-		
-		Builder<T> builder = new ByteBuddy()
-				.subclass(beanClass)
-				.method(ElementMatchers.isPublic().and(ElementMatchers.isGetter().or(ElementMatchers.isSetter())))
-				.intercept(MethodDelegation.to(proxy))
-				.method(ElementMatchers.isProtected().and(ElementMatchers.nameStartsWith(COMPUTE_PREFIX)))
-				.intercept(MethodDelegation.to(proxy))
-				.implement(ContextEntity.class)
-				.method(ElementMatchers.isDeclaredBy(ContextEntity.class))
-				.intercept(MethodCall.call(proxy::populated));
-
-		// allow to seamlessly handle json field values from scripts
-		if (proxy.hasJsonFields()) {
-			final Callable<JsonContext> context = new Callable<JsonContext>() {
-				JsonContext ctx;
-				@Override
-				public JsonContext call() throws Exception {
-					if (ctx == null) {
-						ctx = proxy.createJsonContext();
-					}
-					return ctx;
+		// populate the bean
+		for (Property property : beanMapper.getProperties()) {
+			this.validate(property);
+			if (managed != null && property.isVirtual()) {
+				final Set<String> depends = beanMapper.getComputeDependencies(property);
+				if (depends != null) {
+					depends.stream()
+						.filter(n -> !validated.contains(n))
+						.forEach(n -> beanMapper.set(bean, n, beanMapper.get(managed, n)));
 				}
-			};
-			builder = builder
-					.implement(Map.class)
-					.method(ElementMatchers.isDeclaredBy(Map.class))
-					.intercept(InvocationHandlerAdapter.of((p, method, args) -> {
-						switch (method.getName()) {
-						case "get":
-						case "put":
-							final String name = (String) args[0];
-							final Method found = args.length == 2
-									? proxy.beanMapper.getSetter(name)
-									: proxy.beanMapper.getGetter(name);
-							if (found == null) {
-								return method.invoke(context.call(), args);
-							}
-							final Object[] params = args.length == 2
-									? new Object[]{ args[1] }
-									: new Object[]{};
-							return found.invoke(proxy.proxied, params);
-						}
-						throw new UnsupportedOperationException("cannot call '" + method + "' on proxy object");
-					}));
+			}
 		}
 
-		final Class<?> proxyClass = builder.make()
-			.load(beanClass.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
-			.getLoaded();
-
-		try {
-			proxy.proxied = (T) proxyClass.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
-			throw new RuntimeException(e);
+		// make sure to have version value
+		if (managed != null && bean instanceof Model && !values.containsKey(FIELD_VERSION)) {
+			((Model) bean).setVersion(((Model) managed).getVersion());
 		}
 
-		return proxy;
+		return bean;
 	}
 }

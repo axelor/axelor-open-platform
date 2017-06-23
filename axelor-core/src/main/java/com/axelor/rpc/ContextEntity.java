@@ -18,7 +18,7 @@
 package com.axelor.rpc;
 
 /**
- * This interface is used by {@link ContextProxy} to return real context entity.
+ * This interface is used by {@link ContextHandler} to return real context entity.
  * 
  */
 public interface ContextEntity {
