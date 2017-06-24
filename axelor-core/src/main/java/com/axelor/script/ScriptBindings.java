@@ -31,6 +31,7 @@ import javax.script.SimpleBindings;
 
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
@@ -68,16 +69,18 @@ public class ScriptBindings extends SimpleBindings {
 	}
 	
 	private Map<String, Object> tryContext(Map<String, Object> variables) {
-		if (variables instanceof Context) {
+		if (variables == null || variables.isEmpty() || variables instanceof Context) {
 			return variables;
 		}
-		Class<?> klass = null;
 		try {
-			klass = Class.forName((String) variables.get(MODEL_KEY));
-		} catch (NullPointerException | ClassNotFoundException e) {
+			final String klassName = (String) variables.get(MODEL_KEY);
+			if (StringUtils.isBlank(klassName)) {
+				return variables;
+			}
+			return new Context(variables, Class.forName((String) variables.get(MODEL_KEY)));
+		} catch (ClassNotFoundException e) {
 			return variables;
 		}
-		return new Context(variables, klass);
 	}
 
 	@SuppressWarnings("all")
