@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.common.reflections.ClassFinder;
 import com.axelor.meta.MetaScanner;
+import com.axelor.rpc.ContextHandlerFactory;
 
 /**
  * A custom Hibernate scanner that scans all the classpath entries for all the
@@ -136,6 +137,10 @@ public class JpaScanner extends AbstractScannerImpl {
 					log.trace("Found entity: {}", klass.getName());
 					register(klass);
 				}
+
+				// pre-initialize context handler proxies
+				ContextHandlerFactory.refresh(modelCache.values());
+
 				log.debug("Entitity classes found: {}", modelCache.size());
 			});
 			final Future<?> repos = executor.submit(() -> {

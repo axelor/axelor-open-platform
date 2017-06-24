@@ -28,7 +28,11 @@ import static net.bytebuddy.matcher.ElementMatchers.isPublic;
 import static net.bytebuddy.matcher.ElementMatchers.isSetter;
 import static net.bytebuddy.matcher.ElementMatchers.nameStartsWith;
 
+import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.Map;
+
+import javax.persistence.Entity;
 
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -41,7 +45,7 @@ import net.bytebuddy.dynamic.DynamicType.Builder;
 import net.bytebuddy.implementation.InvocationHandlerAdapter;
 
 /**
- * Factory to create {@link ContextHandler}
+ * Factory to create {@link ContextHandler}.
  *
  */
 public final class ContextHandlerFactory {
@@ -62,6 +66,23 @@ public final class ContextHandlerFactory {
 			});
 
 	private ContextHandlerFactory() {
+	}
+	
+	private static boolean isEntity(Class<?> beanClass) {
+		return !Modifier.isAbstract(beanClass.getModifiers()) && beanClass.getAnnotation(Entity.class) != null;
+	}
+
+	/**
+	 * Asynchronously refresh proxy cache.
+	 * 
+	 * @param models
+	 *            the entity classes for which proxy classes are required
+	 */
+	public static void refresh(Collection<Class<?>> models) {
+		PROXY_CACHE.invalidateAll();
+		models.parallelStream()
+			.filter(ContextHandlerFactory::isEntity)
+			.forEach(PROXY_CACHE::refresh);
 	}
 
 	private static boolean hasJsonFields(Class<?> beanClass) {
