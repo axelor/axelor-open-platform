@@ -305,6 +305,16 @@ ui.directive('uiDialogSize', function() {
 				elemDialog.removeClass('maximized');
 			});
 		});
+		
+		function setFocus() {
+			var focusElem = element.find('input:tabbable');
+			if (focusElem.size() == 0) {
+				focusElem = element.parent().find('.ui-dialog-buttonset').find(':tabbable');
+			}
+			if (focusElem[0]) {
+				focusElem[0].focus();
+			}
+		}
 
 		function doShow() {
 
@@ -316,9 +326,10 @@ ui.directive('uiDialogSize', function() {
 
 			setTimeout(function () {
 				element.dialog('open');
+				element.scrollTop(0);
 				// focus first element
 				if (!axelor.device.mobile) {
-					element.find('.slick-headerrow-column input[type="text"]:first,.form-item-container > input[type="text"]:first').focus();
+					setTimeout(setFocus);
 				}
 			});
 		}
