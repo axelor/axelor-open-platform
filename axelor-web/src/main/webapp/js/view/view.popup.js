@@ -310,17 +310,16 @@ ui.directive('uiDialogSize', function() {
 
 			addMaximizeButton();
 
-			// focus first element
-			if (!axelor.device.mobile) {
-				element.find(':input:first').focus();
-			}
-
 			//XXX: ui-dialog issue
 			element.find('.slick-headerrow-column,.slickgrid,[ui-embedded-editor]').zIndex(element.zIndex());
 			element.find('.record-toolbar .btn').zIndex(element.zIndex()+1);
 
 			setTimeout(function () {
 				element.dialog('open');
+				// focus first element
+				if (!axelor.device.mobile) {
+					element.find('.slick-headerrow-column input[type="text"]:first,.form-item-container > input[type="text"]:first').focus();
+				}
 			});
 		}
 
