@@ -469,6 +469,16 @@ header .navbar .nav-link-user-sub {
 	top: 0px; left: 0px; right: 0px; bottom: 0px;
 }
 
+.ui-dialog-content .view-pane {
+	position: inherit;
+}
+
+.ui-dialog-content .view-pane > .view-container,
+.ui-dialog-content .view-pane > .view-container > div:not(.slick-editor-dropdown),
+.ui-dialog-content .view-pane > .view-container .form-view > div:last-child {
+	position: inherit;
+}
+
 .view-pane > .view-container.has-toolbar {
 	top: -6px;
 }
