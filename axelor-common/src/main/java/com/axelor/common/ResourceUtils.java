@@ -17,37 +17,45 @@
  */
 package com.axelor.common;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
 /**
- * The class provides static helper methods to work with resources. It uses
- * current thread's context {@link ClassLoader} to locate resources.
+ * The class provides static helper methods to work with resources.
  * 
  */
 public final class ResourceUtils {
 
 	/**
-	 * Finds the resource with the given name.
+	 * Finds the resource from the class path with the given location using
+	 * default ClassLoader.
 	 * 
-	 * @param name
-	 *            The resource name
-	 * @return resource an {@link URL} for reading the resource or null
+	 * @param location
+	 *            The resource location
+	 * @return an {@link URL} for reading the resource or null
+	 * @see ClassUtils#getDefaultClassLoader()
 	 * @see ClassLoader#getResource(String)
 	 */
-	public static URL getResource(String name) {
-		return Thread.currentThread().getContextClassLoader().getResource(name);
+	public static URL getResource(String location) {
+		return ClassUtils.getResource(location);
 	}
 
 	/**
 	 * Returns an input stream for reading the specified resource.
 	 * 
-	 * @param name
-	 *            The resource name
+	 * @param location
+	 *            The resource location
 	 * @return An input stream for reading the resource or null
+	 * @see ResourceUtils#getResource(String)
 	 * @see ClassLoader#getResourceAsStream(String)
 	 */
-	public static InputStream getResourceStream(String name) {
-		return Thread.currentThread().getContextClassLoader().getResourceAsStream(name);
+	public static InputStream getResourceStream(String location) {
+		final URL url = getResource(location);
+		try {
+			return url != null ? url.openStream() : null;
+		} catch (IOException e) {
+			return null;
+		}
 	}
 }
