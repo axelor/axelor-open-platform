@@ -17,7 +17,6 @@
  */
 package com.axelor.meta.loader;
 
-import java.net.URL;
 import java.util.List;
 
 import com.google.common.base.MoreObjects;
@@ -40,8 +39,6 @@ final class Module {
 	private boolean removable = false;
 
 	private boolean pending = false;
-
-	private transient URL path = null;
 
 	public Module(String name) {
 		this.name = name;
@@ -97,14 +94,6 @@ final class Module {
 
 	public boolean isUpgradable() {
 		return installed && !Objects.equal(version, installedVersion);
-	}
-	
-	public URL getPath() {
-		return path;
-	}
-
-	public void setPath(URL path) {
-		this.path = path;
 	}
 
 	public void dependsOn(Module module) {

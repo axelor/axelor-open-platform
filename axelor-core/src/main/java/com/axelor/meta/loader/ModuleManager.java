@@ -17,18 +17,14 @@
  */
 package com.axelor.meta.loader;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -194,20 +190,12 @@ public class ModuleManager {
 		return resolver.names();
 	}
 
-	public static List<Module> getAll() {
+	static List<Module> getAll() {
 		return resolver.all();
 	}
 
 	static Module getModule(String name) {
 		return resolver.get(name);
-	}
-
-	public static URL getModulePath(String module) {
-		try {
-			return resolver.get(module).getPath();
-		} catch (NullPointerException e) {
-			return null;
-		}
 	}
 
 	public void install(String moduleName, boolean update, boolean withDemo) {
@@ -245,7 +233,7 @@ public class ModuleManager {
 		resolver.get(module).setPending(false);
 	}
 
-	public void doCleanUp() {
+	private void doCleanUp() {
 		AbstractLoader.doCleanUp();
 	}
 
@@ -253,7 +241,7 @@ public class ModuleManager {
 	MetaModule findModule(String name) {
 		return modules.findByName(name);
 	}
-	
+
 	private void install(String moduleName, boolean update, boolean withDemo, boolean force) {
 
 		final Module module = resolver.get(moduleName);
@@ -347,35 +335,23 @@ public class ModuleManager {
 	 * candidates).
 	 *
 	 */
-	public static Map<String, URL> findInstalled() {
+	public static List<String> findInstalled() {
 		final Resolver resolver = new Resolver();
 		final Set<String> installed = getInstalledModules();
 		final List<String> found = new ArrayList<>();
 
-		for (URL file : MetaScanner.findAll("module\\.properties")) {
-			if (!file.getFile().endsWith("/module.properties")) {
-				continue;
-			}
-			Properties properties = new Properties();
-			try {
-				properties.load(file.openStream());
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-
-			String name = properties.getProperty("name");
-
+		for (final Properties properties : MetaScanner.findModuleProperties()) {
+			final String name = properties.getProperty("name");
 			if (SKIP.contains(name)) {
 				continue;
 			}
 
-			String[] depends = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
-			String[] installs = properties.getProperty("installs", "").trim().split("\\s*,\\s*");
-			boolean removable = "true".equals(properties.getProperty("removable"));
+			final String[] depends = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
+			final String[] installs = properties.getProperty("installs", "").trim().split("\\s*,\\s*");
+			final boolean removable = "true".equals(properties.getProperty("removable"));
 
-			Module module = resolver.add(name, depends);
+			final Module module = resolver.add(name, depends);
 			module.setRemovable(removable);
-			module.setPath(file);
 
 			// install forced modules on init
 			if (installed.isEmpty()) {
@@ -394,49 +370,32 @@ public class ModuleManager {
 			}
 		}
 
-		final Map<String, URL> result = new LinkedHashMap<>();
-		for (String name : found) {
-			result.put(name, resolver.get(name).getPath());
-		}
-
-		return result;
+		return found;
 	}
 
 	@Transactional
 	void resolve(boolean update) {
-
 		final Set<String> forceInstall = new HashSet<>();
 		final boolean forceInit = modules.all().count() == 0;
 
-		for (URL file : MetaScanner.findAll("module\\.properties")) {
-			if (!file.getFile().endsWith("/module.properties")) {
-				continue;
-			}
-			Properties properties = new Properties();
-			try {
-				properties.load(file.openStream());
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-
-			String name = properties.getProperty("name");
-
+		for (final Properties properties : MetaScanner.findModuleProperties()) {
+			final String name = properties.getProperty("name");
 			if (SKIP.contains(name)) {
 				continue;
 			}
 
-			String[] depends = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
-			String title = properties.getProperty("title");
-			String description = properties.getProperty("description");
-			String version = properties.getProperty("version");
-			boolean removable = "true".equals(properties.getProperty("removable"));
+			final String[] depends = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
+			final String title = properties.getProperty("title");
+			final String description = properties.getProperty("description");
+			final String version = properties.getProperty("version");
+			final boolean removable = "true".equals(properties.getProperty("removable"));
 
 			if (forceInit && forceInstall.isEmpty()) {
 				String[] installs = properties.getProperty("installs", "").trim().split("\\s*,\\s*");
 				forceInstall.addAll(Arrays.asList(installs));
 			}
 
-			Module module = resolver.add(name, depends);
+			final Module module = resolver.add(name, depends);
 			MetaModule stored = modules.findByName(name);
 			if (stored == null) {
 				stored = new MetaModule();
@@ -452,7 +411,6 @@ public class ModuleManager {
 				stored = modules.save(stored);
 			}
 
-			module.setPath(file);
 			module.setVersion(version);
 			module.setRemovable(removable);
 			module.setInstalled(stored.getInstalled() == Boolean.TRUE);

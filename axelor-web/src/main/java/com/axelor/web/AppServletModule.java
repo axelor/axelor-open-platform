@@ -143,7 +143,7 @@ public class AppServletModule extends ServletModule {
 
 		// bind all the web service resources
 		for (Class<?> type : MetaScanner
-				.findTypes()
+				.findSubTypesOf(Object.class)
 				.having(Path.class)
 				.having(Provider.class)
 				.any().find()) {

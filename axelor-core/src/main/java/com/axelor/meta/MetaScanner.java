@@ -17,152 +17,244 @@
  */
 package com.axelor.meta;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.Enumeration;
 import java.util.List;
-import java.util.Set;
+import java.util.Properties;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
+import org.eclipse.birt.core.framework.URLClassLoader;
+
+import com.axelor.common.ClassUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.common.reflections.ClassFinder;
 import com.axelor.common.reflections.Reflections;
-import com.axelor.meta.loader.ModuleManager;
 
 /**
- * This class provides some utility methods to scan classpath for
+ * This class provides some utility methods to scan class path for
  * resources/classes.
  *
  */
-public class MetaScanner {
+public final class MetaScanner {
+
+	private static final String MODULE_PROPERTIES = "module.properties";
 	
+	private static final String BUILD_CLASSES = "build/classes/main";
+	private static final String BUILD_RESOURCES = "build/resources/main";
+
 	private MetaScanner() {
-		
+	}
+
+	/**
+	 * Find module properties files within the class path.
+	 * 
+	 * @return list of properties file urls
+	 */
+	private static List<URL> findModuleFiles() {
+		final List<URL> paths = new ArrayList<>();
+		final ClassLoader loader = ClassUtils.getDefaultClassLoader();
+		try {
+			Enumeration<URL> found = loader.getResources(MODULE_PROPERTIES);
+			while (found.hasMoreElements()) {
+				paths.add(found.nextElement());
+			}
+		} catch (IOException e) {
+		}
+		return paths;
+	}
+
+	/**
+	 * Find the properties from the given module properties file.
+	 * 
+	 * @param file
+	 *            the properties file url
+	 * @return module properties
+	 */
+	private static Properties findProperties(URL file) {
+		final Properties properties = new Properties();
+		try (InputStream stream = file.openStream()) {
+			properties.load(stream);
+		} catch (IOException e) {
+		}
+		return properties;
+	}
+
+	/**
+	 * Find class path for the given module represented by the module file.
+	 *
+	 * <p>
+	 * If the module file found in a jar, it will return jar url only. If the
+	 * module file found in a gradle build directory and a resource build
+	 * directory exits, it will return list of classes and resources build dir
+	 * urls. Otherwise, the directory url only.
+	 * </p>
+	 *
+	 * @param moduleFile
+	 *            the module properties file
+	 * @return list of class path urls for the module
+	 */
+	private static List<URL> findClassPath(URL moduleFile) {
+		final List<URL> paths = new ArrayList<>();
+		String file = moduleFile.getFile();
+		file = file.substring(0, file.lastIndexOf(MODULE_PROPERTIES) - 1);
+		file = file.startsWith("file:") ? file.substring(5, file.length() - 1) : file;
+		if (file.endsWith(".jar")) {
+			try {
+				paths.add(new File(file).toURI().toURL());
+			} catch (MalformedURLException e) {
+				// this should never happen
+			}
+			return paths;
+		}
+		final Path dir = Paths.get(file);
+		final Path next;
+		if (dir.endsWith(Paths.get(BUILD_CLASSES))) {
+			next = dir.resolve("../../..").resolve(BUILD_RESOURCES).normalize();
+		} else if (dir.endsWith(Paths.get(BUILD_RESOURCES))) {
+			next = dir.resolve("../../..").resolve(BUILD_CLASSES).normalize();
+		} else {
+			next = null;
+		}
+		try {
+			paths.add(dir.toUri().toURL());
+			if (next != null && Files.exists(next)) {
+				paths.add(next.toUri().toURL());
+			}
+		} catch (MalformedURLException e) {
+			// this should never happen
+		}
+		return paths;
+	}
+
+	/**
+	 * Find class path entries of modules excluding library paths.
+	 *
+	 * @return list of class path entry urls of the modules.
+	 */
+	private static List<URL> findClassPath() {
+		return findModuleFiles()
+			.stream()
+			.flatMap(file -> findClassPath(file).stream())
+			.collect(Collectors.toList());
+	}
+
+	/**
+	 * Run scanner task within module only class path. This will greatly speed
+	 * up scanning process.
+	 * 
+	 * @param task
+	 *            the scanning task
+	 * @return scan result
+	 */
+	private static <T> T findWithinModules(Supplier<T> task) {
+		final List<URL> urls = findClassPath();
+		return findWithinModules(urls.toArray(new URL[] {}), task);
+	}
+
+	/**
+	 * Run scanner task within the given module's class path.
+	 *
+	 * @param module
+	 *            the module to scan
+	 * @param task
+	 *            the scanning task
+	 * @return scan result
+	 */
+	private static <T> T findWithin(String module, Supplier<T> task) {
+		final List<URL> urls = new ArrayList<>();
+		for (URL file : findModuleFiles()) {
+			Properties info = findProperties(file);
+			if (module.equals(info.getProperty("name"))) {
+				urls.addAll(findClassPath(file));
+				break;
+			}
+		}
+		return findWithinModules(urls.toArray(new URL[]{}), task);
+	}
+
+	private static <T> T findWithinModules(URL[] paths, Supplier<T> task) {
+		final ClassLoader context = ClassUtils.getContextClassLoader();
+		final ClassLoader wrapper = new URLClassLoader(paths, null) {
+
+			@Override
+			public Class<?> loadClass(String name) throws ClassNotFoundException {
+				return context.loadClass(name);
+			}
+		};
+		try {
+			ClassUtils.setContextClassLoader(wrapper);
+			return task.get();
+		} finally {
+			ClassUtils.setContextClassLoader(context);
+		}
+	}
+
+	/**
+	 * Find module properties within the class paths.
+	 *
+	 * @return list of module properties
+	 */
+	public static List<Properties> findModuleProperties() {
+		return findModuleFiles().stream()
+				.map(file -> findProperties(file))
+				.filter(p -> StringUtils.notBlank(p.getProperty("name")))
+				.collect(Collectors.toList());
 	}
 
 	/**
 	 * Find all resources matched by the given pattern.
-	 * 
+	 *
 	 * @param pattern
 	 *            the resource name pattern to match
 	 * @return list of resources matched
 	 */
 	public static List<URL> findAll(String pattern) {
-		return Reflections.findResources(wrappedContextLoader()).byName(pattern).find();
+		return findWithinModules(() -> Reflections.findResources().byName(pattern).find());
 	}
 
 	/**
 	 * Find all resources within a directory of the given module matching the
-	 * pattern.
+	 * given pattern.
 	 * 
 	 * @param module
 	 *            the module name
 	 * @param directory
-	 *            the directory name
+	 *            the resource directory name
 	 * @param pattern
 	 *            the resource name pattern to match
 	 * @return list of resources matched
 	 */
 	public static List<URL> findAll(String module, String directory, String pattern) {
-
-		URL pathUrl = ModuleManager.getModulePath(module);
-		if (pathUrl == null) {
-			return Collections.emptyList();
-		}
-
-		String path = pathUrl.getPath();
-		String pathPattern = String.format("^%s", path.replaceFirst("module\\.properties$", ""));
-		String namePattern = "(^|/|\\\\)" + directory + "(/|\\\\)" + pattern;
-
-		try {
-			Path parent = Paths.get(path).getParent();
-			Path resources = parent.resolve("../../resources/main").normalize();
-			if (Files.exists(resources)) {
-				pathPattern = String.format("(%s)|(^%s)", pathPattern, resources);
-			}
-		} catch (Exception e) {
-		}
-
-		return Reflections.findResources().byName(namePattern).byURL(pathPattern).find();
+		final String namePattern = directory + "(/|\\\\)" + pattern;
+		return findWithin(module, () -> Reflections.findResources().byName(namePattern).find());
 	}
 
 	/**
-	 * Find module path URLs as in current classpath.
-	 * 
-	 */
-	public static URL[] findURLs() {
-		final List<URL> path = new ArrayList<>();
-		for (URL item : findClassPath(Thread.currentThread().getContextClassLoader())) {
-			// for unit tests
-			if (item.getPath().endsWith("build/classes/test/")) {
-				path.add(item);
-				continue;
-			}
-			try (final URLClassLoader cl = new URLClassLoader(new URL[] { item }, null)) {
-				URL res = cl.findResource("module.properties");
-				if (res == null) {
-					res = cl.findResource("application.properties");
-				}
-				if (res != null) {
-					path.add(item);
-				}
-			} catch (IOException e) {
-			}
-		}
-		return path.toArray(new URL[] {});
-	}
-
-	private static ClassLoader wrappedContextLoader() {
-		// trick to speed-up search types in axelor modules only
-		// the wrapper class loader loads classes with original class loader only
-		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		return new URLClassLoader(findURLs(), null) {
-			@Override
-			public Class<?> loadClass(String name) throws ClassNotFoundException {
-				return loader.loadClass(name);
-			}
-		};
-	}
-
-	private static Set<URL> findClassPath(ClassLoader classloader) {
-		final Set<URL> entries = new LinkedHashSet<>();
-		// search parent first as ClassLoader#loadClass() does.
-		final ClassLoader parent = classloader.getParent();
-		if (parent != null) {
-			entries.addAll(findClassPath(parent));
-		}
-		if (classloader instanceof URLClassLoader) {
-			entries.addAll(Arrays.asList(((URLClassLoader) classloader).getURLs()));
-		}
-		return entries;
-	}
-
-	/**
-	 * Delegates to {@link Reflections#findSubTypesOf(Class, ClassLoader)}
-	 * method and uses custom {@link ClassLoader} to speedup searching.
-	 * 
-	 * This method search within module jar/directories only.
+	 * Delegates to {@link Reflections#findSubTypesOf(Class)} but searches
+	 * within module paths only.
 	 * 
 	 * @see Reflections#findSubTypesOf(Class)
 	 */
 	public static <T> ClassFinder<T> findSubTypesOf(Class<T> type) {
-		return Reflections.findSubTypesOf(type, wrappedContextLoader());
+		return findWithinModules(() -> Reflections.findSubTypesOf(type));
 	}
 
 	/**
-	 * Delegates to {@link Reflections#findTypes(ClassLoader)} method and uses
-	 * custom {@link ClassLoader} to speedup searching.
+	 * Same as {@link #findSubTypesOf(Class)} but searches only within given
+	 * module.
 	 * 
-	 * This method search within module jar/directories only.
-	 * 
-	 * @see Reflections#findTypes()
+	 * @see #findSubTypesOf(Class)
 	 */
-	public static ClassFinder<?> findTypes() {
-		return Reflections.findTypes(wrappedContextLoader());
+	public static <T> ClassFinder<T> findSubTypesOf(String module, Class<T> type) {
+		return findWithin(module, () -> Reflections.findSubTypesOf(type));
 	}
 }
