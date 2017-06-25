@@ -47,4 +47,22 @@ public final class ObjectUtils {
 		if (value instanceof Collection && ((Collection<?>) value).size() == 0) return true;
 		return false;
 	}
+
+	/**
+	 * Check whether the given value is not empty. <br>
+	 * <br>
+	 * An object value is empty if:
+	 * <ul>
+	 * <li>value is null</li>
+	 * <li>value is string with length 0</li>
+	 * <li>value is map/collection with size 0</li>
+	 * </ul>
+	 *
+	 * @param value
+	 *            the object value to check
+	 * @return true if not empty false otherwise
+	 */
+	public static boolean notEmpty(Object value) {
+		return !isEmpty(value);
+	}
 }

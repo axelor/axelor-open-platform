@@ -36,6 +36,18 @@ public final class StringUtils {
 	}
 
 	/**
+	 * Check whether the given string value is not empty. The value is empty if
+	 * null or length is 0.
+	 *
+	 * @param value
+	 *            the string value to test
+	 * @return true if not empty false otherwise
+	 */
+	public static boolean notEmpty(String value) {
+		return !isEmpty(value);
+	}
+
+	/**
 	 * Check whether the given string value is blank. The value is blank if null
 	 * or contains white spaces only.
 	 * 
@@ -53,6 +65,18 @@ public final class StringUtils {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Check whether the given string value is not blank. The value is blank if
+	 * null or contains white spaces only.
+	 *
+	 * @param value
+	 *            the string value to test
+	 * @return true if not empty false otherwise
+	 */
+	public static boolean notBlank(String value) {
+		return !isBlank(value);
 	}
 
 	/**
