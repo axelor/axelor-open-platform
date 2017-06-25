@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +33,6 @@ import java.util.Set;
 import com.axelor.common.reflections.ClassFinder;
 import com.axelor.common.reflections.Reflections;
 import com.axelor.meta.loader.ModuleManager;
-import com.google.common.collect.ImmutableList;
 
 /**
  * This class provides some utility methods to scan classpath for
@@ -52,7 +52,7 @@ public class MetaScanner {
 	 *            the resource name pattern to match
 	 * @return list of resources matched
 	 */
-	public static ImmutableList<URL> findAll(String pattern) {
+	public static List<URL> findAll(String pattern) {
 		return Reflections.findResources(wrappedContextLoader()).byName(pattern).find();
 	}
 
@@ -68,11 +68,11 @@ public class MetaScanner {
 	 *            the resource name pattern to match
 	 * @return list of resources matched
 	 */
-	public static ImmutableList<URL> findAll(String module, String directory, String pattern) {
+	public static List<URL> findAll(String module, String directory, String pattern) {
 
 		URL pathUrl = ModuleManager.getModulePath(module);
 		if (pathUrl == null) {
-			return ImmutableList.of();
+			return Collections.emptyList();
 		}
 
 		String path = pathUrl.getPath();
