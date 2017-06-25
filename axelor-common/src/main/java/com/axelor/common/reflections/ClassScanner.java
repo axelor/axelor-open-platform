@@ -21,10 +21,15 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -34,11 +39,6 @@ import com.axelor.internal.asm.AnnotationVisitor;
 import com.axelor.internal.asm.ClassReader;
 import com.axelor.internal.asm.ClassVisitor;
 import com.axelor.internal.asm.Opcodes;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
@@ -51,12 +51,12 @@ final class ClassScanner {
 
 	private static final int ASM_FLAGS = ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES;
 	private static final String IGNORE_OBJECT = "java/lang/Object";
-	
+
 	private ClassLoader loader;
-	
-	private Map<String, Collector> collectors = Maps.newConcurrentMap();
-	private Set<String> packages = Sets.newLinkedHashSet();
-	private Set<Pattern> pathPatterns = Sets.newLinkedHashSet();
+
+	private Map<String, Collector> collectors = new ConcurrentHashMap<>();
+	private Set<String> packages = new LinkedHashSet<>();
+	private Set<Pattern> pathPatterns = new LinkedHashSet<>();
 
 	/**
 	 * Create a new instance of {@link ClassScanner} using the given
@@ -87,35 +87,32 @@ final class ClassScanner {
 	 * @return the same finder
 	 */
 	public ClassScanner byURL(String pattern) {
-		Preconditions.checkNotNull(pattern, "pattern must not be null");
+		Objects.requireNonNull(pattern, "pattern must not be null");
 		pathPatterns.add(Pattern.compile(pattern));
 		return this;
 	}
 
 	@SuppressWarnings("all")
-	public <T> ImmutableSet<Class<? extends T>> getSubTypesOf(Class<T> type) {
-		ImmutableSet.Builder<Class<? extends T>> builder = ImmutableSet.builder();
-		
+	public <T> Set<Class<? extends T>> getSubTypesOf(Class<T> type) {
+		Set<Class<? extends T>> classes = new HashSet<>();
 		Set<String> types;
 		try {
 			types = getSubTypesOf(type.getName());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		
 		for (String sub : types) {
 			try {
 				Class<?> found = loader.loadClass(sub);
-				builder.add((Class) found);
+				classes.add((Class) found);
 			} catch (Throwable e) {
 			}
 		}
-		return builder.build();
+		return Collections.unmodifiableSet(classes);
 	}
-	
-	public ImmutableSet<Class<?>> getTypesAnnotatedWith(Class<?> annotation) {
-		ImmutableSet.Builder<Class<?>> builder = ImmutableSet.builder();
-		
+
+	public Set<Class<?>> getTypesAnnotatedWith(Class<?> annotation) {
+		final Set<Class<?>> classes = new HashSet<>();
 		if (collectors.isEmpty()) {
 			try {
 				scan();
@@ -131,22 +128,20 @@ final class ClassScanner {
 			}
 			if (my.contains(annotation.getName())) {
 				try {
-					builder.add(loader.loadClass(klass));
+					classes.add(loader.loadClass(klass));
 				} catch (Throwable e) {
 				}
 			}
 		}
-		return builder.build();
+		return Collections.unmodifiableSet(classes);
 	}
 	
 	private Set<String> getSubTypesOf(String type) throws IOException {
-
-		Set<String> types = Sets.newHashSet();
-
+		final Set<String> types = new HashSet<>();
 		if (collectors.isEmpty()) {
 			scan();
 		}
-		
+
 		for (String klass : collectors.keySet()) {
 			Set<String> my = collectors.get(klass).superNames;
 			if (my == null) {
@@ -163,9 +158,9 @@ final class ClassScanner {
 	
 	private void scan() throws IOException {
 		ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-		List<Future<?>> futures = Lists.newArrayList();
-		Set<ClassInfo> infos = Sets.newHashSet();
-		
+		List<Future<?>> futures = new ArrayList<>();
+		Set<ClassInfo> infos = new HashSet<>();
+
 		if (packages.isEmpty()) {
 			infos = ClassPath.from(loader).getTopLevelClasses();
 		} else {
@@ -176,15 +171,11 @@ final class ClassScanner {
 		
 		try {
 			for (final ClassInfo info : infos) {
-				futures.add(executor.submit(new Callable<Object>() {
-					@Override
-					public Object call() throws Exception {
-						scan(info.getName());
-						return info.getName();
-					}
+				futures.add(executor.submit(() -> {
+					scan(info.getName());
+					return info.getName();
 				}));
 			}
-			
 			for (Future<?> future : futures) {
 				try {
 					future.get();
@@ -246,7 +237,7 @@ final class ClassScanner {
 				return;
 			}
 			if (superNames == null) {
-				superNames = Sets.newHashSet();
+				superNames = new HashSet<>();
 			}
 			superNames.add(name.replace("/", "."));
 		}
@@ -256,7 +247,7 @@ final class ClassScanner {
 				return;
 			}
 			if (annotations == null) {
-				annotations = Sets.newHashSet();
+				annotations = new HashSet<>();
 			}
 			annotations.add(name.replace("/", ".").substring(1, name.length() - 1));
 		}

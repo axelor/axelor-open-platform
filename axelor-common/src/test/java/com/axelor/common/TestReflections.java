@@ -19,6 +19,7 @@ package com.axelor.common;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -26,7 +27,6 @@ import org.junit.Test;
 
 import com.axelor.common.bar.MyBase;
 import com.axelor.common.reflections.Reflections;
-import com.google.common.collect.ImmutableSet;
 
 @SuppressWarnings("all")
 public class TestReflections implements Serializable {
@@ -34,7 +34,7 @@ public class TestReflections implements Serializable {
 	@Test
 	public void testClassFinder() {
 
-		ImmutableSet all;
+		Set<?> all;
 
 		// scan by sub type
 		all = Reflections

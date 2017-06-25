@@ -18,11 +18,13 @@
 package com.axelor.common.reflections;
 
 import java.lang.annotation.Annotation;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
+import com.axelor.common.ClassUtils;
 
 /**
  * The helper class to find sub types of a given super class.
@@ -33,9 +35,9 @@ public final class ClassFinder<T> {
 	private Class<T> type;
 	private ClassLoader loader;
 
-	private Set<Class<? extends Annotation>> annotations = Sets.newLinkedHashSet();
-	private Set<String> packages = Sets.newLinkedHashSet();
-	private Set<String> pathPatterns = Sets.newLinkedHashSet();
+	private Set<Class<? extends Annotation>> annotations = new LinkedHashSet<>();
+	private Set<String> packages = new LinkedHashSet<>();
+	private Set<String> pathPatterns = new LinkedHashSet<>();
 
 	private boolean matchAll = true;
 
@@ -45,7 +47,7 @@ public final class ClassFinder<T> {
 	}
 
 	ClassFinder(Class<T> type) {
-		this(type, Thread.currentThread().getContextClassLoader());
+		this(type, ClassUtils.getDefaultClassLoader());
 	}
 
 	/**
@@ -56,7 +58,7 @@ public final class ClassFinder<T> {
 	 * @return the same finder
 	 */
 	public ClassFinder<T> byURL(String pattern) {
-		Preconditions.checkNotNull(pattern, "pattern must not be null");
+		Objects.requireNonNull(pattern, "pattern must not be null");
 		pathPatterns.add(pattern);
 		return this;
 	}
@@ -128,9 +130,8 @@ public final class ClassFinder<T> {
 	 * 
 	 * @return set of matched classes
 	 */
-	@SuppressWarnings("all")
-	public ImmutableSet<Class<? extends T>> find() {
-		final ImmutableSet.Builder<Class<? extends T>> builder = ImmutableSet.builder();
+	public Set<Class<? extends T>> find() {
+		final Set<Class<? extends T>> classes = new HashSet<>();
 		final ClassScanner scanner = new ClassScanner(loader, packages.toArray(new String[] {}));
 
 		for (String pattern : pathPatterns) {
@@ -143,17 +144,19 @@ public final class ClassFinder<T> {
 		if (Object.class == type) {
 			for (Class<?> a : annotations) {
 				for (Class<?> c : scanner.getTypesAnnotatedWith(a)) {
-					builder.add((Class) c);
+					if (type.isAssignableFrom(c)) {
+						classes.add(c.asSubclass(type));
+					}
 				}
 			}
-			return builder.build();
+			return Collections.unmodifiableSet(classes);
 		}
 		final Set<Class<? extends T>> all = scanner.getSubTypesOf(type);
 		for (Class<? extends T> cls : all) {
 			if (hasAnnotation(cls)) {
-				builder.add(cls);
+				classes.add(cls);
 			}
 		}
-		return builder.build();
+		return Collections.unmodifiableSet(classes);
 	}
 }
