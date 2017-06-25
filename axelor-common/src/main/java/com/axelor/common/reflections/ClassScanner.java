@@ -17,23 +17,18 @@
  */
 package com.axelor.common.reflections;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.axelor.internal.asm.AnnotationVisitor;
 import com.axelor.internal.asm.ClassReader;
@@ -50,7 +45,9 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 final class ClassScanner {
 
 	private static final int ASM_FLAGS = ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES;
-	private static final String IGNORE_OBJECT = "java/lang/Object";
+
+	private static final String OBJECT_CLASS_NAME = "java.lang.Object";
+	private static final String OBJECT_CLASS_NAME_ASM = "java/lang/Object";
 
 	private ClassLoader loader;
 
@@ -92,7 +89,6 @@ final class ClassScanner {
 		return this;
 	}
 
-	@SuppressWarnings("all")
 	public <T> Set<Class<? extends T>> getSubTypesOf(Class<T> type) {
 		Set<Class<? extends T>> classes = new HashSet<>();
 		Set<String> types;
@@ -104,7 +100,7 @@ final class ClassScanner {
 		for (String sub : types) {
 			try {
 				Class<?> found = loader.loadClass(sub);
-				classes.add((Class) found);
+				classes.add(found.asSubclass(type));
 			} catch (Throwable e) {
 			}
 		}
@@ -157,73 +153,61 @@ final class ClassScanner {
 	}
 	
 	private void scan() throws IOException {
-		ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-		List<Future<?>> futures = new ArrayList<>();
-		Set<ClassInfo> infos = new HashSet<>();
+		final ClassPath classPath = ClassPath.from(loader);
+		final Map<String, ClassInfo> classes = classPath
+				.getTopLevelClasses().stream()
+				.collect(Collectors.toMap(ClassInfo::getName, c -> c));
 
 		if (packages.isEmpty()) {
-			infos = ClassPath.from(loader).getTopLevelClasses();
-		} else {
-			for (String pkg : packages) {
-				infos.addAll(ClassPath.from(loader).getTopLevelClassesRecursive(pkg));
-			}
-		}
-		
-		try {
-			for (final ClassInfo info : infos) {
-				futures.add(executor.submit(() -> {
-					scan(info.getName());
-					return info.getName();
-				}));
-			}
-			for (Future<?> future : futures) {
+			for (ClassInfo info : classes.values()) {
 				try {
-					future.get();
-				} catch (Exception e) {
+					scan(info, classes);
+				} catch (ClassNotFoundException e) {
 				}
 			}
-		} finally {
-			executor.shutdown();
+		} else {
+			for (String pkg : packages) {
+				for (ClassInfo info : classPath.getTopLevelClassesRecursive(pkg)) {
+					try {
+						scan(info, classes);
+					} catch (ClassNotFoundException e) {
+					}
+				}
+			}
 		}
 	}
 
-	private void scan(final String type) throws ClassNotFoundException {
-
-		if (collectors.containsKey(type) ||  Object.class.getName().equals(type)) {
+	private void scan(final ClassInfo info, final Map<String, ClassInfo> classes) throws ClassNotFoundException {
+		if (info == null || OBJECT_CLASS_NAME.equals(info.getName()) || collectors.containsKey(info.getName())) {
 			return;
 		}
 
-		URL resource = loader.getResource(type.replace('.', '/') + ".class");
-		boolean matched = pathPatterns.isEmpty();
-		for (Pattern pathPattern : pathPatterns) {
-			matched = pathPattern.matcher(resource.getFile()).matches();
-			if (matched) break;
-		}
+		final URL resource = info.url();
+		boolean matched = pathPatterns.isEmpty() || pathPatterns.stream()
+			.map(p -> p.matcher(resource.getFile()).matches())
+			.findFirst()
+			.orElse(false);
 
 		if (!matched) {
 			return;
 		}
 
-		try {
-			InputStream stream = resource.openStream();
-			try {
-				BufferedInputStream in = new BufferedInputStream(stream);
-				ClassReader reader = new ClassReader(in);
-				Collector collector = new Collector();
-				reader.accept(collector, ASM_FLAGS);
-				collectors.put(type, collector);
-				if (collector.superNames != null) {
-					for (String base : collector.superNames) { scan(base); }
+		try (final InputStream is = resource.openStream()) {
+			final ClassReader reader = new ClassReader(is);
+			final Collector collector = new Collector();
+			reader.accept(collector, ASM_FLAGS);
+			collectors.put(info.getName(), collector);
+			if (collector.superNames != null) {
+				for (String base : collector.superNames) {
+					scan(classes.get(base), classes);
 				}
-			} finally {
-				stream.close();
 			}
-		} catch (NullPointerException | IOException e) {
-			throw new ClassNotFoundException(type);
+		} catch (IOException e) {
+			throw new ClassNotFoundException(info.getName());
 		}
 	}
-	
-	static class Collector extends ClassVisitor {
+
+	private static class Collector extends ClassVisitor {
 		
 		private Set<String> superNames;
 		private Set<String> annotations;
@@ -243,7 +227,7 @@ final class ClassScanner {
 		}
 		
 		private void acceptAnnotation(String name) {
-			if (name == null || IGNORE_OBJECT.equals(name)) {
+			if (name == null || OBJECT_CLASS_NAME_ASM.equals(name)) {
 				return;
 			}
 			if (annotations == null) {
@@ -253,7 +237,8 @@ final class ClassScanner {
 		}
 
 		@Override
-		public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+		public void visit(int version, int access, String name, String signature, String superName,
+				String[] interfaces) {
 			acceptSuper(superName);
 			if (interfaces != null) {
 				for (String iface : interfaces) {
