@@ -54,6 +54,11 @@ public class TestStringUtils {
 			+ "  this is some text\n"
 			+ " this is some text\n";
 
+	final static String text4 = ""
+			+ "this is some text\n"
+			+ "    |this is some text\n"
+			+ "    |this is some text\n";
+
 	@Test
 	public void testStripIndent() {
 		String[] lines = StringUtils.stripIndent(text1).split("\n");
@@ -81,6 +86,15 @@ public class TestStringUtils {
 		Assert.assertEquals(Joiner.on("\n").join(lines), ""
 				+ " this is some text\n"
 				+ " this is some text\n"
+				+ "this is some text");
+	}
+
+	@Test
+	public void testStripMargin() {
+		String[] lines = StringUtils.stripMargin(text4).split("\n");
+		Assert.assertEquals(Joiner.on("\n").join(lines), ""
+				+ "this is some text\n"
+				+ "this is some text\n"
 				+ "this is some text");
 	}
 }

@@ -17,8 +17,11 @@
  */
 package com.axelor.common;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
- * This class provides static helper methods for {@link String}.
+ * This class provides static helper methods for {@link CharSequence}.
  * 
  */
 public final class StringUtils {
@@ -31,7 +34,7 @@ public final class StringUtils {
 	 *            the string value to test
 	 * @return true if empty false otherwise
 	 */
-	public static boolean isEmpty(String value) {
+	public static boolean isEmpty(CharSequence value) {
 		return value == null || value.length() == 0;
 	}
 
@@ -43,7 +46,7 @@ public final class StringUtils {
 	 *            the string value to test
 	 * @return true if not empty false otherwise
 	 */
-	public static boolean notEmpty(String value) {
+	public static boolean notEmpty(CharSequence value) {
 		return !isEmpty(value);
 	}
 
@@ -55,7 +58,7 @@ public final class StringUtils {
 	 *            the string value to test
 	 * @return true if empty false otherwise
 	 */
-	public static boolean isBlank(String value) {
+	public static boolean isBlank(CharSequence value) {
 		if (isEmpty(value)) {
 			return true;
 		}
@@ -75,23 +78,32 @@ public final class StringUtils {
 	 *            the string value to test
 	 * @return true if not empty false otherwise
 	 */
-	public static boolean notBlank(String value) {
+	public static boolean notBlank(CharSequence value) {
 		return !isBlank(value);
 	}
 
 	/**
 	 * Strip the leading indentation from the given text.
 	 * 
+	 * <p>
+	 * The line with the least number of leading spaces determines the number to
+	 * remove. Lines only containing whitespace are ignored when calculating the
+	 * number of leading spaces to strip.
+	 * </p>
+	 *
 	 * @param text
-	 *            the text to strip
+	 *            the text to strip indent from
 	 * @return stripped text
 	 */
-	public static String stripIndent(String text) {
+	public static String stripIndent(CharSequence text) {
+		if (text == null) {
+			return null;
+		}
 		if (isBlank(text)) {
-			return text;
+			return text.toString();
 		}
 
-		final String[] lines = text.split("\\n");
+		final String[] lines = text.toString().split("\\n");
 		final StringBuilder builder = new StringBuilder();
 
 		int leading = -1;
@@ -102,13 +114,13 @@ public final class StringUtils {
 			if (leading == -1) {
 				leading = length;
 			}
-			while(index < length && index < leading && Character.isWhitespace(line.charAt(index))) { index++; }
+			while (index < length && index < leading && Character.isWhitespace(line.charAt(index))) { index++; }
 			if (leading > index) {
 				leading = index;
 			}
 		}
 
-		for(String line : lines) {
+		for (String line : lines) {
 			if (!isBlank(line)) {
 				builder.append(leading <= line.length() ? line.substring(leading) : "");
 			}
@@ -116,5 +128,22 @@ public final class StringUtils {
 		}
 
 		return builder.toString();
+	}
+
+	/**
+	 * Strip leading whitespace/control characters followed by '|' from every
+	 * line in the given text.
+	 *
+	 * @param text
+	 *            the text to strip the margin from
+	 * @return the stripped String
+	 */
+	public static String stripMargin(CharSequence text) {
+		if (text == null) {
+			return null;
+		}
+		return Stream.of(text.toString().split("\n"))
+			.map(line -> line.replaceFirst("^\\s+\\|", ""))
+			.collect(Collectors.joining("\n"));
 	}
 }
