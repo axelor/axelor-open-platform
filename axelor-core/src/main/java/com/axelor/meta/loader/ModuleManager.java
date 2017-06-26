@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -51,8 +52,6 @@ import com.axelor.meta.db.repo.MetaModuleRepository;
 import com.axelor.meta.db.repo.MetaSelectRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.inject.persist.Transactional;
 
 public class ModuleManager {
@@ -84,52 +83,42 @@ public class ModuleManager {
 	@Inject
 	private DemoLoader demoLoader;
 
-	@Inject
-	private AuditableRunner jobRunner;
+	private static final Set<String> SKIP = new HashSet<>();
 
-	private static final Set<String> SKIP = Sets.newHashSet(
-			"axelor-common",
-			"axelor-cglib",
-			"axelor-test");
+	static {
+		SKIP.add("axelor-common");
+		SKIP.add("axelor-cglib");
+		SKIP.add("axelor-test");
+	}
 
 	public ModuleManager() {
-
 	}
 
 	public void initialize(final boolean update, final boolean withDemo) {
-
-		final Runnable job = new Runnable() {
-
-			@Override
-			public void run() {
-				// install modules
-				for (Module module : resolver.all()) {
-					if (!module.isRemovable() || module.isInstalled()) {
-						log.info("Loading package " + module.getName() + "...");
-					}
-					if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
-						install(module.getName(), update, withDemo, false);
-					}
-				}
-				// second iteration ensures proper view sequence
-				for (Module module : resolver.all()) {
-					if (module.isInstalled()) {
-						viewLoader.doLast(module, update);
-					}
-				}
-				// uninstall pending modules
-				for (Module module : resolver.all()) {
-					if (module.isRemovable() && !module.isInstalled() && module.isPending()) {
-						uninstall(module.getName());
-					}
-				}
-			}
-		};
-
 		try {
-			this.createUsers();
-			this.resolve(true);
-			jobRunner.run(job);
+			createUsers();
+			resolve(true);
+			Beans.get(AuditableRunner.class).run(() -> {
+				// install modules
+				resolver.all().stream()
+					.filter(m -> !m.isRemovable() || m.isInstalled())
+					.peek(m -> log.info("Loading package " + m.getName() + "..."))
+					.filter(m -> !m.isRemovable() || m.isPending())
+					.forEach(m -> install(m.getName(), update, withDemo, false));
+
+				// second iteration ensures proper view sequence
+				resolver.all().stream()
+					.filter(Module::isInstalled)
+					.forEach(m -> viewLoader.doLast(m, update));
+
+				// uninstall pending modules
+				resolver.all().stream()
+					.filter(Module::isRemovable)
+					.filter(Module::isPending)
+					.filter(m -> !m.isInstalled())
+					.map(Module::getName)
+					.forEach(this::uninstall);
+			});
 		} finally {
 			this.doCleanUp();
 		}
@@ -139,44 +128,36 @@ public class ModuleManager {
 		try {
 			this.createUsers();
 			this.resolve(true);
-
-			for (Module module : resolver.all()) {
-				install(module.getName(), true, withDemo, false);
-			}
+			resolver.all().stream()
+				.map(Module::getName)
+				.forEach(m -> install(m, true, withDemo, false));
 		} finally {
 			this.doCleanUp();
 		}
 	}
 
 	public void update(boolean withDemo, String... moduleNames) {
-
+		final List<String> names = new ArrayList<>();
+		if (moduleNames != null) {
+			Collections.addAll(names, moduleNames);
+		}
 		try {
 			this.createUsers();
 			this.resolve(true);
-
-			List<String> names = Lists.newArrayList();
-			if (moduleNames != null) {
-				names = Lists.newArrayList(moduleNames);
-			}
-
 			if (names.isEmpty()) {
-				for (Module module : resolver.all()) {
-					if (module.isInstalled()) {
-						names.add(module.getName());
-					}
-				}
+				resolver.all().stream()
+					.filter(Module::isInstalled)
+					.map(Module::getName)
+					.forEach(names::add);
 			}
-
-			for (Module module : resolver.all()) {
-				if (names.contains(module.getName())) {
-					install(module, true, withDemo);
-				}
-			}
+			resolver.all().stream()
+				.filter(m -> names.contains(m.getName()))
+				.forEach(m -> install(m, true, withDemo));
 		} finally {
 			this.doCleanUp();
 		}
 	}
-	
+
 	public void restoreMeta() {
 		try {
 			loadData = false;
@@ -200,12 +181,9 @@ public class ModuleManager {
 
 	public void install(String moduleName, boolean update, boolean withDemo) {
 		try {
-			for (Module module: resolver.resolve(moduleName)) {
-				install(module.getName(), update, withDemo, true);
-			}
-			for (Module module: resolver.resolve(moduleName)) {
-				viewLoader.doLast(module, update);
-			}
+			resolver.resolve(moduleName).stream().map(Module::getName)
+					.forEach(name -> install(name, update, withDemo, true));
+			resolver.resolve(moduleName).stream().forEach(m -> viewLoader.doLast(m, update));
 		} finally {
 			this.doCleanUp();
 		}
@@ -213,10 +191,9 @@ public class ModuleManager {
 
 	@Transactional
 	public void uninstall(String module) {
-
 		log.info("Removing package " + module + "...");
-		
-		MetaModule entity = modules.findByName(module);
+
+		final MetaModule entity = modules.findByName(module);
 
 		Beans.get(MetaViewRepository.class).findByModule(module).remove();
 		Beans.get(MetaSelectRepository.class).findByModule(module).remove();
@@ -237,16 +214,9 @@ public class ModuleManager {
 		AbstractLoader.doCleanUp();
 	}
 
-	@Transactional
-	MetaModule findModule(String name) {
-		return modules.findByName(name);
-	}
-
 	private void install(String moduleName, boolean update, boolean withDemo, boolean force) {
-
 		final Module module = resolver.get(moduleName);
-		final MetaModule metaModule = findModule(moduleName);
-
+		final MetaModule metaModule = modules.findByName(moduleName);
 		if (metaModule == null) {
 			return;
 		}
@@ -256,12 +226,10 @@ public class ModuleManager {
 		if (module.isInstalled() && !(update || module.isUpgradable() || module.isPending())) {
 			return;
 		}
-
 		install(module, update, withDemo);
 	}
 
 	private void install(Module module, boolean update, boolean withDemo) {
-
 		if (SKIP.contains(module.getName())) {
 			return;
 		}
