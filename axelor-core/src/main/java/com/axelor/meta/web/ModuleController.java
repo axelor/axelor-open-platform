@@ -99,9 +99,11 @@ public class ModuleController {
 	private Set<String> resolveLink(MetaModule module, String mainModule) {
 		final Set<String> all = new HashSet<>();
 		all.add(module.getName());
-
-		for (MetaModule metaModule : modules.all().filter("self.depends LIKE ?1", "%" + module.getName() + "%").fetch()) {
-			if(metaModule.getInstalled() != Boolean.TRUE || mainModule.equals(metaModule.getName())) {
+		for (MetaModule metaModule : modules.all()
+				.filter("self.depends LIKE ?1", "%" + module.getName() + "%").fetch()) {
+			if (metaModule.getApplication() == Boolean.TRUE ||
+				metaModule.getInstalled() != Boolean.TRUE ||
+				mainModule.equals(metaModule.getName())) {
 				continue;
 			}
 			if(metaModule.getPending() == Boolean.TRUE) {

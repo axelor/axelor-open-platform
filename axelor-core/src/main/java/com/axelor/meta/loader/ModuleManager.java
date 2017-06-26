@@ -317,9 +317,11 @@ public class ModuleManager {
 			final String[] depends = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
 			final String[] installs = properties.getProperty("installs", "").trim().split("\\s*,\\s*");
 			final boolean removable = "true".equals(properties.getProperty("removable"));
+			final boolean application = "true".equals(properties.getProperty("application"));
 
 			final Module module = resolver.add(name, depends);
 			module.setRemovable(removable);
+			module.setApplication(application);
 
 			// install forced modules on init
 			if (installed.isEmpty()) {
@@ -357,6 +359,7 @@ public class ModuleManager {
 			final String description = properties.getProperty("description");
 			final String version = properties.getProperty("version");
 			final boolean removable = "true".equals(properties.getProperty("removable"));
+			final boolean application = "true".equals(properties.getProperty("application"));
 
 			if (forceInit && forceInstall.isEmpty()) {
 				String[] installs = properties.getProperty("installs", "").trim().split("\\s*,\\s*");
@@ -376,10 +379,12 @@ public class ModuleManager {
 				stored.setDescription(description);
 				stored.setModuleVersion(version);
 				stored.setRemovable(removable);
+				stored.setApplication(application);
 				stored = modules.save(stored);
 			}
 
 			module.setVersion(version);
+			module.setApplication(application);
 			module.setRemovable(removable);
 			module.setInstalled(stored.getInstalled() == Boolean.TRUE);
 			module.setPending(stored.getPending() == Boolean.TRUE);

@@ -15,6 +15,7 @@
     <string name="description" large="true"/>
     <string name="depends" max="512"/>
     <string name="moduleVersion" required="true" title="Version"/>
+    <boolean name="application" />
     <boolean name="removable" />
     <boolean name="installed" />
     <boolean name="pending" />

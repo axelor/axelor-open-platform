@@ -67,9 +67,10 @@
       <field name="name"/>
       <field name="moduleVersion"/>
       <field name="depends"/>
-      <field name="installed" colSpan="4"/>
-      <field name="pending" colSpan="4"/>
-      <field name="removable" colSpan="4"/>
+      <field name="application" colSpan="3"/>
+      <field name="removable" colSpan="3"/>
+      <field name="installed" colSpan="3"/>
+      <field name="pending" colSpan="3"/>
       <panel stacked="true" showIf="removable">
         <button name="btnInstall" title="Install" showIf="!installed &amp;&amp; !pending" onClick="com.axelor.meta.web.ModuleController:validInstall(name),com.axelor.meta.web.ModuleController:install(name)"/>
         <button name="btnUninstall" title="Uninstall" showIf="installed &amp;&amp; !pending &amp;&amp; removable" onClick="com.axelor.meta.web.ModuleController:validUninstall(name),com.axelor.meta.web.ModuleController:uninstall(name)"/>

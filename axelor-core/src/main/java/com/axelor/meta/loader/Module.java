@@ -34,6 +34,8 @@ final class Module {
 
 	private String installedVersion;
 
+	private boolean application = false;
+
 	private boolean installed = false;
 
 	private boolean removable = false;
@@ -66,6 +68,14 @@ final class Module {
 
 	public void setInstalledVersion(String installedVersion) {
 		this.installedVersion = installedVersion;
+	}
+
+	public boolean isApplication() {
+		return application;
+	}
+
+	public void setApplication(boolean application) {
+		this.application = application;
 	}
 
 	public boolean isInstalled() {

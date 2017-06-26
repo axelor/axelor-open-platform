@@ -40,6 +40,7 @@ import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.util.PatternSet;
 
+import com.axelor.gradle.AppPlugin;
 import com.axelor.gradle.AxelorExtension;
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.tools.x2j.Generator;
@@ -130,6 +131,12 @@ public class GenerateCode extends DefaultTask {
 			.append("\n")
 			.append("description = ").append(Joiner.on("\\n").join(descriptionLines))
 			.append("\n");
+
+		if (project.getPlugins().hasPlugin(AppPlugin.class)) {
+			text.append("\n")
+				.append("application = true")
+				.append("\n");
+		}
 
 		if (removable == Boolean.TRUE) {
 			text.append("\n")
