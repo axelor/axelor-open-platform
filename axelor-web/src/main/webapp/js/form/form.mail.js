@@ -645,6 +645,10 @@ ui.directive('uiMailEditor', ["$compile", function ($compile) {
 		scope.select = function (record) {
 
 		};
+		
+		scope.isEditable = function () {
+			return true;
+		};
 
 		scope.onEditEmail = function (record, onSelect) {
 
