@@ -16,6 +16,15 @@ public final class ClassUtils {
 
 	private static final String CLASSPATH_URL_PREFIX = "classpath:";
 
+	private static final String PATH_SEPARATOR = "/";
+
+	private static final String PACKAGE_SEPARATOR = ".";
+
+	private static final String CLASS_FILE_SUFFIX = ".class";
+
+	private ClassUtils() {
+	}
+
 	/**
 	 * Returns the context ClassLoader for this Thread.
 	 *
@@ -63,6 +72,53 @@ public final class ClassUtils {
 			loader = ClassLoader.getSystemClassLoader();
 		}
 		return loader;
+	}
+
+	/**
+	 * Convert the '/' based resource path to '.' based class name.
+	 * 
+	 * @param resource
+	 *            the resource path
+	 * @return the corresponding fully qualified class name
+	 */
+	public static String resourceToClassName(String resource) {
+		Objects.requireNonNull(resource, "resource name cannot be null.");
+		return resource.replace(PATH_SEPARATOR, PACKAGE_SEPARATOR).substring(0, resource.length() - CLASS_FILE_SUFFIX.length());
+	}
+
+	/**
+	 * Convert the class name to '/' based resource path.
+	 * 
+	 * @param klass
+	 *            the fully qualified class name
+	 * @return the corresponding resource path
+	 */
+	public static String classToResourceName(String klass) {
+		Objects.requireNonNull(klass, "class name cannot be null.");
+		return klass.replace(PACKAGE_SEPARATOR, PATH_SEPARATOR) + CLASS_FILE_SUFFIX;
+	}
+
+	/**
+	 * Get the resource path of the given class.
+	 * 
+	 * @param klass
+	 *            the class
+	 * @return the corresponding resource path
+	 */
+	public static String classToResourceName(Class<?> klass) {
+		Objects.requireNonNull(klass, "class cannot be null.");
+		return classToResourceName(klass.getName());
+	}
+
+	/**
+	 * Check whether the given object is a CGLIB or ByteBuddy proxy.
+	 * 
+	 * @param object
+	 *            the object to check
+	 * @return true if object is proxy
+	 */
+	public static boolean isProxy(Object object) {
+		return object != null && isProxyClass(object.getClass());
 	}
 
 	/**
