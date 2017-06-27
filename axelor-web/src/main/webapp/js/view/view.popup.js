@@ -288,7 +288,8 @@ ui.directive('uiDialogSize', function() {
 		if (attrs.uiDialog === undefined && !element.hasClass('ui-dialog-content')) {
 			return;
 		}
-		
+
+		var loaded = false;
 		var addMaximizeButton = _.once(function () {
 			var elemDialog = element.parent();
 			var elemTitle = elemDialog.find('.ui-dialog-title');
@@ -305,8 +306,23 @@ ui.directive('uiDialogSize', function() {
 				elemDialog.removeClass('maximized');
 			});
 		});
-		
-		function setFocus() {
+
+		function doAdjust() {
+			element.dialog('open');
+			element.scrollTop(0);
+			setTimeout(doFocus);
+		}
+
+		function doShow() {
+			addMaximizeButton();
+			if (loaded) {
+				return setTimeout(doAdjust);
+			}
+			loaded = true;
+			scope.waitForActions(doAdjust);
+		}
+
+		function doFocus() {
 			var focusElem = element.find('input:tabbable');
 			if (focusElem.size() == 0) {
 				focusElem = element.parent().find('.ui-dialog-buttonset').find(':tabbable');
@@ -314,24 +330,10 @@ ui.directive('uiDialogSize', function() {
 			if (focusElem[0]) {
 				focusElem[0].focus();
 			}
-		}
-
-		function doShow() {
-
-			addMaximizeButton();
 
 			//XXX: ui-dialog issue
 			element.find('.slick-headerrow-column,.slickgrid,[ui-embedded-editor]').zIndex(element.zIndex());
 			element.find('.record-toolbar .btn').zIndex(element.zIndex()+1);
-
-			setTimeout(function () {
-				element.dialog('open');
-				element.scrollTop(0);
-				// focus first element
-				if (!axelor.device.mobile) {
-					setTimeout(setFocus);
-				}
-			});
 		}
 
 		// a flag used by evalScope to detect popup (see form.base.js)
