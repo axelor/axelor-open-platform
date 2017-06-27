@@ -420,6 +420,10 @@
 					resizable: false,
 					closeOnEscape: false,
 					zIndex: 100001,
+					show: {
+						effect: 'fade',
+						duration: 300
+					},
 					buttons: [{
 						text: _t("Log in"),
 						'class': 'btn btn-primary',
@@ -452,6 +456,10 @@
 					close: function() {
 						$scope.httpError = {};
 						$scope.$apply();
+					},
+					show: {
+						effect: 'fade',
+						duration: 300
 					},
 					buttons: [{
 						text: _t("Show Details"),

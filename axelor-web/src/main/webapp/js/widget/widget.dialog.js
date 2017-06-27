@@ -66,6 +66,10 @@ ui.directive('uiDialog', function() {
 				closeOnEscape: true,
 				modal: true,
 				zIndex: 1100,
+				show: {
+					effect: 'fade',
+					duration: 300
+				},
 				buttons: buttons
 			});
 			

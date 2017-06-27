@@ -123,6 +123,10 @@
 					element.dialog('destroy');
 					element.remove();
 				},
+				show: {
+					effect: 'fade',
+					duration: 300
+				},
 				buttons: buttons
 			});
 
