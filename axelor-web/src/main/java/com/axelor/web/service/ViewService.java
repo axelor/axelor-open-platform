@@ -55,6 +55,7 @@ import com.axelor.meta.schema.views.SearchFilters;
 import com.axelor.meta.schema.views.SimpleContainer;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
+import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -330,8 +331,14 @@ public class ViewService extends AbstractService {
 		actRequest.setAction(action);
 		actRequest.setData(actData);
 
-		final ActionHandler actHandler = new ActionHandler(actRequest);
-		final Object res = act.evaluate(actHandler);
+		Object res = act.evaluate(new ActionHandler(actRequest));
+
+		if (res instanceof ActionResponse) {
+			res = ((ActionResponse) res).getItem(0);
+			if (res instanceof Map && ((Map) res).containsKey("view")) {
+				res = ((Map) res).get("view");
+			}
+		}
 
 		if (res instanceof Map) {
 			Map<String, Object> ctx = (Map) ((Map) res).get("context");
