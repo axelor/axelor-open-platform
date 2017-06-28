@@ -61,6 +61,7 @@ import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
+import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.google.common.base.CaseFormat;
@@ -125,19 +126,27 @@ public class RestService extends ResourceService {
 		actRequest.setAction(action);
 		actRequest.setData(data);
 
-		final ActionHandler actHandler = handler.forRequest(actRequest);
-		final Object res = act.evaluate(actHandler);
+		Object res = act.evaluate(handler.forRequest(actRequest));
 
-		if (res instanceof Map) {
-			Map<String, Object> old = (Map) data.get("_domainContext");
-			Map<String, Object> ctx = (Map) ((Map) res).get("context");
-			if (old == null) {
-				old = ctx;
-			} else {
-				old.putAll(ctx);
+		if (res instanceof ActionResponse) {
+			res = ((ActionResponse) res).getItem(0);
+			if (res instanceof Map && ((Map) res).containsKey("view")) {
+				res = ((Map) res).get("view");
 			}
 		}
-		
+
+		if (res instanceof Map && ((Map) res).containsKey("context")) {
+			Map old = (Map) data.get("_domainContext");
+			Map ctx = (Map) ((Map) res).get("context");
+			if (ctx != null) {
+				if (old == null) {
+					((Map) data).put("_domainContext", ctx);
+				} else {
+					old.putAll(ctx);
+				}
+			}
+		}
+
 		return getResource().search(request);
 	}
 
