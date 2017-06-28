@@ -126,8 +126,8 @@ ui.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, Acti
 			scope.isValid = function(){};
 
 			attrs = {
-				hidden: false,
-				readonly: false
+				hidden: !!item.hidden,
+				readonly: !!item.readonly
 			};
 
 			scope.attr = function(name, value) {

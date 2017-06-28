@@ -826,7 +826,7 @@ ActionHandler.prototype = {
 
 			items = containers.find('[x-path="' + (formScope.formPath ?  formScope.formPath + '.' + name : name) + '"]');
 			if (toolbar) {
-				return toolbar.find('[name="' + name + '"]').add(items);
+				return toolbar.find('[name="' + name + '"],[x-name="' + name + '"]').add(items);
 			}
 			return items;
 		}
@@ -841,7 +841,7 @@ ActionHandler.prototype = {
 			// handle o2m/m2m columns
 			if (item.is('.slick-dummy-column')) {
 				column = item.data('column');
-				itemScope = item.parents('[x-path]:first').data('$scope');
+				itemScope = item.parents('[x-path]:first,.portlet-grid').data('$scope');
 				forEach(itemAttrs, function(value, attr){
 					if (attr == 'hidden')
 						itemScope.showColumn(column.id, !value);
