@@ -115,7 +115,7 @@
     
     <string name="title" required="true" namecolumn="true" help="The select item title." />
     <string name="value" required="true" help="The select item value." />
-    <string name="data" help="The addition data for UI widgets." />
+    <string name="data" help="The addition data for UI widgets." max="1024" />
     <integer name="order" column="order_seq"/>
     <many-to-one name="select" ref="MetaSelect" column="select_id" required="true"/>
   </entity>
