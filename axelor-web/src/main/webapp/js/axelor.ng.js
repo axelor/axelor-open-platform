@@ -40,8 +40,7 @@
 			}
 
 			var $q = null,
-				$http = null,
-				$timeout = null;
+				$http = null;
 			
 			__custom__.ajaxStop = function ajaxStop(callback, context) {
 				var count, wait;
@@ -111,16 +110,16 @@
 				this.$timeout(later, wait);
 			};
 
-			__custom__.$timeout = function(func, wait, invokeApply) {
-				if ($timeout === null) {
-					$timeout = $injector.get('$timeout');
-				}
+			__custom__.$timeout = function(func, wait) {
 				if (arguments.length === 0) {
-					return $timeout();
+					this.$applyAsync();
+				} else {
+					setTimeout(function () {
+						this.$applyAsync(func);
+					}.bind(this), wait);
 				}
-				return $timeout.apply(null, arguments);
 			};
-			
+
 			__custom__.$new = function $new() {
 				var inst = __super__.$new.apply(this, arguments);
 				inst.$$watchChecker = this.$$watchChecker;
@@ -163,34 +162,6 @@
 						return previous(self) && checker(self);
 					};
 				}
-			};
-			
-			function debouncedApply(wait) {
-				return _.debounce(__super__.$apply, wait);
-			}
-
-			var $apply1 = _.debounce(__super__.$apply);
-			var $apply2 = _.debounce(__super__.$apply, 100);
-
-			var $debouncedApply = _.debounce(function $debouncedApply() {
-				if ($http === null) {
-					$http = $injector.get('$http');
-				}
-				if ($http.pendingRequests.length) {
-					return $apply2.call(this);
-				}
-				return $apply1.call(this);
-			});
-
-			__custom__.$apply = function $apply() {
-				if (arguments.length === 0) {
-					return $debouncedApply.call(this);
-				}
-				return __super__.$apply.apply(this, arguments);
-			};
-
-			__custom__.$applyNow = function $applyNow() {
-				return __super__.$apply.apply(this, arguments);
 			};
 
 			angular.extend(__orig__, __custom__);
