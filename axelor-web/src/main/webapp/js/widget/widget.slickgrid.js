@@ -237,7 +237,7 @@ var Editor = function(args) {
 		}
 		setTimeout(function(){
 			if (updated) {
-				scope.$apply();
+				scope.$applyAsync();
 			}
 			element.show();
 			that.focus();

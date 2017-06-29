@@ -384,7 +384,7 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 		}
 
 		$scope.openTabByName(record.action);
-		$scope.$apply();
+		$scope.$applyAsync();
 	};
 
 	$scope.navClick = function(tab) {

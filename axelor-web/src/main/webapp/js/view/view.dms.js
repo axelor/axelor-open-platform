@@ -248,7 +248,7 @@ function DMSFileListCtrl($scope, $element) {
 				return $scope.onEditFile(record);
 			}
 			$scope.onEdit();
-			$scope.$apply();
+			$scope.$applyAsync();
 		});
 	};
 

@@ -665,7 +665,7 @@ ui.directive('uiViewSwitcher', function(){
 				}
 
 				scope.switchTo(type);
-				scope.$apply();
+				scope.$applyAsync();
 			})
 			.each(function() {
 				if (scope._views[$(this).attr("x-view-type")] === undefined) {

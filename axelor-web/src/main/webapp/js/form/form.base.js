@@ -539,7 +539,7 @@ var FormInput = {
 			function listener() {
 				var value = _.str.trim(element.val()) || null;
 				if (value !== model.$viewValue) {
-					scope.$apply(function() {
+					scope.$applyAsync(function() {
 						var val = scope.parse(value);
 						var txt = scope.format(value);
 

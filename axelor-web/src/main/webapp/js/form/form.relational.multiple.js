@@ -304,7 +304,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	$scope.onItemDblClick = function(event, args) {
 		if($scope.canView()){
 			$scope.onEdit();
-			$scope.$apply();
+			$scope.$applyAsync();
 		}
 	};
 

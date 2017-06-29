@@ -532,7 +532,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 						.appendTo(html)
 						.click(function(e){
 							hideBubble();
-							scope.$apply(function(){
+							scope.$applyAsync(function(){
 								scope.removeEvent(event, function() {
 									RecordManager.remove(event.record);
 								});
@@ -545,7 +545,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 					.appendTo(html)
 					.click(function(e){
 						hideBubble();
-						scope.$apply(function(){
+						scope.$applyAsync(function(){
 							scope.showEditor(event);
 						});
 					});

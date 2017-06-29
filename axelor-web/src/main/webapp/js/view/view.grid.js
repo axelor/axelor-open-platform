@@ -551,7 +551,7 @@ function GridViewCtrl($scope, $element) {
 	
 	$scope.onItemDblClick = function(event, args) {
 		$scope.onEdit();
-		$scope.$apply();
+		$scope.$applyAsync();
 	};
 	
 	var _getContext = $scope.getContext;
@@ -772,7 +772,7 @@ ui.directive('uiPortletGrid', function(){
 
 				setTimeout(function(){
 					NavService.openView(tab);
-					$scope.$apply();
+					$scope.$applyAsync();
 					if (force) {
 						$scope.waitForActions(function() {
 							var scope = ($scope.selectedTab || {}).$viewScope;

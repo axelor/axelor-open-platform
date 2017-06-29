@@ -703,7 +703,7 @@ ui.formInput('RadioSelect', {
 		element.on("change", ":input", function(e) {
 			var val = parseNumber(scope.field, $(e.target).val());
 			scope.setValue(val, true);
-			scope.$apply();
+			scope.$applyAsync();
 		});
 		
 		if (field.direction === "vertical" || field.dir === "vert") {
@@ -759,7 +759,7 @@ ui.formInput('CheckboxSelect', {
 			});
 			var value =  selected.length === 0 ? null : selected.join(",");
 			scope.setValue(value, true);
-			scope.$apply();
+			scope.$applyAsync();
 		});
 
 		if (field.direction === "vertical" || field.dir === "vert") {

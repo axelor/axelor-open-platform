@@ -457,7 +457,7 @@
 					width: 420,
 					close: function() {
 						$scope.httpError = {};
-						$scope.$apply();
+						$scope.$applyAsync();
 					},
 					show: {
 						effect: 'fade',
@@ -469,7 +469,7 @@
 						click: function(){
 							var elem = $(this);
 							$scope.onErrorWindowShow('stacktrace');
-							$scope.$apply(function () {
+							$scope.$applyAsync(function () {
 								setTimeout(function () {
 									var maxHeight = $(document).height() - 132;
 									var height = maxHeight;
