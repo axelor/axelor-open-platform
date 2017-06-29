@@ -255,7 +255,7 @@ var NestedEditor = {
 				}
 				unwatchId();
 				unwatchId = null;
-				scope.applyLater();
+				scope.$applyAsync();
 			});
 
 			var unwatchValid = nested.$watch('form.$valid', function(valid, old){

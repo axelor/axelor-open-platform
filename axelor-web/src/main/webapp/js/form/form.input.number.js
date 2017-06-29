@@ -159,7 +159,7 @@ ui.formInput('Number', {
 			}
 
 			scope.setValue(val);
-			scope.applyLater();
+			scope.$applyAsync();
 			
 			pendingChange = true;
 			

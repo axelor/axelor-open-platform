@@ -330,7 +330,7 @@ ui.formInput('Select', 'BaseSelect', {
 		function update(value) {
 			var val = parseNumber(scope.field, value);
 			scope.setValue(val, true);
-			scope.applyLater();
+			scope.$applyAsync();
 		}
 
 		scope.handleDelete = function(e) {
@@ -540,7 +540,7 @@ ui.formInput('MultiSelect', 'Select', {
 		function update(value) {
 			var val = parseNumber(scope.field, value);
 			scope.setValue(val, true);
-			scope.applyLater();
+			scope.$applyAsync();
 			setTimeout(function () {
 				scaleInput(50);
 			});
@@ -657,7 +657,7 @@ ui.formInput('SelectQuery', 'Select', {
 		
 		function update(value) {
 			scope.setValue(value);
-			scope.applyLater();
+			scope.$applyAsync();
 		}
 
 		scope.format = function(value) {

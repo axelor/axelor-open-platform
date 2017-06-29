@@ -135,7 +135,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		if (record == null) {
 			popup.ajaxStop(function() {
 				popup.$broadcast("on:new");
-				popup.applyLater();
+				popup.$applyAsync();
 			});
 		}
 	};

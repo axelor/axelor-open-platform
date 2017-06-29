@@ -35,10 +35,10 @@ function PortalCtrl($scope, $element) {
 		});
 	}
 
-	$scope.applyLater(function(){
+	$scope.$applyAsync(function(){
 		if (view.deferred)
 			view.deferred.resolve($scope);
-	}, 0);
+	});
 
 	$scope.parse = function(schema) {
 	};

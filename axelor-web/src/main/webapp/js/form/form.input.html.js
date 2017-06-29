@@ -329,7 +329,7 @@ ui.formInput('Html', {
 			}
 
 			scope.setValue(value, true);
-			scope.applyLater();
+			scope.$applyAsync();
 		}
 
 		scope.$render_editable = function () {

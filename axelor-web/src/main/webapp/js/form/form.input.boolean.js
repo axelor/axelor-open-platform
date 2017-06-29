@@ -136,7 +136,7 @@ ui.formInput('BooleanSelect', 'Boolean', {
 			source: scope.$selection,
 			select: function (e, u) {
 				scope.setValue(u.item.val, true);
-				scope.applyLater();
+				scope.$applyAsync();
 			}
 		}).click(function (e) {
 			input.autocomplete("search" , '');
@@ -198,7 +198,7 @@ ui.formInput('BooleanRadio', 'BooleanSelect', {
 		element.on('change', 'input', function (e) {
 			var value = $(this).data('value') === true;
 			scope.setValue(value, true);
-			scope.applyLater();
+			scope.$applyAsync();
 		});
 	},
 	template_editable: "<span></span>"

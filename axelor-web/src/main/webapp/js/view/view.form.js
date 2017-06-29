@@ -742,7 +742,7 @@ function FormViewCtrl($scope, $element) {
 				}
 				return;
 			}
-			$scope.applyLater(callback);
+			$scope.$applyAsync(callback);
 		});
 	};
 	
@@ -999,7 +999,7 @@ function FormViewCtrl($scope, $element) {
 			$scope.onBack();
 		}
 		
-		$scope.applyLater();
+		$scope.$applyAsync();
 		
 		return false;
 	};

@@ -65,7 +65,7 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 	$scope.show();
 	
 	$scope.ajaxStop(function () {
-		$scope.applyLater();
+		$scope.$applyAsync();
 	});
 }
 

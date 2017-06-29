@@ -380,7 +380,7 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 				var elem = $(this);
 				var record = elem.scope().record;
 				scope.onEdit(record, true);
-				scope.applyLater();
+				scope.$applyAsync();
 			});
 
 			fetch();
@@ -429,7 +429,7 @@ ui.directive('uiCards', function () {
 			var elem = $(this);
 			var record = elem.scope().record;
 			scope.onEdit(record, true);
-			scope.applyLater();
+			scope.$applyAsync();
 		});
 	};
 });

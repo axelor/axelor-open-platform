@@ -444,7 +444,7 @@ function GridViewCtrl($scope, $element) {
 		}
 		$scope.switchTo('form', function(viewScope){
 			$scope.ajaxStop(function(){
-				$scope.applyLater(function(){
+				$scope.$timeout(function(){
 					viewScope.$broadcast('on:new');
 				});
 			});
@@ -532,7 +532,7 @@ function GridViewCtrl($scope, $element) {
 		});
 
 		$scope.selection = selection;
-		$scope.applyLater(function () {
+		$scope.$timeout(function () {
 			$scope.$broadcast('on:grid-selection-change', $scope.getContext());
 		});
 		
@@ -652,7 +652,7 @@ function GridViewCtrl($scope, $element) {
 			$scope.onNext();
 		}
 
-		$scope.applyLater();
+		$scope.$applyAsync();
 		return false;
 	};
 }

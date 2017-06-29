@@ -665,7 +665,7 @@ ui.directive('uiMailEditor', ["$compile", function ($compile) {
 				.click(function() {
 					var uploader = $compile('<div ui-dms-popup x-on-select="onSelectFiles"></div>')(popup);
 					uploader.isolateScope().showPopup();
-					uploader.isolateScope().applyLater();
+					uploader.isolateScope().$applyAsync();
 				});
 
 				$('<div class="pull-left ui-dialog-buttonset" style="float: left;"></div>')
@@ -853,7 +853,7 @@ ui.formWidget('uiMailComposer', {
 		textarea.on('blur', function () {
 			if (scope.post || !scope.message) return;
 			scope.message.$reply = false;
-			scope.applyLater();
+			scope.$applyAsync();
 		});
 
 		scope.$on('on:message-add', function () {

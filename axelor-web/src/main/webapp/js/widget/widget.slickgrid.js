@@ -774,7 +774,7 @@ Grid.prototype.parse = function(view) {
 				if (handler && handler.onEdit) {
 					handler.waitForActions(function () {
 						args.grid.setActiveCell(args.row, args.cell);
-						handler.applyLater(function () {
+						handler.$applyAsync(function () {
 							handler.onEdit(true);
 						});
 					});
@@ -2007,7 +2007,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 		var args = grid.getActiveCell();
 
 		formScope.editRecord(values);
-		formScope.applyLater();
+		formScope.$applyAsync();
 
 		if (!formScope.$events.onNew) {
 			return;

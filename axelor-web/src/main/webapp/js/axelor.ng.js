@@ -93,10 +93,6 @@
 				}, waitFor);
 			};
 
-			__custom__.applyLater = function applyLater(func, wait) {
-				return this.$timeout(func ||angular.noop, wait);
-			};
-
 			__custom__.$callWhen = function (predicate, callback, wait) {
 				var count = wait || 100;
 

@@ -754,7 +754,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 
 				// continue with next chunk
 				sendChunk();
-				scope.applyLater();
+				scope.$applyAsync();
 			}
 
 			function sendChunk() {
@@ -804,7 +804,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 				info.progress = done > 95 ? "95%" : done + "%";
 				info.transfer = formatSize(total, file.size);
 				info.loaded = total === file.size;
-				scope.applyLater();
+				scope.$applyAsync();
 			});
 
 			xhr.onreadystatechange = function(e) {
@@ -820,7 +820,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 					default:
 						onError();
 					}
-					scope.applyLater();
+					scope.$applyAsync();
 				}
 			};
 
@@ -830,7 +830,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 		}
 
 		input.change(function() {
-			scope.applyLater(function () {
+			scope.$applyAsync(function () {
 				doUpload(input.get(0).files);
 				input.val(null);
 			});
@@ -952,7 +952,7 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 	$scope.onFolderClick = function (node) {
 		if (!node || !node.id || node.home) {
 			$scope.onFolder();
-			$scope.applyLater();
+			$scope.$applyAsync();
 			return;
 		}
 		var paths = [];
@@ -962,7 +962,7 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 			parent = parent.parent;
 		}
 		$scope.onFolder(node, paths);
-		$scope.applyLater();
+		$scope.$applyAsync();
 	};
 }
 
@@ -1492,7 +1492,7 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 		link: function (scope, element, attrs) {
 
 			scope._onSelectFiles = function (items) {
-				scope.applyLater(function () {
+				scope.$applyAsync(function () {
 					var promise = scope.onSelect()(items);
 					if (promise && promise.then) {
 						promise.then(function () {

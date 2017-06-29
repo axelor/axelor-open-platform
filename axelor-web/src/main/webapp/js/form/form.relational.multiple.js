@@ -133,7 +133,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 
 		$scope.itemsPending = records;
 		$scope.setValue(records, callOnChange);
-		$scope.applyLater(function(){
+		$scope.$timeout(function() {
 			$scope.$broadcast('grid:changed');
 		});
 	};
@@ -168,7 +168,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		});
 		
 		$scope.setValue(records, fireOnChange);
-		$scope.applyLater();
+		$scope.$applyAsync();
 	};
 
 	$scope.removeSelected = function(selection) {
@@ -185,7 +185,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 			$scope.dataView.deleteItem(id);
 		});
 		$scope.setValue(items, true);
-		$scope.applyLater();
+		$scope.$applyAsync();
 	};
 
 	$scope.canEditTarget = function () {
@@ -855,7 +855,7 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 					input.val("");
 				});
 				ui.item.click.call(scope);
-				return scope.applyLater();
+				return scope.$applyAsync();
 			}
 			return _handleSelect.apply(this, arguments);
 		};

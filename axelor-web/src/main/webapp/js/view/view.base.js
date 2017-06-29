@@ -475,7 +475,7 @@ ui.directive('uiViewPopup', function() {
 				if (parent && parent.reload && params.popup === "reload") {
 					parent.reload();
 				}
-				$scope.applyLater();
+				$scope.$applyAsync();
 			};
 
 			$scope.onPopupOK = function () {
@@ -485,9 +485,7 @@ ui.directive('uiViewPopup', function() {
 				}
 				return viewScope.onSave().then(function(record, page) {
 					viewScope.edit(record);
-					viewScope.applyLater(function() {
-						$scope.onOK();
-					});
+					viewScope.$timeout($scope.onOK.bind($scope));
 				});
 			};
 
@@ -766,7 +764,7 @@ ui.directive('uiHotKeys', function() {
 
 			if (action === "close") {
 				scope.closeTab(tab, function() {
-					scope.applyLater();
+					scope.$applyAsync();
 				});
 				return false;
 			}
@@ -815,14 +813,14 @@ ui.directive('uiHotKeys', function() {
 
 			$.event.trigger('cancel:hot-edit');
 				
-			fs.applyLater(function () {
+			fs.$applyAsync(function () {
 				fs.attr("force-edit", true);
-				fs.$timeout(function() {
+				setTimeout(function() {
 					elem.find(':input:first').focus();
 				}, 100);
 				elem.on('cancel:hot-edit', function () {
 					cleanup();
-					fs.applyLater();
+					fs.$applyAsync();
 				});
 				elem.on('$destroy.hot-edit', cleanup);
 				unwatch = fs.$watch("attr('force-edit')", function(edit) {

@@ -695,7 +695,7 @@ ActionHandler.prototype = {
 			axelor.dialogs.box(data.flash || data.info, {
 				onClose: function () {
 					if (data.pending) {
-						scope.applyLater(function(){
+						scope.$applyAsync(function(){
 							if (data.reload) {
 								return doReload(data.pending);
 							}
@@ -715,7 +715,7 @@ ActionHandler.prototype = {
 
 		if(data.error) {
 			axelor.dialogs.error(data.error, function(){
-				scope.applyLater(function(){
+				scope.$applyAsync(function(){
 					if (data.action) {
 						self._handleAction(data.action);
 					}
@@ -727,7 +727,7 @@ ActionHandler.prototype = {
 		
 		if (data.alert) {
 			axelor.dialogs.confirm(data.alert, function(confirmed){
-				scope.applyLater(function(){
+				scope.$applyAsync(function(){
 					if (confirmed) {
 						return deferred.resolve(data.pending);
 					}
@@ -986,7 +986,7 @@ ActionHandler.prototype = {
 				record.$attachments = (record.$attachments || 0) + 1;
 				axelor.dialogs.confirm(_t('Report attached to current object. Would you like to download?'),
 				function(confirmed) {
-					scope.applyLater(function() {
+					scope.$applyAsync(function() {
 						if (confirmed) {
 							var url = "ws/rest/com.axelor.meta.db.MetaFile/" + data.attached.id + "/content/download";
 							ui.download(url);
@@ -1054,7 +1054,7 @@ ActionHandler.prototype = {
 					var url = view.name || view.resource;
 					var fileName = tab.params.fileName || "true";
 					ui.download(url, fileName);
-					return scope.applyLater();
+					return scope.$applyAsync();
 				}
 			}
 			if (tab.viewType === "html" && (tab.params||{}).target === "_blank") {
@@ -1064,14 +1064,14 @@ ActionHandler.prototype = {
 					setTimeout(function () {
 						window.open(url);
 					});
-					return scope.applyLater();
+					return scope.$applyAsync();
 				}
 			}
 			if ((tab.params && tab.params.popup) || axelor.device.mobile) {
 				tab.$popupParent = formScope;
 			}
 			openTab(scope, tab);
-			scope.applyLater();
+			scope.$applyAsync();
 		}
 		
 		if (data.view) {
@@ -1148,7 +1148,7 @@ ui.directive('uiActionClick', ['ViewService', function(ViewService) {
 				});
 				element.on("click", function () {
 					handler.handle();
-					scope.applyLater();
+					scope.$applyAsync();
 				});
 			});
 		}

@@ -46,7 +46,7 @@ ui.directive('uiUpdateButton', ['$compile', function ($compile) {
 				
 				$(document).on('mousedown.update-menu', onMouseDown);
 				
-				scope.applyLater(function () {
+				scope.$applyAsync(function () {
 					scope.visible = true;
 				});
 			};
@@ -68,7 +68,7 @@ ui.directive('uiUpdateButton', ['$compile', function ($compile) {
 				if (toggleButton) {
 					toggleButton.removeClass("active");
 				}
-				scope.applyLater(function () {
+				scope.$applyAsync(function () {
 					scope.visible = false;
 				});
 				return menu.hide();

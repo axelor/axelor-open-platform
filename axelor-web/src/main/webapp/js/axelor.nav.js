@@ -261,7 +261,7 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 				return close(tab);
 			}, function() {
 				close(null, tab);
-				viewScope.applyLater();
+				viewScope.$applyAsync();
 			});
 		}
 

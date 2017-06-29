@@ -445,7 +445,7 @@ ui.formInput('ManyToOne', 'Select', {
 				scope.select(ui.item.value);
 			}
 			setTimeout(adjustPadding, 100);
-			scope.applyLater();
+			scope.$applyAsync();
 		};
 		
 		scope.$render_editable = function() {

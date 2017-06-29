@@ -592,7 +592,7 @@
 						} else {
 							deferred.reject(response);
 						}
-						$rootScope.applyLater();
+						$rootScope.$applyAsync();
 					}
 				};
 

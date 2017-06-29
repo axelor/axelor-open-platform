@@ -35,10 +35,10 @@ function DashboardCtrl($scope, $element) {
 		});
 	}
 
-	$scope.applyLater(function(){
+	$scope.$applyAsync(function(){
 		if (view.deferred)
 			view.deferred.resolve($scope);
-	}, 0);
+	});
 
 	$scope.show = function(promise) {
 		$scope.updateRoute();

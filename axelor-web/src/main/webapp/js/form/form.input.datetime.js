@@ -372,7 +372,7 @@ ui.formInput('DateTime', {
 			}
 			
 			scope.setValue(value, true);
-			scope.applyLater();
+			scope.$applyAsync();
 		}
 
 		scope.validate = function(value) {
@@ -492,7 +492,7 @@ ui.formInput('Time', 'DateTime', {
 			}
 			
 			scope.setValue(value, true);
-			scope.applyLater();
+			scope.$applyAsync();
 		}
 		
 		scope.$render_editable = function() {

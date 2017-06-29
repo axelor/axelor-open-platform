@@ -387,7 +387,7 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
 				element.addClass('active');
 
 				if (menu.action && (menu.children||[]).length === 0) {
-					scope.applyLater(function () {
+					scope.$applyAsync(function () {
 						ctrl.onClick(e, menu);
 					});
 				}

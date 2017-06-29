@@ -29,11 +29,11 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 	var view = $scope._views.tree;
 	var viewPromise = $scope.loadView('tree', view.name);
 
-	$scope.applyLater(function() {
+	$scope.$applyAsync(function() {
 		if (view.deferred) {
 			view.deferred.resolve($scope);
 		}
-	}, 0);
+	});
 	
 	viewPromise.success(function(fields, schema){
 		$scope.parse(schema);

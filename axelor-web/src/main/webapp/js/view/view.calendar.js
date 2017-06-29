@@ -455,7 +455,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 					start: start,
 					end: end
 				};
-				scope.applyLater(function(){
+				scope.$applyAsync(function(){
 					scope.showEditor(event);
 				});
 				main.fullCalendar('unselect');

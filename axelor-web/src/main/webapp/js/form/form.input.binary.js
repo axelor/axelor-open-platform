@@ -227,7 +227,7 @@ ui.formInput('Image', 'ImageLink', {
 		}
 
 		function update(value) {
-			scope.applyLater(function() {
+			scope.$applyAsync(function() {
 				doUpdate(value);
 			});
 		}
@@ -319,7 +319,7 @@ ui.formInput('Binary', {
 				if(scope._model === META_FILE) {
 					record.fileName = file.name;
 				}
-				scope.applyLater(function() {
+				scope.$applyAsync(function() {
 					record.fileType = file.type;
 					record.fileSize = file.size;
 				});

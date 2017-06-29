@@ -101,7 +101,7 @@ ui.formInput('CodeEditor', {
 			if (value !== model.$viewValue) {
 				model.$setViewValue(value);
 			}
-			scope.applyLater();
+			scope.$applyAsync();
 		}
 
 		function resize() {

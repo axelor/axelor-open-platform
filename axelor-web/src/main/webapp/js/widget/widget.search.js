@@ -1045,7 +1045,7 @@ ui.directive('uiFilterBox', function() {
 
 				$(document).on('mousedown.search-menu', onMouseDown);
 				
-				scope.applyLater(function () {
+				scope.$applyAsync(function () {
 					scope.visible = true;
 				});
 			};
@@ -1102,7 +1102,7 @@ ui.directive('uiFilterBox', function() {
 
 			function hideMenu() {
 				$(document).off('mousedown.search-menu', onMouseDown);
-				scope.applyLater(function () {
+				scope.$applyAsync(function () {
 					scope.visible = false;
 				});
 				menu.hide();

@@ -196,7 +196,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			$scope.onOK();
 		}
 		
-		$scope.applyLater();
+		$scope.$applyAsync();
 		
 		return false;
 	};
@@ -241,7 +241,7 @@ function SelectorCtrl($scope, $element, DataSource, ViewService) {
 	};
 	
 	$scope.onItemClick = function(e, args) {
-		$scope.applyLater($scope.onOK);
+		$scope.$applyAsync($scope.onOK.bind($scope));
 	};
 	
 	var origOnShow = $scope.onShow;
@@ -261,7 +261,7 @@ function SelectorCtrl($scope, $element, DataSource, ViewService) {
 		});
 		
 		if (!_.isEmpty(selection)) {
-			$scope.applyLater(function () {
+			$scope.$applyAsync(function () {
 				$scope.$parent.select(selection);
 				$scope.selection = [];
 			});
@@ -395,7 +395,7 @@ ui.directive('uiEditorPopup', function() {
 				});
 				element.on('dialogopen', function (e) {
 					scope.isPopupOpen = isOpen = true;
-					scope.applyLater();
+					scope.$applyAsync();
 				});
 			});
 		},

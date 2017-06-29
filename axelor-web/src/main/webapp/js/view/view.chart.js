@@ -205,7 +205,7 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 
 		function reload() {
 			$scope.$parent.onRefresh();
-			$scope.applyLater();
+			$scope.$applyAsync();
 		}
 		
 		function delayedReload() {
