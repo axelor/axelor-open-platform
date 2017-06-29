@@ -203,6 +203,8 @@
 	
 	module.config(['$httpProvider', function(provider) {
 
+		provider.useApplyAsync(true);
+
 		var toString = Object.prototype.toString;
 
 		function isFile(obj) {
