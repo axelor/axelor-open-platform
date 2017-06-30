@@ -256,7 +256,7 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 					"<input type='text'>" +
 				"</div>" +
 				"<ul class='nav nav-tree'>" +
-					"<li ng-repeat='menu in menus' ui-nav-sub-tree x-menu='menu'></li>" +
+					"<li ng-repeat='menu in menus track by menu.name' ui-nav-sub-tree x-menu='menu'></li>" +
 				"</ul>" +
 			"</div>"
 	};
@@ -281,7 +281,7 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
 			if (menu.children) {
 				var sub = $(
 					"<ul class='nav ui-nav-sub-tree'>" +
-						"<li ng-repeat='child in menu.children' ui-nav-sub-tree x-menu='child'></li>" +
+						"<li ng-repeat='child in menu.children track by child.name' ui-nav-sub-tree x-menu='child'></li>" +
 					"</ul>");
 				sub = $compile(sub)(scope);
 				sub.appendTo(element);
@@ -415,12 +415,12 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
 		},
 		replace: true,
 		template:
-			"<li ng-class='{folder: menu.children, tagged: menu.tag }' data-name='{{menu.name}}'>" +
+			"<li ng-class='{folder: menu.children, tagged: menu.tag }' data-name='{{::menu.name}}'>" +
 				"<a href='#'>" +
-					"<img class='nav-image' ng-if='menu.icon' ng-src='{{menu.icon}}'></img>" +
-					"<span class='nav-icon' ng-if='menu.fa'><i class='fa' ng-class='menu.fa'></i></span>" +
+					"<img class='nav-image' ng-if='::menu.icon' ng-src='{{::menu.icon}}'></img>" +
+					"<span class='nav-icon' ng-if='::menu.fa'><i class='fa' ng-class='::menu.fa'></i></span>" +
 					"<span ng-show='menu.tag' ng-class='menu.tagCss' class='nav-tag label'>{{menu.tag}}</span>" +
-					"<span class='nav-title'>{{menu.title}}</span>" +
+					"<span class='nav-title'>{{::menu.title}}</span>" +
 				"</a>" +
 			"</li>"
 	};

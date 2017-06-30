@@ -190,7 +190,7 @@ ui.directive('navMenuBar', function() {
 
 		template:
 			"<ul class='nav nav-menu-bar'>" +
-				"<li class='nav-menu dropdown' ng-class='{empty: !hasText(menu)}' ng-repeat='menu in menus'>" +
+				"<li class='nav-menu dropdown' ng-class='{empty: !hasText(menu)}' ng-repeat='menu in menus track by menu.name'>" +
 					"<a href='javascript:' class='dropdown-toggle' data-toggle='dropdown'>" +
 						"<img ng-if='hasImage(menu)' ng-src='{{menu.icon}}'> " +
 						"<i ng-if='hasIcon(menu)' class='fa {{menu.icon}}'></i> " +
@@ -223,7 +223,7 @@ ui.directive('navMenu', function() {
 		},
 		template:
 			"<ul class='dropdown-menu'>" +
-				"<li ng-repeat='item in menu.children' nav-menu-item='item'>" +
+				"<li ng-repeat='item in menu.children track by item.name' nav-menu-item='item'>" +
 			"</ul>"
 	};
 });
@@ -365,7 +365,7 @@ ui.directive('navMenuFav', function() {
 			"<ul class='dropdown-menu'>" +
 				"<li><a href='' ng-click='addFav()' x-translate>Add to favorites...</a></li>" +
 				"<li class='divider'></li>" +
-				"<li ng-repeat='item in items'><a ng-href='#{{item.link}}'>{{item.title}}</a></li>" +
+				"<li ng-repeat='item in items track by item.name'><a ng-href='#{{item.link}}'>{{item.title}}</a></li>" +
 				"<li class='divider'></li>" +
 				"<li><a href='' ng-click='manageFav()' x-translate>Organize favorites...</a></li>" +
 			"</ul>"
