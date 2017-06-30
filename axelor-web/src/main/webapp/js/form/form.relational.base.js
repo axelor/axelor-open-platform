@@ -133,13 +133,12 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		var popup = editor.isolateScope();
 		popup.show(record);
 		if (record == null) {
-			popup.ajaxStop(function() {
+			popup._afterPopupShow = function() {
 				popup.$broadcast("on:new");
-				popup.$applyAsync();
-			});
+			};
 		}
 	};
-	
+
 	function _showEditor(record) {
 		
 		if (!$scope._isPopup && field.editWindow === "blank" && record && record.id > 0) {

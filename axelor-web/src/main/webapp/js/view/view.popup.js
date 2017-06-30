@@ -311,6 +311,9 @@ ui.directive('uiDialogSize', function() {
 			element.dialog('open');
 			element.scrollTop(0);
 			setTimeout(doFocus);
+			if (scope._afterPopupShow) {
+				scope._afterPopupShow();
+			}
 		}
 
 		function doShow() {
