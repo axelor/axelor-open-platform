@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -76,6 +77,14 @@ public class QueryTest extends JpaTest {
 		List<?> result = q.fetch();	
 		Assert.assertNotNull(result);
 		Assert.assertTrue(result.size() > 0);
+	}
+	
+	@Test
+	public void testStream() {
+		final Query<Contact> q = all(Contact.class);
+		final List<?> first = q.fetch();
+		final List<?> second = q.fetchSteam().collect(Collectors.toList());
+		Assert.assertEquals(first.size(), second.size());
 	}
 
 	@Test

@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
@@ -31,6 +32,7 @@ import javax.persistence.TypedQuery;
 
 import com.axelor.common.StringUtils;
 import com.axelor.db.hibernate.type.JsonFunction;
+import com.axelor.db.internal.DBHelper;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -236,6 +238,43 @@ public class Query<T extends Model> {
 	}
 
 	/**
+	 * Fetch all the matched records as {@link Stream}.
+	 * 
+	 * @return stream of matched records.
+	 */
+	public Stream<T> fetchSteam() {
+		return fetchSteam(0, 0);
+	}
+
+	/**
+	 * Fetch the matched records as {@link Stream} with the given limit.
+	 *
+	 * @param limit
+	 *            the limit
+	 * @return stream of matched records within the limit
+	 */
+	public Stream<T> fetchSteam(int limit) {
+		return fetchSteam(limit, 0);
+	}
+
+	/**
+	 * Fetch the matched records as {@link Stream} within the given range.
+	 *
+	 * @param limit
+	 *            the limit
+	 * @param offset
+	 *            the offset
+	 * @return stream of matched records within the range
+	 */
+	public Stream<T> fetchSteam(int limit, int offset) {
+		final org.hibernate.query.Query<T> query = (org.hibernate.query.Query<T>) fetchQuery(limit, offset);
+		if (limit <= 0) {
+			query.setFetchSize(DBHelper.getJdbcFetchSize());
+		}
+		return query.stream();
+	}
+
+	/**
 	 * Fetch all the matched records.
 	 *
 	 * @return list of all the matched records.
@@ -245,11 +284,11 @@ public class Query<T extends Model> {
 	}
 
 	/**
-	 * Fetch the matchied records with the given limit.
+	 * Fetch the matched records with the given limit.
 	 *
 	 * @param limit
 	 *            the limit
-	 * @return matched records withing the limit
+	 * @return matched records within the limit
 	 */
 	public List<T> fetch(int limit) {
 		return fetch(limit, 0);
@@ -265,6 +304,10 @@ public class Query<T extends Model> {
 	 * @return list of matched records within the range
 	 */
 	public List<T> fetch(int limit, int offset) {
+		return fetchQuery(limit, offset).getResultList();
+	}
+	
+	private TypedQuery<T> fetchQuery(int limit, int offset) {
 		final TypedQuery<T> query = em().createQuery(selectQuery(), beanClass);
 		if (limit > 0) {
 			query.setMaxResults(limit);
@@ -277,7 +320,7 @@ public class Query<T extends Model> {
 		if (readOnly) {
 			binder.setReadOnly();
 		}
-		return query.getResultList();
+		return query;
 	}
 
 	/**
