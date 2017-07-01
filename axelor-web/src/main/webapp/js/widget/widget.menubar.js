@@ -66,11 +66,11 @@ ui.directive('uiMenuBar', function() {
 
 		template:
 			"<ul class='nav menu-bar'>" +
-				"<li class='menu dropdown button-menu' ng-class='::{\"button-menu\": menu.isButton}' ng-repeat='menu in ::menus'>" +
+				"<li class='menu dropdown button-menu' ng-class='::{\"button-menu\": menu.isButton, \"has-icon\": menu.icon}' ng-repeat='menu in ::menus'>" +
 					"<a href='' class='dropdown-toggle btn' ng-class='::{\"btn\": menu.isButton}' data-toggle='dropdown' ng-click='onMenuClick($event)'>" +
 						"<img ng-if='::isImage(menu)' ng-src='{{menu.icon}}'> " +
 						"<i class='fa {{::menu.icon}}' ng-if='::isIcon(menu)'></i> " +
-						"<span ng-show='::canShowTitle(menu)'>{{::menu.title}}</span> " +
+						"<span class='menu-title' ng-show='::canShowTitle(menu)'>{{::menu.title}}</span> " +
 						"<b class='caret'></b>" +
 					"</a>" +
 					"<ul ui-menu='menu'></ul>" +
@@ -198,15 +198,13 @@ ui.directive('uiToolbarAdjust', function() {
 		var elemToolbar = null;
 		var elemSiblings = null;
 
-		var elemMenubarMobile = null;
 		var elemToolbarMobile = null;
 		
 		function setup() {
 			elemMenubar = element.children('.view-menubar');
 			elemToolbar = element.children('.view-toolbar');
-			elemSiblings = element.children(':not(.view-menubar,.view-toolbar,.view-menubar-mobile,.view-toolbar-mobile)');
+			elemSiblings = element.children(':not(.view-menubar,.view-toolbar,.view-toolbar-mobile)');
 
-			elemMenubarMobile = element.children('.view-menubar-mobile').hide();
 			elemToolbarMobile = element.children('.view-toolbar-mobile').hide();
 			
 			var running = false;
@@ -228,7 +226,7 @@ ui.directive('uiToolbarAdjust', function() {
 		}
 
 		function hideAndShow(first, second, visibility) {
-			[elemMenubar, elemToolbar, elemMenubarMobile, elemToolbarMobile].forEach(function (elem) {
+			[elemMenubar, elemToolbar, elemToolbarMobile].forEach(function (elem) {
 				elem.hide().css('visibility', 'hidden');
 			});
 			[first, second].forEach(function (elem) {
@@ -246,14 +244,14 @@ ui.directive('uiToolbarAdjust', function() {
 			elemSiblings.each(function (i) {
 				width -= $(this).width();
 			});
-
+			
 			if (axelor.device.small) {
-				if (width > elemToolbarMobile.width() + elemMenubarMobile.width()) {
-					hideAndShow(elemToolbarMobile, elemMenubarMobile);
+				if (width > elemToolbarMobile.width() + elemMenubar.width()) {
+					hideAndShow(elemToolbarMobile, elemMenubar);
 				} else if (width > elemToolbarMobile.width()) {
 					hideAndShow(elemToolbarMobile);
-				} else if (width > elemMenubarMobile.width()) {
-					hideAndShow(elemMenubarMobile);
+				} else if (width > elemMenubar.width()) {
+					hideAndShow(elemMenubar);
 				}
 				return;
 			}
@@ -269,8 +267,7 @@ ui.directive('uiToolbarAdjust', function() {
 			}
 
 			canShow(elemToolbar, elemMenubar) ||
-			canShow(elemToolbar, elemMenubarMobile) ||
-			canShow(elemToolbarMobile, elemMenubarMobile);
+			canShow(elemToolbarMobile, elemMenubar);
 		}
 
 		scope.waitForActions(setup, 100);

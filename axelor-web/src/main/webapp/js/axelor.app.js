@@ -592,6 +592,8 @@
 		$(window).resize(function(event){
 			if (!event.isTrigger)
 				$.event.trigger('adjustSize');
+			$('body').toggleClass('device-small', axelor.device.small);
+			$('body').toggleClass('device-mobile', axelor.device.mobile);
 		});
 	});
 

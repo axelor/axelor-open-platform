@@ -239,10 +239,6 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
 					})
 				}];
 
-				$scope.menubarAsMenu = _.isEmpty(schema.menubar) ? null : [_.extend({}, _.first(schema.menubar), {
-					isButton: true
-				})];
-
 				// watch on view.loaded to improve performance
 				schema.loaded = true;
 			});

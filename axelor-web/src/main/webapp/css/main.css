@@ -777,6 +777,10 @@ img.prefix-icon {
 	white-space: nowrap;
 }
 
+.device-small .record-toolbar .menu-bar .has-icon .menu-title {
+  display: none;
+}
+
 .record-toolbar .menu-bar,
 .record-toolbar .view-toolbar {
 	margin-left: 0;

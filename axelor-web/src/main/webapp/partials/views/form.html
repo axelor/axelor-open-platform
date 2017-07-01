@@ -31,9 +31,8 @@
         <div class="btn-group" ng-show="toolbar.length" style="display: none;">
           <button ng-repeat="btn in toolbar | filter:{custom: false}" ui-tool-button></button>
         </div>
-        <div ui-menu-bar x-menus="menubar" x-handler="this" class="view-menubar" style="visibility: hidden;"></div>
         <div ui-menu-bar x-menus="toolbarAsMenu" x-handler="this" class="view-toolbar-mobile" style="visibility: hidden;"></div>
-        <div ui-menu-bar x-menus="menubarAsMenu" x-handler="this" class="view-menubar-mobile" style="visibility: hidden;"></div>
+        <div ui-menu-bar x-menus="menubar" x-handler="this" class="view-menubar" style="visibility: hidden;"></div>
         <div class="record-toolbar-right">
             <div ui-view-customize class="pull-right"></div>
             <div ui-view-switcher class="pull-right"></div>
