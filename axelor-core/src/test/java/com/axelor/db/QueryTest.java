@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -85,6 +86,22 @@ public class QueryTest extends JpaTest {
 		final List<?> first = q.fetch();
 		final List<?> second = q.fetchSteam().collect(Collectors.toList());
 		Assert.assertEquals(first.size(), second.size());
+	}
+	
+	@Test
+	@Transactional
+	public void testBulkRemove() {
+		final List<String> names = Arrays.asList("Bulk Remove 1", "Bulk Remove 2");
+		names.stream().forEach(name -> {
+			Contact c = new Contact();
+			c.setFirstName(name);
+			c.setLastName(name);
+			JPA.em().persist(c);
+		});
+		final Query<Contact> q = all(Contact.class).filter("self.firstName in (:names)").bind("names", names);
+		final long count = q.count();
+		final long removed = q.remove();
+		Assert.assertEquals(count, removed);
 	}
 
 	@Test

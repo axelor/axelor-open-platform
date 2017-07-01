@@ -442,12 +442,9 @@ public class Query<T extends Model> {
 	 * @return total number of records removed.
 	 */
 	public long remove() {
-		long n = this.count();
-		while(this.count() > 0) {
-			for(T o : this.fetch(100))
-				JPA.remove(o);
-		}
-		return n;
+		return fetchSteam()
+			.peek(JPA::remove)
+			.count();
 	}
 
 	protected String selectQuery() {
