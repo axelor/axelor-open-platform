@@ -297,6 +297,12 @@ function BarLayout(items, attrs, $scope, $compile) {
 
 	var row = $('<div class="row-fluid">').append(main);
 	
+	if (side && axelor.device.small) {
+		side.children().first().prependTo(main);
+		side.children().appendTo(main);
+		main.children('[ui-panel-mail]').appendTo(main);
+	}
+
 	if (side) {
 		side.appendTo(row);
 	}
