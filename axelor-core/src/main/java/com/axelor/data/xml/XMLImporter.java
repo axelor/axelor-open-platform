@@ -43,6 +43,7 @@ import com.axelor.data.Listener;
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.db.internal.DBHelper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
@@ -135,15 +136,6 @@ public class XMLImporter implements Importer {
 	public void setCanClear(boolean canClear) {
 		this.canClear = canClear;
 	}
-	
-	private int getBatchSize() {
-		try {
-			Object val = JPA.em().getEntityManagerFactory().getProperties().get("hibernate.jdbc.batch_size");
-			return Integer.parseInt(val.toString());
-		} catch (Exception e) {
-		}
-		return DEFAULT_BATCH_SIZE;
-	}
 
 	@Override
 	public void run() {
@@ -204,7 +196,7 @@ public class XMLImporter implements Importer {
 	
 	private void process(XMLInput input, Reader reader) throws ImportException {
 
-		final int batchSize = getBatchSize();
+		final int batchSize = DBHelper.getJdbcBatchSize();
 
 		final XStream stream = new XStream(new StaxDriver()) {
 

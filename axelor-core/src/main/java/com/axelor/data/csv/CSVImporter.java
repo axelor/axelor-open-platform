@@ -42,6 +42,7 @@ import com.axelor.data.Listener;
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.db.internal.DBHelper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -136,15 +137,6 @@ public class CSVImporter implements Importer {
 		for (String name : names)
 			all.add(new File(dataDir, name));
 		return all;
-	}
-
-	private int getBatchSize() {
-		try {
-			Object val = JPA.em().getEntityManagerFactory().getProperties().get("hibernate.jdbc.batch_size");
-			return Integer.parseInt(val.toString());
-		} catch (Exception e) {
-		}
-		return DEFAULT_BATCH_SIZE;
 	}
 
 	public CSVLogger getLoggerManager() {
@@ -284,7 +276,7 @@ public class CSVImporter implements Importer {
 
 		int count = 0;
 		int total = 0;
-		int batchSize = getBatchSize();
+		int batchSize = DBHelper.getJdbcBatchSize();
 
 		JPA.em().getTransaction().begin();
 		try {
