@@ -35,6 +35,7 @@ import com.axelor.app.AppSettings;
 import com.axelor.auth.AuditInterceptor;
 import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.db.hibernate.dialect.CustomDialectResolver;
 import com.axelor.db.hibernate.naming.ImplicitNamingStrategyImpl;
 import com.axelor.db.hibernate.naming.PhysicalNamingStrategyImpl;
 import com.axelor.db.internal.DBHelper;
@@ -143,6 +144,7 @@ public class JpaModule extends AbstractModule {
 		properties.put(Environment.USE_NEW_ID_GENERATOR_MAPPINGS, "true");
 		properties.put(Environment.IMPLICIT_NAMING_STRATEGY, ImplicitNamingStrategyImpl.class.getName());
 		properties.put(Environment.PHYSICAL_NAMING_STRATEGY, PhysicalNamingStrategyImpl.class.getName());
+		properties.put(Environment.DIALECT_RESOLVERS, CustomDialectResolver.class.getName());
 
 		properties.put(Environment.AUTOCOMMIT, "false");
 		properties.put(Environment.CONNECTION_PROVIDER_DISABLES_AUTOCOMMIT, "true");
