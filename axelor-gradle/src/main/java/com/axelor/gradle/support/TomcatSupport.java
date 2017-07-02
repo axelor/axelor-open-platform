@@ -18,6 +18,7 @@
 package com.axelor.gradle.support;
 
 import org.gradle.api.Project;
+import org.gradle.api.plugins.JavaPlugin;
 
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.tasks.TomcatRun;
@@ -34,6 +35,7 @@ public class TomcatSupport extends AbstractSupport {
 		applyConfigurationLibs(project, TOMCAT_CONFIGURATION, TOMCAT_CONFIGURATION);
 
 		project.getTasks().create(TOMCAT_RUN_TASK, TomcatRun.class, task -> {
+			task.dependsOn(JavaPlugin.CLASSES_TASK_NAME);
 			task.dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
 			task.setGroup(AxelorPlugin.AXELOR_APP_GROUP);
 		});
