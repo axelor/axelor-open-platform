@@ -240,7 +240,17 @@ public class Query<T extends Model> {
 	/**
 	 * Fetch all the matched records as {@link Stream}.
 	 * 
+	 * <p>
+	 * Recommended only when dealing with large data, for example, batch processing.
+	 * For normal use cases, the {@link #fetch()} is more appropriate.
+	 * 
+	 * <p>
+	 * Also configure <code>hibernate.jdbc.fetch_size</code> (default is 20) to fine
+	 * tune the fetch size.
+	 * 
 	 * @return stream of matched records.
+	 * @see #fetchSteam(int)
+	 * @see #fetchSteam(int, int)
 	 */
 	public Stream<T> fetchSteam() {
 		return fetchSteam(0, 0);
@@ -249,9 +259,18 @@ public class Query<T extends Model> {
 	/**
 	 * Fetch the matched records as {@link Stream} with the given limit.
 	 *
+	 * <p>
+	 * Recommended only when dealing with large data, for example, batch processing.
+	 * For normal use cases, the {@link #fetch()} is more appropriate.
+	 * 
+	 * <p>
+	 * Also configure <code>hibernate.jdbc.fetch_size</code> (default is 20) to fine
+	 * tune the fetch size.
+	 * 
 	 * @param limit
 	 *            the limit
 	 * @return stream of matched records within the limit
+	 * @see #fetchSteam(int, int)
 	 */
 	public Stream<T> fetchSteam(int limit) {
 		return fetchSteam(limit, 0);
@@ -260,6 +279,14 @@ public class Query<T extends Model> {
 	/**
 	 * Fetch the matched records as {@link Stream} within the given range.
 	 *
+	 * <p>
+	 * Recommended only when dealing with large data, for example, batch processing.
+	 * For normal use cases, the {@link #fetch()} is more appropriate.
+	 * 
+	 * <p>
+	 * Also configure <code>hibernate.jdbc.fetch_size</code> (default is 20) to fine
+	 * tune the fetch size.
+	 * 
 	 * @param limit
 	 *            the limit
 	 * @param offset
