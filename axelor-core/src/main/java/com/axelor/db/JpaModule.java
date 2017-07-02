@@ -128,7 +128,10 @@ public class JpaModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		log.debug("Configuring database...");
-		Properties properties = new Properties();
+		
+		final AppSettings settings = AppSettings.get();
+		final Properties properties = new Properties();
+
 		if (this.properties != null) {
 			properties.putAll(this.properties);
 		}
@@ -151,8 +154,17 @@ public class JpaModule extends AbstractModule {
 		properties.put("hibernate.hikari.maximumPoolSize", "200");
 		properties.put("hibernate.hikari.idleTimeout", "30000");
 
+		// update properties with all hibernate.* settings from app configuration
+		settings.getProperties().stringPropertyNames().stream()
+			.filter(n -> n.startsWith("hibernate."))
+			.forEach(n -> properties.put(n, settings.get(n)));
+
+		configureCache(settings, properties);
+		configureMultiTenancy(settings, properties);
+		configureSearch(settings, properties);
+
 		try {
-			updatePersistenceProperties(properties);
+			configureConnection(settings, properties);
 		} catch (Exception e) {
 		}
 
@@ -165,52 +177,72 @@ public class JpaModule extends AbstractModule {
 		bind(JPA.class).asEagerSingleton();
 	}
 
-	private Properties updatePersistenceProperties(Properties properties) {
-
-		final AppSettings settings = AppSettings.get();
-
-		for (String name : settings.getProperties().stringPropertyNames()) {
-			if (name.startsWith("hibernate.")) {
-				properties.put(name, settings.get(name));
-			}
+	private void configureConnection(final AppSettings settings, final Properties properties) {
+		if (DBHelper.isDataSourceUsed()) {
+			properties.put(Environment.DATASOURCE, DBHelper.getDataSourceName());
+			return;
 		}
 
-		// L2-cache support
-		if (DBHelper.isCacheEnabled()) {
-			properties.put(Environment.USE_SECOND_LEVEL_CACHE, "true");
-			properties.put(Environment.USE_QUERY_CACHE, "true");
+		final Map<String, String> keys = new HashMap<>();
+		final String unit = jpaUnit.replaceAll("(PU|Unit)$", "").replaceAll("^persistence$", "default");
 
-			final String jcacheProvider = settings.get(JCacheRegionFactory.PROVIDER);
-			final String jcacheConfig = settings.get(JCacheRegionFactory.CONFIG_URI);
-
-			if (jcacheProvider != null) {
-				// use jcache
-				properties.put(Environment.CACHE_REGION_FACTORY, JCacheRegionFactory.class.getName());
-				properties.put(JCacheRegionFactory.PROVIDER, jcacheProvider);
-				properties.put(JCacheRegionFactory.CONFIG_URI, jcacheConfig);
-			} else {
-				// use infinispan
-				properties.put(Environment.CACHE_REGION_FACTORY, InfinispanRegionFactory.class.getName());
-				String infinispanConfig = settings.get(InfinispanRegionFactory.INFINISPAN_CONFIG_RESOURCE_PROP);
-				if (infinispanConfig == null) {
-					infinispanConfig = ResourceUtils.getResource(INFINISPAN_CONFIG) != null
-							? INFINISPAN_CONFIG
-							: INFINISPAN_CONFIG_FALLBACK;
-				}
-				if (INFINISPAN_CONFIG_FALLBACK.equals(infinispanConfig)) {
-					properties.put(Environment.DEFAULT_CACHE_CONCURRENCY_STRATEGY, "read-write");
-				}
-				properties.put(InfinispanRegionFactory.INFINISPAN_CONFIG_RESOURCE_PROP, infinispanConfig);
+		keys.put("db.%s.ddl", Environment.HBM2DDL_AUTO);
+		keys.put("db.%s.driver", Environment.JPA_JDBC_DRIVER);
+		keys.put("db.%s.url", Environment.JPA_JDBC_URL);
+		keys.put("db.%s.user", Environment.JPA_JDBC_USER);
+		keys.put("db.%s.password", Environment.JPA_JDBC_PASSWORD);
+		
+		for (String key : keys.keySet()) {
+			String name = keys.get(key);
+			String value = settings.get(String.format(key, unit));
+			if (!StringUtils.isBlank(value)) {
+				properties.put(name, value.trim());
 			}
 		}
+	}
 
+	private void configureCache(final AppSettings settings, final Properties properties) {
+		if (!DBHelper.isCacheEnabled()) {
+			return;
+		}
+
+		properties.put(Environment.USE_SECOND_LEVEL_CACHE, "true");
+		properties.put(Environment.USE_QUERY_CACHE, "true");
+
+		final String jcacheProvider = settings.get(JCacheRegionFactory.PROVIDER);
+		final String jcacheConfig = settings.get(JCacheRegionFactory.CONFIG_URI);
+
+		if (jcacheProvider != null) {
+			// use jcache
+			properties.put(Environment.CACHE_REGION_FACTORY, JCacheRegionFactory.class.getName());
+			properties.put(JCacheRegionFactory.PROVIDER, jcacheProvider);
+			properties.put(JCacheRegionFactory.CONFIG_URI, jcacheConfig);
+		} else {
+			// use infinispan
+			properties.put(Environment.CACHE_REGION_FACTORY, InfinispanRegionFactory.class.getName());
+			String infinispanConfig = settings.get(InfinispanRegionFactory.INFINISPAN_CONFIG_RESOURCE_PROP);
+			if (infinispanConfig == null) {
+				infinispanConfig = ResourceUtils.getResource(INFINISPAN_CONFIG) != null
+						? INFINISPAN_CONFIG
+						: INFINISPAN_CONFIG_FALLBACK;
+			}
+			if (INFINISPAN_CONFIG_FALLBACK.equals(infinispanConfig)) {
+				properties.put(Environment.DEFAULT_CACHE_CONCURRENCY_STRATEGY, "read-write");
+			}
+			properties.put(InfinispanRegionFactory.INFINISPAN_CONFIG_RESOURCE_PROP, infinispanConfig);
+		}
+	}
+
+	private void configureMultiTenancy(final AppSettings settings, final Properties properties) {
 		// multi-tenancy support
 		if (settings.getBoolean(TenantModule.CONFIG_MULTI_TENANCY, false)) {
 			properties.put(Environment.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name());
 			properties.put(Environment.MULTI_TENANT_CONNECTION_PROVIDER, TenantConnectionProvider.class.getName());
 			properties.put(Environment.MULTI_TENANT_IDENTIFIER_RESOLVER, TenantResolver.class.getName());
 		}
+	}
 
+	private void configureSearch(final AppSettings settings, final Properties properties) {
 		// hibernate-search support
 		if ("none".equalsIgnoreCase(settings.get(SearchModule.CONFIG_DIRECTORY_PROVIDER))) {
 			properties.put(org.hibernate.search.cfg.Environment.AUTOREGISTER_LISTENERS, "false");
@@ -225,30 +257,6 @@ public class JpaModule extends AbstractModule {
 			}
 			properties.put(org.hibernate.search.cfg.Environment.MODEL_MAPPING, SearchMappingFactory.class.getName());
 		}
-
-		if (DBHelper.isDataSourceUsed()) {
-			properties.put(Environment.DATASOURCE, DBHelper.getDataSourceName());
-			return properties;
-		}
-
-		final Map<String, String> keys = new HashMap<>();
-		final String unit = jpaUnit.replaceAll("(PU|Unit)$", "").replaceAll("^persistence$", "default");
-
-		keys.put("db.%s.ddl", Environment.HBM2DDL_AUTO);
-		keys.put("db.%s.driver", Environment.JPA_JDBC_DRIVER);
-		keys.put("db.%s.url", Environment.JPA_JDBC_URL);
-		keys.put("db.%s.user", Environment.JPA_JDBC_USER);
-		keys.put("db.%s.password", Environment.JPA_JDBC_PASSWORD);
-
-		for (String key : keys.keySet()) {
-			String name = keys.get(key);
-			String value = settings.get(String.format(key, unit));
-			if (!StringUtils.isBlank(value)) {
-				properties.put(name, value.trim());
-			}
-		}
-
-		return properties;
 	}
 
 	public static class Initializer {
