@@ -24,6 +24,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
 import org.jboss.resteasy.core.Dispatcher;
+import org.jboss.resteasy.core.ResourceMethodRegistry;
+import org.jboss.resteasy.core.SynchronousDispatcher;
+import org.jboss.resteasy.plugins.guice.GuiceResourceFactory;
 import org.jboss.resteasy.plugins.guice.ModuleProcessor;
 import org.jboss.resteasy.plugins.server.servlet.ListenerBootstrap;
 import org.jboss.resteasy.spi.Registry;
@@ -33,8 +36,10 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import com.axelor.app.AppSettings;
 import com.axelor.common.logging.LoggerConfiguration;
 import com.axelor.meta.loader.ViewWatcher;
+import com.google.inject.Binding;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Stage;
 import com.google.inject.servlet.GuiceServletContextListener;
 
 /**
@@ -46,7 +51,7 @@ public class AppContextListener extends GuiceServletContextListener {
 	private ResteasyDeployment deployment;
 
 	private LoggerConfiguration loggerConfig;
-	
+
 	private LoggerConfiguration createLoggerConfig() {
 		final AppSettings settings = AppSettings.get();
 		final Properties loggingConfig = new Properties();
@@ -62,39 +67,49 @@ public class AppContextListener extends GuiceServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
-		
-		servletContextEvent.getServletContext();
-		
 		loggerConfig = createLoggerConfig();
 		loggerConfig.install();
-
 		super.contextInitialized(servletContextEvent);
 
 		final ServletContext context = servletContextEvent.getServletContext();
 		final ListenerBootstrap config = new ListenerBootstrap(context);
-
-		deployment = config.createDeployment();
-		deployment.start();
-
-		context.setAttribute(ResteasyProviderFactory.class.getName(),
-				deployment.getProviderFactory());
-		context.setAttribute(Dispatcher.class.getName(),
-				deployment.getDispatcher());
-		context.setAttribute(Registry.class.getName(),
-				deployment.getRegistry());
-
-		final Registry registry = (Registry) context.getAttribute(Registry.class.getName());
-		final ResteasyProviderFactory providerFactory = (ResteasyProviderFactory) context.getAttribute(ResteasyProviderFactory.class.getName());
-		final ModuleProcessor processor = new ModuleProcessor(registry, providerFactory);
 		final Injector injector = (Injector) context.getAttribute(Injector.class.getName());
 
-		processor.processInjector(injector);
+		deployment = config.createDeployment();
 
-		// load parent injectors
-		Injector parent = injector.getParent();
-		while (parent != null) {
-			parent = injector.getParent();
-			processor.processInjector(parent);
+		// use custom registry for hotswap-agent support
+		final ResteasyProviderFactory providerFactory = ResteasyProviderFactory.getInstance();
+		final ResourceMethodRegistry registry = new ResourceMethodRegistry(providerFactory) {
+
+			@Override
+			@SuppressWarnings("all")
+			public void addPerRequestResource(Class clazz) {
+				final Binding<?> binding = injector.getBinding(clazz);
+				if (binding == null) {
+					super.addPerRequestResource(clazz);
+				} else {
+					super.addResourceFactory(new GuiceResourceFactory(binding.getProvider(), clazz));
+				}
+			}
+		};
+		final Dispatcher dispatcher = new SynchronousDispatcher(providerFactory, registry);
+
+		deployment.setProviderFactory(providerFactory);
+		deployment.setAsyncJobServiceEnabled(false);
+		deployment.setDispatcher(dispatcher);
+		deployment.start();
+
+		context.setAttribute(ResteasyProviderFactory.class.getName(), providerFactory);
+		context.setAttribute(Dispatcher.class.getName(), dispatcher);
+		context.setAttribute(Registry.class.getName(), registry);
+
+		final ModuleProcessor processor = new ModuleProcessor(registry, providerFactory);
+
+		// process all injectors
+		Injector current = injector;
+		while (current != null) {
+			processor.processInjector(current);
+			current = injector.getParent();
 		}
 	}
 
@@ -108,6 +123,7 @@ public class AppContextListener extends GuiceServletContextListener {
 
 	@Override
 	protected Injector getInjector() {
-		return Guice.createInjector(new AppServletModule());
+		final Stage stage = AppSettings.get().isProduction() ? Stage.PRODUCTION : Stage.DEVELOPMENT;
+		return Guice.createInjector(stage, new AppServletModule());
 	}
 }
