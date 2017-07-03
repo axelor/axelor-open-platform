@@ -112,7 +112,7 @@ public class TomcatRun extends JavaExec {
 		}
 
 		setClasspath(tomcat.getAsFileTree().matching(f -> f.exclude("*hotswap-agent*")));
-		setMain("com.axelor.tomcat.TomcatRunner");
+		setMain(TomcatSupport.TOMCAT_RUNNER_CLASS);
 		setArgs(args);
 		setJvmArgs(jvmArgs);
 	}

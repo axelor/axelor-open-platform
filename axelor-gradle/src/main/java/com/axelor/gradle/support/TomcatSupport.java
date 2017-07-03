@@ -17,8 +17,15 @@
  */
 package com.axelor.gradle.support;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.tasks.bundling.Jar;
 
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.tasks.TomcatRun;
@@ -27,17 +34,37 @@ public class TomcatSupport extends AbstractSupport {
 
 	public static final String TOMCAT_CONFIGURATION = "tomcat";
 	public static final String TOMCAT_RUN_TASK = "run";
+	public static final String TOMCAT_RUNNER_TASK = "runnerJar";
+	public static final String TOMCAT_RUNNER_CLASS = "com.axelor.tomcat.TomcatRunner";
+	public static final String TOMCAT_RUNNER_JAR = "axelor-tomcat.jar";
 
 	@Override
 	public void apply(Project project) {
 
-		project.getConfigurations().create(TOMCAT_CONFIGURATION);
+		final Configuration tomcat = project.getConfigurations().create(TOMCAT_CONFIGURATION);
 		applyConfigurationLibs(project, TOMCAT_CONFIGURATION, TOMCAT_CONFIGURATION);
 
 		project.getTasks().create(TOMCAT_RUN_TASK, TomcatRun.class, task -> {
 			task.dependsOn(JavaPlugin.CLASSES_TASK_NAME);
 			task.dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
 			task.setGroup(AxelorPlugin.AXELOR_APP_GROUP);
+		});
+
+		project.getTasks().create(TOMCAT_RUNNER_TASK, Jar.class, task -> {
+			task.dependsOn(JavaPlugin.CLASSES_TASK_NAME);
+			task.dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
+			task.setArchiveName(TOMCAT_RUNNER_JAR);
+			task.setDestinationDir(new File(project.getBuildDir(), "tomcat"));
+
+			final Map<String, String> manifest = new HashMap<>();
+
+			manifest.put("Main-Class", TOMCAT_RUNNER_CLASS);
+			manifest.put("Class-Path", tomcat.getFiles().stream()
+					.filter(f -> !f.getName().contains("hotswap-agent"))
+					.map(f -> f.getAbsolutePath())
+					.collect(Collectors.joining(" ")));
+
+			task.getManifest().attributes(manifest);
 		});
 	}
 }
