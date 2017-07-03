@@ -55,6 +55,7 @@ public class TomcatSupport extends AbstractSupport {
 			task.dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
 			task.setArchiveName(TOMCAT_RUNNER_JAR);
 			task.setDestinationDir(new File(project.getBuildDir(), "tomcat"));
+			task.onlyIf(t -> !task.getArchivePath().exists());
 
 			final Map<String, String> manifest = new HashMap<>();
 
