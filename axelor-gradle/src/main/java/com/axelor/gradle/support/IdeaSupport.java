@@ -93,9 +93,13 @@ public class IdeaSupport extends AbstractSupport {
 	private void generateLauncher(Project project, String name) {
 		final String outName = String.format(".idea/runConfigurations/%s__run_.xml", project.getName());
 		final File outFile = new File(project.getRootDir(), outName);
+		final String code = "<component name='ProjectRunConfigurationManager'>\n"
+				+ generateRunConfiguration(project, name)
+				+ "</component>\n";
+
 		try {
 			Files.createParentDirs(outFile);
-			Files.write(generateRunConfiguration(project, name), outFile, Charsets.UTF_8);
+			Files.write(code, outFile, Charsets.UTF_8);
 		} catch (IOException e) {
 		}
 	}
