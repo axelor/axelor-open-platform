@@ -17,12 +17,22 @@
  */
 package com.axelor.gradle.support;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 
 import org.gradle.api.Project;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
 import org.gradle.plugins.ide.idea.model.IdeaModel;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import com.axelor.gradle.AppPlugin;
 import com.axelor.gradle.AxelorPlugin;
@@ -40,26 +50,62 @@ public class IdeaSupport extends AbstractSupport {
 		project.afterEvaluate(p -> {
 			if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
 				project.getTasks().getByName("ideaModule").dependsOn(GenerateCode.TASK_NAME);
-				project.getConvention().getByType(IdeaModel.class).getModule()
+				project.getExtensions().getByType(IdeaModel.class).getModule()
 					.getGeneratedSourceDirs().add(GenerateCode.getOutputDirectory(project));
 			}
 			if (project.getPlugins().hasPlugin(AppPlugin.class)) {
-				project.getTasks().getByName("ideaModule").doLast(task -> generateLauncher(project));
+				final Project root = project.getRootProject();
+				final String name = String.format("%s (run)", root.getName());
+				root.getExtensions().getByType(IdeaModel.class).getWorkspace().getIws().withXml(xmlProvider -> {
+					try {
+						generateLauncher(project.getRootProject(), xmlProvider.asElement(), name);
+					} catch (Exception e) {
+					}
+				});
+				project.getRootProject().getTasks().create("generateIdeaLauncher", task -> {
+					task.onlyIf(t -> new File(project.getRootDir(), ".idea/workspace.xml").exists());
+					project.getRootProject().getTasks().withType(GenerateCode.class, t -> {
+						t.dependsOn(task);
+					});
+					task.doLast(t -> generateLauncher(root, name));
+				});
 			}
 		});
 	}
 
-	private void generateLauncher(Project project) {
-		final String name = String.format("%s (run)", project.getName());
-		final String output = String.format(".idea/runConfigurations/%s__run_.xml", project.getName());
+	private void generateLauncher(Project project, Element root, String name) throws Exception {
+		final Document doc = root.getOwnerDocument();
+		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		final DocumentBuilder builder = factory.newDocumentBuilder();
+		final XPathFactory xPathfactory = XPathFactory.newInstance();
+		final XPath xpath = xPathfactory.newXPath();
 
+		final Element runManager = (Element) xpath.evaluate("//component[@name='RunManager']", root, XPathConstants.NODE);
+		final Element run = (Element) xpath.evaluate("//configuration[@name='" + name + "']", runManager, XPathConstants.NODE);
+		if (run != null) {
+			runManager.removeChild(run);
+		}
+		final String code = generateRunConfiguration(project, name);
+		final Node node = builder.parse(new ByteArrayInputStream(code.getBytes())).getDocumentElement();
+		runManager.insertBefore(doc.importNode(node, true), runManager.getFirstChild());
+	}
+
+	private void generateLauncher(Project project, String name) {
+		final String outName = String.format(".idea/runConfigurations/%s__run_.xml", project.getName());
+		final File outFile = new File(project.getRootDir(), outName);
+		try {
+			Files.createParentDirs(outFile);
+			Files.write(generateRunConfiguration(project, name), outFile, Charsets.UTF_8);
+		} catch (IOException e) {
+		}
+	}
+
+	private String generateRunConfiguration(Project project, String name) {
 		final TomcatRun tomcatRun = (TomcatRun) project.getTasks().getByName(TomcatSupport.TOMCAT_RUN_TASK);
-
 		// configure tomcatRun
 		tomcatRun.configure(false, true);
-		
+
 		final StringBuilder builder = new StringBuilder();
-		builder.append("<component name='ProjectRunConfigurationManager'>\n");
 		builder.append("  <configuration default='false' name='").append(name).append("'")
 			.append(" type='JarApplication' factoryName='JAR Application' singleton='true'>\n");
 		builder.append("    <option name='JAR_PATH' value='$PROJECT_DIR$/build/tomcat/axelor-tomcat.jar' />\n");
@@ -75,13 +121,6 @@ public class IdeaSupport extends AbstractSupport {
 		builder.append("      <option name='Gradle.BeforeRunTask' enabled='true' tasks='runnerJar' externalProjectPath='$PROJECT_DIR$' vmOptions='' scriptParameters='' />\n");
 		builder.append("    </method>\n");
 		builder.append("  </configuration>\n");
-		builder.append("</component>\n");
-		
-		File out = new File(project.getProjectDir(), output);
-		try {
-			Files.createParentDirs(out);
-			Files.write(builder, out, Charsets.UTF_8);
-		} catch (IOException e) {
-		}
+		return builder.toString();
 	}
 }
