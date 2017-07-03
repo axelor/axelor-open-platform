@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.gradle.api.Project;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
+import org.gradle.plugins.ide.idea.model.IdeaModel;
 
 import com.axelor.gradle.AppPlugin;
 import com.axelor.gradle.AxelorPlugin;
@@ -39,6 +40,8 @@ public class IdeaSupport extends AbstractSupport {
 		project.afterEvaluate(p -> {
 			if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
 				project.getTasks().getByName("ideaModule").dependsOn(GenerateCode.TASK_NAME);
+				project.getConvention().getByType(IdeaModel.class).getModule()
+					.getGeneratedSourceDirs().add(GenerateCode.getOutputDirectory(project));
 			}
 			if (project.getPlugins().hasPlugin(AppPlugin.class)) {
 				project.getTasks().getByName("ideaModule").doLast(task -> generateLauncher(project));
