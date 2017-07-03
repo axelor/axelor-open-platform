@@ -25,8 +25,10 @@ import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
+import org.gradle.plugins.ide.idea.IdeaPlugin;
 
 import com.axelor.gradle.support.EclipseSupport;
+import com.axelor.gradle.support.IdeaSupport;
 import com.axelor.gradle.support.JavaSupport;
 import com.axelor.gradle.support.LicenseSupport;
 import com.axelor.gradle.tasks.GenerateCode;
@@ -49,6 +51,9 @@ public class AxelorPlugin implements Plugin<Project> {
 
 		if (project.getPlugins().hasPlugin(EclipsePlugin.class)) {
 			project.getPlugins().apply(EclipseSupport.class);
+		}
+		if (project.getPlugins().hasPlugin(IdeaPlugin.class)) {
+			project.getPlugins().apply(IdeaSupport.class);
 		}
 
 		configureCodeGeneration(project);
