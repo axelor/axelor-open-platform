@@ -28,6 +28,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
 import org.gradle.plugins.ide.idea.model.IdeaModel;
 import org.w3c.dom.Document;
@@ -64,10 +65,11 @@ public class IdeaSupport extends AbstractSupport {
 				});
 				project.getTasks().create("generateIdeaLauncher", task -> {
 					task.onlyIf(t -> new File(project.getRootDir(), ".idea/workspace.xml").exists());
-					project.getRootProject().getTasks().withType(GenerateCode.class, t -> {
-						t.dependsOn(task);
-					});
 					task.doLast(t -> generateLauncher(project, name));
+					Task generateLauncher = project.getTasks().getByName("generateLauncher");
+					if (generateLauncher != null) {
+						generateLauncher.dependsOn(task);
+					}
 				});
 			}
 		});

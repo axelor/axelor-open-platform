@@ -38,7 +38,6 @@ import org.gradle.api.invocation.Gradle;
 import org.gradle.composite.internal.IncludedBuildInternal;
 
 import com.axelor.common.FileUtils;
-import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.tasks.GenerateCode;
 import com.google.common.base.Joiner;
 
@@ -98,7 +97,6 @@ public class HotswapSupport extends AbstractSupport {
 	public void apply(Project project) {
 
 		project.getTasks().create(GENERATE_HOTSWAP_CONFIG_TASK, task -> {
-			task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
 			task.setDescription("Generate hotswap-agent.properties");
 			task.onlyIf(t -> hasDCEVM());
 			task.doLast(t -> {

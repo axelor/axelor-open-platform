@@ -38,6 +38,8 @@ public class TomcatSupport extends AbstractSupport {
 	public static final String TOMCAT_RUNNER_CLASS = "com.axelor.tomcat.TomcatRunner";
 	public static final String TOMCAT_RUNNER_JAR = "axelor-tomcat.jar";
 
+	public static final String GENERATE_LAUNCHER_TASK = "generateLauncher";
+
 	@Override
 	public void apply(Project project) {
 
@@ -66,6 +68,12 @@ public class TomcatSupport extends AbstractSupport {
 					.collect(Collectors.joining(" ")));
 
 			task.getManifest().attributes(manifest);
+		});
+		
+		project.getTasks().create(GENERATE_LAUNCHER_TASK, task -> {
+			task.setDescription("Generate launcher configuration.");
+			task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
+			task.dependsOn(TOMCAT_RUNNER_TASK);
 		});
 	}
 }
