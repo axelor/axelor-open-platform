@@ -54,20 +54,20 @@ public class IdeaSupport extends AbstractSupport {
 					.getGeneratedSourceDirs().add(GenerateCode.getOutputDirectory(project));
 			}
 			if (project.getPlugins().hasPlugin(AppPlugin.class)) {
-				final Project root = project.getRootProject();
-				final String name = String.format("%s (run)", root.getName());
-				root.getExtensions().getByType(IdeaModel.class).getWorkspace().getIws().withXml(xmlProvider -> {
+				final String name = String.format("%s (run)", project.getName());
+				project.getTasks().getByName("ideaModule").dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
+				project.getExtensions().getByType(IdeaModel.class).getWorkspace().getIws().withXml(xmlProvider -> {
 					try {
 						generateLauncher(project.getRootProject(), xmlProvider.asElement(), name);
 					} catch (Exception e) {
 					}
 				});
-				project.getRootProject().getTasks().create("generateIdeaLauncher", task -> {
+				project.getTasks().create("generateIdeaLauncher", task -> {
 					task.onlyIf(t -> new File(project.getRootDir(), ".idea/workspace.xml").exists());
 					project.getRootProject().getTasks().withType(GenerateCode.class, t -> {
 						t.dependsOn(task);
 					});
-					task.doLast(t -> generateLauncher(root, name));
+					task.doLast(t -> generateLauncher(project, name));
 				});
 			}
 		});

@@ -19,12 +19,14 @@ package com.axelor.gradle.support;
 
 import org.gradle.api.Project;
 import org.gradle.api.file.DuplicatesStrategy;
+import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.WarPlugin;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.bundling.War;
 import org.gradle.api.tasks.util.PatternSet;
 
 import com.axelor.common.VersionUtils;
+import com.axelor.gradle.tasks.GenerateCode;
 
 public class WarSupport extends AbstractSupport {
 
@@ -50,6 +52,8 @@ public class WarSupport extends AbstractSupport {
  		project.getTasks().create(COPY_WEBAPP_TASK_NAME, Copy.class, task -> {
  			task.setDestinationDir(project.getBuildDir());
  			task.into("webapp", spec -> spec.from("src/main/webapp"));
+ 			task.dependsOn(GenerateCode.TASK_NAME);
+ 			task.dependsOn(JavaPlugin.PROCESS_RESOURCES_TASK_NAME);
  			project.getConfigurations().getByName("axelorWeb")
  				.getFiles()
  				.stream()

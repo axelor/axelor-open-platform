@@ -55,7 +55,12 @@ public class EclipseSupport extends AbstractSupport {
 
 		project.afterEvaluate(p -> {
 			if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
-				project.getTasks().getByName(EclipsePlugin.ECLIPSE_CP_TASK_NAME).dependsOn(GenerateCode.TASK_NAME);
+				project.getTasks().getByName(EclipsePlugin.ECLIPSE_CP_TASK_NAME)
+					.dependsOn(GenerateCode.TASK_NAME);
+			}
+			if (project.getPlugins().hasPlugin(AppPlugin.class)) {
+				project.getTasks().getByName(EclipsePlugin.ECLIPSE_CP_TASK_NAME).
+					dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
 			}
 		});
 
