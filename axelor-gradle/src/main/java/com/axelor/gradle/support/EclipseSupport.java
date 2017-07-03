@@ -53,9 +53,11 @@ public class EclipseSupport extends AbstractSupport {
 		project.getPlugins().apply(EclipsePlugin.class);
 		project.getPlugins().apply(EclipseWtpPlugin.class);
 
-		if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
-			project.getTasks().getByName(EclipsePlugin.ECLIPSE_CP_TASK_NAME).dependsOn(GenerateCode.TASK_NAME);
-		}
+		project.afterEvaluate(p -> {
+			if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
+				project.getTasks().getByName(EclipsePlugin.ECLIPSE_CP_TASK_NAME).dependsOn(GenerateCode.TASK_NAME);
+			}
+		});
 
 		final EclipseModel eclipse = project.getExtensions().getByType(EclipseModel.class);
 		final EclipseClasspath ecp = eclipse.getClasspath();
