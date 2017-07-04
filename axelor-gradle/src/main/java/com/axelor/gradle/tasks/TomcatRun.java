@@ -22,12 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.internal.tasks.options.Option;
 import org.gradle.api.plugins.WarPlugin;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.bundling.War;
+import org.gradle.jvm.tasks.Jar;
 
 import com.axelor.gradle.support.HotswapSupport;
 import com.axelor.gradle.support.TomcatSupport;
@@ -55,7 +55,6 @@ public class TomcatRun extends JavaExec {
 
 	public void configure(boolean hot, boolean debug) {
 		final Project project = getProject();
-		final Configuration tomcat = project.getConfigurations().getByName(TomcatSupport.TOMCAT_CONFIGURATION);
 		final War war = (War) project.getTasks().getByName(WarPlugin.WAR_TASK_NAME);
 		final File baseDir = new File(project.getBuildDir(), "tomcat");
 
@@ -110,8 +109,7 @@ public class TomcatRun extends JavaExec {
 				getLogger().info("Cannot enable hot-swaping as DCEVM is not installed.");
 			}
 		}
-
-		setClasspath(tomcat.getAsFileTree().matching(f -> f.exclude("*hotswap-agent*")));
+		setClasspath(((Jar) project.getTasks().getByName(TomcatSupport.TOMCAT_RUNNER_TASK)).getOutputs().getFiles());
 		setMain(TomcatSupport.TOMCAT_RUNNER_CLASS);
 		setArgs(args);
 		setJvmArgs(jvmArgs);

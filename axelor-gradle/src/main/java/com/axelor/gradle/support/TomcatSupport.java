@@ -47,8 +47,7 @@ public class TomcatSupport extends AbstractSupport {
 		applyConfigurationLibs(project, TOMCAT_CONFIGURATION, TOMCAT_CONFIGURATION);
 
 		project.getTasks().create(TOMCAT_RUN_TASK, TomcatRun.class, task -> {
-			task.dependsOn(JavaPlugin.CLASSES_TASK_NAME);
-			task.dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
+			task.dependsOn(TOMCAT_RUNNER_TASK);
 			task.setGroup(AxelorPlugin.AXELOR_APP_GROUP);
 		});
 
