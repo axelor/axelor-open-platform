@@ -49,10 +49,6 @@ public class TomcatRun extends JavaExec {
 		this.port = Integer.parseInt(port);
 	}
 
-	public int getPort() {
-		return port;
-	}
-
 	public void configure(boolean hot, boolean debug) {
 		final Project project = getProject();
 		final War war = (War) project.getTasks().getByName(WarPlugin.WAR_TASK_NAME);
@@ -91,7 +87,7 @@ public class TomcatRun extends JavaExec {
 		final List<String> jvmArgs = new ArrayList<>();
 
 		args.add("--port");
-		args.add("" + getPort());
+		args.add("" + port);
 		args.add("--base-dir");
 		args.add(baseDir.getAbsolutePath());
 		args.add("--context-path");
