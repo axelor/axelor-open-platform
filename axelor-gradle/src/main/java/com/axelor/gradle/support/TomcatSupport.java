@@ -48,6 +48,7 @@ public class TomcatSupport extends AbstractSupport {
 
 		project.getTasks().create(TOMCAT_RUN_TASK, TomcatRun.class, task -> {
 			task.dependsOn(TOMCAT_RUNNER_TASK);
+			task.setDescription("Run application using embedded tomcat server.");
 			task.setGroup(AxelorPlugin.AXELOR_APP_GROUP);
 		});
 
@@ -70,7 +71,7 @@ public class TomcatSupport extends AbstractSupport {
 		});
 		
 		project.getTasks().create(GENERATE_LAUNCHER_TASK, task -> {
-			task.setDescription("Generate launcher configuration.");
+			task.setDescription("Generate ide launcher configurations.");
 			task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
 			task.dependsOn(TOMCAT_RUNNER_TASK);
 		});
