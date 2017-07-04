@@ -132,11 +132,11 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		
 		var popup = editor.isolateScope();
 		popup.show(record);
-		if (record == null) {
-			popup._afterPopupShow = function() {
+		popup._afterPopupShow = function() {
+			if (record == null) {
 				popup.$broadcast("on:new");
-			};
-		}
+			}
+		};
 	};
 
 	function _showEditor(record) {
