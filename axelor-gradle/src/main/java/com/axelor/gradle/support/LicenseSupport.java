@@ -73,8 +73,7 @@ public class LicenseSupport extends AbstractSupport {
 		license.setHeader(header);
 		license.setIgnoreFailures(true);
 
-		license.mapping("groovy", "JAVADOC_STYLE");
-		license.mapping("javascript", "JAVADOC_STYLE");
+		license.mapping("java", "SLASHSTAR_STYLE");
 		
 		license.include("**/*.java");
 		license.include("**/*.groovy");
