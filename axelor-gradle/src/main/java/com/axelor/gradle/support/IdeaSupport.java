@@ -68,7 +68,7 @@ public class IdeaSupport extends AbstractSupport {
 					task.doLast(t -> generateLauncher(project, name));
 					Task generateLauncher = project.getTasks().getByName("generateLauncher");
 					if (generateLauncher != null) {
-						generateLauncher.dependsOn(task);
+						generateLauncher.finalizedBy(task);
 					}
 				});
 			}
@@ -93,7 +93,7 @@ public class IdeaSupport extends AbstractSupport {
 	}
 
 	private void generateLauncher(Project project, String name) {
-		final String outName = String.format(".idea/runConfigurations/%s__run_.xml", project.getName());
+		final String outName = String.format(".idea/runConfigurations/%s.xml", name.replaceAll("[^\\w]", "_"));
 		final File outFile = new File(project.getRootDir(), outName);
 		final String code = "<component name='ProjectRunConfigurationManager'>\n"
 				+ generateRunConfiguration(project, name)
