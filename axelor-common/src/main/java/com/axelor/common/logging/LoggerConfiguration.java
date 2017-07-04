@@ -80,7 +80,7 @@ import ch.qos.logback.core.util.OptionHelper;
  * <p>
  * The logging pattern can use <code>%clr()</code> to highlight based on log
  * level, or <code>%clr(){color}</code> with
- * <code>faint, red, gree, yellow, blue, magenta, cyan</code> as color to style
+ * <code>faint, red, green, yellow, blue, magenta, cyan</code> as color to style
  * the log message on console output.
  * </p>
  */
@@ -282,11 +282,11 @@ public class LoggerConfiguration {
 		return appender;
 	}
 
-	@SuppressWarnings("all")
 	public void conversionRule(String word, Class<? extends Converter<?>> converter) {
-		Map<String, String> registry = (Map) this.context.getObject(CoreConstants.PATTERN_RULE_REGISTRY);
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		Map<String, Object> registry = (Map) this.context.getObject(CoreConstants.PATTERN_RULE_REGISTRY);
 		if (registry == null) {
-			registry = new HashMap<String, String>();
+			registry = new HashMap<>();
 			this.context.putObject(CoreConstants.PATTERN_RULE_REGISTRY, registry);
 		}
 		registry.put(word, converter.getName());
