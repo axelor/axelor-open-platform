@@ -1,8 +1,5 @@
 buildscript {
 	apply from: "gradle/repos.gradle"
-	dependencies {
-		classpath "org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1"
-	}
 }
 
 apply from: "version.gradle"
