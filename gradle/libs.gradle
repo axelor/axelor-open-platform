@@ -205,7 +205,7 @@ libs.ST4 = "org.antlr:ST4:4.0.8"
 libs.gradle_tooling = "org.gradle:gradle-tooling-api:${gradle.gradleVersion}"
 
 // gradle plugins
-libs.plugin_license = "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.1"
+libs.plugin_license = "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0"
 
 // embeded tomcat
 libs.tomcat_embed = [
