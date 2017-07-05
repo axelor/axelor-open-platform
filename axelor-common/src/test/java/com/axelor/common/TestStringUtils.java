@@ -97,4 +97,14 @@ public class TestStringUtils {
 				+ "this is some text\n"
 				+ "this is some text");
 	}
+
+	@Test
+	public void testStripAccent() {
+		Assert.assertEquals("AAAAAACEEEEIIIINOOOOOUUUUY", StringUtils.stripAccent("ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ"));
+		Assert.assertEquals("aaaaaaceeeeiiiinooooouuuuyy", StringUtils.stripAccent("àáâãäåçèéêëìíîïñòóôõöùúûüýÿ"));
+		Assert.assertEquals("L", StringUtils.stripAccent("Ł"));
+		Assert.assertEquals("l", StringUtils.stripAccent("ł"));
+		Assert.assertEquals("Cesar", StringUtils.stripAccent("César"));
+		Assert.assertEquals("Andre", StringUtils.stripAccent("André"));
+	}
 }

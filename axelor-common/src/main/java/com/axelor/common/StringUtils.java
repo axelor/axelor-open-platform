@@ -17,6 +17,7 @@
  */
 package com.axelor.common;
 
+import java.text.Normalizer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -80,6 +81,26 @@ public final class StringUtils {
 	 */
 	public static boolean notBlank(CharSequence value) {
 		return !isBlank(value);
+	}
+	
+	/**
+	 * Remove diacritics (accents) from a {@link CharSequence}.
+	 * 
+	 * @param value
+	 *            the string to be stripped
+	 * @return text with diacritics removed
+	 */
+	public static String stripAccent(CharSequence value) {
+		if (value == null) {
+			return null;
+		}
+		if (isEmpty(value)) {
+			return value.toString();
+		}
+		return Normalizer.normalize(value, Normalizer.Form.NFD)
+			.replace('\u0141', 'L')
+			.replace('\u0142', 'l')
+			.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
 	}
 
 	/**
