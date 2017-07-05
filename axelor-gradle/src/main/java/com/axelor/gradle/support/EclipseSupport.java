@@ -23,8 +23,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin;
+import org.gradle.plugins.ide.eclipse.GenerateEclipseClasspath;
 import org.gradle.plugins.ide.eclipse.model.AccessRule;
 import org.gradle.plugins.ide.eclipse.model.Classpath;
 import org.gradle.plugins.ide.eclipse.model.Container;
@@ -61,6 +63,27 @@ public class EclipseSupport extends AbstractSupport {
 			if (project.getPlugins().hasPlugin(AppPlugin.class)) {
 				project.getTasks().getByName(EclipsePlugin.ECLIPSE_CP_TASK_NAME).
 					dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
+				project.getTasks().create("generateEclipseLauncher", task -> {
+					final File cpFile = new File(project.getRootDir(), ".classpath");
+					final File bkFile = new File(project.getRootDir(), ".classpath.bak");
+					final GenerateEclipseClasspath generateEclipseClasspath = (GenerateEclipseClasspath) project
+							.getTasks().getByName(EclipsePlugin.ECLIPSE_CP_TASK_NAME);
+					task.onlyIf(t -> cpFile.exists());
+					task.doLast(a -> {
+						try {
+							Files.copy(cpFile, bkFile);
+							try {
+								generateEclipseClasspath.execute();
+							} finally {
+								Files.copy(bkFile, cpFile);
+							}
+						} catch (Exception e) {}
+					});
+					final Task generateLauncher = project.getTasks().getByName("generateLauncher");
+					if (generateLauncher != null) {
+						generateLauncher.finalizedBy(task);
+					}
+				});
 			}
 		});
 
