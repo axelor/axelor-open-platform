@@ -2,7 +2,102 @@
 
 ## Bug fixes
 
+- fix technical help info lost issue
+- fix undefined property error
+- fix hard-coded groovy expressions
+- fix grid column reset issue
+-fix click action issue on cards view
+-fix kanban and cards view considering permissions
+-fix m2o selection widget picking wrong input field
+-fix forceTitle param issue on popup view
+-fix menu groups issue
+-fix I18n.get plural issue
+-fix js expressions not evaluated on dummy field changes
+-fix DMS permission issues
+-fix advance search on fields with selection
+-fix client side meta data caching issue
+-fix onChange issue on boolean widget
+-fix incompatible type issue in action-group
+-fix dashlet title update issue
+-fix performance issue caused by sorting fix
+-fix user home action issue
+
 ## Improvements
+
+- add support for selection on search-filter fields
+- allow to define number of rows display in relational field. 
+- add support for changing page limit on search dialog 
+- allow to open record in popup from dashlet
+- show context menu on non-closable nav tab
+- allow if/if-module attributes on menu
+- optimize default view loading
+- optimize menu items rendering
+- optimize menu loading
+- do not generate empty track messages
+- all icons on sub menus
+- add support for changing css/icon of buttons with action
+- allow multi value search input on chart views
+- implement form view extensions support
+- improve binary image widget
+- remove unnecessary css files from login page
+- set selected state of new grid rows
+- add minified css/js to login.jsp
+- prevent google translator bar
+- allow custom viewer on boolean fields
+- allow executing action on chart element click
+- add static method resolver to JEL script helper
+- implement onMove action event on kanban view
+- allow client side validation of required o2m/m2m fields
+- do not copy non-owning m2m fields
+- show 'No records found' message on cards view
+
+# 4.1.4 (2017-06-19)
+
+## Bug fixes
+
+- fix dotted fields update issue
+- do not throw unused IOException
+- isolate dashlet grid columns to avoid name conflict 
+- fix unnecessary dirty flag caused by validators
+- fix unnecessary dirty check when create new record
+
+# 4.1.3 (2017-05-16)
+
+## Bug fixes
+
+- fix dotted field update issue
+- fix domain support issue on ref-select widget
+- fixed translation loading issue
+
+# 4.1.2 (2017-03-20)
+
+## Bug fixes
+
+- fix button prompt issue in grid view
+- fix wrong record selected with grouped selection popup
+- fix BIRT report pdf word wrap issue
+- fix decimal formatting issue in grid view
+- fix alignment issue on grouped grid
+- fix __check_version use on tabs opened with edit-window="blank"
+- fix __check_version reload ignores dirty checking
+
+# 4.1.1 (2017-02-21)
+
+## Bug fixes
+
+- fix NPE issue on xml data import when text node is empty
+- fix x-precision and x-scale attributes issue
+- fix legend display issue on calendar view
+- fix editable grid issue with selection checkbox
+- fix technical help info lost issue
+- fix binary field issue if form has onSave
+- fix attachment file name encoding issue
+
+## Improvements
+
+- add support for changing page limit on search dialog
+- allow to define number of rows display in relational field
+- allow to copy record line on master detail widget
 
 # 4.1.0  (2016-12-15)
 
