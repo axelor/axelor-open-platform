@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -38,6 +39,7 @@ import org.gradle.api.invocation.Gradle;
 import org.gradle.composite.internal.IncludedBuildInternal;
 
 import com.axelor.common.FileUtils;
+import com.axelor.gradle.HotswapExtension;
 import com.axelor.gradle.tasks.GenerateCode;
 import com.google.common.base.Joiner;
 
@@ -95,7 +97,7 @@ public class HotswapSupport extends AbstractSupport {
 
 	@Override
 	public void apply(Project project) {
-
+		project.getExtensions().create(HotswapExtension.EXTENSION_NAME, HotswapExtension.class);
 		project.getTasks().create(GENERATE_HOTSWAP_CONFIG_TASK, task -> {
 			task.setDescription("Generate hotswap-agent.properties");
 			task.onlyIf(t -> hasDCEVM());
@@ -108,6 +110,7 @@ public class HotswapSupport extends AbstractSupport {
 	}
 
 	private void generateHotswapConfig(Project project) {
+		final HotswapExtension extension = project.getExtensions().getByType(HotswapExtension.class);
 		final Function<Project, List<File>> findClasses = p -> Arrays.asList(
 				FileUtils.getFile(p.getProjectDir(), "bin", "main"),
 				FileUtils.getFile(p.getBuildDir(), "classes", "main"));
@@ -136,19 +139,46 @@ public class HotswapSupport extends AbstractSupport {
 		});
 
 		final Properties hotswapProps = new Properties();
-		hotswapProps.setProperty("LOGGER", "reload");
 
-		hotswapProps.setProperty("extraClasspath", extraClasspath.stream()
+		if (!extension.getDisabledPlugins().isEmpty()) {
+			hotswapProps.setProperty("disabledPlugins", Joiner.on(",").join(extension.getDisabledPlugins()));
+		}
+
+		hotswapProps.setProperty("LOGGER", "reload");
+		extension.getLoggers().forEach((logger, level) -> {
+			hotswapProps.setProperty(logger, level);
+		});
+
+		if (extension.getLogFile() != null) {
+			hotswapProps.setProperty("logFile", extension.getLogFile().getAbsolutePath());
+		}
+		if (extension.getLogAppend() != null) {
+			hotswapProps.setProperty("logAppend", extension.getLogAppend() == Boolean.TRUE ? "true" : "false");
+		}
+
+		final Stream<File> classpath = extension.getExtraClasspath() != null
+				? Stream.concat(extension.getExtraClasspath().stream(), extraClasspath.stream())
+				: extraClasspath.stream();
+
+		final Stream<File> resources = extension.getExtraClasspath() != null
+				? Stream.concat(extension.getExtraClasspath().stream(), extraClasspath.stream())
+				: extraClasspath.stream();
+
+		hotswapProps.setProperty("extraClasspath", classpath
 				.filter(File::exists)
 				.map(File::getPath)
 				.collect(Collectors.joining(",")));
 
-		hotswapProps.setProperty("watchResources", watchResources.stream()
+		hotswapProps.setProperty("watchResources", resources
 				.filter(File::exists)
 				.map(File::getPath)
 				.collect(Collectors.joining(",")));
 
 		final File target = new File(project.getBuildDir(), "hotswap-agent.properties");
+
+		// make sure to have parent dir
+		target.getParentFile().mkdirs();
+
 		try (OutputStream os = new FileOutputStream(target)) {
 			hotswapProps.store(os, null);
 		} catch (IOException e) {
