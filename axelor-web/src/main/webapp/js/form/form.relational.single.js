@@ -717,6 +717,26 @@ ui.formInput('RefLink', 'RefSelect', {
 ui.formInput('RefItem', 'ManyToOne', {
 
 	showTitle: false,
+	
+	controller: ['$scope', '$element', 'DataSource', 'ViewService', function ($scope, $element, DataSource, ViewService) {
+
+		var target = $element.attr('x-target');
+		var data = (_.findWhere($scope.$parent.field.selectionList, { value: target})||{}).data || {};
+		
+		var getViewDef = $scope.getViewDef;
+		$scope.getViewDef = function (elem) {
+			if (elem === $element) {
+				return _.extend({}, {
+					domain: data.domain,
+					formView: data.form,
+					gridView: data.grid
+				});
+			}
+			return getViewDef.call($scope, elem);
+		}
+
+		ManyToOneCtrl.apply(this, arguments);
+	}],
 
 	link: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);
