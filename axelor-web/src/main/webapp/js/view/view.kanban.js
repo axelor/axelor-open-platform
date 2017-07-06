@@ -74,12 +74,16 @@ function BaseCardsCtrl(type, $scope, $element) {
 	function update(records) {
 		$scope.records = records;
 	}
+	
+	$scope.handleEmpty = function () {
+	};
 
 	$scope.filter = function(options) {
 		var view = $scope.schema;
 		var opts = {
 			fields: _.pluck($scope.fields, 'name')
 		};
+		var handleEmpty = $scope.handleEmpty.bind($scope);
 
 		if (options.criteria || options._domains) {
 			opts.filter = options;
@@ -91,7 +95,10 @@ function BaseCardsCtrl(type, $scope, $element) {
 			opts.sortBy = view.orderBy.split(',');
 		}
 
-		return ds.search(opts).success(update).then(function () {
+		var promise = ds.search(opts);
+		promise.then(handleEmpty, handleEmpty);
+		return promise.success(update).then(function () {
+			$scope.handleEmpty();
 			return ds.fixPage();
 		});
 	};
@@ -276,6 +283,10 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 			ds._domain = scope._dataSource._domain ? scope._dataSource._domain + " AND " + domain : domain;
 
 			scope.records = [];
+			
+			function handleEmpty() {
+				element.toggleClass('empty', scope.isEmpty());
+			}
 
 			function fetch(options) {
 				var opts = _.extend({
@@ -283,10 +294,12 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 					sortBy: [view.sequenceBy]
 				}, options);
 				elemMore.hide();
-				return ds.search(opts).success(function (records) {
+				var promise = ds.search(opts);
+				promise.success(function (records) {
 					scope.records = scope.records.concat(records);
 					elemMore.fadeIn('slow');
 				});
+				return promise.then(handleEmpty, handleEmpty);
 			}
 
 			scope.hasMore = function () {
@@ -419,6 +432,14 @@ ui.directive('uiCards', function () {
 					scope.records.splice(index, 1);
 				});
 			});
+		};
+		
+		scope.isEmpty = function () {
+			return (scope.records||[]).length == 0;
+		};
+		
+		scope.handleEmpty = function () {
+			element.toggleClass('empty', scope.isEmpty());
 		};
 
 		element.on("click", ".kanban-card", function (e) {
