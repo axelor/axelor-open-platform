@@ -18,6 +18,7 @@
 package com.axelor.script;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import com.axelor.common.ClassUtils;
 import com.axelor.db.JpaRepository;
@@ -98,6 +99,15 @@ public class ELScriptHelper extends AbstractScriptHelper {
 	}
 	
 	class BeanResolver extends BeanELResolver {
+		
+		@Override
+		public Object getValue(ELContext context, Object base, Object property) {
+			if (base instanceof Map<?, ?> && ((Map<?, ?>) base).containsKey(property)) {
+				context.setPropertyResolved(true);
+				return ((Map<?, ?>) base).get(property);
+			}
+			return super.getValue(context, base, property);
+		}
 		
 		@Override
 		public Object invoke(ELContext context, final Object base, Object method, Class<?>[] paramTypes, Object[] params) {
