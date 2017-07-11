@@ -114,6 +114,8 @@ var customDirective = ["$compile", function ($compile) {
 					render(template);
 				}
 			});
+			
+			scope.showToggle = false;
 
 			scope.$watch('data', function (data) {
 				evalScope.data = data;

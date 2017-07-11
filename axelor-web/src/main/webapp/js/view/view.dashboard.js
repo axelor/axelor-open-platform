@@ -266,6 +266,10 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 				}
 			});
 
+			scope.showPager = false;
+			scope.showRefresh = true;
+			scope.showToggle = true;
+
 			scope.collapsed = false;
 			scope.collapsedIcon = "fa-chevron-up";
 			scope.onDashletToggle = function(event) {
@@ -296,11 +300,11 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 			"<div class='dashlet hidden'>" +
 				"<div class='dashlet-header'>" +
 					"<div class='dashlet-title pull-left'>{{title}}</div>" +
-					"<div class='dashlet-buttons pull-right'>" +
-						"<a href='' ng-click='onRefresh()'><i class='fa fa-refresh'></i></a>" +
-						"<a href='' ng-click='onDashletToggle()'><i class='fa' ng-class='collapsedIcon'></i></a>" +
+					"<div class='dashlet-buttons pull-right' ng-if='showRefresh || showToggle'>" +
+						"<a href='' ng-click='onRefresh()' ng-if='showRefresh'><i class='fa fa-refresh'></i></a>" +
+						"<a href='' ng-click='onDashletToggle()' ng-if='showToggle'><i class='fa' ng-class='collapsedIcon'></i></a>" +
 					"</div>" +
-					"<div class='dashlet-pager pull-right' ng-show='showPager'>" +
+					"<div class='dashlet-pager pull-right' ng-if='showPager'>" +
 						"<span class='dashlet-pager-text'>{{pagerText()}}</span>" +
 						"<a href='' ng-click='doPrev()' ng-class='{disabled: !canPrev()}'><i class='fa fa-step-backward'></i></a>" +
 						"<a href='' ng-click='doNext()' ng-class='{disabled: !canNext()}'><i class='fa fa-step-forward'></i></a>" +
