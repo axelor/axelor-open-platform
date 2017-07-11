@@ -443,12 +443,10 @@ ui.directive('uiCards', function () {
 		};
 
 		element.on("click", ".kanban-card", function (e) {
-			if ($(e.target).parents(".kanban-card-menu").size() ||
-				$(e.target).is('[ng-click],[ui-action-click],button,a,.iswitch,.ibox')) {
+			if (element.find('[ng-click],[ui-action-click],button,a,.iswitch,.ibox,.kanban-card-menu').has(e.target).size()) {
 				return;
 			}
-			var elem = $(this);
-			var record = elem.scope().record;
+			var record = element.scope().record;
 			scope.onEdit(record, true);
 			scope.applyLater();
 		});
