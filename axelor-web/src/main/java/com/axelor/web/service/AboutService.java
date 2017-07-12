@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -65,8 +64,8 @@ public class AboutService extends AbstractService {
 
 	@GET
 	@Path("sysinfo")
-	public Properties getSystemInfo() {
-		final Properties info = new Properties();
+	public Map<String, Object> getSystemInfo() {
+		final Map<String, Object> info = new HashMap<>();
 		final Runtime runtime = Runtime.getRuntime();
 		final Set<String> sessions = AppSessionListener.getActiveSessions();
 		final User user = AuthUtils.getUser();
@@ -92,17 +91,17 @@ public class AboutService extends AbstractService {
 			users.add(map);
 		}
 
-		info.setProperty("osName", System.getProperty("os.name"));
-		info.setProperty("osArch", System.getProperty("os.arch"));
-		info.setProperty("osVersion", System.getProperty("os.version"));
+		info.put("osName", System.getProperty("os.name"));
+		info.put("osArch", System.getProperty("os.arch"));
+		info.put("osVersion", System.getProperty("os.version"));
 
-		info.setProperty("javaRuntime", System.getProperty("java.runtime.name"));
-		info.setProperty("javaVersion", System.getProperty("java.runtime.version"));
+		info.put("javaRuntime", System.getProperty("java.runtime.name"));
+		info.put("javaVersion", System.getProperty("java.runtime.version"));
 
-		info.setProperty("memTotal", (runtime.totalMemory() / mb) + " Kb");
-		info.setProperty("memMax", (runtime.maxMemory() / mb) + " Kb");
-		info.setProperty("memUsed", ((runtime.totalMemory() - runtime.freeMemory()) / mb) + " Kb");
-		info.setProperty("memFree", (runtime.freeMemory() / mb) + " Kb");
+		info.put("memTotal", (runtime.totalMemory() / mb) + " Kb");
+		info.put("memMax", (runtime.maxMemory() / mb) + " Kb");
+		info.put("memUsed", ((runtime.totalMemory() - runtime.freeMemory()) / mb) + " Kb");
+		info.put("memFree", (runtime.freeMemory() / mb) + " Kb");
 
 		if (isTechnicalStaff) {
 			info.put("users", users);
