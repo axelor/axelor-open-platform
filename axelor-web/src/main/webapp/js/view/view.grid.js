@@ -638,7 +638,7 @@ ui.directive('uiPortletGrid', function(){
 					$scope.$apply();
 					if (force) {
 						$scope.waitForActions(function() {
-							var scope = ($scope.selectedTab || {}).$viewScope;
+							var scope = tab.$viewScope || ($scope.selectedTab || {}).$viewScope;
 							if (scope && scope.onEdit) {
 								scope.onEdit();
 							}
