@@ -132,7 +132,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		if (field.name && field.name[0] === '$') {
 			scope.$watch('record.' + field.name, function (a, b) {
 				if (a !== b) {
-					scope.$parent.$broadcast('on:record-change', scope.record);
+					scope.$broadcastRecordChange();
 				}
 			});
 		}
