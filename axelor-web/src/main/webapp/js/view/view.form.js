@@ -1306,7 +1306,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			}
 
 			var width = schema.width || params.width;
-			if (width && !scope.$hasPanels) {
+			if (width) {
 				if (width === '100%' || width === '*') {
 					element.removeClass('has-width');
 				}
@@ -1315,6 +1315,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 					minWidth: schema.minWidth || params.minWidth,
 					maxWidth: schema.maxWidth || params.maxWidth
 				});
+				form.removeClass('large-form mid-form mini-form');
 			}
 			
 			if (scope._viewResolver) {
