@@ -26,10 +26,12 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.common.StringUtils;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -66,13 +68,20 @@ public class AppFilter implements Filter {
 		}
 		return LANGUAGE.get();
 	}
+	
+	private String getHeader(ServletRequest req, String name, String defaultValue) {
+		final String value = ((HttpServletRequest) req).getHeader(name);
+		return StringUtils.isBlank(value) ? defaultValue : value;
+	}
 
 	private String getBaseUrl(ServletRequest req) {
-		if (req.getServerPort() == 80 ||
-			req.getServerPort() == 443) {
-			return req.getScheme() + "://" + req.getServerName() + req.getServletContext().getContextPath();
-		}
-		return req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + req.getServletContext().getContextPath();
+		final String proto = getHeader(req, "X-Forwarded-Proto", req.getScheme());
+		final String port = getHeader(req, "X-Forwarded-Port", "" + req.getServerPort());
+		final String host = getHeader(req, "X-Forwarded-Host", req.getServerName());
+		final String context = getHeader(req, "X-Forwarded-Context", req.getServletContext().getContextPath());
+		return port.equals("80") || port.equals("443")
+			? proto + "://" + host + context
+			: proto + "://" + host + ":" + port + context;
 	}
 
 	@Override
