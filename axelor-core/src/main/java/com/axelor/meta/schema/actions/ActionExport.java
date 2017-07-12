@@ -97,7 +97,7 @@ public class ActionExport extends Action {
 		}
 
 		String name = export.getName();
-		if (name.indexOf("$") > -1) {
+		if (name.indexOf("$") > -1 || (name.startsWith("#{") && name.endsWith("}"))) {
 			name = handler.evaluate(toExpression(name, true)).toString();
 		}
 

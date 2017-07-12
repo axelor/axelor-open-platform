@@ -970,7 +970,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		});
 
 		scope.addItem = function () {
-			var items = scope.items;
+			var items = scope.items || (scope.items = []);
 			var item = _.last(items);
 			if (items && items.length && isEmpty(item)) {
 				return;

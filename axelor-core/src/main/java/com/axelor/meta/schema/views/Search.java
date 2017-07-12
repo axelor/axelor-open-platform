@@ -38,7 +38,7 @@ import com.axelor.db.internal.DBHelper;
 import com.axelor.db.mapper.Adapter;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.i18n.I18n;
-import com.axelor.script.GroovyScriptHelper;
+import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -177,7 +177,7 @@ public class Search extends AbstractView {
 		for(SearchField field : searchFields) {
 			map.put(field.getName(), field.validate(variables.get(field.getName())));
 		}
-		return new GroovyScriptHelper(new ScriptBindings(map));
+		return new CompositeScriptHelper(new ScriptBindings(map));
 	}
 
 	static class JoinHelper {

@@ -18,6 +18,7 @@
 package com.axelor.script;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import javax.script.Bindings;
 
@@ -33,7 +34,6 @@ import com.axelor.internal.javax.el.ImportHandler;
 import com.axelor.internal.javax.el.MapELResolver;
 import com.axelor.internal.javax.el.MethodNotFoundException;
 import com.axelor.rpc.Context;
-import com.axelor.script.ScriptBindings.ConfigContext;
 import com.google.common.primitives.Ints;
 
 public class ELScriptHelper extends AbstractScriptHelper {
@@ -103,9 +103,9 @@ public class ELScriptHelper extends AbstractScriptHelper {
 		
 		@Override
 		public Object getValue(ELContext context, Object base, Object property) {
-			if (base instanceof ConfigContext && ((ConfigContext) base).containsKey(property)) {
+			if (base instanceof Map<?, ?> && ((Map<?, ?>) base).containsKey(property)) {
 				context.setPropertyResolved(true);
-				return ((ConfigContext) base).get(property);
+				return ((Map<?, ?>) base).get(property);
 			}
 			return super.getValue(context, base, property);
 		}

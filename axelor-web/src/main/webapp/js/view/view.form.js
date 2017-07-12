@@ -414,6 +414,10 @@ function FormViewCtrl($scope, $element) {
 		$scope.$$dirty = $scope.isDirty();
 	}, true);
 
+	$scope.$broadcastRecordChange = function () {
+		$scope.$broadcast("on:record-change", $scope.record);
+	};
+
 	$scope.isValid = function() {
 		return $scope.form && $scope.form.$valid;
 	};

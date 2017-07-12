@@ -504,8 +504,10 @@ ui.formItem('Button', {
 		});
 
 		scope.$watch('attr("css")', function (css, old) {
-			if (css !== old) {
-				element.removeClass(old || '').addClass(css || field.css || '');
+			var curr = css || field.css || 'btn-success';
+			var prev = old || field.css || 'btn-success';
+			if (curr !== prev) {
+				element.removeClass(prev || '').addClass(curr);
 			}
 		});
 

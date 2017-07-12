@@ -366,10 +366,6 @@
 	position: relative;
 }
 
-.report-box .dashlet-buttons {
-	display: none;
-}
-
 .report-box .dashlet-body {
 	height: 60px;
 	padding: 15px 20px 20px 20px;
@@ -385,7 +381,7 @@
 .report-box .report-tags {
 	position: absolute;
     top: 12px;
-    right: 10px;
+    right: 36px;
 }
 
 .report-table tfoot td {

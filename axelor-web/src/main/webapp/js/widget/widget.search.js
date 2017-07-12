@@ -100,8 +100,6 @@ ui.directive('uiFilterItem', function() {
 			scope.canShowSelect = function () {
 				return scope.filter && scope.filter.selection &&
 					   scope.filter.operator && !(
-					   scope.filter.operator == 'like' ||
-					   scope.filter.operator == 'notLike' ||
 					   scope.filter.operator == 'isNull' ||
 					   scope.filter.operator == 'notNull');
 			};
@@ -131,9 +129,7 @@ ui.directive('uiFilterItem', function() {
 					field = scope.fields[filter.field] || {};
 
 				filter.type = field.type || 'string';
-				if (field.selection) {
-					filter.selection = field.selection;
-				}
+				filter.selection = field.selection;
 
 				if (field.type === 'many-to-one' || field.type === 'one-to-one') {
 					filter.targetName = field.targetName;

@@ -125,7 +125,12 @@
 }
 
 .kanban-empty {
+    display: none;
 	margin: -30px 20px 10px 20px;
+}
+
+.kanban-column.empty .kanban-empty {
+    display: block;
 }
 
 .kanban-card {
@@ -265,12 +270,16 @@
 }
 
 .cards-view .cards-no-records {
-	display: block !important;
+	display: none;
     position: absolute;
     top: 48%;
     width: 100%;
     font-weight: 400;
     text-align: center;
+}
+
+.cards-view.empty .cards-no-records {
+    display: block;
 }
 
 .kanban-column h3,
