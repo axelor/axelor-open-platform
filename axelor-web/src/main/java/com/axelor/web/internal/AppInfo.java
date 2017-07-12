@@ -38,7 +38,7 @@ import com.axelor.common.VersionUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaFile;
-import com.axelor.script.GroovyScriptHelper;
+import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 
@@ -130,7 +130,7 @@ public class AppInfo {
 		final String logo = SETTINGS.get("application.logo", "img/axelor-logo.png");
 		if (SETTINGS.get("context.appLogo") != null) {
 			final ScriptBindings bindings = new ScriptBindings(new HashMap<String, Object>());
-			final ScriptHelper helper = new GroovyScriptHelper(bindings);
+			final ScriptHelper helper = new CompositeScriptHelper(bindings);
 			try {
 				return getLink(helper.eval("__config__.appLogo"), logo);
 			} catch (Exception e) {

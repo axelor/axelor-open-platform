@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.axelor.script.GroovyScriptHelper;
+import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -193,7 +193,7 @@ public class Request {
 		if (ctx == null) {
 			ctx = getRawContext();
 		}
-		return scriptHelper = new GroovyScriptHelper(new ScriptBindings(ctx));
+		return scriptHelper = new CompositeScriptHelper(new ScriptBindings(ctx));
 	}
 
 	/**
