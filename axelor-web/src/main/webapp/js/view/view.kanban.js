@@ -446,7 +446,7 @@ ui.directive('uiCards', function () {
 			if (element.find('[ng-click],[ui-action-click],button,a,.iswitch,.ibox,.kanban-card-menu').has(e.target).size()) {
 				return;
 			}
-			var record = element.scope().record;
+			var record = $(this).scope().record;
 			scope.onEdit(record, true);
 			scope.applyLater();
 		});
