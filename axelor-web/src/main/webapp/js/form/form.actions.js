@@ -950,6 +950,15 @@ ActionHandler.prototype = {
 		forEach(data.attrs, function(itemAttrs, itemName) {
 			var items = findItems(itemName);
 			if (!items || items.length === 0) {
+				// dashlet still not loaded ?
+				if (itemName.indexOf('.') > -1) {
+					var parentName = itemName.substring(0, itemName.indexOf('.'));
+					var parentElem = findItems(parentName);
+					if (parentElem.is('[ui-dashlet]')) {
+						parentElem.scope().$$pendingAttrs = parentElem.scope().$$pendingAttrs || {};
+						parentElem.scope().$$pendingAttrs[itemName.substring(itemName.indexOf('.')+1)] = itemAttrs;
+					}
+				}
 				return;
 			}
 			items.each(function(i) {

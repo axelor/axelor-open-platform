@@ -1026,11 +1026,6 @@ Grid.prototype._doInit = function(view) {
 	}
 	
 	setFilterCols();
-	
-	// make sure to hide columns
-	if (this.visibleCols && this.visibleCols.length < this.cols.length) {
-		grid.setColumns(this.getVisibleColumns());
-	}
 
 	var onInit = scope.onInit();
 	if (_.isFunction(onInit)) {
@@ -1042,12 +1037,7 @@ Grid.prototype._doInit = function(view) {
 	}
 
 	setTimeout(function () {
-		// hide columns
-		_.each(that.cols, function (col) {
-			if (col.descriptor && col.descriptor.hidden) {
-				that.showColumn(col.field, false);
-			}
-		});
+		grid.setColumns(that.getVisibleCols());
 	});
 
 	if (scope.$parent._viewResolver) {
@@ -1237,7 +1227,7 @@ Grid.prototype.showColumn = function(name, show) {
 		grid = this.grid,
 		cols = this.cols;
 	
-	this.visibleCols = this.visibleCols || _.pluck(cols, 'id');
+	this.visibleCols = this.visibleCols || _.pluck(this.getVisibleCols(), 'id');
 
 	show = _.isUndefined(show) ? true : show;
 	
@@ -1269,18 +1259,21 @@ Grid.prototype.showColumn = function(name, show) {
 	this.zIndexFix();
 };
 
-Grid.prototype.getVisibleColumns = function() {
-	var visible = this.visibleCols || [];
-	return _.filter(this.cols, function(col) {
-		return _.contains(visible, col.id);
+Grid.prototype.getVisibleCols = function(reset) {
+	var visible = reset ? [] : (this.visibleCols || []);
+	if (visible.length === 0) {
+		return this.cols.filter(function (col) {
+			return !(col.descriptor||{}).hidden;
+		});
+	}
+	return this.cols.filter(function (col) {
+		return visible.length ? _.contains(visible, col.id) : true;
 	});
 };
 
 Grid.prototype.resetColumns = function() {
 	var grid = this.grid,
-		cols = this.cols.filter(function (col) {
-			return !(col.descriptor||{}).hidden;
-		});
+		cols = this.getVisibleCols(true);
 
 	this.visibleCols = _.pluck(cols, 'id');
 	
@@ -2563,6 +2556,24 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 				if (!handler._isPopup && schema.inlineHelp && !axelor.config["user.noHelp"]) {
 					addHelp(schema.inlineHelp);
 				}
+
+				// handle pending attrs change on dashlets
+				if (handler.$$pendingAttrs) {
+					_.each(handler.$$pendingAttrs, function (itemAttrs, itemName) {
+						_.each(itemAttrs, function (attrValue, attrName) {
+							switch (attrName) {
+							case 'hidden':
+								grid.showColumn(itemName, !attrValue);
+								break;
+							case 'title':
+								grid.setColumnTitle(itemName, attrValue);
+								break;
+							}
+						});
+					});
+					handler.$$pendingAttrs = undefined;
+				}
+
 				grid.adjustSize();
 			}
 
