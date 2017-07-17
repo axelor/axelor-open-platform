@@ -133,9 +133,10 @@ function yearsDefinition( value ) {
 		return false;
 	}
 
+	temp = parseInt( value, 10 );
+
 	// convert 2 digit years to 4 digits, this allows us to type 80 <right>
 	if ( value.length <= 2 ) {
-		temp = parseInt( value, 10 );
 		// before "32" we assume 2000's otherwise 1900's
 		if ( temp < 10 ) {
 			return "200" + temp;
@@ -144,6 +145,9 @@ function yearsDefinition( value ) {
 		} else {
 			return "19" + temp;
 		}
+	}
+	if ( temp === 0 ) {
+		return "2000";
 	}
 	if ( value.length === 3 ) {
 		return "0"+value;
@@ -213,6 +217,17 @@ $.datepicker._updateDatepicker = function(inst) {
 		return _updateDatepicker.call($.datepicker, inst);
 	}
 };
+
+var _parseDate = $.datepicker.parseDate;
+$.datepicker.parseDate = function (format, value, settings) {
+	if (_.isString(value) && value.indexOf('_') > -1) {
+		return;
+	}
+	return _parseDate.call($.datepicker, format, value, settings);
+};
+
+// suppress annoying logs
+$.timepicker.log = function () {};
 
 /**
  * The DateTime input widget.
@@ -381,7 +396,8 @@ ui.formInput('DateTime', {
 				val = moment(value),
 				valid = true;
 
-			if (value && !input.mask("valid")) {
+			var masked = input.mask('value');
+			if (masked && !input.mask("valid")) {
 				return false;
 			}
 
@@ -415,6 +431,7 @@ ui.formInput('DateTime', {
 					try {
 						$.datepicker._noUpdate = true;
 						$.datepicker._setDateDatepicker(input[0], moment(scope.getValue()).toDate());
+						input.mask('refresh');
 					} finally {
 						$.datepicker._noUpdate = false;
 					}
