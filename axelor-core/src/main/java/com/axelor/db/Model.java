@@ -22,6 +22,8 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
+import com.axelor.db.annotations.Widget;
+
 /**
  * The base abstract model class to extend all domain objects.
  * 
@@ -42,6 +44,7 @@ public abstract class Model {
 	@Transient
 	private transient boolean selected;
 
+	@Widget(massUpdate = true)
 	private Boolean archived;
 
 	public abstract Long getId();

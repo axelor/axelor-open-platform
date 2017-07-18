@@ -174,7 +174,7 @@ ui.directive('uiUpdateForm',  function () {
 		
 		_.each(fields, function (field, name) {
 			if (!field.massUpdate) return;
-			if (/id|version|selected|archived|((updated|created)(On|By))/.test(name)) return;
+			if (/id|version|selected|((updated|created)(On|By))/.test(name)) return;
 			if (field.large || field.unique) return;
 			switch (field.type) {
 			case 'one-to-many':
