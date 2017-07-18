@@ -537,9 +537,6 @@ public class Query<T extends Model> {
 	 * @return the same instance
 	 */
 	public Query<T> bind(Map<String, Object> params) {
-		if (this.filter == null) {
-			throw new IllegalStateException("Query is not filtered yet.");
-		}
 		if (this.namedParams == null) {
 			this.namedParams = Maps.newHashMap();
 		}

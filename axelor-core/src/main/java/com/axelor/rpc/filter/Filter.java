@@ -20,6 +20,7 @@ package com.axelor.rpc.filter;
 import java.util.Collection;
 import java.util.List;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.google.common.collect.Lists;
@@ -40,7 +41,9 @@ public abstract class Filter {
 			sb.replace(i, i + 1, "?" + (++n));
 			i = sb.indexOf("?", i + 1);
 		}
-		query.filter(sb.toString(), getParams().toArray());
+		if (StringUtils.notBlank(sb)) {
+			query.filter(sb.toString(), getParams().toArray());
+		}
 		return query;
 	}
 
