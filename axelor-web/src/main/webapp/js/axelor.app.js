@@ -342,7 +342,25 @@
 			}
 		};
 	}]);
-	
+
+	module.filter('unaccent', function() {
+		var source = 'ąàáäâãåæăćčĉęèéëêĝĥìíïîĵłľńňòóöőôõðøśșşšŝťțţŭùúüűûñÿýçżźž';
+		var target = 'aaaaaaaaaccceeeeeghiiiijllnnoooooooossssstttuuuuuunyyczzz';
+
+		source += source.toUpperCase();
+		target += target.toUpperCase();
+
+		var unaccent = function (text) {
+			return typeof(text) !== 'string' ? text : text.replace(/.{1}/g, function(c) {
+				var i = source.indexOf(c);
+				return i === -1 ? c : target[i];
+			});
+		};
+		return function(input) {
+			return unaccent(input);
+		};
+	});
+
 	module.filter('t', function(){
 		return function(input) {
 			var t = _t || angular.nop;
