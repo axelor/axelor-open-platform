@@ -186,12 +186,12 @@ public class ActionView extends Action {
 					if (ctx.getCanCopy() == Boolean.TRUE && value instanceof Model) {
 						value = JPA.copy((Model)value, true);
 					}
-					if (value instanceof Model) {
+					if (value instanceof Model && JPA.em().contains(value)) {
 						value = Resource.toMapCompact(value);
 					}
 					if (value instanceof Collection) {
 						value = Collections2.transform((Collection<?>) value, item -> {
-							return item instanceof Model ? Resource.toMapCompact(item) : item;
+							return item instanceof Model && JPA.em().contains(item) ? Resource.toMapCompact(item) : item;
 						});
 					}
 					context.put(ctx.getName(), value);
