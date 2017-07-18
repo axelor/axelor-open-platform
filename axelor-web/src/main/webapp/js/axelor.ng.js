@@ -40,7 +40,8 @@
 			}
 
 			var $q = null,
-				$http = null;
+				$http = null,
+				$timeout = null;
 			
 			__custom__.ajaxStop = function ajaxStop(callback, context) {
 				var count, wait;
@@ -106,14 +107,14 @@
 				this.$timeout(later, wait);
 			};
 
-			__custom__.$timeout = function(func, wait) {
-				if (arguments.length === 0) {
-					this.$applyAsync();
-				} else {
-					setTimeout(function () {
-						this.$applyAsync(func);
-					}.bind(this), wait);
+			__custom__.$timeout = function(func, wait, invokeApply) {
+				if ($timeout === null) {
+					$timeout = $injector.get('$timeout');
 				}
+				if (arguments.length === 0) {
+					return $timeout();
+				}
+				return $timeout.apply(null, arguments);
 			};
 
 			__custom__.$new = function $new() {
