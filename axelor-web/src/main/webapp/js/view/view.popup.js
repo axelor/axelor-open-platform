@@ -334,7 +334,7 @@ ui.directive('uiDialogSize', function() {
 			height -= element.parent().children('.ui-dialog-titlebar').outerHeight(true) + 4;
 			height -= element.parent().children('.ui-dialog-buttonpane').outerHeight(true) + 4;
 
-			if (element.is('.nav-tabs-popup,[ui-selector-popup]')) {
+			if (element.is('[ui-view-popup],[ui-selector-popup]')) {
 				height = Math.min(height, 480);
 			} else if (height > element[0].scrollHeight) {
 				height = element[0].scrollHeight + 8;

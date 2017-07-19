@@ -31,5 +31,7 @@
       <li ng-show="current && canCloseTab(current)"><a href="" tabindex="-1" ng-click="closeTabAll()" x-translate>Close All</a></li>
     </ul>
   </div>
-  <div class="nav-tabs-popup" ng-repeat="tab in navPopups" ui-view-popup="tab"></div>
+  <div class="nav-tabs-popup" ng-repeat="tab in navPopups">
+  	<div ui-view-popup="tab"></div>
+  </div>
 </div>
