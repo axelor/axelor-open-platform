@@ -840,12 +840,9 @@ ui.directive('uiPortletGrid', function(){
 			var _action = $scope._viewAction;
 
 			$scope.filter = function (searchFilter) {
-				var opts = searchFilter || {};
-				if ($scope.$parent._model) {
-					opts = _.extend({}, opts, {
-						_action: _action
-					});
-				}
+				var opts = _.extend({}, searchFilter, {
+					_action: _action
+				});
 				var ds = $scope._dataSource;
 				var view = $scope.schema || {};
 				if (!opts._sortBy && !ds._sortBy && view.orderBy) {

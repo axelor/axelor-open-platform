@@ -348,11 +348,11 @@ public class ViewService extends AbstractService {
 			return domainContext;
 		}
 		final Action act = MetaStore.getAction(action);
-		final String model = (String) domainContext.get("_model");
-		if (act == null || model == null) {
+		if (act == null) {
 			return domainContext;
 		}
 
+		final String model = (String) domainContext.get("_model");
 		final ActionRequest actRequest = new ActionRequest();
 		final Map<String, Object> actData = new HashMap<>();
 
