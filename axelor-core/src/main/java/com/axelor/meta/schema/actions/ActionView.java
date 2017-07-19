@@ -193,7 +193,9 @@ public class ActionView extends Action {
 			}
 		}
 
-		if (!context.containsKey("_id") && handler.getContext().containsKey("id")) {
+		if (!context.containsKey("_id")
+				&& handler.getContext() != null
+				&& handler.getContext().containsKey("id")) {
 			context.put("_id", handler.evaluate("#{id}"));
 		}
 
