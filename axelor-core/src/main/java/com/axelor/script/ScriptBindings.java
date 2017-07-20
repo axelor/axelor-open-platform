@@ -69,7 +69,10 @@ public class ScriptBindings extends SimpleBindings {
 	}
 	
 	private Map<String, Object> tryContext(Map<String, Object> variables) {
-		if (variables instanceof Context) {
+		if (variables == null) {
+			return new HashMap<>();
+		}
+		if (variables.isEmpty() || variables instanceof Context) {
 			return variables;
 		}
 		Class<?> klass = null;
