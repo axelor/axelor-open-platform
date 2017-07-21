@@ -22,14 +22,22 @@
 var ui = angular.module('axelor.ui');
 
 ui.HtmlViewCtrl = HtmlViewCtrl;
-ui.HtmlViewCtrl.$inject = ['$scope', '$element', '$sce'];
+ui.HtmlViewCtrl.$inject = ['$scope', '$element', '$sce', '$interpolate'];
 
-function HtmlViewCtrl($scope, $element, $sce) {
+function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
 
 	var views = $scope._views;
 	var stamp = -1;
 
 	$scope.view = views.html;
+
+	$scope.getContext = function () {
+		var params = $scope._viewParams || {};
+		var parent = $scope.$parent;
+		return _.extend({}, params.context, parent.getContext ? parent.getContext() : {})
+	};
+	
+	
 
 	$scope.getURL = function getURL() {
 		var view = $scope.view;
@@ -42,6 +50,9 @@ function HtmlViewCtrl($scope, $element, $sce) {
 				} else {
 					url += "?t" + stamp;
 				}
+			}
+			if (url && url.indexOf('{{') > -1) {
+				url = $interpolate(url)($scope.getContext());
 			}
 			return $sce.trustAsResourceUrl(url);
 		}
