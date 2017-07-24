@@ -2,7 +2,13 @@
 
 ## Bug fixes
 
+- fix domain context re-evaluation issue
+
 ## Improvements
+
+- support for data-grid & data-form on ref-select
+- increase select item meta data column size
+- accent insensitive search for multi object search
 
 # 3.4.1 (2017-06-13)
 
