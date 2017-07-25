@@ -194,10 +194,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 	}
 	
 	function withContext(scope, record) {
-		var values = _.extend({}, record);
-		if (scope._context) {
-			values = _.extend({}, scope._context, scope._jsonContext, values);
-		}
+		var values = _.extend({}, scope._context, scope._jsonContext, record);
 		return _.extend(values, {
 			$user: axelor.config['user.login'],
 			$group: axelor.config['user.group']
