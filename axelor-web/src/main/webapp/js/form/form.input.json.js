@@ -105,8 +105,9 @@ ui.formInput('JsonField', 'String', {
 		function watchSelf() {
 			unwatchSelf();
 			selfUnwatch = scope.$watch('record', function (record, old) {
-				if (record === old || angular.equals(record, defaultValues)) return;
-				onUpdate();
+				if (record !== old) {
+					onUpdate();
+				}
 			}, true);
 		}
 		
