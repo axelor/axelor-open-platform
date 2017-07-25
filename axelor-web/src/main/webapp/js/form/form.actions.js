@@ -839,6 +839,10 @@ ActionHandler.prototype = {
 				itemScope = item.data('$scope'),
 				hasValues = false,
 				column;
+			
+			if (item.is('[ui-menu-item]')) {
+				itemScope = item.isolateScope();
+			}
 
 			// handle o2m/m2m columns
 			if (item.is('.slick-dummy-column')) {
