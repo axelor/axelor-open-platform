@@ -67,6 +67,8 @@ function updateValues(source, target, itemScope, formScope) {
 		_.each(source, function (v, k) {
 			source[k] = fix(v);
 		});
+	} else if (itemScope && itemScope.updateJsonValues) {
+		return itemScope.updateJsonValues(source);
 	}
 
 	function compact(value) {

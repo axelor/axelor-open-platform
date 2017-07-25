@@ -32,6 +32,7 @@ ui.formInput('JsonField', 'String', {
 	link: function (scope, element, attrs, model) {
 		var field = scope.field;
 		var jsonFields = field.jsonFields || [];
+		var jsonNames = _.pluck(jsonFields, 'name');
 		var jsonFix = {};
 
 		jsonFields.forEach(function (item) {
@@ -152,6 +153,23 @@ ui.formInput('JsonField', 'String', {
 		scope.$on('on:edit', function () {
 			if (scope.viewType === 'form' || (!scope.viewType && scope._isPopup)) onRender();
 		});
+
+		scope.updateJsonValues = function (values) {
+			var rec = null;
+			_.each(values, function (v, k) {
+				if (jsonNames.indexOf(k) === -1 && scope.fields[k]) {
+					scope.$parent.record[k] = v;
+				} else {
+					if (rec === null) {
+						rec = {};
+					}
+					rec[k] = v;
+				}
+			});
+			if (rec) {
+				scope.record = _.extend({}, scope.record, rec);
+			}
+		}
 
 		watchParent();
 
