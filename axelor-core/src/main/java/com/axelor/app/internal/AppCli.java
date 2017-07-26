@@ -145,9 +145,12 @@ public class AppCli {
 	public static void main(String[] args) {
 		int status = 0;
 		try {
+			AppLogger.install();
 			status = process(args);
 		} catch (Exception e) {
 			status = -1;
+		} finally {
+			AppLogger.uninstall();
 		}
 		System.exit(status);
 	}
