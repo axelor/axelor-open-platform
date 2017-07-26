@@ -32,7 +32,7 @@ import com.axelor.gradle.support.IdeaSupport;
 import com.axelor.gradle.support.JavaSupport;
 import com.axelor.gradle.support.LicenseSupport;
 import com.axelor.gradle.tasks.GenerateCode;
-import com.axelor.gradle.tasks.I18nExtract;
+import com.axelor.gradle.tasks.I18nTask;
 import com.axelor.gradle.tasks.UpdateVersion;
 
 public class AxelorPlugin implements Plugin<Project> {
@@ -60,9 +60,9 @@ public class AxelorPlugin implements Plugin<Project> {
 	}
 
 	private void configureCodeGeneration(Project project) {
-		project.getTasks().create(I18nExtract.TASK_NAME, I18nExtract.class, task -> {
-			task.setDescription(I18nExtract.TASK_DESCRIPTION);
-			task.setGroup(I18nExtract.TASK_GROUP);
+		project.getTasks().create(I18nTask.TASK_NAME, I18nTask.class, task -> {
+			task.setDescription(I18nTask.TASK_DESCRIPTION);
+			task.setGroup(I18nTask.TASK_GROUP);
 		});
 
 		project.getTasks().create(UpdateVersion.TASK_NAME, UpdateVersion.class, task -> {

@@ -20,21 +20,28 @@ package com.axelor.gradle.tasks;
 import java.nio.file.Paths;
 
 import org.gradle.api.DefaultTask;
+import org.gradle.api.internal.tasks.options.Option;
 import org.gradle.api.tasks.TaskAction;
 
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.tools.i18n.I18nExtractor;
 
-public class I18nExtract extends DefaultTask {
+public class I18nTask extends DefaultTask {
 
-	public static final String TASK_NAME = "i18nExtract";
-	public static final String TASK_DESCRIPTION = "Extract i18n messages from source files.";
+	public static final String TASK_NAME = "i18n";
+	public static final String TASK_DESCRIPTION = "Update i18n messages from source files.";
 	public static final String TASK_GROUP = AxelorPlugin.AXELOR_BUILD_GROUP;
+
+	private boolean withContext;
+
+	@Option(option = "with-context", description = "Specify whether to include context details.")
+	public void setWithContext(boolean withContext) {
+		this.withContext = withContext;
+	}
 
 	@TaskAction
 	public void extract() {
 		final I18nExtractor extractor = new I18nExtractor();
-		final boolean withContext = getProject().hasProperty("with.context");
 		extractor.extract(Paths.get(getProject().getProjectDir().getPath()), true, withContext);
 	}
 }
