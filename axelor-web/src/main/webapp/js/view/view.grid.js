@@ -213,7 +213,14 @@ function GridViewCtrl($scope, $element) {
 	$scope.canDelete = function() {
 		return $scope.hasButton('delete') && !$scope.canSave() && $scope.selection.length > 0;
 	};
-	
+
+	$scope.canArchive = function() {
+		return $scope.hasPermission('write')
+			&& $scope.hasButton('archive')
+			&& !$scope.canSave()
+			&& $scope.selection.length > 0;
+	};
+
 	$scope.canEditInline = function() {
 		return _.isFunction(this.dataView.canSave);
 	};
@@ -459,6 +466,7 @@ function GridViewCtrl($scope, $element) {
 	};
 
 	$scope.$confirmMessage = _t("Do you really want to delete the selected record(s)?");
+	$scope.$confirmArchiveMessage = _t("Do you really want to archive the selected record(s)?");
 
 	$scope.onDelete = function() {
 		
@@ -475,6 +483,24 @@ function GridViewCtrl($scope, $element) {
 				if (records.length === 0 && page.total > 0) {
 					$scope.onRefresh();
 				}
+			});
+		});
+	};
+	
+	$scope.onArchive = function() {
+		
+		axelor.dialogs.confirm($scope.$confirmArchiveMessage, function(confirmed) {
+			if (!confirmed) {
+				return;
+			}
+
+			var selected = _.map($scope.selection, function(index) {
+				var item = $scope.dataView.getItem(index);
+				return _.extend({}, _.pick(item, 'id', 'version'), { archived: true });
+			});
+			
+			ds.saveAll(selected).success(function() {
+				$scope.onRefresh();
 			});
 		});
 	};

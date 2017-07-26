@@ -64,7 +64,10 @@ public class FormView extends AbstractView {
 	
 	@XmlAttribute
 	private String canDelete;
-	
+
+	@XmlAttribute
+	private String canArchive;
+
 	@XmlAttribute
 	private String canCopy;
 	
@@ -171,6 +174,14 @@ public class FormView extends AbstractView {
 
 	public void setCanDelete(String canDelete) {
 		this.canDelete = canDelete;
+	}
+
+	public String getCanArchive() {
+		return canArchive;
+	}
+
+	public void setCanArchive(String canArchive) {
+		this.canArchive = canArchive;
 	}
 
 	public String getCanCopy() {

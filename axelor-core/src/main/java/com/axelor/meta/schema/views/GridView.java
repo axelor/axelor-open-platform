@@ -61,6 +61,9 @@ public class GridView extends AbstractView {
 	private Boolean canDelete;
 
 	@XmlAttribute
+	private Boolean canArchive;
+
+	@XmlAttribute
 	private Boolean canMove;
 
 	@XmlAttribute(name = "edit-icon")
@@ -159,6 +162,14 @@ public class GridView extends AbstractView {
 
 	public void setCanDelete(Boolean canDelete) {
 		this.canDelete = canDelete;
+	}
+
+	public Boolean getCanArchive() {
+		return canArchive;
+	}
+	
+	public void setCanArchive(Boolean canArchive) {
+		this.canArchive = canArchive;
 	}
 
 	public Boolean getCanMove() {

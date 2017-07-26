@@ -284,6 +284,7 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
 			'edit': 'write',
 			'save': 'write',
 			'delete': 'remove',
+			'archive': 'remove',
 			'export': 'export'
 		};
 		var actions = {
@@ -292,6 +293,7 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
 			'save': 'canSave',
 			'copy': 'canCopy',
 			'delete': 'canDelete',
+			'archive': 'canArchive',
 			'attach': 'canAttach'
 		};
 
