@@ -20,10 +20,10 @@ package com.axelor.gradle.support;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.Exec;
-import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.SourceSet;
 
 import com.axelor.gradle.AxelorPlugin;
+import com.axelor.gradle.tasks.DbTask;
 
 public class ScriptsSupport extends AbstractSupport {
 
@@ -46,41 +46,14 @@ public class ScriptsSupport extends AbstractSupport {
 			task.dependsOn("npm-install");
 		});
 
-		project.getTasks().create("init", JavaExec.class, task -> {
-			task.setDescription("Initialize application database.");
-			task.setGroup(AxelorPlugin.AXELOR_APP_GROUP);
+		project.getTasks().create(DbTask.TASK_NAME, DbTask.class, task -> {
+			task.setDescription(DbTask.TASK_DESCRIPTION);
+			task.setGroup(DbTask.TASK_GROUP);
 			task.setClasspath(project.getConvention()
 					.getPlugin(JavaPluginConvention.class)
 					.getSourceSets()
 					.getByName(SourceSet.MAIN_SOURCE_SET_NAME)
 					.getRuntimeClasspath());
-
-			if ("true".equals(project.getProperties().get("update"))) {
-				task.args("-u");
-			} else {
-				task.args("-i");
-			}
-			if (project.getProperties().get("modules") != null) {
-				task.args("-m", project.getProperties().get("modules"));
-			}
-			task.jvmArgs("-Daxelor.config=" + task.getSystemProperties().get("axelor.config"));
-			task.setMain("com.axelor.app.internal.AppCli");
-		});
-		
-		project.getTasks().create("migrate", JavaExec.class, task -> {
-			task.setDescription("Run database migration scripts.");
-			task.setGroup(AxelorPlugin.AXELOR_APP_GROUP);
-			task.setClasspath(project.getConvention()
-					.getPlugin(JavaPluginConvention.class)
-					.getSourceSets()
-					.getByName(SourceSet.MAIN_SOURCE_SET_NAME)
-					.getRuntimeClasspath());
-			task.args("-M");
-			if ("true".equals(project.getProperties().get("verbose"))) {
-				task.args("--verbose");
-			}
-			task.jvmArgs("-Daxelor.config=" + task.getSystemProperties().get("axelor.config"));
-			task.setMain("com.axelor.app.internal.AppCli");
 		});
 	}
 }
