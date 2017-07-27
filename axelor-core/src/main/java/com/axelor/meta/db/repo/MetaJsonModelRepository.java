@@ -40,8 +40,7 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 			.orElseGet(() -> {
 				return jsonModel.getFields()
 					.stream()
-					.filter(f -> "name".equalsIgnoreCase(f.getName()))
-					.filter(f -> "fullName".equalsIgnoreCase(f.getName()))
+					.filter(f -> "name".equalsIgnoreCase(f.getName()) || "fullName".equalsIgnoreCase(f.getName()))
 					.findFirst().orElse(null);
 			});
 	}
