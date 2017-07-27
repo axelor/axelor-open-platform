@@ -22,12 +22,14 @@ import javax.persistence.EntityManager;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonModel;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaView;
+import com.google.common.base.Objects;
 import com.google.inject.persist.Transactional;
 
 public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
@@ -51,10 +53,20 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 		}
 
 		final MetaJsonField nameField = findNameField(jsonModel);
+		final String lastName = jsonModel.getNameField();
+
 		if (nameField == null) {
 			jsonModel.setNameField(null);
 		} else {
 			jsonModel.setNameField(nameField.getName());
+		}
+
+		// if name field is changed, update or records with new name field value
+		if (!Objects.equal(lastName, jsonModel.getNameField())) {
+			MetaJsonRecordRepository records = Beans.get(MetaJsonRecordRepository.class);
+			records.all(jsonModel.getName())
+				.fetchSteam()
+				.forEach(records::save);
 		}
 
 		MetaMenu menu = jsonModel.getMenu();
