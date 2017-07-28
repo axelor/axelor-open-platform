@@ -308,8 +308,6 @@ public class MetaService {
 			item.setLeft(menu.getLeft());
 			item.setMobile(menu.getMobile());
 			item.setHidden(menu.getHidden());
-			item.setModuleToCheck(menu.getModuleToCheck());
-			item.setConditionToCheck(menu.getConditionToCheck());
 
 			if (menu.getParent() != null) {
 				item.setParent(menu.getParent().getName());
