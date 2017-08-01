@@ -434,6 +434,17 @@ ui.formInput('ManyToOne', 'Select', {
 			e.stopPropagation();
 			return false;
 		});
+		
+		scope.handleEnter = function (e) {
+			var widget = input.autocomplete('widget');
+			if (widget) {
+				var item = widget.find('li:first').data('ui-autocomplete-item');
+				if (item) {
+					input.autocomplete('close');
+					scope.select(item.value);
+				}
+			}
+		};
 
 		scope.handleSelect = function(e, ui) {
 			if (ui.item.click) {

@@ -106,6 +106,10 @@ ui.formWidget('BaseSelect', {
 		scope.handleDelete = function(e) {
 
 		};
+		
+		scope.handleEnter = function(e) {
+
+		};
 
 		scope.handleSelect = function(e, ui) {
 			
@@ -206,6 +210,10 @@ ui.formWidget('BaseSelect', {
 			case KEY.DELETE:
 			case KEY.BACKSPACE:
 				scope.handleDelete(e);
+				break;
+			case KEY.ENTER:
+				scope.handleEnter(e);
+				break;
 			}
 		}).click(function() {
 			scope.showSelection();
