@@ -88,7 +88,17 @@ function DMSFileListCtrl($scope, $element) {
 	}
 
 	$scope.$emptyMessage = _t("No documents found.");
-	$scope.$confirmMessage = _t("Are you sure you want to delete selected documents?");
+	$scope.$confirmMessage = function() {
+		var strong = function (text, quote) {
+			return "<strong>" + (quote ? "<em>\"" + text + "\"</em>" : text) + "</strong>";
+		}
+		var all = getSelectedAll();
+		if (all.length === 1 || $scope.currentFolder) {
+			var doc = _.first(all) || $scope.currentFolder;
+			return _t('Are you sure you want to delete {0}?', strong(doc.fileName));
+		}
+		return _t("Are you sure you want to delete the {0} selected documents?", strong(all.length));
+	};
 
 	$scope.currentFilter = null;
 	$scope.currentFolder = null;
@@ -256,6 +266,10 @@ function DMSFileListCtrl($scope, $element) {
 		var index = _.first($scope.selection || []);
 		return $scope.dataView.getItem(index);
 	}
+	
+	function getSelectedAll() {
+		return _.map($scope.selection || [], function(i) { return $scope.dataView.getItem(i); });
+	}
 
 	function onNew(options, callback) {
 
@@ -339,7 +353,7 @@ function DMSFileListCtrl($scope, $element) {
 	};
 
 	$scope.onRename = function () {
-		var record = getSelected();
+		var record = getSelected() || $scope.currentFolder;
 		if (!record || !record.id) {
 			return;
 		}
@@ -356,12 +370,36 @@ function DMSFileListCtrl($scope, $element) {
 		});
 
 		function rename(record, done) {
-			var promise = $scope._dataSource.save(record);
+			var rec = _.pick(record, ['id', 'version', 'fileName']);
+			var promise = $scope._dataSource.save(rec);
 			promise.then(done, done);
-			promise.success(function (record) {
+			promise.success(function (res) {
+				record.version = res.version;
 				$scope.reload();
 			});
 		}
+	};
+	
+	var __onDelete = $scope.onDelete;
+	$scope.onDelete = function () {
+		var record = getSelected();
+		if (record) {
+			return __onDelete.apply($scope, arguments);
+		}
+		record = $scope.currentFolder;
+		if (!record || !record.id) {
+			return;
+		}
+		var message = $scope.$confirmMessage();
+		axelor.dialogs.confirm(message, function(confirmed) {
+			if (!confirmed) {
+				return;
+			}
+			var rec = _.pick(record, ['id', 'version']);
+			$scope._dataSource.removeAll([rec]).success(function() {
+				$scope.onFolder(record.parent);
+			});
+		});
 	};
 
 	$scope.onMoveFiles = function (files, toFolder) {
@@ -387,6 +425,9 @@ function DMSFileListCtrl($scope, $element) {
 
 		var http = $scope._dataSource._http;
 		var records = _.map($scope.selection, function (i) { return $scope.dataView.getItem(i); });
+		if (records.length === 0 && $scope.currentFolder) {
+			records = [$scope.currentFolder];
+		}
 		var ids = _.pluck(_.compact(records), "id");
 		if (ids.length === 0) {
 			return;
@@ -1243,12 +1284,20 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 			var form = null;
 
 			scope.permissionFormName = "dms-file-permission-form";
-			scope.permissionFormTitle = _t("Permissions");
+
+			Object.defineProperty(scope, 'permissionFormTitle', {
+				get: function () {
+					return scope.fileName ? _t("Permissions ({0})", scope.fileName) : _t("Permissions");
+				}
+			});
+
+			function getSelected() {
+				var index = _.first(scope.selection || []);
+				return scope.dataView.getItem(index) || scope.currentFolder;
+			}
 
 			scope.canShare = function () {
-				if (!scope.selection || scope.selection.length === 0) return false;
-				var selected = _.first(scope.selection);
-				var record = scope.dataView.getItem(selected);
+				var record = getSelected();
 				return record && record.canShare;
 			};
 
@@ -1264,16 +1313,17 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 					form.width("100%");
 				}
 
-				var selected = _.first(scope.selection);
-				var record = scope.dataView.getItem(selected);
-
+				var record = getSelected();
 				var formScope = form.isolateScope();
+
+				scope.fileName = record.fileName;
 
 				formScope.doRead(record.id).success(function (rec) {
 					formScope.edit(rec);
 					formScope.setEditable(true);
 					setTimeout(function () {
 						element.dialog("option", "height", 320);
+						element.dialog("option", "title", scope.permissionFormTitle);
 						element.dialog("open");
 					});
 				});
@@ -1303,6 +1353,7 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 				function doClose() {
 					element.dialog("close");
 					formScope.edit(null);
+					scope.fileName = null;
 				}
 
 				var promise = null;

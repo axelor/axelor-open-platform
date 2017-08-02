@@ -469,8 +469,10 @@ function GridViewCtrl($scope, $element) {
 	$scope.$confirmArchiveMessage = _t("Do you really want to archive the selected record(s)?");
 
 	$scope.onDelete = function() {
-		
-		axelor.dialogs.confirm($scope.$confirmMessage, function(confirmed){
+		var message = $scope.$confirmMessage;
+		var message = _.isFunction(message) ? message() : message;
+
+		axelor.dialogs.confirm(message, function(confirmed){
 
 			if (!confirmed)
 				return;
