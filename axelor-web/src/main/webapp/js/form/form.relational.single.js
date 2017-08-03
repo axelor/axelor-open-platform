@@ -68,7 +68,8 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 		var relatives = $element.parents().find('[x-field][x-path^="'+path+'."]').map(function() {
 			return $(this).attr('x-path').replace(path+'.','');
 		}).get();
-		return _.unique(relatives);
+		relatives.push($scope.field.targetName);
+		return _.unique(_.compact(relatives));
 	};
 
 	$scope.fetchMissingValues = function (value, fields) {
