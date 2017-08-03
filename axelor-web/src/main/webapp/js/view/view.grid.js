@@ -392,9 +392,13 @@ function GridViewCtrl($scope, $element) {
 		});
 		
 		domain = domain || $scope._domain;
+		context = _.extend({}, $scope._context, context);
+
 		if (domain && $scope.getContext) {
-			context = _.extend({}, $scope._context, context, $scope.getContext());
+			context = _.extend(context, $scope.getContext());
 		}
+
+		context._model = context._model || $scope._model;
 		
 		options = {
 			filter: criteria,

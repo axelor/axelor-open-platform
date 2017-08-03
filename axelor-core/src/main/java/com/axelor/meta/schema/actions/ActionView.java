@@ -197,7 +197,7 @@ public class ActionView extends Action {
 					context.put(ctx.getName(), value);
 
 					// make it available to the evaluation context
-					if (ctx.getName().startsWith("_")) {
+					if (handler.getContext() != null && ctx.getName().startsWith("_")) {
 						handler.getContext().put(ctx.getName(), value);
 					}
 				}
