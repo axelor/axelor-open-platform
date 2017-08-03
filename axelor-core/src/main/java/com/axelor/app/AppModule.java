@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.inject.Beans;
+import com.axelor.inject.logger.LoggerModule;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.report.ReportEngineProvider;
@@ -47,6 +48,9 @@ public class AppModule extends AbstractModule {
 
 		// report engine
 		bind(IReportEngine.class).toProvider(ReportEngineProvider.class);
+
+		// Logger injection support
+		install(new LoggerModule());
 
 		final List<Class<? extends AxelorModule>> moduleClasses = ModuleManager
 				.findInstalled()
