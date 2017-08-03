@@ -443,6 +443,16 @@ function FormViewCtrl($scope, $element) {
 			&& $scope.hasButton('archive')
 			&& ($scope.record || {}).id > 0
 			&& !$scope.$$dirty
+			&& !$scope.record.archived
+			&& $scope.isValid();
+	};
+	
+	$scope.canUnarchive = function() {
+		return $scope.hasPermission('write')
+			&& $scope.hasButton('archive')
+			&& ($scope.record || {}).id > 0
+			&& !$scope.$$dirty
+			&& $scope.record.archived
 			&& $scope.isValid();
 	};
 
@@ -790,6 +800,23 @@ function FormViewCtrl($scope, $element) {
 			});
 		});
 	};
+	
+	$scope.onUnarchive = function() {
+		var record = $scope.record || {};
+		if (!record.id  || record.id < 0) {
+			return;
+		}
+		axelor.dialogs.confirm(_t("Do you really want to unarchive the selected record?"),
+		function(confirmed) {
+			if (!confirmed) {
+				return;
+			}
+			var item = _.extend({}, record, { archived: false });
+			ds.saveAll([item]).success(function() {
+				$scope.reload();
+			});
+		});
+	};
 
 	$scope.onBack = function() {
 		var record = $scope.record || {};
@@ -968,14 +995,6 @@ function FormViewCtrl($scope, $element) {
 				$scope.onRefresh();
 			}
 		}, {
-			title: _t('Archive'),
-			active: function () {
-				return $scope.canArchive();
-			},
-			click: function(e) {
-				$scope.onArchive();
-			}
-		}, {
 			title: _t('Delete'),
 			active: function () {
 				return $scope.canDelete();
@@ -991,6 +1010,23 @@ function FormViewCtrl($scope, $element) {
 			click: function(e) {
 				$scope.onCopy();
 			}
+		}, {
+		}, {
+			title: _t('Archive'),
+			active: function () {
+				return $scope.canArchive();
+			},
+			click: function(e) {
+				$scope.onArchive();
+			},
+		}, {
+			title: _t('Unarchive'),
+			active: function () {
+				return $scope.canUnarchive();
+			},
+			click: function(e) {
+				$scope.onUnarchive();
+			},
 		}, {
 		}, {
 			title: _t('Log...'),

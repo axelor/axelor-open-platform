@@ -13,12 +13,7 @@
           <button class="btn hidden-phone" ng-click="onSave()" ng-if="hasButton('save') && canEditInline()" ng-disabled="!canSave()" title="{{ 'Save' | t}}">
             <i class="fa fa-floppy-o"></i> <span ng-if="::!tbTitleHide" x-translate>Save</span>
           </button>
-          <button class="btn" ng-click="onDelete()" ng-if="hasButton('delete')" ng-disabled="!canDelete()" title="{{ 'Delete' | t}}">
-            <i class="fa fa-trash-o"></i> <span ng-if="::!tbTitleHide" x-translate>Delete</span>
-          </button>
-          <button class="btn" ng-click="onArchive()" ng-if="hasButton('archive')" ng-disabled="!canArchive()" title="{{ 'Archive' | t}}">
-            <i class="fa fa-archive"></i> <span ng-if="::!tbTitleHide" x-translate>Archive</span>
-          </button>
+          <button ui-delete-button></button>
           <button class="btn" ng-if="hasHelp()" ng-click="onShowHelp()"><i class="fa fa-info-circle"></i></button>
           <button class="btn" ng-click="onRefresh()" ng-if="hasButton('refresh')" title="{{ 'Refresh' | t}}">
             <i class="fa fa-refresh"></i> <span ng-if="::!tbTitleHide" x-translate>Refresh</span>

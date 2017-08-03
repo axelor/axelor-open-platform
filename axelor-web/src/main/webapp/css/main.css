@@ -822,6 +822,14 @@ img.prefix-icon {
 	background-image: inherit;
 }
 
+.record-toolbar .delete-button {
+  margin: 0 !important;
+}
+
+.record-toolbar .delete-button .dropdown-toggle {
+  padding: 4px;
+}
+
 .about-page,
 .user-preferences {
 	position: absolute;

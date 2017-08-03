@@ -220,6 +220,10 @@ function GridViewCtrl($scope, $element) {
 			&& !$scope.canSave()
 			&& $scope.selection.length > 0;
 	};
+	
+	$scope.canUnarchive = function() {
+		return $scope.canArchive();
+	};
 
 	$scope.canEditInline = function() {
 		return _.isFunction(this.dataView.canSave);
@@ -471,6 +475,7 @@ function GridViewCtrl($scope, $element) {
 
 	$scope.$confirmMessage = _t("Do you really want to delete the selected record(s)?");
 	$scope.$confirmArchiveMessage = _t("Do you really want to archive the selected record(s)?");
+	$scope.$confirmUnarchiveMessage = _t("Do you really want to unarchive the selected record(s)?");
 
 	$scope.onDelete = function() {
 		var message = $scope.$confirmMessage;
@@ -493,22 +498,29 @@ function GridViewCtrl($scope, $element) {
 		});
 	};
 	
-	$scope.onArchive = function() {
-		
-		axelor.dialogs.confirm($scope.$confirmArchiveMessage, function(confirmed) {
+	$scope._doArchive = function (message, archive) {
+		axelor.dialogs.confirm(message, function(confirmed) {
 			if (!confirmed) {
 				return;
 			}
 
 			var selected = _.map($scope.selection, function(index) {
 				var item = $scope.dataView.getItem(index);
-				return _.extend({}, _.pick(item, 'id', 'version'), { archived: true });
+				return _.extend({}, _.pick(item, 'id', 'version'), { archived: archive });
 			});
 			
 			ds.saveAll(selected).success(function() {
 				$scope.onRefresh();
 			});
 		});
+	}
+	
+	$scope.onArchive = function() {
+		$scope._doArchive($scope.$confirmArchiveMessage, true);
+	};
+	
+	$scope.onUnarchive = function() {
+		$scope._doArchive($scope.$confirmUnarchiveMessage, false);
 	};
 	
 	$scope.onRefresh = function() {

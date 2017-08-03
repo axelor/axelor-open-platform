@@ -21,6 +21,29 @@
 
 var ui = angular.module('axelor.ui');
 
+
+ui.directive('uiDeleteButton', [function () {
+	return {
+		link: function (scope, element, attrs) {
+			
+		},
+		replace: true,
+		template:
+			"<div class='btn-group delete-button'>" +
+				"<button class='btn' ng-click='onDelete()' ng-if='hasButton(\"delete\")' ng-disabled='!canDelete()' title='{{ 'Delete' | t}}'>" +
+					"<i class='fa fa-trash-o'></i> <span ng-if='::!tbTitleHide' x-translate>Delete</span>" +
+				"</button>" +
+				"<button class='btn dropdown-toggle' data-toggle='dropdown' ng-if='hasButton(\"archive\")' ng-disabled='!canArchive()'>" +
+					"<i class='fa fa-caret-down'></i>" +
+				"</button>" +
+				"<ul class='dropdown-menu' ng-if='hasButton(\"archive\")'>" +
+					"<li><a href='' ng-click='onArchive()'>Archive</a></li>" +
+					"<li><a href='' ng-click='onUnarchive()'>Unarchive</a></li>" +
+				"</ul>" +
+			"</div>"
+	};
+}]);
+
 ui.directive('uiUpdateButton', ['$compile', function ($compile) {
 	
 	return {
