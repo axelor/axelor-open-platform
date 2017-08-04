@@ -18,6 +18,7 @@
 package com.axelor.tools.x2j
 
 import com.axelor.tools.x2j.pojo.Entity
+import com.axelor.tools.x2j.pojo.EnumType
 
 class XmlHelper {
 
@@ -42,6 +43,31 @@ class XmlHelper {
 	 */
 	public static Set<String> findEntityNames(File input) {
 		return new XmlSlurper().parse(input).'entity'.collect {
+			return (String) it.@name
+		}
+	}
+	
+	/**
+	 * Parse the given input xml and return {@link EnumType} mapping
+	 * to each entity elements.
+	 *
+	 * @param input the input file
+	 * @return list of entity mapping
+	 */
+	public static List<EnumType> enums(File input) {
+		return new XmlSlurper().parse(input).'enum'.collect {
+			return new EnumType(it)
+		}
+	}
+
+	/**
+	 * Parse the given input xml and return entity names defined in the file.
+	 *
+	 * @param input the input file
+	 * @return list of entity names
+	 */
+	public static Set<String> findEnumNames(File input) {
+		return new XmlSlurper().parse(input).'enum'.collect {
 			return (String) it.@name
 		}
 	}

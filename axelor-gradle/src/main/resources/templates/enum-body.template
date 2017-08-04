@@ -1,0 +1,6 @@
+${pojo.documentation}
+public enum ${pojo.name} {
+<% pojo.items.each { p -> %>
+	${p.itemCode},
+<% } %>\
+}

@@ -39,7 +39,7 @@ public class Utils {
 		return text;
 	}
 
-	public static String stringTrailing(String code) {
+	public static String stripTrailing(String code) {
 		if (code == null || code.trim().length() == 0) {
 			return "";
 		}

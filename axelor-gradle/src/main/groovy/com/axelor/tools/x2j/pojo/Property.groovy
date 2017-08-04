@@ -17,10 +17,10 @@
  */
 package com.axelor.tools.x2j.pojo
 
-import groovy.util.slurpersupport.NodeChild
-
 import com.axelor.common.Inflector
 import com.axelor.tools.x2j.Utils
+
+import groovy.util.slurpersupport.NodeChild
 
 class Property {
 
@@ -88,6 +88,7 @@ class Property {
 				return entity.importType('java.time.' + t)
 			case "binary":
 				return "byte[]"
+			case "enum":
 			case "one-to-one":
 			case "many-to-one":
 				return entity.importType(targetFqn)
@@ -118,6 +119,7 @@ class Property {
 			case "date":
 			case "time":
 			case "datetime":
+			case "enum":
 				return true
 		}
 		return false
@@ -291,6 +293,10 @@ class Property {
 			return attrs["orphan"] == "false"
 		}
 		return type == "one-to-many" && attrs["mappedBy"] != null
+	}
+	
+	boolean isEnum() {
+		return type == 'enum'
 	}
 
 	boolean isJson() {
@@ -621,6 +627,14 @@ class Property {
 		if (isJson() && type == 'string') {
 			return [
 				annon("org.hibernate.annotations.Type").add("type", "json")
+			]
+		}
+		
+		if (isEnum()) {
+			entity.importType("javax.persistence.EnumType")
+			return [
+				annon("javax.persistence.Basic", true),
+				annon("javax.persistence.Enumerated").add("EnumType.STRING", false)
 			]
 		}
 

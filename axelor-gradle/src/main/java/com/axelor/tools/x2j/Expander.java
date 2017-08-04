@@ -17,9 +17,6 @@
  */
 package com.axelor.tools.x2j;
 
-import groovy.text.GStringTemplateEngine;
-import groovy.text.Template;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,8 +27,12 @@ import java.util.Map;
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import com.axelor.tools.x2j.pojo.Entity;
+import com.axelor.tools.x2j.pojo.EnumType;
 import com.axelor.tools.x2j.pojo.Repository;
 import com.google.common.collect.Maps;
+
+import groovy.text.GStringTemplateEngine;
+import groovy.text.Template;
 
 final class Expander {
 
@@ -42,6 +43,12 @@ final class Expander {
 	private Template bodyTemplate;
 
 	private Template headTemplate;
+
+	private Template enumTemplate;
+
+	private Template enumBodyTemplate;
+
+	private Template enumHeadTemplate;
 
 	private Template repoTemplate;
 
@@ -55,6 +62,9 @@ final class Expander {
 		pojoTemplate = template("templates/pojo.template");
 		headTemplate = template("templates/head.template");
 		bodyTemplate = template("templates/body.template");
+		enumTemplate = template("templates/enum.template");
+		enumHeadTemplate = template("templates/enum-head.template");
+		enumBodyTemplate = template("templates/enum-body.template");
 		repoTemplate = template("templates/repo.template");
 		repoHeadTemplate = template("templates/repo-head.template");
 		repoBodyTemplate = template("templates/repo-body.template");
@@ -73,6 +83,10 @@ final class Expander {
 		}
 		return Expander.getInstance().toEntityString(entity);
 	}
+	
+	public static String expand(EnumType entity) {
+		return Expander.getInstance().toEnumString(entity);
+	}
 
 	private Reader read(String resource) {
 		InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
@@ -86,6 +100,22 @@ final class Expander {
 				| IOException e) {
 			throw new IllegalArgumentException(e);
 		}
+	}
+	
+	private String toEnumString(EnumType entity) {
+
+		final Map<String, Object> binding = Maps.newHashMap();
+
+		binding.put("pojo", entity);
+		
+		final String body = enumBodyTemplate.make(binding).toString();
+		final String imports = enumHeadTemplate.make(binding).toString();
+		
+		binding.put("namespace", entity.getNamespace());
+		binding.put("body", body);
+		binding.put("imports", imports);
+
+		return enumTemplate.make(binding).toString();
 	}
 
 	private String toEntityString(Entity entity) {

@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.tools.x2j.pojo.Entity;
+import com.axelor.tools.x2j.pojo.EnumType;
 import com.axelor.tools.x2j.pojo.Repository;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -50,6 +51,7 @@ public class Generator {
 	private final List<Generator> lookup = new ArrayList<>();
 
 	private final Multimap<String, Entity> entities = LinkedHashMultimap.create();
+	private final Multimap<String, EnumType> enums = LinkedHashMultimap.create();
 
 	public Generator(File domainPath, File outputPath) {
 		this.domainPath = domainPath;
@@ -58,6 +60,40 @@ public class Generator {
 
 	private File file(File base, String... parts) {
 		return new File(base.getPath() + "/" + Joiner.on("/").join(parts));
+	}
+	
+	private List<File> render(Collection<EnumType> items) throws IOException {
+
+		if (items == null || items.isEmpty()) {
+			return null;
+		}
+
+		final List<EnumType> all = new ArrayList<>(items);
+		final EnumType entity = all.remove(0);
+
+		final File entityFile = this.file(outputPath, entity.getFile());
+		
+		entityFile.getParentFile().mkdirs();
+
+		String[] existing = {
+			entity.getName() + ".java",
+		};
+
+		for (String fname : existing) {
+			File ex = this.file(entityFile.getParentFile(), fname);
+			if (ex.exists()) {
+				ex.delete();
+			}
+		}
+
+		final List<File> rendered = new ArrayList<>();
+
+		log.info("Generating: " + entityFile.getPath());
+		String code = Expander.expand(entity);
+		Files.write(Utils.stripTrailing(code) + "\n", entityFile, Charsets.UTF_8);
+		rendered.add(entityFile);
+
+		return rendered;
 	}
 
 	private List<File> render(Collection<Entity> items, boolean doLookup) throws IOException {
@@ -124,13 +160,13 @@ public class Generator {
 
 		log.info("Generating: " + entityFile.getPath());
 		String code = Expander.expand(entity, false);
-		Files.write(Utils.stringTrailing(code), entityFile, Charsets.UTF_8);
+		Files.write(Utils.stripTrailing(code), entityFile, Charsets.UTF_8);
 		rendered.add(entityFile);
 
 		if (repoFile != null) {
 			log.info("Generating: " + repoFile.getPath());
 			String repo = Expander.expand(entity, true);
-			Files.write(Utils.stringTrailing(repo), repoFile, Charsets.UTF_8);
+			Files.write(Utils.stripTrailing(repo) + "\n", repoFile, Charsets.UTF_8);
 			rendered.add(repoFile);
 		}
 
@@ -160,6 +196,11 @@ public class Generator {
 		for (Entity entity : all) {
 			entity.setLastModified(input.lastModified());
 			entities.put(entity.getName(), entity);
+		}
+		
+		for (EnumType entity : XmlHelper.enums(input)) {
+			entity.setLastModified(input.lastModified());
+			enums.put(entity.getName(), entity);
 		}
 	}
 
@@ -203,7 +244,7 @@ public class Generator {
 
 	public void start() throws IOException {
 
-		log.info("Generating JPA classes.");
+		log.info("Generating classes...");
 		log.info("Domain path: " + domainPath);
 		log.info("Output path: " + outputPath);
 
@@ -218,7 +259,14 @@ public class Generator {
 				}
 			}
 		}
-		
+
+		for (String name : enums.keySet()) {
+			final List<File> rendered = render(enums.get(name));
+			if (rendered != null) {
+				generated.addAll(rendered);
+			}
+		}
+
 		for (String name : entities.keySet()) {
 			final List<File> rendered = render(entities.get(name), true);
 			if (rendered != null) {
