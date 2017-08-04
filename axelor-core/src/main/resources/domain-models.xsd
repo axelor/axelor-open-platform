@@ -13,21 +13,29 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:element>
-        <xsd:element name="sequence" minOccurs="0" maxOccurs="unbounded" type="dm:Sequence">
-          <xsd:annotation>
-            <xsd:documentation>
-              Define a custom sequence.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:element>
-        <xsd:element name="entity" maxOccurs="unbounded"
-          minOccurs="1" type="dm:Entity">
-          <xsd:annotation>
-            <xsd:documentation>
-              Define an Entity (domain model).
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:element>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="sequence" type="dm:Sequence">
+            <xsd:annotation>
+              <xsd:documentation>
+                Define a custom sequence.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="enum" type="dm:EnumType">
+            <xsd:annotation>
+              <xsd:documentation>
+                Define an enum.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="entity" type="dm:Entity">
+            <xsd:annotation>
+              <xsd:documentation>
+                Define an Entity (domain model).
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:choice>
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
@@ -509,6 +517,28 @@
     </xsd:complexContent>
   </xsd:complexType>
 
+  <xsd:complexType name="Enum">
+    <xsd:annotation>
+      <xsd:documentation>Enum field.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="dm:Column">
+        <xsd:attribute name="ref" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              Fully qualified name of the reference entity class.
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:pattern value="(([a-z][a-zA-Z0-9_]+)(\.[a-z][a-zA-Z0-9_]+)*\.)?([A-Z][a-zA-Z0-9_]+)" />
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
   <xsd:complexType name="Index">
     <xsd:attribute name="name" type="xsd:string" use="optional"/>
     <xsd:attribute name="columns" use="required">
@@ -814,6 +844,13 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:element>
+        <xsd:element name="enum" type="dm:Enum">
+          <xsd:annotation>
+            <xsd:documentation>
+              Enum field.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
         <xsd:element name="one-to-one" type="dm:OneToOneColumn">
           <xsd:annotation>
             <xsd:documentation>
@@ -1023,6 +1060,48 @@
               <xsd:documentation>Generate abstract repository</xsd:documentation>
             </xsd:annotation>
           </xsd:enumeration>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="EnumItem">
+    <xsd:annotation>
+      <xsd:documentation>Define enumeration item.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="name" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>Enumeration item name.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="title" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Display title for UI components.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="help" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Help string.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="EnumType" mixed="true">
+    <xsd:annotation>
+      <xsd:documentation>Define enumeration type.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="item" type="dm:EnumItem" minOccurs="1" maxOccurs="unbounded" />
+    </xsd:sequence>
+    <xsd:attribute name="name" use="required">
+      <xsd:annotation>
+        <xsd:documentation>
+          Enumeration name.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="(([a-z][a-zA-Z0-9]+)(\.[a-z][a-zA-Z0-9]+)*\.)?([A-Z][a-zA-Z0-9]+)" />
         </xsd:restriction>
       </xsd:simpleType>
     </xsd:attribute>
