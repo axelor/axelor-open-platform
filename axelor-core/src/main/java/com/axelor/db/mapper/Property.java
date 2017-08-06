@@ -80,7 +80,9 @@ public class Property {
 	private String targetName;
 
 	private List<String> targetSearch;
-
+	
+	private Class<?> enumType;
+	
 	private boolean primary;
 
 	private boolean required;
@@ -150,6 +152,11 @@ public class Property {
 			this.type = PropertyType
 					.get(javaType.getSimpleName().toUpperCase());
 		} catch (Exception e) {
+		}
+		
+		if (javaType.isEnum()) {
+			type = PropertyType.ENUM;
+			enumType = javaType;
 		}
 
 		for (Annotation annotation : annotations) {
@@ -337,6 +344,10 @@ public class Property {
 		}
 		return targetSearch;
 	}
+	
+	public Class<?> getEnumType() {
+		return enumType;
+	}
 
 	private void findTargetName() {
 
@@ -404,6 +415,10 @@ public class Property {
 
 	public boolean isJson() {
 		return json;
+	}
+	
+	public boolean isEnum() {
+		return type == PropertyType.ENUM;
 	}
 
 	public boolean isPassword() {
@@ -753,7 +768,7 @@ public class Property {
 			map.put("targetName", getTargetName());
 			map.put("targetSearch", getTargetSearch());
 		}
-
+		
 		return map;
 	}
 

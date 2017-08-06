@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.axelor.db.mapper.types.DecimalAdapter;
+import com.axelor.db.mapper.types.EnumAdapter;
 import com.axelor.db.mapper.types.JavaTimeAdapter;
 import com.axelor.db.mapper.types.ListAdapter;
 import com.axelor.db.mapper.types.MapAdapter;
@@ -41,7 +42,8 @@ public class Adapter {
 	private static SetAdapter setAdapter = new SetAdapter();
 	private static MapAdapter mapAdapter = new MapAdapter();
 	private static JavaTimeAdapter javaTimeAdapter = new JavaTimeAdapter();
-	
+	private static EnumAdapter enumAdapter = new EnumAdapter();
+
 	private static DecimalAdapter decimalAdapter = new DecimalAdapter();
 
 	public static Object adapt(Object value, Class<?> type, Type genericType, Annotation[] annotations) {
@@ -67,6 +69,10 @@ public class Adapter {
 
 		if (type.isInstance(value)) {
 			return value;
+		}
+		
+		if (type.isEnum()) {
+			return enumAdapter.adapt(value, type, genericType, annotations);
 		}
 
 		// collection of simple types
