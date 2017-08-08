@@ -82,7 +82,7 @@
   </form>
   <form name="json-field-form" title="Custom field" model="com.axelor.meta.db.MetaJsonField">
     <panel title="Overview">
-      <field name="name" x-pattern="[a-z][a-zA-Z0-9_\\$]+"/>
+      <field name="name" x-pattern="[a-zA-Z][a-zA-Z0-9_\\$]+"/>
       <field name="type" />
       <field name="title" />
       <field name="defaultValue" />
@@ -102,7 +102,7 @@
   <form name="json-field-form-2" title="Custom field" model="com.axelor.meta.db.MetaJsonField"
     onNew="action-json-field-defaults">
     <panel title="Overview">
-      <field name="name" x-pattern="[a-z][a-zA-Z0-9_\\$]+"/>
+      <field name="name" x-pattern="[a-zA-Z][a-zA-Z0-9_\\$]+"/>
       <field name="type" />
       <field name="title" />
       <field name="defaultValue" />
@@ -119,7 +119,7 @@
 
   <form name="json-model-form" title="Custom model" model="com.axelor.meta.db.MetaJsonModel">
     <panel title="Overview">
-      <field name="name" readonlyIf="id" x-pattern="[a-z][a-zA-Z0-9_\\$]+"/>
+      <field name="name" readonlyIf="id" x-pattern="[a-zA-Z][a-zA-Z0-9_\\$]+"/>
       <field name="title" />
       <field name="onNew" />
       <field name="onSave" />
