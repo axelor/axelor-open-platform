@@ -442,6 +442,21 @@ ui.formInput('OneToMany', {
 			if (scope.isRequired() && _.isEmpty(viewValue)) return false;
 			return validate.call(model.$validators, viewValue);
 		};
+		
+		if (scope.field.requiredIf) {
+			scope.$watch("attr('required')", function(required) {
+				if (required !== undefined) {
+					model.$validate();
+				}
+			});
+		}
+		if (scope.field.validIf) {
+			scope.$watch("attr('valid')", function(valid) {
+				if (valid !== undefined) {
+					model.$setValidity('invalid', valid);
+				}
+			});
+		}
 
 		function doRender() {
 			if (doRenderUnwatch) {
