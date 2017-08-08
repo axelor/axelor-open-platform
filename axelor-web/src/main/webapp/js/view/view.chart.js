@@ -408,6 +408,10 @@ function DBarChart(scope, element, data) {
 	  .datum(datum)
 	  .transition().duration(500).call(chart);
 	
+	chart.discretebar.dispatch.on('elementClick', function (e) {
+		scope.handleClick(e);
+	});
+
 	return chart;
 }
 
@@ -446,6 +450,10 @@ function HBarChart(scope, element, data) {
 	  .datum(datum)
 	  .transition().duration(500).call(chart);
 	
+	chart.multibar.dispatch.on('elementClick', function (e) {
+		scope.handleClick(e);
+	});
+
 	return chart;
 }
 
