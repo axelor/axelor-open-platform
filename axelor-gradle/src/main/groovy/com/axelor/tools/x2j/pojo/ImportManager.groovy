@@ -109,6 +109,10 @@ class ImportManager {
 			all.add(null)
 		}
 
+		if (all.empty) {
+			return all
+		}
+
 		all.pop()
 
 		return all.collect {

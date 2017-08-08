@@ -36,6 +36,10 @@ class EnumType {
 
 	List<EnumItem> items
 	
+	Map<String, Property> itemsMap
+
+	EnumType baseType
+	
 	private ImportManager importManager
 	
 	transient long lastModified
@@ -47,7 +51,36 @@ class EnumType {
 		namespace = node.parent().module."@package"
 		importManager = new ImportManager(namespace, false)
 		documentation = findDocs(node)
-		items = node."item".collect { new EnumItem(this, it) }
+		
+		itemsMap = [:]
+		items = []
+		
+		node."item".each {
+			EnumItem item = new EnumItem(this, it)
+			itemsMap[item.name] = item
+			items.add(item)
+		}
+	}
+
+	private boolean isCompatible(EnumItem existing, EnumItem item) {
+		if (existing == null) return true
+		if (existing.name != item.name) return false
+		return true
+	}
+
+	void merge(EnumType other) {
+		for (EnumItem item : other.items) {
+			EnumItem existing = itemsMap.get(item.name)
+			if (isCompatible(existing, item)) {
+				item.entity = this
+				if (existing != null) {
+					items.remove(existing)
+				}
+				items.add(item)
+				itemsMap[item.name] = item
+			}
+		}
+		other.baseType = this
 	}
 	
 	void validate() {

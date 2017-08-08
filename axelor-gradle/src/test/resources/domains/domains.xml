@@ -135,8 +135,18 @@
     <finder-method name="findByUser" using="user" all="false"/>
     
   </entity>
+  
+  <enum name="AccountStatus">
+    <item name="OPEN" />
+    <item name="CLOSED" title="Closed" />
+  </enum>
+  
+  <enum name="AccountStatus">
+    <item name="CANCELED" />
+  </enum>
 
   <entity name="Account">
+    <enum name="status" ref="AccountStatus" />
     <boolean name="active" />
     <string name="name" required="true" />
     <string name="notes" />

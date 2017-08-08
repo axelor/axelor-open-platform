@@ -47,7 +47,9 @@ public class Generator {
 
 	private File outputPath;
 
-	private final Set<String> defines = new HashSet<>();
+	private final Set<String> definedEntities = new HashSet<>();
+	private final Set<String> definedEnums = new HashSet<>();
+
 	private final List<Generator> lookup = new ArrayList<>();
 
 	private final Multimap<String, Entity> entities = LinkedHashMultimap.create();
@@ -62,21 +64,51 @@ public class Generator {
 		return new File(base.getPath() + "/" + Joiner.on("/").join(parts));
 	}
 	
-	private List<File> render(Collection<EnumType> items) throws IOException {
+	private List<File> renderEnum(Collection<EnumType> items, boolean doLookup) throws IOException {
 
 		if (items == null || items.isEmpty()) {
 			return null;
 		}
 
 		final List<EnumType> all = new ArrayList<>(items);
+		final EnumType first = all.get(0);
+
+		final String ns = first.getNamespace();
+		final String name = first.getName();
+
+		// prepend all lookup entities
+		if (doLookup) {
+			for (Generator gen : lookup) {
+				if (gen.definedEnums.contains(name)) {
+					if (gen.enums.isEmpty()) {
+						gen.processAll(false);
+					}
+					all.addAll(0, gen.enums.get(name));
+				}
+			}
+		}
+		
+		// check that all entities have same namespace
+		for (EnumType it : all) {
+			if (!ns.equals(it.getNamespace())) {
+				throw new IllegalArgumentException(String.format(
+						"Invalid namespace: %s.%s != %s.%s", ns, name,
+						it.getNamespace(), name));
+			}
+		}
+
 		final EnumType entity = all.remove(0);
 
 		final File entityFile = this.file(outputPath, entity.getFile());
+
+		for (EnumType it : all) {
+			entity.merge(it);
+		}
 		
 		entityFile.getParentFile().mkdirs();
 
 		String[] existing = {
-			entity.getName() + ".java",
+			entity.getName() + ".java"
 		};
 
 		for (String fname : existing) {
@@ -90,7 +122,7 @@ public class Generator {
 
 		log.info("Generating: " + entityFile.getPath());
 		String code = Expander.expand(entity);
-		Files.write(Utils.stripTrailing(code) + "\n", entityFile, Charsets.UTF_8);
+		Files.write(Utils.stripTrailing(code), entityFile, Charsets.UTF_8);
 		rendered.add(entityFile);
 
 		return rendered;
@@ -111,7 +143,7 @@ public class Generator {
 		// prepend all lookup entities
 		if (doLookup) {
 			for (Generator gen : lookup) {
-				if (gen.defines.contains(name)) {
+				if (gen.definedEntities.contains(name)) {
 					if (gen.entities.isEmpty()) {
 						gen.processAll(false);
 					}
@@ -174,7 +206,8 @@ public class Generator {
 	}
 
 	protected void findFrom(File input) throws IOException {
-		defines.addAll(XmlHelper.findEntityNames(input));
+		definedEnums.addAll(XmlHelper.findEnumNames(input));
+		definedEntities.addAll(XmlHelper.findEntityNames(input));
 	}
 
 	protected void findAll() throws IOException {
@@ -224,7 +257,7 @@ public class Generator {
 	
 	public void addLookupSource(Generator generator) throws IOException {
 		if (generator == null) return;
-		if (generator.defines.isEmpty()) {
+		if (generator.definedEntities.isEmpty()) {
 			generator.findAll();
 		}
 		lookup.add(0, generator);
@@ -260,13 +293,40 @@ public class Generator {
 			}
 		}
 
+		// generate enums
 		for (String name : enums.keySet()) {
-			final List<File> rendered = render(enums.get(name));
+			final List<File> rendered = renderEnum(enums.get(name), true);
+			if (rendered != null) {
+				generated.addAll(rendered);
+			}
+		}
+		
+		// make sure to generate extended enums from parent modules
+		final Multimap<String, EnumType> extendedEnums = LinkedHashMultimap.create();
+		for (Generator generator : lookup) {
+			for (String name : generator.definedEnums) {
+				if (enums.containsKey(name)) {
+					continue;
+				}
+				if (generator.enums.isEmpty()) {
+					generator.processAll(false);
+				}
+				extendedEnums.putAll(name, generator.enums.get(name));
+			}
+		}
+		for (String name : extendedEnums.keySet()) {
+			final List<EnumType> all = new ArrayList<>(extendedEnums.get(name));
+			if (all == null || all.size() < 2) {
+				continue;
+			}
+			Collections.reverse(all);
+			final List<File> rendered = renderEnum(all, false);
 			if (rendered != null) {
 				generated.addAll(rendered);
 			}
 		}
 
+		// generate entities
 		for (String name : entities.keySet()) {
 			final List<File> rendered = render(entities.get(name), true);
 			if (rendered != null) {
@@ -275,20 +335,20 @@ public class Generator {
 		}
 
 		// make sure to generate extended entities from parent modules
-		final Multimap<String, Entity> extended = LinkedHashMultimap.create();
+		final Multimap<String, Entity> extendedEntities = LinkedHashMultimap.create();
 		for (Generator generator : lookup) {
-			for (String name : generator.defines) {
+			for (String name : generator.definedEntities) {
 				if (entities.containsKey(name)) {
 					continue;
 				}
 				if (generator.entities.isEmpty()) {
 					generator.processAll(false);
 				}
-				extended.putAll(name, generator.entities.get(name));
+				extendedEntities.putAll(name, generator.entities.get(name));
 			}
 		}
-		for (String name : extended.keySet()) {
-			final List<Entity> all = new ArrayList<>(extended.get(name));
+		for (String name : extendedEntities.keySet()) {
+			final List<Entity> all = new ArrayList<>(extendedEntities.get(name));
 			if (all == null || all.size() < 2) {
 				continue;
 			}
