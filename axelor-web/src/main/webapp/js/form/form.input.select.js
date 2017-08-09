@@ -368,6 +368,8 @@ ui.formInput('Select', 'BaseSelect', {
 	}
 });
 
+ui.formInput('Enum', 'Select');
+
 ui.formInput('ImageSelect', 'Select', {
 
 	metaWidget: true,

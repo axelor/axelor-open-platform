@@ -43,6 +43,7 @@ var OPERATORS = {
 };
 
 var OPERATORS_BY_TYPE = {
+	"enum"		: ["=", "!=", "isNull", "notNull"],
 	"string"	: ["=", "!=", "like", "notLike", "isNull", "notNull"],
 	"integer"	: ["=", "!=", ">=", "<=", ">", "<", "between", "notBetween", "isNull", "notNull"],
 	"boolean"	: ["true", "false"]
@@ -98,7 +99,7 @@ ui.directive('uiFilterItem', function() {
 			};
 			
 			scope.canShowSelect = function () {
-				return scope.filter && scope.filter.selection &&
+				return scope.filter && scope.filter.selectionList &&
 					   scope.filter.operator && !(
 					   scope.filter.operator == 'isNull' ||
 					   scope.filter.operator == 'notNull');
@@ -129,7 +130,7 @@ ui.directive('uiFilterItem', function() {
 					field = scope.fields[filter.field] || {};
 
 				filter.type = field.type || 'string';
-				filter.selection = field.selection;
+				filter.selectionList = field.selectionList;
 
 				if (field.type === 'many-to-one' || field.type === 'one-to-one') {
 					filter.targetName = field.targetName;
