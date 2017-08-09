@@ -130,6 +130,9 @@ public class Field extends SimpleWidget {
 	@XmlAttribute(name = "x-bind")
 	private String bind;
 
+	@XmlAttribute(name = "x-enum-type")
+	private String enumType;
+
 	@XmlAttribute(name = "x-related")
 	private String related;
 
@@ -348,6 +351,13 @@ public class Field extends SimpleWidget {
 	}
 
 	public List<?> getSelectionList() {
+		if (StringUtils.notBlank(getEnumType())) {
+			try {
+				return MetaStore.getSelectionList(Class.forName(getEnumType()));
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException("No such enum type found: " + getEnumType(), e);
+			}
+		}
 		return MetaStore.getSelectionList(getSelection());
 	}
 
@@ -365,6 +375,10 @@ public class Field extends SimpleWidget {
 
 	public String getBind() {
 		return bind;
+	}
+
+	public String getEnumType() {
+		return enumType;
 	}
 
 	public String getRelated() {

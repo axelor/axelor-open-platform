@@ -643,6 +643,11 @@
         <xsd:documentation>Specify an angular.js expression to bind to the field.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-enum-type">
+      <xsd:annotation>
+        <xsd:documentation>Specify the fully qualified enum type name</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="x-related" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>Specify the name of the related field (for RefSelect widget).</xsd:documentation>
