@@ -167,6 +167,10 @@ public class MetaModelService {
 				metaField.setPackageName(field.getType().getPackage().getName());
 			}
 			
+			if (field.getType().isEnum()) {
+				metaField.setTypeName(field.getType().getSimpleName());
+			}
+
 			if (field.isAnnotationPresent(Widget.class)){
 				metaField.setLabel(field.getAnnotation(Widget.class).title());
 				metaField.setDescription(field.getAnnotation(Widget.class).help());
