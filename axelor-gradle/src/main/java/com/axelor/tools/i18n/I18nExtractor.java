@@ -71,7 +71,7 @@ public class I18nExtractor {
 
 	private static final Set<String> FIELD_NODES = Sets.newHashSet(
 			"string", "boolean", "integer", "long", "decimal", "date", "time", "datetime", "binary",
-			"one-to-one", "many-to-one", "one-to-many", "many-to-many");
+			"enum", "one-to-one", "many-to-one", "one-to-many", "many-to-many");
 
 	private static final Set<String> TEXT_ATTRS = Sets.newHashSet("tag", "prompt", "placeholder", "x-true-text",
 			"x-false-text");
