@@ -17,6 +17,7 @@
  */
 package com.axelor.meta;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,6 +38,7 @@ import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
+import com.axelor.db.annotations.Widget;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
@@ -155,6 +157,9 @@ public final class MetaStore {
 			if (property.getSelection() != null && !"".equals(property.getSelection().trim())) {
 				map.put("selection", property.getSelection());
 				map.put("selectionList", getSelectionList(property.getSelection()));
+			}
+			if (property.isEnum()) {
+				map.put("selectionList", getSelectionList(property.getEnumType()));
 			}
 			if (property.getTarget() != null) {
 				map.put("perms", getPermissions(property.getTarget()));
@@ -354,6 +359,29 @@ public final class MetaStore {
 			fields.put(record.getName(), attrs);
 		}
 		return fields;
+	}
+	
+	public static List<Selection.Option> getSelectionList(Class<?> enumType) {
+		if (enumType == null || !enumType.isEnum()) {
+			return null;
+		}
+		final List<Selection.Option> all = new ArrayList<>();
+		for (Enum<?> item : enumType.asSubclass(Enum.class).getEnumConstants()) {
+			final Selection.Option option = new Selection.Option();
+			final String name = item.name();
+			option.setValue(name);
+			try {
+				final Field field = enumType.getDeclaredField(name);
+				final Widget widget = field.getAnnotation(Widget.class);
+				if (StringUtils.notBlank(widget.title())) {
+					option.setTitle(widget.title());;
+				}
+			} catch (Exception e) {
+				option.setTitle(Inflector.getInstance().humanize(name));
+			}
+			all.add(option);
+		}
+		return all;
 	}
 
 	public static List<Selection.Option> getSelectionList(String selection) {
