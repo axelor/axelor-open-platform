@@ -146,7 +146,7 @@
   </enum>
 
   <entity name="Account">
-    <enum name="status" ref="AccountStatus" />
+    <enum name="status" ref="AccountStatus" default="OPEN" />
     <boolean name="active" />
     <string name="name" required="true" />
     <string name="notes" />

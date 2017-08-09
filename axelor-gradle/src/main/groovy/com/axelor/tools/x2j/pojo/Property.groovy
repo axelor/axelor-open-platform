@@ -151,6 +151,8 @@ class Property {
 			case "datetime":
 				def t = attrs['tz'] == 'true' ? 'ZonedDateTime' : 'LocalDateTime'
 				return value == "now" ? "${t}.now()" : "${t}.parse(\"${value}\")"
+			case "enum":
+				return entity.importType(targetFqn) + "." + value
 		}
 	}
 
