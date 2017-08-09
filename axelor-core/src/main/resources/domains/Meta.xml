@@ -136,6 +136,13 @@
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
   
+  <entity name="MetaEnum" table="META_ENUM" cachable="true">
+    <![CDATA[
+    This object store the enum types.
+    ]]>
+    <string name="name" required="true" unique="true" />
+  </entity>
+
   <entity name="MetaSelect" table="META_SELECT" cachable="true">
     <![CDATA[
     This object store the selects.

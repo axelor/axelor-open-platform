@@ -12,6 +12,7 @@
     <option value="date">Date</option>
     <option value="time">Time</option>
     <option value="panel">Panel</option>
+    <option value="enum">Enum</option>
     <option value="button">Button</option>
     <option value="separator">Separator</option>
     <option value="many-to-one">ManyToOne</option>
@@ -32,9 +33,14 @@
   <form name="json-field-form-base" title="Custom field" model="com.axelor.meta.db.MetaJsonField">
     <panel-tabs>
       <panel title="Options">
-        <field name="selection" widget="ref-text"
-          x-target="com.axelor.meta.db.MetaSelect"
-          x-target-name="name" />
+        <panel itemSpan="12">
+          <field name="enumType" showIf="type === 'enum'" widget="ref-text"
+            x-target="com.axelor.meta.db.MetaEnum"
+            x-target-name="name"/>
+          <field name="selection" showIf="type !== 'enum'" widget="ref-text"
+            x-target="com.axelor.meta.db.MetaSelect"
+            x-target-name="name" />
+        </panel>
         <field name="widget" widget="widget-select" />
         <field name="onChange" colSpan="12" hideIf="type === 'button'"/>
         <field name="onClick" colSpan="12" showIf="type === 'button'" requiredIf="type === 'button'"/>

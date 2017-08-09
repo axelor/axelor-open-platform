@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
@@ -60,6 +63,8 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 public final class MetaStore {
+
+	private static final Logger log = LoggerFactory.getLogger(MetaStore.class);
 
 	private static final Cache<String, Action> ACTIONS = CacheBuilder.newBuilder()
 			.maximumSize(1000)
@@ -346,8 +351,16 @@ public final class MetaStore {
 				}
 			}
 
-			if (!StringUtils.isBlank(record.getSelection())) {
+			if (StringUtils.notBlank(record.getSelection())) {
 				attrs.put("selectionList", getSelectionList(record.getSelection()));
+			}
+			
+			if (StringUtils.notBlank(record.getEnumType())) {
+				try {
+					attrs.put("selectionList", getSelectionList(Class.forName(record.getEnumType())));
+				} catch (ClassNotFoundException e) {
+					log.error("No such enum type found: {}", record.getEnumType());
+				}
 			}
 
 			attrs.put("jsonField", fieldName);

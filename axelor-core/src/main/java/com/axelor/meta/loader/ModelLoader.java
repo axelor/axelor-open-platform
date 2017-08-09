@@ -31,11 +31,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.axelor.db.JPA;
 import com.axelor.meta.MetaScanner;
+import com.axelor.meta.db.MetaEnum;
 import com.axelor.meta.db.MetaSequence;
+import com.axelor.meta.db.repo.MetaEnumRepository;
 import com.axelor.meta.db.repo.MetaSequenceRepository;
 import com.axelor.meta.service.MetaModelService;
 import com.google.common.primitives.Ints;
@@ -50,6 +53,9 @@ public class ModelLoader extends AbstractLoader {
 	
 	@Inject
 	private MetaSequenceRepository sequences;
+	
+	@Inject
+	private MetaEnumRepository enums;
 
 	@Override
 	protected void doLoad(Module module, boolean update) {
@@ -66,8 +72,17 @@ public class ModelLoader extends AbstractLoader {
 			log.debug("importing: {}", file.getFile());
 			try (InputStream is = file.openStream()) {
 				final Document doc = db.parse(is);
-				importModels(doc, file, update);
-				importSequences(doc, file, update);
+				final NodeList elements = doc.getDocumentElement().getChildNodes();
+				for (int i = 0; i < elements.getLength(); i++) {
+					final Node node = elements.item(i);
+					if (node instanceof Element) {
+						final Element element = (Element) elements.item(i);
+						final String name = element.getTagName();
+						if ("enum".equals(name)) importEnums(element, update);
+						if ("entity".equals(name)) importModels(element, update);
+						if ("sequence".equals(name)) importSequences(element, update);
+					}
+				}
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -101,57 +116,54 @@ public class ModelLoader extends AbstractLoader {
 		return names;
 	}
 	
-	private void importModels(Document doc, URL file, boolean update) {
-		final NodeList elements = doc.getElementsByTagName("entity");
-		if (elements.getLength() == 0) {
-			return;
+	private void importModels(Element element, boolean update) {
+		final String name = element.getAttribute("name");
+		log.debug("Loading model: {}", name);
+		service.process(JPA.model(name));
+	}
+	
+	private void importEnums(Element element, boolean update) {
+		final Element module = (Element) element.getOwnerDocument().getElementsByTagName("module").item(0);
+		final String packageName = module.getAttribute("package");
+		final String name = element.getAttribute("name");
+		final String fullName = packageName + "." + name;
+
+		log.debug("Loading enum: {}", fullName);
+		
+		MetaEnum found = enums.findByName(fullName);
+		if (found == null) {
+			found = new MetaEnum();
+			found.setName(fullName);
 		}
 
-		for (int i = 0; i < elements.getLength(); i++) {
-			
-			Element element = (Element) elements.item(i);
-			String name = element.getAttribute("name");
-			
-			log.debug("Loading model: {}", name);
-			
-			service.process(JPA.model(name));
-		}
+		enums.save(found);
 	}
 
-	private void importSequences(Document doc, URL file, boolean update) {
-		final NodeList elements = doc.getElementsByTagName("sequence");
-		if (elements.getLength() == 0) {
+	private void importSequences(Element element, boolean update) {
+		String name = element.getAttribute("name");
+		
+		if (isVisited(MetaSequence.class, name)) {
 			return;
 		}
-		
-		for (int i = 0; i < elements.getLength(); i++) {
-			
-			Element element = (Element) elements.item(i);
-			String name = element.getAttribute("name");
-			
-			if (isVisited(MetaSequence.class, name)) {
-				continue;
-			}
-			if (sequences.findByName(name) != null) {
-				continue;
-			}
-			
-			log.debug("Loading sequence: {}", name);
-			
-			MetaSequence entity = new MetaSequence(name);
-			
-			entity.setPrefix(element.getAttribute("prefix"));
-			entity.setSuffix(element.getAttribute("suffix"));
-			
-			Integer padding = Ints.tryParse(element.getAttribute("padding"));
-			Integer increment = Ints.tryParse(element.getAttribute("increment"));
-			Long initial = Longs.tryParse(element.getAttribute("initial"));
-
-			if (padding != null) entity.setPadding(padding);
-			if (increment != null) entity.setIncrement(increment);
-			if (initial != null) entity.setInitial(initial);
-			
-			sequences.save(entity);
+		if (sequences.findByName(name) != null) {
+			return;
 		}
+
+		log.debug("Loading sequence: {}", name);
+		
+		MetaSequence entity = new MetaSequence(name);
+		
+		entity.setPrefix(element.getAttribute("prefix"));
+		entity.setSuffix(element.getAttribute("suffix"));
+		
+		Integer padding = Ints.tryParse(element.getAttribute("padding"));
+		Integer increment = Ints.tryParse(element.getAttribute("increment"));
+		Long initial = Longs.tryParse(element.getAttribute("initial"));
+
+		if (padding != null) entity.setPadding(padding);
+		if (increment != null) entity.setIncrement(increment);
+		if (initial != null) entity.setInitial(initial);
+		
+		sequences.save(entity);
 	}
 }
