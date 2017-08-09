@@ -23,6 +23,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.junit.Test;
@@ -31,6 +33,8 @@ import com.axelor.AbstractTest;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
+import com.axelor.meta.MetaStore;
+import com.axelor.meta.schema.views.Selection;
 import com.axelor.test.db.EnumCheck;
 import com.axelor.test.db.EnumStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -49,11 +53,14 @@ public class EnumTest extends AbstractTest {
 		assertNotNull(status);
 		assertEquals(PropertyType.ENUM, status.getType());
 		assertEquals(EnumStatus.class, status.getEnumType());
-		assertNotNull(status.getEnumItems());
-		assertEquals(3, status.getEnumItems().size());
 		
+		List<Selection.Option> selectionList = MetaStore.getSelectionList(EnumStatus.class);
+		
+		assertNotNull(selectionList);
+		assertEquals(3, selectionList.size());
+
 		// make sure CLOSED item has custom title
-		assertEquals("Close", status.getEnumItems().get(2).get("title"));
+		assertEquals("Close", selectionList.get(2).getTitle());
 		
 		EnumCheck entity = new EnumCheck();
 		assertNull(entity.getStatus());
