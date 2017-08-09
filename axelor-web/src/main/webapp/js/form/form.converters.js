@@ -77,6 +77,8 @@
 		}
 	};
 
+	ui.formatters["enum"] = ui.formatters.selection;
+
 	ui.formatters.$image = function (scope, fieldName, imageName) {
 		var record = scope.record || {};
 		var fields = scope.fields || {}
