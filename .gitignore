@@ -14,6 +14,12 @@ application.login.gzip.*
 *~
 .#*
 [#]*#
-.idea/
+
+# Intellij
+out
+.idea
 *.iml
+*.ipr
 *.iws
+*.iml
+atlassian-ide-plugin.xml
