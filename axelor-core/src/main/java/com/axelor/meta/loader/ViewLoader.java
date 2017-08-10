@@ -43,6 +43,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaActionMenu;
@@ -69,6 +70,7 @@ import com.axelor.meta.schema.views.Panel;
 import com.axelor.meta.schema.views.PanelField;
 import com.axelor.meta.schema.views.PanelRelated;
 import com.axelor.meta.schema.views.Selection;
+import com.axelor.meta.service.MetaService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
@@ -131,6 +133,11 @@ public class ViewLoader extends AbstractLoader {
 		if (unresolved.size() > 0) {
 			log.error("unresolved items: {}", unresolved);
 			throw new PersistenceException("There are some unresolve items, check the log.");
+		}
+		
+		int deleted = Beans.get(MetaService.class).removeCustomViews();
+		if (deleted > 0) {
+			log.info(deleted + " custom views are deleted.");
 		}
 	}
 

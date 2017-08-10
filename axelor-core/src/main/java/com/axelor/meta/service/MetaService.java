@@ -43,6 +43,7 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
 import com.axelor.common.FileUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
@@ -447,6 +448,19 @@ public class MetaService {
 		response.setStatus(Response.STATUS_SUCCESS);
 
 		return response;
+	}
+
+	@Transactional
+	public int removeCustomViews(MetaView view) {
+		if (view == null || StringUtils.isBlank(view.getName())) {
+			return 0;
+		}
+		return customViews.all().filter("self.name = :name").bind("name", view.getName()).delete();
+	}
+
+	@Transactional
+	public int removeCustomViews() {
+		return customViews.all().delete();
 	}
 
 	@SuppressWarnings("all")
