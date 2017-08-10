@@ -181,3 +181,8 @@
     box-shadow: 1px 1px 3px rgba(0,0,0,0.25);
     transition: margin-left .3s
 }
+
+.ng-invalid > .ibox .box:before,
+.ng-invalid > .iswitch .box:before {
+	border-color: #B94A48;
+}
