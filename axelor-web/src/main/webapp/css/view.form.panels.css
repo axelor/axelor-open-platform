@@ -283,6 +283,14 @@
 	content: "\f0f6";
 }
 
+.panel-related.ng-invalid {
+	border-color: #B94A48;
+}
+
+.panel-related.ng-invalid .panel-header {
+	border-top-color: #B94A48;
+}
+
 .panel-tabs,
 .panel-stack,
 .bar-layout .dashboard {
