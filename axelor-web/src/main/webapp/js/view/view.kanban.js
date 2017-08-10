@@ -291,7 +291,8 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 			function fetch(options) {
 				var opts = _.extend({
 					offset: 0,
-					sortBy: [view.sequenceBy]
+					sortBy: [view.sequenceBy],
+					fields: _.pluck(scope.fields, 'name')
 				}, options);
 				elemMore.hide();
 				var promise = ds.search(opts);
