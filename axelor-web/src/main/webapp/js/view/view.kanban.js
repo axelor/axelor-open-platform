@@ -201,7 +201,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
 				_.each(all, function (item) {
 					_.extend(item, ds.get(item.id));
 				});
-				record.version = rec.version;
+				_.extend(record, rec);
 			});
 		}
 
