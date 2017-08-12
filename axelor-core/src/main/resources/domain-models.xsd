@@ -27,6 +27,10 @@
                 Define an enum.
               </xsd:documentation>
             </xsd:annotation>
+            <xsd:unique name="unique-enum-items">
+              <xsd:selector xpath="dm:item" />
+              <xsd:field xpath="@name" />
+            </xsd:unique>
           </xsd:element>
           <xsd:element name="entity" type="dm:Entity">
             <xsd:annotation>
@@ -34,10 +38,18 @@
                 Define an Entity (domain model).
               </xsd:documentation>
             </xsd:annotation>
+            <xsd:unique name="unique-entity-items">
+              <xsd:selector xpath="dm:*" />
+              <xsd:field xpath="@name" />
+            </xsd:unique>
           </xsd:element>
         </xsd:choice>
       </xsd:sequence>
     </xsd:complexType>
+    <xsd:unique name="unique-sequences">
+      <xsd:selector xpath="dm:sequence" />
+      <xsd:field xpath="@name" />
+    </xsd:unique>
   </xsd:element>
 
   <xsd:complexType name="Namespace">
@@ -1079,6 +1091,11 @@
         <xsd:documentation>Display title for UI components.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="value" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify custom value for the enum item.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="help" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>Help string.</xsd:documentation>
@@ -1104,6 +1121,13 @@
           <xsd:pattern value="(([a-z][a-zA-Z0-9]+)(\.[a-z][a-zA-Z0-9]+)*\.)?([A-Z][a-zA-Z0-9]+)" />
         </xsd:restriction>
       </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="numeric" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify whether to use numeric values, all enum items must provide a numeric value.
+        </xsd:documentation>
+      </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
 </xsd:schema>
