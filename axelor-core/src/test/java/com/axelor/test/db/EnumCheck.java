@@ -23,6 +23,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Type;
+
 import com.axelor.db.JpaModel;
 import com.google.common.base.MoreObjects;
 
@@ -34,6 +36,10 @@ public class EnumCheck extends JpaModel {
 	@Enumerated(EnumType.STRING)
 	private EnumStatus status;
 
+	@Basic
+	@Type(type = "com.axelor.db.hibernate.type.ValueEnumType")
+	private EnumStatusNumber statusNumber;
+
 	public EnumStatus getStatus() {
 		return status;
 	}
@@ -42,8 +48,19 @@ public class EnumCheck extends JpaModel {
 		this.status = status;
 	}
 
+	public EnumStatusNumber getStatusNumber() {
+		return statusNumber;
+	}
+
+	public void setStatusNumber(EnumStatusNumber statusNumber) {
+		this.statusNumber = statusNumber;
+	}
+
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(getClass()).add("status", status).toString();
+		return MoreObjects.toStringHelper(getClass())
+				.add("status", status)
+				.add("statusNumber", statusNumber)
+				.toString();
 	}
 }

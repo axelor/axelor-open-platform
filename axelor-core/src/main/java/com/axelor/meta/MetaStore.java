@@ -41,6 +41,7 @@ import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
+import com.axelor.db.ValueEnum;
 import com.axelor.db.annotations.Widget;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -382,7 +383,15 @@ public final class MetaStore {
 		for (Enum<?> item : enumType.asSubclass(Enum.class).getEnumConstants()) {
 			final Selection.Option option = new Selection.Option();
 			final String name = item.name();
+			
 			option.setValue(name);
+			if (item instanceof ValueEnum<?>) {
+				Object value = ((ValueEnum<?>) item).getValue();
+				if (value != null) {
+					option.setValue(value.toString());
+				}
+			}
+
 			try {
 				final Field field = enumType.getDeclaredField(name);
 				final Widget widget = field.getAnnotation(Widget.class);

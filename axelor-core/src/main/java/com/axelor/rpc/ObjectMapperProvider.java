@@ -33,6 +33,7 @@ import javax.inject.Singleton;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.db.Model;
+import com.axelor.db.ValueEnum;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaPermissions;
 import com.axelor.meta.db.MetaPermissionRule;
@@ -41,17 +42,26 @@ import com.axelor.meta.schema.views.Help;
 import com.axelor.meta.schema.views.SimpleWidget;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.BeanProperty;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
+import com.fasterxml.jackson.databind.deser.std.EnumDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.util.EnumResolver;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -228,6 +238,52 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 			return serializer;
 		}
 	}
+	
+	static class EnumFieldSerializer<T extends Enum<?>> extends JsonSerializer<T> {
+
+		@Override
+		public void serialize(T value, JsonGenerator gen, SerializerProvider serializers)
+				throws IOException, JsonProcessingException {
+			if (value == null) {
+				return;
+			}
+			if (value instanceof ValueEnum<?>) {
+				gen.writeObject(((ValueEnum<?>) value).getValue());
+			} else {
+				gen.writeString(value.name());
+			}
+		}
+	}
+
+	static class EnumFieldDeserializer  extends JsonDeserializer<Enum<?>> implements ContextualDeserializer {
+
+		private Class<?> enumType;
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public Enum<?> deserialize(JsonParser p, DeserializationContext ctxt)
+				throws IOException, JsonProcessingException {
+			if (ValueEnum.class.isAssignableFrom(enumType)) {
+				return ValueEnum.of(enumType.asSubclass(ValueEnum.class), p.getCurrentToken().isNumeric()
+						? p.getValueAsInt()
+						: p.getValueAsString());
+			}
+			return Enum.valueOf(enumType.asSubclass(Enum.class), p.getValueAsString());
+		}
+
+		@Override
+		public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property)
+				throws JsonMappingException {
+			final JavaType javaType = property == null ? ctxt.getContextualType() : property.getType();
+			final Class<?> type = javaType.getRawClass();
+			if (ValueEnum.class.isAssignableFrom(type)) {
+				EnumFieldDeserializer deser = new EnumFieldDeserializer();
+				deser.enumType = type;
+				return deser;
+			}
+			return new EnumDeserializer(EnumResolver.constructUnsafe(type, ctxt.getAnnotationIntrospector()));
+		}
+	}
 
 	static ObjectMapper createObjectMapper() {
 		return createObjectMapper(new ModelSerializer());
@@ -244,6 +300,9 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 		module.addSerializer(Model.class, modelSerializer);
 		module.addSerializer(GString.class, new GStringSerializer());
 		module.addSerializer(BigDecimal.class, new DecimalSerializer());
+		
+		module.addSerializer(Enum.class, new EnumFieldSerializer<>());
+		module.addDeserializer(Enum.class, new EnumFieldDeserializer());
 
 		module.setSerializerModifier(new ListSerializerModifier());
 

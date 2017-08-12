@@ -15,27 +15,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.db.mapper.types;
+package com.axelor.test.db;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
+import java.util.Objects;
 
 import com.axelor.db.ValueEnum;
-import com.axelor.db.mapper.TypeAdapter;
 
-public class EnumAdapter implements TypeAdapter<Enum<?>> {
+public enum EnumStatusNumber implements ValueEnum<Integer> {
+
+	ONE(1),
+
+	TWO(2),
+
+	THREE(3);
+
+	private final Integer value;
+
+	private EnumStatusNumber(Integer value) {
+		this.value = Objects.requireNonNull(value);
+	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public Object adapt(Object value, Class<?> actualType, Type genericType, Annotation[] annotations) {
-		if (value == null) {
-			return null;
-		}
-		if (!actualType.isEnum()) {
-			throw new IllegalArgumentException("Given type is not enum: " + actualType.getName());
-		}
-		return ValueEnum.class.isAssignableFrom(actualType)
-				? ValueEnum.of(actualType.asSubclass(ValueEnum.class), value)
-				: Enum.valueOf(actualType.asSubclass(Enum.class), value.toString());
+	public Integer getValue() {
+		return value;
 	}
 }
