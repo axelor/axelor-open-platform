@@ -633,10 +633,9 @@ class Property {
 		}
 		
 		if (isEnum()) {
-			entity.importType("javax.persistence.EnumType")
 			return [
 				annon("javax.persistence.Basic", true),
-				annon("javax.persistence.Enumerated").add("EnumType.STRING", false)
+				annon("org.hibernate.annotations.Type").add("type", "com.axelor.db.hibernate.type.ValueEnumType")
 			]
 		}
 

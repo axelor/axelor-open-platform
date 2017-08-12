@@ -33,6 +33,8 @@ class EnumType {
 	String documentation
 	
 	Boolean numeric
+	
+	Boolean valueEnum
 
 	List<EnumItem> items
 	
@@ -46,7 +48,7 @@ class EnumType {
 
 	EnumType(NodeChild node) {
 		name = node.@name
-		numeric = node.@integer == 'true'
+		numeric = node.@numeric == 'true'
 		module = node.parent().module.'@name'
 		namespace = node.parent().module."@package"
 		importManager = new ImportManager(namespace, false)
@@ -59,6 +61,9 @@ class EnumType {
 			EnumItem item = new EnumItem(this, it)
 			itemsMap[item.name] = item
 			items.add(item)
+			if (item.value) {
+				valueEnum = true
+			}
 		}
 	}
 
@@ -89,11 +94,19 @@ class EnumType {
 		for (int i = 0; i < items.size(); i++) {
 			def item = items[i];
 			def key = item.value?:null
-			if (numeric && (key == null || Ints.tryParse(key) == null)) {
-				throw new IllegalArgumentException("Invalid enum '${name}', expects item '${item.name}' with integer value.")
+			if (valueEnum || numeric) {
+				if (key == null) {
+					throw new RuntimeException("Invalid enum '${name}', expects item '${item.name}' with a value.")
+				}
+				if (numeric && Ints.tryParse(key) == null) {
+					throw new IllegalArgumentException("Invalid enum '${name}', expects item '${item.name}' with numeric value.")
+				}
 			}
 			if (key == null) {
 				key = item.name
+			}
+			if (key == null) {
+				throw new IllegalArgumentException("Invalid enum '${name}', expects item")
 			}
 			if (map.containsKey(key)) {
 				dup.add(map.get(key))
@@ -137,9 +150,15 @@ class EnumType {
 	}
 	
 	String getType() {
-		numeric ? 'Integer' : 'String'
+		return numeric ? 'Integer' : 'String';
 	}
 	
+	String getImplementsCode() {
+		importManager.importType("java.util.Objects")
+		importManager.importType("com.axelor.db.ValueEnum")
+		return "implements ValueEnum<${type}> "
+	}
+
 	public List<EnumItem> getItems() {
 		validate()
 		return items;

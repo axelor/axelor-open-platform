@@ -144,9 +144,23 @@
   <enum name="AccountStatus">
     <item name="CANCELED" />
   </enum>
+  
+  <enum name="NumStatus" numeric="true">
+    <item name="ONE" value="1" />
+    <item name="TWO" value="2" />
+    <item name="THREE" value="3" />
+  </enum>
+  
+  <enum name="StrStatus">
+    <item name="ONE" value="one" />
+    <item name="TWO" value="two" />
+    <item name="THREE" value="three" />
+  </enum>
 
   <entity name="Account">
     <enum name="status" ref="AccountStatus" default="OPEN" />
+    <enum name="numStatus" ref="NumStatus" />
+    <enum name="strStatus" ref="StrStatus" />
     <boolean name="active" />
     <string name="name" required="true" />
     <string name="notes" />

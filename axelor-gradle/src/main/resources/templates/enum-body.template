@@ -1,6 +1,23 @@
 ${pojo.documentation}
-public enum ${pojo.name} {
+public enum ${pojo.name} ${pojo.implementsCode}{
 <% pojo.items.each { p -> %>
-	${p.itemCode},
+	${p.itemCode}${p == pojo.items.last() ? ';' : ','}
+<% } %>\
+<% if (pojo.valueEnum) { %>
+	private final ${pojo.type} value;
+
+	private ${pojo.name}(${pojo.type} value) {
+		this.value = Objects.requireNonNull(value);
+	}
+
+	@Override
+	public ${pojo.type} getValue() {
+		return value;
+	}
+<% } else { %>
+	@Override
+	public ${pojo.type} getValue() {
+		return name();
+	}
 <% } %>\
 }
