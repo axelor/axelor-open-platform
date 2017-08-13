@@ -35,8 +35,6 @@ public interface ValueEnum<T> {
 	/**
 	 * Get the constant of the specified enum type with the specified value.
 	 * 
-	 * @param <V>
-	 *            the value type
 	 * @param <T>
 	 *            the enum type whose constant is to be returned
 	 * @param enumType
@@ -52,22 +50,20 @@ public interface ValueEnum<T> {
 	 *             if specified enumType is not an enum or no constant found for the
 	 *             specified value
 	 */
-	@SuppressWarnings("unchecked")
-	static <V, T extends ValueEnum<V>> T of(Class<T> enumType, V value) {
+	static <T extends Enum<T>> T of(Class<T> enumType, Object value) {
 		if (value == null) {
 			throw new NullPointerException("Value is null.");
 		}
-		if (!enumType.isEnum()) {
-			throw new IllegalArgumentException("Not enum type " + enumType.getCanonicalName());
-		}
-		for (T item : enumType.getEnumConstants()) {
-			if (Objects.equals(item.getValue(), value)) {
-				return item;
+		if (ValueEnum.class.isAssignableFrom(enumType)) {
+			for (T item : enumType.getEnumConstants()) {
+				if (Objects.equals(((ValueEnum<?>) item).getValue(), value)) {
+					return item;
+				}
 			}
 		}
 		if (value instanceof String) {
 			try {
-				return (T) Enum.valueOf(enumType.asSubclass(Enum.class), (String) value);
+				return Enum.valueOf(enumType, (String) value);
 			} catch (Exception e) {
 			}
 		}

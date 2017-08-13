@@ -80,7 +80,7 @@ public class ValueEnumType implements DynamicParameterizedType, UserType {
 	public Object nullSafeGet(ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner)
 			throws HibernateException, SQLException {
 		final Object value = rs.getObject(names[0]);
-		return rs.wasNull() ? null : ValueEnum.of(returnedClass().asSubclass(ValueEnum.class), value);
+		return rs.wasNull() ? null : ValueEnum.of(returnedClass().asSubclass(Enum.class), value);
 	}
 
 	@Override

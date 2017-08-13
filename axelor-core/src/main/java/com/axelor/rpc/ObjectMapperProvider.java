@@ -260,11 +260,10 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 		private Class<?> enumType;
 
 		@Override
-		@SuppressWarnings("unchecked")
 		public Enum<?> deserialize(JsonParser p, DeserializationContext ctxt)
 				throws IOException, JsonProcessingException {
 			if (ValueEnum.class.isAssignableFrom(enumType)) {
-				return ValueEnum.of(enumType.asSubclass(ValueEnum.class), p.getCurrentToken().isNumeric()
+				return ValueEnum.of(enumType.asSubclass(Enum.class), p.getCurrentToken().isNumeric()
 						? p.getValueAsInt()
 						: p.getValueAsString());
 			}
