@@ -38,10 +38,6 @@
                 Define an Entity (domain model).
               </xsd:documentation>
             </xsd:annotation>
-            <xsd:unique name="unique-entity-items">
-              <xsd:selector xpath="dm:*" />
-              <xsd:field xpath="@name" />
-            </xsd:unique>
           </xsd:element>
         </xsd:choice>
       </xsd:sequence>
