@@ -18,6 +18,7 @@
     "broccoli-merge-trees": "^2.0.0",
     "broccoli-postcss": "^3.3.0",
     "broccoli-uglify-sourcemap": "^1.5.2",
+    "heimdalljs-logger": "^0.1.9",
     "postcss-cssnext": "^2.10.0",
     "postcss-import": "^9.1.0",
     "postcss-url": "^6.0.4",
