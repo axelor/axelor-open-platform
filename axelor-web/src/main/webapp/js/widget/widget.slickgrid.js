@@ -480,6 +480,19 @@ _.extend(Factory.prototype, {
 			return '<span>' + value + '</span>';
 		}
 
+		// try to get dotted field value from related object
+		if ((value === null || value === undefined) && field.name && field.name.indexOf('.') > -1) {
+			var path = field.name.split('.');
+			var val = dataContext || {};
+			var idx = 0;
+			while (val && idx < path.length) {
+				val = val[path[idx++]];
+			}
+			if (idx === path.length) {
+				value = val;
+			}
+		}
+
 		var fn = Formatters[type];
 		if (fn) {
 			value = fn(field, value, dataContext, this.grid);
