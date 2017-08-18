@@ -141,7 +141,7 @@ public class JpaScanner extends AbstractScannerImpl {
 				// pre-initialize context handler proxies
 				ContextHandlerFactory.refresh(modelCache.values());
 
-				log.debug("Entitity classes found: {}", modelCache.size());
+				log.debug("Entity classes found: {}", modelCache.size());
 			});
 			final Future<?> repos = executor.submit(() -> {
 				log.debug("Searching for repository classes...");
