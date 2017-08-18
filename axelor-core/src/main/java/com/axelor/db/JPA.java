@@ -597,7 +597,10 @@ public final class JPA {
 			if (value instanceof List && deep) {
 				List items = Lists.newArrayList();
 				for(Object item : (List) value) {
-					items.add(copy((Model) item, true));
+					Object val = copy((Model) item, true);
+					// break bi-directional association
+					p.setAssociation(val, null);
+					items.add(val);
 				}
 				value = items;
 			} else if (value instanceof List) {
@@ -610,7 +613,12 @@ public final class JPA {
 				value = ((String) value) + " Copy (" +  random + ")";
 			}
 
-			p.set(obj, value);
+			if (p.getType() == PropertyType.ONE_TO_MANY) {
+				// prevent auto bi-directional association
+				mapper.set(obj, p.getName(), value);
+			} else {
+				p.set(obj, value);
+			}
 		}
 
 		return obj;
