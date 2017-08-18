@@ -47,12 +47,6 @@ function ChartCtrl($scope, $element, $http, ActionService) {
 		var context = $scope._context || {};
 		if ($scope.getContext) {
 			context = _.extend({}, $scope.getContext(), context);
-			if ($scope.onSave && !context.id) { // if embedded inside form view
-				if (viewChart) {
-					$scope.render(_.omit(viewChart, 'dataset'));
-				}
-				return;
-			}
 		}
 		
 		if (searchScope) {
