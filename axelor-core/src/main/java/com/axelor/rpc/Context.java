@@ -89,7 +89,8 @@ public class Context extends SimpleBindings {
 	private static final String KEY_MODEL = "_model";
 	private static final String KEY_PARENT = "_parent";
 	private static final String KEY_PARENT_CONTEXT = "parentContext";
-	
+
+	static final String KEY_ID = "id";
 	static final String KEY_JSON_ATTRS = "attrs";
 	static final String KEY_JSON_MODEL = "jsonModel";
 	static final String KEY_JSON_PREFIX = "$";

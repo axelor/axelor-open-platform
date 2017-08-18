@@ -77,13 +77,10 @@ public class JsonContext extends SimpleBindings {
 	}
 
 	public JsonContext(MetaJsonRecord record) {
-		this(Objects.requireNonNull(record).getJsonModel(), record.getAttrs());
-	}
-
-	public JsonContext(String jsonModel, String jsonValue) {
-		super(fromJson(jsonValue));
+		super(fromJson(Objects.requireNonNull(record).getAttrs()));
 		this.context = new Context(MetaJsonRecord.class);
-		this.context.put(Context.KEY_JSON_MODEL, jsonModel);
+		this.context.put(Context.KEY_ID, record.getId());
+		this.context.put(Context.KEY_JSON_MODEL, record.getJsonModel());
 		this.jsonField = Context.KEY_JSON_ATTRS;
 		this.fields = findFields();
 	}
@@ -130,6 +127,10 @@ public class JsonContext extends SimpleBindings {
 
 	private void propagate() {
 		context.put(jsonField, toJson(this));
+	}
+
+	public Long getId() {
+		return context == null ? null : (Long) context.get(Context.KEY_ID);
 	}
 
 	@Override
