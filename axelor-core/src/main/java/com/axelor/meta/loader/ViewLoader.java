@@ -55,7 +55,6 @@ import com.axelor.meta.db.repo.MetaActionMenuRepository;
 import com.axelor.meta.db.repo.MetaActionRepository;
 import com.axelor.meta.db.repo.MetaMenuRepository;
 import com.axelor.meta.db.repo.MetaSelectRepository;
-import com.axelor.meta.db.repo.MetaViewCustomRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
@@ -91,9 +90,6 @@ public class ViewLoader extends AbstractLoader {
 	
 	@Inject
 	private MetaViewRepository views;
-	
-	@Inject
-	private MetaViewCustomRepository customViews;
 
 	@Inject
 	private MetaSelectRepository selects;
@@ -133,11 +129,6 @@ public class ViewLoader extends AbstractLoader {
 		if (unresolved.size() > 0) {
 			log.error("unresolved items: {}", unresolved);
 			throw new PersistenceException("There are some unresolve items, check the log.");
-		}
-		
-		int deleted = Beans.get(MetaService.class).removeCustomViews();
-		if (deleted > 0) {
-			log.info(deleted + " custom views are deleted.");
 		}
 	}
 
@@ -242,7 +233,10 @@ public class ViewLoader extends AbstractLoader {
 
 		// delete personalized dashboards
 		if ("dashboard".equals(type) && !xml.equals(entity.getXml())) {
-			customViews.all().filter("self.name = ? AND self.user is not null", entity.getName()).remove();
+			int deleted = Beans.get(MetaService.class).removeCustomViews(entity);
+			if (deleted > 0) {
+				log.info(deleted + " custom views are deleted : " + entity.getName());
+			}
 		}
 
 		entity.setXmlId(xmlId);
