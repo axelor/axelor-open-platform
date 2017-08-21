@@ -458,11 +458,6 @@ public class MetaService {
 		return customViews.all().filter("self.name = :name").bind("name", view.getName()).delete();
 	}
 
-	@Transactional
-	public int removeCustomViews() {
-		return customViews.all().delete();
-	}
-
 	@SuppressWarnings("all")
 	public Response runSearch(Request request) {
 		Response response = new Response();
